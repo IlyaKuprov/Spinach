@@ -1,0 +1,38 @@
+{{DISPLAYTITLE:function.m}} __NOTOC__
+A description of what the function does and how.
+
+==Syntax==
+
+     function call string
+
+==Arguments==
+
+     argument      - description of the argument
+ 
+     argument      - description of the argument
+                     description of the argument
+
+==Outputs==
+
+     output  - description of the output
+ 
+     output  - description of the output
+               description of the output
+
+==Examples==
+A description of what is done in the example below:
+
+     % Comment
+     matlab code
+ 
+     % Comment
+     matlab code
+
+==Notes==
+Further notes on good and bad practices.
+
+==See also==
+Links to related functions and documentation sections.
+
+
+''Version 2.8, authors: [[Author 1]]''

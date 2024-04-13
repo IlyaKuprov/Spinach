@@ -1,0 +1,5 @@
+Soft pulses:
+
+1. All pulse powers are in rad/s.
+
+2. All pulse frequencies are in Hz.

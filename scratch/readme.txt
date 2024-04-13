@@ -1,0 +1,1 @@
+Spinach requires write access to this directory. Its location may be changed by editing autoexec.m in kernel/includes folder.

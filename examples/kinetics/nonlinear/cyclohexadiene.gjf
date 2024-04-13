@@ -1,0 +1,37 @@
+%Chk=cyclohexadiene.chk
+%Mem=16GB
+%NProcShared=16
+#p opt=tight m06/cc-pvdz scf=tight 
+   scrf=(smd,solvent=chloroform) integral=(grid=ultrafine)
+
+Geometry
+
+0 1
+ C                 -2.29012186   -1.03891595   -0.23976984
+ C                 -0.76566742   -1.05935613    0.00435372
+ C                 -0.20092553    0.35734442    0.24518888
+ C                 -0.99891520    1.41084408    0.50023818
+ C                 -2.45776316    1.47450647   -0.00144415
+ C                 -2.95689859    0.10102813   -0.49983808
+ H                  0.85829931    0.50522814    0.21242971
+ H                 -0.58941987   -1.67909947    0.85861070
+ H                 -0.25895664   -1.46232242   -0.84756315
+ H                 -0.60896672    2.23192489    1.06474371
+ H                 -2.53877167    2.15792974   -0.82075499
+ H                 -3.05971300    1.81379283    0.81552658
+ H                 -3.86353463    0.05367146   -1.06611401
+ H                 -2.83265912   -1.96052380   -0.20524027
+
+--Link1--
+%Chk=cyclohexadiene.chk
+%Mem=16GB
+%NProcShared=16
+#p nmr=(giao,mixed,spinspin) m06/cc-pvdz geom=checkpoint
+   integral=(grid=ultrafine) scrf=(smd,solvent=chloroform)
+   scf=tight guess=read
+
+Magnetic properties
+
+0 1
+
+

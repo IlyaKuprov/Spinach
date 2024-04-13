@@ -1,0 +1,26 @@
+%Chk=acetylene.chk
+%Mem=8GB
+%NProcShared=8
+#p opt=tight m06/cc-pvtz scf=tight 
+   scrf=(smd,solvent=chloroform) integral=(grid=ultrafine)
+
+Geometry
+
+0 1
+ C                 -1.80121087    0.57013120    0.00000000
+ H                 -2.87121087    0.57013120    0.00000000
+ C                 -0.60001087    0.57013120    0.00000000
+ H                  0.46998913    0.57013120    0.00000000
+
+--Link1--
+%Chk=acetylene.chk
+%Mem=8GB
+%NProcShared=8
+#p nmr=(giao,mixed,spinspin) m06/cc-pvtz geom=checkpoint
+   integral=(grid=ultrafine) scrf=(smd,solvent=chloroform)
+   scf=tight guess=read
+
+Magnetic properties
+
+0 1
+

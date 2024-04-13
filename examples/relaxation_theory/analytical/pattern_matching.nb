@@ -1,0 +1,2289 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 6.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[    104648,       2280]
+NotebookOptionsPosition[     99608,       2135]
+NotebookOutlinePosition[    100427,       2160]
+CellTagsIndexPosition[    100384,       2157]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[TextData[StyleBox["Fundamentals of Pattern Matching",
+ FontColor->GrayLevel[0.5]]], "Title",
+ CellChangeTimes->{{3.4033384525984616`*^9, 3.4033384766691866`*^9}, {
+  3.4033386741995125`*^9, 3.403338677967826*^9}, {3.4033388210729246`*^9, 
+  3.403338835799521*^9}, {3.403340373121048*^9, 3.4033404065573845`*^9}, {
+  3.666172472612458*^9, 3.6661724827080317`*^9}},
+ TextAlignment->Center],
+
+Cell[TextData[StyleBox["Ilya Kuprov, University of Southampton, 2016",
+ FontSlant->"Italic"]], "Subsubtitle",
+ CellChangeTimes->{{3.666172372791619*^9, 3.666172388196421*^9}},
+ TextAlignment->Center],
+
+Cell[TextData[StyleBox["Mathematica is very powerful, flexible and efficient \
+in applying the knowledge you give it. Initially, however, it knows nothing \
+-- not even that H is a Hamiltonian. Our job here is to provide it with the \
+necessary knowledge (which it would trust completely, be it right, wrong or \
+approximate). It would then be able to apply that knowledge with astronomical \
+speed to analytical problems that may be too large to be treated by a human.",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392359096546`*^9}, {
+  3.403339932198097*^9, 3.4033400761273613`*^9}, {3.4033401098673897`*^9, 
+  3.403340209649089*^9}, {3.4033402586449766`*^9, 3.403340308463077*^9}, {
+  3.403340434347598*^9, 3.403340534071684*^9}, {3.403358505284734*^9, 
+  3.4033585592197585`*^9}, {3.403459660577959*^9, 3.403459715684784*^9}, {
+  3.4034598067941866`*^9, 3.403459839937573*^9}, {3.6661720322199144`*^9, 
+  3.666172064236706*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Declaring patterns and associating them with symbols or operations\
+\>", "Section",
+ CellChangeTimes->{{3.4033384525984616`*^9, 3.4033384766691866`*^9}, {
+   3.4033386741995125`*^9, 3.403338677967826*^9}, {3.4033388210729246`*^9, 
+   3.403338835799521*^9}, {3.403460216154704*^9, 3.403460217132181*^9}, {
+   3.4035123588456793`*^9, 3.4035123642291236`*^9}, {3.403607839787242*^9, 
+   3.403607861744821*^9}, {3.4036268563679543`*^9, 3.4036268565339594`*^9}, 
+   3.6661727255860996`*^9}],
+
+Cell[TextData[{
+ "At the outset, ",
+ StyleBox["Mathematica\[CloseCurlyQuote]",
+  FontSlant->"Italic"],
+ "s kernel knows very little about spin dynamics in the notation that we \
+commonly use. For example, is not aware of the fact that our operators are \
+linear and it would not open the brackets (press Shift-Enter here and below \
+to evaluate the cells):"
+}], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392359096546`*^9}, {
+  3.4034588882689915`*^9, 3.4034589007310843`*^9}, {3.403510475861706*^9, 
+  3.403510493251218*^9}, {3.4035300608337727`*^9, 3.4035300994279823`*^9}, {
+  3.403592874696241*^9, 3.403592875413968*^9}, {3.6661720752683525`*^9, 
+  3.6661721051400557`*^9}},
+ FontSize->16,
+ FontSlant->"Italic"],
+
+Cell[BoxData[
+ RowBox[{"H", ".", 
+  RowBox[{"(", 
+   RowBox[{
+    RowBox[{"2", "*", "Lx"}], "+", 
+    RowBox[{"3", "*", "Ly"}], "-", 
+    RowBox[{"5", "*", "Lz"}]}], ")"}]}]], "Input",
+ CellChangeTimes->{{3.4033394772301464`*^9, 3.403339497844062*^9}, {
+  3.403339713462097*^9, 3.4033397140147963`*^9}, {3.4034588202460012`*^9, 
+  3.4034588555288997`*^9}, {3.4036099649646983`*^9, 3.403609978123036*^9}}],
+
+Cell[TextData[StyleBox["Here the dot '.' is a symbol for the matrix \
+multiplication (and any other non-commutative multiplication), whereas the \
+star '*' denotes commutative multiplication. In order to inform the kernel \
+that our operators are linear, we need to declare a linearity pattern:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+  3.4034589236007147`*^9, 3.403459034973469*^9}, {3.4035123921628823`*^9, 
+  3.403512395737849*^9}, {3.4035124260786805`*^9, 3.403512428550202*^9}, {
+  3.4035300851652236`*^9, 3.403530105002821*^9}, {3.6661721222530236`*^9, 
+  3.6661721301804857`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"H", "/:", 
+   RowBox[{"H", ".", 
+    RowBox[{"(", 
+     RowBox[{"A_", "+", "B_"}], ")"}]}], ":=", 
+   RowBox[{
+    RowBox[{"H", ".", "A"}], "+", 
+    RowBox[{"H", ".", "B"}]}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.40333849785826*^9, 3.4033386620020514`*^9}, {
+   3.4033387042942657`*^9, 3.4033387308121*^9}, {3.403338767848792*^9, 
+   3.40333880508469*^9}, {3.4033389357433195`*^9, 3.403338980331286*^9}, {
+   3.4033390263742375`*^9, 3.4033390555071383`*^9}, {3.4033396498616753`*^9, 
+   3.403339650917272*^9}, 3.4035105148670216`*^9, 3.4035105456160297`*^9}],
+
+Cell[TextData[{
+ StyleBox["This is a simple replacement pattern. To read it literally: \
+\"Pattern to be associated with the H symbol. Upon encountering a match to ",
+  FontSize->16,
+  FontSlant->"Italic"],
+ "H.(A+B)",
+ StyleBox[", just replace it with ",
+  FontSize->16,
+  FontSlant->"Italic"],
+ "H.A + H.B, asking no questions about what those symbols actually are",
+ StyleBox["\". Now the brackets would open:",
+  FontSize->16,
+  FontSlant->"Italic"]
+}], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+  3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+  3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+  3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.403512464362363*^9, 
+  3.4035125452087507`*^9}, {3.6661721475884743`*^9, 3.666172149068534*^9}}],
+
+Cell[BoxData[
+ RowBox[{"H", ".", 
+  RowBox[{"(", 
+   RowBox[{
+    RowBox[{"2", "*", "Lx"}], "+", 
+    RowBox[{"3", "*", "Ly"}], "-", 
+    RowBox[{"5", "*", "Lz"}]}], ")"}]}]], "Input",
+ CellChangeTimes->{{3.4033388838511333`*^9, 3.4033389251746597`*^9}, {
+   3.4033389858963594`*^9, 3.403338986256688*^9}, 3.4033395056218843`*^9, {
+   3.403339721221366*^9, 3.4033397217242637`*^9}, 3.4036099843462706`*^9}],
+
+Cell["\<\
+However, the scalars are not taken out of the brackets because the kernel \
+does not know that multiplication by a complex scalar commutes with matrix \
+multiplication. We can tell it to check whether one of the multipliers is a \
+complex number and, if such a number is encountered, to take it out. For that \
+we would need a conditional pattern.\
+\>", "Text",
+ CellChangeTimes->{{3.4034591705136223`*^9, 3.403459273991374*^9}, {
+  3.4035124501650295`*^9, 3.4035124523328595`*^9}, {3.403626867316472*^9, 
+  3.4036268675811043`*^9}, {3.66617215597994*^9, 3.6661721608282156`*^9}},
+ FontSize->16,
+ FontSlant->"Italic"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Adding conditions to patterns", "Section",
+ CellChangeTimes->{{3.4033384525984616`*^9, 3.4033384766691866`*^9}, {
+   3.4033386741995125`*^9, 3.403338677967826*^9}, {3.4033388210729246`*^9, 
+   3.403338835799521*^9}, {3.403460216154704*^9, 3.403460217132181*^9}, {
+   3.4035123588456793`*^9, 3.4035123642291236`*^9}, {3.403607839787242*^9, 
+   3.403607861744821*^9}, {3.4036268563679543`*^9, 3.4036268873952656`*^9}, {
+   3.6661716279722385`*^9, 3.6661716370196075`*^9}, 3.6661727299147463`*^9}],
+
+Cell[TextData[StyleBox["To declare a conditional pattern, the '/;' symbol is \
+used, which can be interpreted as 'whenever':",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+  3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+  3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+  3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+  3.4034595138715286`*^9}, {3.403512700896052*^9, 3.4035127022709637`*^9}, {
+  3.4036271744960303`*^9, 3.403627206348484*^9}, {3.666172195212823*^9, 
+  3.666172207492777*^9}}],
+
+Cell[BoxData[
+ RowBox[{"H", "/:", 
+  RowBox[{"H", ".", 
+   RowBox[{"(", 
+    RowBox[{"A_", "*", "B_"}], ")"}]}], ":=", 
+  RowBox[{
+   RowBox[{"A", "*", 
+    RowBox[{"H", ".", "B"}]}], "/;", 
+   RowBox[{"A", "\[Element]", "Complexes"}]}]}]], "Input",
+ CellChangeTimes->{{3.40333849785826*^9, 3.4033386620020514`*^9}, {
+  3.4033387042942657`*^9, 3.4033387308121*^9}, {3.403338767848792*^9, 
+  3.40333880508469*^9}, {3.4033389357433195`*^9, 3.403338980331286*^9}, {
+  3.4033390263742375`*^9, 3.4033390555071383`*^9}, {3.4033395936035576`*^9, 
+  3.403339647165559*^9}, {3.403625801883688*^9, 3.4036258724768257`*^9}}],
+
+Cell[TextData[{
+ StyleBox["In human language, this reads: \"Pattern to be associated with the \
+H symbol. Upon encountering a match to ",
+  FontSize->16,
+  FontSlant->"Italic"],
+ "H.(A*B)",
+ StyleBox[", take A out, but only if it's a complex scalar\". ",
+  FontSize->16,
+  FontSlant->"Italic"],
+ "Now the scalars would be taken out:"
+}], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+  3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+  3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+  3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+  3.4034595138715286`*^9}, {3.403512700896052*^9, 3.4035127022709637`*^9}, {
+  3.4036272129818487`*^9, 3.403627217420041*^9}, {3.666172220228342*^9, 
+  3.6661722216446676`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"H", ".", 
+  RowBox[{"(", 
+   RowBox[{
+    RowBox[{"2", "*", "Lx"}], "+", 
+    RowBox[{"3", "*", "Ly"}], "-", 
+    RowBox[{"5", "*", "Lz"}]}], ")"}]}]], "Input",
+ CellChangeTimes->{{3.403339729748164*^9, 3.40333973030184*^9}, 
+   3.4036099883382025`*^9}],
+
+Cell[TextData[StyleBox["We can actually declare the linearity property for \
+the operator dot product (denoted A.B or Dot[A,B]) in full generality. By \
+default, the dot product keyword is protected, but we know what we are doing, \
+and so we would remove the protection:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+  3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+  3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+  3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+  3.4034595138715286`*^9}, {3.4034598973626084`*^9, 3.4034599978327403`*^9}, {
+  3.4034603019636655`*^9, 3.4034603667739706`*^9}, {3.4034605051928453`*^9, 
+  3.403460533461544*^9}, {3.4034606662645674`*^9, 3.4034606827908535`*^9}, {
+  3.403510788011648*^9, 3.4035108104887257`*^9}, {3.403511083995634*^9, 
+  3.403511289284252*^9}, {3.40351184111905*^9, 3.403511855726514*^9}, {
+  3.403629502008193*^9, 3.4036295141539*^9}, {3.666172230733107*^9, 
+  3.6661722500369167`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Unprotect", "[", "Dot", "]"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Dot", "/:", 
+   RowBox[{"Dot", "[", 
+    RowBox[{"A_", ",", 
+     RowBox[{"B_", "+", "C_"}]}], "]"}], ":=", 
+   RowBox[{
+    RowBox[{"A", ".", "B"}], "+", 
+    RowBox[{"A", ".", "C"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Dot", "/:", 
+   RowBox[{"Dot", "[", 
+    RowBox[{
+     RowBox[{"A_", "+", "B_"}], ",", "C_"}], "]"}], ":=", 
+   RowBox[{
+    RowBox[{"A", ".", "C"}], "+", 
+    RowBox[{"B", ".", "C"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Dot", "/:", 
+  RowBox[{"Dot", "[", 
+   RowBox[{"A_", ",", 
+    RowBox[{"B_", "*", "C_"}]}], "]"}], ":=", 
+  RowBox[{
+   RowBox[{"B", "*", 
+    RowBox[{"A", ".", "C"}]}], "/;", 
+   RowBox[{"B", "\[Element]", "Complexes"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"Dot", "/:", 
+  RowBox[{"Dot", "[", 
+   RowBox[{
+    RowBox[{"A_", "*", "B_"}], ",", "C_"}], "]"}], ":=", 
+  RowBox[{
+   RowBox[{"A", "*", 
+    RowBox[{"B", ".", "C"}]}], "/;", 
+   RowBox[{"A", "\[Element]", "Complexes"}]}]}]}], "Input",
+ CellChangeTimes->{{3.4035108580530643`*^9, 3.403510914447892*^9}, {
+  3.403510984080154*^9, 3.403511049938244*^9}, {3.403511536653186*^9, 
+  3.4035115582494593`*^9}, {3.4035116471304893`*^9, 3.4035117588352537`*^9}, {
+  3.40351260845275*^9, 3.4035126195955915`*^9}, {3.403625810508136*^9, 
+  3.403625815020542*^9}, {3.4036258764648523`*^9, 3.4036258835493593`*^9}}],
+
+Cell[TextData[StyleBox["Linearity is now specified in full. Mathematica still \
+has no idea what those symbols actually mean, but it knows what it can do \
+with them. We generally want to keep it that way -- symbolic processing then \
+becomes very fast because no time is spent in unnecessary transformation and \
+simplification attempts. For example:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+  3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+  3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+  3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+  3.4034595138715286`*^9}, {3.4034598973626084`*^9, 3.4034599978327403`*^9}, {
+  3.4034603019636655`*^9, 3.4034603667739706`*^9}, {3.4034605051928453`*^9, 
+  3.403460533461544*^9}, {3.4034606662645674`*^9, 3.4034606827908535`*^9}, {
+  3.403510788011648*^9, 3.4035108104887257`*^9}, {3.403511083995634*^9, 
+  3.403511289284252*^9}, {3.403511331032557*^9, 3.403511367971599*^9}, {
+  3.4035119249173975`*^9, 3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+  3.4035122749750705`*^9}, {3.6661722577968035`*^9, 3.666172272180277*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(", 
+   RowBox[{
+    RowBox[{"3", " ", "Lx"}], "+", " ", "Ly", "-", "Lz"}], ")"}], ".", 
+  RowBox[{"(", 
+   RowBox[{
+    RowBox[{"3", " ", "Sx"}], "+", "Sy"}], ")"}]}]], "Input",
+ CellChangeTimes->{{3.4035113794816046`*^9, 3.4035113898100452`*^9}, {
+  3.4035116294167795`*^9, 3.403511631534808*^9}, {3.4035116909294443`*^9, 
+  3.403511694416526*^9}, {3.4035117741125965`*^9, 3.403511777927782*^9}, {
+  3.4035118908668423`*^9, 3.4035118948988113`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Processing huge commutators", "Section",
+ CellChangeTimes->{{3.4033384525984616`*^9, 3.4033384766691866`*^9}, {
+   3.4033386741995125`*^9, 3.403338677967826*^9}, {3.4033388210729246`*^9, 
+   3.403338835799521*^9}, {3.403460216154704*^9, 3.4034602378095684`*^9}, {
+   3.4035123336002245`*^9, 3.403512346502719*^9}, {3.403629842114354*^9, 
+   3.4036298464090014`*^9}, {3.6661716665566206`*^9, 3.6661716677317047`*^9}, 
+   3.6661727339164124`*^9}],
+
+Cell[TextData[StyleBox["We shall now specify a few additional patterns that \
+would enable Mathematica to reduce analytically commutators of any size. \
+Firstly, we need to define a symbol for the commutator. The brackets are \
+reserved by the system, but we can use something else, for example a diamond:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->CompressedData["
+1:eJxTTMoPSmViYGAQBWIQnfT93dao6JeOZUK9h0A017IvF0A0i0XKJRC9RXPe
+TRCts9/iFohW4Be2nwqkr21TAdNN5/bEguhlTFJZILrKeEE+iJ7w2LocRNfO
+0l4Oos8v3bUZREde23cTRMcdufEQRJ/SVvsMon8cWfcNRIeVe7BPA9Jr/CI5
+QXROfEPDOiC9ZLF/M4i2uVO/FETPkNDcD6K3ciUeAdHh4v9PgOig6Ll864E0
+09nlkiA66aqIBYg+bhxvBaIVXj0uBdE9R3OaQPSWJp+LIHpaEM91EH13k+oL
+EL1j+VMwHWcT/BFEZ3CdBtNPtlY9XhXw2nHRbYWnIHpK0hbj1UD6S/MtSxAN
+ANCBsig=
+  "]],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Diamond", "/:", 
+   TagBox[
+    StyleBox[
+     RowBox[{"Diamond", "[", 
+      RowBox[{"A_", ",", "B_"}], "]"}],
+     ShowSpecialCharacters->False,
+     ShowStringCharacters->True,
+     NumberMarks->True],
+    FullForm], ":=", 
+   RowBox[{
+    RowBox[{"A", ".", "B"}], "-", 
+    RowBox[{"B", ".", "A"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Lx", "\[Diamond]", "Ly"}]}], "Input",
+ CellChangeTimes->{{3.403513601191945*^9, 3.4035137231323824`*^9}, {
+  3.4035206154861655`*^9, 3.403520730464158*^9}, {3.4035207702360263`*^9, 
+  3.403520804943766*^9}, {3.4035208397725916`*^9, 3.403520910052273*^9}}],
+
+Cell[TextData[StyleBox["There are many ways to specify patterns required for \
+commutator simplification. The general rule is that they shoud be as simple \
+as possible. We will use a simple multiplication table here, associated with \
+the dot product:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->CompressedData["
+1:eJxTTMoPSmViYGAQAWIQnfT93dao6JeOZUK9h0A017IvF0A0i0XKJRC9RXPe
+TRCts9/iFohW4Be2nwqkr21TAdNN5/bEguhlTFJZILrKeEE+iJ7w2LocRNfO
+0l4Oos8v3bUZREde23cTRMcdufEQRJ/SVvsMon8cWfcNRIeVe7BPA9Jr/CI5
+QXROfEPDOiC9ZLF/M4i2uVO/FETPkNDcD6K3ciUeAdHh4v9PgOig6Ll864E0
+09nlkiA66aqIBYg+bhxvBaIVXj0uBdE9R3OaQPSWJp+LIHpaEM91EH13k+oL
+EL1j+VMwHWcT/BFEZ3CdBtMGEwoqNgPpIqOIZhANANTep0U=
+  "]],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Unprotect", "[", "Dot", "]"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Dot", "/:", 
+   RowBox[{"Dot", "[", 
+    RowBox[{"Lx", ",", "Ly"}], "]"}], ":=", 
+   RowBox[{
+    FractionBox["\[ImaginaryI]", "2"], " ", "Lz"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Dot", "/:", 
+   RowBox[{"Dot", "[", 
+    RowBox[{"Lx", ",", "Lz"}], "]"}], ":=", 
+   RowBox[{
+    RowBox[{"-", 
+     FractionBox["\[ImaginaryI]", "2"]}], " ", "Ly"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Dot", "/:", 
+   RowBox[{"Dot", "[", 
+    RowBox[{"Ly", ",", "Lx"}], "]"}], ":=", 
+   RowBox[{
+    RowBox[{"-", 
+     FractionBox["\[ImaginaryI]", "2"]}], " ", "Lz"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Dot", "/:", 
+   RowBox[{"Dot", "[", 
+    RowBox[{"Ly", ",", "Lz"}], "]"}], ":=", 
+   RowBox[{
+    FractionBox["\[ImaginaryI]", "2"], " ", "Lx"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Dot", "/:", 
+   RowBox[{"Dot", "[", 
+    RowBox[{"Lz", ",", "Lx"}], "]"}], ":=", 
+   RowBox[{
+    FractionBox["\[ImaginaryI]", "2"], " ", "Ly"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Dot", "/:", 
+   RowBox[{"Dot", "[", 
+    RowBox[{"Lz", ",", "Ly"}], "]"}], ":=", 
+   RowBox[{
+    RowBox[{"-", 
+     FractionBox["\[ImaginaryI]", "2"]}], " ", "Lx"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Lp", ":=", 
+   RowBox[{"Lx", "+", 
+    RowBox[{"\[ImaginaryI]", " ", "Ly"}]}]}], ";", 
+  RowBox[{"Lm", ":=", 
+   RowBox[{"Lx", "-", 
+    RowBox[{"\[ImaginaryI]", " ", "Ly"}]}]}], 
+  ";"}], "\[IndentingNewLine]"}], "Input",
+ CellChangeTimes->{{3.4035210597155457`*^9, 3.4035210689630003`*^9}, {
+  3.403521292572712*^9, 3.4035213490202713`*^9}, {3.4035214013362584`*^9, 
+  3.403521405534232*^9}, {3.403521467600572*^9, 3.4035215210903125`*^9}, {
+  3.403521596227105*^9, 3.4035216251666594`*^9}, {3.4035929394518623`*^9, 
+  3.40359294413125*^9}, {3.6661717283566303`*^9, 3.6661717293254137`*^9}}],
+
+Cell[TextData[StyleBox["Now for a nested eighteen-fold (!) commutator:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603966744003`*^9}, {3.403460587840876*^9, 3.4034606532986*^9}, 
+   3.403510570739422*^9, {3.403521571362486*^9, 3.4035215772253914`*^9}, {
+   3.4035216546091104`*^9, 3.40352169316426*^9}, {3.403521760462687*^9, 
+   3.4035217732196827`*^9}, {3.6661717464302654`*^9, 
+   3.6661717472898207`*^9}, {3.66617255490869*^9, 3.666172559588935*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(", 
+   RowBox[{"Lp", "\[Diamond]", 
+    RowBox[{"(", 
+     RowBox[{"Lz", "\[Diamond]", 
+      RowBox[{"(", 
+       RowBox[{"Ly", "\[Diamond]", 
+        RowBox[{"(", 
+         RowBox[{"Lp", "\[Diamond]", 
+          RowBox[{"(", 
+           RowBox[{"Lz", "\[Diamond]", 
+            RowBox[{"(", 
+             RowBox[{"Ly", "\[Diamond]", 
+              RowBox[{"(", 
+               RowBox[{"Lp", "\[Diamond]", 
+                RowBox[{"(", 
+                 RowBox[{"Lz", "\[Diamond]", 
+                  RowBox[{"(", 
+                   RowBox[{"Ly", "\[Diamond]", 
+                    RowBox[{"(", 
+                    RowBox[{"Lp", "\[Diamond]", 
+                    RowBox[{"(", 
+                    RowBox[{"Lz", "\[Diamond]", 
+                    RowBox[{"(", 
+                    RowBox[{"Ly", "\[Diamond]", 
+                    RowBox[{"(", 
+                    RowBox[{"Lp", "\[Diamond]", 
+                    RowBox[{"(", 
+                    RowBox[{"Lz", "\[Diamond]", 
+                    RowBox[{"(", 
+                    RowBox[{"Ly", "\[Diamond]", 
+                    RowBox[{"(", 
+                    RowBox[{"Lp", "\[Diamond]", 
+                    RowBox[{"(", 
+                    RowBox[{"Lz", "\[Diamond]", "Ly"}], ")"}]}], ")"}]}], 
+                    ")"}]}], ")"}]}], ")"}]}], ")"}]}], ")"}]}], ")"}]}], 
+                   ")"}]}], ")"}]}], ")"}]}], ")"}]}], ")"}]}], ")"}]}], 
+       ")"}]}], ")"}]}], ")"}], "//", "Timing"}]], "Input",
+ CellChangeTimes->{{3.403521632449396*^9, 3.4035217057269325`*^9}, {
+  3.4035218845934143`*^9, 3.403521960496759*^9}, {3.4035223608451586`*^9, 
+  3.4035223624524775`*^9}}],
+
+Cell[TextData[StyleBox["No matrix multiplication and no arithmetic has been \
+done above: only patterns were detected and replaced by other patterns -- \
+just as a human would do. The timing figure above is likely to be zero -- \
+that means it is less than a millisecond and the system could not measure it \
+accurately.",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603966744003`*^9}, {3.403460587840876*^9, 3.4034606532986*^9}, 
+   3.403510570739422*^9, {3.403521571362486*^9, 3.4035215772253914`*^9}, {
+   3.4035216546091104`*^9, 3.40352169316426*^9}, {3.403521760462687*^9, 
+   3.4035217732196827`*^9}, {3.403522729482697*^9, 3.403522762078267*^9}, {
+   3.4035229702719727`*^9, 3.403523051118361*^9}, {3.4035929741810846`*^9, 
+   3.4035929747318306`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[StyleBox["Exercise 1: a better pattern set for commutators",
+ FontColor->GrayLevel[0]]], "Section",
+ CellChangeTimes->{{3.4033384525984616`*^9, 3.4033384766691866`*^9}, {
+  3.4033386741995125`*^9, 3.403338677967826*^9}, {3.4033388210729246`*^9, 
+  3.403338835799521*^9}, {3.403460216154704*^9, 3.4034602378095684`*^9}, {
+  3.4035123336002245`*^9, 3.403512346502719*^9}, {3.403522074171124*^9, 
+  3.403522075610485*^9}, {3.4035221059269037`*^9, 3.403522146059101*^9}}],
+
+Cell[TextData[StyleBox["In Lie algebras (such as the spin state space) only \
+the commutators are defined well -- the products we used above might actually \
+change between spin systems. Overloading the definition table for the dot \
+product is also undesirable, as it may slow down the kernel (the full list is \
+checked every time dot is used). In a separate worksheet, program an \
+alternative pattern set, associated with Diamond operator and based on \
+directly matching commutators without opening them. Make sure you quit the \
+kernel (Menu > Evaluation > Quit Kernel > Local) to make it forget everything \
+we told it above. Double-click the arrow on the right of the section below \
+for one of the possible answers.",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->CompressedData["
+1:eJxTTMoPSmViYGCQBGIQnfT93dao6JeOZUK9h0A017IvF0A0i0XKJRC9RXPe
+TRCts9/iFohW4Be2nwqkr21TAdNN5/bEguhlTFJZILrKeEE+iJ7w2LocRNfO
+0l4Oos8v3bUZREde23cTRMcdufEQRJ/SVvsMon8cWfcNRIeVe7BPA9Jr/CI5
+QXROfEPDOiC9ZLF/M4i2uVO/FETPkNDcD6K3ciUeAdHh4v9PgOig6Ll864E0
+09nlkiA66aqIBYg+bhxvBaIVXj0uBdE9R3OaQPSWJp+LIHpaEM91EH13k+oL
+EL1j+VMwHWcT/BFEZ3CdBtN+TJt5tgBpIyZtCRDNse6OMYj2KPxnAqKnrJ7j
+CqK/ahYGgmi2hWm920HuWurRB6ITzuvcANEu7Esfg+jL5xNDVwe8dszj94kA
+0QATTc5j
+  "]],
+
+Cell[CellGroupData[{
+
+Cell["Answer", "Text",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.},
+ CellChangeTimes->{{3.403528988628961*^9, 3.403529017208186*^9}, {
+  3.403529279737282*^9, 3.403529287722122*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Diamond", "/:", 
+   RowBox[{"Diamond", "[", 
+    RowBox[{"A_", ",", 
+     RowBox[{"B_", "+", "C_"}]}], "]"}], ":=", 
+   RowBox[{
+    RowBox[{"A", "\[Diamond]", "B"}], "+", 
+    RowBox[{"A", "\[Diamond]", "C"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Diamond", "/:", 
+   RowBox[{"Diamond", "[", 
+    RowBox[{
+     RowBox[{"A_", "+", "B_"}], ",", "C_"}], "]"}], ":=", 
+   RowBox[{
+    RowBox[{"A", "\[Diamond]", "C"}], "+", 
+    RowBox[{"B", "\[Diamond]", "C"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Diamond", "/:", 
+  RowBox[{"Diamond", "[", 
+   RowBox[{"A_", ",", 
+    RowBox[{"B_", "*", "C_"}]}], "]"}], ":=", 
+  RowBox[{
+   RowBox[{"B", "*", 
+    RowBox[{"A", "\[Diamond]", "C"}]}], "/;", 
+   RowBox[{"B", "\[Element]", "Complexes"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"Diamond", "/:", 
+  RowBox[{"Diamond", "[", 
+   RowBox[{
+    RowBox[{"A_", "*", "B_"}], ",", "C_"}], "]"}], ":=", 
+  RowBox[{
+   RowBox[{"A", "*", 
+    RowBox[{"B", "\[Diamond]", "C"}]}], "/;", 
+   RowBox[{"A", "\[Element]", "Complexes"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Diamond", "/:", 
+    RowBox[{"Diamond", "[", 
+     RowBox[{"A_", ",", "A_"}], "]"}], ":=", "0"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Diamond", "/:", 
+   TagBox[
+    StyleBox[
+     RowBox[{"Diamond", "[", 
+      RowBox[{"Lx", ",", "Ly"}], "]"}],
+     ShowSpecialCharacters->False,
+     ShowStringCharacters->True,
+     NumberMarks->True],
+    FullForm], ":=", 
+   RowBox[{"\[ImaginaryI]", " ", "Lz"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Diamond", "/:", 
+   TagBox[
+    StyleBox[
+     RowBox[{"Diamond", "[", 
+      RowBox[{"Ly", ",", "Lx"}], "]"}],
+     ShowSpecialCharacters->False,
+     ShowStringCharacters->True,
+     NumberMarks->True],
+    FullForm], ":=", 
+   RowBox[{
+    RowBox[{"-", "\[ImaginaryI]"}], " ", "Lz"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Diamond", "/:", 
+   TagBox[
+    StyleBox[
+     RowBox[{"Diamond", "[", 
+      RowBox[{"Lx", ",", "Lz"}], "]"}],
+     ShowSpecialCharacters->False,
+     ShowStringCharacters->True,
+     NumberMarks->True],
+    FullForm], ":=", 
+   RowBox[{
+    RowBox[{"-", "\[ImaginaryI]"}], " ", "Ly"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Diamond", "/:", 
+   TagBox[
+    StyleBox[
+     RowBox[{"Diamond", "[", 
+      RowBox[{"Lz", ",", "Lx"}], "]"}],
+     ShowSpecialCharacters->False,
+     ShowStringCharacters->True,
+     NumberMarks->True],
+    FullForm], ":=", 
+   RowBox[{"\[ImaginaryI]", " ", "Ly"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Diamond", "/:", 
+   TagBox[
+    StyleBox[
+     RowBox[{"Diamond", "[", 
+      RowBox[{"Ly", ",", "Lz"}], "]"}],
+     ShowSpecialCharacters->False,
+     ShowStringCharacters->True,
+     NumberMarks->True],
+    FullForm], ":=", 
+   RowBox[{"\[ImaginaryI]", " ", "Lx"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Diamond", "/:", 
+   TagBox[
+    StyleBox[
+     RowBox[{"Diamond", "[", 
+      RowBox[{"Lz", ",", "Ly"}], "]"}],
+     ShowSpecialCharacters->False,
+     ShowStringCharacters->True,
+     NumberMarks->True],
+    FullForm], ":=", 
+   RowBox[{
+    RowBox[{"-", "\[ImaginaryI]"}], " ", "Lx"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Lp", ":=", 
+   RowBox[{"Lx", "+", 
+    RowBox[{"\[ImaginaryI]", " ", "Ly"}]}]}], ";", 
+  RowBox[{"Lm", ":=", 
+   RowBox[{"Lx", "-", 
+    RowBox[{"\[ImaginaryI]", " ", "Ly"}]}]}], 
+  ";"}], "\[IndentingNewLine]"}], "Input",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.},
+ CellChangeTimes->{{3.4035108580530643`*^9, 3.403510914447892*^9}, {
+   3.403510984080154*^9, 3.403511049938244*^9}, {3.403511536653186*^9, 
+   3.4035115582494593`*^9}, {3.4035116471304893`*^9, 
+   3.4035117588352537`*^9}, {3.40351260845275*^9, 3.4035126195955915`*^9}, {
+   3.4035243552839127`*^9, 3.4035244021578655`*^9}, {3.4035266998047523`*^9, 
+   3.403526750531974*^9}, {3.4035285080122614`*^9, 3.4035285152442207`*^9}, {
+   3.4035287899688244`*^9, 3.403528805392642*^9}, 3.403528881270598*^9, {
+   3.4035290015705156`*^9, 3.4035290127836647`*^9}, {3.4035290532674017`*^9, 
+   3.403529067368062*^9}, {3.403529161903027*^9, 3.4035291878915977`*^9}, {
+   3.403529222239009*^9, 3.4035292416205807`*^9}, {3.403529279737282*^9, 
+   3.403529287722122*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(", 
+   RowBox[{"Lp", "\[Diamond]", 
+    RowBox[{"(", 
+     RowBox[{"Lz", "\[Diamond]", 
+      RowBox[{"(", 
+       RowBox[{"Ly", "\[Diamond]", 
+        RowBox[{"(", 
+         RowBox[{"Lp", "\[Diamond]", 
+          RowBox[{"(", 
+           RowBox[{"Lz", "\[Diamond]", 
+            RowBox[{"(", 
+             RowBox[{"Ly", "\[Diamond]", 
+              RowBox[{"(", 
+               RowBox[{"Lp", "\[Diamond]", 
+                RowBox[{"(", 
+                 RowBox[{"Lz", "\[Diamond]", 
+                  RowBox[{"(", 
+                   RowBox[{"Ly", "\[Diamond]", 
+                    RowBox[{"(", 
+                    RowBox[{"Lp", "\[Diamond]", 
+                    RowBox[{"(", 
+                    RowBox[{"Lz", "\[Diamond]", 
+                    RowBox[{"(", 
+                    RowBox[{"Ly", "\[Diamond]", 
+                    RowBox[{"(", 
+                    RowBox[{"Lp", "\[Diamond]", 
+                    RowBox[{"(", 
+                    RowBox[{"Lz", "\[Diamond]", 
+                    RowBox[{"(", 
+                    RowBox[{"Ly", "\[Diamond]", 
+                    RowBox[{"(", 
+                    RowBox[{"Lp", "\[Diamond]", 
+                    RowBox[{"(", 
+                    RowBox[{"Lz", "\[Diamond]", "Ly"}], ")"}]}], ")"}]}], 
+                    ")"}]}], ")"}]}], ")"}]}], ")"}]}], ")"}]}], ")"}]}], 
+                   ")"}]}], ")"}]}], ")"}]}], ")"}]}], ")"}]}], ")"}]}], 
+       ")"}]}], ")"}]}], ")"}], "//", "Timing"}]], "Input",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.},
+ CellChangeTimes->{3.4035292877230988`*^9}],
+
+Cell[TextData[StyleBox["The patterns above are declared by simple enumeration \
+of cases. In later tutorials we will learn how to declare them much more \
+compactly, using membership checks.",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.},
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035221495940313`*^9, 3.403522241344018*^9}, {
+   3.403522462896244*^9, 3.4035224719513283`*^9}, {3.4035226048959446`*^9, 
+   3.4035226995363717`*^9}, {3.403528834107601*^9, 3.403528881269622*^9}, {
+   3.4035289687093377`*^9, 3.4035290127836647`*^9}, {3.4035290447337685`*^9, 
+   3.4035290452610784`*^9}, 3.4035293514035935`*^9, {3.403529885442655*^9, 
+   3.4035298906581416`*^9}}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Building an integrator", "Section",
+ CellChangeTimes->{{3.4033384525984616`*^9, 3.4033384766691866`*^9}, {
+   3.4033386741995125`*^9, 3.403338677967826*^9}, {3.4033388210729246`*^9, 
+   3.403338835799521*^9}, {3.403460216154704*^9, 3.4034602378095684`*^9}, {
+   3.403512348662737*^9, 3.4035123487584343`*^9}, {3.4035992010149636`*^9, 
+   3.403599201127261*^9}, {3.4036298572247157`*^9, 3.403629860679572*^9}, 
+   3.6661727403093443`*^9}],
+
+Cell[TextData[StyleBox["Many analyical spin dynamics problems lead to \
+integrals of highly specialized functions. Furthermore, the exact answer \
+might be unknown in principle, and the integral (for example of a correlation \
+function) must simply replaced by another symbol. In relaxation theory we \
+frequently encounter integrals of the following form:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->CompressedData["
+1:eJxTTMoPSmViYGCQAGIQnfT93dao6JeOZUK9h0A017IvF0A0i0XKJRC9RXPe
+TRCts9/iFohW4Be2nwqkr21TAdNN5/bEguhlTFJZILrKeEE+iJ7w2LocRNfO
+0l4Oos8v3bUZREde23cTRMcdufEQRJ/SVvsMon8cWfcNRIeVe7BPA9Jr/CI5
+QXROfEPDOiC9ZLF/M4i2uVO/FETPkNDcD6K3ciUeAdHh4v9PgOig6Ll864E0
+09nlkiA66aqIBYg+bhxvBaIVXj0uBdE9R3OaQPSWJp+LIHpaEM91EH13k+oL
+EL1j+VMwHWcT/BFEZ3CdBtMav+tXbgf5f7flARDtOjP+FIi+MiPpDIjOsFGb
+fAVIf5d2BNNFYnrK10Dq7t3UAtGP6uNjVwe8djzbtR9MAwBux8qg
+  "]],
+
+Cell[BoxData[
+ RowBox[{
+  SubsuperscriptBox["\[Integral]", "0", "\[Infinity]"], 
+  RowBox[{
+   RowBox[{"g", "[", "\[Tau]", "]"}], " ", 
+   SuperscriptBox["\[ExponentialE]", 
+    RowBox[{
+     RowBox[{"-", "\[ImaginaryI]"}], " ", "\[Omega]", " ", "\[Tau]"}]], 
+   RowBox[{"\[DifferentialD]", "\[Tau]"}]}]}]], "Input",
+ CellChangeTimes->{{3.4035307857785845`*^9, 3.4035308128256817`*^9}}],
+
+Cell[TextData[{
+ StyleBox["Because the kernel doesn't know (and neither do we) what the \
+correlation function g[",
+  FontSize->16,
+  FontSlant->"Italic"],
+ "\[Tau]",
+ StyleBox["] actually is, no amount of tinkering would help -- the integral \
+will stay unevaluated. We do, however, know from relaxation theory that we \
+can simply assume that this integral evaluates to a certain function \
+(so-called spectral density function) and leave it for the experimentalists \
+to mesure. We therefore need (1) to program an integrator that knows this, \
+and (2) to carry the result along without telling the kernel anything about \
+it.",
+  FontSize->16,
+  FontSlant->"Italic"]
+}], "Text",
+ CellChangeTimes->CompressedData["
+1:eJxTTMoPSmViYGCQAmIQnfT93dao6JeOZUK9h0A017IvF0A0i0XKJRC9RXPe
+TRCts9/iFohW4Be2nwqkr21TAdNN5/bEguhlTFJZILrKeEE+iJ7w2LocRNfO
+0l4Oos8v3bUZREde23cTRMcdufEQRJ/SVvsMon8cWfcNRIeVe7BPA9Jr/CI5
+QXROfEPDOiC9ZLF/M4i2uVO/FETPkNDcD6K3ciUeAdHh4v9PgOig6Ll864E0
+09nlkiA66aqIBYg+bhxvBaIVXj0uBdE9R3OaQPSWJp+LIHpaEM91EH13k+oL
+EL1j+VMwHWcT/BFEZ3CdBtMav+tXbgf5f7flARDtOjP+FIi+MiPpDIi+y+Lr
+uQNkX3FUEogOi1ZtuQKkC7bM6gTR2n3Rs8B8lqNgml+4TfcakGbY4KAHol/M
+a4xbHfDaMeuVdBKIBgC0mNm0
+  "]],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Int", "[", 
+    RowBox[{"A_", "+", "B_"}], "]"}], ":=", 
+   RowBox[{
+    RowBox[{"Int", "[", "A", "]"}], "+", 
+    RowBox[{"Int", "[", "B", "]"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Int", "[", 
+   RowBox[{"A_", " ", "B_"}], "]"}], ":=", 
+  RowBox[{
+   RowBox[{"A", " ", 
+    RowBox[{"Int", "[", "B", "]"}]}], "/;", 
+   RowBox[{"FreeQ", "[", 
+    RowBox[{"A", ",", "\[Tau]"}], "]"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Int", "[", 
+    RowBox[{
+     SuperscriptBox["\[ExponentialE]", 
+      RowBox[{"Times", "[", 
+       RowBox[{
+        RowBox[{"Complex", "[", 
+         RowBox[{"0", ",", "a_"}], "]"}], ",", "\[Tau]", ",", "\[Omega]"}], 
+       "]"}]], " ", 
+     RowBox[{"g", "[", "\[Tau]", "]"}]}], "]"}], ":=", 
+   RowBox[{"J", "[", 
+    RowBox[{"a", " ", "\[Omega]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Int", "[", 
+    RowBox[{"g", "[", "\[Tau]", "]"}], "]"}], ":=", 
+   RowBox[{"J", "[", "0", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Int", "[", "0", "]"}], ":=", "0"}], ";"}]}], "Input",
+ CellChangeTimes->{
+  3.403624586699746*^9, 3.4036246335385447`*^9, {3.40362467047954*^9, 
+   3.4036246708164325`*^9}, {3.403629185956156*^9, 3.403629196715233*^9}}],
+
+Cell[TextData[StyleBox["The first two patterns prescribe the integrator Int \
+to be linear. The FreeQ condition checks whether the integration variable \
+appears in the expression A before it's taken out. The third pattern is the \
+integration pattern itself (multiplication operation is written explicitly as \
+Times[a,b,c] and the complex scalar as Complex[a,b]), and the last two deal \
+with the special cases of missing exponential and zero integrand. We can now \
+easily integrate any number of correlation functions with any multipliers:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->CompressedData["
+1:eJwdz00og3EABvC1VtoShfJ1mULWlMMuw0oORPmoqWl72drbRJqmxEppa1yU
+r4s1Cym2pbQV71jIpC2a+Ww+hh00NA5qaJQD/+c9PP16Tk9PEW2Qd3E5HE4h
+CaS/370q6rV2KGvyAAqcX+eQJ9VdQka0GIXlfukdFGZm18wSrzeLWS2nu53Q
+yS3ohcOSJQOciVcb4Yhd7IJnju0NqLzei0J14PYRhsSln/An4E5BhbEhzUpc
+a1HyoV5jNruJK8uto1D2YHJAW57ID70CbQC25/4dQTm1kOEhck9c+ZC+ypHC
+Q4mmCgrf4oNwIqi3QMbSdAGt8vQbGFsvSUCf65lVLWtLwh7BMWvZr2l1C/93
+Kvdh3ZwmBCM2OgxjvOZGH/YGVDRUUCVjEWI/Yx+H4inKznZekFXLr7dcEfuS
+89NQ8dRd/EKsSHlEsOPjXpcghpnzPvgP7sflsw==
+  "]],
+
+Cell[BoxData[
+ RowBox[{"Int", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"g", "[", "\[Tau]", "]"}], " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "\[ImaginaryI]"}], " ", "\[Omega]", " ", "\[Tau]"}]]}], 
+   "+", 
+   RowBox[{"15", " ", 
+    RowBox[{"g", "[", "\[Tau]", "]"}], " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{
+      RowBox[{"-", "2"}], " ", "\[ImaginaryI]", " ", "\[Omega]", " ", 
+      "\[Tau]"}]]}], "+", 
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{"1", "-", 
+      RowBox[{"3", " ", 
+       RowBox[{
+        RowBox[{"Cos", "[", "\[Theta]", "]"}], "^", "2"}]}]}], ")"}], " ", 
+    RowBox[{"g", "[", "\[Tau]", "]"}], " ", 
+    SuperscriptBox["\[ExponentialE]", 
+     RowBox[{"3", " ", "\[ImaginaryI]", " ", "\[Omega]", " ", "\[Tau]"}]]}], 
+   "-", 
+   RowBox[{"4", " ", 
+    RowBox[{"g", "[", "\[Tau]", "]"}]}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.4035907848876143`*^9, 3.403590832813258*^9}, 
+   3.4035908984106216`*^9, 3.4035909757035265`*^9, {3.403629296906086*^9, 
+   3.403629326105389*^9}, 3.403629433860211*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Creating and using simplification rules ", "Section",
+ CellChangeTimes->{{3.4033384525984616`*^9, 3.4033384766691866`*^9}, {
+   3.4033386741995125`*^9, 3.403338677967826*^9}, {3.4033388210729246`*^9, 
+   3.403338835799521*^9}, {3.403460216154704*^9, 3.4034602378095684`*^9}, {
+   3.403512348662737*^9, 3.4035123487584343`*^9}, {3.40359100980193*^9, 
+   3.403591017272155*^9}, {3.4035910507084913`*^9, 3.4035910531800127`*^9}, {
+   3.4035981372158637`*^9, 3.4035981532050743`*^9}, {3.403598264489944*^9, 
+   3.4035982652086477`*^9}, {3.4035987635312457`*^9, 
+   3.4035987702085524`*^9}, {3.4035988242265797`*^9, 
+   3.4035988277058487`*^9}, {3.4035988820197554`*^9, 
+   3.4035989212877502`*^9}, {3.403607782265533*^9, 3.4036077832967167`*^9}, {
+   3.4036300713145285`*^9, 3.4036300809389124`*^9}, 3.666172744935976*^9}],
+
+Cell[TextData[StyleBox["Simplification or change of notation are frequently \
+required in symbolic processing. We can define patterns and pass them on to \
+the FullSimplify command to be used in simplification of expressions. For \
+example:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->CompressedData["
+1:eJxTTMoPSmViYGCQAmIQnfT93dao6JeOZUK9h0A017IvF0A0i0XKJRC9RXPe
+TRCts9/iFohW4Be2nwqkr21TAdNN5/bEguhlTFJZILrKeEE+iJ7w2LocRNfO
+0l4Oos8v3bUZREde23cTRMcdufEQRJ/SVvsMon8cWfcNRIeVe7BPA9Jr/CI5
+QXROfEPDOiC9ZLF/M4i2uVO/FETPkNDcD6K3ciUeAdHh4v9PgOig6Ll864E0
+09nlkiA66aqIBYg+bhxvBaIVXj0uBdE9R3OaQPSWJp+LIHpaEM91EH13k+oL
+EL1j+VMwHWcT/BFEZ3CdBtMav+tXbgf5f7flARDtOjP+FIi+MiPpDIjOsFGb
+fAVIf5d2BNNFYnrK10Dq7t3UAtETpu7UvAmkhZYmGIPoA0rry0B07y6dJhA9
+4/XSdhCdYrwJTAMAz8LbxA==
+  "]],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Rule1", "[", 
+    RowBox[{"A", "+", "B", "+", "C___"}], "]"}], ":=", 
+   RowBox[{"X", "+", 
+    RowBox[{"Plus", "[", "C", "]"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Rule2", "[", 
+    RowBox[{"Sin", "[", "M", "]"}], "]"}], ":=", "Y"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"CleanItUp", "=", 
+   RowBox[{
+    RowBox[{"FullSimplify", "[", 
+     RowBox[{"#", ",", 
+      RowBox[{"TransformationFunctions", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{"Rule1", ",", "Rule2", ",", "Automatic"}], "}"}]}]}], "]"}], 
+    "&"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.403599381732889*^9, 3.4035994142337384`*^9}, {
+  3.4035994470695276`*^9, 3.403599594630396*^9}, {3.403599691859524*^9, 
+  3.4035996961151114`*^9}, {3.4035997522687435`*^9, 3.40359977383377*^9}, {
+  3.403599808158721*^9, 3.403599813181837*^9}, {3.4035998505544453`*^9, 
+  3.403599863760631*^9}, {3.4035999188576903`*^9, 3.4035999396874123`*^9}, {
+  3.403599994714164*^9, 3.4036000104963565`*^9}, {3.4036100389189496`*^9, 
+  3.403610161441381*^9}}],
+
+Cell[TextData[StyleBox["Triple underscore in the pattern specification \
+indicates an optional element or sequence of elements. It is necessary \
+because sums may contain more than two terms, and the other terms have to be \
+kept as they are.",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.403588761194874*^9, 
+   3.4035887620346637`*^9}, {3.40359196144024*^9, 3.4035920228083825`*^9}, {
+   3.403598157799507*^9, 3.40359823502015*^9}, {3.403598773472992*^9, 
+   3.4035988653977723`*^9}, {3.403598909185009*^9, 3.4035989095687733`*^9}, {
+   3.403610187068647*^9, 3.4036102029953623`*^9}, {3.403610863513633*^9, 
+   3.4036109049494576`*^9}, 3.4036109467690463`*^9}],
+
+Cell[BoxData[
+ RowBox[{"A", "+", "B", "+", 
+  RowBox[{
+   RowBox[{"Sin", "[", "M", "]"}], "^", "2"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"A", "+", "B", "+", 
+   RowBox[{
+    RowBox[{"Sin", "[", "M", "]"}], "^", "2"}]}], "//", 
+  "CleanItUp"}]], "Input"],
+
+Cell[TextData[StyleBox["We will use these custom simplification patterns to \
+reduce the relaxation theory expressions in the second tutorial.",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->CompressedData["
+1:eJxTTMoPSmViYGCQBGIQnfT93dao6JeOZUK9h0A017IvF0A0i0XKJRC9RXPe
+TRCts9/iFohW4Be2nwqkr21TAdNN5/bEguhlTFJZILrKeEE+iJ7w2LocRNfO
+0l4Oos8v3bUZREde23cTRMcdufEQRJ/SVvsMon8cWfcNRIeVe7BPA9Jr/CI5
+QXROfEPDOiC9ZLF/M4i2uVO/FETPkNDcD6K3ciUeAdHh4v9PgOig6Ll864E0
+09nlkiA66aqIBYg+bhxvBaIVXj0uBdE9R3OaQPSWJp+LIHpaEM91EH13k+oL
+EL1j+VMwHWcT/BFEZ3CdBtMav+tXbgf5f7flARDtOjP+FIi+MiPpDIjOsFGb
+fAVIf5d2BNNFYnrK10Dq7t3UAtETpu7UvAmy77yCA4iWeHQu4z6Qjo8OzAHR
+AFyX0ro=
+  "]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Clebsch-Gordan expansions of spherical harmonic products", "Section",
+ CellChangeTimes->{{3.4033384525984616`*^9, 3.4033384766691866`*^9}, {
+   3.4033386741995125`*^9, 3.403338677967826*^9}, {3.4033388210729246`*^9, 
+   3.403338835799521*^9}, {3.403460216154704*^9, 3.4034602378095684`*^9}, {
+   3.403512348662737*^9, 3.4035123487584343`*^9}, {3.403591066947686*^9, 
+   3.403591082633206*^9}, {3.403591378091834*^9, 3.4035913788847523`*^9}, {
+   3.4035988890993805`*^9, 3.4035988892673388`*^9}, {3.403630093427371*^9, 
+   3.4036301020508423`*^9}, 3.666172791273175*^9}],
+
+Cell[TextData[StyleBox["A very time-consuming analytical problem in spin \
+dynamics is expanding products of spherical harmonics into sums of spherical \
+harmonics. Doing it by hand can be very slow. We will now program fully \
+general matching patterns what would reduce any spherical harmonic product in \
+milliseconds. Looking up the formulas in a textbook (Brink & Satchler in this \
+case) and typing them in as replacement patterns results in",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->CompressedData["
+1:eJwdz1sog3EABfA1kywRVsODppCZNy9ziTwQ5dbUNF8sX5TWZouxUprGi3JL
+LBZSLktE2YYQ0kRzX9tsbEmLXEqJUAr/8z2cfp2n00mi1ZJGNovFSiSB9Ner
+rYZ6KmiP6d+H3PmPC8gRNzihVTjlgxm74msoiIrNHyV61pIZDWfbtXCenaCA
+HZnTajgUzNHBTpPIDM/nNi1Q5tnxwTq79w46RKnv8Nu+/AmluuIwI3GpXBYO
+lfKurmXi7ExFN8z16+fgWJxwF9q49XZYzf87ghJqMnKFyD41x0PazRPDw0x5
+NhQ8B9tg34HSAK2G0ktolERcwcBqyiPcMN8z1uVWvcEm7jFj2o9+YR3/t7L2
+YOG43AFdY/QJDHDKSjaw11pDQymV0uMiaqymXigaoExM5xww1ocXGdxE1dvE
+IHyIdtxArcX/AF38yV8oVYWGeIjDeRQXTrtHGPu89823RN63swUqJOOaxcqX
+gl9euhb+A4G2/sk=
+  "]],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Off", "[", 
+   RowBox[{"ClebschGordan", "::", "\"\<phy\>\""}], "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Y", "/:", 
+   RowBox[{
+    RowBox[{"Y", "[", 
+     RowBox[{"l1_", ",", "m1_"}], "]"}], " ", 
+    RowBox[{"Y", "[", 
+     RowBox[{"l2_", ",", "m2_"}], "]"}]}], ":=", 
+   RowBox[{"Sum", "[", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       SqrtBox[
+        FractionBox[
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"2", " ", "l1"}], "+", "1"}], ")"}], " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"2", " ", "l2"}], "+", "1"}], ")"}]}], 
+         RowBox[{"4", " ", "\[Pi]", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"2", "L"}], "+", "1"}], ")"}]}]]], 
+       RowBox[{"ClebschGordan", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"l1", ",", "0"}], "}"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"l2", ",", "0"}], "}"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"L", ",", "0"}], "}"}]}], "]"}], " ", 
+       RowBox[{"ClebschGordan", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"l1", ",", "m1"}], "}"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"l2", ",", "m2"}], "}"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"L", ",", "M"}], "}"}]}], "]"}], " ", 
+       RowBox[{"Y", "[", 
+        RowBox[{"L", ",", "M"}], "]"}]}], ")"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"L", ",", 
+       RowBox[{"Abs", "[", 
+        RowBox[{"l1", "-", "l2"}], "]"}], ",", 
+       RowBox[{"l1", "+", "l2"}]}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"M", ",", 
+       RowBox[{"-", "L"}], ",", "L"}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Y", "/:", 
+   SuperscriptBox[
+    RowBox[{"Y", "[", 
+     RowBox[{"l_", ",", "m_"}], "]"}], "2"], ":=", 
+   RowBox[{"Sum", "[", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+       SqrtBox[
+        FractionBox[
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"2", " ", "l"}], "+", "1"}], ")"}], " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"2", " ", "l"}], "+", "1"}], ")"}]}], 
+         RowBox[{"4", " ", "\[Pi]", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"2", "L"}], "+", "1"}], ")"}]}]]], 
+       RowBox[{"ClebschGordan", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"l", ",", "0"}], "}"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"l", ",", "0"}], "}"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"L", ",", "0"}], "}"}]}], "]"}], " ", 
+       RowBox[{"ClebschGordan", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"l", ",", "m"}], "}"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"l", ",", "m"}], "}"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"L", ",", "M"}], "}"}]}], "]"}], " ", 
+       RowBox[{"Y", "[", 
+        RowBox[{"L", ",", "M"}], "]"}]}], ")"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"L", ",", "0", ",", 
+       RowBox[{"2", "l"}]}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"M", ",", 
+       RowBox[{"-", "L"}], ",", "L"}], "}"}]}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.403591487887542*^9, 3.403591502305564*^9}, {
+  3.403591551181342*^9, 3.4035916198800697`*^9}}],
+
+Cell[TextData[StyleBox["The first line switches off some warnings, the second \
+and the third specify the patterns. Because a square is different, in the \
+pattern matching sense, from the product, it has to be specified separately. \
+The power of these patterns is quite dramatic:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.4035308264068437`*^9, 
+   3.403531026826633*^9}, {3.4035886411673994`*^9, 3.403588684834526*^9}, {
+   3.4035888188611045`*^9, 3.4035888221567917`*^9}, {3.403590674188645*^9, 
+   3.403590780904471*^9}, {3.403591390314685*^9, 3.403591478896906*^9}, {
+   3.4035915163896236`*^9, 3.403591520884453*^9}, {3.40359176768311*^9, 
+   3.403591822277272*^9}, 3.403592098664856*^9, {3.4035921345004525`*^9, 
+   3.4035921766247096`*^9}, {3.40359238295623*^9, 3.403592389145287*^9}, {
+   3.403611045086972*^9, 3.403611053942851*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Y", "[", 
+    RowBox[{"2", ",", "1"}], "]"}], " ", 
+   RowBox[{"Y", "[", 
+    RowBox[{"4", ",", 
+     RowBox[{"-", "3"}]}], "]"}], " ", 
+   RowBox[{"Y", "[", 
+    RowBox[{"6", ",", "5"}], "]"}], " ", 
+   RowBox[{"Y", "[", 
+    RowBox[{"2", ",", "0"}], "]"}]}], "//", "ExpandAll"}]], "Input",
+ CellChangeTimes->{{3.403591523384293*^9, 3.403591635097846*^9}, {
+  3.403591826550436*^9, 3.4035918285415196`*^9}, {3.4035921134314885`*^9, 
+  3.403592130677455*^9}, {3.40359219111304*^9, 3.40359219415972*^9}}],
+
+Cell[TextData[StyleBox["The ExpandAll directive opens all brackets in the \
+intermediate results, which helps the matching. It would be almost impossible \
+for an average human not to make any arithmetical mistakes in the expansion \
+above. We can even obtain some general cases and automatically prepare them \
+for cut-and-paste into Fortran:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.4035308264068437`*^9, 
+   3.403531026826633*^9}, {3.4035886411673994`*^9, 3.403588684834526*^9}, {
+   3.4035888188611045`*^9, 3.4035888221567917`*^9}, {3.403590674188645*^9, 
+   3.403590780904471*^9}, {3.403591390314685*^9, 3.403591478896906*^9}, {
+   3.4035915163896236`*^9, 3.403591520884453*^9}, {3.40359176768311*^9, 
+   3.403591822277272*^9}, 3.403592098664856*^9, {3.4035921345004525`*^9, 
+   3.4035921766247096`*^9}, {3.40359224124655*^9, 3.403592280653208*^9}, {
+   3.403592391818944*^9, 3.403592400056698*^9}, {3.40359255360937*^9, 
+   3.4035926720676084`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"$Assumptions", "=", 
+   RowBox[{
+    RowBox[{"m0", "\[Element]", "Integers"}], "&&", 
+    RowBox[{"m1", "\[Element]", "Integers"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"Y", "[", 
+     RowBox[{"2", ",", "m0"}], "]"}], " ", 
+    RowBox[{"Y", "[", 
+     RowBox[{"2", ",", "m1"}], "]"}]}], "//", "Simplify"}], "//", 
+  "FortranForm"}]}], "Input",
+ CellChangeTimes->{{3.40359265468005*^9, 3.4035926571515713`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[StyleBox["Exercise 2: a scalar product for spherical harmonics",
+ FontColor->GrayLevel[0]]], "Section",
+ CellChangeTimes->{{3.4033384525984616`*^9, 3.4033384766691866`*^9}, {
+   3.4033386741995125`*^9, 3.403338677967826*^9}, {3.4033388210729246`*^9, 
+   3.403338835799521*^9}, {3.403460216154704*^9, 3.4034602378095684`*^9}, {
+   3.403512348662737*^9, 3.4035123487584343`*^9}, {3.40359100980193*^9, 
+   3.403591017272155*^9}, {3.4035910507084913`*^9, 3.4035910531800127`*^9}, {
+   3.403592324368183*^9, 3.4035923340950994`*^9}, 3.4036301197997065`*^9, {
+   3.6661729115009303`*^9, 3.666172915932827*^9}}],
+
+Cell[TextData[StyleBox["Being eigenfunctions of the angular momentum \
+operator, spherical harmonics obey the following Hilbert space orthogonality \
+relation:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.4035308264068437`*^9, 
+   3.403531026826633*^9}, {3.4035886411673994`*^9, 3.403588684834526*^9}, {
+   3.4035888188611045`*^9, 3.4035888221567917`*^9}, {3.403590674188645*^9, 
+   3.403590780904471*^9}, {3.403591390314685*^9, 3.403591478896906*^9}, {
+   3.4035915163896236`*^9, 3.403591520884453*^9}, {3.40359176768311*^9, 
+   3.403591822277272*^9}, 3.403592098664856*^9, {3.4035921345004525`*^9, 
+   3.4035921766247096`*^9}, {3.40359238295623*^9, 3.403592389145287*^9}, {
+   3.4035932411190777`*^9, 3.403593338477104*^9}, {3.4035934583043957`*^9, 
+   3.4035934614721613`*^9}, {3.666172922228899*^9, 3.6661729264288435`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Y", "[", 
+    RowBox[{"L", ",", "M"}], "]"}], ".", 
+   RowBox[{"Y", "[", 
+    RowBox[{"P", ",", "Q"}], "]"}]}], "=", 
+  RowBox[{
+   RowBox[{
+    SubsuperscriptBox["\[Integral]", "0", 
+     RowBox[{"2", " ", "\[Pi]"}]], 
+    RowBox[{
+     SubsuperscriptBox["\[Integral]", "0", "\[Pi]"], 
+     RowBox[{
+      RowBox[{"Y", "[", 
+       RowBox[{"L", ",", "M"}], "]"}], " ", 
+      RowBox[{"Y", "[", 
+       RowBox[{"P", ",", 
+        RowBox[{"-", "Q"}]}], "]"}], " ", 
+      RowBox[{"Sin", "[", "\[Theta]", "]"}], 
+      RowBox[{"\[DifferentialD]", "\[Theta]"}], 
+      RowBox[{"\[DifferentialD]", "\[CurlyPhi]"}]}]}]}], "=", 
+   FractionBox[
+    RowBox[{
+     SubscriptBox["\[Delta]", 
+      RowBox[{"L", ",", "M"}]], " ", 
+     SubscriptBox["\[Delta]", 
+      RowBox[{"P", ",", "Q"}]]}], 
+    RowBox[{
+     RowBox[{"2", " ", "L"}], "+", "1"}]]}]}]], "DisplayFormula",
+ CellChangeTimes->{{3.4035933468349676`*^9, 3.4035934422194877`*^9}, 
+   3.4035935505602093`*^9, {3.40359363004731*^9, 3.40359364209439*^9}, {
+   3.4035943457329483`*^9, 3.403594350009042*^9}},
+ TextAlignment->Center,
+ Magnification->1.25],
+
+Cell[TextData[StyleBox["If taken explicitly, by a human or a machine, these \
+double integrals take a very long time. Modify the definition of the 'Dot' \
+operator to include patterns for scalar products of spherical harmonics. Use \
+the result to find the coefficient before Y[41,-8] in the Clebsch-Gordan \
+expansion of Y[22,5] Y[19,-13]. Hint: Mathematica's function for Kronecker \
+symbol is KroneckerDelta[a,b]",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.4035308264068437`*^9, 
+   3.403531026826633*^9}, {3.4035886411673994`*^9, 3.403588684834526*^9}, {
+   3.4035888188611045`*^9, 3.4035888221567917`*^9}, {3.403590674188645*^9, 
+   3.403590780904471*^9}, {3.403591390314685*^9, 3.403591478896906*^9}, {
+   3.4035915163896236`*^9, 3.403591520884453*^9}, {3.40359176768311*^9, 
+   3.403591822277272*^9}, 3.403592098664856*^9, {3.4035921345004525`*^9, 
+   3.4035921766247096`*^9}, {3.40359238295623*^9, 3.403592389145287*^9}, {
+   3.4035932411190777`*^9, 3.403593338477104*^9}, {3.4035934583043957`*^9, 
+   3.4035934614721613`*^9}, {3.403593514026415*^9, 3.4035935633884897`*^9}, {
+   3.403593766727038*^9, 3.403593872675335*^9}, {3.403593907960186*^9, 
+   3.4035939288133435`*^9}, {3.403594070662663*^9, 3.403594078950218*^9}, {
+   3.4035941754831023`*^9, 3.4035942204704576`*^9}, {3.4035944708431044`*^9, 
+   3.4035944857620716`*^9}, {3.403594518505093*^9, 3.4035945188869047`*^9}, {
+   3.6661720200922165`*^9, 3.66617202192432*^9}}],
+
+Cell[CellGroupData[{
+
+Cell["Answer", "Text",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.},
+ CellChangeTimes->{{3.403528988628961*^9, 3.403529017208186*^9}, {
+   3.403529279737282*^9, 3.403529287722122*^9}, 3.403594678324942*^9, {
+   3.40359470868921*^9, 3.403594721624905*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Unprotect", "[", "Dot", "]"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Dot", "/:", 
+   RowBox[{"Dot", "[", 
+    RowBox[{"A_", ",", 
+     RowBox[{"B_", "+", "C_"}]}], "]"}], ":=", 
+   RowBox[{
+    RowBox[{"A", ".", "B"}], "+", 
+    RowBox[{"A", ".", "C"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Dot", "/:", 
+   RowBox[{"Dot", "[", 
+    RowBox[{
+     RowBox[{"A_", "+", "B_"}], ",", "C_"}], "]"}], ":=", 
+   RowBox[{
+    RowBox[{"A", ".", "C"}], "+", 
+    RowBox[{"B", ".", "C"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Dot", "/:", 
+  RowBox[{"Dot", "[", 
+   RowBox[{"A_", ",", 
+    RowBox[{"B_", "*", "C_"}]}], "]"}], ":=", 
+  RowBox[{
+   RowBox[{"B", "*", 
+    RowBox[{"A", ".", "C"}]}], "/;", 
+   RowBox[{"B", "\[Element]", "Complexes"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Dot", "/:", 
+   RowBox[{"Dot", "[", 
+    RowBox[{
+     RowBox[{"A_", "*", "B_"}], ",", "C_"}], "]"}], ":=", 
+   RowBox[{
+    RowBox[{"A", "*", 
+     RowBox[{"B", ".", "C"}]}], "/;", 
+    RowBox[{"A", "\[Element]", "Complexes"}]}]}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Dot", "/:", 
+   RowBox[{
+    RowBox[{"Y", "[", 
+     RowBox[{"L_", ",", "M_"}], "]"}], ".", 
+    RowBox[{"Y", "[", 
+     RowBox[{"P_", ",", "Q_"}], "]"}]}], ":=", 
+   RowBox[{
+    RowBox[{"KroneckerDelta", "[", 
+     RowBox[{"L", ",", "P"}], "]"}], " ", 
+    RowBox[{
+     RowBox[{"KroneckerDelta", "[", 
+      RowBox[{"M", ",", "Q"}], "]"}], "/", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"2", " ", "L"}], "+", "1"}], ")"}]}]}]}], ";"}]}], "Input",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.},
+ CellChangeTimes->{{3.4035947327218513`*^9, 3.403594753841593*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Y", "[", 
+    RowBox[{"41", ",", 
+     RowBox[{"-", "8"}]}], "]"}], ".", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{"Y", "[", 
+      RowBox[{"22", ",", "5"}], "]"}], " ", 
+     RowBox[{"Y", "[", 
+      RowBox[{"19", ",", 
+       RowBox[{"-", "13"}]}], "]"}]}], ")"}]}], "/", 
+  RowBox[{"(", 
+   RowBox[{
+    RowBox[{"Y", "[", 
+     RowBox[{"41", ",", 
+      RowBox[{"-", "8"}]}], "]"}], ".", 
+    RowBox[{"Y", "[", 
+     RowBox[{"41", ",", 
+      RowBox[{"-", "8"}]}], "]"}]}], ")"}]}]], "Input",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.},
+ CellChangeTimes->{{3.403594741706628*^9, 3.403594757749546*^9}}]
+}, Closed]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Using patterns for large-scale analytical transformations", "Section",
+ CellChangeTimes->{{3.4033384525984616`*^9, 3.4033384766691866`*^9}, {
+   3.4033386741995125`*^9, 3.403338677967826*^9}, {3.4033388210729246`*^9, 
+   3.403338835799521*^9}, {3.403460216154704*^9, 3.4034602378095684`*^9}, {
+   3.403512348662737*^9, 3.4035123487584343`*^9}, {3.403591066947686*^9, 
+   3.403591082633206*^9}, {3.403591378091834*^9, 3.4035913788847523`*^9}, {
+   3.403597752338154*^9, 3.403597773447154*^9}, 3.4036111003461313`*^9, {
+   3.4036301464386263`*^9, 3.403630160803918*^9}, {3.66617295462094*^9, 
+   3.66617295787675*^9}}],
+
+Cell[TextData[StyleBox["In many cases the equations are simply too big to be \
+displayed. However, some terms may be known to be zero, others might need to \
+be extracted, some terms may have nice Taylor expansions, or may be replaced \
+with an asymptotic expansion, or be secular, etc. In other words, a \
+complicated transformation has to be applied to something we cannot even \
+print (in extreme cases, there may be gigabytes of analytical formulae). This \
+can be done in a variety of ways, as demonstrated inthe examples below.",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.4035308264068437`*^9, 
+   3.403531026826633*^9}, {3.4035886411673994`*^9, 3.403588684834526*^9}, {
+   3.4035888188611045`*^9, 3.4035888221567917`*^9}, {3.403590674188645*^9, 
+   3.403590780904471*^9}, {3.403591390314685*^9, 3.403591478896906*^9}, {
+   3.4035915163896236`*^9, 3.403591520884453*^9}, {3.40359176768311*^9, 
+   3.403591822277272*^9}, 3.403592098664856*^9, {3.4035921345004525`*^9, 
+   3.4035921766247096`*^9}, {3.40359238295623*^9, 3.403592389145287*^9}, {
+   3.4035932411190777`*^9, 3.403593338477104*^9}, {3.4035934583043957`*^9, 
+   3.4035934614721613`*^9}, {3.403614175215733*^9, 3.40361418230317*^9}, 
+   3.40362516902185*^9, {3.403625467481263*^9, 3.4036255024301977`*^9}, {
+   3.4036296364917727`*^9, 3.403629799118083*^9}, {3.4041343978302*^9, 
+   3.4041344352702*^9}, {3.4041366800165997`*^9, 3.4041366807497997`*^9}, {
+   3.666172981989292*^9, 3.6661729823573284`*^9}}],
+
+Cell[TextData[StyleBox["Find out positions at which x to any power appears:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.4035308264068437`*^9, 
+   3.403531026826633*^9}, {3.4035886411673994`*^9, 3.403588684834526*^9}, {
+   3.4035888188611045`*^9, 3.4035888221567917`*^9}, {3.403590674188645*^9, 
+   3.403590780904471*^9}, {3.403591390314685*^9, 3.403591478896906*^9}, {
+   3.4035915163896236`*^9, 3.403591520884453*^9}, {3.40359176768311*^9, 
+   3.403591822277272*^9}, 3.403592098664856*^9, {3.4035921345004525`*^9, 
+   3.4035921766247096`*^9}, {3.40359238295623*^9, 3.403592389145287*^9}, {
+   3.4035932411190777`*^9, 3.403593338477104*^9}, {3.4035934583043957`*^9, 
+   3.4035934614721613`*^9}, {3.403614158914042*^9, 3.4036141614812603`*^9}, {
+   3.4041343352586*^9, 3.4041343556478*^9}, {3.4041345110394*^9, 
+   3.4041345312726*^9}}],
+
+Cell[BoxData[
+ RowBox[{"Position", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"1", "+", 
+      RowBox[{"x", "^", "2"}]}], ",", "5", ",", 
+     RowBox[{"x", "^", "4"}], ",", 
+     RowBox[{"a", "+", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{"1", "+", 
+         RowBox[{"x", "^", "2"}]}], ")"}], "^", "2"}]}]}], "}"}], ",", 
+   RowBox[{"x", "^", "_"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.403625114665954*^9, 3.403625149114921*^9}, {
+   3.403625307095044*^9, 3.403625315971429*^9}, {3.4036254515770073`*^9, 
+   3.4036254578539495`*^9}, {3.4041341620362*^9, 3.4041341663106003`*^9}, {
+   3.4041342017382*^9, 3.4041342118626003`*^9}, {3.404134302561*^9, 
+   3.4041343231373997`*^9}, 3.4041344914458*^9, {3.4041346707366*^9, 
+   3.4041346888482*^9}}],
+
+Cell[TextData[StyleBox["Return x from all cases of f[x] found:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.4035308264068437`*^9, 
+   3.403531026826633*^9}, {3.4035886411673994`*^9, 3.403588684834526*^9}, {
+   3.4035888188611045`*^9, 3.4035888221567917`*^9}, {3.403590674188645*^9, 
+   3.403590780904471*^9}, {3.403591390314685*^9, 3.403591478896906*^9}, {
+   3.4035915163896236`*^9, 3.403591520884453*^9}, {3.40359176768311*^9, 
+   3.403591822277272*^9}, 3.403592098664856*^9, {3.4035921345004525`*^9, 
+   3.4035921766247096`*^9}, {3.40359238295623*^9, 3.403592389145287*^9}, {
+   3.4035932411190777`*^9, 3.403593338477104*^9}, {3.4035934583043957`*^9, 
+   3.4035934614721613`*^9}, {3.403614158914042*^9, 3.4036141614812603`*^9}, {
+   3.4041343352586*^9, 3.4041343556478*^9}, {3.4041345110394*^9, 
+   3.4041345312726*^9}, {3.4041346957434*^9, 3.4041347109533997`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"Cases", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"1", ",", "1", ",", 
+     RowBox[{"f", "[", "a", "]"}], ",", "2", ",", "3", ",", "y", ",", 
+     RowBox[{"f", "[", "8", "]"}], ",", "9", ",", 
+     RowBox[{"f", "[", "10", "]"}]}], "}"}], ",", 
+   RowBox[{
+    RowBox[{"f", "[", "x_", "]"}], "\[Rule]", "x"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.403625114665954*^9, 3.403625149114921*^9}, {
+   3.403625307095044*^9, 3.403625315971429*^9}, {3.4036254515770073`*^9, 
+   3.4036254578539495`*^9}, {3.4041341620362*^9, 3.4041341663106003`*^9}, {
+   3.4041342017382*^9, 3.4041342118626003`*^9}, {3.404134302561*^9, 
+   3.4041343231373997`*^9}, 3.4041344914458*^9, {3.4041346707366*^9, 
+   3.4041346888482*^9}, 3.4041347367869997`*^9}],
+
+Cell[TextData[StyleBox["Count the number of elements in a sum that depend on \
+z ('infinity' means to look at all levels of the expression):",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.4035308264068437`*^9, 
+   3.403531026826633*^9}, {3.4035886411673994`*^9, 3.403588684834526*^9}, {
+   3.4035888188611045`*^9, 3.4035888221567917`*^9}, {3.403590674188645*^9, 
+   3.403590780904471*^9}, {3.403591390314685*^9, 3.403591478896906*^9}, {
+   3.4035915163896236`*^9, 3.403591520884453*^9}, {3.40359176768311*^9, 
+   3.403591822277272*^9}, 3.403592098664856*^9, {3.4035921345004525`*^9, 
+   3.4035921766247096`*^9}, {3.40359238295623*^9, 3.403592389145287*^9}, {
+   3.4035932411190777`*^9, 3.403593338477104*^9}, {3.4035934583043957`*^9, 
+   3.4035934614721613`*^9}, {3.403614158914042*^9, 3.4036141614812603`*^9}, {
+   3.4041343352586*^9, 3.4041343556478*^9}, {3.4041345110394*^9, 
+   3.4041345312726*^9}, {3.4041346957434*^9, 3.4041347109533997`*^9}, {
+   3.404134841697*^9, 3.4041348807438*^9}, {3.4041350770698*^9, 
+   3.404135114541*^9}}],
+
+Cell[BoxData[
+ RowBox[{"Count", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"2", " ", "a"}], "+", "b", "+", "c", "+", "q", "+", "z", "+", 
+    RowBox[{"Cos", "[", "z", "]"}], "+", 
+    RowBox[{"f", "[", "a", "]"}], "+", 
+    RowBox[{"Sin", "[", "b", "]"}]}], ",", "z", ",", "Infinity"}], 
+  "]"}]], "Input",
+ CellChangeTimes->{{3.403625114665954*^9, 3.403625149114921*^9}, {
+   3.403625307095044*^9, 3.403625315971429*^9}, {3.4036254515770073`*^9, 
+   3.4036254578539495`*^9}, {3.4041341620362*^9, 3.4041341663106003`*^9}, {
+   3.4041342017382*^9, 3.4041342118626003`*^9}, {3.404134302561*^9, 
+   3.4041343231373997`*^9}, 3.4041344914458*^9, {3.4041346707366*^9, 
+   3.4041346888482*^9}, 3.4041347367869997`*^9, {3.4041348180318003`*^9, 
+   3.4041348212609997`*^9}, {3.4041348854393997`*^9, 
+   3.4041350657130003`*^9}, {3.4041351678462*^9, 3.4041351712158003`*^9}}],
+
+Cell[TextData[StyleBox["Pick out numeric quantities from a product:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.4035308264068437`*^9, 
+   3.403531026826633*^9}, {3.4035886411673994`*^9, 3.403588684834526*^9}, {
+   3.4035888188611045`*^9, 3.4035888221567917`*^9}, {3.403590674188645*^9, 
+   3.403590780904471*^9}, {3.403591390314685*^9, 3.403591478896906*^9}, {
+   3.4035915163896236`*^9, 3.403591520884453*^9}, {3.40359176768311*^9, 
+   3.403591822277272*^9}, 3.403592098664856*^9, {3.4035921345004525`*^9, 
+   3.4035921766247096`*^9}, {3.40359238295623*^9, 3.403592389145287*^9}, {
+   3.4035932411190777`*^9, 3.403593338477104*^9}, {3.4035934583043957`*^9, 
+   3.4035934614721613`*^9}, {3.403614158914042*^9, 3.4036141614812603`*^9}, {
+   3.4041343352586*^9, 3.4041343556478*^9}}],
+
+Cell[BoxData[
+ RowBox[{"Select", "[", 
+  RowBox[{
+   RowBox[{"7", " ", 
+    SuperscriptBox["\[Pi]", "2"], " ", 
+    SuperscriptBox["x", "2"], " ", 
+    SuperscriptBox["y", "2"]}], ",", "NumericQ"}], "]"}]], "Input",
+ CellChangeTimes->{{3.403625114665954*^9, 3.403625149114921*^9}, {
+   3.403625307095044*^9, 3.403625315971429*^9}, {3.4036254515770073`*^9, 
+   3.4036254578539495`*^9}, {3.4041341620362*^9, 3.4041341663106003`*^9}, {
+   3.4041342017382*^9, 3.4041342118626003`*^9}, {3.404134302561*^9, 
+   3.4041343231373997`*^9}, 3.4041352214477997`*^9}],
+
+Cell[TextData[StyleBox["Delete occurrences of a certain patern:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.4035308264068437`*^9, 
+   3.403531026826633*^9}, {3.4035886411673994`*^9, 3.403588684834526*^9}, {
+   3.4035888188611045`*^9, 3.4035888221567917`*^9}, {3.403590674188645*^9, 
+   3.403590780904471*^9}, {3.403591390314685*^9, 3.403591478896906*^9}, {
+   3.4035915163896236`*^9, 3.403591520884453*^9}, {3.40359176768311*^9, 
+   3.403591822277272*^9}, 3.403592098664856*^9, {3.4035921345004525`*^9, 
+   3.4035921766247096`*^9}, {3.40359238295623*^9, 3.403592389145287*^9}, {
+   3.4035932411190777`*^9, 3.403593338477104*^9}, {3.4035934583043957`*^9, 
+   3.4035934614721613`*^9}, {3.403614158914042*^9, 3.4036141614812603`*^9}, {
+   3.4041343352586*^9, 3.4041343556478*^9}, {3.4041352276566*^9, 
+   3.4041352419462*^9}}],
+
+Cell[BoxData[
+ RowBox[{"DeleteCases", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"f", "[", "a", "]"}], ",", 
+     RowBox[{"g", "[", "b", "]"}], ",", 
+     RowBox[{"f", "[", "c", "]"}]}], "}"}], ",", 
+   RowBox[{"f", "[", "_", "]"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.403625114665954*^9, 3.403625149114921*^9}, {
+   3.403625307095044*^9, 3.403625315971429*^9}, {3.4036254515770073`*^9, 
+   3.4036254578539495`*^9}, {3.4041341620362*^9, 3.4041341663106003`*^9}, {
+   3.4041342017382*^9, 3.4041342118626003`*^9}, {3.404134302561*^9, 
+   3.4041343231373997`*^9}, 3.4041352214477997`*^9, {3.4041353005554*^9, 
+   3.4041353171694*^9}}],
+
+Cell[TextData[StyleBox["Find all elements flanked by the same element:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.4035308264068437`*^9, 
+   3.403531026826633*^9}, {3.4035886411673994`*^9, 3.403588684834526*^9}, {
+   3.4035888188611045`*^9, 3.4035888221567917`*^9}, {3.403590674188645*^9, 
+   3.403590780904471*^9}, {3.403591390314685*^9, 3.403591478896906*^9}, {
+   3.4035915163896236`*^9, 3.403591520884453*^9}, {3.40359176768311*^9, 
+   3.403591822277272*^9}, 3.403592098664856*^9, {3.4035921345004525`*^9, 
+   3.4035921766247096`*^9}, {3.40359238295623*^9, 3.403592389145287*^9}, {
+   3.4035932411190777`*^9, 3.403593338477104*^9}, {3.4035934583043957`*^9, 
+   3.4035934614721613`*^9}, {3.403614158914042*^9, 3.4036141614812603`*^9}, {
+   3.4041343352586*^9, 3.4041343556478*^9}, {3.4041352276566*^9, 
+   3.4041352419462*^9}, {3.4041353225514*^9, 3.404135333019*^9}}],
+
+Cell[BoxData[
+ RowBox[{"ReplaceList", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"a", ",", "b", ",", "c", ",", "a", ",", "d", ",", "b", ",", "d"}],
+     "}"}], ",", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"___", ",", "x_", ",", "y__", ",", "x_", ",", "___"}], "}"}], 
+    "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"x", ",", 
+      RowBox[{"{", "y", "}"}]}], "}"}]}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.403625114665954*^9, 3.403625149114921*^9}, {
+   3.403625307095044*^9, 3.403625315971429*^9}, {3.4036254515770073`*^9, 
+   3.4036254578539495`*^9}, {3.4041341620362*^9, 3.4041341663106003`*^9}, {
+   3.4041342017382*^9, 3.4041342118626003`*^9}, {3.404134302561*^9, 
+   3.4041343231373997`*^9}, 3.4041352214477997`*^9, {3.4041353005554*^9, 
+   3.4041353171694*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Large-scale transformations: weeding a lengthy Taylor series", "Section",
+ CellChangeTimes->{{3.4033384525984616`*^9, 3.4033384766691866`*^9}, {
+   3.4033386741995125`*^9, 3.403338677967826*^9}, {3.4033388210729246`*^9, 
+   3.403338835799521*^9}, {3.403460216154704*^9, 3.4034602378095684`*^9}, {
+   3.403512348662737*^9, 3.4035123487584343`*^9}, {3.403591066947686*^9, 
+   3.403591082633206*^9}, {3.403591378091834*^9, 3.4035913788847523`*^9}, {
+   3.403597752338154*^9, 3.403597773447154*^9}, 3.4036111003461313`*^9, {
+   3.4036301464386263`*^9, 3.403630160803918*^9}, {3.4041354113934*^9, 
+   3.4041354939486*^9}, {3.4041365644674*^9, 3.4041365757306004`*^9}}],
+
+Cell[TextData[StyleBox["In this example we will extract all tems with total \
+power of 22 from a three-dimensional Taylor series that takes up several \
+screens",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.4035308264068437`*^9, 
+   3.403531026826633*^9}, {3.4035886411673994`*^9, 3.403588684834526*^9}, {
+   3.4035888188611045`*^9, 3.4035888221567917`*^9}, {3.403590674188645*^9, 
+   3.403590780904471*^9}, {3.403591390314685*^9, 3.403591478896906*^9}, {
+   3.4035915163896236`*^9, 3.403591520884453*^9}, {3.40359176768311*^9, 
+   3.403591822277272*^9}, 3.403592098664856*^9, {3.4035921345004525`*^9, 
+   3.4035921766247096`*^9}, {3.40359238295623*^9, 3.403592389145287*^9}, {
+   3.4035932411190777`*^9, 3.403593338477104*^9}, {3.4035934583043957`*^9, 
+   3.4035934614721613`*^9}, {3.403614158914042*^9, 3.4036141614812603`*^9}, {
+   3.4041343352586*^9, 3.4041343556478*^9}, {3.4041352276566*^9, 
+   3.4041352419462*^9}, {3.4041353225514*^9, 3.404135333019*^9}, {
+   3.4041355245713997`*^9, 3.4041355700766*^9}, {3.4041357546558*^9, 
+   3.404135792127*^9}, {3.4041363435246*^9, 3.404136343743*^9}, {
+   3.4041363837882*^9, 3.4041364170006*^9}}],
+
+Cell[BoxData[{
+ RowBox[{"A", "=", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Series", "[", 
+     RowBox[{
+      RowBox[{"Sin", "[", 
+       RowBox[{
+        RowBox[{"x", " ", "y", " ", "z"}], "+", 
+        RowBox[{"3", "x"}], "-", 
+        SuperscriptBox["z", "2"]}], "]"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"x", ",", "0", ",", "23"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"y", ",", "0", ",", "23"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"z", ",", "0", ",", "23"}], "}"}]}], "]"}], "//", "Normal"}], "//",
+    "ExpandAll"}]}], "\[IndentingNewLine]", 
+ RowBox[{"Cases", "[", 
+  RowBox[{"A", ",", 
+   RowBox[{
+    RowBox[{"B_", " ", 
+     RowBox[{"x", "^", "n_"}], " ", 
+     RowBox[{"y", "^", "k_"}], " ", 
+     RowBox[{"z", "^", "m_"}]}], "/;", 
+    RowBox[{
+     RowBox[{"n", "+", "k", "+", "m"}], "\[Equal]", "22"}]}]}], 
+  "]"}]}], "Input",
+ CellChangeTimes->{{3.4041355744602003`*^9, 3.4041357159365997`*^9}, {
+  3.4041358069782*^9, 3.4041358777398*^9}, {3.4041360141462*^9, 
+  3.4041361624086*^9}, {3.4041362083506002`*^9, 3.4041363621198*^9}}],
+
+Cell[TextData[StyleBox["Question: which terms were not matched by the pattern \
+above? Which additional patterns are necessary?",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.4035308264068437`*^9, 
+   3.403531026826633*^9}, {3.4035886411673994`*^9, 3.403588684834526*^9}, {
+   3.4035888188611045`*^9, 3.4035888221567917`*^9}, {3.403590674188645*^9, 
+   3.403590780904471*^9}, {3.403591390314685*^9, 3.403591478896906*^9}, {
+   3.4035915163896236`*^9, 3.403591520884453*^9}, {3.40359176768311*^9, 
+   3.403591822277272*^9}, 3.403592098664856*^9, {3.4035921345004525`*^9, 
+   3.4035921766247096`*^9}, {3.40359238295623*^9, 3.403592389145287*^9}, {
+   3.4035932411190777`*^9, 3.403593338477104*^9}, {3.4035934583043957`*^9, 
+   3.4035934614721613`*^9}, {3.403614158914042*^9, 3.4036141614812603`*^9}, {
+   3.4041343352586*^9, 3.4041343556478*^9}, {3.4041352276566*^9, 
+   3.4041352419462*^9}, {3.4041353225514*^9, 3.404135333019*^9}, {
+   3.4041355245713997`*^9, 3.4041355700766*^9}, {3.4041357546558*^9, 
+   3.404135792127*^9}, {3.4041363435246*^9, 3.404136343743*^9}, {
+   3.4041363837882*^9, 3.4041364789482*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Large-scale transformations: collecting terms around pre-defined symbols\
+\>", "Section",
+ CellChangeTimes->{{3.4033384525984616`*^9, 3.4033384766691866`*^9}, {
+   3.4033386741995125`*^9, 3.403338677967826*^9}, {3.4033388210729246`*^9, 
+   3.403338835799521*^9}, {3.403460216154704*^9, 3.4034602378095684`*^9}, {
+   3.403512348662737*^9, 3.4035123487584343`*^9}, {3.403591066947686*^9, 
+   3.403591082633206*^9}, {3.403591378091834*^9, 3.4035913788847523`*^9}, {
+   3.403597752338154*^9, 3.403597773447154*^9}, 3.4036111003461313`*^9, {
+   3.4036301464386263`*^9, 3.403630160803918*^9}, {3.4041354113934*^9, 
+   3.4041354939486*^9}, {3.4041365644674*^9, 3.4041366192390003`*^9}}],
+
+Cell[TextData[StyleBox["Collecting terms frequently makes the expressions \
+easier to analyze. An example from one of the relaxation theory worksheets:",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.4035308264068437`*^9, 
+   3.403531026826633*^9}, {3.4035886411673994`*^9, 3.403588684834526*^9}, {
+   3.4035888188611045`*^9, 3.4035888221567917`*^9}, {3.403590674188645*^9, 
+   3.403590780904471*^9}, {3.403591390314685*^9, 3.403591478896906*^9}, {
+   3.4035915163896236`*^9, 3.403591520884453*^9}, {3.40359176768311*^9, 
+   3.403591822277272*^9}, 3.403592098664856*^9, {3.4035921345004525`*^9, 
+   3.4035921766247096`*^9}, {3.40359238295623*^9, 3.403592389145287*^9}, {
+   3.4035932411190777`*^9, 3.403593338477104*^9}, {3.4035934583043957`*^9, 
+   3.4035934614721613`*^9}, {3.403614158914042*^9, 3.4036141614812603`*^9}, {
+   3.404136760965*^9, 3.4041367862214003`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{"A", "=", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"-", 
+     FractionBox["1", "45"]}], " ", 
+    RowBox[{"J", "[", 
+     RowBox[{
+      SubscriptBox["\[Tau]", "\"\<c\>\""], ",", "0"}], "]"}], " ", 
+    SubsuperscriptBox["\[CapitalDelta]", "\"\<G1\>\"", "2"]}], "-", 
+   RowBox[{
+    FractionBox["1", "60"], " ", 
+    RowBox[{"J", "[", 
+     RowBox[{
+      SubscriptBox["\[Tau]", "\"\<c\>\""], ",", 
+      SubscriptBox["\[Omega]", "L"]}], "]"}], " ", 
+    SubsuperscriptBox["\[CapitalDelta]", "\"\<G1\>\"", "2"]}], "-", 
+   RowBox[{
+    FractionBox["1", "180"], " ", 
+    RowBox[{"J", "[", 
+     RowBox[{
+      SubscriptBox["\[Tau]", "\"\<c\>\""], ",", "0"}], "]"}], " ", 
+    SubsuperscriptBox["\[CapitalDelta]", "\"\<HFC\>\"", "2"]}], "-", 
+   RowBox[{
+    FractionBox["1", "240"], " ", 
+    RowBox[{"J", "[", 
+     RowBox[{
+      SubscriptBox["\[Tau]", "\"\<c\>\""], ",", 
+      SubscriptBox["\[Omega]", "F"]}], "]"}], " ", 
+    SubsuperscriptBox["\[CapitalDelta]", "\"\<HFC\>\"", "2"]}], "-", 
+   RowBox[{
+    FractionBox["1", "80"], " ", 
+    RowBox[{"J", "[", 
+     RowBox[{
+      SubscriptBox["\[Tau]", "\"\<c\>\""], ",", 
+      SubscriptBox["\[Omega]", "L"]}], "]"}], " ", 
+    SubsuperscriptBox["\[CapitalDelta]", "\"\<HFC\>\"", "2"]}], "-", 
+   RowBox[{
+    FractionBox["1", "720"], " ", 
+    RowBox[{"J", "[", 
+     RowBox[{
+      SubscriptBox["\[Tau]", "\"\<c\>\""], ",", 
+      RowBox[{
+       RowBox[{"-", 
+        SubscriptBox["\[Omega]", "F"]}], "+", 
+       SubscriptBox["\[Omega]", "L"]}]}], "]"}], " ", 
+    SubsuperscriptBox["\[CapitalDelta]", "\"\<HFC\>\"", "2"]}], "-", 
+   RowBox[{
+    FractionBox["2", "15"], " ", 
+    RowBox[{"J", "[", 
+     RowBox[{
+      SubscriptBox["\[Tau]", "\"\<c\>\""], ",", "0"}], "]"}], " ", 
+    SubscriptBox["X", 
+     RowBox[{"\"\<G1\>\"", ",", "\"\<HFC\>\""}]]}], "-", 
+   RowBox[{
+    FractionBox["1", "10"], " ", 
+    RowBox[{"J", "[", 
+     RowBox[{
+      SubscriptBox["\[Tau]", "\"\<c\>\""], ",", 
+      SubscriptBox["\[Omega]", "L"]}], "]"}], " ", 
+    SubscriptBox["X", 
+     RowBox[{"\"\<G1\>\"", ",", "\"\<HFC\>\""}]]}]}]}], "\[IndentingNewLine]", 
+ RowBox[{"Collect", "[", 
+  RowBox[{"A", ",", 
+   RowBox[{"{", 
+    RowBox[{
+     SubsuperscriptBox["\[CapitalDelta]", "\"\<G1\>\"", "2"], ",", 
+     SubsuperscriptBox["\[CapitalDelta]", "\"\<HFC\>\"", "2"], ",", 
+     RowBox[{"X", "[", 
+      RowBox[{"\"\<G1\>\"", ",", "\"\<HFC\>\""}], "]"}]}], "}"}], ",", 
+   "FullSimplify"}], "]"}]}], "Input",
+ CellChangeTimes->{{3.4041368410866003`*^9, 3.4041368671074*^9}, {
+  3.4041369116766*^9, 3.404136912441*^9}, {3.4041369517061996`*^9, 
+  3.4041370625754004`*^9}}],
+
+Cell[TextData[StyleBox["The rearranged form has the spectral densities neatly \
+collected by their respective relaxation mechanism (g anisotropy, HFC \
+anisotropy and their cross-correlation) . The 'FullSimplify' operation is \
+applied to each of the collected groups.",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.4035308264068437`*^9, 
+   3.403531026826633*^9}, {3.4035886411673994`*^9, 3.403588684834526*^9}, {
+   3.4035888188611045`*^9, 3.4035888221567917`*^9}, {3.403590674188645*^9, 
+   3.403590780904471*^9}, {3.403591390314685*^9, 3.403591478896906*^9}, {
+   3.4035915163896236`*^9, 3.403591520884453*^9}, {3.40359176768311*^9, 
+   3.403591822277272*^9}, 3.403592098664856*^9, {3.4035921345004525`*^9, 
+   3.4035921766247096`*^9}, {3.40359238295623*^9, 3.403592389145287*^9}, {
+   3.4035932411190777`*^9, 3.403593338477104*^9}, {3.4035934583043957`*^9, 
+   3.4035934614721613`*^9}, {3.403614158914042*^9, 3.4036141614812603`*^9}, {
+   3.404136760965*^9, 3.4041367862214003`*^9}, {3.4041370953354*^9, 
+   3.4041372235206003`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Playing with patterns", "Section",
+ CellChangeTimes->{{3.4033384525984616`*^9, 3.4033384766691866`*^9}, {
+   3.4033386741995125`*^9, 3.403338677967826*^9}, {3.4033388210729246`*^9, 
+   3.403338835799521*^9}, {3.403460216154704*^9, 3.4034602378095684`*^9}, {
+   3.403512348662737*^9, 3.4035123487584343`*^9}, {3.403591066947686*^9, 
+   3.403591082633206*^9}, {3.403591378091834*^9, 3.4035913788847523`*^9}, {
+   3.403597752338154*^9, 3.403597773447154*^9}, 3.4036111003461313`*^9, {
+   3.4036301464386263`*^9, 3.403630160803918*^9}, {3.403701701932208*^9, 
+   3.4037017054827623`*^9}, 3.4037018649969664`*^9, {3.4041354168534*^9, 
+   3.4041354171342*^9}, 3.666173077772621*^9}],
+
+Cell[TextData[StyleBox["Think of a recent analytical problem that you had \
+encountered. Which functions needed to be transformed? What is the minimal \
+set of rules that is sufficient to transform them? Try creating a coherent \
+pattern set for those functions and applying it to the problem. Remember that \
+Mathematica has a large number of built-in functions which may be used or \
+extended as you see fit. The help system is fairly extensive -- just \
+highlight what you want and press F1.",
+ FontSize->16,
+ FontSlant->"Italic"]], "Text",
+ CellChangeTimes->{{3.403339183467698*^9, 3.4033392844085035`*^9}, {
+   3.4033393996452684`*^9, 3.403339411131838*^9}, {3.4033394689425907`*^9, 
+   3.4033394737733364`*^9}, {3.4034590645955963`*^9, 3.403459065147319*^9}, {
+   3.4034593099002085`*^9, 3.4034594088128233`*^9}, {3.4034594530062838`*^9, 
+   3.4034595138715286`*^9}, {3.4034598973626084`*^9, 
+   3.4034599978327403`*^9}, {3.4034603019636655`*^9, 
+   3.4034603667739706`*^9}, {3.4034605051928453`*^9, 3.403460533461544*^9}, {
+   3.4034606662645674`*^9, 3.4034606827908535`*^9}, {3.403510788011648*^9, 
+   3.4035108104887257`*^9}, {3.403511083995634*^9, 3.403511289284252*^9}, {
+   3.403511331032557*^9, 3.403511367971599*^9}, {3.4035119249173975`*^9, 
+   3.4035120132437754`*^9}, {3.4035122566510477`*^9, 
+   3.4035122749750705`*^9}, {3.4035127511223297`*^9, 
+   3.4035128513991146`*^9}, {3.403513482390955*^9, 3.4035135283850813`*^9}, {
+   3.403513665178084*^9, 3.4035136711767235`*^9}, {3.403513738601119*^9, 
+   3.4035137423450203`*^9}, {3.4035295479994087`*^9, 3.403529729804179*^9}, {
+   3.4035298109874597`*^9, 3.403529827081156*^9}, {3.4035308264068437`*^9, 
+   3.403531026826633*^9}, {3.4035886411673994`*^9, 3.403588684834526*^9}, {
+   3.4035888188611045`*^9, 3.4035888221567917`*^9}, {3.403590674188645*^9, 
+   3.403590780904471*^9}, {3.403591390314685*^9, 3.403591478896906*^9}, {
+   3.4035915163896236`*^9, 3.403591520884453*^9}, {3.40359176768311*^9, 
+   3.403591822277272*^9}, 3.403592098664856*^9, {3.4035921345004525`*^9, 
+   3.4035921766247096`*^9}, {3.40359238295623*^9, 3.403592389145287*^9}, {
+   3.4035932411190777`*^9, 3.403593338477104*^9}, {3.4035934583043957`*^9, 
+   3.4035934614721613`*^9}, {3.403614175215733*^9, 3.40361418230317*^9}, 
+   3.40362516902185*^9, {3.403625467481263*^9, 3.4036255024301977`*^9}, {
+   3.4036296364917727`*^9, 3.403629799118083*^9}, {3.4037017133875294`*^9, 
+   3.403701803505785*^9}, {3.4037018789784937`*^9, 3.4037019476996813`*^9}}]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{1373, 919},
+WindowMargins->{{Automatic, 351}, {253, Automatic}},
+ShowSelection->True,
+FrontEndVersion->"10.2 for Microsoft Windows (64-bit) (July 29, 2015)",
+StyleDefinitions->Notebook[{
+   Cell[
+    StyleData[StyleDefinitions -> "Default.nb"]], 
+   Cell[
+    StyleData["Text"], CellDingbat -> None, TextJustification -> 1., FontSize -> 
+    16, FontSlant -> "Italic", FontColor -> GrayLevel[0], Background -> 
+    RGBColor[0.9019607843137255, 0.9411764705882353, 0.8509803921568627]]}, 
+  Visible -> False, FrontEndVersion -> 
+  "10.2 for Microsoft Windows (64-bit) (July 29, 2015)", StyleDefinitions -> 
+  "PrivateStylesheetFormatting.nb"]
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[567, 22, 392, 6, 101, "Title"],
+Cell[962, 30, 199, 3, 33, "Subsubtitle"],
+Cell[1164, 35, 984, 14, 93, "Text"],
+Cell[CellGroupData[{
+Cell[2173, 53, 495, 8, 70, "Section"],
+Cell[2671, 63, 728, 15, 71, "Text"],
+Cell[3402, 80, 404, 9, 31, "Input"],
+Cell[3809, 91, 665, 10, 71, "Text"],
+Cell[4477, 103, 598, 13, 31, "Input"],
+Cell[5078, 118, 837, 18, 71, "Text"],
+Cell[5918, 138, 406, 9, 31, "Input"],
+Cell[6327, 149, 627, 11, 71, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6991, 165, 500, 6, 70, "Section"],
+Cell[7494, 173, 647, 10, 49, "Text"],
+Cell[8144, 185, 613, 13, 31, "Input"],
+Cell[8760, 200, 821, 17, 71, "Text"],
+Cell[9584, 219, 277, 8, 31, "Input"],
+Cell[9864, 229, 1093, 16, 71, "Text"],
+Cell[10960, 247, 1453, 39, 112, "Input"],
+Cell[12416, 288, 1230, 17, 71, "Text"],
+Cell[13649, 307, 486, 11, 31, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[14172, 323, 450, 6, 70, "Section"],
+Cell[14625, 331, 772, 14, 71, "Text"],
+Cell[15400, 347, 639, 17, 52, "Input"],
+Cell[16042, 366, 698, 13, 71, "Text"],
+Cell[16743, 381, 1993, 60, 294, "Input"],
+Cell[18739, 443, 877, 13, 49, "Text"],
+Cell[19619, 458, 1670, 41, 31, "Input"],
+Cell[21292, 501, 1180, 18, 71, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[22509, 524, 481, 6, 70, "Section"],
+Cell[22993, 532, 1252, 21, 115, "Text"],
+Cell[CellGroupData[{
+Cell[24270, 557, 190, 3, 49, "Text",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.}],
+Cell[24463, 562, 4347, 130, 292, "Input",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.}],
+Cell[28813, 694, 1595, 40, 31, "Input",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.}],
+Cell[30411, 736, 1678, 25, 49, "Text",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.}]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[32138, 767, 443, 6, 70, "Section"],
+Cell[32584, 775, 867, 15, 71, "Text"],
+Cell[33454, 792, 386, 9, 47, "Input"],
+Cell[33843, 803, 1177, 25, 93, "Text"],
+Cell[35023, 830, 1324, 39, 115, "Input"],
+Cell[36350, 871, 1103, 18, 93, "Text"],
+Cell[37456, 891, 1076, 29, 33, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[38569, 925, 824, 11, 70, "Section"],
+Cell[39396, 938, 784, 15, 71, "Text"],
+Cell[40183, 955, 1109, 27, 72, "Input"],
+Cell[41295, 984, 1769, 26, 71, "Text"],
+Cell[43067, 1012, 113, 3, 31, "Input"],
+Cell[43183, 1017, 150, 5, 31, "Input"],
+Cell[43336, 1024, 670, 13, 49, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[44043, 1042, 575, 7, 70, "Section"],
+Cell[44621, 1051, 1044, 18, 93, "Text"],
+Cell[45668, 1071, 3320, 103, 159, "Input"],
+Cell[48991, 1176, 1954, 28, 71, "Text"],
+Cell[50948, 1206, 550, 14, 31, "Input"],
+Cell[51501, 1222, 2067, 30, 71, "Text"],
+Cell[53571, 1254, 492, 15, 52, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[54100, 1274, 618, 8, 70, "Section"],
+Cell[54721, 1284, 1936, 28, 49, "Text"],
+Cell[56660, 1314, 1152, 34, 54, "DisplayFormula"],
+Cell[57815, 1350, 2547, 36, 93, "Text"],
+Cell[CellGroupData[{
+Cell[60387, 1390, 262, 4, 49, "Text",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.}],
+Cell[60652, 1396, 1745, 54, 152, "Input",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.}],
+Cell[62400, 1452, 663, 22, 31, "Input",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.}]
+}, Closed]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[63112, 1480, 622, 8, 70, "Section"],
+Cell[63737, 1490, 2580, 36, 93, "Text"],
+Cell[66320, 1528, 1944, 28, 49, "Text"],
+Cell[68267, 1558, 777, 19, 31, "Input"],
+Cell[69047, 1579, 1977, 28, 49, "Text"],
+Cell[71027, 1609, 760, 15, 31, "Input"],
+Cell[71790, 1626, 2145, 31, 49, "Text"],
+Cell[73938, 1659, 863, 16, 31, "Input"],
+Cell[74804, 1677, 1890, 27, 49, "Text"],
+Cell[76697, 1706, 554, 11, 33, "Input"],
+Cell[77254, 1719, 1932, 28, 49, "Text"],
+Cell[79189, 1749, 653, 14, 31, "Input"],
+Cell[79845, 1765, 1980, 28, 49, "Text"],
+Cell[81828, 1795, 778, 18, 31, "Input"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[82643, 1818, 669, 8, 70, "Section"],
+Cell[83315, 1828, 2252, 33, 49, "Text"],
+Cell[85570, 1863, 1073, 30, 54, "Input"],
+Cell[86646, 1895, 2219, 32, 49, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[88902, 1932, 689, 10, 70, "Section"],
+Cell[89594, 1944, 1977, 28, 49, "Text"],
+Cell[91574, 1974, 2642, 73, 105, "Input"],
+Cell[94219, 2049, 2144, 31, 71, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[96400, 2085, 682, 9, 70, "Section"],
+Cell[97085, 2096, 2495, 35, 93, "Text"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)

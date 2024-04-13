@@ -1,0 +1,200 @@
+<spin_simulation>
+	<version>2</version>
+	<name>4,7,8-Trimethyl-2,3,4,5-tetrahydro-1H-1,5-benzodiazepin-2-one</name>
+	<ID>Maybridge_Ro3_Fragment_09_D11</ID>
+	<SRC name="Maybridge_RO3_Core_Library" ID="BTB00743R3"></SRC>
+	<InChI>InChI=1S/C12H16N2O/c1-7-4-10-11(5-8(7)2)14-12(15)6-9(3)13-10/h4-5,9,13H,6H2,1-3H3,(H,14,15)/t9-/m1/s1</InChI>
+	<comp_db_link>
+		<db_link DBname="CAS Registry" Accession_code="0311-12-03"></db_link>
+	</comp_db_link>
+	<mol_file_path>./alatis_output_input_3d.mol</mol_file_path>
+	<experimental_spectrum>
+		<type>Bruker</type>
+		<root_folder>./1H/</root_folder>
+	</experimental_spectrum>
+	<field_strength>600.01</field_strength>
+	<field_strength_applied_flag>1</field_strength_applied_flag>
+	<num_simulation_points>32768</num_simulation_points>
+	<num_simulation_points_applied_flag>1</num_simulation_points_applied_flag>
+	<path_2D_image>Maybridge_Ro3_Fragment_09_D11_.jpg</path_2D_image>
+	<num_split_matrices>2</num_split_matrices>
+	<roi_rmsd>0.06451</roi_rmsd>
+	<notes>
+		<status>Done</status>
+		<note>16,17,18?19,20,21</note>
+		<note>25?26            </note>
+	</notes>
+	<coupling_matrix>
+		<label>merged</label>
+		<index>1</index>
+		<lw>1</lw>
+		<peak_shape_coefficients>
+			<lorentzian>0.9</lorentzian>
+			<gaussian>0.1</gaussian>
+		</peak_shape_coefficients>
+		<water_region>
+			<min_ppm>4.6</min_ppm>
+			<max_ppm>5</max_ppm>
+			<remove_flag>1</remove_flag>
+		</water_region>
+		<DSS_region>
+			<min_ppm>-.1</min_ppm>
+			<max_ppm>.1</max_ppm>
+			<remove_flag>1</remove_flag>
+		</DSS_region>
+		<additional_coupling_constants>
+		</additional_coupling_constants>
+		<spin_names>
+			<spin index="1" name="16"></spin>
+			<spin index="2" name="17"></spin>
+			<spin index="3" name="18"></spin>
+			<spin index="4" name="19"></spin>
+			<spin index="5" name="20"></spin>
+			<spin index="6" name="21"></spin>
+			<spin index="7" name="22"></spin>
+			<spin index="8" name="23"></spin>
+			<spin index="9" name="24"></spin>
+			<spin index="10" name="25"></spin>
+			<spin index="11" name="26"></spin>
+			<spin index="12" name="27"></spin>
+			<spin index="13" name="28"></spin>
+			<spin index="14" name="29"></spin>
+		</spin_names>
+		<chemical_shifts_ppm>
+			<cs index="1" ppm="2.19679"></cs>
+			<cs index="2" ppm="2.19679"></cs>
+			<cs index="3" ppm="2.19679"></cs>
+			<cs index="4" ppm="2.20532"></cs>
+			<cs index="5" ppm="2.20532"></cs>
+			<cs index="6" ppm="2.20532"></cs>
+			<cs index="7" ppm="1.25760"></cs>
+			<cs index="8" ppm="1.25760"></cs>
+			<cs index="9" ppm="1.25760"></cs>
+			<cs index="10" ppm="6.91405"></cs>
+			<cs index="11" ppm="6.88602"></cs>
+			<cs index="12" ppm="2.59020"></cs>
+			<cs index="13" ppm="2.22220"></cs>
+			<cs index="14" ppm="4.00209"></cs>
+		</chemical_shifts_ppm>
+		<couplings_Hz>
+			<coupling from_index="1" to_index="2" value="-14.0000000"></coupling>
+			<coupling from_index="1" to_index="3" value="-14.0000000"></coupling>
+			<coupling from_index="2" to_index="3" value="-14.0000000"></coupling>
+			<coupling from_index="4" to_index="5" value="-14.0000000"></coupling>
+			<coupling from_index="4" to_index="6" value="-14.0000000"></coupling>
+			<coupling from_index="5" to_index="6" value="-14.0000000"></coupling>
+			<coupling from_index="7" to_index="8" value="-14.0000000"></coupling>
+			<coupling from_index="7" to_index="9" value="-14.0000000"></coupling>
+			<coupling from_index="7" to_index="14" value="6.2743041"></coupling>
+			<coupling from_index="8" to_index="9" value="-14.0000000"></coupling>
+			<coupling from_index="8" to_index="14" value="6.2743041"></coupling>
+			<coupling from_index="9" to_index="14" value="6.2743041"></coupling>
+			<coupling from_index="12" to_index="13" value="-14.7015381"></coupling>
+			<coupling from_index="12" to_index="14" value="6.2056479"></coupling>
+			<coupling from_index="13" to_index="14" value="6.2056479"></coupling>
+		</couplings_Hz>
+		<peak_list>
+		</peak_list>
+	</coupling_matrix>
+	<coupling_matrix>
+		<label>sub_matrix_1</label>
+		<index>2</index>
+		<lw>1.0000</lw>
+		<peak_shape_coefficients>
+			<lorentzian>0.9000</lorentzian>
+			<gaussian>0.1000</gaussian>
+		</peak_shape_coefficients>
+		<water_region>
+			<min_ppm>4.6000</min_ppm>
+			<max_ppm>5.0000</max_ppm>
+			<remove_flag>1</remove_flag>
+		</water_region>
+		<DSS_region>
+			<min_ppm>-0.1000</min_ppm>
+			<max_ppm>0.1000</max_ppm>
+			<remove_flag>1</remove_flag>
+		</DSS_region>
+		<additional_coupling_constants>
+		</additional_coupling_constants>
+		<spin_names>
+			<spin index="1" name="16"></spin>
+			<spin index="2" name="17"></spin>
+			<spin index="3" name="18"></spin>
+			<spin index="4" name="19"></spin>
+			<spin index="5" name="20"></spin>
+			<spin index="6" name="21"></spin>
+		</spin_names>
+		<chemical_shifts_ppm>
+			<cs index="1" ppm="2.19679"></cs>
+			<cs index="2" ppm="2.19679"></cs>
+			<cs index="3" ppm="2.19679"></cs>
+			<cs index="4" ppm="2.20532"></cs>
+			<cs index="5" ppm="2.20532"></cs>
+			<cs index="6" ppm="2.20532"></cs>
+		</chemical_shifts_ppm>
+		<couplings_Hz>
+			<coupling from_index="1" to_index="2" value="-14.0000000"></coupling>
+			<coupling from_index="1" to_index="3" value="-14.0000000"></coupling>
+			<coupling from_index="2" to_index="3" value="-14.0000000"></coupling>
+			<coupling from_index="4" to_index="5" value="-14.0000000"></coupling>
+			<coupling from_index="4" to_index="6" value="-14.0000000"></coupling>
+			<coupling from_index="5" to_index="6" value="-14.0000000"></coupling>
+		</couplings_Hz>
+		<peak_list>
+		</peak_list>
+	</coupling_matrix>
+	<coupling_matrix>
+		<label>sub_matrix_2</label>
+		<index>3</index>
+		<lw>1.0000</lw>
+		<peak_shape_coefficients>
+			<lorentzian>0.9000</lorentzian>
+			<gaussian>0.1000</gaussian>
+		</peak_shape_coefficients>
+		<water_region>
+			<min_ppm>4.6000</min_ppm>
+			<max_ppm>5.0000</max_ppm>
+			<remove_flag>1</remove_flag>
+		</water_region>
+		<DSS_region>
+			<min_ppm>-0.1000</min_ppm>
+			<max_ppm>0.1000</max_ppm>
+			<remove_flag>1</remove_flag>
+		</DSS_region>
+		<additional_coupling_constants>
+		</additional_coupling_constants>
+		<spin_names>
+			<spin index="1" name="22"></spin>
+			<spin index="2" name="23"></spin>
+			<spin index="3" name="24"></spin>
+			<spin index="4" name="25"></spin>
+			<spin index="5" name="26"></spin>
+			<spin index="6" name="27"></spin>
+			<spin index="7" name="28"></spin>
+			<spin index="8" name="29"></spin>
+		</spin_names>
+		<chemical_shifts_ppm>
+			<cs index="1" ppm="1.25760"></cs>
+			<cs index="2" ppm="1.25760"></cs>
+			<cs index="3" ppm="1.25760"></cs>
+			<cs index="4" ppm="6.91405"></cs>
+			<cs index="5" ppm="6.88602"></cs>
+			<cs index="6" ppm="2.59020"></cs>
+			<cs index="7" ppm="2.22220"></cs>
+			<cs index="8" ppm="4.00209"></cs>
+		</chemical_shifts_ppm>
+		<couplings_Hz>
+			<coupling from_index="1" to_index="2" value="-14.0000000"></coupling>
+			<coupling from_index="1" to_index="3" value="-14.0000000"></coupling>
+			<coupling from_index="1" to_index="8" value="6.2743041"></coupling>
+			<coupling from_index="2" to_index="3" value="-14.0000000"></coupling>
+			<coupling from_index="2" to_index="8" value="6.2743041"></coupling>
+			<coupling from_index="3" to_index="8" value="6.2743041"></coupling>
+			<coupling from_index="6" to_index="7" value="-14.7015381"></coupling>
+			<coupling from_index="6" to_index="8" value="6.2056479"></coupling>
+			<coupling from_index="7" to_index="8" value="6.2056479"></coupling>
+		</couplings_Hz>
+		<peak_list>
+		</peak_list>
+	</coupling_matrix>
+</spin_simulation>

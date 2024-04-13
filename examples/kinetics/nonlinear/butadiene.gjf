@@ -1,0 +1,33 @@
+%Chk=butadiene.chk
+%Mem=16GB
+%NProcShared=16
+#p opt=tight m06/cc-pvdz scf=tight 
+   scrf=(smd,solvent=chloroform) integral=(grid=ultrafine)
+
+Geometry
+
+0 1
+ C                 -1.94248231    1.47830480    0.00000000
+ H                 -3.01248231    1.47830480    0.00000000
+ C                 -1.17512514    0.14310332    0.00000000
+ H                 -1.71379135   -0.78141748   -0.00000000
+ C                  0.18005094    0.13505154    0.00000000
+ H                  0.72420058    1.05635559    0.00000000
+ H                  0.70769341   -0.79580475    0.00000000
+ C                 -1.26720800    2.65328209    0.00000000
+ H                 -1.76816447    3.56247708    0.25943612
+ H                 -0.22952621    2.67185578   -0.25943612
+
+--Link1--
+%Chk=butadiene.chk
+%Mem=16GB
+%NProcShared=16
+#p nmr=(giao,mixed,spinspin) m06/cc-pvdz geom=checkpoint
+   integral=(grid=ultrafine) scrf=(smd,solvent=chloroform)
+   scf=tight guess=read
+
+Magnetic properties
+
+0 1
+
+

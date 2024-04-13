@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<spin_system>
+
+  <spin id="1" isotope="13C" label="">
+    <coordinates x="-3.76367" y="0.27069"  z="0.00000" />
+  </spin>
+
+  <spin id="2" isotope="13C" label=""/>
+
+  <spin id="3" isotope="14N" label="">
+    <coordinates x="-1.39936" y="-0.37548" z="0.00000" />
+  </spin>
+
+  <interaction kind="shift" id="1" units="ppm" spin_a="1">
+    <tensor xx="1.9539"  xy="-0.3771" xz="-0.041"
+            yx="-0.3771" yy="1.587"   yz="0.8151" 
+            zx="-0.041"  zy="0.8151"  zz="2.4592" />
+  </interaction>
+
+  <interaction kind="shift" id="2" units="ppm" spin_a="2">
+    <eigenvalues xx="1.0" yy="2.0" zz="3.0"/>
+    <orientation>
+      <euler_angles alpha="0.1" beta="0.2" gamma="0.3"/>
+    </orientation>
+  </interaction>
+
+  <interaction kind="shift" id="3" units="ppm" spin_a="3">
+    <scalar iso="12.0" />
+  </interaction>
+
+  <interaction kind="dipolar" id="4" units="kHz" spin_a="2" spin_b="1">
+    <aniso_asymm iso="0.0" aniso="2.0" asymm="0.0"/>
+    <orientation>
+      <dcm xx="0.1038"  xy="0.4229"  xz="0.9002"
+           yx="0.8648"  yy="-0.4855" yz="0.1283" 
+           zx="0.4913"  zy="0.7651"  zz="-0.4161" />
+    </orientation>
+  </interaction>
+
+  <interaction kind="dipolar" id="5" units="kHz" spin_a="2" spin_b="3">
+    <axiality_rhombicity iso="0.0" ax="2.0" rh="0.0"/>
+    <orientation>
+      <quaternion re="0.4360" i="-0.7183" j="0.3106" k="0.4444" />
+    </orientation>
+  </interaction>
+
+  <interaction kind="quadrupolar" id="6" units="kHz" spin_a="3">
+    <span_skew iso="0.0" span="2.0" skew="0.1"/>
+    <orientation>
+      <angle_axis>
+        <angle phi="0.5" />
+        <axis x="0.1" y="0.2" z="0.3" />
+      </angle_axis>
+    </orientation>
+  </interaction>
+
+</spin_system>

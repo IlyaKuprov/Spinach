@@ -1,0 +1,7 @@
+1. Rename nmrbox_autoexec.m into autoexec.m and move to 
+   kernel/includes, overwriting the previous file.
+
+2. Rename nmrbox_activate_spinach.m into activate_spinach.m 
+   and move to wherever this file normally resides.
+
+ 

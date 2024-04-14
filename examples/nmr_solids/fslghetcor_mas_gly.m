@@ -32,7 +32,7 @@ bas.level=4;
 sys.tols.inter_cutoff=2*pi*200;
 
 % Use GPU arithmetic
-sys.enable={'greedy','gpu'};
+sys.enable={'gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -55,6 +55,7 @@ parameters.cp_dur=1e-4;           % seconds
 parameters.sweep=[NaN 1/(33e-6)]; % f1 f2
 parameters.npoints=[128 512];     % f1 f2
 parameters.zerofill=[512 2048];   % f1 f2
+parameters.nblocks=4;             % Number of FSLG blocks
 parameters.verbose=1;
 parameters.invert_axis=1;
 
@@ -73,8 +74,12 @@ f1_sin=fftshift(fft(fid.sin,parameters.zerofill(2),1),1);
 f1_states=real(f1_cos)+1i*real(f1_sin);
 spectrum=fftshift(fft(f1_states,parameters.zerofill(1),2),2);
 
-% Custom sweep and offset in the F1 direction
-parameters.sweep(1)=1/(4*2*sqrt(2)/parameters.hi_pwr);
+% Custom sweep and offset in the F1 direction: 2 pulses per block 
+% in frequency-switched Lee-Goldburg; 1/sqrt(3) is the scaling of 
+% the chemical shift in the effective Hamiltonian, it may vary in
+% the actual experiment; sqrt(2/3) accounts for the fact that the
+% effective field is at the magic angle.
+parameters.sweep(1)=sqrt(3)*parameters.hi_pwr/(2*parameters.nblocks*sqrt(2/3));
 parameters.offset(1)=0;
 
 % Plotting

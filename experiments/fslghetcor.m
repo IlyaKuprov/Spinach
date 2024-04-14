@@ -112,7 +112,7 @@ for k=1:parameters.npoints(1)
     else
 
         % Subsequent F1 steps keep going
-        for n=1:4
+        for n=1:parameters.nblocks
             rho_cos_ev=step(spin_system,L1_cos,rho_cos_ev,sqrt(2/3)/parameters.hi_pwr);
             rho_cos_ev=step(spin_system,L2_cos,rho_cos_ev,sqrt(2/3)/parameters.hi_pwr);
             rho_sin_ev=step(spin_system,L1_sin,rho_sin_ev,sqrt(2/3)/parameters.hi_pwr);

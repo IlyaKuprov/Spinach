@@ -1,11 +1,13 @@
-% Optimal control optimisation of a pulse performing magnetisation
-% transfer from proton 2 to carbon 5 in a typical protein backbone
-% spin system (literature data for chemical shifts and couplings).
+% Optimal control optimisation of a pulse performing magnetisa-
+% tion transfer from H(N) to C(O) in a typical protein backbone
+% spin system (literature data for shifts and couplings) with a 
+% range of pulse powers emulating B1 inhomogeneity and a range
+% of offsets to account for imperfect transmitter placement.
 %
-% The waveform is optimized with LBFGS-GRAPE algorithm with point-
-% by-point variation and a penalty on the waveform amplitude.
+% The waveform is optimized with LBFGS-GRAPE algorithm with po-
+% int-by-point variation and a penalty on the pulse amplitude.
 %
-%          http://dx.doi.org/10.1016/j.jmr.2011.07.023
+%         http://dx.doi.org/10.1016/j.jmr.2011.07.023
 %
 % Calculation time: hours.
 %
@@ -58,6 +60,11 @@ LyC=operator(spin_system,'Ly','13C');
 LxN=operator(spin_system,'Lx','15N');
 LyN=operator(spin_system,'Ly','15N');
 
+% Offset operators
+LzH=operator(spin_system,'Lz','1H');
+LzC=operator(spin_system,'Lz','13C');
+LzN=operator(spin_system,'Lz','15N');
+
 % Drift Hamiltonian
 H=hamiltonian(assume(spin_system,'nmr'));
 
@@ -69,6 +76,10 @@ H=frqoffset(spin_system,H,parameters);
 % Define control parameters
 control.drifts={{H}};                             % Drift
 control.operators={LxH,LyH,LxC,LyC,LxN,LyN};      % Controls
+control.off_ops={LzH,LzC,LzN};                    % Offset operators 
+control.offsets={linspace(-100,100,3),...
+                 linspace(-100,100,3),...
+                 linspace(-100,100,3)};           % Offset ranges, Hz
 control.rho_init={rho_init};                      % Starting state
 control.rho_targ={rho_targ};                      % Destination state
 control.pwr_levels=2*pi*linspace(0.9e3,1.1e3,5);  % Pulse power, rad/s

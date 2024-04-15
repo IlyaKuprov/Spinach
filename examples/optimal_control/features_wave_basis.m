@@ -1,118 +1,115 @@
-% Optimal control optimisation of a pulse performing magnetisation
-% transfer from proton 2 to carbon 5 in a typical protein backbone
-% spin system (literature data for chemical shifts, with suitable 
-% transmitter offsets, and couplings).
+% An illustration of basis set coefficient optimisation for a pul-
+% se optimised as a linear combination of user-specified vectors.
+% The optimisation is done using LBFGS GRAPE algorithm.
 %
-% The waveform is optimised with the standard LBFGS-GRAPE algorithm
-% in a sine wave basis set with a penalty on the waveform exceeding
-% a defined power threshold.
+%          http://dx.doi.org/10.1016/j.jmr.2011.07.023
 %
-% Spin correlation order populations and the waveform are plotted
-% at every iteration, the fidelity is printed to the console.
+% In a set of 100 equspaced signals, the central 60 spins are set
+% up for maximum excitation; there are no constraints on the dyna-
+% mics of the 20 spins on either side of the interval.
 %
-% Note: optimal control problems using waveform basis sets (as op-
-%       posed to varying the waveform directly point-by-point) ha-
-%       ve slow convergence rates -- about 1000 iterations are re-
-%       quired to achieve a good fidelity in this case.
-%
-% http://dx.doi.org/10.1016/j.jmr.2011.07.023
-%
-% Calculation time: hours.
+% Calculation time: minutes.
 %
 % i.kuprov@soton.ac.uk
 % david.goodwin@inano.au.dk
 
 function features_wave_basis()
 
-% Magnetic field
-sys.magnet=9.4;
+% Set the magnetic field
+sys.magnet=14.1;
 
-% Spin system
-sys.isotopes={'15N','1H','13C','13C','13C','15N'};
-sys.labels={'N_(n)','H','CA','CB','C','N_(n+1)'};
+% 100 non-interacting spins at equal intervals 
+% within the plus/minus 160 ppm range
+n_spins=100; sys.isotopes=cell(n_spins,1);
+for n=1:n_spins, sys.isotopes{n}='13C'; end
+inter.zeeman.scalar=num2cell(linspace(-160,160,n_spins));
 
-% Textbook chemical shifts, ppm
-inter.zeeman.scalar={119.79, 8.03, 57.32, 27.71, 177.25, 115.55};
-
-% Scalar couplings, Hz (literature values)
-inter.coupling.scalar=cell(6);
-inter.coupling.scalar{1,3}=-11; 
-inter.coupling.scalar{2,3}=140;
-inter.coupling.scalar{3,4}=35;
-inter.coupling.scalar{3,5}=55;
-inter.coupling.scalar{3,6}=7;
-inter.coupling.scalar{5,6}=-15;
-
-% Basis set
+% Select a basis set - IK-2 keeps complete basis on each 
+% spin in this case, but ignores multi-spin orders
 bas.formalism='sphten-liouv';
-bas.approximation='IK-0';
-bas.level=4;
+bas.approximation='IK-2';
+bas.space_level=1;
+bas.connectivity='scalar_couplings';
 
-% Spinach housekeeping
+% Run Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Set up and normalise the initial state
-rho_init=state(spin_system,{'Lz'},{2});
+% Set up the initial state vector
+rho_init=state(spin_system,'Lz',21:80);    % 60 spins in the centre
 rho_init=rho_init/norm(full(rho_init),2);
 
-% Set up and normalise the target state
-rho_targ=state(spin_system,{'Lz'},{5});
+% Set up the target state vector
+rho_targ=state(spin_system,'Lx',21:80);    % 60 spins in the centre
 rho_targ=rho_targ/norm(full(rho_targ),2);
 
-% Control operators
-LxH=operator(spin_system,'Lx','1H');
-LyH=operator(spin_system,'Ly','1H');
-LxC=operator(spin_system,'Lx','13C');
-LyC=operator(spin_system,'Ly','13C');
-LxN=operator(spin_system,'Lx','15N');
-LyN=operator(spin_system,'Ly','15N');
+% Get the control operators
+Cx=operator(spin_system,'Lx','13C');
+Cy=operator(spin_system,'Ly','13C');
 
-% Drift Hamiltonian
+% Get the drift Hamiltonian
 H=hamiltonian(assume(spin_system,'nmr'));
 
-% Put transmitters in the right place
-parameters.spins={'1H','13C','15N'};
-parameters.offset=[3214 10000 -4800];
-H=frqoffset(spin_system,H,parameters);
-
 % Define control parameters
-control.drifts={{H}};	                        % Drift
-control.operators={LxH,LyH,LxC,LyC,LxN,LyN};    % Controls
-control.rho_init={rho_init};                    % Starting state
-control.rho_targ={rho_targ};                    % Destination state
-control.pwr_levels=2*pi*linspace(10e3,12e3,5);  % Pulse power, rad/s
-control.pulse_dt=1e-4*ones(1,200);              % Pulse duration
-control.basis=wave_basis('sine_waves',30,200)'; % Basis set
-control.penalties={'SNS'};                      % Penalty
-control.p_weights=100;                          % Penalty weight
-control.method='lbfgs';                         % Optimisation method
-control.max_iter=1000;                          % Termination tolerance
-control.parallel='ensemble';                    % Parallelisation
- 
-% Control trajectory analysis plots
-control.plotting={'correlation_order','local_each_spin',...
-                  'xy_controls','robustness','spectrogram'};
+control.drifts={{H}};                            % Drift
+control.operators={Cx,Cy};                       % Controls
+control.rho_init={rho_init};                     % Starting state
+control.rho_targ={rho_targ};                     % Target state
+control.pulse_dt=4e-6*ones(1,125);               % Slice durations
+control.basis=wave_basis('legendre',20,125)';    % Basis set
+control.pwr_levels=2*pi*linspace(15e3,20e3,11);  % Power levels
+control.method='lbfgs';                          % Optimisation method
+control.max_iter=200;                            % Termination condition
+control.penalties={'SNS'};                       % Penalty type
+control.p_weights=10;                            % Penalty weight
+control.parallel='ensemble';                     % Parallelisation 
+
+% Plotting options
+control.plotting={'xy_controls','amp_controls',...
+                  'robustness','spectrogram'};
+
+% Initial guess
+guess=randn(2,20)/20;
 
 % Spinach housekeeping
 spin_system=optimcon(spin_system,control);
 
-% Initial guess
-guess=randn(6,30);    
-
-% Run the optimisation
+% Run LBFGS GRAPE pulse optimisation
 basis_coeffs=fminnewton(spin_system,@grape_xy,guess);
 
 % Reassemble time-domain control sequence
 pulse=mean(control.pwr_levels)*basis_coeffs*control.basis;
-pulse=mat2cell(pulse,[1 1 1 1 1 1]);
+pulse=mat2cell(pulse,[1 1]);
 
-% Run a test simulation using the optimal pulse
-report(spin_system,'running test simulation...');
-rho=shaped_pulse_xy(spin_system,H,control.operators,pulse,...
+% Simulate the optimised pulse
+rho_init=state(spin_system,'Lz','13C');
+rho=shaped_pulse_xy(spin_system,H,{Cx,Cy},pulse,...
                     control.pulse_dt,rho_init,'expv-pwc');
-fidelity=real(rho_targ'*rho);
-report(spin_system,['Re[<target|rho(T)>] = ' num2str(fidelity)]);
 
+% Set acquisition parameters
+parameters.spins={'13C'};
+parameters.rho0=rho;
+parameters.coil=state(spin_system,'L+','13C');
+parameters.decouple={};
+parameters.offset=0;
+parameters.sweep=55000;
+parameters.npoints=2048;
+parameters.zerofill=16384;
+parameters.axis_units='ppm';
+parameters.invert_axis=1;
+
+% Simulate the free induction decay
+fid=liquid(spin_system,@acquire,parameters,'nmr');
+
+% Apodization
+fid=apodization(fid,'gaussian-1d',10);
+
+% Fourier transform
+spectrum=fftshift(fft(fid,parameters.zerofill));
+
+% Plotting
+figure(); plot_1d(spin_system,real(spectrum),parameters);
+hold on; xline(-96,'r-'); xline(96,'r-');
+    
 end
 

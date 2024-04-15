@@ -54,11 +54,11 @@ control.drifts={{H}};                           % Drift
 control.operators={Lx,Ly};                      % Controls
 control.rho_init={rho_init};                    % Starting state
 control.rho_targ={rho_targ};                    % Target state
-control.pulse_dt=1e-6*ones(1,500);              % Slice durations
+control.pulse_dt=2e-6*ones(1,250);              % Slice durations
 control.pwr_levels=2*pi*linspace(15e3,20e3,11); % Power levels
 control.method='lbfgs';                         % Optimisation method
 control.max_iter=1000;                          % Termination condition
-control.amplitudes=exp(-linspace(-2,2,500).^2); % Amplitude profile
+control.amplitudes=exp(-linspace(-2,2,250).^2); % Amplitude profile
 control.penalties={'DNS'};                      % Penalise non-smooth
 control.p_weights=1;                            % Penalty weight
 control.parallel='ensemble';                    % Parallelisation 
@@ -68,7 +68,7 @@ control.plotting={'xy_controls','phi_controls',...
                   'robustness','spectrogram'};
 
 % Initial guess for phases
-guess=pi/6*ones(1,500);
+guess=pi/6*ones(1,250);
 
 % Spinach housekeeping
 spin_system=optimcon(spin_system,control);

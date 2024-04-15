@@ -1,12 +1,18 @@
 % Optimal control optimisation of a pulse performing magnetisa-
 % tion transfer from H(N) to C(O) in a typical protein backbone
 % spin system (literature data for shifts and couplings) with a 
-% range of pulse powers emulating B1 inhomogeneity.
+% range of pulse powers emulating B1 inhomogeneity and a range
+% of offsets to account for imperfect transmitter placement.
 %
 % The dynamics includes dissipative terms in the drift generator:
 % C(O) and N(H) are set to have rapid transverse relaxation. Four-
 % spin correlation approximation is used, wherein five-spin and 
 % higher correlations are dropped from the basis set.
+%
+% The waveform is optimized with LBFGS-GRAPE algorithm with point-
+% by-point variation and a penalty on the waveform amplitude.
+%
+%          http://dx.doi.org/10.1016/j.jmr.2011.07.023
 %
 % Calculation time: hours.
 %
@@ -66,6 +72,11 @@ LyH=operator(spin_system,'Ly','1H');
 LyC=operator(spin_system,'Ly','13C');
 LyN=operator(spin_system,'Ly','15N');
 
+% Offset operators
+LzH=operator(spin_system,'Lz','1H');
+LzC=operator(spin_system,'Lz','13C');
+LzN=operator(spin_system,'Lz','15N');
+
 % Dissipative drift Liouvillian
 spin_system=assume(spin_system,'nmr');
 L=hamiltonian(spin_system)+1i*relaxation(spin_system);
@@ -78,12 +89,16 @@ L=frqoffset(spin_system,L,parameters);
 % Define control parameters
 control.drifts={{L}};                             % Drift
 control.operators={LxH,LyH,LxC,LyC,LxN,LyN};      % Controls
+control.off_ops={LzH,LzC,LzN};                    % Offset operators 
+control.offsets={linspace(-100,100,3),...
+                 linspace(-100,100,3),...
+                 linspace(-100,100,3)};           % Offset ranges, Hz
 control.rho_init={rho_init};                      % Starting state
 control.rho_targ={rho_targ};                      % Destination state
 control.pwr_levels=2*pi*linspace(0.9e3,1.1e3,5);  % Pulse power, rad/s
-control.pulse_dt=5e-5*ones(1,400);                % Slice durations
-control.penalties={'NS','SNS'};                   % Penalties
-control.p_weights=[0.1 10];                       % Penalty weights
+control.pulse_dt=4e-5*ones(1,500);                % Slice durations
+control.penalties={'NS'};                         % Penalties
+control.p_weights=0.01;                           % Penalty weights
 control.method='lbfgs';                           % Optimisation method
 control.max_iter=500;                             % Termination tolerance
 control.parallel='ensemble';                      % Parallelisation
@@ -97,7 +112,7 @@ spin_system=optimcon(spin_system,control);
 
 % Start with pi/2 on 1H;
 % end with pi/2 on 13C
-guess=randn(6,400)/10; 
+guess=randn(6,500)/10; 
 guess(2,1:20)=0.25;
 guess(4,(end-20):end)=0.25;
 

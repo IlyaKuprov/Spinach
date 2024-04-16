@@ -75,9 +75,6 @@ else
     location='CPU'; rho=full(rho);
 end
 
-% Inform the user about the schedule
-report(spin_system,['taking ' num2str(nsteps) ' Krylov steps...']);
-
 % Start feedback timer
 feedback=tic();
 
@@ -142,22 +139,10 @@ switch output
     case 'observable'
         
         % Preallocate the answer
-        switch location
-
-            case 'CPU'
-                
-                % Preallocate on CPU
-                answer=zeros([(nsteps+1) size(rho,2)],'like',1i);
-
-            case 'GPU'
-
-                % Preallocate on GPU
-                answer=1i*gpuArray.zeros([(nsteps+1) size(rho,2)]);
-
-        end
-        
+        answer=zeros([(nsteps+1) size(rho,2)],'like',1i);
+  
         % Set the initial point
-        answer(1,:)=coil'*rho;
+        answer(1,:)=gather(coil'*rho);
         
         % Loop over steps
         for n=1:nsteps
@@ -166,7 +151,7 @@ switch output
             rho=step(spin_system,L,rho,timestep);
             
             % Assign the answer
-            answer(n+1,:)=hdot(coil,rho);
+            answer(n+1,:)=gather(coil'*rho);
             
             % Inform the user
             if (n==nsteps)||(toc(feedback)>1)
@@ -176,9 +161,6 @@ switch output
             end
             
         end
-
-        % Retrieve from GPU
-        if strcmp(location,'GPU'), answer=gather(answer); end
         
     case 'multichannel'
         

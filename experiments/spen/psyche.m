@@ -4,40 +4,40 @@
 %
 % The following parameters are required:
 %
-% parameters.rho0           initial state
+%      parameters.rho0           initial state
 %
-% parameters.coil           detection state
+%      parameters.coil           detection state
 %
-% parameters.spins          nuclei on which the sequence runs
+%      parameters.spins          nuclei on which the sequence runs
 %
-% parameters.g_amp          gradient amplitude (T/m)
+%      parameters.g_amp          gradient amplitude (T/m)
 %
-% parameters.dims           size of the sample (m)
+%      parameters.dims           size of the sample (m)
 %
-% parameters.npts           number of discretization points in the grid
+%      parameters.npts           number of discretization points in the grid
 %
-% parameters.sweep          spectral range (Hz)
+%      parameters.sweep          spectral range (Hz)
 %
-% parameters.npoints        number of points in the sweep
+%      parameters.npoints        number of points in the sweep
 %
-% parameters.zerofill       number of points for the zero filling
+%      parameters.zerofill       number of points for the zero filling
 %
-% parameters.diff           diffusion constant (m^2/s)
+%      parameters.diff           diffusion constant (m^2/s)
 %
-% H                         Fokker-Planck Hamiltonian, received
-%                           from the imaging context
+%      H                         Fokker-Planck Hamiltonian, received
+%                                from the imaging context
 %
-% R                         Fokker-Planck relaxation superoperator,
-%                           received from the imaging context
+%      R                         Fokker-Planck relaxation superoperator,
+%                                received from the imaging context
 %
-% K                         Fokker-Planck kinetics superoperator,
-%                           received from the imaging context
+%      K                         Fokker-Planck kinetics superoperator,
+%                                received from the imaging context
 %
-% G                         Fokker-Planck gradient superoperators,
-%                           received from the imaging context
+%      G                         Fokker-Planck gradient superoperators,
+%                                received from the imaging context
 %
-% F                         Fokker-Planck diffusion and flow super-
-%                           operator, received from the context
+%      F                         Fokker-Planck diffusion and flow super-
+%                                operator, received from the context
 %
 % mohammadali.foroozandeh@chem.ox.ac.uk
 % m.g.concilio@soton.ac.uk

@@ -20,7 +20,8 @@
 %            tensors of rank k in the order of decreasing
 %            projection. A single argument call produces
 %            tensors of all ranks and puts them into a 
-%            cell array in the order of increasing rank.
+%            cell array in the order of increasing rank,
+%            and decreasing projection within each rank.
 %
 % Note: operator normalisation in spin dynamics is not a good
 % idea. The only way to make the formalism independent of the

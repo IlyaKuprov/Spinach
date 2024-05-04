@@ -175,6 +175,9 @@ parfor (n=1:numel(weights),nworkers)
     
     % Localise the parameter array
     localpar=parameters;
+
+    % Pass the current orientation to the pulse sequence
+    localpar.current_angles=[alphas(n) betas(n) gammas(n)];
     
     % Get the full Hamiltonian at the current orientation
     H=I+orientation(Q,[alphas(n) betas(n) gammas(n)]); H=(H+H')/2;

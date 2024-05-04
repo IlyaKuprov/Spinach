@@ -1,5 +1,7 @@
-% Water protons in the unit cell of monohydrocalcite, 
-% including position exchange and MAS.
+% Water protons in the unit cell of monohydrocalcite, inc-
+% luding position exchange and MAS. Further details in:
+%
+%       https://doi.org/10.1038/s41467-023-44381-x
 %
 % Calculation time: seconds.
 %

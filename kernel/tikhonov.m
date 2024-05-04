@@ -36,6 +36,8 @@
 % Note: for best numerical performance, scale K to have approxima-
 %       tely unit 2-norm, and y to have approximately unit 1-norm.
 %
+% Note: see tikhoind.m for the indeterminate solver.
+%
 % i.kuprov@soton.ac.uk
 % a.acharya@soton.ac.uk
 %

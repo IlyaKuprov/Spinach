@@ -1,6 +1,8 @@
 % Cross-polarisation contact curve under magic angle spinning 
 % in the presence of chemical exchange for H1, H4 and C19 in
-% the unit cell of monohydrocalcite.
+% the unit cell of monohydrocalcite. Further details in:
+%
+%         https://doi.org/10.1038/s41467-023-44381-x
 %
 % Calculation time: hours, much faster on a GPU.
 %

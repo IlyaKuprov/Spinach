@@ -1,5 +1,8 @@
-% Water protons in the unit cell of monohydrocalcite, 
-% including slow isotropic rotational diffusion and MAS.
+% Water protons in the unit cell of monohydrocalcite, inc-
+% luding slow isotropic rotational diffusion and MAS. Fur-
+% ther details in:
+%
+%       https://doi.org/10.1038/s41467-023-44381-x
 %
 % Calculation time: minutes, seconds with a GPU.
 %

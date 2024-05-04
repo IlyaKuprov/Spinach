@@ -1,5 +1,7 @@
 % All protons in the unit cell of monohydrocalcite, magic
-% angle spinning NMR simulation.
+% angle spinning NMR simulation. Further details in:
+%
+%      https://doi.org/10.1038/s41467-023-44381-x
 %
 % Calculation time: hours, minutes on a GPU.
 %

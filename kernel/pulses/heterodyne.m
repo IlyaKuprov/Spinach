@@ -1,55 +1,100 @@
-% Filters out high frequency signals for pulse waveform as recorded by an
-% oscilloscope. Supports GPU usage. Syntax:
+% Signal heterodyne from wall clock time into the rotating frame. Uses
+% a GPU if one is available. Syntax:
 % 
-%                heterodyne(time_grid,exp_data,carrier_freq)
+%                    heterodyne(dt,exp_data,car_freq)
 %
 % Parameters:
 %
-%   time_grid      -  Time grid supplied by RLC circuit data,
-%                     a column vector.
+%   dt         - time step in the input data, seconds
 %
-%   exp_data       -  Amplitude data, supplied as a column vector.
+%   signal     - wall clock time signal, a column vector
 %
-%   carrier_freq   -  carrier frequency, Hz
+%   freq       - frequency to be demodulated, Hz
 %
 % Outputs:
 %
-%       X        - in-phase part of the rotating frame
-%                  pulse waveform distorted by the RLC
-%                  response, a column vector of real 
-%                  numbers
+%   X, Y       - in-phase and out-of-phase parts of the
+%                rotating frame
 %
-%       Y        - out-of-phase part of the rotating
-%                  frame pulse waveform distorted by
-%                  the RLC response, a column vector
-%                  of real numbers
+%
+% Note: the signal must be sampled with at least four points per period
+%       of the frequency being demodulated.
+%
+% a.acharya@soton.ac.uk
+% i.kuprov@soton.ac.uk
+%
+% <https://spindynamics.org/wiki/index.php?title=heterodyne.m>
 
-function [X,Y]=heterodyne(time_grid,exp_data,carrier_freq)
+function [X,Y]=heterodyne(dt,signal,freq)
 
-% Needs a grumbler
+% Check consistency
+grumble(dt,signal,freq);
 
-% Carrier frequency to rad/s
-omega=2*pi*carrier_freq;
+% Build time grid
+time_grid=dt*((1:numel(signal))'-1);
 
 % Move inputs to GPU
 if canUseGPU()
-    exp_data=gpuArray(exp_data); time_grid=gpuArray(time_grid);
+    signal=gpuArray(signal); 
+    time_grid=gpuArray(time_grid);
 end
-
-% Mix with carrier frequency
-X=2*exp_data.*cos(omega*time_grid);
-Y=2*exp_data.*sin(omega*time_grid);
-clear('exp_data','time_grid');
 
 % Define a lowpass filter
-d=designfilt('lowpassfir','SampleRate',          2.5e9, ...
-                          'PassbandFrequency',   1e6,   ...
-                          'StopbandFrequency',   1.5e7, ...
-                          'PassbandRipple',      0.5,   ...
-                          'StopbandAttenuation', 50);
-B = d.Coefficients; if canUseGPU(), B=gpuArray(B); end
+F=designfilt('lowpassfir','FilterOrder',8,...
+             'HalfPowerFrequency',0.25);
 
-% Apply the lowpass filter
-X=gather(fftfilt(B,X)); Y=gather(fftfilt(B,Y));
+% Decide the output
+if nargout==0
+
+    % Plot the filter profile
+    freqz(F.Coefficients,1,[],1/dt);
+
+else
+
+    % Mix with carrier frequency
+    X=2*signal.*cos(2*pi*freq*time_grid);
+    Y=2*signal.*sin(2*pi*freq*time_grid);
+    clear('signal','time_grid');
+
+    % Get coefficients
+    B=F.Coefficients; 
+    if canUseGPU()
+        B=gpuArray(B);
+    end
+
+    % Apply the filter
+    X=gather(fftfilt(B,X)); 
+    Y=gather(fftfilt(B,Y));
 
 end
+
+end
+
+% Consistency enforcement
+function grumble(dt,signal,freq)
+if (~isnumeric(dt))||(~isreal(dt))||(~isscalar(dt))||(dt<=0)
+    error('dt must be a positive real number.');
+end
+if (~isnumeric(signal))||(~isreal(signal))||(~iscolumn(signal))
+    error('signal must be a real column vector.');
+end
+if (~isnumeric(freq))||(~isreal(freq))||(~isscalar(freq))
+    error('freq must be a real number.');
+end
+if 4*dt > 1/freq
+    error('the specified frequency is not sampled well enough.');
+end
+end
+
+% How did we spend the entire day monitoring what we thought was an NMR
+% signal before noticing we had no field? Probably, in the slightly pa-
+% nicked atmosphere a small radio station spike was mistaken for an NMR
+% signal. Under normal operation with a cold superconducting magnet the
+% magnet coil acts as an excellent radio frequency shield. When the mag-
+% net quenches and warms up, the shielding effect is removed, so radio
+% station spikes can appear. That's what seems to have misled us. Moral:
+% check that the "NMR signal" disappears when no pulse is applied.
+%
+% Malcolm Levitt's email to 
+% his group, July 2023.
+

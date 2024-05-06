@@ -1,10 +1,10 @@
 % 3D MRI pulse sequence, with a slice selection stage followed by phase-
-% encoded acquisition in the slice selected. Syntax:
+% encoded acquisition of the slice. Syntax:
 %
-%          mri=slice_phase_enc(spin_system,parameters,H,R,K,G,F)
+%          fid=phase_enc_3d(spin_system,parameters,H,R,K,G,F)
 %     
-% This sequence must be called from the imaging() context, which
-% would provide H,R,K,G, and F. 
+% This sequence must be called from the imaging() context, which would
+% provide H,R,K,G, and F. 
 %
 % Parameters: 
 %
@@ -23,9 +23,6 @@
 %
 %  parameters.ro_grad_dur   -  the duration of the readout gradient,
 %                              seconds
-%
-%  parameters.image_size    -  number of points in each dimension of
-%                              the resulting image
 %
 %  parameters.image_size    -  number of points in each dimension of
 %                              the resulting image

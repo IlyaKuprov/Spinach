@@ -30,15 +30,6 @@ function [X,Y]=heterodyne(dt,signal,freq)
 % Check consistency
 grumble(dt,signal,freq);
 
-% Build time grid
-time_grid=dt*((1:numel(signal))'-1);
-
-% Move inputs to GPU
-if canUseGPU()
-    signal=gpuArray(signal); 
-    time_grid=gpuArray(time_grid);
-end
-
 % Define a lowpass filter
 F=designfilt('lowpassfir','FilterOrder',8,...
              'HalfPowerFrequency',0.25);
@@ -50,6 +41,15 @@ if nargout==0
     freqz(F.Coefficients,1,[],1/dt);
 
 else
+
+    % Build time grid
+    time_grid=dt*((1:numel(signal))'-1);
+
+    % Move inputs to GPU
+    if canUseGPU()
+        signal=gpuArray(signal); 
+        time_grid=gpuArray(time_grid);
+    end
 
     % Mix with carrier frequency
     X=2*signal.*cos(2*pi*freq*time_grid);

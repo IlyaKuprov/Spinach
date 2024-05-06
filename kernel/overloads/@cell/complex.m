@@ -1,14 +1,14 @@
 % A shorthand for making all elements of a cell array complex.
 % Syntax:
-%                        A=inflate(A)
+%                        A=complex(A)
 %
 % Parameters:
 %
-%    A   -  a cell array of polyadics
+%    A   -  a cell array of numeric objects
 %
 % Outputs
 %
-%    A   -  a cell array of matrices
+%    A   -  a cell array of numeric objects
 %
 % i.kuprov@soton.ac.uk
 %

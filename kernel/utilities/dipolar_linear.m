@@ -1,3 +1,24 @@
+% Computes dipolar couplings in the presence or absence of periodic
+% boundary conditions using an optimized approach with the conmat function.
+% This function is part of the Spinach library's kernel utilities and is
+% designed to efficiently handle large systems by reducing computational
+% complexity from quadratic to approximately N log N.
+%
+% Usage of this function within the Spinach library is internal, and
+% direct calls are generally discouraged in favor of higher-level functions.
+% This function updates the spin_system object with new interaction matrices
+% reflecting computed dipolar interactions.
+%
+% Contributors:
+%    Ilya Kuprov - initial implementation
+%    Alessandro Lodi - optimisation using conmat (lodialessandro0@gmail.com)
+%
+% Contact:
+%    lodialessandro0@gmail.com
+%
+% References:
+%    https://spindynamics.org/wiki/index.php?title=dipolar.m
+
 function spin_system = dipolar_linear(spin_system)
 
     % Check consistency
@@ -54,5 +75,14 @@ function spin_system = dipolar_linear(spin_system)
         end
     end
     
+end
+
+% Consistency enforcement
+function grumble(spin_system)
+    if ~all(isfield(spin_system,{'comp','inter','chem','tols'}))
+        error('spin_system object is missing essential information.');
     end
+end
     
+
+

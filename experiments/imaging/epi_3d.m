@@ -1,6 +1,6 @@
 % Diffusion weighted 3D echo planar imaging pulse sequence. Syntax: 
 % 
-%           mri=epi_3d(spin_system,parameters,H,R,K,G,F)
+%           fid=epi_3d(spin_system,parameters,H,R,K,G,F)
 %
 % This sequence must be called from the imaging() context, which
 % would provide H,R,K,G, and F. Parameters:

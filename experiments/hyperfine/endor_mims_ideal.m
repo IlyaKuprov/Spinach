@@ -1,6 +1,6 @@
 % Mims ENDOR sequence with ideal electron pulses. Syntax:
 %
-%     endor_spec=endor_mims_echo(spin_system,parameters,H,R,K)
+%     endor_spec=endor_mims_ideal(spin_system,parameters,H,R,K)
 %
 % Parameters:
 %

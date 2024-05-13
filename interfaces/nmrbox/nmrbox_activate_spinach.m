@@ -11,7 +11,7 @@ addpath(genpath('/usr/software/spinach/interfaces'));
 addpath(genpath('/usr/software/spinach/kernel'));
 
 % Test and display the welcome message
-existentials(); disp('Welcome to Spinach 2.8 and DEERNet.');
+existentials(); disp('Welcome to Spinach 2.9 and DEERNet.');
 disp('Type ''wiki'' and press Enter to open documentation web site.');
 disp('Type ''forum'' and press Enter to open user support forum.');
 disp('See /usr/software/spinach/examples directory for the example set.');

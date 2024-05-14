@@ -1,5 +1,7 @@
 % Saves pulses in Bruker format. The result is a text file with a 
-% list of amplitudes and phases, directly usable in TopSpin.
+% list of amplitudes and phases, usable in TopSpin. Syntax:
+%
+%                 bruker_write(X,Y,dt,file_name)
 %
 % Parameters:
 %
@@ -19,6 +21,7 @@
 %    the function writes an ASCII text file
 %
 % a.acharya@soton.ac.uk
+% david.goodwin@inano.au.dk
 % i.kuprov@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=bruker_write.m>
@@ -29,7 +32,7 @@ function bruker_write(X,Y,dt,file_name)
 grumble(X,Y,dt,file_name);
 
 % Get amplitudes and phases
-amp=sqrt(X.^2+Y.^2); phi=atan2(Y,X);
+[amp,phi]=cartesian2polar(X,Y);
 
 % Wrap phases and convert to degrees
 phi=rad2deg(wrapTo2Pi(phi));
@@ -44,10 +47,10 @@ date=datetime('now','Format','dd/MM/yyyy');
 time=datetime('now','Format','HH:mm:ss');
 
 % Write shaped pulse lines
-lines = ["##TITLE=  Parameter file, TopSpin 4.3.0",  ... 
+lines = ["##TITLE= Optimal control pulse",  ... 
          "##JCAMP-DX= 5.00 Bruker JCAMP library",    ...
          "##DATA TYPE= Shape Data",                  ...
-         "##ORIGIN= Bruker BioSpin GmbH",            ...
+         "##ORIGIN= SPINACH",            ...
          "##OWNER= <demo>",                          ...
          "##DATE=" + string(date),                   ...
          "##TIME=" + string(time),                   ...

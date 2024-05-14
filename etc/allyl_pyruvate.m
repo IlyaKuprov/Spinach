@@ -1,14 +1,21 @@
 % Spin system of allyl pyruvate. Isotropic chemical shifts and 
-% J couplings determined by spectral fitting, coordinates and
+% J-couplings determined by spectral fitting, coordinates and
 % chemical shift anisotropies from DFT. Syntax:
 %
-%                   [sys,inter]=allyl_pyruvate(spins)
+%                [sys,inter]=allyl_pyruvate(spins)
 %
-% The 'spins' parameter is a cell array containing the isotopes
-% to import, e.g. {'1H','13C'}.
+% Parameters:
 %
-% Note: 13C-13C J-couplings are not provided - this file is only
-%       suitable for natural abundance 13C simulations.
+%    spins   - a cell array containing the isotopes
+%              to import, e.g. {'1H','13C'}
+%
+% Outputs:
+%
+%    sys, inter - Spinach data structures with the
+%                 specification of the spin system
+%
+% Note: 13C-13C J-couplings are not provided - this spin system
+%       is for natural abundance 13C simulations only.
 %
 % a.acharya@soton.ac.uk
 % i.kuprov@soton.ac.uk
@@ -26,7 +33,7 @@ sys.isotopes={'13C','13C','13C','13C','13C','13C',...
 sys.labels={'C1','C2','C3','C4','C5','C6',...
             'Ha','Hb','Hc','Hd1','Hd2','He1','He2','He3'};
 
-% Chemical shifts (fitting)
+% Chemical shifts (from fitting)
 inter.zeeman.scalar={119.9643 130.6962 66.8463 160.4202 191.6305 ...
                       26.6961   5.4086  5.3273   5.9678   4.7466 ...
                        4.7466   2.4836  2.4836   2.4836};
@@ -75,7 +82,7 @@ inter.zeeman.matrix{idxof(sys,'He3')}=-remtrace([32.9096    4.0247    0.3478
                                                   0.1631   29.6606   -0.0268
                                                   0.3721    0.2046   26.7796]);
 
-% 13C-1H J-couplings (fitting)
+% 13C-1H J-couplings (from fitting)
 inter.coupling.scalar=cell(14,14);
 inter.coupling.scalar{idxof(sys,'C1'),idxof(sys,'Ha')}= 156.04; 
 inter.coupling.scalar{idxof(sys,'C1'),idxof(sys,'Hb')}= 160.11; 
@@ -103,7 +110,7 @@ inter.coupling.scalar{idxof(sys,'C6'),idxof(sys,'He1')}=129.52;
 inter.coupling.scalar{idxof(sys,'C6'),idxof(sys,'He2')}=129.52;
 inter.coupling.scalar{idxof(sys,'C6'),idxof(sys,'He3')}=129.52;
 
-% 1H-1H J-couplings (fitting)
+% 1H-1H J-couplings (from fitting)
 inter.coupling.scalar{idxof(sys,'Ha'),idxof(sys,'Hb')}=   +1.16;
 inter.coupling.scalar{idxof(sys,'Ha'),idxof(sys,'Hc')}=  +17.18;
 inter.coupling.scalar{idxof(sys,'Hb'),idxof(sys,'Hc')}=  +10.40;
@@ -114,7 +121,7 @@ inter.coupling.scalar{idxof(sys,'Hb'),idxof(sys,'Hd2')}=  -1.16;
 inter.coupling.scalar{idxof(sys,'Hc'),idxof(sys,'Hd1')}=  +5.98;
 inter.coupling.scalar{idxof(sys,'Hc'),idxof(sys,'Hd2')}=  +5.98;
 
-% Coordinates (DFT)
+% Coordinates (from DFT)
 inter.coordinates={[-3.845334  -0.310277  -0.426714]   % C1
                    [-2.765389  -0.342326   0.350942]   % C2
                    [-1.608016   0.574585   0.183489]   % C3

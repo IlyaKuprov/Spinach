@@ -1,7 +1,7 @@
 % 2D phase encoding imaging pulse sequence with optional diffusion
 % weighting during the echo time. Syntax: 
 % 
-%          mri=phase_enc(spin_system,parameters,H,R,K,G,F)
+%        mri=phase_enc_2d(spin_system,parameters,H,R,K,G,F)
 %
 % This sequence must be called from the imaging() context, which
 % would provide H,R,K,G, and F. 
@@ -10,7 +10,7 @@
 %
 %  parameters.t_echo        -  echo time, seconds
 %
-%  parameters.diff_g_amp   -   [optional] a vector of diffusion gra-
+%  parameters.diff_g_amp    -  [optional] a vector of diffusion gra-
 %                              dient pair amplitudes in X,Y (T/m) to
 %                              be active during the echo time
 %

@@ -1,7 +1,7 @@
 % Irreducible spherical tensor expansion of central transition
 % operators of half-integer spins. Syntax:
 %
-%                [states,coeffs]=ct2ist(mult,type)
+%               [states,coeffs]=ct2ist(mult,type)
 %
 % Parameters:
 %

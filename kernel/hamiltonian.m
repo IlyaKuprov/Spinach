@@ -38,11 +38,11 @@
 
 function [H,Q]=hamiltonian(spin_system,operator_type)
 
-% Check consistency
-grumble(spin_system);
-
 % Set the default for the type
 if ~exist('operator_type','var'), operator_type='comm'; end
+
+% Check consistency
+grumble(spin_system,operator_type);
 
 % Decide if the Q part is required
 build_aniso=(nargout>1);
@@ -800,13 +800,18 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system)
+function grumble(spin_system,operator_type)
 if ~isfield(spin_system,'bas')
     error('basis set information is missing, run basis() before calling this function.');
 end
 if (~isfield(spin_system.inter.coupling,'strength'))||...
    (~isfield(spin_system.inter.zeeman,'strength'))     
     error('assumption information is missing, run assume() before calling this function.');
+end
+% Catch operator type errors
+if (~ischar(operator_type))||...
+   (~ismember(operator_type,{'left','right','comm','acomm'}))
+    error('incorrect operator type specification.');
 end
 end
 

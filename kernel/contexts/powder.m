@@ -102,12 +102,25 @@ else
     ZI=[]; ZQ=[]; % Work around the parfor bug
 end
 
-% Get the full lab frame Hamiltonian if needed
-if ismember('aniso_eq',parameters.needs)
+% Get the lab frame Hamiltonian if needed
+if ismember('iso_eq',parameters.needs)
+    
+    % Isotropic part and thermal equilibrium here
+    report(spin_system,'building the lab frame Hamiltonian...');
+    HL=hamiltonian(assume(spin_system,'labframe'),'left'); QL=[];
+    parameters.rho0=equilibrium(spin_system,HL);
+
+elseif ismember('aniso_eq',parameters.needs)
+    
+    % Isotropic + anisotropic part and thermal equilibrium later
     report(spin_system,'building the lab frame Hamiltonian...');
     [HL,QL]=hamiltonian(assume(spin_system,'labframe'),'left');
+
 else
-    HL=[]; QL=[]; % Work around the parfor bug
+
+    % Work around the parfor bug
+    HL=[]; QL=[]; 
+
 end
 
 % Set the assumptions
@@ -188,7 +201,7 @@ parfor (n=1:numel(weights),nworkers)
         localpar.hzeeman=(Z+Z')/2;
     end
     
-    % Compute the thermal equilibrium at the current orientation
+    % Compute thermal equilibrium at the current orientation
     if ismember('aniso_eq',parameters.needs)
         localpar.rho0=equilibrium(spin_system,HL,QL,[alphas(n) betas(n) gammas(n)]);
     end
@@ -334,6 +347,13 @@ for n=1:numel(parameters.rframes)
     end
     if ~isnumeric(parameters.rframes{n}{2})
         error('the second part of each element of parameters.rframes must be a number.');
+    end
+end
+
+% Additional needs
+if isfield(parameters,'needs')
+    if ismember('iso_eq',parameters.needs)&&ismember('aniso_eq',parameters.needs)
+        error('iso_eq and aniso_eq needs cannot be specified simultaneously.');
     end
 end
 

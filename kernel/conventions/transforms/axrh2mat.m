@@ -40,7 +40,7 @@ xx=iso-(ax+3*rh)/6;
 yy=iso-(ax-3*rh)/6;
 zz=iso+ax/3;
 
-% Rotate the matrix
+% Rotate the molecule
 R=euler2dcm(alp,bet,gam);
 M=R*diag([xx yy zz])*R';
 

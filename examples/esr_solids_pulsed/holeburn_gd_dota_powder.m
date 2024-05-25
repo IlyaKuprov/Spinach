@@ -30,7 +30,7 @@ for n=1:numel(W)
     sys.magnet=3.5;
     sys.isotopes={'E8'};
     inter.zeeman.scalar={2.002319};
-    inter.coupling.matrix{1,1}=0.56e9*zfs2mat(D(n),E(n));
+    inter.coupling.matrix{1,1}=0.56e9*zfs2mat(D(n),E(n),0,0,0);
     
     % Basis set
     bas.formalism='sphten-liouv';

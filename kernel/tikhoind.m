@@ -7,8 +7,7 @@
 %
 %    K      - kernel matrix, may be complex, may be non-square
 %
-%    D      - regularisation matrix, leave empty to use finite
-%             difference second derivative matrix
+%    D      - regularisation matrix
 %
 %    y      - a column vector, may be complex
 %

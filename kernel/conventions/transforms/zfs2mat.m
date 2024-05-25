@@ -1,47 +1,51 @@
 % Converts D and E zero-field splitting parameters described in
-% the abstract of
+% the abstract of (http://dx.doi.org/10.1063/1.1682294) into a
+% spin interaction matrix. Syntax:
 %
-%               http://dx.doi.org/10.1063/1.1682294
+%                  M=zfs2mat(D,E,alp,bet,gam)
 %
-% into a diagonal spin interaction matrix. Syntax:
+% Parameters:
 %
-%                         M=zfs2mat(D,E)
+%    D,E  - real scalar parameters, Hz
 %
-% Perameters:
+%    alp  - alpha Euler angle in radians
 %
-%   D,E   - real scalar parameters
+%    bet  - beta Euler angle in radians
+%
+%    gam  - gamma Euler angle in radians
 %
 % Outputs:
 %
-%     M   - diagonal 3x3 matrix
+%     M   - symmetric 3x3 matrix, Hz
 %
 % i.kuprov@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=zfs2mat.m>
 
-function M=zfs2mat(D,E)
+function M=zfs2mat(D,E,alp,bet,gam)
 
 % Check consistency
-grumble(D,E);
+grumble(D,E,alp,bet,gam);
 
-% Compute the matrix
+% Compute the matrix in the eigenframe
 M=[-D/3+E, 0, 0; 0, -D/3-E, 0; 0, 0, 2*D/3];
 
+% Rotate the molecule
+R=euler2dcm(alp,bet,gam); M=R*M*R';
+
 % Tidy up the double precision
-M=M-eye(3)*trace(M)/3;
+M=M-eye(3)*trace(M)/3; M=(M+M')/2;
 
 end
 
 % Consistency enforcement
-function grumble(D,E)
-if (~isnumeric(D))||(~isnumeric(E))
-    error('all inputs must be numeric.');
-end
-if (~isreal(D))||(~isreal(E))
-    error('all inputs must be real.');
-end
-if (numel(D)~=1)||(numel(E)~=1)
-    error('all inputs must have one element.');
+function grumble(D,E,alp,bet,gam)
+if (~isnumeric(D))||(~isreal(D))||(~isscalar(D))||...
+   (~isnumeric(E))||(~isreal(E))||(~isscalar(E))||...
+   (~isnumeric(alp))||(~isreal(alp))||(~isscalar(alp))||...
+   (~isnumeric(bet))||(~isreal(bet))||(~isscalar(bet))||...
+   (~isnumeric(gam))||(~isreal(gam))||(~isscalar(gam))
+    error('all inputs must be real scalars.');
 end
 end
 

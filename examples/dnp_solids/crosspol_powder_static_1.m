@@ -32,7 +32,7 @@ parameters.irr_opers={operator(spin_system,'Ly','E'), ...
                       operator(spin_system,'Lx','15N')};
 parameters.exc_opers={operator(spin_system,'Lx','E'), ...
                       operator(spin_system,'Ly','15N')};
-parameters.needs={'aniso_eq'};
+parameters.needs={'iso_eq'}; % Good enough here
 parameters.coil=state(spin_system,'Lx','15N');
 parameters.grid='rep_2ang_6400pts_sph';
 parameters.time_steps=1e-5*ones(1,100);

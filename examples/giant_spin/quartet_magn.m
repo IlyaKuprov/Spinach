@@ -19,7 +19,7 @@ inter.zeeman.matrix={[2 0 0; 0 2 0; 0 0 2]};
 
 % Zero-field splitting
 D=icm2hz(-0.5); E=0.3*D;
-inter.coupling.matrix{1,1}=zfs2mat(D,E);
+inter.coupling.matrix{1,1}=zfs2mat(D,E,0,0,0);
 
 % Formalism and basis set
 bas.approximation='none';

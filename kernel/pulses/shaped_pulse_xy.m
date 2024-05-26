@@ -29,17 +29,20 @@
 %
 %      method - propagation method and product quadrature: 
 %
-%                 Krylov algorithm (recommended):
+%                 Krylov algorithm (usually faster for calls with one 
+%                 and two outputs):
 %
 %                    'expv-pwc' - piecewise-constant
 %                    'expv-pwl' - 2nd order Lie quadrature
 %
-%                 Explicit matrix exponentiation:
+%                 Explicit matrix exponentiation (usually faster for 
+%                 calls with three outputs):
 %
 %                    'expm-pwc' - piecewise-constant
 %                    'expm-pwl' - 2nd order Lie quadrature
 %
-%                 Spinach evolution function call:
+%                 Spinach evolution function call (do not choose un-
+%                 less you have a specific good reason):
 %                 
 %                    'evol-pwc' - piecewise-constant
 %                    'evol-pwl' - 2nd order Lie quadrature

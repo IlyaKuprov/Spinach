@@ -166,7 +166,7 @@ switch spin_system.bas.formalism
         for n=1:numel(grid)
             
             % Get sorted eigensystem
-            [E(:,n),V{n}]=get_eigensys(parameters,grid(n)*Hz+Hc);
+            [E(:,n),V{n}]=rspt_eig(grid(n)*Hz+Hc,parameters.rspt_order); 
             
             % Hellmann-Feynman energy derivatives
             dE(:,n)=real(sum(conj(V{n}).*(Hz*V{n}),1));
@@ -213,8 +213,8 @@ switch spin_system.bas.formalism
                     % Compute sorted midpoint energies
                     midp1=grid(n-1)+(1/3)*dx;
                     midp2=grid(n-1)+(2/3)*dx;
-                    [Em1,V1]=get_eigensys(parameters,midp1*Hz+Hc);
-                    [Em2,V2]=get_eigensys(parameters,midp2*Hz+Hc);
+                    [Em1,V1]=rspt_eig(midp1*Hz+Hc,parameters.rspt_order); 
+                    [Em2,V2]=rspt_eig(midp2*Hz+Hc,parameters.rspt_order);
                     
                     % Hellmann-Feynman energy derivatives
                     dEm1=real(sum(conj(V1).*(Hz*V1),1));
@@ -369,38 +369,6 @@ tf(hit_list)=[]; tm(hit_list)=[]; tw(hit_list)=[];
 [tf,idx]=sort(tf(:)); 
 tm=tm(:); tm=tm(idx);
 tw=tw(:); tw=tw(idx);
-
-end
-
-% Eigensystem with an RSPT switch
-function [E,V]=get_eigensys(parameters,H)
-
-% Decide the method
-switch parameters.rspt_order
-
-    case {1,2,3,4}
-
-        % Diag and off-diag Hamiltonian
-        H_diag=diag(H); H_offd=(H+H')/2; 
-        H_offd(logical(speye(size(H))))=0;
-
-        % Use perturbation theory
-        [E,V]=rspert(H_diag,H_offd,parameters.rspt_order);
-
-    case Inf
-
-        % Full diagonalisation
-        [V,E]=eig(full(H),'vector');
-
-    otherwise
-
-        % Complain and bomb out
-        error('unsupported perturbation theory order.');
-
-end
-
-% Eigensystem sorting
-[E,idx]=sort(E); V=V(:,idx);
 
 end
 

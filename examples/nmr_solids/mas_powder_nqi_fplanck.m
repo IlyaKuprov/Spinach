@@ -36,8 +36,8 @@ parameters.spins={'2H'};
 parameters.decouple={};
 parameters.axis_units='ppm';
 parameters.invert_axis=1;
-parameters.rho0=state(spin_system,'L+','2H','cheap');
-parameters.coil=state(spin_system,'L+','2H','cheap');
+parameters.rho0=state(spin_system,'L+','2H');
+parameters.coil=state(spin_system,'L+','2H');
 parameters.verbose=0;
 
 % Simulation

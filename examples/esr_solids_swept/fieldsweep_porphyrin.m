@@ -56,6 +56,7 @@ parameters.npoints=512;
 parameters.rspt_order=Inf;
 
 % Run the simulation
+parameters.rho0=state(spin_system,'Lz','E');
 [b_axis,spec]=fieldsweep(spin_system,parameters);
 
 % Plotting

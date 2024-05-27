@@ -37,12 +37,13 @@ parameters.grid=6;
 parameters.mw_freq=9e9;
 parameters.fwhm=1e-5;
 parameters.int_tol=0.1;
-parameters.tm_tol=1e-1;
+parameters.tm_tol=0.1;
 parameters.window=[0.316 0.326];
 parameters.npoints=1024;
 parameters.rspt_order=Inf;
 
 % Run the simulation
+parameters.rho0=state(spin_system,'Lz','E');
 [b_axis,spec]=fieldsweep(spin_system,parameters);
 
 % Plotting

@@ -63,10 +63,6 @@ else
     
 end
 
-% Inform the user
-report(spin_system,['computing the thermal equilibrium state at '...
-                     num2str(spin_system.rlx.temperature) ' Kelvin.']);
-
 % Get the temperature factor
 beta_factor=spin_system.tols.hbar/(spin_system.tols.kbol*spin_system.rlx.temperature);
 
@@ -121,10 +117,6 @@ switch spin_system.bas.formalism
             
         % Determine scaling and squaring parameters
         n_squarings=max([0 ceil(log2(mat_norm))]); scaling_factor=2^n_squarings;
-            
-        % Inform the user
-        report(spin_system,['scaling -H/RT down by ' num2str(scaling_factor) ...
-                            ' and squaring its exponential ' num2str(n_squarings) ' times.']);
             
         % Scale the temperature factor
         if scaling_factor>1, beta_factor=beta_factor/scaling_factor; end

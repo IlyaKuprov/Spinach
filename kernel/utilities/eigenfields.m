@@ -1,6 +1,6 @@
-% Computes resonance fields. For a Hamiltonian Hc+b*Hz, returns all 
-% magnetic fields b for which the difference between two eigenvalues
-% of Hc+b*Hz is equal to the frequency provided, and the transition
+% Computes resonance fields. For a Hamiltonian Hc+B*Hz, returns all 
+% magnetic fields B for which the difference between two eigenvalues
+% of Hc+B*Hz is equal to the frequency provided, and the transition
 % moment across the specified operator Hmw is significant. Syntax:
 %
 %  [tf,tm,tw]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw)
@@ -67,92 +67,23 @@ function [tf,tm,tw]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw)
 % Check consistency
 grumble(parameters,Iz,Qz,Ic,Qc);
 
-% Recursive call for symmetry
-if isfield(spin_system.bas,'irrep')
-    
-    % Preallocate irrep output blocks
-    n_irreps=numel(spin_system.bas.irrep);
-    tf=cell(n_irreps,1); tm=cell(n_irreps,1);
-    tw=cell(n_irreps,1);
-    
-    % Loop over irreducible representations
-    for n=1:n_irreps
-        
-        % Project Hamiltonian components
-        P=spin_system.bas.irrep(n).projector;
-        IzIrr=P'*Iz*P; IzIrr=(IzIrr+IzIrr')/2; 
-        IcIrr=P'*Ic*P; IcIrr=(IcIrr+IcIrr')/2; 
-        QzIrr=Qz; QcIrr=Qc;
-        for k=1:numel(QzIrr)
-            for m=1:numel(QzIrr{k})
-                if ~isempty(QzIrr{k}{m})
-                    QzIrr{k}{m}=P'*QzIrr{k}{m}*P;
-                end
-            end
-        end
-        for k=1:numel(QcIrr)
-            for m=1:numel(QcIrr{k})
-                if ~isempty(QcIrr{k}{m})
-                    QcIrr{k}{m}=P'*QcIrr{k}{m}*P;
-                end
-            end
-        end
+% Get frequency gap tolerance in rad/s
+frq_gap_tol=abs(spin('E')*parameters.pp_tol);
 
-        % Project the microwave operator
-        switch spin_system.bas.formalism
-            
-            % Hilbert space
-            case 'zeeman-hilb'
-                
-                % Hmw is a Hermitian matrix
-                HmwIrr=P'*Hmw*P; HmwIrr=(HmwIrr+HmwIrr')/2;
-                            
-            % Liouville space
-            case {'zeeman-liouv','sphten-liouv'}
-                
-                % Hmw is a vector
-                HmwIrr=P'*Hmw;
-                
-            otherwise
-                
-                % Complain and bomb out
-                error('unknown formalism specification.');
-                
-        end
-           
-        % Issue a recursive call
-        spin_system_nosym=spin_system;
-        spin_system_nosym.bas=rmfield(spin_system.bas,'irrep');
-        [tf{n},tm{n},tw{n}]=eigenfields(spin_system_nosym,parameters,...
-                                        IzIrr,QzIrr,IcIrr,QcIrr,HmwIrr);
-                                    
-    end
-    
-    % Concatenate irrep blocks
-    tf=cell2mat(tf); tf=tf(:);
-    tm=cell2mat(tm); tm=tm(:);
-    tw=cell2mat(tw); tw=tw(:); return;
-    
-end
-
-% Assemble and clean up Hamiltonians
-Hc=Ic+orientation(Qc,parameters.orientation); 
+% Assemble Zeeman and coupling Hamiltonians
 Hz=Iz+orientation(Qz,parameters.orientation); 
-Hc=(Hc+Hc')/2; Hz=(Hz+Hz')/2;
+Hc=Ic+orientation(Qc,parameters.orientation); 
 
-% Decide energy gap tolerance
-engap_tol=abs(spin('E')*parameters.pp_tol);
-
-% Microwave frequency
+% Get MW frequency in rad/s
 omega=2*pi*parameters.mw_freq;
 
 % Pathway selection
 switch spin_system.bas.formalism
     
-    % Hilbert space formalism
+    % Hilbert space
     case 'zeeman-hilb'
         
-        % Initial grid - trisect the window
+        % Initial field grid: trisect the window
         left_edge=min(parameters.window);
         right_edge=max(parameters.window);
         grid=[left_edge+0*(right_edge-left_edge)/3 ...
@@ -160,20 +91,17 @@ switch spin_system.bas.formalism
               left_edge+2*(right_edge-left_edge)/3 ...
               left_edge+3*(right_edge-left_edge)/3];
           
-        % Populate the initial grid
-        E=zeros([size(Hz,1) numel(grid)]); dE=zeros(size(E)); 
-        T=cell(1,numel(grid)); V=cell(1,numel(grid));
+        % Set up field grid data structures
+        E= zeros([size(Hz,1) numel(grid)]); % Level energies
+        LP=zeros([size(Hz,1) numel(grid)]); % Level populations
+        dE=zeros([size(Hz,1) numel(grid)]); % dE/dB derivatives
+        T=cell(1,numel(grid));              % Transition moments
+
+        % Populate initial grid
         for n=1:numel(grid)
-            
-            % Get sorted eigensystem
-            [E(:,n),V{n}]=rspt_eig(grid(n)*Hz+Hc,parameters.rspt_order); 
-            
-            % Hellmann-Feynman energy derivatives
-            dE(:,n)=real(sum(conj(V{n}).*(Hz*V{n}),1));
-            
-            % Mark significant transition moments
-            T{n}=abs(V{n}'*Hmw*V{n}).^2; T_max=max(T{n},[],'all');
-            T{n}=sparse(T{n}>T_max*parameters.tm_tol);
+
+            % Sorted (ascending) energies, dE/dB derivatives, transition moments, level pops
+            [E(:,n),~,dE(:,n),T{n},LP(:,n)]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,grid(n));
             
         end
         
@@ -185,7 +113,7 @@ switch spin_system.bas.formalism
             
             % Start at the leftmost point of the grid
             new_E=E(:,1); new_dE=dE(:,1); new_T=T(1);
-            new_grid=grid(1); new_conv=[]; new_V=V(1);
+            new_grid=grid(1); new_conv=[]; new_LP=LP(:,1);
             
             % Inspect old grid intervals
             for n=2:numel(grid)
@@ -210,31 +138,21 @@ switch spin_system.bas.formalism
                                      (2/3)*ones(size(E,1),1));
                     EmP1=sort(EmP1); EmP2=sort(EmP2);
                                     
-                    % Compute sorted midpoint energies
-                    midp1=grid(n-1)+(1/3)*dx;
-                    midp2=grid(n-1)+(2/3)*dx;
-                    [Em1,V1]=rspt_eig(midp1*Hz+Hc,parameters.rspt_order); 
-                    [Em2,V2]=rspt_eig(midp2*Hz+Hc,parameters.rspt_order);
-                    
-                    % Hellmann-Feynman energy derivatives
-                    dEm1=real(sum(conj(V1).*(Hz*V1),1));
-                    dEm2=real(sum(conj(V2).*(Hz*V2),1));
-                    
-                    % Mark significant transition moments
-                    Tm1=abs(V1'*Hmw*V1).^2; Tm1_max=max(Tm1,[],'all');
-                    Tm2=abs(V2'*Hmw*V2).^2; Tm2_max=max(Tm2,[],'all');
-                                        
+                    % Get the eigensystem information for the grid midpoints
+                    midp1=grid(n-1)+(1/3)*dx; midp2=grid(n-1)+(2/3)*dx;
+                    [Em1,~,dEm1,Tm1,LPm1]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,midp1);
+                    [Em2,~,dEm2,Tm2,LPm2]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,midp2);
+
                     % Add midpoints to the grid
-                    new_grid(end+1)=midp1; new_grid(end+1)=midp2;  %#ok<AGROW>
-                    new_dE(:,end+1)=dEm1;  new_dE(:,end+1)=dEm2;   %#ok<AGROW>
-                    new_E(:,end+1)=Em1;    new_E(:,end+1)=Em2;     %#ok<AGROW>
-                    new_T{end+1}=sparse(Tm1>Tm1_max*parameters.tm_tol);  %#ok<AGROW>
-                    new_T{end+1}=sparse(Tm2>Tm2_max*parameters.tm_tol);  %#ok<AGROW>
-                    new_V{end+1}=V1;  new_V{end+1}=V2;  %#ok<AGROW>
+                    new_grid(end+1)=midp1; new_grid(end+1)=midp2; %#ok<AGROW>
+                    new_dE(:,end+1)=dEm1;  new_dE(:,end+1)=dEm2;  %#ok<AGROW>
+                    new_E(:,end+1)=Em1;    new_E(:,end+1)=Em2;    %#ok<AGROW>
+                    new_T{end+1}=Tm1;      new_T{end+1}=Tm2;      %#ok<AGROW>
+                    new_LP(:,end+1)=LPm1;  new_LP(:,end+1)=LPm2;  %#ok<AGROW>
                     
                     % Check prediction accuracy
-                    if (norm(EmP1-Em1,1)<engap_tol)&&...
-                       (norm(EmP2-Em2,1)<engap_tol)
+                    if (norm(EmP1-Em1,1)<frq_gap_tol)&&...
+                       (norm(EmP2-Em2,1)<frq_gap_tol)
                         
                         % Paint new intervals clean
                         new_conv(end+1)=true();      %#ok<AGROW>
@@ -246,7 +164,7 @@ switch spin_system.bas.formalism
                         % Paint new intervals dirty
                         new_conv(end+1)=false();     %#ok<AGROW>
                         new_conv(end+1)=false();     %#ok<AGROW>
-                        new_conv(end+1)=false();      %#ok<AGROW>
+                        new_conv(end+1)=false();     %#ok<AGROW>
                          
                     end
                     
@@ -257,16 +175,16 @@ switch spin_system.bas.formalism
                 new_dE(:,end+1)=dE(:,n);   %#ok<AGROW>
                 new_E(:,end+1)=E(:,n);     %#ok<AGROW>
                 new_T{end+1}=T{n};         %#ok<AGROW>
-                new_V{end+1}=V{n};         %#ok<AGROW>
+                new_LP(:,end+1)=LP(:,n);   %#ok<AGROW>
                 
             end
             
             % New grid becomes old
             E=new_E; dE=new_dE; grid=new_grid;
-            T=new_T; V=new_V; converged=new_conv;
+            T=new_T; LP=new_LP; converged=new_conv;
             
-            % Complain and bomb out if the grid becomes too large
-            if numel(grid)>1e3, error('grid construction failed'); end
+            % Complain and bomb out if the field grid becomes too large
+            if numel(grid)>1e3, error('field grid construction failed'); end
             
         end
         
@@ -286,8 +204,8 @@ switch spin_system.bas.formalism
             % Screen by energy and transition moment
             deltaE_upper=interval_max'-interval_min;
             deltaE_lower=interval_min'-interval_max;
-            promising_pairs=(omega<deltaE_upper)&...
-                            (omega>deltaE_lower)&(T{n-1}|T{n});
+            promising_pairs=(omega<deltaE_upper)&(omega>deltaE_lower)&...
+                            (T{n-1}>parameters.tm_tol|T{n}>parameters.tm_tol);
             [source,destin]=find(promising_pairs);
             
             % Loop over source-destination pairs
@@ -310,8 +228,8 @@ switch spin_system.bas.formalism
                 if (alpha>0)&&(alpha<1)
 
                     % Grid edge transition moments
-                    tm_left=abs(V{n-1}(:,source(k))'*Hmw*V{n-1}(:,destin(k)))^2;
-                    tm_right=abs(V{n}(:,source(k))'*Hmw*V{n}(:,destin(k)))^2;
+                    tm_left=T{n-1}(source(k),destin(k));
+                    tm_right=T{n}(source(k),destin(k));
                 
                     % Store interpolated transition moment
                     tm(end+1)=(1-alpha)*tm_left+alpha*tm_right; %#ok<AGROW>
@@ -361,8 +279,7 @@ switch spin_system.bas.formalism
 end
 
 % Prune insignificant transition moments
-tm_max=max(tm,[],'all');
-hit_list=(tm<tm_max*parameters.tm_tol);
+hit_list=(tm<parameters.tm_tol);
 tf(hit_list)=[]; tm(hit_list)=[]; tw(hit_list)=[];
 
 % Reshape into columns and sort

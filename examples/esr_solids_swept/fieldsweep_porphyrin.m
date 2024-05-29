@@ -46,17 +46,17 @@ spin_system=basis(spin_system,bas);
 
 % Experiment parameters
 parameters.spins={'E'};
-parameters.grid=6;
+parameters.grid=4;
 parameters.mw_freq=9.39e9;
 parameters.fwhm=5e-4;
-parameters.int_tol=1;
+parameters.int_tol=10;
 parameters.tm_tol=0.1;
 parameters.window=[0.27 0.35];
 parameters.npoints=512;
 parameters.rspt_order=Inf;
 
-% Run the simulation
-parameters.rho0=state(spin_system,'Lz','E');
+% Run the simulation in the high-T approximation
+parameters.rho0=-state(spin_system,'Lz','E');
 [b_axis,spec]=fieldsweep(spin_system,parameters);
 
 % Plotting

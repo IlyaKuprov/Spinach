@@ -58,6 +58,8 @@
 %
 %     tw     -  vector of transition FWHMs in Tesla
 %
+%     pd     -  vector of energy level population differences
+%
 % i.kuprov@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=eigenfields.m>
@@ -138,39 +140,35 @@ switch spin_system.bas.formalism
                                      (2/3)*ones(size(E,1),1));
                     EmP1=sort(EmP1); EmP2=sort(EmP2);
                                     
-                    % Get the eigensystem information for the grid midpoints
+                    % Get eigensystem information for the grid midpoints
                     midp1=grid(n-1)+(1/3)*dx; midp2=grid(n-1)+(2/3)*dx;
                     [Em1,~,dEm1,Tm1,LPm1]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,midp1);
                     [Em2,~,dEm2,Tm2,LPm2]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,midp2);
 
-                    % Add midpoints to the grid
-                    new_grid(end+1)=midp1; new_grid(end+1)=midp2; %#ok<AGROW>
-                    new_dE(:,end+1)=dEm1;  new_dE(:,end+1)=dEm2;  %#ok<AGROW>
-                    new_E(:,end+1)=Em1;    new_E(:,end+1)=Em2;    %#ok<AGROW>
-                    new_T{end+1}=Tm1;      new_T{end+1}=Tm2;      %#ok<AGROW>
-                    new_LP(:,end+1)=LPm1;  new_LP(:,end+1)=LPm2;  %#ok<AGROW>
-                    
+                    % Append midpoints to the new grid
+                    new_grid((end+1):(end+2))=[midp1 midp2];
+                    new_dE(:,(end+1):(end+2))=[dEm1 dEm2];
+                    new_LP(:,(end+1):(end+2))=[LPm1 LPm2];
+                    new_E(:,(end+1):(end+2))=[Em1 Em2];
+                    new_T((end+1):(end+2))={Tm1 Tm2};
+
                     % Check prediction accuracy
                     if (norm(EmP1-Em1,1)<frq_gap_tol)&&...
                        (norm(EmP2-Em2,1)<frq_gap_tol)
                         
                         % Paint new intervals clean
-                        new_conv(end+1)=true();      %#ok<AGROW>
-                        new_conv(end+1)=true();      %#ok<AGROW>
-                        new_conv(end+1)=true();      %#ok<AGROW>
+                        new_conv((end+1):(end+3))=true();
                         
                     else
                         
                         % Paint new intervals dirty
-                        new_conv(end+1)=false();     %#ok<AGROW>
-                        new_conv(end+1)=false();     %#ok<AGROW>
-                        new_conv(end+1)=false();     %#ok<AGROW>
+                        new_conv((end+1):(end+3))=false();     
                          
                     end
                     
                 end
                 
-                % Inherit the right point
+                % Inherit right point from old grid
                 new_grid(end+1)=grid(n);   %#ok<AGROW>
                 new_dE(:,end+1)=dE(:,n);   %#ok<AGROW>
                 new_E(:,end+1)=E(:,n);     %#ok<AGROW>
@@ -182,7 +180,7 @@ switch spin_system.bas.formalism
             % New grid becomes old
             E=new_E; dE=new_dE; grid=new_grid;
             T=new_T; LP=new_LP; converged=new_conv;
-            
+
             % Complain and bomb out if the field grid becomes too large
             if numel(grid)>1e3, error('field grid construction failed'); end
             
@@ -190,7 +188,7 @@ switch spin_system.bas.formalism
         
         % Get outputs started
         tf=[]; tm=[]; tw=[]; pd=[];
-        
+
         % Loop over grid intervals
         for n=2:numel(grid)
             
@@ -220,12 +218,55 @@ switch spin_system.bas.formalism
                 % Energies must be omega apart
                 destin_line(2)=destin_line(2)-omega;
 
-                % Solve the linear interpolant
+                % Use linear interpolation first
                 line_coeffs=destin_line-source_line;
                 alpha=-line_coeffs(2)/line_coeffs(1);
-                
-                % Stay within the interval
-                if (alpha>0)&&(alpha<1)
+
+                % Check level crossing location
+                if (alpha<-0.1)||(alpha>1.1)
+                    
+                    % Outside
+                    continue;
+
+                else
+
+                    % Get spline coefficients (x^3 -> x^0) for energies in this interval
+                    source_spline=[dE(source(k),n-1)*dx E(source(k),n-1) ...
+                                   dE(source(k),n)*dx   E(source(k),n)]*[ 1 -2  1  0; 
+                                                                          2 -3  0  1; 
+                                                                          1 -1  0  0; 
+                                                                         -2  3  0  0];
+                    destin_spline=[dE(destin(k),n-1)*dx E(destin(k),n-1) ...
+                                   dE(destin(k),n)*dx   E(destin(k),n)]*[ 1 -2  1  0; 
+                                                                          2 -3  0  1; 
+                                                                          1 -1  0  0; 
+                                                                         -2  3  0  0];
+                    % Energies must be omega apart
+                    destin_spline(4)=destin_spline(4)-omega;
+
+                    % Get and stabilise cubic equation coefficients
+                    cubic_coeffs=destin_spline-source_spline;
+                    cubic_coeffs=cubic_coeffs/max(abs(cubic_coeffs));
+
+                    % Differentiate the spline and store coefficients as (x^2 -> x^0)
+                    deriv_coeffs=[3*cubic_coeffs(1) 2*cubic_coeffs(2) 1*cubic_coeffs(3)];
+
+                    % One iteration of Newton's method to refine the root
+                    numer=cubic_coeffs(1)*alpha^3+cubic_coeffs(2)*alpha^2+...
+                          cubic_coeffs(3)*alpha  +cubic_coeffs(4);
+                    denom=deriv_coeffs(1)*alpha^2+deriv_coeffs(2)*alpha  +...
+                          deriv_coeffs(3);
+                    alpha=alpha-numer/denom;
+
+                end
+                    
+                % Check level crossing location
+                if (alpha<0)||(alpha>1)
+                    
+                    % Outside
+                    continue;
+
+                else
 
                     % Interval edge transition moments
                     tm_left=T{n-1}(source(k),destin(k));

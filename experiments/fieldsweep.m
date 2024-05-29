@@ -66,14 +66,15 @@ b_axis=linspace(parameters.window(1),...
 spec=zeros(size(b_axis),'like',1i);
 
 % Eigenfields at grid vertices
-tf=cell(grid_size,1); tm=cell(grid_size,1); tw=cell(grid_size,1);
+tf=cell(grid_size,1); tm=cell(grid_size,1); 
+tw=cell(grid_size,1); pd=cell(grid_size,1);
 parfor n=1:grid_size %#ok<*PFBNS>
 
     % Localise parameters array and set the orientation
     loc_params=parameters; loc_params.orientation=[alps(n) bets(n) gams(n)];
     
     % Transition fields and moments
-    [tf{n},tm{n},tw{n}]=eigenfields(spin_system,loc_params,Iz,Qz,Ic,Qc,Hmw); 
+    [tf{n},tm{n},tw{n},pd{n}]=eigenfields(spin_system,loc_params,Iz,Qz,Ic,Qc,Hmw); 
     
 end
 
@@ -85,10 +86,17 @@ parfor n=1:size(hull,1)
     
     % Extract triangle indices
     a=hull(n,1); b=hull(n,2); c=hull(n,3);
+
+    % Get vertex coordinates
+    xyz_a=[x(a); y(a); z(a)]; 
+    xyz_b=[x(b); y(b); z(b)]; 
+    xyz_c=[x(c); y(c); z(c)];
     
     % Call Voitlander integrator
-    spec=spec+voitlander(spin_system,parameters,[x(a);y(a);z(a)],[x(b);y(b);z(b)],[x(c);y(c);z(c)],...
-                         tf{a},tf{b},tf{c},tm{a},tm{b},tm{c},tw{a},tw{b},tw{c},Ic,Iz,Qc,Qz,Hmw,b_axis);
+    spec=spec+voitlander(spin_system,parameters,xyz_a,xyz_b,xyz_c,...
+                                     tf{a},tf{b},tf{c},tm{a},tm{b},tm{c},...
+                                     tw{a},tw{b},tw{c},pd{a},pd{b},pd{c},...
+                                     Ic,Iz,Qc,Qz,Hmw,b_axis);
     
 end
 

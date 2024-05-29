@@ -62,7 +62,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=eigenfields.m>
 
-function [tf,tm,tw]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw)
+function [tf,tm,tw,pd]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw)
 
 % Check consistency
 grumble(parameters,Iz,Qz,Ic,Qc);
@@ -189,7 +189,7 @@ switch spin_system.bas.formalism
         end
         
         % Get outputs started
-        tf=[]; tm=[]; tw=[];
+        tf=[]; tm=[]; tw=[]; pd=[];
         
         % Loop over grid intervals
         for n=2:numel(grid)
@@ -227,14 +227,21 @@ switch spin_system.bas.formalism
                 % Stay within the interval
                 if (alpha>0)&&(alpha<1)
 
-                    % Grid edge transition moments
+                    % Interval edge transition moments
                     tm_left=T{n-1}(source(k),destin(k));
                     tm_right=T{n}(source(k),destin(k));
+
+                    % Interval edge population differences
+                    pd_left=LP(source(k),n-1)-LP(destin(k),n-1);
+                    pd_right=LP(source(k),n)-LP(destin(k),n);
                 
                     % Store interpolated transition moment
                     tm(end+1)=(1-alpha)*tm_left+alpha*tm_right; %#ok<AGROW>
+
+                    % Store interpolated population difference
+                    pd(end+1)=(1-alpha)*pd_left+alpha*pd_right; %#ok<AGROW>
                   
-                    % Store the eigenfield
+                    % Store the transition field
                     tf(end+1)=grid(n-1)+alpha*dx; %#ok<AGROW>
 
                     % Get transition width (much to do here)
@@ -252,14 +259,13 @@ switch spin_system.bas.formalism
         % Get all transitions
         [uv,tf]=eig(omega*eye(size(Hc))-full(Hc),full(Hz),'vector');
         
-        % Prune out instabilities
-        hit_list=~isfinite(tf); uv(:,hit_list)=[]; tf(hit_list)=[];
-        
-        % Make sure tfs are real
-        tf=real(tf);
+        % Prune out unphysical results
+        hit_list=~isfinite(tf); tf(hit_list)=[];  
+        uv(:,hit_list)=[]; tf=real(tf);
         
         % Prune out-of-window transitions
-        hit_list=(tf<min(parameters.window))|(tf>max(parameters.window));
+        hit_list=(tf<min(parameters.window))|...
+                 (tf>max(parameters.window));
         uv(:,hit_list)=[]; tf(hit_list)=[];
 
         % Normalise dyadics
@@ -267,6 +273,9 @@ switch spin_system.bas.formalism
         
         % Compute transition moments
         tm=abs(Hmw'*uv).^2;
+
+        % Unit pop diffs for now
+        pd=ones(size(tm));
 
         % Get transition widths (much to do here)
         tw=ones(size(tm))*parameters.fwhm;
@@ -280,12 +289,14 @@ end
 
 % Prune insignificant transition moments
 hit_list=(tm<parameters.tm_tol);
-tf(hit_list)=[]; tm(hit_list)=[]; tw(hit_list)=[];
+tf(hit_list)=[]; tm(hit_list)=[]; 
+tw(hit_list)=[]; pd(hit_list)=[];
 
 % Reshape into columns and sort
 [tf,idx]=sort(tf(:)); 
 tm=tm(:); tm=tm(idx);
 tw=tw(:); tw=tw(idx);
+pd=pd(:); pd=pd(idx);
 
 end
 

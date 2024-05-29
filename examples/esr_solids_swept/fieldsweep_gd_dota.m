@@ -11,7 +11,7 @@ function fieldsweep_gd_dota()
 % Isotopes
 sys.isotopes={'E8'};
 
-% Magnet field
+% Magnet field (must be 1)
 sys.magnet=1;
 
 % Properties
@@ -32,14 +32,14 @@ parameters.spins={'E8'};
 parameters.grid=6;
 parameters.mw_freq=90e9;
 parameters.fwhm=2e-4;
-parameters.int_tol=1e-2;
-parameters.tm_tol=1e-1;
+parameters.int_tol=0.05;
+parameters.tm_tol=0.1;
 parameters.window=[3.05 3.4];
 parameters.npoints=4096;
 parameters.rspt_order=Inf;
 
-% Run the simulation
-parameters.rho0=state(spin_system,'Lz','E8');
+% Run the simulation in the high-T approximation
+parameters.rho0=-state(spin_system,'Lz','E8');
 [b_axis,spec]=fieldsweep(spin_system,parameters);
 
 % Plotting

@@ -10,7 +10,7 @@ function fieldsweep_nitroxide()
 % Isotopes                          
 sys.isotopes={'E','14N'};
                           
-% Magnet field
+% Magnet field (must be 1)
 sys.magnet=1;
 
 % Interactions
@@ -22,6 +22,9 @@ inter.coupling.matrix=cell(2,2);
 inter.coupling.matrix{1,2}=[1.2356  0.0000  0.6322
                             0.0000  1.1266  0.0000
                             0.6322  0.0000  8.2230]*1e7;
+
+% Temperature
+inter.temperature=298;
                         
 % Basis set
 bas.formalism='zeeman-hilb';
@@ -37,13 +40,12 @@ parameters.grid=6;
 parameters.mw_freq=9e9;
 parameters.fwhm=1e-5;
 parameters.int_tol=0.1;
-parameters.tm_tol=0.1;
+parameters.tm_tol=0.01;
 parameters.window=[0.316 0.326];
 parameters.npoints=1024;
 parameters.rspt_order=Inf;
 
 % Run the simulation
-parameters.rho0=state(spin_system,'Lz','E');
 [b_axis,spec]=fieldsweep(spin_system,parameters);
 
 % Plotting

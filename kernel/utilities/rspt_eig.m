@@ -119,10 +119,10 @@ else
 
 end
 
-% Transition moments, if needed
+% Transition moments, if required
 if nargout>3, T=abs(V'*Hmw*V).^2; end
 
-% Energy level populations, if needed
+% Energy level populations, if required
 if (nargout>4)&&isfield(parameters,'rho0')
 
     % User-specified density matrix

@@ -85,7 +85,7 @@ spec_sub=trint(tf1,tf12,tf31,tm1,tm12,tm31,tw1,tw12,tw31,pd1,pd12,pd31,r1,r12,r3
 spec_dir=trint(tf1,tf2,tf3,tm1,tm2,tm3,tw1,tw2,tw3,pd1,pd2,pd3,r1,r2,r3,b_axis);
 
 % If the accuracy is insufficient, make a recursive call
-if norm(spec_dir-spec_sub,inf)/norm(spec_sub,inf)>parameters.int_tol
+if sphtarea(r1,r2,r3)*norm(spec_dir-spec_sub,2)>parameters.int_tol
 
     % Four triangles of the subdivision
     spec=voitlander(spin_system,parameters,r1,r12,r31,...

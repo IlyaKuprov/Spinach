@@ -1,7 +1,7 @@
 % Powder averaged W-band field-swept ESR spectrum of Gd(III)
 % DOTA complex. Exact diagonalisation is used.
 %
-% Calculation time: minutes.
+% Calculation time: seconds.
 %
 % corzilius@solidstatednp.com
 % i.kuprov@soton.ac.uk
@@ -32,7 +32,7 @@ parameters.spins={'E8'};
 parameters.grid=6;
 parameters.mw_freq=90e9;
 parameters.fwhm=2e-4;
-parameters.int_tol=0.05;
+parameters.int_tol=1e-5;
 parameters.tm_tol=0.1;
 parameters.window=[3.05 3.4];
 parameters.npoints=4096;

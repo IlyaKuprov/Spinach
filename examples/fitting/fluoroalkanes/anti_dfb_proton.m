@@ -1,9 +1,12 @@
 % Fitting of 1H NMR spectrum of anti-2,3-difluorobutane with
-% respect to J-couplings.
+% respect to J-couplings. See our paper for further details:
+%
+%        https://doi.org/doi/10.1021/acs.joc.4c00670
 %
 % Calculation time: hours
 %
 % i.kuprov@soton.ac.uk
+% neil.wells@soton.ac.uk
 % bruno.linclau@soton.ac.uk
 
 function anti_dfb_proton()
@@ -27,9 +30,8 @@ expt_data=conv(expt_data,filter,'same')/sum(filter);
 % Set the guess
 guess=[24.08  6.49  1.44  3.59  15.73  47.76  -13.58  26.56  1.7];
 
-% Set optimizer options
-options=optimset('Display','iter','MaxIter',5000,'MaxFunEvals',Inf,...
-                 'DiffMinChange',1e-3,'FinDiffType','central');
+% Set optimiser options
+options=optimset('Display','iter','MaxIter',5000,'MaxFunEvals',Inf);
 
 % Run the optimisation
 answer=fminsearch(@(x)errfun(axis_hz,expt_data,x),guess,options);
@@ -102,7 +104,7 @@ inter.coupling.scalar{7,9}=j2_f_h;
 inter.coupling.scalar{8,10}=j2_f_h;
 inter.coupling.scalar{9,10}=j3_f_f;
 
-% Basis set
+% Basis set and symmetry
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 bas.sym_group={'S3','S3'};
@@ -140,10 +142,11 @@ sim_spec=interp1(sim_axis,sim_spec,axis_hz,'pchip');
 
 % Plotting
 subplot(2,1,1); plot(axis_hz,real(expt_data),'ro','MarkerSize',1); hold on;
-plot(axis_hz,real(sim_spec)); hold off; axis([635 690 -0.1 0.8]); kgrid;
+plot(axis_hz,real(sim_spec),'b-'); hold off; xlim([2255 2355]); kgrid;
+kxlabel('Frequency, Hz'); klegend({'experiment','simulation'});
 subplot(2,1,2); plot(axis_hz,real(expt_data),'ro','MarkerSize',1); hold on;
-plot(axis_hz,real(sim_spec)); hold off; axis([2250 2357 -0.025 0.1]); 
-kgrid; drawnow;
+plot(axis_hz,real(sim_spec),'b-'); hold off; xlim([635 690]); kgrid;
+kxlabel('Frequency, Hz'); klegend({'experiment','simulation'}); drawnow;
 
 % Error functional
 err=norm(real(expt_data)-real(sim_spec))^2;

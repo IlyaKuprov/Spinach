@@ -9,21 +9,21 @@
 % neil.wells@soton.ac.uk
 % bruno.linclau@soton.ac.uk
 
-function syn_dfp_fit()
+function anti_dfp_fit()
 
 % Load experimental data
-load('syn_dfp_fluorine.mat','axis_ppm','spec'); axis_expt_f=axis_ppm;  spec_expt_f=spec;
-load('syn_dfp_proton_a.mat','axis_ppm','spec'); axis_expt_ha=axis_ppm; spec_expt_ha=spec;
-load('syn_dfp_proton_b.mat','axis_ppm','spec'); axis_expt_hb=axis_ppm; spec_expt_hb=spec;
+load('anti_dfp_fluorine.mat','axis_ppm','spec'); axis_expt_f=axis_ppm;  spec_expt_f=spec;
+load('anti_dfp_proton_a.mat','axis_ppm','spec'); axis_expt_ha=axis_ppm; spec_expt_ha=spec;
+load('anti_dfp_proton_b.mat','axis_ppm','spec'); axis_expt_hb=axis_ppm; spec_expt_hb=spec;
 
-% Normalise and shift the data
-spec_expt_f=  7*spec_expt_f/max(spec_expt_f);
-spec_expt_ha= 4*spec_expt_ha/max(spec_expt_ha)-0.1;
+% Normalise the data
+spec_expt_f= 7*spec_expt_f/max(spec_expt_f);
+spec_expt_ha=4*spec_expt_ha/max(spec_expt_ha);
 spec_expt_hb=10*spec_expt_hb/max(spec_expt_hb);
 
 % Set the guess
-guess=[ 6.2780   23.5067    5.1361    7.0537   24.9899   16.9264...
-       48.0475    1.6017  -14.5413    0.7437    0.8771    0.6311];
+guess=[ 6.2155   23.8923    9.8426    2.4324   13.7379   36.4223...
+       49.2708    1.6130  -15.1165    1.0605    0.7229    1.4874];
 
 % Set optimiser options
 options=optimset('Display','iter','MaxIter',5000,'MaxFunEvals',Inf);
@@ -57,7 +57,7 @@ sys.enable={'gpu'};
 sys.magnet=11.7464;
 
 % Isotopes
-sys.isotopes={'1H','1H','1H','1H','19F','1H','1H','1H','19F','1H','1H','1H'};  
+sys.isotopes={'1H','1H','1H','19F','1H','1H','1H','1H','19F','1H','1H','1H'};  
 
 % Chemical shifts
 inter.zeeman.scalar{1}= 1.0189;
@@ -66,38 +66,38 @@ inter.zeeman.scalar{3}= 1.0189;
 inter.zeeman.scalar{10}=1.0189;
 inter.zeeman.scalar{11}=1.0189;
 inter.zeeman.scalar{12}=1.0189;
-inter.zeeman.scalar{4}=4.8515;
-inter.zeeman.scalar{8}=4.8515;
-inter.zeeman.scalar{5}=-173.4592;
-inter.zeeman.scalar{9}=-173.4592;
-inter.zeeman.scalar{6}=1.7910;
-inter.zeeman.scalar{7}=2.1519;
+inter.zeeman.scalar{5}=4.9062;
+inter.zeeman.scalar{8}=4.9062;
+inter.zeeman.scalar{4}=-175.6250;
+inter.zeeman.scalar{9}=-175.6250;
+inter.zeeman.scalar{6}=1.8307;
+inter.zeeman.scalar{7}=1.8307;
 
 % J-couplings
 inter.coupling.scalar=cell(12,12);  
-inter.coupling.scalar{1,4}=params(1);
-inter.coupling.scalar{2,4}=params(1);
-inter.coupling.scalar{3,4}=params(1);
+inter.coupling.scalar{1,5}=params(1);
+inter.coupling.scalar{2,5}=params(1);
+inter.coupling.scalar{3,5}=params(1);
 inter.coupling.scalar{8,10}=params(1);
 inter.coupling.scalar{8,11}=params(1);
 inter.coupling.scalar{8,12}=params(1);
-inter.coupling.scalar{1,5}=params(2);
-inter.coupling.scalar{2,5}=params(2);
-inter.coupling.scalar{3,5}=params(2);
+inter.coupling.scalar{1,4}=params(2);
+inter.coupling.scalar{2,4}=params(2);
+inter.coupling.scalar{3,4}=params(2);
 inter.coupling.scalar{9,10}=params(2);
 inter.coupling.scalar{9,11}=params(2);
 inter.coupling.scalar{9,12}=params(2);
-inter.coupling.scalar{4,6}=params(3);
-inter.coupling.scalar{8,6}=params(3);
-inter.coupling.scalar{4,7}=params(4);
-inter.coupling.scalar{8,7}=params(4);
-inter.coupling.scalar{5,6}=params(5);
-inter.coupling.scalar{9,6}=params(5);
-inter.coupling.scalar{5,7}=params(6);
-inter.coupling.scalar{9,7}=params(6);
+inter.coupling.scalar{5,6}=params(3);
+inter.coupling.scalar{7,8}=params(3);
+inter.coupling.scalar{5,7}=params(4);
+inter.coupling.scalar{6,8}=params(4);
+inter.coupling.scalar{4,6}=params(5);
+inter.coupling.scalar{9,7}=params(5);
+inter.coupling.scalar{4,7}=params(6);
+inter.coupling.scalar{9,6}=params(6);
 inter.coupling.scalar{4,5}=params(7);
 inter.coupling.scalar{8,9}=params(7);
-inter.coupling.scalar{5,9}=params(8);
+inter.coupling.scalar{4,9}=params(8);
 inter.coupling.scalar{6,7}=params(9);
 
 % Basis set and symmetry
@@ -115,7 +115,7 @@ parameters_f.spins={'19F'};
 parameters_f.rho0=state(spin_system,'L+','19F');
 parameters_f.coil=state(spin_system,'L+','19F');
 parameters_f.decouple={};
-parameters_f.offset=-81655;
+parameters_f.offset=-82646;
 parameters_f.sweep=300;
 parameters_f.npoints=512;
 parameters_f.zerofill=2048;
@@ -124,11 +124,11 @@ parameters_f.invert_axis=1;
 
 % Sequence parameters (1H A)
 parameters_ha.spins={'1H'};
-parameters_ha.rho0=state(spin_system,{'L+'},{4})+state(spin_system,{'L+'},{8});
-parameters_ha.coil=state(spin_system,{'L+'},{4})+state(spin_system,{'L+'},{8});
+parameters_ha.rho0=state(spin_system,{'L+'},{5})+state(spin_system,{'L+'},{8});
+parameters_ha.coil=state(spin_system,{'L+'},{5})+state(spin_system,{'L+'},{8});
 parameters_ha.decouple={};
-parameters_ha.offset=2426;
-parameters_ha.sweep=128;
+parameters_ha.offset=2450;
+parameters_ha.sweep=180;
 parameters_ha.npoints=256;
 parameters_ha.zerofill=1024;
 parameters_ha.axis_units='ppm';
@@ -139,15 +139,15 @@ parameters_hb.spins={'1H'};
 parameters_hb.rho0=state(spin_system,{'L+'},{6})+state(spin_system,{'L+'},{7});
 parameters_hb.coil=state(spin_system,{'L+'},{6})+state(spin_system,{'L+'},{7});
 parameters_hb.decouple={};
-parameters_hb.offset=986;
-parameters_hb.sweep=350;
-parameters_hb.npoints=512;
-parameters_hb.zerofill=2048;
+parameters_hb.offset=915;
+parameters_hb.sweep=150;
+parameters_hb.npoints=256;
+parameters_hb.zerofill=1024;
 parameters_hb.axis_units='ppm';
 parameters_hb.invert_axis=1;
 
 % Simulation
-fid_f=liquid(spin_system,@acquire,parameters_f,'nmr');
+fid_f =liquid(spin_system,@acquire,parameters_f,'nmr');
 fid_ha=liquid(spin_system,@acquire,parameters_ha,'nmr');
 fid_hb=liquid(spin_system,@acquire,parameters_hb,'nmr');
 
@@ -157,7 +157,7 @@ fid_ha=params(11)*apodization(fid_ha,'gaussian-1d',7.0)/4e3;
 fid_hb=params(12)*apodization(fid_hb,'gaussian-1d',6.0)/4e3;
 
 % Fourier transform
-spec_theo_f= real(fftshift(fft(fid_f, parameters_f.zerofill)));  spec_theo_f= spec_theo_f(end:-1:1);
+spec_theo_f= real(fftshift(fft(fid_f, parameters_f.zerofill)));  spec_theo_f =spec_theo_f(end:-1:1);
 spec_theo_ha=real(fftshift(fft(fid_ha,parameters_ha.zerofill))); spec_theo_ha=spec_theo_ha(end:-1:1);
 spec_theo_hb=real(fftshift(fft(fid_hb,parameters_hb.zerofill))); spec_theo_hb=spec_theo_hb(end:-1:1);
 
@@ -165,10 +165,10 @@ spec_theo_hb=real(fftshift(fft(fid_hb,parameters_hb.zerofill))); spec_theo_hb=sp
 axis_theo_f= sweep2ticks(parameters_f.offset, parameters_f.sweep, parameters_f.zerofill);
 axis_theo_ha=sweep2ticks(parameters_ha.offset,parameters_ha.sweep,parameters_ha.zerofill);
 axis_theo_hb=sweep2ticks(parameters_hb.offset,parameters_hb.sweep,parameters_hb.zerofill);
-axis_theo_f= -2*pi*1e6*axis_theo_f/spin_system.inter.basefrqs(5);
+axis_theo_f= -2*pi*1e6*axis_theo_f/spin_system.inter.basefrqs(4);
 axis_theo_ha=-2*pi*1e6*axis_theo_ha/spin_system.inter.basefrqs(1);
 axis_theo_hb=-2*pi*1e6*axis_theo_hb/spin_system.inter.basefrqs(1);
-spec_theo_f= interp1(axis_theo_f,spec_theo_f,axis_expt_f,'pchip');    axis_theo_f=axis_expt_f;
+spec_theo_f= interp1(axis_theo_f, spec_theo_f, axis_expt_f, 'pchip'); axis_theo_f =axis_expt_f;
 spec_theo_ha=interp1(axis_theo_ha,spec_theo_ha,axis_expt_ha,'pchip'); axis_theo_ha=axis_expt_ha;
 spec_theo_hb=interp1(axis_theo_hb,spec_theo_hb,axis_expt_hb,'pchip'); axis_theo_hb=axis_expt_hb;
 

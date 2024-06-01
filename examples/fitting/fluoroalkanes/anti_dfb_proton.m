@@ -15,7 +15,7 @@ function anti_dfb_proton()
 load('anti_dfb_proton.mat','ch_axis_hz','ch_expt_data',...
                            'me_axis_hz','me_expt_data');  
 
-% Normalize the data
+% Normalise the data
 ch_expt_data=-2*ch_expt_data/trapz(ch_axis_hz,ch_expt_data); 
 me_expt_data=-6*me_expt_data/trapz(me_axis_hz,me_expt_data);
 
@@ -29,6 +29,9 @@ expt_data=conv(expt_data,filter,'same')/sum(filter);
 
 % Set the guess
 guess=[24.08  6.49  1.44  3.59  15.73  47.76  -13.58  26.56  1.7];
+
+% Get a figure going
+figure(); scale_figure([1.0 1.5]);
 
 % Set optimiser options
 options=optimset('Display','iter','MaxIter',5000,'MaxFunEvals',Inf);

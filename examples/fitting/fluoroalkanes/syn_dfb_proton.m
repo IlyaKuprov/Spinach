@@ -1,9 +1,12 @@
 % Fitting of 1H NMR spectrum of syn-2,3-difluorobutane with
-% respect to J-couplings.
+% respect to J-couplings. See our paper for further details:
+%
+%        https://doi.org/doi/10.1021/acs.joc.4c00670
 %
 % Calculation time: hours
 %
 % i.kuprov@soton.ac.uk
+% neil.wells@soton.ac.uk
 % bruno.linclau@soton.ac.uk
 
 function syn_dfb_proton()
@@ -22,6 +25,9 @@ axis_hz=[ch_axis_hz; me_axis_hz];
 
 % Set the guess
 guess=[23.95 6.47 0.90 4.36 18.15 47.88 -11.61 13.63 1.7];
+
+% Get a figure going
+figure(); scale_figure([1.0 1.5]);
 
 % Set optimizer options
 options=optimset('Display','iter','MaxIter',5000,'MaxFunEvals',Inf,...
@@ -135,11 +141,12 @@ sim_axis=sweep2ticks(parameters.offset,parameters.sweep,parameters.zerofill);
 sim_spec=interp1(sim_axis,sim_spec,axis_hz,'pchip');
 
 % Plotting
-subplot(2,1,1); plot(axis_hz,real(expt_data),'ro','MarkerSize',1); hold on;
-plot(axis_hz,real(sim_spec)); hold off; axis([645 700 -0.1 0.8]); kgrid;
+subplot(2,1,1); plot(axis_hz,real(expt_data),'ro','MarkerSize',1); hold on; 
+plot(axis_hz,real(sim_spec),'b-'); hold off; xlim([2230 2350]); kgrid;
+kxlabel('Frequency, Hz'); klegend({'experiment','simulation'});
 subplot(2,1,2); plot(axis_hz,real(expt_data),'ro','MarkerSize',1); hold on;
-plot(axis_hz,real(sim_spec)); hold off; axis([2230 2350 -0.025 0.1]); 
-kgrid; drawnow;
+plot(axis_hz,real(sim_spec),'b-'); hold off; xlim([645 700]); kgrid;
+kxlabel('Frequency, Hz'); klegend({'experiment','simulation'}); drawnow;
 
 % Error functional
 err=norm(real(expt_data)-real(sim_spec))^2;

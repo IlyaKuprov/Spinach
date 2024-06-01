@@ -22,6 +22,16 @@
 %                             part of the Hamiltonian, Inf for
 %                             exact diagonalisation
 %
+%     parameters.rho0 - [optional] when a matrix, sets a user-
+%                       specified thermal equilibrium state;
+%                       when a function handle f(B,alp,bet,gam)
+%                       sets the function to call to obtain
+%                       the thermal equilibrium at each orien-
+%                       tation and magnetic field; if not pro-
+%                       vided, the thermal equilibrium is com-
+%                       puted at the current temperature, ori-
+%                       entation, and magnetic field
+%
 % Outputs:
 %
 %     E    - a column vector of energies, sorted in ascen-
@@ -123,16 +133,31 @@ if nargout>3, T=abs(V'*Hmw*V).^2; end
 % Energy level populations, if required
 if (nargout>4)&&isfield(parameters,'rho0')
 
-    % User-specified density matrix
-    LP=real(diag(V'*parameters.rho0*V));
+    % User-specified equilibrium
+    if isa(parameters.rho0,'function_handle')
+
+        % Orientation-dependent
+        rho0=parameters.rho0(B,parameters.orientation(1),...
+                               parameters.orientation(2),...
+                               parameters.orientation(3));
+
+    else
+
+        % Orientation-independent
+        rho0=parameters.rho0;
+
+    end
+
+    % Level populations
+    LP=real(diag(V'*rho0*V));
 
 elseif nargout>4
 
     % Thermal equilibrium
-    rho=equilibrium(spin_system,H);
+    rho0=equilibrium(spin_system,H);
 
     % Level populations
-    LP=real(diag(V'*rho*V));
+    LP=real(diag(V'*rho0*V));
 
 end
 

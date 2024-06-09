@@ -1,17 +1,17 @@
-% Contributions from different orders of spin correlation to the system 
-% trajectory in the pulse-acquire 1H NMR simulation of anti-3,5-difluo-
-% roheptane (16 spins). Different curves correspond the norms of the pro- 
-% jection of the density matrix into the subspace of one-, two-, three-,
-% etc. spin correlations. The two traces in the lower part of the figure
-% correspond to nine- and ten-spin correlations – it is clear that for
-% practical simulation purposes, even in the absence of relaxation, only
-% correlations of up to eight spins need to be accounted for.
+% Pulse-acquire 1H NMR spectrum of anti-3,5-difluoroheptane with
+% a manual basis set specification as a merger of Lie algebras of 
+% the user-specified structral fragments followed by symmetry fac-
+% torisation and conservation law screening. See our paper:
+%
+%           https://doi.org/doi/10.1021/acs.joc.4c00670
+%
+% for further information.
 %
 % Calculation time: minutes, faster with a GPU.
 %
 % i.kuprov@soton.ac.uk
 
-function state_spaces_2()
+function pa_difluoroheptane_anti()
      
 % Magnet induction 
 sys.magnet=11.7464;
@@ -89,28 +89,39 @@ bas.sym_spins={[14 15 16],[21 22 23]};
 bas.longitudinals={'19F'};
 bas.projections=1;
 
-% Prevent automatic state dropout
-sys.disable={'zte'};
-
 % GPU is useful here
 sys.enable={'gpu'};
+
+% ZTE not useful here
+sys.disable={'zte'};
 
 % Spinach housekeeping 
 spin_system=create(sys,inter); 
 spin_system=basis(spin_system,bas);
 
-% Initial condition
-rho=state(spin_system,'L+','1H');
+% Sequence parameters
+parameters.spins={'1H'};
+parameters.rho0=state(spin_system,'L+','1H');
+parameters.coil=state(spin_system,'L+','1H');
+parameters.decouple={};
+parameters.offset=1400;
+parameters.sweep=2500;
+parameters.npoints=4096;
+parameters.zerofill=16536;
+parameters.axis_units='ppm';
+parameters.invert_axis=1;
 
-% Hamiltonian
-H=hamiltonian(assume(spin_system,'nmr'));
+% Simulation
+fid=liquid(spin_system,@acquire,parameters,'nmr');
 
-% Trajectory calculation
-traj=evolution(spin_system,H,[],rho,1e-3,1000,'trajectory');
+% Apodization
+fid=apodization(fid,'exp-1d',5.0);
 
-% Trajectory analysis by spin correlation order
-trajan(spin_system,traj,'correlation_order'); xlim tight;
-ylim([1e-6 3]); set(gca,'YScale','log');
+% Fourier transform
+spectrum=real(fftshift(fft(fid,parameters.zerofill)));
+
+% Plotting
+plot_1d(spin_system,spectrum,parameters);
 
 end
 

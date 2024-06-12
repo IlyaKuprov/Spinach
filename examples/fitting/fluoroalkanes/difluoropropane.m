@@ -9,7 +9,7 @@
 % neil.wells@soton.ac.uk
 % bruno.linclau@soton.ac.uk
 
-function difluoropropane_fit()
+function difluoropropane()
 
 % Load experimental data
 load('difluoropropane_fluorine.mat','axis_ppm','spec'); axis_expt_f=axis_ppm; spec_expt_f=spec;

@@ -9,7 +9,7 @@
 % neil.wells@soton.ac.uk
 % bruno.linclau@soton.ac.uk
 
-function fluorobutane_fit()
+function fluorobutane()
 
 % Load experimental data
 load('fluorobutane_fluorine.mat','spec_f','axis_f'); 

@@ -11,7 +11,8 @@
 %                http://dx.doi.org/10.1063/1.4928978
 %
 % This include is called when relaxation.m is not at the top of 
-% the parallelisation call stack.
+% the parallelisation call stack. When it is, the asynchronous
+% include is called instead.
 %
 % i.kuprov@soton.ac.uk
 %

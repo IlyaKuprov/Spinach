@@ -10,24 +10,23 @@
 function maleate_global()
 
 % Load experimental data
-load('maleate_1h.mat'); axis_expt_h=axis_hz; spec_expt_h=data_expt;
-load('maleate_13c.mat'); axis_expt_c=axis_hz; spec_expt_c=data_expt;
+load('maleate_1h.mat', 'axis_hz','data_expt'); axis_expt_h=axis_hz; spec_expt_h=data_expt;
+load('maleate_13c.mat','axis_hz','data_expt'); axis_expt_c=axis_hz; spec_expt_c=data_expt;
 
-% Normalize the data
+% Normalise the data
 spec_expt_h=spec_expt_h/max(spec_expt_h); 
 spec_expt_c=spec_expt_c/max(spec_expt_c); 
 
 % Set the guess
-guess=[-0.0560    0.0358    0.0005   -0.0013   71.6099   -1.1646...
-      166.5465   11.9548    0.0385    0.0344   10.1085    6.2780];
+guess=[ -0.0560    0.0358    0.0005   -0.0013   71.6099   -1.1646 ...
+       166.5465   11.9548    0.0385    0.0344   10.1085    6.2780];
 
-% Set optimizer options
-options=optimset('Display','iter','MaxIter',5000,'MaxFunEvals',Inf,...
-                 'DiffMinChange',1e-6,'FinDiffType','central',...
-                 'UseParallel',true);
+% Set optimiser options
+options=optimset('Display','iter','MaxIter',5000,'MaxFunEvals',Inf);
 
 % Run the optimisation
-answer=fminunc(@(x)errfun(axis_expt_h,axis_expt_c,spec_expt_h,spec_expt_c,x),guess,options);
+answer=fminsearch(@(x)errfun(axis_expt_h,axis_expt_c,...
+                             spec_expt_h,spec_expt_c,x),guess,options);
 
 % Display the result
 disp(answer);
@@ -35,7 +34,8 @@ disp(answer);
 end
 
 % Least squares error function
-function err=errfun(axis_expt_h,axis_expt_c,spec_expt_h,spec_expt_c,params)
+function err=errfun(axis_expt_h,axis_expt_c,...
+                    spec_expt_h,spec_expt_c,params)
 
 % Silence Spinach
 sys.output='hush';
@@ -65,10 +65,10 @@ sys.magnet=2*pi*500.101412e6/spin('1H');
 inter.zeeman.scalar={h_shift_1 c_shift_1 c_shift_2 h_shift_2};
 
 % Scalar couplings
-inter.coupling.scalar={0.0   j_ch_near   j_ch_far  j_hh;
-                       0.0   0.0         j_cc      j_ch_far;
-                       0.0   0.0         0.0       j_ch_near;
-                       0.0   0.0         0.0       0.0};
+inter.coupling.scalar={0.0   j_ch_near   j_ch_far   j_hh;
+                       0.0   0.0         j_cc       j_ch_far;
+                       0.0   0.0         0.0        j_ch_near;
+                       0.0   0.0         0.0        0.0};
 
 % Basis set
 bas.formalism='zeeman-hilb';
@@ -104,9 +104,9 @@ parameters_c.axis_units='Hz';
 fid_h=liquid(spin_system,@acquire,parameters_h,'nmr');
 fid_c=liquid(spin_system,@acquire,parameters_c,'nmr');
 
-% Apodization
-fid_h=apodization(fid_h,'exp-1d',lw_h);
-fid_c=apodization(fid_c,'exp-1d',lw_c);
+% Apodisation and scaling
+fid_h=apodization(fid_h,'exp-1d',lw_h)/10;
+fid_c=apodization(fid_c,'exp-1d',lw_c)/10;
 
 % Fourier transform
 spec_theo_h=a_h*real(fftshift(fft(fid_h,parameters_h.zerofill)));
@@ -119,13 +119,16 @@ spec_theo_h=interp1(axis_theo_h,spec_theo_h,axis_expt_h,'pchip'); axis_theo_h=ax
 spec_theo_c=interp1(axis_theo_c,spec_theo_c,axis_expt_c,'pchip'); axis_theo_c=axis_expt_c;
 
 % Plotting
-subplot(2,1,1); plot(axis_expt_h,spec_expt_h,'ro'); hold on;
-plot(axis_theo_h,spec_theo_h); hold off; axis([-300 300 -0.1 1.1]);
-subplot(2,1,2); plot(axis_expt_c,spec_expt_c,'ro'); hold on;
-plot(axis_theo_c,spec_theo_c); hold off; axis([-300 300 -0.1 1.1]); drawnow;
+subplot(2,1,1); plot(axis_expt_h,spec_expt_h,'r.','MarkerSize',1); 
+hold on; plot(axis_theo_h,spec_theo_h,'b-'); hold off; xlim tight;
+kgrid; kxlabel('Chemical shift, Hz');
+subplot(2,1,2); plot(axis_expt_c,spec_expt_c,'r.','MarkerSize',1); 
+hold on; plot(axis_theo_c,spec_theo_c,'b-'); hold off; xlim tight; 
+kgrid; kxlabel('Chemical shift, Hz'); drawnow;
 
 % Error functional
-err=norm(spec_expt_h-spec_theo_h)^2+norm(spec_expt_c-spec_theo_c)^2;
+err=norm(spec_expt_h-spec_theo_h)^2+...
+    norm(spec_expt_c-spec_theo_c)^2;
 
 end
 

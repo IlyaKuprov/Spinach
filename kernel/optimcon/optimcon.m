@@ -837,7 +837,7 @@ if isfield(control,'ens_corrs')
         error('control.ens_corrs must be a cell array of character strings.');
     end
     for n=1:numel(control.ens_corrs)
-        if ~ismember(control.ens_corrs{n},{'rho_match','rho_drift','power_drift'})
+        if ~ismember(control.ens_corrs{n},{'rho_ens','rho_drift','power_drift'})
             error('control.ens_corrs contains an unknown ensemble correlation setting')
         end
     end

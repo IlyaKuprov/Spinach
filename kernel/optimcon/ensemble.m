@@ -63,7 +63,7 @@ catalog=[kron(ones(n_cpm_mdepths,1),catalog) kron((1:n_cpm_mdepths)',ones(size(c
 catalog=[kron(ones(n_cpm_phasept,1),catalog) kron((1:n_cpm_phasept)',ones(size(catalog,1),1))];
 
 % Ensemble correlation: own state pair for each member
-if ismember('rho_match',spin_system.control.ens_corrs)
+if ismember('rho_ens',spin_system.control.ens_corrs)
     catalog=catalog(:,2:end); 
     catalog=unique(catalog,'rows');
     catalog=[(1:size(catalog,1))' catalog];

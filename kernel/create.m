@@ -260,9 +260,6 @@ if ~isworkernode
         report(spin_system,['         > parallel profile: ' spin_system.sys.parallel{1}]);
         report(spin_system,['         > workers to start: ' num2str(spin_system.sys.parallel{2})]);
 
-        % Disable worker proxies
-        pctconfig('optimizedpoolbroadcast',false,'reliableconnections',false);
-        
         % Get cluster object
         c=parcluster(spin_system.sys.parallel{1});
         

@@ -26,13 +26,13 @@ spin_system=basis(spin_system,bas);
 
 % Sequence parameters
 parameters.spins={'1H'};
-parameters.rho0=state(spin_system,'L+','1H','cheap');
-parameters.coil=state(spin_system,'L+','1H','cheap');
+parameters.rho0=state(spin_system,'L+','1H');
+parameters.coil=state(spin_system,'L+','1H');
 parameters.decouple={};
 parameters.offset=0;
 parameters.grid='rep_2ang_6400pts_sph';
 parameters.sweep=15000;
-parameters.npoints=128;
+parameters.npoints=256;
 parameters.zerofill=512;
 parameters.axis_units='ppm';
 parameters.invert_axis=1;

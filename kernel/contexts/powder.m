@@ -51,6 +51,10 @@
 %                        computed using the full anisotropic Ha-
 %                        miltonian at each orientation, and sent
 %                        to pulse sequence via parameters.rho0
+%
+%   parameters.rho0    - initial state; may be a function handle
+%                        that depends on the three Euler angles
+%                        in ZYZ active convention
 %  
 %   parameters.serial  - if set to true, disables automatic pa-
 %                        rallelisation
@@ -216,9 +220,17 @@ parfor (n=1:numel(weights),nworkers)
         localpar.hzeeman=(Z+Z')/2;
     end
     
-    % Compute thermal equilibrium at the current orientation
+    % Compute initial state at the current orientation
     if ismember('aniso_eq',parameters.needs)
+
+        % Anisotropic thermal equilibrium state from Hamiltonian and temperature
         localpar.rho0=equilibrium(spin_system,HL,QL,[alphas(n) betas(n) gammas(n)]);
+
+    elseif isa(parameters.rho0,'function_handle')
+
+        % Anisotropic initial condition specified by the user
+        rho_init=parameters.rho0; localpar.rho0=rho_init(alphas(n),betas(n),gammas(n));
+
     end
     
     % Apply rotating frames
@@ -368,6 +380,12 @@ end
 if isfield(parameters,'needs')
     if ismember('iso_eq',parameters.needs)&&ismember('aniso_eq',parameters.needs)
         error('iso_eq and aniso_eq needs cannot be specified simultaneously.');
+    end
+    if isfield(parameters,'rho0')
+        if ismember('iso_eq',parameters.needs)||...
+           ismember('aniso_eq',parameters.needs)
+            error('parameters.needs cannot request initial condition when parameters.rho0 is specified.');
+        end
     end
 end
 

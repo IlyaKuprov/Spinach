@@ -93,7 +93,7 @@ inter.relaxation={'redfield','SRSK'};
 inter.equilibrium='zero';
 inter.srsk_sources=4;
 inter.rlx_keep='secular';
-inter.tau_c={25e-12};
+inter.tau_c={200e-12};
 
 % Algorithmic options
 sys.tols.inter_cutoff=2.0;

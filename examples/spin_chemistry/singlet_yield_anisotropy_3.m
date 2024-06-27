@@ -51,6 +51,7 @@ parameters.grid='leb_1ang_rank_63';
 parameters.spins={'E'};
 parameters.tol=1e-2;
 parameters.verbose=0;
+parameters.sum_up=0;
 
 % Enable GPU arithmetic
 sys.enable={'gpu'};
@@ -60,10 +61,10 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Run a simulation
-[~,betas,~,~,yields]=roadmap(spin_system,@rydmr,parameters,'labframe');
+[yields,grid]=powder(spin_system,@rydmr,parameters,'labframe');
 
 % Do the plotting
-figure(); plot(betas,cell2mat(yields));
+figure(); plot(grid.betas,cell2mat(yields));
 kxlabel('beta spherical angle, radians');
 kylabel('singlet yield'); kgrid; axis tight;
 

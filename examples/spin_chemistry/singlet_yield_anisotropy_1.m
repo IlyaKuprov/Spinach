@@ -1,4 +1,5 @@
-% Singlet yield anisotropy calculation for a model radical pair.
+% Singlet yield anisotropy calculation for a radical pair
+% using exponential recombination kinetics model.
 %
 % Calculation time: seconds
 %
@@ -33,19 +34,20 @@ parameters.electrons=[1 2];
 parameters.grid='leb_2ang_rank_71';
 parameters.spins={'E'};
 parameters.needs={'zeeman_op'};
+parameters.sum_up=0;
 
 % Simulation
-[~,betas,gammas,weights,yield]=roadmap(spin_system,@rydmr_exp,parameters,'labframe');
+[yield,grid]=powder(spin_system,@rydmr_exp,parameters,'labframe');
 
 % Preprocessing
 yield=cell2mat(yield);
-yield=yield-sum(yield.*weights);
+yield=yield-sum(yield.*grid.weights);
 
 % Plotting
-hull=get_hull(betas,gammas);
-x=yield.*sin(betas).*cos(gammas);
-y=yield.*sin(betas).*sin(gammas);
-z=yield.*cos(betas); figure();
+hull=get_hull(grid.betas,grid.gammas);
+x=yield.*sin(grid.betas).*cos(grid.gammas);
+y=yield.*sin(grid.betas).*sin(grid.gammas);
+z=yield.*cos(grid.betas); figure();
 c=sqrt(x.^2+y.^2+z.^2);
 trisurf(hull,x,y,z,c,'EdgeAlpha',0.25); 
 kgrid; axis square; axis equal;

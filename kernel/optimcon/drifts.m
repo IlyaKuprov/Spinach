@@ -45,20 +45,17 @@ systems=context(spin_system,gen_cap,parameters,assumptions);
 
 % Pull drift Liouvillians
 drifts=cell(1,numel(systems));
-for n=1:numel(systems.components)
+for n=1:numel(systems)
     
     % Get Liouvillian components
-    H=systems.components{n}{1};
-    R=systems.components{n}{2};
-    K=systems.components{n}{3};
+    H=systems{n}{1}; R=systems{n}{2}; K=systems{n}{3};
     
     % Assign drift Liouvillians
     drifts{n}={H+1i*R+1i*K};
     
     % Get hydrodynamics if present
-    if numel(systems.components{n})==5
-        F=systems.components{n}{5};
-        drifts{n}{1}=drifts{n}{1}+1i*F;
+    if numel(systems{n})==5
+        drifts{n}{1}=drifts{n}{1}+1i*systems{n}{5};
     end
     
 end

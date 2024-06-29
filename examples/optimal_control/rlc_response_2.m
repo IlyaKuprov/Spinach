@@ -6,6 +6,8 @@
 % The system is assumed to be a powder (100 orientations) 
 % with a B1 distribution (from 40 to 60 kHz per channel).
 %
+% Piecewise-constant GRAPE pulse is used.
+%
 % Calculation time: minutes
 %
 % i.kuprov@soton.ac.uk
@@ -67,6 +69,7 @@ control.penalties={'NS'};                      % Penalty types
 control.p_weights=1;                           % Penalty weights
 control.method='goodwin';                      % Optimisation method
 control.parallel='ensemble';                   % Parallel strategy
+control.integrator='rectangle';                % Piecewise-constant
 
 % Freeze the edges
 control.freeze=false(2,75);                   

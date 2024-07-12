@@ -63,16 +63,22 @@ grumble(spin_system,pulse_sequence,parameters);
 % Substructure pull for parfor
 mesh=spin_system.mesh; ncells=mesh.vor.ncells;
 
-% Take Voronoi cell volumes into account
-W_forw=spdiags(mesh.vor.weights,0,ncells,ncells);
-W_back=spdiags(1./mesh.vor.weights,0,ncells,ncells);
+% Take Voronoi cell areas into account
+A_forw=spdiags(mesh.vor.weights,0,ncells,ncells);
+A_back=spdiags(1./mesh.vor.weights,0,ncells,ncells);
+
+% Pull diff coeff
+D=parameters.diff;
 
 % Build flow index
 F=cell(ncells,1);
-parfor n=1:ncells
+parfor k=1:ncells %#ok<*PFBNS>
+
+    % Pull out cell area
+    A_k=mesh.vor.weights(k); 
     
     % Find the parent vertex
-    parent_vertex=mesh.idx.active(n); %#ok<PFBNS> 
+    parent_vertex=mesh.idx.active(k);
 
     % Find triangles containing parent vertex
     nearby_triangles=find(sum(mesh.idx.triangles==parent_vertex,2));
@@ -88,40 +94,41 @@ parfor n=1:ncells
     F_local=zeros(0,3);
 
     % Loop over nearby cells
-    for k=nearby_cells
+    for m=nearby_cells
 
         % See if they share a boundary
-        shared_pts=intersect(mesh.vor.cells{n},...
-                             mesh.vor.cells{k});
-        if (n~=k)&&(numel(shared_pts)==2)
+        shared_pts=intersect(mesh.vor.cells{k},...
+                             mesh.vor.cells{m});
+        if (k~=m)&&(numel(shared_pts)==2)
             
             % Determine boundary length
-            wall_length=norm(mesh.vor.vertices(shared_pts(1),:)-...       % #NORMOK
-                             mesh.vor.vertices(shared_pts(2),:),2);       % m
+            b_km=norm(mesh.vor.vertices(shared_pts(1),:)-...       % #NORMOK
+                      mesh.vor.vertices(shared_pts(2),:),2);       % m
 
-            % Extract cell centre coordinates
-            XA=mesh.x(mesh.idx.active(n)); YA=mesh.y(mesh.idx.active(n)); % m
-            XB=mesh.x(mesh.idx.active(k)); YB=mesh.y(mesh.idx.active(k)); % m
+            % Distance vector between Voronoi cell centres
+            r_km=[mesh.x(mesh.idx.active(m)); mesh.y(mesh.idx.active(m))]-...
+                 [mesh.x(mesh.idx.active(k)); mesh.y(mesh.idx.active(k))]; 
+
+            % Average velocity between Voronoi cells
+            v_km=[mesh.u(mesh.idx.active(k))+mesh.u(mesh.idx.active(m)); ...
+                  mesh.v(mesh.idx.active(k))+mesh.v(mesh.idx.active(m))]/2;
+
+            % Flow part of the equation from our paper  
+            F_km=-(1/A_k)*(b_km/norm(r_km,2))*dot(v_km,r_km)/2;
             
-            % Extract cell centre velocities
-            UA=mesh.u(mesh.idx.active(n)); VA=mesh.v(mesh.idx.active(n)); % m
-            UB=mesh.u(mesh.idx.active(k)); VB=mesh.v(mesh.idx.active(k)); % m
+            % Add to the generator, avoiding double count
+            if F_km>0, F_local=[F_local; k m F_km]; end
 
-            % Flow velocity between cells
-            direction_vec=-[XB-XA; YB-YA];                                % m
-            direction_vel=[(UA+UB)/2; (VA+VB)/2];                         % m/s
-            direction_vel=dot(direction_vel,...
-                              direction_vec)/norm(direction_vec,2);       % m/s
-
-            % Assign flow graph
-            if direction_vel>0
-                F_local=[F_local; n k direction_vel*wall_length/mesh.vor.weights(n)];         % 1/s 
-            end
-
+            % Diffusion part from our paper
+            F_km=(1/A_k)*(b_km/norm(r_km,2))*D;
+             
+            % Add to the generator
+            F_local=[F_local; k m F_km];
+            
         end
         
         % Add to global
-        F{n}=F_local;
+        F{k}=F_local;
 
     end
 
@@ -129,7 +136,7 @@ end
 
 % Build and balance the flow generator
 F=cell2mat(F); F=sparse(F(:,1),F(:,2),F(:,3),ncells,ncells);
-F=F-spdiags(sum(F,1)',0,ncells,ncells); F=W_back*F*W_forw; 
+F=F-spdiags(sum(F,1)',0,ncells,ncells); F=A_back*F*A_forw;  
 
 % Get problem dimensions
 spc_dim=spin_system.mesh.vor.ncells;  

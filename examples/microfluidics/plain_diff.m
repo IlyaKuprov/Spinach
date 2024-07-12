@@ -1,13 +1,10 @@
-% Simple flow simulation without spin dynamics. Longitudinal mag-
-% netisation is tracked as a function of time after injection in-
-% to the stationary flow field imported from COMSOL. The tail of
-% the pipe has drainage terms set up using a kinetics superopera-
-% tor phantom.
+% Simple diffusion simulation without spin dynamics. Longitudinal 
+% magnetisation is tracked as a function of time.
 %
 % a.acharya@soton.ac.uk
 % i.kuprov@soton.ac.uk
 
-function plain_flow()
+function plain_diff()
 
 % One proton
 sys.magnet=14.1;
@@ -43,7 +40,7 @@ spin_system=mesh_preplot(spin_system);                           % Run output pr
 
 % Initial condition: Lz in a few cells
 parameters.rho0_ph{1}=zeros(spin_system.mesh.vor.ncells,1);
-parameters.rho0_ph{1}(140:160)=1;
+parameters.rho0_ph{1}(1230)=1;
 parameters.rho0_st{1}=state(spin_system,'Lz','1H');
 
 % Detection state: Lz in all cells
@@ -69,8 +66,10 @@ parameters.H_ph={ones(2659,1)};
 parameters.R_op={relaxation(spin_system)}; 
 parameters.R_ph={ones(2659,1)};
 
-% No diffusion
-parameters.diff=0;
+% Just diffusion
+spin_system.mesh.u=0*spin_system.mesh.u;
+spin_system.mesh.v=0*spin_system.mesh.v;
+parameters.diff=5e-8;
 
 % Drainage in the distal pipe
 drainage=zeros(2659,1); 
@@ -90,7 +89,7 @@ figure(); scale_figure([1.5 1.5]);
 camproj('perspective'); view(-20,15); axis vis3d;
 
 % Set Z axis extents
-spin_system.mesh.zext=[-0.02 0.02];
+spin_system.mesh.zext=[-0.01 0.1];
 
 % Run through trajectory
 for n=1:size(traj,2)
@@ -105,7 +104,7 @@ for n=1:size(traj,2)
     mesh_plot(spin_system,0,0);
     conc_plot(spin_system,conc);
     zlim(spin_system.mesh.zext);
-    set(gca,'DataAspectRatio',[1 1 0.05])
+    set(gca,'DataAspectRatio',[1 1 0.1])
     camorbit(0.5,0); drawnow();
         
 end 

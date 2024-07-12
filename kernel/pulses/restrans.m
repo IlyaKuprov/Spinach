@@ -2,7 +2,8 @@
 % ideal shape emitted by the instrument into the shape that comes
 % out of the RLC circuit of the probe. Syntax:
 %
-%   [X,Y,X0,Y0,dt]=restrans(X_user,Y_user,dt_user,omega,Q,model)
+%          [X,Y,dt]=restrans(X_user,Y_user,dt_user,...
+%                            omega,Q,model,up_factor)
 %
 % Parameters:
 %
@@ -24,7 +25,9 @@
 %
 %       model     - input signal model, use 'pwc' for
 %                   piecewise-constant, and 'pwl' for
-%                   piecewise-linear input
+%                   piecewise-linear input; time shift
+%                   compensation for piecewise-linear
+%                   is requested by 'pwl_tsc'
 %
 %       up_factor - the output waveform will have more
 %                   discretisation points than the in-

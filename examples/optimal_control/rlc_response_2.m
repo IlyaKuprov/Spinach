@@ -6,6 +6,8 @@
 % The system is assumed to be a powder (100 orientations) 
 % with a B1 distribution (from 40 to 60 kHz per channel).
 %
+% Piecewise-constant GRAPE pulse is used.
+%
 % Calculation time: minutes
 %
 % i.kuprov@soton.ac.uk
@@ -35,7 +37,7 @@ spin_system=basis(spin_system,bas);
 parameters.spins={'2H'};
 parameters.decouple={};
 parameters.offset=0;
-parameters.grid='rep_2ang_200pts_sph';
+parameters.grid='rep_2ang_100pts_sph';
 parameters.rframes={{'2H',2}};
 parameters.verbose=0;
 
@@ -58,29 +60,31 @@ Ly=operator(spin_system,'Ly','2H');
 control.operators={Lx,Ly};                     % Controls
 control.rho_init={rho_init};                   % Starting state
 control.rho_targ={rho_targ};                   % Destination state
-control.pwr_levels=2*pi*35e3;                  % Power per channel
-control.pulse_dt=6.5e-6*ones(1,24);            % Slice duration grid
+control.pwr_levels=2*pi*[40 45 50 55 60]*1e3;  % Power per channel, Hz
+control.pulse_dt=2e-6*ones(1,75);              % Slice duration grid
 control.method='lbfgs';                        % Optimisation method
-control.max_iter=1000;                         % Maximum iterations
+control.max_iter=50;                           % Maximum iterations
 control.dead_time=100e-6;                      % Dead time
-control.penalties={'SNS'};                     % Penalty types
-control.p_weights=100;                         % Penalty weights
+control.penalties={'NS'};                      % Penalty types
+control.p_weights=1;                           % Penalty weights
+control.method='goodwin';                      % Optimisation method
+control.parallel='ensemble';                   % Parallel strategy
 control.integrator='rectangle';                % Piecewise-constant
 
 % Freeze the edges
-control.freeze=false(2,24);                   
-control.freeze(:,1:2)=true;
-control.freeze(:,(end-1):end)=true;
+control.freeze=false(2,75);                   
+control.freeze(:,1:4)=true;
+control.freeze(:,(end-3):end)=true;
 
 % Plotting options
-control.plotting={'xy_controls','robustness'};
+control.plotting={'xy_controls','robustness','spectrogram'};
 
 % Spinach housekeeping
 spin_system=optimcon(spin_system,control);
 
 % Waveform guess with zeros at the edges
-guess=randn(2,24)/10; guess(:,1:2)=0; 
-guess(:,(end-1):end)=0;
+guess=randn(2,75)/10; guess(:,1:4)=0; 
+guess(:,(end-3):end)=0;
 
 % Run the optimisation
 pulse_profile=fminnewton(spin_system,@grape_xy,guess);

@@ -226,7 +226,7 @@ parfor (n=1:numel(weights),nworkers)
         % Anisotropic thermal equilibrium state from Hamiltonian and temperature
         localpar.rho0=equilibrium(spin_system,HL,QL,[alphas(n) betas(n) gammas(n)]);
 
-    elseif isa(parameters.rho0,'function_handle')
+    elseif isfield(parameters,'rho0')&&isa(parameters.rho0,'function_handle')
 
         % Anisotropic initial condition specified by the user
         rho_init=parameters.rho0; localpar.rho0=rho_init(alphas(n),betas(n),gammas(n));

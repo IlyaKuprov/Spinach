@@ -1365,7 +1365,7 @@ if isfield(inter,'zeeman')
         
         % Check length
         if numel(inter.zeeman.scalar)~=numel(sys.isotopes)
-            error('the number of elements in the inter.zeeman.scalar array should match the number of spins.');
+            error('the number of elements in the inter.zeeman.scalar array must match the number of spins.');
         end
         
         % Make sure all non-empty elements are real numbers

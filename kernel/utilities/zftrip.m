@@ -85,11 +85,11 @@ end
 % Consistency enforcement
 function grumble(spin_system,ZFS,pops,Z,B,idx)
 if (~isnumeric(ZFS))||(~isreal(ZFS))||(size(ZFS,1)~=3)||...
-   (size(ZFS,2)~=3)||(norm(ZFS-ZFS','fro')>1e-6)
+   (size(ZFS,2)~=3)||(norm(ZFS-ZFS','fro')>1e-6*norm(ZFS,'fro'))
     error('ZFS must be a real symmetric 3x3 matrx.');
 end
 if (~isnumeric(Z))||(~isreal(Z))||(size(Z,1)~=3)||...
-   (size(Z,2)~=3)||(norm(Z-Z','fro')>1e-6)
+   (size(Z,2)~=3)||(norm(Z-Z','fro')>1e-6*norm(Z,'fro'))
     error('Z must be a real symmetric 3x3 matrx.');
 end
 if (~isnumeric(pops))||(~isreal(pops))||(numel(pops)~=3)||(sum(pops)~=1)

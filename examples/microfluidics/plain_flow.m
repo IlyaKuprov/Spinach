@@ -105,7 +105,7 @@ for n=1:size(traj,2)
     mesh_plot(spin_system,0,0);
     conc_plot(spin_system,conc);
     zlim(spin_system.mesh.zext);
-    set(gca,'DataAspectRatio',[1 1 0.05])
+    set(gca,'DataAspectRatio',[1 1 0.05]);
     camorbit(0.5,0); drawnow();
         
 end 

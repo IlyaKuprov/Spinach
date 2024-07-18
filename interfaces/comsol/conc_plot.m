@@ -103,9 +103,11 @@ end
 
 % Draw lids and bottoms of the bars as a multifaceted patch
 patch('Faces',F,'Vertices',V,'FaceColor','flat',...
-      'FaceVertexCData',FRGB,'EdgeColor','black'); V(:,3)=0;
+      'FaceVertexCData',FRGB,'EdgeColor','black',...
+      'LineWidth',0.25,'LineJoin','round'); V(:,3)=0;
 patch('Faces',F,'Vertices',V,'FaceColor','flat',...
-      'FaceVertexCData',FRGB,'EdgeColor','black');
+      'FaceVertexCData',FRGB,'EdgeColor','black',...
+      'LineWidth',0.125,'LineJoin','round');
 
 % Loop over cells
 V=zeros(0,3); patch_idx=0; 
@@ -147,7 +149,8 @@ end
 
 % Draw the sides of the bars as a multifaceted patch
 patch('Faces',F,'Vertices',V,'FaceColor','flat',...
-      'FaceVertexCData',FRGB,'EdgeColor','black');
+      'FaceVertexCData',FRGB,'EdgeColor','black',...
+      'LineWidth',0.25,'LineJoin','round');
 
 end
 

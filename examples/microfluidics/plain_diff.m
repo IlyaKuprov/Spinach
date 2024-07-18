@@ -38,9 +38,9 @@ spin_system=mesh_inact(spin_system,[9 10 19 30 20 25 14 13   ...
 spin_system=mesh_vorn(spin_system);                              % Run Voronoi tessellation
 spin_system=mesh_preplot(spin_system);                           % Run output preprocessing
 
-% Initial condition: Lz in a few cells
+% Initial condition: Lz in one cell in the middle
 parameters.rho0_ph{1}=zeros(spin_system.mesh.vor.ncells,1);
-parameters.rho0_ph{1}(1230)=1;
+parameters.rho0_ph{1}(1230)=0.5;
 parameters.rho0_st{1}=state(spin_system,'Lz','1H');
 
 % Detection state: Lz in all cells
@@ -69,7 +69,7 @@ parameters.R_ph={ones(2659,1)};
 % Just diffusion
 spin_system.mesh.u=0*spin_system.mesh.u;
 spin_system.mesh.v=0*spin_system.mesh.v;
-parameters.diff=5e-8;
+parameters.diff=1e-7;
 
 % Drainage in the distal pipe
 drainage=zeros(2659,1); 
@@ -89,7 +89,7 @@ figure(); scale_figure([1.5 1.5]);
 camproj('perspective'); view(-20,15); axis vis3d;
 
 % Set Z axis extents
-spin_system.mesh.zext=[-0.01 0.1];
+spin_system.mesh.zext=[-0.02 0.02];
 
 % Run through trajectory
 for n=1:size(traj,2)
@@ -104,7 +104,7 @@ for n=1:size(traj,2)
     mesh_plot(spin_system,0,0);
     conc_plot(spin_system,conc);
     zlim(spin_system.mesh.zext);
-    set(gca,'DataAspectRatio',[1 1 0.1])
+    set(gca,'DataAspectRatio',[1 1 0.05]);
     camorbit(0.5,0); drawnow();
         
 end 

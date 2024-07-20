@@ -53,47 +53,6 @@ function [opspecs,coeffs]=human2opspec(spin_system,operators,spins)
 % Check input validity
 grumble(operators,spins);
 
-% Preliminary operator inspection
-if ischar(operators)&&strcmp(operators,'Lx')
-
-    % Recursive call for Lx = (Lp + Lm)/2
-    [opspecs_a,coeffs_a]=human2opspec(spin_system,'L+',spins);
-    [opspecs_b,coeffs_b]=human2opspec(spin_system,'L-',spins);
-    opspecs=[opspecs_a; opspecs_b]; coeffs=[coeffs_a; coeffs_b]/2; return
-
-elseif ischar(operators)&&strcmp(operators,'Ly')
-
-    % Recursive call for Ly = (Lp - Lm)/2i
-    [opspecs_a,coeffs_a]=human2opspec(spin_system,'L+',spins);
-    [opspecs_b,coeffs_b]=human2opspec(spin_system,'L-',spins);
-    opspecs=[opspecs_a; opspecs_b]; coeffs=[coeffs_a; -coeffs_b]/2i; return
-
-% Likewise for product states
-elseif iscell(operators)
-
-    % Inspect each term
-    for n=1:numel(operators)
-
-        if strcmp(operators{n},'Lx')
-
-            % Recursive call for Lx = (Lp + Lm)/2
-            operators{n}='L+'; [opspecs_a,coeffs_a]=human2opspec(spin_system,operators,spins);
-            operators{n}='L-'; [opspecs_b,coeffs_b]=human2opspec(spin_system,operators,spins);
-            opspecs=[opspecs_a; opspecs_b]; coeffs=[coeffs_a; coeffs_b]/2; return
-
-        elseif strcmp(operators{n},'Ly')
-
-            % Recursive call for Ly = (Lp - Lm)/2i
-            operators{n}='L+'; [opspecs_a,coeffs_a]=human2opspec(spin_system,operators,spins);
-            operators{n}='L-'; [opspecs_b,coeffs_b]=human2opspec(spin_system,operators,spins);
-            opspecs=[opspecs_a; opspecs_b]; coeffs=[coeffs_a; -coeffs_b]/2i; return
-
-        end
-
-    end
-
-end
-
 % 'Lz','1H' type call returns a sum
 if ischar(operators)&&ischar(spins)
     
@@ -125,38 +84,36 @@ if ischar(operators)&&ischar(spins)
     % Bomb out if the list of spins is empty
     if numel(spin_numbers)==0, error('no such spins in the system.'); end
     
-    % Preallocate descriptors
-    coeffs=zeros(numel(spin_numbers),1);
-    opspecs=cell(numel(spin_numbers),1);
+    % Preallocate descriptor arrays
+    coeffs=cell(numel(spin_numbers),1); opspecs=cell(numel(spin_numbers),1);
     
-    % Use recursive calls
+    % Run recursive calls
     for n=1:numel(spin_numbers)
-        [opspecs(n),coeffs(n)]=human2opspec(spin_system,{operators},{spin_numbers(n)});
+        [opspecs{n},coeffs{n}]=human2opspec(spin_system,{operators},{spin_numbers(n)});
     end
 
-    % Return the outcome
-    return
+    % Concatenate descriptor arrays and return the outcome
+    opspecs=vertcat(opspecs{:}); coeffs=cell2mat(coeffs); return
 
 % 'Lz',[1 2 4] type call returns a sum
 elseif ischar(operators)&&isnumeric(spins)
     
-    % Preallocate descriptors
-    coeffs=zeros(numel(spins),1);
-    opspecs=cell(numel(spins),1);
+    % Preallocate descriptor arrays
+    coeffs=cell(numel(spins),1); opspecs=cell(numel(spins),1);
     
-    % Use recursive calls
+    % Run recursive calls
     for n=1:numel(spins)
-        [opspecs(n),coeffs(n)]=human2opspec(spin_system,{operators},{spins(n)});
+        [opspecs{n},coeffs{n}]=human2opspec(spin_system,{operators},{spins(n)});
     end
-    
-    % Return the outcome
-    return
+
+    % Concatenate descriptor arrays and return the outcome 
+    opspecs=vertcat(opspecs{:}); coeffs=cell2mat(coeffs); return
     
 % {'Lz','L+'},{1,4} type call returns an operator
 elseif iscell(operators)&&iscell(spins)
 
     % Start with an empty opspec and a unit coefficient
-    opspecs={zeros(1,spin_system.comp.nspins)}; coeffs=1;
+    opspecs=zeros(1,spin_system.comp.nspins); coeffs=1;
     
     % Parse operator selection
     for n=1:numel(operators)
@@ -167,48 +124,64 @@ elseif iscell(operators)&&iscell(spins)
             case 'Em'
 
                 % Empty cavity state
-                opspecs{1}(spins{n})=-4;
+                opspecs(:,spins{n})=-4;
 
             case 'An'
                 
                 % Annihilation operator
-                opspecs{1}(spins{n})=-3;
+                opspecs(:,spins{n})=-3;
 
             case 'Nu'
                 
                 % Number operator
-                opspecs{1}(spins{n})=-2;
+                opspecs(:,spins{n})=-2;
 
             case 'Cr'
                 
                 % Creation operator
-                opspecs{1}(spins{n})=-1;
+                opspecs(:,spins{n})=-1;
 
             case 'E'
                 
                 % Unit operator
-                opspecs{1}(spins{n})=0;
+                opspecs(:,spins{n})=0;
                 
             case 'L+'
                 
                 % Raising operator
-                opspecs{1}(spins{n})=1;
+                opspecs(:,spins{n})=1;
 
                 % T(1,+1) coefficient
                 coeffs=-sqrt(2)*coeffs;
                 
-            case 'Lz'
-                
-                % Z projection operator
-                opspecs{1}(spins{n})=2;
-                
             case 'L-'
                 
                 % Lowering operator
-                opspecs{1}(spins{n})=3;
+                opspecs(:,spins{n})=3;
                 
                 % T(1,-1) coefficient
                 coeffs=sqrt(2)*coeffs;
+
+            case 'Lx'
+                
+                % X projection operator: (Lp+Lm)/2
+                opspecs_a=opspecs; opspecs_a(:,spins{n})=1;
+                opspecs_b=opspecs; opspecs_b(:,spins{n})=3;
+                opspecs=[opspecs_a; opspecs_b];
+                coeffs=kron(coeffs,[-sqrt(2); sqrt(2)]/2);
+
+            case 'Ly'
+                
+                % Y projection operator: (Lp-Lm)/2i
+                opspecs_a=opspecs; opspecs_a(:,spins{n})=1;
+                opspecs_b=opspecs; opspecs_b(:,spins{n})=3;
+                opspecs=[opspecs_a; opspecs_b];
+                coeffs=kron(coeffs,[-sqrt(2);-sqrt(2)]/2i);
+
+            case 'Lz'
+                
+                % Z projection operator
+                opspecs(:,spins{n})=2;
 
             otherwise
                 
@@ -226,11 +199,14 @@ elseif iscell(operators)&&iscell(spins)
                 end
                 
                 % Write the specification
-                opspecs{1}(spins{n})=lm2lin(l,m); coeffs=1*coeffs;
+                opspecs(:,spins{n})=lm2lin(l,m); coeffs=1*coeffs;
                 
         end
-        
+
     end
+
+    % Convert to cell array
+    opspecs=num2cell(opspecs,2);    
     
 else
     

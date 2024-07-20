@@ -25,14 +25,12 @@ for n=1:numel(formalisms)
     bas.formalism=formalisms{n};
     bas.approximation='none';
     spin_system=basis(spin_system,bas);
-    Up=state(spin_system,'L+','235U');
-    Um=state(spin_system,'L-','235U');
+    Ux=state(spin_system,'Lx','235U');
+    Uy=state(spin_system,'Ly','235U');
     Uz=state(spin_system,'Lz','235U');
-    Ux=(Up+Um)/2; Uy=(Up-Um)/2i;
-    Hp=state(spin_system,'L+','1H');
-    Hm=state(spin_system,'L-','1H');
+    Hx=state(spin_system,'Lx','1H');
+    Hy=state(spin_system,'Ly','1H');
     Hz=state(spin_system,'Lz','1H');
-    Hx=(Hp+Hm)/2; Hy=(Hp-Hm)/2i;
     norms(1,n)=trace(full(Ux)'*full(Ux));
     norms(2,n)=trace(full(Uy)'*full(Uy));
     norms(3,n)=trace(full(Uz)'*full(Uz));

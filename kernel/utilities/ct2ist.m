@@ -31,31 +31,7 @@ function [states,coeffs]=ct2ist(mult,type)
 grumble(mult,type);
 
 % CT operator in the Zeeman basis
-CT_Z=zeros([mult mult]);
-switch type
-
-    case 'z'
-
-        % Sz on central transition
-        CT_Z(mult/2,mult/2)=0.5;
-        CT_Z(mult/2+1,mult/2+1)=-0.5;
-
-    case '+'
-
-        % S+ on central transition
-        CT_Z(mult/2,mult/2+1)=1;
-
-    case '-'
-
-        % S- on central transition
-        CT_Z(mult/2+1,mult/2)=1;
-
-    otherwise
-
-        % Complain and bomb out
-        error('unknown CT operator type.');
-
-end
+CT_Z=centrans(mult,type);
 
 % Spherical tensors in Zeeman basis
 IST_Z=irr_sph_ten(mult);

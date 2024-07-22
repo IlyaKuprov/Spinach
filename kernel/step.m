@@ -126,10 +126,18 @@ else
 end
 nsteps=ceil(norm_mat/2);
 
-% Warn user if the number is too large
+% Step control
 if nsteps>100
+
+    % Warn user if the number is large
     report(spin_system,['WARNING: ' num2str(nsteps)...
                         ' substeps required, consider using evolution() here.']);
+
+elseif nsteps>1000
+
+    % Catch the common mistake of supplying unreasonable |L*dt|
+    error('either dt is too long, or L is too big: |L*dt|>1000, check both.');
+
 end
 
 % Decide if parallelisation is sensible

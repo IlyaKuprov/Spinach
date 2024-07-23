@@ -44,7 +44,9 @@
 %               normalisation. For very large spin sys-
 %               tems this is much faster
 %
-%    'exact'  - exact state vector with correct normalisation
+%    'exact'  - exact state vector with correct normalisation,
+%               this is the default when the last argument is
+%               skipped in the function call
 %
 %    'chem'   - the exact state vector weighted with the 
 %               concentrations specified in inter.chem.concs

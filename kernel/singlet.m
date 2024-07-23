@@ -25,10 +25,10 @@ function rho=singlet(spin_system,spin_a,spin_b)
 grumble(spin_system,spin_a,spin_b);
 
 % Build the component operators
-unit=state(spin_system,{'E' ,'E' },{spin_a,spin_b},'exact');
-LzSz=state(spin_system,{'Lz','Lz'},{spin_a,spin_b},'exact');
-LmSp=state(spin_system,{'L-','L+'},{spin_a,spin_b},'exact');
-LpSm=state(spin_system,{'L+','L-'},{spin_a,spin_b},'exact');
+unit=state(spin_system,{'E' ,'E' },{spin_a,spin_b});
+LzSz=state(spin_system,{'Lz','Lz'},{spin_a,spin_b});
+LmSp=state(spin_system,{'L-','L+'},{spin_a,spin_b});
+LpSm=state(spin_system,{'L+','L-'},{spin_a,spin_b});
 
 % Build the singlet state
 rho=unit/4-(LzSz+0.5*(LpSm+LmSp)); 

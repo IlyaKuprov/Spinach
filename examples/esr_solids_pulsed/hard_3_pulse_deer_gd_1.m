@@ -45,24 +45,15 @@ bas.approximation='none';
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Build central transition operators
-sigma=pauli(2);
-sigma.p=[zeros(3,8)
-        [zeros(2,3) sigma.p zeros(2,3)]
-         zeros(3,8)];
-Ep_prob=kron(sigma.p,speye(size(sigma.p)));
-Ep_pump=kron(speye(size(sigma.p)),sigma.p);
-
 % Sequence parameters
 parameters.rho0=state(spin_system,'Lz','E8');
-parameters.ex_prob=(Ep_prob+Ep_prob')/2; 
-parameters.ex_pump=(Ep_pump+Ep_pump')/2;
+parameters.ex_prob=operator(spin_system,'CTx',1);
+parameters.ex_pump=operator(spin_system,'CTx',2);
 parameters.coil_prob=state(spin_system,{'L+'},{1});
 parameters.coil_pump=state(spin_system,{'L+'},{2});
 parameters.spectrum_sweep=1e10;
 parameters.spectrum_nsteps=1024;
-parameters.ex_hard=(operator(spin_system,'L+','electrons')+...
-                    operator(spin_system,'L-','electrons'))/2;
+parameters.ex_hard=operator(spin_system,'Lx','electrons');
 parameters.stepsize=1e-7;
 parameters.nsteps=80;
 parameters.spins={'E8'};

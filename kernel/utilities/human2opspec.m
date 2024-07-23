@@ -168,7 +168,7 @@ elseif iscell(operators)&&iscell(spins)
                 opspecs_a=opspecs; opspecs_a(:,spins{n})=1;
                 opspecs_b=opspecs; opspecs_b(:,spins{n})=3;
                 opspecs=[opspecs_a; opspecs_b];
-                coeffs=kron(coeffs,[-sqrt(2); sqrt(2)]/2);
+                coeffs=kron([-sqrt(2); sqrt(2)]/2,coeffs);
 
             case 'Ly'
                 
@@ -176,12 +176,52 @@ elseif iscell(operators)&&iscell(spins)
                 opspecs_a=opspecs; opspecs_a(:,spins{n})=1;
                 opspecs_b=opspecs; opspecs_b(:,spins{n})=3;
                 opspecs=[opspecs_a; opspecs_b];
-                coeffs=kron(coeffs,[-sqrt(2);-sqrt(2)]/2i);
+                coeffs=kron([-sqrt(2);-sqrt(2)]/2i,coeffs);
 
             case 'Lz'
                 
                 % Z projection operator
                 opspecs(:,spins{n})=2;
+
+            case 'CTx'
+
+                % Sx generator for the central transition in the Zeeman basis
+                [ct_states,ct_coeffs]=ct2ist(spin_system.comp.mults(spins{n}),'x');
+                states=kron(ct_states,ones(size(opspecs,1),1));
+                opspecs=kron(ones(numel(ct_states),1),opspecs);
+                opspecs(:,spins{n})=states; coeffs=kron(ct_coeffs,coeffs);
+
+            case 'CTy'
+
+                % Sy generator for the central transition in the Zeeman basis
+                [ct_states,ct_coeffs]=ct2ist(spin_system.comp.mults(spins{n}),'y');
+                states=kron(ct_states,ones(size(opspecs,1),1));
+                opspecs=kron(ones(numel(ct_states),1),opspecs);
+                opspecs(:,spins{n})=states; coeffs=kron(ct_coeffs,coeffs);
+
+            case 'CTz'
+
+                % Sy generator for the central transition in the Zeeman basis
+                [ct_states,ct_coeffs]=ct2ist(spin_system.comp.mults(spins{n}),'z');
+                states=kron(ct_states,ones(size(opspecs,1),1));
+                opspecs=kron(ones(numel(ct_states),1),opspecs);
+                opspecs(:,spins{n})=states; coeffs=kron(ct_coeffs,coeffs);
+
+            case 'CT+'
+
+                % Raising operator for the central transition in the Zeeman basis
+                [ct_states,ct_coeffs]=ct2ist(spin_system.comp.mults(spins{n}),'+');
+                states=kron(ct_states,ones(size(opspecs,1),1));
+                opspecs=kron(ones(numel(ct_states),1),opspecs);
+                opspecs(:,spins{n})=states; coeffs=kron(ct_coeffs,coeffs);
+
+            case 'CT-'
+
+                % Lowering operator for the central transition in the Zeeman basis
+                [ct_states,ct_coeffs]=ct2ist(spin_system.comp.mults(spins{n}),'-');
+                states=kron(ct_states,ones(size(opspecs,1),1));
+                opspecs=kron(ones(numel(ct_states),1),opspecs);
+                opspecs(:,spins{n})=states; coeffs=kron(ct_coeffs,coeffs);
 
             otherwise
                 

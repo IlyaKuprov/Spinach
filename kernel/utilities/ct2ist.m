@@ -38,7 +38,7 @@ IST_Z=irr_sph_ten(mult);
 
 % Compute all expansion coefficients and list all states
 coeffs=cellfun(@(A)trace(A'*CT_Z)/trace(A'*A),IST_Z);
-states=0:(numel(IST_Z)-1);
+states=transpose(0:(numel(IST_Z)-1));
 
 % Drop negligible states
 idx=(abs(coeffs)>10*eps('double'));
@@ -52,8 +52,8 @@ if (~isnumeric(mult))||(~isscalar(mult))||...
    (~isreal(mult))||(mult<2)||(mod(mult,2)~=0)
     error('mult must be an even positive integer.');
 end
-if (~ischar(type))||(~ismember(type,{'z','+','-'}))
-    error('type must be ''+'', ''-'', or ''z''.');
+if (~ischar(type))||(~ismember(type,{'x','y','z','+','-'}))
+    error('type must be ''x'', ''y'', ''z'', ''+'', or ''-''.');
 end
 end
 

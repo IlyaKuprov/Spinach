@@ -28,6 +28,18 @@ grumble(mult,type);
 A=spalloc(mult,mult,2);
 switch type
 
+    case 'x'
+
+        % Sx on central transition
+        A(mult/2,mult/2+1)=0.5;
+        A(mult/2+1,mult/2)=0.5;
+
+    case 'y'
+
+        % Sy on central transition
+        A(mult/2,mult/2+1)=-0.5i;
+        A(mult/2+1,mult/2)=+0.5i;
+
     case 'z'
 
         % Sz on central transition
@@ -51,6 +63,9 @@ switch type
 
 end
 
+% Make complex
+A=complex(A);
+
 end
 
 % Consistency enforcement
@@ -59,8 +74,8 @@ if (~isnumeric(mult))||(~isscalar(mult))||...
    (~isreal(mult))||(mult<2)||(mod(mult,2)~=0)
     error('mult must be an even positive integer.');
 end
-if (~ischar(type))||(~ismember(type,{'z','+','-'}))
-    error('type must be ''+'', ''-'', or ''z''.');
+if (~ischar(type))||(~ismember(type,{'x','y','z','+','-'}))
+    error('type must be ''x'', ''y'', ''z'', ''+'', or ''-''.');
 end
 end
 

@@ -11,10 +11,11 @@
 %
 % the function returns the sum of the corresponding single-spin operators 
 % (Hilbert space) or superoperators (Liouville space) on all spins of that
-% type. Valid labels for operators in this type of call are 'E' (identity),
-% 'Lz', 'Lx', 'Ly', 'L+', 'L-', and 'Tl,m' (irreducible spherical tensor,
-% l and m are integers). Valid labels for spins are standard isotope names
-% as well as 'electrons', 'nuclei' and 'all'.
+% type. Valid labels for states in this type of call are 'E' (identity),
+% 'Lz', 'Lx', 'Ly', 'L+', 'L-', 'Tl,m' (irreducible spherical tensor, l 
+% and m are integers), 'CTx', 'CTy', 'CTz', 'CT+', 'CT-' (central transi-
+% tion operators in the Zeeman basis). Valid labels for spins are standard 
+% isotope names, as well as 'electrons', 'nuclei', and 'all'.
 %
 % 2. If operators is a string and spins is a vector
 %

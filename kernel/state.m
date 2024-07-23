@@ -12,10 +12,11 @@
 % the function returns the sum of the corresponding single-spin densi-
 % ty matrices (Hilbert space) or state vectors (Liouville space) on 
 % all spins of that type. Valid labels for states in this type of call
-% are 'E' (identity), 'Lz', 'Lx', 'Ly', 'L+', 'L-', and 'Tl,m' (irre-
-% ducible spherical tensor, l and m are integers). Valid labels for
-% spins are standard isotope names as well as 'electrons', 'nuclei',
-% and 'all'.
+% are 'E' (identity), 'Lz', 'Lx', 'Ly', 'L+', 'L-', 'Tl,m' (irreduci-
+% ble spherical tensor, l and m are integers), 'CTx', 'CTy', 'CTz',
+% 'CT+','CT-' (central transition operators in the Zeeman basis). Va-
+% lid labels for spins are standard isotope names, as well as 'elect-
+% rons', 'nuclei', and 'all'.
 %
 % 2. If states is a string and spins is a vector
 %

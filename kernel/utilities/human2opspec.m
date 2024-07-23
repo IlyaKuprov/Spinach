@@ -9,10 +9,11 @@
 % the function returns a list of single-spin opspecs for all spins with the
 % specified name. In the example above, the list of Lz operator specificati-
 % ons for all 13C nuclei in the system would be returned. Valid labels for 
-% operators in this type of call are 'E' (identity), 'Lz', 'Lx', 'Ly', 'L+',
-% 'L-', and 'Tl,m' (irreducible spherical tensor, l and m are integers). Va-
-% lid labels for the spins are standard isotope names as well as 'electrons', 
-% 'nuclei', and 'all'.
+% states in this type of call are 'E' (identity), 'Lz', 'Lx', 'Ly', 'L+', 
+% 'L-', 'Tl,m' (irreducible spherical tensor, l and m are integers), 'CTx',
+% 'CTy', 'CTz', 'CT+','CT-' (central transition operators in the Zeeman ba-
+% sis). Valid labels for spins are standard isotope names, as well as 'elec-
+% trons', 'nuclei', and 'all'.
 %
 % 2. If one input is a string and the other is a vector
 %

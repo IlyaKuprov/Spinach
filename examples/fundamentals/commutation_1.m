@@ -1,8 +1,6 @@
-% Commutators of simple operators and superoperators. All output 
-% should be close to zero. The same calculation is performed for 
-% all formalisms supported by Spinach.
-%
-% The calculation should return a 3x4 zero matrix.
+% Commutators of simple operators and superoperators. The test
+% calculation is performed three times in the three formalisms
+% supported by Spinach.
 %
 % i.kuprov@soton.ac.uk
 
@@ -32,8 +30,12 @@ for n=1:numel(formalisms)
     answer(3,n)=norm(Lx*Ly-Ly*Lx-1i*Lz,'fro');
 end
 
-% Display the answers
-disp(abs(answer)>1e-6);
+% Report the outcome
+if norm(answer,'fro')<1e-6
+    disp('Cross-formalism commutation test PASSED.');
+else
+    error('Cross-formalism commutation test FAILED.');
+end
 
 end
 

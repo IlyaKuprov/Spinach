@@ -118,8 +118,8 @@ deer_axis=1e6*linspace(0,parameters.p1_p3_gap,parameters.p2_nsteps+1);
 
 % Plot the echo stack
 figure(); surf(deer_axis_2d,echo_axis_2d,real(echo_stack));
-title('echo stack, unphased'); ylabel('echo window, ns');
-xlabel('2nd pulse position, \mus'); axis tight; kgrid;
+ktitle('echo stack, unphased'); kylabel('echo window, ns');
+kxlabel('2nd pulse position, $\mu$s'); axis tight; kgrid;
 
 % Extract and phase the echo modulation
 [deer_echoes,deer_sigmas,deer_traces]=svd(echo_stack);
@@ -130,18 +130,18 @@ deer_traces=deer_traces*deer_sigmas/deer_traces(1);
 figure(); plot(echo_axis,real(deer_echoes(:,1:3)));
 kylabel('echo, real channel'); kgrid;
 kxlabel('echo window, ns'); axis tight;
-klegend({'u_1\cdot\sigma_1',...
-         'u_2\cdot\sigma_2',...
-         'u_3\cdot\sigma_3'});
+klegend({'${\bf{u}}_1\cdot\sigma_1$',...
+         '${\bf{u}}_2\cdot\sigma_2$',...
+         '${\bf{u}}_3\cdot\sigma_3$'});
 ktitle('principal components of the echo stack');
     
 % Plot DEER components
 figure(); plot(deer_axis,real(deer_traces(:,1:3)));
 kylabel('echo, real channel'); axis tight;
-kxlabel('2nd pulse insertion point, \mus');  
-klegend({'v_1\cdot\sigma_1',...
-         'v_2\cdot\sigma_2',...
-         'v_3\cdot\sigma_3'}); kgrid;
+kxlabel('2nd pulse insertion point, $\mu$s');  
+klegend({'${\bf{v}}_1\cdot\sigma_1$',...
+         '${\bf{v}}_2\cdot\sigma_2$',...
+         '${\bf{v}}_3\cdot\sigma_3$'}); kgrid;
 ktitle('principal components of the echo stack');
 
 end

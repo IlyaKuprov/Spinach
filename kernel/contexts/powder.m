@@ -170,9 +170,10 @@ sph_grid=load([spin_system.sys.root_dir '/kernel/grids/' ...
 % Assign local variables
 alphas=sph_grid.alphas; betas=sph_grid.betas; 
 gammas=sph_grid.gammas; weights=sph_grid.weights;
+n_orients=numel(weights);
 
 % Preallocate answer array
-ans_array=cell(numel(weights),1);
+ans_array=cell(n_orients,1);
 
 % Run serially if needed
 if isfield(parameters,'serial')&&...
@@ -187,23 +188,38 @@ if isfield(parameters,'serial')&&...
 else
     
     % Parallel execution
-    nworkers=min([poolsize numel(weights)]);
+    nworkers=min([poolsize n_orients]);
 
 end
 
 % Inform the user and silence the output
-prev_setting=spin_system.sys.output;
-report(spin_system,['powder simulation with ' num2str(numel(weights)) ' orientations.']);
+prev_setting=spin_system.sys.output; ss_prev.sys.output=spin_system.sys.output;
+report(spin_system,['powder simulation with ' num2str(n_orients) ' orientations.']);
 if ~isfield(parameters,'verbose')||(parameters.verbose==0)
     report(spin_system,'pulse sequence silenced to avoid excessive output.')
     spin_system.sys.output='hush';
 end
 
-% MDCS diagnostics
-parallel_profiler_start;
+% Parfor rigging
+if ~isworkernode
+    D=parallel.pool.DataQueue;
+    afterEach(D,@(~)parfor_progr);
+    orients_done=0; last_toc=0;
+    tic; ticBytes(gcp);
+end
+
+% Parfor progress updater
+function parfor_progr()
+    orients_done=orients_done+1; last_message=toc-last_toc;
+    if (last_message>5)||(orients_done==n_orients)
+        report(ss_prev,[num2str(orients_done) '/' num2str(n_orients) ' orientations done, ' ...
+                        num2str(orients_done/toc) ' orientations per second.']); 
+        last_toc=toc;
+    end
+end
 
 % Parallel powder averaging loop
-parfor (n=1:numel(weights),nworkers)
+parfor (n=1:n_orients,nworkers)
     
     % Localise parameter array
     localpar=parameters;
@@ -247,6 +263,9 @@ parfor (n=1:numel(weights),nworkers)
     
     % Run the simulation (it might return a structure)
     ans_array{n}=pulse_sequence(spin_system,localpar,H,R,K); %#ok<PFBNS>
+
+    % Report progress
+    send(D,n);
     
 end
 
@@ -275,8 +294,13 @@ end
 % Unsilence the output
 spin_system.sys.output=prev_setting;
 
-% Get MDCS diagnostics
-parallel_profiler_report; 
+% Parfor performance
+if ~isworkernode
+    nbytes=mean(tocBytes(gcp),1)/2^20; walltime=toc();
+    report(spin_system,['average worker process received ' num2str(nbytes(1)) ...
+                        ' MB and sent back ' num2str(nbytes(2)) ' MB']);
+    report(spin_system,['powder average run time: ' num2str(walltime) ' seconds']);
+end
 
 end
 

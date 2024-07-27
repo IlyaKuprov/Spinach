@@ -606,7 +606,9 @@ if ~isworkernode
     D=parallel.pool.DataQueue;
     afterEach(D,@(~)parfor_progr);
     terms_done=0; last_toc=0;
-    tic; ticBytes(gcp);
+    tic; ticBytes(gcp); do_diag=true;
+else
+    do_diag=false; D=[];
 end
 
 % Parfor progress updater
@@ -635,7 +637,7 @@ parfor n=1:nterms
     end
 
     % Report progress
-    send(D,n);
+    if do_diag, send(D,n); end
 
 end
 

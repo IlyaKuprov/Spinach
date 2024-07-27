@@ -205,7 +205,9 @@ if ~isworkernode
     D=parallel.pool.DataQueue;
     afterEach(D,@(~)parfor_progr);
     orients_done=0; last_toc=0;
-    tic; ticBytes(gcp);
+    tic; ticBytes(gcp); do_diag=true;
+else
+    do_diag=false; D=[];
 end
 
 % Parfor progress updater
@@ -265,7 +267,7 @@ parfor (n=1:n_orients,nworkers)
     ans_array{n}=pulse_sequence(spin_system,localpar,H,R,K); %#ok<PFBNS>
 
     % Report progress
-    send(D,n);
+    if do_diag, send(D,n); end
     
 end
 

@@ -176,6 +176,7 @@ if ~isempty(spin_system.sys.disable)
     if ismember('trajlevel',spin_system.sys.disable), report(spin_system,'         > trajectory analysis inside evolution() function'); end
     if ismember('merge',spin_system.sys.disable),     report(spin_system,'         > small subspace merging inside evolution() function'); end
     if ismember('colorbar',spin_system.sys.disable),  report(spin_system,'         > colorbar drawing by plotting utilities'); end
+    if ismember('asyredf',spin_system.sys.disable),   report(spin_system,'         > asynchronous Redfied superoperator evaluation'); end
 end
 
 % Enabled features report
@@ -1158,7 +1159,7 @@ if isfield(sys,'disable')
         error('sys.disable must be a cell array of strings.');
     end
     if any(~ismember(sys.disable,{'zte','pt','symmetry','krylov','clean-up','hygiene',...
-                                  'dss','expv','trajlevel','merge','colorbar'}))
+                                  'dss','expv','trajlevel','merge','colorbar','asyredf'}))
         error('unrecognised switch in sys.disable field.');
     end
 end

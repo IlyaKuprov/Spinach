@@ -135,7 +135,7 @@ if ismember('redfield',spin_system.rlx.theories)
     [L0,Q]=hamiltonian(assume(spin_system,'labframe')); %#ok<ASGLU>
     
     % Compute Redfield integral
-    if poolsize==0
+    if isworkernode||ismember('asyredf',spin_system.sys.disable)
         report(spin_system,'serial evaluation path...');
         redfield_integral_serial;
     else

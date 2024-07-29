@@ -4,7 +4,7 @@
 %
 % i.kuprov@soton.ac.uk
 
-function operators_1()
+function state_consistency()
 
 % Magnet field
 sys.magnet=14.1;

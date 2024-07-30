@@ -354,18 +354,16 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
     
     % Sort the basis explicitly
     report(spin_system,'sorting the basis...');
-    if (~isworkernode)&&(size(basis_spec,1)>1e5)
+    if (~isworkernode)&&(nnz(basis_spec)>1e5)
         
-        % Run distributed sorting
-        basis_spec=distributed(basis_spec);
-        spmd
-            basis_spec=sortrows(basis_spec);
-        end
+        % Run multithreaded sorting
+        basis_spec=distrib_dim(basis_spec,2);
+        basis_spec=sortrows(basis_spec);
         spin_system.bas.basis=gather(basis_spec);
         
     else
         
-        % Run serial sorting
+        % Run sorting in a single thread
         spin_system.bas.basis=sortrows(basis_spec);
         
     end

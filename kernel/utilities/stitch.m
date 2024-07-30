@@ -67,10 +67,10 @@ Pm=clean_up(spin_system,Pm,spin_system.tols.prop_chop);
 if ismember('gpu',spin_system.sys.enable)
     
     % Upload the problem to GPU
-    P=gpuArray(P);
-    Pm=gpuArray(Pm);
+    P=gpuArray(P); 
+    Pm=gpuArray(Pm); 
     Pct=gpuArray(Pct); 
-    rho_stack=gpuArray(rho_stack);
+    rho_stack=gpuArray(rho_stack); 
     coil_stack=gpuArray(coil_stack);
     
     % Inform the user
@@ -78,20 +78,13 @@ if ismember('gpu',spin_system.sys.enable)
     
 elseif (~isworkernode)&&(nnz(P)>1e6)
     
-    % Distribute arrays
-    P=distributed(P); 
-    Pm=distributed(Pm);
-    Pct=distributed(Pct);
-    rho_stack=distributed(rho_stack);
-    coil_stack=distributed(coil_stack);
-    
-    % Reslice propagators
-    spmd
-        P=redistribute(P,codistributor1d(1));
-        Pm=redistribute(Pm,codistributor1d(1));
-        Pct=redistribute(Pct,codistributor1d(1));
-    end
-    
+    % Distribute the problem
+    P=distrib_dim(P,1); 
+    Pm=distrib_dim(Pm,1); 
+    Pct=distrib_dim(Pct,1);
+    rho_stack=distrib_dim(rho_stack,2);
+    coil_stack=distrib_dim(coil_stack,2);
+     
     % Inform the user
     report(spin_system,'distributed stitching on CPU.');
     

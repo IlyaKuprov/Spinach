@@ -58,7 +58,7 @@ bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Algorithmic options
-sys.enable={'greedy','gpu'};
+sys.enable={'gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

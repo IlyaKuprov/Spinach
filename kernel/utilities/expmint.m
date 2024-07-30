@@ -57,7 +57,7 @@ clear('auxmat','BE1','BE2');
 if (~isworkernode)&&(nnz(P)>1e6)&&issparse(P)
     
     % Codistributed multiplication
-    P=distributed(P); Q=distributed(Q);
+    P=distrib_dim(P,1); Q=distrib_dim(Q,2);
     spmd
         R=clean_up(spin_system,P*Q,spin_system.tols.prop_chop);
         P=[]; Q=[]; %#ok<NASGU>

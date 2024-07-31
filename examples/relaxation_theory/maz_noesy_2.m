@@ -4,9 +4,9 @@
 % quadrupolar relaxation of the 14N nucleus). The calculation illustra-
 % tes the effect described in:
 %
-%                http://dx.doi.org/10.1002/ange.201410271
+%               http://dx.doi.org/10.1002/ange.201410271
 %
-% Calculation time: minutes on a Tesla A100 GPU, much longer on CPU
+% Calculation time: minutes.
 %
 % i.kuprov@soton.ac.uk
 % tim.claridge@chem.ox.ac.uk
@@ -86,7 +86,6 @@ inter.coordinates={[-1.812977   -1.098554    0.444452]
 sys.tols.inter_cutoff=2.0;
 sys.tols.prox_cutoff=4.0;
 sys.disable={'krylov'};
-sys.enable={'greedy','gpu'};
 
 % Basis set
 bas.formalism='sphten-liouv';

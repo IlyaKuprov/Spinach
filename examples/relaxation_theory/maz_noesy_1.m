@@ -3,7 +3,7 @@
 % J-coupling by the nitrogen centre inversion process. The calcula-
 % tion illustrates the effect described in:
 %
-%                http://dx.doi.org/10.1002/ange.201410271
+%              http://dx.doi.org/10.1002/ange.201410271
 %
 % Calculation time: minutes
 %
@@ -79,7 +79,6 @@ inter.coordinates={[-1.812977   -1.098554    0.444452]
 sys.tols.inter_cutoff=2.0;
 sys.tols.prox_cutoff=4.0;
 sys.disable={'krylov'};
-sys.enable={'greedy'};
 
 % Basis set
 bas.formalism='sphten-liouv';

@@ -99,7 +99,6 @@ inter.tau_c={200e-12};
 sys.tols.inter_cutoff=2.0;
 sys.tols.prox_cutoff=4.0;
 sys.disable={'krylov'};
-sys.enable={'greedy'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

@@ -164,11 +164,8 @@ report(spin_system,['propagator dimension ' num2str(size(P,1)) ...
 % Run the squaring stage
 if n_squarings>0
     
-    % Inform the user
-    report(spin_system,'setting up the squaring process...');
-    
     % Run the appropriate squaring process
-    if ismember('gpu',spin_system.sys.enable)&&(size(P,1)>500)
+    if ismember('gpu',spin_system.sys.enable)
         
         % Move to GPU
         P=gpuArray(P);
@@ -185,32 +182,6 @@ if n_squarings>0
         end
         
         % Gather the propagator
-        P=gather(P);
-        
-    elseif (~isworkernode)&&(nnz(P)>1e6)&&issparse(P)
-        
-        % Distribute the propagator
-        P=distributed(P);
-        
-        % Run codistributed CPU squaring
-        spmd
-            
-            % Run the squaring stage
-            for n=1:n_squarings
-                
-                % Inform the user
-                if spmdIndex==spmdSize
-                    report(spin_system,['codistributed CPU squaring step ' num2str(n) '...']);
-                end
-                
-                % Square the propagator
-                P=clean_up(spin_system,P*P,spin_system.tols.prop_chop);
-                
-            end
-            
-        end
-        
-        % Back to CPU
         P=gather(P);
         
     else

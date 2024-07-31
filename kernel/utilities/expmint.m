@@ -59,14 +59,11 @@ P=(BE1'*auxmat*BE1)'; Q=(BE1'*auxmat*BE2);
 % Reclaim memory
 clear('auxmat','BE1','BE2');
 
-% Codistribute the blocks if beneficial
-if (~isworkernode)&&(nnz(P)>1e6)&&issparse(P)
-    P=distrib_dim(P,1); Q=distrib_dim(Q,2);
-end
-
 % Multiply up the blocks and reclaim memory
 R=clean_up(spin_system,P*Q,spin_system.tols.prop_chop);
-clear('P','Q'); R=gather(R);
+
+% Reclaim memory
+clear('P','Q');
 
 end
 

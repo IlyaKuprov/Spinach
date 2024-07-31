@@ -93,7 +93,7 @@
 % http://dx.doi.org/10.1063/1.3679656 for further information.
 %
 % i.kuprov@soton.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % ohad.levinkron@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=evolution.m>

@@ -5,7 +5,7 @@
 %
 % Calculation time: a week on 32 cores, needs 512 GB of RAM.
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 % andras_boeszoermenyi@hms.harvard.edu
 
@@ -43,6 +43,7 @@ bas.level=4; bas.space_level=3;
 
 % Algorithmic options
 sys.enable={'greedy'};
+sys.disable={'asyredf'};
 
 % Create the spin system structure
 spin_system=create(sys,inter);

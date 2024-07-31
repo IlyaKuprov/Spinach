@@ -24,7 +24,7 @@
 %      tensors      - a cell array of interaction tensors 
 %                     as 3x3 matrices 
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=shift_iso.m>

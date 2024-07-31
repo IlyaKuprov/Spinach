@@ -4,7 +4,7 @@
 %
 % Calculation time: hours.
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 
 function noesyhsqc_ubiquitin_prot()
@@ -22,7 +22,6 @@ sys.magnet=21.1356;
 sys.tols.inter_cutoff=2.0;
 sys.tols.prox_cutoff=4.0;
 
-
 % Relaxation theory
 inter.relaxation={'redfield'};
 inter.rlx_keep='kite';
@@ -37,6 +36,7 @@ bas.level=4; bas.space_level=3;
 
 % Algorithmic options
 sys.enable={'greedy'};
+sys.disable={'asyredf'};
 
 % Create the spin system structure
 spin_system=create(sys,inter);

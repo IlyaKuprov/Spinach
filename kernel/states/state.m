@@ -61,7 +61,7 @@
 %               space state vector
 % 
 % d.sayostyanov@soton.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=state.m>

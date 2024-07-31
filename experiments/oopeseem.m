@@ -36,7 +36,7 @@
 %       to have soft pulses instead.
 %
 % i.kuprov@soton.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=oopeseem.m>
 

@@ -5,7 +5,7 @@
 % Calculation time: minutes
 %
 % i.kuprov@soton.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 
 function mas_powder_gly_gridfree()
 

@@ -28,7 +28,7 @@
 % Note: this function is invoked automatically by liquid.m con-
 %       text when when parameters.needs cell array contains 'rdc'.
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=residual.m>

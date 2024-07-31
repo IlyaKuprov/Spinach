@@ -7,7 +7,7 @@
 % Calculation time: minutes with a Tesla A100 GPU
 %
 % i.kuprov@soton.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % alexander.karabanov@nottingham.ac.uk
 % walter.kockenberger@nottingham.ac.uk
 % yonatan.hovav@weizmann.ac.il

@@ -10,7 +10,7 @@
 % Calculation time: seconds
 %
 % i.kuprov@soton.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % nurit.manukovsky@weizmann.ac.il
 
 function hard_3_pulse_echo_gd()

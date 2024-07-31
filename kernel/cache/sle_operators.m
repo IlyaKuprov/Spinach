@@ -28,7 +28,7 @@
 % compute operator sets that it can find on disk.
 %
 % i.kuprov@soton.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=sle_operators.m>
 

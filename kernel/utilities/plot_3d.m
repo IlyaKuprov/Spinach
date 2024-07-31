@@ -46,7 +46,7 @@
 % where smin and smax are computed from the spectrum cube. 
 %
 % i.kuprov@soton.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=plot_3d.m>
 

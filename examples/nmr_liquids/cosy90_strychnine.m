@@ -4,7 +4,7 @@
 %
 % i.kuprov@soton.ac.uk
 % gareth.charnock@oerc.ox.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 
 function cosy90_strychnine()
 

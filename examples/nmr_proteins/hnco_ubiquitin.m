@@ -3,7 +3,7 @@
 %
 % Calculation time: minutes, faster with a Tesla A100 GPU.
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 
 function hnco_ubiquitin()

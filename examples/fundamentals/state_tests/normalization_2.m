@@ -4,7 +4,7 @@
 % with identical columns.
 %
 % i.kuprov@soton.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 
 function normalization_2()
 

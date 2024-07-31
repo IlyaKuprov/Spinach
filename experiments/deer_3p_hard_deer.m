@@ -58,7 +58,7 @@
 %       higher spin systems transition selective pulse operators
 %       must be supplied.
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 % nurit.manukovsky@weizmann.ac.il
 % daniella.goldfarb@weizmann.ac.il

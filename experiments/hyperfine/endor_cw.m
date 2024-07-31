@@ -21,7 +21,7 @@
 %   fid   - free induction decay whose Fourier transform 
 %           approximates a CW ENDOR spectrum
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=endor_cw.m>
 

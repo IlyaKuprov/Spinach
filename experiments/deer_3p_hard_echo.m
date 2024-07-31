@@ -38,7 +38,7 @@
 %      echo - the signal detected during the parameters.tc interval
 %             with parameters.nsteps points in it
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 % nurit.manukovsky@weizmann.ac.il
 % daniella.goldfarb@weizmann.ac.il

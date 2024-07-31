@@ -4,7 +4,7 @@
 % Calculation time: seconds
 %
 % i.kuprov@soton.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 
 function mas_powder_csa_floquet()
 

@@ -28,7 +28,7 @@
 %                    ly formed isotopomers.
 %
 % i.kuprov@soton.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % bud.macaulay@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=dilute.m>

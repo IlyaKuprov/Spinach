@@ -24,7 +24,7 @@
 %            used; the two components of the States signal are re-
 %            turned in fid.pos and fid.neg
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=clip_hsqc.m>

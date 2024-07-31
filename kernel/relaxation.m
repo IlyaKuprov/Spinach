@@ -19,7 +19,7 @@
 %       ation theory parameters section of the online manual.
 %
 % i.kuprov@soton.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % alexander.karabanov@nottingham.ac.uk
 % walter.kockenberger@nottingham.ac.uk 
 %

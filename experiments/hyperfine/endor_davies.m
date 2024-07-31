@@ -53,7 +53,7 @@
 %       achieved in the output. The same applies to the size of the 
 %       spherical grid.
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=endor_davies.m>
 

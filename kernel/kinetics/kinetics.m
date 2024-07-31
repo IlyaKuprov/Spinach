@@ -23,7 +23,7 @@
 %       into the total Liovillian automatically.
 %
 % i.kuprov@soton.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % hannah.hogben@chem.ox.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=kinetics.m>

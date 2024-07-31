@@ -13,7 +13,7 @@
 %
 %     str_out - the resulting structure
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=struct/mtimes.m>

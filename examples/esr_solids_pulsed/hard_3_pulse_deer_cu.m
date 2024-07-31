@@ -9,7 +9,7 @@
 %
 % Calculation time: seconds
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 
 function hard_3_pulse_deer_cu()

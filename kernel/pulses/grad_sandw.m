@@ -38,7 +38,7 @@
 % Note: this function is OK for standalone gradient pairs; for more
 %       sophisticated gradient work, use the imaging context.
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=grad_sandw.m>

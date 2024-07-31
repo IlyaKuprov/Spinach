@@ -35,7 +35,7 @@
 % WARNING: spin system ground states are commonly degenerate; absolute
 %          zero temperatures are not supported.
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=equilibrium.m>

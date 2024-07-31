@@ -60,7 +60,7 @@
 %        mutation superoperator of a product. In Liouville space, you cannot
 %        generate single-spin superoperators and multiply them up.
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=operator.m>

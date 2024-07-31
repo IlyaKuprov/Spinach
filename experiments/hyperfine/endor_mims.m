@@ -21,7 +21,7 @@
 %   fid  - free induction decay whose Fourier transform is the 
 %          Mims ENDOR signal
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=endor_mims.m>
 

@@ -7,7 +7,7 @@
 %
 % Calculation time: seconds
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 
 function pulse_acquire_benzoquinone()

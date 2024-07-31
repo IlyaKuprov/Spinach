@@ -4,7 +4,7 @@
 %
 %                   http://dx.doi.org/10.1063/1.3679656
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 
 function parallelization_2()

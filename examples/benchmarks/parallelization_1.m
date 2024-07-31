@@ -6,7 +6,7 @@
 % Spin system of 3-phenylmethylene-1H,3H-naphtho-[1,8-c,d]-pyran-1-one.
 % Source: Penchav, et al., Spec. Acta Part A, 78 (2011) 559-565.
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 
 function parallelization_1()

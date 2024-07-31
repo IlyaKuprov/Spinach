@@ -30,7 +30,7 @@
 %       the sparse matrix addition efficiency problem.
 %
 % i.kuprov@soton.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % hannah.hogben@chem.ox.ac.uk
 % d.savostyanov@soton.ac.uk
 %

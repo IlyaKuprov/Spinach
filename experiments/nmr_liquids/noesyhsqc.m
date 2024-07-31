@@ -43,7 +43,7 @@
 %        thermalised - the relaxation destination is the zero state.
 %
 % i.kuprov@soton.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=noesyhsqc.m>
 

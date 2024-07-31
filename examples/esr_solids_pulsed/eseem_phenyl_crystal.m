@@ -4,7 +4,7 @@
 %
 % Calculation time: minutes
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % i.kuprov@soton.ac.uk
 
 function eseem_phenyl_crystal()

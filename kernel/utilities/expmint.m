@@ -23,7 +23,7 @@
 % Note: this is the most memory-intensive stage in a lot of calcula-
 %       tions; memory recycling is aggressive.
 % 
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % david.goodwin@inano.au.dk
 % i.kuprov@soton.ac.uk
 %

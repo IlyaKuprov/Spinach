@@ -26,7 +26,7 @@
 %       is designed to minimize the memory footprint in large cases.
 %
 % i.kuprov@soton.ac.uk
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 % a.acharya@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=step.m>

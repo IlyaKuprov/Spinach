@@ -3,7 +3,7 @@
 %
 %            http://dx.doi.org/10.1016/j.jmr.2014.01.011
 %
-% luke.edwards@ucl.ac.uk
+% ledwards@cbs.mpg.de
 
 function pfg_test_2()
 

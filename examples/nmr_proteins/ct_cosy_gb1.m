@@ -1,7 +1,7 @@
 % Constant-time COSY experiment simulation for the 
 % GB1 protein.
 %
-% Simulation time: hours.
+% Simulation time: minutes, faster with a Tesla A100 GPU.
 %
 % m.walker@soton.ac.uk
 % i.kuprov@soton.ac.uk
@@ -17,16 +17,18 @@ options.select='backbone';
 % Magnet field
 sys.magnet=14.1;
 
-% Algorithmic options
+% Tolerances
 sys.tols.inter_cutoff=1.0;
 sys.tols.prox_cutoff=3.0;
-sys.enable={'greedy'};
 
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-1';
 bas.connectivity='scalar_couplings';
 bas.level=4; bas.space_level=1;
+
+% Algorithmic options
+sys.enable={'greedy','gpu'};
 
 % Sequence parameters
 parameters.offset=2400;

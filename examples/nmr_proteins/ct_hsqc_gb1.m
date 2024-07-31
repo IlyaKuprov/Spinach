@@ -1,7 +1,7 @@
 % Constant-time HSQC experiment simulation for the 
 % GB1 protein.
 %
-% Simulation time: hours.
+% Simulation time: hours, faster with a Tesla A100 GPU.
 %
 % m.walker@soton.ac.uk
 % i.kuprov@soton.ac.uk
@@ -17,8 +17,7 @@ options.select='backbone';
 % Magnet field
 sys.magnet=14.1;
 
-% Algorithmic options
-sys.enable={'greedy'};
+% Tolerances
 sys.tols.inter_cutoff=2.0;
 sys.tols.prox_cutoff=4.0;
 
@@ -26,8 +25,10 @@ sys.tols.prox_cutoff=4.0;
 bas.formalism='sphten-liouv';
 bas.approximation='IK-1';
 bas.connectivity='scalar_couplings';
-bas.level=3;
-bas.space_level=1;
+bas.level=4; bas.space_level=1;
+
+% Algorithmic options
+sys.enable={'greedy','gpu'};
 
 % Sequence parameters
 parameters.J=90;

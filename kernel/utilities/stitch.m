@@ -76,22 +76,10 @@ if ismember('gpu',spin_system.sys.enable)
     % Inform the user
     report(spin_system,'stitching will be done on GPU.');
     
-elseif (~isworkernode)&&(nnz(P)>1e6)
-    
-    % Distribute the problem
-    P=distrib_dim(P,1); 
-    Pm=distrib_dim(Pm,1); 
-    Pct=distrib_dim(Pct,1);
-    rho_stack=distrib_dim(rho_stack,2);
-    coil_stack=distrib_dim(coil_stack,2);
-     
-    % Inform the user
-    report(spin_system,'distributed stitching on CPU.');
-    
 else
     
     % Inform the user
-    report(spin_system,'stitching on CPU.');
+    report(spin_system,'stitching will be done on CPU.');
     
 end
 

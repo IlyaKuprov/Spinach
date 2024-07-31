@@ -2,7 +2,7 @@
 % 15N decoupling in F2. Nitrogen-proton multiplicity is retained
 % in both dimensions.
 %
-% Calculation time: minutes.
+% Calculation time: hours, faster with a Tesla A100 GPU.
 %
 % Zenawi Welderufael
 % Luke Edwards
@@ -22,13 +22,19 @@ sys.magnet=14.1;
 % Tolerances
 sys.tols.inter_cutoff=5.0;
 sys.tols.prox_cutoff=4.0;
-sys.enable={'greedy'};
 
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-1';
 bas.connectivity='scalar_couplings';
 bas.level=4; bas.space_level=1;
+
+% Algorithmic options
+sys.enable={'greedy','gpu'};
+
+% Spinach housekeeping
+spin_system=create(sys,inter);
+spin_system=basis(spin_system,bas);
 
 % Sequence parameters
 parameters.J=90;
@@ -40,12 +46,6 @@ parameters.spins={'15N','1H'};
 parameters.decouple_f1={'13C'};
 parameters.decouple_f2={'13C'};
 parameters.axis_units='ppm';
-
-% Create the spin system structure
-spin_system=create(sys,inter);
-
-% Build the basis
-spin_system=basis(spin_system,bas);
 
 % Simulation
 fid=liquid(spin_system,@hsqc,parameters,'nmr');

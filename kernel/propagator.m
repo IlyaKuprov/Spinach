@@ -186,7 +186,7 @@ if n_squarings>0
         
     else
         
-        % Run serial CPU squaring
+        % Run CPU squaring
         for n=1:n_squarings
             
             % Inform the user

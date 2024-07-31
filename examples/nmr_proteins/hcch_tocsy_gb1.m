@@ -17,7 +17,6 @@ options.select='all';
 sys.magnet=14.1;
 
 % Algorithmic options
-sys.enable={'greedy','caching'};
 sys.tols.inter_cutoff=20.0;
 sys.tols.prox_cutoff=4.0;
 
@@ -26,6 +25,9 @@ bas.formalism='sphten-liouv';
 bas.approximation='IK-1';
 bas.connectivity='scalar_couplings';
 bas.level=4; bas.space_level=1;
+
+% Algorithmic options
+sys.enable={'greedy','caching'};
 
 % Sequence parameters
 parameters.J_ch=140;

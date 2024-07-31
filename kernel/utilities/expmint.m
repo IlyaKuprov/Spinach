@@ -59,7 +59,7 @@ P=(BE1'*auxmat*BE1)'; Q=(BE1'*auxmat*BE2);
 % Reclaim memory
 clear('auxmat','BE1','BE2');
 
-% Multiply up the blocks and reclaim memory
+% Multiply up the blocks
 R=clean_up(spin_system,P*Q,spin_system.tols.prop_chop);
 
 % Reclaim memory

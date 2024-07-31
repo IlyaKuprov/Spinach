@@ -20,7 +20,6 @@ sys.magnet=21.1356;
 % Tolerances
 sys.tols.inter_cutoff=2.0;
 sys.tols.prox_cutoff=4.0;
-sys.enable={'greedy'};
 
 % Relaxation theory
 inter.relaxation={'redfield'};
@@ -33,6 +32,9 @@ bas.formalism='sphten-liouv';
 bas.approximation='IK-1';
 bas.connectivity='scalar_couplings';
 bas.level=4; bas.space_level=3;
+
+% Algorithmic options
+sys.enable={'greedy'};
 
 % Create the spin system structure
 spin_system=create(sys,inter);

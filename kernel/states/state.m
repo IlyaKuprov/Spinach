@@ -61,7 +61,7 @@
 %               space state vector
 % 
 % d.sayostyanov@soton.ac.uk
-% ledwards@cbs.mpg.de
+% luke.edwards@ucl.ac.uk
 % i.kuprov@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=state.m>
@@ -134,8 +134,9 @@ switch spin_system.bas.formalism
                 end
                 
                 % Assemble the state vector
-                rho=accumarray(indices,coeffs,[size(spin_system.bas.basis,1) 1]);
-                 
+                nrows=size(spin_system.bas.basis,1); ncols=1;
+                rho=sparse(indices,ones(size(indices)),coeffs,nrows,ncols);
+
             % Careful normalisation
             case 'exact'
                 

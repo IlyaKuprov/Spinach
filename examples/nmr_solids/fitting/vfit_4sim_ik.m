@@ -2,7 +2,7 @@
 % respect to the chemical shielding anisotropy and quadrupole
 % coupling tensor parameters.
 %
-% Calculation time: hours
+% Calculation time: hours, much faster with a Tesla A100 GPU.
 %
 % m.carravetta@soton.ac.uk
 % i.kuprov@soton.ac.uk
@@ -37,7 +37,7 @@ S29(1:nrpoints_a,1)=s29(sp_range,2)/max(s29(sp_range,2));
 % Set the initial guess
 guess=[-669.0  564.0  0.255  82.0  180.0  19.0  3.72 0.62];
 
-% Set optimizer options
+% Set optimiser options
 options=optimset('Display','iter','MaxIter',5000,'MaxFunEvals',Inf);
 
 % Get a figure going
@@ -58,6 +58,7 @@ disp(params);
 % Silence Spinach
 sys.output='hush';
 sys.disable={'hygiene'};
+% sys.enable={'gpu'};
 
 % Data dimensions
 sfO1 = 157.7815; nrpointsb = 4096;
@@ -75,7 +76,7 @@ Qcc=params(7)*1.0e6;
 Qeta=params(8);
 lw=13000.0;
 
-%Spin system
+% Spin system
 sys.isotopes={'51V'};
 
 % Magnet field
@@ -109,37 +110,36 @@ parameters.npoints=nrpointsb;
 parameters.zerofill=nrpointsb;
 parameters.offset=0.5*(A31(nrpointsb)+A31(1));
 parameters.spins={'51V'};
-parameters.rframes={{'51V',2}};
 parameters.decouple={};
 parameters.axis_units='ppm';
 parameters.invert_axis=1;
-parameters.rho0=state(spin_system,'L+','51V','cheap');
-parameters.coil=state(spin_system,'L+','51V','cheap');
+parameters.rho0=state(spin_system,'L+','51V');
+parameters.coil=state(spin_system,'L+','51V');
 
 % Simulation A
 parameters.rate=41000;
-fida=singlerot(spin_system,@acquire,parameters,'labframe');
+fida=singlerot(spin_system,@acquire,parameters,'nmr');
 fida=apodization(fida,'gaussian-1d',lw);
 sim_speca=fftshift(fft(fida, parameters.zerofill));
 sim_speca=sim_speca/max(sim_speca);
 
 % Simulation B
 parameters.rate=38500;
-fidb=singlerot(spin_system,@acquire,parameters,'labframe');
+fidb=singlerot(spin_system,@acquire,parameters,'nmr');
 fidb=apodization(fidb,'gaussian-1d',lw);
 sim_specb=fftshift(fft(fidb,parameters.zerofill));
 sim_specb=sim_specb/max(sim_specb);
 
 % Simulation C
 parameters.rate=36000;
-fidc=singlerot(spin_system,@acquire,parameters,'labframe');
+fidc=singlerot(spin_system,@acquire,parameters,'nmr');
 fidc=apodization(fidc,'gaussian-1d',lw);
 sim_specc=fftshift(fft(fidc,parameters.zerofill));
 sim_specc=sim_specc/max(sim_specc);
 
 % Simulation D
 parameters.rate=34000;
-fidd=singlerot(spin_system,@acquire,parameters,'labframe');
+fidd=singlerot(spin_system,@acquire,parameters,'nmr');
 fidd=apodization(fidd,'gaussian-1d',lw);
 sim_specd=fftshift(fft(fidd,parameters.zerofill));
 sim_specd=sim_specd/max(sim_specd);

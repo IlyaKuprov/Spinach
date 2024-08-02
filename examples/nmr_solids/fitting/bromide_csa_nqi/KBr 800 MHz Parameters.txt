@@ -1,0 +1,11 @@
+KBr 800 MHz Parameters, 10 kHz MAS, 800 MHz
+Pulse seq: 79Br one pulse
+NS:8
+Pulse length: 4 us, power:159.96 W
+TD: 4096
+SW: 498.7056 ppm / 100000 Hz
+O1: 60.273 ppm /12085.16 Hz
+DW: 5us
+AQ time: 0.02048 s
+No window function
+first order phase correction:33.13

@@ -1,0 +1,12 @@
+KBr 400 MHz Parameters,for 2,5 and 10 kHz MAS, at 400 MHz
+Pulse seq: 79Br one pulse
+NS:8
+D1: 4 s
+Pluse length: 4.5 us, power: 200 W
+TD: 8192
+SW: 997.462 ppm / 100000 Hz
+O1: 60.2 ppm/6034.96 Hz
+DW: 5us
+AQ time: 0.04096 s
+No window function
+first order phase correction:33.6 (2 kHz), 42.00 (5 kHz), 31.2 (10 kHz)

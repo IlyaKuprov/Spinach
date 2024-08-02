@@ -22,6 +22,14 @@ delete(gcp('nocreate'));
 % Close all handles
 fclose('all');
 
+% Clear variables
+clear('all'); %#ok<CLALL>
+
+% Reset GPUs
+for n=1:gpuDeviceCount
+    gpuDevice(n).reset;
+end
+
 end
 
 % The best alibi is to be the victim.

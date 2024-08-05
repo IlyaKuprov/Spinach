@@ -1,5 +1,7 @@
 % Time-domain Z magnetisation dynamics in the Diels-Alder cycloaddition 
-% of acetylene to butadiene, demonstrating the non-linear kinetics module. 
+% of acetylene to butadiene, demonstrating the non-linear kinetics module.
+%
+% Calculation time: hours, faster on a Tesla A100 GPU.
 %
 % i.kuprov@soton.ac.uk
 % a.acharya@soton.ac.uk
@@ -61,10 +63,10 @@ inter.chem.concs=[1 1 1 1];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.space_level=1;
-bas.level=4;
+bas.approximation='none';
+
+% This needs a GPU
+sys.enable={'gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

@@ -2,10 +2,10 @@
 % with respect to the quadrupole coupling constant.
 %
 % The spectrum cannot be fitted with a single quadrupolar
-% tensor; at least # are necessary, likely due to a dist-
+% tensor; at least 3 are necessary, likely due to a dist-
 % ribution of electrostatic environments in the powder.
 %
-% Calculation time: minutes.
+% Calculation time: hours.
 %
 % sanjay.vinod-kumar@uni-konstanz.de
 % guinevere.mathies@uni-konstanz.de
@@ -47,7 +47,6 @@ fminsearch(@errfun,guess,options);
         % Silence Spinach
         sys.output='hush';
         sys.disable={'hygiene','trajlevel'};
-        sys.enable={'gpu'};
         
         % Spin system
         sys.isotopes={'79Br','79Br','79Br'};

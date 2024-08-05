@@ -1,6 +1,8 @@
 % Pulse-acquire experiment during the Diels-Alder cycloaddition 
 % of acetylene to butadiene, demonstrating the non-linear kine-
-% tics module. 
+% tics module.
+%
+% Calculation time: hours, faster on a Tesla A100 GPU.
 %
 % i.kuprov@soton.ac.uk
 % a.acharya@soton.ac.uk
@@ -8,7 +10,7 @@
 function diels_alder_spec()
 
 % DFT import options
-options.min_j=2.0;         % Minimum significant J-coupling, Hz
+options.min_j=0.5;         % Minimum significant J-coupling, Hz
 
 % Load acetylene      (substance A)
 props_a=gparse('acetylene.out');
@@ -49,10 +51,7 @@ inter.chem.concs=[A0 B0 C0 D0];
 
 % Basis set
 bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.connectivity='scalar_couplings';
-bas.space_level=1;
-bas.level=4;
+bas.approximation='none';
 
 % Relaxation theory parameters
 inter.relaxation={'redfield'};
@@ -190,6 +189,8 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting
 figure(); plot_1d(spin_system,real(spectrum),parameters);
+figure(); plot_1d(spin_system,real(spectrum),parameters); xlim([5.5 6.9]);
+figure(); plot_1d(spin_system,real(spectrum),parameters); xlim([2.9 3.0]);
 
 end
 

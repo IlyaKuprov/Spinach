@@ -224,7 +224,9 @@ end
 
 % Tidy up the picture
 axis square; axis tight; axis equal;
-set(gca,'Projection','perspective');
+set(gca,'Projection','perspective',...
+        'XTickLabel',[],'YTickLabel',[],...
+        'ZTickLabel',[],'TickLength',[0 0]); 
 box on; kgrid;
 
 end

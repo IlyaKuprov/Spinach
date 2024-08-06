@@ -30,9 +30,8 @@ nlines=size(mesh.idx.edges,1); A=zeros(1,3*nlines); B=zeros(1,3*nlines); C=zeros
 for n=1:nlines
     A((3*(n-1)+1):(3*n))=[mesh.x(mesh.idx.edges(n,1)) mesh.x(mesh.idx.edges(n,2)) NaN];
     B((3*(n-1)+1):(3*n))=[mesh.y(mesh.idx.edges(n,1)) mesh.y(mesh.idx.edges(n,2)) NaN];
-    C((3*(n-1)+1):(3*n))=[0 0 NaN];
 end
-mesh.plot.edg_a=A; mesh.plot.edg_b=B; mesh.plot.edg_c=C;
+mesh.plot.edg_a=A; mesh.plot.edg_b=B;
 
 % Prepare triangle array for plotting
 nlines=size(mesh.idx.triangles,1); A=zeros(1,5*nlines); B=zeros(1,5*nlines); C=zeros(1,3*nlines);
@@ -41,9 +40,8 @@ for n=1:nlines
                           mesh.x(mesh.idx.triangles(n,3)) mesh.x(mesh.idx.triangles(n,1)) NaN];
     B((5*(n-1)+1):(5*n))=[mesh.y(mesh.idx.triangles(n,1)) mesh.y(mesh.idx.triangles(n,2)) ...
                           mesh.y(mesh.idx.triangles(n,3)) mesh.y(mesh.idx.triangles(n,1)) NaN];
-    C((5*(n-1)+1):(5*n))=[0 0 0 0 NaN];
 end
-mesh.plot.tri_a=A; mesh.plot.tri_b=B; mesh.plot.tri_c=C;
+mesh.plot.tri_a=A; mesh.plot.tri_b=B;
 
 % Prepare rectangle array for plotting
 nlines=size(mesh.idx.rectangles,1); A=zeros(1,6*nlines); B=zeros(1,6*nlines);

@@ -35,7 +35,7 @@ spin_system=mesh_vorn(spin_system);                              % Run Voronoi t
 spin_system=mesh_preplot(spin_system);                           % Run output preprocessing
 
 % Draw the mesh
-mesh_plot(spin_system,2,0); 
+figure(); mesh_plot(spin_system,2,0); 
 xlim([286.88  287.42]); ylim([578.07  578.50]);
 klegend({'triangles','rectangles',...
          'tessellation','velocities'},'Location','NorthEast');

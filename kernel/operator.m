@@ -73,8 +73,24 @@ if ~exist('operator_type','var'), operator_type='comm'; end
 % The default sparse matrix format is CSC
 if ~exist('format','var'), format='csc'; end
 
-% Validate the input
-grumble(spin_system,operators,spins,operator_type,format);
+% Check consistency
+grumble(spin_system,operators,spins,operator_type,format); tic;
+
+% Check disk cache
+if ismember('op_cache',spin_system.sys.enable)
+
+    % Combine specification, isotopes, and basis hash
+    op_hash=md5_hash({operators,spins,operator_type,...
+                      format,spin_system.comp.iso_hash,...
+                      spin_system.bas.basis_hash});
+
+    % Generate the cache record name in the global scratch (for later reuse)
+    filename=[spin_system.sys.scratch filesep 'spinach_op_' op_hash '.mat'];
+
+    % Load the operator from the cache record
+    if exist(filename,'file'), load(filename,'A'); return; end
+    
+end
 
 % Parse the human specification into Spinach notation
 [opspecs,coeffs]=human2opspec(spin_system,operators,spins);
@@ -200,6 +216,11 @@ if strcmp(format,'csc')
     % Make a sparse matrix, making sure it's complex for later
     A=sparse(A(:,1),A(:,2),complex(A(:,3)),matrix_dim,matrix_dim);
 
+end
+
+% Write the cache record if caching is beneficial
+if ismember('op_cache',spin_system.sys.enable)&&(toc>0.1)
+    save(filename,'A','-v7.3','-nocompression'); 
 end
 
 end

@@ -1,9 +1,10 @@
-% A parser for Gaussian03 and Gaussian09 calculation logs.
-% Extracts all potentially useful information. The follo-
-% wing sections must be added to the route section of the
-% Gaussian03/9 input file to produce a useful log:
+% A parser for Gaussian (03, 09, 16) calculation logs. Ex-
+% tracts all potentially useful information. The following
+% options must be added to the route section of the input
+% file to produce a useful log:
 %
-%  #p nmr=(giao,spinspin,susceptibility) output=pickett
+%       #p nmr=(giao,spinspin,susceptibility) 
+%          output=pickett pop=minimal IOp(6/82=1)
 %
 % The options parameter controls the symmetrization of the
 % interaction tensors after they have been read in. By de-

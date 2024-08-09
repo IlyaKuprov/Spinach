@@ -22,7 +22,7 @@ bas.space_level=1;
 bas.connectivity='scalar_couplings';
 
 % Algorithmic options
-sys.enable={'greedy','caching'};
+sys.enable={'greedy','prop_cache'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -30,8 +30,7 @@ spin_system=basis(spin_system,bas);
 
 % Sequence parameters
 parameters.spins={'1H'};
-parameters.rho0=(state(spin_system,'L+','1H')+...
-                 state(spin_system,'L-','1H'));
+parameters.rho0=state(spin_system,'Lx','1H');
 parameters.coil=state(spin_system,'L+','1H');
 
 % Assumptions
@@ -39,8 +38,7 @@ spin_system=assume(spin_system,'nmr');
 
 % Operators
 H=hamiltonian(spin_system);
-Lp=operator(spin_system,'L+','1H');
-Lx=(Lp+Lp')/2;
+Lx=operator(spin_system,'Lx','1H');
 
 % Trajectory generation
 traj=evolution(spin_system,H,[],parameters.rho0,4e-5,50,'trajectory');

@@ -17,8 +17,7 @@
 %       calculation setup.
 %
 % Note: propagator caching (https://doi.org/10.1063/1.4928978) is
-%       supported, add 'caching' to sys.enable array during calcu-
-%       lation setup.
+%       supported, add 'prop_cache' to sys.enable array to enable.
 %
 % Note: we did have Chebyshev and Newton series here at one point,
 %       as well as the Pade method. None of them lived up to their
@@ -47,7 +46,7 @@ report(spin_system,['generator dimension ' num2str(size(A,1)) ...
                     '%, sparsity ' num2str(issparse(A))]);
 
 % Check the cache
-if ismember('caching',spin_system.sys.enable)
+if ismember('prop_cache',spin_system.sys.enable)
     
     % Generate the cache record name in the global scratch (for later reuse)
     filename=[spin_system.sys.scratch filesep 'spinach_prop_' md5_hash(A) '.mat'];
@@ -208,7 +207,7 @@ if n_squarings>0
 end
     
 % Write the cache record if caching is beneficial
-if ismember('caching',spin_system.sys.enable)&&(toc>0.1)
+if ismember('prop_cache',spin_system.sys.enable)&&(toc>0.1)
     
     % Save the propagator
     save(filename,'P','-v7.3','-nocompression'); 

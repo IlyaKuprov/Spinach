@@ -24,7 +24,7 @@ sys.magnet=17.62;
 sys.tols.inter_cutoff=1.0;
 sys.tols.prox_cutoff=5.0;
 sys.disable={'krylov','colorbar'};
-sys.enable={'caching','greedy'};
+sys.enable={'prop_cache','greedy'};
 
 % Relaxation theory
 inter.relaxation={'redfield'};

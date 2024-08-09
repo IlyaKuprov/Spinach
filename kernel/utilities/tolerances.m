@@ -339,8 +339,13 @@ report(spin_system,[pad('Bohr magneton',65) pad(num2str(spin_system.tols.muB,'%0
 
 % Paranoia switches
 if ismember('paranoia',spin_system.sys.enable)
+
+    % Make sure zero track elimination is disabled
     spin_system.sys.disable=unique([spin_system.sys.disable {'zte'}]);
-    spin_system.sys.enable=setdiff(spin_system.sys.enable,{'caching'});
+
+    % Make sure operator and propagator caching is not enabled
+    spin_system.sys.enable=setdiff(spin_system.sys.enable,{'op_cache','prop_cache'});
+    
 end
 
 % Catch unparsed options

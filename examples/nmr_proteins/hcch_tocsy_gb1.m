@@ -27,7 +27,7 @@ bas.connectivity='scalar_couplings';
 bas.level=4; bas.space_level=1;
 
 % Algorithmic options
-sys.enable={'greedy','caching'};
+sys.enable={'greedy','prop_cache'};
 
 % Sequence parameters
 parameters.J_ch=140;

@@ -29,7 +29,7 @@ formalisms={'zeeman-hilb','zeeman-liouv','sphten-liouv'};
 % Loop over formalisms
 for n=1:numel(formalisms)
 
-    % Basis set
+    % Formalism and basis set
     bas.formalism=formalisms{n};
     bas.approximation='none';
 
@@ -37,9 +37,8 @@ for n=1:numel(formalisms)
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);
 
-    % Thermal equilibrium state
-    H=hamiltonian(assume(spin_system,'labframe'),'left');
-    rho_eq=equilibrium(spin_system,H);
+    % Isotropic thermal equilibrium
+    rho_eq=equilibrium(spin_system);
 
     % Detection states
     coil_a=state(spin_system,{'Lz'},{1});

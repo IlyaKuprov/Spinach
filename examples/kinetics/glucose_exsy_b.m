@@ -32,6 +32,7 @@ inter.coupling.scalar{3,4}=238.0633;            % Alpha, outside
 inter.coupling.scalar{5,6}=239.2315;            % Beta,  inside
 inter.coupling.scalar{7,8}=239.2315;            % Beta,  outside
 
+% Cartesian coordinates
 inter.coordinates={[-0.0551   -1.2087   -1.6523];      % Alpha, inside
                    [-0.8604   -2.3200   -0.0624];
                                       
@@ -65,8 +66,7 @@ bas.approximation='none';
 
 % Relaxation theory parameters
 inter.relaxation={'redfield','t1_t2'};
-inter.equilibrium='dibari';
-inter.temperature=310;
+inter.equilibrium='zero';
 inter.rlx_keep='secular';
 inter.tau_c={0.9601e-9 ... % Alpha, inside
              0.5255e-9 ... % Alpha, outside

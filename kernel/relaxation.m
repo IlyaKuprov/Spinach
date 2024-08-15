@@ -494,6 +494,9 @@ switch spin_system.rlx.keep
         
         % Pull out the diagonal
         R=diag(diag(R));
+
+        % Still make sure the unit state is not damped
+        U=unit_state(spin_system); R=R-(U'*R*U)*(U*U');
         
         % Inform the user
         report(spin_system,'all cross-relaxation terms have been ignored.');

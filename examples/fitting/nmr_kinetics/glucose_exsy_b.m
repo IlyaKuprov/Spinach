@@ -101,8 +101,7 @@ bas.approximation='none';
 
 % Relaxation theory parameters
 inter.relaxation={'redfield','t1_t2'};
-inter.equilibrium='dibari';
-inter.temperature=310;
+inter.equilibrium='zero';
 inter.rlx_keep='secular';
 inter.tau_c={10^params(17) 10^params(18) ...
              10^params(17) 10^params(18)};

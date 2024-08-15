@@ -23,12 +23,6 @@ inter.coupling.scalar{1,4}=  -25.9884;
 inter.coupling.scalar{2,3}=    9.9625;
 inter.coupling.scalar{2,4}=  -40.7675;       
 
-% Coordinates
-inter.coordinates={[-0.0551   -1.2087   -1.6523];
-                   [-0.8604   -2.3200   -0.0624];
-                   [-2.4464   -0.1125   -0.9776];
-                   [-1.9914   -0.0836    1.0743]};
-
 % Relaxation theory parameters
 inter.relaxation={'damp'};
 inter.equilibrium='zero';        % Thermalised later

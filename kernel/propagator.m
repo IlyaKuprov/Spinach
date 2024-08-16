@@ -210,7 +210,7 @@ end
 if ismember('prop_cache',spin_system.sys.enable)&&(toc>0.1)
     
     % Save the propagator
-    save(filename,'P','-v7.3','-nocompression'); 
+    save(filename,'P','-v7.3'); 
     report(spin_system,'cache record saved.');
     
 elseif ismember('caching',spin_system.sys.enable)

@@ -134,8 +134,7 @@ bas.approximation='none';
 
 % Relaxation theory parameters
 inter.relaxation={'redfield','t1_t2'};
-inter.equilibrium='dibari';
-inter.temperature=310;
+inter.equilibrium='zero';
 inter.rlx_keep='secular';
 inter.tau_c={10^params(3) 10^params(4) 10^params(3) 10^params(4)};
 inter.r1_rates=params(35)*num2cell(ones(1,16));  % Other mechanisms

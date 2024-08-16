@@ -47,61 +47,6 @@ if isempty(spin_system.rlx.theories)
     
 end
 
-% Add non-selective damping terms
-if ismember('damp',spin_system.rlx.theories)
-
-    % Anisotropic damping option
-    if exist('euler_angles','var')
-
-        % Update the user
-        report(spin_system,'adding anisotropic non-selective damping terms:');
-
-        % Compute orientation ort (this matches alphas=0 of two-angle grids)
-        ort=[0 0 1]*euler2dcm(euler_angles(1),euler_angles(2),euler_angles(3));
-
-        % Get the rate at the current orientation
-        rate=ort*spin_system.rlx.damp_rate*ort';
-
-    else
-
-        % Update the user
-        report(spin_system,'adding isotropic non-selective damping terms:');
-        if ~isscalar(spin_system.rlx.damp_rate)
-            report(spin_system,'   WARNING - damping rate anisotropy ignored');
-        end
-        
-        % Get the isotropic part of the rate
-        rate=mean(diag(spin_system.rlx.damp_rate));
-
-    end
-        
-    % Build the relaxation matrix
-    switch spin_system.bas.formalism
-        
-        case {'zeeman-hilb'}
-            
-            % Update the user
-            report(spin_system,'   Hilbert space - unit state will be damped');
-    
-            % Damp everything
-            R=R-(rate/2)*unit_oper(spin_system);
-            
-        case {'zeeman-liouv','sphten-liouv'}
-            
-            % Update the user
-            report(spin_system,'   Liouville space - unit state will not be damped');
-            
-            % Damp everything at the rate specified
-            R=R-rate*unit_oper(spin_system);
-            
-            % Make sure the unit state is not damped
-            U=unit_state(spin_system);
-            R=R-(U'*R*U)*(U*U');
-            
-    end
-    
-end
-
 % Add extended T1/T2 model terms
 if ismember('t1_t2',spin_system.rlx.theories)
     
@@ -494,6 +439,9 @@ switch spin_system.rlx.keep
         
         % Pull out the diagonal
         R=diag(diag(R));
+
+        % Still make sure the unit state is not damped
+        U=unit_state(spin_system); R=R-(U'*R*U)*(U*U');
         
         % Inform the user
         report(spin_system,'all cross-relaxation terms have been ignored.');
@@ -565,6 +513,59 @@ switch spin_system.rlx.keep
         % Inform the user
         report(spin_system,'returning complete relaxation superoperator (lab frame simulations only).');
         
+end
+
+% Add non-selective damping terms
+if ismember('damp',spin_system.rlx.theories)
+
+    % Anisotropic damping option
+    if exist('euler_angles','var')
+
+        % Update the user
+        report(spin_system,'adding anisotropic non-selective damping terms:');
+
+        % Compute orientation ort (this matches alphas=0 of two-angle grids)
+        ort=[0 0 1]*euler2dcm(euler_angles(1),euler_angles(2),euler_angles(3));
+
+        % Get the rate at the current orientation
+        rate=ort*spin_system.rlx.damp_rate*ort';
+
+    else
+
+        % Update the user
+        report(spin_system,'adding isotropic non-selective damping terms:');
+        if ~isscalar(spin_system.rlx.damp_rate)
+            report(spin_system,'   WARNING - damping rate anisotropy ignored');
+        end
+        
+        % Get the isotropic part of the rate
+        rate=mean(diag(spin_system.rlx.damp_rate));
+
+    end
+        
+    % Build the relaxation matrix
+    switch spin_system.bas.formalism
+        
+        case {'zeeman-hilb'}
+            
+            % Update the user
+            report(spin_system,'   Hilbert space - unit state will be damped');
+    
+            % Damp everything 
+            R=R-(rate/2)*unit_oper(spin_system);
+            
+        case {'zeeman-liouv','sphten-liouv'}
+            
+            % Update the user
+            report(spin_system,'   Liouville space - unit state will not be damped');
+
+            % Damp everything except unit state
+            RD=-rate*unit_oper(spin_system);
+            U=unit_state(spin_system);
+            R=R+RD-(U'*RD*U)*(U*U');
+
+    end
+    
 end
     
 % Choose the thermalisation model

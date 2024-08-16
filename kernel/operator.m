@@ -220,7 +220,7 @@ end
 
 % Write the cache record if caching is beneficial
 if ismember('op_cache',spin_system.sys.enable)&&(toc>0.1)
-    save(filename,'A','-v7.3','-nocompression'); 
+    save(filename,'A','-v7.3'); 
 end
 
 end

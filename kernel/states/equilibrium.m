@@ -55,6 +55,14 @@ elseif nargin==2
     
     % Check consistency
     grumble(spin_system,H);
+
+elseif nargin==1
+
+    % Build the isotropic Hamiltonian
+    H=hamiltonian(assume(spin_system,'labframe'),'left');
+
+    % Check consistency
+    grumble(spin_system,H);
     
 else
     

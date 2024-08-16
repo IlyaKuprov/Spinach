@@ -38,6 +38,7 @@
 %       work better than IME, particularly in exotic regimes.
 %
 % i.kuprov@soton.ac.uk
+% fije@inano.au.dk
 %
 % <https://spindynamics.org/wiki/index.php?title=thermalize.m>
 
@@ -46,16 +47,33 @@ function R=thermalize(spin_system,R,HLSPS,T,rho_eq,method)
 % Check consistency
 grumble(spin_system,R,HLSPS,T,rho_eq,method);
 
-% Get the unit state
-unit=unit_state(spin_system);
-
 % Choose the method
 switch method
     
     case 'IME'
+
+        % This is formalism-dependent
+        switch spin_system.bas.formalism
+
+            case 'sphten-liouv'
+
+                % Unit state has unit population of T(0,0) state
+                U=sparse(1,1,1,size(spin_system.bas.basis,1),1);
+
+            case 'zeeman-liouv'
+
+                % Unit state is a stretched unit matrix
+                U=speye(prod(spin_system.comp.mults)); U=U(:);
+
+            otherwise
+
+                % Complain and bomb out
+                error('this function is only available in Liouville space.');
+
+        end
         
         % Apply IME correction
-        R=R-kron(unit',R*rho_eq);
+        R=R-kron(U',R*rho_eq);
         
     case 'dibari'
         

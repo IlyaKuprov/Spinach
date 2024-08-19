@@ -39,9 +39,10 @@ spin_system=assume(spin_system,'nmr');
 % Hamiltonian superoperator
 H=hamiltonian(spin_system);
 
-% Control operators
-Lx=(operator(spin_system,'L+','1H')+operator(spin_system,'L-','1H'))/2;
-Ly=(operator(spin_system,'L+','1H')-operator(spin_system,'L-','1H'))/2i;
+% Control and offset operators
+Lx=operator(spin_system,'Lx','1H');
+Ly=operator(spin_system,'Ly','1H');
+Lz=operator(spin_system,'Lz','1H');
 
 % Initial state
 rho=state(spin_system,'Lz','1H');
@@ -59,8 +60,9 @@ amplitudes=calibration_factor*amplitudes;
 % Pulse transformation from (A,phi) to (X,Y)
 [Cx,Cy]=polar2cartesian(amplitudes,phases);
 
-% Pulse execution
-rho=shaped_pulse_xy(spin_system,H,{Lx,Ly},{Cx,Cy},time_grid,rho,'expv-pwc');
+% Pulse execution with a 480 Hz frequency offset
+rho=shaped_pulse_xy(spin_system,H+2*pi*480*Lz,...
+                    {Lx,Ly},{Cx,Cy},time_grid,rho,'expv-pwc');
 
 % Set up acquisition
 parameters.spins={'1H'};

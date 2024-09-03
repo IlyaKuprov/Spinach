@@ -67,8 +67,12 @@ mesh=spin_system.mesh; ncells=mesh.vor.ncells;
 A_forw=spdiags(mesh.vor.weights,0,ncells,ncells);
 A_back=spdiags(1./mesh.vor.weights,0,ncells,ncells);
 
-% Pull diff coeff
-D=parameters.diff;
+% Pull diffusion coefficient
+if isfield(parameters,'diff')
+    D=parameters.diff;
+else
+    D=sparse(0);
+end
 
 % Build flow index
 F=cell(ncells,1);

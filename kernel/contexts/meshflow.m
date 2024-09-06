@@ -103,8 +103,8 @@ parfor k=1:ncells %#ok<*PFBNS>
         % See if they share a boundary
         shared_pts=intersect(mesh.vor.cells{k},...
                              mesh.vor.cells{m});
-        if (k~=m)&&(numel(shared_pts)==2)
-            
+        if numel(shared_pts)==2
+
             % Determine boundary length
             b_km=norm(mesh.vor.vertices(shared_pts(1),:)-...       % #NORMOK
                       mesh.vor.vertices(shared_pts(2),:),2);       % m
@@ -113,28 +113,27 @@ parfor k=1:ncells %#ok<*PFBNS>
             r_km=[mesh.x(mesh.idx.active(m)); mesh.y(mesh.idx.active(m))]-...
                  [mesh.x(mesh.idx.active(k)); mesh.y(mesh.idx.active(k))]; 
 
-            % Average velocity between Voronoi cells
-            v_km=[mesh.u(mesh.idx.active(k))+mesh.u(mesh.idx.active(m)); ...
-                  mesh.v(mesh.idx.active(k))+mesh.v(mesh.idx.active(m))]/2;
+            % Velocity in the current and the adjacent cell
+            v_m=[mesh.u(mesh.idx.active(m)); mesh.v(mesh.idx.active(m))];
+            v_k=[mesh.u(mesh.idx.active(k)); mesh.v(mesh.idx.active(k))];
 
-            % Flow part of the equation from our paper  
-            F_km=-(1/A_k)*(b_km/norm(r_km,2))*dot(v_km,r_km)/2;
-            
-            % Add to the generator, avoiding double count
-            if F_km>0, F_local=[F_local; k m F_km]; end
+            % Contribution to the off-diag part
+            F_km=+(1/A_k)*(b_km/norm(r_km,2))*D ...
+                 -(1/A_k)*(b_km/norm(r_km,2))*dot((v_m+v_k)/2,r_km)/2;
 
-            % Diffusion part from our paper
-            F_km=(1/A_k)*(b_km/norm(r_km,2))*D;
-             
-            % Add to the generator
-            F_local=[F_local; k m F_km];
-            
+            % Add the terms to the generator
+            if F_km>0
+                F_local=[F_local; k m  F_km];
+            else
+                F_local=[F_local; m k -F_km];
+            end
+
         end
-        
-        % Add to global
-        F{k}=F_local;
 
     end
+
+    % Add to global
+    F{k}=F_local;
 
 end
 

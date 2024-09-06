@@ -43,7 +43,7 @@ spin_system=mesh_preplot(spin_system);                           % Run output pr
 
 % Initial condition: Lz in a few cells
 parameters.rho0_ph{1}=zeros(spin_system.mesh.vor.ncells,1);
-parameters.rho0_ph{1}(140:160)=1;
+parameters.rho0_ph{1}(140:160)=2;
 parameters.rho0_st{1}=state(spin_system,'Lz','1H');
 
 % Detection state: Lz in all cells
@@ -54,7 +54,7 @@ parameters.coil_st{1}=state(spin_system,'Lz','1H');
 parameters.spins={'1H'};
 parameters.offset=0;
 parameters.dt=160; 
-parameters.npoints=500;
+parameters.npoints=50;
 
 % Set assumptions
 spin_system=assume(spin_system,'nmr');

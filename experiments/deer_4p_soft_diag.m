@@ -103,10 +103,10 @@ fid_d=apodization(fids(:,4),'crisp-1d'); spectrum_d=fftshift(fft(fid_d,parameter
 
 % Plotting
 figure();
-subplot(2,2,1); plot_1d(spin_system,real(spectrum_a),parameters,'r-'); title('first pulse');
-subplot(2,2,2); plot_1d(spin_system,real(spectrum_b),parameters,'r-'); title('second pulse');
-subplot(2,2,3); plot_1d(spin_system,real(spectrum_c),parameters,'r-'); title('third pulse');
-subplot(2,2,4); plot_1d(spin_system,real(spectrum_d),parameters,'r-'); title('fourth pulse');
+subplot(2,2,1); plot_1d(spin_system,real(spectrum_a),parameters,'r-'); ktitle('first pulse');
+subplot(2,2,2); plot_1d(spin_system,real(spectrum_b),parameters,'r-'); ktitle('second pulse');
+subplot(2,2,3); plot_1d(spin_system,real(spectrum_c),parameters,'r-'); ktitle('third pulse');
+subplot(2,2,4); plot_1d(spin_system,real(spectrum_d),parameters,'r-'); ktitle('fourth pulse');
 drawnow();
 
 % DEER simulation

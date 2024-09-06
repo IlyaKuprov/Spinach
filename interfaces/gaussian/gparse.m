@@ -337,7 +337,8 @@ for n=1:length(g03_output)
    end
    
    % Check for error flags
-   if (numel(g03_output{n})>17)&&strcmp(g03_output{n}(1:17),'Error termination')
+   if ((numel(g03_output{n})>17)&&strcmp(g03_output{n}(1:17),'Error termination'))||...
+      ((numel(g03_output{n})>16)&&strcmp(g03_output{n}(1:16),'Erroneous write.'))
        props.error=1; warning('Gaussian import: error message detected.');
    end
    

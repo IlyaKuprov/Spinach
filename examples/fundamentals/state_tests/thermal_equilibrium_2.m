@@ -30,7 +30,7 @@ end
 rho{2}=reshape(rho{2},[24 24]);
 
 % Sphten-liouv to zeeman-hilb
-mult_factor=sqrt(prod(spin_system.comp.mults));
+mult_factor=prod(spin_system.comp.mults);
 rho{3}=sphten2zeeman(spin_system)*rho{3};
 rho{3}=reshape(rho{3},[24 24])/mult_factor;
 

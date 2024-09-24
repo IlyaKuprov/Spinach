@@ -14,6 +14,7 @@
 % Note: the matrix need not be square and may be huge.
 %
 % i.kuprov@soton.ac.uk
+% enu.jamila@proton.me
 %
 % <https://spindynamics.org/wiki/index.php?title=sphten2zeeman.m>
 
@@ -23,16 +24,20 @@ function P=sphten2zeeman(spin_system)
 grumble(spin_system);
 
 % Preallocate the answer
-P=spalloc(prod(spin_system.comp.mults.^2),size(spin_system.bas.basis,1),0);
+P=spalloc(prod(spin_system.comp.mults.^2),...
+          size(spin_system.bas.basis,1),0);
+
+% Destination basis is not normalised
+destin_norm=sqrt(prod(spin_system.comp.mults));
 
 % Loop over the basis set
-for n=1:size(spin_system.bas.basis,1)
+parfor n=1:size(spin_system.bas.basis,1) %#ok<*PFBNS>
 
     % Get the state going
     rho=sparse(1);
     
     % Loop over the elements
-    for k=1:size(spin_system.bas.basis,2)
+    for k=1:size(spin_system.bas.basis,2) 
         
         % Get the spherical tensors for the current spin
         ists=irr_sph_ten(spin_system.comp.mults(k));
@@ -42,8 +47,11 @@ for n=1:size(spin_system.bas.basis,1)
         
     end
     
-    % Stretch and write down
-    P(:,n)=rho(:)/norm(rho(:),2); %#ok<SPRIX>
+    % Source basis is not normalised
+    source_norm=norm(rho(:),2);
+
+    % Write a column into the projector
+    P(:,n)=destin_norm*rho(:)/source_norm; %#ok<SPRIX>
     
 end
 

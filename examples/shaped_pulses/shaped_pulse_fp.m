@@ -66,8 +66,8 @@ fid=liquid(spin_system,@acquire,parameters,'nmr');
 % Phasing
 fid=fid*exp(-1i*0.67);
 
-% Apodization
-fid=apodization(fid,'exp-1d',6);
+% Apodisation
+fid=apodisation(spin_system,fid,{{'exp',6}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

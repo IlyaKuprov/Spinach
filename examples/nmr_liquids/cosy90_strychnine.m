@@ -40,8 +40,8 @@ parameters.axis_units='ppm';
 % Simulation
 fid=liquid(spin_system,@cosy,parameters,'nmr');
 
-% Apodization
-fid=apodization(fid,'cosbell-2d');
+% Apodisation
+fid=apodisation(spin_system,fid,{{'cos'},{'cos'}});
 
 % Fourier transform
 spectrum=fftshift(fft2(fid,parameters.zerofill(2),...

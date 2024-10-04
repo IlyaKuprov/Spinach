@@ -100,7 +100,7 @@ ktitle('active volume'); drawnow();
 fid=imaging(spin_system,@press_2d,parameters);
 
 % Apodisation
-fid=apodization(fid,'sqcosbell-1d');
+fid=apodisation(spin_system,fid,{{'sqcos'}});
 
 % Magnitude Fourier transform
 spec=abs(fftshift(fft(ifftshift(fid))));

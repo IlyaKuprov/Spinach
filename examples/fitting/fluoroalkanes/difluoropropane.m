@@ -137,9 +137,9 @@ fid_ha=liquid(spin_system,@acquire,parameters_ha,'nmr');
 fid_hb=liquid(spin_system,@acquire,parameters_hb,'nmr');
 
 % Apodisation and scaling
-fid_f= params(1)*apodization(fid_f, 'exp-1d',8.0)/3e2;
-fid_ha=params(2)*apodization(fid_ha,'exp-1d',9.0)/3e2;
-fid_hb=params(3)*apodization(fid_hb,'exp-1d',6.0)/3e2;
+fid_f= params(1)*apodisation(spin_system,fid_f, {{'exp',8.0}})/3e2;
+fid_ha=params(2)*apodisation(spin_system,fid_ha,{{'exp',9.0}})/3e2;
+fid_hb=params(3)*apodisation(spin_system,fid_hb,{{'exp',6}})/3e2;
 
 % Fourier transform
 spec_theo_f= 0.05*real(fftshift(fft(fid_f, parameters_f.zerofill)));  spec_theo_f= spec_theo_f(end:-1:1);

@@ -46,8 +46,8 @@ spin_system=basis(spin_system,bas);
 % Simulation
 fid=liquid(spin_system,@zerofield,parameters,'labframe');
 
-% Apodization
-fid=apodization(fid-mean(fid),'exp-1d',6);
+% Apodisation
+fid=apodisation(spin_system,fid-mean(fid),{{'exp',6}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

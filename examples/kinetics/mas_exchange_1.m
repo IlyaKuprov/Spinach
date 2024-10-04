@@ -56,8 +56,8 @@ parameters.max_rank=12;
 % Acquisition
 fid=singlerot(spin_system,@acquire,parameters,'nmr');
 
-% Apodization
-fid=apodization(fid,'exp-1d',6);
+% Apodisation
+fid=apodisation(spin_system,fid,{{'exp',6}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

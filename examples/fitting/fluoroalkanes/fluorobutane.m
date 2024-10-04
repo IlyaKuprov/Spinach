@@ -128,7 +128,7 @@ parameters.invert_axis=1;
 fid=liquid(spin_system,@acquire,parameters,'nmr');
 
 % Apodisation and scaling
-fid=apodization(fid,'gaussian-1d',6.0)/2e3;
+fid=apodisation(spin_system,fid,{{'gauss',6.0}})/2e3;
 
 % Fourier transform
 sim_h=A*fftshift(fft(fid,parameters.zerofill));
@@ -168,7 +168,7 @@ parameters.invert_axis=1;
 fid=liquid(spin_system,@acquire,parameters,'nmr');
 
 % Apodisation and scaling
-fid=apodization(fid,'gaussian-1d',6.0)/1e3;
+fid=apodisation(spin_system,fid,{{'gauss',6.0}})/1e3;
 
 % Fourier transform
 sim_f=B*fftshift(fft(fid,parameters.zerofill));

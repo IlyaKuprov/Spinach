@@ -181,8 +181,8 @@ parfor n=1:parameters.npoints
 
 end
 
-% Apodization
-fid=apodization(fid,'gaussian-1d',10);
+% Apodisation
+fid=apodisation(spin_system,fid,{{'gauss',10}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

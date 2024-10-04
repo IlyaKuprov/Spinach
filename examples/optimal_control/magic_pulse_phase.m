@@ -105,8 +105,8 @@ parameters.invert_axis=1;
 % Simulate the free induction decay
 fid=liquid(spin_system,@acquire,parameters,'nmr');
 
-% Apodization
-fid=apodization(fid,'gaussian-1d',10);
+% Apodisation
+fid=apodisation(spin_system,fid,{{'gauss',10}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));
@@ -125,7 +125,7 @@ parameters.pulse_dur=4.2e-6;
 parameters.pulse_rnk=3;
 parameters.method='expv';
 fid=liquid(spin_system,@sp_acquire,parameters,'nmr');
-fid=apodization(fid,'gaussian-1d',10);
+fid=apodisation(spin_system,fid,{{'gauss',10}});
 spectrum=fftshift(fft(fid,parameters.zerofill));
 subplot(2,1,1); plot_1d(spin_system,real(spectrum),parameters);
 kylabel('intensity, a.u.');

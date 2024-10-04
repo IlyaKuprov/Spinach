@@ -53,8 +53,8 @@ parfor n=1:numel(subsystems)
     fid=liquid(subsystem,@inadequate_2d,parameters,'nmr');
     
     % Apodisation
-    fid.cos=apodization(fid.cos,'cosbell-2d');
-    fid.sin=apodization(fid.sin,'cosbell-2d');
+    fid.cos=apodisation(spin_system,fid.cos,{{'cos'},{'cos'}});
+    fid.sin=apodisation(spin_system,fid.sin,{{'cos'},{'cos'}});
 
     % F2 Fourier transform
     spec_cos=fftshift(fft(fid.cos,parameters.zerofill(2),1),1);

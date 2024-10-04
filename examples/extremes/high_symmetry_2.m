@@ -1,6 +1,6 @@
 % 31P NMR spectrum of a large and highly symmetric spin system
 % with two tert-butyl groups supplied by Eberhard Matern. Done
-% by brute force in Hilbert space.
+% by brute force time propagation in Hilbert space.
 %
 % WARNING: needs 32 CPU cores, 128 GB of RAM and
 %          a Titan V or later.
@@ -79,8 +79,8 @@ parameters.invert_axis=1;
 % Simulation
 fid=liquid(spin_system,@acquire,parameters,'nmr');
 
-% Apodization
-fid=apodization(fid,'exp-1d',5);
+% Apodisation
+fid=apodisation(spin_system,fid,{{'exp',5}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

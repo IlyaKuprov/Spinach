@@ -39,7 +39,7 @@ parameters.axis_units='ppm';
 fid=liquid(spin_system,@inadequate,parameters,'nmr');
 
 % Processing
-fid=apodization(fid,'exp-1d',5);
+fid=apodisation(spin_system,fid,{{'exp',5}});
 spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting

@@ -60,8 +60,8 @@ parameters.method='expm';
 % Simulation
 fid=powder(spin_system,@sp_acquire,parameters,'esr');
 
-% Apodization
-fid=apodization(fid,'crisp-1d');
+% Apodisation
+fid=apodisation(spin_system,fid,{{'crisp'}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

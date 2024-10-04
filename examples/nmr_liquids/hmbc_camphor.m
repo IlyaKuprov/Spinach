@@ -56,8 +56,8 @@ parfor n=1:numel(subsystems)
     % Simulation
     fid=liquid(subsystem,@hmbc,parameters,'nmr');
     
-    % Apodization
-    fid=apodization(fid,'cosbell-2d');
+    % Apodisation
+    fid=apodisation(spin_system,fid,{{'cos'},{'cos'}});
     
     % Fourier transform
     spectrum=spectrum+fftshift(fft2(fid,parameters.zerofill(2),...

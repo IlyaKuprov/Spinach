@@ -57,10 +57,10 @@ for n=1:numel(subsys)
            % Simulation
            fid=liquid(subsystem,@pansy_triple,parameters,'nmr');
 
-           % Apodization
-           fid.aa=apodization(fid.aa,'sqcosbell-2d');
-           fid.ab=apodization(fid.ab,'sqcosbell-2d');
-           fid.ac=apodization(fid.ac,'sqcosbell-2d');
+           % Apodisation
+           fid.aa=apodisation(spin_system,fid.aa,{{'sqcos'},{'sqcos'}});
+           fid.ab=apodisation(spin_system,fid.ab,{{'sqcos'},{'sqcos'}});
+           fid.ac=apodisation(spin_system,fid.ac,{{'sqcos'},{'sqcos'}});
 
            % Fourier transforms
            spec_a=spec_a+fftshift(fft2(fid.aa,parameters.zerofill(1),...

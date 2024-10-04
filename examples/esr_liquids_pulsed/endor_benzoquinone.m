@@ -45,7 +45,7 @@ spin_system=basis(spin_system,bas);
 fid=liquid(spin_system,@endor_cw,parameters,'esr');
 
 % Crude apodization
-fid=apodization(fid-mean(fid),'kaiser-1d',20);
+fid=apodisation(spin_system,fid-mean(fid),{{'kaiser',20}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

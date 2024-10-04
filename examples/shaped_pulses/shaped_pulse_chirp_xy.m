@@ -68,8 +68,8 @@ parameters.rho0=step(spin_system,Ly,parameters.rho0,pi/2);
 % Acquisition
 fid=acquire(spin_system,parameters,H,R,K);
 
-% Apodization
-fid=apodization(fid,'exp-1d',6);
+% Apodisation
+fid=apodisation(spin_system,fid,{{'exp',6}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

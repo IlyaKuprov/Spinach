@@ -65,9 +65,9 @@ parfor n=1:numel(subsystems)
     % Simulation
     fid=liquid(subsystem,@hoesy,parameters,'nmr');
 
-    % Apodization
-    fid.cos=apodization(fid.cos,'sqcosbell-2d');
-    fid.sin=apodization(fid.sin,'sqcosbell-2d');
+    % Apodisation
+    fid.cos=apodisation(spin_system,fid.cos,{{'sqcos'},{'sqcos'}});
+    fid.sin=apodisation(spin_system,fid.sin,{{'sqcos'},{'sqcos'}});
 
     % F2 Fourier transform
     f1_cos=real(fftshift(fft(fid.cos,parameters.zerofill(2),1),1));

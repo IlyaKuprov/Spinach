@@ -43,9 +43,9 @@ parameters.J=140;
 % Simulation
 fid=liquid(spin_system,@clip_hsqc,parameters,'nmr');
 
-% Apodization
-fid.pos=apodization(fid.pos,'sqcosbell-2d');
-fid.neg=apodization(fid.neg,'sqcosbell-2d');
+% Apodisation
+fid.pos=apodisation(spin_system,fid.pos,{{'sqcos'},{'sqcos'}});
+fid.neg=apodisation(spin_system,fid.neg,{{'sqcos'},{'sqcos'}});
 
 % F2 Fourier transform
 f1_pos=fftshift(fft(fid.pos,parameters.zerofill(2),1),1);

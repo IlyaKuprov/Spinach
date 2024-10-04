@@ -67,11 +67,11 @@ parameters.axis_units='ppm';
 % Simulation
 fid=liquid(spin_system,@noesyhsqc,parameters,'nmr');
 
-% Apodization
-fid.pos_pos=apodization(fid.pos_pos,'sqcosbell-3d');
-fid.pos_neg=apodization(fid.pos_neg,'sqcosbell-3d');
-fid.neg_pos=apodization(fid.neg_pos,'sqcosbell-3d');
-fid.neg_neg=apodization(fid.neg_neg,'sqcosbell-3d');
+% Apodisation
+fid.pos_pos=apodisation(spin_system,fid.pos_pos,{{'sqcos'},{'sqcos'},{'sqcos'}});
+fid.pos_neg=apodisation(spin_system,fid.pos_neg,{{'sqcos'},{'sqcos'},{'sqcos'}});
+fid.neg_pos=apodisation(spin_system,fid.neg_pos,{{'sqcos'},{'sqcos'},{'sqcos'}});
+fid.neg_neg=apodisation(spin_system,fid.neg_neg,{{'sqcos'},{'sqcos'},{'sqcos'}});
 
 % F3 Fourier transform
 f3_pos_pos=fftshift(fft(fid.pos_pos,parameters.zerofill(3),3),3);

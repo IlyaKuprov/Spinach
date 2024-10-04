@@ -87,7 +87,7 @@ parameters.diff=0;
 fid=imaging(spin_system,@dpfgse_select,parameters);
 
 % Apodisation
-fid=apodization(fid,'exp-1d',6);
+fid=apodisation(spin_system,fid,{{'exp',6}});
 
 % Run the Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

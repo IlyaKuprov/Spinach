@@ -87,13 +87,13 @@ parameters.invert_axis=1;
 % Run the simulation for the initial guess
 parameters.rho0=step(spin_system,Ly,rho_old,pi/2);
 fid=liquid(spin_system,@acquire,parameters,'nmr');
-fid=apodization(fid,'gaussian-1d',10);
+fid=apodisation(spin_system,fid,{{'gauss',10}});
 spectrum_old=fftshift(fft(fid,parameters.zerofill));
 
 % Run the simulation for the optimised pulse
 parameters.rho0=step(spin_system,Ly,rho_new,pi/2);
 fid=liquid(spin_system,@acquire,parameters,'nmr');
-fid=apodization(fid,'gaussian-1d',10);
+fid=apodisation(spin_system,fid,{{'gauss',10}});
 spectrum_new=fftshift(fft(fid,parameters.zerofill));
 
 % Plot the spectrum before and after optimisation

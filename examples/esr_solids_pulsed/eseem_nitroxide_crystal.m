@@ -54,7 +54,7 @@ plot((0:(parameters.npoints-1))*parameters.timestep*1e6,real(fid));
 xlabel('time, \mus'); axis tight; kgrid;
 
 % Crude apodization
-fid=apodization(fid-mean(fid),'kaiser-1d',6);
+fid=apodisation(spin_system,fid-mean(fid),{{'kaiser',6}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

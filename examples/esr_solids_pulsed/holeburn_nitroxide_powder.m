@@ -70,10 +70,10 @@ parameters.pulse_pwr=zeros(100,1);
 parameters.pulse_frq=zeros(100,1);
 fid_c=powder(spin_system,@holeburn,parameters,'esr');
 
-% Apodization
-fid_a=apodization(fid_a,'exp-1d',6);
-fid_b=apodization(fid_b,'exp-1d',6);
-fid_c=apodization(fid_c,'exp-1d',6);
+% Apodisation
+fid_a=apodisation(spin_system,fid_a,{{'exp',6}});
+fid_b=apodisation(spin_system,fid_b,{{'exp',6}});
+fid_c=apodisation(spin_system,fid_c,{{'exp',6}});
 
 % Fourier transform
 spectrum_a=fftshift(fft(fid_a,parameters.zerofill));
@@ -85,7 +85,7 @@ figure(); hold on;
 plot_1d(spin_system,real(spectrum_a),parameters,'r-'); 
 plot_1d(spin_system,real(spectrum_b),parameters,'b-');
 plot_1d(spin_system,real(spectrum_c),parameters,'k-');
-legend({'chirp pulse','soft pulse','reference'});
+klegend({'chirp pulse','soft pulse','reference'});
 
 end
 

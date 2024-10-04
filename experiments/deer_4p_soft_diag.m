@@ -96,10 +96,10 @@ grumble(parameters);
 fids=powder(spin_system,@deer_4p_soft_hole,parameters,parameters.assumptions);
 
 % Apodisation and Fourier transform
-fid_a=apodization(fids(:,1),'crisp-1d'); spectrum_a=fftshift(fft(fid_a,parameters.zerofill));
-fid_b=apodization(fids(:,2),'crisp-1d'); spectrum_b=fftshift(fft(fid_b,parameters.zerofill));
-fid_c=apodization(fids(:,3),'crisp-1d'); spectrum_c=fftshift(fft(fid_c,parameters.zerofill));
-fid_d=apodization(fids(:,4),'crisp-1d'); spectrum_d=fftshift(fft(fid_d,parameters.zerofill));
+fid_a=apodisation(spin_system,fids(:,1),{{'crisp'}}); spectrum_a=fftshift(fft(fid_a,parameters.zerofill));
+fid_b=apodisation(spin_system,fids(:,2),{{'crisp'}}); spectrum_b=fftshift(fft(fid_b,parameters.zerofill));
+fid_c=apodisation(spin_system,fids(:,3),{{'crisp'}}); spectrum_c=fftshift(fft(fid_c,parameters.zerofill));
+fid_d=apodisation(spin_system,fids(:,4),{{'crisp'}}); spectrum_d=fftshift(fft(fid_d,parameters.zerofill));
 
 % Plotting
 figure();

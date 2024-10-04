@@ -74,8 +74,8 @@ parameters.delay_2=0.1; % s
 % Run simulation        
 fid=liquid(spin_system,@mqs_refocus,parameters,'nmr');       
    
-% Apodization      
-fid=apodization(fid,'sqcosbell-2d');
+% Apodisation      
+fid=apodisation(spin_system,fid,{{'sqcos'},{'sqcos'}});
    
 % Fourier transform         
 spectrum_conv=fftshift(fft2(fid,parameters.zerofill(2),...

@@ -50,8 +50,8 @@ fid=powder(spin_system,@hyscore,parameters,'esr');
 % Centre signal suppression
 fid=fid-mean(mean(fid));
 
-% Apodization
-fid=apodization(fid,'cosbell-2d');
+% Apodisation
+fid=apodisation(spin_system,fid,{{'cos'},{'cos'}});
 
 % Fourier transform
 spectrum=fftshift(fft2(fid,parameters.zerofill(2),parameters.zerofill(1)));

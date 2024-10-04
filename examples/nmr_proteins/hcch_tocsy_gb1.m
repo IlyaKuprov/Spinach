@@ -55,8 +55,8 @@ spin_system=basis(spin_system,bas);
 % Simulation
 fid=liquid(spin_system,@hcch_tocsy,parameters,'nmr');
 
-% Apodization
-fid=apodization(fid,'cosbell-3d');
+% Apodisation
+fid=apodisation(spin_system,fid,{{'cos'},{'cos'},{'cos'}});
 
 % Fourier transform
 spectrum=fftshift(fftn(fid,parameters.zerofill));

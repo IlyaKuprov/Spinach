@@ -17,9 +17,9 @@ parameters.axis_units='ppm';
 % Phasing
 phase_f1=exp(-1i*0.7);
 
-% Apodization
-fid.pos=apodization(fid.pos,'cosbell-2d')*phase_f1;
-fid.neg=apodization(fid.neg,'cosbell-2d')*phase_f1;
+% Apodisation
+fid.pos=apodisation(spin_system,fid.pos,{{'cos'},{'cos'}})*phase_f1;
+fid.neg=apodisation(spin_system,fid.neg,{{'cos'},{'cos'}})*phase_f1;
 
 % F2 Fourier transform
 f1_pos=fftshift(fft(fid.pos,parameters.zerofill(2),1),1);

@@ -102,7 +102,7 @@ parameters.axis_units='ppm';
 fid=imaging(spin_system,@press_1d,parameters);
 
 % Apodisation
-fid=apodization(fid,'sqcosbell-1d');
+fid=apodisation(spin_system,fid,{{'sqcos'}});
 
 % Magnitude Fourier transform
 spec=abs(fftshift(fft(ifftshift(fid))));

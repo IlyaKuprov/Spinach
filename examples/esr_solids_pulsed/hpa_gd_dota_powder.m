@@ -48,8 +48,8 @@ parameters.invert_axis=1;
 % Simulation
 fid=powder(spin_system,@acquire,parameters,'labframe');
 
-% Apodization
-fid=apodization(fid,'exp-1d',6);
+% Apodisation
+fid=apodisation(spin_system,fid,{{'exp',6}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

@@ -99,8 +99,8 @@ y_grid=linspace(-parameters.grad_amp,parameters.grad_amp,sqrt(parameters.spiral_
 % Replace NaN values with zeros
 fid(isnan(fid))=0;
 
-% Apodization
-fid=apodization(fid,'sqsinbell-2d');
+% Apodisation
+fid=apodisation(spin_system,fid,{{'sqsin'},{'sqsin'}});
 
 % Fourier transform
 mri=real(fftshift(fft2(ifftshift(fid))));

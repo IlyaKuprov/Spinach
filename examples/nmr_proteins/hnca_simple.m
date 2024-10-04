@@ -43,8 +43,8 @@ parameters.axis_units='ppm';
 % Simulation
 fid=liquid(spin_system,@hnca,parameters,'nmr');
 
-% Apodization
-fid=apodization(fid,'sqcosbell-3d');
+% Apodisation
+fid=apodisation(spin_system,fid,{{'sqcos'},{'sqcos'},{'sqcos'}});
 
 % Fourier transform
 spectrum=fftshift(fftn(fid,parameters.zerofill));

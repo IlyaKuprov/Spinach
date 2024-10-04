@@ -57,8 +57,8 @@ parameters.invert_axis=1;
 % Simulation
 fid=powder(spin_system,@acquire,parameters,'esr');
 
-% Apodization
-fid=apodization(fid,'crisp-1d');
+% Apodisation
+fid=apodisation(spin_system,fid,{{'crisp'}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

@@ -63,10 +63,10 @@ parameters.output='detailed';
 % Pulse sequence
 deer=powder(spin_system,@deer_3p_hard_deer,parameters,'deer-zz');
 
-% Apodization
-deer.hard_pulse_fid=apodization(deer.hard_pulse_fid,'exp-1d',6);
-deer.pump_pulse_fid=apodization(deer.pump_pulse_fid,'exp-1d',6);
-deer.prob_pulse_fid=apodization(deer.prob_pulse_fid,'exp-1d',6);
+% Apodisation
+deer.hard_pulse_fid=apodisation(spin_system,deer.hard_pulse_fid,{{'exp',6}});
+deer.pump_pulse_fid=apodisation(spin_system,deer.pump_pulse_fid,{{'exp',6}});
+deer.prob_pulse_fid=apodisation(spin_system,deer.prob_pulse_fid,{{'exp',6}});
 
 % Plotting
 figure(); set(gcf,'Position',[100 100 500 800]); 

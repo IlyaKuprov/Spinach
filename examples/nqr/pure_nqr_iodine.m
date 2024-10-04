@@ -41,8 +41,8 @@ parameters.axis_units='MHz';
 % Simulation
 fid=powder(spin_system,@hp_acquire,parameters,'labframe');
 
-% Apodization
-fid=apodization(fid,'exp-1d',6);
+% Apodisation
+fid=apodisation(spin_system,fid,{{'exp',6}});
 
 % Fourier transform
 spec=imag(fftshift(fft(fid)));

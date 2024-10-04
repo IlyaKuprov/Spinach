@@ -4,7 +4,7 @@
 %
 %            https://doi.org/10.1016/j.jmr.2021.106974
 %
-% Calculation time: minutes.
+% Calculation time: seconds.
 %
 % umitakbey@gmail.com
 % i.kuprov@soton.ac.uk
@@ -59,8 +59,8 @@ parameters.max_rank=25;
 % Acquisition
 fid=singlerot(spin_system,@acquire,parameters,'nmr');
 
-% Apodization
-fid=apodization(fid,'exp-1d',3);
+% Apodisation
+fid=apodisation(spin_system,fid,{{'none'}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

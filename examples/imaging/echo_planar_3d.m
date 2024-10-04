@@ -110,7 +110,7 @@ mri_2d_plot(fid.^(1/4),parameters,'k-space');
 ktitle('$k$-space representation');
 
 % Apodisation
-fid=apodization(fid,'sqsinbell-2d');
+fid=apodisation(spin_system,fid,{{'sqsin'},{'sqsin'}});
 
 % Fourier transform
 mri=real(fftshift(fft2(ifftshift(fid))));

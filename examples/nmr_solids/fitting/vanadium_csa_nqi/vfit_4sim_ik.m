@@ -119,28 +119,28 @@ parameters.coil=state(spin_system,'L+','51V');
 % Simulation A
 parameters.rate=41000;
 fida=singlerot(spin_system,@acquire,parameters,'nmr');
-fida=apodization(fida,'gaussian-1d',lw);
+fida=apodisation(spin_system,fida,{{'gauss',lw}});
 sim_speca=fftshift(fft(fida, parameters.zerofill));
 sim_speca=sim_speca/max(sim_speca);
 
 % Simulation B
 parameters.rate=38500;
 fidb=singlerot(spin_system,@acquire,parameters,'nmr');
-fidb=apodization(fidb,'gaussian-1d',lw);
+fidb=apodisation(spin_system,fidb,{{'gauss',lw}});
 sim_specb=fftshift(fft(fidb,parameters.zerofill));
 sim_specb=sim_specb/max(sim_specb);
 
 % Simulation C
 parameters.rate=36000;
 fidc=singlerot(spin_system,@acquire,parameters,'nmr');
-fidc=apodization(fidc,'gaussian-1d',lw);
+fidc=apodisation(spin_system,fidc,{{'gauss',lw}});
 sim_specc=fftshift(fft(fidc,parameters.zerofill));
 sim_specc=sim_specc/max(sim_specc);
 
 % Simulation D
 parameters.rate=34000;
 fidd=singlerot(spin_system,@acquire,parameters,'nmr');
-fidd=apodization(fidd,'gaussian-1d',lw);
+fidd=apodisation(spin_system,fidd,{{'gauss',lw}});
 sim_specd=fftshift(fft(fidd,parameters.zerofill));
 sim_specd=sim_specd/max(sim_specd);
 

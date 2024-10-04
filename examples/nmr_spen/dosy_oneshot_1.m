@@ -75,8 +75,8 @@ parameters.g_stab_del=0.0005; % seconds
 % Call the sequence in the imaging context
 fid=imaging(spin_system,@dosy_oneshot,parameters);
 
-% Apodization
-fid=apodization(fid,'exp-1d',5);
+% Apodisation
+fid=apodisation(spin_system,fid,{{'exp',5}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

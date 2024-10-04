@@ -37,9 +37,9 @@ spin_system=basis(spin_system,bas);
 % Simulation
 fid=liquid(spin_system,@ecosy,parameters,'nmr');
 
-% Apodization
-fid.cos=apodization(fid.cos,'sqcosbell-2d');
-fid.sin=apodization(fid.sin,'sqcosbell-2d');
+% Apodisation
+fid.cos=apodisation(spin_system,fid.cos,{{'sqcos'},{'sqcos'}});
+fid.sin=apodisation(spin_system,fid.sin,{{'sqcos'},{'sqcos'}});
 
 % F2 Fourier transform
 f1_cos=fftshift(fft(fid.cos,parameters.zerofill(2),1),1);

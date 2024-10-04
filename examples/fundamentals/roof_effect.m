@@ -50,8 +50,8 @@ for ppm=[0.2 0.05 0.0125 0.00625]
     % Run the simulation
     fid=liquid(spin_system,@acquire,parameters,'nmr');
 
-    % Apodization
-    fid=apodization(fid,'exp-1d',10);
+    % Apodisation
+    fid=apodisation(spin_system,fid,{{'exp',10}});
 
     % Fourier transform
     spectrum=fftshift(fft(fid,parameters.zerofill));

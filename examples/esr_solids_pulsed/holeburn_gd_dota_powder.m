@@ -75,9 +75,9 @@ for n=1:numel(W)
     parameters.pulse_pwr=2*pi*1e7;
     fid_b=powder(spin_system,@holeburn,parameters,'labframe');
     
-    % Apodization
-    fid_a=apodization(fid_a,'exp-1d',10);
-    fid_b=apodization(fid_b,'exp-1d',10);
+    % Apodisation
+    fid_a=apodisation(spin_system,fid_a,{{'exp',10}});
+    fid_b=apodisation(spin_system,fid_b,{{'exp',10}});
     
     % Fourier transform and addition
     spectrum_a=spectrum_a+W(n)*fftshift(fft(fid_a,parameters.zerofill));

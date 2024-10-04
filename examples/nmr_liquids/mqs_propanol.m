@@ -72,8 +72,8 @@ for n=1:numel(tau_max)
     % Run simulation        
     fid=liquid(spin_system,@mqs,parameters,'nmr');
         
-    % Apodization      
-    fid=apodization(fid,'sinbell-2d');
+    % Apodisation      
+    fid=apodisation(spin_system,fid,{{'sin'},{'sin'}});
         
     % Fourier transform      
     spectrum=fftshift(fft2(fid,parameters.zerofill(2),...

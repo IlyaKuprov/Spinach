@@ -105,8 +105,8 @@ fid_h=liquid(spin_system,@acquire,parameters_h,'nmr');
 fid_c=liquid(spin_system,@acquire,parameters_c,'nmr');
 
 % Apodisation and scaling
-fid_h=apodization(fid_h,'exp-1d',lw_h)/10;
-fid_c=apodization(fid_c,'exp-1d',lw_c)/10;
+fid_h=apodisation(spin_system,fid_h,{{'exp',lw_h}})/10;
+fid_c=apodisation(spin_system,fid_c,{{'exp',lw_c}})/10;
 
 % Fourier transform
 spec_theo_h=a_h*real(fftshift(fft(fid_h,parameters_h.zerofill)));

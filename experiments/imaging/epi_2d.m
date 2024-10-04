@@ -105,8 +105,8 @@ for n=1:parameters.image_size(1)
     
 end
 
-% Apodization
-fid=apodization(fid,'sqsinbell-2d');
+% Apodisation
+fid=apodisation(spin_system,fid,{{'sqsin'},{'sqsin'}});
  
 % Fourier transform
 mri=real(fftshift(fft2(ifftshift(fid))));

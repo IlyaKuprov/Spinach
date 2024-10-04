@@ -60,8 +60,8 @@ parameters.rho0=@(alp,bet,gam)zftrip(spin_system,euler2dcm(alp,bet,gam)*...
 % Simulation of a pulse-acquire experiment
 fid=powder(spin_system,@hp_acquire,parameters,'esr');
 
-% Apodization
-fid=apodization(fid,'crisp-1d');
+% Apodisation
+fid=apodisation(spin_system,fid,{{'crisp'}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

@@ -92,7 +92,7 @@ fminsearch(@errfun,guess,options);
         fid=singlerot(spin_system,@acquire,parameters,'nmr');
 
         % Apodisation
-        fid=apodization(fid,'none-1d');
+        fid=apodisation(spin_system,fid,{{'none'}});
 
         % Fourier transform and scaling
         spec_theo=real(fftshift(fft(fid,parameters.zerofill)));

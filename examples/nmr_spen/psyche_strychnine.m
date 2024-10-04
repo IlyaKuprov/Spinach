@@ -80,8 +80,8 @@ fid=imaging(spin_system,@psyche,parameters);
 np_chunk=parameters.sweep(2)/parameters.sweep(1);
 fidps=fid(1:np_chunk,:); fidps=fidps(:);
 
-% Apodization
-fidps=apodization(fidps,'gaussian-1d',6);
+% Apodisation
+fidps=apodisation(spin_system,fidps,{{'gauss',6}});
 
 % Fourier transform
 spectrum_2d=fftshift(fft2(fid,parameters.zerofill(2),...

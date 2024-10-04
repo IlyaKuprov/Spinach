@@ -114,9 +114,9 @@ parameters.rho0=state(spin_system,'Lz','1H');
 % Simulation
 fid=liquid(spin_system,@noesy,parameters,'nmr');
 
-% Apodization
-fid.cos=apodization(fid.cos,'cosbell-2d');
-fid.sin=apodization(fid.sin,'cosbell-2d');
+% Apodisation
+fid.cos=apodisation(spin_system,fid.cos,{{'cos'},{'cos'}});
+fid.sin=apodisation(spin_system,fid.sin,{{'cos'},{'cos'}});
 
 % F2 Fourier transform
 f1_cos=real(fftshift(fft(fid.cos,parameters.zerofill(2),1),1));

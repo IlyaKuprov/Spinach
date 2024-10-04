@@ -44,8 +44,8 @@ parameters.sweep=[62.5e3 62.5e3];
 % Simulation
 fid=singlerot(spin_system,@mqmas,parameters,'labframe');
 
-% Apodization
-fid=apodization(fid,'cosbell-2d');
+% Apodisation
+fid=apodisation(spin_system,fid,{{'cos'},{'cos'}});
     
 % Fourier transform
 spectrum=fftshift(fft2(fid,parameters.zerofill(2),...

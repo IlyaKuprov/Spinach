@@ -44,7 +44,7 @@ parameters.theta=pi/20;
 fid=singlerot(spin_system,@respiration,parameters,'nmr');
 
 % Apodisation
-fid=apodization(fid,'exp-1d',5);
+fid=apodisation(spin_system,fid,{{'exp',5}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

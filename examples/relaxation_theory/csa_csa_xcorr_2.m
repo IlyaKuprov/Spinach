@@ -37,8 +37,8 @@ spin_system=basis(spin_system,bas);
 
 % Sequence parameters - 1H
 parameters.spins={'1H'};
-parameters.rho0=state(spin_system,'L+','1H','cheap');
-parameters.coil=state(spin_system,'L+','1H','cheap');
+parameters.rho0=state(spin_system,'L+','1H');
+parameters.coil=state(spin_system,'L+','1H');
 parameters.decouple={};
 parameters.offset=6.9*500;
 parameters.sweep=50;
@@ -50,8 +50,8 @@ parameters.invert_axis=1;
 % Simulation
 fid=liquid(spin_system,@acquire,parameters,'nmr');
 
-% Apodization
-fid=apodization(fid,'exp-1d',20);
+% Apodisation
+fid=apodisation(spin_system,fid,{{'exp',20}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

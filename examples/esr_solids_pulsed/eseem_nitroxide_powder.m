@@ -50,7 +50,7 @@ parameters.grid='rep_2ang_400pts_sph';
 fid=powder(spin_system,@eseem,parameters,'esr');
 
 % Run apodization
-fid=apodization(mean(fid)-fid,'exp-1d',5);
+fid=apodisation(spin_system,mean(fid)-fid,{{'exp',5}});
 
 % Run Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));
@@ -58,13 +58,13 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 % Plot the time domain signal
 figure(); subplot(2,1,1);
 plot((0:(parameters.npoints-1))*parameters.timestep*1e6,real(fid));
-xlabel('time, \mus'); axis tight; kgrid;
+kxlabel('time, $\mu$s'); axis tight; kgrid;
 
 % Plot the spectrum
 subplot(2,1,2);
 plot(linspace(-1/parameters.timestep,1/parameters.timestep,...
      parameters.zerofill)*1e-6,real(spectrum));
-xlabel('frequency, MHz'); axis tight; kgrid;
+kxlabel('frequency, MHz'); axis tight; kgrid;
 
 end
 

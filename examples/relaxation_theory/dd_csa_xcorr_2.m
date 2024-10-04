@@ -84,7 +84,7 @@ for t_mix=[0.1 1.4 1.6 1.8 2.0 2.2 2.4 10]
     fid=evolution(spin_system,L,coil,rho,timestep,parameters.npoints-1,'observable');
     
     % Perform the Fourier transform
-    spectrum=fftshift(fft(apodization(fid,'exp-1d',6),parameters.zerofill));
+    spectrum=fftshift(fft(apodisation(spin_system,fid,{{'exp',6}}),parameters.zerofill));
     
     % Plot the spectrum
     hold on; plot(axis_hz,real(spectrum)); drawnow;

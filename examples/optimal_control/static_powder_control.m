@@ -120,8 +120,8 @@ grid on; xlim('tight');
 % The OC echo and the ideal FID
 fid_optim=fid_optim(201:end);
 fid_ideal=fid_ideal(1:300);
-fid_optim=apodization(fid_optim,'exp-1d',5);
-fid_ideal=apodization(fid_ideal,'exp-1d',5);
+fid_optim=apodisation(spin_system,fid_optim,{{'exp',5}});
+fid_ideal=apodisation(spin_system,fid_ideal,{{'exp',5}});
 spec_optim=real(fftshift(fft(fid_optim)));
 spec_ideal=real(fftshift(fft(fid_ideal)));
 

@@ -147,14 +147,14 @@ parameters_hb.axis_units='ppm';
 parameters_hb.invert_axis=1;
 
 % Simulation
-fid_f=liquid(spin_system,@acquire,parameters_f,'nmr');
+fid_f= liquid(spin_system,@acquire,parameters_f, 'nmr');
 fid_ha=liquid(spin_system,@acquire,parameters_ha,'nmr');
 fid_hb=liquid(spin_system,@acquire,parameters_hb,'nmr');
 
 % Apodisation and scaling
-fid_f= params(10)*apodization(fid_f, 'gaussian-1d',7.0)/4e3;
-fid_ha=params(11)*apodization(fid_ha,'gaussian-1d',7.0)/4e3;
-fid_hb=params(12)*apodization(fid_hb,'gaussian-1d',6.0)/4e3;
+fid_f= params(10)*apodisation(spin_system,fid_f, {{'gauss',7.0}})/4e3;
+fid_ha=params(11)*apodisation(spin_system,fid_ha,{{'gauss',7.0}})/4e3;
+fid_hb=params(12)*apodisation(spin_system,fid_hb,{{'gauss',6.0}})/4e3;
 
 % Fourier transform
 spec_theo_f= real(fftshift(fft(fid_f, parameters_f.zerofill)));  spec_theo_f= spec_theo_f(end:-1:1);

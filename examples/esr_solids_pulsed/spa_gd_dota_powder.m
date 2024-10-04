@@ -68,8 +68,8 @@ for n=1:numel(W)
     % Simulation 
     fid=powder(spin_system,@sp_acquire,parameters,'labframe');
     
-    % Apodization
-    fid=apodization(fid,'exp-1d',10);
+    % Apodisation
+    fid=apodisation(spin_system,fid,{{'exp',10}});
     
     % Fourier transform and addition
     spectrum=spectrum+W(n)*fftshift(fft(fid,parameters.zerofill));

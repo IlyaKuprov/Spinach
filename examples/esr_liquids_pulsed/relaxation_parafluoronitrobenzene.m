@@ -58,8 +58,8 @@ spin_system=basis(spin_system,bas);
 
 % Experiment parameters
 parameters.spins={'E'};
-parameters.rho0=state(spin_system,'L+','E','cheap');
-parameters.coil=state(spin_system,'L+','E','cheap');
+parameters.rho0=state(spin_system,'L+','E');
+parameters.coil=state(spin_system,'L+','E');
 parameters.decouple={};
 parameters.offset=-1e7;
 parameters.sweep=2e8;
@@ -72,8 +72,8 @@ parameters.invert_axis=1;
 % Simulation
 fid=liquid(spin_system,@acquire,parameters,'esr');
 
-% Apodization
-fid=apodization(fid,'none-1d');
+% Apodisation
+fid=apodisation(spin_system,fid,{{'none'}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

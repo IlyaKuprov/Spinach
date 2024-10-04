@@ -50,7 +50,7 @@ parameters.invert_axis=1;
 fids=liquid(spin_system,@inv_rec,parameters,'nmr');
 
 % Apodisation
-fids=apodization(fids,'exp-1d',6);
+fids=apodisation(spin_system,fids,{{'exp',6},{}});
 
 % Fourier transform
 spectra=fftshift(fft(fids,[],1));

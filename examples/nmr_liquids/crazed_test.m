@@ -44,8 +44,8 @@ parameters.rho0=equilibrium(spin_system,H,Q,[0 0 0]);
 % CRAZED simulation
 fid=crystal(spin_system,@crazed,parameters,'nmr');
 
-% Apodization
-fid=apodization(fid,'cosbell-2d');
+% Apodisation
+fid=apodisation(spin_system,fid,{{'cos'},{'cos'}});
 
 % Fourier transform
 spectrum=fftshift(fft2(fid,parameters.zerofill(2),...

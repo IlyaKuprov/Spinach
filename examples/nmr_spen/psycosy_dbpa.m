@@ -75,8 +75,8 @@ parameters.sal_smf=20;        % saltire chirp smoothing factor
 % Simulation
 fid=imaging(spin_system,@psycosy,parameters);
 
-% Apodization
-fid=apodization(fid,'sqsinbell-2d');
+% Apodisation
+fid=apodisation(spin_system,fid,{{'sqsin'},{'sqsin'}});
 
 % Fourier transform
 spectrum=fftshift(fft2(fid,parameters.zerofill(2),parameters.zerofill(1)));

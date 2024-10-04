@@ -48,7 +48,7 @@ parameters.grid='rep_2ang_12800pts_sph';
 fid=powder(spin_system,@endor_mims,parameters,'esr');
 
 % Crude apodization
-fid=apodization(fid-mean(fid),'exp-1d',6);
+fid=apodisation(spin_system,fid-mean(fid),{{'exp',6}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

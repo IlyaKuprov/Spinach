@@ -66,7 +66,7 @@ parameters.diff=5e-6;
 fid=imaging(spin_system,@basic_1d_hard,parameters);
 
 % Apodisation
-fid=apodization(fid,'sqsinbell-1d');
+fid=apodisation(spin_system,fid,{{'sqsin'}});
 
 % Run the Fourier transform
 mri=real(fftshift(fft(ifftshift(fid))));

@@ -84,8 +84,8 @@ for n=1:numel(mixing_time)
     % Acquisition
     fid=evolution(spin_system,L,parameters.coil,rho,1/parameters.sweep,parameters.npoints-1,'observable');
 
-    % Apodization
-    fid=apodization(fid,'exp-1d',5);
+    % Apodisation
+    fid=apodisation(spin_system,fid,{{'exp',5}});
 
     % Fourier transform
     spectrum=fftshift(fft(fid,parameters.zerofill));

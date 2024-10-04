@@ -102,8 +102,8 @@ rho=step(spin_system,(Lp-Lp')/2i,rho,pi/2);
 fid=evolution(spin_system,H,coil,rho,1/parameters.sweep,...
               parameters.npoints-1,'observable');
 
-% Apodization
-fid=apodization(fid,'exp-1d',6);
+% Apodisation
+fid=apodisation(spin_system,fid,{{'exp',6}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

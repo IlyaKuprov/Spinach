@@ -62,7 +62,7 @@ time_axis=linspace(-parameters.tc/2,...
 
 % Plotting
 figure(); plot(1e6*time_axis,imag(echo)); kgrid;
-xlabel('time, microseconds'); axis tight;
+kxlabel('time, microseconds'); axis tight;
 
 end
 

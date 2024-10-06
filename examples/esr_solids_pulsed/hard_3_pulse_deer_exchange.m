@@ -16,11 +16,9 @@ function hard_3_pulse_deer_exchange()
 % Generate the distribution
 j_values=linspace(6e6,20e6,20);
 weights=gaussfun(j_values-13.1e6,4.2622e6);
-weights=weights/sum(weights);
+weights=weights/sum(weights); answer=0;
 
-% Get the DEER going
-answer=0;
-
+% Run the averaging
 for n=1:numel(weights)
     
     % Hush up
@@ -66,10 +64,8 @@ for n=1:numel(weights)
     parameters.stepsize=1e-8/4;
     parameters.nsteps=4*50;
     parameters.spins={'E'};
-    parameters.ex_prob=(operator(spin_system,{'L+'},{1})+...
-        operator(spin_system,{'L-'},{1}))/2;
-    parameters.ex_pump=(operator(spin_system,{'L+'},{2})+...
-        operator(spin_system,{'L-'},{2}))/2;
+    parameters.ex_prob=operator(spin_system,{'Lx'},{1});
+    parameters.ex_pump=operator(spin_system,{'Lx'},{2});
     parameters.output='brief';
     parameters.grid='rep_2ang_400pts_sph';
     
@@ -86,7 +82,7 @@ time_axis=linspace(0,parameters.stepsize*parameters.nsteps,parameters.nsteps+1);
 
 % Plotting
 figure(); plot(1e6*time_axis,imag(answer)); 
-axis tight; kgrid; xlabel('time, microseconds');
+axis tight; kgrid; kxlabel('time, microseconds');
 
 end
 

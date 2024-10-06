@@ -38,8 +38,7 @@ parameters.spins={'E'};
 parameters.rho0=state(spin_system,'Lz','E');
 parameters.coil=state(spin_system,'L+','E');
 parameters.screen=state(spin_system,'L-','E');
-parameters.pulse_op=(operator(spin_system,'L+','E')-...
-                     operator(spin_system,'L-','E'))/2i;
+parameters.pulse_op=operator(spin_system,'Ly','E');
 parameters.offset=0;
 parameters.npoints=512;
 parameters.timestep=2e-7;

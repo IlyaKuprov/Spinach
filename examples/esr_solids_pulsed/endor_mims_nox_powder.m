@@ -1,7 +1,7 @@
 % Mims ENDOR simulation for a nitroxide radical powder. Ideal
 % hard pulses are assumed.
 %
-% Calculation time: minutes
+% Calculation time: seconds.
 %
 % i.kuprov@soton.ac.uk
 
@@ -47,7 +47,7 @@ parameters.grid='rep_2ang_12800pts_sph';
 % Simulation
 fid=powder(spin_system,@endor_mims,parameters,'esr');
 
-% Crude apodization
+% Crude apodisation
 fid=apodisation(spin_system,fid-mean(fid),{{'exp',6}});
 
 % Fourier transform

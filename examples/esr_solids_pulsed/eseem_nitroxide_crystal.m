@@ -38,8 +38,7 @@ parameters.spins={'E'};
 parameters.rho0=state(spin_system,'Lz','E');
 parameters.coil=state(spin_system,'L+','E');
 parameters.screen=state(spin_system,'L-','E');
-parameters.pulse_op=(operator(spin_system,'L+','E')-...
-                     operator(spin_system,'L-','E'))/2i;
+parameters.pulse_op=operator(spin_system,'Ly','E');
 parameters.npoints=1024;
 parameters.timestep=1.25e-8;
 parameters.orientation=[pi/5 pi/4 pi/3];
@@ -51,7 +50,7 @@ fid=crystal(spin_system,@eseem,parameters,'esr');
 % Plot the time domain signal
 figure(); subplot(2,1,1);
 plot((0:(parameters.npoints-1))*parameters.timestep*1e6,real(fid));
-xlabel('time, \mus'); axis tight; kgrid;
+kxlabel('time, $\mu$s'); axis tight; kgrid;
 
 % Crude apodization
 fid=apodisation(spin_system,fid-mean(fid),{{'kaiser',6}});
@@ -63,7 +62,7 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 subplot(2,1,2);
 plot(linspace(-1/(parameters.timestep),1/(parameters.timestep),...
      parameters.zerofill)*1e-6,abs(spectrum));
-xlabel('frequency, MHz'); axis tight; kgrid;
+kxlabel('frequency, MHz'); axis tight; kgrid;
 
 end
 

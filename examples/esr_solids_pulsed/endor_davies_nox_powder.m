@@ -4,7 +4,7 @@
 % soft pulses and full account of the effect of the orientati-
 % on selection using a large spherical averaging grid.
 %
-% Calculation time: hours
+% Calculation time: hours.
 %
 % i.kuprov@soton.ac.uk
 
@@ -72,8 +72,8 @@ answer=powder(spin_system,@endor_davies,parameters,'esr');
 
 % Plotting
 figure(); plot(parameters.n_frq/1e6,real(answer));
-kgrid; axis tight; ylabel('(RF on)/(RF off)'); 
-xlabel('Nuclear frequency, MHz');
+kgrid; axis tight; kylabel('(RF on)/(RF off)'); 
+kxlabel('Nuclear frequency, MHz');
 
 end
 

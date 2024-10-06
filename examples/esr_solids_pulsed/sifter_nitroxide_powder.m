@@ -3,7 +3,7 @@
 % Calculation time: minutes.
 %
 % alice.bowen@chem.ox.ac.uk
-% Asif Equbal <asifequbal3@gmail.com>
+% asif@nyu.edu
 
 function sifter_nitroxide_powder()
 
@@ -45,21 +45,28 @@ spin_system=basis(spin_system,bas);
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'Lz','E');
 parameters.coil=state(spin_system,'L+','E');
-parameters.pulse_opy=(operator(spin_system,'L+','E')-...
-                      operator(spin_system,'L-','E'))/2i; % Y pulse
-parameters.pulse_opx=(operator(spin_system,'L+','E')+...
-                      operator(spin_system,'L-','E'))/2;  % X pulse
+parameters.pulse_opy=operator(spin_system,'Ly','E');
+parameters.pulse_opx=operator(spin_system,'Lx','E');
 parameters.offset=0;
 parameters.npoints=200;
 parameters.timestep=8e-9;
 parameters.grid='rep_2ang_3200pts_sph';
 
-% Simulation
-fid=powder(spin_system,@sifter,parameters,'esr');
+% Simulation and time axis generation
+fid=imag(powder(spin_system,@sifter,parameters,'esr'));
+time_axis=parameters.timestep*linspace(-parameters.npoints/2,...
+                                       +parameters.npoints/2,...
+                                        parameters.npoints/2)';
+time_axis=1e9*time_axis;
 
 % Plotting
-figure(); subplot(1,2,1); surf(imag(fid));
-subplot(1,2,2); plot(diag(imag(fid))); kgrid;
+figure(); scale_figure([1.50 0.75]);
+subplot(1,2,1); imagesc(time_axis,time_axis,fid);
+axis equal; axis tight; kxlabel('time, ns');
+kylabel('time, ns'); ktitle('2D SIFTER');
+subplot(1,2,2); plot(time_axis,diag(fid)); 
+kgrid; xlim tight; kxlabel('time, ns'); 
+ktitle('SIFTER diagonal');
 
 end
 

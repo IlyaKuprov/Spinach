@@ -4,12 +4,12 @@
 % tion and numerical powder averaging in Liouville space, inclu-
 % ding g-factor orientation effects on the dipolar coupling.
 %
-% Relaxation is included as extended T1/T2 theory 
+% Relaxation is included as extended T1/T2 theory.
 %
 % The analytical calculation is done for isotropic parts of the
 % electron g-factors.
 %
-% Calculation time: seconds
+% Calculation time: seconds.
 %
 % alice.bowen@chem.ox.ac.uk
 % i.kuprov@soton.ac.uk
@@ -64,25 +64,27 @@ answer.ridme_trace.imag=answer.pxpxpx.imag+answer.pypypx.imag+ ...
 x_axis=linspace((-parameters.stepsize*parameters.nsteps(1)),...
                  (parameters.stepsize*parameters.nsteps(2)),...
                   parameters.nsteps(1)+parameters.nsteps(2)+1);
-figure(); hold on; 
+figure(); scale_figure([1.50 0.75]);
 
 % Real parts
-plot(1e6*x_axis,real(answer.pxpxpx.real),'k');
-plot(1e6*x_axis,real(answer.pypypx.real),'b');
-plot(1e6*x_axis,real(answer.mxmxpx.real),'g');
-plot(1e6*x_axis,real(answer.mymypx.real),'r');
-plot(1e6*x_axis,real(answer.ridme_trace.real),'c');
+subplot(1,2,1); hold on; kgrid; box on;
+plot(1e6*x_axis,real(answer.pxpxpx.real));
+plot(1e6*x_axis,real(answer.pypypx.real));
+plot(1e6*x_axis,real(answer.mxmxpx.real));
+plot(1e6*x_axis,real(answer.mymypx.real));
+plot(1e6*x_axis,real(answer.ridme_trace.real));
+kxlabel('time, $\mu$s'); ktitle('real parts'); xlim tight;
+klegend({'PxPxPx','PyPyPx','MxMxPx','MyMyPx','RIDME'});
 
 % Imaginary parts
-plot(1e6*x_axis,real(answer.pxpxpx.imag),'.k');
-plot(1e6*x_axis,real(answer.pypypx.imag),'.b');
-plot(1e6*x_axis,real(answer.mxmxpx.imag),'.g');
-plot(1e6*x_axis,real(answer.mymypx.imag),'.r');
-plot(1e6*x_axis,real(answer.ridme_trace.imag),'.c');
-
-% Axis labels and extents
-xlabel('time, microseconds'); 
-kgrid; box on; axis tight;
+subplot(1,2,2); hold on; kgrid; box on;
+plot(1e6*x_axis,real(answer.pxpxpx.imag));
+plot(1e6*x_axis,real(answer.pypypx.imag));
+plot(1e6*x_axis,real(answer.mxmxpx.imag));
+plot(1e6*x_axis,real(answer.mymypx.imag));
+plot(1e6*x_axis,real(answer.ridme_trace.imag));
+kxlabel('time, $\mu$s'); ktitle('imag parts'); xlim tight;
+klegend({'PxPxPx','PyPyPx','MxMxPx','MyMyPx','RIDME'});
 
 end
 

@@ -37,10 +37,8 @@ parameters.coil_prob=state(spin_system,{'L-'},{1});
 parameters.stepsize=1e-8;
 parameters.nsteps=100;
 parameters.spins={'E'};
-parameters.ex_prob=(operator(spin_system,{'L+'},{1})+...
-                    operator(spin_system,{'L-'},{1}))/2;
-parameters.ex_pump=(operator(spin_system,{'L+'},{2})+...
-                    operator(spin_system,{'L-'},{2}))/2;
+parameters.ex_prob=operator(spin_system,{'Lx'},{1});
+parameters.ex_pump=operator(spin_system,{'Lx'},{2});
 parameters.output='brief';
 parameters.grid='rep_2ang_3200pts_sph';
 
@@ -52,7 +50,7 @@ time_axis=linspace(0,parameters.stepsize*parameters.nsteps,parameters.nsteps+1);
 
 % Plotting
 figure(); plot(1e6*time_axis,imag(deer.deer_trace)); 
-xlabel('time, microseconds'); axis tight; kgrid; 
+kxlabel('time, microseconds'); axis tight; kgrid; 
 
 end
 

@@ -1,7 +1,7 @@
 % Earth's field NMR Simulation for 2,6-difluoropyridine; replicates 
 % simulated spectra in Figure 7 of 
 %
-%              https://doi.org/10.1016/j.jmr.2023.107540
+%             https://doi.org/10.1016/j.jmr.2023.107540
 %
 % without the weighted addition of the uncoupled 1H signal.
 %

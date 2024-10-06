@@ -132,7 +132,7 @@ alphamap(new_alpha);
 
 % Clean up axes
 axis tight; axis equal; hold off;
-xlabel('X'); ylabel('Y'); zlabel('Z');
+kxlabel('X'); kylabel('Y'); kzlabel('Z');
 
 % Set blue -> white -> red colormap
 colormap(bwr_cmap());

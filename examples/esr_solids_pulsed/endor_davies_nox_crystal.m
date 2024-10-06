@@ -67,7 +67,7 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 % Plotting
 figure(); scale_figure([1.5 1.5]); subplot(2,2,1);
 plot_1d(spin_system,real(spectrum),parameters);
-title('Single crystal ESR spectrum');
+ktitle('Single crystal ESR spectrum');
 
 %% Stage 2: ENDOR, left line
 
@@ -103,14 +103,14 @@ answer_c=crystal(spin_system,@endor_davies,parameters,'esr');
 
 % Plotting
 subplot(2,2,2); plot(parameters.n_frq/1e6,real(answer_a));
-kgrid; axis tight; xlabel('Nuclear frequency, MHz');
-ylabel('(RF on)/(RF off)'); title('Single crystal ENDOR');
+kgrid; axis tight; kxlabel('Nuclear frequency, MHz');
+kylabel('(RF on)/(RF off)'); ktitle('Single crystal ENDOR');
 subplot(2,2,3); plot(parameters.n_frq/1e6,real(answer_b));
-kgrid; axis tight; xlabel('Nuclear frequency, MHz');
-ylabel('(RF on)/(RF off)'); title('Single crystal ENDOR');
+kgrid; axis tight; kxlabel('Nuclear frequency, MHz');
+kylabel('(RF on)/(RF off)'); ktitle('Single crystal ENDOR');
 subplot(2,2,4); plot(parameters.n_frq/1e6,real(answer_c));
-kgrid; axis tight; xlabel('Nuclear frequency, MHz');
-ylabel('(RF on)/(RF off)'); title('Single crystal ENDOR');
+kgrid; axis tight; kxlabel('Nuclear frequency, MHz');
+kylabel('(RF on)/(RF off)'); ktitle('Single crystal ENDOR');
 
 end
 

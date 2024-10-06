@@ -39,10 +39,8 @@ parameters.coil_prob=state(spin_system,{'L-'},{1});
 parameters.stepsize=1e-8;
 parameters.nsteps=50;
 parameters.spins={'E'};
-parameters.ex_prob=(operator(spin_system,{'L+'},{1})+...
-                    operator(spin_system,{'L-'},{1}))/2;
-parameters.ex_pump=(operator(spin_system,{'L+'},{2})+...
-                    operator(spin_system,{'L-'},{2}))/2;
+parameters.ex_prob=operator(spin_system,{'Lx'},{1});
+parameters.ex_pump=operator(spin_system,{'Lx'},{2});
 parameters.output='brief';
 parameters.grid='rep_2ang_1600pts_sph';
 
@@ -60,15 +58,15 @@ deer_anl=0.35*deer_analyt(D,0,time_axis);
 % Plotting (numerical)
 figure(); subplot(1,2,1); 
 plot(1e6*time_axis,imag(deer_num.deer_trace)); 
-axis([0 0.5 -0.1 0.4]); grid ; 
-xlabel('time, microseconds'); 
-title('numerical result');
+axis([0 0.5 -0.1 0.4]); kgrid; 
+kxlabel('time, microseconds'); 
+ktitle('numerical result');
 
 % Plotting (analytical)
 subplot(1,2,2); plot(1e6*time_axis,deer_anl); 
 axis([0 0.5 -0.1 0.4]); kgrid;
-xlabel('time, microseconds'); 
-title('analytical result'); 
+kxlabel('time, microseconds'); 
+ktitle('analytical result'); 
 
 end
 

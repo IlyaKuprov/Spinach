@@ -21,7 +21,8 @@ spin_system=create(sys, inter);
 spin_system=basis(spin_system, bas);
 
 % A suitably complicated state
-Op{1}=state(spin_system,{'Lz','Lx'},{1,2});
+Op{1}=state(spin_system,{'Lz','Lx'},{1,2})+...
+      state(spin_system,{'L+'},{1});
 
 % Liouville space, Zeeman basis
 bas.formalism='zeeman-liouv';
@@ -30,7 +31,8 @@ spin_system=create(sys, inter);
 spin_system=basis(spin_system, bas);
 
 % A suitably complicated state
-Op{2}=state(spin_system,{'Lz','Lx'},{1,2});
+Op{2}=state(spin_system,{'Lz','Lx'},{1,2})+...
+      state(spin_system,{'L+'},{1});
 
 % Fold back into Hilbert space
 Op{2}=reshape(Op{2},[24 24]);
@@ -42,7 +44,8 @@ spin_system=create(sys, inter);
 spin_system=basis(spin_system, bas);
 
 % A suitably complicated state
-Op{3}=state(spin_system,{'Lz','Lx'},{1,2});
+Op{3}=state(spin_system,{'Lz','Lx'},{1,2})+...
+      state(spin_system,{'L+'},{1});
 
 % Project into Zeeman basis
 Op{3}=sphten2zeeman(spin_system)*Op{3};
@@ -61,7 +64,7 @@ if (norm(Op{1}-Op{2},1)>1e-6)||...
 else
 
     % Good news to the user
-    disp('State construction test PASSED.');
+    disp('State consistency test PASSED.');
 
 end
 

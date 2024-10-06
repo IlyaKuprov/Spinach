@@ -59,8 +59,7 @@ parameters.max_rank=3000;
 H=rotor_stack(spin_system,parameters,'esr');
 
 % Microwave operator
-Hmw=(operator(spin_system,'L+','E')+...
-     operator(spin_system,'L-','E'))/2;
+Hmw=operator(spin_system,'Lx','E');
 
 % Zeeman offset operator
 HzE=operator(spin_system,'Lz','E');
@@ -85,7 +84,7 @@ for n=2:nsteps
 end
 
 % Trajectory analysis
-figure(); trajan(spin_system,rho/3,'level_populations'); ylim([0.15 0.18]);
+figure(); trajan(spin_system,rho,'level_populations');
 
 end
 

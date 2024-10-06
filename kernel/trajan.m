@@ -255,6 +255,7 @@ switch property
         
         % Move trajectory into the Zeeman basis set
         traj=sphten2zeeman(spin_system)*traj;
+        traj=traj/prod(spin_system.comp.mults);
         
         % Find out the number of energy levels
         nlevels=sqrt(size(traj,1));
@@ -271,8 +272,11 @@ switch property
         label_text='energy level populations';
         title_text='level populations';
 
-        % Compute Y axis extents (log scale is used later)
-        y_axis_extents=[spin_system.tols.subs_drop 1.05*max(result,[],'all')];
+        % Compute Y axis extents
+        max_val=max(result,[],'all');
+        min_val=min(result,[],'all');
+        y_axis_extents=[min_val-0.05*(max_val-min_val) 
+                        max_val+0.05*(max_val-min_val)];
 
     otherwise
         
@@ -297,11 +301,6 @@ end
 % Plot with predictable colours
 for n=1:numel(p) 
     p(n).Color=hsv2rgb([n/numel(p) 0.75 0.75]);  
-end
-
-% Log scale for level populations  
-if ~ismember(property,'level_populations')
-    set(gca,'yscale','log'); 
 end
 
 % Do not redraw the legend (expensive)

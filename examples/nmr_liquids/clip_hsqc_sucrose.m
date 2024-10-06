@@ -66,7 +66,7 @@ parfor n=1:numel(subsystems)
     fid=liquid(subsystem,@clip_hsqc,parameters,'nmr');
     
     % Apodisation
-    P_term=apodisation(fpin_system,fid.pos,{{'sqcos'},{'sqcos'}});
+    P_term=apodisation(spin_system,fid.pos,{{'sqcos'},{'sqcos'}});
     N_term=apodisation(spin_system,fid.neg,{{'sqcos'},{'sqcos'}});
     
     % F2 Fourier transform (directly detected dimension)

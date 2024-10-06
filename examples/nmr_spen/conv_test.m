@@ -139,16 +139,16 @@ subplot(2,1,1); plot(grid_sizes',D);
 kgrid; ylim([0 20]); xlim([1000 10000]);
 true_val=refline([0 18]);
 set(true_val,'Color','k','LineStyle','--');
-xlabel('grid point count');
-ylabel('D / 10^{-10} m^2/s');
-legend({'3-point stencil','5-point stencil',...
-        '7-point stencil'},'Location','SouthEast');
+kxlabel('grid point count');
+kylabel('$D / 10^{-10} m^2/s$');
+klegend({'3-point stencil','5-point stencil',...
+         '7-point stencil'},'Location','SouthEast');
 subplot(2,1,2); plot(grid_sizes',T); 
 kgrid; axis tight;
-xlabel('grid point count');
-ylabel('wall clock time / s');
-legend({'3-point finite difference','5-point finite difference',...
-        '7-point finite difference'},'Location','NorthWest');
+kxlabel('grid point count');
+kylabel('wall clock time / s');
+klegend({'3-point finite difference','5-point finite difference',...
+         '7-point finite difference'},'Location','NorthWest');
 
 % Generate convergence plot B
 figure(); scale_figure([2.0 1.5]);
@@ -160,10 +160,10 @@ for s=1:numel(stencil_sizes)
     end
     box on; kgrid; xlim tight;
 end
-subplot(2,3,1); title('3-point finite difference');
-ylabel('normalised intensity');
-subplot(2,3,2); title('5-point finite difference');
-subplot(2,3,3); title('7-point finite difference');
+subplot(2,3,1); ktitle('3-point finite difference');
+kylabel('normalised intensity');
+subplot(2,3,2); ktitle('5-point finite difference');
+subplot(2,3,3); ktitle('7-point finite difference');
 ideal_curve=exp(-(grad_amps*spin(parameters.spins{1})*delta_sml).^2*...
                  (delta_big-delta_sml/3)*18e-10);
 for s=1:numel(stencil_sizes)
@@ -174,19 +174,19 @@ for s=1:numel(stencil_sizes)
     end
     box on; kgrid; xlim tight;
 end
-subplot(2,3,4); ylabel('difference from exact');
-xlabel('gradient amplitude, T/m');
-subplot(2,3,5); xlabel('gradient amplitude, T/m');
-subplot(2,3,6); xlabel('gradient amplitude, T/m');
-subplot(2,3,3); legend({[num2str(grid_sizes(3)) ' points'],...
-                        [num2str(grid_sizes(4)) ' points'],...
-                        [num2str(grid_sizes(5)) ' points'],...
-                        [num2str(grid_sizes(6)) ' points'],...
-                        [num2str(grid_sizes(7)) ' points'],...
-                        [num2str(grid_sizes(8)) ' points'],...
-                        [num2str(grid_sizes(9)) ' points'],...
-                        [num2str(grid_sizes(10)) ' points']},...
-                        'Location','SouthWest');
+subplot(2,3,4); kylabel('difference from exact');
+kxlabel('gradient amplitude, T/m');
+subplot(2,3,5); kxlabel('gradient amplitude, T/m');
+subplot(2,3,6); kxlabel('gradient amplitude, T/m');
+subplot(2,3,3); klegend({[num2str(grid_sizes(3))  ' points'],...
+                         [num2str(grid_sizes(4))  ' points'],...
+                         [num2str(grid_sizes(5))  ' points'],...
+                         [num2str(grid_sizes(6))  ' points'],...
+                         [num2str(grid_sizes(7))  ' points'],...
+                         [num2str(grid_sizes(8))  ' points'],...
+                         [num2str(grid_sizes(9))  ' points'],...
+                         [num2str(grid_sizes(10)) ' points']},...
+                         'Location','SouthWest');
 
 end
 

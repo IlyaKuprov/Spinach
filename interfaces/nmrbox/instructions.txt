@@ -4,4 +4,8 @@
 2. Rename nmrbox_activate_spinach.m into activate_spinach.m 
    and move to wherever this file normally resides.
 
+3. Having activated Spinach, run nmrbox_sanity_check.m to 
+   make sure that the parallel pool part of your Matlab 
+   installation is functional.
+
  

@@ -32,6 +32,9 @@ if nargin==1
     error('console reporting function requires two arguments.');
 end
 
+% Catch outside calls with empty spin_system object
+if isempty(spin_system), spin_system.sys.output=1; end
+
 % Ignore the call if the system is hushed
 if ~strcmp(spin_system.sys.output,'hush')
     

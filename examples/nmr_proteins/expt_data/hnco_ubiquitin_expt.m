@@ -5,12 +5,12 @@
 
 function hnco_ubiquitin_expt()
 
-% Data loading
-load('hnco_ubiquitin_expt.mat');
-fid=fid(1:64,:,:); %#ok<NODEF>
+% Data loading and truncation
+load('hnco_ubiquitin_expt.mat','fid'); 
+fid=fid(1:64,:,:); 
 
 % Apodisation
-fid=apodisation(spin_system,fid,{{'cos'},{'cos'},{'cos'}});
+fid=apodisation([],fid,{{'cos'},{'cos'},{'cos'}});
 
 % F3 processing
 fid=fft(fid,256,1); fid=fid*exp(-1i*0.75);

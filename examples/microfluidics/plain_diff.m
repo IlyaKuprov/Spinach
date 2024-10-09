@@ -51,7 +51,7 @@ parameters.coil_st{1}=state(spin_system,'Lz','1H');
 parameters.spins={'1H'};
 parameters.offset=0;
 parameters.dt=160; 
-parameters.npoints=500;
+parameters.npoints=50;
 
 % Set assumptions
 spin_system=assume(spin_system,'nmr');

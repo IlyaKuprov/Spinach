@@ -57,8 +57,8 @@ parameters.coil_ph={}; parameters.coil_st={};
 % Sequence and timing parameters
 parameters.spins={'1H'};
 parameters.offset=0;
-parameters.dt=80; 
-parameters.npoints=500;
+parameters.dt=160; 
+parameters.npoints=50;
 
 % Set assumptions
 spin_system=assume(spin_system,'nmr');

@@ -88,11 +88,16 @@ while hashes_match
     
     % Pick a random file
     n=randi(numel(mfiles));
+
+    % Check that Matlab's syntax checker is on green
+    if ~isempty(checkcode([mfiles(n).folder filesep mfiles(n).name]))
+        edit(file_name); error('the built-in syntax checker has something to say');
+    end
     
     % Run the file
     if ~ismember(mfiles(n).name,exceptions)
         disp(['Running ' mfiles(n).name ' ...']);
-        cd(mfiles(n).folder);
+        cd(mfiles(n).folder); 
         eval(mfiles(n).name(1:(end-2)));
     end
     

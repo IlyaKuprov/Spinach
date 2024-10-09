@@ -380,7 +380,7 @@ end
                                  ['Contrast penalty: '  num2str(reg_a)],...
                                  ['Tikhonov penalty: '  num2str(reg_b)],...
                                  ['Total penalty: '     num2str(err)]},'FitBoxToText','on');
-            xlabel('Experimental PCS, ppm'); ylabel('Predicted PCS, ppm'); kgrid; box on;
+            kxlabel('Experimental PCS, ppm'); kylabel('Predicted PCS, ppm'); kgrid; box on;
         end
         drawnow();
               

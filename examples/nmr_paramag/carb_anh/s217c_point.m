@@ -18,7 +18,7 @@
 function s217c_point()
 
 % Load experimental data
-load('s217c_expt.mat','expt_pcs','xyz'); %#ok<*NODEF>
+load('s217c_expt.mat','expt_pcs','xyz'); 
 
 % Solve the inverse problem
 [mxyz,chi,pred_pcs]=ippcs(xyz,[-23 -16 20],expt_pcs);
@@ -26,7 +26,9 @@ load('s217c_expt.mat','expt_pcs','xyz'); %#ok<*NODEF>
 % Plot experimental vs predicted PCS
 figure(); plot(expt_pcs,pred_pcs,'bo'); hold on; kgrid;
 plot([min(expt_pcs) max(expt_pcs)],[min(expt_pcs) max(expt_pcs)],'r-');
-xlabel('Experimental PCS, ppm'); ylabel('Predicted PCS, ppm');
+kxlabel('Experimental PCS, ppm'); kylabel('Predicted PCS, ppm');
+xlim([min([expt_pcs; pred_pcs]) max([expt_pcs; pred_pcs])]);
+ylim([min([expt_pcs; pred_pcs]) max([expt_pcs; pred_pcs])]);
 
 % Report and save the parameters
 disp('Susceptibility tensor:'); disp(chi);

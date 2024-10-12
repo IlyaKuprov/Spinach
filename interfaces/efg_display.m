@@ -226,7 +226,9 @@ end
 axis square; axis tight; axis equal;
 set(gca,'Projection','perspective',...
         'XTickLabel',[],'YTickLabel',[],...
-        'ZTickLabel',[],'TickLength',[0 0]); 
+        'ZTickLabel',[],'TickLength',[0 0]);
+cameratoolbar('SetMode','orbit');
+cameratoolbar('SetCoordSys','none'); 
 box on; kgrid;
 
 end

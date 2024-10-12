@@ -137,10 +137,6 @@ kxlabel('X'); kylabel('Y'); kzlabel('Z');
 % Set blue -> white -> red colormap
 colormap(bwr_cmap());
 
-% Improve rotation behaviour
-cameratoolbar('SetMode','orbit');
-cameratoolbar('SetCoordSys','none'); 
-
 end
 
 % Consistency enforcement

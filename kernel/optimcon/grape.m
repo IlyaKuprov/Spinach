@@ -56,6 +56,10 @@
 % david.goodwin@inano.au.dk
 % uluk.rasulov@soton.ac.uk
 % i.kuprov@soton.ac.uk
+% maxi.keitel@soton.ac.uk
+%
+% TODO (Keitel): add logic to avoid computing backward trajectory 
+%                when the gradient is not requested
 %
 % <https://spindynamics.org/wiki/index.php?title=grape.m>
 

@@ -48,8 +48,8 @@ parameters.timestep=1e-8;
 
 % Plot the result
 figure(); plot(x_axis,real(spectrum)); kgrid;
-xlabel('Magnetic induction, T');
-ylabel('Signal intensity, a.u.');
+kxlabel('Magnetic induction, T'); xlim tight;
+kylabel('Signal intensity, a.u.');
 
 end
 

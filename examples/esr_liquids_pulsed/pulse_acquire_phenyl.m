@@ -34,8 +34,8 @@ spin_system=basis(spin_system,bas);
 
 % Set the sequence parameters
 parameters.spins={'E'};
-parameters.rho0=state(spin_system,'L+','E','cheap');
-parameters.coil=state(spin_system,'L+','E','cheap');
+parameters.rho0=state(spin_system,'L+','E');
+parameters.coil=state(spin_system,'L+','E');
 parameters.decouple={};
 parameters.offset=0;
 parameters.sweep=2e8;

@@ -45,8 +45,8 @@ spin_system=basis(spin_system,bas);
 
 % Experiment parameters
 parameters.spins={'E'};
-parameters.rho0=state(spin_system,'L+','E','cheap');
-parameters.coil=state(spin_system,'L+','E','cheap');
+parameters.rho0=state(spin_system,'L+','E');
+parameters.coil=state(spin_system,'L+','E');
 parameters.decouple={};
 parameters.offset=-2e7;
 parameters.sweep=2e8;
@@ -67,8 +67,6 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting
 figure(); plot_1d(spin_system,real(spectrum),parameters);
-kxlabel('Electron Zeeman frequency, GHz');
-kylabel('first derivative amplitude, a.u.');
 
 end
 

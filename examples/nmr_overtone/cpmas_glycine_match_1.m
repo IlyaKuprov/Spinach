@@ -49,17 +49,13 @@ parameters.sweep=[4.4e4 5.2e4];
 parameters.npoints=256;
 parameters.zerofill=256;
 parameters.rho0=cos(theta)*state(spin_system,'Lz','1H')+...
-                sin(theta)*(state(spin_system,'L+','1H')+...
-                            state(spin_system,'L-','1H'))/2;
+                sin(theta)*state(spin_system,'Lx','1H');
 parameters.coil=cos(theta)*state(spin_system,'Lz','14N')+...
-                sin(theta)*(state(spin_system,'L+','14N')+...
-                            state(spin_system,'L-','14N'))/2;
+                sin(theta)*state(spin_system,'Lx','14N');
 parameters.Nx=cos(theta)*operator(spin_system,'Lz','14N')+...
-              sin(theta)*(operator(spin_system,'L+','14N')+...
-                          operator(spin_system,'L-','14N'))/2;
+              sin(theta)*operator(spin_system,'Lx','14N');
 parameters.Hx=cos(theta)*operator(spin_system,'Lz','1H')+...
-              sin(theta)*(operator(spin_system,'L+','1H')+...
-                          operator(spin_system,'L-','1H'))/2;
+              sin(theta)*operator(spin_system,'Lx','1H');
 parameters.spins={'14N'};
 parameters.method='average';
 parameters.axis_units='kHz';
@@ -70,7 +66,7 @@ parameters.rf_dur=1e-4;
 rf_powers=linspace(25e3,39e3,15);
 
 % Start a new figure
-figure(); scale_figure([1.5 1.0]);
+figure(); scale_figure([2.5 1.0]);
 
 % Proton RF power scan
 for n=1:15
@@ -87,8 +83,8 @@ for n=1:15
     % Plotting
     plot_1d(spin_system,real(spectrum),parameters);
     axis([44 52 -1e-7 1e-7]); set(gca,'YTick',[]);
-    title([num2str(rf_powers(n)/1e3) ' kHz']); 
-    xlabel(''); set(gca,'XTick',[]); drawnow(); 
+    ktitle([num2str(rf_powers(n)/1e3) ' kHz']); 
+    kxlabel(''); set(gca,'XTick',[]); drawnow(); 
      
 end
 

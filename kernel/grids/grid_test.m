@@ -68,8 +68,8 @@ end
 % Do the plotting
 if nargout==0
     figure(); plot(ranks,grid_profile);
-    xlabel('spherical rank'); kgrid;
-    ylabel('integration residual');
+    kxlabel('spherical rank'); kgrid;
+    kylabel('integration residual');
 end
 
 end

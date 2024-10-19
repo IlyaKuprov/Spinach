@@ -79,10 +79,8 @@ for n=1:numel(field_grid)
         
     % Plotting
     subplot(1,3,n); plot(t_axis,answer); kgrid; box on;
-    title(['ODNP, B_0 = ' num2str(field_grid(n)) ' Tesla']);
-    ylabel('$^{1}$H DNP','interpreter','latex'); 
-    xlabel('time / seconds','interpreter','latex');
-    set(gca,'TickLabelInterpreter','latex'); drawnow;
+    ktitle(['$B_0$ = ' num2str(field_grid(n)) ' Tesla']);
+    kylabel('$^{1}$H DNP'); kxlabel('time / seconds'); drawnow;
   
 end
 

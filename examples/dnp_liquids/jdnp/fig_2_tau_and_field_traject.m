@@ -49,10 +49,8 @@ for n=1:numel(field_grid)
     % Set figure properties
     subplot(2,3,n); hold on;
     axis tight; ylim([-250 50]); kgrid; box on;
-    title(['B_0 = ' num2str(field_grid(n)) ' Tesla']);
-    ylabel('$^{1}$H DNP','interpreter','latex'); 
-    xlabel('Time / ms','interpreter','latex');
-    set(gca,'TickLabelInterpreter','latex');
+    ktitle(['$B_0$ = ' num2str(field_grid(n)) ' Tesla']);
+    kylabel('$^{1}$H DNP'); kxlabel('time / ms');
     
     % Loop over correlation times
     for k=1:numel(tau_c)
@@ -97,9 +95,9 @@ for n=1:numel(field_grid)
     end
     
     % Set the legend
-    legend({'$\tau_c = 300$ ps','$\tau_c = 400$ ps',...
-            '$\tau_c = 500$ ps','$\tau_c = 600$ ps'},...
-            'interpreter','latex','location','southeast');
+    klegend({'$\tau_c = 300$ ps','$\tau_c = 400$ ps',...
+             '$\tau_c = 500$ ps','$\tau_c = 600$ ps'},...
+             'location','southeast');
     
 end
 

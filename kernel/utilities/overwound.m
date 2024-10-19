@@ -61,8 +61,8 @@ if spc_dim(1)>1
     % Draw the plot
     freq_axis=linspace(-1,1,size(rho_kx,1));
     figure(); plot(freq_axis,sum(abs(rho_kx),2));
-    xlabel('X spatial frequency relative to Nyquist limit');
-    ylabel('population density, a.u.'); kgrid;
+    kxlabel('X spatial freq. relative to Nyquist limit');
+    kylabel('population density, a.u.'); kgrid;
     
 end
 
@@ -85,8 +85,8 @@ if spc_dim(2)>1
     % Draw the plot
     freq_axis=linspace(-1,1,size(rho_ky,1));
     figure(); plot(freq_axis,sum(abs(rho_ky),2));
-    xlabel('Y spatial frequency relative to Nyquist limit');
-    ylabel('population density, a.u.'); kgrid;
+    kxlabel('Y spatial freq. relative to Nyquist limit');
+    kylabel('population density, a.u.'); kgrid;
     
 end
 
@@ -109,8 +109,8 @@ if spc_dim(3)>1
     % Draw the plot
     freq_axis=linspace(-1,1,size(rho_kz,1));
     figure(); plot(freq_axis,sum(abs(rho_kz),2));
-    xlabel('Z spatial frequency relative to Nyquist limit');
-    ylabel('population density, a.u.'); kgrid;
+    kxlabel('Z spatial freq. relative to Nyquist limit');
+    kylabel('population density, a.u.'); kgrid;
  
 end
 

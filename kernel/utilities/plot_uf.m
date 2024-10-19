@@ -116,7 +116,7 @@ contour(axis_f2,axis_f1,flipud(spectrum_uf));
 box on; kgrid;
 
 % Get labels
-xlabel('1Q / ppm'); ylabel('MQ / ppm');
+kxlabel('1Q / ppm'); kylabel('MQ / ppm');
 
 % Invert the axes
 set(gca,'XDir','reverse','YDir','reverse');

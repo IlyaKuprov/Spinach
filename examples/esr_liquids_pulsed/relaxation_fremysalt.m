@@ -67,8 +67,8 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting
 figure(); plot_1d(spin_system,real(spectrum),parameters);
-xlabel('Electron Zeeman frequency, GHz');
-ylabel('first derivative amplitude, a.u.');
+kxlabel('Electron Zeeman frequency, GHz');
+kylabel('first derivative amplitude, a.u.');
 
 end
 

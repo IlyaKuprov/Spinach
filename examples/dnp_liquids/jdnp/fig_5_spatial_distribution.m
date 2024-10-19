@@ -88,11 +88,10 @@ for n=1:numel(X)
     end
 
     % Update the plot
-    subplot(1,2,1); imagesc(X,Y,xy_dnp);
-    axis square; set(gca,'TickLabelInterpreter','latex');
-    title('$Z=0$ Angstrom','interpreter','latex');
-    xlabel('Proton Y coordinate, Angstrom','interpreter','latex');
-    ylabel('Proton X coordinate, Angstrom','interpreter','latex');
+    subplot(1,2,1); imagesc(X,Y,xy_dnp);  
+    ktitle('$Z=0$ plane'); axis square;
+    kxlabel('Proton Y coordinate, Angstrom');
+    kylabel('Proton X coordinate, Angstrom');
     cb=colorbar; cb.TickLabelInterpreter='latex';
     cb.Label.String='$^{1}$H DNP @ 20 ms';
     cb.Label.FontSize=12; cb.Limits=[-200 1];
@@ -146,10 +145,9 @@ for n=1:numel(X)
 
     % Update the plot
     subplot(1,2,2); imagesc(X,Z,xz_dnp);
-    axis square; set(gca,'TickLabelInterpreter','latex');
-    title('$Y=0$ Angstrom','interpreter','latex');
-    xlabel('Proton Z coordinate, Angstrom','interpreter','latex');
-    ylabel('Proton X coordinate, Angstrom','interpreter','latex');
+    ktitle('$Y=0$ plane'); axis square; 
+    kxlabel('Proton Z coordinate, Angstrom');
+    kylabel('Proton X coordinate, Angstrom');
     cb=colorbar; cb.TickLabelInterpreter='latex';
     cb.Label.String='$^{1}$H DNP @ 20 ms';
     cb.Label.FontSize=12; cb.Limits=[-200 1];

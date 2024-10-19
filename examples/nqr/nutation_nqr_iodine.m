@@ -61,8 +61,8 @@ for n=1:10
                       parameters.sweep(2),...
                       parameters.npoints);
     subplot(1,10,n); plot(1e-6*frq_axis',imag(spectrum));
-    title([num2str(n/2) ' us']); xlabel('MHz'); 
-    axis tight; ylim([-3e-11 3e-11]); 
+    ktitle([num2str(n/2) ' $\mu$s']); kxlabel('MHz'); 
+    xlim tight; ylim([-3e-11 3e-11]); 
     set(gca,'YTick',[]); drawnow();
  
 end

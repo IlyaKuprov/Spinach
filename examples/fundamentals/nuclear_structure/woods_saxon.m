@@ -38,8 +38,8 @@ V=-V0./(1+exp((R-r_nuc)/a));
 
 % Plot the potential
 figure(); volplot(V,box_extents);
-title(['Woods-Saxon potential, M=' num2str(mass_number)]);
-xlabel('X, fm'); ylabel('Y, fm'); zlabel('Z, fm');
+ktitle(['Woods-Saxon potential, M=' num2str(mass_number)]);
+kxlabel('X, fm'); kylabel('Y, fm'); kzlabel('Z, fm');
 
 % Assemble the Hamiltonian
 H=spdiags(V(:),0,prod(box_npts),prod(box_npts))-L;
@@ -51,8 +51,8 @@ E=diag(E); disp('Energies, MeV:'); disp(E);
 % Plot the state
 psi=reshape(real(psi(:,level_number)),box_npts);
 figure(); volplot(psi,box_extents);
-title(['Eig ' num2str(level_number) ' ,real part']); 
-xlabel('X, fm'); ylabel('Y, fm'); zlabel('Z, fm');
+ktitle(['Eig ' num2str(level_number) ' ,real part']); 
+kxlabel('X, fm'); kylabel('Y, fm'); kzlabel('Z, fm');
 
 end
 

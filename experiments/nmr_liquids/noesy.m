@@ -4,22 +4,25 @@
 %
 % Parameters:
 %
-%    parameters.sweep     sweep widths, Hz
+%    parameters.sweep     - sweep widths, Hz
 %
-%    parameters.npoints   number of points for both dimensions
+%    parameters.npoints   - number of points for both dimensions
 %
-%    parameters.spins     nuclei on which the sequence runs,
-%                         specified as '1H', '13C', etc.
+%    parameters.spins     - nuclei on which the sequence runs,
+%                           specified as '1H', '13C', etc.
 %
-%    parameters.tmix      mixing time, seconds
+%    parameters.tmix      - mixing time, seconds
 %
-%    parameters.decouple  spins to be decoupled, specified either
-%                         by name, e.g. {'13C','1H'}, or by a list
-%                         of numbers, e.g. [1 2]
+%    parameters.decouple  - spins to be decoupled, specified either
+%                           by name, e.g. {'13C','1H'}, or by a list
+%                           of numbers, e.g. [1 2]
 %
-%    parameters.rho0      initial state; skip this and specify
-%                         parameters.needs={'rho_eq'} to start
-%                         from exact thermal equilibrium
+%    parameters.rho0      - initial state; skip this and specify
+%                           parameters.needs={'rho_eq'} to start
+%                           from exact thermal equilibrium
+%
+%    parameters.oldschool - set to 1 to disable homospoil gradient
+%                           before the mixing time
 %
 %    H - Hamiltonian matrix, received from context function
 %
@@ -46,6 +49,11 @@ function fid=noesy(spin_system,parameters,H,R,K)
 
 % Consistency check
 grumble(spin_system,parameters,H,R,K);
+
+% Default version includes homospoil
+if ~isfield(parameters,'oldschool')
+    parameters.oldschool=false();
+end
 
 % Coherent evolution timestep
 timestep=1./parameters.sweep;
@@ -82,14 +90,24 @@ for n=1:4
     % Second pulse
     rho_stack=step(spin_system,Op2{n},rho_stack,An2{n});
 
-    % Homospoil
-    rho_stack=homospoil(spin_system,rho_stack,'destroy');
+    % Gradient purification
+    if parameters.oldschool
 
-    % Mixing time
-    rho_stack=evolution(spin_system,1i*R+1i*K,[],...
-                        rho_stack,parameters.tmix,1,'final');
-    % Homospoil
-    rho_stack=homospoil(spin_system,rho_stack,'destroy');
+        % Mixing time under full evolution generator,
+        % thus including ZQ artefacts and other mess
+        rho_stack=evolution(spin_system,H+1i*R+1i*K,[],...
+                            rho_stack,parameters.tmix,1,'final');
+
+    else
+
+        % Destroy everything except longitudinal magnetisation
+        rho_stack=homospoil(spin_system,rho_stack,'destroy');
+
+        % Mixing time under relaxation and kinetics
+        rho_stack=evolution(spin_system,1i*R+1i*K,[],...
+                            rho_stack,parameters.tmix,1,'final');
+
+    end
 
     % Third pulse
     rho_stack=step(spin_system,Op3{n},rho_stack,An3{n});

@@ -35,22 +35,22 @@ n_files_gone=0; n_dirs_gone=0;
 for n=1:numel(dir_cont)
     if dir_cont(n).datenum<time_horizon
         if dir_cont(n).isdir
-            rmdir([dir_cont(n).folder filesep dir_cont(n).name],'s');
-            n_dirs_gone=n_dirs_gone+1;
+            try %#ok<TRYNC> - fail quietly
+                rmdir([dir_cont(n).folder filesep dir_cont(n).name],'s');
+                n_dirs_gone=n_dirs_gone+1;
+            end
         else
-            delete([dir_cont(n).folder filesep dir_cont(n).name]);
-            n_files_gone=n_files_gone+1;
+            try %#ok<TRYNC> - fail quietly
+                delete([dir_cont(n).folder filesep dir_cont(n).name]);
+                n_files_gone=n_files_gone+1;
+            end
         end
     end
 end
 
 % Report to the user
-if n_files_gone>0
-    report(spin_system,[num2str(n_files_gone) ' out-of-date cache files deleted']);
-end
-if n_dirs_gone>0
-    report(spin_system,[num2str(n_dirs_gone)  ' out-of-date cache directories deleted']);
-end
+report(spin_system,[num2str(n_files_gone) ' out-of-date cache files deleted']);
+report(spin_system,[num2str(n_dirs_gone)  ' out-of-date cache directories deleted']);
 
 end
 

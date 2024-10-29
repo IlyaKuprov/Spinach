@@ -1,4 +1,4 @@
-% Multiplies all entries of a structure by a user-specified 
+% Multiplies all entries of a cell array by a user-specified 
 % matrix. Syntax:
 %
 %                        C=mtimes(A,B)

@@ -1,4 +1,5 @@
-% Returns a two-spin singlet state. Syntax:
+% Returns a two-spin singlet state; both particles must be
+% spin-1/2. Syntax:
 %
 %          rho=singlet(spin_system,spin_a,spin_b)
 %
@@ -46,6 +47,10 @@ end
 if (spin_a>spin_system.comp.nspins)||...
    (spin_b>spin_system.comp.nspins)
     error('spin index exceeds the number of spins.');
+end
+if (spin_system.comp.mults(spin_a)~=2)||...
+   (spin_system.comp.mults(spin_b)~=2)
+    error('both particles must have spin 1/2.')
 end
 end
 

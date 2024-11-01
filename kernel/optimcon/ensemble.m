@@ -52,6 +52,7 @@ n_power_levls=numel(spin_system.control.pwr_levels);   % Power level count
 n_phase_specs=size(spin_system.control.phase_cycle,1); % Phase cycle line count
 n_cpm_mdepths=spin_system.control.cpm_mdp(3);          % Control power modulation depth count
 n_cpm_phasept=spin_system.control.cpm_nph;             % Control power modulation phase count
+n_distortions=size(spin_system.control.distortion,1);  % Distortion function ensemble size
 
 % Create a catalog of the ensemble
 catalog=(1:n_state_pairs)';
@@ -61,6 +62,7 @@ catalog=[kron(ones(n_offset_vals,1),catalog) kron((1:n_offset_vals)',ones(size(c
 catalog=[kron(ones(n_phase_specs,1),catalog) kron((1:n_phase_specs)',ones(size(catalog,1),1))];
 catalog=[kron(ones(n_cpm_mdepths,1),catalog) kron((1:n_cpm_mdepths)',ones(size(catalog,1),1))];
 catalog=[kron(ones(n_cpm_phasept,1),catalog) kron((1:n_cpm_phasept)',ones(size(catalog,1),1))];
+catalog=[kron(ones(n_distortions,1),catalog) kron((1:n_distortions)',ones(size(catalog,1),1))];
 
 % Ensemble correlation: own state pair for each member
 if ismember('rho_ens',spin_system.control.ens_corrs)
@@ -117,7 +119,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     n_rho=catalog(n,1); n_sys=catalog(n,2);
     n_pwr=catalog(n,3); n_off=catalog(n,4);
     n_phi=catalog(n,5); n_mdp=catalog(n,6);
-    n_mph=catalog(n,7);
+    n_mph=catalog(n,7); n_dis=catalog(n,8);
     
     % Get initial and target state
     rho_init=spin_system.control.rho_init{n_rho};
@@ -202,11 +204,8 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
         
     end
     
-    % Get the power_level
-    power_lvl=spin_system.control.pwr_levels(n_pwr);
-    
     % Get drifts from pool ValueStore
-    if nworkers==0
+    if (nworkers==0)||(~isworkernode)
         store=gcp('nocreate').ValueStore; 
         L=store(['oc_drift_' num2str(n_sys)]);
     else
@@ -237,24 +236,65 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
         end
 
     end
-        
+
+    % Move the waveform into physical units
+    power_lvl=spin_system.control.pwr_levels(n_pwr);
+    local_waveform=power_lvl*local_waveform;
+
     % Call GRAPE
     if n_outputs==2
+
+        % Apply waveform distortions
+        for k=1:size(spin_system.control.distortion,2)
+
+            % Get distortion function
+            dist_function=spin_system.control.distortion{n_dis,k};
+
+            % Apply distortion function
+            local_waveform=dist_function(local_waveform);
+
+        end
             
         % Fidelity and trajectory
         [traj_data{n},...
          fidelities{n}]=grape(spin_system,L,spin_system.control.operators,...
-                              power_lvl*local_waveform,rho_init,rho_targ,...
+                              local_waveform,rho_init,rho_targ,...
                               spin_system.control.fidelity);
                                        
     elseif n_outputs==3
+
+        % Get the Jacobian going
+        J=speye(numel(local_waveform));
+
+        % Apply waveform distortions
+        for k=1:size(spin_system.control.distortion,2)
+
+            % Get distortion function
+            dist_function=spin_system.control.distortion{n_dis,k};
+
+            % Apply distortion and get its Jacobian
+            [local_waveform,stage_jacobian]=dist_function(local_waveform);
+
+            % Combine Jacobians
+            J=stage_jacobian*J;
+
+        end
             
         % Fidelity, gradient and trajectory
         [traj_data{n}, ...
          fidelities{n},...
          gradients{n}]=grape(spin_system,L,spin_system.control.operators,...
-                             power_lvl*local_waveform,rho_init,rho_targ,...
+                             local_waveform,rho_init,rho_targ,...
                              spin_system.control.fidelity);
+
+        % Store the gradient layout
+        [n_rows,n_cols]=size(gradients{n});
+
+        % Stretch and apply the Jacobian
+        gradients{n}=J*gradients{n}(:);
+
+        % Restore the original gradient layout
+        gradients{n}=reshape(gradients{n},[n_rows n_cols]);
                                                 
     elseif n_outputs==4
         
@@ -263,7 +303,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
          fidelities{n},...
          gradients{n}, ...
          hessians{n}]=grape(spin_system,L,spin_system.control.operators,...
-                            power_lvl*local_waveform,rho_init,rho_targ,...
+                            local_waveform,rho_init,rho_targ,...
                             spin_system.control.fidelity);
                                                          
     end
@@ -337,7 +377,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     if n_outputs>2
         gradients{n}=gradients{n}.*amp_mod;
     end
-    if (n_outputs>3)&&strcmp(spin_system.control.integrator,'rectangle')
+    if n_outputs>3
         hessians{n}=reshape(hessians{n},[ncont nsteps ncont nsteps]);
         hessians{n}=permute(hessians{n},[2 1 3 4]).*amp_mod';
         hessians{n}=permute(hessians{n},[4 1 3 2]).*amp_mod';
@@ -351,7 +391,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     if n_outputs>2
         gradients{n}=power_lvl*gradients{n}(:);
     end
-    if (n_outputs>3)&&strcmp(spin_system.control.integrator,'rectangle')
+    if n_outputs>3
         hessians{n}=power_lvl*power_lvl*hessians{n}(:);
     end
     

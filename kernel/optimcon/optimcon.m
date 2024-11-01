@@ -279,6 +279,45 @@ else
     
 end
 
+% Process distortion functions
+if isfield(control,'distortion')
+
+    % Input validation
+    if ~iscell(control.distortion)
+        error('control.distortion must be a cell array of function handles.');
+    end
+    for n=1:numel(control.distortion)
+        if ~isa(control.distortion{n},'function_handle')
+            error('control.distortion must be a cell array of function handles.');
+        end
+    end
+    
+    % Absorb distortion functions
+    spin_system.control.distortion=control.distortion;
+    control=rmfield(control,'distortion');
+    
+    % Inform the user
+    report(spin_system,[pad('Waveform distortion stage count',60)   ...
+                        int2str(size(spin_system.control.distortion,2))]);
+    report(spin_system,[pad('Waveform distortion ensemble size',60) ...
+                        int2str(size(spin_system.control.distortion,1))]);
+
+    % Block methods that use exact Hessians
+    if ismember(control.method,{'newton','goodwin'})
+        error('waveform distortions are only available with LBFGS optimiser.');
+    end
+                    
+else
+    
+    % Only one function that does nothing
+    spin_system.control.distortion={@no_dist};
+    
+    % Inform the user
+    report(spin_system,[pad('Waveform distortion stages',60) 'none']);
+    report(spin_system,[pad('Waveform distortion ensemble',60) 'none']);
+    
+end
+
 % Process dead time
 if isfield(control,'dead_time')
 

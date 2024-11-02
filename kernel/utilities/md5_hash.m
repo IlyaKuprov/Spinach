@@ -17,38 +17,18 @@
 
 function hashstr=md5_hash(A)
 
-% Check consistency
-grumble(A);
+% Convert into bytestream
+A=getByteStreamFromArray(A);
 
-% Create the engine
-engine=java.security.MessageDigest.getInstance('MD5');
+% Typecast into a string
+A=typecast(A,'char');
 
-try
+% Compute MD5 hash
+hashstr=mlreportgen.utils.hash(A);
 
-    % Feed the object to the engine
-    engine.update(getByteStreamFromArray(A));
-
-    % Compute the hash
-    hashstr=typecast(engine.digest,'uint8');
-    
-catch
-    
-    % Instruct the user to increase Java heap size if hashing fails
-    error('Java ran out of memory, increase Java heap size in Preferences/General.');
-    
-end
-
-% Convert into a hex string
-hashstr=sprintf('%.2x',double(hashstr));
-
-end
-
-% Consistency enforcement
-function grumble(A) %#ok<INUSD>
-
-% This will eventually check for types of objects
-% that this function cannot handle; none have been
-% found so far.
+% Send Matlab's strings back where
+% they had crawled out of again
+hashstr=char(hashstr);
 
 end
 

@@ -49,8 +49,12 @@ for n=1:numel(dir_cont)
 end
 
 % Report to the user
-report(spin_system,[num2str(n_files_gone) ' out-of-date cache files deleted']);
-report(spin_system,[num2str(n_dirs_gone)  ' out-of-date cache directories deleted']);
+if n_files_gone>0
+    report(spin_system,[num2str(n_files_gone) ' out-of-date cache files deleted']);
+end
+if n_dirs_gone>0
+    report(spin_system,[num2str(n_dirs_gone)  ' out-of-date cache directories deleted']);
+end
 
 end
 

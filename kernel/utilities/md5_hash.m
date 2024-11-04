@@ -17,18 +17,14 @@
 
 function hashstr=md5_hash(A)
 
-% Convert into bytestream
-A=getByteStreamFromArray(A);
-
-% Typecast into a string
-A=typecast(A,'char');
+% Make a bytestream
+A=serializeToBytes(A);
 
 % Compute MD5 hash
-hashstr=mlreportgen.utils.hash(A);
+hashstr=digestMD5(A);
 
-% Send Matlab's strings back where
-% they had crawled out of again
-hashstr=char(hashstr);
+% Convert into a hex string
+hashstr=sprintf('%.2x',hashstr);
 
 end
 

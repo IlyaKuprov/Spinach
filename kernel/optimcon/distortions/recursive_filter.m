@@ -67,108 +67,100 @@
 
 function [y_filtered, Jacobian] = recursive_filter(w, a, b)
 
-    % Initialize the filtered output with the same size as input
-    y_filtered = zeros(size(w), 'like', w);
-    % Initialize the Jacobian matrix
-    Jacobian = zeros(numel(y_filtered), numel(w), 'like', w);
 
     % Number of channels and time slices
     [num_channels, num_cols] = size(w);
 
-    % Loop over channels
+    % Initialize the filtered output
+    y_filtered = zeros(size(w), 'like', w);
+
+    % Initialize lists for Jacobian entries
+    row_indices = [];
+    col_indices = [];
+    values = [];
+
+    % Loop over channel pairs
     for k = 1:(num_channels/2)
-        % Indices for current channel
+        % Indices for current channel pair
         idx1 = 2*k - 1;
         idx2 = 2*k;
 
-        % Get amplitude and phase
+        % Extract u1 and u2
         u1 = w(idx1, :);
         u2 = w(idx2, :);
+
+        % Compute amplitude and phase
         A = sqrt(u1.^2 + u2.^2);
         phi = atan2(u2, u1);
 
-        % Initialize A_dist and its Jacobian
-        A_dist = zeros(size(A), 'like', A);
-        s = zeros(num_cols, num_cols, 'like', A);  % For storing derivatives
+        % Handle zero amplitudes
+        epsilon = 1e-12;
+        A_safe = A;
+        A_safe(A == 0) = epsilon;
 
-        % Compute A_dist and its Jacobian recursively
-        for n = 1:num_cols
-            % Compute A_dist(n)
-            if n == 1
-                A_dist(n) = a(1) * A(n);
-            elseif n == 2
-                A_dist(n) = a(1) * A(n) + a(2) * A(n-1) + b(1) * A_dist(n-1);
-            else
-                A_dist(n) = a(1) * A(n) + a(2) * A(n-1) + a(3) * A(n-2) ...
-                            + b(1) * A_dist(n-1) + b(2) * A_dist(n-2);
-            end
-            % Compute s(n, m)
-            for m = 1:n
-                % Initialize s(n, m)
-                s(n, m) = 0;
-                % Direct dependencies
-                if n == m
-                    s(n, m) = s(n, m) + a(1);
-                end
-                if n - 1 == m
-                    s(n, m) = s(n, m) + a(2);
-                end
-                if n - 2 == m
-                    s(n, m) = s(n, m) + a(3);
-                end
-                % Recursive contributions
-                if n > 1
-                    s(n, m) = s(n, m) + b(1) * s(n - 1, m);
-                end
-                if n > 2
-                    s(n, m) = s(n, m) + b(2) * s(n - 2, m);
-                end
-            end
-        end
+        % Compute derivatives of A and phi
+        dA_du1 = u1 ./ A_safe;
+        dA_du2 = u2 ./ A_safe;
+        dphi_du1 = -u2 ./ (A_safe.^2);
+        dphi_du2 = u1 ./ (A_safe.^2);
 
-        % Compute derivatives of A and phi with respect to u1 and u2
-        dA_du1 = u1 ./ A;
-        dA_du2 = u2 ./ A;
-        dphi_du1 = -u2 ./ (A.^2);
-        dphi_du2 = u1 ./ (A.^2);
+        % Compute A_dist using filter
+        b_coeffs = a(:).';
+        a_coeffs = [1, -b(:).'];
+        A_dist = filter(b_coeffs, a_coeffs, A);
+        
+        % Compute impulse response for sensitivity matrix
+        impulse = zeros(1, num_cols);
+        impulse(1) = 1;
+        s_row = filter(b_coeffs, a_coeffs, impulse);
+        
+        % Ensure the first element of the row vector matches s_row(1)
+        s_first_row = [s_row(1), zeros(1, num_cols - 1)];
+        
+        % Construct sensitivity matrix s without warning
+        s = toeplitz(s_row, s_first_row);
 
-        % Compute the Jacobian entries
-        for n = 1:num_cols
-            for m = 1:n
-                if s(n, m) ~= 0
-                    % Partial derivatives with respect to u1(m)
-                    dy1_du1 = s(n, m) * dA_du1(m) * cos(phi(n));
-                    dy1_du1 = dy1_du1 - A_dist(n) * sin(phi(n)) * dphi_du1(m) * (n == m);
-                    dy2_du1 = s(n, m) * dA_du1(m) * sin(phi(n));
-                    dy2_du1 = dy2_du1 + A_dist(n) * cos(phi(n)) * dphi_du1(m) * (n == m);
+        % Find all non-zero entries in s
+        [n_indices, m_indices, s_values] = find(s);
 
-                    % Partial derivatives with respect to u2(m)
-                    dy1_du2 = s(n, m) * dA_du2(m) * cos(phi(n));
-                    dy1_du2 = dy1_du2 - A_dist(n) * sin(phi(n)) * dphi_du2(m) * (n == m);
-                    dy2_du2 = s(n, m) * dA_du2(m) * sin(phi(n));
-                    dy2_du2 = dy2_du2 + A_dist(n) * cos(phi(n)) * dphi_du2(m) * (n == m);
+        % Compute is_nm
+        is_nm = (n_indices == m_indices);
 
-                    % Adjusted Indices for desired Jacobian structure
-                    % y_idx corresponds to y_filtered(i,n)
-                    % w_idx corresponds to w(k,m)
-                    y_idx1 = (n - 1) * num_channels + idx1;
-                    y_idx2 = (n - 1) * num_channels + idx2;
-                    w_idx1 = (m - 1) * num_channels + idx1;
-                    w_idx2 = (m - 1) * num_channels + idx2;
+        % Compute dy1_du1
+        dy1_du1 = s_values.' .* dA_du1(m_indices) .* cos(phi(n_indices)) ...
+                  - A_dist(n_indices) .* sin(phi(n_indices)) .* dphi_du1(m_indices) .* is_nm.';
 
-                    % Assign to Jacobian matrix
-                    Jacobian(y_idx1, w_idx1) = Jacobian(y_idx1, w_idx1) + dy1_du1;
-                    Jacobian(y_idx1, w_idx2) = Jacobian(y_idx1, w_idx2) + dy1_du2;
-                    Jacobian(y_idx2, w_idx1) = Jacobian(y_idx2, w_idx1) + dy2_du1;
-                    Jacobian(y_idx2, w_idx2) = Jacobian(y_idx2, w_idx2) + dy2_du2;
-                end
-            end
-        end
+        % Compute dy1_du2
+        dy1_du2 = s_values.' .* dA_du2(m_indices) .* cos(phi(n_indices)) ...
+                  - A_dist(n_indices) .* sin(phi(n_indices)) .* dphi_du2(m_indices) .* is_nm.';
+
+        % Compute dy2_du1
+        dy2_du1 = s_values.' .* dA_du1(m_indices) .* sin(phi(n_indices)) ...
+                  + A_dist(n_indices) .* cos(phi(n_indices)) .* dphi_du1(m_indices) .* is_nm.';
+
+        % Compute dy2_du2
+        dy2_du2 = s_values.' .* dA_du2(m_indices) .* sin(phi(n_indices)) ...
+                  + A_dist(n_indices) .* cos(phi(n_indices)) .* dphi_du2(m_indices) .* is_nm.';
+
+        % Compute Jacobian indices
+        y_idx1 = (n_indices - 1) * num_channels + idx1;
+        y_idx2 = (n_indices - 1) * num_channels + idx2;
+        w_idx1 = (m_indices - 1) * num_channels + idx1;
+        w_idx2 = (m_indices - 1) * num_channels + idx2;
+
+        % Accumulate indices and values
+        row_indices = [row_indices; y_idx1; y_idx1; y_idx2; y_idx2];
+        col_indices = [col_indices; w_idx1; w_idx2; w_idx1; w_idx2];
+        values = [values; dy1_du1.'; dy1_du2.'; dy2_du1.'; dy2_du2.'];
 
         % Compute filtered output
         y_filtered(idx1, :) = A_dist .* cos(phi);
         y_filtered(idx2, :) = A_dist .* sin(phi);
     end
+
+    % Construct the sparse Jacobian matrix
+    Jacobian = sparse(row_indices, col_indices, values, numel(y_filtered), numel(w));
+
 end
 
 

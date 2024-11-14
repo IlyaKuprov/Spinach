@@ -1,5 +1,5 @@
-% Recursive filter also called Infinite Impulse Response.Applies digital filter based on 
-% given coefficients to the input waveform.
+% Recursive filter also called Infinite Impulse Response. Applies digital filter based on 
+% given coefficients to the amplitude of the input waveform in XY channels.
 %
 % The recursive filter formula is:
 %
@@ -17,7 +17,7 @@
 %    w           - Input waveform, one time slice per column, rows arranged as
 %                  separate channels (e.g., Channel1_X, Channel1_Y, Channel2_X, ...)
 %
-%    a           - Feedback coefficients of the recursive filter, a vector [1, a1, a2]
+%    a           - Feedback coefficients of the recursive filter, a vector [a1, a2, a3]
 %    b           - Feedforward coefficients of the recursive filter, a vector [b1,b2]
 %
 % Outputs:
@@ -65,76 +65,109 @@
 %
 
 
-function [y_filtered, J] = recursive_filter(w, a, b)
+function [y_filtered, Jacobian] = recursive_filter(w, a, b)
 
     % Initialize the filtered output with the same size as input
     y_filtered = zeros(size(w), 'like', w);
+    % Initialize the Jacobian matrix
+    Jacobian = zeros(numel(y_filtered), numel(w), 'like', w);
 
     % Number of channels and time slices
     [num_channels, num_cols] = size(w);
 
-    % Initialize Jacobian as a sparse matrix
-    if nargout > 1
-        J = zeros(num_channels * num_cols, num_channels * num_cols);
-    end
+    % Loop over channels
+    for k = 1:(num_channels/2)
+        % Indices for current channel
+        idx1 = 2*k - 1;
+        idx2 = 2*k;
 
-    % Iterate over each channel separately
-    for c = 1:num_channels
-        % Indices for the current channel in the Jacobian
-        channel_start = (c-1)*num_cols + 1;
-        channel_end = c*num_cols;
+        % Get amplitude and phase
+        u1 = w(idx1, :);
+        u2 = w(idx2, :);
+        A = sqrt(u1.^2 + u2.^2);
+        phi = atan2(u2, u1);
 
-        % Initialize a temporary matrix to store derivatives for the current channel
-        % This will be a lower triangular matrix
-        if nargout > 1
-            J_channel = zeros(num_cols, num_cols);
-        end
+        % Initialize A_dist and its Jacobian
+        A_dist = zeros(size(A), 'like', A);
+        s = zeros(num_cols, num_cols, 'like', A);  % For storing derivatives
 
-        % Compute the filtered output and Jacobian for the current channel
+        % Compute A_dist and its Jacobian recursively
         for n = 1:num_cols
-            % Compute y_filtered(c, n) based on the recursive formula
+            % Compute A_dist(n)
             if n == 1
-                y_filtered(c, n) = a(1) * w(c, n);
+                A_dist(n) = a(1) * A(n);
             elseif n == 2
-                y_filtered(c, n) = a(1) * w(c, n) + a(2) * w(c, n-1) + b(1) * y_filtered(c, n-1);
+                A_dist(n) = a(1) * A(n) + a(2) * A(n-1) + b(1) * A_dist(n-1);
             else
-                y_filtered(c, n) = a(1) * w(c, n) + a(2) * w(c, n-1) + a(3) * w(c, n-2) ...
-                                  + b(1) * y_filtered(c, n-1) + b(2) * y_filtered(c, n-2);
+                A_dist(n) = a(1) * A(n) + a(2) * A(n-1) + a(3) * A(n-2) ...
+                            + b(1) * A_dist(n-1) + b(2) * A_dist(n-2);
             end
-
-            % Compute Jacobian entries if needed
-            if nargout > 1
-
-                % Initialize the current row in the Jacobian for y[n]
-                J_current = zeros(1, num_cols);
-
-                % Direct dependencies on inputs
-                J_current(n) = a(1);  % d(y[n])/d(w[n]) = a0
-
-                if n >= 2
-                    J_current(n-1) = a(2);  % d(y[n])/d(w[n-1}) = a1
+            % Compute s(n, m)
+            for m = 1:n
+                % Initialize s(n, m)
+                s(n, m) = 0;
+                % Direct dependencies
+                if n == m
+                    s(n, m) = s(n, m) + a(1);
                 end
-                if n >= 3
-                    J_current(n-2) = a(3);  % d(y[n])/d(w[n-2}) = a2
+                if n - 1 == m
+                    s(n, m) = s(n, m) + a(2);
                 end
-
-                % Recursive dependencies on previous outputs
-                if n >= 2
-                    J_current = J_current + b(1) * J_channel(n-1, :);
+                if n - 2 == m
+                    s(n, m) = s(n, m) + a(3);
                 end
-                if n >= 3
-                    J_current = J_current + b(2) * J_channel(n-2, :);
+                % Recursive contributions
+                if n > 1
+                    s(n, m) = s(n, m) + b(1) * s(n - 1, m);
                 end
-
-                % Assign the computed derivatives to the Jacobian matrix
-                J_channel(n, :) = J_current;
+                if n > 2
+                    s(n, m) = s(n, m) + b(2) * s(n - 2, m);
+                end
             end
         end
 
-        % Assign the channel-specific Jacobian to the overall Jacobian matrix
-        if nargout > 1
-            J(channel_start:channel_end, channel_start:channel_end) = J_channel;
+        % Compute derivatives of A and phi with respect to u1 and u2
+        dA_du1 = u1 ./ A;
+        dA_du2 = u2 ./ A;
+        dphi_du1 = -u2 ./ (A.^2);
+        dphi_du2 = u1 ./ (A.^2);
+
+        % Compute the Jacobian entries
+        for n = 1:num_cols
+            for m = 1:n
+                if s(n, m) ~= 0
+                    % Partial derivatives with respect to u1(m)
+                    dy1_du1 = s(n, m) * dA_du1(m) * cos(phi(n));
+                    dy1_du1 = dy1_du1 - A_dist(n) * sin(phi(n)) * dphi_du1(m) * (n == m);
+                    dy2_du1 = s(n, m) * dA_du1(m) * sin(phi(n));
+                    dy2_du1 = dy2_du1 + A_dist(n) * cos(phi(n)) * dphi_du1(m) * (n == m);
+
+                    % Partial derivatives with respect to u2(m)
+                    dy1_du2 = s(n, m) * dA_du2(m) * cos(phi(n));
+                    dy1_du2 = dy1_du2 - A_dist(n) * sin(phi(n)) * dphi_du2(m) * (n == m);
+                    dy2_du2 = s(n, m) * dA_du2(m) * sin(phi(n));
+                    dy2_du2 = dy2_du2 + A_dist(n) * cos(phi(n)) * dphi_du2(m) * (n == m);
+
+                    % Adjusted Indices for desired Jacobian structure
+                    % y_idx corresponds to y_filtered(i,n)
+                    % w_idx corresponds to w(k,m)
+                    y_idx1 = (n - 1) * num_channels + idx1;
+                    y_idx2 = (n - 1) * num_channels + idx2;
+                    w_idx1 = (m - 1) * num_channels + idx1;
+                    w_idx2 = (m - 1) * num_channels + idx2;
+
+                    % Assign to Jacobian matrix
+                    Jacobian(y_idx1, w_idx1) = Jacobian(y_idx1, w_idx1) + dy1_du1;
+                    Jacobian(y_idx1, w_idx2) = Jacobian(y_idx1, w_idx2) + dy1_du2;
+                    Jacobian(y_idx2, w_idx1) = Jacobian(y_idx2, w_idx1) + dy2_du1;
+                    Jacobian(y_idx2, w_idx2) = Jacobian(y_idx2, w_idx2) + dy2_du2;
+                end
+            end
         end
+
+        % Compute filtered output
+        y_filtered(idx1, :) = A_dist .* cos(phi);
+        y_filtered(idx2, :) = A_dist .* sin(phi);
     end
 end
 

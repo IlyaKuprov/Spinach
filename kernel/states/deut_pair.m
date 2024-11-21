@@ -22,17 +22,12 @@
 %             or state vectors (Liouville space), ordered in
 %             a cell array as {Q++,Q+,Q0,Q-,Q--}
 %
-%   ODS     - ortho-deuterium state with equal populations
-%             of singlet and five quintet components
-%
-%   PDS     - para-deuterium state with equal populations
-%             of the three triplet components
-%
 % i.kuprov@soton.ac.uk
+% anakin.aden@mpinat.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=deut_pair.m>
 
-function [S,T,Q,ODS,PDS]=deut_pair(spin_system,spin_a,spin_b)
+function [S,T,Q]=deut_pair(spin_system,spin_a,spin_b)
 
 % Check consistency
 grumble(spin_system,spin_a,spin_b);
@@ -52,8 +47,8 @@ Qmm=kron(gam,gam);
 
 % Obtain spherical tensor expansions
 S=0; T={0,0,0}; Q={0,0,0,0,0}; IST=irr_sph_ten(3);
-for n=1:numel(T)
-    for k=1:numel(T)
+for n=1:numel(IST)
+    for k=1:numel(IST)
 
         % Get spherical tensor indices
         [L1,M1]=lin2lm(n-1); [L2,M2]=lin2lm(k-1);
@@ -103,10 +98,6 @@ for n=1:numel(T)
     end
 
 end
-
-% Build ortho- and paradeuterium states
-ODS=S+Q{1}+Q{2}+Q{3}+Q{4}+Q{5};
-PDS=T{1}+T{2}+T{3};
 
 end
 

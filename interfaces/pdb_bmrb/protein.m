@@ -27,7 +27,8 @@
 %
 % options.deuterate - a cell array of character strings, replaces 
 %                     protons with the specified PDB identifiers 
-%                     with deuterons
+%                     with deuterons; 'non-Me' deuterates every-
+%                     thing except methyl groups
 %
 % Outputs:
 %
@@ -351,30 +352,80 @@ if ~isempty(options.deuterate)
 
     % Get the gamma ratio
     gamma_ratio=spin('2H')/spin('1H');
-    
-    % Treat specified protons as deuterons
-    for n=1:numel(isotopes)
-       if strcmp(isotopes{n},'1H')&&...
-          ismember(pdb_atom_id{n},options.deuterate)
-      
-            % Assign the isotope
-            isotopes{n}='2H';
-            
-            % Scale the J-couplings
-            for k=1:numel(isotopes)
-                scalar_couplings{k,n}=gamma_ratio*scalar_couplings{k,n};
-                scalar_couplings{n,k}=gamma_ratio*scalar_couplings{n,k};
+
+    % Deuteration by PDB ID list
+    if iscell(options.deuterate)
+
+        % Convert specified protons into deuterons
+        for n=1:numel(isotopes)
+            if strcmp(isotopes{n},'1H')&&...
+               ismember(pdb_atom_id{n},options.deuterate)
+
+                % Assign the isotope
+                isotopes{n}='2H';
+
+                % Scale the J-couplings
+                for k=1:numel(isotopes)
+                    scalar_couplings{k,n}=gamma_ratio*scalar_couplings{k,n};
+                    scalar_couplings{n,k}=gamma_ratio*scalar_couplings{n,k};
+                end
+
+                % Inform the user
+                disp(['Proton ' pad([pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ':'],15,'right') ...
+                      ' replaced by deuterium. Shifts kept, J-couplings scaled down.']);
+
+                % Update the label
+                pdb_atom_id{n}(1)='D';
+
             end
+        end
+
+    % Non-methyl deuteration option
+    elseif ischar(options.deuterate)&&...
+           strcmp(options.deuterate,'non-Me')
+
+        % Convert non-methyl protons into deuterons
+        for n=1:numel(isotopes)
             
-            % Inform the user
-            disp(['Proton ' pad([pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ':'],15,'right') ...
-                  ' replaced by deuterium. Shifts kept, J-couplings scaled down.']);
-              
-            % Update the label
-            pdb_atom_id{n}(1)='D';
-              
-       end
+            % Find methyl protons
+            this_be_methyl_proton=...
+            (strcmp(pdb_aa_typ{n},'ALA')&&ismember(pdb_atom_id{n},{'HB1','HB2','HB3'}))||...
+            (strcmp(pdb_aa_typ{n},'ILE')&&ismember(pdb_atom_id{n},{'HD11','HD12','HD13','HG21','HG22','HG23'}))||...
+            (strcmp(pdb_aa_typ{n},'LEU')&&ismember(pdb_atom_id{n},{'HD11','HD12','HD13','HD21','HD22','HD23'}))||...
+            (strcmp(pdb_aa_typ{n},'MET')&&ismember(pdb_atom_id{n},{'HE1','HE2','HE3'}))||...
+            (strcmp(pdb_aa_typ{n},'THR')&&ismember(pdb_atom_id{n},{'HG21','HG22','HG23'}))||...
+            (strcmp(pdb_aa_typ{n},'VAL')&&ismember(pdb_atom_id{n},{'HG11','HG12','HG13','HG21','HG22','HG23'}));
+
+            % Deuterate all other protons
+            if strcmp(pdb_atom_id{n}(1),'H')&&(~this_be_methyl_proton)
+
+                % Assign the isotope
+                isotopes{n}='2H';
+
+                % Scale the J-couplings
+                for k=1:numel(isotopes)
+                    scalar_couplings{k,n}=gamma_ratio*scalar_couplings{k,n};
+                    scalar_couplings{n,k}=gamma_ratio*scalar_couplings{n,k};
+                end
+
+                % Inform the user
+                disp(['Proton ' pad([pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ':'],15,'right') ...
+                      ' replaced by deuterium. Shifts kept, J-couplings scaled down.']);
+
+                % Update the label
+                pdb_atom_id{n}(1)='D';
+
+            end
+        end
+
+    else
+
+        % Complain and bomb out
+        error('unknown deuteration pattern specification.');
+
     end
+
+
    
 end
 

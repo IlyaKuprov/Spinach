@@ -67,15 +67,15 @@ w_dist=zeros(size(w),'like',w);
 for n=1:(size(w,1)/2)
 
     % Get amplitude and phase
-    A=sqrt(w(2*n-1,:).^2+w(2*n,:).^2);
+    amp=sqrt(w(2*n-1,:).^2+w(2*n,:).^2);
     phi=atan2(w(2*n,:),w(2*n-1,:));
 
     % Distort the amplitude
-    A=sat_lvls(n)*tanh(A/sat_lvls(n));
+    amp=sat_lvls(n)*tanh(amp/sat_lvls(n));
 
     % Get X and Y components back
-    w_dist(2*n-1,:)=A.*cos(phi); 
-    w_dist(2*n,:)=A.*sin(phi);
+    w_dist(2*n-1,:)=amp.*cos(phi); 
+    w_dist(2*n,:)=amp.*sin(phi);
 
 end
 

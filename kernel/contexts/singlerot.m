@@ -32,7 +32,7 @@
 %                         debands in the spectrum)
 %
 %   parameters.rframes  - rotating frame specification, e.g.
-%                         {{'13C',2},{'14N,3}} requests second
+%                         {{'13C',2},{'14N',3}} requests second
 %                         order rotating frame transformation
 %                         with respect to carbon-13 and third
 %                         order rotating frame transformation

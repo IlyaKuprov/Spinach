@@ -1223,9 +1223,6 @@ if isfield(sys,'labels')
     elseif numel(sys.labels)~=numel(sys.isotopes)
         error('the length of sys.labels must be the same as the length of sys.isotopes.');
     end
-    if numel(unique(sys.labels))~=numel(sys.labels)
-        error('different particles must have different labels in sys.labels field.');
-    end
 end
 
 % Check order matrices

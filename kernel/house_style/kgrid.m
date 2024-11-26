@@ -9,8 +9,9 @@
 function kgrid()
 
 % Publisher-friendly grid settings
-grid on; set(gca,'GridAlpha',1,'GridColor',...
-                 [0.85 0.85 0.85],'Layer','bottom');
+grid on; grid minor; 
+set(gca,'GridAlpha',1,'GridColor',...
+    [0.85 0.85 0.85],'Layer','bottom');
 
 end
 

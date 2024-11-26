@@ -37,6 +37,15 @@ for n=1:numel(sys_parts)
     sys_parts{n}=rmfield(sys_parts{n},'isotopes');
 end
 
+% Labels
+sys.labels={};
+for n=1:numel(sys_parts)
+    if isfield(sys_parts{n},'labels')
+    sys.labels=[sys.labels sys_parts{n}.labels];
+    sys_parts{n}=rmfield(sys_parts{n},'labels');
+    end 
+end
+
 % Cartesian coordinates
 inter.coordinates={};
 for n=1:numel(inter_parts)

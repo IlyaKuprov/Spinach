@@ -29,7 +29,7 @@ for n=1:numel(Fs)
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);
 
-    % Unit state
+    % Unit state from Spinach
     U=state(spin_system,{'E','E','E','E'},{1 2 3 4});
 
     % Two-spin singlet-triplet state sum test

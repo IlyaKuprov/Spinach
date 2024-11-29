@@ -54,10 +54,10 @@ switch nargout
         if ~isempty(phi)
             disp('WARNING: phi was overwritten to [0 1 2 3]*pi/4');
         end
-        varargout{1}=eeqq2nqi(C_q,eta_q,I,[0*pi/4 theta alpha]);
-        varargout{2}=eeqq2nqi(C_q,eta_q,I,[1*pi/4 theta alpha]);
-        varargout{3}=eeqq2nqi(C_q,eta_q,I,[2*pi/4 theta alpha]);
-        varargout{4}=eeqq2nqi(C_q,eta_q,I,[3*pi/4 theta alpha]);
+        varargout{1}=eeqq2nqi(C_q,eta_q,I,[0*pi/2 theta alpha]);
+        varargout{2}=eeqq2nqi(C_q,eta_q,I,[1*pi/2 theta alpha]);
+        varargout{3}=eeqq2nqi(C_q,eta_q,I,[2*pi/2 theta alpha]);
+        varargout{4}=eeqq2nqi(C_q,eta_q,I,[3*pi/2 theta alpha]);
         
     case 6
         
@@ -65,12 +65,12 @@ switch nargout
         if ~isempty(phi)
             disp('WARNING: phi was overwritten to [0 1 2 3 4 5]*pi/6');
         end
-        varargout{1}=eeqq2nqi(C_q,eta_q,I,[0*pi/6 theta alpha]);
-        varargout{2}=eeqq2nqi(C_q,eta_q,I,[1*pi/6 theta alpha]);
-        varargout{3}=eeqq2nqi(C_q,eta_q,I,[2*pi/6 theta alpha]);
-        varargout{4}=eeqq2nqi(C_q,eta_q,I,[3*pi/6 theta alpha]);
-        varargout{5}=eeqq2nqi(C_q,eta_q,I,[4*pi/6 theta alpha]);
-        varargout{6}=eeqq2nqi(C_q,eta_q,I,[5*pi/6 theta alpha]);
+        varargout{1}=eeqq2nqi(C_q,eta_q,I,[0*pi/3 theta alpha]);
+        varargout{2}=eeqq2nqi(C_q,eta_q,I,[1*pi/3 theta alpha]);
+        varargout{3}=eeqq2nqi(C_q,eta_q,I,[2*pi/3 theta alpha]);
+        varargout{4}=eeqq2nqi(C_q,eta_q,I,[3*pi/3 theta alpha]);
+        varargout{5}=eeqq2nqi(C_q,eta_q,I,[4*pi/3 theta alpha]);
+        varargout{6}=eeqq2nqi(C_q,eta_q,I,[5*pi/3 theta alpha]);
         
     otherwise
         

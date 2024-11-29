@@ -62,8 +62,8 @@ timestep=1./parameters.sweep;
 coil=state(spin_system,'L+',parameters.spins{1},'cheap');
 
 % Pulse operators
-Lp=operator(spin_system,'L+',parameters.spins{1});
-Lx=(Lp+Lp')/2; Ly=(Lp-Lp')/2i;
+Lx=operator(spin_system,'Lx',parameters.spins{1});
+Ly=operator(spin_system,'Ly',parameters.spins{1});
 
 % Decoupling
 if isfield(parameters,'decouple')

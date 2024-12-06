@@ -22,6 +22,7 @@
 %
 % david.goodwin@inano.au.dk
 % i.kuprov@soton.ac.uk
+% m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=ctrl_trajan.m>
 
@@ -349,6 +350,11 @@ end
 
 % Plot correlation orders
 if ismember('correlation_order',spin_system.control.plotting)
+
+    % Disallow Zeeman formalisms
+    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv'})
+        error('trajectory analysis is not available in Zeeman formalisms, use sphten-liouv.');
+    end
     
     % Set the current plot
     subplot(n_plots_x,n_plots_y,current_plot); hold off;
@@ -380,6 +386,11 @@ end
 
 % Plot coherence orders
 if ismember('coherence_order',spin_system.control.plotting)
+
+    % Disallow Zeeman formalisms
+    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv'})
+        error('trajectory analysis is not available in Zeeman formalisms, use sphten-liouv.');
+    end
     
     % Set the current plot
     subplot(n_plots_x,n_plots_y,current_plot); hold off;
@@ -411,6 +422,11 @@ end
 
 % Plot local probability densities
 if ismember('local_each_spin',spin_system.control.plotting)
+
+    % Disallow Zeeman formalisms
+    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv'})
+        error('trajectory analysis is not available in Zeeman formalisms, use sphten-liouv.');
+    end
     
     % Set the current plot
     subplot(n_plots_x,n_plots_y,current_plot); hold off;
@@ -442,6 +458,11 @@ end
 
 % Plot total probability densities
 if ismember('total_each_spin',spin_system.control.plotting)
+
+    % Disallow Zeeman formalisms
+    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv'})
+        error('trajectory analysis is not available in Zeeman formalisms, use sphten-liouv.');
+    end
     
     % Set the current plot
     subplot(n_plots_x,n_plots_y,current_plot); hold off;
@@ -473,6 +494,11 @@ end
 
 % Plot populations of the Zeeman energy levels
 if ismember('level_populations',spin_system.control.plotting)
+
+    % Disallow Zeeman formalisms
+    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv'})
+        error('trajectory analysis is not available in Zeeman formalisms, use sphten-liouv.');
+    end
     
     % Set the current plot
     subplot(n_plots_x,n_plots_y,current_plot); hold off;

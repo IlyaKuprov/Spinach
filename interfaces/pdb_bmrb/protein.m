@@ -63,7 +63,15 @@
 function [sys,inter,aux]=protein(pdb_file,bmrb_file,options)
 
 % Set defaults
-if ~isfield(options,'deuterate'), options.deuterate={}; end
+if ~exist('options','var')
+    options.select='all';
+    options.pdb_mol=1;
+    options.noshift='keep';
+    options.deuterate={};
+end
+if ~isfield(options,'deuterate')
+    options.deuterate={}; 
+end
 
 % Check consistency
 grumble(pdb_file,bmrb_file,options);
@@ -318,7 +326,7 @@ end
 
 % Find missing chemical shifts
 missing_shifts=find(cellfun(@isempty,pdb_chemsh))';
-disp(' '); disp('############# SUMMARY OF MISSING ASSIGNMENTS ###############');
+disp(' '); fprintf(2,'############# SUMMARY OF MISSING ASSIGNMENTS ###############\n');
 
 % Process unassigned chemical shifts
 if strcmp(options.noshift,'keep')
@@ -326,8 +334,10 @@ if strcmp(options.noshift,'keep')
     % Put unassigned spins between -1.0 and 0.0 ppm
     erzatz_shifts=linspace(-1,0,numel(missing_shifts));
     for n=1:numel(missing_shifts)
-        disp(['Missing assignment of ' pdb_aa_typ{missing_shifts(n)} '(' num2str(pdb_aa_num(missing_shifts(n)))...
-              ')-' pdb_atom_id{missing_shifts(n)} ': the spin is placed at ' num2str(erzatz_shifts(n)) ' ppm.']);
+        fprintf(2,['Missing assignment of ' pdb_aa_typ{missing_shifts(n)} ...
+                   '(' num2str(pdb_aa_num(missing_shifts(n)))...
+                   ')-' pdb_atom_id{missing_shifts(n)} ...
+                   ': the spin is placed at ' num2str(erzatz_shifts(n)) ' ppm.\n']);
         pdb_chemsh{missing_shifts(n)}=erzatz_shifts(n);
     end
     
@@ -335,8 +345,9 @@ elseif strcmp(options.noshift,'delete')
     
     % Delete unassigned spins
     for n=missing_shifts
-        disp(['Missing assignment of ' pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ...
-              ': the atom will not appear in the simulation.']);
+        fprintf(2,['Missing assignment of ' pdb_aa_typ{n} 
+                   '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ...
+                   ': the atom will not appear in the simulation.\n']);
     end
     subset=subset&(~cellfun(@isempty,pdb_chemsh));
     
@@ -455,17 +466,20 @@ if ~ischar(bmrb_file)
 end
 if ~isfield(options,'select')
     error('options.select switch must be specfied.');
-elseif (~isnumeric(options.select))&&(~ismember(options.select,{'all','backbone','backbone-hsqc','backbone-minimal','backbone-extended'}))
+elseif (~isnumeric(options.select))&&...
+       (~ismember(options.select,{'all','backbone','backbone-hsqc',...
+                                  'backbone-minimal','backbone-extended'}))
     error('invalid value for options.select, please refer to the manual.');
 end
 if ~isfield(options,'pdb_mol')
     error('options.pdb_mol switch must be specfied.');
-elseif (~isnumeric(options.pdb_mol))
+elseif ~isnumeric(options.pdb_mol)
     error('invalid value for options.pdb_mol, please refer to the manual.');
 end
 if ~isfield(options,'noshift')
     error('options.noshift switch must be specfied.');
-elseif (~isnumeric(options.noshift))&&(~ismember(options.noshift,{'keep','delete'}))
+elseif (~isnumeric(options.noshift))&&...
+       (~ismember(options.noshift,{'keep','delete'}))
     error('invalid value for options.noshift, please refer to the manual.');
 end
 end

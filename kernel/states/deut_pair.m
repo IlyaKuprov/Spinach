@@ -22,6 +22,10 @@
 %             or state vectors (Liouville space), ordered in
 %             a cell array as {Q++,Q+,Q0,Q-,Q--}
 %
+% WARNING: the states above are NOT irreducible spherical tensors - 
+%          Bargon just Kroneckered up some Zeeman states and gave
+%          them what looked to him like appropriate labels.
+%
 % i.kuprov@soton.ac.uk
 % anakin.aden@mpinat.mpg.de
 %

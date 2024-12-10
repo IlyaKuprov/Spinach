@@ -39,11 +39,11 @@ for n=1:numel(sys_parts)
 end
 
 % Labels
-sys.labels={};
-for n=1:numel(sys_parts)
-    if isfield(sys_parts{n},'labels')
+if isfield(sys_parts{n},'labels')
+    sys.labels={};
+    for n=1:numel(sys_parts)
         sys.labels=[sys.labels sys_parts{n}.labels];
-        sys_parts{n}=rmfield(sys_parts{n},'labels');
+        sys_parts{n}=rmfield(sys_parts{n},'labels');        
     end 
 end
 

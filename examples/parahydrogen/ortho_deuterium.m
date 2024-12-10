@@ -33,21 +33,15 @@ bas.approximation='none';
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
+% Continuous deuteration
+options.dephasing=1;
+
 % Singlet and quintet on deuterium 
-[S,~,Q]=deut_pair(spin_system,3,5);
-
-% Get the initial condition
-rho0=S+Q{1}+Q{2}+Q{3}+Q{4}+Q{5};
-
-% Get the Zeeman part of the Hamiltonian
-H=hamiltonian(assume(spin_system,'nmr','zeeman'));
-
-% Apply continuous deuteration dephasing
-[V,~]=eig(H); rho0=remncomm(rho0,V);
+[S,~,Q]=deut_pair(spin_system,3,5,options);
 
 % Experiment parameters
 parameters.spins={'2H'};
-parameters.rho0=rho0;
+parameters.rho0=S+Q{1}+Q{2}+Q{3}+Q{4}+Q{5};
 parameters.coil=state(spin_system,'L+','2H');
 parameters.pulse_op=operator(spin_system,'Ly','2H');
 parameters.pulse_angle=pi/4;

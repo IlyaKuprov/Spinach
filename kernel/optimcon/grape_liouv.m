@@ -3,9 +3,9 @@
 % from a given initial state and projects the result onto the given final
 % state. The fidelity is returned, along with its gradient and Hessian 
 % with respect to amplitudes of all control operators at every time step
-% of the shaped pulse. Syntax:
+% of the shaped pulse. Uses Liouville-space formalism. Syntax:
 %
-%  [traj_data,fidelity,grad,hess]=grape(spin_system,drifts,controls,...
+%  [traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,...
 %                                       waveform,rho_init,rho_targ,...
 %                                       fidelity_type)
 % Parameters:
@@ -46,9 +46,6 @@
 %
 %   traj_data.forward   - forward trajectory from the initial condi-
 %                         tion(a stack of state vectors)
-%
-%   traj_data.backward  - backward trajectory from the target state
-%                         (a stack of state vectors)
 %
 % Note: this is a low level function that is not designed to be called 
 %       directly. Use grape_xy.m and grape_phase.m instead.

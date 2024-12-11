@@ -1,3 +1,60 @@
+% Gradient Ascent Pulse Engineering (GRAPE) objective function and gradient
+% Propagates the system through a user-supplied shaped pulse from a given 
+% initial state and projects the result onto the given final  state. The 
+% fidelity is returned, along with its gradient with respect to amplitudes 
+% of all control operators at every time step of the shaped pulse. 
+% Uses Hilbert-space formalism. Syntax:
+%
+%  [traj_data,fidelity,grad]=grape_hilb(spin_system,drifts,controls,...
+%                                       waveform,rho_init,rho_targ,...
+%                                       fidelity_type)
+% Parameters:
+%
+%   spin_system         - Spinach data object that has been through 
+%                         the optimcon.m problem setup function.
+% 
+%   drifts              - the drift Liouvillians: a cell array con-
+%                         taining one matrix (for time-independent 
+%                         drift) or multiple matrices (for time-de-
+%                         pendent drift).
+%
+%   controls            - control operators in Liouville space (cell 
+%                         array of matrices).
+%
+%   waveform            - control coefficients for each control ope-
+%                         rator (in rows of a matrix), rad/s
+%
+%   rho_init            - initial state of the system as a vector in
+%                         Liouville space.
+%
+%   rho_targ            - target state of the system as a vector in
+%                         Liouville space.
+%
+%   fidelity_type       - 'real'   (real part of the overlap)
+%                         'imag'   (imaginary part of the overlap)
+%                         'square' (absolute square of the overlap)
+%
+% Outputs:
+%
+%   fidelity            - fidelity of the control sequence
+%
+%   grad                - gradient of the fidelity with respect to
+%                         the control sequence
+%
+%   traj_data.forward   - forward trajectory from the initial condi-
+%                         tion(a stack of state vectors)
+%
+% Note: this is a low level function that is not designed to be called 
+%       directly. Use grape_xy.m and grape_phase.m instead.
+%
+% i.kuprov@soton.ac.uk
+% m.keitel@soton.ac.uk
+%
+% TODO (Keitel): add logic to avoid computing backward trajectory 
+%                when the gradient is not requested
+%
+% <https://spindynamics.org/wiki/index.php?title=grape.m>
+
 function [traj_data,fidelity,grad] = grape_hilb(spin_system,drifts,controls,...
                                                 waveform,rho_init,rho_targ,...
                                                 fidelity_type) %#ok<*PFBNS>

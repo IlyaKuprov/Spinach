@@ -1,6 +1,6 @@
 % Applies a discrete single-pole filter:
 %
-%                    Y(n)= X(n)+p*Y(n-1)
+%                 Y(n)=(1-p)*X(n)+p*Y(n-1)
 %
 % to a Spinach optimal control module waveform. Treats odd 
 % rows of multi-row waveform arrays as real, and even rows
@@ -10,13 +10,16 @@
 %
 % Parameters:
 %
-%    w   - waveform in rad/s nutation frequency units,
-%          one time slice per column, and rows arran-
-%          ged as XYXY... with respect to in-phase and
-%          quadrature parts on each control channel
+%    w   - waveform, one time slice per column, and
+%          rows arranged as XYXY... with respect to
+%          in-phase and quadrature parts on each 
+%          control channel
 %
-%
-%    p   - pole of the filter, a complex number
+%    p   - pole of the filter, a complex number; its
+%          amplitude controls the decay rate, its pha-
+%          se is a frequency with which the filter's 
+%          pole rotates the real and the imaginary
+%          part of the complex signal
 %
 % Outputs:
 %
@@ -76,7 +79,7 @@ for n=1:nchannels
 
     % Apply the filter
     for k=2:ncols
-        y(k)=x(k)+p*y(k-1);
+        y(k)=(1-p)*x(k)+p*y(k-1);
     end
 
     % Assign back to w_dist
@@ -100,6 +103,9 @@ if mod(size(w,1),2)~=0
 end
 if (~isnumeric(p))||(~isscalar(p))
     error('p must be a complex scalar.');
+end
+if abs(p)>=1
+    error('must have |p|<1 for causal stability');
 end
 end
 

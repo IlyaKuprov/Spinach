@@ -1,6 +1,6 @@
 % Applies a discrete single-zero filter:
 %
-%                    Y(n)= X(n)-z*X(n-1)
+%              Y(k)=X(k)/(1-z)-z*X(k-1)/(1-z);
 %
 % to a Spinach optimal control module waveform. Treats odd 
 % rows of multi-row waveform arrays as real, and even rows
@@ -10,12 +10,16 @@
 %
 % Parameters:
 %
-%    w   - waveform in rad/s nutation frequency units,
-%          one time slice per column, and rows arran-
-%          ged as XYXY... with respect to in-phase and
-%          quadrature parts on each control channel
+%    w   - waveform, one time slice per column, and
+%          rows arranged as XYXY... with respect to
+%          in-phase and quadrature parts on each 
+%          control channel
 %
-%    z   - zero of the filter, a complex number
+%    z   - zero of the filter, a complex number; its
+%          amplitude controls the decay rate, its pha-
+%          se is a frequency with which the filter's 
+%          pole rotates the real and the imaginary
+%          part of the complex signal
 %
 % Outputs:
 %
@@ -75,7 +79,7 @@ for n=1:nchannels
 
     % Apply the filter
     for k=2:ncols
-        y(k)=x(k)-z*x(k-1);
+        y(k)=x(k)/(1-z)-z*x(k-1)/(1-z);
     end
 
     % Assign back to w_dist

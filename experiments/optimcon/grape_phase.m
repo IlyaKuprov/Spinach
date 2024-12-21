@@ -146,9 +146,6 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,amp_profile,phi_profile)
-if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
-    error('optimal control module requires Lioville space formalism.');
-end
 if ~isfield(spin_system,'control')
     error('control data missing from spin_system, run optimcon() first.');
 end

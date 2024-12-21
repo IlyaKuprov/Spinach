@@ -19,6 +19,7 @@
 % david.goodwin@inano.au.dk
 % u.rasulov@soton.ac.uk
 % i.kuprov@soton.ac.uk
+% m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=optimcon.m>
 
@@ -175,10 +176,31 @@ if isfield(control,'rho_init')
     if ~iscell(control.rho_init)
         error('control.rho_init must be a cell array of vectors.');
     end
+
+    % In-depth checking
     for n=1:numel(control.rho_init)
-        if (~isnumeric(control.rho_init{n}))||(~iscolumn(control.rho_init{n}))
-            error('control.rho_init must be a cell array of column vectors.');
+
+        switch spin_system.bas.formalism
+
+            case {'sphten-liouv','zeeman-liouv'}
+
+                if (~isnumeric(control.rho_init{n}))||(~iscolumn(control.rho_init{n}))
+                    error('control.rho_init must be a cell array of column vectors.');
+                end
+
+            case 'zeeman-hilb'
+
+                if (~isnumeric(control.rho_init{n}))||(size(control.rho_init{n},1)~=...
+                                                       size(control.rho_init{n},2))
+                    error('control.rho_init must be a cell array of square matrices.');
+                end
+
+            otherwise
+
+                error('unrecognised formalism specification.');
+
         end
+
     end
     
     % Absorb initial states
@@ -203,11 +225,34 @@ if isfield(control,'rho_targ')
     if ~iscell(control.rho_targ)
         error('control.rho_targ must be a cell array of vectors.');
     end
+    
+    % In-depth checking
     for n=1:numel(control.rho_targ)
-        if (~isnumeric(control.rho_targ{n}))||(~iscolumn(control.rho_targ{n}))
-            error('control.rho_targ must be a cell array of column vectors.');
+
+        switch spin_system.bas.formalism
+
+            case {'sphten-liouv','zeeman-liouv'}
+
+                if (~isnumeric(control.rho_targ{n}))||(~iscolumn(control.rho_targ{n}))
+                    error('control.rho_targ must be a cell array of column vectors.');
+                end
+
+            case 'zeeman-hilb'
+
+                if (~isnumeric(control.rho_targ{n}))||(size(control.rho_targ{n},1)~=...
+                                                       size(control.rho_targ{n},2))
+                    error('control.rho_targ must be a cell array of square matrices.');
+                end
+
+            otherwise
+
+                error('unrecognised formalism specification.');
+
         end
+
     end
+
+    % Source-target pair consistency
     if numel(control.rho_targ)~=numel(spin_system.control.rho_init)
         error('control.rho_targ must have the same size as control.rho_init');
     end
@@ -281,6 +326,11 @@ end
 
 % Process distortion functions
 if isfield(control,'distortion')
+
+    % Disallow Newton-Raphson
+    if ismember(control.method,{'newton','goodwin'})
+        error('distortion handling not implemented for Newton-Raphson methods.');
+    end
 
     % Input validation
     if ~iscell(control.distortion)
@@ -1102,9 +1152,9 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,control) %#ok<INUSD> 
-if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
-    error('optimal control module requires Liouville space formalism.');
-end
+
+% Add further sanity checks here
+
 end
 
 % Whenever anyone accuses some person of being 'unfeeling' he means that

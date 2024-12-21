@@ -56,16 +56,16 @@
 % david.goodwin@inano.au.dk
 % uluk.rasulov@soton.ac.uk
 % i.kuprov@soton.ac.uk
-% maxi.keitel@soton.ac.uk
+% m.keitel@soton.ac.uk
 %
 % TODO (Keitel): add logic to avoid computing backward trajectory 
 %                when the gradient is not requested
 %
 % <https://spindynamics.org/wiki/index.php?title=grape.m>
 
-function [traj_data,fidelity,grad,hess]=grape(spin_system,drifts,controls,...
-                                              waveform,rho_init,rho_targ,...
-                                              fidelity_type) %#ok<*PFBNS>
+function [traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,...
+                                                    waveform,rho_init,rho_targ,...
+                                                    fidelity_type) %#ok<*PFBNS>
 % Check consistency
 grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ);
     
@@ -181,7 +181,7 @@ switch spin_system.control.integrator
         % Precompute evolution generators
         parfor n=1:nsteps
 
-             % Decide current drifts
+            % Decide current drifts
             if isscalar(drifts)
 
                 % Time-independent drifts, including
@@ -823,7 +823,6 @@ end
 
 % Return trajectory data
 traj_data.forward=fwd_traj;
-traj_data.backward=bwd_traj;
 
 % Catch unreachable objectives
 if abs(fidelity)==0

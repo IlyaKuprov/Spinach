@@ -95,8 +95,10 @@ end
 % Compute the structure coefficients for the relevant sub-algebra
 from=source{1}; to=destin{1}; coeff=struct{1};
 for n=2:numel(active_spins)
-    from=[kron(from,ones(size(source{n},1),1)) kron(ones(size(from,1),1),source{n})];
-    to=[kron(to,ones(size(destin{n},1),1)) kron(ones(size(to,1),1),destin{n})];
+    from=[kron(from,ones(size(source{n},1),1)) ...
+          kron(ones(size(from,1),1),source{n})];
+    to=[kron(to,ones(size(destin{n},1),1)) ...
+        kron(ones(size(to,1),1),destin{n})];
     coeff=kron(coeff,struct{n});
 end
 

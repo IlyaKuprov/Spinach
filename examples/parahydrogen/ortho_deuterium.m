@@ -6,6 +6,7 @@
 % Simulation time: seconds
 %
 % i.kuprov@soton.ac.uk
+% anakin.aden@mpinat.mpg.de 
 
 function ortho_deuterium()
 
@@ -32,12 +33,15 @@ bas.approximation='none';
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
+% Continuous deuteration
+options.dephasing=1;
+
 % Singlet and quintet on deuterium 
-[S,~,Q]=deut_pair(spin_system,3,5);
+[S,~,Q]=deut_pair(spin_system,3,5,options);
 
 % Experiment parameters
 parameters.spins={'2H'};
-parameters.rho0=S+Q{3}; % the rest dephases
+parameters.rho0=S+Q{1}+Q{2}+Q{3}+Q{4}+Q{5};
 parameters.coil=state(spin_system,'L+','2H');
 parameters.pulse_op=operator(spin_system,'Ly','2H');
 parameters.pulse_angle=pi/4;
@@ -52,7 +56,7 @@ parameters.axis_units='ppm';
 fid=liquid(spin_system,@hp_acquire,parameters,'nmr');
 
 % Apodisation and sign flip
-fid=-apodisation(spin_system,fid,{{'exp',6}});
+fid=apodisation(spin_system,fid,{{'exp',6}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

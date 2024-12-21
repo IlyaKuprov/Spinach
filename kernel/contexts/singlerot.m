@@ -156,6 +156,7 @@ sph_grid=load([spin_system.sys.root_dir '/kernel/grids/' ...
 % Assign local variables
 alphas=sph_grid.alphas; betas=sph_grid.betas; 
 gammas=sph_grid.gammas; weights=sph_grid.weights;
+n_orients=numel(weights);
 
 % Project relaxation and kinetics
 R=kron(speye(spc_dim),R); K=kron(speye(spc_dim),K);
@@ -204,15 +205,32 @@ else
 end
 
 % Inform the user and silence the output
-prev_setting=spin_system.sys.output;
-report(spin_system,['powder simulation with ' num2str(numel(weights)) ' orientations.']);
+prev_setting=spin_system.sys.output; ss_prev.sys.output=spin_system.sys.output;
+report(spin_system,['powder simulation with ' num2str(n_orients) ' orientations.']);
 if ~isfield(parameters,'verbose')||(parameters.verbose==0)
     report(spin_system,'pulse sequence silenced to avoid excessive output.')
     spin_system.sys.output='hush';
 end
 
-% MDCS diagnostics
-parallel_profiler_start;
+% Parfor rigging
+if ~isworkernode
+    DQ=parallel.pool.DataQueue;
+    afterEach(DQ,@(~)parfor_progr);
+    orients_done=0; last_toc=0;
+    tic; ticBytes(gcp); do_diag=true;
+else
+    do_diag=false; DQ=[];
+end
+
+% Parfor progress updater
+function parfor_progr()
+    orients_done=orients_done+1; last_message=toc-last_toc;
+    if (last_message>5)||(orients_done==n_orients)
+        report(ss_prev,[num2str(orients_done) '/' num2str(n_orients) ' orientations done, ' ...
+                        num2str(orients_done/toc) ' orientations per second.']); 
+        last_toc=toc;
+    end
+end
 
 % Powder averaging loop
 parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
@@ -242,12 +260,12 @@ parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
             D_rotor=wigner(r,0,0,rotor_angles(n));
             
             % Compose rotations
-            D=D_lab2rot*D_rotor*D_mol2rot;
+            D_comp=D_lab2rot*D_rotor*D_mol2rot;
         
             % Build the block
             for k=1:(2*r+1)
                 for m=1:(2*r+1)
-                    L{n,n}=L{n,n}+D(k,m)*Q{r}{k,m};
+                    L{n,n}=L{n,n}+D_comp(k,m)*Q{r}{k,m};
                 end
             end
             
@@ -266,14 +284,14 @@ parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
     
     % Run the pulse sequence
     ans_array{q}=pulse_sequence(spin_system,parameters,L,R,K);
+
+    % Report parfor progress
+    if do_diag, send(DQ,n); end
     
 end
 
 % Unsilence the output
 spin_system.sys.output=prev_setting;
-
-% Get MDCS diagnostics
-parallel_profiler_report;
 
 % Decide the return array
 if parameters.sum_up
@@ -296,6 +314,14 @@ else
     % Inform the user
     report(spin_system,'returning pulse sequence outputs at each orientation...');
     
+end
+
+% Parfor performance
+if ~isworkernode
+    nbytes=mean(tocBytes(gcp),1)/2^20; walltime=toc();
+    report(spin_system,['average worker process received ' num2str(nbytes(1)) ...
+                        ' MB and sent back ' num2str(nbytes(2)) ' MB']);
+    report(spin_system,['powder average run time: ' num2str(walltime) ' seconds']);
 end
 
 end

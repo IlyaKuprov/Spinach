@@ -82,6 +82,9 @@ if (numel(spin_system.control.rho_targ)~=1)||...
    (numel(spin_system.control.rho_init)~=1)
     error('this function only supports point-to-point transformations.');
 end
+if strcmp(spin_system.bas.formalism,'zeeman-hilb')
+    error('cooperative control not implemented in Hilbert space.');
+end
 end
 
 % Morally authoritarian movements are attractive to

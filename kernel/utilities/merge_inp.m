@@ -22,6 +22,7 @@
 %       extend as appropriate.
 %
 % i.kuprov@soton.ac.uk
+% a.acharya@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=merge_inp.m>
 
@@ -41,8 +42,8 @@ end
 sys.labels={};
 for n=1:numel(sys_parts)
     if isfield(sys_parts{n},'labels')
-    sys.labels=[sys.labels sys_parts{n}.labels];
-    sys_parts{n}=rmfield(sys_parts{n},'labels');
+        sys.labels=[sys.labels sys_parts{n}.labels];
+        sys_parts{n}=rmfield(sys_parts{n},'labels');
     end 
 end
 

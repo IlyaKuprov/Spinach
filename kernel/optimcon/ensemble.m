@@ -29,6 +29,7 @@
 %
 % david.goodwin@inano.au.dk
 % i.kuprov@soton.ac.uk
+% m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=ensemble.m>
 
@@ -256,10 +257,26 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
         end
             
         % Fidelity and trajectory
-        [traj_data{n},...
-         fidelities{n}]=grape(spin_system,L,spin_system.control.operators,...
-                              local_waveform,rho_init,rho_targ,...
-                              spin_system.control.fidelity);
+        switch spin_system.bas.formalism
+
+            case {'sphten-liouv','zeeman-liouv'}
+                
+                % Call Liouville space version of the GRAPE function
+                [traj_data{n},fidelities{n}]=grape_liouv(spin_system,L,spin_system.control.operators,...
+                                                         local_waveform,rho_init,rho_targ,...
+                                                         spin_system.control.fidelity);
+            case 'zeeman-hilb'
+
+                % Call Hilbert space version of the GRAPE function
+                [traj_data{n},fidelities{n}]=grape_hilb(spin_system,L,spin_system.control.operators,...
+                                                        local_waveform,rho_init,rho_targ,...
+                                                        spin_system.control.fidelity);
+            otherwise
+
+                % Complain and bomb out
+                error('unrecognised formalism specification.');
+
+        end
                                        
     elseif n_outputs==3
 
@@ -280,12 +297,27 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
 
         end
             
-        % Fidelity, gradient and trajectory
-        [traj_data{n}, ...
-         fidelities{n},...
-         gradients{n}]=grape(spin_system,L,spin_system.control.operators,...
-                             local_waveform,rho_init,rho_targ,...
-                             spin_system.control.fidelity);
+        % Fidelity and trajectory
+        switch spin_system.bas.formalism
+
+            case {'sphten-liouv','zeeman-liouv'}
+                
+                % Call Liouville space version of the GRAPE function
+                [traj_data{n},fidelities{n},gradients{n}]=grape_liouv(spin_system,L,spin_system.control.operators,...
+                                                                      local_waveform,rho_init,rho_targ,...
+                                                                      spin_system.control.fidelity);
+            case 'zeeman-hilb'
+
+                % Call Hilbert space version of the GRAPE function
+                [traj_data{n},fidelities{n},gradients{n}]=grape_hilb(spin_system,L,spin_system.control.operators,...
+                                                                     local_waveform,rho_init,rho_targ,...
+                                                                     spin_system.control.fidelity);
+            otherwise
+
+                % Complain and bomb out
+                error('unrecognised formalism specification.');
+
+        end
 
         % Store the gradient layout
         [n_rows,n_cols]=size(gradients{n});
@@ -297,14 +329,28 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
         gradients{n}=reshape(gradients{n},[n_rows n_cols]);
                                                 
     elseif n_outputs==4
-        
-        % Fidelity, gradient, Hessian and trajectory
-        [traj_data{n}, ...
-         fidelities{n},...
-         gradients{n}, ...
-         hessians{n}]=grape(spin_system,L,spin_system.control.operators,...
-                            local_waveform,rho_init,rho_targ,...
-                            spin_system.control.fidelity);
+
+        % Fidelity and trajectory
+        switch spin_system.bas.formalism
+
+            case {'sphten-liouv','zeeman-liouv'}
+                
+                % Call Liouville space version of the GRAPE function
+                [traj_data{n},fidelities{n},...
+                 gradients{n},hessians{n}]=grape_liouv(spin_system,L,spin_system.control.operators,...
+                                                       local_waveform,rho_init,rho_targ,...
+                                                       spin_system.control.fidelity);
+            case 'zeeman-hilb'
+
+                % Complain and bomb out
+                error('Newton-Raphson methods are not available in Hilbert space, use LBFGS.');
+
+            otherwise
+
+                % Complain and bomb out
+                error('unrecognised formalism specification.');
+
+        end
                                                          
     end
     
@@ -441,9 +487,6 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,waveform)
-if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
-    error('optimal control module requires Lioville space formalism.');
-end
 if ~isfield(spin_system,'control')
     error('control data missing from spin_system, run optimcon() first.');
 end
@@ -461,6 +504,9 @@ switch spin_system.control.integrator
     case 'trapezium'
         if size(waveform,2)~=(spin_system.control.pulse_nsteps+1)
             error('the number of columns in waveform must be (number of time steps)+1.');
+        end
+        if strcmp(spin_system.bas.formalism,'zeeman-hilb')
+            error('trapezium integration is not available in Hilbert space.');
         end
     otherwise
         error('unknown time propagation algorithm.');

@@ -9,6 +9,10 @@
 %
 %   spin_b  - the number of the second spin 
 %
+%   options.dephasing - set to 1 to eliminate the states that are
+%                       not stationary under Az+Bz Hamiltonian, 
+%                       the default is to keep everything
+%
 % Outputs:
 %
 %   S       - singet state density matrix (Hilbert space)
@@ -22,15 +26,22 @@
 %             or state vectors (Liouville space), ordered in
 %             a cell array as {Q++,Q+,Q0,Q-,Q--}
 %
+% WARNING: the states above are NOT irreducible spherical tensors - 
+%          Bargon just Kroneckered up some Zeeman states and gave
+%          them what looked to him like appropriate labels.
+%
 % i.kuprov@soton.ac.uk
 % anakin.aden@mpinat.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=deut_pair.m>
 
-function [S,T,Q]=deut_pair(spin_system,spin_a,spin_b)
+function [S,T,Q]=deut_pair(spin_system,spin_a,spin_b,options)
+
+% Set defaults
+if ~exist('options','var'), options.dephasing=0; end
 
 % Check consistency
-grumble(spin_system,spin_a,spin_b);
+grumble(spin_system,spin_a,spin_b,options);
 
 % Build component vectors in Hilbert space as per Eq 1
 % in https://doi.org/10.1016/S0009-2614(98)00784-2
@@ -52,6 +63,9 @@ for n=1:numel(IST)
 
         % Get spherical tensor indices
         [L1,M1]=lin2lm(n-1); [L2,M2]=lin2lm(k-1);
+
+        % Skip non-stationary states on user request
+        if (M1~=0)&&(M2~=0)&&(options.dephasing==1), continue; end
 
         % Build Spinach state descriptor
         descr_a=['T' int2str(L1) ',' int2str(M1)];
@@ -102,7 +116,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,spin_a,spin_b)
+function grumble(spin_system,spin_a,spin_b,options)
 if (~isnumeric(spin_a))||(~isnumeric(spin_b))||...
    (~isscalar(spin_a))||(~isscalar(spin_b))||...
    (mod(spin_a,1)~=0)||(mod(spin_b,1)~=0)||...
@@ -116,6 +130,14 @@ end
 if (spin_system.comp.mults(spin_a)~=3)||...
    (spin_system.comp.mults(spin_b)~=3)
     error('both particles must have spin 1.')
+end
+if ~isfield(options,'dephasing')
+    error('options.dephasing must be set.');
+end
+if (~isnumeric(options.dephasing))||...
+   (~isscalar(options.dephasing))||...
+   (~ismember(options.dephasing,[0 1]))
+    error('options.dephasing must be 1 or 0.');
 end
 end
 

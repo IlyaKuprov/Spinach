@@ -1,6 +1,6 @@
 % Tests the internal consistency of kernel rotation functions.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function rotations_1()
 

@@ -7,7 +7,7 @@
 % Calculation time: seconds
 %
 % wwarren@duke.edu
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function warren_singlet()
 

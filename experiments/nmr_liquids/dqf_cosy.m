@@ -22,7 +22,7 @@
 %    fid.cos, fid.sin  -  components of the free induction
 %                         decay for hypercomplex processing
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=dqf_cosy.m>

@@ -3,7 +3,7 @@
 % mental data kindly provided by Gottfried Otting (Australi-
 % an National University).
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % e.suturina@soton.ac.uk
 
 function tm_1igv_mult_fit()

@@ -33,7 +33,7 @@
 %       is impossible in this pulse sequence.
 %
 % Andrew Porter
-% i.kuprov@soton.ac.uk
+% i.ya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=pansy_cosy.m>
 

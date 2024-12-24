@@ -3,7 +3,7 @@
 % Calculation time: minutes
 %
 % Zak El-Machachi
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function inv_rec_strychnine()
 

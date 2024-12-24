@@ -8,7 +8,7 @@
 % may have made and forgotten about, that are causing some un-
 % intended consequences elsewhere in Spinach.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rearm.m>
 

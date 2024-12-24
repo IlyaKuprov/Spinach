@@ -7,7 +7,7 @@
 % Collisions of function names and path problems are the most fre-
 % quent support topic at the forum.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % david.goodwin@kit.edu
 %
 % <https://spindynamics.org/wiki/index.php?title=existentials.m>

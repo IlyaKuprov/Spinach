@@ -10,7 +10,7 @@
 % Calculation time: minutes.
 %
 % m.g.concilio@soton.ac.uk 
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function odnp_liquid_3()
 

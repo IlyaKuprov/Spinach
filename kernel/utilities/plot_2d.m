@@ -51,7 +51,7 @@
 %
 % where smin and smax are computed from the spectrum matrix. 
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=plot_2d.m>
 

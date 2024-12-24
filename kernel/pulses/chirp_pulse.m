@@ -58,7 +58,7 @@
 % Note: Cy is zero for the saltire pulse, this radically changes
 %       its phase and amplitude profiles.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % jeannicolas.dumez@cnrs.fr
 % ludmilla.guduff@cnrs.fr
 % m.g.concilio@soton.ac.uk

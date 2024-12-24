@@ -27,7 +27,7 @@
 % Notes: the function is sensitive to the sign of the magnetogyric
 %        ratio - negative for electrons, positive for protons, etc.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=levelpop.m>
 

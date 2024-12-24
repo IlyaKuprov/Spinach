@@ -3,7 +3,7 @@
 %
 % Calculation time: hours
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function static_powder_suc()
 

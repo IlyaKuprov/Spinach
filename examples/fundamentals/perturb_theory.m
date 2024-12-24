@@ -2,7 +2,7 @@
 % modules test. Eigenvector representations differ in the
 % two theories, but the energies are the same.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function perturb_theory()
 

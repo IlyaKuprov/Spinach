@@ -10,9 +10,9 @@
 %
 % Calculation time: minutes
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % marina.carravetta@soton.ac.uk
-% uluk.rasulov@soton.ac.uk
+% u.rasulov@soton.ac.uk
 
 function rlc_response_2()
 

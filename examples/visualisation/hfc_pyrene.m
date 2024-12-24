@@ -1,7 +1,7 @@
 % Example of carbon hyperfine tensor visualisation for
 % pyrene cation radical. Gaussian log is parsed.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function hfc_pyrene()
     

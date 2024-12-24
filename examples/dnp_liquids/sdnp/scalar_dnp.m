@@ -10,7 +10,7 @@
 % Calculation time: seconds
 % 
 % tomas.orlando@mpinat.mpg.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function scalar_dnp()
 

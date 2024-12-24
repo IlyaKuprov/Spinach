@@ -48,7 +48,7 @@
 %
 % Note: SG and BSG options require sphten-liouv formalism.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % kpervushin@ntu.edu.sg
 %
 % <https://spindynamics.org/wiki/index.php?title=trajsimil.m>

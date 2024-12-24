@@ -39,7 +39,7 @@
 %     endor_spec - Mims ENDOR spectrum, a vector of the same
 %                  size as parameters.n_frq
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=endor_mims_ideal.m>
 

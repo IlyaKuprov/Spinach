@@ -1,7 +1,7 @@
 % Thermal equilibrium states, using all the different formalisms 
 % supported by Spinach kernel.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function thermal_equilibrium_2()
 

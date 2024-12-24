@@ -20,7 +20,7 @@
 % inversion operation below would fail to converge. The relaxation
 % matrix should *not* be thermalized.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=Overtone_a.m>
 

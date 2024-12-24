@@ -20,7 +20,7 @@
 %        a column vector of irreducible spherical tensor coefficients in
 %        the following order: T(2,2), T(2,1), T(2,0), T(2,-1), T(2,-2).
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=dcm2wigner.m>
 

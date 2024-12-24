@@ -25,7 +25,7 @@
 %       precision answers up to about L=1e4. A faster implementation for
 %       low ranks is available in cg_fast.m function.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=clebsch_gordan.m>
 

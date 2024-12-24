@@ -11,7 +11,7 @@
 %
 %   sys, inter - input data structures for Spinach
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.j.allami@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=fatty_acid.m>

@@ -7,7 +7,7 @@
 % Calculation time: hours, line-by-line plotting 
 %
 % maria-grazia.concilio@weizmann.ac.il
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function fig_1_exch_and_field_scan()
 

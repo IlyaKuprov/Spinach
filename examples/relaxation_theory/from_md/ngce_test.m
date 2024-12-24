@@ -4,7 +4,7 @@
 %
 % Calculation time: minutes.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % jpresteg@uga.edu
 
 function ngce_test()

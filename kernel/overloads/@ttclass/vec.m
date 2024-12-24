@@ -10,7 +10,7 @@
 %          stent with tensor train Kronecker product operation output.
 %
 % d.savostyanov@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=ttclass/vec.m>
 

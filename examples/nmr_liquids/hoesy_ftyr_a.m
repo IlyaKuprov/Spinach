@@ -5,7 +5,7 @@
 %
 % Calculation time: minutes
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function hoesy_ftyr_a()
 

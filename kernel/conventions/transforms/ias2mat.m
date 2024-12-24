@@ -20,7 +20,7 @@
 %
 %   C - real 3x3 matrix
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=ias2mat.m>
 

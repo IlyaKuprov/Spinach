@@ -29,7 +29,7 @@
 %       memory footprint to the absolute minimum and work around 
 %       the sparse matrix addition efficiency problem.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % ledwards@cbs.mpg.de
 % hannah.hogben@chem.ox.ac.uk
 % d.savostyanov@soton.ac.uk

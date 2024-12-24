@@ -63,7 +63,7 @@
 % Note: perturbative corrections to the rotating frame transformation are 
 %       not supported - use singlerot.m instead.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=gridfree.m>
 

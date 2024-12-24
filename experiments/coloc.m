@@ -33,7 +33,7 @@
 %       dilution functionality. See dilute.m function.
 % 
 % b.macaulay@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=coloc.m>
 

@@ -3,7 +3,7 @@
 % metric irreducible representation of S3(x)S3(x)S3 per-
 % mutation symmetry group.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function symmetry_2()
 

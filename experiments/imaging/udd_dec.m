@@ -25,7 +25,7 @@
 %       parameters.coil_st, the coil phantom is ignored.
 %
 % a.j.allami@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=udd_dec.m>
 

@@ -16,7 +16,7 @@
 % spin couplings are ignored) or 'couplings' (in which case all Zeeman
 % interactions are ignored).
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=assume.m>
 

@@ -2,7 +2,7 @@
 %
 % Calculation time: minutes
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % mrw1g16@soton.ac.uk
 
 function ct_hsqc_strychnine()

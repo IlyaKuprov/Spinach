@@ -4,7 +4,7 @@
 %
 % Calculation time: hours
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % dmitry.shishmarev@sydney.edu.au
 % philip.kuchel@sydney.edu.au
 

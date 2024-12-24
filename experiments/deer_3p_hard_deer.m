@@ -59,7 +59,7 @@
 %       must be supplied.
 %
 % ledwards@cbs.mpg.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % nurit.manukovsky@weizmann.ac.il
 % daniella.goldfarb@weizmann.ac.il
 %

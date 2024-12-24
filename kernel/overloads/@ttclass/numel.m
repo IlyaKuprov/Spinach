@@ -15,7 +15,7 @@
 %       to fit into the 64-bit integer.
 %
 % d.savostyanov@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=ttclass/numel.m>
 

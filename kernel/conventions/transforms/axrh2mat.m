@@ -26,7 +26,7 @@
 %
 % Note: the inverse transformation is ill-defined.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=axrh2mat.m>
 

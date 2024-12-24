@@ -39,7 +39,7 @@
 % Note: the relaxation superoperator must NOT be thermalized for
 %       this type of calculation (inter.equilibrium='zero').
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % alexander.karabanov@nottingham.ac.uk
 % walter.kockenberger@nottingham.ac.uk
 % m.g.concilio@soton.ac.uk

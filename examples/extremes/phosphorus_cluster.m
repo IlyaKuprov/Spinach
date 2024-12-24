@@ -6,7 +6,7 @@
 %
 % Run time on the above: hours
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function phosphorus_cluster()
 

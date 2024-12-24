@@ -21,7 +21,7 @@
 %        data (e.g. NOESY), fid.cos and fid.sin matrices must
 %        be supplied as a structure.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=s2json.m>
 

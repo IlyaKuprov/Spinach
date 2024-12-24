@@ -29,7 +29,7 @@
 %       on; the one used here was tested against pure numerics and
 %       found to be correct.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=quad_shift.m>
 

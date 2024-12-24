@@ -2,7 +2,7 @@
 % polarisation relationships with inner products of irre-
 % ducible spherical tensor coefficients, second rank.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function blinv_test()
 

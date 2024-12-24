@@ -33,7 +33,7 @@
 % Note: a good initial guess for the paramagnetic centre location is
 %       essential for a successful fit.
 % 
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % e.suturina@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=Ippcs.m>

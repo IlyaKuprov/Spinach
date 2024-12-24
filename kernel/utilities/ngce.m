@@ -33,7 +33,7 @@
 % Note: the result is returned in the LABORATORY FRAME - eli-
 %       minating non-secular terms is user's responsibility.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % jpresteg@uga.edu
 %
 % <https://spindynamics.org/wiki/index.php?title=ngce.m>

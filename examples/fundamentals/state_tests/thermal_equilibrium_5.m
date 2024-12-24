@@ -1,7 +1,7 @@
 % Cross-formalism test of state recovery towards the 
 % thermodynamic equilibrium.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function thermal_equilibrium_5()
 

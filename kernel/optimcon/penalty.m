@@ -59,7 +59,7 @@
 % the time discretization points. Gradient dimensions and element or-
 % der are the same as the input waveform dimensions and element order.
 % 
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % david.goodwin@inano.au.dk
 %
 % <https://spindynamics.org/wiki/index.php?title=penalty.m>

@@ -62,7 +62,7 @@
 %       luding infinite order. See the header of rotframe.m for further
 %       information.
 %
-% i.kuprov@soton.ac.uk
+% i.kuprov@soton.ac.nn.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=crystal.m>
 

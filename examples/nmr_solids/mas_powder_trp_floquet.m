@@ -5,7 +5,7 @@
 %
 % Calculation time: days (hours with a Tesla card)
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % giuseppe.pileio@soton.ac.uk
 % maria.concistre@soton.ac.uk
 

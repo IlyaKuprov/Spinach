@@ -32,7 +32,7 @@
 % Note: exponential recombination kinetics is built into this func-
 %       tion, do not combine with inter.chem.rp_rates parameter.
 % 
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % h.j.hogben@chem.ox.ac.uk
 % peter.hore@chem.ox.ac.uk
 %

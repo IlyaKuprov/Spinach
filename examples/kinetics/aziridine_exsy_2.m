@@ -11,7 +11,7 @@
 %
 % Calculation time: minutes on a Tesla V100 GPU, much longer on CPU
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % barbara.odell@chem.ox.ac.uk
 % tim.claridge@chem.ox.ac.uk
 

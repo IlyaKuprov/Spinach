@@ -56,7 +56,7 @@
 %                       isotropic parts of tensors be-
 %                       fore plotting
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=hfc_display.m>
 

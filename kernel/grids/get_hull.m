@@ -23,7 +23,7 @@
 %                  dimension Nx2, where N is the
 %                  number of grid edges
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=get_hull.m>
 

@@ -25,7 +25,7 @@
 %  mri - MRI image with square sinebell apodisation.
 %
 % a.j.allami@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=fse.m>
 

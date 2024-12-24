@@ -12,7 +12,7 @@
 %              dimension with room for the specified num-
 %              ber of non-zeroes
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=mprealloc.m>
 

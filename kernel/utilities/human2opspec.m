@@ -44,7 +44,7 @@
 % Notes: direct calls to this function are not necessary, use operator.m and
 %        state.m functions instead.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=human2opspec.m>

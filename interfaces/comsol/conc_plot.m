@@ -31,7 +31,7 @@
 %
 %    the function updates a figure created by mesh_plot()
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=conc_plot.m>
 

@@ -45,7 +45,7 @@
 %       sys.labels for this sequence to work properly.
 %
 % m.walker@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=hcch_cosy.m>
 

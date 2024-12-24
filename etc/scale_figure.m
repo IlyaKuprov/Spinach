@@ -8,7 +8,7 @@
 %   by     -  two-element row vector of scaling factors,
 %             format: [width height]
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=scale_figure.m>
 

@@ -15,7 +15,7 @@
 %
 %     A - fractional singlet yield
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % h.j.hogben@chem.ox.ac.uk
 % peter.hore@chem.ox.ac.uk
 %

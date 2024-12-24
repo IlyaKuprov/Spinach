@@ -8,7 +8,7 @@
 % Calculation time: seconds
 %
 % m.g.concilio@soton.ac.uk 
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function freq_scan_main_text()
 

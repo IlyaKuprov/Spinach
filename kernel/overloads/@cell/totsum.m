@@ -13,7 +13,7 @@
 % Notes: if all elements of A are sparse, a sparse result
 %        will be returned.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=cell/totsum.m>
 

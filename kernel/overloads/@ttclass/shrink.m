@@ -5,7 +5,7 @@
 % Returns a single tensor train with right-to-left orthogonalisation.
 %
 % d.savostyanov@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=ttclass/shrink.m>
 

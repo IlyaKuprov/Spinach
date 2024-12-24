@@ -1,6 +1,6 @@
 % GPU arithmetic benchmark - 3D Fourier transforms.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function fft_gpu()
 

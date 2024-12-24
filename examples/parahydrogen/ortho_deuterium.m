@@ -5,7 +5,7 @@
 %
 % Simulation time: seconds
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % anakin.aden@mpinat.mpg.de 
 
 function ortho_deuterium()

@@ -23,7 +23,7 @@
 %
 % Note: this function requires a spherical tensor basis set.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % kpervushin@ntu.edu.sg
 %
 % <https://spindynamics.org/wiki/index.php?title=stateinfo.m>

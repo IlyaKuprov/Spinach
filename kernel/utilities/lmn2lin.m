@@ -25,7 +25,7 @@
 %       I   - linear indices of Wigner D functions, with
 %             I=1 corresponding to L=0, M=0, N=0.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=lmn2lin.m>
 

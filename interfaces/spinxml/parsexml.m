@@ -14,7 +14,7 @@
 %   xml      - Matlab structure containing the 
 %              information from the XML file
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=parsexml.m>
 

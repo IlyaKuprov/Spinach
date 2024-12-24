@@ -7,7 +7,7 @@
 %
 % Calculation time: milliseconds
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function cross_effect_mas_enlev()
 

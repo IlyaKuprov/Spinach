@@ -46,7 +46,7 @@
 %       corresponding sparse matrix.
 %
 % a.j.allami@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=v2fplanck.m>
 

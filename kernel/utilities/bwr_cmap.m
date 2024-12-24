@@ -11,7 +11,7 @@
 %
 %    cmap - colour map in Matlab format
 %   
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=bwr_cmap.m>
 

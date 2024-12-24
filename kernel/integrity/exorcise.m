@@ -16,7 +16,7 @@
 % involved. Always run this function before a commit if you
 % have write access to Spinach repository.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=exorcise.m>
 

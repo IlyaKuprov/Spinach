@@ -3,7 +3,7 @@
 %
 % Calculation time: seconds
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function noe_two_spin_het()
 

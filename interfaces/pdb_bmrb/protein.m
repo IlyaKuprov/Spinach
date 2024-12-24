@@ -52,7 +52,7 @@
 %
 %    aux.pdb_aa_typ        - pdb amino acid type for each spin
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % zenawi.welderufael@soton.ac.uk
 % andras_boeszoermenyi@hms.harvard.edu
 % matt.walker@soton.ac.uk

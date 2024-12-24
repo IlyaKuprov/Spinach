@@ -3,7 +3,7 @@
 %
 % Calculation time: minutes
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function lanthanide_powder()
 

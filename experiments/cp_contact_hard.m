@@ -42,7 +42,7 @@
 % marina.carravetta@soton.ac.uk
 % p.t.williamson@soton.ac.uk
 % guinevere.mathies@uni-konstanz.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=cp_contact_hard.m>
 

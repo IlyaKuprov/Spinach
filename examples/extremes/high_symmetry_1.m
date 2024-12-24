@@ -7,7 +7,7 @@
 %
 % Run time on the above: hours
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % eberhard.matern@t-online.de
 
 function high_symmetry_1()

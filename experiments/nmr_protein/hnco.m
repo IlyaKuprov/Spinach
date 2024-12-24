@@ -44,7 +44,7 @@
 %       sys.labels for this sequence to work properly.
 %
 % ledwards@cbs.mpg.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=hnco.m>
 

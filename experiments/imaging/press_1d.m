@@ -28,7 +28,7 @@
 %
 %    fid - free induction decay of the NMR spectrum
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % a.j.allami@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=press_1d.m>

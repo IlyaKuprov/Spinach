@@ -29,7 +29,7 @@
 %                                gradient, seconds.
 %
 % m.g.concilio@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=mri_2d_plot.m>
 

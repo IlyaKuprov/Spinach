@@ -20,7 +20,7 @@
 %       is irregular and must rely on explicitly stockpiled coeffi-
 %       cients. Only ranks smaller or equal to 12 are available.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % e.suturina@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=stevens.m>

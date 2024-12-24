@@ -27,7 +27,7 @@
 % Automatic caching is implemented - the function would not re-
 % compute operator sets that it can find on disk.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=sle_operators.m>

@@ -65,7 +65,7 @@
 %       in this function see http://dx.doi.org/10.1039/C4CP03106G
 %
 % gareth.charnock@oerc.ox.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % e.suturina@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=Ipcs.m>

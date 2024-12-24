@@ -44,7 +44,7 @@
 %    inter.coupling.scalar - Nspins x Nspins cell array of sca-
 %                            lar couplings, all in Hz.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=Nuclacid.m>
 

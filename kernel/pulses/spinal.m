@@ -12,7 +12,7 @@
 %    phi - the phase of the n-th pulse in 
 %          SPINAL sequence, radians
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % m.carravetta@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=spinal.m>

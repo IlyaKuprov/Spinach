@@ -12,7 +12,7 @@
 %
 %   M     - an OPIUM representing the specified matrix
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=opium/opium.m>
 

@@ -14,7 +14,7 @@
 %
 %    fid - free induction decay throughout the sequence
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=cpmg.m>
 

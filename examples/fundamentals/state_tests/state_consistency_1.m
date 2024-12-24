@@ -2,7 +2,7 @@
 % generation across the three formalisms supported by
 % Spinach. Two- and four-spin states are tested.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function state_consistency_1()
 

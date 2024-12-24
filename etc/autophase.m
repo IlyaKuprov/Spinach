@@ -1,6 +1,6 @@
 % Chebyshev phase corrector for 1D NMR spectra.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function [spec,cheb_coeffs]=autophase(spec,guess)
 

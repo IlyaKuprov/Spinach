@@ -3,7 +3,7 @@
 % Calculation time: seconds
 %
 % lewis.robertson@csiro.au
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function pure_nqr_nitrogen()
 

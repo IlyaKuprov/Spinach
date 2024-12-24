@@ -3,7 +3,7 @@
 % the log and for a text file containing the property calcula-
 % tion header. Some paths are hard-coded; edit as appropriate.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=gslice.m>
 

@@ -4,7 +4,7 @@
 % Calculation time: minutes
 %
 % e.suturina@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function nuclear_relaxation_1()
 

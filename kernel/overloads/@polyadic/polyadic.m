@@ -26,7 +26,7 @@
 % Note: nested polyadics are permitted - the input matrices may be
 %       polyadics themselves.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=polyadic.m>
 

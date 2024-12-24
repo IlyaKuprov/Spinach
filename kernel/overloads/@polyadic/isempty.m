@@ -11,7 +11,7 @@
 %
 %   answer - a logical value
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=polyadic/isempty.m>
 

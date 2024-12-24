@@ -47,7 +47,7 @@
 % Note: second rank rotational correlation times (as per Spinach input) 
 %       will be updated automatically if other ranks are specified.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=corrfun.m>
 

@@ -26,7 +26,7 @@
 %
 %    time_grid - row vector of time grid ticks
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=fapt2sfo.m>
 

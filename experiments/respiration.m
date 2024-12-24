@@ -33,7 +33,7 @@
 %
 % venkata-subbarao.redrouthu@uni-konstanz.de
 % guinevere.mathies@uni-konstanz.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=respiration.m>
 

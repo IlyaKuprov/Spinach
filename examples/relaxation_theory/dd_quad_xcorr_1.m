@@ -6,7 +6,7 @@
 %
 % Calculation time: seconds
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function dd_quad_xcorr_1()
 

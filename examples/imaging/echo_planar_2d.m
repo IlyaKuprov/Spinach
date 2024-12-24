@@ -3,7 +3,7 @@
 % Simulation time: seconds, faster with a Tesla V100 GPU.
 %
 % a.j.allami@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function echo_planar_2d()
 

@@ -11,7 +11,7 @@
 %
 %    A   -  a cell array of matrices
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=cell/inflate.m>
 

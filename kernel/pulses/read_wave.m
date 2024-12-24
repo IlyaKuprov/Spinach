@@ -25,7 +25,7 @@
 % Note: put your own pulses into /kernel/pulses/pk_files; please
 %       also consider sending them to us.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % kpervushin@ntu.edu.sg
 % m.g.concilio@soton.ac.uk
 %

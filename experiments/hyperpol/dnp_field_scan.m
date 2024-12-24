@@ -49,7 +49,7 @@
 %       assumed to be the same at all fields in the sweep - DO NOT
 %       USE with broad magnetic field sweep experiments.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=dnp_field_scan.m>
 

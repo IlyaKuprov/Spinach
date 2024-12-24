@@ -24,7 +24,7 @@
 % Note: if H1(t) has a non-zero time or ensemble average value,
 %       that average must be subtracted out and placed into H0
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rlx_scalar.m>
 

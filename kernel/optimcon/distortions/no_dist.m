@@ -17,7 +17,7 @@
 %    J         - a sparse unit matrix with the dimension mat-
 %                ching the vectorisation of the input
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=no_dist.m>
 

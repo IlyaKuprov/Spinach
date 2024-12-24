@@ -4,7 +4,7 @@
 % Calculation time: seconds
 %
 % Ronghui Zhou (hui@ufl.edu)
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function pasadena_propanal()
 

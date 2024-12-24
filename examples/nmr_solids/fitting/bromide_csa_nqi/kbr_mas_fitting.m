@@ -9,7 +9,7 @@
 %
 % sanjay.vinod-kumar@uni-konstanz.de
 % guinevere.mathies@uni-konstanz.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function kbr_mas_fitting()
 

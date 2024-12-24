@@ -10,7 +10,7 @@
 % Calculation time: minutes.
 %
 % david.goodwin@inano.au.dk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function features_phase_cycle()
 

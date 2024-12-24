@@ -18,7 +18,7 @@
 %     xyz   - a column cell array of Cartesian XYZ row
 %             vectors; carbon is the first atom
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=methyl_group.m>
 

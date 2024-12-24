@@ -4,7 +4,7 @@
 % Calculation time: minutes
 %
 % Zak El-Machachi
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function hoesy_camphor()
 

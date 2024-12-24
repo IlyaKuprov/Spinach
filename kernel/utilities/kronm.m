@@ -13,7 +13,7 @@
 %
 %    x -    a vector or a matrix of appropriate dimension
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=kronm.m>
 

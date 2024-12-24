@@ -27,7 +27,7 @@
 % Notes: pilot implementation with slow indexing, needs
 %        a high-performance overhaul
 %
-% i.kuprov@soton.ac.uk
+% i.kuproprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=react_gen.m>
 

@@ -16,7 +16,7 @@
 %
 %     Kil  -   Killing form (expensive)
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=lorentz.m>
 

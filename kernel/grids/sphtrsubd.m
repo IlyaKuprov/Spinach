@@ -14,7 +14,7 @@
 %   r12,r23,r31 - three-element unit vectors with Cartesian
 %                 coordinates of triangle arc midpoints
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=sphtrsubd.m>
 

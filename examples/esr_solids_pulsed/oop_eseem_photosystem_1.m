@@ -15,7 +15,7 @@
 %
 % Calculation time: seconds
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function oop_eseem_photosystem_1()
 

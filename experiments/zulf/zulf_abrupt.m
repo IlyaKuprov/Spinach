@@ -39,7 +39,7 @@
 % Note: this function ignores the offset parameter and makes its
 %       own Hamiltonian.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=zulf_abrupt.m>
 

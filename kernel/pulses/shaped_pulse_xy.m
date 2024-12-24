@@ -56,7 +56,7 @@
 %
 %           P - effective pulse propagator (expensive, best avoided)
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % a.acharya@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=shaped_pulse_xy.m>

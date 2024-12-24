@@ -15,7 +15,7 @@
 %    r   - the number of singular values to keep
 %
 % d.savostyanov@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=frob_chop.m>
 

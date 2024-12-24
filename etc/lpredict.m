@@ -16,7 +16,7 @@
 %      y        - predicted points
 %
 % malcolm.lidierth@kcl.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=lpredict.m>
 

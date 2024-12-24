@@ -20,7 +20,7 @@
 %    spin_system - updated data structure
 %
 % a.acharya@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=mesh_crop.m>
 

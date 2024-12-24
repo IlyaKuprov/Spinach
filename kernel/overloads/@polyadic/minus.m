@@ -15,7 +15,7 @@
 % Note: use this operation sparingly - the subtractions are simply 
 %       buffered, and all subsequent operations will be slower.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=polyadic/minus.m>
 

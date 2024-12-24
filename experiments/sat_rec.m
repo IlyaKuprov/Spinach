@@ -30,7 +30,7 @@
 % Note: the relaxation superoperator must be thermalised.
 %
 % Zak El-Machachi
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=sat_rec.m>
 

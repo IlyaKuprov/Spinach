@@ -34,7 +34,7 @@
 %       is used - must be replaced with an analytical expression!
 %
 % ke.dai@weizmann.ac.il
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=qxspen_kernel.m>
 

@@ -56,7 +56,7 @@
 %
 % Note: relaxation and chemical kinetics are not included.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rotor_stack.m>
 

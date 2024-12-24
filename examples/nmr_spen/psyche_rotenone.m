@@ -3,7 +3,7 @@
 % Calculation time: hours on NVidia Tesla A100, much longer on CPU
 %
 % mohammadali.foroozandeh@chem.ox.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function psyche_rotenone()
 

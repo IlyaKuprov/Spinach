@@ -2,7 +2,7 @@
 % in https://doi.org/10.1039/d1cp04186j
 %
 % maria-grazia.concilio@weizmann.ac.il
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function [sys,inter,bas,parameters]=system_specification()
 

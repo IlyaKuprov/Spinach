@@ -34,7 +34,7 @@
 %                ents of T(2,2), T(2,1), T(2,0), T(2,-1) and T(2,-2)
 %                in the spherical tensor expansion.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=mat2sphten.m>
 

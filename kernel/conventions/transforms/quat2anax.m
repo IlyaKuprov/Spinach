@@ -16,7 +16,7 @@
 %
 %     rot_angle - rotation angle in radians
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=quat2anax.m>
 

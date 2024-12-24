@@ -36,7 +36,7 @@
 %       it is best to disable zero track elimination by adding 'zte'
 %       to the sys.disable cell array. 
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=zte.m>
 

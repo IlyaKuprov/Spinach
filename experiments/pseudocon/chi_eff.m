@@ -25,7 +25,7 @@
 %     pred_pcs - predicted pseudocontact shift at each nucleus with
 %                the optimised mxyz and chi, ppm.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % e.suturina@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=chi_eff.m>

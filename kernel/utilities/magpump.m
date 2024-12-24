@@ -23,7 +23,7 @@
 % Note: this function is only available in sphten-liouv formalism, and
 %       may be called repeatedly if multiple states are pumped.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=magpump.m>
 

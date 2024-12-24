@@ -6,7 +6,7 @@
 %
 % Calculation time: seconds.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % u.rasulov@soton.ac.uk
 
 function rlc_response_1(interp_type)

@@ -85,7 +85,7 @@
 %       buted Computing Toolbox - different system orientations are eva-
 %       luated on different Matlab workers.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=singlerot.m>
 

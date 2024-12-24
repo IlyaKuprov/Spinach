@@ -15,7 +15,7 @@
 %   rho     - a density matrix (Hilbert space) or
 %             a state vector (Liouville space) 
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % ttheis@ncsu.edu
 %
 % <https://spindynamics.org/wiki/index.php?title=four_spin_states.m>

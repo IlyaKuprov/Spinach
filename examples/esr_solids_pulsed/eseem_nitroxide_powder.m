@@ -6,7 +6,7 @@
 % Calculation time: seconds
 %
 % ledwards@cbs.mpg.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function eseem_nitroxide_powder()
 

@@ -3,7 +3,7 @@
 % Calculation time: seconds
 %
 % a.j.allami@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function m2s_example()
 

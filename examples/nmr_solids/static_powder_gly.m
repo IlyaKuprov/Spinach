@@ -3,7 +3,7 @@
 %
 % Calculation time: seconds
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function static_powder_gly()
 

@@ -30,7 +30,7 @@
 %
 %     parameters.sweep should be set equal to parameters.rate
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % m.carravetta@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=mqmas.m>

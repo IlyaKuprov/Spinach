@@ -42,7 +42,7 @@
 %
 % matthew.krzystyniak@oerc.ox.ac.uk
 % a.biternas@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=spin.m>
 

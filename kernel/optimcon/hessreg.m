@@ -20,7 +20,7 @@
 %          of RFO iterations taken
 %
 % david.goodwin@inano.au.dk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=hessreg.m>
 

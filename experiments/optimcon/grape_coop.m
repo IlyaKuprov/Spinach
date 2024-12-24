@@ -20,7 +20,7 @@
 %
 % Note: only phase-modulated point-to-point transformations are supported.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=grape_coop.m>
 

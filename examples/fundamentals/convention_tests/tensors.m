@@ -1,7 +1,7 @@
 % Test the conversion from Stevens operator coefficients to
 % irreducible spherical tensor coefficients.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function tensors()
 

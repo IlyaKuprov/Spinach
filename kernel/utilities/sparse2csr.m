@@ -17,7 +17,7 @@
 %           col_idx - column index array of the CSR format
 %
 % dgleich@purdue.edu
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=sparse2csr.m>
 

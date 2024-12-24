@@ -25,7 +25,7 @@
 %           of projections
 %
 % e.suturina@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=stev2sph.m>
 

@@ -1,6 +1,6 @@
 % A test of Equation 3 in http://dx.doi.org/10.1002/chem.200902300
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function invariants()
 

@@ -14,7 +14,7 @@
 % the parallelisation call stack. When it is, the asynchronous
 % include is called instead.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=redfield_integral_serial.m>
 

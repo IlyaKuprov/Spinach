@@ -40,7 +40,7 @@
 %
 % Note: penalities are computed using the rectilinear representation.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=grape_curv.m>
 

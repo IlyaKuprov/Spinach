@@ -41,7 +41,7 @@
 %                            gation, 'evolution' for Spin-
 %                            ach evolution function
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=sp_acquire.m>
 

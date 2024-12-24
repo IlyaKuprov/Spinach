@@ -8,7 +8,7 @@
 % Run time: minutes on NVidia Tesla A100, much longer on CPU
 %
 % m.g.concilio@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function conv_test()
 

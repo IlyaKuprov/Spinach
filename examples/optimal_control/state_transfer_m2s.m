@@ -6,7 +6,7 @@
 %
 % Calculation time: many hours.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.acharya@soton.ac.uk
 
 function state_transfer_m2s()

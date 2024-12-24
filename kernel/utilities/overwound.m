@@ -24,7 +24,7 @@
 %       spatial grid point count shuld be set to several times the
 %       minimum Nyquist value.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=overwound.m>
 

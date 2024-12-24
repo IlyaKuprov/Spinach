@@ -32,7 +32,7 @@
 % Note: natural abundance simulations should make use of the isotope
 %       dilution functionality. See dilute.m function.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=hsqc.m>

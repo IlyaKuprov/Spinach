@@ -6,7 +6,7 @@
 % Calculation time: a week on 32 cores, needs 512 GB of RAM.
 %
 % ledwards@cbs.mpg.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % andras_boeszoermenyi@hms.harvard.edu
 
 function noesyhsqc_ubiquitin_deut()

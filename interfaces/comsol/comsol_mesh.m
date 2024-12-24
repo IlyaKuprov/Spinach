@@ -24,7 +24,7 @@
 %       mesh.idx.rectangles - four-column array of integers
 %                             containing rectangle index
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % a.acharya@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=comsol_mesh.m>

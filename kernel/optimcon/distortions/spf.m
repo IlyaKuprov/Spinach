@@ -31,7 +31,7 @@
 %          tions of the output and the input arrays
 %
 % u.rasulov@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=spf.m>
 
@@ -51,8 +51,8 @@ else
     % Autodiff call including Jacobian
     [w,J]=dlfeval(@distort,dlarray(w(:)),p,size(w));
 
-    % Strip the autodiff rigging
-    w=extractdata(w); J=extractdata(J);
+    % Strip autodiff rigging; kill Wirtinger terms
+    w=extractdata(w); J=extractdata(J); J=real(J);
 
 end
 

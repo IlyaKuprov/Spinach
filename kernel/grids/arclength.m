@@ -12,7 +12,7 @@
 %
 %   sig      - arc length
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=arclength.m>
 

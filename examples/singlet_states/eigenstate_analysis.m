@@ -2,7 +2,7 @@
 % finding out which component of the singlet state commutes with
 % the drift Hamiltonian.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function eigenstate_analysis()
 

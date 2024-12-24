@@ -12,7 +12,7 @@
 %
 %   answer     - all input parameters as a cell array
 % 
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=impound.m>
 

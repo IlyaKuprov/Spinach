@@ -18,7 +18,7 @@
 %     S      - the solid angle, radians
 %
 % brunoluong@yahoo.com
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=one_vcell_solidangle.m>
 

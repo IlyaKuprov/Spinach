@@ -24,7 +24,7 @@
 % Note: CSA relaxation rate expressions do not depend on 
 %       the spin quantum number
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=rlx_csa.m>
 

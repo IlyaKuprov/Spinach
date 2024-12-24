@@ -4,7 +4,7 @@
 % Calculation time: hours.
 %
 % ledwards@cbs.mpg.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function noesy_ubiquitin()
 

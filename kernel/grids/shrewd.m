@@ -27,7 +27,7 @@
 %     weights - a vector of grid weights for each 
 %               [alpha beta gamma] point supplied.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=shrewd.m>
 

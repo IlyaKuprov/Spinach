@@ -15,7 +15,7 @@
 %        Clebsch-Gordan coefficients and other objects that in-
 %        volve factorials.
 % 
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=logfactorial.m>
 

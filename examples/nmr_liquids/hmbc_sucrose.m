@@ -4,7 +4,7 @@
 % Calculation time: seconds
 %
 % Bud Macaulay
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function hmbc_sucrose()
 

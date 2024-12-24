@@ -30,7 +30,7 @@
 %
 %    this function produces a figure
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=plot_1d.m>

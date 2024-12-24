@@ -5,7 +5,7 @@
 %
 % Calculation time: seconds
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % u.rasulov@soton.ac.uk
 
 function aht_benchmark()

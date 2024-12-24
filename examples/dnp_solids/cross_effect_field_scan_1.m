@@ -4,7 +4,7 @@
 %
 % Calculation time: hours
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function cross_effect_field_scan_1()
 

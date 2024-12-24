@@ -1,7 +1,7 @@
 % An include that starts profiling infrastructure around parallel
 % stages. Should be invoked just before a parfor or an spmd.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=parallel_profiler_start.m>
 

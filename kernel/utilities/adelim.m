@@ -31,7 +31,7 @@
 %       there the basis states are attributable to indivi-
 %       dual spins.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=adelim.m>
 

@@ -19,7 +19,7 @@
 %       in the log for ALL atoms in the molecule, otherwise the parser
 %       would get confused and throw an error.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=oparse.m>
 

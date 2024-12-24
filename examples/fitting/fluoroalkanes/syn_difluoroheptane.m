@@ -8,7 +8,7 @@
 %
 % Calculation time: hours
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % neil.wells@soton.ac.uk
 % bruno.linclau@soton.ac.uk
 

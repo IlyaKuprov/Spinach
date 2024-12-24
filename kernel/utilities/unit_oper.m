@@ -17,7 +17,7 @@
 %    A            - a sparse unit matrix of appropriate
 %                   dimension 
 % 
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 % d.savostyanov@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=unit_oper.m>

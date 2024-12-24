@@ -28,7 +28,7 @@
 %     sangles  - (n x 1) array, solid angles of each Voronoi cell
 %
 % brunoluong@yahoo.com
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=voronoisphere.m>
 

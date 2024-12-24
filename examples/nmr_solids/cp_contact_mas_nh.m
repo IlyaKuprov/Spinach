@@ -4,7 +4,7 @@
 %
 % Calculation time: seconds
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % aanevzor@ncsu.edu
 
 function cp_contact_mas_nh()

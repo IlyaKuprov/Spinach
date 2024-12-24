@@ -23,7 +23,7 @@
 %     spc_dim     - dimension of the classical dynamics
 %                   subspace (e.g. rotor grid in MAS)
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=drifts.m>
 

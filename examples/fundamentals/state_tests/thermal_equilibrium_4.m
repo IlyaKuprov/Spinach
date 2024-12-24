@@ -1,7 +1,7 @@
 % Test of the invariance of the thermal equilibrium state under the
 % thermalised relaxation superoperator.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function thermal_equilibrium_4()
 

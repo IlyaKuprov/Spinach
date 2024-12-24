@@ -16,7 +16,7 @@
 %     phi    - array of azimuth values
 %
 % e.suturina@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=xyz2sph.m>
 

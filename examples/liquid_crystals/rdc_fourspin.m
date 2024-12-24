@@ -3,7 +3,7 @@
 %
 % Calculation times: seconds.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function rdc_fourspin()
 

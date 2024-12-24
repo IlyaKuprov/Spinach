@@ -53,7 +53,7 @@
 % Note: the rank parameter should be increased until conver-
 %       gence is achieved in the output.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=holeburn.m>
 

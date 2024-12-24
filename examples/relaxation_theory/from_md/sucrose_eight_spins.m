@@ -16,7 +16,7 @@
 %                   computing MD frame Hamiltonians
 %
 % jpresteg@uga.edu
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function sucrose_eight_spins()
 

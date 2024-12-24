@@ -30,7 +30,7 @@
 %       tra orthogonalisation step is therefore applied to make them ortho-
 %       gonal as vectors. As a result, some functions may be upside-down.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=wave_basis.m>
 

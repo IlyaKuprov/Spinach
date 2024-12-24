@@ -20,7 +20,7 @@
 %   S        - Saupe order matrix, a symmetric real
 %              dimensionless 3x3 matrix
 %                
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rdc_fit.m>
 

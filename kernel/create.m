@@ -382,8 +382,13 @@ if (~isworkernode)&&ismember('gpu',spin_system.sys.enable)...
     for n=1:numel(spin_system.sys.gpu_bind)
         bindings=[bindings; n*ones(spin_system.sys.gpu_bind(n),1)]; %#ok<AGROW> 
     end
-    spmd, G=gpuDevice(bindings(spmdIndex)); G.CachePolicy='minimum'; end
     
+    % Tell Matlab not to hog up GPU memory
+    spmd, G=gpuDevice(bindings(spmdIndex)); G.CachePolicy='minimum'; end
+
+    % GPUs hate sparse matrices filling up
+    spin_system.tols.dense_matrix=0.025;
+
 end
 
 % Spin system banner

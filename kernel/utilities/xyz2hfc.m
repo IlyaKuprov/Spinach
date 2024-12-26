@@ -22,7 +22,7 @@
 % Note: Gauss units are used for hyperfine couplings because 
 %       they do not depend on the electron g-tensor.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % e.suturina@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=xyz2hfc.m>

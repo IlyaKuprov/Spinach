@@ -21,7 +21,7 @@
 %     H  - effective evolution generator, to be used
 %          as exp(-1i*H*dt)
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.graham@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=isergen.m>

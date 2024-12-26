@@ -26,7 +26,7 @@
 %       off sharply with the nuclear spin quantum number for
 %       the same anisotropy parameter.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=eeqq2nqi.m>
 

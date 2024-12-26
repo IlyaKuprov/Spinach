@@ -7,7 +7,7 @@
 %
 % Calculation time: seconds, line-by-line plotting 
 %
-% maria-grazia.concilio@weizmann.ac.il
+% mariagrazia.concilio@sjtu.edu.cn
 % ilya.kuprov@weizmann.ac.il
 
 function fig_2_tau_and_field_traject()

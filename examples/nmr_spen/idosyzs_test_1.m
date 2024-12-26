@@ -6,7 +6,7 @@
 %
 % Calculation time: seconds on NVidia Tesla A100, much longer on CPU
 %
-% m.g.concilio@soton.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
 % ilya.kuprov@weizmann.ac.il
 % gareth.morris@manchester.ac.uk
 

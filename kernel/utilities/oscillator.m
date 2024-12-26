@@ -25,7 +25,7 @@
 % Note: gravitation is directed along the X axis. Finite difference
 %       derivative operators are used.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=oscillator.m>
 

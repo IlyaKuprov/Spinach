@@ -26,7 +26,7 @@
 %    fid        - two-dimensional free induction decay
 %
 % mrw1g16@soton.ac.uk
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ct_cosy.m>
 

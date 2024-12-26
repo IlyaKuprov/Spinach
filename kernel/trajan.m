@@ -58,7 +58,7 @@
 % Note: unit state population is ignored.
 %
 % gareth.charnock@oerc.ox.ac.uk
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=trajan.m>

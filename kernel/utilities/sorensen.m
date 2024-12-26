@@ -19,7 +19,7 @@
 %       may be smaller, see the detailed analysis here:
 %       https://doi.org/10.1080/00268979909483117
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=sorensen.m>
 

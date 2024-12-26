@@ -23,7 +23,7 @@
 %       the smallest eigenvalue, this includes signs.
 %
 % e.suturina@soton.ac.uk
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=tsm2param.m>
 

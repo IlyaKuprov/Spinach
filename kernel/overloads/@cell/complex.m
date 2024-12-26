@@ -10,7 +10,7 @@
 %
 %    A   -  a cell array of numeric objects
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=cell/complex.m>
 

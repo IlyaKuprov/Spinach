@@ -3,7 +3,7 @@
 % or GPU arithmetic, or some other specific hardware or soft-
 % ware configuration.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=autoexec.m>
 

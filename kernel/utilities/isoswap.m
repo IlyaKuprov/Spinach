@@ -20,7 +20,7 @@
 % Note: quadratic and higher order couplings are wiped and a warning
 %       is printed - those are not transferable.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=isoswap.m>
 

@@ -39,7 +39,7 @@
 %             with parameters.nsteps points in it
 %
 % ledwards@cbs.mpg.de
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % nurit.manukovsky@weizmann.ac.il
 % daniella.goldfarb@weizmann.ac.il
 %

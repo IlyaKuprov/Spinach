@@ -62,7 +62,7 @@
 %               a vector with the length matching the number of
 %               pulses in the sequence element (seconds)
 %               
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % m.carravetta@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rsequence.m>

@@ -30,7 +30,7 @@
 %          Bargon just Kroneckered up some Zeeman states and gave
 %          them what looked to him like appropriate labels.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % anakin.aden@mpinat.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=deut_pair.m>

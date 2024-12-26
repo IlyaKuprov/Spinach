@@ -31,7 +31,7 @@
 %
 %  mri - MRI image with square sinebell apodisation
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.j.allami@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=phase_enc_2d.m>

@@ -25,7 +25,7 @@
 % Note: this function requires sphten-liouv formalism and supports Fok-
 %       ker-Planck direct products.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=coherence.m>

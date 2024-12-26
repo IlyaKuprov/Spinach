@@ -14,7 +14,7 @@
 %
 %            A  - cleaned-up array
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % alex_nevzorov@ncsu.edu
 %
 % <https://spindynamics.org/wiki/index.php?title=clean_up.m>

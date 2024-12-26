@@ -29,7 +29,7 @@
 %
 %    fid - k-space signal, run an FT to get the image
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.j.allami@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=slice_select_1d.m>

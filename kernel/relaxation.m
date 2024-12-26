@@ -18,7 +18,7 @@
 % Note: a variety of relaxation theories are supported, see the relax-
 %       ation theory parameters section of the online manual.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 % alexander.karabanov@nottingham.ac.uk
 % walter.kockenberger@nottingham.ac.uk 

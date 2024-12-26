@@ -41,7 +41,7 @@
 %     theo_pcs  - predicted pseudocontact shift (in ppm) at 
 %                 each of the nuclei.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % e.suturina@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=lpcs.m>

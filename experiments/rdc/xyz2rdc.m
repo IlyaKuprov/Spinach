@@ -21,7 +21,7 @@
 %    rdc            - residual dipolar coupling in the
 %                     heteronuclear case, Hz
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=xyz2rdc.m>
 

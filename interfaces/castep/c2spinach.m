@@ -25,7 +25,7 @@
 % Notes: CASTEP has a printing bug with over 100 nuclei. A kind of
 %        workaround was implemented, but keep an eye on it.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=c2spinach.m>
 

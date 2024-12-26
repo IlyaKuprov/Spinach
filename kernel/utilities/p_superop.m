@@ -28,7 +28,7 @@
 % Note: the superoperator is returned in XYZ sparse format, which is 
 %       different from Matlab's CSC format.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % hannah.hogben@chem.ox.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=p_superop.m>

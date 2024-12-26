@@ -56,7 +56,7 @@
 %       supplied with sufficiently fine time discretisation to pro-
 %       perly reproduce the waveform.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=shaped_pulse_af.m>
 

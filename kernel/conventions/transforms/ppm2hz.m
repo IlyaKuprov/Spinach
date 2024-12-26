@@ -16,8 +16,8 @@
 %
 % Note: signs of the magnetogyric ratios are preserved.
 %
-% m.g.concilio@soton.ac.uk
-% ilya.kuprov@weizmann.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ppm2hz.m>
 

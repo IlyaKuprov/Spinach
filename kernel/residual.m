@@ -29,7 +29,7 @@
 %       text when when parameters.needs cell array contains 'rdc'.
 %
 % ledwards@cbs.mpg.de
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=residual.m>
 

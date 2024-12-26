@@ -14,7 +14,7 @@
 %      ang     - array of the same size with suscepti-
 %                bility values in cubic Angstrom
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=cgsppm2ang.m>
 

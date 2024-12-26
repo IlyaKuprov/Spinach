@@ -1,7 +1,7 @@
 % Tests NMRBox Matalb installation for basic parallel
 % pool sanity and stability.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=nmrbox_sanity_check.m>
 

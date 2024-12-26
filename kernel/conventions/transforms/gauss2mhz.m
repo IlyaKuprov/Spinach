@@ -17,7 +17,7 @@
 %
 %   hfc_mhz    - an array of values in MHz
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=gauss2mhz.m>
 

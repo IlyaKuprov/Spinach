@@ -7,7 +7,7 @@
 % werful, or renamed into something with a more informa-
 % tive name, which is printed in the error message.
 %
-% m.g.concilio@soton.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
 %
 % <https://spindynamics.org/wiki/index.php?title=mri_plot_2d.m>
 

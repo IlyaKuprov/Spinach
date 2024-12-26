@@ -48,7 +48,7 @@
 % gareth.charnock@oerc.ox.ac.uk
 % jennifer.handsel@stx.ox.ac.uk
 % janm@umbc.edu
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=gparse.m>
 

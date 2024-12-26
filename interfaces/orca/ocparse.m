@@ -22,7 +22,7 @@
 %
 %    dx,dy,dz - grid steps in the three directions, Angstrom
 %
-% Ilya Kuprov (ilya.kuprov@weizmann.ac.uk)
+% Ilya Kuprov (ilya.kuprov@weizmann.ac.il)
 % Elizaveta Suturina( e.suturina@soton.ac.uk)
 % Petra Pikulova (484677@mail.muni.cz)
 %

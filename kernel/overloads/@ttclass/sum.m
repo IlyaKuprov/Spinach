@@ -5,7 +5,7 @@
 % The sum is taken along the specified dimension (dim=1 or dim=2).
 %
 % d.savostyanov@soton.ac.uk
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ttclass/sum.m>
 

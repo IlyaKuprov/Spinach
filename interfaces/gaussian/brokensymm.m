@@ -20,7 +20,7 @@
 %     J           - an order-of-magnitude (really rough)
 %                   estimate of exchange coupling, Hz
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=brokensymm.m>
 

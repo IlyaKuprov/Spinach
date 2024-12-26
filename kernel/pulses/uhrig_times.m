@@ -15,7 +15,7 @@
 %                  after the first delay, and there is a 
 %                  delay after the last pulse
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.j.allami@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=uhrig_times.m>

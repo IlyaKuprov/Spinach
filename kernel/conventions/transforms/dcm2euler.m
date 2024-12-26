@@ -25,7 +25,7 @@
 %       derable work, it has passed rigorous testing: it either
 %       returns a correct answer or gives an informative error.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=dcm2euler.m>
 

@@ -44,7 +44,7 @@
 % Notes: for this experiment to work, relaxation must be present.  
 %
 % alice.bowen@chem.ac.uk
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ridme.m>
 

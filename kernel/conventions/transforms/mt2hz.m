@@ -17,7 +17,7 @@
 %
 %   hfc_hz     - an array of values in Hz
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=mt2hz.m>
 

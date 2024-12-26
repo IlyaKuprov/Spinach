@@ -19,7 +19,7 @@
 %
 %    va, vb, vc       - primitive lattice vectors
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=frac2cart.m>
 

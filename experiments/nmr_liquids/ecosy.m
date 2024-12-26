@@ -25,7 +25,7 @@
 % Notes: implemented up to six-quantum orders as per the original
 %        paper. Let us know if you need more.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ecosy.m>
 

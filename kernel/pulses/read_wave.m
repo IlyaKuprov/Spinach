@@ -25,9 +25,9 @@
 % Note: put your own pulses into /kernel/pulses/pk_files; please
 %       also consider sending them to us.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % kpervushin@ntu.edu.sg
-% m.g.concilio@soton.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
 %
 % <https://spindynamics.org/wiki/index.php?title=read_wave.m>
 

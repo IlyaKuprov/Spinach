@@ -35,7 +35,7 @@
 %     rho_b - state vector at the end of the evolution 
 %             time step
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.graham@soton.ac.uk
 % a.acharya@soton.ac.uk
 %

@@ -38,7 +38,7 @@
 %     plot(time_grid,[Cx; Cy]); kgrid; xlim tight;
 %     kxlabel('time, seconds'); kylabel('amplitude, rad/s');
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=sech_pulse.m>
 

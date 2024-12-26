@@ -60,7 +60,7 @@
 %       luding infinite order. See the header of rotframe.m for further
 %       information.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=liquid.m>
 

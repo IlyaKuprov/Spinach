@@ -12,7 +12,7 @@
 %
 %       d  - a logical number
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=krondelta.m>
 

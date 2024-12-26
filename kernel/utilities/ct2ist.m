@@ -21,7 +21,7 @@
 %     coeffs - coefficients with which the ISTs enter
 %              the linear combination
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ct2ist.m>
 

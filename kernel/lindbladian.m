@@ -24,7 +24,7 @@
 %                ced by the interaction A, such that
 %                <rho|R|rho>/norm(rho,2)^2 = -rlx_rate
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=lindbladian.m>
 

@@ -20,7 +20,7 @@
 %
 %     parameters.coil      - detection state, usually L+
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % m.carravetta@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=Overtone_dante.m>

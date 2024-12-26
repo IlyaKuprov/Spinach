@@ -23,7 +23,7 @@
 %
 %    weights - weights of the product grid
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=grid_kron.m>
 

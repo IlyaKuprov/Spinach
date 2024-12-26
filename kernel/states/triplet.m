@@ -17,7 +17,7 @@
 %               state vectors (Liouville space) of 
 %               TU, T0, and TD projections
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=triplet.m>
 

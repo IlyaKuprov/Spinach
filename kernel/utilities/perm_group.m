@@ -36,7 +36,7 @@
 %                              cible representation (in rows) of each
 %                              class (in columns).
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=perm_group.m>
 

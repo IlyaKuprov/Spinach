@@ -18,7 +18,7 @@
 %                       to the subgraph and 0 for spins that
 %                       do not
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % stst@uw.edu
 %
 % <https://spindynamics.org/wiki/index.php?title=dfpt.m>

@@ -30,7 +30,7 @@
 % N.B. free-particle magnetogyric ratios are used, use xyz2hfc.m
 %      if you have electrons in the system.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=xyz2dd.m>
 

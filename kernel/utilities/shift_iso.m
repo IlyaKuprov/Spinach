@@ -25,7 +25,7 @@
 %                     as 3x3 matrices 
 %
 % ledwards@cbs.mpg.de
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=shift_iso.m>
 

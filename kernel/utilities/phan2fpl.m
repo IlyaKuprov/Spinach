@@ -15,7 +15,7 @@
 %
 %        rho   - Fokker-Planck state vector
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=phan2fpl.m>
 

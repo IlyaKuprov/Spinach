@@ -1,7 +1,7 @@
 % Parameters of the 2e1n system used for the simulations reported
 % in https://doi.org/10.1039/d1cp04186j
 %
-% maria-grazia.concilio@weizmann.ac.il
+% mariagrazia.concilio@sjtu.edu.cn
 % ilya.kuprov@weizmann.ac.il
 
 function [sys,inter,bas,parameters]=system_specification()

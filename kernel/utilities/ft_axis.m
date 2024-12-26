@@ -15,7 +15,7 @@
 %
 %    ax       - row vector of axis ticks
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ft_axis.m>
 

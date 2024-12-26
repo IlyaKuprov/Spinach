@@ -39,7 +39,7 @@
 %       sophisticated gradient work, use the imaging context.
 %
 % ledwards@cbs.mpg.de
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=grad_sandw.m>
 

@@ -1,7 +1,7 @@
 % Distributes an array in the user-specified dimension.
 %
 % Mathworks, Inc.
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function A=distrib_dim(A,dim)
 

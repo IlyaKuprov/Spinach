@@ -61,7 +61,7 @@
 %        generate single-spin superoperators and multiply them up.
 %
 % ledwards@cbs.mpg.de
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=operator.m>
 

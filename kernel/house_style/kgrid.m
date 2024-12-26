@@ -2,7 +2,7 @@
 % produces grey (rather than black-and-transparent) grid
 % lines that are suitable for publishing.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=kgrid.m>
 

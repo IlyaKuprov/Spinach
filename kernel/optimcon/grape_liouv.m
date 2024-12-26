@@ -55,7 +55,7 @@
 %
 % david.goodwin@inano.au.dk
 % u.rasulov@soton.ac.uk
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % m.keitel@soton.ac.uk
 %
 % TODO (Keitel): add logic to avoid computing backward trajectory 

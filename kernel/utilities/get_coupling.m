@@ -12,7 +12,7 @@
 %
 %     A  - 3x3 coupling tensor in rad/s
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=get_coupling.m>
 

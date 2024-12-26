@@ -16,7 +16,7 @@
 %                   concentrations (in rows) at
 %                   each vertex of the mesh
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=comsol_conc.m>
 

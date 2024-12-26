@@ -54,7 +54,7 @@
 %       context function.
 %
 % jeannicolas.dumez@cnrs.fr
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ludmilla.guduff@cnrs.fr
 %
 % <https://spindynamics.org/wiki/index.php?title=spendosy.m>

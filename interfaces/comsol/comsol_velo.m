@@ -15,7 +15,7 @@
 %       mesh.u, mesh.v      - column vectors with velocities
 %                             at each vertex of the mesh
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=comsol_velo.m>
 

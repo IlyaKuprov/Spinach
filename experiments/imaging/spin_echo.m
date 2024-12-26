@@ -15,7 +15,7 @@
 %
 %      fid - the time domain echo signal
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.j.allami@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=spin_echo.m>

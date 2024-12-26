@@ -15,7 +15,7 @@
 %
 %    chi - 3x3 magnetic susceptibility tensor in cubic Angstrom
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % e.suturina@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=g2chi.m>

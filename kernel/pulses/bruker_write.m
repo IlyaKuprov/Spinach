@@ -22,7 +22,7 @@
 %
 % a.acharya@soton.ac.uk
 % david.goodwin@inano.au.dk
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=bruker_write.m>
 

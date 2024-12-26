@@ -18,7 +18,7 @@
 %    fid - free induction decay that should be Fourier transformed
 %          to obtain the image
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.j.allami@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=basic_1d_hard.m>

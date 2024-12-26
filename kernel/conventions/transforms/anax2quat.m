@@ -13,7 +13,7 @@
 % four components of the quaternion. 
 %
 % gareth.charnock@oerc.ox.ac.uk
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=anax2quat.m>
 

@@ -22,7 +22,7 @@
 %       model the spin locking explicity by adding RF terms to the system
 %       Hamiltonian.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=spinlock.m>
 

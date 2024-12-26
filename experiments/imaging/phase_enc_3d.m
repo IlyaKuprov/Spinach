@@ -31,7 +31,7 @@
 %
 %  fid - k-space representation of the image 
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ahmed.allami@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=phase_enc_3d.m>

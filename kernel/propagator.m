@@ -23,7 +23,7 @@
 %       as well as the Pade method. None of them lived up to their
 %       marketing.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=propagator.m>

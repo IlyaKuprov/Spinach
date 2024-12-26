@@ -27,7 +27,7 @@
 %
 % Note: see tikhonov.m for the positive-constraned solver.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=tikhoind.m>
 

@@ -15,7 +15,7 @@
 % Note: use this operation sparingly - the additions are simply 
 %       buffered, and all subsequent operations will be slower.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=polyadic/plus.m>
 

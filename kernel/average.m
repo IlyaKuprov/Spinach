@@ -46,7 +46,7 @@
 %                http://dx.doi.org/10.1039/C2CP23233B
 %                http://dx.doi.org/10.1007/s00723-012-0367-0
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % alexander.karabanov@nottingham.ac.uk
 % walter.kockenberger@nottingham.ac.uk
 %

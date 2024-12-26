@@ -1,6 +1,6 @@
 % Spinach activation script for NMRBox.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % #NGRUM #NWIKI #NHEAD
 

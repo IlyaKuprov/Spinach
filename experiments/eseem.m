@@ -29,7 +29,7 @@
 %    fid  - time domaing signal whose Fourier transform is the 
 %           ESEEM spectrum
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=eseem.m>

@@ -6,7 +6,7 @@
 % The output is an array with ncores rows and two columns.
 %
 % d.savostyanov@soton.ac.uk
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ttclass/sizes.m>
 

@@ -21,7 +21,7 @@
 %      fid.cos, fid.sin   -  sine and cosine components
 %                            of the States quadrature
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=tocsy.m>
 

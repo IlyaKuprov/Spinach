@@ -12,7 +12,7 @@
 %    spin_system - Spinach data structure with a .vor
 %                  subfield added to the mesh structure
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.acharya@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=mesh_vorn.m>

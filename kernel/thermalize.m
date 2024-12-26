@@ -37,7 +37,7 @@
 % Note: DiBari-Levitt method is computationally expensive, but tends to
 %       work better than IME, particularly in exotic regimes.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % fije@inano.au.dk
 %
 % <https://spindynamics.org/wiki/index.php?title=thermalize.m>

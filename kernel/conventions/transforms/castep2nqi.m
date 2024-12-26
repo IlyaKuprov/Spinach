@@ -16,7 +16,7 @@
 %    nqi  - 3x3 matrix in Hz, ready for input 
 %           into create.m function
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=castep2nqi.m>
 

@@ -23,7 +23,7 @@
 %                    three, four, or six sites as 3x3 matrices
 %                    in Hz
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=weblab2nqi.m>
 

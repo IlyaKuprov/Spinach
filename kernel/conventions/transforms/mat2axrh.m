@@ -24,7 +24,7 @@
 % Note: Euler angles are not returned because the transformation
 %       in question is ill-defined
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=mat2axrh.m>
 

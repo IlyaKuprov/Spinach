@@ -53,7 +53,7 @@
 %    Dyy  - optional matrix of second derivatives of a scalar function
 %           with respect to the waveform amplitudes along Y
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % david.goodwin@inano.au.dk
 %
 % <https://spindynamics.org/wiki/index.php?title=polar2cartesian.m>

@@ -2,7 +2,7 @@
 % around parallel stages. Should be invoked just after a parfor or
 % an spmd for which parallel_profiler_start was previously called.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=parallel_profiler_report.m>
 

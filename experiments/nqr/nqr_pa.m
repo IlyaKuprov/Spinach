@@ -41,7 +41,7 @@
 %       matrix inversion operation would fail to converge. The re-
 %       laxation matrix R should *not* be thermalised.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % lewis.robertson@csiro.au
 %
 % <https://spindynamics.org/wiki/index.php?title=nqr_pa.m>

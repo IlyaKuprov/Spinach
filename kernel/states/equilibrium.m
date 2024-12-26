@@ -36,7 +36,7 @@
 %          zero temperatures are not supported.
 %
 % ledwards@cbs.mpg.de
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=equilibrium.m>
 

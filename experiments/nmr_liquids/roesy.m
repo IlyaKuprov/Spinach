@@ -27,7 +27,7 @@
 %     fid.cos, fid.sin  -  components of the free induction
 %                          decay for hypercomplex processing
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=roesy.m>
 

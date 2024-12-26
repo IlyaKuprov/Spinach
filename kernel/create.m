@@ -20,7 +20,7 @@
 %  spin_system   - the primary object used by Spinach
 %                  to store simulation information
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % hannah.hogben@chem.ox.ac.uk
 % kpervushin@ntu.edu.sg
 % luke.edwards@chem.ox.ac.uk

@@ -31,7 +31,7 @@
 %          tions of the output and the input arrays
 %
 % u.rasulov@soton.ac.uk
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=spf.m>
 

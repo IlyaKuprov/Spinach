@@ -25,7 +25,7 @@
 %
 %          M  - 3x3 matrix
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=anas2mat.m>
 

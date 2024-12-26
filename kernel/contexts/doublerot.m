@@ -90,7 +90,7 @@
 %       buted Computing Toolbox - different system orientations are eva-
 %       luated on different labs.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=doublerot.m>
 

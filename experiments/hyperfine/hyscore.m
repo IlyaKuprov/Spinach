@@ -30,7 +30,7 @@
 % Note: the sequence uses ideal pulses, replace with shaped_pulse_af()
 %       to have soft pulses instead.
 % 
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=hyscore.m>

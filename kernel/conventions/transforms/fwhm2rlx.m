@@ -17,7 +17,7 @@
 %
 % Note: Lorentzian line shape is assumed.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=fwhm2rlx.m>
 

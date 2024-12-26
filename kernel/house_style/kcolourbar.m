@@ -12,7 +12,7 @@
 %    creates or updates the colour bar 
 %    in the current axis system
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=kcolourbar.m>
 

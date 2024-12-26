@@ -27,7 +27,7 @@
 % Note: the Zeeman Hamiltonian in Spinach has magnetic field on
 %       the left, hence the operand order in D*chi
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % e.suturina@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=xyz2pms.m>

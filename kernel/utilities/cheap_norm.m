@@ -23,7 +23,7 @@
 % Note: in very rare cases, Hager's algorithm stagnates. If this happens,
 %       drop us a note and we will implement Higham's more recent work.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=cheap_norm.m>
 

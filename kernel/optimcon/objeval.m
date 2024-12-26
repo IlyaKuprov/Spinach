@@ -28,7 +28,7 @@
 % Note: this function will be eliminated in a future release.
 %
 % david.goodwin@inano.au.dk
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=objeval.m>
 

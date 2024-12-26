@@ -21,7 +21,7 @@
 %       when the optimal control problem is set up.
 %
 % david.goodwin@inano.au.dk
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=ctrl_trajan.m>

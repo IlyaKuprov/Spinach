@@ -20,7 +20,7 @@
 % Note: arrays are declared complex at creation to avoid 
 %       expensive reallocation operations later on.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=boson_oper.m>
 

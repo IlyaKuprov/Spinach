@@ -16,7 +16,7 @@
 %
 % Note: a suffix can be a polyadic itself.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=polyadic/suffix.m>
 

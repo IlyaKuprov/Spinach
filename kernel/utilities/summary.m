@@ -27,7 +27,7 @@
 %       ging spin_system.sys.output='hush' at any point during the
 %       calculation.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=summary.m>
 

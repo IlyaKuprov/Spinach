@@ -13,7 +13,7 @@
 %    spin_system - Spinach data structure with a .plot
 %                  subfield added to the mesh structure
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=mesh_preplot.m>
 

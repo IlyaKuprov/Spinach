@@ -50,7 +50,7 @@
 %
 % where smin and smax are computed from the spectrum matrix. 
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=slice_2d.m>
 

@@ -21,7 +21,7 @@
 %         v=R*v    (for 3x1 vectors)
 %         A=R*A*R' (for 3x3 interaction tensors)
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=euler2dcm.m>
 

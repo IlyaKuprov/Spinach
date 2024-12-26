@@ -48,7 +48,7 @@
 %     LP   - a column vector of energy level populations, sor-
 %            ted in the same order as the energies
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=rspt_eig.m>
 

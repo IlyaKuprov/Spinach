@@ -23,7 +23,7 @@
 %      ext      - grid extents in Angstrom, ordered as
 %                 [xmin xmax ymin ymax zmin zmax]
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=zoom_3d.m>
 

@@ -34,7 +34,7 @@
 %       populations and zeroes them out. If the flag is set, zero-qua-
 %       ntum coherences are also erased.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=homospoil.m>
 

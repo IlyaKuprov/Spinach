@@ -17,7 +17,7 @@
 % Note: direct calls are discouraged, see the protein HOWTO docu-
 %       ment for instructions on importing protein data.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=Read_bmrb.m>
 

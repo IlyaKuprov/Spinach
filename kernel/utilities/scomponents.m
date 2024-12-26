@@ -19,7 +19,7 @@
 %             that each node of the graph belongs to
 %
 % dgleich@purdue.edu
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=scomponents.m>
 

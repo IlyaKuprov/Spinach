@@ -7,7 +7,7 @@
 %
 %      p  - a polyadic object
 % 
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=polyadic/validate.m>
 

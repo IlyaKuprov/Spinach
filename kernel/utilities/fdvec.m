@@ -18,7 +18,7 @@
 %
 %    dx      - column or row vector with the derivative
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=fdvec.m>
 

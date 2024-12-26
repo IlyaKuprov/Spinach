@@ -20,7 +20,7 @@
 %       points, they are angles relative to the starting point
 %       of the trajectory.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=rwalk.m>
 

@@ -17,7 +17,7 @@
 % Note: when the matrix B is diagonal, the part of A that commutes
 %       with it is the diagonal part, so just use diag(diag(A))
 %       
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=remncomm.m>
 

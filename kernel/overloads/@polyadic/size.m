@@ -12,7 +12,7 @@
 %
 %    answer - a vector with one or two elements
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=polyadic/size.m>
 

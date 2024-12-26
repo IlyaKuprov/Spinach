@@ -22,7 +22,7 @@
 %       I   - linear indices of spin states, with
 %             I=0 corresponding to L=0, M=0.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=lm2lin.m>
 

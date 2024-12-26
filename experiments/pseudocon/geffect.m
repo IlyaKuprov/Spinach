@@ -18,7 +18,7 @@
 %    g      - 3x3 g-tensor matrix in Bohr mag-
 %             neton units
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % e.suturina@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=geffect.m>

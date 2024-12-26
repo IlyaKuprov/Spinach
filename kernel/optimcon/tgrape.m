@@ -37,7 +37,7 @@
 %   grad                - gradient of the fidelity with respect to
 %                         the durations of the slices
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=tgrape.m>
 

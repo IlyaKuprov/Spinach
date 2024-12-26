@@ -16,7 +16,7 @@
 %
 %    J     - spectral density function value
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=spden.m>
 

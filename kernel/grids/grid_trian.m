@@ -26,7 +26,7 @@
 %
 % If no outputs are requested, a schematic is drawn.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=grid_trian.m>
 

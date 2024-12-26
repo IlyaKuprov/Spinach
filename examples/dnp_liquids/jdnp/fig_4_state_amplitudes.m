@@ -8,7 +8,7 @@
 %
 % Calculation time: seconds
 %
-% maria-grazia.concilio@weizmann.ac.il
+% mariagrazia.concilio@sjtu.edu.cn
 % ilya.kuprov@weizmann.ac.il
 
 function fig_4_state_amplitudes()

@@ -40,9 +40,9 @@
 %
 %  fid -  free induction decay of the ultrafast NMR spectrum.
 % 
-% m.g.concilio@soton.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
 % jean-nicolas.dumez@univ-nantes.fr
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ufmq.m>
 

@@ -30,8 +30,8 @@
 %       corresponding sparse matrix.
 %
 % a.j.allami@soton.ac.uk
-% ilya.kuprov@weizmann.ac.uk
-% m.g.concilio@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
+% mariagrazia.concilio@sjtu.edu.cn
 %
 % <https://spindynamics.org/wiki/index.php?title=g2fplanck.m>
 

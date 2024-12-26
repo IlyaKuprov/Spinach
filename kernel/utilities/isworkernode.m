@@ -10,7 +10,7 @@
 %
 %    answer - true if running on a parallel worker process
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=isworkernode.m>
 

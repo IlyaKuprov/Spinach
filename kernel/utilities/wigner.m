@@ -32,7 +32,7 @@
 % irreducible spherical tensor coefficients, listed vertically in
 % the order: T(2,2), T(2,1), T(2,0), T(2,-1), T(2,-2). 
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=wigner.m>
 

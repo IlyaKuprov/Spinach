@@ -25,7 +25,7 @@
 %                  is no phase modulation), normalised to produce
 %                  a 90-degree pulse, rad/s
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=vg_pulse.m>
 

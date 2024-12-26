@@ -18,7 +18,7 @@
 %  
 %    c - a vector of expansion coefficients
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=cheb_coeff.m>
 

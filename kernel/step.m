@@ -25,7 +25,7 @@
 % Note: the peculiar sequence of algebraic operations in the code below
 %       is designed to minimize the memory footprint in large cases.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 % a.acharya@soton.ac.uk
 %

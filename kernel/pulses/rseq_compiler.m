@@ -37,7 +37,7 @@
 %        specifying which propagator is to be used at which
 %        slice of the phase sequence
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % m.carravetta@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rseq_compiler.m>

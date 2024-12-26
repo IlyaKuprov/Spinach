@@ -28,7 +28,7 @@
 % Note: for further information on the equations and algorithms used in this
 %       function see http://dx.doi.org/10.1039/C4CP03106G
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % e.suturina@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=kpcs.m>

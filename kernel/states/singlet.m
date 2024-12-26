@@ -16,7 +16,7 @@
 %   S       - a density matrix (Hilbert space) or
 %             a state vector (Liouville space) 
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=singlet.m>
 

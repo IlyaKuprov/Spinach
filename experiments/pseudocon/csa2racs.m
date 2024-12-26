@@ -23,7 +23,7 @@
 % The function implements Equation (2) from the paper by Otting
 % and company: http://dx.doi.org/10.1021/ja0564259
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=csa2racs.m>
 

@@ -26,7 +26,7 @@
 % Note: the auxiliary matrix method is massively faster than
 %       either commutator series or diagonalisation.
 %
-% ilya.kuprov@weizmann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=intrep.m>
 

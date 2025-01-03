@@ -33,6 +33,10 @@
 %
 % Note: spin labels must be set to PDB atom IDs ('CA', 'HA', etc.) in
 %       sys.labels for this sequence to work properly.
+%
+% TODO: whoever understands how phase cycles and quadratures work in
+%       3D NMR is welcome to add a phase-sensitive version.
+%
 %  
 % m.walker@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il

@@ -13,7 +13,7 @@
 % maxim.yulikov@phys.chem.ethz.ch
 % luca.garbuio@psi.ch
 % gunnar.jeschke@phys.chem.ethz.ch
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function s166c_mult()
 

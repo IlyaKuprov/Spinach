@@ -17,7 +17,7 @@
 % Note: GPUs are not good at permuting array dimensions. If you find
 %       yourself using polyadics, do check that the CPU isn't faster.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=polyadic/gpuArray.m>
 

@@ -18,7 +18,7 @@
 %
 % Note: this functionality is only available in sphten-liouv formalism.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=sinkhole.m>
 

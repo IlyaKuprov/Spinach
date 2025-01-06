@@ -1,7 +1,7 @@
 % Example of proton hyperfine tensor visualisation for
 % copper porphyrine. ORCA log is parsed.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % e.suturina@soton.ac.uk
 
 function hfc_porphyrine()

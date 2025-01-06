@@ -30,7 +30,7 @@
 %
 %     fid - 2D free induction decay for amplitude-mode processing
 % 
-% m.g.concilio@soton.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
 %
 % <https://spindynamics.org/wiki/index.php?title=mqs_refocus.m>
 

@@ -4,7 +4,7 @@
 %
 % Calculation time: days
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function mas_powder_suc_fplanck()
 

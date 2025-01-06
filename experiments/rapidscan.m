@@ -25,7 +25,7 @@
 %
 % Note: this experiment should be called directly without a context.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=rapidscan.m>
 

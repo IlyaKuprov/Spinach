@@ -11,7 +11,7 @@
 %
 % Calculation time: hours.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % david.goodwin@inano.au.dk
 
 function state_transfer_pro()

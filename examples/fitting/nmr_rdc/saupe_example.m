@@ -2,7 +2,7 @@
 % measurements kindly provided by Andras Boeszoermenyi, Thibault
 % Viennet, and Hari Arthanari.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function saupe_example()
 

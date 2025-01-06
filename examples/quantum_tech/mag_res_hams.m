@@ -2,7 +2,7 @@
 % states, and detection states. Generators are split into Zeeman, cou-
 % pling, and dissipation parts.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function mag_res_hams() %#ok<*NASGU>
 

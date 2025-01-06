@@ -24,7 +24,7 @@
 %
 % The output is a vector of residual norms in each spherical rank.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=grid_test.m>
 

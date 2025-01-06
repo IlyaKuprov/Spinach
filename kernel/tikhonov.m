@@ -38,7 +38,7 @@
 %
 % Note: see tikhoind.m for the indeterminate solver.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.acharya@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=tikhonov.m>

@@ -1,7 +1,7 @@
 % Resonator transform test. Sends a square pulse into a simple
 % resonator model and plots the time-domain response.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % u.rasulov@soton.ac.uk
 
 function restrans_test()

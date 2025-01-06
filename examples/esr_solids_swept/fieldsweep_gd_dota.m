@@ -4,7 +4,7 @@
 % Calculation time: seconds.
 %
 % corzilius@solidstatednp.com
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function fieldsweep_gd_dota()
 

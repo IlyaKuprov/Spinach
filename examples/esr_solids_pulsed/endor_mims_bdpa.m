@@ -5,7 +5,7 @@
 %
 % Run time: hours.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % annemarie.kehl@mpinat.mpg.de
 
 function endor_mims_bdpa()

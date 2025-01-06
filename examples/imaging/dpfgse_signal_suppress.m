@@ -5,7 +5,7 @@
 %
 % a.j.allami@soton.ac.uk
 % p.lally@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function dpfgse_signal_suppress()
 

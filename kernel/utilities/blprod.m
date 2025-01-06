@@ -19,7 +19,7 @@
 % Note: this function is not sensitive to the isotropic components
 %       of A and B tensors.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=blprod.m>
 

@@ -9,7 +9,7 @@
 %
 % High-rank isotropic rotational diffusion tested here.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function correlation_function_4()
 

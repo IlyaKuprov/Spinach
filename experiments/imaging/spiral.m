@@ -25,7 +25,7 @@
 % spiral_y and spiral_z variables if you plan to process the data
 % in a different way.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.j.allami@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=spiral.m>

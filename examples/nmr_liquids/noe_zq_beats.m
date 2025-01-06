@@ -3,7 +3,7 @@
 %
 % Calculation time: seconds
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % cthiele@thielelab.de
 
 function noe_zq_beats()

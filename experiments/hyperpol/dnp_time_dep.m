@@ -36,7 +36,7 @@
 % Note: the relaxation superoperator must be thermalised for this 
 %       type of calculation.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=dnp_time_dep.m>
 

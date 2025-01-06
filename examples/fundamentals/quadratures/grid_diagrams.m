@@ -1,6 +1,6 @@
 % Spherical grid diagrams for IK's book.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function grid_diagrams()
 

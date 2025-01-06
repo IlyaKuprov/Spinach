@@ -10,7 +10,7 @@
 % Note: norms other than Frobenius norm are expensive for tensor trains.
 %
 % d.savostyanov@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ttclass/norm.m>
 

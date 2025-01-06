@@ -29,7 +29,7 @@
 %                   sians from the fidelity Hessian.
 %
 % david.goodwin@inano.au.dk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=grape_phase.m>
 

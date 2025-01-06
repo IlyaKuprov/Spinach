@@ -92,7 +92,7 @@
 % yield any benefits due to large amount of inter-thread communication. See
 % http://dx.doi.org/10.1063/1.3679656 for further information.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 % ohad.levinkron@weizmann.ac.il
 %

@@ -2,7 +2,7 @@
 % 
 %                     wipe_cache(spin_system)
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=wipe_cache.m>
 

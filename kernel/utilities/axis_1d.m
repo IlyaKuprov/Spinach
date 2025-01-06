@@ -29,7 +29,7 @@
 %
 % Note: magnetic field units use the free electron g-tensor for conversion.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=axis_1d.m>
 

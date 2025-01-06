@@ -11,7 +11,7 @@
 % Calculation time: seconds
 %
 % matthew.krzystyniak@oerc.ox.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function relaxation_fremysalt()
 

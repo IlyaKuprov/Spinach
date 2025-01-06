@@ -72,7 +72,7 @@
 % Note: the time in the DEER trace refers to the third pulse inser-
 %       tion point, after end of the second pulse.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=deer_4p_soft_deer.m>
 

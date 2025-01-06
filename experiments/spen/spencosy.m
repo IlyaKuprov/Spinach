@@ -50,7 +50,7 @@
 %       context function.
 %
 % jeannicolas.dumez@cnrs.fr
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ludmilla.guduff@cnrs.fr
 %
 % <https://spindynamics.org/wiki/index.php?title=spencosy.m>

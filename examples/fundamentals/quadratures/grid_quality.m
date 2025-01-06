@@ -1,7 +1,7 @@
 % Performance analysis for the spherical and SO(3) integration
 % grids supplied with Spinach kernel.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function grid_quality()
 

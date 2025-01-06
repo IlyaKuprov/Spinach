@@ -10,7 +10,7 @@
 % Note: when this function is invoked from inside parfor, spmd,
 %       or asynchronous parallel job, it returns zero.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=poolsize.m>
 

@@ -39,7 +39,7 @@
 %       and nucleic acids) - its layout is optimised for minimum
 %       memory footprint rather than CPU time.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 % hannah.hogben@chem.ox.ac.uk
 %

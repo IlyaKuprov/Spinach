@@ -48,7 +48,7 @@
 %    fid  - two-dimensional free induction decay
 %
 % a.m.kenwright@durham.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=psycosy.m>
 

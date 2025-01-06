@@ -4,7 +4,7 @@
 %
 % Calculation time: minutes.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 
 function clip_hsqc_camphor()

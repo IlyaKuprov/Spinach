@@ -7,7 +7,7 @@
 %
 % where A and B are square matrices and H is a scalar.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=hdot.m>
 

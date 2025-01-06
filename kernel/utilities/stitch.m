@@ -37,7 +37,7 @@
 %
 %           fid - three-dimensional free induction decay
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=stitch.m>
 

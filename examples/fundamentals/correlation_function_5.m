@@ -5,7 +5,7 @@
 % where R is the 3D Cartesian rotation matrix, using the 
 % Monte-Carlo method.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function correlation_function_5()
 

@@ -5,7 +5,7 @@
 % and deletes any files that are older than the threshold (defa-
 % ult is 7 days) specified in spin_system.tols.cache_mem field.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=cacheman.m>
 

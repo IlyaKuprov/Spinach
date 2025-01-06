@@ -2,7 +2,7 @@
 % the interaction specification level) spin system with the Hamiltonian
 % that has been rotated using Spinach operator rotation functionality.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % john.price@colorado.edu
 
 function rotations_2()

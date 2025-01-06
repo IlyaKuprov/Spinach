@@ -21,7 +21,7 @@
 %       of the frequency being demodulated.
 %
 % a.acharya@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=heterodyne.m>
 

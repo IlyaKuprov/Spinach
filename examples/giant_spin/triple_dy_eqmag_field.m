@@ -10,7 +10,7 @@
 % Calculation time: hours
 %
 % e.suturina@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function triple_dy_eqmag_field()
 

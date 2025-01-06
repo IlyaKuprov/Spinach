@@ -23,7 +23,7 @@
 % Note: this function is a part of the PCS inverse problem solver module; it
 %       should not normally be called directly by the user.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=interpmat.m>
 

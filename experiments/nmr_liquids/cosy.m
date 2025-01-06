@@ -29,7 +29,7 @@
 %       tude mode plotting is advised.
 %
 % gareth.charnock@oerc.ox.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=cosy.m>
 

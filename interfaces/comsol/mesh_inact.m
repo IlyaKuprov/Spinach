@@ -15,7 +15,7 @@
 %
 %    spin_system - updated data structure
 %   
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=mesh_inact.m>
 

@@ -20,7 +20,7 @@
 %       want to add further parameters by editing sys and inter
 %       data structures manually.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=gissmo2spinach.m>
 

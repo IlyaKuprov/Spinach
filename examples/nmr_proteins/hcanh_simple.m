@@ -3,7 +3,7 @@
 % Calculation time: seconds.
 %
 % m.walker@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function hcanh_simple()
 

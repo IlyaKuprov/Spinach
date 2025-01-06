@@ -1,6 +1,6 @@
 % Opens Spinach documentation Wiki page.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function wiki()
 

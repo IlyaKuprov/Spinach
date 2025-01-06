@@ -5,7 +5,7 @@
 %
 % Calculation time: hours on CPU, minutes with a Tesla V100 GPU.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % p.t.williamson@soton.ac.uk
 % j.jarvis@soton.ac.uk
 

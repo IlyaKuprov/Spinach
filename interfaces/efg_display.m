@@ -56,7 +56,7 @@
 %                       isotropic parts of tensors be-
 %                       fore plotting
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=efg_display.m>
 

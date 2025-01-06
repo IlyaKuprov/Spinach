@@ -17,7 +17,7 @@
 %          the validation against the schema, which may be obtain-
 %          ed from http://spindynamics.org/SpinXML.php
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=x2spinach.m>
 

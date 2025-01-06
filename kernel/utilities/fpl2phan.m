@@ -16,7 +16,7 @@
 %
 %    phan    - the image painted by the specified state
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=fpl2phan.m>
 

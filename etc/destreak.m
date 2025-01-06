@@ -7,7 +7,7 @@
 % The function works by subtracting the kronecker propduct of edge
 % lines from the spectrum matrix.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=Destreak.m>
 

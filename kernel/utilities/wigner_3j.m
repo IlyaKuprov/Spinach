@@ -18,7 +18,7 @@
 %
 %     w       - the resulting 3j-symbol
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=wigner_3j.m>
 

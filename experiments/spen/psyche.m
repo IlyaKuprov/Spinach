@@ -40,7 +40,7 @@
 %                                operator, received from the context
 %
 % mohammadali.foroozandeh@chem.ox.ac.uk
-% m.g.concilio@soton.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
 %
 % <https://spindynamics.org/wiki/index.php?title=psyche.m>
 

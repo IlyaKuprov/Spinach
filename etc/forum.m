@@ -1,6 +1,6 @@
 % Opens Spinach support forum page.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function forum()
 

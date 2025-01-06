@@ -42,7 +42,7 @@
 %
 %   fid  - free induction decay
 %           
-% m.g.concilio@soton.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
 %
 % <https://spindynamics.org/wiki/index.php?title=dosy_oneshot.m>
 

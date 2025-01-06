@@ -13,7 +13,7 @@
 %    of the current grid of plots
 %
 % a.acharya@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ksgtitle.m>
 

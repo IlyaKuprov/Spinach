@@ -15,7 +15,7 @@
 % Note: this is an auxiliary function that is called by protein.m
 %       protein import module. Direct calls are discouraged.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=Guess_csa_pro.m>
 

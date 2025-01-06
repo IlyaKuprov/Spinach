@@ -32,7 +32,7 @@
 %      hess    -  reordered Hessian with N first then K.
 %
 % david.goodwin@inano.au.dk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=hess_reorder.m>
 

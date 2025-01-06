@@ -19,7 +19,7 @@
 %
 %    npts   - row vector of three cube dimensions, points
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=phantoms.m>
 

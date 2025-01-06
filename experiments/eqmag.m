@@ -19,7 +19,7 @@
 %       interaction term in the Hamiltonian is 2*pi*J*(LxSx+LySy+LzSz)
 %       where J is in Hz.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % e.suturina@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=eqmag.m>

@@ -60,7 +60,7 @@
 %
 %     pd     -  vector of energy level population differences
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=eigenfields.m>
 

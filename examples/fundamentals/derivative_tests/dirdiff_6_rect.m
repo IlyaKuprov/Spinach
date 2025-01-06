@@ -1,6 +1,6 @@
 % GRAPE Hessian test against finite-differenced gradients.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % david.goodwin@inano.au.dk
 
 function dirdiff_6_rect()

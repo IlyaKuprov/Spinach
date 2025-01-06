@@ -13,7 +13,7 @@
 %
 %     T - 3x3 real interaction tensor
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=axis_tsymm.m>
 

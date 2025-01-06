@@ -2,7 +2,7 @@
 % a broken-symmetry DFT calculation on a bistrityl bira-
 % dical with an alkinyl linker from Olav Schiemann.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function yamaguchi()
 

@@ -16,7 +16,7 @@
 %
 %         cov   -   covectors as columns of a matrix
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de 
 %
 % <https://spindynamics.org/wiki/index.php?title=svd_shrink.m>

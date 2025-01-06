@@ -13,7 +13,7 @@
 %
 %   cgsppm - an array of values in cgs-ppm
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ang2cgsppm.m>
 

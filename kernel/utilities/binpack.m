@@ -16,7 +16,7 @@
 %    bins      - a cell array of index vectors specifying
 %                boxes allocated into each bin
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=binpack.m>
 

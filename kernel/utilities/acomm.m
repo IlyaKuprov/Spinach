@@ -11,7 +11,7 @@
 %
 %   C   - a square matrix
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=acomm.m>
 

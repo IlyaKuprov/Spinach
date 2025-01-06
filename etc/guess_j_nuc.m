@@ -23,7 +23,7 @@
 %    is bonded to the second, which is bonded to the fourth. The coupling
 %    in this case is between atom 1 and atom 4 in the descriptor.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ztw1e12@soton.ac.uk (Zenawi Welderufael)
 %
 % <https://spindynamics.org/wiki/index.php?title=Guess_j_nuc.m>

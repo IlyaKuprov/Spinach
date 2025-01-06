@@ -11,7 +11,7 @@
 % Note: complex data is exported as a double point count in the first di-
 %       mension. First the reals are given, then the imags.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=Fid2ascii.m>
 

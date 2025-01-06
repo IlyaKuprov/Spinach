@@ -42,7 +42,7 @@
 %        ment and assumes that the relaxation superoperator is not
 %        thermalised - the relaxation destination is the zero state.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=noesyhsqc.m>

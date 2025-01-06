@@ -20,7 +20,7 @@
 %  deer - an array of DEER form factor values of the same
 %         dimension as t
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=deer_analyt.m>
 

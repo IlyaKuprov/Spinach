@@ -41,7 +41,7 @@
 %     stim_echo - stimulated echo seen in the Mims ENDOR sequ-
 %                 ence in the absence of the nuclear RF pulse
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=endor_mims_echo.m>
 

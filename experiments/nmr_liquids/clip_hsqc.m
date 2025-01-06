@@ -25,7 +25,7 @@
 %            turned in fid.pos and fid.neg
 %
 % ledwards@cbs.mpg.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=clip_hsqc.m>
 

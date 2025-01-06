@@ -54,8 +54,8 @@
 %       directly. Use grape_xy.m and grape_phase.m instead.
 %
 % david.goodwin@inano.au.dk
-% uluk.rasulov@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% u.rasulov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % m.keitel@soton.ac.uk
 %
 % TODO (Keitel): add logic to avoid computing backward trajectory 

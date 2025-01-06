@@ -21,7 +21,7 @@
 %
 % Note: periodic boundary conditions.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=fourlap.m>
 

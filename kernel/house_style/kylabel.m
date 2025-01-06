@@ -12,7 +12,7 @@
 % 
 %    creates or updates the current axis system
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=kylabel.m>
 

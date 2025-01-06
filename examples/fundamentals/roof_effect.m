@@ -1,6 +1,6 @@
 % Roof effect in a strongly J-coupled two-spin system.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function roof_effect()
 

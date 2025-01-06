@@ -40,7 +40,7 @@
 %  pos_conts=delta(2)*smax*linspace(0,1,ncont).^k+smax*delta(1);
 %  neg_conts=delta(2)*smin*linspace(0,1,ncont).^k+smin*delta(1);
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=contspacing.m>
 

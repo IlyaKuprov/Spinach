@@ -22,7 +22,7 @@
 %
 %    traj  - system trajectory, a bookshelf stack of state vectors
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=traject.m>

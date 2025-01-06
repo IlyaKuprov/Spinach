@@ -12,7 +12,7 @@
 %
 %     waveform - normalised waveform as a vector
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=pulse_shape.m>
 

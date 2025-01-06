@@ -1,8 +1,8 @@
 % Directional derivative test for the Cartesian GRAPE
 % module, trapezium integrator.
 %
-% i.kuprov@soton.ac.uk
-% uluk.rasulov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
+% u.rasulov@soton.ac.uk
 
 function dirdiff_3_trap()
 

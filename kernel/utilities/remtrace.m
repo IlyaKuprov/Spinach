@@ -11,7 +11,7 @@
 %
 %   A - a square matrix with a zero trace
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=remtrace.m>
 

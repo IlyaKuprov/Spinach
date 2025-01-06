@@ -1,7 +1,7 @@
 % Compares the output of Spinach Clebsch-Gordan function with the 
 % arbitrary precision results returned by Mathematica.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function cg_test_small()
 

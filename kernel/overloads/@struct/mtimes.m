@@ -14,7 +14,7 @@
 %     str_out - the resulting structure
 %
 % ledwards@cbs.mpg.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=struct/mtimes.m>
 

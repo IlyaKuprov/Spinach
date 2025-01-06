@@ -18,7 +18,7 @@
 % These are expensive tables: disk cache is created and used automatically.
 %
 % hannah.hogben@chem.ox.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ist_product_table.m>
 

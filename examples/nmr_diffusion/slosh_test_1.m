@@ -2,7 +2,7 @@
 %
 % Calculation time: seconds.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function slosh_test_1()
 

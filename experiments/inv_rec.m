@@ -29,7 +29,7 @@
 % Note: the relaxation superoperator must be thermalised.
 %
 % Zak El-Machachi
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=inv_rec.m>
 

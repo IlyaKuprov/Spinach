@@ -1,6 +1,6 @@
 % A spin-locking experiment on a two-spin system.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function spin_lock()
 

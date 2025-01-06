@@ -7,7 +7,7 @@
 %
 % Calculation time: minutes
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function cross_effect_mas_powder()
 

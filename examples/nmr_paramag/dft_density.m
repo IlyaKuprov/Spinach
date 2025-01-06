@@ -7,7 +7,7 @@
 %                    http://dx.doi.org/10.1039/C4CP03106G
 %
 % g.t.p.charnock@oerc.ox.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function dft_density()
 

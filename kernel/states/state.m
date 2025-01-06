@@ -62,7 +62,7 @@
 % 
 % d.sayostyanov@soton.ac.uk
 % luke.edwards@ucl.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=state.m>
 

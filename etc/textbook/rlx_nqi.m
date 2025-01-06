@@ -26,7 +26,7 @@
 %
 %    t2     - transverse relaxation time, seconds
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=rlx_nqi.m>
 

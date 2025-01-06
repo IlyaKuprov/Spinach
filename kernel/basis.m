@@ -24,7 +24,7 @@
 %
 %       for further information on this subject.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=basis.m>
 

@@ -14,7 +14,7 @@
 % rallelisation call stack. When relaxation.m is called from inside 
 % a parallel loop, the serial version of this include is used.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=redfield_integral_async.m>
 

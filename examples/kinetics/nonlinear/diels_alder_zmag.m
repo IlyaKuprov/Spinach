@@ -3,7 +3,7 @@
 %
 % Calculation time: hours, faster on a Tesla A100 GPU.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.acharya@soton.ac.uk
 
 function diels_alder_zmag()

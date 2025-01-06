@@ -28,7 +28,7 @@
 %                  sians from the fidelity Hessian.
 %
 % david.goodwin@inano.au.dk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=ensemble.m>

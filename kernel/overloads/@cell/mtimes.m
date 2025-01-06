@@ -15,7 +15,7 @@
 %
 % Note: both arguments cannot be cell arrays.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=cell/mtimes.m>
 

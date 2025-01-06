@@ -26,7 +26,7 @@
 %    J         - distortion Jacobian matrix with respect to
 %                the vectorisation of the input, sparse
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=amp_comp.m>
 

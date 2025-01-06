@@ -17,7 +17,7 @@
 %   p     - an array of probability densities, 
 %           same shape as x 
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=snormpdf.m>
 

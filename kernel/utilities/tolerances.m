@@ -22,7 +22,7 @@
 %        the accuracy settings should be modified by setting the sys.tols
 %        structure, see the input preparation manual.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % hannah.hogben@chem.ox.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=tolerances.m>

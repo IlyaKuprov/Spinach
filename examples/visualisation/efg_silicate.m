@@ -1,7 +1,7 @@
 % Example of electric field gradient tensor visualisation for
 % an aluminosilicate solid. CASTEP log is parsed.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % e.dib@soton.ac.uk
 % m.carravetta@soton.ac.uk
 

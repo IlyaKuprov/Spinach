@@ -1,6 +1,6 @@
 % Paramagnetic chemical shift module tests.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function paramag_test()
 

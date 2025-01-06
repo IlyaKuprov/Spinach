@@ -7,7 +7,7 @@
 %
 %                 run_spinach(config_style)
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % 
 % <https://spindynamics.org/wiki/index.php?title=setup.m>
 

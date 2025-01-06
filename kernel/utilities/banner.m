@@ -8,7 +8,7 @@
 %    identifier - a character string with the banner name,
 %                 see function text
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=banner.m>
 

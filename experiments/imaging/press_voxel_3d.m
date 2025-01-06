@@ -33,7 +33,7 @@
 %
 % Notes: add 'polyadic' to sys.enable, or this will crash your computer.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.j.allami@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=press_voxel_3d.m>

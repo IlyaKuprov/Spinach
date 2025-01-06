@@ -32,7 +32,7 @@
 %
 %   M          - 3x3 interaction tensor
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=sphten2mat.m>
 

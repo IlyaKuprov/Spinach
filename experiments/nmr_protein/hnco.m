@@ -1,4 +1,4 @@
-% Phase-sensitive HNCO pulse sequence from 
+% Magnitude-mode HNCO pulse sequence from 
 %
 %             http://dx.doi.org/10.1016/0022-2364(90)90333-5
 %
@@ -43,8 +43,11 @@
 % Note: spin labels must be set to PDB atom IDs ('CA', 'HA', etc.) in
 %       sys.labels for this sequence to work properly.
 %
+% TODO: whoever understands how phase cycles and quadratures work in
+%       3D NMR is welcome to add a phase-sensitive version.
+%
 % ledwards@cbs.mpg.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=hnco.m>
 

@@ -4,7 +4,7 @@
 %
 % Calculation time: minutes.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % s.g.worswick@soton.ac.uk
 
 function combi_fit_1()

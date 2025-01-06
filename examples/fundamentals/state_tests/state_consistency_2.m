@@ -1,7 +1,7 @@
 % Test of consistency in the projection between spherical
 % tensor basis set and Zeeman basis set.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function state_consistency_2()
 

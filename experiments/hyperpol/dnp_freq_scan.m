@@ -39,10 +39,10 @@
 % Note: the relaxation superoperator must NOT be thermalized for
 %       this type of calculation (inter.equilibrium='zero').
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % alexander.karabanov@nottingham.ac.uk
 % walter.kockenberger@nottingham.ac.uk
-% m.g.concilio@soton.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
 %
 % <https://spindynamics.org/wiki/index.php?title=dnp_freq_scan.m>
 

@@ -7,7 +7,7 @@
 % werful, or renamed into something with a more informa-
 % tive name, which is printed in the error message.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=euler2wigner.m>
 

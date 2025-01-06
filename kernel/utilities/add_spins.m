@@ -20,7 +20,7 @@
 %               product representation, a cell ar-
 %               ray of matrices
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=add_spins.m>
 

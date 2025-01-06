@@ -18,7 +18,7 @@
 %                harmonics in the order of
 %                decreasing m index of Ylm
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % e.suturina@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=qform2sph.m>

@@ -1,7 +1,7 @@
 % Energy level diagram transition from the Zeeman limit to
 % the exchange coupling limit in a two-electron system.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function energy_levels()
 

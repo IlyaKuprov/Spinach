@@ -9,7 +9,7 @@
 %
 % Calculation time: seconds
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % h.j.hogben@chem.ox.ac.uk
 % peter.hore@chem.ox.ac.uk
 

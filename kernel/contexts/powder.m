@@ -92,7 +92,7 @@
 %       luated on different labs.
 %
 % ledwards@cbs.mpg.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=powder.m>
 
@@ -113,10 +113,16 @@ report(spin_system,'building the Liouvillian...');
 
 % Get the lab frame Zeeman operator if needed
 if ismember('zeeman_op',parameters.needs)
+
+    % Isotropic + anisotropic basis, for assembly later 
     report(spin_system,'building the lab frame Zeeman operator...');
     [ZI,ZQ]=hamiltonian(assume(spin_system,'labframe','zeeman'));
+
 else
-    ZI=[]; ZQ=[]; % Work around the parfor bug
+
+    % Work around the parfor bug
+    ZI=[]; ZQ=[]; 
+
 end
 
 % Get the lab frame Hamiltonian if needed
@@ -131,7 +137,7 @@ if ismember('iso_eq',parameters.needs)
 
 elseif ismember('aniso_eq',parameters.needs)
     
-    % Isotropic + anisotropic part and thermal equilibrium later
+    % Isotropic + anisotropic part, for thermal equilibrium later
     report(spin_system,'building the lab frame Hamiltonian...');
     [HL,QL]=hamiltonian(assume(spin_system,'labframe'),'left');
 
@@ -142,10 +148,10 @@ else
 
 end
 
-% Set the assumptions
+% Set the assumptions specified by the user
 spin_system=assume(spin_system,assumptions);
 
-% Get the Hamiltonian
+% Get Hamiltonian building blocks
 [I,Q]=hamiltonian(spin_system);
 
 % Get kinetics superoperator
@@ -163,7 +169,7 @@ end
 % Get problem dimensions
 parameters.spc_dim=1; parameters.spn_dim=size(I,1);
 
-% Get the averaging grid as a structure
+% Get the averaging grid as a Matlab structure
 sph_grid=load([spin_system.sys.root_dir '/kernel/grids/' ...
                parameters.grid],'alphas','betas','gammas','weights');
            
@@ -229,7 +235,7 @@ parfor (n=1:n_orients,nworkers)
     % Pass the current orientation to the pulse sequence
     localpar.current_angles=[alphas(n) betas(n) gammas(n)];
     
-    % Get the full Hamiltonian at the current orientation
+    % Assemble the full Hamiltonian at the current orientation
     H=I+orientation(Q,[alphas(n) betas(n) gammas(n)]); H=(H+H')/2;
     
     % Get the lab frame Zeeman operator at the current orientation

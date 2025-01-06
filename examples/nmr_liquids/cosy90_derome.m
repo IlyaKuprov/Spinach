@@ -3,7 +3,7 @@
 %
 % Calculation time: seconds
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % gareth.charnock@oerc.ox.ac.uk
 
 function cosy90_derome()

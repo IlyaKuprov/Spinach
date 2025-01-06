@@ -28,7 +28,7 @@
 % Note: this is an auxiliary function that is called by protein.m protein
 %       import module. Direct calls are discouraged.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ztw1e12@soton.ac.uk (Zenawi Welderufael)
 % Andras_Boeszoermenyi@hms.harvard.edu
 %

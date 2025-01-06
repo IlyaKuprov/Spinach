@@ -15,7 +15,7 @@
 % a series of Gaussian J-coupling calculation logs that differ 
 % only in the value of the dihedral angle in question.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=Karplus_fit.m>
 

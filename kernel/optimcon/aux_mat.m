@@ -53,7 +53,7 @@
 %
 % david.goodwin@inano.au.dk
 % u.rasulov@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=aux_mat.m>
 

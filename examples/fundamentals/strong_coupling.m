@@ -1,6 +1,6 @@
 % A garden variety strongly coupled two-spin system.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function strong_coupling()
 

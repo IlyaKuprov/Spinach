@@ -15,7 +15,7 @@
 %
 %   this function plots a figure
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=grid_plot.m>
 

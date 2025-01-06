@@ -1,7 +1,7 @@
 % Observables at thermal equilibrium using the three formalisms 
 % supported by Spinach kernel, tested against known answers.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function thermal_equilibrium_1()
 

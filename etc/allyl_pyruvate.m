@@ -18,7 +18,7 @@
 %       is for natural abundance 13C simulations only.
 %
 % a.acharya@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=allyl_pyruvate.m>
 

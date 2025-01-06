@@ -52,11 +52,11 @@
 %
 %    aux.pdb_aa_typ        - pdb amino acid type for each spin
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % zenawi.welderufael@soton.ac.uk
 % andras_boeszoermenyi@hms.harvard.edu
 % matt.walker@soton.ac.uk
-% m.g.concilio@soton.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
 %
 % <https://spindynamics.org/wiki/index.php?title=protein.m>
 
@@ -345,7 +345,7 @@ elseif strcmp(options.noshift,'delete')
     
     % Delete unassigned spins
     for n=missing_shifts
-        fprintf(2,['Missing assignment of ' pdb_aa_typ{n} 
+        fprintf(2,['Missing assignment of ' pdb_aa_typ{n}         ...
                    '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ...
                    ': the atom will not appear in the simulation.\n']);
     end

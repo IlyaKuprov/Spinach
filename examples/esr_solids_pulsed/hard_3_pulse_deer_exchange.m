@@ -7,7 +7,7 @@
 %
 % Calculation time: minutes
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % sabine.richert@chem.ox.ac.uk
 % christiane.timmel@chem.ox.ac.uk
 

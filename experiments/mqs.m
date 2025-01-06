@@ -21,7 +21,7 @@
 %
 %   fid - 2D magnitude-mode free induction decay
 %
-% m.g.concilio@soton.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
 % jean-nicolas.dumez@univ-nantes.fr
 %
 % <https://spindynamics.org/wiki/index.php?title=mqs.m>

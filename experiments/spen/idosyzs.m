@@ -41,7 +41,7 @@
 %             proportional to the integral of the real
 %             part of the correctly phased spectrum
 %
-% m.g.concilio@soton.ac.uk 
+% mariagrazia.concilio@sjtu.edu.cn 
 % gareth.morris@manchester.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=idosyzs.m>

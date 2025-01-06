@@ -10,9 +10,9 @@
 %
 % Calculation time: minutes.
 %
-% uluk.rasulov@soton.ac.uk
+% u.rasulov@soton.ac.uk
 % anupama.acharya@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function features_trapezium()
 

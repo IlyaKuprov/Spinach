@@ -323,7 +323,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
         [n_rows,n_cols]=size(gradients{n});
 
         % Stretch and apply the Jacobian
-        gradients{n}=J*gradients{n}(:);
+        gradients{n}=J'*gradients{n}(:);
 
         % Restore the original gradient layout
         gradients{n}=reshape(gradients{n},[n_rows n_cols]);

@@ -14,8 +14,8 @@
 %
 %  dt - time step of the MD trajectory, seconds
 %
-%  tau_est - correlation tiume estimate for internal safety
-%            control, seconds
+%  tau_est - H1 autocorrelation time estimate for internal 
+%            safety control, seconds
 %
 %  reg - optional overall relaxation rate, this is added to 
 %        every eigenvalue of the resulting matrix to prevent
@@ -60,7 +60,7 @@ traj_dur=dt*(traj_npts-1);
 
 % Print timing diagnostics
 report(spin_system,' ');
-report(spin_system,['H0 period:                       ' num2str(timescale,'%12.5e') ' seconds']);
+report(spin_system,['Shortest period in H0:           ' num2str(timescale,'%12.5e') ' seconds']);
 report(spin_system,['Trajectory step length:          ' num2str(dt,'%12.5e') ' seconds']);
 report(spin_system,['Total trajectory length:         ' num2str(traj_dur,'%12.5e') ' seconds']);
 report(spin_system,['Total trajectory points:         ' num2str(traj_npts)]);

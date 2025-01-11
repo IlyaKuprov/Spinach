@@ -35,7 +35,7 @@ function waveform=vg_pulse(pulse_name,npoints,duration)
 grumble(pulse_name,npoints,duration);
 
 % Stockpile names
-names={'E0A' 'E0B' 'E100A' 'E100B' 'E200A' 'E200D' 'E200F' 'E300C' 'E300F' 'E400B'...
+names={'E0A'   'E0B'   'E100A' 'E100B' 'E200A' 'E200D' 'E200F' 'E300C' 'E300F' 'E400B' ...
        'E300A' 'E500A' 'E500B' 'E500C' 'E600A' 'E600C' 'E600F' 'E800A' 'E800B' 'E1000B'};
 
 % Stockpile cosine coefficients
@@ -105,7 +105,7 @@ for k=1:20
     waveform=waveform+sines(k,pulse_number)*sin(k*time_grid);
 end
 
-% Normalize the waveform
+% Normalise the waveform
 waveform=2*pi*waveform/duration;
 
 end
@@ -132,6 +132,5 @@ end
 % ught, is not to be found, and perhaps, also, is not to be lost. The 
 % noble soul has reverence for itself.
 %
-% Friedrich Nietzsche,
-% "Beyond Good and Evil"
+% Friedrich Nietzsche, in "Beyond Good and Evil"
 

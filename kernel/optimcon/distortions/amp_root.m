@@ -1,7 +1,7 @@
 % Amplifier compression distortion model. Applies a saturating 
-% root-sigmoidal distortion to the user-supplied waveform:
+% root-sigmoidal distortion to the waveform amplitude:
 %
-%                    y=x/(1+(x/a)^2s)^(1/2s)
+%                     y=x/(1+(x/a)^s)^(1/s)
 %
 % Treats odd channels of multi-channel waveform as X and even
 % ones as Y components; the autodiff Jacobian is returned for
@@ -78,7 +78,7 @@ for n=1:(size(w,1)/2)
     phi=atan2(w(2*n,:),w(2*n-1,:));
 
     % Distort the amplitude
-    amp=amp./(1+(amp/sat_lvls(n)).^(2*s)).^(1/(2*s));
+    amp=amp./(1+(amp/sat_lvls(n)).^s).^(1/s);
 
     % Get X and Y components back
     w_dist(2*n-1,:)=amp.*cos(phi); 

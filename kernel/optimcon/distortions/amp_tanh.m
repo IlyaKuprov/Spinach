@@ -1,10 +1,13 @@
 % Amplifier compression distortion model. Applies a saturating 
-% exponential distortion to the user-supplied waveform. Treats
-% odd channels of multi-channel waveform as X and even ones as
-% Y components; the autodiff Jacobian is returned for the vec-
-% torisation of the input array. Syntax:
+% hyperbolic tangent distortion to the user-supplied waveform:
 %
-%                 [w,J]=amp_comp(w,sat_lvls)
+%                         y=a*tanh(x/a)
+%
+% Treats odd channels of multi-channel waveform as X and even 
+% ones as Y components; the autodiff Jacobian is returned for
+% the vectorisation of the input array. Syntax:
+%
+%                  [w,J]=amp_tanh(w,sat_lvls)
 %
 % Parameters:
 %
@@ -28,9 +31,9 @@
 %
 % ilya.kuprov@weizmann.ac.il
 %
-% <https://spindynamics.org/wiki/index.php?title=amp_comp.m>
+% <https://spindynamics.org/wiki/index.php?title=amp_tanh.m>
 
-function [w,J]=amp_comp(w,sat_lvls)
+function [w,J]=amp_tanh(w,sat_lvls)
 
 % Autodiff wrapper
 if nargout<2

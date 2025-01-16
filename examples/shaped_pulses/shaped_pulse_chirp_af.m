@@ -52,12 +52,14 @@ parameters.axis_units='Hz';
 H=hamiltonian(assume(spin_system,'nmr'));
 R=relaxation(spin_system);
 K=kinetics(spin_system);
-Lp=operator(spin_system,'L+','1H');
-Lm=operator(spin_system,'L-','1H');
-Lx=(Lp+Lm)/2; Ly=(Lp-Lm)/2i;
+Lx=operator(spin_system,'Lx','1H');
+Ly=operator(spin_system,'Ly','1H');
 
 % Chirp waveform in amplitude-frequency coordinates
 [~,~,durs,~,amps,~,frqs]=chirp_pulse(100,0.1,2000,16,'wurst');
+
+% Chirp frequency shift
+frqs=frqs+1000;
 
 % Soft pulse
 parameters.rho0=shaped_pulse_af(spin_system,H,Lx,Ly,parameters.rho0,...

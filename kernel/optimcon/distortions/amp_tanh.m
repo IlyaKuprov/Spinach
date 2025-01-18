@@ -16,10 +16,9 @@
 %                ged as XYXY... with respect to in-phase and
 %                quadrature parts on each control channel
 %
-%    sat_lvls  - saturation level beyond which the amplifier
-%                cannot go, rad/s nutation frequency units;
-%                one value per XY pair in w, corresponding 
-%                to the maximum output sqrt(X^2+Y^2) value
+%    sat_lvls  - saturation levels beyond which the amplifi-
+%                er cannot go, one value per X,Y pair in w,
+%                giving the maximum output sqrt(X^2+Y^2)
 %
 % Outputs:
 %

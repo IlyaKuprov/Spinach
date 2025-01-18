@@ -16,14 +16,14 @@
 %                ged as XYXY... with respect to in-phase and
 %                quadrature parts on each control channel
 %
-%    sat_lvls  - saturation level beyond which the amplifier
-%                cannot go, rad/s nutation frequency units;
-%                one value per XY pair in w, corresponding 
-%                to the maximum output sqrt(X^2+Y^2) value
+%    sat_lvls  - saturation levels beyond which the amplifi-
+%                er cannot go, one value per X,Y pair in w,
+%                giving the maximum output sqrt(X^2+Y^2)
 %
-%    s         - a positive integer regulating the sharpness
-%                of the transition from linear to saturating
-%                behaviour, a good starting choice is 4
+%    s         - a vector of positive integers (one value per
+%                X,Y pair in w) regulating the sharpness of
+%                the transition from linear to saturating be-
+%                haviour, a good starting choice is 4
 %
 % Outputs:
 %
@@ -78,7 +78,7 @@ for n=1:(size(w,1)/2)
     phi=atan2(w(2*n,:),w(2*n-1,:));
 
     % Distort the amplitude
-    amp=amp./(1+(amp/sat_lvls(n)).^s).^(1/s);
+    amp=amp./(1+(amp/sat_lvls(n)).^s(n)).^(1/s(n));
 
     % Get X and Y components back
     w_dist(2*n-1,:)=amp.*cos(phi); 

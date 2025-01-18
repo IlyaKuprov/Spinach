@@ -16,11 +16,14 @@
 %          control channel
 %
 %    p   - a vector (one element per XY control pair)
-%          containing the pole of the filter, a comp-
-%          lex number; its amplitude determines the
-%          decay rate, its phase is a frequency with
-%          which the filter's pole rotates the real
-%          and the imaginary part of the signal
+%          containing the filter coefficient:
+%
+%             p=exp(-r*dt+1i*(omega-omega_rf)*dt)
+%
+%          where r is th damping rate, omega is the
+%          pole frequency, omega_rf is the rotating
+%          frame frequency, and dt is the time dis-
+%          cretisation step.
 %
 % Outputs:
 %

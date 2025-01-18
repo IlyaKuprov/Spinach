@@ -23,7 +23,7 @@ switch identifier
         report(spin_system,' ');
         report(spin_system,'============================================');
         report(spin_system,'=                                          =');
-        report(spin_system,'=               SPINACH  v2.9              =');
+        report(spin_system,'=               SPINACH v2.10              =');
         report(spin_system,'=                                          =');
         report(spin_system,'=                <a href = "https://spindynamics.org/wiki/index.php?title=Spinach_developer_team">author list</a>               =');
         report(spin_system,'=                                          =');

@@ -1,7 +1,7 @@
 % A parallel wrapper around GRAPE that enables ensemble optimal control
 % optimisations. This function handles systems with multiple control po-
-% wer levels, multiple resonance offsets, multistate transfers, and en-
-% sembles of drift Liouvillians. Syntax:
+% wer levels, multiple resonance offsets, multistate transfers, ensemb-
+% les of drift Liouvillians, etc. Syntax:
 %
 %      [fidelity,gradient,hessian]=ensemble(waveform,spin_system)
 %

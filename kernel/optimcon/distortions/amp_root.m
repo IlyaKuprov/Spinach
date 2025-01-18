@@ -23,7 +23,7 @@
 %
 %    s         - a positive integer regulating the sharpness
 %                of the transition from linear to saturating
-%                behaviour
+%                behaviour, a good starting choice is 4
 %
 % Outputs:
 %

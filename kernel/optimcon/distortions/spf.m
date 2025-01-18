@@ -15,11 +15,12 @@
 %          in-phase and quadrature parts on each 
 %          control channel
 %
-%    p   - pole of the filter, a complex number; its
-%          amplitude controls the decay rate, its pha-
-%          se is a frequency with which the filter's 
-%          pole rotates the real and the imaginary
-%          part of the complex signal
+%    p   - a vector (one element per XY control pair)
+%          containing the pole of the filter, a comp-
+%          lex number; its amplitude determines the
+%          decay rate, its phase is a frequency with
+%          which the filter's pole rotates the real
+%          and the imaginary part of the signal
 %
 % Outputs:
 %
@@ -74,13 +75,13 @@ for n=1:nchannels
     % Build complex input signal
     x=inp(2*n-1,:)+1i*inp(2*n,:);
 
-    % Start the filtered signal
-    y=zeros(size(x),'like',x); y(1)=x(1);
+    % Build the filter matrix
+    [I,J]=ndgrid(1:ncols,1:ncols);             % Index arrays
+    A=(J==1).*p(n).^(I-1);                     % First element unchanged
+    B=((J>=2)&(I>=J)).*(1-p(n)).*p(n).^(I-J);  % The rest is filtered
 
     % Apply the filter
-    for k=2:ncols
-        y(k)=(1-p)*x(k)+p*y(k-1);
-    end
+    y=(A+B)*transpose(x);
 
     % Assign back to w_dist
     w_dist(2*n-1,:)=real(y);
@@ -99,13 +100,16 @@ if (~isnumeric(w))||(~isreal(w))
     error('w must be an array of real numbers.');
 end
 if mod(size(w,1),2)~=0
-    error('the number of rows in w must be even');
+    error('the number of rows in w must be even.');
 end
-if (~isnumeric(p))||(~isscalar(p))
-    error('p must be a complex scalar.');
+if (~isnumeric(p))||(~isvector(p))
+    error('p must be a vector or a scalar.');
 end
-if abs(p)>=1
-    error('must have |p|<1 for causal stability');
+if numel(p)~=size(w,1)/2
+    error('p must have one element per X,Y control pair.');
+end
+if any(abs(p(:))>=1)
+    error('must have |p(k)|<1 for causal stability.');
 end
 end
 

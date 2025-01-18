@@ -15,11 +15,12 @@
 %          in-phase and quadrature parts on each 
 %          control channel
 %
-%    z   - zero of the filter, a complex number; its
-%          amplitude controls the decay rate, its pha-
-%          se is a frequency with which the filter's 
-%          pole rotates the real and the imaginary
-%          part of the complex signal
+%    z   - a vector (one element per XY control pair)
+%          containing the zero of the filter, a comp-
+%          lex number; its amplitude determines the
+%          decay rate, its phase is a frequency with
+%          which the filter's zero rotates the real
+%          and the imaginary part of the signal
 %
 % Outputs:
 %
@@ -74,13 +75,14 @@ for n=1:nchannels
     % Build complex input signal
     x=inp(2*n-1,:)+1i*inp(2*n,:);
 
-    % Start the filtered signal
-    y=zeros(size(x),'like',x); y(1)=x(1);
+    % Build the filter matrix
+    [I,J]=ndgrid(1:ncols,1:ncols);    % Index arrays
+    A=(I==1)&(J==1);                  % First element unchanged
+    B=((I>1)&(I==J)).*(1/(1-z(n)));   % Main diagonal subsequently
+    C=((I>1)&(I==(J+1))).*(-z/(1-z)); % Subdiagonal subsequently
 
     % Apply the filter
-    for k=2:ncols
-        y(k)=x(k)/(1-z)-z*x(k-1)/(1-z);
-    end
+    y=(A+B+C)*transpose(x);
 
     % Assign back to w_dist
     w_dist(2*n-1,:)=real(y);
@@ -101,8 +103,11 @@ end
 if mod(size(w,1),2)~=0
     error('the number of rows in w must be even');
 end
-if (~isnumeric(z))||(~isscalar(z))
-    error('z must be a complex scalar.');
+if (~isnumeric(z))||(~isvector(z))
+    error('z must be a vector or a scalar.');
+end
+if numel(z)~=size(w,1)/2
+    error('z must have one element per X,Y control pair.');
 end
 end
 

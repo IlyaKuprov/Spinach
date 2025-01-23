@@ -20,7 +20,7 @@
 %   Fax: +44 (0) 161 275 4598
 %   mathias.nilsson@manchester.ac.uk
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=v2spinach.m>
 

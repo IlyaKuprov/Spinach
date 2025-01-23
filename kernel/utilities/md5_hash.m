@@ -11,7 +11,7 @@
 %
 %     hashstr      - hexadecimal character string  
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=md5_hash.m>
 

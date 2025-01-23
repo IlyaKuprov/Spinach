@@ -1,10 +1,13 @@
 % Amplifier compression distortion model. Applies a saturating 
-% exponential distortion to the user-supplied waveform. Treats
-% odd channels of multi-channel waveform as X and even ones as
-% Y components; the autodiff Jacobian is returned for the vec-
-% torisation of the input array. Syntax:
+% hyperbolic tangent distortion to the user-supplied waveform:
 %
-%                 [w,J]=amp_comp(w,sat_lvls)
+%                         y=a*tanh(x/a)
+%
+% Treats odd channels of multi-channel waveform as X and even 
+% ones as Y components; the autodiff Jacobian is returned for
+% the vectorisation of the input array. Syntax:
+%
+%                  [w,J]=amp_tanh(w,sat_lvls)
 %
 % Parameters:
 %
@@ -13,10 +16,9 @@
 %                ged as XYXY... with respect to in-phase and
 %                quadrature parts on each control channel
 %
-%    sat_lvls  - saturation level beyond which the amplifier
-%                cannot go, rad/s nutation frequency units;
-%                one value per XY pair in w, corresponding 
-%                to the maximum output sqrt(X^2+Y^2) value
+%    sat_lvls  - saturation levels beyond which the amplifi-
+%                er cannot go, one value per X,Y pair in w,
+%                giving the maximum output sqrt(X^2+Y^2)
 %
 % Outputs:
 %
@@ -26,11 +28,11 @@
 %    J         - distortion Jacobian matrix with respect to
 %                the vectorisation of the input, sparse
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
-% <https://spindynamics.org/wiki/index.php?title=amp_comp.m>
+% <https://spindynamics.org/wiki/index.php?title=amp_tanh.m>
 
-function [w,J]=amp_comp(w,sat_lvls)
+function [w,J]=amp_tanh(w,sat_lvls)
 
 % Autodiff wrapper
 if nargout<2

@@ -9,7 +9,7 @@
 %
 % Calculation time: minutes, faster with a GPU.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function pa_difluoroheptane_syn()
 

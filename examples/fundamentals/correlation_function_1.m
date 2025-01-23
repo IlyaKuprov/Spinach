@@ -9,7 +9,7 @@
 %
 % Isotropic rotational diffusion tested here.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function correlation_function_1()
 

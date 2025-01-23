@@ -4,7 +4,7 @@
 % Calculation time: seconds.
 %
 % b.macaulay@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function coloc_test()
 

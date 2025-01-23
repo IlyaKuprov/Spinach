@@ -2,7 +2,7 @@
 % electron probability density.
 %
 % g.t.p.charnock@oerc.ox.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function gau_density()
 

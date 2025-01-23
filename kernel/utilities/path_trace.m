@@ -28,7 +28,7 @@
 %             http://dx.doi.org/10.1063/1.3398146
 %             http://dx.doi.org/10.1016/j.jmr.2011.03.010
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % matthew.krzystyniak@oerc.ox.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=path_trace.m>

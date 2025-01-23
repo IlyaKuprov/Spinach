@@ -5,7 +5,7 @@
 %
 % Calculation time: minutes on NVidia Tesla A100, much longer on CPU
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % aanevzor@ncsu.edu
 
 function cp_contact_mas_nhh()

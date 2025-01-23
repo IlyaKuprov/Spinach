@@ -12,7 +12,7 @@
 %              dimension with room for the specified num-
 %              ber of non-zeroes
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=mprealloc.m>
 
@@ -30,7 +30,7 @@ switch spin_system.bas.formalism
         problem_dim=size(spin_system.bas.basis,1);
         A=spalloc(problem_dim,problem_dim,nnzpc*problem_dim);
         
-    case 'zeeman-hilb'
+    case {'zeeman-wavef','zeeman-hilb'}
         
         % Create a zero Hilbert space matrix operator
         problem_dim=prod(spin_system.comp.mults);

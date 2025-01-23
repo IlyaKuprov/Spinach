@@ -7,7 +7,7 @@
 % Source: Penchav, et al., Spec. Acta Part A, 78 (2011) 559-565.
 %
 % ledwards@cbs.mpg.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function parallelization_1()
 

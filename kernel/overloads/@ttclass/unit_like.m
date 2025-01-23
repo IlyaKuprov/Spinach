@@ -5,7 +5,7 @@
 % Full square matrices, sparse matrices and tensor train represen-
 % tations of square matrices are supported.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ttclass/unit_like.m>
 

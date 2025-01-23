@@ -36,7 +36,7 @@
 %       impossible in this pulse sequence.
 %
 % Andrew Porter
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=pansy_triple.m>
 

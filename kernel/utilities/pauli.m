@@ -38,7 +38,7 @@
 % Note: arrays are declared complex at creation to avoid 
 %       expensive reallocation operations later on.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=pauli.m>
 

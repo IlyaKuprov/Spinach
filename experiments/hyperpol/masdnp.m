@@ -43,7 +43,7 @@
 % Note: this function must be called directly, without a context
 %       wrapper.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % fmentink@magnet.fsu.edu
 %
 % <https://spindynamics.org/wiki/index.php?title=masdnp.m>

@@ -30,7 +30,7 @@
 % 
 %     Ilm  - multipole moments of the probability density 
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % e.suturina@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=points2mult.m>

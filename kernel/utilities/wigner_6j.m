@@ -16,7 +16,7 @@
 %
 %     w       - the resulting 6j-symbol
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=wigner_6j.m>
 

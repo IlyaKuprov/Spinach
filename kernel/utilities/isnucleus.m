@@ -12,7 +12,7 @@
 %    verdict - true for a nucleus known to Spinach, false
 %              for an electron, a muon, a neutron, or a ghost
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=isnucleus.m>
 

@@ -4,7 +4,7 @@
 % Note: antisymmetric components of the shielding ten-
 %       sors are ignored.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function cst_peptide_bond()
     

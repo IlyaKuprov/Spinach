@@ -20,7 +20,7 @@
 %
 %                sys.isotopes, inter.coordinates, inter.pbc
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=cubic_lattice.m>
 

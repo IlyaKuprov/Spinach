@@ -1,7 +1,7 @@
 % Test of matrix exponential differentiation routines. The first pair of
 % matrices must be equal; the second pair of matrices must be equal.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function dirdiff_1()
 

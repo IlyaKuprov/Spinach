@@ -18,7 +18,7 @@
 %
 %    w - Gauss-Legendre weights
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=gaussleg.m>
 
@@ -46,6 +46,9 @@ w=(b-a)./((1-x.^2).*dV.^2)*((n+2)/(n+1))^2;
 
 % Map from [-1,1] to [a,b]
 x=(a*(1-x)+b*(1+x))/2;
+
+% Sort arguments in ascending order
+[x,idx]=sort(x,'ascend'); w=w(idx);
 
 end
 

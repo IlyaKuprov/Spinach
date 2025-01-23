@@ -2,7 +2,7 @@
 % over one of the chi angles in leucine using Gaussian09.
 %
 % z.t.welderufael@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function leu_chi_fit()
 

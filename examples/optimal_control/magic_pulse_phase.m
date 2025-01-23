@@ -14,7 +14,7 @@
 %
 % Calculation time: minutes.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % david.goodwin@inano.au.dk
 
 function magic_pulse_phase()

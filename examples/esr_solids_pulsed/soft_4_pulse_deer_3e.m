@@ -3,7 +3,7 @@
 %
 % Calculation time: hours
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function soft_4_pulse_deer_3e()
 

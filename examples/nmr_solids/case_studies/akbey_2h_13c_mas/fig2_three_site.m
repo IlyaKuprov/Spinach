@@ -7,7 +7,7 @@
 % Calculation time: seconds.
 %
 % umitakbey@gmail.com
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function fig2_three_site()
 

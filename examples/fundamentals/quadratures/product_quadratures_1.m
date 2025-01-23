@@ -5,7 +5,7 @@
 %
 % a.graham@soton.ac.uk
 % a.acharya@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function product_quadratures_1()
 

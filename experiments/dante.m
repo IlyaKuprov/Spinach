@@ -24,7 +24,7 @@
 %
 %     fid                  - free induction decay
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % m.carravetta@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=dante.m>

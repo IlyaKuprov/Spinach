@@ -1,6 +1,6 @@
 % A simple test of ttclass object arithmetic.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % d.savostyanov@soton.ac.uk
 
 function ttrain_test_1()

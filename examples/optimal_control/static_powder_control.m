@@ -13,8 +13,8 @@
 %
 % Calculation time: minutes
 %
-% i.kuprov@soton.ac.uk
-% uluk.rasulov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
+% u.rasulov@soton.ac.uk
 % marina.carravetta@soton.ac.uk
 
 function static_powder_control()

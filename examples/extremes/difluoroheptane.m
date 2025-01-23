@@ -6,7 +6,7 @@
 %
 % Run time on the above: minutes
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % b.linclau@soton.ac.uk
 
 function difluoroheptane()

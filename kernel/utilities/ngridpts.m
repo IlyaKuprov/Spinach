@@ -30,7 +30,7 @@
 %       in practice be necessary to have several times the number,
 %       depending on your accuracy requirements.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ngridpts.m>
 

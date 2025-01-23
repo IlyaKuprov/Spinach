@@ -54,7 +54,7 @@
 %    Dpp  - matrix of second derivatives of the function with respect
 %           to the waveform phases.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % david.goodwin@inano.au.dk
 %
 % <https://spindynamics.org/wiki/index.php?title=cartesian2polar.m>

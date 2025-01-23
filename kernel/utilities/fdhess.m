@@ -21,7 +21,7 @@
 %                      d2A_dydx  d2A_dydy  d2A_dydz
 %                      d2A_dzdx  d2A_dzdy  d2A_dzdz}
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=fdhess.m>
 

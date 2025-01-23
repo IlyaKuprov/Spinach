@@ -30,7 +30,7 @@
 %        smallest energy gap in H0; complexity is linear in the or-
 %        der and cubic in the matrix dimension.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=vvpert.m>
 

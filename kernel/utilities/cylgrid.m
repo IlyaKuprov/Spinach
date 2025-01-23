@@ -15,7 +15,7 @@
 %
 %    this function updates the current figure
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % emile.ottoy@ugent.be
 %
 % <https://spindynamics.org/wiki/index.php?title=cylgrid.m>

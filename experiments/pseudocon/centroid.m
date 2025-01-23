@@ -15,7 +15,7 @@
 %
 %     [x,y,z]  - centre of mass coordinates
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=centroid.m>
 

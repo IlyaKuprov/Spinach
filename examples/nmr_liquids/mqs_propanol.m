@@ -3,7 +3,7 @@
 %
 % Calculation time: seconds
 % 
-% m.g.concilio@soton.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
 % jean-nicolas.dumez@univ-nantes.fr
 
 function mqs_propanol()

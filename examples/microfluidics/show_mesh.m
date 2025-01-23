@@ -2,7 +2,7 @@
 % hydrodynamic mesh and velocity field from COMSOL. 
 %
 % a.acharya@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function show_mesh()
 

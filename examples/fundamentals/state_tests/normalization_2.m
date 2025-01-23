@@ -3,7 +3,7 @@
 % malisms supported by Spinach. Output should be a 6x3 matrix
 % with identical columns.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 
 function normalization_2()

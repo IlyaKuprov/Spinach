@@ -10,7 +10,7 @@
 % clears the workspace; do not use it in any way other
 % than from the command line.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=smack.m>
 

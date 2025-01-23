@@ -1,7 +1,7 @@
 % GRAPE Hessian internal consistency test: Newton 
 % against Goodwin algorithm.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % david.goodwin@inano.au.dk
 
 function dirdiff_5_rect()

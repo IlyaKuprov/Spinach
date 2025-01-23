@@ -25,7 +25,7 @@
 %       on, use rotframe.m or intrep.m if a rigorous treat-
 %       ment of second order effects is required.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=frqoffset.m>
 

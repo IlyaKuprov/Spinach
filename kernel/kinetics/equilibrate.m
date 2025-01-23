@@ -15,7 +15,7 @@
 %
 %     c  - vector of equilibrium concentrations
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=equilibrate.m>
 

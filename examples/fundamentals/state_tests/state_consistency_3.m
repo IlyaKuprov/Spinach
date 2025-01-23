@@ -1,7 +1,7 @@
 % Deuterium pair singlet, triplet, and quintet state
 % internal consistency test.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function state_consistency_3()
 

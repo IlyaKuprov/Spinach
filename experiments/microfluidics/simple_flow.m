@@ -25,7 +25,7 @@
 %        or Liouville space, use fpl2phan and fpl2rho func-
 %        tions.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=simple_flow.m>
 

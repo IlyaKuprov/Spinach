@@ -24,7 +24,7 @@
 % Note: multi-spin orders relax at the sum of the rates of
 %       their constituent single-spin orders.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=rlx_t1_t2.m>
 

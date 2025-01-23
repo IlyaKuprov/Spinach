@@ -12,7 +12,7 @@
 %    phi - the phase of the n-th pulse in 
 %          PMLG sequence, radians
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % m.carravetta@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=pmlg5.m>

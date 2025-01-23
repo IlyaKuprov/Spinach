@@ -58,10 +58,10 @@
 % Note: Cy is zero for the saltire pulse, this radically changes
 %       its phase and amplitude profiles.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % jeannicolas.dumez@cnrs.fr
 % ludmilla.guduff@cnrs.fr
-% m.g.concilio@soton.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
 % mohammadali.foroozandeh@chem.ox.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=chirp_pulse.m>

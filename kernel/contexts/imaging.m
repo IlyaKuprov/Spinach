@@ -77,7 +77,7 @@
 %       with dimensions ordered as [X Y Z].
 %
 % a.j.allami@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=Imaging.m>
 

@@ -1,6 +1,6 @@
 % Test of the span-skew interaction convention.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function spsk_test()
 

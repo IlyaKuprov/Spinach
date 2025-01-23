@@ -18,7 +18,7 @@
 % Note: only shifts and coordinates are provided for 15N nuclei.
 %
 % ledwards@cbs.mpg.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=strychnine.m>
 

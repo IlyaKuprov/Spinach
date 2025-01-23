@@ -31,7 +31,7 @@
 % Note: polyadic objects are returned, use inflate() to get the
 %       corresponding sparse matrix.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.j.allami@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=hydrodynamics.m>

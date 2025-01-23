@@ -22,7 +22,8 @@
 %                         array of matrices).
 %
 %   waveform            - control coefficients for each control ope-
-%                         rator (in rows of a matrix), rad/s
+%                         rator (in vertical dimension) at each time
+%                         step (in horizonal dimension), rad/s
 %
 %   rho_init            - initial state of the system as a vector in
 %                         Liouville space.
@@ -51,14 +52,14 @@
 %       directly. Use grape_xy.m and grape_phase.m instead.
 %
 % david.goodwin@inano.au.dk
-% uluk.rasulov@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% u.rasulov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % m.keitel@soton.ac.uk
 %
 % TODO (Keitel): add logic to avoid computing backward trajectory 
 %                when the gradient is not requested
 %
-% <https://spindynamics.org/wiki/index.php?title=grape.m>
+% <https://spindynamics.org/wiki/index.php?title=grape_liouv.m>
 
 function [traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,...
                                                     waveform,rho_init,rho_targ,...
@@ -840,7 +841,7 @@ end
 % Consistency enforcement
 function grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ)
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
-    error('optimal control module requires Lioville space formalism.');
+    error('this function requires Lioville space formalism.');
 end
 if (~isnumeric(rho_init))||(~iscolumn(rho_init))
     error('rho_init must be a column vector.');

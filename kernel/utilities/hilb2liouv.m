@@ -28,7 +28,7 @@
 %
 %          L - the resulting superoperator or state vector
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=hilb2liouv.m>
 

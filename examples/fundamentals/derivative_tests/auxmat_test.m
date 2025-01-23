@@ -2,7 +2,7 @@
 % matrix expression against a high-accuracy finite diffe-
 % rence approximation.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function auxmat_test()
 

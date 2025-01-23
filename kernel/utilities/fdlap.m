@@ -28,7 +28,7 @@
 %                zation of the array. The dimensions are assumed
 %                to be ordered as [X Y Z].
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=fdlap.m>
 

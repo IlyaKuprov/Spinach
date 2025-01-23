@@ -17,7 +17,7 @@
 %     Y        - an array of spherical harmonics 
 %                evaluated at the angles specified 
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=spher_harmon.m>
 

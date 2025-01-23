@@ -1,7 +1,7 @@
 % A parallel wrapper around GRAPE that enables ensemble optimal control
 % optimisations. This function handles systems with multiple control po-
-% wer levels, multiple resonance offsets, multistate transfers, and en-
-% sembles of drift Liouvillians. Syntax:
+% wer levels, multiple resonance offsets, multistate transfers, ensemb-
+% les of drift Liouvillians, etc. Syntax:
 %
 %      [fidelity,gradient,hessian]=ensemble(waveform,spin_system)
 %
@@ -28,7 +28,7 @@
 %                  sians from the fidelity Hessian.
 %
 % david.goodwin@inano.au.dk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=ensemble.m>
@@ -271,6 +271,14 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
                 [traj_data{n},fidelities{n}]=grape_hilb(spin_system,L,spin_system.control.operators,...
                                                         local_waveform,rho_init,rho_targ,...
                                                         spin_system.control.fidelity);
+
+            case 'zeeman-wavef'
+
+                % Call wavefunction version of the GRAPE function
+                [traj_data{n},fidelities{n}]=grape_wavef(spin_system,L,spin_system.control.operators,...
+                                                         local_waveform,rho_init,rho_targ,...
+                                                         spin_system.control.fidelity);
+
             otherwise
 
                 % Complain and bomb out
@@ -312,6 +320,14 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
                 [traj_data{n},fidelities{n},gradients{n}]=grape_hilb(spin_system,L,spin_system.control.operators,...
                                                                      local_waveform,rho_init,rho_targ,...
                                                                      spin_system.control.fidelity);
+
+            case 'zeeman-wavef'
+
+                % Call wavefunction version of the GRAPE function
+                [traj_data{n},fidelities{n},gradients{n}]=grape_wavef(spin_system,L,spin_system.control.operators,...
+                                                                      local_waveform,rho_init,rho_targ,...
+                                                                      spin_system.control.fidelity);
+
             otherwise
 
                 % Complain and bomb out
@@ -323,7 +339,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
         [n_rows,n_cols]=size(gradients{n});
 
         % Stretch and apply the Jacobian
-        gradients{n}=J*gradients{n}(:);
+        gradients{n}=J'*gradients{n}(:);
 
         % Restore the original gradient layout
         gradients{n}=reshape(gradients{n},[n_rows n_cols]);
@@ -344,6 +360,14 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
 
                 % Complain and bomb out
                 error('Newton-Raphson methods are not available in Hilbert space, use LBFGS.');
+
+            case 'zeeman-wavef'
+
+                % Call wavefunction version of the GRAPE function
+                [traj_data{n},fidelities{n},...
+                 gradients{n},hessians{n}]=grape_wavef(spin_system,L,spin_system.control.operators,...
+                                                       local_waveform,rho_init,rho_targ,...
+                                                       spin_system.control.fidelity);
 
             otherwise
 

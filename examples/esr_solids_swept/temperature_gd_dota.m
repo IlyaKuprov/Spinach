@@ -4,7 +4,7 @@
 %
 % Calculation time: seconds.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function temperature_gd_dota()
 

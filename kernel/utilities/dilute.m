@@ -27,7 +27,7 @@
 %                    responding to one of the new-
 %                    ly formed isotopomers.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 % bud.macaulay@soton.ac.uk
 %

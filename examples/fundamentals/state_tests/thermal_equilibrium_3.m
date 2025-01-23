@@ -1,7 +1,7 @@
 % Test of the thermal equilibrium functionality against the 
 % textbook expressions for the Boltzmann populations.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function thermal_equilibrium_3()
 

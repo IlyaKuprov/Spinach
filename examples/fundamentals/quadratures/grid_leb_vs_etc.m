@@ -1,7 +1,7 @@
 % Heuristic vs Lebedev spherical quadrature bake-off, illus-
 % trating the fact that, well... heuristic grids suck.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function grid_leb_vs_etc()
 

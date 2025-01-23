@@ -18,7 +18,7 @@
 %
 %     M   - symmetric 3x3 matrix, Hz
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=zfs2mat.m>
 

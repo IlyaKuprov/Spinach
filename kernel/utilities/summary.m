@@ -27,7 +27,7 @@
 %       ging spin_system.sys.output='hush' at any point during the
 %       calculation.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=summary.m>
 
@@ -286,6 +286,8 @@ switch topic
         
         % Report the formalism
         switch spin_system.bas.formalism
+            case 'zeeman-wavef'
+                report(spin_system,'Zeeman basis set using wavefunction formalism.');
             case 'zeeman-hilb'
                 report(spin_system,'Zeeman basis set using Hilbert space matrix formalism.');
             case 'zeeman-liouv'

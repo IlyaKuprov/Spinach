@@ -4,7 +4,7 @@
 % superoperator phantom.
 %
 % a.acharya@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function reacting_flow()
 

@@ -10,7 +10,7 @@
 %  Tesla A100 (2021, PCI-E): 356.4 GFLOPS (CPU), 10093.5 GFLOPS (GPU)
 %
 % jos.martin@mathworks.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function mult_gpu(precision)
 

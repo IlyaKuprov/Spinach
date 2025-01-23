@@ -7,8 +7,8 @@
 %
 % Calculation time: seconds
 %
-% m.g.concilio@soton.ac.uk 
-% i.kuprov@soton.ac.uk 
+% mariagrazia.concilio@sjtu.edu.cn 
+% ilya.kuprov@weizmann.ac.il 
 
 function states_vs_tauc_si_sys_b()
 

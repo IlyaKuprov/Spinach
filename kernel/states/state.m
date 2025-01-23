@@ -62,7 +62,7 @@
 % 
 % d.sayostyanov@soton.ac.uk
 % luke.edwards@ucl.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=state.m>
 
@@ -200,7 +200,12 @@ switch spin_system.bas.formalism
         
         % Generate a Hilbert space operator
         rho=operator(spin_system,states,spins);
-        
+
+    case 'zeeman-wavef'
+
+        % Tell the user to dog it
+        error('wavefunctions must be specified manually.')
+
     otherwise
         
         % Complain and bomb out

@@ -16,7 +16,7 @@
 %
 % Note: a prefix can be a polyadic itself.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=polyadic/prefix.m>
 

@@ -2,7 +2,7 @@
 % calculation in the three-dimensional Woods-Saxon potential. Units,
 % when not SI, are femtometres and MeV.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function woods_saxon(mass_number,level_number)
 

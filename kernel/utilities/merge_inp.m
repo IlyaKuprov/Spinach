@@ -21,7 +21,7 @@
 % Note: incomplete, an error is thrown for unhandled subfields,
 %       extend as appropriate.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.acharya@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=merge_inp.m>

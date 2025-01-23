@@ -5,7 +5,7 @@
 %
 % Calculation time: seconds
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % matthew.krzystyniak@oerc.ox.ac.uk
 
 function pulse_acquire_chrysene()

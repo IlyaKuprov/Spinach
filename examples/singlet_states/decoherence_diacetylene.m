@@ -6,7 +6,7 @@
 % Calculation time: seconds
 %
 % yesu.feng@duke.edu
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function decoherence_diacetylene()
 

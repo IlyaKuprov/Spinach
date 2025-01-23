@@ -4,7 +4,7 @@
 %
 % Calculation time: minutes.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % a.j.allami@soton.ac.uk
 
 function diffusion_test_2c()

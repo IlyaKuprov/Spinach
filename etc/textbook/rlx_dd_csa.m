@@ -54,7 +54,7 @@
 %     X - longitudinal cross-relaxation rate between 
 %         spins A and B
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=rlx_dd_csa.m>
 

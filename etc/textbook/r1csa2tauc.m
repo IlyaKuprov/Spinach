@@ -18,7 +18,7 @@
 %
 %    tauc    - rotational correlation time, seconds
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=r1csa2tauc.m>
 

@@ -20,7 +20,7 @@
 %      S    - the solid angle of the Voronoi cell
 %
 % brunoluong@yahoo.com
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=vcell_solidangle.m>
 

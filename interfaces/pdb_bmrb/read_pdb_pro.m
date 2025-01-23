@@ -26,7 +26,7 @@
 %       coords - nspins x 1 cell array of 3-vectors giving 
 %                Cartesian coordinates of each spin in Angstrom
 %
-% i.kuprov@soton.ac.uk
+% i.ka.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=read_pdb_pro.m>
 

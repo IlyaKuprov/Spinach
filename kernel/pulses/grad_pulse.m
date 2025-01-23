@@ -35,7 +35,7 @@
 %       sophisticated gradient work, use the imaging context.
 %
 % ledwards@cbs.mpg.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=grad_pulse.m>
 

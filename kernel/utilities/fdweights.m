@@ -20,7 +20,7 @@
 %                    sive derivatives in rows
 %
 % fornberg@colorado.edu
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=fdweights.m>
 

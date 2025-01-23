@@ -28,8 +28,8 @@
 %      parameters.ro_grad_dur  - the duration of the readout
 %                                gradient, seconds.
 %
-% m.g.concilio@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=mri_2d_plot.m>
 

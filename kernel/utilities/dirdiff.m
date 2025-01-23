@@ -22,7 +22,7 @@
 %     D - a cell array of matrices {D0,D1,D2,...} of Eq 18
 %         in Goodwin and Kuprov
 %         
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % david.goodwin@inano.au.dk
 %
 % <https://spindynamics.org/wiki/index.php?title=dirdiff.m>

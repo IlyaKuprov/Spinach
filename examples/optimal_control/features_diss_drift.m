@@ -16,7 +16,7 @@
 %
 % Calculation time: hours.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % david.goodwin@inano.au.dk
 
 function features_diss_drift()

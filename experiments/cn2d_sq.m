@@ -15,7 +15,7 @@
 %        fid.cos             - sine and cosine components
 %                              of the States quadrature
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % p.t.williamson@soton.ac.uk
 % m.carravetta@soton.ac.uk
 % j.jarvis@soton.ac.uk

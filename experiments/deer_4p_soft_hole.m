@@ -58,7 +58,7 @@
 %       calculation runs out of memory, and use 'evolution' as the
 %       last resort.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=deer_4p_soft_hole.m>
 

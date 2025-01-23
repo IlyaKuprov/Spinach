@@ -1,7 +1,7 @@
 % Liouvillian symmetrization for a radical pair with four 
 % equivalent nuclei under the S4 permutation group.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function symmetry_1()
 

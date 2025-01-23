@@ -3,7 +3,7 @@
 %
 % Run time: minutes on NVidia Titan V card, hours on CPU.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % h.j.hogben@chem.ox.ac.uk
 % peter.hore@chem.ox.ac.uk
 

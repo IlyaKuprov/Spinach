@@ -2,7 +2,7 @@
 % distribution. Experimental data from Gottfried Ott-
 % ing (Australian National University).
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % e.suturina@soton.ac.uk
 
 function tm_1igv_distr_fit()

@@ -1,7 +1,7 @@
 % Tests of Spinach Stevens operator function against
 % explicit expressions from the literature.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function stevens_test()
 

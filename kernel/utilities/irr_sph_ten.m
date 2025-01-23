@@ -28,7 +28,7 @@
 % spin quantum number is to impose identical commutation rela-
 % tions rather than equal matrix norms.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % hannah.hogben@chem.ox.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=irr_sph_ten.m>

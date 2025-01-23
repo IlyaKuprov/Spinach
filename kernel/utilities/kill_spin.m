@@ -21,7 +21,7 @@
 %        function; you would need to call basis.m and assume.m
 %        again.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=kill_spin.m>

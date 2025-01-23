@@ -61,7 +61,7 @@
 %        generate single-spin superoperators and multiply them up.
 %
 % ledwards@cbs.mpg.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=operator.m>
 
@@ -126,7 +126,9 @@ switch spin_system.bas.formalism
         end
                 
     % Zeeman basis formalisms
-    case {'zeeman-hilb','zeeman-liouv'}
+    case {'zeeman-wavef',...
+          'zeeman-hilb',...
+          'zeeman-liouv'}
 
         % Parallelisation efficiency
         mults=spin_system.comp.mults;
@@ -196,7 +198,7 @@ if strcmp(format,'csc')
             % As per the basis set specification
             matrix_dim=size(spin_system.bas.basis,1);
 
-        case 'zeeman-hilb'
+        case {'zeeman-wavef','zeeman-hilb'}
             
             % Entire Hilbert space
             matrix_dim=prod(spin_system.comp.mults);

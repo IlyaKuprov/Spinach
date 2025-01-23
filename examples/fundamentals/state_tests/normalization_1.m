@@ -1,7 +1,7 @@
 % Internal consistency test for the state vectors and matrices
 % in each of the three formalisms supported by Spinach.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function normalization_1()
 

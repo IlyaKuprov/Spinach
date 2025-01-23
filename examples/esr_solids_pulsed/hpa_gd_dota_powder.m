@@ -6,7 +6,7 @@
 % Calculation time: minutes
 %
 % corzilius@solidstatednp.com
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function hpa_gd_dota_powder()
 

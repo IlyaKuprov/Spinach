@@ -25,7 +25,7 @@
 %
 %    parameters - the updated parameters structure
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=crop_2d.m>
 

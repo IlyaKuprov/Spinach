@@ -5,7 +5,7 @@
 % Calculation time: hours, much faster with a Tesla A100 GPU.
 %
 % m.carravetta@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function vfit_4sim_ik()
 

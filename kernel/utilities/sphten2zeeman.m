@@ -13,7 +13,7 @@
 %
 % Note: the matrix need not be square and may be huge.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % enu.jamila@proton.me
 %
 % <https://spindynamics.org/wiki/index.php?title=sphten2zeeman.m>

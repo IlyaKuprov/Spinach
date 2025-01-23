@@ -2,7 +2,7 @@
 % calculation is performed three times in the three formalisms
 % supported by Spinach.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function commutation_4()
 

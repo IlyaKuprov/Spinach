@@ -6,7 +6,7 @@
 % Titan V    (2017, TCC mode): send 10.3, gather 2.6, bw GPU 568,  bw CPU 64
 % Tesla A100 (2021, PCI-E):    send 10.4, gather 2.6, bw GPU 1291, bw CPU 64
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function comm_gpu(n)
 

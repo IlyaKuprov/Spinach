@@ -13,7 +13,7 @@
 %    rho          - vector or matrix representation of
 %                   the unit state 
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % d.savostyanov@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=unit_state.m>

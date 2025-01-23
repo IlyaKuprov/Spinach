@@ -19,7 +19,7 @@
 %
 %    the function creates a figure
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=mesh_plot.m>
 

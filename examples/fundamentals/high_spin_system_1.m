@@ -2,7 +2,7 @@
 % coupling to a 235U nucleus. The spectral lines should be split
 % accordingly.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function high_spin_system_1()
 

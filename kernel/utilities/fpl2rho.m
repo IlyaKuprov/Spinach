@@ -15,7 +15,7 @@
 %
 %      rho   - Liouville space state vector
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=fpl2rho.m>
 

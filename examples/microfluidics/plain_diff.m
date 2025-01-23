@@ -2,7 +2,7 @@
 % magnetisation is tracked as a function of time.
 %
 % a.acharya@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function plain_diff()
 

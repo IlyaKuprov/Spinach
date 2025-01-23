@@ -26,7 +26,7 @@
 %
 %    time_grid - row vector of time grid ticks
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=fapt2sfo.m>
 
@@ -50,7 +50,14 @@ if ~exist('time_grid','var')
 
 else
 
-    % Accept what is given
+    % Make sure time grid is a real row vector
+    if (~isnumeric(time_grid))||...
+       (~isreal(time_grid))||...
+       (~isrow(time_grid))
+        error('time_grid must be a real row vector.');
+    end
+
+    % Accept what is provided
     npts=numel(time_grid); dt=[];
 
 end

@@ -11,7 +11,7 @@
 %
 % Calculation time: minutes
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function dor_powder_nav_fplanck_freq()
 

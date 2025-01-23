@@ -18,7 +18,7 @@
 %
 %      Rm  - the rest of R
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=rlx_split.m>
 

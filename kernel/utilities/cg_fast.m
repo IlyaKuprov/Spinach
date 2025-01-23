@@ -26,7 +26,7 @@
 %       machine precision implementation for higher ranks is available
 %       in clebsch_gordan.m function.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=cg_fast.m>
 

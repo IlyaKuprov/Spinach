@@ -33,7 +33,7 @@
 % Notes: the function also creates a figure with the distributi-
 %        ons it has used for D and E parameters.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=zfs_sampling.m>
 

@@ -6,7 +6,7 @@
 % Calculation time: seconds
 %
 % hannah.hogben@chem.ox.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function decoherence_napthalenetetrone()
 

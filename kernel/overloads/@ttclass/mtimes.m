@@ -6,7 +6,7 @@
 % (b) can be scalar, or tensor train, or full matrix.
 %
 % d.savostyanov@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ttclass/mtimes.m>
 

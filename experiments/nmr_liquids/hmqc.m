@@ -33,7 +33,7 @@
 % Note: natural abundance experiments should make use of the iso-
 %       tope dilution functionality. See dilute.m function.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=hmqc.m>
 

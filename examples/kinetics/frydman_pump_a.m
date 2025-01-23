@@ -5,8 +5,8 @@
 %
 % mihajlo.novakovic@weizmann.ac.il
 % lucio.frydman@weizmann.ac.il
-% i.kuprov@soton.ac.uk
-% m.g.concilio@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
+% mariagrazia.concilio@sjtu.edu.cn
 
 function frydman_pump_a()
 

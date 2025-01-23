@@ -27,7 +27,7 @@
 %
 % Note: the reverse transformation is ill-defined.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=spsk2mat.m>
 

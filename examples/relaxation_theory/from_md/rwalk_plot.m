@@ -1,7 +1,7 @@
 % A plot of a typical random walk on a sphere.
 %
 % jpresteg@uga.edu
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function rwalk_plot()
 

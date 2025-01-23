@@ -1,6 +1,6 @@
 % Unit tests for the polyadic object.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function polyadic_test_1()
 

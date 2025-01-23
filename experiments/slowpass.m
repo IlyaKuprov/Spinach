@@ -35,7 +35,7 @@
 %       matrix inversion operation would fail to converge. The re-
 %       laxation matrix R should *not* be thermalized.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=slowpass.m>
 

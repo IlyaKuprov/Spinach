@@ -25,8 +25,8 @@
 %               part of the correctly phased spectrum
 %
 %
-% m.g.concilio@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=st_ideal.m>
 

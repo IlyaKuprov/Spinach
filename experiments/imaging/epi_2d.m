@@ -26,7 +26,7 @@
 %   mri - MRI image with square sinebell apodisation.
 % 
 % a.j.allami@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% i.ka.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=epi_2d.m>
 

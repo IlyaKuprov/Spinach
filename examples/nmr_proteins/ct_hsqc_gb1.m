@@ -4,7 +4,7 @@
 % Simulation time: hours, faster with a Tesla A100 GPU.
 %
 % m.walker@soton.ac.uk
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function ct_hsqc_gb1()
 

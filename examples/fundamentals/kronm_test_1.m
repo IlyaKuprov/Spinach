@@ -1,6 +1,6 @@
 % Tests for the kron-times-matrix infrastructure.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function kronm_test_1()
 

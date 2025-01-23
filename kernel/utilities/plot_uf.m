@@ -33,7 +33,7 @@
 %   a figure with correct axis ticks axes in the UF and conventional
 %   dimension
 %
-% m.g.concilio@soton.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
 %
 % <https://spindynamics.org/wiki/index.php?title=plot_uf.m>
 

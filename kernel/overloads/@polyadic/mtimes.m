@@ -10,7 +10,7 @@
 %
 %      c  - a polyadic or a numerical array
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=polyadic/mtimes.m>
 

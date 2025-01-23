@@ -6,7 +6,7 @@
 %
 % Calculation time: minutes on a Tesla A100, much longer on CPU.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % aanevzor@ncsu.edu
 
 function cp_crystal_static_nhh()

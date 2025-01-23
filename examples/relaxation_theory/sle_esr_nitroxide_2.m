@@ -5,8 +5,8 @@
 %
 % Calculation time: seconds
 %
-% mariagrazia.concilio@postgrad.manchester.ac.uk
-% i.kuprov@soton.ac.uk
+% mariagrazia.concilio@sjtu.edu.cn
+% ilya.kuprov@weizmann.ac.il
 
 function sle_esr_nitroxide_2()
 

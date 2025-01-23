@@ -1,7 +1,7 @@
 % 1H NMR spectrum of valine. Uses the fully symmetric 
 % irreducible representation of the complete S6 group.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function symmetry_3()
 

@@ -32,7 +32,7 @@
 % Note: non-Abelian groups and multi-dimensional irreps are sup-
 %       ported - edit perm_group.m to add your own groups.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % hannah.hogben@chem.ox.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=symmetry.m>

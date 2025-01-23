@@ -2,7 +2,7 @@
 % produces grey (rather than black-and-transparent) grid
 % lines that are suitable for publishing.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=kgrid.m>
 
@@ -10,8 +10,13 @@ function kgrid()
 
 % Publisher-friendly grid settings
 grid on; grid minor; 
-set(gca,'GridAlpha',1,'GridColor',...
-    [0.85 0.85 0.85],'Layer','bottom');
+set(gca,'MinorGridAlpha',1,...
+        'MinorGridColor',[0.95 0.95 0.95],...
+        'MinorGridLineStyle','-')
+set(gca,'GridAlpha',1,...
+        'GridColor',[0.85 0.85 0.85],...
+        'GridLineStyle','-');
+set(gca,'Layer','bottom');
 
 end
 

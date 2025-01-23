@@ -31,7 +31,7 @@
 % Note: uniform weights are assigned at the moment, use the supp-
 %       lied SHREWD function to generate optimal weights.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % fmentink@magnet.fsu.edu
 %
 % <https://spindynamics.org/wiki/index.php?title=repulsion.m>

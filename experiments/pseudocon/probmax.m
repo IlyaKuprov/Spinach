@@ -15,7 +15,7 @@
 %
 %     [x,y,z]  - maximum point coordinates
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=probmax.m>
 

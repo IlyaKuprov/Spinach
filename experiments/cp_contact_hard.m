@@ -72,9 +72,6 @@ contact_curve(:,1)=parameters.coil'*rho;
 % Loop over the time steps
 for n=1:numel(parameters.time_steps)
 
-    % Project out the observable
-    contact_curve(:,n+1)=parameters.coil'*rho;
-
     % Build and project the spin-lock operator
     irr_oper=2*pi*parameters.irr_powers(1,n)*...
                   parameters.irr_opers{1};
@@ -83,9 +80,12 @@ for n=1:numel(parameters.time_steps)
                                parameters.irr_opers{k};
     end
     irr_oper=kron(speye(parameters.spc_dim),irr_oper);
-
+ 
     % Apply the evolution step
     rho=step(spin_system,L+irr_oper,rho,parameters.time_steps(n));
+
+    % Project out the observable
+    contact_curve(:,n+1)=parameters.coil'*rho;
 
 end
 

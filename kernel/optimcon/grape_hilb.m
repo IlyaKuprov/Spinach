@@ -13,22 +13,22 @@
 %   spin_system         - Spinach data object that has been through 
 %                         the optimcon.m problem setup function.
 % 
-%   drifts              - the drift Liouvillians: a cell array con-
+%   drifts              - the drift Hamiltonians: a cell array con-
 %                         taining one matrix (for time-independent 
 %                         drift) or multiple matrices (for time-de-
 %                         pendent drift).
 %
-%   controls            - control operators in Liouville space (cell 
+%   controls            - control operators in Hilbert space (cell 
 %                         array of matrices).
 %
 %   waveform            - control coefficients for each control ope-
 %                         rator (in rows of a matrix), rad/s
 %
-%   rho_init            - initial state of the system as a vector in
-%                         Liouville space.
+%   rho_init            - initial state of the system as a matrix in
+%                         Hilbert space.
 %
-%   rho_targ            - target state of the system as a vector in
-%                         Liouville space.
+%   rho_targ            - target state of the system as a matrix in
+%                         Hilbert space.
 %
 %   fidelity_type       - 'real'   (real part of the overlap)
 %                         'imag'   (imaginary part of the overlap)
@@ -59,6 +59,9 @@ function [traj_data,fidelity,grad] = grape_hilb(spin_system,drifts,controls,...
                                                 waveform,rho_init,rho_targ,...
                                                 fidelity_type) %#ok<*PFBNS>
 
+% Check consistency
+grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ);
+
 % Hush up the output
 shut_up.sys.output='hush';
 shut_up.tols=spin_system.tols;
@@ -73,7 +76,7 @@ nctrls = numel(controls);  nsteps = numel(dt);
 
 % Make pointer arrays for trajectories
 fwd_traj = cell(1,nsteps+1); fwd_traj{1}=rho_init;
-bwd_traj = cell(1,nsteps+1); bwd_traj{1}=rho_targ;
+if n_outputs>2; bwd_traj = cell(1,nsteps+1); bwd_traj{1}=rho_targ; end
 
 % Preallocate gradient
 grad = zeros([nctrls nsteps]);
@@ -88,12 +91,14 @@ for n=1:nsteps
     if isscalar(drifts)
 
         % Time-independent drifts
-        H_forw=drifts{1}; H_back=drifts{1};
+        H_forw=drifts{1}; 
+        if n_outputs>2; H_back=drifts{1}; end
 
     else
 
         % Time-dependent drifts
-        H_forw=drifts{n}; H_back=drifts{nsteps+1-n};
+        H_forw=drifts{n}; 
+        if n_outputs>2; H_back=drifts{nsteps+1-n}; end
 
     end
 
@@ -104,64 +109,67 @@ for n=1:nsteps
         H_forw=H_forw+waveform(k,n)*controls{k};
 
         % Backward evolution generator
-        H_back=H_back+waveform(k,nsteps+1-n)*controls{k};
+        if n_outputs>2; H_back=H_back+waveform(k,nsteps+1-n)*controls{k}; end
 
     end
 
     % Propagators
     prop_forw=propagator(shut_up,H_forw,dt(n));
-    prop_back=propagator(shut_up,H_back,-dt(nsteps+1-n));
+    if n_outputs>2; prop_back=propagator(shut_up,H_back,-dt(nsteps+1-n)); end
 
     % Take the time step forward
     fwd_traj{n+1}=prop_forw*fwd_traj{n}*prop_forw';
 
     % Take the time step backward
-    bwd_traj{n+1}=prop_back*bwd_traj{n}*prop_back';
+    if n_outputs>2; bwd_traj{n+1}=prop_back*bwd_traj{n}*prop_back'; end
 
 end
 
 % Compute fidelity
 overlap = hdot(fwd_traj{end},rho_targ);
 
-% Flip backwards trajectory
-bwd_traj=fliplr(bwd_traj);
+% Compute the Gradient
+if n_outputs>2
+    
+    bwd_traj=fliplr(bwd_traj);
 
-% Gradient loop
-parfor n=1:nsteps
+    % Gradient loop
+    parfor n=1:nsteps
 
-    % Decide current drifts
-    if isscalar(drifts)
+        % Decide current drifts
+        if isscalar(drifts)
 
-        % Time-independent drifts
-        H_forw=drifts{1}; 
+            % Time-independent drifts
+            H_forw=drifts{1};
 
-    else
+        else
 
-        % Time-dependent drifts
-        H_forw=drifts{n};
+            % Time-dependent drifts
+            H_forw=drifts{n};
+
+        end
+
+        % Add current controls to current drifts
+        for k=1:nctrls
+
+            % Forward evolution generator
+            H_forw=H_forw+waveform(k,n)*controls{k};
+
+        end
+
+        for k = 1:nctrls
+
+            % Compute directional derivative w.r.t. control Matrix
+            auxmat = dirdiff(spin_system,H_forw,controls{k},dt(n),2);
+
+            % Compute Gradient
+            grad(k,n) = real(hdot(bwd_traj{n+1},auxmat{2}*fwd_traj{n}*auxmat{1}'+...
+                auxmat{1}*fwd_traj{n}*auxmat{2}'));
+
+        end
 
     end
-
-    % Add current controls to current drifts
-    for k=1:nctrls
-
-        % Forward evolution generator
-        H_forw=H_forw+waveform(k,n)*controls{k};
-
-    end
-
-    for k = 1:nctrls
-
-        % Compute directional derivative w.r.t. control Matrix
-        auxmat = dirdiff(spin_system,H_forw,controls{k},dt(n),2);
-
-        % Compute Gradient
-        grad(k,n) = real(hdot(bwd_traj{n+1},auxmat{2}*fwd_traj{n}*auxmat{1}'+...
-                                            auxmat{1}*fwd_traj{n}*auxmat{2}'));
-
-    end
-
-end
+end    
 
 % Fidelity and its derivatives
 switch fidelity_type
@@ -203,4 +211,56 @@ end
 % Return trajectory data
 traj_data.forward=fwd_traj;
 
+end
+
+% Consistency enforcement
+function grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ)
+if ~ismember(fidelity_type,{'real','imag','square'})
+    error('Fidelity type must be real, imag or square.');
+end
+if (~isnumeric(rho_init))||(~ismatrix(rho_init))
+    error('rho_init must be a column vector.');
+end
+if (~isnumeric(rho_targ))||(~ismatrix(rho_init))
+    error('rho_targ must be a column vector.');
+end
+if ~iscell(drifts)
+    error('drifts must be a cell array of matrices.');
+end
+for n=1:numel(drifts)     
+    if (~isnumeric(drifts{n}))||(size(drifts{n},1)~=size(drifts{n},2))
+        error('all elements of drifts cell array must be square matrices.');
+    end
+    if (size(drifts{n},1)~=numel(rho_init))||...
+       (size(drifts{n},1)~=numel(rho_targ))
+        error('dimensions of drift, rho_init and rho_targ must be consistent.');
+    end
+end
+if ~iscell(controls)
+    error('controls must be a cell array of square matrices.');
+end
+for n=1:numel(controls)
+    if (~isnumeric(controls{n}))||...
+       (size(controls{n},1)~=size(controls{n},2))||...
+       (size(controls{n},1)~=size(drifts{1},1))
+        error('control operators must have the same size as drift operators.');
+    end
+end
+if (~isnumeric(waveform))||(~isreal(waveform))
+    error('waveform must be a real numeric array.');
+end
+if size(waveform,1)~=numel(controls)
+    error('number of waveform rows must be equal to the number of controls.');
+end
+if size(waveform,2)~=spin_system.control.pulse_ntpts
+    error(['waveform must have ' int2str(spin_system.control.pulse_ntpts) ' columns.']);
+end
+if strcmp(spin_system.control.integrator,'rectangle')&&...
+   (size(spin_system.control.pulse_dt,2)~=size(waveform,2))
+    error('pulse_dt must have the same length as waveform for rectangle integrator');
+end
+if strcmp(spin_system.control.integrator,'trapezium')&&...
+   (size(spin_system.control.pulse_dt,2)+1~=size(waveform,2))
+    error('pulse_dt must be one element shorter than waveform for trapezium integrator');
+end
 end

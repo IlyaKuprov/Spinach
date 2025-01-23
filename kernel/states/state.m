@@ -200,7 +200,12 @@ switch spin_system.bas.formalism
         
         % Generate a Hilbert space operator
         rho=operator(spin_system,states,spins);
-        
+
+    case 'zeeman-wavef'
+
+        % Tell the user to dog it
+        error('wavefunctions must be specified manually.')
+
     otherwise
         
         % Complain and bomb out

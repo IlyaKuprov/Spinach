@@ -126,7 +126,9 @@ switch spin_system.bas.formalism
         end
                 
     % Zeeman basis formalisms
-    case {'zeeman-hilb','zeeman-liouv'}
+    case {'zeeman-wavef',...
+          'zeeman-hilb',...
+          'zeeman-liouv'}
 
         % Parallelisation efficiency
         mults=spin_system.comp.mults;
@@ -196,7 +198,7 @@ if strcmp(format,'csc')
             % As per the basis set specification
             matrix_dim=size(spin_system.bas.basis,1);
 
-        case 'zeeman-hilb'
+        case {'zeeman-wavef','zeeman-hilb'}
             
             % Entire Hilbert space
             matrix_dim=prod(spin_system.comp.mults);

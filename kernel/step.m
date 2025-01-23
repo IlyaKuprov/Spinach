@@ -65,11 +65,13 @@ else
     end
 end
 
-% Are we using a Liouville space formalism?
-liouv_space=ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'});
+% Is it expm(A)*x (wavefunctions or state vectors)?
+expm_times_vec=ismember(spin_system.bas.formalism,{'sphten-liouv',...
+                                                   'zeeman-liouv',...
+                                                   'zeeman-wavef'});
 
-% In Hilbert space, run the shortcut
-if ~liouv_space
+% expm(A)*rho*expm(-A) shortcut
+if ~expm_times_vec
     
     % Get the propagator
     if isnumeric(L)

@@ -271,6 +271,14 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
                 [traj_data{n},fidelities{n}]=grape_hilb(spin_system,L,spin_system.control.operators,...
                                                         local_waveform,rho_init,rho_targ,...
                                                         spin_system.control.fidelity);
+
+            case 'zeeman-wavef'
+
+                % Call wavefunction version of the GRAPE function
+                [traj_data{n},fidelities{n}]=grape_wavef(spin_system,L,spin_system.control.operators,...
+                                                         local_waveform,rho_init,rho_targ,...
+                                                         spin_system.control.fidelity);
+
             otherwise
 
                 % Complain and bomb out
@@ -312,6 +320,14 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
                 [traj_data{n},fidelities{n},gradients{n}]=grape_hilb(spin_system,L,spin_system.control.operators,...
                                                                      local_waveform,rho_init,rho_targ,...
                                                                      spin_system.control.fidelity);
+
+            case 'zeeman-wavef'
+
+                % Call wavefunction version of the GRAPE function
+                [traj_data{n},fidelities{n},gradients{n}]=grape_wavef(spin_system,L,spin_system.control.operators,...
+                                                                      local_waveform,rho_init,rho_targ,...
+                                                                      spin_system.control.fidelity);
+
             otherwise
 
                 % Complain and bomb out
@@ -344,6 +360,14 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
 
                 % Complain and bomb out
                 error('Newton-Raphson methods are not available in Hilbert space, use LBFGS.');
+
+            case 'zeeman-wavef'
+
+                % Call wavefunction version of the GRAPE function
+                [traj_data{n},fidelities{n},...
+                 gradients{n},hessians{n}]=grape_wavef(spin_system,L,spin_system.control.operators,...
+                                                       local_waveform,rho_init,rho_targ,...
+                                                       spin_system.control.fidelity);
 
             otherwise
 

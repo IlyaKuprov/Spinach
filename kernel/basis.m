@@ -416,7 +416,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
 end
 
 % Process Hilbert space Zeeman basis
-if strcmp(spin_system.bas.formalism,'zeeman-hilb')
+if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef'})
    
     % Preallocate basis set array
     spin_system.bas.basis=zeros(prod(spin_system.comp.mults),spin_system.comp.nspins);
@@ -457,7 +457,8 @@ if ~isfield(bas,'formalism')
     error('basis specification in bas.formalism is required.');
 elseif ~ischar(bas.formalism)
     error('bas.formalism must be a string.');
-elseif ~ismember(bas.formalism,{'zeeman-hilb','zeeman-liouv','sphten-liouv'})
+elseif ~ismember(bas.formalism,{'zeeman-hilb','zeeman-liouv',...
+                                'sphten-liouv','zeeman-wavef'})
     error('unrecognized formalism - see the basis preparation section of the manual.');
 end
 

@@ -5,20 +5,20 @@
 % with respect to amplitudes of all control operators at every time step
 % of the shaped pulse. Syntax:
 %
-%  [traj_data,fidelity,grad,hess]=grape(spin_system,drifts,controls,...
-%                                       waveform,rho_init,rho_targ,...
-%                                       fidelity_type)
+%  [traj_data,fidelity,grad,hess]=grape_wavef(spin_system,drifts,controls,...
+%                                             waveform,rho_init,rho_targ,...
+%                                             fidelity_type)
 % Parameters:
 %
 %   spin_system         - Spinach data object that has been through 
 %                         the optimcon.m problem setup function.
 % 
-%   drifts              - the drift Liouvillians: a cell array con-
+%   drifts              - the drift Hamiltonians: a cell array con-
 %                         taining one matrix (for time-independent 
 %                         drift) or multiple matrices (for time-de-
 %                         pendent drift).
 %
-%   controls            - control operators in Liouville space (cell 
+%   controls            - control operators in Hilbert space (cell 
 %                         array of matrices).
 %
 %   waveform            - control coefficients for each control ope-
@@ -26,10 +26,10 @@
 %                         step (in horizonal dimension), rad/s
 %
 %   rho_init            - initial state of the system as a vector in
-%                         Liouville space.
+%                         the wavefunction space.
 %
 %   rho_targ            - target state of the system as a vector in
-%                         Liouville space.
+%                         the wavefunction space.
 %
 %   fidelity_type       - 'real'   (real part of the overlap)
 %                         'imag'   (imaginary part of the overlap)
@@ -58,13 +58,11 @@
 % u.rasulov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 % m.keitel@soton.ac.uk
+% callum.musselwhite@soton.ac.uk
 %
-% TODO (Keitel): add logic to avoid computing backward trajectory 
-%                when the gradient is not requested
-%
-% <https://spindynamics.org/wiki/index.php?title=grape_liouv.m>
+% <https://spindynamics.org/wiki/index.php?title=grape_wavef.m>
 
-function [traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,...
+function [traj_data,fidelity,grad,hess]=grape_wavef(spin_system,drifts,controls,...
                                                     waveform,rho_init,rho_targ,...
                                                     fidelity_type) %#ok<*PFBNS>
 % Check consistency
@@ -843,8 +841,8 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ)
-if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
-    error('this function requires Lioville space formalism.');
+if ~ismember(spin_system.bas.formalism,{'zeeman-wavef'})
+    error('this function requires wavefunction formalism.');
 end
 if (~isnumeric(rho_init))||(~iscolumn(rho_init))
     error('rho_init must be a column vector.');
@@ -893,10 +891,4 @@ if strcmp(spin_system.control.integrator,'trapezium')&&...
 end
 end
 
-% In any culture, subculture, or family in which belief is valued above
-% thought, self-surrender is valued above self-expression, and conformity
-% is valued above integrity, those who preserve their self-esteem are
-% likely to be heroic exceptions.
-%
-% Nathaniel Branden
 

@@ -195,6 +195,12 @@ if isfield(control,'rho_init')
                     error('control.rho_init must be a cell array of square matrices.');
                 end
 
+            case 'zeeman-wavef'
+
+                if (~isnumeric(control.rho_init{n}))||(size(control.rho_init{n},2)~=1)
+                    error('control.rho_init must be a cell array of column vectors.');
+                end
+
             otherwise
 
                 error('unrecognised formalism specification.');
@@ -242,6 +248,12 @@ if isfield(control,'rho_targ')
                 if (~isnumeric(control.rho_targ{n}))||(size(control.rho_targ{n},1)~=...
                                                        size(control.rho_targ{n},2))
                     error('control.rho_targ must be a cell array of square matrices.');
+                end
+
+            case 'zeeman-wavef'
+
+                if (~isnumeric(control.rho_targ{n}))||(size(control.rho_targ{n},2)~=1)
+                    error('control.rho_targ must be a cell array of column vectors.');
                 end
 
             otherwise

@@ -76,7 +76,7 @@ nctrls = numel(controls);  nsteps = numel(dt);
 
 % Make pointer arrays for trajectories
 fwd_traj = cell(1,nsteps+1); fwd_traj{1}=rho_init;
-if n_outputs>2; bwd_traj = cell(1,nsteps+1); bwd_traj{1}=rho_targ; end
+bwd_traj = cell(1,nsteps+1); bwd_traj{1}=rho_targ;
 
 % Preallocate gradient
 grad = zeros([nctrls nsteps]);
@@ -92,13 +92,13 @@ for n=1:nsteps
 
         % Time-independent drifts
         H_forw=drifts{1}; 
-        if n_outputs>2; H_back=drifts{1}; end
+        H_back=drifts{1};
 
     else
 
         % Time-dependent drifts
         H_forw=drifts{n}; 
-        if n_outputs>2; H_back=drifts{nsteps+1-n}; end
+        H_back=drifts{nsteps+1-n};
 
     end
 
@@ -109,19 +109,19 @@ for n=1:nsteps
         H_forw=H_forw+waveform(k,n)*controls{k};
 
         % Backward evolution generator
-        if n_outputs>2; H_back=H_back+waveform(k,nsteps+1-n)*controls{k}; end
+        H_back=H_back+waveform(k,nsteps+1-n)*controls{k};
 
     end
 
     % Propagators
     prop_forw=propagator(shut_up,H_forw,dt(n));
-    if n_outputs>2; prop_back=propagator(shut_up,H_back,-dt(nsteps+1-n)); end
+    prop_back=propagator(shut_up,H_back,-dt(nsteps+1-n));
 
     % Take the time step forward
     fwd_traj{n+1}=prop_forw*fwd_traj{n}*prop_forw';
 
     % Take the time step backward
-    if n_outputs>2; bwd_traj{n+1}=prop_back*bwd_traj{n}*prop_back'; end
+    bwd_traj{n+1}=prop_back*bwd_traj{n}*prop_back';
 
 end
 
@@ -129,47 +129,44 @@ end
 overlap = hdot(fwd_traj{end},rho_targ);
 
 % Compute the Gradient
-if n_outputs>2
-    
-    bwd_traj=fliplr(bwd_traj);
+bwd_traj=fliplr(bwd_traj);
 
-    % Gradient loop
-    parfor n=1:nsteps
+% Gradient loop
+parfor n=1:nsteps
 
-        % Decide current drifts
-        if isscalar(drifts)
+    % Decide current drifts
+    if isscalar(drifts)
 
-            % Time-independent drifts
-            H_forw=drifts{1};
+        % Time-independent drifts
+        H_forw=drifts{1};
 
-        else
+    else
 
-            % Time-dependent drifts
-            H_forw=drifts{n};
-
-        end
-
-        % Add current controls to current drifts
-        for k=1:nctrls
-
-            % Forward evolution generator
-            H_forw=H_forw+waveform(k,n)*controls{k};
-
-        end
-
-        for k = 1:nctrls
-
-            % Compute directional derivative w.r.t. control Matrix
-            auxmat = dirdiff(spin_system,H_forw,controls{k},dt(n),2);
-
-            % Compute Gradient
-            grad(k,n) = real(hdot(bwd_traj{n+1},auxmat{2}*fwd_traj{n}*auxmat{1}'+...
-                auxmat{1}*fwd_traj{n}*auxmat{2}'));
-
-        end
+        % Time-dependent drifts
+        H_forw=drifts{n};
 
     end
-end    
+
+    % Add current controls to current drifts
+    for k=1:nctrls
+
+        % Forward evolution generator
+        H_forw=H_forw+waveform(k,n)*controls{k};
+
+    end
+
+    for k = 1:nctrls
+
+        % Compute directional derivative w.r.t. control Matrix
+        auxmat = dirdiff(spin_system,H_forw,controls{k},dt(n),2);
+
+        % Compute Gradient
+        grad(k,n) = real(hdot(bwd_traj{n+1},auxmat{2}*fwd_traj{n}*auxmat{1}'+...
+            auxmat{1}*fwd_traj{n}*auxmat{2}'));
+
+    end
+
+end
 
 % Fidelity and its derivatives
 switch fidelity_type
@@ -215,14 +212,14 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ)
-if ~ismember(fidelity_type,{'real','imag','square'})
-    error('Fidelity type must be real, imag or square.');
+if ~ismember(spin_system.bas.formalism,{'zeeman-hilb'})
+    error('this function requires Lioville space formalism.');
 end
-if (~isnumeric(rho_init))||(~ismatrix(rho_init))
-    error('rho_init must be a column vector.');
+if (~isnumeric(rho_init))||(~ismatrix(rho_init))||(size(rho_init,1)~=size(rho_init,2))
+    error('rho_init must be a square matrix.');
 end
-if (~isnumeric(rho_targ))||(~ismatrix(rho_init))
-    error('rho_targ must be a column vector.');
+if (~isnumeric(rho_targ))||(~ismatrix(rho_init))||(size(rho_targ,1)~=size(rho_targ,2))
+    error('rho_targ must be a square vector.');
 end
 if ~iscell(drifts)
     error('drifts must be a cell array of matrices.');
@@ -231,8 +228,8 @@ for n=1:numel(drifts)
     if (~isnumeric(drifts{n}))||(size(drifts{n},1)~=size(drifts{n},2))
         error('all elements of drifts cell array must be square matrices.');
     end
-    if (size(drifts{n},1)~=numel(rho_init))||...
-       (size(drifts{n},1)~=numel(rho_targ))
+    if (size(drifts{n},1)~=size(rho_init,1))||...
+       (size(drifts{n},1)~=size(rho_targ,1))
         error('dimensions of drift, rho_init and rho_targ must be consistent.');
     end
 end
@@ -254,13 +251,5 @@ if size(waveform,1)~=numel(controls)
 end
 if size(waveform,2)~=spin_system.control.pulse_ntpts
     error(['waveform must have ' int2str(spin_system.control.pulse_ntpts) ' columns.']);
-end
-if strcmp(spin_system.control.integrator,'rectangle')&&...
-   (size(spin_system.control.pulse_dt,2)~=size(waveform,2))
-    error('pulse_dt must have the same length as waveform for rectangle integrator');
-end
-if strcmp(spin_system.control.integrator,'trapezium')&&...
-   (size(spin_system.control.pulse_dt,2)+1~=size(waveform,2))
-    error('pulse_dt must be one element shorter than waveform for trapezium integrator');
 end
 end

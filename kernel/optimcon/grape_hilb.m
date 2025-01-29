@@ -1,9 +1,9 @@
 % Gradient Ascent Pulse Engineering (GRAPE) objective function and gradient
 % Propagates the system through a user-supplied shaped pulse from a given 
-% initial state and projects the result onto the given final  state. The 
-% fidelity is returned, along with its gradient with respect to amplitudes 
-% of all control operators at every time step of the shaped pulse. 
-% Uses Hilbert-space formalism. Syntax:
+% initial state and projects the result onto the given final state. The fi-
+% delity is returned, along with its gradient with respect to amplitudes of
+% all control operators at every time step of the shaped pulse. This func-
+% tion is for the Hilbert space version of GRAPE. Syntax:
 %
 %  [traj_data,fidelity,grad]=grape_hilb(spin_system,drifts,controls,...
 %                                       waveform,rho_init,rho_targ,...
@@ -24,11 +24,11 @@
 %   waveform            - control coefficients for each control ope-
 %                         rator (in rows of a matrix), rad/s
 %
-%   rho_init            - initial state of the system as a matrix in
-%                         Hilbert space.
+%   rho_init            - initial state of the system as a density 
+%                         matrix in Hilbert space.
 %
-%   rho_targ            - target state of the system as a matrix in
-%                         Hilbert space.
+%   rho_targ            - target state of the system as a density
+%                         matrix in Hilbert space.
 %
 %   fidelity_type       - 'real'   (real part of the overlap)
 %                         'imag'   (imaginary part of the overlap)
@@ -50,10 +50,7 @@
 % i.kuprov@soton.ac.uk
 % m.keitel@soton.ac.uk
 %
-% TODO (Keitel): add logic to avoid computing backward trajectory 
-%                when the gradient is not requested
-%
-% <https://spindynamics.org/wiki/index.php?title=grape.m>
+% <https://spindynamics.org/wiki/index.php?title=grape_hilb.m>
 
 function [traj_data,fidelity,grad] = grape_hilb(spin_system,drifts,controls,...
                                                 waveform,rho_init,rho_targ,...
@@ -76,96 +73,86 @@ nctrls = numel(controls);  nsteps = numel(dt);
 
 % Make pointer arrays for trajectories
 fwd_traj = cell(1,nsteps+1); fwd_traj{1}=rho_init;
-bwd_traj = cell(1,nsteps+1); bwd_traj{1}=rho_targ;
+if nargout>2
+    bwd_traj = cell(1,nsteps+1); bwd_traj{1}=rho_targ;
+end
 
 % Preallocate gradient
-grad = zeros([nctrls nsteps]);
+if nargout>2
+    grad = zeros([nctrls nsteps]);
+end
 
 % Reshape waveform
 waveform=reshape(waveform,[nctrls nsteps]);
 
-% Propagate
-for n=1:nsteps
-
-    % Decide current drifts
-    if isscalar(drifts)
-
-        % Time-independent drifts
-        H_forw=drifts{1}; 
-        H_back=drifts{1};
-
-    else
-
-        % Time-dependent drifts
-        H_forw=drifts{n}; 
-        H_back=drifts{nsteps+1-n};
-
-    end
-
-    % Add current controls to current drifts
-    for k=1:nctrls
-
-        % Forward evolution generator
-        H_forw=H_forw+waveform(k,n)*controls{k};
-
-        % Backward evolution generator
-        H_back=H_back+waveform(k,nsteps+1-n)*controls{k};
-
-    end
-
-    % Propagators
-    prop_forw=propagator(shut_up,H_forw,dt(n));
-    prop_back=propagator(shut_up,H_back,-dt(nsteps+1-n));
-
-    % Take the time step forward
-    fwd_traj{n+1}=prop_forw*fwd_traj{n}*prop_forw';
-
-    % Take the time step backward
-    bwd_traj{n+1}=prop_back*bwd_traj{n}*prop_back';
-
-end
-
-% Compute fidelity
-overlap = hdot(fwd_traj{end},rho_targ);
-
-% Compute the Gradient
-bwd_traj=fliplr(bwd_traj);
-
-% Gradient loop
+% Make generators and propagators
+H=cell(nsteps,1); P=cell(nsteps,1);
 parfor n=1:nsteps
 
     % Decide current drifts
     if isscalar(drifts)
 
         % Time-independent drifts
-        H_forw=drifts{1};
-
+        H{n}=drifts{1};
+      
     else
 
         % Time-dependent drifts
-        H_forw=drifts{n};
-
+        H{n}=drifts{n};
+      
     end
 
-    % Add current controls to current drifts
+    % Add current controls
     for k=1:nctrls
 
         % Forward evolution generator
-        H_forw=H_forw+waveform(k,n)*controls{k};
+        H{n}=H{n}+waveform(k,n)*controls{k};
 
     end
 
-    for k = 1:nctrls
+    % Make sure generator is Hermitian
+    if cheap_norm(H{n}-H{n}')>1e-6
 
-        % Compute directional derivative w.r.t. control Matrix
-        auxmat = dirdiff(spin_system,H_forw,controls{k},dt(n),2);
-
-        % Compute Gradient
-        grad(k,n) = real(hdot(bwd_traj{n+1},auxmat{2}*fwd_traj{n}*auxmat{1}'+...
-            auxmat{1}*fwd_traj{n}*auxmat{2}'));
+        % Bomb out if significantly non-Hermitian
+        error('evolution generator must be Hermitian.');
 
     end
 
+    % Tidy up generator and compute propagator
+    P{n}=propagator(shut_up,(H{n}+H{n}')/2,dt(n));
+
+end
+
+% Forward trajectory
+for n=1:nsteps
+    fwd_traj{n+1}=P{n}*fwd_traj{n}*P{n}';
+end
+
+% Backward trajectory
+if nargout>2
+    for n=1:nsteps
+        bwd_traj{n+1}=P{nsteps+1-n}'*bwd_traj{n}*P{nsteps+1-n};
+    end
+    bwd_traj=fliplr(bwd_traj);
+end
+
+% Compute fidelity
+overlap=hdot(fwd_traj{end},rho_targ);
+
+% Gradient loop
+if nargout>2
+    parfor n=1:nsteps
+        for k=1:nctrls
+
+            % Compute directional derivative w.r.t. control
+            auxmat=dirdiff(spin_system,H{n},controls{k},dt(n),2);
+
+            % Compute gradient element
+            grad(k,n)=hdot(bwd_traj{n+1},auxmat{2}*fwd_traj{n}*auxmat{1}'+...
+                                         auxmat{1}*fwd_traj{n}*auxmat{2}');
+
+        end
+    end
 end
 
 % Fidelity and its derivatives
@@ -177,7 +164,7 @@ switch fidelity_type
         fidelity=real(overlap);
         
         % Update gradient
-        if exist('grad','var'), grad=real(grad); end
+        if nargout>2, grad=real(grad); end
         
     case {'imag'}
         
@@ -185,19 +172,19 @@ switch fidelity_type
         fidelity=imag(overlap);
         
         % Update gradient
-        if exist('grad','var'), grad=imag(grad); end
+        if nargout>2, grad=imag(grad); end
         
     case {'square'}
         
         % Absolute square of the overalp
         fidelity=overlap*conj(overlap);
         
-        % Product rule
-        grad=grad*conj(overlap)+overlap*conj(grad);
-        
-        % Cleaning up
-        grad=real(grad);
-        
+        % Update gradient
+        if nargout>2
+            grad=real(grad*conj(overlap)+...
+                      overlap*conj(grad));
+        end  
+      
     otherwise
         
         % Complain and bomb out
@@ -253,3 +240,32 @@ if size(waveform,2)~=spin_system.control.pulse_ntpts
     error(['waveform must have ' int2str(spin_system.control.pulse_ntpts) ' columns.']);
 end
 end
+
+% Series of headlines in Le Moniteur Universel ("le journal de la pensée 
+% officielle"), as Napoleon was approaching Paris between 9 and 21 March
+% 1815, according to Alexandre Dumas:
+%
+%  "L'anthropophage est sorti de son repaire."
+%
+%  "L'ogre de Corse vient de débarquer au golfe Juan."
+%
+%  "Le tigre est arrivé à Gap."
+%
+%  "Le monstre a couché à Grenoble."
+%
+%  "Le tyran a traversé Lyon."
+%
+%  "L'usurpateur a été vu à soixante lieues de la capitale."
+%
+%  "Bonaparte s'avance à grands pas, mais il n'entrera jamais dans Paris."
+%
+%  "Napoléon sera demain sous nos remparts."
+%
+%  "L'empereur est arrivé à Fontainebleau."
+%
+%  "Sa Majesté Impériale et Royale a fait hier son entrée en son château 
+%   des Tuileries au milieu de ses fidèles sujets."
+%
+% Dumas concludes: "This is the ultimate monument to journalism. It need not
+% do anything else, for it won't do anything better."
+

@@ -217,7 +217,24 @@ switch method(1:4)
             PS=propagator(spin_system,slice_oper,slice_durs(n));
 
             % Update state
-            rho=PS*rho;
+            switch spin_system.bas.formalism
+
+                case {'sphten-liouv','zeeman-liouv','zeeman-wavef'}
+                    
+                    % One-sided
+                    rho=PS*rho;
+
+                case 'zeeman-hilb'
+
+                    % Two-sided
+                    rho=PS*rho*PS';
+
+                otherwise
+
+                    % Complain and bomb out
+                    error('unknown formalism specification.');
+
+            end
 
             % Store trajectory element
             if nargout>1, traj{n+1}=rho; end

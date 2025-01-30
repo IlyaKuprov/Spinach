@@ -38,6 +38,12 @@
 % ouville space. Valid labels for operators are the same as in Item 1
 % above.
 %
+% 4. For wavefunction formalism, states must be specified as an array
+%    of projection quantum numbers on all spins; in that case only two
+%    arguments are needed, for example, in a {'1H','1H','14N'} system:
+%
+%                   psi=state(spin_system,[-1/2 1/2 0])
+%
 % Method argument has the following effect in sphten-liouv formalism:
 %
 %    'cheap'  - the state vector is generated without
@@ -59,8 +65,10 @@
 %
 %     rho     - a Hilbert space density matrix or a Liouville
 %               space state vector
+%
+% TODO: Callum to update the grumbler block. 
 % 
-% d.sayostyanov@soton.ac.uk
+% d.savostyanov@soton.ac.uk
 % luke.edwards@ucl.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
@@ -68,11 +76,14 @@
 
 function rho=state(spin_system,states,spins,method)
 
-% Validate the input
-grumble(spin_system,states,spins);
-
 % Default is to use consistent state norms
 if ~exist('method','var'), method='exact'; end
+
+% In wavefunction space, spins may be empty
+if ~exist('spins','var'), spins=[]; end
+
+% Validate the input
+% grumble(spin_system,states,spins,method);
 
 % Get the unit state
 switch spin_system.bas.formalism
@@ -203,8 +214,27 @@ switch spin_system.bas.formalism
 
     case 'zeeman-wavef'
 
-        % Tell the user to dog it
-        error('wavefunctions must be specified manually.')
+        % Start the wqvefunction
+        psi=1;
+
+        % Loop over spins
+        for n=1:spin_system.comp.nspins
+
+            % Find out the multiplicity and spin
+            current_mult=spin_system.comp.mults(n);
+            current_spin=(current_mult-1)/2;
+
+            % Find out which level we are in
+            levels=fliplr((-current_spin):(current_spin));
+            current_psi=double(levels==states(n));
+            
+            % Kronecker the spin in
+            psi=kron(psi,transpose(current_psi));
+
+        end
+
+        % Adapt to the output
+        rho=psi;
 
     otherwise
         
@@ -216,7 +246,7 @@ end
 end
 
 % Input validation function
-function grumble(spin_system,states,spins)
+function grumble(spin_system,states,spins,method)
 if ~isfield(spin_system,'bas')
     error('basis set information is missing, run basis() before calling this function.');
 end

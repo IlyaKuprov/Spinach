@@ -981,39 +981,124 @@ else
     spin_system.rlx.damp_rate=[];
 end
 
-% User-supplied relaxation rates for T1/T2 model
+% R1 rates for T1/T2 model
 if isfield(inter,'r1_rates')
-    spin_system.rlx.r1_rates=inter.r1_rates;
+
+    % Absorb into the data structure and delete from input
+    spin_system.rlx.r1_rates=inter.r1_rates; inter=rmfield(inter,'r1_rates');
+
+    % Report to the user
     report(spin_system,'Extended T1/T2 model, summary of R1 relaxation rates:');
     for n=1:numel(spin_system.rlx.r1_rates)
+
+        % Spin name and blanks of same size
         spin_name=[num2str(n) ' (' spin_system.comp.isotopes{n} ')']; eq_blanks=blanks(numel(spin_name));
-        if isscalar(spin_system.rlx.r1_rates{n})
+
+        % Orientation-independent: scalar
+        if isnumeric(spin_system.rlx.r1_rates{n})&&...
+           isscalar(spin_system.rlx.r1_rates{n})
+
+            % Just report the rate
             report(spin_system,['   ' spin_name ' R1 rate (Hz): ' num2str(spin_system.rlx.r1_rates{n},'%+5.3e  ')]);
-        else
+        
+        % Orientation-dependent: matrix
+        elseif isnumeric(spin_system.rlx.r1_rates{n})&&...
+               (size(spin_system.rlx.r1_rates{n},1)==3)&&...
+               (size(spin_system.rlx.r1_rates{n},2)==3)
+
+            % Report the matrix
             report(spin_system,['   ' spin_name ' R1 tensor (Hz): ' num2str(spin_system.rlx.r1_rates{n}(1,:),'%+5.3e  ')]);
             report(spin_system,['   ' eq_blanks '                 ' num2str(spin_system.rlx.r1_rates{n}(2,:),'%+5.3e  ')]);
             report(spin_system,['   ' eq_blanks '                 ' num2str(spin_system.rlx.r1_rates{n}(3,:),'%+5.3e  ')]);
+
+        % Orientation-dependent: function handle
+        elseif isa(spin_system.rlx.r1_rates{n},'function_handle')
+
+            % Report that the rate is a function handle
+            report(spin_system,['   ' spin_name ' R1 rate (Hz): user-specified Euler angle function handle']);
+
+            % Return a few values for checking
+            r1_func=spin_system.rlx.r1_rates{n};
+            report(spin_system,['   ' eq_blanks 'alp=0,    bet=0,    gam=0   : ' num2str(r1_func(0   , 0   , 0   ),'%+5.3e  ')]);
+            report(spin_system,['   ' eq_blanks 'alp=pi/2, bet=0,    gam=0   : ' num2str(r1_func(pi/2, 0   , 0   ),'%+5.3e  ')]);
+            report(spin_system,['   ' eq_blanks 'alp=0,    bet=pi/2, gam=0   : ' num2str(r1_func(0   , pi/2, 0   ),'%+5.3e  ')]);
+            report(spin_system,['   ' eq_blanks 'alp=0,    bet=0,    gam=pi/2: ' num2str(r1_func(0   , 0   , pi/2),'%+5.3e  ')]);
+            report(spin_system,['   ' eq_blanks 'alp=pi/6, bet=pi/6, gam=pi/6: ' num2str(r1_func(pi/6, pi/6, pi/6),'%+5.3e  ')]);
+
+        else
+
+            % Complain and bomb out
+            error('unknown R1 relaxation rate specification.');
+
         end
+
     end
+
 else
+
+    % Store a blank array
     spin_system.rlx.r1_rates={};
+
 end
+
+% R2 rates for T1/T2 model
 if isfield(inter,'r2_rates')
-    spin_system.rlx.r2_rates=inter.r2_rates;
+
+    % Absorb into the data structure and delete from input
+    spin_system.rlx.r2_rates=inter.r2_rates; inter=rmfield(inter,'r2_rates');
+
+    % Report to the user
     report(spin_system,'Extended T1/T2 model, summary of R2 relaxation rates:');
     for n=1:numel(spin_system.rlx.r2_rates)
+
+        % Spin name and blanks of same size
         spin_name=[num2str(n) ' (' spin_system.comp.isotopes{n} ')']; eq_blanks=blanks(numel(spin_name));
-        if isscalar(spin_system.rlx.r2_rates{n})
+
+        % Orientation-independent: scalar
+        if isnumeric(spin_system.rlx.r2_rates{n})&&...
+           isscalar(spin_system.rlx.r2_rates{n})
+
+            % Just report the rate
             report(spin_system,['   ' spin_name ' R2 rate (Hz): ' num2str(spin_system.rlx.r2_rates{n},'%+5.3e  ')]);
-        else
+        
+        % Orientation-dependent: matrix
+        elseif isnumeric(spin_system.rlx.r2_rates{n})&&...
+               (size(spin_system.rlx.r2_rates{n},1)==3)&&...
+               (size(spin_system.rlx.r2_rates{n},2)==3)
+
+            % Report the matrix
             report(spin_system,['   ' spin_name ' R2 tensor (Hz): ' num2str(spin_system.rlx.r2_rates{n}(1,:),'%+5.3e  ')]);
             report(spin_system,['   ' eq_blanks '                 ' num2str(spin_system.rlx.r2_rates{n}(2,:),'%+5.3e  ')]);
             report(spin_system,['   ' eq_blanks '                 ' num2str(spin_system.rlx.r2_rates{n}(3,:),'%+5.3e  ')]);
+
+        % Orientation-dependent: function handle
+        elseif isa(spin_system.rlx.r2_rates{n},'function_handle')
+
+            % Report that the rate is a function handle
+            report(spin_system,['   ' spin_name ' R2 rate (Hz): user-specified Euler angle function handle']);
+
+            % Return a few values for checking
+            r2_func=spin_system.rlx.r2_rates{n};
+            report(spin_system,['   ' eq_blanks 'alp=0,    bet=0,    gam=0   : ' num2str(r2_func(0   , 0   , 0   ),'%+5.3e  ')]);
+            report(spin_system,['   ' eq_blanks 'alp=pi/2, bet=0,    gam=0   : ' num2str(r2_func(pi/2, 0   , 0   ),'%+5.3e  ')]);
+            report(spin_system,['   ' eq_blanks 'alp=0,    bet=pi/2, gam=0   : ' num2str(r2_func(0   , pi/2, 0   ),'%+5.3e  ')]);
+            report(spin_system,['   ' eq_blanks 'alp=0,    bet=0,    gam=pi/2: ' num2str(r2_func(0   , 0   , pi/2),'%+5.3e  ')]);
+            report(spin_system,['   ' eq_blanks 'alp=pi/6, bet=pi/6, gam=pi/6: ' num2str(r2_func(pi/6, pi/6, pi/6),'%+5.3e  ')]);
+
+        else
+
+            % Complain and bomb out
+            error('unknown R2 relaxation rate specification.');
+
         end
+
     end
-    report(spin_system,'Extended T1/T2 model: product states will relax at the sum of constituent rates')
+
 else
+
+    % Store a blank array
     spin_system.rlx.r2_rates={};
+
 end
 
 % User-supplied R1 relaxation rates for Lindblad theory
@@ -1694,12 +1779,14 @@ if isfield(inter,'relaxation')
     end
   
     % Enforce R1 and R2 rates with T1,T2 approximation
-    if ismember('t1_t2',inter.relaxation)&&((~isfield(inter,'r1_rates'))||(~isfield(inter,'r2_rates')))
+    if ismember('t1_t2',inter.relaxation)&&((~isfield(inter,'r1_rates'))||...
+                                            (~isfield(inter,'r2_rates')))
         error('R1 and R2 rates must be specified with extended T1,T2 relaxation theory.');
     end
     
     % Enforce R1 and R2 rates with Lindblad theory
-    if ismember('lindblad',inter.relaxation)&&((~isfield(inter,'lind_r1_rates'))||(~isfield(inter,'lind_r2_rates')))
+    if ismember('lindblad',inter.relaxation)&&((~isfield(inter,'lind_r1_rates'))||...
+                                               (~isfield(inter,'lind_r2_rates')))
         error('R1 and R2 rates must be specified with Lindblad relaxation theory.');
     end
     
@@ -1919,7 +2006,7 @@ if isfield(inter,'r1_rates')
     
     % Check type and count
     if ~iscell(inter.r1_rates)
-        error('inter.r1_rates must be a cell array of scalars or 3x3 matrices.')
+        error('inter.r1_rates must be a cell array of scalars, or 3x3 matrices, or function handles.');
     end
     if numel(inter.r1_rates)~=numel(sys.isotopes)
         error('element count in inter.r1_rates must match the number of spins.');
@@ -1927,21 +2014,56 @@ if isfield(inter,'r1_rates')
 
     % Check elements
     for n=1:numel(inter.r1_rates)
-        if (~isnumeric(inter.r1_rates{n}))||(~isreal(inter.r1_rates{n}))||...
-           ((~isscalar(inter.r1_rates{n}))&&(~all(size(inter.r1_rates{n})==[3 3])))
-            error('elements of inter.r1_rates must be real scalars or 3x3 matrices.');
+
+        % Check scalar relaxation rates
+        if isnumeric(inter.r1_rates{n})&&isscalar(inter.r1_rates{n})
+
+            % Must be non-negative real numbers
+            if (~isreal(inter.r1_rates{n}))||(inter.r1_rates{n}<0)
+                error('scalars in inter.r1_rates must be real and non-negative.');
+            end
+        
+        % Check 3x3 relaxation rate tensors
+        elseif isnumeric(inter.r1_rates{n})&&all(size(inter.r1_rates{n})==[3 3])
+
+            % Must be real symmetric positive semidefinite
+            if ~isreal(inter.r1_rates{n})
+                error('3x3 matrices in inter.r1_rates must be real.');
+            end
+            if norm(inter.r1_rates{n}-inter.r1_rates{n}',2)>1e-6*norm(inter.r1_rates{n},2)
+                error('3x3 matrices in inter.r1_rates must be symmetric.');
+            end
+            if any(eig(inter.r1_rates{n},'vector')<0)
+                error('3x3 matrices in inter.r1_rates must be positive semidefinite.');
+            end
+
+        % Check function handles
+        elseif isa(inter.r1_rates{n},'function_handle')
+            
+            % The function handles must be 2*pi periodic
+            r1_func=inter.r1_rates{n}; test_angles=[2*pi*rand(), pi*rand(), 2*pi*rand()];
+            test_values=[r1_func(test_angles(1)     ,test_angles(2)     ,test_angles(3)     ),...
+                         r1_func(test_angles(1)+2*pi,test_angles(2)     ,test_angles(3)     ),...
+                         r1_func(test_angles(1)     ,test_angles(2)+2*pi,test_angles(3)     ),...
+                         r1_func(test_angles(1)     ,test_angles(2)     ,test_angles(3)+2*pi)];
+            if (abs(test_values(1)-test_values(2))>1e-6*(abs(test_values(1))+abs(test_values(2))))||...
+               (abs(test_values(2)-test_values(3))>1e-6*(abs(test_values(2))+abs(test_values(3))))||...
+               (abs(test_values(3)-test_values(4))>1e-6*(abs(test_values(3))+abs(test_values(4))))
+                error('function handles in inter.r1_rates must be 2*pi periodic in all arguments.');
+            end
+
+        else
+
+            % Complain and bomb out
+            error('inter.r1_rates must be a cell array of scalars, or 3x3 matrices, or function handles.');
+           
         end
-        if norm(inter.r1_rates{n}-inter.r1_rates{n}',2)>1e-6*norm(inter.r1_rates{n},2)
-            error('3x3 matrices in inter.r1_rates must be symmetric.');
-        end
-        if any(eig(inter.r1_rates{n},'vector')<0)
-            error('elements of inter.r1_rates must be non-negative definite.');
-        end
+        
     end
     
     % Enforce T1,T2 theory if inter.r1_rates rates are specified
     if ~ismember('t1_t2',inter.relaxation)
-        error('inter.r1_rates can only be specified with T1,T2 relaxation theory.');
+        error('inter.r1_rates may only be specified with T1,T2 relaxation theory.');
     end
     
 end
@@ -1951,7 +2073,7 @@ if isfield(inter,'r2_rates')
     
     % Check type and count
     if ~iscell(inter.r2_rates)
-        error('inter.r2_rates must be a cell array of scalars or 3x3 matrices.')
+        error('inter.r2_rates must be a cell array of scalars, or 3x3 matrices, or function handles.');
     end
     if numel(inter.r2_rates)~=numel(sys.isotopes)
         error('element count in inter.r2_rates must match the number of spins.');
@@ -1959,21 +2081,56 @@ if isfield(inter,'r2_rates')
 
     % Check elements
     for n=1:numel(inter.r2_rates)
-        if (~isnumeric(inter.r2_rates{n}))||(~isreal(inter.r2_rates{n}))||...
-           ((~isscalar(inter.r2_rates{n}))&&(~all(size(inter.r2_rates{n})==[3 3])))
-            error('elements of inter.r2_rates must be real scalars or 3x3 matrices.');
+
+        % Check scalar relaxation rates
+        if isnumeric(inter.r2_rates{n})&&isscalar(inter.r2_rates{n})
+
+            % Must be non-negative real numbers
+            if (~isreal(inter.r2_rates{n}))||(inter.r2_rates{n}<0)
+                error('scalars in inter.r2_rates must be real and non-negative.');
+            end
+        
+        % Check 3x3 relaxation rate tensors
+        elseif isnumeric(inter.r2_rates{n})&&all(size(inter.r2_rates{n})==[3 3])
+
+            % Must be real symmetric positive semidefinite
+            if ~isreal(inter.r2_rates{n})
+                error('3x3 matrices in inter.r2_rates must be real.');
+            end
+            if norm(inter.r2_rates{n}-inter.r2_rates{n}',2)>1e-6*norm(inter.r2_rates{n},2)
+                error('3x3 matrices in inter.r2_rates must be symmetric.');
+            end
+            if any(eig(inter.r2_rates{n},'vector')<0)
+                error('3x3 matrices in inter.r2_rates must be positive semidefinite.');
+            end
+
+        % Check function handles
+        elseif isa(inter.r2_rates{n},'function_handle')
+            
+            % The function handles must be 2*pi periodic
+            r2_func=inter.r2_rates{n}; test_angles=[2*pi*rand(), pi*rand(), 2*pi*rand()];
+            test_values=[r2_func(test_angles(1)     ,test_angles(2)     ,test_angles(3)     ),...
+                         r2_func(test_angles(1)+2*pi,test_angles(2)     ,test_angles(3)     ),...
+                         r2_func(test_angles(1)     ,test_angles(2)+2*pi,test_angles(3)     ),...
+                         r2_func(test_angles(1)     ,test_angles(2)     ,test_angles(3)+2*pi)];
+            if (abs(test_values(1)-test_values(2))>1e-6*(abs(test_values(1))+abs(test_values(2))))||...
+               (abs(test_values(2)-test_values(3))>1e-6*(abs(test_values(2))+abs(test_values(3))))||...
+               (abs(test_values(3)-test_values(4))>1e-6*(abs(test_values(3))+abs(test_values(4))))
+                error('function handles in inter.r2_rates must be 2*pi periodic in all arguments.');
+            end
+
+        else
+
+            % Complain and bomb out
+            error('inter.r2_rates must be a cell array of scalars, or 3x3 matrices, or function handles.');
+           
         end
-        if norm(inter.r2_rates{n}-inter.r2_rates{n}',2)>1e-6*norm(inter.r2_rates{n},2)
-            error('3x3 matrices in inter.r2_rates must be symmetric.');
-        end
-        if any(eig(inter.r2_rates{n},'vector')<0)
-            error('elements of inter.r2_rates must be non-negative definite.');
-        end
+        
     end
     
     % Enforce T1,T2 theory if inter.r2_rates rates are specified
     if ~ismember('t1_t2',inter.relaxation)
-        error('inter.r2_rates can only be specified with T1,T2 relaxation theory.');
+        error('inter.r2_rates may only be specified with T1,T2 relaxation theory.');
     end
     
 end

@@ -83,7 +83,7 @@ if ~exist('method','var'), method='exact'; end
 if ~exist('spins','var'), spins=[]; end
 
 % Validate the input
-% grumble(spin_system,states,spins,method);
+grumble(spin_system,states,spins,method);
 
 % Get the unit state
 switch spin_system.bas.formalism
@@ -247,14 +247,37 @@ end
 
 % Input validation function
 function grumble(spin_system,states,spins,method)
+
 if ~isfield(spin_system,'bas')
     error('basis set information is missing, run basis() before calling this function.');
+elseif ~ischar(spin_system.bas.formalism)
+    error('basis set information must be a string.');
+elseif ~ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv',...
+                                'sphten-liouv','zeeman-wavef'})
+    error('unrecognized formalism - see the basis preparation section of the manual.');
 end
+
+if ~ischar(method)
+    error('method information must be a string')
+elseif ~ismember(method, {'cheap', 'exact', 'chem'})
+    error('unrecognised method - allowed methods are: ''cheap'', ''exact'', ''chem''.');
+end
+
 if (~(ischar(states)&&ischar(spins)))&&...
    (~(iscell(states)&&iscell(spins)))&&...
-   (~(ischar(states)&&isnumeric(spins)))
+   (~(ischar(states)&&isnumeric(spins)))&&...
+   (~(isnumeric(states)&&isnumeric(spins)))
     error('invalid state specification.');
 end
+
+if isnumeric(states)&&(numel(states)~=spin_system.comp.nspins)
+    error('the number of states should be equal to the number of spins')
+end
+
+if isnumeric(states)&&any(mod(states, 0.5) ~= 0)
+    error('for wavefunction formalism, quantum projection numbers for all spins must be an integer or half-integer.');
+end
+
 if iscell(states)&&iscell(spins)&&(numel(states)~=numel(spins))
     error('spins and operators cell arrays should have the same number of elements.');
 end
@@ -262,14 +285,19 @@ if iscell(states)&&any(~cellfun(@ischar,states))
     error('all elements of the operators cell array should be strings.');
 end
 if isnumeric(spins)
-    if (~isreal(spins))||(~isrow(spins))||any(mod(spins,1)~=0)||any(spins<1)
-        error('when numeric, spins must be a row of positive integers.');
-    end
-    if numel(spins)~=numel(unique(spins))
-        error('spin list must not have any repetitions.');
+    if ~isempty(spins)
+        if (~isreal(spins))||(~isrow(spins))||any(mod(spins,1)~=0)||any(spins<1)
+            error('when numeric, spins must be a row of positive integers.');
+        end
+        if numel(spins)~=numel(unique(spins))
+            error('spin list must not have any repetitions.');
+        end
     end
 end
 if iscell(spins)
+    if isempty(spins)
+        error('spin list cannot be empty.');
+    end  
     for n=1:numel(spins)
         if (~isreal(spins{n}))||(mod(spins{n},1)~=0)||(spins{n}<1)
             error('when a cell array, spins must contain positive integers.');
@@ -280,7 +308,6 @@ if iscell(spins)
         error('spin list must not have any repetitions.');
     end
 end
-if isempty(spins), error('spin list cannot be empty.'); end
 end
 
 % Aggressive public displays of virtue are where 

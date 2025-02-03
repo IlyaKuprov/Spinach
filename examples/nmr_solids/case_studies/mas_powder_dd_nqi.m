@@ -6,7 +6,7 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function mas_powder_dip_nqi()
+function mas_powder_dd_nqi()
 
 % System specification
 sys.magnet=9.4;

@@ -96,6 +96,15 @@ if numel(Q)>2, error('giant spin model is not supported in this module.'); end
 % Apply offsets
 H=frqoffset(spin_system,H,parameters);
 
+% Compute isotropic thermal equilibrium
+if ismember('iso_eq',parameters.needs)
+    report(spin_system,'WARNING - thermal equilibrium uses the isotropic Hamitonian.');
+    if isfield(parameters,'rho0')
+        report(spin_system,'WARNING - user-specified initial condition has been ignored.');
+    end
+    parameters.rho0=equilibrium(spin_system,hamiltonian(assume(spin_system,'labframe'),'left'));
+end
+
 % Get relaxation and kinetics
 R=relaxation(spin_system); 
 K=kinetics(spin_system);
@@ -208,6 +217,9 @@ end
 if ~isfield(parameters,'verbose')
     report(spin_system,'parameters.verbose field not set, silencing array operations.');
     parameters.verbose=0;
+end
+if ~isfield(parameters,'needs')
+    parameters.needs={};
 end
 end
 

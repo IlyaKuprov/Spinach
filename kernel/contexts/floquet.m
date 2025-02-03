@@ -99,6 +99,22 @@ if numel(Q)>2, error('giant spin model is not supported in this module.'); end
 % Apply frequency offsets
 H=frqoffset(spin_system,H,parameters);
 
+% Compute the thermal equilibrium
+if ismember('iso_eq',parameters.needs)
+    report(spin_system,'WARNING - thermal equilibrium uses the isotropic Hamitonian.');
+    if isfield(parameters,'rho0')
+        report(spin_system,'WARNING - user-specified initial condition has been ignored.');
+    end
+    parameters.rho0=equilibrium(spin_system,hamiltonian(assume(spin_system,'labframe'),'left'));
+end
+
+% Get problem dimensions
+spc_dim=2*parameters.max_rank+1; spn_dim=size(H,1);
+report(spin_system,['lab space problem dimension  ' num2str(spc_dim)]);
+report(spin_system,['spin space problem dimension ' num2str(spn_dim)]);
+report(spin_system,['Floquet problem dimension    ' num2str(spc_dim*spn_dim)]);
+parameters.spc_dim=spc_dim; parameters.spn_dim=spn_dim;
+
 % Get relaxation and kinetics
 R=relaxation(spin_system); K=kinetics(spin_system);
 
@@ -109,13 +125,7 @@ sph_grid=load([spin_system.sys.root_dir '/kernel/grids/' ...
 % Assign local variables
 alphas=sph_grid.alphas; betas=sph_grid.betas; 
 gammas=sph_grid.gammas; weights=sph_grid.weights;
-
-% Get problem dimensions
-spc_dim=2*parameters.max_rank+1; spn_dim=size(H,1);
-report(spin_system,['lab space problem dimension  ' num2str(spc_dim)]);
-report(spin_system,['spin space problem dimension ' num2str(spn_dim)]);
-report(spin_system,['Floquet problem dimension    ' num2str(spc_dim*spn_dim)]);
-parameters.spc_dim=spc_dim; parameters.spn_dim=spn_dim;
+n_orients=numel(weights);
 
 % Build the MAS part of the Liouvillian
 M=2*pi*parameters.rate*kron(spdiags((parameters.max_rank:-1:-parameters.max_rank)',0,spc_dim,spc_dim),speye(spn_dim));
@@ -160,15 +170,32 @@ else
 end
 
 % Inform the user and silence the output
-prev_setting=spin_system.sys.output;
-report(spin_system,['powder simulation with ' num2str(numel(weights)) ' orientations.']);
+prev_setting=spin_system.sys.output; ss_prev.sys.output=spin_system.sys.output;
+report(spin_system,['powder simulation with ' num2str(n_orients) ' orientations.']);
 if ~isfield(parameters,'verbose')||(parameters.verbose==0)
     report(spin_system,'pulse sequence silenced to avoid excessive output.')
     spin_system.sys.output='hush';
 end
 
-% MDCS diagnostics
-parallel_profiler_start;
+% Parfor rigging
+if ~isworkernode
+    DQ=parallel.pool.DataQueue;
+    afterEach(DQ,@(~)parfor_progr);
+    orients_done=0; last_toc=0;
+    tic; ticBytes(gcp); do_diag=true;
+else
+    do_diag=false; DQ=[];
+end
+
+% Parfor progress updater
+function parfor_progr()
+    orients_done=orients_done+1; last_message=toc-last_toc;
+    if (last_message>5)||(orients_done==n_orients)
+        report(ss_prev,[num2str(orients_done) '/' num2str(n_orients) ' orientations done, ' ...
+                        num2str(orients_done/toc) ' orientations per second.']); 
+        last_toc=toc;
+    end
+end
 
 % Powder averaged spectrum
 parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
@@ -212,13 +239,13 @@ parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
     % Run the pulse sequence
     ans_array{q}=pulse_sequence(spin_system,parameters,F,R,K);
 
+    % Report parfor progress
+    if do_diag, send(DQ,n); end
+
 end
 
 % Unsilence the output
 spin_system.sys.output=prev_setting;
-
-% Get MDCS diagnostics
-parallel_profiler_report;
 
 % Decide the return array
 if parameters.sum_up
@@ -243,6 +270,14 @@ else
     
 end
 
+% Parfor performance
+if ~isworkernode
+    nbytes=mean(tocBytes(gcp),1)/2^20; walltime=toc();
+    report(spin_system,['average worker process received ' num2str(nbytes(1)) ...
+                        ' MB and sent back ' num2str(nbytes(2)) ' MB']);
+    report(spin_system,['powder average run time: ' num2str(walltime) ' seconds']);
+end
+
 end
 
 % Default parameters
@@ -261,6 +296,9 @@ if ~isfield(parameters,'verbose')
 end
 if ~isfield(parameters,'sum_up')
     parameters.sum_up=1;
+end
+if ~isfield(parameters,'needs')
+    parameters.needs={};
 end
 end
 

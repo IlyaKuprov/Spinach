@@ -1,13 +1,13 @@
 % Cross-polarisation experiment in the doubly rotating frame. A single
 % nitrogen-15 and a single proton. Spinning powder simulation starting
-% from the thermal equilibrium.
+% from the thermal equilibrium using Fokker-Planck formalism.
 %
 % Calculation time: seconds
 %
 % ilya.kuprov@weizmann.ac.il
 % aanevzor@ncsu.edu
 
-function cp_contact_mas_nh()
+function cp_contact_mas_nh_fplanck()
 
 % System specification
 sys.magnet=9.394;

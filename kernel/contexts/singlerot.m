@@ -109,10 +109,10 @@ spin_system=assume(spin_system,assumptions);
 % Get the Hamiltonian
 [H,Q]=hamiltonian(spin_system);
 
-% Apply offsets
+% Apply frequency offsets
 H=frqoffset(spin_system,H,parameters);
 
-% Compute the thermal equilibrium
+% Compute isotropic thermal equilibrium
 if ismember('iso_eq',parameters.needs)
     report(spin_system,'WARNING - thermal equilibrium uses the isotropic Hamitonian.');
     if isfield(parameters,'rho0')

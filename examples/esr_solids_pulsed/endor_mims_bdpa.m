@@ -1,9 +1,9 @@
 % Mims ENDOR pulse sequence on BDPA with ideal electron pulses,
 % reproducing Figure 10 from 
 %
-%            https://doi.org/10.1007/s00723-020-01269-z
+%           https://doi.org/10.1007/s00723-020-01269-z
 %
-% Run time: hours.
+% Calculation time: minutes.
 %
 % ilya.kuprov@weizmann.ac.il
 % annemarie.kehl@mpinat.mpg.de

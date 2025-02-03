@@ -4,12 +4,12 @@
 %
 % Parameters:
 %
-%     euler_angles  - if this parameter is skipped, the isotropic
-%                     part of the relaxation superoperator is re-
-%                     turned; when this parameter is specified,
-%                     those theories that support relaxation ani-
-%                     sotropy start taking spin system orientati-
-%                     on into account
+%    euler_angles  - three Euler angles (ZYZ active convention
+%                    in radians) specifying system orientation
+%                    relative to the input orientation; requi-
+%                    by those theories that support relaxation
+%                    rate anisotropy. It has no effect on tho-
+%                    se theories (e.g. Redfield) that do not.
 %                    
 % Outputs:
 %
@@ -34,7 +34,7 @@ spin_system=defaults(spin_system);
 grumble(spin_system);
 
 % Get the matrix going
-R=mprealloc(spin_system,0);
+R=mprealloc(spin_system,1);
 
 % Do nothing if none specified
 if isempty(spin_system.rlx.theories)
@@ -49,15 +49,24 @@ end
 
 % Add extended T1/T2 model terms
 if ismember('t1_t2',spin_system.rlx.theories)
+
+    % Inform the user
+    report(spin_system,'adding extended T1/T2 model terms...');
     
     % Call the extended T1/T2 model function
     if exist('euler_angles','var')
-        report(spin_system,'adding anisotropic extended T1/T2 model terms...');
+
+        % Relaxation rates may depend on the orientation
         [R1,R2]=rlx_t1_t2(spin_system,euler_angles);
+
     else
-        report(spin_system,'adding isotropic extended T1/T2 model terms...');
-        [R1,R2]=rlx_t1_t2(spin_system); 
+
+        % Orientation-independent relaxation rates
+        [R1,R2]=rlx_t1_t2(spin_system);
+
     end
+    
+    % Add tothe total
     R=R+R1+R2;
     
 end

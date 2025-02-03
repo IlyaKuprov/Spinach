@@ -6,12 +6,13 @@
 %
 % Parameters:
 %
-%    euler_angles  - if this parameter is skipped, the isotropic
-%                    part of the relaxation superoperator is re-
-%                    turned; when this parameter is specified,
-%                    those theories that support relaxation ani-
-%                    sotropy start taking spin system orientati-
-%                    on into account
+%    euler_angles  - three Euler angles (ZYZ active convention
+%                    in radians) specifying system orientation
+%                    relative to the input orientation; requi-
+%                    red when R1 and/or R2 rates had been spe-
+%                    cified as 3x3 tensor or a function handle,
+%                    this argument has no effect for R1 and R2
+%                    rates specified as scalars.
 %
 % Outputs:
 %
@@ -40,30 +41,109 @@ grumble(spin_system);
 r1_rates=zeros(size(spin_system.comp.isotopes));
 r2_rates=zeros(size(spin_system.comp.isotopes));
 
-% Fill in relaxation rates
+% Fill in R1 relaxation rates
 for n=1:numel(spin_system.comp.isotopes)
 
-    % Process the anisotropies
-    if exist('euler_angles','var')
+    % Get the specification
+    current_r1_rate=spin_system.rlx.r1_rates{n};
+
+    % Scalar relaxation rate
+    if isnumeric(current_r1_rate)&&isscalar(current_r1_rate)
+
+        % Simply assign the rate
+        r1_rates(n)=current_r1_rate;
+
+    % 3x3 tensor specification
+    elseif isnumeric(current_r1_rate)&&...
+           (size(current_r1_rate,1)==3)&&...
+           (size(current_r1_rate,2)==3)
+
+        % Make sure the angles are specified
+        if ~exist('euler_angles','var')
+            error('Euler angles must be specified with anisotropic T1/T2 relaxation theory.');
+        end
 
         % Compute orientation ort (this matches alphas=0 of two-angle grids)
         ort=[0 0 1]*euler2dcm(euler_angles(1),euler_angles(2),euler_angles(3));
 
-        % Get the rates at the current orientation
-        r1_rates(n)=ort*spin_system.rlx.r1_rates{n}*ort';
-        r2_rates(n)=ort*spin_system.rlx.r2_rates{n}*ort';
+        % Get the rate at the current orientation
+        r1_rates(n)=ort*current_r1_rate*ort';
+
+    % Function handle specification
+    elseif isa(current_r1_rate,'function_handle')
+
+        % Make sure the angles are specified
+        if ~exist('euler_angles','var')
+            error('Euler angles must be specified with anisotropic T1/T2 relaxation theory.');
+        end
+
+        % Call the function handle
+        r1_rates(n)=current_r1_rate(euler_angles(1),euler_angles(2),euler_angles(3));
 
     else
 
-        % Get isotropic rates
-        r1_rates(n)=spin_system.rlx.r1_rates{n};
-        r2_rates(n)=spin_system.rlx.r2_rates{n};
+        % Complain and bomb out
+        error('unknown R1 rate specification.');
 
     end
 
 end
 
-% Preallocate the diagonals
+% Fill in R2 relaxation rates
+for n=1:numel(spin_system.comp.isotopes)
+
+    % Get the specification
+    current_r2_rate=spin_system.rlx.r2_rates{n};
+
+    % Scalar relaxation rate
+    if isnumeric(current_r2_rate)&&isscalar(current_r2_rate)
+
+        % Simply assign the rate
+        r2_rates(n)=current_r2_rate;
+
+    % 3x3 tensor specification
+    elseif isnumeric(current_r2_rate)&&...
+           (size(current_r2_rate,1)==3)&&...
+           (size(current_r2_rate,2)==3)
+
+        % Make sure the angles are specified
+        if ~exist('euler_angles','var')
+            error('Euler angles must be specified with anisotropic T1/T2 relaxation theory.');
+        end
+
+        % Compute orientation ort (this matches alphas=0 of two-angle grids)
+        ort=[0 0 1]*euler2dcm(euler_angles(1),euler_angles(2),euler_angles(3));
+
+        % Get the rate at the current orientation
+        r2_rates(n)=ort*current_r2_rate*ort';
+
+    % Function handle specification
+    elseif isa(current_r2_rate,'function_handle')
+
+        % Make sure the angles are specified
+        if ~exist('euler_angles','var')
+            error('Euler angles must be specified with anisotropic T1/T2 relaxation theory.');
+        end
+
+        % Call the function handle
+        r2_rates(n)=current_r2_rate(euler_angles(1),euler_angles(2),euler_angles(3));
+
+    else
+
+        % Complain and bomb out
+        error('unknown R1 rate specification.');
+
+    end
+
+end
+
+% Make sure the rates make sense
+if any(~isreal(r1_rates),'all')||any(r1_rates<0,'all')||...
+   any(~isreal(r2_rates),'all')||any(r2_rates<0,'all')
+    error('all R1 and R2 relaxation rates must be real and non-negative.');
+end
+
+% Preallocate superoperator diagonals
 matrix_dim=size(spin_system.bas.basis,1);
 r1_diagonal=zeros(matrix_dim,1);
 r2_diagonal=zeros(matrix_dim,1);
@@ -92,7 +172,7 @@ parfor n=1:matrix_dim
     
 end
 
-% Form relaxation superoperators
+% Build relaxation superoperators
 R1Op=-spdiags(r1_diagonal,0,matrix_dim,matrix_dim);
 R2Op=-spdiags(r2_diagonal,0,matrix_dim,matrix_dim);
 

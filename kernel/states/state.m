@@ -79,10 +79,10 @@ function rho=state(spin_system,states,spins,method)
 % Default is to use consistent state norms
 if ~exist('method','var'), method='exact'; end
 
-% In wavefunction space, spins may be empty
+% In wavefunction space, empty set here
 if ~exist('spins','var'), spins=[]; end
 
-% Validate the input
+% Check consistency
 grumble(spin_system,states,spins,method);
 
 % Get the unit state
@@ -214,7 +214,7 @@ switch spin_system.bas.formalism
 
     case 'zeeman-wavef'
 
-        % Start the wqvefunction
+        % Start the wavefunction
         psi=1;
 
         % Loop over spins
@@ -248,55 +248,57 @@ end
 % Input validation function
 function grumble(spin_system,states,spins,method)
 
-if ~isfield(spin_system,'bas')
+% Check the formalism
+if (~isfield(spin_system,'bas'))||(~isfield(spin_system.bas,'formalism'))
     error('basis set information is missing, run basis() before calling this function.');
-elseif ~ischar(spin_system.bas.formalism)
-    error('basis set information must be a string.');
-elseif ~ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv',...
-                                'sphten-liouv','zeeman-wavef'})
-    error('unrecognized formalism - see the basis preparation section of the manual.');
+end
+if ~ischar(spin_system.bas.formalism)
+    error('formalism specification must be a character string.');
+end
+if ~ismember(spin_system.bas.formalism,{'zeeman-hilb', 'zeeman-liouv',...
+                                        'sphten-liouv','zeeman-wavef'})
+    error('unknown formalism specification.');
 end
 
+% Check which format is allowed in which formalism - Callum
+
+% Check method
 if ~ischar(method)
-    error('method information must be a string')
+    error('method must be a character string.')
 elseif ~ismember(method, {'cheap', 'exact', 'chem'})
-    error('unrecognised method - allowed methods are: ''cheap'', ''exact'', ''chem''.');
+    error('unknown method specification.');
 end
 
+% Make sure state specification is valid
 if (~(ischar(states)&&ischar(spins)))&&...
    (~(iscell(states)&&iscell(spins)))&&...
    (~(ischar(states)&&isnumeric(spins)))&&...
-   (~(isnumeric(states)&&isnumeric(spins)))
+   (~(isnumeric(states)&&isempty(spins)))
     error('invalid state specification.');
 end
-
 if isnumeric(states)&&(numel(states)~=spin_system.comp.nspins)
-    error('the number of states should be equal to the number of spins')
+    error('numel(states) must match number of spins in the system.')
 end
-
-if isnumeric(states)&&any(mod(states, 0.5) ~= 0)
-    error('for wavefunction formalism, quantum projection numbers for all spins must be an integer or half-integer.');
+if isnumeric(states)&&any(mod(states,0.5)~=0,'all')
+    error('spin projection numbers must be integer or half-integer.');
 end
-
 if iscell(states)&&iscell(spins)&&(numel(states)~=numel(spins))
     error('spins and operators cell arrays should have the same number of elements.');
 end
 if iscell(states)&&any(~cellfun(@ischar,states))
     error('all elements of the operators cell array should be strings.');
 end
-if isnumeric(spins)
-    if ~isempty(spins)
-        if (~isreal(spins))||(~isrow(spins))||any(mod(spins,1)~=0)||any(spins<1)
-            error('when numeric, spins must be a row of positive integers.');
-        end
-        if numel(spins)~=numel(unique(spins))
-            error('spin list must not have any repetitions.');
-        end
+if isnumeric(spins)&&(~isempty(spins))
+    if (~isreal(spins))||(~isrow(spins))||any(mod(spins,1)~=0)||any(spins<1)
+        error('when numeric, spins must be a row of positive integers.');
+    end
+    if numel(spins)~=numel(unique(spins))
+        error('spin list must not have any repetitions.');
     end
 end
 if iscell(spins)
     if isempty(spins)
-        error('spin list cannot be empty.');
+        error('when a cell array, spin list cannot be empty.');
     end  
     for n=1:numel(spins)
         if (~isreal(spins{n}))||(mod(spins{n},1)~=0)||(spins{n}<1)

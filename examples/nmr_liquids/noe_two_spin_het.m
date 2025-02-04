@@ -50,7 +50,7 @@ answer=evolution(spin_system,1i*R,coil,rho,1e-2,400,'multichannel');
 figure(); plot(linspace(0,4,401),answer);
 kxlabel('time, seconds'); kgrid;
 kylabel('$S_{\rm{Z}}$ expectation value');
-legend({'Proton','Carbon'},'Location','southeast');
+klegend({'Proton','Carbon'},'Location','southeast');
 
 end
 

@@ -145,7 +145,7 @@ if nargout>2
         for k=1:nctrls
 
             % Compute directional derivative w.r.t. control
-            auxmat=dirdiff(spin_system,H{n},controls{k},dt(n),2);
+            auxmat=dirdiff(shut_up,H{n},controls{k},dt(n),2);
 
             % Compute gradient element
             grad(k,n)=hdot(bwd_traj{n+1},auxmat{2}*fwd_traj{n}*auxmat{1}'+...

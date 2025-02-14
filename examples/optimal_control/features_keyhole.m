@@ -68,7 +68,6 @@ control.p_weights=100;                            % Penalty weight
 control.method='lbfgs';                           % Optimisation method
 control.max_iter=200;                             % Termination condition
 control.parallel='ensemble';                      % Parallelisation
-control.video_file='movie';
 
 % Set the keyhole
 control.keyholes=cell(1,50);

@@ -48,7 +48,7 @@ parameters.coil=state(spin_system,'Lx','15N');
 parameters.grid='rep_3ang_12800pts';
 
 % Simulation
-fid=powder(spin_system,@cp_contact_hard_tdhamil,parameters,'nmr');
+fid=singlerot(spin_system,@cp_contact_hard_tdhamil,parameters,'nmr');
 
 % Time axis generation
 rotor_period=1/parameters.rate;

@@ -57,20 +57,16 @@ dt=rotor_period/nintspp;
 % Preallocate the observable array
 contact_curve=zeros([1 nsteps+1],'like',1i);
 
-% Get the rotor stack
-parameters.masframe='magnet';
-parameters.orientation=parameters.current_angles;
-[L,~]=rotor_stack(spin_system,parameters,'nmr');
+% Get the operators started
+exc_oper=sparse(0); irr_oper=sparse(0);
 
-% Build and project the excitation operator
-exc_oper=parameters.exc_opers{1};
-for n=2:numel(parameters.exc_opers)
+% Build the excitation operator
+for n=1:numel(parameters.exc_opers)
     exc_oper=exc_oper+parameters.exc_opers{n};
 end
 
-% Build and project the spin-lock operator
-irr_oper=2*pi*parameters.irr_powers(1)*parameters.irr_opers{1};
-for k=2:numel(parameters.irr_opers)
+% Build the spin-lock operator
+for k=1:numel(parameters.irr_opers)
     irr_oper=irr_oper+2*pi*parameters.irr_powers(k)*parameters.irr_opers{k};
 end
 
@@ -83,10 +79,10 @@ contact_curve(:,1)=hdot(parameters.coil,rho);
 % Loop over the time steps
 for n=1:nsteps
 
-    % Get current evolution generator
-    G=L{mod(n-1,nintspp)+1}+irr_oper;
+    % Get the current evolution generator
+    G=H{mod(n-1,nintspp)+1}+1i*R+1i*K+irr_oper;
     
-    % Take an evolution step
+    % Take the evolution step
     rho=step(spin_system,G,rho,dt);
 
     % Get the observable quantity

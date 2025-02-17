@@ -40,6 +40,7 @@
 %   props.isotopes         - nuclear isotopes used by Gaussian
 %   props.atomic_numbers   - atomic numbers
 %   props.charge           - overall charge
+%   props.el_dip_std       - electric dipole moment, Debye
 %   props.multiplicity     - overall multiplicity
 %   props.filename         - log file name
 %   props.error            - true if the calculation
@@ -48,6 +49,7 @@
 % gareth.charnock@oerc.ox.ac.uk
 % jennifer.handsel@stx.ox.ac.uk
 % janm@umbc.edu
+% luke.ward@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=gparse.m>
@@ -329,13 +331,12 @@ for n=1:length(g03_output)
    end
    
    % Read electric dipole moment
-   if strcmp(g03_output(n),'Electric dipole moment (input orientation):')
-       S=char(g03_output(n+3));
-       S=textscan(S,'%s %f %f %f','Delimiter',' ','MultipleDelimsAsOne',1);
-       props.electric_dip=S{3};
+   if strcmp(g03_output(n),'Dipole moment (field-independent basis, Debye):')
+       dip_values=regexp(char(g03_output(n+1)),'([-+]?[0-9]*\.?[0-9]+)','match');
+       dip_values=str2double(dip_values); props.el_dip_std=dip_values(1:3);      
        disp('Gaussian import: found electric dipole moment.');
    end
-   
+
    % Check for error flags
    if ((numel(g03_output{n})>17)&&strcmp(g03_output{n}(1:17),'Error termination'))||...
       ((numel(g03_output{n})>16)&&strcmp(g03_output{n}(1:16),'Erroneous write.'))

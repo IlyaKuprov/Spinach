@@ -3,7 +3,7 @@
 % 
 %    https://doi.org/10.1103/PhysRev.140.A1261
 %    https://doi.org/10.1016/0009-2614(89)87166-0
-%    https://doi.org/10.1006/jmre.1996.1089
+%    https://doi.org/10.1006/jmre.1996.1089 (Figure 1)
 %
 % Syntax:
 %
@@ -51,31 +51,17 @@ function fid=fslghetcor(spin_system,parameters,H,R,K)
 grumble(spin_system,parameters,H,R,K);
  
 % Build 1H and 13C control operators
-Hp=operator(spin_system,'L+',parameters.spins{1});
-Hz=operator(spin_system,'Lz',parameters.spins{1});
-Cp=operator(spin_system,'L+',parameters.spins{2});
-Hp=kron(speye(parameters.spc_dim),Hp);
-Hz=kron(speye(parameters.spc_dim),Hz);
-Cp=kron(speye(parameters.spc_dim),Cp);
-Hx=(Hp+Hp')/2; Hy=(Hp-Hp')/2i; Cx=(Cp+Cp')/2;
- 
-% Compose the Liouvillian
-L=H+1i*R+1i*K;
-    
-% Apply the 90-degree pulses
-rho_cos=step(spin_system,L+2*pi*parameters.hi_pwr*Hx,...
-             parameters.rho0,1/(4*parameters.hi_pwr));
-rho_sin=step(spin_system,L+2*pi*parameters.hi_pwr*Hy,...
-             parameters.rho0,1/(4*parameters.hi_pwr));
+Hx=operator(spin_system,'Lx',parameters.spins{1}); Hx=kron(speye(parameters.spc_dim),Hx);
+Hy=operator(spin_system,'Ly',parameters.spins{1}); Hy=kron(speye(parameters.spc_dim),Hy);
+Hz=operator(spin_system,'Lz',parameters.spins{1}); Hz=kron(speye(parameters.spc_dim),Hz);
+Cx=operator(spin_system,'Lx',parameters.spins{2}); Cx=kron(speye(parameters.spc_dim),Cx);
 
-% Flip to the magic angle
-rho_cos=step(spin_system,L+2*pi*parameters.hi_pwr*Hx,...
-             rho_cos,acos(1/sqrt(3))/(2*pi)/parameters.hi_pwr);
-rho_sin=step(spin_system,L+2*pi*parameters.hi_pwr*Hy,...
-             rho_sin,acos(1/sqrt(3))/(2*pi)/parameters.hi_pwr);
- 
-% Get dwell times 
-dwell_times=1./parameters.sweep;
+% Liouvillian and its decoupled version
+L=H+1i*R+1i*K; L_dec=decouple(spin_system,L,[],parameters.spins(1));
+
+% Proton pulse evolution generators
+L_HPx=L+2*pi*parameters.hi_pwr*Hx; L_HPy=L+2*pi*parameters.hi_pwr*Hy;
+L_HMx=L-2*pi*parameters.hi_pwr*Hx; L_HMy=L-2*pi*parameters.hi_pwr*Hy;
 
 % FSLG pulse evolution generators
 L_FSLG_p=L-2*pi*parameters.offset(1)*Hz ...
@@ -87,19 +73,33 @@ L2_cos=L_FSLG_p-2*pi*parameters.hi_pwr*Hy;
 L1_sin=L_FSLG_p+2*pi*parameters.hi_pwr*Hx;
 L2_sin=L_FSLG_m-2*pi*parameters.hi_pwr*Hx;
 
-% Backflip pulse evolution generators
-L_backtoXY_cos=L-2*pi*parameters.hi_pwr*Hx;
-L_backtoXY_sin=L-2*pi*parameters.hi_pwr*Hy;
-
 % CP period evolution generator
 L_c=L-2*pi*parameters.cp_pwr(1)*Hy...
      +2*pi*parameters.cp_pwr(2)*Cx;
+
+% Move the problem to the GPU
+if ismember('gpu',spin_system.sys.enable)
+    L_HPx=gpuArray(L_HPx);   L_HPy=gpuArray(L_HPy);
+    L1_cos=gpuArray(L1_cos); L2_cos=gpuArray(L2_cos);
+    L1_sin=gpuArray(L1_sin); L2_sin=gpuArray(L2_sin);
+    L_HMx=gpuArray(L_HMx);   L_HMy=gpuArray(L_HMy);
+    L_c=gpuArray(L_c); rho=gpuArray(parameters.rho0);
+end
+
+% Sequence timing shorthands
+hi_pwr_90deg=1/(4*parameters.hi_pwr);
+hi_pwr_magic=acos(1/sqrt(3))/(2*pi)/parameters.hi_pwr;
+dwell_times=1./parameters.sweep;
 
 % Preallocate fid components
 fid.cos=zeros([parameters.npoints(2) ...
                parameters.npoints(1)],'like',1i);
 fid.sin=zeros([parameters.npoints(2) ...
                parameters.npoints(1)],'like',1i);
+
+% Flip by 90 degrees + magic angle
+rho_cos=step(spin_system,L_HPx,rho,hi_pwr_90deg+hi_pwr_magic);
+rho_sin=step(spin_system,L_HPy,rho,hi_pwr_90deg+hi_pwr_magic);
 
 % Run the bulk of the sequence
 for k=1:parameters.npoints(1)
@@ -125,10 +125,8 @@ for k=1:parameters.npoints(1)
     rho_cos_cont=rho_cos_ev; rho_sin_cont=rho_sin_ev;    
  
     % Flip the 1H back from the magic angle to the x,y-plane
-    rho_cos_cont=step(spin_system,L_backtoXY_cos,rho_cos_cont,...
-                      acos(1/sqrt(3))/(2*pi)/parameters.hi_pwr);
-    rho_sin_cont=step(spin_system,L_backtoXY_sin,rho_sin_cont,...
-                      acos(1/sqrt(3))/(2*pi)/parameters.hi_pwr);
+    rho_cos_cont=step(spin_system,L_HMx,rho_cos_cont,hi_pwr_magic);
+    rho_sin_cont=step(spin_system,L_HMy,rho_sin_cont,hi_pwr_magic);
 
     % Save work by stacking cos and sin parts
     rho_cont=[rho_cos_cont rho_sin_cont];
@@ -137,7 +135,7 @@ for k=1:parameters.npoints(1)
     rho_cont=step(spin_system,L_c,rho_cont,parameters.cp_dur);
    
     % Decouple 1H for the acquisition period
-    [L_dec,rho_cont]=decouple(spin_system,L,rho_cont,parameters.spins(1));
+    [~,rho_cont]=decouple(spin_system,[],rho_cont,parameters.spins(1));
     
     % Run the F2 evolution
     traj=evolution(spin_system,L_dec,parameters.coil,rho_cont,...

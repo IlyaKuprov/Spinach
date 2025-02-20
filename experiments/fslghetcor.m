@@ -56,8 +56,8 @@ Hy=operator(spin_system,'Ly',parameters.spins{1}); Hy=kron(speye(parameters.spc_
 Hz=operator(spin_system,'Lz',parameters.spins{1}); Hz=kron(speye(parameters.spc_dim),Hz);
 Cx=operator(spin_system,'Lx',parameters.spins{2}); Cx=kron(speye(parameters.spc_dim),Cx);
 
-% Liouvillian and its decoupled version
-L=H+1i*R+1i*K; L_dec=decouple(spin_system,L,[],parameters.spins(1));
+% Liouvillian 
+L=H+1i*R+1i*K;
 
 % Proton pulse evolution generators
 L_HPx=L+2*pi*parameters.hi_pwr*Hx; L_HPy=L+2*pi*parameters.hi_pwr*Hy;
@@ -77,72 +77,57 @@ L2_sin=L_FSLG_m-2*pi*parameters.hi_pwr*Hx;
 L_c=L-2*pi*parameters.cp_pwr(1)*Hy...
      +2*pi*parameters.cp_pwr(2)*Cx;
 
-% Move the problem to the GPU
-if ismember('gpu',spin_system.sys.enable)
-    L_HPx=gpuArray(L_HPx);   L_HPy=gpuArray(L_HPy);
-    L1_cos=gpuArray(L1_cos); L2_cos=gpuArray(L2_cos);
-    L1_sin=gpuArray(L1_sin); L2_sin=gpuArray(L2_sin);
-    L_HMx=gpuArray(L_HMx);   L_HMy=gpuArray(L_HMy);
-    L_c=gpuArray(L_c); rho=gpuArray(parameters.rho0);
-end
-
 % Sequence timing shorthands
 hi_pwr_90deg=1/(4*parameters.hi_pwr);
 hi_pwr_magic=acos(1/sqrt(3))/(2*pi)/parameters.hi_pwr;
 dwell_times=1./parameters.sweep;
 
-% Preallocate fid components
-fid.cos=zeros([parameters.npoints(2) ...
-               parameters.npoints(1)],'like',1i);
-fid.sin=zeros([parameters.npoints(2) ...
-               parameters.npoints(1)],'like',1i);
-
 % Flip by 90 degrees + magic angle
 rho_cos=step(spin_system,L_HPx,rho,hi_pwr_90deg+hi_pwr_magic);
 rho_sin=step(spin_system,L_HPy,rho,hi_pwr_90deg+hi_pwr_magic);
 
-% Run the bulk of the sequence
-for k=1:parameters.npoints(1)
-
-    if k==1
-
-        % First F1 step gets rho from above
-        rho_cos_ev=rho_cos; rho_sin_ev=rho_sin;
-
-    else
-
-        % Subsequent F1 steps keep going
-        for n=1:parameters.nblocks
-            rho_cos_ev=step(spin_system,L1_cos,rho_cos_ev,sqrt(2/3)/parameters.hi_pwr);
-            rho_cos_ev=step(spin_system,L2_cos,rho_cos_ev,sqrt(2/3)/parameters.hi_pwr);
-            rho_sin_ev=step(spin_system,L1_sin,rho_sin_ev,sqrt(2/3)/parameters.hi_pwr);
-            rho_sin_ev=step(spin_system,L2_sin,rho_sin_ev,sqrt(2/3)/parameters.hi_pwr);
-        end
-
-    end
-    
-    % Grab the current F1 point and divert it to F2
-    rho_cos_cont=rho_cos_ev; rho_sin_cont=rho_sin_ev;    
- 
-    % Flip the 1H back from the magic angle to the x,y-plane
-    rho_cos_cont=step(spin_system,L_HMx,rho_cos_cont,hi_pwr_magic);
-    rho_sin_cont=step(spin_system,L_HMy,rho_sin_cont,hi_pwr_magic);
-
-    % Save work by stacking cos and sin parts
-    rho_cont=[rho_cos_cont rho_sin_cont];
-
-    % Run the CP contact period
-    rho_cont=step(spin_system,L_c,rho_cont,parameters.cp_dur);
-   
-    % Decouple 1H for the acquisition period
-    [~,rho_cont]=decouple(spin_system,[],rho_cont,parameters.spins(1));
-    
-    % Run the F2 evolution
-    traj=evolution(spin_system,L_dec,parameters.coil,rho_cont,...
-                   dwell_times(2),parameters.npoints(2)-1,'observable');
-    fid.cos(:,k)=traj(:,1); fid.sin(:,k)=traj(:,2);
-
+% Move repeating event generators to GPU
+if ismember('gpu',spin_system.sys.enable)
+    L1_cos=gpuArray(L1_cos); L2_cos=gpuArray(L2_cos);
+    L1_sin=gpuArray(L1_sin); L2_sin=gpuArray(L2_sin);
 end
+
+% Preallocate F1 trajectories
+traj_cos=zeros(numel(rho),parameters.npoints(1),'like',1i);
+traj_sin=zeros(numel(rho),parameters.npoints(1),'like',1i);
+
+% Compute the F1 trajectory
+traj_cos(:,1)=rho_cos; traj_sin(:,1)=rho_sin;
+for k=2:parameters.npoints(1)
+    for n=1:parameters.nblocks
+        rho_cos=step(spin_system,L1_cos,rho_cos,sqrt(2/3)/parameters.hi_pwr);
+        rho_cos=step(spin_system,L2_cos,rho_cos,sqrt(2/3)/parameters.hi_pwr);
+        rho_sin=step(spin_system,L1_sin,rho_sin,sqrt(2/3)/parameters.hi_pwr);
+        rho_sin=step(spin_system,L2_sin,rho_sin,sqrt(2/3)/parameters.hi_pwr);
+    end
+    traj_cos(:,k)=rho_cos; traj_sin(:,k)=rho_sin;
+end
+ 
+% Flip the 1H back from the magic angle to the x,y-plane
+traj_cos=step(spin_system,L_HMx,traj_cos,hi_pwr_magic);
+traj_sin=step(spin_system,L_HMy,traj_sin,hi_pwr_magic);
+
+% Save work by stacking cos and sin parts
+traj_cos_sin=[traj_cos traj_sin];
+
+% Run the CP contact period
+traj_cos_sin=step(spin_system,L_c,traj_cos_sin,parameters.cp_dur);
+   
+% Decouple 1H for the acquisition period
+[L_dec,traj_cos_sin]=decouple(spin_system,[],traj_cos_sin,parameters.spins(1));
+    
+% Run the F2 evolution
+fid_cos_sin=evolution(spin_system,L_dec,parameters.coil,traj_cos_sin,...
+                      dwell_times(2),parameters.npoints(2)-1,'observable');
+
+% Unstack cos and sin parts
+fid.cos(:,k)=fid_cos_sin(:,1:(end/2)); 
+fid.sin(:,k)=fid_cos_sin(:,(end/2+1):end); 
 
 end
 

@@ -83,8 +83,8 @@ hi_pwr_magic=acos(1/sqrt(3))/(2*pi)/parameters.hi_pwr;
 dwell_times=1./parameters.sweep;
 
 % Flip by 90 degrees + magic angle
-rho_cos=step(spin_system,L_HPx,rho,hi_pwr_90deg+hi_pwr_magic);
-rho_sin=step(spin_system,L_HPy,rho,hi_pwr_90deg+hi_pwr_magic);
+rho_cos=step(spin_system,L_HPx,parameters.rho0,hi_pwr_90deg+hi_pwr_magic);
+rho_sin=step(spin_system,L_HPy,parameters.rho0,hi_pwr_90deg+hi_pwr_magic);
 
 % Move repeating event generators to GPU
 if ismember('gpu',spin_system.sys.enable)
@@ -92,22 +92,37 @@ if ismember('gpu',spin_system.sys.enable)
     L1_sin=gpuArray(L1_sin); L2_sin=gpuArray(L2_sin);
 end
 
-% Preallocate F1 trajectories
-traj_cos=zeros(numel(rho),parameters.npoints(1),'like',1i);
-traj_sin=zeros(numel(rho),parameters.npoints(1),'like',1i);
-
-% Compute the F1 trajectory
+% Preallocate and start the F1 trajectories
+traj_cos=zeros(numel(rho_cos),parameters.npoints(1),'like',1i);
+traj_sin=zeros(numel(rho_sin),parameters.npoints(1),'like',1i);
 traj_cos(:,1)=rho_cos; traj_sin(:,1)=rho_sin;
+
+% Compute the F1 trajectory, cos part
+if ismember('gpu',spin_system.sys.enable)
+    L1_cos=gpuArray(L1_cos); L2_cos=gpuArray(L2_cos);
+end
 for k=2:parameters.npoints(1)
     for n=1:parameters.nblocks
         rho_cos=step(spin_system,L1_cos,rho_cos,sqrt(2/3)/parameters.hi_pwr);
         rho_cos=step(spin_system,L2_cos,rho_cos,sqrt(2/3)/parameters.hi_pwr);
+    end
+    traj_cos(:,k)=rho_cos;
+end
+clear('L1_cos','L2_cos');
+
+% Compute the F1 trajectory, sin part
+if ismember('gpu',spin_system.sys.enable)
+    L1_sin=gpuArray(L1_sin); L2_sin=gpuArray(L2_sin);
+end
+for k=2:parameters.npoints(1)
+    for n=1:parameters.nblocks
         rho_sin=step(spin_system,L1_sin,rho_sin,sqrt(2/3)/parameters.hi_pwr);
         rho_sin=step(spin_system,L2_sin,rho_sin,sqrt(2/3)/parameters.hi_pwr);
     end
-    traj_cos(:,k)=rho_cos; traj_sin(:,k)=rho_sin;
+    traj_sin(:,k)=rho_sin;
 end
- 
+clear('L1_sin','L2_sin');
+
 % Flip the 1H back from the magic angle to the x,y-plane
 traj_cos=step(spin_system,L_HMx,traj_cos,hi_pwr_magic);
 traj_sin=step(spin_system,L_HMy,traj_sin,hi_pwr_magic);

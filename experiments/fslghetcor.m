@@ -134,15 +134,15 @@ traj_cos_sin=[traj_cos traj_sin];
 traj_cos_sin=step(spin_system,L_c,traj_cos_sin,parameters.cp_dur);
    
 % Decouple 1H for the acquisition period
-[L_dec,traj_cos_sin]=decouple(spin_system,[],traj_cos_sin,parameters.spins(1));
+[L_dec,traj_cos_sin]=decouple(spin_system,L,traj_cos_sin,parameters.spins(1));
     
 % Run the F2 evolution
 fid_cos_sin=evolution(spin_system,L_dec,parameters.coil,traj_cos_sin,...
                       dwell_times(2),parameters.npoints(2)-1,'observable');
 
 % Unstack cos and sin parts
-fid.cos(:,k)=fid_cos_sin(:,1:(end/2)); 
-fid.sin(:,k)=fid_cos_sin(:,(end/2+1):end); 
+fid.cos=fid_cos_sin(:,1:(end/2)); 
+fid.sin=fid_cos_sin(:,(end/2+1):end); 
 
 end
 

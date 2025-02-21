@@ -73,33 +73,77 @@ expm_times_vec=ismember(spin_system.bas.formalism,{'sphten-liouv',...
 % expm(A)*rho*expm(-A) shortcut
 if ~expm_times_vec
     
-    % Get the propagator
-    if isnumeric(L)
-        
-        % Centre point piecewise-constant propagator
-        P=propagator(spin_system,L,time_step);
-        
-    elseif numel(L)==2
-        
-        % Left edge + right edge piecewise-linear propagator
-        P=propagator(spin_system,isergen(L{1},[],L{2},time_step),time_step);
-        
-    elseif numel(L)==3
-        
-        % Left edge + midpoint + right edge piecewise-quadratic propagator
-        P=propagator(spin_system,isergen(L{1},L{2},L{3},time_step),time_step);
-        
+    % Lie generators
+    if iscell(L)&&(numel(L)==2)
+
+        % Two-point Lie quadrature
+        L=isergen(L{1},[],L{2},time_step);
+
+    elseif iscell(L)&&(numel(L)==3)
+
+        % Three-point Lie quadrature
+        L=isergen(L{1},L{2},L{3},time_step);
+
     end
-    
-    % Perform the propagation step
-    if iscell(rho)
-        parfor n=1:numel(rho)
-            rho{n}=P*rho{n}*P';
+
+    % Convergence tolerance
+    tol = eps('double');
+
+    % Clean up and scale the density matrix
+    rho=clean_up(spin_system,rho,tol);
+    rho_norm=cheap_norm(rho);
+    rho=rho/rho_norm;
+
+    % Subdivide the time step
+    norm_gen=cheap_norm(L)*abs(time_step);
+    nsteps=ceil(norm_gen/2);
+
+    % Step checks
+    if nsteps>1e4
+
+        % Catch the common mistake of supplying wildly unreasonable |L*dt|
+        error('either dt is too long, or L is too big: |L*dt|>1e4, check both.');
+
+    elseif nsteps>100
+
+        % Warn user if too many substeps are needed
+        report(spin_system,['WARNING: ' num2str(nsteps)...
+                            ' substeps required, consider using evolution() here.']);
+    end
+
+    % Loop over substeps
+    for n=1:nsteps
+
+        % Start the commutator series
+        next_term=rho; iter=1;
+
+        % Sum up the series
+        while nnz(next_term)>0
+
+            % Compute the next term in the series
+            next_term=(-1i*(time_step/nsteps)/iter)*((L*next_term)-...
+                                                     (next_term*L));
+
+            % Clean up the term
+            next_term=clean_up(spin_system,next_term,tol);
+
+            % Add and increment counter
+            rho=rho+next_term; iter=iter+1;
+
         end
-    else
-        rho=P*rho*P';
+
+        % Complain if the problem is badly scaled
+        if iter>32, warning(['loss of accuracy in the Taylor series, iter=' num2str(iter) ...
+                ', use evolution() here instead of step()']); end
+
+        % Final clean-up for this substep
+        rho=clean_up(spin_system,rho,tol);
+
     end
-    
+
+    % Scale the density matrix back
+    rho=rho_norm*rho;
+
     % Exit
     return;
     

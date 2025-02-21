@@ -69,11 +69,10 @@ end
 expm_times_vec=ismember(spin_system.bas.formalism,{'sphten-liouv',...
                                                    'zeeman-liouv',...
                                                    'zeeman-wavef'});
-
-% expm(A)*rho*expm(-A) shortcut
+% expm(A)*rho*expm(-A)
 if ~expm_times_vec
     
-    % Lie generators
+    % Process Lie generators
     if iscell(L)&&(numel(L)==2)
 
         % Two-point Lie quadrature
@@ -86,17 +85,8 @@ if ~expm_times_vec
 
     end
 
-    % Convergence tolerance
-    tol = eps('double');
-
-    % Clean up and scale the density matrix
-    rho=clean_up(spin_system,rho,tol);
-    rho_norm=cheap_norm(rho);
-    rho=rho/rho_norm;
-
-    % Subdivide the time step
-    norm_gen=cheap_norm(L)*abs(time_step);
-    nsteps=ceil(norm_gen/2);
+    % Subdivide the time step to ensure monotonic convergence
+    norm_gen=cheap_norm(L)*abs(time_step); nsteps=ceil(norm_gen/2);
 
     % Step checks
     if nsteps>1e4
@@ -111,104 +101,154 @@ if ~expm_times_vec
                             ' substeps required, consider using evolution() here.']);
     end
 
-    % Loop over substeps
-    for n=1:nsteps
+    % Check if we have a matrix or
+    % a cell array of matrices
+    if isnumeric(rho)
 
-        % Start the commutator series
-        next_term=rho; iter=1;
+        % Encapsulate into a cell array
+        return_numeric=true(); rho={rho};
 
-        % Sum up the series
-        while nnz(next_term)>0
+    elseif iscell(rho)
 
-            % Compute the next term in the series
-            next_term=(-1i*(time_step/nsteps)/iter)*((L*next_term)-...
-                                                     (next_term*L));
+        % Keep the cell array
+        return_numeric=false();
 
-            % Clean up the term
-            next_term=clean_up(spin_system,next_term,tol);
+    end
 
-            % Add and increment counter
-            rho=rho+next_term; iter=iter+1;
+    % Convergence tolerance
+    tol=eps('double');
+
+    % Loop over the cell array
+    parfor k=1:numel(rho)
+
+        % Clean up the density matrix
+        rho{k}=clean_up(spin_system,rho{k},tol);
+
+        % Small matrix shortcut
+        if size(L,1)<spin_system.tols.small_matrix
+
+            % Use Matlab's expm
+            P=expm(-1i*L*time_step);
+            rho{k}=P*rho{k}*P';
+
+        else
+
+            % Estimate the scaling coefficient
+            scaling=max(abs(rho{k}),[],'all');
+
+            % Catch zeroes
+            if scaling==0
+                report(spin_system,'WARNING: all-zero state received'); scaling=1;
+            end
+
+            % scale density matrix
+            rho{k}=rho{k}/scaling;
+
+            % Loop over substeps
+            for n=1:nsteps
+
+                % Start commutator series
+                next_term=rho{k}; iter=1;
+
+                % Sum up the series
+                while nnz(next_term)>0
+
+                    % Compute the next term in the commutator series
+                    next_term=(-1i*(time_step/nsteps)/iter)*((L*next_term)-...
+                                                             (next_term*L));
+
+                    % Clean up the term
+                    next_term=clean_up(spin_system,next_term,tol);
+
+                    % Add and increment the counter
+                    rho{k}=rho{k}+next_term; iter=iter+1;
+
+                end
+
+                % Complain if the problem is badly scaled
+                if iter>32, warning(['loss of accuracy in the Taylor series, iter=' num2str(iter) ...
+                                     ', use evolution() here instead of step()']); end
+
+                % Final clean-up for this substep
+                rho{k}=clean_up(spin_system,rho{k},tol);
+
+            end
+
+            % Scale the result back
+            rho{k}=scaling*rho{k};
 
         end
 
-        % Complain if the problem is badly scaled
-        if iter>32, warning(['loss of accuracy in the Taylor series, iter=' num2str(iter) ...
-                ', use evolution() here instead of step()']); end
-
-        % Final clean-up for this substep
-        rho=clean_up(spin_system,rho,tol);
-
     end
 
-    % Scale the density matrix back
-    rho=rho_norm*rho;
+    % Strip the cell array if needed
+    if return_numeric, rho=rho{1}; end
 
-    % Exit
-    return;
-    
-end
-
-% Make sure state is full
-if issparse(rho), rho=full(rho); end
-
-% Estimate scaling coefficient
-scaling=max(abs(rho),[],'all');
-
-% Catch zeros
-if scaling==0 
-    report(spin_system,'WARNING: all-zero state received');
-    return;
-end
-
-% Scale the state
-rho=rho/scaling;
-
-% Subdivide the time step
-if isnumeric(L)
-    norm_mat=cheap_norm(L)*abs(time_step);
+% expm(A)*rho
 else
-    norm_mat=max(cellfun(@cheap_norm,L))*abs(time_step);
-end
-nsteps=ceil(norm_mat/2);
 
-% Step checks
-if nsteps>1e4
+    % Make sure state is full
+    if issparse(rho), rho=full(rho); end
 
-    % Catch the common mistake of supplying wildly unreasonable |L*dt|
-    error('either dt is too long, or L is too big: |L*dt|>1e4, check both.');
+    % Estimate scaling coefficient
+    scaling=max(abs(rho),[],'all');
 
-elseif nsteps>100
+    % Catch zeros
+    if scaling==0
+        report(spin_system,'WARNING: all-zero state received');
+        return;
+    end
 
-    % Warn user if too many substeps are needed
-    report(spin_system,['WARNING: ' num2str(nsteps)...
-                        ' substeps required, consider using evolution() here.']);
-end
+    % Scale the state
+    rho=rho/scaling;
 
-% Decide if parallelisation is sensible
-parfor_makes_sense=(size(rho,1)>256)&&(size(rho,2)>32)&&...
-                   (poolsize>0)&&(~want_gpu);
+    % Subdivide the time step
+    if isnumeric(L)
+        norm_mat=cheap_norm(L)*abs(time_step);
+    else
+        norm_mat=max(cellfun(@cheap_norm,L))*abs(time_step);
+    end
+    nsteps=ceil(norm_mat/2);
 
-% Proceed with the propagation
-if parfor_makes_sense
-    
-    % Parallel loop over rho stack
-    parfor m=1:size(rho,2)
-        
+    % Step checks
+    if nsteps>1e4
+
+        % Catch the common mistake of supplying wildly unreasonable |L*dt|
+        error('either dt is too long, or L is too big: |L*dt|>1e4, check both.');
+
+    elseif nsteps>100
+
+        % Warn user if too many substeps are needed
+        report(spin_system,['WARNING: ' num2str(nsteps)...
+                            ' substeps required, consider using evolution() here.']);
+    end
+
+    % Decide if parallelisation is sensible
+    parfor_makes_sense=(size(rho,1)>256)&&(size(rho,2)>32)&&...
+                       (poolsize>0)&&(~want_gpu);
+
+    % Proceed with the propagation
+    if parfor_makes_sense
+
+        % Parallel loop over rho stack
+        parfor m=1:size(rho,2)
+
+            % Call Taylor-times-vector procedure
+            rho(:,m)=reordered_taylor(L,rho(:,m),time_step,nsteps);
+
+        end
+
+    else
+
         % Call Taylor-times-vector procedure
-        rho(:,m)=reordered_taylor(L,rho(:,m),time_step,nsteps);
-        
-    end
-    
-else
-    
-    % Call Taylor-times-vector procedure
-    rho=reordered_taylor(L,rho,time_step,nsteps);
-    
-end
+        rho=reordered_taylor(L,rho,time_step,nsteps);
 
-% Scale the state back
-rho=scaling*rho;
+    end
+
+    % Scale the result back
+    rho=scaling*rho;
+
+end
 
 end
 
@@ -259,6 +299,8 @@ for n=1:nsteps
                       ', use evolution() here instead of step()']); end
     
 end
+
+
 
 end
 

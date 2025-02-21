@@ -186,7 +186,7 @@ if isfield(parameters,'serial')&&...
            parameters.serial
        
     % Serial execution
-    nworkers=0;
+    nworkers=0; do_diag=false; DQ=[];
     
     % Inform the user
     report(spin_system,'WARNING: parallelisation turned off by the user.');
@@ -196,6 +196,16 @@ else
     % Parallel execution
     nworkers=min([poolsize n_orients]);
 
+    % Parfor rigging
+    if ~isworkernode
+        DQ=parallel.pool.DataQueue;
+        afterEach(DQ,@(~)parfor_progr);
+        orients_done=0; last_toc=0;
+        tic; ticBytes(gcp); do_diag=true;
+    else
+        do_diag=false; DQ=[];
+    end
+
 end
 
 % Inform the user and silence the output
@@ -204,16 +214,6 @@ report(spin_system,['powder simulation with ' num2str(n_orients) ' orientations.
 if ~isfield(parameters,'verbose')||(parameters.verbose==0)
     report(spin_system,'pulse sequence silenced to avoid excessive output.')
     spin_system.sys.output='hush';
-end
-
-% Parfor rigging
-if ~isworkernode
-    DQ=parallel.pool.DataQueue;
-    afterEach(DQ,@(~)parfor_progr);
-    orients_done=0; last_toc=0;
-    tic; ticBytes(gcp); do_diag=true;
-else
-    do_diag=false; DQ=[];
 end
 
 % Parfor progress updater

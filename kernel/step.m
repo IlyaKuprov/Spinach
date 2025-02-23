@@ -163,7 +163,7 @@ else
     % Make sure state is full
     if issparse(rho), rho=full(rho); end
 
-    % Estimate scaling coefficient
+    % Get the scaling factor
     scaling=max(abs(rho),[],'all');
 
     % Catch zeros
@@ -234,8 +234,8 @@ tol=eps('double');
 % Clean up the density matrix
 rho=clean_up(spin_system,rho,tol);
 
-% Estimate the scaling coefficient
-scaling=max(abs(rho),[],'all');
+% Get the scaling factor
+scaling=cheap_norm(rho);
 
 % Catch zeroes
 if scaling==0

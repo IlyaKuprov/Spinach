@@ -190,7 +190,7 @@ if isfield(parameters,'serial')&&parameters.serial
 else
     
     % Parallel execution
-    nworkers=min([poolsize numel(weights)]);
+    nworkers=min([poolsize n_orients]);
 
 end
 

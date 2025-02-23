@@ -220,7 +220,7 @@ if isfield(parameters,'serial')&&parameters.serial
 else
     
     % Parallel execution
-    nworkers=min([poolsize numel(weights)]);
+    nworkers=min([poolsize n_orients]);
 
 end
 
@@ -252,7 +252,7 @@ function parfor_progr()
 end
 
 % Parallel powder averaging loop
-parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
+parfor (q=1:n_orients,nworkers) %#ok<*PFBNS>
 
     % Preallocate Hamiltonian blocks
     H=cell(2*parameters.max_rank+1,1); H(:)={I};

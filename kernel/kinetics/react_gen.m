@@ -36,6 +36,9 @@ function [GD,GF]=react_gen(spin_system,reaction)
 % Check consistency
 grumble(spin_system,reaction);
 
+% Inform the user
+report(spin_system,'building reaction generators...');
+
 % Get drain and fill generators started
 GD=cell([numel(reaction.reactants) 1]);
 for n=1:numel(GD), GD{n}=zeros([0 3]); end

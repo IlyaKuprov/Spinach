@@ -46,6 +46,7 @@ for n=1:numel(sys_parts)
         sys_parts{n}=rmfield(sys_parts{n},'labels');
     end 
 end
+if isempty(sys.labels), sys=rmfield(sys,'labels'); end
 
 % Cartesian coordinates
 inter.coordinates={};

@@ -1,7 +1,7 @@
 % Accuracy benchmark for the Hamiltonian period propagator
 % caclulation using Lie group integrators. Bacause the mo-
-% duclation is purely sinusoidal, 2nd and 4th order integ-
-% rators show the same apparent accuracy.
+% dulation is purely sinusoidal, 2nd and 4th order integra-
+% tors show the same apparent accuracy.
 %
 % Calculation time: seconds
 %

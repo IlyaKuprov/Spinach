@@ -8,7 +8,7 @@
 % a.acharya@soton.ac.uk
 % bruno.linclau@ugent.be
 % madhukar.said@ugent.be
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function [sys,inter,bas]=dac_reaction()
 
@@ -146,7 +146,7 @@ bas.connectivity='scalar_couplings';
 bas.space_level=1;
 
 % Relaxation theory parameters
-inter.relaxation={'redfield','r1_r2'};
+inter.relaxation={'redfield','t1_t2'};
 inter.equilibrium='zero';
 inter.rlx_keep='secular';
 inter.tau_c={ 5e-12 ... % Cyclopentadiene

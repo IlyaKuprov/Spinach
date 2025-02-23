@@ -22,7 +22,8 @@
 %
 %    G - a matrix mapping each state of the
 %        reactant state space into its desti-
-%        nation in the product state space
+%        nation in the product state space;
+%        a cell array, one per reactant
 %
 % Notes: pilot implementation with slow indexing, needs
 %        a high-performance overhaul
@@ -42,7 +43,7 @@ report(spin_system,'building reaction generators...');
 % Get drain and fill generators started
 GD=cell([numel(reaction.reactants) 1]);
 for n=1:numel(GD), GD{n}=zeros([0 3]); end
-GF=cell([numel(reaction.products)  1]);
+GF=cell([numel(reaction.reactants) 1]);
 for n=1:numel(GF), GF{n}=zeros([0 3]); end
 
 % Loop over the basis set
@@ -109,7 +110,6 @@ for n=1:size(spin_system.bas.basis,1)
                 end
                 
                 % Add to product fill generator
-                idx=find(reaction.products==host_subst);
                 GF{idx}=[GF{idx}; [destin_index n 1]];
 
             end

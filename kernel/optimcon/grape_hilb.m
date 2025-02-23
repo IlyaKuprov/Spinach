@@ -47,7 +47,7 @@
 % Note: this is a low level function that is not designed to be called 
 %       directly. Use grape_xy.m and grape_phase.m instead.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=grape_hilb.m>

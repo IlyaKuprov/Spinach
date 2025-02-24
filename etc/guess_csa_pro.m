@@ -19,7 +19,10 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=Guess_csa_pro.m>
 
-function CSAs=guess_csa_pro(aa_nums,pdb_ids,coords)
+function CSAs=guess_csa_pro(aa_nums,pdb_ids,coords,options)
+
+% Set default peptide bond CSA options
+if ~isfield(options,'nh_csa'), options.nh_csa='tcb'; end
 
 % Check consistency
 grumble(aa_nums,pdb_ids,coords);
@@ -71,7 +74,34 @@ for n=1:(max(aa_nums)-1)
         xx_eigvec=xx_eigvec/norm(xx_eigvec,2);
         
         % Build the eigenvalue matrix
-        D=diag([-125 45 80]);
+        switch options.nh_csa
+
+            % Cornilescu and Bax
+            case 'bax'
+                
+                % https://doi.org/10.1021/ja0016194
+                D=diag([-108.0 62.0 46.0]);
+
+            % Tjandra, Curtis, and Bodenhausen
+            case 'tcb'
+                
+                % https://doi.org/10.1007/s10858-006-9037-6
+                % https://doi.org/10.1021/ja00083a028
+                % https://doi.org/10.1021/ja042863o
+                D=diag([-125.0 45.0 80.0]);
+            
+            % Case, Polenova, Gronenborn
+            case 'pol'
+                
+                % https://doi.org/10.1039/C8CP00647D
+                D=diag([-92.4 34.7 57.7]);
+
+            otherwise
+
+                % Complain and bomb out
+                error('unknown peptide bond CSA option.');
+
+        end
         
         % Build the eigenvector matrix
         V=[xx_eigvec yy_eigvec zz_eigvec];
@@ -206,7 +236,34 @@ for n=2:(max(aa_nums)-1)
         zz_eigvec=zz_eigvec/norm(zz_eigvec,2);
         
         % Build the eigenvalue matrix
-        D=diag([7.0 0.0 -7.0]);
+        switch options.nh_csa
+
+            % Cornilescu and Bax
+            case 'bax'
+                
+                % https://doi.org/10.1021/ja0016194
+                D=diag([6.00 0.00 -6.00]);
+
+            % Tjandra, Curtis, and Bodenhausen
+            case 'tcb'
+                
+                % https://doi.org/10.1007/s10858-006-9037-6
+                % https://doi.org/10.1021/ja00083a028
+                % https://doi.org/10.1021/ja042863o
+                D=diag([7.00 0.00 -7.00]);
+            
+            % Case, Polenova, Gronenborn
+            case 'pol'
+                
+                % https://doi.org/10.1039/C8CP00647D
+                D=diag([6.66 0.67 -7.33]);
+
+            otherwise
+
+                % Complain and bomb out
+                error('unknown peptide bond CSA option.');
+
+        end
         
         % Build the eigenvector matrix
         V=[xx_eigvec yy_eigvec zz_eigvec];

@@ -30,6 +30,15 @@
 %                     with deuterons; 'non-Me' deuterates every-
 %                     thing except methyl groups
 %
+% options.nh_csa    - peptide bond CSAs differ across literature,
+%                     the following options are available:
+%
+%          'bax' for H:[6.00 0.00 -6.00], N:[-108.0 62.0 46.0] ppm
+%          'tcb' for H:[7.00 0.00 -7.00], N:[-125.0 45.0 80.0] ppm
+%          'pol' for H:[6.66 0.66 -7.33], N:[ -92.4 34.7 57.7] ppm
+%
+%                     the default is 'tcb'.
+%
 % Outputs:
 %
 %    sys.isotopes          - Nspins x 1 cell array of strings
@@ -271,7 +280,7 @@ end
 scalar_couplings=guess_j_pro(pdb_aa_num,pdb_aa_typ,pdb_atom_id,pdb_coords);
 
 % Estimate chemical shielding anisotropies
-CSAs=guess_csa_pro(pdb_aa_num,pdb_atom_id,pdb_coords);
+CSAs=guess_csa_pro(pdb_aa_num,pdb_atom_id,pdb_coords,options);
 
 % Assign isotopes and labels
 isotopes=cell(1,numel(pdb_atom_id));

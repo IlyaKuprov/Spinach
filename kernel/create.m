@@ -160,7 +160,10 @@ end
 [spin_system,sys]=tolerances(spin_system,sys);
 
 % Tidy up the cache
-if ~isworkernode, cacheman(spin_system); end
+if (~isworkernode)&&...
+   (~ismember('hygiene',spin_system.sys.disable))
+    cacheman(spin_system); 
+end
 
 % Disabled features report
 if ~isempty(spin_system.sys.disable)

@@ -53,6 +53,9 @@ parameters.spins={'13C'};
 parameters.grid='rep_2ang_200pts_sph';
 parameters.verbose=0;
 
+% Numerical rotating frame transforms
+parameters.rframes={{'13C',1},{'14N',2}};
+
 % Vary the field
 fields=[4.7 9.4 14.1];
 
@@ -78,8 +81,8 @@ for m=1:numel(fields)
     parameters.rho0=state(spin_system,'L+','13C');
     parameters.coil=state(spin_system,'L+','13C');
         
-    % Laboratory frame with respect to the 14N nuclei
-    fid=singlerot(spin_system,@acquire,parameters,'qnmr');
+    % Lab frame Hamiltonian, then numerical rotating frames
+    fid=singlerot(spin_system,@acquire,parameters,'labframe');
     
     % Apodisation
     fid=apodisation(spin_system,fid,{{'exp',6}});

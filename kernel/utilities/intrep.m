@@ -99,7 +99,7 @@ function grumble(H0,H,order)
 if (~ishermitian(H))||(~ishermitian(H0))
     error('both H and H0 must be Hermitian.');
 end
-if ((~isreal(order))||(order<1)||(mod(order,1)~=0))&&(~isinf(order))
+if ((~isreal(order))||(order<0)||(mod(order,1)~=0))&&(~isinf(order))
     error('unsupported rotating frame transformation theory order.');
 end
 end

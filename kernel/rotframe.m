@@ -77,8 +77,8 @@ end
 if (~ishermitian(H))||(~ishermitian(H0))
     error('both H and C must be Hermitian.');
 end
-if ((~isreal(order))||(order<1)||(mod(order,1)~=0))&&(~isinf(order))
-    error('order must be a positive real integer.');
+if ((~isreal(order))||(order<0)||(mod(order,1)~=0))&&(~isinf(order))
+    error('order must be a non-negative real integer.');
 end
 end
 

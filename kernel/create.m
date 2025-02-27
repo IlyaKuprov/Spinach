@@ -318,11 +318,6 @@ if ~isworkernode
             ncores=max([1 floor(feature('numcores')/spmdSize)]);
             maxNumCompThreads(ncores);
 
-            % First worker is special
-            if spmdIndex==1
-                maxNumCompThreads(feature('numcores'));
-            end
-
         end
 
         % Head process can use what it wants

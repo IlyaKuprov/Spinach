@@ -94,7 +94,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=doublerot.m>
 
-function answer=doublerot(spin_system,pulse_sequence,parameters,assumptions)
+function [answer,sph_grid]=doublerot(spin_system,pulse_sequence,parameters,assumptions)
 
 % Show the banner
 banner(spin_system,'sequence_banner');
@@ -314,10 +314,9 @@ if parameters.sum_up
     
 else
     
-    % Return components and weights
-    answer.components=ans_array;
-    answer.weights=weights;
-    
+    % Return components
+    answer=ans_array;
+   
     % Inform the user
     report(spin_system,'returning pulse sequence outputs at each orientation...');
     

@@ -20,13 +20,9 @@
 %
 % Outputs:
 %
-%    G - a matrix mapping each state of the
-%        reactant state space into its desti-
-%        nation in the product state space;
-%        a cell array, one per reactant
-%
-% Notes: pilot implementation with slow indexing, needs
-%        a high-performance overhaul
+%    G - a cell array of matrices, one per reactant, map-
+%        ping each state of the reactant state space into
+%        its destination in the product state space
 %
 % i.kuproprov@weizmann.ac.il
 %
@@ -40,11 +36,14 @@ grumble(spin_system,reaction);
 % Inform the user
 report(spin_system,'building reaction generators...');
 
-% Reaction generator cell array
-G=cell([numel(reaction.reactants) 1]);
+% Preallocate reaction generator arrays
+% to be [reactant destin source coeff] 
+nstates=size(spin_system.bas.basis,1);
+drain_gen_idx=zeros(nstates,4); 
+fill_gen_idx=zeros(nstates,4);
 
 % Loop over the basis set
-for n=1:size(spin_system.bas.basis,1)
+parfor n=1:nstates %#ok<*PFBNS>
     
     % Extract the state
     source_state=spin_system.bas.basis(n,:); 
@@ -60,10 +59,8 @@ for n=1:size(spin_system.bas.basis,1)
                            spin_system.chem.parts);
         [~,host_subst]=find(host_subst);
 
-        % Double-check indexing
-        if numel(host_subst)~=1
-            error('basis set indexing problem.');
-        end
+        % Double-check basis state indexing
+        if numel(host_subst)~=1, error('basis set indexing problem.'); end
 
         % Determine host substance type
         this_is_reactants=ismember(host_subst,reaction.reactants);
@@ -79,7 +76,7 @@ for n=1:size(spin_system.bas.basis,1)
 
             % Add to reactant drain generator
             idx=find(reaction.reactants==host_subst);
-            G{idx}=[G{idx}; [n n -1]];
+            drain_gen_idx(n,:)=[idx n n -1];
         
             % Build the destination state
             destin_state=zeros(1,numel(source_state));
@@ -107,7 +104,7 @@ for n=1:size(spin_system.bas.basis,1)
                 end
                 
                 % Add to product fill generator
-                G{idx}=[G{idx}; [destin_index n 1]];
+                fill_gen_idx(n,:)=[idx destin_index n 1];
 
             end
 
@@ -117,12 +114,16 @@ for n=1:size(spin_system.bas.basis,1)
 
 end
 
+% Merge and trim generator indices
+gen_idx=[drain_gen_idx; fill_gen_idx];
+gen_idx(gen_idx(:,4)==0,:)=[];
+
 % Convert to sparse matrices
-dim=size(spin_system.bas.basis,1);
-for n=1:numel(G)
-    G{n}=sparse(G{n}(:,1),...
-                G{n}(:,2),...
-                G{n}(:,3),dim,dim);
+G=cell([numel(reaction.reactants) 1]);
+for n=1:numel(reaction.reactants)
+    G{n}=sparse(gen_idx(gen_idx(:,1)==n,2),...
+                gen_idx(gen_idx(:,1)==n,3),...
+                gen_idx(gen_idx(:,1)==n,4),nstates,nstates);
 end
 
 end

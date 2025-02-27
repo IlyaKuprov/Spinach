@@ -53,8 +53,8 @@ parameters.coil_st{1}=state(spin_system,'Lz','1H');
 % Sequence and timing parameters
 parameters.spins={'1H'};
 parameters.offset=0;
-parameters.dt=160; 
-parameters.npoints=50;
+parameters.dt=80; 
+parameters.npoints=70;
 
 % Set assumptions
 spin_system=assume(spin_system,'nmr');
@@ -105,6 +105,7 @@ for n=1:size(traj,2)
     mesh_plot(spin_system,0,0);
     conc_plot(spin_system,conc);
     zlim(spin_system.mesh.zext);
+    kzlabel('concentration, a.u.');
     set(gca,'DataAspectRatio',[1 1 0.05]);
     camorbit(0.5,0); drawnow();
         

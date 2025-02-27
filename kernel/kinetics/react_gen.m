@@ -32,7 +32,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=react_gen.m>
 
-function [GD,GF]=react_gen(spin_system,reaction)
+function G=react_gen(spin_system,reaction)
 
 % Check consistency
 grumble(spin_system,reaction);
@@ -40,17 +40,14 @@ grumble(spin_system,reaction);
 % Inform the user
 report(spin_system,'building reaction generators...');
 
-% Get drain and fill generators started
-GD=cell([numel(reaction.reactants) 1]);
-for n=1:numel(GD), GD{n}=zeros([0 3]); end
-GF=cell([numel(reaction.reactants) 1]);
-for n=1:numel(GF), GF{n}=zeros([0 3]); end
+% Reaction generator cell array
+G=cell([numel(reaction.reactants) 1]);
 
 % Loop over the basis set
 for n=1:size(spin_system.bas.basis,1)
     
     % Extract the state
-    source_state=spin_system.bas.basis(n,:);
+    source_state=spin_system.bas.basis(n,:); 
 
     % Find participating spins
     [~,spins_involved]=find(source_state);
@@ -82,7 +79,7 @@ for n=1:size(spin_system.bas.basis,1)
 
             % Add to reactant drain generator
             idx=find(reaction.reactants==host_subst);
-            GD{idx}=[GD{idx}; [n n -1]];
+            G{idx}=[G{idx}; [n n -1]];
         
             % Build the destination state
             destin_state=zeros(1,numel(source_state));
@@ -110,7 +107,7 @@ for n=1:size(spin_system.bas.basis,1)
                 end
                 
                 % Add to product fill generator
-                GF{idx}=[GF{idx}; [destin_index n 1]];
+                G{idx}=[G{idx}; [destin_index n 1]];
 
             end
 
@@ -122,15 +119,10 @@ end
 
 % Convert to sparse matrices
 dim=size(spin_system.bas.basis,1);
-for n=1:numel(GD)
-    GD{n}=sparse(GD{n}(:,1),...
-                 GD{n}(:,2),...
-                 GD{n}(:,3),dim,dim);
-end
-for n=1:numel(GF)
-    GF{n}=sparse(GF{n}(:,1),...
-                 GF{n}(:,2),...
-                 GF{n}(:,3),dim,dim);
+for n=1:numel(G)
+    G{n}=sparse(G{n}(:,1),...
+                G{n}(:,2),...
+                G{n}(:,3),dim,dim);
 end
 
 end

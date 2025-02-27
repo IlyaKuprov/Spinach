@@ -79,15 +79,15 @@ reaction{2}.products=4;       % into endo-norbornene carbonitrile
 reaction{2}.matching=[1 21; 2 26; 3 27; 4 25; 5 19; 6 20; 7 23; 8 24; 9 22]; 
 
 % Reaction generators
-[D1,F1]=react_gen(spin_system,reaction{1});
-[D2,F2]=react_gen(spin_system,reaction{2});
+G1=react_gen(spin_system,reaction{1});
+G2=react_gen(spin_system,reaction{2});
 
 % Get concentration-weighted initial condition
-eta=A(0)*state(spin_system,'Lz',spin_system.chem.parts{1})+...
-    B(0)*state(spin_system,'Lz',spin_system.chem.parts{2})+...
-    C(0)*state(spin_system,'Lz',spin_system.chem.parts{3})+...
-    D(0)*state(spin_system,'Lz',spin_system.chem.parts{4})+...
-    E(0)*state(spin_system,'Lz',spin_system.chem.parts{5});
+eta=A(0)*state(spin_system,'L+',spin_system.chem.parts{1})+...
+    B(0)*state(spin_system,'L+',spin_system.chem.parts{2})+...
+    C(0)*state(spin_system,'L+',spin_system.chem.parts{3})+...
+    D(0)*state(spin_system,'L+',spin_system.chem.parts{4})+...
+    E(0)*state(spin_system,'L+',spin_system.chem.parts{5});
 
 % Preallocate the trajectory 
 traj=zeros([numel(eta) nsteps+1]); traj(:,1)=eta;
@@ -99,16 +99,16 @@ H=sparse(0); R=sparse(0);
 for n=1:nsteps
 
     % Build the left interval edge composite evolution generator
-    F_L=H+1i*R+1i*k1*(D1{1}+F1{1})*B(time_axis(n))...   % Reaction 1 from substance A
-              +1i*k1*A(time_axis(n))*(D1{2}+F1{2})...   % Reaction 1 from substance B
-              +1i*k2*(D2{1}+F2{1})*B(time_axis(n))...   % Reaction 2 from substance A
-              +1i*k2*A(time_axis(n))*(D2{2}+F2{2});     % Reaction 2 from substance B
+    F_L=H+1i*R+1i*k1*G1{1}*B(time_axis(n))...   % Reaction 1 from substance A
+              +1i*k1*A(time_axis(n))*G1{2}...   % Reaction 1 from substance B
+              +1i*k2*G2{1}*B(time_axis(n))...   % Reaction 2 from substance A
+              +1i*k2*A(time_axis(n))*G2{2};     % Reaction 2 from substance B
 
     % Build the right interval edge composite evolution generator
-    F_R=H+1i*R+1i*k1*(D1{1}+F1{1})*B(time_axis(n+1))... % Reaction 1 from substance A
-              +1i*k1*A(time_axis(n+1))*(D1{2}+F1{2})... % Reaction 1 from substance B
-              +1i*k2*(D2{1}+F2{1})*B(time_axis(n+1))... % Reaction 2 from substance A
-              +1i*k2*A(time_axis(n+1))*(D2{2}+F2{2});   % Reaction 2 from substance B
+    F_R=H+1i*R+1i*k1*G1{1}*B(time_axis(n+1))... % Reaction 1 from substance A
+              +1i*k1*A(time_axis(n+1))*G1{2}... % Reaction 1 from substance B
+              +1i*k2*G2{1}*B(time_axis(n+1))... % Reaction 2 from substance A
+              +1i*k2*A(time_axis(n+1))*G2{2};   % Reaction 2 from substance B
 
     % Take the time step using the two-point Lie quadrature
     traj(:,n+1)=step(spin_system,{F_L,F_R},traj(:,n),time_axis(n+1)-time_axis(n));
@@ -116,10 +116,10 @@ for n=1:nsteps
 end
 
 % Detect particular spins 
-coils=[state(spin_system,{'Lz'},{1})  ...
-       state(spin_system,{'Lz'},{7})  ...
-       state(spin_system,{'Lz'},{10}) ...
-       state(spin_system,{'Lz'},{19})];
+coils=[state(spin_system,{'L+'},{1})  ...
+       state(spin_system,{'L+'},{7})  ...
+       state(spin_system,{'L+'},{10}) ...
+       state(spin_system,{'L+'},{19})];
 x=real((coils'*coils)\(coils'*traj));
 
 % Plot observables, excluding solvent

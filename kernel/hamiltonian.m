@@ -648,7 +648,7 @@ if ~isworkernode
                         ' MB and sent back ' num2str(nbytes(2)) ' MB']);
 end
 
-% Clean up and do the reporting
+% Inform the user
 report(spin_system,['operator construction took ' num2str(toc()) ' seconds']);
 report(spin_system,['operator array footprint: ' ...
                      num2str(whos('oper').bytes/1024^3) ' GB']);
@@ -657,21 +657,35 @@ clear('parfor_ss'); report(spin_system,'assembling the Hamiltonian...'); tic
 % Get matrix dimension
 dim=size(mprealloc(spin_system,0),1);
 
-% Assemble isotropic part in XYZ form
-H=cell(nterms,1);
+% Preallocate index arrays
+max_nnz=0;
 for n=1:nterms
     if abs(descr.isotropic(n))>spin_system.tols.liouv_zero
-        H{n}=[oper{n}(:,1) oper{n}(:,2) descr.isotropic(n)*oper{n}(:,3)];
-        H{n}(abs(H{n}(:,3))<spin_system.tols.liouv_zero,:)=[];
+        max_nnz=max_nnz+size(oper{n},1);
     end
 end
-H(cellfun(@isempty,H))=[]; H=cell2mat(H);
+rows=zeros(max_nnz,1); cols=zeros(max_nnz,1);
+vals=zeros(max_nnz,1); curr_idx=0;
 
-% Convert XYZ form to sparse matrix
-if isempty(H)
+% Assemble isotropic part in indexed form
+for n=1:nterms
+    if abs(descr.isotropic(n))>spin_system.tols.liouv_zero
+        curr_oper=oper{n}; curr_oper_nnz=size(curr_oper,1);
+        if curr_oper_nnz>0
+            idx_range=curr_idx+(1:curr_oper_nnz);
+            rows(idx_range)=curr_oper(:,1);
+            cols(idx_range)=curr_oper(:,2);
+            vals(idx_range)=descr.isotropic(n)*curr_oper(:,3);
+            curr_idx=curr_idx+curr_oper_nnz;
+        end
+    end
+end
+
+% Convert to sparse matrix
+if curr_idx==0
     H=mprealloc(spin_system,0);
 else
-    H=sparse(H(:,1),H(:,2),H(:,3),dim,dim); 
+    H=sparse(rows(1:curr_idx),cols(1:curr_idx),vals(1:curr_idx),dim,dim); 
     H=clean_up(spin_system,H,spin_system.tols.liouv_zero);
 end
 
@@ -688,27 +702,37 @@ if build_aniso
         for m=1:(2*r+1)
             for k=1:(2*r+1)
 
-                % Assemble operator in XYZ form
-                J=cell(nterms,1);
+                % Preallocate index arrays
+                max_nnz=0;
                 for n=1:nterms
-
-                    % Get the combined coefficient
                     coeff=descr.ist_coeff(n,r^2+k-1)*descr.irr_comp(n,r^2+m-1);
-
-                    % Store the operator if significant
                     if abs(coeff)>spin_system.tols.liouv_zero
-                        J{n}=[oper{n}(:,1) oper{n}(:,2) coeff*oper{n}(:,3)];
-                        J{n}(abs(J{n}(:,3))<spin_system.tols.liouv_zero,:)=[];
+                        max_nnz=max_nnz+size(oper{n},1);
                     end
-                    
                 end
-                J(cellfun(@isempty,J))=[]; J=cell2mat(J);
+                rows=zeros(max_nnz,1); cols=zeros(max_nnz,1);
+                vals=zeros(max_nnz,1); curr_idx=0;
 
-                % Convert XYZ form to sparse matrix
-                if isempty(J)
+                % Assemble anisotropic part in indexed form
+                for n=1:nterms
+                    coeff=descr.ist_coeff(n,r^2+k-1)*descr.irr_comp(n,r^2+m-1);
+                    if abs(coeff)>spin_system.tols.liouv_zero
+                        curr_oper=oper{n}; curr_oper_nnz=size(curr_oper,1);
+                        if curr_oper_nnz>0
+                            idx_range=curr_idx+(1:curr_oper_nnz);
+                            rows(idx_range)=curr_oper(:,1);
+                            cols(idx_range)=curr_oper(:,2);
+                            vals(idx_range)=coeff*curr_oper(:,3);
+                            curr_idx=curr_idx+curr_oper_nnz;
+                        end
+                    end
+                end
+
+                % Convert to sparse matrix
+                if curr_idx==0
                     Q{r}{k,m}=mprealloc(spin_system,0);
                 else
-                    J=sparse(J(:,1),J(:,2),J(:,3),dim,dim);
+                    J=sparse(rows(1:curr_idx),cols(1:curr_idx),vals(1:curr_idx),dim,dim);
                     Q{r}{k,m}=clean_up(spin_system,J,spin_system.tols.liouv_zero);
                 end
                 
@@ -719,8 +743,7 @@ if build_aniso
 
 end
 
-% Clean up and do the reporting
-clear('J','descr','irr_comp','iso_coeff','oper');
+% Inform the user
 report(spin_system,['Hamiltonian assembly took ' num2str(toc()) ' seconds']);
 
 % Process giant spin Hamiltonian terms

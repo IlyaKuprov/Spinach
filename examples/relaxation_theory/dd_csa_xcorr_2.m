@@ -93,11 +93,11 @@ end
 
 % Invert the X axis
 set(gca,'XDir','reverse'); 
-xlim tight; box on; kgrid;
-kxlabel('19F linear frequency, Hz');
-legend('\tau_m = 0.1 s','\tau_m = 1.4 s','\tau_m = 1.6 s',...
-       '\tau_m = 1.8 s','\tau_m = 2.0 s','\tau_m = 2.2 s',...
-       '\tau_m = 2.4 s','\tau_m = 10 s');
+xlim tight; ylim padded; box on; 
+kgrid; kxlabel('19F linear frequency, Hz');
+klegend('$\tau_m = 0.1$ s','$\tau_m = 1.4$ s','$\tau_m = 1.6$ s',...
+        '$\tau_m = 1.8$ s','$\tau_m = 2.0$ s','$\tau_m = 2.2$ s',...
+        '$\tau_m = 2.4$ s','$\tau_m = 10$ s');
 
 end
 

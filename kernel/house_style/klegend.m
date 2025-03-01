@@ -19,7 +19,11 @@
 function klegend(varargin)
 
 % Display the legend using LaTeX
-legend(varargin{:},'Interpreter','latex');
+leg_obj=legend(varargin{:},'Interpreter','latex');
+
+% Make legend box translucent
+set(leg_obj.BoxFace,'ColorType','truecoloralpha',...
+                    'ColorData',uint8([200 200 200 64]'));
 
 end
 

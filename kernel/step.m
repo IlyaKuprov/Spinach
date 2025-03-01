@@ -1,6 +1,6 @@
-% Propagation step function. Uses Taylor propagation and sparse exponenti-
-% ation where appropriate. Supports piecewise-constant, piecewise-linear,
-% and piecewise quadratic product quadratures. Syntax:
+% Propagation step function. Computes the action by a matrix exponential 
+% without compuing that exponential. Supports one-, two-, and three-point
+% product quadratures. Syntax:
 %
 %                   rho=step(spin_system,L,rho,time_step)
 %

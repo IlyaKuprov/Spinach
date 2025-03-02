@@ -161,7 +161,9 @@ end
 
 % Tidy up the cache
 if (~isworkernode)&&...
-   (~ismember('hygiene',spin_system.sys.disable))
+   (~ismember('hygiene',spin_system.sys.disable))&&...
+   (~ismember('op_cache',spin_system.sys.enable))&&...
+   (~ismember('prop_cache',spin_system.sys.enable))
     cacheman(spin_system); 
 end
 

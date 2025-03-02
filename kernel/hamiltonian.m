@@ -591,6 +591,32 @@ clear('D1','D2','nL','nS','opL','opS','isotropic','ist_coeff',...
       'irr_comp','mask_a','mask_b','mask_c','L','S','coupling_iso',...
       'n','pair_list','quad_couplings');
 
+% Load the cache record if one exists
+if ismember('ham_cache',spin_system.sys.enable)
+
+    % Combine descriptor, isotopes, and basis hash
+    ham_hash=md5_hash({descr spin_system.comp.iso_hash ...
+                             spin_system.bas.basis_hash});
+
+    % Generate the cache record name in the global scratch (for later reuse)
+    filename=[spin_system.sys.scratch filesep 'spinach_ham_' ham_hash '.mat'];
+
+    % Load from the cache record
+    if exist(filename,'file')
+
+        % Load isotropic part
+        load(filename,'H');
+
+        % Load the rotational basis
+        if build_aniso, load(filename,'Q'); end
+
+        % Tell the user and exit
+        report(spin_system,'cache record found and loaded.'); return; 
+
+    end
+
+end
+
 % Balance the descriptor
 descr=descr(randperm(size(descr,1)),:);
 
@@ -848,6 +874,16 @@ end
 H_whos=whos('H'); report(spin_system,['memory footprint of H array: ' num2str(H_whos.bytes/1024^3) ' GB']);
 if build_aniso
     Q_whos=whos('Q'); report(spin_system,['memory footprint of Q array: ' num2str(Q_whos.bytes/1024^3)  ' GB']);
+end
+
+% Write the cache record 
+if ismember('ham_cache',spin_system.sys.enable)
+    if build_aniso
+        save(filename,'H','Q','-v7.3');
+    else
+        save(filename,'H','-v7.3');
+    end
+    report(spin_system,'cache record saved');
 end
 
 end

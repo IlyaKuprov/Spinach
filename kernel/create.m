@@ -163,6 +163,7 @@ end
 if (~isworkernode)&&...
    (~ismember('hygiene',spin_system.sys.disable))&&...
    (~ismember('op_cache',spin_system.sys.enable))&&...
+   (~ismember('ham_cache',spin_system.sys.enable))&&...
    (~ismember('prop_cache',spin_system.sys.enable))
     cacheman(spin_system); 
 end
@@ -189,6 +190,7 @@ if ~isempty(spin_system.sys.enable)
     report(spin_system,'WARNING: the following functionality is enabled by the user');
     if ismember('gpu',spin_system.sys.enable),        report(spin_system,'         > GPU arithmetic'); end
     if ismember('op_cache',spin_system.sys.enable),   report(spin_system,'         > operator caching'); end
+    if ismember('ham_cache',spin_system.sys.enable),  report(spin_system,'         > Hamiltonian caching'); end
     if ismember('prop_cache',spin_system.sys.enable), report(spin_system,'         > propagator caching'); end
     if ismember('greedy',spin_system.sys.enable),     report(spin_system,'         > greedy parallelisation'); end
     if ismember('xmemlist',spin_system.sys.enable),   report(spin_system,'         > state-cluster cross-membership list generation'); end
@@ -1271,7 +1273,7 @@ if isfield(sys,'enable')
         error('sys.enable must be a cell array of strings.');
     end
     if any(~ismember(sys.enable,{'gpu','op_cache','xmemlist','greedy','paranoia',...
-                                 'cowboy','polyadic','dafuq','prop_cache'}))
+                                 'cowboy','polyadic','dafuq','prop_cache','ham_cache'}))
         error('unrecognised switch in sys.enable field.');
     end
 end

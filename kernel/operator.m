@@ -87,7 +87,7 @@ if ismember('op_cache',spin_system.sys.enable)
     % Generate the cache record name in the global scratch (for later reuse)
     filename=[spin_system.sys.scratch filesep 'spinach_op_' op_hash '.mat'];
 
-    % Load the operator from the cache record
+    % Silently load the operator from the cache record
     if exist(filename,'file'), load(filename,'A'); return; end
     
 end

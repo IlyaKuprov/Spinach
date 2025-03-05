@@ -320,7 +320,7 @@ if isfield(sys,'tols')&&isfield(sys.tols,'cache_mem')
     report(spin_system,[pad('Number of days before a cache record is deleted',65) ...
                         pad(num2str(spin_system.tols.cache_mem),20) ' (user-specified)']);
 else
-    spin_system.tols.cache_mem=7;
+    spin_system.tols.cache_mem=365;
     report(spin_system,[pad('Number of days before a cache record is deleted',65) ...
                         pad(num2str(spin_system.tols.cache_mem),20) ' (safe default)']);
 end

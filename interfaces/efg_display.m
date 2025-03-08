@@ -56,6 +56,9 @@
 %                       isotropic parts of tensors be-
 %                       fore plotting
 %
+%    options.numbers  - set to true() to display atom
+%                       numbers
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=efg_display.m>
@@ -73,6 +76,10 @@ end
 if (~exist('options','var'))||...
    (~isfield(options,'kill_iso'))
    options.kill_iso=false();
+end
+if (~exist('options','var'))||...
+   (~isfield(options,'numbers'))
+   options.numbers=false();
 end
     
 % Set up graphics
@@ -220,6 +227,15 @@ for n=idx
 
     end
 
+end
+
+% Add atom numbers
+if options.numbers
+    for n=1:size(props.std_geom,1)
+        text(props.std_geom(n,1),...
+             props.std_geom(n,2),...
+             props.std_geom(n,3),int2str(n));
+    end
 end
 
 % Tidy up the picture

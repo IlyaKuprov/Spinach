@@ -41,8 +41,8 @@ parameters.spins={'13C'};
 parameters.decouple={};
 parameters.axis_units='ppm';
 parameters.invert_axis=1;
-parameters.rho0=state(spin_system,'L+','13C','cheap');
-parameters.coil=state(spin_system,'L+','13C','cheap');
+parameters.rho0=state(spin_system,'L+','13C');
+parameters.coil=state(spin_system,'L+','13C');
 parameters.verbose=0;
 
 % Simulation

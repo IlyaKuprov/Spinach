@@ -49,10 +49,9 @@ parameters.npoints=1024;
 parameters.zerofill=1024;
 parameters.spins={'14N'};
 parameters.axis_units='kHz';
-parameters.rho0=state(spin_system,'L+','14N','cheap');
-parameters.coil=state(spin_system,'L+','14N','cheap');
+parameters.rho0=state(spin_system,'L+','14N');
+parameters.coil=state(spin_system,'L+','14N');
 parameters.rframes={{'14N',3}};
-parameters.verbose=0;
 
 % Simulation
 spectrum=doublerot(spin_system,@slowpass,parameters,'labframe');

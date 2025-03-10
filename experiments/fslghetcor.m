@@ -86,12 +86,6 @@ dwell_times=1./parameters.sweep;
 rho_cos=step(spin_system,L_HPx,parameters.rho0,hi_pwr_90deg+hi_pwr_magic);
 rho_sin=step(spin_system,L_HPy,parameters.rho0,hi_pwr_90deg+hi_pwr_magic);
 
-% Move repeating event generators to GPU
-if ismember('gpu',spin_system.sys.enable)
-    L1_cos=gpuArray(L1_cos); L2_cos=gpuArray(L2_cos);
-    L1_sin=gpuArray(L1_sin); L2_sin=gpuArray(L2_sin);
-end
-
 % Preallocate and start the F1 trajectories
 traj_cos=zeros(numel(rho_cos),parameters.npoints(1),'like',1i);
 traj_sin=zeros(numel(rho_sin),parameters.npoints(1),'like',1i);

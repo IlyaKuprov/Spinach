@@ -1,7 +1,7 @@
 % All possible states of a spin-1 pair, classified by the total spin 
 % into singlet, triplet, and quartet. Syntax:
 %
-%        [S,T,Q,ODS,PDS]=deut_pair(spin_system,spin_a,spin_b)
+%         [S,T,Q]=deut_pair(spin_system,spin_a,spin_b,options)
 %
 % Arguments:
 %
@@ -27,7 +27,7 @@
 %             a cell array as {Q++,Q+,Q0,Q-,Q--}
 %
 % WARNING: the states above are NOT irreducible spherical tensors - 
-%          Bargon just Kroneckered up some Zeeman states and gave
+%          Bargon just kroneckered up some Zeeman states and gave
 %          them what looked to him like appropriate labels.
 %
 % ilya.kuprov@weizmann.ac.il

@@ -35,7 +35,7 @@ bas.approximation='none';
 sys.disable={'hygiene'};
 
 % Magnetic field grid
-lin_freq=linspace(200,1200,30);
+lin_freq=linspace(200,1500,30);
 B0=2*pi*lin_freq*1e6/spin('1H');
 
 % Loop over magnetic fields
@@ -79,19 +79,17 @@ for n=1:numel(B0) %#ok<*AGROW>
 end
                          
 % Plotting
-figure();
-plot(lin_freq',[hleft' r2h' hright']);
+figure(); plot(lin_freq',[hleft' r2h' hright']);
 kxlabel('Proton Larmor frequency, MHz'); kgrid;
-kylabel('Relaxation matrix element, Hz');
+kylabel('Relaxation matrix element, Hz'); xlim tight;
 klegend({'${\hat H_ + } - 2{\hat H_ + }{\hat N_{\rm{Z}}}$',...
          '${\hat H_ + }$',...
          '${\hat H_ + } + 2{\hat H_ + }{\hat N_{\rm{Z}}}$'},...
          'Location','northwest','FontSize',12);
     
-figure();
-plot(lin_freq',[nleft' r2c' nright']);
+figure(); plot(lin_freq',[nleft' r2c' nright']);
 kxlabel('Proton Larmor frequency, MHz'); kgrid;
-kylabel('Relaxation matrix element, Hz');
+kylabel('Relaxation matrix element, Hz'); xlim tight;
 klegend({'${\hat N_ + } - 2{\hat N_ + }{\hat H_{\rm{Z}}}$',...
          '${\hat N_ + }$',...
          '${\hat N_ + } + 2{\hat N_ + }{\hat H_{\rm{Z}}}$'},...

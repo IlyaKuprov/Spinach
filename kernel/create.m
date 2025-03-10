@@ -337,6 +337,16 @@ if ismember('gpu',spin_system.sys.enable)&&(gpuDeviceCount==0)
     spin_system.sys.enable=setdiff(spin_system.sys.enable,{'gpu'});
 end
 
+% Absorb GPU memory use policy
+if ismember('gpu',spin_system.sys.enable)
+    if isfield(sys,'gpu_mem')
+        spin_system.sys.gpu_mem=sys.gpu_mem;
+    else
+        spin_system.sys.gpu_mem='balanced';
+    end
+    report(spin_system,['GPU memory use policy: ' spin_system.sys.gpu_mem]);
+end
+
 % Binding of GPU devices to workers
 if (~isworkernode)&&ismember('gpu',spin_system.sys.enable)...
                   &&(~ismember('hygiene',spin_system.sys.disable))
@@ -379,14 +389,22 @@ if (~isworkernode)&&ismember('gpu',spin_system.sys.enable)...
                             num2str(spin_system.sys.gpu_bind(n)) ' workers.']); 
     end
 
-    % Assign workers to GPUs
+    % Compute GPU worker binding table
     bindings=[]; report(spin_system,'Binding GPUs to workers...');
     for n=1:numel(spin_system.sys.gpu_bind)
         bindings=[bindings; n*ones(spin_system.sys.gpu_bind(n),1)]; %#ok<AGROW> 
     end
     
-    % Tell Matlab not to hog up GPU memory
-    spmd, G=gpuDevice(bindings(spmdIndex)); G.CachePolicy='minimum'; end
+    % GPU settings on each worker
+    spmd
+
+        % GPU binding
+        G=gpuDevice(bindings(spmdIndex));
+
+        % GPU memory use policy
+        G.CachePolicy=spin_system.sys.gpu_mem;
+
+    end
 
     % GPUs hate sparse matrices filling up
     spin_system.tols.dense_matrix=0.025;

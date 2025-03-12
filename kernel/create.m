@@ -341,6 +341,7 @@ end
 if ismember('gpu',spin_system.sys.enable)
     if isfield(sys,'gpu_mem')
         spin_system.sys.gpu_mem=sys.gpu_mem;
+        sys=rmfield(sys,'gpu_mem');
     else
         spin_system.sys.gpu_mem='balanced';
     end

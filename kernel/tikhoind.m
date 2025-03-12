@@ -1,5 +1,5 @@
 % Analytical Tikhonov regularised solution to K*x=y without any
-% constraints (indeterminate output). Syntax:
+% constraints (sign-indefinite output). Syntax:
 %
 %                [x,err,reg]=tikhoind(K,D,y,lam)
 %

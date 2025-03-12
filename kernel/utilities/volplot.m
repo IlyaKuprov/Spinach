@@ -137,6 +137,12 @@ kxlabel('X'); kylabel('Y'); kzlabel('Z');
 % Set blue -> white -> red colormap
 colormap(bwr_cmap());
 
+% Final figure cosmetics
+set(gca,'Projection','perspective');
+cameratoolbar('SetMode','orbit');
+cameratoolbar('SetCoordSys','none'); 
+box on; kgrid;
+
 end
 
 % Consistency enforcement

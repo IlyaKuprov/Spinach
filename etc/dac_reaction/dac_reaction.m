@@ -123,7 +123,7 @@ inter_d.coupling.scalar(idxof(sys_d,'H19'), idxof(sys_d,'H20'))= 5.7;
 inter_d.coupling.scalar(idxof(sys_d,'H19'), idxof(sys_d,'H25'))= 3.1;
 inter_d.coupling.scalar=num2cell(inter_d.coupling.scalar);
 
-% Cyanomethane (substance E, solvent)
+% Acetonitrile (substance E, solvent)
 sys_e.isotopes={'1H','1H','1H'};
 sys_e.labels={'H28','H29','H30'};
 inter_e.zeeman.matrix={2.0, 2.0, 2.0}*eye(3);
@@ -153,7 +153,7 @@ inter.tau_c={ 5e-12 ... % Cyclopentadiene
              20e-12 ... % Acrylonitrile
              50e-12 ... % Exo-norbornene carbonitrile
              50e-12 ... % Endo-norbornene carbonitrile
-              1e-12};   % Methyl cyanide
+              1e-12};   % Acetonitrile
 inter.r1_rates=cell(30,1); inter.r1_rates(:)={0};
 inter.r2_rates=cell(30,1); inter.r2_rates(:)={0};
 inter.r1_rates(28:30)={0.5}; % Solvent

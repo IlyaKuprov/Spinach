@@ -9,17 +9,13 @@ function nmr_kinetics()
 % Import Diels-Alder cycloaddition
 [sys,inter,bas]=dac_reaction();
 
-% Basis set
-bas.formalism='sphten-liouv';
-bas.approximation='IK-1';
-bas.level=3;
-bas.space_level=2;
-
 % Magnet field
 sys.magnet=14.1;
 
 % This needs a GPU
-sys.enable={'gpu','op_cache','prop_cache','ham_cache'};
+sys.enable={'gpu','op_cache','prop_cache',...
+            'ham_cache'};
+sys.gpu_mem='minimum';
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -89,9 +85,8 @@ eta=(0.5*P(1)-0.5*P(2))*eta;
 % Run chemistry for 20 seconds
 chem_dt=0.1; chem_nsteps=200;
 
-% Preallocate the trajectory 
-chem_traj=gpuArray.zeros([numel(eta) chem_nsteps+1]); 
-chem_traj(:,1)=eta;
+% Preallocate the trajectory and get it started
+chem_traj=zeros([numel(eta) chem_nsteps+1]); chem_traj(:,1)=eta;
 
 % Run chemistry
 for n=1:chem_nsteps
@@ -153,7 +148,7 @@ parfor n=1:size(chem_traj,2) %#ok<*PFBNS>
                          parameters.nsteps+1);
 
     % Preallocate the trajectory and get it started
-    nmr_traj=gpuArray.zeros([numel(eta) parameters.nsteps+1]); 
+    nmr_traj=zeros([numel(eta) parameters.nsteps+1]); 
     nmr_traj(:,1)=chem_traj(:,n);
 
     % Apply the excitation pulse
@@ -193,9 +188,6 @@ parfor n=1:size(chem_traj,2) %#ok<*PFBNS>
 
 end
 
-% Save the workspace
-save('whole_thing.mat');
-
 % Merge and apodisation
 fids=cell2mat(fids);
 fids=apodisation(spin_system,fids,{{},{'exp',6'}});
@@ -217,9 +209,9 @@ kxlabel('time, seconds'); kgrid;
 kzlabel('intensity, a.u.'); axis tight;
 set(gca,'Projection','perspective');
 
-% % Export the figure
-% exportgraphics(gcf,'nmr_kinetics.png','Resolution',1200);
-% savefig(gcf,'nmr_kinetics.fig');
+% Export the figure
+exportgraphics(gcf,'nmr_kinetics.png','Resolution',1200);
+savefig(gcf,'nmr_kinetics.fig');
 
 end
 

@@ -13,11 +13,11 @@
 function [sys,inter,bas]=dac_reaction()
 
 % Find own location
-current_folder=mfilename('fullpath');
-current_folder=current_folder(1:(end-12));
+own_folder=mfilename('fullpath');
+own_folder=own_folder(1:(end-12));
 
 % Cyclopentadiene (substance A)
-props_a=gparse([current_folder 'cyclopentadiene.log']);
+props_a=gparse([own_folder 'cyclopentadiene.log']);
 [sys_a,inter_a]=g2spinach(props_a,{{'H','1H'}},31.8);
 
 % Replace isotropic shifts 
@@ -46,7 +46,7 @@ inter_a.coupling.scalar(idxof(sys_a,'HBp'),idxof(sys_a,'HCp'))= 1.33;
 inter_a.coupling.scalar=num2cell(inter_a.coupling.scalar);
 
 % Acrylonitrile (substance B)
-props_b=gparse([current_folder 'acrylonitrile.log']);
+props_b=gparse([own_folder 'acrylonitrile.log']);
 [sys_b,inter_b]=g2spinach(props_b,{{'H','1H'}},31.8);
 
 % Replace isotropic shifts 
@@ -64,7 +64,7 @@ inter_b.coupling.scalar(idxof(sys_b,'H8'),idxof(sys_b,'H9'))=11.75;
 inter_b.coupling.scalar=num2cell(inter_b.coupling.scalar);
 
 % Endo-norbornene carbonitrile (substance C)
-props_c=gparse([current_folder 'norbornene_endo.log']);
+props_c=gparse([own_folder 'norbornene_endo.log']);
 [sys_c,inter_c]=g2spinach(props_c,{{'H','1H'}},31.8);
 
 % Replace isotropic shifts 
@@ -94,7 +94,7 @@ inter_c.coupling.scalar(idxof(sys_c,'H17'), idxof(sys_c,'H16'))= 1.2;
 inter_c.coupling.scalar=num2cell(inter_c.coupling.scalar);
 
 % Exo-norbornene carbonitrile (substance D)
-props_d=gparse([current_folder 'norbornene_exo.log']);
+props_d=gparse([own_folder 'norbornene_exo.log']);
 [sys_d,inter_d]=g2spinach(props_d,{{'H','1H'}},31.8);
 
 % Replace isotropic shifts 

@@ -81,6 +81,10 @@ if (~exist('options','var'))||...
    (~isfield(options,'numbers'))
    options.numbers=false();
 end
+if (~exist('options','var'))||...
+   (~isfield(options,'symbols'))
+   options.symbols=true();
+end
     
 % Set up graphics
 light('Position',[-2, 2,20]); 
@@ -235,6 +239,15 @@ if options.numbers
         text(props.std_geom(n,1),...
              props.std_geom(n,2),...
              props.std_geom(n,3),int2str(n));
+    end
+end
+
+% Add symbol labels
+if options.symbols
+    for n=1:size(props.std_geom,1)
+        text(props.std_geom(n,1),...
+             props.std_geom(n,2),...
+             props.std_geom(n,3),props.symbols{n});
     end
 end
 

@@ -1,9 +1,9 @@
 % Cache management heuristics. Looks after the scratch folder and
 % prevents it from filling up the disk. Do not call directly.
 %
-% The function inspects the /scratch folder in Spinach directory
-% and deletes any files that are older than the threshold (defa-
-% ult is 7 days) specified in spin_system.tols.cache_mem field.
+% The function inspects the scratch folder and deletes any files
+% that are older than the threshold (default is 365 days) speci-
+% fied in spin_system.tols.cache_mem field.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -32,7 +32,7 @@ end
 
 % Delete anything that is out of date
 n_files_gone=0; n_dirs_gone=0;
-for n=1:numel(dir_cont)
+parfor n=1:numel(dir_cont) % rawrrrrrrr
     if dir_cont(n).datenum<time_horizon
         if dir_cont(n).isdir
             try %#ok<TRYNC> - fail quietly

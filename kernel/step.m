@@ -37,6 +37,9 @@ function rho=step(spin_system,L,rho,time_step)
 % Check consistency
 grumble(L,rho,time_step);
 
+% Zero time step shortcut
+if time_step==0, return; end
+
 % Do we want to run on GPU?
 want_gpu=ismember('gpu',spin_system.sys.enable);
 

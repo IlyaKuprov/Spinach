@@ -13,9 +13,7 @@ function nmr_kinetics()
 sys.magnet=14.1;
 
 % This needs a GPU
-sys.enable={'gpu','op_cache','prop_cache',...
-            'ham_cache'};
-sys.gpu_mem='minimum';
+sys.enable={'gpu','greedy'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -127,7 +125,7 @@ R=relaxation(spin_system);
 Hy=operator(spin_system,'Ly','1H');
 
 % Detect transverse magnetisation
-LpH=state(spin_system,'L+','1H');
+coil=state(spin_system,'L+','1H');
 
 % Run NMR every second
 chem_traj=chem_traj(:,1:10:end);
@@ -139,25 +137,29 @@ nmr_dt=1/parameters.sweep;
 % Preallocate FID array
 fids=cell(numel(start_times),1);
 
+% Upload components to GPUs
+G11=gpuArray(G1{1}); G12=gpuArray(G1{2});
+G21=gpuArray(G2{1}); G22=gpuArray(G2{2});
+L=gpuArray(H+1i*R); Hy=gpuArray(Hy);
+coil=gpuArray(coil);
+
 % Run NMR experiments
-parfor n=1:size(chem_traj,2) %#ok<*PFBNS>
+for n=1:size(chem_traj,2) %#ok<*PFBNS>
 
     % Get the timing grid
     timing_grid=linspace(start_times(n),...
                          start_times(n)+parameters.nsteps*nmr_dt,...
                          parameters.nsteps+1);
 
-    % Preallocate the trajectory and get it started
-    nmr_traj=zeros([numel(eta) parameters.nsteps+1]); 
-    nmr_traj(:,1)=chem_traj(:,n);
+    % Gab the initial condition
+    eta=gpuArray(chem_traj(:,n));
 
     % Apply the excitation pulse
-    nmr_traj(:,1)=step(spin_system,Hy,nmr_traj(:,1),pi/2);
+    eta=step(spin_system,Hy,eta,pi/2);
 
-    % Upload components to GPUs
-    G11=gpuArray(G1{1}); G12=gpuArray(G1{2});
-    G21=gpuArray(G2{1}); G22=gpuArray(G2{2});
-    L=gpuArray(H+1i*R); coil=gpuArray(LpH);
+    % Get the fid started
+    current_fid=gpuArray.zeros(1,parameters.nsteps+1);
+    current_fid(1)=hdot(coil,eta);
 
     % Stage 2: nuclear spin dynamics
     for k=1:parameters.nsteps
@@ -179,12 +181,15 @@ parfor n=1:size(chem_traj,2) %#ok<*PFBNS>
              +1i*k2*A(timing_grid(k+1))*G22;   % Reaction 2 from substance B
 
         % Take the time step using the two-point Lie quadrature
-        nmr_traj(:,k+1)=step(spin_system,{F_L,F_R},nmr_traj(:,k),nmr_dt);
+        eta=step(spin_system,{F_L,F_R},eta,nmr_dt);
+
+        % Read out the observable
+        current_fid(k+1)=hdot(coil,eta);
 
     end
 
     % Store the FID
-    fids{n}=gather(coil'*nmr_traj);
+    fids{n}=gather(current_fid);
 
 end
 

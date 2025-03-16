@@ -95,8 +95,8 @@ if ~isfield(parameters,'g_dur')
     error('gradient duration should be provided in parameters.g_dur field.');
 end
 if (~isreal(parameters.g_dur))||(~isscalar(parameters.g_dur))||...
-   (parameters.g_dur<=0)
-    error('parameters.g_dur must be a positive real number.');
+   (parameters.g_dur<0)
+    error('parameters.g_dur must be a non-negative real number.');
 end
 end
 

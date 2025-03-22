@@ -444,8 +444,6 @@ if ~isempty(options.deuterate)
         error('unknown deuteration pattern specification.');
 
     end
-
-
    
 end
 

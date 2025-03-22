@@ -5,10 +5,7 @@
 %
 % Parameters:
 %
-%    w         - waveform in rad/s nutation frequency units,
-%                one time slice per column, and rows arran-
-%                ged as XYXY... with respect to in-phase and
-%                quadrature parts on each control channel
+%    w         - waveform, a numerical array
 %
 % Outputs:
 %
@@ -23,9 +20,19 @@
 
 function [w,J]=no_dist(w)
 
+% Check consistency
+grumble(w);
+
 % Return a unit Jacobian if asked
 if nargout>1, J=speye(numel(w)); end
 
+end
+
+% Consistency enforcement
+function grumble(w)
+if (~isnumeric(w))||(~isreal(w))
+    error('w must be an array of reals.');
+end
 end
 
 % If I only knew how I could get mathematicians interested in

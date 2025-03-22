@@ -5,10 +5,21 @@
 % calculation; isotropic chemical shifts and J-couplings are ex-
 % perimental (some J-coupling signs are missing).
 %
+% Parameters:
+%
+%     none
+%
+% Outputs:
+%
+%     sys, inter, bas - Spinach input data structures, remember
+%                       to specify the field in sys.magnet
+%
 % a.acharya@soton.ac.uk
 % bruno.linclau@ugent.be
 % madhukar.said@ugent.be
 % ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=dac_reaction.m>
 
 function [sys,inter,bas]=dac_reaction()
 
@@ -166,3 +177,4 @@ end
 %
 % Friedrich Nietzsche
 
+% #NGRUM

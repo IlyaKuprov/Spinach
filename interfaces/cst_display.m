@@ -69,9 +69,6 @@ function cst_display(props,atoms,scaling,conmatrix,options)
 grumble(props,atoms,scaling,conmatrix);
 
 % Set defaults
-options=defaults(options);
-
-% Set defaults
 if (~exist('options','var'))||...
    (~isfield(options,'style'))
    options.style='harmonics';

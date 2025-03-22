@@ -274,8 +274,8 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
 
             case 'zeeman-wavef'
 
-                % Call wavefunction version of the GRAPE function
-                [traj_data{n},fidelities{n}]=grape_wavef(spin_system,L,spin_system.control.operators,...
+                % Call Liouville space version of the GRAPE function (homomorphism)
+                [traj_data{n},fidelities{n}]=grape_liouv(spin_system,L,spin_system.control.operators,...
                                                          local_waveform,rho_init,rho_targ,...
                                                          spin_system.control.fidelity);
 
@@ -323,8 +323,8 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
 
             case 'zeeman-wavef'
 
-                % Call wavefunction version of the GRAPE function
-                [traj_data{n},fidelities{n},gradients{n}]=grape_wavef(spin_system,L,spin_system.control.operators,...
+                % Call Liouville space version of the GRAPE function (homomorphism)
+                [traj_data{n},fidelities{n},gradients{n}]=grape_liouv(spin_system,L,spin_system.control.operators,...
                                                                       local_waveform,rho_init,rho_targ,...
                                                                       spin_system.control.fidelity);
 
@@ -363,9 +363,9 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
 
             case 'zeeman-wavef'
 
-                % Call wavefunction version of the GRAPE function
+                % Call Liouville space version of the GRAPE function (homomorphism)
                 [traj_data{n},fidelities{n},...
-                 gradients{n},hessians{n}]=grape_wavef(spin_system,L,spin_system.control.operators,...
+                 gradients{n},hessians{n}]=grape_liouv(spin_system,L,spin_system.control.operators,...
                                                        local_waveform,rho_init,rho_targ,...
                                                        spin_system.control.fidelity);
 

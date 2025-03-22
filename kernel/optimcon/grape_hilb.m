@@ -200,7 +200,7 @@ end
 % Consistency enforcement
 function grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ)
 if ~ismember(spin_system.bas.formalism,{'zeeman-hilb'})
-    error('this function requires Lioville space formalism.');
+    error('this function requires a density matrix based formalism.');
 end
 if (~isnumeric(rho_init))||(~ismatrix(rho_init))||(size(rho_init,1)~=size(rho_init,2))
     error('rho_init must be a square matrix.');

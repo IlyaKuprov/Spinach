@@ -840,8 +840,10 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ)
-if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
-    error('this function requires Lioville space formalism.');
+if ~ismember(spin_system.bas.formalism,{'sphten-liouv',...
+                                        'zeeman-liouv',...
+                                        'zeeman-wavef'})
+    error('this function requires a state vector based formalism.');
 end
 if (~isnumeric(rho_init))||(~iscolumn(rho_init))
     error('rho_init must be a column vector.');

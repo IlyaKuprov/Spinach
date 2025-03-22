@@ -21,11 +21,14 @@
 
 function wipe_cache(spin_system)
 
+% Inform the user
+disp('cache wipe requested by the user...');
+
+% Defaults for calls from Matlab command line
+if ~exist('spin_system','var'), spin_system=bootstrap('hush'); end
+
 % Check consistency
 grumble(spin_system);
-
-% Inform the user
-report(spin_system,'cache wipe requested by the user...')
 
 % Set cache memory horizon to zero
 spin_system.tols.cache_mem=0;

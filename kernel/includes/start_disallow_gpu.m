@@ -3,6 +3,8 @@
 % using end_disallow_gpu command.
 %
 % ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=start_disallow_gpu.m>
 
 % Check if GPU is currently enabled
 user_wanted_gpu=ismember('gpu',spin_system.sys.enable);
@@ -19,3 +21,4 @@ end
 %
 % Internet folklore
 
+% #NHEAD #NGRUM

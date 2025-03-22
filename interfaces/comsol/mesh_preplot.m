@@ -26,7 +26,7 @@ grumble(spin_system);
 mesh=spin_system.mesh;
 
 % Prepare edge array for plotting 
-nlines=size(mesh.idx.edges,1); A=zeros(1,3*nlines); B=zeros(1,3*nlines); C=zeros(1,3*nlines);
+nlines=size(mesh.idx.edges,1); A=zeros(1,3*nlines); B=zeros(1,3*nlines);
 for n=1:nlines
     A((3*(n-1)+1):(3*n))=[mesh.x(mesh.idx.edges(n,1)) mesh.x(mesh.idx.edges(n,2)) NaN];
     B((3*(n-1)+1):(3*n))=[mesh.y(mesh.idx.edges(n,1)) mesh.y(mesh.idx.edges(n,2)) NaN];
@@ -34,7 +34,7 @@ end
 mesh.plot.edg_a=A; mesh.plot.edg_b=B;
 
 % Prepare triangle array for plotting
-nlines=size(mesh.idx.triangles,1); A=zeros(1,5*nlines); B=zeros(1,5*nlines); C=zeros(1,3*nlines);
+nlines=size(mesh.idx.triangles,1); A=zeros(1,5*nlines); B=zeros(1,5*nlines);
 for n=1:nlines
     A((5*(n-1)+1):(5*n))=[mesh.x(mesh.idx.triangles(n,1)) mesh.x(mesh.idx.triangles(n,2)) ...
                           mesh.x(mesh.idx.triangles(n,3)) mesh.x(mesh.idx.triangles(n,1)) NaN];

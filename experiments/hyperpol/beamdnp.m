@@ -97,7 +97,7 @@ switch spin_system.bas.formalism
     otherwise
 
         % Complain and bomb out
-        error('unknown formalism');
+        error('unknown formalism.');
 
 end
 

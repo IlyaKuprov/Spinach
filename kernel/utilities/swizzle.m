@@ -1,7 +1,8 @@
 % Flattens out nested index lists and outputs them as an array
-% of tuples in random order. Syntax:
+% of tuples in random order. This is useful for flattening nes-
+% ted loops for parallel processing. Syntax:
 %
-%                tuples=swizzle(index_arrays)
+%                  tuples=swizzle(index_arrays)
 %
 % Parameters:
 %
@@ -18,6 +19,9 @@
 
 function tuples=swizzle(index_arrays)
 
+% Check consistency
+grumble(index_arrays);
+
 % Kronecker up the arrays
 tuples=index_arrays{1}(:);
 for n=2:numel(index_arrays)
@@ -25,16 +29,30 @@ for n=2:numel(index_arrays)
             kron(index_arrays{n}(:),ones(size(tuples,1),1))];
 end
 
-% Randomise tuple list
-ntuples=size(tuples,1);
-tuples=tuples(randperm(ntuples),:);
+% Randomise the tuple list
+ntuples=size(tuples,1); tuples=tuples(randperm(ntuples),:);
 
 end
 
-% According to a trade legend, before appointing IK to a professor
-% position, Weizmann Institute had asked its contacts in the Bri-
-% tish academic system to make gentle inquiries about his persona-
-% lity and political views. Two of his colleagues, when asked, we-
-% re very clear: "The man is a proper bastard," - both said - "he
-% continues to openly support Israel!"
+% Consistency enforcement
+function grumble(index_arrays)
+if ~iscell(index_arrays)
+    error('index_arrays must be a cell array of row vectors.');
+end
+for n=1:numel(index_arrays)
+    if (~isreal(index_arrays{n}))||(~isrow(index_arrays{n}))||...
+       (any(mod(index_arrays{n},1)~=0,'all'))||...
+       (any(index_arrays{n}<1,'all'))
+        error('elements of index_arrays must be row vectors of positive integers.');
+    end
+end
+end
+
+% Acording to a conference rumour, before appointing IK to a tenured 
+% full professor position, the Weizmann Institute had asked its peo-
+% ple in the UK academic system to make inquiries about his persona-
+% lity and political views. Two of IK's former colleagues at Oxford,
+% without realising who's asking, had been very clear: "The man is a
+% proper bastard," - both said - "for goodness sake, he continues to 
+% openly support Israel!"
 

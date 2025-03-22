@@ -39,6 +39,9 @@
 
 function [w,J]=amp_root(w,sat_lvls,s)
 
+% Check consistency
+grumble(w,sat_lvls,s);
+
 % Autodiff wrapper
 if nargout<2
     
@@ -89,6 +92,21 @@ end
 % Compute non-zero blocks of the Jacobian
 if nargout>1, J=dljacobian(w_dist,w,1); end
 
+end
+
+% Consistency enforcement
+function grumble(w,sat_lvls,s)
+if (~isnumeric(w))||(~isreal(w))||(mod(size(w,1),2)~=0)
+    error('w must be an array of reals with an even number of rows.');
+end
+if (~isnumeric(sat_lvls))||(~isreal(sat_lvls))||...
+   (numel(sat_lvls)~=size(w,1)/2)||any(sat_lvls<=0,'all')
+    error('sat_lvls must be a real array with one element per XY channel pair.');
+end
+if (~isnumeric(s))||(~isreal(s))||(numel(s)~=size(w,1)/2)||...
+   any(mod(s,1)~=0,'all')||any(s<1,'all')
+    error('s must be an array of positive integers with one element per XY channel pair.');
+end
 end
 
 % Mathematicians are like Frenchmen: whatever you say to them

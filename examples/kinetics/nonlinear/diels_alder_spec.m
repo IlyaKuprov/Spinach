@@ -2,7 +2,7 @@
 % addition of acetylene to butadiene, demonstrating the non-linear
 % kinetics module.
 %
-% Calculation time: hours.
+% Calculation time: hours, much faster on GPU.
 %
 % ilya.kuprov@weizmann.ac.il
 % a.acharya@soton.ac.uk
@@ -58,6 +58,9 @@ inter_d.coupling.scalar=num2cell(inter_d.coupling.scalar);
 % Magnet field
 sys.magnet=14.1;
 
+% This needs a GPU
+sys.enable={'greedy','gpu'};
+
 % Relaxation theory parameters
 inter.relaxation={'redfield','t1_t2'};
 inter.equilibrium='zero';
@@ -93,22 +96,24 @@ K=@(t,x)(1i*[-k*x(2)   0        0        0;
               0        0        0        0]);
 
 % Kinetic time grid, 10 seconds
-nsteps=100; tmax=10; dt=tmax/nsteps;
-time_axis=linspace(0,tmax,nsteps+1); 
+chem_nsteps=100; chem_tmax=10; 
+chem_dt=chem_tmax/chem_nsteps;
+chem_time_grid=linspace(0,chem_tmax,chem_nsteps+1); 
 
 % Preallocate concentration trajectory
-conc_traj=zeros(4,nsteps+1);
+conc_traj=zeros(4,chem_nsteps+1);
 
 % Initial concentrations, mol/L
 conc_traj(:,1)=[1e-2; 2e-2; 0.0; 17.1]; 
 
 % Stage 1: concentration dynamics
-for n=1:nsteps 
-    conc_traj(:,n+1)=iserstep(spin_system,K,conc_traj(:,n),n*dt,dt,'LG4'); 
+for n=1:chem_nsteps 
+    conc_traj(:,n+1)=iserstep(spin_system,K,...
+                              conc_traj(:,n),(n-1)*chem_dt,chem_dt,'LG4'); 
 end
 
 % Plot concentrations, excluding solvent
-figure(); plot(time_axis,real(conc_traj(1:3,:))); 
+figure(); plot(chem_time_grid,real(conc_traj(1:3,:))); 
 xlim tight; ylim padded; kgrid;
 kxlabel('time, seconds'); kylabel('concentration, mol/L');
 klegend({'acetylene','butadiene','cyclohexadiene'}, ...
@@ -116,11 +121,11 @@ klegend({'acetylene','butadiene','cyclohexadiene'}, ...
 scale_figure([1.00 0.75]); axis tight; drawnow;
 
 % Interpolate concentrations as functions of time
-A=griddedInterpolant(time_axis,conc_traj(1,:),'makima','none');
-B=griddedInterpolant(time_axis,conc_traj(2,:),'makima','none');
-C=griddedInterpolant(time_axis,conc_traj(3,:),'makima','none');
+A=griddedInterpolant(chem_time_grid,conc_traj(1,:),'makima','none');
+B=griddedInterpolant(chem_time_grid,conc_traj(2,:),'makima','none');
+C=griddedInterpolant(chem_time_grid,conc_traj(3,:),'makima','none');
 
-% Build kinetics generators
+% Build chemical reaction generators
 reaction.reactants=[1 2];  % which substances are reactants
 reaction.products=3;       % which substances are products
 reaction.matching=[1  9;  
@@ -141,25 +146,25 @@ eta= A(0)*state(spin_system,'Lz',spin_system.chem.parts{1}) ...
 eta=(0.5*P(1)-0.5*P(2))*eta;
 
 % Preallocate the trajectory and get it started
-chem_traj=zeros([numel(eta) nsteps+1]); chem_traj(:,1)=eta;
+chem_traj=zeros([numel(eta) chem_nsteps+1]); chem_traj(:,1)=eta;
 
 % Run chemistry
-for n=1:nsteps
+for n=1:chem_nsteps
 
     % Keep the user informed
     report(spin_system,['chemistry time step ' int2str(n) ...
-                        '/' int2str(nsteps)]);
+                        '/' int2str(chem_nsteps)]);
 
     % Build the left interval edge composite evolution generator
-    F_L=1i*k*B(time_axis(n))*G{1}   ... % Reaction from substance A
-       +1i*k*A(time_axis(n))*G{2};      % Reaction from substance B
+    F_L=1i*k*B(chem_time_grid(n))*G{1}   ... % Reaction from substance A
+       +1i*k*A(chem_time_grid(n))*G{2};      % Reaction from substance B
 
     % Build the right interval edge composite evolution generator
-    F_R=1i*k*B(time_axis(n+1))*G{1} ... % Reaction from substance A
-       +1i*k*A(time_axis(n+1))*G{2};    % Reaction from substance B
+    F_R=1i*k*B(chem_time_grid(n+1))*G{1} ... % Reaction from substance A
+       +1i*k*A(chem_time_grid(n+1))*G{2};    % Reaction from substance B
 
     % Take the time step using the two-point Lie quadrature
-    chem_traj(:,n+1)=step(spin_system,{F_L,F_R},chem_traj(:,n),dt);
+    chem_traj(:,n+1)=step(spin_system,{F_L,F_R},chem_traj(:,n),chem_dt);
 
 end
 
@@ -169,39 +174,42 @@ parameters.offset=2370;
 parameters.sweep=4000;
 parameters.nsteps=4096;
 
+% Time step of NMR stage
+nmr_dt=1/parameters.sweep;
+
 % Get spin evolution generators 
 H=hamiltonian(assume(spin_system,'nmr'));
 H=frqoffset(spin_system,H,parameters);
 R=relaxation(spin_system);
 
-% Detect transverse magnetisation
-coil=state(spin_system,'L+','1H');
-
-% Run NMR every second
-chem_traj=chem_traj(:,1:10:end);
-start_times=0:(numel(chem_traj)-1);
-
-% Apply the excitation pulse
+% Get the pulse operator
 Hy=operator(spin_system,'Ly','1H');
-chem_traj=step(spin_system,Hy,chem_traj,pi/2);
 
-% Timing grid of NMR stage
-nmr_dt=1/parameters.sweep;
+% Detect transverse magnetisation
+Hp=state(spin_system,'L+','1H');
 
 % Preallocate FID array
-fids=cell(numel(start_times),1);
+fids=cell(9,1);
 
 % Run NMR experiments
-parfor n=1:size(chem_traj,2) %#ok<*PFBNS>
+parfor n=0:8 %#ok<*PFBNS>
+
+    % Pull the initial condition
+    eta=chem_traj(:,chem_time_grid==n); 
+
+    % Apply the excitation pulse
+    eta=step(spin_system,Hy,eta,pi/2);
 
     % Get the timing grid
-    timing_grid=linspace(start_times(n),...
-                         start_times(n)+parameters.nsteps*nmr_dt,...
+    timing_grid=linspace(n,n+parameters.nsteps*nmr_dt,...
                          parameters.nsteps+1);
 
-    % Grab the initial condition and start the fid
-    eta=chem_traj(:,n);
-    current_fid=zeros(1,parameters.nsteps+1);
+    % Get everything to the GPU
+    L=gpuArray(H+1i*R); G1=gpuArray(G{1});
+    G2=gpuArray(G{2}); eta=gpuArray(eta); coil=gpuArray(Hp);
+
+    % Get the fid started
+    current_fid=gpuArray.zeros(1,parameters.nsteps+1);
     current_fid(1)=hdot(coil,eta);
 
     % Stage 2: nuclear spin dynamics
@@ -212,12 +220,12 @@ parfor n=1:size(chem_traj,2) %#ok<*PFBNS>
                             '/' int2str(parameters.nsteps)]);
 
         % Build the left interval edge composite evolution generator
-        F_L=H+1i*R+1i*k*G{1}*B(timing_grid(k))   ... % Reaction from substance A
-                  +1i*k*A(timing_grid(k))*G{2};      % Reaction from substance B
+        F_L=L+1i*k*G1*B(timing_grid(k))   ... % Reaction from substance A
+             +1i*k*A(timing_grid(k))*G2;      % Reaction from substance B
 
         % Build the right interval edge composite evolution generator
-        F_R=H+1i*R+1i*k*G{1}*B(timing_grid(k+1)) ... % Reaction from substance A
-                  +1i*k*A(timing_grid(k+1))*G{2};    % Reaction from substance B
+        F_R=L+1i*k*G1*B(timing_grid(k+1)) ... % Reaction from substance A
+             +1i*k*A(timing_grid(k+1))*G2;    % Reaction from substance B
 
         % Take the time step using the two-point Lie quadrature
         eta=step(spin_system,{F_L,F_R},eta,nmr_dt);
@@ -228,7 +236,7 @@ parfor n=1:size(chem_traj,2) %#ok<*PFBNS>
     end
 
     % Store the FID
-    fids{n}=current_fid;
+    fids{n+1}=current_fid;
 
 end
 

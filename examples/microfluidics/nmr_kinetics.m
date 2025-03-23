@@ -1,7 +1,7 @@
 % Non-linear reaction kinetics in combination with spin evolution
 % (repeated pulse-acquire NMR) and relaxation (Redfield theory).
 %
-% Calculation time: hours.
+% Calculation time: hours, much faster on GPU.
 %
 % a.acharya@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -72,7 +72,7 @@ reaction{2}.reactants=[1 2];  % cyclopentadiene and acrylonitrile
 reaction{2}.products=4;       % into endo-norbornene carbonitrile
 reaction{2}.matching=[1 21; 2 26; 3 27; 4 25; 5 19; 6 20; 7 23; 8 24; 9 22]; 
 
-% Build reaction generators
+% Build chemical reaction generators
 G1=react_gen(spin_system,reaction{1});
 G2=react_gen(spin_system,reaction{2});
 
@@ -208,10 +208,6 @@ kylabel('chemical shift, ppm'); box on;
 kxlabel('time, seconds'); kgrid; 
 kzlabel('intensity, a.u.'); axis tight;
 set(gca,'Projection','perspective');
-
-% Export the figure
-exportgraphics(gcf,'nmr_kinetics.png','Resolution',1200);
-savefig(gcf,'nmr_kinetics.fig');
 
 end
 

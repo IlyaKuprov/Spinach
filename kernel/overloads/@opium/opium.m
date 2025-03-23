@@ -65,6 +65,17 @@ classdef (InferiorClasses={?gpuArray}) opium
             n=true(); % Always
             
         end
+
+        % All finite property
+        function n=allfinite(op)
+
+            if isfinite(op.coeff)
+                n=true();
+            else
+                n=false();
+            end
+
+        end
         
         % Is actually unit
         function n=iseye(op)

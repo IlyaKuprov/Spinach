@@ -15,7 +15,7 @@ function nmr_kinetics()
 sys.magnet=14.1;
 
 % Greedy parallelisation
-sys.enable={'greedy'};
+sys.enable={'greedy','gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -33,22 +33,24 @@ K=@(t,x)(1i*[-k1*x(2)-k2*x(2)  0                0      0     0;
               0                0                0      0     0]);        
 
 % Kinetic time grid, 20 seconds
-nsteps=200; tmax=20; dt=tmax/nsteps;
-time_axis=linspace(0,tmax,nsteps+1); 
+chem_nsteps=200; chem_tmax=20; 
+chem_dt=chem_tmax/chem_nsteps;
+chem_time_grid=linspace(0,chem_tmax,chem_nsteps+1); 
 
 % Preallocate concentration trajectory
-conc_traj=zeros(5,nsteps+1);
+chem_traj=zeros(5,chem_nsteps+1);
 
 % Initial concentrations, mol/L
-conc_traj(:,1)=[0.6; 0.5; 0.0; 0.0; 18.1]; 
+chem_traj(:,1)=[0.6; 0.5; 0.0; 0.0; 18.1]; 
 
 % Stage 1: concentration dynamics
-for n=1:nsteps 
-    conc_traj(:,n+1)=iserstep(spin_system,K,conc_traj(:,n),n*dt,dt,'LG4'); 
+for n=1:chem_nsteps 
+    chem_traj(:,n+1)=iserstep(spin_system,K,...
+                              chem_traj(:,n),(n-1)*chem_dt,chem_dt,'LG4'); 
 end
 
 % Plot concentrations, excluding solvent
-figure(); plot(time_axis,real(conc_traj(1:4,:))); 
+figure(); plot(chem_time_grid,real(chem_traj(1:4,:))); 
 xlim tight; ylim padded; kgrid;
 kxlabel('time, seconds'); kylabel('concentration, mol/L');
 klegend({'cyclopentadiene','acrylonitrile', ...
@@ -57,10 +59,10 @@ klegend({'cyclopentadiene','acrylonitrile', ...
          'Location','northeast'); drawnow;
 
 % Interpolate concentrations as functions of time
-A=griddedInterpolant(time_axis,conc_traj(1,:),'makima','none');
-B=griddedInterpolant(time_axis,conc_traj(2,:),'makima','none');
-C=griddedInterpolant(time_axis,conc_traj(3,:),'makima','none');
-D=griddedInterpolant(time_axis,conc_traj(4,:),'makima','none');
+A=griddedInterpolant(chem_time_grid,chem_traj(1,:),'makima','none');
+B=griddedInterpolant(chem_time_grid,chem_traj(2,:),'makima','none');
+C=griddedInterpolant(chem_time_grid,chem_traj(3,:),'makima','none');
+D=griddedInterpolant(chem_time_grid,chem_traj(4,:),'makima','none');
 
 % Nonlinear kinetics generator
 reaction{1}.reactants=[1 2];  % cyclopentadiene and acrylonitrile
@@ -70,7 +72,7 @@ reaction{2}.reactants=[1 2];  % cyclopentadiene and acrylonitrile
 reaction{2}.products=4;       % into endo-norbornene carbonitrile
 reaction{2}.matching=[1 21; 2 26; 3 27; 4 25; 5 19; 6 20; 7 23; 8 24; 9 22]; 
 
-% Build reaction generators and send to GPU
+% Build reaction generators
 G1=react_gen(spin_system,reaction{1});
 G2=react_gen(spin_system,reaction{2});
 
@@ -81,9 +83,6 @@ eta= A(0)*state(spin_system,'Lz',spin_system.chem.parts{1}) ...
     +D(0)*state(spin_system,'Lz',spin_system.chem.parts{4});
 [~,P]=levelpop('1H',sys.magnet,300);
 eta=(0.5*P(1)-0.5*P(2))*eta;
-
-% Run chemistry for 20 seconds
-chem_dt=0.1; chem_nsteps=200;
 
 % Preallocate the trajectory and get it started
 chem_traj=zeros([numel(eta) chem_nsteps+1]); chem_traj(:,1)=eta;
@@ -96,16 +95,16 @@ for n=1:chem_nsteps
                         '/' int2str(chem_nsteps)]);
 
     % Build the left interval edge composite evolution generator
-    F_L=1i*k1*G1{1}*B(time_axis(n)) ...   % Reaction 1 from substance A
-       +1i*k1*A(time_axis(n))*G1{2} ...   % Reaction 1 from substance B
-       +1i*k2*G2{1}*B(time_axis(n)) ...   % Reaction 2 from substance A
-       +1i*k2*A(time_axis(n))*G2{2};      % Reaction 2 from substance B
+    F_L=1i*k1*G1{1}*B(chem_time_grid(n)) ...   % Reaction 1 from substance A
+       +1i*k1*A(chem_time_grid(n))*G1{2} ...   % Reaction 1 from substance B
+       +1i*k2*G2{1}*B(chem_time_grid(n)) ...   % Reaction 2 from substance A
+       +1i*k2*A(chem_time_grid(n))*G2{2};      % Reaction 2 from substance B
 
     % Build the right interval edge composite evolution generator
-    F_R=1i*k1*G1{1}*B(time_axis(n+1)) ... % Reaction 1 from substance A
-       +1i*k1*A(time_axis(n+1))*G1{2} ... % Reaction 1 from substance B
-       +1i*k2*G2{1}*B(time_axis(n+1)) ... % Reaction 2 from substance A
-       +1i*k2*A(time_axis(n+1))*G2{2};    % Reaction 2 from substance B
+    F_R=1i*k1*G1{1}*B(chem_time_grid(n+1)) ... % Reaction 1 from substance A
+       +1i*k1*A(chem_time_grid(n+1))*G1{2} ... % Reaction 1 from substance B
+       +1i*k2*G2{1}*B(chem_time_grid(n+1)) ... % Reaction 2 from substance A
+       +1i*k2*A(chem_time_grid(n+1))*G2{2};    % Reaction 2 from substance B
 
     % Take the time step using the two-point Lie quadrature
     chem_traj(:,n+1)=step(spin_system,{F_L,F_R},chem_traj(:,n),chem_dt);
@@ -118,41 +117,43 @@ parameters.offset=2328;
 parameters.sweep=3500;
 parameters.nsteps=4096;
 
+% Time step of NMR stage
+nmr_dt=1/parameters.sweep;
+
 % Get spin evolution generators 
 H=hamiltonian(assume(spin_system,'nmr'));
 H=frqoffset(spin_system,H,parameters);
 R=relaxation(spin_system);
 
-% Detect transverse magnetisation
-coil=state(spin_system,'L+','1H');
-
-% Run NMR every second
-chem_traj=chem_traj(:,1:10:end);
-start_times=0:(numel(chem_traj)-1);
-
-% Apply the excitation pulse
+% Get the pulse operator
 Hy=operator(spin_system,'Ly','1H');
-chem_traj=step(spin_system,Hy,chem_traj,pi/2);
 
-% Timing grid of NMR stage
-nmr_dt=1/parameters.sweep;
+% Detect transverse magnetisation
+Hp=state(spin_system,'L+','1H');
 
 % Preallocate FID array
-fids=cell(numel(start_times),1);
+fids=cell(19,1);
 
-% Run NMR experiments
-parfor n=1:size(chem_traj,2) %#ok<*PFBNS>
+% Acquisitions every second
+parfor n=0:18 %#ok<*PFBNS>
+
+    % Pull the initial condition
+    eta=chem_traj(:,chem_time_grid==n); 
+
+    % Apply the excitation pulse
+    eta=step(spin_system,Hy,eta,pi/2);
 
     % Get the timing grid
-    timing_grid=linspace(start_times(n),...
-                         start_times(n)+parameters.nsteps*nmr_dt,...
+    timing_grid=linspace(n,n+parameters.nsteps*nmr_dt,...
                          parameters.nsteps+1);
 
-    % Gab the initial condition
-    eta=chem_traj(:,n);
+    % Get everything to the GPU
+    L=gpuArray(H+1i*R);  G11=gpuArray(G1{1});
+    G12=gpuArray(G1{2}); G21=gpuArray(G2{1});
+    G22=gpuArray(G2{2}); eta=gpuArray(eta); coil=gpuArray(Hp);
 
     % Get the fid started
-    current_fid=zeros(1,parameters.nsteps+1);
+    current_fid=gpuArray.zeros(1,parameters.nsteps+1);
     current_fid(1)=hdot(coil,eta);
 
     % Stage 2: nuclear spin dynamics
@@ -163,16 +164,16 @@ parfor n=1:size(chem_traj,2) %#ok<*PFBNS>
                             '/' int2str(parameters.nsteps)]);
 
         % Build the left interval edge composite evolution generator
-        F_L=H+1i*R+1i*k1*G1{1}*B(timing_grid(k)) ...   % Reaction 1 from substance A
-                  +1i*k1*A(timing_grid(k))*G1{2} ...   % Reaction 1 from substance B
-                  +1i*k2*G2{1}*B(timing_grid(k)) ...   % Reaction 2 from substance A
-                  +1i*k2*A(timing_grid(k))*G2{2};      % Reaction 2 from substance B
+        F_L=L+1i*k1*G11*B(timing_grid(k)) ...   % Reaction 1 from substance A
+             +1i*k1*A(timing_grid(k))*G12 ...   % Reaction 1 from substance B
+             +1i*k2*G21*B(timing_grid(k)) ...   % Reaction 2 from substance A
+             +1i*k2*A(timing_grid(k))*G22;      % Reaction 2 from substance B
 
         % Build the right interval edge composite evolution generator
-        F_R=H+1i*R+1i*k1*G1{1}*B(timing_grid(k+1)) ... % Reaction 1 from substance A
-                  +1i*k1*A(timing_grid(k+1))*G1{2} ... % Reaction 1 from substance B
-                  +1i*k2*G2{1}*B(timing_grid(k+1)) ... % Reaction 2 from substance A
-                  +1i*k2*A(timing_grid(k+1))*G2{2};    % Reaction 2 from substance B
+        F_R=L+1i*k1*G11*B(timing_grid(k+1)) ... % Reaction 1 from substance A
+             +1i*k1*A(timing_grid(k+1))*G12 ... % Reaction 1 from substance B
+             +1i*k2*G21*B(timing_grid(k+1)) ... % Reaction 2 from substance A
+             +1i*k2*A(timing_grid(k+1))*G22;    % Reaction 2 from substance B
 
         % Take the time step using the two-point Lie quadrature
         eta=step(spin_system,{F_L,F_R},eta,nmr_dt);
@@ -183,7 +184,7 @@ parfor n=1:size(chem_traj,2) %#ok<*PFBNS>
     end
 
     % Store the FID
-    fids{n}=current_fid;
+    fids{n+1}=gather(current_fid);
 
 end
 

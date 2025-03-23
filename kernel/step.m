@@ -340,10 +340,25 @@ if (~isnumeric(time_step))||(~isscalar(time_step))
     error('time_step must be a scalar.');
 end
 if (~isnumeric(L))&&(~iscell(L))
-    error('L must be a matrix or a cell array of matrices');
+    error('L must be a matrix or a cell array of matrices.');
 end
 if (~isnumeric(rho))&&(~iscell(rho))
-    error('L must be a matrix, a vector, or a cell array thereof');
+    error('L must be a matrix, a vector, or a cell array thereof.');
+end
+if ~allfinite(rho)
+    error('state descriptor is not finite.');
+end
+if isnumeric(L)
+    if ~allfinite(L)
+        error('evolution generator is not finite.');
+    end
+end
+if iscell(L)
+    for n=1:numel(L)
+        if ~allfinite(L{n})
+            error('evolution generator is not finite.');
+        end
+    end
 end
 end
 

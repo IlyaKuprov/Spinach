@@ -97,9 +97,8 @@ end
 A=griddedInterpolant(time_axis,x(1,:),'makima','none');
 B=griddedInterpolant(time_axis,x(2,:),'makima','none');
 C=griddedInterpolant(time_axis,x(3,:),'makima','none');
-D=griddedInterpolant(time_axis,x(4,:),'makima','none');
 
-% Nonlinear kinetics generator
+% Build kinetics generator and send it to GPU
 reaction.reactants=[1 2];  % which substances are reactants
 reaction.products=3;       % which substances are products
 reaction.matching=[1  9;  
@@ -110,12 +109,20 @@ reaction.matching=[1  9;
                    6 11;
                    7 14;
                    8 13];
-[GD,GF]=react_gen(spin_system,reaction); 
-G=gpuArray(GD{1}+GD{2}+GF{1});
+G=react_gen(spin_system,reaction); G=gpuArray(G{1}+G{2});
+
+% Get concentration-weighted initial condition, no solvent
+eta= A(0)*state(spin_system,'Lz',spin_system.chem.parts{1}) ...
+    +B(0)*state(spin_system,'Lz',spin_system.chem.parts{2}) ...
+    +C(0)*state(spin_system,'Lz',spin_system.chem.parts{3});
+[~,P]=levelpop('1H',sys.magnet,300);
+eta=(0.5*P(1)-0.5*P(2))*eta;
+
+% Get the detection state
+coil=state(spin_system,'L+','1H');
 
 % Set up a pulse-acquire experiment
 parameters.spins={'1H'};
-parameters.rho0=state(spin_system,'L+','1H');
 parameters.offset=2400;
 parameters.sweep=5000;
 parameters.npoints=4096;
@@ -123,63 +130,41 @@ parameters.zerofill=16384;
 parameters.axis_units='ppm';
 parameters.invert_axis=1;
 
-% Set up time discretisation
-dt=1/parameters.sweep;
-
 % Get evolution generators
 spin_system=assume(spin_system,'nmr');
 H=hamiltonian(spin_system); 
 H=frqoffset(spin_system,H,parameters); H=gpuArray(H);
-R=relaxation(spin_system); R=gpuArray(R);
+R=relaxation(spin_system);             R=gpuArray(R);
 
 % Preallocate the trajectory and get it started
-traj=gpuArray.zeros([numel(parameters.rho0) ...
-                     parameters.npoints]); 
-traj(:,1)=parameters.rho0;
+traj=zeros([numel(eta) parameters.npoints+1]); traj(:,1)=eta;
+
+% Build the NMR time grid
+dt=1/parameters.sweep;
+time_axis=linspace(0,1,parameters.npoints+1);
 
 % Run the evolution loop
-for n=1:(parameters.npoints-1)
+for n=1:parameters.npoints
 
-    % Get left and right edge reaction rates
-    rr_L=k*A((n-1)*dt)*B((n-1)*dt); rr_R=k*A(n*dt)*B(n*dt);
+    % Keep the user informed
+    report(spin_system,['time step ' int2str(n) ...
+                        '/' int2str(parameters.npoints)]);
 
-    % Make left and right edge evolution generators
-    F_L=H+1i*R+1i*rr_L*G; F_R=H+1i*R+1i*rr_R*G;
+    % Build the left interval edge composite evolution generator
+    F_L=H+1i*R+1i*k1*G{1}*B(time_axis(n))...   % Reaction from substance A
+              +1i*k1*A(time_axis(n))*G{2};     % Reaction from substance B
 
-    % Take the time step using Anu's two-point call
-    traj(:,n+1)=step(spin_system,{F_L,F_R},traj(:,n),dt);
-    
-    % Update the user
-    report(spin_system,['Non-linear kinetics evolution step ' ...
-                        num2str(n) '/' num2str(parameters.npoints-1)]);
+    % Build the right interval edge composite evolution generator
+    F_R=H+1i*R+1i*k1*G{1}*B(time_axis(n+1))... % Reaction from substance A
+              +1i*k1*A(time_axis(n+1))*G{2};   % Reaction from substance B
 
-end
-
-% Get back to CPU
-traj=gather(traj);
-
-% Preallocate the fid
-fid=zeros(parameters.npoints,1);
-
-% Run the detection loop
-parfor n=1:parameters.npoints
-    
-    % Localise spin system object
-    local_sso=spin_system;
-
-    % Update concentrations
-    local_sso.chem.concs=[A((n-1)*dt) ...
-                          B((n-1)*dt) ...
-                          C((n-1)*dt) ...
-                          D((n-1)*dt)]; %#ok<PFBNS>
-
-    % Get chemically weighted detection state
-    coil=state(local_sso,'L+','1H','chem');
-
-    % Take the inner product
-    fid(n)=coil'*traj(:,n);
+    % Take the time step using the two-point Lie quadrature
+    traj(:,n+1)=gather(step(spin_system,{F_L,F_R},traj(:,n),dt));
 
 end
+
+% Detection
+fid=coil'*traj;
 
 % Apodisation
 fid=apodisation(spin_system,fid,{{'gauss',10}});

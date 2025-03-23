@@ -1,6 +1,6 @@
-% Pulse-acquire experiment during the Diels-Alder cycloaddition 
-% of acetylene to butadiene, demonstrating the non-linear kine-
-% tics module.
+% Repeated pulse-acquire experiment during the Diels-Alder cyclo-
+% addition of acetylene to butadiene, demonstrating the non-linear
+% kinetics module.
 %
 % Calculation time: hours, faster on a Tesla A100 GPU.
 %
@@ -10,22 +10,35 @@
 function diels_alder_spec()
 
 % DFT import options
-options.min_j=0.5;         % Minimum significant J-coupling, Hz
+options.min_j=2.0;         % Minimum J-coupling, Hz
+options.style='harmonics'; % Plotting style
 
-% Load acetylene      (substance A)
+% Load and display acetylene      (substance A)
 props_a=gparse('acetylene.out');
 [sys_a,inter_a]=g2spinach(props_a,{{'H','1H'}},31.8,options);
+figure(); scale_figure([1.0 1.0]); 
+subplot(1,2,1); cst_display(props_a,{'C'},0.005,[],options); 
+                camorbit(+45,-45); ktitle('$^{13}$C CST');
+subplot(1,2,2); cst_display(props_a,{'H'},0.05,[],options); 
+                camorbit(+45,-45); ktitle('$^{1}$H CST'); drawnow;
 
-% Load butadiene      (substance B)
+% Load and display butadiene      (substance B)
 props_b=gparse('butadiene.out');
 [sys_b,inter_b]=g2spinach(props_b,{{'H','1H'}},31.8,options);
+figure(); scale_figure([1.5 1.0]);
+subplot(1,2,1); cst_display(props_b,{'C'},0.01,[],options); 
+                camorbit(+45,-45); ktitle('$^{13}$C CST');
+subplot(1,2,2); cst_display(props_b,{'H'},0.1,[],options); 
+                camorbit(+45,-45); ktitle('$^{1}$H CST'); drawnow;
 
-% Load cyclohexadiene (substance C)
+% Load and display cyclohexadiene (substance C)
 props_c=gparse('cyclohexadiene.out');
 [sys_c,inter_c]=g2spinach(props_c,{{'H','1H'}},31.8,options);
-
-% Merge the spin systems
-[sys,inter]=merge_inp({sys_a,sys_b,sys_c},{inter_a,inter_b,inter_c});
+figure(); scale_figure([1.5 1.0]); 
+subplot(1,2,1); cst_display(props_c,{'C'},0.01,[],options); 
+                camorbit(+45,-45); ktitle('$^{13}$C CST');
+subplot(1,2,2); cst_display(props_c,{'H'},0.1,[],options); 
+                camorbit(+45,-45); ktitle('$^{1}$H CST'); drawnow;
 
 % Add natural abundance ethanol   (substance D)
 sys_d.isotopes={'1H','1H','1H','1H','1H','1H'};
@@ -37,30 +50,34 @@ inter_d.coupling.scalar(1,[4 5])=7.0;
 inter_d.coupling.scalar(2,[4 5])=7.0;
 inter_d.coupling.scalar(3,[4 5])=7.0;
 inter_d.coupling.scalar=num2cell(inter_d.coupling.scalar);
-[sys,inter]=merge_inp({sys,sys_d},{inter,inter_d});
+
+% Merge the spin systems
+[sys,inter]=merge_inp({sys_a,  sys_b,  sys_c,  sys_d},...
+                      {inter_a,inter_b,inter_c,inter_d});
 
 % Magnet field
 sys.magnet=14.1;
 
-% Initial concentrations, mol/L
-A0=1e-2; B0=2e-2; C0=0; D0=0.1;
+% Relaxation theory parameters
+inter.relaxation={'redfield','t1_t2'};
+inter.equilibrium='zero';
+inter.rlx_keep='secular';
+inter.tau_c={ 1e-12 ... % Acetylene
+             20e-12 ... % Butadiene
+             50e-12 ... % Cyclohexadiene
+              5e-12};   % Ethanol
+inter.r1_rates=cell(22,1); inter.r1_rates(:)={0};
+inter.r2_rates=cell(22,1); inter.r2_rates(:)={0};
+inter.r1_rates(17:22)={0.5}; % Solvent
+inter.r2_rates(17:22)={0.5}; % Solvent
 
-% Chemical parts and concentrations
+% Chemical parts and unit concentrations
 inter.chem.parts={1:2, 3:8, 9:16, 17:22};
-inter.chem.concs=[A0 B0 C0 D0];
+inter.chem.concs=[1 1 1 1];
 
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-
-% Relaxation theory parameters
-inter.relaxation={'redfield'};
-inter.equilibrium='zero';
-inter.rlx_keep='secular';
-inter.tau_c={ 5e-12 ... % Acetylene
-             20e-12 ... % Butadiene
-             50e-12 ... % Cyclohexadiene
-             10e-12};   % Ethanol
 
 % This needs a GPU
 sys.enable={'gpu'};
@@ -70,7 +87,7 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % 2nd order rate constant
-k=250.0;  % mol/(L*s)
+k=25.0;  % mol/(L*s)
 
 % 2nd order reaction generator
 K=@(t,x)(1i*[-k*x(2)   0        0        0; 
@@ -78,27 +95,35 @@ K=@(t,x)(1i*[-k*x(2)   0        0        0;
               0        k*x(1)   0        0;
               0        0        0        0]);
 
-% Time grid (one second)
-nsteps=1000; tmax=1.0; dt=tmax/nsteps;
+% Kinetic time grid, 10 seconds
+nsteps=100; tmax=10; dt=tmax/nsteps;
 time_axis=linspace(0,tmax,nsteps+1); 
- 
-% Preallocate trajectory 
-x=zeros(4,nsteps+1);
 
-% Define initial concentrations
-x(:,1)=[A0 B0 C0 D0]'; 
- 
-% Run Lie group solver
+% Preallocate concentration trajectory
+conc_traj=zeros(4,nsteps+1);
+
+% Initial concentrations, mol/L
+conc_traj(:,1)=[1e-2; 2e-2; 0.0; 17.1]; 
+
+% Stage 1: concentration dynamics
 for n=1:nsteps 
-    x(:,n+1)=iserstep(spin_system,K,x(:,n),n*dt,dt,'LG4'); 
+    conc_traj(:,n+1)=iserstep(spin_system,K,conc_traj(:,n),n*dt,dt,'LG4'); 
 end
 
-% Interpolate concentrations as functions of time
-A=griddedInterpolant(time_axis,x(1,:),'makima','none');
-B=griddedInterpolant(time_axis,x(2,:),'makima','none');
-C=griddedInterpolant(time_axis,x(3,:),'makima','none');
+% Plot concentrations, excluding solvent
+figure(); plot(time_axis,real(conc_traj(1:3,:))); 
+xlim tight; ylim padded; kgrid;
+kxlabel('time, seconds'); kylabel('concentration, mol/L');
+klegend({'acetylene','butadiene','cyclohexadiene'}, ...
+         'Location','northeast'); 
+scale_figure([1.00 0.75]); axis tight; drawnow;
 
-% Build kinetics generator and send it to GPU
+% Interpolate concentrations as functions of time
+A=griddedInterpolant(time_axis,conc_traj(1,:),'makima','none');
+B=griddedInterpolant(time_axis,conc_traj(2,:),'makima','none');
+C=griddedInterpolant(time_axis,conc_traj(3,:),'makima','none');
+
+% Build kinetics generators and send them to GPU
 reaction.reactants=[1 2];  % which substances are reactants
 reaction.products=3;       % which substances are products
 reaction.matching=[1  9;  
@@ -109,7 +134,7 @@ reaction.matching=[1  9;
                    6 11;
                    7 14;
                    8 13];
-G=react_gen(spin_system,reaction); G=gpuArray(G{1}+G{2});
+G=react_gen(spin_system,reaction); 
 
 % Get concentration-weighted initial condition, no solvent
 eta= A(0)*state(spin_system,'Lz',spin_system.chem.parts{1}) ...
@@ -118,64 +143,127 @@ eta= A(0)*state(spin_system,'Lz',spin_system.chem.parts{1}) ...
 [~,P]=levelpop('1H',sys.magnet,300);
 eta=(0.5*P(1)-0.5*P(2))*eta;
 
-% Get the detection state
-coil=state(spin_system,'L+','1H');
-
-% Set up a pulse-acquire experiment
-parameters.spins={'1H'};
-parameters.offset=2400;
-parameters.sweep=5000;
-parameters.npoints=4096;
-parameters.zerofill=16384;
-parameters.axis_units='ppm';
-parameters.invert_axis=1;
-
-% Get evolution generators
-spin_system=assume(spin_system,'nmr');
-H=hamiltonian(spin_system); 
-H=frqoffset(spin_system,H,parameters); H=gpuArray(H);
-R=relaxation(spin_system);             R=gpuArray(R);
-
 % Preallocate the trajectory and get it started
-traj=zeros([numel(eta) parameters.npoints+1]); traj(:,1)=eta;
+chem_traj=zeros([numel(eta) nsteps+1]); chem_traj(:,1)=eta;
 
-% Build the NMR time grid
-dt=1/parameters.sweep;
-time_axis=linspace(0,1,parameters.npoints+1);
-
-% Run the evolution loop
-for n=1:parameters.npoints
+% Run chemistry
+for n=1:nsteps
 
     % Keep the user informed
-    report(spin_system,['time step ' int2str(n) ...
-                        '/' int2str(parameters.npoints)]);
+    report(spin_system,['chemistry time step ' int2str(n) ...
+                        '/' int2str(nsteps)]);
 
     % Build the left interval edge composite evolution generator
-    F_L=H+1i*R+1i*k1*G{1}*B(time_axis(n))...   % Reaction from substance A
-              +1i*k1*A(time_axis(n))*G{2};     % Reaction from substance B
+    F_L=1i*k*B(time_axis(n))*G{1}   ... % Reaction from substance A
+       +1i*k*A(time_axis(n))*G{2};      % Reaction from substance B
 
     % Build the right interval edge composite evolution generator
-    F_R=H+1i*R+1i*k1*G{1}*B(time_axis(n+1))... % Reaction from substance A
-              +1i*k1*A(time_axis(n+1))*G{2};   % Reaction from substance B
+    F_R=1i*k*B(time_axis(n+1))*G{1} ... % Reaction from substance A
+       +1i*k*A(time_axis(n+1))*G{2};    % Reaction from substance B
 
     % Take the time step using the two-point Lie quadrature
-    traj(:,n+1)=gather(step(spin_system,{F_L,F_R},traj(:,n),dt));
+    chem_traj(:,n+1)=step(spin_system,{F_L,F_R},chem_traj(:,n),dt);
 
 end
 
-% Detection
-fid=coil'*traj;
+% Acquisition parameters
+parameters.spins={'1H'};
+parameters.offset=2370;
+parameters.sweep=4000;
+parameters.nsteps=4096;
 
-% Apodisation
-fid=apodisation(spin_system,fid,{{'gauss',10}});
+% Get spin evolution generators to GPU
+H=hamiltonian(assume(spin_system,'nmr'));
+H=frqoffset(spin_system,H,parameters);
+R=sparse(0); % relaxation(spin_system);
 
-% Fourier transform
-spectrum=fftshift(fft(fid,parameters.zerofill));
+% Pulse operator
+Hy=operator(spin_system,'Ly','1H');
 
-% Plotting
-figure(); plot_1d(spin_system,real(spectrum),parameters);
-figure(); plot_1d(spin_system,real(spectrum),parameters); xlim([5.5 6.9]);
-figure(); plot_1d(spin_system,real(spectrum),parameters); xlim([2.9 3.0]);
+% Detect transverse magnetisation
+coil=state(spin_system,'L+','1H');
+
+% Upload components to the local GPU
+L=gpuArray(H+1i*R); Hy=gpuArray(Hy);
+G1=gpuArray(G{1});  G2=gpuArray(G{2});
+coil=gpuArray(coil);
+
+% Run NMR every second
+chem_traj=chem_traj(:,1:10:end);
+start_times=0:(numel(chem_traj)-1);
+
+% Timing grid of NMR stage
+nmr_dt=1/parameters.sweep;
+
+% Preallocate FID array
+fids=cell(numel(start_times),1);
+
+% Run NMR experiments
+for n=1:size(chem_traj,2) %#ok<*PFBNS>
+
+    % Get the timing grid
+    timing_grid=linspace(start_times(n),...
+                         start_times(n)+parameters.nsteps*nmr_dt,...
+                         parameters.nsteps+1);
+
+    % Grab the initial condition
+    eta=gpuArray(chem_traj(:,n));
+
+    % Apply the excitation pulse
+    eta=step(spin_system,Hy,eta,pi/2);
+
+    % Get the fid started
+    current_fid=gpuArray.zeros(1,parameters.nsteps+1);
+    current_fid(1)=hdot(coil,eta);
+
+    % Stage 2: nuclear spin dynamics
+    for k=1:parameters.nsteps
+
+        % Keep the user informed
+        report(spin_system,['NMR time step ' int2str(k) ...
+                            '/' int2str(parameters.nsteps)]);
+
+        % Build the left interval edge composite evolution generator
+        F_L=L+(1i*k*B(timing_grid(k)))*G1   ... % Reaction from substance A
+             +(1i*k*A(timing_grid(k)))*G2;      % Reaction from substance B
+
+        % Build the right interval edge composite evolution generator
+        F_R=L+(1i*k*B(timing_grid(k+1)))*G1 ... % Reaction from substance A
+             +(1i*k*A(timing_grid(k+1)))*G2;    % Reaction from substance B
+
+        % Take the time step using the two-point Lie quadrature
+        eta=step(spin_system,{F_L,F_R},eta,nmr_dt);
+
+        % Read out the observable
+        current_fid(k+1)=hdot(coil,eta);
+
+    end
+
+    % Store the FID
+    fids{n}=gather(current_fid);
+
+end
+
+% Merge and apodisation
+fids=cell2mat(fids);
+fids=apodisation(spin_system,fids,{{},{'exp',6'}});
+
+% Zerofilling and Fourier transform
+specs=fftshift(fft(fids,16384,2),2);
+
+% Spectrum and time axis ticks
+parameters.axis_units='ppm';
+parameters.zerofill=16384;
+spec_ax=axis_1d(spin_system,parameters);
+time_ax=(1:size(fids,1))-1;
+
+% Waterfall plot
+[time_ax,spec_ax]=meshgrid(time_ax,spec_ax); figure();
+waterfall(time_ax',spec_ax',real(specs),'EdgeColor','k');
+kylabel('chemical shift, ppm'); box on;
+kxlabel('time, seconds'); kgrid; 
+kzlabel('intensity, a.u.'); axis tight;
+set(gca,'Projection','perspective');
 
 end
 

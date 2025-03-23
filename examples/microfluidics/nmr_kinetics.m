@@ -35,18 +35,18 @@ nsteps=200; tmax=20; dt=tmax/nsteps;
 time_axis=linspace(0,tmax,nsteps+1); 
 
 % Preallocate concentration trajectory
-fid=zeros(5,nsteps+1);
+conc_traj=zeros(5,nsteps+1);
 
 % Initial concentrations, mol/L
-fid(:,1)=[0.6; 0.5; 0.0; 0.0; 18.1]; 
+conc_traj(:,1)=[0.6; 0.5; 0.0; 0.0; 18.1]; 
 
 % Stage 1: concentration dynamics
 for n=1:nsteps 
-    fid(:,n+1)=iserstep(spin_system,K,fid(:,n),n*dt,dt,'LG4'); 
+    conc_traj(:,n+1)=iserstep(spin_system,K,conc_traj(:,n),n*dt,dt,'LG4'); 
 end
 
 % Plot concentrations, excluding solvent
-figure(); plot(time_axis,real(fid(1:4,:))); 
+figure(); plot(time_axis,real(conc_traj(1:4,:))); 
 xlim tight; ylim padded; kgrid;
 kxlabel('time, seconds'); kylabel('concentration, mol/L');
 klegend({'cyclopentadiene','acrylonitrile', ...
@@ -55,10 +55,10 @@ klegend({'cyclopentadiene','acrylonitrile', ...
          'Location','northeast'); drawnow;
 
 % Interpolate concentrations as functions of time
-A=griddedInterpolant(time_axis,fid(1,:),'makima','none');
-B=griddedInterpolant(time_axis,fid(2,:),'makima','none');
-C=griddedInterpolant(time_axis,fid(3,:),'makima','none');
-D=griddedInterpolant(time_axis,fid(4,:),'makima','none');
+A=griddedInterpolant(time_axis,conc_traj(1,:),'makima','none');
+B=griddedInterpolant(time_axis,conc_traj(2,:),'makima','none');
+C=griddedInterpolant(time_axis,conc_traj(3,:),'makima','none');
+D=griddedInterpolant(time_axis,conc_traj(4,:),'makima','none');
 
 % Nonlinear kinetics generator
 reaction{1}.reactants=[1 2];  % cyclopentadiene and acrylonitrile

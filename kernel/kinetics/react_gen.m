@@ -118,12 +118,13 @@ end
 gen_idx=[drain_gen_idx; fill_gen_idx];
 gen_idx(gen_idx(:,4)==0,:)=[];
 
-% Convert to sparse matrices
+% Convert to complex sparse matrices
 G=cell([numel(reaction.reactants) 1]);
 for n=1:numel(reaction.reactants)
     G{n}=sparse(gen_idx(gen_idx(:,1)==n,2),...
                 gen_idx(gen_idx(:,1)==n,3),...
                 gen_idx(gen_idx(:,1)==n,4),nstates,nstates);
+    G{n}=complex(G{n});
 end
 
 end

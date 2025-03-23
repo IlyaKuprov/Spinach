@@ -1,7 +1,7 @@
 % Time-domain Z magnetisation dynamics in the Diels-Alder cycloaddition 
 % of acetylene to butadiene, demonstrating the non-linear kinetics module.
 %
-% Calculation time: hours, faster on a Tesla A100 GPU.
+% Calculation time: minutes, faster on a Tesla A100 GPU.
 %
 % ilya.kuprov@weizmann.ac.il
 % a.acharya@soton.ac.uk
@@ -39,9 +39,6 @@ subplot(1,2,1); cst_display(props_c,{'C'},0.01,[],options);
 subplot(1,2,2); cst_display(props_c,{'H'},0.1,[],options); 
                 camorbit(+45,-45); ktitle('$^{1}$H CST'); drawnow;
 
-% Merge the spin systems
-[sys,inter]=merge_inp({sys_a,sys_b,sys_c},{inter_a,inter_b,inter_c});
-
 % Add natural abundance ethanol   (substance D)
 sys_d.isotopes={'1H','1H','1H','1H','1H','1H'};
 inter_d.zeeman.matrix={1.26, 1.26, 1.26, ...
@@ -52,7 +49,10 @@ inter_d.coupling.scalar(1,[4 5])=7.0;
 inter_d.coupling.scalar(2,[4 5])=7.0;
 inter_d.coupling.scalar(3,[4 5])=7.0;
 inter_d.coupling.scalar=num2cell(inter_d.coupling.scalar);
-[sys,inter]=merge_inp({sys,sys_d},{inter,inter_d});
+
+% Merge the spin systems
+[sys,inter]=merge_inp({sys_a,  sys_b,  sys_c,  sys_d},...
+                      {inter_a,inter_b,inter_c,inter_d});
 
 % Magnet field
 sys.magnet=14.1;
@@ -76,7 +76,7 @@ spin_system=basis(spin_system,bas);
 A0=1e-2; B0=2e-2; C0=0; D0=0.1;
 
 % 2nd order rate constant
-k=250.0;  % mol/(L*s)
+k=25.0;  % mol/(L*s)
 
 % 2nd order reaction generator
 K=@(t,x)(1i*[-k*x(2)   0        0        0; 
@@ -84,8 +84,8 @@ K=@(t,x)(1i*[-k*x(2)   0        0        0;
               0        k*x(1)   0        0;
               0        0        0        0]);
 
-% Time grid (one second)
-nsteps=1000; tmax=1.0; dt=tmax/nsteps;
+% Time grid (ten seconds)
+nsteps=100; tmax=10.0; dt=tmax/nsteps;
 time_axis=linspace(0,tmax,nsteps+1); 
  
 % Preallocate trajectory 
@@ -108,9 +108,10 @@ C=griddedInterpolant(time_axis,x(3,:),'makima','none');
 figure(); plot(time_axis',real(x(1:3,:)')); xlim tight; kgrid;
 kxlabel('time, seconds'); kylabel('concentration, mol/L');
 klegend({'acetylene','butadiene','cyclohexadiene'},...
-        'Location','northeast'); drawnow;
+        'Location','northeast'); 
+scale_figure([1.00 0.75]); axis tight; drawnow;
 
-% Nonlinear kinetics generator
+% Build kinetics generators and send them to GPU
 reaction.reactants=[1 2];  % which substances are reactants
 reaction.products=3;       % which substances are products
 reaction.matching=[1  9;  
@@ -121,53 +122,53 @@ reaction.matching=[1  9;
                    6 11;
                    7 14;
                    8 13];
-[GD,GF]=react_gen(spin_system,reaction); G=GD{1}+GD{2}+GF{1};
+G=react_gen(spin_system,reaction); 
+G{1}=gpuArray(G{1}); G{2}=gpuArray(G{2});
 
-% Set up time discretisation
-fid_time_axis=linspace(0,1,1000);
-
-% Get the initial density matrix
-rho=state(spin_system,'Lz','1H');
-
-% No spin dynamics
-H=sparse(0); R=sparse(0);
-
-% Get the number of fid points
-parameters.npoints=numel(fid_time_axis);
+% Get concentration-weighted initial condition, no solvent
+eta= A(0)*state(spin_system,'Lz',spin_system.chem.parts{1}) ...
+    +B(0)*state(spin_system,'Lz',spin_system.chem.parts{2}) ...
+    +C(0)*state(spin_system,'Lz',spin_system.chem.parts{3});
+[~,P]=levelpop('1H',sys.magnet,300);
+eta=(0.5*P(1)-0.5*P(2))*eta;
 
 % Preallocate the trajectory and get it started
-traj=zeros([numel(rho) parameters.npoints]); traj(:,1)=rho;
+traj=zeros([numel(eta) nsteps+1]); traj(:,1)=eta;
 
 % Run the evolution loop
-for n=1:(parameters.npoints-1)
+for n=1:nsteps
 
-    % Get left and right edge reaction rates
-    rr_L=k*A(fid_time_axis(n))*B(fid_time_axis(n));
-    rr_R=k*A(fid_time_axis(n+1))*B(fid_time_axis(n+1));
+    % Keep the user informed
+    report(spin_system,['time step ' int2str(n) ...
+                        '/' int2str(nsteps)]);
 
-    % Make left and right edge evolution generators
-    F_L=H+1i*R+1i*rr_L*G; F_R=H+1i*R+1i*rr_R*G;
+    % Build the left interval edge composite evolution generator
+    F_L=1i*k*G{1}*B(time_axis(n))...   % Reaction from substance A
+       +1i*k*A(time_axis(n))*G{2};     % Reaction from substance B
 
-    % Take the time step using Anu's two-point call
-    traj(:,n+1)=step(spin_system,{F_L,F_R},traj(:,n),...
-                     fid_time_axis(n+1)-fid_time_axis(n));
+    % Build the right interval edge composite evolution generator
+    F_R=1i*k*G{1}*B(time_axis(n+1))... % Reaction from substance A
+       +1i*k*A(time_axis(n+1))*G{2};   % Reaction from substance B
 
-    disp(n);
+    % Take the time step using the two-point Lie quadrature
+    traj(:,n+1)=gather(step(spin_system,{F_L,F_R},traj(:,n),dt));
 
 end
 
 % Look at spins in reactants and product
-reactant=state(spin_system,{'Lz'},{1});
-figure(); plot(fid_time_axis,A(fid_time_axis).*abs(reactant'*traj)); 
-reactant=state(spin_system,{'Lz'},{3});
-hold on; plot(fid_time_axis,B(fid_time_axis).*abs(reactant'*traj)); 
-product=state(spin_system,{'Lz'},{9});
-hold on; plot(fid_time_axis,C(fid_time_axis).*abs(product'*traj));
+coil=state(spin_system,{'Lz'},{1});
+figure(); plot(time_axis,real(coil'*traj)); 
+coil=state(spin_system,{'Lz'},{3});
+hold on;  plot(time_axis,real(coil'*traj)); 
+coil=state(spin_system,{'Lz'},{9});
+hold on;  plot(time_axis,real(coil'*traj));
 xlim tight; kgrid; kxlabel('time, seconds'); 
-kylabel('concentration-weighted expt value');
-klegend({'Acetylene Lz',...
-         'Butadiene Lz',...
-         'Cyclohexadiene Lz'},'Location','northeast'); drawnow;
+kylabel('conc.-weighted expt. value, 300K');
+klegend({'Acetylene $\hat L_{\rm{Z}}$',...
+         'Butadiene $\hat L_{\rm{Z}}$',...
+         'Cyclohexadiene $\hat L_{\rm{Z}}$'},...
+         'Location','northeast'); 
+scale_figure([1.00 0.75]); axis tight;
 
 end
 

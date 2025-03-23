@@ -174,8 +174,6 @@ H=hamiltonian(assume(spin_system,'nmr'));
 H=frqoffset(spin_system,H,parameters);
 R=relaxation(spin_system);
 
-
-
 % Detect transverse magnetisation
 coil=state(spin_system,'L+','1H');
 

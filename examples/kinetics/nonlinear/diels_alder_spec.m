@@ -2,7 +2,7 @@
 % addition of acetylene to butadiene, demonstrating the non-linear
 % kinetics module.
 %
-% Calculation time: hours, faster on a Tesla A100 GPU.
+% Calculation time: hours.
 %
 % ilya.kuprov@weizmann.ac.il
 % a.acharya@soton.ac.uk
@@ -79,9 +79,6 @@ inter.chem.concs=[1 1 1 1];
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
-% This needs a GPU
-sys.enable={'gpu'};
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
@@ -123,7 +120,7 @@ A=griddedInterpolant(time_axis,conc_traj(1,:),'makima','none');
 B=griddedInterpolant(time_axis,conc_traj(2,:),'makima','none');
 C=griddedInterpolant(time_axis,conc_traj(3,:),'makima','none');
 
-% Build kinetics generators and send them to GPU
+% Build kinetics generators
 reaction.reactants=[1 2];  % which substances are reactants
 reaction.products=3;       % which substances are products
 reaction.matching=[1  9;  
@@ -172,25 +169,23 @@ parameters.offset=2370;
 parameters.sweep=4000;
 parameters.nsteps=4096;
 
-% Get spin evolution generators to GPU
+% Get spin evolution generators 
 H=hamiltonian(assume(spin_system,'nmr'));
 H=frqoffset(spin_system,H,parameters);
-R=sparse(0); % relaxation(spin_system);
+R=relaxation(spin_system);
 
-% Pulse operator
-Hy=operator(spin_system,'Ly','1H');
+
 
 % Detect transverse magnetisation
 coil=state(spin_system,'L+','1H');
 
-% Upload components to the local GPU
-L=gpuArray(H+1i*R); Hy=gpuArray(Hy);
-G1=gpuArray(G{1});  G2=gpuArray(G{2});
-coil=gpuArray(coil);
-
 % Run NMR every second
 chem_traj=chem_traj(:,1:10:end);
 start_times=0:(numel(chem_traj)-1);
+
+% Apply the excitation pulse
+Hy=operator(spin_system,'Ly','1H');
+chem_traj=step(spin_system,Hy,chem_traj,pi/2);
 
 % Timing grid of NMR stage
 nmr_dt=1/parameters.sweep;
@@ -199,21 +194,16 @@ nmr_dt=1/parameters.sweep;
 fids=cell(numel(start_times),1);
 
 % Run NMR experiments
-for n=1:size(chem_traj,2) %#ok<*PFBNS>
+parfor n=1:size(chem_traj,2) %#ok<*PFBNS>
 
     % Get the timing grid
     timing_grid=linspace(start_times(n),...
                          start_times(n)+parameters.nsteps*nmr_dt,...
                          parameters.nsteps+1);
 
-    % Grab the initial condition
-    eta=gpuArray(chem_traj(:,n));
-
-    % Apply the excitation pulse
-    eta=step(spin_system,Hy,eta,pi/2);
-
-    % Get the fid started
-    current_fid=gpuArray.zeros(1,parameters.nsteps+1);
+    % Grab the initial condition and start the fid
+    eta=chem_traj(:,n);
+    current_fid=zeros(1,parameters.nsteps+1);
     current_fid(1)=hdot(coil,eta);
 
     % Stage 2: nuclear spin dynamics
@@ -224,12 +214,12 @@ for n=1:size(chem_traj,2) %#ok<*PFBNS>
                             '/' int2str(parameters.nsteps)]);
 
         % Build the left interval edge composite evolution generator
-        F_L=L+(1i*k*B(timing_grid(k)))*G1   ... % Reaction from substance A
-             +(1i*k*A(timing_grid(k)))*G2;      % Reaction from substance B
+        F_L=H+1i*R+1i*k*G{1}*B(timing_grid(k))   ... % Reaction from substance A
+                  +1i*k*A(timing_grid(k))*G{2};      % Reaction from substance B
 
         % Build the right interval edge composite evolution generator
-        F_R=L+(1i*k*B(timing_grid(k+1)))*G1 ... % Reaction from substance A
-             +(1i*k*A(timing_grid(k+1)))*G2;    % Reaction from substance B
+        F_R=H+1i*R+1i*k*G{1}*B(timing_grid(k+1)) ... % Reaction from substance A
+                  +1i*k*A(timing_grid(k+1))*G{2};    % Reaction from substance B
 
         % Take the time step using the two-point Lie quadrature
         eta=step(spin_system,{F_L,F_R},eta,nmr_dt);
@@ -240,7 +230,7 @@ for n=1:size(chem_traj,2) %#ok<*PFBNS>
     end
 
     % Store the FID
-    fids{n}=gather(current_fid);
+    fids{n}=current_fid;
 
 end
 

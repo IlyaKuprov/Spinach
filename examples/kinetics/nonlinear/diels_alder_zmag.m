@@ -1,7 +1,7 @@
 % Time-domain Z magnetisation dynamics in the Diels-Alder cycloaddition 
 % of acetylene to butadiene, demonstrating the non-linear kinetics module.
 %
-% Calculation time: minutes, faster on a Tesla A100 GPU.
+% Calculation time: minutes.
 %
 % ilya.kuprov@weizmann.ac.il
 % a.acharya@soton.ac.uk
@@ -65,9 +65,6 @@ inter.chem.concs=[1 1 1 1];
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
-% This needs a GPU
-sys.enable={'gpu'};
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
@@ -111,7 +108,7 @@ klegend({'acetylene','butadiene','cyclohexadiene'},...
         'Location','northeast'); 
 scale_figure([1.00 0.75]); axis tight; drawnow;
 
-% Build kinetics generators and send them to GPU
+% Build kinetics generators 
 reaction.reactants=[1 2];  % which substances are reactants
 reaction.products=3;       % which substances are products
 reaction.matching=[1  9;  
@@ -123,7 +120,6 @@ reaction.matching=[1  9;
                    7 14;
                    8 13];
 G=react_gen(spin_system,reaction); 
-G{1}=gpuArray(G{1}); G{2}=gpuArray(G{2});
 
 % Get concentration-weighted initial condition, no solvent
 eta= A(0)*state(spin_system,'Lz',spin_system.chem.parts{1}) ...
@@ -151,7 +147,7 @@ for n=1:nsteps
        +1i*k*A(time_axis(n+1))*G{2};   % Reaction from substance B
 
     % Take the time step using the two-point Lie quadrature
-    traj(:,n+1)=gather(step(spin_system,{F_L,F_R},traj(:,n),dt));
+    traj(:,n+1)=step(spin_system,{F_L,F_R},traj(:,n),dt);
 
 end
 

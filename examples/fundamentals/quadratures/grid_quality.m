@@ -22,15 +22,14 @@ for n=[100 200 400 800 1600 3200 6400 12800]
     grid_profile=grid_test(alphas,betas,gammas,weights,0:80,'Y_lm');
     
     % Plot the evaluation
-    plot(grid_profile(2:end)); axis tight; drawnow;
+    plot(grid_profile(2:end)); axis tight; 
     legend_txt{end+1}=['REPULSION ' num2str(n) ' pts']; %#ok<AGROW>
+
+    % Residual cosmetics
+    kxlabel('spherical rank'); kylabel('integration error');
+    klegend(legend_txt,'Location','southeast'); drawnow;
     
 end
-
-% Residual cosmetics
-xlabel('spherical rank');
-ylabel('integration error');
-legend(legend_txt,'Location','southeast');
 
 %% Three-angle REPULSION grids
 
@@ -49,15 +48,14 @@ for n=[100 200 400 800 1600 3200 6400 12800]
     grid_profile=grid_test(alphas,betas,gammas,weights,0:30,'D_lmn');
     
     % Plot the evaluation
-    plot(grid_profile(2:end)); axis tight; drawnow;
+    plot(grid_profile(2:end)); axis tight; 
     legend_txt{end+1}=['REPULSION ' num2str(n) ' pts']; %#ok<AGROW>
+
+    % Residual cosmetics
+    kxlabel('spherical rank'); kylabel('integration error');
+    klegend(legend_txt,'Location','southeast'); drawnow;
     
 end
-
-% Residual cosmetics
-xlabel('spherical rank');
-ylabel('integration error');
-legend(legend_txt,'Location','southeast');
 
 %% Two-angle Lebedev grids
  
@@ -81,13 +79,12 @@ for n=[5 17 29 41 53]
     % Plot the evaluation
     plot(ranks(2:end),grid_profile(2:end)); axis tight; drawnow;
     legend_txt{end+1}=['Lebedev rank ' num2str(n)]; %#ok<AGROW>
+
+    % Residual cosmetics
+    kxlabel('spherical rank'); kylabel('integration error');
+    klegend(legend_txt,'Location','southeast'); drawnow;
     
 end
-
-% Residual cosmetics
-xlabel('spherical rank');
-ylabel('integration error');
-legend(legend_txt,'Location','southeast');
 
 end
 

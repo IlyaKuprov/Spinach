@@ -121,6 +121,9 @@ for n=1:nx
     end
 end
 
+% Set blue -> white -> red colormap
+colormap(bwr_cmap());
+
 % Interpolate alpha map
 new_alpha=interp1(1:64,alphamap,1:0.25:64,'pchip');
 
@@ -130,18 +133,10 @@ new_alpha=new_alpha/5; new_alpha(new_alpha<0.01)=0;
 % Apply new alpha map
 alphamap(new_alpha);
 
-% Clean up axes
-axis tight; axis equal; hold off;
-kxlabel('X'); kylabel('Y'); kzlabel('Z');
-
-% Set blue -> white -> red colormap
-colormap(bwr_cmap());
-
 % Final figure cosmetics
-set(gca,'Projection','perspective');
-cameratoolbar('SetMode','orbit');
-cameratoolbar('SetCoordSys','none'); 
-box on; kgrid;
+axis tight; axis equal; box on; kgrid;
+kxlabel('X'); kylabel('Y'); kzlabel('Z');
+set(gca,'Projection','perspective'); hold off;
 
 end
 

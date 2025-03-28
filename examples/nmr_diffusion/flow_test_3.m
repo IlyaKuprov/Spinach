@@ -1,7 +1,7 @@
 % Circular flow in three-dimensional space in the absence
 % of spin dynamics.
 %
-% Calculation time: minutes.
+% Calculation time: minutes, faster on GPU.
 %
 % ilya.kuprov@weizmann.ac.il
 % a.j.allami@soton.ac.uk
@@ -21,7 +21,7 @@ bas.formalism='sphten-liouv';
 bas.approximation='none';
 
 % Algorithmic options
-sys.enable={'greedy'};
+sys.enable={'greedy','gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

@@ -305,9 +305,8 @@ end
 
 % Do not redraw the legend (expensive)
 if exist('legend_text','var')&&isempty(gca().Legend)  
-    leg_obj=legend(gca(),legend_text,'Location','NorthEast','AutoUpdate','off');  
-    set(leg_obj.BoxFace,'ColorType','truecoloralpha',...
-                        'ColorData',uint8([200 200 200 64]')); 
+    klegend(gca,legend_text,'Location','NorthEast',...
+                            'AutoUpdate','off');  
 end
 
 % Set Y axis label and axis scaling

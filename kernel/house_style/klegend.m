@@ -1,7 +1,7 @@
 % House style settings for Matlab figures; a product of much
 % experience with academic publication aesthetics. Syntax:
 %
-%                      klegend(varargin)
+%                 leg_obj=klegend(varargin)
 %
 % Parameters:
 %
@@ -10,13 +10,13 @@
 %
 % Outputs:
 % 
-%    creates or updates the current figure legend
+%    leg_obj  - Matlab figure legend object
 %
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=klegend.m>
 
-function klegend(varargin)
+function leg_obj=klegend(varargin)
 
 % Display the legend using LaTeX
 leg_obj=legend(varargin{:},'Interpreter','latex');

@@ -15,6 +15,9 @@ inter.chem.concs=[1 1 1 1 0];
 % Magnet field
 sys.magnet=14.1;
 
+% Greedy parallelisation
+sys.enable={'greedy'};
+
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

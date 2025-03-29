@@ -8,26 +8,14 @@
 
 function reacting_flow()
 
-% One proton on either side
+% Import Diels-Alder cycloaddition
+[sys,inter,bas]=dac_reaction();
+
+% Magnet field
 sys.magnet=14.1;
-sys.isotopes={'1H','1H'};
 
-% Chemical shifts
-inter.zeeman.scalar={0.0 0.0};
-
-% Irreversible reaction
-inter.chem.parts={1,2};
-inter.chem.rates=[-1e-3  0.0; 
-                   1e-3  0.0];
-inter.chem.concs=[1.0  0.0];
-
-% Basis set
-bas.formalism='sphten-liouv';
-bas.approximation='none';
-
-% Algorithmic switches
-sys.disable={'trajlevel'};
-sys.enable={'gpu'};
+% This needs a GPU
+sys.enable={'greedy','gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -46,86 +34,121 @@ spin_system=mesh_inact(spin_system,[9 10 19 30 20 25 14 13   ...
 spin_system=mesh_vorn(spin_system);                              % Run Voronoi tessellation
 spin_system=mesh_preplot(spin_system);                           % Run output preprocessing
 
-% Initial condition: Lz of the first spin in a few cells
-parameters.rho0_ph{1}=zeros(spin_system.mesh.vor.ncells,1);
-parameters.rho0_ph{1}(140:160)=1;
-parameters.rho0_st{1}=state(spin_system,{'Lz'},{1},'chem');
+% Rate constants, mol/(L*s)
+k1=2.0;  % towards exo  
+k2=1.0;  % towards endo
 
-% No detection stage inside the sequence
-parameters.coil_ph={}; parameters.coil_st={};
+% Cycloaddition reaction generator, including solvent
+K=@(x)([-k1*x(2)-k2*x(2)  0                0      0     0;      
+         0               -k1*x(1)-k2*x(1)  0      0     0;           
+         0                k1*x(1)          0      0     0;
+         0                k2*x(1)          0      0     0; 
+         0                0                0      0     0]);  
 
-% Sequence and timing parameters
-parameters.spins={'1H'};
-parameters.offset=0;
-parameters.dt=160; 
-parameters.npoints=50;
+% Strong diffusion
+parameters.diff=1e-7;
 
-% Set assumptions
-spin_system=assume(spin_system,'nmr');
+% Timing parameters
+dt=20; npoints=280;
 
-% Same Hamiltonian everywhere
-H=hamiltonian(spin_system);
-H=frqoffset(spin_system,H,parameters);
-parameters.H_op={H}; 
-parameters.H_ph={ones(2659,1)};
+% Get diffusion and flow generator
+GF=flow_gen(spin_system,parameters);
 
-% Same relaxation everywhere
-parameters.R_op={relaxation(spin_system)}; 
-parameters.R_ph={ones(2659,1)};
+% Trajectory preallocation and the initial state
+traj=zeros(5,spin_system.mesh.vor.ncells,npoints+1);
+traj(1,1240,1)=0.50; traj(2,1246,1)=0.25;
 
-% Kinetics A: reaction in a stripe 
-Y=spin_system.mesh.y(spin_system.mesh.idx.active);
-Ph1=double((Y>577.5)&(Y<578)); K1=kinetics(spin_system);
+% Time evolution loop
+for n=1:npoints
 
-% Kinetics B: drainage in the distal pipe
-Ph2=zeros(2659,1); Ph2(2600:end)=-0.01; 
-K2=unit_oper(spin_system);
+    % Keep the user informed
+    report(spin_system,['chemistry time step ' int2str(n) ...
+                        '/' int2str(npoints)]);
 
-% Assemble kinetics
-parameters.K_op={K1,K2}; 
-parameters.K_ph={Ph1,Ph2};
+    % Build a kinetics generator in each cell
+    GK=zeros([5 5 spin_system.mesh.vor.ncells],'like',1i);
+    parfor k=1:spin_system.mesh.vor.ncells
+        GK(:,:,k)=K(traj(:,k,n));
+    end
 
-% Get the trajectory of simple flow
-traj=meshflow(spin_system,@simple_flow,parameters);
+    % Assemble the evolution generator
+    G=1i*spblkdiag(GK)+1i*kron(GF,speye(5));
 
-% Extract the observable quantity
-coil_a=state(spin_system,{'Lz'},{1});
-coil_b=state(spin_system,{'Lz'},{2});
-traj_a=fpl2phan(traj(:),coil_a,[2659 parameters.npoints]);
-traj_b=fpl2phan(traj(:),coil_b,[2659 parameters.npoints]);
+    % Take the time step
+    x_curr=traj(:,:,n); x_curr=x_curr(:);
+    x_next=step(spin_system,G,x_curr,dt);
+    traj(:,:,n+1)=reshape(x_next,[5 spin_system.mesh.vor.ncells]);
+
+end
 
 % Make a figure
-figure(); scale_figure([4.50 2.25]); 
-subplot(1,2,1); camproj('perspective'); view(-20,15); axis vis3d;
-subplot(1,2,2); camproj('perspective'); view(-20,15); axis vis3d;
+figure(); scale_figure([2.5 2.5]);
+ksubplot(2,2,1); camproj('perspective'); view(-20,15); axis vis3d;
+ksubplot(2,2,2); camproj('perspective'); view(-20,15); axis vis3d;
+ksubplot(2,2,3); camproj('perspective'); view(-20,15); axis vis3d;
+ksubplot(2,2,4); camproj('perspective'); view(-20,15); axis vis3d;
 
-% Set the ceiling
-spin_system.mesh.zext=[-0.02 0.02];
+% Set Z axis extents
+spin_system.mesh.zext=[-0.005 0.01];
+
+% Open the video writer object
+writerObj=VideoWriter('reacting_flow.mp4','MPEG-4');
+writerObj.Quality=100; open(writerObj);
 
 % Run through trajectory
-for n=1:size(traj,2)
+for n=1:size(traj,3)
 
-    % Do not steal focus
-    set(groot,'CurrentFigure',1); 
-
-    subplot(1,2,1); cla;
-    conc=full(real(traj_a(:,n)));
+    % First reactant
+    ksubplot(2,2,1); 
+    set(groot,'CurrentFigure',1); cla;
+    conc=squeeze(full(real(traj(1,:,n))));
     mesh_plot(spin_system,0,0);
-    conc_plot(spin_system,conc);
+    conc_plot(spin_system,conc');
     zlim(spin_system.mesh.zext);
-    set(gca,'DataAspectRatio',[1 1 0.05])
-    camorbit(0.5,0); ktitle('Substance A');
+    kzlabel('concentration, a.u.');
+    set(gca,'DataAspectRatio',[1 1 0.025]);
+    camorbit(0.5,0); ktitle('cyclopentadiene');
 
-    subplot(1,2,2); cla;
-    conc=full(real(traj_b(:,n)));
+    % Second reactant
+    ksubplot(2,2,2); 
+    set(groot,'CurrentFigure',1); cla;
+    conc=squeeze(full(real(traj(2,:,n))));
     mesh_plot(spin_system,0,0);
-    conc_plot(spin_system,conc);
+    conc_plot(spin_system,conc');
     zlim(spin_system.mesh.zext);
-    set(gca,'DataAspectRatio',[1 1 0.05])
-    camorbit(0.5,0); ktitle('Substance B');
-    drawnow();
-  
-end 
+    kzlabel('concentration, a.u.');
+    set(gca,'DataAspectRatio',[1 1 0.025]);
+    camorbit(0.5,0); ktitle('acrylonitrile');
 
+    % First product
+    ksubplot(2,2,3); 
+    set(groot,'CurrentFigure',1); cla;
+    conc=squeeze(full(real(traj(3,:,n))));
+    mesh_plot(spin_system,0,0);
+    conc_plot(spin_system,conc');
+    zlim(spin_system.mesh.zext);
+    kzlabel('concentration, a.u.');
+    set(gca,'DataAspectRatio',[1 1 0.025]);
+    camorbit(0.5,0); ktitle('exo-NBCN');
+
+    % Second product
+    ksubplot(2,2,4); 
+    set(groot,'CurrentFigure',1); cla;
+    conc=squeeze(full(real(traj(4,:,n))));
+    mesh_plot(spin_system,0,0);
+    conc_plot(spin_system,conc');
+    zlim(spin_system.mesh.zext);
+    kzlabel('concentration, a.u.');
+    set(gca,'DataAspectRatio',[1 1 0.025]);
+    camorbit(0.5,0); ktitle('endo-NBCN');
+
+    % Grab the frame
+    drawnow(); writeVideo(writerObj,getframe(gcf));
+        
+end
+
+% Close the writer object
+close(writerObj);
+   
 end
 

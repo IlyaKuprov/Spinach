@@ -60,86 +60,8 @@ function answer=meshflow(spin_system,pulse_sequence,parameters)
 % Check consistency
 grumble(spin_system,pulse_sequence,parameters);
 
-% Substructure pull for parfor
-mesh=spin_system.mesh; ncells=mesh.vor.ncells;
-
-% Take Voronoi cell areas into account
-A_forw=spdiags(mesh.vor.weights,0,ncells,ncells);
-A_back=spdiags(1./mesh.vor.weights,0,ncells,ncells);
-
-% Pull diffusion coefficient
-if isfield(parameters,'diff')
-    D=parameters.diff;
-else
-    D=sparse(0);
-end
-
-% Build flow index
-F=cell(ncells,1);
-parfor k=1:ncells %#ok<*PFBNS>
-
-    % Pull out cell area
-    A_k=mesh.vor.weights(k); 
-    
-    % Find the parent vertex
-    parent_vertex=mesh.idx.active(k);
-
-    % Find triangles containing parent vertex
-    nearby_triangles=find(sum(mesh.idx.triangles==parent_vertex,2));
-    nearby_triangles=mesh.idx.triangles(nearby_triangles,:);
-
-    % Collect all nearby vertices
-    nearby_vertices=setdiff(nearby_triangles(:),parent_vertex);
-
-    % Find the Voronoi cells they are parenting
-    nearby_cells=find(ismember(mesh.idx.active,nearby_vertices))';
-    
-    % Start local flow table
-    F_local=zeros(0,3);
-
-    % Loop over nearby cells
-    for m=nearby_cells
-
-        % See if they share a boundary
-        shared_pts=intersect(mesh.vor.cells{k},...
-                             mesh.vor.cells{m});
-        if numel(shared_pts)==2
-
-            % Determine boundary length
-            b_km=norm(mesh.vor.vertices(shared_pts(1),:)-...       % #NORMOK
-                      mesh.vor.vertices(shared_pts(2),:),2);       % m
-
-            % Distance vector between Voronoi cell centres
-            r_km=[mesh.x(mesh.idx.active(m)); mesh.y(mesh.idx.active(m))]-...
-                 [mesh.x(mesh.idx.active(k)); mesh.y(mesh.idx.active(k))]; 
-
-            % Velocity in the current and the adjacent cell
-            v_m=[mesh.u(mesh.idx.active(m)); mesh.v(mesh.idx.active(m))];
-            v_k=[mesh.u(mesh.idx.active(k)); mesh.v(mesh.idx.active(k))];
-
-            % Contribution to the off-diag part
-            F_km=+(1/A_k)*(b_km/norm(r_km,2))*D ...
-                 -(1/A_k)*(b_km/norm(r_km,2))*dot((v_m+v_k)/2,r_km)/2;
-
-            % Add the terms to the generator
-            if F_km>0
-                F_local=[F_local; k m  F_km];
-            else
-                F_local=[F_local; m k -F_km];
-            end
-
-        end
-
-    end
-
-    % Add to global
-    F{k}=F_local;
-
-end
-
-% Build and balance the flow generator
-F=cell2mat(F); F=sparse(F(:,1),F(:,2),F(:,3),ncells,ncells);
-F=F-spdiags(sum(F,1)',0,ncells,ncells); F=A_back*F*A_forw;  
+% Get diffusion and flow generator
+F=flow_gen(spin_system,parameters);
 
 % Get problem dimensions
 spc_dim=spin_system.mesh.vor.ncells;  

@@ -7,7 +7,7 @@
 % a.acharya@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 
-function plain_kinetics()
+function plain_reaction()
 
 % Import Diels-Alder cycloaddition
 [sys,inter,bas]=dac_reaction();
@@ -64,10 +64,6 @@ klegend({'cyclopentadiene','acrylonitrile', ...
          'endo-norbornene carbonitrile',...
          'exo-norbornene carbonitrile'}, ...
          'Location','northeast'); drawnow;
-
-% % Export the figure
-% exportgraphics(gcf,'plain_kinetics.pdf');
-% savefig(gcf,'plain_kinetics.fig');
 
 end
 

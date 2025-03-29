@@ -14,6 +14,9 @@
 %     sys, inter, bas - Spinach input data structures, remember
 %                       to specify the field in sys.magnet
 %
+%     kin - matching tables for which nuclei go where in which
+%           of the two chemical reactions
+%
 % a.acharya@soton.ac.uk
 % bruno.linclau@ugent.be
 % madhukar.said@ugent.be
@@ -21,7 +24,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=dac_reaction.m>
 
-function [sys,inter,bas]=dac_reaction()
+function [sys,inter,bas,kin]=dac_reaction()
 
 % Find own location
 own_folder=mfilename('fullpath');
@@ -169,6 +172,14 @@ inter.r1_rates=cell(30,1); inter.r1_rates(:)={0};
 inter.r2_rates=cell(30,1); inter.r2_rates(:)={0};
 inter.r1_rates(28:30)={0.5}; % Solvent
 inter.r2_rates(28:30)={0.5}; % Solvent
+
+% Matching tables for the chemical reactions
+kin{1}.reactants=[1 2];  % cyclopentadiene and acrylonitrile
+kin{1}.products=3;       % into endo-norbornene carbonitrile
+kin{1}.matching=[1 12; 2 17; 3 18; 4 16; 5 10; 6 11; 7 14; 8 15; 9 13];
+kin{2}.reactants=[1 2];  % cyclopentadiene and acrylonitrile
+kin{2}.products=4;       % into endo-norbornene carbonitrile
+kin{2}.matching=[1 21; 2 26; 3 27; 4 25; 5 19; 6 20; 7 23; 8 24; 9 22]; 
 
 end
 

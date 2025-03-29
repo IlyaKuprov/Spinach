@@ -40,7 +40,7 @@ spin_system=mesh_preplot(spin_system);                           % Run output pr
 
 % Initial condition: Lz in one cell in the middle
 parameters.rho0_ph{1}=zeros(spin_system.mesh.vor.ncells,1);
-parameters.rho0_ph{1}(1230)=0.5;
+parameters.rho0_ph{1}([1240 1246])=0.5;
 parameters.rho0_st{1}=state(spin_system,'Lz','1H');
 
 % Detection state: Lz in all cells

@@ -6,10 +6,10 @@
 % a.acharya@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 
-function nmr_kinetics()
+function reacting_nmr()
 
 % Import Diels-Alder cycloaddition
-[sys,inter,bas]=dac_reaction();
+[sys,inter,bas,kin]=dac_reaction();
 
 % Magnet field
 sys.magnet=14.1;
@@ -64,17 +64,9 @@ B=griddedInterpolant(chem_time_grid,chem_traj(2,:),'makima','none');
 C=griddedInterpolant(chem_time_grid,chem_traj(3,:),'makima','none');
 D=griddedInterpolant(chem_time_grid,chem_traj(4,:),'makima','none');
 
-% Nonlinear kinetics generator
-reaction{1}.reactants=[1 2];  % cyclopentadiene and acrylonitrile
-reaction{1}.products=3;       % into endo-norbornene carbonitrile
-reaction{1}.matching=[1 12; 2 17; 3 18; 4 16; 5 10; 6 11; 7 14; 8 15; 9 13];
-reaction{2}.reactants=[1 2];  % cyclopentadiene and acrylonitrile
-reaction{2}.products=4;       % into endo-norbornene carbonitrile
-reaction{2}.matching=[1 21; 2 26; 3 27; 4 25; 5 19; 6 20; 7 23; 8 24; 9 22]; 
-
 % Build chemical reaction generators
-G1=react_gen(spin_system,reaction{1});
-G2=react_gen(spin_system,reaction{2});
+G1=react_gen(spin_system,kin{1});
+G2=react_gen(spin_system,kin{2});
 
 % Get concentration-weighted initial condition, no solvent
 eta= A(0)*state(spin_system,'Lz',spin_system.chem.parts{1}) ...

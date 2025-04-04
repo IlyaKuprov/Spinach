@@ -1702,7 +1702,7 @@ if isfield(inter,'coupling')
         % Check quadratic couplings
         for n=1:numel(sys.isotopes)
             [~,mult]=spin(sys.isotopes{n});
-            if (norm(inter.coupling.matrix{n,n},1)>0)&&(mult<3)
+            if (norm(inter.coupling.matrix{n,n},1)>0)&&(mult==2)
                 error('quadratic couplings cannot be specified for spin-1/2 particles.');
             elseif abs(trace(inter.coupling.matrix{n,n}))>1e-6
                 error('quadratic couplings cannot have a non-zero trace.');

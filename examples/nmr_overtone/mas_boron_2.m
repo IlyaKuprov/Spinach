@@ -42,11 +42,9 @@ parameters.npoints=256;
 parameters.zerofill=256;
 parameters.rho0=state(spin_system,'Lz','10B');
 parameters.coil=cos(theta)*state(spin_system,'Lz','10B')+...
-                sin(theta)*(state(spin_system,'L+','10B')+...
-                            state(spin_system,'L-','10B'))/2;
+                sin(theta)*state(spin_system,'Lx','10B');
 parameters.Lx=cos(theta)*operator(spin_system,'Lz','10B')+...
-              sin(theta)*(operator(spin_system,'L+','10B')+...
-                          operator(spin_system,'L-','10B'))/2;
+              sin(theta)*operator(spin_system,'Lx','10B');
 parameters.spins={'10B'};
 parameters.axis_units='kHz';
 parameters.rf_pwr=2*pi*50e3/sin(theta);

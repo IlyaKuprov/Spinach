@@ -55,11 +55,9 @@ parameters.zerofill=1024;
 parameters.spins={'14N'};
 parameters.rho0=state(spin_system,'Lz','14N');
 parameters.coil=cos(theta)*state(spin_system,'Lz','14N')+...
-                sin(theta)*(state(spin_system,'L+','14N')+...
-                            state(spin_system,'L-','14N'))/2;
+                sin(theta)*state(spin_system,'Lx','14N');
 parameters.Lx=cos(theta)*operator(spin_system,'Lz','14N')+...
-              sin(theta)*(operator(spin_system,'L+','14N')+...
-                          operator(spin_system,'L-','14N'))/2;
+              sin(theta)*operator(spin_system,'Lx','14N');
 parameters.method='average';
 parameters.rf_pwr=2*pi*3.0e6;
 parameters.rf_dur=1.0e-6;

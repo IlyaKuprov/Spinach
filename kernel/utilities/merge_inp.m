@@ -29,53 +29,40 @@
 function [sys,inter]=merge_inp(sys_parts,inter_parts)
 
 % Check consistency
-grumble(sys_parts,inter_parts);
+grumble(sys_parts,inter_parts); 
 
-% Isotope specification
-sys.isotopes={};
-for n=1:numel(sys_parts)
-    sys.isotopes=[sys.isotopes sys_parts{n}.isotopes];
-    sys_parts{n}=rmfield(sys_parts{n},'isotopes');
-end
+% Create structure stubs
+sys.stub=1; inter.stub=1;
 
-% Labels
-sys.labels={};
-for n=1:numel(sys_parts)
-    if isfield(sys_parts{n},'labels')
-        sys.labels=[sys.labels sys_parts{n}.labels];
-        sys_parts{n}=rmfield(sys_parts{n},'labels');
-    end 
-end
-if isempty(sys.labels), sys=rmfield(sys,'labels'); end
+% Fields containing common scalars that are equal 
+[sys,sys_parts]=merge_like_magnet(sys,sys_parts,'magnet');
 
-% Cartesian coordinates
-inter.coordinates={};
-for n=1:numel(inter_parts)
-    inter.coordinates=[inter.coordinates; inter_parts{n}.coordinates];
-    inter_parts{n}=rmfield(inter_parts{n},'coordinates');
-end
+% Fields containing row cell arrays
+[sys,sys_parts]=merge_like_isotopes(sys,sys_parts,'isotopes');
+[sys,sys_parts]=merge_like_isotopes(sys,sys_parts,'labels');
 
-% Zeeman interactions
-inter.zeeman.matrix={};
-for n=1:numel(inter_parts)
-    inter.zeeman.matrix=[inter.zeeman.matrix inter_parts{n}.zeeman.matrix];
-    inter_parts{n}.zeeman=rmfield(inter_parts{n}.zeeman,'matrix');
-    if isempty(fieldnames(inter_parts{n}.zeeman))
-        inter_parts{n}=rmfield(inter_parts{n},'zeeman');
-    end
-end
+% Fields containing column cell arrays
+[inter,inter_parts]=merge_like_coords(inter,inter_parts,'coordinates');
 
-% Scalar couplings
-inter.coupling.scalar=[];
-for n=1:numel(inter_parts)
-    inter.coupling.scalar=blkdiag(inter.coupling.scalar,...
-                                  cell2mat(inter_parts{n}.coupling.scalar));
-    inter_parts{n}.coupling=rmfield(inter_parts{n}.coupling,'scalar');
-    if isempty(fieldnames(inter_parts{n}.coupling))
-        inter_parts{n}=rmfield(inter_parts{n},'coupling');
-    end
-end
-inter.coupling.scalar=num2cell(inter.coupling.scalar);
+% Zeeman interaction specifications
+zeeman_parts=strip(inter_parts,'zeeman'); zeeman.stub=1;
+zeeman=merge_like_isotopes(zeeman,zeeman_parts,'matrix');
+zeeman=merge_like_isotopes(zeeman,zeeman_parts,'scalar');
+zeeman=merge_like_isotopes(zeeman,zeeman_parts,'eigs');
+zeeman=merge_like_isotopes(zeeman,zeeman_parts,'euler');
+zeeman=rmfield(zeeman,'stub'); inter.zeeman=zeeman;
+inter_parts=cellfun(@(x)rmfield(x,'zeeman'),...
+                    inter_parts,'UniformOutput',false);
+
+% Coupling specifications
+coupling_parts=strip(inter_parts,'coupling'); coupling.stub=1;
+coupling=merge_like_couplings(coupling,coupling_parts,'matrix');
+coupling=merge_like_couplings(coupling,coupling_parts,'scalar');
+coupling=merge_like_couplings(coupling,coupling_parts,'eigs');
+coupling=merge_like_couplings(coupling,coupling_parts,'euler');
+coupling=rmfield(coupling,'stub'); inter.coupling=coupling;
+inter_parts=cellfun(@(x)rmfield(x,'coupling'),...
+                    inter_parts,'UniformOutput',false);
 
 % Catch leftover subfields
 for n=1:numel(sys_parts)
@@ -89,12 +76,132 @@ for n=1:numel(inter_parts)
     end
 end
 
+% Delete the stubs
+sys=rmfield(sys,'stub'); inter=rmfield(inter,'stub');
+
 end
 
 % Consistency enforcement
 function grumble(sys_parts,inter_parts)
 if (~iscell(sys_parts))||(~iscell(inter_parts))
     error('both inputs must be cell arrays of data structures.');
+end
+end
+
+% Strip a common field from an array of structures
+function parts_array=strip(parts_array,field_name)
+    parts_array=cellfun(@(x)x.(field_name),parts_array,'UniformOutput',false);
+end
+
+% Merge subsystem fields assuming they hold an optional common scalar
+function [spec,spec_parts]=merge_like_magnet(spec,spec_parts,field_name)
+if isfield(spec_parts{1},field_name)
+    spec.(field_name)=spec_parts{1}.(field_name);
+    spec_parts{1}=rmfield(spec_parts{1},field_name);
+    for n=2:numel(spec_parts)
+        if isfield(spec_parts{n},field_name)
+            if (~isfield(spec,field_name))||...
+               (spec_parts{n}.(field_name)~=spec.(field_name))
+                error(['values of ' field_name ' are not present or not the same in all subsystems.']);
+            else
+                spec_parts{n}=rmfield(spec_parts{n},field_name);
+            end
+        else
+            if isfield(spec,field_name)
+                error(['values of ' field_name ' are not present or not the same in all subsystems.']);
+            end
+        end
+    end
+else
+    for n=2:numel(spec_parts)
+        if isfield(spec_parts{n},field_name)
+            error(['values of ' field_name ' are not present or not the same in all subsystems.']);
+        end
+    end
+end
+end
+
+% Merge subsystem fields assuming optional row cell arrays
+function [spec,spec_parts]=merge_like_isotopes(spec,spec_parts,field_name)
+if isfield(spec_parts{1},field_name)
+    spec.(field_name)=spec_parts{1}.(field_name);
+    spec_parts{1}=rmfield(spec_parts{1},field_name);
+    for n=2:numel(spec_parts)
+        if isfield(spec_parts{n},field_name)
+            if ~isfield(spec,field_name)
+                error([field_name ' is not present in all subsystems.']);
+            else
+                spec.(field_name)=[spec.(field_name) spec_parts{n}.(field_name)];
+                spec_parts{n}=rmfield(spec_parts{n},field_name);
+            end
+        else
+            if isfield(spec,field_name)
+                error([field_name ' is not present in all subsystems.']);
+            end
+        end
+    end
+else
+    for n=2:numel(spec_parts)
+        if isfield(spec_parts{n},field_name)
+            error([field_name ' is not present in all subsystems.']);
+        end
+    end
+end
+end
+
+% Merge subsystem fields assuming optional column cell arrays
+function [spec,spec_parts]=merge_like_coords(spec,spec_parts,field_name)
+if isfield(spec_parts{1},field_name)
+    spec.(field_name)=spec_parts{1}.(field_name);
+    spec_parts{1}=rmfield(spec_parts{1},field_name);
+    for n=2:numel(spec_parts)
+        if isfield(spec_parts{n},field_name)
+            if ~isfield(spec,field_name)
+                error([field_name ' is not present in all subsystems.']);
+            else
+                spec.(field_name)=[spec.(field_name); spec_parts{n}.(field_name)];
+                spec_parts{n}=rmfield(spec_parts{n},field_name);
+            end
+        else
+            if isfield(spec,field_name)
+                error([field_name ' is not present in all subsystems.']);
+            end
+        end
+    end
+else
+    for n=2:numel(spec_parts)
+        if isfield(spec_parts{n},field_name)
+            error([field_name ' is not present in all subsystems.']);
+        end
+    end
+end
+end
+
+% Merge subsystem fields assuming optional square cell arrays
+function [spec,spec_parts]=merge_like_couplings(spec,spec_parts,field_name)
+if isfield(spec_parts{1},field_name)
+    spec.(field_name)=spec_parts{1}.(field_name);
+    spec_parts{1}=rmfield(spec_parts{1},field_name);
+    for n=2:numel(spec_parts)
+        if isfield(spec_parts{n},field_name)
+            if ~isfield(spec,field_name)
+                error([field_name ' is not present in all subsystems.']);
+            else
+                spec.(field_name)=blkdiag(spec.(field_name),spec_parts{n}.(field_name));
+                spec_parts{n}=rmfield(spec_parts{n},field_name);
+            end
+        else
+            if isfield(spec,field_name)
+                error([field_name ' is not present in all subsystems.']);
+            end
+        end
+    end
+else
+    for n=2:numel(spec_parts)
+        if isfield(spec_parts{n},field_name)
+            error([field_name ' is not present in all subsystems.']);
+        end
+    end
 end
 end
 

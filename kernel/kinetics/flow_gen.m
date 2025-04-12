@@ -112,7 +112,7 @@ end
 % siastic praise for a video installation which -- in their view
 % -- symbolised a part of the female anatomy. Nervously checking
 % the call log later, the team were amazed to find a total lack 
-% of response. Until that is, they reached the listener who had 
+% of response. Until, that is, they reached the listener who had 
 % been "absolutely disgusted to hear someone on the programme 
 % use a split infinitive".
 %

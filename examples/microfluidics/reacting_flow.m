@@ -1,7 +1,5 @@
-% Flow in the absence of spin dynamics (Lz is detected), but pre-
-% sence of a unidirectional first-order chemical reaction. The 
-% tail of the pipe has drainage terms set up using a kinetics 
-% superoperator phantom.
+% Flow in the absence of spin dynamics, but presence of two 
+% unidirectional second-order chemical reactions.
 %
 % a.acharya@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -91,10 +89,6 @@ ksubplot(2,2,4); camproj('perspective'); view(-20,15); axis vis3d;
 % Set Z axis extents
 spin_system.mesh.zext=[-0.005 0.01];
 
-% Open the video writer object
-writerObj=VideoWriter('reacting_flow.mp4','MPEG-4');
-writerObj.Quality=100; open(writerObj);
-
 % Run through trajectory
 for n=1:size(traj,3)
 
@@ -142,13 +136,10 @@ for n=1:size(traj,3)
     set(gca,'DataAspectRatio',[1 1 0.025]);
     camorbit(0.5,0); ktitle('endo-NBCN');
 
-    % Grab the frame
-    drawnow(); writeVideo(writerObj,getframe(gcf));
+    % Draw the frame
+    drawnow();
         
 end
-
-% Close the writer object
-close(writerObj);
    
 end
 

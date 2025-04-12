@@ -64,7 +64,7 @@ coupling=rmfield(coupling,'stub'); inter.coupling=coupling;
 inter_parts=cellfun(@(x)rmfield(x,'coupling'),...
                     inter_parts,'UniformOutput',false);
 
-% Catch leftover subfields
+% Catch unhandled subfields
 for n=1:numel(sys_parts)
     if ~isempty(fieldnames(sys_parts{n}))
         error('unhandled subfield in sys.');

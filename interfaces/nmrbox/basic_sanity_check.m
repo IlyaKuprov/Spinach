@@ -1,11 +1,13 @@
-% Tests NMRBox Matalb installation for basic parallel
-% pool sanity and stability.
+% Tests Matlab installation for basic parallel pool sanity
+% and stability. This can be a problem on NMRBox where the
+% user does not have admin rights and the software deploy-
+% ment automation frequently messes things up.
 %
 % ilya.kuprov@weizmann.ac.il
 %
-% <https://spindynamics.org/wiki/index.php?title=nmrbox_sanity_check.m>
+% <https://spindynamics.org/wiki/index.php?title=basic_sanity_check.m>
 
-function nmrbox_sanity_check()
+function basic_sanity_check()
 
 % Kill the parallel pool
 delete(gcp('nocreate'));

@@ -1,4 +1,22 @@
-% Hydrodynamic flow generator on a mesh.
+% Hydrodynamic flow generator on a mesh. Builds diffusion and 
+% flow generator using the mesh parameters in the spin_system
+% object. Syntax:
+%
+%              F=flow_gen(spin_system,parameters)
+%
+% Parameters:
+%
+%    spin_system - Spinach system descriptor object 
+%                  containing mesh subfields produ-
+%                  ced by COMSOL import functions
+%
+%    parameters.diff - diffusion coefficient, m^2/s
+%
+% Outputs:
+%
+%    F - spatial motion generator matrix with the
+%        dimension equal to the number of Voronoi
+%        cells of the mesh
 %
 % a.acharya@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -7,10 +25,8 @@
 
 function F=flow_gen(spin_system,parameters)
 
-% Default is no diffusion
-if ~isfield(parameters,'diff')
-    parameters.diff=0;
-end
+% Default is zero diffusion coefficient
+if ~isfield(parameters,'diff'), parameters.diff=0; end
 
 % Check consistency
 grumble(spin_system,parameters);

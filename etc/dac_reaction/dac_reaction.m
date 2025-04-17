@@ -1,9 +1,11 @@
 % Example Diels-Alder cycloaddition reaction settings: pentadiene 
 % (reactant), acrylonitrile (reactant), exo-norbornene (product),
-% endo-norbornene (product), and cyanomethane (solvent). Atom co-
+% endo-norbornene (product), and acetonitrile (solvent). Atom co-
 % ordinates and chemical shift anisotropies are pulled from a DFT
 % calculation; isotropic chemical shifts and J-couplings are ex-
-% perimental (some J-coupling signs are missing).
+% perimental (some J-coupling signs are missing). Syntax:
+%
+%              [sys,inter,bas,kin]=dac_reaction()
 %
 % Parameters:
 %

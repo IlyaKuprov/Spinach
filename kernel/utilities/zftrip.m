@@ -3,6 +3,10 @@
 % ZFS + Zeeman eigenstates. This is commonly seen in triplet DNP
 % with photo-generated two-electron triplets. Syntax:
 %
+%            rho=zftrip(spin_system,ZFS,pops,Z,B,idx)
+%
+% Parameters:
+%
 %    ZFS      - 3x3 ZFS tensor (Hz) in the laboratory frame
 %               of reference; use zfs2mat() to get it from
 %               D, E, and molecular Euler angles

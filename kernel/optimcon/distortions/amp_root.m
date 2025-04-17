@@ -33,6 +33,7 @@
 %    J         - distortion Jacobian matrix with respect to
 %                the vectorisation of the input, sparse
 %
+% u.rasulov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=amp_root.m>

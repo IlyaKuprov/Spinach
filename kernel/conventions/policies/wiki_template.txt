@@ -35,4 +35,4 @@ Further notes on good and bad practices.
 Links to related functions and documentation sections.
 
 
-''Version 2.9, authors: [[Author 1]]''
+''Version 2.11, authors: [[Author 1]]''

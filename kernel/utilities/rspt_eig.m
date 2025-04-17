@@ -1,6 +1,9 @@
 % Eigensystem of sparse Hamiltonians to user-specified order in
-% RSPT with careful handling of diagonal dominanace and an opti-
-% on to do exact diagonalisation (expensive). Syntax:
+% RSPT with careful handling of diagonal dominance and an opti-
+% on to do exact diagonalisation (expensive). The function also
+% returns eigenvalue derivatives and transition moments between
+% eigenvectors under a user-specified operator. Parametrisation
+% matches use cases in field-swept EPR spectroscopy. Syntax:
 %
 %  [E,V,dE,T,LP]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,B)
 %

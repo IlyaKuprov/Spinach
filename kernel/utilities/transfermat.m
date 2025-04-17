@@ -1,4 +1,4 @@
-% Transfer matrix calculation for linear amplifiers. Syntax:
+% Transfer matrix calculation for linear filters. Syntax:
 %
 %               T=transfermat(amp_inps,amp_outs)
 %

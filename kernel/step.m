@@ -345,9 +345,6 @@ end
 if (~isnumeric(rho))&&(~iscell(rho))
     error('L must be a matrix, a vector, or a cell array thereof.');
 end
-if ~allfinite(rho)
-    error('state descriptor is not finite.');
-end
 if isnumeric(L)
     if ~allfinite(L)
         error('evolution generator is not finite.');
@@ -360,6 +357,19 @@ if iscell(L)
         end
     end
 end
+if isnumeric(rho)
+    if ~allfinite(rho)
+        error('state descriptor is not finite.');
+    end
+end
+if iscell(rho)
+    for n=1:numel(rho)
+        if ~allfinite(rho{n})
+            error('state descriptor is not finite.');
+        end
+    end
+end
+
 end
 
 % Evans boldly put 50 atm of ethylene in a cell with 25 atm of oxygen. The

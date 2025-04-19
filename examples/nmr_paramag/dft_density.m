@@ -6,6 +6,10 @@
 %
 %                    http://dx.doi.org/10.1039/C4CP03106G
 %
+% One outlier point is due to the presence of contact shift due to the isotro-
+% pic hyperfine coupling being non-sero for that particular nucleus. Point mo-
+% del and Kuprov equation do not include contact shifts.
+%
 % g.t.p.charnock@oerc.ox.ac.uk
 % ilya.kuprov@weizmann.ac.il
 

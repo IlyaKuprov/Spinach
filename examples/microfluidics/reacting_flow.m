@@ -1,6 +1,8 @@
 % Flow in the absence of spin dynamics, but presence of two 
 % unidirectional second-order chemical reactions.
 %
+% Simulation time: seconds.
+%
 % a.acharya@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 
@@ -86,14 +88,12 @@ ksubplot(2,2,2); camproj('perspective'); view(-20,15); axis vis3d;
 ksubplot(2,2,3); camproj('perspective'); view(-20,15); axis vis3d;
 ksubplot(2,2,4); camproj('perspective'); view(-20,15); axis vis3d;
 
-% Set Z axis extents
-spin_system.mesh.zext=[-0.005 0.01];
-
 % Run through trajectory
 for n=1:size(traj,3)
 
     % First reactant
     ksubplot(2,2,1); 
+    spin_system.mesh.zext=[-0.005 0.01];
     set(groot,'CurrentFigure',1); cla;
     conc=squeeze(full(real(traj(1,:,n))));
     mesh_plot(spin_system,0,0);
@@ -101,10 +101,11 @@ for n=1:size(traj,3)
     zlim(spin_system.mesh.zext);
     kzlabel('concentration, a.u.');
     set(gca,'DataAspectRatio',[1 1 0.025]);
-    camorbit(0.5,0); ktitle('cyclopentadiene');
+    camorbit(0.5,0.02); ktitle('cyclopentadiene');
 
     % Second reactant
     ksubplot(2,2,2); 
+    spin_system.mesh.zext=[-0.005 0.01];
     set(groot,'CurrentFigure',1); cla;
     conc=squeeze(full(real(traj(2,:,n))));
     mesh_plot(spin_system,0,0);
@@ -112,29 +113,31 @@ for n=1:size(traj,3)
     zlim(spin_system.mesh.zext);
     kzlabel('concentration, a.u.');
     set(gca,'DataAspectRatio',[1 1 0.025]);
-    camorbit(0.5,0); ktitle('acrylonitrile');
+    camorbit(0.5,0.02); ktitle('acrylonitrile');
 
     % First product
     ksubplot(2,2,3); 
+    spin_system.mesh.zext=[-0.005 0.01]/8;
     set(groot,'CurrentFigure',1); cla;
     conc=squeeze(full(real(traj(3,:,n))));
     mesh_plot(spin_system,0,0);
     conc_plot(spin_system,conc');
     zlim(spin_system.mesh.zext);
     kzlabel('concentration, a.u.');
-    set(gca,'DataAspectRatio',[1 1 0.025]);
-    camorbit(0.5,0); ktitle('exo-NBCN');
+    set(gca,'DataAspectRatio',[1 1 0.025/8]);
+    camorbit(0.5,0.02); ktitle('exo-NBCN');
 
     % Second product
     ksubplot(2,2,4); 
+    spin_system.mesh.zext=[-0.005 0.01]/8;
     set(groot,'CurrentFigure',1); cla;
     conc=squeeze(full(real(traj(4,:,n))));
     mesh_plot(spin_system,0,0);
     conc_plot(spin_system,conc');
     zlim(spin_system.mesh.zext);
     kzlabel('concentration, a.u.');
-    set(gca,'DataAspectRatio',[1 1 0.025]);
-    camorbit(0.5,0); ktitle('endo-NBCN');
+    set(gca,'DataAspectRatio',[1 1 0.025/8]);
+    camorbit(0.5,0.02); ktitle('endo-NBCN');
 
     % Draw the frame
     drawnow();

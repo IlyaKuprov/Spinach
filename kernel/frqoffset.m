@@ -1,4 +1,4 @@
-% Adds omega*Lz Zeeman frequency offsets to the Hamiltonian;
+% Adds omega*Lz Larmor frequency offsets to the Hamiltonian;
 % this is useful in liquid state NMR experiments. Syntax:
 %
 %           H=frqoffset(spin_system,H,parameters)
@@ -9,12 +9,12 @@
 %                       on superoperator
 %
 %    parameters.spins - a cell array giving the spins that
-%                       the offsetrs should be applied to,
+%                       the offsets should be applied to,
 %                       e.g. {'1H','13C'}
 %
-%   parameters.offset - a vector giving Zeeman offsets on
-%                       each of the spins listed in pa-
-%                       rameters.spins array.
+%   parameters.offset - a vector of offsets (in Hz) on
+%                       each of the spins listed in the
+%                       parameters.spins array
 %
 % Outputs:
 %
@@ -43,7 +43,7 @@ if numel(unique_spins)==numel(parameters.spins)
     % Simply apply the offsets
     for n=find(parameters.offset~=0)
         report(spin_system,['applying ' num2str(parameters.offset(n)) ...
-                            ' Hz Zeeman frequency offset to ' parameters.spins{n} '...']);
+                            ' Hz Larmor frequency offset to ' parameters.spins{n} '...']);
         H=H+2*pi*parameters.offset(n)*operator(spin_system,'Lz',parameters.spins{n});
     end
     
@@ -60,7 +60,7 @@ else
     % Apply the offsets
     for n=find(unique_offsets~=0)
         report(spin_system,['applying ' num2str(unique_offsets(n)) ...
-                            ' Hz Zeeman frequency offset to ' unique_spins{n} '...']);
+                            ' Hz Larmor frequency offset to ' unique_spins{n} '...']);
         H=H+2*pi*unique_offsets(n)*operator(spin_system,'Lz',unique_spins{n});
     end
     

@@ -1,53 +1,49 @@
 % Marks 2D microfluidic mesh vertices as inactive in hydrodyna-
 % mic and diffusive transport processes. Syntax:
 %
-%       spin_system=mesh_inact(spin_system,vertex_list)
+%                mesh=mesh_inact(mesh,vertex_list)
 %
 % Parameters:
 %
-%    spin_system - Spinach data structure with a .mesh
-%                  subfield present
+%    mesh        - Spinach mesh object
 %
 %    vertex_list - row vector of integers specifying 
 %                  the vertices to be inactivated
 %
 % Outputs:
 %
-%    spin_system - updated data structure
+%    mesh        - updated mesh object
 %   
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=mesh_inact.m>
 
-function spin_system=mesh_inact(spin_system,vertex_list)
+function mesh=mesh_inact(mesh,vertex_list)
 
 % Check consistency
-grumble(spin_system,vertex_list);
+grumble(mesh,vertex_list);
 
 % Update the active vertex list
-spin_system.mesh.idx.active=setdiff(spin_system.mesh.idx.active,vertex_list);
+mesh.idx.active=setdiff(mesh.idx.active,vertex_list);
 
 % Zero out velocities and concentrations, if present
-vertex_list=setdiff(1:numel(spin_system.mesh.x),spin_system.mesh.idx.active);
-if isfield(spin_system.mesh,'u'), spin_system.mesh.u(vertex_list)=0; end
-if isfield(spin_system.mesh,'v'), spin_system.mesh.v(vertex_list)=0; end
-if isfield(spin_system.mesh,'c'), spin_system.mesh.c(vertex_list,:)=0; end
+vertex_list=setdiff(1:numel(mesh.x),mesh.idx.active);
+if isfield(mesh,'u'), mesh.u(vertex_list)=0; end
+if isfield(mesh,'v'), mesh.v(vertex_list)=0; end
+if isfield(mesh,'c'), mesh.c(vertex_list,:)=0; end
 
 end
 
 % Consistency enforcement
-function grumble(spin_system,vertex_list)
-if ~isfield(spin_system,'mesh')
-    error('mesh information is missing from the spin_system structure.');
-end
-if ~isfield(spin_system.mesh,'idx')
-    error('indexing information is missing from spin_system.mesh structure.');
+function grumble(mesh,vertex_list)
+if ~isfield(mesh,'idx')
+    error('indexing information is missing from mesh structure.');
 end
 if (~isnumeric(vertex_list))||(~isreal(vertex_list))||...
    (~isrow(vertex_list))||any(mod(vertex_list,1)~=0)||any(vertex_list<1)
    error('vertex_list must be a row vector of positive integers.');
 end
-if any(vertex_list>numel(spin_system.mesh.x))
+if any(vertex_list>numel(mesh.x))
     error('vertex index exceeds the number of vertices in the mesh.');
 end
 end

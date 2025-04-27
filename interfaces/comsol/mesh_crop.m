@@ -2,109 +2,102 @@
 % remove anything outside the user-specified vertex coordi-
 % nate ranges. Syntax:
 %
-%     spin_system=mesh_crop(spin_system,xrange,yrange)
+%               mesh=mesh_crop(mesh,ranges)
 %
 % Parameters:
 %
-%    spin_system - Spinach data structure with 
-%                  a .mesh subfield present
+%    mesh        - Spinach mesh object
 %
-%    xrange      - two-element vector specify-
-%                  ing X axis range, [min max]
-%
-%    yrange      - two-element vector specify-
-%                  ing Y axis range, [min max]
+%    ranges      - {[xmin xmax],[ymin ymax]}
 %
 % Outputs:
 %
-%    spin_system - updated data structure
+%    mesh        - updated mesh object
 %
 % a.acharya@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=mesh_crop.m>
 
-function spin_system=mesh_crop(spin_system,xrange,yrange)
+function mesh=mesh_crop(mesh,ranges)
 
 % Check consistency
-grumble(spin_system,xrange,yrange);
+grumble(mesh,ranges);
 
 % Remove tessellation and preplot
-if isfield(spin_system.mesh,'vor')
-    spin_system.mesh=rmfield(spin_system.mesh,'vor');
+if isfield(mesh,'vor')
+    mesh=rmfield(mesh,'vor');
     report(spin_system,'WARNING: out-of-date tessellation information removed.');
 end
-if isfield(spin_system.mesh,'plot')
-    spin_system.mesh=rmfield(spin_system.mesh,'plot');
+if isfield(mesh,'plot')
+    mesh=rmfield(mesh,'plot');
     report(spin_system,'WARNING: out-of-date preplot information removed.');
 end
 
 % Find vertices in the user-specified range
-vertices_in_range=(spin_system.mesh.x>=xrange(1))&(spin_system.mesh.x<=xrange(2))&...
-                  (spin_system.mesh.y>=yrange(1))&(spin_system.mesh.y<=yrange(2));
+vertices_in_range=(mesh.x>=ranges{1}(1))&(mesh.x<=ranges{1}(2))&...
+                  (mesh.y>=ranges{2}(1))&(mesh.y<=ranges{2}(2));
 vertices_in_range=find(vertices_in_range);
 
 % Find edges in the user-specified range
-edges_in_range=ismember(spin_system.mesh.idx.edges(:,1),vertices_in_range)&...
-               ismember(spin_system.mesh.idx.edges(:,2),vertices_in_range);
-spin_system.mesh.idx.edges=spin_system.mesh.idx.edges(edges_in_range,:);
+edges_in_range=ismember(mesh.idx.edges(:,1),vertices_in_range)&...
+               ismember(mesh.idx.edges(:,2),vertices_in_range);
+mesh.idx.edges=mesh.idx.edges(edges_in_range,:);
 
 % Re-index edges with updated vertices 
-[~,spin_system.mesh.idx.edges(:,1)]=ismember(spin_system.mesh.idx.edges(:,1),vertices_in_range); 
-[~,spin_system.mesh.idx.edges(:,2)]=ismember(spin_system.mesh.idx.edges(:,2),vertices_in_range);
+[~,mesh.idx.edges(:,1)]=ismember(mesh.idx.edges(:,1),vertices_in_range); 
+[~,mesh.idx.edges(:,2)]=ismember(mesh.idx.edges(:,2),vertices_in_range);
 
 % Find triangles in the user-specified range 
-tris_in_range=ismember(spin_system.mesh.idx.triangles(:,1),vertices_in_range)&...
-              ismember(spin_system.mesh.idx.triangles(:,2),vertices_in_range)&...
-              ismember(spin_system.mesh.idx.triangles(:,3),vertices_in_range);
-spin_system.mesh.idx.triangles=spin_system.mesh.idx.triangles(tris_in_range,:);
+tris_in_range=ismember(mesh.idx.triangles(:,1),vertices_in_range)&...
+              ismember(mesh.idx.triangles(:,2),vertices_in_range)&...
+              ismember(mesh.idx.triangles(:,3),vertices_in_range);
+mesh.idx.triangles=mesh.idx.triangles(tris_in_range,:);
 
 % Re-index trianges with updated vertices 
-[~,spin_system.mesh.idx.triangles(:,1)]=ismember(spin_system.mesh.idx.triangles(:,1),vertices_in_range);
-[~,spin_system.mesh.idx.triangles(:,2)]=ismember(spin_system.mesh.idx.triangles(:,2),vertices_in_range);
-[~,spin_system.mesh.idx.triangles(:,3)]=ismember(spin_system.mesh.idx.triangles(:,3),vertices_in_range);
+[~,mesh.idx.triangles(:,1)]=ismember(mesh.idx.triangles(:,1),vertices_in_range);
+[~,mesh.idx.triangles(:,2)]=ismember(mesh.idx.triangles(:,2),vertices_in_range);
+[~,mesh.idx.triangles(:,3)]=ismember(mesh.idx.triangles(:,3),vertices_in_range);
 
 % Find rectangles in the user-specified range
-rect_in_range=ismember(spin_system.mesh.idx.rectangles(:,1),vertices_in_range)&...
-              ismember(spin_system.mesh.idx.rectangles(:,2),vertices_in_range)&...
-              ismember(spin_system.mesh.idx.rectangles(:,3),vertices_in_range)&...
-              ismember(spin_system.mesh.idx.rectangles(:,4),vertices_in_range);
-spin_system.mesh.idx.rectangles=spin_system.mesh.idx.rectangles(rect_in_range,:);
+rect_in_range=ismember(mesh.idx.rectangles(:,1),vertices_in_range)&...
+              ismember(mesh.idx.rectangles(:,2),vertices_in_range)&...
+              ismember(mesh.idx.rectangles(:,3),vertices_in_range)&...
+              ismember(mesh.idx.rectangles(:,4),vertices_in_range);
+mesh.idx.rectangles=mesh.idx.rectangles(rect_in_range,:);
 
 % Re-index rectangles with updated vertices 
-[~,spin_system.mesh.idx.rectangles(:,1)]=ismember(spin_system.mesh.idx.rectangles(:,1),vertices_in_range);     
-[~,spin_system.mesh.idx.rectangles(:,2)]=ismember(spin_system.mesh.idx.rectangles(:,2),vertices_in_range); 
-[~,spin_system.mesh.idx.rectangles(:,3)]=ismember(spin_system.mesh.idx.rectangles(:,3),vertices_in_range);
-[~,spin_system.mesh.idx.rectangles(:,4)]=ismember(spin_system.mesh.idx.rectangles(:,4),vertices_in_range);
+[~,mesh.idx.rectangles(:,1)]=ismember(mesh.idx.rectangles(:,1),vertices_in_range);     
+[~,mesh.idx.rectangles(:,2)]=ismember(mesh.idx.rectangles(:,2),vertices_in_range); 
+[~,mesh.idx.rectangles(:,3)]=ismember(mesh.idx.rectangles(:,3),vertices_in_range);
+[~,mesh.idx.rectangles(:,4)]=ismember(mesh.idx.rectangles(:,4),vertices_in_range);
 
 % Crop coordinates, velocities and concentrations
-spin_system.mesh.x=spin_system.mesh.x(vertices_in_range); 
-spin_system.mesh.y=spin_system.mesh.y(vertices_in_range);  
-if isfield(spin_system.mesh,'u'), spin_system.mesh.u=spin_system.mesh.u(vertices_in_range); end
-if isfield(spin_system.mesh,'v'), spin_system.mesh.v=spin_system.mesh.v(vertices_in_range); end
-if isfield(spin_system.mesh,'c'), spin_system.mesh.c=spin_system.mesh.c(vertices_in_range,:); end
+mesh.x=mesh.x(vertices_in_range); 
+mesh.y=mesh.y(vertices_in_range);  
+if isfield(mesh,'u'), mesh.u=mesh.u(vertices_in_range); end
+if isfield(mesh,'v'), mesh.v=mesh.v(vertices_in_range); end
+if isfield(mesh,'c'), mesh.c=mesh.c(vertices_in_range,:); end
 
 % First guess active vertices
-if isfield(spin_system.mesh.idx,'active')
-    report(spin_system,'WARNING: active vertex list overwritten.');
+if isfield(mesh.idx,'active')
+    report(spin_system,'WARNING: active vertex list was overwritten.');
 end
-spin_system.mesh.idx.active=unique(spin_system.mesh.idx.triangles(:));
+mesh.idx.active=unique(mesh.idx.triangles(:));
 
 end
 
 % Consistency enforcement
-function grumble(spin_system,xrange,yrange)
-if ~isfield(spin_system,'mesh')
-    error('mesh information is missing from the spin_system structure.');
+function grumble(mesh,ranges)
+if ~isfield(mesh,'idx')
+    error('vertex index is missing from the mesh structure.');
 end
-if ~isfield(spin_system.mesh,'idx')
-    error('vertex index is missing from spin_system.mesh structure.');
-end
-if (~isnumeric(xrange))||(~isreal(xrange))||(numel(xrange)~=2)||(xrange(1)>=xrange(2))
-    error('xrange must be a two-element real vector in ascending order.');
-end
-if (~isnumeric(yrange))||(~isreal(yrange))||(numel(yrange)~=2)||(yrange(1)>=yrange(2))
-    error('yrange must be a two-element real vector in ascending order.');
+if (~iscell(ranges))||(numel(ranges)~=2)||...
+   (~isnumeric(ranges{1}))||(~isreal(ranges{1}))||...
+   (numel(ranges{1})~=2)||(ranges{1}(1)>=ranges{1}(2))||...
+   (~isnumeric(ranges{2}))||(~isreal(ranges{2}))||...
+   (numel(ranges{2})~=2)||(ranges{2}(1)>=ranges{2}(2))
+    error('ranges must be {[xmin xmax],[ymin ymax]}');
 end
 end
 

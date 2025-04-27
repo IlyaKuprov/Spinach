@@ -81,16 +81,20 @@ parfor k=1:ncells %#ok<*PFBNS>
             v_m=[mesh.u(mesh.idx.active(m)); mesh.v(mesh.idx.active(m))];
             v_k=[mesh.u(mesh.idx.active(k)); mesh.v(mesh.idx.active(k))];
 
-            % Contribution to the off-diag part
-            F_km=+(1/A_k)*(b_km/norm(r_km,2))*parameters.diff ...
-                 -(1/A_k)*(b_km/norm(r_km,2))*dot((v_m+v_k)/2,r_km)/2;
+            % Flow contribution to the off-diag part
+            F_km=-(1/A_k)*(b_km/norm(r_km,2))*dot((v_m+v_k)/2,r_km)/2;
 
-            % Add the terms to the generator
+            % Flow goes one way
             if F_km>0
-                F_local=[F_local; k m  F_km];
+                F_local=[F_local; k, m, +F_km];
             else
-                F_local=[F_local; m k -F_km];
+                F_local=[F_local; m, k, -F_km];
             end
+            
+            % Diffusion goes both ways
+            D_km=(1/A_k)*(b_km/norm(r_km,2))*parameters.diff;
+            F_local=[F_local; k m  D_km];
+            F_local=[F_local; m k  D_km];
 
         end
 

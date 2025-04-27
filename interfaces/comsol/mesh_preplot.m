@@ -1,29 +1,24 @@
 % Mesh preprocessing for drawing. Creates edge, triangle, and 
 % rectangle data structures needed for fast plotting later.
 % Syntax:
-%               spin_system=mesh_preplot(spin_system)
+%                   mesh=mesh_preplot(mesh)
 %
 % Parameters:
 %
-%    spin_system - Spinach data structure with a .mesh
-%                  subfield present
+%    mesh - Spinach mesh object
 %
 % Outputs:
 %
-%    spin_system - Spinach data structure with a .plot
-%                  subfield added to the mesh structure
+%    mesh - updated mesh object
 %
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=mesh_preplot.m>
 
-function spin_system=mesh_preplot(spin_system)
+function mesh=mesh_preplot(mesh)
 
 % Check consistency
-grumble(spin_system);
-
-% Pull mesh out
-mesh=spin_system.mesh;
+grumble(mesh);
 
 % Prepare edge array for plotting 
 nlines=size(mesh.idx.edges,1); A=zeros(1,3*nlines); B=zeros(1,3*nlines);
@@ -65,20 +60,14 @@ for n=1:numel(mesh.vor.cells)
 end
 mesh.plot.vor_a=A; mesh.plot.vor_b=B;
 
-% Put the mesh back in
-spin_system.mesh=mesh;
-
 end
 
 % Consistency enforcement
-function grumble(spin_system)
-if ~isfield(spin_system,'mesh')
-    error('mesh information is missing from the spin_system structure.');
-end
-if ~isfield(spin_system.mesh,'idx')
+function grumble(mesh)
+if ~isfield(mesh,'idx')
     error('vertex index is missing from spin_system.mesh structure.');
 end
-if ~isfield(spin_system.mesh,'vor')
+if ~isfield(mesh,'vor')
     error('Voronoi tessellation information is missing from spin_system.mesh structure.');
 end
 end

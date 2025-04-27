@@ -159,15 +159,6 @@ end
 % Process internal tolerances
 [spin_system,sys]=tolerances(spin_system,sys);
 
-% Tidy up the cache
-if (~isworkernode)&&...
-   (~ismember('hygiene',spin_system.sys.disable))&&...
-   (~ismember('op_cache',spin_system.sys.enable))&&...
-   (~ismember('ham_cache',spin_system.sys.enable))&&...
-   (~ismember('prop_cache',spin_system.sys.enable))
-    cacheman(spin_system); 
-end
-
 % Disabled features report
 if ~isempty(spin_system.sys.disable)
     report(spin_system,'WARNING: the following functionality is disabled by the user');
@@ -329,6 +320,15 @@ if ~isworkernode
 
     end
     
+end
+
+% Tidy up the cache
+if (~isworkernode)&&...
+   (~ismember('hygiene',spin_system.sys.disable))&&...
+   (~ismember('op_cache',spin_system.sys.enable))&&...
+   (~ismember('ham_cache',spin_system.sys.enable))&&...
+   (~ismember('prop_cache',spin_system.sys.enable))
+    cacheman(spin_system); 
 end
 
 % Make sure GPUs are present

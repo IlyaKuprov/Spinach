@@ -12,28 +12,28 @@ function reacting_flow_nmr()
 % Import Diels-Alder cycloaddition
 [sys,inter,bas,kin]=dac_reaction();
 
+% Import hydrodynamics information
+comsol.mesh_file='mesh-4ulm.txt';
+comsol.velo_file='velocity-field-4ulm.txt';
+comsol.crop={[286.8 287.5],[576.0 579.0]};
+comsol.inactivate=[9 10 19 30 20 25 14 13   ...
+                   3372 3373 3380 3381 3382 ...
+                   3386 3169 3185 3201 3054 ...
+                   3077 3055 3053 3078 3186 ...
+                   3168 875 899 897 877 876 ...
+                   860 858 885 859 883];
+mesh=comsol_import(comsol);
+
 % Magnet field
 sys.magnet=14.1;
 
 % This needs a GPU
-sys.enable={'greedy'};
+sys.enable={'greedy','gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
-
-% COMSOL mesh import
-spin_system=comsol_mesh(spin_system,'mesh-4ulm.txt');            % Read the mesh
-spin_system=comsol_velo(spin_system,'velocity-field-4ulm.txt');  % Read velocities
-spin_system=mesh_crop(spin_system,[286.8 287.5],[576.0 579.0]);  % Crop the mesh
-spin_system=mesh_inact(spin_system,[9 10 19 30 20 25 14 13   ...
-                                    3372 3373 3380 3381 3382 ...
-                                    3386 3169 3185 3201 3054 ... % Prune out edge vertices
-                                    3077 3055 3053 3078 3186 ...
-                                    3168 875 899 897 877 876 ...
-                                    860 858 885 859 883]);      
-spin_system=mesh_vorn(spin_system);                              % Run Voronoi tessellation
-spin_system=mesh_preplot(spin_system);                           % Run output preprocessing
+spin_system.mesh=mesh;
 
 %% Concentration dynamics stage
 
@@ -52,7 +52,7 @@ K=@(x)([-k1*x(2)-k2*x(2)  0                0      0     0;
 parameters.diff=1e-7;
 
 % Timing parameters
-chem_dt=20; chem_nsteps=280;
+chem_dt=20; chem_nsteps=501;
 
 % Get diffusion and flow generator
 GF=flow_gen(spin_system,parameters);
@@ -65,7 +65,7 @@ chem_traj(1,1240,1)=0.50; chem_traj(2,1246,1)=0.25;
 for n=1:chem_nsteps
 
     % Keep the user informed
-    report(spin_system,['chemistry time step ' int2str(n) ...
+    report(spin_system,['chemistry + hydrodynamics time step ' int2str(n) ...
                         '/' int2str(chem_nsteps)]);
 
     % Build a kinetics generator in each cell
@@ -97,7 +97,7 @@ parfor n=1:spin_system.mesh.vor.ncells
     D{n}=griddedInterpolant(chem_time_grid,squeeze(chem_traj(1,n,:)),'makima','none');
 end
 
-%% Full dynamics stage
+%% Full chemistry + hydrodynamics + spin dynamics stage
 
 % Build chemical reaction generators
 G1=react_gen(spin_system,kin{1});
@@ -122,7 +122,7 @@ coil=kron(coil_ph,coil);
 parameters.spins={'1H'};
 parameters.offset=2328;
 parameters.sweep=3500;
-parameters.nsteps=2048;
+parameters.nsteps=1024;
 
 % Time step of NMR stage
 nmr_dt=1/parameters.sweep;
@@ -131,9 +131,9 @@ nmr_dt=1/parameters.sweep;
 H=hamiltonian(assume(spin_system,'nmr'));
 H=frqoffset(spin_system,H,parameters);
 R=relaxation(spin_system);
-F=polyadic({{GF,opium(size(H,1),1)}});
-H=polyadic({{opium(size(GF,1),1),H}});
-R=polyadic({{opium(size(GF,1),1),R}});
+F=gpuArray(polyadic({{GF,opium(size(H,1),1)}}));
+H=gpuArray(polyadic({{opium(size(GF,1),1),H}}));
+R=gpuArray(polyadic({{opium(size(GF,1),1),R}}));
 
 % Build state operators
 LzA=state(spin_system,'Lz',spin_system.chem.parts{1});
@@ -144,13 +144,19 @@ LzD=state(spin_system,'Lz',spin_system.chem.parts{4});
 % Preallocate fieds array
 fids=cell(chem_nsteps,1);
 
+% Parfor prep
+n_vals=1:25:chem_nsteps;
+
 % Loop over starting points
-for n=1:chem_nsteps
+parfor j=1:numel(n_vals)
+
+    % dereference
+    n=n_vals(j);
 
     % Build the initial condition
     eta=cell(spin_system.mesh.vor.ncells,1);
     start_time=chem_time_grid(n);
-    parfor k=1:spin_system.mesh.vor.ncells
+    for k=1:spin_system.mesh.vor.ncells
         eta{k}=A{k}(start_time)*LzA+B{k}(start_time)*LzB+...
                C{k}(start_time)*LzC+D{k}(start_time)*LzD;    
     end
@@ -178,7 +184,7 @@ for n=1:chem_nsteps
         % Build the kinetics generator
         K_L=cell(spin_system.mesh.vor.ncells,1);
         K_R=cell(spin_system.mesh.vor.ncells,1);
-        parfor m=1:spin_system.mesh.vor.ncells %#ok<*PFBNS>
+        for m=1:spin_system.mesh.vor.ncells %#ok<*PFBNS>
 
             % Build the left interval edge kinetics generator
             K_L{m}=k1*G1{1}*B{m}(timing_grid(k))+ ...   % Reaction 1 from substance A
@@ -208,12 +214,12 @@ for n=1:chem_nsteps
     end
 
     % Store the FID
-    fids{n}=current_fid;
+    fids{j}=current_fid;
 
 end
 
 % Merge and apodisation
-fids=cell2mat(fids);
+fids(cellfun(@isempty,fids))=[]; fids=cell2mat(fids);
 fids=apodisation(spin_system,fids,{{},{'exp',6'}});
 
 % Zerofilling and Fourier transform
@@ -223,7 +229,7 @@ specs=fftshift(fft(fids,16384,2),2);
 parameters.axis_units='ppm';
 parameters.zerofill=16384;
 spec_ax=axis_1d(spin_system,parameters);
-time_ax=(1:size(fids,1))-1;
+time_ax=chem_time_grid(1:25:chem_nsteps);
 
 % Waterfall plot
 [time_ax,spec_ax]=meshgrid(time_ax,spec_ax); figure();

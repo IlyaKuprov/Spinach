@@ -1,14 +1,12 @@
-% A shortcut to the parallel pool shutdown command. When
-% a Ctrl-C is pressed halfway through a parallel calcula-
-% tion, Matlab would sometimes not terminate the worker
-% processes, and the parallel pool would get stuck until
-% all workers have computed their chunks. Syntax:
+% Gives Matlab a good smack every time MDCS gets its kni-
+% ckers in a twist. Syntax:
 %
 %                        smack()
 % 
-% This function forcibly shuts down the parallel pool and
-% clears the workspace; do not use it in any way other
-% than from the command line.
+% This function shuts down the parallel pool, clears the
+% workspace, clears the GPUs, and makes sure there are no
+% crashed MDCS jobs left over. This function should only
+% be used from the command line.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -19,13 +17,17 @@ function smack()
 % Kill the parallel pool
 delete(gcp('nocreate'));
 
+% Clear out crashed jobs
+myCluster=parcluster('Processes');
+delete(myCluster.Jobs);
+
 % Close all handles
 fclose('all');
 
-% Clear variables
+% Clear the workspace
 clear('all'); %#ok<CLALL>
 
-% Reset GPUs
+% Reset all GPUs
 for n=1:gpuDeviceCount
     gpuDevice(n).reset;
 end

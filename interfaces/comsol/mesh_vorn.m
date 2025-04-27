@@ -1,60 +1,55 @@
 % Voronoi tessellation of a 2D COMSOL mesh. Syntax:
 %
-%        spin_system=mesh_vorn(spin_system)
+%                 mesh=mesh_vorn(mesh)
 %
 % Parameters:
 %
-%    spin_system - Spinach data structure with a .mesh
-%                  subfield present
+%    mesh - Spinach mesh object
 %
 % Outputs:
 %
-%    spin_system - Spinach data structure with a .vor
-%                  subfield added to the mesh structure
+%    mesh - updated mesh object
 %
 % ilya.kuprov@weizmann.ac.il
 % a.acharya@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=mesh_vorn.m>
 
-function spin_system=mesh_vorn(spin_system)
+function mesh=mesh_vorn(mesh)
 
 % Check consistency
-grumble(spin_system);
+grumble(mesh);
 
 % Run Voronoi tessellation of the mesh
-[V,C]=voronoin([spin_system.mesh.x ...
-                spin_system.mesh.y]);
-spin_system.mesh.vor.vertices=V; 
-spin_system.mesh.vor.cells=C;
+[V,C]=voronoin([mesh.x ...
+                mesh.y]);
+mesh.vor.vertices=V; 
+mesh.vor.cells=C;
 
 % Keep only active cells
-spin_system.mesh.vor.cells=spin_system.mesh.vor.cells(spin_system.mesh.idx.active);
-spin_system.mesh.vor.ncells=numel(spin_system.mesh.vor.cells);
+mesh.vor.cells=mesh.vor.cells(mesh.idx.active);
+mesh.vor.ncells=numel(mesh.vor.cells);
 
 % Voronoi cell area calculation
-vor_cell_areas=zeros(spin_system.mesh.vor.ncells,1);
-for n=1:spin_system.mesh.vor.ncells
-    vor_xcoords=spin_system.mesh.vor.vertices(spin_system.mesh.vor.cells{n},1);
-    vor_ycoords=spin_system.mesh.vor.vertices(spin_system.mesh.vor.cells{n},2);
+vor_cell_areas=zeros(mesh.vor.ncells,1);
+for n=1:mesh.vor.ncells
+    vor_xcoords=mesh.vor.vertices(mesh.vor.cells{n},1);
+    vor_ycoords=mesh.vor.vertices(mesh.vor.cells{n},2);
     vor_cell_areas(n)=polyarea(vor_xcoords,vor_ycoords);  
 end 
 
 % Add weights to mesh structure 
-spin_system.mesh.vor.weights=vor_cell_areas;
+mesh.vor.weights=vor_cell_areas;
 
 % Find the maximum number of vertices making up the cell
-spin_system.mesh.vor.max_cell_size=max(cellfun(@numel,spin_system.mesh.vor.cells));
+mesh.vor.max_cell_size=max(cellfun(@numel,mesh.vor.cells));
 
 end
 
 % Consistency enforcement
-function grumble(spin_system)
-if ~isfield(spin_system,'mesh')
-    error('mesh information is missing from the spin_system structure.');
-end
-if ~isfield(spin_system.mesh,'idx')
-    error('vertex index is missing from spin_system.mesh structure.');
+function grumble(mesh)
+if ~isfield(mesh,'idx')
+    error('vertex index is missing from mesh structure.');
 end
 end
 

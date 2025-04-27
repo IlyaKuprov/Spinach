@@ -6,6 +6,18 @@
 
 function plain_diff()
 
+% Import hydrodynamics information
+comsol.mesh_file='mesh-4ulm.txt';
+comsol.velo_file='velocity-field-4ulm.txt';
+comsol.crop={[286.8 287.5],[576.0 579.0]};
+comsol.inactivate=[9 10 19 30 20 25 14 13   ...
+                   3372 3373 3380 3381 3382 ...
+                   3386 3169 3185 3201 3054 ...
+                   3077 3055 3053 3078 3186 ...
+                   3168 875 899 897 877 876 ...
+                   860 858 885 859 883];
+mesh=comsol_import(comsol);
+
 % One proton
 sys.magnet=14.1;
 sys.isotopes={'1H'};
@@ -19,24 +31,11 @@ bas.approximation='none';
 
 % Algorithmic switches
 sys.disable={'trajlevel'};
-sys.enable={'gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
-
-% COMSOL mesh and velocity field import
-spin_system=comsol_mesh(spin_system,'mesh-4ulm.txt');            % Read the mesh
-spin_system=comsol_velo(spin_system,'velocity-field-4ulm.txt');  % Read velocities
-spin_system=mesh_crop(spin_system,[286.8 287.5],[576.0 579.0]);  % Crop the mesh
-spin_system=mesh_inact(spin_system,[9 10 19 30 20 25 14 13   ...
-                                    3372 3373 3380 3381 3382 ...
-                                    3386 3169 3185 3201 3054 ... % Prune out edge vertices
-                                    3077 3055 3053 3078 3186 ...
-                                    3168 875 899 897 877 876 ...
-                                    860 858 885 859 883]);      
-spin_system=mesh_vorn(spin_system);                              % Run Voronoi tessellation
-spin_system=mesh_preplot(spin_system);                           % Run output preprocessing
+spin_system.mesh=mesh;
 
 % Initial condition: Lz in one cell in the middle
 parameters.rho0_ph{1}=zeros(spin_system.mesh.vor.ncells,1);
@@ -50,8 +49,8 @@ parameters.coil_st{1}=state(spin_system,'Lz','1H');
 % Sequence and timing parameters
 parameters.spins={'1H'};
 parameters.offset=0;
-parameters.dt=160; 
-parameters.npoints=70;
+parameters.dt=50;        % step length, seconds
+parameters.npoints=500;  % number of steps
 
 % Set assumptions
 spin_system=assume(spin_system,'nmr');
@@ -69,7 +68,7 @@ parameters.R_ph={ones(2659,1)};
 % Just diffusion
 spin_system.mesh.u=0*spin_system.mesh.u;
 spin_system.mesh.v=0*spin_system.mesh.v;
-parameters.diff=1e-7;
+parameters.diff=1e-7; % m^2/s
 
 % Drainage in the distal pipe
 drainage=zeros(2659,1); 

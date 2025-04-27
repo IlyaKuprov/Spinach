@@ -1,16 +1,12 @@
 % Imports ASCII 2D mesh files produced by COMSOL. Syntax:
 %
-%      spin_system=comsol_mesh(spin_system,file_name)
+%                mesh=comsol_mesh(file_name)
 %
 % Parameters:
-%
-%    spin_system  - Spinach spin system object
 %
 %    file_name    - a character string
 %
 % Ouputs:
-%
-%    the following fields are added to spin_system object
 %
 %       mesh.x, mesh.y      - column vectors with vertex
 %                             coordinates
@@ -29,7 +25,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=comsol_mesh.m>
 
-function spin_system=comsol_mesh(spin_system,file_name)
+function mesh=comsol_mesh(file_name)
 
 % Check consistency
 grumble(file_name);
@@ -45,7 +41,7 @@ while true
         npts=npts{1}; break
     end
 end
-report(spin_system,[num2str(npts) ' mesh vertices']);
+disp(['found ' num2str(npts) ' mesh vertices']);
 
 % Scroll the file to point coordinates
 while ~contains(fgetl(fid),'Mesh point coordinates'), end
@@ -69,7 +65,7 @@ while true
         nedg=nedg{1}; fgetl(fid); break
     end
 end
-report(spin_system,[num2str(nedg) ' mesh edges']);
+disp(['found ' num2str(nedg) ' mesh edges']);
 
 % Read edges
 mesh.idx.edges=nan(nedg,2);
@@ -90,7 +86,7 @@ while true
         ntri=ntri{1}; fgetl(fid); break
     end
 end
-report(spin_system,[num2str(ntri) ' mesh triangles']);
+disp(['found ' num2str(ntri) ' mesh triangles']);
 
 % Read triangles
 mesh.idx.triangles=nan(ntri,3);
@@ -112,7 +108,7 @@ while true
         nrec=nrec{1}; fgetl(fid); break
     end
 end
-report(spin_system,[num2str(nrec) ' mesh rectangles']);
+disp(['found ' num2str(nrec) ' mesh rectangles']);
 
 % Read rectangles 
 mesh.idx.rectangles=nan(nrec,4);
@@ -123,9 +119,6 @@ for n=1:nrec
     mesh.idx.rectangles(n,3)=RS{3}+1; 
     mesh.idx.rectangles(n,4)=RS{4}+1; 
 end
-
-% Add to the object
-spin_system.mesh=mesh;
 
 % Close the file
 fclose(fid);

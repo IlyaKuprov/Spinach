@@ -9,26 +9,8 @@
 
 function plain_reaction()
 
-% Import Diels-Alder cycloaddition
-[sys,inter,bas]=dac_reaction();
-
-% Magnet field
-sys.magnet=14.1;
-
-% Temperature
-inter.temperature=300;
-
-% Basis set
-bas.formalism='sphten-liouv';
-bas.approximation='IK-2';
-bas.space_level=1;
-
-% This needs a GPU
-sys.enable={'gpu'};
-
-% Spinach housekeeping
-spin_system=create(sys,inter);
-spin_system=basis(spin_system,bas);
+% No spin system here
+spin_system=bootstrap();
 
 % Rate constants, mol/(L*s)
 k1=0.5;  % towards exo  
@@ -51,7 +33,7 @@ x=zeros(5,nsteps+1);
 % Initial concentrations, mol/L
 x(:,1)=[0.6; 0.5; 0.0; 0.0; 18.1]; 
 
-% Stage 1: concentration dynamics
+% Concentration dynamics
 for n=1:nsteps 
     x(:,n+1)=iserstep(spin_system,K,x(:,n),n*dt,dt,'LG4'); 
 end

@@ -1,16 +1,16 @@
 % Imports ASCII 2D flow velocity files produced by COMSOL. Syntax:
 %
-%      spin_system=comsol_velo(spin_system,file_name)
+%               mesh=comsol_velo(mesh,file_name)
 %
 % Parameters:
 %
-%    spin_system  - Spinach spin system object
+%    mesh  - mesh object produced by comsol_mesh()
 %
 %    file_name    - a character string
 %
 % Ouputs:
 %
-%    the following fields are added to spin_system object
+%    the following fields are added to the mesh object
 %
 %       mesh.u, mesh.v      - column vectors with velocities
 %                             at each vertex of the mesh
@@ -19,10 +19,10 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=comsol_velo.m>
 
-function spin_system=comsol_velo(spin_system,file_name)
+function mesh=comsol_velo(mesh,file_name)
 
 % Check consistency
-grumble(spin_system,file_name);
+grumble(file_name);
 
 % Open the file
 fid=fopen(file_name,'r');
@@ -36,7 +36,7 @@ while true
         fgetl(fid); fgetl(fid); break
     end
 end
-report(spin_system,[num2str(nvel) ' velocity readouts']);
+disp(['found ' num2str(nvel) ' velocity readouts']);
 
 % Parse velocity readouts
 X=nan(nvel,1); Y=nan(nvel,1);
@@ -51,23 +51,19 @@ end
 fclose(fid);
 
 % Check that vertex locations are the same
-if (norm(spin_system.mesh.x-X,1)>1e-6)||...
-   (norm(spin_system.mesh.y-Y,1)>1e-6)
+if (norm(mesh.x-X,1)>1e-6)||(norm(mesh.y-Y,1)>1e-6)
     error('vertex locations are different in the velocity file.');
 end
 
-% Store velocities in the spin system object
-spin_system.mesh.u=U; spin_system.mesh.v=V;
+% Store velocities
+mesh.u=U; mesh.v=V;
 
 end
 
 % Consistency enforcement
-function grumble(spin_system,file_name)
+function grumble(file_name)
 if ~ischar(file_name)
     error('file_name must be a character string.');
-end
-if ~isfield(spin_system,'mesh')
-    error('mesh information is missing from the spin_system structure.');
 end
 end
 

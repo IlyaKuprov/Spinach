@@ -21,7 +21,7 @@ sys.magnet=9.4;
 
 % Spin system
 sys.isotopes={'15N','1H','13C','13C','13C','15N'};
-sys.labels={'N_{(n)}','H','CA','CB','C','N_{(n+1)}'};
+sys.labels={'N$_{(n)}$','H','CA','CB','C','N$_{(n+1)}$'};
 
 % Textbook chemical shifts, ppm
 inter.zeeman.scalar={119.79, 8.03, 57.32, 27.71, 177.25, 115.55};

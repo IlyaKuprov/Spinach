@@ -91,11 +91,12 @@ result=evolution(spin_system,L,[HZ_aliph HZ_alpha],...
                  rho,dt,nsteps,'multichannel');
     
 % Plotting
-figure('Name','HA and CH3 magnetization evolution');
 time_axis=linspace(0,nsteps*dt,nsteps+1); 
-plot(time_axis,real(result)); xlim tight; kgrid;
-kxlabel('time, seconds'); kylabel('magnetisation, a.u.'); 
-klegend({'$CH_{3}$','$H_{\alpha}$'},'Location','SouthEast'); 
+figure('Name','HA and CH3 magnetisation evolution');
+scale_figure([1.00 0.65]); plot(time_axis,real(result)); 
+kxlabel('time, seconds'); xlim tight; kgrid;
+kylabel('magnetisation, a.u.'); ylim padded; 
+klegend({'CH$_{3}$','H$_{\alpha}$'},'Location','SouthEast'); 
 
 end
 

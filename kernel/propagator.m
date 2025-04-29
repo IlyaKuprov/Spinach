@@ -53,12 +53,17 @@ if ismember('prop_cache',spin_system.sys.enable)
     
     % Try loading the cache record
     if exist(filename,'file')
-        report(spin_system,'cache record found and used.'); load(filename,'P'); 
-        report(spin_system,['propagator dimension ' num2str(size(P,1)) ...
-                            ', nnz ' num2str(nnz(P))                   ...
-                            ', density ' num2str(100*nnz(P)/numel(P))  ...
-                            '%, sparsity ' num2str(issparse(P))]);
-        return;
+        try
+            load(filename,'P'); report(spin_system,'cache record found and used.');  
+            report(spin_system,['propagator dimension ' num2str(size(P,1)) ...
+                                ', nnz ' num2str(nnz(P))                   ...
+                                ', density ' num2str(100*nnz(P)/numel(P))  ...
+                                '%, sparsity ' num2str(issparse(P))]);
+            return;
+        catch
+            % Don't make any fuss if the file is not readable
+            report(spin_system,'could not read the cache record, recomputing...');
+        end
     else
         report(spin_system,'cache record not found, computing...');
     end
@@ -210,8 +215,13 @@ end
 if ismember('prop_cache',spin_system.sys.enable)&&(toc>0.1)
     
     % Save the propagator
-    save(filename,'P','-v7.3'); 
-    report(spin_system,'cache record saved.');
+    try
+        save(filename,'P','-v7.3'); 
+        report(spin_system,'cache record saved.');
+    catch
+        % Do not make any fuss on fail, just report
+        report(spin_system,'could not save cache record.');
+    end
     
 elseif ismember('caching',spin_system.sys.enable)
     

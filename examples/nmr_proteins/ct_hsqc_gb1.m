@@ -43,7 +43,7 @@ parameters.axis_units='ppm';
 % Create the spin system structure
 spin_system=create(sys,inter);
 
-% Kill nitrogens (protein assumed unlabelled)
+% Kill carbons (protein assumed unlabelled)
 spin_system=kill_spin(spin_system,strcmp('13C',spin_system.comp.isotopes));
 
 % Build the basis

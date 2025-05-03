@@ -109,8 +109,8 @@ H=hamiltonian(assume(spin_system,'nmr'));
 traj=evolution(spin_system,H,[],rho,1e-3,1000,'trajectory');
 
 % Trajectory analysis by spin correlation order
-trajan(spin_system,traj,'correlation_order'); xlim tight;
-ylim([1e-6 3]); set(gca,'YScale','log');
+figure(); trajan(spin_system,traj,'correlation_order'); 
+xlim tight; ylim([1e-6 3]); set(gca,'YScale','log');
 
 end
 

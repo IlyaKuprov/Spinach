@@ -102,8 +102,8 @@ end
 figure();
 imagesc([min(rf_powers)  max(rf_powers)]/1000,...
         [min(spin_rates) max(spin_rates)]/1000,intensities);
-xlabel('1H nutation frequency, kHz');
-ylabel('Sample spinning rate, kHz');
+kxlabel('1H nutation frequency, kHz');
+kylabel('Sample spinning rate, kHz');
 set(gca,'YDir','normal'); colorbar;
 
 end

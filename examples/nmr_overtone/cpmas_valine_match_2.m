@@ -103,8 +103,8 @@ end
 figure();
 imagesc([min(rf_powers) max(rf_powers)],...
         [min(spin_rates) max(spin_rates)],intensities);
-xlabel('1H RF power, Hz'); set(gca,'YDir','normal');
-ylabel('Sample spinning rate, Hz');
+kxlabel('1H RF power, Hz'); set(gca,'YDir','normal');
+kylabel('Sample spinning rate, Hz');
 
 end
 

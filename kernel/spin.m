@@ -14,8 +14,6 @@
 %
 %                 'M'  - muon
 %
-%                 'P'  - proton
-%
 %                 'E#' - high-spin electron, # is 
 %                        an integer specifying the
 %                        multiplicity
@@ -60,13 +58,13 @@ if strcmp(name(1),'E')&&(~isempty(regexp(name,'^E\d','once')))
 
 elseif strcmp(name(1),'C')&&(~isempty(regexp(name,'^C\d','once')))
 
-    % Cavity modes are a special case
-    multiplicity=str2double(name(2:end)); gamma=1;
+    % Cavity modes are special, no Zeeman interaction
+    multiplicity=str2double(name(2:end)); gamma=0;
 
 elseif strcmp(name(1),'V')&&(~isempty(regexp(name,'^V\d','once')))
 
-    % Phonon modes are a special case
-    multiplicity=str2double(name(2:end)); gamma=1;
+    % Phonon modes are special, no Zeeman interaction
+    multiplicity=str2double(name(2:end)); gamma=0;
     
 else
     
@@ -78,13 +76,13 @@ else
         case 'E'  % Electron
             multiplicity=2;
             gamma=-1.76085963023e11; % CODATA 2018
-        case 'N'  % Neutron
+        case 'T'  % Neutron (N to be avoided here)
             multiplicity=2;
             gamma=-1.83247171e8;     % CODATA 2018
         case 'M'  % Muon
             multiplicity=2;
             gamma=-8.51615503e8;     % CODATA 2010
-        case {'P','1H'}  % Proton
+        case '1H'
             multiplicity=2;
             gamma= 2.6752218744e8;   % CODATA 2018
         case '2H'

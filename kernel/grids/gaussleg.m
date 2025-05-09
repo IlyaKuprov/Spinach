@@ -60,16 +60,12 @@ end
 if (~isnumeric(b))||(~isreal(b))||(~isfinite(b))||(numel(b)~=1)
     error('b must be a finite real number.');
 end
-if a >= b
-    error('a must be smaller than b.');
-end
+if a>=b, error('a must be smaller than b.'); end
 if (~isnumeric(n))||(~isreal(n))||(~isfinite(n))||...
    (numel(b)~=1)||(n<1)||mod(n,1)
     error('n must be a positive real integer.');
 end
-if n>50
-    error('GL schemes with n>50 are unstable - subdivide your interval.');
-end
+if n>40, error('n>40 is unreasonable - subdivide the interval.'); end
 end
 
 % Life is a fountain of delight; but where the rabble also 

@@ -415,9 +415,32 @@ end
 % Spin system banner
 banner(spin_system,'spin_system_banner');
 
-% Number and types of spins
+% Number and types of particles
 spin_system.comp.isotopes=sys.isotopes;
 spin_system.comp.nspins=numel(spin_system.comp.isotopes);
+spin_system.comp.types=cell(1,spin_system.comp.nspins);
+for n=1:spin_system.comp.nspins
+    
+    % Determine the particle type
+    name=spin_system.comp.isotopes{n};
+    if strcmp(name(1),'C')&&(~isempty(regexp(name,'^C\d','once')))
+
+        % Cavity mode, Weil algebra
+        spin_system.comp.types{n}='C';
+
+    elseif strcmp(name(1),'V')&&(~isempty(regexp(name,'^V\d','once')))
+
+        % Phonon mode, Weil algebra 
+        spin_system.comp.types{n}='V';
+        
+    else
+
+        % Spin, Lie algebra
+        spin_system.comp.types{n}='S';
+
+    end
+
+end
 sys=rmfield(sys,'isotopes');
 
 % Hash isotopes array for caching operations later
@@ -479,7 +502,7 @@ if isfield(inter,'suscept')
         % Loop over the spins
         for n=1:spin_system.comp.nspins
         
-            % Only process nuclei with coordinates
+            % Only process nuclei, and only the ones with coordinates available
             if isnucleus(spin_system.comp.isotopes{n})&&(~isempty(inter.coordinates{n}))
         
                 % Compute the paramagnetic shielding

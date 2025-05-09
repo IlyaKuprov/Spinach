@@ -45,7 +45,50 @@ summary(spin_system,'basis_settings');
 % Process spherical tensor basis sets
 if strcmp(spin_system.bas.formalism,'sphten-liouv')
 
-    % Run connectivity analysis
+    % Run connectivity analysis for IK-DNP basis set
+    if strcmp(spin_system.bas.approximation,'IK-DNP')
+
+        % Find electrons and nuclei
+        e_idx=cellfun(@iselectron,spin_system.comp.isotopes);
+        n_idx=cellfun(@isnucleus,spin_system.comp.isotopes);
+
+        % Make sure there are only electrons and nuclei
+        if (nnz(e_idx)==0)||(nnz(n_idx)==0)
+            error('IK-DNP approximation requires both electrons and nuclei.');
+        end
+        if ~all(e_idx|n_idx) 
+            error('IK-DNP approximation can only handle electrons and nuclei.');
+        end
+
+        % Isolate three types of interactions (e-e, e-n, n-n)
+        ee_couplings=spin_system.inter.coupling.matrix;
+        ee_couplings(:,n_idx)={[]}; ee_couplings(n_idx,:)={[]};         % Electron-electron
+        nn_couplings=spin_system.inter.coupling.matrix;
+        nn_couplings(:,e_idx)={[]}; nn_couplings(e_idx,:)={[]};         % Electron-nuclear
+        en_couplings=spin_system.inter.coupling.matrix;
+        en_couplings(e_idx,e_idx)={[]}; en_couplings(n_idx,n_idx)={[]}; % Inter-nuclear
+
+        % Remind the user about the amplitude cut-off
+        report(spin_system,['coupling tensors with norm below ' num2str(spin_system.tols.inter_cutoff) ' Hz will be ignored.']);
+
+        % Generate three types of connectivity graphs (e-e, e-n, n-n)
+        ee_conmatrix=sparse(cellfun(@(x)norm(x,2),ee_couplings)>2*pi*spin_system.tols.inter_cutoff);
+        en_conmatrix=sparse(cellfun(@(x)norm(x,2),en_couplings)>2*pi*spin_system.tols.inter_cutoff);
+        nn_conmatrix=sparse(cellfun(@(x)norm(x,2),nn_couplings)>2*pi*spin_system.tols.inter_cutoff);
+
+        % Make sure each spin is connected to itself
+        ee_conmatrix=ee_conmatrix|speye(size(ee_conmatrix));
+        en_conmatrix=en_conmatrix|speye(size(en_conmatrix));
+        nn_conmatrix=nn_conmatrix|speye(size(nn_conmatrix));
+  
+        % Make sure connectivity is reciprocal
+        ee_conmatrix=ee_conmatrix|transpose(ee_conmatrix);
+        en_conmatrix=en_conmatrix|transpose(en_conmatrix);
+        nn_conmatrix=nn_conmatrix|transpose(nn_conmatrix);
+        
+    end
+
+    % Run connectivity analysis for IK-1,2 basis sets
     if ismember(spin_system.bas.approximation,{'IK-1','IK-2'})
         
         % Build connectivity and proximity matrices
@@ -187,7 +230,27 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
             % Run proximity analysis
             proximity_subgraphs=dfpt(spin_system.inter.proxmatrix,bas.space_level);
             report(spin_system,['' num2str(size(proximity_subgraphs,1)) ' subgraphs generated from proximity data.']);
-            
+
+        case 'IK-DNP'
+
+            % Inter-electron connectivity analysis
+            ee_subgraphs=dfpt(ee_conmatrix,bas.level(1));
+            report(spin_system,['generated ' num2str(size(ee_subgraphs,1)-nnz(n_idx)) ' inter-electron subgraphs.']);
+
+            % Electron-nuclear connectivity analysis
+            en_subgraphs=dfpt(en_conmatrix,bas.level(2));
+            report(spin_system,['generated ' num2str(size(en_subgraphs,1)) ' electron-nuclear subgraphs.']);
+
+            % Inter-nuclear connectivity analysis
+            nn_subgraphs=dfpt(nn_conmatrix,bas.level(3));
+            report(spin_system,['generated ' num2str(size(nn_subgraphs,1)-nnz(e_idx)) ' inter-nuclear subgraphs.']);
+
+            % Merge coupling subgraph lists
+            coupling_subgraphs=[ee_subgraphs; en_subgraphs; nn_subgraphs];
+
+            % Do not run proximity analysis
+            proximity_subgraphs=[];
+
         otherwise
             
             % Complain and bomb out
@@ -498,7 +561,7 @@ if strcmp(bas.formalism,'sphten-liouv')
         error('approximation level must be specified in bas.approximation for sphten-liouv formalism.');
     elseif ~ischar(bas.approximation)
         error('bas.approximation must be a string.');
-    elseif ~ismember(bas.approximation,{'IK-0','IK-1','IK-2','none'})
+    elseif ~ismember(bas.approximation,{'IK-0','IK-1','IK-2','IK-DNP','none'})
         error('unrecognized approximation - see the basis preparation section of the manual.');
     end
     
@@ -514,15 +577,33 @@ if strcmp(bas.formalism,'sphten-liouv')
     end
     
     % Check bas.level
-    if ismember(bas.approximation,{'IK-0','IK-1'})&&(~isfield(bas,'level'))
+    if ismember(bas.approximation,{'IK-0','IK-1','IK-DNP'})&&(~isfield(bas,'level'))
         error('connectivity tracing depth must be specified in bas.level variable.');
     end
-    if isfield(bas,'level')
+    if ismember(bas.approximation,{'IK-0','IK-1'})
         if (~isnumeric(bas.level))||(~isscalar(bas.level))||(mod(bas.level,1)~=0)||(bas.level<1)
             error('bas.level must be a positive integer.');
         end
         if bas.level>numel(spin_system.comp.isotopes)
             error('bas.level cannot be greater than the number of spins in the system.');
+        end
+    end
+    if strcmp(bas.approximation,'IK-DNP')
+        if (~isnumeric(bas.level))||(numel(bas.level)~=3)||...
+           any(mod(bas.level,1)~=0,'all')||any(bas.level<1,'all')
+            error('bas.level must be a vector with three positive integers.');
+        end
+        n_electrons=nnz(cellfun(@iselectron,spin_system.comp.isotopes));
+        n_nuclei=nnz(cellfun(@isnucleus,spin_system.comp.isotopes));
+        n_spins=numel(spin_system.comp.isotopes);
+        if bas.level(1)>n_electrons
+            error('bas.level(1) cannot exceed the number of electrons in the system.');
+        end
+        if bas.level(2)>n_spins
+            error('bas.level(2) cannot exceed the number of spins in the system.');
+        end
+        if bas.level(3)>n_nuclei
+            error('bas.level(3) cannot exceed the number of nuclei in the system.');
         end
     end
     
@@ -569,8 +650,8 @@ end
     
 % Disallow inapplicable approximations
 if isfield(bas,'level')
-    if ~ismember(bas.approximation,{'IK-0','IK-1','IK-2'})
-        error('bas.level is only applicable to IK-0,1,2 basis sets.');
+    if ~ismember(bas.approximation,{'IK-0','IK-1','IK-2','IK-DNP'})
+        error('bas.level is only applicable to IK-0,1,2,DNP basis sets.');
     end
 end
 if isfield(bas,'space_level')

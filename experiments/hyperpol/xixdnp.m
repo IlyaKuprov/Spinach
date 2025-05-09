@@ -58,37 +58,34 @@ L2=L+2*pi*parameters.irr_powers*(Ex*cos(parameters.phase)+...
 contact_curve=zeros(1,parameters.nloops+1);
 contact_curve(1)=hdot(parameters.coil,parameters.rho0);
 
+% Grab initial condition and detection state
+rho=parameters.rho0; coil=parameters.coil;
+
 % Adapt to the formalism
 switch spin_system.bas.formalism
 
     % Hilbert space
     case 'zeeman-hilb'
 
-        % Precompute the loop propagator
+        % Precompute complete loop propagator
         P=propagator(spin_system,L2,parameters.pulse_dur)*...
           propagator(spin_system,L1,parameters.pulse_dur);
 
-        % Run the sequence
-        rho=parameters.rho0;
+        % Run and record the observable
         for k=1:parameters.nloops
-
-            % Run a loop and record the observable
-            rho=P*rho*P'; contact_curve(1+k)=hdot(parameters.coil,rho);
-
+            rho=P*rho*P'; contact_curve(k+1)=hdot(coil,rho);
         end
 
     % Liouville space
     case {'zeeman-liouv','sphten-liouv'}
 
-        % Run the sequence
-        rho=parameters.rho0;
+        % Precompute individual event propagators
+        P1=propagator(spin_system,L1,parameters.pulse_dur);
+        P2=propagator(spin_system,L2,parameters.pulse_dur);
+
+        % Run and record the observable
         for k=1:parameters.nloops
-
-            % Run a loop and record the observable
-            rho=step(spin_system,L1,rho,parameters.pulse_dur);
-            rho=step(spin_system,L2,rho,parameters.pulse_dur);
-            contact_curve(1+k)=hdot(parameters.coil,rho);
-
+            rho=P2*(P1*rho); contact_curve(k+1)=hdot(coil,rho);
         end
 
     otherwise

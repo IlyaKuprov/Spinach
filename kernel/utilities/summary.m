@@ -302,16 +302,21 @@ switch topic
         if strcmp(spin_system.bas.formalism,'sphten-liouv')
             switch spin_system.bas.approximation
                 case 'IK-0'
-                    report(spin_system,['IK-0 approximation - all correlations of all spins up to order ' num2str(spin_system.bas.level)]);
+                    report(spin_system,['IK-0 approximation - all correlations of all spins up to order ' int2str(spin_system.bas.level)]);
                 case 'IK-1'
-                    report(spin_system,['IK-1 approximation - spin correlations up to order ' num2str(spin_system.bas.level)...
+                    report(spin_system,['IK-1 approximation - spin correlations up to order ' int2str(spin_system.bas.level)...
                                         ' between directly coupled spins.']);
-                    report(spin_system,['IK-1 approximation - spin correlations up to order ' num2str(spin_system.bas.space_level)...
+                    report(spin_system,['IK-1 approximation - spin correlations up to order ' int2str(spin_system.bas.space_level)...
                                         ' between all spins within ' num2str(spin_system.tols.prox_cutoff) ' Angstrom of each other.']);
                 case 'IK-2'
                     report(spin_system, 'IK-2 approximation - spin correlations involving all nearest neighbours of each spin on the coupling graph.');
-                    report(spin_system,['IK-2 approximation - spin correlations up to order ' num2str(spin_system.bas.space_level)...
+                    report(spin_system,['IK-2 approximation - spin correlations up to order ' int2str(spin_system.bas.space_level)...
                                         ' between all spins within ' num2str(spin_system.tols.prox_cutoff) ' Angstrom of each other.']);
+                case 'IK-DNP'
+                    report(spin_system,['IK-DNP approximation | Max inter-electron correlation level:   ' int2str(spin_system.bas.level(1))]);
+                    report(spin_system,['IK-DNP approximation | max electron-nuclear correlation level: ' int2str(spin_system.bas.level(2))]);
+                    report(spin_system,['IK-DNP approximation | max inter-nuclear correlation level:    ' int2str(spin_system.bas.level(3))]);
+                    report(spin_system, 'IK-DNP approximation | with nearest neighbours on the coupling graph.');
                 case 'none'
                     report(spin_system, 'starting with complete basis set on all spins...');
                 otherwise

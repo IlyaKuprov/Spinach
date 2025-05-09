@@ -1,7 +1,6 @@
-% Returns true if the particle specification is not an electron,
-% a neutron, a muon, or a ghost. Syntax:
+% Returns true if the specification is a nucleus. Syntax:
 %
-%                  verdict=isnucleus(spin_spec)
+%               verdict=isnucleus(spin_spec)
 %
 % Parameters:
 %
@@ -9,8 +8,7 @@
 %
 % Output:
 %
-%    verdict - true for a nucleus known to Spinach, false
-%              for an electron, a muon, a neutron, or a ghost
+%    verdict - true for a nucleus, false otherwise
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -21,9 +19,9 @@ function verdict=isnucleus(spin_spec)
 % Check consistency
 grumble(spin_spec);
 
-% A simple matching check
-if strcmp(spin_spec(1),'E')||...
-   ismember(spin_spec,{'G','E','N','M'})
+% A simple name matching check
+if ismember(spin_spec(1),{'E','C','V'})||...
+   ismember(spin_spec,{'G','E','T','M'})
     verdict=false();
 else
     verdict=true();
@@ -36,7 +34,7 @@ function grumble(spin_spec)
 if ~ischar(spin_spec)
     error('spin_spec must be a character string.');
 end
-[~,~]=spin(spin_spec);
+[~,~]=spin(spin_spec); % See if the spec is valid
 end
 
 % Prostitution and soldiering are arguably the oldest professions.

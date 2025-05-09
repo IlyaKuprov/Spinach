@@ -69,7 +69,7 @@ switch spin_system.bas.formalism
     % Hilbert space
     case 'zeeman-hilb'
 
-        % Precompute the loop propagator
+        % Precompute the complete loop propagator
         P=propagator(spin_system,L2,parameters.pulse_dur(2))*...
           propagator(spin_system,L1,parameters.pulse_dur(1));
 
@@ -84,13 +84,15 @@ switch spin_system.bas.formalism
     % Liouville space
     case {'zeeman-liouv','sphten-liouv'}
 
+        % Precompute individual event propagators
+        P1=propagator(spin_system,L1,parameters.pulse_dur(1));
+        P2=propagator(spin_system,L2,parameters.pulse_dur(2));
+
         % Run the sequence
         for k=1:parameters.nloops
 
             % Run a loop and record the observable
-            rho=step(spin_system,L1,rho,parameters.pulse_dur(1));
-            rho=step(spin_system,L2,rho,parameters.pulse_dur(2));
-            contact_curve(1+k)=hdot(parameters.coil,rho);
+            rho=P2*(P1*rho); contact_curve(1+k)=hdot(parameters.coil,rho);
 
         end
 

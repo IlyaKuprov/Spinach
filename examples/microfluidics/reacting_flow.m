@@ -4,13 +4,15 @@
 % Simulation time: seconds.
 %
 % a.acharya@soton.ac.uk
+% sylwia.ostrowska@kit.edu
+% marcel.utz@kit.edu
 % ilya.kuprov@weizmann.ac.il
 
 function reacting_flow()
 
 % Import hydrodynamics information
-comsol.mesh_file='mesh-4ulm.txt';
-comsol.velo_file='velocity-field-4ulm.txt';
+comsol.mesh_file='chip_mesh.txt';
+comsol.velo_file='chip_velo.txt';
 comsol.crop={[286.8 287.5],[576.0 579.0]};
 comsol.inactivate=[9 10 19 30 20 25 14 13   ...
                    3372 3373 3380 3381 3382 ...

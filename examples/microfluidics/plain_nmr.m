@@ -2,6 +2,8 @@
 % chemical kinetics and spatial dynamics.
 %
 % a.acharya@soton.ac.uk
+% madhukar.said@ugent.be
+% bruno.linclau@ugent.be
 % ilya.kuprov@weizmann.ac.il
 
 function plain_nmr()

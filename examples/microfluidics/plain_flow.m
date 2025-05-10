@@ -1,17 +1,19 @@
-% Simple flow simulation without spin dynamics. Longitudinal mag-
-% netisation is tracked as a function of time after injection in-
-% to the stationary flow field imported from COMSOL. The tail of
-% the pipe has drainage terms set up using a kinetics superopera-
-% tor phantom.
+% Simple flow simulation with no dynamics in the spin subspace: 
+% longitudinal magnetisation is tracked as a function of time af-
+% ter injection into the flow field imported from COMSOL with a
+% diffusion term also present. The tail of the pipe has drainage
+% terms set up using a kinetics superoperator phantom.
 %
 % a.acharya@soton.ac.uk
+% sylwia.ostrowska@kit.edu
+% marcel.utz@kit.edu
 % ilya.kuprov@weizmann.ac.il
 
 function plain_flow()
 
 % Import hydrodynamics information
-comsol.mesh_file='mesh-4ulm.txt';
-comsol.velo_file='velocity-field-4ulm.txt';
+comsol.mesh_file='chip_mesh.txt';
+comsol.velo_file='chip_velo.txt';
 comsol.crop={[286.8 287.5],[576.0 579.0]};
 comsol.inactivate=[9 10 19 30 20 25 14 13   ...
                    3372 3373 3380 3381 3382 ...

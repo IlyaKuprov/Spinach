@@ -1,8 +1,9 @@
 % Non-linear reaction kinetics in a situation when there is
-% no hydrodynamics, diffusion, spin dynamics, or relaxation, 
-% but magnetic observables are still being detected. This is
-% intended as a stepping stone to the more complicated cases
+% no hydrodynamics, diffusion, or spin dynamics. This is in-
+% tended as a stepping stone to the more complicated cases
 % in the same directory of the Spinach example set.
+%
+% Calculation time: seconds.
 %
 % a.acharya@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il

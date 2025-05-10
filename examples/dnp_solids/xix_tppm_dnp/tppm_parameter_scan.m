@@ -2,7 +2,7 @@
 % contact time is calculated as a function of electron pulse
 % amplitude and offset. Further information in:
 %
-%                  [submitted for publication]
+%              https://doi.org/10.1063/5.0153053
 %
 % Calculation time: minutes (a large powder grid is needed).
 %

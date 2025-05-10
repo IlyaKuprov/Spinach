@@ -1,4 +1,4 @@
-% Field profile of a TOP DNP experiment. <I_z> after a fixed 
+% Field profile of a XiX DNP experiment. <I_z> after a fixed 
 % contact time is calculated as a function of electron pulse
 % amplitude and offset. Further information in:
 %

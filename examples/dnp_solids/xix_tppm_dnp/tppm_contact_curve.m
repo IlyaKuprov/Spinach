@@ -1,7 +1,7 @@
-% The transformation of -E_z into I_z during the contact time of the
-% TPPM DNP experiment. Further information in:
+% The transformation of -E_z into I_z during the contact time 
+% of the TPPM DNP experiment. Further information in:
 %
-%                     [submitted for publication]
+%               https://doi.org/10.1063/5.0153053
 %
 % Calculation time: seconds
 %

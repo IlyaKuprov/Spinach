@@ -604,14 +604,17 @@ if ismember('ham_cache',spin_system.sys.enable)
     % Load from the cache record
     if exist(filename,'file')
 
-        % Load isotropic part
-        load(filename,'H');
-
-        % Load the rotational basis
-        if build_aniso, load(filename,'Q'); end
-
-        % Tell the user and exit
-        report(spin_system,'cache record found and loaded.'); return; 
+        % Load cache records
+        try
+            load(filename,'H');
+            if build_aniso
+                load(filename,'Q'); 
+            end
+            report(spin_system,'cache record found and loaded.'); 
+            return; 
+        catch
+            % Do not make a fuss
+        end
 
     end
 
@@ -879,11 +882,20 @@ end
 % Write the cache record 
 if ismember('ham_cache',spin_system.sys.enable)
     if build_aniso
-        save(filename,'H','Q','-v7.3');
+        try
+            save(filename,'H','Q','-v7.3');
+            report(spin_system,'cache record saved.');
+        catch
+            % Do not make a fuss
+        end
     else
-        save(filename,'H','-v7.3');
+        try
+            save(filename,'H','-v7.3');
+            report(spin_system,'cache record saved.');
+        catch
+            % Do not make a fuss
+        end
     end
-    report(spin_system,'cache record saved');
 end
 
 end

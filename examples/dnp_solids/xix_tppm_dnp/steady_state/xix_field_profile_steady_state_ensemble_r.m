@@ -1,16 +1,16 @@
-% 2D parameter scan of XiX/TPPM DNP in the steady state with 
-% electron-proton distance ensemble.
+% Simulation of XiX/TPPM DNP field profile in the steady state 
+% with electron-proton distance ensemble.
 % 
 % Calculation time: minutes.
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
-% ilya.kuprov@weizmann.ac.il
+% i.kuprov@soton.ac.uk
 % guinevere.mathies@uni-konstanz.de
 
-function xix_parameter_scan_steady_state_ensemble_r()
+function xix_field_profile_steady_state_ensemble_r()
 
-% W-band magnet
-sys.magnet=3.4;
+% Q-band magnet
+sys.magnet=1.2142;
 
 % Electron and proton
 sys.isotopes={'E','1H'};
@@ -36,22 +36,17 @@ sys.enable={'op_cache','ham_cache'};
 % Distance ensemble
 [r,w]=gaussleg(3.5,20,3);
 
-% Electron pulse duration grid, s
-pulse_durs=linspace(2e-9,21e-9,200);
-
 % Microwave resonance offsets, Hz
-offsets=linspace(-300e6,300e6,101);
+offsets=linspace(-100e6,100e6,201);
 
-% Preallocate steady state DNP array
-dnp=zeros([numel(offsets) numel(pulse_durs) numel(r)],'like',1i);
-
-% Over distances
+% Compute DNP at each distance
+dnp=zeros([numel(offsets) numel(r)]);
 for n=1:numel(r)
 
     % Cartesian coordinates
     inter.coordinates={[0.000 0.000 0.000];
                        [0.000 0.000 r(n) ]};
-      
+    
     % Relaxation rates, distance and ori. dep. R1n
     inter.relaxation={'t1_t2'};
     r1n_rate=@(alp,bet,gam)r1n_dnp(sys.magnet,inter.temperature,...
@@ -60,45 +55,38 @@ for n=1:numel(r)
     inter.r2_rates={200000 50e3};
     inter.rlx_keep='diagonal';
     inter.equilibrium='dibari';
-    
+
     % Spinach housekeeping
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);
-    
+
     % Detect the proton
     parameters.coil=state(spin_system,'Lz',2);
 
     % Experiment parameters
     parameters.spins={'E','1H'};
-    parameters.irr_powers=20e6;            % Electron nutation frequency [Hz]
+    parameters.irr_powers=17.8e6;            % Electron nutation frequency [Hz]
     parameters.grid='rep_2ang_800pts_sph';
-    parameters.nloops=32;
-    parameters.phase=pi;                   % Second pulse inverted phase
-    parameters.shot_spacing=167e-6;
-    parameters.addshift=-33e6;
+    parameters.pulse_dur=48e-9;              % Pulse duration, seconds
+    parameters.nloops=32;                    % Number of XiX/TPPM DNP blocks (power of 2)
+    parameters.phase=pi;                     % Second pulse inverted phase
+    parameters.shot_spacing=204e-6;
+    parameters.addshift=-13e6;
     parameters.el_offs=offsets;
 
-    % Over pulse durations
-    for m=1:numel(pulse_durs)
-    
-        % Set pulse duration
-        parameters.pulse_dur=pulse_durs(m);    
-    
-        % Run the steady state simulation
-        dnp(:,m,n)=powder(spin_system,@xixdnp_steady,parameters,'esr');
-    
-    end
+    % Run the steady state simulation
+    dnp(:,n)=powder(spin_system,@xixdnp_steady,parameters,'esr');
 
 end
 
 % Integrate over the distance distribution, r^2 is the Jacobian
-dnp=sum(dnp.*reshape(r.^2,[1 1 numel(r)]).*reshape(w,[1 1 numel(w)]),3)/sum((r.^2).*w);
-
-% Do the plotting
-imagesc(parameters.el_offs/1e6,pulse_durs*1e9,real(dnp'));
-set(gca,'YDir','normal'); kylabel('Pulse duration, ns');
+dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(w,[1 numel(w)]),2)/sum((r.^2).*w);
+        
+% Plotting 
+figure(); plot(parameters.el_offs/1e6,real(dnp)); 
+kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
 kxlabel('Microwave resonance offset, MHz');
-kcolourbar('$I_\textrm{z}$ expectation value on $^{1}$H');
+kgrid; xlim tight;
 
 end
 

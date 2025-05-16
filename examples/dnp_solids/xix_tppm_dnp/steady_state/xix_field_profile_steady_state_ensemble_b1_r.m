@@ -1,14 +1,13 @@
-% Simulation of XiX DNP repetition time scan in the steady 
-% state with distributions in electron-proton distance and
-% microwave B1 field.
+% Simulation of XiX/TPPM DNP field profile in the steady state with
+% electron-proton distance and electron Rabi frequency ensembles.
 % 
 % Calculation time: minutes.
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
-% ilya.kuprov@weizmann.ac.il
+% i.kuprov@soton.ac.uk
 % guinevere.mathies@uni-konstanz.de
 
-function xix_repetition_time_ensemble_r_b1()
+function xix_field_profile_steady_state_ensemble_b1_r()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -38,14 +37,14 @@ sys.enable={'op_cache','ham_cache'};
 [r,wr]=gaussleg(3.5,20,3);      % Angstrom
 [b1,wb1]=gaussleg(10e6,20e6,5); % Hz
 
-% Shot spacings, s
-srt=logspace(-5,-3,30);
+% Microwave resonance offsets, Hz
+offsets=linspace(-100e6,100e6,201);
 
 % Preallocate equilibrium DNP value array
-dnp=zeros([numel(srt) numel(r) numel(b1)],'like',1i);
+dnp=zeros([numel(offsets) numel(r) numel(b1)],'like',1i);
 
 % Over distances
-for n=1:numel(r)  
+for n=1:numel(r)
 
     % Cartesian coordinates
     inter.coordinates={[0.000 0.000 0.000];
@@ -72,42 +71,35 @@ for n=1:numel(r)
     parameters.spins={'E','1H'};
     parameters.grid='rep_2ang_800pts_sph';
     parameters.pulse_dur=48e-9;              % Pulse duration, seconds
-    parameters.nloops=32;                    % Number of XiX DNP blocks (power of 2)
+    parameters.nloops=32;                    % Number of XiX/TPPM DNP blocks (power of 2)
     parameters.phase=pi;                     % Second pulse inverted phase
+    parameters.shot_spacing=204e-6;
     parameters.addshift=-13e6;
-    parameters.el_offs=-39e6;
+    parameters.el_offs=offsets;
 
     % Over B1 fields
-    for k=1:numel(b1)     
-        
+    for k=1:numel(b1)
+
         % Set electron nutation frequency
-        parameters.irr_powers=b1(k);             
-    
-        % Over shot spacing
-        for m=1:numel(srt)
-        
-            % Set the shot spacing
-            parameters.shot_spacing=srt(m);
-        
-            % Run the steady state simulation
-            dnp(m,n,k)=powder(spin_system,@xixdnp_steady,parameters,'esr');
+        parameters.irr_powers=b1(k);
 
-        end
-    
+        % Run the steady state simulation
+        dnp(:,n,k)=powder(spin_system,@xixdnp_steady,parameters,'esr');
+
     end
-
+     
 end
 
 % Integrate over the B1 field distribution
 dnp=sum(dnp.*reshape(wb1,[1 1 numel(wb1)]),3)/sum(wb1);
 
-% Integrate over the distance distribution, r^2 is the Jacobian
+% Integrate over the distance distribution, r^2 is the radial part of the Jacobian
 dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
 
 % Plotting 
-figure(); plot(srt*1e3,real(dnp));
+figure(); plot(parameters.el_offs/1e6,real(dnp)); 
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
-kxlabel('Repetition time, ms');
+kxlabel('Microwave resonance offset, MHz');
 kgrid; xlim tight;
 
 end

@@ -90,7 +90,8 @@ if ismember('op_cache',spin_system.sys.enable)
     % Load the operator from the cache record
     if exist(filename,'file')
         try
-            load(filename,'A'); return;
+            load(filename,'A'); 
+            if exists('A','var'), return; end
         catch
             % Do not make a fuss on fail 
         end

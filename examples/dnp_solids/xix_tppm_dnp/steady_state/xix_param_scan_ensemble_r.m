@@ -7,7 +7,7 @@
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function xix_param_scan_steady_state_ensemble_r()
+function xix_param_scan_ensemble_r()
 
 % W-band magnet
 sys.magnet=3.4;

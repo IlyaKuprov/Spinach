@@ -7,7 +7,7 @@
 % i.kuprov@soton.ac.uk
 % guinevere.mathies@uni-konstanz.de
 
-function xix_field_profile_steady_state_ensemble_r()
+function xix_field_profile_ensemble_r()
 
 % Q-band magnet
 sys.magnet=1.2142;

@@ -83,7 +83,7 @@ props.error=0;
 props.complete=0;
 
 % Parse the file
-for n=1:length(g03_output)
+for n=1:numel(g03_output)
     
    % Read charge and multiplicity
    current_line=char(g03_output(n));
@@ -99,7 +99,7 @@ for n=1:length(g03_output)
    if strcmp(g03_output(n),'Input orientation:')
       k=n+5; m=1;
       while ~strcmp(deblank(g03_output(k)),'---------------------------------------------------------------------')
-         S=eval(['[' char(g03_output(k)) ']']); atoms(m,:)=S(4:6); atomic_numbers(m)=S(2); k=k+1; m=m+1; %#ok<AGROW>
+         S=sscanf(g03_output{k},'%f')'; atoms(m,:)=S(4:6); atomic_numbers(m)=S(2); k=k+1; m=m+1; %#ok<AGROW>
       end
       natoms=m-1; props.inp_geom=atoms; props.natoms=natoms;
       disp('Gaussian import: found input orientation.');
@@ -109,7 +109,7 @@ for n=1:length(g03_output)
    if strcmp(g03_output(n),'Standard orientation:')
       k=n+5; m=1;
       while ~strcmp(deblank(g03_output(k)),'---------------------------------------------------------------------')
-         S=eval(['[' char(g03_output(k)) ']']); atoms(m,:)=S(4:6); atomic_numbers(m)=S(2); k=k+1; m=m+1;
+         S=sscanf(g03_output{k},'%f')'; atoms(m,:)=S(4:6); atomic_numbers(m)=S(2); k=k+1; m=m+1;
       end
       natoms=m-1; props.std_geom=atoms; props.natoms=natoms;
       disp('Gaussian import: found standard orientation.');
@@ -157,9 +157,9 @@ for n=1:length(g03_output)
       props.hfc.full.eigvecs=cell(natoms,1);
       props.hfc.full.matrix=cell(natoms,1);
       for k=1:natoms
-         baa=g03_output(n+4*k+1); baa=char(baa); baa=eval(['[' baa(4:end) ']']);
-         bbb=g03_output(n+4*k+2); bbb=char(bbb); bbb=eval(['[' bbb(15:end) ']']);
-         bcc=g03_output(n+4*k+3); bcc=char(bcc); bcc=eval(['[' bcc(4:end) ']']);
+         baa=sscanf(g03_output{n+4*k+1}(4:end),'%f')';
+         bbb=sscanf(g03_output{n+4*k+2}(15:end),'%f')';
+         bcc=sscanf(g03_output{n+4*k+3}(4:end),'%f')';
          props.hfc.full.eigvals{k}=[baa(3) bbb(3) bcc(3)]+props.hfc.iso(k);
          props.hfc.full.eigvecs{k}=[baa(5:7)' bbb(5:7)' bcc(5:7)'];
          props.hfc.full.matrix{k}=props.hfc.full.eigvecs{k}*diag(props.hfc.full.eigvals{k})*props.hfc.full.eigvecs{k}';
@@ -176,9 +176,9 @@ for n=1:length(g03_output)
       line1=char(deblank(g03_output(n+1))); 
       line2=char(deblank(g03_output(n+2))); 
       line3=char(deblank(g03_output(n+3)));
-      g=eval(['[' line1(5:18) '   ' line1(26:39) '   ' line1(46:60) ';   '...
-                  line2(5:18) '   ' line2(26:39) '   ' line2(46:60) ';   '...
-                  line3(5:18) '   ' line3(26:39) '   ' line3(46:60) ']']);
+      g=[str2double(strtrim(line1(5:18))) str2double(strtrim(line1(26:39))) str2double(strtrim(line1(46:60)));...
+         str2double(strtrim(line2(5:18))) str2double(strtrim(line2(26:39))) str2double(strtrim(line2(46:60)));...
+         str2double(strtrim(line3(5:18))) str2double(strtrim(line3(26:39))) str2double(strtrim(line3(46:60)))];
       if (~exist('options','var'))||(~ismember('g_nosymm',options))
          g=(g+g')/2; disp('Gaussian import: g-tensor symmetrized.');
       else
@@ -196,9 +196,9 @@ for n=1:length(g03_output)
       line1=char(deblank(g03_output(n+1))); 
       line2=char(deblank(g03_output(n+2))); 
       line3=char(deblank(g03_output(n+3)));
-      g=eval(['[' line1(4:15) '   ' line1(23:35) '   ' line1(42:54) ';   '...
-                  line2(4:15) '   ' line2(23:35) '   ' line2(42:54) ';   '...
-                  line3(4:15) '   ' line3(23:35) '   ' line3(42:54) ']']);
+      g=[str2double(strtrim(line1(4:15))) str2double(strtrim(line1(23:35))) str2double(strtrim(line1(42:54)));...
+         str2double(strtrim(line2(4:15))) str2double(strtrim(line2(23:35))) str2double(strtrim(line2(42:54)));...
+         str2double(strtrim(line3(4:15))) str2double(strtrim(line3(23:35))) str2double(strtrim(line3(42:54)))];
       if (~exist('options','var'))||(~ismember('g_nosymm',options))
          g=(g+g')/2; disp('g-tensor symmetrized.');
       else
@@ -243,7 +243,7 @@ for n=1:length(g03_output)
            lines_to_read=natoms-(k-1)*5;
            current_block=zeros(natoms,5);
            for m=(n+2):(n+1+lines_to_read)
-               current_line=eval(['[' char(g03_output(m)) ']']);
+               current_line=sscanf(g03_output{m},'%f')';
                current_block(current_line(1),1:(length(current_line)-1))=current_line(2:end);
            end
            k_couplings(:,(5*(k-1)+1):(5*k))=current_block;
@@ -261,7 +261,7 @@ for n=1:length(g03_output)
            lines_to_read=natoms-(k-1)*5;
            current_block=zeros(natoms,5);
            for m=(n+2):(n+1+lines_to_read)
-               current_line=eval(['[' char(g03_output(m)) ']']);
+               current_line=sscanf(g03_output{m},'%f')';
                current_block(current_line(1),1:(length(current_line)-1))=current_line(2:end);
            end
            j_couplings(:,(5*(k-1)+1):(5*k))=current_block;
@@ -278,10 +278,10 @@ for n=1:length(g03_output)
        for k=1:natoms
            line3=char(g03_output(n+4*k));   line2=char(g03_output(n+4*k-1));
            line1=char(g03_output(n+4*k-2)); line0=char(g03_output(n+4*k-3));
-           atom_num=regexp(line0,'^[0-9]*','match'); atom_num=eval(atom_num{1});
-           props.srt{atom_num}=[eval(['[' line1(4:14) '     ' line1(21:31) '     ' line1(38:48) ']']);
-                                eval(['[' line2(4:14) '     ' line2(21:31) '     ' line2(38:48) ']']);
-                                eval(['[' line3(4:14) '     ' line3(21:31) '     ' line3(38:48) ']'])]*1e6;
+        atom_num=str2double(regexp(line0,'^[0-9]*','match','once'));
+        props.srt{atom_num}=[str2double(strtrim(line1(4:14))) str2double(strtrim(line1(21:31))) str2double(strtrim(line1(38:48)));
+                             str2double(strtrim(line2(4:14))) str2double(strtrim(line2(21:31))) str2double(strtrim(line2(38:48)));
+                             str2double(strtrim(line3(4:14))) str2double(strtrim(line3(21:31))) str2double(strtrim(line3(38:48)))]*1e6;
            if strcmp(g03_output(n+4*k+1),'Dipole moment (Debye):'), break; end
            if strcmp(g03_output(n+4*k+1),'Nuclear quadrupole coupling constants [Chi] (MHz):'), break; end
        end
@@ -294,10 +294,10 @@ for n=1:length(g03_output)
        for k=1:natoms
            line3=char(g03_output(n+4*k));   line2=char(g03_output(n+4*k-1)); 
            line1=char(g03_output(n+4*k-2)); line0=char(g03_output(n+4*k-3));
-           atom_num=regexp(line0,'^[0-9]*','match'); atom_num=eval(atom_num{1});
-           props.nqi{atom_num}=[eval(['[' line1(4:14) '     ' line1(21:31) '     ' line1(38:48) ']']);
-                                eval(['[' line2(4:14) '     ' line2(21:31) '     ' line2(38:48) ']']);
-                                eval(['[' line3(4:14) '     ' line3(21:31) '     ' line3(38:48) ']'])]*1e6;
+        atom_num=str2double(regexp(line0,'^[0-9]*','match','once'));
+        props.nqi{atom_num}=[str2double(strtrim(line1(4:14))) str2double(strtrim(line1(21:31))) str2double(strtrim(line1(38:48)));
+                             str2double(strtrim(line2(4:14))) str2double(strtrim(line2(21:31))) str2double(strtrim(line2(38:48)));
+                             str2double(strtrim(line3(4:14))) str2double(strtrim(line3(21:31))) str2double(strtrim(line3(38:48)))]*1e6;
            props.nqi{atom_num}=props.nqi{atom_num}-eye(3)*trace(props.nqi{atom_num})/3;
            if strcmp(g03_output(n+4*k+1),'Dipole moment (Debye):'), break; end
        end
@@ -307,9 +307,9 @@ for n=1:length(g03_output)
    % Read magnetic susceptibility tensor (GIAO)
    if strcmp(g03_output(n),'Magnetic susceptibility tensor (cgs-ppm):')
        line1=char(g03_output(n+1)); line2=char(g03_output(n+2)); line3=char(g03_output(n+3));
-       props.chi=[eval(['[' line1(4:19) '     ' line1(25:40) '     ' line1(46:end) ']']);
-                  eval(['[' line2(4:19) '     ' line2(25:40) '     ' line2(46:end) ']']);
-                  eval(['[' line3(4:19) '     ' line3(25:40) '     ' line3(46:end) ']'])];
+       props.chi=[str2double(strtrim(line1(4:19))) str2double(strtrim(line1(25:40))) str2double(strtrim(line1(46:end)));
+                  str2double(strtrim(line2(4:19))) str2double(strtrim(line2(25:40))) str2double(strtrim(line2(46:end)));
+                  str2double(strtrim(line3(4:19))) str2double(strtrim(line3(25:40))) str2double(strtrim(line3(46:end)))];
        props.chi=cgsppm2ang(props.chi); props.chi=(props.chi+props.chi')/2;
        disp('Gaussian import: found and symmetrised magnetic susceptibility tensor.');
    end
@@ -317,16 +317,16 @@ for n=1:length(g03_output)
    % Read magnetic susceptibility tensor (CSGT)
    if strcmp(g03_output(n),'Magnetic susceptibility (cgs-ppm):')
        line1=char(g03_output(n+2)); line2=char(g03_output(n+3)); line3=char(g03_output(n+4));
-       props.chi=[eval(['[' line1(4:14) '     ' line1(21:31) '     ' line1(38:48) ']']);
-                  eval(['[' line2(4:14) '     ' line2(21:31) '     ' line2(38:48) ']']);
-                  eval(['[' line3(4:14) '     ' line3(21:31) '     ' line3(38:48) ']'])];
+       props.chi=[str2double(strtrim(line1(4:14))) str2double(strtrim(line1(21:31))) str2double(strtrim(line1(38:48)));
+                  str2double(strtrim(line2(4:14))) str2double(strtrim(line2(21:31))) str2double(strtrim(line2(38:48)));
+                  str2double(strtrim(line3(4:14))) str2double(strtrim(line3(21:31))) str2double(strtrim(line3(38:48)))];
        props.chi=cgsppm2ang(props.chi); props.chi=(props.chi+props.chi')/2;
        disp('Gaussian import: found and symmetrised magnetic susceptibility tensor.');
    end
    
    % Read Gibbs free energy
    if (numel(g03_output{n})>43)&&strcmp(g03_output{n}(1:43),'Sum of electronic and thermal Free Energies')
-       props.gibbs=eval(g03_output{n}(45:end));
+       props.gibbs=str2double(g03_output{n}(45:end));
        disp('Gaussian import: found Gibbs free energy.');
    end
    

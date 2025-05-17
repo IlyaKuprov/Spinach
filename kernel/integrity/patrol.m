@@ -97,8 +97,8 @@ while hashes_match
     % Run the file
     if ~ismember(mfiles(n).name,exceptions)
         disp(['Running ' mfiles(n).name ' ...']);
-        cd(mfiles(n).folder); 
-        eval(mfiles(n).name(1:(end-2)));
+        cd(mfiles(n).folder);
+        run(mfiles(n).name);
     end
     
     % Flush the display buffer

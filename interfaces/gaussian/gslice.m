@@ -20,11 +20,14 @@ periodic_table={'H','He','Li','Be','B','C','N','O','F','Ne','Na','Mg','Al','Si',
 
 % Read the log file
 [g03_output,g03_output_path]=uigetfile('*.*','Relaxed geometry scan log');
-g03_output=textread([g03_output_path g03_output],'%s','bufsize',65536,'delimiter','\n'); %#ok<DTXTRD>
+fid=fopen([g03_output_path g03_output],'r');
+g03_output=textscan(fid,'%s','Delimiter','\n');
+fclose(fid);
+g03_output=g03_output{1};
 
 % Locate and the stationary point reports
 minima=[];
-for n=1:length(g03_output)
+for n=1:numel(g03_output)
     if strcmp(deblank(g03_output(n)),'-- Stationary point found.')
         minima=[minima n]; %#ok<AGROW>
     end
@@ -46,7 +49,7 @@ disp(['slice: ' num2str(length(std_geom_start)) ' standard orientation headers l
 % Locate standard orientation end points
 std_geom_end=[];
 for n=std_geom_start
-    for k=n:length(g03_output)
+    for k=n:numel(g03_output)
         if strcmp(deblank(g03_output(k)),'---------------------------------------------------------------------')
             std_geom_end=[std_geom_end k-1]; %#ok<AGROW>
             break
@@ -56,8 +59,8 @@ end
 disp(['slice: ' num2str(length(std_geom_start)) ' standard orientation footers located.']);
 
 % Read the standard orientations
-coord_blocks=cell(length(std_geom_start),1);
-for n=1:length(std_geom_start)
+coord_blocks=cell(numel(std_geom_start),1);
+for n=1:numel(std_geom_start)
     coord_blocks{n}=zeros(std_geom_end(n)-std_geom_start(n),6);
     for k=std_geom_start(n):std_geom_end(n)
         coord_blocks{n}(k-std_geom_start(n)+1,:)=cell2mat(textscan(g03_output{k},'%n %n %n %n %n %n'));
@@ -66,14 +69,17 @@ end
 
 % Get the header
 [g03_header,g03_header_path]=uigetfile('*.*','Gaussian header');
-header=textread([g03_header_path g03_header],'%s','delimiter','\n'); %#ok<DTXTRD>
+fid=fopen([g03_header_path g03_header],'r');
+header=textscan(fid,'%s','Delimiter','\n');
+fclose(fid);
+header=header{1};
 
 % Write the inputs
 runscript=fopen('compute.bat','a');
 fprintf(runscript,'%s\n','@ECHO OFF');
 fprintf(runscript,'%s\n','set GAUSS_EXEDIR=C:\G16W');
 fprintf(runscript,'%s\n','set GAUSS_SCRDIR=C:\Temp');
-for n=1:length(coord_blocks)
+for n=1:numel(coord_blocks)
     g03_input=fopen(['g16_input_' num2str(n) '.gjf'],'a');
     dump(g03_input,header);
     for k=1:size(coord_blocks{n},1)
@@ -90,7 +96,7 @@ end
 
 % File writer subroutine
 function dump(file_id,cell_array)
-for p=1:length(cell_array)
+for p=1:numel(cell_array)
     fprintf(file_id,'%s\n',cell_array{p});
 end
 end

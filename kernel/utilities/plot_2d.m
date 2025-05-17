@@ -2,7 +2,9 @@
 % function is useful for NMR data where small cross-peaks must be adequa-
 % tely contoured next to large diagonal peaks. Syntax:
 %
-%  plot_2d(spin_system,spectrum,parameters,ncont,delta,k,ncol,m,signs)
+%      [axis_f1,axis_f2,spectrum]=plot_2d(spin_system,spectrum,...
+%                                         parameters,ncont,delta,...
+%                                         k,ncol,m,signs)
 %
 % Parameters:
 %
@@ -42,7 +44,13 @@
 %
 % Outputs:
 %
-%     this function creates a figure
+%     a figure is drawn and the following parameters returned
+%
+%        axis_f1, axis_f2 - F1 and F2 axis ticks for external
+%                           plotting utilities
+%
+%        spectrum         - 2D spectrum array for external 
+%                           plotting utilities
 %
 % Note: the following functions are used to compute contour levels:
 %
@@ -56,7 +64,8 @@
 % <https://spindynamics.org/wiki/index.php?title=plot_2d.m>
 
 function [axis_f1,axis_f2,spectrum]=plot_2d(spin_system,spectrum,...
-                                    parameters,ncont,delta,k,ncol,m,signs)
+                                            parameters,ncont,delta,...
+                                            k,ncol,m,signs)
 
 % Set common defaults
 parameters=defaults(spin_system,parameters);

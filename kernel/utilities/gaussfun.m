@@ -1,7 +1,7 @@
 % Normalized Gaussian function in magnetic resonance 
 % notation. Syntax:
 %
-%                g=gaussfun(x,fwhm)
+%                 y=gaussfun(x,fwhm)
 %
 % Parameters:
 %
@@ -11,7 +11,7 @@
 %
 % Outputs:
 %
-%        g - function values at the points specified in x
+%        y - function values at the points specified in x
 %
 % ilya.kuprov@weizmann.ac.il
 %

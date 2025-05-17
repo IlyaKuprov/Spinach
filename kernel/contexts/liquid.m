@@ -6,7 +6,7 @@
 % it would use the order matrix supplied by the user to compute the
 % residual anisotropies of all interactions. Syntax:
 %
-%    fid=liquid(spin_system,pulse_sequence,parameters,assumptions)
+%  answer=liquid(spin_system,pulse_sequence,parameters,assumptions)
 %
 % Parameters:
 %
@@ -54,7 +54,9 @@
 %                      'labframe', etc.) - see the pulse sequence
 %                      header for information on this setting.
 %
-% This function returns whatever it is that the pulse sequence returns.
+% Outputs:
+%
+%  answer - whatever it is that the pulse sequence returns.
 %
 % Note: arbitrary order rotating frame transformation is supported, inc-
 %       luding infinite order. See the header of rotframe.m for further

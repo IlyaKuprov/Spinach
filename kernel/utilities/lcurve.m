@@ -1,6 +1,6 @@
 % L-curve analysis function. Syntax:
 %
-%             lambda_opt=lcurve(lambda,err,reg,mode)
+%             lam_opt=lcurve(lam,err,reg,mode)
 %
 % Parameters:
 %

@@ -2,15 +2,15 @@
 % to specified order in perturbation theory, using the formalism
 % described in https://doi.org/10.1063/1.4928978 Syntax:
 %
-%        H=rotframe(spin_system,H0,H,isotope,order)
+%           Hr=rotframe(spin_system,H0,H,isotope,order)
 %
 % Parameters:
 %
-%    H0     - carrier Hamiltonian with respect to which the
-%             rotating frame transformation is to be done
+%    H0      - carrier Hamiltonian with respect to which the
+%              rotating frame transformation is to be done
 %
-%    H      - laboratory frame Hamiltonian H0+H1 that is to
-%             be transformed into the rotating frame 
+%    H       - laboratory frame Hamiltonian H0+H1 that is to
+%              be transformed into the rotating frame 
 %
 %    isotope - string, such as '1H', specifying the spins
 %              with respect to which the transformation is
@@ -21,7 +21,7 @@
 %
 % Outputs:
 %
-%    H       - rotating frame Hamiltonian
+%    Hr      - rotating frame Hamiltonian
 %
 % Notes: the auxiliary matrix method is massively faster than
 %        either commutator series or diagonalisation.

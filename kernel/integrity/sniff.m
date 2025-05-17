@@ -5,7 +5,14 @@
 %
 % The purpose is to catch local modifications that the user may
 % have made and forgotten about, that are causing some unintend-
-% ed consequences elsewhere in Spinach.
+% ed consequences elsewhere in Spinach. Syntax:
+%
+%                         sniff(action)
+%
+% Parameters:
+%
+%    action - 'none' prints the names of fishy files to 
+%              the console, 'open' opens them
 %
 % ilya.kuprov@weizmann.ac.il
 %

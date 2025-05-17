@@ -12,6 +12,8 @@
 %
 %    k   - index of the nearest spin
 %
+%    d   - distance to the nearest spin, Angstrom
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=nearest_spin.m>

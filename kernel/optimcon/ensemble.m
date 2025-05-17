@@ -3,13 +3,16 @@
 % wer levels, multiple resonance offsets, multistate transfers, ensemb-
 % les of drift Liouvillians, etc. Syntax:
 %
-%      [fidelity,gradient,hessian]=ensemble(waveform,spin_system)
+%          [traj_data,fidelity,...
+%           gradient,hessian]=ensemble(waveform,spin_system)
 %
 % Parameters:
 %
 %   waveform  - control coefficients for each control operator, rad/s
 %
 % Outputs:
+%
+%   traj_data    - trajectory data for subsequent diagnostic plotting
 %
 %   fidelity     - figure of merit for the overlap of the current state
 %                  of the system and the desired state(s). When penalty

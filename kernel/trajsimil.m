@@ -3,14 +3,14 @@
 % time. See http://dx.doi.org/10.1016/j.jmr.2013.02.012 for further infor-
 % mation. Syntax:
 %
-%         trajsimil(spin_system,trajectory_1,trajectory_2,method)
+%    score=trajsimil(spin_system,trajectory_1,trajectory_2,scorefcn)
 %
 % Parameters:
 %
 %   trajectory_1,2 - spin system trajectories, supplied as nstates
 %                    x nsteps matrices.
 %
-%   method         - similarity scoring method; possibilities are:
+%   scorefcn       - similarity scoring method; possibilities are:
 %
 %                     'RSP'  - running scalar product. Computes
 %                              scalar products between the cor-
@@ -44,7 +44,8 @@
 %
 % Output:
 %
-%     this function writes into the current figure
+%        score - the similarity score vector, one element
+%                per time slice
 %
 % Note: SG and BSG options require sphten-liouv formalism.
 %

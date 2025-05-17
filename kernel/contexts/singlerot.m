@@ -6,7 +6,8 @@
 % are handed over to the pulse sequence, which the user must supply as a
 % function handle. Syntax:
 %
-%  answer=singlerot(spin_system,pulse_sequence,parameters,assumptions)
+%       [answer,sph_grid]=singlerot(spin_system,pulse_sequence,...
+%                                   parameters,assumptions)
 %
 % Parameters:
 %
@@ -82,8 +83,12 @@
 %   parameters.spn_dim  - matrix dimension for the spin 
 %                         dynamics subspace
 %
-% This function returns the powder average of whatever it is that the pulse
-% sequence returns.
+% Outputs:
+%
+%     answer - the poweder average or a cell array ofwhatever it is 
+%              that the pulse sequence returns
+%
+%     sph_grid - spherical grid used ithe calculation
 %
 % Note: arbitrary order rotating frame transformation is supported, inc-
 %       luding infinite order. See the header of rotframe.m for further
@@ -93,7 +98,8 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=singlerot.m>
 
-function [answer,sph_grid]=singlerot(spin_system,pulse_sequence,parameters,assumptions)
+function [answer,sph_grid]=singlerot(spin_system,pulse_sequence,...
+                                     parameters,assumptions)
 
 % Show the banner
 banner(spin_system,'sequence_banner'); 

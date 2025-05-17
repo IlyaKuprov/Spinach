@@ -2,7 +2,8 @@
 % operator and passes it on to the pulse sequence function, which sho-
 % uld be supplied as a handle. Syntax:
 %
-%    answer=floquet(spin_system,pulse_sequence,parameters,assumptions)
+%      [answer,sph_grid]=floquet(spin_system,pulse_sequence,...
+%                                parameters,assumptions)
 %
 % where pulse sequence is a function handle to one of the pulse sequences
 % located in the experiments directory, assumptions is a string that would
@@ -50,9 +51,12 @@
 %   parameters.spn_dim  - matrix dimension for the spin 
 %                         dynamics subspace
 %
-% This function returns the powder average of whatever it is that the pulse
-% sequence returns, or the components of that powder average, if the sum_up
-% flag is cleared.
+% Outputs:
+%
+%     answer - the poweder average or a cell array ofwhatever it is 
+%              that the pulse sequence returns
+%
+%     sph_grid - spherical grid used ithe calculation
 %
 % Note: the choice of the rank depends on the spinning rate (the slower
 %       the spinning, the greater ranks are required). The rank is appro-
@@ -73,7 +77,8 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=floquet.m>
 
-function [answer,sph_grid]=floquet(spin_system,pulse_sequence,parameters,assumptions)
+function [answer,sph_grid]=floquet(spin_system,pulse_sequence,...
+                                   parameters,assumptions)
 
 % Show the banner
 banner(spin_system,'sequence_banner'); 

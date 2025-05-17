@@ -2,7 +2,8 @@
 % superoperator and passes it on to the pulse sequence function, which
 % should be supplied as a handle. Syntax:
 %
-%   answer=doublerot(spin_system,pulse_sequence,parameters,assumptions)
+%      [answer,sph_grid]=doublerot(spin_system,pulse_sequence,...
+%                                  parameters,assumptions)
 %
 % where pulse sequence is a function handle to one of the pulse sequences
 % located in the experiments directory, assumptions is a string that would
@@ -76,8 +77,12 @@
 %   parameters.spn_dim  - matrix dimension for the spin 
 %                         dynamics subspace
 %
-% This function returns the powder average of whatever it is that the pulse
-% sequence returns.
+% Outputs:
+%
+%     answer - the poweder average or a cell array ofwhatever it is 
+%              that the pulse sequence returns
+%
+%     sph_grid - spherical grid used ithe calculation
 %
 % Note: arbitrary order rotating frame transformation is supported, inc-
 %       luding infinite order. See the header of rotframe.m for further
@@ -94,7 +99,8 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=doublerot.m>
 
-function [answer,sph_grid]=doublerot(spin_system,pulse_sequence,parameters,assumptions)
+function [answer,sph_grid]=doublerot(spin_system,pulse_sequence,...
+                                     parameters,assumptions)
 
 % Show the banner
 banner(spin_system,'sequence_banner');

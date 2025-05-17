@@ -18,6 +18,8 @@
 %         rh  - interaction rhombicity, defined as (xx-yy) in
 %               terms of eigenvalues
 %
+%    eigvals  - interaction tensor eigenvalues in Mehring order
+%
 % Note: eigenvalues [xx yy zz] are sorted in Mehring order, that
 %       is xx<=yy<=zz
 %

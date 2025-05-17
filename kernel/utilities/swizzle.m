@@ -2,7 +2,7 @@
 % of tuples in random order. This is useful for flattening nes-
 % ted loops for parallel processing. Syntax:
 %
-%                  tuples=swizzle(index_arrays)
+%                 tuples=swizzle(index_arrays)
 %
 % Parameters:
 %

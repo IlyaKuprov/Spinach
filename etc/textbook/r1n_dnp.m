@@ -38,6 +38,8 @@
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
+%
+% <https://spindynamics.org/wiki/index.php?title=r1n_dnp.m>
 
 function R1n=r1n_dnp(B0,T,g,T1e,T1n_bulk,r,bet)
 
@@ -70,8 +72,8 @@ end
 if (~isnumeric(T1e))||(~isreal(T1e))||(~isscalar(T1e))||(T1e<=0)
     error('T1e must be a positive real number.');
 end
-if (~isnumeric(T1n_bulk))||(~isreal(T1n_bulk))||(~isscalar(T1n_bulk))||...
-   (T1n_bulk<=0)
+if (~isnumeric(T1n_bulk))||(~isreal(T1n_bulk))||...
+   (~isscalar(T1n_bulk))||(T1n_bulk<=0)
     error('T1n_bulk must be a positive real number.');
 end
 if (~isnumeric(r))||(~isreal(r))||(~isscalar(r))||(r<=0)

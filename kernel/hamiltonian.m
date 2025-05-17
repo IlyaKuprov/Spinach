@@ -725,7 +725,7 @@ if build_aniso
     for r=1:2
 
         % Preallocate output
-        Q{r}=cell(2*r+1,2*r+1); %#ok<AGROW>
+        Q{r}=cell(2*r+1,2*r+1);
 
         % Projection loops
         for m=1:(2*r+1)

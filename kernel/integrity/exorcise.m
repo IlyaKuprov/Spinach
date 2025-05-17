@@ -140,7 +140,7 @@ for k=1:numel(mfiles)
                 edit(file_name); web(wiki_address,'-browser');
                 error('documentation page missing from the wiki');
             end
-            pause(0.5); % do not make too many requests all at once
+            pause(0.25); % do not make too many requests all at once
         end
         
         % Check that norms specify type explicitly

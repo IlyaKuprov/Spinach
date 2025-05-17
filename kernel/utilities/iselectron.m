@@ -4,7 +4,7 @@
 %
 % Parameters:
 %
-%    spin_spec - a character string
+%    spin_spec - a Spinach particle specification
 %
 % Output:
 %

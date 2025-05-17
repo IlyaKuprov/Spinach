@@ -1,20 +1,25 @@
-% Steady-state simulation of XiX/TPPM DNP. Syntax (call from powder context):
+% TPPM DNP and its special case X-inverse-X (XiX) DNP experiment 
+% from (https://doi.org/10.1021/jacs.1c09900), steady state ver-
+% sion. Syntax (call from powder context):
 %
-%               dnp=xixdnp_steady(spin_system,parameters,H,R,K)
+%        dnp=xixdnp_steady(spin_system,parameters,H,R,K)
 %
 % Parameters:
 %
-%     H - Hamiltonian matrix, received from context function
+%     H - Hamiltonian matrix, received from 
+%         context function
 %
-%     R - relaxation superoperator, received from context function,
-%         must be thermalised to some finite temperature
+%     R - relaxation superoperator, received 
+%         from context function, must be ther-
+%         malised to some finite temperature
 %
-%     K - kinetics superoperator, received from context function
+%     K - kinetics superoperator, received 
+%         from context function
 %
 %     parameters.irr_powers   - microwave amplitude (aka electron
-%                             nutation frequency), Hz 
+%                               nutation frequency), Hz 
 %
-%     parameters.coil         - detection state(s)
+%     parameters.coil         - detection state vector
 %
 %     parameters.pulse_dur    - pulse duration, seconds
 %
@@ -36,7 +41,9 @@
 %
 % Output:
 %
-%     dnp                     - coil as a function of microwave resonance offset
+%     dnp                     - steady state observable on the de-
+%                               tection state vector as a function
+%                               of microwave resonance offset
 %
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il

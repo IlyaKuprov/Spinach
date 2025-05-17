@@ -1,7 +1,6 @@
 % TPPM DNP and its special case X-inverse-X (XiX) DNP experiment 
-% from (https://doi.org/10.1021/jacs.1c09900).
-%
-% Syntax (call from powder context):
+% from (https://doi.org/10.1021/jacs.1c09900). Syntax (call from
+% powder context):
 %
 %        contact_curve=xixdnp(spin_system,parameters,H,R,K)
 %

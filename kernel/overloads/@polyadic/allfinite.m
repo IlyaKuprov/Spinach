@@ -1,11 +1,16 @@
 % Returns true if none of the elements of the polyadic are Inf 
 % or NaN. Syntax:
 %
-%                           allfinite(p)
+%                       answ=allfinite(p)
 %
 % Parameters:
 %
-%      p  - a polyadic object
+%      p    - a polyadic object
+%
+% Outputs
+%
+%      answ - logical true if all numeric data
+%             in the polyadic object is finite
 % 
 % ilya.kuprov@weizmann.ac.il
 %

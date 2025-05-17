@@ -1,4 +1,4 @@
-% Converts the secular relaxation superoperator into the Redfield
+% Converts a secular relaxation superoperator into the Redfield
 % kite form by dropping all non-longitudinal cross-relaxation pro-
 % cesses. Useful when the relaxation superoperator is huge, but
 % TROSY-like effects are negligible. Syntax:

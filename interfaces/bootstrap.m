@@ -37,6 +37,9 @@ sys.magnet=0; sys.isotopes={'G'};
 inter.zeeman.matrix=cell(1);
 inter.coupling.matrix=cell(1);
 
+% No hygienic checks
+sys.disable={'hygiene'};
+
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';

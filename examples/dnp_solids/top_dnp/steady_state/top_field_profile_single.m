@@ -1,13 +1,12 @@
-% Simulation of XiX DNP field profile in the steady state 
-% with electron Rabi frequency ensemble.
+% Simulation of TOP DNP field profile in the steady state.
 % 
-% Calculation time: minutes.
+% Calculation time: seconds
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % i.kuprov@soton.ac.uk
 % guinevere.mathies@uni-konstanz.de
 
-function xix_field_profile_ensemble_b1()
+function top_field_profile_single()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -42,10 +41,6 @@ inter.equilibrium='dibari';
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
-% Algorithmic options
-sys.disable={'hygiene'}';
-sys.enable={'op_cache','ham_cache'};
-
 % Propagator accuracy
 sys.tols.prop_chop=1e-12;
 
@@ -56,38 +51,19 @@ spin_system=basis(spin_system,bas);
 % Detect the proton
 parameters.coil=state(spin_system,'Lz',2);
 
-% B1 ensemble
-[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
-
-% Microwave resonance offsets, Hz
-offsets=linspace(-100e6,100e6,201);
-
 % Experiment parameters
 parameters.spins={'E','1H'};
+parameters.irr_powers=17.8e6;            % Electron nutation frequency [Hz]
 parameters.grid='rep_2ang_800pts_sph';
 parameters.pulse_dur=48e-9;              % Pulse duration, seconds
-parameters.nloops=32;                    % Number of XiX DNP blocks (power of 2)
-parameters.phase=pi;                     % Second pulse inverted phase
+parameters.delay_dur=14e-9;              % Delay duration, seconds
+parameters.nloops=256;                   % Number of TOP DNP blocks (power of 2)
 parameters.shot_spacing=204e-6;
 parameters.addshift=-13e6;
-parameters.el_offs=offsets;
+parameters.el_offs=linspace(-100e6,100e6,201);
 
-% Preallocate equilibrium DNP value array
-dnp=zeros([numel(offsets) numel(b1)],'like',1i);
-
-% Over B1 fields
-for k=1:numel(b1)
-
-    % Set electron nutation frequency
-    parameters.irr_powers=b1(k);
-
-    % Run the steady state simulation
-    dnp(:,k)=powder(spin_system,@xixdnp_steady,parameters,'esr');
-
-end
-
-% Integrate over the B1 field distribution
-dnp=sum(dnp.*reshape(wb1,[1 numel(wb1)]),2)/sum(wb1);
+% Run the steady state simulation
+dnp=powder(spin_system,@topdnp_steady,parameters,'esr');
 
 % Plotting 
 figure(); plot(parameters.el_offs/1e6,real(dnp)); 

@@ -1,4 +1,4 @@
-% 2D parameter scan of XiX/TPPM DNP in the steady state with 
+% 2D parameter scan of XiX DNP in the steady state with 
 % electron-proton distance ensemble.
 % 
 % Calculation time: minutes.

@@ -1,4 +1,4 @@
-% Simulation of XiX DNP repetition time scan in the 
+% Simulation of TPPM DNP repetition time scan in the 
 % steady state.
 % 
 % Calculation time: seconds.

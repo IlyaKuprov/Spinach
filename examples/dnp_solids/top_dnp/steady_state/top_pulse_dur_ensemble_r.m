@@ -1,13 +1,13 @@
-% 2D parameter scan of TPPM DNP in the steady state with 
-% electron-proton distance and electron Rabi frequency ensembles.
+% 2D parameter scan of TOP DNP in the steady state with 
+% electron-proton distance ensemble.
 % 
-% Calculation time: hours.
+% Calculation time: minutes.
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function tppm_pulse_dur_ensemble_b1_r()
+function top_pulse_dur_ensemble_r()
 
 % W-band magnet
 sys.magnet=3.4;
@@ -33,9 +33,8 @@ sys.tols.prop_chop=1e-12;
 sys.disable={'hygiene'}';
 sys.enable={'op_cache','ham_cache'};
 
-% Distance and B1 ensemble
+% Distance ensemble
 [r,w]=gaussleg(3.5,20,3);
-[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
 
 % Electron pulse duration grid, s
 pulse_durs=linspace(2e-9,21e-9,200);
@@ -44,8 +43,7 @@ pulse_durs=linspace(2e-9,21e-9,200);
 offsets=linspace(-300e6,300e6,101);
 
 % Preallocate steady state DNP array
-dnp=zeros([numel(offsets) numel(pulse_durs) ...
-           numel(r) numel(b1)],'like',1i);
+dnp=zeros([numel(offsets) numel(pulse_durs) numel(r)],'like',1i);
 
 % Over distances
 for n=1:numel(r)
@@ -72,9 +70,10 @@ for n=1:numel(r)
 
     % Experiment parameters
     parameters.spins={'E','1H'};
+    parameters.irr_powers=20e6;              % Electron nutation frequency [Hz]
     parameters.grid='rep_2ang_800pts_sph';
-    parameters.nloops=256;                   % Number of TPPM DNP blocks (power of 2)
-    parameters.phase=120*pi/180;             % Second pulse phase
+    parameters.delay_dur=14e-9;              % Delay duration, seconds
+    parameters.nloops=256;                   % Number of TOP DNP blocks (power of 2)
     parameters.shot_spacing=167e-6;
     parameters.addshift=-33e6;
     parameters.el_offs=offsets;
@@ -84,24 +83,13 @@ for n=1:numel(r)
     
         % Set pulse duration
         parameters.pulse_dur=pulse_durs(m);    
-
-        % Over B1 fields
-        for k=1:numel(b1)
-
-            % Set electron nutation frequency
-            parameters.irr_powers=b1(k);
     
-            % Run the steady state simulation
-            dnp(:,m,n,k)=powder(spin_system,@xixdnp_steady,parameters,'esr');
-
-        end
+        % Run the steady state simulation
+        dnp(:,m,n)=powder(spin_system,@topdnp_steady,parameters,'esr');
     
     end
 
 end
-
-% Integrate over the B1 field distribution
-dnp=sum(dnp.*reshape(wb1,[1 1 1 numel(wb1)]),4)/sum(wb1);
 
 % Integrate over the distance distribution, r^2 is the Jacobian
 dnp=sum(dnp.*reshape(r.^2,[1 1 numel(r)]).*reshape(w,[1 1 numel(w)]),3)/sum((r.^2).*w);

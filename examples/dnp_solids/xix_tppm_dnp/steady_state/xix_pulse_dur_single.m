@@ -1,4 +1,4 @@
-% 2D parameter scan of XiX/TPPM DNP in the steady state.
+% 2D parameter scan of XiX DNP in the steady state.
 % 
 % Calculation time: minutes.
 % 

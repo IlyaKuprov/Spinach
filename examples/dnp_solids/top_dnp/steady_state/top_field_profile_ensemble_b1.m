@@ -1,4 +1,4 @@
-% Simulation of XiX DNP field profile in the steady state 
+% Simulation of TOP DNP field profile in the steady state 
 % with electron Rabi frequency ensemble.
 % 
 % Calculation time: minutes.
@@ -7,7 +7,7 @@
 % i.kuprov@soton.ac.uk
 % guinevere.mathies@uni-konstanz.de
 
-function xix_field_profile_ensemble_b1()
+function top_field_profile_ensemble_b1()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -66,8 +66,8 @@ offsets=linspace(-100e6,100e6,201);
 parameters.spins={'E','1H'};
 parameters.grid='rep_2ang_800pts_sph';
 parameters.pulse_dur=48e-9;              % Pulse duration, seconds
-parameters.nloops=32;                    % Number of XiX DNP blocks (power of 2)
-parameters.phase=pi;                     % Second pulse inverted phase
+parameters.delay_dur=14e-9;              % Delay duration, seconds
+parameters.nloops=256;                   % Number of TOP DNP blocks (power of 2)
 parameters.shot_spacing=204e-6;
 parameters.addshift=-13e6;
 parameters.el_offs=offsets;
@@ -82,7 +82,7 @@ for k=1:numel(b1)
     parameters.irr_powers=b1(k);
 
     % Run the steady state simulation
-    dnp(:,k)=powder(spin_system,@xixdnp_steady,parameters,'esr');
+    dnp(:,k)=powder(spin_system,@topdnp_steady,parameters,'esr');
 
 end
 

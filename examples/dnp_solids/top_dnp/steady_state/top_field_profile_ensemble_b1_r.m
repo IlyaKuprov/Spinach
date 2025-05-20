@@ -1,4 +1,4 @@
-% Simulation of TPPM DNP field profile in the steady state with
+% Simulation of TOP DNP field profile in the steady state with
 % electron-proton distance and electron Rabi frequency ensembles.
 % 
 % Calculation time: minutes.
@@ -7,7 +7,7 @@
 % i.kuprov@soton.ac.uk
 % guinevere.mathies@uni-konstanz.de
 
-function tppm_field_profile_ensemble_b1_r()
+function top_field_profile_ensemble_b1_r()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -71,8 +71,8 @@ for n=1:numel(r)
     parameters.spins={'E','1H'};
     parameters.grid='rep_2ang_800pts_sph';
     parameters.pulse_dur=48e-9;              % Pulse duration, seconds
-    parameters.nloops=32;                    % Number of TPPM DNP blocks (power of 2)
-    parameters.phase=pi;                     % Second pulse inverted phase
+    parameters.delay_dur=14e-9;              % Delay duration, seconds
+    parameters.nloops=256;                   % Number of TOP DNP blocks (power of 2)
     parameters.shot_spacing=204e-6;
     parameters.addshift=-13e6;
     parameters.el_offs=offsets;
@@ -84,7 +84,7 @@ for n=1:numel(r)
         parameters.irr_powers=b1(k);
 
         % Run the steady state simulation
-        dnp(:,n,k)=powder(spin_system,@xixdnp_steady,parameters,'esr');
+        dnp(:,n,k)=powder(spin_system,@topdnp_steady,parameters,'esr');
 
     end
      

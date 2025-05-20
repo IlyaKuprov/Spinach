@@ -1,4 +1,4 @@
-% Simulation of XiX/TPPM DNP field profile in the steady state 
+% Simulation of TPPM DNP field profile in the steady state 
 % with electron-proton distance ensemble.
 % 
 % Calculation time: minutes.
@@ -65,10 +65,10 @@ for n=1:numel(r)
 
     % Experiment parameters
     parameters.spins={'E','1H'};
-    parameters.irr_powers=30e6;            % Electron nutation frequency [Hz]
+    parameters.irr_powers=30e6;              % Electron nutation frequency [Hz]
     parameters.grid='rep_2ang_800pts_sph';
     parameters.pulse_dur=48e-9;              % Pulse duration, seconds
-    parameters.nloops=32;                    % Number of XiX/TPPM DNP blocks (power of 2)
+    parameters.nloops=32;                    % Number of TPPM DNP blocks (power of 2)
     parameters.phase=pi;                     % Second pulse inverted phase
     parameters.shot_spacing=204e-6;
     parameters.addshift=-13e6;

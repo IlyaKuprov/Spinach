@@ -1,4 +1,4 @@
-% 2D parameter scan of TPPM DNP in the steady state with 
+% 2D parameter scan of TOP DNP in the steady state with 
 % electron-proton distance and electron Rabi frequency ensembles.
 % 
 % Calculation time: hours.
@@ -7,7 +7,7 @@
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function tppm_pulse_dur_ensemble_b1_r()
+function top_pulse_dur_ensemble_b1_r()
 
 % W-band magnet
 sys.magnet=3.4;
@@ -73,8 +73,8 @@ for n=1:numel(r)
     % Experiment parameters
     parameters.spins={'E','1H'};
     parameters.grid='rep_2ang_800pts_sph';
-    parameters.nloops=256;                   % Number of TPPM DNP blocks (power of 2)
-    parameters.phase=120*pi/180;             % Second pulse phase
+    parameters.delay_dur=14e-9;              % Delay duration, seconds
+    parameters.nloops=256;                   % Number of TOP DNP blocks (power of 2)
     parameters.shot_spacing=167e-6;
     parameters.addshift=-33e6;
     parameters.el_offs=offsets;
@@ -92,7 +92,7 @@ for n=1:numel(r)
             parameters.irr_powers=b1(k);
     
             % Run the steady state simulation
-            dnp(:,m,n,k)=powder(spin_system,@xixdnp_steady,parameters,'esr');
+            dnp(:,m,n,k)=powder(spin_system,@topdnp_steady,parameters,'esr');
 
         end
     

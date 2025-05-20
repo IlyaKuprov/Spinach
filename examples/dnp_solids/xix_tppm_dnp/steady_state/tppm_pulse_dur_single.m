@@ -1,4 +1,4 @@
-% 2D parameter scan of XiX/TPPM DNP in the steady state.
+% 2D parameter scan of TPPM DNP in the steady state.
 % 
 % Calculation time: minutes.
 % 
@@ -65,8 +65,8 @@ parameters.coil=state(spin_system,'Lz',2);
 parameters.spins={'E','1H'};
 parameters.irr_powers=30e6;            % Electron nutation frequency [Hz]
 parameters.grid='rep_2ang_800pts_sph';
-parameters.nloops=32;
-parameters.phase=pi;                   % Second pulse inverted phase
+parameters.nloops=256;                   % Number of TPPM DNP blocks (power of 2)
+parameters.phase=120*pi/180;             % Second pulse phase
 parameters.shot_spacing=167e-6;
 parameters.addshift=-33e6;
 parameters.el_offs=offsets;

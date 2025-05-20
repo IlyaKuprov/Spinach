@@ -1,4 +1,4 @@
-% Simulation of XiX DNP repetition time scan in the steady 
+% Simulation of TPPM DNP repetition time scan in the steady 
 % state with distributions in electron-proton distance and
 % microwave B1 field.
 % 

@@ -1,4 +1,4 @@
-% Simulation of XiX DNP loop count dependence in the 
+% Simulation of TPPM DNP loop count dependence in the 
 % steady state.
 %
 % Calculation time: seconds.

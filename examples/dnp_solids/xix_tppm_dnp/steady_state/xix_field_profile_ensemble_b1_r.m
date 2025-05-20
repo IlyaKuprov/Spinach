@@ -1,4 +1,4 @@
-% Simulation of XiX/TPPM DNP field profile in the steady state with
+% Simulation of XiX DNP field profile in the steady state with
 % electron-proton distance and electron Rabi frequency ensembles.
 % 
 % Calculation time: minutes.
@@ -71,7 +71,7 @@ for n=1:numel(r)
     parameters.spins={'E','1H'};
     parameters.grid='rep_2ang_800pts_sph';
     parameters.pulse_dur=48e-9;              % Pulse duration, seconds
-    parameters.nloops=32;                    % Number of XiX/TPPM DNP blocks (power of 2)
+    parameters.nloops=32;                    % Number of XiX DNP blocks (power of 2)
     parameters.phase=pi;                     % Second pulse inverted phase
     parameters.shot_spacing=204e-6;
     parameters.addshift=-13e6;

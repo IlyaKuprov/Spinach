@@ -1,12 +1,12 @@
-% 2D parameter scan of XiX DNP in the steady state.
+% 2D parameter scan of TOP DNP in the steady state.
 % 
-% Calculation time: hours.
+% Calculation time: minutes.
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function xix_pulse_dur_ensemble_b1()
+function top_pulse_dur_single()
 
 % W-band magnet
 sys.magnet=3.4;
@@ -39,9 +39,6 @@ sys.tols.prop_chop=1e-12;
 sys.disable={'hygiene'}';
 sys.enable={'op_cache','ham_cache'};
 
-% B1 ensemble
-[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
-
 % Electron pulse duration grid, s
 pulse_durs=linspace(2e-9,21e-9,200);
 
@@ -66,37 +63,27 @@ parameters.coil=state(spin_system,'Lz',2);
 
 % Experiment parameters
 parameters.spins={'E','1H'};
+parameters.irr_powers=20e6;              % Electron nutation frequency [Hz]
 parameters.grid='rep_2ang_800pts_sph';
-parameters.nloops=32;
-parameters.phase=pi;                   % Second pulse inverted phase
+parameters.delay_dur=14e-9;              % Delay duration, seconds
+parameters.nloops=256;                   % Number of TOP DNP blocks (power of 2)
 parameters.shot_spacing=167e-6;
 parameters.addshift=-33e6;
 parameters.el_offs=offsets;
 
 % Preallocate steady state DNP array
-dnp=zeros([numel(offsets) numel(pulse_durs) numel(b1)],'like',1i);
+dnp=zeros([numel(offsets) numel(pulse_durs)],'like',1i);
 
-% Over B1 fields
-for k=1:numel(b1)
+% Over pulse durations
+for m=1:numel(pulse_durs)
 
-    % Set electron nutation frequency
-    parameters.irr_powers=b1(k);
+    % Set pulse duration
+    parameters.pulse_dur=pulse_durs(m);
 
-    % Over pulse durations
-    for m=1:numel(pulse_durs)
-
-        % Set pulse duration
-        parameters.pulse_dur=pulse_durs(m);
-
-        % Run the steady state simulation
-        dnp(:,m,k)=powder(spin_system,@xixdnp_steady,parameters,'esr');
-
-    end
+    % Run the steady state simulation
+    dnp(:,m)=powder(spin_system,@topdnp_steady,parameters,'esr');
 
 end
-
-% Integrate over the B1 field distribution
-dnp=sum(dnp.*reshape(wb1,[1 1 numel(wb1)]),3)/sum(wb1);
 
 % Do the plotting
 imagesc(parameters.el_offs/1e6,pulse_durs*1e9,real(dnp'));

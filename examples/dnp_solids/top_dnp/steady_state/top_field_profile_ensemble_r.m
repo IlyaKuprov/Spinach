@@ -1,5 +1,5 @@
-% Simulation of TPPM DNP field profile in the steady state with
-% electron-proton distance and electron Rabi frequency ensembles.
+% Simulation of TOP DNP field profile in the steady state 
+% with electron-proton distance ensemble.
 % 
 % Calculation time: minutes.
 % 
@@ -7,7 +7,7 @@
 % i.kuprov@soton.ac.uk
 % guinevere.mathies@uni-konstanz.de
 
-function tppm_field_profile_ensemble_b1_r()
+function top_field_profile_ensemble_r()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -33,69 +33,55 @@ sys.tols.prop_chop=1e-12;
 sys.disable={'hygiene'}';
 sys.enable={'op_cache','ham_cache'};
 
-% Distance and B1 ensemble
-[r,wr]=gaussleg(3.5,20,3);      % Angstrom
-[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
+% Distance ensemble
+[r,w]=gaussleg(3.5,20,3);
 
 % Microwave resonance offsets, Hz
 offsets=linspace(-100e6,100e6,201);
 
-% Preallocate equilibrium DNP value array
-dnp=zeros([numel(offsets) numel(r) numel(b1)],'like',1i);
-
-% Over distances
+% Compute DNP at each distance
+dnp=zeros([numel(offsets) numel(r)]);
 for n=1:numel(r)
 
     % Cartesian coordinates
     inter.coordinates={[0.000 0.000 0.000];
                        [0.000 0.000 r(n) ]};
-       
-    % Relaxation rates, distance and orientation 
-    % dependence provided using a function handle
+    
+    % Relaxation rates, distance and ori. dep. R1n
     inter.relaxation={'t1_t2'};
     r1n_rate=@(alp,bet,gam)r1n_dnp(sys.magnet,inter.temperature,...
-                                   2.00230,1e-3,52,r(n),bet);
+                                   2.00230,1e-3,52,r(n),bet); 
     inter.r1_rates={1000 r1n_rate};
     inter.r2_rates={200000 50e3};
     inter.rlx_keep='diagonal';
     inter.equilibrium='dibari';
-    
+
     % Spinach housekeeping
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);
-    
+
     % Detect the proton
-    parameters.coil=state(spin_system,'Lz','1H');
+    parameters.coil=state(spin_system,'Lz',2);
 
     % Experiment parameters
     parameters.spins={'E','1H'};
+    parameters.irr_powers=17.8e6;            % Electron nutation frequency [Hz]
     parameters.grid='rep_2ang_800pts_sph';
     parameters.pulse_dur=48e-9;              % Pulse duration, seconds
-    parameters.nloops=32;                    % Number of TPPM DNP blocks (power of 2)
-    parameters.phase=pi;                     % Second pulse inverted phase
+    parameters.delay_dur=14e-9;              % Delay duration, seconds
+    parameters.nloops=256;                   % Number of TOP DNP blocks (power of 2)
     parameters.shot_spacing=204e-6;
     parameters.addshift=-13e6;
     parameters.el_offs=offsets;
 
-    % Over B1 fields
-    for k=1:numel(b1)
+    % Run the steady state simulation
+    dnp(:,n)=powder(spin_system,@topdnp_steady,parameters,'esr');
 
-        % Set electron nutation frequency
-        parameters.irr_powers=b1(k);
-
-        % Run the steady state simulation
-        dnp(:,n,k)=powder(spin_system,@xixdnp_steady,parameters,'esr');
-
-    end
-     
 end
 
-% Integrate over the B1 field distribution
-dnp=sum(dnp.*reshape(wb1,[1 1 numel(wb1)]),3)/sum(wb1);
-
-% Integrate over the distance distribution, r^2 is the radial part of the Jacobian
-dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
-
+% Integrate over the distance distribution, r^2 is the Jacobian
+dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(w,[1 numel(w)]),2)/sum((r.^2).*w);
+        
 % Plotting 
 figure(); plot(parameters.el_offs/1e6,real(dnp)); 
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  

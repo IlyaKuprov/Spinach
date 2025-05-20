@@ -1,4 +1,4 @@
-% Simulation of TPPM DNP field profile in the steady state with
+% Simulation of NOVEL DNP field profile in the steady state with
 % electron-proton distance and electron Rabi frequency ensembles.
 % 
 % Calculation time: minutes.
@@ -7,7 +7,7 @@
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function tppm_field_profile_ensemble_b1_r()
+function novel_field_profile_ensemble_b1_r()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -35,7 +35,7 @@ sys.enable={'op_cache','ham_cache'};
 
 % Distance and B1 ensemble
 [r,wr]=gaussleg(3.5,20,3);      % Angstrom
-[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
+[b1,wb1]=gaussleg(14e6,16e6,5); % Hz
 
 % Microwave resonance offsets, Hz
 offsets=linspace(-100e6,100e6,201);
@@ -70,11 +70,10 @@ for n=1:numel(r)
     % Experiment parameters
     parameters.spins={'E','1H'};
     parameters.grid='rep_2ang_800pts_sph';
-    parameters.pulse_dur=48e-9;              % Pulse duration, seconds
-    parameters.nloops=32;                    % Number of TPPM DNP blocks (power of 2)
-    parameters.phase=pi;                     % Second pulse inverted phase
-    parameters.shot_spacing=204e-6;
-    parameters.addshift=-13e6;
+    parameters.contact_dur=500e-9;           % Pulse duration, seconds
+    parameters.flippulse=1;                  % 1 for NOVEL, 0 for SE
+    parameters.flipback=1;                   % 1 for flipback, 0 for no flipback
+    parameters.addshift=-3.3e6;
     parameters.el_offs=offsets;
 
     % Over B1 fields
@@ -84,7 +83,7 @@ for n=1:numel(r)
         parameters.irr_powers=b1(k);
 
         % Run the steady state simulation
-        dnp(:,n,k)=powder(spin_system,@xixdnp_steady,parameters,'esr');
+        dnp(:,n,k)=powder(spin_system,@noveldnp_steady,parameters,'esr');
 
     end
      

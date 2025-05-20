@@ -1,13 +1,14 @@
-% Simulation of TPPM DNP field profile in the steady state with
-% electron-proton distance and electron Rabi frequency ensembles.
-% 
+% Simulation of NOVEL DNP loop count dependence in the 
+% steady state with electron-proton distance and elec-
+% tron Rabi frequency ensembles.
+%
 % Calculation time: minutes.
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function tppm_field_profile_ensemble_b1_r()
+function novel_loop_count_ensemble_b1_r()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -35,13 +36,13 @@ sys.enable={'op_cache','ham_cache'};
 
 % Distance and B1 ensemble
 [r,wr]=gaussleg(3.5,20,3);      % Angstrom
-[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
+[b1,wb1]=gaussleg(14e6,16e6,5); % Hz
 
-% Microwave resonance offsets, Hz
-offsets=linspace(-100e6,100e6,201);
+% Number of NOVEL loops
+loop_counts=[1 2 4 8 16 32 64 128 256];
 
 % Preallocate equilibrium DNP value array
-dnp=zeros([numel(offsets) numel(r) numel(b1)],'like',1i);
+dnp=zeros([numel(loop_counts) numel(r) numel(b1)],'like',1i);
 
 % Over distances
 for n=1:numel(r)
@@ -70,24 +71,31 @@ for n=1:numel(r)
     % Experiment parameters
     parameters.spins={'E','1H'};
     parameters.grid='rep_2ang_800pts_sph';
-    parameters.pulse_dur=48e-9;              % Pulse duration, seconds
-    parameters.nloops=32;                    % Number of TPPM DNP blocks (power of 2)
-    parameters.phase=pi;                     % Second pulse inverted phase
-    parameters.shot_spacing=204e-6;
-    parameters.addshift=-13e6;
-    parameters.el_offs=offsets;
+    parameters.contact_dur=500e-9;           % Pulse duration, seconds
+    parameters.flippulse=1;                  % 1 for NOVEL, 0 for SE
+    parameters.flipback=1;                   % 1 for flipback, 0 for no flipback
+    parameters.addshift=-3.3e6;
+    parameters.el_offs=0e6;
 
     % Over B1 fields
     for k=1:numel(b1)
 
         % Set electron nutation frequency
         parameters.irr_powers=b1(k);
+        
+        % Over loop counts
+        for m=1:numel(loop_counts)
 
-        % Run the steady state simulation
-        dnp(:,n,k)=powder(spin_system,@xixdnp_steady,parameters,'esr');
+            % Set the number of loops
+            parameters.nloops=loop_counts(m);
+
+            % Run the steady state simulation
+            dnp(m,n,k)=powder(spin_system,@noveldnp_steady,parameters,'esr');
+
+        end
 
     end
-     
+        
 end
 
 % Integrate over the B1 field distribution
@@ -97,9 +105,10 @@ dnp=sum(dnp.*reshape(wb1,[1 1 numel(wb1)]),3)/sum(wb1);
 dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
 
 % Plotting 
-figure(); plot(parameters.el_offs/1e6,real(dnp)); 
+contact_times=parameters.pulse_dur*2*loop_counts;
+figure(); plot(contact_times*1e6,real(dnp),'-o');
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
-kxlabel('Microwave resonance offset, MHz'); kgrid; xlim tight;
+kxlabel('Contact time, $\mu$s'); kgrid; xlim tight;
 
 end
 

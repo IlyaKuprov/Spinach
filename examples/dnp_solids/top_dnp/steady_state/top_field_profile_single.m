@@ -3,7 +3,7 @@
 % Calculation time: seconds
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
 function top_field_profile_single()

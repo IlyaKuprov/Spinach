@@ -66,7 +66,7 @@ parfor m=1:numel(offsets)
     localpar.offset=[offsets(m)+reference_point 0];
 
     % Run the simulation
-    contactcurve=powder(spin_system,@novel_se,localpar,'esr');
+    contactcurve=powder(spin_system,@noveldnp,localpar,'esr');
 
     % Extract the answer
     field_prof(m)=real(contactcurve(end));

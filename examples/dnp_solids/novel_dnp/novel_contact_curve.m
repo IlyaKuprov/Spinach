@@ -50,7 +50,7 @@ parameters.flippulse=1;                  % NOVEL pulse sequence
 parameters.needs={'aniso_eq'};           % Sequence needs rho_eq
 
 % Run the calculation
-contact_curve=powder(spin_system,@novel_se,parameters,'esr');
+contact_curve=powder(spin_system,@noveldnp,parameters,'esr');
 
 % Plotting
 time_axis=linspace(0,parameters.timestep*parameters.nsteps,parameters.nsteps+1);

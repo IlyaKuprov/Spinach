@@ -30,6 +30,7 @@
 %     contact_curve         - time dependence of the coil state
 %
 % venkata-subbarao.redrouthu@uni-konstanz.de
+% ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 %
 % <https://spindynamics.org/wiki/index.php?title=xixdnp.m>

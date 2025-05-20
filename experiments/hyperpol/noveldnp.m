@@ -6,7 +6,7 @@
 % 
 % Syntax (call from powder context):
 %
-%          contact_curve=novel_se(spin_system,parameters,H,R,K)
+%          contact_curve=noveldnp(spin_system,parameters,H,R,K)
 %
 % Parameters:
 %
@@ -36,11 +36,12 @@
 %     contact_curve         - time dependence of the coil state
 %
 % venkata-subbarao.redrouthu@uni-konstanz.de
+% ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 %
-% <https://spindynamics.org/wiki/index.php?title=novel_se.m>
+% <https://spindynamics.org/wiki/index.php?title=noveldnp.m>
 
-function contact_curve=novel_se(spin_system,parameters,H,R,K)
+function contact_curve=noveldnp(spin_system,parameters,H,R,K)
 
 % Check consistency
 grumble(parameters,H,R,K);

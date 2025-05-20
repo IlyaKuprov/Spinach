@@ -5,7 +5,7 @@
 % Calculation time: minutes.
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
 function xix_loop_count_ensemble_b1_r()

@@ -1,4 +1,4 @@
-% Simulation of TOP DNP loop count dependence in the 
+% Simulation of NOVEL DNP loop count dependence in the 
 % steady state with electron Rabi frequency ensemble.
 %
 % Calculation time: minutes.
@@ -7,7 +7,7 @@
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function top_loop_count_ensemble_b1()
+function novel_loop_count_ensemble_b1()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -41,9 +41,9 @@ sys.disable={'hygiene'}';
 sys.enable={'op_cache','ham_cache'};
 
 % Distance and B1 ensemble
-[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
+[b1,wb1]=gaussleg(14e6,16e6,5); % Hz
 
-% Number of TOP loops
+% Number of NOVEL loops
 loop_counts=[1 2 4 8 16 32 64 128 256];
 
 % Relaxation rates, distance and orientation
@@ -66,11 +66,11 @@ parameters.coil=state(spin_system,'Lz','1H');
 % Experiment parameters
 parameters.spins={'E','1H'};
 parameters.grid='rep_2ang_800pts_sph';
-parameters.pulse_dur=48e-9;              % Pulse duration, seconds
-parameters.delay_dur=14e-9;              % Delay duration, seconds
-parameters.shot_spacing=153e-6;
-parameters.addshift=-13e6;
-parameters.el_offs=61e6;
+parameters.contact_dur=500e-9;           % Pulse duration, seconds
+parameters.flippulse=1;                  % 1 for NOVEL, 0 for SE
+parameters.flipback=1;                   % 1 for flipback, 0 for no flipback
+parameters.addshift=-3.3e6;
+parameters.el_offs=0e6;
 
 % Preallocate equilibrium DNP value array
 dnp=zeros([numel(loop_counts) numel(b1)],'like',1i);
@@ -88,7 +88,7 @@ for k=1:numel(b1)
         parameters.nloops=loop_counts(m);
 
         % Run the steady state simulation
-        dnp(m,k)=powder(spin_system,@topdnp_steady,parameters,'esr');
+        dnp(m,k)=powder(spin_system,@noveldnp_steady,parameters,'esr');
 
     end
 

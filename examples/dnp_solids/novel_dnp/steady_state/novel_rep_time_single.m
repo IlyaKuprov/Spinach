@@ -1,13 +1,13 @@
-% Simulation of TOP DNP loop count dependence in the 
-% steady state with electron Rabi frequency ensemble.
-%
-% Calculation time: minutes.
+% Simulation of NOVEL DNP repetition time scan in the 
+% steady state.
+% 
+% Calculation time: seconds.
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function top_loop_count_ensemble_b1()
+function novel_rep_time_single()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -40,11 +40,11 @@ sys.tols.prop_chop=1e-12;
 sys.disable={'hygiene'}';
 sys.enable={'op_cache','ham_cache'};
 
-% Distance and B1 ensemble
-[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
+% Shot spacings, s
+srt=logspace(-5,-3,30);
 
-% Number of TOP loops
-loop_counts=[1 2 4 8 16 32 64 128 256];
+% Preallocate equilibrium DNP value array
+dnp=zeros(size(srt),'like',1i);
 
 % Relaxation rates, distance and orientation
 % dependence provided using a function handle
@@ -66,42 +66,28 @@ parameters.coil=state(spin_system,'Lz','1H');
 % Experiment parameters
 parameters.spins={'E','1H'};
 parameters.grid='rep_2ang_800pts_sph';
-parameters.pulse_dur=48e-9;              % Pulse duration, seconds
-parameters.delay_dur=14e-9;              % Delay duration, seconds
-parameters.shot_spacing=153e-6;
-parameters.addshift=-13e6;
-parameters.el_offs=61e6;
+parameters.irr_powers=17.8e6;            % Electron nutation frequency [Hz]
+parameters.contact_dur=500e-9;           % Pulse duration, seconds
+parameters.flippulse=1;                  % 1 for NOVEL, 0 for SE
+parameters.flipback=1;                   % 1 for flipback, 0 for no flipback
+parameters.addshift=-3.3e6;
+parameters.el_offs=0e6;
 
-% Preallocate equilibrium DNP value array
-dnp=zeros([numel(loop_counts) numel(b1)],'like',1i);
+% Over shot spacing
+for m=1:numel(srt)
 
-% Over B1 fields
-for k=1:numel(b1)
+    % Set the shot spacing
+    parameters.shot_spacing=srt(m);
 
-    % Set electron nutation frequency
-    parameters.irr_powers=b1(k);
-
-    % Over loop counts
-    for m=1:numel(loop_counts)
-
-        % Set the number of loops
-        parameters.nloops=loop_counts(m);
-
-        % Run the steady state simulation
-        dnp(m,k)=powder(spin_system,@topdnp_steady,parameters,'esr');
-
-    end
+    % Run the steady state simulation
+    dnp(m)=powder(spin_system,@noveldnp_steady,parameters,'esr');
 
 end
 
-% Integrate over the B1 field distribution
-dnp=sum(dnp.*reshape(wb1,[1 numel(wb1)]),2)/sum(wb1);
-
 % Plotting 
-contact_times=parameters.pulse_dur*2*loop_counts;
-figure(); plot(contact_times*1e6,real(dnp),'-o');
+figure(); plot(srt*1e3,real(dnp));
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
-kxlabel('Contact time, $\mu$s'); kgrid; xlim tight;
+kxlabel('Repetition time, ms'); kgrid; xlim tight;
 
 end
 

@@ -83,7 +83,7 @@ for n=1:numel(nutfrqs)
         localpar.offset=[offsets(m)+reference_point 0];
 
         % Run the simulation
-        contact_curve=powder(spin_system,@novel_se,localpar,'esr');
+        contact_curve=powder(spin_system,@noveldnp,localpar,'esr');
         dnp_surf(n,m)=real(contact_curve(end));
 
     end

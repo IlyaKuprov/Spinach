@@ -68,8 +68,7 @@ dnp=powder(spin_system,@xixdnp_steady,parameters,'esr');
 % Plotting 
 figure(); plot(parameters.el_offs/1e6,real(dnp)); 
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
-kxlabel('Microwave resonance offset, MHz');
-kgrid; xlim tight;
+kxlabel('Microwave resonance offset, MHz'); kgrid; xlim tight;
 
 end
 

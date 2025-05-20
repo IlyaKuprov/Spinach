@@ -100,8 +100,7 @@ dnp=sum(dnp.*reshape(wb1,[1 numel(wb1)]),2)/sum(wb1);
 % Plotting 
 figure(); plot(srt*1e3,real(dnp));
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
-kxlabel('Repetition time, ms');
-kgrid; xlim tight;
+kxlabel('Repetition time, ms'); kgrid; xlim tight;
 
 end
 

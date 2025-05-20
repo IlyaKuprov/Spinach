@@ -96,8 +96,7 @@ dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2)
 contact_times=parameters.pulse_dur*2*loop_counts;
 figure(); plot(contact_times*1e6,real(dnp),'-o');
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
-kxlabel('Contact time, $\mu$s');
-kgrid; xlim tight;
+kxlabel('Contact time, $\mu$s'); kgrid; xlim tight;
 
 end
 

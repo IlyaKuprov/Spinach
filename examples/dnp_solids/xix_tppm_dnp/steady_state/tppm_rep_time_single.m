@@ -87,8 +87,7 @@ end
 % Plotting 
 figure(); plot(srt*1e3,real(dnp));
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
-kxlabel('Repetition time, ms');
-kgrid; xlim tight;
+kxlabel('Repetition time, ms'); kgrid; xlim tight;
 
 end
 

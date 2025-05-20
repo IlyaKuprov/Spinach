@@ -24,4 +24,9 @@ The template for a Wiki page of each function is provided in wiki_template.txt f
 When making a Wiki documentation file for a function, you must include all documentation and syntax information that is present in that function's file. Do not omit any of that information. You must keep the line breaks in the documentation header unchanged when you create a Wiki file. When writing the description of what the function does and how, analyse the function, understnad what it does, and then write a brief informative description. 
 
 
+==Instruction policies==
+
+You must do everything I ask and produce all the files that I ask you to produce. Keep running until you have produced everything I have told you to produce. Then check my instructions again and make sure you have produced everything I have asked you to produce. If not, then keep running until you you have produced everything I have asked you to produce.
+
+
 

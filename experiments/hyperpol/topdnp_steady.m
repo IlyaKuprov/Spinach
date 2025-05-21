@@ -81,10 +81,15 @@ for n=1:numel(parameters.el_offs)
     % Send the problem to GPU if necessary
     if ismember('gpu',spin_system.sys.enable), P=gpuArray(P); end
 
-    % TOP propagator loop in power of 2
-    power_of_two=round(log2(parameters.nloops));
-    for m=1:power_of_two
-        P=clean_up(spin_system,P*P,spin_system.tols.prop_chop); 
+    % Use propagator squaring to do 2^N blocks
+    power_of_two=log2(parameters.nloops);
+    if mod(power_of_two,1)==0
+        for m=1:power_of_two
+            P=clean_up(spin_system,P*P,spin_system.tols.prop_chop); 
+        end
+    else
+        P=clean_up(spin_system,mpower(P,parameters.nloops),...
+                               spin_system.tols.prop_chop);
     end
 
     % Get the problem from GPU if necessary

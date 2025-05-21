@@ -1,4 +1,5 @@
-% 2D parameter scan of XiX DNP in the steady state.
+% 2D parameter scan of XiX DNP in the steady state with 
+% electron Rabi frequency ensemble.
 % 
 % Calculation time: hours.
 % 
@@ -6,7 +7,7 @@
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function xix_pulse_dur_ensemble_b1()
+function xix_w_pulse_dur_ensemble_b1()
 
 % W-band magnet
 sys.magnet=3.4;
@@ -40,20 +41,17 @@ sys.disable={'hygiene'}';
 sys.enable={'op_cache','ham_cache'};
 
 % B1 ensemble
-[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
+[b1,wb1]=gaussleg(10e6,20e6,7); % Hz
 
 % Electron pulse duration grid, s
 pulse_durs=linspace(2e-9,21e-9,200);
-
-% Microwave resonance offsets, Hz
-offsets=linspace(-300e6,300e6,101);
 
 % Relaxation rates, distance and ori. dep. R1n
 inter.relaxation={'t1_t2'};
 r1n_rate=@(alp,bet,gam)r1n_dnp(sys.magnet,inter.temperature,...
                                2.00230,1e-3,52,r_en,bet);
-inter.r1_rates={1000 r1n_rate};
-inter.r2_rates={200000 50e3};
+inter.r1_rates={1e3 r1n_rate};
+inter.r2_rates={200e3 50e3};
 inter.rlx_keep='diagonal';
 inter.equilibrium='dibari';
 
@@ -71,10 +69,10 @@ parameters.nloops=32;
 parameters.phase=pi;                   % Second pulse inverted phase
 parameters.shot_spacing=167e-6;
 parameters.addshift=-33e6;
-parameters.el_offs=offsets;
+parameters.el_offs=linspace(-230e6,205e6,101);
 
 % Preallocate steady state DNP array
-dnp=zeros([numel(offsets) numel(pulse_durs) numel(b1)],'like',1i);
+dnp=zeros([numel(parameters.el_offs) numel(pulse_durs) numel(b1)],'like',1i);
 
 % Over B1 fields
 for k=1:numel(b1)
@@ -83,13 +81,13 @@ for k=1:numel(b1)
     parameters.irr_powers=b1(k);
 
     % Over pulse durations
-    for m=1:numel(pulse_durs)
+    parfor m=1:numel(pulse_durs)
 
-        % Set pulse duration
-        parameters.pulse_dur=pulse_durs(m);
+        % Localise for parallel loop and set pulse duration 
+        localpar=parameters; localpar.pulse_dur=pulse_durs(m);  
 
         % Run the steady state simulation
-        dnp(:,m,k)=powder(spin_system,@xixdnp_steady,parameters,'esr');
+        dnp(:,m,k)=powder(spin_system,@xixdnp_steady,localpar,'esr');
 
     end
 
@@ -99,10 +97,13 @@ end
 dnp=sum(dnp.*reshape(wb1,[1 1 numel(wb1)]),3)/sum(wb1);
 
 % Do the plotting
-imagesc(parameters.el_offs/1e6,pulse_durs*1e9,real(dnp'));
+figure(); imagesc(parameters.el_offs/1e6,pulse_durs*1e9,real(dnp'));
 set(gca,'YDir','normal'); kylabel('Pulse duration, ns');
-kxlabel('Microwave resonance offset, MHz');
+kxlabel('Microwave resonance offset, MHz'); colormap turbo;
 kcolourbar('$I_\textrm{z}$ expectation value on $^{1}$H');
+
+% Save for later
+savefig(gcf,'xix_w_pulse_dur_ensemble_b1.fig');
 
 end
 

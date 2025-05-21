@@ -42,9 +42,6 @@ sys.enable={'op_cache','ham_cache'};
 % Electron pulse duration grid, s
 pulse_durs=linspace(2e-9,21e-9,200);
 
-% Microwave resonance offsets, Hz
-offsets=linspace(-300e6,300e6,101);
-
 % Relaxation rates, distance and ori. dep. R1n
 inter.relaxation={'t1_t2'};
 r1n_rate=@(alp,bet,gam)r1n_dnp(sys.magnet,inter.temperature,...
@@ -69,10 +66,13 @@ parameters.nloops=32;
 parameters.phase=pi;                   % Second pulse inverted phase
 parameters.shot_spacing=167e-6;
 parameters.addshift=-33e6;
-parameters.el_offs=offsets;
+parameters.el_offs=linspace(-230e6,205e6,101);
 
 % Preallocate steady state DNP array
-dnp=zeros([numel(offsets) numel(pulse_durs)],'like',1i);
+dnp=zeros([numel(parameters.el_offs) numel(pulse_durs)],'like',1i);
+
+% Get a figure
+figure();
 
 % Over pulse durations
 for m=1:numel(pulse_durs)
@@ -83,13 +83,17 @@ for m=1:numel(pulse_durs)
     % Run the steady state simulation
     dnp(:,m)=powder(spin_system,@xixdnp_steady,parameters,'esr');
 
+    % Do the plotting
+    imagesc(parameters.el_offs/1e6,pulse_durs*1e9,real(dnp'));
+    set(gca,'YDir','normal'); kylabel('Pulse duration, ns');
+    kcolourbar('$I_\textrm{z}$ expectation value on $^{1}$H');
+    kxlabel('Microwave resonance offset, MHz'); 
+    colormap turbo; drawnow();
+
 end
 
-% Do the plotting
-imagesc(parameters.el_offs/1e6,pulse_durs*1e9,real(dnp'));
-set(gca,'YDir','normal'); kylabel('Pulse duration, ns');
-kxlabel('Microwave resonance offset, MHz');
-kcolourbar('$I_\textrm{z}$ expectation value on $^{1}$H');
+% Save for later
+savefig(gcf,'xix_w_pulse_dur_single.fig');
 
 end
 

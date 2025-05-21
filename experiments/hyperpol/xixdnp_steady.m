@@ -25,8 +25,9 @@
 %
 %     parameters.phase        - phase of each second pulse in radians
 %
-%     parameters.nloops       - number of XiX/TPPM DNP blocks,
-%                               must be an integer power of 2
+%     parameters.nloops       - number of XiX/TPPM DNP blocks, the
+%                               calculation is faster when this is
+%                               an integer power of 2
 %
 %     parameters.shot_spacing - delay between microwave irradiation
 %                               periods, seconds
@@ -76,7 +77,7 @@ for n=1:numel(parameters.el_offs)
     L2=L_curr+2*pi*parameters.irr_powers*(Ex*cos(parameters.phase)+...
                                           Ey*sin(parameters.phase));
 
-    % Precompute and clean up XiX/TPPM propagator
+    % Compute the contact time block propagator
     P=propagator(spin_system,L2,parameters.pulse_dur)*...
       propagator(spin_system,L1,parameters.pulse_dur);
     P=clean_up(spin_system,P,spin_system.tols.prop_chop);
@@ -84,20 +85,25 @@ for n=1:numel(parameters.el_offs)
     % Send the problem to GPU if necessary
     if ismember('gpu',spin_system.sys.enable), P=gpuArray(P); end
 
-    % XiX/TPPM propagator loop in power of 2
-    power_of_two=round(log2(parameters.nloops));
-    for m=1:power_of_two
-        P=clean_up(spin_system,P*P,spin_system.tols.prop_chop); 
+    % Use propagator squaring to do 2^N blocks
+    power_of_two=log2(parameters.nloops);
+    if mod(power_of_two,1)==0
+        for m=1:power_of_two
+            P=clean_up(spin_system,P*P,spin_system.tols.prop_chop); 
+        end
+    else
+        P=clean_up(spin_system,mpower(P,parameters.nloops),...
+                               spin_system.tols.prop_chop);
     end
 
     % Get the problem from GPU if necessary
     if isa(P,'gpuArray'), P=gather(P); end
 
-    % Shot spacing delay
+    % Add the delay after the contact time
     P=propagator(spin_system,L_curr,parameters.shot_spacing)*P;
     P=clean_up(spin_system,P,spin_system.tols.prop_chop);
 
-    % Compute the steady state
+    % Compute the stroboscopic steady state
     rho=steady(spin_system,P,[],[],'newton');
    
     % Get the observable at the steady state
@@ -120,22 +126,22 @@ if ~isfield(parameters,'coil')
     error('detection state must be specified in parameters.coil variable.');
 end
 if ~isfield(parameters,'pulse_dur')
-    error('the pulse duration must be specified in parameters.pulse_dur variable.');
+    error('pulse duration must be specified in parameters.pulse_dur variable.');
 end
 if ~isfield(parameters,'phase')
-    error('the phase of the second pulse must be specified in parameters.phase variable.');
+    error('second pulse phase must be specified in parameters.phase variable.');
 end
 if ~isfield(parameters,'nloops')
-    error('the nubmer of XiX/TPPM blocks must be specified in parameters.nloops variable.');
+    error('nubmer of XiX/TPPM blocks must be specified in parameters.nloops variable.');
 end
 if ~isfield(parameters,'shot_spacing')
-    error('the delay between microwave irradiation periods must be specified in parameters.shot_spacing variable.');
+    error('delay between MW irradiation periods must be specified in parameters.shot_spacing variable.');
 end
 if ~isfield(parameters,'addshift')
-    error('a shift to center the field profile must be specified in parameters.addshift variable.');
+    error('field profile centre shift must be specified in parameters.addshift variable.');
 end
 if ~isfield(parameters,'el_offs')
-    error('the microwave resonance offsets must be specified in parameters.el_offs variable.');
+    error('microwave resonance offsets must be specified in parameters.el_offs variable.');
 end
 end
 

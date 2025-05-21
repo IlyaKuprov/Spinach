@@ -6,7 +6,7 @@
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function xix_pulse_dur_single()
+function xix_w_pulse_dur_single()
 
 % W-band magnet
 sys.magnet=3.4;
@@ -49,8 +49,8 @@ offsets=linspace(-300e6,300e6,101);
 inter.relaxation={'t1_t2'};
 r1n_rate=@(alp,bet,gam)r1n_dnp(sys.magnet,inter.temperature,...
                                2.00230,1e-3,52,r_en,bet);
-inter.r1_rates={1000 r1n_rate};
-inter.r2_rates={200000 50e3};
+inter.r1_rates={1e3 r1n_rate};
+inter.r2_rates={200e3 50e3};
 inter.rlx_keep='diagonal';
 inter.equilibrium='dibari';
 

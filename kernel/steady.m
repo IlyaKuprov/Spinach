@@ -1,7 +1,7 @@
 % Steady state under the repeated action by the same dissi-
 % pative evolution propagator. Syntax:
 %
-%             rho=steady(spin_system,P,rho,tol)
+%         rho=steady(spin_system,P,rho,tol,method)
 %
 % Parameters:
 %

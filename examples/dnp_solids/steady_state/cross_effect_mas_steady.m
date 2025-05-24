@@ -75,9 +75,6 @@ parameters.rate=12.5e3;
 % Relaxation superoperator
 R=relaxation(spin_system);
 
-% Thermal equilibrium state
-rho_eq=equilibrium(spin_system,hamiltonian(assume(spin_system,'labframe'),'left'));
-
 % Rotor period integration
 nsteps=numel(H); P=speye(size(H{1}));
 spin_system.sys.output='hush';
@@ -88,11 +85,10 @@ parfor n=1:nsteps %#ok<*PFBNS>
 end
 
 % Steady state
-for n=1:15, P=P^2; end
-rho_st=P*rho_eq;
+rho_st=steady(spin_system,P,[],[],'newton');
 
 % Rotor period trajectory
-nsteps=numel(H); rho=zeros(numel(rho_eq),nsteps,'like',1i); rho(:,1)=rho_st;
+nsteps=numel(H); rho=zeros(numel(rho_st),nsteps,'like',1i); rho(:,1)=rho_st;
 for n=2:nsteps
     rho(:,n)=step(spin_system,H{n}+2*pi*parameters.mw_pwr*Hmw+...
                                    2*pi*parameters.mw_off*HzE+1i*R,...
@@ -102,10 +98,14 @@ end
 % Trajectory analysis
 figure(); trajan(spin_system,rho,'level_populations');
 
+% Thermal equilibrium state
+rho_eq=equilibrium(spin_system,hamiltonian(assume(spin_system,'labframe'),'left'));
+
 % Enhancement factor
 Hz_dnp=mean(state(spin_system,'Lz','1H')'*rho);
 Hz_eq=state(spin_system,'Lz','1H')'*rho_eq;
-disp(['Enhancement factor: ' num2str(Hz_dnp/Hz_eq)]);
+enh_factor=real(Hz_dnp/Hz_eq);
+disp(['Enhancement factor: ' num2str(enh_factor)]);
 
 end
 

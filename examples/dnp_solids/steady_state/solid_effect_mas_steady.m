@@ -3,7 +3,8 @@
 %
 %         http://dx.doi.org/10.1016/j.jmr.2015.07.001
 %
-% Steady state rotor period simulation for a single crystal.
+% Steady state rotor period simulation for a single crystal,
+% computed using Newton-Raphson steady state solver.
 %
 % Calculation time: seconds
 %

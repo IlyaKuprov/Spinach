@@ -41,13 +41,14 @@ parameters.coil=state(spin_system,'Lz','1H');
 
 % Experiment parameters
 parameters.spins={'E','1H'};
-parameters.offset=[(-3.3+0.0)*1e6 0];    % -3.3 MHz reference point, 0.0 MHz offset
-parameters.irr_powers=14.48e6;           % Electron pulse nutation frequency [Hz]
-parameters.timestep=1e-9;                % Sequence time step, seconds
-parameters.grid='rep_2ang_400pts_sph';   % Spherical averaging grid
-parameters.nsteps=2400;                  % Number of time steps
-parameters.flippulse=1;                  % NOVEL pulse sequence
-parameters.needs={'aniso_eq'};           % Sequence needs rho_eq
+parameters.offset=[(-3.3+0.0)*1e6 0];              % -3.3 MHz reference point, 0.0 MHz offset
+parameters.irr_powers=14.48e6;                     % Electron pulse nutation frequency [Hz]
+parameters.pulse_dur=1/(4*parameters.irr_powers);  % 90-degree pulse duration
+parameters.timestep=1e-9;                          % Sequence time step, seconds
+parameters.grid='rep_2ang_400pts_sph';             % Spherical averaging grid
+parameters.nsteps=2400;                            % Number of time steps
+parameters.flippulse=1;                            % NOVEL pulse sequence
+parameters.needs={'aniso_eq'};                     % Sequence needs rho_eq
 
 % Run the calculation
 contact_curve=powder(spin_system,@noveldnp,parameters,'esr');

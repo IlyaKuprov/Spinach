@@ -74,15 +74,12 @@ for n=1:numel(parameters.el_offs)
         % Add microwave irradiation along X during the 90-degree flip pulse
         L_pulse=L_curr+2*pi*parameters.irr_powers*(Ex*cosd(0)+Ey*sind(0));
         
-        % Calculate the length of the 90-degree flip pulse
-        pulse_dur=1/(4*parameters.irr_powers);
-
         % Add microwave irradiation along -Y during the contact pulse
         L_contact=L_curr+2*pi*parameters.irr_powers*(Ex*cosd(270)+Ey*sind(270));
     
         % Compute and clean up NOVEL propagator
         P=propagator(spin_system,L_contact,parameters.contact_dur)*...
-          propagator(spin_system,L_pulse,pulse_dur);
+          propagator(spin_system,L_pulse,parameters.pulse_dur);
         P=clean_up(spin_system,P,spin_system.tols.prop_chop);
     
         if parameters.flipback
@@ -91,7 +88,7 @@ for n=1:numel(parameters.el_offs)
             L_flipback=L_curr+2*pi*parameters.irr_powers*(Ex*cosd(180)+Ey*sind(180));
 
             % Compute and clean up NOVEL w flipback propagator
-            P=propagator(spin_system,L_flipback,pulse_dur)*P;
+            P=propagator(spin_system,L_flipback,parameters.pulse_dur)*P;
             P=clean_up(spin_system,P,spin_system.tols.prop_chop);
 
          end
@@ -152,4 +149,9 @@ if ~isfield(parameters,'el_offs')
     error('the microwave resonance offsets must be specified in parameters.el_offs variable.');
 end
 end
+
+% Nothing was your own except the few
+% cubic centimetres inside your skull.
+%
+% George Orwell, "1984"
 

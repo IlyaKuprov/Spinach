@@ -73,6 +73,9 @@ for n=1:numel(nutfrqs)
     % Set nutation frequency
     parameters.irr_powers=nutfrqs(n);
 
+    % Get 90-degree pulse duration
+    parameters.pulse_dur=1/(4*parameters.irr_powers);  
+
     % Loop over offsets
     parfor m=1:numel(offsets)
 

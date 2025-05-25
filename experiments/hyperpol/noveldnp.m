@@ -59,11 +59,9 @@ if parameters.flippulse
     % Add microwave irradiation along X during the 90-degree flip pulse
     L_pulse=L+2*pi*parameters.irr_powers*(Ex*cosd(0)+Ey*sind(0));
     
-    % Calculate the length of the 90-degree flip pulse
-    pulse_dur=1/(4*parameters.irr_powers);
-
     % Apply the 90-degree flip pulse
-    rho=evolution(spin_system,L_pulse,[],parameters.rho0,pulse_dur,1,'final');
+    rho=evolution(spin_system,L_pulse,[],parameters.rho0,...
+                                         parameters.pulse_dur,1,'final');
 
 else
     

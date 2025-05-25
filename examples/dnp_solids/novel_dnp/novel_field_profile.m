@@ -45,12 +45,13 @@ parameters.coil=state(spin_system,'Lz','1H');
 
 % Experiment parameters
 parameters.spins={'E','1H'};
-parameters.timestep=1e-9;                % Sequence time step, seconds
-parameters.nsteps=250;                   % Number of time steps
-parameters.flippulse=1;                  % NOVEL pulse sequence
-parameters.irr_powers=14.48e6;           % Electron nutation frequency
-parameters.grid='rep_2ang_100pts_sph';   % Spherical averaging grid
-parameters.needs={'aniso_eq'};           % Sequence needs rho_eq
+parameters.timestep=1e-9;                          % Sequence time step, seconds
+parameters.nsteps=250;                             % Number of time steps
+parameters.flippulse=1;                            % NOVEL pulse sequence
+parameters.irr_powers=14.48e6;                     % Electron nutation frequency
+parameters.pulse_dur=1/(4*parameters.irr_powers);  % 90-degree pulse duration
+parameters.grid='rep_2ang_100pts_sph';             % Spherical averaging grid
+parameters.needs={'aniso_eq'};                     % Sequence needs rho_eq
 
 % Microwave offsets, Hz
 offsets=linspace(-35e6,35e6,71);

@@ -1,4 +1,4 @@
-% Simulation of XiX DNP loop count dependence in the 
+% Simulation of XiX DNP contact time dependence in the 
 % steady state with electron Rabi frequency ensemble.
 %
 % Calculation time: minutes.
@@ -7,7 +7,7 @@
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function xix_loop_count_ensemble_b1()
+function xix_q_con_time_ensemble_b1()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -43,8 +43,8 @@ sys.enable={'op_cache','ham_cache'};
 % Distance and B1 ensemble
 [b1,wb1]=gaussleg(10e6,20e6,5); % Hz
 
-% Number of XiX loops
-loop_counts=[1 2 4 8 16 32 64];
+% XiX loop count
+loop_counts=1:64;
 
 % Relaxation rates, distance and orientation
 % dependence provided using a function handle
@@ -68,7 +68,6 @@ parameters.spins={'E','1H'};
 parameters.grid='rep_2ang_800pts_sph';
 parameters.pulse_dur=48e-9;              % Pulse duration, seconds
 parameters.phase=pi;                     % Second pulse inverted phase
-parameters.shot_spacing=153e-6;
 parameters.addshift=-13e6;
 parameters.el_offs=61e6;
 
@@ -82,13 +81,20 @@ for k=1:numel(b1)
     parameters.irr_powers=b1(k);
 
     % Over loop counts
-    for m=1:numel(loop_counts)
+    parfor m=1:numel(loop_counts)
+
+        % Localise parameters
+        localpar=parameters;
 
         % Set the number of loops
-        parameters.nloops=loop_counts(m);
+        localpar.nloops=loop_counts(m);
+
+        % Update the shot spacing
+        pulses_dur=2*localpar.nloops*localpar.pulse_dur;
+        localpar.shot_spacing=153e-6 - pulses_dur;
 
         % Run the steady state simulation
-        dnp(m,k)=powder(spin_system,@xixdnp_steady,parameters,'esr');
+        dnp(m,k)=powder(spin_system,@xixdnp_steady,localpar,'esr');
 
     end
 
@@ -101,7 +107,11 @@ dnp=sum(dnp.*reshape(wb1,[1 numel(wb1)]),2)/sum(wb1);
 contact_times=parameters.pulse_dur*2*loop_counts;
 figure(); plot(contact_times*1e6,real(dnp),'-o');
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
-kxlabel('Contact time, $\mu$s'); kgrid; xlim tight;
+kkxlabel('Total contact time, $\mu$s'); 
+kgrid; xlim tight; ylim padded;
+
+% Save for later
+savefig(gcf,'xix_q_con_time_ensemble_b1.fig');
 
 end
 

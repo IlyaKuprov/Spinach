@@ -1,4 +1,4 @@
-% Simulation of XiX DNP loop count dependence in the 
+% Simulation of XiX DNP contact time dependence in the 
 % steady state.
 %
 % Calculation time: seconds.
@@ -7,7 +7,7 @@
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function xix_loop_count_single()
+function xix_q_con_time_single()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -33,8 +33,8 @@ xyz=cell2mat(inter.coordinates); r_en=xyz(2,3);
 inter.relaxation={'t1_t2'};
 r1n_rate=@(alp,bet,gam)r1n_dnp(sys.magnet,inter.temperature,...
                                2.00230,1e-3,52,r_en,bet); 
-inter.r1_rates={1000 r1n_rate};
-inter.r2_rates={200000 50e3};
+inter.r1_rates={1e3 r1n_rate};
+inter.r2_rates={200e3 50e3};
 inter.rlx_keep='diagonal';
 inter.equilibrium='dibari';
 
@@ -52,36 +52,46 @@ spin_system=basis(spin_system,bas);
 % Detect the proton
 parameters.coil=state(spin_system,'Lz',2);
 
-% Number of XiX loops
-loop_counts=[1 2 4 8 16 32 64];
+% XiX loop count
+loop_counts=1:64;
 
 % Experiment parameters
 parameters.spins={'E','1H'};
-parameters.irr_powers=17.8e6;            % Electron nutation frequency [Hz]
+parameters.irr_powers=18e6;              % Electron nutation frequency [Hz]
 parameters.grid='rep_2ang_800pts_sph';
 parameters.pulse_dur=48e-9;              % Pulse duration, seconds
 parameters.phase=pi;                     % Second pulse inverted phase
-parameters.shot_spacing=204e-6;
 parameters.addshift=-13e6;
 parameters.el_offs=61e6;
        
 % Over loop counts
 dnp=zeros(size(loop_counts),'like',1i);
-for m=1:numel(loop_counts)
+parfor m=1:numel(loop_counts)
+
+    % Localise parameters
+    localpar=parameters;
 
     % Set the number of loops
-    parameters.nloops=loop_counts(m);
+    localpar.nloops=loop_counts(m);
+
+    % Update the shot spacing
+    pulses_dur=2*localpar.nloops*localpar.pulse_dur;
+    localpar.shot_spacing=153e-6 - pulses_dur;
 
     % Run the steady state simulation
-    dnp(m)=powder(spin_system,@xixdnp_steady,parameters,'esr');
+    dnp(m)=powder(spin_system,@xixdnp_steady,localpar,'esr');
 
 end
 
 % Plotting 
-contact_times=parameters.pulse_dur*2*loop_counts;
-figure(); plot(contact_times*1e6,real(dnp),'-o');
+contact_times=2*parameters.pulse_dur*loop_counts;
+figure(); plot(contact_times*1e6,real(dnp));
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
-kxlabel('Contact time, $\mu$s'); kgrid; xlim tight;
+kxlabel('Total contact time, $\mu$s'); 
+kgrid; xlim tight; ylim padded;
+
+% Save for later
+savefig(gcf,'xix_q_con_time_single.fig');
 
 end
 

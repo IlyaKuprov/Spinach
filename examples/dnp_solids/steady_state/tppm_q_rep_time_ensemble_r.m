@@ -100,7 +100,7 @@ dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2)
 figure(); plot(rep_time*1e3,real(dnp));
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
 kxlabel('Repetition time, ms'); 
-kgrid; xlim tight; ylim padded;
+kgrid; xlim([0 2]); ylim padded;
 
 % Save for later
 savefig(gcf,'tppm_q_rep_time_ensemble_r.fig');

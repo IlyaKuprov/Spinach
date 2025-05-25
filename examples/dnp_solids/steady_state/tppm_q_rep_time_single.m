@@ -45,8 +45,8 @@ sys.enable={'op_cache','ham_cache'};
 inter.relaxation={'t1_t2'};
 r1n_rate=@(alp,bet,gam)r1n_dnp(sys.magnet,inter.temperature,...
                                2.00230,1e-3,52,r_en,bet);
-inter.r1_rates={1000 r1n_rate};
-inter.r2_rates={200000 50e3};
+inter.r1_rates={1e3 r1n_rate};
+inter.r2_rates={200e3 50e3};
 inter.rlx_keep='diagonal';
 inter.equilibrium='dibari';
 
@@ -92,7 +92,7 @@ end
 figure(); plot(rep_time*1e3,real(dnp));
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
 kxlabel('Repetition time, ms'); 
-kgrid; xlim tight; ylim padded;
+kgrid; xlim([0 2]); ylim padded;
 
 % Save for later
 savefig(gcf,'tppm_q_rep_time_single.fig');

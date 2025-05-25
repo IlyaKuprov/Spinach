@@ -7,7 +7,7 @@
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function top_rep_time_ensemble_r()
+function top_q_rep_time_ensemble_r()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -36,11 +36,11 @@ sys.enable={'op_cache','ham_cache'};
 % Distance ensemble
 [r,wr]=gaussleg(3.5,20,3);      % Angstrom
 
-% Shot spacings, s
-srt=logspace(-5,-3,30);
+% Log spacing for rep. time
+rep_time=logspace(-5,-3,30);
 
 % Preallocate equilibrium DNP value array
-dnp=zeros([numel(srt) numel(r)],'like',1i);
+dnp=zeros([numel(rep_time) numel(r)],'like',1i);
 
 % Over distances
 for n=1:numel(r)  
@@ -54,8 +54,8 @@ for n=1:numel(r)
     inter.relaxation={'t1_t2'};
     r1n_rate=@(alp,bet,gam)r1n_dnp(sys.magnet,inter.temperature,...
                                    2.00230,1e-3,52,r(n),bet);
-    inter.r1_rates={1000 r1n_rate};
-    inter.r2_rates={200000 50e3};
+    inter.r1_rates={1e3 r1n_rate};
+    inter.r2_rates={200e3 50e3};
     inter.rlx_keep='diagonal';
     inter.equilibrium='dibari';
     
@@ -69,21 +69,26 @@ for n=1:numel(r)
     % Experiment parameters
     parameters.spins={'E','1H'};
     parameters.grid='rep_2ang_800pts_sph';
-    parameters.irr_powers=17.8e6;            % Electron nutation frequency [Hz]
-    parameters.pulse_dur=48e-9;              % Pulse duration, seconds
+    parameters.irr_powers=18e6;              % Electron nutation frequency [Hz]
+    parameters.pulse_dur=10e-9;              % Pulse duration, seconds
     parameters.delay_dur=14e-9;              % Delay duration, seconds
-    parameters.nloops=256;                   % Number of TOP DNP blocks (power of 2)
+    parameters.nloops=300;                   % Number of TOP DNP blocks
     parameters.addshift=-13e6;
-    parameters.el_offs=-39e6;
+    parameters.el_offs=95e6;
 
-    % Over shot spacing
-    for m=1:numel(srt)
+    % Over repetition times
+    parfor m=1:numel(rep_time)
+
+        % Localise parameters
+        localpar=parameters;
 
         % Set the shot spacing
-        parameters.shot_spacing=srt(m);
+        pulses_time=localpar.nloops*(localpar.pulse_dur+...
+                                     localpar.delay_dur);
+        localpar.shot_spacing=rep_time(m)-pulses_time;
 
         % Run the steady state simulation
-        dnp(m,n)=powder(spin_system,@topdnp_steady,parameters,'esr');
+        dnp(m,n)=powder(spin_system,@topdnp_steady,localpar,'esr');
 
     end
    
@@ -93,9 +98,13 @@ end
 dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
 
 % Plotting 
-figure(); plot(srt*1e3,real(dnp));
+figure(); plot(rep_time*1e3,real(dnp));
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
-kxlabel('Repetition time, ms'); kgrid; xlim tight;
+kxlabel('Repetition time, ms'); 
+kgrid; xlim([0 2]); ylim padded;
+
+% Save for later
+savefig(gcf,'top_q_rep_time_ensemble_r.fig');
 
 end
 

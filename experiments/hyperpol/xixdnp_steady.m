@@ -137,6 +137,9 @@ end
 if ~isfield(parameters,'shot_spacing')
     error('delay between MW irradiation periods must be specified in parameters.shot_spacing variable.');
 end
+if parameters.shot_spacing<0
+    error('parameters.shot_spacing must be a non-negative real number.');
+end
 if ~isfield(parameters,'addshift')
     error('field profile centre shift must be specified in parameters.addshift variable.');
 end

@@ -1,13 +1,13 @@
-% Simulation of XiX DNP repetition time scan in the steady 
-% state with distributions in microwave B1 field.
+% Simulation of XiX DNP repetition time scan in the 
+% steady state.
 % 
-% Calculation time: minutes.
+% Calculation time: seconds.
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function xix_rep_time_ensemble_b1()
+function xix_q_rep_time_single()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -40,15 +40,6 @@ sys.tols.prop_chop=1e-12;
 sys.disable={'hygiene'}';
 sys.enable={'op_cache','ham_cache'};
 
-% B1 ensemble
-[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
-
-% Shot spacings, s
-srt=logspace(-5,-3,30);
-
-% Preallocate equilibrium DNP value array
-dnp=zeros([numel(srt) numel(b1)],'like',1i);
-
 % Relaxation rates, distance and orientation
 % dependence provided using a function handle
 inter.relaxation={'t1_t2'};
@@ -69,38 +60,42 @@ parameters.coil=state(spin_system,'Lz','1H');
 % Experiment parameters
 parameters.spins={'E','1H'};
 parameters.grid='rep_2ang_800pts_sph';
+parameters.irr_powers=18e6;              % Electron nutation frequency [Hz]
 parameters.pulse_dur=48e-9;              % Pulse duration, seconds
-parameters.nloops=32;                    % Number of XiX DNP blocks (power of 2)
+parameters.nloops=36;                    % Number of XiX DNP blocks (power of 2)
 parameters.phase=pi;                     % Second pulse inverted phase
 parameters.addshift=-13e6;
 parameters.el_offs=-39e6;
 
-% Over B1 fields
-for k=1:numel(b1)
+% Log spacing for rep. time
+rep_time=logspace(-5,-3,30);
 
-    % Set electron nutation frequency
-    parameters.irr_powers=b1(k);
+% Preallocate equilibrium DNP value array
+dnp=zeros(size(rep_time),'like',1i);
 
-    % Over shot spacing
-    for m=1:numel(srt)
+% Over repetition times
+parfor m=1:numel(rep_time)
 
-        % Set the shot spacing
-        parameters.shot_spacing=srt(m);
+    % Localise parameters
+    localpar=parameters;
 
-        % Run the steady state simulation
-        dnp(m,k)=powder(spin_system,@xixdnp_steady,parameters,'esr');
+    % Set the shot spacing
+    pulses_time=2*localpar.nloops*localpar.pulse_dur;
+    localpar.shot_spacing=rep_time(m)-pulses_time;
 
-    end
+    % Run the steady state simulation
+    dnp(m)=powder(spin_system,@xixdnp_steady,localpar,'esr');
 
 end
 
-% Integrate over the B1 field distribution
-dnp=sum(dnp.*reshape(wb1,[1 numel(wb1)]),2)/sum(wb1);
-
 % Plotting 
-figure(); plot(srt*1e3,real(dnp));
+figure(); plot(rep_time*1e3,real(dnp));
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
-kxlabel('Repetition time, ms'); kgrid; xlim tight;
+kxlabel('Repetition time, ms'); 
+kgrid; xlim tight; ylim padded;
+
+% Save for later
+savefig(gcf,'xix_q_rep_time_single.fig');
 
 end
 

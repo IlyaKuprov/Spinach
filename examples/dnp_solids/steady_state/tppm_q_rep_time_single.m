@@ -38,7 +38,6 @@ sys.tols.prop_chop=1e-12;
 
 % Algorithmic options
 sys.disable={'hygiene'}';
-sys.enable={'op_cache','ham_cache'};
 
 % Relaxation rates, distance and orientation
 % dependence provided using a function handle

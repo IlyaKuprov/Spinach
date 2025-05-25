@@ -44,7 +44,6 @@ bas.approximation='none';
 
 % Algorithmic options
 sys.disable={'hygiene'}';
-sys.enable={'op_cache','ham_cache'};
 
 % Propagator accuracy
 sys.tols.prop_chop=1e-12;

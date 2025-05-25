@@ -37,7 +37,6 @@ sys.tols.prop_chop=1e-12;
 
 % Algorithmic options
 sys.disable={'hygiene'}';
-sys.enable={'op_cache','ham_cache'};
 
 % Electron pulse duration grid, s
 pulse_durs=linspace(2e-9,21e-9,200);

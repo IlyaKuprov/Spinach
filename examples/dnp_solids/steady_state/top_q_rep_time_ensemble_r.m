@@ -31,7 +31,6 @@ sys.tols.prop_chop=1e-12;
 
 % Algorithmic options
 sys.disable={'hygiene'}';
-sys.enable={'op_cache','ham_cache'};
 
 % Distance ensemble
 [r,wr]=gaussleg(3.5,20,3);      % Angstrom

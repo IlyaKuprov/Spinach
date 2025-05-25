@@ -88,5 +88,8 @@ kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');
 kxlabel('Microwave resonance offset, MHz'); 
 kgrid; xlim tight; ylim padded;
 
+% Save for later
+savefig(gcf,'xix_q_field_profile_ensemble_r.fig');
+
 end
 

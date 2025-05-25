@@ -1,6 +1,5 @@
-% Simulation of XiX DNP repetition time scan in the steady 
-% state with distributions in electron-proton distance and
-% microwave B1 field.
+% Simulation of TPPM DNP repetition time scan in the steady 
+% state with distributions in electron-proton distance.
 % 
 % Calculation time: minutes.
 % 
@@ -8,7 +7,7 @@
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function xix_q_rep_time_ensemble_b1_r()
+function tppm_q_rep_time_ensemble_r()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -34,15 +33,14 @@ sys.tols.prop_chop=1e-12;
 sys.disable={'hygiene'}';
 sys.enable={'op_cache','ham_cache'};
 
-% Distance and B1 ensemble
+% Distance ensemble
 [r,wr]=gaussleg(3.5,20,3);      % Angstrom
-[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
 
 % Log spacing for rep. time
-rep_time=logspace(-5,-3,30);
+rep_time=logspace(-5.0,-2.7,30);
 
 % Preallocate equilibrium DNP value array
-dnp=zeros([numel(rep_time) numel(r) numel(b1)],'like',1i);
+dnp=zeros([numel(rep_time) numel(r)],'like',1i);
 
 % Over distances
 for n=1:numel(r)  
@@ -71,39 +69,29 @@ for n=1:numel(r)
     % Experiment parameters
     parameters.spins={'E','1H'};
     parameters.grid='rep_2ang_800pts_sph';
-    parameters.pulse_dur=48e-9;              % Pulse duration, seconds
-    parameters.nloops=36;                    % Number of XiX DNP blocks
-    parameters.phase=pi;                     % Second pulse inverted phase
+    parameters.irr_powers=33e6;              % Electron nutation frequency [Hz]
+    parameters.pulse_dur=16e-9;              % Pulse duration, seconds
+    parameters.nloops=300;                   % Number of TPPM DNP blocks
+    parameters.phase=115*pi/180;             % Second pulse phase
     parameters.addshift=-13e6;
-    parameters.el_offs=-39e6;
+    parameters.el_offs=2e6;
 
-    % Over B1 fields
-    for k=1:numel(b1)     
-        
-        % Set electron nutation frequency
-        parameters.irr_powers=b1(k);             
-    
-        % Over repetition times
-        parfor m=1:numel(rep_time)
+    % Over repetition times
+    parfor m=1:numel(rep_time)
 
-            % Localise parameters
-            localpar=parameters;
+        % Localise parameters
+        localpar=parameters;
 
-            % Set the shot spacing
-            pulses_time=2*localpar.nloops*localpar.pulse_dur;
-            localpar.shot_spacing=rep_time(m)-pulses_time;
+        % Set the shot spacing
+        pulses_time=2*localpar.nloops*localpar.pulse_dur;
+        localpar.shot_spacing=rep_time(m)-pulses_time;
 
-            % Run the steady state simulation
-            dnp(m,n,k)=powder(spin_system,@xixdnp_steady,localpar,'esr');
+        % Run the steady state simulation
+        dnp(m,n)=powder(spin_system,@xixdnp_steady,localpar,'esr');
 
-        end
-    
     end
-
+   
 end
-
-% Integrate over the B1 field distribution
-dnp=sum(dnp.*reshape(wb1,[1 1 numel(wb1)]),3)/sum(wb1);
 
 % Integrate over the distance distribution, r^2 is the Jacobian
 dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
@@ -115,7 +103,7 @@ kxlabel('Repetition time, ms');
 kgrid; xlim tight; ylim padded;
 
 % Save for later
-savefig(gcf,'xix_q_rep_time_ensemble_b1_r.fig');
+savefig(gcf,'tppm_q_rep_time_ensemble_r.fig');
 
 end
 

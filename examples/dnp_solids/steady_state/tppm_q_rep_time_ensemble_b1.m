@@ -1,4 +1,4 @@
-% Simulation of XiX DNP repetition time scan in the steady 
+% Simulation of TPPM DNP repetition time scan in the steady 
 % state with distributions in microwave B1 field.
 % 
 % Calculation time: minutes.
@@ -7,7 +7,7 @@
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function xix_q_rep_time_ensemble_b1()
+function tppm_q_rep_time_ensemble_b1()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -41,10 +41,10 @@ sys.disable={'hygiene'}';
 sys.enable={'op_cache','ham_cache'};
 
 % B1 ensemble
-[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
+[b1,wb1]=gaussleg(25e6,35e6,5); % Hz
 
 % Log spacing for rep. time
-rep_time=logspace(-5,-3,30);
+rep_time=logspace(-5.0,-2.7,30);
 
 % Preallocate equilibrium DNP value array
 dnp=zeros([numel(rep_time) numel(b1)],'like',1i);
@@ -69,11 +69,11 @@ parameters.coil=state(spin_system,'Lz','1H');
 % Experiment parameters
 parameters.spins={'E','1H'};
 parameters.grid='rep_2ang_800pts_sph';
-parameters.pulse_dur=48e-9;              % Pulse duration, seconds
-parameters.nloops=36;                    % Number of XiX DNP blocks
-parameters.phase=pi;                     % Second pulse inverted phase
+parameters.pulse_dur=16e-9;              % Pulse duration, seconds
+parameters.nloops=300;                   % Number of TPPM DNP blocks
+parameters.phase=115*pi/180;             % Second pulse phase
 parameters.addshift=-13e6;
-parameters.el_offs=-39e6;
+parameters.el_offs=2e6;
 
 % Over B1 fields
 for k=1:numel(b1)
@@ -108,7 +108,7 @@ kxlabel('Repetition time, ms');
 kgrid; xlim tight; ylim padded;
 
 % Save for later
-savefig(gcf,'xix_q_rep_time_ensemble_b1.fig');
+savefig(gcf,'tppm_q_rep_time_ensemble_b1.fig');
 
 end
 

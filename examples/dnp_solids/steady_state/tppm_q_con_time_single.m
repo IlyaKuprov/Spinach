@@ -92,6 +92,7 @@ kgrid; xlim tight; ylim padded;
 
 % Save for later
 savefig(gcf,'tppm_q_con_time_single.fig');
+save('tppm_q_con_time_single.mat');
 
 end
 

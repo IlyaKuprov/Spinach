@@ -89,6 +89,7 @@ kgrid; xlim tight; ylim padded;
 
 % Save for later
 savefig(gcf,'xix_w_field_profile_ensemble_r.fig');
+save('xix_w_field_profile_ensemble_r.mat');
 
 end
 

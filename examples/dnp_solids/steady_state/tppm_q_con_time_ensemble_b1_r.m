@@ -119,6 +119,7 @@ kgrid; xlim tight; ylim padded;
 
 % Save for later
 savefig(gcf,'tppm_q_con_time_ensemble_b1_r.fig');
+save('tppm_q_con_time_ensemble_b1_r.mat');
 
 end
 

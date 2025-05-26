@@ -115,6 +115,7 @@ kgrid; xlim([0 2]); ylim padded;
 
 % Save for later
 savefig(gcf,'xix_q_rep_time_ensemble_b1_r.fig');
+save('xix_q_rep_time_ensemble_b1_r.mat');
 
 end
 

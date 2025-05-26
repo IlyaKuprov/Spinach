@@ -151,6 +151,7 @@ kgrid; xlim tight; ylim padded;
 
 % Save for later
 savefig(gcf,'top_q_con_time_ensemble_b1.fig');
+save('top_q_con_time_ensemble_b1.mat');
 
 end
 

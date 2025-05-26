@@ -103,6 +103,7 @@ kgrid; xlim([0 2]); ylim padded;
 
 % Save for later
 savefig(gcf,'tppm_q_rep_time_ensemble_r.fig');
+save('tppm_q_rep_time_ensemble_r.mat');
 
 end
 

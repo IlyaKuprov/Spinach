@@ -93,6 +93,7 @@ end
 
 % Save for later
 savefig(gcf,'xix_w_pulse_dur_single.fig');
+save('xix_w_pulse_dur_single.mat');
 
 end
 

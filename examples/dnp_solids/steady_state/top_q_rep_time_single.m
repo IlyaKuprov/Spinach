@@ -96,6 +96,7 @@ kgrid; xlim([0 2]); ylim padded;
 
 % Save for later
 savefig(gcf,'top_q_rep_time_single.fig');
+save('top_q_rep_time_single.mat');
 
 end
 

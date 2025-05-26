@@ -1,4 +1,4 @@
-% Simulation of TOP DNP contact time dependence in the 
+% Simulation of TPPM DNP contact time dependence in the 
 % steady state with electron-proton distance ensembles.
 %
 % Calculation time: minutes.
@@ -7,7 +7,7 @@
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function top_q_con_time_ensemble_r()
+function tppm_q_con_time_ensemble_r()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -35,12 +35,11 @@ sys.disable={'hygiene'}';
 % Distance ensemble
 [r,wr]=gaussleg(3.5,20,3);      % Angstrom
 
-% TOP loop count
+% TPPM loop count
 loop_counts=1:64;
 
 % Preallocate equilibrium DNP value array
-dnp_a=zeros([numel(loop_counts) numel(r)],'like',1i);
-dnp_b=zeros([numel(loop_counts) numel(r)],'like',1i);
+dnp=zeros([numel(loop_counts) numel(r)],'like',1i);
 
 % Over distances
 for n=1:numel(r)
@@ -68,10 +67,12 @@ for n=1:numel(r)
 
     % Experiment parameters
     parameters.spins={'E','1H'};
+    parameters.irr_powers=33e6;              % Electron nutation frequency [Hz]
+    parameters.pulse_dur=16e-9;              % Pulse duration, seconds
     parameters.grid='rep_2ang_800pts_sph';
-    parameters.pulse_dur=10e-9;              % Pulse duration, seconds
-    parameters.delay_dur=14e-9;
+    parameters.phase=115*pi/180;             % Second pulse phase
     parameters.addshift=-13e6;
+    parameters.el_offs=2e6;
 
     % Over loop counts
     parfor m=1:numel(loop_counts)
@@ -82,45 +83,29 @@ for n=1:numel(r)
         % Set the number of loops
         localpar.nloops=loop_counts(m);
 
-        % Parameter set A
-        localpar.irr_powers=18e6;
-        localpar.el_offs=95e6;
-        pulses_dur=localpar.nloops*(localpar.pulse_dur+...
-                                    localpar.delay_dur);
-        localpar.shot_spacing=102e-6 - pulses_dur;
+        % Update the shot spacing
+        pulses_dur=2*localpar.nloops*localpar.pulse_dur;
+        localpar.shot_spacing=816e-6 - pulses_dur;
 
-        % Run the steady state simulation A
-        dnp_a(m,n)=powder(spin_system,@topdnp_steady,localpar,'esr');
-
-        % Parameter set B
-        localpar.irr_powers=33e6;
-        localpar.el_offs=92e6;
-        pulses_dur=localpar.nloops*(localpar.pulse_dur+...
-                                    localpar.delay_dur);
-        localpar.shot_spacing=153e-6 - pulses_dur;
-
-        % Run the steady state simulation B
-        dnp_b(m,n)=powder(spin_system,@topdnp_steady,localpar,'esr');
+        % Run the steady state simulation
+        dnp(m,n)=powder(spin_system,@xixdnp_steady,localpar,'esr');
 
     end
- 
+        
 end
 
 % Integrate over the distance distribution, r^2 is the radial part of the Jacobian
-dnp_a=sum(dnp_a.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
-dnp_b=sum(dnp_b.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
+dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
 
 % Plotting 
-contact_times=(parameters.pulse_dur+parameters.delay_dur)*loop_counts;
-figure(); plot(contact_times*1e6,real(dnp_a));
-hold on; plot(contact_times*1e6,real(dnp_b));
-kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');
-klegend({'TOP, 18 MHz','TOP, 33 MHz'});
+contact_times=parameters.pulse_dur*2*loop_counts;
+figure(); plot(contact_times*1e6,real(dnp));
+kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
 kxlabel('Total contact time, $\mu$s'); 
 kgrid; xlim tight; ylim padded;
 
 % Save for later
-savefig(gcf,'top_q_con_time_ensemble_r.fig');
+savefig(gcf,'tppm_q_con_time_ensemble_r.fig');
 
 end
 

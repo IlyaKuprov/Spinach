@@ -89,7 +89,8 @@ for k=1:numel(b1)
 
         % Parameter set A
         localpar.el_offs=95e6;
-        pulses_dur=2*localpar.nloops*localpar.pulse_dur;
+        pulses_dur=localpar.nloops*(localpar.pulse_dur+...
+                                    localpar.delay_dur);
         localpar.shot_spacing=102e-6 - pulses_dur;
 
         % Run the steady state simulation A
@@ -125,7 +126,8 @@ for k=1:numel(b1)
 
         % Parameter set B
         localpar.el_offs=92e6;
-        pulses_dur=2*localpar.nloops*localpar.pulse_dur;
+        pulses_dur=localpar.nloops*(localpar.pulse_dur+...
+                                    localpar.delay_dur);
         localpar.shot_spacing=153e-6 - pulses_dur;
 
         % Run the steady state simulation B
@@ -139,7 +141,7 @@ end
 dnp_b=sum(dnp_b.*reshape(wb1,[1 numel(wb1)]),2)/sum(wb1);
 
 % Plotting 
-contact_times=2*parameters.pulse_dur*loop_counts;
+contact_times=(parameters.pulse_dur+parameters.delay_dur)*loop_counts;
 figure(); plot(contact_times*1e6,real(dnp_a));
 hold on; plot(contact_times*1e6,real(dnp_b));
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');

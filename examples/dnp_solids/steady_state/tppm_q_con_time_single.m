@@ -1,4 +1,4 @@
-% Simulation of TOP DNP contact time dependence in the 
+% Simulation of TPPM DNP contact time dependence in the 
 % steady state.
 %
 % Calculation time: seconds.
@@ -7,7 +7,7 @@
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
 
-function top_q_con_time_single()
+function tppm_q_con_time_single()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -52,19 +52,20 @@ spin_system=basis(spin_system,bas);
 % Detect the proton
 parameters.coil=state(spin_system,'Lz',2);
 
-% TOP loop count
+% TPPM loop count
 loop_counts=1:64;
 
 % Experiment parameters
 parameters.spins={'E','1H'};
+parameters.irr_powers=33e6;              % Electron nutation frequency [Hz]
+parameters.pulse_dur=16e-9;              % Pulse duration, seconds
 parameters.grid='rep_2ang_800pts_sph';
-parameters.pulse_dur=10e-9;              % Pulse duration, seconds
-parameters.delay_dur=14e-9;
+parameters.phase=115*pi/180;             % Second pulse phase
 parameters.addshift=-13e6;
+parameters.el_offs=2e6;
        
 % Over loop counts
-dnp_a=zeros(size(loop_counts),'like',1i);
-dnp_b=zeros(size(loop_counts),'like',1i);
+dnp=zeros(size(loop_counts),'like',1i);
 parfor m=1:numel(loop_counts)
 
     % Localise parameters
@@ -73,39 +74,24 @@ parfor m=1:numel(loop_counts)
     % Set the number of loops
     localpar.nloops=loop_counts(m);
 
-    % Parameter set A
-    localpar.irr_powers=18e6;             
-    localpar.el_offs=95e6;
-    pulses_dur=localpar.nloops*(localpar.pulse_dur+...
-                                localpar.delay_dur);
-    localpar.shot_spacing=102e-6 - pulses_dur;
-    
-    % Run the steady state simulation A
-    dnp_a(m)=powder(spin_system,@topdnp_steady,localpar,'esr');
+    % Update the shot spacing
+    pulses_dur=2*localpar.nloops*localpar.pulse_dur;
+    localpar.shot_spacing=816e-6 - pulses_dur;
 
-    % Parameter set B
-    localpar.irr_powers=33e6;             
-    localpar.el_offs=92e6;
-    pulses_dur=localpar.nloops*(localpar.pulse_dur+...
-                                localpar.delay_dur);
-    localpar.shot_spacing=153e-6 - pulses_dur;
-    
-    % Run the steady state simulation B
-    dnp_b(m)=powder(spin_system,@topdnp_steady,localpar,'esr');
+    % Run the steady state simulation
+    dnp(m)=powder(spin_system,@xixdnp_steady,localpar,'esr');
 
 end
 
 % Plotting 
-contact_times=(parameters.pulse_dur+parameters.delay_dur)*loop_counts;
-figure(); plot(contact_times*1e6,real(dnp_a));
-hold on; plot(contact_times*1e6,real(dnp_b));
-kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');
-klegend({'TOP, 18 MHz','TOP, 33 MHz'});
+contact_times=2*parameters.pulse_dur*loop_counts;
+figure(); plot(contact_times*1e6,real(dnp));
+kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
 kxlabel('Total contact time, $\mu$s'); 
 kgrid; xlim tight; ylim padded;
 
 % Save for later
-savefig(gcf,'top_q_con_time_single.fig');
+savefig(gcf,'tppm_q_con_time_single.fig');
 
 end
 

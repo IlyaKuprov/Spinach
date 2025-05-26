@@ -56,7 +56,7 @@ spin_system=basis(spin_system,bas);
 parameters.coil=state(spin_system,'Lz',2);
 
 % B1 ensemble, Gauss-Legendre points
-[b1,wb1]=gaussleg(10e6,20e6,7); % Hz
+[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
 
 % Experiment parameters
 parameters.spins={'E','1H'};
@@ -64,9 +64,11 @@ parameters.grid='rep_2ang_800pts_sph';
 parameters.pulse_dur=48e-9;              % Pulse duration, seconds
 parameters.nloops=36;                    % Number of XiX DNP blocks
 parameters.phase=pi;                     % Second pulse inverted phase
-parameters.shot_spacing=204e-6;
 parameters.addshift=-13e6;
 parameters.el_offs=linspace(-100e6,100e6,201);
+
+ % Calculate shot spacing
+ parameters.shot_spacing=204e-6 - 2*parameters.nloops*parameters.pulse_dur;
 
 % Preallocate equilibrium DNP value array
 dnp=zeros([numel(parameters.el_offs) numel(b1)],'like',1i);

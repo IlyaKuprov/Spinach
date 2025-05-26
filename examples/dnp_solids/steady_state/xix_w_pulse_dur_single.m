@@ -61,9 +61,7 @@ parameters.coil=state(spin_system,'Lz',2);
 parameters.spins={'E','1H'};
 parameters.irr_powers=20e6;            % Electron nutation frequency [Hz]
 parameters.grid='rep_2ang_800pts_sph';
-parameters.nloops=32;
 parameters.phase=pi;                   % Second pulse inverted phase
-parameters.shot_spacing=167e-6;
 parameters.addshift=-33e6;
 parameters.el_offs=linspace(-230e6,205e6,101);
 
@@ -78,6 +76,12 @@ for m=1:numel(pulse_durs)
 
     % Set pulse duration
     parameters.pulse_dur=pulse_durs(m);
+
+    % Loop count: contact time / pulse duration per block
+    parameters.nloops=round(360e-9/(2*pulse_durs(m)));
+
+    % Shot spacing: repetition time - contact time
+    parameters.shot_spacing=167e-6 - 360e-9;
 
     % Run the steady state simulation
     dnp(:,m)=powder(spin_system,@xixdnp_steady,parameters,'esr');

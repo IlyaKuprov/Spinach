@@ -71,18 +71,25 @@ for n=1:numel(r)
     parameters.spins={'E','1H'};
     parameters.irr_powers=20e6;            % Electron nutation frequency [Hz]
     parameters.grid='rep_2ang_800pts_sph';
-    parameters.nloops=32;
     parameters.phase=pi;                   % Second pulse inverted phase
-    parameters.shot_spacing=167e-6;
     parameters.addshift=-33e6;
     parameters.el_offs=offsets;
 
     % Over pulse durations
     parfor m=1:numel(pulse_durs)
     
-        % Localise for parallel loop and set pulse duration 
-        localpar=parameters; localpar.pulse_dur=pulse_durs(m);    
-    
+        % Localise 
+        localpar=parameters; 
+        
+        % Set pulse duration 
+        localpar.pulse_dur=pulse_durs(m);
+
+        % Loop count: contact time / pulse duration per block
+		localpar.nloops=round(360e-9/(2*pulse_durs(m)));
+
+        % Shot spacing: repetition time - contact time
+		localpar.shot_spacing=167e-6 - 360e-9;
+
         % Run the steady state simulation
         dnp(:,m,n)=powder(spin_system,@xixdnp_steady,localpar,'esr');
     

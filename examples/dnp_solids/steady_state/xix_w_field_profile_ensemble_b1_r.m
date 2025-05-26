@@ -35,7 +35,7 @@ sys.disable={'hygiene'}';
 
 % Distance and B1 ensemble, Gauss-Legendre points
 [r,wr]=gaussleg(3.5,20,3);      % Angstrom
-[b1,wb1]=gaussleg(10e6,20e6,7); % Hz
+[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
 
 % Microwave resonance offsets, Hz
 offsets=linspace(-300e6,300e6,201);

@@ -35,7 +35,7 @@ sys.disable={'hygiene'}';
 
 % Distance and B1 ensemble, Gauss-Legendre points
 [r,wr]=gaussleg(3.5,20,3);      % Angstrom
-[b1,wb1]=gaussleg(10e6,20e6,7); % Hz
+[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
 
 % Microwave resonance offsets, Hz
 offsets=linspace(-100e6,100e6,201);
@@ -73,9 +73,11 @@ for n=1:numel(r)
     parameters.pulse_dur=48e-9;              % Pulse duration, seconds
     parameters.nloops=36;                    % Number of XiX DNP blocks
     parameters.phase=pi;                     % Second pulse inverted phase
-    parameters.shot_spacing=204e-6;
     parameters.addshift=-13e6;
     parameters.el_offs=offsets;
+
+    % Calculate shot spacing
+    parameters.shot_spacing=204e-6 - 2*parameters.nloops*parameters.pulse_dur;
 
     % Over B1 fields
     for k=1:numel(b1)

@@ -56,7 +56,7 @@ spin_system=basis(spin_system,bas);
 parameters.coil=state(spin_system,'Lz',2);
 
 % B1 ensemble, Gauss-Legendre points
-[b1,wb1]=gaussleg(10e6,20e6,7); % Hz
+[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
 
 % Experiment parameters
 parameters.spins={'E','1H'};

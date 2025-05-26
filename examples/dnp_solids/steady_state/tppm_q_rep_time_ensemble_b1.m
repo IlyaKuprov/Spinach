@@ -70,7 +70,7 @@ parameters.spins={'E','1H'};
 parameters.grid='rep_2ang_800pts_sph';
 parameters.pulse_dur=16e-9;              % Pulse duration, seconds
 parameters.nloops=300;                   % Number of TPPM DNP blocks
-parameters.phase=115*pi/180;             % Second pulse phase
+parameters.phase=120*pi/180;             % Second pulse phase
 parameters.addshift=-13e6;
 parameters.el_offs=2e6;
 

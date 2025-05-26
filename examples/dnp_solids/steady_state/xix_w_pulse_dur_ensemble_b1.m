@@ -40,7 +40,7 @@ sys.tols.prop_chop=1e-12;
 sys.disable={'hygiene'}';
 
 % B1 ensemble
-[b1,wb1]=gaussleg(10e6,20e6,7); % Hz
+[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
 
 % Electron pulse duration grid, s
 pulse_durs=linspace(2e-9,21e-9,200);
@@ -64,9 +64,7 @@ parameters.coil=state(spin_system,'Lz',2);
 % Experiment parameters
 parameters.spins={'E','1H'};
 parameters.grid='rep_2ang_800pts_sph';
-parameters.nloops=32;
 parameters.phase=pi;                   % Second pulse inverted phase
-parameters.shot_spacing=167e-6;
 parameters.addshift=-33e6;
 parameters.el_offs=linspace(-230e6,205e6,101);
 
@@ -82,8 +80,17 @@ for k=1:numel(b1)
     % Over pulse durations
     parfor m=1:numel(pulse_durs)
 
-        % Localise for parallel loop and set pulse duration 
-        localpar=parameters; localpar.pulse_dur=pulse_durs(m);  
+        % Localise 
+        localpar=parameters; 
+        
+        % Set pulse duration 
+        localpar.pulse_dur=pulse_durs(m);
+
+        % Loop count: contact time / pulse duration per block
+		localpar.nloops=round(360e-9/(2*pulse_durs(m)));
+
+        % Shot spacing: repetition time - contact time
+		localpar.shot_spacing=167e-6 - 360e-9;
 
         % Run the steady state simulation
         dnp(:,m,k)=powder(spin_system,@xixdnp_steady,localpar,'esr');

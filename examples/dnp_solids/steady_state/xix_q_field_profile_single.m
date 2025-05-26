@@ -62,9 +62,11 @@ parameters.pulse_dur=48e-9;              % Pulse duration, seconds
 parameters.grid='rep_2ang_800pts_sph';
 parameters.nloops=36;                    % Number of XiX DNP blocks
 parameters.phase=pi;                     % Second pulse inverted phase
-parameters.shot_spacing=204e-6;
 parameters.addshift=-13e6;
 parameters.el_offs=linspace(-100e6,100e6,201);
+
+% Calculate shot spacing
+parameters.shot_spacing=204e-6 - 2*parameters.nloops*parameters.pulse_dur;
 
 % Run the steady state simulation
 dnp=powder(spin_system,@xixdnp_steady,parameters,'esr');

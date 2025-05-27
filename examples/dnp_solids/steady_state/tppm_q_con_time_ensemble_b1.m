@@ -40,10 +40,10 @@ sys.tols.prop_chop=1e-12;
 sys.disable={'hygiene'}';
 
 % Distance and B1 ensemble
-[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
+[b1,wb1]=gaussleg(25e6,35e6,5); % Hz
 
 % TPPM loop count
-loop_counts=1:64;
+loop_counts=1:256;
 
 % Relaxation rates, distance and orientation
 % dependence provided using a function handle

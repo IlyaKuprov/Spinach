@@ -36,7 +36,7 @@ sys.disable={'hygiene'}';
 [r,wr]=gaussleg(3.5,20,3);      % Angstrom
 
 % TPPM loop count
-loop_counts=1:64;
+loop_counts=1:256;
 
 % Preallocate equilibrium DNP value array
 dnp=zeros([numel(loop_counts) numel(r)],'like',1i);

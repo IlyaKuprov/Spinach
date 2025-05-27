@@ -35,10 +35,10 @@ sys.disable={'hygiene'}';
 
 % Distance and B1 ensemble
 [r,wr]=gaussleg(3.5,20,3);      % Angstrom
-[b1,wb1]=gaussleg(10e6,20e6,5); % Hz
+[b1,wb1]=gaussleg(25e6,35e6,5); % Hz
 
 % TPPM loop count
-loop_counts=1:64;
+loop_counts=1:256;
 
 % Preallocate equilibrium DNP value array
 dnp=zeros([numel(loop_counts) numel(r) numel(b1)],'like',1i);

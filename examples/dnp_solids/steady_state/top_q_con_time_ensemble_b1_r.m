@@ -37,7 +37,7 @@ sys.disable={'hygiene'}';
 [r,wr]=gaussleg(3.5,20,3);      % Angstrom
 
 % TOP loop count
-loop_counts=1:64;
+loop_counts=1:256;
 
 % B1 ensembles
 [b1a,wb1a]=gaussleg(10e6,20e6,5); % Hz

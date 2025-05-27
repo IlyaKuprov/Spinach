@@ -53,7 +53,7 @@ spin_system=basis(spin_system,bas);
 parameters.coil=state(spin_system,'Lz',2);
 
 % TOP loop count
-loop_counts=1:64;
+loop_counts=1:256;
 
 % Experiment parameters
 parameters.spins={'E','1H'};

@@ -40,7 +40,7 @@ sys.tols.prop_chop=1e-12;
 sys.disable={'hygiene'}';
 
 % TOP loop count
-loop_counts=1:64;
+loop_counts=1:256;
 
 % Relaxation rates, distance and orientation
 % dependence provided using a function handle

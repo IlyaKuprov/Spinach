@@ -1267,6 +1267,19 @@ else
     
 end
 
+% Apply interaction drops
+if isfield(inter,'ignore')
+    for n=1:numel(inter.ignore)
+        spin_system.inter.coupling.matrix{inter.ignore{n}(1),...
+                                          inter.ignore{n}(2)}=[];
+        spin_system.inter.coupling.matrix{inter.ignore{n}(2),...
+                                          inter.ignore{n}(1)}=[];
+        report(spin_system,['Interactions between spins ' int2str(inter.ignore{n}(1)) ...
+                                                  ' and ' int2str(inter.ignore{n}(2)) ...
+                            ' ignored on user request.']);
+    end
+end                         
+
 % Catch unparsed options
 unparsed=fieldnames(sys);
 if ~isempty(unparsed)
@@ -2560,6 +2573,25 @@ if isfield(inter,'chem')
         end
     end
     
+end
+
+% Check the drop list
+if isfield(inter,'ignore')
+    if ~iscell(inter.ignore)
+        error('inter.ignore must be a cell array of two-element vectors.');
+    end
+    for n=1:numel(inter.ignore)
+        if (~isnumeric(inter.ignore{n}))|(numel(inter.ignore{n})~=2)
+            error('entries of inter.ignore cell array must be two-element vectors.');
+        end
+        if (~isreal(inter.ignore{n}(1)))||(inter.ignore{n}(1)<1)||(mod(inter.ignore{n}(1),1)~=0)||...
+           (~isreal(inter.ignore{n}(2)))||(inter.ignore{n}(2)<1)||(mod(inter.ignore{n}(2),1)~=0)
+            error('elements of vectors in inter.ignore must be integers.');
+        end
+        if (inter.ignore{n}(1)>numel(sys.isotopes))||(inter.ignore{n}(2)>numel(sys.isotopes))
+            error('an integer in inter.ignore exceeds the number of spins.');
+        end
+    end
 end
 
 end

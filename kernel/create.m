@@ -444,7 +444,8 @@ end
 sys=rmfield(sys,'isotopes');
 
 % Hash isotopes array for caching operations later
-if ismember('op_cache',spin_system.sys.enable)
+if ismember('op_cache',spin_system.sys.enable)||...
+   ismember('ham_cache',spin_system.sys.enable)
     spin_system.comp.iso_hash=md5_hash(spin_system.comp.isotopes);
 end
 

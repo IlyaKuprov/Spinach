@@ -506,7 +506,8 @@ if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef'})
 end
 
 % Hash the basis descriptor for caching tools later
-if ismember('op_cache',spin_system.sys.enable)
+if ismember('op_cache',spin_system.sys.enable)||...
+   ismember('ham_cache',spin_system.sys.enable)
     spin_system.bas.basis_hash=md5_hash(spin_system.bas.basis);
 end
 

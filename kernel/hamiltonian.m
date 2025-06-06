@@ -595,26 +595,46 @@ clear('D1','D2','nL','nS','opL','opS','isotropic','ist_coeff',...
 if ismember('ham_cache',spin_system.sys.enable)
 
     % Combine descriptor, isotopes, and basis hash
-    ham_hash=md5_hash({descr spin_system.comp.iso_hash ...
-                             spin_system.bas.basis_hash});
+    ham_hash=md5_hash({descr,spin_system.comp.iso_hash, ...
+                       spin_system.bas.basis_hash,build_aniso});
 
-    % Generate the cache record name in the global scratch (for later reuse)
+    % Generate the cache record name in the scratch directory
     filename=[spin_system.sys.scratch filesep 'spinach_ham_' ham_hash '.mat'];
 
-    % Load from the cache record
+    % Check if the file exists
     if exist(filename,'file')
 
-        % Load cache records
+        % Try to use
         try
-            load(filename,'H');
+            
+            % Try to load
             if build_aniso
-                load(filename,'Q'); 
+                load(filename,'H','Q'); 
+            else
+                load(filename,'H');
             end
-            report(spin_system,'cache record found and loaded.'); 
-            return; 
+            
+            % Check load success and let the user know
+            if build_aniso&&exists('H','var')&&exists('Q','var')
+                report(spin_system,'cache record found and loaded.'); return;
+            elseif (~build_aniso)&&exists('H','var')
+                report(spin_system,'cache record found and loaded.'); return;
+            else
+                % Do not make a fuss on fail
+                report(spin_system,'could not read the cache record, recomputing...');
+            end
+
         catch
-            % Do not make a fuss
+
+            % Do not make a fuss on fail
+            report(spin_system,'could not read the cache record, recomputing...');
+
         end
+
+    else
+
+        % Let the user know the Hamiltonian is being computed
+        report(spin_system,'cache record not found, computing...');
 
     end
 
@@ -879,23 +899,46 @@ if build_aniso
     Q_whos=whos('Q'); report(spin_system,['memory footprint of Q array: ' num2str(Q_whos.bytes/1024^3)  ' GB']);
 end
 
-% Write the cache record 
-if ismember('ham_cache',spin_system.sys.enable)
-    if build_aniso
+% Write the cache record if caching is beneficial
+if ismember('ham_cache',spin_system.sys.enable)&&(toc>0.1)
+
+    % Do not fight other workers
+    if ~exist(filename,'file')
+        
+        % Try to save
         try
-            save(filename,'H','Q','-v7.3');
-            report(spin_system,'cache record saved.');
+            
+            % H and Q parts
+            if build_aniso
+                
+                % Modern format, compressed
+                save(filename,'H','Q','-v7.3');
+                report(spin_system,'cache record saved.');
+
+            else
+
+                % Modern format, compressed
+                save(filename,'H','-v7.3');
+                report(spin_system,'cache record saved.');
+
+            end
+
         catch
-            % Do not make a fuss
+
+            % Do not make a fuss on fail, this can happen
+            % for large parallel pools where many workers
+            % may be trying to write the same file.
+            report(spin_system,'could not save cache record.');
+
         end
-    else
-        try
-            save(filename,'H','-v7.3');
-            report(spin_system,'cache record saved.');
-        catch
-            % Do not make a fuss
-        end
+        
     end
+    
+elseif ismember('ham_cache',spin_system.sys.enable)
+
+    % Tell the user that caching is pointless here
+    report(spin_system,'cache record not worth saving.');
+
 end
 
 end

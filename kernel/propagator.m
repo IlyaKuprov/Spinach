@@ -20,8 +20,8 @@
 %       supported, add 'prop_cache' to sys.enable array to enable.
 %
 % Note: we did have Chebyshev and Newton series here at one point,
-%       as well as the Pade method. None of them lived up to their
-%       marketing.
+%       as well as the Pade method. None of them had lived up to
+%       their marketing.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -33,13 +33,15 @@ function P=propagator(spin_system,L,timestep)
 % Check consistency
 grumble(L,timestep); tic;
 
+% Fast bypass for small matrices
+if size(L,1)<spin_system.tols.small_matrix
+    P=expm((-1i*timestep)*L); return; 
+end
+
 % Set and clean up a shorthand for -i*L*dt
-A=clean_up(spin_system,-1i*L*timestep,spin_system.tols.prop_chop);
+A=clean_up(spin_system,(-1i*timestep)*L,spin_system.tols.prop_chop);
 
-% Fast bypass for small matrices - use Matlab's built-in expm
-if size(A,1)<spin_system.tols.small_matrix, P=expm(A); return; end
-
-% Inform the user about matrix densities
+% Inform the user about ge densities
 report(spin_system,['generator dimension ' num2str(size(A,1)) ...
                     ', nnz ' num2str(nnz(A))                  ...
                     ', density ' num2str(100*nnz(A)/numel(A)) ...
@@ -47,25 +49,52 @@ report(spin_system,['generator dimension ' num2str(size(A,1)) ...
 
 % Check the cache
 if ismember('prop_cache',spin_system.sys.enable)
+
+    % Hash the generator, the step, and the tolerance
+    prop_hash=md5_hash({L,timestep,spin_system.tols.prop_chop});
     
-    % Generate the cache record name in the global scratch (for later reuse)
-    filename=[spin_system.sys.scratch filesep 'spinach_prop_' md5_hash(A) '.mat'];
+    % Generate the cache record name in the scratch directory
+    filename=[spin_system.sys.scratch filesep 'spinach_prop_' prop_hash '.mat'];
     
-    % Try loading the cache record
+    % Check if the file exists
     if exist(filename,'file')
+
+        % Try to use
         try
-            load(filename,'P'); report(spin_system,'cache record found and used.');  
-            report(spin_system,['propagator dimension ' num2str(size(P,1)) ...
-                                ', nnz ' num2str(nnz(P))                   ...
-                                ', density ' num2str(100*nnz(P)/numel(P))  ...
-                                '%, sparsity ' num2str(issparse(P))]);
-            return;
+            
+            % Try to load
+            load(filename,'P'); 
+            
+            % Check load success
+            if exists('P','var')
+                
+                % Report the stats and return the cached propagator
+                report(spin_system,'cache record found and loaded.');  
+                report(spin_system,['propagator dimension ' num2str(size(P,1)) ...
+                                    ', nnz ' num2str(nnz(P))                   ...
+                                    ', density ' num2str(100*nnz(P)/numel(P))  ...
+                                    '%, sparsity ' num2str(issparse(P))]);
+                return;
+
+            else
+                
+                % Do not make a fuss on fail
+                report(spin_system,'could not read the cache record, recomputing...');
+                
+            end
+            
         catch
-            % Don't make any fuss if the file is not readable
+
+            % Do not make a fuss on fail
             report(spin_system,'could not read the cache record, recomputing...');
+
         end
+
     else
+        
+        % Let the user know the propagator is being computed
         report(spin_system,'cache record not found, computing...');
+
     end
     
 end
@@ -213,17 +242,29 @@ end
     
 % Write the cache record if caching is beneficial
 if ismember('prop_cache',spin_system.sys.enable)&&(toc>0.1)
+
+    % Do not fight other workers
+    if ~exist(filename,'file')
     
-    % Save the propagator
-    try
-        save(filename,'P','-v7.3'); 
-        report(spin_system,'cache record saved.');
-    catch
-        % Do not make any fuss on fail, just report
-        report(spin_system,'could not save cache record.');
+        % Try to save
+        try
+            
+            % Modern format, compressed
+            save(filename,'P','-v7.3');
+            report(spin_system,'cache record saved.');
+
+        catch
+
+            % Do not make a fuss on fail, this can happen
+            % for large parallel pools where many workers
+            % may be trying to write the same file.
+            report(spin_system,'could not save cache record.');
+
+        end
+
     end
     
-elseif ismember('caching',spin_system.sys.enable)
+elseif ismember('prop_cache',spin_system.sys.enable)
     
     % Tell the user that caching is pointless here
     report(spin_system,'cache record not worth saving.');

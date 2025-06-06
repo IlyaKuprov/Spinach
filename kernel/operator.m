@@ -60,6 +60,9 @@
 %        mutation superoperator of a product. In Liouville space, you cannot
 %        generate single-spin superoperators and multiply them up.
 %
+% Note: operator caching is supported, add 'op_cache' to sys.enable array 
+%       to enable; make sure your scratch storage is fast.
+%
 % ledwards@cbs.mpg.de
 % ilya.kuprov@weizmann.ac.il
 %
@@ -76,7 +79,7 @@ if ~exist('format','var'), format='csc'; end
 % Check consistency
 grumble(spin_system,operators,spins,operator_type,format); tic;
 
-% Check disk cache
+% Load the cache record if one exists
 if ismember('op_cache',spin_system.sys.enable)
 
     % Combine specification, isotopes, and basis hash
@@ -84,17 +87,31 @@ if ismember('op_cache',spin_system.sys.enable)
                       format,spin_system.comp.iso_hash,...
                       spin_system.bas.basis_hash});
 
-    % Generate the cache record name in the global scratch (for later reuse)
+    % Generate the cache record name in the scratch directory
     filename=[spin_system.sys.scratch filesep 'spinach_op_' op_hash '.mat'];
 
-    % Load the operator from the cache record
+    % Check if the file exists
     if exist(filename,'file')
+
+        % Try to use
         try
-            load(filename,'A'); 
-            if exists('A','var'), return; end
+
+            % Try to load
+            load(filename,'A');
+
+            % Check load success
+            if exists('A','var')
+                return; 
+            else
+                % Do not make a fuss on fail
+            end
+
         catch
-            % Do not make a fuss on fail 
+
+            % Do not make a fuss on fail
+            
         end
+
     end
     
 end
@@ -229,11 +246,26 @@ end
 
 % Write the cache record if caching is beneficial
 if ismember('op_cache',spin_system.sys.enable)&&(toc>0.1)
-    try
-        save(filename,'A','-v7.3'); 
-    catch
-        % Do not make a fuss on fail
+
+    % Do not fight other workers
+    if ~exist(filename,'file')
+
+        % Try to save
+        try
+
+            % Modern format, compressed
+            save(filename,'A','-v7.3');
+
+        catch
+
+            % Do not make a fuss on fail, this can happen
+            % for large parallel pools where many workers
+            % may be trying to write the same file.
+
+        end
+
     end
+
 end
 
 end

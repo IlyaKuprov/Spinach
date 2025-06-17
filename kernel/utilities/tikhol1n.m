@@ -1,65 +1,136 @@
-% L1 norm Tikhonov regularised solver for ...
+% L1 norm Tikhonov regularised solver for A*x=y where
+% A is an ill-conditioned matrix. The error functional
+% is norm(A*x-y,2)^2+lambda*norm(x,1), it is minimised
+% using the FISTA algorithm. The user specifies the de-
+% sired number of non-zeroes, lambda parameter is then
+% found by bracketing / bisection. Syntax:
+%
+%           [x,err,reg]=tikhol1n(A,y,nnzt)
+%
+% Parameters:
+%
+%    A    - a real or complex matrix
+%
+%    y    - a real or complex column vector
+%
+%    nnzt - the target for the number of 
+%           non-zeroes in the solution
+%
+% Outputs:
+%
+%    x   - a real or complex vector
+%
+%    err - squared 2-norm of the fitting
+%          error divided by the squared
+%          2-norm of the solution
+%
+%    reg - 1-norm of the solution
 %
 % ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=tikhol1n.m>
 
-function [spec,err,reg]=tikhol1n(A,y,lambda)
+function [x,err,reg]=tikhol1n(A,y,nnzt)
 
 % Tolerances
-normest_tol=1e-3;
-step_norm_tol=1e-4;
+normest_tol=1e-3;   % relative 2-norm estimation tolerance
+step_norm_tol=1e-6; % relative step norm convergence tolerance
 
 % Pre-compute CT
 A_ct=ctranspose(A);
         
-% Lipschitz constant and the threshold
-L=2*normest(A,normest_tol)^2; thr=lambda/L;
+% Lipschitz constant and initial threshold
+L=2*(1+normest_tol)*normest(A,normest_tol)^2; thr=1/L;
 
 % Complex soft thresholding function
-soft_thr=@(x)sign(x).*max(abs(x)-thr,0);
+soft_thr=@(x,thr)sign(x).*max(abs(x)-thr,0);
         
-% Complex random initial guess
-spec=   randn(size(A,2),1)+...
-     1i*randn(size(A,2),1);
-spec_old=spec;
+% Zero initial guess
+x=zeros(size(A,2),1); x_old=x;
+
+% Threshold brackets for ZF targeting
+thr_lower=0; thr_upper=max(abs(A_ct*y));
 
 % Iteration counters and momentum
 t=1; iter_count=0; converged=false;
+
+% Tell the user we are starting to iterate
+disp(['FISTA called with target nnz = ' int2str(nnzt)]);
         
-% FISTA iteration loop
+% FISTA loop
 while ~converged
 
-    % Get the error vector
-    err_vec=A*spec-y;
+    % Error vector
+    err_vec=A*x-y;
 
-    % Get the gradient of the error
+    % Error gradient 
     g=2*(A_ct*err_vec);
 
-    % Compute the proximal point
-    spec_prox=soft_thr(spec-g/L);
+    % Compute proximal point
+    x_prox=soft_thr(x-g/L,thr);
 
     % Update Nesterov momentum
     t_new=0.5*(1+sqrt(1+4*t^2));
 
     % Take the step
-    spec=spec_prox+((t-1)/t_new)*(spec_prox-spec_old);
+    x=x_prox+((t-1)/t_new)*(x_prox-x_old);
 
     % Check convergence
-    soln_norm=norm(spec_prox,2);
-    step_norm=norm(spec_prox-spec_old,2);
+    soln_norm=norm(x_prox,2);
+    step_norm=norm(x_prox-x_old,2);
     converged=(step_norm<step_norm_tol*soln_norm);
-
+    
     % Close the loop
-    t=t_new; spec_old=spec_prox;
+    t=t_new; x_old=x_prox;
     iter_count=iter_count+1;
 
-    % Compute figures of merit
-    err=norm(err_vec,2)^2; reg=norm(spec,1);
+    % Progress report and nnz targeting
+    if mod(iter_count,1000)==0 || converged
 
-    % Report progress
-    if mod(iter_count,10)==0
-        disp(['FISTA iter ' int2str(iter_count) ...
-              ', err '  num2str(err) ', reg ' num2str(reg) ...
-              ', step ' num2str(step_norm/soln_norm)]);
+        % Check the nnz target
+        if (converged || nnz(x)==0) && nnz(x)~=nnzt
+
+            % Decisions
+            if nnz(x)>nnzt
+
+                % Need fewer zeroes  
+                thr_lower=thr;
+
+            else
+                
+                % Need more zeroes
+                thr_upper=thr;
+
+            end
+            
+            % Recalculate midpoint
+            thr=(thr_lower+thr_upper)/2;
+
+            % Restart the calculation
+            t=1; converged=false;
+            
+            % Inform the user
+            disp(['zero threshold brackets updated: lower ' ...
+                  num2str(thr_lower) ', upper ' num2str(thr_upper)]);
+            
+            % Detect stagnation
+            if thr<1e-7*max(abs(x))
+                error('nnz target unreachable');
+            end
+
+        else
+
+            % Get solver state metrics
+            err=norm(err_vec,2)^2/norm(x,2)^2; reg=norm(x,1);
+
+            % Print the report
+            disp(['FISTA iter ' int2str(iter_count) ', nnz ' int2str(nnz(x)) ...
+                  ', rel. sq. err. ' num2str(err) ', 1-norm ' num2str(reg) ...
+                  ', rel. step ' num2str(step_norm/soln_norm)                ...
+                  ', zero thr. ' num2str(thr)]);
+
+        end
+
     end
 
 end

@@ -25,7 +25,7 @@ function [x,err,reg]=tikhol1n(A,y,zft)
 
 % Tolerances
 normest_tol=1e-3;   % relative 2-norm estimation tolerance
-step_norm_tol=1e-6; % relative step norm convergence tolerance
+step_norm_tol=5e-6; % relative step norm convergence tolerance
 
 % Pre-compute CT
 A_ct=ctranspose(A);
@@ -72,11 +72,11 @@ while ~converged
     t=t_new; x_old=x_prox;
     iter_count=iter_count+1;
 
-    % Adaptively update the threshold
-    zf=1-nnz(x)/numel(x); thr=(1-0.01*(zf-zft))*thr;
-
     % Report progress
     if mod(iter_count,1000)==0
+
+        % Adaptively update the threshold
+        zf=1-nnz(x)/numel(x); thr=thr*16^(zft-zf);
 
         % Get solver state metrics
         err=norm(err_vec,2)^2; reg=norm(x,1);

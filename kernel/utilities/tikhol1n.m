@@ -25,7 +25,7 @@ function [x,err,reg]=tikhol1n(A,y,zft)
 
 % Tolerances
 normest_tol=1e-3;   % relative 2-norm estimation tolerance
-step_norm_tol=5e-6; % relative step norm convergence tolerance
+step_norm_tol=1e-6; % relative step norm convergence tolerance
 
 % Pre-compute CT
 A_ct=ctranspose(A);
@@ -72,19 +72,36 @@ while ~converged
     t=t_new; x_old=x_prox;
     iter_count=iter_count+1;
 
-    % Report progress
-    if mod(iter_count,1000)==0
+    % Analyse and report progress
+    if mod(iter_count,1000)==0 || converged
 
-        % Adaptively update the threshold
-        zf=1-nnz(x)/numel(x); thr=thr*16^(zft-zf);
+        % Get the zero fraction
+        zf=1-nnz(x)/numel(x);
 
-        % Get solver state metrics
-        err=norm(err_vec,2)^2; reg=norm(x,1);
+        % Check the zero fraction target
+        if abs(zft-zf)>0.01 && converged
 
-        % Print the report
-        disp(['FISTA iter ' int2str(iter_count) ', zf ' num2str(zf) ...
-              ', err '  num2str(err) ', reg ' num2str(reg)          ...
-              ', step ' num2str(step_norm/soln_norm)]);
+            % Update the threshold
+            thr=thr*2^sign(zft-zf);
+
+            % Reset the state
+            t=1; converged=false;
+
+            % Let the user know
+            disp('threshold updated');
+
+        else
+
+            % Get solver state metrics
+            err=norm(err_vec,2)^2; reg=norm(x,1);
+
+            % Print the report
+            disp(['FISTA iter ' int2str(iter_count) ', zf ' num2str(zf) ...
+                  ', err '  num2str(err) ', reg ' num2str(reg)          ...
+                  ', step ' num2str(step_norm/soln_norm)                ...
+                  ', thr ' num2str(thr)]);
+
+        end
 
     end
 

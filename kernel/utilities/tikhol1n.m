@@ -74,18 +74,24 @@ while ~converged
     t=t_new; x_old=x_prox;
     iter_count=iter_count+1;
 
-    % Compute figures of merit
-    err=norm(err_vec,2)^2; reg=norm(x,1);
-
     % Report progress
-    if mod(iter_count,100)==0
+    if mod(iter_count,1000)==0
+
+        % Get solver state metrics
+        err=norm(err_vec,2)^2; reg=norm(x,1);
         zf=nnz(abs(x)<rel_nz_tol*max(abs(x)))/numel(x);
+
+        % Print the report
         disp(['FISTA iter ' int2str(iter_count) ', zf ' num2str(zf) ...
               ', err '  num2str(err) ', reg ' num2str(reg)          ...
               ', step ' num2str(step_norm/soln_norm)]);
+        
     end
 
 end
+
+% Compute figures of merit
+err=norm(err_vec,2)^2; reg=norm(x,1);
 
 end
 

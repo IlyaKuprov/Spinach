@@ -25,8 +25,7 @@ function [x,err,reg]=tikhol1n(A,y,lambda)
 
 % Tolerances
 normest_tol=1e-3;   % relative 2-norm estimation tolerance
-step_norm_tol=1e-5; % relative step norm convergence tolerance
-rel_nz_tol=1e-6;    % relative (to the max) non-zero tolerance
+step_norm_tol=1e-6; % relative step norm convergence tolerance
 
 % Pre-compute CT
 A_ct=ctranspose(A);
@@ -37,9 +36,8 @@ L=2*normest(A,normest_tol)^2; thr=lambda/L;
 % Complex soft thresholding function
 soft_thr=@(x)sign(x).*max(abs(x)-thr,0);
         
-% Complex random initial guess
-x=   randn(size(A,2),1)+...
-  1i*randn(size(A,2),1); x_old=x;
+% Zero initial guess
+x=zeros(size(A,2),1); x_old=x;
 
 % Iteration counters and momentum
 t=1; iter_count=0; converged=false;
@@ -66,9 +64,11 @@ while ~converged
     x=x_prox+((t-1)/t_new)*(x_prox-x_old);
 
     % Check convergence
-    soln_norm=norm(x_prox,2);
-    step_norm=norm(x_prox-x_old,2);
-    converged=(step_norm<step_norm_tol*soln_norm);
+    if mod(iter_count,100)==0
+        soln_norm=norm(x_prox,2);
+        step_norm=norm(x_prox-x_old,2);
+        converged=(step_norm<step_norm_tol*soln_norm);
+    end
 
     % Close the loop
     t=t_new; x_old=x_prox;
@@ -79,13 +79,13 @@ while ~converged
 
         % Get solver state metrics
         err=norm(err_vec,2)^2; reg=norm(x,1);
-        zf=nnz(abs(x)<rel_nz_tol*max(abs(x)))/numel(x);
+        zf=1-nnz(x)/numel(x);
 
         % Print the report
         disp(['FISTA iter ' int2str(iter_count) ', zf ' num2str(zf) ...
               ', err '  num2str(err) ', reg ' num2str(reg)          ...
               ', step ' num2str(step_norm/soln_norm)]);
-        
+
     end
 
 end

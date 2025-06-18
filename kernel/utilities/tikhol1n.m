@@ -25,7 +25,7 @@ function [x,err,reg]=tikhol1n(A,y,lambda)
 
 % Tolerances
 normest_tol=1e-3;   % relative 2-norm estimation tolerance
-step_norm_tol=1e-4; % relative step norm convergence tolerance
+step_norm_tol=1e-5; % relative step norm convergence tolerance
 rel_nz_tol=1e-6;    % relative (to the max) non-zero tolerance
 
 % Pre-compute CT

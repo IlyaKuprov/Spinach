@@ -39,22 +39,25 @@ soft_thr=@(x,thr)sign(x).*max(abs(x)-thr,0);
 % Zero initial guess
 x=zeros(size(A,2),1); x_old=x;
 
+% Threshold brackets for ZF targeting
+thr_lower=0; thr_upper=max(abs(A_ct*y));
+
 % Iteration counters and momentum
 t=1; iter_count=0; converged=false;
 
-% Report to the user
+% Tell the user we are starting to iterate
 disp(['FISTA called with zero fraction target = ' num2str(zft)]);
         
-% FISTA iteration loop
+% FISTA loop
 while ~converged
 
-    % Get the error vector
+    % Error vector
     err_vec=A*x-y;
 
-    % Get the gradient of the error
+    % Error gradient 
     g=2*(A_ct*err_vec);
 
-    % Compute the proximal point
+    % Compute proximal point
     x_prox=soft_thr(x-g/L,thr);
 
     % Update Nesterov momentum
@@ -72,23 +75,42 @@ while ~converged
     t=t_new; x_old=x_prox;
     iter_count=iter_count+1;
 
-    % Analyse and report progress
+    % Progress report and ZF targeting
     if mod(iter_count,1000)==0 || converged
 
         % Get the zero fraction
         zf=1-nnz(x)/numel(x);
 
         % Check the zero fraction target
-        if abs(zft-zf)>0.01 && converged
+        if (abs(zft-zf)>0.01 && converged)||(zf==1)
 
-            % Update the threshold
-            thr=thr*2^sign(zft-zf);
+            % Decisions
+            if zf<zft
 
-            % Reset the state
+                % Too few zeroes  
+                thr_lower=thr;
+
+            else
+                
+                % Too many zeroes
+                thr_upper=thr;
+
+            end
+            
+            % Recalculate midpoint
+            thr=(thr_lower+thr_upper)/2;
+
+            % Restart the calculation
             t=1; converged=false;
-
-            % Let the user know
-            disp('threshold updated');
+            
+            % Inform the user
+            disp(['zero threshold brackets updated: lower ' ...
+                  num2str(thr_lower) ', upper ' num2str(thr_upper)]);
+            
+            % Detect stagnation
+            if thr<1e-7*max(abs(x))
+                error('zero fraction target unreachable');
+            end
 
         else
 

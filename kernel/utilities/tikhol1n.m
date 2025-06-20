@@ -1,7 +1,9 @@
 % L1 norm Tikhonov regularised solver for A*x=y where
 % A is an ill-conditioned matrix. The error functional
 % is norm(A*x-y,1)^2+lambda*norm(x,1), it is minimised
-% using the FISTA algorithm. Syntax:
+% using the FISTA algorithm. The user specifies the de-
+% sired number of non-zeroes, lambda parameter is then
+% found by bracketing / bisection. Syntax:
 %
 %           [x,err,reg]=tikhol1n(A,y,nnzt)
 %
@@ -16,7 +18,13 @@
 %
 % Outputs:
 %
-%    x - a real or complex vector
+%    x   - a real or complex vector
+%
+%    err - squared 2-norm of the fitting
+%          error divided by the squared
+%          2-norm of the solution
+%
+%    reg - 1-norm of the solution
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -117,7 +125,7 @@ while ~converged
 
             % Print the report
             disp(['FISTA iter ' int2str(iter_count) ', nnz ' int2str(nnz(x)) ...
-                  ', rel. lsq. err. '  num2str(err) ', 1-norm ' num2str(reg) ...
+                  ', rel. sq. err. ' num2str(err) ', 1-norm ' num2str(reg) ...
                   ', rel. step ' num2str(step_norm/soln_norm)                ...
                   ', zero thr. ' num2str(thr)]);
 
@@ -126,9 +134,6 @@ while ~converged
     end
 
 end
-
-% Compute figures of merit
-err=norm(err_vec,2)^2; reg=norm(x,1);
 
 end
 

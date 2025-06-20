@@ -1,6 +1,6 @@
 % L1 norm Tikhonov regularised solver for A*x=y where
 % A is an ill-conditioned matrix. The error functional
-% is norm(A*x-y,1)^2+lambda*norm(x,1), it is minimised
+% is norm(A*x-y,2)^2+lambda*norm(x,1), it is minimised
 % using the FISTA algorithm. The user specifies the de-
 % sired number of non-zeroes, lambda parameter is then
 % found by bracketing / bisection. Syntax:
@@ -40,7 +40,7 @@ step_norm_tol=1e-6; % relative step norm convergence tolerance
 A_ct=ctranspose(A);
         
 % Lipschitz constant and initial threshold
-L=2*normest(A,normest_tol)^2; thr=1/L;
+L=2*(1+normest_tol)*normest(A,normest_tol)^2; thr=1/L;
 
 % Complex soft thresholding function
 soft_thr=@(x,thr)sign(x).*max(abs(x)-thr,0);

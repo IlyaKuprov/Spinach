@@ -3,15 +3,16 @@
 % is norm(A*x-y,1)^2+lambda*norm(x,1), it is minimised
 % using the FISTA algorithm. Syntax:
 %
-%           [x,err,reg]=tikhol1n(A,y,zft)
+%           [x,err,reg]=tikhol1n(A,y,nnzt)
 %
 % Parameters:
 %
-%    A - a real or complex matrix
+%    A    - a real or complex matrix
 %
-%    y - a real or complex column vector
+%    y    - a real or complex column vector
 %
-%    zft - zero fraction target
+%    nnzt - the target for the number of 
+%           non-zeroes in the solution
 %
 % Outputs:
 %
@@ -21,7 +22,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=tikhol1n.m>
 
-function [x,err,reg]=tikhol1n(A,y,zft)
+function [x,err,reg]=tikhol1n(A,y,nnzt)
 
 % Tolerances
 normest_tol=1e-3;   % relative 2-norm estimation tolerance
@@ -46,7 +47,7 @@ thr_lower=0; thr_upper=max(abs(A_ct*y));
 t=1; iter_count=0; converged=false;
 
 % Tell the user we are starting to iterate
-disp(['FISTA called with zero fraction target = ' num2str(zft)]);
+disp(['FISTA called with target nnz = ' int2str(nnzt)]);
         
 % FISTA loop
 while ~converged
@@ -75,24 +76,21 @@ while ~converged
     t=t_new; x_old=x_prox;
     iter_count=iter_count+1;
 
-    % Progress report and ZF targeting
+    % Progress report and nnz targeting
     if mod(iter_count,1000)==0 || converged
 
-        % Get the zero fraction
-        zf=1-nnz(x)/numel(x);
-
-        % Check the zero fraction target
-        if (abs(zft-zf)>0.01 && converged)||(zf==1)
+        % Check the nnz target
+        if (converged || nnz(x)==0) && nnz(x)~=nnzt
 
             % Decisions
-            if zf<zft
+            if nnz(x)>nnzt
 
-                % Too few zeroes  
+                % Need fewer zeroes  
                 thr_lower=thr;
 
             else
                 
-                % Too many zeroes
+                % Need more zeroes
                 thr_upper=thr;
 
             end
@@ -109,19 +107,19 @@ while ~converged
             
             % Detect stagnation
             if thr<1e-7*max(abs(x))
-                error('zero fraction target unreachable');
+                error('nnz target unreachable');
             end
 
         else
 
             % Get solver state metrics
-            err=norm(err_vec,2)^2; reg=norm(x,1);
+            err=norm(err_vec,2)^2/norm(x,2)^2; reg=norm(x,1);
 
             % Print the report
-            disp(['FISTA iter ' int2str(iter_count) ', zf ' num2str(zf) ...
-                  ', err '  num2str(err) ', reg ' num2str(reg)          ...
-                  ', step ' num2str(step_norm/soln_norm)                ...
-                  ', thr ' num2str(thr)]);
+            disp(['FISTA iter ' int2str(iter_count) ', nnz ' int2str(nnz(x)) ...
+                  ', rel. lsq. err. '  num2str(err) ', 1-norm ' num2str(reg) ...
+                  ', rel. step ' num2str(step_norm/soln_norm)                ...
+                  ', zero thr. ' num2str(thr)]);
 
         end
 

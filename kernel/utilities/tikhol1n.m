@@ -87,8 +87,8 @@ while ~converged
     % Progress report and nnz targeting
     if mod(iter_count,1000)==0 || converged
 
-        % Check the nnz target
-        if (converged || nnz(x)==0) && nnz(x)~=nnzt
+        % Check solution health and the nnz target within ±1 tolerance
+        if nnz(x)==0 || (converged && ~ismember(nnz(x),[nnzt-1, nnzt, nnzt+1]))
 
             % Decisions
             if nnz(x)>nnzt
@@ -114,7 +114,7 @@ while ~converged
                   num2str(thr_lower) ', upper ' num2str(thr_upper)]);
             
             % Detect stagnation
-            if thr<1e-7*max(abs(x))
+            if (thr_upper-thr_lower)/(thr_upper+thr_lower)<1e-6
                 error('nnz target unreachable');
             end
 

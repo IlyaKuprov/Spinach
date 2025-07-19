@@ -33,8 +33,9 @@ function G=react_gen(spin_system,reaction)
 % Check consistency
 grumble(spin_system,reaction);
 
-% Inform the user
+% Inform the user and get the timer going
 report(spin_system,'building reaction generators...');
+timer_react_gen=tic;
 
 % Preallocate reaction generator arrays
 % to be [reactant destin source coeff] 
@@ -126,6 +127,10 @@ for n=1:numel(reaction.reactants)
                 gen_idx(gen_idx(:,1)==n,4),nstates,nstates);
     G{n}=complex(G{n});
 end
+
+% Report the time taken
+report(spin_system,['reaction generator build time: ' ...
+                     num2str(toc(timer_react_gen)) ' seconds']);
 
 end
 

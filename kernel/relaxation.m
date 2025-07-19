@@ -74,8 +74,9 @@ end
 % Add Redfield terms
 if ismember('redfield',spin_system.rlx.theories)
     
-    % Update the user
-    report(spin_system,'Redfield theory with user-supplied correlation times.');
+    % Update the user and get the timer going
+    report(spin_system,'Redfield theory (rotational diffusion).');
+    timer_redfield=tic;
 
     % Catch zero correlation times
     for n=1:numel(spin_system.rlx.tau_c)
@@ -106,6 +107,10 @@ if ismember('redfield',spin_system.rlx.theories)
             error('T1,2>>tau_c validity condition violation in Redfield theory');
         end
     end
+
+    % Report the wall clock time
+    report(spin_system,['Redfield superoperator build time: ' ...
+                         num2str(toc(timer_redfield)) ' seconds']);
     
 end
         

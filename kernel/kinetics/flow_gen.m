@@ -31,6 +31,10 @@ if ~isfield(parameters,'diff'), parameters.diff=0; end
 % Check consistency
 grumble(spin_system,parameters);
 
+% Update the user and get the timer going
+report(spin_system,'building diffusion and flow generator...');
+timer_diff_flow=tic;
+
 % Substructure pull for parfor
 mesh=spin_system.mesh; ncells=mesh.vor.ncells;
 
@@ -107,7 +111,11 @@ end
 
 % Build and balance the flow generator
 F=cell2mat(F); F=sparse(F(:,1),F(:,2),F(:,3),ncells,ncells);
-F=F-spdiags(sum(F,1)',0,ncells,ncells); F=A_back*F*A_forw;  
+F=F-spdiags(sum(F,1)',0,ncells,ncells); F=A_back*F*A_forw;
+
+% Report the time taken
+report(spin_system,['diffusion and flow generator build time: ' ...
+                     num2str(toc(timer_diff_flow)) ' seconds']);
 
 end
 

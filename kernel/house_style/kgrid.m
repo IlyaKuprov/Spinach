@@ -9,7 +9,7 @@
 function kgrid()
 
 % Publisher-friendly grid settings
-grid on; grid minor; 
+grid on; grid minor;
 set(gca,'MinorGridAlpha',1,...
         'MinorGridColor',[0.95 0.95 0.95],...
         'MinorGridLineStyle','-')

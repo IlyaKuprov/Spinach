@@ -7,8 +7,23 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=autoexec.m>
 
+% Kill stupid ass figure defaults in R2025a and later 
+set(groot,'defaultFigurePosition',[680 458 560 420]); 
+set(groot,'defaultFigureWindowStyle','normal'); 
+set(groot,'defaultFigureMenuBar','figure'); 
+set(groot,'defaultFigureToolbar','figure'); 
+
 % This relocates the scratch folder
 % sys.scratch='/somewhere/it/can/write'
+
+
+
+
+
+
+
+
+% ------------------------------------------------------------
 
 % This question often produced vague answers with some candida-
 % tes invoking exchange energy as if they were summoning Volde-

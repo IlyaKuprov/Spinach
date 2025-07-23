@@ -30,12 +30,6 @@ if isMATLABReleaseOlderThan('R2024a')
     error('Spinach requires Matlab R2024a or later.');
 end
 
-% Refuse to run on R2025a
-ver_info=matlabRelease;
-if strcmp(ver_info.Release,'R2025a')
-    error('Matlab R2025a graphics is a mess, use R2024b.');
-end
-
 % Existential toolboxes
 if ~exist([matlabroot '/toolbox/parallel'],'dir')
     error('Spinach requires Parallel Computing Toolbox.');

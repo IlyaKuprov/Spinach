@@ -42,8 +42,12 @@ if ~strcmp(spin_system.sys.output,'hush')
     grumble(spin_system,report_string);
     
     % List call stack exceptions
-    not_useful={'make_general_channel/channel_general','parallel_function'};
-    mdcs={'remoteParallelFunction','remoteBlockExecution','cppRemoteParallelFunction'};
+    not_useful={'hamiltonian/parfor_progr','@(~)parfor_progr','iDispatchDataReceived',...
+                'iDispatchDataReceived','@(src,event)iDispatchDataReceived(func,src,event)',...
+                'DataQueue.dispatchContinuation','DataQueue.maybeDrainAndDispatchAllDataOnQueue',...
+                'AbstractDataQueue.notifyQueue','ParforEngine.getCompleteIntervals',...
+                'parallel_function','powder/parfor_progr'};
+    mdcs={'distributed_execution'};
     
     % Get the call stack
     call_stack=dbstack;
@@ -61,7 +65,7 @@ if ~strcmp(spin_system.sys.output,'hush')
         elseif ismember(call_stack(n).name,mdcs)
 
             % Tell the user it's a parallel call
-            call_stack(n).name=' (parfor/spmd) > ';
+            call_stack(n).name='parfor/spmd > ';
 
         else
 

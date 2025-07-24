@@ -31,11 +31,11 @@ parameters.offset=0;
 parameters.sweep=6e6;
 parameters.npoints=512;
 parameters.zerofill=2048;
-parameters.axis_units='Hz';
+parameters.axis_units='MHz';
 parameters.invert_axis=1;
 parameters.grid='icos_2ang_163842pts';
-parameters.rho0=state(spin_system,'L+','14N','cheap');
-parameters.coil=state(spin_system,'L+','14N','cheap');
+parameters.rho0=state(spin_system,'L+','14N');
+parameters.coil=state(spin_system,'L+','14N');
 parameters.verbose=0;
 
 % Simulation

@@ -100,6 +100,20 @@ for n=1:numel(top_level)
     end
 end
 
+% Avoid ReFS volumes
+if ispc
+
+    % Find out what the file system is, fail silently
+    own_disk=mfilename('fullpath'); own_disk=own_disk(1:2);
+    [~,cmdout]=system(['fsutil fsinfo volumeinfo ',own_disk]);
+
+    % Refuse to run on ReFS volumes
+    if contains(char(cmdout),'File System Name : ReFS')
+        error('Matlab hates ReFS, move Spinach to an NTFS volume.');
+    end
+
+end
+
 end
 
 % It has been my observation that most people get ahead

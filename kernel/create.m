@@ -223,23 +223,49 @@ if ~isworkernode
     % Set default parallel profile
     if ~isfield(sys,'parallel')
 
-        % Leave one core to the operating system
-        sys.parallel={'local',max([1, feature('numcores')-1])};
+        % This needs some care
+        ncores=feature('numcores');
+        if ncores>64
+
+            % Beyond 64 workers, MDCS
+            % needs a personal touch
+            nworkers=64;
+
+        else
+
+            % Leave one core to the 
+            % operating system
+            nworkers=ncores-1;
+
+        end
+
+        % Default to the local parallel pool
+        sys.parallel={'local',max([1 nworkers])};
 
     end
     
     % Set default parallel properties
     if ~isfield(sys,'parprops'), sys.parprops={}; end
     
-    % Set up parallel pool
+    % Get the current pool
     current_pool=gcp('nocreate');
+
+    % Destroy pools not created by Spinach because their scratch is fuck knows where
+    if (~isempty(current_pool))&&(~strcmp(current_pool.Cluster.JobStorageLocation(1:(end-32)),...
+                                          spin_system.sys.job_dir(1:(end-32))))
+        report(spin_system,'found a non-Spinach parallel pool, destroying...');
+        delete(current_pool); current_pool=gcp('nocreate');
+    end
+    
+    % Check for running pools
     if ~isempty(current_pool)
         
         % Use the existing pool
         spin_system.sys.parallel{1}=current_pool.Cluster.Profile;
         spin_system.sys.parallel{2}=current_pool.NumWorkers;
-        report(spin_system,'a running parallel pool found:')
+        report(spin_system,'a running Spinach parallel pool found:')
         report(spin_system,['         > parallel profile: ' spin_system.sys.parallel{1}]);
+        report(spin_system,['         > job identifier:   ' current_pool.Cluster.JobStorageLocation((end-31):end)]);
         report(spin_system,['         > worker processes: ' num2str(spin_system.sys.parallel{2})]);
         report(spin_system,'WARNING - this pool will be re-used');
         sys=rmfield(sys,'parallel'); sys=rmfield(sys,'parprops');

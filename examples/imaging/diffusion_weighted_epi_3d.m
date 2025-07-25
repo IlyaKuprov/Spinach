@@ -102,8 +102,8 @@ parameters.dzz=2e-5*ones(parameters.npts);
 
 % Draw the phantom
 figure(); dims=zeros(1,6); 
-dims([1 3 5])=-parameters.dims;
-dims([2 4 6])=+parameters.dims;
+dims([1 3 5])=-parameters.dims/2;
+dims([2 4 6])=+parameters.dims/2;
 volplot(R1_Ph,dims);
 ktitle('$R_1$ map in 3D'); drawnow();
 

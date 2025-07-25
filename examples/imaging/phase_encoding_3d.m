@@ -29,6 +29,7 @@ sys.disable={'pt','krylov'};
 
 % This needs a GPU
 sys.enable={'greedy','gpu'};
+sys.gpu_mem='minimum';
 
 % Basis set
 bas.formalism='sphten-liouv';
@@ -96,8 +97,8 @@ parameters.grad_angles=[pi/3 pi/4 pi/5];
 
 % Draw phantom at high contrast
 figure(); dims=zeros(1,6); 
-dims([1 3 5])=-parameters.dims;
-dims([2,4,6])=+parameters.dims;
+dims([1 3 5])=-parameters.dims/2;
+dims([2,4,6])=+parameters.dims/2;
 volplot(R1_Ph,dims);
 ktitle('$R_1$ map in 3D'); drawnow();
 

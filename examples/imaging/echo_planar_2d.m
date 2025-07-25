@@ -81,8 +81,8 @@ mri=imaging(spin_system,@epi_2d,parameters);
 parameters.pe_grad_amp=parameters.pe_grad_amp/2;
 
 % Plotting
-loc=get(0,'defaultfigureposition'); figure('Position',[loc(1:2) 3*loc(3) loc(4)]);
-subplot(1,3,1); mri_2d_plot(mri,parameters,'image'); ktitle('recorded image');
+figure(); scale_figure([2.5 1.0]);
+subplot(1,3,1); mri_2d_plot(mri,parameters,'image');    ktitle('recorded image');
 subplot(1,3,2); mri_2d_plot(R1Ph,parameters,'phantom'); ktitle('$R_1$ phantom');
 subplot(1,3,3); mri_2d_plot(R2Ph,parameters,'phantom'); ktitle('$R_2$ phantom');
 

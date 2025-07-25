@@ -98,10 +98,13 @@ end
 mri_slice=fpl2phan(rho,state(spin_system,'L+','1H'),parameters.npts);
 
 % Get sample dimension information
-dims=zeros(1,6); dims([1 3 5])=-parameters.dims; dims([2 4 6])=+parameters.dims;
+dims=zeros(1,6); 
+dims([1 3 5])=-parameters.dims/2; 
+dims([2 4 6])=+parameters.dims/2;
 
 % Draw the slice in three dimensions
-figure(); volplot(abs(mri_slice),dims); ktitle('after slice sel. and echo'); drawnow();
+figure(); volplot(abs(mri_slice),dims); 
+ktitle('after slice sel. and echo'); drawnow();
 
 % Preroll the gradients
 rho=evolution(spin_system,B-parameters.pe_grad_amp*G{2}...

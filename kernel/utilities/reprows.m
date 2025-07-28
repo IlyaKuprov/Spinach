@@ -1,5 +1,5 @@
-% Replicates specified rows of a matrix or cell array a specified
-% number of times. Syntax:
+% Replicates specified rows of a matrix or cell array a 
+% specified number of times. Syntax:
 %
 %            B=reprows(A,row_nums,rep_counts)
 %
@@ -26,7 +26,8 @@ function B=reprows(A,row_nums,rep_counts)
 grumble(A,row_nums,rep_counts);
 
 % Replication counts for every row
-n=size(A,1); rep_map=ones(1,n); rep_map(row_nums)=rep_counts(:);
+n=size(A,1); rep_map=ones(1,n); 
+rep_map(row_nums)=rep_counts(:);
 
 % Build row index vector
 row_idx=repelem(1:n,rep_map);
@@ -40,9 +41,6 @@ end
 function grumble(A,row_nums,rep_counts)
 if (~isnumeric(A))&&(~iscell(A))
     error('A must be numeric or a cell array.');
-end
-if ndims(A)~=2
-    error('A must be two-dimensional.');
 end
 if (~isnumeric(row_nums))||(~isvector(row_nums))||...
    any(row_nums<1)||any(mod(row_nums,1)~=0)

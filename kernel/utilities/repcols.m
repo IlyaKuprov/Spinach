@@ -1,5 +1,5 @@
-% Replicates specified columns of a matrix or cell array a specified
-% number of times. Syntax:
+% Replicates specified columns of a matrix or cell array a 
+% specified number of times. Syntax:
 %
 %            B=repcols(A,col_nums,rep_counts)
 %
@@ -26,7 +26,8 @@ function B=repcols(A,col_nums,rep_counts)
 grumble(A,col_nums,rep_counts);
 
 % Replication counts for every column
-n=size(A,2); rep_map=ones(1,n); rep_map(col_nums)=rep_counts(:);
+n=size(A,2); rep_map=ones(1,n); 
+rep_map(col_nums)=rep_counts(:);
 
 % Build column index vector
 col_idx=repelem(1:n,rep_map);
@@ -40,9 +41,6 @@ end
 function grumble(A,col_nums,rep_counts)
 if (~isnumeric(A))&&(~iscell(A))
     error('A must be numeric or a cell array.');
-end
-if ndims(A)~=2
-    error('A must be two-dimensional.');
 end
 if (~isnumeric(col_nums))||(~isvector(col_nums))||...
    any(col_nums<1)||any(mod(col_nums,1)~=0)

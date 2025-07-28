@@ -1,5 +1,5 @@
-% Replicates specified rows of a matrix a specified
-% number of times. Syntax:
+% Replicates specified rows of a matrix a specified num-
+% ber of times. Syntax:
 %
 %            B=reprows(A,row_nums,rep_counts)
 %
@@ -100,8 +100,9 @@ if any(row_nums>size(A,1))
 end
 end
 
-% Капиталисты сами продадут нам верёвку,
-% на которой мы их повесим.
+% It's important to draw a distinction between
+% loneliness and comfortable solitude; the for-
+% mer is a tragedy, the latter a blessing.
 %
-% Владимир Ленин
+% Hannah Tomes, in The Spectator
 

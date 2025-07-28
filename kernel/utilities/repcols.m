@@ -1,11 +1,11 @@
-% Replicates specified columns of a matrix a specified
+% Replicates specified columns of a matrix or cell array a specified
 % number of times. Syntax:
 %
-%            B=repcols(A,col_num,rep_counts)
+%            B=repcols(A,col_nums,rep_counts)
 %
 % Parameters:
 %
-%   A          - a sparse matrix
+%   A          - a numeric matrix or a cell array
 %
 %   col_nums   - vector of column indices to replicate
 %
@@ -14,7 +14,7 @@
 %
 % Output:
 %
-%   B          - a sparse matrix
+%   B          - same type as A
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -25,63 +25,24 @@ function B=repcols(A,col_nums,rep_counts)
 % Check consistency
 grumble(A,col_nums,rep_counts);
 
-% Sort user indices left to right
-C=col_nums(:); R=rep_counts(:);
-[C,ord]=sort(C); R=R(ord);
+% Replication counts for every column
+n=size(A,2); rep_map=ones(1,n); rep_map(col_nums)=rep_counts(:);
 
-% Number of extra columns after each original column
-n=size(A,2); extra_cols=zeros(1,n); extra_cols(C)=R-1;
+% Build column index vector
+col_idx=repelem(1:n,rep_map);
 
-% Shift map for column insertion
-shift=[0 cumsum(extra_cols(1:end-1))];
-
-% Original matrix information
-m=size(A,1); [ri,ci,vi]=find(A);
-nnz_per_col=accumarray(ci,1,[n 1],@sum,0);
-total_new_nnz=nnz(A)+sum((R-1).*nnz_per_col(C));
-
-% Preallocate output triplets
-ro=zeros(total_new_nnz,1,'like',ri);
-co=zeros(total_new_nnz,1,'like',ci);
-vo=zeros(total_new_nnz,1,'like',vi);
-
-% Copy non-replicated columns
-is_rep=false(n,1); is_rep(C)=true;
-nonrep_idx=~is_rep(ci);
-cnt=sum(nonrep_idx);
-ro(1:cnt)=ri(nonrep_idx);
-co(1:cnt)=ci(nonrep_idx)+shift(ci(nonrep_idx))';
-vo(1:cnt)=vi(nonrep_idx); k=cnt;
-
-% Replicate requested columns
-for p=1:numel(C)
-    
-    col=C(p); rep=R(p);
-    mask=(ci==col);
-    rdup=ri(mask);
-    vdup=vi(mask);
-    nnzc=numel(rdup);
-    base=col+shift(col);
-
-    for j=0:(rep-1)
-        ro(k+1:k+nnzc)=rdup;
-        co(k+1:k+nnzc)=base+j;
-        vo(k+1:k+nnzc)=vdup;
-        k=k+nnzc;
-    end
-
-end
-
-% Build the output matrix
-B=sparse(ro,co,vo,m,n+sum(R-1));
-if ~issparse(A), B=full(B); end
+% Extract and replicate
+B=A(:,col_idx);
 
 end
 
 % Consistency enforcement
 function grumble(A,col_nums,rep_counts)
-if ~isnumeric(A)
-    error('A must be a numeric matrix.');
+if (~isnumeric(A))&&(~iscell(A))
+    error('A must be numeric or a cell array.');
+end
+if ndims(A)~=2
+    error('A must be two-dimensional.');
 end
 if (~isnumeric(col_nums))||(~isvector(col_nums))||...
    any(col_nums<1)||any(mod(col_nums,1)~=0)
@@ -100,8 +61,7 @@ if any(col_nums>size(A,2))
 end
 end
 
-% Капиталисты сами продадут нам верёвку, 
+% Капиталисты сами продадут нам верёвку,
 % на которой мы их повесим.
 %
 % Владимир Ленин
-

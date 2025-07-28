@@ -8,14 +8,14 @@ This is the GitHub repository for Spinach, a spin dynamics simulation software p
 
 ==Programming style instructions==
 
-You must create all new functions as standalone files with indentation using four spaces. Use descriptive lowercase names with underscores for all variables and function names, for example: zeeman_isotropic, spin_system, norm_estimate. Above every logically distinct code block, write a one-line comment explaining what that code block does.
+You must create all new functions as standalone files with indentation using four spaces. Use descriptive lowercase names with underscores for all variables and function names, for example: zeeman_isotropic, spin_system, norm_estimate. Above every logically distinct code block, write a one-line comment explaining what that code block does. Do not put comments in the same line after code, comments must always be in the line above the code.
 
 You must provide documentation as a comment block at the top of each function, explaining the purpose, usage syntax, parameters and outputs. If you are creating a function, you must include this documentation header and follow the same style as you see in other functions residing in "kernel" and "experiments" folders. 
 
 You must program all functions (except those in the example set) to call an internal helper named "grumble" right after the main function begins. Put the helper function code at the end of the file. Make the helper function check arguments and throw informative errors if validations fail. If you are creating a new function, you must include this validation helper and follow the same style as you see in helpers of other functions residing in "kernel" and "experiments" folders.
 
-You must leave no spaces around arithmetical ("+","-","*", etc.), logical ("==",">","<=", etc.), or assignment operations anywhere in the code.
-
+You must leave no spaces around arithmetical ("+","-","*", etc.), logical ("==",">","<=", etc.), or assignment operations anywhere in the code. In general, follow the same style as you see in other functions residing in "kernel" and "experiments" folders. 
+ 
 
 ==Wiki documentation files==
 

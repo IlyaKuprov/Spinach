@@ -14,14 +14,16 @@ You must provide documentation as a comment block at the top of each function, e
 
 You must program all functions (except those in the example set) to call an internal helper named "grumble" right after the main function begins. Put the helper function code at the end of the file. Make the helper function check arguments and throw informative errors if validations fail. If you are creating a new function, you must include this validation helper and follow the same style as you see in helpers of other functions residing in "kernel" and "experiments" folders.
 
-You must leave no spaces around arithmetical ("+","-","*", etc.), logical ("==",">","<=", etc.), or assignment operations anywhere in the code. In general, follow the same style as you see in other functions residing in "kernel" and "experiments" folders. 
+You must leave no spaces around arithmetical ("+","-","*", etc.), logical ("==",">","<=", etc.), or assignment operations anywhere in the code. In general, follow the same style as you see in other functions residing in "kernel" and "experiments" folders.
+
+You must use descriptive names for all variables except loop indices. To decide what the variable name should be, read the function and its documentation header, understand what the function does, and then make a decision. However, keep variable names brief and use abbpreviations as appropriate. For example, a variable containing peroperty index may be called prop_idx.  
  
 
 ==Wiki documentation files==
 
 The template for a Wiki page of each function is provided in wiki_template.txt file. If you are asked to create a Wiki file for a function in Spinach, you must use that template file. 
 
-When making a Wiki documentation file for a function, you must include all documentation and syntax information that is present in that function's file. Do not omit any of that information. You must keep the line breaks in the documentation header unchanged when you create a Wiki file. When writing the description of what the function does and how, analyse the function, understnad what it does, and then write a brief informative description. 
+When making a Wiki documentation file for a function, you must include all documentation and syntax information that is present in that function's file. Do not omit any of that information. You must keep the line breaks in the documentation header unchanged when you create a Wiki file. When writing the description of what the function does and how, analyse the function, understand what it does, and then write a brief informative description. 
 
 
 ==Instruction policies==

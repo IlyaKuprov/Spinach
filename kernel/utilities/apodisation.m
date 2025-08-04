@@ -156,8 +156,14 @@ for n=1:numel(rel_dims)
             % Well burn my papers and call me a teaching fellow: 
             % turns out I need this, you sloppy muppets. - IK
             x=linspace(0,1,npts); x=transpose(x(2:end));
-            x=sqrt(x*winfuns{dim}{2});
-            wf=(fresnelc(x)+1i*fresnels(x))./x; 
+            x=sqrt(x*winfuns{dim}{2}); wf=zeros(size(x));
+
+            % Symbolic toolbox (slow)
+            parfor k=1:numel(x)
+                wf(k)=(fresnelc(x(k))+1i*fresnels(x(k)))/x(k);
+            end
+
+            % Avoid the singularity
             wf=[1; wf]; %#ok<AGROW>
             
         otherwise

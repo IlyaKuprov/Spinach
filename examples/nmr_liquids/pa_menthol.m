@@ -1,4 +1,5 @@
-% Menthol NMR spectrum from Damien Jeannerat.
+% Menthol NMR spectrum from Damien Jeannerat, including the 
+% effect of a misset Z2 magnet shim.
 %
 % Calculation time: minutes.
 %
@@ -32,16 +33,17 @@ parameters.coil=state(spin_system,'L+','1H');
 parameters.decouple={};
 parameters.offset=1000;
 parameters.sweep=2000;
-parameters.npoints=2048;
-parameters.zerofill=16384;
+parameters.npoints=8192;
+parameters.zerofill=65536;
 parameters.axis_units='ppm';
 parameters.invert_axis=1;
 
 % Simulation
 fid=liquid(spin_system,@acquire,parameters,'nmr');
 
-% Apodisation
-fid=apodisation(spin_system,fid,{{'gauss',10}});
+% Gaussian apodisation and then a bad Z2 shim
+fid=apodisation(spin_system,fid,{{'gauss',5}});
+fid=apodisation(spin_system,fid,{{'bad-z2',-40}},0);
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));

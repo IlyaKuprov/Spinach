@@ -50,6 +50,16 @@
 %                        of the Kaiser function is in the middle 
 %                        of the FID.
 %
+%         {'bad-z1',k} - emulation of a misset Z1 shim, k is a di-
+%                        mensionless constant proportional to the
+%                        shim current, a good guess for 1H NMR at
+%                        600 MHz is 10.
+%
+%         {'bad-z2',k} - emulation of a misset Z2 shim, k is a di-
+%                        mensionless constant proportional to the
+%                        shim current, a good guess for 1H NMR at
+%                        600 MHz is 40.
+%                        
 %     fp_half  - set to false() to disable dividing of the first points
 %                by 2, this is needed when multiple window functions are
 %                appied to the same dimensions
@@ -151,14 +161,23 @@ for n=1:numel(rel_dims)
             k=winfuns{dim}{2};
             wf=kaiser(npts,k);
 
+        case 'bad-z1'
+
+            % For all ye lazy PhD students out there
+            x=linspace(0,1,npts); x=transpose(x(2:end));
+            wf=sinc(x*winfuns{dim}{2});
+
+            % Avoid the singularity
+            wf=[1; wf]; %#ok<AGROW>
+
         case 'bad-z2'
 
             % Well burn my papers and call me a teaching fellow: 
-            % turns out I need this, you sloppy muppets. - IK
+            % turns out I need this too, you sloppy muppets
             x=linspace(0,1,npts); x=transpose(x(2:end));
             x=sqrt(x*winfuns{dim}{2}); wf=zeros(size(x));
 
-            % Symbolic toolbox (slow)
+            % Symbolic toolbox is slow
             parfor k=1:numel(x)
                 wf(k)=(fresnelc(x(k))+1i*fresnels(x(k)))/x(k);
             end

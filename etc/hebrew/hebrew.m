@@ -32,6 +32,7 @@ function hebrew(xlsFile)
 
         % Wait for user input, then reveal translation
         pause(); fprintf('%s (%s)\n',eng(idx),trans(idx));
+        
     end
 
 end

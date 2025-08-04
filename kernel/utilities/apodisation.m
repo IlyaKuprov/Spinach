@@ -50,6 +50,10 @@
 %                        of the Kaiser function is in the middle 
 %                        of the FID.
 %
+%     fp_half  - set to false() to disable dividing of the first points
+%                by 2, this is needed when multiple window functions are
+%                appied to the same dimensions
+%
 % Outputs:
 %
 %     fid   - apodised free induction decay
@@ -58,10 +62,13 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=apodisation.m>
 
-function fid=apodisation(spin_system,fid,winfuns)
+function fid=apodisation(spin_system,fid,winfuns,fp_half)
 
 % Check consistency
 grumble(fid,winfuns);
+
+% Default is to halve first points
+if ~exist('fp_half','var'), fp_half=true(); end
 
 % Find non-singleton dimensions
 rel_dims=true(1,ndims(fid));
@@ -73,18 +80,20 @@ inact_dims=find(cellfun(@isempty,winfuns));
 rel_dims=setdiff(rel_dims,inact_dims);
 
 % Factors of 2
-for dim=rel_dims
+if fp_half
+    for dim=rel_dims
 
-    % Index first points along each dimension
-    idx=repmat({':'},1,ndims(fid)); idx{dim}=1;
+        % Index first points along each dimension
+        idx=repmat({':'},1,ndims(fid)); idx{dim}=1;
 
-    % FFT symmetry requirement
-    fid(idx{:})=fid(idx{:})/2;
+        % FFT symmetry requirement
+        fid(idx{:})=fid(idx{:})/2;
 
-    % Report to the user
-    report(spin_system,['FID dimension ' num2str(dim) ...
-                        ', all first points divided by 2']);
+        % Report to the user
+        report(spin_system,['FID dimension ' num2str(dim) ...
+                            ', all first points divided by 2']);
 
+    end
 end
 
 % Window functions
@@ -142,6 +151,15 @@ for n=1:numel(rel_dims)
             k=winfuns{dim}{2};
             wf=kaiser(npts,k);
 
+        case 'bad-z2'
+
+            % Well burn my papers and call me a teaching fellow: 
+            % turns out I need this, you sloppy muppets. - IK
+            x=linspace(0,1,npts); x=transpose(x(2:end));
+            x=sqrt(x*winfuns{dim}{2});
+            wf=(fresnelc(x)+1i*fresnels(x))./x; 
+            wf=[1; wf]; %#ok<AGROW>
+            
         otherwise
 
             % Complain and bomb out

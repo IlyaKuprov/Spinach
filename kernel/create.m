@@ -394,7 +394,8 @@ if (~isworkernode)&&ismember('gpu',spin_system.sys.enable)...
     end
     
     % Head node uses the GPU with the most memory
-    [~,has_most_ram]=max(gpu_ram); G=gpuDevice(has_most_ram); G.CachePolicy='minimum';
+    [~,has_most_ram]=max(gpu_ram); 
+    G=gpuDevice(has_most_ram); G.CachePolicy=spin_system.sys.gpu_mem;
     report(spin_system,['         > head node uses GPU ' num2str(has_most_ram)]);
 
     % Default allocations proportional to GPU memory

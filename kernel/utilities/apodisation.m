@@ -62,7 +62,7 @@
 %                        
 %     fp_half  - set to false() to disable dividing of the first points
 %                by 2, this is needed when multiple window functions are
-%                appied to the same dimensions
+%                applied to the same dimension one after another
 %
 % Outputs:
 %
@@ -173,7 +173,7 @@ for n=1:numel(rel_dims)
         case 'bad-z2'
 
             % Well burn my papers and call me a teaching fellow: 
-            % turns out I need this too, you sloppy muppets
+            % turns out we need this too, you sloppy muppets
             x=linspace(0,1,npts); x=transpose(x(2:end));
             x=sqrt(x*winfuns{dim}{2}); wf=zeros(size(x));
 

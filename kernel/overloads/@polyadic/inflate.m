@@ -12,7 +12,8 @@
 %
 % Outputs:
 %
-%     answer - a sparse matrix
+%     answer - a sparse matrix, except if prefixes or suffixes
+%              are full (in that case, a full matrix)
 %
 % ilya.kuprov@weizmann.ac.il
 %

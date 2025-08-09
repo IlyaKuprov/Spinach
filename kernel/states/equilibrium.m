@@ -88,7 +88,7 @@ switch spin_system.bas.formalism
                 % Unit population of T(0,0) state, normalisation is
                 % such because prod(spin_system.comp.mults) can be-
                 % come too large for double precision arithmetic
-                unit=sparse(1,1,1,size(spin_system.bas.basis,1),1);
+                unit=sparse(1,1,1,size(H,2),1);
 
             case 'zeeman-liouv'
 

@@ -58,7 +58,7 @@ switch method
             case 'sphten-liouv'
 
                 % Unit state has unit population of T(0,0) state
-                U=sparse(1,1,1,size(spin_system.bas.basis,1),1);
+                U=sparse(1,1,1,size(R,2),1);
 
             case 'zeeman-liouv'
 

@@ -110,39 +110,13 @@ parameters=defaults(spin_system,parameters);
 % Check consistency
 grumble(spin_system,pulse_sequence,parameters,assumptions);
 
-% Load the spherical integration grid
-sph_grid=load([spin_system.sys.root_dir '/kernel/grids/' ...
-               parameters.grid],'alphas','betas','gammas','weights');
-alphas=sph_grid.alphas; betas=sph_grid.betas; 
-gammas=sph_grid.gammas; weights=sph_grid.weights;
-
-% Get and report rotor axis orientation angles
-[rotor_phi,rotor_theta,~]=cart2sph(parameters.axis(1),...
-                                   parameters.axis(2),...
-                                   parameters.axis(3)); 
-rotor_theta=pi/2-rotor_theta;
-report(spin_system,['lab frame rotor direction, theta: ' num2str(180*rotor_theta/pi) ' degrees.']);
-report(spin_system,['lab frame rotor direction, phi:   ' num2str(180*rotor_phi/pi) ' degrees.']);
-
-% Report problem dimensions to the user
-spn_dim=size(spin_system.bas.basis,1);
-spc_dim=2*parameters.max_rank+1; n_orients=numel(weights);
-report(spin_system,['spin space problem dimension:     ' num2str(spn_dim)]);
-report(spin_system,['number of rotor grid points:      ' num2str(spc_dim)]);
-report(spin_system,['number of powder grid points:     ' num2str(n_orients)]);
-
-% Forward dimension information to the pulse sequence
-parameters.spc_dim=spc_dim; parameters.spn_dim=spn_dim;
-
 % Set the interaction assumptions
 spin_system=assume(spin_system,assumptions);
 
 % Get isotropic Hamiltonian and rotations basis
-report(spin_system,'building the Hamiltonian...');
 [I,Q]=hamiltonian(assume(spin_system,assumptions));
 
 % Apply channel frequency offsets
-report(spin_system,'applying frequency offsets...');
 I=frqoffset(spin_system,I,parameters);
 
 % Compute isotropic thermal equilibrium
@@ -161,6 +135,30 @@ end
 
 % Get relaxation and kinetics generators
 R=relaxation(spin_system); K=kinetics(spin_system);
+
+% Load the spherical integration grid
+sph_grid=load([spin_system.sys.root_dir '/kernel/grids/' ...
+               parameters.grid],'alphas','betas','gammas','weights');
+alphas=sph_grid.alphas; betas=sph_grid.betas; 
+gammas=sph_grid.gammas; weights=sph_grid.weights;
+
+% Get and report rotor axis orientation angles
+[rotor_phi,rotor_theta,~]=cart2sph(parameters.axis(1),...
+                                   parameters.axis(2),...
+                                   parameters.axis(3)); 
+rotor_theta=pi/2-rotor_theta;
+report(spin_system,['lab frame rotor direction, theta: ' num2str(180*rotor_theta/pi) ' degrees.']);
+report(spin_system,['lab frame rotor direction, phi:   ' num2str(180*rotor_phi/pi) ' degrees.']);
+
+% Report problem dimensions to the user
+spn_dim=sum(size(I,2)); % Use Hamiltonian dimension
+spc_dim=2*parameters.max_rank+1; n_orients=numel(weights);
+report(spin_system,['spin space problem dimension:     ' num2str(spn_dim)]);
+report(spin_system,['number of rotor grid points:      ' num2str(spc_dim)]);
+report(spin_system,['number of powder grid points:     ' num2str(n_orients)]);
+
+% Forward dimension information to the pulse sequence
+parameters.spc_dim=spc_dim; parameters.spn_dim=spn_dim;
 
 % Formalism-dependent stage
 switch spin_system.bas.formalism

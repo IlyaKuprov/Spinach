@@ -43,8 +43,12 @@ end
 % Find matrix dimensions
 [nrows,ncols]=size(p);
 
+% Get index arrays going
+rows=cell(numel(p.cores),1);
+cols=cell(numel(p.cores),1);
+vals=cell(numel(p.cores),1);
+
 % Loop over the sum
-answers=cell(numel(p.cores),1);
 for n=1:numel(p.cores)
     
     % Compute the polyadic
@@ -52,25 +56,24 @@ for n=1:numel(p.cores)
     for k=2:numel(p.cores{n})
         term=kron(term,p.cores{n}{k});
     end
-    [rows,cols,vals]=find(term);
-    answers{n}=[rows cols vals];
-    
-    % Take care with memory
-    clear('term','rows','cols','vals');
+    [rows{n},cols{n},vals{n}]=find(term);
     
 end
 
-% Merge the answer indices
-answers=cell2mat(answers);
+% Merge index arrays
+rows=cell2mat(rows);
+cols=cell2mat(cols);
+vals=cell2mat(vals);
 
 % Build a sparse matrix
-if isempty(answers)
+if isempty(vals)
     answer=sparse([],[],[],nrows,ncols);
 else
-    answer=sparse(answers(:,1),...
-                  answers(:,2),...
-                  answers(:,3),nrows,ncols);
+    answer=sparse(rows,cols,vals,nrows,ncols);
 end
+
+% Prevent GPU memory leaks
+clear('rows','cols','vals');
 
 % Multiply by prefixes
 for n=numel(p.prefix):-1:1

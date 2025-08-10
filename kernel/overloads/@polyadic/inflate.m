@@ -73,7 +73,7 @@ else
 end
 
 % Prevent GPU memory leaks
-clear('rows','cols','vals');
+clear('rows','cols','vals','term');
 
 % Multiply by prefixes
 for n=numel(p.prefix):-1:1

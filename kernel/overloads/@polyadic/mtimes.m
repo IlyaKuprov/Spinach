@@ -40,7 +40,8 @@ end
 if ~isa(a,'polyadic')&&isnumeric(a)
     
     % Issue a recursive call
-    c=ctranspose(b'*a'); return
+    c=ctranspose(ctranspose(b)*...
+                 ctranspose(a)); return
     
 end
     

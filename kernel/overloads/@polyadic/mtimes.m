@@ -1,98 +1,157 @@
 % Performs multiplications involving polyadics. Syntax:
 %
-%                           c=mtimes(a,b)
+%                           C=mtimes(A,B)
 %
 % Parameters:
 %
-%    a,b  - a polyadic or a numerical array
+%    A,B  - a polyadic or a numerical array
 %
 % Outputs:
 %
-%      c  - a polyadic or a numerical array
+%      C  - a polyadic or a numerical array
 %
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=polyadic/mtimes.m>
 
-function c=mtimes(a,b)
+function C=mtimes(A,B)
 
 % When A is a number
-if ~isa(a,'polyadic')&&isnumeric(a)&&isscalar(a)
+if ~isa(A,'polyadic')&&isnumeric(A)&&isscalar(A)
     
     % Multiply smallest cores in the B buffer
-    for n=1:numel(b.cores)
-        [~,smallest_core]=min(cellfun(@numel,b.cores{n}));
-        b.cores{n}{smallest_core}=a*b.cores{n}{smallest_core};
+    for n=1:numel(B.cores)
+        [~,smallest_core]=min(cellfun(@numel,B.cores{n}));
+        B.cores{n}{smallest_core}=A*B.cores{n}{smallest_core};
     end
-    c=simplify(b); return
+    C=simplify(B); return
 
 end
 
 % When A is a sparse matrix
-if ~isa(a,'polyadic')&&isnumeric(a)&&issparse(a)
+if ~isa(A,'polyadic')&&isnumeric(A)&&issparse(A)
     
     % Attach as a prefix to B
-    b.prefix=[{a} b.prefix]; c=simplify(b); return
+    B.prefix=[{A} B.prefix]; C=simplify(B); return
     
 end
 
 % When A is a full matrix
-if ~isa(a,'polyadic')&&isnumeric(a)
+if ~isa(A,'polyadic')&&isnumeric(A)
     
     % Issue a recursive call
-    c=ctranspose(ctranspose(b)*...
-                 ctranspose(a)); return
+    C=ctranspose(ctranspose(B)*...
+                 ctranspose(A)); return
     
 end
     
 % When B is a number
-if ~isa(b,'polyadic')&&isnumeric(b)&&isscalar(b)
+if ~isa(B,'polyadic')&&isnumeric(B)&&isscalar(B)
 
     % Multiply smallest cores in the A buffer
-    for n=1:numel(a.cores)
-        [~,smallest_core]=min(cellfun(@numel,a.cores{n}));
-        a.cores{n}{smallest_core}=a.cores{n}{smallest_core}*b;
+    for n=1:numel(A.cores)
+        [~,smallest_core]=min(cellfun(@numel,A.cores{n}));
+        A.cores{n}{smallest_core}=A.cores{n}{smallest_core}*B;
     end
-    c=simplify(a); return
+    C=simplify(A); return
     
 end
 
 % When B is a sparse matrix
-if ~isa(b,'polyadic')&&isnumeric(b)&&issparse(b)
+if ~isa(B,'polyadic')&&isnumeric(B)&&issparse(B)
     
     % Attach as a suffix to A
-    a.suffix=[a.suffix {b}]; c=simplify(a); return
+    A.suffix=[A.suffix {B}]; C=simplify(A); return
     
 end
 
 % When B is a full matrix
-if ~isa(b,'polyadic')&&isnumeric(b)
+if ~isa(B,'polyadic')&&isnumeric(B)
     
     % Multiply by suffixes
-    for n=numel(a.suffix):-1:1
-        b=a.suffix{n}*b;
+    for n=numel(A.suffix):-1:1
+        B=A.suffix{n}*B;
     end
-    b=full(b);
+    B=full(B);
    
     % Multiply by cores
-    c=zeros(size(b));
-    for n=1:numel(a.cores)
-        c=c+kronm(a.cores{n},b);
+    C=zeros(size(B));
+    for n=1:numel(A.cores)
+        C=C+kronm(A.cores{n},B);
     end
     
     % Multiply by prefixes
-    for n=numel(a.prefix):-1:1
-        c=a.prefix{n}*c;
+    for n=numel(A.prefix):-1:1
+        C=A.prefix{n}*C;
     end
-    c=full(c); return
+    C=full(C); return
     
 end
 
 % When both are polyadic
-if isa(a,'polyadic')&&isa(b,'polyadic')
-    
-    % Add a suffix
-    c=simplify(suffix(a,b)); return
+if isa(A,'polyadic')&&isa(B,'polyadic')
+
+    % Merge threshold and green light flag
+    merge_thresh=1024; can_proceed=true();
+
+    % Does anything get in the way?
+    can_proceed=isempty(A.suffix)&&can_proceed;
+    can_proceed=isempty(B.prefix)&&can_proceed;
+
+    % Are these single-core polyadics?
+    can_proceed=isscalar(A.cores)&&isscalar(B.cores)&&can_proceed;
+
+    % Does the Kronecker product term count match?
+    can_proceed=(numel(A.cores{1})==numel(B.cores{1}))&&can_proceed;
+
+    % Deeper check
+    if can_proceed
+
+        % Are all dimensions OK?
+        for n=1:numel(A.cores{1})
+            
+            % Inner product compatibility check
+            can_proceed=(size(A.cores{1}{n},2)==...
+                         size(B.cores{1}{n},1))&&can_proceed;
+
+            % Opia are fine in any case...
+            if (~isa(A.cores{1}{n},'opium'))&&...
+               (~isa(B.cores{1}{n},'opium'))
+
+                % ...but matrix dimensions must be moderate
+                can_proceed=(size(A.cores{1}{n},1)<=merge_thresh)&&can_proceed;
+                can_proceed=(size(A.cores{1}{n},2)<=merge_thresh)&&can_proceed;
+                can_proceed=(size(B.cores{1}{n},1)<=merge_thresh)&&can_proceed;
+                can_proceed=(size(B.cores{1}{n},2)<=merge_thresh)&&can_proceed;
+
+            end
+
+        end
+
+    end
+   
+    % Do the deed
+    if can_proceed
+       
+        % Term-by-term product of krons
+        C=polyadic({cell(1,numel(A.cores{1}))});
+        for n=1:numel(A.cores{1})
+            C.cores{1}{n}=A.cores{1}{n}*B.cores{1}{n};
+        end
+
+        % Inherit prefix and suffix
+        if ~isempty(A.prefix), C.prefix=A.prefix; end
+        if ~isempty(B.suffix), C.suffix=B.suffix; end
+
+        % Simplify and return
+        C=simplify(C); return;
+
+    else
+        
+        % Place B as a suffix of A
+        C=simplify(suffix(A,B)); return
+
+    end
     
 end
     

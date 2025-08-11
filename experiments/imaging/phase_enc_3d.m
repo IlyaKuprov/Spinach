@@ -45,8 +45,16 @@ grumble(spin_system,parameters,H,R,K,G,F);
 B=H+F+1i*R+1i*K;
 
 % Make pulse operators and kron them up into Fokker-Planck space
-Sx=operator(spin_system,'Lx','1H'); Sx=kron(speye(prod(parameters.npts)),Sx);
-Sy=operator(spin_system,'Ly','1H'); Sy=kron(speye(prod(parameters.npts)),Sy);
+Sx=operator(spin_system,'Lx','1H'); 
+Sy=operator(spin_system,'Ly','1H');
+
+% Make and inflate polyadics
+spc_dim=prod(parameters.npts);
+Sx=polyadic({{opium(spc_dim,1),Sx}});
+Sy=polyadic({{opium(spc_dim,1),Sy}});
+if ~ismember('polyadic',spin_system.sys.enable)
+    Sx=inflate(Sx); Sy=inflate(Sy);
+end
 
 % Slice selection operator 
 L=B+parameters.ss_grad_amp*G{1};

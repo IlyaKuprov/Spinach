@@ -29,8 +29,17 @@ function [traj_data,fidelity,gradient]=grape_coop(phi_profile,spin_system)
 % Check consistency
 grumble(spin_system);
 
-% Extract phase profiles of the two pulses
-profile_a=phi_profile(1,:); profile_b=phi_profile(2,:);
+% Get number of controls
+if spin_system.control.ncontrols==4
+
+    % Extract phase profile 1 on both channels
+    profile_a=phi_profile(1:2,:); profile_b=phi_profile(3:4,:);
+
+elseif spin_system.control.ncontrols==2
+
+    % Extract phase profiles of the two pulses
+    profile_a=phi_profile(1,:); profile_b=phi_profile(2,:);
+end 
 
 % Get the impurity projector
 P_targ=spin_system.control.rho_targ{1}*...

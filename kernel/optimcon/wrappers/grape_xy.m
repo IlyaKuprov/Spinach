@@ -94,11 +94,8 @@ elseif nargout==3
     
     % Translate the basis if necessary
     if ~isempty(spin_system.control.basis)
-        grad_in_basis=zeros(size(waveform,1),nwaves,npenterms+1);
-        for n=1:(npenterms+1)
-            grad_in_basis(:,:,n)=grad(:,:,n)*spin_system.control.basis';
-        end
-        grad=grad_in_basis;
+        grad=tensorprod(spin_system.control.basis,grad,2,2);
+        grad=permute(grad,[2 1 3]);
     end
     
 elseif nargout==4
@@ -130,11 +127,8 @@ elseif nargout==4
     if ~isempty(spin_system.control.basis)
         
         % Transform the gradient
-        grad_in_basis=zeros(size(waveform,1),nwaves,npenterms+1);
-        for n=1:(npenterms+1)
-            grad_in_basis(:,:,n)=grad(:,:,n)*spin_system.control.basis';
-        end
-        grad=grad_in_basis;
+        grad=tensorprod(spin_system.control.basis,grad,2,2);
+        grad=permute(grad,[2 1 3]);
         
         % Preallocate the transform
         hess_in_basis=zeros([numel(spin_system.control.operators)*nwaves ...
@@ -159,8 +153,8 @@ elseif nargout==4
                               numel(spin_system.control.operators)]);
             
             % Compute scalar products
-            for j=1:numel(spin_system.sys.controls)
-                for k=1:numel(spin_system.sys.controls)
+            for j=1:numel(spin_system.control.operators)
+                for k=1:numel(spin_system.control.operators)
                     hess_trans(:,:,j,k)=spin_system.control.basis*...
                                        (squeeze(hess_re(:,:,j,k))*...
                                         spin_system.control.basis');

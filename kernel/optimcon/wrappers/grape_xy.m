@@ -126,52 +126,43 @@ elseif nargout==4
     % Translate the basis if necessary
     if ~isempty(spin_system.control.basis)
         
-        % Transform the gradient
+        % Transform gradients
         grad=tensorprod(spin_system.control.basis,grad,2,2);
         grad=permute(grad,[2 1 3]);
         
-        % Preallocate the transform
-        hess_in_basis=zeros([numel(spin_system.control.operators)*nwaves ...
-                             numel(spin_system.control.operators)*nwaves npenterms+1]);
-        
-        % Transform Hessian and penalties
+        % Preallocate transformed Hessians
+        hess_in_basis=zeros([nwaves*numel(spin_system.control.operators) ...
+                             nwaves*numel(spin_system.control.operators) ...
+                             npenterms+1]);
+
+        % Transform Hessians
         for n=1:size(hess,3)
-            
+
             % Reorder Hessian
             hess_re=hess_reorder(hess(:,:,n),numel(spin_system.control.operators),...
-                                                spin_system.control.pulse_nsteps);
-            
-            % Unfold block matrix to 4d tensor
-            hess_re=permute(reshape(hess_re,[spin_system.control.pulse_nsteps ...
-                                             numel(spin_system.control.operators) ...
-                                             spin_system.control.pulse_nsteps ...
-                                             numel(spin_system.control.operators)]),[1 3 2 4]);
-            % Preallocate the transform
-            hess_trans=zeros([nwaves ...
-                              nwaves ...
-                              numel(spin_system.control.operators) ...
-                              numel(spin_system.control.operators)]);
-            
-            % Compute scalar products
-            for j=1:numel(spin_system.control.operators)
-                for k=1:numel(spin_system.control.operators)
-                    hess_trans(:,:,j,k)=spin_system.control.basis*...
-                                       (squeeze(hess_re(:,:,j,k))*...
-                                        spin_system.control.basis');
-                end
-            end
-            
-            % Fold 4d tensor to block matrix
-            hess_trans=reshape(permute(hess_trans,[1 3 2 4]),...
-                              [nwaves*numel(spin_system.control.operators) ...
-                               numel(spin_system.control.operators)*nwaves]);
-            
+                                             spin_system.control.pulse_nsteps);
+
+            % Fold up the block matrix into a 4D tensor
+            hess_re=reshape(hess_re,[spin_system.control.pulse_nsteps ...
+                                     numel(spin_system.control.operators) ...
+                                     spin_system.control.pulse_nsteps ...
+                                     numel(spin_system.control.operators)]);
+
+            % Transform the Hessian
+            hess_re=tensorprod(spin_system.control.basis,hess_re,2,1);
+            hess_re=tensorprod(spin_system.control.basis,hess_re,2,3);
+            hess_re=permute(hess_re,[2 3 1 4]);
+
+            % Unfold the 4D tensor into block matrix
+            hess_re=reshape(hess_re,[nwaves*numel(spin_system.control.operators) ...
+                                     nwaves*numel(spin_system.control.operators)]);
+
             % Reorder transformed Hessian
-            hess_in_basis(:,:,n)=hess_reorder(hess_trans,nwaves,...
+            hess_in_basis(:,:,n)=hess_reorder(hess_re,nwaves,...
                                               numel(spin_system.control.operators));
-                                          
+
         end
-        
+
         % Write the result out
         hess=hess_in_basis;
         

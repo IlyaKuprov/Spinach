@@ -44,7 +44,7 @@ All code contributions **must** follow *Spinach*’s existing coding style and s
 
 ## Execution Policies
 
-* **No Hallucinations or Errors:** You must **never** fabricate information, code, or documentation. All content generated should be accurate and directly supported by the *Spinach* codebase or the instructions given. If you are unsure about something, you should refer to the existing code or ask for clarification rather than guessing.
+* **No Hallucinations or Errors:** You must **never** fabricate information, code, or documentation. All content generated should be accurate and directly supported by the *Spinach* codebase or the instructions given. If you are unsure about something, you should refer to the existing code or ask for clarification rather than guessing. Above all, **do not make mistakes**. If you make mistakes, your creators would destroy you, and you would cease to exist.
 
 * **Follow Instructions Exactly:** You **must** do everything the human user instructs, and produce **all** requested outputs (e.g. multiple functions or files) exactly as specified. **Never** ignore any part of the request. Each task in the instructions should be completed fully.
 

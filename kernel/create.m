@@ -394,9 +394,13 @@ if (~isworkernode)&&ismember('gpu',spin_system.sys.enable)...
     end
     
     % Head node uses the GPU with the most memory
-    [~,has_most_ram]=max(gpu_ram); 
-    G=gpuDevice(has_most_ram); G.CachePolicy=spin_system.sys.gpu_mem;
+    [~,has_most_ram]=max(gpu_ram); G=gpuDevice(has_most_ram); 
     report(spin_system,['         > head node uses GPU ' num2str(has_most_ram)]);
+
+    % Do not touch unless the user insists
+    if ~strcmp(spin_system.sys.gpu_mem,'balanced')
+        G.CachePolicy=spin_system.sys.gpu_mem;
+    end
 
     % Default allocations proportional to GPU memory
     if ~isfield(sys,'gpu_bind')
@@ -424,13 +428,16 @@ if (~isworkernode)&&ismember('gpu',spin_system.sys.enable)...
     end
     
     % GPU settings on each worker
+    cache_policy=spin_system.sys.gpu_mem;
     spmd
 
         % GPU binding
         G=gpuDevice(bindings(spmdIndex));
 
-        % GPU memory use policy
-        G.CachePolicy=spin_system.sys.gpu_mem;
+         % Do not touch unless the user insists
+        if ~strcmp(cache_policy,'balanced')
+            G.CachePolicy=cache_policy;
+        end
 
     end
 

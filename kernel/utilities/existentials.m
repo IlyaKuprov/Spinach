@@ -43,9 +43,6 @@ end
 if ~exist([matlabroot '/toolbox/optim'],'dir')
     error('Spinach requires Optimisation Toolbox.');
 end
-if ~exist([matlabroot '/toolbox/stats'],'dir')
-    error('Spinach requires Statistics and Machine Learning Toolbox.');
-end
 if ~exist([matlabroot '/toolbox/map'],'dir')
     error('Spinach requires Mapping Toolbox.');
 end

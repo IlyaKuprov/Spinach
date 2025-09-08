@@ -82,10 +82,20 @@ if ismember('spectrogram',spin_system.control.plotting)
         % Modify the time axis to account for the replicas
         t_axis=t_axis-sum(spin_system.control.pulse_dt);
         
-        % Interpret phase as hue and amplitude as value in HSV - phase unwrap needed
-        phi=atan2(real(st_fft),imag(st_fft)); phi=(phi+pi)/(2*pi); 
+        % Get, wrap, and scale the phase
+        phi=atan2(real(st_fft),imag(st_fft)); 
+        phi=wrapTo2Pi(phi)/(2*pi);
+
+        % Get and scale the amplitude
         amp=abs(st_fft); amp=amp/max(amp,[],'all');
+        
+        % Interpret phase as hue and amplitude as value in HSV 
+        % hsv=cat(3,phi,ones(size(phi)),amp); rgb=hsv2rgb(hsv);
+
+        % Interpret amplitude as value in HSV - needs a phase fix
         hsv=cat(3,ones(size(phi)),ones(size(phi)),amp); rgb=hsv2rgb(hsv);
+
+        % Do the plotting
         image(t_axis,f_axis,rgb); kxlabel('time, seconds');
         ktitle(['channels ' num2str(2*n-1) ',' num2str(2*n)]);
         kylabel('frequency offset, Hz'); set(gca,'YDir','normal');

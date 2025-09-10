@@ -1,5 +1,5 @@
 % IK's Hebrew flashcards function. The Excel file should contain
-% one header row followed by three text columns:
+% three text columns:
 %
 %       A) English words
 %       B) Hebrew translations
@@ -15,23 +15,34 @@ function hebrew(xlsFile)
     
     % Read the spreadsheet
     T=readtable(xlsFile,'TextType','string',      ...
-                        'ReadVariableNames',true, ... 
-                        'PreserveVariableNames',true);
+                        'ReadVariableNames',false, ... 
+                        'PreserveVariableNames',false);
 
     % Extract columns
     eng=T{:,1}; heb=T{:,2}; trans=T{:,3}; n=numel(eng);
+
+    % Trajectory
+    past_idx=[];
 
     % Main flash card loop
     while true
 
         % Random row
-        idx=randi(n);   
+        idx=randi(n);
 
-        % Show Hebrew
-        disp(' '); disp(heb(idx));
+        % Do not show twice
+        if ~ismember(idx,past_idx)
 
-        % Wait for user input, then reveal translation
-        pause(); fprintf('%s (%s)\n',eng(idx),trans(idx));
+            % Show Hebrew
+            disp(' '); disp(heb(idx));
+
+            % Wait for user input, then reveal translation
+            pause(); fprintf('%s (%s)\n',eng(idx),trans(idx));
+
+        end
+
+        % Record as done
+        past_idx=[past_idx idx];  %#ok<AGROW>
         
     end
 

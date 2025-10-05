@@ -29,19 +29,12 @@ function [traj_data,fidelity,gradient]=grape_coop(phi_profile,spin_system)
 % Check consistency
 grumble(spin_system);
 
-% Get number of controls
-if spin_system.control.ncontrols==4
+% Extract phase profiles
+n_channels=spin_system.control.ncontrols/2;
+profile_a=phi_profile(1:n_channels,:);
+profile_b=phi_profile((n_channels+1):end,:);
 
-    % Extract phase profile 1 on both channels
-    profile_a=phi_profile(1:2,:); profile_b=phi_profile(3:4,:);
-
-elseif spin_system.control.ncontrols==2
-
-    % Extract phase profiles of the two pulses
-    profile_a=phi_profile(1,:); profile_b=phi_profile(2,:);
-end 
-
-% Get the impurity projector
+% Get target and impurity projectors
 P_targ=spin_system.control.rho_targ{1}*...
        spin_system.control.rho_targ{1}';
 P_dirt=eye(size(P_targ))-P_targ;
@@ -93,6 +86,9 @@ if (numel(spin_system.control.rho_targ)~=1)||...
 end
 if strcmp(spin_system.bas.formalism,'zeeman-hilb')
     error('cooperative control not implemented in Hilbert space.');
+end
+if mod(spin_system.control.ncontrols,2)~=0
+    error('grape_coop is phase-modulated, number of controls must be even.');
 end
 end
 

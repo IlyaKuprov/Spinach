@@ -35,7 +35,6 @@ grumble(context,assumptions);
 
 % Disable ensemble summation
 parameters.sum_up=0;
-parameters.serial=1;
 
 % Capture evolution generators
 gen_cap=@(varargin)varargin(3:end);

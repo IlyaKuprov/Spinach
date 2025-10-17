@@ -49,7 +49,7 @@ if numel(rot_angle)~=1
 end
 end
 
-% Many lecture videos in IK's Spin Dynamics course (http://spindynamics.org)
+% Some lecture videos in IK's Spin Dynamics course (https://spindynamics.org)
 % look far too smooth and orderly for something that requires ten boardfuls 
 % of dense mathematics. In the actual reality, the subject is very hard to 
 % read and neat lecture videos were in a few cases assembled piecewise from

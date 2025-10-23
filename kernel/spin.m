@@ -10,29 +10,33 @@
 %
 %                 'G'  - ghost spin: gamma=0, mult=1
 %
-%                 'N'  - neutron
-%
-%                 'M'  - muon
+%            'N', 'M'  - neutron, muon
 %
 %                 'E#' - high-spin electron, # is 
 %                        an integer specifying the
 %                        multiplicity
 %
-%                 'C#' - cavity mode, # is an in-
-%                        teger specifying the num-
-%                        ber of energy levels to
-%                        include
+%                 'C#' - electromagnetic cavity mo-
+%                        de, # is an integer speci-
+%                        fying the number of popu-
+%                        lation levels
 %
 %                 'V#' - phonon mode, # is an in-
 %                        teger specifying the num-
-%                        ber of energy levels to
-%                        include
+%                        ber of population levels
+%
+%                 'T#' - transmon, # is an integer
+%                        specifying the number of
+%                        energy levels
 %
 % Outputs:
 %
-%      gamma         - magnetogyric ratio, rad/(s*Tesla)
+%      gamma         - magnetogyric ratio, rad/(s*Tesla);
+%                      zero for cavities, phonons, and
+%                      transmons
 %
-%      multiplicity  - spin multiplicity of the particle
+%      multiplicity  - multiplicity (the number of energy
+%                      or population levels)
 %
 % Note: data with no source specified was sourced from Google
 %       and should be double-checked before running producti-
@@ -56,14 +60,12 @@ if strcmp(name(1),'E')&&(~isempty(regexp(name,'^E\d','once')))
     multiplicity=str2double(name(2:end));
     gamma=-1.76085963023e11; % CODATA 2018
 
-elseif strcmp(name(1),'C')&&(~isempty(regexp(name,'^C\d','once')))
+elseif (strcmp(name(1),'C')&&(~isempty(regexp(name,'^C\d','once'))))||...
+       (strcmp(name(1),'V')&&(~isempty(regexp(name,'^V\d','once'))))||...
+       (strcmp(name(1),'T')&&(~isempty(regexp(name,'^T\d','once'))))
 
-    % Cavity modes are special, no Zeeman interaction
-    multiplicity=str2double(name(2:end)); gamma=0;
-
-elseif strcmp(name(1),'V')&&(~isempty(regexp(name,'^V\d','once')))
-
-    % Phonon modes are special, no Zeeman interaction
+    % Cavity modes, phonon modes, and transmons
+    % are special cases, no Zeeman interactions
     multiplicity=str2double(name(2:end)); gamma=0;
     
 else
@@ -76,7 +78,7 @@ else
         case 'E'  % Electron
             multiplicity=2;
             gamma=-1.76085963023e11; % CODATA 2018
-        case 'T'  % Neutron (N to be avoided here)
+        case 'N'  % Neutron
             multiplicity=2;
             gamma=-1.83247171e8;     % CODATA 2018
         case 'M'  % Muon

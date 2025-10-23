@@ -911,10 +911,10 @@ end
 % Clean up the result
 for n=1:spin_system.comp.nspins
     for k=1:spin_system.comp.nspins
-        
+
         % Re-check all coupling tensors for significance in 2-norm and relevance
         if (norm(spin_system.inter.coupling.matrix{n,k},2)<2*pi*spin_system.tols.inter_cutoff)||...
-           (spin(spin_system.comp.isotopes{n})==0)||(spin(spin_system.comp.isotopes{k})==0)
+           (spin_system.comp.mults(n)==1)||((spin_system.comp.mults(k)==1)) % Ignore ghost spins
        
             % Set irrelevant tensors to empty
             spin_system.inter.coupling.matrix{n,k}=[];

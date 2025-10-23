@@ -38,7 +38,7 @@ grumble(H);
 % Get multiplicity and basis operators
 mult=size(H,1); T=irr_sph_ten(mult); S=pauli(mult);
 
-% Get Larmor frequencies
+% Get Larmor frequencies (rad/s)
 omega(1)=trace(S.x'*H)/norm(S.x,'fro')^2;
 omega(2)=trace(S.y'*H)/norm(S.y,'fro')^2;
 omega(3)=trace(S.z'*H)/norm(S.z,'fro')^2;
@@ -54,7 +54,7 @@ if mult>2
     rank2(4)=trace(T{8}'*H)/norm(T{8},'fro')^2;
     rank2(5)=trace(T{9}'*H)/norm(T{9},'fro')^2;
 
-    % Translate quadratic part (Hz)
+    % Translate quadratic part (rad/s)
     Q=sphten2mat([],[],rank2); Q=real(Q);
 
 else
@@ -65,9 +65,9 @@ else
 end
 
 % Run an explicit reconstruction
-HR=omega(1)*S.x+omega(2)*S.y+omega(3)*S.z+...
-   Q(1,1)*S.x*S.x+Q(2,1)*S.y*S.x+Q(3,1)*S.z*S.x+...
-   Q(1,2)*S.x*S.y+Q(2,2)*S.y*S.y+Q(3,2)*S.z*S.y+...
+HR=omega(1)*S.x+omega(2)*S.y+omega(3)*S.z+       ...
+   Q(1,1)*S.x*S.x+Q(2,1)*S.y*S.x+Q(3,1)*S.z*S.x+ ...
+   Q(1,2)*S.x*S.y+Q(2,2)*S.y*S.y+Q(3,2)*S.z*S.y+ ...
    Q(1,3)*S.x*S.z+Q(2,3)*S.y*S.z+Q(3,3)*S.z*S.z;
 
 % Double-check reconstruction

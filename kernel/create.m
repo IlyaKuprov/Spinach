@@ -363,87 +363,10 @@ if ismember('gpu',spin_system.sys.enable)&&(gpuDeviceCount==0)
     spin_system.sys.enable=setdiff(spin_system.sys.enable,{'gpu'});
 end
 
-% Absorb GPU memory use policy
-if ismember('gpu',spin_system.sys.enable)
-    if isfield(sys,'gpu_mem')
-        spin_system.sys.gpu_mem=sys.gpu_mem;
-        sys=rmfield(sys,'gpu_mem');
-    else
-        spin_system.sys.gpu_mem='balanced';
-    end
-    report(spin_system,['GPU memory use policy: ' spin_system.sys.gpu_mem]);
-end
-
-% Binding of GPU devices to workers
+% Reset and restart all GPUs
 if (~isworkernode)&&ismember('gpu',spin_system.sys.enable)...
                   &&(~ismember('hygiene',spin_system.sys.disable))
-
-    % Reset all GPUs
-    report(spin_system,'Clearing GPU(s)...'); 
-    gpuDevice([]); pctRunOnAll('gpuDevice([]);');
-
-    % Inform the user
-    report(spin_system,'GPU configuration report:');
-
-    % Find out how much GPU memory we have
-    gpu_ram=nan(gpuDeviceCount,1);
-    for n=1:gpuDeviceCount
-        nth_gpu=gpuDevice(n); gpu_ram(n)=nth_gpu.TotalMemory;
-        report(spin_system,['         > GPU ' num2str(n) ': ' nth_gpu.Name ...
-                            ', ' num2str(gpu_ram(n)/2^30) ' GB total.']); 
-    end
-    
-    % Head node uses the GPU with the most memory
-    [~,has_most_ram]=max(gpu_ram); G=gpuDevice(has_most_ram); 
-    report(spin_system,['         > head node uses GPU ' num2str(has_most_ram)]);
-
-    % Do not touch unless the user insists
-    if ~strcmp(spin_system.sys.gpu_mem,'balanced')
-        G.CachePolicy=spin_system.sys.gpu_mem;
-    end
-
-    % Default allocations proportional to GPU memory
-    if ~isfield(sys,'gpu_bind')
-        allocations=ceil(spin_system.sys.parallel{2}*gpu_ram/sum(gpu_ram));
-        if sum(allocations)>spin_system.sys.parallel{2}
-            allocations(has_most_ram)=allocations(has_most_ram)-1;
-        end
-        spin_system.sys.gpu_bind=allocations;
-    else
-        % Allocate manually if the user insists
-        spin_system.sys.gpu_bind=sys.gpu_bind;
-        sys=rmfield(sys,'gpu_bind');
-    end
-
-    % Report GPU allocations
-    for n=1:gpuDeviceCount
-        report(spin_system,['         > GPU ' num2str(n) ': ' ...
-                            num2str(spin_system.sys.gpu_bind(n)) ' workers.']); 
-    end
-
-    % Compute GPU worker binding table
-    bindings=[]; report(spin_system,'Binding GPUs to workers...');
-    for n=1:numel(spin_system.sys.gpu_bind)
-        bindings=[bindings; n*ones(spin_system.sys.gpu_bind(n),1)]; %#ok<AGROW> 
-    end
-    
-    % GPU settings on each worker
-    cache_policy=spin_system.sys.gpu_mem;
-    spmd
-
-        % GPU binding
-        G=gpuDevice(bindings(spmdIndex));
-
-         % Do not touch unless the user insists
-        if ~strcmp(cache_policy,'balanced')
-            G.CachePolicy=cache_policy;
-        end
-
-    end
-
-    % GPUs hate sparse matrices filling up
-    spin_system.tols.dense_matrix=0.025;
-
+    report(spin_system,'Clearing GPU(s)...'); pctRunOnAll('gpuDevice([]);');
 end
 
 % Spin system banner

@@ -615,9 +615,9 @@ if ismember('ham_cache',spin_system.sys.enable)
             end
             
             % Check load success and let the user know
-            if build_aniso&&exists('H','var')&&exists('Q','var')
+            if build_aniso&&exist('H','var')&&exist('Q','var')
                 report(spin_system,'cache record found and loaded.'); return;
-            elseif (~build_aniso)&&exists('H','var')
+            elseif (~build_aniso)&&exist('H','var')
                 report(spin_system,'cache record found and loaded.'); return;
             else
                 % Do not make a fuss on fail
@@ -912,13 +912,13 @@ if ismember('ham_cache',spin_system.sys.enable)&&(toc>0.1)
             if build_aniso
                 
                 % Modern format, compressed
-                save(filename,'H','Q','-v7.3');
+                save(filename,'H','Q','-v7.3'); drawnow;
                 report(spin_system,'cache record saved.');
 
             else
 
                 % Modern format, compressed
-                save(filename,'H','-v7.3');
+                save(filename,'H','-v7.3'); drawnow;
                 report(spin_system,'cache record saved.');
 
             end

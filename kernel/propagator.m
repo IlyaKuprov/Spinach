@@ -38,15 +38,6 @@ if size(L,1)<spin_system.tols.small_matrix
     P=expm((-1i*timestep)*L); return; 
 end
 
-% Set and clean up a shorthand for -i*L*dt
-A=clean_up(spin_system,(-1i*timestep)*L,spin_system.tols.prop_chop);
-
-% Inform the user about ge densities
-report(spin_system,['generator dimension ' num2str(size(A,1)) ...
-                    ', nnz ' num2str(nnz(A))                  ...
-                    ', density ' num2str(100*nnz(A)/numel(A)) ...
-                    '%, sparsity ' num2str(issparse(A))]);
-
 % Check the cache
 if ismember('prop_cache',spin_system.sys.enable)
 
@@ -62,14 +53,14 @@ if ismember('prop_cache',spin_system.sys.enable)
         % Try to use
         try
             
-            % Try to load
-            load(filename,'P'); 
+            % Try to load the cache record
+            load(filename,'P'); load_time=toc();
             
             % Check load success
-            if exists('P','var')
+            if exist('P','var')
                 
                 % Report the stats and return the cached propagator
-                report(spin_system,'cache record found and loaded.');  
+                report(spin_system,['cache record loaded in ' num2str(load_time) ' seconds']);  
                 report(spin_system,['propagator dimension ' num2str(size(P,1)) ...
                                     ', nnz ' num2str(nnz(P))                   ...
                                     ', density ' num2str(100*nnz(P)/numel(P))  ...
@@ -98,6 +89,15 @@ if ismember('prop_cache',spin_system.sys.enable)
     end
     
 end
+
+% Set and clean up a shorthand for -i*L*dt
+A=clean_up(spin_system,(-1i*timestep)*L,spin_system.tols.prop_chop);
+
+% Inform the user about generator densities
+report(spin_system,['generator dimension ' num2str(size(A,1)) ...
+                    ', nnz ' num2str(nnz(A))                  ...
+                    ', density ' num2str(100*nnz(A)/numel(A)) ...
+                    '%, sparsity ' num2str(issparse(A))]);
 
 % Estimate the norm
 mat_norm=cheap_norm(A);
@@ -241,7 +241,7 @@ if n_squarings>0
 end
     
 % Write the cache record if caching is beneficial
-if ismember('prop_cache',spin_system.sys.enable)&&(toc>0.1)
+if ismember('prop_cache',spin_system.sys.enable)&&(toc>0.01)
 
     % Do not fight other workers
     if ~exist(filename,'file')
@@ -250,8 +250,8 @@ if ismember('prop_cache',spin_system.sys.enable)&&(toc>0.1)
         try
             
             % Modern format, compressed
-            save(filename,'P','-v7.3');
-            report(spin_system,'cache record saved.');
+            save(filename,'P','-v7.3'); drawnow;
+            report(spin_system,'propagator cache record saved.');
 
         catch
 

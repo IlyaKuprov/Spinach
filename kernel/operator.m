@@ -100,7 +100,7 @@ if ismember('op_cache',spin_system.sys.enable)
             load(filename,'A');
 
             % Check load success
-            if exists('A','var')
+            if exist('A','var')
                 return; 
             else
                 % Do not make a fuss on fail
@@ -254,7 +254,7 @@ if ismember('op_cache',spin_system.sys.enable)&&(toc>0.1)
         try
 
             % Modern format, compressed
-            save(filename,'A','-v7.3');
+            save(filename,'A','-v7.3'); drawnow;
 
         catch
 

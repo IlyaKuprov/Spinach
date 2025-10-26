@@ -19,7 +19,7 @@ time_horizon=now-spin_system.tols.cache_mem; %#ok<TNOW1>
 
 try % Enforce the ability to write into the scratch directory
     test=1; save([spin_system.sys.scratch filesep 'test.mat'],'test');
-    delete([spin_system.sys.scratch filesep 'test.mat']);
+    drawnow; delete([spin_system.sys.scratch filesep 'test.mat']); 
 catch
     error(['Unable to write into ' spin_system.sys.scratch]);
 end

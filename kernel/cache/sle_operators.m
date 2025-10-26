@@ -168,7 +168,8 @@ else
     end
         
     try % Try to save a cache record, but don't insist
-        save(cache_file,'space_basis','Lx','Ly','Lz','D','-v7.3');
+        save(cache_file,'space_basis','Lx','Ly','Lz',...
+                        'D','-v7.3'); drawnow;
     catch
         warning('Spinach installation appears to be write-protected');
     end

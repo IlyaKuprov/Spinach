@@ -176,7 +176,8 @@ for n=1:spin_system.control.max_iter
     % Save checkpoint
     if isfield(spin_system.control,'checkpoint')
         save([spin_system.sys.scratch filesep ... 
-              spin_system.control.checkpoint],'x','-v7.3','-nocompression');
+              spin_system.control.checkpoint],...
+              'x','-v7.3'); drawnow;
     end
     
     % Check termination conditions

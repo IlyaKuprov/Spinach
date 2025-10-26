@@ -88,7 +88,7 @@ if ~exist(filename,'file')
         [ranges{n,1},ranges{n,2}]=ginput(2); %#ok<AGROW>
         
         % Write the file
-        save(filename,'ranges');
+        save(filename,'ranges'); drawnow;
         
         % Compute axis grids
         [F1,F2]=ndgrid(f1,f2);

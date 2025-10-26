@@ -98,7 +98,8 @@ else
     end
 
     try % Try to save a cache record, but don't insist
-        save(table_file,'product_table_left','product_table_right');
+        save(table_file,'product_table_left',...
+                        'product_table_right'); drawnow;
     catch
         warning('Spinach installation appears to be write-protected');
     end

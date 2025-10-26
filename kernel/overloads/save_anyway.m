@@ -21,7 +21,7 @@ function save_anyway(file_name,variable)
 grumble(file_name);
 
 % Just call save
-save(file_name,'variable','-v7.3');
+save(file_name,'variable','-v7.3'); drawnow;
 
 end
 

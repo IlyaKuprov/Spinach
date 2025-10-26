@@ -19,7 +19,7 @@ if (~isworkernode)&&ismember('dafuq',spin_system.sys.enable)
     parpool_history=parProfiler.drainLog(); a=dbstack;
     filename=[spin_system.sys.scratch filesep ...
               datestr(clock,30) '_' a(end-1).name '.mat']; %#ok<CLOCK,DATST> 
-    save(filename,'parpool_history');
+    save(filename,'parpool_history'); drawnow;
     report(spin_system,['dafuq saved as ' filename]);
 end
 

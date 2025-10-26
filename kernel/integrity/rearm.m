@@ -49,7 +49,8 @@ for n=1:numel(top_level)
 end
 
 % Overwrite the file
-delete([P 'smells.mat']); save([P 'smells.mat'],'smells');
+delete([P 'smells.mat']); drawnow; 
+save([P 'smells.mat'],'smells');
 
 % Inform the user
 disp('rearm: sniffer rearmed.');

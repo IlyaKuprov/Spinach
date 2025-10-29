@@ -54,7 +54,7 @@ parameters.verbose=0;
 parameters.sum_up=0;
 
 % Enable GPU arithmetic
-sys.enable={'gpu'};
+% sys.enable={'gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

@@ -93,7 +93,7 @@ bas.projections=1;
 sys.disable={'zte'};
 
 % GPU is useful here
-sys.enable={'gpu'};
+% sys.enable={'gpu'};
 
 % Spinach housekeeping 
 spin_system=create(sys,inter); 

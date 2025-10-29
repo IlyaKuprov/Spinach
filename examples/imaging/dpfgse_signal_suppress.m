@@ -39,7 +39,7 @@ bas.connectivity='scalar_couplings';
 sys.disable={'pt','krylov'};
 
 % This needs a GPU
-sys.enable={'gpu'};
+% sys.enable={'gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

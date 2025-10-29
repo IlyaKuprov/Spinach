@@ -23,7 +23,7 @@ inter.coupling.scalar{5,2}=0;
 inter.coupling.scalar{5,5}=0;
 
 % Algorithmic options
-sys.enable={'greedy','gpu'};
+sys.enable={'greedy'}; % 'gpu'
 sys.tols.prox_cutoff=4.0;
 sys.tols.merge_dim=500;
 

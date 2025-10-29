@@ -26,7 +26,7 @@ bas.formalism='sphten-liouv';
 bas.approximation='none';
 
 % This needs a GPU
-sys.enable={'gpu'};
+% sys.enable={'gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

@@ -59,7 +59,7 @@ bas.approximation='none';
 sys.disable={'hygiene'};
 
 % Enable GPU
-sys.enable={'gpu'};
+% sys.enable={'gpu'};
 
 % Exchange rate constant array
 exch_rates=[1e1 1e2 1e3 1e4 1e5 1e6]; % Hz

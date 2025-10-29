@@ -28,7 +28,7 @@ inter.r2_rates={1.0};
 sys.disable={'pt'};
 
 % This needs a GPU
-sys.enable={'greedy','gpu'};
+sys.enable={'greedy'}; % 'gpu'
 
 % Basis set
 bas.formalism='sphten-liouv';

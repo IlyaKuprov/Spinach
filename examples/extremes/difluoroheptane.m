@@ -88,7 +88,7 @@ bas.zero_quantum={'1H'};
 bas.projections=1;
 
 % Greedy parallelisation
-sys.enable={'greedy','gpu'};
+sys.enable={'greedy'}; % 'gpu'
 
 % Spinach housekeeping 
 spin_system=create(sys,inter); 

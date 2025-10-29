@@ -28,7 +28,7 @@ bas.connectivity='scalar_couplings';
 bas.level=4; bas.space_level=1;
 
 % Algorithmic options
-sys.enable={'greedy','gpu'};
+sys.enable={'greedy'}; % 'gpu'
 
 % Sequence parameters
 parameters.J=90;

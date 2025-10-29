@@ -28,7 +28,7 @@ bas.level=3;
 % Algorithmic options
 sys.tols.inter_cutoff=5.0;
 sys.tols.prox_cutoff=4.0;
-sys.enable={'greedy','polyadic','gpu'};
+sys.enable={'greedy','polyadic'}; % 'gpu'
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

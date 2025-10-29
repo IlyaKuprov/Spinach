@@ -61,7 +61,7 @@ parameters.detection='uniaxial';
 parameters.flip_angle=pi/2;
 
 % This needs a GPU
-sys.enable={'gpu'}; 
+% sys.enable={'gpu'}; 
 
 % 14N relaxation rates, Hz
 R_14N=[0 10 100 500 1e3 1e4 1e5 1e6];

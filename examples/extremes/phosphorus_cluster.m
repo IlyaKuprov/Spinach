@@ -77,8 +77,8 @@ bas.projections=1;
 bas.sym_group={'S3','S3','S3'};
 bas.sym_spins={[8 9 10],[17 18 19],[26 27 28]};
 
-% Use greedy parallelisation
-sys.enable={'greedy','gpu'};
+% Greedy parallelisation
+sys.enable={'greedy'}; % 'gpu'
 
 % Spinach housekeeping 
 spin_system=create(sys,inter); 

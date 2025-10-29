@@ -51,7 +51,7 @@ sys.output='hush';
 sys.disable={'hygiene'};
 
 % Run on GPU
-sys.enable={'gpu'};
+% sys.enable={'gpu'};
 
 % Magnet induction 
 sys.magnet=11.7464;

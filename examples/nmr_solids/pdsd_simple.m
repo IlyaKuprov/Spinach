@@ -25,7 +25,7 @@ bas.formalism='sphten-liouv';
 bas.approximation='none';
 
 % Algorithmic options
-sys.enable={'prop_cache','gpu'};
+sys.enable={'prop_cache'}; % 'gpu'
 
 % Create the spin system structure
 spin_system=create(sys,inter);

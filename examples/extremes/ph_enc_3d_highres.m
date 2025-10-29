@@ -29,7 +29,7 @@ inter.rlx_keep='diagonal';
 sys.disable={'pt'};
 
 % This needs a GPU
-sys.enable={'greedy','polyadic','gpu'};
+sys.enable={'greedy','polyadic'}; % 'gpu'
 
 % Basis set
 bas.formalism='sphten-liouv';

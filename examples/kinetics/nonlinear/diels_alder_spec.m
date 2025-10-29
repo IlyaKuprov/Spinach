@@ -59,7 +59,7 @@ inter_d.coupling.scalar=num2cell(inter_d.coupling.scalar);
 sys.magnet=14.1;
 
 % This needs a GPU
-sys.enable={'greedy','gpu'};
+sys.enable={'greedy'}; % 'gpu'
 
 % Relaxation theory parameters
 inter.relaxation={'redfield','t1_t2'};

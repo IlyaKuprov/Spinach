@@ -21,7 +21,9 @@ bas.longitudinals={'15N','13C'};
 
 % Force Krylov propagation
 sys.tols.krylov_tol=1000;
-sys.enable={'gpu'};
+
+% This needs a GPU
+% sys.enable={'gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

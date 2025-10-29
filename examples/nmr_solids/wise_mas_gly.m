@@ -32,7 +32,7 @@ bas.level=3;
 sys.tols.inter_cutoff=2*pi*200;
 
 % Use GPU arithmetic
-sys.enable={'greedy','gpu'};
+sys.enable={'greedy'}; % 'gpu'
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

@@ -28,7 +28,7 @@ bas.approximation='none';
 bas.projections=+1;
 
 % Enable GPU
-sys.enable={'gpu'};
+% sys.enable={'gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

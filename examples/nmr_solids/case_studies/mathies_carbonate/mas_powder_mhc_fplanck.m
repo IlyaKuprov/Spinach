@@ -53,7 +53,7 @@ bas.projections=+1;
 sys.tols.inter_cutoff=500;
 
 % This needs a GPU
-sys.enable={'gpu'};
+% sys.enable={'gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

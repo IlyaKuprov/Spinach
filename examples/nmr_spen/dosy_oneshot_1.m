@@ -31,7 +31,7 @@ inter.r2_rates=num2cell(1./[0.1602 0.1802 0.1902]);
 
 % Algorithmic options
 sys.disable={'pt'};
-sys.enable={'greedy','gpu'};
+sys.enable={'greedy'}; % 'gpu'
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

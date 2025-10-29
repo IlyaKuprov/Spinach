@@ -32,7 +32,7 @@ mesh=comsol_import(comsol);
 sys.magnet=14.1;
 
 % This needs a GPU
-sys.enable={'greedy','gpu'};
+sys.enable={'greedy'}; % 'gpu'
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

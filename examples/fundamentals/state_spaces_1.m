@@ -28,7 +28,7 @@ sys.tols.prox_cutoff=4.0;
 
 % Algorithmic options
 sys.disable={'trajlevel'};
-sys.enable={'greedy','gpu'};
+sys.enable={'greedy'}; % 'gpu'
 
 % Relaxation theory parameters
 inter.relaxation={'redfield'};

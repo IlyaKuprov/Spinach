@@ -20,7 +20,7 @@ bas.approximation='none';
 
 % Algorithmic options
 sys.disable={'pt'};
-sys.enable={'greedy','gpu'};
+sys.enable={'greedy'}; % 'gpu'
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

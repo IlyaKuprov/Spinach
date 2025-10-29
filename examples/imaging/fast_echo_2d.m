@@ -28,7 +28,7 @@ inter.r2_rates={1};
 sys.disable={'pt'};
 
 % This needs a GPU
-sys.enable={'gpu'};
+% sys.enable={'gpu'};
 
 % Basis set
 bas.formalism='sphten-liouv';

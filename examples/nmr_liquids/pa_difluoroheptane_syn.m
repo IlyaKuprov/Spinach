@@ -90,7 +90,7 @@ bas.longitudinals={'19F'};
 bas.projections=1;
 
 % GPU is useful here
-sys.enable={'gpu'};
+% sys.enable={'gpu'};
 
 % ZTE not useful here
 sys.disable={'zte'};

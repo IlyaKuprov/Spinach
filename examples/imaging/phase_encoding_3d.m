@@ -28,7 +28,7 @@ inter.rlx_keep='diagonal';
 sys.disable={'pt','krylov'};
 
 % This needs a GPU
-sys.enable={'greedy','gpu'};
+sys.enable={'greedy'}; % 'gpu'
 sys.gpu_mem='minimum';
 
 % Basis set

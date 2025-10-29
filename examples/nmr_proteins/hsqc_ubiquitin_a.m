@@ -29,7 +29,7 @@ bas.connectivity='scalar_couplings';
 bas.level=4; bas.space_level=1;
 
 % Algorithmic options
-sys.enable={'greedy','gpu'};
+sys.enable={'greedy'}; % 'gpu'
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

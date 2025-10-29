@@ -42,7 +42,7 @@ bas.approximation='none';
 sys.disable={'pt'};
 
 % This needs a GPU
-sys.enable={'gpu'};
+% sys.enable={'gpu'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

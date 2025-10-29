@@ -33,7 +33,7 @@ bas.approximation='IK-0';
 bas.level=3;
 
 % Algorithmic options
-sys.enable={'greedy','gpu'};
+sys.enable={'greedy'}; % 'gpu'
 sys.disable={'pt'};
 
 % Neglect interactions below 200 Hz

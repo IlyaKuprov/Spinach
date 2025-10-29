@@ -13,15 +13,38 @@ set(groot,'defaultFigureWindowStyle','normal');
 set(groot,'defaultFigureMenuBar','figure'); 
 set(groot,'defaultFigureToolbar','figure'); 
 
+% Overrides for IK group systems
+switch getenv('COMPUTERNAME')
+
+    case 'ELMINSTER' % 256 AMD cores, 3 TB of RAM
+        
+        % Matlab crashes with 256 cores
+        sys.parallel={'processes',128};
+
+    case 'ALAUNDO' % 128 Intel cores, 4 TB of RAM, 8 H200 GPUs
+        
+        % Are GPUs involved?
+        if isfield(sys,'enable')&&...
+           ismember('gpu',sys.enable)
+
+            % 4 workers per GPU are safe
+            sys.parallel={'processes',32};
+
+        else
+
+            % Without GPUs, use all cores
+            sys.parallel={'processes',128};
+
+        end
+
+    otherwise
+
+        % Do nothing
+
+end
+
 % This relocates the scratch folder
 % sys.scratch='/somewhere/it/can/write'
-
-
-
-
-
-
-
 
 % ------------------------------------------------------------
 

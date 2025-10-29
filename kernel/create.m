@@ -286,6 +286,9 @@ if ~isworkernode
         report(spin_system,['         > parallel profile: ' spin_system.sys.parallel{1}]);
         report(spin_system,['         > workers to start: ' num2str(spin_system.sys.parallel{2})]);
 
+        % Default port range is insufficient
+        pctconfig('portrange',[20000 30000]);
+
         % Get cluster object
         c=parcluster(spin_system.sys.parallel{1});
         

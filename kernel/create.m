@@ -349,6 +349,12 @@ if ~isworkernode
 
     end
     
+else
+
+    % Workers do not need setting up
+    if isfield(sys,'parallel'), sys=rmfield(sys,'parallel'); end
+    if isfield(sys,'parprops'), sys=rmfield(sys,'parprops'); end
+
 end
 
 % Tidy up the cache
@@ -370,6 +376,7 @@ end
 if (~isworkernode)&&ismember('gpu',spin_system.sys.enable)...
                   &&(~ismember('hygiene',spin_system.sys.disable))
     report(spin_system,'Clearing GPU(s)...'); pctRunOnAll('gpuDevice([]);');
+    parallel.gpu.enableCUDAForwardCompatibility(true);
 end
 
 % Spin system banner

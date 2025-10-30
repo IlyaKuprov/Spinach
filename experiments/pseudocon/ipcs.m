@@ -75,6 +75,9 @@ function [source_cube,ranges,pred_pcs,err_ls,reg_a,reg_b]=ipcs(parameters,npoint
 % Check consistency
 grumble(parameters,npoints,lambda);
 
+% Allow GPUs Matlab has not yet seen
+parallel.gpu.enableCUDAForwardCompatibility(true);
+
 % Validate GPU option
 if parameters.gpu
     parameters.gpu=logical(gpuDeviceCount); 

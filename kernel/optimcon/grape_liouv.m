@@ -819,8 +819,14 @@ switch fidelity_type
         
 end
 
-% Return trajectory data
-traj_data.forward=fwd_traj;
+% Return the trajectory (a huge array) only if needed
+if any(ismember({'correlation_order','coherence_order',...
+                 'local_each_spin','total_each_spin',...
+                 'level_populations'},spin_system.control.plotting(:)))
+    traj_data.forward=fwd_traj;
+else
+    traj_data.forward=[];
+end
 
 % Catch unreachable objectives
 if abs(fidelity)==0

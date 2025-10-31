@@ -48,8 +48,7 @@ current_plot=1;
 
 % Get a figure without stealing focus
 try
-    set(groot,'CurrentFigure',1);
-    scale_figure([0.70*n_plots_y 0.70*n_plots_x]);
+    set(groot,'CurrentFigure',1); clf;
 catch
     figure(1); set(groot,'CurrentFigure',1);
     scale_figure([0.70*n_plots_y 0.70*n_plots_x]);
@@ -551,7 +550,15 @@ if ismember('robustness',spin_system.control.plotting)
 
     % Get histogram range + 10% margin
     edge_val=1.1*max(abs(fidelities),[],'all');
-    xlim([-edge_val, +edge_val]); 
+    xlim([-edge_val, +edge_val]);
+
+    % Report fidelity stats
+    x_range=xlim; y_range=ylim;
+    text(x_range(1)+0.05*diff(x_range),...
+         y_range(2)-0.10*diff(y_range),...
+         {['$\mu = '    num2str(mean(fidelities),4) '$'],...
+          ['$\sigma = ' num2str(std(fidelities),4)  '$']},...
+         'Interpreter','latex');
     
 end
 

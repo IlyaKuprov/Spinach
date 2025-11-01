@@ -225,22 +225,57 @@ elseif iscell(operators)&&iscell(spins)
                 opspecs(:,spins{n})=states; coeffs=kron(ct_coeffs,coeffs);
 
             otherwise
+
+                % Irreducible spherical tensor
+                if strcmp(operators{n}(1),'T')
                 
-                % Validate the irreducible spherical tensor input
-                if isempty(regexp(operators{n},'^T([\+\-]?\d+),([\+\-]?\d+)$','once'))
-                    error('unrecognized operator specification.');
+                    % Validate the irreducible spherical tensor specification
+                    if isempty(regexp(operators{n},'^T([\+\-]?\d+),([\+\-]?\d+)$','once'))
+                        error('unrecognized operator or state specification.');
+                    end
+
+                    % Extract the IST quantum numbers
+                    indices=textscan(operators{n},'T%n,%n'); l=indices{1}; m=indices{2};
+
+                    % Validate the IST quantum numbers
+                    if (l<0)||(abs(m)>l)||(mod(l,1)~=0)||(mod(m,1)~=0)||...
+                       (lm2lin(l,m)+1>spin_system.comp.mults(spins{n})^2)
+                        error('invalid irreducible spherical tensor indices.');
+                    end
+
+                    % Write the specification
+                    opspecs(:,spins{n})=lm2lin(l,m); coeffs=1*coeffs;
+
+                % Specific Zeeman energy level
+                elseif strcmp(operators{n}(1:2),'ZL')
+
+                    % Validate Zeeman energy level specification
+                    if isempty(regexp(operators{n},'^ZL([1-9]\d*)$','once'))
+                        error('unrecognized operator or state specification.');
+                    end
+
+                    % Extract Zeeman energy level number
+                    level_number=textscan(operators{n},'ZL%n'); 
+                    level_number=level_number{1};
+
+                    % Validate the number
+                    if (level_number<1)||(mod(level_number,1)~=0)|| ...
+                       (level_number>spin_system.comp.mults(spins{n}))
+                        error('invalid Zeeman energy level number.');
+                    end
+
+                    % Get the spherical tensor expansion of the specified energy level projector
+                    [zl_states,zl_coeffs]=enlev2ist(spin_system.comp.mults(spins{n}),level_number);
+                    states=kron(zl_states,ones(size(opspecs,1),1));
+                    opspecs=kron(ones(numel(zl_states),1),opspecs);
+                    opspecs(:,spins{n})=states; coeffs=kron(zl_coeffs,coeffs);
+
+                else
+
+                    % Complain and bomb out
+                    error('unrecognized operator or state specification.');
+
                 end
-                
-                % Extract the quantum numbers
-                indices=textscan(operators{n},'T%n,%n'); l=indices{1}; m=indices{2};
-                
-                % Validate the quantum numbers
-                if (l<0)||(abs(m)>l)
-                    error('invalid indices in irreducible spherical tensors.');
-                end
-                
-                % Write the specification
-                opspecs(:,spins{n})=lm2lin(l,m); coeffs=1*coeffs;
                 
         end
 

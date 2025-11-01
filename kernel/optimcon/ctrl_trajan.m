@@ -327,7 +327,12 @@ if ismember('amp_controls',spin_system.control.plotting)
     end
     
     % Determine the amplitude bound
-    amp_bound=max([sqrt(2)*abs(upper_bound) sqrt(2)*abs(lower_bound)]);
+    if ismember('SNSA',spin_system.control.penalties)
+        amp_bound=abs(upper_bound);
+    else
+        amp_bound=max([sqrt(2)*abs(upper_bound) ...
+                       sqrt(2)*abs(lower_bound)]);
+    end
     
     % Power bound
     max_amp=refline([0 amp_bound/(2*pi)]);

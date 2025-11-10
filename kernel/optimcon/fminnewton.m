@@ -96,6 +96,11 @@ if isfield(spin_system.control,'video_file')
                    'Motion JPEG AVI'); open(VW);
 end
 
+% If zero iterations, still display graphics
+if spin_system.control.max_iter==0
+    [~,~]=objeval(x,cost_function,data,spin_system);
+end
+
 % Start the iteration loop
 for n=1:spin_system.control.max_iter
     

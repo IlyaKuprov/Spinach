@@ -989,59 +989,6 @@ for n=1:numel(spin_system.control.ens_corrs)
                         spin_system.control.ens_corrs{n}]);
 end
 
-% Process control power modulation
-if isfield(control,'cpm_frq')&&isfield(control,'cpm_mdp')&&isfield(control,'cpm_nph')
-
-    % Input validation
-    if (~isnumeric(control.cpm_frq))||(~isreal(control.cpm_frq))||(~isscalar(control.cpm_frq))
-        error('control.cpm_frq must be a real number.');
-    end
-    if (~isnumeric(control.cpm_mdp))||(~isreal(control.cpm_frq))||(numel(control.cpm_mdp)~=3)
-        error('control.cpm_mdp must have three real elements.');
-    end
-    if (control.cpm_mdp(1)<0)||(control.cpm_mdp(2)<0)
-        error('first two elements of control.cpm_mdp must be non-negative.');
-    end
-    if control.cpm_mdp(1)>control.cpm_mdp(2)
-        error('the first element of control.cpm_mdp must be smaller than the second one.');
-    end
-    if (control.cpm_mdp(3)<1)||(mod(control.cpm_mdp(3),1)~=0)
-        error('the third element of control.cpm_mdp must be a positive integer.');
-    end
-    if (~isnumeric(control.cpm_nph))||(~isreal(control.cpm_nph))||...
-       (~isscalar(control.cpm_nph))||(mod(control.cpm_nph,1)~=0)||(control.cpm_nph<1)
-        error('control.cpm_nph must be positive real integer.');
-    end
-      
-    % Absorb control power modulation
-    spin_system.control.cpm_frq=control.cpm_frq;
-    control=rmfield(control,'cpm_frq');
-    spin_system.control.cpm_mdp=control.cpm_mdp;
-    control=rmfield(control,'cpm_mdp');
-    spin_system.control.cpm_nph=control.cpm_nph;
-    control=rmfield(control,'cpm_nph');
-    
-else
-    
-    % No control power modulation
-    spin_system.control.cpm_frq=0;
-    spin_system.control.cpm_mdp=[0 0 1];
-    spin_system.control.cpm_nph=1;
-    
-end
-
-% Inform the user
-report(spin_system,[pad('Control power modulation frequency, Hz',60) ...
-                         num2str(spin_system.control.cpm_frq,'%.9g')]);
-report(spin_system,[pad('Control power modulation depth, min',60) ...
-                         num2str(spin_system.control.cpm_mdp(1),'%.9g')]);
-report(spin_system,[pad('Control power modulation depth, max',60) ...
-                         num2str(spin_system.control.cpm_mdp(2),'%.9g')]);
-report(spin_system,[pad('Control power modulation depth, npt',60) ...
-                         num2str(spin_system.control.cpm_mdp(3),'%.9g')]);
-report(spin_system,[pad('Control power modulation phase, npt',60) ...
-                         num2str(spin_system.control.cpm_nph,'%.9g')]);
-
 % Parallelisation strategy
 if isfield(control,'parallel')
 

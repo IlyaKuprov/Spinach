@@ -54,8 +54,6 @@ n_state_pairs=numel(spin_system.control.rho_init);     % State-target pair count
 n_ens_systems=spin_system.control.ndrifts;             % Drift ensemble size
 n_power_levls=numel(spin_system.control.pwr_levels);   % Power level count
 n_phase_specs=size(spin_system.control.phase_cycle,1); % Phase cycle line count
-n_cpm_mdepths=spin_system.control.cpm_mdp(3);          % Control power modulation depth count
-n_cpm_phasept=spin_system.control.cpm_nph;             % Control power modulation phase count
 n_distortions=size(spin_system.control.distortion,1);  % Distortion function ensemble size
 
 % Create a catalog of the ensemble
@@ -64,8 +62,6 @@ catalog=[kron(ones(n_ens_systems,1),catalog) kron((1:n_ens_systems)',ones(size(c
 catalog=[kron(ones(n_power_levls,1),catalog) kron((1:n_power_levls)',ones(size(catalog,1),1))];
 catalog=[kron(ones(n_offset_vals,1),catalog) kron((1:n_offset_vals)',ones(size(catalog,1),1))];
 catalog=[kron(ones(n_phase_specs,1),catalog) kron((1:n_phase_specs)',ones(size(catalog,1),1))];
-catalog=[kron(ones(n_cpm_mdepths,1),catalog) kron((1:n_cpm_mdepths)',ones(size(catalog,1),1))];
-catalog=[kron(ones(n_cpm_phasept,1),catalog) kron((1:n_cpm_phasept)',ones(size(catalog,1),1))];
 catalog=[kron(ones(n_distortions,1),catalog) kron((1:n_distortions)',ones(size(catalog,1),1))];
 
 % Ensemble correlation: own state pair for each member
@@ -122,59 +118,14 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     % Extract ensemble indices
     n_rho=catalog(n,1); n_sys=catalog(n,2);
     n_pwr=catalog(n,3); n_off=catalog(n,4);
-    n_phi=catalog(n,5); n_mdp=catalog(n,6);
-    n_mph=catalog(n,7); n_dis=catalog(n,8);
+    n_phi=catalog(n,5); n_dis=catalog(n,6);
     
     % Get initial and target state
     rho_init=spin_system.control.rho_init{n_rho};
     rho_targ=spin_system.control.rho_targ{n_rho};
     
-    % Grab a copy of the waveform
+    % Localise the waveform
     local_waveform=waveform;
-    
-    % Control power modulation depths
-    mdepths=linspace(spin_system.control.cpm_mdp(1),...
-                     spin_system.control.cpm_mdp(2),...
-                     spin_system.control.cpm_mdp(3));
-
-    % Current modulation depth
-    mdepth=mdepths(n_mdp);
-
-    % Control power modulation phases
-    mphases=linspace(0,2*pi,spin_system.control.cpm_nph+1); 
-    mphases=mphases(1:(end-1)); 
-    
-    % Current modulation phase
-    mphase=mphases(n_mph);
-
-    % Control power modulation function
-    switch spin_system.control.integrator
-        
-        % Piecewise-constant
-        case 'rectangle'
-
-            % Equal number of points and intervals
-            time_grid=cumsum(spin_system.control.pulse_dt)-...
-                      spin_system.control.pulse_dt(1);
-            amp_mod=1+mdepth*cos(2*pi*spin_system.control.cpm_frq*time_grid+mphase);
-        
-        % Piecewise-linear
-        case 'trapezium'
-
-            % One more point than intervals
-            time_grid=[0 cumsum(spin_system.control.pulse_dt)];
-            amp_mod=1+mdepth*cos(2*pi*spin_system.control.cpm_frq*time_grid+mphase);
-
-        % Parfor needs this
-        otherwise
-
-            % Complain and bomb out
-            error('unknown integrator.'); amp_mod=[]; %#ok<UNRCH> 
-
-    end
-
-    % Apply control power modulation
-    local_waveform=local_waveform.*amp_mod;
     
     % Apply the phase cycle
     if ~isempty(spin_system.control.phase_cycle)
@@ -444,20 +395,6 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
         % Reshape the Hessian back
         hessians{n}=reshape(hessians{n},[ncont*nsteps nsteps*ncont]);
         
-    end
-    
-    % Apply control power modulation
-    if n_outputs>2
-        gradients{n}=gradients{n}.*amp_mod;
-    end
-    if n_outputs>3
-        hessians{n}=reshape(hessians{n},[ncont nsteps ncont nsteps]);
-        hessians{n}=permute(hessians{n},[2 1 3 4]).*amp_mod';
-        hessians{n}=permute(hessians{n},[4 1 3 2]).*amp_mod';
-        hessians{n}=permute(hessians{n},[4 2 3 1]);
-        hessians{n}=reshape(hessians{n},[ncont*nsteps nsteps*ncont]);
-    else 
-        hessians{n}=[];
     end
     
     % Apply power level

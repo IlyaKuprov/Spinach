@@ -284,6 +284,35 @@ else
 
 end
 
+% Stroboscopic steady state switch
+if isfield(control,'steady')
+
+    % Input validation
+    if ~islogical(control.steady) || ~isscalar(control.steady)
+        error('control.steady must be true() or false()');
+    end
+
+    % Absorb stroboscopic steady state switch
+    spin_system.control.steady=control.steady; 
+    control=rmfield(control,'steady');
+
+    % Inform the user
+    if spin_system.control.steady
+        report(spin_system,[pad('Stroboscopic steady state',60)  'on']);
+    else
+        report(spin_system,[pad('Stroboscopic steady state',60)  'off']);
+    end
+
+else
+
+    % Default is user-specified states
+    spin_system.control.steady=false();
+
+    % Inform the user
+    report(spin_system,[pad('Stroboscopic steady state',60) 'off']);
+
+end
+
 % Process prefix function
 if isfield(control,'prefix')
 
@@ -1049,7 +1078,7 @@ if isfield(control,'plotting')
                                           'amp_controls','correlation_order',...
                                           'coherence_order','local_each_spin',...
                                           'total_each_spin','level_populations',...
-                                          'robustness','spectrogram'}))
+                                          'robustness','spectrogram','time_by_slice'}))
         error('unrecognised element encountered in control.plotting');
     end
 
@@ -1131,6 +1160,11 @@ end
 % Warn that plotting is expensive
 if ~isempty(spin_system.control.plotting)
     report(spin_system,'WARNING: diagnostic plots are computationally expensive');
+end
+
+% Warn that StStSt ignores the initial condition
+if spin_system.control.steady
+    report(spin_system,'WARNING: stroboscopic steady state mode, rho_init ignored.');
 end
 
 % Internal parameters that users do not need to know about

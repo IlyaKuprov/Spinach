@@ -78,12 +78,12 @@ if ~isempty(spin_system.control.freeze)
     end
 
     % Stretch freeze mask to match x
-    freeze=spin_system.control.freeze(:);
+    frozen=spin_system.control.freeze(:);
 
 else
 
     % Do not freeze anything
-    freeze=false(size(x));
+    frozen=false(size(x));
 
 end
 
@@ -118,13 +118,13 @@ for n=1:spin_system.control.max_iter
                 [data,fx,g]=objeval(x,cost_function,data,spin_system);
                 
                 % Start history arrays
-                old_x=x(~freeze); dx_hist=[]; 
-                old_g=g(~freeze); dg_hist=[]; 
+                old_x=x(~frozen); dx_hist=[]; 
+                old_g=g(~frozen); dg_hist=[]; 
                 
                 % Direction vector
-                dir=g.*(~freeze);
+                dir=g.*(~frozen);
                 
-                % Catch zeros
+                % Catch unreasonably low gradients
                 if (abs(fx)<1e-6)||(norm(g,2)<1e-6)
                     error('fidelity or gradient too small at iter 1, find a better guess.');
                 end
@@ -132,8 +132,8 @@ for n=1:spin_system.control.max_iter
             else
                 
                 % Update the history of dx and dg
-                dx_hist=[x(~freeze)-old_x dx_hist]; old_x=x(~freeze); %#ok<AGROW>
-                dg_hist=[g(~freeze)-old_g dg_hist]; old_g=g(~freeze); %#ok<AGROW>
+                dx_hist=[x(~frozen)-old_x dx_hist]; old_x=x(~frozen); %#ok<AGROW>
+                dg_hist=[g(~frozen)-old_g dg_hist]; old_g=g(~frozen); %#ok<AGROW>
                 
                 % Truncate the history
                 if size(dx_hist,2)>spin_system.control.n_grads
@@ -144,8 +144,8 @@ for n=1:spin_system.control.max_iter
                 end
                 
                 % Get the direction
-                dir=zeros(size(freeze));
-                dir(~freeze)=-lbfgs(dx_hist,dg_hist,g(~freeze));
+                dir=zeros(size(frozen));
+                dir(~frozen)=-lbfgs(dx_hist,dg_hist,g(~frozen));
                 
             end
             
@@ -158,14 +158,14 @@ for n=1:spin_system.control.max_iter
             H=real(H+H')/2; g=real(g);
             
             % Apply freeze mask
-            H=H(~freeze,~freeze);
+            H=H(~frozen,~frozen);
             
             % Regularise the Hessian
-            [H,data]=hessreg(spin_system,-H,g(~freeze),data);
+            [H,data]=hessreg(spin_system,-H,g(~frozen),data);
             
             % Get the search direction
-            dir=zeros(size(freeze));
-            dir(~freeze)=H\g(~freeze);
+            dir=zeros(size(frozen));
+            dir(~frozen)=H\g(~frozen);
             
     end
     
@@ -181,14 +181,13 @@ for n=1:spin_system.control.max_iter
     % Save checkpoint
     if isfield(spin_system.control,'checkpoint')
         save([spin_system.sys.scratch filesep ... 
-              spin_system.control.checkpoint],...
-              'x','-v7.3'); drawnow;
+              spin_system.control.checkpoint],'x','-v7.3','-nocompression');
     end
     
     % Check termination conditions
     if norm(alpha*dir,1)<spin_system.control.tol_x
         exitflag=2;
-    elseif norm(g(~freeze),2)<spin_system.control.tol_g
+    elseif norm(g(~frozen),2)<spin_system.control.tol_g
         exitflag=1;
     end
 
@@ -270,7 +269,7 @@ report(spin_system,[pad(num2str(data.count.iter,'%4.0f'),6),...
                     pad(num2str(pens,'%+9.6f'),11),'   '...
                     pad(num2str(fx,'%+9.6f'),11),'   '...
                     pad(num2str(alpha,'%4.0e'),9),...
-                    pad(num2str(norm(g,2),'%0.3e'),10)]);
+                    pad(num2str(norm(g(:),2),'%0.3e'),10)]);
                 
 end
 

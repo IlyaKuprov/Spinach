@@ -47,6 +47,9 @@ for n=1:size(phi_profile,1)
     [waveform_xy(2*n-1,:),waveform_xy(2*n,:)]=polar2cartesian(spin_system.control.amplitudes(n,:),phi_profile(n,:));
 end
 
+% Translate the freeze mask to Cartesians
+spin_system.control.freeze=kron(spin_system.control.freeze,[1; 1]);
+
 % Just fidelity
 if nargout==2
 

@@ -39,6 +39,9 @@ n_plots=numel(spin_system.control.plotting);
 if ismember('spectrogram',spin_system.control.plotting)
     n_plots=n_plots+size(waveform,1)/2-1;
 end
+if ismember('time_by_slice',spin_system.control.plotting)
+    n_plots=n_plots-1;
+end
 if n_plots>3
     n_plots_y=ceil(n_plots/2); n_plots_x=2;
 else
@@ -54,8 +57,30 @@ catch
     scale_figure([0.70*n_plots_y 0.70*n_plots_x]);
 end
 
-% Plot the spectrograms
+% Plot spectrograms for as long as timing grid permits
 if ismember('spectrogram',spin_system.control.plotting)
+
+    % Count uniform slices
+    last_slice_to_plot=1; % Move to optimcon.m
+    for n=1:numel(spin_system.control.pulse_dt)
+        if spin_system.control.pulse_dt(n)==...
+           spin_system.control.pulse_dt(1)
+            last_slice_to_plot=n;
+        else
+            break;
+        end
+    end
+
+    % Refuse when too few
+    if last_slice_to_plot<5
+        error('spectrograms need at least five equal duration slices.');
+    end
+    
+    % Truncate the timing grid for spectrogram plotting
+    timing_grid=spin_system.control.pulse_dt(1:last_slice_to_plot);
+
+    % Get the sampling rate
+    sampl_rate=1/spin_system.control.pulse_dt(1);
 
     % Loop over channel pairs
     for n=1:(size(waveform,1)/2)
@@ -64,43 +89,43 @@ if ismember('spectrogram',spin_system.control.plotting)
         subplot(n_plots_x,n_plots_y,current_plot);
 
         % Get the complex channel waveform
-        cplx_ch_wf=waveform(2*n-1,:)-1i*waveform(2*n,:);
+        cplx_ch_wf=    waveform(2*n-1,1:last_slice_to_plot)...
+                   -1i*waveform(2*n  ,1:last_slice_to_plot);
 
         % Mirror replication at the edges
         padded_wf=[fliplr(cplx_ch_wf) cplx_ch_wf fliplr(cplx_ch_wf)];
 
-        % Get the sampling rate
-        sampl_rate=1/spin_system.control.pulse_dt(1);
-
         % Get the spectrogram
-        window_size=ceil(sqrt(numel(spin_system.control.pulse_dt)));
+        window_size=ceil(sqrt(numel(timing_grid)));
         window_overlap=ceil(window_size/2); n_freq_bins=2*window_size;
         [st_fft,f_axis,t_axis]=spectrogram(padded_wf,window_size,window_overlap,...
                                            n_freq_bins,sampl_rate,'yaxis','center');
 
-        % Modify the time axis to account for the replicas
-        t_axis=t_axis-sum(spin_system.control.pulse_dt);
-        
-        % Get, wrap, and scale the phase
-        phi=atan2(real(st_fft),imag(st_fft)); 
-        phi=wrapTo2Pi(phi)/(2*pi);
-
-        % Get and scale the amplitude
-        amp=abs(st_fft); amp=amp/max(amp,[],'all');
+        % Account for the replicas
+        t_axis=t_axis-sum(timing_grid);
         
         % Interpret phase as hue and amplitude as value in HSV 
-        % hsv=cat(3,phi,ones(size(phi)),amp); rgb=hsv2rgb(hsv);
+        phi=atan2(real(st_fft),imag(st_fft)); phi=(phi+pi)/(2*pi); 
+        amp=abs(st_fft); amp=amp/max(amp,[],'all');
 
-        % Interpret amplitude as value in HSV - needs a phase fix
-        hsv=cat(3,ones(size(phi)),ones(size(phi)),amp); rgb=hsv2rgb(hsv);
+        % Ignore hue and saturation information for now,
+        % IK could not figure out how to unwrap phases
+        hsv=cat(3,ones(size(phi)),ones(size(phi)),amp);
 
-        % Do the plotting
-        image(t_axis,f_axis,rgb); kxlabel('time, seconds');
+        % Plot the spectrogram
+        image(t_axis,f_axis,hsv2rgb(hsv));
         ktitle(['channels ' num2str(2*n-1) ',' num2str(2*n)]);
         kylabel('frequency offset, Hz'); set(gca,'YDir','normal');
 
-        % Only keep the physically relevan interval
-        xlim([0 sum(spin_system.control.pulse_dt)]);
+        % Warn the user when the time axis is truncated
+        if last_slice_to_plot==numel(spin_system.control.pulse_dt)
+            kxlabel('time, seconds');
+        else
+            kxlabel('time, s (truncated)');
+        end
+
+        % Physically relevant interval
+        xlim([0 sum(timing_grid)]-timing_grid(1)/2);
 
         % Increment plot number
         current_plot=current_plot+1;
@@ -109,8 +134,20 @@ if ismember('spectrogram',spin_system.control.plotting)
 
 end
 
-% Build the time axis
-t_axis=[0 cumsum(spin_system.control.pulse_dt)];
+% Decide the time axis
+if ismember('time_by_slice',spin_system.control.plotting)
+
+    % Slice count axis
+    t_axis=0:numel(spin_system.control.pulse_dt);
+    t_axis_label='waveform slice number';
+
+else
+
+    % Wall clock time axis
+    t_axis=[0 cumsum(spin_system.control.pulse_dt)];
+    t_axis_label='time, seconds';
+
+end
 
 % Apply the average power for plotting
 average_power=mean(spin_system.control.pwr_levels);
@@ -178,21 +215,21 @@ if ismember('xy_controls',spin_system.control.plotting)
     for n=1:numel(p)
         p(n).Color=hsv2rgb([n/numel(p) 0.75 0.75]);
     end
-    
-    % Power bounds
-    fb_pwr=refline([0 lower_bound/(2*pi)]);
-    set(fb_pwr,'Color','k','LineStyle','--');
-    cb_pwr=refline([0 upper_bound/(2*pi)]);
-    set(cb_pwr,'Color','k','LineStyle','--');
-    
+       
     % Compute axis limits
-    x_lower=0; x_upper=spin_system.control.pulse_dur;
+    x_lower=0; x_upper=max(t_axis);
     y_lower=min([min(waveform(:)), lower_bound-0.05*abs(lower_bound)])/(2*pi);
     y_upper=max([max(waveform(:)), upper_bound+0.05*abs(upper_bound)])/(2*pi);
 
     % Set axis limits
-    xlim([x_lower x_upper]); ylim([y_lower y_upper]);
-       
+    xlim('tight'); ylim([y_lower y_upper]);
+    
+    % Draw power bounds
+    fb_pwr=refline([0 lower_bound/(2*pi)]);
+    set(fb_pwr,'Color','k','LineStyle','--');
+    cb_pwr=refline([0 upper_bound/(2*pi)]);
+    set(cb_pwr,'Color','k','LineStyle','--');
+
     % Set labels and title
     control_labels=cell(1,size(waveform,1));
     for n=1:size(waveform,1)
@@ -205,7 +242,7 @@ if ismember('xy_controls',spin_system.control.plotting)
                         'ColorData',uint8([200 200 200 64]')); 
     
     % Labels and the grid
-    kxlabel('time, seconds'); ktitle('controls');
+    kxlabel(t_axis_label); ktitle('controls');
     kylabel('ens. average value, Hz'); kgrid; 
 
     % Report maximum nutation angle
@@ -280,12 +317,11 @@ if ismember('phi_controls',spin_system.control.plotting)
                         'ColorData',uint8([200 200 200 64]')); 
     
     % Labels and the grid
-    kxlabel('time, seconds'); ktitle('control phases');
+    kxlabel(t_axis_label); ktitle('control phases');
     kylabel('phase, radians'); kgrid;
     
     % Custom axis limits and ticks
-    xlim([0 spin_system.control.pulse_dur]);
-    ylim([0 2*pi]); yticks(0:pi/2:2*pi);
+    xlim('tight'); ylim([0 2*pi]); yticks(0:pi/2:2*pi);
     yticklabels({'$0$','$0.5\pi$','$\pi$','$1.5\pi$','$2\pi$'});
 
     % Increment plot counter
@@ -334,13 +370,12 @@ if ismember('amp_controls',spin_system.control.plotting)
                        sqrt(2)*abs(lower_bound)]);
     end
     
-    % Power bound
+    % Axis limits with approproate padding of the Y axis
+    xlim('tight'); ylim([0 max([max(amp_profile(:)) 1.05*amp_bound])]/(2*pi));
+
+    % Draw power bound
     max_amp=refline([0 amp_bound/(2*pi)]);
     set(max_amp,'Color','k','LineStyle','--');
-    
-    % Axis limits
-    set(gca,'xlim',[0 spin_system.control.pulse_dur],...
-            'ylim',[0 max([max(amp_profile(:)) 1.05*amp_bound])]/(2*pi));
     
     % Set labels and title
     control_labels=cell(1,size(waveform,1)/2);
@@ -354,7 +389,7 @@ if ismember('amp_controls',spin_system.control.plotting)
                         'ColorData',uint8([200 200 200 64]')); 
     
     % Labels and the grid
-    kxlabel('time, seconds'); ktitle('control moduli');
+    kxlabel(t_axis_label); ktitle('control moduli');
     kylabel('ens. average value, Hz'); kgrid; 
     
     % Increment plot counter
@@ -390,7 +425,7 @@ if ismember('correlation_order',spin_system.control.plotting)
     end
     
     % Update the axes
-    kxlabel('time, seconds');
+    kxlabel(t_axis_label);
     xlim tight; ylim padded;
     
     % Increment plot counter
@@ -426,7 +461,7 @@ if ismember('coherence_order',spin_system.control.plotting)
     end
     
     % Update the axes
-    kxlabel('time, seconds');
+    kxlabel(t_axis_label);
     xlim tight; ylim padded;
     
     % Increment plot counter
@@ -462,7 +497,7 @@ if ismember('local_each_spin',spin_system.control.plotting)
     end
     
     % Update the axes
-    kxlabel('time, seconds');
+    kxlabel(t_axis_label);
     xlim tight; ylim padded;
     
     % Increment plot counter
@@ -498,7 +533,7 @@ if ismember('total_each_spin',spin_system.control.plotting)
     end
     
     % Update the axes
-    kxlabel('time, seconds');
+    kxlabel(t_axis_label);
     xlim tight; ylim padded;
     
     % Increment plot counter
@@ -534,7 +569,7 @@ if ismember('level_populations',spin_system.control.plotting)
     end
     
     % Update the axes
-    kxlabel('time, seconds');
+    kxlabel(t_axis_label);
     xlim tight; ylim padded;
     
     % Increment plot counter
@@ -555,7 +590,7 @@ if ismember('robustness',spin_system.control.plotting)
 
     % Get histogram range + 10% margin
     edge_val=1.1*max(abs(fidelities),[],'all');
-    xlim([-edge_val, +edge_val]);
+    xlim([-edge_val, +edge_val]); 
 
     % Report fidelity stats
     x_range=xlim; y_range=ylim;
@@ -564,7 +599,7 @@ if ismember('robustness',spin_system.control.plotting)
          {['$\mu = '    num2str(mean(fidelities),4) '$'],...
           ['$\sigma = ' num2str(std(fidelities),4)  '$']},...
          'Interpreter','latex');
-    
+
 end
 
 % Flush the graphics
@@ -584,9 +619,6 @@ if (~isnumeric(fidelities))||(~isreal(fidelities))
     error('fidelities must be a real numerical array.');
 end
 if ismember('spectrogram',spin_system.control.plotting)
-    if numel(unique(diff(spin_system.control.pulse_dt)))~=1
-        error('spectrograms require uniform time intervals.');
-    end
     if ~(mod(size(waveform,1),2)==0)
         error('spectrograms require an even number of control channels.');
     end

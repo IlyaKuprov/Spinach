@@ -1,34 +1,27 @@
-% Simulation of nutation frequency dependent XiX DNP field profiles in 
-% the steady state with electron-proton distance and electron Rabi 
-% frequency ensembles.
-%
+% Simulation of T2e dependent XiX DNP contact curves in the steady state 
+% with electron-proton distance ensemble.
+% 
 % Calculation time: minutes
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % guinevere.mathies@uni-konstanz.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 close all
 
-nu=6.8;                                 % Electron nutation frequency, MHz
-srt=0.051;                              % Repetition time, ms
-for n=1
-    xix_field_profile_b1_r(nu(n),srt(n))
+T2e=[50e-6 15e-6 5e-6 1.5e-6 0.5e-6];
+Color={'#D95319' '#EDB120' '#000000' '#77AC30' '#0072BD'};
+
+for j=1:numel(T2e)
+    col=char(Color(j));
+    xix_contact_curve_ensemble_r(T2e(j),col)
+    legend('50 \mus','15 \mus','5 \mus','1.5 \mus','0.5 \mus','location','southeast')
 end
 
-nu=[9.6 13.5 18.5 25 36];               % Electron nutation frequency, MHz
-srt=[0.051 0.102 0.153 0.153 0.306];    % Repetition time, ms
-for n=1:numel(nu)
-    xix_field_profile_b1_r(nu(n),srt(n))
-end
-legend('7 MHz','10 MHz','14 MHz','18 MHz','25 MHz','36 MHz')
-set(gcf,'outerposition',[1000 650 710 510])
+savefig(gcf,'xix_contact_curve_ensemble_r_T2e.fig');
 
-% Save results
-savefig(gcf,'xix_nutation_ensemble_b1_r.fig');
-
-
-function xix_field_profile_b1_r(nu,srt)
+% Simulation for a specific T2e
+function xix_contact_curve_ensemble_r(T2e,col)
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -53,23 +46,18 @@ sys.tols.prop_chop=1e-12;
 % Algorithmic options
 sys.disable={'hygiene'}';
 
-% Distance and B1 ensemble, Gauss-Legendre points
-[r,wr]=gaussleg(3.5,20,3);      % Angstrom
-if nu == 6.8
-    [b1,wb1]=gaussleg(1e6,(nu+2)*1e6,5);  % Hz
-else
-    [b1,wb1]=gaussleg((nu-8)*1e6,(nu+2)*1e6,5);  % Hz
-end
+% XiX loop count
+loop_counts=1:64;
 
-% Microwave resonance offsets, Hz
-offsets=-52e6:-1e6:-64e6;
+% Distance ensemble
+[r,wr]=gaussleg(3.5,20,3);      % Angstrom
 
 % Preallocate equilibrium DNP value array
-dnp=zeros([numel(offsets) numel(r) numel(b1)],'like',1i);
+dnp=zeros([numel(loop_counts) numel(r)],'like',1i);
 
 % Over distances
 for n=1:numel(r)
-
+    
     % Cartesian coordinates
     inter.coordinates={[0.000 0.000 0.000];
                        [0.000 0.000 r(n) ]};
@@ -80,7 +68,7 @@ for n=1:numel(r)
     r1n_rate=@(alp,bet,gam)r1n_dnp(sys.magnet,inter.temperature,...
                                    2.00230,1e-3,52,r(n),bet);
     inter.r1_rates={1e3 r1n_rate};
-    inter.r2_rates={200e3 50e3};
+    inter.r2_rates={1/T2e 50e3};
     inter.rlx_keep='diagonal';
     inter.equilibrium='dibari';
     
@@ -93,46 +81,47 @@ for n=1:numel(r)
 
     % Experiment parameters
     parameters.spins={'E','1H'};
+    parameters.irr_powers=18e6;            % Electron nutation frequency [Hz]
     parameters.grid='rep_2ang_800pts_sph';
     parameters.pulse_dur=48e-9;              % Pulse duration, seconds
-    parameters.nloops=36;                    % Number of XiX DNP blocks
     parameters.phase=pi;                     % Second pulse inverted phase
     parameters.addshift=-13e6;
-    parameters.el_offs=offsets;
+    parameters.el_offs=61e6;
+   
+    % Over loop counts
+    parfor m=1:numel(loop_counts)
 
-    % Calculate shot spacing
-    parameters.shot_spacing=(srt*1e-3) - 2*parameters.nloops*parameters.pulse_dur;
+        % Localise parameters
+        localpar=parameters;
 
-    % Over B1 fields
-    for k=1:numel(b1)
+        % Set the number of loops
+        localpar.nloops=loop_counts(m);
 
-        % Set electron nutation frequency
-        parameters.irr_powers=b1(k);
+        % Update the shot spacing
+        pulses_dur=2*localpar.nloops*localpar.pulse_dur;
+        localpar.shot_spacing=153e-6 - pulses_dur;
 
         % Run the steady state simulation
-        dnp(:,n,k)=powder(spin_system,@xixdnp_steady,parameters,'esr');
+        dnp(m,n)=powder(spin_system,@xixdnp_steady,localpar,'esr');
 
     end
 
 end
 
-% Integrate over the B1 field distribution
-dnp=sum(dnp.*reshape(wb1,[1 1 numel(wb1)]),3)/sum(wb1);
-
 % Integrate over the distance distribution, r^2 is the radial part of the Jacobian
 dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
 
 % Plotting 
-figure(1); plot3(nu*ones(1,numel(offsets)),parameters.el_offs/1e6,-real(dnp),'o-','LineWidth',1.5); 
-xlabel('\nu_1_S (MHz)');
-ylabel('\Omega/2\pi (MHz)');
-zlabel('\langle I_Z \rangle');
+contact_times=parameters.pulse_dur*2*loop_counts;
+figure(1); plot(contact_times*1e6,real(dnp),'color',col,'LineWidth',1.5);
+xlabel('Contact time (\mus)');
+ylabel('\langle I_Z \rangle');
+grid on; xlim([0 10]); ylim([2e-4 14e-4]); hold on
+
 ax=gca;
 ax.FontSize=14;
 ax.LineWidth=1.2;
 set(gca,'XMinorTick','on','YMinorTick','on');
-grid on; hold on
-view([-67 11]); xlim([0 40]); ylim([-65 -50]); zlim([0 1.2e-3]);
 
 end
 

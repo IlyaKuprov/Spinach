@@ -1,28 +1,27 @@
-% Simulation of T1e dependent XiX DNP field profiles in the steady state 
-% with electron-proton distance ensemble.
+% Simulation of T2e dependent XiX DNP optimization of repetition time in 
+% the steady state with electron-proton distance ensemble.
 % 
 % Calculation time: minutes
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % guinevere.mathies@uni-konstanz.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 close all
 
-T1e=[10e-3 3e-3 1e-3 0.3e-3 0.1e-3];
+T2e=[50e-6 15e-6 5e-6 1.5e-6 0.5e-6];
 Color={'#D95319' '#EDB120' '#000000' '#77AC30' '#0072BD'};
 
-for j=1:numel(T1e)
+for j=1:numel(T2e)
     col=char(Color(j));
-    xix_field_profile_ensemble_r(T1e(j),col)
-    legend('10 ms','3 ms','1 ms','0.3 ms','0.1 ms','location','southeast')
+    xix_rep_time_ensemble_r(T2e(j),col)
+    legend('50 \mus','15 \mus','5 \mus','1.5 \mus','0.5 \mus','location','southeast')
 end
 
-% Save figure
-savefig(gcf,'xix_field_profile_ensemble_r_T1e.fig');
+savefig(gcf,'xix_rep_time_ensemble_r_T2e.fig');
 
-
-function xix_field_profile_ensemble_r(T1e,col)
+% Simulation for a specific T2e
+function xix_rep_time_ensemble_r(T2e,col)
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -47,35 +46,38 @@ sys.tols.prop_chop=1e-12;
 % Algorithmic options
 sys.disable={'hygiene'}';
 
-% Distance ensemble, Gauss-Legendre points
-[r,w]=gaussleg(3.5,20,3);
+% Distance ensemble
+[r,wr]=gaussleg(3.5,20,3);      % Angstrom
 
-% Microwave resonance offsets, Hz
-offsets=linspace(-100e6,100e6,201);
+% Log spacing for rep. time
+rep_time=logspace(-5,-3,30);
 
-% Compute DNP at each distance
-dnp=zeros([numel(offsets) numel(r)]);
+% Preallocate equilibrium DNP value array
+dnp=zeros([numel(rep_time) numel(r)],'like',1i);
+
+% Over distances
 for n=1:numel(r)
-
+    
     % Cartesian coordinates
     inter.coordinates={[0.000 0.000 0.000];
                        [0.000 0.000 r(n) ]};
-    
-    % Relaxation rates, distance and ori. dep. R1n
+       
+    % Relaxation rates, distance and orientation 
+    % dependence provided using a function handle
     inter.relaxation={'t1_t2'};
     r1n_rate=@(alp,bet,gam)r1n_dnp(sys.magnet,inter.temperature,...
-                                   2.00230,1e-3,52,r(n),bet); 
-    inter.r1_rates={1/T1e r1n_rate};
-    inter.r2_rates={200e3 50e3};
+                                   2.00230,1e-3,52,r(n),bet);
+    inter.r1_rates={1e3 r1n_rate};
+    inter.r2_rates={1/T2e 50e3};
     inter.rlx_keep='diagonal';
     inter.equilibrium='dibari';
-
+    
     % Spinach housekeeping
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);
-
+    
     % Detect the proton
-    parameters.coil=state(spin_system,'Lz',2);
+    parameters.coil=state(spin_system,'Lz','1H');
 
     % Experiment parameters
     parameters.spins={'E','1H'};
@@ -85,24 +87,33 @@ for n=1:numel(r)
     parameters.nloops=36;                    % Number of XiX DNP blocks (power of 2)
     parameters.phase=pi;                     % Second pulse inverted phase
     parameters.addshift=-13e6;
-    parameters.el_offs=offsets;
+    parameters.el_offs=-39e6;
 
-    % Calculate shot spacing
-    parameters.shot_spacing=204e-6 - 2*parameters.nloops*parameters.pulse_dur;
+    % Over repetition times
+    parfor m=1:numel(rep_time)
 
-    % Run the steady state simulation
-    dnp(:,n)=powder(spin_system,@xixdnp_steady,parameters,'esr');
+        % Localise parameters
+        localpar=parameters;
 
+        % Set the shot spacing
+        pulses_time=2*localpar.nloops*localpar.pulse_dur;
+        localpar.shot_spacing=rep_time(m)-pulses_time;
+
+        % Run the steady state simulation
+        dnp(m,n)=powder(spin_system,@xixdnp_steady,localpar,'esr');
+
+    end
+   
 end
 
 % Integrate over the distance distribution, r^2 is the Jacobian
-dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(w,[1 numel(w)]),2)/sum((r.^2).*w);
+dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
 
 % Plotting 
-figure(1); plot(parameters.el_offs/1e6,real(dnp),'color',col,'LineWidth',1.5); 
-xlabel('\Omega/2\pi (MHz)');
+figure(1); plot(rep_time*1e3,-real(dnp),'color',col,'LineWidth',1.5);
+xlabel('Repetition time (ms)');
 ylabel('\langle I_Z \rangle');
-grid on; xlim tight; ylim([-3e-3 3e-3]); hold on
+grid on; xlim([0 2]); ylim([0 1.4e-3]); hold on
 
 ax=gca;
 ax.FontSize=14;

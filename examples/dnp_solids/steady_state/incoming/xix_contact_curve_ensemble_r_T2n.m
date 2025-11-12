@@ -1,27 +1,27 @@
-% Simulation of T1e dependent XiX DNP contact curves in the steady state 
+% Simulation of T2n dependent XiX DNP contact curves in the steady state 
 % with electron-proton distance ensemble.
 % 
 % Calculation time: minutes
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % guinevere.mathies@uni-konstanz.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 close all
 
-T1e=[10e-3 3e-3 1e-3 0.3e-3 0.1e-3];
-Color={'#D95319' '#EDB120' '#000000' '#77AC30' '#0072BD'};
+T2n=[20e-3 2e-3 200e-6 20e-6 2e-6];
+Color={'#D95319' '#EDB120' '#77AC30' '#000000' '#0072BD'};
 
-for j=1:numel(T1e)
+for j=1:numel(T2n)
     col=char(Color(j));
-    xix_contact_curve_ensemble_r(T1e(j),col)
-    legend('10 ms','3 ms','1 ms','0.3 ms','0.1 ms','location','southeast')
+    xix_contact_curve_ensemble_r(T2n(j),col)
+    legend('20 ms','2 ms','200 \mus','20 \mus','2 \mus','location','southeast')
 end
 
-savefig(gcf,'xix_contact_curve_ensemble_r_T1e.fig');
+savefig(gcf,'xix_contact_curve_ensemble_r_T2n.fig');
 
-
-function xix_contact_curve_ensemble_r(T1e,col)
+% Simulation for a specific T2n
+function xix_contact_curve_ensemble_r(T2n,col)
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -67,8 +67,8 @@ for n=1:numel(r)
     inter.relaxation={'t1_t2'};
     r1n_rate=@(alp,bet,gam)r1n_dnp(sys.magnet,inter.temperature,...
                                    2.00230,1e-3,52,r(n),bet);
-    inter.r1_rates={1/T1e r1n_rate};
-    inter.r2_rates={200e3 50e3};
+    inter.r1_rates={1e3 r1n_rate};
+    inter.r2_rates={200e3 1/T2n};
     inter.rlx_keep='diagonal';
     inter.equilibrium='dibari';
     
@@ -116,7 +116,7 @@ contact_times=parameters.pulse_dur*2*loop_counts;
 figure(1); plot(contact_times*1e6,real(dnp),'color',col,'LineWidth',1.5);
 xlabel('Contact time (\mus)');
 ylabel('\langle I_Z \rangle');
-grid on; xlim([0 10]); ylim([0 1.7e-3]); hold on
+grid on; xlim([0 10]); ylim([2e-4 16e-4]); hold on
 
 ax=gca;
 ax.FontSize=14;

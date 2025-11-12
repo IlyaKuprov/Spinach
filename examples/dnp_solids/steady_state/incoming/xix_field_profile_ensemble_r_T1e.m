@@ -1,28 +1,28 @@
-% Simulation of T2e dependent XiX DNP field profiles in the steady state 
+% Simulation of T1e dependent XiX DNP field profiles in the steady state 
 % with electron-proton distance ensemble.
 % 
 % Calculation time: minutes
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % guinevere.mathies@uni-konstanz.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 close all
 
-T2e=[50e-6 15e-6 5e-6 1.5e-6 0.5e-6];
+T1e=[10e-3 3e-3 1e-3 0.3e-3 0.1e-3];
 Color={'#D95319' '#EDB120' '#000000' '#77AC30' '#0072BD'};
 
-for j=1:numel(T2e)
+for j=1:numel(T1e)
     col=char(Color(j));
-    xix_field_profile_ensemble_r(T2e(j),col)
-    legend('50 \mus','15 \mus','5 \mus','1.5 \mus','0.5 \mus','location','southeast')
+    xix_field_profile_ensemble_r(T1e(j),col)
+    legend('10 ms','3 ms','1 ms','0.3 ms','0.1 ms','location','southeast')
 end
 
 % Save figure
-savefig(gcf,'xix_field_profile_ensemble_r_T2e.fig');
+savefig(gcf,'xix_field_profile_ensemble_r_T1e.fig');
 
-
-function xix_field_profile_ensemble_r(T2e,col)
+% Simulation for a specific T1e
+function xix_field_profile_ensemble_r(T1e,col)
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -65,8 +65,8 @@ for n=1:numel(r)
     inter.relaxation={'t1_t2'};
     r1n_rate=@(alp,bet,gam)r1n_dnp(sys.magnet,inter.temperature,...
                                    2.00230,1e-3,52,r(n),bet); 
-    inter.r1_rates={1e3 r1n_rate};
-    inter.r2_rates={1/T2e 50e3};
+    inter.r1_rates={1/T1e r1n_rate};
+    inter.r2_rates={200e3 50e3};
     inter.rlx_keep='diagonal';
     inter.equilibrium='dibari';
 

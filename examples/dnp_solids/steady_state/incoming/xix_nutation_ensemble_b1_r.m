@@ -1,4 +1,4 @@
-% Simulation of nutation frequency dependent TOP DNP field profiles in 
+% Simulation of nutation frequency dependent XiX DNP field profiles in 
 % the steady state with electron-proton distance and electron Rabi 
 % frequency ensembles.
 %
@@ -6,27 +6,29 @@
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % guinevere.mathies@uni-konstanz.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 close all
 
 nu=6.8;                                 % Electron nutation frequency, MHz
+srt=0.051;                              % Repetition time, ms
 for n=1
-    top_field_profile_b1_r(nu(n))
+    xix_field_profile_b1_r(nu(n),srt(n))
 end
 
-nu=[9.6 13.5 17.5 25 36];               % Electron nutation frequency, MHz
+nu=[9.6 13.5 18.5 25 36];               % Electron nutation frequency, MHz
+srt=[0.051 0.102 0.153 0.153 0.306];    % Repetition time, ms
 for n=1:numel(nu)
-    top_field_profile_b1_r(nu(n))
+    xix_field_profile_b1_r(nu(n),srt(n))
 end
 legend('7 MHz','10 MHz','14 MHz','18 MHz','25 MHz','36 MHz')
 set(gcf,'outerposition',[1000 650 710 510])
 
 % Save results
-savefig(gcf,'top_nutation_ensemble_b1_r.fig');
+savefig(gcf,'xix_nutation_ensemble_b1_r.fig');
 
 
-function top_field_profile_b1_r(nu)
+function xix_field_profile_b1_r(nu,srt)
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -60,7 +62,7 @@ else
 end
 
 % Microwave resonance offsets, Hz
-offsets=88e6:1e6:97e6;
+offsets=-52e6:-1e6:-64e6;
 
 % Preallocate equilibrium DNP value array
 dnp=zeros([numel(offsets) numel(r) numel(b1)],'like',1i);
@@ -92,14 +94,14 @@ for n=1:numel(r)
     % Experiment parameters
     parameters.spins={'E','1H'};
     parameters.grid='rep_2ang_800pts_sph';
-    parameters.pulse_dur=10e-9;              % Pulse duration, seconds
-    parameters.delay_dur=14e-9;              % Delay duration, seconds
-    parameters.nloops=300;                   % Number of TOP DNP blocks (power of 2)     
+    parameters.pulse_dur=48e-9;              % Pulse duration, seconds
+    parameters.nloops=36;                    % Number of XiX DNP blocks
+    parameters.phase=pi;                     % Second pulse inverted phase
     parameters.addshift=-13e6;
     parameters.el_offs=offsets;
 
     % Calculate shot spacing
-    parameters.shot_spacing=153e-6 - parameters.nloops*(parameters.pulse_dur+parameters.delay_dur);
+    parameters.shot_spacing=(srt*1e-3) - 2*parameters.nloops*parameters.pulse_dur;
 
     % Over B1 fields
     for k=1:numel(b1)
@@ -108,7 +110,7 @@ for n=1:numel(r)
         parameters.irr_powers=b1(k);
 
         % Run the steady state simulation
-        dnp(:,n,k)=powder(spin_system,@topdnp_steady,parameters,'esr');
+        dnp(:,n,k)=powder(spin_system,@xixdnp_steady,parameters,'esr');
 
     end
 
@@ -121,7 +123,7 @@ dnp=sum(dnp.*reshape(wb1,[1 1 numel(wb1)]),3)/sum(wb1);
 dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
 
 % Plotting 
-figure(1); plot3(nu*ones(1,numel(offsets)),parameters.el_offs/1e6,real(dnp),'o-','LineWidth',1.5); 
+figure(1); plot3(nu*ones(1,numel(offsets)),parameters.el_offs/1e6,-real(dnp),'o-','LineWidth',1.5); 
 xlabel('\nu_1_S (MHz)');
 ylabel('\Omega/2\pi (MHz)');
 zlabel('\langle I_Z \rangle');
@@ -130,7 +132,7 @@ ax.FontSize=14;
 ax.LineWidth=1.2;
 set(gca,'XMinorTick','on','YMinorTick','on');
 grid on; hold on
-view([-67 11]); xlim([0 40]); ylim([85 100]); zlim([0 1.2e-3]);
+view([-67 11]); xlim([0 40]); ylim([-65 -50]); zlim([0 1.2e-3]);
 
 end
 

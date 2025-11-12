@@ -135,9 +135,14 @@ nmr_dt=1/parameters.sweep;
 H=hamiltonian(assume(spin_system,'nmr'));
 H=frqoffset(spin_system,H,parameters);
 R=relaxation(spin_system);
-F=gpuArray(polyadic({{GF,opium(size(H,1),1)}}));
-H=gpuArray(polyadic({{opium(size(GF,1),1),H}}));
-R=gpuArray(polyadic({{opium(size(GF,1),1),R}}));
+F=polyadic({{GF,opium(size(H,1),1)}});
+H=polyadic({{opium(size(GF,1),1),H}});
+R=polyadic({{opium(size(GF,1),1),R}});
+
+% Move to GPU if requested
+if ismember('gpu',sys.enable)
+    F=gpuArray(F); H=gpuArray(H); R=gpuArray(R);
+end
 
 % Build state operators
 LzA=state(spin_system,'Lz',spin_system.chem.parts{1});

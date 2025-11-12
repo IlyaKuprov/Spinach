@@ -4,7 +4,7 @@
 % group, paper link coming in due course; see also the Ma-
 % thematica worksheet.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function rlx_trajectory()
 

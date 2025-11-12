@@ -1,30 +1,30 @@
-% Simulation of T1n dependent XiX DNP contact curves in the steady state 
-% with electron-proton distance ensemble.
+% Simulation of T1n dependent XiX DNP optimization of repetition time in 
+% the steady state with electron-proton distance ensemble.
 % 
 % Calculation time: minutes
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % guinevere.mathies@uni-konstanz.de
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 close all
 
-xix_contact_curve_ensemble_r_ori
+xix_rep_time_ensemble_r_ori
 
 T1n=[52 5 0.5 50e-3 5e-3];
 Color={'#D95319' '#EDB120' '#77AC30' '#0072BD' '#7E2F8E'};
 
 for j=1:numel(T1n)
     col=char(Color(j));
-    xix_contact_curve_ensemble_r(T1n(j),col)
+    xix_rep_time_ensemble_r(T1n(j),col)
 end
 
 legend('Ori. dep. {\itT}_1_n','52 s','5 s','0.5 s','50 ms','5 ms','location','southeast')
 
-savefig(gcf,'xix_contact_curve_ensemble_r_T1n.fig');
+savefig(gcf,'xix_rep_time_ensemble_r_T1n.fig');
 
 
-function xix_contact_curve_ensemble_r_ori()
+function xix_rep_time_ensemble_r_ori()
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -49,14 +49,14 @@ sys.tols.prop_chop=1e-12;
 % Algorithmic options
 sys.disable={'hygiene'}';
 
-% XiX loop count
-loop_counts=1:64;
-
 % Distance ensemble
 [r,wr]=gaussleg(3.5,20,3);      % Angstrom
 
+% Log spacing for rep. time
+rep_time=logspace(-5,-3,30);
+
 % Preallocate equilibrium DNP value array
-dnp=zeros([numel(loop_counts) numel(r)],'like',1i);
+dnp=zeros([numel(rep_time) numel(r)],'like',1i);
 
 % Over distances
 for n=1:numel(r)
@@ -87,39 +87,36 @@ for n=1:numel(r)
     parameters.irr_powers=18e6;            % Electron nutation frequency [Hz]
     parameters.grid='rep_2ang_800pts_sph';
     parameters.pulse_dur=48e-9;              % Pulse duration, seconds
+    parameters.nloops=36;                    % Number of XiX DNP blocks (power of 2)
     parameters.phase=pi;                     % Second pulse inverted phase
     parameters.addshift=-13e6;
-    parameters.el_offs=61e6;
-   
-    % Over loop counts
-    parfor m=1:numel(loop_counts)
+    parameters.el_offs=-39e6;
+
+    % Over repetition times
+    parfor m=1:numel(rep_time)
 
         % Localise parameters
         localpar=parameters;
 
-        % Set the number of loops
-        localpar.nloops=loop_counts(m);
-
-        % Update the shot spacing
-        pulses_dur=2*localpar.nloops*localpar.pulse_dur;
-        localpar.shot_spacing=153e-6 - pulses_dur;
+        % Set the shot spacing
+        pulses_time=2*localpar.nloops*localpar.pulse_dur;
+        localpar.shot_spacing=rep_time(m)-pulses_time;
 
         % Run the steady state simulation
         dnp(m,n)=powder(spin_system,@xixdnp_steady,localpar,'esr');
 
     end
-
+   
 end
 
-% Integrate over the distance distribution, r^2 is the radial part of the Jacobian
+% Integrate over the distance distribution, r^2 is the Jacobian
 dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
 
 % Plotting 
-contact_times=parameters.pulse_dur*2*loop_counts;
-figure(1); plot(contact_times*1e6,real(dnp),'-','color','#000000','LineWidth',1.5);
-xlabel('Contact time (\mus)');
+figure(1); plot(rep_time*1e3,-real(dnp),'color','#000000','LineWidth',1.5);
+xlabel('Repetition time (ms)');
 ylabel('\langle I_Z \rangle');
-grid on; xlim([0 10]); ylim([0 1.4e-3]); hold on
+grid on; xlim([0 2]); ylim([0 8e-4]); hold on
 
 ax=gca;
 ax.FontSize=14;
@@ -128,7 +125,7 @@ set(gca,'XMinorTick','on','YMinorTick','on');
 
 end
 
-function xix_contact_curve_ensemble_r(T1n,col)
+function xix_rep_time_ensemble_r(T1n,col)
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -153,14 +150,14 @@ sys.tols.prop_chop=1e-12;
 % Algorithmic options
 sys.disable={'hygiene'}';
 
-% XiX loop count
-loop_counts=1:64;
-
 % Distance ensemble
 [r,wr]=gaussleg(3.5,20,3);      % Angstrom
 
+% Log spacing for rep. time
+rep_time=logspace(-5,-3,30);
+
 % Preallocate equilibrium DNP value array
-dnp=zeros([numel(loop_counts) numel(r)],'like',1i);
+dnp=zeros([numel(rep_time) numel(r)],'like',1i);
 
 % Over distances
 for n=1:numel(r)
@@ -189,39 +186,36 @@ for n=1:numel(r)
     parameters.irr_powers=18e6;            % Electron nutation frequency [Hz]
     parameters.grid='rep_2ang_800pts_sph';
     parameters.pulse_dur=48e-9;              % Pulse duration, seconds
+    parameters.nloops=36;                    % Number of XiX DNP blocks (power of 2)
     parameters.phase=pi;                     % Second pulse inverted phase
     parameters.addshift=-13e6;
-    parameters.el_offs=61e6;
-   
-    % Over loop counts
-    parfor m=1:numel(loop_counts)
+    parameters.el_offs=-39e6;
+
+    % Over repetition times
+    parfor m=1:numel(rep_time)
 
         % Localise parameters
         localpar=parameters;
 
-        % Set the number of loops
-        localpar.nloops=loop_counts(m);
-
-        % Update the shot spacing
-        pulses_dur=2*localpar.nloops*localpar.pulse_dur;
-        localpar.shot_spacing=153e-6 - pulses_dur;
+        % Set the shot spacing
+        pulses_time=2*localpar.nloops*localpar.pulse_dur;
+        localpar.shot_spacing=rep_time(m)-pulses_time;
 
         % Run the steady state simulation
         dnp(m,n)=powder(spin_system,@xixdnp_steady,localpar,'esr');
 
     end
-
+   
 end
 
-% Integrate over the distance distribution, r^2 is the radial part of the Jacobian
+% Integrate over the distance distribution, r^2 is the Jacobian
 dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
 
 % Plotting 
-contact_times=parameters.pulse_dur*2*loop_counts;
-figure(1); plot(contact_times*1e6,real(dnp),'color',col,'LineWidth',1.5);
-xlabel('Contact time (\mus)');
+figure(1); plot(rep_time*1e3,-real(dnp),'color',col,'LineWidth',1.5);
+xlabel('Repetition time (ms)');
 ylabel('\langle I_Z \rangle');
-grid on; xlim([0 10]); ylim([0 1.4e-3]); hold on
+grid on; xlim([0 2]); ylim([0 8e-4]); hold on
 
 ax=gca;
 ax.FontSize=14;

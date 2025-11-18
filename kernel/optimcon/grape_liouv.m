@@ -167,6 +167,9 @@ if n_outputs>2
 
 end
 
+% Count the drifts
+ndrifts=numel(drifts);
+
 % Run forward and backward propagation
 switch spin_system.control.integrator
 
@@ -179,20 +182,9 @@ switch spin_system.control.integrator
         % Precompute evolution generators
         parfor n=1:nsteps
 
-            % Decide current drifts
-            if isscalar(drifts)
-
-                % Time-independent drifts, including
-                % conj-transpose for dissipative cases
-                L_forw{n}=drifts{1}; L_back{n}=drifts{1}';
-
-            else
-
-                % Time-dependent drifts, including
-                % conj-transpose for dissipative cases
-                L_forw{n}=drifts{n}; L_back{n}=drifts{nsteps+1-n}';
-
-            end
+            % Cycle through the drifts array
+            L_forw{n}=drifts{mod(n-1,ndrifts)+1};
+            L_back{n}=drifts{mod(nsteps-n,ndrifts)+1}';
 
             % Add current controls to current drifts, including
             % conjugate-transpose for dissipative controls; the
@@ -247,22 +239,11 @@ switch spin_system.control.integrator
         % Precompute evolution generators
         parfor n=1:nsteps
 
-            % Decide current drifts
-            if isscalar(drifts)
-
-                % Time-independent drifts, including
-                % conjugate-transpose for dissipative cases
-                L_forw_left{n}=drifts{1};  L_forw_right{n}=drifts{1};
-                L_back_left{n}=drifts{1}'; L_back_right{n}=drifts{1}';
-
-            else
-
-                % Time-dependent drifts, including
-                % conjugate-transpose for dissipative cases
-                L_forw_left{n}=drifts{n};           L_forw_right{n}=drifts{n+1};
-                L_back_left{n}=drifts{nsteps+1-n}'; L_back_right{n}=drifts{nsteps+2-n}';
-
-            end
+            % Cycle through the drifts array
+            L_forw_left{n}=drifts{mod(n-1,ndrifts)+1};           
+            L_forw_right{n}=drifts{mod(n,ndrifts)+1};
+            L_back_left{n}=drifts{mod(nsteps-n,ndrifts)+1}'; 
+            L_back_right{n}=drifts{mod(nsteps+1-n,ndrifts)+1}';
 
             % Add current controls to current drifts, including
             % conjugate-transpose for dissipative controls; the
@@ -369,18 +350,9 @@ if n_outputs>2
                 % First step is special
                 if n==1
 
-                    % Decide current drift
-                    if isscalar(drifts)
-
-                        % Time-independent drift
-                        L={drifts{1},drifts{1}};
-
-                    else
-
-                        % Time-dependent drift
-                        L={drifts{1},drifts{2}};
-
-                    end
+                    % Left pair of drifts
+                    L={drifts{mod(n-1,ndrifts)+1},...
+                       drifts{mod(n,ndrifts)+1}};
     
                     % Loop over controls
                     for k=1:nctrls
@@ -402,19 +374,10 @@ if n_outputs>2
                 % Last step is special
                 elseif n==(nsteps+1)
 
-                    % Decide current drift
-                    if isscalar(drifts)
-
-                        % Time-independent drift
-                        L={drifts{1},drifts{1}};
-
-                    else
-
-                        % Time-dependent drift
-                        L={drifts{n-1},drifts{n}};
-
-                    end
-
+                    % Right pair of drifts
+                    L={drifts{mod(n-2,ndrifts)+1},...
+                       drifts{mod(n-1,ndrifts)+1}};
+                    
                     % Loop over controls
                     for k=1:nctrls
                         
@@ -439,17 +402,8 @@ if n_outputs>2
                     for k=1:nctrls
 
                         % Left pair of drifts
-                        if isscalar(drifts)
-
-                            % Time-independent drift
-                            L={drifts{1},drifts{1}};
-
-                        else
-
-                            % Time-dependent drift
-                            L={drifts{n},drifts{n+1}};
-
-                        end
+                        L={drifts{mod(n-1,ndrifts)+1},...
+                           drifts{mod(n,ndrifts)+1}};
                         
                         % Auxiliary matrix
                         [Right_DL,~]=aux_mat(L,controls,cc_comm_idx,cc_comm,dt(n),waveform(:,n),waveform(:,n+1),k);
@@ -464,17 +418,8 @@ if n_outputs>2
                         grad_col(k)=grad_col(k)+bwd_traj(:,n+1)'*aux_vec_a(1:(end/2));
                         
                         % Right pair of drifts
-                        if isscalar(drifts)
-
-                            % Time-independent drift
-                            L={drifts{1},drifts{1}};
-
-                        else
-
-                            % Time-dependent drift
-                            L={drifts{n-1},drifts{n}};
-
-                        end
+                        L={drifts{mod(n-2,ndrifts)+1},...
+                           drifts{mod(n-1,ndrifts)+1}};
 
                         % Auxiliary vector and matrix
                         [~,Left_DR]=aux_mat(L,controls,cc_comm_idx,cc_comm,dt(n-1),waveform(:,n-1),waveform(:,n),k);
@@ -698,12 +643,8 @@ if strcmp(spin_system.control.integrator,'rectangle')&&(n_outputs>3)
                         % Loop over remaining time slices
                         for m=n-2:-1:1
 
-                            % Decide current drifts
-                            if isscalar(drifts)
-                                L_back=drifts{1}';
-                            else
-                                L_back=drifts{m+1}';
-                            end
+                            % Loop through the drifts array
+                            L_back=drifts{mod(m,ndrifts)+1}';
 
                             % Inner control loop
                             for j=1:numel(controls)

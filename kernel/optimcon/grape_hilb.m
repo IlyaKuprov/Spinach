@@ -85,22 +85,15 @@ end
 % Reshape waveform
 waveform=reshape(waveform,[nctrls nsteps]);
 
+% Count the drifts
+ndrifts=numel(drifts);
+
 % Make generators and propagators
 H=cell(nsteps,1); P=cell(nsteps,1);
 parfor n=1:nsteps
 
-    % Decide current drifts
-    if isscalar(drifts)
-
-        % Time-independent drifts
-        H{n}=drifts{1};
-      
-    else
-
-        % Time-dependent drifts
-        H{n}=drifts{n};
-      
-    end
+    % Cycle through the drifts array
+    H{n}=drifts{mod(n-1,ndrifts)+1};
 
     % Add current controls
     for k=1:nctrls

@@ -71,7 +71,7 @@ HR=omega(1)*S.x+omega(2)*S.y+omega(3)*S.z+       ...
    Q(1,3)*S.x*S.z+Q(2,3)*S.y*S.z+Q(3,3)*S.z*S.z;
 
 % Double-check reconstruction
-if norm(H-HR,2)>mult^3*eps()
+if norm(H-HR,2)>eps()*norm(H,2)
     error('this Hamiltonian has terms of cubic or higher order.');
 end
 
@@ -80,7 +80,7 @@ end
 % Consistency enforcement
 function grumble(H)
 if (~isnumeric(H))||(~ishermitian(H))||...
-   (abs(trace(H))>10*eps)||(numel(H)<4)
+   (abs(trace(H))>eps()*norm(H,2))||(numel(H)<4)
     error('H must be traceless, Hermitian, and at least 2x2.');
 end
 end

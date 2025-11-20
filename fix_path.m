@@ -5,13 +5,13 @@
 % student with a laptop. Otherwise, there are a few specific
 % config options for different system types. Syntax:
 %
-%                 run_spinach(config_style)
+%                 fix_path(config_style)
 %
 % ilya.kuprov@weizmann.ac.il
 % 
-% <https://spindynamics.org/wiki/index.php?title=setup.m>
+% <https://spindynamics.org/wiki/index.php?title=fix_path.m>
 
-function run_spinach(config_style)
+function fix_path(config_style)
 
 % Default config style
 if ~exist('config_style','var')

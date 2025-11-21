@@ -104,9 +104,8 @@ klegend({'TOP, 18 MHz','TOP, 33 MHz'});
 kxlabel('Total contact time, $\mu$s'); 
 kgrid; xlim tight; ylim padded;
 
-% Save for later
+% Save the figure
 savefig(gcf,'top_q_con_time_single.fig');
-save('top_q_con_time_single.mat');
 
 end
 

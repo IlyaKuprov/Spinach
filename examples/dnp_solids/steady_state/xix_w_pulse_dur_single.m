@@ -95,9 +95,8 @@ for m=1:numel(pulse_durs)
 
 end
 
-% Save for later
+% Save the figure
 savefig(gcf,'xix_w_pulse_dur_single.fig');
-save('xix_w_pulse_dur_single.mat');
 
 end
 

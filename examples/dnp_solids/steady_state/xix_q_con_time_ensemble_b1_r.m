@@ -116,9 +116,8 @@ kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');
 kxlabel('Total contact time, $\mu$s'); 
 kgrid; xlim tight; ylim padded;
 
-% Save for later
+% Save the figure
 savefig(gcf,'xix_q_con_time_ensemble_b1_r.fig');
-save('xix_q_con_time_ensemble_b1_r.mat');
 
 end
 

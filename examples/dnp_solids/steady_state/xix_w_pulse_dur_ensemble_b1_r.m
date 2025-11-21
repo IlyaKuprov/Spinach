@@ -119,9 +119,8 @@ set(gca,'YDir','normal'); kylabel('Pulse duration, ns');
 kxlabel('Microwave resonance offset, MHz'); colormap turbo;
 kcolourbar('$I_\textrm{z}$ expectation value on $^{1}$H');
 
-% Save for later
+% Save the figure
 savefig(gcf,'xix_w_pulse_dur_ensemble_b1_r.fig');
-save('xix_w_pulse_dur_ensemble_b1_r.mat');
 
 end
 

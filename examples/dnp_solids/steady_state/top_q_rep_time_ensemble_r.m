@@ -102,9 +102,8 @@ kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');
 kxlabel('Repetition time, ms'); 
 kgrid; xlim([0 2]); ylim padded;
 
-% Save for later
+% Save the figure
 savefig(gcf,'top_q_rep_time_ensemble_r.fig');
-save('top_q_rep_time_ensemble_r.mat');
 
 end
 

@@ -107,9 +107,8 @@ klegend({'without flipback','with flipback'});
 kxlabel('Repetition time, ms'); 
 kgrid; xlim([-1 11]); ylim padded;
 
-% Save for later
+% Save the figure
 savefig(gcf,'novel_x_rep_time_single.fig');
-save('novel_x_rep_time_single.mat');
 
 end
 

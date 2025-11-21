@@ -37,7 +37,7 @@ bas.approximation='none';
 sys.tols.prop_chop=1e-12;
 
 % Algorithmic options
-sys.disable={'hygiene'}';
+sys.disable={'hygiene'};
 
 % B1 ensemble
 [b1,wb1]=gaussleg(25e6,35e6,5); % Hz
@@ -104,7 +104,7 @@ dnp=sum(dnp.*reshape(wb1,[1 numel(wb1)]),2)/sum(wb1);
 kfigure(); plot(rep_time*1e3,real(dnp));
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
 kxlabel('Repetition time, ms'); 
-kgrid; xlim([0 2]); ylim padded;
+kgrid; xlim tight; ylim padded;
 
 % Save the figure
 savefig(gcf,'tppm_q_rep_time_ensemble_b1.fig');

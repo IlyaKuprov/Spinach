@@ -37,7 +37,7 @@ bas.approximation='none';
 sys.tols.prop_chop=1e-12;
 
 % Algorithmic options
-sys.disable={'hygiene'}';
+sys.disable={'hygiene'};
 
 % Distance and B1 ensemble
 [b1,wb1]=gaussleg(10e6,20e6,5); % Hz

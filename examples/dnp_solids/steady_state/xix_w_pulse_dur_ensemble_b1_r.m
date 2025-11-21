@@ -31,7 +31,7 @@ bas.approximation='none';
 sys.tols.prop_chop=1e-12;
 
 % Algorithmic options
-sys.disable={'hygiene'}';
+sys.disable={'hygiene'};
 
 % Distance and B1 ensemble
 [r,w]=gaussleg(3.5,20,3);

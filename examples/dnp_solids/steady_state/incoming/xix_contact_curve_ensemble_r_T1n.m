@@ -47,7 +47,7 @@ bas.approximation='none';
 sys.tols.prop_chop=1e-12;
 
 % Algorithmic options
-sys.disable={'hygiene'}';
+sys.disable={'hygiene'};
 
 % XiX loop count
 loop_counts=1:64;
@@ -151,7 +151,7 @@ bas.approximation='none';
 sys.tols.prop_chop=1e-12;
 
 % Algorithmic options
-sys.disable={'hygiene'}';
+sys.disable={'hygiene'};
 
 % XiX loop count
 loop_counts=1:64;

@@ -13,7 +13,7 @@ function xix_q_rep_time_ensemble_r_T1e()
 % Electron relaxation times to use, seconds
 T1e=[10e-3, 3.0e-3, 1.0e-3, 0.3e-3, 0.1e-3];
 
-% Get figure started
+% Get the figure started
 kfigure(); hold on; kgrid;
 kxlabel('XiX repetition time (ms)');
 kylabel('$\langle I_Z \rangle _{\infty}$');
@@ -56,7 +56,7 @@ bas.approximation='none';
 sys.tols.prop_chop=1e-12;
 
 % Algorithmic options
-sys.disable={'hygiene'}';
+sys.disable={'hygiene'};
 
 % Distance ensemble
 [r,wr]=gaussleg(3.5,20,3);      % Angstrom

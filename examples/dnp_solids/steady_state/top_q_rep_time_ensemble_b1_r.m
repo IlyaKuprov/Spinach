@@ -31,7 +31,7 @@ bas.approximation='none';
 sys.tols.prop_chop=1e-12;
 
 % Algorithmic options
-sys.disable={'hygiene'}';
+sys.disable={'hygiene'};
 
 % Distance and B1 ensemble
 [r,wr]=gaussleg(3.5,20,3);      % Angstrom
@@ -112,7 +112,7 @@ dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2)
 kfigure(); plot(rep_time*1e3,real(dnp));
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
 kxlabel('Repetition time, ms'); 
-kgrid; xlim([0 2]); ylim padded;
+kgrid; xlim tight; ylim padded;
 
 % Save the figure
 savefig(gcf,'top_q_rep_time_ensemble_b1_r.fig');

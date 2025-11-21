@@ -43,7 +43,7 @@ bas.formalism='sphten-liouv';
 bas.approximation='none';
 
 % Algorithmic options
-sys.disable={'hygiene'}';
+sys.disable={'hygiene'};
 
 % Propagator accuracy
 sys.tols.prop_chop=1e-12;

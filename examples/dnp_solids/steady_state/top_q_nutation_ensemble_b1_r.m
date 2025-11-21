@@ -1,6 +1,6 @@
-% Simulation of nutation frequency dependent TOP DNP field profiles in 
-% the steady state with electron-proton distance and electron Rabi 
-% frequency ensembles.
+% Simulation of nutation frequency dependence of TOP DNP 
+% field profiles in the steady state with electron-proton
+% distance and electron Rabi frequency ensembles.
 %
 % Calculation time: minutes
 % 
@@ -8,23 +8,29 @@
 % guinevere.mathies@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il
 
-close all
+function top_q_nutation_ensemble_b1_r()
 
-nu=6.8;                                 % Electron nutation frequency, MHz
-for n=1
-    top_field_profile_b1_r(nu(n))
-end
+% Nutation frequencies, Hz
+nu=1e6*[6.8 9.6 13.5 17.5 25 36];
 
-nu=[9.6 13.5 17.5 25 36];               % Electron nutation frequency, MHz
+% Get the figure started
+kfigure(); hold on; kgrid;
+kxlabel('$\nu$ (MHz)');
+kylabel('$\Omega/2\pi$ (MHz)');
+kzlabel('$\langle I_Z \rangle _{\infty}$');
+view([-67 11]); xlim([0 40]); 
+ylim([85 100]); zlim([0 1.2e-3]);
+set(gca,'projection','perspective');
+
+% Plot the curves              
 for n=1:numel(nu)
     top_field_profile_b1_r(nu(n))
 end
-legend('7 MHz','10 MHz','14 MHz','18 MHz','25 MHz','36 MHz')
-set(gcf,'outerposition',[1000 650 710 510])
 
 % Save results
-savefig(gcf,'top_nutation_ensemble_b1_r.fig');
+savefig(gcf,'top_q_nutation_ensemble_b1_r.fig');
 
+end
 
 function top_field_profile_b1_r(nu)
 
@@ -49,18 +55,14 @@ bas.approximation='none';
 sys.tols.prop_chop=1e-12;
 
 % Algorithmic options
-sys.disable={'hygiene'}';
+sys.disable={'hygiene'};
 
 % Distance and B1 ensemble, Gauss-Legendre points
-[r,wr]=gaussleg(3.5,20,3);      % Angstrom
-if nu == 6.8
-    [b1,wb1]=gaussleg(1e6,(nu+2)*1e6,5);  % Hz
-else
-    [b1,wb1]=gaussleg((nu-8)*1e6,(nu+2)*1e6,5);  % Hz
-end
+[r,wr]=gaussleg(3.5,20,3);           % Angstrom
+[b1,wb1]=gaussleg(0.2*nu,1.2*nu,5);  % Hz
 
 % Microwave resonance offsets, Hz
-offsets=88e6:1e6:97e6;
+offsets=linspace(88e6,97e6,10);
 
 % Preallocate equilibrium DNP value array
 dnp=zeros([numel(offsets) numel(r) numel(b1)],'like',1i);
@@ -121,16 +123,9 @@ dnp=sum(dnp.*reshape(wb1,[1 1 numel(wb1)]),3)/sum(wb1);
 dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
 
 % Plotting 
-figure(1); plot3(nu*ones(1,numel(offsets)),parameters.el_offs/1e6,real(dnp),'o-','LineWidth',1.5); 
-xlabel('\nu_1_S (MHz)');
-ylabel('\Omega/2\pi (MHz)');
-zlabel('\langle I_Z \rangle');
-ax=gca;
-ax.FontSize=14;
-ax.LineWidth=1.2;
-set(gca,'XMinorTick','on','YMinorTick','on');
-grid on; hold on
-view([-67 11]); xlim([0 40]); ylim([85 100]); zlim([0 1.2e-3]);
+plot3(nu*ones(1,numel(offsets))/1e6,...
+      parameters.el_offs/1e6,   ...
+      real(dnp),'o-'); drawnow;
 
 end
 

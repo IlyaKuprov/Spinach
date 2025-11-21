@@ -72,7 +72,7 @@ parameters.shot_spacing=204e-6 - 2*parameters.nloops*parameters.pulse_dur;
 dnp=powder(spin_system,@xixdnp_steady,parameters,'esr');
 
 % Plotting 
-figure(); plot(parameters.el_offs/1e6,real(dnp)); 
+kfigure(); plot(parameters.el_offs/1e6,real(dnp)); 
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
 kxlabel('Microwave resonance offset, MHz'); 
 kgrid; xlim tight; ylim padded;

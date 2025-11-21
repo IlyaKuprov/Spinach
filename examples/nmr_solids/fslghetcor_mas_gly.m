@@ -83,7 +83,7 @@ parameters.sweep(1)=sqrt(3)*parameters.hi_pwr/(2*parameters.nblocks*sqrt(2/3));
 parameters.offset(1)=0;
 
 % Plotting
-figure(); scale_figure([1.5 2.0]);
+kfigure(); scale_figure([1.5 2.0]);
 plot_2d(spin_system,real(spectrum),parameters,...
         20,[0.05 0.95 0.05 0.95],2,256,6,'both');
 

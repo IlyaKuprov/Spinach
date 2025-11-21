@@ -68,7 +68,7 @@ answer=solid_effect(spin_system,parameters);
 % Time domain plotting
 time_axis=linspace(0,parameters.time_step*parameters.n_steps,...
                      parameters.n_steps+1);
-figure(); scale_figure([1.75 0.75]);
+kfigure(); scale_figure([1.75 0.75]);
 subplot(1,2,1); plot(time_axis,real(answer(1,:)));
 kylabel('$S_\textrm{z}$ expectation value'); 
 kxlabel('time, seconds'); kgrid;

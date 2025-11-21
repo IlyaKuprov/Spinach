@@ -96,7 +96,7 @@ parfor n=1:numel(tau_c)
 end
 
 % Plotting
-figure(); scale_figure([0.6 1.0]);
+kfigure(); scale_figure([0.6 1.0]);
 imagesc(tau_c/1e-12,(parameters.mw_frq/(2*pi*1e6)),real(answer));
 kxlabel('$\tau_c$ / ps'); kcolourbar('Steady state $^{1}$H DNP');
 kylabel('MW freq offset from $g_{iso}^{(1)}$, MHz');

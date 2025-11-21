@@ -66,7 +66,7 @@ parameters.rf_dur=1e-4;
 rf_powers=linspace(25e3,39e3,15);
 
 % Start a new figure
-figure(); scale_figure([2.5 1.0]);
+kfigure(); scale_figure([2.5 1.0]);
 
 % Proton RF power scan
 for n=1:15

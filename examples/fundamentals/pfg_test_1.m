@@ -69,7 +69,7 @@ parfor t_idx=1:nsteps
 end
 
 % Analyze the trajectory
-figure();
+kfigure();
 trajan(spin_system,rho_stack,'coherence_order');
 set(gca,'yscale','linear');
 

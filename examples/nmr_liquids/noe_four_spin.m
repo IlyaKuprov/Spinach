@@ -77,7 +77,7 @@ fid=apodisation(spin_system,fid,{{'exp',6}});
 spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting
-figure(); plot_1d(spin_system,real(spectrum),parameters);
+kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 scale_figure([2.0 0.85]); xlim([0.8 4.2]);
 kylabel('intensity, a.u.');
 

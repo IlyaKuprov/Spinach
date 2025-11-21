@@ -44,7 +44,7 @@ for n=1:numel(omega_j)
 end
 
 % Plot energies
-figure(); plot(omega_j/omega_e,energies'/omega_e,'k-'); 
+kfigure(); plot(omega_j/omega_e,energies'/omega_e,'k-'); 
 kxlabel('$\omega_{J}/\omega_{E}$');
 kylabel('$\omega/\omega_{E}$'); kgrid;
 

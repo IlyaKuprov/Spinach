@@ -39,7 +39,7 @@ for n=1:numel(rdc_hz)
 end
 
 % Do the plotting
-figure(); plot(rdc_hz,rdc_theo','r.'); 
+kfigure(); plot(rdc_hz,rdc_theo','r.'); 
 kxlabel('Experimental RDC, Hz'); 
 kylabel('Theoretical RDC, Hz');
 xlim([-30 30]); ylim([-30 30]); 

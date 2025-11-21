@@ -28,7 +28,7 @@ set(groot,'defaultFigureMenuBar','figure');
 set(groot,'defaultFigureToolbar','figure'); 
 
 % Reference unit sphere
-figure(); [X,Y,Z]=sphere; 
+kfigure(); [X,Y,Z]=sphere; 
 surf(X,Y,Z,'FaceAlpha',0.25,'EdgeAlpha',0.25);
 colormap bone; box on; axis square; hold on;
 set(gca,'Projection','perspective'); kgrid;

@@ -105,7 +105,7 @@ end
 time_axis=linspace(0,parameters.timestep*parameters.nsteps,parameters.nsteps+1);
 
 % Do the plotting
-figure(); plot(1e3*time_axis,real(contact_curves));
+kfigure(); plot(1e3*time_axis,real(contact_curves));
 kxlabel('contact time, ms'); grid on;
 kylabel('$^{13}$C NMR signal, a.u.');
 legend('10 Hz','100 Hz','1 kHz','10 kHz',...

@@ -89,7 +89,7 @@ dims([1 3 5])=-parameters.dims/2;
 dims([2 4 6])=+parameters.dims/2;
 
 % Draw the slice in three dimensions
-figure(); volplot(abs(mri_slice),dims); 
+ffigure(); volplot(abs(mri_slice),dims); 
 ktitle('after slice sel. and echo'); drawnow();
 
 % Get phase encoding gradient range

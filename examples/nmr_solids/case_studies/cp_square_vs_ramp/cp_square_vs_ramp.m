@@ -61,7 +61,7 @@ parameters.irr_powers=irr_powers_c;
 fid_c=powder(spin_system,@cp_contact_hard,parameters,'nmr');
 
 % Plotting
-figure(); scale_figure([1.5 0.75]);
+kfigure(); scale_figure([1.5 0.75]);
 time_axis=[0 cumsum(parameters.time_steps)];
 subplot(1,2,1); plot(time_axis(2:end),[irr_powers_a;
                                        irr_powers_b;

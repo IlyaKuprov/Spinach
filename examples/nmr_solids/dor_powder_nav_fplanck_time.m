@@ -60,7 +60,7 @@ fid=doublerot(spin_system,@acquire,parameters,'labframe');
 spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting
-figure(); plot_1d(spin_system,real(spectrum),parameters);
+kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
 

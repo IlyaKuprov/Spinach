@@ -74,7 +74,7 @@ parameters.needs={'aniso_eq'};
 answer=powder(spin_system,@dnp_field_scan,parameters,'esr');
 
 % Plotting
-figure(); plot(parameters.fields,real(answer)); kgrid;
+kfigure(); plot(parameters.fields,real(answer)); kgrid;
 axis tight; kxlabel('Magnetic field offset, Tesla');
 kylabel('$S_\textrm{z}$ expectation value on $^{1}$H'); 
 

@@ -47,7 +47,7 @@ parameters.timestep=1e-8;
 [x_axis,spectrum]=rapidscan(spin_system,parameters);
 
 % Plot the result
-figure(); plot(x_axis,real(spectrum)); kgrid;
+kfigure(); plot(x_axis,real(spectrum)); kgrid;
 kxlabel('Magnetic induction, T'); xlim tight;
 kylabel('Signal intensity, a.u.');
 

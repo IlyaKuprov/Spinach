@@ -21,7 +21,7 @@ load('noesy_ubiquitin_expt.mat','spectrum')
 % Plotting
 spin_system.sys.disable={'colorbar'}; 
 spin_system.sys.output=1; 
-figure(); scale_figure([1.5 2.0]);
+kfigure(); scale_figure([1.5 2.0]);
 plot_2d(spin_system,spectrum,parameters,...
         20,[1e-5 50e-5 1e-5 50e-5],2,256,6,'positive');
 

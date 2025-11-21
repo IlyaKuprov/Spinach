@@ -56,7 +56,7 @@ for n=1:numel(delta)
 end
 
 % Plot one-photon case
-figure(); plot(1e-6*delta/(2*pi),...
+kfigure(); plot(1e-6*delta/(2*pi),...
                1e-6*eig_array(2:3,:)/(2*pi));
 axis tight; kxlabel('detuning, MHz'); 
 kylabel('energy levels, MHz'); kgrid;

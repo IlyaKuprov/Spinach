@@ -102,7 +102,7 @@ disp('Susceptibility tensor (cubic Angstrom):');  disp(chi_m);
 disp('Standard deviation (cubic Angstrom):   ');  disp(s_chi_m);
 
 % % Plot the diagnostics
-figure();   plot(sqrt(x.^2+y.^2+z.^2),theo_pcs_p-expt_pcs,'bo');
+kfigure();   plot(sqrt(x.^2+y.^2+z.^2),theo_pcs_p-expt_pcs,'bo');
 hold('on'); plot(sqrt(x.^2+y.^2+z.^2),theo_pcs_m-expt_pcs,'ro'); kgrid;
 kxlabel('Distance from the origin, Angstrom'); kylabel('PCS fitting error (ppm)')
 klegend('point model','delocalised model','Location','northeast'); hold('off');

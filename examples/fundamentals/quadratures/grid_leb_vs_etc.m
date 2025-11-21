@@ -39,7 +39,7 @@ perf_asg=grid_test(alphas,betas,gammas,weights,4:2:60,'Y_lm');
 perf_sop=grid_test(alphas,betas,gammas,weights,4:2:60,'Y_lm');
 
 % Plot the profiles
-figure(); hold on;
+kfigure(); hold on;
 plot(4:2:60,perf_rep);
 plot(4:2:60,perf_esp);
 plot(4:2:60,perf_leb,'k-');

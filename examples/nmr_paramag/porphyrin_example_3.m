@@ -55,7 +55,7 @@ zoom_vol=[pad_size/(2*pad_size+1) (pad_size+1)/(2*pad_size+1)...
 
 % Draw the probability density schematic
 [zoom_den,zoom_ext]=zoom_3d(density,ext,zoom_vol);
-figure(); volplot(zoom_den,zoom_ext,[0.05 0.05]);
+kfigure(); volplot(zoom_den,zoom_ext,[0.05 0.05]);
 hold on; molplot(props.std_geom,[]); drawnow();
 
 % Solve Kuprov equation
@@ -67,7 +67,7 @@ disp([hfc_pcs_cu pde_pcs_cu]);
 
 % Plot the PCS field schematic
 [zoom_pcs,zoom_ext]=zoom_3d(pcs_cube,ext,zoom_vol);
-figure(); volplot(zoom_pcs,zoom_ext,[0.02 0.02]); 
+kfigure(); volplot(zoom_pcs,zoom_ext,[0.02 0.02]); 
 hold on; molplot(props.std_geom,[]);
 
 end

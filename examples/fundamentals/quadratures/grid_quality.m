@@ -8,7 +8,7 @@ function grid_quality()
 %% Two-angle REPULSION grids
 
 % Create a figure
-figure(); hold on; kgrid; box on;
+kfigure(); hold on; kgrid; box on;
 set(gca,'YScale','log'); legend_txt={};
 
 % Loop over two-angle REPULSION grids
@@ -34,7 +34,7 @@ end
 %% Three-angle REPULSION grids
 
 % Create a figure
-figure(); hold on; kgrid; box on;
+kfigure(); hold on; kgrid; box on;
 set(gca,'YScale','log'); legend_txt={};
 
 % Loop over three-angle REPULSION grids
@@ -60,7 +60,7 @@ end
 %% Two-angle Lebedev grids
  
 % Create a figure
-figure(); hold on; kgrid; box on;
+kfigure(); hold on; kgrid; box on;
 set(gca,'YScale','log'); legend_txt={};
 
 % Loop over two-angle Lebedev grids

@@ -66,7 +66,7 @@ axis_hz=sweep2ticks(parameters.offset,parameters.sweep,parameters.zerofill);
 rho_eq=equilibrium(spin_system,hamiltonian(assume(spin_system,'labframe'),'left'));
 
 % Get the figure going
-figure(); 
+kfigure(); 
 
 % Loop over mixing times
 for t_mix=[0.1 1.4 1.6 1.8 2.0 2.2 2.4 10]

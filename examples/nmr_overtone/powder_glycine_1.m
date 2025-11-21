@@ -59,7 +59,7 @@ parameters.verbose=0;
 spectrum=powder(spin_system,@overtone_pa,parameters,'qnmr');
 
 % Plotting
-figure(); plot_1d(spin_system,real(spectrum),parameters);
+kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
 

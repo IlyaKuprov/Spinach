@@ -96,7 +96,7 @@ fid_c=apodisation(spin_system,fids(:,3),{{'crisp'}}); spectrum_c=fftshift(fft(fi
 fid_d=apodisation(spin_system,fids(:,4),{{'crisp'}}); spectrum_d=fftshift(fft(fid_d,parameters.zerofill));
 
 % Plotting
-figure(); scale_figure([2.0 1.5]);
+kfigure(); scale_figure([2.0 1.5]);
 subplot(2,2,1); plot_1d(spin_system,real(spectrum_a),parameters,'r-'); ktitle('frequency sweep epr');
 subplot(2,2,2); plot_1d(spin_system,real(spectrum_b),parameters,'r-'); ktitle('first pulse');
 subplot(2,2,3); plot_1d(spin_system,real(spectrum_c),parameters,'r-'); ktitle('second pulse');
@@ -117,7 +117,7 @@ deer_axis=1e6*linspace(0,parameters.p1_p3_gap,parameters.p2_nsteps+1);
 [deer_axis_2d,echo_axis_2d]=meshgrid(deer_axis,echo_axis);
 
 % Plot the echo stack
-figure(); surf(deer_axis_2d,echo_axis_2d,real(echo_stack));
+kfigure(); surf(deer_axis_2d,echo_axis_2d,real(echo_stack));
 ktitle('echo stack, unphased'); kylabel('echo window, ns');
 kxlabel('2nd pulse position, $\mu$s'); axis tight; kgrid;
 
@@ -127,7 +127,7 @@ deer_echoes=deer_echoes*deer_sigmas/deer_traces(1);
 deer_traces=deer_traces*deer_sigmas/deer_traces(1);
 
 % Plot echo components
-figure(); plot(echo_axis,real(deer_echoes(:,1:3)));
+kfigure(); plot(echo_axis,real(deer_echoes(:,1:3)));
 kylabel('echo, real channel'); kgrid;
 kxlabel('echo window, ns'); axis tight;
 klegend({'${\bf{u}}_1\cdot\sigma_1$',...
@@ -136,7 +136,7 @@ klegend({'${\bf{u}}_1\cdot\sigma_1$',...
 ktitle('principal components of the echo stack');
     
 % Plot DEER components
-figure(); plot(deer_axis,real(deer_traces(:,1:3)));
+kfigure(); plot(deer_axis,real(deer_traces(:,1:3)));
 kylabel('echo, real channel'); axis tight;
 kxlabel('2nd pulse insertion point, $\mu$s');  
 klegend({'${\bf{v}}_1\cdot\sigma_1$',...

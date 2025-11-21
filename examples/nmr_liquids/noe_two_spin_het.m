@@ -47,7 +47,7 @@ coil=[state(spin_system,{'Lz'},{1})...
 answer=evolution(spin_system,1i*R,coil,rho,1e-2,400,'multichannel');
 
 % Plot the longitudinal magnetization
-figure(); plot(linspace(0,4,401),answer);
+kfigure(); plot(linspace(0,4,401),answer);
 kxlabel('time, seconds'); kgrid;
 kylabel('$S_{\rm{Z}}$ expectation value');
 klegend({'Proton','Carbon'},'Location','southeast');

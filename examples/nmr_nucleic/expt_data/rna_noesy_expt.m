@@ -23,7 +23,7 @@ load('rna_noesy_expt.mat','spec_expt')
 
 % Plotting
 spin_system.sys.disable={}; spin_system.sys.output=1; 
-figure(); scale_figure([1.5 2.0]);
+kfigure(); scale_figure([1.5 2.0]);
 plot_2d(spin_system,-spec_expt,parameters,...
         20,[0.001 0.05 0.001 0.05],2,256,6,'positive');
 

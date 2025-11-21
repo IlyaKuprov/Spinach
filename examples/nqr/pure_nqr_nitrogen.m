@@ -49,7 +49,7 @@ fid=apodisation(spin_system,fid,{{'exp',6}});
 spec=imag(fftshift(fft(fid)));
 
 % Plotting
-figure(); plot_1d(spin_system,spec,parameters);
+kfigure(); plot_1d(spin_system,spec,parameters);
 
 end
 

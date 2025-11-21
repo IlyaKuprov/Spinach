@@ -94,7 +94,7 @@ CLx=mean(control.pwr_levels)*pulse_profile(1,:);
 CLy=mean(control.pwr_levels)*pulse_profile(2,:);
 
 % Apply RLC response distortion by a probe circuit with Q = 200
-figure(); restrans(CLx',CLy',control.pulse_dt(1),...
+kfigure(); restrans(CLx',CLy',control.pulse_dt(1),...
                    sys.magnet*spin('2H'),200,'pwc',100);
 
 end

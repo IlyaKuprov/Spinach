@@ -82,7 +82,7 @@ spectrum_conv=fftshift(fft2(fid,parameters.zerofill(2),...
                                 parameters.zerofill(1)));
                         
 % Plotting
-figure(); scale_figure([1.5 2.0]);
+kfigure(); scale_figure([1.5 2.0]);
 plot_2d(spin_system,abs(spectrum_conv),parameters,...
         20,[0.1 0.5 0.1 0.5],2,256,6,'both');           
 kxlabel('1Q / ppm'); kylabel('6Q / ppm');

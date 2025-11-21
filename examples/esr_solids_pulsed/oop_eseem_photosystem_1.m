@@ -68,7 +68,7 @@ fid=powder(spin_system,@oopeseem,parameters,'esr');
 time_axis=(0:(parameters.npoints-1))*parameters.timestep*1e6/2;
 
 % Plot the results
-figure(); plot(time_axis,-imag(fid)); 
+kfigure(); plot(time_axis,-imag(fid)); 
 kxlabel('time, $\mu$s'); xlim tight;
 kylabel('echo intensity, a.u.'); kgrid;
 

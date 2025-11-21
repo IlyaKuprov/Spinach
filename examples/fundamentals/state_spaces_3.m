@@ -58,7 +58,7 @@ for n=1:N_rep
 end
 
 % Trajectory analysis
-figure(); trajan(spin_system,traj,'correlation_order');
+kfigure(); trajan(spin_system,traj,'correlation_order');
 
 end
 

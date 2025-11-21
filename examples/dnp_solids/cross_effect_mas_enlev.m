@@ -59,7 +59,7 @@ parfor n=1:numel(H)
 end
 
 % Plotting
-figure(); scale_figure([0.75 2.0]);
+kfigure(); scale_figure([0.75 2.0]);
 time_axis=1e6*linspace(0,1,2*parameters.max_rank+1)'/parameters.rate;
 subplot(3,1,3); plot(time_axis,energies(1:2,:)','b-'); axis tight;
 kxlabel('time, $\mu$s'); kylabel('energy, GHz'); kgrid;

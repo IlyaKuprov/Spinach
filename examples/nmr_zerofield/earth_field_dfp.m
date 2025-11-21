@@ -67,7 +67,7 @@ parameters.flip_angle=pi/2;
 R_14N=[0 10 100 500 1e3 1e4 1e5 1e6];
 
 % Get the figure going
-figure(); scale_figure([1.0 2.0]);
+kfigure(); scale_figure([1.0 2.0]);
 
 % Loop over 14N relaxation rates
 for n=1:numel(R_14N)

@@ -65,7 +65,7 @@ parameters.g_ref=inter.zeeman.scalar{1};
 answer=crystal(spin_system,@dnp_freq_scan,parameters,'esr');
 
 % Plotting
-figure(); plot(linspace(-350,350,5e4),real(answer)); kgrid;
+kfigure(); plot(linspace(-350,350,5e4),real(answer)); kgrid;
 axis tight; kxlabel('Microwave frequency offset, MHz');
 kylabel('$S_\textrm{z}$ expectation value on $^{1}$H'); 
  

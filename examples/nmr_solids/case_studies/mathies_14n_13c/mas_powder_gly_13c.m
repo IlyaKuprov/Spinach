@@ -60,7 +60,7 @@ parameters.rframes={{'13C',1},{'14N',2}};
 fields=[4.7 9.4 14.1];
 
 % Get a figure going
-figure(); hold on;
+kfigure(); hold on;
 
 for m=1:numel(fields)
 					

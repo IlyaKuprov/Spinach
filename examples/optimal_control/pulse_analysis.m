@@ -13,7 +13,7 @@ y=chirp(t,100,1,200,'quadratic')+...
   chirp(t,200,1,100,'quadratic');
 
 % Do the plotting
-figure(); subplot(1,2,1); plot(t,y); kgrid;
+kfigure(); subplot(1,2,1); plot(t,y); kgrid;
 kxlabel('time, seconds'); kylabel('amplitude, a.u.');
 subplot(1,2,2); scale_figure([1.75 0.75]);
 spectrogram(y,100,80,100,fs,'yaxis','MinThreshold',-50);

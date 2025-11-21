@@ -71,7 +71,7 @@ parameters.n_pwr=pi*1e7;
 answer=powder(spin_system,@endor_davies,parameters,'esr');
 
 % Plotting
-figure(); plot(parameters.n_frq/1e6,real(answer));
+kfigure(); plot(parameters.n_frq/1e6,real(answer));
 kgrid; axis tight; kylabel('(RF on)/(RF off)'); 
 kxlabel('Nuclear frequency, MHz');
 

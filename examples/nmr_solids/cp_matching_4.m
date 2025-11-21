@@ -69,7 +69,7 @@ parfor n=1:60
 end
 
 % Plotting
-figure(); plot(powers'/1e3,cp);
+kfigure(); plot(powers'/1e3,cp);
 kylabel('$^{15}$N signal, a.u.'); kgrid;
 kxlabel('$^{1}$H spin-lock RF power, kHz');
 

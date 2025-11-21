@@ -11,7 +11,7 @@ function efg_silicate()
 props=c2spinach('alsilicate.magres');
 
 % Do the visualisation
-figure(); subplot(1,2,1);
+kfigure(); subplot(1,2,1);
 options.style='ellipsoids';
 efg_display(props,{'Al'},100,[],options);
 set(gca,'CameraPosition',[40 40 40]);

@@ -62,7 +62,7 @@ parfor n=1:numel(subsystems)
 end
 
 % Plotting - heteronuclear side
-figure(); scale_figure([2.0 1.5]); subplot(1,2,2);
+kfigure(); scale_figure([2.0 1.5]); subplot(1,2,2);
 plot_2d(spin_system,abs(spec_b),parameters,20,...
         [0.05 0.25 0.05 0.25],2,256,6,'positive');
 

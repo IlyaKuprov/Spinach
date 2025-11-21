@@ -67,7 +67,7 @@ parameters.rf_frq=48e3;
 parameters.verbose=0;
 
 % Start a new figure
-figure(); scale_figure([1.5 1.0]);
+kfigure(); scale_figure([1.5 1.0]);
 
 % Loop over contact times
 for n=1:10

@@ -55,7 +55,7 @@ contact_curve=powder(spin_system,@noveldnp,parameters,'esr');
 
 % Plotting
 time_axis=linspace(0,parameters.timestep*parameters.nsteps,parameters.nsteps+1);
-figure(); plot(time_axis,real(contact_curve)); kxlabel('contact time, seconds');
+kfigure(); plot(time_axis,real(contact_curve)); kxlabel('contact time, seconds');
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H'); axis tight; kgrid;
 
 end

@@ -49,7 +49,7 @@ ranks=[3    7    15   30  ];
 tau_c=[1e-9 1e-8 1e-7 1e-6];
 
 % Start a figure
-figure(); scale_figure([3.0 1.0]);
+kfigure(); scale_figure([3.0 1.0]);
 
 % Loop over correlation times
 for n=1:numel(ranks)

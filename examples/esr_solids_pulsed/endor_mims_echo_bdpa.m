@@ -50,7 +50,7 @@ answer=powder(spin_system,@endor_mims_echo,parameters,'esr');
 
 % Plotting
 time_axis=linspace(0,2*parameters.tau,parameters.nsteps+1);
-figure(); plot(1e9*time_axis,real(answer)); xlim tight;
+kfigure(); plot(1e9*time_axis,real(answer)); xlim tight;
 kgrid; kxlabel('time, ns'); kylabel('intensity, a.u.');
 
 end

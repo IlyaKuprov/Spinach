@@ -47,7 +47,7 @@ parameters.rho0=-state(spin_system,'Lz','E');
 [b_axis,spec]=fieldsweep(spin_system,parameters);
 
 % Plotting
-figure(); plot(b_axis',spec');
+kfigure(); plot(b_axis',spec');
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
 axis tight; kgrid;

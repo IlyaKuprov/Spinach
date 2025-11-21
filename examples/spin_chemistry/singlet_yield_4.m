@@ -46,7 +46,7 @@ spin_system=basis(spin_system,bas);
 M=liquid(spin_system,@rydmr_exp,parameters,'labframe');
 
 % Plotting
-figure(); plot(linspace(-5,3,2000),M); kgrid;
+kfigure(); plot(linspace(-5,3,2000),M); kgrid;
 kylabel('singlet recombination yield');
 kxlabel('log(magnetic induction / mT)');
 

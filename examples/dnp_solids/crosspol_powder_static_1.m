@@ -45,7 +45,7 @@ fid=powder(spin_system,@cp_contact_hard,parameters,'nmr');
 t_axis=[0 cumsum(parameters.time_steps)];
 
 % Plotting
-figure(); plot(t_axis,real(fid)); kgrid;
+kfigure(); plot(t_axis,real(fid)); kgrid;
 kylabel('$S_\textrm{x}$ expectation value on $^{15}$N'); 
 kxlabel('Contact pulse duration, seconds'); xlim tight;
 

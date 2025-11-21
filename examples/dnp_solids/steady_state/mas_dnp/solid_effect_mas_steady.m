@@ -93,7 +93,7 @@ for n=2:nsteps
 end
 
 % Trajectory analysis
-figure(); trajan(spin_system,rho,'level_populations');
+kfigure(); trajan(spin_system,rho,'level_populations');
 
 % Thermal equilibrium state
 rho_eq=equilibrium(spin_system,hamiltonian(assume(spin_system,'labframe'),'left'));

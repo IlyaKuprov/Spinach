@@ -69,7 +69,7 @@ F=v2fplanck(spin_system,parameters); F=inflate(F);
 traj=evolution(spin_system,F,[],A(:),5e-5,200,'trajectory'); traj=full(traj);
 
 % Plotting
-figure();
+kfigure();
 for n=1:size(traj,2)
     volplot(reshape(traj(:,n),parameters.npts),[-parameters.dims(1)/2 parameters.dims(1)/2 ...
                                                 -parameters.dims(2)/2 parameters.dims(2)/2 ...

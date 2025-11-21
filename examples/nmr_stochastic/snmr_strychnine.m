@@ -87,7 +87,7 @@ traj=gather(traj);
 coil=state(spin_system,'L+','1H'); fid=coil'*traj;
 
 % Plotting - control sequence
-figure(); subplot(1,2,1);
+kfigure(); subplot(1,2,1);
 time_axis=linspace(0,nsteps*dt,nsteps);
 plot(time_axis,[Cx Cy]');
 axis tight; kgrid; title('controls');

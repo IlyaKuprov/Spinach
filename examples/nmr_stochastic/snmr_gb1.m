@@ -120,7 +120,7 @@ disp(['steps per second: ' num2str(nsteps/toc)]);
 save('gb1_workspace.mat','-v7.3','-nocompression');
 
 % Plotting - control sequences
-figure(); scale_figure([2.0 3.0])
+ffigure(); scale_figure([2.0 3.0])
 time_axis=linspace(0,nsteps*dt,nsteps);
 subplot(6,2,1); plot(time_axis,cHx/(2*pi)); ktitle('controls');
 axis tight; kgrid; klegend({'Hx'},'Location','NorthEast');

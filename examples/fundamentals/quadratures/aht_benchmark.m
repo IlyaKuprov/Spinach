@@ -119,7 +119,7 @@ for k=1:numel(nslices)
 end
 
 % Plotting
-figure(); grid on; plot(nslices',error);
+kfigure(); grid on; plot(nslices',error);
 set(gca,'YScale','log','XScale','log');
 set(gca,'MinorGridLineStyle','-'); 
 set(gca,'MinorGridColor',0.9*[1 1 1]);

@@ -117,7 +117,7 @@ load('glucose_expt_b.mat','spec');
 expt_spec=keep_rank(atranspose(spec),25);
 
 % Plotting - theory vs experiment
-figure(); scale_figure([2.1 1.2]);
+kfigure(); scale_figure([2.1 1.2]);
 subplot(1,2,1); 
 plot_2d(spin_system,spectrum,parameters,...
         20,[0.01 0.2 0.01 0.2],2,256,6,'positive');
@@ -128,7 +128,7 @@ plot_2d(spin_system,expt_spec,parameters,...
 ktitle('experimental spectrum');
 
 % Plotting - deviation histogram
-figure(); histogram(spectrum(:)-expt_spec(:));
+kfigure(); histogram(spectrum(:)-expt_spec(:));
 kxlabel('deviation'); kylabel('point count');
 ktitle('difference histogram');
 kgrid; xlim([-300 300]);

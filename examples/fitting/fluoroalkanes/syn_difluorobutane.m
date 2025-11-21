@@ -27,7 +27,7 @@ axis_hz=[ch_axis_hz; me_axis_hz];
 guess=[23.95 6.47 0.90 4.36 18.15 47.88 -11.61 13.63 1.7];
 
 % Get a figure going
-figure(); scale_figure([1.0 1.5]);
+kfigure(); scale_figure([1.0 1.5]);
 
 % Set optimizer options
 options=optimset('Display','iter','MaxIter',5000,'MaxFunEvals',Inf,...

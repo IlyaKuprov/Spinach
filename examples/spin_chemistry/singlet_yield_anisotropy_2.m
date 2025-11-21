@@ -63,7 +63,7 @@ yield=yield-sum(yield.*grid.weights);
 hull=get_hull(grid.betas,grid.gammas);
 x=yield.*sin(grid.betas).*cos(grid.gammas);
 y=yield.*sin(grid.betas).*sin(grid.gammas);
-z=yield.*cos(grid.betas); figure();
+z=yield.*cos(grid.betas); kfigure();
 c=sqrt(x.^2+y.^2+z.^2);
 trisurf(hull,x,y,z,c,'EdgeAlpha',0.25); 
 kgrid; axis square; axis equal;

@@ -89,7 +89,7 @@ opts=optimoptions(@lsqcurvefit,'Display','iter');
 x=lsqcurvefit(F,[1 18 0.01],grad_amps,inten,[],[],opts);  
 
 % Plot simulation data
-figure(); plot(grad_amps,inten,'ro'); hold on;
+kfigure(); plot(grad_amps,inten,'ro'); hold on;
 
 % Plot fitting data
 g_axis=linspace(min(grad_amps),max(grad_amps),100);

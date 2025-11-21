@@ -86,7 +86,7 @@ parameters.chirptype='wurst';
 ktdata=imaging(spin_system,@ufmq,parameters);
 
 % Plot echoes
-figure(); subplot(1,2,1);
+kfigure(); subplot(1,2,1);
 imagesc(imag(ktdata));
 xlabel('t_{2} dimension points'); 
 ylabel('k-space points');

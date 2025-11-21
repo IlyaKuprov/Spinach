@@ -42,7 +42,7 @@ parameters.rf_frq=84.0e6;
 parameters.rf_pwr=2*pi*1e5;
 
 % Get a figure started
-figure(); scale_figure([2 1]); drawnow;
+kfigure(); scale_figure([2 1]); drawnow;
 
 % Loop over the pulse durations
 for n=1:10

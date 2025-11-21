@@ -40,7 +40,7 @@ for n=1:nsteps
 end
 
 % Plot concentrations, excluding solvent
-figure(); plot(time_axis,real(x(1:4,:))); 
+kfigure(); plot(time_axis,real(x(1:4,:))); 
 xlim tight; ylim padded; kgrid;
 kxlabel('time, seconds'); kylabel('concentration, mol/L');
 klegend({'cyclopentadiene','acrylonitrile', ...

@@ -52,7 +52,7 @@ parameters.time_steps=4e-5*ones(1,10);
 parameters.grid='rep_2ang_200pts_oct';
 
 % Parallel loop over power levels
-cp=zeros(numel(powers),numel(powers)); figure();
+cp=zeros(numel(powers),numel(powers)); kfigure();
 for n=1:numel(powers)
     
     parfor k=1:numel(powers)

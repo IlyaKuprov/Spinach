@@ -74,7 +74,7 @@ parfor m=1:numel(offsets)
 end 
 
 % Plotting
-figure(); plot(offsets/1e6,field_prof); axis tight;
+kfigure(); plot(offsets/1e6,field_prof); axis tight;
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
 kxlabel('Microwave resonance offset, MHz'); kgrid;
 

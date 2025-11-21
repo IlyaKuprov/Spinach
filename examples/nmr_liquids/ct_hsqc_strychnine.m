@@ -69,7 +69,7 @@ parfor n=1:numel(subsystems)
 end
 
 % Plotting
-figure(); scale_figure([1.5 2.0]);
+kfigure(); scale_figure([1.5 2.0]);
 plot_2d(spin_system,abs(spectrum),parameters,...
         20,[0.05 1.0 0.05 1.0],2,256,6,'positive');
 

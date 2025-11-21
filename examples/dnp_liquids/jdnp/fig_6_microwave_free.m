@@ -101,7 +101,7 @@ coils=[Tpa,Tpb,Tma,Tmb,T0a,T0b,Sa,Sb,SNz,TpNz,T0Nz,TmNz,E1z,E2z,Nz];
 answer=real(coils'*traj);
 
 % Plotting
-figure(); subplot(1,3,1); scale_figure([1.75 0.5]);
+kfigure(); subplot(1,3,1); scale_figure([1.75 0.5]);
 time_axis=linspace(0,numel(field_grid)*dt,numel(field_grid)+1);
 plot(time_axis,answer(1,:),'b-'); hold on;
 plot(time_axis,answer(3,:),'b-');

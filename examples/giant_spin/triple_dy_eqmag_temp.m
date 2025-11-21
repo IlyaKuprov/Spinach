@@ -111,7 +111,7 @@ T=[1 2 3 4 5 6 7 8 9 10 15 20 25 30 35 40 45 ...
    170 180 190 200 250 300];
 
 % Preallocate the answer
-Mz=nan(size(T)); figure();
+Mz=nan(size(T)); kfigure();
 
 % Scan the temperature
 for n=1:numel(T)

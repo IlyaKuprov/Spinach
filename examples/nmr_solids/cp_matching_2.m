@@ -62,7 +62,7 @@ parfor n=1:numel(powers)
 end
 
 % Plotting
-figure(); plot(powers'/1e3,cp); xlim tight;
+kfigure(); plot(powers'/1e3,cp); xlim tight;
 kylabel('$^{15}$N signal, a.u.'); kgrid;
 kxlabel('$^{1}$H spin-lock RF power, kHz');
 

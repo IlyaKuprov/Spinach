@@ -43,7 +43,7 @@ spectrum_sle=gridfree(spin_system,@slowpass,parameters,'esr');
 spectrum_sle=fdvec(spectrum_sle,5,1);
 
 % SLE plotting
-figure(); subplot(1,2,1);
+kfigure(); subplot(1,2,1);
 plot_1d(spin_system,real(spectrum_sle),parameters);
 ktitle('SLE');
 

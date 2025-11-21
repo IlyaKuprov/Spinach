@@ -21,7 +21,7 @@ spectrum_b=zeros(2048,1,'like',1i);
 [D,E,W]=zfs_sampling(30,5,1e-2); drawnow();
 
 % Get the figure going
-figure();
+kfigure();
 
 % Loop over ZFS distribution
 for n=1:numel(W)

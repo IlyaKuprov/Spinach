@@ -99,7 +99,7 @@ parfor nk=1:numel(rf_powers)*numel(spin_rates)
 end
 
 % Plot as image
-figure();
+kfigure();
 imagesc([min(rf_powers)  max(rf_powers)]/1000,...
         [min(spin_rates) max(spin_rates)]/1000,intensities);
 kxlabel('1H nutation frequency, kHz');

@@ -50,7 +50,7 @@ parfor n=1:30 %#ok<*PFOUS,*PFBNS>
 end
 
 % L-curve analysis
-figure(); S=lcurve(lam,err,reg./lam,'log'); drawnow;
+kfigure(); S=lcurve(lam,err,reg./lam,'log'); drawnow;
 disp(['Suggested smoothing parameter: ' num2str(S)]);
 
 end

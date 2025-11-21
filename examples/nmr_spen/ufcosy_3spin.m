@@ -71,7 +71,7 @@ fid=imaging(spin_system,@spencosy,parameters);
 
 % Processing and plotting
 spectrum=fftshift(fft(fid,[],2),2);
-figure(); contour(abs(spectrum)); kgrid;
+kfigure(); contour(abs(spectrum)); kgrid;
 
 end
 

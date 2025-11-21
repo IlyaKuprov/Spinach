@@ -72,7 +72,7 @@ parameters.g_ref=spin_system.tols.freeg;
 answer=crystal(spin_system,@dnp_freq_scan,parameters,'esr');
 
 % Plotting
-figure(); scale_figure([1.75 1.75]);
+kfigure(); scale_figure([1.75 1.75]);
 subplot(2,2,1); plot(linspace(144.0,145.5,100),real(answer(1:100,1))); 
 kxlabel('Microwave frequency, MHz'); kgrid; axis('tight');
 kylabel('$S_\textrm{z}$ expectation value on $^{1}$H'); 

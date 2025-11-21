@@ -85,7 +85,7 @@ for k=1:numel(weights{1})
 end
 
 % Plotting
-figure(); 
+kfigure(); 
 plot(lags(1:nlags),real(cf_mc(1:nlags)),'ro'); hold on;
 plot(lags(1:nlags),cf_an,'b-'); xlim('tight'); kgrid; 
 kylabel('correlation function'); kxlabel('lag, points');

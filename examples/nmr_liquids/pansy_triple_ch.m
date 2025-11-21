@@ -75,7 +75,7 @@ for n=1:numel(subsys)
 end
 
 % Plotting - 1H-15N block
-figure(); scale_figure([3.0 1.5]); subplot(1,3,3);
+kfigure(); scale_figure([3.0 1.5]); subplot(1,3,3);
 parameters.offset=[parameters.offset(1) parameters.offset(3)];
 parameters.sweep=[parameters.sweep(1) parameters.sweep(3)];
 parameters.spins={'1H','15N'};

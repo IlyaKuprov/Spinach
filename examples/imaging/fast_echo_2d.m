@@ -74,7 +74,7 @@ parameters.coil_st={state(spin_system,'L+','1H')};
 mri=imaging(spin_system,@fse,parameters);
 
 % Plotting
-figure(); scale_figure([2.5 1.0]);
+kfigure(); scale_figure([2.5 1.0]);
 subplot(1,3,1); mri_2d_plot(mri,parameters,'image');    ktitle('recorded image');
 subplot(1,3,2); mri_2d_plot(R1Ph,parameters,'phantom'); ktitle('$R_1$ phantom');
 subplot(1,3,3); mri_2d_plot(R2Ph,parameters,'phantom'); ktitle('$R_2$ phantom');

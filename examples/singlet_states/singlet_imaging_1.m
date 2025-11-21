@@ -140,7 +140,7 @@ parameters.diff=[3.6e-6 0 0; 0 0 0; 0 0 0];
 traj=imaging(spin_system,@tube_flow,parameters); 
                 
 % Show the movie
-figure();
+kfigure();
 for n=1:100
     tube_sing=fpl2phan(traj{1}(:,n),singlet(spin_system,1,2),parameters.npts);
     tube_magn=fpl2phan(traj{2}(:,n),state(spin_system,'L+','all'),parameters.npts);

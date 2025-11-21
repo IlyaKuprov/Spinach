@@ -94,7 +94,7 @@ spectrum=fftshift(fft(spectrum,[],2),2);
 spectrum=fftshift(fft(spectrum,[],3),3);
 
 % Plotting
-figure(); volplot(abs(spectrum).^(1/2),[-1 1 -1 1 -1 1]);
+kfigure(); volplot(abs(spectrum).^(1/2),[-1 1 -1 1 -1 1]);
     
 end 
 

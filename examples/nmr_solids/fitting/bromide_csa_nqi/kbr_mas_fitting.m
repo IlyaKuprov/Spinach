@@ -36,7 +36,7 @@ guess=[60.0933        ...  % chemical shift, ppm
 options=optimset('Display','iter','MaxIter',5000,'MaxFunEvals',Inf);
 
 % Get a figure going
-figure(); scale_figure([1.75 1.50]);
+kfigure(); scale_figure([1.75 1.50]);
 
 % Run the optimisation
 fminsearch(@errfun,guess,options);

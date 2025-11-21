@@ -94,7 +94,7 @@ parameters.v=zeros(parameters.npts);
 parameters.diff=0;
 
 % Draw the phantom
-figure(); dims=zeros(1,6); 
+kfigure(); dims=zeros(1,6); 
 dims([1 3 5])=-parameters.dims/2;
 dims([2 4 6])=+parameters.dims/2;
 volplot(R1_Ph,dims);
@@ -105,7 +105,7 @@ fid=imaging(spin_system,@epi_3d,parameters);
 
 % Plot k-space representation of the slice,
 % the .^(1/4) improves fringe visibility
-figure(); scale_figure([2.0 1.0]); subplot(1,2,1);
+kfigure(); scale_figure([2.0 1.0]); subplot(1,2,1);
 mri_2d_plot(fid.^(1/4),parameters,'k-space');
 ktitle('$k$-space representation');
 

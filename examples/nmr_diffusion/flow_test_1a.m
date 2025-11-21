@@ -50,7 +50,7 @@ traj=evolution(spin_system,F,[],rho,timestep,nsteps,'trajectory');
 x_axis=linspace(-parameters.dims/2,parameters.dims/2,parameters.npts);
 
 % Plotting
-figure();
+kfigure();
 for n=1:nsteps
     plot(x_axis',traj(:,n)); kgrid;
     kxlabel('sample coordinate, m'); kylabel('concentration');

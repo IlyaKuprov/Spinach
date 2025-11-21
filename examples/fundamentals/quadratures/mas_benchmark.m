@@ -112,7 +112,7 @@ for k=1:numel(np)
 end
 
 % Plotting
-figure(); grid on; plot(np',error);
+kfigure(); grid on; plot(np',error);
 set(gca,'YScale','log','XScale','log');
 set(gca,'MinorGridLineStyle','-'); 
 set(gca,'MinorGridColor',0.9*[1 1 1]);

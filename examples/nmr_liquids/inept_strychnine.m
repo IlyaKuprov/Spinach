@@ -57,7 +57,7 @@ parfor n=1:numel(subsystems)
 end
 
 %Plotting
-figure(); parameters.spins={'13C'};
+kfigure(); parameters.spins={'13C'};
 parameters.offset=parameters.offset(1);
 parameters.axis_units='ppm';
 plot_1d(spin_system,imag(spectrum),parameters);

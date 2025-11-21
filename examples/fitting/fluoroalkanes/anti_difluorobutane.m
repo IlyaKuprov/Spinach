@@ -31,7 +31,7 @@ expt_data=conv(expt_data,filter,'same')/sum(filter);
 guess=[24.08  6.49  1.44  3.59  15.73  47.76  -13.58  26.56  1.7];
 
 % Get a figure going
-figure(); scale_figure([1.0 1.5]);
+kfigure(); scale_figure([1.0 1.5]);
 
 % Set optimiser options
 options=optimset('Display','iter','MaxIter',5000,'MaxFunEvals',Inf);

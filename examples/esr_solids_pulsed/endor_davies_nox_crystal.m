@@ -65,7 +65,7 @@ fid=apodisation(spin_system,fid,{{'none'}});
 spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting
-figure(); scale_figure([1.5 1.5]); subplot(2,2,1);
+kfigure(); scale_figure([1.5 1.5]); subplot(2,2,1);
 plot_1d(spin_system,real(spectrum),parameters);
 ktitle('Single crystal ESR spectrum');
 

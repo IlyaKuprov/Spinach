@@ -15,7 +15,7 @@ options.style='harmonics'; % Plotting style
 % Load and display acetylene      (substance A)
 props_a=gparse('acetylene.out');
 [sys_a,inter_a]=g2spinach(props_a,{{'H','1H'}},31.8,options);
-figure(); scale_figure([1.0 1.0]); 
+kfigure(); scale_figure([1.0 1.0]); 
 subplot(1,2,1); cst_display(props_a,{'C'},0.005,[],options); 
                 camorbit(+45,-45); ktitle('$^{13}$C CST');
 subplot(1,2,2); cst_display(props_a,{'H'},0.05,[],options); 
@@ -24,7 +24,7 @@ subplot(1,2,2); cst_display(props_a,{'H'},0.05,[],options);
 % Load and display butadiene      (substance B)
 props_b=gparse('butadiene.out');
 [sys_b,inter_b]=g2spinach(props_b,{{'H','1H'}},31.8,options);
-figure(); scale_figure([1.5 1.0]);
+kfigure(); scale_figure([1.5 1.0]);
 subplot(1,2,1); cst_display(props_b,{'C'},0.01,[],options); 
                 camorbit(+45,-45); ktitle('$^{13}$C CST');
 subplot(1,2,2); cst_display(props_b,{'H'},0.1,[],options); 
@@ -33,7 +33,7 @@ subplot(1,2,2); cst_display(props_b,{'H'},0.1,[],options);
 % Load and display cyclohexadiene (substance C)
 props_c=gparse('cyclohexadiene.out');
 [sys_c,inter_c]=g2spinach(props_c,{{'H','1H'}},31.8,options);
-figure(); scale_figure([1.5 1.0]); 
+kfigure(); scale_figure([1.5 1.0]); 
 subplot(1,2,1); cst_display(props_c,{'C'},0.01,[],options); 
                 camorbit(+45,-45); ktitle('$^{13}$C CST');
 subplot(1,2,2); cst_display(props_c,{'H'},0.1,[],options); 
@@ -102,7 +102,7 @@ B=griddedInterpolant(time_axis,x(2,:),'makima','none');
 C=griddedInterpolant(time_axis,x(3,:),'makima','none');
 
 % Plot chemical kinetics, excluding ethanol
-figure(); plot(time_axis',real(x(1:3,:)')); xlim tight; kgrid;
+kfigure(); plot(time_axis',real(x(1:3,:)')); xlim tight; kgrid;
 kxlabel('time, seconds'); kylabel('concentration, mol/L');
 klegend({'acetylene','butadiene','cyclohexadiene'},...
         'Location','northeast'); 
@@ -153,7 +153,7 @@ end
 
 % Look at spins in reactants and product
 coil=state(spin_system,{'Lz'},{1});
-figure(); plot(time_axis,real(coil'*traj)); 
+kfigure(); plot(time_axis,real(coil'*traj)); 
 coil=state(spin_system,{'Lz'},{3});
 hold on;  plot(time_axis,real(coil'*traj)); 
 coil=state(spin_system,{'Lz'},{9});

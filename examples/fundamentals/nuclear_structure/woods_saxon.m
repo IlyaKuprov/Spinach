@@ -37,7 +37,7 @@ Z=linspace(box_extents(5),box_extents(6),box_npts(3));
 V=-V0./(1+exp((R-r_nuc)/a));
 
 % Plot the potential
-figure(); volplot(V,box_extents);
+kfigure(); volplot(V,box_extents);
 ktitle(['Woods-Saxon potential, M=' num2str(mass_number)]);
 kxlabel('X, fm'); kylabel('Y, fm'); kzlabel('Z, fm');
 
@@ -50,7 +50,7 @@ E=diag(E); disp('Energies, MeV:'); disp(E);
 
 % Plot the state
 psi=reshape(real(psi(:,level_number)),box_npts);
-figure(); volplot(psi,box_extents);
+kfigure(); volplot(psi,box_extents);
 ktitle(['Eig ' num2str(level_number) ' ,real part']); 
 kxlabel('X, fm'); kylabel('Y, fm'); kzlabel('Z, fm');
 

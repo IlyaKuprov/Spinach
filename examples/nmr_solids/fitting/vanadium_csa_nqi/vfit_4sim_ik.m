@@ -41,7 +41,7 @@ guess=[-669.0  564.0  0.255  82.0  180.0  19.0  3.72 0.62];
 options=optimset('Display','iter','MaxIter',5000,'MaxFunEvals',Inf);
 
 % Get a figure going
-figure(); scale_figure([1.75 1.50]);
+kfigure(); scale_figure([1.75 1.50]);
 
 % Run the optimisation
 fminsearch(@(x)errfun(A35,A33,A31,A29,S35,S33,S31,S29,x),guess,options);

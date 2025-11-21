@@ -74,7 +74,7 @@ for n=1:npoints
 end
 
 % Make a figure
-figure(); scale_figure([2.5 2.5]);
+kfigure(); scale_figure([2.5 2.5]);
 ksubplot(2,2,1); camproj('perspective'); view(-20,15); axis vis3d;
 ksubplot(2,2,2); camproj('perspective'); view(-20,15); axis vis3d;
 ksubplot(2,2,3); camproj('perspective'); view(-20,15); axis vis3d;

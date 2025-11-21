@@ -80,7 +80,7 @@ SWconv=1/(2*parameters.npoints*parameters.deltat)/magnet_mhz;
 ppm_axis=(-npoints2/2:npoints2/2-1)/npoints2*SWconv+parameters.offset/magnet_mhz;
 FOV=1/(parameters.deltat)*2*pi/(spin(parameters.spins{1})*parameters.Ga);
 npoints=size(squarespectrum,1); dispaxis=FOV*(-npoints/2:npoints/2-1)/npoints;
-figure(); imagesc(ppm_axis,1000*dispaxis,abs(squarespectrum));
+kfigure(); imagesc(ppm_axis,1000*dispaxis,abs(squarespectrum));
 kxlabel('chemical shift / ppm'); kylabel('FOV / mm');
 
 end 

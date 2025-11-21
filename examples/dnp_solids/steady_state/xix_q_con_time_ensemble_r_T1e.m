@@ -14,7 +14,7 @@ function xix_q_con_time_ensemble_r_T1e()
 T1e=[10e-3, 3.0e-3, 1.0e-3, 0.3e-3, 0.1e-3];
 
 % Get figure started
-figure(); hold on; kgrid;
+kfigure(); hold on; kgrid;
 kxlabel('XiX contact time ($\mu$s)');
 kylabel('$\langle I_Z \rangle _{\infty}$');
 xlim([0 6]); ylim([0 1.7e-3]);

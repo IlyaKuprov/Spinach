@@ -49,7 +49,7 @@ deer=powder(spin_system,@deer_3p_hard_deer,parameters,'deer');
 time_axis=linspace(0,parameters.stepsize*parameters.nsteps,parameters.nsteps+1);
 
 % Plotting
-figure(); plot(1e6*time_axis,imag(deer.deer_trace)); 
+kfigure(); plot(1e6*time_axis,imag(deer.deer_trace)); 
 kxlabel('time, microseconds'); axis tight; kgrid; 
 
 end

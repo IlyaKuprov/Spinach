@@ -56,7 +56,7 @@ D=mean(inter.zeeman.eigs{1})*mean(inter.zeeman.eigs{2})*D/(spin_system.tols.free
 deer_anl=0.35*deer_analyt(D,0,time_axis);
 
 % Plotting (numerical)
-figure(); subplot(1,2,1); 
+kfigure(); subplot(1,2,1); 
 plot(1e6*time_axis,imag(deer_num.deer_trace)); 
 axis([0 0.5 -0.1 0.4]); kgrid; 
 kxlabel('time, microseconds'); 

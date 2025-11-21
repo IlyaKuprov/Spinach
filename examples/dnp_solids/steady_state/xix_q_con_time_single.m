@@ -85,7 +85,7 @@ end
 
 % Plotting 
 contact_times=2*parameters.pulse_dur*loop_counts;
-figure(); plot(contact_times*1e6,real(dnp));
+kfigure(); plot(contact_times*1e6,real(dnp));
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
 kxlabel('Total contact time, $\mu$s'); 
 kgrid; xlim tight; ylim padded;

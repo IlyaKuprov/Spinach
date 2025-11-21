@@ -82,7 +82,7 @@ parameters.diff=0;
 mri=imaging(spin_system,@cpmg_dec,parameters);
 
 % Plotting
-figure(); surf(abs(mri)); set(gca,'XDir','reverse');
+kfigure(); surf(abs(mri)); set(gca,'XDir','reverse');
 kxlabel('FOV1, px'); kylabel('FOV2, px'); kgrid;
 ktitle('Bright fat effect under CPMG echo train');
 

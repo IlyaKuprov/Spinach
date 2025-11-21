@@ -39,7 +39,7 @@ end
 means=mean(timings(:,:,2:end),3);
 
 % Plotting
-figure(); hold on;
+kfigure(); hold on;
 plot(sizes',means(:,1),'ro');
 plot(sizes',means(:,2),'bo');
 xlim([100 600]); box on; kgrid;

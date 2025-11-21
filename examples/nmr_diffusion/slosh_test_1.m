@@ -23,7 +23,7 @@ psi=exp(-50*(xgrid-0.6).^2);
 P=expm(full(-1i*H*0.001));
 
 % Run the evolution
-figure();
+kfigure();
 for n=1:1000
     plot(xgrid,abs(psi)+xgrid.^2,'r-'); hold on;
     plot(xgrid,xgrid.^2,'b-'); axis([-1 1 0 1.5]);

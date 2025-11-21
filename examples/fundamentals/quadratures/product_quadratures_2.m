@@ -60,7 +60,7 @@ for k=1:numel(np)
 end
 
 % Plotting
-figure(); scale_figure([1.5 0.6]);
+kfigure(); scale_figure([1.5 0.6]);
 time_axis=linspace(0,0.5,np_ref);
 subplot(1,2,1); plot(time_axis,mu_traj);
 kgrid; xlim tight; ylim padded;

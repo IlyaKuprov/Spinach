@@ -48,7 +48,7 @@ spin_system=basis(spin_system,bas);
 M=liquid(spin_system,@rydmr_exp,parameters,'labframe');
 
 % Plot the answer
-figure(); plot(parameters.fields,M,'r-'); 
+kfigure(); plot(parameters.fields,M,'r-'); 
 kxlabel('magnetic field, Tesla'); kgrid;
 kylabel('singlet recombination yield');
 

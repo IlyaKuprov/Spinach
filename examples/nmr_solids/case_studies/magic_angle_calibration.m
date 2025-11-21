@@ -47,7 +47,7 @@ parameters.coil=state(spin_system,'L+','79Br');
 ma_errors=deg2rad([-1.00 -0.25  0.00  0.25  1.00]);
 
 % Get a figure going and compute the time axis
-figure(); scale_figure([2.5 2.5]);
+kfigure(); scale_figure([2.5 2.5]);
 time_axis=(0:1:parameters.npoints-1)/parameters.sweep;
 
 % Loop over angle errors

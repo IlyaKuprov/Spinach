@@ -56,7 +56,7 @@ echo=imaging(spin_system,@spin_echo,parameters);
 
 % Plotting
 time_axis=(0:400)*parameters.g_step_dur;
-figure(); plot(time_axis',real(echo));
+kfigure(); plot(time_axis',real(echo));
 kylabel('echo intensity, a.u.');
 kxlabel('time, seconds'); 
 axis('tight'); kgrid;

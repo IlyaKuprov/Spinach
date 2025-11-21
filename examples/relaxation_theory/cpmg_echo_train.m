@@ -47,7 +47,7 @@ fid=powder(spin_system,@cpmg,parameters,'nmr');
 
 % Plotting
 x_axis=linspace(0,parameters.timestep*size(fid,2),size(fid,2));
-figure(); plot(x_axis,real(fid)); kgrid; kxlabel('time, s');
+kfigure(); plot(x_axis,real(fid)); kgrid; kxlabel('time, s');
 kylabel('transverse magnetisation, a.u.'); xlim tight;
 
 end

@@ -38,7 +38,7 @@ diffs_rs=[diag(H0) real(E_rs)]-E_inf;
 diffs_rs=sqrt(sum(diffs_rs.^2,1))/norm(E_inf,2);
 diffs_vv=[diag(H0) real(E_vv)]-E_inf;
 diffs_vv=sqrt(sum(diffs_vv.^2,1))/norm(E_inf,2);
-figure(); hold on;
+kfigure(); hold on;
 plot(0:max_ord,diffs_rs,'-'); 
 plot(0:max_ord,diffs_vv,'--');
 set(gca,'YScale','log'); kgrid;

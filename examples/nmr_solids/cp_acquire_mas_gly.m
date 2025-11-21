@@ -73,7 +73,7 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % 1D plotting
 parameters.offset=parameters.offset(2);
-parameters.spins=parameters.spins(2); figure();
+parameters.spins=parameters.spins(2); kfigure();
 plot_1d(spin_system,real(spectrum),parameters);
 
 end

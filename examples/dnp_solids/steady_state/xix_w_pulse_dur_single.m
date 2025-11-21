@@ -69,7 +69,7 @@ parameters.el_offs=linspace(-230e6,205e6,101);
 dnp=zeros([numel(parameters.el_offs) numel(pulse_durs)],'like',1i);
 
 % Get a figure
-figure();
+kfigure();
 
 % Over pulse durations
 for m=1:numel(pulse_durs)

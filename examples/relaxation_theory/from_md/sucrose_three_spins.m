@@ -91,7 +91,7 @@ spin_system.inter.pbc={}; spin_system=dipolar(spin_system);
 R_red=relaxation(spin_system);
 
 % Plotting
-figure();
+kfigure();
 plot(diag(R_gce),diag(R_red),'ro');
 kxlabel('Redfield matrix elements, mol. dyn.');
 kylabel('Redfield matrix elements, rot. diff.');

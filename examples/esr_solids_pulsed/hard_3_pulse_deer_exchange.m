@@ -81,7 +81,7 @@ end
 time_axis=linspace(0,parameters.stepsize*parameters.nsteps,parameters.nsteps+1);
 
 % Plotting
-figure(); plot(1e6*time_axis,imag(answer)); 
+kfigure(); plot(1e6*time_axis,imag(answer)); 
 axis tight; kgrid; kxlabel('time, microseconds');
 
 end

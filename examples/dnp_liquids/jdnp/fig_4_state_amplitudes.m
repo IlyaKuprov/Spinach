@@ -97,7 +97,7 @@ answer=evolution(spin_system,H+1i*R,coils,rho_eq,parameters.t_step,...
 t_axis=linspace(0,parameters.t_step*parameters.nsteps,parameters.nsteps+1);   
                  
 % Plotting
-figure(); subplot(1,3,1); scale_figure([1.75 0.5]);
+kfigure(); subplot(1,3,1); scale_figure([1.75 0.5]);
 plot(t_axis(2:end),real(answer(1,2:end)),'b-'); hold on;
 plot(t_axis(2:end),real(answer(3,2:end)),'b-');
 plot(t_axis(2:end),real(answer(5,2:end)),'b-');

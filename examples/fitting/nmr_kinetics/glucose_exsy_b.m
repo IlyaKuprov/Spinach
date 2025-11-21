@@ -11,7 +11,7 @@
 function glucose_exsy_b()
 
 % Get a figure going
-figure(); scale_figure([1.75 1.00]);
+kfigure(); scale_figure([1.75 1.00]);
 
 % Set the initial guess
 guess=[ 0.2331    0.1114    6.8446    0.1210    0.1423    0.1205  ...

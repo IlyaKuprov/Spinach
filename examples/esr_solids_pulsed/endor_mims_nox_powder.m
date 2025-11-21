@@ -54,7 +54,7 @@ fid=apodisation(spin_system,fid-mean(fid),{{'exp',6}});
 spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting
-figure(); plot_1d(spin_system,real(spectrum),parameters);
+kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 kxlabel('Nuclear frequency, MHz');
 
 end

@@ -20,7 +20,7 @@ root_waveform=amp_root([waveform
 root_waveform=root_waveform(1,:);
 
 % Plot waveforms
-figure(); hold on;
+kfigure(); hold on;
 plot(time_axis,waveform,'LineWidth',1.5); 
 plot(time_axis,tanh_waveform,'LineWidth',1.5);
 plot(time_axis,root_waveform,'LineWidth',1.5);

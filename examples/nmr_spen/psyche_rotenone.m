@@ -107,7 +107,7 @@ spectrum_2d=fftshift(fft2(fid,parameters.zerofill(2),...
 spectrum_ps=fftshift(fft(fidps,parameters.zerofill(2)));
 
 % Plotting: full 2D version
-figure(); scale_figure([2.0 1.5]); subplot(1,2,1);
+kfigure(); scale_figure([2.0 1.5]); subplot(1,2,1);
 plot_2d(spin_system,abs(spectrum_2d),parameters,...
         20,[0.05 1.0 0.05 1.0],2,256,6,'positive');
  

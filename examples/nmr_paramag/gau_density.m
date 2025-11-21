@@ -23,7 +23,7 @@ probden=(1/sqrt((2*pi)^3*sigma^3))*exp(-(X.^2+Y.^2+Z.^2)/(2*sigma));
 [~,pcs_3d]=kpcs(probden,chi,[-ext ext -ext ext -ext ext],[0 0 0],'fft');
 
 % Plot the solution
-figure(); volplot(pcs_3d,[-ext ext -ext ext -ext ext]); 
+kfigure(); volplot(pcs_3d,[-ext ext -ext ext -ext ext]); 
 kgrid; ktitle('PCS field');
 
 end

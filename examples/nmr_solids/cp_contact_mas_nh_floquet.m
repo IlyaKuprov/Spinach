@@ -52,7 +52,7 @@ fid=floquet(spin_system,@cp_contact_hard,parameters,'nmr');
 
 % Plot the answer
 time_axis=[0 cumsum(parameters.time_steps)];
-figure(); plot(time_axis,real(fid)); kgrid;
+kfigure(); plot(time_axis,real(fid)); kgrid;
 kylabel('$S_{\rm{X}}$ expectation value on $^{15}N$');  
 kxlabel('time, seconds'); xlim tight;
 

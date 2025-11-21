@@ -5,7 +5,7 @@
 function grid_diagrams()
 
 % Plotting logistics
-figure(); scale_figure([1.5 1.3]);
+kfigure(); scale_figure([1.5 1.3]);
 tiledlayout(2,3,'TileSpacing','Compact',...
                 'Padding','Compact');
             

@@ -100,7 +100,7 @@ parfor nk=1:numel(rf_powers)*numel(spin_rates)
 end
 
 % Plot as image
-figure();
+kfigure();
 imagesc([min(rf_powers) max(rf_powers)],...
         [min(spin_rates) max(spin_rates)],intensities);
 kxlabel('1H RF power, Hz'); set(gca,'YDir','normal');

@@ -84,7 +84,7 @@ Hz=real(Hz'*traj); Hx=real(Hx'*traj);
 Nz=real(Nz'*traj); Nx=real(Nx'*traj); 
 
 % Plotting
-figure(); scale_figure([1.0 1.5]);
+kfigure(); scale_figure([1.0 1.5]);
 subplot(2,1,1); plot([Hz' Hx']); 
 klegend({'H$_{\rm{Z}}$','H$_{\rm{X}}$'}); xlim tight; kgrid;
 kylabel('expectation value'); kxlabel('time, ms');

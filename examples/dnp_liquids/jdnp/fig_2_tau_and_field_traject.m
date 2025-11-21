@@ -27,7 +27,7 @@ field_grid=[0.5 3.4 7.0 11.7 14.1 23.5];
 tau_c=[300e-12 400e-12 500e-12 600e-12];
 
 % Get a figure going
-figure(); scale_figure([1.75 1.0]);
+kfigure(); scale_figure([1.75 1.0]);
 
 % Loop over the field grid
 for n=1:numel(field_grid)

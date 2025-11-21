@@ -116,7 +116,7 @@ dnp_noflip=sum(dnp_noflip.*reshape(wb1,[1 numel(wb1)]),2)/sum(wb1);
 dnp_flip=sum(dnp_flip.*reshape(wb1,[1 numel(wb1)]),2)/sum(wb1);
 
 % Plotting 
-figure(); plot(rep_time*1e3,real(dnp_noflip));
+kfigure(); plot(rep_time*1e3,real(dnp_noflip));
 hold on; plot(rep_time*1e3,real(dnp_flip));
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');
 klegend({'without flipback','with flipback'});

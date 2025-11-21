@@ -81,7 +81,7 @@ spectrum_b=fftshift(fft(fid_b,parameters.zerofill));
 spectrum_c=fftshift(fft(fid_c,parameters.zerofill));
 
 % Plotting
-figure(); hold on;
+kfigure(); hold on;
 plot_1d(spin_system,real(spectrum_a),parameters,'r-'); 
 plot_1d(spin_system,real(spectrum_b),parameters,'b-');
 plot_1d(spin_system,real(spectrum_c),parameters,'k-');

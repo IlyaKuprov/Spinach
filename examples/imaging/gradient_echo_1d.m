@@ -57,7 +57,7 @@ echo=imaging(spin_system,@grad_echo,parameters);
 % Plotting
 grad_duration=parameters.g_step_dur*parameters.g_n_steps;
 time_axis=linspace(-grad_duration,grad_duration,401);
-figure(); plot(time_axis,real(echo)); axis('tight'); kgrid;
+kfigure(); plot(time_axis,real(echo)); axis('tight'); kgrid;
 kxlabel('time, seconds'); kylabel('intensity, a.u.');
  
 end

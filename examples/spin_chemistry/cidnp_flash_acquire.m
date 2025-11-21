@@ -85,7 +85,7 @@ traj=[traj_a traj_b(:,2:end)];
 x_axis=linspace(0,5.5,551);
 
 % Do the plotting
-figure(); scale_figure([1.5 1.0]);
+kfigure(); scale_figure([1.5 1.0]);
 subplot(1,3,1); plot(x_axis,Fz'*traj); kgrid;
 ktitle('$F_{\mathrm{Z}}$'); kxlabel('time, s'); 
 axis tight; ylim([0 15]);

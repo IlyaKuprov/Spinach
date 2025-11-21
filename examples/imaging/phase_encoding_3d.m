@@ -96,7 +96,7 @@ parameters.t_echo=20e-3;
 parameters.grad_angles=[pi/3 pi/4 pi/5];
 
 % Draw phantom at high contrast
-figure(); dims=zeros(1,6); 
+kfigure(); dims=zeros(1,6); 
 dims([1 3 5])=-parameters.dims/2;
 dims([2,4,6])=+parameters.dims/2;
 volplot(R1_Ph,dims);
@@ -106,7 +106,7 @@ ktitle('$R_1$ map in 3D'); drawnow();
 fid=imaging(spin_system,@phase_enc_3d,parameters);
 
 % Plot k-space representation of the slice
-figure(); scale_figure([2.0 1.0]); subplot(1,2,1);
+kfigure(); scale_figure([2.0 1.0]); subplot(1,2,1);
 mri_2d_plot(fid.^(1/4),parameters,'k-space');
 ktitle('$k$-space representation');
 

@@ -52,7 +52,7 @@ fid=apodisation(spin_system,fid,{{'cos'},{'cos'},{'cos'}});
 spectrum=fftshift(fftn(fid,parameters.zerofill));
 
 % Plotting
-figure(); plot_3d(spin_system,abs(spectrum),parameters,...
+kfigure(); plot_3d(spin_system,abs(spectrum),parameters,...
                   10,[0.1 0.5 0.1 0.5],2,'positive');
 
 end

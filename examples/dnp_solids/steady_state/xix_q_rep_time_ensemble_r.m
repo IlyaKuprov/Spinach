@@ -96,7 +96,7 @@ end
 dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
 
 % Plotting 
-figure(); plot(rep_time*1e3,real(dnp));
+kfigure(); plot(rep_time*1e3,real(dnp));
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
 kxlabel('Repetition time, ms'); 
 kgrid; xlim([0 2]); ylim padded;

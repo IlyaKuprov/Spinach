@@ -66,7 +66,7 @@ spectrum=singlerot(spin_system,@overtone_pa,parameters,'qnmr');
 spectrum=exp(1i*1.75)*spectrum;
 
 % Plotting
-figure(); plot_1d(spin_system,real(spectrum),parameters);
+kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
 

@@ -36,7 +36,7 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Show a spy plot of R
-figure(); spy(relaxation(spin_system));
+figure((); spy(relaxation(spin_system));
 
 end
 

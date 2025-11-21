@@ -24,7 +24,7 @@ wave_spf=spf(wave,    0.9*exp(-1i*0.05));
 wave_spf=spf(wave_spf,0.9*exp(-1i*0.05));
 
 % Original vs second-order low-pass filter
-figure(); scale_figure([1 1.6]);
+kfigure(); scale_figure([1 1.6]);
 subplot(3,1,1); hold on; box on;
 plot(1e6*time_grid,wave(1,:),'r-','LineWidth',1);
 plot(1e6*time_grid,wave(2,:),'b-','LineWidth',1);

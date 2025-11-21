@@ -39,7 +39,7 @@ H=hamiltonian(spin_system);
 S=horzcat(spin_system.bas.irrep.projector);
 
 % Plotting
-figure(); scale_figure([1.5 1]);
+kfigure(); scale_figure([1.5 1]);
 subplot(1,2,1); spy(abs(H)>1e3); 
 ktitle('Original Hamiltonian');
 subplot(1,2,2); spy(abs(S'*H*S)>1e3); 

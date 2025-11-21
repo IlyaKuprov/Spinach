@@ -65,7 +65,7 @@ tau_c=1e-6*[0.10 1.00 10.0 100.0 1000.0];
 max_rank=[2 3 5 7 13];
 
 % Get figure going
-figure(); hold on; 
+kfigure(); hold on; 
 
 % Loop over tau_c
 for m=1:numel(tau_c)

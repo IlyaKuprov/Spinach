@@ -102,7 +102,7 @@ expt_data=[0.34, -0.84;
            9.40, -0.16];
 
 % Plotting
-figure(); hold on;
+kfigure(); hold on;
 plot(b_vector,sigma_over_R1,'b-'); 
 plot(expt_data(:,1),expt_data(:,2),'ro');
 set(gca,'XScale','log'); box on;

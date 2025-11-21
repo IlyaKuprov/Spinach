@@ -54,7 +54,7 @@ parameters.derivative=1;
 spectrum_sle=gridfree(spin_system,@slowpass,parameters,'esr');
 
 % SLE plotting
-figure(); plot_1d(spin_system,real(spectrum_sle),parameters);
+kfigure(); plot_1d(spin_system,real(spectrum_sle),parameters);
 
 end
 

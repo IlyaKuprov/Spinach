@@ -15,7 +15,7 @@ load('tm_1igv_pcs.mat','expt_pcs','x','y','z');
 [mxyz,chi,~,pred_pcs]=ilpcs([x y z],expt_pcs,[0 1 2],[-5 5 -15]);
 
 % Plot experimental vs predicted PCS
-figure(); plot(expt_pcs,pred_pcs,'bo'); hold on; kgrid;
+kfigure(); plot(expt_pcs,pred_pcs,'bo'); hold on; kgrid;
 plot([min(expt_pcs) max(expt_pcs)],[min(expt_pcs) max(expt_pcs)],'r-');
 kxlabel('Experimental PCS, ppm'); kylabel('Predicted PCS, ppm');
 xlim([min([expt_pcs; pred_pcs]) max([expt_pcs; pred_pcs])]);

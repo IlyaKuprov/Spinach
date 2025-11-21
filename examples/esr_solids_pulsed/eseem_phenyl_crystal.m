@@ -39,7 +39,7 @@ parameters.zerofill=4096;
 fid=crystal(spin_system,@eseem,parameters,'esr');
 
 % Plot the time domain signal
-figure(); subplot(2,1,1);
+kfigure(); subplot(2,1,1);
 plot((0:(parameters.npoints-1))*parameters.timestep*1e6,real(fid));
 kxlabel('time, $\mu$s'); axis tight; kgrid;
 

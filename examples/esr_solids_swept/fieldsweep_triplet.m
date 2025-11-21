@@ -55,7 +55,7 @@ parameters.rho0=@(B,alp,bet,gam)zftrip(spin_system,euler2dcm(alp,bet,gam)*...
 [b_axis,spec]=fieldsweep(spin_system,parameters);
 
 % Plotting
-figure(); plot(b_axis',spec');
+kfigure(); plot(b_axis',spec');
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.'); kgrid;
 xlim tight; drawnow;

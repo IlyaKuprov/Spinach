@@ -241,7 +241,7 @@ spec_ax=axis_1d(spin_system,parameters);
 time_ax=chem_time_grid(1:25:chem_nsteps);
 
 % Waterfall plot
-[time_ax,spec_ax]=meshgrid(time_ax,spec_ax); figure();
+[time_ax,spec_ax]=meshgrid(time_ax,spec_ax); kfigure();
 waterfall(time_ax',spec_ax',real(specs),'EdgeColor','k');
 kylabel('chemical shift, ppm'); box on;
 kxlabel('time, seconds'); kgrid; 

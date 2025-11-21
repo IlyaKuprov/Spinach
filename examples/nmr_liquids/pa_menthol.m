@@ -50,7 +50,7 @@ fid=apodisation(spin_system,fid,{{'bad-z2',40}},0);
 spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting
-figure(); plot_1d(spin_system,real(spectrum),parameters);
+kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
 

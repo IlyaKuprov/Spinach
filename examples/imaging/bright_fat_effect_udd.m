@@ -81,7 +81,7 @@ parameters.diff=0;
 mri=imaging(spin_system,@udd_dec,parameters);
 
 % Plotting
-figure(); surf(abs(mri)); set(gca,'XDir','reverse');
+kfigure(); surf(abs(mri)); set(gca,'XDir','reverse');
 kxlabel('FOV1, px'); kylabel('FOV2, px'); kgrid;
 ktitle('Bright fat effect under UDD echo train');
 

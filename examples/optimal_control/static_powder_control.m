@@ -111,7 +111,7 @@ parfor n=1:numel(control.drifts)
 end
 
 % Plot the echo
-figure(); subplot(1,2,1);
+kfigure(); subplot(1,2,1);
 time_axis=linspace(0,250,500)';
 plot(time_axis,real(fid_optim)); 
 kxlabel('time after pulse, $\mu$s');

@@ -75,7 +75,7 @@ prob_pulse_spec=imag(fftshift(fft(deer.pump_pulse_fid,4*parameters.spectrum_nste
 freq_axis_hz=ft_axis(0,parameters.spectrum_sweep,4*parameters.spectrum_nsteps);
 
 % Plotting
-figure(); scale_figure([1.0 2.0]);
+kfigure(); scale_figure([1.0 2.0]);
 time_axis=(0:parameters.nsteps)*parameters.stepsize;
 subplot(4,1,1); plot(freq_axis_hz,hard_pulse_spec);
 kxlabel('Offset frequency, Hz'); xlim tight; kgrid; 

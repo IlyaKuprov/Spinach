@@ -12,7 +12,7 @@ function cst_peptide_bond()
 props=gparse('..\standard_systems\amino_acids\ala.log');
 
 % Do the visualisation
-figure(); scale_figure([2.0 1.0]);
+kfigure(); scale_figure([2.0 1.0]);
 
 subplot(1,3,1); options.style='harmonics';
 cst_display(props,{'C'},0.01,[],options);

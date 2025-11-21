@@ -51,7 +51,7 @@ rho=step(spin_system,Lx,rho,pi);
 answer=evolution(spin_system,H+1i*R,coil,rho,1e-3,1000,'observable');
 
 % Plotting
-figure(); x_axis=linspace(0,1,1001); 
+kfigure(); x_axis=linspace(0,1,1001); 
 plot(x_axis,real(answer)); 
 kylabel('$S_{\rm{Z}}$ expectation value'); 
 kxlabel('time, seconds'); 

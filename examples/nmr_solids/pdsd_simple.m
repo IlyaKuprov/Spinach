@@ -64,7 +64,7 @@ spectrum=fftshift(fft(f1_states,parameters.zerofill(1),2),2);
 spectrum=real(spectrum);
 
 % Plotting
-figure(); scale_figure([1.5 2.0]);
+kfigure(); scale_figure([1.5 2.0]);
 parameters.spins={'13C'};
 parameters.offset=parameters.offset(2);
 plot_2d(spin_system,spectrum,parameters,...

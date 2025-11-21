@@ -134,7 +134,7 @@ for k=1:numel(grid_sizes)
 end
     
 % Generate convergence plot A
-figure(); scale_figure([2.0 1.5]);
+kfigure(); scale_figure([2.0 1.5]);
 subplot(2,1,1); plot(grid_sizes',D); 
 kgrid; ylim([0 20]); xlim([1000 10000]);
 true_val=refline([0 18]);
@@ -151,7 +151,7 @@ klegend({'3-point finite difference','5-point finite difference',...
          '7-point finite difference'},'Location','NorthWest');
 
 % Generate convergence plot B
-figure(); scale_figure([2.0 1.5]);
+kfigure(); scale_figure([2.0 1.5]);
 grids_to_plot=3:10;
 for s=1:numel(stencil_sizes)
     subplot(2,3,s); hold on;

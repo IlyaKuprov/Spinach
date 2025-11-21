@@ -79,7 +79,7 @@ for n=1:numel(B0) %#ok<*AGROW>
 end
                          
 % Plotting
-figure();
+kfigure();
 plot(lin_freq',[seleft' r2se' seright']); 
 kxlabel('Proton Larmor frequency, MHz'); kgrid;
 kylabel('Relaxation matrix element, Hz');
@@ -88,7 +88,7 @@ klegend({'${\hat Se_ + } - 2{\hat Se_ + }{\hat C_{\rm{Z}}}$',...
          '${\hat Se_ + } + 2{\hat Se_ + }{\hat C_{\rm{Z}}}$'},...
          'Location','northwest','FontSize',12);
     
-figure();
+kfigure();
 plot(lin_freq',[cleft' r2c' cright']); 
 kxlabel('Proton Larmor frequency, MHz'); kgrid;
 kylabel('Relaxation matrix element, Hz');

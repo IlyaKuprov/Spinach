@@ -82,7 +82,7 @@ parfor n=1:numel(subsystems)
 end
 
 % Plotting
-figure(); plot_1d(spin_system,real(spectrum),parameters);
+kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
 

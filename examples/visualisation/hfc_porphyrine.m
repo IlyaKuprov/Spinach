@@ -10,7 +10,7 @@ function hfc_porphyrine()
 props=oparse('porphyrine.out');
 
 % Do the visualisation
-figure(); subplot(1,2,1);
+kfigure(); subplot(1,2,1);
 options.style='ellipsoids';
 hfc_display(props,{'H'},2.0,[],options);
 set(gca,'CameraPosition',[40 40 40]);

@@ -97,7 +97,7 @@ fid=apodisation(spin_system,fid,{{'gauss',10}});
 spectrum_new=fftshift(fft(fid,parameters.zerofill));
 
 % Plot the spectrum before and after optimisation
-figure(); scale_figure([2.0 0.75]);
+kfigure(); scale_figure([2.0 0.75]);
 subplot(1,2,1); plot_1d(spin_system,real(spectrum_old),parameters);
 ktitle('composite inversion, initial guess');
 subplot(1,2,2); plot_1d(spin_system,real(spectrum_new),parameters);

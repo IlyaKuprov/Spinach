@@ -197,7 +197,7 @@ f1_states=f1_cos-1i*f1_sin;
 spectrum=fftshift(fft(f1_states,parameters.zerofill(1),2),2);
 
 % Plotting
-figure(); scale_figure([1.5 2.0]);
+kfigure(); scale_figure([1.5 2.0]);
 plot_2d(spin_system,-real(spectrum),parameters,...
         20,[0.0005 0.01 0.025 0.25],2,256,6,'both');
 

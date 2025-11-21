@@ -50,7 +50,7 @@ fid=apodisation(spin_system,fid,{{'exp',5}});
 spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting
-figure(); parameters.spins={'13C'};
+kfigure(); parameters.spins={'13C'};
 plot_1d(spin_system,real(spectrum),parameters);
 
 end

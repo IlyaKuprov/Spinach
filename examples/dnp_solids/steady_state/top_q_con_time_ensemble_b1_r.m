@@ -146,7 +146,7 @@ dnp_b=sum(dnp_b.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r
 
 % Plotting 
 contact_times=(parameters.pulse_dur+parameters.delay_dur)*loop_counts;
-figure(); plot(contact_times*1e6,real(dnp_a));
+kfigure(); plot(contact_times*1e6,real(dnp_a));
 hold on; plot(contact_times*1e6,real(dnp_b));
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');
 klegend({'TOP, 18 MHz','TOP, 33 MHz'});

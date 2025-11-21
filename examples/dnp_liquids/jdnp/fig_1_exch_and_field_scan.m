@@ -26,7 +26,7 @@ exch_grid=linspace(-100e9,100e9,256); % Hz
 dnp=zeros([numel(field_grid) numel(exch_grid)]);
 
 % Create and scale the figure
-current_fig=figure(); scale_figure([1.0 0.65]);
+current_fig=kfigure(); scale_figure([1.0 0.65]);
 
 % Loop over the fields
 for n=1:numel(field_grid)

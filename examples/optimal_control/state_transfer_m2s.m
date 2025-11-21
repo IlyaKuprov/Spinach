@@ -108,7 +108,7 @@ fid=apodisation(spin_system,fid,{{'exp',6}});
 spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting
-figure(); scale_figure([2.5 0.75]);
+kfigure(); scale_figure([2.5 0.75]);
 subplot(1,2,1); plot_1d(spin_system,real(spectrum),parameters);
 xlim tight; ylim([-40 40]);
 

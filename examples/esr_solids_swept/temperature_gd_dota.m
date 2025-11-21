@@ -24,7 +24,7 @@ bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Get figure going
-figure(); hold on; n=1;
+kfigure(); hold on; n=1;
 scale_figure([2.0 1.5]);
 
 % Loop over temperatures

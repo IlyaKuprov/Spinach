@@ -55,7 +55,7 @@ answer=evolution(spin_system,H,[coil_x1 coil_y1 coil_z1 ...
                  rho,1e-4,100,'multichannel');
 
 % Bloch sphere plot
-[X,Y,Z]=sphere; figure();
+[X,Y,Z]=sphere; kfigure();
 surf(X,Y,Z,'FaceAlpha',0.5,'EdgeAlpha',0.1);
 answer=real(answer)'; hold on; colormap bone;
 plot3(answer(:,1),answer(:,2),answer(:,3),'b-');

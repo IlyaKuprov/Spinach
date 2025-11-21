@@ -12,7 +12,7 @@ function cst_strychnine()
 props=gparse('strychnine.log');
 
 % Do the visualisation
-figure(); subplot(1,2,1);
+kfigure(); subplot(1,2,1);
 options.style='ellipsoids';
 cst_display(props,{'C'},0.005,[],options);
 set(gca,'CameraPosition',[40 40 40]);

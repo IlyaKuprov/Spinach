@@ -110,7 +110,7 @@ B0=[0.01 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 ...
     0.9 1.0 1.1 1.2 1.3 1.4 1.5 2 3 4 5 6];
 
 % Preallocate the answer
-Mz=nan(size(B0)); figure();
+Mz=nan(size(B0)); kfigure();
 
 % Scan magnetic field
 for n=1:numel(B0)

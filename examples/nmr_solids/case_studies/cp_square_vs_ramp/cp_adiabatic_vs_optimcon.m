@@ -48,7 +48,7 @@ parameters.irr_powers=irr_powers_a;
 fid_a=powder(spin_system,@cp_contact_hard,parameters,'nmr');
 
 % Plotting - waveform
-figure(); scale_figure([1.5 1.5]);
+kfigure(); scale_figure([1.5 1.5]);
 time_axis=[0 cumsum(parameters.time_steps)];
 subplot(2,2,1); plot(time_axis(2:end),irr_powers_a);
 xlim tight; kgrid; kxlabel('time, seconds');

@@ -62,7 +62,7 @@ traj=evolution(spin_system,L,[A/2 4*B C],rho,2e-3,1000,'multichannel');
 
 % Plotting
 time_axis=linspace(0,2,1001);
-figure(); plot(time_axis,real(traj));
+kfigure(); plot(time_axis,real(traj));
 kxlabel('time, seconds'); kgrid;
 kylabel('observable'); xlim tight; 
 klegend({'$\bf{L}_{+}\bf{S}_{-}+\bf{L}_{-}\bf{S}_{+}$',...

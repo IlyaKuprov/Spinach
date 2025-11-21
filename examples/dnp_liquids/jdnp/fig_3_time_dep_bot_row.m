@@ -25,7 +25,7 @@ parameters.nsteps=300;
 field_grid=[0.034 0.34 3.4];
 
 % Get a figure going
-figure(); scale_figure([1.75 0.5]);
+kfigure(); scale_figure([1.75 0.5]);
 
 % Loop over the fields
 for n=1:numel(field_grid)

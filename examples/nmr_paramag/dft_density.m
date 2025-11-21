@@ -52,19 +52,19 @@ for n=1:(props.natoms-1) %#ok<*AGROW>
 end
 
 % Plot DFT against distributed
-figure(); plot(pcs_hfc,pcs_distr,'ro');
+kfigure(); plot(pcs_hfc,pcs_distr,'ro');
 hold on; plot([-5 5],[-5 5],'b-'); kgrid;
 kxlabel('PCS from HFC tensors, ppm'); 
 kylabel('PCS from Kuprov eqn, ppm');
 
 % Plot point against distributed
-figure(); plot(pcs_point,pcs_distr,'ro');
+kfigure(); plot(pcs_point,pcs_distr,'ro');
 hold on; plot([-5 5],[-5 5],'b-'); kgrid;
 kxlabel('PCS from point model, ppm'); 
 kylabel('PCS from Kuprov eqn, ppm');
 
 % Plot the distributed solution
-figure(); pcs_3d=sqrt(abs(pcs_3d)).*sign(pcs_3d);
+kfigure(); pcs_3d=sqrt(abs(pcs_3d)).*sign(pcs_3d);
 volplot(pcs_3d,ext); hold on; molplot(xyz,[]); 
 kgrid; ktitle('PCS field');
 

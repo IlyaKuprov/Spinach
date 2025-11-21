@@ -35,7 +35,7 @@ spectrum=fftshift(fft(fid,parameters.zerofill(1),2),2);
 spectrum=flip(flip(spectrum,1),2);
 spin_system.sys.disable={'colorbar'}; 
 spin_system.sys.output=1; 
-figure(); scale_figure([1.5 2.0]);
+kfigure(); scale_figure([1.5 2.0]);
 plot_2d(spin_system,-imag(spectrum),parameters,...
         20,[0.1 0.5 0.1 0.5],2,256,6,'positive');
 

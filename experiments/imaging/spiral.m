@@ -60,7 +60,7 @@ spiral_x=time_grid*(parameters.grad_amp/parameters.spiral_dur).*cos(parameters.s
 spiral_y=time_grid*(parameters.grad_amp/parameters.spiral_dur).*sin(parameters.spiral_frq*time_grid);
 
 % Report the sampling spiral to the user
-figure(); plot(spiral_x,spiral_y,'b-'); ktitle('$k$-space sampling spiral');
+kfigure(); plot(spiral_x,spiral_y,'b-'); ktitle('$k$-space sampling spiral');
 kxlabel('X gradient amplitude, T/m'); kylabel('Y gradient amplitude, T/m'); 
 kgrid; axis equal; drawnow();
 

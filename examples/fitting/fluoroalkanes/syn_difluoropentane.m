@@ -29,7 +29,7 @@ guess=[ 6.2780   23.5067    5.1361    7.0537   24.9899   16.9264...
 options=optimset('Display','iter','MaxIter',5000,'MaxFunEvals',Inf);
 
 % Get the figure going
-figure(); scale_figure([2.00 1.75]);
+kfigure(); scale_figure([2.00 1.75]);
 
 % Run the optimisation
 answer=fminsearch(@(x)errfun(axis_expt_f, spec_expt_f,...

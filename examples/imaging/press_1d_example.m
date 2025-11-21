@@ -79,7 +79,7 @@ parameters.coil_ph={ones(parameters.npts,1)};
 parameters.coil_st={state(spin_system,'L+','all')};
 
 % Show the phantom
-figure(); scale_figure([1.50 0.75]); 
+kfigure(); scale_figure([1.50 0.75]); 
 subplot(1,3,1); 
 plot(parameters.rho0_ph{1}+...
      parameters.rho0_ph{2}+...

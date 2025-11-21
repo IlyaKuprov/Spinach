@@ -53,7 +53,7 @@ contact_curve=powder(spin_system,@beamdnp,parameters,'esr');
 
 % Plotting
 time_axis=linspace(0,sum(parameters.pulse_dur)*parameters.nloops,parameters.nloops+1);
-figure(); plot(time_axis,real(contact_curve)); kxlabel('contact time, seconds');
+kfigure(); plot(time_axis,real(contact_curve)); kxlabel('contact time, seconds');
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H'); xlim tight; kgrid;
 
 end

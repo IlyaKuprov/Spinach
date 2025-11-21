@@ -51,7 +51,7 @@ fid=apodisation(spin_system,fid-mean(fid),{{'kaiser',20}});
 spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting
-figure(); plot_1d(spin_system,-abs(spectrum),parameters);
+kfigure(); plot_1d(spin_system,-abs(spectrum),parameters);
 
 end
 

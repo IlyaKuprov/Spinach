@@ -99,7 +99,7 @@ dnp=sum(dnp.*reshape(wb1,[1 1 numel(wb1)]),3)/sum(wb1);
 dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
 
 % Plotting 
-figure(); plot(parameters.el_offs/1e6,real(dnp)); 
+kfigure(); plot(parameters.el_offs/1e6,real(dnp)); 
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
 kxlabel('Microwave resonance offset, MHz'); 
 kgrid; xlim tight; ylim padded;

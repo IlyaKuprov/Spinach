@@ -62,7 +62,7 @@ spin_system.sys.output='hush';
 [X,Y]=meshgrid(offsets/1e6,nutfrqs/1e6);
 
 % Get the figure going
-figure(); dnp_surf=zeros(numel(nutfrqs),numel(offsets));
+kfigure(); dnp_surf=zeros(numel(nutfrqs),numel(offsets));
 
 % Loop over offsets
 for m=1:numel(offsets)

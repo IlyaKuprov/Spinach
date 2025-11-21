@@ -64,7 +64,7 @@ L=hamiltonian(assume(spin_system,'nmr'))+...
 Ly=operator(spin_system,'Ly','1H');
 
 % Get figure going
-figure(); scale_figure([2.5 1.8]);
+kfigure(); scale_figure([2.5 1.8]);
 
 % Set up loop
 for n=1:numel(mixing_time)

@@ -59,7 +59,7 @@ parameters.grid='rep_2ang_400pts_sph';
 answer=powder(spin_system,@endor_mims_ideal,parameters,'esr');
 
 % Plotting
-figure(); plot(1e-6*parameters.n_frq,abs(answer)); 
+kfigure(); plot(1e-6*parameters.n_frq,abs(answer)); 
 kgrid; kylabel('abs. intensity, a.u.'); xlim tight;
 kxlabel('Lab frame nuclear frequency, MHz');
 

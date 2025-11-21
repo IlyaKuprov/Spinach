@@ -25,7 +25,7 @@ spin_system=bootstrap();
 spin_system.mesh=mesh;
 
 % Draw the mesh
-figure(); mesh_plot(spin_system,2,0); 
+kfigure(); mesh_plot(spin_system,2,0); 
 xlim([286.88  287.42]); ylim([578.07  578.50]);
 klegend({'triangles','rectangles',...
          'tessellation','velocities'},'Location','NorthEast');

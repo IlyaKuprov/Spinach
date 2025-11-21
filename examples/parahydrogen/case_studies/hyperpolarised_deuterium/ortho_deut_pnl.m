@@ -71,7 +71,7 @@ fid=apodisation(spin_system,fid,{{'exp',6}});
 spec=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting
-figure(); plot_1d(spin_system,real(spec),parameters);
+kfigure(); plot_1d(spin_system,real(spec),parameters);
 xlim([4.4 4.7]); ylim padded; kylabel('intensity');
 kxlabel('$^2$H chemical shift / ppm'); kgrid;
 

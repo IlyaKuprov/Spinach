@@ -44,7 +44,7 @@ inp_real=amp_part.*cos(phi_part);
 inp_imag=amp_part.*sin(phi_part);
 
 % Plot input signal components
-figure(); scale_figure([1.75 1.2]);
+kfigure(); scale_figure([1.75 1.2]);
 subplot(2,2,1); plot(1e6*time_grid,inp_signal);
 kxlabel('time, $\mu$s'); kylabel('voltage, a.u.');
 ktitle('input, wall clock'); 

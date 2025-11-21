@@ -53,7 +53,7 @@ L=hamiltonian(spin_system)+1i*relaxation(spin_system);
 traj=evolution(spin_system,L,[],rho,1e-3,1000,'trajectory');
 
 % Trajectory analysis
-figure(); trajan(spin_system,traj,'correlation_order'); 
+kfigure(); trajan(spin_system,traj,'correlation_order'); 
 axis([0 1000 1e-7 10]); set(gca,'YScale','log');
 
 end

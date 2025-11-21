@@ -61,7 +61,7 @@ tau_max=[0.0333 0.0710 0.5000];
 parameters.mqorder=+3;
 
 % Get a figure going
-figure(); scale_figure([2.5 1.5]);
+kfigure(); scale_figure([2.5 1.5]);
 
 % Loop over tau delays
 for n=1:numel(tau_max)

@@ -67,7 +67,7 @@ fid=apodisation(spin_system,fid,{{'exp',6}});
 spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting
-figure(); hold on;
+kfigure(); hold on;
 plot_1d(spin_system,real(spectrum),parameters);
 
 % Quadrupolar interaction measured by O'Dell PCCP 2009

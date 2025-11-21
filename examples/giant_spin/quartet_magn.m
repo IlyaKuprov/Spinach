@@ -43,7 +43,7 @@ parameters.nstates=4;
 [fields,z_magn]=fieldscan_magn(spin_system,parameters);
 
 % Plot the results
-figure(); plot(fields,z_magn); kgrid;
+kfigure(); plot(fields,z_magn); kgrid;
 kxlabel('Magnetic field, Tesla');
 kylabel('Sample magnetisation');
 

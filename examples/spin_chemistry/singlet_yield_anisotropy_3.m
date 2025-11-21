@@ -64,7 +64,7 @@ spin_system=basis(spin_system,bas);
 [yields,grid]=powder(spin_system,@rydmr,parameters,'labframe');
 
 % Do the plotting
-figure(); plot(grid.betas,cell2mat(yields));
+kfigure(); plot(grid.betas,cell2mat(yields));
 kxlabel('beta spherical angle, radians');
 kylabel('singlet yield'); kgrid; axis tight;
 

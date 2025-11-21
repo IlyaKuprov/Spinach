@@ -73,7 +73,7 @@ fid=apodisation(spin_system,fid,{{'none'}});
 spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting
-figure(); plot_1d(spin_system,real(spectrum),parameters);
+figuree(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
 

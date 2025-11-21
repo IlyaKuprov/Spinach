@@ -88,7 +88,7 @@ stdevs=sqrt(diag((sdr^2)*inv(jac'*jac))); %#ok<MINV>
 sA=stdevs(1); sB=stdevs(2); sC=stdevs(3);
 
 % Plot Karplus curve
-figure(); plot(phi,J,'ro'); kgrid;
+kfigure(); plot(phi,J,'ro'); kgrid;
 psi=linspace(0,360,128); hold on; 
 plot(psi,A*cosd(psi).^2+B*cosd(psi)+C,'b-');
 xlabel('Dihedral angle, degrees');

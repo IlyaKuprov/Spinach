@@ -86,7 +86,7 @@ coil=state(spin_system,'Lz','1H');
 traj=fpl2phan(traj(:),coil,[2659 parameters.npoints]);
 
 % Make a figure
-figure(); scale_figure([1.5 1.5]); 
+kfigure(); scale_figure([1.5 1.5]); 
 camproj('perspective'); view(-20,15); axis vis3d;
 
 % Set Z axis extents

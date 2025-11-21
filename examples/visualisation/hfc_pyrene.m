@@ -9,7 +9,7 @@ function hfc_pyrene()
 props=gparse('pyrene_cation.log');
 
 % Do the visualization
-figure(); 
+kfigure(); 
 subplot(1,2,1);
 options.style='ellipsoids';
 hfc_display(props,{'C'},0.2,[],options);

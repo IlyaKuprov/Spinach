@@ -39,7 +39,7 @@ spin_system=basis(spin_system,bas);
 M=liquid(spin_system,@rydmr_exp,parameters,'labframe');
 
 % Plotting
-figure(); plot(linspace(0,0.5,200),M); kgrid;
+kfigure(); plot(linspace(0,0.5,200),M); kgrid;
 kylabel('singlet recombination yield');
 kxlabel('$\omega/a$'); axis([0 0.5 0.46 0.58]);
 

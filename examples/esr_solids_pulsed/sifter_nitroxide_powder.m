@@ -60,7 +60,7 @@ time_axis=parameters.timestep*linspace(-parameters.npoints/2,...
 time_axis=1e9*time_axis;
 
 % Plotting
-figure(); scale_figure([1.50 0.75]);
+kfigure(); scale_figure([1.50 0.75]);
 subplot(1,2,1); imagesc(time_axis,time_axis,fid);
 axis equal; axis tight; kxlabel('time, ns');
 kylabel('time, ns'); ktitle('2D SIFTER');

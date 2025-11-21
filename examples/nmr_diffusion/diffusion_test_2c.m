@@ -53,7 +53,7 @@ timestep=5e-4; nsteps=200;
 traj=evolution(spin_system,F,[],R1(:),timestep,nsteps,'trajectory');
 
 % Plotting
-figure();
+kfigure();
 for n=1:nsteps
     imagesc(reshape(traj(:,n),108,90));
     drawnow; pause(0.025);

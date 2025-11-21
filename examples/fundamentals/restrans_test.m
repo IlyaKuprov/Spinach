@@ -12,7 +12,7 @@ pulse_in(1:3,:)=0;
 pulse_in((end-2):end,:)=0;
 
 % Get a figure going
-figure(); scale_figure([2.0 1.0]);
+kfigure(); scale_figure([2.0 1.0]);
 
 % RLC response simulation, 1H @ 14.1 Tesla
 subplot(1,2,1);

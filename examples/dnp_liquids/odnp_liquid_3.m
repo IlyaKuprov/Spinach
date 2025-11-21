@@ -86,7 +86,7 @@ parfor n=1:numel(field_grid)
 end
 
 % Plotting
-figure(); imagesc(field_grid,(parameters.mw_frq/(2*pi*1e6)),real(answer)); 
+kfigure(); imagesc(field_grid,(parameters.mw_frq/(2*pi*1e6)),real(answer)); 
 xlim([min(field_grid) max(field_grid)]); kxlabel('$B_0$, Tesla');
 kylabel('MW freq offset from $g_{iso}$, MHz');
 kcolourbar('$\langle H_{\rm{Z}} \rangle$ at the steady state');  

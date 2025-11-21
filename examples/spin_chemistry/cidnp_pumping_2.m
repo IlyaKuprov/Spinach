@@ -70,7 +70,7 @@ rho0=unit_state(spin_system)+2*Hz+2*Fz;
 answer=evolution(spin_system,H+1i*R,coil,rho0,0.1,40,'multichannel');
 
 % Do the plotting
-figure(); scale_figure([1.5 1.0]);
+kfigure(); scale_figure([1.5 1.0]);
 time_axis=linspace(0,4,41);
 subplot(1,3,1); plot(time_axis,real(answer(1,:))); 
 ktitle('$H_{\mathrm{Z}}$'); kxlabel('time, s'); kgrid;

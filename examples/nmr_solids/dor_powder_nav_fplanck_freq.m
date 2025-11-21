@@ -57,7 +57,7 @@ parameters.rframes={{'14N',3}};
 spectrum=doublerot(spin_system,@slowpass,parameters,'labframe');
 
 % Plotting
-figure(); plot_1d(spin_system,real(spectrum),parameters);
+kfigure(); plot_1d(spin_system,real(spectrum),parameters);
 
 end
 

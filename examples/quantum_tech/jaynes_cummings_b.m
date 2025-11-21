@@ -54,7 +54,7 @@ traj_c=evolution(spin_system,H,B,rho,10e-9,250,'observable');
 
 % Plot the observables
 time_axis=linspace(0,2.5,251); % us
-figure(); scale_figure([2.0 0.75]);
+kfigure(); scale_figure([2.0 0.75]);
 subplot(1,2,1); plot(time_axis,real(traj_s));
 axis tight; kgrid; kxlabel('time, $\mu$s');
 kylabel('$S_{X}$ of the spin');

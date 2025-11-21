@@ -53,7 +53,7 @@ for n=1:numel(b20)
 end
 
 % Do the plotting
-figure(); plot(b20,[T1; T2],'o');
+kfigure(); plot(b20,[T1; T2],'o');
 set(gca,'yscale','log'); kgrid;
 kxlabel('ZFS $B_{2}^{0} (cm^{-1})$');
 kylabel('Relaxation time, seconds');

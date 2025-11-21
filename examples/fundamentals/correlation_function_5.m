@@ -38,7 +38,7 @@ end
 cf_mc=(1/3)*ifftshift(cf_mc); lags=ifftshift(lags);
 
 % Plotting
-figure(); 
+kfigure(); 
 plot(lags(1:nlags),real(cf_mc(1:nlags)),'b-');
 xlim('tight'); kgrid; kxlabel('lag, points');
 kylabel('correlation function'); 

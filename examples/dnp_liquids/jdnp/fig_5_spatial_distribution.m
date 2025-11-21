@@ -38,7 +38,7 @@ inter.coupling.scalar{2,3}=electron_zeeman_iso+proton_zeeman_iso;
 X=linspace(-30,30,30); Y=linspace(-30,30,30); Z=linspace(-30,30,30);
 
 % Get a figure going
-figure(); scale_figure([1.75 1.0]);
+kfigure(); scale_figure([1.75 1.0]);
 
 % Preallocate answer arrays
 xy_dnp=nan(numel(X),numel(Y));

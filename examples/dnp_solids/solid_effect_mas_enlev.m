@@ -53,7 +53,7 @@ end
 
 % Plotting
 phi_axis=linspace(0,2*pi,numel(H)+1)';
-phi_axis(end)=[]; figure(); 
+phi_axis(end)=[]; kfigure(); 
 plot(phi_axis,energies','b-'); kgrid;
 axis tight; kxlabel('rotor phase, rad'); 
 kylabel('level energy, rad/s');

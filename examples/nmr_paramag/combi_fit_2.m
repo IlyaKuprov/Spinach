@@ -40,7 +40,7 @@ parameters.p_ambig={[3 4]};
 [~,~,pcs_theo,pcs_expt,~,~]=pcs_combi_fit(parameters);
 
 % Plot theory against experiment
-figure();
+kfigure();
 plot(pcs_theo,pcs_expt,'ro'); hold on;
 plot([-20 20],[-20 20],'b-'); hold off;
 xlabel('Theoretical PCS / ppm');

@@ -60,7 +60,7 @@ for n=1:2:(numel(amps)-2)
 end
 
 % Plotting
-figure(); scale_figure([1.50 0.60]);
+kfigure(); scale_figure([1.50 0.60]);
 time_axis=linspace(0,duration,2*np-1)';
 subplot(1,2,1); plot(time_axis,amps/(2*pi)); 
 xlim tight; ylim padded; kgrid;

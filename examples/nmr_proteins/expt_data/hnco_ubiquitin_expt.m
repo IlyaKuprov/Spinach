@@ -46,7 +46,7 @@ parameters.npoints=[64 64 64];
 parameters.axis_units='ppm';
 
 % Plotting
-spin_system.sys.disable={'colorbar'}; spin_system.sys.output=1; figure();
+spin_system.sys.disable={'colorbar'}; spin_system.sys.output=1; kfigure();
 plot_3d(spin_system,real(spectrum),parameters,10,[0.2 0.9 0.2 0.9],2,'positive');
 
 end

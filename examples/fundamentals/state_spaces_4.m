@@ -49,7 +49,7 @@ traj=singlerot(spin_system,@traject,parameters,'nmr');
 traj=fpl2rho(traj,2*parameters.max_rank+1);
 
 % Trajectory analysis
-figure(); trajan(spin_system,traj,'correlation_order');
+kfigure(); trajan(spin_system,traj,'correlation_order');
 xlim tight; ylim([1e-5 0.05]); set(gca,'YScale','log');
 
 end

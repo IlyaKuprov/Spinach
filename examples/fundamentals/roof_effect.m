@@ -38,7 +38,7 @@ parameters.axis_units='Hz';
 parameters.invert_axis=1;
 
 % Get the figure going
-figure(); subp=0; scale_figure([1.5 1.0]);
+kfigure(); subp=0; scale_figure([1.5 1.0]);
 
 % Loop over line positions
 for ppm=[0.2 0.05 0.0125 0.00625]

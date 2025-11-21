@@ -103,7 +103,7 @@ end
 dnp=sum(dnp.*reshape(wb1,[1 1 numel(wb1)]),3)/sum(wb1);
 
 % Do the plotting
-figure(); imagesc(parameters.el_offs/1e6,pulse_durs*1e9,real(dnp'));
+kfigure(); imagesc(parameters.el_offs/1e6,pulse_durs*1e9,real(dnp'));
 set(gca,'YDir','normal'); kylabel('Pulse duration, ns');
 kxlabel('Microwave resonance offset, MHz'); colormap turbo;
 kcolourbar('$I_\textrm{z}$ expectation value on $^{1}$H');

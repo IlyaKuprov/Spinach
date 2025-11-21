@@ -56,7 +56,7 @@ fids=apodisation(spin_system,fids,{{'exp',6},{}});
 spectra=fftshift(fft(fids,[],1));
 
 % Plotting
-figure(); plot_1d(spin_system,real(spectra),parameters);
+kfigure(); plot_1d(spin_system,real(spectra),parameters);
 
 end
 

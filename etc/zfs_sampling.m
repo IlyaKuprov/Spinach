@@ -52,7 +52,7 @@ sigma=1/(2*sqrt(2*log(2)));
 WX=WX.*(normpdf(X,-1,sigma)+normpdf(X,+1,sigma)); WX=WX/sum(WX);
 
 % Plot the double Gaussian
-figure(); scale_figure([1.50 0.75]); subplot(1,2,1); 
+kfigure(); scale_figure([1.50 0.75]); subplot(1,2,1); 
 plot(X,normpdf(X,-1,sigma)+normpdf(X,+1,sigma),'r-');
 ktitle('$D/D_0$ distribution'); kxlabel('$D/D_0$'); 
 kylabel('probability density'); xlim tight; kgrid;

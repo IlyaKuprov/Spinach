@@ -72,7 +72,7 @@ fid=apodisation(spin_system,fid,{{'sqsin'}});
 mri=real(fftshift(fft(ifftshift(fid))));
 
 % Plotting
-figure(); plot_1d(spin_system,mri,parameters);
+kfigure(); plot_1d(spin_system,mri,parameters);
 
 end
 

@@ -60,7 +60,7 @@ end
 E=hz2icm(E/(2*pi));
 
 % Plot the energy levels
-figure(); plot(B0,E,'r-'); kgrid;
+kfigure(); plot(B0,E,'r-'); kgrid;
 kxlabel('Magnetic field, Tesla');
 kylabel('Energy, cm$^{-1}$');
 

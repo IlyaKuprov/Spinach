@@ -59,7 +59,7 @@ spectrum=fftn(fid,parameters.zerofill);
 spectrum=fftshift(spectrum);
 
 % Plotting
-figure(); scale_figure([1.5 2.0]);
+kfigure(); scale_figure([1.5 2.0]);
 plot_2d(spin_system,abs(spectrum),parameters,...
         20,[0.01 0.125 0.01 0.125],2,256,6,'positive');
 

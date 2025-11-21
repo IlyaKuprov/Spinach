@@ -55,7 +55,7 @@ disp('Relaxation superoperator, numerical'); disp(full(R_gce));
 disp('Relaxation superoperator, analytical'); disp(full(R_red));
 
 % Do diagnostic plotting
-figure();
+kfigure();
 gce_rates=diag(R_gce);
 red_rates=diag(R_red);
 min_rate=min([R_gce; R_red]);

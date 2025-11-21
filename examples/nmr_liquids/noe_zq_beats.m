@@ -50,7 +50,7 @@ coil=[state(spin_system,{'Lz'},{1}) state(spin_system,{'Lz'},{2})];
 answer=evolution(spin_system,L,coil,rho,1e-2,1000,'multichannel');
 
 % Plot the longitudinal magnetization
-figure(); 
+kfigure(); 
 plot(linspace(0,10,1001),real(answer));
 kxlabel('time, seconds'); kgrid;
 kylabel('$S_{\rm{Z}}$ expectation value');

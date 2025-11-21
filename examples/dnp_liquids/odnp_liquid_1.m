@@ -54,7 +54,7 @@ parameters.nsteps=1e3;
 answer=liquid(spin_system,@dnp_time_dep,parameters,'esr');
 
 % Plotting
-figure(); x_axis=linspace(0,1000,1001);
+kfigure(); x_axis=linspace(0,1000,1001);
 subplot(2,1,1); plot(x_axis,real(answer(3,:))); 
 kxlabel('time, microseconds'); kgrid;
 kylabel('$\langle E_{\rm{Z}} \rangle$');

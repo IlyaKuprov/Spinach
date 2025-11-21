@@ -76,7 +76,7 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 spectrum=real(spectrum);
 
 % Plotting
-figure(); scale_figure([2.0 1.0]);
+kfigure(); scale_figure([2.0 1.0]);
 subplot(1,2,1); plot(cumsum(durs),[Cx; Cy]); 
 kxlabel('time, seconds'); ktitle('chirp pulse'); 
 kylabel('amplitude, rad/s'); kgrid; xlim tight;

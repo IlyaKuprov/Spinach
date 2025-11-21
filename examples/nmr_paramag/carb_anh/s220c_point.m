@@ -24,7 +24,7 @@ load('s220c_expt.mat','expt_pcs','xyz');
 [mxyz,chi,pred_pcs]=ippcs(xyz,[-14 -26 4],expt_pcs);
 
 % Plot experimental vs predicted PCS
-figure(); plot(expt_pcs,pred_pcs,'bo'); hold on; kgrid;
+kfigure(); plot(expt_pcs,pred_pcs,'bo'); hold on; kgrid;
 plot([min(expt_pcs) max(expt_pcs)],[min(expt_pcs) max(expt_pcs)],'r-');
 kxlabel('Experimental PCS, ppm'); kylabel('Predicted PCS, ppm');
 xlim([min([expt_pcs; pred_pcs]) max([expt_pcs; pred_pcs])]);

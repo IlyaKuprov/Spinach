@@ -94,7 +94,7 @@ for n=1:numel(r)
     % Experiment parameters
     parameters.spins={'E','1H'};
     parameters.irr_powers=18e6;              % Electron nutation frequency [Hz]
-    parameters.grid='rep_2ang_100pts_oct';
+    parameters.grid='rep_2ang_800pts_sph';
     parameters.pulse_dur=48e-9;              % Pulse duration, seconds
     parameters.phase=pi;                     % Second pulse inverted phase
     parameters.addshift=-13e6;

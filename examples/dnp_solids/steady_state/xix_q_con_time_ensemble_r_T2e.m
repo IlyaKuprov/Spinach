@@ -8,32 +8,32 @@
 % guinevere.mathies@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il
 
-function xix_q_con_time_ensemble_r_T1e()
+function xix_q_con_time_ensemble_r_T2e()
 
 % Electron relaxation times to use, seconds
-T1e=[10e-3, 3.0e-3, 1.0e-3, 0.3e-3, 0.1e-3];
+T2e=[50e-6 15e-6 5e-6 1.5e-6 0.5e-6];
 
-% Get figure started
+% Get the figure started
 kfigure(); hold on; kgrid;
 kxlabel('XiX contact time ($\mu$s)');
 kylabel('$\langle I_Z \rangle _{\infty}$');
-xlim([0 6]); ylim([0 1.7e-3]);
+xlim tight; ylim([0 14e-4]);
 
 % Plot the curves
-for n=1:numel(T1e)
-    xix_contact_curve_ensemble_r(T1e(n))
+for n=1:numel(T2e)
+    xix_contact_curve_ensemble_r(T2e(n));
 end
 
 % Add the legend and save the plot
-klegend({'$T_{1e}$ = 10 ms', '$T_{1e}$ = 3.0 ms',...
-         '$T_{1e}$ = 1.0 ms','$T_{1e}$ = 0.3 ms',...
-         '$T_{1e}$ = 0.1 ms'},'Location','NorthEast');
-savefig(gcf,'xix_q_con_time_ensemble_r_T1e.fig');
+klegend({'$T_{2e}$ = 50 $\mu$s', '$T_{2e}$ = 15 $\mu$s',...
+         '$T_{2e}$ = 5 $\mu$s','$T_{2e}$ = 1.5 $\mu$s',...
+         '$T_{2e}$ = 0.5 $\mu$s'},'Location','SouthEast');
+savefig(gcf,'xix_q_con_time_ensemble_r_T2e.fig');
 
 end
 
-% Simulation for a specific T1e
-function xix_contact_curve_ensemble_r(T1e)
+% Simulation for a specific T2e
+function xix_contact_curve_ensemble_r(T2e)
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -79,8 +79,8 @@ for n=1:numel(r)
     inter.relaxation={'t1_t2'};
     r1n_rate=@(alp,bet,gam)r1n_dnp(sys.magnet,inter.temperature,...
                                    2.00230,1e-3,52,r(n),bet);
-    inter.r1_rates={1/T1e r1n_rate};
-    inter.r2_rates={200e3 50e3};
+    inter.r1_rates={1e3 r1n_rate};
+    inter.r2_rates={1/T2e 50e3};
     inter.rlx_keep='diagonal';
     inter.equilibrium='dibari';
     
@@ -123,9 +123,9 @@ end
 % Integrate over the distance distribution, r^2 is the radial part of the Jacobian
 dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
 
-% Generate the time axis and plot 
+% Plotting 
 contact_times=2*parameters.pulse_dur*loop_counts;
-plot(1e6*contact_times,real(dnp)); drawnow();
+plot(1e6*contact_times,real(dnp)); drawnow;
 
 end
 

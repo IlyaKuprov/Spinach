@@ -1,27 +1,39 @@
-% Simulation of T2n dependent XiX DNP contact curves in the steady state 
-% with electron-proton distance ensemble.
+% Simulation of T1n dependence of XiX DNP contact 
+% curves in the steady state with electron-proton
+% distance ensemble.
 % 
-% Calculation time: minutes
+% Calculation time: hours
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % guinevere.mathies@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il
 
-close all
+function xix_q_con_time_ensemble_r_T1n()
 
-T2n=[20e-3 2e-3 200e-6 20e-6 2e-6];
-Color={'#D95319' '#EDB120' '#77AC30' '#000000' '#0072BD'};
+% Nuclear T1 times, seconds
+T1n=[50 5 0.5 0.05 0.005];
 
-for j=1:numel(T2n)
-    col=char(Color(j));
-    xix_contact_curve_ensemble_r(T2n(j),col)
-    legend('20 ms','2 ms','200 \mus','20 \mus','2 \mus','location','southeast')
+% Get the figure started
+kfigure(); hold on; kgrid;
+kxlabel('XiX contact time ($\mu$s)');
+kylabel('$\langle I_Z \rangle _{\infty}$');
+xlim tight; ylim([0 14e-4]);
+
+% Plot the curves
+for n=1:numel(T1n)
+    xix_contact_curve_ensemble_r(T1n(n));
 end
 
-savefig(gcf,'xix_contact_curve_ensemble_r_T2n.fig');
+% Add the legend and save the plot
+klegend({'$T_{1n}$ = 50 s', '$T_{1n}$ = 5 s',...
+         '$T_{1n}$ = 0.5 s','$T_{1n}$ = 0.05 s',...
+         '$T_{1n}$ = 0.005 s'},'Location','NorthEast');
+savefig(gcf,'xix_q_con_time_ensemble_r_T1n.fig');
 
-% Simulation for a specific T2n
-function xix_contact_curve_ensemble_r(T2n,col)
+end
+
+% Simulation for a specific T1n
+function xix_contact_curve_ensemble_r(T1n)
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -65,10 +77,8 @@ for n=1:numel(r)
     % Relaxation rates, distance and orientation 
     % dependence provided using a function handle
     inter.relaxation={'t1_t2'};
-    r1n_rate=@(alp,bet,gam)r1n_dnp(sys.magnet,inter.temperature,...
-                                   2.00230,1e-3,52,r(n),bet);
-    inter.r1_rates={1e3 r1n_rate};
-    inter.r2_rates={200e3 1/T2n};
+    inter.r1_rates={1e3 1/T1n};
+    inter.r2_rates={200e3 50e3};
     inter.rlx_keep='diagonal';
     inter.equilibrium='dibari';
     
@@ -81,7 +91,7 @@ for n=1:numel(r)
 
     % Experiment parameters
     parameters.spins={'E','1H'};
-    parameters.irr_powers=18e6;            % Electron nutation frequency [Hz]
+    parameters.irr_powers=18e6;              % Electron nutation frequency [Hz]
     parameters.grid='rep_2ang_800pts_sph';
     parameters.pulse_dur=48e-9;              % Pulse duration, seconds
     parameters.phase=pi;                     % Second pulse inverted phase
@@ -112,16 +122,8 @@ end
 dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
 
 % Plotting 
-contact_times=parameters.pulse_dur*2*loop_counts;
-figure(1); plot(contact_times*1e6,real(dnp),'color',col,'LineWidth',1.5);
-xlabel('Contact time (\mus)');
-ylabel('\langle I_Z \rangle');
-grid on; xlim([0 10]); ylim([2e-4 16e-4]); hold on
-
-ax=gca;
-ax.FontSize=14;
-ax.LineWidth=1.2;
-set(gca,'XMinorTick','on','YMinorTick','on');
+contact_times=2*parameters.pulse_dur*loop_counts;
+plot(1e6*contact_times,real(dnp)); drawnow;
 
 end
 

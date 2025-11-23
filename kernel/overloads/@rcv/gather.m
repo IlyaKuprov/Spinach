@@ -1,14 +1,14 @@
-% Gathers an RCV object from the GPU back to the CPU. Syntax:
+% Gathers an RCV sparse matrix from GPU. Syntax:
 %
-%                       obj=gather(obj)
+%                 obj=gather(obj)
 %
 % Parameters:
 %
-%    obj   - an RCV object
+%    obj   - an RCV sparse matrix
 %
 % Outputs:
 %
-%    obj   - the same object with data stored on the CPU
+%    obj   - the same matrix with data stored on the CPU
 %
 % m.keitel@soton.ac.uk
 %
@@ -19,7 +19,7 @@ function obj=gather(obj)
 % Check consistency
 grumble(obj);
 
-% Move row, column and value data to the CPU
+% Gather to CPU
 if obj.isGPU
     obj.row=gather(obj.row);
     obj.col=gather(obj.col);
@@ -32,10 +32,7 @@ end
 % Consistency enforcement
 function grumble(obj)
 if ~isa(obj,'rcv')
-    error('the input must be an rcv object.');
-end
-if ~isscalar(obj)
-    error('the input must be a scalar rcv object.');
+    error('the input must be an RCV sparse matrix.');
 end
 end
 
@@ -44,3 +41,4 @@ end
 % often a good thing to do and a clever thing to say.
 %
 % Edwin Odesseiron, in Baldur's Gate 2
+

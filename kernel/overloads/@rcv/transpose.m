@@ -1,14 +1,14 @@
-% Returns the transpose of an RCV object. Syntax:
+% The transpose of an RCV sparse matrix. Syntax:
 %
-%                     obj=transpose(obj)
+%                 obj=transpose(obj)
 %
 % Parameters:
 %
-%    obj   - an RCV object
+%    obj   - an RCV sparse matrix
 %
 % Outputs:
 %
-%    obj   - transposed RCV object
+%    obj   - transposed RCV matrix
 %
 % m.keitel@soton.ac.uk
 %
@@ -19,7 +19,7 @@ function obj=transpose(obj)
 % Check consistency
 grumble(obj);
 
-% Swap rows and columns
+% Efficiently swap rows and columns
 [obj.col,obj.row]=deal(obj.row,obj.col);
 
 end
@@ -27,10 +27,7 @@ end
 % Consistency enforcement
 function grumble(obj)
 if ~isa(obj,'rcv')
-    error('the input must be an rcv object.');
-end
-if ~isscalar(obj)
-    error('the input must be a scalar rcv object.');
+    error('the input must be an RCV sparse matrix.');
 end
 end
 
@@ -45,3 +42,4 @@ end
 %
 % Attributed to Sergei Shoigu during his time as
 % the Head of the Russian Emergencies Command
+

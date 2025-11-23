@@ -1,24 +1,26 @@
-% Creates an object of an RCV class. Syntax:
+% Creates an RCV (row-column-value storage) sparse matrix. Syntax:
 %
-%                       obj=rcv(Mat)
+%                       obj=rcv(M)
 %                       obj=rcv(dim1,dim2)
-%                       obj=rcv(R,C,V)
-%
-% rcv (row, column, value) is a special format for storing and adding large
-% sparse matrices.
+%                       obj=rcv(R,C,V,dim1,dim2)
 %
 % Parameters:
 %
-%    Mat    - sparse or numeric matrix
-%    dim1   - number of rows for an empty object
-%    dim2   - number of columns for an empty object
+%    M      - a Matlab matrix
+%
+%    dim1   - number of rows 
+%
+%    dim2   - number of columns 
+%
 %    R      - row indices of non-zero entries
+%
 %    C      - column indices of non-zero entries
+%
 %    V      - values corresponding to entries in R and C
 %
 % Outputs:
 %
-%    obj    - an object that behaves like a sparse matrix
+%    obj    - an RCV sparse matrix object
 %
 % m.keitel@soton.ac.uk
 %
@@ -40,35 +42,44 @@ classdef (InferiorClasses={?gpuArray}) rcv
         function obj=rcv(varargin)
 
             % Check consistency
-            grumble_constructor(varargin{:});
+            grumble(varargin{:});
 
             if nargin==1
 
-                % Return the input if it is already RCV
-                input=varargin{1};
-                if isa(input,'rcv')
-                    obj=input;
+                % Do nothing if already RCV
+                if isa(varargin{1},'rcv')
+                    
+                    % Return input
+                    obj=varargin{1};
 
-                % Convert numeric or sparse input to RCV
-                elseif isnumeric(input)||issparse(input)||isa(input,'gpuArray')
+                % Convert Matlab matrices to RCV
+                elseif ismatrix(input)
+                    
+                    % Preserve location
                     obj.isGPU=isa(input,'gpuArray');
+
+                    % Get dimensions
                     obj.numRows=int64(size(input,1));
                     obj.numCols=int64(size(input,2));
+
+                    % Get non-zeroes
                     [row,col,val]=find(input);
-                    if obj.isGPU
-                        obj.row=gpuArray(int64(row(:)));
-                        obj.col=gpuArray(int64(col(:)));
-                        obj.val=gpuArray(double(val(:)));
-                    else
-                        obj.row=int64(row(:));
-                        obj.col=int64(col(:));
-                        obj.val=double(val(:));
-                    end
+
+                    % Make the object
+                    obj.row=int64(row(:));
+                    obj.col=int64(col(:));
+                    obj.val=double(val(:));
+                   
+                else
+
+                    % Complain and bomb out
+                    error('input cannot be converted into RCV sparse format.');
+                
                 end
 
             elseif nargin==2
 
-                % Create an empty object with specified dimensions
+                % Empty object with specified dimensions
                 obj.numRows=int64(varargin{1});
                 obj.numCols=int64(varargin{2});
                 obj.row=int64([]);
@@ -76,49 +87,56 @@ classdef (InferiorClasses={?gpuArray}) rcv
                 obj.val=double([]);
                 obj.isGPU=false;
 
-            elseif nargin==3
+            elseif nargin==5
 
-                % Build an object from row, column and value vectors
+                % Build an object from scratch
                 obj.row=int64(varargin{1}(:));
                 obj.col=int64(varargin{2}(:));
                 obj.val=double(varargin{3}(:));
-                obj.numRows=max(obj.row);
-                obj.numCols=max(obj.col);
-                obj.isGPU=isa(varargin{1},'gpuArray')||isa(varargin{2},'gpuArray')||isa(varargin{3},'gpuArray');
+                obj.numRows=int64(varargin{4});
+                obj.numCols=int64(varargin{5});
+
+                % Decide the location
+                obj.isGPU=isa(varargin{1},'gpuArray')||...
+                          isa(varargin{2},'gpuArray')||...
+                          isa(varargin{3},'gpuArray');
+
+                % Upload to GPU
                 if obj.isGPU
                     obj.row=gpuArray(obj.row);
                     obj.col=gpuArray(obj.col);
                     obj.val=gpuArray(obj.val);
                 end
+
+            else
+
+                % Complain and bomb out
+                error('incorrect number of input arguments.');
+
             end
+
         end
 
+        % RCV sparse matrices are numeric
         function answer=isnumeric(obj) %#ok<MANU>
 
-            % Check consistency
-            grumble_unary(obj);
-
-            % RCV matrices are numeric
+            % Always yes
             answer=true();
 
         end
 
+        % RCV sparse matrices are matrices
         function answer=ismatrix(obj) %#ok<MANU>
 
-            % Check consistency
-            grumble_unary(obj);
-
-            % RCV matrices are matrices
+            % Always yes
             answer=true();
 
         end
 
+        % RCV sparse matrices are floats
         function answer=isfloat(obj) %#ok<MANU>
 
-            % Check consistency
-            grumble_unary(obj);
-
-            % RCV matrices are floats
+            % Always yes
             answer=true();
 
         end
@@ -127,45 +145,14 @@ classdef (InferiorClasses={?gpuArray}) rcv
 
 end
 
-% Consistency enforcement for constructor
-function grumble_constructor(varargin)
-if (nargin<1)||(nargin>3)
-    error('use one, two or three arguments to create an rcv object.');
-end
-if nargin==1
-    input=varargin{1};
-    if ~(isa(input,'rcv')||isnumeric(input)||issparse(input)||isa(input,'gpuArray'))
-        error('single argument must be an rcv, numeric or sparse matrix.');
-    end
-elseif nargin==2
-    dim1=varargin{1}; dim2=varargin{2};
-    if ~(isnumeric(dim1)&&isnumeric(dim2)&&isscalar(dim1)&&isscalar(dim2))
-        error('two arguments must be numeric scalars specifying dimensions.');
-    end
-elseif nargin==3
-    row=varargin{1}; col=varargin{2}; val=varargin{3};
-    if ~(isnumeric(row)&&isnumeric(col)&&isnumeric(val))
-        error('row, column and value arrays must be numeric.');
-    end
-    if ~(isvector(row)&&isvector(col)&&isvector(val))
-        error('row, column and value inputs must be vectors.');
-    end
-    if ~(numel(row)==numel(col)&&numel(col)==numel(val))
-        error('row, column and value vectors must be the same length.');
-    end
-end
-end
+% Consistency enforcement
+function grumble(varargin)
 
-% Consistency enforcement for unary checks
-function grumble_unary(obj)
-if ~isa(obj,'rcv')
-    error('the input must be an rcv object.');
-end
-if ~isscalar(obj)
-    error('the input must be a scalar rcv object.');
-end
+% Needs some thought
+
 end
 
 % There are weeks when decades happen.
 %
 % Vladimir Lenin
+

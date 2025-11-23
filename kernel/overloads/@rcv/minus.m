@@ -1,11 +1,12 @@
 % Subtracts one RCV object from another. Syntax:
 %
-%                        a=minus(a,b)
+%                    a=minus(a,b)
 %
 % Parameters:
 %
-%    a     - left RCV operand
-%    b     - right operand (RCV, sparse or numeric scalar)
+%    a     - left operand
+%
+%    b     - right operand 
 %
 % Outputs:
 %
@@ -20,18 +21,15 @@ function a=minus(a,b)
 % Check consistency
 grumble(a,b);
 
-% Perform subtraction by negating the second argument
+% Just call plus
 a=plus(a,(-1)*b);
 
 end
 
 % Consistency enforcement
 function grumble(a,b)
-if ~(isa(a,'rcv')||isa(b,'rcv'))
-    error('at least one input must be an rcv object.');
-end
-if ~isscalar(a)&&~isscalar(b)
-    error('rcv operands must be scalar objects.');
+if (~isa(a,'rcv'))&&(~isa(b,'rcv'))
+    error('at least one input must be an RCV sparse matrix.');
 end
 end
 
@@ -50,3 +48,4 @@ end
 % A 2022 special considerations request by a
 % Southampton University student, requesting
 % more lenient assessment.
+

@@ -1,14 +1,15 @@
-% Converts an RCV object to a sparse matrix. Syntax:
+% Converts an RCV sparse matrix into a Matlab sparse 
+% matrix. Syntax:
 %
-%                       S=sparse(obj)
+%                     S=sparse(obj)
 %
 % Parameters:
 %
-%    obj   - RCV object
+%    obj   - RCV sparse matrix
 %
 % Outputs:
 %
-%    S     - sparse matrix representation of obj
+%    S     - Matlab sparse matrix
 %
 % m.keitel@soton.ac.uk
 %
@@ -19,11 +20,17 @@ function S=sparse(obj)
 % Check consistency
 grumble(obj);
 
-% Build a sparse matrix from row, column and value arrays
+% Check if empty
 if isempty(obj.col)
+
+    % Empty matrix of a specified size
     S=spalloc(obj.numRows,obj.numCols,0);
+
 else
+
+    % Call Matlab's sparse matrix constructor
     S=sparse(obj.row,obj.col,obj.val,obj.numRows,obj.numCols);
+
 end
 
 end
@@ -31,10 +38,7 @@ end
 % Consistency enforcement
 function grumble(obj)
 if ~isa(obj,'rcv')
-    error('the input must be an rcv object.');
-end
-if ~isscalar(obj)
-    error('the input must be a scalar rcv object.');
+    error('the input must be an RCV sparse matrix.');
 end
 end
 
@@ -42,3 +46,4 @@ end
 % in a year, and people still calling me lucky.
 %
 % Elon Musk
+

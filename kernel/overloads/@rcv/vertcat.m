@@ -1,15 +1,15 @@
-% Vertical concatenation for RCV objects. Syntax:
+% Vertical concatenation for RCV sparse matrices. Syntax:
 %
-%                     obj1=vertcat(obj1,obj2)
+%                   obj1=vertcat(obj1,obj2)
 %
 % Parameters:
 %
-%    obj1  - top RCV object
-%    obj2  - bottom RCV object
+%    obj1  - top RCV matrix
+%    obj2  - bottom RCV matrix
 %
 % Outputs:
 %
-%    obj1  - concatenated object representing [obj1;obj2]
+%    obj1  - concatenated matrix
 %
 % m.keitel@soton.ac.uk
 %
@@ -20,25 +20,30 @@ function obj1=vertcat(obj1,obj2)
 % Check consistency
 grumble(obj1,obj2);
 
-% Align data locations between operands
-if obj1.isGPU&&~obj2.isGPU
+% Align data locations
+if obj1.isGPU&&(~obj2.isGPU)
+
     obj2.row=gpuArray(obj2.row);
     obj2.col=gpuArray(obj2.col);
     obj2.val=gpuArray(obj2.val);
-elseif ~obj1.isGPU&&obj2.isGPU
+    obj2.isGPU=true;
+
+elseif (~obj1.isGPU)&&obj2.isGPU
+
     obj1.row=gpuArray(obj1.row);
     obj1.col=gpuArray(obj1.col);
     obj1.val=gpuArray(obj1.val);
     obj1.isGPU=true;
+
 end
 
 % Shift row indices of the lower operand
 obj2.row=obj2.row+obj1.numRows;
 
 % Concatenate row, column and value arrays
-obj1.row=[obj1.row;obj2.row];
-obj1.col=[obj1.col;obj2.col];
-obj1.val=[obj1.val;obj2.val];
+obj1.row=[obj1.row; obj2.row];
+obj1.col=[obj1.col; obj2.col];
+obj1.val=[obj1.val; obj2.val];
 
 % Update row count
 obj1.numRows=obj1.numRows+obj2.numRows;
@@ -48,10 +53,7 @@ end
 % Consistency enforcement
 function grumble(obj1,obj2)
 if ~isa(obj1,'rcv')||~isa(obj2,'rcv')
-    error('both inputs must be rcv objects.');
-end
-if ~isscalar(obj1)||~isscalar(obj2)
-    error('concatenation inputs must be scalar rcv objects.');
+    error('both inputs must be RCV sparse matrices.');
 end
 if obj1.numCols~=obj2.numCols
     error('column counts must match for vertical concatenation.');
@@ -73,3 +75,4 @@ end
 %
 % A letter to Karl Marx by his father in Nov 1837,
 % Marx Engels Collected Works Vol 1, pp. 683-685.
+

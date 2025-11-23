@@ -1,15 +1,16 @@
-% Divides an RCV object by a numeric scalar. Syntax:
+% Divides an RCV sparse matrix by a numeric scalar. Syntax:
 %
-%                      obj=rdivide(obj,scalar)
+%                   obj=rdivide(obj,scalar)
 %
 % Parameters:
 %
-%    obj    - RCV object
+%    obj    - RCV sparse matrix
+%
 %    scalar - numeric scalar
 %
 % Outputs:
 %
-%    obj    - result of obj./scalar
+%    obj    - RCV sparse matrix
 %
 % m.keitel@soton.ac.uk
 %
@@ -28,12 +29,14 @@ end
 % Consistency enforcement
 function grumble(obj,scalar)
 if ~isa(obj,'rcv')
-    error('the first argument must be an rcv object.');
+    error('the first argument must be an RCV sparse matrix.');
 end
-if ~isscalar(obj)
-    error('the rcv input must be a scalar object.');
-end
-if ~(isnumeric(scalar)&&isscalar(scalar))
+if (~isnumeric(scalar))||(~isscalar(scalar))
     error('division is only defined for numeric scalars.');
 end
 end
+
+% Главное памятник поставить, а голуби сами прилетят.
+%
+% Святослав Вернидубович Кривич
+

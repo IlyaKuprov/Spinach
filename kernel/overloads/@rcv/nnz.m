@@ -20,7 +20,7 @@ function n=nnz(A)
 % Check consistency
 grumble(A);
 
-% Count unique index pairs in the row and column arrays
+% Count unique index pairs
 n=numunique([A.row A.col],'rows');
 
 end
@@ -28,10 +28,7 @@ end
 % Consistency enforcement
 function grumble(A)
 if ~isa(A,'rcv')
-    error('the input must be an rcv object.');
-end
-if ~isscalar(A)
-    error('the input must be a scalar rcv object.');
+    error('the input must be an RCV sparse matrix.');
 end
 end
 
@@ -40,3 +37,4 @@ end
 % An old courtier, quoted by Seneca,
 % when asked how he had lasted so
 % long in the imperial service.
+

@@ -1,15 +1,16 @@
-% Kronecker product between two RCV objects. Syntax:
+% Kronecker product between two RCV sparse matrices. Syntax:
 %
-%                        result=kron(A,B)
+%                       result=kron(A,B)
 %
 % Parameters:
 %
-%    A     - left RCV operand
-%    B     - right RCV operand
+%    A      - left RCV sparse matrix
+%
+%    B      - right RCV sparse matrix
 %
 % Outputs:
 %
-%    result- RCV object representing kron(A,B)
+%    result - RCV sparse matrix
 %
 % m.keitel@soton.ac.uk
 %
@@ -24,11 +25,11 @@ grumble(A,B);
 newRows=A.numRows*B.numRows;
 newCols=A.numCols*B.numCols;
 
-% Ensure both operands reside on the same device
-if ~A.isGPU&&B.isGPU
+% Match location
+if (~A.isGPU)&&B.isGPU
     A=gpuArray(A);
 end
-if ~B.isGPU&&A.isGPU
+if (~B.isGPU)&&A.isGPU
     B=gpuArray(B);
 end
 
@@ -37,7 +38,7 @@ end
 ia=ia(:); ib=ib(:);
 newRow=(A.row(ia)-1)*B.numRows+B.row(ib);
 newCol=(A.col(ia)-1)*B.numCols+B.col(ib);
-newVal=A.val(ia).*B.val(ib);
+newVal=(A.val(ia)).*(B.val(ib));
 
 % Assemble the output object
 result=rcv(newCol,newRow,newVal);
@@ -50,10 +51,7 @@ end
 % Consistency enforcement
 function grumble(A,B)
 if ~isa(A,'rcv')||~isa(B,'rcv')
-    error('both inputs must be rcv objects.');
-end
-if ~isscalar(A)||~isscalar(B)
-    error('the inputs must be scalar rcv objects.');
+    error('both inputs must be RCV sparse matrices.');
 end
 end
 
@@ -61,3 +59,4 @@ end
 % My boat has passed ten thousand mounts briskly.
 %
 % Li Bai
+

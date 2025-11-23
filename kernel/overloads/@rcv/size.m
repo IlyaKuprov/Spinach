@@ -1,11 +1,12 @@
-% Returns the size of an RCV object. Syntax:
+% Returns the size of an RCV sparse matrix. Syntax:
 %
-%                       s=size(obj)
-%                       s=size(obj,dim)
+%                    s=size(obj,dim)
+%                      
 %
 % Parameters:
 %
 %    obj   - RCV object
+%
 %    dim   - optional dimension index
 %
 % Outputs:
@@ -25,7 +26,7 @@ else
     grumble(obj,dim);
 end
 
-% Return either both dimensions or a specific one
+% Mimic Matlab
 if nargin==1
     s=[obj.numRows obj.numCols];
 else
@@ -43,16 +44,12 @@ end
 % Consistency enforcement
 function grumble(obj,dim)
 if ~isa(obj,'rcv')
-    error('the first argument must be an rcv object.');
+    error('the first argument must be an RCV sparse matrix.');
 end
-if ~isscalar(obj)
-    error('the rcv input must be a scalar object.');
-end
-if nargin<2
-    dim=[];
-end
-if (nargin==2)&&~(isscalar(dim)&&isnumeric(dim))
-    error('dimension index must be a numeric scalar.');
+if nargin==2
+    if (~isscalar(dim))||(~isnumeric(dim))
+        error('dimension index must be a numeric scalar.');
+    end
 end
 end
 
@@ -60,3 +57,4 @@ end
 % because I have a long attention span.
 %
 % Charlie Munger
+

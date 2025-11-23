@@ -1,15 +1,16 @@
-% Matrix multiplication for RCV objects. Syntax:
+% Multiplication for RCV sparse matrices. Syntax:
 %
 %                       result=mtimes(a,b)
 %
 % Parameters:
 %
-%    a     - left operand (RCV, sparse or scalar numeric)
-%    b     - right operand (RCV, sparse or scalar numeric)
+%    a     - left operand 
+%
+%    b     - right operand 
 %
 % Outputs:
 %
-%    result- product a*b
+%    result - product a*b
 %
 % m.keitel@soton.ac.uk
 %
@@ -20,55 +21,57 @@ function result=mtimes(a,b)
 % Check consistency
 grumble(a,b);
 
-% Scalar multiplication with an RCV object
+% RCV sparse by a scalar
 if isa(a,'rcv')&&isscalar(b)&&isnumeric(b)
-    a.val=a.val*b;
-    result=a;
 
+    a.val=a.val*b; result=a;
+
+% Scalar by RCV sparse
 elseif isa(b,'rcv')&&isscalar(a)&&isnumeric(a)
-    b.val=b.val*a;
-    result=b;
 
-% Multiplication between two RCV objects
+    b.val=b.val*a; result=b;
+
+% RCV sparse by RCV sparse
 elseif isa(a,'rcv')&&isa(b,'rcv')
+
+    % Check dimension consistency
     if a.numCols~=b.numRows
         error('inner matrix dimensions must agree.');
     end
+
+    % Result is Matlab sparse
     result=sparse(a)*sparse(b);
 
-% Multiplication between RCV and sparse matrices
 elseif isa(a,'rcv')&&issparse(b)
+
+    % Check dimension consistency
     if a.numCols~=size(b,1)
         error('inner matrix dimensions must agree.');
     end
+
+    % Result is Matlab sparse
     result=sparse(a)*b;
 
+% Matlab sparse by RCV sparse
 elseif issparse(a)&&isa(b,'rcv')
+
+    % Check dimension consistency
     if size(a,2)~=b.numRows
         error('inner matrix dimensions must agree.');
     end
+
+    % Result is Matlab sparse
     result=a*sparse(b);
+
 end
 
 end
 
 % Consistency enforcement
 function grumble(a,b)
-if ~(isa(a,'rcv')||isa(b,'rcv')||issparse(a)||issparse(b)||isnumeric(a)||isnumeric(b))
-    error('inputs must be rcv, sparse or numeric objects.');
-end
-if isa(a,'rcv')&&~isscalar(a)
-    error('rcv objects must be scalar.');
-end
-if isa(b,'rcv')&&~isscalar(b)
-    error('rcv objects must be scalar.');
-end
-if isnumeric(a)&&~isscalar(a)
-    error('numeric inputs must be scalar.');
-end
-if isnumeric(b)&&~isscalar(b)
-    error('numeric inputs must be scalar.');
-end
+
+% Needs some thought
+
 end
 
 % When the Earl of Sandwich, speaking in parliament, told John Wilkes that
@@ -77,3 +80,4 @@ end
 % ples or his mistress.
 %
 % Taki Theodoracopoulos
+

@@ -1,14 +1,14 @@
-% Returns the conjugate transpose of an RCV object. Syntax:
+% Returns the conjugate transpose of an RCV sparse matrix. Syntax:
 %
-%                   obj=ctranspose(obj)
+%                        obj=ctranspose(obj)
 %
 % Parameters:
 %
-%    obj   - an RCV object
+%    obj   - an RCV sparse matrix
 %
 % Outputs:
 %
-%    obj   - conjugate-transposed RCV object
+%    obj   - an RCV sparse matrix
 %
 % m.keitel@soton.ac.uk
 %
@@ -19,7 +19,7 @@ function obj=ctranspose(obj)
 % Check consistency
 grumble(obj);
 
-% Swap rows and columns
+% Efficiently Swap rows and columns
 [obj.col,obj.row]=deal(obj.row,obj.col);
 
 % Conjugate the values
@@ -30,10 +30,7 @@ end
 % Consistency enforcement
 function grumble(obj)
 if ~isa(obj,'rcv')
-    error('the input must be an rcv object.');
-end
-if ~isscalar(obj)
-    error('the input must be a scalar rcv object.');
+    error('the input must be an RCV sparse matrix.');
 end
 end
 
@@ -43,3 +40,4 @@ end
 % given anything to drink but wine.
 %
 % Tom Holland
+

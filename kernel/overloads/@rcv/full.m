@@ -1,14 +1,14 @@
-% Converts an RCV object to a full matrix. Syntax:
+% Converts an RCV sparse matrix into a full matrix. Syntax:
 %
 %                       S=full(obj)
 %
 % Parameters:
 %
-%    obj   - an RCV object
+%    obj   - an RCV sparse matrix
 %
 % Outputs:
 %
-%    S     - a full matrix containing the data from obj
+%    S     - a full matrix
 %
 % m.keitel@soton.ac.uk
 %
@@ -19,7 +19,7 @@ function S=full(obj)
 % Check consistency
 grumble(obj);
 
-% Convert to a sparse matrix and then expand to full
+% Delegate to Matlab
 S=full(sparse(obj));
 
 end
@@ -27,10 +27,7 @@ end
 % Consistency enforcement
 function grumble(obj)
 if ~isa(obj,'rcv')
-    error('the input must be an rcv object.');
-end
-if ~isscalar(obj)
-    error('the input must be a scalar rcv object.');
+    error('the input must be an RCV sparse matrix.');
 end
 end
 
@@ -38,3 +35,4 @@ end
 % majority, it is time to pause and reflect.
 %
 % Mark Twain
+

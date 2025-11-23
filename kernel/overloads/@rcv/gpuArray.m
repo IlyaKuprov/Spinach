@@ -1,14 +1,14 @@
-% Transfers an RCV object to the GPU. Syntax:
+% Transfers an RCV sparse matrix to the GPU. Syntax:
 %
-%                     obj=gpuArray(obj)
+%                   obj=gpuArray(obj)
 %
 % Parameters:
 %
-%    obj   - an RCV object
+%    obj   - an RCV sparse matrix
 %
 % Outputs:
 %
-%    obj   - the same object with data stored on the GPU
+%    obj   - the same matrix with data stored on GPU
 %
 % m.keitel@soton.ac.uk
 %
@@ -19,7 +19,7 @@ function obj=gpuArray(obj)
 % Check consistency
 grumble(obj);
 
-% Move row, column and value data to the GPU
+% Upload to GPU
 if ~obj.isGPU
     obj.row=gpuArray(obj.row);
     obj.col=gpuArray(obj.col);
@@ -32,10 +32,7 @@ end
 % Consistency enforcement
 function grumble(obj)
 if ~isa(obj,'rcv')
-    error('the input must be an rcv object.');
-end
-if ~isscalar(obj)
-    error('the input must be a scalar rcv object.');
+    error('the input must be an RCV sparse matrix.');
 end
 end
 
@@ -49,3 +46,4 @@ end
 % Toby Young, about Andrew Doyle's book titled
 % "The New Puritans: How the Religion of Social
 % Justice Captured the Western World"
+

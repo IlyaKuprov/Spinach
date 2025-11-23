@@ -1,11 +1,37 @@
-% Plot the sparsity pattern of an RCV matrix.
+% Plots the sparsity pattern of an RCV matrix. Syntax:
+%
+%                           spy(A)
+%
+% Parameters:
+%
+%    A     - RCV object
+%
+% Outputs:
+%
+%    none  - produces a sparsity plot
 %
 % m.keitel@soton.ac.uk
+%
+% <https://spindynamics.org/wiki/index.php?title=rcv/spy.m>
 
 function spy(A)
 
-    spy(sparse(A));
+% Check consistency
+grumble(A);
 
+% Delegate plotting to MATLAB sparse implementation
+spy(sparse(A));
+
+end
+
+% Consistency enforcement
+function grumble(A)
+if ~isa(A,'rcv')
+    error('the input must be an rcv object.');
+end
+if ~isscalar(A)
+    error('the input must be a scalar rcv object.');
+end
 end
 
 % Downloaded a virus for Linux lately and unpacked it. Tried to run it as
@@ -24,4 +50,3 @@ end
 % coin wallet and sent $5 out of pity.
 %
 % Internet folklore
-

@@ -1,12 +1,37 @@
-% Returns transpose of RCV object
+% Returns the transpose of an RCV object. Syntax:
+%
+%                     obj=transpose(obj)
+%
+% Parameters:
+%
+%    obj   - an RCV object
+%
+% Outputs:
+%
+%    obj   - transposed RCV object
 %
 % m.keitel@soton.ac.uk
+%
+% <https://spindynamics.org/wiki/index.php?title=rcv/transpose.m>
 
 function obj=transpose(obj)
 
-    % Efficiently swap rows and columns
-    [obj.col,obj.row]=deal(obj.row,obj.col);
+% Check consistency
+grumble(obj);
 
+% Swap rows and columns
+[obj.col,obj.row]=deal(obj.row,obj.col);
+
+end
+
+% Consistency enforcement
+function grumble(obj)
+if ~isa(obj,'rcv')
+    error('the input must be an rcv object.');
+end
+if ~isscalar(obj)
+    error('the input must be a scalar rcv object.');
+end
 end
 
 % Я Шойгу. Значит, объясняю. Если вы такой хороший хозяин, что у вас
@@ -20,4 +45,3 @@ end
 %
 % Attributed to Sergei Shoigu during his time as
 % the Head of the Russian Emergencies Command
-

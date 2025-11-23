@@ -1,25 +1,44 @@
-% Convert to sparse matrix.
+% Converts an RCV object to a sparse matrix. Syntax:
+%
+%                       S=sparse(obj)
+%
+% Parameters:
+%
+%    obj   - RCV object
+%
+% Outputs:
+%
+%    S     - sparse matrix representation of obj
 %
 % m.keitel@soton.ac.uk
+%
+% <https://spindynamics.org/wiki/index.php?title=rcv/sparse.m>
 
 function S=sparse(obj)
 
-    if isempty(obj.col)
+% Check consistency
+grumble(obj);
 
-        % Empty sparse matrix
-        S=spalloc(obj.numRows,obj.numCols,0);
+% Build a sparse matrix from row, column and value arrays
+if isempty(obj.col)
+    S=spalloc(obj.numRows,obj.numCols,0);
+else
+    S=sparse(obj.row,obj.col,obj.val,obj.numRows,obj.numCols);
+end
 
-    else
+end
 
-        % Matlab's constructor
-        S=sparse(obj.row,obj.col,obj.val,obj.numRows,obj.numCols);
-
-    end
-    
+% Consistency enforcement
+function grumble(obj)
+if ~isa(obj,'rcv')
+    error('the input must be an rcv object.');
+end
+if ~isscalar(obj)
+    error('the input must be a scalar rcv object.');
+end
 end
 
 % Working 16 hours a day, 7 days a week, 52 weeks
 % in a year, and people still calling me lucky.
 %
 % Elon Musk
-

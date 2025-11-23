@@ -2,7 +2,7 @@
 
 ## General Context
 
-*Spinach* is an open-source spin dynamics simulation library implemented exclusively in **MATLAB**. It spans numerous areas of physics and mathematics, including linear algebra (and numerical linear algebra), quantum mechanics, Lie algebras and Lie groups, as well as general scientific computing and numerical methods. *Spinach* supports applications such as nuclear magnetic resonance (**NMR**), electron spin (paramagnetic) resonance (**ESR/EPR**), magnetic resonance imaging (**MRI**), quantum optimal control theory, and other spin dynamics-related domains. This repository contains the *Spinach* codebase, and all contributions or AI-generated code **must** adhere to the established conventions of this codebase.
+*Spinach* is an open-source spin dynamics simulation library implemented exclusively in *MATLAB*. It spans numerous areas of physics and mathematics, including linear algebra (and numerical linear algebra), quantum mechanics, Lie algebras and Lie groups, as well as general scientific computing and numerical methods. *Spinach* supports applications such as nuclear magnetic resonance (NMR), electron spin (paramagnetic) resonance (ESR/EPR), magnetic resonance imaging (MRI), quantum optimal control theory, and other spin dynamics-related domains. This repository contains the *Spinach* codebase, and all contributions or AI-generated code **must** adhere to the established conventions of this codebase.
 
 ## Programming Style Guidelines
 
@@ -29,6 +29,8 @@ All code contributions **must** follow *Spinach*’s existing coding style and s
 * **Choosing Names Carefully:** When introducing a new variable, determine its name by considering the context and role. Read the function’s documentation and understand what the function does and what the variable represents. **Then** choose a concise name that conveys that meaning.
 
 * **Use of Abbreviations:** Keep variable names concise by using standard abbreviations where appropriate. For example, a variable holding a **property index** may be named `prop_idx`. Ensure any abbreviation used is commonly understood or documented in the codebase.
+
+* **Matlab and Spinach functionality checks:** Make sure that the functions you are calling in your code actually exist in *Matlab* or *Spinach*. **Never** call functions that do not exist.
 
 ## Wiki Documentation Instructions
 

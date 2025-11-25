@@ -1,11 +1,11 @@
 % Returns the size of an RCV sparse matrix. Syntax:
 %
-%                    s=size(obj,dim)
+%                    s=size(A,dim)
 %                      
 %
 % Parameters:
 %
-%    obj   - RCV object
+%    A     - RCV sparse matrix
 %
 %    dim   - optional dimension index
 %
@@ -17,23 +17,23 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/size.m>
 
-function s=size(obj,dim)
+function s=size(A,dim)
 
 % Check consistency
 if nargin==1
-    grumble(obj);
+    grumble(A);
 else
-    grumble(obj,dim);
+    grumble(A,dim);
 end
 
 % Mimic Matlab
 if nargin==1
-    s=[obj.numRows obj.numCols];
+    s=[A.numRows A.numCols];
 else
     if dim==1
-        s=obj.numRows;
+        s=A.numRows;
     elseif dim==2
-        s=obj.numCols;
+        s=A.numCols;
     else
         s=1;
     end
@@ -42,8 +42,8 @@ end
 end
 
 % Consistency enforcement
-function grumble(obj,dim)
-if ~isa(obj,'rcv')
+function grumble(A,dim)
+if ~isa(A,'rcv')
     error('the first argument must be an RCV sparse matrix.');
 end
 if nargin==2

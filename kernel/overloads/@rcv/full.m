@@ -1,32 +1,32 @@
 % Converts an RCV sparse matrix into a full matrix. Syntax:
 %
-%                       S=full(obj)
+%                       A=full(A)
 %
 % Parameters:
 %
-%    obj   - an RCV sparse matrix
+%    A   - an RCV sparse matrix
 %
 % Outputs:
 %
-%    S     - a full matrix
+%    A   - a full Matlab matrix
 %
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/full.m>
 
-function S=full(obj)
+function A=full(A)
 
 % Check consistency
-grumble(obj);
+grumble(A);
 
 % Delegate to Matlab
-S=full(sparse(obj));
+A=full(sparse(A));
 
 end
 
 % Consistency enforcement
-function grumble(obj)
-if ~isa(obj,'rcv')
+function grumble(A)
+if ~isa(A,'rcv')
     error('the input must be an RCV sparse matrix.');
 end
 end

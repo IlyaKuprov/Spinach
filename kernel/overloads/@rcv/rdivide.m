@@ -1,37 +1,37 @@
 % Divides an RCV sparse matrix by a numeric scalar. Syntax:
 %
-%                   obj=rdivide(obj,scalar)
+%                       A=rdivide(A,k)
 %
 % Parameters:
 %
-%    obj    - RCV sparse matrix
+%    A    - RCV sparse matrix
 %
-%    scalar - numeric scalar
+%    k - numeric scalar
 %
 % Outputs:
 %
-%    obj    - RCV sparse matrix
+%    A    - RCV sparse matrix
 %
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/rdivide.m>
 
-function obj=rdivide(obj,scalar)
+function A=rdivide(A,k)
 
 % Check consistency
-grumble(obj,scalar);
+grumble(A,k);
 
 % Divide stored values by the scalar
-obj.val=obj.val/scalar;
+A.val=A.val/k;
 
 end
 
 % Consistency enforcement
-function grumble(obj,scalar)
-if ~isa(obj,'rcv')
+function grumble(A,k)
+if ~isa(A,'rcv')
     error('the first argument must be an RCV sparse matrix.');
 end
-if (~isnumeric(scalar))||(~isscalar(scalar))
+if (~isnumeric(k))||(~isscalar(k))
     error('division is only defined for numeric scalars.');
 end
 end

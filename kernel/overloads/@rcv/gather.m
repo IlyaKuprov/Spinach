@@ -1,37 +1,37 @@
 % Gathers an RCV sparse matrix from GPU. Syntax:
 %
-%                 obj=gather(obj)
+%                    A=gather(A)
 %
 % Parameters:
 %
-%    obj   - an RCV sparse matrix
+%    A   - an RCV sparse matrix
 %
 % Outputs:
 %
-%    obj   - the same matrix with data stored on the CPU
+%    A   - the same matrix with data stored on the CPU
 %
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/gather.m>
 
-function obj=gather(obj)
+function A=gather(A)
 
 % Check consistency
-grumble(obj);
+grumble(A);
 
 % Gather to CPU
-if obj.isGPU
-    obj.row=gather(obj.row);
-    obj.col=gather(obj.col);
-    obj.val=gather(obj.val);
-    obj.isGPU=false;
+if A.isGPU
+    A.row=gather(A.row);
+    A.col=gather(A.col);
+    A.val=gather(A.val);
+    A.isGPU=false;
 end
 
 end
 
 % Consistency enforcement
-function grumble(obj)
-if ~isa(obj,'rcv')
+function grumble(A)
+if ~isa(A,'rcv')
     error('the input must be an RCV sparse matrix.');
 end
 end

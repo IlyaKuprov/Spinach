@@ -1,35 +1,35 @@
 % Returns the conjugate transpose of an RCV sparse matrix. Syntax:
 %
-%                        obj=ctranspose(obj)
+%                        A=ctranspose(A)
 %
 % Parameters:
 %
-%    obj   - an RCV sparse matrix
+%    A   - an RCV sparse matrix
 %
 % Outputs:
 %
-%    obj   - an RCV sparse matrix
+%    A   - an RCV sparse matrix
 %
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/ctranspose.m>
 
-function obj=ctranspose(obj)
+function A=ctranspose(A)
 
 % Check consistency
-grumble(obj);
+grumble(A);
 
 % Efficiently Swap rows and columns
-[obj.col,obj.row]=deal(obj.row,obj.col);
+[A.col,A.row]=deal(A.row,A.col);
 
 % Conjugate the values
-obj.val=conj(obj.val);
+A.val=conj(A.val);
 
 end
 
 % Consistency enforcement
-function grumble(obj)
-if ~isa(obj,'rcv')
+function grumble(A)
+if ~isa(A,'rcv')
     error('the input must be an RCV sparse matrix.');
 end
 end

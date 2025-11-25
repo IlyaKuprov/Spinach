@@ -21,7 +21,7 @@
 %
 %     S.y - Sy observable operator
 %
-%     S.z - Sx observable operator
+%     S.z - Sz observable operator
 %
 % Note: the matrices are normalised to obey the following
 %       commutation relations for all multiplicities: 

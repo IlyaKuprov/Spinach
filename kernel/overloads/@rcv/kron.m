@@ -1,6 +1,6 @@
 % Kronecker product between two RCV sparse matrices. Syntax:
 %
-%                       result=kron(A,B)
+%                         C=kron(A,B)
 %
 % Parameters:
 %
@@ -10,13 +10,13 @@
 %
 % Outputs:
 %
-%    result - RCV sparse matrix
+%    C      - RCV sparse matrix
 %
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/kron.m>
 
-function result=kron(A,B)
+function C=kron(A,B)
 
 % Check consistency
 grumble(A,B);
@@ -25,11 +25,9 @@ grumble(A,B);
 newRows=A.numRows*B.numRows;
 newCols=A.numCols*B.numCols;
 
-% Match location
-if (~A.isGPU)&&B.isGPU
+% Align locations
+if A.isGPU||B.isGPU
     A=gpuArray(A);
-end
-if (~B.isGPU)&&A.isGPU
     B=gpuArray(B);
 end
 
@@ -41,10 +39,10 @@ newCol=(A.col(ia)-1)*B.numCols+B.col(ib);
 newVal=(A.val(ia)).*(B.val(ib));
 
 % Assemble the output object
-result=rcv(newCol,newRow,newVal);
-result.numRows=newRows;
-result.numCols=newCols;
-result.isGPU=A.isGPU||B.isGPU;
+C=rcv(newCol,newRow,newVal);
+C.numRows=newRows;
+C.numCols=newCols;
+C.isGPU=A.isGPU||B.isGPU;
 
 end
 

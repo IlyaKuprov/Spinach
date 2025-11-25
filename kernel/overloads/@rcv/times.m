@@ -1,37 +1,37 @@
 % Multiplies an RCV sparse matrix by a numeric scalar. Syntax:
 %
-%                      obj=times(scalar,obj)
+%                         A=times(k,A)
 %
 % Parameters:
 %
-%    scalar - numeric scalar
+%    k - numeric scalar
 %
-%    obj    - RCV sparse matrix
+%    A - RCV sparse matrix
 %
 % Outputs:
 %
-%    obj    - RCV sparse matrix
+%    A - RCV sparse matrix
 %
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/times.m>
 
-function obj=times(scalar,obj)
+function A=times(k,A)
 
 % Check consistency
-grumble(scalar,obj);
+grumble(k,A);
 
-% Multiply values by the scalar
-obj.val=obj.val*scalar;
+% Multiply values
+A.val=k*A.val;
 
 end
 
 % Consistency enforcement
-function grumble(scalar,obj)
-if ~isa(obj,'rcv')
+function grumble(k,A)
+if ~isa(A,'rcv')
     error('the second argument must be an RCV sparse matrix.');
 end
-if (~isnumeric(scalar))||(~isscalar(scalar))
+if (~isnumeric(k))||(~isscalar(k))
     error('multiplication is only defined by numeric scalars.');
 end
 end

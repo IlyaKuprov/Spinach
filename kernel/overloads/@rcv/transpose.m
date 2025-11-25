@@ -1,32 +1,32 @@
 % The transpose of an RCV sparse matrix. Syntax:
 %
-%                 obj=transpose(obj)
+%                 A=transpose(A)
 %
 % Parameters:
 %
-%    obj   - an RCV sparse matrix
+%    A   - an RCV sparse matrix
 %
 % Outputs:
 %
-%    obj   - transposed RCV matrix
+%    A   - transposed RCV matrix
 %
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/transpose.m>
 
-function obj=transpose(obj)
+function A=transpose(A)
 
 % Check consistency
-grumble(obj);
+grumble(A);
 
 % Efficiently swap rows and columns
-[obj.col,obj.row]=deal(obj.row,obj.col);
+[A.col,A.row]=deal(A.row,A.col);
 
 end
 
 % Consistency enforcement
-function grumble(obj)
-if ~isa(obj,'rcv')
+function grumble(A)
+if ~isa(A,'rcv')
     error('the input must be an RCV sparse matrix.');
 end
 end

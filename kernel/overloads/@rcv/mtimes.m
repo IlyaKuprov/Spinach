@@ -1,74 +1,75 @@
 % Multiplication for RCV sparse matrices. Syntax:
 %
-%                       result=mtimes(a,b)
+%                     C=mtimes(A,B)
 %
 % Parameters:
 %
-%    a     - left operand 
+%    A    - left operand 
 %
-%    b     - right operand 
+%    B    - right operand 
 %
 % Outputs:
 %
-%    result - product a*b
+%    C    - product A*B as a Matlab sparse matrix if
+%           both operands are RCV or Matlab matrices
 %
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/mtimes.m>
 
-function result=mtimes(a,b)
+function C=mtimes(A,B)
 
 % Check consistency
-grumble(a,b);
+grumble(A,B);
 
 % RCV sparse by a scalar
-if isa(a,'rcv')&&isscalar(b)&&isnumeric(b)
+if isa(A,'rcv')&&isscalar(B)&&isnumeric(B)
 
-    a.val=a.val*b; result=a;
+    A.val=A.val*B; C=A;
 
 % Scalar by RCV sparse
-elseif isa(b,'rcv')&&isscalar(a)&&isnumeric(a)
+elseif isa(B,'rcv')&&isscalar(A)&&isnumeric(A)
 
-    b.val=b.val*a; result=b;
+    B.val=B.val*A; C=B;
 
 % RCV sparse by RCV sparse
-elseif isa(a,'rcv')&&isa(b,'rcv')
+elseif isa(A,'rcv')&&isa(B,'rcv')
 
     % Check dimension consistency
-    if a.numCols~=b.numRows
+    if A.numCols~=B.numRows
         error('inner matrix dimensions must agree.');
     end
 
     % Result is Matlab sparse
-    result=sparse(a)*sparse(b);
+    C=sparse(A)*sparse(B);
 
-elseif isa(a,'rcv')&&issparse(b)
+elseif isa(A,'rcv')&&issparse(B)
 
     % Check dimension consistency
-    if a.numCols~=size(b,1)
+    if A.numCols~=size(B,1)
         error('inner matrix dimensions must agree.');
     end
 
     % Result is Matlab sparse
-    result=sparse(a)*b;
+    C=sparse(A)*B;
 
 % Matlab sparse by RCV sparse
-elseif issparse(a)&&isa(b,'rcv')
+elseif issparse(A)&&isa(B,'rcv')
 
     % Check dimension consistency
-    if size(a,2)~=b.numRows
+    if size(A,2)~=B.numRows
         error('inner matrix dimensions must agree.');
     end
 
     % Result is Matlab sparse
-    result=a*sparse(b);
+    C=A*sparse(B);
 
 end
 
 end
 
 % Consistency enforcement
-function grumble(a,b)
+function grumble(A,B)
 
 % Needs some thought
 

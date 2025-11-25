@@ -1,61 +1,50 @@
 % Vertical concatenation for RCV sparse matrices. Syntax:
 %
-%                   obj1=vertcat(obj1,obj2)
+%                      A=vertcat(A,B)
 %
 % Parameters:
 %
-%    obj1  - top RCV matrix
-%    obj2  - bottom RCV matrix
+%    A  - top RCV matrix
+%    B  - bottom RCV matrix
 %
 % Outputs:
 %
-%    obj1  - concatenated matrix
+%    A  - concatenated RCV sparse matrix
 %
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/vertcat.m>
 
-function obj1=vertcat(obj1,obj2)
+function A=vertcat(A,B)
 
 % Check consistency
-grumble(obj1,obj2);
+grumble(A,B);
 
-% Align data locations
-if obj1.isGPU&&(~obj2.isGPU)
-
-    obj2.row=gpuArray(obj2.row);
-    obj2.col=gpuArray(obj2.col);
-    obj2.val=gpuArray(obj2.val);
-    obj2.isGPU=true;
-
-elseif (~obj1.isGPU)&&obj2.isGPU
-
-    obj1.row=gpuArray(obj1.row);
-    obj1.col=gpuArray(obj1.col);
-    obj1.val=gpuArray(obj1.val);
-    obj1.isGPU=true;
-
+% Align locations
+if A.isGPU||B.isGPU
+    A=gpuArray(A);
+    B=gpuArray(B);
 end
 
-% Shift row indices of the lower operand
-obj2.row=obj2.row+obj1.numRows;
+% Shift row indices
+B.row=B.row+A.numRows;
 
-% Concatenate row, column and value arrays
-obj1.row=[obj1.row; obj2.row];
-obj1.col=[obj1.col; obj2.col];
-obj1.val=[obj1.val; obj2.val];
+% Concatenate indices
+A.row=[A.row; B.row];
+A.col=[A.col; B.col];
+A.val=[A.val; B.val];
 
-% Update row count
-obj1.numRows=obj1.numRows+obj2.numRows;
+% Update row count in the result
+A.numRows=A.numRows+B.numRows;
 
 end
 
 % Consistency enforcement
-function grumble(obj1,obj2)
-if ~isa(obj1,'rcv')||~isa(obj2,'rcv')
+function grumble(A,B)
+if ~isa(A,'rcv')||~isa(B,'rcv')
     error('both inputs must be RCV sparse matrices.');
 end
-if obj1.numCols~=obj2.numCols
+if A.numCols~=B.numCols
     error('column counts must match for vertical concatenation.');
 end
 end

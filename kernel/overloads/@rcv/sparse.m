@@ -1,43 +1,42 @@
 % Converts an RCV sparse matrix into a Matlab sparse 
 % matrix. Syntax:
-%
-%                     S=sparse(obj)
+%                      A=sparse(A)
 %
 % Parameters:
 %
-%    obj   - RCV sparse matrix
+%    A   - RCV sparse matrix
 %
 % Outputs:
 %
-%    S     - Matlab sparse matrix
+%    A   - Matlab sparse matrix
 %
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/sparse.m>
 
-function S=sparse(obj)
+function A=sparse(A)
 
 % Check consistency
-grumble(obj);
+grumble(A);
 
 % Check if empty
-if isempty(obj.col)
+if isempty(A.col)
 
     % Empty matrix of a specified size
-    S=spalloc(obj.numRows,obj.numCols,0);
+    A=spalloc(A.numRows,A.numCols,0);
 
 else
 
     % Call Matlab's sparse matrix constructor
-    S=sparse(obj.row,obj.col,obj.val,obj.numRows,obj.numCols);
+    A=sparse(A.row,A.col,A.val,A.numRows,A.numCols);
 
 end
 
 end
 
 % Consistency enforcement
-function grumble(obj)
-if ~isa(obj,'rcv')
+function grumble(A)
+if ~isa(A,'rcv')
     error('the input must be an RCV sparse matrix.');
 end
 end

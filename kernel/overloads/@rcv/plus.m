@@ -1,96 +1,82 @@
 % Adds things to RCV sparse matrices. Syntax:
 %
-%                result=plus(a,b)
+%                  C=plus(A,B)
 %
 % Parameters:
 %
-%    a  - left operand
+%    A  - left operand
 %
-%    b  - right operand
+%    B  - right operand
 %
 % Outputs:
 %
-%    result - sum a+b
+%    C  - sum A+B, RCV sparse matrix
 %
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/plus.m>
 
-function result=plus(a,b)
+function C=plus(A,B)
 
 % Check consistency
-grumble(a,b);
+grumble(A,B);
 
 % Add a scalar to an RCV sparse matrix
-if isa(a,'rcv')&&isscalar(b)&&isnumeric(b)
+if isa(A,'rcv')&&isscalar(B)&&isnumeric(B)
 
-    a.val=a.val+b; result=a;
+    A.val=A.val+B; C=A;
 
 % Add a scalar to an RCV sparse matrix
-elseif isa(b,'rcv')&&isscalar(a)&&isnumeric(a)
+elseif isa(B,'rcv')&&isscalar(A)&&isnumeric(A)
     
-    b.val=b.val+a; result=b;
+    B.val=B.val+A; C=B;
 
 % Add two RCV sparse matrices
-elseif isa(a,'rcv')&&isa(b,'rcv')
+elseif isa(A,'rcv')&&isa(B,'rcv')
 
     % Check for dimension match
-    if a.numRows~=b.numRows||a.numCols~=b.numCols
+    if A.numRows~=B.numRows||A.numCols~=B.numCols
         error('matrix sizes must match for addition.');
     end
 
-    % Location matching
-    if a.isGPU&&(~b.isGPU)
-        
-        % GPU upload
-        b.row=gpuArray(b.row);
-        b.col=gpuArray(b.col);
-        b.val=gpuArray(b.val);
-        b.isGPU=true;
-
-    elseif (~a.isGPU)&&b.isGPU
-
-        % GPU upload
-        a.col=gpuArray(a.col);
-        a.row=gpuArray(a.row);
-        a.val=gpuArray(a.val);
-        a.isGPU=true;
-
+    % Align locations
+    if A.isGPU||B.isGPU
+        A=gpuArray(A);
+        B=gpuArray(B);
     end
     
     % RCV addition
-    a.row=[a.row; b.row];
-    a.col=[a.col; b.col];
-    a.val=[a.val; b.val];
-    result=a;
+    A.row=[A.row; B.row];
+    A.col=[A.col; B.col];
+    A.val=[A.val; B.val]; C=A;
 
 % RCV sparse + Matlab sparse
-elseif isa(a,'rcv')&&issparse(b)
+elseif isa(A,'rcv')&&issparse(B)
 
     % Check for dimension match
-    if a.numRows~=size(b,1)||a.numCols~=size(b,2)
+    if A.numRows~=size(B,1)||A.numCols~=size(B,2)
         error('matrix sizes must match for addition.');
     end
 
     % Recursive call
-    result=plus(a,rcv(b));
+    C=plus(A,rcv(B));
 
-elseif isa(b,'rcv')&&issparse(a)
+elseif isa(B,'rcv')&&issparse(A)
 
     % Check for dimension match
-    if b.numRows~=size(a,1)||b.numCols~=size(a,2)
+    if B.numRows~=size(A,1)||B.numCols~=size(A,2)
         error('matrix sizes must match for addition.');
     end
 
     % Recursive call
-    result=plus(rcv(a),b);
+    C=plus(rcv(A),B);
 
 end
 
 end
 
 % Consistency enforcement
-function grumble(a,b)
+function grumble(A,B)
 
 % Needs some thinking
 

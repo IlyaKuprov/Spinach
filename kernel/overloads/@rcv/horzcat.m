@@ -1,64 +1,51 @@
 % Horizontal concatenation for RCV sparse matrices. Syntax:
 %
-%                     obj=horzcat(obj,obj2)
+%                        A=horzcat(A,B)
 %
 % Parameters:
 %
-%    obj   - left RCV sparse matrix
+%    A   - left RCV sparse matrix
 %
-%    obj2  - right RCV sparse matrix
+%    B   - right RCV sparse matrix
 %
 % Outputs:
 %
-%    obj   - RCV sparse matrix
+%    A   - RCV sparse matrix
 %
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/horzcat.m>
 
-function obj=horzcat(obj,obj2)
+function A=horzcat(A,B)
 
 % Check consistency
-grumble(obj,obj2);
+grumble(A,B);
 
-% Match data locations
-if obj.isGPU&&(~obj2.isGPU)
-
-    % Upload to GPU
-    obj2.row=gpuArray(obj2.row);
-    obj2.col=gpuArray(obj2.col);
-    obj2.val=gpuArray(obj2.val);
-    obj2.isGPU=true;
-
-elseif (~obj.isGPU)&&obj2.isGPU
-
-    % Upload to GPU
-    obj.row=gpuArray(obj.row);
-    obj.col=gpuArray(obj.col);
-    obj.val=gpuArray(obj.val);
-    obj.isGPU=true;
-
+% Align locations
+if A.isGPU||B.isGPU
+    A=gpuArray(A);
+    B=gpuArray(B);
 end
 
 % Shift column indices
-obj2.col=obj2.col+obj.numCols;
+B.col=B.col+A.numCols;
 
 % Concatenate RCV arrays
-obj.row=[obj.row; obj2.row];
-obj.col=[obj.col; obj2.col];
-obj.val=[obj.val; obj2.val];
+A.row=[A.row; B.row];
+A.col=[A.col; B.col];
+A.val=[A.val; B.val];
 
 % Update column count
-obj.numCols=obj.numCols+obj2.numCols;
+A.numCols=A.numCols+B.numCols;
 
 end
 
 % Consistency enforcement
-function grumble(obj,obj2)
-if ~isa(obj,'rcv')||~isa(obj2,'rcv')
+function grumble(A,B)
+if ~isa(A,'rcv')||~isa(B,'rcv')
     error('both inputs must be RCV sparse matrices.');
 end
-if obj.numRows~=obj2.numRows
+if A.numRows~=B.numRows
     error('row counts must match for horizontal concatenation.');
 end
 end

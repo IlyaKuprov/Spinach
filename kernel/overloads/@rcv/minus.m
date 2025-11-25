@@ -1,34 +1,34 @@
 % Subtracts one RCV object from another. Syntax:
 %
-%                    a=minus(a,b)
+%                    A=minus(A,B)
 %
 % Parameters:
 %
-%    a     - left operand
+%    A     - left operand
 %
-%    b     - right operand 
+%    B     - right operand 
 %
 % Outputs:
 %
-%    a     - result of a-b
+%    A     - result A-B as an RCV sparse matrix
 %
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/minus.m>
 
-function a=minus(a,b)
+function A=minus(A,B)
 
 % Check consistency
-grumble(a,b);
+grumble(A,B);
 
 % Just call plus
-a=plus(a,(-1)*b);
+A=plus(A,(-1)*B);
 
 end
 
 % Consistency enforcement
-function grumble(a,b)
-if (~isa(a,'rcv'))&&(~isa(b,'rcv'))
+function grumble(A,B)
+if (~isa(A,'rcv'))&&(~isa(B,'rcv'))
     error('at least one input must be an RCV sparse matrix.');
 end
 end

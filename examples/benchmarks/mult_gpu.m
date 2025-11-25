@@ -2,14 +2,16 @@
 % either 'single' or 'double'. IK's workstation output:
 %
 %  GPU, precision: single
-%   Titan V    PCIe (2017): 12534.7 GFLOPS
-%   Tesla A100 PCIe (2021): 10285.8 GFLOPS
-%   Tesla A800 PCIe (2024): 17801.2 GFLOPS
+%   Titan V    PCIe (2017): 12 TFLOPS
+%   Tesla A100 PCIe (2021): 10 TFLOPS
+%   Tesla A800 PCIe (2024): 18 TFLOPS
+%   Tesla H200 SXM  (2025): 51 TFLOPS
 %
 %  GPU, precision: double
-%   Titan V    PCIe (2017): 6508.9  GFLOPS
-%   Tesla A100 PCIe (2021): 10093.5 GFLOPS
-%   Tesla A800 PCIe (2024): 14984.8 GFLOPS
+%   Titan V    PCIe (2017): 6.5 TFLOPS
+%   Tesla A100 PCIe (2021): 10  TFLOPS
+%   Tesla A800 PCIe (2024): 15  TFLOPS
+%   Tesla H200 SXM  (2025): 60  TFLOPS
 %
 % jos.martin@mathworks.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -50,18 +52,18 @@ for n=1:numel(sizes)
 end
 
 % Convert to GFlops
-mmGFlopsCPU=(2*N.^3-N.^2)./mmTimesCPU/1e9;
-mmGFlopsGPU=(2*N.^3-N.^2)./mmTimesGPU/1e9;
+mmTFlopsCPU=(2*N.^3-N.^2)./mmTimesCPU/1e12;
+mmTFlopsGPU=(2*N.^3-N.^2)./mmTimesGPU/1e12;
 
 % Get the maxima
-maxGFlopsCPU=max(mmGFlopsCPU);
-maxGFlopsGPU=max(mmGFlopsGPU);
+maxTFlopsCPU=max(mmTFlopsCPU);
+maxTFlopsGPU=max(mmTFlopsGPU);
 
 % Report to the user
 disp(['Precision: ' precision]);
 fprintf(['Matrix multiplication: ', ...
-         '%1.1f GFLOPS (CPU), %1.1f GFLOPS (GPU)\n'], ...
-         maxGFlopsCPU, maxGFlopsGPU)
+         '%1.1f TFLOPS (CPU), %1.1f TFLOPS (GPU)\n'], ...
+         maxTFlopsCPU, maxTFlopsGPU)
       
 end
 

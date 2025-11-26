@@ -1,7 +1,7 @@
 % All possible states of a spin-1 pair, classified by the total spin 
 % into singlet, triplet, and quartet. Syntax:
 %
-%         [S,T,Q]=deut_pair(spin_system,spin_a,spin_b,options)
+%     [S,T,Q,Tc,Qc]=deut_pair(spin_system,spin_a,spin_b,options)
 %
 % Arguments:
 %
@@ -26,16 +26,23 @@
 %             or state vectors (Liouville space), ordered in
 %             a cell array as {Q++,Q+,Q0,Q-,Q--}
 %
+%   Tc      - coherences between triplet states:
+%             {T0 -> T-, T+ -> T0, T- -> T0, T0 -> T+}
+%
+%   Qc      - coherences between quintet states:
+%             {Q- -> Q--, Q0 -> Q-, Q+ -> Q0, Q++ -> Q+, ...
+%              Q-- -> Q-, Q- -> Q0, Q0 -> Q+, Q+ -> Q++ }
+%
 % WARNING: the states above are NOT irreducible spherical tensors - 
 %          Bargon just kroneckered up some Zeeman states and gave
-%          them what looked to him like appropriate labels.
+%          them what looked to him like reasonable labels.
 %
 % ilya.kuprov@weizmann.ac.il
 % anakin.aden@mpinat.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=deut_pair.m>
 
-function [S,T,Q]=deut_pair(spin_system,spin_a,spin_b,options)
+function [S,T,Q,Tc,Qc]=deut_pair(spin_system,spin_a,spin_b,options)
 
 % Set defaults
 if ~exist('options','var'), options.dephasing=0; end
@@ -57,7 +64,8 @@ Qm=(1/sqrt(2))*(kron(bet,gam)+kron(gam,bet));
 Qmm=kron(gam,gam);
 
 % Obtain spherical tensor expansions
-S=0; T={0,0,0}; Q={0,0,0,0,0}; IST=irr_sph_ten(3);
+S=0; T={0,0,0}; Q={0,0,0,0,0}; Tc={0,0,0,0};
+Qc={0,0,0,0,0,0,0,0}; IST=irr_sph_ten(3);
 for n=1:numel(IST)
     for k=1:numel(IST)
 
@@ -98,17 +106,45 @@ for n=1:numel(IST)
 
         end
 
-        % Add to the relevant totals
-        S   =S   +trace(S0' *tss'*S0 )*rho;
-        T{1}=T{1}+trace(Tp' *tss'*Tp )*rho;
-        T{2}=T{2}+trace(T0' *tss'*T0 )*rho;
-        T{3}=T{3}+trace(Tm' *tss'*Tm )*rho;
-        Q{1}=Q{1}+trace(Qpp'*tss'*Qpp)*rho;
-        Q{2}=Q{2}+trace(Qp' *tss'*Qp )*rho;
-        Q{3}=Q{3}+trace(Q0' *tss'*Q0 )*rho;
-        Q{4}=Q{4}+trace(Qm' *tss'*Qm )*rho;
-        Q{5}=Q{5}+trace(Qmm'*tss'*Qmm)*rho;
+        % Singlet state population
+        S=S+trace(S0'*tss'*S0)*rho;
 
+        % Triplet state populations
+        if nargout>1
+            T{1}=T{1}+trace(Tp' *tss'*Tp )*rho;
+            T{2}=T{2}+trace(T0' *tss'*T0 )*rho;
+            T{3}=T{3}+trace(Tm' *tss'*Tm )*rho;
+        end
+
+        % Quintet state populations
+        if nargout>2
+            Q{1}=Q{1}+trace(Qpp'*tss'*Qpp)*rho;
+            Q{2}=Q{2}+trace(Qp' *tss'*Qp )*rho;
+            Q{3}=Q{3}+trace(Q0' *tss'*Q0 )*rho;
+            Q{4}=Q{4}+trace(Qm' *tss'*Qm )*rho;
+            Q{5}=Q{5}+trace(Qmm'*tss'*Qmm)*rho;
+        end
+
+        % Triplet state coherences
+        if nargout>3
+            Tc{1}=Tc{1}+trace(T0'*tss'*Tm)*rho;
+            Tc{2}=Tc{2}+trace(Tp'*tss'*T0)*rho;
+            Tc{3}=Tc{3}+trace(Tm'*tss'*T0)*rho;
+            Tc{4}=Tc{4}+trace(T0'*tss'*Tp)*rho;
+        end
+
+        % Quintet state coherences
+        if nargout>4
+            Qc{1}=Qc{1}+trace(Qm'*tss'*Qmm)*rho;
+            Qc{2}=Qc{2}+trace(Q0'*tss'*Qm)*rho;
+            Qc{3}=Qc{3}+trace(Qp'*tss'*Q0)*rho;
+            Qc{4}=Qc{4}+trace(Qpp'*tss'*Qp)*rho;
+            Qc{5}=Qc{5}+trace(Qmm'*tss'*Qm)*rho;
+            Qc{6}=Qc{6}+trace(Qm'*tss'*Q0)*rho;
+            Qc{7}=Qc{7}+trace(Q0'*tss'*Qp)*rho;
+            Qc{8}=Qc{8}+trace(Qp'*tss'*Qpp)*rho;
+        end
+   
     end
 
 end

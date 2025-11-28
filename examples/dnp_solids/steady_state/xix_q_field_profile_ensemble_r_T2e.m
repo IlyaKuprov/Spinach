@@ -1,28 +1,39 @@
-% Simulation of T2e dependent XiX DNP field profiles in the steady state 
-% with electron-proton distance ensemble.
+% Simulation of T1e dependence of XiX DNP field
+% profiles in the steady state with electron-proton
+% distance ensemble.
 % 
-% Calculation time: minutes
+% Calculation time: seconds
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % guinevere.mathies@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il
 
-close all
+function xix_q_field_profile_ensemble_r_T2e()
 
+% Electron relaxation times, seconds
 T2e=[50e-6 15e-6 5e-6 1.5e-6 0.5e-6];
-Color={'#D95319' '#EDB120' '#000000' '#77AC30' '#0072BD'};
 
-for j=1:numel(T2e)
-    col=char(Color(j));
-    xix_field_profile_ensemble_r(T2e(j),col)
-    legend('50 \mus','15 \mus','5 \mus','1.5 \mus','0.5 \mus','location','southeast')
+% Get the figure started
+kfigure(); hold on; kgrid;
+kxlabel('Microwave resonance offset, MHz'); 
+kylabel('$\langle I_Z \rangle _{\infty}$');
+xlim tight; ylim([-3e-3 3e-3]);
+
+% Plot the curves
+for n=1:numel(T2e)
+    xix_field_profile_ensemble_r(T2e(n));
 end
 
-% Save figure
-savefig(gcf,'xix_field_profile_ensemble_r_T2e.fig');
+% Add the legend and save the plot
+klegend({'$T_{2e}$ = 50 $\mu$s', '$T_{2e}$ = 15 $\mu$s',...
+         '$T_{2e}$ = 5 $\mu$s','$T_{2e}$ = 1.5 $\mu$s',...
+         '$T_{2e}$ = 0.5 $\mu$s'},'Location','SouthEast');
+savefig(gcf,'xix_q_field_profile_ensemble_r_T2e.fig');
+
+end
 
 % Simulation for a specific T2e
-function xix_field_profile_ensemble_r(T2e,col)
+function xix_field_profile_ensemble_r(T2e)
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -79,7 +90,7 @@ for n=1:numel(r)
 
     % Experiment parameters
     parameters.spins={'E','1H'};
-    parameters.irr_powers=18e6;            % Electron nutation frequency [Hz]
+    parameters.irr_powers=18e6;              % Electron nutation frequency [Hz]
     parameters.grid='rep_2ang_800pts_sph';
     parameters.pulse_dur=48e-9;              % Pulse duration, seconds
     parameters.nloops=36;                    % Number of XiX DNP blocks (power of 2)
@@ -88,7 +99,7 @@ for n=1:numel(r)
     parameters.el_offs=offsets;
 
     % Calculate shot spacing
-    parameters.shot_spacing=204e-6 - 2*parameters.nloops*parameters.pulse_dur;
+    parameters.shot_spacing = 204e-6 - 2*parameters.nloops*parameters.pulse_dur;
 
     % Run the steady state simulation
     dnp(:,n)=powder(spin_system,@xixdnp_steady,parameters,'esr');
@@ -99,15 +110,7 @@ end
 dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(w,[1 numel(w)]),2)/sum((r.^2).*w);
 
 % Plotting 
-figure(1); plot(parameters.el_offs/1e6,real(dnp),'color',col,'LineWidth',1.5); 
-xlabel('\Omega/2\pi (MHz)');
-ylabel('\langle I_Z \rangle');
-grid on; xlim tight; ylim([-3e-3 3e-3]); hold on
-
-ax=gca;
-ax.FontSize=14;
-ax.LineWidth=1.2;
-set(gca,'XMinorTick','on','YMinorTick','on');
+plot(parameters.el_offs/1e6,real(dnp)); drawnow;
 
 end
 

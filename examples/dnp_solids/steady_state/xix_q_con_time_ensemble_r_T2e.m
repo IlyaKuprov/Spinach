@@ -10,7 +10,7 @@
 
 function xix_q_con_time_ensemble_r_T2e()
 
-% Electron relaxation times to use, seconds
+% Electron relaxation times, seconds
 T2e=[50e-6 15e-6 5e-6 1.5e-6 0.5e-6];
 
 % Get the figure started

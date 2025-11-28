@@ -1,5 +1,6 @@
-% Simulation of T2e dependent XiX DNP optimization of repetition time in 
-% the steady state with electron-proton distance ensemble.
+% Simulation of T2e dependence of XiX DNP repetition time 
+% profile in the steady state with electron-proton distan-
+% ce ensemble.
 % 
 % Calculation time: minutes
 % 
@@ -7,21 +8,32 @@
 % guinevere.mathies@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il
 
-close all
+function xix_q_rep_time_ensemble_r_T2e()
 
+% Electron relaxation times, seconds
 T2e=[50e-6 15e-6 5e-6 1.5e-6 0.5e-6];
-Color={'#D95319' '#EDB120' '#000000' '#77AC30' '#0072BD'};
 
-for j=1:numel(T2e)
-    col=char(Color(j));
-    xix_rep_time_ensemble_r(T2e(j),col)
-    legend('50 \mus','15 \mus','5 \mus','1.5 \mus','0.5 \mus','location','southeast')
+% Get the figure started
+kfigure(); hold on; kgrid;
+kxlabel('Repetition time (ms)');
+kylabel('$\langle I_Z \rangle _{\infty}$');
+xlim tight; ylim([0 2e-3]);
+
+% Plot the curves
+for n=1:numel(T2e)
+    xix_rep_time_ensemble_r(T2e(n));
 end
 
-savefig(gcf,'xix_rep_time_ensemble_r_T2e.fig');
+% Add the legend and save the plot
+klegend({'$T_{2e}$ = 50 $\mu$s', '$T_{2e}$ = 15 $\mu$s',...
+         '$T_{2e}$ = 5 $\mu$s','$T_{2e}$ = 1.5 $\mu$s',...
+         '$T_{2e}$ = 0.5 $\mu$s'},'Location','NorthEast');
+savefig(gcf,'xix_q_rep_time_ensemble_r_T2e.fig');
+
+end
 
 % Simulation for a specific T2e
-function xix_rep_time_ensemble_r(T2e,col)
+function xix_rep_time_ensemble_r(T2e)
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -81,8 +93,8 @@ for n=1:numel(r)
 
     % Experiment parameters
     parameters.spins={'E','1H'};
-    parameters.irr_powers=18e6;            % Electron nutation frequency [Hz]
-    parameters.grid='rep_2ang_800pts_sph';
+    parameters.irr_powers=18e6;              % Electron nutation frequency [Hz]
+    parameters.grid='rep_2ang_800pts_oct';
     parameters.pulse_dur=48e-9;              % Pulse duration, seconds
     parameters.nloops=36;                    % Number of XiX DNP blocks (power of 2)
     parameters.phase=pi;                     % Second pulse inverted phase
@@ -110,15 +122,7 @@ end
 dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(wr,[1 numel(wr)]),2)/sum((r.^2).*wr);
 
 % Plotting 
-figure(1); plot(rep_time*1e3,-real(dnp),'color',col,'LineWidth',1.5);
-xlabel('Repetition time (ms)');
-ylabel('\langle I_Z \rangle');
-grid on; xlim([0 2]); ylim([0 1.4e-3]); hold on
-
-ax=gca;
-ax.FontSize=14;
-ax.LineWidth=1.2;
-set(gca,'XMinorTick','on','YMinorTick','on');
+plot(rep_time*1e3,-real(dnp)); drawnow;
 
 end
 

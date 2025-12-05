@@ -53,17 +53,17 @@ classdef (InferiorClasses={?gpuArray}) rcv
                     obj=varargin{1};
 
                 % Convert Matlab matrices to RCV
-                elseif ismatrix(input)
+                elseif ismatrix(varargin{1})
                     
                     % Preserve location
-                    obj.isGPU=isa(input,'gpuArray');
+                    obj.isGPU=isa(varargin{1},'gpuArray');
 
                     % Get dimensions
-                    obj.numRows=int64(size(input,1));
-                    obj.numCols=int64(size(input,2));
+                    obj.numRows=int64(size(varargin{1},1));
+                    obj.numCols=int64(size(varargin{1},2));
 
                     % Get non-zeroes
-                    [row,col,val]=find(input);
+                    [row,col,val]=find(varargin{1});
 
                     % Make the object
                     obj.row=int64(row(:));

@@ -5,7 +5,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=pauli.m>
 
-function kfigure(varargin)
+function handle=kfigure(varargin)
 
 % Reset to pre-R2025a settings
 set(groot,'defaultFigurePosition',[680 458 560 420]); 
@@ -13,8 +13,8 @@ set(groot,'defaultFigureWindowStyle','normal');
 set(groot,'defaultFigureMenuBar','figure'); 
 set(groot,'defaultFigureToolbar','figure'); 
 
-% Create
-figure(varargin{:});
+% Create and return a handle
+handle=figure(varargin{:});
 
 end
 

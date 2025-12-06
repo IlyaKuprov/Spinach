@@ -26,8 +26,8 @@ disp('Running startup checks...');
 %##########################################
 
 % Global Matlab release
-if isMATLABReleaseOlderThan('R2025a')
-    error('Spinach requires Matlab R2025a or later.');
+if isMATLABReleaseOlderThan('R2024b')
+    error('Spinach requires Matlab R2024b or later.');
 end
 
 % Existential toolboxes

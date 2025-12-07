@@ -43,7 +43,12 @@ spin_system.inter.coupling.strength=cell(spin_system.comp.nspins);
 switch assumptions
     
     case {'nmr'}
-        
+
+        % Disallow particles that are not spins
+        if any(ismember({'C','V','T'},spin_system.comp.types),'all')
+            error('Cavities, phonons, and transmons are not allowed under this assumption set.');
+        end
+
         % Do the reporting
         report(spin_system,'generic high-field NMR assumption set:');
         report(spin_system,'  rotating frame approximation for electrons,');
@@ -87,6 +92,11 @@ switch assumptions
         end
         
     case {'esr','deer'}
+
+        % Disallow particles that are not spins
+        if any(ismember({'C','V','T'},spin_system.comp.types),'all')
+            error('Cavities, phonons, and transmons are not allowed under this assumption set.');
+        end
         
         % Do the reporting
         report(spin_system,'generic high-field EPR/DEER assumption set:');
@@ -149,6 +159,11 @@ switch assumptions
         end
         
     case {'deer-zz'}
+
+        % Disallow particles that are not spins
+        if any(ismember({'C','V','T'},spin_system.comp.types),'all')
+            error('Cavities, phonons, and transmons are not allowed under this assumption set.');
+        end
         
         % Do the reporting
         report(spin_system,'specialised (electron ZZ only) DEER assumption set:');
@@ -217,6 +232,11 @@ switch assumptions
         end
         
     case {'labframe'}
+
+        % Disallow particles that are not spins
+        if any(ismember({'C','V','T'},spin_system.comp.types),'all')
+            error('Cavities, phonons, and transmons are not allowed under this assumption set.');
+        end
         
         % Do the reporting
         report(spin_system,'lab frame assumption set - no assumptions:');
@@ -252,6 +272,11 @@ switch assumptions
         end
         
     case {'se_dnp_h+'}
+
+        % Disallow particles that are not spins
+        if any(ismember({'C','V','T'},spin_system.comp.types),'all')
+            error('Cavities, phonons, and transmons are not allowed under this assumption set.');
+        end
         
         % Do the reporting
         report(spin_system,'H+ part of the solid effect DNP Hamiltonian:');
@@ -306,6 +331,11 @@ switch assumptions
         end
         
     case {'se_dnp_h-'}
+
+        % Disallow particles that are not spins
+        if any(ismember({'C','V','T'},spin_system.comp.types),'all')
+            error('Cavities, phonons, and transmons are not allowed under this assumption set.');
+        end
         
         % Do the reporting
         report(spin_system,'H- part of the solid effect DNP Hamiltonian:');
@@ -360,6 +390,11 @@ switch assumptions
         end
         
     case {'se_dnp_h0'}
+
+        % Disallow particles that are not spins
+        if any(ismember({'C','V','T'},spin_system.comp.types),'all')
+            error('Cavities, phonons, and transmons are not allowed under this assumption set.');
+        end
         
         % Do the reporting
         report(spin_system,'H0 part of the solid effect DNP Hamiltonian:');
@@ -414,6 +449,11 @@ switch assumptions
         end
         
     case 'qnmr'
+
+        % Disallow particles that are not spins
+        if any(ismember({'C','V','T'},spin_system.comp.types),'all')
+            error('Cavities, phonons, and transmons are not allowed under this assumption set.');
+        end
         
         % Do the reporting
         report(spin_system,'generic quadrupolar NMR assumption set:');
@@ -484,6 +524,37 @@ switch assumptions
                 
             end
             
+        end
+
+    case 'duffing'
+
+        % Disallow particles that are not transmons
+        if any(ismember({'C','V','S'},spin_system.comp.types),'all')
+            error('Cavities, phonons, and spins are not allowed under this assumption set.');
+        end
+        
+        % Do the reporting
+        report(spin_system,'transmon assumption set - Duffing model:');
+        report(spin_system,'  offset term is omega*Cr*An,');
+        report(spin_system,'  anharmonicity term is (alpha/2)*Cr*Cr*An*An,');
+        report(spin_system,'  coupling terms are J*(AnA*CrB+CrA*AnB).');
+        
+        % Process Zeeman interactions
+        for n=1:spin_system.comp.nspins
+            
+            % Full Duffing offsets for all transmons
+            spin_system.inter.duffing.strength{n}='full';
+            
+        end
+        
+        % Process couplings
+        for n=1:spin_system.comp.nspins
+            for k=1:spin_system.comp.nspins
+                
+                % The word for XX+YY coupling was invented here
+                spin_system.inter.coupling.strength{n,k}='tough';
+                
+            end
         end
         
     otherwise

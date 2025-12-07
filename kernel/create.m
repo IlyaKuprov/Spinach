@@ -399,6 +399,11 @@ for n=1:spin_system.comp.nspins
 
         % Phonon mode, Weil algebra 
         spin_system.comp.types{n}='V';
+
+    elseif strcmp(name(1),'T')&&(~isempty(regexp(name,'^T\d','once')))
+
+        % Transmon, Weil algebra 
+        spin_system.comp.types{n}='T';
         
     else
 
@@ -449,6 +454,35 @@ report(spin_system,['magnetic induction of ' num2str(spin_system.inter.magnet,'%
 
 % Compute carrier frequencies
 spin_system.inter.basefrqs=-spin_system.inter.gammas*spin_system.inter.magnet;
+
+% Absorb transmon parameters
+if isfield(inter,'duffing')
+
+    % Absorb parameters and parse out
+    spin_system.inter.duffing.offset=inter.duffing.offset;
+    spin_system.inter.duffing.anharm=inter.duffing.anharm;
+    inter=rmfield(inter,'duffing');
+
+    % Print report header
+    report(spin_system,' ');
+    report(spin_system,'Duffing approximation parameters for transmons');
+    report(spin_system,'=================================================');
+    report(spin_system,' Number    Levels    Offset, Hz    Anharm, Hz    ');
+    report(spin_system,'-------------------------------------------------');
+
+    % Report transmons
+    for n=1:spin_system.comp.nspins
+        if strcmp(spin_system.comp.types{n},'T')
+            report(spin_system,['  ' pad(int2str(n),10) pad(int2str(spin_system.comp.mults(n)),9) ...
+                                     pad(num2str(spin_system.inter.duffing.offset{n},'%+4.3e'),14)   ...
+                                     pad(num2str(spin_system.inter.duffing.anharm{n},'%+4.3e'),14)]);
+        end
+    end
+
+    % Finish up transmon reporting
+    report(spin_system,'=================================================');
+
+end
 
 % Preallocate Zeeman tensor array
 spin_system.inter.zeeman.matrix=mat2cell(zeros(3*spin_system.comp.nspins,3),3*ones(spin_system.comp.nspins,1));

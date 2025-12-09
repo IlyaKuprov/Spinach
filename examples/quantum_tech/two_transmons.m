@@ -11,22 +11,75 @@ sys.magnet=0;
 % Particle specification
 sys.isotopes={'T3','T5'};
 
-% Interactions
-inter.duffing.offset={1e6 2e6};
-inter.duffing.anharm={1e3 2e3};
-inter.coupling.scalar=cell(2,2);
-inter.coupling.scalar{1,2}=1e3;
-
 % Formalism and basis
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Spinach housekeeping
-spin_system=create(sys,inter);
+spin_system=create(sys);
 spin_system=basis(spin_system,bas);
 
-% Assumptions
-spin_system=assume(spin_system,'duffing');
+% Get elementary operators
+CrA=operator(spin_system,'Cr',1);
+AnA=operator(spin_system,'An',1);
+CrB=operator(spin_system,'Cr',2);
+AnB=operator(spin_system,'An',2);
+
+% Hamiltonian parameters
+deltas=2*pi*[100 -200];
+alphas=2*pi*[10   20];
+J=2*pi*50;
+
+% Build the Hamiltonian
+H=deltas(1)*CrA*AnA+(alphas(1)/2)*CrA*CrA*AnA*AnA+...
+  deltas(2)*CrB*AnB+(alphas(2)/2)*CrB*CrB*AnB*AnB+...
+  J*(CrA*AnB+CrB*AnA);
+
+% Build control operators
+C_A=(CrA+AnA)/2; C_B=(CrB+AnB)/2;
+
+% Build offset operators
+O_A=operator(spin_system,'Nu',1);
+O_B=operator(spin_system,'Nu',2);
+
+% Build source and destination states
+rho_init=state(spin_system,{'Cr','Em'},{1 2})+...
+         state(spin_system,{'An','Em'},{1 2});
+rho_targ=state(spin_system,{'Em','Cr'},{1 2})+...
+         state(spin_system,{'Em','An'},{1 2});
+rho_init=rho_init/norm(rho_init,'fro');
+rho_targ=rho_targ/norm(rho_targ,'fro');
+
+% Unit fidelity is Sorensen bound
+rho_targ=rho_targ/sorensen(rho_init,rho_targ);
+
+% Define control parameters
+control.drifts={{H}};                             % Drift
+control.operators={C_A,C_B};                      % Controls
+control.off_ops={O_A,O_B};                        % Offset operator
+control.offsets={linspace(-10,10,5)...
+                 linspace(-10,10,5)};             % Offset distribution
+control.rho_init={rho_init};                      % Starting state
+control.rho_targ={rho_targ};                      % Destination state
+control.pwr_levels=2*pi*[40 45 50 55 60]*5;       % Pulse power ensemble
+control.pulse_dt=1e-3*ones(1,100);                % Slice durations
+control.penalties={'NS'};                         % Penalties
+control.p_weights=0.1;                            % Penalty weights
+control.method='lbfgs';                           % Optimisation method
+control.max_iter=100;                             % Termination condition
+control.parallel='ensemble';                      % Parallelisation mode
+
+% Plots during optimisation
+control.plotting={'xy_controls','spectrogram','robustness'};
+
+% Spinach housekeeping
+spin_system=optimcon(spin_system,control);
+
+% Initial guess - random
+pulse=(1/10)*randn(2,100);
+
+% Run the optimisation, get normalised pulse
+fminnewton(spin_system,@grape_xy,pulse);
 
 end
 

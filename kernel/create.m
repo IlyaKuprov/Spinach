@@ -57,6 +57,9 @@ end
 % Run overrides
 autoexec;
 
+% Rare, but it can happen
+if nargin==1, inter=[]; end
+
 % Validate input
 grumble(sys,inter);
 

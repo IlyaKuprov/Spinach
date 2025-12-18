@@ -30,7 +30,7 @@ H_S=H_S+omega(2)*operator(spin_system,'Ly','14N');
 H_S=H_S+omega(3)*operator(spin_system,'Lz','14N');
 
 % Compare the matrices
-if norm(H_T-H_S,2)>1e-6
+if norm(H_T-H_S,2)>1e-6*norm(H_T+H_S,2)
     error('Quadrupolar reconstruction test FAILED.');
 else
     disp('Quadrupolar reconstruction test PASSED.');

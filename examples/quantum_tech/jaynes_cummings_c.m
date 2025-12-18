@@ -59,8 +59,8 @@ S=state(spin_system,{'Lx'},{1})+...
   state(spin_system,{'Lx'},{2});
 
 % Detection state, cavity mode
-B=(state(spin_system,{'Cr'},{2})-...
-   state(spin_system,{'An'},{2}))/2i;
+B=(state(spin_system,{'Cr'},{3})-...
+   state(spin_system,{'An'},{3}))/2i;
 
 % Run evolution
 traj_s=evolution(spin_system,H,S,rho,10e-9,250,'observable');

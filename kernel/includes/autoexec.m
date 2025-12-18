@@ -13,49 +13,54 @@ set(groot,'defaultFigureWindowStyle','normal');
 set(groot,'defaultFigureMenuBar','figure'); 
 set(groot,'defaultFigureToolbar','figure'); 
 
-% IK group system settings
-switch getenv('COMPUTERNAME')
+% Do not override user spec
+if ~isfield(sys,'parallel')
 
-    case 'ELMINSTER' % 256 AMD cores, 3 TB of RAM
-        
-        % 256 workers crash Matlab
-        sys.parallel={'processes',128};
+    % IK group system settings
+    switch getenv('COMPUTERNAME')
 
-    case 'ALAUNDO' % 128 Intel cores, 4 TB of RAM, 8 H200 GPUs
-        
-        % Are GPUs involved?
-        if isfield(sys,'enable')&&...
-           ismember('gpu',sys.enable)
+        case 'ELMINSTER' % 256 AMD cores, 3 TB of RAM
 
-            % 4 workers per GPU are safe
-            sys.parallel={'processes',32};
-
-        else
-
-            % Without GPUs, use all cores
+            % 256 workers crash Matlab
             sys.parallel={'processes',128};
 
-        end
+        case 'ALAUNDO' % 128 Intel cores, 4 TB of RAM, 8 H200 GPUs
 
-    case 'TALOS' % 56 Intel cores, 1 TB of RAM, 3 A800 GPUs
-        
-        % Are GPUs involved?
-        if isfield(sys,'enable')&&...
-           ismember('gpu',sys.enable)
+            % Are GPUs involved?
+            if isfield(sys,'enable')&&...
+               ismember('gpu',sys.enable)
 
-            % 4 workers per GPU are safe
-            sys.parallel={'processes',12};
+                % 4 workers per GPU are safe
+                sys.parallel={'processes',32};
 
-        else
+            else
 
-            % Without GPUs, use all cores
-            sys.parallel={'processes',56};
+                % Without GPUs, use all cores
+                sys.parallel={'processes',128};
 
-        end
+            end
 
-    otherwise
+        case 'TALOS' % 56 Intel cores, 1 TB of RAM, 3 A800 GPUs
 
-        % Do nothing
+            % Are GPUs involved?
+            if isfield(sys,'enable')&&...
+               ismember('gpu',sys.enable)
+
+                % 4 workers per GPU are safe
+                sys.parallel={'processes',12};
+
+            else
+
+                % Without GPUs, use all cores
+                sys.parallel={'processes',56};
+
+            end
+
+        otherwise
+
+            % Do nothing
+
+    end
 
 end
 

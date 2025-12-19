@@ -90,13 +90,12 @@ parameters.invert_axis=1;
 
 % Set the detection state
 coil=state(spin_system,'L+',parameters.spins{1});
-coil=coil/norm(coil);
 
 % Get the pulse operator
-Lp=operator(spin_system,'L+',parameters.spins{1});
+Ly=operator(spin_system,'Ly',parameters.spins{1});
 
 % Apply pi/2 pulse on Y axis
-rho=step(spin_system,(Lp-Lp')/2i,rho,pi/2);
+rho=step(spin_system,Ly,rho,pi/2);
 
 % Detect the magnetization
 fid=evolution(spin_system,H,coil,rho,1/parameters.sweep,...

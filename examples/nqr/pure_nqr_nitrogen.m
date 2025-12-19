@@ -34,8 +34,7 @@ parameters.sweep=5e6;
 parameters.npoints=512;
 parameters.grid='rep_2ang_200pts_sph';
 parameters.coil=state(spin_system,'L+','14N');
-parameters.pulse_op=(operator(spin_system,'L+','14N')+...
-                     operator(spin_system,'L-','14N'))/2;
+parameters.pulse_op=operator(spin_system,'Lx','14N');
 parameters.pulse_angle=pi/2;               
 parameters.axis_units='MHz';
 

@@ -39,7 +39,7 @@ coil=state(spin_system,'Lz','1H');
 H=hamiltonian(assume(spin_system,'nmr'));
 
 % Pulse operator
-Lp=operator(spin_system,'L+','1H'); Lx=(Lp+Lp')/2;
+Lx=operator(spin_system,'Lx','1H');
 
 % Relaxation superoperator
 R=relaxation(spin_system);

@@ -44,8 +44,7 @@ spin_system=basis(spin_system,bas);
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,{'Lz','Lz'},{1,4});
 parameters.coil=state(spin_system,'L+','1H');
-parameters.pulse_op=(operator(spin_system,'L+','1H')-...
-                     operator(spin_system,'L-','1H'))/2i;
+parameters.pulse_op=operator(spin_system,'Ly','1H');
 parameters.pulse_angle=-pi/4;
 parameters.decouple={};
 parameters.offset=500;

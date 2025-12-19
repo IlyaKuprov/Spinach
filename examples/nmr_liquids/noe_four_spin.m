@@ -56,8 +56,7 @@ rho=rho-rho_eq;
 parameters.spins={'1H'};
 parameters.rho0=rho;
 parameters.coil=state(spin_system,'L+','1H');
-parameters.pulse_op=(operator(spin_system,'L+','1H')-...
-                     operator(spin_system,'L-','1H'))/2i;
+parameters.pulse_op=operator(spin_system,'Ly','1H');
 parameters.pulse_angle=pi/2;
 parameters.decouple={};
 parameters.offset=1400;

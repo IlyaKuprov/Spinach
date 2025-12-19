@@ -89,17 +89,19 @@ Nz=real(Nz'*traj); Nx=real(Nx'*traj);
 COz=real(COz'*traj); COx=real(COx'*traj);
 
 % Plotting
-figure; scale_figure([1.0 2.0]);
+kfigure(); scale_figure([1.0 2.0]);
 subplot(3,1,1); plot([Hz' Hx']); 
-klegend({'H$_{\rm{Z}}$','H$_{\rm{X}}$'}); xlim tight; kgrid;
+klegend({'H$_{\rm{Z}}$','H$_{\rm{X}}$'},...
+        'Location','SouthEast'); xlim tight; kgrid;
 kylabel('expectation value'); kxlabel('time, ms');
 subplot(3,1,2); plot([Nz' Nx']); 
-klegend({'N$_{\rm{Z}}$','N$_{\rm{X}}$'}); xlim tight; kgrid;
+klegend({'N$_{\rm{Z}}$','N$_{\rm{X}}$'},...
+        'Location','SouthEast'); xlim tight; kgrid;
 kylabel('expectation value'); kxlabel('time, ms');
 subplot(3,1,3); plot([COz' COx']); 
-klegend({'C$^{(O)}_{\rm{Z}}$','C$^{(O)}_{\rm{X}}$'}); 
-xlim tight; kgrid; kxlabel('time, ms');
-kylabel('expectation value'); 
+klegend({'C$^{(\rm{O})}_{\rm{Z}}$','C$^{(\rm{O})}_{\rm{X}}$'},...
+        'Location','SouthEast'); xlim tight; kgrid;
+kxlabel('time, ms'); kylabel('expectation value'); 
 
 end
 
@@ -107,10 +109,9 @@ end
 function traj=frydman_pump(spin_system,parameters,~,R,K)
 
 % Get pulse operators
-Hp=operator(spin_system,'L+',parameters.spins{1});
-Np=operator(spin_system,'L+',parameters.spins{2});
-Cp=operator(spin_system,'L+',parameters.spins{3});
-Hy=(Hp-Hp')/2i; Ny=(Np-Np')/2i; Cy=(Cp-Cp')/2i;
+Hy=operator(spin_system,'Ly',parameters.spins{1});
+Ny=operator(spin_system,'Ly',parameters.spins{2});
+Cy=operator(spin_system,'Ly',parameters.spins{3});
 
 % Lab frame Hamiltonian and equilibrium state
 H=hamiltonian(assume(spin_system,'labframe'),'left');

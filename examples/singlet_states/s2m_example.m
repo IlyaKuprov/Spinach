@@ -26,10 +26,8 @@ spin_system=basis(spin_system,bas);
 H=hamiltonian(assume(spin_system,'nmr'));
 
 % Pulse operators
-Hy=(operator(spin_system,'L+','13C')-...
-    operator(spin_system,'L-','13C'))/2i;
-Hx=(operator(spin_system,'L+','13C')+...
-    operator(spin_system,'L-','13C'))/2;
+Cx=operator(spin_system,'Lx','13C');
+Cy=operator(spin_system,'Ly','13C');
 
 % Start with singlet state
 rho0=singlet(spin_system,1,2);
@@ -38,7 +36,7 @@ rho0=singlet(spin_system,1,2);
 coil=state(spin_system,'Lz','all');
 
 % Call the S2M sequence
-rho=s2m(spin_system,H,Hx,Hy,rho0,55,6.0);
+rho=s2m(spin_system,H,Cx,Cy,rho0,55,6.0);
 
 % Display the longitudinal magnetisation
 disp(['Longitudinal magnetisation: ' num2str(coil'*rho)]);

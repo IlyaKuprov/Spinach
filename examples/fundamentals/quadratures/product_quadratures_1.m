@@ -43,8 +43,7 @@ spin_system=assume(spin_system,'nmr');
 H=hamiltonian(spin_system);
 
 % Control operator
-Lx=(operator(spin_system,'L+','1H')+...
-    operator(spin_system,'L-','1H'))/2;
+Lx=operator(spin_system,'Lx','1H');
 
 % Pulse duration
 duration=1e-2;

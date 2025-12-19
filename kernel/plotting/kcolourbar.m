@@ -18,6 +18,9 @@
 
 function kcolourbar(x)
 
+% Default is empty string
+if ~exist('x','var'), x=''; end
+
 % Check consistency
 grumble(x);
 

@@ -76,9 +76,10 @@ parameters.diff=[3.6e-6 0 0; 0 0 0; 0 0 0];
         L=H+F+1i*R+1i*K;
         
         % Get pulse operators
-        Lp=operator(spin_system,'L+',parameters.spins{1});
-        Lx=kron(speye(prod(parameters.npts)),(Lp+Lp')/2);
-        Ly=kron(speye(prod(parameters.npts)),(Lp-Lp')/2i);
+        Lx=operator(spin_system,'Lx',parameters.spins{1});
+        Ly=operator(spin_system,'Ly',parameters.spins{1});
+        Lx=kron(speye(prod(parameters.npts)),Lx);
+        Ly=kron(speye(prod(parameters.npts)),Ly);
 
         % Pulse phase
         rf_phi=pi/2;
@@ -137,15 +138,21 @@ parameters.diff=[3.6e-6 0 0; 0 0 0; 0 0 0];
     end
 
 % Run the pulse sequence in the imaging context
-traj=imaging(spin_system,@tube_flow,parameters); 
+traj=imaging(spin_system,@tube_flow,parameters);
+
+% Get detection states
+coil_sing=singlet(spin_system,1,2);
+coil_magn=state(spin_system,'L+','all');
                 
 % Show the movie
 kfigure();
 for n=1:100
-    tube_sing=fpl2phan(traj{1}(:,n),singlet(spin_system,1,2),parameters.npts);
-    tube_magn=fpl2phan(traj{2}(:,n),state(spin_system,'L+','all'),parameters.npts);
-    subplot(1,2,1); imagesc(real(tube_sing),25*[-2e-3 6e-3]/2); colorbar; title('singlet');
-    subplot(1,2,2); imagesc(real(tube_magn),25*[-2e-3 6e-3]); colorbar; title('magnetisation');
+    tube_sing=fpl2phan(traj{1}(:,n),coil_sing,parameters.npts);
+    tube_magn=fpl2phan(traj{2}(:,n),coil_magn,parameters.npts);
+    subplot(1,2,1); imagesc(real(tube_sing),25*[-2e-3 6e-3]/2); 
+    kcolourbar; ktitle('singlet state'); kxlabel('mm');
+    subplot(1,2,2); imagesc(real(tube_magn),25*[-2e-3 6e-3]); 
+    kcolourbar; ktitle('transv. magn.'); kxlabel('mm');
     drawnow; pause(0.01);
 end
 

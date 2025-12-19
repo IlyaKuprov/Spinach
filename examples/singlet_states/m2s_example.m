@@ -26,10 +26,8 @@ spin_system=basis(spin_system,bas);
 H=hamiltonian(assume(spin_system,'nmr'));
 
 % Pulse operators
-Hy=(operator(spin_system,'L+','13C')-...
-    operator(spin_system,'L-','13C'))/2i;
-Hx=(operator(spin_system,'L+','13C')+...
-    operator(spin_system,'L-','13C'))/2;
+Cx=operator(spin_system,'Lx','13C');
+Cy=operator(spin_system,'Ly','13C');
 
 % Start with longitudinal magnetisation
 rho0=state(spin_system,'Lz','all');
@@ -38,7 +36,7 @@ rho0=state(spin_system,'Lz','all');
 coil=singlet(spin_system,1,2);
 
 % Call the M2S sequence
-rho=m2s(spin_system,H,Hx,Hy,rho0,55,6.0);
+rho=m2s(spin_system,H,Cx,Cy,rho0,55,6.0);
 
 % Display the singlet population
 disp(['Singlet population: ' num2str(coil'*rho)]);

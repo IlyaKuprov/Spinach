@@ -34,10 +34,8 @@ parameters.sweep=[83.5e6 84.5e6];
 parameters.npoints=512;
 parameters.grid='rep_2ang_200pts_sph';
 parameters.coil=state(spin_system,'L+','127I');
-parameters.Lx=(operator(spin_system,'L+','127I')+...
-               operator(spin_system,'L-','127I'))/2;
-parameters.Ly=(operator(spin_system,'L+','127I')-...
-               operator(spin_system,'L-','127I'))/2i;
+parameters.Lx=operator(spin_system,'Lx','127I');
+parameters.Ly=operator(spin_system,'Ly','127I');
 parameters.rf_frq=84.0e6;
 parameters.rf_pwr=2*pi*1e5;
 

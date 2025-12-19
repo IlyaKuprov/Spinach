@@ -38,12 +38,11 @@ spin_system=basis(spin_system,bas);
 
 % Sequence parameters
 parameters.spins={'1H'};
-parameters.rho0=state(spin_system,{'Lz','Lz'},{1,4})-...
+parameters.rho0=1.0*state(spin_system,{'Lz','Lz'},{1,4})-...
                 0.5*state(spin_system,{'Lz'},{1})+...
                 0.5*state(spin_system,{'Lz'},{4});
 parameters.coil=state(spin_system,'L+','1H');
-parameters.pulse_op=(operator(spin_system,'L+','1H')-...
-                     operator(spin_system,'L-','1H'))/2i;
+parameters.pulse_op=operator(spin_system,'Ly','1H');
 parameters.pulse_angle=pi/100;
 parameters.decouple={};
 parameters.offset=500;

@@ -3,6 +3,8 @@
 %
 %            http://dx.doi.org/10.1016/j.jmr.2014.01.011
 %
+% Calculation time: seconds
+%
 % ledwards@cbs.mpg.de
 
 function pfg_test_2()
@@ -31,8 +33,8 @@ spin_system=assume(spin_system,'nmr');
 H=hamiltonian(spin_system);
 
 % Propagator for a pi/2 pulse
-Hp=operator(spin_system,'L+','1H');
-P=propagator(spin_system,0.5*(Hp+Hp'),pi/2);
+Hx=operator(spin_system,'Lx','1H');
+P=propagator(spin_system,Hx,pi/2);
 
 % Build initial state vector
 rho=rand(size(H,1),1);

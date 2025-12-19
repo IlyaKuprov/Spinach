@@ -153,7 +153,7 @@ switch property
         % Create a legend
         legend_text=cell(numel(unique_coherence_orders),1);
         for n=1:numel(unique_coherence_orders)
-            legend_text{n}=num2str(unique_coherence_orders(n));
+            legend_text{n}=['$' num2str(unique_coherence_orders(n)) '$'];
         end
         
         % Create labels

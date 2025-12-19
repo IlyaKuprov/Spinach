@@ -23,8 +23,9 @@ for n=1:numel(formalisms)
     spin_system=basis(spin_system,bas);
     Lp=operator(spin_system,'L+','235U');
     Lm=operator(spin_system,'L-','235U');
+    Lx=operator(spin_system,'Lx','235U');
+    Ly=operator(spin_system,'Ly','235U');
     Lz=operator(spin_system,'Lz','235U');
-    Lx=(Lp+Lm)/2; Ly=(Lp-Lm)/2i;
     answer(1,n)=norm(Lz*Lp-Lp*Lz-Lp,'fro');
     answer(2,n)=norm(Lz*Lm-Lm*Lz+Lm,'fro');
     answer(3,n)=norm(Lx*Ly-Ly*Lx-1i*Lz,'fro');

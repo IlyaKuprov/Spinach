@@ -54,8 +54,7 @@ parameters.mw_pwr=1e5;
 parameters.mw_frq=-14e8;
 parameters.fields=linspace(-0.08,+0.08,512);
 parameters.coil=state(spin_system,'Lz','15N');
-parameters.mw_oper=(operator(spin_system,'L-','E8')+...
-                    operator(spin_system,'L+','E8'))/2;
+parameters.mw_oper=operator(spin_system,'Lx','E8');
 parameters.ez_oper=operator(spin_system,'Lz','E8');
 parameters.grid='rep_2ang_6400pts_sph';
 parameters.method='backslash';

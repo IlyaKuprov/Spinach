@@ -28,17 +28,13 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Set up spin states
-Sp=state(spin_system,'L+','13C');
-Sm=state(spin_system,'L-','13C');
-Sz=state(spin_system,'Lz','13C');
-Sx=(Sp+Sm)/2; Sy=(Sp-Sm)/2i;
-Sx=Sx/norm(full(Sx),2);
-Sy=Sy/norm(full(Sy),2);
-Sz=Sz/norm(full(Sz),2);
+Sx=state(spin_system,'Lx','13C'); Sx=Sx/norm(full(Sx),2);
+Sy=state(spin_system,'Ly','13C'); Sy=Sy/norm(full(Sy),2);
+Sz=state(spin_system,'Lz','13C'); Sz=Sz/norm(full(Sz),2);
 
-% Get the control operators
-Lp=operator(spin_system,'L+','13C');
-Lx=(Lp+Lp')/2; Ly=(Lp-Lp')/2i;
+% Get control operators
+Lx=operator(spin_system,'Lx','13C');
+Ly=operator(spin_system,'Ly','13C');
 
 % Get the drift Hamiltonian
 H=hamiltonian(assume(spin_system,'nmr'));

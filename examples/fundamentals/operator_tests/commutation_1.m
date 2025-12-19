@@ -21,10 +21,11 @@ for n=1:numel(formalisms)
     bas.approximation='none';
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);
+    Lx=operator(spin_system,'Lx','1H');
+    Ly=operator(spin_system,'Ly','1H');
+    Lz=operator(spin_system,'Lz','1H');
     Lp=operator(spin_system,'L+','1H');
     Lm=operator(spin_system,'L-','1H');
-    Lz=operator(spin_system,'Lz','1H');
-    Lx=(Lp+Lm)/2; Ly=(Lp-Lm)/2i;
     answer(1,n)=norm(Lz*Lp-Lp*Lz-Lp,'fro');
     answer(2,n)=norm(Lz*Lm-Lm*Lz+Lm,'fro');
     answer(3,n)=norm(Lx*Ly-Ly*Lx-1i*Lz,'fro');

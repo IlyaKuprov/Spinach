@@ -116,8 +116,7 @@ for n=1:numel(X)
         spin_system=basis(spin_system,bas);
         
         % Electron operators
-        Ex=(operator(spin_system,'L-','E')+...
-            operator(spin_system,'L+','E'))/2;
+        Ex=operator(spin_system,'Lx','E');
         Ez=operator(spin_system,'Lz','E');
 
         % Detection state

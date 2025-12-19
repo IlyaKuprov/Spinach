@@ -53,8 +53,7 @@ parameters.spins={'E'};
 parameters.mw_pwr=2*pi*100e3;
 parameters.mw_frq=2*pi*linspace(-350,350,1e4)*1e6;
 parameters.coil=state(spin_system,'Lz','1H');
-parameters.mw_oper=(operator(spin_system,'L-','E')+...
-                    operator(spin_system,'L+','E'))/2;
+parameters.mw_oper=operator(spin_system,'Lx','E');
 parameters.ez_oper=operator(spin_system,'Lz','E');
 parameters.orientation=[0 0 0];
 parameters.method='lvn-backs';

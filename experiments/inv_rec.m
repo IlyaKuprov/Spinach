@@ -41,9 +41,8 @@ grumble(spin_system,parameters,H,R,K);
 % Compose Liouvillian
 L=H+1i*R+1i*K;
 
-% Get the thermodynamic equilibrium
-H=hamiltonian(assume(spin_system,'labframe'),'left');
-rho0=equilibrium(spin_system,H);
+% Isotropic thermal equilibrium
+rho0=equilibrium(spin_system);
 
 % Get the detection state
 coil=state(spin_system,'L+',parameters.spins{1});
@@ -65,6 +64,7 @@ rho_stack=step(spin_system,Ly,rho_stack,pi/2);
 % Run the detection period 
 fids=evolution(spin_system,L,coil,rho_stack,1/parameters.sweep,...
                parameters.npoints-1,'observable');
+
 end
 
 % Consistency enforcement

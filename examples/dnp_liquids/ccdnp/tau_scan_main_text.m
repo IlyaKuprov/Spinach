@@ -88,9 +88,8 @@ parfor n=1:numel(tau_c)
     % Steady state simulation
     answer(:,n)=liquid(spin_system,@dnp_freq_scan,localpar,'esr');
 
-    % Thermal equilibium state
-    H0=hamiltonian(assume(spin_system,'labframe'),'left');
-    rho_eq=equilibrium(spin_system,H0);
+    % Isotropic thermal equilibrium
+    rho_eq=equilibrium(spin_system);
 
     % Apply thermal equilibrium reference
     answer(:,n)=answer(:,n)/(localpar.coil'*rho_eq);

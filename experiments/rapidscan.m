@@ -38,9 +38,8 @@ grumble(parameters);
 Ep=operator(spin_system,'L+','E');
 H_mw=-parameters.mw_pwr*(Ep-Ep')/2i;
 
-% Get the thermal equilibrium
-H=hamiltonian(assume(spin_system,'labframe'),'left');
-rho=equilibrium(spin_system,H);
+% Isotropic thermal equilibrium
+rho=equilibrium(spin_system);
 
 % Relevant operators
 Hz=hamiltonian(assume(spin_system,'labframe','zeeman'));

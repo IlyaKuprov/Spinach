@@ -62,9 +62,8 @@ coils=[state(spin_system,'Lx','1H')  state(spin_system,'Ly','1H')  ...
        state(spin_system,'Lx','13C') state(spin_system,'Ly','13C') ...
        state(spin_system,'Lx','15N') state(spin_system,'Ly','15N')];
 
-% Initial condition
-H_lab=hamiltonian(assume(spin_system,'labframe'),'left');
-rho=equilibrium(spin_system,H_lab);
+% Isotropic thermal equilibrium
+rho=equilibrium(spin_system);
 
 % Re-save the workspace
 save('gb1_workspace.mat','-v7.3','-nocompression');

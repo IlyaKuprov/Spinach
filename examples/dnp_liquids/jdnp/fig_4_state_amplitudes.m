@@ -43,9 +43,8 @@ spin_system=basis(spin_system,bas);
 Ex=operator(spin_system,'Lx','E');
 Ez=operator(spin_system,'Lz','E');
 
-% Thermal equilibirium state
-H0=hamiltonian(assume(spin_system,'labframe'),'left');
-rho_eq=equilibrium(spin_system,H0);
+% Isotropic thermal equilibrium
+rho_eq=equilibrium(spin_system);
 
 % Hamiltonian and relaxation superoperator
 H=hamiltonian(assume(spin_system,'esr'));
@@ -97,33 +96,31 @@ answer=evolution(spin_system,H+1i*R,coils,rho_eq,parameters.t_step,...
 t_axis=linspace(0,parameters.t_step*parameters.nsteps,parameters.nsteps+1);   
                  
 % Plotting
-kfigure(); subplot(1,3,1); scale_figure([1.75 0.5]);
+kfigure(); scale_figure([1.75 0.5]); subplot(1,3,1);
 plot(t_axis(2:end),real(answer(1,2:end)),'b-'); hold on;
 plot(t_axis(2:end),real(answer(3,2:end)),'b-');
 plot(t_axis(2:end),real(answer(5,2:end)),'b-');
 plot(t_axis(2:end),real(answer(2,2:end)),'r-');
 plot(t_axis(2:end),real(answer(4,2:end)),'r-');
-plot(t_axis(2:end),real(answer(6,2:end)),'r-'); kgrid;
-xlabel('time / seconds','interpreter','latex');
-ylabel('state population','interpreter','latex');
-legend({'${T_{+,\alpha}}$','${T_{-,\alpha}}$','${T_{0,\alpha}}$',...
-        '${T_{+,\beta}}$','${T_{-,\beta}}$','${T_{0,\beta}}$'},...
-        'interpreter','latex','Location','northeast');
-set(gca,'TickLabelInterpreter','latex'); axis tight;
+plot(t_axis(2:end),real(answer(6,2:end)),'r-');
+kxlabel('time / seconds'); kylabel('state population');
+klegend({'${T_{+,\alpha}}$','${T_{-,\alpha}}$','${T_{0,\alpha}}$',...
+         '${T_{+,\beta}}$','${T_{-,\beta}}$','${T_{0,\beta}}$'},...
+         'interpreter','latex','Location','northeast');
+kgrid; xlim tight; ylim padded;
 subplot(1,3,2);
 plot(t_axis(2:end),real(answer(7,2:end)),'b-'); hold on;
 plot(t_axis(2:end),real(answer(8,2:end)),'r-'); kgrid;
-xlabel('time / seconds','interpreter','latex');
-ylabel('state population','interpreter','latex');
-legend({'${S_{\alpha}}$','${S_{\beta}}$'},...
-        'interpreter','latex','Location','southeast');
-set(gca,'TickLabelInterpreter','latex'); axis tight;
+kxlabel('time / seconds'); kylabel('state population');
+klegend({'${S_{\alpha}}$','${S_{\beta}}$'},...
+         'interpreter','latex','Location','southeast');
+xlim tight; ylim padded;
 subplot(1,3,3);
 plot(t_axis(2:end),real(answer(15,2:end)),'b-'); hold on;
-xlabel('time / seconds','interpreter','latex');
-ylabel('state population','interpreter','latex');
-legend({'${N_{\rm{Z}}}$'},'interpreter','latex','Location','southeast');
-set(gca,'TickLabelInterpreter','latex'); kgrid; axis tight;
+kxlabel('time / seconds','interpreter','latex');
+kylabel('state population','interpreter','latex');
+klegend({'${N_{\rm{Z}}}$'},'interpreter','latex','Location','southeast');
+kgrid; xlim tight; ylim padded;
 
 end
 

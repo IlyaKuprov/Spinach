@@ -66,9 +66,8 @@ for n=1:numel(field_grid)
         Ex=operator(spin_system,'Lx','E');
         Ez=operator(spin_system,'Lz','E');
       
-        % Thermal equilibirium state
-        H0=hamiltonian(assume(spin_system,'labframe'),'left');
-        rho_eq=equilibrium(spin_system,H0); 
+        % Isotropic thermal equilibrium
+        rho_eq=equilibrium(spin_system); 
 
         % Hamiltonian and relaxation superoperator
         H=hamiltonian(assume(spin_system,'esr'));

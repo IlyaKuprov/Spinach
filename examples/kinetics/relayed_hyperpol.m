@@ -73,9 +73,8 @@ R=relaxation(spin_system);
 K=kinetics(spin_system);
 L=H+1i*R+1i*K;
        
-% Get equilibrium density matrix
-HL=hamiltonian(assume(spin_system,'labframe'),'left');
-rho=equilibrium(spin_system,HL);
+% Isotropic thermal equilibrium
+rho=equilibrium(spin_system);
 
 % Polarise the water 100%
 Wz=state(spin_system,'Lz',11:20);

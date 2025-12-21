@@ -60,9 +60,8 @@ drop=expdrop(spin_system.inter.magnet,parameters.drop_field,parameters.drop_time
              parameters.drop_npoints,parameters.drop_rate);
 time_step=parameters.drop_time/parameters.drop_npoints;
 
-% Get the equilibrium state
-H=hamiltonian(assume(spin_system,'labframe'),'left');
-rho=equilibrium(spin_system,H);
+% Isotropic thermal equilibrium
+rho=equilibrium(spin_system);
          
 % Propagate the system through the drop
 for n=1:numel(drop)

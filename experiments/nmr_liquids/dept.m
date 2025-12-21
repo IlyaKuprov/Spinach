@@ -50,9 +50,8 @@ L=H+1i*R+1i*K;
 tau_j=abs(1/(2*parameters.J)); 
 timestep=1/parameters.sweep;
 
-% Get accurate thermal equilibrium
-H0=hamiltonian(assume(spin_system,'labframe'),'left');
-rho=equilibrium(spin_system,H0);
+% Isotropic thermal equilibrium
+rho=equilibrium(spin_system);
 
 % Detection state
 coil=state(spin_system,'L+',parameters.spins{1},'cheap');

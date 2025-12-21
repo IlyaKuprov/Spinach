@@ -4,7 +4,7 @@
 %
 %           https://doi.org/10.1039/d1cp04186j
 %
-% Calculation time: hours, line-by-line plotting 
+% Calculation time: minutes, line-by-line plotting 
 %
 % mariagrazia.concilio@sjtu.edu.cn
 % ilya.kuprov@weizmann.ac.il
@@ -59,9 +59,8 @@ for n=1:numel(field_grid)
         E_mw=operator(spin_system,'Lx','E')/2;
         Ez=operator(spin_system,'Lz','E');
       
-        % Thermal equilibium state
-        H0=hamiltonian(assume(spin_system,'labframe'),'left');
-        rho_eq=equilibrium(spin_system,H0); 
+        % Isotropic thermal equilibrium
+        rho_eq=equilibrium(spin_system); 
 
         % Detection state
         Nz=state(spin_system,'Lz','1H');

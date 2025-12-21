@@ -110,8 +110,7 @@ end
 % Get the thermal equilibrium if needed
 if ismember('rho_eq',parameters.needs)
     report(spin_system,'building the thermal equilibrium state...');
-    H0=hamiltonian(assume(spin_system,'labframe'),'left');
-    parameters.rho0=equilibrium(spin_system,H0); clear('H0');
+    parameters.rho0=equilibrium(spin_system);
 end
 
 % Process channel offsets

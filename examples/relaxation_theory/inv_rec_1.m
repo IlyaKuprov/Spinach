@@ -1,4 +1,5 @@
-% A simple inversion-recovery experiment.
+% A simple inversion-recovery experiment; longitudinal
+% magnetisation is monitored as a function of time.
 %
 % Calculation time: seconds.
 %
@@ -29,9 +30,8 @@ inter.temperature=298;
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Initial state - thermal equilibrium
-[H,Q]=hamiltonian(assume(spin_system,'labframe'),'left');
-rho=equilibrium(spin_system,H,Q,[0 0 0]);
+% Isotropic thermal equilibrium
+rho=equilibrium(spin_system);
 
 % Detection state
 coil=state(spin_system,'Lz','1H');
@@ -52,11 +52,12 @@ rho=step(spin_system,Lx,rho,pi);
 answer=evolution(spin_system,L+1i*R,coil,rho,1e-3,1000,'observable');
 
 % Plotting
-kfigure(); x_axis=linspace(0,1,1001); 
+kfigure(); scale_figure([1.00 0.65])
+x_axis=linspace(0,1,1001); 
 plot(x_axis,real(answer)); 
 kylabel('$S_{\rm{Z}}$ expectation value'); 
 kxlabel('time, seconds'); 
-xlim tight; kgrid;
+xlim tight; ylim padded; kgrid;
 
 end
 

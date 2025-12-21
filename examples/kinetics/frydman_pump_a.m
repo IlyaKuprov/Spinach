@@ -101,9 +101,8 @@ function traj=frydman_pump(spin_system,parameters,~,R,K)
 Hy=operator(spin_system,'Ly',parameters.spins{1});
 Ny=operator(spin_system,'Ly',parameters.spins{2});
 
-% Lab frame Hamiltonian and equilibrium state
-H=hamiltonian(assume(spin_system,'labframe'),'left');
-rho=equilibrium(spin_system,H);
+% Isotropic thermal equilibrium
+rho=equilibrium(spin_system);
 
 % Effective spin-lock Hamiltonian
 spin_system=dictum(spin_system,{'1H'},'ignore');         % Kill Zeeman on H

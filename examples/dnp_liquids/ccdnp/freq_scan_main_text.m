@@ -80,9 +80,8 @@ parfor n=1:numel(field_grid)
     localpar.mw_oper=operator(spin_system,'Lx','E')/2;
     localpar.ez_oper=operator(spin_system,'Lz','E');
 
-    % Thermal equilibium state
-    H0=hamiltonian(assume(spin_system,'labframe'),'left');
-    rho_eq=equilibrium(spin_system,H0);
+    % Isotropic thermal equilibrium
+    rho_eq=equilibrium(spin_system);
 
     % Steady state simulation
     answer(:,n)=liquid(spin_system,@dnp_freq_scan,localpar,'esr');

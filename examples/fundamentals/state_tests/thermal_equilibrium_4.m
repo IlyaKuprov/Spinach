@@ -44,7 +44,7 @@ for n=1:numel(formalisms)
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);
 
-    % Get thermal equilibrium state
+    % Isotropic thermal equilibrium
     rho_eq=equilibrium(spin_system);
 
     % Get relaxation superoperator

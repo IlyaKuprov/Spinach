@@ -55,9 +55,8 @@ Hy=operator(spin_system,'Ly','1H');
 Cx=omega_max*(2*rand(nsteps,1)-1);
 Cy=omega_max*(2*rand(nsteps,1)-1);
 
-% Initial condition
-H_lab=hamiltonian(assume(spin_system,'labframe'),'left');
-rho_eq=equilibrium(spin_system,H_lab);
+% Isotropic thermal equilibrium
+rho_eq=equilibrium(spin_system);
 
 % GPU uploads
 H0=gpuArray(H0); R=gpuArray(R);

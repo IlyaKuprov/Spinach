@@ -37,9 +37,8 @@ inter.tau_c={10e-12};
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Thermal equilibrium state
-[H,Q]=hamiltonian(assume(spin_system,'labframe'),'left');
-rho_eq=equilibrium(spin_system,H,Q,[0 0 0]);
+% Isotropic thermal equilibrium
+rho_eq=equilibrium(spin_system);
 
 % Electron control operator
 Lx=operator(spin_system,'Lx','E');
@@ -68,12 +67,14 @@ kfigure(); x_axis=linspace(0,1000,1001);
 subplot(2,1,1); plot(x_axis,real(answer(3,:))); 
 kxlabel('time, microseconds'); kgrid;
 kylabel('$\langle E_{\rm{Z}} \rangle$');
+xlim tight; ylim padded;
 subplot(2,1,2); plot(x_axis,real(answer(1:2,:))); 
 kxlabel('time, microseconds'); kgrid;
 kylabel('$\langle H_{\rm{Z}} \rangle$');
-legend({'0.5 Angstrom from electron',...
-        '1.5 Angstrom from electron'},...
-        'Location','SouthEast');
+klegend({'0.5 Angstrom from electron',...
+         '1.5 Angstrom from electron'},...
+         'Location','SouthEast');
+xlim tight; ylim padded;
 
 end
 

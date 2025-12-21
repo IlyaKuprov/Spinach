@@ -113,9 +113,8 @@ Hy=operator(spin_system,'Ly',parameters.spins{1});
 Ny=operator(spin_system,'Ly',parameters.spins{2});
 Cy=operator(spin_system,'Ly',parameters.spins{3});
 
-% Lab frame Hamiltonian and equilibrium state
-H=hamiltonian(assume(spin_system,'labframe'),'left');
-rho=equilibrium(spin_system,H);
+% Isotropic thermal equilibrium
+rho=equilibrium(spin_system);
 
 % Effective DIPSI Hamiltonian, CP stage 1
 spin_system=dictum(spin_system,{'1H'},'ignore');         % Kill Zeeman on H

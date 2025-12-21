@@ -47,11 +47,8 @@ parameters.offset=2800;   % Hz
 % Set up different recovery delays
 mixing_time=[0.01; 0.1; 0.5; 1; 5; 10]; % s
 
-% Lab frame Hamiltonian
-H=hamiltonian(assume(spin_system,'labframe'),'left');
-
-% Initial state - thermal equilibrium
-parameters.rho_eq=equilibrium(spin_system,H);
+% Isotropic thermal equilibrium
+parameters.rho_eq=equilibrium(spin_system);
 
 % Detection state
 parameters.coil=state(spin_system,'L+','1H');

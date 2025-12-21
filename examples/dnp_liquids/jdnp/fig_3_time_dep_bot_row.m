@@ -52,9 +52,8 @@ for n=1:numel(field_grid)
     Ex=operator(spin_system,'Lx','E');
     Ez=operator(spin_system,'Lz','E');
         
-    % Thermal equilibirium state
-    H0=hamiltonian(assume(spin_system,'labframe'),'left');
-    rho_eq=equilibrium(spin_system,H0);
+    % Isotropic thermal equilibrium
+    rho_eq=equilibrium(spin_system);
         
     % Hamiltonian and relaxation superoperator
     H=hamiltonian(assume(spin_system,'esr'));
@@ -78,7 +77,8 @@ for n=1:numel(field_grid)
     % Plotting
     subplot(1,3,n); plot(t_axis,answer); kgrid; box on;
     ktitle(['$B_0$ = ' num2str(field_grid(n)) ' Tesla']);
-    kylabel('$^{1}$H DNP'); kxlabel('time / seconds'); drawnow;
+    kylabel('$^{1}$H DNP'); kxlabel('time / seconds'); 
+    ylim([-150 10]); drawnow;
   
 end
 

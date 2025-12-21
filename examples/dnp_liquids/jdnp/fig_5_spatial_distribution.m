@@ -67,9 +67,8 @@ for n=1:numel(X)
         % Detection state
         Nz=state(spin_system,'Lz','1H');
         
-        % Thermal equilibrium state
-        H0=hamiltonian(assume(spin_system,'labframe'),'left');
-        rho_eq=equilibrium(spin_system,H0);
+        % Isotropic thermal equilibrium
+        rho_eq=equilibrium(spin_system);
         
         % Hamiltonian and relaxation superoperator
         H=hamiltonian(assume(spin_system,'esr'));
@@ -122,9 +121,8 @@ for n=1:numel(X)
         % Detection state
         Nz=state(spin_system,'Lz','1H');
         
-        % Thermal equilibrium state
-        H0=hamiltonian(assume(spin_system,'labframe'),'left');
-        rho_eq=equilibrium(spin_system,H0);
+        % Isotropic thermal equilibrium
+        rho_eq=equilibrium(spin_system);
         
         % Hamiltonian and relaxation superoperator
         H=hamiltonian(assume(spin_system,'esr'));

@@ -33,8 +33,8 @@ spin_system=basis(spin_system,bas);
 % Experiment setup
 parameters.grid='rep_2ang_200pts_sph';
 parameters.spins={'1H'};
-parameters.rho0=state(spin_system,'L+','1H','cheap');
-parameters.coil=state(spin_system,'L+','1H','cheap');
+parameters.rho0=state(spin_system,'L+','1H');
+parameters.coil=state(spin_system,'L+','1H');
 parameters.pulse_op=operator(spin_system,'Lx','1H');
 parameters.nloops=10;
 parameters.timestep=1e-5;
@@ -45,9 +45,11 @@ parameters.verbose=0;
 fid=powder(spin_system,@cpmg,parameters,'nmr');
 
 % Plotting
+kfigure(); scale_figure([1.00 0.65])
 x_axis=linspace(0,parameters.timestep*size(fid,2),size(fid,2));
-kfigure(); plot(x_axis,real(fid)); kgrid; kxlabel('time, s');
-kylabel('transverse magnetisation, a.u.'); xlim tight;
+plot(x_axis,real(fid)); kxlabel('time, seconds');
+kylabel('$S_{\rm{Z}}$ expectation value');
+xlim tight; ylim padded; kgrid;
 
 end
 

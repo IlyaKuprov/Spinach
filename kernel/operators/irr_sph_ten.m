@@ -1,12 +1,11 @@
-% Single-spin irreducible spherical tensor operators T(k,m). The 
-% resulting spherical tensors are normalised in such a way as to
-% obey the following commutation relation:
+% Single-spin irreducible spherical tensor operators T(k,m)  
+% obeying the following commutation relation:
 %
-%                         [Lz,T_km]=m*T_km
+%                      [Lz,T_km]=m*T_km
 % 
 % Syntax:
 %
-%                        T=irr_sph_ten(mult,k)
+%                     T=irr_sph_ten(mult,k)
 %
 % Parameters:
 %

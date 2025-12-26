@@ -110,7 +110,7 @@ control.pulse_dt = dt * ones(1, n_t_steps);
 % RF power levels
 % In actual implementation, the SIMPSON example
 % takes 30 random rf amplftudes from
-% 0 to 1000 or 1500 Hz range for H and C chappel respectively
+% 0 to 1000 or 1500 Hz range for H and C channel respectively
 % Here we choose 30 random values between 0 to 1000 Hz over all channels.
 control.pwr_levels = 2*pi * 1000 * rand(1,30);
 

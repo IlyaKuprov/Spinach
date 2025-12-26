@@ -93,7 +93,7 @@ control.operators = {LxH, LyH};
 % The SIMPSON example considers two cases:
 %   (a) offsets separated by 10 kHz (11 points)
 %   (b) offsets separated by  1 kHz (101 points)
-% Here we consider case (a); for case (b), change 11 -> 101.
+% Here we consider case (b); for case (a), change 101 -> 11.
 control.off_ops = {LzH};
 control.offsets = {2*pi*linspace(-50e3, 50e3, 101)};   % rad/s
 

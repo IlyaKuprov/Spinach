@@ -121,7 +121,7 @@ control.max_iter = 200;
 % RF power penalty; to keep a check on accumulated power in the system.
 % Case (a) is without any penalty check, in which case we can simply
 % comment out this part. Case (b) imposes the penalty on accumulated
-% powers. we implement case (b) here.
+% powers. We implement case (b) here.
 control.penalties = {'NS'};
 control.p_weights = 0.01;
 

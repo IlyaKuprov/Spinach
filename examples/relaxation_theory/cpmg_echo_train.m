@@ -48,7 +48,7 @@ fid=powder(spin_system,@cpmg,parameters,'nmr');
 kfigure(); scale_figure([1.00 0.65])
 x_axis=linspace(0,parameters.timestep*size(fid,2),size(fid,2));
 plot(x_axis,real(fid)); kxlabel('time, seconds');
-kylabel('$S_{\rm{Z}}$ expectation value');
+kylabel('$S_{\rm{X}}$ expectation value');
 xlim tight; ylim padded; kgrid;
 
 end

@@ -67,15 +67,12 @@ switch nargin
             % Get Weyl matrices
             A=weyl(nlevels);
             
-            % Preallocate the cell array
+            % Preallocate cell array
             B=cell(2*k+1,1);
             
-            % Get the top state
-            B{1}=A.c^k;
-            
-            % Apply sequential lowering
-            for n=2:(2*k+1)
-                q=k-n+2; B{n}=(1/(k+q))*(A.a*B{n-1}-B{n-1}*A.a);
+            % Do not use commutators
+            for q=-k:k
+                B{q+k+1}=(A.c^(k+q))*(A.a^(k-q));
             end
                 
         elseif isnumeric(nlevels)&&isscalar(nlevels)&&(mod(nlevels,1)==0)&&...

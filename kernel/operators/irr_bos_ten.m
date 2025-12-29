@@ -1,8 +1,11 @@
-% Single-mode irreducible bosonic tensor operators B(k,q)  
-% obeying the following commutation relation with the po-
-% pulation number operator N:
+% Single-mode bosonic monomial operators:
 %
-%                      [N,B_kq]=q*B_kq
+%                B(k,q) = (Cr^(q))*(An^(k-q))
+%
+% with q=0:k, obeying the following commutation relations with
+% the population number operator N:
+%
+%                          [specify]
 % 
 % Syntax:
 %
@@ -13,16 +16,16 @@
 %     nlevels - number of bosonic ladder 
 %               population levels
 %
-%           k - bosonic tensor rank (optional)
+%           k - total monomial power (optional)
 %
 % Outputs:
 %
 %        B - a two-argument call returns a cell array of 
-%            tensors of rank k in the order of decreasing
-%            projection. A single argument call produces
-%            tensors of all ranks and puts them into a 
+%            monomials of total power k in the order of
+%            increasing q. A single argument call produces
+%            monomials of all ranks and puts them into a 
 %            cell array in the order of increasing rank,
-%            and decreasing projection within each rank.
+%            and increasing q within each rank.
 %
 % Note: operator normalisation in spin dynamics is not a good
 % idea. The only way to make the formalism independent of the
@@ -40,15 +43,16 @@ switch nargin
     
     case 1
         
-        % Generate tensors of all ranks and put them into a cell array
+        % Generate monomials of all total powers and put them into a cell array
         if isnumeric(nlevels)&&isscalar(nlevels)&&(nlevels>0)&&(mod(nlevels,1)==0)
             
             % Preallocate the answer
-            B=cell(nlevels^2,1);
+            B=cell(nlevels*(nlevels+1)/2,1);
             
             % Fill in recursively
             for n=0:(nlevels-1)
-                B((n^2+1):((n+1)^2))=irr_bos_ten(nlevels,n);
+                lower_idx=1+n*(n+1)/2; upper_idx=(n+1)*(n+2)/2;
+                B(lower_idx:upper_idx)=irr_bos_ten(nlevels,n);
             end
             
         else
@@ -59,8 +63,8 @@ switch nargin
         end
         
     case 2
-        
-        % Generate bosonic tensor operators of the specified rank
+       
+        % Generate monomials of the specified total power
         if isnumeric(nlevels)&&isscalar(nlevels)&&(mod(nlevels,1)==0)&&...
            isnumeric(k)&&isscalar(k)&&(k>0)&&(k<nlevels)&&(mod(k,1)==0)
             
@@ -68,17 +72,17 @@ switch nargin
             A=weyl(nlevels);
             
             % Preallocate cell array
-            B=cell(2*k+1,1);
+            B=cell(k+1,1);
             
-            % Do not use commutators
-            for q=-k:k
-                B{q+k+1}=(A.c^(k+q))*(A.a^(k-q));
+            % Make the monomial
+            for q=0:k
+                B{q+1}=(A.c^(q))*(A.a^(k-q));
             end
                 
         elseif isnumeric(nlevels)&&isscalar(nlevels)&&(mod(nlevels,1)==0)&&...
                isnumeric(k)&&isscalar(k)&&(k==0)
             
-            % For zero rank, return a unit matrix
+            % For zero power, return a unit matrix
             B={speye(nlevels)};
             
         else

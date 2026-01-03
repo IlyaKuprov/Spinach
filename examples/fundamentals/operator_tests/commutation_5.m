@@ -13,7 +13,6 @@ acc=10*nlevels*eps('double');
 
 % Operators
 A=weyl(nlevels);
-B=irr_bos_ten(nlevels);
 
 % Product test
 err=norm(A.c*A.a-A.n,'fro')/norm(A.n,'fro');

@@ -1,15 +1,15 @@
-% Single-mode bosonic monomial operators:
+% Bosonic monomial operators of a specified total power:
 %
-%                B(k,q) = (Cr^(q))*(An^(k-q))
+%                  B(k,q)=(Cr^(q))*(An^(k-q))
 %
 % with q=0:k, obeying the following commutation relations with
 % the population number operator N:
 %
-%                          [specify]
+%                    [find out and specify]
 % 
 % Syntax:
 %
-%                   B=irr_sph_ten(nlevels,k)
+%                    B=bos_monom(nlevels,k)
 %
 % Parameters:
 %
@@ -34,9 +34,9 @@
 %
 % ilya.kuprov@weizmann.ac.il
 %
-% <https://spindynamics.org/wiki/index.php?title=irr_bos_ten.m>
+% <https://spindynamics.org/wiki/index.php?title=bos_monom.m>
 
-function B=irr_bos_ten(nlevels,k)
+function B=bos_monom(nlevels,k)
 
 % Adapt to the input style
 switch nargin

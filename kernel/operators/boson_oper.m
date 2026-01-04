@@ -1,11 +1,11 @@
 % Bosonic operators; ad hoc numbering scheme until such time
 % as we code up Weyl algebras. Syntax:
 %
-%                   A=boson_oper(mult,opspec)
+%                 A=boson_oper(nlevels,opspec)
 %
 % Parameters:
 %
-%   mult    - number of population levels to consider in
+%   nlevels - number of population levels to consider in
 %             the bosonic mode, an integer
 %
 %   opspec  - operator specification, an integer: -1 for
@@ -15,7 +15,7 @@
 %
 % Outputs:
 %
-%   A       - a [mult]x[mult] matrix
+%   A       - a [nlevels]x[nlevels] matrix
 %
 % Note: arrays are declared complex at creation to avoid 
 %       expensive reallocation operations later on.
@@ -24,10 +24,10 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=boson_oper.m>
 
-function A=boson_oper(mult,opspec)
+function A=boson_oper(nlevels,opspec)
 
 % Check consistency
-grumble(mult,opspec);
+grumble(nlevels,opspec);
 
 % Decide the type
 switch opspec
@@ -35,22 +35,25 @@ switch opspec
     case -1
 
         % Creation operator
-        diags=sqrt(1:mult); A=spdiags(diags',-1,mult,mult);
+        diags=sqrt(1:nlevels); 
+        A=spdiags(diags',-1,nlevels,nlevels);
 
     case -2
 
         % Number operator
-        diags=0:(mult-1); A=spdiags(diags',0,mult,mult);
+        diags=0:(nlevels-1); 
+        A=spdiags(diags',0,nlevels,nlevels);
 
     case -3
 
         % Annihilation operator
-        diags=sqrt(0:(mult-1)); A=spdiags(diags',+1,mult,mult);
+        diags=sqrt(0:(nlevels-1)); 
+        A=spdiags(diags',+1,nlevels,nlevels);
 
     case -4
 
         % Empty cavity operator
-        A=spalloc(mult,mult,1); A(1,1)=1;
+        A=spalloc(nlevels,nlevels,1); A(1,1)=1;
         
     otherwise
 

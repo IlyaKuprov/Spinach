@@ -9,7 +9,7 @@
 % 
 % Syntax:
 %
-%                    B=bos_monom(nlevels,k)
+%                    B=boson_mono(nlevels,k)
 %
 % Parameters:
 %
@@ -36,7 +36,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=bos_monom.m>
 
-function B=bos_monom(nlevels,k)
+function B=boson_mono(nlevels,k)
 
 % Adapt to the input style
 switch nargin
@@ -50,9 +50,9 @@ switch nargin
             B=cell(nlevels*(nlevels+1)/2,1);
             
             % Fill in recursively
-            for n=0:(nlevels-1)
-                lower_idx=1+n*(n+1)/2; upper_idx=(n+1)*(n+2)/2;
-                B(lower_idx:upper_idx)=irr_bos_ten(nlevels,n);
+            for k=0:(nlevels-1)
+                lower_idx=1+k*(k+1)/2; upper_idx=(k+1)*(k+2)/2;
+                B(lower_idx:upper_idx)=boson_mono(nlevels,k);
             end
             
         else

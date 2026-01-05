@@ -160,10 +160,6 @@ for s=1:numel(stencil_sizes)
     end
     box on; kgrid; xlim tight;
 end
-subplot(2,3,1); ktitle('3-point finite difference');
-kylabel('normalised intensity');
-subplot(2,3,2); ktitle('5-point finite difference');
-subplot(2,3,3); ktitle('7-point finite difference');
 ideal_curve=exp(-(grad_amps*spin(parameters.spins{1})*delta_sml).^2*...
                  (delta_big-delta_sml/3)*18e-10);
 for s=1:numel(stencil_sizes)
@@ -174,10 +170,12 @@ for s=1:numel(stencil_sizes)
     end
     box on; kgrid; xlim tight;
 end
-subplot(2,3,4); kylabel('difference from exact');
-kxlabel('gradient amplitude, T/m');
-subplot(2,3,5); kxlabel('gradient amplitude, T/m');
-subplot(2,3,6); kxlabel('gradient amplitude, T/m');
+subplot(2,3,1); ktitle('3-point finite difference'); kylabel('normalised intensity');
+subplot(2,3,2); ktitle('5-point finite difference'); kylabel('normalised intensity');
+subplot(2,3,3); ktitle('7-point finite difference'); kylabel('normalised intensity');
+subplot(2,3,4); kxlabel('gradient amplitude, T/m'); kylabel('difference from exact'); 
+subplot(2,3,5); kxlabel('gradient amplitude, T/m'); kylabel('difference from exact');
+subplot(2,3,6); kxlabel('gradient amplitude, T/m'); kylabel('difference from exact');
 subplot(2,3,3); klegend({[num2str(grid_sizes(3))  ' points'],...
                          [num2str(grid_sizes(4))  ' points'],...
                          [num2str(grid_sizes(5))  ' points'],...

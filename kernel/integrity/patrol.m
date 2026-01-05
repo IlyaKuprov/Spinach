@@ -1,7 +1,6 @@
-% This function runs contiouously on one of our servers
-% at Southampton, and its purpose is to catch any unin-
-% tended consequences before they propagate too far down
-% the development chain. Syntax:
+% This function runs contiouously on one of our servers, its
+% purpose is to catch any unintended consequences before they
+% propagate too far down the development chain. Syntax:
 %
 %                  patrol(test_subject)
 %
@@ -89,8 +88,12 @@ while hashes_match
     % Pick a random file
     n=randi(numel(mfiles));
 
+    % Build the file name
+    file_name=[mfiles(n).folder filesep mfiles(n).name];
+    disp(['PATROL: running ' file_name]);
+
     % Check that Matlab's syntax checker is on green
-    if ~isempty(checkcode([mfiles(n).folder filesep mfiles(n).name]))
+    if ~isempty(checkcode(file_name))
         edit(file_name); error('the built-in syntax checker has something to say');
     end
     
@@ -100,7 +103,7 @@ while hashes_match
         cd(mfiles(n).folder); 
         eval(mfiles(n).name(1:(end-2)));
     end
-    
+
     % Flush the display buffer
     drawnow(); pause(1);
     

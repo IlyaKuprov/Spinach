@@ -69,17 +69,17 @@ shut_up.sys.disable=spin_system.sys.disable;
 dt=spin_system.control.pulse_dt;
 
 % Extract number of controls and time elements
-nctrls = numel(controls);  nsteps = numel(dt);
+nctrls=numel(controls); nsteps=numel(dt);
 
 % Make pointer arrays for trajectories
-fwd_traj = cell(1,nsteps+1); fwd_traj{1}=rho_init;
+fwd_traj=cell(1,nsteps+1); fwd_traj{1}=rho_init;
 if nargout>2
-    bwd_traj = cell(1,nsteps+1); bwd_traj{1}=rho_targ;
+    bwd_traj=cell(1,nsteps+1); bwd_traj{1}=rho_targ;
 end
 
 % Preallocate gradient
 if nargout>2
-    grad = zeros([nctrls nsteps]);
+    grad=zeros([nctrls nsteps]);
 end
 
 % Reshape waveform
@@ -103,16 +103,8 @@ parfor n=1:nsteps
 
     end
 
-    % Make sure generator is Hermitian
-    if cheap_norm(H{n}-H{n}')>1e-6
-
-        % Bomb out if significantly non-Hermitian
-        error('evolution generator must be Hermitian.');
-
-    end
-
     % Tidy up generator and compute propagator
-    P{n}=propagator(shut_up,(H{n}+H{n}')/2,dt(n));
+    P{n}=propagator(shut_up,H{n},dt(n));
 
 end
 
@@ -134,7 +126,11 @@ overlap=hdot(fwd_traj{end},rho_targ);
 
 % Gradient loop
 if nargout>2
+
+    % Over time steps
     parfor n=1:nsteps
+
+        % Over controls
         for k=1:nctrls
 
             % Compute directional derivative w.r.t. control
@@ -145,7 +141,9 @@ if nargout>2
                                          auxmat{1}*fwd_traj{n}*auxmat{2}');
 
         end
+
     end
+    
 end
 
 % Fidelity and its derivatives
@@ -185,8 +183,28 @@ switch fidelity_type
         
 end
 
-% Return trajectory data
-traj_data.forward=fwd_traj;
+% Return the trajectory (a huge array) only if needed
+if any(ismember({'correlation_order','coherence_order',...
+                 'local_each_spin',  'total_each_spin',...
+                 'level_populations'},spin_system.control.plotting(:)))
+    traj_data.forward=fwd_traj;
+else
+    traj_data.forward=[];
+end
+
+% Catch unreachable objectives
+if abs(fidelity)==0
+    spin_system.sys.output=1;
+    report(spin_system,'exactly zero fidelity: either the target is unreachable');
+    report(spin_system,'from the source, or the initial guess is very poor.');
+    error('GRAPE cannot proceed.');
+end
+if exist('grad','var')&&(norm(grad,1)==0)
+    spin_system.sys.output=1;
+    report(spin_system,'exactly zero gradient: either the target is unreachable');
+    report(spin_system,'from the source, or the initial guess is very poor.');
+    error('GRAPE cannot proceed.');
+end
 
 end
 

@@ -118,6 +118,26 @@ if isfield(control,'operators')
         error('control.operators must be a cell array of matrices.');
     end
 
+    % In Hilbert space, disallow non-Hermitian controls
+    if strcmp('zeeman-hilb',spin_system.bas.formalism)
+
+        % Over controls
+        for n=1:numel(control.operators)
+
+            % Get pertinent norms
+            norm_a=cheap_norm(control.operators{n}-...
+                              control.operators{n}');
+            norm_b=cheap_norm(control.operators{n});
+
+            % Check the norms
+            if norm_a>1e-10*norm_b
+                error('all control generators must be Hermitian in Hilbert space.');
+            end
+
+        end
+
+    end
+
     % Control operator count
     spin_system.control.ncontrols=numel(control.operators);
 
@@ -594,6 +614,31 @@ if isfield(control,'drifts')
         error('all time-dependent drifts must have the same number of time slices.');
     end
 
+    % In Hilbert space, disallow non-Hermitian drifts
+    if strcmp('zeeman-hilb',spin_system.bas.formalism)
+        
+        % Over drift ensemble
+        for n=1:numel(control.drifts)
+
+            % Over time slices
+            for k=1:numel(control.drifts{n})
+
+                % Get pertinent norms
+                norm_a=cheap_norm(control.drifts{n}{k}-...
+                                  control.drifts{n}{k}');
+                norm_b=cheap_norm(control.drifts{n}{k});
+
+                % Check the norms
+                if norm_a>1e-10*norm_b
+                    error('all drift generators must be Hermitian in Hilbert space.');
+                end
+
+            end
+
+        end
+
+    end
+    
     % Inform the user
     report(spin_system,[pad('Drift generator ensemble size',60) ...
                         int2str(numel(control.drifts))]);
@@ -1099,7 +1144,7 @@ if (~isempty(spin_system.control.plotting))&&...
                  
 end
 
-% Test for Hermitian controls
+% In Liouville space, warn about non-Hermitian controls
 if ~all(cellfun(@ishermitian,spin_system.control.operators))
     report(spin_system,'WARNING: not all control operators are Hermitian');
 end

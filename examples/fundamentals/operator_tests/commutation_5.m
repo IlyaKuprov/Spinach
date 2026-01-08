@@ -11,7 +11,7 @@ nlevels=5+randi(20);
 % Accuracy threshold
 acc=10*nlevels*eps('double');
 
-% Operators
+% Weyl operators
 A=weyl(nlevels);
 
 % Product test
@@ -26,19 +26,38 @@ end
 err_a=norm(comm(A.n,A.c)-A.c,'fro')/norm(A.c,'fro');
 err_b=norm(comm(A.n,A.a)+A.a,'fro')/norm(A.a,'fro');
 if (err_a>acc)||(err_b>acc)
-    error('Bosonic operator commutation test FAILED.');
+    error('Bosonic operator commutation test 1 FAILED.');
 else
-    disp('Bosonic operator commutation test PASSED.');
+    disp('Bosonic operator commutation test 1 PASSED.');
 end
 
 % Boundary commutator test
 C=comm(A.a,A.c); C(end,end)=1;
 err=norm(C-A.u,'fro')/norm(A.u,'fro');
 if err>acc
-    error('Bosonic operator commutation test FAILED.');
+    error('Bosonic operator commutation test 2 FAILED.');
 else
-    disp('Bosonic operator commutation test PASSED.');
+    disp('Bosonic operator commutation test 2 PASSED.');
 end
+
+% Bosonic monomials
+B=boson_mono(nlevels);
+
+% Exact commutator test
+for n=1:numel(B)
+
+    % Physical indices
+    [k,q]=lin2kq(n-1);
+
+    % Deviation norm testing
+    err=norm(comm(A.n,B{n})-(2*q-k)*B{n},'fro')/...
+        norm((2*q-k)*B{n},'fro');
+    if err>acc
+        error('Bosonic operator commutation test 3 FAILED.');
+    end
+
+end
+disp('Bosonic operator commutation test 3 PASSED.');
 
 end
 

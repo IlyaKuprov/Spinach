@@ -5,7 +5,7 @@
 % with q=0:k, obeying the following commutation relations with
 % the population number operator N:
 %
-%                    [find out and specify]
+%                    [N,B(k,q)]=(2q-k)*B(k,q)
 % 
 % Syntax:
 %

@@ -1,6 +1,6 @@
 % Broadband inversion pulse design for liquid-state NMR. This script
-% reproduces,using Spinach,the second SIMPSON optimal control exam-
-% ple from http://dx.doi.org/10.1016/j.jmr.2008.11.020
+% reproduces,using Spinach,the second SIMPSON optimal control exam- ple
+% from http://dx.doi.org/10.1016/j.jmr.2008.11.020
 %
 % A single-spin (1H) system is considered in the rotating frame,on
 % resonance (no isotropic chemical shift). The goal is to design a
@@ -8,13 +8,13 @@
 %
 %                              I_z  →  -I_z
 %
-% uniformly over a frequency offset range of ±50 kHz,under a fixed 
-% pulse duration T=600 µs,discretised into 600 time steps of 1 µs.
+% uniformly over a frequency offset range of ±50 kHz,under a fixed pulse
+% duration T=600 µs,discretised into 600 time steps of 1 µs.
 %
 % The control fields are Cartesian RF components (Lx,Ly) on 1H,and
 % robustness is enforced by an offset ensemble and RF-power penalties.
 %
-% aditya.dev@weizmann.ac.il
+% aditya.dev@weizmann.ac.il 
 % ilya.kuprov@weizmann.ac.il
 
 function broadband_inversion_pulse_for_nmr()
@@ -23,7 +23,7 @@ function broadband_inversion_pulse_for_nmr()
 sys.magnet=14.1;
 sys.isotopes={'1H'};
 
-% Chemical shift (ppm) 
+% Chemical shift (ppm)
 inter.zeeman.scalar={0.0};
 
 % Basis set
@@ -60,7 +60,7 @@ control.p_weights=[0.1 100];                     % Penalty weights
 control.method='lbfgs';                          % Optimiser
 control.max_iter=200;                            % Max iterations
 control.parallel='ensemble';                     % Parallel mode
-control.plotting={'xy_controls','amp_controls','robustness'};
+%control.plotting={'xy_controls','amp_controls','robustness'};
 
 % Random guess
 guess=randn(2,600)/3;
@@ -70,6 +70,29 @@ spin_system=optimcon(spin_system,control);
 xy_profile=fminnewton(spin_system,@grape_xy,guess);
 
 % Demonstration simulation goes here
+rf_scale = mean(control.pwr_levels);      % rad/s
+CLx = rf_scale * xy_profile(1,:);
+CLy = rf_scale * xy_profile(2,:);
+
+% Dense offset grid for verification (Hz -> rad/s)
+offs_hz = linspace(-50e3, 50e3, 101);
+inv_eff = zeros(size(offs_hz));
+
+for k = 1:numel(offs_hz)
+    w = 2*pi*offs_hz(k);  % rad/s
+    Hd = H + w*LzH;       % drift + offset term 
+    rho_f = shaped_pulse_xy(spin_system, Hd, {LxH, LyH}, {CLx, CLy}, ...
+        control.pulse_dt, Sz, 'expv-pwc');
+    inv_eff(k) = real((-Sz)' * rho_f);
+end
+
+% Report and plot
+fprintf('Inversion profile over ±50 kHz: mean=%.6f, min=%.6f\n', ...
+    mean(inv_eff), min(inv_eff));
+
+figure(); plot(offs_hz/1e3, inv_eff);
+kxlabel('offset / kHz'); kylabel('<-Sz | rho(T) >');
+kgrid;
 
 end
 

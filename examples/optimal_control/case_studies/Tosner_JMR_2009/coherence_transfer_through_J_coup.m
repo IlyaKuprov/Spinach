@@ -19,7 +19,7 @@ function coherence_transfer_through_J_coup()
 
 J = 140;  % Scalar coupling Hz
 T = 1 / J; % pulse duration
-n_t_steps = 150;  % # time steps
+n_t_steps = 150;  % Number of time steps
 dt        = T / n_t_steps;
 
 % Magnetic field (Tesla)

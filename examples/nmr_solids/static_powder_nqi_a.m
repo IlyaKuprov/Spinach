@@ -2,13 +2,13 @@
 % very large numerical orientation grid, set to reproduce Figure 5
 % from the paper by O'Dell and Ratcliffe:
 %
-%           http://dx.doi.org/10.1016/j.cplett.2011.08.030
+%           https://doi.org/10.1016/j.cplett.2011.08.030
 %
 % Calculation time: minutes
 %
 % ilya.kuprov@weizmann.ac.il
 
-function static_powder_nqi()
+function static_powder_nqi_a()
 
 % System specification
 sys.magnet=21.1;

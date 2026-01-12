@@ -1,18 +1,16 @@
 % Broadband inversion pulse design for liquid-state NMR. This script
-% reproduces,using Spinach,the second SIMPSON optimal control exam- ple
-% from http://dx.doi.org/10.1016/j.jmr.2008.11.020
+% reproduces,using Spinach,the second SIMPSON optimal control examp-
+% le from http://dx.doi.org/10.1016/j.jmr.2008.11.020
 %
 % A single-spin (1H) system is considered in the rotating frame,on
 % resonance (no isotropic chemical shift). The goal is to design a
 % broadband inversion pulse that performs:
 %
-%                              I_z  →  -I_z
+%                          I_z  →  -I_z
 %
-% uniformly over a frequency offset range of ±50 kHz,under a fixed pulse
-% duration T=600 µs,discretised into 600 time steps of 1 µs.
-%
-% The control fields are Cartesian RF components (Lx,Ly) on 1H,and
-% robustness is enforced by an offset ensemble and RF-power penalties.
+% uniformly over a frequency offset range of ±50 kHz,under a fixed 
+% pulse duration T=600 µs, discretised into 600 time steps of 1 µs;
+% the control fields are Cartesian RF (Lx,Ly) on 1H.
 %
 % aditya.dev@weizmann.ac.il 
 % ilya.kuprov@weizmann.ac.il
@@ -50,49 +48,53 @@ H=hamiltonian(assume(spin_system,'nmr'));
 control.drifts={{H}};                            % Drift Hamiltonian
 control.operators={LxH,LyH};                     % Control operators
 control.off_ops={LzH};                           % Offset operator
-control.offsets={2*pi*linspace(-50e3,50e3,101)}; % As per the paper
-control.rho_init={Sz};                           % Initial state
+control.offsets={linspace(-50e3,50e3,101)};      % As per the paper
+control.rho_init={+Sz};                          % Initial state
 control.rho_targ={-Sz};                          % Target state
 control.pulse_dt=1e-6*ones(1,600);               % As per the paper
-control.pwr_levels=2*pi*13e3;                    % As per the paper
-control.penalties={'NS','SNS'};                  % Penalties
-control.p_weights=[0.1 100];                     % Penalty weights
+control.pwr_levels=2*pi*10e3;                    % As per the paper
+control.penalties={'NS','SNSA'};                 % Penalties
+control.p_weights=[0.1 10];                      % Penalty weights
 control.method='lbfgs';                          % Optimiser
 control.max_iter=200;                            % Max iterations
 control.parallel='ensemble';                     % Parallel mode
-%control.plotting={'xy_controls','amp_controls','robustness'};
+control.plotting={'phi_controls','amp_controls',...
+                  'robustness','spectrogram'};
 
 % Random guess
-guess=randn(2,600)/3;
+guess=randn(2,600)/10;
 
 % Optimisation
 spin_system=optimcon(spin_system,control);
 xy_profile=fminnewton(spin_system,@grape_xy,guess);
 
-% Demonstration simulation goes here
-rf_scale = mean(control.pwr_levels);      % rad/s
-CLx = rf_scale * xy_profile(1,:);
-CLy = rf_scale * xy_profile(2,:);
+% Return to physical units
+rf_scale=mean(control.pwr_levels);
+CLx=rf_scale*xy_profile(1,:);
+CLy=rf_scale*xy_profile(2,:);
 
-% Dense offset grid for verification (Hz -> rad/s)
-offs_hz = linspace(-50e3, 50e3, 101);
-inv_eff = zeros(size(offs_hz));
+% Offset grid for verification
+offs_hz=linspace(-50e3,50e3,101);
+inv_eff=zeros(size(offs_hz));
 
-for k = 1:numel(offs_hz)
-    w = 2*pi*offs_hz(k);  % rad/s
-    Hd = H + w*LzH;       % drift + offset term 
-    rho_f = shaped_pulse_xy(spin_system, Hd, {LxH, LyH}, {CLx, CLy}, ...
-        control.pulse_dt, Sz, 'expv-pwc');
-    inv_eff(k) = real((-Sz)' * rho_f);
+% Test simulations
+parfor k=1:numel(offs_hz)
+    
+    % Add the offset term
+    Hd=H+2*pi*offs_hz(k)*LzH; 
+
+    % Run the pulse
+    rho_f=shaped_pulse_xy(spin_system,Hd,{LxH, LyH},{CLx,CLy}, ...
+                          control.pulse_dt,Sz,'expv-pwc');     %#ok<PFBNS>
+
+    % Compute inversion efficiency
+    inv_eff(k)=-real(Sz'*rho_f);
+
 end
 
-% Report and plot
-fprintf('Inversion profile over ±50 kHz: mean=%.6f, min=%.6f\n', ...
-    mean(inv_eff), min(inv_eff));
-
-figure(); plot(offs_hz/1e3, inv_eff);
-kxlabel('offset / kHz'); kylabel('<-Sz | rho(T) >');
-kgrid;
+% Plot the efficiency profile
+kfigure(); plot(offs_hz/1e3,inv_eff); kgrid;
+kxlabel('offset, kHz'); kylabel('fidelity');
 
 end
 

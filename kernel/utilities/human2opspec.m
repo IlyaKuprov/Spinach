@@ -122,30 +122,25 @@ elseif iscell(operators)&&iscell(spins)
         % Operator type
         switch operators{n}
 
-            case 'Em'
-
-                % Empty cavity state
-                opspecs(:,spins{n})=-4;
-
-            case 'An'
-                
-                % Annihilation operator
-                opspecs(:,spins{n})=-3;
-
-            case 'Nu'
-                
-                % Number operator
-                opspecs(:,spins{n})=-2;
-
-            case 'Cr'
-                
-                % Creation operator
-                opspecs(:,spins{n})=-1;
-
             case 'E'
                 
                 % Unit operator
                 opspecs(:,spins{n})=0;
+
+            case 'Cr'
+                
+                % Creation operator
+                opspecs(:,spins{n})=1;
+
+            case 'An'
+                
+                % Annihilation operator
+                opspecs(:,spins{n})=2;
+
+            case 'Nu'
+                
+                % Number operator
+                opspecs(:,spins{n})=4;
                 
             case 'L+'
                 
@@ -269,6 +264,30 @@ elseif iscell(operators)&&iscell(spins)
                     states=kron(zl_states,ones(size(opspecs,1),1));
                     opspecs=kron(ones(numel(zl_states),1),opspecs);
                     opspecs(:,spins{n})=states; coeffs=kron(zl_coeffs,coeffs);
+
+                % Specific bosonic energy level
+                elseif strcmp(operators{n}(1:2),'BL')
+
+                    % Validate bosonic energy level specification
+                    if isempty(regexp(operators{n},'^BL([1-9]\d*)$','once'))
+                        error('unrecognized operator or state specification.');
+                    end
+
+                    % Extract bosonic energy level number
+                    level_number=textscan(operators{n},'BL%n');
+                    level_number=level_number{1};
+
+                    % Validate the number
+                    if (level_number<1)||(mod(level_number,1)~=0)|| ...
+                       (level_number>spin_system.comp.mults(spins{n}))
+                        error('invalid bosonic energy level number.');
+                    end
+
+                    % Get the bosonic monomial expansion of the specified energy level projector
+                    [bl_states,bl_coeffs]=enlev2bm(spin_system.comp.mults(spins{n}),level_number);
+                    states=kron(bl_states,ones(size(opspecs,1),1));
+                    opspecs=kron(ones(numel(bl_states),1),opspecs);
+                    opspecs(:,spins{n})=states; coeffs=kron(bl_coeffs,coeffs);
 
                 else
 

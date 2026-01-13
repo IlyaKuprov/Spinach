@@ -39,7 +39,7 @@ delta=2*pi*5e6;
 H=delta*Ez+H_JC;
 
 % Initial state - Sx in empty cavity mode
-rho=state(spin_system,{'Lx','Em'},{1,2});
+rho=state(spin_system,{'Lx','BL1'},{1,2});
 
 % Detection state, spin
 S=state(spin_system,{'Lx'},{1});

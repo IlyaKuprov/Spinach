@@ -5,8 +5,8 @@
 %
 % Parameters:
 %
-%     mult    - multipicity of the spin in question, an
-%               even positive integer
+%     mult    - multipicity of the spin in question, a
+%               positive integer
 %
 %     lvl_num - energy level number, counting from the
 %               bottom up
@@ -34,12 +34,12 @@ grumble(mult,lvl_num);
 P=zeros(mult,mult); 
 P(mult-lvl_num+1,mult-lvl_num+1)=1;
 
-% Spherical tensors in Zeeman basis
-IST_Z=irr_sph_ten(mult);
+% Spherical tensors
+IST=irr_sph_ten(mult);
 
 % Get all expansion coefficients and list all states
-coeffs=cellfun(@(A)trace(A'*P)/trace(A'*A),IST_Z);
-states=transpose(0:(numel(IST_Z)-1));
+coeffs=cellfun(@(A)trace(A'*P)/trace(A'*A),IST);
+states=transpose(0:(numel(IST)-1));
 
 % Drop negligible states
 idx=(abs(coeffs)>10*eps('double'));
@@ -50,12 +50,11 @@ end
 % Consistency enforcement
 function grumble(mult,lvl_num)
 if (~isnumeric(mult))||(~isscalar(mult))||...
-   (~isreal(mult))||(mult<2)||(mod(mult,2)~=0)
-    error('mult must be an even positive integer.');
+   (~isreal(mult))||(mult<1)
+    error('mult must be a positive integer.');
 end
 if (~isnumeric(lvl_num))||(~isscalar(lvl_num))||...
-   (~isreal(lvl_num))||(lvl_num<1)||(lvl_num>mult)||...
-   (mod(lvl_num,2)~=0)
+   (~isreal(lvl_num))||(lvl_num<1)||(lvl_num>mult)
     error('the specified Zeeman energy level does not exist.');
 end
 end

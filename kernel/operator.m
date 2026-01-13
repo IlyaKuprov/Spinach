@@ -157,6 +157,7 @@ switch spin_system.bas.formalism
         % Parallelisation efficiency
         mults=spin_system.comp.mults;
         formalism=spin_system.bas.formalism;
+        types=spin_system.comp.types;
 
         % Build summation terms
         parfor n=1:numel(opspecs)
@@ -168,27 +169,34 @@ switch spin_system.bas.formalism
             for k=1:numel(opspecs{n})
 
                 % Check physics type
-                if opspecs{n}(k)>=0
+                switch types{k} %#ok<PFBNS>
+                
+                    case 'S' % Spins
 
-                    % Spin: get spin state indices
-                    [L,M]=lin2lm(opspecs{n}(k));
+                        % Get spin state indices
+                        [L,M]=lin2lm(opspecs{n}(k));
 
-                    % Spin: get irreducible spherical tensors
-                    ist=irr_sph_ten(mults(k),L); %#ok<PFBNS>
+                        % Get irreducible spherical tensors
+                        ist=irr_sph_ten(mults(k),L); %#ok<PFBNS>
 
-                    % Spin: get operator
-                    T=ist{L-M+1};
+                        % Update the kron
+                        B=kron(B,ist{L-M+1});
 
-                else
+                    case {'C','V','T'} % Cavities, phonons, transmons
 
-                    % Cavities and phonons: get operator
-                    T=boson_oper(mults(k),opspecs{n}(k));
+                        % Get bosonic monomials
+                        bmon=boson_mono(mults(k));
+
+                        % Update the kron
+                        B=kron(B,bmon{opspecs{n}(k)+1});
+
+                    otherwise
+
+                        % Complain and bomb out
+                        error('unknown particle type.');
 
                 end
                 
-                % Update the kron
-                B=kron(B,T);
-
             end
             
             % Move to Liouville space if necessary

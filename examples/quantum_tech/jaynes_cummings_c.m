@@ -51,8 +51,8 @@ H=delta1*Ez1+delta2*Ez2+H_JC+H_EX;
 
 % Initial state Sx on electrons
 % in an empty cavity mode
-rho=state(spin_system,{'Lx','Em'},{1,3})+...
-    state(spin_system,{'Lx','Em'},{2,3});
+rho=state(spin_system,{'Lx','BL1'},{1,3})+...
+    state(spin_system,{'Lx','BL1'},{2,3});
 
 % Detection state, spins
 S=state(spin_system,{'Lx'},{1})+...

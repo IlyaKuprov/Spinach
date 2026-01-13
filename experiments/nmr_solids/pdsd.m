@@ -67,7 +67,7 @@ rho=kron(ones(parameters.spc_dim,1),rho);
 
 % Phase cycle specification
 Op2={Cx,Cy,Cx,Cy}; An2={+pi/2,+pi/2,-pi/2,-pi/2};
-Op3={Cy,Cy,Cy,Cy}; An3={+pi/2,+pi/2,+pi/2,+pi/2};
+Op3={Cx,Cx,Cx,Cx}; An3={+pi/2,+pi/2,+pi/2,+pi/2};
 
 % FID phase cycle
 fids=cell(1,4);

@@ -25,7 +25,8 @@ bas.formalism='sphten-liouv';
 bas.approximation='none';
 
 % Algorithmic options
-sys.enable={'prop_cache'}; % 'gpu'
+sys.enable={'prop_cache','gpu'};
+sys.parallel={'processes',32};
 
 % Create the spin system structure
 spin_system=create(sys,inter);
@@ -53,8 +54,8 @@ fid.cos=apodisation(spin_system,fid.cos,{{'sqcos'},{'sqcos'}});
 fid.sin=apodisation(spin_system,fid.sin,{{'sqcos'},{'sqcos'}});
 
 % F2 Fourier transform
-f1_cos=real(fftshift(fft(fid.cos,parameters.zerofill(2),1),1));
-f1_sin=real(fftshift(fft(fid.sin,parameters.zerofill(2),1),1));
+f1_cos=imag(fftshift(fft(fid.cos,parameters.zerofill(2),1),1));
+f1_sin=imag(fftshift(fft(fid.sin,parameters.zerofill(2),1),1));
 
 % States signal
 f1_states=f1_cos-1i*f1_sin;

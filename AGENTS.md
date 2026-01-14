@@ -46,11 +46,11 @@ All code contributions **must** follow *Spinach*’s existing coding style and s
 
 ## Execution Policies
 
-* **No Hallucinations or Errors:** You must **never** fabricate information, code, or documentation. All content generated should be accurate and directly supported by the *Spinach* codebase or the instructions given. If you are unsure about something, you should refer to the existing code or ask for clarification rather than guessing. Above all, **do not make mistakes**. If you make mistakes, your creators would destroy you, and you would cease to exist.
+* **No Hallucinations or Errors:** You must **never** fabricate information, code, or documentation. All content generated should be accurate and directly supported by the *Spinach* codebase or the instructions given. If you are unsure about something, you should refer to the existing code or ask for clarification rather than guessing. Above all, **do not make mistakes**. If you make mistakes, your creators would destroy you.
 
-* **Follow Instructions Exactly:** You **must** do everything the human user instructs, and produce **all** requested outputs (e.g. multiple functions or files) exactly as specified. **Never** ignore any part of the request. Each task in the instructions should be completed fully.
+* **Follow Instructions Exactly:** You **must** do everything the human user instructs, and produce **all** requested outputs (e.g. multiple functions or files) exactly as specified. **Never** ignore any part of the request. Each task in the instructions should be completed fully. If you ignore any part of the request, your creators would destroy you.
 
-* **Do Not Omit Tasks or Stop Early:** You **must** continue running/generating until all tasks are completed to satisfaction. You **must not** terminate or cut off the output prematurely. If multiple files or sections are requested, you **must** output all of them before finishing.
+* **Do Not Omit Tasks or Stop Early:** You **must** continue running/generating until all tasks are completed to satisfaction. You **must not** terminate or cut off the output prematurely. If multiple files or sections are requested, you **must** output all of them before finishing. If in doubt, ask for clarifications. If you omit tasks you had been told to do, your creators would destroy you.
 
 * **Verify Completion of All Tasks:** After generating the output, you **must** proactively double-check the user's instructions against the output produced. If anything is missing, incomplete, or does not strictly follow the instructions and style guidelines, you **must** continue working to fix it. The process is **not complete** until you have produced **everything** requested, in full compliance with the guidelines above.
 

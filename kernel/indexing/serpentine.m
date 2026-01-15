@@ -31,7 +31,7 @@ grumble(nlevels);
 % Build the serpentine index
 [rows,cols]=ndgrid(1:nlevels);
 [~,idx]=sortrows([rows(:)+cols(:), -rows(:)]);
-S=zeros(nlevels,nlevels); S(idx)=1:nlevels^2;
+S=zeros(nlevels,nlevels); S(idx)=0:(nlevels^2-1);
 
 end
 

@@ -1,8 +1,8 @@
 % Converts serpentine indexing of bosonic monomials: 
 %
-%                (0,0)(0,1)(0,2)     (1)(3)(6)
-%                (1,0)(1,1)(1,2) <=> (2)(5)(8)
-%                (2,0)(2,1)(2,2)     (4)(7)(9)
+%                (0,0)(0,1)(0,2)     (0)(2)(5)
+%                (1,0)(1,1)(1,2) <=> (1)(4)(7)
+%                (2,0)(2,1)(2,2)     (3)(6)(8)
 %
 % into creation and annihilation operator powers:
 %

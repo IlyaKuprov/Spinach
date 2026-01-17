@@ -1,13 +1,39 @@
-% Simulation of XiX DNP field profile in the steady state 
-% with electron-proton distance ensemble averaging.
+% Simulation of T1n dependence of XiX DNP field 
+% profiles in the steady state with electron-
+% proton distance ensemble.
 % 
-% Calculation time: minutes.
+% Calculation time: minutes
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
-% ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
+% ilya.kuprov@weizmann.ac.il
 
-function xix_q_field_profile_ensemble_r()
+function xix_q_field_profile_ensemble_r_T1n()
+
+% Nuclear relaxation times, seconds
+T1n=[50.0 5.0 0.500 0.050 0.005];
+
+% Get the figure started
+kfigure(); hold on; kgrid;
+kxlabel('Microwave resonance offset, MHz'); 
+kylabel('$\langle I_Z \rangle _{\infty}$');
+xlim tight; ylim([-1.3e-3 1.3e-3]);
+
+% Plot the curves
+for n=1:numel(T1n)
+    xix_field_profile_ensemble_r(T1n(n));
+end
+
+% Add the legend and save the plot
+klegend({'$T_{1n}$ = 50 s', '$T_{1n}$ = 5 s',...
+         '$T_{1n}$ = 0.5 s','$T_{1n}$ = 0.05 s',...
+         '$T_{1n}$ = 0.005 s'},'Location','SouthEast');
+savefig(gcf,'xix_q_field_profile_ensemble_r_T1n.fig');
+
+end
+
+% Simulation for a specific T1n
+function xix_field_profile_ensemble_r(T1n)
 
 % Q-band magnet
 sys.magnet=1.2142;
@@ -46,11 +72,9 @@ for n=1:numel(r)
     inter.coordinates={[0.000 0.000 0.000];
                        [0.000 0.000 r(n) ]};
     
-    % Relaxation rates, distance and ori. dep. R1n
+    % Relaxation rates
     inter.relaxation={'t1_t2'};
-    r1n_rate=@(alp,bet,gam)r1n_dnp(sys.magnet,inter.temperature,...
-                                   2.00230,1e-3,52,r(n),bet); 
-    inter.r1_rates={1e3 r1n_rate};
+    inter.r1_rates={1e3 1/T1n};
     inter.r2_rates={200e3 50e3};
     inter.rlx_keep='diagonal';
     inter.equilibrium='dibari';
@@ -72,7 +96,7 @@ for n=1:numel(r)
     parameters.addshift=-13e6;
     parameters.el_offs=offsets;
 
-     % Calculate shot spacing
+    % Calculate shot spacing
     parameters.shot_spacing=204e-6 - 2*parameters.nloops*parameters.pulse_dur;
 
     % Run the steady state simulation
@@ -82,15 +106,9 @@ end
 
 % Integrate over the distance distribution, r^2 is the Jacobian
 dnp=sum(dnp.*reshape(r.^2,[1 numel(r)]).*reshape(w,[1 numel(w)]),2)/sum((r.^2).*w);
-        
-% Plotting 
-kfigure(); plot(parameters.el_offs/1e6,real(dnp)); 
-kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');  
-kxlabel('Microwave resonance offset, MHz'); 
-kgrid; xlim tight; ylim padded;
 
-% Save the figure
-savefig(gcf,'xix_q_field_profile_ensemble_r.fig');
+% Plotting 
+plot(parameters.el_offs/1e6,real(dnp)); drawnow;
 
 end
 

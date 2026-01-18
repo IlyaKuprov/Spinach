@@ -16,12 +16,13 @@
 % Output:
 %    M13     - (1,3) block of the auxiliary matrix exponential
 %    or if requested
-%   [M11_inv*M13, M11_inv] - where M11_inv is conj transpose of (1, 1) block,
+%   [M11_inv*M13, M11_inv] - where M11_inv is conj transpose of (1, 1)
+%   block.
 %
 % aditya.dev@weizmann.ac.il
 % ilya.kuprov@weizmann.ac.il
 
-function varargout =expmint2(spin_system,A,B,C,D,E,T)
+function varargout=expmint2(spin_system,A,B,C,D,E,T)
 
 % Check consistency
 grumble(A,B,C,D,E,T);
@@ -104,3 +105,9 @@ if (~isnumeric(T))||(~isreal(T))||(~isscalar(T))
     error('T must be a real scalar.');
 end
 end
+
+% Beauty may be in the eye of the beholder, but elegance in equations is
+% best compiled in LaTeX -- unless, of course, they're formatted in Word,
+% where elegance yields to existential despair.
+% --  Anonymous Physicist 
+

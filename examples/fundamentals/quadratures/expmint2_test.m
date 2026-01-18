@@ -2,7 +2,7 @@
 %
 %    expmint2_test(n,t)
 %
-% Parameters:
+% Parameters(optional):
 %
 %    n  - matrix dimension
 %
@@ -79,7 +79,7 @@ if ~isempty(r_fast)
     end
     fprintf('Analytical vs Numerical Difference: %e\n',diff_norm);
     fprintf('Relative Error: %e\n',rel_err);
-    if rel_err<1e-2
+    if rel_err<1e-8
         fprintf('SUCCESS: Verification Passed.\n');
     else
         fprintf('FAILURE: Verification Failed.\n');

@@ -47,11 +47,10 @@ B=boson_mono(nlevels);
 for n=1:numel(B)
 
     % Physical indices
-    [k,q]=lin2kq(n-1);
+    [k,q]=lin2kq(nlevels,n-1);
 
     % Deviation norm testing
-    err=norm(comm(A.n,B{n})-(2*q-k)*B{n},'fro')/...
-        norm((2*q-k)*B{n},'fro');
+    err=norm(comm(A.n,B{n})-(k-q)*B{n},'fro')/norm(B{n},'fro');
     if err>acc
         error('Bosonic operator commutation test 3 FAILED.');
     end

@@ -5,7 +5,7 @@
 % obeying the following commutation relations with the po-
 % pulation number operator N:
 %
-%                    [N,B(k,q)]=(??)*B(k,q)
+%                   [N,B(k,q)]=(k-q)*B(k,q)
 % 
 % Syntax:
 %

@@ -82,7 +82,7 @@ parfor n=1:nsteps %#ok<*PFBNS>
 end
 
 % Steady state
-rho_st=steady(spin_system,P,[],[],'newton');
+rho_st=steady(spin_system,P,[],'newton');
 
 % Rotor period trajectory
 nsteps=numel(H); rho=zeros(numel(rho_st),nsteps,'like',1i); rho(:,1)=rho_st;

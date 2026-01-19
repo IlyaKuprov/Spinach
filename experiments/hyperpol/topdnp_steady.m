@@ -100,7 +100,7 @@ for n=1:numel(parameters.el_offs)
     P=clean_up(spin_system,P,spin_system.tols.prop_chop);
 
     % Compute the steady state
-    rho=steady(spin_system,P,[],[],'newton');
+    rho=steady(spin_system,P,[],'newton');
    
     % Get the observable at the steady state
     dnp(:,n)=gather(parameters.coil'*rho);

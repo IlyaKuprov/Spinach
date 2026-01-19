@@ -17,13 +17,6 @@
 %          element (it corresponds to the density mat-
 %          rix trace in sphten-liouv) must always be 1
 %
-%    tol   - tolerance on the 2-norm of the difference
-%            in the state vector between steady state
-%            solver iterations; when the 2-norm of the
-%            difference becomes smaller than this num-
-%            ber, the iterations are stopped. The defa-
-%            ult (1e-8) is suitable for DNP work
-%
 %    method - 'newton' (default) for the Newton-Raphson
 %             steady state solver, 'squaring' for propa-
 %             gator squaring (much more expensive, but
@@ -40,16 +33,11 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=steady.m>
 
-function rho=steady(spin_system,P,rho,tol,method)
+function rho=steady(spin_system,P,rho,method)
 
 % Default initial guess
 if (~exist('rho','var'))||isempty(rho)
     rho=zeros([size(P,2) 1],'like',1i); rho(1)=1;
-end
-
-% Default tolerance
-if (~exist('tol','var'))||isempty(tol)
-    tol=1e-8; 
 end
 
 % Default method
@@ -58,7 +46,7 @@ if (~exist('method','var'))||isempty(method)
 end
 
 % Check consistency
-grumble(spin_system,P,rho,tol);
+grumble(spin_system,P,rho);
 
 % Pick the method
 switch method
@@ -69,7 +57,7 @@ switch method
         cheap_diff=1; n_iter=1;
 
         % Keep going
-        while cheap_diff>tol
+        while cheap_diff>spin_system.tols.stst_tol
 
             % Compute the square
             Psq=clean_up(spin_system,P*P,spin_system.tols.prop_chop);
@@ -98,7 +86,7 @@ switch method
         n_iter=0;
 
         % Newton iteration
-        while norm(du,2)>tol
+        while norm(du,2)>spin_system.tols.stst_tol
 
             % Compute the residual
             r=P*rho-rho; r=r(2:end);
@@ -124,7 +112,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,P,rho,tol)
+function grumble(spin_system,P,rho)
 if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
     error('steady state is only available for sphten-liouv formalism.');
 end
@@ -145,9 +133,6 @@ if ~iscolumn(rho)
 end
 if rho(1)~=1
     error('rho(1) must be equal to 1.');
-end
-if (~isnumeric(tol))||(~isreal(tol))||(~isscalar(tol))
-    error('tol must be a real scalar.');
 end
 end
 

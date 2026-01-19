@@ -146,6 +146,25 @@ else
                         pad(num2str(spin_system.tols.irrep_drop,'%0.8e'),20) ' (safe default)']);
 end
 
+% Steady state convergence tolerance
+if isfield(sys,'tols')&&isfield(sys.tols,'stst_tol')
+    spin_system.tols.stst_tol=sys.tols.stst_tol; sys.tols=rmfield(sys.tols,'stst_tol');
+    report(spin_system,[pad('Steady state convergence tolerance',65) ...
+                        pad(num2str(spin_system.tols.stst_tol,'%0.8e'),20) ' (user-specified)']);
+elseif ismember('paranoia',spin_system.sys.enable)
+    spin_system.tols.stst_tol=eps();
+    report(spin_system,[pad('Steady state convergence tolerance',65) ...
+                        pad(num2str(spin_system.tols.stst_tol,'%0.8e'),20) ' (paranoid)']);
+elseif ismember('cowboy',spin_system.sys.enable)
+    spin_system.tols.stst_tol=1e-6;
+    report(spin_system,[pad('Steady state convergence tolerance',65) ...
+                        pad(num2str(spin_system.tols.stst_tol,'%0.8e'),20) ' (loose)']);
+else
+    spin_system.tols.stst_tol=1e-8;
+    report(spin_system,[pad('Steady state convergence tolerance',65) ...
+                        pad(num2str(spin_system.tols.stst_tol,'%0.8e'),20) ' (safe default)']);
+end
+
 % ZTE sample length
 if isfield(sys,'tols')&&isfield(sys.tols,'zte_nsteps')
     spin_system.tols.zte_nsteps=sys.tols.zte_nsteps; sys.tols=rmfield(sys.tols,'zte_nsteps');

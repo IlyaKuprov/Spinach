@@ -1,7 +1,7 @@
 % Simulation of NOVEL DNP repetition time scan in the 
 % steady state.
 % 
-% Calculation time: seconds.
+% Calculation time: minutes.
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il

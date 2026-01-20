@@ -127,12 +127,15 @@ switch spin_system.bas.formalism
     
     % Spherical tensor basis
     case 'sphten-liouv'
+
+        % Parallelisation efficiency
+        types=spin_system.comp.types;
         
         % Build summation terms
         parfor n=1:numel(opspecs)
 
             % Check physics type
-            if all(opspecs{n}>=0,'all')
+            if all(strcmp('S',types),'all')
 
                 % For spins: get the superoperator
                 A{n}=p_superop(spin_system,opspecs{n},operator_type);

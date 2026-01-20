@@ -60,6 +60,11 @@ if strcmp(name(1),'E')&&(~isempty(regexp(name,'^E\d','once')))
     multiplicity=str2double(name(2:end));
     gamma=-1.76085963023e11; % CODATA 2018
 
+    % At least two levels
+    if multiplicity<2
+        error('electrons need at least two energy levels.');
+    end
+
 elseif (strcmp(name(1),'C')&&(~isempty(regexp(name,'^C\d','once'))))||...
        (strcmp(name(1),'V')&&(~isempty(regexp(name,'^V\d','once'))))||...
        (strcmp(name(1),'T')&&(~isempty(regexp(name,'^T\d','once'))))
@@ -67,7 +72,12 @@ elseif (strcmp(name(1),'C')&&(~isempty(regexp(name,'^C\d','once'))))||...
     % Cavity modes, phonon modes, and transmons
     % are special cases, no Zeeman interactions
     multiplicity=str2double(name(2:end)); gamma=0;
-    
+
+    % At least 3 levels
+    if multiplicity<3
+        error('bosonic modes need at least three energy levels.');
+    end
+ 
 else
     
     % Other cases come from the database

@@ -55,8 +55,7 @@ active_spins=find(opspec);
 if isempty(active_spins)
     A=unit_oper(spin_system); 
     [rows,cols,vals]=find(A);
-    A=[rows cols vals];
-    return;
+    A=[rows cols vals]; return;
 end
 
 % Preallocate source state index
@@ -71,8 +70,25 @@ struct=cell(1,numel(active_spins));
 % Loop over the relevant spins
 for n=1:length(active_spins)
     
-    % Get right and left product action tables for the current spin
-    [pt_left,pt_right]=ist_product_table(spin_system.comp.mults(active_spins(n)));
+    % Get right and left product action tables
+    switch spin_system.comp.types{active_spins(n)}
+
+        case 'S' % Spins
+
+            % Spins need irreducible spherical tensor product action tables
+            [pt_left,pt_right]=ist_product_table(spin_system.comp.mults(active_spins(n)));
+
+        case {'C','V','T'} % Cavities, phonons, transmons
+
+            % Bosons need bosonic monomial product action tables
+            [pt_left,pt_right]=bos_product_table(spin_system.comp.mults(active_spins(n)));
+
+        otherwise
+
+            % Complain and bomb out
+            error('unknown particle type.');
+
+    end 
     
     % Extract pages corresponding to the current state
     switch side

@@ -128,27 +128,14 @@ switch spin_system.bas.formalism
     % Spherical tensor basis
     case 'sphten-liouv'
 
-        % Parallelisation efficiency
-        types=spin_system.comp.types;
-        
         % Build summation terms
         parfor n=1:numel(opspecs)
 
-            % Check physics type
-            if all(strcmp('S',types),'all')
+            % Get the superoperator
+            A{n}=p_superop(spin_system,opspecs{n},operator_type);
 
-                % For spins: get the superoperator
-                A{n}=p_superop(spin_system,opspecs{n},operator_type);
-
-                % For spins: apply the coefficient
-                A{n}(:,3)=coeffs(n)*A{n}(:,3);
-
-            else
-
-                % For cavities and phonons: complain and bomb out
-                error('Cavities and phonons not yet available in sphten-liouv.');
-
-            end
+            % Apply the coefficient
+            A{n}(:,3)=coeffs(n)*A{n}(:,3);
 
         end
                 
@@ -180,18 +167,18 @@ switch spin_system.bas.formalism
                         [L,M]=lin2lm(opspecs{n}(k));
 
                         % Get irreducible spherical tensors
-                        ist=irr_sph_ten(mults(k),L); %#ok<PFBNS>
+                        IST=irr_sph_ten(mults(k),L); %#ok<PFBNS>
 
                         % Update the kron
-                        B=kron(B,ist{L-M+1});
+                        B=kron(B,IST{L-M+1});
 
                     case {'C','V','T'} % Cavities, phonons, transmons
 
                         % Get bosonic monomials
-                        bmon=boson_mono(mults(k));
+                        BM=boson_mono(mults(k));
 
                         % Update the kron
-                        B=kron(B,bmon{opspecs{n}(k)+1});
+                        B=kron(B,BM{opspecs{n}(k)+1});
 
                     otherwise
 

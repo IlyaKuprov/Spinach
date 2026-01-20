@@ -20,10 +20,10 @@ spin_system=create(sys);
 spin_system=basis(spin_system,bas);
 
 % Get elementary operators
-CrA=operator(spin_system,'Cr',1);
-AnA=operator(spin_system,'An',1);
-CrB=operator(spin_system,'Cr',2);
-AnB=operator(spin_system,'An',2);
+CrA=operator(spin_system,'C',1);
+AnA=operator(spin_system,'A',1);
+CrB=operator(spin_system,'C',2);
+AnB=operator(spin_system,'A',2);
 
 % Hamiltonian parameters
 deltas=2*pi*[100 -200];
@@ -31,22 +31,22 @@ alphas=2*pi*[10   20];
 J=2*pi*50;
 
 % Build the Hamiltonian
-H=deltas(1)*operator(spin_system,'Nu',1)+(alphas(1)/2)*CrA*CrA*AnA*AnA+...
-  deltas(2)*operator(spin_system,'Nu',2)+(alphas(2)/2)*CrB*CrB*AnB*AnB+...
+H=deltas(1)*operator(spin_system,'N',1)+(alphas(1)/2)*CrA*CrA*AnA*AnA+...
+  deltas(2)*operator(spin_system,'N',2)+(alphas(2)/2)*CrB*CrB*AnB*AnB+...
   J*(CrA*AnB+CrB*AnA);
 
 % Build control operators
 C_A=(CrA+AnA)/2; C_B=(CrB+AnB)/2;
 
 % Build offset operators
-O_A=operator(spin_system,'Nu',1);
-O_B=operator(spin_system,'Nu',2);
+O_A=operator(spin_system,'N',1);
+O_B=operator(spin_system,'N',2);
 
 % Build source and destination states
-rho_init=state(spin_system,{'Cr','BL1'},{1 2})+...
-         state(spin_system,{'An','BL1'},{1 2});
-rho_targ=state(spin_system,{'BL1','Cr'},{1 2})+...
-         state(spin_system,{'BL1','An'},{1 2});
+rho_init=state(spin_system,{'C','BL1'},{1 2})+...
+         state(spin_system,{'A','BL1'},{1 2});
+rho_targ=state(spin_system,{'BL1','C'},{1 2})+...
+         state(spin_system,{'BL1','A'},{1 2});
 rho_init=rho_init/norm(rho_init,'fro');
 rho_targ=rho_targ/norm(rho_targ,'fro');
 

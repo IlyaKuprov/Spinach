@@ -29,8 +29,8 @@ Ez=operator(spin_system,{'Lz'},{1});
 
 % Jaynes-Cummings term
 g=2*pi*2.828e6;
-H_JC=g*(operator(spin_system,{'L+','An'},{1,2})+...
-        operator(spin_system,{'L-','Cr'},{1,2}));
+H_JC=g*(operator(spin_system,{'L+','A'},{1,2})+...
+        operator(spin_system,{'L-','C'},{1,2}));
 
 % Detuning of 5 MHz
 delta=2*pi*5e6;
@@ -45,8 +45,8 @@ rho=state(spin_system,{'Lx','BL1'},{1,2});
 S=state(spin_system,{'Lx'},{1});
 
 % Detection state, cavity mode
-B=(state(spin_system,{'Cr'},{2})-...
-   state(spin_system,{'An'},{2}))/2i;
+B=(state(spin_system,{'C'},{2})-...
+   state(spin_system,{'A'},{2}))/2i;
 
 % Run evolution
 traj_s=evolution(spin_system,H,S,rho,10e-9,250,'observable');

@@ -25,7 +25,7 @@ spin_system=basis(spin_system,bas);
 
 % Larmor and cavity energy operators
 Ez=operator(spin_system,{'Lz'},{1});
-N=operator(spin_system,{'Nu'},{2});
+N=operator(spin_system,{'N'},{2});
 U=unit_oper(spin_system);
 
 % Electron larmor and cavity frequency
@@ -33,8 +33,8 @@ omega_c=-sys.magnet*spin('E');
 
 % Jaynes-Cummings term
 g=2*pi*2.828e6;
-H_JC=g*(operator(spin_system,{'L+','An'},{1,2})+...
-        operator(spin_system,{'L-','Cr'},{1,2}));
+H_JC=g*(operator(spin_system,{'L+','A'},{1,2})+...
+        operator(spin_system,{'L-','C'},{1,2}));
 
 % Detuning range
 delta=2*pi*linspace(-15e6,15e6,100);

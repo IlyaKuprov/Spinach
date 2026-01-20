@@ -127,17 +127,17 @@ elseif iscell(operators)&&iscell(spins)
                 % Unit operator
                 opspecs(:,spins{n})=0;
 
-            case 'Cr'
+            case 'C'
                 
                 % Creation operator
                 opspecs(:,spins{n})=1;
 
-            case 'An'
+            case 'A'
                 
                 % Annihilation operator
                 opspecs(:,spins{n})=2;
 
-            case 'Nu'
+            case 'N'
                 
                 % Number operator
                 opspecs(:,spins{n})=4;

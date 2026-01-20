@@ -141,6 +141,14 @@ elseif iscell(operators)&&iscell(spins)
                 
                 % Number operator
                 opspecs(:,spins{n})=4;
+
+            case 'CCAA' % A common anharmonicity term
+
+                % Get the energy level truncation
+                nlevels=spin_system.comp.mults(spins{n});
+
+                % Determine the operator number
+                opspecs(:,spins{n})=kq2lin(nlevels,2,2);
                 
             case 'L+'
                 

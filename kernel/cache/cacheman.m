@@ -14,6 +14,14 @@ function cacheman(spin_system)
 % Check consistency
 grumble(spin_system);
 
+% Get parallel pool directory
+current_pool=gcp('nocreate');
+if ~isempty(current_pool)
+    pool_dir=current_pool.Cluster.JobStorageLocation;
+else
+    pool_dir='';
+end
+
 % Calculate the time horizon
 time_horizon=now-spin_system.tols.cache_mem; %#ok<TNOW1> 
 
@@ -36,8 +44,10 @@ parfor n=1:numel(dir_cont) % rawrrrrrrr
     if dir_cont(n).datenum<time_horizon
         if dir_cont(n).isdir
             try %#ok<TRYNC> - fail quietly
-                rmdir([dir_cont(n).folder filesep dir_cont(n).name],'s');
-                n_dirs_gone=n_dirs_gone+1;
+                dir_name=[dir_cont(n).folder filesep dir_cont(n).name];
+                if ~strcmp(dir_name,pool_dir)
+                    rmdir(dir_name,'s'); n_dirs_gone=n_dirs_gone+1;
+                end
             end
         else
             try %#ok<TRYNC> - fail quietly

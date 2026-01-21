@@ -15,14 +15,16 @@
 %    partners    - a cell array of partner state specifica-
 %                  tions of the form
 %
-%                  {{states_a,spins_a},{states_b,spins_b},...}
+%                          { {states_a,spins_a},...
+%                            {states_b,spins_b},... }
 %
 %                  where states_a,b are cell arrays of sta-
 %                  tes that the partner spins can have and 
 %                  spins_a,b are lists of numbers of those
 %                  spins on the main isotope list, e.g.
 %
-%                  {{'E' 'Lz'},[1 5]},{'L+','L-',[2 7]},...}
+%                         { {{'E'  'Lz'},[1 5]},...
+%                           {{'L+' 'L-'},[2 7]},... }
 %
 % Outputs:
 %
@@ -34,7 +36,7 @@
 %
 % Example: in a five-spin system, the following call
 %
-%  A=partner_state(spin_system,{'L+',2},{{'E','Lz'},[1 3])
+%  A=partner_state(spin_system,{'L+',2},{{{'E','Lz'},[1 3]}})
 %
 %          will return the following state array
 %
@@ -45,7 +47,7 @@
 %
 % ilya.kuprov@weizmann.ac.il
 %
-% <https://spindynamics.org/wiki/index.php?title=pauli.m>
+% <https://spindynamics.org/wiki/index.php?title=partner_state.m>
 
 function A=partner_state(spin_system,active_spin,partners)
 

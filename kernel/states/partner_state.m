@@ -32,16 +32,16 @@
 %        ons specified by the user. All spins not explicitly
 %        mentioned in the input will be in their 'E' states.
 %
-% Example: in five system, the follwing call
+% Example: in a five-spin system, the following call
 %
-%      A=partner_state(spin_system,{'L+',2},{{'E','Lz'},[1 3])
+%  A=partner_state(spin_system,{'L+',2},{{'E','Lz'},[1 3])
 %
 %          will return the following state array
 %
-%      A={state(spin_system,{'E', 'L+','E' },{1 2 3}),...
-%         state(spin_system,{'Lz','L+','E' },{1 2 3}),...
-%         state(spin_system,{'E', 'L+','Lz'},{1 2 3}),...
-%         state(spin_system,{'Lz','L+','Lz'},{1 2 3})};
+%  A={state(spin_system,{'E' ,'L+','E' ,'E' ,'E'},{1 2 3 4 5}),...
+%     state(spin_system,{'Lz','L+','E' ,'E' ,'E'},{1 2 3 4 5}),...
+%     state(spin_system,{'E' ,'L+','Lz','E' ,'E'},{1 2 3 4 5}),...
+%     state(spin_system,{'Lz','L+','Lz','E' ,'E'},{1 2 3 4 5})};
 %
 % ilya.kuprov@weizmann.ac.il
 %

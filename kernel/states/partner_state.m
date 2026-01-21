@@ -54,59 +54,38 @@ function A=partner_state(spin_system,active_spin,partners)
 % Check consistency
 grumble(spin_system,active_spin,partners);
 
-% Normalize partner specifications
-if isempty(partners)
-    partner_specs={};
-elseif (iscell(partners))&&(numel(partners)==2)&&...
-       (iscell(partners{1}))&&(isnumeric(partners{2}))
-    partner_specs={partners};
-else
-    partner_specs=partners;
-end
-
 % Build partner spin lists and state combinations
 nspins=spin_system.comp.nspins;
 base_states=repmat({'E'},1,nspins);
 base_states{active_spin{2}}=active_spin{1};
-partner_spins=[];
-partner_allowed_states={};
-for n=1:numel(partner_specs)
-    partner_states=partner_specs{n}{1};
-    partner_spin_list=partner_specs{n}{2};
-    for k=1:numel(partner_spin_list)
-        partner_spins=[partner_spins partner_spin_list(k)];
-        partner_allowed_states{end+1}=partner_states;
-    end
+partner_spin_lists=cellfun(@(spec) spec{2},partners,'UniformOutput',false);
+partner_spins=[partner_spin_lists{:}];
+partner_state_sets=cellfun(@(spec) spec{1},partners,'UniformOutput',false);
+partner_allowed_state_cells=cellfun(@(states,spins) repmat({states},1,numel(spins)),...
+                                    partner_state_sets,partner_spin_lists,...
+                                    'UniformOutput',false);
+partner_allowed_states=[partner_allowed_state_cells{:}];
+% Build partner state combinations
+state_counts=cellfun(@numel,partner_allowed_states);
+block_sizes=ones(1,numel(state_counts));
+if numel(state_counts)>1
+    block_sizes(2:end)=cumprod(state_counts(1:end-1));
 end
-if isempty(partner_spins)
-    index_matrix=zeros(1,0);
-else
-    state_counts=cellfun(@numel,partner_allowed_states);
-    index_axes=cell(1,numel(state_counts));
-    for n=1:numel(state_counts)
-        index_axes{n}=1:state_counts(n);
-    end
-    [index_axes{:}]=ndgrid(index_axes{:});
-    index_matrix=zeros(numel(index_axes{1}),numel(state_counts));
-    for n=1:numel(state_counts)
-        index_matrix(:,n)=index_axes{n}(:);
-    end
+repeat_counts=ones(1,numel(state_counts));
+if numel(state_counts)>1
+    repeat_counts(1:end-1)=cumprod(state_counts(end:-1:2));
+    repeat_counts=repeat_counts(end:-1:1);
 end
-state_combinations=cell(size(index_matrix,1),1);
-for n=1:size(index_matrix,1)
-    current_states=base_states;
-    for k=1:numel(partner_spins)
-        current_states{partner_spins(k)}=partner_allowed_states{k}{index_matrix(n,k)};
-    end
-    state_combinations{n}=current_states;
-end
+index_columns=arrayfun(@(count,block,repeat) repmat(kron((1:count).',ones(block,1)),repeat,1),...
+                       state_counts,block_sizes,repeat_counts,'UniformOutput',false);
+index_matrix=[index_columns{:}];
+state_combinations=arrayfun(@(row_idx) build_state_combination(base_states,partner_spins,...
+                                        partner_allowed_states,index_matrix(row_idx,:)),...
+                            1:size(index_matrix,1),'UniformOutput',false);
 spin_list=num2cell(1:nspins);
 
 % Generate the states using Spinach kernel
-A=cell(numel(state_combinations),1);
-for n=1:numel(state_combinations)
-    A{n}=state(spin_system,state_combinations{n},spin_list);
-end
+A=cellfun(@(states) state(spin_system,states,spin_list),state_combinations,'UniformOutput',false);
 
 end
 
@@ -121,24 +100,19 @@ end
 if active_spin{2}>spin_system.comp.nspins
     error('active spin index exceeds the number of spins.');
 end
-if isempty(partners)
-    return
-end
 if ~iscell(partners)
     error('partners must be a cell array.');
 end
-if (numel(partners)==2)&&(iscell(partners{1}))&&(isnumeric(partners{2}))
-    partner_specs={partners};
-else
-    partner_specs=partners;
+if isempty(partners)
+    error('partners must contain at least one specification.');
 end
 all_partner_spins=[];
-for n=1:numel(partner_specs)
-    if (~iscell(partner_specs{n}))||(numel(partner_specs{n})~=2)
+for n=1:numel(partners)
+    if (~iscell(partners{n}))||(numel(partners{n})~=2)
         error('each partner specification must be a {states,spins} cell array.');
     end
-    partner_states=partner_specs{n}{1};
-    partner_spin_list=partner_specs{n}{2};
+    partner_states=partners{n}{1};
+    partner_spin_list=partners{n}{2};
     if (~iscell(partner_states))||(~all(cellfun(@ischar,partner_states)))
         error('partner states must be a cell array of character strings.');
     end
@@ -157,6 +131,15 @@ end
 if any(all_partner_spins==active_spin{2},'all')
     error('active spin must not appear in partner spin lists.');
 end
+end
+
+% Build the state list for a single partner combination
+function current_states=build_state_combination(base_states,partner_spins,...
+                                                partner_allowed_states,index_row)
+current_states=base_states;
+current_states(partner_spins)=cellfun(@(states,idx) states{idx},...
+                                      partner_allowed_states,num2cell(index_row),...
+                                      'UniformOutput',false);
 end
 
 % Challenges improve those who survive.

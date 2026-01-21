@@ -93,7 +93,7 @@ x(:,1)=[A0 B0 C0 D0]';
  
 % Run Lie group solver
 for n=1:nsteps 
-    x(:,n+1)=iserstep(spin_system,K,x(:,n),n*dt,dt,'LG4'); 
+    x(:,n+1)=step(spin_system,{K,n*dt,'LG4'},x(:,n),dt); 
 end
 
 % Interpolate concentrations as functions of time

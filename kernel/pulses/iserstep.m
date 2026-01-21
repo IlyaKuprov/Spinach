@@ -7,7 +7,7 @@
 % The key difference from step() function is that the Liouvillian
 % can depend on the density matrix. Syntax:
 %
-%         rho_b=iserstep(spin_system,L,rho_a,t,dt,method)
+%         rho_b=iserstep(spin_system,{L,t,method},rho_a,dt)
 %
 % Parameters:
 %
@@ -41,7 +41,10 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=iserstep.m>
 
-function rho_b=iserstep(spin_system,L,rho_a,t,dt,method)
+function rho_b=iserstep(spin_system,L_t_method,rho_a,dt)
+L=L_t_method{1};
+t=L_t_method{2};
+method=L_t_method{3}; 
 
 % Check consistency
 grumble(L,rho_a,t,dt,method);
@@ -83,6 +86,46 @@ switch method
         
         % Take the step using fourth-order Lie method
         rho_b=step(spin_system,{LL,LM,L(t+dt,rho_b)},rho_a,dt);
+    
+    case 'LG4A'
+        A_func = @(t,rho) -1i*L(t,rho);
+        h=dt; t_n=t; Y_n=rho_a;
+        % Stage 1
+        u1 = 0;
+        k1 = h * A_func(t_n, Y_n);
+        Q1 = k1;
+
+        % Stage 2
+        u2 = 0.5 * Q1;
+        k2 = h * A_func(t_n + h/2, expm(u2) * Y_n);
+        Q2 = k2 - k1;
+
+        % Stage 3
+        u3 = 0.5 * Q1 + 0.25 * Q2;
+        k3 = h * A_func(t_n + h/2, expm(u3) * Y_n);
+        Q3 = k3 - k2;
+
+        % Stage 4
+        u4 = Q1 + Q2;
+        k4 = h * A_func(t_n + h, expm(u4) * Y_n);
+        Q4 = k4 - 2*k2 + k1;
+
+        % Stage 5 (Note: [A, B] is the commutator A*B - B*A)
+        u5 = 0.5*Q1 + 0.25*Q2 + (1/3)*Q3 - (1/24)*Q4 - (1/48)*(Q1*Q2 - Q2*Q1);
+        k5 = h * A_func(t_n + h/2, expm(u5) * Y_n);
+        Q5 = k5 - k2;
+
+        % Stage 6
+        u6 = Q1 + Q2 + (2/3)*Q3 + (1/6)*Q4 - (1/6)*(Q1*Q2 - Q2*Q1);
+        k6 = h * A_func(t_n + h, expm(u6) * Y_n);
+        Q6 = k6 - 2*k2 + k1;
+
+        % Final exponent v
+        v = Q1 + Q2 + (2/3)*Q5 + (1/6)*Q6 - (1/6)*(Q1*Q2 - (Q2 - Q3 + Q5 + 0.5*Q6)*Q1);
+
+        % Step update
+        Y_next = expm(v) * Y_n;
+        rho_b = Y_next;
 
     case 'RKMK4' % Fourth order RKMK method
 
@@ -106,7 +149,7 @@ switch method
 
         % Take the step under RKMK4 generator
         rho_b=step(spin_system,LA+1i*dt*(1/36)*LC,rho_a,dt);
-        
+
     otherwise
         
         % Complain and bomb out

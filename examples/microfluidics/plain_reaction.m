@@ -36,7 +36,7 @@ x(:,1)=[0.6; 0.5; 0.0; 0.0; 18.1];
 
 % Concentration dynamics
 for n=1:nsteps 
-    x(:,n+1)=iserstep(spin_system,K,x(:,n),n*dt,dt,'LG4'); 
+    x(:,n+1)=step(spin_system,{K,n*dt,'LG4'},x(:,n),dt); 
 end
 
 % Plot concentrations, excluding solvent

@@ -47,8 +47,8 @@ chem_traj(:,1)=[0.6; 0.5; 0.0; 0.0; 18.1];
 
 % Stage 1: concentration dynamics
 for n=1:chem_nsteps 
-    chem_traj(:,n+1)=iserstep(spin_system,K,...
-                              chem_traj(:,n),(n-1)*chem_dt,chem_dt,'LG4'); 
+    chem_traj(:,n+1)=step(spin_system,{K,(n-1)*chem_dt,'LG4'},...
+                              chem_traj(:,n),chem_dt); 
 end
 
 % Plot concentrations, excluding solvent

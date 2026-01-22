@@ -104,10 +104,18 @@ else
     % Populate product tables
     for k=1:mult^2
         for m=1:mult^2
-            normalisation=norms(k)*norms(m);
             for n=1:mult^2
-                product_table_left(n,m,k)= hdot(T{k},T{n}*T{m})/normalisation;
-                product_table_right(n,m,k)=hdot(T{k},T{m}*T{n})/normalisation;
+
+                % Left product action: carefully tiptoe around extreme norms
+                product_table_left(n,m,k)= norms(n)*hdot((T{k}/norms(k)),...
+                                                        (T{n}/norms(n))*...
+                                                        (T{m}/norms(m)));
+
+                % Right product action: carefully tiptoe around extreme norms
+                product_table_right(n,m,k)=norms(n)*hdot((T{k}/norms(k)),...
+                                                        (T{m}/norms(m))*...
+                                                        (T{n}/norms(n)));
+
             end
         end
     end

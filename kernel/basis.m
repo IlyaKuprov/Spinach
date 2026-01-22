@@ -45,6 +45,11 @@ summary(spin_system,'basis_settings');
 % Process spherical tensor basis sets
 if strcmp(spin_system.bas.formalism,'sphten-liouv')
 
+    % Disallow spherical tensor basis sets for large multiplicities
+    if any(spin_system.comp.mults>10,'all')
+        error('multiplicities above 10 are not supported by sphten-liouv formalism.');
+    end
+
     % Run connectivity analysis for IK-DNP basis set
     if strcmp(spin_system.bas.approximation,'IK-DNP')
 

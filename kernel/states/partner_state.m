@@ -2,7 +2,7 @@
 % is kroneckered with all combinations of the specified states
 % of the other specified spins. Syntax:
 % 
-%       A=partner_state(spin_system,active_spin,partners)
+%  [A,descr]=partner_state(spin_system,active_spin,partners)
 %
 % Parameters:
 %
@@ -34,6 +34,9 @@
 %        ons specified by the user. All spins not explicitly
 %        mentioned in the input will be in their 'E' states.
 %
+%    descr - a cell array of product structure descriptors for 
+%            each element of A
+%
 % Example: in a five-spin system, the following call
 %
 %  A=partner_state(spin_system,{'L+',2},{{{'E','Lz'},[1 3]}})
@@ -45,103 +48,84 @@
 %     state(spin_system,{'E' ,'L+','Lz','E' ,'E'},{1 2 3 4 5}),...
 %     state(spin_system,{'Lz','L+','Lz','E' ,'E'},{1 2 3 4 5})};
 %
+%          and the following descriptor array
+%
+%     descr={{'E' ,'L+','E' ,'E' ,'E'},...
+%            {'Lz','L+','E' ,'E' ,'E'},...
+%            {'E' ,'L+','Lz','E' ,'E'},...
+%            {'Lz','L+','Lz','E' ,'E'}};
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=partner_state.m>
 
-function A=partner_state(spin_system,active_spin,partners)
+function [A,descr]=partner_state(spin_system,active_spin,partners)
 
-% Check consistency
-grumble(spin_system,active_spin,partners);
+% The state vector that we mutate
+base_state=repmat({'E'},1,spin_system.comp.nspins);
+base_state{active_spin{2}}=active_spin{1};
 
-% Build partner spin lists and state combinations
-nspins=spin_system.comp.nspins;
-base_states=repmat({'E'},1,nspins);
-base_states{active_spin{2}}=active_spin{1};
-partner_spin_lists=cellfun(@(spec) spec{2},partners,'UniformOutput',false);
-partner_spins=[partner_spin_lists{:}];
-partner_state_sets=cellfun(@(spec) spec{1},partners,'UniformOutput',false);
-partner_allowed_state_cells=cellfun(@(states,spins) repmat({states},1,numel(spins)),...
-                                    partner_state_sets,partner_spin_lists,...
-                                    'UniformOutput',false);
-partner_allowed_states=[partner_allowed_state_cells{:}];
-% Build partner state combinations
-state_counts=cellfun(@numel,partner_allowed_states);
-block_sizes=ones(1,numel(state_counts));
-if numel(state_counts)>1
-    block_sizes(2:end)=cumprod(state_counts(1:end-1));
-end
-repeat_counts=ones(1,numel(state_counts));
-if numel(state_counts)>1
-    repeat_counts(1:end-1)=cumprod(state_counts(end:-1:2));
-    repeat_counts=repeat_counts(end:-1:1);
-end
-index_columns=arrayfun(@(count,block,repeat) repmat(kron((1:count).',ones(block,1)),repeat,1),...
-                       state_counts,block_sizes,repeat_counts,'UniformOutput',false);
-index_matrix=[index_columns{:}];
-state_combinations=arrayfun(@(row_idx) build_state_combination(base_states,partner_spins,...
-                                        partner_allowed_states,index_matrix(row_idx,:)),...
-                            1:size(index_matrix,1),'UniformOutput',false);
-spin_list=num2cell(1:nspins);
+% Pull out partner spin lists and partner state sets
+partner_spin_lists=cellfun(@(spec)spec{2},partners,'UniformOutput',false);
+partner_state_sets=cellfun(@(spec)spec{1},partners,'UniformOutput',false);
 
-% Generate the states using Spinach kernel
-A=cellfun(@(states) state(spin_system,states,spin_list),state_combinations,'UniformOutput',false);
+% Compile the active partner list
+active_partners=[partner_spin_lists{:}];
 
-end
+% Compile state lists for each partner
+partner_state_sets=cellfun(@(x,y)repmat({x},1,numel(y)),...
+                           partner_state_sets,...
+                           partner_spin_lists,'UniformOutput',false);
+partner_state_sets=[partner_state_sets{:}];
 
-% Consistency enforcement
-function grumble(spin_system,active_spin,partners)
-if (~iscell(active_spin))||(numel(active_spin)~=2)||...
-   (~ischar(active_spin{1}))||(~isnumeric(active_spin{2}))||...
-   (~isscalar(active_spin{2}))||(~isreal(active_spin{2}))||...
-   (mod(active_spin{2},1)~=0)||(active_spin{2}<1)
-    error('active_spin must be a {state,spin_number} cell array.');
-end
-if active_spin{2}>spin_system.comp.nspins
-    error('active spin index exceeds the number of spins.');
-end
-if ~iscell(partners)
-    error('partners must be a cell array.');
-end
-if isempty(partners)
-    error('partners must contain at least one specification.');
-end
-all_partner_spins=[];
-for n=1:numel(partners)
-    if (~iscell(partners{n}))||(numel(partners{n})~=2)
-        error('each partner specification must be a {states,spins} cell array.');
+% Start descriptor
+descr={base_state};
+
+% Over active partner spins
+for n=1:numel(active_partners)
+
+    % Pull current partner
+    partner=active_partners(n);
+    
+    % Over the partner state set
+    for k=1:numel(partner_state_sets{n})
+
+        % Pull current partner spin state
+        partner_state=partner_state_sets{n}{k};
+
+        % Scan descriptors
+        for m=1:numel(descr)
+
+            % Pull descriptor line
+            current_line=descr{m};
+
+            % Modify the descriptor line if necessary
+            if ~strcmp(current_line{partner},partner_state)
+
+                % Write in the new state and append
+                current_line{partner}=partner_state;
+                descr=[descr; {current_line}]; %#ok<AGROW>
+
+            end
+
+        end
+
     end
-    partner_states=partners{n}{1};
-    partner_spin_list=partners{n}{2};
-    if (~iscell(partner_states))||(~all(cellfun(@ischar,partner_states)))
-        error('partner states must be a cell array of character strings.');
-    end
-    if (~isnumeric(partner_spin_list))||(~isvector(partner_spin_list))||...
-       any(mod(partner_spin_list,1)~=0,'all')||any(partner_spin_list<1,'all')
-        error('partner spin lists must contain positive integers.');
-    end
-    all_partner_spins=[all_partner_spins partner_spin_list(:).'];
-end
-if numel(unique(all_partner_spins))~=numel(all_partner_spins)
-    error('partner spin lists must not contain duplicates.');
-end
-if any(all_partner_spins>spin_system.comp.nspins,'all')
-    error('partner spin index exceeds the number of spins.');
-end
-if any(all_partner_spins==active_spin{2},'all')
-    error('active spin must not appear in partner spin lists.');
-end
+
 end
 
-% Build the state list for a single partner combination
-function current_states=build_state_combination(base_states,partner_spins,...
-                                                partner_allowed_states,index_row)
-current_states=base_states;
-current_states(partner_spins)=cellfun(@(states,idx) states{idx},...
-                                      partner_allowed_states,num2cell(index_row),...
-                                      'UniformOutput',false);
+% Get the full spin list    
+full_spin_list=num2cell(1:spin_system.comp.nspins);
+
+% Generate the states
+A=cell(1,numel(descr));
+parfor n=1:numel(descr)
+    A{n}=state(spin_system,descr{n},full_spin_list);
+end
+
 end
 
 % Challenges improve those who survive.
 %
 % Frank Herbert
+

@@ -6,11 +6,15 @@
 %
 % Parameters:
 %
-%    active_spin - a two-element cell array with the first
-%                  element giving the state of the active
-%                  spin and the second element giving the
-%                  number of the active spin on the main
-%                  isotope list, e.g. {'L+',5}
+%    set_spin    - a cell array of two-element cell arrays 
+%                  with the first element giving the state
+%                  of the spin and the second element num-
+%                  ber on the isotope list, for example
+%
+%                                {{'L+',3}}
+%
+%                  These spins will have their states set
+%                  immutably as specified.
 %
 %    partners    - a cell array of partner state specifica-
 %                  tions of the form
@@ -26,6 +30,9 @@
 %                         { {{'E'  'Lz'},[1 5]},...
 %                           {{'L+' 'L-'},[2 7]},... }
 %
+%                  These spins will have their state varied
+%                  combinatorially as specified.
+%
 % Outputs:
 %
 %    A - a cell array of spin states (matrices in Hilbert space,
@@ -39,7 +46,7 @@
 %
 % Example: in a five-spin system, the following call
 %
-%  A=partner_state(spin_system,{'L+',2},{{{'E','Lz'},[1 3]}})
+%  A=partner_state(spin_system,{{'L+',2}},{{{'E','Lz'},[1 3]}})
 %
 %          will return the following state array
 %
@@ -59,11 +66,13 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=partner_state.m>
 
-function [A,descr]=partner_state(spin_system,active_spin,partners)
+function [A,descr]=partner_state(spin_system,set_spin,partners)
 
-% The state vector that we mutate
+% Write the states of the spins that stay unchanged
 base_state=repmat({'E'},1,spin_system.comp.nspins);
-base_state{active_spin{2}}=active_spin{1};
+for n=1:numel(set_spin)
+    base_state{set_spin{n}{2}}=set_spin{n}{1};
+end
 
 % Pull out partner spin lists and partner state sets
 partner_spin_lists=cellfun(@(spec)spec{2},partners,'UniformOutput',false);

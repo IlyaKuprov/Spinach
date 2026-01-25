@@ -1,6 +1,6 @@
-% Partner state expansion; a given state of the specified spin
+% Partner state expansion; a given state of the specified spins
 % is kroneckered with all combinations of the specified states
-% of the other specified spins. Syntax:
+% of specfied partner spins. Syntax:
 % 
 %  [A,descr]=partner_state(spin_system,active_spin,partners)
 %

@@ -167,9 +167,11 @@ for n=1:numel(rows)
               -3*ort(2)*ort(1)  1-3*ort(2)*ort(2)   -3*ort(2)*ort(3);
               -3*ort(3)*ort(1)   -3*ort(3)*ort(2)  1-3*ort(3)*ort(3)];
           
-        % Account for chemical shifts and g-tensors
-        D=spin_system.inter.zeeman.ddscal{rows(n)}'*D*...
-          spin_system.inter.zeeman.ddscal{cols(n)};
+        % Optional approximate spin-orbit correction
+        if ismember('sodd',spin_system.sys.enable)
+            D=spin_system.inter.zeeman.ddscal{rows(n)}'*D*...
+              spin_system.inter.zeeman.ddscal{cols(n)};
+        end
       
         % Clean up numerical noise
         D=D-eye(3)*trace(D)/3;

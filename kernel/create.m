@@ -192,6 +192,7 @@ if ~isempty(spin_system.sys.enable)
     if ismember('cowboy',spin_system.sys.enable),     report(spin_system,'         > loose numerical accuracy settings'); end
     if ismember('polyadic',spin_system.sys.enable),   report(spin_system,'         > polyadic arithmetic with spatial degrees of freedom'); end
     if ismember('dafuq',spin_system.sys.enable),      report(spin_system,'         > detailed parallel profiling'); end
+    if ismember('sodd',spin_system.sys.enable),       report(spin_system,'         > spin-orbit corrections to dipolar couplings'); end
 end
 
 % Get a unique job identifier
@@ -592,7 +593,7 @@ if isfield(inter,'zeeman')||isfield(inter,'suscept')
             
             case 'E'
                 
-                % Store the scaling multiplier for dipolar couplings
+                % Store the spin-orbit coupling correction multiplier for contact / dipolar couplings
                 spin_system.inter.zeeman.ddscal{n}=spin_system.inter.zeeman.matrix{n}/spin_system.tols.freeg;
                 
                 % For electrons, assume that the g-tensor is given in Bohr magneton units
@@ -600,7 +601,7 @@ if isfield(inter,'zeeman')||isfield(inter,'suscept')
                 
             otherwise
                 
-                % Store the scaling multiplier for dipolar couplings
+                % Store the spin-orbit coupling correction multiplier for contact / dipolar couplings
                 spin_system.inter.zeeman.ddscal{n}=(eye(3)+(1e-6)*spin_system.inter.zeeman.matrix{n});
                 
                 % For nuclei, assume that the chemical shift is given in ppm
@@ -1332,7 +1333,7 @@ if isfield(sys,'enable')
     if (~iscell(sys.enable))||any(~cellfun(@ischar,sys.enable))
         error('sys.enable must be a cell array of strings.');
     end
-    if any(~ismember(sys.enable,{'gpu','op_cache','xmemlist','greedy','paranoia',...
+    if any(~ismember(sys.enable,{'gpu','op_cache','xmemlist','greedy','paranoia','sodd',...
                                  'cowboy','polyadic','dafuq','prop_cache','ham_cache'}))
         error('unrecognised switch in sys.enable field.');
     end

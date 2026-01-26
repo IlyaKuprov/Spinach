@@ -45,7 +45,7 @@ function rho=step(spin_system,L,rho,time_step)
 if iscell(L)&&(numel(L)==3)&&isa(L{1},'function_handle')
 
     % Call state-dependent evolution generator solver
-    rho=iserstep(spin_system, L, rho, time_step); return;
+    rho=iserstep(spin_system,L,rho,time_step); return;
 
 end
 
@@ -384,7 +384,6 @@ if iscell(rho)
         end
     end
 end
-
 end
 
 % Evans boldly put 50 atm of ethylene in a cell with 25 atm of oxygen. The

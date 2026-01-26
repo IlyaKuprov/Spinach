@@ -19,7 +19,7 @@ function A=ctranspose(A)
 % Check consistency
 grumble(A);
 
-% Efficiently Swap rows and columns
+% Efficiently swap rows and columns
 [A.col,A.row]=deal(A.row,A.col);
 
 % Conjugate the values

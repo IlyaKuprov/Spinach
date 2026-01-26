@@ -22,7 +22,7 @@ xlim([0 0.05]); ylim padded; kgrid;
 ktitle('wall clock'); kxlabel('time, s');
 
 % Carrier frequency and timing
-carrier_freq=500.1029461081154e6;
+carrier_freq=500.1029395e6;
 dt=time_grid(2)-time_grid(1);
                                   
 % Apply heterodyne transformation wrt carrier frequency

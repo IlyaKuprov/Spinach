@@ -28,10 +28,12 @@ dt=time_grid(2)-time_grid(1);
 % Apply heterodyne transformation wrt carrier frequency
 [real_bruk,imag_bruk]=heterodyne(dt,expt_data,carrier_freq);
 
-% Downsample and convert to complex
-time_grid=resample(time_grid,1,10000);
+% Resample and convert to complex
 real_bruk=resample(real_bruk,1,10000);
 imag_bruk=resample(imag_bruk,1,10000);
+time_grid=linspace(time_grid(1),...
+                   time_grid(end),...
+                   numel(real_bruk))';
 cplx_bruk=real_bruk+1i*imag_bruk;
 ampl_bruk=abs(cplx_bruk);
 

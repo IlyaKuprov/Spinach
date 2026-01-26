@@ -3,7 +3,7 @@
 % and time-dependent evolution generator.
 %
 % a.acharya@soton.ac.uk
-% ilya.kuprov@weizmann.ac.il
+% ilya.kuprov@weizmann.ac.il 
 
 function product_quadratures_2()
 
@@ -23,12 +23,12 @@ G=@(t,mu)(-1i*[r2 cr*t 0; -cr*t r2 0; 0 0 r1]...
 np_ref=2^16; dt=0.5/(np_ref-1); mu_traj=zeros(3,np_ref);
 mu_traj(:,1)=euler2dcm(0,pi*178/180,0)*[0 0 1]';
 for n=2:np_ref 
-    mu_traj(:,n)=iserstep(spin_system,G,mu_traj(:,n-1),(n-2)*dt,dt,'RKMK4');
+    mu_traj(:,n)=step(spin_system, {G, (n-2)*dt, 'RKMK4'}, mu_traj(:,n-1), dt);
 end
 mu_ref=mu_traj(:,end);
 
 % Benchmark arrays
-np=ceil(2.^linspace(9,15,20)); bench=zeros(numel(np),3);
+np=ceil(2.^linspace(9,15,20)); bench=zeros(numel(np),4);
 
 % Benchmarking loop
 for k=1:numel(np)
@@ -39,23 +39,31 @@ for k=1:numel(np)
     % Piecewise-constant, left edge
     mu=euler2dcm(0,pi*178/180,0)*[0 0 1]';
     for n=2:np(k) 
-        mu=iserstep(spin_system,G,mu,(n-2)*dt,dt,'PWCL');
+        mu=iserstep(spin_system, {G, (n-2)*dt, 'PWCL'}, mu, dt);
     end
     bench(k,1)=norm(mu-mu_ref)/norm(mu_ref);
 
     % Lie group, order 2
     mu=euler2dcm(0,pi*178/180,0)*[0 0 1]';
     for n=2:np(k) 
-        mu=iserstep(spin_system,G,mu,(n-2)*dt,dt,'LG2');
+        mu=iserstep(spin_system, {G, (n-2)*dt, 'LG2'}, mu, dt);
     end
     bench(k,2)=norm(mu-mu_ref)/norm(mu_ref);
 
     % Lie group, order 4
     mu=euler2dcm(0,pi*178/180,0)*[0 0 1]';
     for n=2:np(k) 
-        mu=iserstep(spin_system,G,mu,(n-2)*dt,dt,'LG4');
+        mu=iserstep(spin_system, {G, (n-2)*dt, 'LG4'}, mu, dt);
     end
     bench(k,3)=norm(mu-mu_ref)/norm(mu_ref);
+
+    % Lie group, order 4 (from Casas-Iserles Appendix A1)
+    mu=euler2dcm(0,pi*178/180,0)*[0 0 1]';
+    for n=2:np(k) 
+        mu=iserstep(spin_system, {G, (n-2)*dt, 'LG4A'}, mu, dt);
+    end
+    bench(k,4)=norm(mu-mu_ref)/norm(mu_ref);
+   
 
 end
 
@@ -73,7 +81,7 @@ kgrid; xlim tight; ylim([1e-7 1e0]);
 set(gca,'YScale','log','XScale','log');
 kxlabel('number of points in the time grid');
 kylabel('$\|$difference$\|$/$\|$exact$\|$'); 
-klegend({'LP','LG-2','LG-4'},...
+klegend({'LP','LG-2','LG-4', 'LG-4A'},...
         'Location','SouthWest');
 set(gca,'YTick',10.^(-7:2:0));
 set(gca,'MinorGridLineStyle','-'); 
@@ -81,4 +89,3 @@ set(gca,'MinorGridColor',0.9*[1 1 1]);
 set(gca,'GridColor',0.9*[1 1 1]);
 
 end
-

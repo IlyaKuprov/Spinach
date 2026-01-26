@@ -81,7 +81,7 @@ end
 if (~isnumeric(freq))||(~isreal(freq))||(~isscalar(freq))
     error('freq must be a real number.');
 end
-if 4*dt > 1/freq
+if (2*dt)>(1/freq)
     error('the specified frequency is not sampled well enough.');
 end
 end

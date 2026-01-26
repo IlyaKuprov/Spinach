@@ -41,13 +41,13 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=iserstep.m>
 
-function rho_b=iserstep(spin_system,L_t_method,rho_a,dt)
-L=L_t_method{1};
-t=L_t_method{2};
-method=L_t_method{3}; 
+function rho_b=iserstep(spin_system,LTM,rho_a,dt)
 
 % Check consistency
-grumble(L,rho_a,t,dt,method);
+grumble(LTM,rho_a,dt);
+
+% Dereference input pointers
+L=LTM{1}; t=LTM{2}; method=LTM{3}; 
 
 % Decide method
 switch method
@@ -87,11 +87,13 @@ switch method
         % Take the step using fourth-order Lie method
         rho_b=step(spin_system,{LL,LM,L(t+dt,rho_b)},rho_a,dt);
     
-    case 'LG4A'
-        A_func = @(t,rho) -1i*L(t,rho);
+    case 'LG4A' % https://doi.org/10.1088/0305-4470/39/19/S07
+        
+        % Match the paper notation
+        A_func = @(t,rho)(-1i*L(t,rho));
         h=dt; t_n=t; Y_n=rho_a;
+
         % Stage 1
-        u1 = 0;
         k1 = h * A_func(t_n, Y_n);
         Q1 = k1;
 
@@ -160,18 +162,24 @@ end
 end
 
 % Consistency enforcement
-function grumble(L,rho_a,t,dt,method)
-if ~isa(L,'function_handle')
-    error('L must be a function handle.');
+function grumble(LTM,rho_a,dt)
+if ~iscell(LTM)
+    error('second input must be a cell array.');
 end
-if (~isnumeric(t))||(~isnumeric(dt))||(~isnumeric(rho_a))
-    error('rho_a, t, and dt must be numeric.');
+if ~isa(LTM{1},'function_handle')
+    error('evolution generator must be a function handle.');
 end
-if (~isscalar(t))||(~isscalar(dt))
-    error('t and dt must be scalars.');
+if (~isnumeric(LTM{2}))||(~isscalar(LTM{2}))
+    error('current time must be a numeric scalar.');
 end
-if ~ischar(method)
+if ~ischar(LTM{3})
    error('method must be a character string.')
+end
+if (~isnumeric(dt))||(~isnumeric(rho_a))
+    error('rho_a and dt must be numeric.');
+end
+if ~isscalar(dt)
+    error('dt must be a scalar.');
 end
 end
 

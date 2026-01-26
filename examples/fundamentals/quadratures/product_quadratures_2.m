@@ -16,14 +16,17 @@ rrd=40;        % 40 Hz radiation damping
 spin_system=bootstrap();
 
 % Make Bloch-Maxwell generator
-G=@(t,mu)(-1i*[r2 cr*t 0; -cr*t r2 0; 0 0 r1]...
-          -1i*rrd*[mu(3) 0 0; 0 mu(3) 0; mu(1) mu(2) 0]);
+G=@(t,mu)(-1i*[ r2    cr*t  0; 
+               -cr*t  r2    0;
+                0     0     r1]-1i*rrd*[ mu(3)  0      0; 
+                                         0      mu(3)  0; 
+                                         mu(1)  mu(2)  0]);
 
 % Run reference RKMK4 simulation and keep the trajectory
 np_ref=2^16; dt=0.5/(np_ref-1); mu_traj=zeros(3,np_ref);
 mu_traj(:,1)=euler2dcm(0,pi*178/180,0)*[0 0 1]';
 for n=2:np_ref 
-    mu_traj(:,n)=step(spin_system, {G, (n-2)*dt, 'RKMK4'}, mu_traj(:,n-1), dt);
+    mu_traj(:,n)=step(spin_system,{G,(n-2)*dt,'RKMK4'},mu_traj(:,n-1),dt);
 end
 mu_ref=mu_traj(:,end);
 
@@ -39,31 +42,30 @@ for k=1:numel(np)
     % Piecewise-constant, left edge
     mu=euler2dcm(0,pi*178/180,0)*[0 0 1]';
     for n=2:np(k) 
-        mu=iserstep(spin_system, {G, (n-2)*dt, 'PWCL'}, mu, dt);
+        mu=iserstep(spin_system,{G,(n-2)*dt,'PWCL'},mu,dt);
     end
     bench(k,1)=norm(mu-mu_ref)/norm(mu_ref);
 
     % Lie group, order 2
     mu=euler2dcm(0,pi*178/180,0)*[0 0 1]';
     for n=2:np(k) 
-        mu=iserstep(spin_system, {G, (n-2)*dt, 'LG2'}, mu, dt);
+        mu=iserstep(spin_system,{G,(n-2)*dt,'LG2'},mu,dt);
     end
     bench(k,2)=norm(mu-mu_ref)/norm(mu_ref);
 
     % Lie group, order 4
     mu=euler2dcm(0,pi*178/180,0)*[0 0 1]';
     for n=2:np(k) 
-        mu=iserstep(spin_system, {G, (n-2)*dt, 'LG4'}, mu, dt);
+        mu=iserstep(spin_system,{G,(n-2)*dt,'LG4'},mu,dt);
     end
     bench(k,3)=norm(mu-mu_ref)/norm(mu_ref);
 
     % Lie group, order 4 (from Casas-Iserles Appendix A1)
     mu=euler2dcm(0,pi*178/180,0)*[0 0 1]';
     for n=2:np(k) 
-        mu=iserstep(spin_system, {G, (n-2)*dt, 'LG4A'}, mu, dt);
+        mu=iserstep(spin_system,{G,(n-2)*dt,'LG4A'},mu,dt);
     end
     bench(k,4)=norm(mu-mu_ref)/norm(mu_ref);
-   
 
 end
 

@@ -11,11 +11,14 @@
 %                    rule if one matrix is supplied, piecewise-
 %                    linear rule if two matrices {left, right} 
 %                    are supplied, piecewise-quadratic if three
-%                    matrices {left, midpoint, right} are given,
-%                    Lie group solver from Iserles et al. if L{1}
-%                    is a function handle, L{2} is current time,
-%                    and L{3} is the method (see iserstep.m for 
-%                    details).
+%                    matrices {left, midpoint, right} are given.
+%
+%                    State-dependent evolution generators are 
+%                    supported: if L{1} is a function handle (see
+%                    iserstep.m documentation), L{2} is current
+%                    time, and L{3} is the method (see iserstep.m
+%                    documentation), the problem is routed to a
+%                    an appropriate Lie group solver. 
 %
 %      rho        -  state vector or density matrix to be propagated
 %
@@ -37,10 +40,13 @@
 % <https://spindynamics.org/wiki/index.php?title=step.m>
 
 function rho=step(spin_system,L,rho,time_step)
+
 % If L{1} is a function handle, route to iserstep
-if iscell(L) && numel(L)==3 && isa(L{1},'function_handle')
-    rho = iserstep(spin_system, L, rho, time_step);
-    return
+if iscell(L)&&(numel(L)==3)&&isa(L{1},'function_handle')
+
+    % Call state-dependent evolution generator solver
+    rho=iserstep(spin_system, L, rho, time_step); return;
+
 end
 
 % Check consistency

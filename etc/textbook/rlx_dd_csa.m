@@ -70,7 +70,7 @@ omegaB=B0*(1+trace(1e-6*deltas{2})/3)*spin(isotopes{2});
 % Spectral power density function
 J=@(omega)tau_c/(1+omega^2*tau_c^2);
 
-% Aniso parts of Zeeman tensors
+% Anisotropic parts of Zeeman tensors
 ZA=1e-6*B0*(deltas{1}-eye(3)*trace(deltas{1})/3)*spin(isotopes{1});
 ZB=1e-6*B0*(deltas{2}-eye(3)*trace(deltas{2})/3)*spin(isotopes{2});
 

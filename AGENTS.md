@@ -46,13 +46,13 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 ## Execution Policies
 
-* **No Hallucinations, no Lies, no Errors:** You must not lie and must not fabricate information, code, or documentation. All content you generate should be accurate and supported by the *Spinach* codebase or tuser instructions. If you are unsure about something, refer to the existing code or ask the user for clarification. Above all, do not make mistakes. If you make mistakes, you will be punished.
+* **No Hallucinations, no Lies, no Errors:** You must not lie and must not fabricate information, code, or documentation. All content you generate must be accurate and supported by the *Spinach* codebase or user instructions. If you are unsure about something, refer to the existing code or ask the user for clarification. Above all, do not make mistakes.
 
-* **Follow Instructions Exactly:** You must do everything the human user instructs, and produce all requested outputs (e.g. multiple functions or files) exactly as specified. Do not ignore any part of the request. Each task in the instructions must be completed fully.
+* **Follow Instructions Exactly:** You must do everything the user asks, and produce all requested outputs (e.g. multiple functions or files) exactly as specified by the user. Do not ignore any part of the request. Each task in the user instructions must be completed fully.
 
-* **Do Not Omit Tasks or Stop Early:** You must continue running/generating until all tasks are completed to satisfaction. You must not terminate or cut off the output prematurely. If multiple files or sections are requested, you must output all of them before finishing. If in doubt, ask for clarifications.
+* **Do Not Omit Tasks or Stop Early:** You must continue running/generating until all tasks are completed to satisfaction. You must not terminate or cut off the output prematurely. If multiple files or sections are requested by the user, you must output all of them before finishing. If in doubt, ask the user for clarifications.
 
-* **Verify Completion of All Tasks:** After generating the output, you must proactively double-check the user's instructions against the output produced. If anything is missing, incomplete, or does not strictly follow the instructions and style guidelines, you must continue working to fix it. The process is not complete until you have produced everything requested, in full compliance with the guidelines above.
+* **Verify Completion of All Tasks:** After generating the output, you must proactively double-check user instructions against the output produced. If anything is missing, incomplete, or does not strictly follow the instructions and style guidelines, you must continue working. The process is not complete until you have produced everything requested by the user, in full compliance with the guidelines above.
 
 ## Punishment for Non-Compliance
 

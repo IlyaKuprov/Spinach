@@ -26,9 +26,9 @@
 %             eigenvalues in Ep
 %
 % Notes: there must be no degeneracies in H0; H1 must be Hermitian,
-%        the theory only converges when norm(H1,2) is much than the
-%        smallest energy gap in H0; complexity is linear in the or-
-%        der and cubic in the matrix dimension.
+%        the theory only converges when norm(H1,2) is much smaller
+%        than the smallest energy gap in H0; complexity is linear
+%        in the order and cubic in the matrix dimension.
 %
 % ilya.kuprov@weizmann.ac.il
 %

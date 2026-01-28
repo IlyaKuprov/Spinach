@@ -39,12 +39,11 @@ diffs_rs=sqrt(sum(diffs_rs.^2,1))/norm(E_inf,2);
 diffs_vv=[diag(H0) real(E_vv)]-E_inf;
 diffs_vv=sqrt(sum(diffs_vv.^2,1))/norm(E_inf,2);
 kfigure(); subplot(1,2,1); hold on;
-plot(0:max_ord,diffs_rs,'-'); 
-plot(0:max_ord,diffs_vv,'--');
-set(gca,'YScale','log'); kgrid;
-kxlabel('perturbation theory order'); 
+plot(0:max_ord,diffs_rs,'-'); xlim padded;
+plot(0:max_ord,diffs_vv,'--'); xlim padded;
+set(gca,'YScale','log'); kxlabel('order'); 
 kylabel('energies, $\|pt-exact\|/\|exact\|$');
-legend({'RSPT','VVPT'}); box on;
+klegend({'RSPT','VVPT'}); box on; kgrid;
 
 % Eigensystems, PTs
 V_rs=cell(max_ord,1);
@@ -72,12 +71,11 @@ V_inf=V_inf(:,idx); % Sorting
 diffs_rs=cellfun(@(V)norm(abs(V'*V_inf)-eye(size(V)),2),V_rs);
 diffs_vv=cellfun(@(V)norm(abs(V'*V_inf)-eye(size(V)),2),V_vv);
 subplot(1,2,2); hold on;
-plot(0:max_ord,diffs_rs','-'); 
-plot(0:max_ord,diffs_vv','--');
-set(gca,'YScale','log'); kgrid;
-kxlabel('perturbation theory order'); 
-kylabel('eigensystem overlap residual');
-legend({'RSPT','VVPT'}); box on;
+plot(0:max_ord,diffs_rs','-'); xlim padded;
+plot(0:max_ord,diffs_vv','--'); xlim padded;
+set(gca,'YScale','log'); kxlabel('order'); 
+kylabel('eigenv. overlap residual with exact');
+klegend({'RSPT','VVPT'}); box on; kgrid; 
 
 end
 

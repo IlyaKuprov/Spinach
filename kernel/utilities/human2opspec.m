@@ -116,194 +116,222 @@ elseif iscell(operators)&&iscell(spins)
     % Start with an empty opspec and a unit coefficient
     opspecs=zeros(1,spin_system.comp.nspins); coeffs=1;
     
-    % Parse operator selection
+    % Parse operator type
     for n=1:numel(operators)
-        
-        % Operator type
-        switch operators{n}
 
-            case 'E'
-                
-                % Unit operator
-                opspecs(:,spins{n})=0;
+        % Different for spins and bosons
+        switch spin_system.comp.types{spins{n}}
 
-            case 'C'
-                
-                % Creation operator
-                opspecs(:,spins{n})=1;
+            case 'S' % Spins
 
-            case 'A'
-                
-                % Annihilation operator
-                opspecs(:,spins{n})=2;
+                % Operator type
+                switch operators{n}
 
-            case 'N'
-                
-                % Number operator
-                opspecs(:,spins{n})=4;
+                    case 'E' 
+                         
+                        % Unit operator
+                        opspecs(:,spins{n})=0;
 
-            case 'CCAA' % A common anharmonicity term
+                    case 'L+'
+
+                        % Raising operator
+                        opspecs(:,spins{n})=1;
+
+                        % T(1,+1) coefficient
+                        coeffs=-sqrt(2)*coeffs;
+
+                    case 'L-'
+
+                        % Lowering operator
+                        opspecs(:,spins{n})=3;
+
+                        % T(1,-1) coefficient
+                        coeffs=sqrt(2)*coeffs;
+
+                    case 'Lx'
+
+                        % X projection operator: (Lp+Lm)/2
+                        opspecs_a=opspecs; opspecs_a(:,spins{n})=1;
+                        opspecs_b=opspecs; opspecs_b(:,spins{n})=3;
+                        opspecs=[opspecs_a; opspecs_b];
+                        coeffs=kron([-sqrt(2); sqrt(2)]/2,coeffs);
+
+                    case 'Ly'
+
+                        % Y projection operator: (Lp-Lm)/2i
+                        opspecs_a=opspecs; opspecs_a(:,spins{n})=1;
+                        opspecs_b=opspecs; opspecs_b(:,spins{n})=3;
+                        opspecs=[opspecs_a; opspecs_b];
+                        coeffs=kron([-sqrt(2);-sqrt(2)]/2i,coeffs);
+
+                    case 'Lz'
+
+                        % Z projection operator
+                        opspecs(:,spins{n})=2;
+
+                    case 'CTx'
+
+                        % Sx generator for the central transition in the Zeeman basis
+                        [ct_states,ct_coeffs]=ct2ist(spin_system.comp.mults(spins{n}),'x');
+                        states=kron(ct_states,ones(size(opspecs,1),1));
+                        opspecs=kron(ones(numel(ct_states),1),opspecs);
+                        opspecs(:,spins{n})=states; coeffs=kron(ct_coeffs,coeffs);
+
+                    case 'CTy'
+
+                        % Sy generator for the central transition in the Zeeman basis
+                        [ct_states,ct_coeffs]=ct2ist(spin_system.comp.mults(spins{n}),'y');
+                        states=kron(ct_states,ones(size(opspecs,1),1));
+                        opspecs=kron(ones(numel(ct_states),1),opspecs);
+                        opspecs(:,spins{n})=states; coeffs=kron(ct_coeffs,coeffs);
+
+                    case 'CTz'
+
+                        % Sy generator for the central transition in the Zeeman basis
+                        [ct_states,ct_coeffs]=ct2ist(spin_system.comp.mults(spins{n}),'z');
+                        states=kron(ct_states,ones(size(opspecs,1),1));
+                        opspecs=kron(ones(numel(ct_states),1),opspecs);
+                        opspecs(:,spins{n})=states; coeffs=kron(ct_coeffs,coeffs);
+
+                    case 'CT+'
+
+                        % Raising operator for the central transition in the Zeeman basis
+                        [ct_states,ct_coeffs]=ct2ist(spin_system.comp.mults(spins{n}),'+');
+                        states=kron(ct_states,ones(size(opspecs,1),1));
+                        opspecs=kron(ones(numel(ct_states),1),opspecs);
+                        opspecs(:,spins{n})=states; coeffs=kron(ct_coeffs,coeffs);
+
+                    case 'CT-'
+
+                        % Lowering operator for the central transition in the Zeeman basis
+                        [ct_states,ct_coeffs]=ct2ist(spin_system.comp.mults(spins{n}),'-');
+                        states=kron(ct_states,ones(size(opspecs,1),1));
+                        opspecs=kron(ones(numel(ct_states),1),opspecs);
+                        opspecs(:,spins{n})=states; coeffs=kron(ct_coeffs,coeffs);
+
+                    otherwise
+
+                        % Irreducible spherical tensor
+                        if strcmp(operators{n}(1),'T')
+
+                            % Validate the irreducible spherical tensor specification
+                            if isempty(regexp(operators{n},'^T([\+\-]?\d+),([\+\-]?\d+)$','once'))
+                                error('unrecognized operator or state specification.');
+                            end
+
+                            % Extract the IST quantum numbers
+                            indices=textscan(operators{n},'T%n,%n'); l=indices{1}; m=indices{2};
+
+                            % Validate the IST quantum numbers
+                            if (l<0)||(abs(m)>l)||(mod(l,1)~=0)||(mod(m,1)~=0)||...
+                               (lm2lin(l,m)+1>spin_system.comp.mults(spins{n})^2)
+                                error('invalid irreducible spherical tensor indices.');
+                            end
+
+                            % Write the specification
+                            opspecs(:,spins{n})=lm2lin(l,m); coeffs=1*coeffs;
+
+                        % Specific Zeeman energy level
+                        elseif strcmp(operators{n}(1:2),'ZL')
+
+                            % Validate Zeeman energy level specification
+                            if isempty(regexp(operators{n},'^ZL([1-9]\d*)$','once'))
+                                error('unrecognized operator or state specification.');
+                            end
+
+                            % Extract Zeeman energy level number
+                            level_number=textscan(operators{n},'ZL%n');
+                            level_number=level_number{1};
+
+                            % Validate the number
+                            if (level_number<1)||(mod(level_number,1)~=0)|| ...
+                               (level_number>spin_system.comp.mults(spins{n}))
+                                error('invalid Zeeman energy level number.');
+                            end
+
+                            % Get the spherical tensor expansion of the specified energy level projector
+                            [zl_states,zl_coeffs]=enlev2ist(spin_system.comp.mults(spins{n}),level_number);
+                            states=kron(zl_states,ones(size(opspecs,1),1));
+                            opspecs=kron(ones(numel(zl_states),1),opspecs);
+                            opspecs(:,spins{n})=states; coeffs=kron(zl_coeffs,coeffs);
+
+                        else
+
+                            % Complain and bomb out
+                            error('unrecognized operator or state specification.');
+
+                        end
+
+                end
+
+            case {'C','V','T'} % Cavities, lattices, transmons
 
                 % Get the energy level truncation
                 nlevels=spin_system.comp.mults(spins{n});
 
-                % Determine the operator number
-                opspecs(:,spins{n})=kq2lin(nlevels,2,2);
-                
-            case 'L+'
-                
-                % Raising operator
-                opspecs(:,spins{n})=1;
+                % Operator type
+                if strcmp(operators{n},'E')
 
-                % T(1,+1) coefficient
-                coeffs=-sqrt(2)*coeffs;
-                
-            case 'L-'
-                
-                % Lowering operator
-                opspecs(:,spins{n})=3;
-                
-                % T(1,-1) coefficient
-                coeffs=sqrt(2)*coeffs;
-
-            case 'Lx'
-                
-                % X projection operator: (Lp+Lm)/2
-                opspecs_a=opspecs; opspecs_a(:,spins{n})=1;
-                opspecs_b=opspecs; opspecs_b(:,spins{n})=3;
-                opspecs=[opspecs_a; opspecs_b];
-                coeffs=kron([-sqrt(2); sqrt(2)]/2,coeffs);
-
-            case 'Ly'
-                
-                % Y projection operator: (Lp-Lm)/2i
-                opspecs_a=opspecs; opspecs_a(:,spins{n})=1;
-                opspecs_b=opspecs; opspecs_b(:,spins{n})=3;
-                opspecs=[opspecs_a; opspecs_b];
-                coeffs=kron([-sqrt(2);-sqrt(2)]/2i,coeffs);
-
-            case 'Lz'
-                
-                % Z projection operator
-                opspecs(:,spins{n})=2;
-
-            case 'CTx'
-
-                % Sx generator for the central transition in the Zeeman basis
-                [ct_states,ct_coeffs]=ct2ist(spin_system.comp.mults(spins{n}),'x');
-                states=kron(ct_states,ones(size(opspecs,1),1));
-                opspecs=kron(ones(numel(ct_states),1),opspecs);
-                opspecs(:,spins{n})=states; coeffs=kron(ct_coeffs,coeffs);
-
-            case 'CTy'
-
-                % Sy generator for the central transition in the Zeeman basis
-                [ct_states,ct_coeffs]=ct2ist(spin_system.comp.mults(spins{n}),'y');
-                states=kron(ct_states,ones(size(opspecs,1),1));
-                opspecs=kron(ones(numel(ct_states),1),opspecs);
-                opspecs(:,spins{n})=states; coeffs=kron(ct_coeffs,coeffs);
-
-            case 'CTz'
-
-                % Sy generator for the central transition in the Zeeman basis
-                [ct_states,ct_coeffs]=ct2ist(spin_system.comp.mults(spins{n}),'z');
-                states=kron(ct_states,ones(size(opspecs,1),1));
-                opspecs=kron(ones(numel(ct_states),1),opspecs);
-                opspecs(:,spins{n})=states; coeffs=kron(ct_coeffs,coeffs);
-
-            case 'CT+'
-
-                % Raising operator for the central transition in the Zeeman basis
-                [ct_states,ct_coeffs]=ct2ist(spin_system.comp.mults(spins{n}),'+');
-                states=kron(ct_states,ones(size(opspecs,1),1));
-                opspecs=kron(ones(numel(ct_states),1),opspecs);
-                opspecs(:,spins{n})=states; coeffs=kron(ct_coeffs,coeffs);
-
-            case 'CT-'
-
-                % Lowering operator for the central transition in the Zeeman basis
-                [ct_states,ct_coeffs]=ct2ist(spin_system.comp.mults(spins{n}),'-');
-                states=kron(ct_states,ones(size(opspecs,1),1));
-                opspecs=kron(ones(numel(ct_states),1),opspecs);
-                opspecs(:,spins{n})=states; coeffs=kron(ct_coeffs,coeffs);
-
-            otherwise
-
-                % Irreducible spherical tensor
-                if strcmp(operators{n}(1),'T')
-                
-                    % Validate the irreducible spherical tensor specification
-                    if isempty(regexp(operators{n},'^T([\+\-]?\d+),([\+\-]?\d+)$','once'))
-                        error('unrecognized operator or state specification.');
-                    end
-
-                    % Extract the IST quantum numbers
-                    indices=textscan(operators{n},'T%n,%n'); l=indices{1}; m=indices{2};
-
-                    % Validate the IST quantum numbers
-                    if (l<0)||(abs(m)>l)||(mod(l,1)~=0)||(mod(m,1)~=0)||...
-                       (lm2lin(l,m)+1>spin_system.comp.mults(spins{n})^2)
-                        error('invalid irreducible spherical tensor indices.');
-                    end
-
-                    % Write the specification
-                    opspecs(:,spins{n})=lm2lin(l,m); coeffs=1*coeffs;
-
-                % Specific Zeeman energy level
-                elseif strcmp(operators{n}(1:2),'ZL')
-
-                    % Validate Zeeman energy level specification
-                    if isempty(regexp(operators{n},'^ZL([1-9]\d*)$','once'))
-                        error('unrecognized operator or state specification.');
-                    end
-
-                    % Extract Zeeman energy level number
-                    level_number=textscan(operators{n},'ZL%n'); 
-                    level_number=level_number{1};
-
-                    % Validate the number
-                    if (level_number<1)||(mod(level_number,1)~=0)|| ...
-                       (level_number>spin_system.comp.mults(spins{n}))
-                        error('invalid Zeeman energy level number.');
-                    end
-
-                    % Get the spherical tensor expansion of the specified energy level projector
-                    [zl_states,zl_coeffs]=enlev2ist(spin_system.comp.mults(spins{n}),level_number);
-                    states=kron(zl_states,ones(size(opspecs,1),1));
-                    opspecs=kron(ones(numel(zl_states),1),opspecs);
-                    opspecs(:,spins{n})=states; coeffs=kron(zl_coeffs,coeffs);
-
-                % Specific bosonic energy level
-                elseif strcmp(operators{n}(1:2),'BL')
-
-                    % Validate bosonic energy level specification
-                    if isempty(regexp(operators{n},'^BL([1-9]\d*)$','once'))
-                        error('unrecognized operator or state specification.');
-                    end
-
-                    % Extract bosonic energy level number
-                    level_number=textscan(operators{n},'BL%n');
-                    level_number=level_number{1};
-
-                    % Validate the number
-                    if (level_number<1)||(mod(level_number,1)~=0)|| ...
-                       (level_number>spin_system.comp.mults(spins{n}))
-                        error('invalid bosonic energy level number.');
-                    end
-
-                    % Get the bosonic monomial expansion of the specified energy level projector
-                    [bl_states,bl_coeffs]=enlev2bm(spin_system.comp.mults(spins{n}),level_number);
-                    states=kron(bl_states,ones(size(opspecs,1),1));
-                    opspecs=kron(ones(numel(bl_states),1),opspecs);
-                    opspecs(:,spins{n})=states; coeffs=kron(bl_coeffs,coeffs);
+                    % Unit operator
+                    opspecs(:,spins{n})=0;
 
                 else
 
-                    % Complain and bomb out
-                    error('unrecognized operator or state specification.');
+                    % Non-unit operators
+                    if strcmp(operators{n},'C')
+
+                        % Get creation operator element list
+                        [rows,cols,vals]=find(weyl(nlevels).c);
+
+                    elseif strcmp(operators{n},'A')
+
+                        % Get annihilation operator element list
+                        [rows,cols,vals]=find(weyl(nlevels).a);
+
+                    elseif strcmp(operators{n},'N')
+
+                        % Get number operator element list
+                        [rows,cols,vals]=find(weyl(nlevels).n);
+
+                    elseif strcmp(operators{n},'CCAA')
+
+                        % Get the anharmonicity operator
+                        A=weyl(nlevels); A=A.c*A.c*A.a*A.a;
+
+                        % Get its element list
+                        [rows,cols,vals]=find(A);
+
+                    elseif strcmp(operators{n}(1:2),'BL')
+
+                        % Extract bosonic energy level number
+                        level_number=textscan(operators{n},'BL%n');
+                        level_number=level_number{1};
+
+                        % Projector into a specific energy level
+                        rows=level_number; cols=level_number; vals=1;
+
+                    else
+
+                        % Complain and bomb out
+                        error('unknown boson state specification.');
+
+                    end
+
+                    % Get linear state indices
+                    idx=kq2lin(nlevels,rows-1,cols-1)+1;
+
+                    % Update the state list
+                    states=kron(idx,ones(size(opspecs,1),1));
+                    opspecs=kron(ones(numel(idx),1),opspecs);
+                    opspecs(:,spins{n})=states; coeffs=kron(vals,coeffs);
 
                 end
-                
+
+            otherwise
+
+                % Complain and bomb out
+                error('unknown particle type.');
+
         end
 
     end

@@ -80,8 +80,8 @@ for n=1:length(active_spins)
 
         case {'C','V','T'} % Cavities, phonons, transmons
 
-            % Bosons need bosonic monomial product action tables
-            [pt_left,pt_right]=bos_product_table(spin_system.comp.mults(active_spins(n)));
+            % Bosons need single transition operator product action tables
+            [pt_left,pt_right]=st_product_table(spin_system.comp.mults(active_spins(n)));
 
         otherwise
 

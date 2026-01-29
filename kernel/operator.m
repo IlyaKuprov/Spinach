@@ -174,11 +174,20 @@ switch spin_system.bas.formalism
 
                     case {'C','V','T'} % Cavities, phonons, transmons
 
-                        % Get bosonic monomials
-                        BM=boson_mono(mults(k));
+                        % Unit operators
+                        if opspecs{n}(k)==0
 
-                        % Update the kron
-                        B=kron(B,BM{opspecs{n}(k)+1});
+                            B=kron(B,speye(mults(k)));
+
+                        else
+
+                            % Get ST operators
+                            BM=sin_tran(mults(k));
+
+                            % Update the kron
+                            B=kron(B,BM{opspecs{n}(k)});
+
+                        end
 
                     otherwise
 

@@ -18,10 +18,6 @@
 %
 % Note: these are expensive tables, disk cache is used automatically.
 %
-% Note: unlike irreducible spherical tensors, ST operators are not
-%       orthogonal (because the unit matrix is present); the over-
-%       lap matrix is built and used below.
-%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=st_product_table.m>
@@ -48,23 +44,6 @@ else
     % Get ST operators
     B=sin_tran(nlevels);
 
-    % Precompute norms
-    norms=zeros(nlevels^2,1);
-    for n=1:nlevels^2
-        norms(n)=sqrt(hdot(B{n},B{n}));
-    end
-
-    % Get the overlap matrix
-    S=zeros(nlevels^2,nlevels^2);
-    for m=1:nlevels^2
-        for k=1:nlevels^2
-
-            % Carefully tiptoe around extreme norms
-            S(m,k)=hdot(B{m}/norms(m),B{k}/norms(k));
-
-        end
-    end
-    
     % Preallocate the arrays
     pt_left= zeros(nlevels^2,nlevels^2,nlevels^2);
     pt_right=zeros(nlevels^2,nlevels^2,nlevels^2);
@@ -74,26 +53,15 @@ else
         for m=1:nlevels^2
             for n=1:nlevels^2
 
-                % Left product action: carefully tiptoe around extreme norms
-                pt_left(n,m,k)= norms(n)*hdot((B{k}/norms(k)),...
-                                              (B{n}/norms(n))*...
-                                              (B{m}/norms(m)));
+                % Left product action
+                pt_left(n,m,k)= hdot(B{k},B{n}*B{m});
 
-                % Right product action: carefully tiptoe around extreme norms
-                pt_right(n,m,k)=norms(n)*hdot((B{k}/norms(k)),...
-                                              (B{m}/norms(m))*...
-                                              (B{n}/norms(n)));
+                % Right product action
+                pt_right(n,m,k)=hdot(B{k},B{m}*B{n});
 
             end
         end
     end
-
-    % Apply the overlap matrix
-    pt_left= reshape(pt_left, [nlevels^4 nlevels^2]);
-    pt_right=reshape(pt_right,[nlevels^4 nlevels^2]);
-    pt_left= pt_left/S'; pt_right=pt_right/S';
-    pt_left= reshape(pt_left, [nlevels^2 nlevels^2 nlevels^2]);
-    pt_right=reshape(pt_right,[nlevels^2 nlevels^2 nlevels^2]);
 
     try % Try to save a cache record, but don't insist
         save(table_file,'pt_left','pt_right'); drawnow;
@@ -108,8 +76,8 @@ end
 % Consistency enforcement
 function grumble(nlevels)
 if (~isnumeric(nlevels))||(~isreal(nlevels))||...
-   (~isscalar(nlevels))||(nlevels<3)||(mod(nlevels,1)~=0)
-    error('mult must be a real integer greater than 2.');
+   (~isscalar(nlevels))||(nlevels<1)||(mod(nlevels,1)~=0)
+    error('mult must be a positive real integer.');
 end
 end
 

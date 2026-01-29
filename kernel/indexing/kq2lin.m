@@ -38,17 +38,14 @@ function I=kq2lin(N,K,Q)
 % Check consistency
 grumble(N,K,Q);
 
-% Get input size
-inp_size=size(K);
-
 % Sepentine matrix
 S=serpentine(N);
 
 % Direct look-up
-I=S(K(:)+1,Q(:)+1);
-
-% Match input size
-I=reshape(I,inp_size);
+I=zeros(size(K));
+for n=1:numel(K)
+    I(n)=S(K(n)+1,Q(n)+1);
+end
 
 end
 
@@ -60,12 +57,15 @@ if (~isnumeric(N))||(~isreal(N))||(mod(N,1)~=0)||...
    (~isnumeric(Q))||(~isreal(Q))||any(mod(Q,1)~=0,'all')
     error('all elements of the inputs must be real integers.');
 end
-if N<3, error('minimum representation dimension is 3'); end
+if N<1, error('N must be a positive real integer.'); end
 if any(K<0,'all')||any(Q<0,'all')
     error('elements of K and Q must be non-negative.');
 end
 if any(size(K)~=size(Q),'all')
     error('K and Q arrays must have the same size.');
+end
+if any((K+1)>N,'all')||any((Q+1)>N,'all')
+    error('K,Q overflow matrix dimension.');
 end
 end
 

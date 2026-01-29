@@ -59,7 +59,10 @@ if (~isnumeric(N))||(~isreal(N))||(mod(N,1)~=0)||...
    (~isnumeric(I))||(~isreal(I))||any(mod(I,1)~=0,'all')||any(I<0,'all')
     error('elements of I must be non-negative integers.');
 end
-if N<3, error('minimum representation dimension is 3'); end
+if N<1, error('N must be a positive real integer.'); end
+if any((I+1)>N^2,'all')
+    error('I overflows matrix dimension.');
+end
 end
 
 % "Sulphur Philosophorum": 

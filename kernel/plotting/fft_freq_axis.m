@@ -1,6 +1,6 @@
 % Frequency axis for FFT with optional zero-filling. Syntax:
 %
-%          [f_shift,f,df,nfft]=fft_freq_axis(npts,dt,zf)
+%       [f_shift,f,df,nfft]=fft_freq_axis(npts,dt,zf)
 %
 % Parameters:
 %
@@ -19,26 +19,26 @@
 %    df      - frequency resolution
 %
 %    nfft    - FFT length used
+%
+% ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=fft_freq_axis.m>
 
 function [f_shift,f,df,nfft]=fft_freq_axis(npts,dt,zf)
-
-% Check consistency
-grumble(npts,dt,zf);
 
 % Set default zero-fill
 if nargin<3, zf=0; end
 
-% Round point counts
-npts=round(npts);
-zf=round(zf);
+% Check consistency
+grumble(npts,dt,zf);
 
-% Compute FFT length
+% FFT length
 nfft=npts+zf;
 
-% Compute sampling frequency
+% Sampling frequency
 sfreq=1/dt;
 
-% Compute frequency resolution
+% Frequency resolution
 df=sfreq/nfft;
 
 % Build unshifted axis
@@ -52,18 +52,25 @@ end
 % Consistency enforcement
 function grumble(npts,dt,zf)
 if (~isnumeric(npts))||(~isreal(npts))||...
-   (~isscalar(npts))||(npts<=0)
-    error('npts must be a positive real scalar.');
+   (~isscalar(npts))||(mod(npts,1)~=0)||(npts<=1)
+    error('npts must be a positive real integer.');
 end
 if (~isnumeric(dt))||(~isreal(dt))||...
    (~isscalar(dt))||(dt<=0)
     error('dt must be a positive real scalar.');
 end
-if nargin<3
-    return;
-end
 if (~isnumeric(zf))||(~isreal(zf))||...
-   (~isscalar(zf))||(zf<0)
-    error('zf must be a non-negative real scalar.');
+   (~isscalar(zf))||(mod(zf,1)~=0)||(zf<0)
+    error('zf must be a non-negative real integer.');
 end
 end
+
+% All albatrosses live in the southern hemisphere - except 
+% one. 'Albie', or 'Albert', is believed to have made a na-
+% vigational error in around 2014 and has since been living
+% in Europe, dividing his time between Germany, Yorkshire
+% coast and the east coast of scotland, where he tends to
+% hang out with gannets.
+%
+% The Spectator
+

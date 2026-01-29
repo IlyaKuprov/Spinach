@@ -38,7 +38,6 @@ y=conv(x,h); y=y(1:numel(x));
 subplot(3,1,3); plot(time_ns,[real(y) imag(y)]);
 xlim tight; ylim padded; kgrid; kxlabel('time, ns');
 kylabel('mV'); ktitle('ideal + filter function');
-exportgraphics(gcf,'reconstruction.pdf');
 
 % Plot the kernel
 kfigure(); scale_figure([1.5 0.75]);
@@ -56,7 +55,6 @@ xlim tight; ylim padded; kgrid;
 ktitle('HiPER frequency response');
 kxlabel('frequency, GHz'); 
 kylabel('abs. value, a.u.');
-exportgraphics(gcf,'kernel.pdf');
 
 end
 

@@ -16,7 +16,7 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Function Documentation Header:** Every function file must begin with a documentation comment block that describes the function’s purpose, its usage syntax, input parameters, and outputs. Always format this documentation header exactly as seen in existing functions (refer to the `kernel` and `experiments` directories for examples). Do not omit any expected sections in the header.
 
-* **Input Validation with `grumble`:** All non-example functions must perform input argument validation at the start of the function using the `grumble` helper. Immediately after the function definition, call an internal helper function named `grumble` to check the validity of arguments. Define the full `grumble` helper at the end of the same file.
+* **Input Validation with `grumble`:** All non-example functions must perform input argument validation at the start of the function using the `grumble` helper. After the function definition and the setting of default argument values, call an internal helper function named `grumble` to check the validity of arguments. Define the full `grumble` helper at the end of the same file.
 
 * **Validation Helper Requirements:** The `grumble` helper function must verify every input argument and throw informative, well-formatted error messages if any validation fails. Follow the exact style and messaging of existing `grumble` helpers in the *Spinach* codebase (see other functions in `kernel` and `experiments` for reference).
 

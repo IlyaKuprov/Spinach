@@ -69,42 +69,98 @@ struct=cell(1,numel(active_spins));
 
 % Loop over the relevant spins
 for n=1:length(active_spins)
+
+    % Get the multiplicity out
+    mult=spin_system.comp.mults(active_spins(n));
+
+    % Unit operator does nothing
+    if opspec(active_spins(n))==0
+
+        % Unit action table
+        source{n}=(0:(mult^2-1))';
+        destin{n}=(0:(mult^2-1))';
+        struct{n}=ones(mult^2,1);
+
+    else
     
-    % Get right and left product action tables
-    switch spin_system.comp.types{active_spins(n)}
+        % The rest depends on the particle type
+        switch spin_system.comp.types{active_spins(n)}
 
-        case 'S' % Spins
+            case 'S' % Spins
+            
+                % Retrieve irreducible spherical tensor product action tables
+                [pt_left,pt_right]=ist_product_table(spin_system.comp.mults(active_spins(n)));
 
-            % Spins need irreducible spherical tensor product action tables
-            [pt_left,pt_right]=ist_product_table(spin_system.comp.mults(active_spins(n)));
+                % Action side
+                switch side
 
-        case {'C','V','T'} % Cavities, phonons, transmons
+                    % Left side action
+                    case {'left','leftofcomm'}
 
-            % Bosons need single transition operator product action tables
-            [pt_left,pt_right]=st_product_table(spin_system.comp.mults(active_spins(n)));
+                        % Extract pages corresponding to the current state
+                        pt=squeeze(pt_left(opspec(active_spins(n))+1,:,:));
+
+                    % Right side action
+                    case {'right','rightofcomm'}
+                        
+                        % Extract pages corresponding to the current state
+                        pt=squeeze(pt_right(opspec(active_spins(n))+1,:,:));
+
+                    otherwise
+
+                        % Complain and bomb out
+                        error('invalid side specification.');
+
+                end
+
+                % Convert product action table to indices
+                [destin{n},source{n},struct{n}]=find(pt);
+
+                % Switch to 0 base indexing for unit state
+                source{n}=source{n}-1; destin{n}=destin{n}-1;
+
+            case {'C','V','T'} % Cavities, phonons, transmons
+
+                % Retrieve single transition operator product action tables
+                [pt_left,pt_right]=st_product_table(spin_system.comp.mults(active_spins(n)));
+
+                % Action side
+                switch side
+
+                    % Left side action
+                    case {'left','leftofcomm'}
+
+                        % Extract pages corresponding to the current state
+                        pt=squeeze(pt_left(opspec(active_spins(n)),:,:));
+
+                        % Right side action
+                    case {'right','rightofcomm'}
+
+                        % Extract pages corresponding to the current state
+                        pt=squeeze(pt_right(opspec(active_spins(n)),:,:));
+
+                    otherwise
+
+                        % Complain and bomb out
+                        error('invalid side specification.');
+
+                end
+
+                % Convert product action table to indices
+                [destin{n},source{n},struct{n}]=find(pt);
+
+                % Add unit state destinations manually
+                struct{end+1}=1; source{end+1}=0;      %#ok<AGROW>
+                destin{end+1}=opspec(active_spins(n)); %#ok<AGROW>
 
         otherwise
 
             % Complain and bomb out
             error('unknown particle type.');
 
+        end
+
     end 
-    
-    % Extract pages corresponding to the current state
-    switch side
-        case {'left','leftofcomm'}
-            pt=squeeze(pt_left(opspec(active_spins(n))+1,:,:));
-        case {'right','rightofcomm'}
-            pt=squeeze(pt_right(opspec(active_spins(n))+1,:,:));
-        otherwise
-            error('invalid side specification.');
-    end
-    
-    % Convert product action table to indices
-    [destin{n},source{n},struct{n}]=find(pt);
-    
-    % Switch to 0 index for unit state
-    source{n}=source{n}-1; destin{n}=destin{n}-1;
     
 end
     

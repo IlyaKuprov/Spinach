@@ -1,57 +1,129 @@
-%RECOVER_CONV_KERNEL  Estimate an L-tap FIR convolution kernel h from x and y.
+% FIR convolution kernel estimation from input/output samples.
 %
-% Model (default, causal):   y(n) ≈ sum_{k=1..L} h(k) * x(n-k+1)   (zero-padded for n-k+1<=0)
+%               h=kernelest(x,y,ker_len,method,align,lambda)
 %
-% Inputs
-%   x,y    : input/output samples on the same grid (same length N)
-%   L      : kernel length (number of taps / grid points)
-%   method : 'backslash' (default) | 'pinv' | 'svd' | 'tikh'
-%   align  : 'causal' (default) or 'same' (matches conv(x,h,'same') indexing)
-%   lambda : Tikhonov regularization for 'tikh' (optional, e.g. 1e-6)
+% Parameters:
 %
-% Output
-%   h      : estimated kernel (Lx1)
+%    x        - input samples on a uniform grid
+%
+%    y        - output samples on the same grid
+%
+%    ker_len  - kernel length (number of taps)
+%
+%    method   - 'backslash' (default) | 'pinv' | 'svd' | 'tikh'
+%
+%    align    - 'causal' (default) or 'same' output alignment
+%
+%    lambda   - Tikhonov parameter for 'tikh' (optional)
+%
+% Outputs:
+%
+%    h        - estimated convolution kernel
 
-function h = kernelest(x,y,L,method,align,lambda)
+function h=kernelest(x,y,ker_len,method,align,lambda)
 
-x = x(:);  y = y(:);
-N = numel(x);
+% Check consistency
+grumble(x,y,ker_len,method,align,lambda);
 
-if nargin < 4 || isempty(method), method = 'backslash'; end
-if nargin < 5 || isempty(align),  align  = 'causal';    end
+% Enforce column vectors
+x=x(:); y=y(:);
 
-% Full convolution matrix: conv(x,h) = Xfull*h, size (N+L-1) x L
-Xfull = toeplitz([x; zeros(L-1,1)], [x(1) zeros(1,L-1)]);
+% Get sample count
+npts=numel(x);
 
-% Pick the rows that correspond to how your instrument outputs "same-grid" data
+% Set default method
+if nargin<4, method='backslash'; end
+
+% Set default alignment
+if nargin<5, align='causal'; end
+
+% Build convolution matrix
+conv_mat=toeplitz([x; zeros(ker_len-1,1)],[x(1) zeros(1,ker_len-1)]);
+
+% Select rows matching alignment
 switch lower(align)
     case 'causal'
-        A = Xfull(1:N, :);                         % y ≈ first N samples of conv(x,h)
+
+        % Select the first npts rows
+        sys_mat=conv_mat(1:npts,:);
+
     case 'same'
-        start = floor(L/2) + 1;                    % typical conv(...,'same') indexing
-        A = Xfull(start:start+N-1, :);             % y ≈ central N samples of conv(x,h)
+
+        % Select the central npts rows
+        row_start=floor(ker_len/2)+1;
+        sys_mat=conv_mat(row_start:(row_start+npts-1),:);
+
     otherwise
         error('align must be ''causal'' or ''same''.');
 end
 
-% Solve least-squares for h
+% Compute kernel by the chosen method
 switch lower(method)
     case 'backslash'
-        h = A \ y;                                 % LS fit (or exact if square)
+
+        % Solve linear least squares
+        h=sys_mat\y;
+
     case 'pinv'
-        h = pinv(A) * y;                           % Moore-Penrose pseudoinverse
+
+        % Solve using the pseudoinverse
+        h=pinv(sys_mat)*y;
+
     case 'svd'
-        [U,S,V] = svd(A,'econ');                   % truncated-SVD pseudoinverse
-        s = diag(S);
-        tol = max(size(A)) * eps(max(s));
-        sInv = zeros(size(s));
-        sInv(s > tol) = 1 ./ s(s > tol);
-        h = V * (sInv .* (U' * y));
+
+        % Build truncated-SVD pseudoinverse
+        [u_mat,s_mat,v_mat]=svd(sys_mat,'econ');
+        s_vals=diag(s_mat);
+        s_tol=max(size(sys_mat))*eps(max(s_vals));
+        s_inv=zeros(size(s_vals));
+        s_inv(s_vals>s_tol)=1./s_vals(s_vals>s_tol);
+        h=v_mat*(s_inv.*(u_mat'*y));
+
     case 'tikh'
-        if nargin < 6 || isempty(lambda), lambda = 1e-6; end
-        h = (A'*A + lambda*eye(L)) \ (A'*y);        % ridge / Tikhonov
+
+        % Set default regularisation
+        if nargin<6, lambda=1e-6; end
+
+        % Solve Tikhonov-regularised system
+        h=(sys_mat'*sys_mat+lambda*eye(ker_len))\(sys_mat'*y);
+
     otherwise
-        error('Unknown method: %s', method);
+        error('Unknown method: %s',method);
+end
+
+end
+
+% Consistency enforcement
+function grumble(x,y,ker_len,method,align,lambda)
+if (~isnumeric(x))||(~isreal(x))||(~isvector(x))
+    error('x must be a real numeric vector.');
+end
+if (~isnumeric(y))||(~isreal(y))||(~isvector(y))||...
+   (numel(y)~=numel(x))
+    error('y must be a real numeric vector with the same length as x.');
+end
+if (~isnumeric(ker_len))||(~isreal(ker_len))||...
+   (~isscalar(ker_len))||(mod(ker_len,1)~=0)||(ker_len<1)
+    error('ker_len must be a positive integer.');
+end
+if nargin<4||isempty(method)
+    return;
+end
+if (~ischar(method))&&(~isstring(method))
+    error('method must be a character string.');
+end
+if nargin<5||isempty(align)
+    return;
+end
+if (~ischar(align))&&(~isstring(align))
+    error('align must be a character string.');
+end
+if nargin<6||isempty(lambda)
+    return;
+end
+if (~isnumeric(lambda))||(~isreal(lambda))||...
+   (~isscalar(lambda))||(lambda<=0)
+    error('lambda must be a positive real scalar.');
 end
 end
 
@@ -62,4 +134,3 @@ end
 %
 % Olivia Potts, the cooking
 % columninst at The Spectator
-

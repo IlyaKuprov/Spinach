@@ -1,35 +1,69 @@
-%FFT_FREQ_AXIS  Frequency axis for FFT with optional zero-filling.
+% Frequency axis for FFT with optional zero-filling. Syntax:
 %
-% Inputs
-%   Nt : number of acquired time-domain points
-%   dt : time spacing between points (seconds, or whatever your time unit is)
-%   zf : extent of zero-filling = number of zeros appended in time domain
-%        (so FFT length is Nfft = Nt + zf)
+%          [f_shift,f,df,nfft]=fft_freq_axis(npts,dt,zf)
 %
-% Outputs
-%   fShift : frequency axis (same length as FFT) for fftshift(fft(...))
-%   f      : frequency axis for raw fft(...) (unshifted, starts at 0)
-%   df     : frequency resolution
-%   Nfft   : FFT length used
+% Parameters:
+%
+%    npts    - number of acquired time-domain points
+%
+%    dt      - time step between points
+%
+%    zf      - zero-fill length added to time domain
+%
+% Outputs:
+%
+%    f_shift - frequency axis for fftshift(fft(...))
+%
+%    f       - frequency axis for fft(...)
+%
+%    df      - frequency resolution
+%
+%    nfft    - FFT length used
 
-function [fShift, f, df, Nfft] = fft_freq_axis(Nt, dt, zf)
+function [f_shift,f,df,nfft]=fft_freq_axis(npts,dt,zf)
 
-if nargin < 3, zf = 0; end
-Nt  = round(Nt);
-zf  = round(zf);
-if Nt <= 0, error('Nt must be positive.'); end
-if dt <= 0, error('dt must be positive.'); end
-if zf < 0, error('zf must be >= 0.'); end
+% Check consistency
+grumble(npts,dt,zf);
 
-Nfft = Nt + zf;
+% Set default zero-fill
+if nargin<3, zf=0; end
 
-Fs = 1/dt;        % sampling frequency (units: 1/time)
-df = Fs/Nfft;     % frequency bin spacing
+% Round point counts
+npts=round(npts);
+zf=round(zf);
 
-% Unshifted frequency bins (matches fft output ordering)
-f = (0:Nfft-1).' * df;
+% Compute FFT length
+nfft=npts+zf;
 
-% Shifted frequency bins (matches fftshift(fft(...)) ordering)
-fShift = (-floor(Nfft/2) : ceil(Nfft/2)-1).' * df;
+% Compute sampling frequency
+sfreq=1/dt;
 
+% Compute frequency resolution
+df=sfreq/nfft;
+
+% Build unshifted axis
+f=(0:(nfft-1)).'*df;
+
+% Build shifted axis
+f_shift=(-floor(nfft/2):ceil(nfft/2)-1).'*df;
+
+end
+
+% Consistency enforcement
+function grumble(npts,dt,zf)
+if (~isnumeric(npts))||(~isreal(npts))||...
+   (~isscalar(npts))||(npts<=0)
+    error('npts must be a positive real scalar.');
+end
+if (~isnumeric(dt))||(~isreal(dt))||...
+   (~isscalar(dt))||(dt<=0)
+    error('dt must be a positive real scalar.');
+end
+if nargin<3
+    return;
+end
+if (~isnumeric(zf))||(~isreal(zf))||...
+   (~isscalar(zf))||(zf<0)
+    error('zf must be a non-negative real scalar.');
+end
 end

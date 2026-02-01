@@ -60,7 +60,7 @@ Dx=operator(spin_system,'Lx','2H');
 Dy=operator(spin_system,'Ly','2H');
 
 % Get deuterium offset operator
-Dz=operator(spin_system,'Ly','2H');
+Dz=operator(spin_system,'Lz','2H');
 
 % Define control parameters
 control.operators={Dx,Dy};                     % Controls

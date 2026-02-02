@@ -1085,6 +1085,26 @@ else
     
 end
 
+% Distortion before plotting
+if isfield(control,'distplot')
+
+    % Input validation
+    if (~iscell(control.distplot))||...
+        any(~cellfun(@(x)isa(x,'function_handle'),control.distplot(:)))
+        error('control.distplot must be a cell array of function handles.');
+    end
+    
+    % Absorb the specification
+    spin_system.control.distplot=control.distplot;
+    control=rmfield(control,'distplot');
+    
+else
+    
+    % Plot ideal waveform by default
+    spin_system.control.distplot={};
+    
+end
+
 % Process trajectory options
 if isfield(control,'traj_opts')
 

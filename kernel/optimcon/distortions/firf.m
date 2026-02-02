@@ -95,7 +95,7 @@ for n=1:nchannels
 
         % Accumulate Jacobian contribution
         J=J+ins_re*(a_mat*sel_re-b_mat*sel_im)+...
-             ins_im*(b_mat*sel_re+a_mat*sel_im);
+            ins_im*(b_mat*sel_re+a_mat*sel_im);
 
     end
 

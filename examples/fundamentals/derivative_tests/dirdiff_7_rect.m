@@ -53,8 +53,8 @@ control.plotting={};                            % Plotting options
 control.integrator='rectangle';                 % Integrator
 
 % Define an ensemble of distortion chains
-control.distortion={@no_dist, @(w)spf(w,0.2), @(w)szf(w,0.2), @(w)amp_root(w,2*pi*20e3,4);
-                    @(w)spf(w,0.2), @(w)szf(w,0.2), @(w)amp_root(w,2*pi*20e3,4), @no_dist};
+control.distortion={@(w)firf(w,[0.9 0.1i]), @(w)spf(w,0.2), @(w)szf(w,0.2), @(w)amp_root(w,2*pi*20e3,4);
+                    @(w)szf(w,0.2), @(w)spf(w,0.2), @(w)amp_root(w,2*pi*20e3,4), @(w)firf(w,[0.9 0.1i])};
 
 % Set the interval grid
 control.pulse_dt=12.8e-6*ones(1,5);

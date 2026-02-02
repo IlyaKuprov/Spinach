@@ -33,51 +33,46 @@ function [w,J]=firf(w,ker)
 % Check consistency
 grumble(w,ker);
 
-% Autodiff wrapper
-if nargout<2
-    
-    % Plain call
-    w=distort(w(:),ker,size(w));
-
-else
-
-    % Autodiff call including Jacobian
-    [w,J]=dlfeval(@distort,dlarray(w(:)),ker,size(w));
-
-    % Strip autodiff rigging; kill Wirtinger terms
-    w=extractdata(w); J=extractdata(J); J=real(J);
-
-end
-
-end
-
-% Actual distortion function
-function [w_dist,J]=distort(w,ker,dims)
-
-% Fold into physical dimensions
-inp=reshape(w,dims); nrows=dims(1);
-ncols=dims(2); nchannels=nrows/2;
-
-% Preallocate the output
-w_dist=zeros(size(inp),'like',inp);
-
 % Force coefficients into a column
 ker=ker(:);
+
+% Fold into physical dimensions
+dims=size(w); nrows=dims(1);
+ncols=dims(2); nchannels=nrows/2;
+
+% Build the convolution matrix
+if ncols>=numel(ker)
+    ker_col=[ker; zeros(ncols-numel(ker),1)];
+else
+    ker_col=ker(1:ncols);
+end
+ker_row=[ker(1) zeros(1,ncols-1)];
+conv_mat=toeplitz(ker_col,ker_row);
+conv_mat=sparse(conv_mat);
+
+% Preallocate the output
+w_dist=zeros(size(w),'like',w);
+
+% Precompute Jacobian components
+if nargout>1
+
+    % Build sparse identity matrix
+    id_cols=speye(ncols);
+
+    % Separate real and imaginary parts
+    a_mat=real(conv_mat);
+    b_mat=imag(conv_mat);
+
+    % Preallocate Jacobian matrix
+    J=spalloc(numel(w),numel(w),4*nchannels*nnz(conv_mat));
+
+end
 
 % Loop over channels
 for n=1:nchannels
 
     % Build complex input signal
-    x=inp(2*n-1,:)+1i*inp(2*n,:);
-
-    % Build the convolution matrix
-    if ncols>=numel(ker)
-        ker_col=[ker; zeros(ncols-numel(ker),1)];
-    else
-        ker_col=ker(1:ncols);
-    end
-    ker_row=[ker(1) zeros(1,ncols-1)];
-    conv_mat=toeplitz(ker_col,ker_row);
+    x=w(2*n-1,:)+1i*w(2*n,:);
 
     % Apply the filter
     y=conv_mat*transpose(x);
@@ -86,10 +81,28 @@ for n=1:nchannels
     w_dist(2*n-1,:)=real(y);
     w_dist(2*n,:)=imag(y);
 
+    % Compute Jacobian block
+    if nargout>1
+
+        % Build row selectors
+        row_re=2*n-1; row_im=2*n;
+        sel_re=kron(id_cols,sparse(1,row_re,1,1,nrows));
+        sel_im=kron(id_cols,sparse(1,row_im,1,1,nrows));
+
+        % Build row inserters
+        ins_re=kron(id_cols,sparse(row_re,1,1,nrows,1));
+        ins_im=kron(id_cols,sparse(row_im,1,1,nrows,1));
+
+        % Accumulate Jacobian contribution
+        J=J+ins_re*(a_mat*sel_re-b_mat*sel_im)+...
+             ins_im*(b_mat*sel_re+a_mat*sel_im);
+
+    end
+
 end
 
-% Compute the autodiff Jacobian
-if nargout>1, J=dljacobian(w_dist(:),w,1); end
+% Return distorted waveform
+w=w_dist;
 
 end
 

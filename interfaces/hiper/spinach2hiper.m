@@ -1,12 +1,14 @@
 % Exports phase-modulated optimal control waveforms into the
 % format expected by Graham Smith's HiPER instrument. Syntax:
 %
-%            spinach2hiper(file_name,phi,off,dt)
+%           spinach2hiper(file_name,amp,phi,off,dt)
 %
 % Parameters:
 %
 %     file_name  - CSV file name, a character string
 %                  without the extension
+%
+%     amp        - a vector of amplitudes
 %
 %     phi        - a vector of phases in radians
 %
@@ -26,7 +28,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=spinach2hiper.m>
 
-function spinach2hiper(file_name,phi,off,dt)
+function spinach2hiper(file_name,amp,phi,off,dt)
 
 % Convert and wrap phases
 phi=wrapTo360(180*phi(:)/pi);       % degrees [0 360]
@@ -36,11 +38,8 @@ off=1e-6*repmat(off,size(phi)); % MHz
 dt=1e9*repmat(dt,size(phi));    % ns
 times=cumsum(dt)-dt;            % ns
 
-% Amplitudes are constant
-amp=ones(size(phi));
-
 % Make a table for export
-pulse_table=table(times,off,phi,amp,'VariableNames',...
+pulse_table=table(times,off,phi,amp(:),'VariableNames',...
             {'time_ns','freq_MHz','phase_deg','amplitude'});
 
 % Export the table into a CSV file

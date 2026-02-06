@@ -41,7 +41,7 @@ x=x(:); y=y(:); npts=numel(x);
 conv_mat=toeplitz([x;   zeros(ker_len-1,1)],...
                   [x(1) zeros(1,ker_len-1)]);
 
-% Select rows matching alignment
+% Alignment choice
 switch lower(align)
 
     case 'causal'
@@ -62,7 +62,7 @@ switch lower(align)
 
 end
 
-% Compute kernel by the chosen method
+% Compute kernel 
 switch lower(method)
 
     case 'backslash'

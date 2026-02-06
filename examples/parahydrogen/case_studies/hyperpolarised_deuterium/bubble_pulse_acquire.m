@@ -33,8 +33,8 @@ inter.coupling.matrix{4,4}=1e3*[ -55.2    8.1  -14.5
 
 % Cartesian coordinates, DFT calculation
 inter.coordinates={[]; []; % None for D2
-                   [-1.98  0.45  -0.55];
-                   [-0.25  1.33  -1.65]};
+                   [-1.962    0.573   -0.576];
+                   [-0.175    1.399   -1.630]};
 
 % Kinetics
 inter.chem.parts={[1 2],[3 4]};
@@ -107,8 +107,9 @@ fid=liquid(spin_system,@hp_acquire,parameters,'nmr');
 % Apodisation
 fid=apodisation(spin_system,fid,{{'exp',6}});
 
-% Fourier transform
+% Fourier transform and normalisation
 spectrum=fftshift(fft(fid,parameters.zerofill));
+spectrum=spectrum/max(abs(spectrum));
 
 % Plotting
 kfigure(); scale_figure([1.00 0.75]);

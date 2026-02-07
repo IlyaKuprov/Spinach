@@ -169,8 +169,31 @@ for n=1:spin_system.control.max_iter
             
     end
     
+    
+    % Cache objective and gradient at the current point
+    fx_0=fx; g_0=g;
+    
     % Run line search, refresh objective and gradient
     [alpha,fx,g,exitflag,data]=linesearch(spin_system,cost_function,dir,x,fx,g,data);
+    
+    % Fall back to gradient direction if LBFGS search fails
+    if strcmp(spin_system.control.method,'lbfgs')&&(exitflag==-2)
+        
+        % Reset objective and gradient at the current point
+        fx=fx_0; g=g_0;
+        
+        % Use the unmodified gradient as search direction
+        dir=g.*(~frozen);
+        
+        % Run line search in the gradient direction
+        [alpha,fx,g,exitflag,data]=linesearch(spin_system,cost_function,dir,x,fx,g,data);
+        
+        % Terminate only if gradient direction fails as well
+        if exitflag==-2
+            alpha=0; fx=fx_0; g=g_0;
+        end
+        
+    end
     
     % Report diagnostics to user
     itrep(spin_system,fx,g,alpha,data); 
@@ -324,4 +347,3 @@ end
 % sublimity; they see the monster, they do not see the prodigy.
 %
 % Victor Hugo - Ninety-three
-

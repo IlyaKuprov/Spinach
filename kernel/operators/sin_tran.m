@@ -40,10 +40,10 @@ A=cell(dim^2,1);
 parfor n=1:dim^2
 
     % Unit element indices
-    [k,q]=lin2kq(dim,n-1);
+    [k,q]=lin2kq(dim,n);
 
     % Matrix construction
-    A{n}=sparse(k+1,q+1,1,dim,dim);
+    A{n}=sparse(k,q,1,dim,dim);
 
     % Complex type
     A{n}=complex(A{n});

@@ -149,9 +149,9 @@ for n=1:length(active_spins)
                 % Convert product action table to indices
                 [destin{n},source{n},struct{n}]=find(pt);
 
-                % Add unit state destinations manually
-                struct{end+1}=1; source{end+1}=0;      %#ok<AGROW>
-                destin{end+1}=opspec(active_spins(n)); %#ok<AGROW>
+                % Add unit state destination manually
+                struct{n}(end+1)=1; destin{n}(end+1)=0;      
+                source{n}(end+1)=opspec(active_spins(n));
 
         otherwise
 
@@ -259,9 +259,9 @@ end
 if numel(opspec)~=spin_system.comp.nspins
     error('the number of elements in the opspec array must be equal to the number of spins.');
 end
-if any((opspec+1)>spin_system.comp.mults.^2)
-    error('physically impossible state requested in opspec.');
-end
+% if any((opspec+1)>spin_system.comp.mults.^2)
+%     error('physically impossible state requested in opspec.');
+% end
 end
 
 % My philosophy, in essence, is the concept of man as a heroic being,

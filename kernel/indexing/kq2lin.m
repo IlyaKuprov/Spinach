@@ -1,12 +1,9 @@
-% Converts k,q power indexing of bosonic monomials: 
+% Converts k,q indexing of single transition operators into 
+% serpentine indexing:
 %
-%                    B(k,q)=(Cr^k)*(An^q)
-%
-% into serpentine indexing:
-%
-%                (0,0)(0,1)(0,2)     (0)(2)(5)
-%                (1,0)(1,1)(1,2) <=> (1)(4)(7)
-%                (2,0)(2,1)(2,2)     (3)(6)(8)
+%               (1,1)(1,2)(1,3)     (1)(3)(6)
+%               (2,1)(2,2)(2,3) <=> (2)(5)(8)
+%               (3,1)(3,2)(3,3)     (4)(7)(9)
 %
 % Syntax: 
 %
@@ -16,17 +13,15 @@
 %
 %       N   - matrix dimension, a scalar
 %
-%       K   - creation operator power, an
-%             integer array of any size
+%       K   - first index, positive integer
+%             array of any size
 %
-%       Q   - annihilation operator power,
-%             an integer array of the same
-%             size as K
+%       Q   - second index, positive integer
+%             array of the same size as K
 %
 % Outputs:
 %
-%       I   - linear serpentine index with I=0 
-%             corresponding to K=0, Q=0; an ar-
+%       I   - linear serpentine index, an ar-
 %             ray of the same size as inputs
 %
 % ilya.kuprov@weizmann.ac.il
@@ -44,7 +39,7 @@ S=serpentine(N);
 % Direct look-up
 I=zeros(size(K));
 for n=1:numel(K)
-    I(n)=S(K(n)+1,Q(n)+1);
+    I(n)=S(K(n),Q(n));
 end
 
 end
@@ -58,13 +53,13 @@ if (~isnumeric(N))||(~isreal(N))||(mod(N,1)~=0)||...
     error('all elements of the inputs must be real integers.');
 end
 if N<1, error('N must be a positive real integer.'); end
-if any(K<0,'all')||any(Q<0,'all')
-    error('elements of K and Q must be non-negative.');
+if any(K<1,'all')||any(Q<1,'all')
+    error('elements of K and Q must be positive.');
 end
 if any(size(K)~=size(Q),'all')
     error('K and Q arrays must have the same size.');
 end
-if any((K+1)>N,'all')||any((Q+1)>N,'all')
+if any(K>N,'all')||any(Q>N,'all')
     error('K,Q overflow matrix dimension.');
 end
 end

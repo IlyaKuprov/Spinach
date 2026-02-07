@@ -1,23 +1,20 @@
 % Serpentine index matrix used in Spinach for single-index
-% numbering of bosonic monomials. Syntax:
+% numbering of single transition operators. Syntax:
 %
 %                   S=serpentine(nlevels)
 %
 % Parameters:
 %
-%    nlevels - number of energy levels in the trun-
-%              cated bosonic mode
+%    nlevels - number of energy levels 
 %
 % Outputs:
 %
-%    idx     - a matrix that indexes the powers of
-%              creation and annihilation operators
-%              in a grid of bosonic monomials in
-%              the following way:
+%    S       - serpentine matrix, for example:
 %
-%                 (0,0)(0,1)(0,2)     (0)(2)(5)
-%                 (1,0)(1,1)(1,2) <=> (1)(4)(7)
-%                 (2,0)(2,1)(2,2)     (3)(6)(8)
+%                     (1 )(3 )(6 )(10)
+%                     (2 )(5 )(9 )(13)
+%                     (4 )(8 )(12)(15)
+%                     (7 )(11)(14)(16)
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -28,10 +25,10 @@ function S=serpentine(nlevels)
 % Check consistency
 grumble(nlevels);
 
-% Build the serpentine index
+% Build the serpentine matrix
 [rows,cols]=ndgrid(1:nlevels);
 [~,idx]=sortrows([rows(:)+cols(:), -rows(:)]);
-S=zeros(nlevels,nlevels); S(idx)=0:(nlevels^2-1);
+S=zeros(nlevels,nlevels); S(idx)=1:nlevels^2;
 
 end
 

@@ -47,7 +47,7 @@ B=boson_mono(nlevels);
 for n=1:numel(B)
 
     % Physical indices
-    [k,q]=lin2kq(nlevels,n-1);
+    [k,q]=lin2kq(nlevels,n);
 
     % Deviation norm testing
     err=norm(comm(A.n,B{n})-(k-q)*B{n},'fro')/norm(B{n},'fro');

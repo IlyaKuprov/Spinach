@@ -40,7 +40,7 @@ A=cell(dim^2,1);
 parfor n=1:dim^2
 
     % Unit element indices
-    [k,q]=lin2kq(dim,n);
+    [k,q]=lin2kq(dim,n,1);
 
     % Matrix construction
     A{n}=sparse(k,q,1,dim,dim);

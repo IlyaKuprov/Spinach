@@ -1,66 +1,100 @@
-% Converts k,q indexing of single transition operators into 
-% serpentine indexing:
+% Converts k,q indexing of matrices into their linear 
+% serpentine indexing. In base 1 indexing convention:
 %
 %               (1,1)(1,2)(1,3)     (1)(3)(6)
 %               (2,1)(2,2)(2,3) <=> (2)(5)(8)
 %               (3,1)(3,2)(3,3)     (4)(7)(9)
 %
+% and in base 0 indexing convention:
+%
+%               (0,0)(0,1)(0,2)     (0)(2)(5)
+%               (1,0)(1,1)(1,2) <=> (1)(4)(7)
+%               (2,0)(2,1)(2,2)     (3)(6)(8)
+%
 % Syntax: 
 %
-%                       I=kq2lin(N,K,Q)
+%                  I=kq2lin(N,K,Q,idx_base)
 %
 % Parameters:
 %
-%       N   - matrix dimension, a scalar
+%         N   - matrix dimension, a scalar
 %
-%       K   - first index, positive integer
-%             array of any size
+%         K   - first index, positive integer
+%               array of any size
 %
-%       Q   - second index, positive integer
-%             array of the same size as K
+%         Q   - second index, positive integer
+%               array of the same size as K
+%
+%    idx_base - indexing base, 0 or 1 
 %
 % Outputs:
 %
-%       I   - linear serpentine index, an ar-
-%             ray of the same size as inputs
+%         I   - linear serpentine index, an ar-
+%               ray of the same size as inputs
 %
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=kq2lin.m>
 
-function I=kq2lin(N,K,Q)
+function I=kq2lin(N,K,Q,idx_base)
 
 % Check consistency
-grumble(N,K,Q);
+grumble(N,K,Q,idx_base);
 
 % Sepentine matrix
-S=serpentine(N);
+S=serpentine(N,idx_base);
 
 % Direct look-up
 I=zeros(size(K));
-for n=1:numel(K)
-    I(n)=S(K(n),Q(n));
+switch idx_base
+
+    case 0
+
+        % 0-base indexing
+        for n=1:numel(K)
+            I(n)=S(K(n)+1,Q(n)+1);
+        end
+
+    case 1
+        
+        % 1-base indexing
+        for n=1:numel(K)
+            I(n)=S(K(n),Q(n));
+        end
+
+    otherwise
+
+        % Complain and bomb out
+        error('unsupported indexing base.');
+
 end
 
 end
 
 % Consistency enforcement
-function grumble(N,K,Q)
+function grumble(N,K,Q,idx_base)
+if (~isnumeric(idx_base))||(~isreal(idx_base))||...
+   (~isscalar(idx_base))||(~ismember(idx_base,[0 1]))
+    error('idx_base must be 0 or 1.');
+end
 if ~isscalar(N), error('N must be a scalar.'); end
 if (~isnumeric(N))||(~isreal(N))||(mod(N,1)~=0)||...
    (~isnumeric(K))||(~isreal(K))||any(mod(K,1)~=0,'all')||...
    (~isnumeric(Q))||(~isreal(Q))||any(mod(Q,1)~=0,'all')
     error('all elements of the inputs must be real integers.');
 end
-if N<1, error('N must be a positive real integer.'); end
-if any(K<1,'all')||any(Q<1,'all')
-    error('elements of K and Q must be positive.');
+if N<idx_base
+    error('N cannot be smaller than the indexing base.');
+end
+if any(K<idx_base,'all')||any(Q<idx_base,'all')
+    error('K and Q cannot be smaller than the indexing base.');
 end
 if any(size(K)~=size(Q),'all')
     error('K and Q arrays must have the same size.');
 end
-if any(K>N,'all')||any(Q>N,'all')
-    error('K,Q overflow matrix dimension.');
+if any(K>(N-1+idx_base),'all')||...
+   any(Q>(N-1+idx_base),'all')
+    error('element(s) of K or Q overflow matrix dimension.');
 end
 end
 

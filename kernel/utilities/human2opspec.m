@@ -318,7 +318,7 @@ elseif iscell(operators)&&iscell(spins)
                     end
 
                     % Get linear state indices
-                    idx=kq2lin(nlevels,rows,cols);
+                    idx=kq2lin(nlevels,rows,cols,1);
 
                     % Update the state list
                     states=kron(idx,ones(size(opspecs,1),1));

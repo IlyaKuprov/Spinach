@@ -122,7 +122,7 @@ if isempty(ker)
 end
 end
 
-% In theory there is no difference between theory and
-% practice. In practice there is.
-%
-% Yogi Berra
+% In 1952, claims that smoking causes cancer led Kent
+% Cigarettes to introduce an asbestos filter to "pro-
+% tect" smokers. They called it "micronite filter".
+

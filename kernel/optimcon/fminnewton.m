@@ -169,8 +169,20 @@ for n=1:spin_system.control.max_iter
             
     end
     
-    % Run line search, refresh objective and gradient
+    % The normal process is line search in Newton / quasi-Newton descent direction 
     [alpha,fx,g,exitflag,data]=linesearch(spin_system,cost_function,dir,x,fx,g,data);
+    
+    % But sometimes
+    if exitflag==-2
+
+        % Use step length Newton / quasi-Newton had intended
+        norm_grad=norm(g.*(~frozen),2); norm_step=norm(dir);
+        dir=norm_step*(g.*(~frozen))/norm_grad;
+        
+        % When Hessian gets confused and sends us into a wall, search down the gradient
+        [alpha,fx,g,exitflag,data]=linesearch(spin_system,cost_function,dir,x,fx,g,data);
+        
+    end
     
     % Report diagnostics to user
     itrep(spin_system,fx,g,alpha,data); 
@@ -324,4 +336,3 @@ end
 % sublimity; they see the monster, they do not see the prodigy.
 %
 % Victor Hugo - Ninety-three
-

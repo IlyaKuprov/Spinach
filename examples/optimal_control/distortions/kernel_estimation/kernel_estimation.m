@@ -12,9 +12,9 @@ function kernel_estimation()
 load('xix_on_resonance.mat','time_ns','real_part','imag_part');
 
 % Plot the experimental data
-kfigure(); scale_figure([1.5 2.0]);
+kfigure(); scale_figure([1.5 1.5]);
 subplot(3,1,1); plot(time_ns,[real_part imag_part]);
-xlim tight; ylim padded; kgrid; kxlabel('time, ns');
+xlim([60 500]); ylim padded; kgrid; kxlabel('time, ns');
 kylabel('mV'); ktitle('HiPER instrument readout');
 
 % Make ideal XiX waveform with ten 36 ns periods
@@ -25,7 +25,7 @@ imag_ideal=zeros(1152,1);
 
 % Plot the ideal waveform
 subplot(3,1,2); plot(time_ns,[real_ideal imag_ideal]);
-xlim tight; ylim padded; kgrid; kxlabel('time, ns');
+xlim([60 500]); ylim padded; kgrid; kxlabel('time, ns');
 kylabel('a.u.'); ktitle('ideal XiX waveform');
 
 % Extract the kernel
@@ -36,12 +36,12 @@ h=kernelest(x,y,32,'tikh','causal',10);
 % Compute and plot the convolution
 y=conv(x,h); y=y(1:numel(x));
 subplot(3,1,3); plot(time_ns,[real(y) imag(y)]);
-xlim tight; ylim padded; kgrid; kxlabel('time, ns');
+xlim([60 500]); ylim padded; kgrid; kxlabel('time, ns');
 kylabel('mV'); ktitle('ideal + filter function');
 
 % Plot the kernel
-kfigure(); scale_figure([1.5 0.75]);
-time_axis=0.5*(0:31)'; subplot(1,2,1); 
+kfigure(); scale_figure([0.75 1.5]);
+time_axis=0.5*(0:31)'; subplot(2,1,1); 
 plot(time_axis,[real(h) imag(h)]);
 xlim tight; ylim padded; kgrid;
 ktitle('HiPER filter function kernel');
@@ -50,7 +50,7 @@ kxlabel('time, ns'); kylabel('mV');
 % Plot the frequency response
 h=abs(fftshift(fft(h,128)));
 freq_axis=fft_freq_axis(32,0.5,128-32);
-subplot(1,2,2); plot(freq_axis,h);
+subplot(2,1,2); plot(freq_axis,h);
 xlim tight; ylim padded; kgrid;
 ktitle('HiPER frequency response');
 kxlabel('frequency, GHz'); 

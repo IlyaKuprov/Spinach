@@ -10,7 +10,7 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Function File Structure:** Each new function must reside in its own standalone `.m` file. Use four spaces for indentation (no tabs).
 
-* **Naming Conventions:** Use descriptive, all-lowercase names with underscores for all variables and function names. For example, follow naming patterns seen in the codebase such as `zeeman_isotropic`, `spin_system`, or `norm_estimate`. Never use capital letters or ambiguous names. Variable and function names should not be longer than 20 characters; use abbreviations as necessary to make this possible.
+* **Naming Conventions:** Use descriptive, abbreviated, all-lowercase names with underscores for variables and function names. One-letter variables commonly used in physics textbooks to denote operators or matrices (H, R, K, P, Q) are premitted and should be capitalised, all other variables should be descriptive and lowercase. For example, follow naming patterns seen in the codebase such as `zeeman_iso`, `spin_system`, or `norm_est`. Avoid ambiguous variable names. Variable and function names should not be longer than 20 characters; use abbreviations as necessary to make this possible.
 
 * **Code Comments:** Above every conceptually distinct operation performed in the code, write a one-line comment explaining the purpose of the operation. Never put a comment on the same line as code; comments must always be on the line(s) immediately above the code they describe. Each comment block must be preceded by a blank line.
 

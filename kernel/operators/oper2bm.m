@@ -29,6 +29,7 @@ grumble(A);
 
 % Bosonic monomials
 BM=boson_mono(size(A,1));
+nlevels=size(A,1);
 
 % Compute the overlap matrix
 S=zeros(nlevels^2,nlevels^2);
@@ -41,7 +42,7 @@ end
 % Get the expansion coefficients
 coeffs=zeros(nlevels^2,1);
 for n=1:nlevels^2
-    coeffs(n)=hdot(BM{n},P);
+    coeffs(n)=hdot(BM{n},A);
 end
 coeffs=S\full(coeffs);
 
@@ -67,4 +68,3 @@ end
 % instructor of all may be pain.
 %
 % Frank Herbert, in the Dune series
-

@@ -8,11 +8,11 @@
 
 All code contributions must follow *Spinach*’s existing coding style and structure. When writing code, adhere to the following rules without exception:
 
-* **Function File Structure:** Each new function must reside in its own standalone `.m` file. Use four spaces for indentation (no tabs).
+* **Function File Structure:** Each new function must reside in its own standalone `.m` file. Use four spaces for indentation (no tabs). Function file must end with two blank lines.
 
 * **Naming Conventions:** Use descriptive, abbreviated, all-lowercase names with underscores for variables and function names. One-letter variables commonly used in physics textbooks to denote operators or matrices (H, R, K, P, Q) are premitted and should be capitalised, all other variables should be descriptive and lowercase. For example, follow naming patterns seen in the codebase such as `zeeman_iso`, `spin_system`, or `norm_est`. Avoid ambiguous variable names. Variable and function names should not be longer than 20 characters; use abbreviations as necessary to make this possible.
 
-* **Code Comments:** Above every conceptually distinct operation performed in the code, write a one-line comment explaining the purpose of the operation. Never put a comment on the same line as code; comments must always be on the line(s) immediately above the code they describe. Each comment block must be preceded by a blank line.
+* **Code Comments:** Above every conceptually distinct operation performed in the code, write a one-line comment explaining the purpose of the operation. Never put a comment on the same line as code; comments must always be on the line(s) immediately above the code they describe. Each comment block must be preceded by a blank line. If the comment only contans one sentence, omit the full stop at the end of the sentence.
 
 * **Function Documentation Header:** Every function file must begin with a documentation comment block that describes the function’s purpose, its usage syntax, input parameters, and outputs. Always format this documentation header exactly as seen in existing functions (refer to the `kernel` and `experiments` directories for examples). Do not omit any expected sections in the header.
 

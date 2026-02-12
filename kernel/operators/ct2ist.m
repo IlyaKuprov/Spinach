@@ -30,19 +30,11 @@ function [states,coeffs]=ct2ist(mult,type)
 % Check consistency
 grumble(mult,type);
 
-% CT operator in the Zeeman basis
+% Get the CT operator
 CT_Z=centrans(mult,type);
 
-% Spherical tensors in Zeeman basis
-IST_Z=irr_sph_ten(mult);
-
-% Compute all expansion coefficients and list all states
-coeffs=cellfun(@(A)trace(A'*CT_Z)/trace(A'*A),IST_Z);
-states=transpose(0:(numel(IST_Z)-1));
-
-% Drop negligible states
-idx=(abs(coeffs)>10*eps('double'));
-coeffs=coeffs(idx); states=states(idx);
+% Run IST expansion
+[states,coeffs]=oper2ist(CT_Z);
 
 end
 

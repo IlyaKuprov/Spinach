@@ -34,16 +34,8 @@ grumble(mult,lvl_num);
 P=zeros(mult,mult); 
 P(mult-lvl_num+1,mult-lvl_num+1)=1;
 
-% Spherical tensors
-IST=irr_sph_ten(mult);
-
-% Get all expansion coefficients and list all states
-coeffs=cellfun(@(A)trace(A'*P)/trace(A'*A),IST);
-states=transpose(0:(numel(IST)-1));
-
-% Drop negligible states
-idx=(abs(coeffs)>10*eps('double'));
-coeffs=coeffs(idx); states=states(idx);
+% Spherical tensor expansion
+[states,coeffs]=oper2ist(P);
 
 end
 

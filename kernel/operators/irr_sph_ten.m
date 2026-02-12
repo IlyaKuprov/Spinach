@@ -5,7 +5,7 @@
 % 
 % Syntax:
 %
-%                     T=irr_sph_ten(mult,k)
+%                    T=irr_sph_ten(mult,k)
 %
 % Parameters:
 %

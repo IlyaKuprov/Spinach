@@ -1,15 +1,15 @@
-% Bosonic monomial operators of a specified maximum power:
+% Bosonic monomial operators of the following structure:
 %
-%                     B(k,q)=(Cr^k)*(An^q)
+%                  B(k,q)=(Cr^k)*(An^q)
 %
 % obeying the following commutation relations with the po-
 % pulation number operator N:
 %
-%                   [N,B(k,q)]=(k-q)*B(k,q)
+%                [N,B(k,q)]=(k-q)*B(k,q)
 % 
 % Syntax:
 %
-%                    B=boson_mono(nlevels)
+%                 B=boson_mono(nlevels)
 %
 % Parameters:
 %

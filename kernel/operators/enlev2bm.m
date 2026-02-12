@@ -34,30 +34,8 @@ grumble(nlevels,lvl_num);
 P=zeros(nlevels,nlevels); 
 P(lvl_num,lvl_num)=1;
 
-% Bosonic monomials
-BM=boson_mono(nlevels);
-
-% Compute the overlap matrix
-S=zeros(nlevels^2,nlevels^2);
-for n=1:nlevels^2
-    for k=1:nlevels^2
-        S(n,k)=hdot(BM{n},BM{k});
-    end
-end
-
-% Get the expansion coefficients
-coeffs=zeros(nlevels^2,1);
-for n=1:nlevels^2
-    coeffs(n)=hdot(BM{n},P);
-end
-coeffs=S\full(coeffs);
-
-% List the states
-states=transpose(0:(numel(BM)-1));
-
-% Drop negligible states
-idx=(abs(coeffs)>10*eps('double'));
-coeffs=coeffs(idx); states=states(idx);
+% Bosonic monomial expansion
+[states,coeffs]=oper2bm(P);
 
 end
 

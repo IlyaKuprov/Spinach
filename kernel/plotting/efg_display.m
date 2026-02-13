@@ -59,6 +59,9 @@
 %    options.numbers  - set to true() to display atom
 %                       numbers
 %
+%    options.symbols  - set to false() to not display
+%                       atom symbols
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=efg_display.m>

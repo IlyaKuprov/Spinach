@@ -1,6 +1,6 @@
-% Refines a previously found step bracket by repeated interval
-% bisection until a step satisfying Wolfe tests is found or the
-% bracket collapses. Syntax:
+% Refines a previously found step bracket by repeated cubic
+% interpolation until a step satisfying Wolfe tests is found
+% or the bracket collapses below numerical accuracy. Syntax:
 %
 %   [alpha,fx_1,gfx_1,exitflag,data]=...
 %         sectioning(cost_function,A,B,x_0,fx_0,gfx_0,...
@@ -58,12 +58,22 @@ if ~isempty(spin_system.control.freeze)
     gfx_0=gfx_0.*(~spin_system.control.freeze(:));
 end
 
-% Iterate until Wolfe conditions 
-% pass or the bracket collapses
+% Iterate until Wolfe conditions pass or bracket collapses
 while true
 
-    % Simple interval bisection
-    alpha=(a.alpha+b.alpha)/2;
+    % Build reduced interpolation bounds inside the bracket
+    end_a=a.alpha+spin_system.control.ls_tau2*(b.alpha-a.alpha);
+    end_b=b.alpha-spin_system.control.ls_tau3*(b.alpha-a.alpha);
+
+    % Maximise cubic model inside reduced interpolation bounds
+    alpha=cubic_interp(end_a,end_b,a.alpha,b.alpha,...
+                       a.fx,a.gfx'*dir,b.fx,b.gfx'*dir);
+
+    % Stop when interpolation displacement is numerically unresolved
+    if abs((alpha-a.alpha)*(a.gfx'*dir))<eps(max(1,abs(a.fx)))
+        exitflag=-2; alpha=a.alpha;
+        fx_1=a.fx; gfx_1=a.gfx; return;
+    end
 
     % Evaluate objective and gradient at current trial step
     [data,fx_1,gfx_1]=objeval(x_0+alpha*dir,cost_function,data,spin_system);
@@ -73,12 +83,12 @@ while true
         gfx_1=gfx_1.*(~spin_system.control.freeze(:));
     end
 
-    % Save lower bracket endpoint
-    lower_bracket_endpoint=a;
+    % Store current lower bracket endpoint before updates
+    tmp=a;
 
     % Update bracket based on Armijo and monotonicity tests
     if (~alpha_conds(1,alpha,fx_0,fx_1,gfx_0,gfx_1,dir,spin_system))||...
-       (~alpha_conds(0,[],a.fx,fx_1,[],[],[],[]))
+       (~alpha_conds(0,alpha,a.fx,fx_1,a.gfx,gfx_1,dir,spin_system))
 
         % Move upper bracket endpoint to current trial step
         b.alpha=alpha; b.fx=fx_1; b.gfx=gfx_1;
@@ -95,24 +105,15 @@ while true
 
         % Swap upper endpoint when derivative sign condition fails
         if (a.alpha-b.alpha)*(gfx_1'*dir)>=0
-            b=lower_bracket_endpoint;
+            b=tmp;
         end
 
     end
 
-    % Terminate when bracket width becomes too small
+    % Terminate when bracket width is numerically unresolved
     if abs((b.alpha-a.alpha)*(a.gfx'*dir))<eps(max(1,abs(a.fx)))
-
-        % Current point is final
-        alpha=a.alpha; fx_1=a.fx; gfx_1=a.gfx;
-
-        % Keep improvements, otherwise terminate
-        if alpha_conds(0,[],fx_0,fx_1,[],[],[],[])
-            exitflag=0; return;
-        else
-            exitflag=-2; return;
-        end
-
+        alpha=a.alpha; fx_1=a.fx;
+        gfx_1=a.gfx; exitflag=-2; return;
     end
 
 end

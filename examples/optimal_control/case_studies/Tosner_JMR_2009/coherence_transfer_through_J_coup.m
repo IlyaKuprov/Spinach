@@ -88,7 +88,7 @@ guess      = rand(n_channels, n_t_steps); % Random initial guess
 
 % Optimisation
 spin_system = optimcon(spin_system, control);
-xy_profile  = fminnewton(spin_system, @grape_xy, guess);
+xy_profile  = fmaxnewton(spin_system, @grape_xy, guess);
 
 t = ((1:n_t_steps)-0.5)*dt;  % time axis (s)
 

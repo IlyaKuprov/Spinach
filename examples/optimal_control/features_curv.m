@@ -79,7 +79,7 @@ dx_du=@(u)[      cos(u(2))      sin(u(2))
 guess_u=[ones(1,50); (pi/2)*randn(1,50)];
        
 % Run LBFGS GRAPE pulse optimisation
-curv_profile=fminnewton(spin_system,@(x,y)grape_curv(x,u2x,dx_du,y),guess_u);
+curv_profile=fmaxnewton(spin_system,@(x,y)grape_curv(x,u2x,dx_du,y),guess_u);
 
 % Get Cartesian components of the pulse
 cart_profile=zeros(size(curv_profile));

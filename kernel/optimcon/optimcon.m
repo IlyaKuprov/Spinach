@@ -679,7 +679,7 @@ end
 % Process freeze mask
 if isfield(control,'freeze')
 
-    % Store the mask (validated in fminnewton)
+    % Store the mask (validated in fmaxnewton)
     spin_system.control.freeze=logical(control.freeze);
     control=rmfield(control,'freeze');
     

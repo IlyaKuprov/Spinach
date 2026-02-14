@@ -73,7 +73,7 @@ guess=randn(2,100);
 spin_system=optimcon(spin_system,control);
 
 % Optimisation
-[~,data]=fminnewton(spin_system,@grape_coop,guess);
+[~,data]=fmaxnewton(spin_system,@grape_coop,guess);
 
 % Pull out final states
 outcome_a=data.traj_data{1}{1}.forward(:,end);

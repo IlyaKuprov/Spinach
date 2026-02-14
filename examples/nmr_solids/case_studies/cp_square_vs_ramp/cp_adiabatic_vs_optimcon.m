@@ -97,7 +97,7 @@ spin_system=optimcon(spin_system,control);
 guess=[ramp_down; ramp_up];
 
 % Run the optimisation
-pulse=fminnewton(spin_system,@grape_xy,guess);
+pulse=fmaxnewton(spin_system,@grape_xy,guess);
 
 % Simulate GRAPE CP
 parameters.irr_powers=5e4*pulse;
@@ -122,7 +122,7 @@ control.pulse_dt=parameters.time_steps;
 spin_system=optimcon(spin_system,control);
 
 % Re-run the optimisation
-pulse=fminnewton(spin_system,@grape_xy,guess);
+pulse=fmaxnewton(spin_system,@grape_xy,guess);
 
 % Simulate GRAPE CP
 parameters.irr_powers=5e4*pulse;

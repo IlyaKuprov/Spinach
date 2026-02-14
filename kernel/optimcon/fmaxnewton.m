@@ -1,8 +1,7 @@
-% Finds a local minimum of a function of several variables using Newton
-% and quasi-Newton algorithms. Based on fminlbfgs.m code from D. Kroon,
-% University of Twente. Syntax:
+% Finds a local maximum of a function of several variables using Newton
+% and quasi-Newton algorithms. Syntax:
 %
-%          [x,data]=fminnewton(spin_system,cost_function,guess)
+%          [x,data]=fmaxnewton(spin_system,cost_function,guess)
 %
 % Parameters:
 %
@@ -36,9 +35,9 @@
 % david.goodwin@inano.au.dk
 % ilya.kuprov@weizmann.ac.il
 %
-% <https://spindynamics.org/wiki/index.php?title=fminnewton.m>
+% <https://spindynamics.org/wiki/index.php?title=fmaxnewton.m>
 
-function [x,data]=fminnewton(spin_system,cost_function,guess)
+function [x,data]=fmaxnewton(spin_system,cost_function,guess)
 
 % Check consistency
 grumble(spin_system,cost_function,guess);

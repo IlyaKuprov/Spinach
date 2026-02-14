@@ -87,7 +87,7 @@ guess = rand(n_channels, n_t_steps);
 
 % Optimisation
 spin_system = optimcon(spin_system, control);
-xy_profile  = fminnewton(spin_system, @grape_xy, guess);
+xy_profile  = fmaxnewton(spin_system, @grape_xy, guess);
 
 % Convert normalised waveform to physical rad/s controls
 CLx = control.pwr_levels*xy_profile(1,:);

@@ -84,7 +84,7 @@ pulse=0.05*[cos(2*pi*300*time_axis);
             ones(size(time_axis))/2];
 
 % Run the optimisation, get normalised pulse
-pulse=fminnewton(spin_system,@grape_xy,pulse);
+pulse=fmaxnewton(spin_system,@grape_xy,pulse);
 
 %% Simple pulse-acquire
 

@@ -10,7 +10,7 @@
 %    objfun_handle      - handle to the objective function
 %    
 %    data               - data structure inherited from 
-%                         fminnewton.m
+%                         fmaxnewton.m
 %
 % Outputs:
 %

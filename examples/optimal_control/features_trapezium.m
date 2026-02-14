@@ -82,7 +82,7 @@ spin_system=optimcon(spin_system,control);
 guess=randn(6,51)/3;   
 
 % Run the optimal control procedure
-pulse=fminnewton(spin_system,@grape_xy,guess);
+pulse=fmaxnewton(spin_system,@grape_xy,guess);
 
 % Denormalise the waveform
 pulse=pulse*mean(control.pwr_levels);

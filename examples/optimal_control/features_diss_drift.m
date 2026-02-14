@@ -117,7 +117,7 @@ guess(2,1:20)=0.25;
 guess(4,(end-20):end)=0.25;
 
 % Run the optimisation
-pulse=fminnewton(spin_system,@grape_xy,guess);
+pulse=fmaxnewton(spin_system,@grape_xy,guess);
 
 % Apply power level scaling
 pulse=mean(control.pwr_levels)*pulse;

@@ -82,7 +82,7 @@ spin_system=optimcon(spin_system,control);
 guess=randn(4,100)/10;
 
 % Run the optimisation, get normalised pulse
-pulse=fminnewton(spin_system,@grape_xy,guess);
+pulse=fmaxnewton(spin_system,@grape_xy,guess);
 
 % Apply power level scaling
 pulse=mean(control.pwr_levels)*pulse;

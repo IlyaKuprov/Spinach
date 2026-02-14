@@ -87,7 +87,7 @@ spin_system=optimcon(spin_system,control);
 guess=randn(2,100)/10;
 
 % Run the optimisation
-pulse_profile=fminnewton(spin_system,@grape_xy,guess);
+pulse_profile=fmaxnewton(spin_system,@grape_xy,guess);
 
 % Get Cartesian components of the pulse
 CLx=mean(control.pwr_levels)*pulse_profile(1,:);

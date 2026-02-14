@@ -79,7 +79,7 @@ spin_system=optimcon(spin_system,control);
 guess=(1/4)*ones(2,40);
 
 % GRAPE optimisation
-xy_profile=fminnewton(spin_system,@grape_xy,guess);
+xy_profile=fmaxnewton(spin_system,@grape_xy,guess);
 
 % Extract the waveform
 xy_profile=mean(control.pwr_levels)*xy_profile;

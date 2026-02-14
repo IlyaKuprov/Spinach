@@ -66,7 +66,7 @@ guess=randn(2,600)/10;
 
 % Optimisation
 spin_system=optimcon(spin_system,control);
-xy_profile=fminnewton(spin_system,@grape_xy,guess);
+xy_profile=fmaxnewton(spin_system,@grape_xy,guess);
 
 % Return to physical units
 rf_scale=mean(control.pwr_levels);

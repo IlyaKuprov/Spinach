@@ -75,7 +75,7 @@ guess=(pi/4)*ones(1,250);
 spin_system=optimcon(spin_system,control);
 
 % Run LBFGS GRAPE pulse optimisation
-phi_profile=fminnewton(spin_system,@grape_phase,guess);
+phi_profile=fmaxnewton(spin_system,@grape_phase,guess);
 
 % Loop over the power levels
 X=zeros(1,128); Z=zeros(1,128);

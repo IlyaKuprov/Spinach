@@ -90,7 +90,7 @@ control.plotting={'correlation_order','local_each_spin',...
 spin_system=optimcon(spin_system,control);
 
 % Run the optimisation from a random guess
-pulse=fminnewton(spin_system,@grape_xy,randn(4,275)/3);
+pulse=fmaxnewton(spin_system,@grape_xy,randn(4,275)/3);
 
 % Denormalise and format the waveform
 pulse=pulse*control.pwr_levels;

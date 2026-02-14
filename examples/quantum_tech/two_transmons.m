@@ -82,7 +82,7 @@ spin_system=optimcon(spin_system,control);
 pulse=(1/10)*randn(2,100);
 
 % Run the optimisation, get normalised pulse
-fminnewton(spin_system,@grape_xy,pulse);
+fmaxnewton(spin_system,@grape_xy,pulse);
 
 end
 

@@ -79,7 +79,7 @@ guess=(pi/5)*ones(1,60);
 spin_system=optimcon(spin_system,control);
 
 % Run LBFGS GRAPE pulse optimisation
-phi_profile=fminnewton(spin_system,@grape_phase,guess);
+phi_profile=fmaxnewton(spin_system,@grape_phase,guess);
 
 % Get Cartesian components of the pulse
 amp_profile=mean(control.pwr_levels)*control.amplitudes;

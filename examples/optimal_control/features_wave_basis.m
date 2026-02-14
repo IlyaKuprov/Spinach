@@ -75,7 +75,7 @@ guess=randn(2,20)/20;
 spin_system=optimcon(spin_system,control);
 
 % Run LBFGS GRAPE pulse optimisation
-basis_coeffs=fminnewton(spin_system,@grape_xy,guess);
+basis_coeffs=fmaxnewton(spin_system,@grape_xy,guess);
 
 % Reassemble time-domain control sequence
 pulse=mean(control.pwr_levels)*basis_coeffs*control.basis;

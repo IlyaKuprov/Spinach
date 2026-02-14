@@ -80,7 +80,7 @@ control.plotting={'xy_controls','robustness','spectrogram'};
 spin_system=optimcon(spin_system,control);
 
 % Run the LBFGS-GRAPE algorithm
-xy_profile=fminnewton(spin_system,@grape_xy,guess);
+xy_profile=fmaxnewton(spin_system,@grape_xy,guess);
 
 % Benchmark arrays
 sat_factor=linspace(0.5,1.5,41); figure(2);

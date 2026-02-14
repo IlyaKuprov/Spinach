@@ -82,7 +82,7 @@ guess=pi/2*ones(1,100);
 spin_system=optimcon(spin_system,control);
 
 % Run the optimisation
-pulse=fminnewton(spin_system,@grape_phase,guess);
+pulse=fmaxnewton(spin_system,@grape_phase,guess);
 
 % Construct Cartesian waveform
 pulse_x=mean(control.pwr_levels)*cos(pulse);

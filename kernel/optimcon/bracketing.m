@@ -4,8 +4,9 @@
 %
 % Syntax:
 %
-%    [A,B,alpha,fx,gfx,next_act,data]=bracketing(cost_function,...
-%                              alpha,dir,x_0,fx_0,gfx_0,data,spin_system)
+%    [A,B,alpha,fx,gfx,next_act,data]=...
+%                bracketing(cost_function,alpha,dir,x_0,fx_0,...
+%                           gfx_0,data,spin_system)
 %
 % Arguments:
 %
@@ -48,17 +49,18 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=bracketing.m>
 
-function [A,B,alpha,fx,gfx,next_act,data]=bracketing(cost_function,alpha,dir,x_0,fx_0,gfx_0,data,spin_system)
+function [a,b,alpha,fx,gfx,next_act,data]=bracketing(cost_function,alpha,dir,x_0,...
+                                                     fx_0,gfx_0,data,spin_system)
 
 % Check consistency
-grumble(cost_function,alpha,dir,x_0,fx_0,gfx_0,data,spin_system);
+grumble(cost_function,alpha,dir,x_0,fx_0,gfx_0);
 
 % Evaluate objective and gradient at the first trial point
 [data,fx_2,gfx_2]=objeval(x_0+dir,cost_function,data,spin_system);
 
 % Initialise empty bracket records
-A.alpha=[]; A.fx=[]; A.gfx=[];
-B.alpha=[]; B.fx=[]; B.gfx=[];
+a.alpha=[]; a.fx=[]; a.gfx=[];
+b.alpha=[]; b.fx=[]; b.gfx=[];
 
 % Apply coordinate freezing mask when requested
 if ~isempty(spin_system.control.freeze)
@@ -80,8 +82,8 @@ while true
        (~alpha_conds(0,[],fx_1,fx_2,[],[],[],spin_system))
 
         % Store current interval endpoints
-        A.alpha=alpha_1; A.fx=fx_1; A.gfx=gfx_1;
-        B.alpha=alpha_2; B.fx=fx_2; B.gfx=gfx_2;
+        a.alpha=alpha_1; a.fx=fx_1; a.gfx=gfx_1;
+        b.alpha=alpha_2; b.fx=fx_2; b.gfx=gfx_2;
 
         % Hand over to sectioning stage
         next_act='sectioning'; return;
@@ -103,8 +105,8 @@ while true
     if ~alpha_conds(3,[],[],[],[],gfx_2,dir,spin_system)
 
         % Store current interval endpoints
-        A.alpha=alpha_2; A.fx=fx_2; A.gfx=gfx_2;
-        B.alpha=alpha_1; B.fx=fx_1; B.gfx=gfx_1;
+        a.alpha=alpha_2; a.fx=fx_2; a.gfx=gfx_2;
+        b.alpha=alpha_1; b.fx=fx_1; b.gfx=gfx_1;
 
         % Hand over to sectioning stage
         next_act='sectioning'; return;
@@ -116,7 +118,8 @@ while true
     br_end_pt_B=alpha_2+spin_system.control.ls_tau1*(alpha_2-alpha_1);
 
     % Maximise the cubic model inside interpolation bounds
-    alpha_new=cubic_interp(br_end_pt_A,br_end_pt_B,alpha_1,alpha_2,fx_1,gfx_1'*dir,fx_2,gfx_2'*dir);
+    alpha_new=cubic_interp(br_end_pt_A,br_end_pt_B,alpha_1,alpha_2,...
+                           fx_1,gfx_1'*dir,fx_2,gfx_2'*dir);
 
     % Shift history to the new trial point
     alpha_1=alpha_2; alpha_2=alpha_new;
@@ -135,7 +138,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(cost_function,alpha,dir,x_0,fx_0,gfx_0,data,spin_system)
+function grumble(cost_function,alpha,dir,x_0,fx_0,gfx_0)
 if ~isa(cost_function,'function_handle')
     error('cost_function must be a function handle.');
 end
@@ -157,26 +160,9 @@ end
 if ~isequal(size(dir),size(x_0),size(gfx_0))
     error('dir, x_0, and gfx_0 must have matching dimensions.');
 end
-if ~isstruct(data)
-    error('data must be a structure.');
-end
-if (~isstruct(spin_system))||(~isfield(spin_system,'control'))
-    error('spin_system.control must be present.');
-end
-if (~isfield(spin_system.control,'ls_tau1'))||(~isnumeric(spin_system.control.ls_tau1))||...
-   (~isreal(spin_system.control.ls_tau1))||(~isscalar(spin_system.control.ls_tau1))
-    error('spin_system.control.ls_tau1 must be a real scalar.');
-end
-if ~isfield(spin_system.control,'freeze')
-    error('spin_system.control.freeze must be present.');
-end
-if ~isempty(spin_system.control.freeze)
-    if (~islogical(spin_system.control.freeze))||...
-       (~isvector(spin_system.control.freeze))||...
-       (numel(spin_system.control.freeze)~=numel(dir))
-        error('spin_system.control.freeze must be a logical vector matching dir length.');
-    end
-end
 end
 
+% Одной рукой бунтую, другой пишу донос.
+%
+% Михаил Щербаков
 

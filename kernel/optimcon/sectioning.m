@@ -1,20 +1,19 @@
 % Refines a previously found step bracket by repeated cubic
 % interpolation until a step satisfying Wolfe tests is found
-% or the bracket collapses below numerical resolution.
+% or the bracket collapses below numerical accuracy. Syntax:
 %
-% Syntax:
-%
-%   [alpha,fx_1,gfx_1,exitflag,data]=sectioning(cost_function,...
-%                      A,B,x_0,fx_0,gfx_0,dir,data,spin_system)
+%   [alpha,fx_1,gfx_1,exitflag,data]=...
+%         sectioning(cost_function,A,B,x_0,fx_0,gfx_0,...
+%                    dir,data,spin_system)
 %
 % Arguments:
 %
 %    cost_function     - objective function handle
 %
-%    A                 - lower bracket structure with
+%    a                 - lower bracket structure with
 %                        fields alpha, fx, and gfx
 %
-%    B                 - upper bracket structure with
+%    b                 - upper bracket structure with
 %                        fields alpha, fx, and gfx
 %
 %    x_0               - current optimisation vector
@@ -47,10 +46,11 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=sectioning.m>
 
-function [alpha,fx_1,gfx_1,exitflag,data]=sectioning(cost_function,A,B,x_0,fx_0,gfx_0,dir,data,spin_system)
+function [alpha,fx_1,gfx_1,exitflag,data]=sectioning(cost_function,a,b,x_0,fx_0,...
+                                                     gfx_0,dir,data,spin_system)
 
 % Check consistency
-grumble(cost_function,A,B,x_0,fx_0,gfx_0,dir,data,spin_system);
+grumble(cost_function,a,b,x_0,fx_0,gfx_0,dir);
 
 % Apply coordinate freezing mask when requested
 if ~isempty(spin_system.control.freeze)
@@ -62,14 +62,15 @@ end
 while true
 
     % Build reduced interpolation bounds inside the bracket
-    end_A=A.alpha+spin_system.control.ls_tau2*(B.alpha-A.alpha);
-    end_B=B.alpha-spin_system.control.ls_tau3*(B.alpha-A.alpha);
+    end_A=a.alpha+spin_system.control.ls_tau2*(b.alpha-a.alpha);
+    end_B=b.alpha-spin_system.control.ls_tau3*(b.alpha-a.alpha);
 
     % Maximise cubic model inside reduced interpolation bounds
-    alpha=cubic_interp(end_A,end_B,A.alpha,B.alpha,A.fx,A.gfx'*dir,B.fx,B.gfx'*dir);
+    alpha=cubic_interp(end_A,end_B,a.alpha,b.alpha,...
+                       a.fx,a.gfx'*dir,b.fx,b.gfx'*dir);
 
     % Stop when interpolation displacement is numerically unresolved
-    if abs((alpha-A.alpha)*(A.gfx'*dir))<=eps(max(1,abs(fx_0)))
+    if abs((alpha-a.alpha)*(a.gfx'*dir))<=eps(max(1,abs(fx_0)))
         exitflag=-2; return;
     end
 
@@ -82,14 +83,14 @@ while true
     end
 
     % Store current lower bracket endpoint before updates
-    tmp=A;
+    tmp=a;
 
     % Update bracket based on Armijo and monotonicity tests
     if (~alpha_conds(1,alpha,fx_0,fx_1,gfx_0,gfx_1,dir,spin_system))||...
-       (~alpha_conds(0,alpha,A.fx,fx_1,A.gfx,gfx_1,dir,spin_system))
+       (~alpha_conds(0,alpha,a.fx,fx_1,a.gfx,gfx_1,dir,spin_system))
 
         % Move upper bracket endpoint to current trial step
-        B.alpha=alpha; B.fx=fx_1; B.gfx=gfx_1;
+        b.alpha=alpha; b.fx=fx_1; b.gfx=gfx_1;
 
     else
 
@@ -99,19 +100,19 @@ while true
         end
 
         % Move lower bracket endpoint to current trial step
-        A.alpha=alpha; A.fx=fx_1; A.gfx=gfx_1;
+        a.alpha=alpha; a.fx=fx_1; a.gfx=gfx_1;
 
         % Swap upper endpoint when derivative sign condition fails
-        if (A.alpha-B.alpha)*(gfx_1'*dir)>=0
-            B=tmp;
+        if (a.alpha-b.alpha)*(gfx_1'*dir)>=0
+            b=tmp;
         end
 
     end
 
     % Terminate when bracket width falls below machine precision
-    if abs(B.alpha-A.alpha)<eps
-        alpha=A.alpha; fx_1=A.fx;
-        gfx_1=A.gfx; exitflag=-2; return;
+    if abs(b.alpha-a.alpha)<eps
+        alpha=a.alpha; fx_1=a.fx;
+        gfx_1=a.gfx; exitflag=-2; return;
     end
 
 end
@@ -119,38 +120,38 @@ end
 end
 
 % Consistency enforcement
-function grumble(cost_function,A,B,x_0,fx_0,gfx_0,dir,data,spin_system)
+function grumble(cost_function,a,b,x_0,fx_0,gfx_0,dir)
 if ~isa(cost_function,'function_handle')
     error('cost_function must be a function handle.');
 end
-if ~isstruct(A)
+if ~isstruct(a)
     error('A must be a structure.');
 end
-if ~isstruct(B)
+if ~isstruct(b)
     error('B must be a structure.');
 end
-if (~isfield(A,'alpha'))||(~isfield(A,'fx'))||(~isfield(A,'gfx'))
+if (~isfield(a,'alpha'))||(~isfield(a,'fx'))||(~isfield(a,'gfx'))
     error('A must contain alpha, fx, and gfx fields.');
 end
-if (~isfield(B,'alpha'))||(~isfield(B,'fx'))||(~isfield(B,'gfx'))
+if (~isfield(b,'alpha'))||(~isfield(b,'fx'))||(~isfield(b,'gfx'))
     error('B must contain alpha, fx, and gfx fields.');
 end
-if isempty(A.alpha)||(~isnumeric(A.alpha))||(~isreal(A.alpha))||(~isscalar(A.alpha))
+if isempty(a.alpha)||(~isnumeric(a.alpha))||(~isreal(a.alpha))||(~isscalar(a.alpha))
     error('A.alpha must be a real scalar.');
 end
-if isempty(B.alpha)||(~isnumeric(B.alpha))||(~isreal(B.alpha))||(~isscalar(B.alpha))
+if isempty(b.alpha)||(~isnumeric(b.alpha))||(~isreal(b.alpha))||(~isscalar(b.alpha))
     error('B.alpha must be a real scalar.');
 end
-if isempty(A.fx)||(~isnumeric(A.fx))||(~isreal(A.fx))||(~isscalar(A.fx))
+if isempty(a.fx)||(~isnumeric(a.fx))||(~isreal(a.fx))||(~isscalar(a.fx))
     error('A.fx must be a real scalar.');
 end
-if isempty(B.fx)||(~isnumeric(B.fx))||(~isreal(B.fx))||(~isscalar(B.fx))
+if isempty(b.fx)||(~isnumeric(b.fx))||(~isreal(b.fx))||(~isscalar(b.fx))
     error('B.fx must be a real scalar.');
 end
-if isempty(A.gfx)||(~isnumeric(A.gfx))||(~isreal(A.gfx))||(~iscolumn(A.gfx))
+if isempty(a.gfx)||(~isnumeric(a.gfx))||(~isreal(a.gfx))||(~iscolumn(a.gfx))
     error('A.gfx must be a real column vector.');
 end
-if isempty(B.gfx)||(~isnumeric(B.gfx))||(~isreal(B.gfx))||(~iscolumn(B.gfx))
+if isempty(b.gfx)||(~isnumeric(b.gfx))||(~isreal(b.gfx))||(~iscolumn(b.gfx))
     error('B.gfx must be a real column vector.');
 end
 if isempty(x_0)||(~isnumeric(x_0))||(~isreal(x_0))||(~iscolumn(x_0))
@@ -165,33 +166,16 @@ end
 if isempty(dir)||(~isnumeric(dir))||(~isreal(dir))||(~iscolumn(dir))
     error('dir must be a real column vector.');
 end
-if ~isequal(size(dir),size(x_0),size(gfx_0),size(A.gfx),size(B.gfx))
+if ~isequal(size(dir),size(x_0),size(gfx_0),size(a.gfx),size(b.gfx))
     error('all vectors must have matching dimensions.');
-end
-if ~isstruct(data)
-    error('data must be a structure.');
-end
-if (~isstruct(spin_system))||(~isfield(spin_system,'control'))
-    error('spin_system.control must be present.');
-end
-if (~isfield(spin_system.control,'ls_tau2'))||(~isnumeric(spin_system.control.ls_tau2))||...
-   (~isreal(spin_system.control.ls_tau2))||(~isscalar(spin_system.control.ls_tau2))
-    error('spin_system.control.ls_tau2 must be a real scalar.');
-end
-if (~isfield(spin_system.control,'ls_tau3'))||(~isnumeric(spin_system.control.ls_tau3))||...
-   (~isreal(spin_system.control.ls_tau3))||(~isscalar(spin_system.control.ls_tau3))
-    error('spin_system.control.ls_tau3 must be a real scalar.');
-end
-if ~isfield(spin_system.control,'freeze')
-    error('spin_system.control.freeze must be present.');
-end
-if ~isempty(spin_system.control.freeze)
-    if (~islogical(spin_system.control.freeze))||...
-       (~isvector(spin_system.control.freeze))||...
-       (numel(spin_system.control.freeze)~=numel(dir))
-        error('spin_system.control.freeze must be a logical vector matching dir length.');
-    end
 end
 end
 
+% A gentleman a few rows in front of us took grave
+% exception to the behaviour of an opposing player
+% and identified him, very loudly, as the author 
+% of the Critique of Pure Reason - repeatedly and
+% with venom.
+%
+% Rod Liddle, in The Spectator
 

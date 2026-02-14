@@ -9,7 +9,7 @@
 function kernel_estimation()
 
 % Read the experimental data
-load('xix_on_resonance.mat','time_ns','real_part','imag_part');
+load('xix_on_resonance_b.mat','time_ns','real_part','imag_part');
 
 % Plot the experimental data
 kfigure(); scale_figure([1.5 1.5]);

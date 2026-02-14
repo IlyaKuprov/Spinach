@@ -65,11 +65,10 @@ while true
     end_a=a.alpha+spin_system.control.ls_tau2*(b.alpha-a.alpha);
     end_b=b.alpha-spin_system.control.ls_tau3*(b.alpha-a.alpha);
 
-    % Maximise cubic model inside reduced interpolation bounds
-    alpha=cubic_interp(end_a,end_b,a.alpha,b.alpha,...
-                       a.fx,a.gfx'*dir,b.fx,b.gfx'*dir);
+    % Simple bisection
+    alpha=(end_a+end_b)/2;
 
-    % Stop when interpolation displacement is numerically unresolved
+    % Stop when displacement is numerically unresolved
     if abs((alpha-a.alpha)*(a.gfx'*dir))<eps(max(1,abs(a.fx)))
         exitflag=-2; alpha=a.alpha;
         fx_1=a.fx; gfx_1=a.gfx; return;

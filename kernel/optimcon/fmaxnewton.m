@@ -174,14 +174,6 @@ for n=1:spin_system.control.max_iter
             
     end
 
-    % Check the ascent direction
-    if g(~frozen)'*dir(~frozen)<=0
-
-        % Fall back to gradient
-        dir=g.*(~frozen);
-
-    end
-
     % If line search would be worthwhile, get a bracket [A B] of acceptable points
     [A,B,alpha,fx_new,g_new,next_act,data]=bracketing(cost_function,1,dir,x,fx,...
                                                       g.*(~frozen),data,spin_system);
@@ -189,7 +181,7 @@ for n=1:spin_system.control.max_iter
     % Run sectioning if necessary
     if strcmp(next_act,'sectioning')
     
-       % Find an acceptable point within the [A B] bracket    
+       % Try to find an acceptable (quasi-)Newton step within the [A B] bracket   
        [alpha,fx,g,exitflag,data]=sectioning(cost_function,A,B,x,fx,g.*(~frozen),...
                                              dir,data,spin_system);
 

@@ -61,18 +61,8 @@ end
 % Iterate until Wolfe conditions pass or bracket collapses
 while true
 
-    % Build reduced interpolation bounds inside the bracket
-    end_a=a.alpha+spin_system.control.ls_tau2*(b.alpha-a.alpha);
-    end_b=b.alpha-spin_system.control.ls_tau3*(b.alpha-a.alpha);
-
-    % Simple bisection
-    alpha=(end_a+end_b)/2;
-
-    % Stop when displacement is numerically unresolved
-    if abs((alpha-a.alpha)*(a.gfx'*dir))<eps(max(1,abs(a.fx)))
-        exitflag=-2; alpha=a.alpha;
-        fx_1=a.fx; gfx_1=a.gfx; return;
-    end
+    % Simple interval bisection
+    alpha=(a.alpha+b.alpha)/2;
 
     % Evaluate objective and gradient at current trial step
     [data,fx_1,gfx_1]=objeval(x_0+alpha*dir,cost_function,data,spin_system);
@@ -82,12 +72,12 @@ while true
         gfx_1=gfx_1.*(~spin_system.control.freeze(:));
     end
 
-    % Store current lower bracket endpoint before updates
-    tmp=a;
+    % Save lower bracket endpoint
+    lower_bracket_endpoint=a;
 
     % Update bracket based on Armijo and monotonicity tests
     if (~alpha_conds(1,alpha,fx_0,fx_1,gfx_0,gfx_1,dir,spin_system))||...
-       (~alpha_conds(0,alpha,a.fx,fx_1,a.gfx,gfx_1,dir,spin_system))
+       (~alpha_conds(0,[],a.fx,fx_1,[],[],[],[]))
 
         % Move upper bracket endpoint to current trial step
         b.alpha=alpha; b.fx=fx_1; b.gfx=gfx_1;
@@ -104,15 +94,24 @@ while true
 
         % Swap upper endpoint when derivative sign condition fails
         if (a.alpha-b.alpha)*(gfx_1'*dir)>=0
-            b=tmp;
+            b=lower_bracket_endpoint;
         end
 
     end
 
-    % Terminate when bracket width is numerically unresolved
+    % Terminate when bracket width becomes too small
     if abs((b.alpha-a.alpha)*(a.gfx'*dir))<eps(max(1,abs(a.fx)))
-        alpha=a.alpha; fx_1=a.fx;
-        gfx_1=a.gfx; exitflag=-2; return;
+
+        % Current point is final
+        alpha=a.alpha; fx_1=a.fx; gfx_1=a.gfx;
+
+        % Keep improvements, otherwise terminate
+        if alpha_conds(0,[],a.fx,fx_1,[],[],[],[])
+            exitflag=0; return;
+        else
+            exitflag=-2; return;
+        end
+
     end
 
 end

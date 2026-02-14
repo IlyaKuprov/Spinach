@@ -62,16 +62,17 @@ end
 while true
 
     % Build reduced interpolation bounds inside the bracket
-    end_A=a.alpha+spin_system.control.ls_tau2*(b.alpha-a.alpha);
-    end_B=b.alpha-spin_system.control.ls_tau3*(b.alpha-a.alpha);
+    end_a=a.alpha+spin_system.control.ls_tau2*(b.alpha-a.alpha);
+    end_b=b.alpha-spin_system.control.ls_tau3*(b.alpha-a.alpha);
 
     % Maximise cubic model inside reduced interpolation bounds
-    alpha=cubic_interp(end_A,end_B,a.alpha,b.alpha,...
+    alpha=cubic_interp(end_a,end_b,a.alpha,b.alpha,...
                        a.fx,a.gfx'*dir,b.fx,b.gfx'*dir);
 
     % Stop when interpolation displacement is numerically unresolved
-    if abs((alpha-a.alpha)*(a.gfx'*dir))<=eps(max(1,abs(fx_0)))
-        exitflag=-2; return;
+    if abs((alpha-a.alpha)*(a.gfx'*dir))<eps(max(1,abs(a.fx)))
+        exitflag=-2; alpha=a.alpha;
+        fx_1=a.fx; gfx_1=a.gfx; return;
     end
 
     % Evaluate objective and gradient at current trial step
@@ -109,8 +110,8 @@ while true
 
     end
 
-    % Terminate when bracket width falls below machine precision
-    if abs(b.alpha-a.alpha)<eps
+    % Terminate when bracket width is numerically unresolved
+    if abs((b.alpha-a.alpha)*(a.gfx'*dir))<eps(max(1,abs(a.fx)))
         alpha=a.alpha; fx_1=a.fx;
         gfx_1=a.gfx; exitflag=-2; return;
     end

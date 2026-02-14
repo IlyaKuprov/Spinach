@@ -174,6 +174,14 @@ for n=1:spin_system.control.max_iter
             
     end
 
+    % Check the ascent direction
+    if g(~frozen)'*dir(~frozen)<=0
+
+        % Fall back to gradient
+        dir=g.*(~frozen);
+
+    end
+
     % If line search would be worthwhile, get a bracket [A B] of acceptable points
     [A,B,alpha,fx_new,g_new,next_act,data]=bracketing(cost_function,1,dir,x,fx,...
                                                       g.*(~frozen),data,spin_system);
@@ -194,21 +202,37 @@ for n=1:spin_system.control.max_iter
 
     % Report diagnostics to user
     itrep(spin_system,fx,g,alpha,data);
-
-    % Save checkpoint
-    if isfield(spin_system.control,'checkpoint')
-        save([spin_system.sys.scratch filesep ... 
-              spin_system.control.checkpoint],'x','-v7.3','-nocompression');
-    end
                                          
-    % Update x if we plan to continue
-    if exitflag~=-2, x=x+alpha*dir; end
+    % If all good
+    if exitflag~=-2
+        
+        % Update x
+        x=x+alpha*dir; 
+
+        % Save checkpoint
+        if isfield(spin_system.control,'checkpoint')
+            save([spin_system.sys.scratch filesep ... 
+                  spin_system.control.checkpoint],'x','-v7.3','-nocompression');
+        end
+
+    end
     
-    % Check termination conditions
-    if norm(alpha*dir,1)<spin_system.control.tol_x
-        exitflag=2;
-    elseif norm(g(~frozen),2)<spin_system.control.tol_g
-        exitflag=1;
+    % If all good
+    if exitflag==0
+
+        % Check termination conditions
+        if norm(alpha*dir,1)<spin_system.control.tol_x
+
+            % Step size
+            exitflag=2;
+
+        elseif norm(g(~frozen),2)<spin_system.control.tol_g
+
+            % Grad norm
+            exitflag=1;
+
+        end
+
     end
 
     % Grab the frame

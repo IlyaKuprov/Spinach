@@ -55,19 +55,23 @@ function [a,b,alpha,fx,gfx,next_act,data]=bracketing(cost_function,alpha,dir,x_0
 % Check consistency
 grumble(cost_function,alpha,dir,x_0,fx_0,gfx_0);
 
-% Evaluate objective and gradient at the first trial point
-[data,fx_2,gfx_2]=objeval(x_0+dir,cost_function,data,spin_system);
-
-% Initialise empty bracket records
-a.alpha=[]; a.fx=[]; a.gfx=[];
-b.alpha=[]; b.fx=[]; b.gfx=[];
-
 % Apply coordinate freezing mask when requested
 if ~isempty(spin_system.control.freeze)
     dir=dir.*(~spin_system.control.freeze(:));
     gfx_0=gfx_0.*(~spin_system.control.freeze(:));
+end
+
+% Evaluate objective and gradient at the first trial point
+[data,fx_2,gfx_2]=objeval(x_0+alpha*dir,cost_function,data,spin_system);
+
+% Apply coordinate freezing mask when requested
+if ~isempty(spin_system.control.freeze)
     gfx_2=gfx_2.*(~spin_system.control.freeze(:));
 end
+
+% Initialise empty bracket records
+a.alpha=[]; a.fx=[]; a.gfx=[];
+b.alpha=[]; b.fx=[]; b.gfx=[];
 
 % Initialise bracketing history variables
 fx=fx_0; fx_1=fx_0;

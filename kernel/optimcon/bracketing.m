@@ -83,7 +83,7 @@ while true
 
     % Capture bracket when Armijo or monotonicity fails
     if (~alpha_conds(1,alpha_2,fx_0,fx_2,gfx_0,[],dir,spin_system))||...
-       (~alpha_conds(0,[],fx_1,fx_2,[],[],[],spin_system))
+       (~alpha_conds(0,[],fx_0,fx_2,[],[],[],spin_system))
 
         % Store current interval endpoints
         a.alpha=alpha_1; a.fx=fx_1; a.gfx=gfx_1;

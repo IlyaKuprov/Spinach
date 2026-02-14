@@ -117,13 +117,12 @@ while true
 
     end
 
-    % Build interpolation window ahead of current trial point
-    br_end_pt_A=2*alpha_2-alpha_1;
-    br_end_pt_B=alpha_2+spin_system.control.ls_tau1*(alpha_2-alpha_1);
+    % Build the window ahead of current trial point
+    br_end_pt_a=2*alpha_2-alpha_1;
+    br_end_pt_b=alpha_2+spin_system.control.ls_tau1*(alpha_2-alpha_1);
 
-    % Maximise the cubic model inside interpolation bounds
-    alpha_new=cubic_interp(br_end_pt_A,br_end_pt_B,alpha_1,alpha_2,...
-                           fx_1,gfx_1'*dir,fx_2,gfx_2'*dir);
+    % Bisect the interval
+    alpha_new=(br_end_pt_a+br_end_pt_b)/2;
 
     % Shift history to the new trial point
     alpha_1=alpha_2; alpha_2=alpha_new;

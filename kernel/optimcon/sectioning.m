@@ -58,7 +58,8 @@ if ~isempty(spin_system.control.freeze)
     gfx_0=gfx_0.*(~spin_system.control.freeze(:));
 end
 
-% Iterate until Wolfe conditions pass or bracket collapses
+% Iterate until Wolfe conditions 
+% pass or the bracket collapses
 while true
 
     % Simple interval bisection
@@ -106,7 +107,7 @@ while true
         alpha=a.alpha; fx_1=a.fx; gfx_1=a.gfx;
 
         % Keep improvements, otherwise terminate
-        if alpha_conds(0,[],a.fx,fx_1,[],[],[],[])
+        if alpha_conds(0,[],fx_0,fx_1,[],[],[],[])
             exitflag=0; return;
         else
             exitflag=-2; return;

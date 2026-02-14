@@ -92,8 +92,11 @@ header(spin_system);
 
 % Get the video writer going (use VLC to play)
 if isfield(spin_system.control,'video_file')
+
+    % This format is available on all platforms
     VW=VideoWriter(spin_system.control.video_file,...
                    'Motion JPEG AVI'); open(VW);
+
 end
 
 % If zero iterations, still display graphics
@@ -103,6 +106,9 @@ end
 
 % Start the iteration loop
 for n=1:spin_system.control.max_iter
+
+    % Default exit flag
+    exitflag=0;
     
     % Update iteration counter
     data.count.iter=data.count.iter+1;
@@ -121,11 +127,11 @@ for n=1:spin_system.control.max_iter
                 old_x=x(~frozen); dx_hist=[]; 
                 old_g=g(~frozen); dg_hist=[]; 
                 
-                % Direction vector
-                dir=g.*(~frozen);
+                % Take a conservative step at first iteration
+                dir=g.*(~frozen); dir=0.01*dir/max(abs(dir));
                 
                 % Catch unreasonably low gradients
-                if (abs(fx)<1e-6)||(norm(g,2)<1e-6)
+                if (abs(fx)<1e-6)||(norm(g(~frozen),2)<1e-6)
                     error('fidelity or gradient too small at iter 1, find a better guess.');
                 end
                 
@@ -168,22 +174,28 @@ for n=1:spin_system.control.max_iter
             dir(~frozen)=H\g(~frozen);
             
     end
-    
-    % The normal process is line search in Newton / quasi-Newton descent direction 
-    [alpha,fx,g,exitflag,data]=linesearch(spin_system,cost_function,dir,x,fx,g,data);
-    
-    % But sometimes
-    if exitflag==-2
 
-        % Use step length Newton / quasi-Newton had intended
-        norm_grad=norm(g.*(~frozen),2); norm_step=norm(dir);
-        dir=norm_step*(g.*(~frozen))/norm_grad;
-        
-        % When Hessian gets confused and sends us into a wall, search down the gradient
-        [alpha,fx,g,exitflag,data]=linesearch(spin_system,cost_function,dir,x,fx,g,data);
-        
-    end
+    % Take a look at the proposed new point
+    [data,fx_new,g_new]=objeval(x+dir,cost_function,data,spin_system);
+
+    % If line search would be worthwhile, get a bracket [A B] of acceptable points
+    [A,B,alpha,fx_new,g_new,next_act,data]=bracketing(cost_function,1,dir,x,fx,g.*(~frozen),...
+                                                      fx_new,g_new.*(~frozen),data,spin_system);
+
+    % Run sectioning if necessary
+    if strcmp(next_act,'sectioning')
     
+        % Find an acceptable point within the [A B] bracket    
+       [alpha,fx,g,exitflag,data]=sectioning(cost_function,A,B,x,fx,g.*(~frozen),...
+                                             dir,data,spin_system);
+                                 
+    else
+
+        % History update
+        fx=fx_new; g=g_new;
+
+    end
+
     % Report diagnostics to user
     itrep(spin_system,fx,g,alpha,data); 
                                          

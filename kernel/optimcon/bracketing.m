@@ -1,7 +1,10 @@
 % Docs header here.
 
-function [A,B,alpha,fx,gfx,next_act,data] = bracketing(cost_function,alpha,dir,x_0,fx_0,...
-                                                       gfx_0,fx_2,gfx_2,data,spin_system)
+function [A,B,alpha,fx,gfx,next_act,data]=bracketing(cost_function,alpha,dir,x_0,...
+                                                     fx_0,gfx_0,data,spin_system)
+
+% Take a look at the proposed new point
+[data,fx_2,gfx_2]=objeval(x_0+dir,cost_function,data,spin_system);
 
 % Initialise brackets A and B
 A.alpha=[]; A.fx=[]; A.gfx=[];

@@ -174,12 +174,9 @@ for n=1:spin_system.control.max_iter
             
     end
 
-    % Take a look at the proposed new point
-    [data,fx_new,g_new]=objeval(x+dir,cost_function,data,spin_system);
-
     % If line search would be worthwhile, get a bracket [A B] of acceptable points
-    [A,B,alpha,fx_new,g_new,next_act,data]=bracketing(cost_function,1,dir,x,fx,g.*(~frozen),...
-                                                      fx_new,g_new.*(~frozen),data,spin_system);
+    [A,B,alpha,fx_new,g_new,next_act,data]=bracketing(cost_function,1,dir,x,fx,...
+                                                      g.*(~frozen),data,spin_system);
 
     % Run sectioning if necessary
     if strcmp(next_act,'sectioning')

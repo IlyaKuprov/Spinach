@@ -8,18 +8,22 @@ c2= 3*(f_B-f_A)-(2*dir_deriv_A+dir_deriv_B)*(alpha_B-alpha_A);
 c3=(alpha_B-alpha_A)*dir_deriv_A; c4=f_A;
 
 % Convert bounds to the z-space
-bounds = ([End_A End_B ]-alpha_A)./(alpha_B - alpha_A);
+bounds=([End_A End_B]-alpha_A)/(alpha_B-alpha_A);
 
-% Find minima and maxima from the roots of the derivative
+% Find derivative roots
 sPoints = roots([3*c1 2*c2 1*c3]);
 
-% Remove imaginary and points outside range and make vector with solutions
+% Remove complex roots
 sPoints(imag(sPoints)~=0)=[];
+
+% Remove points outside ranges 
 sPoints(sPoints<min(bounds))=[];
 sPoints(sPoints>max(bounds))=[];
+
+% Make vector with solutions
 sPoints=[min(bounds) sPoints(:)' max(bounds)];
 
-% Select the global minimum point
+% Select the global maximum point
 [fx,k]=max(polyval([c1 c2 c3 c4],sPoints));
 
 % Add the offset and scale back from [0..1] to the alpha domain

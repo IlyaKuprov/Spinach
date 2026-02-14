@@ -1,29 +1,31 @@
 % Docs header here.
 
 function [alpha,fx_1,gfx_1,exitflag,data] = sectioning(cost_function,A,B,x_0,fx_0,...
-                                                       gfx_0,d_0,data,spin_system)
+                                                       gfx_0,dir,data,spin_system)
 
-% Worst-case returns are empty
-fx_1=[]; gfx_1=[];
+% Frost incoming gradient and direction
+if ~isempty(spin_system.control.freeze)
+    dir=dir.*(~spin_system.control.freeze(:));
+    gfx_0=gfx_0.*(~spin_system.control.freeze(:));
+end
 
 % Enter sectioning loop
 while true
     
     % Pick alpha in reduced bracket
-    End_A = A.alpha + min(spin_system.control.ls_tau2,...
-                          spin_system.control.ls_c2)*(B.alpha - A.alpha);
-    End_B = B.alpha - spin_system.control.ls_tau3*(B.alpha - A.alpha);
+    End_A = A.alpha + spin_system.control.ls_tau2*(B.alpha-A.alpha);
+    End_B = B.alpha - spin_system.control.ls_tau3*(B.alpha-A.alpha);
     
     % Minimize cubic interpolant
-    alpha = cubic_interp(End_A,End_B,A.alpha,B.alpha,A.fx,A.gfx'*d_0,B.fx,B.gfx'*d_0);
+    alpha = cubic_interp(End_A,End_B,A.alpha,B.alpha,A.fx,A.gfx'*dir,B.fx,B.gfx'*dir);
     
     % No acceptable point could be found
-    if (abs( (alpha - A.alpha)*(A.gfx'*d_0) ) <= eps(max(1,abs(fx_0))))
+    if (abs( (alpha - A.alpha)*(A.gfx'*dir) ) <= eps(max(1,abs(fx_0))))
         exitflag = -2; return;
     end
     
     % Calculate value and gradient of current alpha
-    [data,fx_1,gfx_1]=objeval(x_0+alpha*d_0,cost_function,data,spin_system);
+    [data,fx_1,gfx_1]=objeval(x_0+alpha*dir,cost_function,data,spin_system);
 
     % Frost the new gradient
     if ~isempty(spin_system.control.freeze)
@@ -34,8 +36,8 @@ while true
     Tmp=A;
     
     % Update the current brackets
-    if (~alpha_conds(1,alpha,fx_0,fx_1,gfx_0,gfx_1,d_0,spin_system))||...
-       (~alpha_conds(0,alpha,A.fx,fx_1,A.gfx,gfx_1,d_0,spin_system))
+    if (~alpha_conds(1,alpha,fx_0,fx_1,gfx_0,gfx_1,dir,spin_system))||...
+       (~alpha_conds(0,alpha,A.fx,fx_1,A.gfx,gfx_1,dir,spin_system))
         
         % Update bracket B to current alpha
         B.alpha = alpha; B.fx = fx_1; B.gfx = gfx_1;
@@ -43,7 +45,7 @@ while true
     else
         
         % Wolfe conditions, if true then acceptable point found
-        if alpha_conds(2,alpha,fx_0,fx_1,gfx_0,gfx_1,d_0,spin_system)
+        if alpha_conds(2,alpha,fx_0,fx_1,gfx_0,gfx_1,dir,spin_system)
             exitflag = 0; return;
         end
         
@@ -51,12 +53,15 @@ while true
         A.alpha = alpha; A.fx = fx_1;  A.gfx = gfx_1;
         
         % B becomes old bracket A;
-        if (A.alpha - B.alpha)*(gfx_1'*d_0) >= 0, B=Tmp; end
+        if (A.alpha - B.alpha)*(gfx_1'*dir) >= 0, B=Tmp; end
         
     end
     
     % No acceptable point could be found
-    if (abs(B.alpha-A.alpha) < eps), exitflag = -2; return, end
+    if abs((alpha-A.alpha)*(A.gfx'*d_0))<sqrt(eps)
+        alpha=A.alpha; fx_1=A.fx;
+        gfx_1=A.gfx; exitflag=-2; return;
+    end
     
 end
 

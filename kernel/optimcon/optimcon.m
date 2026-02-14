@@ -682,6 +682,11 @@ if isfield(control,'freeze')
     % Store the mask (validated in fmaxnewton)
     spin_system.control.freeze=logical(control.freeze);
     control=rmfield(control,'freeze');
+
+    % Make sure not everything is frozen
+    if all(spin_system.control.freeze,'all')
+        error('the entire waveform is frozen.');
+    end
     
     % Inform the user
     report(spin_system,[pad('Freeze mask supplied',60) 'yes']);

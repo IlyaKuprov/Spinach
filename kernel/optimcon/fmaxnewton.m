@@ -121,6 +121,11 @@ for n=1:spin_system.control.max_iter
                 
                 % Get objective and gradient
                 [data,fx,g]=objeval(x,cost_function,data,spin_system);
+
+                % Catch unreasonably small initial fidelities and gradients
+                if (abs(data.fx_sep_pen(1))<1e-6)||(norm(g(~frozen),2)<1e-6)
+                    error('fidelity or gradient too small at iter 1, find a better guess.');
+                end
                 
                 % Start history arrays
                 old_x=x(~frozen); dx_hist=[]; 
@@ -128,11 +133,6 @@ for n=1:spin_system.control.max_iter
                 
                 % Take a conservative step at first iteration
                 dir=g.*(~frozen); dir=0.01*dir/max(abs(dir));
-                
-                % Catch unreasonably low gradients
-                if (abs(fx)<1e-6)||(norm(g(~frozen),2)<1e-6)
-                    error('fidelity or gradient too small at iter 1, find a better guess.');
-                end
                 
             else
                 
@@ -196,16 +196,16 @@ for n=1:spin_system.control.max_iter
     end
 
     % Report diagnostics to user
-    itrep(spin_system,fx,g,alpha,data); 
-                                         
-    % Update x
-    x=x+alpha*dir;
-    
+    itrep(spin_system,fx,g,alpha,data);
+
     % Save checkpoint
     if isfield(spin_system.control,'checkpoint')
         save([spin_system.sys.scratch filesep ... 
               spin_system.control.checkpoint],'x','-v7.3','-nocompression');
     end
+                                         
+    % Update x if we plan to continue
+    if exitflag~=-2, x=x+alpha*dir; end
     
     % Check termination conditions
     if norm(alpha*dir,1)<spin_system.control.tol_x
@@ -224,10 +224,8 @@ for n=1:spin_system.control.max_iter
    
 end
 
-% See if iteration count was exceeded
-if isempty(n)||(n==spin_system.control.max_iter)
-    exitflag=0; 
-end
+% When no iterations were taken
+if ~exist(exitflag,'var'), exitflag=0; end
 
 % Fold back the waveform
 x=reshape(x,data.x_shape);
@@ -236,7 +234,7 @@ x=reshape(x,data.x_shape);
 footer(spin_system,exitflag,data);
 
 % Shut down the video writer
-if isfield(spin_system.control,'videowriter'), close(VW); end
+if isfield(spin_system.control,'video_file'), close(VW); end
 
 end
 
@@ -259,7 +257,7 @@ switch exitflag
     case  1, message='norm(gradient,2) < tol_gfx';
     case  2, message='norm(step,1) < tol_x';
     case  0, message='number of iterations exceeded';
-    case -2, message='line search found no minimum';
+    case -2, message='line search found no maximum';
 end
 report(spin_system,['    Algorithm Used     : ' data.algorithm]);
 report(spin_system,['    Exit message       : ' message]);

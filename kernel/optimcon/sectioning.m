@@ -58,7 +58,7 @@ while true
     end
     
     % No acceptable point could be found
-    if abs((alpha-A.alpha)*(A.gfx'*dir))<sqrt(eps)
+    if abs(B.alpha-A.alpha)<eps
         alpha=A.alpha; fx_1=A.fx;
         gfx_1=A.gfx; exitflag=-2; return;
     end

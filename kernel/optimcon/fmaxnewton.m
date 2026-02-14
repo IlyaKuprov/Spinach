@@ -225,7 +225,7 @@ for n=1:spin_system.control.max_iter
 end
 
 % When no iterations were taken
-if ~exist(exitflag,'var'), exitflag=0; end
+if ~exist('exitflag','var'), exitflag=0; end
 
 % Fold back the waveform
 x=reshape(x,data.x_shape);

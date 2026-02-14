@@ -182,23 +182,9 @@ for n=1:spin_system.control.max_iter
 
     end
 
-    % If line search would be worthwhile, get a bracket [A B] of acceptable points
-    [A,B,alpha,fx_new,g_new,next_act,data]=bracketing(cost_function,1,dir,x,fx,...
-                                                      g.*(~frozen),data,spin_system);
-
-    % Run sectioning if necessary
-    if strcmp(next_act,'sectioning')
-    
-        % Find an acceptable point within the [A B] bracket    
-       [alpha,fx,g,exitflag,data]=sectioning(cost_function,A,B,x,fx,g.*(~frozen),...
-                                             dir,data,spin_system);
-                                 
-    else
-
-        % History update
-        fx=fx_new; g=g_new;
-
-    end
+    % Run forward-backtracking line search in the ascent direction
+    [alpha,fx,g,exitflag,data]=fwdback_line(cost_function,1,dir,x,fx,...
+                                            g.*(~frozen),data,spin_system);
 
     % Report diagnostics to user
     itrep(spin_system,fx,g,alpha,data);

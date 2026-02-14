@@ -1,6 +1,6 @@
-% Refines a previously found step bracket by repeated cubic
-% interpolation until a step satisfying Wolfe tests is found
-% or the bracket collapses below numerical accuracy. Syntax:
+% Refines a previously found step bracket by repeated interval
+% bisection until a step satisfying Wolfe tests is found or the
+% bracket collapses. Syntax:
 %
 %   [alpha,fx_1,gfx_1,exitflag,data]=...
 %         sectioning(cost_function,A,B,x_0,fx_0,gfx_0,...

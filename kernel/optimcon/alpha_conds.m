@@ -1,6 +1,6 @@
 % Docs header here.
 
-function test=alpha_conds(test_type,alpha,fx_0,fx_1,gfx_0,gfx_1,d_0,spin_system)
+function test=alpha_conds(test_type,alpha,fx_0,fx_1,gfx_0,gfx_1,dir,spin_system)
 
 % Select test type
 if test_type==0
@@ -11,17 +11,17 @@ if test_type==0
 elseif test_type==1
     
     % Armijo condition - ensure sufficient increase
-    test=(fx_1 >= fx_0 + spin_system.control.ls_c1*alpha*(gfx_0'*d_0));
+    test=(fx_1 >= fx_0 + spin_system.control.ls_c1*alpha*(gfx_0'*dir));
     
 elseif test_type==2
     
-    % Strong Wolfe (Curvature) condition - avoid underestimated step length
-    test=(abs(gfx_1'*d_0) <= spin_system.control.ls_c2*abs(gfx_0'*d_0));
+    % Strong Wolfe (curvature) condition - avoid underestimated step length
+    test=(abs(gfx_1'*dir) <= spin_system.control.ls_c2*abs(gfx_0'*dir));
     
 elseif test_type==3
     
     % Gradient test - ensure an ascent direction
-    test=(gfx_1'*d_0 > 0);
+    test=(gfx_1'*dir > 0);
     
 end
 

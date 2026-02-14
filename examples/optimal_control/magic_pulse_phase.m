@@ -73,7 +73,7 @@ control.plotting={'phi_controls','xy_controls',...
                   'robustness','spectrogram'};
 
 % Initial guess
-guess=(pi/5)*ones(1,60);
+guess=(pi/5)*randn(1,60);
 
 % Spinach housekeeping
 spin_system=optimcon(spin_system,control);

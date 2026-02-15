@@ -34,6 +34,24 @@ function direction=lbfgs(dx_hist,dg_hist,g)
 % Check consistency
 grumble(dx_hist,dg_hist,g);
 
+% Build curvature quality indicators
+curv=real(sum(dx_hist.*dg_hist,1));
+dx_norms=sqrt(sum(dx_hist.^2,1));
+dg_norms=sqrt(sum(dg_hist.^2,1));
+
+% Detect curvature pairs fit for recursion
+curv_mask=curv>eps*(dx_norms.*dg_norms);
+
+% Keep only valid curvature pairs
+dx_hist=dx_hist(:,curv_mask);
+dg_hist=dg_hist(:,curv_mask);
+
+% Return steepest descent if no pair survives
+if isempty(dx_hist)
+    direction=-g;
+    return
+end
+
 % Initialize variables
 N=size(dx_hist,2);
 alpha=zeros(1,N);
@@ -73,4 +91,3 @@ end
 % es are very different.
 %
 % Bruce Schneier, on biometric security
-

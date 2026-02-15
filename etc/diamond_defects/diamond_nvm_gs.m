@@ -26,14 +26,14 @@
 %
 %   .temperature   - temperature, K (default: 298)
 %
-%   .concentration - defect concentration for the 
-%                    relaxation model, ppm (default: 0.001)
+%   .concentration - defect concentration in ppm for the 
+%                    relaxation model, default is 0.001
 %
 %   .orientation   - '111', '110', or '100' crystal 
 %                     plane normal aligned with the
-%                     magnetic field
+%                     magnetic field, def. is '111'
 %
-%   .nitrogen      - '14N' or '15N'
+%   .nitrogen      - '14N' or '15N', default is '14N'
 %
 % Outputs:
 %
@@ -41,7 +41,6 @@
 %
 %   inter - Spinach interaction specification structure
 %
-% ilya.kuprov@weizmann.ac.il
 % alexey.bogdanov@weizmann.ac.il
 
 function [sys,inter]=diamond_nvm_gs(parameters)
@@ -63,7 +62,7 @@ if ~isfield(parameters,'nitrogen')
     parameters.nitrogen='14N';
 end
 
-% Define spin system isotopes.
+% Define spin system isotopes
 sys.isotopes={'E3',parameters.nitrogen};
 
 % Electron relaxation rates
@@ -120,17 +119,20 @@ inter.coupling.matrix{1,1}=R*zfs2mat(2872e6,0,0,0,0)*R';
 switch parameters.nitrogen
 
     case '14N'
-
+        
+        % Hyperfine and quadrupolar coupling
         inter.coupling.matrix{1,2}=R*diag([-2.70e6 -2.70e6 -2.14e6])*R';
         inter.coupling.matrix{2,2}=R*zfs2mat(-5.01e6,0,0,0,0)*R';
 
     case '15N'
 
+        % Only hyperfine coupling, opposite sign
         inter.coupling.matrix{1,2}=R*diag([3.65e6 3.65e6 3.03e6])*R';
         inter.coupling.matrix{2,2}=[];
 
     otherwise
 
+        % Complain and bomb out
         error('wrong nitrogen isotope.');
 
 end

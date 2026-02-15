@@ -1,15 +1,11 @@
-% Field-swept EPR spectra of NV- center in diamond at X and W bands. Syntax:
+% Field-swept powder EPR spectra of an NV centre 
+% in diamond at X and W bands.
 %
-%                        diamond_nvm_epr_xw()
-%
-% This function takes no input arguments.
-%
-% This function produces diagnostic plots.
 % alexey.bogdanov@weizmann.ac.il
 
 function diamond_nvm_epr_xw()
 
-% Set NV centre parameters.
+% Set NV centre parameters
 nv_params.temperature=296;
 nv_params.concentration=0.001;
 nv_params.orientation='111';
@@ -18,7 +14,7 @@ nv_params.nitrogen='14N';
 % Build the spin system
 [sys,inter]=diamond_nvm_gs(nv_params);
 
-% Set the magnetic field for fieldsweep
+% Field sweep
 sys.magnet=1;
 
 % Define the basis set
@@ -29,13 +25,13 @@ bas.approximation='none';
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Set common EPR parameters
+% EPR sim parameters
 parameters.spins={'E3'};
 parameters.grid=20;
 parameters.fwhm=0.001;
 parameters.int_tol=0.1;
 parameters.tm_tol=0.01;
-parameters.npoints=256;
+parameters.npoints=512;
 parameters.rspt_order=Inf;
 
 % Set X-band parameters
@@ -50,8 +46,8 @@ kfigure(); scale_figure([1.50 0.75]);
 subplot(1,2,1); plot(b_axis_x',spec_x');
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
-ktitle('NV- X-band EPR');
-axis tight; kgrid;
+ktitle('NV$^{-}$ X-band EPR');
+xlim tight; ylim padded; kgrid;
 
 % Set W-band parameters
 parameters.mw_freq=94e9;
@@ -64,11 +60,8 @@ parameters.window=[3.2 3.5];
 subplot(1,2,2); plot(b_axis_w',spec_w');
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
-ktitle('NV- W-band EPR');
-axis tight; kgrid;
+ktitle('NV$^{-}$ W-band EPR');
+xlim tight; ylim padded; kgrid;
 
 end
-
-
-
 

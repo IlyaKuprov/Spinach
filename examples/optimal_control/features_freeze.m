@@ -69,10 +69,10 @@ control.rho_init={rho_init};                      % Starting state
 control.rho_targ={rho_targ};                      % Destination state
 control.pwr_levels=2*pi*linspace(0.8e3,1.2e3,5);  % Pulse powers, rad/s
 control.pulse_dt=2e-4*ones(1,50);                 % Slice durations
-control.penalties={'SNS'};                        % Penalty
-control.p_weights=100;                            % Penalty weight
+control.penalties={'NS'};                         % Penalty
+control.p_weights=0.01;                           % Penalty weight
 control.method='newton';                          % Optimisation method
-control.max_iter=30;                              % Termination condition
+control.max_iter=50;                              % Termination condition
 control.parallel='ensemble';                      % Parallelisation
 
 % Initial guess

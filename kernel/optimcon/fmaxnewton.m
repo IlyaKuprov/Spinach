@@ -174,13 +174,8 @@ for n=1:spin_system.control.max_iter
             
     end
 
-    % Check the ascent direction
-    if g(~frozen)'*dir(~frozen)<=0
-
-        % Fall back to gradient
-        dir=g.*(~frozen);
-
-    end
+    % Store the reference point
+    g_ref=g(~frozen); dir_ref=dir(~frozen);
 
     % If line search would be worthwhile, get a bracket [A B] of acceptable points
     [A,B,alpha,fx_new,g_new,next_act,data]=bracketing(cost_function,1,dir,x,fx,...
@@ -200,8 +195,8 @@ for n=1:spin_system.control.max_iter
 
     end
 
-    % Report diagnostics to user
-    itrep(spin_system,fx,g,alpha,data);
+    % Report reference point diagnostics to user
+    itrep(spin_system,fx,g_ref,dir_ref,alpha,data);
                                          
     % If all good
     if exitflag~=-2
@@ -261,14 +256,14 @@ end
 
 % Header printing function
 function header(spin_system)
-report(spin_system,'========================================================================================');
-report(spin_system,'Iter  #f   #g   #H   #R    fidelity      penalties     total        alpha     |grad|    ');
-report(spin_system,'----------------------------------------------------------------------------------------');
+report(spin_system,'==============================================================================================');
+report(spin_system,'Iter  #f   #g   #H   #R    fidelity      penalties     total        alpha     |grad|     DGA  ');
+report(spin_system,'----------------------------------------------------------------------------------------------');
 end
 
 % Footer printing function
 function footer(spin_system,exitflag,data)
-report(spin_system,'----------------------------------------------------------------------------------------');
+report(spin_system,'----------------------------------------------------------------------------------------------');
 switch(spin_system.control.method)
     case 'lbfgs',  data.algorithm='LBFGS method';
     case 'newton', data.algorithm='Newton-Raphson method';
@@ -290,16 +285,14 @@ report(spin_system,'============================================================
 end
 
 % Iteration report function
-function itrep(spin_system,fx,g,alpha,data)
+function itrep(spin_system,fx,g,dir,alpha,data)
 
 % Performance figures
 fid=data.fx_sep_pen(1);
 pens=sum(data.fx_sep_pen(2:end));
 
-% Apply freeze mask to gradient
-if ~isempty(spin_system.control.freeze)
-    g=g.*(~spin_system.control.freeze(:));
-end
+% Angle between search direction and gradient
+dga=abs(acosd((g'*dir)/(norm(g,2)*norm(dir,2))));
 
 % Print iteration data
 report(spin_system,[pad(num2str(data.count.iter,'%4.0f'),6),...
@@ -311,7 +304,8 @@ report(spin_system,[pad(num2str(data.count.iter,'%4.0f'),6),...
                     pad(num2str(pens,'%+9.6f'),11),'   '...
                     pad(num2str(fx,'%+9.6f'),11),'   '...
                     pad(num2str(alpha,'%4.0e'),9),...
-                    pad(num2str(norm(g(:),2),'%0.3e'),10)]);
+                    pad(num2str(norm(g(:),2),'%0.2e'),12),...
+                    pad(num2str(dga,'%9.1f'),10)]);
                 
 end
 

@@ -3,7 +3,7 @@
 % to build a serviceable substitute to a Hessian. The Hes-
 % sian matrix is not formed explicitly. Syntax:
 %
-%             direction=lbfgs(dx_hist,dg_hist,g)
+%            direction=lbfgs(dx_hist,dg_hist,g)
 %
 % Arguments:
 %
@@ -40,7 +40,7 @@ ys=sum(dg_hist.*dx_hist,1); % y'*s
 yy=sum(dg_hist.*dg_hist,1); % y'*y
 ss=sum(dx_hist.*dx_hist,1); % s'*s
 
-% Inner product validation
+% Curvature pair validation
 valid=isfinite(ys)&isfinite(yy)&isfinite(ss)&...
       (yy>0)&(ss>0)&(ys<-curv_rel_tol*sqrt(yy.*ss));
 

@@ -59,29 +59,34 @@ LyC=operator(spin_system,'Ly','13C');
 LxF=operator(spin_system,'Lx','19F');
 LyF=operator(spin_system,'Ly','19F');
 
+% Offset operator
+LzH=operator(spin_system,'Lz','1H');
+
 % Drift Hamiltonian
 H=hamiltonian(assume(spin_system,'nmr'));
 
 % Define control parameters
-control.drifts={{H}};                             % Drift
-control.operators={LxH,LyH,LxC,LyC,LxF,LyF};      % Controls
-control.rho_init={rho_init};                      % Starting state
-control.rho_targ={rho_targ};                      % Destination state
-control.pwr_levels=2*pi*linspace(0.8e3,1.2e3,5);  % Pulse powers, rad/s
-control.pulse_dt=2e-4*ones(1,50);                 % Slice durations
-control.penalties={'NS'};                         % Penalty
-control.p_weights=0.01;                           % Penalty weight
-control.method='newton';                          % Optimisation method
-control.max_iter=50;                              % Termination condition
-control.parallel='ensemble';                      % Parallelisation
+control.drifts={{H}};                           % Drift
+control.operators={LxH,LyH,LxC,LyC,LxF,LyF};    % Controls
+control.off_ops={LzH};                          % Offset operator 
+control.offsets={linspace(-1e3,+1e3,5)};        % Offset range, Hz
+control.rho_init={rho_init};                    % Starting state
+control.rho_targ={rho_targ};                    % Destination state
+control.pwr_levels=2*pi*[0.8 0.9 1.0]*1e3;      % Pulse powers, rad/s
+control.pulse_dt=1e-4*ones(1,100);              % Slice durations
+control.penalties={'NS'};                       % Penalty type
+control.p_weights=0.01;                         % Penalty weight
+control.method='newton';                        % Optimisation method
+control.max_iter=50;                            % Termination condition
+control.parallel='ensemble';                    % Parallelisation
 
 % Initial guess
-guess=randn(6,50)/3; 
-guess(:,[15:20 35:40])=0.1;        % Frozen at 100 Hz
+guess=randn(6,100)/10; 
+guess(:,[30:40 70:80])=0.1;        % Frozen at 100 Hz
 
 % Freeze region
-control.freeze=false(6,50);
-control.freeze(:,[15:20 35:40])=1; % Frozen at 100 Hz
+control.freeze=false(6,100);
+control.freeze(:,[30:40 70:80])=1; % Frozen at 100 Hz
 
 % Plots during optimisation
 control.plotting={'correlation_order','local_each_spin',...

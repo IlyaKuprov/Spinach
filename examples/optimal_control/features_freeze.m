@@ -76,8 +76,8 @@ control.pwr_levels=2*pi*[0.8 0.9 1.0]*1e3;      % Pulse powers, rad/s
 control.pulse_dt=1e-4*ones(1,100);              % Slice durations
 control.penalties={'NS'};                       % Penalty type
 control.p_weights=0.01;                         % Penalty weight
-control.method='newton';                        % Optimisation method
-control.max_iter=50;                            % Termination condition
+control.method='goodwin';                       % Optimisation method
+control.max_iter=100;                           % Termination condition
 control.parallel='ensemble';                    % Parallelisation
 
 % Initial guess

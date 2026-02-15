@@ -1,9 +1,7 @@
 % Calculates an approximation to the Newton-Raphson search
-% direction using past gradients to build a serviceable sub-
-% stitute to a Hessian. The Hessian matrix is never expli-
-% citly formed or inverted.
-%
-% Syntax:
+% direction for maximising a function using past gradients
+% to build a serviceable substitute to a Hessian. The Hes-
+% sian matrix is not formed explicitly. Syntax:
 %
 %             direction=lbfgs(dx_hist,dg_hist,g)
 %
@@ -22,7 +20,7 @@
 % Returns:
 %
 %    direction       - LBFGS approximation to the 
-%                      search direction
+%                      maximisation step vector
 %
 % david.goodwin@inano.au.dk
 % ilya.kuprov@weizmann.ac.il
@@ -51,14 +49,14 @@ dx_hist=dx_hist(:,valid);
 dg_hist=dg_hist(:,valid);
 
 % Return steepest ascent if no pair survives
-if isempty(dx_hist), direction=-g; return; end
+if isempty(dx_hist), direction=g; return; end
 
 % Initialise variables
 N=size(dx_hist,2);
 alpha=zeros(1,N);
 p=zeros(1,N);
 
-% Loop over history
+% History
 for n=1:N
     p(n)=1/(dg_hist(:,n)'*dx_hist(:,n));
     alpha(n)=p(n)*dx_hist(:,n)'*g;
@@ -74,6 +72,9 @@ for n=N:-1:1
     b=p(n)*dg_hist(:,n)'*direction;
     direction=direction+dx_hist(:,n)*(alpha(n)-b);
 end
+
+% Convert to ascent
+direction=-direction;
 
 end
 

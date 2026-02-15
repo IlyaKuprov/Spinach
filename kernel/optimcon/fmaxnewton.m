@@ -148,9 +148,9 @@ for n=1:spin_system.control.max_iter
                     dg_hist=dg_hist(:,1:spin_system.control.n_grads);
                 end
                 
-                % Get the direction
+                % Get ascent direction
                 dir=zeros(size(frozen));
-                dir(~frozen)=-lbfgs(dx_hist,dg_hist,g(~frozen));
+                dir(~frozen)=lbfgs(dx_hist,dg_hist,g(~frozen));
                 
             end
             

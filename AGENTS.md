@@ -32,6 +32,8 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Matlab and Spinach functionality checks:** Make sure that the functions you are calling in your code actually exist in *Matlab* or *Spinach*. Never call functions that do not exist.
 
+* **British spelling throughout:** In all function names, variable names, and comments, use British spelling. Oxford comma is also mandatory. 
+
 ## Wiki Documentation Instructions
 
 *Spinach* maintains a Wiki for function documentation. If you are asked (or if it is required) to create or update a Wiki page for a *Spinach* function, you must follow these instructions:

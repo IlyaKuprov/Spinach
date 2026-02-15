@@ -34,7 +34,26 @@ function direction=lbfgs(dx_hist,dg_hist,g)
 % Check consistency
 grumble(dx_hist,dg_hist,g);
 
-% Initialize variables
+% Curv. tolerance
+curv_rel_tol=0.01;  
+
+% Relevant inner products
+ys=sum(dg_hist.*dx_hist,1); % y'*s
+yy=sum(dg_hist.*dg_hist,1); % y'*y
+ss=sum(dx_hist.*dx_hist,1); % s'*s
+
+% Inner product validation
+valid=isfinite(ys)&isfinite(yy)&isfinite(ss)&...
+      (yy>0)&(ss>0)&(ys<-curv_rel_tol*sqrt(yy.*ss));
+
+% Dropping bad pairs
+dx_hist=dx_hist(:,valid);
+dg_hist=dg_hist(:,valid);
+
+% Return steepest ascent if no pair survives
+if isempty(dx_hist), direction=-g; return; end
+
+% Initialise variables
 N=size(dx_hist,2);
 alpha=zeros(1,N);
 p=zeros(1,N);
@@ -49,7 +68,7 @@ end
 % Scaling of initial Hessian (identity matrix)
 p_k=dg_hist(:,1)'*dx_hist(:,1)/sum(dg_hist(:,1).^2);
 
-% Make r = - Hessian * gradient
+% Direction
 direction=p_k*g;
 for n=N:-1:1
     b=p(n)*dg_hist(:,n)'*direction;
@@ -73,4 +92,3 @@ end
 % es are very different.
 %
 % Bruce Schneier, on biometric security
-

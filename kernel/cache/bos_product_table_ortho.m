@@ -1,24 +1,24 @@
-function [product_table_left,product_table_right]= bos_product_table_ortho(nlevels)
+function [product_table_left_ortho,product_table_right_ortho]= bos_product_table_ortho(nlevels)
 
 % Check consistency
 grumble(nlevels);
 
 % Generate cache record name
 own_path=mfilename('fullpath');
-own_path=own_path(1:(end-17));
-table_file=[own_path 'bos_product_table_ortho' ...
+own_path=own_path(1:(end-23));
+table_file=[own_path 'bos_product_table_ortho_' ...
             num2str(nlevels) '.mat'];
 
 % Check the cache
 if exist(table_file,'file')
     
     % Lift data from the cache if the file is already available
-    load(table_file,'product_table_left','product_table_right');
+    load(table_file,'product_table_left_ortho','product_table_right_ortho');
     
 else
     
     % Get orthogonal bosonic monomials
-    B = boson_product_table(nlevels);
+    B = boson_mono_ortho(nlevels);
 
     % Precompute norms
     norms=zeros(nlevels^2,1);
@@ -27,8 +27,8 @@ else
     end
     
     % Preallocate IST product tables
-    product_table_left= zeros(nlevels^2,nlevels^2,nlevels^2);
-    product_table_right=zeros(nlevels^2,nlevels^2,nlevels^2);
+    product_table_left_ortho= zeros(nlevels^2,nlevels^2,nlevels^2);
+    product_table_right_ortho=zeros(nlevels^2,nlevels^2,nlevels^2);
 
     % Populate product tables
     for k=1:nlevels^2
@@ -36,12 +36,12 @@ else
             for n=1:nlevels^2
 
                 % Left product action: carefully tiptoe around extreme norms
-                product_table_left(n,m,k)= norms(n)*hdot((B{k}/norms(k)),...
+                product_table_left_ortho(n,m,k)= norms(n)*hdot((B{k}/norms(k)),...
                                                         (B{n}/norms(n))*...
                                                         (B{m}/norms(m)));
 
                 % Right product action: carefully tiptoe around extreme norms
-                product_table_right(n,m,k)=norms(n)*hdot((B{k}/norms(k)),...
+                product_table_right_ortho(n,m,k)=norms(n)*hdot((B{k}/norms(k)),...
                                                         (B{m}/norms(m))*...
                                                         (B{n}/norms(n)));
 
@@ -50,8 +50,8 @@ else
     end
 
     try % Try to save a cache record, but do not insist
-        save(table_file,'product_table_left',...
-                        'product_table_right','-v7.3'); drawnow;
+        save(table_file,'product_table_left_ortho',...
+                        'product_table_right_ortho','-v7.3'); drawnow;
     catch
         warning('Spinach directory appears to be write-protected');
     end
@@ -61,9 +61,9 @@ end
 end
 
 % Consistency enforcement
-function grumble(mult)
-if (numel(mult)~=1)||(~isnumeric(mult))||...
-   (~isreal(mult))||(mult<2)||(mod(mult,1)~=0)
-    error('mult must be a real integer greater than 1.');
+function grumble(nlevels)
+if (numel(nlevels)~=1)||(~isnumeric(nlevels))||...
+   (~isreal(nlevels))||(nlevels<2)||(mod(nlevels,1)~=0)
+    error('nlevels must be a real integer greater than 1.');
 end
 end

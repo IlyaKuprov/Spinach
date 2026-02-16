@@ -132,7 +132,7 @@ switch spin_system.bas.formalism
         parfor n=1:numel(opspecs)
 
             % Get the superoperator
-            A{n}=p_superop(spin_system,opspecs{n},operator_type);
+            A{n}=superop(spin_system,opspecs{n},operator_type);
 
             % Apply the coefficient
             A{n}(:,3)=coeffs(n)*A{n}(:,3);
@@ -147,8 +147,7 @@ switch spin_system.bas.formalism
         % Parallelisation efficiency
         mults=spin_system.comp.mults;
         formalism=spin_system.bas.formalism;
-        types=spin_system.comp.types;
-
+        
         % Build summation terms
         parfor n=1:numel(opspecs)
 
@@ -158,44 +157,15 @@ switch spin_system.bas.formalism
             % Over particles
             for k=1:numel(opspecs{n})
 
-                % Check physics type
-                switch types{k} %#ok<PFBNS>
-                
-                    case 'S' % Spins
+                % Get state indices
+                [L,M]=lin2lm(opspecs{n}(k));
 
-                        % Get spin state indices
-                        [L,M]=lin2lm(opspecs{n}(k));
+                % Get irreducible spherical tensors
+                IST=irr_sph_ten(mults(k),L); %#ok<PFBNS>
 
-                        % Get irreducible spherical tensors
-                        IST=irr_sph_ten(mults(k),L); %#ok<PFBNS>
+                % Update the kron
+                B=kron(B,IST{L-M+1});
 
-                        % Update the kron
-                        B=kron(B,IST{L-M+1});
-
-                    case {'C','V','T'} % Cavities, phonons, transmons
-
-                        % Unit operators
-                        if opspecs{n}(k)==0
-
-                            B=kron(B,speye(mults(k)));
-
-                        else
-
-                            % Get ST operators
-                            BM=sin_tran(mults(k));
-
-                            % Update the kron
-                            B=kron(B,BM{opspecs{n}(k)});
-
-                        end
-
-                    otherwise
-
-                        % Complain and bomb out
-                        error('unknown particle type.');
-
-                end
-                
             end
             
             % Move to Liouville space if necessary

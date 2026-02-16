@@ -15,7 +15,7 @@
 %  aditya.dev@weizmann.ac.il
 %  ilya.kuprov@weizmann.ac.il
 
-function coherence_transfer_through_J_coup()
+function coherence_transfer()
 
 J = 140;  % Scalar coupling Hz
 T = 1 / J; % pulse duration

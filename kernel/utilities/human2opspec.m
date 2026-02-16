@@ -250,7 +250,7 @@ elseif iscell(operators)&&iscell(spins)
                             end
 
                             % Get the spherical tensor expansion of the specified energy level projector
-                            [zl_states,zl_coeffs]=enlev2ist(spin_system.comp.mults(spins{n}),level_number);
+                            [zl_states,zl_coeffs]=enlev2ist(spin_system.comp.mults(spins{n}),level_number,'S');
                             states=kron(zl_states,ones(size(opspecs,1),1));
                             opspecs=kron(ones(numel(zl_states),1),opspecs);
                             opspecs(:,spins{n})=states; coeffs=kron(zl_coeffs,coeffs);
@@ -275,55 +275,35 @@ elseif iscell(operators)&&iscell(spins)
                     % Unit operator
                     opspecs(:,spins{n})=0;
 
-                else
+                elseif (numel(operators{n})>1)&&strcmp(operators{n}(1:2),'BL')
 
-                    % Non-unit operators
-                    if strcmp(operators{n},'C')
-
-                        % Get creation operator element list
-                        [rows,cols,vals]=find(weyl(nlevels).c);
-
-                    elseif strcmp(operators{n},'A')
-
-                        % Get annihilation operator element list
-                        [rows,cols,vals]=find(weyl(nlevels).a);
-
-                    elseif strcmp(operators{n},'N')
-
-                        % Get number operator element list
-                        [rows,cols,vals]=find(weyl(nlevels).n);
-
-                    elseif strcmp(operators{n},'CCAA')
-
-                        % Get the anharmonicity operator
-                        A=weyl(nlevels); A=A.c*A.c*A.a*A.a;
-
-                        % Get its element list
-                        [rows,cols,vals]=find(A);
-
-                    elseif strcmp(operators{n}(1:2),'BL')
-
-                        % Extract bosonic energy level number
-                        level_number=textscan(operators{n},'BL%n');
-                        level_number=level_number{1};
-
-                        % Projector into a specific energy level
-                        rows=level_number; cols=level_number; vals=1;
-
-                    else
-
-                        % Complain and bomb out
-                        error('unknown boson state specification.');
-
+                    % Validate bosonic energy level specification
+                    if isempty(regexp(operators{n},'^BL([1-9]\d*)$','once'))
+                        error('unrecognized operator or state specification.');
                     end
 
-                    % Get linear state indices
-                    idx=kq2lin(nlevels,rows,cols,1);
+                    % Extract bosonic energy level number
+                    level_number=textscan(operators{n},'BL%n');
+                    level_number=level_number{1};
 
-                    % Update the state list
-                    states=kron(idx,ones(size(opspecs,1),1));
-                    opspecs=kron(ones(numel(idx),1),opspecs);
-                    opspecs(:,spins{n})=states; coeffs=kron(vals,coeffs);
+                    % Validate the number
+                    if (level_number<1)||(mod(level_number,1)~=0)||(level_number>nlevels)
+                        error('invalid bosonic energy level number.');
+                    end
+
+                    % Get the spherical tensor expansion of the specified energy level projector
+                    [b_states,b_coeffs]=enlev2ist(spin_system.comp.mults(spins{n}),level_number,'B');
+                    states=kron(b_states,ones(size(opspecs,1),1));
+                    opspecs=kron(ones(numel(b_states),1),opspecs);
+                    opspecs(:,spins{n})=states; coeffs=kron(b_coeffs,coeffs);
+
+                else
+
+                    % Get the spherical tensor expansion
+                    [b_states,b_coeffs]=bos2ist(operators{n},nlevels);
+                    states=kron(b_states,ones(size(opspecs,1),1));
+                    opspecs=kron(ones(numel(b_states),1),opspecs);
+                    opspecs(:,spins{n})=states; coeffs=kron(b_coeffs,coeffs);
 
                 end
 

@@ -2,7 +2,7 @@
 % superoperators corresponding to right or left multiplication of a den-
 % sity matrix by a user-specified operator. Syntax:
 %
-%                  A=p_superop(spin_system,opspec,side)
+%                  A=superop(spin_system,opspec,side)
 %
 % Arguments:
 %
@@ -31,18 +31,18 @@
 % ilya.kuprov@weizmann.ac.il
 % hannah.hogben@chem.ox.ac.uk
 %
-% <https://spindynamics.org/wiki/index.php?title=p_superop.m>
+% <https://spindynamics.org/wiki/index.php?title=superop.m>
 
-function A=p_superop(spin_system,opspec,side)
+function A=superop(spin_system,opspec,side)
 
 % Issue a recursive call if appropriate
 if strcmp(side,'comm')
-    A=p_superop(spin_system,opspec,'leftofcomm');
-    B=p_superop(spin_system,opspec,'rightofcomm');
+    A=superop(spin_system,opspec,'leftofcomm');
+    B=superop(spin_system,opspec,'rightofcomm');
     B(:,3)=-B(:,3); A=[A; B]; return;
 elseif strcmp(side,'acomm')
-    A=[p_superop(spin_system,opspec,'left');
-       p_superop(spin_system,opspec,'right')]; return;
+    A=[superop(spin_system,opspec,'left');
+       superop(spin_system,opspec,'right')]; return;
 end
 
 % Validate the input
@@ -55,7 +55,8 @@ active_spins=find(opspec);
 if isempty(active_spins)
     A=unit_oper(spin_system); 
     [rows,cols,vals]=find(A);
-    A=[rows cols vals]; return;
+    A=[rows cols vals];
+    return;
 end
 
 % Preallocate source state index
@@ -69,98 +70,25 @@ struct=cell(1,numel(active_spins));
 
 % Loop over the relevant spins
 for n=1:length(active_spins)
-
-    % Get the multiplicity out
-    mult=spin_system.comp.mults(active_spins(n));
-
-    % Unit operator does nothing
-    if opspec(active_spins(n))==0
-
-        % Unit action table
-        source{n}=(0:(mult^2-1))';
-        destin{n}=(0:(mult^2-1))';
-        struct{n}=ones(mult^2,1);
-
-    else
     
-        % The rest depends on the particle type
-        switch spin_system.comp.types{active_spins(n)}
-
-            case 'S' % Spins
-            
-                % Retrieve irreducible spherical tensor product action tables
-                [pt_left,pt_right]=ist_product_table(spin_system.comp.mults(active_spins(n)));
-
-                % Action side
-                switch side
-
-                    % Left side action
-                    case {'left','leftofcomm'}
-
-                        % Extract pages corresponding to the current state
-                        pt=squeeze(pt_left(opspec(active_spins(n))+1,:,:));
-
-                    % Right side action
-                    case {'right','rightofcomm'}
-                        
-                        % Extract pages corresponding to the current state
-                        pt=squeeze(pt_right(opspec(active_spins(n))+1,:,:));
-
-                    otherwise
-
-                        % Complain and bomb out
-                        error('invalid side specification.');
-
-                end
-
-                % Convert product action table to indices
-                [destin{n},source{n},struct{n}]=find(pt);
-
-                % Switch to 0 base indexing for unit state
-                source{n}=source{n}-1; destin{n}=destin{n}-1;
-
-            case {'C','V','T'} % Cavities, phonons, transmons
-
-                % Retrieve single transition operator product action tables
-                [pt_left,pt_right]=st_product_table(spin_system.comp.mults(active_spins(n)));
-
-                % Action side
-                switch side
-
-                    % Left side action
-                    case {'left','leftofcomm'}
-
-                        % Extract pages corresponding to the current state
-                        pt=squeeze(pt_left(opspec(active_spins(n)),:,:));
-
-                        % Right side action
-                    case {'right','rightofcomm'}
-
-                        % Extract pages corresponding to the current state
-                        pt=squeeze(pt_right(opspec(active_spins(n)),:,:));
-
-                    otherwise
-
-                        % Complain and bomb out
-                        error('invalid side specification.');
-
-                end
-
-                % Convert product action table to indices
-                [destin{n},source{n},struct{n}]=find(pt);
-
-                % Add unit state destination manually
-                struct{n}(end+1)=1; destin{n}(end+1)=0;      
-                source{n}(end+1)=opspec(active_spins(n));
-
+    % Get right and left product action tables for the current spin
+    [pt_left,pt_right]=ist_product_table(spin_system.comp.mults(active_spins(n)));
+    
+    % Extract pages corresponding to the current state
+    switch side
+        case {'left','leftofcomm'}
+            pt=squeeze(pt_left(opspec(active_spins(n))+1,:,:));
+        case {'right','rightofcomm'}
+            pt=squeeze(pt_right(opspec(active_spins(n))+1,:,:));
         otherwise
-
-            % Complain and bomb out
-            error('unknown particle type.');
-
-        end
-
-    end 
+            error('invalid side specification.');
+    end
+    
+    % Convert product action table to indices
+    [destin{n},source{n},struct{n}]=find(pt);
+    
+    % Switch to 0 index for unit state
+    source{n}=source{n}-1; destin{n}=destin{n}-1;
     
 end
     
@@ -259,9 +187,9 @@ end
 if numel(opspec)~=spin_system.comp.nspins
     error('the number of elements in the opspec array must be equal to the number of spins.');
 end
-% if any((opspec+1)>spin_system.comp.mults.^2)
-%     error('physically impossible state requested in opspec.');
-% end
+if any((opspec+1)>spin_system.comp.mults.^2)
+    error('physically impossible state requested in opspec.');
+end
 end
 
 % My philosophy, in essence, is the concept of man as a heroic being,

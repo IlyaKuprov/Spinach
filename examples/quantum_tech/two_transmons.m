@@ -53,6 +53,10 @@ rho_targ=state(spin_system,{'BL1','C'},{1 2})+...
 rho_init=rho_init/norm(rho_init,'fro');
 rho_targ=rho_targ/norm(rho_targ,'fro');
 
+% Clean up rounding errors
+rho_init=(rho_init+rho_init')/2;
+rho_targ=(rho_targ+rho_targ')/2;
+
 % Unit fidelity is Sorensen bound
 rho_targ=rho_targ/sorensen(rho_init,rho_targ);
 

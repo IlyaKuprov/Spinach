@@ -17,14 +17,14 @@ sys.magnet=0.33;
 sys.isotopes={'E','C5'};
 
 % Basis set
-bas.formalism='zeeman-hilb';
+bas.formalism='sphten-liouv';
 bas.approximation='none';
 
 % Spinach housekeeping
 spin_system=create(sys,[]);
 spin_system=basis(spin_system,bas);
 
-% Larmor and cavity energy operators
+% Zeeman interaction operator, spin
 Ez=operator(spin_system,{'Lz'},{1});
 
 % Jaynes-Cummings term

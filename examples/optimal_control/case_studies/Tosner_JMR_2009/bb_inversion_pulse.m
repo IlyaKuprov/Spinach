@@ -1,21 +1,20 @@
-% Broadband inversion pulse design for liquid-state NMR. This script
-% reproduces,using Spinach,the second SIMPSON optimal control examp-
-% le from http://dx.doi.org/10.1016/j.jmr.2008.11.020
+% Broadband inversion pulse design for liquid-state NMR. Reprodu-
+% ces, using Spinach, the second example from:
 %
-% A single-spin (1H) system is considered in the rotating frame,on
-% resonance (no isotropic chemical shift). The goal is to design a
-% broadband inversion pulse that performs:
+%             http://dx.doi.org/10.1016/j.jmr.2008.11.020
 %
-%                          I_z  →  -I_z
+% A single proton is considered in the rotating frame with multiple
+% transmitter offsets (or chemical shifts). The goal is to design a
+% 600 µs broadband inversion pulse (1 µs slices) that performs:
 %
-% uniformly over a frequency offset range of ±50 kHz,under a fixed 
-% pulse duration T=600 µs, discretised into 600 time steps of 1 µs;
-% the control fields are Cartesian RF (Lx,Ly) on 1H.
+%                            I_z  →  -I_z
+%
+% uniformly over a frequency offset range of ±50 kHz; controls are
+% Cartesian (Lx, Ly) operators in the rotating frame.
 %
 % aditya.dev@weizmann.ac.il 
-% ilya.kuprov@weizmann.ac.il
 
-function broadband_inversion_pulse_for_nmr()
+function bb_inversion_pulse()
 
 % Magnetic field (Tesla)
 sys.magnet=14.1;
@@ -54,7 +53,7 @@ control.rho_targ={-Sz};                          % Target state
 control.pulse_dt=1e-6*ones(1,600);               % As per the paper
 control.pwr_levels=2*pi*10e3;                    % As per the paper
 control.penalties={'NS','SNSA'};                 % Penalties
-control.p_weights=[0.1 10];                      % Penalty weights
+control.p_weights=[0.01 10];                     % Penalty weights
 control.method='lbfgs';                          % Optimiser
 control.max_iter=200;                            % Max iterations
 control.parallel='ensemble';                     % Parallel mode
@@ -74,10 +73,10 @@ CLx=rf_scale*xy_profile(1,:);
 CLy=rf_scale*xy_profile(2,:);
 
 % Offset grid for verification
-offs_hz=linspace(-50e3,50e3,101);
+offs_hz=linspace(-100e3,100e3,201);
 inv_eff=zeros(size(offs_hz));
 
-% Test simulations
+% Test simulation
 parfor k=1:numel(offs_hz)
     
     % Add the offset term
@@ -95,6 +94,7 @@ end
 % Plot the efficiency profile
 kfigure(); plot(offs_hz/1e3,inv_eff); kgrid;
 kxlabel('offset, kHz'); kylabel('fidelity');
+xlim([-100 100]); ylim([-1.1 1.1]);
 
 end
 

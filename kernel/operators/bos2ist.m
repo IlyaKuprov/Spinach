@@ -50,6 +50,11 @@ for n=1:numel(prod_spec)
             % Annihilation
             P=P*W.a;
 
+        case 'N'
+
+            % Number
+            P=P*W.n;
+
         otherwise
 
             % Complain and bomb out

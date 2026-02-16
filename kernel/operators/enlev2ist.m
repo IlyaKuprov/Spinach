@@ -9,7 +9,11 @@
 %               positive integer
 %
 %     lvl_num - energy level number, counting from the
-%               bottom up
+%               bottom up for spins and from top down
+%               for bosons
+%
+%    particle - particle type, 'S' for a spin and 'B'
+%               for a boson
 %
 % Outputs:
 %
@@ -25,14 +29,33 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=enlev2ist.m>
 
-function [states,coeffs]=enlev2ist(mult,lvl_num)
+function [states,coeffs]=enlev2ist(mult,lvl_num,particle)
 
 % Check consistency
 grumble(mult,lvl_num);
 
 % Energy level projector
-P=zeros(mult,mult); 
-P(mult-lvl_num+1,mult-lvl_num+1)=1;
+P=zeros(mult,mult);
+
+% Energy level counting
+switch particle
+
+    case 'S'
+
+        % From the bottom up
+        P(mult-lvl_num+1,mult-lvl_num+1)=1;
+
+    case 'B'
+
+        % From top to bottom
+        P(lvl_num,lvl_num)=1;
+
+    otherwise
+
+        % Complain and bomb out
+        error('unknown particle type.');
+
+end
 
 % Spherical tensor expansion
 [states,coeffs]=oper2ist(P);

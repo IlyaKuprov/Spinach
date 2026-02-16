@@ -15,7 +15,7 @@
 % aditya.dev@weizmann.ac.il
 % ilya.kuprov@weizmann.ac.il
 
-function broadband_refocusing_pulses()
+function bb_refocusing_pulse()
 
 % Pulse length and discretisation
 T         = 200e-6;                 % total duration, s

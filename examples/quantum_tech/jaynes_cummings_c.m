@@ -18,7 +18,7 @@ sys.magnet=0.33;
 sys.isotopes={'E','E','C5'};
 
 % Basis set
-bas.formalism='zeeman-hilb';
+bas.formalism='sphten-liouv';
 bas.approximation='none';
 
 % Spinach housekeeping

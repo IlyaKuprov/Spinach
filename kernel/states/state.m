@@ -187,7 +187,7 @@ switch spin_system.bas.formalism
                     coeffs(n)=coeffs(n)*spin_system.chem.concs(species);
                     
                     % Get the operator
-                    A=p_superop(spin_system,opspecs{n},'left');
+                    A=superop(spin_system,opspecs{n},'left');
                     A=sparse(A(:,1),A(:,2),A(:,3),matrix_dim,matrix_dim);
 
                     % Get the state vector

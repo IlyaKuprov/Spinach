@@ -91,7 +91,7 @@ parfor k=1:numel(offs_hz)
 
 end
 
-% Plot the efficiency profile
+% Plot the fidelity profile
 kfigure(); plot(offs_hz/1e3,inv_eff); kgrid;
 kxlabel('offset, kHz'); kylabel('fidelity');
 xlim([-100 100]); ylim([-1.1 1.1]);

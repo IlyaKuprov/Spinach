@@ -1,7 +1,15 @@
 % Structure coefficient tables for the associative envelopes of trun-
-% cated Weyl algebras. Syntax:
+% cated Weyl algebras. Bosonic monomials in boson_mono(nlevels) are
+% orthognalised by boson_mono_ortho(nlevels)and then used to calculate 
+% the structure coeffcients. 
+% 
+% Syntax:
 %
 % [product_table_left,product_table_right]=bos_product_table(nlevels)
+% 
+% Parameters:
+%
+%          nlevels - number of bosonic ladder population levels 
 %
 % The input parameter is the number of energy levels in the truncated 
 % bosonic mode. Output contains the structure coefficients in the fol-
@@ -19,15 +27,15 @@
 %
 % Note: these are expensive tables, disk cache is used automatically.
 %
-% Note: unlike irreducible spherical tensors, bosonic monomials are
-%       not orthogonal; the overlap matrix is built and used below.
+% Note: bosonic monomials have been orthogonalised; the overlap matrix 
+%       is the identity matrix upto machine precision.
 %
 % sarbojoy.das@weizmann.ac.il
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=bos_product_table.m>
 
-function [product_table_left,product_table_right]=bos_product_table(nlevels)
+function [product_table_left,product_table_right]= bos_product_table(nlevels)
 
 % Check consistency
 grumble(nlevels);
@@ -46,62 +54,43 @@ if exist(table_file,'file')
     
 else
     
-    % Get bosonic monomials
-    B=boson_mono(nlevels);
+    % Get orthogonal bosonic monomials
+    B = boson_mono_ortho(nlevels);
 
     % Precompute norms
     norms=zeros(nlevels^2,1);
     for n=1:nlevels^2
         norms(n)=sqrt(hdot(B{n},B{n}));
     end
-
-    % Get the overlap matrix
-    S=zeros(nlevels^2,nlevels^2);
-    for m=1:nlevels^2
-        for k=1:nlevels^2
-
-            % Carefully tiptoe around extreme norms
-            S(m,k)=hdot(B{m}/norms(m),B{k}/norms(k));
-
-        end
-    end
     
-    % Preallocate the arrays
+    % Preallocate IST product tables
     product_table_left= zeros(nlevels^2,nlevels^2,nlevels^2);
     product_table_right=zeros(nlevels^2,nlevels^2,nlevels^2);
-    
-    % Get the structure coefficients
+
+    % Populate product tables
     for k=1:nlevels^2
         for m=1:nlevels^2
             for n=1:nlevels^2
 
                 % Left product action: carefully tiptoe around extreme norms
                 product_table_left(n,m,k)= norms(n)*hdot((B{k}/norms(k)),...
-                                                         (B{n}/norms(n))*...
-                                                         (B{m}/norms(m)));
+                                                        (B{n}/norms(n))*...
+                                                        (B{m}/norms(m)));
 
                 % Right product action: carefully tiptoe around extreme norms
                 product_table_right(n,m,k)=norms(n)*hdot((B{k}/norms(k)),...
-                                                         (B{m}/norms(m))*...
-                                                         (B{n}/norms(n)));
+                                                        (B{m}/norms(m))*...
+                                                        (B{n}/norms(n)));
 
             end
         end
     end
 
-    % Apply the overlap matrix
-    product_table_left= reshape(product_table_left, [nlevels^4 nlevels^2]);
-    product_table_right=reshape(product_table_right,[nlevels^4 nlevels^2]);
-    product_table_left= product_table_left /S';
-    product_table_right=product_table_right/S';
-    product_table_left= reshape(product_table_left, [nlevels^2 nlevels^2 nlevels^2]);
-    product_table_right=reshape(product_table_right,[nlevels^2 nlevels^2 nlevels^2]);
-
-    try % Try to save a cache record, but don't insist
+    try % Try to save a cache record, but do not insist
         save(table_file,'product_table_left',...
-                        'product_table_right'); drawnow;
+                        'product_table_right','-v7.3'); drawnow;
     catch
-        warning('Spinach installation appears to be write-protected');
+        warning('Spinach directory appears to be write-protected');
     end
 
 end
@@ -111,8 +100,8 @@ end
 % Consistency enforcement
 function grumble(nlevels)
 if (~isnumeric(nlevels))||(~isreal(nlevels))||...
-   (~isscalar(nlevels))||(nlevels<3)||(mod(nlevels,1)~=0)
-    error('mult must be a real integer greater than 2.');
+   (~isscalar(nlevels))||(nlevels<1)||(mod(nlevels,1)~=0)
+    error('nlevels must be a positive integer.');
 end
 end
 
@@ -121,4 +110,3 @@ end
 % kon it was probably a printer.
 %
 % John Moynes
-

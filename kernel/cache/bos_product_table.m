@@ -1,6 +1,6 @@
 % Structure coefficient tables for the associative envelopes of trun-
 % cated Weyl algebras. Bosonic monomials in boson_mono(nlevels) are
-% orthognalised by boson_mono_ortho(nlevels)and then used to calculate 
+% orthognalised by boson_mono_ortho(nlevels) and then used to calculate 
 % the structure coeffcients. 
 % 
 % Syntax:

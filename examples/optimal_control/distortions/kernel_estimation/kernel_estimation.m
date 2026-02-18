@@ -18,9 +18,9 @@ xlim([60 500]); ylim padded; kgrid; kxlabel('time, ns');
 kylabel('mV'); ktitle('HiPER instrument readout');
 
 % Make ideal XiX waveform with ten 36 ns periods
-xix_block=[ones(36,1); -ones(36,1)];
-real_ideal=[zeros(175,1); xix_block; xix_block; xix_block; xix_block; xix_block; 
-            xix_block; xix_block; xix_block; xix_block; xix_block; zeros(257,1)];
+xix_block=[ones(36,1); -ones(36,1)]; ts=2; % Time shift
+real_ideal=[zeros(175-ts,1); xix_block; xix_block; xix_block; xix_block; xix_block; 
+            xix_block; xix_block; xix_block; xix_block; xix_block; zeros(257+ts,1)];
 imag_ideal=zeros(1152,1);
 
 % Plot the ideal waveform

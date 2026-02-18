@@ -282,9 +282,10 @@ end
 function footer(spin_system,exitflag,data)
 report(spin_system,'----------------------------------------------------------------------------------------------');
 switch(spin_system.control.method)
-    case 'lbfgs',  data.algorithm='LBFGS method';
-    case 'newton', data.algorithm='Newton-Raphson method';
-    case 'goodwin', data.algorithm='Newton-Raphson method with Goodwin acceleration';
+    case 'lbfgs',   data.algorithm='LBFGS method';
+    case 'rbfgs',   data.algorithm='Regularised BFGS method';
+    case 'newton',  data.algorithm='Regularised Newton-Raphson method';
+    case 'goodwin', data.algorithm='Regularised Newton-Raphson method with Goodwin acceleration';
 end
 switch exitflag
     case  1, message='norm(gradient,2) < tol_gfx';

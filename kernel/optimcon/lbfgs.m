@@ -36,20 +36,23 @@ grumble(dx_hist,dg_hist,g);
 curv_rel_tol=0.01;  
 
 % Relevant inner products
-ys=sum(dg_hist.*dx_hist,1); % y'*s
-yy=sum(dg_hist.*dg_hist,1); % y'*y
-ss=sum(dx_hist.*dx_hist,1); % s'*s
+dgdx=sum(dg_hist.*dx_hist,1); 
+dgdg=sum(dg_hist.*dg_hist,1);
+dxdx=sum(dx_hist.*dx_hist,1); 
 
 % Curvature pair validation
-valid=isfinite(ys)&isfinite(yy)&isfinite(ss)&...
-      (yy>0)&(ss>0)&(ys<-curv_rel_tol*sqrt(yy.*ss));
+valid=isfinite(dgdx)&isfinite(dgdg)&isfinite(dxdx)&...
+      (dgdg>0)&(dxdx>0)&(dgdx<-curv_rel_tol*sqrt(dgdg.*dxdx));
 
 % Dropping bad pairs
 dx_hist=dx_hist(:,valid);
 dg_hist=dg_hist(:,valid);
 
-% Return steepest ascent if no pair survives
-if isempty(dx_hist), direction=g; return; end
+% Return steepest ascent
+% if all pairs are bad
+if isempty(dx_hist)
+    direction=g; return; 
+end
 
 % Initialise variables
 N=size(dx_hist,2);

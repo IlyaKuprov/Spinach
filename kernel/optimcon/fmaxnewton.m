@@ -115,7 +115,7 @@ for n=1:spin_system.control.max_iter
     % Get the search direction
     switch spin_system.control.method
         
-        case 'lbfgs'
+        case {'lbfgs','rbfgs'}
             
             if n==1
                 
@@ -150,10 +150,27 @@ for n=1:spin_system.control.max_iter
                 
                 % Get ascent direction
                 dir=zeros(size(frozen));
-                dir(~frozen)=lbfgs(dx_hist,dg_hist,g(~frozen));
+                if strcmp(spin_system.control.method,'lbfgs')
+
+                    % LBFGS with no possibility of regularisation
+                    dir(~frozen)=lbfgs(dx_hist,dg_hist,g(~frozen));
+
+                else
+                    
+                    % Full BFGS pseudo-Hessian
+                    H=bfgs(dx_hist,dg_hist,g(~frozen));
+
+                    % Regularise the pseudo-Hessian 
+                    [H,data]=hessreg(spin_system,H,g(~frozen),data);
+                    
+                    % Get the search direction
+                    dir=zeros(size(frozen));
+                    dir(~frozen)=H\g(~frozen);
+
+                end
                 
             end
-            
+
         case {'newton','goodwin'}
             
             % Get objective, gradient, and Hessian

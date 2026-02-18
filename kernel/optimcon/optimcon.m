@@ -705,8 +705,9 @@ end
 if isfield(control,'method')
 
     % Input validation
-    if (~ischar(control.method))||(~ismember(control.method,{'lbfgs','newton','goodwin'}))
-        error('control.method must be ''lbfgs'', ''newton'', or ''goodwin''.');
+    if (~ischar(control.method))||(~ismember(control.method,{'lbfgs','rbfgs',...
+                                                             'newton','goodwin'}))
+        error('control.method must be ''lbfgs'', ''rbfgs'', ''newton'', or ''goodwin''.');
     end
     
     % Absorb the method
@@ -809,7 +810,7 @@ report(spin_system,[pad('Termination tolerance on |grad(x)|',60) ...
                     pad(num2str(spin_system.control.tol_g,'%0.8g'),20)]);
 
 % Set up LBFGS history
-if strcmp(spin_system.control.method,'lbfgs')
+if ismember(spin_system.control.method,{'lbfgs','rbfgs'})
     
     % Decide history length
     if isfield(control,'n_grads')

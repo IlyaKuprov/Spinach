@@ -1,41 +1,37 @@
-% Structure coefficient tables for the associative envelopes of trun-
-% cated Weyl algebras. Bosonic monomials in boson_mono(nlevels) are
-% orthognalised by boson_mono_ortho(nlevels) and then used to calculate 
-% the structure coeffcients. 
-% 
-% Syntax:
+% Structure coefficient tables for the associative envelopes of 
+% truncated Weyl algebras spanned by orthogonalised bosonic mo-
+% nomials. Syntax:
 %
-% [product_table_left,product_table_right]=bos_product_table(nlevels)
+%       [product_table_left,...
+%        product_table_right]=bos_product_table(nlevels)
 % 
 % Parameters:
 %
-%          nlevels - number of bosonic ladder population levels 
+%     nlevels - number of bosonic ladder population levels 
 %
-% The input parameter is the number of energy levels in the truncated 
-% bosonic mode. Output contains the structure coefficients in the fol-
-% lowing conventions (B{m} and B{k} are normalised):
 %
-%            B{n}*B{m}=...+product_table_left(n,m,k)*B{k}+...
+% The output contains the structure coefficients in the follow-
+% ing lowing conventions:
 %
-%            B{m}*B{n}=...+product_table_right(n,m,k)*B{k}+...
+%       B{n}*B{m}=...+product_table_left(n,m,k)*B{k}+...
 %
-% corresponding to the expansion of the left and the right multiplica-
-% tive action by B{n} on B{m} as given in Eq 7.18 of the first edition
-% of IK's book (normalisation is missing in the book, that's a typo).
-% Numbering translation between single and double index is given by 
-% kq2lin and lin2kq functions.
+%       B{m}*B{n}=...+product_table_right(n,m,k)*B{k}+...
 %
-% Note: these are expensive tables, disk cache is used automatically.
+% corresponding to the expansion of the left and the right mul-
+% tiplicative action by B{n} on B{m} as given in Eq 7.18 of the
+% first edition of IK's book (normalisation is missing in the
+% book, that's a typo).
 %
-% Note: bosonic monomials have been orthogonalised; the overlap matrix 
-%       is the identity matrix upto machine precision.
+% Note: these are expensive tables, a disk cache is created and
+%       used automatically.
 %
 % sarbojoy.das@weizmann.ac.il
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=bos_product_table.m>
 
-function [product_table_left,product_table_right]= bos_product_table(nlevels)
+function [product_table_left,...
+          product_table_right]=bos_product_table(nlevels)
 
 % Check consistency
 grumble(nlevels);
@@ -54,8 +50,8 @@ if exist(table_file,'file')
     
 else
     
-    % Get orthogonal bosonic monomials
-    B = boson_mono_ortho(nlevels);
+    % Orthogonalised bosonic monomials
+    B=boson_ortho(nlevels);
 
     % Precompute norms
     norms=zeros(nlevels^2,1);
@@ -72,15 +68,15 @@ else
         for m=1:nlevels^2
             for n=1:nlevels^2
 
-                % Left product action: carefully tiptoe around extreme norms
+                % Left product action
                 product_table_left(n,m,k)= norms(n)*hdot((B{k}/norms(k)),...
-                                                        (B{n}/norms(n))*...
-                                                        (B{m}/norms(m)));
+                                                         (B{n}/norms(n))*...
+                                                         (B{m}/norms(m)));
 
-                % Right product action: carefully tiptoe around extreme norms
+                % Right product action
                 product_table_right(n,m,k)=norms(n)*hdot((B{k}/norms(k)),...
-                                                        (B{m}/norms(m))*...
-                                                        (B{n}/norms(n)));
+                                                         (B{m}/norms(m))*...
+                                                         (B{n}/norms(n)));
 
             end
         end

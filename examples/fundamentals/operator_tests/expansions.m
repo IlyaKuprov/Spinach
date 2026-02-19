@@ -1,5 +1,5 @@
 % Product action tests for irreducible spherical tensor
-% operators and bosonic monomials.
+% operators and orthogonalised bosonic monomials.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -11,7 +11,7 @@ bos_nlevels=2+randi(8);
 
 % Monomials and ISTs
 T=irr_sph_ten(spin_mult);
-B=boson_mono(bos_nlevels);
+B=boson_ortho(bos_nlevels);
 
 % Multiplication tables
 [ist_PTL,ist_PTR]=ist_product_table(spin_mult);

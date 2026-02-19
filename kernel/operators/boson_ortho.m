@@ -10,7 +10,7 @@
 %
 % Outputs:
 %
-%        B - a cell array of orthogonal bosonic monomials
+%       B - a cell array of orthogonal bosonic monomials
 %
 % ilya.kuprov@weizmann.ac.il
 % sarbojoy.das@weizmann.ac.il
@@ -30,6 +30,7 @@ for n=1:numel(B)
     for k=1:(n-1)
         B{n}=B{n}-B{k}*hdot(B{k},B{n})/hdot(B{k},B{k});
     end
+    B{n}=B{n}/norm(B{n},'fro');
 end
 
 end

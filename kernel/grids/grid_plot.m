@@ -1,15 +1,23 @@
 % Spherical quadrature grid plotter. Takes a cloud of points
 % on a sphere and plots its Voronoi tessellation. Syntax:
 %
-%                     grid_plot(x,y,z,vorn)
+%               grid_plot(x,y,z,vorn,c,options)
 %
 % Parameters:
 %
 %   x,y,z  - column vectors containing Cartesian 
 %            coordinates of grid points
 %
+%   c      - values to be mapped into the colour
+%            of each tessellation face, white if
+%            this input is left empty
+%
 %   vorn   - Voronoi tessellation; if this is not 
 %            provided, it will be computed
+%
+%   options.dots - the default (true) puts black
+%                  dots at centres of tessellati-
+%                  on faces
 %
 % Outputs:
 %
@@ -19,26 +27,47 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=grid_plot.m>
 
-function grid_plot(x,y,z,vorn)
+function grid_plot(x,y,z,vorn,c,options)
 
-% Run the tessellation
-if ~exist('vorn','var')
+% Run Voronoi tessellation on a sphere
+if (~exist('vorn','var'))||isempty(vorn)
     [~,~,vorn]=voronoisphere([x'; y'; z']);
+end
+
+% Default tessellation face colour is white
+if (~exist('c','var'))||isempty(c), c='white'; end
+
+% Default is to draw centre dots
+if (~exist('options','var'))||...
+   (~isfield(options,'dots'))
+    options.dots=true;
 end
 
 % Check consistency
 grumble(x,y,z,vorn);
 
 % Plot the points
-plot3(x,y,z,'k.','MarkerSize',3);
+if options.dots
+    plot3(x,y,z,'k.','MarkerSize',3);
+end
 xlim([-1.1 +1.1]); ylim([-1.1 +1.1]);
 zlim([-1.1 +1.1]); hold on;
 
 % Plot the tessera
 for k=1:numel(vorn)
-    patch(vorn{k}(1,:),...
-          vorn{k}(2,:),...
-          vorn{k}(3,:),'white','FaceAlpha',1);
+    if ischar(c)
+
+        % Colour by the name
+        patch(vorn{k}(1,:),vorn{k}(2,:),...
+              vorn{k}(3,:),c,'FaceAlpha',1);
+
+    else
+
+        % Colour by the numbers
+        patch(vorn{k}(1,:),vorn{k}(2,:),...
+              vorn{k}(3,:),c(k),'FaceAlpha',1);
+
+    end
 end
 
 % Residual cosmetics

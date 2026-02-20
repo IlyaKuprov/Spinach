@@ -16,7 +16,7 @@ function write_movie(file_name)
 % Check consistency
 grumble(file_name);
 
-% Overrride stretch-to-fill
+% Disable stretch-to-fill
 axis vis3d;
 
 % Open the video writer object

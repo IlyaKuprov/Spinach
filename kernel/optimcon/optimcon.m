@@ -1192,9 +1192,9 @@ spin_system.control.ls_tau1=3;         % Line search: bracket expansion factor
 spin_system.control.ls_tau2=0.1;       % Line search: left section contraction
 spin_system.control.ls_tau3=0.5;       % Line search: right section contraction
 spin_system.control.reg_max_iter=2500; % RFO: max regularisation iterations
-spin_system.control.reg_alpha=1;       % RFO: scaling factor
-spin_system.control.reg_phi=0.9;       % RFO: conditioning multiplier
-spin_system.control.reg_max_cond=1e4;  % RFO: max condition number
+spin_system.control.reg_alpha=1;       % RFO: initial scaling factor
+spin_system.control.reg_phi=0.5;       % RFO: conditioning multiplier
+spin_system.control.reg_max_cond=1e3;  % RFO: max condition number
 
 % Accept pulse sequence parameters
 if isfield(control,'parameters')

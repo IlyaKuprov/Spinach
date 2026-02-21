@@ -1,7 +1,7 @@
-% Signal heterodyne from wall clock time into the rotating frame. Uses
-% a GPU if one is available. Syntax:
+% Signal heterodyne from wall clock time into the rotating 
+% frame. Uses a GPU if one is available. Syntax:
 % 
-%                    heterodyne(dt,exp_data,car_freq)
+%              heterodyne(dt,exp_data,car_freq)
 %
 % Parameters:
 %
@@ -17,8 +17,8 @@
 %                rotating frame
 %
 %
-% Note: the signal must be sampled with at least four points per period
-%       of the frequency being demodulated.
+% Note: the signal must be sampled with at least four points 
+%       per period of the frequency being demodulated.
 %
 % a.acharya@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il

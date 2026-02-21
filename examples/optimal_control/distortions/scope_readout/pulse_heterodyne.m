@@ -55,21 +55,21 @@ subplot(2,2,2); stairs(time_grid,ampl_bruk);
 hold on; stairs(time_theo,ampl_theo');
 xlim([0 0.05]); ylim padded; kgrid; 
 ktitle('amplitude'); kxlabel('time, s');
-klegend({'Bruker','OC'},'Location','northwest');
+klegend({'antenna','input'},'Location','northwest');
 
 % Plot real part of both signals
 subplot(2,2,3); stairs(time_grid,real(cplx_bruk)); 
 hold on; stairs(time_theo,real(cplx_theo));
 xlim([0 0.05]); ylim padded; kgrid; 
 ktitle('in-phase component'); kxlabel('time, s');
-klegend({'Bruker','OC'},'Location','southwest');
+klegend({'antenna','input'},'Location','southwest');
 
 % Plot imaginary part of both signals
 subplot(2,2,4); stairs(time_grid,imag(cplx_bruk));
 hold on; stairs(time_theo,imag(cplx_theo));
 xlim([0 0.05]); ylim padded; kgrid; 
 ktitle('out-of-phase component'); kxlabel('time, s');
-klegend({'Bruker','OC'},'Location','southwest');
+klegend({'antenna','input'},'Location','southwest');
 
 end 
 

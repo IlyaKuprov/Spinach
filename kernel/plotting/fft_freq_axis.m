@@ -18,13 +18,11 @@
 %
 %    df      - frequency resolution
 %
-%    nfft    - FFT length used
-%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=fft_freq_axis.m>
 
-function [f_shift,f,df,nfft]=fft_freq_axis(npts,dt,zf)
+function [f_shift,f,df]=fft_freq_axis(npts,dt,zf)
 
 % Set default zero-fill
 if nargin<3, zf=0; end
@@ -69,7 +67,7 @@ end
 % one. 'Albie', or 'Albert', is believed to have made a na-
 % vigational error in around 2014 and has since been living
 % in Europe, dividing his time between Germany, Yorkshire
-% coast and the east coast of scotland, where he tends to
+% coast and the east coast of Scotland, where he tends to
 % hang out with gannets.
 %
 % The Spectator

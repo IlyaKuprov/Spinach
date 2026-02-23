@@ -81,6 +81,26 @@ if ismember('power_drift',spin_system.control.ens_corrs)
     catalog(catalog(:,3)~=catalog(:,2),:)=[];
 end
 
+% Count the full ensemble size
+n_cases=size(catalog,1);
+
+% Get ensemble budget
+if isfield(spin_system.control,'budget')
+    ens_budget=spin_system.control.budget;
+else
+    ens_budget=inf;
+end
+
+% Apply ensemble budget if requested
+if isfinite(ens_budget)&&(ens_budget<n_cases)
+
+    % Draw a reproducible random subset
+    rng_state=rng; rng(0,'twister');
+    catalog=catalog(randperm(n_cases,ens_budget),:);
+    rng(rng_state);
+
+end
+
 % Count the cases
 n_cases=size(catalog,1);
 
@@ -439,31 +459,11 @@ else
     hessian=[];
 end
 
-% Run diagnostic plotting (expensive!)
+% Run diagnostic plotting
 if ~isempty(spin_system.control.plotting)
-
-    % With or without instrumental distortions
-    if ~isempty(spin_system.control.distplot)
-
-        % Apply the distortions
-        dist_waveform=waveform;
-        for k=1:numel(spin_system.control.distplot)
-
-            % Extract and apply distortion function
-            dist_function=spin_system.control.distplot{k};
-            dist_waveform=dist_function(dist_waveform);
-
-        end
-
-        % Real-life trajectory and the distorted control sequence
-        ctrl_trajan(spin_system,dist_waveform,traj_data,fidelities);
-
-    else
     
-        % Real-life trajectory but the ideal control sequence
-        ctrl_trajan(spin_system,waveform,traj_data,fidelities);
-
-    end
+    % Send waveform, trajectories, and fidelities for plotting
+    ctrl_trajan(spin_system,waveform,traj_data,fidelities);
     
 end
 

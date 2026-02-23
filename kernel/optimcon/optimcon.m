@@ -679,14 +679,9 @@ end
 % Process freeze mask
 if isfield(control,'freeze')
 
-    % Store the mask (validated in fmaxnewton)
+    % Store the mask (validated in fminnewton)
     spin_system.control.freeze=logical(control.freeze);
     control=rmfield(control,'freeze');
-
-    % Make sure not everything is frozen
-    if all(spin_system.control.freeze,'all')
-        error('the entire waveform is frozen.');
-    end
     
     % Inform the user
     report(spin_system,[pad('Freeze mask supplied',60) 'yes']);
@@ -705,9 +700,8 @@ end
 if isfield(control,'method')
 
     % Input validation
-    if (~ischar(control.method))||(~ismember(control.method,{'lbfgs','rbfgs',...
-                                                             'newton','goodwin'}))
-        error('control.method must be ''lbfgs'', ''rbfgs'', ''newton'', or ''goodwin''.');
+    if (~ischar(control.method))||(~ismember(control.method,{'lbfgs','newton','goodwin'}))
+        error('control.method must be ''lbfgs'', ''newton'', or ''goodwin''.');
     end
     
     % Absorb the method
@@ -810,7 +804,7 @@ report(spin_system,[pad('Termination tolerance on |grad(x)|',60) ...
                     pad(num2str(spin_system.control.tol_g,'%0.8g'),20)]);
 
 % Set up LBFGS history
-if ismember(spin_system.control.method,{'lbfgs','rbfgs'})
+if strcmp(spin_system.control.method,'lbfgs')
     
     % Decide history length
     if isfield(control,'n_grads')
@@ -1040,6 +1034,36 @@ for n=1:numel(spin_system.control.ens_corrs)
                         spin_system.control.ens_corrs{n}]);
 end
 
+% Process ensemble budget
+if isfield(control,'budget')
+
+    % Input validation
+    if (~isnumeric(control.budget))||(~isreal(control.budget))||...
+       (~isscalar(control.budget))||(mod(control.budget,1)~=0)||...
+       (control.budget<1)
+        error('control.budget must be a positive real integer.');
+    end
+
+    % Absorb ensemble budget
+    spin_system.control.budget=control.budget;
+    control=rmfield(control,'budget');
+
+else
+
+    % Default is all ensemble members
+    spin_system.control.budget=inf;
+
+end
+
+% Inform the user
+if isfinite(spin_system.control.budget)
+    report(spin_system,[pad('Ensemble budget',60) ...
+                        int2str(spin_system.control.budget)]);
+else
+    report(spin_system,[pad('Ensemble budget',60) ...
+                        'all']);
+end
+
 % Parallelisation strategy
 if isfield(control,'parallel')
 
@@ -1088,26 +1112,6 @@ else
     
     % Default is no plotting
     spin_system.control.plotting={};
-    
-end
-
-% Distortion before plotting
-if isfield(control,'distplot')
-
-    % Input validation
-    if (~iscell(control.distplot))||...
-        any(~cellfun(@(x)isa(x,'function_handle'),control.distplot(:)))
-        error('control.distplot must be a cell array of function handles.');
-    end
-    
-    % Absorb the specification
-    spin_system.control.distplot=control.distplot;
-    control=rmfield(control,'distplot');
-    
-else
-    
-    % Plot ideal waveform by default
-    spin_system.control.distplot={};
     
 end
 
@@ -1192,9 +1196,9 @@ spin_system.control.ls_tau1=3;         % Line search: bracket expansion factor
 spin_system.control.ls_tau2=0.1;       % Line search: left section contraction
 spin_system.control.ls_tau3=0.5;       % Line search: right section contraction
 spin_system.control.reg_max_iter=2500; % RFO: max regularisation iterations
-spin_system.control.reg_alpha=1;       % RFO: initial scaling factor
-spin_system.control.reg_phi=0.5;       % RFO: conditioning multiplier
-spin_system.control.reg_max_cond=1e3;  % RFO: max condition number
+spin_system.control.reg_alpha=1;       % RFO: scaling factor
+spin_system.control.reg_phi=0.9;       % RFO: conditioning multiplier
+spin_system.control.reg_max_cond=1e4;  % RFO: max condition number
 
 % Accept pulse sequence parameters
 if isfield(control,'parameters')

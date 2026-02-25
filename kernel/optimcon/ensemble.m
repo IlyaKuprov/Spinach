@@ -88,15 +88,19 @@ n_cases=size(catalog,1);
 if isfield(spin_system.control,'budget')
     ens_budget=spin_system.control.budget;
 else
-    ens_budget=inf;
+    ens_budget=Inf;
 end
 
-% Apply ensemble budget if requested
-if isfinite(ens_budget)&&(ens_budget<n_cases)
+% Apply ensemble budget
+if ens_budget<n_cases
 
-    % Draw a reproducible random subset
-    rng_state=rng; rng(0,'twister');
+    % Get RNG into a reproducible state
+    rng_state=rng; rng(5318008,'twister');
+
+    % Draw a random subset of the ensemble
     catalog=catalog(randperm(n_cases,ens_budget),:);
+
+    % Release RNG
     rng(rng_state);
 
 end

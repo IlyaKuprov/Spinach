@@ -1057,7 +1057,7 @@ if isfield(control,'budget')
 else
 
     % Default is all ensemble members
-    spin_system.control.budget=inf;
+    spin_system.control.budget=Inf;
 
 end
 
@@ -1066,8 +1066,7 @@ if isfinite(spin_system.control.budget)
     report(spin_system,[pad('Ensemble budget',60) ...
                         int2str(spin_system.control.budget)]);
 else
-    report(spin_system,[pad('Ensemble budget',60) ...
-                        'all']);
+    report(spin_system,[pad('Ensemble budget',60) 'all']);
 end
 
 % Parallelisation strategy

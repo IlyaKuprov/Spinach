@@ -459,11 +459,31 @@ else
     hessian=[];
 end
 
-% Run diagnostic plotting
+% Run diagnostic plotting (expensive!)
 if ~isempty(spin_system.control.plotting)
+
+    % With or without instrumental distortions
+    if ~isempty(spin_system.control.distplot)
+
+        % Apply the distortions
+        dist_waveform=waveform;
+        for k=1:numel(spin_system.control.distplot)
+
+            % Extract and apply distortion function
+            dist_function=spin_system.control.distplot{k};
+            dist_waveform=dist_function(dist_waveform);
+
+        end
+
+        % Real-life trajectory and the distorted control sequence
+        ctrl_trajan(spin_system,dist_waveform,traj_data,fidelities);
+
+    else
     
-    % Send waveform, trajectories, and fidelities for plotting
-    ctrl_trajan(spin_system,waveform,traj_data,fidelities);
+        % Real-life trajectory but the ideal control sequence
+        ctrl_trajan(spin_system,waveform,traj_data,fidelities);
+
+    end
     
 end
 

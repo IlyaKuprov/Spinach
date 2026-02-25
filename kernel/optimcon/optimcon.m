@@ -679,9 +679,14 @@ end
 % Process freeze mask
 if isfield(control,'freeze')
 
-    % Store the mask (validated in fminnewton)
+    % Store the mask (validated in fmaxnewton)
     spin_system.control.freeze=logical(control.freeze);
     control=rmfield(control,'freeze');
+
+    % Make sure not everything is frozen
+    if all(spin_system.control.freeze,'all')
+        error('the entire waveform is frozen.');
+    end
     
     % Inform the user
     report(spin_system,[pad('Freeze mask supplied',60) 'yes']);
@@ -700,8 +705,9 @@ end
 if isfield(control,'method')
 
     % Input validation
-    if (~ischar(control.method))||(~ismember(control.method,{'lbfgs','newton','goodwin'}))
-        error('control.method must be ''lbfgs'', ''newton'', or ''goodwin''.');
+    if (~ischar(control.method))||(~ismember(control.method,{'lbfgs','rbfgs',...
+                                                             'newton','goodwin'}))
+        error('control.method must be ''lbfgs'', ''rbfgs'', ''newton'', or ''goodwin''.');
     end
     
     % Absorb the method
@@ -804,7 +810,7 @@ report(spin_system,[pad('Termination tolerance on |grad(x)|',60) ...
                     pad(num2str(spin_system.control.tol_g,'%0.8g'),20)]);
 
 % Set up LBFGS history
-if strcmp(spin_system.control.method,'lbfgs')
+if ismember(spin_system.control.method,{'lbfgs','rbfgs'})
     
     % Decide history length
     if isfield(control,'n_grads')
@@ -1115,6 +1121,26 @@ else
     
 end
 
+% Distortion before plotting
+if isfield(control,'distplot')
+
+    % Input validation
+    if (~iscell(control.distplot))||...
+        any(~cellfun(@(x)isa(x,'function_handle'),control.distplot(:)))
+        error('control.distplot must be a cell array of function handles.');
+    end
+    
+    % Absorb the specification
+    spin_system.control.distplot=control.distplot;
+    control=rmfield(control,'distplot');
+    
+else
+    
+    % Plot ideal waveform by default
+    spin_system.control.distplot={};
+    
+end
+
 % Process trajectory options
 if isfield(control,'traj_opts')
 
@@ -1196,9 +1222,9 @@ spin_system.control.ls_tau1=3;         % Line search: bracket expansion factor
 spin_system.control.ls_tau2=0.1;       % Line search: left section contraction
 spin_system.control.ls_tau3=0.5;       % Line search: right section contraction
 spin_system.control.reg_max_iter=2500; % RFO: max regularisation iterations
-spin_system.control.reg_alpha=1;       % RFO: scaling factor
-spin_system.control.reg_phi=0.9;       % RFO: conditioning multiplier
-spin_system.control.reg_max_cond=1e4;  % RFO: max condition number
+spin_system.control.reg_alpha=1;       % RFO: initial scaling factor
+spin_system.control.reg_phi=0.5;       % RFO: conditioning multiplier
+spin_system.control.reg_max_cond=1e3;  % RFO: max condition number
 
 % Accept pulse sequence parameters
 if isfield(control,'parameters')

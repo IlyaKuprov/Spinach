@@ -1040,6 +1040,36 @@ for n=1:numel(spin_system.control.ens_corrs)
                         spin_system.control.ens_corrs{n}]);
 end
 
+% Process ensemble budget
+if isfield(control,'budget')
+
+    % Input validation
+    if (~isnumeric(control.budget))||(~isreal(control.budget))||...
+       (~isscalar(control.budget))||(mod(control.budget,1)~=0)||...
+       (control.budget<1)
+        error('control.budget must be a positive real integer.');
+    end
+
+    % Absorb ensemble budget
+    spin_system.control.budget=control.budget;
+    control=rmfield(control,'budget');
+
+else
+
+    % Default is all ensemble members
+    spin_system.control.budget=inf;
+
+end
+
+% Inform the user
+if isfinite(spin_system.control.budget)
+    report(spin_system,[pad('Ensemble budget',60) ...
+                        int2str(spin_system.control.budget)]);
+else
+    report(spin_system,[pad('Ensemble budget',60) ...
+                        'all']);
+end
+
 % Parallelisation strategy
 if isfield(control,'parallel')
 

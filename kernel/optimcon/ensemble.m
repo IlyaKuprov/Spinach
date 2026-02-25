@@ -81,6 +81,26 @@ if ismember('power_drift',spin_system.control.ens_corrs)
     catalog(catalog(:,3)~=catalog(:,2),:)=[];
 end
 
+% Count the full ensemble size
+n_cases=size(catalog,1);
+
+% Get ensemble budget
+if isfield(spin_system.control,'budget')
+    ens_budget=spin_system.control.budget;
+else
+    ens_budget=inf;
+end
+
+% Apply ensemble budget if requested
+if isfinite(ens_budget)&&(ens_budget<n_cases)
+
+    % Draw a reproducible random subset
+    rng_state=rng; rng(0,'twister');
+    catalog=catalog(randperm(n_cases,ens_budget),:);
+    rng(rng_state);
+
+end
+
 % Count the cases
 n_cases=size(catalog,1);
 

@@ -28,8 +28,9 @@
 %     dt  - evolution time step, seconds
 %
 %     method - 'PWCL', 'PWCM', 'RKMK4', 'RKMK-DP5',
-%              'RKMK-DP8', or 'LG4',
-%              the latter one is recommended
+%              'RKMK-DP8', or 'LG4'; the latter one
+%               has a good balance of efficiency and
+%               numerical accuracy
 %
 % Outputs:
 %
@@ -140,11 +141,11 @@ switch method
         LMA=L(t+0.5*dt,rho_mid);
         
         % Re-estimate midpoint state and generator
-        rho_mid=step(spin_system,LMA+1i*dt*(1/6)*(LL*LMA-LMA*LL),rho_a,dt/2);
+        rho_mid=step(spin_system,LMA+1i*dt*(1/6)*comm(LL,LMA),rho_a,dt/2);
         LMB=L(t+0.5*dt,rho_mid);
         
         % Estimate right point state and generator
-        rho_right=step(spin_system,LMB+1i*dt*(1/6)*(LL*LMB-LMB*LL),rho_a,dt);
+        rho_right=step(spin_system,LMB+1i*dt*(1/6)*comm(LL,LMB),rho_a,dt);
         LR=L(t+dt,rho_right);
         
         % Get the average generator and the commutator correction

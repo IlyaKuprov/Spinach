@@ -99,7 +99,7 @@ for k=1:numel(np)
 end
 
 % Plotting
-kfigure(); scale_figure([1.8 0.6]);
+kfigure(); scale_figure([1.8 1.0]);
 time_axis=linspace(0,0.5,np_ref);
 subplot(1,2,1); plot(time_axis,mu_traj);
 kgrid; xlim tight; ylim padded;
@@ -114,7 +114,7 @@ kxlabel('number of points in the time grid');
 kylabel('$\|$difference$\|$/$\|$exact$\|$');
 klegend({'LP','LG-2','LG-4','LG-4A',...
          'RKMK4','RKMK-DP5','RKMK-DP8'},...
-        'Location','SouthWest');
+        'Location','NorthEast');
 set(gca,'YTick',10.^(-7:2:0));
 set(gca,'MinorGridLineStyle','-'); 
 set(gca,'MinorGridColor',0.9*[1 1 1]);

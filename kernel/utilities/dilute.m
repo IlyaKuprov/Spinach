@@ -87,6 +87,7 @@ end
 
 % "Dear Mother, good news today."
 %
-% Albert Einstein, in a 1919 postcard to his mother telling her that his
-% general theory of relativity had been proven.
+% Albert Einstein, in a 1919 postcard to his 
+% mother telling her that his general theory
+% of relativity had been proven.
 

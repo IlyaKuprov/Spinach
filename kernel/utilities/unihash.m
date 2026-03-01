@@ -20,6 +20,9 @@
 
 function A=unihash(A)
 
+% Check consistency
+grumble(A);
+
 % Build an MD5 hash table
 hash_table=repmat(' ',[size(A,1) 32]);
 parfor k=1:size(A,1)
@@ -32,6 +35,13 @@ end
 % Elimination
 A=A(idx,:);
 
+end
+
+% Consistency enforcement
+function grumble(A)
+if (~isnumeric(A))||(~ismatrix(A))
+    error('A must be a numeric matrix.');
+end
 end
 
 % Вот полно статей: норм введение, норм постановка задачи. А потом 

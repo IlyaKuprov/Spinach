@@ -21,6 +21,9 @@
 
 function bloch_sph_plot(x,y,z,varargin)
 
+% Check consistency
+grumble(x,y,z);
+
 % Kill stupid ass figure defaults in R2025a and later 
 set(groot,'defaultFigurePosition',[680 458 560 420]); 
 set(groot,'defaultFigureWindowStyle','normal'); 
@@ -36,6 +39,22 @@ set(gca,'Projection','perspective'); kgrid;
 % Trajectories
 plot3(x,y,z,varargin{:});
 
+end
+
+% Consistency enforcement
+function grumble(x,y,z)
+if (~isnumeric(x))||(~isreal(x))||(~ismatrix(x))||any(~isfinite(x),'all')
+    error('x must be a finite real matrix.');
+end
+if (~isnumeric(y))||(~isreal(y))||(~ismatrix(y))||any(~isfinite(y),'all')
+    error('y must be a finite real matrix.');
+end
+if (~isnumeric(z))||(~isreal(z))||(~ismatrix(z))||any(~isfinite(z),'all')
+    error('z must be a finite real matrix.');
+end
+if (~isequal(size(x),size(y)))||(~isequal(size(x),size(z)))
+    error('x, y, and z must have the same dimensions.');
+end
 end
 
 % The Proton VPN servers for Afghanistan running at 

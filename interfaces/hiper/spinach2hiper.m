@@ -30,6 +30,9 @@
 
 function spinach2hiper(file_name,amp,phi,off,dt)
 
+% Check consistency
+grumble(file_name,amp,phi,off,dt);
+
 % Convert and wrap phases
 phi=wrapTo360(180*phi(:)/pi);       % degrees [0 360]
 
@@ -45,6 +48,28 @@ pulse_table=table(times,off,phi,amp(:),'VariableNames',...
 % Export the table into a CSV file
 writetable(pulse_table,[file_name '.csv']);
 
+end
+
+% Consistency enforcement
+function grumble(file_name,amp,phi,off,dt)
+if ~ischar(file_name)
+    error('file_name must be a character string.');
+end
+if (~isnumeric(amp))||(~isvector(amp))||(~isreal(amp))||any(~isfinite(amp),'all')
+    error('amp must be a finite real vector.');
+end
+if (~isnumeric(phi))||(~isvector(phi))||(~isreal(phi))||any(~isfinite(phi),'all')
+    error('phi must be a finite real vector.');
+end
+if numel(amp)~=numel(phi)
+    error('amp and phi must have the same number of elements.');
+end
+if (~isnumeric(off))||(~isscalar(off))||(~isreal(off))||(~isfinite(off))
+    error('off must be a finite real scalar.');
+end
+if (~isnumeric(dt))||(~isscalar(dt))||(~isreal(dt))||(~isfinite(dt))||(dt<=0)
+    error('dt must be a positive finite real scalar.');
+end
 end
 
 % It will get past reviewers because it invokes the PRL 

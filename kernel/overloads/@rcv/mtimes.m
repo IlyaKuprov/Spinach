@@ -70,9 +70,15 @@ end
 
 % Consistency enforcement
 function grumble(A,B)
-
-% Needs some thought
-
+if ~isa(A,'rcv')&&~isa(B,'rcv')
+    error('at least one input must be an RCV sparse matrix.');
+end
+if isa(A,'rcv')&&(~isa(B,'rcv'))&&(~issparse(B))&&((~isnumeric(B))||(~isscalar(B)))
+    error('the second input must be an RCV sparse matrix, a Matlab sparse matrix, or a numeric scalar.');
+end
+if isa(B,'rcv')&&(~isa(A,'rcv'))&&(~issparse(A))&&((~isnumeric(A))||(~isscalar(A)))
+    error('the first input must be an RCV sparse matrix, a Matlab sparse matrix, or a numeric scalar.');
+end
 end
 
 % When the Earl of Sandwich, speaking in parliament, told John Wilkes that

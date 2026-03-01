@@ -10,6 +10,9 @@
 
 function [phi,r,L]=grid_polar(ncircles,rmax)
 
+% Check consistency
+grumble(ncircles,rmax);
+
 % Get the radius grid
 radii=linspace(0,rmax,ncircles);
 
@@ -52,6 +55,18 @@ if nargout>2
 
 end
     
+end
+
+% Consistency enforcement
+function grumble(ncircles,rmax)
+if (~isnumeric(ncircles))||(~isreal(ncircles))||...
+   (~isscalar(ncircles))||(ncircles<2)||mod(ncircles,1)
+    error('ncircles must be a positive real integer greater than one');
+end
+if (~isnumeric(rmax))||(~isreal(rmax))||...
+   (~isscalar(rmax))||(rmax<=0)
+    error('rmax must be a positive real number');
+end
 end
 
 % Буря мглою месит жижу,

@@ -36,6 +36,9 @@
 
 function eff=trosy_eff(B0,isotopes,xyz,csa)
 
+% Check consistency
+grumble(B0,isotopes,xyz,csa);
+
 % Dipole-dipole coupling tensor
 [~,~,~,~,DD]=xyz2dd(xyz{1},xyz{2},isotopes{1},isotopes{2});
 
@@ -48,6 +51,36 @@ Z=1e-6*B0*(csa-eye(3)*trace(csa)/3)*spin(isotopes{1});
 % TROSY efficiency
 eff=abs(X_DD_Z/DsqZ);
 
+end
+
+% Consistency enforcement
+function grumble(B0,isotopes,xyz,csa)
+if (~isnumeric(B0))||(~isreal(B0))||(~isscalar(B0))
+    error('B0 must be a real number.');
+end
+if (~iscell(isotopes))||(numel(isotopes)~=2)||...
+   (~ischar(isotopes{1}))||(~ischar(isotopes{2}))
+    error('isotopes must be a cell array containing two character strings.');
+end
+if (~iscell(xyz))||(numel(xyz)~=2)||...
+   (~isnumeric(xyz{1}))||(~isreal(xyz{1}))||(numel(xyz{1})~=3)||...
+   (~isnumeric(xyz{2}))||(~isreal(xyz{2}))||(numel(xyz{2})~=3)
+    error('xyz must be a cell array containing two three-element real vectors.');
+end
+if ~all(size(xyz{1})==size(xyz{2}))
+    error('the two coordinate vectors in xyz must have the same dimension.');
+end
+if (~isnumeric(csa))||(~isreal(csa))||...
+   (~ismatrix(csa))||any(size(csa)~=[3 3])
+    error('csa must be a real 3x3 matrix.');
+end
+[~,mult_a]=spin(isotopes{1}); [~,mult_b]=spin(isotopes{2});
+if (mult_a~=2)||(mult_b~=2)
+    error('this function only supports spin-1/2 isotopes.');
+end
+if norm(xyz{1}-xyz{2},2)==0
+    error('the two spins must not occupy the same point in space.');
+end
 end
 
 % Of caffeine's almighty healing powers 

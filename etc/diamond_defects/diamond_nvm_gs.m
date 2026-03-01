@@ -42,6 +42,8 @@
 %   inter - Spinach interaction specification structure
 %
 % alexey.bogdanov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=diamond_nvm_gs.m>
 
 function [sys,inter]=diamond_nvm_gs(parameters)
 

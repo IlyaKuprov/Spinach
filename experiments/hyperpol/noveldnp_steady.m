@@ -48,6 +48,8 @@
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il
 % guinevere.mathies@uni-konstanz.de
+%
+% <https://spindynamics.org/wiki/index.php?title=noveldnp_steady.m>
 
 function dnp=noveldnp_steady(spin_system,parameters,H,R,K)
 

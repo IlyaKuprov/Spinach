@@ -70,7 +70,7 @@ end
 
 % Consistency enforcement
 function grumble(A,B)
-if ~isa(A,'rcv')&&~isa(B,'rcv')
+if (~isa(A,'rcv'))&&(~isa(B,'rcv'))
     error('at least one input must be an RCV sparse matrix.');
 end
 if isa(A,'rcv')&&(~isa(B,'rcv'))&&(~issparse(B))&&((~isnumeric(B))||(~isscalar(B)))

@@ -78,15 +78,15 @@ end
 if (mult_a~=2)||(mult_b~=2)
     error('this function only supports spin-1/2 isotopes.');
 end
-if norm(xyz{1}-xyz{2},2)==0
-    error('the two spins must not occupy the same point in space.');
+if norm(xyz{1}-xyz{2},2)<0.25
+    error('unphysical proximity.');
 end
 end
 
 % Of caffeine's almighty healing powers 
 % Which soothe away a thousand whisky sours,
 % Transform the darkest morning into light,
-% And bid the fiercest crapula take flight
+% And bid the fiercest crapula take flight,
 % I sing. Come Muse! Inspire my dreary tale
 % That all may learn a lesson, none may fail.
 %

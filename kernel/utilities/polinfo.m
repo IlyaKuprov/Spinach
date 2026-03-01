@@ -23,6 +23,9 @@ function polinfo(p,level,label)
 if ~exist('level','var'), level=0; end
 if ~exist('label','var'), label='polyadic'; end
 
+% Check consistency
+grumble(p,level,label);
+
 % Set indentation level
 indent=repmat(' ',1,4*level);
 
@@ -84,6 +87,20 @@ if isa(p,'polyadic')
     end
 end
 
+end
+
+% Consistency enforcement
+function grumble(p,level,label)
+if ~isa(p,'polyadic')
+    error('p must be a polyadic object.');
+end
+if (~isnumeric(level))||(~isreal(level))||(~isscalar(level))||...
+   (level<0)||(mod(level,1)~=0)
+    error('level must be a non-negative integer.');
+end
+if ~ischar(label)
+    error('label must be a character string.');
+end
 end
 
 % Ignoring bad ideas doesn't make them go away; they will 

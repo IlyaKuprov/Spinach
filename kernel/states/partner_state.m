@@ -68,6 +68,9 @@
 
 function [A,descr]=partner_state(spin_system,set_spin,partners)
 
+% Check consistency
+grumble(spin_system,set_spin,partners);
+
 % Write the states of the spins that stay unchanged
 base_state=repmat({'E'},1,spin_system.comp.nspins);
 for n=1:numel(set_spin)
@@ -132,6 +135,71 @@ parfor n=1:numel(descr)
     A{n}=state(spin_system,descr{n},full_spin_list);
 end
 
+end
+
+% Consistency enforcement
+function grumble(spin_system,set_spin,partners)
+if (~isfield(spin_system,'comp'))||(~isfield(spin_system.comp,'nspins'))||...
+   (~isnumeric(spin_system.comp.nspins))||(~isreal(spin_system.comp.nspins))||...
+   (~isscalar(spin_system.comp.nspins))||(spin_system.comp.nspins<1)||...
+   (mod(spin_system.comp.nspins,1)~=0)
+    error('spin_system.comp.nspins must be a positive integer.');
+end
+if ~iscell(set_spin)
+    error('set_spin must be a cell array.');
+end
+set_spin_idx=zeros(1,numel(set_spin));
+for n=1:numel(set_spin)
+    if (~iscell(set_spin{n}))||(numel(set_spin{n})~=2)
+        error('each set_spin specification must be a two-element cell array.');
+    end
+    if ~ischar(set_spin{n}{1})
+        error('state labels in set_spin must be character strings.');
+    end
+    if (~isnumeric(set_spin{n}{2}))||(~isreal(set_spin{n}{2}))||...
+       (~isscalar(set_spin{n}{2}))||(set_spin{n}{2}<1)||...
+       (mod(set_spin{n}{2},1)~=0)
+        error('spin numbers in set_spin must be positive integers.');
+    end
+    set_spin_idx(n)=set_spin{n}{2};
+end
+if any(set_spin_idx>spin_system.comp.nspins,'all')
+    error('spin index in set_spin exceeds the number of spins in the system.');
+end
+if numel(unique(set_spin_idx))~=numel(set_spin_idx)
+    error('set_spin must not contain duplicate spin indices.');
+end
+if ~iscell(partners)
+    error('partners must be a cell array.');
+end
+partner_idx=[];
+for n=1:numel(partners)
+    if (~iscell(partners{n}))||(numel(partners{n})~=2)
+        error('each partner specification must be a two-element cell array.');
+    end
+    if (~iscell(partners{n}{1}))||isempty(partners{n}{1})||...
+       any(~cellfun(@ischar,partners{n}{1}))
+        error('partner state lists must be non-empty cell arrays of character strings.');
+    end
+    if (~isnumeric(partners{n}{2}))||(~isreal(partners{n}{2}))||...
+       (~isvector(partners{n}{2}))||isempty(partners{n}{2})||...
+       any(partners{n}{2}<1,'all')||any(mod(partners{n}{2},1)~=0,'all')
+        error('partner spin lists must be non-empty vectors of positive integers.');
+    end
+    if numel(unique(partners{n}{2}))~=numel(partners{n}{2})
+        error('partner spin lists must not contain duplicate indices.');
+    end
+    partner_idx=[partner_idx partners{n}{2}(:).']; %#ok<AGROW>
+end
+if any(partner_idx>spin_system.comp.nspins,'all')
+    error('partner spin index exceeds the number of spins in the system.');
+end
+if numel(unique(partner_idx))~=numel(partner_idx)
+    error('partner spin lists must not contain duplicate indices.');
+end
+if any(ismember(partner_idx,set_spin_idx),'all')
+    error('spins in set_spin must not appear in partners.');
+end
 end
 
 % Challenges improve those who survive.

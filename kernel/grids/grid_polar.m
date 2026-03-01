@@ -3,10 +3,30 @@
 %
 %          [phi,r,L]=grid_polar(ncircles,rmax)
 %
-% The last output is the Laplacian on the grid.
+% Parameters:
 %
-% Chris Brett
-% Ilya Kuprov
+%     ncircles - number of radial circles 
+%                in the grid, an integer
+%
+%     rmax     - maximum radius that the
+%                grid must reach
+%
+% Outputs:
+%
+%     phi      - a column vector of polar
+%                phi angles, radians
+%
+%     rmax     - a coluim vector of radii
+%
+%     L        - sparse Laplacian operator
+%                acting on functions defined
+%                as vector of values in the
+%                same order as the grid
+%
+% c.brett@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=grid_polar.m>
 
 function [phi,r,L]=grid_polar(ncircles,rmax)
 

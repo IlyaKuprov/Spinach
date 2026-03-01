@@ -20,6 +20,8 @@
 %    
 % aditya.dev@weizmann.ac.il
 % ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=expmint2.m>
 
 function I=expmint2(spin_system,A,B,C,D,E,T)
 
@@ -46,6 +48,7 @@ I=BE1*P*BE3;
 
 end
 
+% Consistency enforcement
 function grumble(A,B,C,D,E,T)
 if (~isnumeric(A))||(~isnumeric(B))||(~isnumeric(C))||...
    (~isnumeric(D))||(~isnumeric(E))||(~isnumeric(T))

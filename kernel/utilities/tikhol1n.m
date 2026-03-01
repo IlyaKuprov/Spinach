@@ -32,6 +32,9 @@
 
 function [x,err,reg]=tikhol1n(A,y,nnzt)
 
+% Check consistency
+grumble(A,y,nnzt);
+
 % Tolerances
 normest_tol=1e-3;   % relative 2-norm estimation tolerance
 step_norm_tol=1e-6; % relative step norm convergence tolerance
@@ -135,6 +138,26 @@ while ~converged
 
 end
 
+end
+
+% Consistency enforcement
+function grumble(A,y,nnzt)
+if (~isnumeric(A))||(~ismatrix(A))
+    error('A must be a numeric matrix.');
+end
+if (~isnumeric(y))||(~iscolumn(y))
+    error('y must be a numeric column vector.');
+end
+if size(A,1)~=size(y,1)
+    error('the number of rows in A must match the number of elements in y.');
+end
+if (~isnumeric(nnzt))||(~isreal(nnzt))||(~isscalar(nnzt))||...
+   (nnzt<1)||(mod(nnzt,1)~=0)
+    error('nnzt must be a positive integer.');
+end
+if nnzt>size(A,2)
+    error('nnzt cannot exceed the number of columns in A.');
+end
 end
 
 % "He begins working on calculus problems in his head as 

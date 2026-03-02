@@ -346,15 +346,20 @@ end
 
 % Fundamental constants
 spin_system.tols.hbar=6.62607015e-34/(2*pi); % J*s, exact number
-report(spin_system,[pad('Planck constant (hbar)',65) pad(num2str(spin_system.tols.hbar,'%0.8e'),20)]);
-spin_system.tols.kbol=1.380649e-23; % J*K^{-1}, exact number 
-report(spin_system,[pad('Boltzmann constant (k)',65) pad(num2str(spin_system.tols.kbol,'%0.8e'),20)]);
-spin_system.tols.freeg=2.00231930436256;
-report(spin_system,[pad('Free electron g-factor',65) pad(num2str(spin_system.tols.freeg,'%0.8e'),20)]);
-spin_system.tols.mu0=1.25663706212e-6; % N A^-2 = T^2 m^3 J^-1
-report(spin_system,[pad('Vacuum permeability',65) pad(num2str(spin_system.tols.mu0,'%0.8e'),20)]);
-spin_system.tols.muB=9.2740100783e-24; % J T^-1
-report(spin_system,[pad('Bohr magneton',65) pad(num2str(spin_system.tols.muB,'%0.8e'),20)]);
+report(spin_system,[pad('Planck constant (hbar)',65) ...
+                    pad(num2str(spin_system.tols.hbar,'%0.8e'),20)]);
+spin_system.tols.kbol=1.380649e-23;          % J*K^{-1}, exact number 
+report(spin_system,[pad('Boltzmann constant (k)',65) ...
+                    pad(num2str(spin_system.tols.kbol,'%0.8e'),20)]);
+spin_system.tols.freeg=2.00231930436092;     % CODATA 2022
+report(spin_system,[pad('Free electron g-factor',65) ...
+                    pad(num2str(spin_system.tols.freeg,'%0.8e'),20)]);
+spin_system.tols.mu0=1.25663706127e-6;       % N A^{-2}, CODATA 2022
+report(spin_system,[pad('Vacuum permeability',65) ...
+                    pad(num2str(spin_system.tols.mu0,'%0.8e'),20)]);
+spin_system.tols.muB=9.2740100657e-24;       % J T^-1, CODATA 2022
+report(spin_system,[pad('Bohr magneton',65) ...
+                    pad(num2str(spin_system.tols.muB,'%0.8e'),20)]);
 
 % Paranoia switches
 if ismember('paranoia',spin_system.sys.enable)

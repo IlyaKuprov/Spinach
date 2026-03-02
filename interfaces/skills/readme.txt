@@ -1,0 +1,1 @@
+This is an OpenClaw skill descriptor that allows it to use Spinach when it has command line access to a supported version of Matlab.

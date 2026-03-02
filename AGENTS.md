@@ -50,6 +50,8 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **No Hallucinations, no Lies, no Errors:** You must not lie and must not fabricate information, code, or documentation. All content you generate must be accurate and supported by the *Spinach* codebase or user instructions. If you are unsure about something, refer to the existing code or ask the user for clarification. Above all, do not make mistakes.
 
+* **No uninformative output:** You must not produce usless or uninformative output. If you are unsure about something, you must read the existing *Spinach* code and find missing information to make sure that your output is useful and informative. Generic placeholder phrases must be removed from your output if they appear. Avoid cosmetic churn unless explicitly requested and clearly beneficial.
+
 * **Follow Instructions:** You must do everything the user asks, and produce all requested outputs (e.g. multiple functions or files) exactly as specified by the user. Do not ignore any part of the request. Each task in the user instructions must be completed fully.
 
 * **Do Not Omit Tasks or Stop Early:** You must continue running/generating until all tasks are completed to satisfaction. You must not terminate or cut off the output prematurely. If multiple files or sections are requested by the user, you must output all of them before finishing. If in doubt, ask the user for clarifications.

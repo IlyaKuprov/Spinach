@@ -64,8 +64,21 @@ fid=apodisation(spin_system,fid,{{'gauss',6}});
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));
 
-% Plotting
-kfigure(); plot_1d(spin_system,real(spectrum),parameters);
+% Plotting, full spectrum
+kfigure(); subplot(2,1,1);
+plot_1d(spin_system,real(spectrum),parameters);
+kxlabel('$^{13}$C chemical shift, ppm');
+
+% Re-run with no DD to protons
+inter.coordinates{1}=[];
+inter.coordinates{2}=[];
+spin_system=create(sys,inter);
+spin_system=basis(spin_system,bas);
+fid=liquid(spin_system,@acquire,parameters,'nmr');
+fid=apodisation(spin_system,fid,{{'gauss',6}});
+spectrum=fftshift(fft(fid,parameters.zerofill));
+subplot(2,1,2); plot_1d(spin_system,real(spectrum),parameters);
+kxlabel('$^{13}$C chemical shift, ppm');
 
 end
 

@@ -1,2 +1,0 @@
-# Ignore compiled MEX binaries (platform-specific build artifacts)
-*.mex*

@@ -32,6 +32,8 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Matlab and Spinach functionality checks:** Make sure that the functions you are calling in your code actually exist in *Matlab* or *Spinach*. Never call functions that do not exist.
 
+* **Content preservation:** Before proposing any code rewrite, you must run an information-preservation gate: compare proposed code against existing code, flag content-drop risks, and block any edit that removes substantial existing code unless the user explicitly approves that removal.
+
 * **British spelling throughout:** In all function names, variable names, and comments, use British spelling. Oxford comma is also mandatory. 
 
 ## Wiki Documentation Instructions
@@ -45,6 +47,8 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 * **Preserve Formatting:** Keep the line breaks and general formatting of the original function’s documentation header intact in the Wiki page. This ensures consistency between the code and its documentation. For example, if the code’s documentation has separate lines for each parameter, the Wiki should reflect the same line structure.
 
 * **Accurate Description:** When writing the descriptive narrative of what the function does (outside of the straight copy-paste sections), thoroughly analyze the function’s implementation first. Make sure you understand how it works and what its key algorithms are. Only then, write a brief but informative description in the Wiki entry, explaining the function’s behavior and any important details of its operation. Always maintain a factual and clear tone – never speculate or introduce information not present in the code.
+
+* **Preserve content:** Before proposing any documentation rewrite, you must run an information-preservation gate: compare proposed code against existing documentation, flag content-drop risks, and block any edit that removes substantial existing documentation unless the user explicitly approves that removal.
 
 ## Execution Policies
 

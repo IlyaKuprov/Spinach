@@ -12,10 +12,9 @@
  *   matrix (plus O(ncols) bookkeeping) and streams over the input.
  *
  * Note on "in-place":
- *   Modern MATLAB releases actively block older undocumented APIs that were once
- *   used to detach shared arrays for in-place edits (e.g., mxUnshareArray).
- *   Modifying prhs[0] directly is unsupported and can crash MATLAB.
- *   Therefore this implementation is "single-extra-copy" (output only), not
+ *   Modern MATLAB releases (including our minimum supported R2024b) do not
+ *   provide a supported way to detach and modify prhs[0] sparse storage in-place.
+ *   This implementation is therefore "single-extra-copy" (output only), not
  *   true in-place within the caller's sparse buffers.
  */
 
@@ -62,23 +61,36 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     const mwIndex *jc = mxGetJc(A);
     const mwIndex *ir = mxGetIr(A);
 
-    const double *pr = mxGetPr(A);
-    const double *pi = mxGetPi(A); /* NULL for real */
-    const bool is_cplx = (pi != NULL);
+    const bool is_cplx = mxIsComplex(A);
 
     /* First pass: count kept entries per column */
     mwIndex *colCounts = (mwIndex*) mxCalloc(n, sizeof(mwIndex));
 
-    for (mwIndex col = 0; col < (mwIndex)n; col++) {
-        const mwIndex start = jc[col];
-        const mwIndex end   = jc[col + 1];
-        mwIndex cnt = 0;
-        for (mwIndex k = start; k < end; k++) {
-            const double r = q(pr[k], invtol, tol);
-            const double i = is_cplx ? q(pi[k], invtol, tol) : 0.0;
-            if ((r != 0.0) || (i != 0.0)) cnt++;
+    if (is_cplx) {
+        const mxComplexDouble *px = mxGetComplexDoubles(A);
+        for (mwIndex col = 0; col < (mwIndex)n; col++) {
+            const mwIndex start = jc[col];
+            const mwIndex end   = jc[col + 1];
+            mwIndex cnt = 0;
+            for (mwIndex k = start; k < end; k++) {
+                const double r = q(px[k].real, invtol, tol);
+                const double i = q(px[k].imag, invtol, tol);
+                if ((r != 0.0) || (i != 0.0)) cnt++;
+            }
+            colCounts[col] = cnt;
         }
-        colCounts[col] = cnt;
+    } else {
+        const double *pr = mxGetDoubles(A);
+        for (mwIndex col = 0; col < (mwIndex)n; col++) {
+            const mwIndex start = jc[col];
+            const mwIndex end   = jc[col + 1];
+            mwIndex cnt = 0;
+            for (mwIndex k = start; k < end; k++) {
+                const double r = q(pr[k], invtol, tol);
+                if (r != 0.0) cnt++;
+            }
+            colCounts[col] = cnt;
+        }
     }
 
     /* Prefix sum into jc_out */
@@ -94,32 +106,57 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
     mwIndex *jc_out = mxGetJc(Aout);
     mwIndex *ir_out = mxGetIr(Aout);
-    double  *pr_out = mxGetPr(Aout);
-    double  *pi_out = mxGetPi(Aout);
 
     /* Copy column pointers */
     for (mwIndex col = 0; col < (mwIndex)(n + 1); col++) jc_out[col] = jc_out_tmp[col];
 
     /* Second pass: fill */
-    for (mwIndex col = 0; col < (mwIndex)n; col++) {
-        mwIndex w = jc_out[col];
-        const mwIndex start = jc[col];
-        const mwIndex end   = jc[col + 1];
+    if (is_cplx) {
+        const mxComplexDouble *px_in = mxGetComplexDoubles(A);
+        mxComplexDouble *px_out = mxGetComplexDoubles(Aout);
 
-        for (mwIndex k = start; k < end; k++) {
-            const double r = q(pr[k], invtol, tol);
-            const double i = is_cplx ? q(pi[k], invtol, tol) : 0.0;
-            if ((r != 0.0) || (i != 0.0)) {
-                ir_out[w] = ir[k];
-                pr_out[w] = r;
-                if (is_cplx) pi_out[w] = i;
-                w++;
+        for (mwIndex col = 0; col < (mwIndex)n; col++) {
+            mwIndex w = jc_out[col];
+            const mwIndex start = jc[col];
+            const mwIndex end   = jc[col + 1];
+
+            for (mwIndex k = start; k < end; k++) {
+                const double r = q(px_in[k].real, invtol, tol);
+                const double i = q(px_in[k].imag, invtol, tol);
+                if ((r != 0.0) || (i != 0.0)) {
+                    ir_out[w] = ir[k];
+                    px_out[w].real = r;
+                    px_out[w].imag = i;
+                    w++;
+                }
             }
-        }
 
-        /* Sanity check */
-        if (w != jc_out[col + 1])
-            mexErrMsgIdAndTxt("Spinach:prune_cpu:internal", "Internal error: column write count mismatch.");
+            /* Sanity check */
+            if (w != jc_out[col + 1])
+                mexErrMsgIdAndTxt("Spinach:prune_cpu:internal", "Internal error: column write count mismatch.");
+        }
+    } else {
+        const double *pr_in = mxGetDoubles(A);
+        double *pr_out = mxGetDoubles(Aout);
+
+        for (mwIndex col = 0; col < (mwIndex)n; col++) {
+            mwIndex w = jc_out[col];
+            const mwIndex start = jc[col];
+            const mwIndex end   = jc[col + 1];
+
+            for (mwIndex k = start; k < end; k++) {
+                const double r = q(pr_in[k], invtol, tol);
+                if (r != 0.0) {
+                    ir_out[w] = ir[k];
+                    pr_out[w] = r;
+                    w++;
+                }
+            }
+
+            /* Sanity check */
+            if (w != jc_out[col + 1])
+                mexErrMsgIdAndTxt("Spinach:prune_cpu:internal", "Internal error: column write count mismatch.");
+        }
     }
 
     mxFree(jc_out_tmp);

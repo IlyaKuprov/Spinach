@@ -10,8 +10,8 @@ if ~exist(src,'file')
     error('Source file not found: %s', src);
 end
 
-% Use the R2017b MEX API to allow mxUnshareArray() (copy-on-write detach).
-% This targets the classic (separate real/imag) complex API, which is fine for Spinach.
-mex('-R2017b','-O',src,'-outdir',here);
+% Use modern interleaved-complex MEX API (R2018a+).
+% Spinach minimum supported MATLAB is R2024b.
+mex('-R2018a','-O',src,'-outdir',here);
 
 end

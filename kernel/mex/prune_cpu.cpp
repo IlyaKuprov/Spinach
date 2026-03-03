@@ -25,7 +25,7 @@
 static void grumble(int nlhs, int nrhs, const mxArray *prhs[])
 {
     if (nrhs != 2) mexErrMsgIdAndTxt("Spinach:prune_cpu:nrhs", "Two inputs required: A, nonzero_tol.");
-    if (nlhs > 1)  mexErrMsgIdAndTxt("Spinach:prune_cpu:nlhs", "One output at most.");
+    if (nlhs != 1) mexErrMsgIdAndTxt("Spinach:prune_cpu:nlhs", "Exactly one output is required: Aout = prune_cpu(A, nonzero_tol).");
 
     const mxArray *A = prhs[0];
     const mxArray *tol = prhs[1];

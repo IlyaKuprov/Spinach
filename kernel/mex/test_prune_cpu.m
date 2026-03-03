@@ -76,7 +76,18 @@ end
 function testBadInputs(testCase)
 Afull = rand(3);
 tol = 1e-3;
-verifyError(testCase, @() prune_cpu(Afull,tol), 'Spinach:prune_cpu:notSparse');
-verifyError(testCase, @() prune_cpu(sparse(eye(3)), -1), 'Spinach:prune_cpu:tolVal');
-verifyError(testCase, @() prune_cpu(sparse(eye(3)), [1 2]), 'Spinach:prune_cpu:tolType');
+verifyError(testCase, @() call_prune(Afull,tol), 'Spinach:prune_cpu:notSparse');
+verifyError(testCase, @() call_prune(sparse(eye(3)), -1), 'Spinach:prune_cpu:tolVal');
+verifyError(testCase, @() call_prune(sparse(eye(3)), [1 2]), 'Spinach:prune_cpu:tolType');
+
+A = sparse(eye(3));
+verifyError(testCase, @() call_prune_no_output(A,tol), 'Spinach:prune_cpu:nlhs');
+end
+
+function Aout = call_prune(A,tol)
+Aout = prune_cpu(A,tol);
+end
+
+function call_prune_no_output(A,tol)
+prune_cpu(A,tol);
 end

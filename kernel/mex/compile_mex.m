@@ -1,17 +1,13 @@
-% MEX compilation utility. Rebuilds all C++ MEX binaries in its own
-% directory. Syntax:
+% MEX compilation utility. Rebuilds all C++ MEX binaries in 
+% the current directory. Syntax:
 %
-%                      compile_mex()
+%                       compile_mex()
 %
-% Parameters:
+% ilya.kuprov@weizmann.ac.il
 %
-%   none
-%
-% Outputs:
-%
-%   none
+% <https://spindynamics.org/wiki/index.php?title=compile_mex.m>
 
-function compile_mex()
+function compile_mex() % #NGRUM #NHEAD
 
 % Build compiler argument list
 if ispc
@@ -45,4 +41,10 @@ end
 
 end
 
+% Audiophiles don't use their equip-
+% ment to listen to your music. Audio-
+% philes use your music to listen to
+% their equipment.
+%
+% Alan Parsons
 

@@ -30,9 +30,8 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
 
 #ifdef _OPENMP
 
-    // Use all CPU cores available to OpenMP
+    // Do what Matlab says
     omp_set_dynamic(0);
-    omp_set_num_threads(omp_get_num_procs());
 
 #endif
 

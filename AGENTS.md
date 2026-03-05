@@ -2,7 +2,7 @@
 
 ## General Context
 
-*Spinach* is an open-source spin dynamics simulation library implemented in *MATLAB* (assume version R2024b or later). It spans numerous areas of physics and mathematics, including linear algebra (and numerical linear algebra), quantum mechanics, Lie algebras and Lie groups, as well as general scientific computing and numerical methods. *Spinach* supports applications such as nuclear magnetic resonance (NMR), electron spin (paramagnetic) resonance (ESR/EPR), magnetic resonance imaging (MRI), quantum optimal control theory, and other spin dynamics-related domains. This repository contains the *Spinach* codebase, and all contributions or AI-generated code must adhere to the established conventions of this codebase.
+*Spinach* is an open-source spin dynamics simulation library implemented in *MATLAB* (assume version R2024b or later) with small amounts of Java and C++/CUDA. It spans many areas of physics and mathematics, including linear algebra, quantum mechanics, Lie algebras and Lie groups, as well as scientific computing and numerical methods. *Spinach* supports applications such as nuclear magnetic resonance (NMR), electron spin resonance, magnetic resonance imaging, quantum optimal control theory, and other spin dynamics-related domains. This repository contains the *Spinach* codebase. All contributions or AI-generated code must adhere to the established conventions of this codebase. These conventions are summarised below.
 
 ## Programming Style Guidelines
 

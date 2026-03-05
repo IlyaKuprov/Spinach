@@ -1,4 +1,4 @@
-% MEX compilation utility. Rebuilds all C++ MEX binaries in the current
+% MEX compilation utility. Rebuilds all C++ MEX binaries in its own
 % directory. Syntax:
 %
 %                      compile_mex()
@@ -26,17 +26,21 @@ else
     mex_args={'-R2018a','-O'};
 end
 
-% Get C++ source file list
-cpp_files=dir('*.cpp');
+% Get this function directory
+here=fileparts(mfilename('fullpath'));
+
+% Get C++ source file list in this function directory
+cpp_files=dir(fullfile(here,'*.cpp'));
 
 % Halt if there is nothing to compile
 if isempty(cpp_files)
-    error('No C++ source files were found in the current directory.');
+    error('No C++ source files were found in %s.',here);
 end
 
-% Rebuild all MEX binaries in the current directory
+% Rebuild all MEX binaries in this function directory
 for n=1:numel(cpp_files)
-    mex(mex_args{:},cpp_files(n).name,'-outdir',pwd);
+    src_file=fullfile(here,cpp_files(n).name);
+    mex(mex_args{:},src_file,'-outdir',here);
 end
 
 end

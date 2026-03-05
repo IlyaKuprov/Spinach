@@ -61,8 +61,8 @@ if ~ismember('clean-up',spin_system.sys.disable)
     if ismember('mex',spin_system.sys.enable)&&...
        issparse(A)&&(~isa(A,'gpuArray'))
 
-        % Memory-friendly in-place MEX
-        prune_cpu(A,nonzero_tol); A=1*A;
+        % Memory-friendly sparse clean-up MEX (allocates output only)
+        A=prune_cpu(A,nonzero_tol);
 
     else
 

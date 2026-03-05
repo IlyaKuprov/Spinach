@@ -15,43 +15,26 @@
 
 #include "mex.h"
 #include <cmath>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
-static void grumble(int nlhs,int nrhs,const mxArray *prhs[])
-{
-    if (nrhs!=2)
-        mexErrMsgIdAndTxt("Spinach:prune_cpu:nrhs","Two inputs required: A, nonzero_tol.");
-
-    if (nlhs!=1)
-        mexErrMsgIdAndTxt("Spinach:prune_cpu:nlhs","Exactly one output is required: Aout=prune_cpu(A,nonzero_tol).");
-
-    const mxArray *a=prhs[0];
-    const mxArray *nonzero_tol=prhs[1];
-
-    if (!mxIsSparse(a))
-        mexErrMsgIdAndTxt("Spinach:prune_cpu:notSparse","A must be sparse.");
-
-    if (!mxIsDouble(a)||mxIsLogical(a))
-        mexErrMsgIdAndTxt("Spinach:prune_cpu:type","A must be a sparse double array.");
-
-    if (!mxIsDouble(nonzero_tol)||mxIsComplex(nonzero_tol)||(mxGetNumberOfElements(nonzero_tol)!=1))
-        mexErrMsgIdAndTxt("Spinach:prune_cpu:tolType","nonzero_tol must be a real double scalar.");
-
-    const double tol=mxGetScalar(nonzero_tol);
-
-    if (!(tol>0.0)||mxIsNaN(tol)||mxIsInf(tol))
-        mexErrMsgIdAndTxt("Spinach:prune_cpu:tolVal","nonzero_tol must be a finite positive real scalar.");
-}
-
-static inline double quantise_value(const double x,const double inv_tol,const double tol)
-{
-    return tol*std::round(x*inv_tol);
-}
+static inline double quantise_value(const double x,const double inv_tol,const double tol);
+static void grumble(int nlhs,int nrhs,const mxArray *prhs[]);
 
 void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
 {
 
     // Validate input arguments
     grumble(nlhs,nrhs,prhs);
+
+#ifdef _OPENMP
+
+    // Use all CPU cores available to OpenMP
+    omp_set_dynamic(0);
+    omp_set_num_threads(omp_get_num_procs());
+
+#endif
 
     // Get input arguments
     const mxArray *a=prhs[0];
@@ -77,10 +60,11 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
     {
         const mxComplexDouble *px=mxGetComplexDoubles(a);
 
-        for (mwIndex col=0;col<(mwIndex)n_cols;col++)
+#pragma omp parallel for schedule(static)
+        for (mwSignedIndex col=0;col<(mwSignedIndex)n_cols;col++)
         {
-            const mwIndex start=jc[col];
-            const mwIndex finish=jc[col+1];
+            const mwIndex start=jc[(mwIndex)col];
+            const mwIndex finish=jc[(mwIndex)col+1];
             mwIndex count=0;
 
             for (mwIndex k=start;k<finish;k++)
@@ -92,17 +76,18 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
                     count++;
             }
 
-            col_counts[col]=count;
+            col_counts[(mwIndex)col]=count;
         }
     }
     else
     {
         const double *pr=mxGetDoubles(a);
 
-        for (mwIndex col=0;col<(mwIndex)n_cols;col++)
+#pragma omp parallel for schedule(static)
+        for (mwSignedIndex col=0;col<(mwSignedIndex)n_cols;col++)
         {
-            const mwIndex start=jc[col];
-            const mwIndex finish=jc[col+1];
+            const mwIndex start=jc[(mwIndex)col];
+            const mwIndex finish=jc[(mwIndex)col+1];
             mwIndex count=0;
 
             for (mwIndex k=start;k<finish;k++)
@@ -113,7 +98,7 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
                     count++;
             }
 
-            col_counts[col]=count;
+            col_counts[(mwIndex)col]=count;
         }
     }
 
@@ -145,11 +130,12 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
         const mxComplexDouble *px_in=mxGetComplexDoubles(a);
         mxComplexDouble *px_out=mxGetComplexDoubles(a_out);
 
-        for (mwIndex col=0;col<(mwIndex)n_cols;col++)
+#pragma omp parallel for schedule(static)
+        for (mwSignedIndex col=0;col<(mwSignedIndex)n_cols;col++)
         {
-            mwIndex write_ptr=jc_out[col];
-            const mwIndex start=jc[col];
-            const mwIndex finish=jc[col+1];
+            mwIndex write_ptr=jc_out[(mwIndex)col];
+            const mwIndex start=jc[(mwIndex)col];
+            const mwIndex finish=jc[(mwIndex)col+1];
 
             for (mwIndex k=start;k<finish;k++)
             {
@@ -165,7 +151,7 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
                 }
             }
 
-            if (write_ptr!=jc_out[col+1])
+            if (write_ptr!=jc_out[(mwIndex)col+1])
                 mexErrMsgIdAndTxt("Spinach:prune_cpu:internal","Internal error: column write count mismatch.");
         }
     }
@@ -174,11 +160,12 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
         const double *pr_in=mxGetDoubles(a);
         double *pr_out=mxGetDoubles(a_out);
 
-        for (mwIndex col=0;col<(mwIndex)n_cols;col++)
+#pragma omp parallel for schedule(static)
+        for (mwSignedIndex col=0;col<(mwSignedIndex)n_cols;col++)
         {
-            mwIndex write_ptr=jc_out[col];
-            const mwIndex start=jc[col];
-            const mwIndex finish=jc[col+1];
+            mwIndex write_ptr=jc_out[(mwIndex)col];
+            const mwIndex start=jc[(mwIndex)col];
+            const mwIndex finish=jc[(mwIndex)col+1];
 
             for (mwIndex k=start;k<finish;k++)
             {
@@ -192,7 +179,7 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
                 }
             }
 
-            if (write_ptr!=jc_out[col+1])
+            if (write_ptr!=jc_out[(mwIndex)col+1])
                 mexErrMsgIdAndTxt("Spinach:prune_cpu:internal","Internal error: column write count mismatch.");
         }
     }
@@ -203,4 +190,35 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
 
     // Return output argument
     plhs[0]=a_out;
+}
+
+static inline double quantise_value(const double x,const double inv_tol,const double tol)
+{
+    return tol*std::round(x*inv_tol);
+}
+
+static void grumble(int nlhs,int nrhs,const mxArray *prhs[])
+{
+    if (nrhs!=2)
+        mexErrMsgIdAndTxt("Spinach:prune_cpu:nrhs","Two inputs required: A, nonzero_tol.");
+
+    if (nlhs!=1)
+        mexErrMsgIdAndTxt("Spinach:prune_cpu:nlhs","Exactly one output is required: Aout=prune_cpu(A,nonzero_tol).");
+
+    const mxArray *a=prhs[0];
+    const mxArray *nonzero_tol=prhs[1];
+
+    if (!mxIsSparse(a))
+        mexErrMsgIdAndTxt("Spinach:prune_cpu:notSparse","A must be sparse.");
+
+    if (!mxIsDouble(a)||mxIsLogical(a))
+        mexErrMsgIdAndTxt("Spinach:prune_cpu:type","A must be a sparse double array.");
+
+    if (!mxIsDouble(nonzero_tol)||mxIsComplex(nonzero_tol)||(mxGetNumberOfElements(nonzero_tol)!=1))
+        mexErrMsgIdAndTxt("Spinach:prune_cpu:tolType","nonzero_tol must be a real double scalar.");
+
+    const double tol=mxGetScalar(nonzero_tol);
+
+    if (!(tol>0.0)||mxIsNaN(tol)||mxIsInf(tol))
+        mexErrMsgIdAndTxt("Spinach:prune_cpu:tolVal","nonzero_tol must be a finite positive real scalar.");
 }

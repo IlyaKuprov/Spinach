@@ -13,6 +13,19 @@
 
 function compile_mex()
 
+% Build compiler argument list
+if ispc
+    mex_args={'-R2018a','-O',...
+              'COMPFLAGS=$COMPFLAGS /openmp',...
+              'LINKFLAGS=$LINKFLAGS /openmp'};
+elseif isunix&&(~ismac)
+    mex_args={'-R2018a','-O',...
+              'CXXFLAGS=$CXXFLAGS -fopenmp',...
+              'LDFLAGS=$LDFLAGS -fopenmp'};
+else
+    mex_args={'-R2018a','-O'};
+end
+
 % Get C++ source file list
 cpp_files=dir('*.cpp');
 
@@ -23,7 +36,7 @@ end
 
 % Rebuild all MEX binaries in the current directory
 for n=1:numel(cpp_files)
-    mex('-R2018a','-O',cpp_files(n).name,'-outdir',pwd);
+    mex(mex_args{:},cpp_files(n).name,'-outdir',pwd);
 end
 
 end

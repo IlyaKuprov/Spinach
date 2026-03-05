@@ -57,16 +57,16 @@ grumble(A,nonzero_tol);
 % Check if clean-up is allowed
 if ~ismember('clean-up',spin_system.sys.disable)
 
-    % Use MEX if appropriate
+    % Use high-efficiency MEX if appropriate
     if ismember('mex',spin_system.sys.enable)&&...
        issparse(A)&&(~isa(A,'gpuArray'))
 
-        % Memory-friendly sparse clean-up MEX (allocates output only)
+        % Use memory-friendly MEX
         A=prune_cpu(A,nonzero_tol);
 
     else
 
-        % Use the memory-hungry generic method
+        % Use memory-hungry generic method
         A=nonzero_tol*round((1/nonzero_tol)*A);
 
     end

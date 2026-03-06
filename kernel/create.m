@@ -293,6 +293,9 @@ if ~isworkernode
         % Default port range is insufficient
         pctconfig('portrange',[20000 30000]);
 
+        % Avoid firewall and DNS issues
+        pctconfig('hostname','localhost');
+
         % Get cluster object
         c=parcluster(spin_system.sys.parallel{1});
         

@@ -321,26 +321,38 @@ for k=1:numel(mfiles)
             has_otherwise=false;
             for n=(m+1):numel(content)
 
-                % Read current line
-                subline=strtrim(content{n});
+                % Tokenise current line
+                [tokens,token_start,token_end,code_line]=control_tokens(content{n});
 
-                % Update block depth on block starts
-                if is_block_start(subline)
-                    block_depth=block_depth+1;
-                end
+                % Process tokens in lexical order
+                for p=1:numel(tokens)
 
-                % Record top-level otherwise
-                if (block_depth==1)&&...
-                   (~isempty(regexp(subline,'^otherwise\b','once')))
-                    has_otherwise=true;
-                end
-
-                % Update block depth on block ends
-                if strcmp(subline,'end')
-                    block_depth=block_depth-1;
-                    if block_depth==0
-                        break;
+                    % Block-opening keywords
+                    if is_block_start_token(tokens{p})
+                        block_depth=block_depth+1;
+                        continue;
                     end
+
+                    % Top-level otherwise clause
+                    if strcmp(tokens{p},'otherwise')&&(block_depth==1)
+                        has_otherwise=true;
+                        continue;
+                    end
+
+                    % Block-closing end keyword
+                    if strcmp(tokens{p},'end')&&...
+                       is_block_end_token(code_line,token_start(p),token_end(p))
+                        block_depth=block_depth-1;
+                        if block_depth==0
+                            break;
+                        end
+                    end
+
+                end
+
+                % Exit when switch block terminates
+                if block_depth==0
+                    break;
                 end
 
             end
@@ -398,29 +410,91 @@ disp('Now ye are clean through the word which I have spoken unto you. - John 15:
 end
 
 % Detect block-opening MATLAB keywords
-function answer=is_block_start(line_text)
-if isempty(line_text)
-    answer=false;
-    return;
+function answer=is_block_start_token(token)
+answer=ismember(token,{'if','for','parfor','while',...
+                       'switch','try','spmd','function','classdef'});
 end
-answer=~isempty(regexp(line_text,'^(if|for|parfor|while|switch|try|spmd|function|classdef|methods|properties|events)\b','once'));
+
+% Extract control-flow tokens from a line
+function [tokens,token_start,token_end,code_line]=control_tokens(line_text)
+code_line=lower(strip_strings_and_comments(line_text));
+[token_start,token_end,tokens]=regexp(code_line,...
+    '(?<![A-Za-z0-9_])(if|for|parfor|while|switch|try|spmd|function|classdef|otherwise|end)(?![A-Za-z0-9_])',...
+    'start','end','match');
+end
+
+% Remove string literals and comments from a line
+function code_line=strip_strings_and_comments(line_text)
+code_chars=[]; in_string=false; n=1;
+while n<=numel(line_text)
+    if in_string
+        if strcmp(line_text(n),'''')
+            if (n<numel(line_text))&&strcmp(line_text(n+1),'''')
+                n=n+2;
+            else
+                in_string=false;
+                n=n+1;
+            end
+        else
+            n=n+1;
+        end
+    else
+        if strcmp(line_text(n),'''')
+            in_string=true;
+            n=n+1;
+        elseif strcmp(line_text(n),'%')
+            break;
+        else
+            code_chars=[code_chars line_text(n)]; %#ok<AGROW>
+            n=n+1;
+        end
+    end
+end
+code_line=char(code_chars);
+end
+
+% Decide whether an "end" token closes a code block
+function answer=is_block_end_token(code_line,start_idx,end_idx)
+prev_idx=find(~isspace(code_line(1:(start_idx-1))),1,'last');
+next_rel=find(~isspace(code_line((end_idx+1):end)),1,'first');
+
+if isempty(prev_idx)
+    prev_char=[];
+else
+    prev_char=code_line(prev_idx);
+end
+if isempty(next_rel)
+    next_char=[];
+else
+    next_char=code_line(end_idx+next_rel);
+end
+
+answer=(isempty(prev_char)||any(prev_char==[';',',']))&&...
+       (isempty(next_char)||any(next_char==[';',',']));
 end
 
 % Find terminating end for a block
 function end_line=find_block_end(content,start_line)
 block_depth=1; end_line=[];
 for n=(start_line+1):numel(content)
-    line_text=strtrim(content{n});
-    if is_block_start(line_text)
-        block_depth=block_depth+1;
-    end
-    if strcmp(line_text,'end')
-        block_depth=block_depth-1;
-        if block_depth==0
-            end_line=n;
-            return;
+
+    % Tokenise current line
+    [tokens,token_start,token_end,code_line]=control_tokens(content{n});
+
+    % Process control-flow tokens
+    for p=1:numel(tokens)
+        if is_block_start_token(tokens{p})
+            block_depth=block_depth+1;
+        elseif strcmp(tokens{p},'end')&&...
+               is_block_end_token(code_line,token_start(p),token_end(p))
+            block_depth=block_depth-1;
+            if block_depth==0
+                end_line=n;
+                return;
+            end
         end
     end
+
 end
 end
 

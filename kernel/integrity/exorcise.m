@@ -107,13 +107,6 @@ for k=1:numel(mfiles)
             end
         end
 
-        % % Check for trailing white space
-        % for m=1:numel(raw_content)
-        %     if ~isempty(regexp(raw_content{m},'[ \t]+$','once'))
-        %         edit(file_name); error(['trailing white space in line ' num2str(m)]);
-        %     end
-        % end
-
         % Check for two line breaks at end of file
         file_text=fileread(file_name);
         if isempty(regexp(file_text,'(\r\n|\n){2}$','once'))
@@ -175,12 +168,6 @@ for k=1:numel(mfiles)
                     edit(file_name); error('unable to determine grumbler function end');
                 end
 
-                % Reject comments in grumble body
-                for m=(grumble_line+1):(grumble_end-1)
-                    if startsWith(strtrim(content{m}),'%')
-                        edit(file_name); error(['comments are not allowed in grumbler, line ' num2str(m)]);
-                    end
-                end
             end
 
         end

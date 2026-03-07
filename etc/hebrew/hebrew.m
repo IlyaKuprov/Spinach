@@ -11,7 +11,7 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function hebrew(xlsFile) 
+function hebrew(xlsFile) %#NHEAD
     
     % Read the spreadsheet
     T=readtable(xlsFile,'TextType','string',      ...

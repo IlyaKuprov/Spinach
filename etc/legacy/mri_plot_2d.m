@@ -11,7 +11,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=mri_plot_2d.m>
 
-function varargout=mri_plot_2d(varargin) %#ok<STOUT>
+function varargout=mri_plot_2d(varargin) %#ok<STOUT> #NHEAD
 
 % Direct the user to the new function
 error('This function is deprecated, use mri_2d_plot() instead.');

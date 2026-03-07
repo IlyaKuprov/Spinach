@@ -12,6 +12,10 @@
 %
 %       coords   - a cell array of coordinate vectors
 %
+% Outputs:
+%
+%       jmatrix  - a matrix of J-couplings
+%
 % Database nomenclature is as follows:
 %
 % 1. Atoms in the subgraph descriptor are listed alphabetically to make
@@ -32,7 +36,7 @@
 % ztw1e12@soton.ac.uk (Zenawi Welderufael)
 % Andras_Boeszoermenyi@hms.harvard.edu
 %
-% <https://spindynamics.org/wiki/index.php?title=Guess_j_pro.m>
+% <https://spindynamics.org/wiki/index.php?title=guess_j_pro.m>
 
 function jmatrix=guess_j_pro(aa_num,aa_typ,pdb_id,coords)
 

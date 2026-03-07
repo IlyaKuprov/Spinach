@@ -4,6 +4,16 @@
 %
 %                  spectrum=destreak(spectrum)
 %
+% Parameters:
+%
+%    spectrum - a 2D or a 3D array, or a cell 
+%               array, or a structure thereof
+%
+% Outputs:
+%
+%    spectrum - a 2D or a 3D array, or a cell 
+%               array, or a structure thereof
+%
 % The function works by subtracting the kronecker propduct of edge
 % lines from the spectrum matrix.
 %

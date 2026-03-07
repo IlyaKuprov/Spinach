@@ -11,6 +11,12 @@
 %               specifying atmos making up the dihe-
 %               dral angles of interest
 %
+% Outputs:
+%
+%    A,B,C    - coefficients for A+B*cos(phi)+C*cos(phi)^2
+%
+%    As,Bs,Vs - standard deviations of those coefficients
+%
 % The directory specified in the first argument should contain 
 % a series of Gaussian J-coupling calculation logs that differ 
 % only in the value of the dihedral angle in question.

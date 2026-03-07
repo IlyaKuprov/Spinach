@@ -2,7 +2,7 @@
 %
 %             fid=spendosy(spin_system,parameters,H,R,K,G,F)
 %
-% The following parameters are required
+% Parameters:
 %
 % parameters.dims           size of the sample in m
 %
@@ -49,6 +49,10 @@
 % G                         Fokker-Planck gradient superoperators
 %
 % F                         Fokker-Planck diffusion and flow superoperator
+%
+% Outputs:
+%
+%    fid - free induction decay
 %
 % Note: the last five parameters are built automatically by the imaging
 %       context function.

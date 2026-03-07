@@ -3,7 +3,7 @@
 %
 %                F=v2fplanck(spin_system,parameters)
 %
-% The following parameters are necessary:
+% Parameters:
 %
 %   parameters.u       - X components of the velocity vectors
 %                        for each voxel in the sample, m/s

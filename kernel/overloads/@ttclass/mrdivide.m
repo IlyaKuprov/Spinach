@@ -2,8 +2,15 @@
 %
 %                    c=mrdivide(a,b)
 %
-% The first input should be a ttclass object and the 
-% second one a scalar.
+% Parameters:
+%
+%    a - tensor train object
+%
+%    b - a scalar
+%
+% Outputs:
+%
+%    c - tensor train object
 %
 % d.savostyanov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il

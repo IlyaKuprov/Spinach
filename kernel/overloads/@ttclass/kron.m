@@ -1,6 +1,14 @@
 % Kronecker product of two matrices in a tensor train format. Syntax:
 %
-%                                c=kron(a,b)
+%                            c=kron(a,b)
+%
+% Parameters:
+%
+%     a,b - tensor train objects
+%
+% Outputs:
+%
+%     c   - a tensor trin object
 %
 % WARNING: the result is not the same as the flat matrix Kronecker pro-
 %          duct (it is a row and column permutation away from it), but

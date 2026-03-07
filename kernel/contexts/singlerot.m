@@ -137,8 +137,8 @@ end
 R=relaxation(spin_system); K=kinetics(spin_system);
 
 % Load the spherical integration grid
-sph_grid=load([spin_system.sys.root_dir '/kernel/grids/' ...
-               parameters.grid],'alphas','betas','gammas','weights');
+sph_grid=load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ...
+               filesep parameters.grid],'alphas','betas','gammas','weights');
 alphas=sph_grid.alphas; betas=sph_grid.betas; 
 gammas=sph_grid.gammas; weights=sph_grid.weights;
 

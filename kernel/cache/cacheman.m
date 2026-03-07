@@ -9,7 +9,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=cacheman.m>
 
-function cacheman(spin_system)
+function cacheman(spin_system) %#NHEAD
 
 % Check consistency
 grumble(spin_system);

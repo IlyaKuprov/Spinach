@@ -78,7 +78,7 @@ end
 function grumble(H,g)
 if (~isnumeric(H))||(size(H,1)~=size(H,2))||...
    (~issymmetric(H))||(~isreal(H))
-    error('H must be a real square symmatric matrix.');
+    error('H must be a real square symmetric matrix.');
 end
 if (~isnumeric(g))||(~isreal(g))||(~iscolumn(g))
     error('g must be a real column vector.');

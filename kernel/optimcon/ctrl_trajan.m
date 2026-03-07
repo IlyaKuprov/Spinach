@@ -98,13 +98,25 @@ if ismember('spectrogram',spin_system.control.plotting)
         [st_fft,f_axis,t_axis]=spectrogram(cplx_ch_wf,window_size,window_overlap,...
                                            n_freq_bins,sampl_rate,'yaxis','center');
 
-        % Apply NMR phase convention
+        % Compute hop size between adjacent STFT frames
         hop=window_size-window_overlap;
+
+        % Measure frame-to-frame phase advance for every frequency bin
         ph_adv=angle(st_fft(:,2:end).*conj(st_fft(:,1:end-1)));
+
+        % Compute ideal phase advance for each bin clock over one hop
         ph_ref=(2*pi*hop/sampl_rate)*f_axis;
-        ph_err=mod(ph_adv-ph_ref+pi,2*pi )-pi;
+
+        % Wrap the phase-advance mismatch into principal value interval
+        ph_err=mod(ph_adv-ph_ref+pi,2*pi)-pi;
+
+        % Convert wrapped phase mismatch into frequency error estimate
         freq_err=ph_err*sampl_rate/(2*pi*hop);
+
+        % Build per-frame effective bin frequencies keeping matrix dimensions
         f_eff=f_axis+[freq_err(:,1) freq_err];
+
+        % De-rotate each STFT sample by its effective phase clock
         st_fft=st_fft.*exp(-1i*2*pi*(f_eff.*t_axis));
         
         % Map amplitude into HSV brightness channel 

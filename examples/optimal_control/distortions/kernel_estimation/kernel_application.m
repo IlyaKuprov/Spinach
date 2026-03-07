@@ -18,8 +18,8 @@ subplot(3,1,1); plot(time_ns,[real_part imag_part]);
 xlim tight; ylim padded; kgrid; kxlabel('time, ns');
 kylabel('a.u.'); ktitle('input pulse');
 
-% Load HiPER kernel
-load('hiper_kernel.mat','h');
+% Load appropriate HiPER kernel
+load('hiper_kernel_antenna.mat','h');
 
 % Compute and plot the convolution
 x=real_part+1i*imag_part;

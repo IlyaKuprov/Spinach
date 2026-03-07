@@ -290,37 +290,29 @@ if ~isworkernode
         report(spin_system,['         > parallel profile: ' spin_system.sys.parallel{1}]);
         report(spin_system,['         > workers to start: ' num2str(spin_system.sys.parallel{2})]);
 
-        % Build a wide port range for worker endpoint binding
-        pool_port_rng=[20000 45000];
-        port_rng_str=[num2str(pool_port_rng(1)) ' ' num2str(pool_port_rng(2))];
+        % Default port range is insufficient
+        pool_port_range=[20000 45000];
+        port_rng_str=[num2str(pool_port_range(1)) ' ' ...
+                      num2str(pool_port_range(2))];
+        pctconfig('portrange',pool_port_range);
 
-        % Default worker port range is insufficient
-        pctconfig('portrange',pool_port_rng);
-
-        % Increase pool startup timeout at high worker counts
-        if spin_system.sys.parallel{2}>128
-            pool_start_to=minutes(60);
-        else
-            pool_start_to=minutes(30);
-        end
-        pctconfig('poolstarttimeout',pool_start_to);
-
-        % Avoid firewall and DNS issues
-        pctconfig('hostname','localhost');
+        % Report the network port range override
+        report(spin_system,['         > worker port range: ' num2str(pool_port_range(1)) '-' ...
+                                                             num2str(pool_port_range(2))]);
 
         % Pass worker-side port override into worker environment
         setenv('PARALLEL_SERVER_OVERRIDE_PORT_RANGE',port_rng_str);
         pool_env_vars={'PARALLEL_SERVER_OVERRIDE_PORT_RANGE'};
 
+        % Avoid firewall and DNS issues
+        pctconfig('hostname','127.0.0.1');
+        setenv('MDCE_OVERRIDE_CLIENT_HOST','127.0.0.1');
+        setenv('MDCE_OVERRIDE_EXTERNAL_HOSTNAME','127.0.0.1');
+        pool_env_vars=[pool_env_vars {'MDCE_OVERRIDE_CLIENT_HOST' ...
+                                      'MDCE_OVERRIDE_EXTERNAL_HOSTNAME'}];
+
         % Get cluster object
         c=parcluster(spin_system.sys.parallel{1});
-
-        % Apply loopback host overrides on Windows local pools
-        if ispc&&isa(c,'parallel.cluster.Local')
-            setenv('MDCE_OVERRIDE_CLIENT_HOST','127.0.0.1');
-            setenv('MDCE_OVERRIDE_EXTERNAL_HOSTNAME','127.0.0.1');
-            pool_env_vars=[pool_env_vars {'MDCE_OVERRIDE_CLIENT_HOST' 'MDCE_OVERRIDE_EXTERNAL_HOSTNAME'}];
-        end
         
         % Point the cluster into the job directory
         c.JobStorageLocation=spin_system.sys.job_dir;
@@ -338,10 +330,8 @@ if ~isworkernode
             end
         end
         
-        % Report network overrides
-        report(spin_system,['         > worker port range: ' num2str(pool_port_rng(1)) '-' num2str(pool_port_rng(2))]);
-        report(spin_system,['         > startup timeout:   ' char(pool_start_to)]);
-
+        
+        
         % Start the parallel pool
         current_pool=parpool(c,spin_system.sys.parallel{2},'EnvironmentVariables',pool_env_vars);
 

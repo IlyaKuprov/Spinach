@@ -32,7 +32,7 @@ kylabel('a.u.'); ktitle('ideal waveform');
 x=real_ideal+1i*imag_ideal;
 y=real_part+1i*imag_part;
 h=kernelest(x,y,32,'tikh','causal',10);
-save('hiper_kernel.mat','h');
+save('hiper_kernel_antenna.mat','h');
 
 % Compute and plot the convolution
 y=conv(x,h); y=y(1:numel(x));

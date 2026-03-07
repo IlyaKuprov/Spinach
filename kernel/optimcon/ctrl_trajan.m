@@ -104,16 +104,27 @@ if ismember('spectrogram',spin_system.control.plotting)
         % Account for the replicas
         t_axis=t_axis-sum(timing_grid);
         
-        % Interpret phase as hue and amplitude as value in HSV 
-        phi=atan2(real(st_fft),imag(st_fft)); phi=(phi+pi)/(2*pi); 
-        amp=abs(st_fft); amp=amp/max(amp,[],'all');
+        % Compute phase-sensitive colouring in NMR convention
+        st_fft=st_fft.*exp(-1i*2*pi*(f_axis*t_axis(:).'));
+        amp_map=abs(st_fft); amp_max=max(amp_map,[],'all');
+        if amp_max==0, amp_max=1; end
+        val_map=min(max(amp_map/amp_max,0),1);
+        hue_map=mod(angle(st_fft),2*pi)/(2*pi);
+        sat_map=ones(size(hue_map));
+        rgb_img=hsv2rgb(cat(3,hue_map,sat_map,val_map));
+        gbc=1;
 
-        % Ignore hue and saturation information for now,
-        % IK could not figure out how to unwrap phases
-        hsv=cat(3,ones(size(phi)),ones(size(phi)),amp);
+        % Blur the chroma channel
+        rgb_img_gb=imgaussfilt(rgb_img,gbc);
+        rgb_img_gb=rgb_img_gb/max(rgb_img_gb,[],'all');
+        ycbcr_img_gb=rgb2ycbcr(rgb_img_gb);
+        ycbcr_img=rgb2ycbcr(rgb_img);
+        ycbcr_img(:,:,2)=ycbcr_img_gb(:,:,2);
+        ycbcr_img(:,:,3)=ycbcr_img_gb(:,:,3);
+        rgb_img=ycbcr2rgb(ycbcr_img);
 
         % Plot the spectrogram
-        image(t_axis,f_axis,hsv2rgb(hsv));
+        image(t_axis,f_axis,rgb_img);
         ktitle(['channels ' num2str(2*n-1) ',' num2str(2*n)]);
         kylabel('frequency offset, Hz'); set(gca,'YDir','normal');
 

@@ -125,6 +125,15 @@ if ismember('spectrogram',spin_system.control.plotting)
 
         % Plot the spectrogram
         image(t_axis,f_axis,rgb_img);
+
+        % Add phase colour bar
+        colormap(gca,hsv(1024)); clim([0 2*pi]);
+        cb=colorbar('eastoutside');
+        cb.Ticks=0:pi/2:2*pi;
+        cb.TickLabels={'$0$','$0.5\pi$','$\pi$','$1.5\pi$','$2\pi$'};
+        cb.TickLabelInterpreter='latex';
+
+        % Add labels and orientation
         ktitle(['channels ' num2str(2*n-1) ',' num2str(2*n)]);
         kylabel('frequency offset, Hz'); set(gca,'YDir','normal');
 

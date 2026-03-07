@@ -92,57 +92,28 @@ if ismember('spectrogram',spin_system.control.plotting)
         cplx_ch_wf=    waveform(2*n-1,1:last_slice_to_plot)...
                    -1i*waveform(2*n  ,1:last_slice_to_plot);
 
+        % Mirror replication at the edges
+        padded_wf=[fliplr(cplx_ch_wf) cplx_ch_wf fliplr(cplx_ch_wf)];
+
         % Get the spectrogram
         window_size=ceil(sqrt(numel(timing_grid)));
         window_overlap=ceil(window_size/2); n_freq_bins=2*window_size;
-        [st_fft,f_axis,t_axis]=spectrogram(cplx_ch_wf,window_size,window_overlap,...
+        [st_fft,f_axis,t_axis]=spectrogram(padded_wf,window_size,window_overlap,...
                                            n_freq_bins,sampl_rate,'yaxis','center');
 
-        % Compute hop size between adjacent STFT frames
-        hop=window_size-window_overlap;
-
-        % Measure frame-to-frame phase advance for every frequency bin
-        ph_adv=angle(st_fft(:,2:end).*conj(st_fft(:,1:end-1)));
-
-        % Compute ideal phase advance for each bin clock over one hop
-        ph_ref=(2*pi*hop/sampl_rate)*f_axis;
-
-        % Wrap the phase-advance mismatch into principal value interval
-        ph_err=mod(ph_adv-ph_ref+pi,2*pi)-pi;
-
-        % Convert wrapped phase mismatch into frequency error estimate
-        freq_err=ph_err*sampl_rate/(2*pi*hop);
-
-        % Build per-frame effective bin frequencies keeping matrix dimensions
-        f_eff=f_axis+[freq_err(:,1) freq_err];
-
-        % De-rotate each STFT sample by its effective phase clock
-        st_fft=st_fft.*exp(-1i*2*pi*(f_eff.*t_axis));
+        % Account for the replicas
+        t_axis=t_axis-sum(timing_grid);
         
-        % Map amplitude into HSV brightness channel 
-        v_map=abs(st_fft); v_map=v_map/max(v_map,[],'all');
+        % Interpret phase as hue and amplitude as value in HSV 
+        phi=atan2(real(st_fft),imag(st_fft)); phi=(phi+pi)/(2*pi); 
+        amp=abs(st_fft); amp=amp/max(amp,[],'all');
 
-        % Map phase into HSV colour wheel
-        st_fft=sgolayfilt(st_fft,2,7,[],1);
-        st_fft=sgolayfilt(st_fft,2,7,[],2);
-        h_map=wrapTo2Pi(angle(st_fft))/(2*pi);
- 
-        % Maximum saturation
-        sat_map=ones(size(h_map));
-
-        % Assemble spectrogram as an RGB image
-        rgb_img=hsv2rgb(cat(3,h_map,sat_map,v_map));
+        % Ignore hue and saturation information for now,
+        % IK could not figure out how to unwrap phases
+        hsv=cat(3,ones(size(phi)),ones(size(phi)),amp);
 
         % Plot the spectrogram
-        image(t_axis,f_axis,rgb_img);
-
-        % Add phase colour bar
-        colormap(gca,hsv(1024)); clim([0 2*pi]);
-        cb=colorbar('eastoutside'); cb.Ticks=0:pi/2:2*pi;
-        cb.TickLabels={'$0$','$0.5\pi$','$\pi$','$1.5\pi$','$2\pi$'};
-        cb.TickLabelInterpreter='latex';
-
-        % Add labels and orientation
+        image(t_axis,f_axis,hsv2rgb(hsv));
         ktitle(['channels ' num2str(2*n-1) ',' num2str(2*n)]);
         kylabel('frequency offset, Hz'); set(gca,'YDir','normal');
 
@@ -153,8 +124,8 @@ if ismember('spectrogram',spin_system.control.plotting)
             kxlabel('time, s (truncated)');
         end
 
-        % Honest plotting margins
-        xlim([0 sum(timing_grid)]);
+        % Physically relevant interval
+        xlim([0 sum(timing_grid)]-timing_grid(1)/2);
 
         % Increment plot number
         current_plot=current_plot+1;

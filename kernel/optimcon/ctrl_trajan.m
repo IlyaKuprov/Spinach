@@ -92,30 +92,29 @@ if ismember('spectrogram',spin_system.control.plotting)
         cplx_ch_wf=    waveform(2*n-1,1:last_slice_to_plot)...
                    -1i*waveform(2*n  ,1:last_slice_to_plot);
 
-        % Mirror replication at the edges
-        padded_wf=[fliplr(cplx_ch_wf) cplx_ch_wf fliplr(cplx_ch_wf)];
-
         % Get the spectrogram
         window_size=ceil(sqrt(numel(timing_grid)));
         window_overlap=ceil(window_size/2); n_freq_bins=2*window_size;
-        [st_fft,f_axis,t_axis]=spectrogram(padded_wf,window_size,window_overlap,...
+        [st_fft,f_axis,t_axis]=spectrogram(cplx_ch_wf,window_size,window_overlap,...
                                            n_freq_bins,sampl_rate,'yaxis','center');
-
-        % Account for the replicas
-        t_axis=t_axis-sum(timing_grid);
         
-        % Compute phase-sensitive colouring in NMR convention
-        st_fft=st_fft.*exp(-1i*2*pi*(f_axis*t_axis(:).'));
-        amp_map=abs(st_fft); amp_max=max(amp_map,[],'all');
-        if amp_max==0, amp_max=1; end
-        val_map=min(max(amp_map/amp_max,0),1);
-        hue_map=mod(angle(st_fft),2*pi)/(2*pi);
-        sat_map=ones(size(hue_map));
-        rgb_img=hsv2rgb(cat(3,hue_map,sat_map,val_map));
-        gbc=1;
+        % Apply NMR phase convention
+        st_fft=st_fft.*exp(-1i*2*pi*(f_axis.*t_axis));
+        
+        % Map amplitude into HSV brightness channel 
+        v_map=abs(st_fft); v_map=v_map/max(v_map,[],'all');
+
+        % Map phase into HSV colour wheel
+        h_map=wrapTo2Pi(angle(st_fft))/(2*pi);
+        
+        % Maximum saturation
+        sat_map=ones(size(h_map));
+
+        % Assemble spectrogram as an RGB image
+        rgb_img=hsv2rgb(cat(3,h_map,sat_map,v_map));
 
         % Blur the chroma channel
-        rgb_img_gb=imgaussfilt(rgb_img,gbc);
+        rgb_img_gb=imgaussfilt(rgb_img,2.0);
         rgb_img_gb=rgb_img_gb/max(rgb_img_gb,[],'all');
         ycbcr_img_gb=rgb2ycbcr(rgb_img_gb);
         ycbcr_img=rgb2ycbcr(rgb_img);
@@ -128,8 +127,7 @@ if ismember('spectrogram',spin_system.control.plotting)
 
         % Add phase colour bar
         colormap(gca,hsv(1024)); clim([0 2*pi]);
-        cb=colorbar('eastoutside');
-        cb.Ticks=0:pi/2:2*pi;
+        cb=colorbar('eastoutside'); cb.Ticks=0:pi/2:2*pi;
         cb.TickLabels={'$0$','$0.5\pi$','$\pi$','$1.5\pi$','$2\pi$'};
         cb.TickLabelInterpreter='latex';
 
@@ -144,8 +142,8 @@ if ismember('spectrogram',spin_system.control.plotting)
             kxlabel('time, s (truncated)');
         end
 
-        % Physically relevant interval
-        xlim([0 sum(timing_grid)]-timing_grid(1)/2);
+        % Honest plotting margins
+        xlim([0 sum(timing_grid)]);
 
         % Increment plot number
         current_plot=current_plot+1;

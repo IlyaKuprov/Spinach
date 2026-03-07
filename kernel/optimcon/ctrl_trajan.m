@@ -123,22 +123,15 @@ if ismember('spectrogram',spin_system.control.plotting)
         v_map=abs(st_fft); v_map=v_map/max(v_map,[],'all');
 
         % Map phase into HSV colour wheel
+        st_fft=sgolayfilt(st_fft,2,7,[],1);
+        st_fft=sgolayfilt(st_fft,2,7,[],2);
         h_map=wrapTo2Pi(angle(st_fft))/(2*pi);
-        
+ 
         % Maximum saturation
         sat_map=ones(size(h_map));
 
         % Assemble spectrogram as an RGB image
         rgb_img=hsv2rgb(cat(3,h_map,sat_map,v_map));
-
-        % Blur the chroma channel
-        rgb_img_gb=imgaussfilt(rgb_img,2.0);
-        rgb_img_gb=rgb_img_gb/max(rgb_img_gb,[],'all');
-        ycbcr_img_gb=rgb2ycbcr(rgb_img_gb);
-        ycbcr_img=rgb2ycbcr(rgb_img);
-        ycbcr_img(:,:,2)=ycbcr_img_gb(:,:,2);
-        ycbcr_img(:,:,3)=ycbcr_img_gb(:,:,3);
-        rgb_img=ycbcr2rgb(ycbcr_img);
 
         % Plot the spectrogram
         image(t_axis,f_axis,rgb_img);

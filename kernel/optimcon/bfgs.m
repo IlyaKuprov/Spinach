@@ -1,6 +1,6 @@
 % Calculates a BFGS approximation to the Newton-Raphson search
 % direction for maximising a function using past gradients to
-% build a serviceable substitute to a Hessian. Unlike LBFGS, 
+% build a serviceable substitute to a Hessian. Unlike LBFGS,
 % the pseudo-Hessian matrix is formed explicitly. Syntax:
 %
 %                 H=bfgs(dx_hist,dg_hist,g)

@@ -11,7 +11,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=roadmap.m>
 
-function varargout=roadmap(varargin) %#ok<STOUT>
+function varargout=roadmap(varargin) %#ok<STOUT> #NHEAD
 
 % Direct the user to the new function
 error('This function is deprecated, use powder() instead.');

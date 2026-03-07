@@ -8,7 +8,7 @@
 %                bracketing(cost_function,alpha,dir,x_0,fx_0,...
 %                           gfx_0,data,spin_system)
 %
-% Arguments:
+% Parameters:
 %
 %    cost_function     - objective function handle
 %
@@ -27,7 +27,7 @@
 %    spin_system       - Spinach data structure with
 %                        line search settings
 %
-% Returns:
+% Outputs:
 %
 %    A                 - lower bracket point structure
 %

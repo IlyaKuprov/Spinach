@@ -11,7 +11,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=sim_pulse.m>
 
-function varargout=sim_pulse(varargin) %#ok<STOUT>
+function varargout=sim_pulse(varargin) %#ok<STOUT> #NHEAD
 
 % Direct the user to the new function
 error('This function is deprecated, use shaped_pulse_xy() instead.');

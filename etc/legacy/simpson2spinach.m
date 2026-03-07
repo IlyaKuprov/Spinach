@@ -11,7 +11,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=simpson2spinach.m>
 
-function varargout=simpson2spinach(varargin) %#ok<STOUT>
+function varargout=simpson2spinach(varargin) %#ok<STOUT> #NHEAD
 
 % Direct the user to the new function
 error('This function is deprecated, use s2spinach() instead.');

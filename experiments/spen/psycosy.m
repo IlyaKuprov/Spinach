@@ -71,7 +71,7 @@ Ly=kron(speye(prod(parameters.npts)),(Lp-Lp')/2i);
 % Get chirp pulse qaveform
 [Cx,Cy]=chirp_pulse(parameters.sal_npt,parameters.sal_dur,...
                        parameters.sal_swp,parameters.sal_smf,'saltire');
-                   
+
 % Normalize chirp amplitude                   
 norm_factor=max(Cx); Cx=Cx/norm_factor; Cy=Cy/norm_factor;
     

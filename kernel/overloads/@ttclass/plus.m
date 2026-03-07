@@ -1,5 +1,5 @@
-% Tensor train addition operation. Does not perform the actual addition, 
-% but instead concatenates the operands until such time as recompression 
+% Tensor train addition operation. Does not perform the actual addition,
+% but instead concatenates the operands until such time as recompression
 % becomes absolutely necessary. Syntax:
 %
 %                              c=plus(a,b)

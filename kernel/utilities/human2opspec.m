@@ -1,6 +1,5 @@
 % Converts user-friendly descriptions of spin states and operators into the 
-% formal description (opspec) used by Spinach kernel. The function supports
-% three types of syntax:
+% formal description (opspec) used by Spinach kernel. Syntax:
 %
 % 1. If both inputs are strings
 %

@@ -1,6 +1,15 @@
-% Converts a tensor train representation of a matrix into a matrix.
-% Syntax: 
-%                           answer=full(ttrain)
+% Converts a tensor train representation of a matrix 
+% into a matrix. Syntax:
+%
+%                 answer=full(ttrain)
+%
+% Parameters:
+%
+%    ttrain - tensor train object
+%
+% Outputs:
+%
+%    answer - a full matrix
 %
 % Note: the result can be huge, careless use would crash the system.
 %

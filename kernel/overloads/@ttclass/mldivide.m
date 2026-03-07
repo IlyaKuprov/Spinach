@@ -1,12 +1,19 @@
 % Solves a linear system with tensor train objects. Syntax:
 %
-%                    x=mldivide(A,y)
+%                      x=mldivide(A,y)
 %
-% The first input should be a ttclass matrix and the 
-% second one a ttclass vector of appropriate mode sizes.
+% Parameters:
 %
-% Note: the AMEn-solve algorithm is applied to symmetrized 
-%       system A'A x = A'y.
+%    A - ttclass matrix 
+%
+%    x - ttclass vector
+%
+% Outputs:
+%
+%    x - ttclass vector
+%
+% Note: the AMEn-solve algorithm is applied to symmetrised 
+%       system (A'*A)*x=A'*y
 %
 % d.savostyanov@soton.ac.uk
 %

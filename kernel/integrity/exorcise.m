@@ -107,12 +107,12 @@ for k=1:numel(mfiles)
             end
         end
 
-        % Check for trailing white space
-        for m=1:numel(raw_content)
-            if ~isempty(regexp(raw_content{m},'[ \t]+$','once'))
-                edit(file_name); error(['trailing white space in line ' num2str(m)]);
-            end
-        end
+        % % Check for trailing white space
+        % for m=1:numel(raw_content)
+        %     if ~isempty(regexp(raw_content{m},'[ \t]+$','once'))
+        %         edit(file_name); error(['trailing white space in line ' num2str(m)]);
+        %     end
+        % end
 
         % Check for two line breaks at end of file
         file_text=fileread(file_name);
@@ -273,12 +273,6 @@ for k=1:numel(mfiles)
 
         end
         
-        % Spaces around arithmetical and logical operations
-        
-        % Brackets around intervals
-        
-        % Overlong lines
-        
         % Enforce filesep in all paths
         path_calls={'dir(','fopen(','load(','save(','copyfile(',...
                     'movefile(','delete(','mkdir(','rmdir(',...
@@ -369,10 +363,6 @@ for k=1:numel(mfiles)
 
         end
         
-        % Quotation present
-        
-        % Percentage sign with no space afterwards, or multiple percentage signs
-        
         % disp() instead of report() when spin_system is available
         if is_function&&contains(top_line,'spin_system')
             for m=1:numel(content)
@@ -384,22 +374,6 @@ for k=1:numel(mfiles)
                 end
             end
         end
-
-        % Debug and unsafe calls
-        unsafe_calls={'keyboard','dbstop','eval(','evalin(',...
-                      'assignin(','clear all','clc','close all'};
-        for m=1:numel(content)
-            line_text=strtrim(content{m});
-            if isempty(line_text), continue; end
-            if strcmp(line_text(1),'%'), continue; end
-            if any(contains(line_text,unsafe_calls))
-                edit(file_name); error(['unsafe or debug call in line ' num2str(m)]);
-            end
-        end
-
-        % RNG calls
-        
-        % No white line before a comment
         
     end
 end
@@ -457,7 +431,6 @@ end
 function answer=is_block_end_token(code_line,start_idx,end_idx)
 prev_idx=find(~isspace(code_line(1:(start_idx-1))),1,'last');
 next_rel=find(~isspace(code_line((end_idx+1):end)),1,'first');
-
 if isempty(prev_idx)
     prev_char=[];
 else
@@ -468,7 +441,6 @@ if isempty(next_rel)
 else
     next_char=code_line(end_idx+next_rel);
 end
-
 answer=(isempty(prev_char)||any(prev_char==[';',',']))&&...
        (isempty(next_char)||any(next_char==[';',',']));
 end

@@ -322,18 +322,19 @@ if ~isworkernode
             c.AdditionalProperties.(spin_system.sys.parprops{n}{1})=...
                                     spin_system.sys.parprops{n}{2};
             if ischar(spin_system.sys.parprops{n}{2})
-                report(spin_system,[' AdditionalProperties.' spin_system.sys.parprops{n}{1}...
-                                    '=' spin_system.sys.parprops{n}{2}]);
+                report(spin_system,[' AdditionalProperties.' ...
+                                    spin_system.sys.parprops{n}{1} '=' ...
+                                    spin_system.sys.parprops{n}{2}]);
             elseif isnumeric(spin_system.sys.parprops{n}{2})
-                report(spin_system,[' AdditionalProperties.' spin_system.sys.parprops{n}{1}...
-                                    '=' num2str(spin_system.sys.parprops{n}{2})]);
+                report(spin_system,[' AdditionalProperties.' ...
+                                    spin_system.sys.parprops{n}{1} '=' ...
+                                    num2str(spin_system.sys.parprops{n}{2})]);
             end
         end
         
-        
-        
         % Start the parallel pool
-        current_pool=parpool(c,spin_system.sys.parallel{2},'EnvironmentVariables',pool_env_vars);
+        current_pool=parpool(c,spin_system.sys.parallel{2},...
+                             'EnvironmentVariables',pool_env_vars);
 
         % Disable pool timeout
         current_pool.IdleTimeout=inf;

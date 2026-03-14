@@ -10,6 +10,10 @@
 %                             subdivided spherical quadrature
 %                             grid, 6 is a good choice
 %
+%     parameters.spins     -  a one-element cell array giving
+%                             the spin to couple to the mi-
+%                             crowave field, e.g. {'E'}
+%
 %     parameters.mw_freq   -  microwave frequency, Hz
 %
 %     parameters.fwhm      -  line FWHM, Tesla
@@ -17,6 +21,18 @@
 %     parameters.window    -  field sweep window, [Bmin Bmax]
 %
 %     parameters.npoints   -  number of points in the sweep
+%
+%     parameters.tm_tol    -  relative transition moment
+%                             tolerance passed to eigen-
+%                             fields.m
+%
+%     parameters.rspt_order - perturbation theory order
+%                             passed to rspt_eig.m, Inf
+%                             for exact diagonalisation
+%
+%     parameters.int_tol   -  recursive triangle inte-
+%                             gration tolerance passed
+%                             to voitlander.m
 %
 % Outputs:
 %

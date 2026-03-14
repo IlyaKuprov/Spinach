@@ -204,153 +204,68 @@ spin_system.sys.job_dir=[spin_system.sys.scratch filesep 'spinach_job_' ...
                          spin_system.sys.job_id];
 if ~isfolder(spin_system.sys.job_dir), mkdir(spin_system.sys.job_dir); end
 
-% Set up head node
-if ~isworkernode
-    
-    % Shuffle the random number generator
-    rng('shuffle'); report(spin_system,'random number generator shuffled');
-    
-    % Detailed parallel profiling
-    if ismember('dafuq',spin_system.sys.enable)
+% Shuffle the random number generator
+rng('shuffle'); report(spin_system,'random number generator shuffled');
+
+% Leave one core to the operating system
+ncores=feature('numcores'); nworkers=ncores-1;
+sys.parallel={'threads',max([1 nworkers])};
+
+% Get the current pool
+current_pool=gcp('nocreate');
+
+% Destroy inappropriate pools
+if ~isempty(current_pool)
+
+    % Destroy pools that are not threads based
+    if ~isa(current_pool,'parallel.ThreadPool')
         
-        % Dump MDCS messages to console
-        setSchedulerMessageHandler(@disp);
-        
-        % Turn on MDCS debugging
-        setenv('MDCE_DEBUG','true');
-        
-        % Preserve job information
-        pctconfig('preservejobs',true);
-        
-    end
-    
-    % Set default parallel profile
-    if ~isfield(sys,'parallel')
+        % Kill the pool and update current pool to empty
+        report(spin_system,'found a process-based parallel pool, destroying...');
+        delete(current_pool); current_pool=gcp('nocreate');
 
-        % This needs some care
-        ncores=feature('numcores');
-        if ncores>64
+    % Destroy pools with wrong number of workers
+    elseif current_pool.NumWorkers~=sys.parallel{2}
 
-            % Beyond 64 workers, MDCS
-            % needs a personal touch
-            nworkers=64;
-
-        else
-
-            % Leave one core to the 
-            % operating system
-            nworkers=ncores-1;
-
-        end
-
-        % Default to the thread pool
-        sys.parallel={'threads',max([1 nworkers])};
+        % Kill the pool and update current pool to empty
+        report(spin_system,'found a threads pool with wrong size, destroying...');
+        delete(current_pool); current_pool=gcp('nocreate');
 
     end
-    
-    % Set default parallel properties
-    if ~isfield(sys,'parprops'), sys.parprops={}; end
-    
-    % Convert legacy pool profile requests
-    if ismember(sys.parallel{1},{'local','processes'})
-        sys.parallel{1}='threads';
-    end
-    
-    % Get the current pool
-    current_pool=gcp('nocreate');
-
-    % Destroy process pools and mismatched thread pools
-    if ~isempty(current_pool)
-        if ~isa(current_pool,'parallel.ThreadPool')
-            report(spin_system,'found a process-based parallel pool, destroying...');
-            delete(current_pool); current_pool=gcp('nocreate');
-        elseif current_pool.NumWorkers~=sys.parallel{2}
-            report(spin_system,'found a thread-based parallel pool with the wrong size, destroying...');
-            delete(current_pool); current_pool=gcp('nocreate');
-        end
-    end
-    
-    % Check for running pools
-    if ~isempty(current_pool)
-        
-        % Use the existing pool
-        spin_system.sys.parallel={'threads',current_pool.NumWorkers};
-        spin_system.sys.parprops={};
-        report(spin_system,'a running Spinach thread pool found:')
-        report(spin_system,['         > workers available: ' num2str(spin_system.sys.parallel{2})]);
-        report(spin_system,'WARNING - this pool will be re-used');
-        sys=rmfield(sys,'parallel'); sys=rmfield(sys,'parprops');
-
-        % Empty ValueStore of the current pool
-        store=current_pool.ValueStore; store.remove(store.keys);
-        report(spin_system,'parallel pool ValueStore cleared.');
-        
-    else
-
-        % Absorb parallel profile
-        spin_system.sys.parallel={'threads',sys.parallel{2}};
-        spin_system.sys.parprops=sys.parprops;
-        sys=rmfield(sys,'parallel'); sys=rmfield(sys,'parprops');
-        report(spin_system,'starting a thread pool with the following parameters:')
-        report(spin_system,['         > workers to start: ' num2str(spin_system.sys.parallel{2})]);
-
-        % Warn about ignored cluster properties
-        if ~isempty(spin_system.sys.parprops)
-            report(spin_system,'WARNING - thread pools ignore sys.parprops');
-        end
-
-        % Start the parallel pool
-        current_pool=parpool('threads',spin_system.sys.parallel{2});
-    
-    end
-    
-    % Set up parallel resource allocation
-    warning('off','MATLAB:maxNumCompThreads:Deprecated');
-    if isa(current_pool,'parallel.ThreadPool')
-
-        % Thread pools manage CPU allocation internally
-        report(spin_system,'thread pool detected, worker CPU pinning skipped');
-        maxNumCompThreads(feature('numcores'));
-
-    elseif ismember('greedy',spin_system.sys.enable)
-        
-        % Greedy
-        spmd
-
-            % Allow every worker to use every CPU core
-            warning('off','MATLAB:maxNumCompThreads:Deprecated');
-            maxNumCompThreads(feature('numcores'));
-
-        end
-
-        % Head process can use what it wants
-        maxNumCompThreads(feature('numcores'));
-
-    else
-        
-        % Modest
-        spmd
-            
-            % Try to work out a reasonable allocation
-            warning('off','MATLAB:maxNumCompThreads:Deprecated');
-            ncores=max([1 floor(feature('numcores')/spmdSize)]);
-            maxNumCompThreads(ncores);
-
-        end
-
-        % Head process can use what it wants
-        maxNumCompThreads(feature('numcores'));
-
-    end
-    
-else
-
-    % Workers do not need setting up
-    if isfield(sys,'parallel'), sys=rmfield(sys,'parallel'); end
-    if isfield(sys,'parprops'), sys=rmfield(sys,'parprops'); end
 
 end
 
+% Check for running pools
+if ~isempty(current_pool)
+
+    % Use the existing pool
+    spin_system.sys.parallel={'threads',current_pool.NumWorkers};
+    report(spin_system,'a running thread pool found:')
+    report(spin_system,['         > workers available: ' num2str(spin_system.sys.parallel{2})]);
+    report(spin_system,'this pool will be re-used.');
+    sys=rmfield(sys,'parallel');
+
+    % Empty the ValueStore of the current pool
+    store=current_pool.ValueStore; store.remove(store.keys);
+    report(spin_system,'parallel pool ValueStore cleared.');
+
+else
+
+    % Absorb parallel profile
+    spin_system.sys.parallel={'threads',sys.parallel{2}};
+    sys=rmfield(sys,'parallel');
+    report(spin_system,'starting a thread pool:')
+    report(spin_system,['         > workers to start: ' num2str(spin_system.sys.parallel{2})]);
+
+    % Start a threads based parallel pool
+    parpool('threads',spin_system.sys.parallel{2});
+
+end
+
+% % Head process can use what it likes
+% warning('off','MATLAB:maxNumCompThreads:Deprecated');
+% maxNumCompThreads(feature('numcores'));
+    
 % Tidy up the cache
 if (~isworkernode)&&...
    (~ismember('hygiene',spin_system.sys.disable))&&...

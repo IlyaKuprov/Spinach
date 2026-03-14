@@ -100,6 +100,30 @@ else
         
 end
 
+% Decide scratch destination
+if isfield(sys,'scratch')
+    
+    % Scratch to a user-specified directory
+    spin_system.sys.scratch=sys.scratch;
+    
+    % Parse out
+    sys=rmfield(sys,'scratch');
+    
+else
+    
+    % Scratch to the default directory
+    spin_system.sys.scratch=[spin_system.sys.root_dir filesep 'scratch'];
+    
+end
+
+% If scratch directory does not exist, create it
+if ~exist(spin_system.sys.scratch,'dir')
+    mkdir(spin_system.sys.scratch);
+end
+
+% Report scratch location
+report(spin_system,['scratch location: ' spin_system.sys.scratch]);
+
 % Show version banner
 banner(spin_system,'version_banner');
 

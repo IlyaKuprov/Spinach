@@ -63,16 +63,20 @@ switch basis_type
         
         % Fill the array using the three-term recurrence to avoid
         % Symbolic Math Toolbox dispatch on thread-based workers.
+        % The recurrence must use unnormalised Legendre polynomials;
+        % only the stored output rows are normalised.
         x=linspace(-1,1,n_points);
-        basis_waves(1,:)=ones(1,n_points);
-        basis_waves(1,:)=basis_waves(1,:)/norm(basis_waves(1,:),2);
+        p_prev=ones(1,n_points);
+        basis_waves(1,:)=p_prev/norm(p_prev,2);
         if n_func>1
-            basis_waves(2,:)=x;
-            basis_waves(2,:)=basis_waves(2,:)/norm(basis_waves(2,:),2);
+            p_curr=x;
+            basis_waves(2,:)=p_curr/norm(p_curr,2);
             for n=3:n_func
                 ell=n-1;
-                basis_waves(n,:)=((2*ell-1)*x.*basis_waves(n-1,:)-(ell-1)*basis_waves(n-2,:))/ell;
-                basis_waves(n,:)=basis_waves(n,:)/norm(basis_waves(n,:),2);
+                p_next=((2*ell-1)*x.*p_curr-(ell-1)*p_prev)/ell;
+                basis_waves(n,:)=p_next/norm(p_next,2);
+                p_prev=p_curr;
+                p_curr=p_next;
             end
         end
         

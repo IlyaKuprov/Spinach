@@ -39,7 +39,7 @@ if size(L,1)<spin_system.tols.small_matrix
 end
 
 % Check the cache
-if ismember('prop_cache',spin_system.sys.enable)
+if (~isworkernode)&&ismember('prop_cache',spin_system.sys.enable)
 
     % Hash the generator, the step, and the tolerance
     prop_hash=md5_hash({L,timestep,spin_system.tols.prop_chop});
@@ -241,7 +241,7 @@ if n_squarings>0
 end
     
 % Write the cache record if caching is beneficial
-if ismember('prop_cache',spin_system.sys.enable)&&(toc>0.01)
+if (~isworkernode)&&ismember('prop_cache',spin_system.sys.enable)&&(toc>0.01)
 
     % Do not fight other workers
     if ~exist(filename,'file')
@@ -264,7 +264,7 @@ if ismember('prop_cache',spin_system.sys.enable)&&(toc>0.01)
 
     end
     
-elseif ismember('prop_cache',spin_system.sys.enable)
+elseif (~isworkernode)&&ismember('prop_cache',spin_system.sys.enable)
     
     % Tell the user that caching is pointless here
     report(spin_system,'cache record not worth saving.');

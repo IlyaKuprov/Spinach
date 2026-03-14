@@ -243,107 +243,76 @@ if ~isworkernode
 
         end
 
-        % Default to the local parallel pool
-        sys.parallel={'local',max([1 nworkers])};
+        % Default to the thread pool
+        sys.parallel={'threads',max([1 nworkers])};
 
     end
     
     % Set default parallel properties
     if ~isfield(sys,'parprops'), sys.parprops={}; end
     
+    % Convert legacy pool profile requests
+    if ismember(sys.parallel{1},{'local','processes'})
+        sys.parallel{1}='threads';
+    end
+    
     % Get the current pool
     current_pool=gcp('nocreate');
 
-    % Destroy pools not created by Spinach because their scratch is fuck knows where
-    if (~isempty(current_pool))&&(~strcmp(current_pool.Cluster.JobStorageLocation(1:(end-32)),...
-                                          spin_system.sys.job_dir(1:(end-32))))
-        report(spin_system,'found a non-Spinach parallel pool, destroying...');
-        delete(current_pool); current_pool=gcp('nocreate');
+    % Destroy process pools and mismatched thread pools
+    if ~isempty(current_pool)
+        if ~isa(current_pool,'parallel.ThreadPool')
+            report(spin_system,'found a process-based parallel pool, destroying...');
+            delete(current_pool); current_pool=gcp('nocreate');
+        elseif current_pool.NumWorkers~=sys.parallel{2}
+            report(spin_system,'found a thread-based parallel pool with the wrong size, destroying...');
+            delete(current_pool); current_pool=gcp('nocreate');
+        end
     end
     
     % Check for running pools
     if ~isempty(current_pool)
         
         % Use the existing pool
-        spin_system.sys.parallel{1}=current_pool.Cluster.Profile;
-        spin_system.sys.parallel{2}=current_pool.NumWorkers;
-        report(spin_system,'a running Spinach parallel pool found:')
-        report(spin_system,['         > parallel profile: ' spin_system.sys.parallel{1}]);
-        report(spin_system,['         > job identifier:   ' current_pool.Cluster.JobStorageLocation((end-31):end)]);
-        report(spin_system,['         > worker processes: ' num2str(spin_system.sys.parallel{2})]);
+        spin_system.sys.parallel={'threads',current_pool.NumWorkers};
+        spin_system.sys.parprops={};
+        report(spin_system,'a running Spinach thread pool found:')
+        report(spin_system,['         > workers available: ' num2str(spin_system.sys.parallel{2})]);
         report(spin_system,'WARNING - this pool will be re-used');
         sys=rmfield(sys,'parallel'); sys=rmfield(sys,'parprops');
 
         % Empty ValueStore of the current pool
         store=current_pool.ValueStore; store.remove(store.keys);
         report(spin_system,'parallel pool ValueStore cleared.');
-
-        % Disable pool timeout
-        current_pool.IdleTimeout=inf;
         
     else
 
         % Absorb parallel profile
-        spin_system.sys.parallel=sys.parallel; sys=rmfield(sys,'parallel');
-        spin_system.sys.parprops=sys.parprops; sys=rmfield(sys,'parprops');
-        report(spin_system,'starting a parallel pool with the following parameters:')
-        report(spin_system,['         > parallel profile: ' spin_system.sys.parallel{1}]);
+        spin_system.sys.parallel={'threads',sys.parallel{2}};
+        spin_system.sys.parprops=sys.parprops;
+        sys=rmfield(sys,'parallel'); sys=rmfield(sys,'parprops');
+        report(spin_system,'starting a thread pool with the following parameters:')
         report(spin_system,['         > workers to start: ' num2str(spin_system.sys.parallel{2})]);
 
-        % Default port range is insufficient
-        pool_port_range=[20000 45000];
-        port_rng_str=[num2str(pool_port_range(1)) ' ' ...
-                      num2str(pool_port_range(2))];
-        pctconfig('portrange',pool_port_range);
-
-        % Report the network port range override
-        report(spin_system,['         > worker port range: ' num2str(pool_port_range(1)) '-' ...
-                                                             num2str(pool_port_range(2))]);
-
-        % Pass worker-side port override into worker environment
-        setenv('PARALLEL_SERVER_OVERRIDE_PORT_RANGE',port_rng_str);
-        pool_env_vars={'PARALLEL_SERVER_OVERRIDE_PORT_RANGE'};
-
-        % Avoid firewall and DNS issues
-        pctconfig('hostname','127.0.0.1');
-        setenv('MDCE_OVERRIDE_CLIENT_HOST','127.0.0.1');
-        setenv('MDCE_OVERRIDE_EXTERNAL_HOSTNAME','127.0.0.1');
-        pool_env_vars=[pool_env_vars {'MDCE_OVERRIDE_CLIENT_HOST' ...
-                                      'MDCE_OVERRIDE_EXTERNAL_HOSTNAME'}];
-
-        % Get cluster object
-        c=parcluster(spin_system.sys.parallel{1});
-        
-        % Point the cluster into the job directory
-        c.JobStorageLocation=spin_system.sys.job_dir;
-        
-        % Set additional properties
-        for n=1:numel(spin_system.sys.parprops)
-            c.AdditionalProperties.(spin_system.sys.parprops{n}{1})=...
-                                    spin_system.sys.parprops{n}{2};
-            if ischar(spin_system.sys.parprops{n}{2})
-                report(spin_system,[' AdditionalProperties.' ...
-                                    spin_system.sys.parprops{n}{1} '=' ...
-                                    spin_system.sys.parprops{n}{2}]);
-            elseif isnumeric(spin_system.sys.parprops{n}{2})
-                report(spin_system,[' AdditionalProperties.' ...
-                                    spin_system.sys.parprops{n}{1} '=' ...
-                                    num2str(spin_system.sys.parprops{n}{2})]);
-            end
+        % Warn about ignored cluster properties
+        if ~isempty(spin_system.sys.parprops)
+            report(spin_system,'WARNING - thread pools ignore sys.parprops');
         end
-        
-        % Start the parallel pool
-        current_pool=parpool(c,spin_system.sys.parallel{2},...
-                             'EnvironmentVariables',pool_env_vars);
 
-        % Disable pool timeout
-        current_pool.IdleTimeout=inf;
+        % Start the parallel pool
+        current_pool=parpool('threads',spin_system.sys.parallel{2});
     
     end
     
     % Set up parallel resource allocation
     warning('off','MATLAB:maxNumCompThreads:Deprecated');
-    if ismember('greedy',spin_system.sys.enable)
+    if isa(current_pool,'parallel.ThreadPool')
+
+        % Thread pools manage CPU allocation internally
+        report(spin_system,'thread pool detected, worker CPU pinning skipped');
+        maxNumCompThreads(feature('numcores'));
+
+    elseif ismember('greedy',spin_system.sys.enable)
         
         % Greedy
         spmd

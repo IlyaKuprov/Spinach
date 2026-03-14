@@ -815,40 +815,50 @@ switch spin_system.bas.formalism
                                 % Compute the exponential propagator
                                 P_sub=propagator(spin_system,L_sub,timestep);
                                 
-                                % Distribute the initial condition
-                                rho_sub=distrib_dim(rho_sub,2);
-                            
-                                % Distribute covector array
-                                cov_sub=speye(size(rho_sub));
-                                cov_sub=distrib_dim(cov_sub,2);
-                            
-                                % Parallel processing
-                                spmd
-                                
-                                    % Localize the problem and save memory
-                                    rho_local=getLocalPart(rho_sub); rho_sub=[]; %#ok<NASGU>
-                                    cov_local=getLocalPart(cov_sub); cov_sub=[]; %#ok<NASGU>
+                                % Partition the density matrix columns into
+                                % contiguous segments for parallel processing.
+                                ncols=size(rho_sub,2);
+                                current_pool=gcp('nocreate');
+                                if isempty(current_pool)
+                                    nsegments=1;
+                                else
+                                    nsegments=min(current_pool.NumWorkers,ncols);
+                                end
+                                edges=round(linspace(0,ncols,nsegments+1));
+                                seg_starts=edges(1:end-1)+1;
+                                seg_ends=edges(2:end);
+                                fid_parts=cell(1,nsegments);
+
+                                % Parallel processing over matrix segments
+                                parfor seg=1:nsegments
+
+                                    % Pull the current block of columns
+                                    cols=seg_starts(seg):seg_ends(seg);
+                                    rho_local=rho_sub(:,cols);
+                                    cov_local=sparse(cols,1:numel(cols),1,ncols,numel(cols));
                                     fid_local=zeros([(nsteps+1) 1],'like',1i);
-                                
+
                                     % Loop over time steps
                                     for n=1:(nsteps+1)
-                                    
-                                        % Write local fid
+
+                                        % Write local fid contribution
                                         fid_local(n)=hdot(coil_sub*cov_local,rho_local);
-                                    
+
                                         % Step forward on rho and cov
                                         rho_local=P_sub*rho_local;
                                         cov_local=P_sub*cov_local;
-                                    
+
                                     end
-                                
-                                    % Collect the results
-                                    answer_sub=spmdPlus(fid_local,1);
-                                
+
+                                    % Store the segment contribution
+                                    fid_parts{seg}=fid_local;
+
                                 end
-                            
-                                % Return the result
-                                answer=answer+answer_sub{1};
+
+                                % Collect the results
+                                for seg=1:nsegments
+                                    answer=answer+fid_parts{seg};
+                                end
                                 
                             end
                         

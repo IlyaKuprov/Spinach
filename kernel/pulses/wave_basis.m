@@ -61,10 +61,19 @@ switch basis_type
         
     case 'legendre'
         
-        % Fill the array
-        parfor n=1:n_func
-            basis_waves(n,:)=legendreP(n-1,linspace(-1,1,n_points));
-            basis_waves(n,:)=basis_waves(n,:)/norm(basis_waves(n,:),2);
+        % Fill the array using the three-term recurrence to avoid
+        % Symbolic Math Toolbox dispatch on thread-based workers.
+        x=linspace(-1,1,n_points);
+        basis_waves(1,:)=ones(1,n_points);
+        basis_waves(1,:)=basis_waves(1,:)/norm(basis_waves(1,:),2);
+        if n_func>1
+            basis_waves(2,:)=x;
+            basis_waves(2,:)=basis_waves(2,:)/norm(basis_waves(2,:),2);
+            for n=3:n_func
+                ell=n-1;
+                basis_waves(n,:)=((2*ell-1)*x.*basis_waves(n-1,:)-(ell-1)*basis_waves(n-2,:))/ell;
+                basis_waves(n,:)=basis_waves(n,:)/norm(basis_waves(n,:),2);
+            end
         end
         
     otherwise

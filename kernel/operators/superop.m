@@ -70,26 +70,37 @@ struct=cell(1,numel(active_spins));
 
 % Loop over the relevant spins
 for n=1:length(active_spins)
-    
-    % Get right and left product action tables for the current spin
-    [pt_left,pt_right]=ist_product_table(spin_system.comp.mults(active_spins(n)));
-    
+
+    % Current spin multiplicity and state index
+    mult=spin_system.comp.mults(active_spins(n));
+    table_idx=opspec(active_spins(n))+1;
+
     % Extract pages corresponding to the current state
     switch side
+
         case {'left','leftofcomm'}
-            pt=squeeze(pt_left(opspec(active_spins(n))+1,:,:));
+
+            % Extract left product pages from Lie structure tables
+            pt=squeeze(spin_system.bas.lpst{mult}(table_idx,:,:));
+
         case {'right','rightofcomm'}
-            pt=squeeze(pt_right(opspec(active_spins(n))+1,:,:));
+
+            % Extract right product pages from Lie structure tables
+            pt=squeeze(spin_system.bas.rpst{mult}(table_idx,:,:));
+
         otherwise
+
+            % Complain and bomb out
             error('invalid side specification.');
+
     end
-    
+
     % Convert product action table to indices
     [destin{n},source{n},struct{n}]=find(pt);
-    
-    % Switch to 0 index for unit state
+
+    % Spinach uses 0 index for the unit matrix
     source{n}=source{n}-1; destin{n}=destin{n}-1;
-    
+
 end
     
 % Compute the structure coefficients for the relevant sub-algebra

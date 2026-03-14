@@ -422,7 +422,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
     
     % Sort the basis explicitly
     report(spin_system,'sorting the basis...');
-    if (~isworkernode)&&(nnz(basis_spec)>1e5)
+    if (~isworkernode)&&(nnz(basis_spec)>1e5)&&(~isa(gcp,'parallel.ThreadPool'))
         
         % Run multithreaded sorting
         basis_spec=distrib_dim(basis_spec,2);
@@ -508,6 +508,35 @@ if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef'})
     % Run the symmetry treatment
     spin_system=symmetry(spin_system,bas);
     
+end
+
+% Preload Lie algebra structure tables into RAM
+if strcmp(spin_system.bas.formalism,'sphten-liouv')
+
+    % Inform the user
+    report(spin_system,'caching Lie structure tables...');
+
+    % Find the spin multiplicities present
+    unique_mults=unique(spin_system.comp.mults);
+
+    % Preallocate the structure table arrays
+    spin_system.bas.lpst=cell(max(unique_mults),1);
+    spin_system.bas.rpst=cell(max(unique_mults),1);
+
+    % Fill the arrays
+    for n=setdiff(unique_mults,1)
+
+        % Load from disk or compute
+        [lpst,rpst]=ist_product_table(n);
+
+        % Left product structure table
+        spin_system.bas.lpst{n}=lpst;
+
+        % Right product structure table
+        spin_system.bas.rpst{n}=rpst;
+
+    end
+
 end
 
 % Hash the basis descriptor for caching tools later

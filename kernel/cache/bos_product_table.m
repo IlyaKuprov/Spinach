@@ -43,7 +43,7 @@ table_file=[own_path 'bos_product_table_' ...
             num2str(nlevels) '.mat'];
 
 % Check the cache
-if exist(table_file,'file')
+if (~isworkernode)&&exist(table_file,'file')
     
     % Lift data from the cache if the file is already available
     load(table_file,'product_table_left','product_table_right');
@@ -82,11 +82,13 @@ else
         end
     end
 
-    try % Try to save a cache record, but do not insist
-        save(table_file,'product_table_left',...
-                        'product_table_right','-v7.3'); drawnow;
-    catch
-        warning('Spinach directory appears to be write-protected');
+    if ~isworkernode
+        try % Try to save a cache record, but do not insist
+            save(table_file,'product_table_left',...
+                            'product_table_right','-v7.3'); drawnow;
+        catch
+            warning('Spinach directory appears to be write-protected');
+        end
     end
 
 end

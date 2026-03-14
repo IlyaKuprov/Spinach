@@ -592,7 +592,7 @@ clear('D1','D2','nL','nS','opL','opS','isotropic','ist_coeff',...
       'n','pair_list','quad_couplings');
 
 % Load the cache record if one exists
-if ismember('ham_cache',spin_system.sys.enable)
+if (~isworkernode)&&ismember('ham_cache',spin_system.sys.enable)
 
     % Combine descriptor, isotopes, and basis hash
     ham_hash=md5_hash({descr,spin_system.comp.iso_hash, ...
@@ -655,7 +655,10 @@ if ~isworkernode
     D=parallel.pool.DataQueue;
     afterEach(D,@(~)parfor_progr);
     terms_done=0; last_toc=0;
-    tic; ticBytes(gcp); do_diag=true;
+    tic; do_diag=true;
+    if ~isa(gcp,'parallel.ThreadPool')
+        ticBytes(gcp);
+    end
 else
     do_diag=false; D=[];
 end
@@ -692,9 +695,13 @@ end
 
 % Parfor communication stats
 if ~isworkernode
-    nbytes=mean(tocBytes(gcp),1)/2^20;
-    report(spin_system,['average worker process received ' num2str(nbytes(1)) ...
-                        ' MB and sent back ' num2str(nbytes(2)) ' MB']);
+    if isa(gcp,'parallel.ThreadPool')
+        report(spin_system,'thread pool in use, worker traffic statistics unavailable');
+    else
+        nbytes=mean(tocBytes(gcp),1)/2^20;
+        report(spin_system,['average worker process received ' num2str(nbytes(1)) ...
+                            ' MB and sent back ' num2str(nbytes(2)) ' MB']);
+    end
 end
 
 % Inform the user
@@ -900,7 +907,7 @@ if build_aniso
 end
 
 % Write the cache record if caching is beneficial
-if ismember('ham_cache',spin_system.sys.enable)&&(toc>0.1)
+if (~isworkernode)&&ismember('ham_cache',spin_system.sys.enable)&&(toc>0.1)
 
     % Do not fight other workers
     if ~exist(filename,'file')
@@ -934,7 +941,7 @@ if ismember('ham_cache',spin_system.sys.enable)&&(toc>0.1)
         
     end
     
-elseif ismember('ham_cache',spin_system.sys.enable)
+elseif (~isworkernode)&&ismember('ham_cache',spin_system.sys.enable)
 
     % Tell the user that caching is pointless here
     report(spin_system,'cache record not worth saving.');

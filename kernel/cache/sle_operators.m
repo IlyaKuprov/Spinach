@@ -44,7 +44,7 @@ cache_file=[own_path 'sle_operators_rank_' ...
             num2str(max_rank) '.mat'];
 
 % Check the cache
-if exist(cache_file,'file')
+if (~isworkernode)&&exist(cache_file,'file')
     
     % Lift data from the cache if the file is already available
     load(cache_file,'space_basis','Lx','Ly','Lz','D');
@@ -167,11 +167,13 @@ else
         
     end
         
-    try % Try to save a cache record, but don't insist
-        save(cache_file,'space_basis','Lx','Ly','Lz',...
-                        'D','-v7.3'); drawnow;
-    catch
-        warning('Spinach installation appears to be write-protected');
+    if ~isworkernode
+        try % Try to save a cache record, but don't insist
+            save(cache_file,'space_basis','Lx','Ly','Lz',...
+                            'D','-v7.3'); drawnow;
+        catch
+            warning('Spinach installation appears to be write-protected');
+        end
     end
     
 end

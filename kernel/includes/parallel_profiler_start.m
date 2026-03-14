@@ -7,7 +7,9 @@
 
 % Brief parallel profiler start
 if ~isworkernode
-    ticBytes(gcp);
+    if ~isa(gcp,'parallel.ThreadPool')
+        ticBytes(gcp);
+    end
 end
 tic();
 

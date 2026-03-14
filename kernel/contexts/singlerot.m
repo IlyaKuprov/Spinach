@@ -240,7 +240,10 @@ if ~isworkernode
     DQ=parallel.pool.DataQueue;
     afterEach(DQ,@(~)parfor_progr);
     orients_done=0; last_toc=0;
-    tic; ticBytes(gcp); do_diag=true;
+    tic; do_diag=true;
+    if ~isa(gcp,'parallel.ThreadPool')
+        ticBytes(gcp);
+    end
 else
     do_diag=false; DQ=[];
 end
@@ -363,9 +366,14 @@ end
 
 % Parfor performance
 if ~isworkernode
-    nbytes=mean(tocBytes(gcp),1)/2^20; walltime=toc();
-    report(spin_system,['average worker process received ' num2str(nbytes(1)) ...
-                        ' MB and sent back ' num2str(nbytes(2)) ' MB']);
+    walltime=toc();
+    if isa(gcp,'parallel.ThreadPool')
+        report(spin_system,'thread pool in use, worker traffic statistics unavailable');
+    else
+        nbytes=mean(tocBytes(gcp),1)/2^20;
+        report(spin_system,['average worker process received ' num2str(nbytes(1)) ...
+                            ' MB and sent back ' num2str(nbytes(2)) ' MB']);
+    end
     report(spin_system,['powder average run time: ' num2str(walltime) ' seconds']);
 end
 

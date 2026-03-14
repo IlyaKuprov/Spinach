@@ -80,7 +80,7 @@ if ~exist('format','var'), format='csc'; end
 grumble(spin_system,operators,spins,operator_type,format); tic;
 
 % Load the cache record if one exists
-if ismember('op_cache',spin_system.sys.enable)
+if (~isworkernode)&&ismember('op_cache',spin_system.sys.enable)
 
     % Combine specification, isotopes, and basis hash
     op_hash=md5_hash({operators,spins,operator_type,...
@@ -222,7 +222,7 @@ if strcmp(format,'csc')
 end
 
 % Write the cache record if caching is beneficial
-if ismember('op_cache',spin_system.sys.enable)&&(toc>0.1)
+if (~isworkernode)&&ismember('op_cache',spin_system.sys.enable)&&(toc>0.1)
 
     % Do not fight other workers
     if ~exist(filename,'file')

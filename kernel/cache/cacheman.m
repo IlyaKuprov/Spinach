@@ -17,7 +17,11 @@ grumble(spin_system);
 % Get parallel pool directory
 current_pool=gcp('nocreate');
 if ~isempty(current_pool)
-    pool_dir=current_pool.Cluster.JobStorageLocation;
+    if isa(current_pool,'parallel.ThreadPool')
+        pool_dir='';
+    else
+        pool_dir=current_pool.Cluster.JobStorageLocation;
+    end
 else
     pool_dir='';
 end

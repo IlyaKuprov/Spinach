@@ -8,9 +8,14 @@
 
 % Brief parallel profiler report
 if ~isworkernode
-    nbytes=mean(tocBytes(gcp),1)/2^20; walltime=toc();
-    report(spin_system,['average worker process received ' num2str(nbytes(1)) ...
-                        ' MB and sent back ' num2str(nbytes(2)) ' MB']);
+    walltime=toc();
+    if isa(gcp,'parallel.ThreadPool')
+        report(spin_system,'thread pool in use, worker traffic statistics unavailable');
+    else
+        nbytes=mean(tocBytes(gcp),1)/2^20;
+        report(spin_system,['average worker process received ' num2str(nbytes(1)) ...
+                            ' MB and sent back ' num2str(nbytes(2)) ' MB']);
+    end
     report(spin_system,['parallel stage run time: ' num2str(walltime) ' seconds']);
 end
 

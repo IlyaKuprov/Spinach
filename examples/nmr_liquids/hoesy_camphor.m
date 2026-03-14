@@ -30,7 +30,6 @@ inter.tau_c={50e-12};
 inter.temperature=298;
 
 % Algorithmic options
-sys.enable={'greedy'};
 sys.tols.prox_cutoff=5.0;
 sys.tols.inter_cutoff=2.0;
 

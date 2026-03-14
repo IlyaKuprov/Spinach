@@ -32,7 +32,6 @@ bas.connectivity='scalar_couplings';
 bas.space_level=1;
 
 % Algorithmic options
-sys.enable={'greedy'};
 sys.tols.prox_cutoff=4.0;
 
 % Sequence parameters

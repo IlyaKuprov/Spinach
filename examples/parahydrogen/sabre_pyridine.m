@@ -39,9 +39,6 @@ nmr_field=7.05;
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
-% Algorithmic options
-sys.enable={'greedy'};
-
 % Do the housekeeping
 sys.magnet=polarization_field;
 spin_system=create(sys,inter);

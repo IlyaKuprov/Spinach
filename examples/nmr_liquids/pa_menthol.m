@@ -19,9 +19,6 @@ bas.projections=+1;
 bas.sym_group={'S3','S3','S3'};
 bas.sym_spins={[4 5 6],[9 10 11],[12 13 14]};
 
-% Algorithms
-sys.enable={'greedy'};
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

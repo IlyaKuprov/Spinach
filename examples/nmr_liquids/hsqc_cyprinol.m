@@ -14,7 +14,6 @@ function hsqc_cyprinol()
 sys.magnet=11.7;
 
 % Algorithmic options
-sys.enable={'greedy'};
 sys.tols.prox_cutoff=4.0;
 sys.tols.inter_cutoff=5.0;
 

@@ -21,7 +21,6 @@ bas.formalism='sphten-liouv';
 bas.approximation='none';
 
 % Algorithmic options
-sys.enable={'greedy'};
 sys.tols.prox_cutoff=4.0;
 
 % Sequence parameters

@@ -14,7 +14,6 @@ function hetcor_strychnine()
 sys.magnet=5.9;
 
 % Algorithmic options
-sys.enable={'greedy'};
 sys.tols.prox_cutoff=4.0;
 
 % Basis set

@@ -36,7 +36,6 @@ inter.coupling.scalar{12,14}=0.9;
 inter.coupling.scalar{22,22}=0;
 
 % Algorithmic options
-sys.enable={'greedy'};
 sys.tols.prox_cutoff=4.0;
 
 % Basis set

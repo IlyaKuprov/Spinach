@@ -28,9 +28,6 @@ inter.tau_c={1e-9};
 sys.tols.rlx_integration=1e-5;
 sys.tols.rlx_zero=1e-5;
 
-% Algorithmic options
-sys.enable={'greedy'};
-
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';

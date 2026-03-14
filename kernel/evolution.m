@@ -149,57 +149,48 @@ switch spin_system.bas.formalism
         
         % Count subspaces
         nsubs=numel(projectors);
-        
-        % Parallel strategy
-        if nsubs>1
-            nworkers=poolsize;
-        else
-            nworkers=0;
-        end
-        
+
         % Run the evolution
         switch output
             
             case 'final'
                 
-                % Create arrays of projections
-                L_sub=cell(nsubs,1); rho_sub=cell(nsubs,1); 
-                rows=cell(nsubs,1); cols=cell(nsubs,1); vals=cell(nsubs,1);
-                report(spin_system,'splitting the space...');
+                % Preallocate the answer
+                answer=zeros(size(rho),'like',1i);
+                                
+                % Over subspaces
                 for sub=1:nsubs
-                    L_sub{sub}=projectors{sub}'*L*projectors{sub};
-                    rho_sub{sub}=projectors{sub}'*rho;
-                end
-                
-                % Loop in parallel over independent subspaces
-                parfor (sub=1:nsubs,nworkers)
+
+                    % Project into the current subspace
+                    L_sub=projectors{sub}'*L*projectors{sub};
+                    rho_sub=full(projectors{sub}'*rho);
                     
                     % Inform the user
-                    report(spin_system,['evolving subspace ' num2str(sub) ' of ' num2str(nsubs) '...']);
+                    report(spin_system,['evolving subspace ' num2str(sub) ...
+                                        ' of ' num2str(nsubs) '...']);
                     
-                    % Grab local copies
-                    L_loc=L_sub{sub}; rho_loc=rho_sub{sub}; proj_loc=projectors{sub};
-                    L_loc=clean_up(spin_system,L_loc,spin_system.tols.liouv_zero);
-                    rho_loc=clean_up(spin_system,rho_loc,spin_system.tols.zte_tol);
+                    % Clean up the projection of the evolution generator
+                    L_sub=clean_up(spin_system,L_sub,spin_system.tols.liouv_zero);
                     
-                    % Decide if Krylov should be used
-                    if ((size(L_loc,2)<spin_system.tols.krylov_tol)||...
+                    % Decide if Krylov should be used instead
+                    if ((size(L_sub,2)<spin_system.tols.krylov_tol)||...
                         ismember('krylov',spin_system.sys.disable))&&...
                       (~ismember('krylov',spin_system.sys.enable))
                         
-                        % Ignore user timing and use optimal one
-                        nsteps_opt=ceil(log2(size(L_loc,1)/(size(rho_loc,2)*log(2)))); 
+                        % Ignore user-specified timing and use the optimal one
+                        nsteps_opt=ceil(log2(size(L_sub,1)/(size(rho_sub,2)*log(2)))); 
                         nsteps_opt=max([1 nsteps_opt]); total_time=timestep*nsteps;
-                        timestep_loc=total_time/nsteps_opt;
+                        timestep_opt=total_time/nsteps_opt;
                         
                         % Inform the user
-                        report(spin_system,['dim(L)=' num2str(size(L_loc,1)) ...
-                                            ', rho stack size ' num2str(size(rho_loc,2)) ', ' ...
-                                            num2str(nsteps_opt) ' substeps in optimal stepping.']); 
+                        report(spin_system,['dim(L)=' num2str(size(L_sub,1))             ...
+                                            ', rho stack size ' num2str(size(rho_sub,2)) ...
+                                            ', ' num2str(nsteps_opt)                     ...
+                                            ' substeps in optimal stepping.']); 
                   
                         % Get the exponential propagator
                         report(spin_system,'building the propagator...');
-                        P=propagator(spin_system,L_loc,timestep_loc);
+                        P=propagator(spin_system,L_sub,timestep_opt);
                         
                         % Adapt to the target device
                         if ismember('gpu',spin_system.sys.enable)
@@ -208,15 +199,16 @@ switch spin_system.bas.formalism
                             report(spin_system,'propagating the system on GPU...');
                             
                             % Move things to GPU
-                            P=gpuArray(P); rho_loc=gpuArray(rho_loc);
+                            rho_sub=gpuArray(rho_sub);
+                            P=gpuArray(P);
                             
                             % Run the propagation
                             for n=1:nsteps_opt
-                                rho_loc=P*rho_loc;
+                                rho_sub=P*rho_sub;
                             end
                             
                             % Gather the result
-                            rho_loc=gather(rho_loc);
+                            rho_sub=gather(rho_sub);
                             
                         else
                             
@@ -225,7 +217,7 @@ switch spin_system.bas.formalism
                             
                             % Run the propagation
                             for n=1:nsteps_opt
-                                rho_loc=P*rho_loc;
+                                rho_sub=P*rho_sub;
                             end
                             
                         end
@@ -234,107 +226,77 @@ switch spin_system.bas.formalism
                         
                         % For very large subspaces use Krylov propagation
                         report(spin_system,'large Liouvillian, propagating using Krylov algorithm... ');
-                        rho_loc=krylov(spin_system,L_loc,[],rho_loc,timestep,nsteps,'final');
+                        rho_sub=krylov(spin_system,L_sub,[],rho_sub,timestep,nsteps,'final');
                         
                     end
                     
-                    % Project back into the full space and convert into i,j,v
-                    rho_loc=clean_up(spin_system,rho_loc,spin_system.tols.zte_tol);
-                    [rows{sub},cols{sub},vals{sub}]=find(proj_loc*sparse(rho_loc));
-                    
-                    % Deallocate memory in a transparent way
-                    rho_loc=[]; L_loc=[]; proj_loc=[]; P=[]; %#ok<NASGU>
+                    % Project back and add to the answer
+                    answer=answer+projectors{sub}*rho_sub;
                     
                 end
                 
                 % Update the user
                 report(spin_system,'propagation finished.');
                 
-                % Deallocate memory
-                clear('L_sub','rho_sub','projectors');
-                
-                % Recombine the subspaces
-                report(spin_system,'recombining subspaces...');
-                rows=cell2mat(rows); cols=cell2mat(cols); vals=cell2mat(vals);
-                answer=sparse(rows,cols,vals,size(rho,1),size(rho,2));
-                answer=clean_up(spin_system,answer,spin_system.tols.zte_tol);
-                report(spin_system,'data retrieval finished.');
-                
             case 'total'
                 
-                % Create arrays of projections
-                L_sub=cell(nsubs,1); 
-                rho_sub=cell(nsubs,1); coil_sub=cell(nsubs,1);
-                report(spin_system,'splitting the space...');
-                for sub=1:nsubs
-                    L_sub{sub}=projectors{sub}'*L*projectors{sub};
-                    rho_sub{sub}=full(projectors{sub}'*rho);
-                    coil_sub{sub}=projectors{sub}'*coil;
-                end
-                
-                % Start with zero
+                % Start
                 answer=0;
                 
-                % Loop in parallel over independent subspaces
-                parfor (sub=1:nsubs,nworkers)
+                % Over subspaces
+                for sub=1:nsubs
+
+                    % Project into the current subspace
+                    L_sub=projectors{sub}'*L*projectors{sub};
+                    rho_sub=full(projectors{sub}'*rho);
+                    coil_sub=full(projectors{sub}'*coil);
                     
                     % Inform the user
-                    report(spin_system,['evolving subspace ' num2str(sub) ' of ' num2str(nsubs) '...']);
+                    report(spin_system,['evolving subspace ' num2str(sub) ...
+                                        ' of ' num2str(nsubs) '...']);
                     
-                    % Grab local copies
-                    L_loc=L_sub{sub}; rho_loc=rho_sub{sub}; coil_loc=coil_sub{sub}; 
-                    L_loc=clean_up(spin_system,L_loc,spin_system.tols.liouv_zero);
-                    rho_loc=clean_up(spin_system,rho_loc,spin_system.tols.zte_tol);
-                    coil_loc=clean_up(spin_system,coil_loc,spin_system.tols.zte_tol);
-                    
-                    % Compute the integral
+                    % Clean up the projection of the evolution generator
+                    L_sub=clean_up(spin_system,L_sub,spin_system.tols.liouv_zero);
+                   
+                    % Compute the integral and add it to the answer
                     report(spin_system,'integrating the trajectory...');
-                    answer_loc=real(coil_loc'*((1i*L_loc)\rho_loc));
-                    
-                    % Add the subspace to the total
-                    answer=answer+answer_loc;
+                    answer=answer+1i*coil_sub'*(L_sub\rho_sub);
                     
                     % Update the user
                     report(spin_system,'integration finished.');
                     
                 end
                 
-                % Make sure a full array is returned
-                answer=full(answer);
-                
             case 'trajectory'
                 
-                % Create arrays of projections
-                L_sub=cell(nsubs,1); rho_sub=cell(nsubs,1);
-                rows=cell(nsubs,1); cols=cell(nsubs,1); vals=cell(nsubs,1);
-                report(spin_system,'splitting the space...');
+                % Preallocate the answer
+                answer=zeros(size(rho,1),nsteps+1,'like',1i);
+
+                % Over subspaces
                 for sub=1:nsubs
-                    L_sub{sub}=projectors{sub}'*L*projectors{sub};
-                    rho_sub{sub}=projectors{sub}'*rho;
-                end
-                
-                % Loop in parallel over independent subspaces
-                parfor (sub=1:nsubs,nworkers)
+
+                    % Project into the current subspace
+                    L_sub=projectors{sub}'*L*projectors{sub};
+                    rho_sub=full(projectors{sub}'*rho);
                     
                     % Inform the user
-                    report(spin_system,['evolving subspace ' num2str(sub) ' of ' num2str(nsubs) '...']);
+                    report(spin_system,['evolving subspace ' num2str(sub) ...
+                                        ' of ' num2str(nsubs) '...']);
                     
-                     % Grab local copies
-                    L_loc=L_sub{sub}; rho_loc=rho_sub{sub}; proj_loc=projectors{sub};
-                    L_loc=clean_up(spin_system,L_loc,spin_system.tols.liouv_zero);
-                    rho_loc=clean_up(spin_system,rho_loc,spin_system.tols.zte_tol);
+                    % Clean up the projection of the evolution generator
+                    L_sub=clean_up(spin_system,L_sub,spin_system.tols.liouv_zero);
                     
-                    % Propagate the system
-                    if ((size(L_loc,2)<spin_system.tols.krylov_tol)||...
+                    % Decide if Krylov should be used instead
+                    if ((size(L_sub,2)<spin_system.tols.krylov_tol)||...
                         ismember('krylov',spin_system.sys.disable))&&...
                       (~ismember('krylov',spin_system.sys.enable))
                         
-                        % Preallocate the answer
-                        answer=zeros([size(rho_loc,1) (nsteps+1)],'like',1i);
+                        % Preallocate the answer in the current subspace
+                        answer_subs=zeros([size(rho_sub,1) (nsteps+1)],'like',1i);
                   
                         % Get the exponential propagator
                         report(spin_system,'building the propagator...');
-                        P=propagator(spin_system,L_loc,timestep);
+                        P=propagator(spin_system,L_sub,timestep);
                     
                         % Adapt to the target device
                         if ismember('gpu',spin_system.sys.enable)
@@ -343,12 +305,12 @@ switch spin_system.bas.formalism
                             report(spin_system,'propagating the system on GPU...');
                             
                             % Move things to GPU
-                            rho_loc=gpuArray(rho_loc); P=gpuArray(P);
+                            rho_sub=gpuArray(rho_sub); P=gpuArray(P);
                             
                             % Propagate the system
                             for n=1:(nsteps+1)
-                                answer(:,n)=gather(rho_loc);
-                                rho_loc=P*rho_loc;
+                                answer_subs(:,n)=gather(rho_sub);
+                                rho_sub=P*rho_sub;
                             end
                             
                         else
@@ -358,8 +320,8 @@ switch spin_system.bas.formalism
                             
                             % Propagate the system
                             for n=1:(nsteps+1)
-                                answer(:,n)=rho_loc;
-                                rho_loc=P*rho_loc;
+                                answer_subs(:,n)=rho_sub;
+                                rho_sub=P*rho_sub;
                             end
                             
                         end
@@ -368,62 +330,45 @@ switch spin_system.bas.formalism
                         
                         % For very large subspaces use Krylov propagation
                         report(spin_system,'large Liouvillian, propagating using Krylov algorithm... ');
-                        answer=krylov(spin_system,L_loc,[],rho_loc,timestep,nsteps,'trajectory')
+                        answer_subs=krylov(spin_system,L_subs,[],rho_subs,timestep,nsteps,'trajectory');
                         
                     end
                     
-                    % Project back into the full space
-                    answer=clean_up(spin_system,answer,spin_system.tols.zte_tol);
-                    [rows{sub},cols{sub},vals{sub}]=find(proj_loc*sparse(answer));
-                    
-                    % Deallocate memory in a transparent way
-                    rho_loc=[]; L_loc=[]; proj_loc=[]; P=[]; answer=[]; %#ok<NASGU>
+                    % Project back and add to the answer
+                    answer=answer+projectors{sub}*answer_subs;
                     
                 end
                 
                 % Update the user
                 report(spin_system,'propagation finished.');
                 
-                % Deallocate memory
-                clear('L_sub','rho_sub','projectors');
-                
-                % Recombine the subspaces
-                report(spin_system,'recombining subspaces...');
-                rows=cell2mat(rows); cols=cell2mat(cols); vals=cell2mat(vals);
-                answer=sparse(rows,cols,vals,size(rho,1),nsteps+1);
-                answer=clean_up(spin_system,answer,spin_system.tols.zte_tol);
-                report(spin_system,'data retrieval finished.');
-                
             case 'refocus'
                 
-                % Create arrays of projections
-                L_sub=cell(nsubs,1); rho_sub=cell(nsubs,1);
-                rows=cell(nsubs,1); cols=cell(nsubs,1); vals=cell(nsubs,1);
-                report(spin_system,'splitting the space...');
-                for sub=1:nsubs
-                    L_sub{sub}=projectors{sub}'*L*projectors{sub};
-                    rho_sub{sub}=projectors{sub}'*rho;
-                end
+                % Preallocate the answer
+                answer=zeros(size(rho),'like',1i);
                 
-                % Loop over independent subspaces
-                parfor (sub=1:nsubs,nworkers)
+                % Over subspaces
+                for sub=1:nsubs
+
+                    % Project into the current subspace
+                    L_sub=projectors{sub}'*L*projectors{sub};
+                    rho_sub=full(projectors{sub}'*rho);
                     
                     % Inform the user
-                    report(spin_system,['evolving subspace ' num2str(sub) ' of ' num2str(nsubs) '...']);
+                    report(spin_system,['evolving subspace ' num2str(sub) ...
+                                        ' of ' num2str(nsubs) '...']);
                     
-                    % Grab local copies
-                    L_loc=L_sub{sub}; rho_loc=rho_sub{sub}; proj_loc=projectors{sub};
-                    L_loc=clean_up(spin_system,L_loc,spin_system.tols.liouv_zero);
-                    rho_loc=clean_up(spin_system,rho_loc,spin_system.tols.zte_tol);
+                    % Clean up the projection of the evolution generator
+                    L_sub=clean_up(spin_system,L_sub,spin_system.tols.liouv_zero);
                     
-                    % Propagate the system
-                    if ((size(L_loc,2)<spin_system.tols.krylov_tol)||...
+                    % Decide if Krylov should be used instead
+                    if ((size(L_sub,2)<spin_system.tols.krylov_tol)||...
                         ismember('krylov',spin_system.sys.disable))&&...
                       (~ismember('krylov',spin_system.sys.enable))
                         
                         % Get the exponential propagator
                         report(spin_system,'building the propagator...');
-                        P=propagator(spin_system,L_loc,timestep);
+                        P=propagator(spin_system,L_sub,timestep);
                         
                         % Adapt to the target device
                         if ismember('gpu',spin_system.sys.enable)
@@ -435,10 +380,10 @@ switch spin_system.bas.formalism
                             P=gpuArray(P);
                             
                             % Loop over stack elements
-                            for n=2:size(rho_loc,2)               % done this way because sparse gpuArrays
+                            for n=2:size(rho_sub,2)               % done this way because sparse gpuArrays
                                                                   % cannot be indexed into in R2017b - IK
                                 % Get the current state vector
-                                rho_cur=rho_loc(:,n);
+                                rho_cur=rho_sub(:,n);
                                 
                                 % Move it to GPU
                                 rho_cur=gpuArray(rho_cur);
@@ -449,7 +394,7 @@ switch spin_system.bas.formalism
                                 end
                                 
                                 % Gather and reassign
-                                rho_loc(:,n)=gather(rho_cur);
+                                rho_sub(:,n)=gather(rho_cur);
                                 
                             end
                             
@@ -459,8 +404,8 @@ switch spin_system.bas.formalism
                             report(spin_system,'propagating the system on CPU...');
                             
                             % Propagate the system
-                            for n=2:size(rho_loc,2)
-                                rho_loc(:,n:end)=P*rho_loc(:,n:end);
+                            for n=2:size(rho_sub,2)
+                                rho_sub(:,n:end)=P*rho_sub(:,n:end);
                             end
                             
                         end
@@ -469,70 +414,49 @@ switch spin_system.bas.formalism
                         
                         % For very large subspaces use Krylov propagation
                         report(spin_system,'large Liouvillian, propagating using Krylov algorithm... ');
-                        rho_loc=krylov(spin_system,L_loc,[],rho_loc,timestep,[],'refocus');
+                        rho_sub=krylov(spin_system,L_sub,[],rho_sub,timestep,[],'refocus');
                         
                     end
                     
-                    % Project back into the full space
-                    rho_loc=clean_up(spin_system,rho_loc,spin_system.tols.zte_tol);
-                    [rows{sub},cols{sub},vals{sub}]=find(proj_loc*sparse(rho_loc));
-                    
-                    % Deallocate memory in a transparent way
-                    rho_loc=[]; L_loc=[]; proj_loc=[]; P=[]; %#ok<NASGU>
-                    
+                    % Project back and add to the answer
+                    answer=answer+projectors{sub}*rho_sub;
+                   
                 end
                 
                 % Update the user
                 report(spin_system,'propagation finished.');
                 
-                % Deallocate memory
-                clear('L_sub','rho_sub','projectors');
-                
-                % Recombine the subspaces
-                report(spin_system,'recombining subspaces...');
-                rows=cell2mat(rows); cols=cell2mat(cols); vals=cell2mat(vals);
-                answer=sparse(rows,cols,vals,size(rho,1),nsteps+1);
-                answer=clean_up(spin_system,answer,spin_system.tols.zte_tol);
-                report(spin_system,'data retrieval finished.');
-                
             case 'observable'
-                
-                % Create arrays of projections
-                L_sub=cell(nsubs,1); 
-                rho_sub=cell(nsubs,1); coil_sub=cell(nsubs,1);
-                report(spin_system,'splitting the space...');
-                for sub=1:nsubs
-                    L_sub{sub}=projectors{sub}'*L*projectors{sub};
-                    rho_sub{sub}=projectors{sub}'*rho;
-                    coil_sub{sub}=projectors{sub}'*coil;
-                end
                 
                 % Preallocate the answer
                 answer=zeros([(nsteps+1) size(rho,2)],'like',1i);
                 
                 % Loop over independent subspaces
-                parfor (sub=1:nsubs,nworkers)
+                for sub=1:nsubs
+
+                    % Project into the current subspace
+                    L_sub=projectors{sub}'*L*projectors{sub};
+                    rho_sub=full(projectors{sub}'*rho);
+                    coil_sub=full(projectors{sub}'*coil);
                     
                     % Inform the user
-                    report(spin_system,['evolving subspace ' num2str(sub) ' of ' num2str(nsubs) '...']);
+                    report(spin_system,['evolving subspace ' num2str(sub) ...
+                                        ' of ' num2str(nsubs) '...']);
                     
-                    % Grab local copies
-                    L_loc=L_sub{sub}; rho_loc=rho_sub{sub}; coil_loc=coil_sub{sub}; 
-                    L_loc=clean_up(spin_system,L_loc,spin_system.tols.liouv_zero);
-                    rho_loc=clean_up(spin_system,rho_loc,spin_system.tols.zte_tol);
-                    coil_loc=clean_up(spin_system,coil_loc,spin_system.tols.zte_tol);
+                     % Clean up the projection of the evolution generator
+                    L_sub=clean_up(spin_system,L_sub,spin_system.tols.liouv_zero);
                     
                     % Propagate the system
-                    if ((size(L_loc,2)<spin_system.tols.krylov_tol)||...
+                    if ((size(L_sub,2)<spin_system.tols.krylov_tol)||...
                         ismember('krylov',spin_system.sys.disable))&&...
                       (~ismember('krylov',spin_system.sys.enable))
                         
                         % Get the exponential propagator
                         report(spin_system,'building the propagator...');
-                        P=propagator(spin_system,L_loc,timestep);
+                        P=propagator(spin_system,L_sub,timestep);
                         
                         % Preallocate the local answer
-                        answer_loc=zeros([(nsteps+1) size(rho_loc,2)],'like',1i);
+                        answer_sub=zeros([(nsteps+1) size(rho_sub,2)],'like',1i);
                         
                         % Adapt to the target device
                         if ismember('gpu',spin_system.sys.enable)
@@ -541,12 +465,14 @@ switch spin_system.bas.formalism
                             report(spin_system,'propagating the system on GPU...');
                             
                             % Upload things to GPU
-                            P=gpuArray(P); coil_loc=gpuArray(coil_loc); rho_loc=gpuArray(rho_loc);
+                            coil_sub=gpuArray(coil_sub); 
+                            rho_sub=gpuArray(rho_sub);
+                            P=gpuArray(P);
                             
                             % Propagate and detect
                             for n=1:(nsteps+1)
-                                answer_loc(n,:)=gather(coil_loc'*rho_loc);
-                                rho_loc=P*rho_loc;
+                                answer_sub(n,:)=gather(coil_sub'*rho_sub);
+                                rho_sub=P*rho_sub;
                             end
                             
                         else
@@ -556,8 +482,8 @@ switch spin_system.bas.formalism
                             
                             % Propagate and detect
                             for n=1:(nsteps+1)
-                                answer_loc(n,:)=coil_loc'*rho_loc;
-                                rho_loc=P*rho_loc;
+                                answer_sub(n,:)=coil_sub'*rho_sub;
+                                rho_sub=P*rho_sub;
                             end
                             
                         end
@@ -566,15 +492,12 @@ switch spin_system.bas.formalism
                         
                         % For very large subspaces use Krylov propagation
                         report(spin_system,'large Liouvillian, propagating using Krylov algorithm... ');
-                        answer_loc=krylov(spin_system,L_loc,coil_loc,rho_loc,timestep,nsteps,'observable');
+                        answer_sub=krylov(spin_system,L_sub,coil_sub,rho_sub,timestep,nsteps,'observable');
                         
                     end
                     
                     % Add to the total
-                    answer=answer+answer_loc;
-                    
-                    % Deallocate memory in a transparent way
-                    rho_loc=[]; L_loc=[]; P=[]; answer_loc=[]; %#ok<NASGU>
+                    answer=answer+answer_sub;
                     
                     % Update the user
                     report(spin_system,'propagation finished.');
@@ -583,42 +506,35 @@ switch spin_system.bas.formalism
                 
             case 'multichannel'
                 
-                % Create arrays of projections
-                L_sub=cell(nsubs,1); 
-                rho_sub=cell(nsubs,1); coil_sub=cell(nsubs,1);
-                report(spin_system,'splitting the space...');
-                for sub=1:nsubs
-                    L_sub{sub}=projectors{sub}'*L*projectors{sub};
-                    rho_sub{sub}=projectors{sub}'*rho;
-                    coil_sub{sub}=projectors{sub}'*coil;
-                end
-                
                 % Preallocate the answer
                 answer=zeros([size(coil,2) (nsteps+1)],'like',1i);
                 
-                % Loop over independent subspaces
-                parfor (sub=1:nsubs,nworkers)
+                % Over subspaces
+                for sub=1:nsubs
+                    
+                    % Project into the current subspace
+                    L_sub=projectors{sub}'*L*projectors{sub};
+                    rho_sub=full(projectors{sub}'*rho);
+                    coil_sub=full(projectors{sub}'*coil);
                     
                     % Inform the user
-                    report(spin_system,['evolving subspace ' num2str(sub) ' of ' num2str(numel(projectors)) '...']);
+                    report(spin_system,['evolving subspace ' num2str(sub) ...
+                                        ' of ' num2str(nsubs) '...']);
                     
-                    % Grab local copies
-                    L_loc=L_sub{sub}; rho_loc=rho_sub{sub}; coil_loc=coil_sub{sub}; 
-                    L_loc=clean_up(spin_system,L_loc,spin_system.tols.liouv_zero);
-                    rho_loc=clean_up(spin_system,rho_loc,spin_system.tols.zte_tol);
-                    coil_loc=clean_up(spin_system,coil_loc,spin_system.tols.zte_tol);
+                     % Clean up the projection of the evolution generator
+                    L_sub=clean_up(spin_system,L_sub,spin_system.tols.liouv_zero);
                     
                     % Propagate the system
-                    if ((size(L_loc,2)<spin_system.tols.krylov_tol)||...
+                    if ((size(L_sub,2)<spin_system.tols.krylov_tol)||...
                         ismember('krylov',spin_system.sys.disable))&&...
                       (~ismember('krylov',spin_system.sys.enable))
                         
                         % Get the exponential propagator
                         report(spin_system,'building the propagator...');
-                        P=propagator(spin_system,L_loc,timestep);
+                        P=propagator(spin_system,L_sub,timestep);
                         
                         % Preallocate the local answer
-                        answer_loc=zeros([size(coil_loc,2) (nsteps+1)],'like',1i);
+                        answer_sub=zeros([size(coil_sub,2) (nsteps+1)],'like',1i);
                         
                         % Adapt to the target device
                         if ismember('gpu',spin_system.sys.enable)
@@ -627,12 +543,14 @@ switch spin_system.bas.formalism
                             report(spin_system,'propagating the system on GPU...');
                             
                             % Upload things to GPU
-                            P=gpuArray(P); rho_loc=gpuArray(rho_loc); coil_loc=gpuArray(coil_loc);
+                            P=gpuArray(P); 
+                            rho_sub=gpuArray(rho_sub); 
+                            coil_sub=gpuArray(coil_sub);
                             
                             % Propagate the system
                             for n=1:(nsteps+1)
-                                answer_loc(:,n)=gather(coil_loc'*rho_loc);
-                                rho_loc=P*rho_loc;
+                                answer_sub(:,n)=gather(coil_sub'*rho_sub);
+                                rho_sub=P*rho_sub;
                             end
                             
                         else
@@ -642,8 +560,8 @@ switch spin_system.bas.formalism
                             
                             % Propagate the system
                             for n=1:(nsteps+1)
-                                answer_loc(:,n)=coil_loc'*rho_loc;
-                                rho_loc=P*rho_loc;
+                                answer_sub(:,n)=coil_sub'*rho_sub;
+                                rho_sub=P*rho_sub;
                             end
                         
                         end
@@ -652,15 +570,12 @@ switch spin_system.bas.formalism
                         
                         % For very large subspaces use Krylov propagation
                         report(spin_system,'large Liouvillian, propagating using Krylov algorithm... ');
-                        answer_loc=krylov(spin_system,L_loc,coil_loc,rho_loc,timestep,nsteps,'multichannel');
+                        answer_sub=krylov(spin_system,L_sub,coil_sub,rho_sub,timestep,nsteps,'multichannel');
                         
                     end
                     
                     % Add to the total
-                    answer=answer+answer_loc;
-                    
-                    % Deallocate memory in a transparent way
-                    rho_loc=[]; L_loc=[]; P=[]; answer_loc=[]; %#ok<NASGU>
+                    answer=answer+answer_sub;
                     
                     % Update the user
                     report(spin_system,'propagation finished.');

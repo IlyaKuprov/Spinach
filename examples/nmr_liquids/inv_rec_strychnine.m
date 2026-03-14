@@ -16,9 +16,6 @@ sys.magnet=5.9;
 % Maximum distance to consider
 sys.tols.prox_cutoff=5.0;
 
-% Greedy parallelisation
-sys.enable={'greedy'};
-
 % Relaxation theory parameters
 inter.relaxation={'redfield'};
 inter.equilibrium='dibari';

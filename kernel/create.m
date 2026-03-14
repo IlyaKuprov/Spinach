@@ -100,30 +100,6 @@ else
         
 end
 
-% Decide scratch destination
-if isfield(sys,'scratch')
-    
-    % Scratch to a user-specified directory
-    spin_system.sys.scratch=sys.scratch;
-    
-    % Parse out
-    sys=rmfield(sys,'scratch');
-    
-else
-    
-    % Scratch to the default directory
-    spin_system.sys.scratch=[spin_system.sys.root_dir filesep 'scratch'];
-    
-end
-
-% If scratch directory does not exist, create it
-if ~exist(spin_system.sys.scratch,'dir')
-    mkdir(spin_system.sys.scratch);
-end
-
-% Report scratch location
-report(spin_system,['scratch location: ' spin_system.sys.scratch]);
-
 % Show version banner
 banner(spin_system,'version_banner');
 
@@ -186,7 +162,6 @@ if ~isempty(spin_system.sys.enable)
     if ismember('op_cache',spin_system.sys.enable),   report(spin_system,'         > operator caching'); end
     if ismember('ham_cache',spin_system.sys.enable),  report(spin_system,'         > Hamiltonian caching'); end
     if ismember('prop_cache',spin_system.sys.enable), report(spin_system,'         > propagator caching'); end
-    if ismember('greedy',spin_system.sys.enable),     report(spin_system,'         > greedy parallelisation'); end
     if ismember('xmemlist',spin_system.sys.enable),   report(spin_system,'         > state-cluster cross-membership list generation'); end
     if ismember('paranoia',spin_system.sys.enable),   report(spin_system,'         > paranoid numerical accuracy settings'); end
     if ismember('cowboy',spin_system.sys.enable),     report(spin_system,'         > loose numerical accuracy settings'); end
@@ -195,21 +170,16 @@ if ~isempty(spin_system.sys.enable)
     if ismember('sodd',spin_system.sys.enable),       report(spin_system,'         > spin-orbit corrections to dipolar couplings'); end
 end
 
-% Get a unique job identifier
-spin_system.sys.job_id=md5_hash([clock feature('getpid')]);      %#ok<CLOCK> 
+% Get a unique job identifier by hashing the clock and the process identifier
+spin_system.sys.job_id=md5_hash([posixtime(datetime('now')) matlabProcessID]);      
 report(spin_system,['job identifier: ' spin_system.sys.job_id]);
-
-% Create a unique scratch subdirectory for the current job
-spin_system.sys.job_dir=[spin_system.sys.scratch filesep 'spinach_job_' ...
-                         spin_system.sys.job_id];
-if ~isfolder(spin_system.sys.job_dir), mkdir(spin_system.sys.job_dir); end
 
 % Shuffle the random number generator
 rng('shuffle'); report(spin_system,'random number generator shuffled');
 
 % Leave one core to the operating system
 ncores=feature('numcores'); nworkers=ncores-1;
-sys.parallel={'threads',max([1 nworkers])};
+spin_system.sys.parallel={'threads',max([1 nworkers])};
 
 % Get the current pool
 current_pool=gcp('nocreate');
@@ -222,57 +192,33 @@ if ~isempty(current_pool)
         
         % Kill the pool and update current pool to empty
         report(spin_system,'found a process-based parallel pool, destroying...');
-        delete(current_pool); current_pool=gcp('nocreate');
+        delete(current_pool); current_pool=[];
 
     % Destroy pools with wrong number of workers
-    elseif current_pool.NumWorkers~=sys.parallel{2}
+    elseif current_pool.NumWorkers~=spin_system.sys.parallel{2}
 
         % Kill the pool and update current pool to empty
-        report(spin_system,'found a threads pool with wrong size, destroying...');
-        delete(current_pool); current_pool=gcp('nocreate');
+        report(spin_system,'found a threads pool of wrong size, destroying...');
+        delete(current_pool); current_pool=[];
+
+    else
+
+        % Report a healthy pre-existing pool to the user
+        report(spin_system,'a healthy threads-based parallel pool found:')
+        report(spin_system,['         > workers running: ' num2str(spin_system.sys.parallel{2})]);
 
     end
 
 end
 
-% Check for running pools
-if ~isempty(current_pool)
+% If still no pool
+if isempty(current_pool)
 
-    % Use the existing pool
-    spin_system.sys.parallel={'threads',current_pool.NumWorkers};
-    report(spin_system,'a running thread pool found:')
-    report(spin_system,['         > workers available: ' num2str(spin_system.sys.parallel{2})]);
-    report(spin_system,'this pool will be re-used.');
-    sys=rmfield(sys,'parallel');
-
-    % Empty the ValueStore of the current pool
-    store=current_pool.ValueStore; store.remove(store.keys);
-    report(spin_system,'parallel pool ValueStore cleared.');
-
-else
-
-    % Absorb parallel profile
-    spin_system.sys.parallel={'threads',sys.parallel{2}};
-    sys=rmfield(sys,'parallel');
-    report(spin_system,'starting a thread pool:')
+    % Start a new threads-based parallel pool
+    report(spin_system,'starting a threads-based parallel pool:')
     report(spin_system,['         > workers to start: ' num2str(spin_system.sys.parallel{2})]);
-
-    % Start a threads based parallel pool
     parpool('threads',spin_system.sys.parallel{2});
 
-end
-
-% % Head process can use what it likes
-% warning('off','MATLAB:maxNumCompThreads:Deprecated');
-% maxNumCompThreads(feature('numcores'));
-    
-% Tidy up the cache
-if (~isworkernode)&&...
-   (~ismember('hygiene',spin_system.sys.disable))&&...
-   (~ismember('op_cache',spin_system.sys.enable))&&...
-   (~ismember('ham_cache',spin_system.sys.enable))&&...
-   (~ismember('prop_cache',spin_system.sys.enable))
-    cacheman(spin_system); 
 end
 
 % Make sure GPUs are present
@@ -1238,8 +1184,8 @@ if isfield(sys,'enable')
     if (~iscell(sys.enable))||any(~cellfun(@ischar,sys.enable))
         error('sys.enable must be a cell array of strings.');
     end
-    if any(~ismember(sys.enable,{'gpu','op_cache','xmemlist','greedy','paranoia','sodd',...
-                                 'cowboy','polyadic','dafuq','prop_cache','ham_cache'}))
+    if any(~ismember(sys.enable,{'gpu','op_cache','xmemlist','paranoia','sodd',...
+                                 'cowboy','polyadic','prop_cache','ham_cache'}))
         error('unrecognised switch in sys.enable field.');
     end
 end

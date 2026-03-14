@@ -422,19 +422,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
     
     % Sort the basis explicitly
     report(spin_system,'sorting the basis...');
-    if (~isworkernode)&&(nnz(basis_spec)>1e5)&&(~isa(gcp,'parallel.ThreadPool'))
-        
-        % Run multithreaded sorting
-        basis_spec=distrib_dim(basis_spec,2);
-        basis_spec=sortrows(basis_spec);
-        spin_system.bas.basis=gather(basis_spec);
-        
-    else
-        
-        % Run sorting in a single thread
-        spin_system.bas.basis=sortrows(basis_spec);
-        
-    end
+    spin_system.bas.basis=sortrows(basis_spec);
     
     % Deallocate variables
     clear('basis_spec');
@@ -510,7 +498,7 @@ if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef'})
     
 end
 
-% Preload Lie algebra structure tables into RAM
+% Preload Lie algebra structure tables
 if strcmp(spin_system.bas.formalism,'sphten-liouv')
 
     % Inform the user
@@ -547,7 +535,7 @@ end
 
 end
 
-% Grumble function
+% Consistency enforcement
 function grumble(spin_system,bas)
 
 % Check bas.formalism

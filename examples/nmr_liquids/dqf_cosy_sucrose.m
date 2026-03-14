@@ -15,7 +15,6 @@ options.min_j=2.0; options.no_xyz=1;
 sys.magnet=5.9;
 
 % Algorithmic options
-sys.enable={'greedy'};
 sys.tols.prox_cutoff=4.0;
 
 % Basis set

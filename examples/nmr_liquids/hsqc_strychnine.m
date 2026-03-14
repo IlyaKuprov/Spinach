@@ -14,7 +14,6 @@ function hsqc_strychnine()
 sys.magnet=5.9;
 
 % Algorithmic options
-sys.enable={'greedy'};
 sys.tols.prox_cutoff=4.0;
 
 % Basis set
@@ -45,7 +44,7 @@ spectrum=zeros(parameters.zerofill(2),...
                parameters.zerofill(1),'like',1i);
 
 % Loop over isotopomers
-parfor n=1:numel(subsystems)
+for n=1:numel(subsystems)
     
     % Build the basis
     subsystem=basis(subsystems{n},bas);

@@ -147,7 +147,7 @@ bas.space_level=3;
 
 % Algorithmic options
 sys.disable={'krylov'};
-sys.enable={'greedy'};
+sys.enable={}; % 'gpu'
 
 % Proximity cut-off
 sys.tols.prox_cutoff=10.0;

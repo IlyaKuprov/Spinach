@@ -80,39 +80,22 @@ if ~exist('format','var'), format='csc'; end
 grumble(spin_system,operators,spins,operator_type,format); tic;
 
 % Load the cache record if one exists
-if (~isworkernode)&&ismember('op_cache',spin_system.sys.enable)
+if ismember('op_cache',spin_system.sys.enable)
 
     % Combine specification, isotopes, and basis hash
     op_hash=md5_hash({operators,spins,operator_type,...
                       format,spin_system.comp.iso_hash,...
                       spin_system.bas.basis_hash});
 
-    % Generate the cache record name in the scratch directory
-    filename=[spin_system.sys.scratch filesep 'spinach_op_' op_hash '.mat'];
-
-    % Check if the file exists
-    if exist(filename,'file')
-
-        % Try to use
-        try
-
-            % Try to load
-            load(filename,'A');
-
-            % Check load success
-            if exist('A','var')
-                return; 
-            else
-                % Do not make a fuss on fail
-            end
-
-        catch
-
-            % Do not make a fuss on fail
-            
-        end
-
+    % Get the current ValueStore
+    if ~isworkernode
+        store=gcp('nocreate').ValueStore; 
+    else
+        store=getCurrentValueStore(); 
     end
+
+    % Try to retrieve the operator from the ValueStore
+    if isKey(store,op_hash), A=store(op_hash); return; end
     
 end
 
@@ -222,26 +205,10 @@ if strcmp(format,'csc')
 end
 
 % Write the cache record if caching is beneficial
-if (~isworkernode)&&ismember('op_cache',spin_system.sys.enable)&&(toc>0.1)
+if ismember('op_cache',spin_system.sys.enable)&&(toc>0.1)
 
     % Do not fight other workers
-    if ~exist(filename,'file')
-
-        % Try to save
-        try
-
-            % Modern format, compressed
-            save(filename,'A','-v7.3'); drawnow;
-
-        catch
-
-            % Do not make a fuss on fail, this can happen
-            % for large parallel pools where many workers
-            % may be trying to write the same file.
-
-        end
-
-    end
+    if ~isKey(store,op_hash), put(store,{op_hash},{A}); end
 
 end
 

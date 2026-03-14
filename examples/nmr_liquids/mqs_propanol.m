@@ -34,9 +34,6 @@ bas.approximation='none';
 bas.sym_group={'S2','S2','S3'};
 bas.sym_spins={[1 2],[3 4],[5 6 7]};
 
-% Algorithmic options
-sys.enable={'greedy'};
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);

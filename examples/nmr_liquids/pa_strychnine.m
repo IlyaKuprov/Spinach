@@ -26,7 +26,6 @@ inter.rlx_keep='kite';
 inter.tau_c={200e-12};
 
 % Algorithmic options
-sys.enable={'greedy'};
 sys.tols.prox_cutoff=4.0;
 
 % Spinach housekeeping

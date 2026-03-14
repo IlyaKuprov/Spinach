@@ -25,7 +25,6 @@ inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,spin_numbers,new_shifts);
 sys.magnet=11.7;
 
 % Algorithmic options
-sys.enable={'greedy'};
 sys.tols.prox_cutoff=4.0;
 
 % Basis set

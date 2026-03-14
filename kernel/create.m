@@ -36,8 +36,8 @@ if strcmp(call_stack(end).name,'create')&&(~isworkernode)
           'there will be no end to confusion. Add a [function ... end] block.');
 end
 
-% Close all open files
-fclose('all');
+% On head node, close all open files
+if ~isworkernode, fclose('all'); end
 
 % Locate the root and run sanity checks
 if isempty(which('existentials'))
@@ -54,7 +54,7 @@ else
     
 end
 
-% Run overrides
+% Overrides
 autoexec;
 
 % Rare, but it can happen
@@ -177,61 +177,66 @@ report(spin_system,['job identifier: ' spin_system.sys.job_id]);
 % Shuffle the random number generator
 rng('shuffle'); report(spin_system,'random number generator shuffled');
 
-% Leave one core to the operating system
-ncores=feature('numcores'); nworkers=ncores-1;
-spin_system.sys.parallel={'threads',max([1 nworkers])};
+% Head node setup
+if ~isworkernode
 
-% Get the current pool
-current_pool=gcp('nocreate');
+    % Leave one core to the operating system
+    ncores=feature('numcores'); nworkers=ncores-1;
+    spin_system.sys.parallel={'threads',max([1 nworkers])};
 
-% Destroy inappropriate pools
-if ~isempty(current_pool)
+    % Get the current pool
+    current_pool=gcp('nocreate');
 
-    % Destroy pools that are not threads based
-    if ~isa(current_pool,'parallel.ThreadPool')
-        
-        % Kill the pool and update current pool to empty
-        report(spin_system,'found a process-based parallel pool, destroying...');
-        delete(current_pool); current_pool=[];
+    % Destroy inappropriate pools
+    if ~isempty(current_pool)
 
-    % Destroy pools with wrong number of workers
-    elseif current_pool.NumWorkers~=spin_system.sys.parallel{2}
+        % Destroy pools that are not threads based
+        if ~isa(current_pool,'parallel.ThreadPool')
 
-        % Kill the pool and update current pool to empty
-        report(spin_system,'found a threads pool of wrong size, destroying...');
-        delete(current_pool); current_pool=[];
+            % Kill the pool and update current pool to empty
+            report(spin_system,'found a process-based parallel pool, destroying...');
+            delete(current_pool); current_pool=[];
 
-    else
+            % Destroy pools with wrong number of workers
+        elseif current_pool.NumWorkers~=spin_system.sys.parallel{2}
 
-        % Report a healthy pre-existing pool to the user
-        report(spin_system,'a healthy threads-based parallel pool found:')
-        report(spin_system,['         > workers running: ' num2str(spin_system.sys.parallel{2})]);
+            % Kill the pool and update current pool to empty
+            report(spin_system,'found a threads pool of wrong size, destroying...');
+            delete(current_pool); current_pool=[];
+
+        else
+
+            % Report a healthy pre-existing pool to the user
+            report(spin_system,'a healthy threads-based parallel pool found:')
+            report(spin_system,['         > workers running: ' num2str(spin_system.sys.parallel{2})]);
+
+        end
 
     end
 
-end
+    % If the pool still needs to be started
+    if (~isworkernode)&&isempty(current_pool)
 
-% If still no pool
-if isempty(current_pool)
+        % Start a new threads-based parallel pool
+        report(spin_system,'starting a threads-based parallel pool:')
+        report(spin_system,['         > workers to start: ' num2str(spin_system.sys.parallel{2})]);
+        parpool('threads',spin_system.sys.parallel{2});
 
-    % Start a new threads-based parallel pool
-    report(spin_system,'starting a threads-based parallel pool:')
-    report(spin_system,['         > workers to start: ' num2str(spin_system.sys.parallel{2})]);
-    parpool('threads',spin_system.sys.parallel{2});
+    end
 
-end
+    % Make sure GPUs are present
+    if ismember('gpu',spin_system.sys.enable)&&(gpuDeviceCount==0)
+        report(spin_system,'no CUDA capable GPUs found - running on CPU...');
+        spin_system.sys.enable=setdiff(spin_system.sys.enable,{'gpu'});
+    end
 
-% Make sure GPUs are present
-if ismember('gpu',spin_system.sys.enable)&&(gpuDeviceCount==0)
-    report(spin_system,'no CUDA capable GPUs found - running on CPU...');
-    spin_system.sys.enable=setdiff(spin_system.sys.enable,{'gpu'});
-end
+    % Reset and restart all GPUs
+    if (~isworkernode)&&ismember('gpu',spin_system.sys.enable)...
+            &&(~ismember('hygiene',spin_system.sys.disable))
+        report(spin_system,'Clearing GPU(s)...'); pctRunOnAll('gpuDevice([]);');
+        parallel.gpu.enableCUDAForwardCompatibility(true);
+    end
 
-% Reset and restart all GPUs
-if (~isworkernode)&&ismember('gpu',spin_system.sys.enable)...
-                  &&(~ismember('hygiene',spin_system.sys.disable))
-    report(spin_system,'Clearing GPU(s)...'); pctRunOnAll('gpuDevice([]);');
-    parallel.gpu.enableCUDAForwardCompatibility(true);
 end
 
 % Spin system banner

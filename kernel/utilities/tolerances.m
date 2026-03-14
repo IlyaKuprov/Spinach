@@ -265,7 +265,7 @@ if isfield(sys,'tols')&&isfield(sys.tols,'merge_dim')
     report(spin_system,[pad('Collect small subspaces into bundles of dimension',65) ...
                         pad(num2str(spin_system.tols.merge_dim),20) ' (user-specified)']);
 else
-    spin_system.tols.merge_dim=1000;
+    spin_system.tols.merge_dim=5000;
     report(spin_system,[pad('Collect small subspaces into bundles of dimension',65) ...
                         pad(num2str(spin_system.tols.merge_dim),20) ' (safe default)']);
 end

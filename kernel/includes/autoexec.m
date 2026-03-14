@@ -7,11 +7,13 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=autoexec.m>
 
-% Kill stupid ass figure defaults in R2025a and later 
-set(groot,'defaultFigurePosition',[680 458 560 420]); 
-set(groot,'defaultFigureWindowStyle','normal'); 
-set(groot,'defaultFigureMenuBar','figure'); 
-set(groot,'defaultFigureToolbar','figure'); 
+% Kill stupid ass figure defaults in R2025a and later
+if ~isworkernode
+    set(groot,'defaultFigurePosition',[680 458 560 420]);
+    set(groot,'defaultFigureWindowStyle','normal');
+    set(groot,'defaultFigureMenuBar','figure');
+    set(groot,'defaultFigureToolbar','figure');
+end
 
 % This relocates the scratch folder
 % sys.scratch='/somewhere/it/can/write'

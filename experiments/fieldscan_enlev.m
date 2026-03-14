@@ -97,6 +97,14 @@ if (~isnumeric(parameters.orientation))||(~isreal(parameters.orientation))||...
    (~isrow(parameters.orientation))||(numel(parameters.orientation)~=3)
     error('parameters.field must be a row vector with three elements.');
 end
+if ~isfield(parameters,'nstates')
+    error('the number of states must be specified in parameters.nstates field.');
+end
+if (~isnumeric(parameters.nstates))||(~isreal(parameters.nstates))||...
+   (numel(parameters.nstates)~=1)||(mod(parameters.nstates,1)~=0)||...
+   (parameters.nstates<1)
+    error('parameters.nstates must be a positive real integer.');
+end
 end
 
 % If you take hyphens seriously, you will surely go mad.

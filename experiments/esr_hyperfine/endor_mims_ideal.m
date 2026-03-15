@@ -156,8 +156,26 @@ end
 if ~isfield(parameters,'electrons')
     error('electrons must be enumerated in parameters.electrons field.');
 end
+if (~isnumeric(parameters.electrons))||(~isreal(parameters.electrons))||...
+   (~isrow(parameters.electrons))||(numel(parameters.electrons)<1)||...
+   (any(mod(parameters.electrons,1)~=0))
+    error('parameters.electrons must be a row vector of positive integers.');
+end
 if ~isfield(parameters,'nuclei')
     error('nuclei must be enumerated in parameters.nuclei field.');
+end
+if (~isnumeric(parameters.nuclei))||(~isreal(parameters.nuclei))||...
+   (~isrow(parameters.nuclei))||(numel(parameters.nuclei)<1)||...
+   (any(mod(parameters.nuclei,1)~=0))
+    error('parameters.nuclei must be a row vector of positive integers.');
+end
+if ~isfield(parameters,'nsteps')
+    error('number of steps in the detection period must be specified in parameters.nsteps field.');
+end
+if (~isnumeric(parameters.nsteps))||(~isreal(parameters.nsteps))||...
+   (~isscalar(parameters.nsteps))||(mod(parameters.nsteps,1)~=0)||...
+   (parameters.nsteps<1)
+    error('parameters.nsteps must be a positive real integer.');
 end
 end
 

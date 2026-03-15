@@ -18,7 +18,9 @@
 %    parameters.theta              the angle of the ideal pulse
 %                                  at the end of each loop
 %
-%    parameters.spins              working spins, e.g. {'1H',13C'}
+%    parameters.rate               RESPIRATION pulse train rate, Hz
+%
+%    parameters.spins              working spins, e.g. {'1H','13C'}
 %
 %    H     - Hamiltonian matrix, received from context function
 %
@@ -110,8 +112,31 @@ end
 if ~isfield(parameters,'nloops')
     error('the number of loops must be specified in parameters.nloops variable.');
 end
+if (~isnumeric(parameters.nloops))||(~isreal(parameters.nloops))||...
+   (~isscalar(parameters.nloops))||(mod(parameters.nloops,1)~=0)||...
+   (parameters.nloops<1)
+    error('parameters.nloops should be a positive integer.');
+end
 if ~isfield(parameters,'theta')
     error('short pulse angle must be specified in parameters.theta variable.');
+end
+if (~isnumeric(parameters.theta))||(~isreal(parameters.theta))||...
+   (~isscalar(parameters.theta))
+    error('parameters.theta should be a real scalar.');
+end
+if ~isfield(parameters,'rate')
+    error('RESPIRATION rate must be specified in parameters.rate variable.');
+end
+if (~isnumeric(parameters.rate))||(~isreal(parameters.rate))||...
+   (~isscalar(parameters.rate))||(parameters.rate<=0)
+    error('parameters.rate should be a positive real number.');
+end
+if ~isfield(parameters,'spins')
+    error('working spins must be specified in parameters.spins variable.');
+end
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=2)||...
+   (~all(cellfun(@ischar,parameters.spins)))
+    error('parameters.spins must be a two-element cell array of character strings.');
 end
 end
 

@@ -116,6 +116,20 @@ if (~isnumeric(parameters.pulse_rnk))||(~isreal(parameters.pulse_rnk))||...
    (numel(parameters.pulse_rnk)~=1)||(mod(parameters.pulse_rnk,1)~=0)
     error('parameters.pulse_rnk must be a real integer.');
 end
+if ~isfield(parameters,'spins')
+    error('irradiated spins must be specified in parameters.spins field.');
+end
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||...
+   (~ischar(parameters.spins{1}))
+    error('parameters.spins must be a one-element cell array of character strings.');
+end
+if ~isfield(parameters,'offset')
+    error('transmitter offset must be specified in parameters.offset field.');
+end
+if (~isnumeric(parameters.offset))||(~isreal(parameters.offset))||...
+   (~isscalar(parameters.offset))
+    error('parameters.offset must be a real scalar.');
+end
 if ~isfield(parameters,'rho0')
     error('initial state must be specified in parameters.rho0 variable.');
 end

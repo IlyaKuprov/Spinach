@@ -116,6 +116,29 @@ if numel(parameters.decouple)>0
         error('analytical decoupling is only available for sphten-liouv formalism.');
     end
 end
+if isfield(parameters,'homodec_oper')
+    if ~isnumeric(parameters.homodec_oper)
+        error('parameters.homodec_oper must be a numeric matrix.');
+    end
+    if ~isfield(parameters,'homodec_pwr')
+        error('homodecoupling power must be specified in parameters.homodec_pwr field.');
+    end
+    if (~isnumeric(parameters.homodec_pwr))||(~isreal(parameters.homodec_pwr))||...
+       (~isscalar(parameters.homodec_pwr))
+        error('parameters.homodec_pwr must be a real scalar.');
+    end
+end
+if isfield(parameters,'homodec_pwr')
+    if ~isfield(parameters,'homodec_oper')
+        error('homodecoupling operator must be specified in parameters.homodec_oper field.');
+    end
+end
+if isfield(parameters,'dead_time')
+    if (~isnumeric(parameters.dead_time))||(~isreal(parameters.dead_time))||...
+       (~isscalar(parameters.dead_time))||(parameters.dead_time<0)
+        error('parameters.dead_time must be a non-negative real scalar.');
+    end
+end
 end
 
 % According to Oxford Chemistry folklore, Steve Davies's car, usually

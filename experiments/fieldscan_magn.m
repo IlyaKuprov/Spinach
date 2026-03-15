@@ -145,6 +145,13 @@ if (~isnumeric(parameters.sweep_time))||(~isreal(parameters.sweep_time))||...
    (numel(parameters.sweep_time)~=1)||(parameters.sweep_time<=0)
     error('parameters.sweep_time must be a positive real number.');
 end
+if isfield(parameters,'nstates')
+    if (~isnumeric(parameters.nstates))||(~isreal(parameters.nstates))||...
+       (numel(parameters.nstates)~=1)||(mod(parameters.nstates,1)~=0)||...
+       (parameters.nstates<1)
+        error('parameters.nstates must be a positive real integer.');
+    end
+end
 end
 
 % Those who are determined to be 'offended' will discover a provocation

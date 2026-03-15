@@ -45,6 +45,9 @@
 %                            this should be much smaller than
 %                            the typical line width
 %
+%     parameters.fwhm     -  transition full width at half
+%                            maximum, Tesla
+%
 %     parameters.rspt_order - perturbation theory order to use
 %                             to account for the off-diagonal
 %                             part of the Hamiltonian, Inf for
@@ -67,7 +70,7 @@
 function [tf,tm,tw,pd]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw)
 
 % Check consistency
-grumble(parameters,Iz,Qz,Ic,Qc);
+grumble(spin_system,parameters,Iz,Qz,Ic,Qc);
 
 % Get frequency gap tolerance in rad/s
 frq_gap_tol=abs(spin('E')*parameters.pp_tol);
@@ -342,7 +345,7 @@ pd=pd(:); pd=pd(idx);
 end
 
 % Consistency enforcement
-function grumble(parameters,Iz,Qz,Ic,Qc)
+function grumble(spin_system,parameters,Iz,Qz,Ic,Qc)
 if (~isnumeric(Ic))||(size(Ic,1)~=size(Ic,2))||...
    (~isnumeric(Iz))||(size(Iz,1)~=size(Iz,2))||...
    (size(Ic,1)~=size(Iz,1))
@@ -366,6 +369,9 @@ end
 if ~isfield(parameters,'tm_tol')
     error('transition moment tolerance must be supplied in parameters.tm_tol field.');
 end
+if ~isfield(parameters,'fwhm')
+    error('transition FWHM must be supplied in parameters.fwhm field.');
+end
 if ~isfield(parameters,'orientation')
     error('system orientation must be supplied in parameters.orientation field.');
 end
@@ -384,6 +390,12 @@ if (~isnumeric(parameters.tm_tol))||...
    (~isscalar(parameters.tm_tol))
     error('parameters.tm_tol must be a real scalar.');
 end
+if (~isnumeric(parameters.fwhm))||...
+   (~isreal(parameters.fwhm))||...
+   (~isscalar(parameters.fwhm))||...
+   (parameters.fwhm<=0)
+    error('parameters.fwhm must be a positive real scalar.');
+end
 if (~isnumeric(parameters.window))||...
    (~isreal(parameters.window))||...
    (numel(parameters.window)~=2)
@@ -393,6 +405,16 @@ if (~isnumeric(parameters.orientation))||...
    (~isreal(parameters.orientation))||...
    (numel(parameters.orientation)~=3)
     error('parameters.orientation must have three real elements.');
+end
+if strcmp(spin_system.bas.formalism,'zeeman-hilb')
+    if ~isfield(parameters,'rspt_order')
+        error('perturbation theory order must be supplied in parameters.rspt_order field.');
+    end
+    if (~isnumeric(parameters.rspt_order))||(~isreal(parameters.rspt_order))||...
+       (~isscalar(parameters.rspt_order))||((mod(parameters.rspt_order,1)~=0)&&...
+       (~isinf(parameters.rspt_order)))||(parameters.rspt_order<0)
+        error('parameters.rspt_order must be a non-negative integer or Inf.');
+    end
 end
 end
 

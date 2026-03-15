@@ -43,6 +43,13 @@
 %
 %     b_axis      - a vector of magnetic field values, Tesla
 %
+%     pd1,pd2,pd3 - energy level population differences at the
+%                   triangle corners, real column vectors, one
+%                   element per transition
+%
+%     parameters.int_tol - recursive integration accuracy
+%                          tolerance
+%
 % Outputs:
 %
 %     spec        - ESR spectrum integral over the triangle, array
@@ -56,8 +63,8 @@ function spec=voitlander(spin_system,parameters,r1,r2,r3,tf1,tf2,tf3,...
                          tm1,tm2,tm3,tw1,tw2,tw3,pd1,pd2,pd3,Ic,Iz,Qc,Qz,Hmw,b_axis)
                      
 % Check consistency
-grumble(r1,r2,r3,tf1,tf2,tf3,tm1,tm2,tm3,...
-        tw1,tw2,tw3,Ic,Iz,Qc,Qz,b_axis);
+grumble(parameters,r1,r2,r3,tf1,tf2,tf3,tm1,tm2,tm3,...
+        tw1,tw2,tw3,pd1,pd2,pd3,Ic,Iz,Qc,Qz,b_axis);
 
 % Subdivide the triangle
 [r12,r23,r31]=sphtrsubd(r1,r2,r3);
@@ -157,8 +164,8 @@ end
 end
 
 % Consistency enforcement
-function grumble(r1,r2,r3,tf1,tf2,tf3,tm1,tm2,tm3,...
-                 tw1,tw2,tw3,Ic,Iz,Qc,Qz,b_axis)
+function grumble(parameters,r1,r2,r3,tf1,tf2,tf3,tm1,tm2,tm3,...
+                 tw1,tw2,tw3,pd1,pd2,pd3,Ic,Iz,Qc,Qz,b_axis)
 if (~isnumeric(r1))||(~isreal(r1))||(~iscolumn(r1))||...
    (numel(r1)~=3)||(abs(norm(r1,2)-1)>1e-6)||...
    (~isnumeric(r2))||(~isreal(r2))||(~iscolumn(r2))||...
@@ -181,6 +188,18 @@ if (~isnumeric(tw1))||(~isreal(tw1))||(~iscolumn(tw1))||...
    (~isnumeric(tw2))||(~isreal(tw2))||(~iscolumn(tw2))||...
    (~isnumeric(tw3))||(~isreal(tw3))||(~iscolumn(tw3))
     error('tw1,tw2,tw3 must be real column vectors.');
+end
+if (~isnumeric(pd1))||(~isreal(pd1))||(~iscolumn(pd1))||...
+   (~isnumeric(pd2))||(~isreal(pd2))||(~iscolumn(pd2))||...
+   (~isnumeric(pd3))||(~isreal(pd3))||(~iscolumn(pd3))
+    error('pd1,pd2,pd3 must be real column vectors.');
+end
+if ~isfield(parameters,'int_tol')
+    error('integration accuracy tolerance must be supplied in parameters.int_tol field.');
+end
+if (~isnumeric(parameters.int_tol))||(~isreal(parameters.int_tol))||...
+   (~isscalar(parameters.int_tol))||(parameters.int_tol<=0)
+    error('parameters.int_tol must be a positive real scalar.');
 end
 if (~isnumeric(Ic))||(size(Ic,1)~=size(Ic,2))||...
    (~isnumeric(Iz))||(size(Iz,1)~=size(Iz,2))

@@ -63,8 +63,34 @@ if (~all(size(H)==size(R)))||...
    (~all(size(K)==size(F)))
     error('H,R,K,F matrices must have the same dimension.');
 end
-if ~iscell(G)
-    error('the G argument must be a cell array.');
+if (~iscell(G))||(numel(G)<1)
+    error('the G argument must be a cell array with at least one gradient operator.');
+end
+if ~isfield(parameters,'spins')
+    error('parameters.spins field must be present.');
+end
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||(~ischar(parameters.spins{1}))
+    error('parameters.spins must be a cell array containing one spin name.');
+end
+if ~isfield(parameters,'npts')
+    error('parameters.npts field must be present.');
+end
+if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
+   (~isscalar(parameters.npts))||(parameters.npts<1)||...
+   (mod(parameters.npts,1)~=0)
+    error('parameters.npts must be a positive integer.');
+end
+if ~isfield(parameters,'rho0')
+    error('parameters.rho0 field must be present.');
+end
+if ~isnumeric(parameters.rho0)
+    error('parameters.rho0 must be numeric.');
+end
+if ~isfield(parameters,'coil')
+    error('parameters.coil field must be present.');
+end
+if ~isnumeric(parameters.coil)
+    error('parameters.coil must be numeric.');
 end
 if ~isfield(parameters,'g_amp')
     error('gradient amplitude must be specified in parameters.g_amp field.');

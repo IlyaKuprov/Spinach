@@ -138,8 +138,70 @@ if (~all(size(H)==size(R)))||...
    (~all(size(K)==size(F)))
     error('H,R,K,F matrices must have the same dimension.');
 end
-if ~iscell(G)
-    error('the G argument must be a cell array.');
+if (~iscell(G))||(numel(G)<3)
+    error('the G argument must be a cell array with at least three gradient operators.');
+end
+if ~isfield(parameters,'rho0')
+    error('parameters.rho0 field must be present.');
+end
+if ~isnumeric(parameters.rho0)
+    error('parameters.rho0 must be numeric.');
+end
+if ~isfield(parameters,'coil')
+    error('parameters.coil field must be present.');
+end
+if ~isnumeric(parameters.coil)
+    error('parameters.coil must be numeric.');
+end
+if ~isfield(parameters,'npts')
+    error('parameters.npts field must be present.');
+end
+if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
+   (~isvector(parameters.npts))||any(parameters.npts<1)||...
+   any(mod(parameters.npts,1)~=0)
+    error('parameters.npts must be a vector of positive integers.');
+end
+if ~isfield(parameters,'dims')
+    error('parameters.dims field must be present.');
+end
+if (~isnumeric(parameters.dims))||(~isreal(parameters.dims))||...
+   (~isvector(parameters.dims))||(numel(parameters.dims)~=3)
+    error('parameters.dims must be a vector with three real numbers.');
+end
+if ~isfield(parameters,'image_size')
+    error('parameters.image_size field must be present.');
+end
+if (~isnumeric(parameters.image_size))||(~isreal(parameters.image_size))||...
+   (~isvector(parameters.image_size))||(numel(parameters.image_size)~=2)||...
+   any(parameters.image_size<2)||any(mod(parameters.image_size,1)~=0)
+    error('parameters.image_size must be a vector of two integers greater than one.');
+end
+if ~isfield(parameters,'rf_frq_list')
+    error('parameters.rf_frq_list field must be present.');
+end
+if (~isnumeric(parameters.rf_frq_list))||(~isreal(parameters.rf_frq_list))||...
+   (~isvector(parameters.rf_frq_list))
+    error('parameters.rf_frq_list must be a real vector.');
+end
+if ~isfield(parameters,'rf_amp_list')
+    error('parameters.rf_amp_list field must be present.');
+end
+if (~isnumeric(parameters.rf_amp_list))||(~isreal(parameters.rf_amp_list))||...
+   (~isvector(parameters.rf_amp_list))
+    error('parameters.rf_amp_list must be a real vector.');
+end
+if ~isfield(parameters,'rf_dur_list')
+    error('parameters.rf_dur_list field must be present.');
+end
+if (~isnumeric(parameters.rf_dur_list))||(~isreal(parameters.rf_dur_list))||...
+   (~isvector(parameters.rf_dur_list))||any(parameters.rf_dur_list<=0)
+    error('parameters.rf_dur_list must be a positive real vector.');
+end
+if ~isfield(parameters,'rf_phi')
+    error('parameters.rf_phi field must be present.');
+end
+if (~isnumeric(parameters.rf_phi))||(~isreal(parameters.rf_phi))||(~isscalar(parameters.rf_phi))
+    error('parameters.rf_phi must be a real scalar.');
 end
 if ~isfield(parameters,'t_echo')
     error('echo time must be specified in parameters.t_echo field.');
@@ -149,14 +211,14 @@ if (~isnumeric(parameters.t_echo))||(~isreal(parameters.t_echo))||...
     error('parameters.t_echo must be a positive real scalar.');
 end
 if ~isfield(parameters,'ss_grad_dur')
-    error(' slice selection gradient duration must be specified in parameters.ss_grad_dur field.');
+    error('slice selection gradient duration must be specified in parameters.ss_grad_dur field.');
 end
 if (~isnumeric(parameters.ss_grad_dur))||(~isreal(parameters.ss_grad_dur))||...
    (~isscalar(parameters.ss_grad_dur))||(parameters.ss_grad_dur<=0)
     error('parameters.ss_grad_dur must be a positive real scalar.');
 end
 if ~isfield(parameters,'ro_grad_dur')
-    error(' readout gradient duration must be specified in parameters.ro_grad_dur field.');
+    error('readout gradient duration must be specified in parameters.ro_grad_dur field.');
 end
 if (~isnumeric(parameters.ro_grad_dur))||(~isreal(parameters.ro_grad_dur))||...
    (~isscalar(parameters.ro_grad_dur))||(parameters.ro_grad_dur<=0)
@@ -189,6 +251,10 @@ end
 if (~isnumeric(parameters.pe_grad_amp))||(~isreal(parameters.pe_grad_amp))||...
    (~isscalar(parameters.pe_grad_amp))
     error('parameters.pe_grad_amp must be a real scalar.');
+end
+if (numel(parameters.rf_frq_list)~=numel(parameters.rf_amp_list))||...
+   (numel(parameters.rf_amp_list)~=numel(parameters.rf_dur_list))
+    error('parameters.rf_frq_list, parameters.rf_amp_list, and parameters.rf_dur_list must have the same number of elements.');
 end
 end
 

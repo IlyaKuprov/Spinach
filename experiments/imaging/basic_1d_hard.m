@@ -56,7 +56,7 @@ fid=acquire(spin_system,parameters,L+parameters.ro_grad_amp*G{1},sparse(0),spars
 end
 
 % Consistency enforcement
-function grumble(spin_system,parameters,H,R,K,G,F) %#ok<INUSL>
+function grumble(spin_system,parameters,H,R,K,G,F)
 if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
     error('this function is only available in sphten-liouv formalism.');
 end
@@ -70,8 +70,35 @@ if (~all(size(H)==size(R)))||...
    (~all(size(K)==size(F)))
     error('H,R,K,F matrices must have the same dimension.');
 end
-if ~iscell(G)
-    error('the G argument must be a cell array.');
+if (~iscell(G))||(numel(G)<1)
+    error('the G argument must be a cell array with at least one gradient operator.');
+end
+if ~isfield(parameters,'spins')
+    error('parameters.spins field must be present.');
+end
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||(~ischar(parameters.spins{1}))
+    error('parameters.spins must be a cell array containing one spin name.');
+end
+if ~isfield(parameters,'npts')
+    error('parameters.npts field must be present.');
+end
+if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
+   (~isscalar(parameters.npts))||(parameters.npts<1)||...
+   (mod(parameters.npts,1)~=0)
+    error('parameters.npts must be a positive integer.');
+end
+if ~isfield(parameters,'rho0')
+    error('parameters.rho0 field must be present.');
+end
+if ~isnumeric(parameters.rho0)
+    error('parameters.rho0 must be numeric.');
+end
+if ~isfield(parameters,'ro_grad_amp')
+    error('readout gradient amplitude must be specified in parameters.ro_grad_amp field.');
+end
+if (~isnumeric(parameters.ro_grad_amp))||(~isreal(parameters.ro_grad_amp))||...
+   (~isscalar(parameters.ro_grad_amp))
+    error('parameters.ro_grad_amp must be a real scalar.');
 end
 end
 

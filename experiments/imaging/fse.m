@@ -104,11 +104,45 @@ if (~all(size(H)==size(R)))||...
    (~all(size(K)==size(F)))
     error('H,R,K,F matrices must have the same dimension.');
 end
-if ~iscell(G)
-    error('the G argument must be a cell array.');
+if (~iscell(G))||(numel(G)<2)
+    error('the G argument must be a cell array with at least two gradient operators.');
+end
+if ~isfield(parameters,'spins')
+    error('parameters.spins field must be present.');
+end
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||(~ischar(parameters.spins{1}))
+    error('parameters.spins must be a cell array containing one spin name.');
+end
+if ~isfield(parameters,'npts')
+    error('parameters.npts field must be present.');
+end
+if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
+   (~isvector(parameters.npts))||any(parameters.npts<1)||...
+   any(mod(parameters.npts,1)~=0)
+    error('parameters.npts must be a vector of positive integers.');
+end
+if ~isfield(parameters,'rho0')
+    error('parameters.rho0 field must be present.');
+end
+if ~isnumeric(parameters.rho0)
+    error('parameters.rho0 must be numeric.');
+end
+if ~isfield(parameters,'coil')
+    error('parameters.coil field must be present.');
+end
+if ~isnumeric(parameters.coil)
+    error('parameters.coil must be numeric.');
+end
+if ~isfield(parameters,'image_size')
+    error('parameters.image_size field must be present.');
+end
+if (~isnumeric(parameters.image_size))||(~isreal(parameters.image_size))||...
+   (~isvector(parameters.image_size))||(numel(parameters.image_size)~=2)||...
+   any(parameters.image_size<2)||any(mod(parameters.image_size,1)~=0)
+    error('parameters.image_size must be a vector of two integers greater than one.');
 end
 if ~isfield(parameters,'ro_grad_dur')
-    error(' readout gradient duration must be specified in parameters.ro_grad_dur field.');
+    error('readout gradient duration must be specified in parameters.ro_grad_dur field.');
 end
 if (~isnumeric(parameters.ro_grad_dur))||(~isreal(parameters.ro_grad_dur))||...
    (~isscalar(parameters.ro_grad_dur))||(parameters.ro_grad_dur<=0)
@@ -121,7 +155,6 @@ if (~isnumeric(parameters.pe_grad_dur))||(~isreal(parameters.pe_grad_dur))||...
    (~isscalar(parameters.pe_grad_dur))||(parameters.pe_grad_dur<=0)
     error('parameters.pe_grad_dur must be a positive real scalar.');
 end
-
 if ~isfield(parameters,'ro_grad_amp')
     error('readout gradient amplitude must be specified in parameters.ro_grad_amp field.');
 end

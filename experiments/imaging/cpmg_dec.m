@@ -92,19 +92,48 @@ if (~all(size(H)==size(R)))||...
    (~all(size(K)==size(F)))
     error('H,R,K,F matrices must have the same dimension.');
 end
-if ~iscell(G), error('the G argument must be a cell array.'); end
+if (~iscell(G))||(numel(G)<1)
+    error('the G argument must be a cell array with at least one gradient operator.');
+end
+if ~isfield(parameters,'spins')
+    error('parameters.spins field must be present.');
+end
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||(~ischar(parameters.spins{1}))
+    error('parameters.spins must be a cell array containing one spin name.');
+end
+if ~isfield(parameters,'npts')
+    error('parameters.npts field must be present.');
+end
+if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
+   (~isvector(parameters.npts))||any(parameters.npts<1)||...
+   any(mod(parameters.npts,1)~=0)
+    error('parameters.npts must be a vector of positive integers.');
+end
+if ~isfield(parameters,'rho0')
+    error('parameters.rho0 field must be present.');
+end
+if ~isnumeric(parameters.rho0)
+    error('parameters.rho0 must be numeric.');
+end
+if ~isfield(parameters,'coil_st')
+    error('parameters.coil_st field must be present.');
+end
+if (~iscell(parameters.coil_st))||(numel(parameters.coil_st)~=1)||(~ischar(parameters.coil_st{1}))
+    error('parameters.coil_st must be a cell array containing one state specification.');
+end
 if ~isfield(parameters,'dec_time')
     error('sequence duration must be specfied in parameters.dec_time field.');
 end
-if (~isreal(parameters.dec_time))||(~isscalar(parameters.dec_time))||...
-   (parameters.dec_time<=0)
+if (~isnumeric(parameters.dec_time))||(~isreal(parameters.dec_time))||...
+   (~isscalar(parameters.dec_time))||(parameters.dec_time<=0)
     error('parameters.dec_time must be a positive real number.');
 end
 if ~isfield(parameters,'npulses')
     error('number of pi pulses must be specfied in parameters.npulses field.');
 end
-if (~isreal(parameters.npulses))||(~isscalar(parameters.npulses))||...
-   (parameters.npulses<1)||(mod(parameters.npulses,1)~=0)
+if (~isnumeric(parameters.npulses))||(~isreal(parameters.npulses))||...
+   (~isscalar(parameters.npulses))||(parameters.npulses<1)||...
+   (mod(parameters.npulses,1)~=0)
     error('parameters.npulses must be a positive real integer.');
 end
 end

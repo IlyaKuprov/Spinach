@@ -1,7 +1,7 @@
 % DPFGSE signal suppression, based on Equation 3 from the paper by
 % Stott et al. (https://doi.org/10.1006/jmre.1997.1110). Syntax:
 %
-%      fid=dpfgse_select(spin_system,parameters,H,R,K,G,F)
+%      fid=dpfgse_suppress(spin_system,parameters,H,R,K,G,F)
 %
 % Parameters:
 %
@@ -85,18 +85,99 @@ end
 
 % Consistency enforcement
 function grumble(parameters)
+if ~isfield(parameters,'rho0')
+    error('parameters.rho0 field must be present.');
+end
+if ~isnumeric(parameters.rho0)
+    error('parameters.rho0 must be numeric.');
+end
+if ~isfield(parameters,'coil')
+    error('parameters.coil field must be present.');
+end
+if ~isnumeric(parameters.coil)
+    error('parameters.coil must be numeric.');
+end
+if ~isfield(parameters,'npts')
+    error('parameters.npts field must be present.');
+end
+if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
+   (~isvector(parameters.npts))||any(parameters.npts<1)||...
+   any(mod(parameters.npts,1)~=0)
+    error('parameters.npts must be a vector of positive integers.');
+end
+if ~isfield(parameters,'offset')
+    error('parameters.offset field must be present.');
+end
+if (~isnumeric(parameters.offset))||(~isreal(parameters.offset))||(~isscalar(parameters.offset))
+    error('parameters.offset must be a real scalar.');
+end
+if ~isfield(parameters,'rf_frq_list')
+    error('parameters.rf_frq_list field must be present.');
+end
+if (~isnumeric(parameters.rf_frq_list))||(~isreal(parameters.rf_frq_list))||...
+   (~isvector(parameters.rf_frq_list))
+    error('parameters.rf_frq_list must be a real vector.');
+end
+if ~isfield(parameters,'rf_amp_list')
+    error('parameters.rf_amp_list field must be present.');
+end
+if (~isnumeric(parameters.rf_amp_list))||(~isreal(parameters.rf_amp_list))||...
+   (~isvector(parameters.rf_amp_list))
+    error('parameters.rf_amp_list must be a real vector.');
+end
+if ~isfield(parameters,'rf_dur_list')
+    error('parameters.rf_dur_list field must be present.');
+end
+if (~isnumeric(parameters.rf_dur_list))||(~isreal(parameters.rf_dur_list))||...
+   (~isvector(parameters.rf_dur_list))||any(parameters.rf_dur_list<=0)
+    error('parameters.rf_dur_list must be a positive real vector.');
+end
+if ~isfield(parameters,'rf_phi')
+    error('parameters.rf_phi field must be present.');
+end
+if (~isnumeric(parameters.rf_phi))||(~isreal(parameters.rf_phi))||(~isscalar(parameters.rf_phi))
+    error('parameters.rf_phi must be a real scalar.');
+end
+if ~isfield(parameters,'max_rank')
+    error('parameters.max_rank field must be present.');
+end
+if (~isnumeric(parameters.max_rank))||(~isreal(parameters.max_rank))||...
+   (~isscalar(parameters.max_rank))||(parameters.max_rank<1)||...
+   (mod(parameters.max_rank,1)~=0)
+    error('parameters.max_rank must be a positive integer.');
+end
+if ~isfield(parameters,'sweep')
+    error('parameters.sweep field must be present.');
+end
+if (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+   (~isscalar(parameters.sweep))||(parameters.sweep<=0)
+    error('parameters.sweep must be a positive real scalar.');
+end
+if ~isfield(parameters,'npoints')
+    error('parameters.npoints field must be present.');
+end
+if (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+   (~isscalar(parameters.npoints))||(parameters.npoints<1)||...
+   (mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must be a positive integer.');
+end
 if ~isfield(parameters,'g_amp')
     error('gradient amplitudes should be provided in parameters.g_amp field.');
 end
-if (~isreal(parameters.g_amp))||(numel(parameters.g_amp)~=2)
+if (~isnumeric(parameters.g_amp))||(~isreal(parameters.g_amp))||...
+   (~isvector(parameters.g_amp))||(numel(parameters.g_amp)~=2)
     error('parameters.g_amp must be a vector with two real numbers.');
 end
 if ~isfield(parameters,'g_dur')
     error('gradient duration should be provided in parameters.g_dur field.');
 end
-if (~isreal(parameters.g_dur))||(~isscalar(parameters.g_dur))||...
-   (parameters.g_dur<0)
+if (~isnumeric(parameters.g_dur))||(~isreal(parameters.g_dur))||...
+   (~isscalar(parameters.g_dur))||(parameters.g_dur<0)
     error('parameters.g_dur must be a non-negative real number.');
+end
+if (numel(parameters.rf_frq_list)~=numel(parameters.rf_amp_list))||...
+   (numel(parameters.rf_amp_list)~=numel(parameters.rf_dur_list))
+    error('parameters.rf_frq_list, parameters.rf_amp_list, and parameters.rf_dur_list must have the same number of elements.');
 end
 end
 

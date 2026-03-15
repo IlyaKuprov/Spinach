@@ -22,7 +22,7 @@ bas.space_level=1;
 bas.connectivity='scalar_couplings';
 
 % Algorithmic options
-sys.enable={,'prop_cache'};
+sys.enable={'prop_cache'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

@@ -243,6 +243,16 @@ if ~isfield(parameters,'dipsi_dur')
 elseif numel(parameters.dipsi_dur)~=1
     error('parameters.dipsi_dur array should have exactly one element.');
 end
+if (~isnumeric(parameters.dipsi_dur))||(~isreal(parameters.dipsi_dur))
+    error('parameters.dipsi_dur must be a real scalar.');
+end
+if ~isfield(parameters,'decouple_f3')
+    error('decoupling list should be specified in parameters.decouple_f3 variable.');
+end
+if (~iscell(parameters.decouple_f3))||...
+   any(~cellfun(@ischar,parameters.decouple_f3))
+    error('parameters.decouple_f3 must be a cell array of strings.');
+end
 end
 
 % Talk is cheap, show me the code!

@@ -21,6 +21,10 @@
 %                             the sweep widths in the three frequen-
 %                             cy dimensions, ordered as [f1 f2 f3].
 %
+%    parameters.spins       - isotopes affected by ideal broadband
+%                             pulses, specified as a cell array of
+%                             strings, e.g. {'1H'}.
+%
 %    H   - Hamiltonian matrix, received from context function
 %
 %    R   - relaxation superoperator, received from context function
@@ -211,6 +215,10 @@ end
 if (~isnumeric(parameters.sweep))||(~isvector(parameters.sweep))||...
    (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)
     error('parameters.sweep must be a vector of three real numbers.');
+end
+if (~iscell(parameters.spins))||isempty(parameters.spins)||...
+   any(~cellfun(@ischar,parameters.spins))
+    error('parameters.spins must be a non-empty cell array of strings.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');

@@ -9,7 +9,7 @@
 % PDB labels to select spins that will be affected by otherwise ideal
 % pulses. F1 is 15N, F2 is 13C, F3 is 1H. Syntax:
 %
-%               fid=hnca(spin_system,parameters,H,R,K)
+%             fid=hncaco(spin_system,parameters,H,R,K)
 %
 % Parameters:
 %
@@ -20,6 +20,14 @@
 %    parameters.sweep       - a vector of three real numbers giving
 %                             the sweep widths in the three frequen-
 %                             cy dimensions, ordered as [f1 f2 f3].
+%
+%    parameters.J_nh        - 1H-15N J-coupling in Hz to be used for
+%                             magnetisation transfer.
+%
+%    parameters.T           - evolution delay in the indirect 15N
+%                             dimension, in seconds.
+%
+%    parameters.delta2      - coherence transfer delay in seconds.
 %
 %    H   - Hamiltonian matrix, received from context function
 %
@@ -214,6 +222,25 @@ if ~isfield(parameters,'J_nh')
     error('scalar coupling should be specified in parameters.J_nh variable.');
 elseif numel(parameters.J_nh)~=1
     error('parameters.J_nh array should have exactly one element.');
+end
+if (~isnumeric(parameters.J_nh))||(~isreal(parameters.J_nh))
+    error('parameters.J_nh must be a real scalar.');
+end
+if ~isfield(parameters,'T')
+    error('evolution delay should be specified in parameters.T variable.');
+elseif numel(parameters.T)~=1
+    error('parameters.T array should have exactly one element.');
+end
+if (~isnumeric(parameters.T))||(~isreal(parameters.T))
+    error('parameters.T must be a real scalar.');
+end
+if ~isfield(parameters,'delta2')
+    error('coherence transfer delay should be specified in parameters.delta2 variable.');
+elseif numel(parameters.delta2)~=1
+    error('parameters.delta2 array should have exactly one element.');
+end
+if (~isnumeric(parameters.delta2))||(~isreal(parameters.delta2))
+    error('parameters.delta2 must be a real scalar.');
 end
 end
 

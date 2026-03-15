@@ -161,7 +161,7 @@ if ~isfield(parameters,'f1_decouple')
 end
 if (~isnumeric(parameters.f1_decouple))||(~isscalar(parameters.f1_decouple))||...
    ((parameters.f1_decouple~=0)&&(parameters.f1_decouple~=1))
-    error('parameters.J must be set to 1 or 0.');
+    error('parameters.f1_decouple must be set to 1 or 0.');
 end
 end
 

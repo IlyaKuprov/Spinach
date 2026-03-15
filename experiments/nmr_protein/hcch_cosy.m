@@ -225,6 +225,16 @@ if ~isfield(parameters,'delta')
 elseif numel(parameters.delta)~=1
     error('parameters.delta array should have exactly one element.');
 end
+if (~isnumeric(parameters.delta))||(~isreal(parameters.delta))
+    error('parameters.delta must be a real scalar.');
+end
+if ~isfield(parameters,'decouple_f3')
+    error('decoupling list should be specified in parameters.decouple_f3 variable.');
+end
+if (~iscell(parameters.decouple_f3))||...
+   any(~cellfun(@ischar,parameters.decouple_f3))
+    error('parameters.decouple_f3 must be a cell array of strings.');
+end
 end
 
 % Laplace went in state to beg Napoleon to accept a copy of his work [...]

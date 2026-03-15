@@ -70,6 +70,9 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,parameters)
+if ~isfield(parameters,'spins')
+    error('parameters.spins variable must be present.');
+end
 if isempty(parameters.spins)
     error('parameters.spins variable cannot be empty.');
 elseif ~iscell(parameters.spins)
@@ -84,10 +87,8 @@ if ~isfield(parameters,'offset')
 end
 if isempty(parameters.offset)
     error('parameters.offset variable cannot be empty.');
-elseif ~isnumeric(parameters.offset)
-    error('parameters.offset variable must be an array of real numbers.');
-elseif ~isfield(parameters,'spins')
-    error('parameters.spins must be specified alongside parameters.offset');
+elseif (~isnumeric(parameters.offset))||(~isreal(parameters.offset))||(~isvector(parameters.offset))
+    error('parameters.offset variable must be a vector of real numbers.');
 elseif numel(parameters.offset)~=numel(parameters.spins)
     error('parameters.offset must have the same number of elements as parameters.spins');
 end

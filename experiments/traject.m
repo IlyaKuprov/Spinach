@@ -50,6 +50,9 @@ if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
     error('H, R and K arguments must be matrices.');
 end
+if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))
+    error('H, R and K matrices must have the same dimension.');
+end
 if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 end

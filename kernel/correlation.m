@@ -8,9 +8,11 @@
 %
 %   rho     -  a state vector or a horizontal stack thereof
 %
-%   orders  -  a row vector of correlation orders to keep
+%   correlation_orders  -  a row vector of correlation
+%                          orders to keep
 %
-%   spins   -  which spins to consider (e.g. '1H', '13C', 'all')
+%   spins               -  which spins to consider (e.g.
+%                          '1H', '13C', 'all')
 %
 % Outputs:
 %
@@ -31,7 +33,7 @@ function rho=correlation(spin_system,rho,orders,spins)
 if ~exist('spins','var'), spins='all'; end
 
 % Check consistency
-grumble(spin_system,rho,orders)
+grumble(spin_system,rho,orders,spins)
 
 % Store dimension statistics
 spn_dim=size(spin_system.bas.basis,1);
@@ -73,7 +75,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,rho,correlation_orders)
+function grumble(spin_system,rho,correlation_orders,spins)
 if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
     error('analytical correlation order selection is only available for sphten-liouv formalism.');
 end
@@ -83,6 +85,17 @@ end
 if (~isnumeric(correlation_orders))||(~isvector(correlation_orders))||...
      any(correlation_orders<0)||any(mod(correlation_orders,1)~=0)
     error('correlation_orders parameter must be a vector of non-negative integers.');
+end
+if ~isnumeric(spins)&&~ischar(spins)
+    error('spins parameter must be ''all'', an isotope label, or a list of spin numbers.');
+end
+if isnumeric(spins)
+    if (~isreal(spins))||(~isvector(spins))||any(spins<1)||...
+       any(spins>spin_system.comp.nspins)||any(mod(spins,1)~=0)
+        error('spins parameter must be a vector of valid spin numbers.');
+    end
+elseif (~strcmp(spins,'all'))&&(~ismember(spins,spin_system.comp.isotopes))
+    error('spins parameter must be ''all'' or an isotope label present in the system.');
 end
 end
 

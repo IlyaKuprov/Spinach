@@ -35,10 +35,14 @@
 function [r1,r2,t1,t2,R]=relaxan(spin_system,euler_angles)
 
 % Check consistency
-grumble(spin_system);
+if nargin==2
+    grumble(spin_system,euler_angles);
+else
+    grumble(spin_system);
+end
 
 % Compute the relaxation superoperator
-if exist('euler_angles','var')
+if nargin==2
     R=relaxation(spin_system,euler_angles);
 else
     R=relaxation(spin_system);
@@ -73,9 +77,13 @@ report(spin_system,'============================================================
 end
 
 % Consistency enforcement
-function grumble(spin_system)
+function grumble(spin_system,euler_angles)
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
     error('this function is only available in Liouville space.');
+end
+if (nargin>1)&&(~isempty(euler_angles))&&...
+   ((~isnumeric(euler_angles))||(~isreal(euler_angles))||(numel(euler_angles)~=3))
+    error('euler_angles must be a three-element real vector.');
 end
 end
 

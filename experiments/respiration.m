@@ -42,7 +42,7 @@
 function fid=respiration(spin_system,parameters,H,R,K)
 
 % Check consistency
-grumble(parameters,H,R,K);
+grumble(spin_system,parameters,H,R,K);
 
 % Generate and project pulse operators
 Hp=operator(spin_system,'L+',parameters.spins{1});
@@ -83,10 +83,13 @@ fid=evolution(spin_system,L,parameters.coil,rho,...
 end
 
 % Consistency enforcement
-function grumble(parameters,H,R,K)
+function grumble(spin_system,parameters,H,R,K)
 if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
     error('H, R and K arguments must be matrices.');
+end
+if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))
+    error('H, R and K matrices must have the same dimension.');
 end
 if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
@@ -137,6 +140,9 @@ end
 if (~iscell(parameters.spins))||(numel(parameters.spins)~=2)||...
    (~all(cellfun(@ischar,parameters.spins)))
     error('parameters.spins must be a two-element cell array of character strings.');
+end
+if any(~ismember(parameters.spins,spin_system.comp.isotopes))
+    error('parameters.spins contains isotopes that are not present in the system.');
 end
 end
 

@@ -71,6 +71,9 @@ if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
     error('H, R and K arguments must be matrices.');
 end
+if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))
+    error('H, R and K matrices must have the same dimension.');
+end
 if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 end
@@ -92,6 +95,9 @@ end
 if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||...
    (~ischar(parameters.spins{1}))
     error('parameters.spins must be a one-element cell array of character strings.');
+end
+if ~ismember(parameters.spins{1},spin_system.comp.isotopes)
+    error('parameters.spins contains an isotope that is not present in the system.');
 end
 if ~isfield(parameters,'max_delay')
     error('longest relaxation delay must be specified in parameters.max_delay variable.');

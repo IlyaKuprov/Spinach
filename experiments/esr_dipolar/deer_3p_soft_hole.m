@@ -33,6 +33,8 @@
 %      parameters.npoints    - number of points in the free
 %                              induction decay 
 %
+%      parameters.spins      - irradiated spins, normally {'E'}
+%
 %      parameters.rho0       - initial state
 %
 %      parameters.coil       - detection state

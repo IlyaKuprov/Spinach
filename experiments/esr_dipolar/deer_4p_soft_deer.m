@@ -43,6 +43,8 @@
 %
 %    parameters.coil       - detection state
 %
+%    parameters.spins      - irradiated spins, normally {'E'}
+%
 %    parameters.method     - soft puse propagation method,
 %                            'expv' for Krylov propagation,
 %                            'expm' for exponential propa-

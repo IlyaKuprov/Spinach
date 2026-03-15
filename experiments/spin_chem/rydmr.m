@@ -61,6 +61,13 @@ end
 if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))
     error('H, R and K matrices must have the same dimension.');
 end
+if ~isfield(parameters,'tol')
+    error('solver tolerance should be specified in parameters.tol variable.');
+end
+if (~isnumeric(parameters.tol))||(~isreal(parameters.tol))||...
+   (~isscalar(parameters.tol))||(parameters.tol<=0)
+    error('parameters.tol must be a positive real scalar.');
+end
 end
 
 % You can stand on the shoulders of giants, or a big 

@@ -78,6 +78,9 @@ if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
     error('H, R and K arguments must be matrices.');
 end
+if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))
+    error('H, R and K matrices must have the same dimension.');
+end
 if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 end
@@ -117,8 +120,11 @@ if numel(parameters.decouple)>0
     end
 end
 if isfield(parameters,'homodec_oper')
-    if ~isnumeric(parameters.homodec_oper)
+    if (~isnumeric(parameters.homodec_oper))||(~ismatrix(parameters.homodec_oper))
         error('parameters.homodec_oper must be a numeric matrix.');
+    end
+    if size(parameters.homodec_oper,1)~=size(parameters.homodec_oper,2)
+        error('parameters.homodec_oper must be a square matrix.');
     end
     if ~isfield(parameters,'homodec_pwr')
         error('homodecoupling power must be specified in parameters.homodec_pwr field.');

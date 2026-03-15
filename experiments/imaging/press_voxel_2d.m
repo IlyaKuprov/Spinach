@@ -100,8 +100,70 @@ if (~all(size(H)==size(R)))||...
    (~all(size(K)==size(F)))
     error('H,R,K,F matrices must have the same dimension.');
 end
-if ~iscell(G)
-    error('the G argument must be a cell array.');
+if (~iscell(G))||(numel(G)<2)
+    error('the G argument must be a cell array with at least two gradient operators.');
+end
+if ~isfield(parameters,'spins')
+    error('parameters.spins field must be present.');
+end
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||(~ischar(parameters.spins{1}))
+    error('parameters.spins must be a cell array containing one spin name.');
+end
+if ~isfield(parameters,'npts')
+    error('parameters.npts field must be present.');
+end
+if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
+   (numel(parameters.npts)~=2)||any(parameters.npts<1)||...
+   any(mod(parameters.npts,1)~=0)
+    error('parameters.npts must be a vector of two positive integers.');
+end
+if ~isfield(parameters,'ss_grad_amp')
+    error('gradient amplitude must be specified in parameters.ss_grad_amp field.');
+end
+if (~isnumeric(parameters.ss_grad_amp))||(~isreal(parameters.ss_grad_amp))||...
+   (numel(parameters.ss_grad_amp)~=2)
+    error('parameters.ss_grad_amp must be a vector of two real numbers.');
+end
+if ~isfield(parameters,'rf_frq_list')
+    error('parameters.rf_frq_list field must be present.');
+end
+if (~iscell(parameters.rf_frq_list))||(numel(parameters.rf_frq_list)~=2)||...
+   any(cellfun(@(x) (~isnumeric(x))||(~isreal(x))||(~isvector(x)),parameters.rf_frq_list))
+    error('parameters.rf_frq_list must be a cell array of two real vectors.');
+end
+if ~isfield(parameters,'rf_amp_list')
+    error('parameters.rf_amp_list field must be present.');
+end
+if (~iscell(parameters.rf_amp_list))||(numel(parameters.rf_amp_list)~=2)||...
+   any(cellfun(@(x) (~isnumeric(x))||(~isreal(x))||(~isvector(x)),parameters.rf_amp_list))
+    error('parameters.rf_amp_list must be a cell array of two real vectors.');
+end
+if ~isfield(parameters,'rf_dur_list')
+    error('parameters.rf_dur_list field must be present.');
+end
+if (~iscell(parameters.rf_dur_list))||(numel(parameters.rf_dur_list)~=2)||...
+   any(cellfun(@(x) (~isnumeric(x))||(~isreal(x))||(~isvector(x))||any(x<=0),parameters.rf_dur_list))
+    error('parameters.rf_dur_list must be a cell array of two positive real vectors.');
+end
+if ~isfield(parameters,'rf_phi')
+    error('parameters.rf_phi field must be present.');
+end
+if (~iscell(parameters.rf_phi))||(numel(parameters.rf_phi)~=2)||...
+   any(cellfun(@(x) (~isnumeric(x))||(~isreal(x))||(~isscalar(x)),parameters.rf_phi))
+    error('parameters.rf_phi must be a cell array of two real scalars.');
+end
+if ~isfield(parameters,'max_rank')
+    error('parameters.max_rank field must be present.');
+end
+if (~iscell(parameters.max_rank))||(numel(parameters.max_rank)~=2)||...
+   any(cellfun(@(x) (~isnumeric(x))||(~isreal(x))||(~isscalar(x))||(x<1)||(mod(x,1)~=0),parameters.max_rank))
+    error('parameters.max_rank must be a cell array of two positive integers.');
+end
+for n=1:2
+    if (numel(parameters.rf_frq_list{n})~=numel(parameters.rf_amp_list{n}))||...
+       (numel(parameters.rf_amp_list{n})~=numel(parameters.rf_dur_list{n}))
+        error('RF frequency, amplitude, and duration lists must match within each slice-selection pulse.');
+    end
 end
 end
 

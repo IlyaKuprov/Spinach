@@ -81,8 +81,22 @@ if (~all(size(H)==size(R)))||...
    (~all(size(K)==size(F)))
     error('H,R,K,F matrices must have the same dimension.');
 end
-if ~iscell(G)
-    error('the G argument must be a cell array.');
+if (~iscell(G))||(numel(G)<1)
+    error('the G argument must be a cell array with at least one gradient operator.');
+end
+if ~isfield(parameters,'spins')
+    error('parameters.spins field must be present.');
+end
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||(~ischar(parameters.spins{1}))
+    error('parameters.spins must be a cell array containing one spin name.');
+end
+if ~isfield(parameters,'npts')
+    error('parameters.npts field must be present.');
+end
+if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
+   (~isscalar(parameters.npts))||(parameters.npts<1)||...
+   (mod(parameters.npts,1)~=0)
+    error('parameters.npts must be a positive integer.');
 end
 if ~isfield(parameters,'ss_grad_amp')
     error('gradient amplitude must be specified in parameters.ss_grad_amp field.');
@@ -90,6 +104,45 @@ end
 if (~isnumeric(parameters.ss_grad_amp))||(~isreal(parameters.ss_grad_amp))||...
    (~isscalar(parameters.ss_grad_amp))
     error('parameters.ss_grad_amp must be a real scalar.');
+end
+if ~isfield(parameters,'rf_frq_list')
+    error('parameters.rf_frq_list field must be present.');
+end
+if (~isnumeric(parameters.rf_frq_list))||(~isreal(parameters.rf_frq_list))||...
+   (~isvector(parameters.rf_frq_list))
+    error('parameters.rf_frq_list must be a real vector.');
+end
+if ~isfield(parameters,'rf_amp_list')
+    error('parameters.rf_amp_list field must be present.');
+end
+if (~isnumeric(parameters.rf_amp_list))||(~isreal(parameters.rf_amp_list))||...
+   (~isvector(parameters.rf_amp_list))
+    error('parameters.rf_amp_list must be a real vector.');
+end
+if ~isfield(parameters,'rf_dur_list')
+    error('parameters.rf_dur_list field must be present.');
+end
+if (~isnumeric(parameters.rf_dur_list))||(~isreal(parameters.rf_dur_list))||...
+   (~isvector(parameters.rf_dur_list))||any(parameters.rf_dur_list<=0)
+    error('parameters.rf_dur_list must be a positive real vector.');
+end
+if ~isfield(parameters,'rf_phi')
+    error('parameters.rf_phi field must be present.');
+end
+if (~isnumeric(parameters.rf_phi))||(~isreal(parameters.rf_phi))||(~isscalar(parameters.rf_phi))
+    error('parameters.rf_phi must be a real scalar.');
+end
+if ~isfield(parameters,'max_rank')
+    error('parameters.max_rank field must be present.');
+end
+if (~isnumeric(parameters.max_rank))||(~isreal(parameters.max_rank))||...
+   (~isscalar(parameters.max_rank))||(parameters.max_rank<1)||...
+   (mod(parameters.max_rank,1)~=0)
+    error('parameters.max_rank must be a positive integer.');
+end
+if (numel(parameters.rf_frq_list)~=numel(parameters.rf_amp_list))||...
+   (numel(parameters.rf_amp_list)~=numel(parameters.rf_dur_list))
+    error('parameters.rf_frq_list, parameters.rf_amp_list, and parameters.rf_dur_list must have the same number of elements.');
 end
 end
 

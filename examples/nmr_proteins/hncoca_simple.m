@@ -37,6 +37,7 @@ parameters.sweep=[5000 8000 5000];
 parameters.npoints=[63 64 65];
 parameters.zerofill=[255 256 257];
 parameters.axis_units='ppm';
+parameters.tau=[2.25e-3, 2.75e-3, 8.00e-3, 7.00e-3];
 
 % Simulation
 fid=liquid(spin_system,@hncoca,parameters,'nmr');

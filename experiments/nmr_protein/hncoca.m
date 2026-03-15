@@ -61,10 +61,6 @@ t1.nsteps=parameters.npoints(1); t1.timestep=1/parameters.sweep(1);
 t2.nsteps=parameters.npoints(2); t2.timestep=1/parameters.sweep(2);
 t3.nsteps=parameters.npoints(3); t3.timestep=1/parameters.sweep(3);
 
-% Hard-wired timings from the paper
-tau1=2.25e-3; tau2=2.75e-3;
-tau3=8.00e-3; tau4=7.00e-3;
-
 % Initial condition - NH protons
 if ~isfield(parameters,'rho0')
     HNs=ismember(spin_system.comp.labels,{'H'}); 
@@ -93,39 +89,39 @@ COx=(COp+COp')/2; CAx=(CAp+CAp')/2;
 
 % Run the first half forward
 rho=step(spin_system,Hx,parameters.rho0,pi/2);
-rho=evolution(spin_system,L,[],rho,tau1,1,'final');
+rho=evolution(spin_system,L,[],rho,parameters.tau(1),1,'final');
 rho=step(spin_system,Hx+Ny,rho,pi);
-rho=evolution(spin_system,L,[],rho,tau1,1,'final');
+rho=evolution(spin_system,L,[],rho,parameters.tau(1),1,'final');
 rho=step(spin_system,Hy+Nx,rho,pi/2);
-rho=evolution(spin_system,L,[],rho,tau2,1,'final');
+rho=evolution(spin_system,L,[],rho,parameters.tau(2),1,'final');
 rho=coherence(spin_system,rho,{{find(Ns),1}});
 rho_stack=evolution(spin_system,L,[],rho,t1.timestep/2,t1.nsteps-1,'trajectory');
 rho_stack=step(spin_system,Hx,rho_stack,pi);
 rho_stack=evolution(spin_system,L,[],rho_stack,t1.timestep/2,t1.nsteps-1,'refocus');
-rho_stack=evolution(spin_system,L,[],rho_stack,tau3,1,'final');
+rho_stack=evolution(spin_system,L,[],rho_stack,parameters.tau(3),1,'final');
 rho_stack=step(spin_system,Nx+COx,rho_stack,pi);
-rho_stack=evolution(spin_system,L,[],rho_stack,tau2,1,'final');
-rho_stack=evolution(spin_system,L,[],rho_stack,tau3,1,'final');
+rho_stack=evolution(spin_system,L,[],rho_stack,parameters.tau(2),1,'final');
+rho_stack=evolution(spin_system,L,[],rho_stack,parameters.tau(3),1,'final');
 rho_stack=step(spin_system,Nx+COx,rho_stack,pi/2);
-rho_stack=evolution(spin_system,L,[],rho_stack,tau4,1,'final');
+rho_stack=evolution(spin_system,L,[],rho_stack,parameters.tau(4),1,'final');
 rho_stack=step(spin_system,CAx,rho_stack,pi/2);
 rho_stack=coherence(spin_system,rho_stack,{{find(CAs),1}});
 
 % Run the second half backward
 [L_dec,coil]=decouple(spin_system,L,parameters.coil,find(strcmp('15N',spin_system.comp.isotopes)));
 coil_stack=evolution(spin_system,L_dec',[],coil,-t3.timestep,t3.nsteps-1,'trajectory');
-coil_stack=evolution(spin_system,L',[],coil_stack,-tau1,1,'final');
+coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.tau(1),1,'final');
 coil_stack=step(spin_system,Hx+Nx,coil_stack,-pi);
-coil_stack=evolution(spin_system,L',[],coil_stack,-tau1,1,'final');
+coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.tau(1),1,'final');
 coil_stack=step(spin_system,Hx+Nx,coil_stack,-pi/2);
-coil_stack=evolution(spin_system,L',[],coil_stack,-tau2,1,'final');
+coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.tau(2),1,'final');
 coil_stack=step(spin_system,Hx,coil_stack,-pi);
-coil_stack=evolution(spin_system,L',[],coil_stack,-tau3,1,'final');
+coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.tau(3),1,'final');
 coil_stack=step(spin_system,Nx+COx,coil_stack,-pi);
-coil_stack=evolution(spin_system,L',[],coil_stack,-tau2,1,'final');
-coil_stack=evolution(spin_system,L',[],coil_stack,-tau3,1,'final');
+coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.tau(2),1,'final');
+coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.tau(3),1,'final');
 coil_stack=step(spin_system,Nx+COx,coil_stack,-pi/2);
-coil_stack=evolution(spin_system,L',[],coil_stack,-tau4,1,'final');
+coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.tau(4),1,'final');
 coil_stack=step(spin_system,CAx,coil_stack,-pi/2);
 coil_stack=coherence(spin_system,coil_stack,{{find(CAs),1}});
 

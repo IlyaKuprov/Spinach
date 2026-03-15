@@ -12,7 +12,12 @@
 %     parameters.spins     nuclei on which the sequence runs,
 %                          e.g. {'15N','13C'}
 %
+%     parameters.decouple_f1 nuclei to decouple in F1, e.g.
+%                            {'1H','13C'}
+%
 %     parameters.tmix      mixing time, seconds
+%
+%     parameters.rho0      initial state
 %
 %     parameters.needs     should be set to {'rho_eq'}, this
 %                          sequence needs the thermal equili-
@@ -130,21 +135,43 @@ if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 elseif numel(parameters.sweep)~=2
     error('parameters.sweep array should have exactly two elements.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       any(parameters.sweep<=0)
+    error('parameters.sweep must contain two positive real numbers.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
 elseif numel(parameters.spins)~=2
-    error('parameters.spins cell array should have exactly one element.');
+    error('parameters.spins cell array should have exactly two elements.');
+elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))||...
+       (~ischar(parameters.spins{2}))
+    error('parameters.spins must be a two-element cell array of character strings.');
+end
+if ~isfield(parameters,'decouple_f1')
+    error('decoupling channel list should be specified in parameters.decouple_f1 variable.');
+elseif ~iscell(parameters.decouple_f1)
+    error('parameters.decouple_f1 must be a cell array.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
 elseif numel(parameters.npoints)~=2
     error('parameters.npoints array should have exactly two elements.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       any(parameters.npoints<1)||any(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must contain two positive integers.');
 end
 if ~isfield(parameters,'tmix')
     error('mixing time should be specified in parameters.tmix variable.');
 elseif numel(parameters.tmix)~=1
     error('parameters.tmix array should have exactly one element.');
+elseif (~isnumeric(parameters.tmix))||(~isreal(parameters.tmix))||...
+       (parameters.tmix<0)
+    error('parameters.tmix must be a non-negative real scalar.');
+end
+if ~isfield(parameters,'rho0')
+    error('initial state should be specified in parameters.rho0 variable.');
+elseif ~isnumeric(parameters.rho0)
+    error('parameters.rho0 must be a numeric array.');
 end
 end
 

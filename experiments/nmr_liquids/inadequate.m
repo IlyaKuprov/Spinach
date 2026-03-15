@@ -13,6 +13,8 @@
 %
 %    parameters.spins              active nuclei, e.g. {'13C'}
 %
+%    parameters.decouple           nuclei to decouple, e.g. {'1H'}
+%
 %    parameters.J                  working J-coupling in Hz
 %
 %    H - Hamiltonian matrix, received from context function
@@ -97,21 +99,37 @@ if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 elseif numel(parameters.sweep)~=1
     error('parameters.sweep array should have exactly one element.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       (parameters.sweep<=0)
+    error('parameters.sweep must be a positive real scalar.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
 elseif numel(parameters.spins)~=1
     error('parameters.spins cell array should have exactly one element.');
+elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))
+    error('parameters.spins must be a single-element cell array of character strings.');
+end
+if ~isfield(parameters,'decouple')
+    error('decoupling channel list should be specified in parameters.decouple variable.');
+elseif ~iscell(parameters.decouple)
+    error('parameters.decouple must be a cell array.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
 elseif numel(parameters.npoints)~=1
     error('parameters.npoints array should have exactly one element.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       (parameters.npoints<1)||(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must be a positive integer.');
 end
 if ~isfield(parameters,'J')
     error('scalar coupling should be specified in parameters.J variable.');
 elseif numel(parameters.J)~=1
     error('parameters.J array should have exactly one element.');
+elseif (~isnumeric(parameters.J))||(~isreal(parameters.J))||...
+       (parameters.J==0)
+    error('parameters.J must be a non-zero real scalar.');
 end
 end
 

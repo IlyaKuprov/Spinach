@@ -118,6 +118,13 @@ end
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
     error('this function is only available in Liouville space.');
 end
+if ~isfield(parameters,'spins')
+    error('working spins must be specified in parameters.spins field.');
+end
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||...
+   (~ischar(parameters.spins{1}))
+    error('parameters.spins must be a one-element cell array of character strings.');
+end
 if ~isfield(parameters,'n_dur')
     error('nuclear pulse duration must be specified in parameters.n_dur field.');
 end

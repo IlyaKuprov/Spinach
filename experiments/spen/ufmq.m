@@ -10,15 +10,15 @@
 %
 % parameters.dims           size of the sample, m
 %
-% parameters.npts           number of grid points 
+% parameters.npts           number of grid points
 %
-% parameters.npoints        number of acquired points for each 
+% parameters.npoints        number of acquired points for each
 %                           gradient readout
 %
-% parameters.nloops         number of loop, where each loop consists of 
+% parameters.nloops         number of loop, where each loop consists of
 %                           a positive and a negative readout
 %
-% parameters.offset         offset, Hz 
+% parameters.offset         offset, Hz
 %
 % parameters.Ga             acquisition gradient in T/m
 %
@@ -39,7 +39,7 @@
 % Outputs:
 %
 %  fid -  free induction decay of the ultrafast NMR spectrum.
-% 
+%
 % mariagrazia.concilio@sjtu.edu.cn
 % jean-nicolas.dumez@univ-nantes.fr
 % ilya.kuprov@weizmann.ac.il
@@ -49,7 +49,7 @@
 function fid=ufmq(spin_system,parameters,H,R,K,G,F)
 
 % Check consistency
-grumble(spin_system,parameters);
+grumble(spin_system,parameters,H,R,K,G,F);
 
 % Compose Liouvillian
 L=H+F+1i*R+1i*K;
@@ -84,15 +84,15 @@ rho=evolution(spin_system,L,[],rho,parameters.delay,1,'final');
 
 % Select operator for the second 90 deg pulse
 if mod(parameters.mqorder,2)==0
-    
+
     % Apply the second 90 deg pulse on x
-    rho=step(spin_system,Lx,rho,pi/2);    
-    
+    rho=step(spin_system,Lx,rho,pi/2);
+
 else
-    
+
     % Apply the second 90 deg pulse on y
-    rho=step(spin_system,Ly,rho,pi/2);        
-    
+    rho=step(spin_system,Ly,rho,pi/2);
+
 end
 
 % Apply the pair of chirp pulses with opposite gradients
@@ -119,7 +119,7 @@ fid=zeros([parameters.npoints parameters.nloops],'like',1i);
 
 % Upload to GPU
 if ismember('gpu',spin_system.sys.enable)
-    L=gpuArray(L); G{1}=gpuArray(G{1}); 
+    L=gpuArray(L); G{1}=gpuArray(G{1});
     rho=gpuArray(rho); fid=gpuArray(fid);
 end
 
@@ -129,24 +129,24 @@ EGm=L-parameters.Ga*G{1};
 
 % SPEN readout loop
 for m=1:parameters.nloops
-    
+
     % Tell the user
     report(spin_system,['readout loop ' num2str(m) '/' num2str(parameters.nloops) '...']);
-    
+
     % Evolution under positive grad
     rho=step(spin_system,EGp,rho,Taq);
-    
+
     % Detection under negative grad
     for k=1:parameters.npoints
-        
+
         % Record magnetisation
         fid(k,m)=parameters.coil'*rho;
-        
+
         % Make a time step
         rho=step(spin_system,EGm,rho,parameters.deltat);
-        
+
     end
-    
+
 end
 
 % Retrieve from GPU
@@ -157,9 +157,26 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,parameters)
+function grumble(spin_system,parameters,H,R,K,G,F)
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
     error('this function is only available for sphten-liouv formalism.');
+end
+if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
+   (~isnumeric(F))||(~ismatrix(H))||(~ismatrix(R))||...
+   (~ismatrix(K))||(~ismatrix(F))
+    error('H, R, K and F must be matrices.');
+end
+if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))||(~all(size(K)==size(F)))
+    error('H, R, K and F matrices must have the same dimension.');
+end
+if ~iscell(G)
+    error('the G must be a 1x3 cell array.');
+end
+if ~isfield(parameters,'rho0')
+    error('the initial state should be specified in parameters.rho0 variable.');
+end
+if ~isfield(parameters,'coil')
+    error('the detection state should be specified in parameters.coil variable.');
 end
 if ~isfield(parameters,'dims')
     error('sample dimension should be specified in parameters.dims variable.');
@@ -191,6 +208,11 @@ if ~isfield(parameters,'Ga')
 elseif numel(parameters.Ga)~=1
     error('parameters.Ga array should have exactly one elements.');
 end
+if ~isfield(parameters,'deltat')
+    error('timestep should be specified in parameters.deltat variable.');
+elseif numel(parameters.deltat)~=1
+    error('parameters.deltat array should have exactly one elements.');
+end
 if ~isfield(parameters,'pulsenpoints')
     error('number of points in the pulse shape should be specified in parameters.pulsenpoints variable.');
 elseif numel(parameters.pulsenpoints)~=1
@@ -216,8 +238,20 @@ if ~isfield(parameters,'Ge')
 elseif numel(parameters.Ge)~=1
     error('parameters.Ge array should have exactly one elements.');
 end
+if ~isfield(parameters,'delay')
+    error('the interpulse delay should be specified in parameters.delay variable.');
+elseif numel(parameters.delay)~=1
+    error('parameters.delay array should have exactly one elements.');
+end
+if ~isfield(parameters,'chirptype')
+    error('chirptype, smoothed or wurst, should be specified in parameters.chirptype variable.');
+elseif ~ischar(parameters.chirptype)
+    error('parameters.chirptype must be a character string.');
+end
 if ~isfield(parameters,'mqorder')
     error('the multiple quantum coherence order should be specified in parameters.mqorder variable.');
+elseif numel(parameters.mqorder)~=1
+    error('parameters.mqorder array should have exactly one elements.');
 end
 end
 

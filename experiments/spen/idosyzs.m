@@ -1,7 +1,7 @@
 % A simplified model sequence of the ZS iDOSY pulse sequence. Syntax:
 %
 %           inten=idosyzs(spin_system,parameters,H,R,K,G,F)
-% 
+%
 % This sequence must be called from the imaging() context, which
 % would provide H, R, K, G and F. Parameters:
 %
@@ -9,25 +9,25 @@
 %
 %    parameters.coil           - detection state
 %
-%    parameters.spins          - nuclei on which the sequence runs  
+%    parameters.spins          - nuclei on which the sequence runs
 %
-%    parameters.g_amp          - gradient amplitude for diffusion 
+%    parameters.g_amp          - gradient amplitude for diffusion
 %                                encoding (T/m)
 %
-%    parameters.sel_g_amp      - gradient amplitude during the 
+%    parameters.sel_g_amp      - gradient amplitude during the
 %                                selective pulse (T/m)
 %
-%    parameters.rf_phi         - phase of the inversion pulse (rad/s)  
-%                                        
+%    parameters.rf_phi         - phase of the inversion pulse (rad/s)
+%
 %    parameters.delta_big      - length of the diffusion delay (s)
 %
-%    parameters.delta_sml      - pulse width of the gradient for 
-%                                diffusion encoding (s)    
+%    parameters.delta_sml      - pulse width of the gradient for
+%                                diffusion encoding (s)
 %
-%    parameters.rf_dur         - length of the selective 180 
+%    parameters.rf_dur         - length of the selective 180
 %                                degree pulse (s)
 %
-%    parameters.filename       - a character string specifying the 
+%    parameters.filename       - a character string specifying the
 %                                pulse shape
 %
 %    parameters.pulse_npoints  - number of points in the soft pulse
@@ -37,11 +37,11 @@
 % Outputs:
 %
 %    inten  - the absolute value of the first point in
-%             the free induction decay; this number is 
+%             the free induction decay; this number is
 %             proportional to the integral of the real
 %             part of the correctly phased spectrum
 %
-% mariagrazia.concilio@sjtu.edu.cn 
+% mariagrazia.concilio@sjtu.edu.cn
 % gareth.morris@manchester.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=idosyzs.m>
@@ -49,7 +49,7 @@
 function inten=idosyzs(spin_system,parameters,H,R,K,G,F)
 
 % Check consistency
-grumble(spin_system,parameters,H,R,K,F,G);
+grumble(spin_system,parameters,H,R,K,G,F);
 
 % Compose Liouvillian
 L=H+F+1i*R+1i*K;
@@ -74,7 +74,7 @@ gradient_amplitudes=parameters.sel_g_amp*ones(parameters.pulse_npoints,1);
 gamma_B1=parameters.rf_phi/parameters.rf_dur;  % rad/s
 gamma_B1_max=gamma_B1/scaling_factor;
 amps=gamma_B1_max*amps;
-         
+
 % Pulse transformation from (amplitude, phase) to (X,Y)
 [Cx,Cy]=polar2cartesian(amps,phases);
 
@@ -96,25 +96,25 @@ rho=shaped_pulse_xy(spin_system,L,{Lx,Ly,G{1}},{Cx,Cy,+gradient_amplitudes},...
 
 % Select coherence +1
 rho=coherence(spin_system,rho,{{parameters.spins{1},+1}});
-    
+
 % Evolve under second positive gradient
 rho=evolution(spin_system,L+parameters.g_amp*G{1},[],rho,parameters.delta_sml,1,'final');
 
-% Evolve under delay to obtain complete refocus of the signal 
+% Evolve under delay to obtain complete refocus of the signal
 rho=step(spin_system,L,rho,parameters.delta);
 
 % Intensity is the first point in the FID
 inten=abs(parameters.coil'*rho);
 
-% Inform the user        
+% Inform the user
 report(spin_system,['the scaling factor is ' num2str(scaling_factor)...
        ', the gamma B1 max is ' num2str(gamma_B1_max./(2*pi)) ' Hz ']);
 
 end
- 
+
 % Consistency enforcement
-function grumble(spin_system,parameters,H,R,K,F,G)
- if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
+function grumble(spin_system,parameters,H,R,K,G,F)
+if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
     error('this function is only available for sphten-liouv formalism.');
 end
 if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
@@ -127,8 +127,11 @@ end
 if ~iscell(G)
     error('the G must be a 1x3 cell array.');
 end
-if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
-    error('this function is only available for sphten-liouv formalism.');
+if ~isfield(parameters,'rho0')
+    error('the initial state should be specified in parameters.rho0 variable.');
+end
+if ~isfield(parameters,'coil')
+    error('the detection state should be specified in parameters.coil variable.');
 end
 if ~isfield(parameters,'dims')
    error('sample dimension should be specified in parameters.dims variable.');
@@ -145,6 +148,16 @@ if ~isfield(parameters,'spins')
 elseif numel(parameters.spins)~=1
     error('parameters.spins cell array should have exactly one element.');
 end
+if ~isfield(parameters,'filename')
+    error('the pulse shape should be specified in parameters.filename variable.');
+elseif ~ischar(parameters.filename)
+    error('parameters.filename must be a character string.');
+end
+if ~isfield(parameters,'pulse_npoints')
+    error('soft pulse point count should be specified in parameters.pulse_npoints variable.');
+elseif numel(parameters.pulse_npoints)~=1
+    error('parameters.pulse_npoints array should have exactly one element.');
+end
 if ~isfield(parameters,'diff')
     error('the diffusion coefficient should be specified in parameters.diff variable.');
 elseif numel(parameters.diff)~=1
@@ -155,10 +168,10 @@ if ~isfield(parameters,'g_amp')
 elseif numel(parameters.g_amp)~=1
     error('parameters.g_amp array should have exactly one element.');
 end
- if ~isfield(parameters,'sel_g_amp')
+if ~isfield(parameters,'sel_g_amp')
     error('the amplitude of the gradient during the selective 180 degree pulse should be specified in parameters.sel_g_amp variable.');
 elseif numel(parameters.sel_g_amp)~=1
-   error('parameters.sel_g_amp array should have exactly one element.'); 
+   error('parameters.sel_g_amp array should have exactly one element.');
 end
 if ~isfield(parameters,'rf_dur')
     error('the length of the selective 180 pulse should be specified in parameters.rf_dur variable.');
@@ -166,14 +179,14 @@ elseif numel(parameters.rf_dur)~=1
     error('parameters.rf_dur array should have exactly one element.');
 end
 if ~isfield(parameters,'rf_phi')
-    error('the phase of the selective pulse has to be specified in arameters.rf_phi variable.');
+    error('the phase of the selective pulse has to be specified in parameters.rf_phi variable.');
 elseif numel(parameters.rf_phi)~=1
     error('parameters.rf_phi array should have exactly one element.');
 end
 if ~isfield(parameters,'delta_big')
     error('the diffusion delay should be specified in parameters.delta_big variable.');
 elseif numel(parameters.delta_big)~=1
-    error('parameters.delta_big array should have exactly one element.'); 
+    error('parameters.delta_big array should have exactly one element.');
 end
 if ~isfield(parameters,'delta_sml')
     error('the gradient pulse width should be specified in parameters.delta_sml variable.');
@@ -182,4 +195,3 @@ elseif numel(parameters.delta_sml)~=1
 end
 end
 
- 

@@ -20,7 +20,7 @@
 % Outputs:
 %
 %      inten  - the absolute value of the first point in
-%               the free induction decay; this number is 
+%               the free induction decay; this number is
 %               proportional to the integral of the real
 %               part of the correctly phased spectrum
 %
@@ -79,6 +79,17 @@ if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))||(~all(size(K)==size(F)))
     error('H, R, K and F matrices must have the same dimension.');
 end
 if ~iscell(G), error('G must be a cell array.'); end
+if ~isfield(parameters,'rho0')
+    error('the initial state should be specified in parameters.rho0 variable.');
+end
+if ~isfield(parameters,'coil')
+    error('the detection state should be specified in parameters.coil variable.');
+end
+if ~isfield(parameters,'npts')
+    error('number of spin packets should be specified in parameters.npts variable.');
+elseif numel(parameters.npts)~=1
+    error('parameters.npts array should have exactly one element.');
+end
 if ~isfield(parameters,'g_amp')
     error('the gradient amplitude should be specified in parameters.g_amp variable.');
 elseif numel(parameters.g_amp)~=1
@@ -90,9 +101,9 @@ elseif numel(parameters.delta_sml)~=1
     error('parameters.delta_sml array should have exactly one element.');
 end
 if ~isfield(parameters,'delta_big')
-    error('the diffusion delay should be specified in parameters.delta_sml variable.');
-elseif numel(parameters.delta_sml)~=1
-    error('parameters.delta_sml array should have exactly one element.');
+    error('the diffusion delay should be specified in parameters.delta_big variable.');
+elseif numel(parameters.delta_big)~=1
+    error('parameters.delta_big array should have exactly one element.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');

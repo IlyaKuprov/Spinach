@@ -12,10 +12,10 @@
 %
 % parameters.deltat         timestep for acquisition
 %
-% parameters.npoints        number of acquired points for each 
+% parameters.npoints        number of acquired points for each
 %                           gradient readout
 %
-% parameters.nloops         number of loop, where each loop consists of 
+% parameters.nloops         number of loop, where each loop consists of
 %                           a positive and a negative readout
 %
 % parameters.Ga             acquisition gradient in T/m
@@ -58,7 +58,7 @@
 function fid=spencosy(spin_system,parameters,H,R,K,G,F)
 
 % Check consistency
-grumble(spin_system,parameters);
+grumble(spin_system,parameters,H,R,K,G,F);
 
 % Compose Liouvillian
 L=H+F+1i*R+1i*K;
@@ -106,7 +106,7 @@ P=propagator(spin_system,L+parameters.Ga*G{1},parameters.deltat);
 % Move to the GPU if necessary
 if ismember('gpu',spin_system.sys.enable)
     P=gpuArray(P); PL=gpuArray(PL);
-    rho=gpuArray(full(rho)); 
+    rho=gpuArray(full(rho));
     coil=gpuArray(parameters.coil);
 else
     rho=full(rho); coil=parameters.coil;
@@ -114,7 +114,7 @@ end
 
 % Generate loop starts
 report(spin_system,'computing loop starts...');
-rho_stack=cell(1,parameters.nloops); 
+rho_stack=cell(1,parameters.nloops);
 for m=1:parameters.nloops
     rho_stack{m}=rho; rho=PL*rho;
 end
@@ -127,19 +127,36 @@ report(spin_system,'computing loop bodies...');
 parfor m=1:parameters.nloops %#ok<*PFBNS>
     rho=rho_stack{m};
     local_fid=zeros(parameters.npoints,1);
-    for n=1:parameters.npoints 
+    for n=1:parameters.npoints
         local_fid(n)=gather(coil'*rho); rho=P*rho;
     end
     fid(:,m)=local_fid;
 end
 report(spin_system,'propagation finished.');
-          
+
 end
 
 % Consistency enforcement
-function grumble(spin_system,parameters)
+function grumble(spin_system,parameters,H,R,K,G,F)
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
     error('this function is only available for sphten-liouv formalism.');
+end
+if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
+   (~isnumeric(F))||(~ismatrix(H))||(~ismatrix(R))||...
+   (~ismatrix(K))||(~ismatrix(F))
+    error('H, R, K and F must be matrices.');
+end
+if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))||(~all(size(K)==size(F)))
+    error('H, R, K and F matrices must have the same dimension.');
+end
+if ~iscell(G)
+    error('the G must be a 1x3 cell array.');
+end
+if ~isfield(parameters,'rho0')
+    error('the initial state should be specified in parameters.rho0 variable.');
+end
+if ~isfield(parameters,'coil')
+    error('the detection state should be specified in parameters.coil variable.');
 end
 if ~isfield(parameters,'dims')
     error('sample dimension should be specified in parameters.dims variable.');
@@ -214,7 +231,7 @@ end
 end
 
 % Microsoft made a big deal about Windows NT getting a C2 security
-% rating. They were much less forthcoming with the fact that this 
+% rating. They were much less forthcoming with the fact that this
 % rating only applied if the computer was not attached to a network
 % and had no network card, and had its floppy drive epoxied shut,
 % and was running on a Compaq 386. Solaris's C2 rating was just as

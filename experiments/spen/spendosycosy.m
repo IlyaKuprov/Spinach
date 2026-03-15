@@ -12,10 +12,10 @@
 %
 % parameters.deltat         timestep for acquisition
 %
-% parameters.npoints        number of acquired points for each 
+% parameters.npoints        number of acquired points for each
 %                           gradient readout
 %
-% parameters.nloops         number of loop, where each loop consists of 
+% parameters.nloops         number of loop, where each loop consists of
 %                           a positive and a negative readout
 %
 % parameters.Ga             acquisition gradient in T/m
@@ -58,7 +58,7 @@
 function fid=spendosycosy(spin_system,parameters,H,R,K,G,F)
 
 % Check consistency
-grumble(spin_system,parameters);
+grumble(spin_system,parameters,H,R,K,G,F);
 
 % Compose Liouvillian
 L=H+F+1i*R+1i*K;
@@ -97,14 +97,14 @@ rho=step(spin_system,L+parameters.Ge*G{1},rho,parameters.Tau);
 
 % Apply the second pulse
 rho=step(spin_system,Lx,rho,pi/2);
-  
+
 % Select "0" coherence
 rho=coherence(spin_system,rho,{{parameters.spins{1},0}});
 
 % Run the diffusion time evolution
 rho=step(spin_system,L,rho,parameters.td-parameters.Tau-parameters.Te);
 
-% Apply the third pulse 
+% Apply the third pulse
 rho=step(spin_system,Lx,rho,pi/2);
 
 % Select "-1" coherence
@@ -150,7 +150,7 @@ end
 report(spin_system,'computing loop starts...');
 loop_stack=cell(1,parameters.nloops);
 for m=1:parameters.nloops
-    loop_stack{m}=gather(cosy_stack); 
+    loop_stack{m}=gather(cosy_stack);
     cosy_stack=PL*cosy_stack;
 end
 
@@ -162,7 +162,7 @@ fid=zeros([parameters.npoints1 ...
 % Propagate the system
 report(spin_system,'computing loop bodies...');
 parfor m=1:parameters.nloops %#ok<*PFBNS>
-    
+
     % Get the current stack
     cosy_stack=loop_stack{m};
 
@@ -173,12 +173,12 @@ parfor m=1:parameters.nloops %#ok<*PFBNS>
     else
         coil=parameters.coil;
     end
-    
+
     % Compute the local fid slice
     local_fid=zeros(parameters.npoints1,...
                     parameters.npoints2,'like',1i);
-    for n=1:parameters.npoints1 
-        local_fid(n,:)=gather(coil'*cosy_stack); 
+    for n=1:parameters.npoints1
+        local_fid(n,:)=gather(coil'*cosy_stack);
         cosy_stack=P*cosy_stack;
     end
 
@@ -190,9 +190,26 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,parameters)
+function grumble(spin_system,parameters,H,R,K,G,F)
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
     error('this function is only available for sphten-liouv formalism.');
+end
+if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
+   (~isnumeric(F))||(~ismatrix(H))||(~ismatrix(R))||...
+   (~ismatrix(K))||(~ismatrix(F))
+    error('H, R, K and F must be matrices.');
+end
+if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))||(~all(size(K)==size(F)))
+    error('H, R, K and F matrices must have the same dimension.');
+end
+if ~iscell(G)
+    error('the G must be a 1x3 cell array.');
+end
+if ~isfield(parameters,'rho0')
+    error('the initial state should be specified in parameters.rho0 variable.');
+end
+if ~isfield(parameters,'coil')
+    error('the detection state should be specified in parameters.coil variable.');
 end
 if ~isfield(parameters,'dims')
     error('sample dimension should be specified in parameters.dims variable.');
@@ -213,6 +230,16 @@ if ~isfield(parameters,'npoints1')
     error('number of points should be specified in parameters.npoints1 variable.');
 elseif numel(parameters.npoints1)~=1
     error('parameters.npoints1 array should have exactly one elements.');
+end
+if ~isfield(parameters,'npoints2')
+    error('number of points should be specified in parameters.npoints2 variable.');
+elseif numel(parameters.npoints2)~=1
+    error('parameters.npoints2 array should have exactly one elements.');
+end
+if ~isfield(parameters,'sweep')
+    error('sweep width should be specified in parameters.sweep variable.');
+elseif numel(parameters.sweep)~=1
+    error('parameters.sweep array should have exactly one elements.');
 end
 if ~isfield(parameters,'deltat')
     error('timestep should be specified in parameters.deltat variable.');
@@ -244,6 +271,16 @@ if ~isfield(parameters,'Te')
 elseif numel(parameters.Te)~=1
     error('parameters.Te array should have exactly one elements.');
 end
+if ~isfield(parameters,'Tau')
+    error('extra dephasing gradient duration should be specified in parameters.Tau variable.');
+elseif numel(parameters.Tau)~=1
+    error('parameters.Tau array should have exactly one elements.');
+end
+if ~isfield(parameters,'td')
+    error('the diffusion delay should be specified in parameters.td variable.');
+elseif numel(parameters.td)~=1
+    error('parameters.td array should have exactly one elements.');
+end
 if ~isfield(parameters,'BW')
     error('pulse bandwidth should be specified in parameters.BW variable.');
 elseif numel(parameters.BW)~=1
@@ -253,6 +290,11 @@ if ~isfield(parameters,'Ge')
     error('encoding gradient should be specified in parameters.Ge variable.');
 elseif numel(parameters.Ge)~=1
     error('parameters.Ge array should have exactly one elements.');
+end
+if ~isfield(parameters,'chirptype')
+    error('chirptype, smoothed or wurst, should be specified in parameters.chirptype variable.');
+elseif ~ischar(parameters.chirptype)
+    error('parameters.chirptype must be a character string.');
 end
 end
 

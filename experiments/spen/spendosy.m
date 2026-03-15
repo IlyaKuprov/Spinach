@@ -12,15 +12,15 @@
 %
 % parameters.deltat         timestep for acquisition
 %
-% parameters.npoints        number of acquired points for each 
+% parameters.npoints        number of acquired points for each
 %                           gradient readout
 %
-% parameters.nloops         number of loop, where each loop consists of 
+% parameters.nloops         number of loop, where each loop consists of
 %                           a positive and a negative readout
 %
-% parameters.offset         offset 
+% parameters.offset         offset
 %
-% parameters.cond           bondary conditions 
+% parameters.cond           bondary conditions
 %
 % parameters.Ga             acquisition gradient in T/m
 %
@@ -37,8 +37,8 @@
 % parameters.Ge             encoding gradient in T/m
 %
 % parameters.chirptype      can be 'wurst' or 'smoothed'
-% 
-% parameters.td             diffusion delay 
+%
+% parameters.td             diffusion delay
 %
 % H                         Fokker-Planck Hamiltonian
 %
@@ -66,7 +66,7 @@
 function fid=spendosy(spin_system,parameters,H,R,K,G,F)
 
 % Check consistency
-grumble(spin_system,parameters);
+grumble(spin_system,parameters,H,R,K,G,F);
 
 % Compose Liouvillian
 L=H+F+1i*R+1i*K;
@@ -102,14 +102,14 @@ rho=step(spin_system,L+parameters.Ge*G{1},rho,parameters.Tau);
 
 % Apply the second pulse
 rho=step(spin_system,Lx,rho,pi/2);
-  
+
 % Select "0" coherence
 rho=coherence(spin_system,rho,{{parameters.spins{1},0}});
 
 % Run the diffusion time evolution
 rho=step(spin_system,L,rho,parameters.td-parameters.Tau-parameters.Te);
 
-% Apply the third pulse 
+% Apply the third pulse
 rho=step(spin_system,Lx,rho,pi/2);
 
 % Select "-1" coherence
@@ -140,7 +140,7 @@ P=propagator(spin_system,L+parameters.Ga*G{1},parameters.deltat);
 % Move to the GPU if necessary
 if ismember('gpu',spin_system.sys.enable)
     P=gpuArray(P); PL=gpuArray(PL);
-    rho=gpuArray(full(rho)); 
+    rho=gpuArray(full(rho));
     coil=gpuArray(parameters.coil);
 else
     rho=full(rho); coil=parameters.coil;
@@ -148,9 +148,9 @@ end
 
 % Generate loop starts
 report(spin_system,'computing loop starts...');
-rho_stack=cell(1,parameters.nloops); 
+rho_stack=cell(1,parameters.nloops);
 for m=1:parameters.nloops
-    rho_stack{m}=gather(rho); 
+    rho_stack{m}=gather(rho);
     rho=PL*rho;
 end
 
@@ -162,7 +162,7 @@ report(spin_system,'computing loop bodies...');
 parfor m=1:parameters.nloops %#ok<*PFBNS>
     rho=rho_stack{m};
     local_fid=zeros(parameters.npoints,1);
-    for n=1:parameters.npoints 
+    for n=1:parameters.npoints
         local_fid(n)=gather(coil'*rho); rho=P*rho;
     end
     fid(:,m)=local_fid;
@@ -172,9 +172,26 @@ report(spin_system,'propagation finished.');
 end
 
 % Consistency enforcement
-function grumble(spin_system,parameters)
+function grumble(spin_system,parameters,H,R,K,G,F)
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
     error('this function is only available for sphten-liouv formalism.');
+end
+if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
+   (~isnumeric(F))||(~ismatrix(H))||(~ismatrix(R))||...
+   (~ismatrix(K))||(~ismatrix(F))
+    error('H, R, K and F must be matrices.');
+end
+if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))||(~all(size(K)==size(F)))
+    error('H, R, K and F matrices must have the same dimension.');
+end
+if ~iscell(G)
+    error('the G must be a 1x3 cell array.');
+end
+if ~isfield(parameters,'rho0')
+    error('the initial state should be specified in parameters.rho0 variable.');
+end
+if ~isfield(parameters,'coil')
+    error('the detection state should be specified in parameters.coil variable.');
 end
 if ~isfield(parameters,'dims')
     error('sample dimension should be specified in parameters.dims variable.');
@@ -226,6 +243,11 @@ if ~isfield(parameters,'Te')
 elseif numel(parameters.Te)~=1
     error('parameters.Te array should have exactly one elements.');
 end
+if ~isfield(parameters,'Tau')
+    error('extra dephasing gradient duration should be specified in parameters.Tau variable.');
+elseif numel(parameters.Tau)~=1
+    error('parameters.Tau array should have exactly one elements.');
+end
 if ~isfield(parameters,'BW')
     error('pulse bandwidth should be specified in parameters.BW variable.');
 elseif numel(parameters.BW)~=1
@@ -237,14 +259,20 @@ elseif numel(parameters.Ge)~=1
     error('parameters.Ge array should have exactly one elements.');
 end
 if ~isfield(parameters,'chirptype')
-    error('chiprtype, smoothed or wurst, should be specified in parameters.chirptype variable.');
+    error('chirptype, smoothed or wurst, should be specified in parameters.chirptype variable.');
+elseif ~ischar(parameters.chirptype)
+    error('parameters.chirptype must be a character string.');
 end
-
+if ~isfield(parameters,'td')
+    error('the diffusion delay should be specified in parameters.td variable.');
+elseif numel(parameters.td)~=1
+    error('parameters.td array should have exactly one elements.');
+end
 end
 
 % Critique is a description of what the critic would have done
 % if he were the author. If he had the author's abilities, the
-% author's audience, the author's luck, esteem, and personal 
+% author's audience, the author's luck, esteem, and personal
 % history. But he has none of that, and so he's a critic.
 %
 % Sergei Shnurov

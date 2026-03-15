@@ -86,6 +86,28 @@ if (~isnumeric(parameters.npoints))||(numel(parameters.npoints)~=1)||...
    (mod(parameters.npoints,1)~=0)
     error('parameters.npoints should be a positive integer.');
 end
+if ~isfield(parameters,'spins')
+    error('working spins must be specified in parameters.spins variable.');
+end
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||...
+   (~ischar(parameters.spins{1}))
+    error('parameters.spins must be a one-element cell array of character strings.');
+end
+if ~isfield(parameters,'max_delay')
+    error('longest relaxation delay must be specified in parameters.max_delay variable.');
+end
+if (~isnumeric(parameters.max_delay))||(~isreal(parameters.max_delay))||...
+   (~isscalar(parameters.max_delay))||(parameters.max_delay<=0)
+    error('parameters.max_delay should be a positive real number.');
+end
+if ~isfield(parameters,'n_delays')
+    error('number of relaxation delays must be specified in parameters.n_delays variable.');
+end
+if (~isnumeric(parameters.n_delays))||(~isreal(parameters.n_delays))||...
+   (~isscalar(parameters.n_delays))||(mod(parameters.n_delays,1)~=0)||...
+   (parameters.n_delays<1)
+    error('parameters.n_delays should be a positive integer.');
+end
 if strcmp(spin_system.rlx.equilibrium,'zero')
     error('inter.equilibrium cannot be ''zero'' in this experiment.');
 end

@@ -118,6 +118,13 @@ end
 if ~isfield(parameters,'coil')
     error('detection state must be specified in parameters.coil variable.');
 end
+if ~isfield(parameters,'time_steps')
+    error('time slice durations must be specified in parameters.time_steps variable.');
+end
+if (~isnumeric(parameters.time_steps))||(~isreal(parameters.time_steps))||...
+   (~isrow(parameters.time_steps))||any(parameters.time_steps<=0)
+    error('parameters.time_steps must be a row vector of positive real numbers.');
+end
 end
 
 % No one would remember the Good Samaritan if he'd

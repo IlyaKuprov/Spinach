@@ -88,6 +88,13 @@ if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
     error('H, R and K arguments must be matrices.');
 end
+if ~isfield(parameters,'spins')
+    error('working spins must be specified in parameters.spins variable.');
+end
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=2)||...
+   (~all(cellfun(@ischar,parameters.spins)))
+    error('parameters.spins must be a two-element cell array of character strings.');
+end
 if ~isfield(parameters,'hi_pwr')||(parameters.hi_pwr<=0)
     error('high RF amplitude must be specified in parameters.hi_pwr variable.');
 end

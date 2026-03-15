@@ -19,13 +19,17 @@
 %   parameters.kappa          unbalancing factor to unbalance the bipolar 
 %                             gradients in the ratio (1+kappa):(1-kappa)
 %
-%   parameters.g_stab_del     gradient stabilization delay (s)                      
+%   parameters.g_stab_del     gradient stabilization delay (s)
+%
+%   parameters.del            diffusion delay, seconds
 % 
 %   parameters.dims           size of the sample (m)
 %
 %   parameters.npts           number of discretization points in the grid
+%
+%   parameters.npoints        number of points in the acquired signal
 % 
-%   parameters.diff           diffusion constant (m^2/s)
+%   parameters.sweep          acquisition sweep width, Hz
 %
 %   H                         Fokker-Planck Hamiltonian
 %
@@ -148,20 +152,42 @@ end
 if ~iscell(G)
     error('the G must be a 1x3 cell array.');
 end
+if ~isfield(parameters,'rho0')
+    error('initial state should be specified in parameters.rho0.');
+end
+if ~isfield(parameters,'coil')
+    error('detection state should be specified in parameters.coil.');
+end
 if ~isfield(parameters,'g_amp')
     error('the gradient amplitude should be specified in parameters.g_amp.');
-elseif numel(parameters.g_amp)~=1
-    error('parameters.g_amp array should have exactly one element.');
+elseif (~isnumeric(parameters.g_amp))||(~isreal(parameters.g_amp))||(numel(parameters.g_amp)~=1)
+    error('parameters.g_amp array should have exactly one real element.');
 end
 if ~isfield(parameters,'g_dur')
     error('the gradient pulse width should be specified in parameters.g_dur.');
-elseif numel(parameters.g_dur)~=1
-    error('parameters.g_dur array should have exactly one element.');
+elseif (~isnumeric(parameters.g_dur))||(~isreal(parameters.g_dur))||...
+       (numel(parameters.g_dur)~=1)||(parameters.g_dur<=0)
+    error('parameters.g_dur should be a positive real scalar.');
 end
 if ~isfield(parameters,'kappa')
     error('the parameter kappa should be specified in parameters.kappa.');
-elseif numel(parameters.g_amp)~=1
-    error('parameters.kappa array should have exactly one element.');
+elseif (~isnumeric(parameters.kappa))||(~isreal(parameters.kappa))||(numel(parameters.kappa)~=1)
+    error('parameters.kappa array should have exactly one real element.');
+end
+if ~isfield(parameters,'g_stab_del')
+    error('the gradient stabilization delay should be specified in parameters.g_stab_del.');
+elseif (~isnumeric(parameters.g_stab_del))||(~isreal(parameters.g_stab_del))||...
+       (numel(parameters.g_stab_del)~=1)||(parameters.g_stab_del<0)
+    error('parameters.g_stab_del should be a non-negative real scalar.');
+end
+if ~isfield(parameters,'del')
+    error('the diffusion delay should be specified in parameters.del.');
+elseif (~isnumeric(parameters.del))||(~isreal(parameters.del))||...
+       (numel(parameters.del)~=1)||(parameters.del<=0)
+    error('parameters.del should be a positive real scalar.');
+end
+if parameters.del<(2*parameters.g_dur+4*parameters.g_stab_del)
+    error('parameters.del should exceed 2*parameters.g_dur+4*parameters.g_stab_del.');
 end
 if ~isfield(parameters,'dims')
     error('sample dimension should be specified in parameters.dims.');
@@ -180,18 +206,15 @@ elseif numel(parameters.spins)~=1
 end
 if ~isfield(parameters,'sweep')
     error('the spectral range should be specified in parameters.sweep.');
-elseif numel(parameters.sweep)~=1
-    error('parameters.sweep array should have exactly one element.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       (numel(parameters.sweep)~=1)||(parameters.sweep<=0)
+    error('parameters.sweep should be a positive real scalar.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints.');
-elseif numel(parameters.npoints)~=1
-    error('parameters.npoints array should have exactly one element.');
-end
-if ~isfield(parameters,'diff')
-    error('the diffusion coefficient should specified in parameters.diff.');
-elseif numel(parameters.diff)~=1
-    error('parameters.diff array should have exactly one element.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       (numel(parameters.npoints)~=1)||(parameters.npoints<1)||(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints should be a positive integer.');
 end
 end
 
@@ -200,4 +223,5 @@ end
 % Dr Who:  "Well, most people, when they don't 
 %           understand something, they frown.
 %           You - smile."
+
 

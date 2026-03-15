@@ -16,25 +16,22 @@
 % 
 %    .drop_rate    - field drop rate, Hz
 %
-%    .rho0         - initial state
-%
-%    .coil         - detection state
-%
 %    .sweep        - sweep width during acquisition
 %
+%    .npoints      - number of points during acquisition
+%
 %    .detection    - 'uniaxial' to emulate common ZULF
-%                     hardware, 'quadrature' for proper
-%                     frequency sign discrimination
+%                    hardware, 'quadrature' for proper
+%                    frequency sign discrimination
 %
 %    .flip_angle   - pulse flip angle in radians for
 %                    protons; for other nuclei, this
 %                    will be scaled by the gamma ratio
 %
-%
 % Outputs:
 %
 %     fid          - the free induction decay detected on the
-%                    coil state supplied
+%                    internally generated gamma-weighted state
 %
 % Note: this function ignores the offset parameter and makes its
 %       own Hamiltonian.
@@ -119,6 +116,9 @@ if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
     error('H, R and K arguments must be matrices.');
 end
+if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))
+    error('H, R and K matrices must have the same dimension.');
+end
 if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 end
@@ -135,15 +135,28 @@ if (~isnumeric(parameters.npoints))||(numel(parameters.npoints)~=1)||...
 end
 if ~isfield(parameters,'drop_field')
     error('parameters.drop_field field is missing.');
+elseif (~isnumeric(parameters.drop_field))||(~isreal(parameters.drop_field))||...
+       (numel(parameters.drop_field)~=1)||(parameters.drop_field<0)
+    error('parameters.drop_field should be a non-negative real scalar.');
 end
 if ~isfield(parameters,'drop_time')
     error('parameters.drop_time field is missing.');
+elseif (~isnumeric(parameters.drop_time))||(~isreal(parameters.drop_time))||...
+       (numel(parameters.drop_time)~=1)||(parameters.drop_time<=0)
+    error('parameters.drop_time should be a positive real scalar.');
 end
 if ~isfield(parameters,'drop_npoints')
     error('parameters.drop_npoints field is missing.');
+elseif (~isnumeric(parameters.drop_npoints))||(~isreal(parameters.drop_npoints))||...
+       (numel(parameters.drop_npoints)~=1)||(parameters.drop_npoints<1)||...
+       (mod(parameters.drop_npoints,1)~=0)
+    error('parameters.drop_npoints should be a positive integer.');
 end
 if ~isfield(parameters,'drop_rate')
     error('parameters.drop_rate field is missing.');
+elseif (~isnumeric(parameters.drop_rate))||(~isreal(parameters.drop_rate))||...
+       (numel(parameters.drop_rate)~=1)||(parameters.drop_rate<=0)
+    error('parameters.drop_rate should be a positive real scalar.');
 end
 if ~isfield(parameters,'detection')
     error('detection mode must be specified in parameters.detection');
@@ -152,7 +165,10 @@ if ~ismember(parameters.detection,{'uniaxial','quadrature'})
     error('parameters.detection must be ''uniaxial'' or ''quadrature''');
 end
 if ~isfield(parameters,'flip_angle')
-    error('proton filip angle must be specified in parameters.flip_angle');
+    error('proton flip angle must be specified in parameters.flip_angle');
+elseif (~isnumeric(parameters.flip_angle))||(~isreal(parameters.flip_angle))||...
+       (numel(parameters.flip_angle)~=1)
+    error('parameters.flip_angle should be a real scalar.');
 end
 end
 
@@ -163,4 +179,5 @@ end
 % der the peaceful stars while Igor clocks up the overtime.
 %
 % Terry Pratchett
+
 

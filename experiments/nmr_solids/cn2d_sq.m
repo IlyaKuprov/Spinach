@@ -5,9 +5,23 @@
 %  
 % Parameters:
 %
+%        parameters.spins    - isotopes to which the sequence is
+%                              applied, specified as a cell array
+%                              with 14N first, and 13C second
+%
+%        parameters.spc_dim  - Fokker-Planck spatial dimension
+%
+%        parameters.sweep    - sweep widths in the two dimensions, Hz
+%
+%        parameters.npoints  - numbers of points in the two dimensions
+%
+%        parameters.rho0     - initial state
+%
+%        parameters.coil     - detection state
+%
 %        parameters.rf_pwr   - RF power on 14N, Hz
 %
-%        parameters.rf_dur   - RF pulse duration on 14N
+%        parameters.rf_dur   - RF pulse duration on 14N, seconds
 %
 % Outputs:
 %
@@ -91,10 +105,34 @@ if ~isfield(parameters,'npoints')
 elseif numel(parameters.npoints)~=2
     error('parameters.npoints array should have exactly two elements.');
 end
+if ~isfield(parameters,'spc_dim')
+    error('Fokker-Planck dimension should be specified in parameters.spc_dim variable.');
+elseif (~isnumeric(parameters.spc_dim))||(~isreal(parameters.spc_dim))||...
+       (numel(parameters.spc_dim)~=1)||(parameters.spc_dim<1)||(mod(parameters.spc_dim,1)~=0)
+    error('parameters.spc_dim should be a positive integer.');
+end
+if ~isfield(parameters,'rho0')
+    error('initial state must be specified in parameters.rho0 variable.');
+end
+if ~isfield(parameters,'coil')
+    error('detection state must be specified in parameters.coil variable.');
+end
+if ~isfield(parameters,'rf_pwr')
+    error('RF power must be specified in parameters.rf_pwr variable.');
+elseif (~isnumeric(parameters.rf_pwr))||(~isreal(parameters.rf_pwr))||(numel(parameters.rf_pwr)~=1)
+    error('parameters.rf_pwr should be a real scalar.');
+end
+if ~isfield(parameters,'rf_dur')
+    error('RF pulse duration must be specified in parameters.rf_dur variable.');
+elseif (~isnumeric(parameters.rf_dur))||(~isreal(parameters.rf_dur))||...
+       (numel(parameters.rf_dur)~=1)||(parameters.rf_dur<=0)
+    error('parameters.rf_dur should be a positive real scalar.');
+end
 end
 
 % The main reason Santa is so jolly is that he
 % knows where all the bad girls live.
 %
 % George Carlin
+
 

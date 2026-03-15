@@ -6,6 +6,9 @@
 % superoperator and K is the chemical kinetics superoperator. The following
 % parameters are required:
 %
+%    parameters.spins           overtone-active nucleus, specified as a
+%                               single-element cell array
+%
 %    parameters.sweep           vector with two elements giving
 %                               the spectrum frequency extents
 %                               in Hz around the overtone frequency
@@ -46,6 +49,11 @@ if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
     error('H, R and K arguments must be matrices.');
 end
+if ~isfield(parameters,'spins')
+    error('overtone-active nucleus must be specified in parameters.spins variable.');
+elseif (~iscell(parameters.spins))||(numel(parameters.spins)~=1)
+    error('parameters.spins should be a single-element cell array.');
+end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
 end
@@ -71,4 +79,5 @@ end
 % think that money is earned. 
 %
 % A Russian saying
+
 

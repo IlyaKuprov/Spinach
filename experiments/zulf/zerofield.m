@@ -1,19 +1,19 @@
 % Budker group style gamma-weighted pulse-acquire sequence in zero 
 % field. Uses gamma-weighted initial state (corresponding to using 
 % a pre-polarisation magnet at high temperature), gamma-weighted
-% pulse operators and gamma-weighted detection state. Syntax:
+% pulse operators, and gamma-weighted detection state. Syntax:
 %
 %            fid=zerofield(spin_system,parameters,H,R,K)
 %
 % Parameters:
 %
-%    parameters.sweep - the width of the spectral window (Hz)
+%    parameters.sweep      - the width of the spectral window (Hz)
 %
-%    parameters.npoints  - number time steps in the simulation
+%    parameters.npoints    - number time steps in the simulation
 %
-%    parameters.detection - 'uniaxial' to emulate common ZULF
-%                           hardware, 'quadrature' for proper
-%                           frequency sign discrimination
+%    parameters.detection  - 'uniaxial' to emulate common ZULF
+%                            hardware, 'quadrature' for proper
+%                            frequency sign discrimination
 %
 %    parameters.flip_angle - pulse flip angle in radians for
 %                            protons; for other nuclei, this
@@ -94,6 +94,9 @@ if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
     error('H, R and K arguments must be matrices.');
 end
+if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))
+    error('H, R and K matrices must have the same dimension.');
+end
 if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 end
@@ -116,7 +119,10 @@ if ~ismember(parameters.detection,{'uniaxial','quadrature'})
     error('parameters.detection must be ''uniaxial'' or ''quadrature''');
 end
 if ~isfield(parameters,'flip_angle')
-    error('proton filip angle must be specified in parameters.flip_angle');
+    error('proton flip angle must be specified in parameters.flip_angle');
+elseif (~isnumeric(parameters.flip_angle))||(~isreal(parameters.flip_angle))||...
+       (numel(parameters.flip_angle)~=1)
+    error('parameters.flip_angle should be a real scalar.');
 end
 end
 
@@ -124,4 +130,5 @@ end
 % be true to the best one knows.
 %
 % Buddha
+
 

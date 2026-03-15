@@ -38,7 +38,7 @@ function H=carrier(spin_system,spins,operator_type)
 if ~exist('operator_type','var'), operator_type='comm'; end
 
 % Check consistency
-grumble(spin_system,spins);
+grumble(spin_system,spins,operator_type);
 
 % Preallocate the answer
 H=mprealloc(spin_system,1);
@@ -64,12 +64,18 @@ H=clean_up(spin_system,(H+H')/2,spin_system.tols.liouv_zero);
 end
 
 % Consistency enforcement
-function grumble(spin_system,spins)
+function grumble(spin_system,spins,operator_type)
 if ~ischar(spins)
     error('spins argument must be a character array');
 end
 if (~strcmp(spins,'all'))&&(~ismember(spins,spin_system.comp.isotopes))
     error('no such spins in the system.');
+end
+if ~ischar(operator_type)
+    error('operator_type argument must be a character array');
+end
+if ~ismember(operator_type,{'left','right','comm','acomm'})
+    error('operator_type must be ''left'', ''right'', ''comm'', or ''acomm''.');
 end
 end
 

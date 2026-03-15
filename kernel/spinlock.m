@@ -59,15 +59,18 @@ end
 
 % Consistency enforcement
 function grumble(Lx,Ly,rho,direction)
-if ~ismember(direction,{'X','Y'})
+if (~ischar(direction))||(~ismember(direction,{'X','Y'}))
     error('direction argument can be ''X'' or ''Y''');
 end
 if (~isnumeric(Lx))||(size(Lx,1)~=size(Lx,2))||(~ishermitian(Lx))||...
    (~isnumeric(Ly))||(size(Ly,1)~=size(Ly,2))||(~ishermitian(Ly))
     error('Lx and Ly must be Hermitian square matrices');
 end
-if ~isnumeric(rho)
-    error('rho parameter must be numeric');
+if ~all(size(Lx)==size(Ly))
+    error('Lx and Ly must have the same dimension.');
+end
+if (~isnumeric(rho))||(size(rho,1)~=size(Lx,1))
+    error('rho must have the same number of rows as Lx and Ly.');
 end
 end
 

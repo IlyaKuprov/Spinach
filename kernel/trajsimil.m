@@ -60,7 +60,7 @@ function score=trajsimil(spin_system,trajectory_1,trajectory_2,scorefcn)
 grumble(spin_system,trajectory_1,trajectory_2,scorefcn);
 
 % Run state grouping
-if strcmp(scorefcn(1:3),'SG-')||strcmp(scorefcn(1:3),'BSG')
+if strncmp(scorefcn,'SG-',3)||strncmp(scorefcn,'BSG',3)
     
     % Grab the description of the current basis
     state_list=spin_system.bas.basis;
@@ -69,7 +69,7 @@ if strcmp(scorefcn(1:3),'SG-')||strcmp(scorefcn(1:3),'BSG')
     report(spin_system,'collapsing equivalent subspaces...');
     
     % Decide how to proceed
-    if strcmp(scorefcn(1:3),'SG-')
+    if strncmp(scorefcn,'SG-',3)
         
         % Rename all T(l,-m) states into T(l,m) states
         [L,M]=lin2lm(state_list); state_list=lm2lin(L,abs(M));
@@ -77,7 +77,7 @@ if strcmp(scorefcn(1:3),'SG-')||strcmp(scorefcn(1:3),'BSG')
         % Update the method variable
         scorefcn=scorefcn(4:end);
         
-    elseif strcmp(scorefcn(1:3),'BSG')
+    elseif strncmp(scorefcn,'BSG',3)
         
         % Rename all non-identity states into Lz
         state_list(state_list~=0)=2;
@@ -145,7 +145,10 @@ function grumble(spin_system,trajectory_1,trajectory_2,scorefcn)
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
     error('this function is only available for Liouville space formalisms.');
 end
-if (strcmp(scorefcn(1:3),'SG-')||strcmp(scorefcn(1:3),'BSG'))&&...
+if ~ischar(scorefcn)
+    error('scorefcn argument must be a character string.');
+end
+if (strncmp(scorefcn,'SG-',3)||strncmp(scorefcn,'BSG',3))&&...
    (~ismember(spin_system.bas.formalism,{'sphten-liouv'}))
     error('state grouping is only available for sphten-liouv formalism.');
 end

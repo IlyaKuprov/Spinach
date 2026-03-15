@@ -130,7 +130,7 @@ end
 if isnumeric(spins)&&(max(spins)>spin_system.comp.nspins)
     error('the spin number specified is greater than the number of spins in the system.');
 end
-if isnumeric(spins)&&(any(~isreal(spins))||any(spins<1))
+if isnumeric(spins)&&(any(~isreal(spins))||any(spins<1)||any(mod(spins,1)~=0))
     error('spin numbers must be real positive integers.');
 end
 end

@@ -180,8 +180,20 @@ end
 if ~isfield(parameters,'rho0')
     error('the initial state must be specified in parameters.rho0 variable.');
 end
+if (~isnumeric(parameters.rho0))||(~ismatrix(parameters.rho0))
+    error('parameters.rho0 must be a numeric matrix.');
+end
+if size(parameters.rho0,1)~=size(H,2)
+    error('parameters.rho0 must have the same number of rows as H.');
+end
 if ~isfield(parameters,'coil')
     error('the detection state must be specified in parameters.coil variable.');
+end
+if (~isnumeric(parameters.coil))||(~ismatrix(parameters.coil))
+    error('parameters.coil must be a numeric matrix.');
+end
+if size(parameters.coil,1)~=size(H,2)
+    error('parameters.coil must have the same number of rows as H.');
 end
 end
 

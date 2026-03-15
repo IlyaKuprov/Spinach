@@ -108,7 +108,7 @@ if ~isfield(parameters,'timestep')
 end
 if (~isnumeric(parameters.timestep))||(~isreal(parameters.timestep))||...
    (~isscalar(parameters.timestep))||(parameters.timestep<=0)
-    error('parameters.mw_pwr must be a positive real scalar.');
+    error('parameters.timestep must be a positive real scalar.');
 end
 end
 

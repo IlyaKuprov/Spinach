@@ -33,7 +33,7 @@
 %            'kb_second_order' - second order in Krylov-Bogolyubov
 %                                theory (DNP experiments only)
 %
-%            'kb_second_order' - third order in Krylov-Bogolyubov
+%            'kb_third_order'  - third order in Krylov-Bogolyubov
 %                                theory (DNP experiments only)
 %
 % Outputs:

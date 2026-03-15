@@ -129,26 +129,60 @@ end
 if ~isfield(parameters,'irr_powers')
     error('electron Rabi frequency must be specified in parameters.irr_powers variable.');
 end
+if (~isnumeric(parameters.irr_powers))||(~isreal(parameters.irr_powers))||...
+   (~isscalar(parameters.irr_powers))||(parameters.irr_powers<0)
+    error('parameters.irr_powers must be a non-negative real scalar.');
+end
 if ~isfield(parameters,'coil')
     error('detection state must be specified in parameters.coil variable.');
 end
 if ~isfield(parameters,'contact_dur')
     error('the contact time must be specified in parameters.contact_dur variable.');
 end
+if (~isnumeric(parameters.contact_dur))||(~isreal(parameters.contact_dur))||...
+   (~isscalar(parameters.contact_dur))||(parameters.contact_dur<0)
+    error('parameters.contact_dur must be a non-negative real scalar.');
+end
 if ~isfield(parameters,'shot_spacing')
     error('the delay between microwave irradiation periods must be specified in parameters.shot_spacing variable.');
+end
+if (~isnumeric(parameters.shot_spacing))||(~isreal(parameters.shot_spacing))||...
+   (~isscalar(parameters.shot_spacing))||(parameters.shot_spacing<0)
+    error('parameters.shot_spacing must be a non-negative real scalar.');
+end
+if ~isfield(parameters,'flippulse')
+    error('flip pulse switch must be specified in parameters.flippulse variable.');
 end
 if ((parameters.flippulse~=1)&&(parameters.flippulse~=0))
     error('parameters.flippulse can only be 0 or 1.');
 end
+if ~isfield(parameters,'flipback')
+    error('flipback pulse switch must be specified in parameters.flipback variable.');
+end
 if ((parameters.flipback~=1)&&(parameters.flipback~=0))
     error('parameters.flipback can only be 0 or 1.');
+end
+if parameters.flippulse&&(~isfield(parameters,'pulse_dur'))
+    error('pulse duration should be specified in parameters.pulse_dur variable.');
+end
+if isfield(parameters,'pulse_dur')
+    if (~isnumeric(parameters.pulse_dur))||(~isreal(parameters.pulse_dur))||...
+       (~isscalar(parameters.pulse_dur))||(parameters.pulse_dur<=0)
+        error('parameters.pulse_dur must be a positive real scalar.');
+    end
 end
 if ~isfield(parameters,'addshift')
     error('a shift to center the field profile must be specified in parameters.addshift variable.');
 end
+if (~isnumeric(parameters.addshift))||(~isreal(parameters.addshift))||...
+   (~isscalar(parameters.addshift))
+    error('parameters.addshift must be a real scalar.');
+end
 if ~isfield(parameters,'el_offs')
     error('the microwave resonance offsets must be specified in parameters.el_offs variable.');
+end
+if (~isnumeric(parameters.el_offs))||(~isreal(parameters.el_offs))
+    error('parameters.el_offs must be an array of real numbers.');
 end
 end
 

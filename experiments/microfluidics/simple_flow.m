@@ -48,13 +48,20 @@ function grumble(parameters,H,R,K,F)
 if ~isfield(parameters,'rho0')
     error('initial state must be specified in parameters.rho0 variable.');
 end
+if ~isfield(parameters,'dt')
+    error('time step must be specified in parameters.dt variable.');
+end
+if ~isfield(parameters,'npoints')
+    error('number of points must be specified in parameters.npoints variable.');
+end
 if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||(~isnumeric(F))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))||(~ismatrix(F))
     error('H, R, K, F arguments must be matrices.');
 end
 if (~isnumeric(parameters.dt))||(~isscalar(parameters.dt))||...
-   (~isreal(parameters.dt))||(~isfinite(parameters.dt))
-    error('parameters.dt should be finite real scalar.');
+   (~isreal(parameters.dt))||(~isfinite(parameters.dt))||...
+   (parameters.dt<=0)
+    error('parameters.dt should be a positive finite real scalar.');
 end
 if (~isnumeric(parameters.npoints))||(~isscalar(parameters.npoints))||...
    (~isreal(parameters.npoints))||(parameters.npoints<1)||...

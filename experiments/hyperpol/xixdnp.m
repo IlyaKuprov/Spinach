@@ -103,6 +103,13 @@ if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
     error('H, R and K arguments must be matrices.');
 end
+if ~isfield(parameters,'irr_powers')
+    error('microwave amplitude must be specified in parameters.irr_powers variable.');
+end
+if (~isnumeric(parameters.irr_powers))||(~isreal(parameters.irr_powers))||...
+   (~isscalar(parameters.irr_powers))||(parameters.irr_powers<0)
+    error('parameters.irr_powers should be a non-negative real scalar.');
+end
 if ~isfield(parameters,'rho0')
     error('initial state must be specified in parameters.rho0 variable.');
 end
@@ -112,12 +119,23 @@ end
 if ~isfield(parameters,'pulse_dur')
     error('pulse duration should be specified in parameters.pulse_dur variable.');
 end
+if (~isnumeric(parameters.pulse_dur))||(~isreal(parameters.pulse_dur))||...
+   (~isscalar(parameters.pulse_dur))||(parameters.pulse_dur<=0)
+    error('parameters.pulse_dur should be a positive real scalar.');
+end
 if ~isfield(parameters,'nloops')
     error('the number of loops must be specified in parameters.nloops variable.');
 end
 if (~isnumeric(parameters.nloops))||(numel(parameters.nloops)~=1)||...
    (~isreal(parameters.nloops))||(parameters.nloops<1)||(mod(parameters.nloops,1)~=0)
     error('parameters.nloops should be a positive integer.');
+end
+if ~isfield(parameters,'phase')
+    error('the phase of the second pulse must be specified in parameters.phase variable.');
+end
+if (~isnumeric(parameters.phase))||(~isreal(parameters.phase))||...
+   (~isscalar(parameters.phase))
+    error('parameters.phase should be a real scalar.');
 end
 end
 

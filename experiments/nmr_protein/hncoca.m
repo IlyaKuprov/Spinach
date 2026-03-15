@@ -51,7 +51,7 @@
 function fid=hncoca(spin_system,parameters,H,R,K)
 
 % Check consistency
-grumble(spin_system,parameters,H,R,K)
+grumble(spin_system,parameters,H,R,K);
 
 % Compose Liouvillian
 L=H+1i*R+1i*K;
@@ -158,8 +158,17 @@ if ~isfield(parameters,'sweep')
     error('sweep widths must be specificed in parameters.sweep variable.');
 end
 if (~isnumeric(parameters.sweep))||(~isvector(parameters.sweep))||...
-   (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)
-    error('parameters.sweep must be a vector of three real numbers.');
+   (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)||...
+   any(parameters.sweep<=0)
+    error('parameters.sweep must be a vector of three positive real numbers.');
+end
+if ~isfield(parameters,'tau')
+    error('sequence delays must be specified in parameters.tau variable.');
+end
+if (~isnumeric(parameters.tau))||(~isvector(parameters.tau))||...
+   (~isreal(parameters.tau))||(numel(parameters.tau)~=4)||...
+   any(parameters.tau<=0)
+    error('parameters.tau must be a vector of four positive real numbers.');
 end
 end
 

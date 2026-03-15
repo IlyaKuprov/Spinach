@@ -12,12 +12,16 @@
 %
 %    parameters.npoints         number of points in the spectrum
 %
+%    parameters.spins           overtone-active nucleus, specified as a
+%                               single-element cell array
+%
+%    parameters.spc_dim         Fokker-Planck spatial dimension
+%
 %    parameters.rho0            initial state
 %
 %    parameters.coil            detection state
 %
-%    parameters.Lx
-%    parameters.Ly              X and Y Zeeman operators on the
+%    parameters.Lx              X Zeeman operator on the
 %                               quadrupolar nucleus
 %
 %    parameters.rf_frq          pulse frequency offset from
@@ -32,6 +36,10 @@
 %    parameters.method          'average' uses the average Hamil-
 %                               tonian theory, 'fplanck' uses
 %                               Fokker-Planck formalism
+%
+% Outputs:
+%
+%    spectrum                   overtone spectrum
 %
 % Relaxation must be present in the system dynamics, or the matrix
 % inversion operation below would fail to converge. The relaxation
@@ -89,6 +97,21 @@ if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
     error('H, R and K arguments must be matrices.');
 end
+if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))
+    error('H, R and K matrices must have the same dimension.');
+end
+if ~isfield(parameters,'spins')
+    error('overtone-active nucleus must be specified in parameters.spins variable.');
+elseif (~iscell(parameters.spins))||(numel(parameters.spins)~=1)
+    error('parameters.spins should be a single-element cell array.');
+end
+if ~isfield(parameters,'spc_dim')
+    error('Fokker-Planck dimension should be specified in parameters.spc_dim variable.');
+elseif (~isnumeric(parameters.spc_dim))||(~isreal(parameters.spc_dim))||...
+       (numel(parameters.spc_dim)~=1)||(parameters.spc_dim<1)||...
+       (mod(parameters.spc_dim,1)~=0)
+    error('parameters.spc_dim should be a positive integer.');
+end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
 end
@@ -101,6 +124,38 @@ if ~isfield(parameters,'rho0')
 end
 if ~isfield(parameters,'coil')
     error('detection state must be specified in parameters.coil variable.');
+end
+if ~isfield(parameters,'sweep')
+    error('spectral range must be specified in parameters.sweep variable.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       (numel(parameters.sweep)~=2)
+    error('parameters.sweep vector must have two real elements.');
+end
+if ~isfield(parameters,'Lx')
+    error('quadrupolar nucleus X pulse operator must be supplied in parameters.Lx field.');
+end
+if ~isfield(parameters,'rf_frq')
+    error('parameters.rf_frq field is missing.');
+elseif (~isnumeric(parameters.rf_frq))||(~isreal(parameters.rf_frq))||...
+       (numel(parameters.rf_frq)~=1)
+    error('parameters.rf_frq should be a real scalar.');
+end
+if ~isfield(parameters,'rf_pwr')
+    error('parameters.rf_pwr field is missing.');
+elseif (~isnumeric(parameters.rf_pwr))||(~isreal(parameters.rf_pwr))||...
+       (numel(parameters.rf_pwr)~=1)
+    error('parameters.rf_pwr should be a real scalar.');
+end
+if ~isfield(parameters,'rf_dur')
+    error('parameters.rf_dur field is missing.');
+elseif (~isnumeric(parameters.rf_dur))||(~isreal(parameters.rf_dur))||...
+       (numel(parameters.rf_dur)~=1)||(parameters.rf_dur<=0)
+    error('parameters.rf_dur should be a positive real scalar.');
+end
+if ~isfield(parameters,'method')
+    error('pulse simulation method must be specified in parameters.method variable.');
+elseif ~ismember(parameters.method,{'average','fplanck'})
+    error('parameters.method must be ''average'' or ''fplanck''.');
 end
 end
 

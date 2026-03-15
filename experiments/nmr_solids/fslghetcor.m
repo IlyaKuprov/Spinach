@@ -22,6 +22,14 @@
 %
 %     parameters.cp_dur       - CP contact time duration, s
 %
+%     parameters.offset       - transmitter offsets on the
+%                               two channels, Hz
+%
+%     parameters.nblocks      - number of FSLG blocks per
+%                               indirect-dimension point
+%
+%     parameters.spc_dim      - Fokker-Planck spatial dimension
+%
 %     parameters.rho0         - initial state
 %
 %     parameters.coil         - detection state
@@ -152,11 +160,43 @@ end
 if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))
     error('H, R and K matrices must have the same dimension.');
 end
-if ~isfield(parameters,'hi_pwr')||(parameters.hi_pwr<=0)
+if ~isfield(parameters,'hi_pwr')
     error('high RF amplitude must be specified in parameters.hi_pwr variable.');
+elseif (~isnumeric(parameters.hi_pwr))||(~isreal(parameters.hi_pwr))||...
+       (numel(parameters.hi_pwr)~=1)||(parameters.hi_pwr<=0)
+    error('parameters.hi_pwr must be a positive real scalar.');
 end
 if ~isfield(parameters,'cp_pwr')
     error('RF amplitude during CP must be specified in parameters.cp_pwr variable.');
+elseif (~isnumeric(parameters.cp_pwr))||(~isreal(parameters.cp_pwr))||...
+       (numel(parameters.cp_pwr)~=2)||any(parameters.cp_pwr<=0)
+    error('parameters.cp_pwr must be a two-element vector of positive real numbers.');
+end
+if ~isfield(parameters,'cp_dur')
+    error('CP contact time must be specified in parameters.cp_dur variable.');
+elseif (~isnumeric(parameters.cp_dur))||(~isreal(parameters.cp_dur))||...
+       (numel(parameters.cp_dur)~=1)||(parameters.cp_dur<=0)
+    error('parameters.cp_dur must be a positive real scalar.');
+end
+if ~isfield(parameters,'offset')
+    error('transmitter offsets must be specified in parameters.offset variable.');
+elseif (~isnumeric(parameters.offset))||(~isreal(parameters.offset))||...
+       (numel(parameters.offset)~=2)
+    error('parameters.offset must be a two-element vector of real numbers.');
+end
+if ~isfield(parameters,'nblocks')
+    error('the number of FSLG blocks must be specified in parameters.nblocks variable.');
+elseif (~isnumeric(parameters.nblocks))||(~isreal(parameters.nblocks))||...
+       (numel(parameters.nblocks)~=1)||(parameters.nblocks<1)||...
+       (mod(parameters.nblocks,1)~=0)
+    error('parameters.nblocks must be a positive integer.');
+end
+if ~isfield(parameters,'spc_dim')
+    error('Fokker-Planck dimension should be specified in parameters.spc_dim variable.');
+elseif (~isnumeric(parameters.spc_dim))||(~isreal(parameters.spc_dim))||...
+       (numel(parameters.spc_dim)~=1)||(parameters.spc_dim<1)||...
+       (mod(parameters.spc_dim,1)~=0)
+    error('parameters.spc_dim should be a positive integer.');
 end
 if ~isfield(parameters,'rho0')
     error('initial state must be specified in parameters.rho0 variable.');
@@ -166,18 +206,25 @@ if ~isfield(parameters,'coil')
 end
 if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
-elseif numel(parameters.sweep)~=2
-    error('parameters.sweep array should have exactly two elements.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       (numel(parameters.sweep)~=2)||any(parameters.sweep<=0)
+    error('parameters.sweep must be a two-element vector of positive real numbers.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
-elseif numel(parameters.spins)~=2
+elseif (~iscell(parameters.spins))||(numel(parameters.spins)~=2)
     error('parameters.spins cell array should have exactly two elements.');
+elseif any(~cellfun(@ischar,parameters.spins))
+    error('elements of parameters.spins cell array must be strings.');
+elseif any(~ismember(parameters.spins,spin_system.comp.isotopes))
+    error('parameters.spins contains isotopes that are not present in the system.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
-elseif numel(parameters.npoints)~=2
-    error('parameters.npoints array should have exactly two elements.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       (numel(parameters.npoints)~=2)||any(parameters.npoints<1)||...
+       any(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must be a two-element vector of positive integers.');
 end
 end
 

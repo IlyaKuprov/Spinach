@@ -24,6 +24,13 @@
 %
 %    parameters.ez_oper      -   Lz operator on the electrons
 %
+%    parameters.method       -   calculation method: 'fp-backs',
+%                                'fp-gmres', 'lvn-backs', or
+%                                'lvn-gmres'
+%
+%    parameters.nphases      -   number of microwave phase grid
+%                                points for the Fokker-Planck path
+%
 %    H - Hamiltonian matrix, received from context function
 %
 %    R - relaxation superoperator, received from context function
@@ -209,14 +216,28 @@ elseif numel(parameters.mw_pwr)~=1
 end
 if ~isfield(parameters,'mw_frq')
     error('microwave frequencies should be specified in parameters.mw_frq');
-elseif ~isnumeric(parameters.mw_frq)
+elseif (~isnumeric(parameters.mw_frq))||(~isreal(parameters.mw_frq))
     error('elements of parameters.mw_frq variable must be real numbers.');
+end
+if ~isfield(parameters,'g_ref')
+    error('reference g-factor should be specified in parameters.g_ref');
+elseif (~isnumeric(parameters.g_ref))||(~isreal(parameters.g_ref))||(~isscalar(parameters.g_ref))
+    error('parameters.g_ref should be a real scalar.');
+end
+if ~isfield(parameters,'rho0')
+    error('thermal equilibrium state must be specified in parameters.rho0');
 end
 if ~isfield(parameters,'coil')
     error('one or more detection states must be specified in parameters.coil');
 end
 if ~isfield(parameters,'mw_oper')      
     error('microwave irradiation operator must be specified in parameters.mw_oper');   
+end
+if ~isfield(parameters,'method')
+    error('calculation method must be specified in parameters.method');
+end
+if ~ischar(parameters.method)
+    error('parameters.method must be a character string.');
 end
 if ismember(parameters.method,{'lvn-gmres','lvn-backs'})  
     if ~isfield(parameters,'ez_oper')
@@ -229,6 +250,11 @@ end
 if ismember(parameters.method,{'fp-backs','fp-gmres'})  
     if ~isfield(parameters,'nphases')
         error('MW phase grid size must be specified in parameters.nphases');
+    end
+    if (~isnumeric(parameters.nphases))||(~isreal(parameters.nphases))||...
+       (~isscalar(parameters.nphases))||(mod(parameters.nphases,1)~=0)||...
+       (parameters.nphases<1)
+        error('parameters.nphases must be a positive real integer.');
     end
     if ~strcmp(spin_system.inter.assumptions,'labframe')
         error('FP formalism requires labframe assumptions.');

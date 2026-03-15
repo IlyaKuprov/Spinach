@@ -27,6 +27,10 @@
 %
 %     parameters.coil       - detection state
 %
+%     parameters.sweep      - sweep width for the FID, Hz
+%
+%     parameters.npoints    - number of points in the FID
+%
 %     H - Hamiltonian matrix, received from context function
 %
 %     R - relaxation superoperator, received from context function

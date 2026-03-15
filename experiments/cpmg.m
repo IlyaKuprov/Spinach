@@ -4,6 +4,12 @@
 %
 % Parameters:
 %
+%    parameters.rho0     - initial state
+%
+%    parameters.coil     - detection state
+%
+%    parameters.pulse_op - pulse operator
+%
 %    parameters.nloops   - number of CPMG loops
 %
 %    parameters.timestep - time step

@@ -118,8 +118,20 @@ end
 if ~isfield(parameters,'coil')
     error('detection state must be specified in parameters.coil variable.');
 end
+if ~isfield(parameters,'irr_powers')
+    error('microwave amplitude must be specified in parameters.irr_powers variable.');
+end
+if (~isnumeric(parameters.irr_powers))||(~isreal(parameters.irr_powers))||...
+   (~isscalar(parameters.irr_powers))||(parameters.irr_powers<=0)
+    error('parameters.irr_powers should be a positive real number.');
+end
 if ~isfield(parameters,'pulse_dur')
     error('pulse duration should be specified in parameters.pulse_dur variable.');
+end
+if (~isnumeric(parameters.pulse_dur))||(~isreal(parameters.pulse_dur))||...
+   (~isrow(parameters.pulse_dur))||(numel(parameters.pulse_dur)~=2)||...
+   any(parameters.pulse_dur<=0)
+    error('parameters.pulse_dur should be a row vector with two positive elements.');
 end
 if ~isfield(parameters,'nloops')
     error('the number of loops must be specified in parameters.nloops variable.');

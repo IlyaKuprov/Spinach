@@ -151,6 +151,18 @@ end
 if ~isfield(parameters,'ez_oper')
     error('electron Lz operator must be specified in parameters.ez_oper variable.');
 end
+if ~isfield(parameters,'fields')
+    error('magnetic field offsets must be specified in parameters.fields variable.');
+end
+if (~isnumeric(parameters.fields))||(~isreal(parameters.fields))||(~isvector(parameters.fields))
+    error('parameters.fields should be a vector of real numbers.');
+end
+if ~isfield(parameters,'method')
+    error('solver method must be specified in parameters.method variable.');
+end
+if ~ischar(parameters.method)
+    error('parameters.method should be a character string.');
+end
 end
 
 % Great art is the contempt of a great man for small art.

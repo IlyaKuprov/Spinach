@@ -21,6 +21,16 @@
 %     parameters.n_dur     - duration of the nuclear pulse,
 %                            seconds; 50e-6 is typical
 %
+%     parameters.n_frq     - nuclear pulse frequency offsets
+%
+%     parameters.rf_b1_field - RF B1 field strength
+%
+%     parameters.n_rnk     - nuclear pulse grid rank
+%
+%     parameters.nuclei    - a vector of integers specifying
+%                            which spins in sys.isotopes are
+%                            nuclei to irradiate
+%
 %     parameters.nsteps    - number of time steps to make
 %                            in the detection period, which
 %                            runs from 0 to 2*paramters.tau

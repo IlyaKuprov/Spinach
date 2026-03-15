@@ -113,8 +113,9 @@ if ~isfield(parameters,'pulse_rnk')
     error('pulse grid rank must be specified in parameters.pulse_rnk field.');
 end
 if (~isnumeric(parameters.pulse_rnk))||(~isreal(parameters.pulse_rnk))||...
-   (numel(parameters.pulse_rnk)~=1)||(mod(parameters.pulse_rnk,1)~=0)
-    error('parameters.pulse_rnk must be a real integer.');
+   (numel(parameters.pulse_rnk)~=1)||(mod(parameters.pulse_rnk,1)~=0)||...
+   (parameters.pulse_rnk<1)
+    error('parameters.pulse_rnk must be a positive integer.');
 end
 if ~isfield(parameters,'spins')
     error('irradiated spins must be specified in parameters.spins field.');
@@ -138,6 +139,10 @@ if ~isfield(parameters,'coil')
 end
 if ~isfield(parameters,'method')
     error('shaped pulse simulation method must be specified in parameters.method field.');
+end
+if (~ischar(parameters.method))||...
+   (~ismember(parameters.method,{'expv','expm','evolution'}))
+    error('parameters.method must be ''expv'', ''expm'', or ''evolution''.');
 end
 if ~isfield(parameters,'sweep')
     error('width of the detection window must be specified in parameters.sweep field.');

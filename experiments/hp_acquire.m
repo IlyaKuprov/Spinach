@@ -134,7 +134,7 @@ if numel(parameters.decouple)>0
     if any(~ismember(parameters.decouple,spin_system.comp.isotopes))
         error('parameters.decouple contains isotopes that are not present in the system.');
     end
-    if ~ismember(spin_system.bas.formalism,{'zeeman-liouv'})
+    if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
         error('analytical decoupling is only available for sphten-liouv formalism.');
     end
 end

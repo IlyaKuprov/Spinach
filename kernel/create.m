@@ -1212,7 +1212,7 @@ if isfield(sys,'enable')
         error('sys.enable must be a cell array of strings.');
     end
     if any(~ismember(sys.enable,{'gpu','op_cache','xmemlist','paranoia','sodd',...
-                                 'cowboy','polyadic','prop_cache','ham_cache'}))
+                                 'cowboy','polyadic','prop_cache','ham_cache','dafuq'}))
         error('unrecognised switch in sys.enable field.');
     end
 end

@@ -77,8 +77,71 @@ end
 % Consistency enforcement
 function grumble(spin_system,parameters,H,R,K)
 if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
-   (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
-    error('H, R and K arguments must be matrices.');
+   (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))||...
+   (~isequal(size(H),size(R),size(K)))||...
+   (size(H,1)~=size(H,2))
+    error('H, R and K arguments must be square matrices of equal size.');
+end
+if ~isfield(parameters,'spins')
+    error('active spin must be specified in parameters.spins variable.');
+end
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||...
+   (~all(cellfun(@ischar,parameters.spins)))
+    error('parameters.spins must be a cell array containing a single isotope string.');
+end
+if ~ismember(parameters.spins{1},spin_system.comp.isotopes)
+    error('the isotope specified in parameters.spins is not present in the system.');
+end
+if ~isfield(parameters,'pulse_dur')
+    error('pulse durations must be specified in parameters.pulse_dur variable.');
+end
+if (~isnumeric(parameters.pulse_dur))||(~isreal(parameters.pulse_dur))||...
+   (numel(parameters.pulse_dur)~=2)||any(parameters.pulse_dur<0)
+    error('parameters.pulse_dur must be a two-element vector of non-negative real numbers.');
+end
+if ~isfield(parameters,'pulse_amp')
+    error('pulse amplitudes must be specified in parameters.pulse_amp variable.');
+end
+if (~isnumeric(parameters.pulse_amp))||(~isreal(parameters.pulse_amp))||...
+   (numel(parameters.pulse_amp)~=2)
+    error('parameters.pulse_amp must be a two-element vector of real numbers.');
+end
+if ~isfield(parameters,'mq_order')
+    error('multiple quantum order must be specified in parameters.mq_order variable.');
+end
+if (~isnumeric(parameters.mq_order))||(~isreal(parameters.mq_order))||...
+   (~isscalar(parameters.mq_order))||(mod(parameters.mq_order,1)~=0)
+    error('parameters.mq_order must be an integer.');
+end
+if ~isfield(parameters,'spc_dim')
+    error('spatial problem dimension must be specified in parameters.spc_dim variable.');
+end
+if (~isnumeric(parameters.spc_dim))||(~isreal(parameters.spc_dim))||...
+   (~isscalar(parameters.spc_dim))||(parameters.spc_dim<1)||...
+   (mod(parameters.spc_dim,1)~=0)
+    error('parameters.spc_dim must be a positive integer.');
+end
+if ~isfield(parameters,'npoints')
+    error('number of points must be specified in parameters.npoints variable.');
+end
+if (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+   (numel(parameters.npoints)~=2)||any(parameters.npoints<1)||...
+   any(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must be a two-element vector of positive integers.');
+end
+if ~isfield(parameters,'rate')
+    error('MAS rate must be specified in parameters.rate variable.');
+end
+if (~isnumeric(parameters.rate))||(~isreal(parameters.rate))||...
+   (~isscalar(parameters.rate))||(parameters.rate==0)
+    error('parameters.rate must be a non-zero real scalar.');
+end
+if ~isfield(parameters,'sweep')
+    error('sweep width must be specified in parameters.sweep variable.');
+end
+if (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+   (~isscalar(parameters.sweep))||(parameters.sweep==0)
+    error('parameters.sweep must be a non-zero real scalar.');
 end
 if ~isfield(parameters,'rho0')
     error('initial state must be specified in parameters.rho0 variable.');

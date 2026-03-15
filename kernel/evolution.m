@@ -872,24 +872,48 @@ end
 
 % Consistency enforcement
 function grumble(L,coil,rho,timestep,nsteps,output)
-if ~isnumeric(L)
-    error('Liouvillian must be numeric.');
+if (~isnumeric(L))||(~ismatrix(L))||(~allfinite(L))
+    error('Liouvillian must be a finite numeric matrix.');
 end
-if ~isnumeric(coil)
-    error('coil argument must be numeric.');
+if (~isnumeric(coil))||(~ismatrix(coil))||(~allfinite(coil))
+    error('coil argument must be a finite numeric array.');
 end
 if (~isnumeric(rho))&&(~iscell(rho))
-    error('rho argument must either be numeric or a cell array');
+    error('rho argument must either be numeric or a cell array.');
 end
-if ~isnumeric(timestep)
-    error('timestep argument must be numeric.');
+if isnumeric(rho)
+    if (~ismatrix(rho))||(~allfinite(rho))
+        error('rho argument must be a finite numeric array.');
+    end
+elseif any(~cellfun(@isnumeric,rho))||any(~cellfun(@ismatrix,rho))||...
+       any(~cellfun(@allfinite,rho))
+    error('rho cell array elements must be finite numeric arrays.');
 end
-if ~isnumeric(nsteps)
-    error('nsteps must be numeric.');
+if (~isnumeric(timestep))||(~isreal(timestep))||(~isscalar(timestep))
+    error('timestep argument must be a real scalar.');
+end
+if (~isnumeric(nsteps))||(~isreal(nsteps))||(~isscalar(nsteps))||...
+   (mod(nsteps,1)~=0)||(nsteps<0)
+    error('nsteps must be a non-negative integer.');
+end
+if size(L,1)~=size(L,2)
+    error('Liouvillian must be a square matrix.');
+end
+if isnumeric(rho)
+    if size(rho,1)~=size(L,1)
+        error('the first dimension of rho must match the dimension of L.');
+    end
+else
+    if any(cellfun(@(x)size(x,1)~=size(L,1),rho))
+        error('the first dimension of every element in rho must match the dimension of L.');
+    end
 end
 if (~ischar(output))||(~ismember(output,{'observable','final',...
    'trajectory','total','multichannel','refocus'}))
-    error('observable argument must be a valid character string.');
+    error('output argument must be a valid character string.');
+end
+if strcmp(output,'multichannel')&&(size(coil,2)<2)
+    error('multichannel output requires at least two columns in coil.');
 end
 end
 

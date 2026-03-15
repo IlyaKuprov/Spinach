@@ -105,7 +105,8 @@ end
 % Consistency enforcement
 function grumble(parameters,H,R,K)
 if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))|| ...
-   (~isequal(size(H),size(R),size(K)))
+   (~isequal(size(H),size(R),size(K)))||...
+   (size(H,1)~=size(H,2))
     error('H,R,K must be square matrices of equal size.');
 end
 required={'sweep','npoints','tmix','rate','spc_dim'};

@@ -46,7 +46,7 @@ if (~exist('method','var'))||isempty(method)
 end
 
 % Check consistency
-grumble(spin_system,P,rho);
+grumble(spin_system,P,rho,method);
 
 % Pick the method
 switch method
@@ -112,7 +112,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,P,rho)
+function grumble(spin_system,P,rho,method)
 if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
     error('steady state is only available for sphten-liouv formalism.');
 end
@@ -121,6 +121,9 @@ if (~isnumeric(rho))||(~isnumeric(P))
 end
 if size(P,1)~=size(P,2)
     error('P must be a square matrix.');
+end
+if (~ischar(method))||(~ismember(method,{'newton','squaring'}))
+    error('method must be ''newton'' or ''squaring''.');
 end
 if (P(1,1)~=1)||(norm(P(1,2:end),2)~=0)
     error('P(1,:) must be [1 0 0 0 ...]');

@@ -97,20 +97,30 @@ if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
     error('H, R and K arguments must be matrices.');
 end
+if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))
+    error('H, R and K matrices must have the same dimension.');
+end
 if ~isfield(parameters,'irr_powers')
     error('nutation frequencies must be specified in parameters.irr_powers variable.');
+end
+if (~isnumeric(parameters.irr_powers))||(~isreal(parameters.irr_powers))||...
+   isempty(parameters.irr_powers)
+    error('parameters.irr_powers must be a non-empty real matrix.');
 end
 if ~isfield(parameters,'irr_opers')
     error('spin-lock operators must be specified in parameters.irr_opers variable.');
 end
-if ~iscell(parameters.irr_opers)
-    error('parameters.irr_opers must be a cell array of matrices.');
+if (~iscell(parameters.irr_opers))||isempty(parameters.irr_opers)
+    error('parameters.irr_opers must be a non-empty cell array of matrices.');
+end
+if size(parameters.irr_powers,1)~=numel(parameters.irr_opers)
+    error('the number of rows in parameters.irr_powers must match the number of elements in parameters.irr_opers.');
 end
 if ~isfield(parameters,'exc_opers')
     error('excitation operators must be specified in parameters.exc_opers variable.');
 end
-if ~iscell(parameters.exc_opers)
-    error('parameters.exc_opers must be a cell array of matrices.');
+if (~iscell(parameters.exc_opers))||isempty(parameters.exc_opers)
+    error('parameters.exc_opers must be a non-empty cell array of matrices.');
 end
 if ~isfield(parameters,'rho0')
     error('initial state must be specified in parameters.rho0 variable.');
@@ -118,12 +128,23 @@ end
 if ~isfield(parameters,'coil')
     error('detection state must be specified in parameters.coil variable.');
 end
+if ~isfield(parameters,'spc_dim')
+    error('spatial problem dimension must be specified in parameters.spc_dim variable.');
+end
+if (~isnumeric(parameters.spc_dim))||(~isscalar(parameters.spc_dim))||...
+   (~isreal(parameters.spc_dim))||(parameters.spc_dim<1)||...
+   (mod(parameters.spc_dim,1)~=0)
+    error('parameters.spc_dim must be a positive integer.');
+end
 if ~isfield(parameters,'time_steps')
     error('time slice durations must be specified in parameters.time_steps variable.');
 end
 if (~isnumeric(parameters.time_steps))||(~isreal(parameters.time_steps))||...
    (~isrow(parameters.time_steps))||any(parameters.time_steps<=0)
     error('parameters.time_steps must be a row vector of positive real numbers.');
+end
+if size(parameters.irr_powers,2)~=numel(parameters.time_steps)
+    error('the number of columns in parameters.irr_powers must match the number of elements in parameters.time_steps.');
 end
 end
 

@@ -1,7 +1,7 @@
 % Z magnetization of the sample as a function of magnetic field in a
 % finite-speed magnetic field sweep experiment. Syntax:
 %
-%             magn=fieldscan_magn(spin_system,parameters)
+%     [fields,z_magn]=fieldscan_magn(spin_system,parameters)
 %
 % Parameters:
 %

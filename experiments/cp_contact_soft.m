@@ -88,6 +88,9 @@ if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
     error('H, R and K arguments must be matrices.');
 end
+if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))
+    error('H, R and K matrices must have the same dimension.');
+end
 if ~isfield(parameters,'spins')
     error('working spins must be specified in parameters.spins variable.');
 end
@@ -95,17 +98,34 @@ if (~iscell(parameters.spins))||(numel(parameters.spins)~=2)||...
    (~all(cellfun(@ischar,parameters.spins)))
     error('parameters.spins must be a two-element cell array of character strings.');
 end
-if ~isfield(parameters,'hi_pwr')||(parameters.hi_pwr<=0)
+if ~isfield(parameters,'hi_pwr')
     error('high RF amplitude must be specified in parameters.hi_pwr variable.');
+end
+if (~isnumeric(parameters.hi_pwr))||(~isscalar(parameters.hi_pwr))||...
+   (~isreal(parameters.hi_pwr))||(parameters.hi_pwr<=0)
+    error('parameters.hi_pwr must be a positive real scalar.');
 end
 if ~isfield(parameters,'cp_pwr')
     error('CP RF amplitudes must be specified in parameters.cp_pwr variable.');
+end
+if (~isnumeric(parameters.cp_pwr))||(~isreal(parameters.cp_pwr))||...
+   (~isrow(parameters.cp_pwr))||(numel(parameters.cp_pwr)~=2)||...
+   any(parameters.cp_pwr<=0)
+    error('parameters.cp_pwr must be a two-element row vector of positive real numbers.');
 end
 if ~isfield(parameters,'rho0')
     error('initial state must be specified in parameters.rho0 variable.');
 end
 if ~isfield(parameters,'coil')
     error('detection state must be specified in parameters.coil variable.');
+end
+if ~isfield(parameters,'spc_dim')
+    error('spatial problem dimension must be specified in parameters.spc_dim variable.');
+end
+if (~isnumeric(parameters.spc_dim))||(~isscalar(parameters.spc_dim))||...
+   (~isreal(parameters.spc_dim))||(parameters.spc_dim<1)||...
+   (mod(parameters.spc_dim,1)~=0)
+    error('parameters.spc_dim must be a positive integer.');
 end
 if ~isfield(parameters,'nsteps')
     error('number of time steps must be specified in parameters.nsteps variable.');
@@ -118,7 +138,7 @@ if ~isfield(parameters,'timestep')
     error('time step must be specified in parameters.timestep variable.');
 end
 if (~isnumeric(parameters.timestep))||(~isscalar(parameters.timestep))||...
-   (~isreal(parameters.timestep))||(parameters.timestep<0)
+   (~isreal(parameters.timestep))||(parameters.timestep<=0)
     error('parameters.timestep must be a positive real scalar.');
 end
 end

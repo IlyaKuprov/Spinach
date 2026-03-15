@@ -31,7 +31,7 @@ function R=relaxation(spin_system,euler_angles)
 spin_system=defaults(spin_system);
 
 % Check consistency
-grumble(spin_system);
+grumble(spin_system,euler_angles);
 
 % Get the matrix going
 R=mprealloc(spin_system,1);
@@ -689,12 +689,17 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system)
+function grumble(spin_system,euler_angles)
 if ~isfield(spin_system,'rlx')
     error('relaxation data (.rlx) is missing from the spin_system structure.');
 end
 if ~isfield(spin_system.rlx,'theories')
     error('relaxation data (.rlx.theories) is missing from the spin_system structure.');
+end
+if exist('euler_angles','var')&&(~isempty(euler_angles))&&...
+   ((~isnumeric(euler_angles))||(~isreal(euler_angles))||...
+    (~isrow(euler_angles))||(numel(euler_angles)~=3))
+    error('euler_angles must be a row vector with three real elements.');
 end
 if ~iscell(spin_system.rlx.theories)||any(~cellfun(@ischar,spin_system.rlx.theories))
     error('spin_system.rlx.theories must be a cell array of character strings.');

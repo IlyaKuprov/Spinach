@@ -66,7 +66,7 @@
 function trajan(spin_system,traj,property,time_axis)
 
 % Check the input
-grumble(spin_system,traj);
+grumble(spin_system,traj,property,time_axis);
 
 % Set the defaults
 if ~exist('property','var'), property='correlation_order'; end
@@ -318,7 +318,7 @@ ktitle(title_text); kgrid;
 end
 
 % Consistency enforcement
-function grumble(spin_system,trajectory)
+function grumble(spin_system,trajectory,property,time_axis)
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
     error('trajectory analysis is only available for sphten-liouv formalism.');
 end
@@ -327,6 +327,17 @@ if ~isnumeric(trajectory)
 end
 if size(trajectory,1)~=size(spin_system.bas.basis,1)
     error('trajectory dimension should match basis dimension.');
+end
+if exist('property','var')&&(~isempty(property))&&...
+   ((~ischar(property))||(~ismember(property,{'correlation_order',...
+   'coherence_order','total_each_spin','local_each_spin',...
+   'level_populations'})))
+    error('property must be ''correlation_order'', ''coherence_order'', ''total_each_spin'', ''local_each_spin'', or ''level_populations''.');
+end
+if exist('time_axis','var')&&(~isempty(time_axis))&&...
+   ((~isnumeric(time_axis))||(~isreal(time_axis))||(~isrow(time_axis))||...
+    (numel(time_axis)~=size(trajectory,2)))
+    error('time_axis must be a real row vector with one element for each trajectory column.');
 end
 end
 

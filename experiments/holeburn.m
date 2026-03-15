@@ -151,6 +151,9 @@ end
 if ~isfield(parameters,'method')
     error('shaped pulse simulation method must be specified in parameters.method field.');
 end
+if (~ischar(parameters.method))||(~ismember(parameters.method,{'expv','expm','evolution'}))
+    error('parameters.method must be ''expv'', ''expm'', or ''evolution''.');
+end
 if ~isfield(parameters,'sweep')
     error('width of the detection window must be specified in parameters.sweep field.');
 end

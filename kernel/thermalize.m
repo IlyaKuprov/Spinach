@@ -104,6 +104,9 @@ end
 if ~ischar(method)
     error('method must be a character string.');
 end
+if ~ismember(method,{'IME','dibari'})
+    error('method must be ''IME'' or ''dibari''.');
+end
 if strcmp(method,'IME')
     if isempty(rho_eq)
         error('rho_eq cannot be empty for IME formalism.');

@@ -65,20 +65,43 @@ end
 if ~isfield(parameters,'mw_pwr')
     error('microwave power should be specified in parameters.mw_pwr variable.');
 end
-if numel(parameters.mw_pwr)~=1
-    error('parameters.mw_pwr should have exactly one element.');
+if (~isnumeric(parameters.mw_pwr))||(~isreal(parameters.mw_pwr))||...
+   (numel(parameters.mw_pwr)~=1)
+    error('parameters.mw_pwr should be a real scalar.');
+end
+if ~isfield(parameters,'mw_off')
+    error('microwave offset should be specified in parameters.mw_off variable.');
+end
+if (~isnumeric(parameters.mw_off))||(~isreal(parameters.mw_off))||...
+   (numel(parameters.mw_off)~=1)
+    error('parameters.mw_off should be a real scalar.');
+end
+if ~isfield(parameters,'rho0')
+    error('thermal equilibrium state should be specified in parameters.rho0 variable.');
+end
+if ~isfield(parameters,'coil')
+    error('coil state should be specified in parameters.coil variable.');
+end
+if ~isfield(parameters,'mw_oper')
+    error('microwave irradiation operator should be specified in parameters.mw_oper variable.');
+end
+if ~isfield(parameters,'ez_oper')
+    error('electron Lz operator should be specified in parameters.ez_oper variable.');
 end
 if ~isfield(parameters,'nsteps')
     error('number of time steps should be specified in parameters.nsteps variable.');
 end
-if numel(parameters.nsteps)~=1
-    error('parameters.nsteps should have exactly one element.');
+if (~isnumeric(parameters.nsteps))||(~isreal(parameters.nsteps))||...
+   (numel(parameters.nsteps)~=1)||(mod(parameters.nsteps,1)~=0)||...
+   (parameters.nsteps<1)
+    error('parameters.nsteps should be a positive real integer.');
 end
 if ~isfield(parameters,'dt')
     error('time step length should be specified in parameters.dt variable.');
 end
-if numel(parameters.dt)~=1
-    error('parameters.dt should have exactly one element.');
+if (~isnumeric(parameters.dt))||(~isreal(parameters.dt))||...
+   (numel(parameters.dt)~=1)||(parameters.dt<=0)
+    error('parameters.dt should be a positive real scalar.');
 end
 end
 

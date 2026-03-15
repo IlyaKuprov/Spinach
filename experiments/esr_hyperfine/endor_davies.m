@@ -38,6 +38,18 @@
 %     parameters.method - method to use during the call
 %                         to shaped_pulse_af()
 %
+%     parameters.spins  - irradiated spins, electron first,
+%                         nucleus second
+%
+%     parameters.offset - transmitter offsets for the electron
+%                         and the nucleus pulses, Hz
+%
+%     parameters.rho0   - initial state
+%
+%     parameters.coil   - detection state
+%
+%     parameters.tau    - optional spin echo delay, seconds
+%
 %     H    - Hamiltonian matrix, received from context function
 %
 %     R    - relaxation superoperator, received from context function
@@ -148,6 +160,23 @@ end
 if ~isfield(parameters,'method')
     error('shaped pulse simulation method must be specified in parameters.method field.');
 end
+if ~ischar(parameters.method)
+    error('parameters.method must be a character string.');
+end
+if ~isfield(parameters,'spins')
+    error('irradiated spins must be specified in parameters.spins field.');
+end
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=2)||...
+   (~all(cellfun(@ischar,parameters.spins)))
+    error('parameters.spins must be a two-element cell array of character strings.');
+end
+if ~isfield(parameters,'offset')
+    error('transmitter offsets must be specified in parameters.offset field.');
+end
+if (~isnumeric(parameters.offset))||(~isreal(parameters.offset))||...
+   (~isrow(parameters.offset))||(numel(parameters.offset)~=2)
+    error('parameters.offset must be a row vector with two real elements.');
+end
 if ~isfield(parameters,'rho0')
     error('initial state must be specified in parameters.rho0 variable.');
 end
@@ -221,6 +250,12 @@ if (~isnumeric(parameters.n_rnk))||(~isreal(parameters.n_rnk))||...
    (~isscalar(parameters.n_rnk))||(mod(parameters.n_rnk,1)~=0)||...
    (parameters.n_rnk<1)
     error('parameters.n_rnk must be a positive real integer.');
+end
+if isfield(parameters,'tau')
+    if (~isnumeric(parameters.tau))||(~isreal(parameters.tau))||...
+       (~isscalar(parameters.tau))||(parameters.tau<0)
+        error('parameters.tau must be a non-negative real scalar.');
+    end
 end
 end
 

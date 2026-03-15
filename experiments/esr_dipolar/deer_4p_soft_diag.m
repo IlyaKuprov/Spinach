@@ -53,6 +53,8 @@
 %      parameters.npoints    - number of points in the free
 %                              induction decay 
 %
+%      parameters.zerofill   - length of the zero-filled FFT
+%
 %      parameters.method     - soft puse propagation method,
 %                              'expv' for Krylov propagation,
 %                              'expm' for exponential propa-
@@ -155,6 +157,120 @@ end
 
 % Consistency enforcement
 function grumble(parameters)
+if ~isfield(parameters,'pulse_frq')
+    error('pulse frequencies must be specified in parameters.pulse_frq field.');
+end
+if (~isnumeric(parameters.pulse_frq))||(~isreal(parameters.pulse_frq))||...
+   (numel(parameters.pulse_frq)~=4)
+    error('parameters.pulse_frq must have four real elements.');
+end
+if ~isfield(parameters,'pulse_pwr')
+    error('pulse powers must be specified in parameters.pulse_pwr field.');
+end
+if (~isnumeric(parameters.pulse_pwr))||(~isreal(parameters.pulse_pwr))||...
+   (numel(parameters.pulse_pwr)~=4)||any(parameters.pulse_pwr<=0)
+    error('parameters.pulse_pwr must have four positive real elements.');
+end
+if ~isfield(parameters,'pulse_dur')
+    error('pulse durations must be specified in parameters.pulse_dur field.');
+end
+if (~isnumeric(parameters.pulse_dur))||(~isreal(parameters.pulse_dur))||...
+   (numel(parameters.pulse_dur)~=4)||any(parameters.pulse_dur<=0)
+    error('parameters.pulse_dur must have four positive real elements.');
+end
+if ~isfield(parameters,'pulse_phi')
+    error('pulse phases must be specified in parameters.pulse_phi field.');
+end
+if (~isnumeric(parameters.pulse_phi))||(~isreal(parameters.pulse_phi))||...
+   (numel(parameters.pulse_phi)~=4)
+    error('parameters.pulse_phi must have four real elements.');
+end
+if ~isfield(parameters,'pulse_rnk')
+    error('pulse grid ranks must be specified in parameters.pulse_rnk field.');
+end
+if (~isnumeric(parameters.pulse_rnk))||(~isreal(parameters.pulse_rnk))||...
+   (numel(parameters.pulse_rnk)~=4)||any(mod(parameters.pulse_rnk,1)~=0)
+    error('parameters.pulse_rnk must have four integer real elements.');
+end
+if ~isfield(parameters,'offset')
+    error('receiver offset must be specified in parameters.offset field.');
+end
+if (~isnumeric(parameters.offset))||(~isreal(parameters.offset))||...
+   (~isscalar(parameters.offset))
+    error('parameters.offset must be a real scalar.');
+end
+if ~isfield(parameters,'sweep')
+    error('width of the detection window must be specified in parameters.sweep field.');
+end
+if (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+   (~isscalar(parameters.sweep))||(parameters.sweep<=0)
+    error('parameters.sweep must be a positive real scalar.');
+end
+if ~isfield(parameters,'npoints')
+    error('number of points in the FID must be specified in parameters.npoints field.');
+end
+if (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+   (~isscalar(parameters.npoints))||(parameters.npoints<1)||...
+   (mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must be a positive real integer.');
+end
+if ~isfield(parameters,'zerofill')
+    error('FFT zero fill length must be specified in parameters.zerofill field.');
+end
+if (~isnumeric(parameters.zerofill))||(~isreal(parameters.zerofill))||...
+   (~isscalar(parameters.zerofill))||(parameters.zerofill<parameters.npoints)||...
+   (mod(parameters.zerofill,1)~=0)
+    error('parameters.zerofill must be an integer not smaller than parameters.npoints.');
+end
+if ~isfield(parameters,'rho0')
+    error('initial state must be specified in parameters.rho0 variable.');
+end
+if ~isfield(parameters,'coil')
+    error('detection state must be specified in parameters.coil variable.');
+end
+if ~isfield(parameters,'p1_p2_gap')
+    error('p1-p2 time gap must be specified in parameters.p1_p2_gap field.');
+end
+if (~isnumeric(parameters.p1_p2_gap))||(~isreal(parameters.p1_p2_gap))||...
+   (~isscalar(parameters.p1_p2_gap))||(parameters.p1_p2_gap<=0)
+    error('parameters.p1_p2_gap must be a positive real scalar.');
+end
+if ~isfield(parameters,'p2_p4_gap')
+    error('p2-p4 time gap must be specified in parameters.p2_p4_gap field.');
+end
+if (~isnumeric(parameters.p2_p4_gap))||(~isreal(parameters.p2_p4_gap))||...
+   (~isscalar(parameters.p2_p4_gap))||(parameters.p2_p4_gap<=0)
+    error('parameters.p2_p4_gap must be a positive real scalar.');
+end
+if ~isfield(parameters,'p3_nsteps')
+    error('number of points in the trace must be specified in parameters.p3_nsteps field.');
+end
+if (~isnumeric(parameters.p3_nsteps))||(~isreal(parameters.p3_nsteps))||...
+   (~isscalar(parameters.p3_nsteps))||(parameters.p3_nsteps<1)||...
+   (mod(parameters.p3_nsteps,1)~=0)
+    error('parameters.p3_nsteps must be a positive real integer.');
+end
+if ~isfield(parameters,'echo_time')
+    error('width of the echo window must be specified in parameters.echo_time field.');
+end
+if (~isnumeric(parameters.echo_time))||(~isreal(parameters.echo_time))||...
+   (~isscalar(parameters.echo_time))||(parameters.echo_time<=0)
+    error('parameters.echo_time must be a positive real scalar.');
+end
+if ~isfield(parameters,'echo_npts')
+    error('number of points in the echo must be specified in parameters.echo_npts field.');
+end
+if (~isnumeric(parameters.echo_npts))||(~isreal(parameters.echo_npts))||...
+   (~isscalar(parameters.echo_npts))||(parameters.echo_npts<1)||...
+   (mod(parameters.echo_npts,1)~=0)
+    error('parameters.echo_npts must be a positive real integer.');
+end
+if ~isfield(parameters,'method')
+    error('shaped pulse simulation method must be specified in parameters.method field.');
+end
+if ~ischar(parameters.method)
+    error('parameters.method must be a character string.');
+end
 if ~isfield(parameters,'assumptions')
     error('assumptions must be specified in parameters.assumptions field.');
 end

@@ -143,6 +143,36 @@ end
 if ~isfield(parameters,'rho0')
     error('the initial state must be provided in parameters.rho0 variable.');
 end
+if ~isfield(parameters,'probe_spin')
+    error('the probe spin number must be provided in parameters.probe_spin variable.');
+end
+if (~isnumeric(parameters.probe_spin))||(~isreal(parameters.probe_spin))||...
+   (~isscalar(parameters.probe_spin))||(mod(parameters.probe_spin,1)~=0)||...
+   (parameters.probe_spin<1)
+    error('parameters.probe_spin must be a positive real integer.');
+end
+if ~isfield(parameters,'stepsize')
+    error('the relaxation period increment must be provided in parameters.stepsize variable.');
+end
+if (~isnumeric(parameters.stepsize))||(~isreal(parameters.stepsize))||...
+   (~isscalar(parameters.stepsize))||(parameters.stepsize<=0)
+    error('parameters.stepsize must be a positive real scalar.');
+end
+if ~isfield(parameters,'nsteps')
+    error('the numbers of steps must be provided in parameters.nsteps variable.');
+end
+if (~isnumeric(parameters.nsteps))||(~isreal(parameters.nsteps))||...
+   (~isrow(parameters.nsteps))||(numel(parameters.nsteps)~=2)||...
+   any(parameters.nsteps<1)||any(mod(parameters.nsteps,1)~=0)
+    error('parameters.nsteps must be a row vector with two positive integers.');
+end
+if ~isfield(parameters,'tmix')
+    error('the mixing time must be provided in parameters.tmix variable.');
+end
+if (~isnumeric(parameters.tmix))||(~isreal(parameters.tmix))||...
+   (~isscalar(parameters.tmix))||(parameters.tmix<=0)
+    error('parameters.tmix must be a positive real scalar.');
+end
 end
 
 % "Begin at the beginning," the King said, very gravely, 

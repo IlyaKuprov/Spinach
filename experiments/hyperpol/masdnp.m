@@ -143,7 +143,9 @@ elseif (~isnumeric(parameters.axis))||(~isreal(parameters.axis))||...
        (~isrow(parameters.axis))||(numel(parameters.axis)~=3)
     error('parameters.axis must be a row vector of three real numbers.');
 end
-if isempty(parameters.spins)
+if ~isfield(parameters,'spins')
+    error('parameters.spins variable must be specified.');
+elseif isempty(parameters.spins)
     error('parameters.spins variable cannot be empty.');
 elseif ~iscell(parameters.spins)
     error('parameters.spins variable must be a cell array.');
@@ -180,9 +182,15 @@ if ~isfield(parameters,'mw_time')
     error('microwaving time must be specified in parameters.mw_time field.');
 end
 if (~isnumeric(parameters.mw_time))||(~isreal(parameters.mw_time))||...
-   (numel(parameters.mw_time)~=1)||(parameters.mw_time<0)||...
-   (mod(parameters.mw_time,1)~=0)
-    error('parameters.mw_time must be a non-negative real integer.');
+   (numel(parameters.mw_time)~=1)||(parameters.mw_time<0)
+    error('parameters.mw_time must be a non-negative real scalar.');
+end
+if ~isfield(parameters,'verbose')
+    error('diagnostic output flag must be specified in parameters.verbose variable.');
+end
+if (~isnumeric(parameters.verbose))||(~isreal(parameters.verbose))||...
+   (numel(parameters.verbose)~=1)
+    error('parameters.verbose must be a real scalar.');
 end
 end
 

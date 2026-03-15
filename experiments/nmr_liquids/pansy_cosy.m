@@ -104,17 +104,26 @@ end
 if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 elseif numel(parameters.sweep)~=2
-    error('parameters array should have exactly one element.');
+    error('parameters.sweep array should have exactly two elements.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       any(parameters.sweep<=0)
+    error('parameters.sweep must contain two positive real numbers.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
 elseif numel(parameters.spins)~=2
-    error('parameters.spins cell array should have exactly two element.');
+    error('parameters.spins cell array should have exactly two elements.');
+elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))||...
+       (~ischar(parameters.spins{2}))
+    error('parameters.spins must be a two-element cell array of character strings.');
 end
 if ~isfield(parameters,'npoints')
-    error('number of points should be specified in parameters.points variable.');
+    error('number of points should be specified in parameters.npoints variable.');
 elseif numel(parameters.npoints)~=2
     error('parameters.npoints array should have exactly two elements.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       any(parameters.npoints<1)||any(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must contain two positive integers.');
 end
 end
 

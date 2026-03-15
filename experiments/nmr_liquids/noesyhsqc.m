@@ -161,22 +161,23 @@ if ~isfield(parameters,'sweep')
     error('sweep widths must be specificed in parameters.sweep variable.');
 end
 if (~isnumeric(parameters.sweep))||(~isvector(parameters.sweep))||...
-   (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)
-    error('parameters.sweep must be a vector of three real numbers.');
+   (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)||...
+   any(parameters.sweep<=0)
+    error('parameters.sweep must be a vector of three positive real numbers.');
 end
 if ~isfield(parameters,'J')
     error('HSQC stage J-coupling must be specificed in parameters.J variable.');
 end
 if (~isnumeric(parameters.J))||(~isscalar(parameters.J))||...
-   (~isreal(parameters.J))
-    error('parameters.J must be a real number.');
+   (~isreal(parameters.J))||(parameters.J==0)
+    error('parameters.J must be a non-zero real number.');
 end
 if ~isfield(parameters,'tmix')
     error('NOESY stage mixing time must be specificed in parameters.tmix variable.');
 end
 if (~isnumeric(parameters.tmix))||(~isscalar(parameters.tmix))||...
-   (~isreal(parameters.tmix))
-    error('parameters.tmix must be a real number.');
+   (~isreal(parameters.tmix))||(parameters.tmix<0)
+    error('parameters.tmix must be a non-negative real number.');
 end
 end
 

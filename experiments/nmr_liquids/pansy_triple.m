@@ -112,17 +112,26 @@ end
 if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 elseif numel(parameters.sweep)~=3
-    error('parameters array should have exactly three elements.');
+    error('parameters.sweep array should have exactly three elements.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       any(parameters.sweep<=0)
+    error('parameters.sweep must contain three positive real numbers.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
 elseif numel(parameters.spins)~=3
     error('parameters.spins cell array should have exactly three elements.');
+elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))||...
+       (~ischar(parameters.spins{2}))||(~ischar(parameters.spins{3}))
+    error('parameters.spins must be a three-element cell array of character strings.');
 end
 if ~isfield(parameters,'npoints')
-    error('number of points should be specified in parameters.points variable.');
+    error('number of points should be specified in parameters.npoints variable.');
 elseif numel(parameters.npoints)~=3
     error('parameters.npoints array should have exactly three elements.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       any(parameters.npoints<1)||any(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must contain three positive integers.');
 end
 end
 

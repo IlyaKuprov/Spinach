@@ -16,6 +16,14 @@
 %
 %      parameters.lamp    -  spin-lock power, Hz
 %
+%      parameters.rho0    -  initial state
+%
+%      H - Hamiltonian matrix, received from context function
+%
+%      R - relaxation superoperator, received from context function
+%
+%      K - kinetics superoperator, received from context function
+%
 % Outputs:
 %
 %      fid.cos, fid.sin   -  sine and cosine components
@@ -74,21 +82,44 @@ if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 elseif numel(parameters.sweep)~=2
     error('parameters.sweep array should have exactly two elements.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       any(parameters.sweep<=0)
+    error('parameters.sweep must contain two positive real numbers.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
 elseif numel(parameters.spins)~=1
     error('parameters.spins cell array should have exactly one element.');
+elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))
+    error('parameters.spins must be a single-element cell array of character strings.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
 elseif numel(parameters.npoints)~=2
     error('parameters.npoints array should have exactly two elements.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       any(parameters.npoints<1)||any(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must contain two positive integers.');
 end
 if ~isfield(parameters,'tmix')
     error('mixing time should be specified in parameters.tmix variable.');
 elseif numel(parameters.tmix)~=1
     error('parameters.tmix array should have exactly one element.');
+elseif (~isnumeric(parameters.tmix))||(~isreal(parameters.tmix))||...
+       (parameters.tmix<0)
+    error('parameters.tmix must be a non-negative real scalar.');
+end
+if ~isfield(parameters,'lamp')
+    error('spin-lock power should be specified in parameters.lamp variable.');
+elseif numel(parameters.lamp)~=1
+    error('parameters.lamp array should have exactly one element.');
+elseif (~isnumeric(parameters.lamp))||(~isreal(parameters.lamp))
+    error('parameters.lamp must be a real scalar.');
+end
+if ~isfield(parameters,'rho0')
+    error('initial state should be specified in parameters.rho0 variable.');
+elseif ~isnumeric(parameters.rho0)
+    error('parameters.rho0 must be a numeric array.');
 end
 end
 

@@ -254,10 +254,8 @@ if ~isworkernode
         spin_system.sys.enable=setdiff(spin_system.sys.enable,{'gpu'});
     end
 
-    % Reset and restart all GPUs
-    if (~isworkernode)&&ismember('gpu',spin_system.sys.enable)...
-            &&(~ismember('hygiene',spin_system.sys.disable))
-        report(spin_system,'Clearing GPU(s)...'); pctRunOnAll('gpuDevice([]);');
+    % Enable the forward compatibility assumption for CUDA
+    if (~isworkernode)&&ismember('gpu',spin_system.sys.enable)
         parallel.gpu.enableCUDAForwardCompatibility(true);
     end
 

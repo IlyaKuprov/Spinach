@@ -330,7 +330,7 @@ switch spin_system.bas.formalism
                         
                         % For very large subspaces use Krylov propagation
                         report(spin_system,'large Liouvillian, propagating using Krylov algorithm... ');
-                        answer_subs=krylov(spin_system,L_subs,[],rho_subs,timestep,nsteps,'trajectory');
+                        answer_subs=krylov(spin_system,L_sub,[],rho_sub,timestep,nsteps,'trajectory');
                         
                     end
                     

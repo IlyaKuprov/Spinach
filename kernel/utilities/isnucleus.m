@@ -6,7 +6,7 @@
 %
 %    spin_spec - a character string
 %
-% Output:
+% Outputs:
 %
 %    verdict - true for a nucleus, false otherwise
 %

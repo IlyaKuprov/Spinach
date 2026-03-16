@@ -71,26 +71,32 @@ end
 
 % Consistency enforcement
 function grumble(smax,smin,delta,k,signs,ncont)
-if (~isnumeric(smax))||(~isscalar(smax))||(~isreal(smax))
-    error('smax must be a real scalar.');
+if (~isnumeric(smax))||(~isscalar(smax))||(~isreal(smax))||(~isfinite(smax))
+    error('smax must be a finite real scalar.');
 end
-if (~isnumeric(smin))||(~isscalar(smin))||(~isreal(smin))
-    error('smin must be a real scalar.');
+if (~isnumeric(smin))||(~isscalar(smin))||(~isreal(smin))||(~isfinite(smin))
+    error('smin must be a finite real scalar.');
 end
 if (~isnumeric(ncont))||(~isscalar(ncont))||(~isreal(ncont))||...
-   (ncont<1)||(mod(ncont,1)~=0)
+   (~isfinite(ncont))||(ncont<1)||(mod(ncont,1)~=0)
     error('ncont must be a positive integer.');
 end
 if (~isnumeric(delta))||(numel(delta)~=4)||(~isreal(delta))||...
-    any(delta>1)||any(delta<0)
-    error('delta must be a vector with four elements between 0 and 1.');
+   any(~isfinite(delta))||any(delta>1)||any(delta<0)
+    error('delta must be a finite real vector with four elements between 0 and 1.');
+end
+if (delta(1)>delta(2))||(delta(3)>delta(4))
+    error('delta must specify ascending minimum and maximum contour fractions.');
 end
 if (~isnumeric(k))||(~isscalar(k))||(~isreal(k))||...
-   (k<1)||(mod(k,1)~=0)
+   (~isfinite(k))||(k<1)||(mod(k,1)~=0)
     error('k must be a positive integer.');
 end
 if ~ischar(signs)
     error('signs parameter must be a character string.');
+end
+if ~ismember(signs,{'positive','negative','both'})
+    error('signs parameter must be ''positive'', ''negative'', or ''both''.');
 end
 end
 

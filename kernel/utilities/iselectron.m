@@ -6,7 +6,7 @@
 %
 %    spin_spec - a Spinach particle specification
 %
-% Output:
+% Outputs:
 %
 %    verdict - true for an electron, false otherwise
 %

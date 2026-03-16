@@ -2,6 +2,10 @@
 %
 %                       n=poolsize()
 %
+% Parameters:
+%
+%    none
+%
 % Outputs:
 %
 %     n  -  number of workers in the current

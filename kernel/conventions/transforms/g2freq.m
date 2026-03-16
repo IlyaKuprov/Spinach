@@ -5,9 +5,9 @@
 %
 % Parameters:
 %
-%     g  -  frequency in g-tensor units (Bohr magnetons)
+%     g  -  g-values, scalar or array
 %
-%     B  -  magnet field in Tesla
+%     B  -  magnetic field in Tesla
 %
 % Outputs:
 %
@@ -20,7 +20,7 @@
 function f=g2freq(g,B)
 
 % Check consistency
-grumble(g,B)
+grumble(g,B);
 
 % Get the free electron carrier frequency
 omega=B*spin('E')/(2*pi);
@@ -32,8 +32,11 @@ end
 
 % Consistency enforcement
 function grumble(g,B)
-if (~isnumeric(g))||(~isreal(g))||(~isnumeric(B))||(~isreal(B))
-    error('both arguments must be numeric and real.');
+if (~isnumeric(g))||(~isreal(g))||any(~isfinite(g),'all')
+    error('g must be a finite real numeric array.');
+end
+if (~isnumeric(B))||(~isscalar(B))||(~isreal(B))||(~isfinite(B))
+    error('B must be a finite real scalar.');
 end
 end
 

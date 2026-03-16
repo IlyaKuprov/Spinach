@@ -114,6 +114,24 @@ function grumble(spin_system,parameters) %#ok<INUSD>
 if spin_system.inter.magnet==0
     error('the primary magnet field must be non-zero.');
 end
+if ~isfield(parameters,'dims')
+    error('sample dimensions must be specified in parameters.dims field.');
+end
+if (~isnumeric(parameters.dims))||(~isreal(parameters.dims))||...
+   any(parameters.dims<=0)||((numel(parameters.dims)<1)||(numel(parameters.dims)>3))
+    error('parameters.dims must be a vector with one, two or three positive real elements.');
+end
+if ~isfield(parameters,'npts')
+    error('grid point counts must be specified in parameters.npts field.');
+end
+if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
+   any(parameters.npts<1)||any(mod(parameters.npts,1)~=0)||...
+   ((numel(parameters.npts)<1)||(numel(parameters.npts)>3))
+    error('parameters.npts must be a vector with one, two or three positive integer elements.');
+end
+if numel(parameters.dims)~=numel(parameters.npts)
+    error('parameters.dims and parameters.npts must have the same number of elements.');
+end
 end
 
 % There is nothing of any importance in life - except how well you do

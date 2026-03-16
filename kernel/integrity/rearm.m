@@ -2,17 +2,30 @@
 % distribution .m files for any modifications that the user
 % did since downloading Spinach. The function prints the 
 % list of files that have changed in any way since the in-
-% ternal database has been rearmed.
+% ternal database has been rearmed. Syntax:
 %
-% The purpose is to catch local modifications that the user
-% may have made and forgotten about, that are causing some un-
-% intended consequences elsewhere in Spinach.
+%                             rearm()
+%
+% Parameters:
+%
+%    none
+%
+% Outputs:
+%
+%    none
+%
+% Note: the purpose is to catch local modifications that the
+%       user may have made and forgotten about, that are cau-
+%       sing some unintended consequences elsewhere in Spinach.
 %
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=rearm.m>
 
 function rearm()
+
+% Check consistency
+grumble();
 
 % List top level directories
 top_level={'kernel','interfaces','experiments','etc'};
@@ -55,6 +68,10 @@ save([P 'smells.mat'],'smells');
 % Inform the user
 disp('rearm: sniffer rearmed.');
 
+end
+
+% Consistency enforcement
+function grumble()
 end
 
 % MEN WANTED for hazardous journey, small wages, bitter cold, long months

@@ -17,6 +17,9 @@
 
 function cmap=bwr_cmap()
 
+% Check consistency
+grumble();
+
 % Preallocate the map
 cmap=zeros(255,3);
 
@@ -26,7 +29,7 @@ cmap(1:128,2)=linspace(0,1,128); % greens
 cmap(1:128,3)=1;                 % blues
 
 % Rise from white to red
-cmap(128:255,1)=1;                         % reds
+cmap(128:255,1)=1;                          % reds
 cmap(128:255,2)=fliplr(linspace(0,1,128)); % greens
 cmap(128:255,3)=fliplr(linspace(0,1,128)); % blues
 
@@ -35,8 +38,13 @@ cmap=cmap.^2;
     
 end
 
+% Consistency enforcement
+function grumble()
+end
+
 % The worst thing I can be is the same as everybody 
 % else. I hate that. 
 %
 % Arnold Schwarzenegger
+
 

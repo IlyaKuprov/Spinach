@@ -18,6 +18,9 @@
 
 function kgrid()
 
+% Check consistency
+grumble();
+
 % Publisher-friendly grid settings
 box on; grid on; grid minor;
 set(gca,'MinorGridAlpha',1,...
@@ -30,6 +33,10 @@ set(gca,'Layer','bottom');
 
 end
 
+% Consistency enforcement
+function grumble()
+end
+
 % Frigid gentlewomen of the jury! I had thought that
 % months, perhaps years, would elapse before I dared
 % to reveal myself to Dolores Haze; but by six she
@@ -39,5 +46,4 @@ end
 %
 % Vladimir Nabokov, "Lolita"
 
-% #NGRUM
 

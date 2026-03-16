@@ -6,6 +6,10 @@
 %
 %                    answer=isworkernode()
 %
+% Parameters:
+%
+%    none
+%
 % Outputs:
 %
 %    answer - true if running on a parallel worker process

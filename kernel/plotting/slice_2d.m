@@ -14,6 +14,8 @@
 %
 %     parameters.offset      -  one or two transmitter offsets, Hz
 %
+%     parameters.zerofill    -  one or two point counts in F1 and F2
+%
 %     parameters.axis_units  -  axis units ('ppm','Hz','Gauss')
 %
 %     ncont     - the number of contours, a reasonable value is 20
@@ -157,6 +159,14 @@ if ~isfield(parameters,'sweep')
 end
 if (numel(parameters.sweep)~=1)&&(numel(parameters.sweep)~=2)
     error('parameters.sweep array should have one or two elements.');
+end
+if ~isfield(parameters,'zerofill')
+    error('point counts should be specified in parameters.zerofill variable.');
+end
+if (~isnumeric(parameters.zerofill))||(~isreal(parameters.zerofill))||...
+   any(parameters.zerofill<1)||any(mod(parameters.zerofill,1)~=0)||...
+   ((numel(parameters.zerofill)~=1)&&(numel(parameters.zerofill)~=2))
+    error('parameters.zerofill must have one or two positive integer elements.');
 end
 if ~isfield(parameters,'axis_units')
     error('axis units must be specified in parameters.axis_units variable.');

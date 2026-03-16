@@ -2,10 +2,20 @@
 % functions and anything else that the user may have installed or
 % written in the current Matlab instance. Also checks for any fi-
 % les that are not visible to Matlab because the corresponding di-
-% rectory is not on the path.
+% rectory is not on the path. Syntax:
 %
-% Collisions of function names and path problems are the most fre-
-% quent support topic at the forum.
+%                         existentials()
+%
+% Parameters:
+%
+%    none
+%
+% Outputs:
+%
+%    none
+%
+% Note: collisions of function names and path problems are the
+%       most frequent support topic at the forum.
 %
 % ilya.kuprov@weizmann.ac.il
 % david.goodwin@kit.edu
@@ -13,6 +23,9 @@
 % <https://spindynamics.org/wiki/index.php?title=existentials.m>
 
 function existentials()
+
+% Check consistency
+grumble();
 
 % Do not run inside parallel pools
 if isworkernode, return; end
@@ -114,6 +127,10 @@ if ispc
 
 end
 
+end
+
+% Consistency enforcement
+function grumble()
 end
 
 % It has been my observation that most people get ahead

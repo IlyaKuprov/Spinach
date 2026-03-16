@@ -2,7 +2,7 @@
 %
 %                   hz=ppm2hz(ppm,B0,nucleus)
 %
-% Inputs:
+% Parameters:
 %
 %    ppm       - chemical shift in ppm
 %
@@ -10,7 +10,7 @@
 %
 %    nucleus   - a string specifying the isotope, e.g. '1H'
 %
-% Result:
+% Outputs:
 %
 %    hz        - resonance offset in Hz
 %
@@ -36,11 +36,11 @@ function grumble(ppm,B0,nucleus)
 if (~isnumeric(ppm))||(~isreal(ppm))
     error('chemical shift must be real.');
 end
-if (~isnumeric(B0))||(~isreal(B0))
-    error('magnetic induction must be real.');
+if (~isnumeric(B0))||(~isreal(B0))||(numel(B0)~=1)
+    error('magnetic induction must be a real number.');
 end
 if ~ischar(nucleus)
-    error('nucleus must be a character array');
+    error('nucleus must be a character array.');
 end
 end
 

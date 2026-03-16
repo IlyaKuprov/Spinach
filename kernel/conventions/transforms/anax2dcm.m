@@ -4,15 +4,15 @@
 %
 %              dcm=anax2dcm(rot_axis,rot_angle)
 %
-% Arguments:
+% Parameters:
 %
-%      rot_axis - cartesian direction vector given as 
+%      rot_axis - cartesian direction vector given as
 %                 a row or column with three real ele-
 %                 ments
 %
 %     rot_angle - rotation angle in radians
 %
-% Ouputs:
+% Outputs:
 %
 %           dcm - directional cosine matrix
 %
@@ -46,6 +46,9 @@ if any(~isreal(rot_axis))||any(~isreal(rot_angle))
 end
 if numel(rot_axis)~=3
     error('direction vector must have three real elements.');
+end
+if norm(rot_axis,2)==0
+    error('direction vector must be non-zero.');
 end
 if numel(rot_angle)~=1
     error('rotation angle must be a real number.');

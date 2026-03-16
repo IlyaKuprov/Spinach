@@ -8,7 +8,7 @@
 %
 %       b  - an integer number
 %
-% Output:
+% Outputs:
 %
 %       d  - a logical number
 %

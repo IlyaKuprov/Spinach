@@ -83,7 +83,7 @@ end
 
 % Consistency enforcement
 function grumble(A)
-if ~isnumeric(A)
+if (~isnumeric(A))||((~isa(A,'polyadic'))&&(~ismatrix(A)))
     error('A must be a matrix or a polyadic.');
 end
 end

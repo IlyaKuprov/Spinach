@@ -167,6 +167,14 @@ else
         error('parameters.offset vector should have exactly one element.');
     end
 end
+if ~isfield(parameters,'zerofill')
+    error('zerofill should be specified in parameters.zerofill variable.');
+end
+if (~isnumeric(parameters.zerofill))||(~isreal(parameters.zerofill))||...
+   (~isscalar(parameters.zerofill))||(parameters.zerofill<1)||...
+   (mod(parameters.zerofill,1)~=0)
+    error('parameters.zerofill must be a positive integer.');
+end
 if ~isfield(parameters,'axis_units')
     error('axis units must be specified in parameters.axis_units variable.');
 end

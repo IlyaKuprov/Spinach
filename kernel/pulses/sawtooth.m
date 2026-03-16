@@ -22,7 +22,7 @@
 function waveform=sawtooth(amplitude,frequency,time_grid)
 
 % Check consistency
-grumble(amplitude,frequency,time_grid)
+grumble(amplitude,frequency,time_grid);
 
 % Compute the waveform
 waveform=amplitude*(2*frequency*mod(time_grid,1/frequency)-1);
@@ -31,14 +31,17 @@ end
 
 % Consistency enforcement
 function grumble(amplitude,frequency,time_grid)
-if (numel(amplitude)~=1)||(~isnumeric(amplitude))||(~isreal(amplitude))
-    error('amplitude parameter must be a real number.');
+if (numel(amplitude)~=1)||(~isnumeric(amplitude))||...
+   (~isreal(amplitude))||(~isfinite(amplitude))
+    error('amplitude parameter must be a finite real scalar.');
 end
-if (numel(frequency)~=1)||(~isnumeric(frequency))||(~isreal(frequency))
-    error('frequency parameter must be a real number.');
+if (numel(frequency)~=1)||(~isnumeric(frequency))||...
+   (~isreal(frequency))||(~isfinite(frequency))||(frequency<=0)
+    error('frequency parameter must be a positive finite real scalar.');
 end
-if (~isnumeric(time_grid))||(~isreal(time_grid))
-    error('time_grid parameter must be a vector of real numbers.');
+if (~isnumeric(time_grid))||(~isreal(time_grid))||...
+   any(~isfinite(time_grid),'all')
+    error('time_grid parameter must be a finite real array.');
 end
 end
 

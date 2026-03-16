@@ -12,7 +12,7 @@
 %   rep_counts - vector of positive integers specifying
 %                how many copies of each row to make
 %
-% Output:
+% Outputs:
 %
 %   B          - same type as A
 %
@@ -42,13 +42,13 @@ function grumble(A,row_nums,rep_counts)
 if (~isnumeric(A))&&(~iscell(A))
     error('A must be numeric or a cell array.');
 end
-if (~isnumeric(row_nums))||(~isvector(row_nums))||...
-   any(row_nums<1)||any(mod(row_nums,1)~=0)
+if (~isnumeric(row_nums))||(~isreal(row_nums))||(~isvector(row_nums))||...
+   any(~isfinite(row_nums))||any(row_nums<1)||any(mod(row_nums,1)~=0)
     error('row_nums must be a vector of positive integers.');
 end
-if (~isnumeric(rep_counts))||(~isvector(rep_counts))||...
-   any(rep_counts<1)||any(mod(rep_counts,1)~=0)||...
-   (numel(rep_counts)~=numel(row_nums))
+if (~isnumeric(rep_counts))||(~isreal(rep_counts))||(~isvector(rep_counts))||...
+   any(~isfinite(rep_counts))||any(rep_counts<1)||...
+   any(mod(rep_counts,1)~=0)||(numel(rep_counts)~=numel(row_nums))
     error('rep_counts must match row_nums in size and contain positive integers.');
 end
 if numel(unique(row_nums))~=numel(row_nums)

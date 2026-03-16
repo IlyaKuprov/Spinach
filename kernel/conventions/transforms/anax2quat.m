@@ -2,15 +2,17 @@
 %
 %                  q=anax2quat(rot_axis,rot_angle)
 %
-% Arguments:
+% Parameters:
 %
-%      rot_axis - cartesian direction vector given as a row or column 
+%      rot_axis - cartesian direction vector given as a row or column
 %                 with three real elements
 %
 %     rot_angle - rotation angle in radians
 %
-% Output: a structure with four fields q.u, q.i, q.j, q.k giving the
-% four components of the quaternion. 
+% Outputs:
+%
+%             q - structure with four fields q.u, q.i, q.j, q.k giving
+%                 the four components of the quaternion
 %
 % gareth.charnock@oerc.ox.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -43,6 +45,9 @@ if any(~isreal(rot_axis))||any(~isreal(rot_angle))
 end
 if numel(rot_axis)~=3
     error('direction vector must have three real elements.');
+end
+if norm(rot_axis,2)==0
+    error('direction vector must be non-zero.');
 end
 if numel(rot_angle)~=1
     error('rotation angle must be a real number.');

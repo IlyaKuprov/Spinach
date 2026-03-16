@@ -9,9 +9,10 @@
 %
 %     a - 3x1 real vector specifying the rotation axis
 %
-% Output:
+% Outputs:
 %
-%     T - 3x3 real interaction tensor
+%     A - 3x3 real interaction tensor averaged over
+%         the rotation around the specified axis
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -40,11 +41,14 @@ end
 function grumble(T,a)
 if (~isnumeric(a))||(~isreal(a))||...
    (size(a,1)~=3)||(size(a,2)~=1)
-	error('d must be a real 3x1 vector.');
-end 
+    error('a must be a real 3x1 vector.');
+end
+if norm(a,2)==0
+    error('a must be non-zero.');
+end
 if (~isnumeric(T))||(~isreal(T))||...
    (size(T,1)~=3)||(size(T,2)~=3)
-	error('T must be a real 3x3 matrix.');
+    error('T must be a real 3x3 matrix.');
 end
 end
 

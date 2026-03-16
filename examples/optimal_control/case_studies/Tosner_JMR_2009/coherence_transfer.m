@@ -71,7 +71,7 @@ guess=rand(4,150)/10;
 
 % Optimisation
 spin_system=optimcon(spin_system,control);
-xy_profile=fmaxnewton(spin_system,@grape_xy,guess);
+fmaxnewton(spin_system,@grape_xy,guess);
 
 % Better plotting needed here
 

@@ -10,11 +10,11 @@
 %
 %     parameters.spins              {F1 F2} nuclei (e.g. '13C','1H')
 %
-%     parameters.decouple_f2        nuclei to decouple in F2, e.g. 
-%                                   {'15N','13C'}
+%     parameters.decouple_f2        [optional] nuclei to decouple
+%                                   in F2, e.g. {'15N','13C'}
 %
-%     parameters.decouple_f1        nuclei to decouple in F1, e.g. 
-%                                   {'1H','13C'}
+%     parameters.decouple_f1        [optional] nuclei to decouple 
+%                                   in F1, e.g. {'1H','13C'}
 %
 %     parameters.J                  working scalar coupling, Hz
 %
@@ -177,15 +177,11 @@ elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))||...
        (~ischar(parameters.spins{2}))
     error('parameters.spins must be a two-element cell array of character strings.');
 end
-if ~isfield(parameters,'decouple_f2')
-    error('decoupling channel list should be specified in parameters.decouple_f2 variable.');
-elseif ~iscell(parameters.decouple_f2)
-    error('parameters.decouple_f2 must be a cell array.');
+if isfield(parameters,'decouple_f2')&&(~iscell(parameters.decouple_f2))
+    error('parameters.decouple_f2, if specified, must be a cell array.');
 end
-if ~isfield(parameters,'decouple_f1')
-    error('decoupling channel list should be specified in parameters.decouple_f1 variable.');
-elseif ~iscell(parameters.decouple_f1)
-    error('parameters.decouple_f1 must be a cell array.');
+if isfield(parameters,'decouple_f1')&&(~iscell(parameters.decouple_f1))
+    error('parameters.decouple_f1, if specified, must be a cell array.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');

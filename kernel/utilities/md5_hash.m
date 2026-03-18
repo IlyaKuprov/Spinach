@@ -17,6 +17,9 @@
 
 function hashstr=md5_hash(A)
 
+% Check consistency
+grumble(A);
+
 % Make a bytestream
 A=serializeToBytes(A);
 
@@ -26,6 +29,10 @@ hashstr=digestMD5(A);
 % Convert into a hex string
 hashstr=sprintf('%.2x',hashstr);
 
+end
+
+% Consistency enforcement
+function grumble(~)
 end
 
 % The basic principle of the new education is to be that dunces and

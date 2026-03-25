@@ -195,7 +195,7 @@ if ~isempty(spin_system.sys.enable)
 end
 
 % Get a unique job identifier by hashing the clock and the process identifier
-spin_system.sys.job_id=md5_hash([posixtime(datetime('now')) matlabProcessID]);      
+spin_system.sys.job_id=md5_hash([posixtime(datetime('now')) feature('getpid')]);      
 report(spin_system,['job identifier: ' spin_system.sys.job_id]);
 
 % Shuffle the random number generator

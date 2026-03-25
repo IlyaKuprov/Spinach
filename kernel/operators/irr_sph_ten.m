@@ -35,63 +35,69 @@
 function T=irr_sph_ten(mult,k)
 
 % Adapt to the input style
-switch nargin
+if nargin==1
+
+    % Check consistency
+    grumble(mult);
     
-    case 1
+    % Generate tensors of all ranks and put them into a cell array
+    T=cell(mult^2,1);
+    
+    % Fill in recursively
+    for n=0:(mult-1)
+        T((n^2+1):((n+1)^2))=irr_sph_ten(mult,n);
+    end
+
+elseif nargin==2
+
+    % Check consistency
+    grumble(mult,k);
+    
+    % Process zero-rank requests
+    if k==0
         
-        % Generate tensors of all ranks and put them into a cell array
-        if isnumeric(mult)&&isscalar(mult)&&(mult>0)&&(mod(mult,1)==0)
-            
-            % Preallocate the answer
-            T=cell(mult^2,1);
-            
-            % Fill in recursively
-            for n=0:(mult-1)
-                T((n^2+1):((n+1)^2))=irr_sph_ten(mult,n);
-            end
-            
-        else
-            
-            % Catch incorrect calls
-            error('mult must be a non-negative integer.');
+        % Return a unit matrix
+        T={speye(mult)};
         
+    else
+        
+        % Get Pauli matrices
+        L=pauli(mult);
+        
+        % Preallocate the cell array
+        T=cell(2*k+1,1);
+        
+        % Get the top state
+        T{1}=((-1)^k)*(2^(-k/2))*L.p^k;
+        
+        % Apply sequential lowering using Racah's commutation rule
+        for n=2:(2*k+1)
+            q=k-n+2; T{n}=(1/sqrt((k+q)*(k-q+1)))*(L.m*T{n-1}-T{n-1}*L.m);
         end
-        
-    case 2
-        
-        % Generate spherical tensor operators of the specified rank
-        if isnumeric(mult)&&isscalar(mult)&&(mod(mult,1)==0)&&...
-           isnumeric(k)&&isscalar(k)&&(k>0)&&(k<mult)&&(mod(k,1)==0)
-            
-            % Get Pauli matrices
-            L=pauli(mult);
-            
-            % Preallocate the cell array
-            T=cell(2*k+1,1);
-            
-            % Get the top state
-            T{1}=((-1)^k)*(2^(-k/2))*L.p^k;
-            
-            % Apply sequential lowering using Racah's commutation rule
-            for n=2:(2*k+1)
-                q=k-n+2; T{n}=(1/sqrt((k+q)*(k-q+1)))*(L.m*T{n-1}-T{n-1}*L.m);
-            end
-                
-        elseif isnumeric(mult)&&isscalar(mult)&&(mod(mult,1)==0)&&...
-               isnumeric(k)&&isscalar(k)&&(k==0)
-            
-            % For zero rank, return a unit matrix
-            T={speye(mult)};
-            
-        else
-            
-            % Catch incorrect calls
-            error('mult must be a non-negative integer and k must be an integer from [0, mult-1] interval.');
-            
-        end
-        
+
+    end
+
+else
+
+    % Catch incorrect calls
+    error('the number of input arguments must be one or two.');
+
 end
 
+end
+
+% Consistency enforcement
+function grumble(mult,k)
+if (~isnumeric(mult))||(~isscalar(mult))||(~isreal(mult))||...
+   (~isfinite(mult))||(mult<1)||(mod(mult,1)~=0)
+    error('mult must be a positive integer.');
+end
+if nargin==2
+    if (~isnumeric(k))||(~isscalar(k))||(~isreal(k))||...
+       (~isfinite(k))||(k<0)||(k>=mult)||(mod(k,1)~=0)
+        error('k must be an integer between 0 and mult-1.');
+    end
+end
 end
 
 % I swear by my life and my love of it that I will never 

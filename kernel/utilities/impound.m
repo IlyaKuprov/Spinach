@@ -18,9 +18,16 @@
 
 function answer=impound(varargin)
 
+% Check consistency
+grumble(varargin{:});
+
 % Return what was received
 answer=varargin;
 
+end
+
+% Consistency enforcement
+function grumble(varargin)
 end
 
 % He who dares not offend cannot be honest.

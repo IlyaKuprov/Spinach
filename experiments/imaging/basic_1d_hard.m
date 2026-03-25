@@ -51,7 +51,9 @@ parameters.rho0=evolution(spin_system,L-parameters.ro_grad_amp*G{1},[],...
                           parameters.rho0,0.5/parameters.sweep,parameters.npoints,'final');
 
 % Acquisition under a gradient
-fid=acquire(spin_system,parameters,L+parameters.ro_grad_amp*G{1},sparse(0),sparse(0));
+fid=acquire(spin_system,parameters,L+parameters.ro_grad_amp*G{1},...
+                        spalloc(size(L,1),size(L,2),0),...
+                        spalloc(size(L,1),size(L,2),0));
          
 end
 

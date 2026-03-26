@@ -166,8 +166,8 @@ end
 if ~isempty(spin_system.sys.disable)
     report(spin_system,'WARNING: the following functionality is disabled by the user');
     if ismember('hygiene',spin_system.sys.disable),   report(spin_system,'         > health checks at start-up'); end
-    if ismember('pt',spin_system.sys.disable),        report(spin_system,'         > automatic detection of non-interacting subspaces'); end
-    if ismember('zte',spin_system.sys.disable),       report(spin_system,'         > automatic elimination of unpopulated states'); end
+    if ismember('pt',spin_system.sys.disable),        report(spin_system,'         > detection of non-interacting subspaces'); end
+    if ismember('zte',spin_system.sys.disable),       report(spin_system,'         > elimination of unpopulated states'); end
     if ismember('symmetry',spin_system.sys.disable),  report(spin_system,'         > permutation symmetry factorisation'); end
     if ismember('krylov',spin_system.sys.disable),    report(spin_system,'         > Krylov propagation inside evolution() function'); end
     if ismember('clean-up',spin_system.sys.disable),  report(spin_system,'         > sparse array clean-up'); end
@@ -190,7 +190,6 @@ if ~isempty(spin_system.sys.enable)
     if ismember('paranoia',spin_system.sys.enable),   report(spin_system,'         > paranoid numerical accuracy settings'); end
     if ismember('cowboy',spin_system.sys.enable),     report(spin_system,'         > loose numerical accuracy settings'); end
     if ismember('polyadic',spin_system.sys.enable),   report(spin_system,'         > polyadic arithmetic with spatial degrees of freedom'); end
-    if ismember('dafuq',spin_system.sys.enable),      report(spin_system,'         > detailed parallel profiling'); end
     if ismember('sodd',spin_system.sys.enable),       report(spin_system,'         > spin-orbit corrections to dipolar couplings'); end
 end
 
@@ -204,46 +203,46 @@ rng('shuffle'); report(spin_system,'random number generator shuffled');
 % Head node setup
 if ~isworkernode
 
-    % Leave one core to the operating system
-    ncores=feature('numcores'); nworkers=ncores-1;
-    spin_system.sys.parallel={'threads',max([1 nworkers])};
-
-    % Get the current pool
-    current_pool=gcp('nocreate');
-
-    % Destroy inappropriate pools
+    % Get the current pool              % Policy here is that we accept exiting parallel pools
+    current_pool=gcp('nocreate');       % because they may be seriously big / complex in MDCS.
+                                        % But if a pool does not exist, we start a threads one
+    % Respect existing pools            % because it plays better with most people's hardware.
     if ~isempty(current_pool)
 
-        % Destroy pools that are not threads based
-        if ~isa(current_pool,'parallel.ThreadPool')
+        % Inspect the existing threads pool
+        if isa(current_pool,'parallel.ThreadPool')
 
-            % Kill the pool and update current pool to empty
-            report(spin_system,'found a process-based parallel pool, destroying...');
-            delete(current_pool); current_pool=[];
+            % Record and report what we have
+            spin_system.sys.parallel{1}='threads';
+            spin_system.sys.parallel{2}=current_pool.NumWorkers;
+            report(spin_system,'a thread-based parallel pool already exists:')
+            report(spin_system,['         > threads running: ' num2str(spin_system.sys.parallel{2})]);
 
-            % Destroy pools with wrong number of workers
-        elseif current_pool.NumWorkers~=spin_system.sys.parallel{2}
+        % Inspect the existing processes pool
+        elseif isa(current_pool,'parallel.ProcessPool')
 
-            % Kill the pool and update current pool to empty
-            report(spin_system,'found a threads pool of wrong size, destroying...');
-            delete(current_pool); current_pool=[];
+            % Record and report what we have
+            spin_system.sys.parallel{1}='processes';
+            spin_system.sys.parallel{2}=current_pool.NumWorkers;
+            report(spin_system,'a process-based parallel pool already exists:')
+            report(spin_system,['         > workers running: ' num2str(spin_system.sys.parallel{2})]);
 
         else
 
-            % Report a healthy pre-existing pool to the user
-            report(spin_system,'a healthy threads-based parallel pool found:')
-            report(spin_system,['         > workers running: ' num2str(spin_system.sys.parallel{2})]);
+            % Unfamiliar pool: complain and bomb out
+            error('unfamiliar parallel pool type.')
 
         end
 
-    end
+    else
 
-    % If the pool still needs to be started
-    if (~isworkernode)&&isempty(current_pool)
+        % Leave one core to the operating system
+        ncores=feature('numcores'); nworkers=ncores-1;
+        spin_system.sys.parallel={'threads',max([1 nworkers])};
 
-        % Start a new threads-based parallel pool
-        report(spin_system,'starting a threads-based parallel pool:')
-        report(spin_system,['         > workers to start: ' num2str(spin_system.sys.parallel{2})]);
+        % Start a threads-based parallel pool
+        report(spin_system,'starting a thread-based parallel pool:')
+        report(spin_system,['         > threads to use: ' num2str(spin_system.sys.parallel{2})]);
         parpool('threads',spin_system.sys.parallel{2});
 
     end

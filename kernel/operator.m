@@ -87,7 +87,7 @@ if ismember('op_cache',spin_system.sys.enable)
                       format,spin_system.comp.iso_hash,...
                       spin_system.bas.basis_hash});
 
-    % Get the current ValueStore
+    % Get ValueStore
     if ~isworkernode
         store=gcp('nocreate').ValueStore; 
     else
@@ -204,11 +204,13 @@ if strcmp(format,'csc')
 
 end
 
-% Write the cache record if caching is beneficial
-if ismember('op_cache',spin_system.sys.enable)&&(toc>0.1)
+% Write the cache record
+if ismember('op_cache',spin_system.sys.enable)
 
-    % Do not fight other workers
-    if ~isKey(store,op_hash), put(store,{op_hash},{A}); end
+    % Update the cache
+    if ~isKey(store,op_hash)
+        put(store,{op_hash},{A});
+    end
 
 end
 

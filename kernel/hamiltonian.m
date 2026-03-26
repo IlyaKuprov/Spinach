@@ -1,7 +1,7 @@
 % Hamiltonian operator or superoperator and its rotational decomposi-
 % tion. Descriptor and operator generation are parallelised. Syntax:
 %
-%             [H,Q]=hamiltonian(spin_system,operator_type)
+%             [I,Q]=hamiltonian(spin_system,operator_type)
 %
 % Parameters: 
 %
@@ -19,7 +19,7 @@
 %
 % Outputs:
 %
-%     H   - rotationally invariant part of the Hamiltonian
+%     I   - rotationally invariant part of the Hamiltonian
 %
 %     Q   - irreducible components of the anisotropic part,
 %           use orientation.m to get the full Hamiltonian
@@ -36,7 +36,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=hamiltonian.m>
 
-function [H,Q]=hamiltonian(spin_system,operator_type)
+function [I,Q]=hamiltonian(spin_system,operator_type)
 
 % Set the default for the type
 if ~exist('operator_type','var'), operator_type='comm'; end
@@ -591,45 +591,33 @@ clear('D1','D2','nL','nS','opL','opS','isotropic','ist_coeff',...
       'irr_comp','mask_a','mask_b','mask_c','L','S','coupling_iso',...
       'n','pair_list','quad_couplings');
 
-% Load the cache record if one exists
-if (~isworkernode)&&ismember('ham_cache',spin_system.sys.enable)
+% Use the cache record if one exists
+if ismember('ham_cache',spin_system.sys.enable)
 
     % Combine descriptor, isotopes, and basis hash
     ham_hash=md5_hash({descr,spin_system.comp.iso_hash, ...
-                       spin_system.bas.basis_hash,build_aniso});
+                       spin_system.bas.basis_hash});
 
-    % Generate the cache record name in the scratch directory
-    filename=[spin_system.sys.scratch filesep 'spinach_ham_' ham_hash '.mat'];
+    % Get ValueStore
+    if ~isworkernode
+        store=gcp('nocreate').ValueStore; 
+    else
+        store=getCurrentValueStore(); 
+    end
 
-    % Check if the file exists
-    if exist(filename,'file')
+    % Try to retrieve the operator from the ValueStore
+    if build_aniso&&isKey(store,[ham_hash ':I'])...
+                  &&isKey(store,[ham_hash ':Q'])
 
-        % Try to use
-        try
-            
-            % Try to load
-            if build_aniso
-                load(filename,'H','Q'); 
-            else
-                load(filename,'H');
-            end
-            
-            % Check load success and let the user know
-            if build_aniso&&exist('H','var')&&exist('Q','var')
-                report(spin_system,'cache record found and loaded.'); return;
-            elseif (~build_aniso)&&exist('H','var')
-                report(spin_system,'cache record found and loaded.'); return;
-            else
-                % Do not make a fuss on fail
-                report(spin_system,'could not read the cache record, recomputing...');
-            end
+        % Load I and Q, report success, and return
+        I=store([ham_hash ':I']); Q=store([ham_hash ':Q']);
+        report(spin_system,'cache record used.'); return;
 
-        catch
+    elseif (~build_aniso)&&isKey(store,[ham_hash ':I'])
 
-            % Do not make a fuss on fail
-            report(spin_system,'could not read the cache record, recomputing...');
-
-        end
+        % Load I, report success, and return
+        I=store([ham_hash ':I']); 
+        report(spin_system,'cache record used.'); return;
 
     else
 
@@ -650,17 +638,14 @@ oper=cell(size(descr,1),1);
 parfor_ss.sys=spin_system.sys; parfor_ss.tols=spin_system.tols;
 parfor_ss.bas=spin_system.bas; parfor_ss.comp=spin_system.comp;
 
-% Parfor rigging
+% Parfor timing
 if ~isworkernode
     D=parallel.pool.DataQueue;
     afterEach(D,@(~)parfor_progr);
     terms_done=0; last_toc=0;
-    tic; do_diag=true;
-    if ~isa(gcp,'parallel.ThreadPool')
-        ticBytes(gcp);
-    end
+    do_diag=true; tic;
 else
-    do_diag=false; D=[];
+    do_diag=false; D=[]; tic;
 end
 
 % Parfor progress updater
@@ -674,7 +659,7 @@ function parfor_progr()
 end
 
 % Build component operators in XYZ form
-report(spin_system,'building individual operators...'); tic;
+report(spin_system,'building individual operators...');
 parfor n=1:nterms
     
     % Get descriptor line
@@ -691,17 +676,6 @@ parfor n=1:nterms
     % Report progress
     if do_diag, send(D,n); end
 
-end
-
-% Parfor communication stats
-if ~isworkernode
-    if isa(gcp,'parallel.ThreadPool')
-        report(spin_system,'thread pool in use, worker traffic statistics unavailable');
-    else
-        nbytes=mean(tocBytes(gcp),1)/2^20;
-        report(spin_system,['average worker process received ' num2str(nbytes(1)) ...
-                            ' MB and sent back ' num2str(nbytes(2)) ' MB']);
-    end
 end
 
 % Inform the user
@@ -739,10 +713,10 @@ end
 
 % Convert to sparse matrix
 if curr_idx==0
-    H=mprealloc(spin_system,0);
+    I=mprealloc(spin_system,0);
 else
-    H=sparse(rows(1:curr_idx),cols(1:curr_idx),vals(1:curr_idx),dim,dim); 
-    H=clean_up(spin_system,H,spin_system.tols.liouv_zero);
+    I=sparse(rows(1:curr_idx),cols(1:curr_idx),vals(1:curr_idx),dim,dim); 
+    I=clean_up(spin_system,I,spin_system.tols.liouv_zero);
 end
 
 % Assemble anisotropic part
@@ -752,7 +726,7 @@ if build_aniso
     for r=1:2
 
         % Preallocate output
-        Q{r}=cell(2*r+1,2*r+1);
+        Q{r}=cell(2*r+1,2*r+1); %#ok<AGROW>
 
         % Projection loops
         for m=1:(2*r+1)
@@ -896,55 +870,28 @@ if ~build_aniso
 end
 
 % Warn about all-zero Hamiltonians
-if (~build_aniso)&&(nnz(H)==0)
+if (~build_aniso)&&(nnz(I)==0)
     report(spin_system,'WARNING - the Hamiltonian is ALL ZERO.');
 end
 
 % Print memory diagnostics
-H_whos=whos('H'); report(spin_system,['memory footprint of H array: ' num2str(H_whos.bytes/1024^3) ' GB']);
+I_whos=whos('I'); report(spin_system,['memory footprint of I array: ' num2str(I_whos.bytes/1024^3) ' GB']);
 if build_aniso
     Q_whos=whos('Q'); report(spin_system,['memory footprint of Q array: ' num2str(Q_whos.bytes/1024^3)  ' GB']);
 end
 
-% Write the cache record if caching is beneficial
-if (~isworkernode)&&ismember('ham_cache',spin_system.sys.enable)&&(toc>0.1)
+% Update the cache if caching is beneficial
+if ismember('ham_cache',spin_system.sys.enable)
 
-    % Do not fight other workers
-    if ~exist(filename,'file')
-        
-        % Try to save
-        try
-            
-            % H and Q parts
-            if build_aniso
-                
-                % Modern format, compressed
-                save(filename,'H','Q','-v7.3'); drawnow;
-                report(spin_system,'cache record saved.');
-
-            else
-
-                % Modern format, compressed
-                save(filename,'H','-v7.3'); drawnow;
-                report(spin_system,'cache record saved.');
-
-            end
-
-        catch
-
-            % Do not make a fuss on fail, this can happen
-            % for large parallel pools where many workers
-            % may be trying to write the same file.
-            report(spin_system,'could not save cache record.');
-
-        end
-        
+    % Update the cache: isotropic part
+    if ~isKey(store,[ham_hash ':I'])
+        put(store,{[ham_hash ':I']},{I});
     end
-    
-elseif (~isworkernode)&&ismember('ham_cache',spin_system.sys.enable)
 
-    % Tell the user that caching is pointless here
-    report(spin_system,'cache record not worth saving.');
+    % Update the cache: anisotropic part
+    if build_aniso&&(~isKey(store,[ham_hash ':Q']))
+        put(store,{[ham_hash ':Q']},{Q});
+    end
 
 end
 

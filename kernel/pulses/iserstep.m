@@ -91,45 +91,57 @@ switch method
     
     case 'LG4A' % https://doi.org/10.1088/0305-4470/39/19/S07
         
+        % Return the input state for zero time step
+        if dt==0
+            rho_b=rho_a;
+            return;
+        end
+
         % Match the paper notation
-        A_func = @(t,rho)(-1i*L(t,rho));
-        h=dt; t_n=t; Y_n=rho_a;
+        a_fun=@(t,rho)(-1i*L(t,rho));
+
+        % Convert Lie algebra elements into generators for step()
+        h=dt; t_n=t; prop_scale=1i/dt;
 
         % Stage 1
-        k1 = h * A_func(t_n, Y_n);
-        Q1 = k1;
+        k1=h*a_fun(t_n,rho_a);
+        Q1=k1;
 
         % Stage 2
-        u2 = 0.5 * Q1;
-        k2 = h * A_func(t_n + h/2, expm(u2) * Y_n);
-        Q2 = k2 - k1;
+        u2=0.5*Q1;
+        rho_u2=step(spin_system,prop_scale*u2,rho_a,dt);
+        k2=h*a_fun(t_n+h/2,rho_u2);
+        Q2=k2-k1;
 
         % Stage 3
-        u3 = 0.5 * Q1 + 0.25 * Q2;
-        k3 = h * A_func(t_n + h/2, expm(u3) * Y_n);
-        Q3 = k3 - k2;
+        u3=0.5*Q1+0.25*Q2;
+        rho_u3=step(spin_system,prop_scale*u3,rho_a,dt);
+        k3=h*a_fun(t_n+h/2,rho_u3);
+        Q3=k3-k2;
 
         % Stage 4
-        u4 = Q1 + Q2;
-        k4 = h * A_func(t_n + h, expm(u4) * Y_n);
-        Q4 = k4 - 2*k2 + k1;
+        u4=Q1+Q2;
+        rho_u4=step(spin_system,prop_scale*u4,rho_a,dt);
+        k4=h*a_fun(t_n+h,rho_u4);
+        Q4=k4-2*k2+k1;
 
         % Stage 5 (Note: [A, B] is the commutator A*B - B*A)
-        u5 = 0.5*Q1 + 0.25*Q2 + (1/3)*Q3 - (1/24)*Q4 - (1/48)*(Q1*Q2 - Q2*Q1);
-        k5 = h * A_func(t_n + h/2, expm(u5) * Y_n);
-        Q5 = k5 - k2;
+        u5=0.5*Q1+0.25*Q2+(1/3)*Q3-(1/24)*Q4-(1/48)*(Q1*Q2-Q2*Q1);
+        rho_u5=step(spin_system,prop_scale*u5,rho_a,dt);
+        k5=h*a_fun(t_n+h/2,rho_u5);
+        Q5=k5-k2;
 
         % Stage 6
-        u6 = Q1 + Q2 + (2/3)*Q3 + (1/6)*Q4 - (1/6)*(Q1*Q2 - Q2*Q1);
-        k6 = h * A_func(t_n + h, expm(u6) * Y_n);
-        Q6 = k6 - 2*k2 + k1;
+        u6=Q1+Q2+(2/3)*Q3+(1/6)*Q4-(1/6)*(Q1*Q2-Q2*Q1);
+        rho_u6=step(spin_system,prop_scale*u6,rho_a,dt);
+        k6=h*a_fun(t_n+h,rho_u6);
+        Q6=k6-2*k2+k1;
 
         % Final exponent v
-        v = Q1 + Q2 + (2/3)*Q5 + (1/6)*Q6 - (1/6)*(Q1*Q2 - (Q2 - Q3 + Q5 + 0.5*Q6)*Q1);
+        v=Q1+Q2+(2/3)*Q5+(1/6)*Q6-(1/6)*(Q1*Q2-(Q2-Q3+Q5+0.5*Q6)*Q1);
 
         % Step update
-        Y_next = expm(v) * Y_n;
-        rho_b = Y_next;
+        rho_b=step(spin_system,prop_scale*v,rho_a,dt);
 
     case 'RKMK4' % Fourth order RKMK method
 
@@ -495,4 +507,5 @@ end
 % they didn't look capable of doing either.
 %
 % Ronald Reagan
+
 

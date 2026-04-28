@@ -1,8 +1,8 @@
 % Redfield superoperator for the scalar relaxation of the first
 % kind in a two-proton system with a noisy J-coupling. This si-
-% tuation occurs in aziridines, where the slow nitrogen inver-
-% sion jitters scalar couplings on a millisecond time scale.
-% Set to demonstrate the effect described in:
+% tuation occurs in aziridines, where the slow nitrogen inversi-
+% on jitters scalar couplings on a millisecond time scale. Set
+% to demonstrate the effect described in:
 %
 %           http://dx.doi.org/10.1002/ange.201410271
 %
@@ -36,7 +36,8 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Show a spy plot of R
-figure((); spy(relaxation(spin_system));
+kfigure(); spy(relaxation(spin_system));
+ktitle('non-zeroes in the relaxation superop.');
 
 end
 

@@ -1,7 +1,11 @@
 % Spin system of 13C-labelled lactate with the OH protons
 % assumed to be in rapid exchange with water. Syntax:
 %
-%               [sys,inter,bas]=lactate()
+%             [sys,inter,bas]=lactate(spins)
+%
+% Parameters:
+%
+%    spins - which spins to include, e.g. {'1H','13C'}
 %
 % Outputs:
 %

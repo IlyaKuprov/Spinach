@@ -508,4 +508,3 @@ end
 %
 % Ronald Reagan
 
-

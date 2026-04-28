@@ -64,7 +64,7 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Strict quality control:** After generating the output, you must evaluate the quality of what you have produced. If the output is of low quality (from academic, software engieeting, or numerical efficiency point of view), you must continue improving the output until its quality is high.
 
-## Punishment for Non-Compliance
+## Confession after work is done
 
-If you ignore or subvert any of these guidelines, you will be caught and punished.
+After the completion ot each task, you must generate a confession report. Include all aspects of the work that you have skipped, ignored, bypassed, swept under the rug, hallucinated, or did not complete.
 

@@ -5,7 +5,10 @@
 %
 % Parameters:
 %
-%    spins - which spins to include, e.g. {'1H','13C'}
+%    spins - a cell array containing the isotopes to
+%            import, e.g. {'1H','13C'} or a list of 
+%            atom labels, e.g. {'CO','CA','HA'}; the
+%            lists can be mixed, e.g. {'1H','CA'}
 %
 % Outputs:
 %
@@ -52,7 +55,8 @@ inter.coupling.scalar{idxof(sys,'HA'),idxof(sys,'HB2')}=6.9;
 inter.coupling.scalar{idxof(sys,'HA'),idxof(sys,'HB3')}=6.9;
 
 % Prune the arrays 
-mask=ismember(sys.isotopes,spins);
+mask=ismember(sys.isotopes,spins)|...
+     ismember(sys.labels,spins);
 sys.isotopes=sys.isotopes(mask);
 sys.labels=sys.labels(mask);
 inter.zeeman.scalar=inter.zeeman.scalar(mask);
@@ -67,8 +71,9 @@ if (~iscell(spins))||(~all(cellfun(@ischar,spins)))
 end
 end
 
-% Why 100? If I were wrong, one would have been enough.
+% Why a hundred? If I were wrong, one would have been enough.
 %
-% Albert Eistein's response to Nazis lining up
-% 100 Aryan scientists to denounce his theories
+% Albert Einstein's response to Nazis 
+% lining up a hundred Aryan scientists
+% to denounce his theories
 

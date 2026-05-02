@@ -75,9 +75,9 @@ for n=1:numel(fapt)
     % Get the time interval mask
     time_mask=(time_grid>=start_time)&(time_grid<=end_time);
 
-    % Add event to the waveform, counterclockwise phase
+    % Add event to the waveform
     wave(1,:)=wave(1,:)+ampl*cos(2*pi*freq*time_grid+phi).*time_mask;
-    wave(2,:)=wave(2,:)+ampl*sin(2*pi*freq*time_grid+phi).*time_mask;
+    wave(2,:)=wave(2,:)-ampl*sin(2*pi*freq*time_grid+phi).*time_mask;
 
 end
 

@@ -980,8 +980,8 @@ if isfield(control,'keyholes')
             error('non-empty elements of control.keyholes must be function handles.');
         end
         if isa(control.keyholes{n},'function_handle')
-            a=randn(1,size(spin_system.control.rho_init{1},1));
-            b=randn(1,size(spin_system.control.rho_init{1},1));
+            a=randn(size(spin_system.control.rho_init{1}));
+            b=randn(size(spin_system.control.rho_init{1}));
             keyhole=control.keyholes{n};
             if norm(keyhole(a)-keyhole(keyhole(a)),2)/norm(a,2)>1e-6
                 error('keyhole functions must be idempotent.');

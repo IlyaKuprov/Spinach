@@ -2,7 +2,8 @@
 % rates in a chemical exchange and the rotational correlation times
 % within Redfield theory.
 %
-% Calculation time: hours
+% Calculation time: minutes (iteration count is limited 
+%                            in this example file)  
 %
 % ilya.kuprov@weizmann.ac.il
 % dmitry.shishmarev@sydney.edu.au
@@ -20,8 +21,8 @@ guess=[ 0.2331    0.1114    6.8446    0.1210    0.1423    0.1205  ...
         1.1924   32.9179];
 
 % Set optimiser options
-options=optimset('Display','iter','MaxIter',100000,...
-                 'MaxFunEvals',200000,'UseParallel',true);
+options=optimset('Display','iter','MaxIter',10,...
+                 'MaxFunEvals',Inf,'UseParallel',true);
 
 % Run the optimisation
 answer=fminsearch(@exsy_err,guess,options);

@@ -137,26 +137,26 @@ rho_stack_neg=step(spin_system,Hx+CAx,rho_stack_neg,pi/2);
 [L_dec,~]=decouple(spin_system,L,[],{'15N'});
 
 % Detection on 1H
-coil_stack=evolution(spin_system,L_dec,[],parameters.coil,...
+coil_stack=evolution(spin_system,L_dec',[],parameters.coil,...
                      -t3.timestep,t3.nsteps-1,'trajectory');
                  
 % Select single quantum coherence
 coil_stack=coherence(spin_system,coil_stack,{{'1H',1}});                 
 
 % tau evolution
-coil_stack=evolution(spin_system,L,[],coil_stack,-tau,1,'final');
+coil_stack=evolution(spin_system,L',[],coil_stack,-tau,1,'final');
 
 % Inversion pulses on 1H and 15N
 coil_stack=step(spin_system,Hx+Nx,coil_stack,-pi);
 
 % tau evolution
-coil_stack=evolution(spin_system,L,[],coil_stack,-tau,1,'final');
+coil_stack=evolution(spin_system,L',[],coil_stack,-tau,1,'final');
 
 % Pulses on 1H and 15N
 coil_stack=step(spin_system,Hx+Nx,coil_stack,-pi/2);
 
 % delta evolution
-coil_stack=evolution(spin_system,L,[],coil_stack,-delta,1,'final');
+coil_stack=evolution(spin_system,L',[],coil_stack,-delta,1,'final');
 
 % Pulses on 1H and 13CA
 coil_stack=step(spin_system,Hx+CAx,coil_stack,-pi/2);

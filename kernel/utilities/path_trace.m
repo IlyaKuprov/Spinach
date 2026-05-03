@@ -166,10 +166,15 @@ else
         new_projectors{n}=[projectors{bins{n}}];
     end
     projectors=new_projectors;
+
+    % Extract and sort dimensions
+    dims=cellfun(@(x)size(x,2),projectors);
+    dims=sort(dims,'ascend'); 
     
-    % Report to the user
-    for n=1:numel(projectors)
-        report(spin_system,['working subspace ' num2str(n) ', dimension '  num2str(size(projectors{n},2))]);
+    % Report the dimensions
+    for n=1:numel(dims)
+        report(spin_system,['working subspace ' int2str(n) ...
+                            ', dim '  int2str(dims(n))]);
     end
     
 end

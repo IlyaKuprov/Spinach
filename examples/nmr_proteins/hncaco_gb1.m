@@ -29,6 +29,7 @@ bas.level=4; bas.space_level=1;
 
 % Algorithmic options
 sys.enable={'greedy'}; % 'gpu'
+sys.disable={'krylov'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

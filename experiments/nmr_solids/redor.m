@@ -1,8 +1,10 @@
 % Rotational-echo double-resonance (REDOR) experiment with ideal
-% hard pi pulses on the dephasing channel. The sequence reports the
-% full rotational echo, the dephased echo, and their difference as a
-% function of the number of rotor cycles. To be called from singlerot
-% context. Further information in:
+% hard pi pulses. The observed channel is refocused once per rotor
+% period, and the dephasing channel is pulsed at rotor-period
+% boundaries. The sequence reports the full rotational echo, the
+% dephased echo, and their difference as a function of the number of
+% rotor cycles. To be called from singlerot context. Further
+% information in:
 %
 %                 https://doi.org/10.1016/0022-2364(89)90280-1
 %                 https://doi.org/10.1006/jmre.2000.2128
@@ -33,6 +35,10 @@
 %                              during REDOR evolution, supplied as
 %                              a cell array of isotope strings
 %
+%    parameters.refocus_phase - phase of the observed-channel pi
+%                              refocusing pulses, radians; defaults
+%                              to 0
+%
 %    parameters.pulse_phase  - phases of the dephasing-channel pi
 %                              pulses, radians; the vector is cycled
 %                              through the pulse train, and defaults
@@ -46,12 +52,12 @@
 %
 % Outputs:
 %
-%    redor_curve(1,:)        - full echo S0, without dephasing
-%                              pulses
+%    redor_curve(1,:)        - full echo S0, with observed-channel
+%                              refocusing pulses only
 %
-%    redor_curve(2,:)        - dephased echo S, with pi pulses every
-%                              half rotor period on the dephasing
-%                              channel
+%    redor_curve(2,:)        - dephased echo S, with observed-channel
+%                              refocusing and dephasing-channel pi
+%                              pulses
 %
 %    redor_curve(3,:)        - REDOR difference, S0-S
 %
@@ -66,7 +72,12 @@ if ~isfield(parameters,'decouple')
     parameters.decouple={};
 end
 
-% Set default pulse phases
+% Set default refocusing phase
+if ~isfield(parameters,'refocus_phase')
+    parameters.refocus_phase=0;
+end
+
+% Set default dephasing pulse phases
 if ~isfield(parameters,'pulse_phase')
     parameters.pulse_phase=[0 pi/2];
 end
@@ -79,6 +90,13 @@ L=H+1i*R+1i*K;
 
 % Apply analytical decoupling if requested
 [L,rho0]=decouple(spin_system,L,parameters.rho0,parameters.decouple);
+
+% Get observed-channel refocusing operator
+Ip=operator(spin_system,'L+',parameters.spins{1});
+Ix=(Ip+Ip')/2; Iy=(Ip-Ip')/2i;
+ref_oper=cos(parameters.refocus_phase)*Ix+...
+         sin(parameters.refocus_phase)*Iy;
+ref_oper=kron(speye(parameters.spc_dim),ref_oper);
 
 % Get dephasing-channel pulse operators
 Ip=operator(spin_system,'L+',parameters.spins{2});
@@ -111,21 +129,19 @@ rho_s0=rho0; rho_s=rho0; pulse_count=0;
 % Step through the requested REDOR evolution window
 for n=1:max(parameters.ncycles)
 
-    % Propagate the full rotational echo over one rotor period
-    rho_s0=step(spin_system,L,rho_s0,rotor_period);
-
-    % Propagate the dephased echo over the first half-period
+    % Propagate both echoes over the first half-period
+    rho_s0=step(spin_system,L,rho_s0,half_period);
     rho_s=step(spin_system,L,rho_s,half_period);
 
-    % Apply the first dephasing-channel pi pulse
-    pulse_count=pulse_count+1;
-    pulse_idx=mod(pulse_count-1,numel(deph_opers))+1;
-    rho_s=step(spin_system,deph_opers{pulse_idx},rho_s,pi);
+    % Refocus the observed channel
+    rho_s0=step(spin_system,ref_oper,rho_s0,pi);
+    rho_s=step(spin_system,ref_oper,rho_s,pi);
 
-    % Propagate the dephased echo over the second half-period
+    % Propagate both echoes over the second half-period
+    rho_s0=step(spin_system,L,rho_s0,half_period);
     rho_s=step(spin_system,L,rho_s,half_period);
 
-    % Apply the second dephasing-channel pi pulse
+    % Apply the dephasing-channel pi pulse to the S echo
     pulse_count=pulse_count+1;
     pulse_idx=mod(pulse_count-1,numel(deph_opers))+1;
     rho_s=step(spin_system,deph_opers{pulse_idx},rho_s,pi);
@@ -218,6 +234,10 @@ if any(~ismember(parameters.decouple,spin_system.comp.isotopes))
 end
 if any(ismember(parameters.spins,parameters.decouple))
     error('parameters.decouple must not include REDOR working spins.');
+end
+if (~isnumeric(parameters.refocus_phase))||(~isreal(parameters.refocus_phase))||...
+   (~isscalar(parameters.refocus_phase))
+    error('parameters.refocus_phase must be a real scalar.');
 end
 if (~isnumeric(parameters.pulse_phase))||(~isreal(parameters.pulse_phase))||...
    (~isrow(parameters.pulse_phase))||isempty(parameters.pulse_phase)

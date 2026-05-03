@@ -28,20 +28,21 @@ bas.connectivity='scalar_couplings';
 bas.level=4; bas.space_level=1;
 
 % Algorithmic options
-sys.enable={}; % 'gpu'
+sys.enable={'greedy'}; % 'gpu'
+sys.disable={'krylov'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Sequence parameters
+parameters.tau=[2.25e-3, 2.75e-3, 8.00e-3, 7.00e-3];
 parameters.spins={'15N','13C','1H'};
 parameters.offset=[-7100 8450 4850];
 parameters.sweep=[2500 4500 3000];
 parameters.npoints=[64 64 64];
 parameters.zerofill=[256 256 256];
 parameters.axis_units='ppm';
-parameters.tau=[2.25e-3, 2.75e-3, 8.00e-3, 7.00e-3];
 
 % Simulation
 fid=liquid(spin_system,@hncoca,parameters,'nmr');

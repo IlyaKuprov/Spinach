@@ -324,6 +324,22 @@ if ~isworkernode
                                     num2str(spin_system.sys.parprops{n}{2})]);
             end
         end
+
+        % Set up parallel resource allocation
+        if ismember('greedy',spin_system.sys.enable)
+
+            % Every worker can use every core
+            c.NumThreads=feature('numcores');
+
+        else
+
+            % Figure out the maximum reasonable per-worker core count
+            c.NumThreads=max([1 floor(feature('numcores')/spmdSize)]);
+
+        end
+
+        % Head process may use what it wants
+        maxNumCompThreads(feature('numcores'));
         
         % Start the parallel pool
         current_pool=parpool(c,spin_system.sys.parallel{2},...
@@ -332,39 +348,6 @@ if ~isworkernode
         % Disable pool timeout
         current_pool.IdleTimeout=inf;
     
-    end
-    
-    % Set up parallel resource allocation
-    warning('off','MATLAB:maxNumCompThreads:Deprecated');
-    if ismember('greedy',spin_system.sys.enable)
-        
-        % Greedy
-        spmd
-
-            % Allow every worker to use every CPU core
-            warning('off','MATLAB:maxNumCompThreads:Deprecated');
-            maxNumCompThreads(feature('numcores'));
-
-        end
-
-        % Head process can use what it wants
-        maxNumCompThreads(feature('numcores'));
-
-    else
-        
-        % Modest
-        spmd
-            
-            % Try to work out a reasonable allocation
-            warning('off','MATLAB:maxNumCompThreads:Deprecated');
-            ncores=max([1 floor(feature('numcores')/spmdSize)]);
-            maxNumCompThreads(ncores);
-
-        end
-
-        % Head process can use what it wants
-        maxNumCompThreads(feature('numcores'));
-
     end
     
 else

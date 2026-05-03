@@ -31,6 +31,7 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Sequence parameters
+parameters.tau=[2.25e-3, 2.75e-3, 8.00e-3, 7.00e-3];
 parameters.spins={'15N','13C','1H'};
 parameters.offset=[-7200 5600 4800];
 parameters.sweep=[5000 8000 5000];

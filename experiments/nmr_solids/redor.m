@@ -6,8 +6,8 @@
 % rotor cycles. To be called from singlerot context. Further
 % information in:
 %
-%                 https://doi.org/10.1016/0022-2364(89)90280-1
-%                 https://doi.org/10.1006/jmre.2000.2128
+%           https://doi.org/10.1016/0022-2364(89)90280-1
+%             https://doi.org/10.1006/jmre.2000.2128
 %
 % Syntax:
 %

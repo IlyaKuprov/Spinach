@@ -33,8 +33,8 @@ parameters.spins={'13C','15N'};
 parameters.rate=10000;
 parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=9;
-parameters.grid='leb_2ang_rank_11';
-parameters.ncycles=0:2:24;
+parameters.grid='leb_2ang_rank_23';
+parameters.ncycles=0:48;
 parameters.rho0=state(spin_system,'Lx','13C');
 parameters.coil=state(spin_system,'Lx','13C');
 parameters.verbose=0;
@@ -46,9 +46,9 @@ curve=singlerot(spin_system,@redor,parameters,'nmr');
 redor_diff=real(curve(3,:)./curve(1,:));
 
 % Plotting
-kfigure(); plot(parameters.ncycles,redor_diff,'o-'); kgrid;
+kfigure(); plot(parameters.ncycles,redor_diff); 
 kxlabel('REDOR evolution time, rotor cycles');
-kylabel('$\Delta S/S_0$'); xlim tight;
+kylabel('$\Delta S/S_0$'); kgrid; xlim tight;
 
 end
 

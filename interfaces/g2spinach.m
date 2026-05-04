@@ -37,7 +37,10 @@
 %                  B3LYP/6-31G*        188.5603  29.1952 
 %                  B3LYP/6-311+G(2d,p) 182.1386  31.7788 
 %                  HF/6-31G*           196.8670  29.5517 
-%                  HF/6-311+G(2d,p)    192.5701  31.5989 
+%                  HF/6-311+G(2d,p)    192.5701  31.5989
+%
+%                 This setting is ignored when electrons are
+%                 present in the system.
 %
 %     options.min_j    -  scalar coupling threshold in Hz. J-coup-
 %                         lings smaller than this value will be 
@@ -140,9 +143,11 @@ switch ismember('E',[particles{:}])
         % Electron coordinates should be treated as unknown
         if include_xyz, inter.coordinates{end+1}=[]; end
         
-        % All Zeeman tensors are zero except for the g-tensor of the electron
+        % All Zeeman tensors are zero except for electron g-tensor
         inter.zeeman.matrix=cell(1,nspins);
         inter.zeeman.matrix{nspins}=props.g_tensor.matrix;
+        disp('WARNING: nuclear chemical shifts were set to zero.');
+        disp('WARNING: offset specification has been ignored.');
         
         % All couplings are zero except for the hyperfine couplings to the electron
         inter.coupling.matrix=mat2cell(zeros(3*nspins,3*nspins),3*ones(nspins,1),3*ones(nspins,1));

@@ -28,7 +28,7 @@
 %       the left, hence the operand order in D*chi
 %
 % ilya.kuprov@weizmann.ac.il
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=xyz2pms.m>
 

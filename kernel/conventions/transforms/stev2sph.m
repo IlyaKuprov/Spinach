@@ -24,7 +24,7 @@
 %           tensor operators, in decreasing order
 %           of projections
 %
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=stev2sph.m>

@@ -19,7 +19,7 @@
 %   parameters.nstates - number of lowest energy states
 %                        to solve for
 %
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=fieldscan_enlev.m>

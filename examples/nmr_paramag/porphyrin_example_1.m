@@ -3,7 +3,7 @@
 %
 % http://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis
 %
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 
 function porphyrin_example_1()
 

@@ -21,7 +21,7 @@
 %       cients. Only ranks smaller or equal to 12 are available.
 %
 % ilya.kuprov@weizmann.ac.il
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=stevens.m>
 

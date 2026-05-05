@@ -42,7 +42,7 @@
 %                 each of the nuclei.
 %
 % ilya.kuprov@weizmann.ac.il
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=lpcs.m>
 

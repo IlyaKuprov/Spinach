@@ -9,7 +9,7 @@
 %
 % Calculation time: hours
 %
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 % ilya.kuprov@weizmann.ac.il
 
 function triple_dy_eqmag_field()
@@ -105,12 +105,16 @@ parameters.grid='leb_2ang_rank_11';
 % Temperature in Kelvin
 inter.temperature=2.0;
 
+% Plot the experimental data
+load('triple_dy_eqmag.mat','field','magn');
+kfigure(); plot(field,magn,'b-'); hold on;
+kgrid; box on; xlim tight; ylim padded; 
+kylabel('Magnetisation, Bohr magneton');
+kxlabel('Magnetic field, Tesla'); drawnow();
+
 % Magnetic field range, Tesla
 B0=[0.01 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 ...
     0.9 1.0 1.1 1.2 1.3 1.4 1.5 2 3 4 5 6];
-
-% Preallocate the answer
-Mz=nan(size(B0)); kfigure();
 
 % Scan magnetic field
 for n=1:numel(B0)
@@ -125,20 +129,14 @@ for n=1:numel(B0)
     % Compute equilibrium magnetisation
     mag=eqmag(spin_system,parameters);
     
-    % Take the Z component
-    Mz(n)=mag(3);
-    
-    % Do the plotting (theory)
-    plot(B0,Mz); hold on;
-    kxlabel('Magnetic field, Tesla');
-    kylabel('Magnetisation, Bohr magneton');
-    
-    % Do the plotting (experiment)
-    load('triple_dy_eqmag.mat','field','magn');
-    plot(field,magn,'o'); hold off; 
-    kgrid; box on; axis tight; drawnow();
+    % Plot the Z component
+    plot(B0(n),mag(3),'ro'); drawnow;
     
 end
+
+% Add the legend
+klegend({'experiment','simulation'},...
+         'Location','SouthEast');
 
 end
 

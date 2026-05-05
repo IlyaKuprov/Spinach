@@ -3,7 +3,7 @@
 %
 % Calculation time: seconds
 %
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 % ilya.kuprov@weizmann.ac.il
 
 function dy_lft_single_1()

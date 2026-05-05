@@ -8,10 +8,10 @@
 %
 % Calculation time: hours
 %
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 % ilya.kuprov@weizmann.ac.il
 
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 
 function triple_dy_levels()
 

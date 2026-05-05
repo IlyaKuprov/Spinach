@@ -7,7 +7,7 @@
 %
 % http://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis
 %
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 % daniel.haeussinger@unibas.ch
 % kaspar.zimmermann@unibas.ch
 % maxim.yulikov@phys.chem.ethz.ch

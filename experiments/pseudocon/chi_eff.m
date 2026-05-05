@@ -26,7 +26,7 @@
 %                the optimised mxyz and chi, ppm.
 %
 % ilya.kuprov@weizmann.ac.il
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=chi_eff.m>
 

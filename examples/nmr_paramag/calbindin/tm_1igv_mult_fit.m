@@ -4,7 +4,7 @@
 % an National University).
 %
 % ilya.kuprov@weizmann.ac.il
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 
 function tm_1igv_mult_fit()
 

@@ -9,7 +9,7 @@
 %
 % Calculation time: minutes
 %
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 
 function point_vs_distr()
 

@@ -29,7 +29,7 @@
 %
 % Note: this function requires Hilbert space formalism.
 %
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=fieldscan_magn.m>

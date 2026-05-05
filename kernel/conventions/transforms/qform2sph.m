@@ -19,7 +19,7 @@
 %                decreasing m index of Ylm
 %
 % ilya.kuprov@weizmann.ac.il
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=qform2sph.m>
 

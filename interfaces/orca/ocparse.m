@@ -23,7 +23,7 @@
 %    dx,dy,dz - grid steps in the three directions, Angstrom
 %
 % Ilya Kuprov (ilya.kuprov@weizmann.ac.il)
-% Elizaveta Suturina( e.suturina@soton.ac.uk)
+% Elizaveta Suturina( e.suturina@bath.ac.uk)
 % Petra Pikulova (484677@mail.muni.cz)
 %
 % <https://spindynamics.org/wiki/index.php?title=ocparse.m>

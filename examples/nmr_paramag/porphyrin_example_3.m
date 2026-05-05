@@ -9,7 +9,7 @@
 %
 % Calculation time: minutes, 64GB of RAM required
 %
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 
 function porphyrin_example_3()
 

@@ -22,7 +22,7 @@
 % Note: Mehring convention has Z as the largest eigenvalue, and X as 
 %       the smallest eigenvalue, this includes signs.
 %
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=tsm2param.m>

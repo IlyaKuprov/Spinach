@@ -34,9 +34,9 @@
 %       essential for a successful fit.
 % 
 % ilya.kuprov@weizmann.ac.il
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 %
-% <https://spindynamics.org/wiki/index.php?title=Ippcs.m>
+% <https://spindynamics.org/wiki/index.php?title=ippcs.m>
 
 function [mxyz,chi,pred_pcs,s_mxyz,s_chi]=ippcs(nxyz,mguess,expt_pcs)
 

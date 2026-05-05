@@ -29,7 +29,7 @@
 %       function see http://dx.doi.org/10.1039/C4CP03106G
 %
 % ilya.kuprov@weizmann.ac.il
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=kpcs.m>
 

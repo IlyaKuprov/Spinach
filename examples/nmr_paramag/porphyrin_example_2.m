@@ -7,7 +7,7 @@
 %
 %                  http://dx.doi.org/10.1039/c6cp05437d
 %
-% e.suturina@soton.ac.uk
+% e.suturina@bath.ac.uk
 
 function porphyrin_example_2()
 

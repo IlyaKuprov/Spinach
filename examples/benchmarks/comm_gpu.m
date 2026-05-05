@@ -88,7 +88,7 @@ kylabel('Transfer bandwidth (GB/s)');
 subplot(1,2,2); hold on; kgrid; box on;
 plot(sizes,memory_bandwidth_gpu,'bo',...
      sizes,memory_bandwidth_host,'ro');
-klegend('On GPU','On Host','Location','NorthWest')
+klegend('On GPU','On Host','Location','NorthWest');
 set(gca,'XScale','log','YScale','log'); 
 kxlabel('Array size (bytes)'); kylabel('Bandwidth (GB/s)'); 
 scale_figure([1.5 0.75]); drawnow();

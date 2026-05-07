@@ -49,6 +49,9 @@ end
 if ~exist([matlabroot filesep 'toolbox' filesep 'map'],'dir')
     error('Spinach requires Mapping Toolbox.');
 end
+if ~exist([matlabroot filesep 'toolbox' filesep 'aero'],'dir')
+    error('Spinach requires Aerospace Toolbox.');
+end
 
 % List top level directories
 top_level={'kernel','interfaces','experiments','etc'};

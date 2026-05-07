@@ -102,4 +102,8 @@ for n=1:nargin
 end
 end
 
-% Knowledge is only useful when it has somewhere to live.
+% Hopeless? It's not hopeless.
+% Doubtful, but not hopeless.
+%
+% A-ha
+

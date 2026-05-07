@@ -21,6 +21,10 @@ sys.isotopes={'E16','E16','E16'};
 % g-tensor eigenvalues
 g_eigs=[1.325781502 1.322640525 1.317917615];
 
+% Spin-orbit corrections
+% to the DD couplings
+sys.enable={'sodd'};
+
 % g-tensor eigenvectors
 U3=[ -0.507708  0.520032  0.686877
      -0.589399  0.371842 -0.717177

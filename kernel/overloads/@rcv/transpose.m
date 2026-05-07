@@ -22,6 +22,9 @@ grumble(A);
 % Efficiently swap rows and columns
 [A.col,A.row]=deal(A.row,A.col);
 
+% Update row and column dimension information
+[A.numCols,A.numRows]=deal(A.numRows,A.numCols);
+
 end
 
 % Consistency enforcement

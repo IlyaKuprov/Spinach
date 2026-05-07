@@ -67,7 +67,7 @@ end
 % Consistency enforcement
 function grumble(Op,v0,niter)
 if ~isa(Op,'function_handle')
-    errror('Op must be a function handle.');
+    error('Op must be a function handle.');
 end
 if (~isnumeric(v0))||(~iscolumn(v0))
     error('v0 must be a column vector');

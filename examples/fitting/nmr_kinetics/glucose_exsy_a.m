@@ -32,9 +32,6 @@ answer=fminsearch(@exsy_err,guess,options);
 % Display the result
 disp(answer);
 
-% Save figure
-try_to_savefig(gcf,'glucose_exsy_a.fig');
-
 end
 
 function err=exsy_err(params)

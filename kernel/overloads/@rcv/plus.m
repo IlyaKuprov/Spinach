@@ -13,6 +13,7 @@
 %    C  - sum A+B, RCV sparse matrix
 %
 % m.keitel@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/plus.m>
 
@@ -21,22 +22,24 @@ function C=plus(A,B)
 % Check consistency
 grumble(A,B);
 
-% Add a scalar to an RCV sparse matrix
+% Process the special cases
 if isa(A,'rcv')&&isscalar(B)&&isnumeric(B)
 
-    A.val=A.val+B; C=A;
+    % Explain the refusal to add a scalar to an RCV object
+    error('adding a scalar makes a matrix non-sparse; inflate manually first.');
 
 % Add a scalar to an RCV sparse matrix
 elseif isa(B,'rcv')&&isscalar(A)&&isnumeric(A)
     
-    B.val=B.val+A; C=B;
+    % Explain the refusal to add a scalar to an RCV object
+    error('adding a scalar makes a matrix non-sparse; inflate manually first.');
 
 % Add two RCV sparse matrices
 elseif isa(A,'rcv')&&isa(B,'rcv')
 
     % Check for dimension match
     if A.numRows~=B.numRows||A.numCols~=B.numCols
-        error('matrix sizes must match for addition.');
+        error('matrix sizes must match.');
     end
 
     % Align locations
@@ -55,7 +58,7 @@ elseif isa(A,'rcv')&&issparse(B)
 
     % Check for dimension match
     if A.numRows~=size(B,1)||A.numCols~=size(B,2)
-        error('matrix sizes must match for addition.');
+        error('matrix sizes must match.');
     end
 
     % Recursive call
@@ -65,7 +68,7 @@ elseif isa(B,'rcv')&&issparse(A)
 
     % Check for dimension match
     if B.numRows~=size(A,1)||B.numCols~=size(A,2)
-        error('matrix sizes must match for addition.');
+        error('matrix sizes must match.');
     end
 
     % Recursive call

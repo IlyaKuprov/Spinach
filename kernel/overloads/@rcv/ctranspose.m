@@ -22,7 +22,10 @@ grumble(A);
 % Efficiently swap rows and columns
 [A.col,A.row]=deal(A.row,A.col);
 
-% Conjugate the values
+% Update row and column dimension information
+[A.numCols,A.numRows]=deal(A.numRows,A.numCols);
+
+% Conjugate values
 A.val=conj(A.val);
 
 end

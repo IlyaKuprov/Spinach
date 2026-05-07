@@ -127,6 +127,7 @@ parameters.nstates=64;
 kfigure(); plot(fields,z_magn); 
 kxlabel('Magnetic field, Tesla');
 kylabel('Magnetisation'); kgrid;
+xlim tight; ylim padded;
 
 end
 

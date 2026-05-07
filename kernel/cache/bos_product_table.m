@@ -61,7 +61,7 @@ else
         norms(n)=sqrt(hdot(B{n},B{n}));
     end
     
-    % Preallocate IST product tables
+    % Preallocate OBM product tables
     product_table_left= zeros(nlevels^2,nlevels^2,nlevels^2);
     product_table_right=zeros(nlevels^2,nlevels^2,nlevels^2);
 

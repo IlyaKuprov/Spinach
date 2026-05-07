@@ -79,7 +79,7 @@ for n=1:chem_nsteps
     end
 
     % Assemble the evolution generator
-    G=1i*spblkdiag(GK)+1i*kron(GF,speye(5));
+    G=1i*sp_block_diag(GK)+1i*kron(GF,speye(5));
 
     % Take the time step
     c_curr=chem_traj(:,:,n); c_curr=c_curr(:);

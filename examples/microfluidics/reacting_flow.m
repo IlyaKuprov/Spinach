@@ -64,7 +64,7 @@ for n=1:npoints
     end
 
     % Assemble the evolution generator
-    G=1i*spblkdiag(GK)+1i*kron(GF,speye(5));
+    G=1i*sp_block_diag(GK)+1i*kron(GF,speye(5));
 
     % Take the time step
     x_curr=traj(:,:,n); x_curr=x_curr(:);

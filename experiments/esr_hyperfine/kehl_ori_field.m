@@ -160,12 +160,14 @@ function EPR=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,para
             % CS ENDOR
             CS_zz=zeros(1,Ni_ENDOR);
             if spinSys("CS_used")==true
-                CS_zz(m)=(sin(theta))^2*(cos(phi))^2*CS(3*m-2,1)...
+                for m=1:Ni_ENDOR
+                    CS_zz(m)=(sin(theta))^2*(cos(phi))^2*CS(3*m-2,1)...
 +(sin(theta))^2*(sin(phi))^2*CS(3*m-1,2)...
 +(cos(theta))^2*CS(3*m,3)...
 +2*(sin(theta))^2*sin(phi)*cos(phi)*CS(3*m-2,2)...
 +2*sin(theta)*cos(theta)*cos(phi)*CS(3*m-2,3)...
 +2*sin(theta)*cos(theta)*sin(phi)*CS(3*m-1,3);
+                end
             end
 
             % dipolar SSC ENDOR
@@ -285,6 +287,8 @@ function EPR=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,para
         NQI=zeros(Ni_ENDOR,3,3);
 
 
+        CS_zz=zeros(1,Ni_ENDOR);
+
         for m=1:Ni_ENDOR
 
             HF_zz(m)=A(3*m,3);
@@ -299,7 +303,6 @@ function EPR=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,para
             end
 
             % CS ENDOR
-            CS_zz=zeros(1,Ni_ENDOR);
             if spinSys("CS_used")==true
                 CS_zz(m)=CS(3*m,3);
             end

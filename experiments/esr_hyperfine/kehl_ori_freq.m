@@ -40,6 +40,9 @@ function EPR=kehl_ori_freq(constants,spinSys,spinOps,paramsEPR,paramsENDOR,param
         IyEPR=spinOpsEPR("Iy");
     else
         Ni_EPR=0;
+        spinOpsEPR=kehl_spin_ops(spinSys("S"),zeros(0,1),0,1);
+        SzEPR=spinOpsEPR("Sz");
+        SxEPR=spinOpsEPR("Sx");
     end
     if spinSys("CS_used")==true
         CS=spinSys("CS");
@@ -223,15 +226,15 @@ function EPR=kehl_ori_freq(constants,spinSys,spinOps,paramsEPR,paramsENDOR,param
                    for mm=1:Ni_EPR
                         H_NZ_EPR=H_NZ_EPR+g_N_EPR(mm)*IzEPR{mm};
                         H_HF_EPR=H_HF_EPR+IzEPR{mm}*HF_EPR(3,3,mm)*SzEPR+IxEPR{mm}*(HF_EPR(1,3,mm)^2+HF_EPR(2,3,mm)^2)^0.5*SzEPR;
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(1,1,m)*IxEPR{mm}*IxEPR{mm};
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(1,2,m)*IxEPR{mm}*IyEPR{mm};
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(1,3,m)*IxEPR{mm}*IzEPR{mm};
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(2,1,m)*IyEPR{mm}*IxEPR{mm};
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(2,2,m)*IyEPR{mm}*IyEPR{mm};
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(2,3,m)*IyEPR{mm}*IzEPR{mm};
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(3,1,m)*IzEPR{mm}*IxEPR{mm};
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(3,2,m)*IzEPR{mm}*IyEPR{mm};
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(3,3,m)*IzEPR{mm}*IzEPR{mm};
+                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(1,1,mm)*IxEPR{mm}*IxEPR{mm};
+                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(1,2,mm)*IxEPR{mm}*IyEPR{mm};
+                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(1,3,mm)*IxEPR{mm}*IzEPR{mm};
+                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(2,1,mm)*IyEPR{mm}*IxEPR{mm};
+                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(2,2,mm)*IyEPR{mm}*IyEPR{mm};
+                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(2,3,mm)*IyEPR{mm}*IzEPR{mm};
+                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(3,1,mm)*IzEPR{mm}*IxEPR{mm};
+                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(3,2,mm)*IzEPR{mm}*IyEPR{mm};
+                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(3,3,mm)*IzEPR{mm}*IzEPR{mm};
                    end
                end
 
@@ -249,6 +252,8 @@ function EPR=kehl_ori_freq(constants,spinSys,spinOps,paramsEPR,paramsENDOR,param
 
 
                % Calculate transitions between all elements
+                trans_prob_EPR=[];
+                freq_EPR=[];
                 q=1;
                 for x=1:length(V_EPR)
                     for y=x+1:length(V_EPR)
@@ -338,6 +343,8 @@ function EPR=kehl_ori_freq(constants,spinSys,spinOps,paramsEPR,paramsENDOR,param
         NQI=zeros(Ni_ENDOR,3,3);
 
 
+        CS_zz=zeros(1,Ni_ENDOR);
+
         for m=1:Ni_ENDOR
 
             HF_zz(m)=A(3*m,3);
@@ -352,7 +359,6 @@ function EPR=kehl_ori_freq(constants,spinSys,spinOps,paramsEPR,paramsENDOR,param
             end
 
             % CS ENDOR
-            CS_zz=zeros(1,Ni_ENDOR);
             if spinSys("CS_used")==true
                 CS_zz(m)=CS(3*m,3);
             end

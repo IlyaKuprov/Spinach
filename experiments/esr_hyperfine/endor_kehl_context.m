@@ -2147,7 +2147,7 @@ function endor_amp=kehl_mims_rlx(spin_system,parameters)
                     value_Sy=0;
                     for b=1
                        rho=U9*rho;
-                       rho_f=kehl_lket_to_mat(rho);
+                       rho_f=reshape(rho,sqrt(size(rho,1)),sqrt(size(rho,1)));
                        value_Sy=value_Sy+(real(trace(rho_f*Sy)));
                     end
                     endor_amp_tmp(a)=endor_amp_tmp(a)+(value_Sy*S/(Nint*size(offsets,2)));
@@ -2839,7 +2839,7 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
 
                 value_Sy=0;
                 for b=1
-                   rho_f=kehl_lket_to_mat(rho);
+                   rho_f=reshape(rho,sqrt(size(rho,1)),sqrt(size(rho,1)));
                    value_Sy=value_Sy+(real(trace(rho_f*Sy)));
                 end
 
@@ -3466,7 +3466,7 @@ function endor_amp=kehl_davies_rlx(spin_system,parameters)
                 value_Sy=0;
                 for b=1:Nint
                    rho=U9*rho;
-                   rho_f=kehl_lket_to_mat(rho);
+                   rho_f=reshape(rho,sqrt(size(rho,1)),sqrt(size(rho,1)));
                    value_Sy=value_Sy+real(trace(rho_f*Sy));
                 end
 
@@ -4133,10 +4133,10 @@ function endor_amp=kehl_spinlock_rlx(spin_system,parameters)
 
                 rho=hilb2liouv(rho0,'statevec');
 
-                rho_t=W*kehl_lket_to_mat(rho)*W^(-1);
+                rho_t=W*reshape(rho,sqrt(size(rho,1)),sqrt(size(rho,1)))*W^(-1);
                 rho_t=hilb2liouv(rho_t,'statevec');
                 rho_t=U1*rho_t;
-                rho=V*kehl_lket_to_mat(rho_t)*V^(-1);
+                rho=V*reshape(rho_t,sqrt(size(rho_t,1)),sqrt(size(rho_t,1)))*V^(-1);
                 rho=hilb2liouv(rho,'statevec');
 
                 % rho = U1*rho;
@@ -4152,7 +4152,7 @@ function endor_amp=kehl_spinlock_rlx(spin_system,parameters)
                 value_Sy=0;
                 for b=1:Nint
                    rho=U9*rho;
-                   rho_f=kehl_lket_to_mat(rho);
+                   rho_f=reshape(rho,sqrt(size(rho,1)),sqrt(size(rho,1)));
                    value_Sy=value_Sy+real(trace(rho_f*Sy));
                 end
 
@@ -4724,7 +4724,7 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
                 value_Sy=0;
                 for b=1
                    rho=U2*rho;
-                   rho_f=kehl_lket_to_mat(rho);
+                   rho_f=reshape(rho,sqrt(size(rho,1)),sqrt(size(rho,1)));
                    value_Sy=value_Sy+(real(trace(rho_f*Sz*Iz{1})));
                 end
                 if parameters.temp_eff==true
@@ -5393,10 +5393,10 @@ function endor_amp=kehl_cp_calc_rlx(spin_system,parameters)
                 rho=U1*rho;
                 rho=U2*rho;
 
-                rho_t=W*kehl_lket_to_mat(rho)*W^(-1);
+                rho_t=W*reshape(rho,sqrt(size(rho,1)),sqrt(size(rho,1)))*W^(-1);
                 rho_t=hilb2liouv(rho_t,'statevec');
                 rho_t=U3*rho_t;
-                rho=V*kehl_lket_to_mat(rho_t)*V^(-1);
+                rho=V*reshape(rho_t,sqrt(size(rho_t,1)),sqrt(size(rho_t,1)))*V^(-1);
                 rho=hilb2liouv(rho,'statevec');
 
                 rho=U4*rho;
@@ -5410,7 +5410,7 @@ function endor_amp=kehl_cp_calc_rlx(spin_system,parameters)
                 value_Sy=0;
                 for b=1:Nint
                    rho=U11*rho;
-                   rho_f=kehl_lket_to_mat(rho);
+                   rho_f=reshape(rho,sqrt(size(rho,1)),sqrt(size(rho,1)));
                    value_Sy=value_Sy+real(trace(rho_f*Sy));
                 end
                     endor_amp(a)=endor_amp(a)+(value_Sy*S/(Nint*size(offsets,2)));

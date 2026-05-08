@@ -111,7 +111,14 @@ function isotopes=legacy_isotopes(S,I,Nuclei,N_Nuclei,N_SpinSys)
 
     for n=1:N_Nuclei
         if numel(Nuclei)>=n
-            isotopes{n+1}=kehl_spin_label(Nuclei{n});
+            isotope=Nuclei{n};
+            if isstring(isotope)
+                isotope=char(isotope);
+            end
+            if strcmp(isotope,'2D')
+                isotope='2H';
+            end
+            isotopes{n+1}=isotope;
         else
             isotopes{n+1}=nucleus_label(I(n));
         end

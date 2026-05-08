@@ -212,7 +212,10 @@ function spinSys=context_spin_system(spin_system,parameters)
         EPR_Q_used=false;
         for n=1:n_epr
             spin_idx=epr_spins(n);
-            g_N_EPR(n)=kehl_nuc_gamma(isotopes{spin_idx});
+
+            % Convert Spinach magnetogyric ratio to Hz/T
+            [gamma,~]=spin(isotopes{spin_idx});
+            g_N_EPR(n)=gamma/(2*pi);
             A_EPR(3*n-2:3*n,:)=coupling_matrix(spin_system,electron_idx,spin_idx);
             Q_block=coupling_matrix(spin_system,spin_idx,spin_idx);
             Q_EPR(3*n-2:3*n,:)=Q_block;
@@ -713,7 +716,10 @@ function paramsENDOR=kehl_prep_time(spin_system,parameters)
     Nuclei=spinSys("Nuclei");
     v_L=zeros(size(Nuclei,2),1);
     for i=1:size(Nuclei,2)
-        v_L(i)=kehl_nuc_gamma(Nuclei{i})*expt("Field");
+
+        % Convert Spinach magnetogyric ratio to Hz/T
+        [gamma,~]=spin(Nuclei{i});
+        v_L(i)=gamma*expt("Field")/(2*pi);
     end
 
     % number of points and values for x-axis
@@ -771,7 +777,10 @@ function paramsENDOR=kehl_prep_endor(spin_system,parameters)
     Nuclei=spinSys("Nuclei");
     v_L=zeros(size(Nuclei,2),1);
     for i=1:size(Nuclei,2)
-        v_L(i)=kehl_nuc_gamma(Nuclei{i})*expt("Field");
+
+        % Convert Spinach magnetogyric ratio to Hz/T
+        [gamma,~]=spin(Nuclei{i});
+        v_L(i)=gamma*expt("Field")/(2*pi);
     end
 
     % number of points and values for x-axis

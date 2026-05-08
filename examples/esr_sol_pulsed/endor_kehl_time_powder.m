@@ -61,7 +61,7 @@ parameters.Nang=50;
 parameters.endor_spins=[2,3,4];
 
 % Actual ENDOR calculation through Spinach-style context and experiment
-[endor_amp,~,x_coords,~]=endor_kehl_context(spin_system,'time',parameters,'labframe');
+[endor_amp,~,x_coords,~]=endor_kehl_context(spin_system,@endor_kehl_time,parameters,'labframe');
 
 % Plotting
 sim=endor_amp(:)-endor_amp(1);

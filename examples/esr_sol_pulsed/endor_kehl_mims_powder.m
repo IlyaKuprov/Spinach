@@ -6,9 +6,6 @@
 
 function endor_kehl_mims_powder()
 
-% Define constants
-constants=kehl_constants();
-
 % Spinach spin-system constructor input
 T=0.066;
 D=6.5;
@@ -48,17 +45,22 @@ bas.approximation='none';
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Experiment parameters
-expt=kehl_exp_create(33.7727,12052.1,0.5,0.001,0.3,...
-                      [12,2000,12,1000,200000,1000,12]);
-expt=kehl_mims_fields(constants,expt,true,[0,0]);
-expt=kehl_exp_freq(expt,32,3,0.001);
-expt=kehl_exp_angle(expt,163);
-expt=kehl_exp_pulse(expt,...
-    fullfile(fileparts(mfilename('fullpath')),'kehl_mlr09_12ns_pulse.txt'),false);
-
 % ENDOR context metadata and simulation parameters
 parameters.inter=inter;
+parameters.mw_freq_ghz=33.7727;
+parameters.static_field_g=12052.1;
+parameters.field_step_g=0.5;
+parameters.endor_res_mhz=0.001;
+parameters.endor_range_mhz=0.3;
+parameters.pulse_times_ns=[12,2000,12,1000,200000,1000,12];
+parameters.rf_field_from_pulses=true;
+parameters.epr_freq_min_ghz=32;
+parameters.epr_freq_range_ghz=3;
+parameters.epr_freq_step_ghz=0.001;
+parameters.rf_flip_angle_deg=163;
+parameters.pulse_file=fullfile(fileparts(mfilename('fullpath')),...
+                               'kehl_mlr09_12ns_pulse.txt');
+parameters.multipulses=false;
 parameters.freqDomain=true;
 parameters.powder=true;
 parameters.Nang=50;
@@ -69,7 +71,6 @@ parameters.epr_spins=5;
 parameters.epr_quadrupole_matrix=diag([1.2,0.54,-1.7]*1e6);
 parameters.n_spin_systems=1;
 parameters.dipolar_pairs=[2,3;2,4];
-parameters.expt=expt;
 
 % Actual ENDOR calculation through Spinach-style context and experiment
 [endor_amp,endor_amp_conv,x_coords,v_L]=endor_kehl_context(spin_system,@endor_kehl_mims,parameters,'labframe'); %#ok<ASGLU>

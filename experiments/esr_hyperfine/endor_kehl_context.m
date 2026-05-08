@@ -1,10 +1,11 @@
 %ENDOR_KEHL_CONTEXT Spinach-style ENDOR context for the Kehl pulse sequences.
 %
 %   [ENDOR,ENDOR_LB,X,V]=ENDOR_KEHL_CONTEXT(SPIN_SYSTEM,PULSE_SEQUENCE,...
-%   PARAMETERS,ASSUMPTIONS) prepares the Spinach-backed spin operators,
-%   EPR orientation selection, ENDOR sweep axes, and line broadening, then
-%   calls a pulse sequence function with Spinach's standard
-%   (spin_system,parameters,H,R,K) experiment signature.
+%   PARAMETERS,ASSUMPTIONS) builds Kehl experimental parameters from the
+%   physical fields in PARAMETERS, prepares the Spinach-backed spin
+%   operators, EPR orientation selection, ENDOR sweep axes, and line
+%   broadening, then calls a pulse sequence function with Spinach's
+%   standard (spin_system,parameters,H,R,K) experiment signature.
 %
 %   For CP ENDOR, the return signature is
 %   [ENDOR,ENDOR_LB,X,Y,V].
@@ -15,14 +16,17 @@ if nargin<4
     assumptions='labframe';
 end
 
-% Check consistency
-grumble(spin_system,pulse_sequence,parameters,assumptions);
+% Set default simulation parameters
 parameters=kehl_defaults(parameters);
 
+% Check consistency
+grumble(spin_system,pulse_sequence,parameters,assumptions);
+
+% Build legacy Kehl data structures from Spinach parameters
 constants=kehl_constants();
+expt=context_experiment(parameters,constants,pulse_sequence);
 spinSys=context_spin_system(spin_system,parameters,constants);
 spinOps=kehl_spin_ops(spin_system,parameters.endor_spins,spinSys('N_SpinSys'));
-expt=parameters.expt;
 
 if nargin>=4 && ~isempty(assumptions)
     spin_system=assume(spin_system,assumptions);
@@ -211,6 +215,80 @@ function [y_coords,localpar]=cp_axis(localpar)
     localpar.expt=expt;
 end
 
+function expt=context_experiment(parameters,constants,pulse_sequence)
+    % Create the primary experiment parameter map
+    expt=kehl_exp_create(parameters.mw_freq_ghz,parameters.static_field_g,...
+                         parameters.field_step_g,parameters.endor_res_mhz,...
+                         parameters.endor_range_mhz,parameters.pulse_times_ns);
+
+    % Set microwave and radiofrequency nutation fields
+    [rf_auto,rf_nutations]=rf_field_spec(parameters);
+    field_fun=context_field_fun(parameters,pulse_sequence);
+    expt=field_fun(constants,expt,rf_auto,rf_nutations);
+
+    % Set the frequency-domain EPR sweep
+    if isfield(parameters,'epr_freq_min_ghz')
+        expt=kehl_exp_freq(expt,parameters.epr_freq_min_ghz,...
+                           parameters.epr_freq_range_ghz,...
+                           parameters.epr_freq_step_ghz);
+    end
+
+    % Set the ENDOR radiofrequency pulse flip angle
+    if isfield(parameters,'rf_flip_angle_deg')
+        expt=kehl_exp_angle(expt,parameters.rf_flip_angle_deg);
+    end
+
+    % Set the shaped pulse profile file
+    if isfield(parameters,'pulse_file')
+        multipulses=false;
+        if isfield(parameters,'multipulses')
+            multipulses=parameters.multipulses;
+        end
+        expt=kehl_exp_pulse(expt,parameters.pulse_file,multipulses);
+    end
+
+    % Set the CP sweep dimension when present
+    if isfield(parameters,'cp_start_mhz')
+        expt=kehl_cp_def(expt,parameters.cp_start_mhz,...
+                         parameters.cp_npoints,parameters.cp_range_mhz);
+    end
+end
+
+function [rf_auto,rf_nutations]=rf_field_spec(parameters)
+    rf_nutations=[];
+    if isfield(parameters,'rf_nutation_freqs')
+        rf_nutations=parameters.rf_nutation_freqs;
+    end
+    if isfield(parameters,'rf_field_from_pulses')
+        rf_auto=parameters.rf_field_from_pulses;
+    else
+        rf_auto=isempty(rf_nutations);
+    end
+end
+
+function field_fun=context_field_fun(parameters,pulse_sequence)
+    if isfield(parameters,'cp') && parameters.cp==true
+        field_fun=@kehl_cp_fields;
+        return
+    end
+    if isfield(parameters,'time_domain') && parameters.time_domain==true
+        field_fun=@kehl_time_fields;
+        return
+    end
+    seq_name=func2str(pulse_sequence);
+    if contains(seq_name,'davies')
+        field_fun=@kehl_davies_fields;
+    elseif contains(seq_name,'spinlock')
+        field_fun=@kehl_spinlock_fields;
+    elseif contains(seq_name,'tensor')
+        field_fun=@kehl_tensor_fields;
+    elseif contains(seq_name,'cp')
+        field_fun=@kehl_cp_fields;
+    else
+        field_fun=@kehl_mims_fields;
+    end
+end
+
 function M=zeeman_matrix(inter,spin_idx)
     M=zeros(3,3);
     if isfield(inter,'zeeman') && isfield(inter.zeeman,'matrix')
@@ -300,8 +378,45 @@ end
 if ~isfield(parameters,'endor_spins')
     error('parameters.endor_spins must list ENDOR nuclei by Spinach spin index.');
 end
-if ~isfield(parameters,'expt')
-    error('parameters.expt must contain the experiment parameter Map.');
+if ~isfield(parameters,'mw_freq_ghz')
+    error('parameters.mw_freq_ghz must be specified.');
+end
+if ~isfield(parameters,'static_field_g')
+    error('parameters.static_field_g must be specified.');
+end
+if ~isfield(parameters,'field_step_g')
+    error('parameters.field_step_g must be specified.');
+end
+if ~isfield(parameters,'endor_res_mhz')
+    error('parameters.endor_res_mhz must be specified.');
+end
+if ~isfield(parameters,'endor_range_mhz')
+    error('parameters.endor_range_mhz must be specified.');
+end
+if ~isfield(parameters,'pulse_times_ns')
+    error('parameters.pulse_times_ns must be specified.');
+end
+if parameters.freqDomain==true
+    if ~isfield(parameters,'epr_freq_min_ghz')
+        error('parameters.epr_freq_min_ghz must be specified for frequency-domain EPR.');
+    end
+    if ~isfield(parameters,'epr_freq_range_ghz')
+        error('parameters.epr_freq_range_ghz must be specified for frequency-domain EPR.');
+    end
+    if ~isfield(parameters,'epr_freq_step_ghz')
+        error('parameters.epr_freq_step_ghz must be specified for frequency-domain EPR.');
+    end
+end
+if isfield(parameters,'cp') && parameters.cp==true
+    if ~isfield(parameters,'cp_start_mhz')
+        error('parameters.cp_start_mhz must be specified for CP ENDOR.');
+    end
+    if ~isfield(parameters,'cp_npoints')
+        error('parameters.cp_npoints must be specified for CP ENDOR.');
+    end
+    if ~isfield(parameters,'cp_range_mhz')
+        error('parameters.cp_range_mhz must be specified for CP ENDOR.');
+    end
 end
 if (~ischar(assumptions))&&(~isstring(assumptions))
     error('assumptions must be a character string or a string scalar.');

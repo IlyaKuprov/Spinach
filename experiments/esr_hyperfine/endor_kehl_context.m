@@ -80,7 +80,6 @@ end
 end
 
 function spinSys=context_spin_system(spin_system,parameters,constants)
-    inter=parameters.inter;
     isotopes=spin_system.comp.isotopes;
     electron_idx=find(cellfun(@is_electron,isotopes),1);
     if isempty(electron_idx)
@@ -88,23 +87,15 @@ function spinSys=context_spin_system(spin_system,parameters,constants)
     end
 
     endor_spins=parameters.endor_spins;
-    if isfield(parameters,'epr_spins')
-        epr_spins=parameters.epr_spins;
-    else
-        epr_spins=[];
-    end
-    if isfield(parameters,'n_spin_systems')
-        n_spin_systems=parameters.n_spin_systems;
-    else
-        n_spin_systems=1;
-    end
+    epr_spins=infer_epr_spins(spin_system,electron_idx,endor_spins);
+    n_spin_systems=1;
 
     [~,electron_mult]=spin(isotopes{electron_idx});
     n_endor=numel(endor_spins);
 
     spinSys=containers.Map;
     spinSys('S')=(electron_mult-1)/2;
-    spinSys('g')=zeeman_matrix(inter,electron_idx);
+    spinSys('g')=electron_g_matrix(spin_system,electron_idx);
     spinSys('g_iso')=trace(spinSys('g'))/3;
     spinSys('Ni_ENDOR')=n_endor;
     spinSys('Nuclei')=isotopes(endor_spins);
@@ -116,19 +107,12 @@ function spinSys=context_spin_system(spin_system,parameters,constants)
     Q_used=false;
     for n=1:n_endor
         spin_idx=endor_spins(n);
-        A(3*n-2:3*n,:)=coupling_matrix(inter,electron_idx,spin_idx);
-        Q_block=coupling_matrix(inter,spin_idx,spin_idx);
+        A(3*n-2:3*n,:)=coupling_matrix(spin_system,electron_idx,spin_idx);
+        Q_block=coupling_matrix(spin_system,spin_idx,spin_idx);
         Q(3*n-2:3*n,:)=Q_block;
         Q_used=Q_used||any(Q_block(:));
     end
     spinSys('A')=A;
-    if isfield(parameters,'endor_quadrupole_matrix')
-        Q=parameters.endor_quadrupole_matrix;
-        if ~isequal(size(Q),[3*n_endor,3])
-            error('parameters.endor_quadrupole_matrix must be a 3*N_ENDOR by 3 matrix.');
-        end
-        Q_used=any(Q(:));
-    end
     spinSys('Q')=Q;
     spinSys('Q_used')=Q_used;
 
@@ -136,7 +120,7 @@ function spinSys=context_spin_system(spin_system,parameters,constants)
     CS_used=false;
     for n=1:n_endor
         spin_idx=endor_spins(n);
-        CS_block=zeeman_matrix(inter,spin_idx)*1e6;
+        CS_block=nuclear_cs_matrix(spin_system,spin_idx);
         CS(3*n-2:3*n,:)=CS_block;
         CS_used=CS_used||any(CS_block(:));
     end
@@ -145,11 +129,11 @@ function spinSys=context_spin_system(spin_system,parameters,constants)
     end
     spinSys('CS_used')=CS_used;
 
-    if isfield(parameters,'dipolar_pairs') && ~isempty(parameters.dipolar_pairs)
-        pairs=parameters.dipolar_pairs;
+    pairs=infer_dipolar_pairs(spin_system,endor_spins);
+    if ~isempty(pairs)
         D=zeros(3*size(pairs,1),3);
         for n=1:size(pairs,1)
-            D(3*n-2:3*n,:)=coupling_matrix(inter,pairs(n,1),pairs(n,2));
+            D(3*n-2:3*n,:)=coupling_matrix(spin_system,pairs(n,1),pairs(n,2));
         end
         spinSys('D')=D;
         spinSys('D_used')=true;
@@ -171,17 +155,10 @@ function spinSys=context_spin_system(spin_system,parameters,constants)
         for n=1:n_epr
             spin_idx=epr_spins(n);
             g_N_EPR(n)=kehl_nuc_gamma(constants,isotopes{spin_idx});
-            A_EPR(3*n-2:3*n,:)=coupling_matrix(inter,electron_idx,spin_idx);
-            Q_block=coupling_matrix(inter,spin_idx,spin_idx);
+            A_EPR(3*n-2:3*n,:)=coupling_matrix(spin_system,electron_idx,spin_idx);
+            Q_block=coupling_matrix(spin_system,spin_idx,spin_idx);
             Q_EPR(3*n-2:3*n,:)=Q_block;
             EPR_Q_used=EPR_Q_used||any(Q_block(:));
-        end
-        if isfield(parameters,'epr_quadrupole_matrix')
-            Q_EPR=parameters.epr_quadrupole_matrix;
-            if ~isequal(size(Q_EPR),[3*n_epr,3])
-                error('parameters.epr_quadrupole_matrix must be a 3*N_EPR by 3 matrix.');
-            end
-            EPR_Q_used=any(Q_EPR(:));
         end
         spinSys('g_N_EPR')=g_N_EPR;
         spinSys('A_EPR')=A_EPR;
@@ -289,52 +266,51 @@ function field_fun=context_field_fun(parameters,pulse_sequence)
     end
 end
 
-function M=zeeman_matrix(inter,spin_idx)
-    M=zeros(3,3);
-    if isfield(inter,'zeeman') && isfield(inter.zeeman,'matrix')
-        if isvector(inter.zeeman.matrix) && numel(inter.zeeman.matrix)>=spin_idx &&...
-           ~isempty(inter.zeeman.matrix{spin_idx})
-            M=inter.zeeman.matrix{spin_idx};
-        else
-            M=matrix_from_cell(inter.zeeman.matrix,spin_idx,spin_idx);
+function M=electron_g_matrix(spin_system,spin_idx)
+    M=spin_system.inter.zeeman.matrix{spin_idx}*...
+      spin_system.tols.freeg/spin_system.inter.basefrqs(spin_idx);
+end
+
+function M=nuclear_cs_matrix(spin_system,spin_idx)
+    M=(spin_system.inter.zeeman.matrix{spin_idx}/...
+       spin_system.inter.basefrqs(spin_idx)-eye(3,3))*1e12;
+end
+
+function M=coupling_matrix(spin_system,row,col)
+    M=matrix_from_cell(spin_system.inter.coupling.matrix,row,col)/(2*pi);
+end
+
+function pairs=infer_dipolar_pairs(spin_system,endor_spins)
+    pairs=zeros(numel(endor_spins)*(numel(endor_spins)-1)/2,2);
+    pair_count=0;
+    for n=1:numel(endor_spins)
+        for k=n+1:numel(endor_spins)
+            spin_a=endor_spins(n);
+            spin_b=endor_spins(k);
+            if norm(coupling_matrix(spin_system,spin_a,spin_b),'fro')>0
+                pair_count=pair_count+1;
+                pairs(pair_count,:)=[spin_a,spin_b];
+            end
         end
     end
-    if isfield(inter,'zeeman') && isfield(inter.zeeman,'eigs') &&...
-       numel(inter.zeeman.eigs)>=spin_idx && ~isempty(inter.zeeman.eigs{spin_idx})
-        S=euler_matrix(inter.zeeman.euler{spin_idx});
-        M=M+S*diag(inter.zeeman.eigs{spin_idx})*S';
-    end
+    pairs=pairs(1:pair_count,:);
 end
 
-function M=coupling_matrix(inter,row,col)
-    M=zeros(3,3);
-    if isfield(inter,'coupling') && isfield(inter.coupling,'matrix')
-        M=matrix_from_cell(inter.coupling.matrix,row,col);
+function epr_spins=infer_epr_spins(spin_system,electron_idx,endor_spins)
+    epr_spins=zeros(1,spin_system.comp.nspins);
+    spin_count=0;
+    for n=1:spin_system.comp.nspins
+        if (n~=electron_idx) && (~ismember(n,endor_spins)) &&...
+           (spin_system.comp.mults(n)>1)
+            has_hfc=norm(coupling_matrix(spin_system,electron_idx,n),'fro')>0;
+            has_nqi=norm(coupling_matrix(spin_system,n,n),'fro')>0;
+            if has_hfc || has_nqi
+                spin_count=spin_count+1;
+                epr_spins(spin_count)=n;
+            end
+        end
     end
-    if isfield(inter,'coupling') && isfield(inter.coupling,'eigs')
-        M=M+coupling_eigs_matrix(inter.coupling,row,col);
-    end
-end
-
-function M=coupling_eigs_matrix(coupling,row,col)
-    M=zeros(3,3);
-    if size(coupling.eigs,1)>=row && size(coupling.eigs,2)>=col &&...
-       ~isempty(coupling.eigs{row,col})
-        S=euler_matrix(coupling.euler{row,col});
-        M=S*diag(coupling.eigs{row,col})*S';
-    elseif size(coupling.eigs,1)>=col && size(coupling.eigs,2)>=row &&...
-           ~isempty(coupling.eigs{col,row})
-        S=euler_matrix(coupling.euler{col,row});
-        M=S*diag(coupling.eigs{col,row})*S';
-    end
-end
-
-function S=euler_matrix(eulers)
-    if isempty(eulers)
-        S=eye(3,3);
-    else
-        S=euler2dcm(eulers);
-    end
+    epr_spins=epr_spins(1:spin_count);
 end
 
 function M=matrix_from_cell(cells,row,col)
@@ -371,9 +347,6 @@ if ~isa(pulse_sequence,'function_handle')
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
-end
-if ~isfield(parameters,'inter')
-    error('parameters.inter must contain the raw Spinach interaction structure.');
 end
 if ~isfield(parameters,'endor_spins')
     error('parameters.endor_spins must list ENDOR nuclei by Spinach spin index.');

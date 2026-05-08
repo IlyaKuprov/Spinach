@@ -46,7 +46,6 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % ENDOR context metadata and simulation parameters
-parameters.inter=inter;
 parameters.mw_freq_ghz=33.7727;
 parameters.static_field_g=12052.1;
 parameters.field_step_g=0.5;
@@ -67,13 +66,9 @@ parameters.Nang=50;
 parameters.Relax=false;
 parameters.Bterm=false;
 parameters.endor_spins=[2,3,4];
-parameters.epr_spins=5;
-parameters.epr_quadrupole_matrix=diag([1.2,0.54,-1.7]*1e6);
-parameters.n_spin_systems=1;
-parameters.dipolar_pairs=[2,3;2,4];
 
 % Actual ENDOR calculation through Spinach-style context and experiment
-[endor_amp,endor_amp_conv,x_coords,v_L]=endor_kehl_context(spin_system,@endor_kehl_mims,parameters,'labframe'); %#ok<ASGLU>
+[endor_amp,~,x_coords,~]=endor_kehl_context(spin_system,@endor_kehl_mims,parameters,'labframe');
 
 % Plotting
 sim=endor_amp(:)-endor_amp(1);

@@ -24,126 +24,86 @@ grumble(spin_system,sequence,parameters,assumptions);
 % Normalise the pulse-sequence selector
 seq_name=sequence_name(sequence);
 
+% Store context selector and assumptions
+parameters.seq_name=seq_name;
+parameters.assumptions=assumptions;
+
 % Build legacy Kehl data structures from Spinach parameters
-constants=containers.Map;
-constants('CONST1')=2.81;
-constants('K_B')=2.0836618E10;
-constants('H')=6.62607E-34;
-constants('MU_B')=9.27401E-24;
-constants('MU_N')=5.050783699E-27;
-constants('GE')=28024.95266E6;
-constants('GN_1H')=42.576E6;
-constants('GN_2D')=6.536E6;
-constants('GN_19F')=40.078E6;
-constants('GN_14N')=3.077E6;
-constants('GN_17O')=-5.772E6;
-expt=context_experiment(parameters,constants,seq_name);
-spinSys=context_spin_system(spin_system,parameters,constants);
-spinOps=kehl_spin_ops(spin_system,parameters.endor_spins,spinSys('N_SpinSys'));
+parameters.constants=context_constants(spin_system);
+parameters.expt=context_experiment(parameters);
+parameters.spinSys=context_spin_system(spin_system,parameters);
+parameters.spinOps=kehl_spin_ops(spin_system,parameters.endor_spins,...
+                                 parameters.spinSys('N_SpinSys'));
 
 if nargin>=4 && ~isempty(assumptions)
     spin_system=assume(spin_system,assumptions);
 end
 
-if strcmp(seq_name,'time')
-    t=expt('t');
-    expt('t_start')=t(6);
-    paramsENDOR=kehl_prep_time(constants,spinSys,expt);
+if strcmp(parameters.seq_name,'time')
+    t=parameters.expt('t');
+    parameters.expt('t_start')=t(6);
+    parameters.paramsENDOR=kehl_prep_time(spin_system,parameters);
 else
-    paramsENDOR=kehl_prep_endor(constants,spinSys,expt);
+    parameters.paramsENDOR=kehl_prep_endor(spin_system,parameters);
 end
 
-paramsEPR=kehl_prep_epr(spinSys,expt);
+parameters.paramsEPR=kehl_prep_epr(spin_system,parameters);
 if parameters.freqDomain==false
-    epr=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt);
+    parameters.epr=kehl_ori_field(spin_system,parameters);
 else
-    epr=kehl_ori_freq(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt);
+    parameters.epr=kehl_ori_freq(spin_system,parameters);
 end
 
-localpar=parameters;
-localpar.constants=constants;
-localpar.spinSys=spinSys;
-localpar.spinOps=spinOps;
-localpar.expt=expt;
-localpar.paramsENDOR=paramsENDOR;
-localpar.paramsEPR=paramsEPR;
-localpar.epr=epr;
-localpar.assumptions=assumptions;
-
-is_cp=strcmp(seq_name,'cp');
+is_cp=strcmp(parameters.seq_name,'cp');
 if is_cp
-    [y_coords,localpar]=cp_axis(localpar);
+    [y_coords,parameters]=cp_axis(parameters);
 end
 
-switch seq_name
+switch parameters.seq_name
     case 'mims'
         if parameters.Relax==true
-            endor_amp=kehl_mims_rlx(localpar.constants,localpar.spinOps,...
-                                    localpar.spinSys,localpar.expt,localpar,...
-                                    localpar.paramsENDOR,localpar.epr);
+            endor_amp=kehl_mims_rlx(spin_system,parameters);
         else
-            endor_amp=kehl_mims_calc(localpar.constants,localpar.spinOps,...
-                                     localpar.spinSys,localpar.expt,localpar,...
-                                     localpar.paramsENDOR,localpar.epr);
+            endor_amp=kehl_mims_calc(spin_system,parameters);
         end
     case 'time'
         if parameters.Relax==true
-            endor_amp=kehl_time_rlx(localpar.constants,localpar.spinOps,...
-                                    localpar.spinSys,localpar.expt,localpar,...
-                                    localpar.paramsENDOR,localpar.epr);
+            endor_amp=kehl_time_rlx(spin_system,parameters);
         else
-            endor_amp=kehl_time_calc(localpar.constants,localpar.spinOps,...
-                                     localpar.spinSys,localpar.expt,localpar,...
-                                     localpar.paramsENDOR,localpar.epr);
+            endor_amp=kehl_time_calc(spin_system,parameters);
         end
     case 'davies'
         if parameters.Relax==true
-            endor_amp=kehl_davies_rlx(localpar.constants,localpar.spinOps,...
-                                      localpar.spinSys,localpar.expt,localpar,...
-                                      localpar.paramsENDOR,localpar.epr);
+            endor_amp=kehl_davies_rlx(spin_system,parameters);
         else
-            endor_amp=kehl_davies_calc(localpar.constants,localpar.spinOps,...
-                                       localpar.spinSys,localpar.expt,localpar,...
-                                       localpar.paramsENDOR,localpar.epr);
+            endor_amp=kehl_davies_calc(spin_system,parameters);
         end
     case 'spinlock'
         if parameters.Relax==true
-            endor_amp=kehl_spinlock_rlx(localpar.constants,localpar.spinOps,...
-                                        localpar.spinSys,localpar.expt,localpar,...
-                                        localpar.paramsENDOR,localpar.epr);
+            endor_amp=kehl_spinlock_rlx(spin_system,parameters);
         else
-            endor_amp=kehl_spinlock_calc(localpar.constants,localpar.spinOps,...
-                                         localpar.spinSys,localpar.expt,localpar,...
-                                         localpar.paramsENDOR,localpar.epr);
+            endor_amp=kehl_spinlock_calc(spin_system,parameters);
         end
     case 'tensor'
         if parameters.Relax==true
-            endor_amp=kehl_tensor_rlx(localpar.constants,localpar.spinOps,...
-                                      localpar.spinSys,localpar.expt,localpar,...
-                                      localpar.paramsENDOR,localpar.epr);
+            endor_amp=kehl_tensor_rlx(spin_system,parameters);
         else
-            endor_amp=kehl_tensor_calc(localpar.constants,localpar.spinOps,...
-                                       localpar.spinSys,localpar.expt,localpar,...
-                                       localpar.paramsENDOR,localpar.epr);
+            endor_amp=kehl_tensor_calc(spin_system,parameters);
         end
     case 'cp'
         if parameters.Relax==true
-            endor_amp=kehl_cp_calc_rlx(localpar.constants,localpar.spinOps,...
-                                       localpar.spinSys,localpar.expt,localpar,...
-                                       localpar.paramsENDOR,localpar.epr);
+            endor_amp=kehl_cp_calc_rlx(spin_system,parameters);
         else
-            endor_amp=kehl_cp_calc(localpar.constants,localpar.spinOps,...
-                                   localpar.spinSys,localpar.expt,localpar,...
-                                   localpar.paramsENDOR,localpar.epr);
+            endor_amp=kehl_cp_calc(spin_system,parameters);
         end
     otherwise
         error('unknown Kehl ENDOR pulse sequence.');
 end
-endor_amp_conv=kehl_line_broaden(endor_amp,parameters,localpar.expt('range_EN'));
+endor_amp_conv=kehl_line_broaden(endor_amp,parameters);
 
-x_coords=paramsENDOR('x_coords');
+x_coords=parameters.paramsENDOR('x_coords');
 x_coords=x_coords(:,1)';
-v_L=paramsENDOR('v_L');
+v_L=parameters.paramsENDOR('v_L');
 
 if is_cp
     varargout={endor_amp,endor_amp_conv,x_coords,y_coords,v_L};
@@ -168,7 +128,16 @@ function seq_name=sequence_name(sequence)
     end
 end
 
-function spinSys=context_spin_system(spin_system,parameters,constants)
+function constants=context_constants(spin_system)
+    constants=containers.Map;
+    constants('H')=2*pi*spin_system.tols.hbar;
+    constants('K_B')=spin_system.tols.kbol/constants('H');
+    constants('MU_B')=spin_system.tols.muB;
+    constants('GE')=spin_system.tols.freeg*spin_system.tols.muB/constants('H');
+    constants('CONST1')=constants('GE')/1e10;
+end
+
+function spinSys=context_spin_system(spin_system,parameters)
     isotopes=spin_system.comp.isotopes;
     electron_idx=find(cellfun(@is_electron,isotopes),1);
     if isempty(electron_idx)
@@ -243,7 +212,7 @@ function spinSys=context_spin_system(spin_system,parameters,constants)
         EPR_Q_used=false;
         for n=1:n_epr
             spin_idx=epr_spins(n);
-            g_N_EPR(n)=kehl_nuc_gamma(constants,isotopes{spin_idx});
+            g_N_EPR(n)=kehl_nuc_gamma(isotopes{spin_idx});
             A_EPR(3*n-2:3*n,:)=coupling_matrix(spin_system,electron_idx,spin_idx);
             Q_block=coupling_matrix(spin_system,spin_idx,spin_idx);
             Q_EPR(3*n-2:3*n,:)=Q_block;
@@ -258,9 +227,9 @@ function spinSys=context_spin_system(spin_system,parameters,constants)
     end
 end
 
-function [y_coords,localpar]=cp_axis(localpar)
-    expt=localpar.expt;
-    if localpar.powder==false
+function [y_coords,parameters]=cp_axis(parameters)
+    expt=parameters.expt;
+    if parameters.powder==false
         expt('Npts_CP')=1;
         expt('range_CP')=0;
         y_coords=1;
@@ -276,12 +245,15 @@ function [y_coords,localpar]=cp_axis(localpar)
             y_coords=expt('start_CP');
             y_coords=y_coords(:,1)';
         end
-        localpar.paramsENDOR('y_coords')=y_coords;
+        parameters.paramsENDOR('y_coords')=y_coords;
     end
-    localpar.expt=expt;
+    parameters.expt=expt;
 end
 
-function expt=context_experiment(parameters,constants,seq_name)
+function expt=context_experiment(parameters)
+    constants=parameters.constants;
+    seq_name=parameters.seq_name;
+
     % Create the primary experiment parameter map
     expt=containers.Map;
     expt('FreqMeas')=parameters.mw_freq_ghz*1e9;
@@ -729,14 +701,19 @@ end
 
 % Larmor frequencies
 
-function paramsENDOR=kehl_prep_time(constants,spinSys,expt)
+function paramsENDOR=kehl_prep_time(spin_system,parameters)
 
     % Check consistency
-    kehl_prep_time_grumble(constants,spinSys,expt);
+    kehl_prep_time_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinSys=parameters.spinSys;
+    expt=parameters.expt;
     Nuclei=spinSys("Nuclei");
     v_L=zeros(size(Nuclei,2),1);
     for i=1:size(Nuclei,2)
-        v_L(i)=kehl_nuc_gamma(constants,Nuclei{i})*expt("Field");
+        v_L(i)=kehl_nuc_gamma(Nuclei{i})*expt("Field");
     end
 
     % number of points and values for x-axis
@@ -773,43 +750,28 @@ function paramsENDOR=kehl_prep_time(constants,spinSys,expt)
 
 end
 
-function kehl_prep_time_grumble(constants,spinSys,expt)
-if ~isa(constants,'containers.Map')
-    error('constants must be a containers.Map object.');
+function kehl_prep_time_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
-end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
+if ~isstruct(parameters)
+    error('parameters must be a structure.');
 end
 end
 
-
-% --- Localised from kehl_prep_endor.m ---
-% calculates/sets necessary parameters for the ENDOR calculation from
-% the experimental values
-%
-% input parameters:
-% constants:the Map containing the constants
-% spinSys: the Map describing the spin system
-% expt: the Map containing the experimental parameters
-%
-% output parameters:
-% paramsENDOR: the Map containing the ENDOR parameters
-%
-% February 2024 A. Kehl (akehl@gwdg.de)
-
-% Larmor frequencies
-
-function paramsENDOR=kehl_prep_endor(constants,spinSys,expt)
+function paramsENDOR=kehl_prep_endor(spin_system,parameters)
 
     % Check consistency
-    kehl_prep_endor_grumble(constants,spinSys,expt);
+    kehl_prep_endor_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinSys=parameters.spinSys;
+    expt=parameters.expt;
     Nuclei=spinSys("Nuclei");
     v_L=zeros(size(Nuclei,2),1);
     for i=1:size(Nuclei,2)
-        v_L(i)=kehl_nuc_gamma(constants,Nuclei{i})*expt("Field");
+        v_L(i)=kehl_nuc_gamma(Nuclei{i})*expt("Field");
     end
 
     % number of points and values for x-axis
@@ -845,45 +807,31 @@ function paramsENDOR=kehl_prep_endor(constants,spinSys,expt)
 
 end
 
-function kehl_prep_endor_grumble(constants,spinSys,expt)
-if ~isa(constants,'containers.Map')
-    error('constants must be a containers.Map object.');
+function kehl_prep_endor_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
-end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
+if ~isstruct(parameters)
+    error('parameters must be a structure.');
 end
 end
 
-
-% --- Localised from kehl_prep_epr.m ---
-% calculates/sets necessary parameters for the EPR calculation from
-% the experimental values
-%
-% input parameters:
-% spinSys: the Map describing the spin system
-% expt: the Map containing the experimental parameters
-%
-% output parameters:
-% paramsEPR: the Map containing the EPR parameters
-%
-% February 2024 A. Kehl (akehl@gwdg.de)
-
-
-
-function paramsEPR=kehl_prep_epr(spinSys,expt)
+function paramsEPR=kehl_prep_epr(spin_system,parameters)
 
     % Check consistency
-    kehl_prep_epr_grumble(spinSys,expt);
+    kehl_prep_epr_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinSys=parameters.spinSys;
+    expt=parameters.expt;
     g_iso=spinSys("g_iso");
     obsField=expt("Field");
 
     gBepr=obsField*g_iso;
     geff=g_iso;
     B=gBepr/geff;
-    veff=geff*obsField*9.27401*1e-24/(6.62607*1e-34);
+    veff=geff*obsField*constants('MU_B')/constants('H');
 
     % EPR simulation range
     fieldCenter=gBepr/g_iso;
@@ -902,40 +850,27 @@ function paramsEPR=kehl_prep_epr(spinSys,expt)
 
 end
 
-function kehl_prep_epr_grumble(spinSys,expt)
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
+function kehl_prep_epr_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
+if ~isstruct(parameters)
+    error('parameters must be a structure.');
 end
 end
 
-
-% --- Localised from kehl_ori_field.m ---
-% calculates the selected EPR orientations in the field domain and the
-% corresponding effective spin parameter values
-%
-% input parameters:
-% constants: the Map containing the constants
-% spinSys: the Map describing the spin system
-% spinOps: the Map containing the spin operators
-% paramsEPR: the Map containing the EPR parameters
-% parameters: structure containing simulation parameters
-% expt: the Map containing the experimental parameters
-%
-% output parameters:
-% EPR: Map containing the information from the EPR experiment
-%
-% February 2024 A. Kehl (akehl@gwdg.de)
-%
-
-% get parameters from Maps
-
-function EPR=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt)
+function EPR=kehl_ori_field(spin_system,parameters)
 
     % Check consistency
-    kehl_ori_field_grumble(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt);
+    kehl_ori_field_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinSys=parameters.spinSys;
+    spinOps=parameters.spinOps;
+    paramsEPR=parameters.paramsEPR;
+    paramsENDOR=parameters.paramsENDOR;
+    expt=parameters.expt;
     Ntheta=parameters.Nang;
     Nphimax=parameters.Nang;
     g=spinSys("g");
@@ -1373,55 +1308,27 @@ function M=kehl_ori_field_BuildSpace(S)
     end
 end
 
-function kehl_ori_field_grumble(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt)
-if ~isa(constants,'containers.Map')
-    error('constants must be a containers.Map object.');
-end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
-end
-if ~isa(spinOps,'containers.Map')
-    error('spinOps must be a containers.Map object.');
-end
-if ~isa(paramsEPR,'containers.Map')
-    error('paramsEPR must be a containers.Map object.');
-end
-if ~isa(paramsENDOR,'containers.Map')
-    error('paramsENDOR must be a containers.Map object.');
+function kehl_ori_field_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
-end
 end
 
-
-% --- Localised from kehl_ori_freq.m ---
-% calculates the selected EPR orientations in the frequency domain and the
-% corresponding effective spin parameter values
-%
-% input parameters:
-% constants: the Map containing the constants
-% spinSys: the Map describing the spin system
-% spinOps: the Map containing the spin operators
-% paramsEPR: the Map containing the EPR parameters
-% parameters: structure containing simulation parameters
-% expt: the Map containing the experimental parameters
-%
-% output parameters:
-% EPR: Map containing the information from the EPR experiment
-%
-% February 2024 A. Kehl (akehl@gwdg.de)
-%
-
-% get parameters from Maps
-
-function EPR=kehl_ori_freq(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt)
+function EPR=kehl_ori_freq(spin_system,parameters)
 
     % Check consistency
-    kehl_ori_freq_grumble(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt);
+    kehl_ori_freq_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinSys=parameters.spinSys;
+    spinOps=parameters.spinOps;
+    paramsEPR=parameters.paramsEPR;
+    paramsENDOR=parameters.paramsENDOR;
+    expt=parameters.expt;
     Ntheta=parameters.Nang;
     Nphimax=parameters.Nang;
     g=spinSys("g");
@@ -1498,7 +1405,7 @@ function EPR=kehl_ori_freq(constants,spinSys,spinOps,paramsEPR,paramsENDOR,param
                 B=expt("Field");
 
                 % Resonance frequency for geff at ObsField in GHz
-                veff=geff*expt("Field")*9.27401*10^-24/(6.62607*10^-34);
+                veff=geff*expt("Field")*constants('MU_B')/constants('H');
 
                 % Rotation matrix into lab system
                 R1=zeros(3);
@@ -1866,52 +1773,22 @@ function scalefactor=kehl_ori_freq_pulsescale(expt,DeltaOm)
     end
 end
 
-function kehl_ori_freq_grumble(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt)
-if ~isa(constants,'containers.Map')
-    error('constants must be a containers.Map object.');
-end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
-end
-if ~isa(spinOps,'containers.Map')
-    error('spinOps must be a containers.Map object.');
-end
-if ~isa(paramsEPR,'containers.Map')
-    error('paramsEPR must be a containers.Map object.');
-end
-if ~isa(paramsENDOR,'containers.Map')
-    error('paramsENDOR must be a containers.Map object.');
+function kehl_ori_freq_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
-end
 end
 
-
-% --- Localised from kehl_line_broaden.m ---
-% convolutes the input data with a Lorentian and/or a
-% Gaussian line broadening by applying a fft, then convoluting with an
-% exponential function and applying a fft again.
-%
-% input parameters:
-% data: data to be convoluted
-% parameters: structure, should contain fields ('Lorentian'/'Gaussian' and
-%       'lw_L'/'lw_G')
-% sw: width of the data points
-%
-% output parameters:
-% data_conv: convoluted data
-%
-% April 2024 A. Kehl (akehl@gwdg.de)
-%
-
-function data_conv=kehl_line_broaden(data,parameters,sw)
+function data_conv=kehl_line_broaden(data,parameters)
 
     % Check consistency
-    kehl_line_broaden_grumble(data,parameters,sw);
+    kehl_line_broaden_grumble(data,parameters);
+
+    % Get ENDOR sweep width
+    sw=parameters.expt('range_EN');
     if parameters.Lorentzian==1
 
         % Lorentian
@@ -1962,42 +1839,27 @@ function data_conv=kehl_line_broaden(data,parameters,sw)
     end
 end
 
-function kehl_line_broaden_grumble(data,parameters,sw)
-if (~isnumeric(data))&&(~ischar(data))&&(~isstring(data))
-    error('data must be numeric, a character string, or a string scalar.');
+function kehl_line_broaden_grumble(data,parameters)
+if ~isnumeric(data)
+    error('data must be numeric.');
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-if ~isnumeric(sw)
-    error('sw must be numeric.');
-end
 end
 
-
-% --- Localised from kehl_mims_rlx.m ---
-% performs the actual ENDOR calculation (with relaxation)
-%
-% input parameters:
-% constants: the Map containing the constants
-% spinOps: the Map containing the spin operators
-% spinSys: the Map describing the spin system
-% expt: the Map containing the experimental parameters
-% parameters: structure containing simulation parameters
-% paramsENDOR: the Map containing the ENDOR parameters
-% EPR: the Map with results from EPR calculation
-%
-% output parameters:
-% endor_amp: endor amplitude values
-%
-% February 2024 A. Kehl (akehl@gwdg.de)
-%
-
-
-function endor_amp=kehl_mims_rlx(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
+function endor_amp=kehl_mims_rlx(spin_system,parameters)
 
     % Check consistency
-    kehl_mims_rlx_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR);
+    kehl_mims_rlx_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinOps=parameters.spinOps;
+    spinSys=parameters.spinSys;
+    expt=parameters.expt;
+    paramsENDOR=parameters.paramsENDOR;
+    EPR=parameters.epr;
     spinOps_D=kehl_diag_ops(spinOps,spinSys('Ni_ENDOR'));
 
     % get values from Maps
@@ -2288,55 +2150,27 @@ function endor_amp=kehl_mims_rlx(constants,spinOps,spinSys,expt,parameters,param
     end
 end
 
-function kehl_mims_rlx_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
-if ~isa(constants,'containers.Map')
-    error('constants must be a containers.Map object.');
-end
-if ~isa(spinOps,'containers.Map')
-    error('spinOps must be a containers.Map object.');
-end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
-end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
+function kehl_mims_rlx_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-if ~isa(paramsENDOR,'containers.Map')
-    error('paramsENDOR must be a containers.Map object.');
-end
-if ~isa(EPR,'containers.Map')
-    error('EPR must be a containers.Map object.');
-end
 end
 
-
-% --- Localised from kehl_mims_calc.m ---
-% performs the actual ENDOR calculation (no relaxation)
-%
-% input parameters:
-% constants: the Map containing the constants
-% spinOps: the Map containing the spin operators
-% spinSys: the Map describing the spin system
-% expt: the Map containing the experimental parameters
-% parameters: structure containing simulation parameters
-% paramsENDOR: the Map containing the ENDOR parameters
-% EPR: the Map with results from EPR calculation
-%
-% output parameters:
-% endor_amp: endor amplitude values
-%
-% February 2024 A. Kehl (akehl@gwdg.de)
-%
-
-% get values from Maps
-
-function endor_amp=kehl_mims_calc(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
+function endor_amp=kehl_mims_calc(spin_system,parameters)
 
     % Check consistency
-    kehl_mims_calc_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR);
+    kehl_mims_calc_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinOps=parameters.spinOps;
+    spinSys=parameters.spinSys;
+    expt=parameters.expt;
+    paramsENDOR=parameters.paramsENDOR;
+    EPR=parameters.epr;
     Sz=spinOps("Sz");
     Sx=spinOps("Sx");
     Sy=spinOps("Sy");
@@ -2658,56 +2492,27 @@ function endor_amp=kehl_mims_calc(constants,spinOps,spinSys,expt,parameters,para
     end
 end
 
-function kehl_mims_calc_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
-if ~isa(constants,'containers.Map')
-    error('constants must be a containers.Map object.');
-end
-if ~isa(spinOps,'containers.Map')
-    error('spinOps must be a containers.Map object.');
-end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
-end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
+function kehl_mims_calc_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-if ~isa(paramsENDOR,'containers.Map')
-    error('paramsENDOR must be a containers.Map object.');
-end
-if ~isa(EPR,'containers.Map')
-    error('EPR must be a containers.Map object.');
-end
 end
 
-
-% --- Localised from kehl_time_rlx.m ---
-% performs the actual ENDOR calculation (with relaxation)
-% CAUTION: this is a beta version and not fully tested
-%
-% input parameters:
-% constants: the Map containing the constants
-% spinOps: the Map containing the spin operators
-% spinSys: the Map describing the spin system
-% expt: the Map containing the experimental parameters
-% parameters: structure containing simulation parameters
-% paramsENDOR: the Map containing the ENDOR parameters
-% EPR: the Map with results from EPR calculation
-%
-% output parameters:
-% endor_amp: endor amplitude values
-%
-% April 2024 A. Kehl (akehl@gwdg.de)
-%
-
-% get values from Maps
-
-function endor_amp=kehl_time_rlx(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
+function endor_amp=kehl_time_rlx(spin_system,parameters)
 
     % Check consistency
-    kehl_time_rlx_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR);
+    kehl_time_rlx_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinOps=parameters.spinOps;
+    spinSys=parameters.spinSys;
+    expt=parameters.expt;
+    paramsENDOR=parameters.paramsENDOR;
+    EPR=parameters.epr;
     spinOps_D=kehl_diag_ops(spinOps,spinSys('Ni_ENDOR'));
 
     Sz=spinOps("Sz");
@@ -3040,55 +2845,27 @@ function endor_amp=kehl_time_rlx(constants,spinOps,spinSys,expt,parameters,param
 
 end
 
-function kehl_time_rlx_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
-if ~isa(constants,'containers.Map')
-    error('constants must be a containers.Map object.');
-end
-if ~isa(spinOps,'containers.Map')
-    error('spinOps must be a containers.Map object.');
-end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
-end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
+function kehl_time_rlx_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-if ~isa(paramsENDOR,'containers.Map')
-    error('paramsENDOR must be a containers.Map object.');
-end
-if ~isa(EPR,'containers.Map')
-    error('EPR must be a containers.Map object.');
-end
 end
 
-
-% --- Localised from kehl_time_calc.m ---
-% performs the actual ENDOR calculation (no relaxation)
-%
-% input parameters:
-% constants: the Map containing the constants
-% spinOps: the Map containing the spin operators
-% spinSys: the Map describing the spin system
-% expt: the Map containing the experimental parameters
-% parameters: structure containing simulation parameters
-% paramsENDOR: the Map containing the ENDOR parameters
-% EPR: the Map with results from EPR calculation
-%
-% output parameters:
-% endor_amp: endor amplitude values
-%
-% February 2024 A. Kehl (akehl@gwdg.de)
-%
-
-% get values from Maps
-
-function endor_amp=kehl_time_calc(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
+function endor_amp=kehl_time_calc(spin_system,parameters)
 
     % Check consistency
-    kehl_time_calc_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR);
+    kehl_time_calc_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinOps=parameters.spinOps;
+    spinSys=parameters.spinSys;
+    expt=parameters.expt;
+    paramsENDOR=parameters.paramsENDOR;
+    EPR=parameters.epr;
     Sz=spinOps("Sz");
     Sx=spinOps("Sx");
     Sy=spinOps("Sy");
@@ -3398,54 +3175,27 @@ function endor_amp=kehl_time_calc(constants,spinOps,spinSys,expt,parameters,para
 
 end
 
-function kehl_time_calc_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
-if ~isa(constants,'containers.Map')
-    error('constants must be a containers.Map object.');
-end
-if ~isa(spinOps,'containers.Map')
-    error('spinOps must be a containers.Map object.');
-end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
-end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
+function kehl_time_calc_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-if ~isa(paramsENDOR,'containers.Map')
-    error('paramsENDOR must be a containers.Map object.');
-end
-if ~isa(EPR,'containers.Map')
-    error('EPR must be a containers.Map object.');
-end
 end
 
-
-% --- Localised from kehl_davies_rlx.m ---
-% performs the actual ENDOR calculation (with relaxation)
-%
-% input parameters:
-% constants: the Map containing the constants
-% spinOps: the Map containing the spin operators
-% spinSys: the Map describing the spin system
-% expt: the Map containing the experimental parameters
-% parameters: structure containing simulation parameters
-% paramsENDOR: the Map containing the ENDOR parameters
-% EPR: the Map with results from EPR calculation
-%
-% output parameters:
-% endor_amp: endor amplitude values
-%
-% February 2024 A. Kehl (akehl@gwdg.de)
-%
-
-
-function endor_amp=kehl_davies_rlx(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
+function endor_amp=kehl_davies_rlx(spin_system,parameters)
 
     % Check consistency
-    kehl_davies_rlx_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR);
+    kehl_davies_rlx_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinOps=parameters.spinOps;
+    spinSys=parameters.spinSys;
+    expt=parameters.expt;
+    paramsENDOR=parameters.paramsENDOR;
+    EPR=parameters.epr;
     spinOps_D=kehl_diag_ops(spinOps,spinSys('Ni_ENDOR'));
 
     % get values from Maps
@@ -3719,55 +3469,27 @@ function endor_amp=kehl_davies_rlx(constants,spinOps,spinSys,expt,parameters,par
     end
 end
 
-function kehl_davies_rlx_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
-if ~isa(constants,'containers.Map')
-    error('constants must be a containers.Map object.');
-end
-if ~isa(spinOps,'containers.Map')
-    error('spinOps must be a containers.Map object.');
-end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
-end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
+function kehl_davies_rlx_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-if ~isa(paramsENDOR,'containers.Map')
-    error('paramsENDOR must be a containers.Map object.');
-end
-if ~isa(EPR,'containers.Map')
-    error('EPR must be a containers.Map object.');
-end
 end
 
-
-% --- Localised from kehl_davies_calc.m ---
-% performs the actual ENDOR calculation (no relaxation)
-%
-% input parameters:
-% constants: the Map containing the constants
-% spinOps: the Map containing the spin operators
-% spinSys: the Map describing the spin system
-% expt: the Map containing the experimental parameters
-% parameters: structure containing simulation parameters
-% paramsENDOR: the Map containing the ENDOR parameters
-% EPR: the Map with results from EPR calculation
-%
-% output parameters:
-% endor_amp: endor amplitude values
-%
-% February 2024 A. Kehl (akehl@gwdg.de)
-%
-
-% get values from Maps
-
-function endor_amp=kehl_davies_calc(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
+function endor_amp=kehl_davies_calc(spin_system,parameters)
 
     % Check consistency
-    kehl_davies_calc_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR);
+    kehl_davies_calc_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinOps=parameters.spinOps;
+    spinSys=parameters.spinSys;
+    expt=parameters.expt;
+    paramsENDOR=parameters.paramsENDOR;
+    EPR=parameters.epr;
     Sz=spinOps("Sz");
     Sx=spinOps("Sx");
     Sy=spinOps("Sy");
@@ -4078,53 +3800,27 @@ function endor_amp=kehl_davies_calc(constants,spinOps,spinSys,expt,parameters,pa
 
 end
 
-function kehl_davies_calc_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
-if ~isa(constants,'containers.Map')
-    error('constants must be a containers.Map object.');
-end
-if ~isa(spinOps,'containers.Map')
-    error('spinOps must be a containers.Map object.');
-end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
-end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
+function kehl_davies_calc_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-if ~isa(paramsENDOR,'containers.Map')
-    error('paramsENDOR must be a containers.Map object.');
-end
-if ~isa(EPR,'containers.Map')
-    error('EPR must be a containers.Map object.');
-end
 end
 
-
-% --- Localised from kehl_spinlock_rlx.m ---
-% performs the actual ENDOR calculation (with relaxation)
-%
-% input parameters:
-% constants: the Map containing the constants
-% spinOps: the Map containing the spin operators
-% spinSys: the Map describing the spin system
-% expt: the Map containing the experimental parameters
-% parameters: structure containing simulation parameters
-% paramsENDOR: the Map containing the ENDOR parameters
-% EPR: the Map with results from EPR calculation
-%
-% output parameters:
-% endor_amp: endor amplitude values
-%
-% February 2024 A. Kehl (akehl@gwdg.de)
-%
-
-function endor_amp=kehl_spinlock_rlx(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
+function endor_amp=kehl_spinlock_rlx(spin_system,parameters)
 
     % Check consistency
-    kehl_spinlock_rlx_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR);
+    kehl_spinlock_rlx_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinOps=parameters.spinOps;
+    spinSys=parameters.spinSys;
+    expt=parameters.expt;
+    paramsENDOR=parameters.paramsENDOR;
+    EPR=parameters.epr;
     spinOps_D=kehl_diag_ops(spinOps,spinSys('Ni_ENDOR'));
 
 
@@ -4460,55 +4156,27 @@ function endor_amp=kehl_spinlock_rlx(constants,spinOps,spinSys,expt,parameters,p
     end
 end
 
-function kehl_spinlock_rlx_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
-if ~isa(constants,'containers.Map')
-    error('constants must be a containers.Map object.');
-end
-if ~isa(spinOps,'containers.Map')
-    error('spinOps must be a containers.Map object.');
-end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
-end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
+function kehl_spinlock_rlx_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-if ~isa(paramsENDOR,'containers.Map')
-    error('paramsENDOR must be a containers.Map object.');
-end
-if ~isa(EPR,'containers.Map')
-    error('EPR must be a containers.Map object.');
-end
 end
 
-
-% --- Localised from kehl_spinlock_calc.m ---
-% performs the actual ENDOR calculation (no relaxation)
-%
-% input parameters:
-% constants: the Map containing the constants
-% spinOps: the Map containing the spin operators
-% spinSys: the Map describing the spin system
-% expt: the Map containing the experimental parameters
-% parameters: structure containing simulation parameters
-% paramsENDOR: the Map containing the ENDOR parameters
-% EPR: the Map with results from EPR calculation
-%
-% output parameters:
-% endor_amp: endor amplitude values
-%
-% February 2024 A. Kehl (akehl@gwdg.de)
-%
-
-% get values from Maps
-
-function endor_amp=kehl_spinlock_calc(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
+function endor_amp=kehl_spinlock_calc(spin_system,parameters)
 
     % Check consistency
-    kehl_spinlock_calc_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR);
+    kehl_spinlock_calc_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinOps=parameters.spinOps;
+    spinSys=parameters.spinSys;
+    expt=parameters.expt;
+    paramsENDOR=parameters.paramsENDOR;
+    EPR=parameters.epr;
     Sz=spinOps("Sz");
     Sx=spinOps("Sx");
     Sy=spinOps("Sy");
@@ -4820,55 +4488,27 @@ function endor_amp=kehl_spinlock_calc(constants,spinOps,spinSys,expt,parameters,
     end
 end
 
-function kehl_spinlock_calc_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
-if ~isa(constants,'containers.Map')
-    error('constants must be a containers.Map object.');
-end
-if ~isa(spinOps,'containers.Map')
-    error('spinOps must be a containers.Map object.');
-end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
-end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
+function kehl_spinlock_calc_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-if ~isa(paramsENDOR,'containers.Map')
-    error('paramsENDOR must be a containers.Map object.');
-end
-if ~isa(EPR,'containers.Map')
-    error('EPR must be a containers.Map object.');
-end
 end
 
-
-% --- Localised from kehl_tensor_rlx.m ---
-% performs the actual ENDOR calculation (with relaxation)
-%
-% input parameters:
-% constants: the Map containing the constants
-% spinOps: the Map containing the spin operators
-% spinSys: the Map describing the spin system
-% expt: the Map containing the experimental parameters
-% parameters: structure containing simulation parameters
-% paramsENDOR: the Map containing the ENDOR parameters
-% EPR: the Map with results from EPR calculation
-%
-% output parameters:
-% endor_amp: endor amplitude values
-%
-% February 2024 A. Kehl (akehl@gwdg.de)
-%
-
-% redefine, one spin system is not possible
-
-function endor_amp=kehl_tensor_rlx(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
+function endor_amp=kehl_tensor_rlx(spin_system,parameters)
 
     % Check consistency
-    kehl_tensor_rlx_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR);
+    kehl_tensor_rlx_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinOps=parameters.spinOps;
+    spinSys=parameters.spinSys;
+    expt=parameters.expt;
+    paramsENDOR=parameters.paramsENDOR;
+    EPR=parameters.epr;
     spinSys('N_SpinSys')=spinSys('Ni_ENDOR');
     spinOps=kehl_spin_ops(spinSys("S"),spinSys("I"),spinSys("Ni_ENDOR"),spinSys("Ni_ENDOR"));
 
@@ -5092,55 +4732,27 @@ function endor_amp=kehl_tensor_rlx(constants,spinOps,spinSys,expt,parameters,par
     end
 end
 
-function kehl_tensor_rlx_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
-if ~isa(constants,'containers.Map')
-    error('constants must be a containers.Map object.');
-end
-if ~isa(spinOps,'containers.Map')
-    error('spinOps must be a containers.Map object.');
-end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
-end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
+function kehl_tensor_rlx_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-if ~isa(paramsENDOR,'containers.Map')
-    error('paramsENDOR must be a containers.Map object.');
-end
-if ~isa(EPR,'containers.Map')
-    error('EPR must be a containers.Map object.');
-end
 end
 
-
-% --- Localised from kehl_tensor_calc.m ---
-% performs the actual ENDOR calculation (no relaxation)
-%
-% input parameters:
-% constants: the Map containing the constants
-% spinOps: the Map containing the spin operators
-% spinSys: the Map describing the spin system
-% expt: the Map containing the experimental parameters
-% parameters: structure containing simulation parameters
-% paramsENDOR: the Map containing the ENDOR parameters
-% EPR: the Map with results from EPR calculation
-%
-% output parameters:
-% endor_amp: endor amplitude values
-%
-% February 2024 A. Kehl (akehl@gwdg.de)
-%
-
-% redefine, one spin system is not possible
-
-function endor_amp=kehl_tensor_calc(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
+function endor_amp=kehl_tensor_calc(spin_system,parameters)
 
     % Check consistency
-    kehl_tensor_calc_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR);
+    kehl_tensor_calc_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinOps=parameters.spinOps;
+    spinSys=parameters.spinSys;
+    expt=parameters.expt;
+    paramsENDOR=parameters.paramsENDOR;
+    EPR=parameters.epr;
     spinSys('N_SpinSys')=spinSys("Ni_ENDOR");
     spinOps=kehl_spin_ops(spinSys("S"),spinSys("I"),spinSys("Ni_ENDOR"),spinSys("Ni_ENDOR"));
 
@@ -5357,54 +4969,27 @@ function endor_amp=kehl_tensor_calc(constants,spinOps,spinSys,expt,parameters,pa
     end
 end
 
-function kehl_tensor_calc_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
-if ~isa(constants,'containers.Map')
-    error('constants must be a containers.Map object.');
-end
-if ~isa(spinOps,'containers.Map')
-    error('spinOps must be a containers.Map object.');
-end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
-end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
+function kehl_tensor_calc_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-if ~isa(paramsENDOR,'containers.Map')
-    error('paramsENDOR must be a containers.Map object.');
-end
-if ~isa(EPR,'containers.Map')
-    error('EPR must be a containers.Map object.');
-end
 end
 
-
-% --- Localised from kehl_cp_calc_rlx.m ---
-% performs the actual CP ENDOR calculation (with relaxation)
-%
-% input parameters:
-% constants: the Map containing the constants
-% spinOps: the Map containing the spin operators
-% spinSys: the Map describing the spin system
-% expt: the Map containing the experimental parameters
-% parameters: structure containing simulation parameters
-% paramsENDOR: the Map containing the ENDOR parameters
-% EPR: the Map with results from EPR calculation
-%
-% output parameters:
-% endor_amp: endor amplitude values
-%
-% February 2024 A. Kehl (akehl@gwdg.de)
-%
-
-
-function endor_amp=kehl_cp_calc_rlx(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
+function endor_amp=kehl_cp_calc_rlx(spin_system,parameters)
 
     % Check consistency
-    kehl_cp_calc_rlx_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR);
+    kehl_cp_calc_rlx_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinOps=parameters.spinOps;
+    spinSys=parameters.spinSys;
+    expt=parameters.expt;
+    paramsENDOR=parameters.paramsENDOR;
+    EPR=parameters.epr;
     spinOps_D=kehl_diag_ops(spinOps,spinSys('Ni_ENDOR'));
 
     % get parameters from Maps
@@ -5828,55 +5413,27 @@ function endor_amp=kehl_cp_calc_rlx(constants,spinOps,spinSys,expt,parameters,pa
     end
 end
 
-function kehl_cp_calc_rlx_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
-if ~isa(constants,'containers.Map')
-    error('constants must be a containers.Map object.');
-end
-if ~isa(spinOps,'containers.Map')
-    error('spinOps must be a containers.Map object.');
-end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
-end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
+function kehl_cp_calc_rlx_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-if ~isa(paramsENDOR,'containers.Map')
-    error('paramsENDOR must be a containers.Map object.');
-end
-if ~isa(EPR,'containers.Map')
-    error('EPR must be a containers.Map object.');
-end
 end
 
-
-% --- Localised from kehl_cp_calc.m ---
-% performs the actual CP ENDOR calculation (no relaxation)
-%
-% input parameters:
-% constants: the Map containing the constants
-% spinOps: the Map containing the spin operators
-% spinSys: the Map describing the spin system
-% expt: the Map containing the experimental parameters
-% parameters: structure containing simulation parameters
-% paramsENDOR: the Map containing the ENDOR parameters
-% EPR: the Map with results from EPR calculation
-%
-% output parameters:
-% endor_amp: endor amplitude values
-%
-% February 2024 A. Kehl (akehl@gwdg.de)
-%
-
-% get values from Maps
-
-function endor_amp=kehl_cp_calc(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
+function endor_amp=kehl_cp_calc(spin_system,parameters)
 
     % Check consistency
-    kehl_cp_calc_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR);
+    kehl_cp_calc_grumble(spin_system,parameters);
+
+    % Unpack legacy data
+    constants=parameters.constants;
+    spinOps=parameters.spinOps;
+    spinSys=parameters.spinSys;
+    expt=parameters.expt;
+    paramsENDOR=parameters.paramsENDOR;
+    EPR=parameters.epr;
     Sz=spinOps("Sz");
     Sx=spinOps("Sx");
     Sy=spinOps("Sy");
@@ -6249,27 +5806,12 @@ function endor_amp=kehl_cp_calc(constants,spinOps,spinSys,expt,parameters,params
     end
 end
 
-function kehl_cp_calc_grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
-if ~isa(constants,'containers.Map')
-    error('constants must be a containers.Map object.');
-end
-if ~isa(spinOps,'containers.Map')
-    error('spinOps must be a containers.Map object.');
-end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
-end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
+function kehl_cp_calc_grumble(spin_system,parameters)
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+    error('spin_system must be a Spinach spin system structure.');
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
-end
-if ~isa(paramsENDOR,'containers.Map')
-    error('paramsENDOR must be a containers.Map object.');
-end
-if ~isa(EPR,'containers.Map')
-    error('EPR must be a containers.Map object.');
 end
 end
 

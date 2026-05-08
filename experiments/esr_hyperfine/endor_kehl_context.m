@@ -100,7 +100,7 @@ function spinSys=context_spin_system(spin_system,parameters,constants)
 
     spinSys=containers.Map;
     spinSys('S')=(electron_mult-1)/2;
-    spinSys('g')=matrix_from_cell(inter.zeeman.matrix,electron_idx,electron_idx);
+    spinSys('g')=zeeman_matrix(inter,electron_idx);
     spinSys('g_iso')=trace(spinSys('g'))/3;
     spinSys('Ni_ENDOR')=n_endor;
     spinSys('Nuclei')=isotopes(endor_spins);
@@ -112,8 +112,8 @@ function spinSys=context_spin_system(spin_system,parameters,constants)
     Q_used=false;
     for n=1:n_endor
         spin_idx=endor_spins(n);
-        A(3*n-2:3*n,:)=matrix_from_cell(inter.coupling.matrix,electron_idx,spin_idx);
-        Q_block=matrix_from_cell(inter.coupling.matrix,spin_idx,spin_idx);
+        A(3*n-2:3*n,:)=coupling_matrix(inter,electron_idx,spin_idx);
+        Q_block=coupling_matrix(inter,spin_idx,spin_idx);
         Q(3*n-2:3*n,:)=Q_block;
         Q_used=Q_used||any(Q_block(:));
     end
@@ -130,15 +130,11 @@ function spinSys=context_spin_system(spin_system,parameters,constants)
 
     CS=zeros(3*n_endor,3);
     CS_used=false;
-    if isfield(inter,'zeeman') && isfield(inter.zeeman,'matrix')
-        for n=1:n_endor
-            spin_idx=endor_spins(n);
-            if numel(inter.zeeman.matrix)>=spin_idx && ~isempty(inter.zeeman.matrix{spin_idx})
-                CS_block=inter.zeeman.matrix{spin_idx}*1e6;
-                CS(3*n-2:3*n,:)=CS_block;
-                CS_used=CS_used||any(CS_block(:));
-            end
-        end
+    for n=1:n_endor
+        spin_idx=endor_spins(n);
+        CS_block=zeeman_matrix(inter,spin_idx)*1e6;
+        CS(3*n-2:3*n,:)=CS_block;
+        CS_used=CS_used||any(CS_block(:));
     end
     if CS_used
         spinSys('CS')=CS;
@@ -149,7 +145,7 @@ function spinSys=context_spin_system(spin_system,parameters,constants)
         pairs=parameters.dipolar_pairs;
         D=zeros(3*size(pairs,1),3);
         for n=1:size(pairs,1)
-            D(3*n-2:3*n,:)=matrix_from_cell(inter.coupling.matrix,pairs(n,1),pairs(n,2));
+            D(3*n-2:3*n,:)=coupling_matrix(inter,pairs(n,1),pairs(n,2));
         end
         spinSys('D')=D;
         spinSys('D_used')=true;
@@ -171,8 +167,8 @@ function spinSys=context_spin_system(spin_system,parameters,constants)
         for n=1:n_epr
             spin_idx=epr_spins(n);
             g_N_EPR(n)=kehl_nuc_gamma(constants,isotopes{spin_idx});
-            A_EPR(3*n-2:3*n,:)=matrix_from_cell(inter.coupling.matrix,electron_idx,spin_idx);
-            Q_block=matrix_from_cell(inter.coupling.matrix,spin_idx,spin_idx);
+            A_EPR(3*n-2:3*n,:)=coupling_matrix(inter,electron_idx,spin_idx);
+            Q_block=coupling_matrix(inter,spin_idx,spin_idx);
             Q_EPR(3*n-2:3*n,:)=Q_block;
             EPR_Q_used=EPR_Q_used||any(Q_block(:));
         end
@@ -213,6 +209,54 @@ function [y_coords,localpar]=cp_axis(localpar)
         localpar.paramsENDOR('y_coords')=y_coords;
     end
     localpar.expt=expt;
+end
+
+function M=zeeman_matrix(inter,spin_idx)
+    M=zeros(3,3);
+    if isfield(inter,'zeeman') && isfield(inter.zeeman,'matrix')
+        if isvector(inter.zeeman.matrix) && numel(inter.zeeman.matrix)>=spin_idx &&...
+           ~isempty(inter.zeeman.matrix{spin_idx})
+            M=inter.zeeman.matrix{spin_idx};
+        else
+            M=matrix_from_cell(inter.zeeman.matrix,spin_idx,spin_idx);
+        end
+    end
+    if isfield(inter,'zeeman') && isfield(inter.zeeman,'eigs') &&...
+       numel(inter.zeeman.eigs)>=spin_idx && ~isempty(inter.zeeman.eigs{spin_idx})
+        S=euler_matrix(inter.zeeman.euler{spin_idx});
+        M=M+S*diag(inter.zeeman.eigs{spin_idx})*S';
+    end
+end
+
+function M=coupling_matrix(inter,row,col)
+    M=zeros(3,3);
+    if isfield(inter,'coupling') && isfield(inter.coupling,'matrix')
+        M=matrix_from_cell(inter.coupling.matrix,row,col);
+    end
+    if isfield(inter,'coupling') && isfield(inter.coupling,'eigs')
+        M=M+coupling_eigs_matrix(inter.coupling,row,col);
+    end
+end
+
+function M=coupling_eigs_matrix(coupling,row,col)
+    M=zeros(3,3);
+    if size(coupling.eigs,1)>=row && size(coupling.eigs,2)>=col &&...
+       ~isempty(coupling.eigs{row,col})
+        S=euler_matrix(coupling.euler{row,col});
+        M=S*diag(coupling.eigs{row,col})*S';
+    elseif size(coupling.eigs,1)>=col && size(coupling.eigs,2)>=row &&...
+           ~isempty(coupling.eigs{col,row})
+        S=euler_matrix(coupling.euler{col,row});
+        M=S*diag(coupling.eigs{col,row})*S';
+    end
+end
+
+function S=euler_matrix(eulers)
+    if isempty(eulers)
+        S=eye(3,3);
+    else
+        S=euler2dcm(eulers);
+    end
 end
 
 function M=matrix_from_cell(cells,row,col)

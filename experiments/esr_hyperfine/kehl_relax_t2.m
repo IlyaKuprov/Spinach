@@ -16,7 +16,7 @@ function RT2=kehl_relax_t2(O,T2)
     grumble(O,T2);
     RT2=zeros(size(O).^2);
 
-    ind=find(kehl_mat_to_lbra(O));
+    ind=find(hilb2liouv(O,'statevec'));
 
     RT2(ind,ind)=-1/T2;
     RT2=diag(diag(RT2));

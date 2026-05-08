@@ -2132,7 +2132,7 @@ function endor_amp=kehl_mims_rlx(spin_system,parameters)
 
 
                     % Evolve the densitymatrix
-                    rho=kehl_mat_to_lbra(rho0)';
+                    rho=hilb2liouv(rho0,'statevec');
 
                     rho=U1*rho;
                     rho=U2*rho;
@@ -2813,7 +2813,7 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
                 end
 
                 % Evolve the densitymatrix
-                rho=kehl_mat_to_lbra(rho0)';
+                rho=hilb2liouv(rho0,'statevec');
 
                 rho=U1*rho;
                 rho=U2*rho;
@@ -3451,7 +3451,7 @@ function endor_amp=kehl_davies_rlx(spin_system,parameters)
 
                 % Evolve the densitymatrix
 
-                rho=kehl_mat_to_lbra(rho0)';
+                rho=hilb2liouv(rho0,'statevec');
 
                 rho=U1*rho;
                 rho=U2*rho;
@@ -4131,13 +4131,13 @@ function endor_amp=kehl_spinlock_rlx(spin_system,parameters)
 
                 % Evolve the densitymatrix
 
-                rho=kehl_mat_to_lbra(rho0)';
+                rho=hilb2liouv(rho0,'statevec');
 
                 rho_t=W*kehl_lket_to_mat(rho)*W^(-1);
-                rho_t=kehl_mat_to_lbra(rho_t)';
+                rho_t=hilb2liouv(rho_t,'statevec');
                 rho_t=U1*rho_t;
                 rho=V*kehl_lket_to_mat(rho_t)*V^(-1);
-                rho=kehl_mat_to_lbra(rho)';
+                rho=hilb2liouv(rho,'statevec');
 
                 % rho = U1*rho;
                 rho=U2*rho;
@@ -4718,7 +4718,7 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
 
                 % Evolve the densitymatrix
 
-                rho=kehl_mat_to_lbra(rho0)';
+                rho=hilb2liouv(rho0,'statevec');
                 rho=U1*rho;
 
                 value_Sy=0;
@@ -5389,15 +5389,15 @@ function endor_amp=kehl_cp_calc_rlx(spin_system,parameters)
                     end
 
                 % Evolve the densitymatrix
-                rho=kehl_mat_to_lbra(rho0)';
+                rho=hilb2liouv(rho0,'statevec');
                 rho=U1*rho;
                 rho=U2*rho;
 
                 rho_t=W*kehl_lket_to_mat(rho)*W^(-1);
-                rho_t=kehl_mat_to_lbra(rho_t)';
+                rho_t=hilb2liouv(rho_t,'statevec');
                 rho_t=U3*rho_t;
                 rho=V*kehl_lket_to_mat(rho_t)*V^(-1);
-                rho=kehl_mat_to_lbra(rho)';
+                rho=hilb2liouv(rho,'statevec');
 
                 rho=U4*rho;
                 rho=U5*rho;

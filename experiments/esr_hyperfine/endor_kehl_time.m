@@ -213,67 +213,20 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
             oneE=parameters.electron_nutation;
             oneN=parameters.nuclear_nutation;
 
-            Hfree_p=2*pi*v_off_S*Sz;
             if n_spin_systems>1
-                nuc=round(i/(2*I(1)+1)) ;
-                % HF
-                Hfree_p=Hfree_p-2*pi*v_L(1)*Iz{1}+2*pi*v_L(1)*Iz{1}*CS_zz(nuc)+2*pi*HF_zz(nuc)*(Sz*Iz{1})+2*pi*HF_zy(nuc)*(Sz*Iy{1})+2*pi*HF_zx(nuc)*(Sz*Ix{1});
-                % NQI
-                if parameters.Bterm==true
-                    Hfree_p=Hfree_p+NQI(1,1,1)*Ix{1}*Ix{1};
-                    Hfree_p=Hfree_p+NQI(1,1,2)*Ix{1}*Iy{1};
-                    Hfree_p=Hfree_p+NQI(1,1,3)*Ix{1}*Iz{1};
-                    Hfree_p=Hfree_p+NQI(1,2,1)*Iy{1}*Ix{1};
-                    Hfree_p=Hfree_p+NQI(1,2,2)*Iy{1}*Iy{1};
-                    Hfree_p=Hfree_p+NQI(1,2,3)*Iy{1}*Iz{1};
-                    Hfree_p=Hfree_p+NQI(1,3,1)*Iz{1}*Ix{1};
-                    Hfree_p=Hfree_p+NQI(1,3,2)*Iz{1}*Iy{1};
-                    Hfree_p=Hfree_p+NQI(1,3,3)*Iz{1}*Iz{1};
-                else
-                    Hfree_p=Hfree_p+pi*NQI_zz(1)*(3*Iz{1}*Iz{1}-I(1)*(I(1)+1)*eye(size(Hfree_p)));
-                end
+                nuc=round(i/(2*I(1)+1));
+                spin_map=nuc;
+                term_map=struct('zeeman',1,'hyperfine',nuc,...
+                                'nqi',1,'cs',nuc,'cs_larmor',1);
+                use_dipolar=false;
             else
-                for mn=1:n_endor
-                    % HF
-                    Hfree_p=Hfree_p-2*pi*v_L(mn)*Iz{mn}+2*pi*HF_zz(mn)*(Sz*Iz{mn})+2*pi*HF_zy(mn)*(Sz*Iy{mn})+2*pi*HF_zx(mn)*(Sz*Ix{mn})+2*pi*v_L(mn)*CS_zz(mn)*Iz{mn};
-                    % NQI
-                    if parameters.Bterm==true
-                        Hfree_p=Hfree_p+NQI(mn,1,1)*Ix{mn}*Ix{mn};
-                        Hfree_p=Hfree_p+NQI(mn,1,2)*Ix{mn}*Iy{mn};
-                        Hfree_p=Hfree_p+NQI(mn,1,3)*Ix{mn}*Iz{mn};
-                        Hfree_p=Hfree_p+NQI(mn,2,1)*Iy{mn}*Ix{mn};
-                        Hfree_p=Hfree_p+NQI(mn,2,2)*Iy{mn}*Iy{mn};
-                        Hfree_p=Hfree_p+NQI(mn,2,3)*Iy{mn}*Iz{mn};
-                        Hfree_p=Hfree_p+NQI(mn,3,1)*Iz{mn}*Ix{mn};
-                        Hfree_p=Hfree_p+NQI(mn,3,2)*Iz{mn}*Iy{mn};
-                        Hfree_p=Hfree_p+NQI(mn,3,3)*Iz{mn}*Iz{mn};
-                    else
-                        Hfree_p=Hfree_p+pi*NQI_zz(mn)*(3*Iz{mn}*Iz{mn}-I(mn)*(I(mn)+1)*eye(size(Hfree_p)));
-                    end
-                end
-
-                if parameters.dipolar_active==true
-                    for mn=2:(size(D_zz,2)+1)
-                        dipC=2*pi*D_zz(mn-1);
-
-                        HD=zeros(size(Hfree_p));
-
-                        HD=HD+Ix{1}*Ix{mn};
-                        HD=HD+Ix{1}*Iy{mn};
-                        HD=HD+Ix{1}*Iz{mn};
-                        HD=HD+Iy{1}*Ix{mn};
-                        HD=HD+Iy{1}*Iy{mn};
-                        HD=HD+Iy{1}*Iz{mn};
-                        HD=HD+Iz{1}*Ix{mn};
-                        HD=HD+Iz{1}*Iy{mn};
-                        HD=HD+Iz{1}*Iz{mn};
-
-                        HDip=dipC*(3*Iz{1}*Iz{mn}-HD)/2;
-                        Hfree_p=Hfree_p+HDip;
-                    end
-                end
+                spin_map=1:n_endor;
+                term_map=struct();
+                use_dipolar=true;
             end
-
+            Hfree_p=kehl_free_ham(parameters,paramsENDOR,operator_spin_system,...
+                                    v_off_S,spin_map,HF_zz,HF_zy,HF_zx,...
+                                    NQI,NQI_zz,CS_zz,D_zz,use_dipolar,term_map);
             % Integration step for the Signal to account for oscillation
             if v_off_S==0
                 t11=1/(off_1*Nint);
@@ -551,169 +504,115 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
             oneE=parameters.electron_nutation;
             oneN=parameters.nuclear_nutation;
 
-            Hfree_p=2*pi*v_off_S*Sz;
             if n_spin_systems>1
-                nuc=round(i/(2*I(1)+1)) ;
-                % HF
-                Hfree_p=Hfree_p-2*pi*v_L(1)*Iz{1}+2*pi*v_L(1)*Iz{1}*CS_zz(nuc)+2*pi*HF_zz(nuc)*(Sz*Iz{1})+2*pi*HF_zy(nuc)*(Sz*Iy{1})+2*pi*HF_zx(nuc)*(Sz*Ix{1});
-                % NQI
-                if parameters.Bterm==true
-                    Hfree_p=Hfree_p+NQI(1,1,1)*Ix{1}*Ix{1};
-                    Hfree_p=Hfree_p+NQI(1,1,2)*Ix{1}*Iy{1};
-                    Hfree_p=Hfree_p+NQI(1,1,3)*Ix{1}*Iz{1};
-                    Hfree_p=Hfree_p+NQI(1,2,1)*Iy{1}*Ix{1};
-                    Hfree_p=Hfree_p+NQI(1,2,2)*Iy{1}*Iy{1};
-                    Hfree_p=Hfree_p+NQI(1,2,3)*Iy{1}*Iz{1};
-                    Hfree_p=Hfree_p+NQI(1,3,1)*Iz{1}*Ix{1};
-                    Hfree_p=Hfree_p+NQI(1,3,2)*Iz{1}*Iy{1};
-                    Hfree_p=Hfree_p+NQI(1,3,3)*Iz{1}*Iz{1};
-                else
-                    Hfree_p=Hfree_p+pi*NQI_zz(1)*(3*Iz{1}*Iz{1}-I(1)*(I(1)+1)*eye(size(Hfree_p)));
-                end
+                nuc=round(i/(2*I(1)+1));
+                spin_map=nuc;
+                term_map=struct('zeeman',1,'hyperfine',nuc,...
+                                'nqi',1,'cs',nuc,'cs_larmor',1);
+                use_dipolar=false;
+            else
+                spin_map=1:n_endor;
+                term_map=struct();
+                use_dipolar=true;
+            end
+            Hfree_p=kehl_free_ham(parameters,paramsENDOR,operator_spin_system,...
+                                    v_off_S,spin_map,HF_zz,HF_zy,HF_zx,...
+                                    NQI,NQI_zz,CS_zz,D_zz,use_dipolar,term_map);
+            v_RF=v_L(1);
+            Hcorr=zeros(size(Hfree_p));
+            if n_spin_systems>1
+                m=1;
+                Hcorr=Hcorr+2*pi*v_RF*Iz{m};
             else
                 for mm=1:n_endor
-                    % HF
-                    Hfree_p=Hfree_p-2*pi*v_L(mm)*Iz{mm}+2*pi*HF_zz(mm)*(Sz*Iz{mm})+2*pi*HF_zy(mm)*(Sz*Iy{mm})+2*pi*HF_zx(mm)*(Sz*Ix{mm})+2*pi*v_L(mm)*CS_zz(mm)*Iz{mm};
-                    % NQI
-                    if parameters.Bterm==true
-                        HNQI=zeros(size(Hfree_p));
-                        HNQI=HNQI+Ix{mm}*NQI(mm,1,1)*Ix{mm};
-                        HNQI=HNQI+Ix{mm}*NQI(mm,1,2)*Iy{mm};
-                        HNQI=HNQI+Ix{mm}*NQI(mm,1,3)*Iz{mm};
-                        HNQI=HNQI+Iy{mm}*NQI(mm,2,1)*Ix{mm};
-                        HNQI=HNQI+Iy{mm}*NQI(mm,2,2)*Iy{mm};
-                        HNQI=HNQI+Iy{mm}*NQI(mm,2,3)*Iz{mm};
-                        HNQI=HNQI+Iz{mm}*NQI(mm,3,1)*Ix{mm};
-                        HNQI=HNQI+Iz{mm}*NQI(mm,3,2)*Iy{mm};
-                        HNQI=HNQI+Iz{mm}*NQI(mm,3,3)*Iz{mm};
-                        Hfree_p=Hfree_p+HNQI;
-                    else
-                        Hfree_p=Hfree_p+pi*NQI_zz(mm)*(3*Iz{mm}*Iz{mm}-I(mm)*(I(mm)+1)*eye(size(Hfree_p)));
-
-                    end
-
+                    Hcorr=Hcorr+2*pi*v_RF*Iz{mm};
                 end
+            end
+            if parameters.Bterm==false
+                Hfree=Hfree_p+Hcorr;
+            else
+                Hfree=Hfree_p;
+            end
 
-                if parameters.dipolar_active==true
-                    for mm=2:(size(D_zz,2)+1)
-                        dipC=2*pi*D_zz(mm-1);
+            % mw pulses
+            Hnonsel=Hfree+oneE*Sx;
 
-                        HD=zeros(size(Hfree_p));
+            HRF=Hfree;
 
-                        HD=HD+Ix{1}*Ix{mm};
-                        HD=HD+Ix{1}*Iy{mm};
-                        HD=HD+Ix{1}*Iz{mm};
-                        HD=HD+Iy{1}*Ix{mm};
-                        HD=HD+Iy{1}*Iy{mm};
-                        HD=HD+Iy{1}*Iz{mm};
-                        HD=HD+Iz{1}*Ix{mm};
-                        HD=HD+Iz{1}*Iy{mm};
-                        HD=HD+Iz{1}*Iz{mm};
-
-                        HDip=dipC*(3*Iz{1}*Iz{mm}-HD)/2;
-
-                        Hfree_p=Hfree_p+HDip;
+            if parameters.Bterm==false
+                if n_spin_systems>1
+                    m=1;
+                    HRF=HRF+oneN*Iy{m};
+                else
+                    for mm=1:n_endor
+                        HRF=HRF+oneN*Iy{mm};
                     end
                 end
             end
-                v_RF=v_L(1);
-                Hcorr=zeros(size(Hfree_p));
-                if n_spin_systems>1
-                    m=1;
-                    Hcorr=Hcorr+2*pi*v_RF*Iz{m};
+
+
+            % Integration step for the Signal to account for oscillation
+            if v_off_S==0
+                t11=1/abs(off_1*Nint);
+            else
+                t11=1/abs(v_off_S*Nint);
+            end
+
+
+            if parameters.Bterm==false
+                U5=full(propagator(operator_spin_system,sparse(HRF),t(5)));
+                if t(5)==t(7)
+                    U7=U5;
                 else
-
-                    for mm=1:n_endor
-                        Hcorr=Hcorr+2*pi*v_RF*Iz{mm};
-
-                    end
+                    U7=full(propagator(operator_spin_system,sparse(HRF),t(7)));
                 end
 
-                if parameters.Bterm==false
-                    Hfree=Hfree_p+Hcorr;
+            else
+                U5=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t(5),n_endor,n_spin_systems,operator_spin_system);
+                if t(5)==t(7)
+                    U7=U5;
                 else
-                    Hfree=Hfree_p;
+                    U7=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t(7),n_endor,n_spin_systems,operator_spin_system);
                 end
+            end
 
-                % mw pulses
-                Hnonsel=Hfree+oneE*Sx;
+            % Calculate the propagators
+            U1=full(propagator(operator_spin_system,sparse(Hnonsel),t(1)));
 
-                HRF=Hfree;
+            if t(1)==t(3)
+                U3=U1;
+            else
+                U3=full(propagator(operator_spin_system,sparse(Hnonsel),t(3)));
+            end
 
-                if parameters.Bterm==false
-                    if n_spin_systems>1
-                        m=1;
-                        HRF=HRF+oneN*Iy{m};
-                    else
-                        for mm=1:n_endor
-                            HRF=HRF+oneN*Iy{mm};
-                        end
-                    end
-                end
+            if t(1)==t(9)
+                U9=U1;
+            elseif t(3)==t(9)
+                U9=U3;
+            else
+                U9=full(propagator(operator_spin_system,sparse(Hfree),t(9)));
+            end
 
+            U2=full(propagator(operator_spin_system,sparse(Hfree),t(2)));
 
-                % Integration step for the Signal to account for oscillation
-                if v_off_S==0
-                    t11=1/abs(off_1*Nint);
-                else
-                    t11=1/abs(v_off_S*Nint);
-                end
+            U4=full(propagator(operator_spin_system,sparse(Hfree),t(4)));
 
+            U10=full(propagator(operator_spin_system,sparse(Hfree),t(2)+t(3)/2));
 
-                if parameters.Bterm==false
-                    U5=full(propagator(operator_spin_system,sparse(HRF),t(5)));
-                    if t(5)==t(7)
-                        U7=U5;
-                    else
-                        U7=full(propagator(operator_spin_system,sparse(HRF),t(7)));
-                    end
-
-                else
-                    U5=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t(5),n_endor,n_spin_systems,operator_spin_system);
-                    if t(5)==t(7)
-                        U7=U5;
-                    else
-                        U7=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t(7),n_endor,n_spin_systems,operator_spin_system);
-                    end
-                end
-
-                % Calculate the propagators
-                U1=full(propagator(operator_spin_system,sparse(Hnonsel),t(1)));
-
-                if t(1)==t(3)
-                    U3=U1;
-                else
-                    U3=full(propagator(operator_spin_system,sparse(Hnonsel),t(3)));
-                end
-
-                if t(1)==t(9)
-                    U9=U1;
-                elseif t(3)==t(9)
-                    U9=U3;
-                else
-                    U9=full(propagator(operator_spin_system,sparse(Hfree),t(9)));
-                end
-
-                U2=full(propagator(operator_spin_system,sparse(Hfree),t(2)));
-
-                U4=full(propagator(operator_spin_system,sparse(Hfree),t(4)));
-
-                U10=full(propagator(operator_spin_system,sparse(Hfree),t(2)+t(3)/2));
-
-                U11=full(propagator(operator_spin_system,sparse(Hfree),t11));
+            U11=full(propagator(operator_spin_system,sparse(Hfree),t11));
 
 
-                % Evolve the densitymatrix
-                rho=rho0;
-                rho=U1*rho*U1';
-                rho=U2*rho*U2';
-                rho=U3*rho*U3';
-                rho=U4*rho*U4';
-                rho=U5*rho*U5';
+            % Evolve the densitymatrix
+            rho=rho0;
+            rho=U1*rho*U1';
+            rho=U2*rho*U2';
+            rho=U3*rho*U3';
+            rho=U4*rho*U4';
+            rho=U5*rho*U5';
 
-                if parameters.Bterm==true
-                    rho=diag(diag(rho));
-                end
+            if parameters.Bterm==true
+                rho=diag(diag(rho));
+            end
 
             rho_t=rho;
 

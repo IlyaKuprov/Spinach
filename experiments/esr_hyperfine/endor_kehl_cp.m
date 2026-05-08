@@ -338,77 +338,34 @@ function endor_amp=kehl_cp_calc_rlx(spin_system,parameters)
             oneE=parameters.electron_nutation;
             oneN=parameters.nuclear_nutation;
 
-            Hfree_p=2*pi*v_off_S*Sz;
             if n_spin_systems>1
                 if parameters.powder==1
-                    mn=round(i/(2*I(1)+1));
+                    spin_map=round(i/(2*I(1)+1));
                 else
-                    mn=i;
+                    spin_map=i;
                 end
-                % HF
-                Hfree_p=Hfree_p-2*pi*v_L(mn)*Iz{1}+2*pi*v_L(mn)*Iz{1}*CS_zz(mn)+2*pi*HF_zz(mn)*(Sz*Iz{1})+2*pi*HF_zy(mn)*(Sz*Iy{1})+2*pi*HF_zx(mn)*(Sz*Ix{1});
-                % NQI
-                if parameters.Bterm==true
-                    Hfree_p=Hfree_p+NQI(mn,1,1)*Ix{1}*Ix{1};
-                    Hfree_p=Hfree_p+NQI(mn,1,2)*Ix{1}*Iy{1};
-                    Hfree_p=Hfree_p+NQI(mn,1,3)*Ix{1}*Iz{1};
-                    Hfree_p=Hfree_p+NQI(mn,2,1)*Iy{1}*Ix{1};
-                    Hfree_p=Hfree_p+NQI(mn,2,2)*Iy{1}*Iy{1};
-                    Hfree_p=Hfree_p+NQI(mn,2,3)*Iy{1}*Iz{1};
-                    Hfree_p=Hfree_p+NQI(mn,3,1)*Iz{1}*Ix{1};
-                    Hfree_p=Hfree_p+NQI(mn,3,2)*Iz{1}*Iy{1};
-                    Hfree_p=Hfree_p+NQI(mn,3,3)*Iz{1}*Iz{1};
-                else
-                    Hfree_p=Hfree_p+pi*NQI_zz(mn)*(3*Iz{1}*Iz{1}-I(1)*(I(1)+1)*eye(size(Hfree_p)));
-                end
-
-                % get offset for sc CP calculation
+                term_map=struct();
+                use_dipolar=false;
+            else
+                spin_map=1:n_endor;
+                term_map=struct();
+                use_dipolar=true;
+            end
+            Hfree_p=kehl_free_ham(parameters,paramsENDOR,operator_spin_system,...
+                                    v_off_S,spin_map,HF_zz,HF_zy,HF_zx,...
+                                    NQI,NQI_zz,CS_zz,D_zz,use_dipolar,term_map);
+            if n_spin_systems>1
                 if parameters.powder==false
-                    [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,v_off_S,HF_zz,NQI_zz,mn,i);
+                    [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,...
+                                                       v_off_S,HF_zz,NQI_zz,...
+                                                       spin_map,i);
                 end
-
             else
                 for mm=1:n_endor
-                    % HF
-                    Hfree_p=Hfree_p-2*pi*v_L(mm)*Iz{mm}+2*pi*HF_zz(mm)*(Sz*Iz{mm})+2*pi*HF_zy(mm)*(Sz*Iy{mm})+2*pi*HF_zx(mm)*(Sz*Ix{mm})+2*pi*v_L(mm)*CS_zz(mm)*Iz{mm};
-                    % NQI
-                    if parameters.Bterm==true
-                        Hfree_p=Hfree_p+NQI(mm,1,1)*Ix{mm}*Ix{mm};
-                        Hfree_p=Hfree_p+NQI(mm,1,2)*Ix{mm}*Iy{mm};
-                        Hfree_p=Hfree_p+NQI(mm,1,3)*Ix{mm}*Iz{mm};
-                        Hfree_p=Hfree_p+NQI(mm,2,1)*Iy{mm}*Ix{mm};
-                        Hfree_p=Hfree_p+NQI(mm,2,2)*Iy{mm}*Iy{mm};
-                        Hfree_p=Hfree_p+NQI(mm,2,3)*Iy{mm}*Iz{mm};
-                        Hfree_p=Hfree_p+NQI(mm,3,1)*Iz{mm}*Ix{mm};
-                        Hfree_p=Hfree_p+NQI(mm,3,2)*Iz{mm}*Iy{mm};
-                        Hfree_p=Hfree_p+NQI(mm,3,3)*Iz{mm}*Iz{mm};
-                    else
-                        Hfree_p=Hfree_p+pi*NQI_zz(mm)*(3*Iz{mm}*Iz{mm}-I(mm)*(I(mm)+1)*eye(size(Hfree_p)));
-                    end
-
-                    % get offset for sc CP calculation
                     if parameters.powder==false
-                        [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,v_off_S,HF_zz,NQI_zz,mm,i);
-                    end
-                end
-                 if parameters.dipolar_active==true
-                    for mm=2:(size(D_zz,2)+1)
-                        dipC=2*pi*D_zz(mm-1);
-
-                        HD=zeros(size(Hfree_p));
-
-                        HD=HD+Ix{1}*Ix{mm};
-                        HD=HD+Ix{1}*Iy{mm};
-                        HD=HD+Ix{1}*Iz{mm};
-                        HD=HD+Iy{1}*Ix{mm};
-                        HD=HD+Iy{1}*Iy{mm};
-                        HD=HD+Iy{1}*Iz{mm};
-                        HD=HD+Iz{1}*Ix{mm};
-                        HD=HD+Iz{1}*Iy{mm};
-                        HD=HD+Iz{1}*Iz{mm};
-
-                        HDip=dipC*(3*Iz{1}*Iz{mm}-HD)/2;
-                        Hfree_p=Hfree_p+HDip;
+                        [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,...
+                                                           v_off_S,HF_zz,NQI_zz,...
+                                                           mm,i);
                     end
                 end
             end
@@ -706,105 +663,62 @@ function endor_amp=kehl_cp_calc(spin_system,parameters)
             oneN=parameters.nuclear_nutation;
 
             % define free Hamiltonian
-            Hfree_p=2*pi*v_off_S*Sz;
             if n_spin_systems>1
                 if parameters.powder==1
-                    mn=round(i/(2*I(1)+1));
+                    spin_map=round(i/(2*I(1)+1));
                 else
-                    mn=i;
+                    spin_map=i;
                 end
-                % HF
-                Hfree_p=Hfree_p-2*pi*v_L(mn)*Iz{1}+2*pi*v_L(mn)*Iz{1}*CS_zz(mn)+2*pi*HF_zz(mn)*(Sz*Iz{1})+2*pi*HF_zy(mn)*(Sz*Iy{1})+2*pi*HF_zx(mn)*(Sz*Ix{1});
-                % NQI
-                if parameters.Bterm==true
-                    Hfree_p=Hfree_p+NQI(mn,1,1)*Ix{1}*Ix{1};
-                    Hfree_p=Hfree_p+NQI(mn,1,2)*Ix{1}*Iy{1};
-                    Hfree_p=Hfree_p+NQI(mn,1,3)*Ix{1}*Iz{1};
-                    Hfree_p=Hfree_p+NQI(mn,2,1)*Iy{1}*Ix{1};
-                    Hfree_p=Hfree_p+NQI(mn,2,2)*Iy{1}*Iy{1};
-                    Hfree_p=Hfree_p+NQI(mn,2,3)*Iy{1}*Iz{1};
-                    Hfree_p=Hfree_p+NQI(mn,3,1)*Iz{1}*Ix{1};
-                    Hfree_p=Hfree_p+NQI(mn,3,2)*Iz{1}*Iy{1};
-                    Hfree_p=Hfree_p+NQI(mn,3,3)*Iz{1}*Iz{1};
-                else
-                    Hfree_p=Hfree_p+pi*NQI_zz(mn)*(3*Iz{1}*Iz{1}-I(1)*(I(1)+1)*eye(size(Hfree_p)));
-                end
-
-                % get offset for sc CP calculation
+                term_map=struct();
+                use_dipolar=false;
+            else
+                spin_map=1:n_endor;
+                term_map=struct();
+                use_dipolar=true;
+            end
+            Hfree_p=kehl_free_ham(parameters,paramsENDOR,operator_spin_system,...
+                                    v_off_S,spin_map,HF_zz,HF_zy,HF_zx,...
+                                    NQI,NQI_zz,CS_zz,D_zz,use_dipolar,term_map);
+            if n_spin_systems>1
                 if parameters.powder==false
-                    [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,v_off_S,HF_zz,NQI_zz,mn,i);
+                    [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,...
+                                                       v_off_S,HF_zz,NQI_zz,...
+                                                       spin_map,i);
                 end
             else
                 for mm=1:n_endor
-                    % HF
-                    Hfree_p=Hfree_p-2*pi*v_L(mm)*Iz{mm}+2*pi*HF_zz(mm)*(Sz*Iz{mm})+2*pi*HF_zy(mm)*(Sz*Iy{mm})+2*pi*HF_zx(mm)*(Sz*Ix{mm})+2*pi*v_L(mm)*CS_zz(mm)*Iz{mm};
-                    % NQI
-                    if parameters.Bterm==true
-                        Hfree_p=Hfree_p+NQI(mm,1,1)*Ix{mm}*Ix{mm};
-                        Hfree_p=Hfree_p+NQI(mm,1,2)*Ix{mm}*Iy{mm};
-                        Hfree_p=Hfree_p+NQI(mm,1,3)*Ix{mm}*Iz{mm};
-                        Hfree_p=Hfree_p+NQI(mm,2,1)*Iy{mm}*Ix{mm};
-                        Hfree_p=Hfree_p+NQI(mm,2,2)*Iy{mm}*Iy{mm};
-                        Hfree_p=Hfree_p+NQI(mm,2,3)*Iy{mm}*Iz{mm};
-                        Hfree_p=Hfree_p+NQI(mm,3,1)*Iz{mm}*Ix{mm};
-                        Hfree_p=Hfree_p+NQI(mm,3,2)*Iz{mm}*Iy{mm};
-                        Hfree_p=Hfree_p+NQI(mm,3,3)*Iz{mm}*Iz{mm};
-                    else
-                        Hfree_p=Hfree_p+pi*NQI_zz(mm)*(3*Iz{mm}*Iz{mm}-I(mm)*(I(mm)+1)*eye(size(Hfree_p)));
-                    end
-
-                    % get offset for sc CP calculation
                     if parameters.powder==false
-                        [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,v_off_S,HF_zz,NQI_zz,mm,i);
-                    end
-                end
-
-                if parameters.dipolar_active==true
-                    for mm=2:(size(D_zz,2)+1)
-                        dipC=2*pi*D_zz(mm-1);
-
-                        HD=zeros(size(Hfree_p));
-
-                        HD=HD+Ix{1}*Ix{mm};
-                        HD=HD+Ix{1}*Iy{mm};
-                        HD=HD+Ix{1}*Iz{mm};
-                        HD=HD+Iy{1}*Ix{mm};
-                        HD=HD+Iy{1}*Iy{mm};
-                        HD=HD+Iy{1}*Iz{mm};
-                        HD=HD+Iz{1}*Ix{mm};
-                        HD=HD+Iz{1}*Iy{mm};
-                        HD=HD+Iz{1}*Iz{mm};
-
-                        HDip=dipC*(3*Iz{1}*Iz{mm}-HD)/2;
-                        Hfree_p=Hfree_p+HDip;
+                        [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,...
+                                                           v_off_S,HF_zz,NQI_zz,...
+                                                           mm,i);
                     end
                 end
             end
 
-                % Hamiltonian for mw pulses
-                Hprep_p=Hfree_p+prep*Sx;
-                Hnonsel_p=Hfree_p+oneE*Sx;
+            % Hamiltonian for mw pulses
+            Hprep_p=Hfree_p+prep*Sx;
+            Hnonsel_p=Hfree_p+oneE*Sx;
 
-                % Integration step for the Signal to account for oscillation
-                if v_off_S==0
-                    t11=1/(off_1*Nint);
-                else
-                    t11=1/(v_off_S*Nint);
-                end
+            % Integration step for the Signal to account for oscillation
+            if v_off_S==0
+                t11=1/(off_1*Nint);
+            else
+                t11=1/(v_off_S*Nint);
+            end
 
 
-                % Calculate the propagators
-                U1_p=full(propagator(operator_spin_system,sparse(Hprep_p),t(1)));
-                U2_p=full(propagator(operator_spin_system,sparse(Hfree_p),t(2)));
-                % SL/CP step
-                U4_p=full(propagator(operator_spin_system,sparse(Hfree_p),t(4)));
-                % RF pulse
-                U6_p=full(propagator(operator_spin_system,sparse(Hfree_p),t(6)));
-                U7_p=full(propagator(operator_spin_system,sparse(Hnonsel_p),t(7)));
-                U8_p=full(propagator(operator_spin_system,sparse(Hfree_p),t(8)));
-                U9_p=full(propagator(operator_spin_system,sparse(Hnonsel_p),t(9)));
-                U10_p=full(propagator(operator_spin_system,sparse(Hfree_p),t(8)+t(7)/2));
-                U11_p=full(propagator(operator_spin_system,sparse(Hfree_p),t11));
+            % Calculate the propagators
+            U1_p=full(propagator(operator_spin_system,sparse(Hprep_p),t(1)));
+            U2_p=full(propagator(operator_spin_system,sparse(Hfree_p),t(2)));
+            % SL/CP step
+            U4_p=full(propagator(operator_spin_system,sparse(Hfree_p),t(4)));
+            % RF pulse
+            U6_p=full(propagator(operator_spin_system,sparse(Hfree_p),t(6)));
+            U7_p=full(propagator(operator_spin_system,sparse(Hnonsel_p),t(7)));
+            U8_p=full(propagator(operator_spin_system,sparse(Hfree_p),t(8)));
+            U9_p=full(propagator(operator_spin_system,sparse(Hnonsel_p),t(9)));
+            U10_p=full(propagator(operator_spin_system,sparse(Hfree_p),t(8)+t(7)/2));
+            U11_p=full(propagator(operator_spin_system,sparse(Hfree_p),t11));
 
             % loop over cp frequencies (y-axis)
             for c=1:Npts_CP

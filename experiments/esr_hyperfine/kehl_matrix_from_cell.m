@@ -2,7 +2,7 @@
 %
 %   Spinach architecture migration May 2026 Talos
 
-function M=kehl_kehl_matrix_from_cell(cells,row,col)
+function M=kehl_matrix_from_cell(cells,row,col)
     M=zeros(3,3);
     if isempty(cells)
         return

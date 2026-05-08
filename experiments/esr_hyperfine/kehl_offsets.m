@@ -27,20 +27,14 @@ function offsets=kehl_offsets(constants,parameters,operator_spin_system,...
 grumble(constants,parameters,operator_spin_system,paramsENDOR,B,geff,...
         HF_zz,NQI_zz);
 
-% Obtain electron operators directly from Spinach
-Sz=full(operator(operator_spin_system,'Lz',1));
-Sx=full(operator(operator_spin_system,'Lx',1));
-
-% Obtain nuclear operators directly from Spinach
-Ix=cell(1,operator_spin_system.comp.nspins-1);
-Iy=cell(1,operator_spin_system.comp.nspins-1);
-Iz=cell(1,operator_spin_system.comp.nspins-1);
-for k=1:numel(Iz)
-    spin_idx=k+1;
-    Ix{k}=full(operator(operator_spin_system,'Lx',spin_idx));
-    Iy{k}=full(operator(operator_spin_system,'Ly',spin_idx));
-    Iz{k}=full(operator(operator_spin_system,'Lz',spin_idx));
-end
+% Get cached operators
+ops=kehl_operator_basis(operator_spin_system,parameters.n_endor,...
+                        parameters.n_spin_systems);
+Sz=ops.Sz;
+Sx=ops.Sx;
+Ix=ops.Ix;
+Iy=ops.Iy;
+Iz=ops.Iz;
 
 % Get explicit context data
 n_endor=parameters.n_endor;
@@ -63,7 +57,7 @@ for n=1:n_spin_systems
         H_NZ=H_NZ-v_L(n)*Iz{1};
         H_HF=H_HF+2*pi*HF_zz(n)*(Sz*Iz{1});
         H_NQI=H_NQI+pi*NQI_zz(n)*(3*Iz{1}*Iz{1}-...
-              spin_numbers(n)*(spin_numbers(n)+1)*eye(size(Sz)));
+              spin_numbers(n)*(spin_numbers(n)+1)*ops.eye);
     else
 
         % Use all ENDOR nuclear operators in compact mode
@@ -71,7 +65,7 @@ for n=1:n_spin_systems
             H_NZ=H_NZ-v_L(mm)*Iz{mm};
             H_HF=H_HF+2*pi*HF_zz(mm)*(Sz*Iz{mm});
             H_NQI=H_NQI+pi*NQI_zz(mm)*(3*Iz{mm}*Iz{mm}-...
-                  spin_numbers(mm)*(spin_numbers(mm)+1)*eye(size(Sz)));
+                  spin_numbers(mm)*(spin_numbers(mm)+1)*ops.eye);
         end
     end
 

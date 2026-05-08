@@ -36,19 +36,12 @@ n_endor=parameters.n_endor;
 n_spin_systems=parameters.n_spin_systems;
 spin_numbers=parameters.endor_spin_numbers;
 
-% Obtain electron operators directly from Spinach
-Sz=full(operator(operator_spin_system,'Lz',1));
-
-% Obtain nuclear operators directly from Spinach
-Ix=cell(1,operator_spin_system.comp.nspins-1);
-Iy=cell(1,operator_spin_system.comp.nspins-1);
-Iz=cell(1,operator_spin_system.comp.nspins-1);
-for n=1:numel(Iz)
-    spin_idx=n+1;
-    Ix{n}=full(operator(operator_spin_system,'Lx',spin_idx));
-    Iy{n}=full(operator(operator_spin_system,'Ly',spin_idx));
-    Iz{n}=full(operator(operator_spin_system,'Lz',spin_idx));
-end
+% Get cached operators and states
+ops=kehl_operator_basis(operator_spin_system,n_endor,n_spin_systems);
+Sz=ops.Sz;
+Ix=ops.Ix;
+Iy=ops.Iy;
+Iz=ops.Iz;
 
 % Default quadrupole offsets to zero
 v_L=paramsENDOR("v_L");
@@ -69,7 +62,7 @@ if n_spin_systems>1
     H_HF=H_HF+HF_zz(m)*Sz*Iz{m}+HF_zy(m)*(Sz*Iy{m})+...
          HF_zx(m)*(Sz*Ix{m});
     H_NQI=H_NQI+1/2*NQI_zz(m)*(3*Iz{m}*Iz{m}-...
-          spin_numbers(m)*(spin_numbers(m)+1)*eye(size(Iz{m})));
+          spin_numbers(m)*(spin_numbers(m)+1)*ops.eye);
 else
 
     % Add nuclear terms for the complete ENDOR spin system
@@ -78,7 +71,7 @@ else
         H_HF=H_HF+HF_zz(m)*Sz*Iz{m}+HF_zy(m)*(Sz*Iy{m})+...
              HF_zx(m)*(Sz*Ix{m});
         H_NQI=H_NQI+1/2*NQI_zz(m)*(3*Iz{m}*Iz{m}-...
-              spin_numbers(m)*(spin_numbers(m)+1)*eye(size(Iz{m})));
+              spin_numbers(m)*(spin_numbers(m)+1)*ops.eye);
     end
 end
 
@@ -95,8 +88,8 @@ if parameters.temp_eff==true
     rho0=Boltz/trace(Boltz);
 else
 
-    % Use the electron Lz state without temperature correction
-    rho0=-full(state(operator_spin_system,'Lz',1));
+    % Use the cached electron Lz state without temperature correction
+    rho0=ops.rho_z;
 end
 
 % Preserve only populations

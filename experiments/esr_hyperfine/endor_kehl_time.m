@@ -92,22 +92,20 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
     n_spin_systems=parameters.n_spin_systems;
     I=parameters.endor_spin_numbers;
 
-    % Obtain electron operators directly from Spinach
-    Sx=full(operator(operator_spin_system,'Lx',1));
-    Sy=full(operator(operator_spin_system,'Ly',1));
-    Sz=full(operator(operator_spin_system,'Lz',1));
-
-    % Obtain nuclear operators directly from Spinach
-    Ix=cell(1,operator_spin_system.comp.nspins-1);
-    Iy=cell(1,operator_spin_system.comp.nspins-1);
-    Iz=cell(1,operator_spin_system.comp.nspins-1);
-    for n=1:numel(Ix)
-        spin_idx=n+1;
-        Ix{n}=full(operator(operator_spin_system,'Lx',spin_idx));
-        Iy{n}=full(operator(operator_spin_system,'Ly',spin_idx));
-        Iz{n}=full(operator(operator_spin_system,'Lz',spin_idx));
-    end
-    [Sx_D,Sy_D,Sz_D,Ix_D,Iy_D,Iz_D]=kehl_diag_ops(Sx,Sy,Sz,Ix,Iy,Iz,n_endor);
+    % Get cached operators and states
+    ops=kehl_operator_basis(operator_spin_system,n_endor,n_spin_systems);
+    Sx=ops.Sx;
+    Sy=ops.Sy;
+    Sz=ops.Sz;
+    Ix=ops.Ix;
+    Iy=ops.Iy;
+    Iz=ops.Iz;
+    Sx_D=ops.Sx_D;
+    Sy_D=ops.Sy_D;
+    Sz_D=ops.Sz_D;
+    Ix_D=ops.Ix_D;
+    Iy_D=ops.Iy_D;
+    Iz_D=ops.Iz_D;
 
 
 
@@ -127,6 +125,7 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
 
     geff_sel=EPR("geff_sel");
     B_sel=EPR("B_sel");
+    euler_sel=EPR("euler_sel");
     HF_zz_sel=EPR("HF_zz_sel");
     HF_zy_sel=EPR("HF_zy_sel");
     HF_zx_sel=EPR("HF_zx_sel");
@@ -160,6 +159,7 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
         % set parameters for this orientation
         geff=geff_sel(j);
         B=B_sel(j);
+        euler_angles=euler_sel(j,:);
 
         HF_zz=HF_zz_sel(j,:);
 
@@ -225,8 +225,8 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
                 use_dipolar=true;
             end
             Hfree_p=kehl_free_ham(parameters,paramsENDOR,operator_spin_system,...
-                                    v_off_S,spin_map,HF_zz,HF_zy,HF_zx,...
-                                    NQI,NQI_zz,CS_zz,D_zz,use_dipolar,term_map);
+                                    v_off_S,spin_map,use_dipolar,...
+                                    term_map,euler_angles);
             % Integration step for the Signal to account for oscillation
             if v_off_S==0
                 t11=1/(off_1*Nint);
@@ -241,18 +241,8 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
                 HRF=Hfree_p;
 
                 if parameters.Bterm==false
-                    if n_spin_systems>1
-                        m=1;
-                        Hcorr=Hcorr+2*pi*v_RF*Iz{m};
-
-                        HRF=HRF+2*pi*v_RF*Iz{m}+oneN*Iy{m};
-                    else
-                        for mn=1:n_endor
-                            Hcorr=Hcorr+2*pi*v_RF*Iz{mn};
-
-                            HRF=HRF+2*pi*v_RF*Iz{mn}+oneN*Iy{mn};
-                        end
-                    end
+                    Hcorr=2*pi*v_RF*ops.Iz_rf;
+                    HRF=Hfree_p+Hcorr+oneN*ops.Iy_rf;
                 end
 
                 Hfree=Hfree_p+Hcorr;
@@ -398,21 +388,14 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
     n_spin_systems=parameters.n_spin_systems;
     I=parameters.endor_spin_numbers;
 
-    % Obtain electron operators directly from Spinach
-    Sx=full(operator(operator_spin_system,'Lx',1));
-    Sy=full(operator(operator_spin_system,'Ly',1));
-    Sz=full(operator(operator_spin_system,'Lz',1));
-
-    % Obtain nuclear operators directly from Spinach
-    Ix=cell(1,operator_spin_system.comp.nspins-1);
-    Iy=cell(1,operator_spin_system.comp.nspins-1);
-    Iz=cell(1,operator_spin_system.comp.nspins-1);
-    for n=1:numel(Ix)
-        spin_idx=n+1;
-        Ix{n}=full(operator(operator_spin_system,'Lx',spin_idx));
-        Iy{n}=full(operator(operator_spin_system,'Ly',spin_idx));
-        Iz{n}=full(operator(operator_spin_system,'Lz',spin_idx));
-    end
+    % Get cached operators and states
+    ops=kehl_operator_basis(operator_spin_system,n_endor,n_spin_systems);
+    Sx=ops.Sx;
+    Sy=ops.Sy;
+    Sz=ops.Sz;
+    Ix=ops.Ix;
+    Iy=ops.Iy;
+    Iz=ops.Iz;
     t=parameters.pulse_times_s;
     Nint=8;
 
@@ -430,6 +413,7 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
 
     geff_sel=EPR("geff_sel");
     B_sel=EPR("B_sel");
+    euler_sel=EPR("euler_sel");
     HF_zz_sel=EPR("HF_zz_sel");
     HF_zy_sel=EPR("HF_zy_sel");
     HF_zx_sel=EPR("HF_zx_sel");
@@ -472,6 +456,7 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
 
         geff=geff_sel(j);
         B=B_sel(j);
+        euler_angles=euler_sel(j,:);
 
         HF_zz=HF_zz_sel(j,:);
         HF_zy=HF_zy_sel(j,:);
@@ -516,19 +501,14 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
                 use_dipolar=true;
             end
             Hfree_p=kehl_free_ham(parameters,paramsENDOR,operator_spin_system,...
-                                    v_off_S,spin_map,HF_zz,HF_zy,HF_zx,...
-                                    NQI,NQI_zz,CS_zz,D_zz,use_dipolar,term_map);
+                                    v_off_S,spin_map,use_dipolar,...
+                                    term_map,euler_angles);
             v_RF=v_L(1);
             Hcorr=zeros(size(Hfree_p));
-            if n_spin_systems>1
-                m=1;
-                Hcorr=Hcorr+2*pi*v_RF*Iz{m};
-            else
-                for mm=1:n_endor
-                    Hcorr=Hcorr+2*pi*v_RF*Iz{mm};
-                end
-            end
+            HRF=Hfree_p;
             if parameters.Bterm==false
+                Hcorr=2*pi*v_RF*ops.Iz_rf;
+                HRF=Hfree_p+Hcorr+oneN*ops.Iy_rf;
                 Hfree=Hfree_p+Hcorr;
             else
                 Hfree=Hfree_p;
@@ -536,19 +516,6 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
 
             % mw pulses
             Hnonsel=Hfree+oneE*Sx;
-
-            HRF=Hfree;
-
-            if parameters.Bterm==false
-                if n_spin_systems>1
-                    m=1;
-                    HRF=HRF+oneN*Iy{m};
-                else
-                    for mm=1:n_endor
-                        HRF=HRF+oneN*Iy{mm};
-                    end
-                end
-            end
 
 
             % Integration step for the Signal to account for oscillation

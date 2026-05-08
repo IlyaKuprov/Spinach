@@ -63,6 +63,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
     NQI_sel=[];
     CS_zz_sel=[];
     D_zz_sel=[];
+euler_sel=[];
     offsets_sel=[];
 
     S_sel=[];
@@ -82,6 +83,9 @@ function EPR=kehl_ori_freq(spin_system,parameters)
             Nphi=round(sin(theta)*Nphimax)*1;
             for jj=1:Nphi
                 phi=(jj-1)*pi*2/(Nphi);
+
+                % Euler angles for Spinach orientation assembly
+                euler_angles=[0 -theta -phi];
 
                 % direction cosine vector
                 dc=[cos(phi)*sin(theta) sin(phi)*sin(theta) cos(theta)];
@@ -316,6 +320,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
                         NQI_sel(or,:,:,:)=NQI(:,:,:);
                         CS_zz_sel(or,:)=CS_zz(:);
                         D_zz_sel(or,:)=D_zz(:);
+                        euler_sel(or,:)=euler_angles;
                         S_sel(or)=scalefactor;
                         offsets_sel(or,:)=offsets(:);
                     end
@@ -392,6 +397,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
         NQI_sel(or,:,:,:)=NQI(:,:,:);
         CS_zz_sel(or,:)=CS_zz(:);
         D_zz_sel(or,:)=D_zz(:);
+        euler_sel(or,:)=[0 0 0];
         S_sel(or)=scalefactor;
         offsets_sel(or,:)=offsets(:);
     end
@@ -405,6 +411,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
     EPR("HF_zx_sel")=HF_zx_sel;
     EPR("CS_zz_sel")=CS_zz_sel;
     EPR("D_zz_sel")=D_zz_sel;
+    EPR("euler_sel")=euler_sel;
 
     EPR("NQI_zz_sel")=NQI_zz_sel;
     EPR("NQI_sel")=NQI_sel;

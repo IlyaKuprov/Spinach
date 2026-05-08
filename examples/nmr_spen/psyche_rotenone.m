@@ -1,6 +1,7 @@
 % PSYCHE pure-shift NMR spectrum of rotenone.
 %
-% Calculation time: hours on NVidia Tesla A100, much longer on CPU
+% Calculation time: minutes on a Tesla A800, 
+%                   much longer on CPU
 %
 % mohammadali.foroozandeh@chem.ox.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -61,7 +62,6 @@ parameters.g_amp=0.015;  % T/m
 % Saltire chirp parameters
 parameters.beta=20;             % flip angle of the saltire chirp (degrees)
 parameters.duration=0.015;      % pulse width of saltire chirp (s)
-parameters.del=0;               % diffusion delay (s)
 parameters.bandwidth=10000;     % sweep width of saltire chirp (Hz)
 parameters.pulsenpoints=1000;   % number of points in the saltire chirp
 parameters.smfactor=20;         % smoothing factor

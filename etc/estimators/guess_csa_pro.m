@@ -218,10 +218,6 @@ for n=2:(max(aa_nums)-1)
        ismember('N',pdb_ids(aa_nums==n))&&...
        ismember('CA',pdb_ids(aa_nums==n))&&...
        ismember('C',pdb_ids(aa_nums==(n-1)))
-
-        % Get C coordinates
-        local_coords=coords(aa_nums==(n-1));
-        C=local_coords{strcmp('C',pdb_ids(aa_nums==n))}; C=C(:);
     
         % Get H coordinates
         local_coords=coords(aa_nums==n);
@@ -229,11 +225,15 @@ for n=2:(max(aa_nums)-1)
    
         % Get N coordinates
         local_coords=coords(aa_nums==n);
-        N=local_coords{strcmp('N',pdb_ids(aa_nums==(n+1)))}; N=N(:);
+        N=local_coords{strcmp('N',pdb_ids(aa_nums==n))}; N=N(:);
    
         % Get CA coordinates
         local_coords=coords(aa_nums==n);
         CA=local_coords{strcmp('CA',pdb_ids(aa_nums==n))}; CA=CA(:);
+
+        % Get C coordinates
+        local_coords=coords(aa_nums==(n-1));
+        C=local_coords{strcmp('C',pdb_ids(aa_nums==(n-1)))}; C=C(:);
         
         % Get the primary directions
         N_H_vec=N-H; N_CA_vec=N-CA; N_C_vec=N-C; H_CA_vec=H-CA;

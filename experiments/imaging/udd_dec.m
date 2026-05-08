@@ -11,7 +11,7 @@
 %    parameters.dec_time     - total duration of the sequence
 %
 %    parameters.npulses      - number of pulses in the sequence,
-%                              including the first pi/2 pulse
+%                              excluding the first pi/2 pulse
 %
 %    parameters.spins        - nuclei on which the sequence
 %                              is to act, e.g. {'1H'}

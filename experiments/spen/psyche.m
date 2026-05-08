@@ -63,8 +63,8 @@ Ly=kron(speye(prod(parameters.npts)),(Lp-Lp')/2i);
 
 % Get chirp pulse waveform
 [Cx,Cy]=chirp_pulse(parameters.pulsenpoints,parameters.duration,...
-                       parameters.bandwidth,parameters.smfactor,...
-                       parameters.chirptype);
+                    parameters.bandwidth,parameters.smfactor,...
+                    parameters.chirptype);
 
 % Compute chirp RF amplitudes
 if strcmp(parameters.chirptype,'saltire')
@@ -107,10 +107,6 @@ rho_stack=coherence(spin_system,rho_stack,{{'1H',-1}});
 durations=ones(size(Cx))*parameters.duration/numel(Cx);
 rho_stack=shaped_pulse_xy(spin_system,L+parameters.g_amp*G{1},...
                           {Lx,Ly},{Cx,+Cy},durations,rho_stack,'expv-pwc');
-
-% Run the diffusion time evolution
-rho_stack=evolution(spin_system,L+parameters.g_amp*G{1},[],...
-                    rho_stack,parameters.del-2*parameters.duration,1,'final');
 
 % Select "0" coherence
 rho_stack=coherence(spin_system,rho_stack,{{'1H',0}});

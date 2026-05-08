@@ -1,112 +1,117 @@
-% calculate the cp offset to hit one cp transition for the sc
-% calculation
-% only for I=1/2 and I=1
+%KEHL_CP_OFFSET CP frequency offset for Kehl ENDOR kernels.
 %
-% input parameters:
-% parameters: structure containing simulation parameters
-% paramsENDOR_IN: the Map containing the ENDOR parameters
-% expt: the Map containing the experimental parameters
-% spinSys: the Map describing the spin system
-% v_off_S: electron offset freq
-% HF_zz: effective HF coupling value
-% NQI_zz: effective NQC value
-% m: number of the nucleus (loop iteration)
-% kk: number of the offset (loop iteration)
+%   [V_CP,PARAMSENDOR]=KEHL_CP_OFFSET(PARAMETERS,PARAMSENDOR_IN,EXPT,
+%   V_OFF_S,HF_ZZ,NQI_ZZ,M,KK) calculates the CP offset that selects one
+%   CP transition in the single-crystal calculation.
 %
-% output parameters:
-% v_CP: cp frequency
-% paramsENDOR: updated Map
+%   Inputs:
 %
-% February 2024 A. Kehl (akehl@gwdg.de)
+%      PARAMETERS      - Kehl ENDOR context parameters.
+%      PARAMSENDOR_IN  - map containing ENDOR parameters.
+%      EXPT            - map containing experimental parameters.
+%      V_OFF_S         - electron offset frequency.
+%      HF_ZZ,NQI_ZZ    - effective hyperfine and quadrupole couplings.
+%      M,KK            - nucleus and offset indices.
 %
+%   Outputs:
+%
+%      V_CP        - CP frequency.
+%      PARAMSENDOR - updated ENDOR parameter map.
+%
+%   February 2024 A. Kehl (akehl@gwdg.de)
+%   Spinach architecture migration May 2026 Talos
 
-function [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR_IN,expt,spinSys,v_off_S,HF_zz,NQI_zz,m,kk)
+function [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR_IN,expt,...
+                                           v_off_S,HF_zz,NQI_zz,m,kk)
 
-    % Check consistency
-    grumble(parameters,paramsENDOR_IN,expt,spinSys,v_off_S,HF_zz,NQI_zz,m,kk);
-    paramsENDOR=paramsENDOR_IN;
-    I=spinSys("I");
+% Check consistency
+grumble(parameters,paramsENDOR_IN,expt,v_off_S,HF_zz,NQI_zz,m,kk);
 
-    if parameters.Bterm==false
-         if I(m)==1/2
-            if kk<0
+% Get the explicit nuclear spin quantum numbers
+paramsENDOR=paramsENDOR_IN;
+spin_numbers=parameters.endor_spin_numbers;
 
-                nu_alpha=sqrt((v_off_S+HF_zz(m)/2)^2+(expt("oneE")/(2*pi))^2);
-                nu_beta=sqrt((v_off_S-HF_zz(m)/2)^2+(expt("oneE")/(2*pi))^2);
+% Calculate the CP offset without the RF B term
+if parameters.Bterm==false
+    if spin_numbers(m)==1/2
+        if kk<0
+            nu_alpha=sqrt((v_off_S+HF_zz(m)/2)^2+(expt("oneE")/(2*pi))^2);
+            nu_beta=sqrt((v_off_S-HF_zz(m)/2)^2+(expt("oneE")/(2*pi))^2);
 
-                if HF_zz(m)>0
-                    offset_CP=1/2*(nu_alpha+nu_beta);
-                else
-                    offset_CP=1/2*(nu_alpha-nu_beta);
-                end
-
+            if HF_zz(m)>0
+                offset_CP=1/2*(nu_alpha+nu_beta);
             else
-
-                nu_alpha=sqrt((v_off_S+HF_zz(m)/2)^2+(expt("oneE")/(2*pi))^2);
-                nu_beta=sqrt((v_off_S-HF_zz(m)/2)^2+(expt("oneE")/(2*pi))^2);
-
-                if HF_zz(m)>0
-                    offset_CP=1/2*(nu_alpha-nu_beta);
-                else
-                    offset_CP=-1/2*(nu_alpha+nu_beta);
-                end
+                offset_CP=1/2*(nu_alpha-nu_beta);
             end
+        else
+            nu_alpha=sqrt((v_off_S+HF_zz(m)/2)^2+(expt("oneE")/(2*pi))^2);
+            nu_beta=sqrt((v_off_S-HF_zz(m)/2)^2+(expt("oneE")/(2*pi))^2);
 
-            if parameters.sel_CP==2
-                offset_CP=-offset_CP;
-            end
-
-
-        elseif I(m)==1
-          % from diagonalization for 2D
-            if kk==1
-                v_off_S=freq_EPR(2)-freq_EPR(3);
-            elseif kk==0
-                v_off_S=0;
-            elseif kk==-1
-                v_off_S=freq_EPR(2)-freq_EPR(1);
-            end
-
-
-            omega_alpha=sqrt((v_off_S+HF_zz(m))^2+(expt("oneE")/(2*pi))^2);
-            omega_beta=sqrt((v_off_S)^2+(expt("oneE")/(2*pi))^2);
-            omega_gamma=sqrt((v_off_S-HF_zz(m))^2+(expt("oneE")/(2*pi))^2);
-
-
-            if kk==1
-                if parameters.sel_CP==3
-                    offset_CP=-(-omega_beta+omega_alpha+3*NQI_zz(m))/2;
-                elseif parameters.sel_CP==1
-                    offset_CP=-(omega_beta-omega_alpha+3*NQI_zz(m))/2;
-                end
-            elseif kk==0
-                if parameters.sel_CP==4
-                    offset_CP=(omega_gamma-omega_beta+3*NQI_zz(m))/2;
-                elseif parameters.sel_CP==3
-                    offset_CP=-(-omega_beta-omega_alpha+3*NQI_zz(m))/2;
-                elseif parameters.sel_CP==2
-                    offset_CP=(-omega_gamma+omega_beta+3*NQI_zz(m))/2;
-                elseif parameters.sel_CP==1
-                    offset_CP=-(+omega_beta+omega_alpha+3*NQI_zz(m))/2;
-                end
-            elseif kk==(-1)
-                if parameters.sel_CP==2
-                    offset_CP=(omega_gamma+omega_beta+3*NQI_zz(m))/2;
-                elseif parameters.sel_CP==1
-                    offset_CP=(-omega_gamma-omega_beta+3*NQI_zz(m))/2;
-                end
+            if HF_zz(m)>0
+                offset_CP=1/2*(nu_alpha-nu_beta);
+            else
+                offset_CP=-1/2*(nu_alpha+nu_beta);
             end
         end
 
-    else
-        offset_CP=expt("start_CP");
+        % Select the opposite CP branch when requested
+        if parameters.sel_CP==2
+            offset_CP=-offset_CP;
+        end
+    elseif spin_numbers(m)==1
+
+        % Legacy branch for spin-1 nuclei
+        if kk==1
+            v_off_S=freq_EPR(2)-freq_EPR(3);
+        elseif kk==0
+            v_off_S=0;
+        elseif kk==-1
+            v_off_S=freq_EPR(2)-freq_EPR(1);
+        end
+
+        omega_alpha=sqrt((v_off_S+HF_zz(m))^2+(expt("oneE")/(2*pi))^2);
+        omega_beta=sqrt((v_off_S)^2+(expt("oneE")/(2*pi))^2);
+        omega_gamma=sqrt((v_off_S-HF_zz(m))^2+(expt("oneE")/(2*pi))^2);
+
+        if kk==1
+            if parameters.sel_CP==3
+                offset_CP=-(-omega_beta+omega_alpha+3*NQI_zz(m))/2;
+            elseif parameters.sel_CP==1
+                offset_CP=-(omega_beta-omega_alpha+3*NQI_zz(m))/2;
+            end
+        elseif kk==0
+            if parameters.sel_CP==4
+                offset_CP=(omega_gamma-omega_beta+3*NQI_zz(m))/2;
+            elseif parameters.sel_CP==3
+                offset_CP=-(-omega_beta-omega_alpha+3*NQI_zz(m))/2;
+            elseif parameters.sel_CP==2
+                offset_CP=(-omega_gamma+omega_beta+3*NQI_zz(m))/2;
+            elseif parameters.sel_CP==1
+                offset_CP=-(+omega_beta+omega_alpha+3*NQI_zz(m))/2;
+            end
+        elseif kk==(-1)
+            if parameters.sel_CP==2
+                offset_CP=(omega_gamma+omega_beta+3*NQI_zz(m))/2;
+            elseif parameters.sel_CP==1
+                offset_CP=(-omega_gamma-omega_beta+3*NQI_zz(m))/2;
+            end
+        end
     end
-    v_L=paramsENDOR("v_L");
-    v_CP=v_L(m)-offset_CP;
-    paramsENDOR("yCoords")=v_CP;
+else
+
+    % Use externally supplied CP start when RF B term is active
+    offset_CP=expt("start_CP");
 end
 
-function grumble(parameters,paramsENDOR_IN,expt,spinSys,v_off_S,HF_zz,NQI_zz,m,kk)
+% Write the selected CP frequency into the ENDOR parameter map
+v_L=paramsENDOR("v_L");
+v_CP=v_L(m)-offset_CP;
+paramsENDOR("yCoords")=v_CP;
+
+end
+
+% Consistency enforcement
+function grumble(parameters,paramsENDOR_IN,expt,v_off_S,HF_zz,NQI_zz,m,kk)
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
@@ -115,9 +120,6 @@ if ~isa(paramsENDOR_IN,'containers.Map')
 end
 if ~isa(expt,'containers.Map')
     error('expt must be a containers.Map object.');
-end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
 end
 if ~isnumeric(v_off_S)
     error('v_off_S must be numeric.');
@@ -135,4 +137,3 @@ if ~isnumeric(kk)
     error('kk must be numeric.');
 end
 end
-

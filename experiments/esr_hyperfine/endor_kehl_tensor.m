@@ -41,40 +41,41 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
     % Check consistency
     kehl_tensor_rlx_grumble(spin_system,parameters);
 
-    % Unpack legacy data
+    % Unpack context data
     constants=parameters.constants;
-    spinOps=parameters.spinOps;
-    spinSys=parameters.spinSys;
     expt=parameters.expt;
     paramsENDOR=parameters.paramsENDOR;
     EPR=parameters.epr;
-    spinSys('N_SpinSys')=spinSys('Ni_ENDOR');
-    spinOps=kehl_spin_ops(spinSys("S"),spinSys("I"),spinSys("Ni_ENDOR"),spinSys("Ni_ENDOR"));
+    n_endor=parameters.n_endor;
+    n_spin_systems=n_endor;
+    I=parameters.endor_spin_numbers;
+    operator_spin_system=kehl_spin_system(parameters.operator_isotopes,n_spin_systems);
 
-    spinOps_D=kehl_diag_ops(spinOps,spinSys('Ni_ENDOR'));
+    % Obtain electron operators directly from Spinach
+    Sx=full(operator(operator_spin_system,'Lx',1));
+    Sy=full(operator(operator_spin_system,'Ly',1));
+    Sz=full(operator(operator_spin_system,'Lz',1));
+
+    % Obtain nuclear operators directly from Spinach
+    Ix=cell(1,operator_spin_system.comp.nspins-1);
+    Iy=cell(1,operator_spin_system.comp.nspins-1);
+    Iz=cell(1,operator_spin_system.comp.nspins-1);
+    for n=1:numel(Ix)
+        spin_idx=n+1;
+        Ix{n}=full(operator(operator_spin_system,'Lx',spin_idx));
+        Iy{n}=full(operator(operator_spin_system,'Ly',spin_idx));
+        Iz{n}=full(operator(operator_spin_system,'Lz',spin_idx));
+    end
+
+    [Sx_D,Sy_D,Sz_D,Ix_D,Iy_D,Iz_D]=kehl_diag_ops(Sx,Sy,Sz,Ix,Iy,Iz,n_endor);
 
     % get values from Maps
-    Sz=spinOps("Sz");
-    Sx=spinOps("Sx");
-    Sy=spinOps("Sy");
-    Iz=spinOps("Iz");
-    Ix=spinOps("Ix");
-    Iy=spinOps("Iy");
 
-    Sz_D=spinOps_D("Sz");
-    Sx_D=spinOps_D("Sx");
-    Sy_D=spinOps_D("Sy");
-    Iz_D=spinOps_D("Iz");
-    Ix_D=spinOps_D("Ix");
-    Iy_D=spinOps_D("Iy");
 
     t=expt("t");
     Nint=8;
 
 
-    N_spinSys=spinSys("N_SpinSys");
-
-    Ni_ENDOR=spinSys("Ni_ENDOR");
 
     geff_sel=EPR("geff_sel");
     B_sel=EPR("B_sel");
@@ -93,7 +94,6 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
     offsets_sel=EPR("offsets");
     Npts_EN=paramsENDOR("Npts_EN");
 
-    I=spinSys("I");
     v_L=paramsENDOR("v_L");
 
 
@@ -118,7 +118,7 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
         HF_zx=HF_zx_sel(j,:);
 
         NQI_zz=NQI_zz_sel(j,:);
-        NQI=zeros(Ni_ENDOR,3,3);
+        NQI=zeros(n_endor,3,3);
 
         NQI(:,:,:)=2*pi*NQI_sel(j,:,:,:);
         CS_zz=CS_zz_sel(j,:)*1e-12;
@@ -129,9 +129,8 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
         endor_amp_tmp=zeros(1,Npts_EN);
 
         % loop over nuclei
-        for i=1 : Ni_ENDOR
-            I=spinSys('I');
-            mI=-I(i):1:I(i);
+        for i=1 : n_endor
+                    mI=-I(i):1:I(i);
 
             for jj=mI
 
@@ -140,17 +139,17 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
 
                 [rho0]=2*Sz*Iz{1};
 
-            RT2e=kehl_relax_t2(Sx_D,spinSys("T2e"));
+            RT2e=kehl_relax_t2(Sx_D,parameters.T2e);
             RT2n=zeros(size(RT2e));
 
-            if N_spinSys==1
-                for mm=1:Ni_ENDOR
-                   RT2e=RT2e+kehl_relax_t2(Sx_D*Ix_D{mm},spinSys("T2dq"));
-                   RT2n=RT2n+kehl_relax_t2(Ix_D{mm},spinSys("T2n"));
+            if n_spin_systems==1
+                for mm=1:n_endor
+                   RT2e=RT2e+kehl_relax_t2(Sx_D*Ix_D{mm},parameters.T2dq);
+                   RT2n=RT2n+kehl_relax_t2(Ix_D{mm},parameters.T2n);
                 end
             else
-                RT2e=RT2e+kehl_relax_t2(Sx_D*Ix_D{1},spinSys("T2dq"));
-                RT2n=RT2n+kehl_relax_t2(Ix_D{1},spinSys("T2n"));
+                RT2e=RT2e+kehl_relax_t2(Sx_D*Ix_D{1},parameters.T2dq);
+                RT2n=RT2n+kehl_relax_t2(Ix_D{1},parameters.T2n);
             end
             R=RT2e+RT2n;
             start_EN=paramsENDOR("start_EN");
@@ -160,7 +159,7 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
             oneN=expt("oneN");
 
             Hfree_p=2*pi*v_off_S*Sz;
-            if spinSys('N_SpinSys')>1
+            if n_spin_systems>1
                 nuc=i;
                 m=1;
                 % HF
@@ -180,7 +179,7 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
                     Hfree_p=Hfree_p+pi*NQI_zz(m)*(3*Iz{1}*Iz{1}-I(1)*(I(1)+1)*eye(size(Hfree_p)));
                 end
             else
-                for mm=1:Ni_ENDOR
+                for mm=1:n_endor
                     % HF
                     Hfree_p=Hfree_p-2*pi*v_L(mm)*Iz{mm}+2*pi*HF_zz(mm)*(Sz*Iz{mm})+2*pi*HF_zy(mm)*(Sz*Iy{mm})+2*pi*HF_zx(mm)*(Sz*Ix{mm})+2*pi*v_L(mm)*CS_zz(mm)*Iz{mm};
                     % NQI
@@ -219,13 +218,13 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
                 HRF=Hfree_p;
 
                 if parameters.Bterm==false
-                    if spinSys('N_SpinSys')>1
+                    if n_spin_systems>1
                         m=1;
                         Hcorr=Hcorr+2*pi*v_RF*Iz{m};
 
                         HRF=HRF+2*pi*v_RF*Iz{m}+oneN*Iy{m};
                     else
-                        for mm=1:Ni_ENDOR
+                        for mm=1:n_endor
                             Hcorr=Hcorr+2*pi*v_RF*Iz{mm};
 
                             HRF=HRF+2*pi*v_RF*Iz{mm}+oneN*Iy{mm};
@@ -239,11 +238,11 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
 
                 if parameters.Bterm==false
 
-                    U1=full(propagator(spinOps('spin_system'),1i*sparse(R-1i*full(hilb2liouv(sparse(HRF),'comm'))),t(1)));
-                    U2=full(propagator(spinOps('spin_system'),1i*sparse(R-1i*Hfree),t2));
+                    U1=full(propagator(operator_spin_system,1i*sparse(R-1i*full(hilb2liouv(sparse(HRF),'comm'))),t(1)));
+                    U2=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t2));
                 else
-                    U1=kehl_rf_bterm_rlx(parameters,expt,v_RF,Hfree_p,Iy,t(1),Ni_ENDOR,N_spinSys,R,spinOps('spin_system'));
-                    U2=full(propagator(spinOps('spin_system'),1i*sparse(R-1i*Hfree),t2));
+                    U1=kehl_rf_bterm_rlx(parameters,expt,v_RF,Hfree_p,Iy,t(1),n_endor,n_spin_systems,R,operator_spin_system);
+                    U2=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t2));
                 end
 
                 % Evolve the densitymatrix
@@ -285,32 +284,40 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters)
     % Check consistency
     kehl_tensor_calc_grumble(spin_system,parameters);
 
-    % Unpack legacy data
+    % Unpack context data
     constants=parameters.constants;
-    spinOps=parameters.spinOps;
-    spinSys=parameters.spinSys;
     expt=parameters.expt;
     paramsENDOR=parameters.paramsENDOR;
     EPR=parameters.epr;
-    spinSys('N_SpinSys')=spinSys("Ni_ENDOR");
-    spinOps=kehl_spin_ops(spinSys("S"),spinSys("I"),spinSys("Ni_ENDOR"),spinSys("Ni_ENDOR"));
+    n_endor=parameters.n_endor;
+    n_spin_systems=n_endor;
+    I=parameters.endor_spin_numbers;
+    operator_spin_system=kehl_spin_system(parameters.operator_isotopes,n_spin_systems);
+
+    % Obtain electron operators directly from Spinach
+    Sx=full(operator(operator_spin_system,'Lx',1));
+    Sy=full(operator(operator_spin_system,'Ly',1));
+    Sz=full(operator(operator_spin_system,'Lz',1));
+
+    % Obtain nuclear operators directly from Spinach
+    Ix=cell(1,operator_spin_system.comp.nspins-1);
+    Iy=cell(1,operator_spin_system.comp.nspins-1);
+    Iz=cell(1,operator_spin_system.comp.nspins-1);
+    for n=1:numel(Ix)
+        spin_idx=n+1;
+        Ix{n}=full(operator(operator_spin_system,'Lx',spin_idx));
+        Iy{n}=full(operator(operator_spin_system,'Ly',spin_idx));
+        Iz{n}=full(operator(operator_spin_system,'Lz',spin_idx));
+    end
 
     % get values from Maps
-    Sz=spinOps("Sz");
-    Sx=spinOps("Sx");
-    Sy=spinOps("Sy");
-    Iz=spinOps("Iz");
-    Ix=spinOps("Ix");
-    Iy=spinOps("Iy");
     t=expt("t");
     Nint=8;
 
-    N_spinSys=spinSys("Ni_ENDOR");
-    Ni_ENDOR=spinSys("Ni_ENDOR");
-
-    if N_spinSys>1
-       nucs=Ni_ENDOR;
-        for i=1:Ni_ENDOR-1
+    n_spin_systems=n_endor;
+    if n_spin_systems>1
+       nucs=n_endor;
+        for i=1:n_endor-1
             Ix{i+1}=Ix{1};
             Iy{i+1}=Iy{1};
             Iz{i+1}=Iz{1};
@@ -338,7 +345,6 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters)
     offsets_sel=EPR("offsets");
     Npts_EN=paramsENDOR("Npts_EN");
 
-    I=spinSys("I");
     v_L=paramsENDOR("v_L");
 
 
@@ -363,7 +369,7 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters)
         HF_zx=HF_zx_sel(j,:);
 
         NQI_zz=NQI_zz_sel(j,:);
-        NQI=zeros(Ni_ENDOR,3,3);
+        NQI=zeros(n_endor,3,3);
 
         NQI(:,:,:)=2*pi*NQI_sel(j,:,:,:);
 
@@ -377,9 +383,8 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters)
         endor_amp_tmp=zeros(1,Npts_EN);
 
         % loop over nuclei
-        for i=1 : Ni_ENDOR
-            I=spinSys('I');
-            mI=-I(i):1:I(i);
+        for i=1 : n_endor
+                    mI=-I(i):1:I(i);
 
             for jj=mI
 
@@ -415,7 +420,7 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters)
                     Hfree_p=Hfree_p+pi*NQI_zz(m)*(3*Iz{m}*Iz{1}-I(1)*(I(1)+1)*eye(size(Hfree_p)));
                 end
 
-                if spinSys("D_used")==true && i==1
+                if parameters.dipolar_active==true && i==1
                     for mm=2:(size(D_zz,2)+1)
                         dipC=2*pi*D_zz(mm-1);
 
@@ -448,7 +453,7 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters)
 
 
 
-                U2_p=full(propagator(spinOps('spin_system'),sparse(Hfree_p),t2));
+                U2_p=full(propagator(operator_spin_system,sparse(Hfree_p),t2));
 
 
             % loop over rf frequencies (x-axis)
@@ -469,11 +474,11 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters)
 
 
                 if parameters.Bterm==false
-                    U1=full(propagator(spinOps('spin_system'),sparse(HRF),t(1)));
-                    U2=U2_p*full(propagator(spinOps('spin_system'),sparse(Hcorr),t2));
+                    U1=full(propagator(operator_spin_system,sparse(HRF),t(1)));
+                    U2=U2_p*full(propagator(operator_spin_system,sparse(Hcorr),t2));
                 else
                     Hfree=Hfree_p;
-                    U1=kehl_rf_bterm(parameters,expt,v_RF,Hfree,Iy,t(1),Ni_ENDOR,N_spinSys,spinOps('spin_system'));
+                    U1=kehl_rf_bterm(parameters,expt,v_RF,Hfree,Iy,t(1),n_endor,n_spin_systems,operator_spin_system);
                     U2=U2_p;
                 end
 

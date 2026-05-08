@@ -30,12 +30,12 @@ seq_name=sequence_name(pulse_sequence);
 parameters.seq_name=seq_name;
 parameters.assumptions=assumptions;
 
-% Build legacy Kehl data structures from Spinach parameters
+% Build Kehl context data structures from Spinach parameters
 parameters.constants=context_constants(spin_system);
 parameters.expt=context_experiment(parameters);
-parameters.spinSys=context_spin_system(spin_system,parameters);
-parameters.spinOps=kehl_spin_ops(spin_system,parameters.endor_spins,...
-                                 parameters.spinSys('N_SpinSys'));
+parameters=context_spin_data(spin_system,parameters);
+parameters.operator_spin_system=kehl_spin_system(parameters.operator_isotopes,...
+                                                parameters.n_spin_systems);
 
 if nargin>=4 && ~isempty(assumptions)
     spin_system=assume(spin_system,assumptions);
@@ -127,7 +127,7 @@ function constants=context_constants(spin_system)
     constants('CONST1')=constants('GE')/1e10;
 end
 
-function spinSys=context_spin_system(spin_system,parameters)
+function parameters=context_spin_data(spin_system,parameters)
     isotopes=spin_system.comp.isotopes;
     electron_idx=find(cellfun(@is_electron,isotopes),1);
     if isempty(electron_idx)
@@ -141,14 +141,15 @@ function spinSys=context_spin_system(spin_system,parameters)
     [~,electron_mult]=spin(isotopes{electron_idx});
     n_endor=numel(endor_spins);
 
-    spinSys=containers.Map;
-    spinSys('S')=(electron_mult-1)/2;
-    spinSys('g')=electron_g_matrix(spin_system,electron_idx);
-    spinSys('g_iso')=trace(spinSys('g'))/3;
-    spinSys('Ni_ENDOR')=n_endor;
-    spinSys('Nuclei')=isotopes(endor_spins);
-    spinSys('N_SpinSys')=n_spin_systems;
-    spinSys('I')=spin_numbers(isotopes(endor_spins));
+    parameters.electron_spin=(electron_mult-1)/2;
+    parameters.electron_isotope=isotopes{electron_idx};
+    parameters.g_matrix=electron_g_matrix(spin_system,electron_idx);
+    parameters.g_iso=trace(parameters.g_matrix)/3;
+    parameters.n_endor=n_endor;
+    parameters.endor_isotopes=isotopes(endor_spins);
+    parameters.n_spin_systems=n_spin_systems;
+    parameters.endor_spin_numbers=spin_numbers(isotopes(endor_spins));
+    parameters.operator_isotopes=[{parameters.electron_isotope} parameters.endor_isotopes(:).'];
 
     A=zeros(3*n_endor,3);
     Q=zeros(3*n_endor,3);
@@ -160,9 +161,9 @@ function spinSys=context_spin_system(spin_system,parameters)
         Q(3*n-2:3*n,:)=Q_block;
         Q_used=Q_used||any(Q_block(:));
     end
-    spinSys('A')=A;
-    spinSys('Q')=Q;
-    spinSys('Q_used')=Q_used;
+    parameters.hfc_matrix=A;
+    parameters.nqi_matrix=Q;
+    parameters.nqi_active=Q_used;
 
     CS=zeros(3*n_endor,3);
     CS_used=false;
@@ -173,9 +174,9 @@ function spinSys=context_spin_system(spin_system,parameters)
         CS_used=CS_used||any(CS_block(:));
     end
     if CS_used
-        spinSys('CS')=CS;
+        parameters.cs_matrix=CS;
     end
-    spinSys('CS_used')=CS_used;
+    parameters.cs_active=CS_used;
 
     pairs=infer_dipolar_pairs(spin_system,endor_spins);
     if ~isempty(pairs)
@@ -183,19 +184,19 @@ function spinSys=context_spin_system(spin_system,parameters)
         for n=1:size(pairs,1)
             D(3*n-2:3*n,:)=coupling_matrix(spin_system,pairs(n,1),pairs(n,2));
         end
-        spinSys('D')=D;
-        spinSys('D_used')=true;
+        parameters.dipolar_matrix=D;
+        parameters.dipolar_active=true;
     else
-        spinSys('D')=zeros(0,3);
-        spinSys('D_used')=false;
+        parameters.dipolar_matrix=zeros(0,3);
+        parameters.dipolar_active=false;
     end
 
-    spinSys('EPR_Nucs_used')=~isempty(epr_spins);
+    parameters.epr_nuclei_active=~isempty(epr_spins);
     if ~isempty(epr_spins)
         n_epr=numel(epr_spins);
-        spinSys('EPR_Nuclei')=isotopes(epr_spins);
-        spinSys('Ni_EPR')=n_epr;
-        spinSys('I_EPR')=spin_numbers(isotopes(epr_spins));
+        parameters.epr_isotopes=isotopes(epr_spins);
+        parameters.n_epr=n_epr;
+        parameters.epr_spin_numbers=spin_numbers(isotopes(epr_spins));
         g_N_EPR=zeros(n_epr,1);
         A_EPR=zeros(3*n_epr,3);
         Q_EPR=zeros(3*n_epr,3);
@@ -211,12 +212,18 @@ function spinSys=context_spin_system(spin_system,parameters)
             Q_EPR(3*n-2:3*n,:)=Q_block;
             EPR_Q_used=EPR_Q_used||any(Q_block(:));
         end
-        spinSys('g_N_EPR')=g_N_EPR;
-        spinSys('A_EPR')=A_EPR;
-        spinSys('Q_EPR')=Q_EPR;
-        spinSys('EPR_Q_used')=EPR_Q_used;
+        parameters.epr_gamma_hz_t=g_N_EPR;
+        parameters.epr_hfc_matrix=A_EPR;
+        parameters.epr_nqi_matrix=Q_EPR;
+        parameters.epr_nqi_active=EPR_Q_used;
     else
-        spinSys('EPR_Q_used')=false;
+        parameters.epr_isotopes={};
+        parameters.n_epr=0;
+        parameters.epr_spin_numbers=zeros(0,1);
+        parameters.epr_gamma_hz_t=zeros(0,1);
+        parameters.epr_hfc_matrix=zeros(0,3);
+        parameters.epr_nqi_matrix=zeros(0,3);
+        parameters.epr_nqi_active=false;
     end
 end
 
@@ -684,7 +691,7 @@ end
 %
 % input parameters:
 % constants:the Map containing the constants
-% spinSys: the Map describing the spin system
+% spin_system: Spinach spin system structure
 % expt: the Map containing the experimental parameters
 %
 % output parameters:
@@ -699,11 +706,10 @@ function paramsENDOR=kehl_prep_time(spin_system,parameters)
     % Check consistency
     kehl_prep_time_grumble(spin_system,parameters);
 
-    % Unpack legacy data
+    % Unpack context data
     constants=parameters.constants;
-    spinSys=parameters.spinSys;
     expt=parameters.expt;
-    Nuclei=spinSys("Nuclei");
+    Nuclei=parameters.endor_isotopes;
     v_L=zeros(size(Nuclei,2),1);
     for i=1:size(Nuclei,2)
 
@@ -760,11 +766,10 @@ function paramsENDOR=kehl_prep_endor(spin_system,parameters)
     % Check consistency
     kehl_prep_endor_grumble(spin_system,parameters);
 
-    % Unpack legacy data
+    % Unpack context data
     constants=parameters.constants;
-    spinSys=parameters.spinSys;
     expt=parameters.expt;
-    Nuclei=spinSys("Nuclei");
+    Nuclei=parameters.endor_isotopes;
     v_L=zeros(size(Nuclei,2),1);
     for i=1:size(Nuclei,2)
 
@@ -820,11 +825,10 @@ function paramsEPR=kehl_prep_epr(spin_system,parameters)
     % Check consistency
     kehl_prep_epr_grumble(spin_system,parameters);
 
-    % Unpack legacy data
+    % Unpack context data
     constants=parameters.constants;
-    spinSys=parameters.spinSys;
     expt=parameters.expt;
-    g_iso=spinSys("g_iso");
+    g_iso=parameters.g_iso;
     obsField=expt("Field");
 
     gBepr=obsField*g_iso;
@@ -863,32 +867,30 @@ function EPR=kehl_ori_field(spin_system,parameters)
     % Check consistency
     kehl_ori_field_grumble(spin_system,parameters);
 
-    % Unpack legacy data
+    % Unpack context data
     constants=parameters.constants;
-    spinSys=parameters.spinSys;
-    spinOps=parameters.spinOps;
     paramsEPR=parameters.paramsEPR;
     paramsENDOR=parameters.paramsENDOR;
     expt=parameters.expt;
     Ntheta=parameters.Nang;
     Nphimax=parameters.Nang;
-    g=spinSys("g");
-    A=spinSys("A");
-    Q=spinSys("Q");
-    if spinSys("EPR_Nucs_used")==true
-        Ni_EPR=spinSys("Ni_EPR");
-        A_EPR=spinSys("A_EPR");
-        Q_EPR=spinSys("Q_EPR");
+    g=parameters.g_matrix;
+    A=parameters.hfc_matrix;
+    Q=parameters.nqi_matrix;
+    if parameters.epr_nuclei_active==true
+        Ni_EPR=parameters.n_epr;
+        A_EPR=parameters.epr_hfc_matrix;
+        Q_EPR=parameters.epr_nqi_matrix;
     else
         Ni_EPR=0;
     end
-    if spinSys("CS_used")==true
-        CS=spinSys("CS");
+    if parameters.cs_active==true
+        CS=parameters.cs_matrix;
     end
-    if spinSys("D_used")==true
-        D=spinSys("D");
+    if parameters.dipolar_active==true
+        D=parameters.dipolar_matrix;
     end
-    Ni_ENDOR=spinSys("Ni_ENDOR");
+    n_endor=parameters.n_endor;
     g2=g*g;
 
     % initialize arrays
@@ -930,15 +932,15 @@ function EPR=kehl_ori_field(spin_system,parameters)
             geff=(dc*g2*dc')^.5;
 
             % effective B field for given theta and phi
-            B=(expt("Field")*spinSys("g_iso"))/geff(1);
+            B=(expt("Field")*parameters.g_iso)/geff(1);
             Beff=expt('FreqMeas')*constants('H')/(constants('MU_B')*geff);
 
             % HF ENDOR
-            HF_zz=zeros(1,Ni_ENDOR);
-            HF_zx=zeros(1,Ni_ENDOR);
-            HF_zy=zeros(1,Ni_ENDOR);
+            HF_zz=zeros(1,n_endor);
+            HF_zx=zeros(1,n_endor);
+            HF_zy=zeros(1,n_endor);
 
-            for m=1:Ni_ENDOR
+            for m=1:n_endor
 
                  HF_zz(m)=(sin(theta))^2*(cos(phi))^2*A(3*m-2,1)...
 +(sin(theta))^2*(sin(phi))^2*A(3*m-1,2)...
@@ -969,11 +971,11 @@ function EPR=kehl_ori_field(spin_system,parameters)
             end
 
             % NQI ENDOR
-            NQI_zz=zeros(1,Ni_ENDOR);
-            NQI=zeros(Ni_ENDOR,3,3);
+            NQI_zz=zeros(1,n_endor);
+            NQI=zeros(n_endor,3,3);
 
-            for m=1:Ni_ENDOR
-                if spinSys("Q_used")==true
+            for m=1:n_endor
+                if parameters.nqi_active==true
 
                     NQI_zz(m)=(sin(theta))^2*(cos(phi))^2*Q(3*m-2,1)...
 +(sin(theta))^2*(sin(phi))^2*Q(3*m-1,2)...
@@ -995,7 +997,7 @@ function EPR=kehl_ori_field(spin_system,parameters)
                     R1(3,2)=sin(theta)*sin(phi);
                     R1(3,3)=cos(theta);
 
-                    Q_ENDOR=spinSys("Q");
+                    Q_ENDOR=parameters.nqi_matrix;
                     qq2=Q_ENDOR((m-1)*3+1:(m-1)*3+3,:);
                     Y2=R1*qq2*R1';
                     NQI(m,:,:)=Y2;
@@ -1007,9 +1009,9 @@ function EPR=kehl_ori_field(spin_system,parameters)
             end
 
             % CS ENDOR
-            CS_zz=zeros(1,Ni_ENDOR);
-            if spinSys("CS_used")==true
-                for m=1:Ni_ENDOR
+            CS_zz=zeros(1,n_endor);
+            if parameters.cs_active==true
+                for m=1:n_endor
                     CS_zz(m)=(sin(theta))^2*(cos(phi))^2*CS(3*m-2,1)...
 +(sin(theta))^2*(sin(phi))^2*CS(3*m-1,2)...
 +(cos(theta))^2*CS(3*m,3)...
@@ -1020,9 +1022,9 @@ function EPR=kehl_ori_field(spin_system,parameters)
             end
 
             % dipolar SSC ENDOR
-            D_zz=zeros(1,Ni_ENDOR);
+            D_zz=zeros(1,n_endor);
 
-             if spinSys("D_used")==true
+             if parameters.dipolar_active==true
                  D_zz=zeros(size(D,1)/3);
                  for m=1:size(D,1)/3
                     D_zz(m)=(sin(theta))^2*(cos(phi))^2*D(3*m-2,1)...
@@ -1051,7 +1053,7 @@ function EPR=kehl_ori_field(spin_system,parameters)
             fieldAxis=paramsEPR('fieldAxis');
 
             if Ni_EPR>0
-                I_EPR=spinSys("I_EPR");
+                I_EPR=parameters.epr_spin_numbers;
                 mI=kehl_ori_field_BuildSpace(I_EPR);
                 for i=1:Ni_EPR
                         % EPR resonance with hyperfine coupling only
@@ -1069,7 +1071,7 @@ function EPR=kehl_ori_field(spin_system,parameters)
                 tmp_epr(bin(p))=tmp_epr(bin(p))+1;
             end
 
-            offsets=kehl_offsets(constants,spinSys,spinOps,paramsENDOR,B,geff,HF_zz,NQI_zz);
+            offsets=kehl_offsets(constants,parameters,parameters.operator_spin_system,paramsENDOR,B,geff,HF_zz,NQI_zz);
 
             DeltaB=0;
             scalefactor=0;
@@ -1124,21 +1126,21 @@ function EPR=kehl_ori_field(spin_system,parameters)
     % only one orientation for single crystal calculation
     elseif parameters.powder==false
         or=or+1;
-        geff=spinSys("g_iso");
+        geff=parameters.g_iso;
 
         %effective B field for given theta and phi
         Beff=expt('FreqMeas')*constants('H')/(constants('MU_B')*geff);
 
-        HF_zz=zeros(1,Ni_ENDOR);
-        HF_zx=zeros(1,Ni_ENDOR);
-        HF_zy=zeros(1,Ni_ENDOR);
-        NQI_zz=zeros(1,Ni_ENDOR);
-        NQI=zeros(Ni_ENDOR,3,3);
+        HF_zz=zeros(1,n_endor);
+        HF_zx=zeros(1,n_endor);
+        HF_zy=zeros(1,n_endor);
+        NQI_zz=zeros(1,n_endor);
+        NQI=zeros(n_endor,3,3);
 
 
-        CS_zz=zeros(1,Ni_ENDOR);
+        CS_zz=zeros(1,n_endor);
 
-        for m=1:Ni_ENDOR
+        for m=1:n_endor
 
             HF_zz(m)=A(3*m,3);
             if parameters.Bterm==1
@@ -1146,22 +1148,22 @@ function EPR=kehl_ori_field(spin_system,parameters)
                 HF_zx(m)=A(3*m,1);
             end
 
-            if spinSys("Q_used")==true
+            if parameters.nqi_active==true
                 NQI_zz(m)=Q(3*m,3);
                 NQI(m,:,:)=Q;
             end
 
             % CS ENDOR
-            if spinSys("CS_used")==true
+            if parameters.cs_active==true
                 CS_zz(m)=CS(3*m,3);
             end
 
         end
 
         % dipolar SSC ENDOR
-        D_zz=zeros(1,Ni_ENDOR);
+        D_zz=zeros(1,n_endor);
 
-        if spinSys("D_used")==true
+        if parameters.dipolar_active==true
              D_zz=zeros(1,size(D,1)/3);
              for m=1:size(D,1)/3
                  D_zz(m)=D(3*m,3);
@@ -1169,17 +1171,17 @@ function EPR=kehl_ori_field(spin_system,parameters)
          end
 
 
-        offsets_tmp=kehl_offsets(constants,spinSys,spinOps,paramsENDOR,Beff,geff,HF_zz,NQI_zz);
+        offsets_tmp=kehl_offsets(constants,parameters,parameters.operator_spin_system,paramsENDOR,Beff,geff,HF_zz,NQI_zz);
 
         sel_I=parameters.sel_I;
-        if spinSys('N_SpinSys')>1
-            s=size(offsets_tmp,2)/Ni_ENDOR;
-            for n=1:Ni_ENDOR
+        if parameters.n_spin_systems>1
+            s=size(offsets_tmp,2)/n_endor;
+            for n=1:n_endor
                 offsets(n)=offsets_tmp(sel_I+(n-1)*s);
             end
         else
             size(offsets_tmp,2)
-            s=size(offsets_tmp,2)/Ni_ENDOR;
+            s=size(offsets_tmp,2)/n_endor;
             offsets=offsets_tmp(((sel_I-1)*s+1):(sel_I*s));
         end
 
@@ -1321,43 +1323,47 @@ function EPR=kehl_ori_freq(spin_system,parameters)
     % Check consistency
     kehl_ori_freq_grumble(spin_system,parameters);
 
-    % Unpack legacy data
+    % Unpack context data
     constants=parameters.constants;
-    spinSys=parameters.spinSys;
-    spinOps=parameters.spinOps;
     paramsEPR=parameters.paramsEPR;
     paramsENDOR=parameters.paramsENDOR;
     expt=parameters.expt;
     Ntheta=parameters.Nang;
     Nphimax=parameters.Nang;
-    g=spinSys("g");
-    A=spinSys("A");
-    Q=spinSys("Q");
-    if spinSys("EPR_Nucs_used")==true
-        Ni_EPR=spinSys("Ni_EPR");
-        A_EPR=spinSys("A_EPR");
-        Q_EPR=spinSys("Q_EPR");
-        g_N_EPR=spinSys("g_N_EPR");
-        I_EPR=spinSys("I_EPR");
-        spinOpsEPR=kehl_spin_ops(spinSys("S"),I_EPR,Ni_EPR,Ni_EPR);
-        SzEPR=spinOpsEPR("Sz");
-        SxEPR=spinOpsEPR("Sx");
-        IzEPR=spinOpsEPR("Iz");
-        IxEPR=spinOpsEPR("Ix");
-        IyEPR=spinOpsEPR("Iy");
+    g=parameters.g_matrix;
+    A=parameters.hfc_matrix;
+    Q=parameters.nqi_matrix;
+    if parameters.epr_nuclei_active==true
+        Ni_EPR=parameters.n_epr;
+        A_EPR=parameters.epr_hfc_matrix;
+        Q_EPR=parameters.epr_nqi_matrix;
+        g_N_EPR=parameters.epr_gamma_hz_t;
+        I_EPR=parameters.epr_spin_numbers;
+        epr_spin_system=kehl_spin_system([{parameters.electron_isotope} parameters.epr_isotopes(:).'],1);
+        SzEPR=full(operator(epr_spin_system,'Lz',1));
+        SxEPR=full(operator(epr_spin_system,'Lx',1));
+        IzEPR=cell(1,Ni_EPR);
+        IxEPR=cell(1,Ni_EPR);
+        IyEPR=cell(1,Ni_EPR);
+        for n=1:Ni_EPR
+            spin_idx=n+1;
+            IzEPR{n}=full(operator(epr_spin_system,'Lz',spin_idx));
+            IxEPR{n}=full(operator(epr_spin_system,'Lx',spin_idx));
+            IyEPR{n}=full(operator(epr_spin_system,'Ly',spin_idx));
+        end
     else
         Ni_EPR=0;
-        spinOpsEPR=kehl_spin_ops(spinSys("S"),zeros(0,1),0,1);
-        SzEPR=spinOpsEPR("Sz");
-        SxEPR=spinOpsEPR("Sx");
+        epr_spin_system=kehl_spin_system({parameters.electron_isotope},1);
+        SzEPR=full(operator(epr_spin_system,'Lz',1));
+        SxEPR=full(operator(epr_spin_system,'Lx',1));
     end
-    if spinSys("CS_used")==true
-        CS=spinSys("CS");
+    if parameters.cs_active==true
+        CS=parameters.cs_matrix;
     end
-    if spinSys("D_used")==true
-        D=spinSys("D");
+    if parameters.dipolar_active==true
+        D=parameters.dipolar_matrix;
     end
-    Ni_ENDOR=spinSys("Ni_ENDOR");
+    n_endor=parameters.n_endor;
     g2=g*g;
 
     % initialize arrays
@@ -1400,7 +1406,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
                 geff=(dc*g2*dc')^.5;
 
                 % effective B field for given theta and phi
-                Beff=(expt("Field")*spinSys("g_iso"))/geff(1);
+                Beff=(expt("Field")*parameters.g_iso)/geff(1);
                 B=expt("Field");
 
                 % Resonance frequency for geff at ObsField in GHz
@@ -1423,15 +1429,15 @@ function EPR=kehl_ori_freq(spin_system,parameters)
 
 
                 % ENDOR values
-                HF_zz=zeros(1,Ni_ENDOR);
-                HF_zx=zeros(1,Ni_ENDOR);
-                HF_zy=zeros(1,Ni_ENDOR);
-                NQI_zz=zeros(1,Ni_ENDOR);
-                NQI=zeros(Ni_ENDOR,3,3);
-                CS_zz=zeros(1,Ni_ENDOR);
-                D_zz=zeros(1,Ni_ENDOR);
+                HF_zz=zeros(1,n_endor);
+                HF_zx=zeros(1,n_endor);
+                HF_zy=zeros(1,n_endor);
+                NQI_zz=zeros(1,n_endor);
+                NQI=zeros(n_endor,3,3);
+                CS_zz=zeros(1,n_endor);
+                D_zz=zeros(1,n_endor);
 
-                for m=1:Ni_ENDOR
+                for m=1:n_endor
                      % HF ENDOR
                      HF_zz(m)=(sin(theta))^2*(cos(phi))^2*A(3*m-2,1)...
 +(sin(theta))^2*(sin(phi))^2*A(3*m-1,2)...
@@ -1460,7 +1466,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
                      end
 
                      % NQI ENDOR
-                     if spinSys("Q_used")==true
+                     if parameters.nqi_active==true
 
                         NQI_zz(m)=(sin(theta))^2*(cos(phi))^2*Q(3*m-2,1)...
 +(sin(theta))^2*(sin(phi))^2*Q(3*m-1,2)...
@@ -1470,14 +1476,14 @@ function EPR=kehl_ori_freq(spin_system,parameters)
 +2*sin(theta)*cos(theta)*sin(phi)*Q(3*m-1,3);
                         % Q11,Q22,Q33,Q12,Q13,Q23
 
-                        % Q_ENDOR = spinSys("Q");
+                        % Q_ENDOR = parameters.nqi_matrix;
                         qq2=Q((m-1)*3+1:(m-1)*3+3,:);
                         Y2=R1*qq2*R1';
                         NQI(m,:,:)=Y2;
                      end
 
                      % CS ENDOR
-                     if spinSys("CS_used")==true
+                     if parameters.cs_active==true
                         CS_zz(m)=(sin(theta))^2*(cos(phi))^2*CS(3*m-2,1)...
 +(sin(theta))^2*(sin(phi))^2*CS(3*m-1,2)...
 +(cos(theta))^2*CS(3*m,3)...
@@ -1488,7 +1494,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
 
                 end
                 % nulcear dipolar-dipolar coupling ENDOR
-                 if spinSys("D_used")==true
+                 if parameters.dipolar_active==true
                      D_zz=zeros(1,size(D,1)/3);
                      for m=1:size(D,1)/3
                         D_zz(m)=(sin(theta))^2*(cos(phi))^2*D(3*m-2,1)...
@@ -1515,7 +1521,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
 
 
                          % Q EPR
-                        if spinSys("EPR_Q_used")==true
+                        if parameters.epr_nqi_active==true
                             qq2=Q_EPR((m-1)*3+1:(m-1)*3+3,:);
                             Y2=R1*qq2*R1';
                             NQI_EPR(:,:,m)=Y2;
@@ -1529,7 +1535,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
                H_HF_EPR=zeros(size(SzEPR));
                H_NQI_EPR=zeros(size(SzEPR));
 
-               if spinSys('EPR_Nucs_used')>0
+               if parameters.epr_nuclei_active>0
                    for mm=1:Ni_EPR
                         H_NZ_EPR=H_NZ_EPR+g_N_EPR(mm)*IzEPR{mm};
                         H_HF_EPR=H_HF_EPR+IzEPR{mm}*HF_EPR(3,3,mm)*SzEPR+IxEPR{mm}*(HF_EPR(1,3,mm)^2+HF_EPR(2,3,mm)^2)^0.5*SzEPR;
@@ -1612,7 +1618,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
 
                     %Select only those parameters, for which scalefactor > 0
 
-                    offsets=kehl_offsets(constants,spinSys,spinOps,paramsENDOR,B,geff,HF_zz,NQI_zz);
+                    offsets=kehl_offsets(constants,parameters,parameters.operator_spin_system,paramsENDOR,B,geff,HF_zz,NQI_zz);
 
 
                     if (scalefactor>0) && (trans_prob_EPR(p)>0)
@@ -1638,21 +1644,21 @@ function EPR=kehl_ori_freq(spin_system,parameters)
     % single orientation for single crystal
     elseif parameters.powder==false
         or=or+1;
-        geff=spinSys("g_iso");
+        geff=parameters.g_iso;
 
         %effective B field for given theta and phi
-        B=(expt("Field")*spinSys("g_iso"))/geff(1);
+        B=(expt("Field")*parameters.g_iso)/geff(1);
 
-        HF_zz=zeros(1,Ni_ENDOR);
-        HF_zx=zeros(1,Ni_ENDOR);
-        HF_zy=zeros(1,Ni_ENDOR);
-        NQI_zz=zeros(1,Ni_ENDOR);
-        NQI=zeros(Ni_ENDOR,3,3);
+        HF_zz=zeros(1,n_endor);
+        HF_zx=zeros(1,n_endor);
+        HF_zy=zeros(1,n_endor);
+        NQI_zz=zeros(1,n_endor);
+        NQI=zeros(n_endor,3,3);
 
 
-        CS_zz=zeros(1,Ni_ENDOR);
+        CS_zz=zeros(1,n_endor);
 
-        for m=1:Ni_ENDOR
+        for m=1:n_endor
 
             HF_zz(m)=A(3*m,3);
             if parameters.Bterm==1
@@ -1660,36 +1666,36 @@ function EPR=kehl_ori_freq(spin_system,parameters)
                 HF_zx(m)=A(3*m,1);
             end
 
-            if spinSys("Q_used")==true
+            if parameters.nqi_active==true
                 NQI_zz(m)=Q(3*m,3);
                 NQI(m,:,:)=Q;
             end
 
             % CS ENDOR
-            if spinSys("CS_used")==true
+            if parameters.cs_active==true
                 CS_zz(m)=CS(3*m,3);
             end
         end
 
         % nuclear dipolar-dipolar coupling ENDOR
-        D_zz=zeros(1,Ni_ENDOR);
-        if spinSys("D_used")==true
+        D_zz=zeros(1,n_endor);
+        if parameters.dipolar_active==true
              D_zz=zeros(1,size(D,1)/3);
              for m=1:size(D,1)/3
                  D_zz(m)=D(3*m,3);
              end
          end
 
-        offsets_tmp=kehl_offsets(constants,spinSys,spinOps,paramsENDOR,B,geff,HF_zz,NQI_zz);
+        offsets_tmp=kehl_offsets(constants,parameters,parameters.operator_spin_system,paramsENDOR,B,geff,HF_zz,NQI_zz);
 
         sel_I=parameters.sel_I;
-        if spinSys('N_SpinSys')>1
-            s=size(offsets_tmp,2)/Ni_ENDOR;
-            for n=1:Ni_ENDOR
+        if parameters.n_spin_systems>1
+            s=size(offsets_tmp,2)/n_endor;
+            for n=1:n_endor
                 offsets(n)=offsets_tmp(sel_I+(n-1)*s);
             end
         else
-            s=size(offsets_tmp,2)/Ni_ENDOR;
+            s=size(offsets_tmp,2)/n_endor;
             offsets=offsets_tmp(((sel_I-1)*s+1):(sel_I*s));
         end
 
@@ -1846,4 +1852,3 @@ if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
 end
-

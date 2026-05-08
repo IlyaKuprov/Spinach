@@ -5,10 +5,10 @@
 % expt: the Map containing the experimental parameters
 % v_RF: RF frequency
 % Hfree: acting Hamiltonian without RF term
-% Iy: the Iy spin Operator dictionary
+% Iy: cell array of nuclear Iy spin operators
 % t: pulse length
-% Ni_ENDOR: number of ENDOR nuclei
-% N_spinSys: number of spin systems
+% n_endor: number of ENDOR nuclei
+% n_spin_systems: number of spin systems
 % spin_system: Spinach spin system object
 %
 % output parameters:
@@ -17,22 +17,22 @@
 % February 2024 A. Kehl (akehl@gwdg.de)
 
 
-function U=kehl_rf_bterm(parameters,expt,v_RF,Hfree,Iy,t,Ni_ENDOR,N_spinSys,spin_system)
+function U=kehl_rf_bterm(parameters,expt,v_RF,Hfree,Iy,t,n_endor,n_spin_systems,spin_system)
     if nargin<9
         spin_system=[];
     end
 
 
     % Check consistency
-    grumble(parameters,expt,v_RF,Hfree,Iy,t,Ni_ENDOR,N_spinSys,spin_system);
+    grumble(parameters,expt,v_RF,Hfree,Iy,t,n_endor,n_spin_systems,spin_system);
     % Incrementation calculation for the RF pulse
     t_stepRF=1/(v_RF*parameters.N_stepRF);
     U_RF=eye(size(Hfree));
 
     for ll=1:parameters.N_stepRF
-        if N_spinSys==1
+        if n_spin_systems==1
             HRF=Hfree;
-            for mm=1:Ni_ENDOR
+            for mm=1:n_endor
                 HRF=HRF+2*(expt("oneN"))*Iy{mm}*cos(2*pi*v_RF*t_stepRF*(ll-1));
             end
         else
@@ -50,7 +50,7 @@ function U=kehl_rf_bterm(parameters,expt,v_RF,Hfree,Iy,t,Ni_ENDOR,N_spinSys,spin
 
 end
 
-function grumble(parameters,expt,v_RF,Hfree,Iy,t,Ni_ENDOR,N_spinSys,spin_system)
+function grumble(parameters,expt,v_RF,Hfree,Iy,t,n_endor,n_spin_systems,spin_system)
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
@@ -69,11 +69,11 @@ end
 if ~isnumeric(t)
     error('t must be numeric.');
 end
-if ~isnumeric(Ni_ENDOR)
-    error('Ni_ENDOR must be numeric.');
+if ~isnumeric(n_endor)
+    error('n_endor must be numeric.');
 end
-if ~isnumeric(N_spinSys)
-    error('N_spinSys must be numeric.');
+if ~isnumeric(n_spin_systems)
+    error('n_spin_systems must be numeric.');
 end
 if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
     error('spin_system must be a Spinach spin system structure.');

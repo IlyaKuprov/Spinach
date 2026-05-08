@@ -1,52 +1,60 @@
-% generate diagonal spin operators
+%KEHL_DIAG_OPS Generates diagonal-frame Kehl relaxation operators.
 %
-% input parameters:
-% spinOps: the Map containing the spin operators
-% N_Nuclei: number of nuclei
+%   [SX_D,SY_D,SZ_D,IX_D,IY_D,IZ_D]=KEHL_DIAG_OPS(SX,SY,SZ,IX,IY,IZ,
+%   N_ENDOR) applies the Kehl diagonal-frame transformation to the
+%   explicit electron and nuclear spin operators supplied by the caller.
 %
-% output parameters:
-% Ops: the Map containing the diagonal spin operators
+%   Inputs:
 %
-% February 2024 A. Kehl (akehl@gwdg.de)
+%      SX,SY,SZ - electron spin operators.
+%      IX,IY,IZ - cell arrays of nuclear spin operators.
+%      N_ENDOR  - number of ENDOR nuclei.
+%
+%   Outputs:
+%
+%      SX_D,SY_D,SZ_D - transformed electron spin operators.
+%      IX_D,IY_D,IZ_D - transformed nuclear spin operators.
+%
+%   February 2024 A. Kehl (akehl@gwdg.de)
+%   Spinach architecture migration May 2026 Talos
 
+function [Sx_D,Sy_D,Sz_D,Ix_D,Iy_D,Iz_D]=kehl_diag_ops(Sx,Sy,Sz,Ix,Iy,Iz,n_endor)
 
-function Ops=kehl_diag_ops(spinOps,N_Nuclei)
+% Check consistency
+grumble(Sx,Sy,Sz,Ix,Iy,Iz,n_endor);
 
-    % Check consistency
-    grumble(spinOps,N_Nuclei);
-    Ops=containers.Map;
-    D=eye(size(spinOps('Sz')));
+% Preserve the identity transformation matrix
+D=eye(size(Sz));
 
+% Transform electron operators explicitly
+Sx_D=D\Sx*D;
+Sy_D=D\Sy*D;
+Sz_D=D\Sz*D;
 
-    Ops('Sx')=D\spinOps('Sx')*D;
-    Ops('Sy')=D\spinOps('Sy')*D;
-    Ops('Sz')=D\spinOps('Sz')*D;
+% Preallocate transformed nuclear operators
+Ix_D=cell(1,n_endor);
+Iy_D=cell(1,n_endor);
+Iz_D=cell(1,n_endor);
 
-    Ix=spinOps('Ix');
-    Iy=spinOps('Iy');
-    Iz=spinOps('Iz');
-
-    Ix_D{N_Nuclei}=[];
-    Iy_D{N_Nuclei}=[];
-    Iz_D{N_Nuclei}=[];
-
-    for i=1:size(Ix,2)
-        Ix_D{i}=D/Ix{i}*D;
-        Iy_D{i}=D/Iy{i}*D;
-        Iz_D{i}=D/Iz{i}*D;
-    end
-
-    Ops('Ix')=Ix_D;
-    Ops('Iy')=Iy_D;
-    Ops('Iz')=Iz_D;
+% Transform nuclear operators explicitly
+for n=1:numel(Ix)
+    Ix_D{n}=D/Ix{n}*D;
+    Iy_D{n}=D/Iy{n}*D;
+    Iz_D{n}=D/Iz{n}*D;
 end
 
-function grumble(spinOps,N_Nuclei)
-if ~isa(spinOps,'containers.Map')
-    error('spinOps must be a containers.Map object.');
-end
-if ~isnumeric(N_Nuclei)
-    error('N_Nuclei must be numeric.');
-end
 end
 
+% Consistency enforcement
+function grumble(Sx,Sy,Sz,Ix,Iy,Iz,n_endor)
+if (~isnumeric(Sx))||(~isnumeric(Sy))||(~isnumeric(Sz))
+    error('electron spin operators must be numeric.');
+end
+if (~iscell(Ix))||(~iscell(Iy))||(~iscell(Iz))
+    error('nuclear spin operators must be cell arrays.');
+end
+if (~isnumeric(n_endor))||(~isscalar(n_endor))||...
+   (n_endor<0)||mod(n_endor,1)~=0
+    error('n_endor must be a non-negative integer.');
+end
+end

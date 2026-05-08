@@ -1,84 +1,112 @@
-% sets the initial densitiy matrix either temperature dependent or as
-% approximation (-Sz)
+%KEHL_RHO0 Initial density matrix for Kehl ENDOR kernels.
 %
-% input parameters:
-% constants: the Map containing the constants
-% paramsENDOR: the Map containing the ENDOR parameters
-% B: the main field
-% geff: the effective g value
-% spinOps: the Map containing the spin operators
-% spinSys: the Map describing the spin system
-% parameters: structure containing simulation parameters
-% HF_zz, HF_zy, HF_zx: the effective HF coupling value
-% NQI_zz: the effective NQ coupling value
+%   RHO0=KEHL_RHO0(CONSTANTS,PARAMSENDOR,B,GEFF,OPERATOR_SPIN_SYSTEM,
+%   PARAMETERS,HF_ZZ,HF_ZY,HF_ZX,NQI_ZZ) builds the initial density matrix
+%   either from a Boltzmann factor or from the electron Lz state.
 %
-% output parameters:
-% rho0: the starting density matrix
+%   Inputs:
 %
-% February 2024 A. Kehl (akehl@gwdg.de)
+%      CONSTANTS            - map containing physical constants.
+%      PARAMSENDOR          - map containing ENDOR parameters.
+%      B,GEFF               - magnetic field and effective g value.
+%      OPERATOR_SPIN_SYSTEM - reduced Spinach spin system for Kehl kernels.
+%      PARAMETERS           - Kehl ENDOR context parameters.
+%      HF_ZZ,HF_ZY,HF_ZX    - effective hyperfine couplings.
+%      NQI_ZZ               - effective quadrupole couplings.
+%
+%   Output:
+%
+%      RHO0 - starting density matrix.
+%
+%   February 2024 A. Kehl (akehl@gwdg.de)
+%   Spinach architecture migration May 2026 Talos
 
-
-function [rho0]=kehl_rho0(constants,paramsENDOR,B,geff,spinOps,spinSys,parameters,HF_zz,HF_zy,HF_zx,NQI_zz)
-if nargin<11
+function rho0=kehl_rho0(constants,paramsENDOR,B,geff,operator_spin_system,...
+                       parameters,HF_zz,HF_zy,HF_zx,NQI_zz)
+if nargin<10
     NQI_zz=0;
 end
 
+% Check consistency
+grumble(constants,paramsENDOR,B,geff,operator_spin_system,parameters,...
+        HF_zz,HF_zy,HF_zx,NQI_zz);
 
-    % Check consistency
-    grumble(constants,paramsENDOR,B,geff,spinOps,spinSys,parameters,HF_zz,HF_zy,HF_zx,NQI_zz);
- % getting parameters from Maps
- I=spinSys("I");
- Sz=spinOps('Sz');
+% Get explicit spin-system dimensions
+n_endor=parameters.n_endor;
+n_spin_systems=parameters.n_spin_systems;
+spin_numbers=parameters.endor_spin_numbers;
 
- Ix=spinOps('Ix');
- Iy=spinOps('Iy');
- Iz=spinOps('Iz');
+% Obtain electron operators directly from Spinach
+Sz=full(operator(operator_spin_system,'Lz',1));
 
- v_L=paramsENDOR("v_L");
- if NQI_zz==0
-     NQI_zz=zeros(spinSys("Ni_ENDOR"));
- end
+% Obtain nuclear operators directly from Spinach
+Ix=cell(1,operator_spin_system.comp.nspins-1);
+Iy=cell(1,operator_spin_system.comp.nspins-1);
+Iz=cell(1,operator_spin_system.comp.nspins-1);
+for n=1:numel(Iz)
+    spin_idx=n+1;
+    Ix{n}=full(operator(operator_spin_system,'Lx',spin_idx));
+    Iy{n}=full(operator(operator_spin_system,'Ly',spin_idx));
+    Iz{n}=full(operator(operator_spin_system,'Lz',spin_idx));
+end
 
- % setting the spin Hamiltonian
- H_EZ=B*geff*constants("MU_B")/constants("H")*Sz;
- H_NZ=zeros(size(H_EZ));
- H_HF=zeros(size(H_EZ));
- H_NQI=zeros(size(H_EZ));
+% Default quadrupole offsets to zero
+v_L=paramsENDOR("v_L");
+if NQI_zz==0
+    NQI_zz=zeros(n_endor);
+end
 
- if spinSys('N_SpinSys')>1
+% Set the electron Zeeman Hamiltonian
+H_EZ=B*geff*constants("MU_B")/constants("H")*Sz;
+H_NZ=zeros(size(H_EZ));
+H_HF=zeros(size(H_EZ));
+H_NQI=zeros(size(H_EZ));
+
+% Add nuclear terms for separated-spin-system mode
+if n_spin_systems>1
     m=1;
     H_NZ=H_NZ+v_L(m)*Iz{m};
-    H_HF=H_HF+HF_zz(m)*Sz*Iz{m}+HF_zy(m)*(Sz*Iy{m})+HF_zx(m)*(Sz*Ix{m});
-    H_NQI=H_NQI+1/2*NQI_zz(m)*(3*Iz{m}*Iz{m}-I(m)*(I(m)+1)*eye(size(Iz{m})));
- else
-    for m=1:spinSys('Ni_ENDOR')
+    H_HF=H_HF+HF_zz(m)*Sz*Iz{m}+HF_zy(m)*(Sz*Iy{m})+...
+         HF_zx(m)*(Sz*Ix{m});
+    H_NQI=H_NQI+1/2*NQI_zz(m)*(3*Iz{m}*Iz{m}-...
+          spin_numbers(m)*(spin_numbers(m)+1)*eye(size(Iz{m})));
+else
+
+    % Add nuclear terms for the complete ENDOR spin system
+    for m=1:n_endor
         H_NZ=H_NZ+v_L(m)*Iz{m};
-        H_HF=H_HF+HF_zz(m)*Sz*Iz{m}+HF_zy(m)*(Sz*Iy{m})+HF_zx(m)*(Sz*Ix{m});
-        H_NQI=H_NQI+1/2*NQI_zz(m)*(3*Iz{m}*Iz{m}-I(m)*(I(m)+1)*eye(size(Iz{m})));
+        H_HF=H_HF+HF_zz(m)*Sz*Iz{m}+HF_zy(m)*(Sz*Iy{m})+...
+             HF_zx(m)*(Sz*Ix{m});
+        H_NQI=H_NQI+1/2*NQI_zz(m)*(3*Iz{m}*Iz{m}-...
+              spin_numbers(m)*(spin_numbers(m)+1)*eye(size(Iz{m})));
     end
- end
+end
 
-
+% Assemble the static Hamiltonian
 H_S=H_EZ+H_NZ+H_HF+H_NQI;
 
-% calc. density matrix
+% Calculate the density matrix
 if parameters.temp_eff==true
 
-    % calculate Boltzmann factor
+    % Calculate the Boltzmann factor
     Boltz=expm(-H_S/(constants("K_B")*parameters.T));
 
-    % calculate density matrix with Temp Effect
+    % Normalise the temperature-dependent density matrix
     rho0=Boltz/trace(Boltz);
 else
 
-    % calculate density matrix without Temp Effect
-    rho0=-Sz;
+    % Use the electron Lz state without temperature correction
+    rho0=-full(state(operator_spin_system,'Lz',1));
 end
 
+% Preserve only populations
 rho0=diag(diag(rho0));
+
 end
 
-function grumble(constants,paramsENDOR,B,geff,spinOps,spinSys,parameters,HF_zz,HF_zy,HF_zx,NQI_zz)
+% Consistency enforcement
+function grumble(constants,paramsENDOR,B,geff,operator_spin_system,...
+                 parameters,HF_zz,HF_zy,HF_zx,NQI_zz)
 if ~isa(constants,'containers.Map')
     error('constants must be a containers.Map object.');
 end
@@ -91,11 +119,9 @@ end
 if ~isnumeric(geff)
     error('geff must be numeric.');
 end
-if ~isa(spinOps,'containers.Map')
-    error('spinOps must be a containers.Map object.');
-end
-if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
-    error('spinSys must be empty, or a containers.Map object.');
+if (~isstruct(operator_spin_system))||(~isfield(operator_spin_system,'bas'))||...
+   (~isfield(operator_spin_system,'comp'))
+    error('operator_spin_system must be a Spinach spin system structure.');
 end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
@@ -113,4 +139,3 @@ if ~isnumeric(NQI_zz)
     error('NQI_zz must be numeric.');
 end
 end
-

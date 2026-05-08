@@ -1,6 +1,6 @@
 %KEHL_CP_OFFSET CP frequency offset for Kehl ENDOR kernels.
 %
-%   [V_CP,PARAMSENDOR]=KEHL_CP_OFFSET(PARAMETERS,PARAMSENDOR_IN,EXPT,
+%   [V_CP,PARAMSENDOR]=KEHL_CP_OFFSET(PARAMETERS,PARAMSENDOR_IN,
 %   V_OFF_S,HF_ZZ,NQI_ZZ,M,KK) calculates the CP offset that selects one
 %   CP transition in the single-crystal calculation.
 %
@@ -8,7 +8,6 @@
 %
 %      PARAMETERS      - Kehl ENDOR context parameters.
 %      PARAMSENDOR_IN  - map containing ENDOR parameters.
-%      EXPT            - map containing experimental parameters.
 %      V_OFF_S         - electron offset frequency.
 %      HF_ZZ,NQI_ZZ    - effective hyperfine and quadrupole couplings.
 %      M,KK            - nucleus and offset indices.
@@ -21,11 +20,11 @@
 %   February 2024 A. Kehl (akehl@gwdg.de)
 %   Spinach architecture migration May 2026 Talos
 
-function [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR_IN,expt,...
+function [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR_IN,...
                                            v_off_S,HF_zz,NQI_zz,m,kk)
 
 % Check consistency
-grumble(parameters,paramsENDOR_IN,expt,v_off_S,HF_zz,NQI_zz,m,kk);
+grumble(parameters,paramsENDOR_IN,v_off_S,HF_zz,NQI_zz,m,kk);
 
 % Get the explicit nuclear spin quantum numbers
 paramsENDOR=paramsENDOR_IN;
@@ -35,8 +34,10 @@ spin_numbers=parameters.endor_spin_numbers;
 if parameters.Bterm==false
     if spin_numbers(m)==1/2
         if kk<0
-            nu_alpha=sqrt((v_off_S+HF_zz(m)/2)^2+(expt("oneE")/(2*pi))^2);
-            nu_beta=sqrt((v_off_S-HF_zz(m)/2)^2+(expt("oneE")/(2*pi))^2);
+            nu_alpha=sqrt((v_off_S+HF_zz(m)/2)^2+...
+                     (parameters.electron_nutation/(2*pi))^2);
+            nu_beta=sqrt((v_off_S-HF_zz(m)/2)^2+...
+                    (parameters.electron_nutation/(2*pi))^2);
 
             if HF_zz(m)>0
                 offset_CP=1/2*(nu_alpha+nu_beta);
@@ -44,8 +45,10 @@ if parameters.Bterm==false
                 offset_CP=1/2*(nu_alpha-nu_beta);
             end
         else
-            nu_alpha=sqrt((v_off_S+HF_zz(m)/2)^2+(expt("oneE")/(2*pi))^2);
-            nu_beta=sqrt((v_off_S-HF_zz(m)/2)^2+(expt("oneE")/(2*pi))^2);
+            nu_alpha=sqrt((v_off_S+HF_zz(m)/2)^2+...
+                     (parameters.electron_nutation/(2*pi))^2);
+            nu_beta=sqrt((v_off_S-HF_zz(m)/2)^2+...
+                    (parameters.electron_nutation/(2*pi))^2);
 
             if HF_zz(m)>0
                 offset_CP=1/2*(nu_alpha-nu_beta);
@@ -69,9 +72,12 @@ if parameters.Bterm==false
             v_off_S=freq_EPR(2)-freq_EPR(1);
         end
 
-        omega_alpha=sqrt((v_off_S+HF_zz(m))^2+(expt("oneE")/(2*pi))^2);
-        omega_beta=sqrt((v_off_S)^2+(expt("oneE")/(2*pi))^2);
-        omega_gamma=sqrt((v_off_S-HF_zz(m))^2+(expt("oneE")/(2*pi))^2);
+        omega_alpha=sqrt((v_off_S+HF_zz(m))^2+...
+                    (parameters.electron_nutation/(2*pi))^2);
+        omega_beta=sqrt((v_off_S)^2+...
+                   (parameters.electron_nutation/(2*pi))^2);
+        omega_gamma=sqrt((v_off_S-HF_zz(m))^2+...
+                    (parameters.electron_nutation/(2*pi))^2);
 
         if kk==1
             if parameters.sel_CP==3
@@ -100,26 +106,23 @@ if parameters.Bterm==false
 else
 
     % Use externally supplied CP start when RF B term is active
-    offset_CP=expt("start_CP");
+    offset_CP=parameters.cp_start_hz;
 end
 
 % Write the selected CP frequency into the ENDOR parameter map
-v_L=paramsENDOR("v_L");
+v_L=paramsENDOR('v_L');
 v_CP=v_L(m)-offset_CP;
-paramsENDOR("yCoords")=v_CP;
+paramsENDOR('yCoords')=v_CP;
 
 end
 
 % Consistency enforcement
-function grumble(parameters,paramsENDOR_IN,expt,v_off_S,HF_zz,NQI_zz,m,kk)
+function grumble(parameters,paramsENDOR_IN,v_off_S,HF_zz,NQI_zz,m,kk)
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
 if ~isa(paramsENDOR_IN,'containers.Map')
     error('paramsENDOR_IN must be a containers.Map object.');
-end
-if ~isa(expt,'containers.Map')
-    error('expt must be a containers.Map object.');
 end
 if ~isnumeric(v_off_S)
     error('v_off_S must be numeric.');

@@ -8,6 +8,12 @@
 
 function endor_amp=endor_kehl_tensor(spin_system,parameters,H,R,K)
 
+
+% Append sequence-specific parameters when requested by the context
+if nargin>=3 && ischar(H) && strcmp(H,'parameters')
+    endor_amp=kehl_tensor_parameters(spin_system,parameters);
+    return
+end
 % Check consistency
 grumble(spin_system,parameters,H,R,K);
 if parameters.Relax==true
@@ -36,6 +42,36 @@ if (~isempty(K))&&(~isnumeric(K))
 end
 end
 
+
+function parameters=kehl_tensor_parameters(spin_system,parameters)
+
+% Get pulse sequence timing and RF-field policy
+constants=parameters.constants;
+t=parameters.pulse_times_s;
+[rf_nutations,rf_auto]=kehl_rf_policy(parameters);
+
+% Set tensor RF nutation fields
+if rf_auto==false
+    if size(rf_nutations,1)==2
+        parameters.electron_nutation=rf_nutations(1)*2*pi*1e6;
+        parameters.nuclear_nutation=rf_nutations(2)*2*pi*1e3;
+        parameters.pulse_width=parameters.electron_nutation/...
+                         (2*pi*constants('CONST1')*1e10);
+    else
+        error('parameters.rf_nutation_freqs has incompatible dimensions.');
+    end
+else
+    parameters.electron_nutation=2*pi/(2*t(2));
+    parameters.nuclear_nutation=2*pi/(2*t(1));
+    parameters.pulse_width=parameters.electron_nutation/...
+                     (2*pi*constants('CONST1')*1e10);
+end
+
+% Append standard ENDOR sweep-axis data
+parameters=kehl_endor_axis(spin_system,parameters,'endor');
+
+end
+
 function endor_amp=kehl_tensor_rlx(spin_system,parameters)
 
     % Check consistency
@@ -43,8 +79,7 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
 
     % Unpack context data
     constants=parameters.constants;
-    expt=parameters.expt;
-    paramsENDOR=parameters.paramsENDOR;
+        paramsENDOR=parameters.paramsENDOR;
     EPR=parameters.epr;
     n_endor=parameters.n_endor;
     n_spin_systems=n_endor;
@@ -72,7 +107,7 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
     % get values from Maps
 
 
-    t=expt("t");
+    t=parameters.pulse_times_s;
     Nint=8;
 
 
@@ -156,7 +191,7 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
             step_EN=paramsENDOR("step_EN");
 
 
-            oneN=expt("oneN");
+            oneN=parameters.nuclear_nutation;
 
             Hfree_p=2*pi*v_off_S*Sz;
             if n_spin_systems>1
@@ -241,7 +276,7 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
                     U1=full(propagator(operator_spin_system,1i*sparse(R-1i*full(hilb2liouv(sparse(HRF),'comm'))),t(1)));
                     U2=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t2));
                 else
-                    U1=kehl_rf_bterm_rlx(parameters,expt,v_RF,Hfree_p,Iy,t(1),n_endor,n_spin_systems,R,operator_spin_system);
+                    U1=kehl_rf_bterm_rlx(parameters,v_RF,Hfree_p,Iy,t(1),n_endor,n_spin_systems,R,operator_spin_system);
                     U2=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t2));
                 end
 
@@ -286,8 +321,7 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters)
 
     % Unpack context data
     constants=parameters.constants;
-    expt=parameters.expt;
-    paramsENDOR=parameters.paramsENDOR;
+        paramsENDOR=parameters.paramsENDOR;
     EPR=parameters.epr;
     n_endor=parameters.n_endor;
     n_spin_systems=n_endor;
@@ -311,7 +345,7 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters)
     end
 
     % get values from Maps
-    t=expt("t");
+    t=parameters.pulse_times_s;
     Nint=8;
 
     n_spin_systems=n_endor;
@@ -396,8 +430,8 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters)
                 start_EN=paramsENDOR("start_EN");
                 step_EN=paramsENDOR("step_EN");
 
-                oneE=expt("oneE");
-                oneN=expt("oneN");
+                oneE=parameters.electron_nutation;
+                oneN=parameters.nuclear_nutation;
 
                 Hfree_p=2*pi*v_off_S*Sz;
                 nuc=i
@@ -478,7 +512,7 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters)
                     U2=U2_p*full(propagator(operator_spin_system,sparse(Hcorr),t2));
                 else
                     Hfree=Hfree_p;
-                    U1=kehl_rf_bterm(parameters,expt,v_RF,Hfree,Iy,t(1),n_endor,n_spin_systems,operator_spin_system);
+                    U1=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t(1),n_endor,n_spin_systems,operator_spin_system);
                     U2=U2_p;
                 end
 

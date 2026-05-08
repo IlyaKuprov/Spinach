@@ -8,6 +8,12 @@
 
 function endor_amp=endor_kehl_cp(spin_system,parameters,H,R,K)
 
+
+% Append sequence-specific parameters when requested by the context
+if nargin>=3 && ischar(H) && strcmp(H,'parameters')
+    endor_amp=kehl_cp_parameters(spin_system,parameters);
+    return
+end
 % Check consistency
 grumble(spin_system,parameters,H,R,K);
 if parameters.Relax==true
@@ -36,6 +42,97 @@ if (~isempty(K))&&(~isnumeric(K))
 end
 end
 
+
+function parameters=kehl_cp_parameters(spin_system,parameters)
+
+% Check CP sweep inputs
+if ~isfield(parameters,'cp_start_hz')
+    error('parameters.cp_start_mhz must be specified for CP ENDOR.');
+end
+if ~isfield(parameters,'cp_npoints')
+    error('parameters.cp_npoints must be specified for CP ENDOR.');
+end
+if ~isfield(parameters,'cp_range_hz')
+    error('parameters.cp_range_mhz must be specified for CP ENDOR.');
+end
+
+% Get pulse sequence timing and RF-field policy
+constants=parameters.constants;
+t=parameters.pulse_times_s;
+[rf_nutations,rf_auto]=kehl_rf_policy(parameters);
+
+% Set CP RF nutation fields
+if rf_auto==false
+    if size(rf_nutations,2)==5
+        parameters.prep_nutation=rf_nutations(1)*2*pi*1e6;
+        parameters.spinlock_nutation=rf_nutations(2)*2*pi*1e6;
+        parameters.cp_nutation=rf_nutations(3)*2*pi*1e3;
+        parameters.electron_nutation=rf_nutations(4)*2*pi*1e6;
+        parameters.nuclear_nutation=rf_nutations(5)*2*pi*1e3;
+        parameters.pulse_width=parameters.prep_nutation/...
+                         (2*pi*constants('CONST1')*1e10);
+    elseif size(rf_nutations,2)==3
+        parameters.prep_nutation=rf_nutations(1)*2*pi*1e6;
+        parameters.spinlock_nutation=rf_nutations(2)*2*pi*1e6;
+        parameters.cp_nutation=rf_nutations(3)*2*pi*1e3;
+        parameters.electron_nutation=2*pi/(4*t(7));
+        parameters.nuclear_nutation=2*pi/(2*t(5));
+        parameters.pulse_width=parameters.prep_nutation/...
+                         (2*pi*constants('CONST1')*1e10);
+    elseif size(rf_nutations,2)==2
+        if t(1)==0
+            parameters.prep_nutation=2*pi/(4*t(7));
+            parameters.spinlock_nutation=rf_nutations(1)*2*pi*1e6;
+            parameters.cp_nutation=rf_nutations(2)*2*pi*1e3;
+            parameters.pulse_width=parameters.spinlock_nutation/...
+                             (2*pi*constants('CONST1')*1e10);
+        else
+            parameters.prep_nutation=2*pi/(4*t(1));
+            parameters.spinlock_nutation=rf_nutations(1)*2*pi*1e6;
+            parameters.cp_nutation=rf_nutations(2)*2*pi*1e3;
+            parameters.pulse_width=parameters.prep_nutation/...
+                             (2*pi*constants('CONST1')*1e10);
+        end
+        parameters.electron_nutation=2*pi/(4*t(7));
+        parameters.nuclear_nutation=2*pi/(2*t(5));
+    else
+        error('parameters.rf_nutation_freqs has incompatible dimensions.');
+    end
+else
+    parameters.prep_nutation=2*pi/(4*t(7));
+    parameters.spinlock_nutation=2*pi/(4*t(7));
+    parameters.cp_nutation=2*pi/(2*t(5));
+    parameters.electron_nutation=2*pi/(4*t(7));
+    parameters.nuclear_nutation=2*pi/(2*t(5));
+    parameters.pulse_width=parameters.electron_nutation/...
+                     (2*pi*constants('CONST1')*1e10);
+end
+
+% Append standard ENDOR sweep-axis data
+parameters=kehl_endor_axis(spin_system,parameters,'endor');
+
+% Append CP sweep-axis data
+if parameters.powder==false
+    parameters.cp_npoints=1;
+    parameters.cp_range_hz=0;
+    parameters.y_coords=1;
+else
+    if parameters.cp_npoints>1
+        step_CP=parameters.cp_range_hz/(parameters.cp_npoints-1);
+        y_coords=zeros(parameters.cp_npoints);
+        for n=1:parameters.cp_npoints
+            y_coords(n)=parameters.cp_start_hz+(n-1)*step_CP;
+        end
+        parameters.y_coords=y_coords(:,1)';
+    else
+        y_coords=parameters.cp_start_hz;
+        parameters.y_coords=y_coords(:,1)';
+    end
+    parameters.paramsENDOR('y_coords')=parameters.y_coords;
+end
+
+end
+
 function endor_amp=kehl_cp_calc_rlx(spin_system,parameters)
 
     % Check consistency
@@ -43,8 +140,7 @@ function endor_amp=kehl_cp_calc_rlx(spin_system,parameters)
 
     % Unpack context data
     constants=parameters.constants;
-    expt=parameters.expt;
-    paramsENDOR=parameters.paramsENDOR;
+        paramsENDOR=parameters.paramsENDOR;
     EPR=parameters.epr;
     operator_spin_system=parameters.operator_spin_system;
     n_endor=parameters.n_endor;
@@ -72,16 +168,16 @@ function endor_amp=kehl_cp_calc_rlx(spin_system,parameters)
 
 
 
-    t=expt("t");
+    t=parameters.pulse_times_s;
     Nint=8;
 
     n_spin_systems=n_spin_systems;
 
     n_endor=n_endor;
-    Npts_CP=expt("Npts_CP");
+    Npts_CP=parameters.cp_npoints;
 
-    if expt("Npts_CP")>1
-        step_CP=expt("range_CP")/(expt("Npts_CP")-1);
+    if parameters.cp_npoints>1
+        step_CP=parameters.cp_range_hz/(parameters.cp_npoints-1);
     else
         step_CP=0;
     end
@@ -236,11 +332,11 @@ function endor_amp=kehl_cp_calc_rlx(spin_system,parameters)
             start_EN=paramsENDOR("start_EN");
             step_EN=paramsENDOR("step_EN");
 
-            prep=expt("prep");
-            sl=expt("SL");
-            cp=expt("CP");
-            oneE=expt("oneE");
-            oneN=expt("oneN");
+            prep=parameters.prep_nutation;
+            sl=parameters.spinlock_nutation;
+            cp=parameters.cp_nutation;
+            oneE=parameters.electron_nutation;
+            oneN=parameters.nuclear_nutation;
 
             Hfree_p=2*pi*v_off_S*Sz;
             if n_spin_systems>1
@@ -268,7 +364,7 @@ function endor_amp=kehl_cp_calc_rlx(spin_system,parameters)
 
                 % get offset for sc CP calculation
                 if parameters.powder==false
-                    [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,expt,v_off_S,HF_zz,NQI_zz,mn,i);
+                    [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,v_off_S,HF_zz,NQI_zz,mn,i);
                 end
 
             else
@@ -292,7 +388,7 @@ function endor_amp=kehl_cp_calc_rlx(spin_system,parameters)
 
                     % get offset for sc CP calculation
                     if parameters.powder==false
-                        [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,expt,v_off_S,HF_zz,NQI_zz,mm,i);
+                        [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,v_off_S,HF_zz,NQI_zz,mm,i);
                     end
                 end
                  if parameters.dipolar_active==true
@@ -328,7 +424,7 @@ function endor_amp=kehl_cp_calc_rlx(spin_system,parameters)
             for c=1:Npts_CP
 
             if parameters.powder==true
-                v_CP=expt("start_CP")+step_CP*(c-1);
+                v_CP=parameters.cp_start_hz+step_CP*(c-1);
             end
 
             % loop over rf frequencies (x-axis)
@@ -416,17 +512,17 @@ function endor_amp=kehl_cp_calc_rlx(spin_system,parameters)
                         for ll=1:parameters.N_stepRF
                             if n_spin_systems==1
                                 for mm=1:n_endor
-                                    H_SL=H_SL+2*expt('CP')*Ix{mm}*cos(2*pi*v_CP*t_stepCP*(ll-1));
+                                    H_SL=H_SL+2*parameters.cp_nutation*Ix{mm}*cos(2*pi*v_CP*t_stepCP*(ll-1));
                                 end
                             else
-                                H_SL=H_SL+2*expt('CP')*Ix{1}*cos(2*pi*v_CP*t_stepCP*(ll-1));
+                                H_SL=H_SL+2*parameters.cp_nutation*Ix{1}*cos(2*pi*v_CP*t_stepCP*(ll-1));
                             end
                             G=RRho/t_stepCP-1i*full(hilb2liouv(sparse(H_SL),'comm'));
                             U_step=full(propagator(operator_spin_system,1i*sparse(G),t_stepCP));
                             U_SL=U_step*U_SL;
                         end
                         U3=(U_SL^(t(3)*v_CP));
-                        U5=kehl_rf_bterm_rlx(parameters,expt,v_RF,Hfree_p,Iy,t(5),n_endor,n_spin_systems,R,operator_spin_system);
+                        U5=kehl_rf_bterm_rlx(parameters,v_RF,Hfree_p,Iy,t(5),n_endor,n_spin_systems,R,operator_spin_system);
 
                         U1=full(propagator(operator_spin_system,1i*sparse(R-1i*Hprep),t(1)));
                         U2=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(2)));
@@ -492,8 +588,7 @@ function endor_amp=kehl_cp_calc(spin_system,parameters)
 
     % Unpack context data
     constants=parameters.constants;
-    expt=parameters.expt;
-    paramsENDOR=parameters.paramsENDOR;
+        paramsENDOR=parameters.paramsENDOR;
     EPR=parameters.epr;
     operator_spin_system=parameters.operator_spin_system;
     n_endor=parameters.n_endor;
@@ -515,7 +610,7 @@ function endor_amp=kehl_cp_calc(spin_system,parameters)
         Iy{n}=full(operator(operator_spin_system,'Ly',spin_idx));
         Iz{n}=full(operator(operator_spin_system,'Lz',spin_idx));
     end
-    t=expt("t");
+    t=parameters.pulse_times_s;
     Nint=8;
 
     n_spin_systems=n_spin_systems;
@@ -548,10 +643,10 @@ function endor_amp=kehl_cp_calc(spin_system,parameters)
 
     offsets_sel=EPR("offsets");
     Npts_EN=paramsENDOR("Npts_EN");
-    Npts_CP=expt("Npts_CP");
+    Npts_CP=parameters.cp_npoints;
 
-    if expt("Npts_CP")>1
-        step_CP=expt("range_CP")/(expt("Npts_CP")-1);
+    if parameters.cp_npoints>1
+        step_CP=parameters.cp_range_hz/(parameters.cp_npoints-1);
     else
         step_CP=0;
     end
@@ -604,11 +699,11 @@ function endor_amp=kehl_cp_calc(spin_system,parameters)
             start_EN=paramsENDOR("start_EN");
             step_EN=paramsENDOR("step_EN");
 
-            prep=expt("prep");
-            sl=expt("SL");
-            cp=expt("CP");
-            oneE=expt("oneE");
-            oneN=expt("oneN");
+            prep=parameters.prep_nutation;
+            sl=parameters.spinlock_nutation;
+            cp=parameters.cp_nutation;
+            oneE=parameters.electron_nutation;
+            oneN=parameters.nuclear_nutation;
 
             % define free Hamiltonian
             Hfree_p=2*pi*v_off_S*Sz;
@@ -637,7 +732,7 @@ function endor_amp=kehl_cp_calc(spin_system,parameters)
 
                 % get offset for sc CP calculation
                 if parameters.powder==false
-                    [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,expt,v_off_S,HF_zz,NQI_zz,mn,i);
+                    [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,v_off_S,HF_zz,NQI_zz,mn,i);
                 end
             else
                 for mm=1:n_endor
@@ -660,7 +755,7 @@ function endor_amp=kehl_cp_calc(spin_system,parameters)
 
                     % get offset for sc CP calculation
                     if parameters.powder==false
-                        [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,expt,v_off_S,HF_zz,NQI_zz,mm,i);
+                        [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,v_off_S,HF_zz,NQI_zz,mm,i);
                     end
                 end
 
@@ -715,7 +810,7 @@ function endor_amp=kehl_cp_calc(spin_system,parameters)
             for c=1:Npts_CP
 
             if parameters.powder==true
-                v_CP=expt("start_CP")+step_CP*(c-1);
+                v_CP=parameters.cp_start_hz+step_CP*(c-1);
             end
 
 
@@ -798,16 +893,16 @@ function endor_amp=kehl_cp_calc(spin_system,parameters)
                     for ll=1:parameters.N_stepRF
                         if n_spin_systems==1
                             for mm=1:n_endor
-                                H_SL=H_SL+2*expt('CP')*Ix{mm}*cos(2*pi*v_RF*t_stepCP*(ll-1));
+                                H_SL=H_SL+2*parameters.cp_nutation*Ix{mm}*cos(2*pi*v_RF*t_stepCP*(ll-1));
                             end
                         else
-                            H_SL=H_SL+2*expt('CP')*Ix{1}*cos(2*pi*v_RF*t_stepCP*(ll-1));
+                            H_SL=H_SL+2*parameters.cp_nutation*Ix{1}*cos(2*pi*v_RF*t_stepCP*(ll-1));
                         end
                         U_step=full(propagator(operator_spin_system,sparse(H_SL),t_stepCP));
                         U_SL=U_step*U_SL;
                     end
                     U3=(U_SL^(t(3)*v_RF));
-                    U5=kehl_rf_bterm(parameters,expt,v_RF,Hfree,Iy,t(5),n_endor,n_spin_systems,operator_spin_system);
+                    U5=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t(5),n_endor,n_spin_systems,operator_spin_system);
 
                     U1=U1_p;
                     U2=U2_p;

@@ -24,15 +24,13 @@ grumble(spin_system,sequence,parameters,assumptions);
 
 % Normalise the pulse-sequence selector
 pulse_sequence=sequence_handle(sequence);
-seq_name=sequence_name(pulse_sequence);
 
-% Store context selector and assumptions
-parameters.seq_name=seq_name;
+% Store context assumptions
 parameters.assumptions=assumptions;
 
-% Build Kehl context data structures from Spinach parameters
+% Build sequence-agnostic Kehl context data from Spinach parameters
 parameters.constants=context_constants(spin_system);
-parameters.expt=context_experiment(parameters);
+parameters=context_fields(parameters);
 parameters=context_spin_data(spin_system,parameters);
 parameters.operator_spin_system=kehl_spin_system(parameters.operator_isotopes,...
                                                 parameters.n_spin_systems);
@@ -41,24 +39,15 @@ if nargin>=4 && ~isempty(assumptions)
     spin_system=assume(spin_system,assumptions);
 end
 
-if strcmp(parameters.seq_name,'time')
-    t=parameters.expt('t');
-    parameters.expt('t_start')=t(6);
-    parameters.paramsENDOR=kehl_prep_time(spin_system,parameters);
-else
-    parameters.paramsENDOR=kehl_prep_endor(spin_system,parameters);
-end
+% Let the pulse sequence append its own derived parameters
+parameters=pulse_sequence(spin_system,parameters,'parameters',[],[]);
 
+% Select EPR orientations using sequence-independent context data
 parameters.paramsEPR=kehl_prep_epr(spin_system,parameters);
 if parameters.freqDomain==false
     parameters.epr=kehl_ori_field(spin_system,parameters);
 else
     parameters.epr=kehl_ori_freq(spin_system,parameters);
-end
-
-is_cp=strcmp(parameters.seq_name,'cp');
-if is_cp
-    [y_coords,parameters]=cp_axis(parameters);
 end
 
 % Run the requested pulse sequence using the Spinach experiment signature
@@ -72,27 +61,11 @@ x_coords=parameters.paramsENDOR('x_coords');
 x_coords=x_coords(:,1)';
 v_L=parameters.paramsENDOR('v_L');
 
-if is_cp
-    varargout={endor_amp,endor_amp_conv,x_coords,y_coords,v_L};
+if isfield(parameters,'y_coords')
+    varargout={endor_amp,endor_amp_conv,x_coords,parameters.y_coords,v_L};
 else
     varargout={endor_amp,endor_amp_conv,x_coords,v_L};
 end
-end
-
-function seq_name=sequence_name(sequence)
-    if isa(sequence,'function_handle')
-        seq_name=func2str(sequence);
-    else
-        seq_name=char(sequence);
-    end
-    seq_name=lower(seq_name);
-    seq_name=strrep(seq_name,'endor_kehl_','');
-    seq_name=strrep(seq_name,'kehl_','');
-    seq_name=strrep(seq_name,'_calc','');
-    seq_name=strrep(seq_name,'_rlx','');
-    if strcmp(seq_name,'timedomain')
-        seq_name='time';
-    end
 end
 
 function pulse_sequence=sequence_handle(sequence)
@@ -100,22 +73,15 @@ function pulse_sequence=sequence_handle(sequence)
         pulse_sequence=sequence;
         return
     end
-    switch sequence_name(sequence)
-        case 'mims'
-            pulse_sequence=@endor_kehl_mims;
-        case 'time'
-            pulse_sequence=@endor_kehl_time;
-        case 'davies'
-            pulse_sequence=@endor_kehl_davies;
-        case 'spinlock'
-            pulse_sequence=@endor_kehl_spinlock;
-        case 'tensor'
-            pulse_sequence=@endor_kehl_tensor;
-        case 'cp'
-            pulse_sequence=@endor_kehl_cp;
-        otherwise
-            error('unknown Kehl ENDOR pulse sequence.');
+    name=char(sequence);
+    name=lower(name);
+    if strcmp(name,'timedomain')
+        name='time';
     end
+    if ~startsWith(name,'endor_kehl_')
+        name=['endor_kehl_' name];
+    end
+    pulse_sequence=str2func(name);
 end
 
 function constants=context_constants(spin_system)
@@ -227,213 +193,37 @@ function parameters=context_spin_data(spin_system,parameters)
     end
 end
 
-function [y_coords,parameters]=cp_axis(parameters)
-    expt=parameters.expt;
-    if parameters.powder==false
-        expt('Npts_CP')=1;
-        expt('range_CP')=0;
-        y_coords=1;
-    else
-        if expt('Npts_CP')>1
-            step_CP=expt('range_CP')/(expt('Npts_CP')-1);
-            y_coords=zeros(expt('Npts_CP'));
-            for n=1:expt('Npts_CP')
-                y_coords(n)=expt('start_CP')+(n-1)*step_CP;
-            end
-            y_coords=y_coords(:,1)';
-        else
-            y_coords=expt('start_CP');
-            y_coords=y_coords(:,1)';
-        end
-        parameters.paramsENDOR('y_coords')=y_coords;
-    end
-    parameters.expt=expt;
-end
+function parameters=context_fields(parameters)
 
-function expt=context_experiment(parameters)
-    constants=parameters.constants;
-    seq_name=parameters.seq_name;
+    % Append generic field and frequency data
+    parameters.mw_freq_hz=parameters.mw_freq_ghz*1e9;
+    parameters.field_t=parameters.static_field_g*1e-4;
+    parameters.field_step_t=parameters.field_step_g*1e-4;
+    parameters.endor_res_hz=parameters.endor_res_mhz*1e6;
+    parameters.endor_range_hz=parameters.endor_range_mhz*1e6;
+    parameters.pulse_times_s=parameters.pulse_times_ns*1e-9;
 
-    % Create the primary experiment parameter map
-    expt=containers.Map;
-    expt('FreqMeas')=parameters.mw_freq_ghz*1e9;
-    expt('Field')=parameters.static_field_g*1e-4;
-    expt('deltaField')=parameters.field_step_g*1e-4;
-    expt('res_EN')=parameters.endor_res_mhz*1e6;
-    expt('range_EN')=parameters.endor_range_mhz*1e6;
-    expt('t')=parameters.pulse_times_ns*1e-9;
-
-    % Get radiofrequency and microwave nutation field policy
-    rf_nutations=[];
-    if isfield(parameters,'rf_nutation_freqs')
-        rf_nutations=parameters.rf_nutation_freqs;
-    end
-    if isfield(parameters,'rf_field_from_pulses')
-        rf_auto=parameters.rf_field_from_pulses;
-    else
-        rf_auto=isempty(rf_nutations);
-    end
-
-    % Set sequence-specific nutation fields
-    t=expt('t');
-    switch seq_name
-        case 'davies'
-            if rf_auto==false
-                if size(rf_nutations,1)==3
-                    expt('prep')=rf_nutations(1)*2*pi*1e6;
-                    expt('oneE')=rf_nutations(2)*2*pi*1e6;
-                    expt('oneN')=rf_nutations(3)*2*pi*1e3;
-                    expt('pulsewidth')=expt('oneE')/(2*pi*constants('CONST1')*1e10);
-                elseif ~isempty(rf_nutations)
-                    error('parameters.rf_nutation_freqs has incompatible dimensions.');
-                end
-            else
-                expt('prep')=2*pi/(2*t(1));
-                expt('oneE')=2*pi/(4*t(5));
-                expt('oneN')=2*pi/(2*t(3));
-                expt('pulsewidth')=expt('oneE')/(2*pi*constants('CONST1')*1e10);
-            end
-        case 'spinlock'
-            if rf_auto==false
-                if size(rf_nutations,1)==3
-                    expt('SL')=rf_nutations(1)*2*pi*1e6;
-                    expt('oneE')=rf_nutations(2)*2*pi*1e6;
-                    expt('oneN')=rf_nutations(3)*2*pi*1e3;
-                    expt('pulsewidth')=expt('SL')/(2*pi*constants('CONST1')*1e10);
-                elseif size(rf_nutations,1)==1
-                    expt('SL')=rf_nutations(1)*2*pi*1e6;
-                    expt('oneE')=2*pi/(4*t(5));
-                    expt('oneN')=2*pi/(2*t(3));
-                    expt('pulsewidth')=expt('SL')/(2*pi*constants('CONST1')*1e10);
-                elseif ~isempty(rf_nutations)
-                    error('parameters.rf_nutation_freqs has incompatible dimensions.');
-                end
-            else
-                expt('SL')=2*pi/(4*t(5));
-                expt('oneE')=2*pi/(4*t(5));
-                expt('oneN')=2*pi/(2*t(3));
-                expt('pulsewidth')=expt('SL')/(2*pi*constants('CONST1')*1e10);
-            end
-        case 'tensor'
-            if rf_auto==false
-                if size(rf_nutations,1)==2
-                    expt('oneE')=rf_nutations(1)*2*pi*1e6;
-                    expt('oneN')=rf_nutations(2)*2*pi*1e3;
-                    expt('pulsewidth')=expt('oneE')/(2*pi*constants('CONST1')*1e10);
-                elseif ~isempty(rf_nutations)
-                    error('parameters.rf_nutation_freqs has incompatible dimensions.');
-                end
-            else
-                expt('oneE')=2*pi/(2*t(2));
-                expt('oneN')=2*pi/(2*t(1));
-                expt('pulsewidth')=expt('oneE')/(2*pi*constants('CONST1')*1e10);
-            end
-        case 'time'
-            if rf_auto==false
-                if size(rf_nutations,1)==2
-                    expt('oneE')=rf_nutations(1)*2*pi*1e6;
-                    expt('oneN')=rf_nutations(2)*2*pi*1e3;
-                    expt('pulsewidth')=expt('oneE')/(2*pi*constants('CONST1')*1e10);
-                elseif ~isempty(rf_nutations)
-                    error('parameters.rf_nutation_freqs has incompatible dimensions.');
-                end
-            else
-                expt('oneE')=2*pi/(4*t(1));
-                if isKey(expt,'ang')
-                    expt('oneN')=(expt('ang')/180)*2*pi/(4*t(5));
-                else
-                    expt('oneN')=2*pi/(4*t(5));
-                end
-                expt('pulsewidth')=expt('oneE')/(2*pi*constants('CONST1')*1e10);
-            end
-        case 'cp'
-            if rf_auto==false
-                if size(rf_nutations,2)==5
-                    expt('prep')=rf_nutations(1)*2*pi*1e6;
-                    expt('SL')=rf_nutations(2)*2*pi*1e6;
-                    expt('CP')=rf_nutations(3)*2*pi*1e3;
-                    expt('oneE')=rf_nutations(4)*2*pi*1e6;
-                    expt('oneN')=rf_nutations(5)*2*pi*1e3;
-                    expt('pulsewidth')=expt('prep')/(2*pi*constants('CONST1')*1e10);
-                elseif size(rf_nutations,2)==3
-                    expt('prep')=rf_nutations(1)*2*pi*1e6;
-                    expt('SL')=rf_nutations(2)*2*pi*1e6;
-                    expt('CP')=rf_nutations(3)*2*pi*1e3;
-                    expt('oneE')=2*pi/(4*t(7));
-                    expt('oneN')=2*pi/(2*t(5));
-                    expt('pulsewidth')=expt('prep')/(2*pi*constants('CONST1')*1e10);
-                elseif size(rf_nutations,2)==2
-                    if t(1)==0
-                        expt('prep')=2*pi/(4*t(7));
-                        expt('SL')=rf_nutations(1)*2*pi*1e6;
-                        expt('CP')=rf_nutations(2)*2*pi*1e3;
-                        expt('pulsewidth')=expt('SL')/(2*pi*constants('CONST1')*1e10);
-                    else
-                        expt('prep')=2*pi/(4*t(1));
-                        expt('SL')=rf_nutations(1)*2*pi*1e6;
-                        expt('CP')=rf_nutations(2)*2*pi*1e3;
-                        expt('pulsewidth')=expt('prep')/(2*pi*constants('CONST1')*1e10);
-                    end
-                    expt('oneE')=2*pi/(4*t(7));
-                    expt('oneN')=2*pi/(2*t(5));
-                elseif ~isempty(rf_nutations)
-                    error('parameters.rf_nutation_freqs has incompatible dimensions.');
-                end
-            else
-                expt('prep')=2*pi/(4*t(7));
-                expt('SL')=2*pi/(4*t(7));
-                expt('CP')=2*pi/(2*t(5));
-                expt('oneE')=2*pi/(4*t(7));
-                expt('oneN')=2*pi/(2*t(5));
-                expt('pulsewidth')=expt('oneE')/(2*pi*constants('CONST1')*1e10);
-            end
-        otherwise
-            if rf_auto==false
-                if size(rf_nutations,1)==2
-                    expt('oneE')=rf_nutations(1)*2*pi*1e6;
-                    expt('oneN')=rf_nutations(2)*2*pi*1e3;
-                    expt('pulsewidth')=expt('oneE')/(2*pi*constants('CONST1')*1e10);
-                elseif ~isempty(rf_nutations)
-                    error('parameters.rf_nutation_freqs has incompatible dimensions.');
-                end
-            else
-                expt('oneE')=2*pi/(4*t(1));
-                if isKey(expt,'ang')
-                    expt('oneN')=(expt('ang')/180)*2*pi/(2*t(5));
-                else
-                    expt('oneN')=2*pi/(2*t(5));
-                end
-                expt('pulsewidth')=expt('oneE')/(2*pi*constants('CONST1')*1e10);
-            end
-    end
-
-    % Set the frequency-domain EPR sweep
+    % Append frequency-domain EPR sweep data when present
     if isfield(parameters,'epr_freq_min_ghz')
-        expt('FreqMin')=parameters.epr_freq_min_ghz*1e9;
-        expt('FreqRange')=parameters.epr_freq_range_ghz*1e9;
-        expt('FreqSteps')=parameters.epr_freq_step_ghz*1e9;
+        parameters.epr_freq_min_hz=parameters.epr_freq_min_ghz*1e9;
+        parameters.epr_freq_range_hz=parameters.epr_freq_range_ghz*1e9;
+        parameters.epr_freq_step_hz=parameters.epr_freq_step_ghz*1e9;
     end
 
-    % Set the ENDOR radiofrequency pulse flip angle
-    if isfield(parameters,'rf_flip_angle_deg')
-        expt('ang')=parameters.rf_flip_angle_deg;
+    % Append optional direct RF and CP sweep starts
+    if isfield(parameters,'rf_start_mhz')
+        parameters.rf_start_hz=parameters.rf_start_mhz*1e6;
     end
-
-    % Set the shaped pulse profile file
-    if isfield(parameters,'pulse_file')
-        multipulses=false;
-        if isfield(parameters,'multipulses')
-            multipulses=parameters.multipulses;
-        end
-        expt('pulse')=parameters.pulse_file;
-        expt('3pulses')=multipulses;
-    end
-
-    % Set the CP sweep dimension when present
     if isfield(parameters,'cp_start_mhz')
-        expt('start_CP')=parameters.cp_start_mhz*1e6;
-        expt('Npts_CP')=parameters.cp_npoints;
-        expt('range_CP')=parameters.cp_range_mhz*1e6;
+        parameters.cp_start_hz=parameters.cp_start_mhz*1e6;
+    end
+    if isfield(parameters,'cp_range_mhz')
+        parameters.cp_range_hz=parameters.cp_range_mhz*1e6;
+    end
+
+    % Default shaped-pulse multiplicity flag
+    if isfield(parameters,'pulse_file')&&~isfield(parameters,'multipulses')
+        parameters.multipulses=false;
     end
 end
 
@@ -516,10 +306,6 @@ end
 if (~isa(sequence,'function_handle'))&&(~ischar(sequence))&&(~isstring(sequence))
     error('sequence must be a function handle, character string, or string scalar.');
 end
-seq_name=sequence_name(sequence);
-if ~ismember(seq_name,{'mims','time','davies','spinlock','tensor','cp'})
-    error('sequence must specify mims, time, davies, spinlock, tensor, or cp.');
-end
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
@@ -553,17 +339,6 @@ if parameters.freqDomain==true
     end
     if ~isfield(parameters,'epr_freq_step_ghz')
         error('parameters.epr_freq_step_ghz must be specified for frequency-domain EPR.');
-    end
-end
-if strcmp(seq_name,'cp')
-    if ~isfield(parameters,'cp_start_mhz')
-        error('parameters.cp_start_mhz must be specified for CP ENDOR.');
-    end
-    if ~isfield(parameters,'cp_npoints')
-        error('parameters.cp_npoints must be specified for CP ENDOR.');
-    end
-    if ~isfield(parameters,'cp_range_mhz')
-        error('parameters.cp_range_mhz must be specified for CP ENDOR.');
     end
 end
 if (~ischar(assumptions))&&(~isstring(assumptions))
@@ -685,141 +460,6 @@ end
 end
 
 
-% --- Localised from kehl_prep_time.m ---
-% calculates/sets necessary parameters for the time domain ENDOR calculation from
-% the experimental values
-%
-% input parameters:
-% constants:the Map containing the constants
-% spin_system: Spinach spin system structure
-% expt: the Map containing the experimental parameters
-%
-% output parameters:
-% paramsENDOR: the Map containing the ENDOR parameters
-%
-% February 2024 A. Kehl (akehl@gwdg.de)
-
-% Larmor frequencies
-
-function paramsENDOR=kehl_prep_time(spin_system,parameters)
-
-    % Check consistency
-    kehl_prep_time_grumble(spin_system,parameters);
-
-    % Unpack context data
-    constants=parameters.constants;
-    expt=parameters.expt;
-    Nuclei=parameters.endor_isotopes;
-    v_L=zeros(size(Nuclei,2),1);
-    for i=1:size(Nuclei,2)
-
-        % Convert Spinach magnetogyric ratio to Hz/T
-        [gamma,~]=spin(Nuclei{i});
-        v_L(i)=gamma*expt("Field")/(2*pi);
-    end
-
-    % number of points and values for x-axis
-
-    % input in us, factor 10e-6 due to usual conversion MHz to Hz
-    range_EN=expt("range_EN")*1e-12;
-
-    % input in us, factor 10e-6 due to usual conversion MHz to Hz
-    res_EN=expt("res_EN")*1e-12;
-    Npts_EN=(round(range_EN/res_EN));
-
-    % ENDOR start x-axis
-    start_EN=expt("t_start");
-
-    % X-Axis steps
-    step_EN=range_EN/(Npts_EN-1);
-    x_coords=zeros(Npts_EN);
-    for ii=1:Npts_EN
-
-        %-v_L;
-        x_coords(ii)=start_EN+(ii-1)*step_EN;
-    end
-
-    paramsENDOR=containers.Map;
-
-    paramsENDOR("v_L")=v_L;
-    paramsENDOR("start_EN")=start_EN;
-    paramsENDOR("step_EN")=step_EN;
-    paramsENDOR("range_EN")=expt("range_EN");
-    paramsENDOR("Npts_EN")=Npts_EN;
-    paramsENDOR("x_coords")=x_coords;
-
-
-
-end
-
-function kehl_prep_time_grumble(spin_system,parameters)
-if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
-    error('spin_system must be a Spinach spin system structure.');
-end
-if ~isstruct(parameters)
-    error('parameters must be a structure.');
-end
-end
-
-function paramsENDOR=kehl_prep_endor(spin_system,parameters)
-
-    % Check consistency
-    kehl_prep_endor_grumble(spin_system,parameters);
-
-    % Unpack context data
-    constants=parameters.constants;
-    expt=parameters.expt;
-    Nuclei=parameters.endor_isotopes;
-    v_L=zeros(size(Nuclei,2),1);
-    for i=1:size(Nuclei,2)
-
-        % Convert Spinach magnetogyric ratio to Hz/T
-        [gamma,~]=spin(Nuclei{i});
-        v_L(i)=gamma*expt("Field")/(2*pi);
-    end
-
-    % number of points and values for x-axis
-    Npts_EN=(round(expt("range_EN")/expt("res_EN")));
-    if isKey(expt,"RF_start")
-
-        % ENDOR start x-axis
-        start_EN=expt("RF_start");
-    else
-
-        % ENDOR start x-axis
-        start_EN=v_L(1)-expt("range_EN")/2;
-    end
-
-    % X-Axis steps
-    step_EN=expt("range_EN")/(Npts_EN-1);
-    x_coords=zeros(Npts_EN);
-    for ii=1:Npts_EN
-
-        %-v_L;
-        x_coords(ii)=start_EN+(ii-1)*step_EN;
-    end
-
-    paramsENDOR=containers.Map;
-
-    paramsENDOR("v_L")=v_L;
-    paramsENDOR("start_EN")=start_EN;
-    paramsENDOR("step_EN")=step_EN;
-    paramsENDOR("range_EN")=expt("range_EN");
-    paramsENDOR("Npts_EN")=Npts_EN;
-    paramsENDOR("x_coords")=x_coords;
-
-
-end
-
-function kehl_prep_endor_grumble(spin_system,parameters)
-if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
-    error('spin_system must be a Spinach spin system structure.');
-end
-if ~isstruct(parameters)
-    error('parameters must be a structure.');
-end
-end
-
 function paramsEPR=kehl_prep_epr(spin_system,parameters)
 
     % Check consistency
@@ -827,9 +467,8 @@ function paramsEPR=kehl_prep_epr(spin_system,parameters)
 
     % Unpack context data
     constants=parameters.constants;
-    expt=parameters.expt;
-    g_iso=parameters.g_iso;
-    obsField=expt("Field");
+        g_iso=parameters.g_iso;
+    obsField=parameters.field_t;
 
     gBepr=obsField*g_iso;
     geff=g_iso;
@@ -844,7 +483,7 @@ function paramsEPR=kehl_prep_epr(spin_system,parameters)
     % EPR x-axis definition
 
     % no of points in Field dimension
-    Npts=(round((fieldmax-fieldmin)/expt("deltaField"))+1);
+    Npts=(round((fieldmax-fieldmin)/parameters.field_step_t)+1);
     field=linspace(fieldmin,fieldmax,Npts);
 
     paramsEPR=containers.Map;
@@ -871,8 +510,7 @@ function EPR=kehl_ori_field(spin_system,parameters)
     constants=parameters.constants;
     paramsEPR=parameters.paramsEPR;
     paramsENDOR=parameters.paramsENDOR;
-    expt=parameters.expt;
-    Ntheta=parameters.Nang;
+        Ntheta=parameters.Nang;
     Nphimax=parameters.Nang;
     g=parameters.g_matrix;
     A=parameters.hfc_matrix;
@@ -913,10 +551,10 @@ function EPR=kehl_ori_field(spin_system,parameters)
 
     % for powder pattern
     if parameters.powder==true
-        if isKey(expt,'exciteWidth')
-            W1=expt('exciteWidth');
+        if isfield(parameters,'excite_width')
+            W1=parameters.excite_width;
         else
-            W1=expt("pulsewidth")*constants("CONST1")*1e10;
+            W1=parameters.pulse_width*constants("CONST1")*1e10;
         end
         nor=0;
     % loop through orientations
@@ -932,8 +570,8 @@ function EPR=kehl_ori_field(spin_system,parameters)
             geff=(dc*g2*dc')^.5;
 
             % effective B field for given theta and phi
-            B=(expt("Field")*parameters.g_iso)/geff(1);
-            Beff=expt('FreqMeas')*constants('H')/(constants('MU_B')*geff);
+            B=(parameters.field_t*parameters.g_iso)/geff(1);
+            Beff=parameters.mw_freq_hz*constants('H')/(constants('MU_B')*geff);
 
             % HF ENDOR
             HF_zz=zeros(1,n_endor);
@@ -1059,10 +697,10 @@ function EPR=kehl_ori_field(spin_system,parameters)
                         % EPR resonance with hyperfine coupling only
                         E=Beff+mI*(HF_zz_EPR(i)/constants("CONST1")*10^(-10))';
                 end
-                bin=(round((E-fieldAxis(1))/expt("deltaField"))+1);
+                bin=(round((E-fieldAxis(1))/parameters.field_step_t)+1);
             else
                 E=Beff;
-                bin=(round((E-fieldAxis(1))/expt("deltaField"))+1);
+                bin=(round((E-fieldAxis(1))/parameters.field_step_t)+1);
             end
 
             for p=1:length(bin)
@@ -1080,10 +718,10 @@ function EPR=kehl_ori_field(spin_system,parameters)
                 nor=nor+1;
 
                 % Magnetic field offset in T
-                DeltaB=fieldAxis(bin(l))-expt("Field");
+                DeltaB=fieldAxis(bin(l))-parameters.field_t;
 
-                if isKey(expt,"pulse")
-                    scalefactor=kehl_ori_field_pulsescale(expt,DeltaB,constants("CONST1"));
+                if isfield(parameters,'pulse_file')
+                    scalefactor=kehl_ori_field_pulsescale(parameters,DeltaB,constants("CONST1"));
                 else
 
                     if abs(DeltaB)<=abs(parameters.nwidth*(W1/(constants("CONST1")*1e10)))
@@ -1129,7 +767,7 @@ function EPR=kehl_ori_field(spin_system,parameters)
         geff=parameters.g_iso;
 
         %effective B field for given theta and phi
-        Beff=expt('FreqMeas')*constants('H')/(constants('MU_B')*geff);
+        Beff=parameters.mw_freq_hz*constants('H')/(constants('MU_B')*geff);
 
         HF_zz=zeros(1,n_endor);
         HF_zx=zeros(1,n_endor);
@@ -1218,12 +856,12 @@ function EPR=kehl_ori_field(spin_system,parameters)
     EPR("offsets")=offsets_sel;
 end
 
-function scalefactor=kehl_ori_field_pulsescale(expt,DeltaB,CONST1)
+function scalefactor=kehl_ori_field_pulsescale(parameters,DeltaB,CONST1)
     % calculates the scalefactor in dependence of the mw pulse's excitation
     % profile
     %
     % input parameters:
-    % expt: the Map containing the experimental parameters
+    % parameters: Kehl ENDOR context parameters
     % DeltaB: offset of the actual field from the effective resonance field
     % CONST1: constant to convert between field and frequency
     %
@@ -1233,7 +871,7 @@ function scalefactor=kehl_ori_field_pulsescale(expt,DeltaB,CONST1)
     % February 2024 A. Kehl (akehl@gwdg.de)
     %
 
-    data=expt("pulse");
+    data=parameters.pulse_file;
     pulse=fopen(data);
 
     pulse_data=textscan(pulse,'%f %f %f %f');
@@ -1250,7 +888,7 @@ function scalefactor=kehl_ori_field_pulsescale(expt,DeltaB,CONST1)
     y=Y.^3;
     y=y/max(y);
     Y=Y/max(Y);
-    if isKey(expt,"3pulses") && expt("3pulses")==true
+    if isfield(parameters,'multipulses')&&parameters.multipulses==true
        Y=y;
     end
 
@@ -1327,8 +965,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
     constants=parameters.constants;
     paramsEPR=parameters.paramsEPR;
     paramsENDOR=parameters.paramsENDOR;
-    expt=parameters.expt;
-    Ntheta=parameters.Nang;
+        Ntheta=parameters.Nang;
     Nphimax=parameters.Nang;
     g=parameters.g_matrix;
     A=parameters.hfc_matrix;
@@ -1388,10 +1025,10 @@ function EPR=kehl_ori_freq(spin_system,parameters)
 
     % loop over orientations for powder pattern
     if parameters.powder==true
-        if isKey(expt,'exciteWidth')
-            W1=expt('exciteWidth');
+        if isfield(parameters,'excite_width')
+            W1=parameters.excite_width;
         else
-            W1=expt("pulsewidth")*constants("CONST1")*1e10;
+            W1=parameters.pulse_width*constants("CONST1")*1e10;
         end
 
         for ii=1:Ntheta
@@ -1406,11 +1043,11 @@ function EPR=kehl_ori_freq(spin_system,parameters)
                 geff=(dc*g2*dc')^.5;
 
                 % effective B field for given theta and phi
-                Beff=(expt("Field")*parameters.g_iso)/geff(1);
-                B=expt("Field");
+                Beff=(parameters.field_t*parameters.g_iso)/geff(1);
+                B=parameters.field_t;
 
                 % Resonance frequency for geff at ObsField in GHz
-                veff=geff*expt("Field")*constants('MU_B')/constants('H');
+                veff=geff*parameters.field_t*constants('MU_B')/constants('H');
 
                 % Rotation matrix into lab system
                 R1=zeros(3);
@@ -1593,13 +1230,13 @@ function EPR=kehl_ori_freq(spin_system,parameters)
                 for p=1:length(freq_EPR)
 
                     %scale resonance to freq axis bin
-                    bin_freq=round((freq_EPR-expt("FreqMin"))/expt("FreqSteps"))+1;
+                    bin_freq=round((freq_EPR-parameters.epr_freq_min_hz)/parameters.epr_freq_step_hz)+1;
                     if trans_prob_EPR(p)>0
                         tmp_epr(bin_freq(p))=tmp_epr(bin_freq(p))+trans_prob_EPR(p);
-                        DeltaOm=freq_EPR(p)-expt("FreqMeas");
+                        DeltaOm=freq_EPR(p)-parameters.mw_freq_hz;
 
-                        if isKey(expt,"pulse")
-                            SF=kehl_ori_freq_pulsescale(expt,DeltaOm)/2;
+                        if isfield(parameters,'pulse_file')
+                            SF=kehl_ori_freq_pulsescale(parameters,DeltaOm)/2;
                         else
                             SF=((DeltaOm^2)-(W1^2))/((DeltaOm^2)+(W1^2));
                             SF=(1-SF)/2;
@@ -1647,7 +1284,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
         geff=parameters.g_iso;
 
         %effective B field for given theta and phi
-        B=(expt("Field")*parameters.g_iso)/geff(1);
+        B=(parameters.field_t*parameters.g_iso)/geff(1);
 
         HF_zz=zeros(1,n_endor);
         HF_zx=zeros(1,n_endor);
@@ -1732,12 +1369,12 @@ function EPR=kehl_ori_freq(spin_system,parameters)
     EPR("offsets")=offsets_sel;
 end
 
-function scalefactor=kehl_ori_freq_pulsescale(expt,DeltaOm)
+function scalefactor=kehl_ori_freq_pulsescale(parameters,DeltaOm)
     % calculates the scalefactor in dependence of the mw pulse's excitation
     % profile
     %
     % input parameters:
-    % expt: the Map containing the experimental parameters
+    % parameters: Kehl ENDOR context parameters
     % DeltaOm: offset of the actual freq from the resonance freq
     %
     % output parameters:
@@ -1745,7 +1382,7 @@ function scalefactor=kehl_ori_freq_pulsescale(expt,DeltaOm)
     %
     % February 2024 A. Kehl (akehl@gwdg.de)
     %
-    data=expt("pulse");
+    data=parameters.pulse_file;
     %%
     pulse=fopen(data);
 
@@ -1763,7 +1400,7 @@ function scalefactor=kehl_ori_freq_pulsescale(expt,DeltaOm)
     y=Y.^3;
     y=y/max(y);
     Y=Y/max(Y);
-    if isKey(expt,"3pulses") && expt("3pulses")==true
+    if isfield(parameters,'multipulses')&&parameters.multipulses==true
        Y=y;
     end
 %%
@@ -1793,7 +1430,7 @@ function data_conv=kehl_line_broaden(data,parameters)
     kehl_line_broaden_grumble(data,parameters);
 
     % Get ENDOR sweep width
-    sw=parameters.expt('range_EN');
+    sw=parameters.endor_range_hz;
     if parameters.Lorentzian==1
 
         % Lorentian

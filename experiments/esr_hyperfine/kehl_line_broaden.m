@@ -1,6 +1,20 @@
-%KEHL_LINE_BROADEN Line broadening for Kehl ENDOR spectra.
+% Line broadening for Kehl ENDOR spectra. Syntax:
 %
-%   Spinach architecture migration May 2026 Talos
+%      data_conv=kehl_line_broaden(data,parameters)
+%
+% Parameters:
+%
+%   data             - ENDOR amplitude array.
+%   parameters       - Kehl ENDOR context parameter structure.
+%
+% Outputs:
+%
+%   data_conv        - line-broadened ENDOR amplitude array.
+%
+% February 2024 A. Kehl (akehl@gwdg.de)
+% May 2026 Spinach integration
+%
+% <https://spindynamics.org/wiki/index.php?title=kehl_line_broaden.m>
 
 function data_conv=kehl_line_broaden(data,parameters)
 
@@ -11,13 +25,13 @@ function data_conv=kehl_line_broaden(data,parameters)
     sw=parameters.endor_range_hz;
     if parameters.Lorentzian==1
 
-        % Lorentian
+        % Lorentzian broadening
         Deltaend_L=parameters.lw_L*pi/(sw);
         endintens1=ifft(data(:));
-        for i=1:size(data,2)
+        for point_idx=1:size(data,2)
 
             % Lorentzian line shape
-            endintens(i)=endintens1(i)*exp(-Deltaend_L*i);
+            endintens(point_idx)=endintens1(point_idx)*exp(-Deltaend_L*point_idx);
         end
         endintens(1)=0.37*endintens(1);
         endamp_2d_L_conv(:)=real(fft(endintens));
@@ -27,10 +41,10 @@ function data_conv=kehl_line_broaden(data,parameters)
             lw=parameters.lw_G;
             Deltaend_G=(lw*pi/(sw*sqrt(2*log(2))))^2;
             endintens1=ifft(endamp_2d_L_conv(:)+1000);
-            for i=1:size(data,2)
+            for point_idx=1:size(data,2)
 
                 % Gaussian line shape
-                endintens(i)=endintens1(i)*exp(-Deltaend_G*i^2/2);
+                endintens(point_idx)=endintens1(point_idx)*exp(-Deltaend_G*point_idx^2/2);
             end
             endintens(1)=0.5*endintens(1);
             data_conv(:)=-abs(fft(endintens));
@@ -44,12 +58,10 @@ function data_conv=kehl_line_broaden(data,parameters)
         Deltaend_G=(lw*pi/(sw*sqrt(2*log(2))))^2;
         data=data+1000;
         endintens1=ifft(data(:));
-
-        %size(data,2)
-        for i=1:length(data)
+        for point_idx=1:length(data)
 
             % Gaussian line shape
-            endintens(i)=endintens1(i)*exp(-Deltaend_G*i^2/2);
+            endintens(point_idx)=endintens1(point_idx)*exp(-Deltaend_G*point_idx^2/2);
         end
         endintens(1)=0.5*endintens(1);
         data_conv(:)=-abs(fft(endintens(:)));
@@ -59,10 +71,11 @@ function data_conv=kehl_line_broaden(data,parameters)
     end
 end
 function grumble(data,parameters)
-if ~isnumeric(data)
-    error('data must be numeric.');
+    if ~isnumeric(data)
+        error('data must be numeric.');
+    end
+    if ~isstruct(parameters)
+        error('parameters must be a structure.');
+    end
 end
-if ~isstruct(parameters)
-    error('parameters must be a structure.');
-end
-end
+

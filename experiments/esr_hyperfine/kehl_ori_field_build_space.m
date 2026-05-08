@@ -1,57 +1,47 @@
-%KEHL_ORI_FIELD_BUILD_SPACE Magnetic-quantum-number basis table for EPR nuclei.
+% Magnetic-quantum-number basis table for EPR nuclei. Syntax:
 %
-%   Spinach architecture migration May 2026 Talos
+%      basis_table=kehl_ori_field_build_space(spin_q)
+%
+% Parameters:
+%
+%   spin_q           - spin quantum numbers.
+%
+% Outputs:
+%
+%   basis_table      - basis vectors in columns.
+%
+% February 2024 A. Kehl (akehl@gwdg.de)
+% May 2026 Spinach integration
+%
+% <https://spindynamics.org/wiki/index.php?title=kehl_ori_field_build_space.m>
 
-function M=kehl_ori_field_build_space(S)
+function basis_table=kehl_ori_field_build_space(spin_q)
 
-% Check consistency
-grumble(S);
+    % Check consistency
+    grumble(spin_q);
 
-    % builds up the space of basis vectors in columns,
-    % script by M. Bennati
-    %
-    % input parameters:
-    % S: spin quantum number
-    %
-    % output parameters:
-    % M: basis vectors in columns
-    %
-    % February 2024 A. Kehl (akehl@gwdg.de)
-    %
+    % Initialise the empty basis table
+    basis_table=[];
 
-    % Initialize the space to a null
-    M=[];
-
-    % Initialize the dimension to one
+    % Initialise the dimension counter
     dim=1;
 
-    % Loop over each spin
-    for j=1:length(S)
-
-      % Initialize the holder
-      temp=[];
-
-      % Loop over the z components
-      for k=-S(j):S(j)
-
-        %   adding block of the old space
-        temp=[temp; M k*ones(dim,1)];
-
-      %   plus a column of the z component
-      end
-
-      % Update M
-      M=temp;
-
-      % The dimensionality is the number
-      dim=size(M,1);
-                                            %   of rows in M
+    % Append one magnetic quantum number column at a time
+    for n=1:length(spin_q)
+        basis_block=[];
+        for k=-spin_q(n):spin_q(n)
+            basis_block=[basis_block; basis_table k*ones(dim,1)];
+        end
+        basis_table=basis_block;
+        dim=size(basis_table,1);
     end
+
 end
 
 % Consistency enforcement
-function grumble(S)
-if ~isnumeric(S)
-    error('S must be numeric.');
+function grumble(spin_q)
+    if ~isnumeric(spin_q)
+        error('spin_q must be numeric.');
+    end
 end
-end
+

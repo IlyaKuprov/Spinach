@@ -1,11 +1,25 @@
-%KEHL_CONTEXT_SPIN_DATA Spinach spin-system metadata for Kehl ENDOR context.
+% Spin-system metadata for the Kehl ENDOR context. Syntax:
 %
-%   Spinach architecture migration May 2026 Talos
+%      parameters=kehl_context_spin_data(spin_system,parameters)
+%
+% Parameters:
+%
+%   spin_system      - Spinach spin system structure.
+%   parameters       - Kehl ENDOR context parameter structure.
+%
+% Outputs:
+%
+%   parameters       - parameter structure with Kehl spin metadata.
+%
+% February 2024 A. Kehl (akehl@gwdg.de)
+% May 2026 Spinach integration
+%
+% <https://spindynamics.org/wiki/index.php?title=kehl_context_spin_data.m>
 
 function parameters=kehl_context_spin_data(spin_system,parameters)
 
-% Check consistency
-grumble(spin_system,parameters);
+    % Check consistency
+    grumble(spin_system,parameters);
 
     isotopes=spin_system.comp.isotopes;
     electron_idx=find(cellfun(@kehl_is_electron,isotopes),1);
@@ -108,11 +122,12 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,parameters)
-if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||...
-   (~isfield(spin_system,'comp'))
-    error('spin_system must be a Spinach spin system structure.');
+    if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||...
+            (~isfield(spin_system,'comp'))
+        error('spin_system must be a Spinach spin system structure.');
+    end
+    if ~isstruct(parameters)
+        error('parameters must be a structure.');
+    end
 end
-if ~isstruct(parameters)
-    error('parameters must be a structure.');
-end
-end
+

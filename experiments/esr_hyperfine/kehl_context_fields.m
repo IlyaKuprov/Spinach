@@ -1,12 +1,24 @@
-%KEHL_CONTEXT_FIELDS Generic field and sweep parameters for Kehl ENDOR context.
+% Generic field and sweep parameters for the Kehl ENDOR context. Syntax:
 %
-%   Spinach architecture migration May 2026 Talos
+%      parameters=kehl_context_fields(parameters)
+%
+% Parameters:
+%
+%   parameters       - Kehl ENDOR context parameter structure.
+%
+% Outputs:
+%
+%   parameters       - parameter structure with derived field and frequency data.
+%
+% February 2024 A. Kehl (akehl@gwdg.de)
+% May 2026 Spinach integration
+%
+% <https://spindynamics.org/wiki/index.php?title=kehl_context_fields.m>
 
 function parameters=kehl_context_fields(parameters)
 
-% Check consistency
-grumble(parameters);
-
+    % Check consistency
+    grumble(parameters);
 
     % Append generic field and frequency data
     parameters.mw_freq_hz=parameters.mw_freq_ghz*1e9;
@@ -42,7 +54,8 @@ end
 
 % Consistency enforcement
 function grumble(parameters)
-if ~isstruct(parameters)
-    error('parameters must be a structure.');
+    if ~isstruct(parameters)
+        error('parameters must be a structure.');
+    end
 end
-end
+

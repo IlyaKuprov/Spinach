@@ -1,91 +1,81 @@
-%ENDOR_KEHL_TIME time-domain Mims ENDOR pulse sequence for the Kehl ENDOR context.
+% Time-domain Mims ENDOR pulse sequence for the Kehl ENDOR context. Syntax:
 %
-%   ENDOR_AMP=ENDOR_KEHL_TIME(SPIN_SYSTEM,PARAMETERS,H,R,K) is called by
-%   endor_kehl_context.m. H, R, and K are present for Spinach experiment
-%   signature compatibility; this sequence uses orientation-selected
-%   effective Hamiltonian data prepared by the context.
-
+%      endor_amp=endor_kehl_time(spin_system,parameters,H,R,K)
+%
+% Parameters:
+%
+%   spin_system      - Spinach spin system structure.
+%   parameters       - Kehl ENDOR context parameter structure.
+%   H,R,K            - Spinach experiment signature matrices.
+%
+% Outputs:
+%
+%   endor_amp        - simulated time-domain ENDOR amplitude array.
+%
+% February 2024 A. Kehl (akehl@gwdg.de)
+% May 2026 Spinach integration
+%
+% <https://spindynamics.org/wiki/index.php?title=endor_kehl_time.m>
 
 function endor_amp=endor_kehl_time(spin_system,parameters,H,R,K)
 
-
-% Append sequence-specific parameters when requested by the context
-if nargin>=3 && ischar(H) && strcmp(H,'parameters')
-    endor_amp=kehl_time_parameters(spin_system,parameters);
-    return
+    % Append sequence-specific parameters when requested by the context
+    if nargin>=3&&ischar(H)&&strcmp(H,'parameters')
+        endor_amp=kehl_time_parameters(spin_system,parameters);
+        return
+    end
+    % Check consistency
+    grumble(spin_system,parameters,H,R,K);
+    if parameters.Relax==true
+        endor_amp=kehl_time_rlx(spin_system,parameters);
+    else
+        endor_amp=kehl_time_calc(spin_system,parameters);
+    end
 end
-% Check consistency
-grumble(spin_system,parameters,H,R,K);
-if parameters.Relax==true
-    endor_amp=kehl_time_rlx(spin_system,parameters);
-else
-    endor_amp=kehl_time_calc(spin_system,parameters);
-end
-end
-
-% Consistency enforcement
-function grumble(spin_system,parameters,H,R,K)
-if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
-    error('spin_system must be a Spinach spin system structure.');
-end
-if ~isstruct(parameters)
-    error('parameters must be a structure.');
-end
-if (~isempty(H))&&(~isnumeric(H))
-    error('H must be empty or numeric.');
-end
-if (~isempty(R))&&(~isnumeric(R))
-    error('R must be empty or numeric.');
-end
-if (~isempty(K))&&(~isnumeric(K))
-    error('K must be empty or numeric.');
-end
-end
-
 
 function parameters=kehl_time_parameters(spin_system,parameters)
 
-% Get pulse sequence timing and RF-field policy
-constants=parameters.constants;
-t=parameters.pulse_times_s;
-[rf_nutations,rf_auto]=kehl_rf_policy(parameters);
+    % Get pulse sequence timing and RF-field policy
+    constants=parameters.constants;
+    t=parameters.pulse_times_s;
+    [rf_nutations,rf_auto]=kehl_rf_policy(parameters);
 
-% Set time-domain RF nutation fields
-if rf_auto==false
-    if size(rf_nutations,1)==2
-        parameters.electron_nutation=rf_nutations(1)*2*pi*1e6;
-        parameters.nuclear_nutation=rf_nutations(2)*2*pi*1e3;
+    % Set time-domain RF nutation fields
+    if rf_auto==false
+        if size(rf_nutations,1)==2
+            parameters.electron_nutation=rf_nutations(1)*2*pi*1e6;
+            parameters.nuclear_nutation=rf_nutations(2)*2*pi*1e3;
+            parameters.pulse_width=parameters.electron_nutation/...
+                (2*pi*constants('CONST1')*1e10);
+        else
+            error('parameters.rf_nutation_freqs has incompatible dimensions.');
+        end
+    else
+        parameters.electron_nutation=2*pi/(4*t(1));
+        if isfield(parameters,'rf_flip_angle_deg')
+            parameters.nuclear_nutation=(parameters.rf_flip_angle_deg/180)*...
+                2*pi/(4*t(5));
+        else
+            parameters.nuclear_nutation=2*pi/(4*t(5));
+        end
         parameters.pulse_width=parameters.electron_nutation/...
-                         (2*pi*constants('CONST1')*1e10);
-    else
-        error('parameters.rf_nutation_freqs has incompatible dimensions.');
+            (2*pi*constants('CONST1')*1e10);
     end
-else
-    parameters.electron_nutation=2*pi/(4*t(1));
-    if isfield(parameters,'rf_flip_angle_deg')
-        parameters.nuclear_nutation=(parameters.rf_flip_angle_deg/180)*...
-                                    2*pi/(4*t(5));
-    else
-        parameters.nuclear_nutation=2*pi/(4*t(5));
-    end
-    parameters.pulse_width=parameters.electron_nutation/...
-                     (2*pi*constants('CONST1')*1e10);
-end
 
-% Append time-domain ENDOR sweep-axis data
-parameters.time_start_s=t(6);
-parameters=kehl_endor_axis(spin_system,parameters,'time');
+    % Append time-domain ENDOR sweep-axis data
+    parameters.time_start_s=t(6);
+    parameters=kehl_endor_axis(spin_system,parameters,'time');
 
 end
 
 function endor_amp=kehl_time_rlx(spin_system,parameters)
 
     % Check consistency
-    kehl_time_rlx_grumble(spin_system,parameters);
+    grumble(spin_system,parameters,[],[],[]);
 
     % Unpack context data
     constants=parameters.constants;
-        paramsENDOR=parameters.paramsENDOR;
+    paramsENDOR=parameters.paramsENDOR;
     EPR=parameters.epr;
     operator_spin_system=parameters.operator_spin_system;
     n_endor=parameters.n_endor;
@@ -96,31 +86,21 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
     ops=kehl_operator_basis(operator_spin_system,n_endor,n_spin_systems);
     Sx=ops.Sx;
     Sy=ops.Sy;
-    Sz=ops.Sz;
     Ix=ops.Ix;
     Iy=ops.Iy;
     Iz=ops.Iz;
     Sx_D=ops.Sx_D;
-    Sy_D=ops.Sy_D;
-    Sz_D=ops.Sz_D;
     Ix_D=ops.Ix_D;
-    Iy_D=ops.Iy_D;
-    Iz_D=ops.Iz_D;
-
-
 
     t=parameters.pulse_times_s;
     Nint=8;
 
     if n_spin_systems>1
-       nucs=n_endor;
-        for i=1:n_endor-1
-            Ix{i+1}=Ix{1};
-            Iy{i+1}=Iy{1};
-            Iz{i+1}=Iz{1};
+        for spin_idx=1:n_endor-1
+            Ix{spin_idx+1}=Ix{1};
+            Iy{spin_idx+1}=Iy{1};
+            Iz{spin_idx+1}=Iz{1};
         end
-    else
-       nucs=1;
     end
 
     geff_sel=EPR("geff_sel");
@@ -137,26 +117,23 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
 
     S_sel=EPR("S_sel");
 
-
     offsets_sel=EPR("offsets");
     Npts_EN=paramsENDOR("Npts_EN");
 
     v_L=paramsENDOR("v_L");
 
-
     endor_amp=zeros(1,Npts_EN);
-    if length(B_sel)==0
+    if isempty(B_sel)
         % No resonance orientations were found
         return
     end
     warning('This is a beta version and has not been fully tested.');
 
-
-    % loop to repeat the calculation for every orientation
+    % Loop over selected orientations
     parfor j=1:length(B_sel)
         endor_amp_tmp=zeros(1,Npts_EN);
 
-        % set parameters for this orientation
+        % Select orientation-specific parameters
         geff=geff_sel(j);
         B=B_sel(j);
         euler_angles=euler_sel(j,:);
@@ -170,22 +147,19 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
         NQI=zeros(n_endor,3,3);
 
         NQI(:,:,:)=2*pi*NQI_sel(j,:,:,:);
-        CS_zz=CS_zz_sel(j,:)*1e-12;
-        D_zz=D_zz_sel(j,:);
 
         S=S_sel(j);
         offsets=offsets_sel(j,:);
 
+        % Loop over spin-manifold offsets
+        for offset_idx=1:size(offsets,2)
 
-        % loop over all offsets (spin manifolds)
-        for i=1 : size(offsets,2)
-
-            v_off_S=offsets(i);
+            v_off_S=offsets(offset_idx);
             off_1=offsets(1);
 
             rho0=kehl_rho0(constants,paramsENDOR,B,geff,operator_spin_system,parameters,HF_zz,HF_zy,HF_zx,NQI_zz);
 
-            %electron T1
+            % Electron T1 relaxation
             RT1e=kehl_relax_t1(rho0,Sx_D,parameters.T1e);
             RT1n=zeros(size(RT1e));
             RT2e=kehl_relax_t2(Sx_D,parameters.T2e);
@@ -194,10 +168,10 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
             if n_spin_systems==1
                 for mn=1:n_endor
 
-                   %nuclear T1
-                   RT1n=RT1e+kehl_relax_t1(rho0,Ix_D{mn},parameters.T1n);
-                   RT2e=RT2e+kehl_relax_t2(Sx_D*Ix_D{mn},parameters.T2dq);
-                   RT2n=RT2n+kehl_relax_t2(Ix_D{mn},parameters.T2n);
+                    % Nuclear T1 relaxation
+                    RT1n=RT1e+kehl_relax_t1(rho0,Ix_D{mn},parameters.T1n);
+                    RT2e=RT2e+kehl_relax_t2(Sx_D*Ix_D{mn},parameters.T2dq);
+                    RT2n=RT2n+kehl_relax_t2(Ix_D{mn},parameters.T2n);
                 end
             else
                 RT1n=RT1e+kehl_relax_t1(rho0,Ix_D{1},parameters.T1n);
@@ -206,18 +180,16 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
             end
             R=RT1e+RT1n+RT2e+RT2n;
 
-
-            start_EN=paramsENDOR("start_EN");
             step_EN=paramsENDOR("step_EN");
 
             oneE=parameters.electron_nutation;
             oneN=parameters.nuclear_nutation;
 
             if n_spin_systems>1
-                nuc=round(i/(2*I(1)+1));
+                nuc=round(offset_idx/(2*I(1)+1));
                 spin_map=nuc;
                 term_map=struct('zeeman',1,'hyperfine',nuc,...
-                                'nqi',1,'cs',nuc,'cs_larmor',1);
+                    'nqi',1,'cs',nuc,'cs_larmor',1);
                 use_dipolar=false;
             else
                 spin_map=1:n_endor;
@@ -225,116 +197,112 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
                 use_dipolar=true;
             end
             Hfree_p=kehl_free_ham(parameters,paramsENDOR,operator_spin_system,...
-                                    v_off_S,spin_map,use_dipolar,...
-                                    term_map,euler_angles);
+                v_off_S,spin_map,use_dipolar,...
+                term_map,euler_angles);
             % Integration step for the Signal to account for oscillation
             if v_off_S==0
                 t11=1/(off_1*Nint);
             else
-                t11=1/(v_off_S*Nint);
             end
 
             % Radiofrequency
             v_RF=v_L(1);
 
-                Hcorr=zeros(size(Hfree_p));
-                HRF=Hfree_p;
+            Hcorr=zeros(size(Hfree_p));
+            HRF=Hfree_p;
 
-                if parameters.Bterm==false
-                    Hcorr=2*pi*v_RF*ops.Iz_rf;
-                    HRF=Hfree_p+Hcorr+oneN*ops.Iy_rf;
-                end
+            if parameters.Bterm==false
+                Hcorr=2*pi*v_RF*ops.Iz_rf;
+                HRF=Hfree_p+Hcorr+oneN*ops.Iy_rf;
+            end
 
-                Hfree=Hfree_p+Hcorr;
+            Hfree=Hfree_p+Hcorr;
 
-                Hnonsel=full(hilb2liouv(sparse(Hfree+oneE*Sx),'comm'));
+            Hnonsel=full(hilb2liouv(sparse(Hfree+oneE*Sx),'comm'));
 
-                Hfree=full(hilb2liouv(sparse(Hfree),'comm'));
+            Hfree=full(hilb2liouv(sparse(Hfree),'comm'));
 
+            if parameters.Bterm==false
 
-
-                if parameters.Bterm==false
-
-                    U5=full(propagator(operator_spin_system,1i*sparse(R-1i*full(hilb2liouv(sparse(HRF),'comm'))),t(5)));
-                    if t(5)==t(7)
-                        U7=U5;
-                    else
-                        U7=full(propagator(operator_spin_system,1i*sparse(R-1i*full(hilb2liouv(sparse(HRF),'comm'))),t(7)));
-                    end
-
-                    U1=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(1)));
-
-                    if t(1)==t(3)
-                        U3=U1;
-                    else
-                        U3=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(3)));
-                    end
-
-                    if t(1)==t(9)
-                        U9=U1;
-                    elseif t(3)==t(9)
-                        U9=U3;
-                    else
-                        U9=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(9)));
-                    end
-
-                    U2=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(2)));
-                    U4=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(4)));
-
-                    if t(8)==t(4)
-                        U8=U4;
-                    else
-                        U8=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(8)));
-                    end
-                    U10=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(2)+t(3)/2));
+                U5=full(propagator(operator_spin_system,1i*sparse(R-1i*full(hilb2liouv(sparse(HRF),'comm'))),t(5)));
+                if t(5)==t(7)
+                    U7=U5;
                 else
-                    U5=kehl_rf_bterm_rlx(parameters,v_RF,Hfree_p,Iy,t(5),n_endor,n_spin_systems,R,operator_spin_system);
-                    if t(5)==t(7)
-                        U7=U5;
-                    else
-                        U7=kehl_rf_bterm_rlx(parameters,v_RF,Hfree_p,Iy,t(7),n_endor,n_spin_systems,R,operator_spin_system);
-                    end
-
-                    U1=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(1)));
-
-                    if t(1)==t(3)
-                        U3=U1;
-                    else
-                        U3=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(3)));
-
-                    end
-
-                    if t(1)==t(9)
-                        U9=U1;
-                    elseif t(3)==t(9)
-                        U9=U3;
-                    else
-                        U9=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(9)));
-                    end
-
-                    U2=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(2)));
-                    U4=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(4)));
-                    if t(8)==t(4)
-                        U8=U4;
-                    else
-                        U8=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(8)));
-                    end
-
-                    U10=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(2)+t(3)/2));
+                    U7=full(propagator(operator_spin_system,1i*sparse(R-1i*full(hilb2liouv(sparse(HRF),'comm'))),t(7)));
                 end
 
-                % Evolve the densitymatrix
-                rho=hilb2liouv(rho0,'statevec');
+                U1=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(1)));
 
-                rho=U1*rho;
-                rho=U2*rho;
-                rho=U3*rho;
-                rho=U4*rho;
-                rho=U5*rho;
-                rho_t=rho;
+                if t(1)==t(3)
+                    U3=U1;
+                else
+                    U3=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(3)));
+                end
 
+                if t(1)==t(9)
+                    U9=U1;
+                elseif t(3)==t(9)
+                    U9=U3;
+                else
+                    U9=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(9)));
+                end
 
-            % loop over different separation of the RF pulses (x-axis)
+                U2=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(2)));
+                U4=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(4)));
+
+                if t(8)==t(4)
+                    U8=U4;
+                else
+                    U8=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(8)));
+                end
+                U10=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(2)+t(3)/2));
+            else
+                U5=kehl_rf_bterm_rlx(parameters,v_RF,Hfree_p,Iy,t(5),n_endor,n_spin_systems,R,operator_spin_system);
+                if t(5)==t(7)
+                    U7=U5;
+                else
+                    U7=kehl_rf_bterm_rlx(parameters,v_RF,Hfree_p,Iy,t(7),n_endor,n_spin_systems,R,operator_spin_system);
+                end
+
+                U1=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(1)));
+
+                if t(1)==t(3)
+                    U3=U1;
+                else
+                    U3=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(3)));
+
+                end
+
+                if t(1)==t(9)
+                    U9=U1;
+                elseif t(3)==t(9)
+                    U9=U3;
+                else
+                    U9=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(9)));
+                end
+
+                U2=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(2)));
+                U4=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(4)));
+                if t(8)==t(4)
+                    U8=U4;
+                else
+                    U8=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(8)));
+                end
+
+                U10=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(2)+t(3)/2));
+            end
+
+            % Evolve the densitymatrix
+            rho=hilb2liouv(rho0,'statevec');
+
+            rho=U1*rho;
+            rho=U2*rho;
+            rho=U3*rho;
+            rho=U4*rho;
+            rho=U5*rho;
+            rho_t=rho;
+
+            % Loop over RF-pulse separations
             for a=1:Npts_EN
                 t6=t(6)+step_EN*(a-1);
                 U6=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t6));
@@ -347,11 +315,10 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
                 rho=U9*rho;
                 rho=U10*rho;
 
-
                 value_Sy=0;
                 for b=1
-                   rho_f=reshape(rho,sqrt(size(rho,1)),sqrt(size(rho,1)));
-                   value_Sy=value_Sy+(real(trace(rho_f*Sy)));
+                    rho_f=reshape(rho,sqrt(size(rho,1)),sqrt(size(rho,1)));
+                    value_Sy=value_Sy+(real(trace(rho_f*Sy)));
                 end
 
                 if abs(HF_zz(1))>1/parameters.T2e*0.1
@@ -365,23 +332,14 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
 
 end
 
-function kehl_time_rlx_grumble(spin_system,parameters)
-if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
-    error('spin_system must be a Spinach spin system structure.');
-end
-if ~isstruct(parameters)
-    error('parameters must be a structure.');
-end
-end
-
 function endor_amp=kehl_time_calc(spin_system,parameters)
 
     % Check consistency
-    kehl_time_calc_grumble(spin_system,parameters);
+    grumble(spin_system,parameters,[],[],[]);
 
     % Unpack context data
     constants=parameters.constants;
-        paramsENDOR=parameters.paramsENDOR;
+    paramsENDOR=parameters.paramsENDOR;
     EPR=parameters.epr;
     operator_spin_system=parameters.operator_spin_system;
     n_endor=parameters.n_endor;
@@ -392,7 +350,6 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
     ops=kehl_operator_basis(operator_spin_system,n_endor,n_spin_systems);
     Sx=ops.Sx;
     Sy=ops.Sy;
-    Sz=ops.Sz;
     Ix=ops.Ix;
     Iy=ops.Iy;
     Iz=ops.Iz;
@@ -400,16 +357,12 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
     Nint=8;
 
     if n_spin_systems>1
-       nucs=n_endor;
-        for i=1:n_endor-1
-            Ix{i+1}=Ix{1};
-            Iy{i+1}=Iy{1};
-            Iz{i+1}=Iz{1};
+        for spin_idx=1:n_endor-1
+            Ix{spin_idx+1}=Ix{1};
+            Iy{spin_idx+1}=Iy{1};
+            Iz{spin_idx+1}=Iz{1};
         end
-    else
-       nucs=1;
     end
-
 
     geff_sel=EPR("geff_sel");
     B_sel=EPR("B_sel");
@@ -424,34 +377,27 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
     D_zz_sel=EPR("D_zz_sel");
 
     if parameters.cs_active
-       [v_cs,d_cs]=eig(parameters.cs_matrix);
-       cs_iso=trace(d_cs)/3*1e-12;
-    else
-        cs_iso=0;
+        [v_cs,d_cs]=eig(parameters.cs_matrix);
+        cs_iso=trace(d_cs)/3*1e-12;
     end
 
-
     S_sel=EPR("S_sel");
-
 
     offsets_sel=EPR("offsets");
     Npts_EN=paramsENDOR("Npts_EN");
 
     v_L=paramsENDOR("v_L");
 
-
     endor_amp=zeros(1,Npts_EN);
 
-    if length(B_sel)==0
+    if isempty(B_sel)
         % No resonance orientations were found
         return
     end
 
-
-    % loop to repeat the calculation for every orientation
+    % Loop over selected orientations
     parfor j=1:length(B_sel)
-        % for j=1
-        % set parameters for this orientation
+        % Select orientation-specific parameters
         endor_amp_tmp=zeros(1,Npts_EN);
 
         geff=geff_sel(j);
@@ -467,33 +413,27 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
 
         NQI(:,:,:)=2*pi*NQI_sel(j,:,:,:);
 
-        CS_zz=CS_zz_sel(j,:)*1e-12;
-        D_zz=D_zz_sel(j,:);
-
-
         S=S_sel(j);
         offsets=offsets_sel(j,:);
 
+        % Loop over spin-manifold offsets
+        for offset_idx=1:size(offsets,2)
 
-        % loop over all offsets (spin manifolds)
-        for i=1 : size(offsets,2)
-
-            v_off_S=offsets(i);
+            v_off_S=offsets(offset_idx);
             off_1=offsets(1);
 
             [rho0]=kehl_rho0(constants,paramsENDOR,B,geff,operator_spin_system,parameters,HF_zz,HF_zy,HF_zx,NQI_zz);
 
-            start_EN=paramsENDOR("start_EN");
             step_EN=paramsENDOR("step_EN");
 
             oneE=parameters.electron_nutation;
             oneN=parameters.nuclear_nutation;
 
             if n_spin_systems>1
-                nuc=round(i/(2*I(1)+1));
+                nuc=round(offset_idx/(2*I(1)+1));
                 spin_map=nuc;
                 term_map=struct('zeeman',1,'hyperfine',nuc,...
-                                'nqi',1,'cs',nuc,'cs_larmor',1);
+                    'nqi',1,'cs',nuc,'cs_larmor',1);
                 use_dipolar=false;
             else
                 spin_map=1:n_endor;
@@ -501,8 +441,8 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
                 use_dipolar=true;
             end
             Hfree_p=kehl_free_ham(parameters,paramsENDOR,operator_spin_system,...
-                                    v_off_S,spin_map,use_dipolar,...
-                                    term_map,euler_angles);
+                v_off_S,spin_map,use_dipolar,...
+                term_map,euler_angles);
             v_RF=v_L(1);
             Hcorr=zeros(size(Hfree_p));
             HRF=Hfree_p;
@@ -514,9 +454,8 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
                 Hfree=Hfree_p;
             end
 
-            % mw pulses
+            % Apply microwave pulses
             Hnonsel=Hfree+oneE*Sx;
-
 
             % Integration step for the Signal to account for oscillation
             if v_off_S==0
@@ -524,7 +463,6 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
             else
                 t11=1/abs(v_off_S*Nint);
             end
-
 
             if parameters.Bterm==false
                 U5=full(propagator(operator_spin_system,sparse(HRF),t(5)));
@@ -568,7 +506,6 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
 
             U11=full(propagator(operator_spin_system,sparse(Hfree),t11));
 
-
             % Evolve the densitymatrix
             rho=rho0;
             rho=U1*rho*U1';
@@ -583,11 +520,10 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
 
             rho_t=rho;
 
-             % loop over different separation of the RF pulses (x-axis)
+            % Loop over RF-pulse separations
             for a=1:Npts_EN
                 t6=t(6)+step_EN*(a-1);
                 t8=t(8)-step_EN*(a-1);
-
 
                 if parameters.Bterm==false
                     U6=full(propagator(operator_spin_system,sparse(Hfree_p+Hcorr),t6));
@@ -596,7 +532,6 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
                     U6=full(propagator(operator_spin_system,sparse(Hfree),t6));
                 end
                 U8=full(propagator(operator_spin_system,sparse(Hfree),t8));
-
 
                 rho=rho_t;
                 rho=U6*rho*U6';
@@ -612,8 +547,8 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
 
                 value_Sy=0;
                 for b=1:Nint
-                   rho=U11*rho*U11';
-                   value_Sy=value_Sy+(real(trace(rho*Sy)));
+                    rho=U11*rho*U11';
+                    value_Sy=value_Sy+(real(trace(rho*Sy)));
                 end
 
                 endor_amp_tmp(a)=endor_amp_tmp(a)+(value_Sy*S/(Nint*size(offsets,2)));
@@ -624,11 +559,22 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
 
 end
 
-function kehl_time_calc_grumble(spin_system,parameters)
-if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
-    error('spin_system must be a Spinach spin system structure.');
+% Consistency enforcement
+function grumble(spin_system,parameters,H,R,K)
+    if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+        error('spin_system must be a Spinach spin system structure.');
+    end
+    if ~isstruct(parameters)
+        error('parameters must be a structure.');
+    end
+    if (~isempty(H))&&(~isnumeric(H))
+        error('H must be empty or numeric.');
+    end
+    if (~isempty(R))&&(~isnumeric(R))
+        error('R must be empty or numeric.');
+    end
+    if (~isempty(K))&&(~isnumeric(K))
+        error('K must be empty or numeric.');
+    end
 end
-if ~isstruct(parameters)
-    error('parameters must be a structure.');
-end
-end
+

@@ -1,11 +1,24 @@
-%KEHL_CONTEXT_CONSTANTS Spinach-derived constants for Kehl ENDOR context.
+% Spinach-derived constants for the Kehl ENDOR context. Syntax:
 %
-%   Spinach architecture migration May 2026 Talos
+%      constants=kehl_context_constants(spin_system)
+%
+% Parameters:
+%
+%   spin_system      - Spinach spin system structure.
+%
+% Outputs:
+%
+%   constants        - map of physical constants in Kehl units.
+%
+% February 2024 A. Kehl (akehl@gwdg.de)
+% May 2026 Spinach integration
+%
+% <https://spindynamics.org/wiki/index.php?title=kehl_context_constants.m>
 
 function constants=kehl_context_constants(spin_system)
 
-% Check consistency
-grumble(spin_system);
+    % Check consistency
+    grumble(spin_system);
 
     constants=containers.Map;
     constants('H')=2*pi*spin_system.tols.hbar;
@@ -17,8 +30,9 @@ end
 
 % Consistency enforcement
 function grumble(spin_system)
-if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||...
-   (~isfield(spin_system,'comp'))
-    error('spin_system must be a Spinach spin system structure.');
+    if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||...
+            (~isfield(spin_system,'comp'))
+        error('spin_system must be a Spinach spin system structure.');
+    end
 end
-end
+

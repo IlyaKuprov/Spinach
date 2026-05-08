@@ -1,6 +1,20 @@
-%KEHL_PREP_EPR EPR field-axis parameters for Kehl ENDOR context.
+% EPR field-axis parameters for the Kehl ENDOR context. Syntax:
 %
-%   Spinach architecture migration May 2026 Talos
+%      paramsEPR=kehl_prep_epr(spin_system,parameters)
+%
+% Parameters:
+%
+%   spin_system      - Spinach spin system structure.
+%   parameters       - Kehl ENDOR context parameter structure.
+%
+% Outputs:
+%
+%   paramsEPR        - map containing EPR field-axis data.
+%
+% February 2024 A. Kehl (akehl@gwdg.de)
+% May 2026 Spinach integration
+%
+% <https://spindynamics.org/wiki/index.php?title=kehl_prep_epr.m>
 
 function paramsEPR=kehl_prep_epr(spin_system,parameters)
 
@@ -9,13 +23,11 @@ function paramsEPR=kehl_prep_epr(spin_system,parameters)
 
     % Unpack context data
     constants=parameters.constants;
-        g_iso=parameters.g_iso;
+    g_iso=parameters.g_iso;
     obsField=parameters.field_t;
 
     gBepr=obsField*g_iso;
     geff=g_iso;
-    B=gBepr/geff;
-    veff=geff*obsField*constants('MU_B')/constants('H');
 
     % EPR simulation range
     fieldCenter=gBepr/g_iso;
@@ -34,10 +46,11 @@ function paramsEPR=kehl_prep_epr(spin_system,parameters)
 
 end
 function grumble(spin_system,parameters)
-if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
-    error('spin_system must be a Spinach spin system structure.');
+    if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
+        error('spin_system must be a Spinach spin system structure.');
+    end
+    if ~isstruct(parameters)
+        error('parameters must be a structure.');
+    end
 end
-if ~isstruct(parameters)
-    error('parameters must be a structure.');
-end
-end
+

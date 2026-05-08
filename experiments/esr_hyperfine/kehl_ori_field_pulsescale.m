@@ -1,52 +1,55 @@
-%KEHL_ORI_FIELD_PULSESCALE Microwave pulse excitation factor for field-domain selection.
+% Microwave pulse excitation factor for field-domain selection. Syntax:
 %
-%   Spinach architecture migration May 2026 Talos
+%      scalefactor=kehl_ori_field_pulsescale(parameters,DeltaB,CONST1)
+%
+% Parameters:
+%
+%   parameters       - Kehl ENDOR context parameter structure.
+%   DeltaB           - field offset.
+%   CONST1           - field-to-frequency conversion constant.
+%
+% Outputs:
+%
+%   scalefactor      - orientation excitation factor.
+%
+% February 2024 A. Kehl (akehl@gwdg.de)
+% May 2026 Spinach integration
+%
+% <https://spindynamics.org/wiki/index.php?title=kehl_ori_field_pulsescale.m>
 
 function scalefactor=kehl_ori_field_pulsescale(parameters,DeltaB,CONST1)
 
-% Check consistency
-grumble(parameters,DeltaB,CONST1);
+    % Check consistency
+    grumble(parameters,DeltaB,CONST1);
 
-    % calculates the scalefactor in dependence of the mw pulse's excitation
-    % profile
-    %
-    % input parameters:
-    % parameters: Kehl ENDOR context parameters
-    % DeltaB: offset of the actual field from the effective resonance field
-    % CONST1: constant to convert between field and frequency
-    %
-    % output parameters:
-    % scalefactor: scalefactor for the specific orientation
-    %
-    % February 2024 A. Kehl (akehl@gwdg.de)
-    %
-
-    data=parameters.pulse_file;
-    pulse=fopen(data);
-
+    % Load microwave pulse shape
+    pulse=fopen(parameters.pulse_file);
+    if pulse<0
+        error('parameters.pulse_file could not be opened.');
+    end
     pulse_data=textscan(pulse,'%f %f %f %f');
-    fclose('all');
+    fclose(pulse);
+
+    % Compute normalised excitation profile
     pulse_x=pulse_data{2};
     dx=1000/(pulse_x(2)-pulse_x(1));
-
     n=1000;
-
-
     pulse_y=pulse_data{3}+1i*pulse_data{4};
-
     Y=abs(fftshift(fft(pulse_y,(n+1))));
     y=Y.^3;
     y=y/max(y);
     Y=Y/max(Y);
+
+    % Select multipulse excitation profile if requested
     if isfield(parameters,'multipulses')&&parameters.multipulses==true
-       Y=y;
+        Y=y;
     end
 
-    %Delta omega/2pi in MHz
+    % Convert field offset to profile-bin units
     DeltaOM=DeltaB*CONST1*10^4*2*pi;
 
     binDOM=round(DeltaOM)+(dx/2+1);
-    if binDOM>0 && binDOM<(n+1)
+    if binDOM>0&&binDOM<(n+1)
         scalefactor=Y(binDOM);
     else
         scalefactor=0;
@@ -56,13 +59,17 @@ end
 
 % Consistency enforcement
 function grumble(parameters,DeltaB,CONST1)
-if ~isstruct(parameters)
-    error('parameters must be a structure.');
+    if ~isstruct(parameters)
+        error('parameters must be a structure.');
+    end
+    if (~isfield(parameters,'pulse_file'))||(~ischar(parameters.pulse_file)&&~isstring(parameters.pulse_file))
+        error('parameters.pulse_file must be a character string.');
+    end
+    if ~isnumeric(DeltaB)
+        error('DeltaB must be numeric.');
+    end
+    if ~isnumeric(CONST1)
+        error('CONST1 must be numeric.');
+    end
 end
-if ~isnumeric(DeltaB)
-    error('DeltaB must be numeric.');
-end
-if ~isnumeric(CONST1)
-    error('CONST1 must be numeric.');
-end
-end
+

@@ -1,45 +1,45 @@
-%KEHL_RF_POLICY Radiofrequency-field policy for Kehl ENDOR sequences.
+% Radiofrequency-field policy for Kehl ENDOR sequences. Syntax:
 %
-%   [RF_NUTATIONS,RF_AUTO]=KEHL_RF_POLICY(PARAMETERS) returns explicit
-%   nutation frequencies from PARAMETERS.RF_NUTATION_FREQS when supplied,
-%   and reports whether the sequence should derive missing nutation fields
-%   from pulse durations.
+%      [rf_nutations,rf_auto]=kehl_rf_policy(parameters)
 %
-%   Inputs:
+% Parameters:
 %
-%      PARAMETERS - Kehl ENDOR context parameters.
+%   parameters       - Kehl ENDOR context parameter structure.
 %
-%   Outputs:
+% Outputs:
 %
-%      RF_NUTATIONS - user-specified nutation-frequency array.
-%      RF_AUTO      - true if nutation fields should be inferred.
+%   rf_nutations     - user-specified nutation-frequency array.
+%   rf_auto          - true when nutation fields should be inferred.
 %
-%   February 2024 A. Kehl (akehl@gwdg.de)
-%   Spinach architecture migration May 2026 Talos
+% February 2024 A. Kehl (akehl@gwdg.de)
+% May 2026 Spinach integration
+%
+% <https://spindynamics.org/wiki/index.php?title=kehl_rf_policy.m>
 
 function [rf_nutations,rf_auto]=kehl_rf_policy(parameters)
 
-% Check consistency
-grumble(parameters);
+    % Check consistency
+    grumble(parameters);
 
-% Get explicit nutation-frequency data when supplied
-rf_nutations=[];
-if isfield(parameters,'rf_nutation_freqs')
-    rf_nutations=parameters.rf_nutation_freqs;
-end
+    % Get explicit nutation-frequency data when supplied
+    rf_nutations=[];
+    if isfield(parameters,'rf_nutation_freqs')
+        rf_nutations=parameters.rf_nutation_freqs;
+    end
 
-% Infer fields from pulses unless explicitly disabled
-if isfield(parameters,'rf_field_from_pulses')
-    rf_auto=parameters.rf_field_from_pulses;
-else
-    rf_auto=isempty(rf_nutations);
-end
+    % Infer fields from pulses unless explicitly disabled
+    if isfield(parameters,'rf_field_from_pulses')
+        rf_auto=parameters.rf_field_from_pulses;
+    else
+        rf_auto=isempty(rf_nutations);
+    end
 
 end
 
 % Consistency enforcement
 function grumble(parameters)
-if ~isstruct(parameters)
-    error('parameters must be a structure.');
+    if ~isstruct(parameters)
+        error('parameters must be a structure.');
+    end
 end
-end
+

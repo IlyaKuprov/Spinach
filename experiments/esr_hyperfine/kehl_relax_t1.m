@@ -1,17 +1,21 @@
-% generates the relaxation superoperator for T1 relaxation in
-% Liouville space
+% T1 relaxation superoperator for Kehl ENDOR kernels. Syntax:
 %
-% input parameters:
-% rho0: the equilibrium density matrix
-% O: the Relaxation inducing operator (usually Sx or Ix)
-% T1: the relaxation time in s
+%      R1=kehl_relax_t1(rho0,O,T1)
 %
-% output parameters:
-% R1: the R1 relaxation superoperator
+% Parameters:
+%
+%   rho0             - equilibrium density matrix.
+%   O                - relaxation-inducing operator.
+%   T1               - longitudinal relaxation time.
+%
+% Outputs:
+%
+%   R1               - T1 relaxation superoperator.
 %
 % February 2024 A. Kehl (akehl@gwdg.de)
-
-% preallocate matrix
+% May 2026 Spinach integration
+%
+% <https://spindynamics.org/wiki/index.php?title=kehl_relax_t1.m>
 
 function R1=kehl_relax_t1(rho0,O,T1)
 
@@ -21,10 +25,10 @@ function R1=kehl_relax_t1(rho0,O,T1)
 
     % equilibrium population of states are diagonal values of rho0
     population=diag(rho0);
-    % epsilon gives the ratio between the equl. densities
+    % Calculate the equilibrium population ratio
     epsilon=(population*population'.^-1)';
 
-    % equivalent to the epsilon factor in
+    % Use the epsilon factor from
     % Feintuch, Vega in EPR spectroscopy (2018)
     % (only upper right triangle used later)
     Thermal=epsilon./(1+epsilon)./T1;
@@ -47,14 +51,14 @@ function R1=kehl_relax_t1(rho0,O,T1)
 end
 
 function grumble(rho0,O,T1)
-if ~isnumeric(rho0)
-    error('rho0 must be numeric.');
-end
-if ~isnumeric(O)
-    error('O must be numeric.');
-end
-if ~isnumeric(T1)
-    error('T1 must be numeric.');
-end
+    if ~isnumeric(rho0)
+        error('rho0 must be numeric.');
+    end
+    if ~isnumeric(O)
+        error('O must be numeric.');
+    end
+    if ~isnumeric(T1)
+        error('T1 must be numeric.');
+    end
 end
 

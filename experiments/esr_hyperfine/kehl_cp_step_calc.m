@@ -5,7 +5,7 @@
 % spinOps: the Map containing the spin operators
 % spinSys: the Map describing the spin system
 % expt: the Map containing the experimental parameters
-% opt: the Map containing the optional paramters
+% parameters: structure containing simulation parameters
 % paramsENDOR: the Map containing the ENDOR parameters
 % EPR: the Map with results from EPR calculation
 %
@@ -15,10 +15,10 @@
 % February 2024 A. Kehl (akehl@gwdg.de)
 %
 
-function rho=kehl_cp_step_calc(constants,spinOps,spinSys,expt,opt,paramsENDOR,EPR)
+function rho=kehl_cp_step_calc(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
 
     % Check consistency
-    grumble(constants,spinOps,spinSys,expt,opt,paramsENDOR,EPR);
+    grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR);
     spinOps_D=kehl_diag_ops(spinOps,spinSys('Ni_ENDOR'));
 
     % performs the actual calculation
@@ -113,11 +113,11 @@ function rho=kehl_cp_step_calc(constants,spinOps,spinSys,expt,opt,paramsENDOR,EP
                 v_off_S=offsets(i);
                 off_1=offsets(1);
 
-                if opt("powder")==false
-                    [v_CP,paramsENDOR]=kehl_cp_offset(opt,paramsENDOR,expt,spinSys,v_off_S,HF_zz,NQI_zz,n,i);
+                if parameters.powder==false
+                    [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,expt,spinSys,v_off_S,HF_zz,NQI_zz,n,i);
                 end
 
-                rho0=kehl_rho0(constants,paramsENDOR,B,geff,spinOps,spinSys,opt,HF_zz,HF_zy,HF_zx,NQI_zz);
+                rho0=kehl_rho0(constants,paramsENDOR,B,geff,spinOps,spinSys,parameters,HF_zz,HF_zy,HF_zx,NQI_zz);
 
                 %electron T1
                 RT1e=kehl_relax_t1(rho0,Sx_D,spinSys("T1e"));
@@ -153,7 +153,7 @@ function rho=kehl_cp_step_calc(constants,spinOps,spinSys,expt,opt,paramsENDOR,EP
                     % HF
                     Hfree_p=Hfree_p-2*pi*v_L(mm)*Iz{mm}+2*pi*v_L(mm)*Iz{mm}*CS_zz(nuc)+2*pi*HF_zz(nuc)*(Sz*Iz{mm})+2*pi*HF_zy(nuc)*(Sz*Iy{mm})+2*pi*HF_zx(nuc)*(Sz*Ix{mm});
                     % NQI
-                    if opt("Bterm")==true
+                    if parameters.Bterm==true
                         Hfree_p=Hfree_p+NQI(mm,1,1)*Ix{mm}*Ix{mm};
                         Hfree_p=Hfree_p+NQI(mm,1,2)*Ix{mm}*Iy{mm};
                         Hfree_p=Hfree_p+NQI(mm,1,3)*Ix{mm}*Iz{mm};
@@ -171,7 +171,7 @@ function rho=kehl_cp_step_calc(constants,spinOps,spinSys,expt,opt,paramsENDOR,EP
                         % HF
                         Hfree_p=Hfree_p-2*pi*v_L(mm)*Iz{mm}+2*pi*HF_zz(mm)*(Sz*Iz{mm})+2*pi*HF_zy(mm)*(Sz*Iy{mm})+2*pi*HF_zx(mm)*(Sz*Ix{mm})+2*pi*v_L(mm)*CS_zz(mm)*Iz{mm};
                         % NQI
-                        if opt("Bterm")==true
+                        if parameters.Bterm==true
                             Hfree_p=Hfree_p+NQI(mm,1,1)*Ix{mm}*Ix{mm};
                             Hfree_p=Hfree_p+NQI(mm,1,2)*Ix{mm}*Iy{mm};
                             Hfree_p=Hfree_p+NQI(mm,1,3)*Ix{mm}*Iz{mm};
@@ -197,7 +197,7 @@ function rho=kehl_cp_step_calc(constants,spinOps,spinSys,expt,opt,paramsENDOR,EP
                 % loop over all cp freq (y-axis)
                 for c=1:Npts_CP
 
-                    if opt("powder")==true
+                    if parameters.powder==true
                         v_CP=expt("start_CP")+step_CP*(c-1);
                     end
 
@@ -224,7 +224,7 @@ function rho=kehl_cp_step_calc(constants,spinOps,spinSys,expt,opt,paramsENDOR,EP
                     W=V^(-1);
 
 
-                    if opt("Bterm")==false
+                    if parameters.Bterm==false
                         if spinSys('N_SpinSys')>1
                             m=1;
                             HSL=HSL+2*pi*v_CP*Iz{m}+cp*Ix{m};
@@ -245,8 +245,8 @@ function rho=kehl_cp_step_calc(constants,spinOps,spinSys,expt,opt,paramsENDOR,EP
 
 
                     HSL_t=W*HSL*W^(-1);
-                    if opt("Bterm")==false
-                        if opt("Relax_step")==0
+                    if parameters.Bterm==false
+                        if parameters.Relax_step==0
                             U3=full(propagator(spinOps('spin_system'),1i*sparse(-1i*full(hilb2liouv(sparse(HSL_t),'comm'))),t(3)));
                             U1=full(propagator(spinOps('spin_system'),1i*sparse(-1i*Hprep),t(1)));
                             U2=full(propagator(spinOps('spin_system'),1i*sparse(-1i*Hfree),t(2)));
@@ -256,7 +256,7 @@ function rho=kehl_cp_step_calc(constants,spinOps,spinSys,expt,opt,paramsENDOR,EP
                             U2=full(propagator(spinOps('spin_system'),1i*sparse(R-1i*Hfree),t(2)));
                         end
                     else
-                        U3=kehl_cp_bterm_rlx(opt,expt,v_CP,HSL_t,Ix,t(3),Ni_ENDOR,N_spinSys,R,spinOps('spin_system'));
+                        U3=kehl_cp_bterm_rlx(parameters,expt,v_CP,HSL_t,Ix,t(3),Ni_ENDOR,N_spinSys,R,spinOps('spin_system'));
                         U1=full(propagator(spinOps('spin_system'),1i*sparse(R-1i*Hprep),t(1)));
                         U2=full(propagator(spinOps('spin_system'),1i*sparse(R-1i*Hfree),t(2)));
                     end
@@ -281,7 +281,7 @@ function rho=kehl_cp_step_calc(constants,spinOps,spinSys,expt,opt,paramsENDOR,EP
     end
 end
 
-function grumble(constants,spinOps,spinSys,expt,opt,paramsENDOR,EPR)
+function grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
 if ~isa(constants,'containers.Map')
     error('constants must be a containers.Map object.');
 end
@@ -294,8 +294,8 @@ end
 if ~isa(expt,'containers.Map')
     error('expt must be a containers.Map object.');
 end
-if ~isa(opt,'containers.Map')
-    error('opt must be a containers.Map object.');
+if ~isstruct(parameters)
+    error('parameters must be a structure.');
 end
 if ~isa(paramsENDOR,'containers.Map')
     error('paramsENDOR must be a containers.Map object.');

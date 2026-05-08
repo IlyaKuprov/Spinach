@@ -6,7 +6,7 @@
 % spinSys: the Map describing the spin system
 % spinOps: the Map containing the spin operators
 % expt: the Map containing the experimental parameters
-% opt: the Map containing the optional paramters
+% parameters: structure containing simulation parameters
 %
 % output parameters:
 % endor_amp: endor amplitude values
@@ -18,10 +18,11 @@
 %
 
 
-function [endor_amp,endor_amp_conv,x_coords,v_L]=kehl_time_sim(constants,spinSys,spinOps,expt,opt)
+function [endor_amp,endor_amp_conv,x_coords,v_L]=kehl_time_sim(constants,spinSys,spinOps,expt,parameters)
 
     % Check consistency
-    grumble(constants,spinSys,spinOps,expt,opt);
+    grumble(constants,spinSys,spinOps,expt,parameters);
+    parameters=kehl_defaults(parameters);
     t=expt('t');
     expt('t_start')=t(6);
 
@@ -35,28 +36,28 @@ function [endor_amp,endor_amp_conv,x_coords,v_L]=kehl_time_sim(constants,spinSys
 
 
     % EPR calculation
-    if opt('freqDomain')==false
-        epr=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,opt,expt);
+    if parameters.freqDomain==false
+        epr=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt);
     else
-        epr=kehl_ori_freq(constants,spinSys,spinOps,paramsEPR,paramsENDOR,opt,expt);
+        epr=kehl_ori_freq(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt);
     end
 
     % ENDOR calculation
-    if opt("Relax")==true
+    if parameters.Relax==true
 
         % starts the actual calculation with relaxation
-        endor_amp=kehl_time_rlx(constants,spinOps,spinSys,expt,opt,paramsENDOR,epr);
+        endor_amp=kehl_time_rlx(constants,spinOps,spinSys,expt,parameters,paramsENDOR,epr);
     else
 
         % starts the actual calculation
-        endor_amp=kehl_time_calc(constants,spinOps,spinSys,expt,opt,paramsENDOR,epr);
+        endor_amp=kehl_time_calc(constants,spinOps,spinSys,expt,parameters,paramsENDOR,epr);
     end
 
     % convolution with lb
-    endor_amp_conv=kehl_time_lb(endor_amp,opt);
+    endor_amp_conv=kehl_time_lb(endor_amp,parameters);
 end
 
-function grumble(constants,spinSys,spinOps,expt,opt)
+function grumble(constants,spinSys,spinOps,expt,parameters)
 if ~isa(constants,'containers.Map')
     error('constants must be a containers.Map object.');
 end
@@ -69,8 +70,8 @@ end
 if ~isa(expt,'containers.Map')
     error('expt must be a containers.Map object.');
 end
-if ~isa(opt,'containers.Map')
-    error('opt must be a containers.Map object.');
+if ~isstruct(parameters)
+    error('parameters must be a structure.');
 end
 end
 

@@ -17,13 +17,12 @@ end
 
 % Check consistency
 grumble(spin_system,pulse_sequence,parameters,assumptions);
-
+parameters=kehl_defaults(parameters);
 
 constants=kehl_constants();
 spinSys=context_spin_system(spin_system,parameters,constants);
 spinOps=kehl_spin_ops(spin_system,parameters.endor_spins,spinSys('N_SpinSys'));
 expt=parameters.expt;
-opt=parameters.opt;
 
 if nargin>=4 && ~isempty(assumptions)
     spin_system=assume(spin_system,assumptions);
@@ -38,10 +37,10 @@ else
 end
 
 paramsEPR=kehl_prep_epr(spinSys,expt);
-if opt('freqDomain')==false
-    epr=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,opt,expt);
+if parameters.freqDomain==false
+    epr=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt);
 else
-    epr=kehl_ori_freq(constants,spinSys,spinOps,paramsEPR,paramsENDOR,opt,expt);
+    epr=kehl_ori_freq(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt);
 end
 
 localpar=parameters;
@@ -49,7 +48,6 @@ localpar.constants=constants;
 localpar.spinSys=spinSys;
 localpar.spinOps=spinOps;
 localpar.expt=expt;
-localpar.opt=opt;
 localpar.paramsENDOR=paramsENDOR;
 localpar.paramsEPR=paramsEPR;
 localpar.epr=epr;
@@ -64,7 +62,7 @@ H=[];
 R=[];
 K=[];
 endor_amp=pulse_sequence(spin_system,localpar,H,R,K);
-endor_amp_conv=kehl_line_broaden(endor_amp,opt,localpar.expt('range_EN'));
+endor_amp_conv=kehl_line_broaden(endor_amp,parameters,localpar.expt('range_EN'));
 
 x_coords=paramsENDOR('x_coords');
 x_coords=x_coords(:,1)';
@@ -196,8 +194,7 @@ end
 
 function [y_coords,localpar]=cp_axis(localpar)
     expt=localpar.expt;
-    opt=localpar.opt;
-    if opt('powder')==false
+    if localpar.powder==false
         expt('Npts_CP')=1;
         expt('range_CP')=0;
         y_coords=1;
@@ -261,9 +258,6 @@ if ~isfield(parameters,'endor_spins')
 end
 if ~isfield(parameters,'expt')
     error('parameters.expt must contain the experiment parameter Map.');
-end
-if ~isfield(parameters,'opt')
-    error('parameters.opt must contain the option Map.');
 end
 if (~ischar(assumptions))&&(~isstring(assumptions))
     error('assumptions must be a character string or a string scalar.');

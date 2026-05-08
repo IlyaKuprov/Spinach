@@ -6,7 +6,7 @@
 % spinSys: the Map describing the spin system
 % spinOps: the Map containing the spin operators
 % paramsEPR: the Map containing the EPR parameters
-% opt: the Map containing the optional parameters
+% parameters: structure containing simulation parameters
 % expt: the Map containing the experimental parameters
 %
 % output parameters:
@@ -17,12 +17,12 @@
 
 % get parameters from Maps
 
-function EPR=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,opt,expt)
+function EPR=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt)
 
     % Check consistency
-    grumble(constants,spinSys,spinOps,paramsEPR,paramsENDOR,opt,expt);
-    Ntheta=opt("Nang");
-    Nphimax=opt("Nang");
+    grumble(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt);
+    Ntheta=parameters.Nang;
+    Nphimax=parameters.Nang;
     g=spinSys("g");
     A=spinSys("A");
     Q=spinSys("Q");
@@ -61,7 +61,7 @@ function EPR=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,opt,
 
 
     % for powder pattern
-    if opt("powder")==true
+    if parameters.powder==true
         if isKey(expt,'exciteWidth')
             W1=expt('exciteWidth');
         else
@@ -99,7 +99,7 @@ function EPR=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,opt,
 +2*sin(theta)*cos(theta)*sin(phi)*A(3*m-1,3);
                     %A11+A22+A33+A12+A13+A23
 
-                 if opt("Bterm")==1
+                 if parameters.Bterm==1
                         HF_zx(m)=(A(3*m-2,1)*sin(theta)*cos(phi)...
 +A(3*m-1,1)*sin(theta)*sin(phi)...
 +A(3*m,1)*cos(theta))*cos(theta)*cos(phi)...
@@ -233,7 +233,7 @@ function EPR=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,opt,
                     scalefactor=pulsescale(expt,DeltaB,constants("CONST1"));
                 else
 
-                    if abs(DeltaB)<=abs(opt("nwidth")*(W1/(constants("CONST1")*1e10)))
+                    if abs(DeltaB)<=abs(parameters.nwidth*(W1/(constants("CONST1")*1e10)))
 
                         %exp('res_EN')
                         if abs(HF_zz(m))>1
@@ -271,7 +271,7 @@ function EPR=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,opt,
     end
 
     % only one orientation for single crystal calculation
-    elseif opt("powder")==false
+    elseif parameters.powder==false
         or=or+1;
         geff=spinSys("g_iso");
 
@@ -288,7 +288,7 @@ function EPR=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,opt,
         for m=1:Ni_ENDOR
 
             HF_zz(m)=A(3*m,3);
-            if opt("Bterm")==1
+            if parameters.Bterm==1
                 HF_zy(m)=A(3*m,2);
                 HF_zx(m)=A(3*m,1);
             end
@@ -319,7 +319,7 @@ function EPR=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,opt,
 
         offsets_tmp=kehl_offsets(constants,spinSys,spinOps,paramsENDOR,Beff,geff,HF_zz,NQI_zz);
 
-        sel_I=opt("sel_I");
+        sel_I=parameters.sel_I;
         if spinSys('N_SpinSys')>1
             s=size(offsets_tmp,2)/Ni_ENDOR;
             for n=1:Ni_ENDOR
@@ -455,7 +455,7 @@ function M=BuildSpace(S)
     end
 end
 
-function grumble(constants,spinSys,spinOps,paramsEPR,paramsENDOR,opt,expt)
+function grumble(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt)
 if ~isa(constants,'containers.Map')
     error('constants must be a containers.Map object.');
 end
@@ -471,8 +471,8 @@ end
 if ~isa(paramsENDOR,'containers.Map')
     error('paramsENDOR must be a containers.Map object.');
 end
-if ~isa(opt,'containers.Map')
-    error('opt must be a containers.Map object.');
+if ~isstruct(parameters)
+    error('parameters must be a structure.');
 end
 if ~isa(expt,'containers.Map')
     error('expt must be a containers.Map object.');

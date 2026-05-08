@@ -1,7 +1,7 @@
 % calculate the propagator of the CP pulse with Bterm
 %
 % input parameters:
-% opt: the Map containing the optional paramters
+% parameters: structure containing simulation parameters
 % expt: the Map containing the experimental parameters
 % v_CP: CP frequency
 % H_IN: acting Hamiltonian without RF term
@@ -17,19 +17,19 @@
 % February 2024 A. Kehl (akehl@gwdg.de)
 %
 
-function U=kehl_cp_bterm(opt,expt,v_CP,H_IN,Ix,t,Ni_ENDOR,N_spinSys,spin_system)
+function U=kehl_cp_bterm(parameters,expt,v_CP,H_IN,Ix,t,Ni_ENDOR,N_spinSys,spin_system)
     if nargin<9
         spin_system=[];
     end
 
 
     % Check consistency
-    grumble(opt,expt,v_CP,H_IN,Ix,t,Ni_ENDOR,N_spinSys,spin_system);
-    t_stepCP=1/(v_CP*opt("N_stepRF"));
+    grumble(parameters,expt,v_CP,H_IN,Ix,t,Ni_ENDOR,N_spinSys,spin_system);
+    t_stepCP=1/(v_CP*parameters.N_stepRF);
     U_SL=eye(size(H_IN));
     H_SL=H_IN;
 
-    for ll=1:opt("N_stepRF")
+    for ll=1:parameters.N_stepRF
         % build the Hamiltonian for the increment
         if N_spinSys==1
             for mm=1:Ni_ENDOR
@@ -51,9 +51,9 @@ function U=kehl_cp_bterm(opt,expt,v_CP,H_IN,Ix,t,Ni_ENDOR,N_spinSys,spin_system)
     U=(U_SL^(t*v_CP));
 end
 
-function grumble(opt,expt,v_CP,H_IN,Ix,t,Ni_ENDOR,N_spinSys,spin_system)
-if ~isa(opt,'containers.Map')
-    error('opt must be a containers.Map object.');
+function grumble(parameters,expt,v_CP,H_IN,Ix,t,Ni_ENDOR,N_spinSys,spin_system)
+if ~isstruct(parameters)
+    error('parameters must be a structure.');
 end
 if ~isa(expt,'containers.Map')
     error('expt must be a containers.Map object.');

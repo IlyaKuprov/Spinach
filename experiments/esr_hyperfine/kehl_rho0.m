@@ -8,7 +8,7 @@
 % geff: the effective g value
 % spinOps: the Map containing the spin operators
 % spinSys: the Map describing the spin system
-% opt: the Map containing the optional paramters
+% parameters: structure containing simulation parameters
 % HF_zz, HF_zy, HF_zx: the effective HF coupling value
 % NQI_zz: the effective NQ coupling value
 %
@@ -18,14 +18,14 @@
 % February 2024 A. Kehl (akehl@gwdg.de)
 
 
-function [rho0]=kehl_rho0(constants,paramsENDOR,B,geff,spinOps,spinSys,opt,HF_zz,HF_zy,HF_zx,NQI_zz)
+function [rho0]=kehl_rho0(constants,paramsENDOR,B,geff,spinOps,spinSys,parameters,HF_zz,HF_zy,HF_zx,NQI_zz)
 if nargin<11
     NQI_zz=0;
 end
 
 
     % Check consistency
-    grumble(constants,paramsENDOR,B,geff,spinOps,spinSys,opt,HF_zz,HF_zy,HF_zx,NQI_zz);
+    grumble(constants,paramsENDOR,B,geff,spinOps,spinSys,parameters,HF_zz,HF_zy,HF_zx,NQI_zz);
  % getting parameters from Maps
  I=spinSys("I");
  Sz=spinOps('Sz');
@@ -62,10 +62,10 @@ end
 H_S=H_EZ+H_NZ+H_HF+H_NQI;
 
 % calc. density matrix
-if opt("temp_eff")==true
+if parameters.temp_eff==true
 
     % calculate Boltzmann factor
-    Boltz=expm(-H_S/(constants("K_B")*opt("T")));
+    Boltz=expm(-H_S/(constants("K_B")*parameters.T));
 
     % calculate density matrix with Temp Effect
     rho0=Boltz/trace(Boltz);
@@ -78,7 +78,7 @@ end
 rho0=diag(diag(rho0));
 end
 
-function grumble(constants,paramsENDOR,B,geff,spinOps,spinSys,opt,HF_zz,HF_zy,HF_zx,NQI_zz)
+function grumble(constants,paramsENDOR,B,geff,spinOps,spinSys,parameters,HF_zz,HF_zy,HF_zx,NQI_zz)
 if ~isa(constants,'containers.Map')
     error('constants must be a containers.Map object.');
 end
@@ -97,8 +97,8 @@ end
 if (~isempty(spinSys))&&(~isa(spinSys,'containers.Map'))
     error('spinSys must be empty, or a containers.Map object.');
 end
-if ~isa(opt,'containers.Map')
-    error('opt must be a containers.Map object.');
+if ~isstruct(parameters)
+    error('parameters must be a structure.');
 end
 if ~isnumeric(HF_zz)
     error('HF_zz must be numeric.');

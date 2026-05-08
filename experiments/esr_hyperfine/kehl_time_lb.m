@@ -6,7 +6,7 @@
 %
 % input parameters:
 % data: data to be convoluted
-% opt: options Map, should contain keys ('Lorentian'/'Gaussian' and
+% parameters: structure, should contain fields ('Lorentian'/'Gaussian' and
 %       'lw_L'/'lw_G')
 %
 % output parameters:
@@ -15,17 +15,17 @@
 % February 2024 A. Kehl (akehl@gwdg.de)
 %
 
-function data_conv=kehl_time_lb(data,opt)
+function data_conv=kehl_time_lb(data,parameters)
 
     % Check consistency
-    grumble(data,opt);
+    grumble(data,parameters);
 data_n=(data-min(data))/(max(data)-min(data))-0.5;
 
-if opt("Lorentzian")==1
+if parameters.Lorentzian==1
         warning('This is a beta version and has not been fully tested.');
 
 
-        Deltaend_L=opt('lw_L')*pi/0.1;
+        Deltaend_L=parameters.lw_L*pi/0.1;
         % Lorentian
         endintens1=(data_n(:));
         for i=1:size(data,2)
@@ -36,8 +36,8 @@ if opt("Lorentzian")==1
         endintens(1)=0.37*endintens(1);
         endamp_2d_L_conv(:)=real((endintens));
 
-        if opt("Gaussian")==1
-            lw=opt('lw_G');
+        if parameters.Gaussian==1
+            lw=parameters.lw_G;
             Deltaend_G=(lw*pi/(0.1*sqrt(2*log(2))))^2;
             % Gaussian
             endintens1=(endamp_2d_L_conv(:));
@@ -52,10 +52,10 @@ if opt("Lorentzian")==1
         else
             data_conv=endamp_2d_L_conv(:);
         end
-    elseif opt("Gaussian")==1
+    elseif parameters.Gaussian==1
         warning('This is a beta version and has not been fully tested.');
 
-        lw=opt('lw_G');
+        lw=parameters.lw_G;
         Deltaend_G=(lw*pi/(0.1*sqrt(2*log(2))))^2;
 
         % Gaussian
@@ -74,12 +74,12 @@ if opt("Lorentzian")==1
 end
 end
 
-function grumble(data,opt)
+function grumble(data,parameters)
 if (~isnumeric(data))&&(~ischar(data))&&(~isstring(data))
     error('data must be numeric, a character string, or a string scalar.');
 end
-if ~isa(opt,'containers.Map')
-    error('opt must be a containers.Map object.');
+if ~isstruct(parameters)
+    error('parameters must be a structure.');
 end
 end
 

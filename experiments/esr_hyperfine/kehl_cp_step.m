@@ -5,7 +5,7 @@
 % spinSys: the Map describing the spin system
 % spinOps: the Map containing the spin operators
 % expt: the Map containing the experimental parameters
-% opt: the Map containing the optional paramters
+% parameters: structure containing simulation parameters
 %
 % output parameters:
 % rho: the final spin density matrix
@@ -13,16 +13,17 @@
 % February 2024 A. Kehl (akehl@gwdg.de)
 %
 
-function [rho]=kehl_cp_step(constants,spinSys,spinOps,expt,opt)
+function [rho]=kehl_cp_step(constants,spinSys,spinOps,expt,parameters)
 
     % Check consistency
-    grumble(constants,spinSys,spinOps,expt,opt);
-    if opt("Relax")==0
-        opt("Relax_step")=0;
-        opt("Relax")=1;
-        opt("temp_eff")=1;
-    elseif ~isKey(opt,"Relax_step")
-        opt("Relax_step")=1;
+    grumble(constants,spinSys,spinOps,expt,parameters);
+    parameters=kehl_defaults(parameters);
+    if parameters.Relax==0
+        parameters.Relax_step=0;
+        parameters.Relax=1;
+        parameters.temp_eff=1;
+    elseif ~isfield(parameters,"Relax_step")
+        parameters.Relax_step=1;
     end
 
     % prepare EPR and ENDOR calculations
@@ -31,7 +32,7 @@ function [rho]=kehl_cp_step(constants,spinSys,spinOps,expt,opt)
 
 
     % for SC no 2D scan, and for Powder define y-axis
-    if opt("powder")==false
+    if parameters.powder==false
         expt("Npts_CP")=1;
         expt("range_CP")=0;
     else
@@ -50,20 +51,20 @@ function [rho]=kehl_cp_step(constants,spinSys,spinOps,expt,opt)
     end
 
     % EPR calculation
-    if opt('freqDomain')==false
-        epr=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,opt,expt);
+    if parameters.freqDomain==false
+        epr=kehl_ori_field(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt);
     else
-        epr=kehl_ori_freq(constants,spinSys,spinOps,paramsEPR,paramsENDOR,opt,expt);
+        epr=kehl_ori_freq(constants,spinSys,spinOps,paramsEPR,paramsENDOR,parameters,expt);
     end
 
     % ENDOR calculation
 
     % starts the actual calculation
-    rho=kehl_cp_step_calc(constants,spinOps,spinSys,expt,opt,paramsENDOR,epr);
+    rho=kehl_cp_step_calc(constants,spinOps,spinSys,expt,parameters,paramsENDOR,epr);
 
 end
 
-function grumble(constants,spinSys,spinOps,expt,opt)
+function grumble(constants,spinSys,spinOps,expt,parameters)
 if ~isa(constants,'containers.Map')
     error('constants must be a containers.Map object.');
 end
@@ -76,8 +77,8 @@ end
 if ~isa(expt,'containers.Map')
     error('expt must be a containers.Map object.');
 end
-if ~isa(opt,'containers.Map')
-    error('opt must be a containers.Map object.');
+if ~isstruct(parameters)
+    error('parameters must be a structure.');
 end
 end
 

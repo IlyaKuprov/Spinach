@@ -6,7 +6,7 @@
 % spinOps: the Map containing the spin operators
 % spinSys: the Map describing the spin system
 % expt: the Map containing the experimental parameters
-% opt: the Map containing the optional paramters
+% parameters: structure containing simulation parameters
 % paramsENDOR: the Map containing the ENDOR parameters
 % EPR: the Map with results from EPR calculation
 %
@@ -18,10 +18,10 @@
 
 % get values from Maps
 
-function endor_amp=kehl_time_rlx(constants,spinOps,spinSys,expt,opt,paramsENDOR,EPR)
+function endor_amp=kehl_time_rlx(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
 
     % Check consistency
-    grumble(constants,spinOps,spinSys,expt,opt,paramsENDOR,EPR);
+    grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR);
     spinOps_D=kehl_diag_ops(spinOps,spinSys('Ni_ENDOR'));
 
     Sz=spinOps("Sz");
@@ -115,7 +115,7 @@ function endor_amp=kehl_time_rlx(constants,spinOps,spinSys,expt,opt,paramsENDOR,
             v_off_S=offsets(i);
             off_1=offsets(1);
 
-            rho0=kehl_rho0(constants,paramsENDOR,B,geff,spinOps,spinSys,opt,HF_zz,HF_zy,HF_zx,NQI_zz);
+            rho0=kehl_rho0(constants,paramsENDOR,B,geff,spinOps,spinSys,parameters,HF_zz,HF_zy,HF_zx,NQI_zz);
 
             %electron T1
             RT1e=kehl_relax_t1(rho0,Sx_D,spinSys("T1e"));
@@ -151,7 +151,7 @@ function endor_amp=kehl_time_rlx(constants,spinOps,spinSys,expt,opt,paramsENDOR,
                 % HF
                 Hfree_p=Hfree_p-2*pi*v_L(1)*Iz{1}+2*pi*v_L(1)*Iz{1}*CS_zz(nuc)+2*pi*HF_zz(nuc)*(Sz*Iz{1})+2*pi*HF_zy(nuc)*(Sz*Iy{1})+2*pi*HF_zx(nuc)*(Sz*Ix{1});
                 % NQI
-                if opt("Bterm")==true
+                if parameters.Bterm==true
                     Hfree_p=Hfree_p+NQI(1,1,1)*Ix{1}*Ix{1};
                     Hfree_p=Hfree_p+NQI(1,1,2)*Ix{1}*Iy{1};
                     Hfree_p=Hfree_p+NQI(1,1,3)*Ix{1}*Iz{1};
@@ -169,7 +169,7 @@ function endor_amp=kehl_time_rlx(constants,spinOps,spinSys,expt,opt,paramsENDOR,
                     % HF
                     Hfree_p=Hfree_p-2*pi*v_L(mn)*Iz{mn}+2*pi*HF_zz(mn)*(Sz*Iz{mn})+2*pi*HF_zy(mn)*(Sz*Iy{mn})+2*pi*HF_zx(mn)*(Sz*Ix{mn})+2*pi*v_L(mn)*CS_zz(mn)*Iz{mn};
                     % NQI
-                    if opt("Bterm")==true
+                    if parameters.Bterm==true
                         Hfree_p=Hfree_p+NQI(mn,1,1)*Ix{mn}*Ix{mn};
                         Hfree_p=Hfree_p+NQI(mn,1,2)*Ix{mn}*Iy{mn};
                         Hfree_p=Hfree_p+NQI(mn,1,3)*Ix{mn}*Iz{mn};
@@ -219,7 +219,7 @@ function endor_amp=kehl_time_rlx(constants,spinOps,spinSys,expt,opt,paramsENDOR,
                 Hcorr=zeros(size(Hfree_p));
                 HRF=Hfree_p;
 
-                if opt("Bterm")==false
+                if parameters.Bterm==false
                     if spinSys('N_SpinSys')>1
                         m=1;
                         Hcorr=Hcorr+2*pi*v_RF*Iz{m};
@@ -242,7 +242,7 @@ function endor_amp=kehl_time_rlx(constants,spinOps,spinSys,expt,opt,paramsENDOR,
 
 
 
-                if opt("Bterm")==false
+                if parameters.Bterm==false
 
                     U5=full(propagator(spinOps('spin_system'),1i*sparse(R-1i*full(hilb2liouv(sparse(HRF),'comm'))),t(5)));
                     if t(5)==t(7)
@@ -277,11 +277,11 @@ function endor_amp=kehl_time_rlx(constants,spinOps,spinSys,expt,opt,paramsENDOR,
                     end
                     U10=full(propagator(spinOps('spin_system'),1i*sparse(R-1i*Hfree),t(2)+t(3)/2));
                 else
-                    U5=kehl_rf_bterm_rlx(opt,expt,v_RF,Hfree_p,Iy,t(5),Ni_ENDOR,N_spinSys,R,spinOps('spin_system'));
+                    U5=kehl_rf_bterm_rlx(parameters,expt,v_RF,Hfree_p,Iy,t(5),Ni_ENDOR,N_spinSys,R,spinOps('spin_system'));
                     if t(5)==t(7)
                         U7=U5;
                     else
-                        U7=kehl_rf_bterm_rlx(opt,expt,v_RF,Hfree_p,Iy,t(7),Ni_ENDOR,N_spinSys,R,spinOps('spin_system'));
+                        U7=kehl_rf_bterm_rlx(parameters,expt,v_RF,Hfree_p,Iy,t(7),Ni_ENDOR,N_spinSys,R,spinOps('spin_system'));
                     end
 
                     U1=full(propagator(spinOps('spin_system'),1i*sparse(R-1i*Hnonsel),t(1)));
@@ -354,7 +354,7 @@ function endor_amp=kehl_time_rlx(constants,spinOps,spinSys,expt,opt,paramsENDOR,
 
 end
 
-function grumble(constants,spinOps,spinSys,expt,opt,paramsENDOR,EPR)
+function grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
 if ~isa(constants,'containers.Map')
     error('constants must be a containers.Map object.');
 end
@@ -367,8 +367,8 @@ end
 if ~isa(expt,'containers.Map')
     error('expt must be a containers.Map object.');
 end
-if ~isa(opt,'containers.Map')
-    error('opt must be a containers.Map object.');
+if ~isstruct(parameters)
+    error('parameters must be a structure.');
 end
 if ~isa(paramsENDOR,'containers.Map')
     error('paramsENDOR must be a containers.Map object.');

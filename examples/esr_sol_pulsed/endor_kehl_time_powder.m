@@ -46,22 +46,17 @@ expt=kehl_exp_freq(expt,32,3,0.001);
 expt=kehl_exp_pulse(expt,...
     fullfile(fileparts(mfilename('fullpath')),'kehl_mlr09_12ns_pulse.txt'),false);
 
-% Context options
-values=containers.Map;
-values('freqDomain')=true;
-values('powder')=true;
-values('Nang')=50;
-opt=kehl_set_opt([],values);
-
-% ENDOR context metadata
+% ENDOR context metadata and simulation parameters
 parameters.inter=inter;
+parameters.freqDomain=true;
+parameters.powder=true;
+parameters.Nang=50;
 parameters.endor_spins=[2,3,4];
 parameters.epr_spins=5;
 parameters.epr_quadrupole_matrix=local_tensor([1.2,0.54,-1.7]*1e6,[0,0,0]);
 parameters.n_spin_systems=1;
 parameters.dipolar_pairs=[2,3;2,4];
 parameters.expt=expt;
-parameters.opt=opt;
 parameters.time_domain=true;
 
 % Actual ENDOR calculation through Spinach-style context and experiment

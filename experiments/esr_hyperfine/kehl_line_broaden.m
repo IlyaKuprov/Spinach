@@ -4,7 +4,7 @@
 %
 % input parameters:
 % data: data to be convoluted
-% opt: options Map, should contain keys ('Lorentian'/'Gaussian' and
+% parameters: structure, should contain fields ('Lorentian'/'Gaussian' and
 %       'lw_L'/'lw_G')
 % sw: width of the data points
 %
@@ -14,14 +14,14 @@
 % April 2024 A. Kehl (akehl@gwdg.de)
 %
 
-function data_conv=kehl_line_broaden(data,opt,sw)
+function data_conv=kehl_line_broaden(data,parameters,sw)
 
     % Check consistency
-    grumble(data,opt,sw);
-    if opt("Lorentzian")==1
+    grumble(data,parameters,sw);
+    if parameters.Lorentzian==1
 
         % Lorentian
-        Deltaend_L=opt('lw_L')*pi/(sw);
+        Deltaend_L=parameters.lw_L*pi/(sw);
         endintens1=ifft(data(:));
         for i=1:size(data,2)
 
@@ -31,9 +31,9 @@ function data_conv=kehl_line_broaden(data,opt,sw)
         endintens(1)=0.37*endintens(1);
         endamp_2d_L_conv(:)=real(fft(endintens));
 
-        if opt("Gaussian")==1
+        if parameters.Gaussian==1
             % Gaussian
-            lw=opt('lw_G');
+            lw=parameters.lw_G;
             Deltaend_G=(lw*pi/(sw*sqrt(2*log(2))))^2;
             endintens1=ifft(endamp_2d_L_conv(:)+1000);
             for i=1:size(data,2)
@@ -47,9 +47,9 @@ function data_conv=kehl_line_broaden(data,opt,sw)
         else
             data_conv=endamp_2d_L_conv(:);
         end
-    elseif opt("Gaussian")==1
+    elseif parameters.Gaussian==1
         % Gaussian
-        lw=opt('lw_G');
+        lw=parameters.lw_G;
         Deltaend_G=(lw*pi/(sw*sqrt(2*log(2))))^2;
         data=data+1000;
         endintens1=ifft(data(:));
@@ -68,12 +68,12 @@ function data_conv=kehl_line_broaden(data,opt,sw)
     end
 end
 
-function grumble(data,opt,sw)
+function grumble(data,parameters,sw)
 if (~isnumeric(data))&&(~ischar(data))&&(~isstring(data))
     error('data must be numeric, a character string, or a string scalar.');
 end
-if ~isa(opt,'containers.Map')
-    error('opt must be a containers.Map object.');
+if ~isstruct(parameters)
+    error('parameters must be a structure.');
 end
 if ~isnumeric(sw)
     error('sw must be numeric.');

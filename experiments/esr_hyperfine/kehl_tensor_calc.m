@@ -5,7 +5,7 @@
 % spinOps: the Map containing the spin operators
 % spinSys: the Map describing the spin system
 % expt: the Map containing the experimental parameters
-% opt: the Map containing the optional paramters
+% parameters: structure containing simulation parameters
 % paramsENDOR: the Map containing the ENDOR parameters
 % EPR: the Map with results from EPR calculation
 %
@@ -17,10 +17,10 @@
 
 % redefine, one spin system is not possible
 
-function endor_amp=kehl_tensor_calc(constants,spinOps,spinSys,expt,opt,paramsENDOR,EPR)
+function endor_amp=kehl_tensor_calc(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
 
     % Check consistency
-    grumble(constants,spinOps,spinSys,expt,opt,paramsENDOR,EPR);
+    grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR);
     spinSys('N_SpinSys')=spinSys("Ni_ENDOR");
     spinOps=kehl_spin_ops(spinSys("S"),spinSys("I"),spinSys("Ni_ENDOR"),spinSys("Ni_ENDOR"));
 
@@ -85,7 +85,7 @@ function endor_amp=kehl_tensor_calc(constants,spinOps,spinSys,expt,opt,paramsEND
         % set parameters for this orientation
         geff=geff_sel(j);
         B=B_sel(j);
-        const_R=1/size(Sz,2)*constants('GE')*B/(2*pi*constants('K_B')*opt("T"));
+        const_R=1/size(Sz,2)*constants('GE')*B/(2*pi*constants('K_B')*parameters.T);
 
         HF_zz=HF_zz_sel(j,:);
         HF_zy=HF_zy_sel(j,:);
@@ -128,7 +128,7 @@ function endor_amp=kehl_tensor_calc(constants,spinOps,spinSys,expt,opt,paramsEND
                 % HF
                 Hfree_p=Hfree_p-2*pi*v_L(nuc)*Iz{1}+2*pi*v_L(nuc)*Iz{1}*CS_zz(nuc)+2*pi*HF_zz(nuc)*(Sz*Iz{1})+2*pi*HF_zy(nuc)*(Sz*Iy{1})+2*pi*HF_zx(nuc)*(Sz*Ix{1});
                 % NQI
-                if opt("Bterm")==true
+                if parameters.Bterm==true
                     m=1;
                     Hfree_p=Hfree_p+NQI(m,1,1)*Ix{1}*Ix{1};
                     Hfree_p=Hfree_p+NQI(m,1,2)*Ix{1}*Iy{1};
@@ -190,19 +190,19 @@ function endor_amp=kehl_tensor_calc(constants,spinOps,spinSys,expt,opt,paramsEND
                 Hcorr=zeros(size(Hfree_p));
                 HRF=Hfree_p;
 
-                if opt("Bterm")==false
+                if parameters.Bterm==false
                    HRF=HRF+2*pi*v_RF*Iz{1}+oneN*Iy{1};
                 end
 
                 Hcorr=Hcorr+2*pi*v_RF*Iz{1};
 
 
-                if opt("Bterm")==false
+                if parameters.Bterm==false
                     U1=full(propagator(spinOps('spin_system'),sparse(HRF),t(1)));
                     U2=U2_p*full(propagator(spinOps('spin_system'),sparse(Hcorr),t2));
                 else
                     Hfree=Hfree_p;
-                    U1=kehl_rf_bterm(opt,expt,v_RF,Hfree,Iy,t(1),Ni_ENDOR,N_spinSys,spinOps('spin_system'));
+                    U1=kehl_rf_bterm(parameters,expt,v_RF,Hfree,Iy,t(1),Ni_ENDOR,N_spinSys,spinOps('spin_system'));
                     U2=U2_p;
                 end
 
@@ -211,7 +211,7 @@ function endor_amp=kehl_tensor_calc(constants,spinOps,spinSys,expt,opt,paramsEND
                 rho=rho0;
                 rho=U1*rho*U1';
 
-                if opt("Bterm")==true
+                if parameters.Bterm==true
                     rho=diag(diag(rho));
                 end
 
@@ -223,7 +223,7 @@ function endor_amp=kehl_tensor_calc(constants,spinOps,spinSys,expt,opt,paramsEND
                    value_Sy=value_Sy+(real(trace(rho*Sz*Iz{1})));
                 end
 
-                if opt('temp_eff')==true
+                if parameters.temp_eff==true
                     endor_amp_tmp(a)=endor_amp_tmp(a)+abs(value_Sy*S/(Nint*size(mI,2)))*const_R;
                 else
                     endor_amp_tmp(a)=endor_amp_tmp(a)+abs(value_Sy*S/(Nint*size(mI,2)));
@@ -237,7 +237,7 @@ function endor_amp=kehl_tensor_calc(constants,spinOps,spinSys,expt,opt,paramsEND
     end
 end
 
-function grumble(constants,spinOps,spinSys,expt,opt,paramsENDOR,EPR)
+function grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
 if ~isa(constants,'containers.Map')
     error('constants must be a containers.Map object.');
 end
@@ -250,8 +250,8 @@ end
 if ~isa(expt,'containers.Map')
     error('expt must be a containers.Map object.');
 end
-if ~isa(opt,'containers.Map')
-    error('opt must be a containers.Map object.');
+if ~isstruct(parameters)
+    error('parameters must be a structure.');
 end
 if ~isa(paramsENDOR,'containers.Map')
     error('paramsENDOR must be a containers.Map object.');

@@ -1,7 +1,7 @@
 % creates the propagator for the RF pulse if the Bterm is considered
 %
 % input parameters:
-% opt: the Map containing the optional paramters
+% parameters: structure containing simulation parameters
 % expt: the Map containing the experimental parameters
 % v_RF: RF frequency
 % Hfree: acting Hamiltonian without RF term
@@ -17,19 +17,19 @@
 % February 2024 A. Kehl (akehl@gwdg.de)
 
 
-function U=kehl_rf_bterm(opt,expt,v_RF,Hfree,Iy,t,Ni_ENDOR,N_spinSys,spin_system)
+function U=kehl_rf_bterm(parameters,expt,v_RF,Hfree,Iy,t,Ni_ENDOR,N_spinSys,spin_system)
     if nargin<9
         spin_system=[];
     end
 
 
     % Check consistency
-    grumble(opt,expt,v_RF,Hfree,Iy,t,Ni_ENDOR,N_spinSys,spin_system);
+    grumble(parameters,expt,v_RF,Hfree,Iy,t,Ni_ENDOR,N_spinSys,spin_system);
     % Incrementation calculation for the RF pulse
-    t_stepRF=1/(v_RF*opt("N_stepRF"));
+    t_stepRF=1/(v_RF*parameters.N_stepRF);
     U_RF=eye(size(Hfree));
 
-    for ll=1:opt("N_stepRF")
+    for ll=1:parameters.N_stepRF
         if N_spinSys==1
             HRF=Hfree;
             for mm=1:Ni_ENDOR
@@ -50,9 +50,9 @@ function U=kehl_rf_bterm(opt,expt,v_RF,Hfree,Iy,t,Ni_ENDOR,N_spinSys,spin_system
 
 end
 
-function grumble(opt,expt,v_RF,Hfree,Iy,t,Ni_ENDOR,N_spinSys,spin_system)
-if ~isa(opt,'containers.Map')
-    error('opt must be a containers.Map object.');
+function grumble(parameters,expt,v_RF,Hfree,Iy,t,Ni_ENDOR,N_spinSys,spin_system)
+if ~isstruct(parameters)
+    error('parameters must be a structure.');
 end
 if ~isa(expt,'containers.Map')
     error('expt must be a containers.Map object.');

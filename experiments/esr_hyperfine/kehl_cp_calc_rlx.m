@@ -5,7 +5,7 @@
 % spinOps: the Map containing the spin operators
 % spinSys: the Map describing the spin system
 % expt: the Map containing the experimental parameters
-% opt: the Map containing the optional paramters
+% parameters: structure containing simulation parameters
 % paramsENDOR: the Map containing the ENDOR parameters
 % EPR: the Map with results from EPR calculation
 %
@@ -16,10 +16,10 @@
 %
 
 
-function endor_amp=kehl_cp_calc_rlx(constants,spinOps,spinSys,expt,opt,paramsENDOR,EPR)
+function endor_amp=kehl_cp_calc_rlx(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
 
     % Check consistency
-    grumble(constants,spinOps,spinSys,expt,opt,paramsENDOR,EPR);
+    grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR);
     spinOps_D=kehl_diag_ops(spinOps,spinSys('Ni_ENDOR'));
 
     % get parameters from Maps
@@ -126,7 +126,7 @@ function endor_amp=kehl_cp_calc_rlx(constants,spinOps,spinSys,expt,opt,paramsEND
             off_1=offsets(1);
 
 
-            rho0=kehl_rho0(constants,paramsENDOR,B,geff,spinOps,spinSys,opt,HF_zz,HF_zy,HF_zx,NQI_zz);
+            rho0=kehl_rho0(constants,paramsENDOR,B,geff,spinOps,spinSys,parameters,HF_zz,HF_zy,HF_zx,NQI_zz);
 
             %electron T1
             RT1e=kehl_relax_t1(rho0,Sx_D,spinSys("T1e"));
@@ -211,7 +211,7 @@ function endor_amp=kehl_cp_calc_rlx(constants,spinOps,spinSys,expt,opt,paramsEND
 
             Hfree_p=2*pi*v_off_S*Sz;
             if spinSys('N_SpinSys')>1
-                if opt("powder")==1
+                if parameters.powder==1
                     mn=round(i/(2*I(1)+1));
                 else
                     mn=i;
@@ -219,7 +219,7 @@ function endor_amp=kehl_cp_calc_rlx(constants,spinOps,spinSys,expt,opt,paramsEND
                 % HF
                 Hfree_p=Hfree_p-2*pi*v_L(mn)*Iz{1}+2*pi*v_L(mn)*Iz{1}*CS_zz(mn)+2*pi*HF_zz(mn)*(Sz*Iz{1})+2*pi*HF_zy(mn)*(Sz*Iy{1})+2*pi*HF_zx(mn)*(Sz*Ix{1});
                 % NQI
-                if opt("Bterm")==true
+                if parameters.Bterm==true
                     Hfree_p=Hfree_p+NQI(mn,1,1)*Ix{1}*Ix{1};
                     Hfree_p=Hfree_p+NQI(mn,1,2)*Ix{1}*Iy{1};
                     Hfree_p=Hfree_p+NQI(mn,1,3)*Ix{1}*Iz{1};
@@ -234,8 +234,8 @@ function endor_amp=kehl_cp_calc_rlx(constants,spinOps,spinSys,expt,opt,paramsEND
                 end
 
                 % get offset for sc CP calculation
-                if opt("powder")==false
-                    [v_CP,paramsENDOR]=kehl_cp_offset(opt,paramsENDOR,expt,spinSys,v_off_S,HF_zz,NQI_zz,mn,i);
+                if parameters.powder==false
+                    [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,expt,spinSys,v_off_S,HF_zz,NQI_zz,mn,i);
                 end
 
             else
@@ -243,7 +243,7 @@ function endor_amp=kehl_cp_calc_rlx(constants,spinOps,spinSys,expt,opt,paramsEND
                     % HF
                     Hfree_p=Hfree_p-2*pi*v_L(mm)*Iz{mm}+2*pi*HF_zz(mm)*(Sz*Iz{mm})+2*pi*HF_zy(mm)*(Sz*Iy{mm})+2*pi*HF_zx(mm)*(Sz*Ix{mm})+2*pi*v_L(mm)*CS_zz(mm)*Iz{mm};
                     % NQI
-                    if opt("Bterm")==true
+                    if parameters.Bterm==true
                         Hfree_p=Hfree_p+NQI(mm,1,1)*Ix{mm}*Ix{mm};
                         Hfree_p=Hfree_p+NQI(mm,1,2)*Ix{mm}*Iy{mm};
                         Hfree_p=Hfree_p+NQI(mm,1,3)*Ix{mm}*Iz{mm};
@@ -258,8 +258,8 @@ function endor_amp=kehl_cp_calc_rlx(constants,spinOps,spinSys,expt,opt,paramsEND
                     end
 
                     % get offset for sc CP calculation
-                    if opt("powder")==false
-                        [v_CP,paramsENDOR]=kehl_cp_offset(opt,paramsENDOR,expt,spinSys,v_off_S,HF_zz,NQI_zz,mm,i);
+                    if parameters.powder==false
+                        [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR,expt,spinSys,v_off_S,HF_zz,NQI_zz,mm,i);
                     end
                 end
                  if spinSys("D_used")==true
@@ -294,7 +294,7 @@ function endor_amp=kehl_cp_calc_rlx(constants,spinOps,spinSys,expt,opt,paramsEND
             % loop over cp frequencies (y-axis)
             for c=1:Npts_CP
 
-            if opt("powder")==true
+            if parameters.powder==true
                 v_CP=expt("start_CP")+step_CP*(c-1);
             end
 
@@ -314,7 +314,7 @@ function endor_amp=kehl_cp_calc_rlx(constants,spinOps,spinSys,expt,opt,paramsEND
                 HSL=Hfree_p+sl*Sy;
 
 
-                if opt("Bterm")==false
+                if parameters.Bterm==false
                     if spinSys('N_SpinSys')>1
                         m=1;
                         HRF=HRF+2*pi*v_RF*Iz{m}+oneN*Ix{m};
@@ -360,7 +360,7 @@ function endor_amp=kehl_cp_calc_rlx(constants,spinOps,spinSys,expt,opt,paramsEND
                 Hfree=full(hilb2liouv(sparse(Hfree),'comm'));
 
 
-                    if opt("Bterm")==false
+                    if parameters.Bterm==false
                         U3=full(propagator(spinOps('spin_system'),1i*sparse(RRho-1i*full(hilb2liouv(sparse(HSL_t),'comm'))),t(3)));
 
                         U5=full(propagator(spinOps('spin_system'),1i*sparse(R-1i*full(hilb2liouv(sparse(HRF),'comm'))),t(5)));
@@ -377,8 +377,8 @@ function endor_amp=kehl_cp_calc_rlx(constants,spinOps,spinSys,expt,opt,paramsEND
                         U10=full(propagator(spinOps('spin_system'),1i*sparse(R-1i*Hfree),t(8)+t(7)/2));
                         U11=full(propagator(spinOps('spin_system'),1i*sparse(R-1i*Hfree),t11));
                     else
-                        U3=kehl_cp_bterm_rlx(opt,expt,v_CP,HSL_t,Ix,t(3),Ni_ENDOR,N_spinSys,RRho,spinOps('spin_system'));
-                        U5=kehl_rf_bterm_rlx(opt,expt,v_RF,Hfree_p,Iy,t(5),Ni_ENDOR,N_spinSys,R,spinOps('spin_system'));
+                        U3=kehl_cp_bterm_rlx(parameters,expt,v_CP,HSL_t,Ix,t(3),Ni_ENDOR,N_spinSys,RRho,spinOps('spin_system'));
+                        U5=kehl_rf_bterm_rlx(parameters,expt,v_RF,Hfree_p,Iy,t(5),Ni_ENDOR,N_spinSys,R,spinOps('spin_system'));
 
                         U1=full(propagator(spinOps('spin_system'),1i*sparse(R-1i*Hprep),t(1)));
                         U2=full(propagator(spinOps('spin_system'),1i*sparse(R-1i*Hfree),t(2)));
@@ -428,7 +428,7 @@ function endor_amp=kehl_cp_calc_rlx(constants,spinOps,spinSys,expt,opt,paramsEND
     end
 end
 
-function grumble(constants,spinOps,spinSys,expt,opt,paramsENDOR,EPR)
+function grumble(constants,spinOps,spinSys,expt,parameters,paramsENDOR,EPR)
 if ~isa(constants,'containers.Map')
     error('constants must be a containers.Map object.');
 end
@@ -441,8 +441,8 @@ end
 if ~isa(expt,'containers.Map')
     error('expt must be a containers.Map object.');
 end
-if ~isa(opt,'containers.Map')
-    error('opt must be a containers.Map object.');
+if ~isstruct(parameters)
+    error('parameters must be a structure.');
 end
 if ~isa(paramsENDOR,'containers.Map')
     error('paramsENDOR must be a containers.Map object.');

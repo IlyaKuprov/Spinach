@@ -3,7 +3,7 @@
 % only for I=1/2 and I=1
 %
 % input parameters:
-% opt: the Map containing the optional paramters
+% parameters: structure containing simulation parameters
 % paramsENDOR_IN: the Map containing the ENDOR parameters
 % expt: the Map containing the experimental parameters
 % spinSys: the Map describing the spin system
@@ -20,14 +20,14 @@
 % February 2024 A. Kehl (akehl@gwdg.de)
 %
 
-function [v_CP,paramsENDOR]=kehl_cp_offset(opt,paramsENDOR_IN,expt,spinSys,v_off_S,HF_zz,NQI_zz,m,kk)
+function [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR_IN,expt,spinSys,v_off_S,HF_zz,NQI_zz,m,kk)
 
     % Check consistency
-    grumble(opt,paramsENDOR_IN,expt,spinSys,v_off_S,HF_zz,NQI_zz,m,kk);
+    grumble(parameters,paramsENDOR_IN,expt,spinSys,v_off_S,HF_zz,NQI_zz,m,kk);
     paramsENDOR=paramsENDOR_IN;
     I=spinSys("I");
 
-    if opt("Bterm")==false
+    if parameters.Bterm==false
          if I(m)==1/2
             if kk<0
 
@@ -52,7 +52,7 @@ function [v_CP,paramsENDOR]=kehl_cp_offset(opt,paramsENDOR_IN,expt,spinSys,v_off
                 end
             end
 
-            if opt("sel_CP")==2
+            if parameters.sel_CP==2
                 offset_CP=-offset_CP;
             end
 
@@ -74,25 +74,25 @@ function [v_CP,paramsENDOR]=kehl_cp_offset(opt,paramsENDOR_IN,expt,spinSys,v_off
 
 
             if kk==1
-                if opt("sel_CP")==3
+                if parameters.sel_CP==3
                     offset_CP=-(-omega_beta+omega_alpha+3*NQI_zz(m))/2;
-                elseif opt("sel_CP")==1
+                elseif parameters.sel_CP==1
                     offset_CP=-(omega_beta-omega_alpha+3*NQI_zz(m))/2;
                 end
             elseif kk==0
-                if opt("sel_CP")==4
+                if parameters.sel_CP==4
                     offset_CP=(omega_gamma-omega_beta+3*NQI_zz(m))/2;
-                elseif opt("sel_CP")==3
+                elseif parameters.sel_CP==3
                     offset_CP=-(-omega_beta-omega_alpha+3*NQI_zz(m))/2;
-                elseif opt("sel_CP")==2
+                elseif parameters.sel_CP==2
                     offset_CP=(-omega_gamma+omega_beta+3*NQI_zz(m))/2;
-                elseif opt("sel_CP")==1
+                elseif parameters.sel_CP==1
                     offset_CP=-(+omega_beta+omega_alpha+3*NQI_zz(m))/2;
                 end
             elseif kk==(-1)
-                if opt("sel_CP")==2
+                if parameters.sel_CP==2
                     offset_CP=(omega_gamma+omega_beta+3*NQI_zz(m))/2;
-                elseif opt("sel_CP")==1
+                elseif parameters.sel_CP==1
                     offset_CP=(-omega_gamma-omega_beta+3*NQI_zz(m))/2;
                 end
             end
@@ -106,9 +106,9 @@ function [v_CP,paramsENDOR]=kehl_cp_offset(opt,paramsENDOR_IN,expt,spinSys,v_off
     paramsENDOR("yCoords")=v_CP;
 end
 
-function grumble(opt,paramsENDOR_IN,expt,spinSys,v_off_S,HF_zz,NQI_zz,m,kk)
-if ~isa(opt,'containers.Map')
-    error('opt must be a containers.Map object.');
+function grumble(parameters,paramsENDOR_IN,expt,spinSys,v_off_S,HF_zz,NQI_zz,m,kk)
+if ~isstruct(parameters)
+    error('parameters must be a structure.');
 end
 if ~isa(paramsENDOR_IN,'containers.Map')
     error('paramsENDOR_IN must be a containers.Map object.');

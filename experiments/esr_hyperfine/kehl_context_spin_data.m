@@ -96,15 +96,15 @@ function parameters=kehl_context_spin_data(spin_system,parameters)
         for n=1:n_epr
             spin_idx=epr_spins(n);
 
-            % Convert Spinach magnetogyric ratio to Hz/T
+            % Store Spinach magnetogyric ratio in rad/s/T
             [gamma,~]=spin(isotopes{spin_idx});
-            g_N_EPR(n)=gamma/(2*pi);
+            g_N_EPR(n)=gamma;
             A_EPR(3*n-2:3*n,:)=kehl_coupling_matrix(spin_system,electron_idx,spin_idx);
             Q_block=kehl_coupling_matrix(spin_system,spin_idx,spin_idx);
             Q_EPR(3*n-2:3*n,:)=Q_block;
             EPR_Q_used=EPR_Q_used||any(Q_block(:));
         end
-        parameters.epr_gamma_hz_t=g_N_EPR;
+        parameters.epr_gamma=g_N_EPR;
         parameters.epr_hfc_matrix=A_EPR;
         parameters.epr_nqi_matrix=Q_EPR;
         parameters.epr_nqi_active=EPR_Q_used;
@@ -113,7 +113,7 @@ function parameters=kehl_context_spin_data(spin_system,parameters)
         parameters.epr_isotopes={};
         parameters.n_epr=0;
         parameters.epr_spin_numbers=zeros(0,1);
-        parameters.epr_gamma_hz_t=zeros(0,1);
+        parameters.epr_gamma=zeros(0,1);
         parameters.epr_hfc_matrix=zeros(0,3);
         parameters.epr_nqi_matrix=zeros(0,3);
         parameters.epr_nqi_active=false;

@@ -8,7 +8,7 @@
 %
 % Outputs:
 %
-%   constants        - map of physical constants in Kehl units.
+%   constants        - map of physical constants in angular-frequency units.
 %
 % February 2024 A. Kehl (akehl@gwdg.de)
 % May 2026 Spinach integration
@@ -21,11 +21,10 @@ function constants=kehl_context_constants(spin_system)
     grumble(spin_system);
 
     constants=containers.Map;
-    constants('H')=2*pi*spin_system.tols.hbar;
-    constants('K_B')=spin_system.tols.kbol/constants('H');
+    constants('HBAR')=spin_system.tols.hbar;
+    constants('K_B')=spin_system.tols.kbol/constants('HBAR');
     constants('MU_B')=spin_system.tols.muB;
-    constants('GE')=spin_system.tols.freeg*spin_system.tols.muB/constants('H');
-    constants('CONST1')=constants('GE')/1e10;
+    constants('GE')=spin_system.tols.freeg*spin_system.tols.muB/constants('HBAR');
 end
 
 % Consistency enforcement

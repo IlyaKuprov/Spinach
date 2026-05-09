@@ -53,16 +53,16 @@ function endor_kehl_time_powder()
     spin_system=basis(spin_system,bas);
 
     % ENDOR context metadata and simulation parameters
-    parameters.mw_freq_ghz=33.7727;
-    parameters.static_field_g=12052.1;
-    parameters.field_step_g=0.5;
-    parameters.endor_res_mhz=0.24;
-    parameters.endor_range_mhz=144.24;
-    parameters.pulse_times_ns=[12,1600,12,1000,6000,1000,6000,344240,12];
+    parameters.mw_freq=2.122001324237840e11;
+    parameters.static_field=1.20521;
+    parameters.field_step=5e-5;
+    parameters.time_res=2.4e-7;
+    parameters.time_range=1.4424e-4;
+    parameters.pulse_times=[12e-9,1.6e-6,12e-9,1e-6,6e-6,1e-6,6e-6,344.24e-6,12e-9];
     parameters.rf_field_from_pulses=true;
-    parameters.epr_freq_min_ghz=32;
-    parameters.epr_freq_range_ghz=3;
-    parameters.epr_freq_step_ghz=0.001;
+    parameters.epr_freq_min=2.010619298297468e11;
+    parameters.epr_freq_range=1.884955592153876e10;
+    parameters.epr_freq_step=6.283185307179586e6;
     parameters.pulse_file=fullfile(fileparts(mfilename('fullpath')),...
         'kehl_mlr09_12ns_pulse.txt');
     parameters.multipulses=false;
@@ -77,7 +77,7 @@ function endor_kehl_time_powder()
     % Plotting
     sim=endor_amp(:)-endor_amp(1);
     sim=sim/min(sim);
-    plot((x_coords(:))*1e-6,sim);
+    plot(x_coords(:),sim);
 
 end
 

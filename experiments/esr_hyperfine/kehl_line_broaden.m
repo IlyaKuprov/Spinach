@@ -21,8 +21,14 @@ function data_conv=kehl_line_broaden(data,parameters)
     % Check consistency
     grumble(data,parameters);
 
+    % Return immediately when broadening is disabled
+    if (parameters.Lorentzian~=1)&&(parameters.Gaussian~=1)
+        data_conv=data;
+        return
+    end
+
     % Get ENDOR sweep width
-    sw=parameters.endor_range_hz;
+    sw=parameters.endor_range;
     if parameters.Lorentzian==1
 
         % Lorentzian broadening
@@ -66,8 +72,6 @@ function data_conv=kehl_line_broaden(data,parameters)
         endintens(1)=0.5*endintens(1);
         data_conv(:)=-abs(fft(endintens(:)));
 
-    else
-        data_conv=data;
     end
 end
 function grumble(data,parameters)

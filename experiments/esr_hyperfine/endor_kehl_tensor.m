@@ -32,25 +32,23 @@ end
 function parameters=kehl_tensor_parameters(parameters)
 
     % Get pulse sequence timing and RF-field policy
-    constants=parameters.constants;
-    t=parameters.pulse_times_s;
+    t=parameters.pulse_times;
     [rf_nutations,rf_auto]=kehl_rf_policy(parameters);
 
     % Set tensor RF nutation fields
     if rf_auto==false
         if size(rf_nutations,1)==2
-            parameters.electron_nutation=rf_nutations(1)*2*pi*1e6;
-            parameters.nuclear_nutation=rf_nutations(2)*2*pi*1e3;
-            parameters.pulse_width=parameters.electron_nutation/...
-                (2*pi*constants('CONST1')*1e10);
+            parameters.electron_nutation=rf_nutations(1);
+            parameters.nuclear_nutation=rf_nutations(2);
         else
-            error('parameters.rf_nutation_freqs has incompatible dimensions.');
+            error('parameters.rf_nutations has incompatible dimensions.');
         end
     else
-        parameters.electron_nutation=2*pi/(2*t(2));
-        parameters.nuclear_nutation=2*pi/(2*t(1));
-        parameters.pulse_width=parameters.electron_nutation/...
-            (2*pi*constants('CONST1')*1e10);
+        parameters.electron_nutation=pi/t(2);
+        parameters.nuclear_nutation=pi/t(1);
+    end
+    if ~isfield(parameters,'excite_width')
+        parameters.excite_width=parameters.electron_nutation;
     end
 
     % Append standard ENDOR sweep-axis data
@@ -88,7 +86,7 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters,R)
 
     % Unpack context maps
 
-    t=parameters.pulse_times_s;
+    t=parameters.pulse_times;
     Nint=8;
 
     B_sel=EPR("B_sel");
@@ -112,7 +110,7 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters,R)
         % Select orientation-specific parameters
         B=B_sel(j);
         euler_angles=euler_sel(j,:);
-        const_R=1/size(Sz,2)*constants('GE')*B/(2*pi*constants('K_B')*parameters.T);
+        const_R=1/size(Sz,2)*constants('GE')*B/(constants('K_B')*parameters.T);
 
         HF_zz=HF_zz_sel(j,:);
 
@@ -149,7 +147,7 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters,R)
                     HRF=Hfree_p;
 
                     if parameters.Bterm==false
-                        Hcorr=2*pi*v_RF*Iz_rf;
+                        Hcorr=v_RF*Iz_rf;
                         HRF=Hfree_p+Hcorr+oneN*Iy_rf;
                     end
 

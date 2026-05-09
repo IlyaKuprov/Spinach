@@ -23,7 +23,7 @@ function M=kehl_nuclear_cs_matrix(spin_system,spin_idx)
 
     % Convert the Spinach Zeeman tensor into chemical shift in ppm
     M=(spin_system.inter.zeeman.matrix{spin_idx}/...
-        spin_system.inter.basefrqs(spin_idx)-eye(3,3))*1e12;
+        spin_system.inter.basefrqs(spin_idx)-eye(3,3))*1e6;
 
 end
 

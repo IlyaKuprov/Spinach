@@ -4,8 +4,8 @@
 %
 % Parameters:
 %
-%   offset           - current electron offset frequency.
-%   reference_offset - first electron offset frequency.
+%   offset           - current electron angular-frequency offset.
+%   reference_offset - first electron angular-frequency offset.
 %   n_steps          - integration divisor.
 %
 % Outputs:
@@ -24,13 +24,13 @@ function timestep=kehl_offset_step(offset,reference_offset,n_steps)
 
     % Use the current offset when it is non-zero
     if offset~=0
-        timestep=1/(offset*n_steps);
+        timestep=2*pi/(offset*n_steps);
         return
     end
 
     % Fall back to the reference offset if available
     if reference_offset~=0
-        timestep=1/(reference_offset*n_steps);
+        timestep=2*pi/(reference_offset*n_steps);
         return
     end
 

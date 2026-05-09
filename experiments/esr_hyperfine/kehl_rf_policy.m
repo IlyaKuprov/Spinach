@@ -8,7 +8,7 @@
 %
 % Outputs:
 %
-%   rf_nutations     - user-specified nutation-frequency array.
+%   rf_nutations     - user-specified nutation angular-frequency array.
 %   rf_auto          - true when nutation fields should be inferred.
 %
 % February 2024 A. Kehl (akehl@gwdg.de)
@@ -21,10 +21,10 @@ function [rf_nutations,rf_auto]=kehl_rf_policy(parameters)
     % Check consistency
     grumble(parameters);
 
-    % Get explicit nutation-frequency data when supplied
+    % Get explicit nutation angular-frequency data when supplied
     rf_nutations=[];
-    if isfield(parameters,'rf_nutation_freqs')
-        rf_nutations=parameters.rf_nutation_freqs;
+    if isfield(parameters,'rf_nutations')
+        rf_nutations=parameters.rf_nutations;
     end
 
     % Infer fields from pulses unless explicitly disabled

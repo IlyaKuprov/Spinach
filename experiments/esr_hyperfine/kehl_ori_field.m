@@ -58,11 +58,7 @@ function EPR=kehl_ori_field(spin_system,parameters)
 
     % for powder pattern
     if parameters.powder==true
-        if isfield(parameters,'excite_width')
-            W1=parameters.excite_width;
-        else
-            W1=parameters.pulse_width*constants("CONST1")*1e10;
-        end
+        W1=parameters.excite_width;
 
         % Loop over orientations
         for ii=1:Ntheta
@@ -186,9 +182,9 @@ function EPR=kehl_ori_field(spin_system,parameters)
                 % Select microwave-active EPR fields in Liouville space
                 [field_roots,trans_prob_EPR]=kehl_epr_transitions(...
                     spin_system,parameters,euler_angles,'field',...
-                    parameters.mw_freq_hz);
+                    parameters.mw_freq);
                 bin=round((field_roots-fieldAxis(1))/...
-                    parameters.field_step_t)+1;
+                    parameters.field_step)+1;
                 if isempty(trans_prob_EPR)
                     hit_list=[];
                 else
@@ -208,17 +204,18 @@ function EPR=kehl_ori_field(spin_system,parameters)
                 for root_idx=1:numel(field_roots)
 
                     % Magnetic field offset in T
-                    DeltaB=field_roots(root_idx)-parameters.field_t;
+                    DeltaB=field_roots(root_idx)-parameters.static_field;
 
                     if isfield(parameters,'pulse_file')
-                        scalefactor=kehl_ori_field_pulsescale(parameters,DeltaB,constants("CONST1"));
+                        scalefactor=kehl_ori_field_pulsescale(parameters,DeltaB);
                     else
 
-                        if abs(DeltaB)<=abs(parameters.nwidth*(W1/(constants("CONST1")*1e10)))
+                        field_width=W1/constants('GE');
+                        if abs(DeltaB)<=abs(parameters.nwidth*field_width)
 
                             %exp('res_EN')
                             if max(abs(HF_zz))>1
-                                Scale=(DeltaB^2-(W1/(constants("CONST1")*1e10))^2)/(DeltaB^2+(W1/(constants("CONST1")*1e10))^2);
+                                Scale=(DeltaB^2-field_width^2)/(DeltaB^2+field_width^2);
                                 Scale=(1-Scale)/2;
                             else
                                 Scale=0;
@@ -259,7 +256,7 @@ function EPR=kehl_ori_field(spin_system,parameters)
         geff=parameters.g_iso;
 
         %effective B field for given theta and phi
-        Beff=parameters.mw_freq_hz*constants('H')/(constants('MU_B')*geff);
+        Beff=parameters.mw_freq*constants('HBAR')/(constants('MU_B')*geff);
 
         HF_zz=zeros(1,n_endor);
         HF_zx=zeros(1,n_endor);

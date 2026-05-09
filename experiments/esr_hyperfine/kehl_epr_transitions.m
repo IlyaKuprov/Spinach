@@ -9,11 +9,11 @@
 %   parameters       - Kehl ENDOR context parameter structure.
 %   euler_angles     - Kehl orientation angles stored by the context.
 %   mode             - 'field' for transition fields, or 'frequency' for transition frequencies.
-%   probe            - microwave frequency in Hz for 'field', or magnetic field in T for 'frequency'.
+%   probe            - microwave angular frequency for 'field', or magnetic field in T for 'frequency'.
 %
 % Outputs:
 %
-%   positions        - transition fields in T, or transition frequencies in Hz.
+%   positions        - transition fields in T, or transition angular frequencies in rad/s.
 %   moments          - microwave transition moments.
 %
 % February 2024 A. Kehl (akehl@gwdg.de)
@@ -33,7 +33,7 @@ function [positions,moments]=kehl_epr_transitions(spin_system,...
     % Solve the transition-selection problem in Liouville space
     switch mode
         case 'field'
-            omega=2*pi*probe;
+            omega=probe;
             dim=size(Hc,1);
             [uv,roots]=eig(omega*speye(dim)-full(Hc),full(Hz),'vector');
             hit_list=(~isfinite(roots))|...
@@ -51,7 +51,7 @@ function [positions,moments]=kehl_epr_transitions(spin_system,...
             [uv,omega]=eig(full(H),'vector');
             hit_list=(~isfinite(omega))|...
                 (abs(imag(omega))>sqrt(eps)*max(1,abs(real(omega))));
-            positions=real(omega)/(2*pi);
+            positions=real(omega);
             hit_list=hit_list|(positions<=0);
         otherwise
             error('unexpected transition-selection mode.');
@@ -125,39 +125,39 @@ function [Hz,Hc,Hmw]=epr_liouvillian(spin_system,parameters,euler_angles)
     electron_idx=parameters.electron_spin_idx;
     g_lab=R*parameters.g_matrix*R';
     Sz=operator(spin_system,'Lz',electron_idx);
-    Hz=Hz+2*pi*parameters.constants('MU_B')*g_lab(3,3)*...
-        Sz/parameters.constants('H');
+    Hz=Hz+parameters.constants('MU_B')*g_lab(3,3)*...
+        Sz/parameters.constants('HBAR');
 
     % Add nuclear Zeeman, hyperfine, and quadrupolar terms
     for n=1:parameters.n_epr
         spin_idx=parameters.epr_spins(n);
         Iz=operator(spin_system,'Lz',spin_idx);
-        Hz=Hz-2*pi*parameters.epr_gamma_hz_t(n)*Iz;
+        Hz=Hz-parameters.epr_gamma(n)*Iz;
         A=R*parameters.epr_hfc_matrix(3*n-2:3*n,:)*R';
-        Hc=Hc+2*pi*A(3,3)*kehl_product_comm(spin_system,...
+        Hc=Hc+A(3,3)*kehl_product_comm(spin_system,...
             {'Lz','Lz'},[electron_idx spin_idx]);
-        Hc=Hc+2*pi*sqrt(A(1,3)^2+A(2,3)^2)*...
+        Hc=Hc+sqrt(A(1,3)^2+A(2,3)^2)*...
             kehl_product_comm(spin_system,{'Lz','Lx'},...
             [electron_idx spin_idx]);
         if parameters.epr_nqi_active
             Q=R*parameters.epr_nqi_matrix(3*n-2:3*n,:)*R';
-            Hc=Hc+2*pi*Q(1,1)*kehl_product_comm(spin_system,...
+            Hc=Hc+Q(1,1)*kehl_product_comm(spin_system,...
                 {'Lx','Lx'},[spin_idx spin_idx]);
-            Hc=Hc+2*pi*Q(1,2)*kehl_product_comm(spin_system,...
+            Hc=Hc+Q(1,2)*kehl_product_comm(spin_system,...
                 {'Lx','Ly'},[spin_idx spin_idx]);
-            Hc=Hc+2*pi*Q(1,3)*kehl_product_comm(spin_system,...
+            Hc=Hc+Q(1,3)*kehl_product_comm(spin_system,...
                 {'Lx','Lz'},[spin_idx spin_idx]);
-            Hc=Hc+2*pi*Q(2,1)*kehl_product_comm(spin_system,...
+            Hc=Hc+Q(2,1)*kehl_product_comm(spin_system,...
                 {'Ly','Lx'},[spin_idx spin_idx]);
-            Hc=Hc+2*pi*Q(2,2)*kehl_product_comm(spin_system,...
+            Hc=Hc+Q(2,2)*kehl_product_comm(spin_system,...
                 {'Ly','Ly'},[spin_idx spin_idx]);
-            Hc=Hc+2*pi*Q(2,3)*kehl_product_comm(spin_system,...
+            Hc=Hc+Q(2,3)*kehl_product_comm(spin_system,...
                 {'Ly','Lz'},[spin_idx spin_idx]);
-            Hc=Hc+2*pi*Q(3,1)*kehl_product_comm(spin_system,...
+            Hc=Hc+Q(3,1)*kehl_product_comm(spin_system,...
                 {'Lz','Lx'},[spin_idx spin_idx]);
-            Hc=Hc+2*pi*Q(3,2)*kehl_product_comm(spin_system,...
+            Hc=Hc+Q(3,2)*kehl_product_comm(spin_system,...
                 {'Lz','Ly'},[spin_idx spin_idx]);
-            Hc=Hc+2*pi*Q(3,3)*kehl_product_comm(spin_system,...
+            Hc=Hc+Q(3,3)*kehl_product_comm(spin_system,...
                 {'Lz','Lz'},[spin_idx spin_idx]);
         end
     end
@@ -223,18 +223,18 @@ end
 
 % Frequency root tolerance
 function tol=freq_tol(parameters,positions)
-    if isfield(parameters,'epr_freq_step_hz')
-        tol=max(parameters.epr_freq_step_hz*1e-6,...
+    if isfield(parameters,'epr_freq_step')
+        tol=max(parameters.epr_freq_step*1e-6,...
             100*eps(max(abs(positions))));
     else
-        tol=max(1e-6,100*eps(max(abs(positions))));
+        tol=max(1,100*eps(max(abs(positions))));
     end
 end
 
 % Field root tolerance
 function tol=field_tol(parameters,positions)
-    if isfield(parameters,'field_step_t')
-        tol=max(parameters.field_step_t*1e-6,...
+    if isfield(parameters,'field_step')
+        tol=max(parameters.field_step*1e-6,...
             100*eps(max(abs(positions))));
     else
         tol=max(1e-12,100*eps(max(abs(positions))));
@@ -264,4 +264,3 @@ function grumble(spin_system,parameters,euler_angles,mode,probe)
         error('probe must be a real numeric scalar.');
     end
 end
-

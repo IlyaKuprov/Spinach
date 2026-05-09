@@ -5,7 +5,7 @@
 % Parameters:
 %
 %   parameters       - Kehl ENDOR context parameter structure.
-%   DeltaOm          - frequency offset.
+%   DeltaOm          - angular-frequency offset.
 %
 % Outputs:
 %
@@ -44,8 +44,8 @@ function scalefactor=kehl_ori_freq_pulsescale(parameters,DeltaOm)
         Y=y;
     end
 
-    % Convert angular-frequency offset to MHz profile-bin units
-    DeltaOM=DeltaOm*2*pi*1e-6;
+    % Convert angular-frequency offset to pulse-profile bins
+    DeltaOM=DeltaOm*1e-6;
     binDOM=round(DeltaOM)+(dx/2+1);
     if binDOM>0&&binDOM<(n+1)
         scalefactor=Y(binDOM);

@@ -1,4 +1,4 @@
-% Cross-polarisation frequency offset for Kehl ENDOR kernels. Syntax:
+% Cross-polarisation angular-frequency offset for Kehl ENDOR kernels. Syntax:
 %
 %      [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR_IN,...
 %
@@ -6,13 +6,13 @@
 %
 %   parameters       - Kehl ENDOR context parameter structure.
 %   paramsENDOR_IN   - map containing ENDOR parameters.
-%   v_off_S          - electron offset frequency.
+%   v_off_S          - electron angular-frequency offset.
 %   HF_zz,NQI_zz     - effective hyperfine and quadrupole couplings.
 %   m,kk             - nucleus and offset indices.
 %
 % Outputs:
 %
-%   v_CP             - cross-polarisation frequency.
+%   v_CP             - cross-polarisation angular frequency.
 %   paramsENDOR      - updated ENDOR parameter map.
 %
 % February 2024 A. Kehl (akehl@gwdg.de)
@@ -35,9 +35,9 @@ function [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR_IN,...
         if spin_numbers(m)==1/2
             if kk<0
                 nu_alpha=sqrt((v_off_S+HF_zz(m)/2)^2+...
-                    (parameters.electron_nutation/(2*pi))^2);
+                    (parameters.electron_nutation)^2);
                 nu_beta=sqrt((v_off_S-HF_zz(m)/2)^2+...
-                    (parameters.electron_nutation/(2*pi))^2);
+                    (parameters.electron_nutation)^2);
 
                 if HF_zz(m)>0
                     offset_CP=1/2*(nu_alpha+nu_beta);
@@ -46,9 +46,9 @@ function [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR_IN,...
                 end
             else
                 nu_alpha=sqrt((v_off_S+HF_zz(m)/2)^2+...
-                    (parameters.electron_nutation/(2*pi))^2);
+                    (parameters.electron_nutation)^2);
                 nu_beta=sqrt((v_off_S-HF_zz(m)/2)^2+...
-                    (parameters.electron_nutation/(2*pi))^2);
+                    (parameters.electron_nutation)^2);
 
                 if HF_zz(m)>0
                     offset_CP=1/2*(nu_alpha-nu_beta);
@@ -73,11 +73,11 @@ function [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR_IN,...
             end
 
             omega_alpha=sqrt((v_off_S+HF_zz(m))^2+...
-                (parameters.electron_nutation/(2*pi))^2);
+                (parameters.electron_nutation)^2);
             omega_beta=sqrt((v_off_S)^2+...
-                (parameters.electron_nutation/(2*pi))^2);
+                (parameters.electron_nutation)^2);
             omega_gamma=sqrt((v_off_S-HF_zz(m))^2+...
-                (parameters.electron_nutation/(2*pi))^2);
+                (parameters.electron_nutation)^2);
 
             if kk==1
                 if parameters.sel_CP==3
@@ -106,10 +106,10 @@ function [v_CP,paramsENDOR]=kehl_cp_offset(parameters,paramsENDOR_IN,...
     else
 
         % Use externally supplied CP start when RF B term is active
-        offset_CP=parameters.cp_start_hz;
+        offset_CP=parameters.cp_start;
     end
 
-    % Write the selected CP frequency into the ENDOR parameter map
+    % Write the selected CP angular frequency into the ENDOR parameter map
     v_L=paramsENDOR('v_L');
     v_CP=v_L(m)-offset_CP;
     paramsENDOR('yCoords')=v_CP;

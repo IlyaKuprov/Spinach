@@ -32,33 +32,29 @@ end
 function parameters=kehl_spinlock_parameters(parameters)
 
     % Get pulse sequence timing and RF-field policy
-    constants=parameters.constants;
-    t=parameters.pulse_times_s;
+    t=parameters.pulse_times;
     [rf_nutations,rf_auto]=kehl_rf_policy(parameters);
 
     % Set spin-lock RF nutation fields
     if rf_auto==false
         if size(rf_nutations,1)==3
-            parameters.spinlock_nutation=rf_nutations(1)*2*pi*1e6;
-            parameters.electron_nutation=rf_nutations(2)*2*pi*1e6;
-            parameters.nuclear_nutation=rf_nutations(3)*2*pi*1e3;
-            parameters.pulse_width=parameters.spinlock_nutation/...
-                (2*pi*constants('CONST1')*1e10);
+            parameters.spinlock_nutation=rf_nutations(1);
+            parameters.electron_nutation=rf_nutations(2);
+            parameters.nuclear_nutation=rf_nutations(3);
         elseif size(rf_nutations,1)==1
-            parameters.spinlock_nutation=rf_nutations(1)*2*pi*1e6;
-            parameters.electron_nutation=2*pi/(4*t(5));
-            parameters.nuclear_nutation=2*pi/(2*t(3));
-            parameters.pulse_width=parameters.spinlock_nutation/...
-                (2*pi*constants('CONST1')*1e10);
+            parameters.spinlock_nutation=rf_nutations(1);
+            parameters.electron_nutation=pi/(2*t(5));
+            parameters.nuclear_nutation=pi/t(3);
         else
-            error('parameters.rf_nutation_freqs has incompatible dimensions.');
+            error('parameters.rf_nutations has incompatible dimensions.');
         end
     else
-        parameters.spinlock_nutation=2*pi/(4*t(5));
-        parameters.electron_nutation=2*pi/(4*t(5));
-        parameters.nuclear_nutation=2*pi/(2*t(3));
-        parameters.pulse_width=parameters.spinlock_nutation/...
-            (2*pi*constants('CONST1')*1e10);
+        parameters.spinlock_nutation=pi/(2*t(5));
+        parameters.electron_nutation=pi/(2*t(5));
+        parameters.nuclear_nutation=pi/t(3);
+    end
+    if ~isfield(parameters,'excite_width')
+        parameters.excite_width=parameters.spinlock_nutation;
     end
 
     % Append standard ENDOR sweep-axis data
@@ -93,7 +89,7 @@ function endor_amp=kehl_spinlock_calc(spin_system,parameters,R)
 
     % Unpack context maps
 
-    t=parameters.pulse_times_s;
+    t=parameters.pulse_times;
     Nint=8;
 
     B_sel=EPR("B_sel");
@@ -158,7 +154,7 @@ function endor_amp=kehl_spinlock_calc(spin_system,parameters,R)
                     HRF=Hfree_p;
 
                     if parameters.Bterm==false
-                        Hcorr=2*pi*v_RF*Iz_rf;
+                        Hcorr=v_RF*Iz_rf;
                         HRF=Hfree_p+Hcorr+oneN*Iy_rf;
                     end
 

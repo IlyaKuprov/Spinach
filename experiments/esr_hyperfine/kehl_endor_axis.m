@@ -24,35 +24,36 @@ function parameters=kehl_endor_axis(parameters,mode)
     % Check consistency
     grumble(parameters,mode);
 
-    % Calculate nuclear Larmor frequencies
+    % Calculate nuclear Larmor angular frequencies
     nuclei=parameters.endor_isotopes;
     v_L=zeros(size(nuclei,2),1);
     for n=1:size(nuclei,2)
 
-        % Convert Spinach magnetogyric ratio to Hz/T
+        % Use the Spinach magnetogyric ratio in rad/s/T
         [gamma,~]=spin(nuclei{n});
-        v_L(n)=gamma*parameters.field_t/(2*pi);
+        v_L(n)=gamma*parameters.static_field;
     end
 
     % Build the requested ENDOR axis
     if strcmp(mode,'time')
 
-        % Time-domain x-axis uses microsecond-style legacy scaling
-        range_EN=parameters.endor_range_hz*1e-12;
-        res_EN=parameters.endor_res_hz*1e-12;
+        % Time-domain x-axis uses seconds directly
+        range_EN=parameters.time_range;
+        res_EN=parameters.time_res;
         Npts_EN=round(range_EN/res_EN);
-        start_EN=parameters.time_start_s;
+        start_EN=parameters.time_start;
         step_EN=range_EN/(Npts_EN-1);
     else
 
         % Frequency-domain x-axis uses the ENDOR RF sweep
-        Npts_EN=round(parameters.endor_range_hz/parameters.endor_res_hz);
-        if isfield(parameters,'rf_start_hz')
-            start_EN=parameters.rf_start_hz;
+        range_EN=parameters.endor_range;
+        Npts_EN=round(range_EN/parameters.endor_res);
+        if isfield(parameters,'rf_start')
+            start_EN=parameters.rf_start;
         else
-            start_EN=v_L(1)-parameters.endor_range_hz/2;
+            start_EN=v_L(1)-parameters.endor_range/2;
         end
-        step_EN=parameters.endor_range_hz/(Npts_EN-1);
+        step_EN=range_EN/(Npts_EN-1);
     end
 
     % Populate the Kehl ENDOR parameter map used by sequence kernels
@@ -64,7 +65,7 @@ function parameters=kehl_endor_axis(parameters,mode)
     paramsENDOR('v_L')=v_L;
     paramsENDOR('start_EN')=start_EN;
     paramsENDOR('step_EN')=step_EN;
-    paramsENDOR('range_EN')=parameters.endor_range_hz;
+    paramsENDOR('range_EN')=range_EN;
     paramsENDOR('Npts_EN')=Npts_EN;
     paramsENDOR('x_coords')=x_coords;
     parameters.paramsENDOR=paramsENDOR;

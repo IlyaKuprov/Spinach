@@ -32,34 +32,31 @@ end
 function parameters=kehl_time_parameters(parameters)
 
     % Get pulse sequence timing and RF-field policy
-    constants=parameters.constants;
-    t=parameters.pulse_times_s;
+    t=parameters.pulse_times;
     [rf_nutations,rf_auto]=kehl_rf_policy(parameters);
 
     % Set time-domain RF nutation fields
     if rf_auto==false
         if size(rf_nutations,1)==2
-            parameters.electron_nutation=rf_nutations(1)*2*pi*1e6;
-            parameters.nuclear_nutation=rf_nutations(2)*2*pi*1e3;
-            parameters.pulse_width=parameters.electron_nutation/...
-                (2*pi*constants('CONST1')*1e10);
+            parameters.electron_nutation=rf_nutations(1);
+            parameters.nuclear_nutation=rf_nutations(2);
         else
-            error('parameters.rf_nutation_freqs has incompatible dimensions.');
+            error('parameters.rf_nutations has incompatible dimensions.');
         end
     else
-        parameters.electron_nutation=2*pi/(4*t(1));
-        if isfield(parameters,'rf_flip_angle_deg')
-            parameters.nuclear_nutation=(parameters.rf_flip_angle_deg/180)*...
-                2*pi/(4*t(5));
+        parameters.electron_nutation=pi/(2*t(1));
+        if isfield(parameters,'rf_flip_angle')
+            parameters.nuclear_nutation=parameters.rf_flip_angle/(2*t(5));
         else
-            parameters.nuclear_nutation=2*pi/(4*t(5));
+            parameters.nuclear_nutation=pi/(2*t(5));
         end
-        parameters.pulse_width=parameters.electron_nutation/...
-            (2*pi*constants('CONST1')*1e10);
+    end
+    if ~isfield(parameters,'excite_width')
+        parameters.excite_width=parameters.electron_nutation;
     end
 
     % Append time-domain ENDOR sweep-axis data
-    parameters.time_start_s=t(6);
+    parameters.time_start=t(6);
     parameters=kehl_endor_axis(parameters,'time');
 
 end
@@ -88,7 +85,7 @@ function endor_amp=kehl_time_calc(spin_system,parameters,R)
         Iz_rf=Iz_rf+operator(spin_system,'Lz',spin_idx);
     end
 
-    t=parameters.pulse_times_s;
+    t=parameters.pulse_times;
     Nint=8;
 
     B_sel=EPR("B_sel");
@@ -139,7 +136,7 @@ function endor_amp=kehl_time_calc(spin_system,parameters,R)
             HRF=Hfree_p;
 
             if parameters.Bterm==false
-                Hcorr=2*pi*v_RF*Iz_rf;
+                Hcorr=v_RF*Iz_rf;
                 HRF=Hfree_p+Hcorr+oneN*Iy_rf;
             end
 

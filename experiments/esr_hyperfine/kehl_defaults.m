@@ -111,9 +111,9 @@ function parameters=kehl_defaults(parameters)
         parameters.Lorentzian=false;
     end
 
-    % Lorentzian line broadening, Hz
+    % Lorentzian line broadening, rad/s
     if ~isfield(parameters,'lw_L')
-        parameters.lw_L=20*1e3;
+        parameters.lw_L=1.256637061435917e5;
     end
 
     % Is Gaussian line broadening used?
@@ -121,9 +121,9 @@ function parameters=kehl_defaults(parameters)
         parameters.Gaussian=false;
     end
 
-    % Gaussian line broadening, Hz
+    % Gaussian line broadening, rad/s
     if ~isfield(parameters,'lw_G')
-        parameters.lw_G=20*1e3;
+        parameters.lw_G=1.256637061435917e5;
     end
 end
 function grumble(parameters)

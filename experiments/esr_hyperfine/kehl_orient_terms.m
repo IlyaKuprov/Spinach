@@ -55,12 +55,12 @@ function terms=kehl_orient_terms(parameters,euler_angles)
             Q=R*parameters.nqi_matrix(3*n-2:3*n,:)*R';
             terms.nqi_zz(n)=Q(3,3);
             if parameters.Bterm
-                terms.nqi(n,:,:)=2*pi*Q;
+                terms.nqi(n,:,:)=Q;
             end
         end
         if parameters.cs_active
             CS=R*parameters.cs_matrix(3*n-2:3*n,:)*R';
-            terms.cs_zz(n)=CS(3,3)*1e-12;
+            terms.cs_zz(n)=CS(3,3);
         end
     end
 

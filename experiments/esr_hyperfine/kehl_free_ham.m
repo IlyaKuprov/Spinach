@@ -32,29 +32,30 @@ function H=kehl_free_ham(parameters,paramsENDOR,spin_system,v_off_S,euler_angles
     % Project tensor data onto the selected Kehl orientation
     terms=kehl_orient_terms(parameters,euler_angles);
 
-    % Get the ENDOR Larmor frequencies and electron index
+    % Get the ENDOR Larmor angular frequencies and electron index
     v_L=paramsENDOR('v_L');
     electron_idx=parameters.electron_spin_idx;
 
-    % Start with the electron frequency offset
-    H=2*pi*v_off_S*operator(spin_system,'Lz',electron_idx);
+    % Start with the electron angular-frequency offset
+    H=v_off_S*operator(spin_system,'Lz',electron_idx);
 
     % Add all ENDOR nuclear terms in the legacy Kehl form
     for n=1:parameters.n_endor
         spin_idx=parameters.endor_spins(n);
         Iz=operator(spin_system,'Lz',spin_idx);
-        H=H-2*pi*v_L(n)*Iz+2*pi*v_L(n)*terms.cs_zz(n)*Iz;
-        H=H+2*pi*terms.hf_zz(n)*product_comm(spin_system,...
+        cs_offset=v_L(n)*terms.cs_zz(n)/1e6;
+        H=H-v_L(n)*Iz+cs_offset*Iz;
+        H=H+terms.hf_zz(n)*product_comm(spin_system,...
             {'Lz','Lz'},[electron_idx spin_idx])+...
-            2*pi*terms.hf_zy(n)*product_comm(spin_system,...
+            terms.hf_zy(n)*product_comm(spin_system,...
             {'Lz','Ly'},[electron_idx spin_idx])+...
-            2*pi*terms.hf_zx(n)*product_comm(spin_system,...
+            terms.hf_zx(n)*product_comm(spin_system,...
             {'Lz','Lx'},[electron_idx spin_idx]);
         if parameters.nqi_active
             if parameters.Bterm
                 H=H+nqi_full(spin_system,terms.nqi(n,:,:),spin_idx);
             else
-                H=H+3*pi*terms.nqi_zz(n)*product_comm(spin_system,...
+                H=H+(3/2)*terms.nqi_zz(n)*product_comm(spin_system,...
                     {'Lz','Lz'},[spin_idx spin_idx]);
             end
         end
@@ -63,7 +64,7 @@ function H=kehl_free_ham(parameters,paramsENDOR,spin_system,v_off_S,euler_angles
     % Add the legacy first-nucleus dipolar correction
     if parameters.dipolar_active
         for n=1:numel(terms.dip_zz)
-            H=H+2*pi*terms.dip_zz(n)*legacy_dip_oper(...
+            H=H+terms.dip_zz(n)*legacy_dip_oper(...
                 spin_system,parameters,n+1);
         end
     end

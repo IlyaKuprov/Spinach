@@ -11,7 +11,7 @@
 %
 % Outputs:
 %
-%   offsets          - electron spin offsets for all selected EPR transitions.
+%   offsets          - electron spin angular-frequency offsets for all selected EPR transitions.
 %
 % February 2024 A. Kehl (akehl@gwdg.de)
 % May 2026 Spinach integration
@@ -23,7 +23,7 @@ function offsets=kehl_offsets(parameters,spin_system,B,euler_angles)
     % Check consistency
     grumble(parameters,spin_system,B,euler_angles);
 
-    % Get Liouville-space EPR transition frequencies
+    % Get Liouville-space EPR transition angular frequencies
     [freq_epr,moments]=kehl_epr_transitions(spin_system,parameters,...
         euler_angles,'frequency',B);
 
@@ -39,7 +39,7 @@ function offsets=kehl_offsets(parameters,spin_system,B,euler_angles)
         return
     end
 
-    % Sort transition frequencies for offset construction
+    % Sort transition angular frequencies for offset construction
     freq_epr=sort(freq_epr(:).');
     offsets=zeros(1,numel(freq_epr));
 

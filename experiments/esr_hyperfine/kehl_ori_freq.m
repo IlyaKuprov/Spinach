@@ -22,7 +22,6 @@ function EPR=kehl_ori_freq(spin_system,parameters)
     grumble(spin_system,parameters);
 
     % Unpack context data
-    constants=parameters.constants;
     paramsEPR=parameters.paramsEPR;
     Ntheta=parameters.Nang;
     Nphimax=parameters.Nang;
@@ -59,11 +58,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
 
     % Loop over powder orientations
     if parameters.powder==true
-        if isfield(parameters,'excite_width')
-            W1=parameters.excite_width;
-        else
-            W1=parameters.pulse_width*constants("CONST1")*1e10;
-        end
+        W1=parameters.excite_width;
 
         for ii=1:Ntheta
             theta=ii*pi/Ntheta;
@@ -81,10 +76,8 @@ function EPR=kehl_ori_freq(spin_system,parameters)
                 geff=(dc*g2*dc')^.5;
 
                 % effective B field for given theta and phi
-                Beff=(parameters.field_t*parameters.g_iso)/geff(1);
-                B=parameters.field_t;
-
-                % Resonance frequency for geff at ObsField in GHz
+                Beff=(parameters.static_field*parameters.g_iso)/geff(1);
+                B=parameters.static_field;
 
                 % Rotation matrix into lab system
                 R1=zeros(3);
@@ -181,7 +174,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
                 % Select microwave-active EPR transitions in Liouville space
                 [freq_EPR,trans_prob_EPR]=kehl_epr_transitions(...
                     spin_system,parameters,euler_angles,'frequency',B);
-                hit_list=(freq_EPR<1e9)|(trans_prob_EPR<0.1);
+                hit_list=(freq_EPR<parameters.epr_freq_min)|(trans_prob_EPR<0.1);
                 freq_EPR(hit_list)=[];
                 trans_prob_EPR(hit_list)=[];
 
@@ -190,12 +183,12 @@ function EPR=kehl_ori_freq(spin_system,parameters)
 
                     % Scale resonance to frequency-axis bin
                     scalefactor=0;
-                    bin_freq=round((freq_EPR(p)-parameters.epr_freq_min_hz)/...
-                        parameters.epr_freq_step_hz)+1;
+                    bin_freq=round((freq_EPR(p)-parameters.epr_freq_min)/...
+                        parameters.epr_freq_step)+1;
                     if (bin_freq>=1)&&(bin_freq<=paramsEPR("Npts"))&&...
                             (trans_prob_EPR(p)>0)
                         tmp_epr(bin_freq)=tmp_epr(bin_freq)+trans_prob_EPR(p);
-                        DeltaOm=freq_EPR(p)-parameters.mw_freq_hz;
+                        DeltaOm=freq_EPR(p)-parameters.mw_freq;
 
                         if isfield(parameters,'pulse_file')
                             SF=kehl_ori_freq_pulsescale(parameters,DeltaOm)/2;
@@ -241,7 +234,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
         geff=parameters.g_iso;
 
         %effective B field for given theta and phi
-        B=(parameters.field_t*parameters.g_iso)/geff(1);
+        B=(parameters.static_field*parameters.g_iso)/geff(1);
 
         HF_zz=zeros(1,n_endor);
         HF_zx=zeros(1,n_endor);

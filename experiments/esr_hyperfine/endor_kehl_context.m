@@ -11,7 +11,7 @@
 %
 % Outputs:
 %
-%   varargout        - ENDOR amplitude, broadened spectrum, frequency axis, optional field axis, and Larmor-frequency data.
+%   varargout        - ENDOR amplitude, broadened spectrum, frequency/time axis, optional field axis, and Larmor angular-frequency data.
 %
 % February 2024 A. Kehl (akehl@gwdg.de)
 % May 2026 Spinach integration
@@ -159,33 +159,48 @@ function grumble(spin_system,sequence,parameters,assumptions)
     if ~isfield(parameters,'endor_spins')
         error('parameters.endor_spins must list ENDOR nuclei by Spinach spin index.');
     end
-    if ~isfield(parameters,'mw_freq_ghz')
-        error('parameters.mw_freq_ghz must be specified.');
+    if ~isfield(parameters,'mw_freq')
+        error('parameters.mw_freq must be specified.');
     end
-    if ~isfield(parameters,'static_field_g')
-        error('parameters.static_field_g must be specified.');
+    if ~isfield(parameters,'static_field')
+        error('parameters.static_field must be specified.');
     end
-    if ~isfield(parameters,'field_step_g')
-        error('parameters.field_step_g must be specified.');
+    if ~isfield(parameters,'field_step')
+        error('parameters.field_step must be specified.');
     end
-    if ~isfield(parameters,'endor_res_mhz')
-        error('parameters.endor_res_mhz must be specified.');
+    if isa(sequence,'function_handle')
+        sequence_name=func2str(sequence);
+    else
+        sequence_name=char(sequence);
     end
-    if ~isfield(parameters,'endor_range_mhz')
-        error('parameters.endor_range_mhz must be specified.');
+    if strcmp(sequence_name,'endor_kehl_time')||strcmp(sequence_name,'time')||...
+            strcmp(sequence_name,'timedomain')
+        if ~isfield(parameters,'time_res')
+            error('parameters.time_res must be specified for time-domain ENDOR.');
+        end
+        if ~isfield(parameters,'time_range')
+            error('parameters.time_range must be specified for time-domain ENDOR.');
+        end
+    else
+        if ~isfield(parameters,'endor_res')
+            error('parameters.endor_res must be specified.');
+        end
+        if ~isfield(parameters,'endor_range')
+            error('parameters.endor_range must be specified.');
+        end
     end
-    if ~isfield(parameters,'pulse_times_ns')
-        error('parameters.pulse_times_ns must be specified.');
+    if ~isfield(parameters,'pulse_times')
+        error('parameters.pulse_times must be specified.');
     end
     if parameters.freqDomain==true
-        if ~isfield(parameters,'epr_freq_min_ghz')
-            error('parameters.epr_freq_min_ghz must be specified for frequency-domain EPR.');
+        if ~isfield(parameters,'epr_freq_min')
+            error('parameters.epr_freq_min must be specified for frequency-domain EPR.');
         end
-        if ~isfield(parameters,'epr_freq_range_ghz')
-            error('parameters.epr_freq_range_ghz must be specified for frequency-domain EPR.');
+        if ~isfield(parameters,'epr_freq_range')
+            error('parameters.epr_freq_range must be specified for frequency-domain EPR.');
         end
-        if ~isfield(parameters,'epr_freq_step_ghz')
-            error('parameters.epr_freq_step_ghz must be specified for frequency-domain EPR.');
+        if ~isfield(parameters,'epr_freq_step')
+            error('parameters.epr_freq_step must be specified for frequency-domain EPR.');
         end
     end
     if (~ischar(assumptions))&&(~isstring(assumptions))

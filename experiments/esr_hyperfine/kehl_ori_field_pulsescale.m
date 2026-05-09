@@ -1,12 +1,11 @@
 % Microwave pulse excitation factor for field-domain selection. Syntax:
 %
-%      scalefactor=kehl_ori_field_pulsescale(parameters,DeltaB,CONST1)
+%      scalefactor=kehl_ori_field_pulsescale(parameters,DeltaB)
 %
 % Parameters:
 %
 %   parameters       - Kehl ENDOR context parameter structure.
 %   DeltaB           - field offset.
-%   CONST1           - field-to-frequency conversion constant.
 %
 % Outputs:
 %
@@ -17,10 +16,10 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=kehl_ori_field_pulsescale.m>
 
-function scalefactor=kehl_ori_field_pulsescale(parameters,DeltaB,CONST1)
+function scalefactor=kehl_ori_field_pulsescale(parameters,DeltaB)
 
     % Check consistency
-    grumble(parameters,DeltaB,CONST1);
+    grumble(parameters,DeltaB);
 
     % Load microwave pulse shape
     pulse=fopen(parameters.pulse_file);
@@ -45,8 +44,8 @@ function scalefactor=kehl_ori_field_pulsescale(parameters,DeltaB,CONST1)
         Y=y;
     end
 
-    % Convert field offset to profile-bin units
-    DeltaOM=DeltaB*CONST1*10^4*2*pi;
+    % Convert field offset to pulse-profile bins
+    DeltaOM=DeltaB*parameters.constants('GE')*1e-6;
 
     binDOM=round(DeltaOM)+(dx/2+1);
     if binDOM>0&&binDOM<(n+1)
@@ -58,7 +57,7 @@ function scalefactor=kehl_ori_field_pulsescale(parameters,DeltaB,CONST1)
 end
 
 % Consistency enforcement
-function grumble(parameters,DeltaB,CONST1)
+function grumble(parameters,DeltaB)
     if ~isstruct(parameters)
         error('parameters must be a structure.');
     end
@@ -68,8 +67,8 @@ function grumble(parameters,DeltaB,CONST1)
     if ~isnumeric(DeltaB)
         error('DeltaB must be numeric.');
     end
-    if ~isnumeric(CONST1)
-        error('CONST1 must be numeric.');
+    if (~isfield(parameters,'constants'))||(~isa(parameters.constants,'containers.Map'))
+        error('parameters.constants must be a containers.Map object.');
     end
 end
 

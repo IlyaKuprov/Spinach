@@ -5,7 +5,7 @@
 % Parameters:
 %
 %   parameters       - Kehl ENDOR context parameter structure.
-%   v_RF             - radiofrequency offset.
+%   v_RF             - radiofrequency angular-frequency offset.
 %   Hfree            - Hamiltonian without the RF term.
 %   Iy               - cell array of nuclear Iy spin operators.
 %   t                - pulse length.
@@ -31,7 +31,7 @@ function U=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t,n_endor,spin_system,R)
     grumble(parameters,v_RF,Hfree,Iy,t,n_endor,spin_system,R);
 
     % Incrementation calculation for the RF pulse
-    t_stepRF=1/(v_RF*parameters.N_stepRF);
+    t_stepRF=2*pi/(v_RF*parameters.N_stepRF);
     if isempty(R)
         U_RF=eye(size(Hfree));
     else
@@ -42,7 +42,7 @@ function U=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t,n_endor,spin_system,R)
         HRF=Hfree;
         for k=1:n_endor
             HRF=HRF+2*parameters.nuclear_nutation*Iy{k}*...
-                cos(2*pi*v_RF*t_stepRF*(n-1));
+                cos(v_RF*t_stepRF*(n-1));
         end
         if isempty(R)
             U_step=full(propagator(spin_system,sparse(HRF),t_stepRF));
@@ -53,7 +53,7 @@ function U=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t,n_endor,spin_system,R)
         U_RF=U_step*U_RF;
     end
 
-    U=U_RF^(t*v_RF);
+    U=U_RF^(t*v_RF/(2*pi));
 
 end
 

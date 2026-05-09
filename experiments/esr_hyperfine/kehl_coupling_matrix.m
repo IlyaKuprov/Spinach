@@ -1,4 +1,4 @@
-% Spinach coupling tensor lookup converted to Hz. Syntax:
+% Spinach coupling tensor lookup in angular-frequency units. Syntax:
 %
 %      M=kehl_coupling_matrix(spin_system,row,col)
 %
@@ -9,7 +9,7 @@
 %
 % Outputs:
 %
-%   M                - coupling tensor in Hz.
+%   M                - coupling tensor in rad/s.
 %
 % February 2024 A. Kehl (akehl@gwdg.de)
 % May 2026 Spinach integration
@@ -21,8 +21,8 @@ function M=kehl_coupling_matrix(spin_system,row,col)
     % Check consistency
     grumble(spin_system,row,col);
 
-    % Get coupling tensor in Hz
-    M=kehl_matrix_from_cell(spin_system.inter.coupling.matrix,row,col)/(2*pi);
+    % Get coupling tensor in Spinach angular-frequency units
+    M=kehl_matrix_from_cell(spin_system.inter.coupling.matrix,row,col);
 
 end
 

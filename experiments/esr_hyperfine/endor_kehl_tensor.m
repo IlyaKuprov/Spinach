@@ -70,32 +70,33 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters,R)
     n_endor=parameters.n_endor;
     I=parameters.endor_spin_numbers;
 
-    % Get cached operators and states
-    ops=kehl_operator_basis(spin_system,parameters);
-    Sz=ops.Sz;
-    Iy=ops.Iy;
-    Iz=ops.Iz;
-    SzIz_state=ops.SzIz_state;
+    % Request Spinach operators and states directly
+    electron_idx=parameters.electron_spin_idx;
+    Sz=operator(spin_system,'Lz',electron_idx);
+    Iy=cell(1,n_endor);
+    SzIz_state=cell(1,n_endor);
+    Iy_rf=sparse(size(Sz,1),size(Sz,2));
+    Iz_rf=sparse(size(Sz,1),size(Sz,2));
+    for n=1:n_endor
+        spin_idx=parameters.endor_spins(n);
+        Iy{n}=operator(spin_system,'Ly',spin_idx);
+        SzIz_state{n}=state(spin_system,{'Lz','Lz'},...
+            {electron_idx,spin_idx});
+        Iy_rf=Iy_rf+Iy{n};
+        Iz_rf=Iz_rf+operator(spin_system,'Lz',spin_idx);
+    end
 
     % Unpack context maps
 
     t=parameters.pulse_times_s;
     Nint=8;
 
-    geff_sel=EPR("geff_sel");
     B_sel=EPR("B_sel");
     euler_sel=EPR("euler_sel");
     HF_zz_sel=EPR("HF_zz_sel");
-    HF_zy_sel=EPR("HF_zy_sel");
-    HF_zx_sel=EPR("HF_zx_sel");
-
-    NQI_zz_sel=EPR("NQI_zz_sel");
-    NQI_sel=EPR("NQI_sel");
-    CS_zz_sel=EPR("CS_zz_sel");
 
     S_sel=EPR("S_sel");
 
-    offsets_sel=EPR("offsets");
     Npts_EN=paramsENDOR("Npts_EN");
 
     endor_amp=zeros(1,Npts_EN);
@@ -114,10 +115,6 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters,R)
         const_R=1/size(Sz,2)*constants('GE')*B/(2*pi*constants('K_B')*parameters.T);
 
         HF_zz=HF_zz_sel(j,:);
-
-        NQI=zeros(n_endor,3,3);
-
-        NQI(:,:,:)=2*pi*NQI_sel(j,:,:,:);
 
         S=S_sel(j);
 
@@ -152,8 +149,8 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters,R)
                     HRF=Hfree_p;
 
                     if parameters.Bterm==false
-                        Hcorr=2*pi*v_RF*ops.Iz_rf;
-                        HRF=Hfree_p+Hcorr+oneN*ops.Iy_rf;
+                        Hcorr=2*pi*v_RF*Iz_rf;
+                        HRF=Hfree_p+Hcorr+oneN*Iy_rf;
                     end
 
                     Hfree=Hfree_p+Hcorr;

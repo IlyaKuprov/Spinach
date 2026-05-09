@@ -77,14 +77,20 @@ function endor_amp=kehl_spinlock_calc(spin_system,parameters,R)
     EPR=parameters.epr;
     n_endor=parameters.n_endor;
 
-    % Get cached operators and states
-    ops=kehl_operator_basis(spin_system,parameters);
-    Sx=ops.Sx;
-    Sy=ops.Sy;
-    Sy_state=ops.Sy_state;
-    Ix=ops.Ix;
-    Iy=ops.Iy;
-    Iz=ops.Iz;
+    % Request Spinach operators and states directly
+    electron_idx=parameters.electron_spin_idx;
+    Sx=operator(spin_system,'Lx',electron_idx);
+    Sy=operator(spin_system,'Ly',electron_idx);
+    Sy_state=state(spin_system,'Ly',electron_idx);
+    Iy=cell(1,n_endor);
+    Iy_rf=sparse(size(Sx,1),size(Sx,2));
+    Iz_rf=sparse(size(Sx,1),size(Sx,2));
+    for n=1:n_endor
+        spin_idx=parameters.endor_spins(n);
+        Iy{n}=operator(spin_system,'Ly',spin_idx);
+        Iy_rf=Iy_rf+Iy{n};
+        Iz_rf=Iz_rf+operator(spin_system,'Lz',spin_idx);
+    end
 
     % Unpack context maps
 
@@ -99,9 +105,6 @@ function endor_amp=kehl_spinlock_calc(spin_system,parameters,R)
     HF_zx_sel=EPR("HF_zx_sel");
 
     NQI_zz_sel=EPR("NQI_zz_sel");
-    NQI_sel=EPR("NQI_sel");
-
-    CS_zz_sel=EPR("CS_zz_sel");
 
     S_sel=EPR("S_sel");
 
@@ -127,10 +130,6 @@ function endor_amp=kehl_spinlock_calc(spin_system,parameters,R)
         HF_zx=HF_zx_sel(j,:);
 
         NQI_zz=NQI_zz_sel(j,:);
-        NQI=zeros(n_endor,3,3);
-
-        NQI(:,:,:)=2*pi*NQI_sel(j,:,:,:);
-
         S=S_sel(j);
         offsets=offsets_sel(j,:);
 
@@ -170,8 +169,8 @@ function endor_amp=kehl_spinlock_calc(spin_system,parameters,R)
                     HRF=Hfree_p;
 
                     if parameters.Bterm==false
-                        Hcorr=2*pi*v_RF*ops.Iz_rf;
-                        HRF=Hfree_p+Hcorr+oneN*ops.Iy_rf;
+                        Hcorr=2*pi*v_RF*Iz_rf;
+                        HRF=Hfree_p+Hcorr+oneN*Iy_rf;
                     end
 
                     Hfree=Hfree_p+Hcorr;

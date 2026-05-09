@@ -130,14 +130,20 @@ function endor_amp=kehl_cp_calc(spin_system,parameters,R)
     EPR=parameters.epr;
     n_endor=parameters.n_endor;
 
-    % Get cached operators and states
-    ops=kehl_operator_basis(spin_system,parameters);
-    Sx=ops.Sx;
-    Sy=ops.Sy;
-    Sy_state=ops.Sy_state;
-    Ix=ops.Ix;
-    Iy=ops.Iy;
-    Iz=ops.Iz;
+    % Request Spinach operators and states directly
+    electron_idx=parameters.electron_spin_idx;
+    Sx=operator(spin_system,'Lx',electron_idx);
+    Sy=operator(spin_system,'Ly',electron_idx);
+    Sy_state=state(spin_system,'Ly',electron_idx);
+    Ix=cell(1,n_endor);
+    Iy=cell(1,n_endor);
+    Iz=cell(1,n_endor);
+    for n=1:n_endor
+        spin_idx=parameters.endor_spins(n);
+        Ix{n}=operator(spin_system,'Lx',spin_idx);
+        Iy{n}=operator(spin_system,'Ly',spin_idx);
+        Iz{n}=operator(spin_system,'Lz',spin_idx);
+    end
     t=parameters.pulse_times_s;
     Nint=8;
     Npts_CP=parameters.cp_npoints;
@@ -156,10 +162,6 @@ function endor_amp=kehl_cp_calc(spin_system,parameters,R)
     HF_zx_sel=EPR("HF_zx_sel");
 
     NQI_zz_sel=EPR("NQI_zz_sel");
-    NQI_sel=EPR("NQI_sel");
-
-    CS_zz_sel=EPR("CS_zz_sel");
-    D_zz_sel=EPR("D_zz_sel");
 
     S_sel=EPR("S_sel");
 
@@ -185,10 +187,6 @@ function endor_amp=kehl_cp_calc(spin_system,parameters,R)
         HF_zx=HF_zx_sel(j,:);
 
         NQI_zz=NQI_zz_sel(j,:);
-        NQI=zeros(n_endor,3,3);
-
-        NQI(:,:,:)=2*pi*NQI_sel(j,:,:,:);
-
         S=S_sel(j);
         offsets=offsets_sel(j,:);
 
@@ -261,8 +259,6 @@ function endor_amp=kehl_cp_calc(spin_system,parameters,R)
 
                         Hnonsel=(Hfree+oneE*Sx);
                         Hprep=(Hfree+prep*Sx);
-
-                        Hfree=Hfree;
 
                         if parameters.Bterm==false
                             U3=full(propagator(spin_system,1i*sparse(RRho-1i*HSL_t),t(3)));

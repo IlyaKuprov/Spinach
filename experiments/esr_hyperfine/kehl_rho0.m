@@ -32,9 +32,8 @@ function rho0=kehl_rho0(constants,paramsENDOR,B,geff,spin_system,...
     grumble(constants,paramsENDOR,B,geff,spin_system,parameters,...
         HF_zz,HF_zy,HF_zx,NQI_zz);
 
-    % Return the cached electron Lz state
-    ops=kehl_operator_basis(spin_system,parameters);
-    rho0=ops.rho_z;
+    % Request the electron Lz state directly from Spinach
+    rho0=-state(spin_system,'Lz',parameters.electron_spin_idx);
 
 end
 

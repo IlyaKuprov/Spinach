@@ -77,13 +77,10 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
     constants=parameters.constants;
     paramsENDOR=parameters.paramsENDOR;
     EPR=parameters.epr;
-    operator_spin_system=parameters.operator_spin_system;
     n_endor=parameters.n_endor;
-    n_spin_systems=parameters.n_spin_systems;
-    I=parameters.endor_spin_numbers;
 
     % Get cached operators and states
-    ops=kehl_operator_basis(operator_spin_system,n_endor,n_spin_systems);
+    ops=kehl_operator_basis(spin_system,parameters);
     Sx=ops.Sx;
     Sy=ops.Sy;
     Ix=ops.Ix;
@@ -94,14 +91,6 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
 
     t=parameters.pulse_times_s;
     Nint=8;
-
-    if n_spin_systems>1
-        for spin_idx=1:n_endor-1
-            Ix{spin_idx+1}=Ix{1};
-            Iy{spin_idx+1}=Iy{1};
-            Iz{spin_idx+1}=Iz{1};
-        end
-    end
 
     geff_sel=EPR("geff_sel");
     B_sel=EPR("B_sel");
@@ -157,7 +146,7 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
             v_off_S=offsets(offset_idx);
             off_1=offsets(1);
 
-            rho0=kehl_rho0(constants,paramsENDOR,B,geff,operator_spin_system,parameters,HF_zz,HF_zy,HF_zx,NQI_zz);
+            rho0=kehl_rho0(constants,paramsENDOR,B,geff,spin_system,parameters,HF_zz,HF_zy,HF_zx,NQI_zz);
 
             % Electron T1 relaxation
             RT1e=kehl_relax_t1(rho0,Sx_D,parameters.T1e);
@@ -165,18 +154,12 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
             RT2e=kehl_relax_t2(Sx_D,parameters.T2e);
             RT2n=zeros(size(RT2e));
 
-            if n_spin_systems==1
-                for mn=1:n_endor
+            for mn=1:n_endor
 
-                    % Nuclear T1 relaxation
-                    RT1n=RT1e+kehl_relax_t1(rho0,Ix_D{mn},parameters.T1n);
-                    RT2e=RT2e+kehl_relax_t2(Sx_D*Ix_D{mn},parameters.T2dq);
-                    RT2n=RT2n+kehl_relax_t2(Ix_D{mn},parameters.T2n);
-                end
-            else
-                RT1n=RT1e+kehl_relax_t1(rho0,Ix_D{1},parameters.T1n);
-                RT2e=RT2e+kehl_relax_t2(Sx_D*Ix_D{1},parameters.T2dq);
-                RT2n=RT2n+kehl_relax_t2(Ix_D{1},parameters.T2n);
+                % Nuclear T1 relaxation
+                RT1n=RT1e+kehl_relax_t1(rho0,Ix_D{mn},parameters.T1n);
+                RT2e=RT2e+kehl_relax_t2(Sx_D*Ix_D{mn},parameters.T2dq);
+                RT2n=RT2n+kehl_relax_t2(Ix_D{mn},parameters.T2n);
             end
             R=RT1e+RT1n+RT2e+RT2n;
 
@@ -184,26 +167,10 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
 
             oneE=parameters.electron_nutation;
             oneN=parameters.nuclear_nutation;
-
-            if n_spin_systems>1
-                nuc=round(offset_idx/(2*I(1)+1));
-                spin_map=nuc;
-                term_map=struct('zeeman',1,'hyperfine',nuc,...
-                    'nqi',1,'cs',nuc,'cs_larmor',1);
-                use_dipolar=false;
-            else
-                spin_map=1:n_endor;
-                term_map=struct();
-                use_dipolar=true;
-            end
-            Hfree_p=kehl_free_ham(parameters,paramsENDOR,operator_spin_system,...
-                v_off_S,spin_map,use_dipolar,...
-                term_map,euler_angles);
+            Hfree_p=kehl_free_ham(parameters,paramsENDOR,spin_system,...
+                v_off_S,euler_angles);
             % Integration step for the Signal to account for oscillation
-            if v_off_S==0
-                t11=1/(off_1*Nint);
-            else
-            end
+            t11=kehl_offset_step(v_off_S,off_1,Nint);
 
             % Radiofrequency
             v_RF=v_L(1);
@@ -224,19 +191,19 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
 
             if parameters.Bterm==false
 
-                U5=full(propagator(operator_spin_system,1i*sparse(R-1i*full(hilb2liouv(sparse(HRF),'comm'))),t(5)));
+                U5=full(propagator(spin_system,1i*sparse(R-1i*full(hilb2liouv(sparse(HRF),'comm'))),t(5)));
                 if t(5)==t(7)
                     U7=U5;
                 else
-                    U7=full(propagator(operator_spin_system,1i*sparse(R-1i*full(hilb2liouv(sparse(HRF),'comm'))),t(7)));
+                    U7=full(propagator(spin_system,1i*sparse(R-1i*full(hilb2liouv(sparse(HRF),'comm'))),t(7)));
                 end
 
-                U1=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(1)));
+                U1=full(propagator(spin_system,1i*sparse(R-1i*Hnonsel),t(1)));
 
                 if t(1)==t(3)
                     U3=U1;
                 else
-                    U3=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(3)));
+                    U3=full(propagator(spin_system,1i*sparse(R-1i*Hnonsel),t(3)));
                 end
 
                 if t(1)==t(9)
@@ -244,32 +211,32 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
                 elseif t(3)==t(9)
                     U9=U3;
                 else
-                    U9=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(9)));
+                    U9=full(propagator(spin_system,1i*sparse(R-1i*Hnonsel),t(9)));
                 end
 
-                U2=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(2)));
-                U4=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(4)));
+                U2=full(propagator(spin_system,1i*sparse(R-1i*Hfree),t(2)));
+                U4=full(propagator(spin_system,1i*sparse(R-1i*Hfree),t(4)));
 
                 if t(8)==t(4)
                     U8=U4;
                 else
-                    U8=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(8)));
+                    U8=full(propagator(spin_system,1i*sparse(R-1i*Hfree),t(8)));
                 end
-                U10=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(2)+t(3)/2));
+                U10=full(propagator(spin_system,1i*sparse(R-1i*Hfree),t(2)+t(3)/2));
             else
-                U5=kehl_rf_bterm_rlx(parameters,v_RF,Hfree_p,Iy,t(5),n_endor,n_spin_systems,R,operator_spin_system);
+                U5=kehl_rf_bterm_rlx(parameters,v_RF,Hfree_p,Iy,t(5),n_endor,R,spin_system);
                 if t(5)==t(7)
                     U7=U5;
                 else
-                    U7=kehl_rf_bterm_rlx(parameters,v_RF,Hfree_p,Iy,t(7),n_endor,n_spin_systems,R,operator_spin_system);
+                    U7=kehl_rf_bterm_rlx(parameters,v_RF,Hfree_p,Iy,t(7),n_endor,R,spin_system);
                 end
 
-                U1=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(1)));
+                U1=full(propagator(spin_system,1i*sparse(R-1i*Hnonsel),t(1)));
 
                 if t(1)==t(3)
                     U3=U1;
                 else
-                    U3=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(3)));
+                    U3=full(propagator(spin_system,1i*sparse(R-1i*Hnonsel),t(3)));
 
                 end
 
@@ -278,18 +245,18 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
                 elseif t(3)==t(9)
                     U9=U3;
                 else
-                    U9=full(propagator(operator_spin_system,1i*sparse(R-1i*Hnonsel),t(9)));
+                    U9=full(propagator(spin_system,1i*sparse(R-1i*Hnonsel),t(9)));
                 end
 
-                U2=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(2)));
-                U4=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(4)));
+                U2=full(propagator(spin_system,1i*sparse(R-1i*Hfree),t(2)));
+                U4=full(propagator(spin_system,1i*sparse(R-1i*Hfree),t(4)));
                 if t(8)==t(4)
                     U8=U4;
                 else
-                    U8=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(8)));
+                    U8=full(propagator(spin_system,1i*sparse(R-1i*Hfree),t(8)));
                 end
 
-                U10=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t(2)+t(3)/2));
+                U10=full(propagator(spin_system,1i*sparse(R-1i*Hfree),t(2)+t(3)/2));
             end
 
             % Evolve the densitymatrix
@@ -305,7 +272,7 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
             % Loop over RF-pulse separations
             for a=1:Npts_EN
                 t6=t(6)+step_EN*(a-1);
-                U6=full(propagator(operator_spin_system,1i*sparse(R-1i*Hfree),t6));
+                U6=full(propagator(spin_system,1i*sparse(R-1i*Hfree),t6));
 
                 rho=rho_t;
                 rho=U6*rho;
@@ -341,13 +308,10 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
     constants=parameters.constants;
     paramsENDOR=parameters.paramsENDOR;
     EPR=parameters.epr;
-    operator_spin_system=parameters.operator_spin_system;
     n_endor=parameters.n_endor;
-    n_spin_systems=parameters.n_spin_systems;
-    I=parameters.endor_spin_numbers;
 
     % Get cached operators and states
-    ops=kehl_operator_basis(operator_spin_system,n_endor,n_spin_systems);
+    ops=kehl_operator_basis(spin_system,parameters);
     Sx=ops.Sx;
     Sy=ops.Sy;
     Ix=ops.Ix;
@@ -355,14 +319,6 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
     Iz=ops.Iz;
     t=parameters.pulse_times_s;
     Nint=8;
-
-    if n_spin_systems>1
-        for spin_idx=1:n_endor-1
-            Ix{spin_idx+1}=Ix{1};
-            Iy{spin_idx+1}=Iy{1};
-            Iz{spin_idx+1}=Iz{1};
-        end
-    end
 
     geff_sel=EPR("geff_sel");
     B_sel=EPR("B_sel");
@@ -422,27 +378,14 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
             v_off_S=offsets(offset_idx);
             off_1=offsets(1);
 
-            [rho0]=kehl_rho0(constants,paramsENDOR,B,geff,operator_spin_system,parameters,HF_zz,HF_zy,HF_zx,NQI_zz);
+            [rho0]=kehl_rho0(constants,paramsENDOR,B,geff,spin_system,parameters,HF_zz,HF_zy,HF_zx,NQI_zz);
 
             step_EN=paramsENDOR("step_EN");
 
             oneE=parameters.electron_nutation;
             oneN=parameters.nuclear_nutation;
-
-            if n_spin_systems>1
-                nuc=round(offset_idx/(2*I(1)+1));
-                spin_map=nuc;
-                term_map=struct('zeeman',1,'hyperfine',nuc,...
-                    'nqi',1,'cs',nuc,'cs_larmor',1);
-                use_dipolar=false;
-            else
-                spin_map=1:n_endor;
-                term_map=struct();
-                use_dipolar=true;
-            end
-            Hfree_p=kehl_free_ham(parameters,paramsENDOR,operator_spin_system,...
-                v_off_S,spin_map,use_dipolar,...
-                term_map,euler_angles);
+            Hfree_p=kehl_free_ham(parameters,paramsENDOR,spin_system,...
+                v_off_S,euler_angles);
             v_RF=v_L(1);
             Hcorr=zeros(size(Hfree_p));
             HRF=Hfree_p;
@@ -458,36 +401,32 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
             Hnonsel=Hfree+oneE*Sx;
 
             % Integration step for the Signal to account for oscillation
-            if v_off_S==0
-                t11=1/abs(off_1*Nint);
-            else
-                t11=1/abs(v_off_S*Nint);
-            end
+            t11=abs(kehl_offset_step(v_off_S,off_1,Nint));
 
             if parameters.Bterm==false
-                U5=full(propagator(operator_spin_system,sparse(HRF),t(5)));
+                U5=full(propagator(spin_system,sparse(HRF),t(5)));
                 if t(5)==t(7)
                     U7=U5;
                 else
-                    U7=full(propagator(operator_spin_system,sparse(HRF),t(7)));
+                    U7=full(propagator(spin_system,sparse(HRF),t(7)));
                 end
 
             else
-                U5=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t(5),n_endor,n_spin_systems,operator_spin_system);
+                U5=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t(5),n_endor,spin_system);
                 if t(5)==t(7)
                     U7=U5;
                 else
-                    U7=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t(7),n_endor,n_spin_systems,operator_spin_system);
+                    U7=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t(7),n_endor,spin_system);
                 end
             end
 
             % Calculate the propagators
-            U1=full(propagator(operator_spin_system,sparse(Hnonsel),t(1)));
+            U1=full(propagator(spin_system,sparse(Hnonsel),t(1)));
 
             if t(1)==t(3)
                 U3=U1;
             else
-                U3=full(propagator(operator_spin_system,sparse(Hnonsel),t(3)));
+                U3=full(propagator(spin_system,sparse(Hnonsel),t(3)));
             end
 
             if t(1)==t(9)
@@ -495,16 +434,16 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
             elseif t(3)==t(9)
                 U9=U3;
             else
-                U9=full(propagator(operator_spin_system,sparse(Hfree),t(9)));
+                U9=full(propagator(spin_system,sparse(Hfree),t(9)));
             end
 
-            U2=full(propagator(operator_spin_system,sparse(Hfree),t(2)));
+            U2=full(propagator(spin_system,sparse(Hfree),t(2)));
 
-            U4=full(propagator(operator_spin_system,sparse(Hfree),t(4)));
+            U4=full(propagator(spin_system,sparse(Hfree),t(4)));
 
-            U10=full(propagator(operator_spin_system,sparse(Hfree),t(2)+t(3)/2));
+            U10=full(propagator(spin_system,sparse(Hfree),t(2)+t(3)/2));
 
-            U11=full(propagator(operator_spin_system,sparse(Hfree),t11));
+            U11=full(propagator(spin_system,sparse(Hfree),t11));
 
             % Evolve the densitymatrix
             rho=rho0;
@@ -526,12 +465,12 @@ function endor_amp=kehl_time_calc(spin_system,parameters)
                 t8=t(8)-step_EN*(a-1);
 
                 if parameters.Bterm==false
-                    U6=full(propagator(operator_spin_system,sparse(Hfree_p+Hcorr),t6));
+                    U6=full(propagator(spin_system,sparse(Hfree_p+Hcorr),t6));
                 else
                     Hfree=Hfree_p;
-                    U6=full(propagator(operator_spin_system,sparse(Hfree),t6));
+                    U6=full(propagator(spin_system,sparse(Hfree),t6));
                 end
-                U8=full(propagator(operator_spin_system,sparse(Hfree),t8));
+                U8=full(propagator(spin_system,sparse(Hfree),t8));
 
                 rho=rho_t;
                 rho=U6*rho*U6';

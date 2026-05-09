@@ -210,10 +210,9 @@ function EPR=kehl_ori_field(spin_system,parameters)
                 if Ni_EPR>0
                     I_EPR=parameters.epr_spin_numbers;
                     mI=kehl_ori_field_build_space(I_EPR);
-                    for epr_idx=1:Ni_EPR
-                        % EPR resonance with hyperfine coupling only
-                        E=Beff+mI*(HF_zz_EPR(epr_idx)/constants("CONST1")*10^(-10))';
-                    end
+
+                    % EPR resonance with all nuclear hyperfine manifolds
+                    E=Beff+mI*(HF_zz_EPR(:)/constants("CONST1")*10^(-10));
                     bin=(round((E-fieldAxis(1))/parameters.field_step_t)+1);
                 else
                     E=Beff;
@@ -226,7 +225,7 @@ function EPR=kehl_ori_field(spin_system,parameters)
                     tmp_epr(bin(p))=tmp_epr(bin(p))+1;
                 end
 
-                offsets=kehl_offsets(constants,parameters,parameters.operator_spin_system,paramsENDOR,B,geff,HF_zz,NQI_zz);
+                offsets=kehl_offsets(constants,parameters,spin_system,paramsENDOR,B,geff,HF_zz,NQI_zz);
 
                 DeltaB=0;
                 scalefactor=0;
@@ -323,18 +322,11 @@ function EPR=kehl_ori_field(spin_system,parameters)
             end
         end
 
-        offsets_tmp=kehl_offsets(constants,parameters,parameters.operator_spin_system,paramsENDOR,Beff,geff,HF_zz,NQI_zz);
+        offsets_tmp=kehl_offsets(constants,parameters,spin_system,paramsENDOR,Beff,geff,HF_zz,NQI_zz);
 
         sel_I=parameters.sel_I;
-        if parameters.n_spin_systems>1
-            s=size(offsets_tmp,2)/n_endor;
-            for n=1:n_endor
-                offsets(n)=offsets_tmp(sel_I+(n-1)*s);
-            end
-        else
-            s=size(offsets_tmp,2)/n_endor;
-            offsets=offsets_tmp(((sel_I-1)*s+1):(sel_I*s));
-        end
+        s=size(offsets_tmp,2)/n_endor;
+        offsets=offsets_tmp(((sel_I-1)*s+1):(sel_I*s));
 
         scalefactor=1;
         geff_sel(or)=geff(1);

@@ -1,41 +1,26 @@
 % Cached operator basis for Kehl ENDOR Hamiltonians. Syntax:
 %
-%      ham=kehl_ham_basis(parameters,paramsENDOR,spin_system,...
-%                         spin_map,use_dipolar,term_map)
+%      ham=kehl_ham_basis(parameters,paramsENDOR,spin_system)
 %
 % Parameters:
 %
 %   parameters       - Kehl ENDOR context parameter structure.
 %   paramsENDOR      - map containing ENDOR parameters.
-%   spin_system      - reduced Spinach spin system.
-%   spin_map         - ENDOR data indices represented by the reduced system.
-%   use_dipolar      - flag enabling the legacy first-nucleus dipolar term.
-%   term_map         - optional interaction-index override map.
+%   spin_system      - full Spinach spin system.
 %
 % Outputs:
 %
-%   ham              - structure containing cached operators and term maps.
+%   ham              - structure containing cached operators.
 %
 % February 2024 A. Kehl (akehl@gwdg.de)
 % May 2026 Spinach integration
 %
 % <https://spindynamics.org/wiki/index.php?title=kehl_ham_basis.m>
 
-function ham=kehl_ham_basis(parameters,paramsENDOR,spin_system,...
-        spin_map,use_dipolar,term_map)
-
-    % Default is to preserve the legacy dipolar correction
-    if nargin<5
-        use_dipolar=true;
-    end
-
-    % Default is to use the same data index for every interaction type
-    if nargin<6
-        term_map=struct();
-    end
+function ham=kehl_ham_basis(parameters,paramsENDOR,spin_system)
 
     % Check consistency
-    grumble(parameters,paramsENDOR,spin_system,spin_map,use_dipolar,term_map);
+    grumble(parameters,paramsENDOR,spin_system);
 
     % Initialise the process-local Hamiltonian-basis cache
     persistent basis_cache
@@ -43,12 +28,8 @@ function ham=kehl_ham_basis(parameters,paramsENDOR,spin_system,...
         basis_cache=containers.Map;
     end
 
-    % Normalise the spin-map and term-map shapes
-    spin_map=spin_map(:).';
-    term_map=complete_map(term_map,spin_map);
-
     % Build a conservative cache key
-    cache_key=ham_key(spin_system,spin_map,use_dipolar,term_map);
+    cache_key=ham_key(spin_system,parameters);
 
     % Return the cached basis if it already exists
     if isKey(basis_cache,cache_key)
@@ -57,13 +38,17 @@ function ham=kehl_ham_basis(parameters,paramsENDOR,spin_system,...
     end
 
     % Cache electron and identity operators
-    ham.Sz=full(operator(spin_system,'Lz',1));
+    ham.Sz=full(operator(spin_system,'Lz',parameters.electron_spin_idx));
     ham.id=eye(size(ham.Sz));
 
-    % Cache local nuclear operators
-    n_nuc=numel(spin_map);
-    for n=1:n_nuc
-        spin_idx=n+1;
+    % Cache ENDOR nuclear operators
+    n_endor=parameters.n_endor;
+    ham.Ix=cell(1,n_endor);
+    ham.Iy=cell(1,n_endor);
+    ham.Iz=cell(1,n_endor);
+    ham.spin_q=zeros(1,n_endor);
+    for n=1:n_endor
+        spin_idx=parameters.endor_spins(n);
         ham.Ix{n}=full(operator(spin_system,'Lx',spin_idx));
         ham.Iy{n}=full(operator(spin_system,'Ly',spin_idx));
         ham.Iz{n}=full(operator(spin_system,'Lz',spin_idx));
@@ -72,16 +57,11 @@ function ham=kehl_ham_basis(parameters,paramsENDOR,spin_system,...
 
     % Cache legacy first-nucleus dipolar operator shapes
     ham.dip_oper={};
-    if use_dipolar&&parameters.dipolar_active&&(n_nuc>1)
-        for n=2:n_nuc
+    if parameters.dipolar_active&&(n_endor>1)
+        for n=2:n_endor
             ham.dip_oper{n-1}=legacy_dip_oper(ham,n);
         end
     end
-
-    % Store index maps needed by the Hamiltonian assembler
-    ham.spin_map=spin_map;
-    ham.term_map=term_map;
-    ham.use_dipolar=logical(use_dipolar);
 
     % Store the basis in the process-local cache
     basis_cache(cache_key)=ham;
@@ -104,9 +84,9 @@ function D_oper=legacy_dip_oper(ham,spin_idx)
 end
 
 % Build a conservative cache key
-function cache_key=ham_key(spin_system,spin_map,use_dipolar,term_map)
+function cache_key=ham_key(spin_system,parameters)
 
-    % Identify the reduced Spinach basis
+    % Identify the Spinach basis
     if isfield(spin_system.bas,'basis_hash')
         basis_id=spin_system.bas.basis_hash;
     else
@@ -114,38 +94,14 @@ function cache_key=ham_key(spin_system,spin_map,use_dipolar,term_map)
     end
 
     % Hash all data that can affect the operator basis
-    cache_key=md5_hash({spin_system.comp.isotopes,basis_id,spin_map,...
-        logical(use_dipolar),term_map});
+    cache_key=md5_hash({spin_system.comp.isotopes,basis_id,...
+        parameters.electron_spin_idx,parameters.endor_spins,...
+        parameters.dipolar_active});
 
-end
-
-% Complete omitted legacy term-map fields
-function term_map=complete_map(term_map,spin_map)
-    if ~isfield(term_map,'zeeman')
-        term_map.zeeman=spin_map;
-    end
-    if ~isfield(term_map,'hyperfine')
-        term_map.hyperfine=spin_map;
-    end
-    if ~isfield(term_map,'nqi')
-        term_map.nqi=spin_map;
-    end
-    if ~isfield(term_map,'cs')
-        term_map.cs=spin_map;
-    end
-    if ~isfield(term_map,'cs_larmor')
-        term_map.cs_larmor=term_map.zeeman;
-    end
-    term_map.zeeman=term_map.zeeman(:).';
-    term_map.hyperfine=term_map.hyperfine(:).';
-    term_map.nqi=term_map.nqi(:).';
-    term_map.cs=term_map.cs(:).';
-    term_map.cs_larmor=term_map.cs_larmor(:).';
 end
 
 % Consistency enforcement
-function grumble(parameters,paramsENDOR,spin_system,spin_map,...
-        use_dipolar,term_map)
+function grumble(parameters,paramsENDOR,spin_system)
     if ~isstruct(parameters)
         error('parameters must be a structure.');
     end
@@ -156,18 +112,19 @@ function grumble(parameters,paramsENDOR,spin_system,spin_map,...
             (~isfield(spin_system,'comp'))
         error('spin_system must be a Spinach spin system structure.');
     end
-    if (~isnumeric(spin_map))||(~isvector(spin_map))||isempty(spin_map)||...
-            any(spin_map<1)||any(mod(spin_map,1)~=0)
-        error('spin_map must be a vector of positive integers.');
+    if (~isfield(parameters,'electron_spin_idx'))||...
+            (~isnumeric(parameters.electron_spin_idx))||...
+            (~isscalar(parameters.electron_spin_idx))
+        error('parameters.electron_spin_idx must be a numeric scalar.');
     end
-    if spin_system.comp.nspins~=numel(spin_map)+1
-        error('spin_map must match the number of nuclear spins in spin_system.');
+    if (~isfield(parameters,'endor_spins'))||...
+            (~isnumeric(parameters.endor_spins))||...
+            (~isvector(parameters.endor_spins))
+        error('parameters.endor_spins must be a numeric vector.');
     end
-    if (~islogical(use_dipolar))&&(~isnumeric(use_dipolar))
-        error('use_dipolar must be logical or numeric.');
-    end
-    if ~isstruct(term_map)
-        error('term_map must be a structure.');
+    if (~isfield(parameters,'n_endor'))||...
+            (~isnumeric(parameters.n_endor))||(~isscalar(parameters.n_endor))
+        error('parameters.n_endor must be a numeric scalar.');
     end
 end
 

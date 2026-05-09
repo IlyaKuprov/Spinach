@@ -1,13 +1,14 @@
 % Initial density matrix for Kehl ENDOR kernels. Syntax:
 %
-%      rho0=kehl_rho0(constants,paramsENDOR,B,geff,operator_spin_system,...
+%      rho0=kehl_rho0(constants,paramsENDOR,B,geff,spin_system,...
+%                     parameters,HF_zz,HF_zy,HF_zx,NQI_zz)
 %
 % Parameters:
 %
 %   constants        - map containing physical constants.
 %   paramsENDOR      - map containing ENDOR parameters.
 %   B,geff           - magnetic field and effective g value.
-%   operator_spin_system - reduced Spinach spin system.
+%   spin_system      - full Spinach spin system.
 %   parameters       - Kehl ENDOR context parameter structure.
 %   HF_zz,HF_zy,HF_zx - effective hyperfine couplings.
 %   NQI_zz           - effective quadrupole couplings.
@@ -21,23 +22,22 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=kehl_rho0.m>
 
-function rho0=kehl_rho0(constants,paramsENDOR,B,geff,operator_spin_system,...
+function rho0=kehl_rho0(constants,paramsENDOR,B,geff,spin_system,...
         parameters,HF_zz,HF_zy,HF_zx,NQI_zz)
     if nargin<10
         NQI_zz=0;
     end
 
     % Check consistency
-    grumble(constants,paramsENDOR,B,geff,operator_spin_system,parameters,...
+    grumble(constants,paramsENDOR,B,geff,spin_system,parameters,...
         HF_zz,HF_zy,HF_zx,NQI_zz);
 
     % Get explicit spin-system dimensions
     n_endor=parameters.n_endor;
-    n_spin_systems=parameters.n_spin_systems;
     spin_numbers=parameters.endor_spin_numbers;
 
     % Get cached operators and states
-    ops=kehl_operator_basis(operator_spin_system,n_endor,n_spin_systems);
+    ops=kehl_operator_basis(spin_system,parameters);
     Sz=ops.Sz;
     Ix=ops.Ix;
     Iy=ops.Iy;
@@ -55,24 +55,13 @@ function rho0=kehl_rho0(constants,paramsENDOR,B,geff,operator_spin_system,...
     H_HF=zeros(size(H_EZ));
     H_NQI=zeros(size(H_EZ));
 
-    % Add nuclear terms for separated-spin-system mode
-    if n_spin_systems>1
-        m=1;
-        H_NZ=H_NZ+v_L(m)*Iz{m};
-        H_HF=H_HF+HF_zz(m)*Sz*Iz{m}+HF_zy(m)*(Sz*Iy{m})+...
-            HF_zx(m)*(Sz*Ix{m});
-        H_NQI=H_NQI+1/2*NQI_zz(m)*(3*Iz{m}*Iz{m}-...
-            spin_numbers(m)*(spin_numbers(m)+1)*ops.eye);
-    else
-
-        % Add nuclear terms for the complete ENDOR spin system
-        for m=1:n_endor
-            H_NZ=H_NZ+v_L(m)*Iz{m};
-            H_HF=H_HF+HF_zz(m)*Sz*Iz{m}+HF_zy(m)*(Sz*Iy{m})+...
-                HF_zx(m)*(Sz*Ix{m});
-            H_NQI=H_NQI+1/2*NQI_zz(m)*(3*Iz{m}*Iz{m}-...
-                spin_numbers(m)*(spin_numbers(m)+1)*ops.eye);
-        end
+    % Add nuclear terms for the complete ENDOR spin system
+    for n=1:n_endor
+        H_NZ=H_NZ+v_L(n)*Iz{n};
+        H_HF=H_HF+HF_zz(n)*Sz*Iz{n}+HF_zy(n)*(Sz*Iy{n})+...
+            HF_zx(n)*(Sz*Ix{n});
+        H_NQI=H_NQI+1/2*NQI_zz(n)*(3*Iz{n}*Iz{n}-...
+            spin_numbers(n)*(spin_numbers(n)+1)*ops.eye);
     end
 
     % Assemble the static Hamiltonian
@@ -98,7 +87,7 @@ function rho0=kehl_rho0(constants,paramsENDOR,B,geff,operator_spin_system,...
 end
 
 % Consistency enforcement
-function grumble(constants,paramsENDOR,B,geff,operator_spin_system,...
+function grumble(constants,paramsENDOR,B,geff,spin_system,...
         parameters,HF_zz,HF_zy,HF_zx,NQI_zz)
     if ~isa(constants,'containers.Map')
         error('constants must be a containers.Map object.');
@@ -112,9 +101,9 @@ function grumble(constants,paramsENDOR,B,geff,operator_spin_system,...
     if ~isnumeric(geff)
         error('geff must be numeric.');
     end
-    if (~isstruct(operator_spin_system))||(~isfield(operator_spin_system,'bas'))||...
-            (~isfield(operator_spin_system,'comp'))
-        error('operator_spin_system must be a Spinach spin system structure.');
+    if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||...
+            (~isfield(spin_system,'comp'))
+        error('spin_system must be a Spinach spin system structure.');
     end
     if ~isstruct(parameters)
         error('parameters must be a structure.');

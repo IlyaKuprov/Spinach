@@ -28,21 +28,19 @@ function parameters=kehl_context_spin_data(spin_system,parameters)
     end
 
     endor_spins=parameters.endor_spins;
-    epr_spins=kehl_infer_epr_spins(spin_system,electron_idx,endor_spins);
-    n_spin_systems=1;
+    epr_spins=setdiff(1:numel(isotopes),electron_idx);
 
     [~,electron_mult]=spin(isotopes{electron_idx});
     n_endor=numel(endor_spins);
 
     parameters.electron_spin=(electron_mult-1)/2;
+    parameters.electron_spin_idx=electron_idx;
     parameters.electron_isotope=isotopes{electron_idx};
     parameters.g_matrix=kehl_electron_g_matrix(spin_system,electron_idx);
     parameters.g_iso=trace(parameters.g_matrix)/3;
     parameters.n_endor=n_endor;
     parameters.endor_isotopes=isotopes(endor_spins);
-    parameters.n_spin_systems=n_spin_systems;
     parameters.endor_spin_numbers=kehl_spin_numbers(isotopes(endor_spins));
-    parameters.operator_isotopes=[{parameters.electron_isotope} parameters.endor_isotopes(:).'];
 
     A=zeros(3*n_endor,3);
     Q=zeros(3*n_endor,3);
@@ -87,6 +85,7 @@ function parameters=kehl_context_spin_data(spin_system,parameters)
     parameters.epr_nuclei_active=~isempty(epr_spins);
     if ~isempty(epr_spins)
         n_epr=numel(epr_spins);
+        parameters.epr_spins=epr_spins;
         parameters.epr_isotopes=isotopes(epr_spins);
         parameters.n_epr=n_epr;
         parameters.epr_spin_numbers=kehl_spin_numbers(isotopes(epr_spins));
@@ -110,6 +109,7 @@ function parameters=kehl_context_spin_data(spin_system,parameters)
         parameters.epr_nqi_matrix=Q_EPR;
         parameters.epr_nqi_active=EPR_Q_used;
     else
+        parameters.epr_spins=[];
         parameters.epr_isotopes={};
         parameters.n_epr=0;
         parameters.epr_spin_numbers=zeros(0,1);

@@ -39,8 +39,6 @@ function varargout=endor_kehl_context(spin_system,sequence,parameters,assumption
     parameters.constants=kehl_context_constants(spin_system);
     parameters=kehl_context_fields(parameters);
     parameters=kehl_context_spin_data(spin_system,parameters);
-    parameters.operator_spin_system=kehl_spin_system(parameters.operator_isotopes,...
-        parameters.n_spin_systems);
 
     if nargin>=4&&~isempty(assumptions)
         spin_system=assume(spin_system,assumptions);

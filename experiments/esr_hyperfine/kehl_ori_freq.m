@@ -30,28 +30,22 @@ function EPR=kehl_ori_freq(spin_system,parameters)
     g=parameters.g_matrix;
     A=parameters.hfc_matrix;
     Q=parameters.nqi_matrix;
+    Ni_EPR=parameters.n_epr;
+    SzEPR=full(operator(spin_system,'Lz',parameters.electron_spin_idx));
+    SxEPR=full(operator(spin_system,'Lx',parameters.electron_spin_idx));
     if parameters.epr_nuclei_active==true
-        Ni_EPR=parameters.n_epr;
         A_EPR=parameters.epr_hfc_matrix;
         Q_EPR=parameters.epr_nqi_matrix;
         g_N_EPR=parameters.epr_gamma_hz_t;
-        epr_spin_system=kehl_spin_system([{parameters.electron_isotope} parameters.epr_isotopes(:).'],1);
-        SzEPR=full(operator(epr_spin_system,'Lz',1));
-        SxEPR=full(operator(epr_spin_system,'Lx',1));
         IzEPR=cell(1,Ni_EPR);
         IxEPR=cell(1,Ni_EPR);
         IyEPR=cell(1,Ni_EPR);
         for n=1:Ni_EPR
-            spin_idx=n+1;
-            IzEPR{n}=full(operator(epr_spin_system,'Lz',spin_idx));
-            IxEPR{n}=full(operator(epr_spin_system,'Lx',spin_idx));
-            IyEPR{n}=full(operator(epr_spin_system,'Ly',spin_idx));
+            spin_idx=parameters.epr_spins(n);
+            IzEPR{n}=full(operator(spin_system,'Lz',spin_idx));
+            IxEPR{n}=full(operator(spin_system,'Lx',spin_idx));
+            IyEPR{n}=full(operator(spin_system,'Ly',spin_idx));
         end
-    else
-        Ni_EPR=0;
-        epr_spin_system=kehl_spin_system({parameters.electron_isotope},1);
-        SzEPR=full(operator(epr_spin_system,'Lz',1));
-        SxEPR=full(operator(epr_spin_system,'Lx',1));
     end
     if parameters.cs_active==true
         CS=parameters.cs_matrix;
@@ -309,7 +303,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
 
                     %Select only those parameters, for which scalefactor > 0
 
-                    offsets=kehl_offsets(constants,parameters,parameters.operator_spin_system,paramsENDOR,B,geff,HF_zz,NQI_zz);
+                    offsets=kehl_offsets(constants,parameters,spin_system,paramsENDOR,B,geff,HF_zz,NQI_zz);
 
                     if (scalefactor>0)&&(trans_prob_EPR(p)>0)
 
@@ -376,18 +370,11 @@ function EPR=kehl_ori_freq(spin_system,parameters)
             end
         end
 
-        offsets_tmp=kehl_offsets(constants,parameters,parameters.operator_spin_system,paramsENDOR,B,geff,HF_zz,NQI_zz);
+        offsets_tmp=kehl_offsets(constants,parameters,spin_system,paramsENDOR,B,geff,HF_zz,NQI_zz);
 
         sel_I=parameters.sel_I;
-        if parameters.n_spin_systems>1
-            s=size(offsets_tmp,2)/n_endor;
-            for n=1:n_endor
-                offsets(n)=offsets_tmp(sel_I+(n-1)*s);
-            end
-        else
-            s=size(offsets_tmp,2)/n_endor;
-            offsets=offsets_tmp(((sel_I-1)*s+1):(sel_I*s));
-        end
+        s=size(offsets_tmp,2)/n_endor;
+        offsets=offsets_tmp(((sel_I-1)*s+1):(sel_I*s));
 
         scalefactor=1;
         geff_sel(or)=geff(1);

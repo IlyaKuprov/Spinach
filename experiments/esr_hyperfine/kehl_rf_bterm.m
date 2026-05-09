@@ -47,7 +47,7 @@ function U=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t,n_endor,spin_system,R)
         if isempty(R)
             U_step=full(propagator(spin_system,sparse(HRF),t_stepRF));
         else
-            G=R-1i*full(hilb2liouv(sparse(HRF),'comm'));
+            G=R-1i*HRF;
             U_step=full(propagator(spin_system,1i*sparse(G),t_stepRF));
         end
         U_RF=U_step*U_RF;

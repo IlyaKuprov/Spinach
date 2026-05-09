@@ -32,35 +32,47 @@ function varargout=endor_kehl_context(spin_system,sequence,parameters,assumption
     % Normalise the pulse-sequence selector
     pulse_sequence=sequence_handle(sequence);
 
+    % Use Hilbert space only for EPR transition selection
+    hilb_spin_system=spin_system;
+    hilb_spin_system.bas.formalism='zeeman-hilb';
+    hilb_spin_system.bas.approximation='none';
+    hilb_spin_system=basis(hilb_spin_system,hilb_spin_system.bas);
+
     % Store context assumptions
     parameters.assumptions=assumptions;
 
     % Build sequence-agnostic Kehl context data from Spinach parameters
-    parameters.constants=kehl_context_constants(spin_system);
+    parameters.constants=kehl_context_constants(hilb_spin_system);
     parameters=kehl_context_fields(parameters);
-    parameters=kehl_context_spin_data(spin_system,parameters);
+    parameters=kehl_context_spin_data(hilb_spin_system,parameters);
 
     if nargin>=4&&~isempty(assumptions)
-        spin_system=assume(spin_system,assumptions);
+        hilb_spin_system=assume(hilb_spin_system,assumptions);
     end
 
     % Let the pulse sequence append its own derived parameters
-    parameters=pulse_sequence(spin_system,parameters,'parameters',[],[]);
+    parameters=pulse_sequence(hilb_spin_system,parameters,'parameters',[],[]);
 
     % Select EPR orientations using sequence-independent context data
-    parameters.paramsEPR=kehl_prep_epr(spin_system,parameters);
+    parameters.paramsEPR=kehl_prep_epr(hilb_spin_system,parameters);
     if parameters.freqDomain==false
-        parameters.epr=kehl_ori_field(spin_system,parameters);
+        parameters.epr=kehl_ori_field(hilb_spin_system,parameters);
     else
-        parameters.epr=kehl_ori_freq(spin_system,parameters);
+        parameters.epr=kehl_ori_freq(hilb_spin_system,parameters);
     end
+
+    % Switch the pulse sequence to native Zeeman-Liouville space
+    spin_system=hilb_spin_system;
+    spin_system.bas.formalism='zeeman-liouv';
+    spin_system.bas.approximation='none';
+    spin_system=basis(spin_system,spin_system.bas);
 
     % Build Spinach relaxation superoperator when requested
     H=[];
     if parameters.Relax==true
         R=kehl_context_relaxation(spin_system,parameters);
     else
-        R=[];
+        R=mprealloc(spin_system,1);
     end
     K=[];
 

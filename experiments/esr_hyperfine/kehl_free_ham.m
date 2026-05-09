@@ -1,4 +1,4 @@
-% Static ENDOR Hamiltonian from cached Spinach operators. Syntax:
+% Static ENDOR Liouvillian from cached Spinach operators. Syntax:
 %
 %      H=kehl_free_ham(parameters,paramsENDOR,spin_system,v_off_S,euler_angles)
 %
@@ -6,13 +6,13 @@
 %
 %   parameters       - Kehl ENDOR context parameter structure.
 %   paramsENDOR      - map containing ENDOR parameters.
-%   spin_system      - full Spinach spin system.
+%   spin_system      - Zeeman-Liouville Spinach spin system.
 %   v_off_S          - electron offset frequency.
 %   euler_angles     - Kehl orientation angles stored by the context.
 %
 % Outputs:
 %
-%   H                - static Hilbert-space Hamiltonian.
+%   H                - static Liouville-space commutation superoperator.
 %
 % February 2024 A. Kehl (akehl@gwdg.de)
 % May 2026 Spinach integration
@@ -29,7 +29,7 @@ function H=kehl_free_ham(parameters,paramsENDOR,spin_system,v_off_S,euler_angles
     % Check consistency
     grumble(parameters,paramsENDOR,spin_system,v_off_S,euler_angles);
 
-    % Retrieve cached Cartesian operators
+    % Retrieve cached Cartesian superoperators
     ham=kehl_ham_basis(parameters,paramsENDOR,spin_system);
 
     % Project tensor data onto the selected Kehl orientation
@@ -45,15 +45,14 @@ function H=kehl_free_ham(parameters,paramsENDOR,spin_system,v_off_S,euler_angles
     for n=1:parameters.n_endor
         H=H-2*pi*v_L(n)*ham.Iz{n}+2*pi*v_L(n)*...
             terms.cs_zz(n)*ham.Iz{n};
-        H=H+2*pi*terms.hf_zz(n)*(ham.Sz*ham.Iz{n})+...
-            2*pi*terms.hf_zy(n)*(ham.Sz*ham.Iy{n})+...
-            2*pi*terms.hf_zx(n)*(ham.Sz*ham.Ix{n});
+        H=H+2*pi*terms.hf_zz(n)*ham.SzIz{n}+...
+            2*pi*terms.hf_zy(n)*ham.SzIy{n}+...
+            2*pi*terms.hf_zx(n)*ham.SzIx{n};
         if parameters.nqi_active
             if parameters.Bterm
                 H=H+nqi_full(terms.nqi(n,:,:),ham,n);
             else
-                H=H+pi*terms.nqi_zz(n)*(3*ham.Iz{n}*ham.Iz{n}-...
-                    ham.spin_q(n)*(ham.spin_q(n)+1)*ham.id);
+                H=H+3*pi*terms.nqi_zz(n)*ham.IzIz{n};
             end
         end
     end
@@ -65,9 +64,6 @@ function H=kehl_free_ham(parameters,paramsENDOR,spin_system,v_off_S,euler_angles
         end
     end
 
-    % Return a Hermitian dense matrix for the sequence kernels
-    H=full((H+H')/2);
-
 end
 
 % Full quadrupolar B-term contribution
@@ -76,16 +72,12 @@ function H=nqi_full(nqi_tensor,ham,spin_idx)
     % Reshape the selected tensor slice
     Q=squeeze(nqi_tensor);
 
-    % Assemble the full quadrupolar Hamiltonian
-    H=Q(1,1)*ham.Ix{spin_idx}*ham.Ix{spin_idx}+...
-        Q(1,2)*ham.Ix{spin_idx}*ham.Iy{spin_idx}+...
-        Q(1,3)*ham.Ix{spin_idx}*ham.Iz{spin_idx}+...
-        Q(2,1)*ham.Iy{spin_idx}*ham.Ix{spin_idx}+...
-        Q(2,2)*ham.Iy{spin_idx}*ham.Iy{spin_idx}+...
-        Q(2,3)*ham.Iy{spin_idx}*ham.Iz{spin_idx}+...
-        Q(3,1)*ham.Iz{spin_idx}*ham.Ix{spin_idx}+...
-        Q(3,2)*ham.Iz{spin_idx}*ham.Iy{spin_idx}+...
-        Q(3,3)*ham.Iz{spin_idx}*ham.Iz{spin_idx};
+    % Assemble the full quadrupolar Liouvillian
+    H=Q(1,1)*ham.IxIx{spin_idx}+Q(1,2)*ham.IxIy{spin_idx}+...
+        Q(1,3)*ham.IxIz{spin_idx}+Q(2,1)*ham.IyIx{spin_idx}+...
+        Q(2,2)*ham.IyIy{spin_idx}+Q(2,3)*ham.IyIz{spin_idx}+...
+        Q(3,1)*ham.IzIx{spin_idx}+Q(3,2)*ham.IzIy{spin_idx}+...
+        Q(3,3)*ham.IzIz{spin_idx};
 
 end
 
@@ -100,6 +92,9 @@ function grumble(parameters,paramsENDOR,spin_system,v_off_S,euler_angles)
     if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||...
             (~isfield(spin_system,'comp'))
         error('spin_system must be a Spinach spin system structure.');
+    end
+    if ~strcmp(spin_system.bas.formalism,'zeeman-liouv')
+        error('spin_system must use zeeman-liouv formalism.');
     end
     if ~isnumeric(v_off_S)
         error('v_off_S must be numeric.');

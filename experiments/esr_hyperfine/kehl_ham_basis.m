@@ -6,11 +6,11 @@
 %
 %   parameters       - Kehl ENDOR context parameter structure.
 %   paramsENDOR      - map containing ENDOR parameters.
-%   spin_system      - full Spinach spin system.
+%   spin_system      - Zeeman-Liouville Spinach spin system.
 %
 % Outputs:
 %
-%   ham              - structure containing cached operators.
+%   ham              - structure containing cached superoperators.
 %
 % February 2024 A. Kehl (akehl@gwdg.de)
 % May 2026 Spinach integration
@@ -37,29 +37,61 @@ function ham=kehl_ham_basis(parameters,paramsENDOR,spin_system)
         return
     end
 
-    % Cache electron and identity operators
-    ham.Sz=full(operator(spin_system,'Lz',parameters.electron_spin_idx));
-    ham.id=eye(size(ham.Sz));
-
-    % Cache ENDOR nuclear operators
+    % Cache electron and ENDOR nuclear superoperators
+    electron_idx=parameters.electron_spin_idx;
+    ham.Sz=operator(spin_system,'Lz',electron_idx);
     n_endor=parameters.n_endor;
     ham.Ix=cell(1,n_endor);
     ham.Iy=cell(1,n_endor);
     ham.Iz=cell(1,n_endor);
-    ham.spin_q=zeros(1,n_endor);
+    ham.SzIx=cell(1,n_endor);
+    ham.SzIy=cell(1,n_endor);
+    ham.SzIz=cell(1,n_endor);
+    ham.IxIx=cell(1,n_endor);
+    ham.IxIy=cell(1,n_endor);
+    ham.IxIz=cell(1,n_endor);
+    ham.IyIx=cell(1,n_endor);
+    ham.IyIy=cell(1,n_endor);
+    ham.IyIz=cell(1,n_endor);
+    ham.IzIx=cell(1,n_endor);
+    ham.IzIy=cell(1,n_endor);
+    ham.IzIz=cell(1,n_endor);
     for n=1:n_endor
         spin_idx=parameters.endor_spins(n);
-        ham.Ix{n}=full(operator(spin_system,'Lx',spin_idx));
-        ham.Iy{n}=full(operator(spin_system,'Ly',spin_idx));
-        ham.Iz{n}=full(operator(spin_system,'Lz',spin_idx));
-        ham.spin_q(n)=(spin_system.comp.mults(spin_idx)-1)/2;
+        ham.Ix{n}=operator(spin_system,'Lx',spin_idx);
+        ham.Iy{n}=operator(spin_system,'Ly',spin_idx);
+        ham.Iz{n}=operator(spin_system,'Lz',spin_idx);
+        ham.SzIx{n}=product_comm(spin_system,{'Lz','Lx'},...
+            [electron_idx spin_idx]);
+        ham.SzIy{n}=product_comm(spin_system,{'Lz','Ly'},...
+            [electron_idx spin_idx]);
+        ham.SzIz{n}=product_comm(spin_system,{'Lz','Lz'},...
+            [electron_idx spin_idx]);
+        ham.IxIx{n}=product_comm(spin_system,{'Lx','Lx'},...
+            [spin_idx spin_idx]);
+        ham.IxIy{n}=product_comm(spin_system,{'Lx','Ly'},...
+            [spin_idx spin_idx]);
+        ham.IxIz{n}=product_comm(spin_system,{'Lx','Lz'},...
+            [spin_idx spin_idx]);
+        ham.IyIx{n}=product_comm(spin_system,{'Ly','Lx'},...
+            [spin_idx spin_idx]);
+        ham.IyIy{n}=product_comm(spin_system,{'Ly','Ly'},...
+            [spin_idx spin_idx]);
+        ham.IyIz{n}=product_comm(spin_system,{'Ly','Lz'},...
+            [spin_idx spin_idx]);
+        ham.IzIx{n}=product_comm(spin_system,{'Lz','Lx'},...
+            [spin_idx spin_idx]);
+        ham.IzIy{n}=product_comm(spin_system,{'Lz','Ly'},...
+            [spin_idx spin_idx]);
+        ham.IzIz{n}=product_comm(spin_system,{'Lz','Lz'},...
+            [spin_idx spin_idx]);
     end
 
-    % Cache legacy first-nucleus dipolar operator shapes
+    % Cache legacy first-nucleus dipolar superoperator shapes
     ham.dip_oper={};
     if parameters.dipolar_active&&(n_endor>1)
         for n=2:n_endor
-            ham.dip_oper{n-1}=legacy_dip_oper(ham,n);
+            ham.dip_oper{n-1}=legacy_dip_oper(spin_system,parameters,n);
         end
     end
 
@@ -68,18 +100,49 @@ function ham=kehl_ham_basis(parameters,paramsENDOR,spin_system)
 
 end
 
-% Legacy secular dipolar operator shape
-function D_oper=legacy_dip_oper(ham,spin_idx)
+% Commutation superoperator for an ordered product of spin operators
+function A=product_comm(spin_system,operators,spins)
 
-    % Assemble the scalar nuclear spin product
-    H=ham.Ix{1}*ham.Ix{spin_idx}+ham.Ix{1}*ham.Iy{spin_idx}+...
-        ham.Ix{1}*ham.Iz{spin_idx}+ham.Iy{1}*ham.Ix{spin_idx}+...
-        ham.Iy{1}*ham.Iy{spin_idx}+ham.Iy{1}*ham.Iz{spin_idx}+...
-        ham.Iz{1}*ham.Ix{spin_idx}+ham.Iz{1}*ham.Iy{spin_idx}+...
-        ham.Iz{1}*ham.Iz{spin_idx};
+    % Initialise left and right product superoperators
+    dim=prod(spin_system.comp.mults)^2;
+    left_op=speye(dim);
+    right_op=speye(dim);
+
+    % Build the left product in physical operator order
+    for n=1:numel(operators)
+        left_op=left_op*operator(spin_system,operators{n},spins(n),'left');
+    end
+
+    % Build the right product in reverse order
+    for n=numel(operators):-1:1
+        right_op=right_op*operator(spin_system,operators{n},spins(n),'right');
+    end
+
+    % Return the commutation superoperator
+    A=left_op-right_op;
+
+end
+
+% Legacy secular dipolar superoperator shape
+function D_oper=legacy_dip_oper(spin_system,parameters,spin_idx)
+
+    % Get first and current ENDOR spin numbers
+    spin_a=parameters.endor_spins(1);
+    spin_b=parameters.endor_spins(spin_idx);
+
+    % Assemble the scalar nuclear spin product superoperator
+    H=product_comm(spin_system,{'Lx','Lx'},[spin_a spin_b])+...
+        product_comm(spin_system,{'Lx','Ly'},[spin_a spin_b])+...
+        product_comm(spin_system,{'Lx','Lz'},[spin_a spin_b])+...
+        product_comm(spin_system,{'Ly','Lx'},[spin_a spin_b])+...
+        product_comm(spin_system,{'Ly','Ly'},[spin_a spin_b])+...
+        product_comm(spin_system,{'Ly','Lz'},[spin_a spin_b])+...
+        product_comm(spin_system,{'Lz','Lx'},[spin_a spin_b])+...
+        product_comm(spin_system,{'Lz','Ly'},[spin_a spin_b])+...
+        product_comm(spin_system,{'Lz','Lz'},[spin_a spin_b]);
 
     % Return the legacy axial operator combination
-    D_oper=(3*ham.Iz{1}*ham.Iz{spin_idx}-H)/2;
+    D_oper=(3*product_comm(spin_system,{'Lz','Lz'},[spin_a spin_b])-H)/2;
 
 end
 
@@ -111,6 +174,9 @@ function grumble(parameters,paramsENDOR,spin_system)
     if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||...
             (~isfield(spin_system,'comp'))
         error('spin_system must be a Spinach spin system structure.');
+    end
+    if ~strcmp(spin_system.bas.formalism,'zeeman-liouv')
+        error('spin_system must use zeeman-liouv formalism.');
     end
     if (~isfield(parameters,'electron_spin_idx'))||...
             (~isnumeric(parameters.electron_spin_idx))||...

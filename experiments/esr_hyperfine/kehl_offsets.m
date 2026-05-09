@@ -28,16 +28,19 @@ function offsets=kehl_offsets(constants,parameters,spin_system,...
     grumble(constants,parameters,spin_system,paramsENDOR,B,geff,...
         HF_zz,NQI_zz);
 
-    % Get cached operators
-    ops=kehl_operator_basis(spin_system,parameters);
-    Sz=ops.Sz;
-    Sx=ops.Sx;
-    Iz=ops.Iz;
-
     % Get explicit context data
     n_endor=parameters.n_endor;
     spin_numbers=parameters.endor_spin_numbers;
     v_L=paramsENDOR("v_L");
+
+    % Build Hilbert-space operators for EPR transition selection
+    Sz=full(operator(spin_system,'Lz',parameters.electron_spin_idx));
+    Sx=full(operator(spin_system,'Lx',parameters.electron_spin_idx));
+    Iz=cell(1,n_endor);
+    for n=1:n_endor
+        Iz{n}=full(operator(spin_system,'Lz',parameters.endor_spins(n)));
+    end
+    unit=eye(size(Sz));
 
     % Build the spin Hamiltonian
     H_EZ=B*geff*constants("MU_B")/constants("H")*Sz;
@@ -50,7 +53,7 @@ function offsets=kehl_offsets(constants,parameters,spin_system,...
         H_NZ=H_NZ-v_L(n)*Iz{n};
         H_HF=H_HF+2*pi*HF_zz(n)*(Sz*Iz{n});
         H_NQI=H_NQI+pi*NQI_zz(n)*(3*Iz{n}*Iz{n}-...
-            spin_numbers(n)*(spin_numbers(n)+1)*ops.eye);
+            spin_numbers(n)*(spin_numbers(n)+1)*unit);
     end
 
     % Diagonalise the electron transition Hamiltonian

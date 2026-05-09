@@ -50,7 +50,7 @@ function endor_kehl_mims_powder()
     inter.coupling.eigs{2,4}=[2*D,-D,-D]*1e3;
     inter.coupling.euler{2,4}=[0,-34.3,47.9]*pi/180;
 
-    bas.formalism='zeeman-hilb';
+    bas.formalism='zeeman-liouv';
     bas.approximation='none';
 
     spin_system=create(sys,inter);

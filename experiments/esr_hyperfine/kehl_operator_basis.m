@@ -4,7 +4,7 @@
 %
 % Parameters:
 %
-%   spin_system      - full Spinach spin system.
+%   spin_system      - Zeeman-Liouville Spinach spin system.
 %   parameters       - Kehl ENDOR context parameter structure.
 %
 % Outputs:
@@ -36,35 +36,33 @@ function ops=kehl_operator_basis(spin_system,parameters)
         return
     end
 
-    % Build electron operators once
+    % Build electron commutation superoperators and detection state
     electron_idx=parameters.electron_spin_idx;
-    ops.Sx=full(operator(spin_system,'Lx',electron_idx));
-    ops.Sy=full(operator(spin_system,'Ly',electron_idx));
-    ops.Sz=full(operator(spin_system,'Lz',electron_idx));
+    ops.Sx=operator(spin_system,'Lx',electron_idx);
+    ops.Sy=operator(spin_system,'Ly',electron_idx);
+    ops.Sz=operator(spin_system,'Lz',electron_idx);
+    ops.Sy_state=state(spin_system,'Ly',electron_idx);
+    ops.rho_z=-state(spin_system,'Lz',electron_idx);
 
-    % Build ENDOR nuclear operators once
+    % Build ENDOR nuclear commutation superoperators
     n_endor=parameters.n_endor;
     ops.Ix=cell(1,n_endor);
     ops.Iy=cell(1,n_endor);
     ops.Iz=cell(1,n_endor);
+    ops.SzIz_state=cell(1,n_endor);
     for n=1:n_endor
         spin_idx=parameters.endor_spins(n);
-        ops.Ix{n}=full(operator(spin_system,'Lx',spin_idx));
-        ops.Iy{n}=full(operator(spin_system,'Ly',spin_idx));
-        ops.Iz{n}=full(operator(spin_system,'Lz',spin_idx));
+        ops.Ix{n}=operator(spin_system,'Lx',spin_idx);
+        ops.Iy{n}=operator(spin_system,'Ly',spin_idx);
+        ops.Iz{n}=operator(spin_system,'Lz',spin_idx);
+        ops.SzIz_state{n}=state(spin_system,{'Lz','Lz'},...
+            {electron_idx,spin_idx});
     end
 
-    % Precompute legacy diagonal-frame relaxation operators
-    [ops.Sx_D,ops.Sy_D,ops.Sz_D,ops.Ix_D,ops.Iy_D,ops.Iz_D]=...
-        kehl_diag_ops(ops.Sx,ops.Sy,ops.Sz,ops.Ix,ops.Iy,ops.Iz,n_endor);
-
-    % Precompute the legacy density matrix without normalisation
-    ops.rho_z=-ops.Sz;
-
-    % Precompute the repeated RF correction operators
-    ops.Ix_rf=zeros(size(ops.Sz));
-    ops.Iy_rf=zeros(size(ops.Sz));
-    ops.Iz_rf=zeros(size(ops.Sz));
+    % Precompute the repeated RF correction superoperators
+    ops.Ix_rf=sparse(size(ops.Sz,1),size(ops.Sz,2));
+    ops.Iy_rf=sparse(size(ops.Sz,1),size(ops.Sz,2));
+    ops.Iz_rf=sparse(size(ops.Sz,1),size(ops.Sz,2));
     for n=1:n_endor
         ops.Ix_rf=ops.Ix_rf+ops.Ix{n};
         ops.Iy_rf=ops.Iy_rf+ops.Iy{n};
@@ -73,7 +71,7 @@ function ops=kehl_operator_basis(spin_system,parameters)
 
     % Store dimensions and identity for small repeated constructions
     ops.dim=size(ops.Sz,1);
-    ops.eye=eye(ops.dim);
+    ops.eye=speye(ops.dim);
 
     % Store the operators in the process-local cache
     operator_cache(cache_key)=ops;
@@ -101,6 +99,9 @@ function grumble(spin_system,parameters)
     if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||...
             (~isfield(spin_system,'comp'))
         error('spin_system must be a Spinach spin system structure.');
+    end
+    if ~strcmp(spin_system.bas.formalism,'zeeman-liouv')
+        error('spin_system must use zeeman-liouv formalism.');
     end
     if ~isstruct(parameters)
         error('parameters must be a structure.');

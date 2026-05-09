@@ -132,7 +132,7 @@ function endor_amp=kehl_spinlock_calc(spin_system,parameters,R)
                 v_off_S=offsets(offset_idx);
                 off_1=offsets(1);
 
-                rho0=kehl_rho0(spin_system,parameters);
+                rho0=-state(spin_system,'Lz',parameters.electron_spin_idx);
 
                 % for tilted frame Rho relaxation times
                 RRho=R;

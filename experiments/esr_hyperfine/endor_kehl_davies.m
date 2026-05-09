@@ -126,7 +126,7 @@ function endor_amp=kehl_davies_calc(spin_system,parameters,R)
                 v_off_S=offsets(offset_idx);
                 off_1=offsets(1);
 
-                rho0=kehl_rho0(spin_system,parameters);
+                rho0=-state(spin_system,'Lz',parameters.electron_spin_idx);
 
                 start_EN=paramsENDOR("start_EN");
                 step_EN=paramsENDOR("step_EN");

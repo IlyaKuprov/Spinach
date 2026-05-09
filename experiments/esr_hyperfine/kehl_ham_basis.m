@@ -152,8 +152,10 @@ function cache_key=ham_key(spin_system,parameters)
     % Identify the Spinach basis
     if isfield(spin_system.bas,'basis_hash')
         basis_id=spin_system.bas.basis_hash;
-    else
+    elseif isfield(spin_system.bas,'basis')
         basis_id=spin_system.bas.basis;
+    else
+        basis_id={spin_system.bas.formalism,spin_system.bas.approximation};
     end
 
     % Hash all data that can affect the operator basis

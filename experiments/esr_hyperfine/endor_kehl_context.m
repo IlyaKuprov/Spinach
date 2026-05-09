@@ -32,45 +32,33 @@ function varargout=endor_kehl_context(spin_system,sequence,parameters,assumption
     % Normalise the pulse-sequence selector
     pulse_sequence=sequence_handle(sequence);
 
-    % Use Hilbert space only for EPR transition selection
-    hilb_spin_system=spin_system;
-    hilb_spin_system.bas.formalism='zeeman-hilb';
-    hilb_spin_system.bas.approximation='none';
-    hilb_spin_system=basis(hilb_spin_system,hilb_spin_system.bas);
-
     % Store context assumptions
     parameters.assumptions=assumptions;
 
     % Build sequence-agnostic Kehl context data from Spinach parameters
-    parameters.constants=kehl_context_constants(hilb_spin_system);
+    parameters.constants=kehl_context_constants(spin_system);
     parameters=kehl_context_fields(parameters);
-    parameters=kehl_context_spin_data(hilb_spin_system,parameters);
+    parameters=kehl_context_spin_data(spin_system,parameters);
 
     if nargin>=4&&~isempty(assumptions)
-        hilb_spin_system=assume(hilb_spin_system,assumptions);
+        spin_system=assume(spin_system,assumptions);
     end
 
     % Let the pulse sequence append its own derived parameters
-    parameters=pulse_sequence(hilb_spin_system,parameters,'parameters',[],[]);
+    parameters=pulse_sequence(spin_system,parameters,'parameters',[],[]);
 
     % Select EPR orientations using sequence-independent context data
-    parameters.paramsEPR=kehl_prep_epr(hilb_spin_system,parameters);
+    parameters.paramsEPR=kehl_prep_epr(spin_system,parameters);
     if parameters.freqDomain==false
-        parameters.epr=kehl_ori_field(hilb_spin_system,parameters);
+        parameters.epr=kehl_ori_field(spin_system,parameters);
     else
-        parameters.epr=kehl_ori_freq(hilb_spin_system,parameters);
+        parameters.epr=kehl_ori_freq(spin_system,parameters);
     end
-
-    % Switch the pulse sequence to native Zeeman-Liouville space
-    spin_system=hilb_spin_system;
-    spin_system.bas.formalism='zeeman-liouv';
-    spin_system.bas.approximation='none';
-    spin_system=basis(spin_system,spin_system.bas);
 
     % Build Spinach relaxation superoperator when requested
     H=[];
     if parameters.Relax==true
-        R=kehl_context_relaxation(spin_system,parameters);
+        [spin_system,R]=kehl_context_relaxation(spin_system,parameters);
     else
         R=mprealloc(spin_system,1);
     end
@@ -107,50 +95,41 @@ function pulse_sequence=sequence_handle(sequence)
     pulse_sequence=str2func(name);
 end
 
-function R=kehl_context_relaxation(spin_system,parameters)
+function [spin_system,R]=kehl_context_relaxation(spin_system,parameters)
 
-    % Build a spherical-tensor Liouville copy for Spinach T1/T2 relaxation
-    rlx_spin_system=spin_system;
-    rlx_spin_system.bas.formalism='sphten-liouv';
-    rlx_spin_system.bas.approximation='none';
-    rlx_spin_system.rlx.theories={'t1_t2'};
-    rlx_spin_system.rlx.r1_rates=kehl_relaxation_rates(spin_system,parameters,'r1');
-    rlx_spin_system.rlx.r2_rates=kehl_relaxation_rates(spin_system,parameters,'r2');
-    rlx_spin_system.rlx.keep='diagonal';
-    rlx_spin_system.rlx.equilibrium='zero';
-    rlx_spin_system.rlx.dfs='ignore';
-    rlx_spin_system=basis(rlx_spin_system,rlx_spin_system.bas);
+    % Configure Spinach Lindblad T1/T2 relaxation on the existing system
+    spin_system.rlx.theories={'lindblad'};
+    spin_system.rlx.lind_r1_rates=kehl_relaxation_rates(...
+        spin_system,parameters,'r1');
+    spin_system.rlx.lind_r2_rates=kehl_relaxation_rates(...
+        spin_system,parameters,'r2');
+    spin_system.rlx.keep='diagonal';
+    spin_system.rlx.equilibrium='zero';
+    spin_system.rlx.dfs='ignore';
 
-    % Calculate Spinach relaxation in spherical-tensor Liouville space
-    R_sphten=relaxation(rlx_spin_system);
-
-    % Transform the superoperator into the Kehl Zeeman-Liouville basis
-    P=sphten2zeeman(rlx_spin_system);
-    if size(P,1)~=size(P,2)
-        error('Kehl ENDOR relaxation requires a complete spherical-tensor basis.');
-    end
-    R=sparse(P*R_sphten/P);
+    % Calculate Spinach relaxation in the existing Zeeman-Liouville basis
+    R=relaxation(spin_system);
 
 end
 
 function rates=kehl_relaxation_rates(spin_system,parameters,kind)
 
     % Preallocate one relaxation rate per spin
-    rates=cell(1,spin_system.comp.nspins);
+    rates=zeros(1,spin_system.comp.nspins);
 
     % Convert Kehl relaxation times to Spinach rates
     for n=1:spin_system.comp.nspins
         if kehl_is_electron(spin_system.comp.isotopes{n})
             if strcmp(kind,'r1')
-                rates{n}=kehl_rate(parameters.T1e);
+                rates(n)=kehl_rate(parameters.T1e);
             else
-                rates{n}=kehl_rate(parameters.T2e);
+                rates(n)=kehl_rate(parameters.T2e);
             end
         else
             if strcmp(kind,'r1')
-                rates{n}=kehl_rate(parameters.T1n);
+                rates(n)=kehl_rate(parameters.T1n);
             else
-                rates{n}=kehl_rate(parameters.T2n);
+                rates(n)=kehl_rate(parameters.T2n);
             end
         end
     end
@@ -168,6 +147,9 @@ end
 function grumble(spin_system,sequence,parameters,assumptions)
     if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
         error('spin_system must be a Spinach spin system structure.');
+    end
+    if ~strcmp(spin_system.bas.formalism,'zeeman-liouv')
+        error('spin_system must use zeeman-liouv formalism.');
     end
     if (~isa(sequence,'function_handle'))&&(~ischar(sequence))&&(~isstring(sequence))
         error('sequence must be a function handle, character string, or string scalar.');

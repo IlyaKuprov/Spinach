@@ -24,29 +24,11 @@ function EPR=kehl_ori_freq(spin_system,parameters)
     % Unpack context data
     constants=parameters.constants;
     paramsEPR=parameters.paramsEPR;
-    paramsENDOR=parameters.paramsENDOR;
     Ntheta=parameters.Nang;
     Nphimax=parameters.Nang;
     g=parameters.g_matrix;
     A=parameters.hfc_matrix;
     Q=parameters.nqi_matrix;
-    Ni_EPR=parameters.n_epr;
-    SzEPR=full(operator(spin_system,'Lz',parameters.electron_spin_idx));
-    SxEPR=full(operator(spin_system,'Lx',parameters.electron_spin_idx));
-    if parameters.epr_nuclei_active==true
-        A_EPR=parameters.epr_hfc_matrix;
-        Q_EPR=parameters.epr_nqi_matrix;
-        g_N_EPR=parameters.epr_gamma_hz_t;
-        IzEPR=cell(1,Ni_EPR);
-        IxEPR=cell(1,Ni_EPR);
-        IyEPR=cell(1,Ni_EPR);
-        for n=1:Ni_EPR
-            spin_idx=parameters.epr_spins(n);
-            IzEPR{n}=full(operator(spin_system,'Lz',spin_idx));
-            IxEPR{n}=full(operator(spin_system,'Lx',spin_idx));
-            IyEPR{n}=full(operator(spin_system,'Ly',spin_idx));
-        end
-    end
     if parameters.cs_active==true
         CS=parameters.cs_matrix;
     end
@@ -74,8 +56,6 @@ function EPR=kehl_ori_freq(spin_system,parameters)
     offsets_sel=[];
 
     S_sel=[];
-
-    nor=0;
 
     % Loop over powder orientations
     if parameters.powder==true
@@ -118,8 +98,6 @@ function EPR=kehl_ori_freq(spin_system,parameters)
                 R1(3,1)=sin(theta)*cos(phi);
                 R1(3,2)=sin(theta)*sin(phi);
                 R1(3,3)=cos(theta);
-
-                grot=R1*g*R1';
 
                 % ENDOR values
                 HF_zz=zeros(1,n_endor);
@@ -200,89 +178,23 @@ function EPR=kehl_ori_freq(spin_system,parameters)
                     end
                 end
 
-                % EPR tensors
-                HF_EPR=zeros(3,3,Ni_EPR);
-                NQI_EPR=zeros(3,3,Ni_EPR);
-
-                if Ni_EPR>0
-                    for m=1:Ni_EPR
-                        % Hyperfine EPR tensor
-                        hf2=A_EPR((m-1)*3+1:(m-1)*3+3,:);
-                        X2=R1*hf2*R1';
-                        HF_EPR(:,:,m)=X2;
-
-                        % Quadrupolar EPR tensor
-                        if parameters.epr_nqi_active==true
-                            qq2=Q_EPR((m-1)*3+1:(m-1)*3+3,:);
-                            Y2=R1*qq2*R1';
-                            NQI_EPR(:,:,m)=Y2;
-                        end
-
-                    end
-                end
-
-                H_EZ_EPR=constants("MU_B")*grot(3,3)*B/constants("H")*SzEPR;
-                H_NZ_EPR=zeros(size(SzEPR));
-                H_HF_EPR=zeros(size(SzEPR));
-                H_NQI_EPR=zeros(size(SzEPR));
-
-                if parameters.epr_nuclei_active>0
-                    for mm=1:Ni_EPR
-                        H_NZ_EPR=H_NZ_EPR+g_N_EPR(mm)*IzEPR{mm};
-                        H_HF_EPR=H_HF_EPR+IzEPR{mm}*HF_EPR(3,3,mm)*SzEPR+IxEPR{mm}*(HF_EPR(1,3,mm)^2+HF_EPR(2,3,mm)^2)^0.5*SzEPR;
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(1,1,mm)*IxEPR{mm}*IxEPR{mm};
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(1,2,mm)*IxEPR{mm}*IyEPR{mm};
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(1,3,mm)*IxEPR{mm}*IzEPR{mm};
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(2,1,mm)*IyEPR{mm}*IxEPR{mm};
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(2,2,mm)*IyEPR{mm}*IyEPR{mm};
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(2,3,mm)*IyEPR{mm}*IzEPR{mm};
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(3,1,mm)*IzEPR{mm}*IxEPR{mm};
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(3,2,mm)*IzEPR{mm}*IyEPR{mm};
-                        H_NQI_EPR=H_NQI_EPR+NQI_EPR(3,3,mm)*IzEPR{mm}*IzEPR{mm};
-                    end
-                end
-
-                H_S_EPR=H_EZ_EPR-H_NZ_EPR+H_HF_EPR+H_NQI_EPR;
-
-                % Diagonalize and calculate eigenvalues of the EPR Hamiltonian
-
-                % E ... Hamiltonian Elements, V... eigenvectors
-                [V_EPR,E_EPR]=eig(H_S_EPR);
-
-                % round necessary for following calculation
-                V_EPR=round((V_EPR),9);
-                E_EPR=real(diag(E_EPR));
-
-                % Calculate transitions between all elements
-                trans_prob_EPR=[];
-                freq_EPR=[];
-                q=1;
-                for x=1:length(V_EPR)
-                    for y=x+1:length(V_EPR)
-                        % Electron transition probability in the eigenbasis
-                        trans_prob_EPR(q)=abs(round((V_EPR(:,x))'*SxEPR*(V_EPR(:,y)),9))^2;
-
-                        % Transition frequency in Hz
-                        freq_EPR(q)=abs(E_EPR(x)-E_EPR(y));
-
-                        % Select EPR transitions with frequency threshold value (1 GHz)
-                        if (freq_EPR(q)<1e9)||(trans_prob_EPR(q)<0.1)
-                            trans_prob_EPR(q)=0;
-                        end
-                        q=q+1;
-                    end
-                end
-
-                freq_EPR=freq_EPR(logical(trans_prob_EPR))   ;
-                trans_prob_EPR=trans_prob_EPR(logical(trans_prob_EPR));
+                % Select microwave-active EPR transitions in Liouville space
+                [freq_EPR,trans_prob_EPR]=kehl_epr_transitions(...
+                    spin_system,parameters,euler_angles,'frequency',B);
+                hit_list=(freq_EPR<1e9)|(trans_prob_EPR<0.1);
+                freq_EPR(hit_list)=[];
+                trans_prob_EPR(hit_list)=[];
 
                 % EPR Frequency Spectrum
                 for p=1:length(freq_EPR)
 
                     % Scale resonance to frequency-axis bin
-                    bin_freq=round((freq_EPR-parameters.epr_freq_min_hz)/parameters.epr_freq_step_hz)+1;
-                    if trans_prob_EPR(p)>0
-                        tmp_epr(bin_freq(p))=tmp_epr(bin_freq(p))+trans_prob_EPR(p);
+                    scalefactor=0;
+                    bin_freq=round((freq_EPR(p)-parameters.epr_freq_min_hz)/...
+                        parameters.epr_freq_step_hz)+1;
+                    if (bin_freq>=1)&&(bin_freq<=paramsEPR("Npts"))&&...
+                            (trans_prob_EPR(p)>0)
+                        tmp_epr(bin_freq)=tmp_epr(bin_freq)+trans_prob_EPR(p);
                         DeltaOm=freq_EPR(p)-parameters.mw_freq_hz;
 
                         if isfield(parameters,'pulse_file')
@@ -294,32 +206,29 @@ function EPR=kehl_ori_freq(spin_system,parameters)
 
                         if SF>1e-3
 
-                            % including transition probability!
+                            % Include transition probability in the EPR spectrum
                             scalefactor=SF;
-                        else
-                            scalefactor=0;
                         end
                     end
 
-                    %Select only those parameters, for which scalefactor > 0
-
-                    offsets=kehl_offsets(constants,parameters,spin_system,paramsENDOR,B,geff,HF_zz,NQI_zz);
+                    % Select only transitions with non-negligible excitation
+                    offsets=kehl_offsets(parameters,spin_system,B,euler_angles);
 
                     if (scalefactor>0)&&(trans_prob_EPR(p)>0)
 
                         or=or+1;
-                        geff_sel(or)=geff(1);
-                        B_sel(or)=Beff;
-                        HF_zz_sel(or,:)=HF_zz(:);
-                        HF_zy_sel(or,:)=HF_zy(:);
-                        HF_zx_sel(or,:)=HF_zx(:);
-                        NQI_zz_sel(or,:)=NQI_zz(:);
-                        NQI_sel(or,:,:,:)=NQI(:,:,:);
-                        CS_zz_sel(or,:)=CS_zz(:);
-                        D_zz_sel(or,:)=D_zz(:);
-                        euler_sel(or,:)=euler_angles;
-                        S_sel(or)=scalefactor;
-                        offsets_sel(or,:)=offsets(:);
+                        geff_sel(or)=geff(1); %#ok<AGROW>
+                        B_sel(or)=Beff; %#ok<AGROW>
+                        HF_zz_sel(or,:)=HF_zz(:); %#ok<AGROW>
+                        HF_zy_sel(or,:)=HF_zy(:); %#ok<AGROW>
+                        HF_zx_sel(or,:)=HF_zx(:); %#ok<AGROW>
+                        NQI_zz_sel(or,:)=NQI_zz(:); %#ok<AGROW>
+                        NQI_sel(or,:,:,:)=NQI(:,:,:); %#ok<AGROW>
+                        CS_zz_sel(or,:)=CS_zz(:); %#ok<AGROW>
+                        D_zz_sel(or,:)=D_zz(:); %#ok<AGROW>
+                        euler_sel(or,:)=euler_angles; %#ok<AGROW>
+                        S_sel(or)=scalefactor; %#ok<AGROW>
+                        offsets_sel(or,:)=offsets(:); %#ok<AGROW>
                     end
                 end
             end
@@ -370,11 +279,7 @@ function EPR=kehl_ori_freq(spin_system,parameters)
             end
         end
 
-        offsets_tmp=kehl_offsets(constants,parameters,spin_system,paramsENDOR,B,geff,HF_zz,NQI_zz);
-
-        sel_I=parameters.sel_I;
-        s=size(offsets_tmp,2)/n_endor;
-        offsets=offsets_tmp(((sel_I-1)*s+1):(sel_I*s));
+        offsets=kehl_offsets(parameters,spin_system,B,[0 0 0]);
 
         scalefactor=1;
         geff_sel(or)=geff(1);
@@ -413,6 +318,9 @@ end
 function grumble(spin_system,parameters)
     if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
         error('spin_system must be a Spinach spin system structure.');
+    end
+    if ~strcmp(spin_system.bas.formalism,'zeeman-liouv')
+        error('spin_system must use zeeman-liouv formalism.');
     end
     if ~isstruct(parameters)
         error('parameters must be a structure.');

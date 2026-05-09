@@ -36,6 +36,7 @@ function parameters=kehl_context_spin_data(spin_system,parameters)
     parameters.electron_spin=(electron_mult-1)/2;
     parameters.electron_spin_idx=electron_idx;
     parameters.electron_isotope=isotopes{electron_idx};
+    parameters.electron_r2_rate=kehl_spin_r2_rate(spin_system,electron_idx);
     parameters.g_matrix=kehl_electron_g_matrix(spin_system,electron_idx);
     parameters.g_iso=trace(parameters.g_matrix)/3;
     parameters.n_endor=n_endor;
@@ -118,6 +119,22 @@ function parameters=kehl_context_spin_data(spin_system,parameters)
         parameters.epr_nqi_matrix=zeros(0,3);
         parameters.epr_nqi_active=false;
     end
+end
+
+% Read scalar R2 rate from Spinach relaxation data
+function rate=kehl_spin_r2_rate(spin_system,spin_idx)
+
+    % Default to no line-width threshold without scalar R2 data
+    rate=0;
+
+    % Use canonical Spinach R2 rates when present
+    if isfield(spin_system,'rlx')&&isfield(spin_system.rlx,'r2_rates')&&...
+            (numel(spin_system.rlx.r2_rates)>=spin_idx)&&...
+            isnumeric(spin_system.rlx.r2_rates{spin_idx})&&...
+            isscalar(spin_system.rlx.r2_rates{spin_idx})
+        rate=spin_system.rlx.r2_rates{spin_idx};
+    end
+
 end
 
 % Consistency enforcement

@@ -264,3 +264,4 @@ function grumble(spin_system,parameters,euler_angles,mode,probe)
         error('probe must be a real numeric scalar.');
     end
 end
+

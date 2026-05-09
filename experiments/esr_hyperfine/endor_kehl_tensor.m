@@ -1,6 +1,6 @@
 % ENDOR tensor pulse sequence for the Kehl ENDOR context. Syntax:
 %
-%      endor_amp=endor_kehl_tensor(spin_system,parameters,H,R)
+%      [endor_amp,parameters]=endor_kehl_tensor(spin_system,parameters,H,R)
 %
 % Parameters:
 %
@@ -11,21 +11,25 @@
 % Outputs:
 %
 %   endor_amp        - simulated tensor-ENDOR amplitude array.
+%   parameters       - parameter structure with derived sequence data.
 %
 % February 2024 A. Kehl (akehl@gwdg.de)
 % May 2026 Spinach integration
 %
 % <https://spindynamics.org/wiki/index.php?title=endor_kehl_tensor.m>
 
-function endor_amp=endor_kehl_tensor(spin_system,parameters,H,R)
+function [endor_amp,parameters]=endor_kehl_tensor(spin_system,parameters,H,R)
 
-    % Append sequence-specific parameters when requested by the context
-    if nargin>=3&&ischar(H)&&strcmp(H,'parameters')
-        endor_amp=kehl_tensor_parameters(parameters);
-        return
-    end
     % Check consistency
     grumble(spin_system,parameters,H,R);
+
+    % Append sequence-specific parameters
+    parameters=kehl_tensor_parameters(parameters);
+
+    % Select sequence-dependent EPR orientations
+    parameters=kehl_sequence_context(spin_system,parameters);
+
+    % Run the sequence calculation
     endor_amp=kehl_tensor_calc(spin_system,parameters,R);
 end
 

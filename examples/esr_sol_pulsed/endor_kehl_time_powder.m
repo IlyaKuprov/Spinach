@@ -46,6 +46,12 @@ function endor_kehl_time_powder()
     inter.coupling.eigs{2,4}=[2*D,-D,-D]*1e3;
     inter.coupling.euler{2,4}=[0,-34.3,47.9]*pi/180;
 
+    inter.relaxation={'t1_t2'};
+    inter.r1_rates={1/(4e-3) 0 0 0 0};
+    inter.r2_rates={1/(5e-6) 1/(3e-3) 1/(3e-3) 1/(3e-3) 1/(3e-3)};
+    inter.equilibrium='zero';
+    inter.rlx_keep='diagonal';
+
     bas.formalism='zeeman-liouv';
     bas.approximation='none';
 

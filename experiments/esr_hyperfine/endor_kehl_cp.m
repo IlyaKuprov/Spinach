@@ -1,6 +1,6 @@
 % Cross-polarisation ENDOR pulse sequence for the Kehl ENDOR context. Syntax:
 %
-%      endor_amp=endor_kehl_cp(spin_system,parameters,H,R)
+%      [endor_amp,parameters]=endor_kehl_cp(spin_system,parameters,H,R)
 %
 % Parameters:
 %
@@ -11,21 +11,25 @@
 % Outputs:
 %
 %   endor_amp        - simulated cross-polarisation ENDOR amplitude array.
+%   parameters       - parameter structure with derived sequence data.
 %
 % February 2024 A. Kehl (akehl@gwdg.de)
 % May 2026 Spinach integration
 %
 % <https://spindynamics.org/wiki/index.php?title=endor_kehl_cp.m>
 
-function endor_amp=endor_kehl_cp(spin_system,parameters,H,R)
+function [endor_amp,parameters]=endor_kehl_cp(spin_system,parameters,H,R)
 
-    % Append sequence-specific parameters when requested by the context
-    if nargin>=3&&ischar(H)&&strcmp(H,'parameters')
-        endor_amp=kehl_cp_parameters(parameters);
-        return
-    end
     % Check consistency
     grumble(spin_system,parameters,H,R);
+
+    % Append sequence-specific parameters
+    parameters=kehl_cp_parameters(parameters);
+
+    % Select sequence-dependent EPR orientations
+    parameters=kehl_sequence_context(spin_system,parameters);
+
+    % Run the sequence calculation
     endor_amp=kehl_cp_calc(spin_system,parameters,R);
 end
 
@@ -219,7 +223,7 @@ function endor_amp=kehl_cp_calc(spin_system,parameters,R)
                 % Loop over RF frequencies
                 parfor a=1:Npts_EN
 
-                    if abs(HF_zz(1))>1/parameters.T2e*0.1
+                    if abs(HF_zz(1))>parameters.electron_r2_rate*0.1
 
                         % Radiofrequency
                         v_RF=(start_EN+step_EN*(a-1));

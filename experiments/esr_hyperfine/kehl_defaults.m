@@ -43,42 +43,9 @@ function parameters=kehl_defaults(parameters)
         parameters.N_stepRF=100;
     end
 
-    % Is relaxation included?
-    if ~isfield(parameters,'Relax')
-        parameters.Relax=false;
-    end
-
     % Are temperature effects used?
     if ~isfield(parameters,'temp_eff')
         parameters.temp_eff=false;
-    end
-
-    % Use temperature effects if relaxation is used
-    if parameters.Relax==true
-        if parameters.temp_eff==false
-            warning('The temperature needs to be considered if relaxation is used.');
-        end
-        parameters.temp_eff=true;
-    end
-
-    % Electron longitudinal relaxation time, seconds
-    if ~isfield(parameters,'T1e')
-        parameters.T1e=4e-3;
-    end
-
-    % Nuclear longitudinal relaxation time, seconds
-    if ~isfield(parameters,'T1n')
-        parameters.T1n=Inf;
-    end
-
-    % Electron transverse relaxation time, seconds
-    if ~isfield(parameters,'T2e')
-        parameters.T2e=5e-6;
-    end
-
-    % Nuclear transverse relaxation time, seconds
-    if ~isfield(parameters,'T2n')
-        parameters.T2n=3e-3;
     end
 
     % Set the temperature

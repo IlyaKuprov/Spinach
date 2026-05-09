@@ -45,10 +45,10 @@ function varargout=endor_kehl_context(spin_system,sequence,parameters,assumption
     end
 
     % Let the pulse sequence append its own derived parameters
-    parameters=pulse_sequence(spin_system,parameters,'parameters',[],[]);
+    parameters=pulse_sequence(spin_system,parameters,'parameters',[]);
 
     % Select EPR orientations using sequence-independent context data
-    parameters.paramsEPR=kehl_prep_epr(spin_system,parameters);
+    parameters.paramsEPR=kehl_prep_epr(parameters);
     if parameters.freqDomain==false
         parameters.epr=kehl_ori_field(spin_system,parameters);
     else
@@ -62,10 +62,9 @@ function varargout=endor_kehl_context(spin_system,sequence,parameters,assumption
     else
         R=mprealloc(spin_system,1);
     end
-    K=[];
 
     % Run the requested pulse sequence using the Spinach experiment signature
-    endor_amp=pulse_sequence(spin_system,parameters,H,R,K);
+    endor_amp=pulse_sequence(spin_system,parameters,H,R);
     endor_amp_conv=kehl_line_broaden(endor_amp,parameters);
 
     x_coords=parameters.paramsENDOR('x_coords');

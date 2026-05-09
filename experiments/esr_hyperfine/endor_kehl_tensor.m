@@ -1,12 +1,12 @@
 % ENDOR tensor pulse sequence for the Kehl ENDOR context. Syntax:
 %
-%      endor_amp=endor_kehl_tensor(spin_system,parameters,H,R,K)
+%      endor_amp=endor_kehl_tensor(spin_system,parameters,H,R)
 %
 % Parameters:
 %
 %   spin_system      - Spinach spin system structure.
 %   parameters       - Kehl ENDOR context parameter structure.
-%   H,R,K            - Spinach experiment signature matrices.
+%   H,R              - Spinach experiment signature matrices.
 %
 % Outputs:
 %
@@ -17,19 +17,19 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=endor_kehl_tensor.m>
 
-function endor_amp=endor_kehl_tensor(spin_system,parameters,H,R,K)
+function endor_amp=endor_kehl_tensor(spin_system,parameters,H,R)
 
     % Append sequence-specific parameters when requested by the context
     if nargin>=3&&ischar(H)&&strcmp(H,'parameters')
-        endor_amp=kehl_tensor_parameters(spin_system,parameters);
+        endor_amp=kehl_tensor_parameters(parameters);
         return
     end
     % Check consistency
-    grumble(spin_system,parameters,H,R,K);
+    grumble(spin_system,parameters,H,R);
     endor_amp=kehl_tensor_calc(spin_system,parameters,R);
 end
 
-function parameters=kehl_tensor_parameters(spin_system,parameters)
+function parameters=kehl_tensor_parameters(parameters)
 
     % Get pulse sequence timing and RF-field policy
     constants=parameters.constants;
@@ -54,14 +54,14 @@ function parameters=kehl_tensor_parameters(spin_system,parameters)
     end
 
     % Append standard ENDOR sweep-axis data
-    parameters=kehl_endor_axis(spin_system,parameters,'endor');
+    parameters=kehl_endor_axis(parameters,'endor');
 
 end
 
 function endor_amp=kehl_tensor_calc(spin_system,parameters,R)
 
     % Check consistency
-    grumble(spin_system,parameters,[],[],[]);
+    grumble(spin_system,parameters,[],R);
 
     % Unpack context data
     constants=parameters.constants;
@@ -188,7 +188,7 @@ function endor_amp=kehl_tensor_calc(spin_system,parameters,R)
     end
 end
 
-function grumble(spin_system,parameters,H,R,K)
+function grumble(spin_system,parameters,H,R)
     if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
         error('spin_system must be a Spinach spin system structure.');
     end
@@ -200,9 +200,6 @@ function grumble(spin_system,parameters,H,R,K)
     end
     if (~isempty(R))&&(~isnumeric(R))
         error('R must be empty or numeric.');
-    end
-    if (~isempty(K))&&(~isnumeric(K))
-        error('K must be empty or numeric.');
     end
 end
 

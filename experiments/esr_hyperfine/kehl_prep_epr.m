@@ -1,10 +1,9 @@
 % EPR field-axis parameters for the Kehl ENDOR context. Syntax:
 %
-%      paramsEPR=kehl_prep_epr(spin_system,parameters)
+%      paramsEPR=kehl_prep_epr(parameters)
 %
 % Parameters:
 %
-%   spin_system      - Spinach spin system structure.
 %   parameters       - Kehl ENDOR context parameter structure.
 %
 % Outputs:
@@ -16,13 +15,12 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=kehl_prep_epr.m>
 
-function paramsEPR=kehl_prep_epr(spin_system,parameters)
+function paramsEPR=kehl_prep_epr(parameters)
 
     % Check consistency
-    grumble(spin_system,parameters);
+    grumble(parameters);
 
     % Unpack context data
-    constants=parameters.constants;
     g_iso=parameters.g_iso;
     obsField=parameters.field_t;
 
@@ -30,7 +28,7 @@ function paramsEPR=kehl_prep_epr(spin_system,parameters)
     geff=g_iso;
 
     % EPR simulation range
-    fieldCenter=gBepr/g_iso;
+    fieldCenter=gBepr/geff;
     fieldmin=fieldCenter-0.260;
     fieldmax=fieldCenter+0.260;
 
@@ -45,10 +43,9 @@ function paramsEPR=kehl_prep_epr(spin_system,parameters)
     paramsEPR("fieldAxis")=field;
 
 end
-function grumble(spin_system,parameters)
-    if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
-        error('spin_system must be a Spinach spin system structure.');
-    end
+
+% Consistency enforcement
+function grumble(parameters)
     if ~isstruct(parameters)
         error('parameters must be a structure.');
     end

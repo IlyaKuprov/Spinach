@@ -1,12 +1,12 @@
 % Time-domain Mims ENDOR pulse sequence for the Kehl ENDOR context. Syntax:
 %
-%      endor_amp=endor_kehl_time(spin_system,parameters,H,R,K)
+%      endor_amp=endor_kehl_time(spin_system,parameters,H,R)
 %
 % Parameters:
 %
 %   spin_system      - Spinach spin system structure.
 %   parameters       - Kehl ENDOR context parameter structure.
-%   H,R,K            - Spinach experiment signature matrices.
+%   H,R              - Spinach experiment signature matrices.
 %
 % Outputs:
 %
@@ -17,19 +17,19 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=endor_kehl_time.m>
 
-function endor_amp=endor_kehl_time(spin_system,parameters,H,R,K)
+function endor_amp=endor_kehl_time(spin_system,parameters,H,R)
 
     % Append sequence-specific parameters when requested by the context
     if nargin>=3&&ischar(H)&&strcmp(H,'parameters')
-        endor_amp=kehl_time_parameters(spin_system,parameters);
+        endor_amp=kehl_time_parameters(parameters);
         return
     end
     % Check consistency
-    grumble(spin_system,parameters,H,R,K);
+    grumble(spin_system,parameters,H,R);
     endor_amp=kehl_time_calc(spin_system,parameters,R);
 end
 
-function parameters=kehl_time_parameters(spin_system,parameters)
+function parameters=kehl_time_parameters(parameters)
 
     % Get pulse sequence timing and RF-field policy
     constants=parameters.constants;
@@ -60,17 +60,16 @@ function parameters=kehl_time_parameters(spin_system,parameters)
 
     % Append time-domain ENDOR sweep-axis data
     parameters.time_start_s=t(6);
-    parameters=kehl_endor_axis(spin_system,parameters,'time');
+    parameters=kehl_endor_axis(parameters,'time');
 
 end
 
 function endor_amp=kehl_time_calc(spin_system,parameters,R)
 
     % Check consistency
-    grumble(spin_system,parameters,[],[],[]);
+    grumble(spin_system,parameters,[],R);
 
     % Unpack context data
-    constants=parameters.constants;
     paramsENDOR=parameters.paramsENDOR;
     EPR=parameters.epr;
     n_endor=parameters.n_endor;
@@ -92,14 +91,9 @@ function endor_amp=kehl_time_calc(spin_system,parameters,R)
     t=parameters.pulse_times_s;
     Nint=8;
 
-    geff_sel=EPR("geff_sel");
     B_sel=EPR("B_sel");
     euler_sel=EPR("euler_sel");
     HF_zz_sel=EPR("HF_zz_sel");
-    HF_zy_sel=EPR("HF_zy_sel");
-    HF_zx_sel=EPR("HF_zx_sel");
-
-    NQI_zz_sel=EPR("NQI_zz_sel");
 
     S_sel=EPR("S_sel");
 
@@ -118,16 +112,10 @@ function endor_amp=kehl_time_calc(spin_system,parameters,R)
         endor_amp_tmp=zeros(1,Npts_EN);
 
         % Select orientation-specific parameters
-        geff=geff_sel(j);
-        B=B_sel(j);
         euler_angles=euler_sel(j,:);
 
         HF_zz=HF_zz_sel(j,:);
 
-        HF_zy=HF_zy_sel(j,:);
-        HF_zx=HF_zx_sel(j,:);
-
-        NQI_zz=NQI_zz_sel(j,:);
         S=S_sel(j);
         offsets=offsets_sel(j,:);
 
@@ -136,7 +124,7 @@ function endor_amp=kehl_time_calc(spin_system,parameters,R)
 
             v_off_S=offsets(offset_idx);
 
-            rho0=kehl_rho0(constants,paramsENDOR,B,geff,spin_system,parameters,HF_zz,HF_zy,HF_zx,NQI_zz);
+            rho0=kehl_rho0(spin_system,parameters);
 
             step_EN=paramsENDOR("step_EN");
 
@@ -268,7 +256,7 @@ function endor_amp=kehl_time_calc(spin_system,parameters,R)
 
 end
 
-function grumble(spin_system,parameters,H,R,K)
+function grumble(spin_system,parameters,H,R)
     if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
         error('spin_system must be a Spinach spin system structure.');
     end
@@ -280,9 +268,6 @@ function grumble(spin_system,parameters,H,R,K)
     end
     if (~isempty(R))&&(~isnumeric(R))
         error('R must be empty or numeric.');
-    end
-    if (~isempty(K))&&(~isnumeric(K))
-        error('K must be empty or numeric.');
     end
 end
 

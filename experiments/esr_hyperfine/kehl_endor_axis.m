@@ -1,10 +1,9 @@
 % ENDOR sweep axis for Kehl pulse sequences. Syntax:
 %
-%      parameters=kehl_endor_axis(spin_system,parameters,mode)
+%      parameters=kehl_endor_axis(parameters,mode)
 %
 % Parameters:
 %
-%   spin_system      - Spinach spin system structure.
 %   parameters       - Kehl ENDOR context parameter structure.
 %   mode             - 'endor' or 'time' axis mode.
 %
@@ -17,13 +16,13 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=kehl_endor_axis.m>
 
-function parameters=kehl_endor_axis(spin_system,parameters,mode)
-    if nargin<3
+function parameters=kehl_endor_axis(parameters,mode)
+    if nargin<2
         mode='endor';
     end
 
     % Check consistency
-    grumble(spin_system,parameters,mode);
+    grumble(parameters,mode);
 
     % Calculate nuclear Larmor frequencies
     nuclei=parameters.endor_isotopes;
@@ -73,10 +72,7 @@ function parameters=kehl_endor_axis(spin_system,parameters,mode)
 end
 
 % Consistency enforcement
-function grumble(spin_system,parameters,mode)
-    if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||(~isfield(spin_system,'comp'))
-        error('spin_system must be a Spinach spin system structure.');
-    end
+function grumble(parameters,mode)
     if ~isstruct(parameters)
         error('parameters must be a structure.');
     end

@@ -26,8 +26,8 @@ function endor_amp=endor_kehl_tensor(spin_system,parameters,H,R,K)
     end
     % Check consistency
     grumble(spin_system,parameters,H,R,K);
-    if parameters.Relax==true
-        endor_amp=kehl_tensor_rlx(spin_system,parameters);
+    if ~isempty(R)
+        endor_amp=kehl_tensor_liouv(spin_system,parameters,R);
     else
         endor_amp=kehl_tensor_calc(spin_system,parameters);
     end
@@ -62,7 +62,7 @@ function parameters=kehl_tensor_parameters(spin_system,parameters)
 
 end
 
-function endor_amp=kehl_tensor_rlx(spin_system,parameters)
+function endor_amp=kehl_tensor_liouv(spin_system,parameters,R)
 
     % Check consistency
     grumble(spin_system,parameters,[],[],[]);
@@ -138,15 +138,6 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
                 off_1=-I(spin_idx)*HF_zz(spin_idx);
 
                 [rho0]=2*Sz*Iz{1};
-
-                RT2e=kehl_relax_t2(Sx_D,parameters.T2e);
-                RT2n=zeros(size(RT2e));
-
-                for mm=1:n_endor
-                    RT2e=RT2e+kehl_relax_t2(Sx_D*Ix_D{mm},parameters.T2dq);
-                    RT2n=RT2n+kehl_relax_t2(Ix_D{mm},parameters.T2n);
-                end
-                R=RT2e+RT2n;
                 start_EN=paramsENDOR("start_EN");
                 step_EN=paramsENDOR("step_EN");
 
@@ -178,7 +169,7 @@ function endor_amp=kehl_tensor_rlx(spin_system,parameters)
                         U1=full(propagator(spin_system,1i*sparse(R-1i*full(hilb2liouv(sparse(HRF),'comm'))),t(1)));
                         U2=full(propagator(spin_system,1i*sparse(R-1i*Hfree),t2));
                     else
-                        U1=kehl_rf_bterm_rlx(parameters,v_RF,Hfree_p,Iy,t(1),n_endor,R,spin_system);
+                        U1=kehl_rf_bterm(parameters,v_RF,Hfree_p,Iy,t(1),n_endor,spin_system,R);
                         U2=full(propagator(spin_system,1i*sparse(R-1i*Hfree),t2));
                     end
 

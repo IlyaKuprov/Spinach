@@ -26,8 +26,8 @@ function endor_amp=endor_kehl_time(spin_system,parameters,H,R,K)
     end
     % Check consistency
     grumble(spin_system,parameters,H,R,K);
-    if parameters.Relax==true
-        endor_amp=kehl_time_rlx(spin_system,parameters);
+    if ~isempty(R)
+        endor_amp=kehl_time_liouv(spin_system,parameters,R);
     else
         endor_amp=kehl_time_calc(spin_system,parameters);
     end
@@ -68,7 +68,7 @@ function parameters=kehl_time_parameters(spin_system,parameters)
 
 end
 
-function endor_amp=kehl_time_rlx(spin_system,parameters)
+function endor_amp=kehl_time_liouv(spin_system,parameters,R)
 
     % Check consistency
     grumble(spin_system,parameters,[],[],[]);
@@ -116,8 +116,6 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
         % No resonance orientations were found
         return
     end
-    warning('This is a beta version and has not been fully tested.');
-
     % Loop over selected orientations
     parfor j=1:length(B_sel)
         endor_amp_tmp=zeros(1,Npts_EN);
@@ -147,21 +145,6 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
             off_1=offsets(1);
 
             rho0=kehl_rho0(constants,paramsENDOR,B,geff,spin_system,parameters,HF_zz,HF_zy,HF_zx,NQI_zz);
-
-            % Electron T1 relaxation
-            RT1e=kehl_relax_t1(rho0,Sx_D,parameters.T1e);
-            RT1n=zeros(size(RT1e));
-            RT2e=kehl_relax_t2(Sx_D,parameters.T2e);
-            RT2n=zeros(size(RT2e));
-
-            for mn=1:n_endor
-
-                % Nuclear T1 relaxation
-                RT1n=RT1e+kehl_relax_t1(rho0,Ix_D{mn},parameters.T1n);
-                RT2e=RT2e+kehl_relax_t2(Sx_D*Ix_D{mn},parameters.T2dq);
-                RT2n=RT2n+kehl_relax_t2(Ix_D{mn},parameters.T2n);
-            end
-            R=RT1e+RT1n+RT2e+RT2n;
 
             step_EN=paramsENDOR("step_EN");
 
@@ -224,11 +207,11 @@ function endor_amp=kehl_time_rlx(spin_system,parameters)
                 end
                 U10=full(propagator(spin_system,1i*sparse(R-1i*Hfree),t(2)+t(3)/2));
             else
-                U5=kehl_rf_bterm_rlx(parameters,v_RF,Hfree_p,Iy,t(5),n_endor,R,spin_system);
+                U5=kehl_rf_bterm(parameters,v_RF,Hfree_p,Iy,t(5),n_endor,spin_system,R);
                 if t(5)==t(7)
                     U7=U5;
                 else
-                    U7=kehl_rf_bterm_rlx(parameters,v_RF,Hfree_p,Iy,t(7),n_endor,R,spin_system);
+                    U7=kehl_rf_bterm(parameters,v_RF,Hfree_p,Iy,t(7),n_endor,spin_system,R);
                 end
 
                 U1=full(propagator(spin_system,1i*sparse(R-1i*Hnonsel),t(1)));

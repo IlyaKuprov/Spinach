@@ -1,6 +1,6 @@
 % RF B-term propagator for Kehl ENDOR kernels. Syntax:
 %
-%      U=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t,n_endor,spin_system)
+%      U=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t,n_endor,spin_system,R)
 %
 % Parameters:
 %
@@ -11,6 +11,7 @@
 %   t                - pulse length.
 %   n_endor          - number of ENDOR nuclei.
 %   spin_system      - Spinach spin system structure.
+%   R                - optional relaxation superoperator.
 %
 % Outputs:
 %
@@ -21,14 +22,21 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=kehl_rf_bterm.m>
 
-function U=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t,n_endor,spin_system)
+function U=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t,n_endor,spin_system,R)
+    if nargin<8
+        R=[];
+    end
 
     % Check consistency
-    grumble(parameters,v_RF,Hfree,Iy,t,n_endor,spin_system);
+    grumble(parameters,v_RF,Hfree,Iy,t,n_endor,spin_system,R);
 
     % Incrementation calculation for the RF pulse
     t_stepRF=1/(v_RF*parameters.N_stepRF);
-    U_RF=eye(size(Hfree));
+    if isempty(R)
+        U_RF=eye(size(Hfree));
+    else
+        U_RF=eye(size(R));
+    end
 
     for n=1:parameters.N_stepRF
         HRF=Hfree;
@@ -36,7 +44,12 @@ function U=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t,n_endor,spin_system)
             HRF=HRF+2*parameters.nuclear_nutation*Iy{k}*...
                 cos(2*pi*v_RF*t_stepRF*(n-1));
         end
-        U_step=full(propagator(spin_system,sparse(HRF),t_stepRF));
+        if isempty(R)
+            U_step=full(propagator(spin_system,sparse(HRF),t_stepRF));
+        else
+            G=R-1i*full(hilb2liouv(sparse(HRF),'comm'));
+            U_step=full(propagator(spin_system,1i*sparse(G),t_stepRF));
+        end
         U_RF=U_step*U_RF;
     end
 
@@ -45,7 +58,7 @@ function U=kehl_rf_bterm(parameters,v_RF,Hfree,Iy,t,n_endor,spin_system)
 end
 
 % Consistency enforcement
-function grumble(parameters,v_RF,Hfree,Iy,t,n_endor,spin_system)
+function grumble(parameters,v_RF,Hfree,Iy,t,n_endor,spin_system,R)
     if ~isstruct(parameters)
         error('parameters must be a structure.');
     end
@@ -67,6 +80,9 @@ function grumble(parameters,v_RF,Hfree,Iy,t,n_endor,spin_system)
     if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||...
             (~isfield(spin_system,'comp'))
         error('spin_system must be a Spinach spin system structure.');
+    end
+    if (~isempty(R))&&(~isnumeric(R))
+        error('R must be empty or numeric.');
     end
 end
 

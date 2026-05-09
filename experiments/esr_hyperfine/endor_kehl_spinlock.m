@@ -26,8 +26,8 @@ function endor_amp=endor_kehl_spinlock(spin_system,parameters,H,R,K)
     end
     % Check consistency
     grumble(spin_system,parameters,H,R,K);
-    if parameters.Relax==true
-        endor_amp=kehl_spinlock_rlx(spin_system,parameters);
+    if ~isempty(R)
+        endor_amp=kehl_spinlock_liouv(spin_system,parameters,R);
     else
         endor_amp=kehl_spinlock_calc(spin_system,parameters);
     end
@@ -70,7 +70,7 @@ function parameters=kehl_spinlock_parameters(spin_system,parameters)
 
 end
 
-function endor_amp=kehl_spinlock_rlx(spin_system,parameters)
+function endor_amp=kehl_spinlock_liouv(spin_system,parameters,R)
 
     % Check consistency
     grumble(spin_system,parameters,[],[],[]);
@@ -151,46 +151,8 @@ function endor_amp=kehl_spinlock_rlx(spin_system,parameters)
 
                 rho0=kehl_rho0(constants,paramsENDOR,B,geff,spin_system,parameters,HF_zz,HF_zy,HF_zx,NQI_zz);
 
-                % Electron T1 relaxation
-                RT1e=kehl_relax_t1(rho0,Sx_D,parameters.T1e);
-                RT1n=zeros(size(RT1e));
-                RT2e=kehl_relax_t2(Sx_D,parameters.T2e);
-                RT2n=zeros(size(RT2e));
-
-                for mm=1:n_endor
-
-                    % Nuclear T1 relaxation
-                    RT1n=RT1e+kehl_relax_t1(rho0,Ix_D{mm},parameters.T1n);
-                    RT2e=RT2e+kehl_relax_t2(Sx_D*Ix_D{mm},parameters.T2dq);
-                    RT2n=RT2n+kehl_relax_t2(Ix_D{mm},parameters.T2n);
-                end
-
-                R=RT1e+RT1n+RT2e+RT2n;
-
                 % for tilted frame Rho relaxation times
-
-                % Electron T1 relaxation
-                RT1eRho=kehl_relax_t1(rho0,Sx_D,parameters.T1eR);
-                RT1nRho=zeros(size(RT1eRho));
-
-                % electron T2
-                RT2eRho=kehl_relax_t2(Sx_D,parameters.T2eR);
-                RT2nRho=zeros(size(RT2eRho));
-
-                for mm=1:n_endor
-
-                    % Nuclear T1 relaxation
-                    RT1nRho=RT1eRho+kehl_relax_t1(rho0,Ix_D{mm},parameters.T1nR);
-
-                    % double and zero quantum T2
-                    RT2eRho=RT2eRho+kehl_relax_t2(Sx_D*Ix_D{mm},parameters.T2dqR);
-
-                    % nuclear T2
-                    RT2nRho=RT2nRho+kehl_relax_t2(Ix_D{mm},parameters.T2nR);
-                end
-
-                % full relaxation superoperator
-                RRho=RT1eRho+RT1nRho+RT2eRho+RT2nRho;
+                RRho=R;
 
                 start_EN=paramsENDOR("start_EN");
                 step_EN=paramsENDOR("step_EN");
@@ -252,7 +214,7 @@ function endor_amp=kehl_spinlock_rlx(spin_system,parameters)
                         U8=full(propagator(spin_system,1i*sparse(R-1i*Hfree),t(6)+t(5)/2));
                         U9=full(propagator(spin_system,1i*sparse(R-1i*Hfree),t9));
                     else
-                        U3=kehl_rf_bterm_rlx(parameters,v_RF,Hfree_p,Iy,t(3),n_endor,R,spin_system);
+                        U3=kehl_rf_bterm(parameters,v_RF,Hfree_p,Iy,t(3),n_endor,spin_system,R);
 
                         U1=full(propagator(spin_system,1i*sparse(RRho-1i*HSL_t),t(1)));
                         U2=full(propagator(spin_system,1i*sparse(R-1i*Hfree),t(2)));

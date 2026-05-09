@@ -55,10 +55,16 @@ function varargout=endor_kehl_context(spin_system,sequence,parameters,assumption
         parameters.epr=kehl_ori_freq(spin_system,parameters);
     end
 
-    % Run the requested pulse sequence using the Spinach experiment signature
+    % Build Spinach relaxation superoperator when requested
     H=[];
-    R=[];
+    if parameters.Relax==true
+        R=kehl_context_relaxation(spin_system,parameters);
+    else
+        R=[];
+    end
     K=[];
+
+    % Run the requested pulse sequence using the Spinach experiment signature
     endor_amp=pulse_sequence(spin_system,parameters,H,R,K);
     endor_amp_conv=kehl_line_broaden(endor_amp,parameters);
 
@@ -87,6 +93,64 @@ function pulse_sequence=sequence_handle(sequence)
         name=['endor_kehl_' name];
     end
     pulse_sequence=str2func(name);
+end
+
+function R=kehl_context_relaxation(spin_system,parameters)
+
+    % Build a spherical-tensor Liouville copy for Spinach T1/T2 relaxation
+    rlx_spin_system=spin_system;
+    rlx_spin_system.bas.formalism='sphten-liouv';
+    rlx_spin_system.bas.approximation='none';
+    rlx_spin_system.rlx.theories={'t1_t2'};
+    rlx_spin_system.rlx.r1_rates=kehl_relaxation_rates(spin_system,parameters,'r1');
+    rlx_spin_system.rlx.r2_rates=kehl_relaxation_rates(spin_system,parameters,'r2');
+    rlx_spin_system.rlx.keep='diagonal';
+    rlx_spin_system.rlx.equilibrium='zero';
+    rlx_spin_system.rlx.dfs='ignore';
+    rlx_spin_system=basis(rlx_spin_system,rlx_spin_system.bas);
+
+    % Calculate Spinach relaxation in spherical-tensor Liouville space
+    R_sphten=relaxation(rlx_spin_system);
+
+    % Transform the superoperator into the Kehl Zeeman-Liouville basis
+    P=sphten2zeeman(rlx_spin_system);
+    if size(P,1)~=size(P,2)
+        error('Kehl ENDOR relaxation requires a complete spherical-tensor basis.');
+    end
+    R=sparse(P*R_sphten/P);
+
+end
+
+function rates=kehl_relaxation_rates(spin_system,parameters,kind)
+
+    % Preallocate one relaxation rate per spin
+    rates=cell(1,spin_system.comp.nspins);
+
+    % Convert Kehl relaxation times to Spinach rates
+    for n=1:spin_system.comp.nspins
+        if kehl_is_electron(spin_system.comp.isotopes{n})
+            if strcmp(kind,'r1')
+                rates{n}=kehl_rate(parameters.T1e);
+            else
+                rates{n}=kehl_rate(parameters.T2e);
+            end
+        else
+            if strcmp(kind,'r1')
+                rates{n}=kehl_rate(parameters.T1n);
+            else
+                rates{n}=kehl_rate(parameters.T2n);
+            end
+        end
+    end
+
+end
+
+function rate=kehl_rate(relax_time)
+    if isinf(relax_time)
+        rate=0;
+    else
+        rate=1/relax_time;
+    end
 end
 
 function grumble(spin_system,sequence,parameters,assumptions)

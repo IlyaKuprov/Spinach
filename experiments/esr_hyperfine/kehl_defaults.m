@@ -61,6 +61,26 @@ function parameters=kehl_defaults(parameters)
         parameters.temp_eff=true;
     end
 
+    % Electron longitudinal relaxation time, seconds
+    if ~isfield(parameters,'T1e')
+        parameters.T1e=4e-3;
+    end
+
+    % Nuclear longitudinal relaxation time, seconds
+    if ~isfield(parameters,'T1n')
+        parameters.T1n=Inf;
+    end
+
+    % Electron transverse relaxation time, seconds
+    if ~isfield(parameters,'T2e')
+        parameters.T2e=5e-6;
+    end
+
+    % Nuclear transverse relaxation time, seconds
+    if ~isfield(parameters,'T2n')
+        parameters.T2n=3e-3;
+    end
+
     % Set the temperature
     if ~isfield(parameters,'T')
         parameters.T=10;

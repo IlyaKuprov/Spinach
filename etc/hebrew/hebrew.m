@@ -1,9 +1,14 @@
 % IK's Hebrew flashcards function. The Excel files should contain
-% Hebrew vocabulary in two separate spreadsheets:
+% Hebrew vocabulary in four separate spreadsheets:
 %
 %       nouns.xlsx - English, masculine singular, feminine singular,
 %                    masculine plural, feminine plural, invariant,
 %                    notes
+%       adjectives.xlsx - English, masculine singular, feminine singular,
+%                         masculine plural, feminine plural, notes
+%       question_words.xlsx - English, masculine singular,
+%                             feminine singular, masculine plural,
+%                             feminine plural, invariant, notes
 %       verbs.xlsx - English, infinitive, masculine singular,
 %                    feminine singular, masculine plural,
 %                    feminine plural, notes
@@ -94,11 +99,23 @@ function cards=load_cards(root_dir)
     cards=table(strings(0,1),strings(0,1),strings(0,1),strings(0,1),...
                 'VariableNames',{'english','hebrew','form','source'});
 
-    % Load noun/adjective forms
+    % Load noun forms
     noun_file=fullfile(root_dir,'nouns.xlsx');
     noun_forms=["masculine singular","feminine singular",...
                 "masculine plural","feminine plural","invariant"];
     cards=[cards;read_cards(noun_file,"noun",noun_forms,2:6)];
+
+    % Load adjective forms
+    adj_file=fullfile(root_dir,'adjectives.xlsx');
+    adj_forms=["masculine singular","feminine singular",...
+               "masculine plural","feminine plural"];
+    cards=[cards;read_cards(adj_file,"adjective",adj_forms,2:5)];
+
+    % Load question word forms
+    ques_file=fullfile(root_dir,'question_words.xlsx');
+    ques_forms=["masculine singular","feminine singular",...
+                "masculine plural","feminine plural","invariant"];
+    cards=[cards;read_cards(ques_file,"question word",ques_forms,2:6)];
 
     % Load verb forms
     verb_file=fullfile(root_dir,'verbs.xlsx');
@@ -108,7 +125,7 @@ function cards=load_cards(root_dir)
 
     % Refuse to run on empty input
     if isempty(cards)
-        error('No flashcards found in nouns.xlsx and verbs.xlsx.');
+        error('No flashcards found in the Hebrew vocabulary spreadsheets.');
     end
 
 end

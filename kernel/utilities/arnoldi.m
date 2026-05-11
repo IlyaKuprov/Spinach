@@ -21,6 +21,9 @@
 %
 %    H - extended Hessenberg matrix
 %
+% If exact Krylov breakdown occurs, V and H are truncated to the
+% completed invariant subspace.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=arnoldi.m>
@@ -56,7 +59,12 @@ for n=1:niter
     
     % Compute the norm
     H(n+1,n)=norm(V(:,n+1),2);
-    
+
+    % Return if exact Krylov breakdown occurs
+    if H(n+1,n)==0
+        V=V(:,1:n); H=H(1:n,1:n); return;
+    end
+
     % Divide out the norm
     V(:,n+1)=V(:,n+1)/H(n+1,n);
     

@@ -1,9 +1,15 @@
 % IK's Hebrew flashcards function. The Excel files should contain
-% Hebrew vocabulary in four separate spreadsheets:
+% Hebrew vocabulary in separate spreadsheets:
 %
 %       nouns.xlsx - English, masculine singular, feminine singular,
 %                    masculine plural, feminine plural, invariant,
 %                    notes
+%       adverbs.xlsx, directions.xlsx, greetings.xlsx, languages.xlsx,
+%                    numbers.xlsx, particles.xlsx, phrases.xlsx,
+%                    prepositions.xlsx, pronouns.xlsx,
+%                    proper_nouns.xlsx, quantifiers.xlsx,
+%                    sex_terms.xlsx, weekdays.xlsx - same columns as
+%                    nouns.xlsx
 %       adjectives.xlsx - English, masculine singular, feminine singular,
 %                         masculine plural, feminine plural, notes
 %       question_words.xlsx - English, masculine singular,
@@ -99,23 +105,39 @@ function cards=load_cards(root_dir)
     cards=table(strings(0,1),strings(0,1),strings(0,1),strings(0,1),...
                 'VariableNames',{'english','hebrew','form','source'});
 
-    % Load noun forms
-    noun_file=fullfile(root_dir,'nouns.xlsx');
+    % Define the forms used by noun-like word classes
     noun_forms=["masculine singular","feminine singular",...
                 "masculine plural","feminine plural","invariant"];
-    cards=[cards;read_cards(noun_file,"noun",noun_forms,2:6)];
+
+    % List noun-like word class files
+    lex_files={...
+        'nouns.xlsx',"noun";...
+        'proper_nouns.xlsx',"proper noun";...
+        'languages.xlsx',"language";...
+        'weekdays.xlsx',"weekday";...
+        'numbers.xlsx',"number";...
+        'pronouns.xlsx',"pronoun";...
+        'prepositions.xlsx',"preposition";...
+        'adverbs.xlsx',"adverb";...
+        'particles.xlsx',"particle";...
+        'quantifiers.xlsx',"quantifier";...
+        'directions.xlsx',"direction";...
+        'phrases.xlsx',"phrase";...
+        'greetings.xlsx',"greeting";...
+        'sex_terms.xlsx',"sex term";...
+        'question_words.xlsx',"question word"};
+
+    % Load noun-like and invariant word classes
+    for n=1:size(lex_files,1)
+        lex_file=fullfile(root_dir,lex_files{n,1});
+        cards=[cards;read_cards(lex_file,lex_files{n,2},noun_forms,2:6)];
+    end
 
     % Load adjective forms
     adj_file=fullfile(root_dir,'adjectives.xlsx');
     adj_forms=["masculine singular","feminine singular",...
                "masculine plural","feminine plural"];
     cards=[cards;read_cards(adj_file,"adjective",adj_forms,2:5)];
-
-    % Load question word forms
-    ques_file=fullfile(root_dir,'question_words.xlsx');
-    ques_forms=["masculine singular","feminine singular",...
-                "masculine plural","feminine plural","invariant"];
-    cards=[cards;read_cards(ques_file,"question word",ques_forms,2:6)];
 
     % Load verb forms
     verb_file=fullfile(root_dir,'verbs.xlsx');
@@ -227,5 +249,4 @@ end
 % being intercepted over Rehovot
 
 % #NWIKI
-
 

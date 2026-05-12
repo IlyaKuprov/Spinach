@@ -1,7 +1,8 @@
 % Cavity-induced spin relaxation in the EPR Purcell regime.
-% The Lorentzian Purcell rate follows Bienfait et al., Nature
-% 531, 74-77 (2016), and is plotted together with the corres-
-% ponding survival dynamics.
+% Coherent Jaynes-Cummings exchange is combined with rapid
+% cavity damping in Liouville space, producing relaxation of
+% the spin excitation by the NMR mechanism known as relaxation
+% of the second kind.
 %
 % Calculation time: seconds
 %
@@ -26,9 +27,12 @@ spin_system=basis(spin_system,bas);
 % Purcell parameters
 coupling=2*pi*0.35e6;
 detuning=2*pi*linspace(-8e6,8e6,301);
-kappas=2*pi*[0.5e6 1.0e6 2.0e6 4.0e6];
+loss_rates=2*pi*[2e6 4e6 8e6 16e6];
 
-% Jaynes-Cummings Hamiltonian in the one-excitation manifold
+% Spin detuning Hamiltonian
+spin_ham=operator(spin_system,'Lz',1);
+
+% Jaynes-Cummings exchange Hamiltonian
 Hjc=coupling*(operator(spin_system,{'L+','A'},{1,2})+...
               operator(spin_system,{'L-','C'},{1,2}));
 
@@ -45,14 +49,35 @@ if abs(jc_coupling-coupling)>1e-10*coupling
     error('Jaynes-Cummings matrix element is inconsistent.');
 end
 
-% Compute the Lorentzian Purcell rates
-rates=zeros(numel(detuning),numel(kappas));
-for n=1:numel(kappas)
-    rates(:,n)=kappas(n)*jc_coupling^2./...
-               (detuning.^2+(kappas(n)/2)^2);
+% Build the cavity loss Lindblad dissipator in Liouville space
+cav_ann=operator(spin_system,'A',2);
+cav_pop=cav_ann'*cav_ann;
+unit=speye(size(Hjc,1));
+loss_gen=kron(conj(cav_ann),cav_ann)-...
+         0.5*kron(unit,cav_pop)-...
+         0.5*kron(cav_pop.',unit);
+
+% Extract Purcell rates from Liouvillian slow modes
+rates=zeros(numel(detuning),numel(loss_rates));
+for n=1:numel(loss_rates)
+    for k=1:numel(detuning)
+
+        % Assemble the coherent Hamiltonian at this detuning
+        H=detuning(k)*spin_ham+Hjc;
+        H=(H+H')/2;
+
+        % Assemble the Hamiltonian and dissipative Liouvillian
+        L=-1i*(kron(unit,H)-kron(H.',unit))+loss_rates(n)*loss_gen;
+
+        % Convert the slow spin-amplitude mode into a population rate
+        decay_modes=eig(full(L));
+        decay_modes=decay_modes(real(decay_modes)<-1e-3);
+        rates(k,n)=-2*max(real(decay_modes));
+
+    end
 end
 
-% Validate resonant enhancement of the Purcell rate
+% Validate resonant second-kind relaxation
 if rates(ceil(end/2),2)<=rates(1,2)
     error('Purcell rate is not resonantly enhanced.');
 end
@@ -61,22 +86,43 @@ end
 time_axis=linspace(0,40e-6,250);
 det_pick=2*pi*[0 2e6 6e6];
 survival=zeros(numel(time_axis),numel(det_pick));
+rho_vec=spin_exc(:);
+spin_obs=spin_exc(:)';
+loss_ref=2*pi*4e6;
+
+% Simulate spin excitation survival under cavity damping
 for n=1:numel(det_pick)
-    rate=kappas(2)*jc_coupling^2/(det_pick(n)^2+(kappas(2)/2)^2);
-    survival(:,n)=exp(-rate*time_axis);
+
+    % Assemble the coherent Hamiltonian at this detuning
+    H=det_pick(n)*spin_ham+Hjc;
+    H=(H+H')/2;
+
+    % Assemble the Hamiltonian and dissipative Liouvillian
+    L=-1i*(kron(unit,H)-kron(H.',unit))+loss_ref*loss_gen;
+
+    % Propagate the density matrix in Liouville space
+    for k=1:numel(time_axis)
+        survival(k,n)=real(spin_obs*(expm(full(L)*time_axis(k))*rho_vec));
+    end
+
 end
 
-% Plot Purcell rate and survival dynamics
+% Validate the survival dynamics
+if survival(end,1)>=survival(end,end)
+    error('resonant Purcell relaxation is not faster than off-resonant relaxation.');
+end
+
+% Plot Liouvillian rates and survival dynamics
 kfigure(); scale_figure([2.0 0.75]);
 subplot(1,2,1); plot(detuning/(2*pi*1e6),rates/(2*pi*1e3),'LineWidth',1.5);
 axis tight; kgrid; kxlabel('spin-cavity detuning, MHz');
 kylabel('$\Gamma_P/2\pi$, kHz');
-ktitle('Purcell rate');
-klegend({'0.5 MHz','1 MHz','2 MHz','4 MHz'},'Location','NorthEast');
+ktitle('Liouvillian Purcell rate');
+klegend({'2 MHz','4 MHz','8 MHz','16 MHz'},'Location','NorthEast');
 subplot(1,2,2); plot(1e6*time_axis,survival,'LineWidth',1.5);
 axis tight; kgrid; kxlabel('time, $\mu$s');
 kylabel('spin excitation survival');
-ktitle('Purcell relaxation');
+ktitle('relaxation of the second kind');
 klegend({'0 MHz','2 MHz','6 MHz'},'Location','NorthEast');
 
 end

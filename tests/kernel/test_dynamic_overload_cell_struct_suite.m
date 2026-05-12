@@ -50,6 +50,14 @@ cell_c=7-cell_a;
 result=test_close(result,'cell left numeric minus',cell_c{1},7-A,1e-15,1e-15,...
                   'numeric left minus must subtract each cell from the scalar');
 
+% Exercise direct method-name dispatch for coverage tracking
+cell_c=plus(cell_a,cell_b);
+result=test_close(result,'cell direct plus',cell_c{1},A+C,1e-15,1e-15,...
+                  'direct plus() must dispatch to the cell overload');
+cell_c=minus(cell_a,cell_b);
+result=test_close(result,'cell direct minus',cell_c{2},B-D,1e-15,1e-15,...
+                  'direct minus() must dispatch to the cell overload');
+
 % Exercise cell times and mtimes dispatch
 weights=[2 3];
 cell_c=cell_a.*weights;
@@ -65,6 +73,12 @@ result=test_close(result,'cell right mtimes',cell_c{1},A*R,1e-15,1e-15,...
 cell_c=R*cell_a;
 result=test_close(result,'cell left mtimes',cell_c{2},R*B,1e-15,1e-15,...
                   'cell mtimes must left-multiply every cell');
+cell_c=times(cell_a,weights);
+result=test_close(result,'cell direct times',cell_c{1},2*A,1e-15,1e-15,...
+                  'direct times() must dispatch to the cell overload');
+cell_c=mtimes(cell_a,R);
+result=test_close(result,'cell direct mtimes',cell_c{2},B*R,1e-15,1e-15,...
+                  'direct mtimes() must dispatch to the cell overload');
 
 % Exercise cell utility overloads through real objects
 cell_sparse={sparse(A),sparse(B)};
@@ -105,11 +119,16 @@ result=test_close(result,'struct mtimes top field',struct_d.alpha,2*struct_a.alp
                   'struct mtimes must recurse into top-level numeric fields');
 result=test_close(result,'struct mtimes nested cell',struct_d.beta.delta{2},2*B,1e-15,1e-15,...
                   'struct mtimes must delegate nested cell multiplication');
+struct_c=plus(struct_a,struct_b);
+result=test_close(result,'struct direct plus',struct_c.beta.gamma,[10 12],1e-15,1e-15,...
+                  'direct plus() must dispatch to the struct overload');
+struct_d=mtimes(2,struct_a);
+result=test_close(result,'struct direct mtimes',struct_d.beta.delta{1},2*A,1e-15,1e-15,...
+                  'direct mtimes() must dispatch to the struct overload');
 
 % Exercise the double inflate no-op dispatch
 result=test_close(result,'double inflate no-op',inflate(A),A,1e-15,1e-15,...
                   'double inflate must leave dense numeric arrays unchanged');
 
 end
-
 

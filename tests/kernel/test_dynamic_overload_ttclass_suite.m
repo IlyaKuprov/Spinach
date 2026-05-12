@@ -37,10 +37,17 @@ result=test_close(result,'ttclass mode sizes',T.sizes,[2 2],0,0,...
                   'ttclass sizes must report one physical row and column mode');
 result=test_close(result,'ttclass ranks',T.ranks,[1;1],0,0,...
                   'ttclass ranks must report unit boundary ranks for a rank-one train');
+result=test_close(result,'ttclass direct sizes',sizes(T),[2 2],0,0,...
+                  'direct sizes() must dispatch to the ttclass overload');
+result=test_close(result,'ttclass direct ranks',ranks(T),[1;1],0,0,...
+                  'direct ranks() must dispatch to the ttclass overload');
 result=test_close(result,'ttclass numel',numel(T),numel(t_ref),0,0,...
                   'ttclass numel must match the represented matrix element count');
 result=test_close(result,'ttclass scalar subsref',T(2,1),t_ref(2,1),1e-15,1e-15,...
                   'ttclass scalar indexing must match dense indexing');
+idx=substruct('()',{2,1});
+result=test_close(result,'ttclass direct subsref',subsref(T,idx),t_ref(2,1),1e-15,1e-15,...
+                  'direct subsref() must dispatch to the ttclass overload');
 if (T.ncores~=1)||(T.ntrains~=1)||~ismatrix(T)||~isnumeric(T)||~isreal(T)
     error('FAILED: ttclass structural predicates returned unexpected values.');
 end
@@ -59,6 +66,14 @@ result=test_close(result,'ttclass rdivide scalar',full(T./2),t_ref/2,1e-15,1e-15
                   'element-wise scalar division must scale a tensor train');
 result=test_close(result,'ttclass mrdivide scalar',full(T/2),t_ref/2,1e-15,1e-15,...
                   'matrix scalar division must scale a tensor train');
+result=test_close(result,'ttclass direct plus',full(plus(T,U)),t_ref+u_ref,1e-15,1e-15,...
+                  'direct plus() must dispatch to the ttclass overload');
+result=test_close(result,'ttclass direct minus',full(minus(T,U)),t_ref-u_ref,1e-15,1e-15,...
+                  'direct minus() must dispatch to the ttclass overload');
+result=test_close(result,'ttclass direct rdivide',full(rdivide(T,2)),t_ref/2,1e-15,1e-15,...
+                  'direct rdivide() must dispatch to the ttclass overload');
+result=test_close(result,'ttclass direct mrdivide',full(mrdivide(T,2)),t_ref/2,1e-15,1e-15,...
+                  'direct mrdivide() must dispatch to the ttclass overload');
 
 % Exercise matrix, vector, and tensor-train multiplication dispatch
 rhs_vec=[1;-2];
@@ -68,6 +83,8 @@ result=test_close(result,'ttclass dense-matrix mtimes',T*[1 0;0 -1],t_ref*[1 0;0
                   'ttclass mtimes must act on dense matrices');
 result=test_close(result,'ttclass tensor mtimes',full(T*U),t_ref*u_ref,1e-12,1e-12,...
                   'ttclass mtimes must multiply two tensor trains');
+result=test_close(result,'ttclass direct mtimes',full(mtimes(T,U)),t_ref*u_ref,1e-12,1e-12,...
+                  'direct mtimes() must dispatch to the ttclass overload');
 result=test_close(result,'ttclass dot product object',full(dot(T,U)),t_ref'*u_ref,1e-12,1e-12,...
                   'ttclass dot must dispatch through Hermitian tensor-train multiplication');
 result=test_close(result,'ttclass Hadamard dot',hdot(T,U),sum(conj(t_ref(:)).*u_ref(:)),1e-12,1e-12,...
@@ -82,6 +99,8 @@ result=test_close(result,'ttclass transpose',full(Z.'),z_ref.',1e-15,1e-15,...
                   'ttclass transpose must swap physical matrix indices');
 result=test_close(result,'ttclass ctranspose',full(Z'),z_ref',1e-15,1e-15,...
                   'ttclass ctranspose must conjugate and swap physical matrix indices');
+result=test_close(result,'ttclass direct ctranspose',full(ctranspose(Z)),z_ref',1e-15,1e-15,...
+                  'direct ctranspose() must dispatch to the ttclass overload');
 if isreal(Z)
     error('FAILED: ttclass isreal returned true for a complex tensor train.');
 end
@@ -131,6 +150,19 @@ result=test_close(result,'ttclass shrink value',full(shrunk),t_ref+u_ref,1e-12,1
 result=test_close(result,'ttclass Frobenius norm',norm(T,'fro'),norm(t_ref,'fro'),1e-12,1e-12,...
                   'ttclass Frobenius norm must match the dense Frobenius norm');
 
+% Exercise direct AMEn summation and isolated SPMD-save wrapper dispatch
+sum_opts=struct('max_swp',10,'init_guess_rank',1,'enrichment_rank',0,'verb',0);
+sum_train=ttclass(2,{1;1},0)+ttclass(3,{1;1},0);
+summed=amensum(sum_train,1e-12,sum_opts);
+result=test_close(result,'ttclass direct amensum',full(summed),5,1e-12,1e-12,...
+                  'direct amensum() must compress a buffered two-core scalar sum');
+save_file=[tempname '.mat'];
+save_anyway(save_file,t_ref);
+saved_data=load(save_file,'variable');
+delete(save_file);
+result=test_close(result,'save_anyway round trip',saved_data.variable,t_ref,1e-15,1e-15,...
+                  'save_anyway() must write the supplied variable under the documented name');
+
 % Exercise unit_like, rand, kron, and vec on object instances
 result=test_close(result,'ttclass unit_like',full(unit_like(T)),eye(2),1e-15,1e-15,...
                   'unit_like must build an identity tensor train with matching topology');
@@ -169,7 +201,13 @@ opts=struct('nswp',2,'verb',0,'enrichment_rank',0,'max_full_size',10);
 solution=amensolve(lhs,rhs,1e-12,opts,init);
 result=test_close(result,'ttclass amensolve scalar system',full(solution),3,1e-10,1e-10,...
                   'AMEn solve must recover the exact scalar solution for a one-core system');
-
+try
+    mldivide(T,3);
+    error('FAILED: direct mldivide() accepted a non-tensor right-hand side.');
+catch err
+    result=test_true(result,'ttclass direct mldivide grumbler',...
+                     contains(err.message,'both arguments should be tensor trains'),...
+                     'direct mldivide() must reject non-tensor right-hand sides');
 end
 
-
+end

@@ -1046,12 +1046,32 @@ end
 % Process lower and upper bounds
 if isfield(control,'u_bound')&&isfield(control,'l_bound')
 
+    % Expected waveform dimensions
+    wf_dims=[spin_system.control.ncontrols spin_system.control.pulse_ntpts];
+
     % Input validation
-    if (~isnumeric(control.u_bound))||(~isreal(control.u_bound))||(~isscalar(control.u_bound))
-        error('control.u_bound must be a real scalar.');
+    if (~isnumeric(control.u_bound))||(~isreal(control.u_bound))
+        error('control.u_bound must be a real scalar or a real array.');
     end
-    if (~isnumeric(control.l_bound))||(~isreal(control.l_bound))||(~isscalar(control.l_bound))
-        error('control.l_bound must be a real scalar.');
+    if (~isnumeric(control.l_bound))||(~isreal(control.l_bound))
+        error('control.l_bound must be a real scalar or a real array.');
+    end
+    if (~isscalar(control.u_bound))&&(~isequal(size(control.u_bound),wf_dims))
+        error(['control.u_bound must be a scalar or have dimensions ' int2str(wf_dims) '.']);
+    end
+    if (~isscalar(control.l_bound))&&(~isequal(size(control.l_bound),wf_dims))
+        error(['control.l_bound must be a scalar or have dimensions ' int2str(wf_dims) '.']);
+    end
+    if any(control.u_bound-control.l_bound<0,'all')
+        error('control.u_bound must be greater than or equal to control.l_bound.');
+    end
+    if ((~isscalar(control.u_bound))||(~isscalar(control.l_bound)))&&...
+       ismember('SNSA',spin_system.control.penalties)
+        error('array bounds are not supported with SNSA amplitude penalty.');
+    end
+    if ((~isscalar(control.u_bound))||(~isscalar(control.l_bound)))&&...
+       isfield(spin_system.control,'amplitudes')
+        error('array bounds are not supported for phase-modulated optimisations.');
     end
         
     % Absorb bounds
@@ -1067,10 +1087,24 @@ else
 end
 
 % Inform the user
-report(spin_system,[pad('SNS penalty ceiling, fraction of power level',60) ...
-                         num2str(spin_system.control.u_bound,'%+.9g')]);
-report(spin_system,[pad('SNS penalty floor, fraction of power level',60) ...
-                         num2str(spin_system.control.l_bound,'%+.9g')]);
+if isscalar(spin_system.control.u_bound)
+    report(spin_system,[pad('SNS penalty ceiling, fraction of power level',60) ...
+                             num2str(spin_system.control.u_bound,'%+.9g')]);
+else
+    report(spin_system,[pad('SNS penalty ceiling, fraction of power level',60) ...
+                             'array ' int2str(size(spin_system.control.u_bound)) ...
+                             ', range [' num2str(min(spin_system.control.u_bound(:)),'%+.9g') ...
+                             ',' num2str(max(spin_system.control.u_bound(:)),'%+.9g') ']']);
+end
+if isscalar(spin_system.control.l_bound)
+    report(spin_system,[pad('SNS penalty floor, fraction of power level',60) ...
+                             num2str(spin_system.control.l_bound,'%+.9g')]);
+else
+    report(spin_system,[pad('SNS penalty floor, fraction of power level',60) ...
+                             'array ' int2str(size(spin_system.control.l_bound)) ...
+                             ', range [' num2str(min(spin_system.control.l_bound(:)),'%+.9g') ...
+                             ',' num2str(max(spin_system.control.l_bound(:)),'%+.9g') ']']);
+end
 
 % Process ensemble correlations
 if isfield(control,'ens_corrs')
@@ -1322,4 +1356,5 @@ end
 % is the opposite of charity.
 %
 % Ayn Rand, "Atlas Shrugged"
+
 

@@ -27,9 +27,9 @@ p=[0.2 -0.7 1.1];
 Dr=2*r;
 Dp=zeros(size(r));
 Drr=2*eye(numel(r));
-Drp=zeros(numel(r));
-Dpr=zeros(numel(r));
-Dpp=zeros(numel(r));
+Drp=zeros(numel(r),numel(r));
+Dpr=zeros(numel(r),numel(r));
+Dpp=zeros(numel(r),numel(r));
 
 % Convert polar coordinates, gradients, and Hessians to Cartesian and back
 [x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy]=polar2cartesian(r,p,Dr,Dp,Drr,Drp,Dpr,Dpp);
@@ -47,9 +47,9 @@ result=test_close(result,'polar-cartesian Dxx Hessian',Dxx,2*eye(numel(r)),1e-12
                   'the X-X Hessian block of RF power is 2I');
 result=test_close(result,'polar-cartesian Dyy Hessian',Dyy,2*eye(numel(r)),1e-12,1e-12,...
                   'the Y-Y Hessian block of RF power is 2I');
-result=test_close(result,'polar-cartesian Dxy Hessian',Dxy,zeros(numel(r)),1e-12,1e-12,...
+result=test_close(result,'polar-cartesian Dxy Hessian',Dxy,zeros(numel(r),numel(r)),1e-12,1e-12,...
                   'the X-Y Hessian block of RF power is zero');
-result=test_close(result,'polar-cartesian Dyx Hessian',Dyx,zeros(numel(r)),1e-12,1e-12,...
+result=test_close(result,'polar-cartesian Dyx Hessian',Dyx,zeros(numel(r),numel(r)),1e-12,1e-12,...
                   'the Y-X Hessian block of RF power is zero');
 result=test_close(result,'polar-cartesian amplitude-gradient round-trip',Dr_back,Dr,1e-10,1e-10,...
                   'amplitude gradients transform back by the chain rule');

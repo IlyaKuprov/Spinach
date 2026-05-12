@@ -47,7 +47,7 @@ result=test_close(result,'boson_mono annihilation',B{3},weyl(3).a,1e-15,1e-15,..
 
 % Check Gram-Schmidt orthogonality without imposing normalisation
 B=boson_ortho(3);
-gram=zeros(numel(B));
+gram=zeros(numel(B),numel(B));
 for n=1:numel(B)
     for k=1:numel(B)
         gram(n,k)=trace(full(B{n}'*B{k}));

@@ -57,7 +57,7 @@ result=test_close(result,'gaussleg quadratic integral',sum(wg.*xg.^2),2/3,1e-14,
                   'the integral of x^2 over [-1,1] is two thirds');
 
 % Check polar grid point count, radial bounds, and Laplacian nullspace
-[phi_pol,r_pol,L_pol]=grid_polar(4,2);
+[~,r_pol,L_pol]=grid_polar(4,2);
 npnts=3*(4-1)^2+2*(4-1)+1;
 result=test_close(result,'grid_polar point count',numel(r_pol),npnts,0,0,...
                   'the balanced polar grid has 3*(n-1)^2+2*(n-1)+1 points');
@@ -162,7 +162,7 @@ result=test_close(result,'ngridpts formula',ngridpts(amps,durs,'1H',coh_order,sa
 % Check seeded repulsion grid invariants without relying on a particular random cloud
 rng_state=rng;
 rng(1,'twister');
-[alps,bets,gams,whts]=repulsion(5,3,1);
+[~,bets,gams,whts]=repulsion(5,3,1);
 rng(rng_state);
 xyz=[sin(bets).*cos(gams) sin(bets).*sin(gams) cos(bets)];
 result=test_close(result,'repulsion uniform weights',whts,ones(5,1)/5,1e-15,1e-15,...

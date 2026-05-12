@@ -34,7 +34,7 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,L,states)
-if ~strcmp(spin_system.bas.formalims,'sphten-liouv')
+if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
     error('this function is only applicable to sphten-liouv formalism.');
 end
 if (~isnumeric(L))||(size(L,1)~=size(L,2))

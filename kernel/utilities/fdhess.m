@@ -50,7 +50,7 @@ end
 
 % Consistency enforcement
 function grumble(A,npoints)
-if (~isnumeric(A))||(ndims(A)~=0)
+if (~isnumeric(A))||(ndims(A)~=3)
     error('A must be a three-dimensional numeric array.');
 end
 if any(size(A)<npoints)

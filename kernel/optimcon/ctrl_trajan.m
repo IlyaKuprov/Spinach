@@ -183,6 +183,14 @@ end
 lower_bound=spin_system.control.l_bound*average_power;
 upper_bound=spin_system.control.u_bound*average_power;
 
+% Match the stairs plot extension
+if strcmp(spin_system.control.integrator,'rectangle')&&(~isscalar(lower_bound))
+    lower_bound=[lower_bound lower_bound(:,end)];
+end
+if strcmp(spin_system.control.integrator,'rectangle')&&(~isscalar(upper_bound))
+    upper_bound=[upper_bound upper_bound(:,end)];
+end
+
 % Plot Cartesian controls
 if ismember('xy_controls',spin_system.control.plotting)
     
@@ -218,17 +226,43 @@ if ismember('xy_controls',spin_system.control.plotting)
        
     % Compute axis limits
     x_lower=0; x_upper=max(t_axis);
-    y_lower=min([min(waveform(:)), lower_bound-0.05*abs(lower_bound)])/(2*pi);
-    y_upper=max([max(waveform(:)), upper_bound+0.05*abs(upper_bound)])/(2*pi);
+    y_lower=min([waveform(:); lower_bound(:)-0.05*abs(lower_bound(:))])/(2*pi);
+    y_upper=max([waveform(:); upper_bound(:)+0.05*abs(upper_bound(:))])/(2*pi);
 
     % Set axis limits
     xlim('tight'); ylim([y_lower y_upper]);
     
     % Draw power bounds
-    fb_pwr=refline([0 lower_bound/(2*pi)]);
-    set(fb_pwr,'Color','k','LineStyle','--');
-    cb_pwr=refline([0 upper_bound/(2*pi)]);
-    set(cb_pwr,'Color','k','LineStyle','--');
+    if isscalar(lower_bound)
+        fb_pwr=refline([0 lower_bound/(2*pi)]);
+        set(fb_pwr,'Color','k','LineStyle','--','HandleVisibility','off');
+    else
+        hold on;
+        switch spin_system.control.integrator
+            case 'trapezium'
+                fb_pwr=plot(t_axis',lower_bound'/(2*pi));
+            case 'rectangle'
+                fb_pwr=stairs(t_axis',lower_bound'/(2*pi));
+            otherwise
+                error('unknown integrator.');
+        end
+        set(fb_pwr,'Color','k','LineStyle','--','HandleVisibility','off');
+    end
+    if isscalar(upper_bound)
+        cb_pwr=refline([0 upper_bound/(2*pi)]);
+        set(cb_pwr,'Color','k','LineStyle','--','HandleVisibility','off');
+    else
+        hold on;
+        switch spin_system.control.integrator
+            case 'trapezium'
+                cb_pwr=plot(t_axis',upper_bound'/(2*pi));
+            case 'rectangle'
+                cb_pwr=stairs(t_axis',upper_bound'/(2*pi));
+            otherwise
+                error('unknown integrator.');
+        end
+        set(cb_pwr,'Color','k','LineStyle','--','HandleVisibility','off');
+    end
 
     % Set labels and title
     control_labels=cell(1,size(waveform,1));
@@ -364,10 +398,10 @@ if ismember('amp_controls',spin_system.control.plotting)
     
     % Determine the amplitude bound
     if ismember('SNSA',spin_system.control.penalties)
-        amp_bound=abs(upper_bound);
+        amp_bound=max(abs(upper_bound(:)));
     else
-        amp_bound=max([sqrt(2)*abs(upper_bound) ...
-                       sqrt(2)*abs(lower_bound)]);
+        amp_bound=max([sqrt(2)*abs(upper_bound(:)); ...
+                       sqrt(2)*abs(lower_bound(:))]);
     end
     
     % Axis limits with approproate padding of the Y axis
@@ -629,4 +663,5 @@ end
 % understand it well enough.
 %
 % Albert Einstein
+
 

@@ -31,13 +31,16 @@
 %                                   with waveform rows ordered as:
 %                                   [Xa Ya Xb Yb ... Xn Yn]
 %
-%    fb                          -  floor bound, the lower bound on
-%                                   waveform used in the SNS penal-
-%                                   ty function.
+%    fb                          -  floor bound, a scalar or an array
+%                                   with the same dimensions as the
+%                                   waveform used in the SNS penalty
+%                                   function.
 %                                   
-%    cb                          -  ceiling bound, the upper bound
-%                                   on waveform used in the SNS and
-%                                   SNSA penalty functions.
+%    cb                          -  ceiling bound, a scalar or an ar-
+%                                   ray with the same dimensions as
+%                                   the waveform used in the SNS pen-
+%                                   alty function, scalar only for
+%                                   the SNSA penalty function.
 %
 % Outputs:
 %
@@ -213,11 +216,14 @@ end
 if ~(isscalar(cb)||(isnumeric(cb)&&isequal(size(cb),size(wf))))
     error('ceiling bound must be a scalar or a numeric array.');
 end
-if any(cb<fb)
+if any(cb-fb<0,'all')
     error('ceiling bound should be above the floor bound.');
 end
 if ~ischar(type)
     error('type must be a character string.');
+end
+if strcmp(type,'SNSA')&&((~isscalar(fb))||(~isscalar(cb)))
+    error('SNSA bounds must be scalar.');
 end
 if ismember(type,{'SNSA'})&&logical(mod(size(wf,1),2))
     error('waveform must have an even number of rows.')
@@ -227,4 +233,5 @@ end
 % I would never die for my beliefs because I might be wrong.
 %
 % Bertrand Russell
+
 

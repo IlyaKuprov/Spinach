@@ -36,22 +36,31 @@ H=delta*operator(spin_system,'Lz',1)+...
 % Clean up numerical asymmetry
 H=(H+H')/2;
 
-% Initial state and observables
-rho=state(spin_system,{'ZL1','BL1'},{1,2});
-Ps=state(spin_system,{'ZL1','E'},{1,2});
-Pc=state(spin_system,{'E','BL2'},{1,2});
+% Initial spin excitation and observables
+rho=state(spin_system,{'ZL2','BL1'},{1,2});
+Ps=state(spin_system,{'ZL2','E'},{1,2});
+Pc=state(spin_system,{'ZL1','BL2'},{1,2});
 
 % Propagate the excitation swap
 pop_s=evolution(spin_system,H,Ps,rho,1e-9,500,'observable');
 pop_c=evolution(spin_system,H,Pc,rho,1e-9,500,'observable');
 
+% Validate visible excitation exchange
+if (max(real(pop_c))<0.95)||(min(real(pop_s))>0.05)
+    error('vacuum Rabi exchange is not visible.');
+end
+
+% Validate population conservation in the active doublet
+if max(abs(real(pop_s+pop_c)-1))>1e-6
+    error('active-doublet population is not conserved.');
+end
+
 % Plot the vacuum Rabi dynamics
 time_axis=linspace(0,500,501);
 kfigure(); plot(time_axis,real([pop_s pop_c]),'LineWidth',1.5);
-axis tight; kgrid; kxlabel('time, ns');
+axis tight; ylim([-0.05 1.05]); kgrid; kxlabel('time, ns');
 kylabel('excitation population');
 ktitle('spin-cavity vacuum Rabi oscillation');
 klegend({'spin','cavity'},'Location','East');
 
 end
-

@@ -28,22 +28,33 @@ coupling=2*pi*0.35e6;
 detuning=2*pi*linspace(-8e6,8e6,301);
 kappas=2*pi*[0.5e6 1.0e6 2.0e6 4.0e6];
 
-% Jaynes-Cummings Hamiltonian, included for explicit model syntax
+% Jaynes-Cummings Hamiltonian in the one-excitation manifold
 Hjc=coupling*(operator(spin_system,{'L+','A'},{1,2})+...
               operator(spin_system,{'L-','C'},{1,2}));
 
 % Clean up numerical asymmetry
 Hjc=(Hjc+Hjc')/2;
 
-% Validate the coupling Hamiltonian
-if norm(Hjc,'fro')==0
-    error('Jaynes-Cummings Hamiltonian must be non-zero.');
+% Project the Hamiltonian coupling into the active doublet
+spin_exc=state(spin_system,{'ZL2','BL1'},{1,2});
+cav_exc=state(spin_system,{'ZL1','BL2'},{1,2});
+jc_coupling=norm(cav_exc*Hjc*spin_exc,'fro');
+
+% Validate the active matrix element
+if abs(jc_coupling-coupling)>1e-10*coupling
+    error('Jaynes-Cummings matrix element is inconsistent.');
 end
 
 % Compute the Lorentzian Purcell rates
 rates=zeros(numel(detuning),numel(kappas));
 for n=1:numel(kappas)
-    rates(:,n)=kappas(n)*coupling^2./(detuning.^2+(kappas(n)/2)^2);
+    rates(:,n)=kappas(n)*jc_coupling^2./...
+               (detuning.^2+(kappas(n)/2)^2);
+end
+
+% Validate resonant enhancement of the Purcell rate
+if rates(ceil(end/2),2)<=rates(1,2)
+    error('Purcell rate is not resonantly enhanced.');
 end
 
 % Pick representative detunings for survival curves
@@ -51,7 +62,7 @@ time_axis=linspace(0,40e-6,250);
 det_pick=2*pi*[0 2e6 6e6];
 survival=zeros(numel(time_axis),numel(det_pick));
 for n=1:numel(det_pick)
-    rate=kappas(2)*coupling^2/(det_pick(n)^2+(kappas(2)/2)^2);
+    rate=kappas(2)*jc_coupling^2/(det_pick(n)^2+(kappas(2)/2)^2);
     survival(:,n)=exp(-rate*time_axis);
 end
 
@@ -69,4 +80,3 @@ ktitle('Purcell relaxation');
 klegend({'0 MHz','2 MHz','6 MHz'},'Location','NorthEast');
 
 end
-

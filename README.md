@@ -16,5 +16,6 @@ Detailed documentation is here:
 
 https://spindynamics.org/wiki/index.php?title=Main_Page
 
-Spinach requires Matlab 2024a or later with the following toolboxes: Parallel Computing, 
-Deep Learning, Reinforcement Lerning, Optimisation, Statistics and Machine Learning, Mapping.
+Spinach requires Matlab R2024b or later with the following toolboxes: Parallel Computing, 
+Deep Learning, Reinforcement Lerning, Optimisation, Statistics and Machine Learning, 
+Aerospace, Mapping.

@@ -14,6 +14,9 @@
 
 function result=test_transform_tensor_suite()
 
+% Announce the test target
+fprintf('TESTING: Tensor transform helpers\n');
+
 % State the tensor target of the test
 result=new_test_result('kernel/transform_tensor_suite',...
                        'Tensor transform helpers',...

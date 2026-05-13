@@ -13,6 +13,9 @@
 
 function result=test_ctx_powder_average()
 
+% Announce the test target
+fprintf('TESTING: Powder weighted sum path\n');
+
 % State the powder-averaging target of the test
 result=new_test_result('kernel/ctx_powder_average',...
                        'Powder weighted sum path',...

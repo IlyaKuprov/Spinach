@@ -13,6 +13,9 @@
 
 function result=test_pauli_spin_one_algebra()
 
+% Announce the test target
+fprintf('TESTING: Spin-one angular momentum algebra\n');
+
 % State the physical target of the test
 result=new_test_result('kernel/pauli_spin_one_algebra',...
                        'Spin-one angular momentum algebra',...

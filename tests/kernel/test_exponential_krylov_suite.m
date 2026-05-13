@@ -14,6 +14,9 @@
 
 function result=test_exponential_krylov_suite()
 
+% Announce the test target
+fprintf('TESTING: Exponential and Krylov numerical utilities\n');
+
 % State the utility target of the test
 result=new_test_result('kernel/exponential_krylov_suite',...
                        'Exponential and Krylov numerical utilities',...

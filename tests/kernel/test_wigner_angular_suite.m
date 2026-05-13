@@ -13,6 +13,9 @@
 
 function result=test_wigner_angular_suite()
 
+% Announce the test target
+fprintf('TESTING: Angular-momentum coefficient functions\n');
+
 % State the angular target of the test
 result=new_test_result('kernel/wigner_angular_suite',...
                        'Angular-momentum coefficient functions',...

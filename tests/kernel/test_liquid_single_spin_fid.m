@@ -13,6 +13,9 @@
 
 function result=test_liquid_single_spin_fid()
 
+% Announce the test target
+fprintf('TESTING: Single-spin liquid-state FID\n');
+
 % State the NMR target of the test
 result=new_test_result('kernel/liquid_single_spin_fid',...
                        'Single-spin liquid-state FID',...

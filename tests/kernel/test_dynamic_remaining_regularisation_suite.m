@@ -14,6 +14,9 @@
 
 function result=test_dynamic_remaining_regularisation_suite()
 
+% Announce the test target
+fprintf('TESTING: Remaining regularisation utilities\n');
+
 % State the utility target of the test
 result=new_test_result('kernel/dynamic_remaining_regularisation_suite',...
                        'Remaining regularisation utilities',...

@@ -14,6 +14,9 @@
 
 function result=test_dynamic_examples_smoke()
 
+% Announce the test target
+fprintf('TESTING: Dynamic plotting example smoke paths\n');
+
 % State the dynamic example-stage target of the test
 result=new_test_result('examples/dynamic_examples_smoke',...
                        'Dynamic plotting example smoke paths',...

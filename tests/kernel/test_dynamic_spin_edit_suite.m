@@ -13,6 +13,9 @@
 
 function result=test_dynamic_spin_edit_suite()
 
+% Announce the test target
+fprintf('TESTING: Spin-system editing utilities\n');
+
 % State the spin editing target of the test
 result=new_test_result('kernel/dynamic_spin_edit_suite',...
                        'Spin-system editing utilities',...

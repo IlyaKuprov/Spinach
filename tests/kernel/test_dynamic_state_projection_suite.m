@@ -13,6 +13,9 @@
 
 function result=test_dynamic_state_projection_suite()
 
+% Announce the test target
+fprintf('TESTING: Dynamic state projection helpers\n');
+
 % State the state-projection target of the test
 result=new_test_result('kernel/dynamic_state_projection_suite',...
                        'Dynamic state projection helpers',...

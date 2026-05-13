@@ -14,6 +14,9 @@
 
 function result=test_dynamic_filter_frontends()
 
+% Announce the test target
+fprintf('TESTING: Dynamic state-filter front ends\n');
+
 % State the dynamic filter target of the test
 result=new_test_result('kernel/dynamic_filter_frontends',...
                        'Dynamic state-filter front ends',...

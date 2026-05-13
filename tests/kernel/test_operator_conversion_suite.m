@@ -14,6 +14,9 @@
 
 function result=test_operator_conversion_suite()
 
+% Announce the test target
+fprintf('TESTING: Hilbert/Liouville conversion helpers\n');
+
 % State the operator-conversion target of the test
 result=new_test_result('kernel/operator_conversion_suite',...
                        'Hilbert/Liouville conversion helpers',...

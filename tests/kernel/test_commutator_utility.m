@@ -13,6 +13,9 @@
 
 function result=test_commutator_utility()
 
+% Announce the test target
+fprintf('TESTING: Matrix commutator utility\n');
+
 % State the mathematical target of the test
 result=new_test_result('kernel/commutator_utility',...
                        'Matrix commutator utility',...

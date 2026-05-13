@@ -13,6 +13,9 @@
 
 function result=test_rf_cartesian_polar()
 
+% Announce the test target
+fprintf('TESTING: RF Cartesian/polar conversion\n');
+
 % State the pulse-control target of the test
 result=new_test_result('kernel/rf_cartesian_polar',...
                        'RF Cartesian/polar conversion',...

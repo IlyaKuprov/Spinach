@@ -13,6 +13,9 @@
 
 function result=test_dynamic_overload_sparse_polyadic_suite()
 
+% Announce the test target
+fprintf('TESTING: Sparse, polyadic, and OPIUM overload dispatch\n');
+
 % State the overload target of the test
 result=new_test_result('kernel/dynamic_overload_sparse_polyadic_suite',...
                        'Dynamic sparse and polyadic overload dispatch',...

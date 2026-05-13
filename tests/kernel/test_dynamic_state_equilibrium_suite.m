@@ -13,6 +13,9 @@
 
 function result=test_dynamic_state_equilibrium_suite()
 
+% Announce the test target
+fprintf('TESTING: Thermal equilibrium constructors\n');
+
 % State the equilibrium-constructor target of the test
 result=new_test_result('kernel/dynamic_state_equilibrium_suite',...
                        'Thermal equilibrium constructors',...

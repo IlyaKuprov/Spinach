@@ -14,6 +14,9 @@
 
 function result=test_kinetics_generator_suite()
 
+% Announce the test target
+fprintf('TESTING: Kinetics and flow generator functions\n');
+
 % State the kinetics target of the test
 result=new_test_result('kernel/kinetics_generator_suite',...
                        'Kinetics and flow generator functions',...

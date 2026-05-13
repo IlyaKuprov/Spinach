@@ -14,6 +14,9 @@
 
 function result=test_ctx_liquid_acquire()
 
+% Announce the test target
+fprintf('TESTING: Liquid context acquire path\n');
+
 % State the liquid-context target of the test
 result=new_test_result('kernel/ctx_liquid_acquire',...
                        'Liquid context acquire path',...

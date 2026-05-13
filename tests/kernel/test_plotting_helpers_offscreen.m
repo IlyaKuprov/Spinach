@@ -14,6 +14,9 @@
 
 function result=test_plotting_helpers_offscreen()
 
+% Announce the test target
+fprintf('TESTING: Offscreen plotting helpers\n');
+
 % State the plotting-helper target of the test
 result=new_test_result('kernel/plotting_helpers_offscreen',...
                        'Offscreen plotting helpers',...

@@ -13,6 +13,9 @@
 
 function result=test_hilbert_state()
 
+% Announce the test target
+fprintf('TESTING: Hilbert-space state generation\n');
+
 % State the physical target of the test
 result=new_test_result('kernel/hilbert_state',...
                        'Hilbert-space state generation',...

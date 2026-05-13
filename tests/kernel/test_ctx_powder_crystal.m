@@ -14,6 +14,9 @@
 
 function result=test_ctx_powder_crystal()
 
+% Announce the test target
+fprintf('TESTING: Powder and crystal single orientation\n');
+
 % State the static-context target of the test
 result=new_test_result('kernel/ctx_powder_crystal',...
                        'Powder and crystal single orientation',...

@@ -13,6 +13,9 @@
 
 function result=test_scalar_coupling_hamiltonian()
 
+% Announce the test target
+fprintf('TESTING: Scalar coupling Hamiltonian\n');
+
 % State the Hamiltonian target of the test
 result=new_test_result('kernel/scalar_coupling_hamiltonian',...
                        'Scalar coupling Hamiltonian',...

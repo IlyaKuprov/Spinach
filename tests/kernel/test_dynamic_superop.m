@@ -13,6 +13,9 @@
 
 function result=test_dynamic_superop()
 
+% Announce the test target
+fprintf('TESTING: Spherical-tensor superoperator construction\n');
+
 % State the superop target of the test
 result=new_test_result('kernel/dynamic_superop',...
                        'Spherical-tensor superoperator construction',...

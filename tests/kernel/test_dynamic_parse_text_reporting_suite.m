@@ -13,6 +13,9 @@
 
 function result=test_dynamic_parse_text_reporting_suite()
 
+% Announce the test target
+fprintf('TESTING: Parsing, text, and reporting utilities\n');
+
 % State the utility target of the test
 result=new_test_result('kernel/dynamic_parse_text_reporting_suite',...
                        'Parsing, text, and reporting utilities',...

@@ -14,6 +14,9 @@
 
 function result=test_linear_perturbation_suite()
 
+% Announce the test target
+fprintf('TESTING: Linear algebra and perturbation utilities\n');
+
 % State the utility target of the test
 result=new_test_result('kernel/linear_perturbation_suite',...
                        'Linear algebra and perturbation utilities',...

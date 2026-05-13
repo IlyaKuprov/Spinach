@@ -15,6 +15,9 @@
 
 function result=test_dynamic_integrity_includes_mex_suite()
 
+% Announce the test target
+fprintf('TESTING: Dynamic integrity, include, and MEX helper coverage\n');
+
 % State the integrity/include/MEX target of the test
 result=new_test_result('kernel/dynamic_integrity_includes_mex',...
                        'Dynamic integrity, include, and MEX helper coverage',...

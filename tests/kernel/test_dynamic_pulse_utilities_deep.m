@@ -14,6 +14,9 @@
 
 function result=test_dynamic_pulse_utilities_deep()
 
+% Announce the test target
+fprintf('TESTING: Dynamic pulse utility paths\n');
+
 % State the pulse-utility target of the test
 result=new_test_result('kernel/dynamic_pulse_utilities_deep',...
                        'Dynamic pulse utility paths',...

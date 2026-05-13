@@ -13,6 +13,9 @@
 
 function result=test_shaped_pulse_rotation()
 
+% Announce the test target
+fprintf('TESTING: Piecewise Cartesian pulse rotation\n');
+
 % State the pulse target of the test
 result=new_test_result('kernel/shaped_pulse_rotation',...
                        'Piecewise Cartesian pulse rotation',...

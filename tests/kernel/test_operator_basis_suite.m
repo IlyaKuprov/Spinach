@@ -14,6 +14,9 @@
 
 function result=test_operator_basis_suite()
 
+% Announce the test target
+fprintf('TESTING: Operator-basis construction functions\n');
+
 % State the operator-basis target of the test
 result=new_test_result('kernel/operator_basis_suite',...
                        'Operator-basis construction functions',...

@@ -14,6 +14,9 @@
 
 function result=test_dynamic_overload_cell_struct_suite()
 
+% Announce the test target
+fprintf('TESTING: Cell and structure overload dispatch\n');
+
 % State the overload target of the test
 result=new_test_result('tmp/dynamic_overloads_retry/cell_struct',...
                        'Dynamic cell and struct overload dispatch',...

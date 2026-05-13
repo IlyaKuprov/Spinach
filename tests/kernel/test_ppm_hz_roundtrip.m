@@ -13,6 +13,9 @@
 
 function result=test_ppm_hz_roundtrip()
 
+% Announce the test target
+fprintf('TESTING: Chemical-shift frequency conversion\n');
+
 % State the physical target of the test
 result=new_test_result('kernel/ppm_hz_roundtrip',...
                        'Chemical-shift frequency conversion',...

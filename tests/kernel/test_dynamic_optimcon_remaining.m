@@ -16,6 +16,9 @@
 
 function result=test_dynamic_optimcon_remaining()
 
+% Announce the test target
+fprintf('TESTING: Remaining optimal-control dynamic helpers\n');
+
 % State the dynamic optimal-control target of the test
 result=new_test_result('kernel/dynamic_optimcon_remaining',...
                        'Remaining optimal-control dynamic helpers',...

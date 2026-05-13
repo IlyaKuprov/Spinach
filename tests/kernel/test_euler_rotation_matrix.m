@@ -13,6 +13,9 @@
 
 function result=test_euler_rotation_matrix()
 
+% Announce the test target
+fprintf('TESTING: Euler active rotation matrix\n');
+
 % State the physical target of the test
 result=new_test_result('kernel/euler_rotation_matrix',...
                        'Euler active rotation matrix',...

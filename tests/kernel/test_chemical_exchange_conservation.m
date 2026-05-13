@@ -13,6 +13,9 @@
 
 function result=test_chemical_exchange_conservation()
 
+% Announce the test target
+fprintf('TESTING: Chemical exchange conservation\n');
+
 % State the kinetics target of the test
 result=new_test_result('kernel/chemical_exchange_conservation',...
                        'Chemical exchange conservation',...

@@ -14,6 +14,9 @@
 
 function result=test_operator_expansion_suite()
 
+% Announce the test target
+fprintf('TESTING: Operator expansion and conversion helpers\n');
+
 % State the expansion target of the test
 result=new_test_result('kernel/operator_expansion_suite',...
                        'Operator expansions and conversions',...

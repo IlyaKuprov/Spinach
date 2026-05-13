@@ -13,6 +13,9 @@
 
 function result=test_matrix_utility_suite()
 
+% Announce the test target
+fprintf('TESTING: Matrix utility functions\n');
+
 % State the utility target of the test
 result=new_test_result('kernel/matrix_utility_suite',...
                        'Matrix utility functions',...

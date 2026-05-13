@@ -13,6 +13,9 @@
 
 function result=test_dynamic_equilibrium_frontends()
 
+% Announce the test target
+fprintf('TESTING: Dynamic equilibrium front ends\n');
+
 % State the dynamic equilibrium target of the test
 result=new_test_result('kernel/dynamic_equilibrium_frontends',...
                        'Dynamic equilibrium front ends',...

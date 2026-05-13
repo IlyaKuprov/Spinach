@@ -13,6 +13,9 @@
 
 function result=test_hilbert_operator()
 
+% Announce the test target
+fprintf('TESTING: Hilbert-space operator generation\n');
+
 % State the physical target of the test
 result=new_test_result('kernel/hilbert_operator',...
                        'Hilbert-space operator generation',...

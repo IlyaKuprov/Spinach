@@ -14,6 +14,9 @@
 
 function result=test_transform_rotation_suite()
 
+% Announce the test target
+fprintf('TESTING: Rotation transform helpers\n');
+
 % State the geometric target of the test
 result=new_test_result('kernel/transform_rotation_suite',...
                        'Rotation transform helpers',...

@@ -13,6 +13,9 @@
 
 function result=test_pulses_waveform_suite()
 
+% Announce the test target
+fprintf('TESTING: Pulse waveform generators\n');
+
 % State the waveform target of the test
 result=new_test_result('kernel/pulses_waveform_suite',...
                        'Pulse waveform generators',...

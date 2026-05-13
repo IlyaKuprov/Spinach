@@ -13,6 +13,9 @@
 
 function result=test_zeeman_hamiltonian()
 
+% Announce the test target
+fprintf('TESTING: Zeeman Hamiltonian sign and units\n');
+
 % State the Hamiltonian target of the test
 result=new_test_result('kernel/zeeman_hamiltonian',...
                        'Zeeman Hamiltonian sign and units',...

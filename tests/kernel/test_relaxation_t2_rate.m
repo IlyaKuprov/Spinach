@@ -13,6 +13,9 @@
 
 function result=test_relaxation_t2_rate()
 
+% Announce the test target
+fprintf('TESTING: Phenomenological T2 decay rate\n');
+
 % State the relaxation target of the test
 result=new_test_result('kernel/relaxation_t2_rate',...
                        'Phenomenological T2 decay rate',...

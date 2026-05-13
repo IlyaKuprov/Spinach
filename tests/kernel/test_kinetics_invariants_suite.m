@@ -14,6 +14,9 @@
 
 function result=test_kinetics_invariants_suite()
 
+% Announce the test target
+fprintf('TESTING: Chemical kinetics invariants\n');
+
 % State the kinetics target of the test
 result=new_test_result('kernel/kinetics_invariants_suite',...
                        'Chemical kinetics invariants',...

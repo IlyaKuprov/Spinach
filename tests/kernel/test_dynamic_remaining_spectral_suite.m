@@ -14,6 +14,9 @@
 
 function result=test_dynamic_remaining_spectral_suite()
 
+% Announce the test target
+fprintf('TESTING: Remaining spectral and spatial utilities\n');
+
 % State the utility target of the test
 result=new_test_result('kernel/dynamic_remaining_spectral_suite',...
                        'Remaining spectral and spatial utilities',...

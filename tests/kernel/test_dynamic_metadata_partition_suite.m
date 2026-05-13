@@ -13,6 +13,9 @@
 
 function result=test_dynamic_metadata_partition_suite()
 
+% Announce the test target
+fprintf('TESTING: Metadata and partition utilities\n');
+
 % State the metadata and partition target of the test
 result=new_test_result('kernel/dynamic_metadata_partition_suite',...
                        'Metadata, hashing, and partition utilities',...

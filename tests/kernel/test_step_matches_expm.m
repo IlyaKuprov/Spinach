@@ -13,6 +13,9 @@
 
 function result=test_step_matches_expm()
 
+% Announce the test target
+fprintf('TESTING: Hilbert propagation against expm\n');
+
 % State the propagation target of the test
 result=new_test_result('kernel/step_matches_expm',...
                        'Hilbert propagation against expm',...

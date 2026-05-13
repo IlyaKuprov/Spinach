@@ -14,6 +14,9 @@
 
 function result=test_plotting_remaining_suite()
 
+% Announce the test target
+fprintf('TESTING: Remaining offscreen plotting helpers\n');
+
 % State the remaining plotting-helper target of the test
 result=new_test_result('kernel/plotting_remaining_suite',...
                        'Remaining plotting helper gaps',...

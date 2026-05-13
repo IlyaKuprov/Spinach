@@ -13,6 +13,9 @@
 
 function result=test_transform_roundtrip_suite()
 
+% Announce the test target
+fprintf('TESTING: Coordinate and tensor transform functions\n');
+
 % State the transform target of the test
 result=new_test_result('kernel/transform_roundtrip_suite',...
                        'Coordinate and tensor transform functions',...

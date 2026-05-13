@@ -13,6 +13,9 @@
 
 function result=test_dynamic_overload_ttclass_suite()
 
+% Announce the test target
+fprintf('TESTING: Tensor-train overload dispatch\n');
+
 % State the overload target of the test
 result=new_test_result('kernel/dynamic_overload_ttclass_suite',...
                        'Dynamic ttclass overload dispatch',...

@@ -14,6 +14,9 @@
 
 function result=test_finite_difference_suite()
 
+% Announce the test target
+fprintf('TESTING: Finite-difference and spectral differentiation functions\n');
+
 % State the differentiation target of the test
 result=new_test_result('kernel/finite_difference_suite',...
                        'Finite-difference and spectral differentiation functions',...

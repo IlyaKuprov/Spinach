@@ -14,6 +14,9 @@
 
 function result=test_dynamic_shaped_pulses_deep()
 
+% Announce the test target
+fprintf('TESTING: Dynamic shaped pulse propagation paths\n');
+
 % State the dynamic shaped-pulse target of the test
 result=new_test_result('kernel/dynamic_shaped_pulses_deep',...
                        'Dynamic shaped pulse propagation paths',...

@@ -13,6 +13,9 @@
 
 function result=test_dynamic_chem_geometry_suite()
 
+% Announce the test target
+fprintf('TESTING: Chemistry and geometry utilities\n');
+
 % State the chemistry and geometry target of the test
 result=new_test_result('kernel/dynamic_chem_geometry_suite',...
                        'Chemistry and geometry utilities',...

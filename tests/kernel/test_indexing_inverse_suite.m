@@ -13,6 +13,9 @@
 
 function result=test_indexing_inverse_suite()
 
+% Announce the test target
+fprintf('TESTING: Indexing inverse helpers\n');
+
 % State the indexing target of the test
 result=new_test_result('kernel/indexing_inverse_suite',...
                        'Indexing inverse helpers',...

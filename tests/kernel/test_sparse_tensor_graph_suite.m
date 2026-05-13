@@ -14,6 +14,9 @@
 
 function result=test_sparse_tensor_graph_suite()
 
+% Announce the test target
+fprintf('TESTING: Sparse, tensor, and graph helper functions\n');
+
 % State the utility target of the test
 result=new_test_result('kernel/sparse_tensor_graph_suite',...
                        'Sparse, tensor, and graph helper functions',...

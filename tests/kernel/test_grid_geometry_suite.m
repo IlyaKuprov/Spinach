@@ -14,6 +14,9 @@
 
 function result=test_grid_geometry_suite()
 
+% Announce the test target
+fprintf('TESTING: Grid and spherical geometry helpers\n');
+
 % State the grid target of the test
 result=new_test_result('kernel/grid_geometry_suite',...
                        'Grid and spherical geometry helpers',...

@@ -15,6 +15,9 @@
 
 function result=test_tensor_vector_suite()
 
+% Announce the test target
+fprintf('TESTING: Tensor, vector, and relaxation utilities\n');
+
 % State the utility target of the test
 result=new_test_result('kernel/tensor_vector_suite',...
                        'Tensor, vector, and relaxation utilities',...

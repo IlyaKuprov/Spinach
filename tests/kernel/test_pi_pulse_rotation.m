@@ -13,6 +13,9 @@
 
 function result=test_pi_pulse_rotation()
 
+% Announce the test target
+fprintf('TESTING: Hard pi pulse rotation\n');
+
 % State the pulse target of the test
 result=new_test_result('kernel/pi_pulse_rotation',...
                        'Hard pi pulse rotation',...

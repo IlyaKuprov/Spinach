@@ -13,6 +13,9 @@
 
 function result=test_transform_units_coordinates_suite()
 
+% Announce the test target
+fprintf('TESTING: Unit and coordinate transforms\n');
+
 % State the conversion target of the test
 result=new_test_result('kernel/transform_units_coordinates_suite',...
                        'Unit and coordinate transforms',...

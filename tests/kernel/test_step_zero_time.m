@@ -13,6 +13,9 @@
 
 function result=test_step_zero_time()
 
+% Announce the test target
+fprintf('TESTING: Zero-duration propagation identity\n');
+
 % State the propagation target of the test
 result=new_test_result('kernel/step_zero_time',...
                        'Zero-duration propagation identity',...

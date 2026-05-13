@@ -14,6 +14,9 @@
 
 function result=test_dynamic_frame_frontends()
 
+% Announce the test target
+fprintf('TESTING: Dynamic frame and averaging front ends\n');
+
 % State the dynamic frame target of the test
 result=new_test_result('kernel/dynamic_frame_frontends',...
                        'Dynamic frame and averaging front ends',...

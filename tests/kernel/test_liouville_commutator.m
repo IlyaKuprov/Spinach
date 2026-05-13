@@ -13,6 +13,9 @@
 
 function result=test_liouville_commutator()
 
+% Announce the test target
+fprintf('TESTING: Liouville commutation superoperator\n');
+
 % State the Liouville-space target of the test
 result=new_test_result('kernel/liouville_commutator',...
                        'Liouville commutation superoperator',...

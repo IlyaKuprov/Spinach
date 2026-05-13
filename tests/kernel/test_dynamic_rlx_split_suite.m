@@ -13,6 +13,9 @@
 
 function result=test_dynamic_rlx_split_suite()
 
+% Announce the test target
+fprintf('TESTING: Relaxation component splitting\n');
+
 % State the relaxation-splitting target of the test
 result=new_test_result('kernel/dynamic_rlx_split_suite',...
                        'Relaxation component splitting',...

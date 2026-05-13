@@ -14,6 +14,9 @@
 
 function result=test_unit_conversion_suite()
 
+% Announce the test target
+fprintf('TESTING: Unit-conversion functions\n');
+
 % State the conversion target of the test
 result=new_test_result('kernel/unit_conversion_suite',...
                        'Unit-conversion functions',...

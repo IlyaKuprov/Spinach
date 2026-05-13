@@ -14,6 +14,9 @@
 
 function result=test_ctx_singlerot_acquire()
 
+% Announce the test target
+fprintf('TESTING: Single-rotor acquire path\n');
+
 % State the single-rotor target of the test
 result=new_test_result('kernel/ctx_singlerot_acquire',...
                        'Single-rotor acquire path',...

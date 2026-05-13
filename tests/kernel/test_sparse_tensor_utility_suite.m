@@ -14,6 +14,9 @@
 
 function result=test_sparse_tensor_utility_suite()
 
+% Announce the test target
+fprintf('TESTING: Sparse, tensor, and numerical utility functions\n');
+
 % State the utility target of the test
 result=new_test_result('kernel/sparse_tensor_utility_suite',...
                        'Sparse, tensor, and numerical utility functions',...

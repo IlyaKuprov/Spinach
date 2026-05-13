@@ -14,6 +14,9 @@
 
 function result=test_ctx_floquet_acquire()
 
+% Announce the test target
+fprintf('TESTING: Floquet acquire path\n');
+
 % State the Floquet-context target of the test
 result=new_test_result('kernel/ctx_floquet_acquire',...
                        'Floquet acquire path',...

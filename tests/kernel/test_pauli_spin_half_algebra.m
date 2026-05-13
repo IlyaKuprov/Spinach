@@ -14,6 +14,9 @@
 
 function result=test_pauli_spin_half_algebra()
 
+% Announce the test target
+fprintf('TESTING: Spin-half angular momentum algebra\n');
+
 % State the physical target of the test
 result=new_test_result('kernel/pauli_spin_half_algebra',...
                        'Spin-half angular momentum algebra',...

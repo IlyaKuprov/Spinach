@@ -15,6 +15,9 @@
 
 function result=test_graph_geometry_suite()
 
+% Announce the test target
+fprintf('TESTING: Graph, geometry, and coordinate utilities\n');
+
 % State the utility target of the test
 result=new_test_result('kernel/graph_geometry_suite',...
                        'Graph, geometry, and coordinate utilities',...

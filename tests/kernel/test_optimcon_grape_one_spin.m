@@ -14,6 +14,9 @@
 
 function result=test_optimcon_grape_one_spin()
 
+% Announce the test target
+fprintf('TESTING: One-spin optimal-control setup and GRAPE gradient\n');
+
 % State the optimal-control target of the test
 result=new_test_result('optimcon/grape_one_spin',...
                        'One-spin optimal-control setup and GRAPE gradient',...

@@ -14,6 +14,9 @@
 
 function result=test_dynamic_physics_formulae_suite()
 
+% Announce the test target
+fprintf('TESTING: Physical formula utilities\n');
+
 % State the physical formula target of the test
 result=new_test_result('kernel/dynamic_physics_formulae_suite',...
                        'Physical formula utilities',...

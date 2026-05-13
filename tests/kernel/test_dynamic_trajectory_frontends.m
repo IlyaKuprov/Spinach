@@ -13,6 +13,9 @@
 
 function result=test_dynamic_trajectory_frontends()
 
+% Announce the test target
+fprintf('TESTING: Dynamic trajectory analysis front ends\n');
+
 % State the dynamic trajectory target of the test
 result=new_test_result('kernel/dynamic_trajectory_frontends',...
                        'Dynamic trajectory analysis front ends',...

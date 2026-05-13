@@ -13,6 +13,9 @@
 
 function result=test_apodisation_exp_window()
 
+% Announce the test target
+fprintf('TESTING: Exponential FID apodisation\n');
+
 % State the processing target of the test
 result=new_test_result('kernel/apodisation_exp_window',...
                        'Exponential FID apodisation',...

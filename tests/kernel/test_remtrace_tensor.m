@@ -13,6 +13,9 @@
 
 function result=test_remtrace_tensor()
 
+% Announce the test target
+fprintf('TESTING: Traceless rank-two tensor construction\n');
+
 % State the physical target of the test
 result=new_test_result('kernel/remtrace_tensor',...
                        'Traceless rank-two tensor construction',...

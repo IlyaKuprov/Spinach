@@ -14,6 +14,9 @@
 
 function result=test_dynamic_iserstep_highorder()
 
+% Announce the test target
+fprintf('TESTING: Nonlinear high-order iserstep branches\n');
+
 % State the nonlinear Lie-step target of the test
 result=new_test_result('kernel/dynamic_iserstep_highorder',...
                        'Nonlinear high-order iserstep branches',...

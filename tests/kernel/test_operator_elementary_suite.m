@@ -13,6 +13,9 @@
 
 function result=test_operator_elementary_suite()
 
+% Announce the test target
+fprintf('TESTING: Elementary operator generators\n');
+
 % State the operator target of the test
 result=new_test_result('kernel/operator_elementary_suite',...
                        'Elementary operator generators',...

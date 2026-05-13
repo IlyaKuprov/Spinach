@@ -13,6 +13,9 @@
 
 function result=test_states_composite_suite()
 
+% Announce the test target
+fprintf('TESTING: Composite state generators\n');
+
 % State the state-generation target of the test
 result=new_test_result('kernel/states_composite_suite',...
                        'Composite state generators',...

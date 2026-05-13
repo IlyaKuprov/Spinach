@@ -13,6 +13,9 @@
 
 function result=test_lowlevel_utilities_suite()
 
+% Announce the test target
+fprintf('TESTING: Low-level utility functions\n');
+
 % State the utility target of the test
 result=new_test_result('kernel/lowlevel_utilities_suite',...
                        'Low-level utility functions',...

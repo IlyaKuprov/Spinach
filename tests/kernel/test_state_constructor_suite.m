@@ -14,6 +14,9 @@
 
 function result=test_state_constructor_suite()
 
+% Announce the test target
+fprintf('TESTING: State-constructor functions\n');
+
 % State the state-constructor target of the test
 result=new_test_result('kernel/state_constructor_suite',...
                        'State-constructor functions',...

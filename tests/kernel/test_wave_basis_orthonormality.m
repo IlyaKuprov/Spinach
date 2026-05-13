@@ -13,6 +13,9 @@
 
 function result=test_wave_basis_orthonormality()
 
+% Announce the test target
+fprintf('TESTING: Waveform basis orthonormality\n');
+
 % State the numerical target of the test
 result=new_test_result('kernel/wave_basis_orthonormality',...
                        'Waveform basis orthonormality',...

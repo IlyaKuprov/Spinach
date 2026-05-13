@@ -14,6 +14,9 @@
 
 function result=test_cache_temp_scratch()
 
+% Announce the test target
+fprintf('TESTING: Temporary scratch cache management\n');
+
 % State the cache-management target of the test
 result=new_test_result('kernel/cache_temp_scratch',...
                        'Temporary scratch cache management',...

@@ -13,6 +13,9 @@
 
 function result=test_dynamic_grid_plot()
 
+% Announce the test target
+fprintf('TESTING: Spherical grid plotting\n');
+
 % State the grid_plot target of the test
 result=new_test_result('kernel/dynamic_grid_plot',...
                        'Offscreen spherical grid plotting',...

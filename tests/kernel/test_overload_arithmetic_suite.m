@@ -14,6 +14,9 @@
 
 function result=test_overload_arithmetic_suite()
 
+% Announce the test target
+fprintf('TESTING: Cheap overload arithmetic\n');
+
 % State the utility target of the test
 result=new_test_result('kernel/overload_arithmetic_suite',...
                        'Cheap overload arithmetic',...

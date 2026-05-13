@@ -14,6 +14,9 @@
 
 function result=test_indexing_roundtrip_suite()
 
+% Announce the test target
+fprintf('TESTING: Indexing conversion functions\n');
+
 % State the indexing target of the test
 result=new_test_result('kernel/indexing_roundtrip_suite',...
                        'Indexing conversion functions',...

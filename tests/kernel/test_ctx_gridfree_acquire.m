@@ -14,6 +14,9 @@
 
 function result=test_ctx_gridfree_acquire()
 
+% Announce the test target
+fprintf('TESTING: Grid-free acquire path\n');
+
 % State the grid-free target of the test
 result=new_test_result('kernel/ctx_gridfree_acquire',...
                        'Grid-free acquire path',...

@@ -13,6 +13,9 @@
 
 function result=test_optimcon_support_paths()
 
+% Announce the test target
+fprintf('TESTING: Optimal-control support helper paths\n');
+
 % State the support-path target of the test
 result=new_test_result('optimcon/support_paths',...
                        'Optimal-control support helper paths',...

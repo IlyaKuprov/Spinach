@@ -13,6 +13,9 @@
 
 function result=test_dynamic_propagation_frontends()
 
+% Announce the test target
+fprintf('TESTING: Dynamic propagation front ends\n');
+
 % State the dynamic propagation target of the test
 result=new_test_result('kernel/dynamic_propagation_frontends',...
                        'Dynamic propagation front ends',...

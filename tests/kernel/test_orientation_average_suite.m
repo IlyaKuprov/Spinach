@@ -14,6 +14,9 @@
 
 function result=test_orientation_average_suite()
 
+% Announce the test target
+fprintf('TESTING: Orientation and average helpers\n');
+
 % State the rotational-kernel target of the test
 result=new_test_result('kernel/orientation_average_suite',...
                        'Orientation and average helpers',...

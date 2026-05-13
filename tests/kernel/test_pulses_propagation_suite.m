@@ -14,6 +14,9 @@
 
 function result=test_pulses_propagation_suite()
 
+% Announce the test target
+fprintf('TESTING: Pulse coordinate and propagation helpers\n');
+
 % State the propagation-helper target of the test
 result=new_test_result('kernel/pulses_propagation_suite',...
                        'Pulse coordinate and propagation helpers',...

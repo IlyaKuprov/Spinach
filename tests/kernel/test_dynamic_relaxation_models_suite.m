@@ -13,6 +13,9 @@
 
 function result=test_dynamic_relaxation_models_suite()
 
+% Announce the test target
+fprintf('TESTING: Dynamic relaxation model helpers\n');
+
 % State the relaxation-model target of the test
 result=new_test_result('kernel/dynamic_relaxation_models_suite',...
                        'Dynamic relaxation model helpers',...

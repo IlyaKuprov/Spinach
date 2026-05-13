@@ -13,6 +13,9 @@
 
 function result=test_dynamic_fp_contexts()
 
+% Announce the test target
+fprintf('TESTING: Fokker-Planck imaging and meshflow contexts\n');
+
 % State the context target of the test
 result=new_test_result('kernel/dynamic_fp_contexts',...
                        'Fokker-Planck imaging and meshflow contexts',...

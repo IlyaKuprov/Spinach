@@ -35,10 +35,27 @@ if ~isequal(size(observed),size(reference))
     error(['FAILED: ' label ' -- size mismatch.']);
 end
 
+% Convert data to double vectors for numerical comparison
+observed_vec=double(observed(:));
+reference_vec=double(reference(:));
+
+% Reject non-finite values before norm evaluation
+if any(~isfinite(observed_vec))
+    error(['FAILED: ' label ' -- observed value contains NaN or Inf.']);
+end
+if any(~isfinite(reference_vec))
+    error(['FAILED: ' label ' -- reference value contains NaN or Inf.']);
+end
+
 % Compute a scaled Frobenius/vector norm error
-error_norm=norm(observed(:)-reference(:),2);
-ref_norm=max([1 norm(reference(:),2)]);
+error_norm=norm(observed_vec-reference_vec,2);
+ref_norm=max([1 norm(reference_vec,2)]);
 limit=abs_tol+rel_tol*ref_norm;
+
+% Reject non-finite comparison scalars
+if (~isfinite(error_norm))||(~isfinite(limit))
+    error(['FAILED: ' label ' -- comparison produced a non-finite scalar.']);
+end
 
 % Fail with the numerical details
 if error_norm>limit

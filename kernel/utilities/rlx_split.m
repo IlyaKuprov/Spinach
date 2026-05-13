@@ -41,7 +41,7 @@ tran_sso_mask=any((L>0)&(M~=0),2)&sso_mask;
 % Split the relaxation superoperator
 R1=R; R1(~long_sso_mask,~long_sso_mask)=0;
 R2=R; R2(~tran_sso_mask,~tran_sso_mask)=0;
-Rm=R; R2(~mso_mask,~mso_mask)=0;
+Rm=R; Rm(~mso_mask,~mso_mask)=0;
 
 end
 

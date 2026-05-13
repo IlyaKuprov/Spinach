@@ -21,7 +21,7 @@ result=new_test_result('kernel/dynamic_integrity_includes_mex',...
                        'low-feasibility include scripts and integrity utilities must be exercised without mutating the Spinach tree.');
 
 % Locate canonical Spinach subtrees
-spinach_root='/home/kuprov/.openclaw/workspace/Spinach';
+spinach_root=fileparts(fileparts(fileparts(mfilename('fullpath'))));
 includes_dir=fullfile(spinach_root,'kernel','includes');
 integrity_dir=fullfile(spinach_root,'kernel','integrity');
 mex_dir=fullfile(spinach_root,'kernel','mex');

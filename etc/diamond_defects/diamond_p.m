@@ -2,21 +2,19 @@
 %
 %          [sys,inter]=diamond_p(parameters)
 %
-% This is a convenience wrapper around diamond_defect().
+% Magnetic parameters from Nadolinny et al., Crystals 7, 237 (2017),
+% https://doi.org/10.3390/cryst7080237
 %
 % Parameters:
 %
 %    parameters is a structure with the following fields:
 %
-%      .centre        - 'ma1', 'np1', 'np2', 'np3', 'np4',
-%                        'np5', 'np6', 'np8', or 'np9', default is 'ma1'
-%
-%      .orientation   - '111', '110', or '100' crystal plane
-%                        normal aligned with the magnetic field,
-%                        default is '111'
-%
-%      .include_13c  - include reported 13C hyperfine couplings
-%                       where available, false by default
+%      .centre       - 'ma1', 'np1', 'np2', 'np3', 'np4', 'np5',
+%                      'np6', 'np8', or 'np9', default is 'ma1'
+%      .orientation  - '111', '110', or '100' crystal plane normal
+%                      aligned with the magnetic field, default is '111'
+%      .include_13c - include reported 13C hyperfine couplings for MA1,
+%                     false by default
 %
 % Outputs:
 %
@@ -36,15 +34,80 @@ end
 % Check consistency
 grumble(parameters);
 
-% Set default centre
+% Set default parameters
 if ~isfield(parameters,'centre')
     parameters.centre='ma1';
 end
+if ~isfield(parameters,'orientation')
+    parameters.orientation='111';
+end
+if ~isfield(parameters,'include_13c')
+    parameters.include_13c=false;
+end
 
-% Call the common diamond defect database
-parameters.defect=lower(parameters.centre);
-[sys,inter]=diamond_defect(parameters);
+% Set field-unit conversion constants
+[hz_per_mt,~]=diamond_hz_per_mt();
 
+% Select the phosphorus centre
+electron='E'; zfs=[];
+[gmat,nuclei]=phosphorus_data(lower(parameters.centre),hz_per_mt,parameters.include_13c);
+
+% Build the Spinach structures
+[sys,inter]=diamond_system(electron,gmat,zfs,nuclei,parameters.orientation);
+
+end
+
+% Phosphorus centre table data
+function [gmat,nuclei]=phosphorus_data(centre,hz_per_mt,include_13c)
+nuclei={}; frame=eye(3);
+switch centre
+    case 'ma1'
+        gmat=eye(3)*2.0025;
+        nuclei{end+1}=diamond_nuc('31P',...
+            diamond_tensor([1.96 1.96 2.32]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+        if include_13c
+            nuclei{end+1}=diamond_nuc('13C',...
+                diamond_tensor([13.92 13.92 18.13]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+        end
+    case 'np1'
+        gmat=diamond_tensor([2.00243 2.0028 2.0026],frame);
+        nuclei{end+1}=diamond_nuc('31P',diamond_tensor([2.08 2.02 2.18]*hz_per_mt,frame),[]);
+        nuclei{end+1}=diamond_nuc('14N',diamond_tensor([4.08 3.10 3.00]*hz_per_mt,frame),[]);
+    case 'np2'
+        gmat=eye(3)*2.0025;
+        nuclei{end+1}=diamond_nuc('31P',...
+            diamond_tensor([2.09 2.09 2.34]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+        nuclei{end+1}=diamond_nuc('14N',...
+            diamond_tensor([3.09 3.09 6.42]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+    case 'np3'
+        gmat=eye(3)*2.0025;
+        nuclei{end+1}=diamond_nuc('31P',...
+            diamond_tensor([18.23 18.23 17.48]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+        nuclei{end+1}=diamond_nuc('14N',...
+            diamond_tensor([0.33 0.33 0.10]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+    case 'np4'
+        gmat=diamond_tensor([2.0009 2.0012 2.00047],frame);
+        nuclei{end+1}=diamond_nuc('31P',diamond_tensor([5.456 3.838 3.80]*hz_per_mt,frame),[]);
+    case 'np5'
+        gmat=diamond_tensor([2.0009 2.0009 2.00087],diamond_frame_z([1 1 1]));
+        nuclei{end+1}=diamond_nuc('31P',...
+            diamond_tensor([1.024 1.024 6.522]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+    case 'np6'
+        gmat=diamond_tensor([2.00083 2.00083 2.00085],diamond_frame_z([1 1 1]));
+        nuclei{end+1}=diamond_nuc('31P',diamond_tensor([7.585 2.942 2.328]*hz_per_mt,frame),[]);
+    case 'np8'
+        gmat=diamond_tensor([2.0016 2.0016 2.0048],diamond_frame_z([1 1 1]));
+        nuclei{end+1}=diamond_nuc('31P',...
+            diamond_tensor([3.2 3.2 5.6]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+        nuclei{end+1}=diamond_nuc('31P',...
+            diamond_tensor([8.8 8.8 13.6]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+    case 'np9'
+        gmat=diamond_tensor([2.0038 2.0038 2.0030],diamond_frame_z([1 1 1]));
+        nuclei{end+1}=diamond_nuc('31P',...
+            diamond_tensor([2.2 2.2 1.4]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+    otherwise
+        error('unknown phosphorus centre.');
+end
 end
 
 % Consistency enforcement
@@ -55,8 +118,13 @@ end
 if isfield(parameters,'centre')&&(~ischar(parameters.centre))
     error('parameters.centre must be a character string.');
 end
+if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
+    error('parameters.orientation must be a character string.');
+end
+if isfield(parameters,'include_13c')&&(~islogical(parameters.include_13c))
+    error('parameters.include_13c must be logical.');
+end
 end
 
-% Good catalogues are maps, not territories.
-
+% The phosphorus table is compact, but each centre is separate data.
 

@@ -1,15 +1,16 @@
-% R2 self-interstitial spin system for diamond. Syntax:
+% R10 vacancy-chain spin system for diamond. Syntax:
 %
-%          [sys,inter]=diamond_r2(parameters)
+%          [sys,inter]=diamond_r10(parameters)
 %
-% Magnetic parameters from Hunt et al., Phys. Rev. B 61,
-% 3863 (2000), https://doi.org/10.1103/PhysRevB.61.3863
+% Magnetic parameters from Iakoubovskii and Stesmans, Phys. Rev. B 66,
+% 045406 (2002), https://doi.org/10.1103/PhysRevB.66.045406
+% ZFS table values cross-checked against Ball, PhD thesis,
+% OIST Graduate University (2021).
 %
 % Parameters:
 %
 %    parameters is a structure with the following fields:
 %
-%      .d_sign       - sign of D, default is +1
 %      .orientation  - '111', '110', or '100' crystal plane normal
 %                      aligned with the magnetic field, default is '111'
 %
@@ -19,9 +20,9 @@
 %
 %    inter - Spinach interaction specification structure
 %
-% <https://spindynamics.org/wiki/index.php?title=diamond_r2.m>
+% <https://spindynamics.org/wiki/index.php?title=diamond_r10.m>
 
-function [sys,inter]=diamond_r2(parameters)
+function [sys,inter]=diamond_r10(parameters)
 
 % Set default input
 if nargin==0
@@ -31,19 +32,15 @@ end
 % Check consistency
 grumble(parameters);
 
-% Set default parameters
+% Set default orientation
 if ~isfield(parameters,'orientation')
     parameters.orientation='111';
-end
-if ~isfield(parameters,'d_sign')
-    parameters.d_sign=1;
 end
 
 % Build the electron tensors
 electron='E3';
-frame=diamond_frame_z([1 0 0]);
-gmat=diamond_tensor([2.0019 2.0019 2.0021],frame);
-zfs=diamond_zfs(parameters.d_sign*4173e6,0,frame);
+gmat=eye(3)*2.0023;
+zfs=diamond_tensor([36 36 -73]*1e6,diamond_frame_z([1 1 0]));
 nuclei={};
 
 % Build the Spinach structures
@@ -59,11 +56,7 @@ end
 if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
     error('parameters.orientation must be a character string.');
 end
-if isfield(parameters,'d_sign')&&...
-   (~isnumeric(parameters.d_sign)||~isreal(parameters.d_sign)||~isscalar(parameters.d_sign))
-    error('parameters.d_sign must be a real scalar.');
-end
 end
 
-% A self-interstitial has its own symmetry axis.
+% Vacancy chains leave their spin signature in the D tensor.
 

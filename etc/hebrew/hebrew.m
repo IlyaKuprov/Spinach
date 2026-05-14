@@ -24,12 +24,16 @@
 %       hebrew()
 %       hebrew(mode)
 %       ncards=hebrew(mode,max_cards)
+%       hebrew('gui')
 %
-% The mode may be 'forward', 'backward', or 'both'. In forward mode,
+% The mode may be 'forward', 'backward', 'both', or 'gui'. In forward mode,
 % English is shown first and Hebrew is revealed after <Enter>. In
 % backward mode, Hebrew is shown first and English is revealed after
 % <Enter>. In both mode, the direction is random on every card. Exit
-% an open-ended run with CTRL+C.
+% an open-ended run with CTRL+C. In gui mode, a one-button graphical
+% flashcard window is opened; the button reveals the answer on the
+% first click and advances to another randomly selected card on the
+% second click.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -59,6 +63,12 @@ function ncards=hebrew(mode,max_cards) %#NHEAD
 
     % Return immediately for spreadsheet-loading tests
     if max_cards==0
+        return
+    end
+
+    % Start the graphical flashcard interface
+    if mode=="gui"
+        show_gui(cards);
         return
     end
 
@@ -232,9 +242,147 @@ function show_card(card,mode)
 end
 
 
+function show_gui(cards)
+
+    % Select a Hebrew-capable display font
+    gui_font=select_font();
+
+    % Create the flashcard window
+    gui_fig=figure('Name','Hebrew flashcards','NumberTitle','off',...
+                   'MenuBar','none','ToolBar','none','Color',[1 1 1],...
+                   'Units','pixels','Position',[100 100 760 430]);
+
+    % Create the card direction label
+    context_ctrl=uicontrol(gui_fig,'Style','text','Units','normalized',...
+                           'Position',[0.05 0.88 0.90 0.06],...
+                           'BackgroundColor',[1 1 1],'FontName',char(gui_font),...
+                           'FontSize',12,'HorizontalAlignment','center');
+
+    % Create the current-word label
+    prompt_ctrl=uicontrol(gui_fig,'Style','text','Units','normalized',...
+                          'Position',[0.05 0.54 0.90 0.30],...
+                          'BackgroundColor',[1 1 1],'FontName',char(gui_font),...
+                          'FontSize',34,'FontWeight','bold',...
+                          'HorizontalAlignment','center');
+
+    % Create the answer label
+    answer_ctrl=uicontrol(gui_fig,'Style','text','Units','normalized',...
+                          'Position',[0.05 0.29 0.90 0.20],...
+                          'BackgroundColor',[1 1 1],'FontName',char(gui_font),...
+                          'FontSize',24,'HorizontalAlignment','center');
+
+    % Create the single control button
+    button_ctrl=uicontrol(gui_fig,'Style','pushbutton','Units','normalized',...
+                          'Position',[0.35 0.08 0.30 0.13],...
+                          'FontName',char(gui_font),'FontSize',16,...
+                          'Callback',@button_press);
+
+    % Initialise the GUI state
+    gui_state.cards=cards;
+    gui_state.card_idx=0;
+    gui_state.revealed=false;
+    gui_state.prompt="";
+    gui_state.answer="";
+    gui_state.context="";
+
+    % Display the first random card
+    next_card();
+
+    function button_press(~,~)
+
+        % Reveal or advance depending on the current state
+        if gui_state.revealed
+            next_card();
+        else
+            gui_state.revealed=true;
+            set(answer_ctrl,'String',char(gui_state.answer));
+            set(button_ctrl,'String','Next');
+        end
+
+    end
+
+    function next_card()
+
+        % Select a random card without immediate repetition where possible
+        new_idx=randi(height(gui_state.cards));
+        if height(gui_state.cards)>1&&new_idx==gui_state.card_idx
+            new_idx=mod(new_idx,height(gui_state.cards))+1;
+        end
+
+        % Randomise the question direction
+        if rand()<0.5
+            card_mode="forward";
+        else
+            card_mode="backward";
+        end
+
+        % Prepare the prompt and answer strings
+        gui_state.card_idx=new_idx;
+        gui_state.revealed=false;
+        [gui_state.prompt,gui_state.answer,gui_state.context]=...
+            card_sides(gui_state.cards(new_idx,:),card_mode);
+
+        % Refresh the visible card controls
+        set(context_ctrl,'String',char(gui_state.context));
+        set(prompt_ctrl,'String',char(gui_state.prompt));
+        set(answer_ctrl,'String','');
+        set(button_ctrl,'String','Reveal');
+
+    end
+
+end
+
+
+function [prompt_text,answer_text,context_text]=card_sides(card,mode)
+
+    % Build the English side of the card
+    eng_text=sprintf('%s [%s, %s]',char(card.english),...
+                     char(card.source),char(card.form));
+
+    % Choose the displayed side and the hidden answer
+    if mode=="forward"
+        prompt_text=string(eng_text);
+        answer_text=card.hebrew;
+        context_text="English -> Hebrew";
+    else
+        prompt_text=card.hebrew;
+        answer_text=string(eng_text);
+        context_text="Hebrew -> English";
+    end
+
+end
+
+
+function font_name=select_font()
+
+    % Define a cross-platform preference list with Hebrew coverage
+    pref_fonts=["Noto Sans Hebrew","Arial Unicode MS","Arial",...
+                "DejaVu Sans","Helvetica","SansSerif"];
+
+    % Query installed fonts where the graphics system is available
+    try
+        avail_fonts=string(listfonts);
+    catch
+        avail_fonts=strings(0,1);
+    end
+
+    % Fall back to MATLAB's logical sans-serif font
+    font_name="SansSerif";
+
+    % Select the first preferred font installed on this system
+    for n=1:numel(pref_fonts)
+        if any(strcmpi(avail_fonts,pref_fonts(n)))
+            font_name=pref_fonts(n);
+            return
+        end
+    end
+
+end
+
+
 function grumble(mode,max_cards)
-if ~isscalar(mode)||~ismember(mode,["forward","backward","both"])
-    error('mode must be ''forward'', ''backward'', or ''both''.');
+if ~isscalar(mode)||~ismember(mode,["forward","backward","both","gui"])
+    error('mode must be ''forward'', ''backward'', ''both'', or ''gui''.');
 end
 if ~isnumeric(max_cards)||~isscalar(max_cards)||max_cards<0
     error('max_cards must be a non-negative real scalar.');
@@ -249,4 +397,5 @@ end
 % being intercepted over Rehovot
 
 % #NWIKI
+
 

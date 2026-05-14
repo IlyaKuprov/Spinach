@@ -117,8 +117,8 @@ if ~expm_times_vec
 
     else
 
-        % Subdivide the time step to ensure monotonic convergence
-        norm_gen=cheap_norm(L)*abs(time_step); nsteps=ceil(norm_gen/2);
+        % Select Taylor-cost subdivision count using a commutator norm bound
+        norm_gen=cheap_norm(L)*abs(time_step); nsteps=taylor_steps(2*norm_gen);
 
         % Step checks
         if nsteps>1e4
@@ -197,13 +197,13 @@ else
     % Scale the state
     rho=rho/scaling;
 
-    % Subdivide the time step
+    % Select Taylor-cost subdivision count
     if isnumeric(L)
         norm_mat=cheap_norm(L)*abs(time_step);
     else
         norm_mat=max(cellfun(@cheap_norm,L))*abs(time_step);
     end
-    nsteps=max(1,ceil(norm_mat/24));
+    nsteps=taylor_steps(norm_mat);
 
     % Step checks
     if nsteps>1e4
@@ -244,6 +244,49 @@ else
     rho=scaling*rho;
 
 end
+
+end
+
+% Taylor subdivision selector
+function nsteps=taylor_steps(norm_mat)
+
+% Move scalar GPU norms back to the CPU if needed
+if isa(norm_mat,'gpuArray')
+    norm_mat=gather(norm_mat);
+end
+
+% Convert the norm estimate into a scalar double
+norm_mat=double(full(norm_mat));
+
+% Double-precision Taylor-action thresholds for orders 1:55
+theta=[2.2204460492503131e-16; 2.5809568029946243e-08; 1.3863478661191185e-05;...
+       3.3971688399768305e-04; 2.4008763578872742e-03; 9.0656564075951018e-03;...
+       2.3844555325002736e-02; 4.9912288711153226e-02; 8.9577602032233430e-02;...
+       1.4418297616143780e-01; 2.1423580684517107e-01; 2.9961589138115802e-01;...
+       3.9977753363167950e-01; 5.1391469361242936e-01; 6.4108352330411988e-01;...
+       7.8028742566265763e-01; 9.3053284607865683e-01; 1.0908637192900361e+00;...
+       1.2603810606426387e+00; 1.4382525968043369e+00; 1.6237159502358214e+00;...
+       1.8160778162150852e+00; 2.0147107809446161e+00; 2.2190488693650896e+00;...
+       2.4285825244428265e+00; 2.6428534574594353e+00; 2.8614496339342641e+00;...
+       3.0840005449891619e+00; 3.3101728398902708e+00; 3.5396663487436895e+00;...
+       3.7722104956817510e+00; 4.0075610861180397e+00; 4.2454974425796959e+00;...
+       4.4858198594473686e+00; 4.7283473457935390e+00; 4.9729156261919814e+00;...
+       5.2193753710840580e+00; 5.4675906305245441e+00; 5.7174374475720127e+00;...
+       5.9688026300418491e+00; 6.2215826616898910e+00; 6.4756827360799845e+00;...
+       6.7310158983810240e+00; 6.9875022821306301e+00; 7.2450684295979526e+00;...
+       7.5036466857888637e+00; 7.7631746573779870e+00; 8.0235947289399796e+00;...
+       8.2848536298039175e+00; 8.5469020456849325e+00; 8.8096942699713221e+00;...
+       9.0731878901761451e+00; 9.3373435056120133e+00; 9.6021244728265565e+00;...
+       9.8674966757534008e+00];
+
+% Compute the Taylor work model over admissible orders
+orders=(1:numel(theta)).';
+scalings=max(1,ceil(norm_mat./theta));
+work=orders.*scalings;
+
+% Pick the scaling count with the smallest predicted work
+[~,best_idx]=min(work);
+nsteps=scalings(best_idx);
 
 end
 

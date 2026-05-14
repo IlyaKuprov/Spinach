@@ -44,8 +44,10 @@ end
 
 % Build the electron tensors
 electron='E3';
-frame=diamond_frame_z([1 1 1]);
-gmat=diamond_tensor([2.0035 2.0035 2.0042],frame);
+frame=[-1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
+            1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
+            0          2/sqrt(6)  1/sqrt(3)];
+gmat=((frame)*diag([2.0035 2.0035 2.0042])*(frame)');
 zfs=frame*zfs2mat(1000e6,0,0,0,0)*frame';
 nuclei={};
 
@@ -56,14 +58,14 @@ else
     silicon='29Si';
 end
 if strcmp(silicon,'29Si')
-    nuclei{end+1}=struct('iso','29Si','A',diamond_tensor([78.9e6 78.9e6 76.3e6],frame),'Q',[]);
+    nuclei{end+1}=struct('iso','29Si','A',((frame)*diag([78.9e6 78.9e6 76.3e6])*(frame)'),'Q',[]);
 elseif ~strcmp(silicon,'none')
     nuclei{end+1}=struct('iso',silicon,'A',zeros(3),'Q',[]);
 end
 
 % Add reported nearest-neighbour carbons
 if parameters.include_13c
-    Cmat=diamond_tensor([30.2e6 30.2e6 66.2e6],frame);
+    Cmat=((frame)*diag([30.2e6 30.2e6 66.2e6])*(frame)');
     nuc_idx=numel(nuclei);
     nuclei(nuc_idx+1:nuc_idx+6)={[]};
     for n=1:6
@@ -72,61 +74,7 @@ if parameters.include_13c
 end
 
 % Build the Spinach structures
-[sys,inter]=diamond_system(electron,gmat,zfs,nuclei,parameters.orientation);
-
-end
-
-% Consistency enforcement
-function grumble(parameters)
-if(~isstruct(parameters))
-    error('parameters must be a structure.');
-end
-if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
-    error('parameters.orientation must be a character string.');
-end
-if isfield(parameters,'silicon')&&(~ischar(parameters.silicon))
-    error('parameters.silicon must be a character string.');
-end
-if isfield(parameters,'include_13c')&&(~islogical(parameters.include_13c))
-    error('parameters.include_13c must be logical.');
-end
-end
-
-% Silicon substitution is visible in both D and hyperfine tensors.
-
-% Shared local helpers
-
-% Make a principal-axis frame from the z axis
-function frame=diamond_frame_z(zaxis)
-zaxis=zaxis(:)/norm(zaxis,2);
-if abs(dot(zaxis,[0;0;1]))<0.9
-    xaxis=cross([0;0;1],zaxis);
-else
-    xaxis=cross([0;1;0],zaxis);
-end
-xaxis=xaxis/norm(xaxis,2);
-yaxis=cross(zaxis,xaxis);
-frame=[xaxis yaxis zaxis];
-end
-
-% Orthogonalise a right-handed frame
-function frame=diamond_frame_orth(frame)
-[frame,~]=qr(frame,0);
-if det(frame)<0
-    frame(:,3)=-frame(:,3);
-end
-end
-
-% Build a tensor from principal values and axes
-function M=diamond_tensor(values,frame)
-frame=diamond_frame_orth(frame);
-M=frame*diag(values)*frame';
-M=(M+M')/2;
-end
-
-% Crystal-to-laboratory rotation matrix
-function C=diamond_orient(orientation)
-switch orientation
+switch parameters.orientation
     case '111'
         C=rotmat_align([1 1 1],[0 0 1]);
     case '110'
@@ -136,11 +84,6 @@ switch orientation
     otherwise
         error('unknown orientation specification.');
 end
-end
-
-% Build the Spinach structures
-function [sys,inter]=diamond_system(electron,gmat,zfs,nuclei,orientation)
-C=diamond_orient(orientation);
 sys.isotopes={electron};
 inter.zeeman.matrix{1}=C*gmat*C';
 if ~isempty(zfs)
@@ -159,6 +102,23 @@ for n=1:numel(nuclei)
     else
         inter.coupling.matrix{n+1,n+1}=[];
     end
+end
+
+end
+
+% Consistency enforcement
+function grumble(parameters)
+if(~isstruct(parameters))
+    error('parameters must be a structure.');
+end
+if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
+    error('parameters.orientation must be a character string.');
+end
+if isfield(parameters,'silicon')&&(~ischar(parameters.silicon))
+    error('parameters.silicon must be a character string.');
+end
+if isfield(parameters,'include_13c')&&(~islogical(parameters.include_13c))
+    error('parameters.include_13c must be logical.');
 end
 end
 

@@ -47,28 +47,36 @@ end
 
 % Select the vacancy centre
 centre=lower(parameters.centre);
+
+% Set vacancy principal-axis frames
+frame_111=[-1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
+            1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
+            0          2/sqrt(6)  1/sqrt(3)];
+frame_110=[-1/sqrt(2) 0 1/sqrt(2);...
+            1/sqrt(2) 0 1/sqrt(2);...
+            0         1 0];
 switch centre
     case {'r4_w6','w6','r4'}
         electron='E3'; giso=2.0022;
-        zfs=diamond_tensor([105 197 -303]*1e6,diamond_frame_z([1 1 1]));
+        zfs=((frame_111)*diag([105 197 -303]*1e6)*(frame_111)');
     case 'w29'
         electron='E4'; giso=2.0019;
-        zfs=diamond_tensor([297 156 -453]*1e6,diamond_frame_z([1 1 1]));
+        zfs=((frame_111)*diag([297 156 -453]*1e6)*(frame_111)');
     case 'r5'
         electron='E3'; giso=2.0023;
-        zfs=diamond_tensor([283 244 -524]*1e6,diamond_frame_z([1 1 0]));
+        zfs=((frame_110)*diag([283 244 -524]*1e6)*(frame_110)');
     case 'o1'
         electron='E3'; giso=2.0023;
-        zfs=diamond_tensor([109 95 -205]*1e6,diamond_frame_z([1 1 0]));
+        zfs=((frame_110)*diag([109 95 -205]*1e6)*(frame_110)');
     case 'r6'
         electron='E3'; giso=2.0023;
-        zfs=diamond_tensor([62 59 -120]*1e6,diamond_frame_z([1 1 0]));
+        zfs=((frame_110)*diag([62 59 -120]*1e6)*(frame_110)');
     case 'r10'
         electron='E3'; giso=2.0023;
-        zfs=diamond_tensor([36 36 -73]*1e6,diamond_frame_z([1 1 0]));
+        zfs=((frame_110)*diag([36 36 -73]*1e6)*(frame_110)');
     case 'r11'
         electron='E3'; giso=2.0023;
-        zfs=diamond_tensor([27 27 -53]*1e6,diamond_frame_z([1 1 0]));
+        zfs=((frame_110)*diag([27 27 -53]*1e6)*(frame_110)');
     otherwise
         error('unknown vacancy centre.');
 end
@@ -78,56 +86,7 @@ gmat=eye(3)*giso;
 nuclei={};
 
 % Build the Spinach structures
-[sys,inter]=diamond_system(electron,gmat,zfs,nuclei,parameters.orientation);
-
-end
-
-% Consistency enforcement
-function grumble(parameters)
-if(~isstruct(parameters))
-    error('parameters must be a structure.');
-end
-if isfield(parameters,'centre')&&(~ischar(parameters.centre))
-    error('parameters.centre must be a character string.');
-end
-if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
-    error('parameters.orientation must be a character string.');
-end
-end
-
-% Shared local helpers
-
-% Make a principal-axis frame from the z axis
-function frame=diamond_frame_z(zaxis)
-zaxis=zaxis(:)/norm(zaxis,2);
-if abs(dot(zaxis,[0;0;1]))<0.9
-    xaxis=cross([0;0;1],zaxis);
-else
-    xaxis=cross([0;1;0],zaxis);
-end
-xaxis=xaxis/norm(xaxis,2);
-yaxis=cross(zaxis,xaxis);
-frame=[xaxis yaxis zaxis];
-end
-
-% Orthogonalise a right-handed frame
-function frame=diamond_frame_orth(frame)
-[frame,~]=qr(frame,0);
-if det(frame)<0
-    frame(:,3)=-frame(:,3);
-end
-end
-
-% Build a tensor from principal values and axes
-function M=diamond_tensor(values,frame)
-frame=diamond_frame_orth(frame);
-M=frame*diag(values)*frame';
-M=(M+M')/2;
-end
-
-% Crystal-to-laboratory rotation matrix
-function C=diamond_orient(orientation)
-switch orientation
+switch parameters.orientation
     case '111'
         C=rotmat_align([1 1 1],[0 0 1]);
     case '110'
@@ -137,11 +96,6 @@ switch orientation
     otherwise
         error('unknown orientation specification.');
 end
-end
-
-% Build the Spinach structures
-function [sys,inter]=diamond_system(electron,gmat,zfs,nuclei,orientation)
-C=diamond_orient(orientation);
 sys.isotopes={electron};
 inter.zeeman.matrix{1}=C*gmat*C';
 if ~isempty(zfs)
@@ -160,6 +114,20 @@ for n=1:numel(nuclei)
     else
         inter.coupling.matrix{n+1,n+1}=[];
     end
+end
+
+end
+
+% Consistency enforcement
+function grumble(parameters)
+if(~isstruct(parameters))
+    error('parameters must be a structure.');
+end
+if isfield(parameters,'centre')&&(~ischar(parameters.centre))
+    error('parameters.centre must be a character string.');
+end
+if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
+    error('parameters.orientation must be a character string.');
 end
 end
 

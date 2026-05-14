@@ -45,67 +45,18 @@ if ~strcmp(parameters.nitrogen,'15N')
 end
 
 % Build the electron tensors
-frame=diamond_frame_z([1 1 1]);
+frame=[-1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
+            1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
+            0          2/sqrt(6)  1/sqrt(3)];
 electron='E4';
-gmat=diamond_tensor([2.0035 2.0035 2.0029],frame);
+gmat=((frame)*diag([2.0035 2.0035 2.0029])*(frame)');
 zfs=frame*zfs2mat(1685e6,0,0,0,0)*frame';
 
 % Add the nitrogen hyperfine tensor
-nuclei={struct('iso','15N','A',diamond_tensor([-23.8e6 -23.8e6 -35.7e6],frame),'Q',[])};
+nuclei={struct('iso','15N','A',((frame)*diag([-23.8e6 -23.8e6 -35.7e6])*(frame)'),'Q',[])};
 
 % Build the Spinach structures
-[sys,inter]=diamond_system(electron,gmat,zfs,nuclei,parameters.orientation);
-
-end
-
-% Consistency enforcement
-function grumble(parameters)
-if(~isstruct(parameters))
-    error('parameters must be a structure.');
-end
-if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
-    error('parameters.orientation must be a character string.');
-end
-if isfield(parameters,'nitrogen')&&(~ischar(parameters.nitrogen))
-    error('parameters.nitrogen must be a character string.');
-end
-end
-
-% A name is useful only when it remains attached to evidence.
-
-% Shared local helpers
-
-% Make a principal-axis frame from the z axis
-function frame=diamond_frame_z(zaxis)
-zaxis=zaxis(:)/norm(zaxis,2);
-if abs(dot(zaxis,[0;0;1]))<0.9
-    xaxis=cross([0;0;1],zaxis);
-else
-    xaxis=cross([0;1;0],zaxis);
-end
-xaxis=xaxis/norm(xaxis,2);
-yaxis=cross(zaxis,xaxis);
-frame=[xaxis yaxis zaxis];
-end
-
-% Orthogonalise a right-handed frame
-function frame=diamond_frame_orth(frame)
-[frame,~]=qr(frame,0);
-if det(frame)<0
-    frame(:,3)=-frame(:,3);
-end
-end
-
-% Build a tensor from principal values and axes
-function M=diamond_tensor(values,frame)
-frame=diamond_frame_orth(frame);
-M=frame*diag(values)*frame';
-M=(M+M')/2;
-end
-
-% Crystal-to-laboratory rotation matrix
-function C=diamond_orient(orientation)
-switch orientation
+switch parameters.orientation
     case '111'
         C=rotmat_align([1 1 1],[0 0 1]);
     case '110'
@@ -115,11 +66,6 @@ switch orientation
     otherwise
         error('unknown orientation specification.');
 end
-end
-
-% Build the Spinach structures
-function [sys,inter]=diamond_system(electron,gmat,zfs,nuclei,orientation)
-C=diamond_orient(orientation);
 sys.isotopes={electron};
 inter.zeeman.matrix{1}=C*gmat*C';
 if ~isempty(zfs)
@@ -138,6 +84,20 @@ for n=1:numel(nuclei)
     else
         inter.coupling.matrix{n+1,n+1}=[];
     end
+end
+
+end
+
+% Consistency enforcement
+function grumble(parameters)
+if(~isstruct(parameters))
+    error('parameters must be a structure.');
+end
+if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
+    error('parameters.orientation must be a character string.');
+end
+if isfield(parameters,'nitrogen')&&(~ischar(parameters.nitrogen))
+    error('parameters.nitrogen must be a character string.');
 end
 end
 

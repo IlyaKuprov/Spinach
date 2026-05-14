@@ -54,10 +54,10 @@ electron='E'; nuclei={}; zfs=[];
 [gvals,An,Ati,g_alpha,A_alpha]=titanium_data(centre);
 gframe=diamond_frame_alpha(g_alpha);
 aframe=diamond_frame_alpha(A_alpha);
-gmat=diamond_tensor(gvals,gframe);
+gmat=((gframe)*diag(gvals)*(gframe)');
 
 % Add the nitrogen hyperfine tensor
-nuclei{end+1}=struct('iso','14N','A',diamond_tensor(An*hz_per_mt,aframe),'Q',[]);
+nuclei{end+1}=struct('iso','14N','A',((aframe)*diag(An*hz_per_mt)*(aframe)'),'Q',[]);
 
 % Add the titanium isotope if requested
 if isfield(parameters,'titanium')
@@ -66,19 +66,47 @@ else
     titanium='47Ti';
 end
 if ~strcmp(titanium,'none')
-    nuclei{end+1}=struct('iso',titanium,'A',diamond_tensor(Ati*hz_per_mt,aframe),'Q',[]);
+    nuclei{end+1}=struct('iso',titanium,'A',((aframe)*diag(Ati*hz_per_mt)*(aframe)'),'Q',[]);
 end
 
 % Add reported OK1 nearest-neighbour carbons
 if strcmp(centre,'ok1')&&parameters.include_13c
-    Cmat=diamond_tensor([2.62 2.62 4.38]*hz_per_mt,diamond_frame_xz([1 1 0],[1 -1 -1]));
+    Cmat=((diamond_frame_xz([1 1 0],[1 -1 -1]))*diag([2.62 2.62 4.38]*hz_per_mt)*(diamond_frame_xz([1 1 0],[1 -1 -1]))');
     nuclei{end+1}=struct('iso','13C','A',Cmat,'Q',[]);
-    Cmat=diamond_tensor([2.62 2.62 4.38]*hz_per_mt,diamond_frame_xz([1 1 0],[-1 1 -1]));
+    Cmat=((diamond_frame_xz([1 1 0],[-1 1 -1]))*diag([2.62 2.62 4.38]*hz_per_mt)*(diamond_frame_xz([1 1 0],[-1 1 -1]))');
     nuclei{end+1}=struct('iso','13C','A',Cmat,'Q',[]);
 end
 
 % Build the Spinach structures
-[sys,inter]=diamond_system(electron,gmat,zfs,nuclei,parameters.orientation);
+switch parameters.orientation
+    case '111'
+        C=rotmat_align([1 1 1],[0 0 1]);
+    case '110'
+        C=rotmat_align([1 1 0],[0 0 1]);
+    case '100'
+        C=rotmat_align([1 0 0],[0 0 1]);
+    otherwise
+        error('unknown orientation specification.');
+end
+sys.isotopes={electron};
+inter.zeeman.matrix{1}=C*gmat*C';
+if ~isempty(zfs)
+    [~,~,zfs]=mat2ias(C*zfs*C');
+    inter.coupling.matrix{1,1}=zfs;
+else
+    inter.coupling.matrix{1,1}=[];
+end
+for n=1:numel(nuclei)
+    sys.isotopes{n+1}=nuclei{n}.iso;
+    inter.zeeman.matrix{n+1}=zeros(3);
+    inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
+    if ~isempty(nuclei{n}.Q)
+        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
+        inter.coupling.matrix{n+1,n+1}=nqi;
+    else
+        inter.coupling.matrix{n+1,n+1}=[];
+    end
+end
 
 end
 
@@ -119,22 +147,13 @@ if isfield(parameters,'include_13c')&&(~islogical(parameters.include_13c))
 end
 end
 
-% Titanium centres carry both impurity and nitrogen signatures.
-
-% Shared local helpers
-
-% Orthogonalise a right-handed frame
-function frame=diamond_frame_orth(frame)
+% Make a principal-axis frame from three vectors
+function frame=diamond_frame_xyz(xaxis,yaxis,zaxis)
+frame=[xaxis(:) yaxis(:) zaxis(:)];
 [frame,~]=qr(frame,0);
 if det(frame)<0
     frame(:,3)=-frame(:,3);
 end
-end
-
-% Make a principal-axis frame from three vectors
-function frame=diamond_frame_xyz(xaxis,yaxis,zaxis)
-frame=[xaxis(:) yaxis(:) zaxis(:)];
-frame=diamond_frame_orth(frame);
 end
 
 % Frame used in the Nadolinny nickel and titanium tables
@@ -154,50 +173,5 @@ zaxis=zaxis(:)-xaxis*dot(xaxis,zaxis(:));
 zaxis=zaxis/norm(zaxis,2);
 yaxis=cross(zaxis,xaxis);
 frame=diamond_frame_xyz(xaxis,yaxis,zaxis);
-end
-
-% Build a tensor from principal values and axes
-function M=diamond_tensor(values,frame)
-frame=diamond_frame_orth(frame);
-M=frame*diag(values)*frame';
-M=(M+M')/2;
-end
-
-% Crystal-to-laboratory rotation matrix
-function C=diamond_orient(orientation)
-switch orientation
-    case '111'
-        C=rotmat_align([1 1 1],[0 0 1]);
-    case '110'
-        C=rotmat_align([1 1 0],[0 0 1]);
-    case '100'
-        C=rotmat_align([1 0 0],[0 0 1]);
-    otherwise
-        error('unknown orientation specification.');
-end
-end
-
-% Build the Spinach structures
-function [sys,inter]=diamond_system(electron,gmat,zfs,nuclei,orientation)
-C=diamond_orient(orientation);
-sys.isotopes={electron};
-inter.zeeman.matrix{1}=C*gmat*C';
-if ~isempty(zfs)
-    [~,~,zfs]=mat2ias(C*zfs*C');
-    inter.coupling.matrix{1,1}=zfs;
-else
-    inter.coupling.matrix{1,1}=[];
-end
-for n=1:numel(nuclei)
-    sys.isotopes{n+1}=nuclei{n}.iso;
-    inter.zeeman.matrix{n+1}=zeros(3);
-    inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
-    if ~isempty(nuclei{n}.Q)
-        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
-        inter.coupling.matrix{n+1,n+1}=nqi;
-    else
-        inter.coupling.matrix{n+1,n+1}=[];
-    end
-end
 end
 

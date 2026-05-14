@@ -47,11 +47,39 @@ centre=lower(parameters.centre);
 electron='E'; zfs=[];
 [gvals,Aco,alpha]=cobalt_data(centre);
 frame=diamond_frame_cobalt(alpha);
-gmat=diamond_tensor(gvals,frame);
-nuclei={struct('iso','59Co','A',diamond_tensor(Aco*hz_per_mt,frame),'Q',[])};
+gmat=((frame)*diag(gvals)*(frame)');
+nuclei={struct('iso','59Co','A',((frame)*diag(Aco*hz_per_mt)*(frame)'),'Q',[])};
 
 % Build the Spinach structures
-[sys,inter]=diamond_system(electron,gmat,zfs,nuclei,parameters.orientation);
+switch parameters.orientation
+    case '111'
+        C=rotmat_align([1 1 1],[0 0 1]);
+    case '110'
+        C=rotmat_align([1 1 0],[0 0 1]);
+    case '100'
+        C=rotmat_align([1 0 0],[0 0 1]);
+    otherwise
+        error('unknown orientation specification.');
+end
+sys.isotopes={electron};
+inter.zeeman.matrix{1}=C*gmat*C';
+if ~isempty(zfs)
+    [~,~,zfs]=mat2ias(C*zfs*C');
+    inter.coupling.matrix{1,1}=zfs;
+else
+    inter.coupling.matrix{1,1}=[];
+end
+for n=1:numel(nuclei)
+    sys.isotopes{n+1}=nuclei{n}.iso;
+    inter.zeeman.matrix{n+1}=zeros(3);
+    inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
+    if ~isempty(nuclei{n}.Q)
+        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
+        inter.coupling.matrix{n+1,n+1}=nqi;
+    else
+        inter.coupling.matrix{n+1,n+1}=[];
+    end
+end
 
 end
 
@@ -84,22 +112,13 @@ if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
 end
 end
 
-% Cobalt anisotropy deserves its own frame.
-
-% Shared local helpers
-
-% Orthogonalise a right-handed frame
-function frame=diamond_frame_orth(frame)
+% Make a principal-axis frame from three vectors
+function frame=diamond_frame_xyz(xaxis,yaxis,zaxis)
+frame=[xaxis(:) yaxis(:) zaxis(:)];
 [frame,~]=qr(frame,0);
 if det(frame)<0
     frame(:,3)=-frame(:,3);
 end
-end
-
-% Make a principal-axis frame from three vectors
-function frame=diamond_frame_xyz(xaxis,yaxis,zaxis)
-frame=[xaxis(:) yaxis(:) zaxis(:)];
-frame=diamond_frame_orth(frame);
 end
 
 % Frame used in the Nadolinny cobalt table
@@ -110,50 +129,5 @@ zbase=cross(xbase,yaxis);
 xaxis=cosd(alpha)*xbase+sind(alpha)*zbase;
 zaxis=cross(xaxis,yaxis);
 frame=diamond_frame_xyz(xaxis,yaxis,zaxis);
-end
-
-% Build a tensor from principal values and axes
-function M=diamond_tensor(values,frame)
-frame=diamond_frame_orth(frame);
-M=frame*diag(values)*frame';
-M=(M+M')/2;
-end
-
-% Crystal-to-laboratory rotation matrix
-function C=diamond_orient(orientation)
-switch orientation
-    case '111'
-        C=rotmat_align([1 1 1],[0 0 1]);
-    case '110'
-        C=rotmat_align([1 1 0],[0 0 1]);
-    case '100'
-        C=rotmat_align([1 0 0],[0 0 1]);
-    otherwise
-        error('unknown orientation specification.');
-end
-end
-
-% Build the Spinach structures
-function [sys,inter]=diamond_system(electron,gmat,zfs,nuclei,orientation)
-C=diamond_orient(orientation);
-sys.isotopes={electron};
-inter.zeeman.matrix{1}=C*gmat*C';
-if ~isempty(zfs)
-    [~,~,zfs]=mat2ias(C*zfs*C');
-    inter.coupling.matrix{1,1}=zfs;
-else
-    inter.coupling.matrix{1,1}=[];
-end
-for n=1:numel(nuclei)
-    sys.isotopes{n+1}=nuclei{n}.iso;
-    inter.zeeman.matrix{n+1}=zeros(3);
-    inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
-    if ~isempty(nuclei{n}.Q)
-        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
-        inter.coupling.matrix{n+1,n+1}=nqi;
-    else
-        inter.coupling.matrix{n+1,n+1}=[];
-    end
-end
 end
 

@@ -53,114 +53,7 @@ electron='E'; zfs=[];
 [gmat,nuclei]=phosphorus_data(lower(parameters.centre),hz_per_mt,parameters.include_13c);
 
 % Build the Spinach structures
-[sys,inter]=diamond_system(electron,gmat,zfs,nuclei,parameters.orientation);
-
-end
-
-% Phosphorus centre table data
-function [gmat,nuclei]=phosphorus_data(centre,hz_per_mt,include_13c)
-nuclei={}; frame=eye(3);
-switch centre
-    case 'ma1'
-        gmat=eye(3)*2.0025;
-        nuclei{end+1}=struct('iso','31P','A',...
-            diamond_tensor([1.96 1.96 2.32]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
-        if include_13c
-            nuclei{end+1}=struct('iso','13C','A',...
-                diamond_tensor([13.92 13.92 18.13]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
-        end
-    case 'np1'
-        gmat=diamond_tensor([2.00243 2.0028 2.0026],frame);
-        nuclei{end+1}=struct('iso','31P','A',diamond_tensor([2.08 2.02 2.18]*hz_per_mt,frame),'Q',[]);
-        nuclei{end+1}=struct('iso','14N','A',diamond_tensor([4.08 3.10 3.00]*hz_per_mt,frame),'Q',[]);
-    case 'np2'
-        gmat=eye(3)*2.0025;
-        nuclei{end+1}=struct('iso','31P','A',...
-            diamond_tensor([2.09 2.09 2.34]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
-        nuclei{end+1}=struct('iso','14N','A',...
-            diamond_tensor([3.09 3.09 6.42]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
-    case 'np3'
-        gmat=eye(3)*2.0025;
-        nuclei{end+1}=struct('iso','31P','A',...
-            diamond_tensor([18.23 18.23 17.48]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
-        nuclei{end+1}=struct('iso','14N','A',...
-            diamond_tensor([0.33 0.33 0.10]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
-    case 'np4'
-        gmat=diamond_tensor([2.0009 2.0012 2.00047],frame);
-        nuclei{end+1}=struct('iso','31P','A',diamond_tensor([5.456 3.838 3.80]*hz_per_mt,frame),'Q',[]);
-    case 'np5'
-        gmat=diamond_tensor([2.0009 2.0009 2.00087],diamond_frame_z([1 1 1]));
-        nuclei{end+1}=struct('iso','31P','A',...
-            diamond_tensor([1.024 1.024 6.522]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
-    case 'np6'
-        gmat=diamond_tensor([2.00083 2.00083 2.00085],diamond_frame_z([1 1 1]));
-        nuclei{end+1}=struct('iso','31P','A',diamond_tensor([7.585 2.942 2.328]*hz_per_mt,frame),'Q',[]);
-    case 'np8'
-        gmat=diamond_tensor([2.0016 2.0016 2.0048],diamond_frame_z([1 1 1]));
-        nuclei{end+1}=struct('iso','31P','A',...
-            diamond_tensor([3.2 3.2 5.6]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
-        nuclei{end+1}=struct('iso','31P','A',...
-            diamond_tensor([8.8 8.8 13.6]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
-    case 'np9'
-        gmat=diamond_tensor([2.0038 2.0038 2.0030],diamond_frame_z([1 1 1]));
-        nuclei{end+1}=struct('iso','31P','A',...
-            diamond_tensor([2.2 2.2 1.4]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
-    otherwise
-        error('unknown phosphorus centre.');
-end
-end
-
-% Consistency enforcement
-function grumble(parameters)
-if(~isstruct(parameters))
-    error('parameters must be a structure.');
-end
-if isfield(parameters,'centre')&&(~ischar(parameters.centre))
-    error('parameters.centre must be a character string.');
-end
-if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
-    error('parameters.orientation must be a character string.');
-end
-if isfield(parameters,'include_13c')&&(~islogical(parameters.include_13c))
-    error('parameters.include_13c must be logical.');
-end
-end
-
-% The phosphorus table is compact, but each centre is separate data.
-
-% Shared local helpers
-
-% Make a principal-axis frame from the z axis
-function frame=diamond_frame_z(zaxis)
-zaxis=zaxis(:)/norm(zaxis,2);
-if abs(dot(zaxis,[0;0;1]))<0.9
-    xaxis=cross([0;0;1],zaxis);
-else
-    xaxis=cross([0;1;0],zaxis);
-end
-xaxis=xaxis/norm(xaxis,2);
-yaxis=cross(zaxis,xaxis);
-frame=[xaxis yaxis zaxis];
-end
-
-% Orthogonalise a right-handed frame
-function frame=diamond_frame_orth(frame)
-[frame,~]=qr(frame,0);
-if det(frame)<0
-    frame(:,3)=-frame(:,3);
-end
-end
-
-% Build a tensor from principal values and axes
-function M=diamond_tensor(values,frame)
-frame=diamond_frame_orth(frame);
-M=frame*diag(values)*frame';
-M=(M+M')/2;
-end
-
-% Crystal-to-laboratory rotation matrix
-function C=diamond_orient(orientation)
-switch orientation
+switch parameters.orientation
     case '111'
         C=rotmat_align([1 1 1],[0 0 1]);
     case '110'
@@ -170,11 +63,6 @@ switch orientation
     otherwise
         error('unknown orientation specification.');
 end
-end
-
-% Build the Spinach structures
-function [sys,inter]=diamond_system(electron,gmat,zfs,nuclei,orientation)
-C=diamond_orient(orientation);
 sys.isotopes={electron};
 inter.zeeman.matrix{1}=C*gmat*C';
 if ~isempty(zfs)
@@ -193,6 +81,81 @@ for n=1:numel(nuclei)
     else
         inter.coupling.matrix{n+1,n+1}=[];
     end
+end
+
+end
+
+% Phosphorus centre table data
+function [gmat,nuclei]=phosphorus_data(centre,hz_per_mt,include_13c)
+nuclei={}; frame=eye(3);
+
+% Set the trigonal principal-axis frame
+frame_111=[-1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
+            1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
+            0          2/sqrt(6)  1/sqrt(3)];
+switch centre
+    case 'ma1'
+        gmat=eye(3)*2.0025;
+        nuclei{end+1}=struct('iso','31P','A',...
+            ((frame_111)*diag([1.96 1.96 2.32]*hz_per_mt)*(frame_111)'),'Q',[]);
+        if include_13c
+            nuclei{end+1}=struct('iso','13C','A',...
+                ((frame_111)*diag([13.92 13.92 18.13]*hz_per_mt)*(frame_111)'),'Q',[]);
+        end
+    case 'np1'
+        gmat=((frame)*diag([2.00243 2.0028 2.0026])*(frame)');
+        nuclei{end+1}=struct('iso','31P','A',((frame)*diag([2.08 2.02 2.18]*hz_per_mt)*(frame)'),'Q',[]);
+        nuclei{end+1}=struct('iso','14N','A',((frame)*diag([4.08 3.10 3.00]*hz_per_mt)*(frame)'),'Q',[]);
+    case 'np2'
+        gmat=eye(3)*2.0025;
+        nuclei{end+1}=struct('iso','31P','A',...
+            ((frame_111)*diag([2.09 2.09 2.34]*hz_per_mt)*(frame_111)'),'Q',[]);
+        nuclei{end+1}=struct('iso','14N','A',...
+            ((frame_111)*diag([3.09 3.09 6.42]*hz_per_mt)*(frame_111)'),'Q',[]);
+    case 'np3'
+        gmat=eye(3)*2.0025;
+        nuclei{end+1}=struct('iso','31P','A',...
+            ((frame_111)*diag([18.23 18.23 17.48]*hz_per_mt)*(frame_111)'),'Q',[]);
+        nuclei{end+1}=struct('iso','14N','A',...
+            ((frame_111)*diag([0.33 0.33 0.10]*hz_per_mt)*(frame_111)'),'Q',[]);
+    case 'np4'
+        gmat=((frame)*diag([2.0009 2.0012 2.00047])*(frame)');
+        nuclei{end+1}=struct('iso','31P','A',((frame)*diag([5.456 3.838 3.80]*hz_per_mt)*(frame)'),'Q',[]);
+    case 'np5'
+        gmat=((frame_111)*diag([2.0009 2.0009 2.00087])*(frame_111)');
+        nuclei{end+1}=struct('iso','31P','A',...
+            ((frame_111)*diag([1.024 1.024 6.522]*hz_per_mt)*(frame_111)'),'Q',[]);
+    case 'np6'
+        gmat=((frame_111)*diag([2.00083 2.00083 2.00085])*(frame_111)');
+        nuclei{end+1}=struct('iso','31P','A',((frame)*diag([7.585 2.942 2.328]*hz_per_mt)*(frame)'),'Q',[]);
+    case 'np8'
+        gmat=((frame_111)*diag([2.0016 2.0016 2.0048])*(frame_111)');
+        nuclei{end+1}=struct('iso','31P','A',...
+            ((frame_111)*diag([3.2 3.2 5.6]*hz_per_mt)*(frame_111)'),'Q',[]);
+        nuclei{end+1}=struct('iso','31P','A',...
+            ((frame_111)*diag([8.8 8.8 13.6]*hz_per_mt)*(frame_111)'),'Q',[]);
+    case 'np9'
+        gmat=((frame_111)*diag([2.0038 2.0038 2.0030])*(frame_111)');
+        nuclei{end+1}=struct('iso','31P','A',...
+            ((frame_111)*diag([2.2 2.2 1.4]*hz_per_mt)*(frame_111)'),'Q',[]);
+    otherwise
+        error('unknown phosphorus centre.');
+end
+end
+
+% Consistency enforcement
+function grumble(parameters)
+if(~isstruct(parameters))
+    error('parameters must be a structure.');
+end
+if isfield(parameters,'centre')&&(~ischar(parameters.centre))
+    error('parameters.centre must be a character string.');
+end
+if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
+    error('parameters.orientation must be a character string.');
+end
+if isfield(parameters,'include_13c')&&(~islogical(parameters.include_13c))
+    error('parameters.include_13c must be logical.');
 end
 end
 

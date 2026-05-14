@@ -203,7 +203,7 @@ else
     else
         norm_mat=max(cellfun(@cheap_norm,L))*abs(time_step);
     end
-    nsteps=ceil(norm_mat/2);
+    nsteps=max(1,ceil(norm_mat/24));
 
     % Step checks
     if nsteps>1e4

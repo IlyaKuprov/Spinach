@@ -117,8 +117,16 @@ if ~expm_times_vec
 
     else
 
+        % Remove scalar part that drops out of the commutator
+        gen_shift=trace(L)/size(L,1);
+        if issparse(L)
+            L=L-gen_shift*speye(size(L,1),size(L,2));
+        else
+            L=L-gen_shift*eye(size(L),'like',L);
+        end
+
         % Select Taylor-cost subdivision count using a commutator norm bound
-        norm_gen=cheap_norm(L)*abs(time_step); nsteps=taylor_steps(2*norm_gen);
+        norm_gen=cheap_norm(L)*abs(time_step); nsteps=taylor_steps(2*norm_gen,3);
 
         % Step checks
         if nsteps>1e4
@@ -128,9 +136,8 @@ if ~expm_times_vec
 
         elseif nsteps>100
 
-            % Warn user if too many substeps are needed
-            report(spin_system,['WARNING: ' num2str(nsteps)...
-                                ' substeps required, consider using evolution() here.']);
+            % Avoid inaccurate or very slow commutator series
+            error([num2str(nsteps) ' substeps required, use evolution() here.']);
         end
 
         % Check if we have a matrix or
@@ -198,12 +205,49 @@ else
     rho=rho/scaling;
 
     % Select Taylor-cost subdivision count
+    gen_shift=0;
     if isnumeric(L)
+        safe_fac=8;
+
+        % Remove scalar trace phase from the generator
+        gen_shift=trace(L)/size(L,1);
+        if issparse(L)
+            L=L-gen_shift*speye(size(L,1),size(L,2));
+        else
+            L=L-gen_shift*eye(size(L),'like',L);
+        end
         norm_mat=cheap_norm(L)*abs(time_step);
     else
-        norm_mat=max(cellfun(@cheap_norm,L))*abs(time_step);
+        safe_fac=8;
+
+        % Remove scalar trace phase from product quadrature
+        if numel(L)==2
+            gen_shift=(trace(L{1})/size(L{1},1)+...
+                       trace(L{2})/size(L{2},1))/2;
+        elseif numel(L)==3
+            gen_shift=(trace(L{1})/size(L{1},1)+...
+                     4*trace(L{2})/size(L{2},1)+...
+                       trace(L{3})/size(L{3},1))/6;
+        end
+
+        % Centre each generator for the Taylor series
+        for n=1:numel(L)
+            mat_shift=trace(L{n})/size(L{n},1);
+            if issparse(L{n})
+                L{n}=L{n}-mat_shift*speye(size(L{n},1),size(L{n},2));
+            else
+                L{n}=L{n}-mat_shift*eye(size(L{n}),'like',L{n});
+            end
+        end
+        if numel(L)==2
+            norm_mat=(abs(time_step)/2)*(cheap_norm(L{1})+cheap_norm(L{2}))+...
+                     (time_step^2/6)*cheap_norm(L{1}*L{2}-L{2}*L{1});
+        elseif numel(L)==3
+            norm_mat=(abs(time_step)/6)*(cheap_norm(L{1})+4*cheap_norm(L{2})+cheap_norm(L{3}))+...
+                     (time_step^2/12)*cheap_norm(L{1}*L{3}-L{3}*L{1});
+        end
     end
-    nsteps=taylor_steps(norm_mat);
+    nsteps=taylor_steps(norm_mat,safe_fac);
 
     % Step checks
     if nsteps>1e4
@@ -213,9 +257,8 @@ else
 
     elseif nsteps>100
 
-        % Warn user if too many substeps are needed
-        report(spin_system,['WARNING: ' num2str(nsteps)...
-                            ' substeps required, consider using evolution() here.']);
+        % Avoid inaccurate or very slow Taylor series
+        error([num2str(nsteps) ' substeps required, use evolution() here.']);
     end
 
     % Decide if parallelisation would be beneficial 
@@ -240,6 +283,9 @@ else
 
     end
 
+    % Restore the scalar trace phase
+    if gen_shift~=0, rho=exp(-1i*gen_shift*time_step)*rho; end
+
     % Scale the result back
     rho=scaling*rho;
 
@@ -248,7 +294,7 @@ end
 end
 
 % Taylor subdivision selector
-function nsteps=taylor_steps(norm_mat)
+function nsteps=taylor_steps(norm_mat,safe_fac)
 
 % Move scalar GPU norms back to the CPU if needed
 if isa(norm_mat,'gpuArray')
@@ -257,6 +303,9 @@ end
 
 % Convert the norm estimate into a scalar double
 norm_mat=double(full(norm_mat));
+
+% Add a safety margin for low-to-high Taylor summation
+norm_mat=safe_fac*norm_mat;
 
 % Double-precision Taylor-action thresholds for orders 1:55
 theta=[2.2204460492503131e-16; 2.5809568029946243e-08; 1.3863478661191185e-05;...
@@ -294,7 +343,7 @@ end
 function rho=comm_series(spin_system,L,rho,time_step,nsteps)
 
 % Convergence tolerance
-tol=eps('double');
+tol=eps('double')/16;
 
 % Clean up the density matrix
 rho=clean_up(spin_system,rho,tol);
@@ -315,7 +364,7 @@ rho=rho/scaling;
 for n=1:nsteps
 
     % Start commutator series
-    next_term=rho; iter=1;
+    next_term=rho; corr_term=zeros(size(rho),'like',rho); iter=1;
 
     % Sum up the series
     while nnz(next_term)>0
@@ -327,8 +376,14 @@ for n=1:nsteps
         % Clean up the term
         next_term=clean_up(spin_system,next_term,tol);
 
-        % Add and increment the counter
-        rho=rho+next_term; iter=iter+1;
+        % Add the next term with compensated summation
+        summand=next_term-corr_term;
+        rho_new=rho+summand;
+        corr_term=(rho_new-rho)-summand;
+        rho=rho_new; iter=iter+1;
+
+        % Stop before the commutator series becomes unreliable
+        if iter>64, error('commutator series failed to converge, use evolution() here.'); end
 
     end
 
@@ -353,7 +408,8 @@ function rho=reordered_taylor(L,rho,t,nsteps)
 for n=1:nsteps
     
     % Start the Taylor series
-    next_term=rho; k=1; tol=eps('double');
+    next_term=rho; corr_term=zeros(size(rho),'like',rho);
+    k=1; tol=eps('double')/16;
     
     % Loop until convergence
     while nnz(abs(next_term)>tol)>0
@@ -383,8 +439,14 @@ for n=1:nsteps
             
         end
         
-        % Add the next term and increment
-        rho=rho+next_term; k=k+1;
+        % Add the next term with compensated summation
+        summand=next_term-corr_term;
+        rho_new=rho+summand;
+        corr_term=(rho_new-rho)-summand;
+        rho=rho_new; k=k+1;
+
+        % Stop before the Taylor series becomes unreliable
+        if k>64, error('Taylor series failed to converge, use evolution() here.'); end
         
     end
     

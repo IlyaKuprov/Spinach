@@ -45,11 +45,11 @@ if ~isfield(parameters,'include_13c')
 end
 
 % Build the reported frames
-c2rot=diamond_rot_axis([0 0 1],180);
+c2rot=anax2dcm([0 0 1],-pi);
 gframe=diamond_frame_xyz([1 1 0],[0 0 1],[1 -1 0]);
-nframe=diamond_rot_axis([1 -1 0],-3.5)*...
+nframe=anax2dcm([1 -1 0],3.5*pi/180)*...
        diamond_frame_xyz([1 1 -2],[1 1 1],[1 -1 0]);
-cframe=diamond_rot_axis([-1 -1 0],2.0)*...
+cframe=anax2dcm([-1 -1 0],-2.0*pi/180)*...
        diamond_frame_xz([-1 -1 0],[-1 1 1]);
 
 % Build the electron tensors
@@ -59,23 +59,23 @@ zfs=[]; nuclei={};
 
 % Add nitrogen tensors
 if strcmp(parameters.nitrogen,'15N')
-    nuclei{end+1}=diamond_nuc('15N',diamond_tensor([3.47e6 4.51e6 4.09e6],nframe),[]);
-    nuclei{end+1}=diamond_nuc('15N',diamond_tensor([3.47e6 4.51e6 4.09e6],c2rot*nframe),[]);
+    nuclei{end+1}=struct('iso','15N','A',diamond_tensor([3.47e6 4.51e6 4.09e6],nframe),'Q',[]);
+    nuclei{end+1}=struct('iso','15N','A',diamond_tensor([3.47e6 4.51e6 4.09e6],c2rot*nframe),'Q',[]);
 elseif strcmp(parameters.nitrogen,'14N')
     scale=spin('14N')/spin('15N');
     Qframe=diamond_frame_z([1 1 1]);
-    nuclei{end+1}=diamond_nuc('14N',scale*diamond_tensor([3.47e6 4.51e6 4.09e6],nframe),...
-                               diamond_zfs(-5.0e6,0,Qframe));
-    nuclei{end+1}=diamond_nuc('14N',scale*diamond_tensor([3.47e6 4.51e6 4.09e6],c2rot*nframe),...
-                               diamond_zfs(-5.0e6,0,c2rot*Qframe));
+    nuclei{end+1}=struct('iso','14N','A',scale*diamond_tensor([3.47e6 4.51e6 4.09e6],nframe),'Q',...
+                               Qframe*zfs2mat(-5.0e6,0,0,0,0)*Qframe');
+    nuclei{end+1}=struct('iso','14N','A',scale*diamond_tensor([3.47e6 4.51e6 4.09e6],c2rot*nframe),'Q',...
+                               ((c2rot*Qframe)*zfs2mat(-5.0e6,0,0,0,0)*(c2rot*Qframe)'));
 else
     error('parameters.nitrogen must be ''14N'' or ''15N''.');
 end
 
 % Add reported nearest-neighbour carbons
 if parameters.include_13c
-    nuclei{end+1}=diamond_nuc('13C',diamond_tensor([202.3e6 202.3e6 317.5e6],cframe),[]);
-    nuclei{end+1}=diamond_nuc('13C',diamond_tensor([202.3e6 202.3e6 317.5e6],c2rot*cframe),[]);
+    nuclei{end+1}=struct('iso','13C','A',diamond_tensor([202.3e6 202.3e6 317.5e6],cframe),'Q',[]);
+    nuclei{end+1}=struct('iso','13C','A',diamond_tensor([202.3e6 202.3e6 317.5e6],c2rot*cframe),'Q',[]);
 end
 
 % Build the Spinach structures
@@ -103,13 +103,19 @@ end
 
 % Shared local helpers
 
-
-% Rotation matrix for an axis-angle rotation in degrees
-function R=diamond_rot_axis(axis,angle)
-axis=axis(:)/norm(axis,2);
-K=[0 -axis(3) axis(2);axis(3) 0 -axis(1);-axis(2) axis(1) 0];
-R=eye(3)+sind(angle)*K+(1-cosd(angle))*(K*K);
+% Make a principal-axis frame from the z axis
+function frame=diamond_frame_z(zaxis)
+zaxis=zaxis(:)/norm(zaxis,2);
+if abs(dot(zaxis,[0;0;1]))<0.9
+    xaxis=cross([0;0;1],zaxis);
+else
+    xaxis=cross([0;1;0],zaxis);
 end
+xaxis=xaxis/norm(xaxis,2);
+yaxis=cross(zaxis,xaxis);
+frame=[xaxis yaxis zaxis];
+end
+
 
 % Orthogonalise a right-handed frame
 function frame=diamond_frame_orth(frame)
@@ -141,24 +147,6 @@ M=frame*diag(values)*frame';
 M=(M+M')/2;
 end
 
-% Enforce symmetric traceless form for quadratic couplings
-function M=diamond_traceless(M)
-M=(M+M')/2;
-M=M-eye(3)*trace(M)/3;
-M=(M+M')/2;
-end
-
-% Build a zero-field splitting tensor from principal axes
-function M=diamond_zfs(D,E,frame)
-frame=diamond_frame_orth(frame);
-M=diamond_traceless(frame*zfs2mat(D,E,0,0,0)*frame');
-end
-
-% Build a nucleus record
-function nucleus=diamond_nuc(iso,A,Q)
-nucleus=struct('iso',iso,'A',A,'Q',Q);
-end
-
 % Crystal-to-laboratory rotation matrix
 function C=diamond_orient(orientation)
 switch orientation
@@ -179,7 +167,8 @@ C=diamond_orient(orientation);
 sys.isotopes={electron};
 inter.zeeman.matrix{1}=C*gmat*C';
 if ~isempty(zfs)
-    inter.coupling.matrix{1,1}=diamond_traceless(C*zfs*C');
+    [~,~,zfs]=mat2ias(C*zfs*C');
+    inter.coupling.matrix{1,1}=zfs;
 else
     inter.coupling.matrix{1,1}=[];
 end
@@ -188,7 +177,8 @@ for n=1:numel(nuclei)
     inter.zeeman.matrix{n+1}=zeros(3);
     inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
     if ~isempty(nuclei{n}.Q)
-        inter.coupling.matrix{n+1,n+1}=diamond_traceless(C*nuclei{n}.Q*C');
+        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
+        inter.coupling.matrix{n+1,n+1}=nqi;
     else
         inter.coupling.matrix{n+1,n+1}=[];
     end

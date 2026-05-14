@@ -97,7 +97,6 @@ end
 
 % Shared local helpers
 
-
 % Make a principal-axis frame from the z axis
 function frame=diamond_frame_z(zaxis)
 zaxis=zaxis(:)/norm(zaxis,2);
@@ -140,20 +139,14 @@ switch orientation
 end
 end
 
-% Enforce symmetric traceless form for quadratic couplings
-function M=diamond_traceless(M)
-M=(M+M')/2;
-M=M-eye(3)*trace(M)/3;
-M=(M+M')/2;
-end
-
 % Build the Spinach structures
 function [sys,inter]=diamond_system(electron,gmat,zfs,nuclei,orientation)
 C=diamond_orient(orientation);
 sys.isotopes={electron};
 inter.zeeman.matrix{1}=C*gmat*C';
 if ~isempty(zfs)
-    inter.coupling.matrix{1,1}=diamond_traceless(C*zfs*C');
+    [~,~,zfs]=mat2ias(C*zfs*C');
+    inter.coupling.matrix{1,1}=zfs;
 else
     inter.coupling.matrix{1,1}=[];
 end
@@ -162,7 +155,8 @@ for n=1:numel(nuclei)
     inter.zeeman.matrix{n+1}=zeros(3);
     inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
     if ~isempty(nuclei{n}.Q)
-        inter.coupling.matrix{n+1,n+1}=diamond_traceless(C*nuclei{n}.Q*C');
+        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
+        inter.coupling.matrix{n+1,n+1}=nqi;
     else
         inter.coupling.matrix{n+1,n+1}=[];
     end

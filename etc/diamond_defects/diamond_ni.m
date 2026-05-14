@@ -51,7 +51,8 @@ if ~isfield(parameters,'include_13c')
 end
 
 % Set field-unit conversion constants
-[hz_per_mt,hz_per_t]=diamond_hz_per_mt();
+hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
+hz_per_t=abs(spin('E'))/(2*pi);
 
 % Select the nickel centre
 centre=lower(parameters.centre);
@@ -60,18 +61,22 @@ switch centre
     case 'w8'
         electron='E4';
         gmat=eye(3)*2.032;
-        nickel=diamond_get(parameters,'nickel','61Ni');
+        if isfield(parameters,'nickel')
+            nickel=parameters.nickel;
+        else
+            nickel='61Ni';
+        end
         if strcmp(nickel,'61Ni')
-            nuclei{end+1}=diamond_nuc('61Ni',eye(3)*0.65*hz_per_mt,[]);
+            nuclei{end+1}=struct('iso','61Ni','A',eye(3)*0.65*hz_per_mt,'Q',[]);
         elseif ~strcmp(nickel,'none')
-            nuclei{end+1}=diamond_nuc(nickel,zeros(3),[]);
+            nuclei{end+1}=struct('iso',nickel,'A',zeros(3),'Q',[]);
         end
         if parameters.include_13c
             Cmat=diamond_tensor([0.340 0.340 1.339]*hz_per_mt,diamond_frame_z([1 1 1]));
             nuc_idx=numel(nuclei);
             nuclei(nuc_idx+1:nuc_idx+4)={[]};
             for n=1:4
-                nuclei{nuc_idx+n}=diamond_nuc('13C',Cmat,[]);
+                nuclei{nuc_idx+n}=struct('iso','13C','A',Cmat,'Q',[]);
             end
         end
     case {'ne1','ne2','ne3','ne5','ne8'}
@@ -81,7 +86,7 @@ switch centre
         gmat=diamond_tensor(gvals,frame);
         nuclei=cell(1,size(avalues,1));
         for n=1:size(avalues,1)
-            nuclei{n}=diamond_nuc('14N',diamond_tensor(avalues(n,:)*hz_per_mt,frame),[]);
+            nuclei{n}=struct('iso','14N','A',diamond_tensor(avalues(n,:)*hz_per_mt,frame),'Q',[]);
         end
     case 'ne4'
         electron='E';
@@ -95,12 +100,12 @@ switch centre
         electron='E3';
         frame=diamond_frame_z([1 1 1]);
         gmat=diamond_tensor([2.022 2.022 2.037],frame);
-        zfs=diamond_zfs(1.132*hz_per_t,0,frame);
+        zfs=frame*zfs2mat(1.132*hz_per_t,0,0,0,0)*frame';
     case {'nol1','nirim5'}
         electron='E3';
         frame=diamond_frame_z([1 1 1]);
         gmat=diamond_tensor([2.002 2.002 2.0235],frame);
-        zfs=diamond_zfs(-6.10*hz_per_t,0,frame);
+        zfs=frame*zfs2mat(-6.10*hz_per_t,0,0,0,0)*frame';
     otherwise
         error('unknown nickel centre.');
 end
@@ -172,22 +177,6 @@ end
 
 % Shared local helpers
 
-
-% Field getter with a default value
-function value=diamond_get(parameters,name,default)
-if isfield(parameters,name)
-    value=parameters.(name);
-else
-    value=default;
-end
-end
-
-% Field-unit conversion constants
-function [hz_per_mt,hz_per_t]=diamond_hz_per_mt()
-hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
-hz_per_t=1e3*hz_per_mt;
-end
-
 % Make a principal-axis frame from the z axis
 function frame=diamond_frame_z(zaxis)
 zaxis=zaxis(:)/norm(zaxis,2);
@@ -232,24 +221,6 @@ M=frame*diag(values)*frame';
 M=(M+M')/2;
 end
 
-% Enforce symmetric traceless form for quadratic couplings
-function M=diamond_traceless(M)
-M=(M+M')/2;
-M=M-eye(3)*trace(M)/3;
-M=(M+M')/2;
-end
-
-% Build a zero-field splitting tensor from principal axes
-function M=diamond_zfs(D,E,frame)
-frame=diamond_frame_orth(frame);
-M=diamond_traceless(frame*zfs2mat(D,E,0,0,0)*frame');
-end
-
-% Build a nucleus record
-function nucleus=diamond_nuc(iso,A,Q)
-nucleus=struct('iso',iso,'A',A,'Q',Q);
-end
-
 % Crystal-to-laboratory rotation matrix
 function C=diamond_orient(orientation)
 switch orientation
@@ -270,7 +241,8 @@ C=diamond_orient(orientation);
 sys.isotopes={electron};
 inter.zeeman.matrix{1}=C*gmat*C';
 if ~isempty(zfs)
-    inter.coupling.matrix{1,1}=diamond_traceless(C*zfs*C');
+    [~,~,zfs]=mat2ias(C*zfs*C');
+    inter.coupling.matrix{1,1}=zfs;
 else
     inter.coupling.matrix{1,1}=[];
 end
@@ -279,7 +251,8 @@ for n=1:numel(nuclei)
     inter.zeeman.matrix{n+1}=zeros(3);
     inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
     if ~isempty(nuclei{n}.Q)
-        inter.coupling.matrix{n+1,n+1}=diamond_traceless(C*nuclei{n}.Q*C');
+        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
+        inter.coupling.matrix{n+1,n+1}=nqi;
     else
         inter.coupling.matrix{n+1,n+1}=[];
     end

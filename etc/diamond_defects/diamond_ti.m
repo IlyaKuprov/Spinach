@@ -46,7 +46,7 @@ if ~isfield(parameters,'include_13c')
 end
 
 % Set field-unit conversion constants
-[hz_per_mt,~]=diamond_hz_per_mt();
+hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
 
 % Select the titanium centre
 centre=lower(parameters.centre);
@@ -57,20 +57,24 @@ aframe=diamond_frame_alpha(A_alpha);
 gmat=diamond_tensor(gvals,gframe);
 
 % Add the nitrogen hyperfine tensor
-nuclei{end+1}=diamond_nuc('14N',diamond_tensor(An*hz_per_mt,aframe),[]);
+nuclei{end+1}=struct('iso','14N','A',diamond_tensor(An*hz_per_mt,aframe),'Q',[]);
 
 % Add the titanium isotope if requested
-titanium=diamond_get(parameters,'titanium','47Ti');
+if isfield(parameters,'titanium')
+    titanium=parameters.titanium;
+else
+    titanium='47Ti';
+end
 if ~strcmp(titanium,'none')
-    nuclei{end+1}=diamond_nuc(titanium,diamond_tensor(Ati*hz_per_mt,aframe),[]);
+    nuclei{end+1}=struct('iso',titanium,'A',diamond_tensor(Ati*hz_per_mt,aframe),'Q',[]);
 end
 
 % Add reported OK1 nearest-neighbour carbons
 if strcmp(centre,'ok1')&&parameters.include_13c
     Cmat=diamond_tensor([2.62 2.62 4.38]*hz_per_mt,diamond_frame_xz([1 1 0],[1 -1 -1]));
-    nuclei{end+1}=diamond_nuc('13C',Cmat,[]);
+    nuclei{end+1}=struct('iso','13C','A',Cmat,'Q',[]);
     Cmat=diamond_tensor([2.62 2.62 4.38]*hz_per_mt,diamond_frame_xz([1 1 0],[-1 1 -1]));
-    nuclei{end+1}=diamond_nuc('13C',Cmat,[]);
+    nuclei{end+1}=struct('iso','13C','A',Cmat,'Q',[]);
 end
 
 % Build the Spinach structures
@@ -119,22 +123,6 @@ end
 
 % Shared local helpers
 
-
-% Field getter with a default value
-function value=diamond_get(parameters,name,default)
-if isfield(parameters,name)
-    value=parameters.(name);
-else
-    value=default;
-end
-end
-
-% Field-unit conversion constants
-function [hz_per_mt,hz_per_t]=diamond_hz_per_mt()
-hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
-hz_per_t=1e3*hz_per_mt;
-end
-
 % Orthogonalise a right-handed frame
 function frame=diamond_frame_orth(frame)
 [frame,~]=qr(frame,0);
@@ -175,11 +163,6 @@ M=frame*diag(values)*frame';
 M=(M+M')/2;
 end
 
-% Build a nucleus record
-function nucleus=diamond_nuc(iso,A,Q)
-nucleus=struct('iso',iso,'A',A,'Q',Q);
-end
-
 % Crystal-to-laboratory rotation matrix
 function C=diamond_orient(orientation)
 switch orientation
@@ -194,20 +177,14 @@ switch orientation
 end
 end
 
-% Enforce symmetric traceless form for quadratic couplings
-function M=diamond_traceless(M)
-M=(M+M')/2;
-M=M-eye(3)*trace(M)/3;
-M=(M+M')/2;
-end
-
 % Build the Spinach structures
 function [sys,inter]=diamond_system(electron,gmat,zfs,nuclei,orientation)
 C=diamond_orient(orientation);
 sys.isotopes={electron};
 inter.zeeman.matrix{1}=C*gmat*C';
 if ~isempty(zfs)
-    inter.coupling.matrix{1,1}=diamond_traceless(C*zfs*C');
+    [~,~,zfs]=mat2ias(C*zfs*C');
+    inter.coupling.matrix{1,1}=zfs;
 else
     inter.coupling.matrix{1,1}=[];
 end
@@ -216,7 +193,8 @@ for n=1:numel(nuclei)
     inter.zeeman.matrix{n+1}=zeros(3);
     inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
     if ~isempty(nuclei{n}.Q)
-        inter.coupling.matrix{n+1,n+1}=diamond_traceless(C*nuclei{n}.Q*C');
+        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
+        inter.coupling.matrix{n+1,n+1}=nqi;
     else
         inter.coupling.matrix{n+1,n+1}=[];
     end

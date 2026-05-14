@@ -40,7 +40,7 @@ if ~isfield(parameters,'orientation')
 end
 
 % Set field-unit conversion constants
-[hz_per_mt,~]=diamond_hz_per_mt();
+hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
 
 % Select the cobalt centre
 centre=lower(parameters.centre);
@@ -48,7 +48,7 @@ electron='E'; zfs=[];
 [gvals,Aco,alpha]=cobalt_data(centre);
 frame=diamond_frame_cobalt(alpha);
 gmat=diamond_tensor(gvals,frame);
-nuclei={diamond_nuc('59Co',diamond_tensor(Aco*hz_per_mt,frame),[])};
+nuclei={struct('iso','59Co','A',diamond_tensor(Aco*hz_per_mt,frame),'Q',[])};
 
 % Build the Spinach structures
 [sys,inter]=diamond_system(electron,gmat,zfs,nuclei,parameters.orientation);
@@ -88,13 +88,6 @@ end
 
 % Shared local helpers
 
-
-% Field-unit conversion constants
-function [hz_per_mt,hz_per_t]=diamond_hz_per_mt()
-hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
-hz_per_t=1e3*hz_per_mt;
-end
-
 % Orthogonalise a right-handed frame
 function frame=diamond_frame_orth(frame)
 [frame,~]=qr(frame,0);
@@ -126,11 +119,6 @@ M=frame*diag(values)*frame';
 M=(M+M')/2;
 end
 
-% Build a nucleus record
-function nucleus=diamond_nuc(iso,A,Q)
-nucleus=struct('iso',iso,'A',A,'Q',Q);
-end
-
 % Crystal-to-laboratory rotation matrix
 function C=diamond_orient(orientation)
 switch orientation
@@ -145,20 +133,14 @@ switch orientation
 end
 end
 
-% Enforce symmetric traceless form for quadratic couplings
-function M=diamond_traceless(M)
-M=(M+M')/2;
-M=M-eye(3)*trace(M)/3;
-M=(M+M')/2;
-end
-
 % Build the Spinach structures
 function [sys,inter]=diamond_system(electron,gmat,zfs,nuclei,orientation)
 C=diamond_orient(orientation);
 sys.isotopes={electron};
 inter.zeeman.matrix{1}=C*gmat*C';
 if ~isempty(zfs)
-    inter.coupling.matrix{1,1}=diamond_traceless(C*zfs*C');
+    [~,~,zfs]=mat2ias(C*zfs*C');
+    inter.coupling.matrix{1,1}=zfs;
 else
     inter.coupling.matrix{1,1}=[];
 end
@@ -167,7 +149,8 @@ for n=1:numel(nuclei)
     inter.zeeman.matrix{n+1}=zeros(3);
     inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
     if ~isempty(nuclei{n}.Q)
-        inter.coupling.matrix{n+1,n+1}=diamond_traceless(C*nuclei{n}.Q*C');
+        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
+        inter.coupling.matrix{n+1,n+1}=nqi;
     else
         inter.coupling.matrix{n+1,n+1}=[];
     end

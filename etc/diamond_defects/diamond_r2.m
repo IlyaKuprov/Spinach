@@ -43,7 +43,7 @@ end
 electron='E3';
 frame=diamond_frame_z([1 0 0]);
 gmat=diamond_tensor([2.0019 2.0019 2.0021],frame);
-zfs=diamond_zfs(parameters.d_sign*4173e6,0,frame);
+zfs=frame*zfs2mat(parameters.d_sign*4173e6,0,0,0,0)*frame';
 nuclei={};
 
 % Build the Spinach structures
@@ -68,7 +68,6 @@ end
 % A self-interstitial has its own symmetry axis.
 
 % Shared local helpers
-
 
 % Make a principal-axis frame from the z axis
 function frame=diamond_frame_z(zaxis)
@@ -98,19 +97,6 @@ M=frame*diag(values)*frame';
 M=(M+M')/2;
 end
 
-% Enforce symmetric traceless form for quadratic couplings
-function M=diamond_traceless(M)
-M=(M+M')/2;
-M=M-eye(3)*trace(M)/3;
-M=(M+M')/2;
-end
-
-% Build a zero-field splitting tensor from principal axes
-function M=diamond_zfs(D,E,frame)
-frame=diamond_frame_orth(frame);
-M=diamond_traceless(frame*zfs2mat(D,E,0,0,0)*frame');
-end
-
 % Crystal-to-laboratory rotation matrix
 function C=diamond_orient(orientation)
 switch orientation
@@ -131,7 +117,8 @@ C=diamond_orient(orientation);
 sys.isotopes={electron};
 inter.zeeman.matrix{1}=C*gmat*C';
 if ~isempty(zfs)
-    inter.coupling.matrix{1,1}=diamond_traceless(C*zfs*C');
+    [~,~,zfs]=mat2ias(C*zfs*C');
+    inter.coupling.matrix{1,1}=zfs;
 else
     inter.coupling.matrix{1,1}=[];
 end
@@ -140,7 +127,8 @@ for n=1:numel(nuclei)
     inter.zeeman.matrix{n+1}=zeros(3);
     inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
     if ~isempty(nuclei{n}.Q)
-        inter.coupling.matrix{n+1,n+1}=diamond_traceless(C*nuclei{n}.Q*C');
+        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
+        inter.coupling.matrix{n+1,n+1}=nqi;
     else
         inter.coupling.matrix{n+1,n+1}=[];
     end

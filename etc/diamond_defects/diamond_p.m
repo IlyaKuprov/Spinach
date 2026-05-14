@@ -46,7 +46,7 @@ if ~isfield(parameters,'include_13c')
 end
 
 % Set field-unit conversion constants
-[hz_per_mt,~]=diamond_hz_per_mt();
+hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
 
 % Select the phosphorus centre
 electron='E'; zfs=[];
@@ -63,48 +63,48 @@ nuclei={}; frame=eye(3);
 switch centre
     case 'ma1'
         gmat=eye(3)*2.0025;
-        nuclei{end+1}=diamond_nuc('31P',...
-            diamond_tensor([1.96 1.96 2.32]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+        nuclei{end+1}=struct('iso','31P','A',...
+            diamond_tensor([1.96 1.96 2.32]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
         if include_13c
-            nuclei{end+1}=diamond_nuc('13C',...
-                diamond_tensor([13.92 13.92 18.13]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+            nuclei{end+1}=struct('iso','13C','A',...
+                diamond_tensor([13.92 13.92 18.13]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
         end
     case 'np1'
         gmat=diamond_tensor([2.00243 2.0028 2.0026],frame);
-        nuclei{end+1}=diamond_nuc('31P',diamond_tensor([2.08 2.02 2.18]*hz_per_mt,frame),[]);
-        nuclei{end+1}=diamond_nuc('14N',diamond_tensor([4.08 3.10 3.00]*hz_per_mt,frame),[]);
+        nuclei{end+1}=struct('iso','31P','A',diamond_tensor([2.08 2.02 2.18]*hz_per_mt,frame),'Q',[]);
+        nuclei{end+1}=struct('iso','14N','A',diamond_tensor([4.08 3.10 3.00]*hz_per_mt,frame),'Q',[]);
     case 'np2'
         gmat=eye(3)*2.0025;
-        nuclei{end+1}=diamond_nuc('31P',...
-            diamond_tensor([2.09 2.09 2.34]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
-        nuclei{end+1}=diamond_nuc('14N',...
-            diamond_tensor([3.09 3.09 6.42]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+        nuclei{end+1}=struct('iso','31P','A',...
+            diamond_tensor([2.09 2.09 2.34]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
+        nuclei{end+1}=struct('iso','14N','A',...
+            diamond_tensor([3.09 3.09 6.42]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
     case 'np3'
         gmat=eye(3)*2.0025;
-        nuclei{end+1}=diamond_nuc('31P',...
-            diamond_tensor([18.23 18.23 17.48]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
-        nuclei{end+1}=diamond_nuc('14N',...
-            diamond_tensor([0.33 0.33 0.10]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+        nuclei{end+1}=struct('iso','31P','A',...
+            diamond_tensor([18.23 18.23 17.48]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
+        nuclei{end+1}=struct('iso','14N','A',...
+            diamond_tensor([0.33 0.33 0.10]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
     case 'np4'
         gmat=diamond_tensor([2.0009 2.0012 2.00047],frame);
-        nuclei{end+1}=diamond_nuc('31P',diamond_tensor([5.456 3.838 3.80]*hz_per_mt,frame),[]);
+        nuclei{end+1}=struct('iso','31P','A',diamond_tensor([5.456 3.838 3.80]*hz_per_mt,frame),'Q',[]);
     case 'np5'
         gmat=diamond_tensor([2.0009 2.0009 2.00087],diamond_frame_z([1 1 1]));
-        nuclei{end+1}=diamond_nuc('31P',...
-            diamond_tensor([1.024 1.024 6.522]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+        nuclei{end+1}=struct('iso','31P','A',...
+            diamond_tensor([1.024 1.024 6.522]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
     case 'np6'
         gmat=diamond_tensor([2.00083 2.00083 2.00085],diamond_frame_z([1 1 1]));
-        nuclei{end+1}=diamond_nuc('31P',diamond_tensor([7.585 2.942 2.328]*hz_per_mt,frame),[]);
+        nuclei{end+1}=struct('iso','31P','A',diamond_tensor([7.585 2.942 2.328]*hz_per_mt,frame),'Q',[]);
     case 'np8'
         gmat=diamond_tensor([2.0016 2.0016 2.0048],diamond_frame_z([1 1 1]));
-        nuclei{end+1}=diamond_nuc('31P',...
-            diamond_tensor([3.2 3.2 5.6]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
-        nuclei{end+1}=diamond_nuc('31P',...
-            diamond_tensor([8.8 8.8 13.6]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+        nuclei{end+1}=struct('iso','31P','A',...
+            diamond_tensor([3.2 3.2 5.6]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
+        nuclei{end+1}=struct('iso','31P','A',...
+            diamond_tensor([8.8 8.8 13.6]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
     case 'np9'
         gmat=diamond_tensor([2.0038 2.0038 2.0030],diamond_frame_z([1 1 1]));
-        nuclei{end+1}=diamond_nuc('31P',...
-            diamond_tensor([2.2 2.2 1.4]*hz_per_mt,diamond_frame_z([1 1 1])),[]);
+        nuclei{end+1}=struct('iso','31P','A',...
+            diamond_tensor([2.2 2.2 1.4]*hz_per_mt,diamond_frame_z([1 1 1])),'Q',[]);
     otherwise
         error('unknown phosphorus centre.');
 end
@@ -129,13 +129,6 @@ end
 % The phosphorus table is compact, but each centre is separate data.
 
 % Shared local helpers
-
-
-% Field-unit conversion constants
-function [hz_per_mt,hz_per_t]=diamond_hz_per_mt()
-hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
-hz_per_t=1e3*hz_per_mt;
-end
 
 % Make a principal-axis frame from the z axis
 function frame=diamond_frame_z(zaxis)
@@ -165,11 +158,6 @@ M=frame*diag(values)*frame';
 M=(M+M')/2;
 end
 
-% Build a nucleus record
-function nucleus=diamond_nuc(iso,A,Q)
-nucleus=struct('iso',iso,'A',A,'Q',Q);
-end
-
 % Crystal-to-laboratory rotation matrix
 function C=diamond_orient(orientation)
 switch orientation
@@ -184,20 +172,14 @@ switch orientation
 end
 end
 
-% Enforce symmetric traceless form for quadratic couplings
-function M=diamond_traceless(M)
-M=(M+M')/2;
-M=M-eye(3)*trace(M)/3;
-M=(M+M')/2;
-end
-
 % Build the Spinach structures
 function [sys,inter]=diamond_system(electron,gmat,zfs,nuclei,orientation)
 C=diamond_orient(orientation);
 sys.isotopes={electron};
 inter.zeeman.matrix{1}=C*gmat*C';
 if ~isempty(zfs)
-    inter.coupling.matrix{1,1}=diamond_traceless(C*zfs*C');
+    [~,~,zfs]=mat2ias(C*zfs*C');
+    inter.coupling.matrix{1,1}=zfs;
 else
     inter.coupling.matrix{1,1}=[];
 end
@@ -206,7 +188,8 @@ for n=1:numel(nuclei)
     inter.zeeman.matrix{n+1}=zeros(3);
     inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
     if ~isempty(nuclei{n}.Q)
-        inter.coupling.matrix{n+1,n+1}=diamond_traceless(C*nuclei{n}.Q*C');
+        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
+        inter.coupling.matrix{n+1,n+1}=nqi;
     else
         inter.coupling.matrix{n+1,n+1}=[];
     end

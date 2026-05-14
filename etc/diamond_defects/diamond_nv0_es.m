@@ -7,11 +7,11 @@
 %
 % Parameters:
 %
-%    parameters is a structure with the following fields:
+%    parameters is a structure with the following required fields:
 %
 %      .orientation  - '111', '110', or '100' crystal plane normal
-%                      aligned with the magnetic field, default is '111'
-%      .nitrogen     - must be '15N', default is '15N'
+%                      aligned with the magnetic field
+%      .nitrogen     - must be '15N'
 %
 % Outputs:
 %
@@ -23,26 +23,13 @@
 
 function [sys,inter]=diamond_nv0_es(parameters)
 
-% Set default input
-if nargin==0
-    parameters=struct();
+% Check input count
+if nargin~=1
+    error('exactly one input argument is required.');
 end
 
 % Check consistency
 grumble(parameters);
-
-% Set default parameters
-if ~isfield(parameters,'orientation')
-    parameters.orientation='111';
-end
-if ~isfield(parameters,'nitrogen')
-    parameters.nitrogen='15N';
-end
-
-% Restrict to the verified isotope
-if ~strcmp(parameters.nitrogen,'15N')
-    error('NV0 excited-state parameters are only available here for 15N.');
-end
 
 % Build the electron tensors
 frame=[-1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
@@ -93,11 +80,23 @@ function grumble(parameters)
 if(~isstruct(parameters))
     error('parameters must be a structure.');
 end
-if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
+if ~isfield(parameters,'orientation')
+    error('parameters.orientation field is required.');
+end
+if(~ischar(parameters.orientation))
     error('parameters.orientation must be a character string.');
 end
-if isfield(parameters,'nitrogen')&&(~ischar(parameters.nitrogen))
+if ~ismember(parameters.orientation,{'111','110','100'})
+    error('parameters.orientation must be ''111'', ''110'', or ''100''.');
+end
+if ~isfield(parameters,'nitrogen')
+    error('parameters.nitrogen field is required.');
+end
+if(~ischar(parameters.nitrogen))
     error('parameters.nitrogen must be a character string.');
+end
+if ~strcmp(parameters.nitrogen,'15N')
+    error('NV0 excited-state parameters are only available here for 15N.');
 end
 end
 

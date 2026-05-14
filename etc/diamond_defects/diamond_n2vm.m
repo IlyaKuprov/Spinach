@@ -7,13 +7,13 @@
 %
 % Parameters:
 %
-%    parameters is a structure with the following fields:
+%    parameters is a structure with the following required fields:
 %
-%      .nitrogen     - '14N' or '15N', default is '15N'
+%      .nitrogen     - '14N' or '15N'
 %      .orientation  - '111', '110', or '100' crystal plane normal
-%                      aligned with the magnetic field, default is '111'
-%      .include_13c - include reported 13C hyperfine couplings,
-%                     false by default
+%                      aligned with the magnetic field
+%      .include_13c  - include reported 13C hyperfine couplings,
+%                      true or false
 %
 % Outputs:
 %
@@ -25,32 +25,29 @@
 
 function [sys,inter]=diamond_n2vm(parameters)
 
-% Set default input
-if nargin==0
-    parameters=struct();
+% Check input count
+if nargin~=1
+    error('exactly one input argument is required.');
 end
 
 % Check consistency
 grumble(parameters);
-
-% Set default parameters
-if ~isfield(parameters,'orientation')
-    parameters.orientation='111';
-end
-if ~isfield(parameters,'nitrogen')
-    parameters.nitrogen='15N';
-end
-if ~isfield(parameters,'include_13c')
-    parameters.include_13c=false;
-end
 
 % Build the reported frames
 c2rot=anax2dcm([0 0 1],-pi);
 gframe=diamond_frame_xyz([1 1 0],[0 0 1],[1 -1 0]);
 nframe=anax2dcm([1 -1 0],3.5*pi/180)*...
        diamond_frame_xyz([1 1 -2],[1 1 1],[1 -1 0]);
+
+% Orthogonalise the carbon hyperfine frame axes
+xaxis=[-1 -1 0]';
+xaxis=xaxis/norm(xaxis,2);
+zaxis=[-1 1 1]';
+zaxis=zaxis-xaxis*dot(xaxis,zaxis);
+zaxis=zaxis/norm(zaxis,2);
+yaxis=cross(zaxis,xaxis);
 cframe=anax2dcm([-1 -1 0],-2.0*pi/180)*...
-       diamond_frame_xz([-1 -1 0],[-1 1 1]);
+       diamond_frame_xyz(xaxis,yaxis,zaxis);
 
 % Build the electron tensors
 electron='E';
@@ -118,14 +115,29 @@ function grumble(parameters)
 if(~isstruct(parameters))
     error('parameters must be a structure.');
 end
-if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
+if(~isfield(parameters,'orientation'))
+    error('parameters.orientation field is required.');
+end
+if(~isfield(parameters,'nitrogen'))
+    error('parameters.nitrogen field is required.');
+end
+if(~isfield(parameters,'include_13c'))
+    error('parameters.include_13c field is required.');
+end
+if(~ischar(parameters.orientation))
     error('parameters.orientation must be a character string.');
 end
-if isfield(parameters,'nitrogen')&&(~ischar(parameters.nitrogen))
+if(~any(strcmp(parameters.orientation,{'111','110','100'})))
+    error('parameters.orientation must be ''111'', ''110'', or ''100''.');
+end
+if(~ischar(parameters.nitrogen))
     error('parameters.nitrogen must be a character string.');
 end
-if isfield(parameters,'include_13c')&&(~islogical(parameters.include_13c))
-    error('parameters.include_13c must be logical.');
+if(~any(strcmp(parameters.nitrogen,{'14N','15N'})))
+    error('parameters.nitrogen must be ''14N'' or ''15N''.');
+end
+if(~islogical(parameters.include_13c)||~isscalar(parameters.include_13c))
+    error('parameters.include_13c must be a logical scalar.');
 end
 end
 
@@ -136,14 +148,5 @@ frame=[xaxis(:) yaxis(:) zaxis(:)];
 if det(frame)<0
     frame(:,3)=-frame(:,3);
 end
-end
-
-% Principal-axis frame from a specified x axis and z axis
-function frame=diamond_frame_xz(xaxis,zaxis)
-xaxis=xaxis(:)/norm(xaxis,2);
-zaxis=zaxis(:)-xaxis*dot(xaxis,zaxis(:));
-zaxis=zaxis/norm(zaxis,2);
-yaxis=cross(zaxis,xaxis);
-frame=diamond_frame_xyz(xaxis,yaxis,zaxis);
 end
 

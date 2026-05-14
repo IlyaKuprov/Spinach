@@ -13,13 +13,12 @@
 %
 %      .centre       - 'w8', 'ne1', 'ne2', 'ne3', 'ne4', 'ne5',
 %                      'ne8', 'ab1', 'ab2', 'ab3', 'ab4', 'ab5',
-%                      'nol1', or 'nirim5', default is 'w8'
+%                      'nol1', or 'nirim5'
 %      .orientation  - '111', '110', or '100' crystal plane normal
-%                      aligned with the magnetic field, default is '111'
-%      .nickel       - '61Ni', 'none', or another nickel isotope for W8,
-%                      default is '61Ni'
-%      .include_13c - include reported 13C hyperfine couplings,
-%                     false by default
+%                      aligned with the magnetic field
+%      .nickel       - '61Ni', 'none', or another nickel isotope;
+%                      required when .centre is 'w8'
+%      .include_13c  - logical flag enabling reported 13C hyperfine couplings
 %
 % Outputs:
 %
@@ -31,24 +30,13 @@
 
 function [sys,inter]=diamond_ni(parameters)
 
-% Set default input
-if nargin==0
-    parameters=struct();
+% Check input count
+if nargin~=1
+    error('exactly one input argument is required.');
 end
 
 % Check consistency
 grumble(parameters);
-
-% Set default parameters
-if ~isfield(parameters,'centre')
-    parameters.centre='w8';
-end
-if ~isfield(parameters,'orientation')
-    parameters.orientation='111';
-end
-if ~isfield(parameters,'include_13c')
-    parameters.include_13c=false;
-end
 
 % Set field-unit conversion constants
 hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
@@ -66,11 +54,7 @@ switch centre
     case 'w8'
         electron='E4';
         gmat=eye(3)*2.032;
-        if isfield(parameters,'nickel')
-            nickel=parameters.nickel;
-        else
-            nickel='61Ni';
-        end
+        nickel=parameters.nickel;
         if strcmp(nickel,'61Ni')
             nuclei{end+1}=struct('iso','61Ni','A',eye(3)*0.65*hz_per_mt,'Q',[]);
         elseif ~strcmp(nickel,'none')
@@ -86,8 +70,33 @@ switch centre
         end
     case {'ne1','ne2','ne3','ne5','ne8'}
         electron='E';
-        [gvals,avalues,alpha]=nickel_ne_data(centre);
-        frame=diamond_frame_alpha(alpha);
+
+        % Get tabulated NE centre parameters
+        switch centre
+            case 'ne1'
+                gvals=[2.1282 2.0070 2.0908]; alpha=14;
+                avalues=[2.09 1.43 1.45;2.09 1.43 1.45];
+            case 'ne2'
+                gvals=[2.1301 2.0100 2.0931]; alpha=14;
+                avalues=[2.10 1.42 1.41;1.87 1.18 1.25;0.18 0.35 0.25];
+            case 'ne3'
+                gvals=[2.0729 2.0100 2.0476]; alpha=14;
+                avalues=[1.60 1.24 1.15;0.66 0.50 0.50;0.66 0.50 0.50];
+            case 'ne5'
+                gvals=[2.0329 2.0898 2.0476]; alpha=27.5;
+                avalues=[1.22 0.98 0.89;1.22 0.98 0.89];
+            case 'ne8'
+                gvals=[2.0439 2.1722 2.0476]; alpha=27.5;
+                avalues=[1.14 0.78 0.75;1.14 0.78 0.75;1.14 0.78 0.75;1.14 0.78 0.75];
+        end
+
+        % Build the Nadolinny table frame
+        xaxis=[1;-1;0]/sqrt(2);
+        ybase=[1;1;0]/sqrt(2);
+        zbase=[0;0;1];
+        yaxis=cosd(alpha)*ybase+sind(alpha)*zbase;
+        zaxis=cross(xaxis,yaxis);
+        frame=diamond_frame_xyz(xaxis,yaxis,zaxis);
         gmat=((frame)*diag(gvals)*(frame)');
         nuclei=cell(1,size(avalues,1));
         for n=1:size(avalues,1)
@@ -99,7 +108,18 @@ switch centre
         gmat=((frame)*diag([2.0988 2.0988 2.0227])*(frame)');
     case {'ab1','ab2','ab3','ab4'}
         electron='E';
-        [gvals,frame]=nickel_ab_data(centre);
+
+        % Get tabulated AB centre parameters
+        switch centre
+            case 'ab1'
+                frame=frame_111; gvals=[2.0920 2.0920 2.0024];
+            case 'ab2'
+                frame=frame_111; gvals=[2.0672 2.0672 2.0072];
+            case 'ab3'
+                frame=diamond_frame_xyz([1 0 0],[0 1 1],[0 -1 1]); gvals=[2.1105 2.0663 2.0181];
+            case 'ab4'
+                frame=diamond_frame_xyz([1 0 0],[0 1 1],[0 -1 1]); gvals=[2.0220 2.0094 2.0084];
+        end
         gmat=((frame)*diag(gvals)*(frame)');
     case 'ab5'
         electron='E3';
@@ -148,65 +168,31 @@ end
 
 end
 
-% Nickel-nitrogen centre table data
-function [gvals,avalues,alpha]=nickel_ne_data(centre)
-switch centre
-    case 'ne1'
-        gvals=[2.1282 2.0070 2.0908]; alpha=14;
-        avalues=[2.09 1.43 1.45;2.09 1.43 1.45];
-    case 'ne2'
-        gvals=[2.1301 2.0100 2.0931]; alpha=14;
-        avalues=[2.10 1.42 1.41;1.87 1.18 1.25;0.18 0.35 0.25];
-    case 'ne3'
-        gvals=[2.0729 2.0100 2.0476]; alpha=14;
-        avalues=[1.60 1.24 1.15;0.66 0.50 0.50;0.66 0.50 0.50];
-    case 'ne5'
-        gvals=[2.0329 2.0898 2.0476]; alpha=27.5;
-        avalues=[1.22 0.98 0.89;1.22 0.98 0.89];
-    case 'ne8'
-        gvals=[2.0439 2.1722 2.0476]; alpha=27.5;
-        avalues=[1.14 0.78 0.75;1.14 0.78 0.75;1.14 0.78 0.75;1.14 0.78 0.75];
-    otherwise
-        error('unknown nickel NE centre.');
-end
-end
-
-% Nitrogen-free nickel centre table data
-function [gvals,frame]=nickel_ab_data(centre)
-switch centre
-    case 'ab1'
-        frame=[-1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
-            1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
-            0          2/sqrt(6)  1/sqrt(3)]; gvals=[2.0920 2.0920 2.0024];
-    case 'ab2'
-        frame=[-1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
-            1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
-            0          2/sqrt(6)  1/sqrt(3)]; gvals=[2.0672 2.0672 2.0072];
-    case 'ab3'
-        frame=diamond_frame_xyz([1 0 0],[0 1 1],[0 -1 1]); gvals=[2.1105 2.0663 2.0181];
-    case 'ab4'
-        frame=diamond_frame_xyz([1 0 0],[0 1 1],[0 -1 1]); gvals=[2.0220 2.0094 2.0084];
-    otherwise
-        error('unknown nickel AB centre.');
-end
-end
-
 % Consistency enforcement
 function grumble(parameters)
-if(~isstruct(parameters))
+if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-if isfield(parameters,'centre')&&(~ischar(parameters.centre))
+required={'centre','orientation','include_13c'};
+for n=1:numel(required)
+    if ~isfield(parameters,required{n})
+        error(['parameters.' required{n} ' field is required.']);
+    end
+end
+if ~ischar(parameters.centre)
     error('parameters.centre must be a character string.');
 end
-if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
+if ~ischar(parameters.orientation)
     error('parameters.orientation must be a character string.');
+end
+if ~islogical(parameters.include_13c)||~isscalar(parameters.include_13c)
+    error('parameters.include_13c must be a scalar logical.');
+end
+if strcmpi(parameters.centre,'w8')&&(~isfield(parameters,'nickel'))
+    error('parameters.nickel field is required for W8 centre.');
 end
 if isfield(parameters,'nickel')&&(~ischar(parameters.nickel))
     error('parameters.nickel must be a character string.');
-end
-if isfield(parameters,'include_13c')&&(~islogical(parameters.include_13c))
-    error('parameters.include_13c must be logical.');
 end
 end
 
@@ -217,15 +203,5 @@ frame=[xaxis(:) yaxis(:) zaxis(:)];
 if det(frame)<0
     frame(:,3)=-frame(:,3);
 end
-end
-
-% Frame used in the Nadolinny nickel and titanium tables
-function frame=diamond_frame_alpha(alpha)
-xaxis=[1;-1;0]/sqrt(2);
-ybase=[1;1;0]/sqrt(2);
-zbase=[0;0;1];
-yaxis=cosd(alpha)*ybase+sind(alpha)*zbase;
-zaxis=cross(xaxis,yaxis);
-frame=diamond_frame_xyz(xaxis,yaxis,zaxis);
 end
 

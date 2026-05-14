@@ -9,10 +9,9 @@
 %
 %    parameters is a structure with the following fields:
 %
-%      .germanium    - '73Ge', 'none', or another germanium isotope,
-%                      default is '73Ge'
+%      .germanium    - '73Ge', 'none', or another germanium isotope
 %      .orientation  - '111', '110', or '100' crystal plane normal
-%                      aligned with the magnetic field, default is '111'
+%                      aligned with the magnetic field
 %
 % Outputs:
 %
@@ -24,18 +23,13 @@
 
 function [sys,inter]=diamond_gev0(parameters)
 
-% Set default input
-if nargin==0
-    parameters=struct();
+% Check input count
+if nargin~=1
+    error('exactly one input argument is required.');
 end
 
 % Check consistency
 grumble(parameters);
-
-% Set default orientation
-if ~isfield(parameters,'orientation')
-    parameters.orientation='111';
-end
 
 % Set field-unit conversion constants
 hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
@@ -50,11 +44,7 @@ zfs=frame*zfs2mat(80.3*hz_per_mt,0,0,0,0)*frame';
 nuclei={};
 
 % Add the germanium isotope if requested
-if isfield(parameters,'germanium')
-    germanium=parameters.germanium;
-else
-    germanium='73Ge';
-end
+germanium=parameters.germanium;
 if strcmp(germanium,'73Ge')
     nuclei{end+1}=struct('iso','73Ge','A',eye(3)*1.64*hz_per_mt,'Q',[]);
 elseif ~strcmp(germanium,'none')
@@ -99,10 +89,19 @@ function grumble(parameters)
 if(~isstruct(parameters))
     error('parameters must be a structure.');
 end
-if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
+if ~isfield(parameters,'orientation')
+    error('parameters.orientation field is required.');
+end
+if(~ischar(parameters.orientation))
     error('parameters.orientation must be a character string.');
 end
-if isfield(parameters,'germanium')&&(~ischar(parameters.germanium))
+if ~ismember(parameters.orientation,{'111','110','100'})
+    error('parameters.orientation must be ''111'', ''110'', or ''100''.');
+end
+if ~isfield(parameters,'germanium')
+    error('parameters.germanium field is required.');
+end
+if(~ischar(parameters.germanium))
     error('parameters.germanium must be a character string.');
 end
 end

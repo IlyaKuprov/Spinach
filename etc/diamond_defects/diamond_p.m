@@ -10,11 +10,10 @@
 %    parameters is a structure with the following fields:
 %
 %      .centre       - 'ma1', 'np1', 'np2', 'np3', 'np4', 'np5',
-%                      'np6', 'np8', or 'np9', default is 'ma1'
+%                      'np6', 'np8', or 'np9'
 %      .orientation  - '111', '110', or '100' crystal plane normal
-%                      aligned with the magnetic field, default is '111'
-%      .include_13c - include reported 13C hyperfine couplings for MA1,
-%                     false by default
+%                      aligned with the magnetic field
+%      .include_13c - include reported 13C hyperfine couplings for MA1
 %
 % Outputs:
 %
@@ -26,79 +25,34 @@
 
 function [sys,inter]=diamond_p(parameters)
 
-% Set default input
-if nargin==0
-    parameters=struct();
+% Check input count
+if nargin~=1
+    error('exactly one input argument is required.');
 end
 
 % Check consistency
 grumble(parameters);
 
-% Set default parameters
-if ~isfield(parameters,'centre')
-    parameters.centre='ma1';
-end
-if ~isfield(parameters,'orientation')
-    parameters.orientation='111';
-end
-if ~isfield(parameters,'include_13c')
-    parameters.include_13c=false;
-end
-
 % Set field-unit conversion constants
 hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
 
 % Select the phosphorus centre
+centre=lower(parameters.centre);
 electron='E'; zfs=[];
-[gmat,nuclei]=phosphorus_data(lower(parameters.centre),hz_per_mt,parameters.include_13c);
-
-% Build the Spinach structures
-switch parameters.orientation
-    case '111'
-        C=rotmat_align([1 1 1],[0 0 1]);
-    case '110'
-        C=rotmat_align([1 1 0],[0 0 1]);
-    case '100'
-        C=rotmat_align([1 0 0],[0 0 1]);
-    otherwise
-        error('unknown orientation specification.');
-end
-sys.isotopes={electron};
-inter.zeeman.matrix{1}=C*gmat*C';
-if ~isempty(zfs)
-    [~,~,zfs]=mat2ias(C*zfs*C');
-    inter.coupling.matrix{1,1}=zfs;
-else
-    inter.coupling.matrix{1,1}=[];
-end
-for n=1:numel(nuclei)
-    sys.isotopes{n+1}=nuclei{n}.iso;
-    inter.zeeman.matrix{n+1}=zeros(3);
-    inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
-    if ~isempty(nuclei{n}.Q)
-        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
-        inter.coupling.matrix{n+1,n+1}=nqi;
-    else
-        inter.coupling.matrix{n+1,n+1}=[];
-    end
-end
-
-end
-
-% Phosphorus centre table data
-function [gmat,nuclei]=phosphorus_data(centre,hz_per_mt,include_13c)
 nuclei={}; frame=eye(3);
 
 % Set the trigonal principal-axis frame
 frame_111=[-1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
             1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
             0          2/sqrt(6)  1/sqrt(3)];
+
+% Get phosphorus centre table data
 switch centre
     case 'ma1'
         gmat=eye(3)*2.0025;
         nuclei{end+1}=struct('iso','31P','A',...
             ((frame_111)*diag([1.96 1.96 2.32]*hz_per_mt)*(frame_111)'),'Q',[]);
-        if include_13c
+        if parameters.include_13c
             nuclei{end+1}=struct('iso','13C','A',...
                 ((frame_111)*diag([13.92 13.92 18.13]*hz_per_mt)*(frame_111)'),'Q',[]);
         end
@@ -141,6 +95,38 @@ switch centre
     otherwise
         error('unknown phosphorus centre.');
 end
+
+% Build the Spinach structures
+switch parameters.orientation
+    case '111'
+        C=rotmat_align([1 1 1],[0 0 1]);
+    case '110'
+        C=rotmat_align([1 1 0],[0 0 1]);
+    case '100'
+        C=rotmat_align([1 0 0],[0 0 1]);
+    otherwise
+        error('unknown orientation specification.');
+end
+sys.isotopes={electron};
+inter.zeeman.matrix{1}=C*gmat*C';
+if ~isempty(zfs)
+    [~,~,zfs]=mat2ias(C*zfs*C');
+    inter.coupling.matrix{1,1}=zfs;
+else
+    inter.coupling.matrix{1,1}=[];
+end
+for n=1:numel(nuclei)
+    sys.isotopes{n+1}=nuclei{n}.iso;
+    inter.zeeman.matrix{n+1}=zeros(3);
+    inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
+    if ~isempty(nuclei{n}.Q)
+        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
+        inter.coupling.matrix{n+1,n+1}=nqi;
+    else
+        inter.coupling.matrix{n+1,n+1}=[];
+    end
+end
+
 end
 
 % Consistency enforcement
@@ -148,13 +134,28 @@ function grumble(parameters)
 if(~isstruct(parameters))
     error('parameters must be a structure.');
 end
-if isfield(parameters,'centre')&&(~ischar(parameters.centre))
+if ~isfield(parameters,'centre')
+    error('parameters.centre field is required.');
+end
+if(~ischar(parameters.centre))
     error('parameters.centre must be a character string.');
 end
-if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
+if ~ismember(lower(parameters.centre),{'ma1','np1','np2','np3','np4','np5','np6','np8','np9'})
+    error('parameters.centre has an unsupported value.');
+end
+if ~isfield(parameters,'orientation')
+    error('parameters.orientation field is required.');
+end
+if(~ischar(parameters.orientation))
     error('parameters.orientation must be a character string.');
 end
-if isfield(parameters,'include_13c')&&(~islogical(parameters.include_13c))
+if ~ismember(parameters.orientation,{'111','110','100'})
+    error('parameters.orientation must be ''111'', ''110'', or ''100''.');
+end
+if ~isfield(parameters,'include_13c')
+    error('parameters.include_13c field is required.');
+end
+if(~islogical(parameters.include_13c))
     error('parameters.include_13c must be logical.');
 end
 end

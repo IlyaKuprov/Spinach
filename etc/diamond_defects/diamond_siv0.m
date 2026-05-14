@@ -7,14 +7,12 @@
 %
 % Parameters:
 %
-%    parameters is a structure with the following fields:
+%    parameters is a structure with the following required fields:
 %
-%      .silicon      - '29Si', 'none', or another silicon isotope,
-%                      default is '29Si'
+%      .silicon      - '29Si', 'none', or another silicon isotope
 %      .orientation  - '111', '110', or '100' crystal plane normal
-%                      aligned with the magnetic field, default is '111'
-%      .include_13c - include reported 13C hyperfine couplings,
-%                     false by default
+%                      aligned with the magnetic field
+%      .include_13c  - include reported 13C hyperfine couplings
 %
 % Outputs:
 %
@@ -26,21 +24,13 @@
 
 function [sys,inter]=diamond_siv0(parameters)
 
-% Set default input
-if nargin==0
-    parameters=struct();
+% Check input count
+if nargin~=1
+    error('exactly one input argument is required.');
 end
 
 % Check consistency
 grumble(parameters);
-
-% Set default parameters
-if ~isfield(parameters,'orientation')
-    parameters.orientation='111';
-end
-if ~isfield(parameters,'include_13c')
-    parameters.include_13c=false;
-end
 
 % Build the electron tensors
 electron='E3';
@@ -52,11 +42,7 @@ zfs=frame*zfs2mat(1000e6,0,0,0,0)*frame';
 nuclei={};
 
 % Add the silicon isotope if requested
-if isfield(parameters,'silicon')
-    silicon=parameters.silicon;
-else
-    silicon='29Si';
-end
+silicon=parameters.silicon;
 if strcmp(silicon,'29Si')
     nuclei{end+1}=struct('iso','29Si','A',((frame)*diag([78.9e6 78.9e6 76.3e6])*(frame)'),'Q',[]);
 elseif ~strcmp(silicon,'none')
@@ -111,13 +97,25 @@ function grumble(parameters)
 if(~isstruct(parameters))
     error('parameters must be a structure.');
 end
-if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
+if ~isfield(parameters,'orientation')
+    error('parameters.orientation field is missing.');
+end
+if ~ischar(parameters.orientation)
     error('parameters.orientation must be a character string.');
 end
-if isfield(parameters,'silicon')&&(~ischar(parameters.silicon))
+if ~ismember(parameters.orientation,{'111','110','100'})
+    error('parameters.orientation must be ''111'', ''110'', or ''100''.');
+end
+if ~isfield(parameters,'silicon')
+    error('parameters.silicon field is missing.');
+end
+if ~ischar(parameters.silicon)
     error('parameters.silicon must be a character string.');
 end
-if isfield(parameters,'include_13c')&&(~islogical(parameters.include_13c))
+if ~isfield(parameters,'include_13c')
+    error('parameters.include_13c field is missing.');
+end
+if (~islogical(parameters.include_13c))||(~isscalar(parameters.include_13c))
     error('parameters.include_13c must be logical.');
 end
 end

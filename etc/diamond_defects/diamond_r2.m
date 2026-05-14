@@ -9,9 +9,9 @@
 %
 %    parameters is a structure with the following fields:
 %
-%      .d_sign       - sign of D, default is +1
+%      .d_sign       - sign of D
 %      .orientation  - '111', '110', or '100' crystal plane normal
-%                      aligned with the magnetic field, default is '111'
+%                      aligned with the magnetic field
 %
 % Outputs:
 %
@@ -23,21 +23,13 @@
 
 function [sys,inter]=diamond_r2(parameters)
 
-% Set default input
-if nargin==0
-    parameters=struct();
+% Check input count
+if nargin~=1
+    error('exactly one input argument is required.');
 end
 
 % Check consistency
 grumble(parameters);
-
-% Set default parameters
-if ~isfield(parameters,'orientation')
-    parameters.orientation='111';
-end
-if ~isfield(parameters,'d_sign')
-    parameters.d_sign=1;
-end
 
 % Build the electron tensors
 electron='E3';
@@ -86,11 +78,19 @@ function grumble(parameters)
 if(~isstruct(parameters))
     error('parameters must be a structure.');
 end
-if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
+if ~isfield(parameters,'orientation')
+    error('parameters.orientation field is required.');
+end
+if(~ischar(parameters.orientation))
     error('parameters.orientation must be a character string.');
 end
-if isfield(parameters,'d_sign')&&...
-   (~isnumeric(parameters.d_sign)||~isreal(parameters.d_sign)||~isscalar(parameters.d_sign))
+if ~any(strcmp(parameters.orientation,{'111','110','100'}))
+    error('parameters.orientation must be ''111'', ''110'', or ''100''.');
+end
+if ~isfield(parameters,'d_sign')
+    error('parameters.d_sign field is required.');
+end
+if(~isnumeric(parameters.d_sign)||~isreal(parameters.d_sign)||~isscalar(parameters.d_sign))
     error('parameters.d_sign must be a real scalar.');
 end
 end

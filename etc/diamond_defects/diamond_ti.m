@@ -7,14 +7,14 @@
 %
 % Parameters:
 %
-%    parameters is a structure with the following fields:
+%    parameters is a structure with the following required fields:
 %
-%      .centre       - 'n3' or 'ok1', default is 'n3'
+%      .centre       - 'n3' or 'ok1'
 %      .orientation  - '111', '110', or '100' crystal plane normal
-%                      aligned with the magnetic field, default is '111'
-%      .titanium     - titanium isotope label, or 'none', default is '47Ti'
+%                      aligned with the magnetic field
+%      .titanium     - titanium isotope label, or 'none'
 %      .include_13c - include reported 13C hyperfine couplings for OK1,
-%                     false by default
+%                     true or false
 %
 % Outputs:
 %
@@ -26,24 +26,13 @@
 
 function [sys,inter]=diamond_ti(parameters)
 
-% Set default input
-if nargin==0
-    parameters=struct();
+% Check input count
+if nargin~=1
+    error('exactly one input argument is required.');
 end
 
 % Check consistency
 grumble(parameters);
-
-% Set default parameters
-if ~isfield(parameters,'centre')
-    parameters.centre='n3';
-end
-if ~isfield(parameters,'orientation')
-    parameters.orientation='111';
-end
-if ~isfield(parameters,'include_13c')
-    parameters.include_13c=false;
-end
 
 % Set field-unit conversion constants
 hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
@@ -51,7 +40,22 @@ hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
 % Select the titanium centre
 centre=lower(parameters.centre);
 electron='E'; nuclei={}; zfs=[];
-[gvals,An,Ati,g_alpha,A_alpha]=titanium_data(centre);
+
+% Select centre-specific magnetic parameters
+switch centre
+    case 'n3'
+        gvals=[2.0022 2.0025 2.0020];
+        An=[0.11 0.15 0.11];
+        Ati=[0.28 0.40 0.28];
+        g_alpha=32; A_alpha=26;
+    case 'ok1'
+        gvals=[2.0031 2.0019 2.0025];
+        An=[0.55 0.77 0.54];
+        Ati=[0.06 0.06 0.06];
+        g_alpha=40; A_alpha=20;
+    otherwise
+        error('unknown titanium centre.');
+end
 gframe=diamond_frame_alpha(g_alpha);
 aframe=diamond_frame_alpha(A_alpha);
 gmat=((gframe)*diag(gvals)*(gframe)');
@@ -60,11 +64,7 @@ gmat=((gframe)*diag(gvals)*(gframe)');
 nuclei{end+1}=struct('iso','14N','A',((aframe)*diag(An*hz_per_mt)*(aframe)'),'Q',[]);
 
 % Add the titanium isotope if requested
-if isfield(parameters,'titanium')
-    titanium=parameters.titanium;
-else
-    titanium='47Ti';
-end
+titanium=parameters.titanium;
 if ~strcmp(titanium,'none')
     nuclei{end+1}=struct('iso',titanium,'A',((aframe)*diag(Ati*hz_per_mt)*(aframe)'),'Q',[]);
 end
@@ -110,40 +110,34 @@ end
 
 end
 
-% Titanium centre table data
-function [gvals,An,Ati,g_alpha,A_alpha]=titanium_data(centre)
-switch centre
-    case 'n3'
-        gvals=[2.0022 2.0025 2.0020];
-        An=[0.11 0.15 0.11];
-        Ati=[0.28 0.40 0.28];
-        g_alpha=32; A_alpha=26;
-    case 'ok1'
-        gvals=[2.0031 2.0019 2.0025];
-        An=[0.55 0.77 0.54];
-        Ati=[0.06 0.06 0.06];
-        g_alpha=40; A_alpha=20;
-    otherwise
-        error('unknown titanium centre.');
-end
-end
-
 % Consistency enforcement
 function grumble(parameters)
-if(~isstruct(parameters))
+if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-if isfield(parameters,'centre')&&(~ischar(parameters.centre))
+if ~isfield(parameters,'centre')
+    error('parameters.centre field is required.');
+end
+if ~ischar(parameters.centre)
     error('parameters.centre must be a character string.');
 end
-if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
+if ~isfield(parameters,'orientation')
+    error('parameters.orientation field is required.');
+end
+if ~ischar(parameters.orientation)
     error('parameters.orientation must be a character string.');
 end
-if isfield(parameters,'titanium')&&(~ischar(parameters.titanium))
+if ~isfield(parameters,'titanium')
+    error('parameters.titanium field is required.');
+end
+if ~ischar(parameters.titanium)
     error('parameters.titanium must be a character string.');
 end
-if isfield(parameters,'include_13c')&&(~islogical(parameters.include_13c))
-    error('parameters.include_13c must be logical.');
+if ~isfield(parameters,'include_13c')
+    error('parameters.include_13c field is required.');
+end
+if (~islogical(parameters.include_13c))||(~isscalar(parameters.include_13c))
+    error('parameters.include_13c must be a logical scalar.');
 end
 end
 

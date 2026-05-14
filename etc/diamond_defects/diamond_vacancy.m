@@ -14,10 +14,10 @@
 %    parameters is a structure with the following fields:
 %
 %      .centre       - 'r4_w6', 'w6', 'r4', 'w29', 'r5', 'o1',
-%                      'r6', 'r10', or 'r11', default is 'r4_w6'
+%                      'r6', 'r10', or 'r11'
 %
 %      .orientation  - '111', '110', or '100' crystal plane normal
-%                      aligned with the magnetic field, default is '111'
+%                      aligned with the magnetic field
 %
 % Outputs:
 %
@@ -29,21 +29,13 @@
 
 function [sys,inter]=diamond_vacancy(parameters)
 
-% Set default input
-if nargin==0
-    parameters=struct();
+% Check input count
+if nargin~=1
+    error('exactly one input argument is required.');
 end
 
 % Check consistency
 grumble(parameters);
-
-% Set default parameters
-if ~isfield(parameters,'centre')
-    parameters.centre='r4_w6';
-end
-if ~isfield(parameters,'orientation')
-    parameters.orientation='111';
-end
 
 % Select the vacancy centre
 centre=lower(parameters.centre);
@@ -123,10 +115,16 @@ function grumble(parameters)
 if(~isstruct(parameters))
     error('parameters must be a structure.');
 end
-if isfield(parameters,'centre')&&(~ischar(parameters.centre))
+if ~isfield(parameters,'centre')
+    error('parameters.centre must be specified.');
+end
+if ~isfield(parameters,'orientation')
+    error('parameters.orientation must be specified.');
+end
+if ~ischar(parameters.centre)
     error('parameters.centre must be a character string.');
 end
-if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
+if ~ischar(parameters.orientation)
     error('parameters.orientation must be a character string.');
 end
 end

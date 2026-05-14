@@ -9,10 +9,10 @@
 %
 %    parameters is a structure with the following fields:
 %
-%      .centre       - 'war9' or 'war10', default is 'war9'
+%      .centre       - 'war9' or 'war10'
 %      .orientation  - '111', '110', or '100' crystal plane normal
-%                      aligned with the magnetic field, default is '111'
-%      .nitrogen     - must be '15N', default is '15N'
+%                      aligned with the magnetic field
+%      .nitrogen     - must be '15N'
 %
 % Outputs:
 %
@@ -24,24 +24,13 @@
 
 function [sys,inter]=diamond_n_inter(parameters)
 
-% Set default input
-if nargin==0
-    parameters=struct();
+% Check input count
+if nargin~=1
+    error('exactly one input argument is required.');
 end
 
 % Check consistency
 grumble(parameters);
-
-% Set default parameters
-if ~isfield(parameters,'centre')
-    parameters.centre='war9';
-end
-if ~isfield(parameters,'orientation')
-    parameters.orientation='111';
-end
-if ~isfield(parameters,'nitrogen')
-    parameters.nitrogen='15N';
-end
 
 % Restrict to the verified isotope
 if ~strcmp(parameters.nitrogen,'15N')
@@ -111,13 +100,22 @@ function grumble(parameters)
 if(~isstruct(parameters))
     error('parameters must be a structure.');
 end
-if isfield(parameters,'centre')&&(~ischar(parameters.centre))
+if(~isfield(parameters,'centre'))
+    error('parameters.centre field is required.');
+end
+if(~ischar(parameters.centre))
     error('parameters.centre must be a character string.');
 end
-if isfield(parameters,'orientation')&&(~ischar(parameters.orientation))
+if(~isfield(parameters,'orientation'))
+    error('parameters.orientation field is required.');
+end
+if(~ischar(parameters.orientation))
     error('parameters.orientation must be a character string.');
 end
-if isfield(parameters,'nitrogen')&&(~ischar(parameters.nitrogen))
+if(~isfield(parameters,'nitrogen'))
+    error('parameters.nitrogen field is required.');
+end
+if(~ischar(parameters.nitrogen))
     error('parameters.nitrogen must be a character string.');
 end
 end

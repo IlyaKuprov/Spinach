@@ -160,3 +160,10 @@ if(~islogical(parameters.include_13c))
 end
 end
 
+% The fact that we live at the bottom of a deep gravity well, on the
+% surface of a gas covered planet going around a nuclear fireball 90
+% million miles away and think this to be normal is obviously some
+% indication of how skewed our perspective tends to be.
+%
+% Douglas Adams
+

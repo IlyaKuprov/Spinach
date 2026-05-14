@@ -150,3 +150,7 @@ if det(frame)<0
 end
 end
 
+% If nothing is self-evident, nothing can be proved.
+% 
+% C.S. Lewis
+

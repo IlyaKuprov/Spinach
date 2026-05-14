@@ -106,3 +106,8 @@ if(~ischar(parameters.germanium))
 end
 end
 
+% The bravest sight in the world is to see a great man 
+% struggling against adversity.
+% 
+% Lucius Annaeus Seneca
+

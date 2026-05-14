@@ -100,3 +100,8 @@ if ~strcmp(parameters.nitrogen,'15N')
 end
 end
 
+% In the fields of observation, chance 
+% favors only the prepared mind.
+%
+% Louis Pasteur
+

@@ -205,3 +205,10 @@ if det(frame)<0
 end
 end
 
+% I have brought myself, by long meditation, to the conviction 
+% that a human being with a settled purpose must accomplish it, 
+% and that nothing can resist a will which would stake even 
+% existence upon its fulfillment. 
+%
+% Benjamin Disraeli
+

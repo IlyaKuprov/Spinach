@@ -169,3 +169,9 @@ yaxis=cross(zaxis,xaxis);
 frame=diamond_frame_xyz(xaxis,yaxis,zaxis);
 end
 
+% Hence it comes that all armed prophets 
+% have been victorious, and all unarmed 
+% prophets have been destroyed.
+%
+% Nicolo Machiavelli
+

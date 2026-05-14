@@ -95,3 +95,9 @@ if(~isnumeric(parameters.d_sign)||~isreal(parameters.d_sign)||~isscalar(paramete
 end
 end
 
+% "By accepting insults and expressing gratitute for them."
+%
+% An old courtier, quoted by Seneca,
+% when asked how he had lasted so
+% long in the imperial service.
+

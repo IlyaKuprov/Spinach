@@ -129,3 +129,9 @@ if det(frame)<0
 end
 end
 
+% It is a general rule of human nature that people despise
+% those who treat them well, and look up to those who make
+% no concessions. 
+%
+% Thucydides
+

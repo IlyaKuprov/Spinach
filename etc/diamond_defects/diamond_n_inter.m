@@ -38,7 +38,7 @@ if ~strcmp(parameters.nitrogen,'15N')
 end
 
 % Build the common frame
-electron='E'; zfs=[]; nuclei={};
+electron='E';
 gframe=diamond_frame_xyz([sind(90)*cosd(45);sind(90)*sind(45);cosd(90)],...
                          [sind(180)*cosd(45);sind(180)*sind(45);cosd(180)],...
                          [sind(90)*cosd(315);sind(90)*sind(315);cosd(90)]);
@@ -60,7 +60,7 @@ switch centre
 end
 
 % Add the nitrogen hyperfine tensor
-nuclei{end+1}=struct('iso','15N','A',Amat,'Q',[]);
+nucleus=struct('iso','15N','A',Amat);
 
 % Build the Spinach structures
 switch parameters.orientation
@@ -73,25 +73,11 @@ switch parameters.orientation
     otherwise
         error('unknown orientation specification.');
 end
-sys.isotopes={electron};
+sys.isotopes={electron,nucleus.iso};
+inter.zeeman.matrix=cell(1,numel(sys.isotopes));
 inter.zeeman.matrix{1}=C*gmat*C';
-if ~isempty(zfs)
-    [~,~,zfs]=mat2ias(C*zfs*C');
-    inter.coupling.matrix{1,1}=zfs;
-else
-    inter.coupling.matrix{1,1}=[];
-end
-for n=1:numel(nuclei)
-    sys.isotopes{n+1}=nuclei{n}.iso;
-    inter.zeeman.matrix{n+1}=zeros(3);
-    inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
-    if ~isempty(nuclei{n}.Q)
-        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
-        inter.coupling.matrix{n+1,n+1}=nqi;
-    else
-        inter.coupling.matrix{n+1,n+1}=[];
-    end
-end
+inter.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
+inter.coupling.matrix{1,2}=C*nucleus.A*C';
 
 end
 

@@ -46,9 +46,9 @@ nuclei={};
 % Add the germanium isotope if requested
 germanium=parameters.germanium;
 if strcmp(germanium,'73Ge')
-    nuclei{end+1}=struct('iso','73Ge','A',eye(3)*1.64*hz_per_mt,'Q',[]);
+    nuclei{end+1}=struct('iso','73Ge','A',eye(3)*1.64*hz_per_mt);
 elseif ~strcmp(germanium,'none')
-    nuclei{end+1}=struct('iso',germanium,'A',zeros(3),'Q',[]);
+    nuclei{end+1}=struct('iso',germanium);
 end
 
 % Build the Spinach structures
@@ -63,22 +63,17 @@ switch parameters.orientation
         error('unknown orientation specification.');
 end
 sys.isotopes={electron};
-inter.zeeman.matrix{1}=C*gmat*C';
-if ~isempty(zfs)
-    [~,~,zfs]=mat2ias(C*zfs*C');
-    inter.coupling.matrix{1,1}=zfs;
-else
-    inter.coupling.matrix{1,1}=[];
-end
 for n=1:numel(nuclei)
     sys.isotopes{n+1}=nuclei{n}.iso;
-    inter.zeeman.matrix{n+1}=zeros(3);
-    inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
-    if ~isempty(nuclei{n}.Q)
-        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
-        inter.coupling.matrix{n+1,n+1}=nqi;
-    else
-        inter.coupling.matrix{n+1,n+1}=[];
+end
+inter.zeeman.matrix=cell(1,numel(sys.isotopes));
+inter.zeeman.matrix{1}=C*gmat*C';
+inter.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
+[~,~,zfs]=mat2ias(C*zfs*C');
+inter.coupling.matrix{1,1}=zfs;
+for n=1:numel(nuclei)
+    if isfield(nuclei{n},'A')&&norm(nuclei{n}.A,2)>0
+        inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
     end
 end
 

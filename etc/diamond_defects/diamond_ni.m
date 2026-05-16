@@ -56,16 +56,16 @@ switch centre
         gmat=eye(3)*2.032;
         nickel=parameters.nickel;
         if strcmp(nickel,'61Ni')
-            nuclei{end+1}=struct('iso','61Ni','A',eye(3)*0.65*hz_per_mt,'Q',[]);
+            nuclei{end+1}=struct('iso','61Ni','A',eye(3)*0.65*hz_per_mt);
         elseif ~strcmp(nickel,'none')
-            nuclei{end+1}=struct('iso',nickel,'A',zeros(3),'Q',[]);
+            nuclei{end+1}=struct('iso',nickel);
         end
         if parameters.include_13c
             Cmat=((frame_111)*diag([0.340 0.340 1.339]*hz_per_mt)*(frame_111)');
             nuc_idx=numel(nuclei);
             nuclei(nuc_idx+1:nuc_idx+4)={[]};
             for n=1:4
-                nuclei{nuc_idx+n}=struct('iso','13C','A',Cmat,'Q',[]);
+                nuclei{nuc_idx+n}=struct('iso','13C','A',Cmat);
             end
         end
     case {'ne1','ne2','ne3','ne5','ne8'}
@@ -100,7 +100,7 @@ switch centre
         gmat=((frame)*diag(gvals)*(frame)');
         nuclei=cell(1,size(avalues,1));
         for n=1:size(avalues,1)
-            nuclei{n}=struct('iso','14N','A',((frame)*diag(avalues(n,:)*hz_per_mt)*(frame)'),'Q',[]);
+            nuclei{n}=struct('iso','14N','A',((frame)*diag(avalues(n,:)*hz_per_mt)*(frame)'));
         end
     case 'ne4'
         electron='E';
@@ -147,22 +147,19 @@ switch parameters.orientation
         error('unknown orientation specification.');
 end
 sys.isotopes={electron};
+for n=1:numel(nuclei)
+    sys.isotopes{n+1}=nuclei{n}.iso;
+end
+inter.zeeman.matrix=cell(1,numel(sys.isotopes));
 inter.zeeman.matrix{1}=C*gmat*C';
+inter.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
 if ~isempty(zfs)
     [~,~,zfs]=mat2ias(C*zfs*C');
     inter.coupling.matrix{1,1}=zfs;
-else
-    inter.coupling.matrix{1,1}=[];
 end
 for n=1:numel(nuclei)
-    sys.isotopes{n+1}=nuclei{n}.iso;
-    inter.zeeman.matrix{n+1}=zeros(3);
-    inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
-    if ~isempty(nuclei{n}.Q)
-        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
-        inter.coupling.matrix{n+1,n+1}=nqi;
-    else
-        inter.coupling.matrix{n+1,n+1}=[];
+    if isfield(nuclei{n},'A')&&norm(nuclei{n}.A,2)>0
+        inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
     end
 end
 

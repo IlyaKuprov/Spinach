@@ -52,12 +52,12 @@ cframe=anax2dcm([-1 -1 0],-2.0*pi/180)*...
 % Build the electron tensors
 electron='E';
 gmat=((gframe)*diag([2.00345 2.00274 2.00271])*(gframe)');
-zfs=[]; nuclei={};
+nuclei={};
 
 % Add nitrogen tensors
 if strcmp(parameters.nitrogen,'15N')
-    nuclei{end+1}=struct('iso','15N','A',((nframe)*diag([3.47e6 4.51e6 4.09e6])*(nframe)'),'Q',[]);
-    nuclei{end+1}=struct('iso','15N','A',((c2rot*nframe)*diag([3.47e6 4.51e6 4.09e6])*(c2rot*nframe)'),'Q',[]);
+    nuclei{end+1}=struct('iso','15N','A',((nframe)*diag([3.47e6 4.51e6 4.09e6])*(nframe)'));
+    nuclei{end+1}=struct('iso','15N','A',((c2rot*nframe)*diag([3.47e6 4.51e6 4.09e6])*(c2rot*nframe)'));
 elseif strcmp(parameters.nitrogen,'14N')
     scale=spin('14N')/spin('15N');
     Qframe=[-1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
@@ -73,8 +73,8 @@ end
 
 % Add reported nearest-neighbour carbons
 if parameters.include_13c
-    nuclei{end+1}=struct('iso','13C','A',((cframe)*diag([202.3e6 202.3e6 317.5e6])*(cframe)'),'Q',[]);
-    nuclei{end+1}=struct('iso','13C','A',((c2rot*cframe)*diag([202.3e6 202.3e6 317.5e6])*(c2rot*cframe)'),'Q',[]);
+    nuclei{end+1}=struct('iso','13C','A',((cframe)*diag([202.3e6 202.3e6 317.5e6])*(cframe)'));
+    nuclei{end+1}=struct('iso','13C','A',((c2rot*cframe)*diag([202.3e6 202.3e6 317.5e6])*(c2rot*cframe)'));
 end
 
 % Build the Spinach structures
@@ -89,22 +89,19 @@ switch parameters.orientation
         error('unknown orientation specification.');
 end
 sys.isotopes={electron};
-inter.zeeman.matrix{1}=C*gmat*C';
-if ~isempty(zfs)
-    [~,~,zfs]=mat2ias(C*zfs*C');
-    inter.coupling.matrix{1,1}=zfs;
-else
-    inter.coupling.matrix{1,1}=[];
-end
 for n=1:numel(nuclei)
     sys.isotopes{n+1}=nuclei{n}.iso;
-    inter.zeeman.matrix{n+1}=zeros(3);
-    inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
-    if ~isempty(nuclei{n}.Q)
+end
+inter.zeeman.matrix=cell(1,numel(sys.isotopes));
+inter.zeeman.matrix{1}=C*gmat*C';
+inter.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
+for n=1:numel(nuclei)
+    if isfield(nuclei{n},'A')&&norm(nuclei{n}.A,2)>0
+        inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
+    end
+    if isfield(nuclei{n},'Q')&&~isempty(nuclei{n}.Q)
         [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
         inter.coupling.matrix{n+1,n+1}=nqi;
-    else
-        inter.coupling.matrix{n+1,n+1}=[];
     end
 end
 

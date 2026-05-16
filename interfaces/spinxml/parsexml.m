@@ -23,12 +23,11 @@ function xml=parsexml(filename)
 % Check consistency
 grumble(filename);
 
-% TODO: validation against the schema,
-%       best just call Java here
+% Use Matlab's native XML engine, avoiding Java
 
 % Read the file
 try
-   tree=xmlread(filename);
+   tree=xmlread(filename,'XMLEngine','maxp');
 catch
    error('Could not read XML file %s.',filename);
 end
@@ -45,14 +44,14 @@ end
 % Child node parsing
 function children=parseChildNodes(theNode)
 children=[];
-if theNode.hasChildNodes
-    childNodes=theNode.getChildNodes;
-    numChildNodes=childNodes.getLength;
+if isprop(theNode,'Children')&&(~isempty(theNode.Children))
+    childNodes=theNode.Children;
+    numChildNodes=numel(childNodes);
     allocCell=cell(1,numChildNodes);
     children=struct('name',allocCell,'attributes',allocCell,...
                     'data',allocCell,'children',allocCell);
     for n=1:numChildNodes
-        theChild=childNodes.item(n-1);
+        theChild=childNodes(n);
         children(n)=makeStructFromNode(theChild);
     end
 end
@@ -60,28 +59,42 @@ end
 
 % Structure creation
 function nodeStruct=makeStructFromNode(theNode)
-nodeStruct=struct('name',char(theNode.getNodeName),...
-                  'attributes',parseAttributes(theNode),...
-                  'data','','children',parseChildNodes(theNode));
-if ismember('getData',methods(theNode))
-   nodeStruct.data=char(theNode.getData); 
+if isprop(theNode,'TagName')
+    nodeName=char(theNode.TagName);
 else
-   nodeStruct.data='';
+    switch class(theNode)
+        case 'matlab.io.xml.dom.Text'
+            nodeName='#text';
+        case 'matlab.io.xml.dom.Comment'
+            nodeName='#comment';
+        otherwise
+            nodeName=class(theNode);
+    end
 end
+if isprop(theNode,'TagName')
+    nodeData='';
+elseif isprop(theNode,'TextContent')
+    nodeData=char(theNode.TextContent);
+else
+    nodeData='';
+end
+nodeStruct=struct('name',nodeName,...
+                  'attributes',parseAttributes(theNode),...
+                  'data',nodeData,'children',parseChildNodes(theNode));
 end
 
 % Attribute parsing
 function attributes=parseAttributes(theNode)
 attributes=[];
-if theNode.hasAttributes
+if isprop(theNode,'HasAttributes')&&theNode.HasAttributes
    theAttributes=theNode.getAttributes;
-   numAttributes=theAttributes.getLength;
+   numAttributes=theAttributes.Length;
    allocCell=cell(1,numAttributes);
    attributes=struct('name',allocCell,'value',allocCell);
    for n=1:numAttributes
       attrib=theAttributes.item(n-1);
-      attributes(n).name=char(attrib.getName);
-      attributes(n).value=char(attrib.getValue);
+      attributes(n).name=char(attrib.Name);
+      attributes(n).value=char(attrib.Value);
    end
 end
 end

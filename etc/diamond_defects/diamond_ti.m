@@ -39,7 +39,7 @@ hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
 
 % Select the titanium centre
 centre=lower(parameters.centre);
-electron='E'; nuclei={}; zfs=[];
+electron='E'; nuclei={};
 
 % Select centre-specific magnetic parameters
 switch centre
@@ -61,20 +61,20 @@ aframe=diamond_frame_alpha(A_alpha);
 gmat=((gframe)*diag(gvals)*(gframe)');
 
 % Add the nitrogen hyperfine tensor
-nuclei{end+1}=struct('iso','14N','A',((aframe)*diag(An*hz_per_mt)*(aframe)'),'Q',[]);
+nuclei{end+1}=struct('iso','14N','A',((aframe)*diag(An*hz_per_mt)*(aframe)'));
 
 % Add the titanium isotope if requested
 titanium=parameters.titanium;
 if ~strcmp(titanium,'none')
-    nuclei{end+1}=struct('iso',titanium,'A',((aframe)*diag(Ati*hz_per_mt)*(aframe)'),'Q',[]);
+    nuclei{end+1}=struct('iso',titanium,'A',((aframe)*diag(Ati*hz_per_mt)*(aframe)'));
 end
 
 % Add reported OK1 nearest-neighbour carbons
 if strcmp(centre,'ok1')&&parameters.include_13c
     Cmat=((diamond_frame_xz([1 1 0],[1 -1 -1]))*diag([2.62 2.62 4.38]*hz_per_mt)*(diamond_frame_xz([1 1 0],[1 -1 -1]))');
-    nuclei{end+1}=struct('iso','13C','A',Cmat,'Q',[]);
+    nuclei{end+1}=struct('iso','13C','A',Cmat);
     Cmat=((diamond_frame_xz([1 1 0],[-1 1 -1]))*diag([2.62 2.62 4.38]*hz_per_mt)*(diamond_frame_xz([1 1 0],[-1 1 -1]))');
-    nuclei{end+1}=struct('iso','13C','A',Cmat,'Q',[]);
+    nuclei{end+1}=struct('iso','13C','A',Cmat);
 end
 
 % Build the Spinach structures
@@ -89,22 +89,15 @@ switch parameters.orientation
         error('unknown orientation specification.');
 end
 sys.isotopes={electron};
-inter.zeeman.matrix{1}=C*gmat*C';
-if ~isempty(zfs)
-    [~,~,zfs]=mat2ias(C*zfs*C');
-    inter.coupling.matrix{1,1}=zfs;
-else
-    inter.coupling.matrix{1,1}=[];
-end
 for n=1:numel(nuclei)
     sys.isotopes{n+1}=nuclei{n}.iso;
-    inter.zeeman.matrix{n+1}=zeros(3);
-    inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
-    if ~isempty(nuclei{n}.Q)
-        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
-        inter.coupling.matrix{n+1,n+1}=nqi;
-    else
-        inter.coupling.matrix{n+1,n+1}=[];
+end
+inter.zeeman.matrix=cell(1,numel(sys.isotopes));
+inter.zeeman.matrix{1}=C*gmat*C';
+inter.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
+for n=1:numel(nuclei)
+    if isfield(nuclei{n},'A')&&norm(nuclei{n}.A,2)>0
+        inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
     end
 end
 

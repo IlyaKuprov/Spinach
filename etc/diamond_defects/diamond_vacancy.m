@@ -75,7 +75,6 @@ end
 
 % Build the electron tensors
 gmat=eye(3)*giso;
-nuclei={};
 
 % Build the Spinach structures
 switch parameters.orientation
@@ -89,24 +88,11 @@ switch parameters.orientation
         error('unknown orientation specification.');
 end
 sys.isotopes={electron};
+inter.zeeman.matrix=cell(1,numel(sys.isotopes));
 inter.zeeman.matrix{1}=C*gmat*C';
-if ~isempty(zfs)
-    [~,~,zfs]=mat2ias(C*zfs*C');
-    inter.coupling.matrix{1,1}=zfs;
-else
-    inter.coupling.matrix{1,1}=[];
-end
-for n=1:numel(nuclei)
-    sys.isotopes{n+1}=nuclei{n}.iso;
-    inter.zeeman.matrix{n+1}=zeros(3);
-    inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
-    if ~isempty(nuclei{n}.Q)
-        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
-        inter.coupling.matrix{n+1,n+1}=nqi;
-    else
-        inter.coupling.matrix{n+1,n+1}=[];
-    end
-end
+inter.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
+[~,~,zfs]=mat2ias(C*zfs*C');
+inter.coupling.matrix{1,1}=zfs;
 
 end
 

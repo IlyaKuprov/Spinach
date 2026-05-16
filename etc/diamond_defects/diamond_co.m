@@ -36,7 +36,7 @@ hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
 
 % Select the cobalt centre
 centre=lower(parameters.centre);
-electron='E'; zfs=[];
+electron='E';
 
 % Get cobalt centre table data
 switch centre
@@ -70,7 +70,7 @@ end
 
 % Build electron and cobalt tensors
 gmat=((frame)*diag(gvals)*(frame)');
-nuclei={struct('iso','59Co','A',((frame)*diag(Aco*hz_per_mt)*(frame)'),'Q',[])};
+nucleus=struct('iso','59Co','A',((frame)*diag(Aco*hz_per_mt)*(frame)'));
 
 % Build the Spinach structures
 switch parameters.orientation
@@ -83,25 +83,11 @@ switch parameters.orientation
     otherwise
         error('unknown orientation specification.');
 end
-sys.isotopes={electron};
+sys.isotopes={electron,nucleus.iso};
+inter.zeeman.matrix=cell(1,numel(sys.isotopes));
 inter.zeeman.matrix{1}=C*gmat*C';
-if ~isempty(zfs)
-    [~,~,zfs]=mat2ias(C*zfs*C');
-    inter.coupling.matrix{1,1}=zfs;
-else
-    inter.coupling.matrix{1,1}=[];
-end
-for n=1:numel(nuclei)
-    sys.isotopes{n+1}=nuclei{n}.iso;
-    inter.zeeman.matrix{n+1}=zeros(3);
-    inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
-    if ~isempty(nuclei{n}.Q)
-        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
-        inter.coupling.matrix{n+1,n+1}=nqi;
-    else
-        inter.coupling.matrix{n+1,n+1}=[];
-    end
-end
+inter.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
+inter.coupling.matrix{1,2}=C*nucleus.A*C';
 
 end
 

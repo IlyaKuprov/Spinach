@@ -457,12 +457,31 @@ for n=1:numel(xml.children)
         
         % Rotate the tensor
         A=dcm*A*dcm';
-        
+
+        % Classify the first particle
+        spin_a_electron=iselectron(sys.isotopes{inter_spin_a});
+        spin_a_nucleus=isnucleus(sys.isotopes{inter_spin_a});
+
+        % Classify the second particle if present
+        if ~isempty(inter_spin_b)
+            spin_b_electron=iselectron(sys.isotopes{inter_spin_b});
+            spin_b_nucleus=isnucleus(sys.isotopes{inter_spin_b});
+        else
+            spin_b_electron=false();
+            spin_b_nucleus=false();
+        end
+
         % Process interaction type
         switch inter_kind
             
             case 'hfc'
-                
+
+                % Make sure hyperfine coupling joins an electron and a nucleus
+                if ~((spin_a_electron&&spin_b_nucleus)||...
+                     (spin_a_nucleus&&spin_b_electron))
+                    error('hyperfine coupling must connect one electron and one nucleus.');
+                end
+
                 % Make sure coordinates are not specified
                 if (~isempty(inter.coordinates{inter_spin_a}))&&...
                    (~isempty(inter.coordinates{inter_spin_b}))
@@ -504,7 +523,12 @@ for n=1:numel(xml.children)
                 if ~strcmp(inter_units,'ppm')
                     error('unknown chemical shielding units.');
                 end
-                
+
+                % Make sure this is a nuclear Zeeman interaction
+                if ~spin_a_nucleus
+                    error('chemical shielding specified for something that is not a nucleus.');
+                end
+
                 % Catch double spec
                 if ~isempty(inter.zeeman.matrix{inter_spin_a})
                     error('chemical shielding specified twice.');
@@ -538,7 +562,12 @@ for n=1:numel(xml.children)
                 if ~strcmp(inter_units,'ppm')
                     error('unknown chemical shift units.');
                 end
-                
+
+                % Make sure this is a nuclear Zeeman interaction
+                if ~spin_a_nucleus
+                    error('chemical shift specified for something that is not a nucleus.');
+                end
+
                 % Catch double spec
                 if ~isempty(inter.zeeman.matrix{inter_spin_a})
                     error('chemical shift specified twice.');
@@ -597,7 +626,12 @@ for n=1:numel(xml.children)
                 inter.coupling.label{inter_spin_a,inter_spin_b}=inter_label;
             
             case 'quadrupolar'
-                
+
+                % Make sure this is a nuclear quadrupolar interaction
+                if ~spin_a_nucleus
+                    error('quadrupolar interaction specified for something that is not a nucleus.');
+                end
+
                 % Make sure the spin is big enough
                 [~,mult]=spin(sys.isotopes{inter_spin_a});
                 if mult<3, error('quadratic coupling specified for a spin-1/2 particle.'); end
@@ -633,7 +667,12 @@ for n=1:numel(xml.children)
                 inter.coupling.label{inter_spin_a,inter_spin_a}=inter_label;
             
             case 'jcoupling'
-                
+
+                % Make sure J-coupling joins two nuclei
+                if (~spin_a_nucleus)||(~spin_b_nucleus)
+                    error('J-coupling must connect two nuclei.');
+                end
+
                 % Make sure spins are different
                 if inter_spin_a==inter_spin_b
                     error('J-coupling specified between a spin and itself.');
@@ -659,7 +698,7 @@ for n=1:numel(xml.children)
             case 'gtensor'
                 
                 % Make sure the particle is an electron
-                if ~regexp(sys.isotopes{inter_spin_a},'^E\d')
+                if ~spin_a_electron
                     error('g-tensor specified for something that is not an electron.');
                 end
                 
@@ -687,7 +726,7 @@ for n=1:numel(xml.children)
             case 'zfs'
                 
                 % Make sure the particle is an electron
-                if ~regexp(sys.isotopes{inter_spin_a},'^E\d')
+                if ~spin_a_electron
                     error('ZFS specified for something that is not an electron.');
                 end
                 
@@ -728,8 +767,7 @@ for n=1:numel(xml.children)
             case 'exchange'
                 
                 % Make sure both particles are electrons
-                if (~regexp(sys.isotopes{inter_spin_a},'^E\d'))||...
-                   (~regexp(sys.isotopes{inter_spin_b},'^E\d'))
+                if (~spin_a_electron)||(~spin_b_electron)
                     error('exchange coupling specified for something that is not an electron.');
                 end
                 
@@ -765,7 +803,12 @@ for n=1:numel(xml.children)
                 inter.coupling.label{inter_spin_a,inter_spin_b}=inter_label;
             
             case 'spinrotation'
-                
+
+                % Make sure this is a nuclear spin-rotation interaction
+                if ~spin_a_nucleus
+                    error('spin-rotation tensor specified for something that is not a nucleus.');
+                end
+
                 % Catch double spec
                 if ~isempty(inter.spinrot.matrix{inter_spin_a})
                     error('spin-rotation tensor specified twice.');
@@ -802,7 +845,8 @@ for n=1:numel(xml.children)
         
         % Clear temporary variables
         clear('inter_kind','inter_id','inter_units','inter_spin_a','inter_units',...
-              'inter_spin_b','inter_label','inter_reference','A','dcm');
+              'inter_spin_b','inter_label','inter_reference','A','dcm',...
+              'spin_a_electron','spin_a_nucleus','spin_b_electron','spin_b_nucleus');
 
     end
     

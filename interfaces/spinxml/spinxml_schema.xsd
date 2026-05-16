@@ -2,9 +2,18 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            version="1.1">
 
-    <!-- Positive one-based identifiers -->
+    <!-- Canonical positive one-based identifiers -->
     <xs:simpleType name="positive_id">
-        <xs:restriction base="xs:positiveInteger" />
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[1-9][0-9]*" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Spinach isotope lexical names -->
+    <xs:simpleType name="isotope_name">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="([1-9][0-9]*[A-Z][a-z]?|E|E[1-9][0-9]*)" />
+        </xs:restriction>
     </xs:simpleType>
 
     <!-- Finite real scalar values -->
@@ -209,7 +218,7 @@
                         <xs:element name="coordinates" type="vector" />
                     </xs:sequence>
                     <xs:attribute name="id" type="positive_id" use="required" />
-                    <xs:attribute name="isotope" type="xs:string" use="required" />
+                    <xs:attribute name="isotope" type="isotope_name" use="required" />
                     <xs:attribute name="label" type="xs:string" use="optional" />
                 </xs:complexType>
             </xs:element>

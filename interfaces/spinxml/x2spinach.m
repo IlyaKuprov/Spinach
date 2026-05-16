@@ -483,8 +483,12 @@ for n=1:numel(xml.children)
                 switch inter_units
                     case 'Hz'
                         inter.coupling.matrix{inter_spin_a,inter_spin_b}=inter.coupling.matrix{inter_spin_a,inter_spin_b}+A;
+                    case 'kHz'
+                        inter.coupling.matrix{inter_spin_a,inter_spin_b}=inter.coupling.matrix{inter_spin_a,inter_spin_b}+1e3*A;
                     case 'MHz'
                         inter.coupling.matrix{inter_spin_a,inter_spin_b}=inter.coupling.matrix{inter_spin_a,inter_spin_b}+1e6*A;
+                    case 'GHz'
+                        inter.coupling.matrix{inter_spin_a,inter_spin_b}=inter.coupling.matrix{inter_spin_a,inter_spin_b}+1e9*A;
                     case 'gauss'
                         inter.coupling.matrix{inter_spin_a,inter_spin_b}=inter.coupling.matrix{inter_spin_a,inter_spin_b}+1e6*gauss2mhz(A);
                     otherwise
@@ -581,6 +585,10 @@ for n=1:numel(xml.children)
                         inter.coupling.matrix{inter_spin_a,inter_spin_b}=inter.coupling.matrix{inter_spin_a,inter_spin_b}+A;
                     case 'kHz'
                         inter.coupling.matrix{inter_spin_a,inter_spin_b}=inter.coupling.matrix{inter_spin_a,inter_spin_b}+1e3*A;
+                    case 'MHz'
+                        inter.coupling.matrix{inter_spin_a,inter_spin_b}=inter.coupling.matrix{inter_spin_a,inter_spin_b}+1e6*A;
+                    case 'GHz'
+                        inter.coupling.matrix{inter_spin_a,inter_spin_b}=inter.coupling.matrix{inter_spin_a,inter_spin_b}+1e9*A;
                     otherwise
                         error('unknown dipolar coupling units.');
                 end
@@ -609,10 +617,14 @@ for n=1:numel(xml.children)
                 
                 % Assign the quadrupolar coupling
                 switch inter_units
+                    case 'Hz'
+                        inter.coupling.matrix{inter_spin_a,inter_spin_a}=A;
                     case 'kHz'
                         inter.coupling.matrix{inter_spin_a,inter_spin_a}=1e3*A;
                     case 'MHz'
                         inter.coupling.matrix{inter_spin_a,inter_spin_a}=1e6*A;
+                    case 'GHz'
+                        inter.coupling.matrix{inter_spin_a,inter_spin_a}=1e9*A;
                     otherwise
                         error('unknown quadrupolar coupling units.');
                 end
@@ -698,6 +710,10 @@ for n=1:numel(xml.children)
                 
                 % Assign ZFS
                 switch inter_units
+                    case 'Hz'
+                        inter.coupling.matrix{inter_spin_a,inter_spin_a}=A;
+                    case 'kHz'
+                        inter.coupling.matrix{inter_spin_a,inter_spin_a}=1e3*A;
                     case 'MHz'
                         inter.coupling.matrix{inter_spin_a,inter_spin_a}=1e6*A;
                     case 'GHz'
@@ -729,6 +745,12 @@ for n=1:numel(xml.children)
                 
                 % Assign the exchange coupling
                 switch inter_units
+                    case 'Hz'
+                        inter.coupling.matrix{inter_spin_a,inter_spin_b}=...
+                        inter.coupling.matrix{inter_spin_a,inter_spin_b}+A;
+                    case 'kHz'
+                        inter.coupling.matrix{inter_spin_a,inter_spin_b}=...
+                        inter.coupling.matrix{inter_spin_a,inter_spin_b}+1e3*A;
                     case 'MHz'
                         inter.coupling.matrix{inter_spin_a,inter_spin_b}=...
                         inter.coupling.matrix{inter_spin_a,inter_spin_b}+1e6*A;

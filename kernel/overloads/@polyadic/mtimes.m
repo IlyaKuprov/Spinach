@@ -74,8 +74,11 @@ if ~isa(B,'polyadic')&&isnumeric(B)
     end
     B=full(B);
    
+    % Preallocate the core product result
+    core_rows=prod(cellfun(@(x)size(x,1),A.cores{1}));
+    C=zeros(core_rows,size(B,2));
+
     % Multiply by cores
-    C=zeros(size(B));
     for n=1:numel(A.cores)
         C=C+kronm(A.cores{n},B);
     end
@@ -165,4 +168,3 @@ end
 % immediately, so I can work out who to blame."
 %
 % Preface to a cryptanalysis book
-

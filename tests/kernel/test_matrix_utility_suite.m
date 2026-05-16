@@ -38,6 +38,16 @@ result=test_close(result,'cheap_norm polyadic positive',cheap_norm(P),norm(A,1),
 result=test_close(result,'cheap_norm polyadic block',cheap_norm(P,2,5),norm(A,1),1e-15,1e-15,...
                   'the block estimator keeps the non-negative exactness property');
 
+% Check rectangular polyadic sign-history dimensions
+R=[1 0;2 3;4 5];
+P=polyadic({{R}});
+result=test_close(result,'cheap_norm polyadic tall',cheap_norm(P),norm(R,1),1e-15,1e-15,...
+                  'tall rectangular polyadics use row-length sign vectors and column-length probes');
+R=[1 2 3;4 5 6];
+P=polyadic({{R}});
+result=test_close(result,'cheap_norm polyadic wide',cheap_norm(P,2,5),norm(R,1),1e-15,1e-15,...
+                  'wide rectangular polyadics use row-length sign vectors and column-length probes');
+
 % Check the Higham-Tisseur zero-sign convention
 Z=[-2 0;-1 2];
 P=polyadic({{Z}});

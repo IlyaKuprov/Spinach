@@ -52,23 +52,23 @@ if ~isa(A,'polyadic')
     n=norm(A,1); return
 end
 
-% Relevant dimension
-dim=size(A,2);
+% Relevant dimensions
+row_dim=size(A,1); col_dim=size(A,2);
 
 % Respect small dimensions
-t=min(t,dim);
+t=min(t,col_dim);
 
 % Starting matrix
-X=ones(dim,t);
+X=ones(col_dim,t);
 if t>1
     for col_idx=2:t
-        X(:,col_idx)=2*randi([0 1],dim,1)-1;
+        X(:,col_idx)=2*randi([0 1],col_dim,1)-1;
     end
     for col_idx=1:t
         sign_pool=X(:,[1:(col_idx-1) (col_idx+1):t]);
         ntries=0;
-        while any(abs(sign_pool'*X(:,col_idx))==dim)
-            X(:,col_idx)=2*randi([0 1],dim,1)-1;
+        while any(abs(sign_pool'*X(:,col_idx))==col_dim)
+            X(:,col_idx)=2*randi([0 1],col_dim,1)-1;
             sign_pool=X(:,[1:(col_idx-1) (col_idx+1):t]);
             ntries=ntries+1;
             if ntries>100
@@ -77,10 +77,10 @@ if t>1
         end
     end
 end
-X=X/dim;
+X=X/col_dim;
 
 % Estimator state
-idx_hist=[]; idx=1:t; idx_best=1; est_old=0; S=zeros(dim,t);
+idx_hist=[]; idx=1:t; idx_best=1; est_old=0; S=zeros(row_dim,t);
 
 % Iteration loop
 for k=1:(itmax+1)
@@ -110,15 +110,15 @@ for k=1:(itmax+1)
 
     % Remove redundant sign probes in the real case
     if isreal(A)
-        if all(any(abs(S_old'*S)==dim,1))
+        if all(any(abs(S_old'*S)==row_dim,1))
             n=est_old; return
         end
         if t>1
             for col_idx=1:t
                 sign_pool=[S(:,[1:(col_idx-1) (col_idx+1):t]) S_old];
                 ntries=0;
-                while any(abs(sign_pool'*S(:,col_idx))==dim)
-                    S(:,col_idx)=2*randi([0 1],dim,1)-1;
+                while any(abs(sign_pool'*S(:,col_idx))==row_dim)
+                    S(:,col_idx)=2*randi([0 1],row_dim,1)-1;
                     sign_pool=[S(:,[1:(col_idx-1) (col_idx+1):t]) S_old];
                     ntries=ntries+1;
                     if ntries>100
@@ -149,7 +149,7 @@ for k=1:(itmax+1)
     end
 
     % Assemble the next probe matrix
-    X=zeros(dim,t);
+    X=zeros(col_dim,t);
     for col_idx=1:t
         X(idx(col_idx),col_idx)=1;
     end
@@ -181,4 +181,3 @@ end
 % when they are anything but.
 %
 % Rod Liddle
-

@@ -31,6 +31,52 @@ result=test_close(result,'acomm',acomm(A,B),A*B+B*A,1e-15,1e-15,...
 result=test_close(result,'cheap_norm CPU',cheap_norm(A),norm(A,1),1e-15,1e-15,...
                   'for CPU matrices cheap_norm returns the matrix one-norm');
 
+% Check polyadic norm estimation paths
+P=polyadic({{A}});
+result=test_close(result,'cheap_norm polyadic positive',cheap_norm(P),norm(A,1),1e-15,1e-15,...
+                  'the estimator is exact on non-negative matrices after its forced second iteration');
+result=test_close(result,'cheap_norm polyadic block',cheap_norm(P,2,5),norm(A,1),1e-15,1e-15,...
+                  'the block estimator keeps the non-negative exactness property');
+
+% Check rectangular polyadic sign-history dimensions
+R=[1 0;2 3;4 5];
+P=polyadic({{R}});
+result=test_close(result,'cheap_norm polyadic tall',cheap_norm(P),norm(R,1),1e-15,1e-15,...
+                  'tall rectangular polyadics use row-length sign vectors and column-length probes');
+R=[1 2 3;4 5 6];
+P=polyadic({{R}});
+result=test_close(result,'cheap_norm polyadic wide',cheap_norm(P,2,5),norm(R,1),1e-15,1e-15,...
+                  'wide rectangular polyadics use row-length sign vectors and column-length probes');
+
+% Check the Higham-Tisseur zero-sign convention
+Z=[-2 0;-1 2];
+P=polyadic({{Z}});
+result=test_close(result,'cheap_norm polyadic zero sign',cheap_norm(P),norm(Z,1),1e-15,1e-15,...
+                  'zero phase entries are treated as one, as required by Algorithm 2.4');
+
+% Check complex adjoint and phase handling
+Z=[-2 0;-1+1i 2];
+P=polyadic({{Z}});
+result=test_close(result,'cheap_norm polyadic complex',cheap_norm(P),norm(Z,1),1e-15,1e-15,...
+                  'complex polyadic estimation uses conjugate transposes and unit phases');
+
+% Check the block estimator lower-bound contract
+rng_state=rng;
+rng_cleanup=onCleanup(@()rng(rng_state));
+rng(1);
+Z=[0 -3 2 1;4 0 -1 2;-2 5 0 -4;1 -1 3 0];
+P=polyadic({{Z}});
+est=cheap_norm(P,3,5);
+result=test_true(result,'cheap_norm polyadic lower bound',(est<=norm(Z,1)+1e-12)&&(est>0),...
+                 'Algorithm 2.4 returns a positive lower bound not exceeding the exact one-norm');
+clear('rng_cleanup');
+
+% Check polyadic realness dispatch
+result=test_true(result,'polyadic isreal true',isreal(polyadic({{Z}})),...
+                 'real polyadic cores are recognised without opening the Kronecker products');
+result=test_true(result,'polyadic isreal false',~isreal(polyadic({{[1 1i;0 2]}})),...
+                 'complex polyadic cores are recognised without opening the Kronecker products');
+
 % Check identity and trace predicates
 result=test_true(result,'iseye true',iseye(speye(3)),...
                  'the sparse unit matrix is recognised as identity');
@@ -70,4 +116,3 @@ result=test_close(result,'clean_up sparse tolerance',C_obs,sparse([0 1;0 2]),1e-
                   'clean_up removes elements below the requested non-zero tolerance');
 
 end
-

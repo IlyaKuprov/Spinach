@@ -1,33 +1,31 @@
-% The cheapest possible norm for various representations of matrices. CUDA
-% stores matrices by rows, Matlab by columns, and polyadic objects can on-
-% ly multiply vectors, in which case Algorithm 2.4 from Higham and
-% Tisseur's paper:
+% The cheapest norm for various representations of matrices. CUDA
+% stores matrices by rows, Matlab by columns, and polyadic objects
+% can only multiply vectors, in which case Algorithm 2.4 from Hig-
+% ham and Tisseur's paper:
 %
-%                 https://doi.org/10.1137/S0895479899356080
+%            https://doi.org/10.1137/S0895479899356080
 %
 % is used. Syntax:
 %
-%                            n=cheap_norm(A)
-%                         n=cheap_norm(A,t)
 %                    n=cheap_norm(A,t,itmax)
 %
 % Parameters:
 %
 %     A     - a matrix, or a polyadic representation thereof
 %
-%     t     - number of probe columns in the polyadic norm estimator,
-%             optional, defaults to 1
+%     t     - (optional) number of probe columns in the poly-
+%             adic norm estimator, defaults to 1
 %
-%     itmax - maximum number of estimator iterations, optional,
-%             defaults to 5
+%     itmax - (optional) maximum number of estimator iterati-
+%             ons, defaults to 5
 %
 % Outputs:
 %
 %     n - infinity-norm for GPU arrays, 1-norm for CPU arrays,
 %         and a lower-bound 1-norm estimate for polyadics
 %
-% Note: some norms are vastly more expensive than others, this function
-%       uses the cheapest ones available.
+% Note: some norms are vastly more expensive than others, this
+%       function uses the cheapest ones available.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -181,3 +179,4 @@ end
 % when they are anything but.
 %
 % Rod Liddle
+

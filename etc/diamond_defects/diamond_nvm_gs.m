@@ -68,6 +68,8 @@ end
 
 % Define spin system isotopes
 sys.isotopes={'E3',parameters.nitrogen};
+inter.zeeman.matrix=cell(1,numel(sys.isotopes));
+inter.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
 
 % Electron relaxation rates
 a1=0.8*parameters.concentration;    % s^-1*ppm^-1
@@ -113,9 +115,6 @@ end
 % Electron g-tensor
 inter.zeeman.matrix{1}=R*diag([2.0031 2.0031 2.0029])*R';
 
-% Nuclear shielding tensor is ignored
-inter.zeeman.matrix{2}=zeros(3);
-
 % Electron ZFS tensor
 inter.coupling.matrix{1,1}=R*zfs2mat(2872e6,0,0,0,0)*R';
 
@@ -132,7 +131,6 @@ switch parameters.nitrogen
 
         % Only hyperfine coupling, opposite sign
         inter.coupling.matrix{1,2}=R*diag([3.65e6 3.65e6 3.03e6])*R';
-        inter.coupling.matrix{2,2}=[];
 
     otherwise
 

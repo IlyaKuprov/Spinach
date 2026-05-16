@@ -44,9 +44,9 @@ nuclei={};
 % Add the silicon isotope if requested
 silicon=parameters.silicon;
 if strcmp(silicon,'29Si')
-    nuclei{end+1}=struct('iso','29Si','A',((frame)*diag([78.9e6 78.9e6 76.3e6])*(frame)'),'Q',[]);
+    nuclei{end+1}=struct('iso','29Si','A',((frame)*diag([78.9e6 78.9e6 76.3e6])*(frame)'));
 elseif ~strcmp(silicon,'none')
-    nuclei{end+1}=struct('iso',silicon,'A',zeros(3),'Q',[]);
+    nuclei{end+1}=struct('iso',silicon);
 end
 
 % Add reported nearest-neighbour carbons
@@ -55,7 +55,7 @@ if parameters.include_13c
     nuc_idx=numel(nuclei);
     nuclei(nuc_idx+1:nuc_idx+6)={[]};
     for n=1:6
-        nuclei{nuc_idx+n}=struct('iso','13C','A',Cmat,'Q',[]);
+        nuclei{nuc_idx+n}=struct('iso','13C','A',Cmat);
     end
 end
 
@@ -71,22 +71,17 @@ switch parameters.orientation
         error('unknown orientation specification.');
 end
 sys.isotopes={electron};
-inter.zeeman.matrix{1}=C*gmat*C';
-if ~isempty(zfs)
-    [~,~,zfs]=mat2ias(C*zfs*C');
-    inter.coupling.matrix{1,1}=zfs;
-else
-    inter.coupling.matrix{1,1}=[];
-end
 for n=1:numel(nuclei)
     sys.isotopes{n+1}=nuclei{n}.iso;
-    inter.zeeman.matrix{n+1}=zeros(3);
-    inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
-    if ~isempty(nuclei{n}.Q)
-        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
-        inter.coupling.matrix{n+1,n+1}=nqi;
-    else
-        inter.coupling.matrix{n+1,n+1}=[];
+end
+inter.zeeman.matrix=cell(1,numel(sys.isotopes));
+inter.zeeman.matrix{1}=C*gmat*C';
+inter.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
+[~,~,zfs]=mat2ias(C*zfs*C');
+inter.coupling.matrix{1,1}=zfs;
+for n=1:numel(nuclei)
+    if isfield(nuclei{n},'A')&&norm(nuclei{n}.A,2)>0
+        inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
     end
 end
 

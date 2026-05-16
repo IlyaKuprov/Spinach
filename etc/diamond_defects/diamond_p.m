@@ -38,7 +38,7 @@ hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
 
 % Select the phosphorus centre
 centre=lower(parameters.centre);
-electron='E'; zfs=[];
+electron='E';
 nuclei={}; frame=eye(3);
 
 % Set the trigonal principal-axis frame
@@ -51,47 +51,47 @@ switch centre
     case 'ma1'
         gmat=eye(3)*2.0025;
         nuclei{end+1}=struct('iso','31P','A',...
-            ((frame_111)*diag([1.96 1.96 2.32]*hz_per_mt)*(frame_111)'),'Q',[]);
+            ((frame_111)*diag([1.96 1.96 2.32]*hz_per_mt)*(frame_111)'));
         if parameters.include_13c
             nuclei{end+1}=struct('iso','13C','A',...
-                ((frame_111)*diag([13.92 13.92 18.13]*hz_per_mt)*(frame_111)'),'Q',[]);
+                ((frame_111)*diag([13.92 13.92 18.13]*hz_per_mt)*(frame_111)'));
         end
     case 'np1'
         gmat=((frame)*diag([2.00243 2.0028 2.0026])*(frame)');
-        nuclei{end+1}=struct('iso','31P','A',((frame)*diag([2.08 2.02 2.18]*hz_per_mt)*(frame)'),'Q',[]);
-        nuclei{end+1}=struct('iso','14N','A',((frame)*diag([4.08 3.10 3.00]*hz_per_mt)*(frame)'),'Q',[]);
+        nuclei{end+1}=struct('iso','31P','A',((frame)*diag([2.08 2.02 2.18]*hz_per_mt)*(frame)'));
+        nuclei{end+1}=struct('iso','14N','A',((frame)*diag([4.08 3.10 3.00]*hz_per_mt)*(frame)'));
     case 'np2'
         gmat=eye(3)*2.0025;
         nuclei{end+1}=struct('iso','31P','A',...
-            ((frame_111)*diag([2.09 2.09 2.34]*hz_per_mt)*(frame_111)'),'Q',[]);
+            ((frame_111)*diag([2.09 2.09 2.34]*hz_per_mt)*(frame_111)'));
         nuclei{end+1}=struct('iso','14N','A',...
-            ((frame_111)*diag([3.09 3.09 6.42]*hz_per_mt)*(frame_111)'),'Q',[]);
+            ((frame_111)*diag([3.09 3.09 6.42]*hz_per_mt)*(frame_111)'));
     case 'np3'
         gmat=eye(3)*2.0025;
         nuclei{end+1}=struct('iso','31P','A',...
-            ((frame_111)*diag([18.23 18.23 17.48]*hz_per_mt)*(frame_111)'),'Q',[]);
+            ((frame_111)*diag([18.23 18.23 17.48]*hz_per_mt)*(frame_111)'));
         nuclei{end+1}=struct('iso','14N','A',...
-            ((frame_111)*diag([0.33 0.33 0.10]*hz_per_mt)*(frame_111)'),'Q',[]);
+            ((frame_111)*diag([0.33 0.33 0.10]*hz_per_mt)*(frame_111)'));
     case 'np4'
         gmat=((frame)*diag([2.0009 2.0012 2.00047])*(frame)');
-        nuclei{end+1}=struct('iso','31P','A',((frame)*diag([5.456 3.838 3.80]*hz_per_mt)*(frame)'),'Q',[]);
+        nuclei{end+1}=struct('iso','31P','A',((frame)*diag([5.456 3.838 3.80]*hz_per_mt)*(frame)'));
     case 'np5'
         gmat=((frame_111)*diag([2.0009 2.0009 2.00087])*(frame_111)');
         nuclei{end+1}=struct('iso','31P','A',...
-            ((frame_111)*diag([1.024 1.024 6.522]*hz_per_mt)*(frame_111)'),'Q',[]);
+            ((frame_111)*diag([1.024 1.024 6.522]*hz_per_mt)*(frame_111)'));
     case 'np6'
         gmat=((frame_111)*diag([2.00083 2.00083 2.00085])*(frame_111)');
-        nuclei{end+1}=struct('iso','31P','A',((frame)*diag([7.585 2.942 2.328]*hz_per_mt)*(frame)'),'Q',[]);
+        nuclei{end+1}=struct('iso','31P','A',((frame)*diag([7.585 2.942 2.328]*hz_per_mt)*(frame)'));
     case 'np8'
         gmat=((frame_111)*diag([2.0016 2.0016 2.0048])*(frame_111)');
         nuclei{end+1}=struct('iso','31P','A',...
-            ((frame_111)*diag([3.2 3.2 5.6]*hz_per_mt)*(frame_111)'),'Q',[]);
+            ((frame_111)*diag([3.2 3.2 5.6]*hz_per_mt)*(frame_111)'));
         nuclei{end+1}=struct('iso','31P','A',...
-            ((frame_111)*diag([8.8 8.8 13.6]*hz_per_mt)*(frame_111)'),'Q',[]);
+            ((frame_111)*diag([8.8 8.8 13.6]*hz_per_mt)*(frame_111)'));
     case 'np9'
         gmat=((frame_111)*diag([2.0038 2.0038 2.0030])*(frame_111)');
         nuclei{end+1}=struct('iso','31P','A',...
-            ((frame_111)*diag([2.2 2.2 1.4]*hz_per_mt)*(frame_111)'),'Q',[]);
+            ((frame_111)*diag([2.2 2.2 1.4]*hz_per_mt)*(frame_111)'));
     otherwise
         error('unknown phosphorus centre.');
 end
@@ -108,22 +108,15 @@ switch parameters.orientation
         error('unknown orientation specification.');
 end
 sys.isotopes={electron};
-inter.zeeman.matrix{1}=C*gmat*C';
-if ~isempty(zfs)
-    [~,~,zfs]=mat2ias(C*zfs*C');
-    inter.coupling.matrix{1,1}=zfs;
-else
-    inter.coupling.matrix{1,1}=[];
-end
 for n=1:numel(nuclei)
     sys.isotopes{n+1}=nuclei{n}.iso;
-    inter.zeeman.matrix{n+1}=zeros(3);
-    inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
-    if ~isempty(nuclei{n}.Q)
-        [~,~,nqi]=mat2ias(C*nuclei{n}.Q*C');
-        inter.coupling.matrix{n+1,n+1}=nqi;
-    else
-        inter.coupling.matrix{n+1,n+1}=[];
+end
+inter.zeeman.matrix=cell(1,numel(sys.isotopes));
+inter.zeeman.matrix{1}=C*gmat*C';
+inter.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
+for n=1:numel(nuclei)
+    if isfield(nuclei{n},'A')&&norm(nuclei{n}.A,2)>0
+        inter.coupling.matrix{1,n+1}=C*nuclei{n}.A*C';
     end
 end
 

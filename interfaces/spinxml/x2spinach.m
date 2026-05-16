@@ -635,7 +635,8 @@ for n=1:numel(xml.children)
                 % Assign the J-coupling
                 switch inter_units
                     case 'Hz'
-                        inter.coupling.matrix{inter_spin_a,inter_spin_b}=A;
+                        inter.coupling.matrix{inter_spin_a,inter_spin_b}=...
+                        inter.coupling.matrix{inter_spin_a,inter_spin_b}+A;
                     otherwise
                         error('unknown J-coupling units.');
                 end
@@ -729,9 +730,11 @@ for n=1:numel(xml.children)
                 % Assign the exchange coupling
                 switch inter_units
                     case 'MHz'
-                        inter.coupling.matrix{inter_spin_a,inter_spin_b}=1e6*A;
+                        inter.coupling.matrix{inter_spin_a,inter_spin_b}=...
+                        inter.coupling.matrix{inter_spin_a,inter_spin_b}+1e6*A;
                     case 'GHz'
-                        inter.coupling.matrix{inter_spin_a,inter_spin_b}=1e9*A;
+                        inter.coupling.matrix{inter_spin_a,inter_spin_b}=...
+                        inter.coupling.matrix{inter_spin_a,inter_spin_b}+1e9*A;
                     otherwise
                         error('unknown exchange coupling units.');
                 end

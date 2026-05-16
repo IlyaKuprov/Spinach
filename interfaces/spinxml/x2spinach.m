@@ -757,8 +757,10 @@ for n=1:numel(xml.children)
                         inter.spinrot.matrix{inter_spin_a}=A;
                     case 'kHz'
                         inter.spinrot.matrix{inter_spin_a}=1e3*A;
-                    case 'GHz'
+                    case 'MHz'
                         inter.spinrot.matrix{inter_spin_a}=1e6*A;
+                    case 'GHz'
+                        inter.spinrot.matrix{inter_spin_a}=1e9*A;
                     otherwise
                         error('unknown spin-rotation tensor units.');
                 end

@@ -2,283 +2,285 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            version="1.1">
 
+    <!-- Canonical positive one-based identifiers -->
     <xs:simpleType name="positive_id">
-        <xs:restriction base="xs:positiveInteger" />
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[1-9][0-9]*" />
+        </xs:restriction>
     </xs:simpleType>
 
+    <!-- Spinach isotope lexical names -->
+    <xs:simpleType name="isotope_name">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="([1-9][0-9]*[A-Z][a-z]?|E|E[1-9][0-9]*)" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Finite real scalar values -->
+    <xs:simpleType name="finite_double">
+        <xs:restriction base="xs:double">
+            <xs:assertion test="$value=$value" />
+            <xs:minExclusive value="-INF" />
+            <xs:maxExclusive value="INF" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Interaction kind names -->
+    <xs:simpleType name="interaction_kind">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="hfc" />
+            <xs:enumeration value="shielding" />
+            <xs:enumeration value="shift" />
+            <xs:enumeration value="dipolar" />
+            <xs:enumeration value="quadrupolar" />
+            <xs:enumeration value="jcoupling" />
+            <xs:enumeration value="gtensor" />
+            <xs:enumeration value="zfs" />
+            <xs:enumeration value="exchange" />
+            <xs:enumeration value="spinrotation" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Unit names used by all interaction types -->
+    <xs:simpleType name="unit_kind">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Hz" />
+            <xs:enumeration value="kHz" />
+            <xs:enumeration value="MHz" />
+            <xs:enumeration value="GHz" />
+            <xs:enumeration value="ppm" />
+            <xs:enumeration value="bohr" />
+            <xs:enumeration value="gauss" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Three-dimensional real vector -->
     <xs:complexType name="vector">
-        <xs:attribute name="x"
-                      type="xs:double"
-                      use="required" />
-        <xs:attribute name="y"
-                      type="xs:double"
-                      use="required" />
-        <xs:attribute name="z"
-                      type="xs:double"
-                      use="required" />
+        <xs:attribute name="x" type="finite_double" use="required" />
+        <xs:attribute name="y" type="finite_double" use="required" />
+        <xs:attribute name="z" type="finite_double" use="required" />
     </xs:complexType>
 
+    <!-- Three-by-three real matrix -->
     <xs:complexType name="matrix">
-        <xs:attribute name="xx"
-                      type="xs:double"
-                      use="required" />
-        <xs:attribute name="xy"
-                      type="xs:double"
-                      use="required" />
-        <xs:attribute name="xz"
-                      type="xs:double"
-                      use="required" />
-        <xs:attribute name="yx"
-                      type="xs:double"
-                      use="required" />
-        <xs:attribute name="yy"
-                      type="xs:double"
-                      use="required" />
-        <xs:attribute name="yz"
-                      type="xs:double"
-                      use="required" />
-        <xs:attribute name="zx"
-                      type="xs:double"
-                      use="required" />
-        <xs:attribute name="zy"
-                      type="xs:double"
-                      use="required" />
-        <xs:attribute name="zz"
-                      type="xs:double"
-                      use="required" />
+        <xs:attribute name="xx" type="finite_double" use="required" />
+        <xs:attribute name="xy" type="finite_double" use="required" />
+        <xs:attribute name="xz" type="finite_double" use="required" />
+        <xs:attribute name="yx" type="finite_double" use="required" />
+        <xs:attribute name="yy" type="finite_double" use="required" />
+        <xs:attribute name="yz" type="finite_double" use="required" />
+        <xs:attribute name="zx" type="finite_double" use="required" />
+        <xs:attribute name="zy" type="finite_double" use="required" />
+        <xs:attribute name="zz" type="finite_double" use="required" />
     </xs:complexType>
 
+    <!-- Tensor orientation in space -->
     <xs:complexType name="rotation">
-        <xs:choice minOccurs="1"
-                   maxOccurs="1">
+        <xs:choice minOccurs="1" maxOccurs="1">
+
+            <!-- Euler angle convention used by Spinach -->
             <xs:element name="euler_angles">
                 <xs:complexType>
-                    <xs:attribute name="alpha"
-                                  type="xs:double"
-                                  use="required" />
-                    <xs:attribute name="beta"
-                                  type="xs:double"
-                                  use="required" />
-                    <xs:attribute name="gamma"
-                                  type="xs:double"
-                                  use="required" />
+                    <xs:attribute name="alpha" type="finite_double" use="required" />
+                    <xs:attribute name="beta" type="finite_double" use="required" />
+                    <xs:attribute name="gamma" type="finite_double" use="required" />
                 </xs:complexType>
             </xs:element>
+
+            <!-- Angle-axis rotation specification -->
             <xs:element name="angle_axis">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="angle"
-                                    minOccurs="1"
-                                    maxOccurs="1">
+                        <xs:element name="angle" minOccurs="1" maxOccurs="1">
                             <xs:complexType>
-                                <xs:attribute name="phi"
-                                              type="xs:double"
-                                              use="required" />
+                                <xs:attribute name="phi" type="finite_double" use="required" />
                             </xs:complexType>
                         </xs:element>
-                        <xs:element name="axis"
-                                    type="vector"
-                                    minOccurs="1"
-                                    maxOccurs="1" />
+                        <xs:element name="axis" type="vector" minOccurs="1" maxOccurs="1" />
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+
+            <!-- Quaternion rotation specification -->
             <xs:element name="quaternion">
                 <xs:complexType>
-                    <xs:attribute name="re"
-                                  type="xs:double"
-                                  use="required" />
-                    <xs:attribute name="i"
-                                  type="xs:double"
-                                  use="required" />
-                    <xs:attribute name="j"
-                                  type="xs:double"
-                                  use="required" />
-                    <xs:attribute name="k"
-                                  type="xs:double"
-                                  use="required" />
+                    <xs:attribute name="re" type="finite_double" use="required" />
+                    <xs:attribute name="i" type="finite_double" use="required" />
+                    <xs:attribute name="j" type="finite_double" use="required" />
+                    <xs:attribute name="k" type="finite_double" use="required" />
                 </xs:complexType>
             </xs:element>
-            <xs:element name="dcm"
-                        type="matrix" />
+
+            <!-- Direction cosine matrix specification -->
+            <xs:element name="dcm" type="matrix" />
+
         </xs:choice>
     </xs:complexType>
 
-    <xs:complexType name="interaction_term">
-        <xs:choice minOccurs="1"
-                   maxOccurs="1">
+    <!-- Numerical specification of an interaction tensor -->
+    <xs:complexType name="interaction_tensor">
+        <xs:choice minOccurs="1" maxOccurs="1">
+
+            <!-- Isotropic tensor specification -->
             <xs:element name="scalar">
                 <xs:complexType>
-                    <xs:attribute name="iso"
-                                  type="xs:double"
-                                  use="required" />
+                    <xs:attribute name="iso" type="finite_double" use="required" />
                 </xs:complexType>
             </xs:element>
-            <xs:element name="tensor"
-                        type="matrix" />
+
+            <!-- Full Cartesian tensor specification -->
+            <xs:element name="tensor" type="matrix" />
+
+            <!-- Principal values with explicit orientation -->
             <xs:sequence>
-                <xs:choice minOccurs="1"
-                           maxOccurs="1">
+                <xs:choice minOccurs="1" maxOccurs="1">
+
+                    <!-- Diagonal tensor eigenvalues -->
                     <xs:element name="eigenvalues">
                         <xs:complexType>
-                            <xs:attribute name="xx"
-                                          type="xs:double"
-                                          use="required" />
-                            <xs:attribute name="yy"
-                                          type="xs:double"
-                                          use="required" />
-                            <xs:attribute name="zz"
-                                          type="xs:double"
-                                          use="required" />
+                            <xs:attribute name="xx" type="finite_double" use="required" />
+                            <xs:attribute name="yy" type="finite_double" use="required" />
+                            <xs:attribute name="zz" type="finite_double" use="required" />
                         </xs:complexType>
                     </xs:element>
+
+                    <!-- Haeberlen axiality-rhombicity parametrisation -->
                     <xs:element name="axiality_rhombicity">
                         <xs:complexType>
-                            <xs:attribute name="iso"
-                                          type="xs:double"
-                                          use="required" />
-                            <xs:attribute name="ax"
-                                          type="xs:double"
-                                          use="required" />
-                            <xs:attribute name="rh"
-                                          type="xs:double"
-                                          use="required" />
+                            <xs:attribute name="iso" type="finite_double" use="required" />
+                            <xs:attribute name="ax" type="finite_double" use="required" />
+                            <xs:attribute name="rh" type="finite_double" use="required" />
                         </xs:complexType>
                     </xs:element>
+
+                    <!-- Herzfeld-Berger span-skew parametrisation -->
                     <xs:element name="span_skew">
                         <xs:complexType>
-                            <xs:attribute name="iso"
-                                          type="xs:double"
-                                          use="required" />
-                            <xs:attribute name="span"
-                                          type="xs:double"
-                                          use="required" />
-                            <xs:attribute name="skew"
-                                          type="xs:double"
-                                          use="required" />
+                            <xs:attribute name="iso" type="finite_double" use="required" />
+                            <xs:attribute name="span" type="finite_double" use="required" />
+                            <xs:attribute name="skew" type="finite_double" use="required" />
                         </xs:complexType>
                     </xs:element>
+
+                    <!-- Anisotropy-asymmetry parametrisation -->
                     <xs:element name="aniso_asymm">
                         <xs:complexType>
-                            <xs:attribute name="iso"
-                                          type="xs:double"
-                                          use="required" />
-                            <xs:attribute name="aniso"
-                                          type="xs:double"
-                                          use="required" />
-                            <xs:attribute name="asymm"
-                                          type="xs:double"
-                                          use="required" />
+                            <xs:attribute name="iso" type="finite_double" use="required" />
+                            <xs:attribute name="aniso" type="finite_double" use="required" />
+                            <xs:attribute name="asymm" type="finite_double" use="required" />
                         </xs:complexType>
                     </xs:element>
+
                 </xs:choice>
-                <xs:element name="orientation"
-                            type="rotation" />
+
+                <!-- Orientation of the principal axis system -->
+                <xs:element name="orientation" type="rotation" />
+
             </xs:sequence>
+
         </xs:choice>
-        <xs:attribute name="kind"
-                      use="required">
-            <xs:simpleType>
-                <xs:restriction base="xs:string">
-                    <xs:enumeration value="hfc" />
-                    <xs:enumeration value="shielding" />
-                    <xs:enumeration value="shift" />
-                    <xs:enumeration value="dipolar" />
-                    <xs:enumeration value="quadrupolar" />
-                    <xs:enumeration value="jcoupling" />
-                    <xs:enumeration value="gtensor" />
-                    <xs:enumeration value="zfs" />
-                    <xs:enumeration value="exchange" />
-                    <xs:enumeration value="spinrotation" />
-                </xs:restriction>
-            </xs:simpleType>
-        </xs:attribute>
-        <xs:attribute name="id"
-                      type="positive_id"
-                      use="required" />
-        <xs:attribute name="units"
-                      use="required">
-            <xs:simpleType>
-                <xs:restriction base="xs:string">
-                    <xs:enumeration value="Hz" />
-                    <xs:enumeration value="kHz" />
-                    <xs:enumeration value="MHz" />
-                    <xs:enumeration value="GHz" />
-                    <xs:enumeration value="ppm" />
-                    <xs:enumeration value="bohr" />
-                    <xs:enumeration value="gauss" />
-                </xs:restriction>
-            </xs:simpleType>
-        </xs:attribute>
-        <xs:attribute name="spin_a"
-                      type="positive_id"
-                      use="required" />
-        <xs:attribute name="spin_b"
-                      type="positive_id"
-                      use="optional" />
-        <xs:attribute name="reference"
-                      type="xs:string"
-                      use="optional" />
-        <xs:attribute name="label"
-                      type="xs:string"
-                      use="optional" />
     </xs:complexType>
 
+    <!-- Spin interaction record -->
+    <xs:complexType name="interaction_term">
+        <xs:complexContent>
+            <xs:extension base="interaction_tensor">
+                <xs:attribute name="kind" type="interaction_kind" use="required" />
+                <xs:attribute name="id" type="positive_id" use="required" />
+                <xs:attribute name="units" type="unit_kind" use="required" />
+                <xs:attribute name="spin_a" type="positive_id" use="required" />
+                <xs:attribute name="spin_b" type="positive_id" use="optional" />
+                <xs:attribute name="reference" type="xs:string" use="optional" />
+                <xs:attribute name="label" type="xs:string" use="optional" />
+
+                <!-- Kind-specific unit restrictions -->
+                <xs:assert test="not(@kind='hfc') or @units=('Hz','kHz','MHz','GHz','gauss')" />
+                <xs:assert test="not(@kind=('shielding','shift')) or @units='ppm'" />
+                <xs:assert test="not(@kind='dipolar') or @units=('Hz','kHz','MHz','GHz')" />
+                <xs:assert test="not(@kind='quadrupolar') or @units=('Hz','kHz','MHz','GHz')" />
+                <xs:assert test="not(@kind='jcoupling') or @units='Hz'" />
+                <xs:assert test="not(@kind='gtensor') or @units='bohr'" />
+                <xs:assert test="not(@kind='zfs') or @units=('Hz','kHz','MHz','GHz')" />
+                <xs:assert test="not(@kind='exchange') or @units=('Hz','kHz','MHz','GHz')" />
+                <xs:assert test="not(@kind='spinrotation') or @units=('Hz','kHz','MHz','GHz')" />
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- Complete SpinXML spin system -->
     <xs:complexType name="spin_system">
-        <xs:sequence minOccurs="1"
-                     maxOccurs="1">
-            <xs:element name="spin"
-                        minOccurs="1"
-                        maxOccurs="unbounded">
+        <xs:sequence minOccurs="1" maxOccurs="1">
+
+            <!-- Spin record -->
+            <xs:element name="spin" minOccurs="1" maxOccurs="unbounded">
                 <xs:complexType>
-                    <xs:sequence minOccurs="0"
-                                 maxOccurs="1">
-                        <xs:element name="coordinates"
-                                    type="vector" />
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element name="coordinates" type="vector" />
                     </xs:sequence>
-                    <xs:attribute name="id"
-                                  type="positive_id"
-                                  use="required" />
-                    <xs:attribute name="isotope"
-                                  type="xs:string"
-                                  use="required" />
-                    <xs:attribute name="label"
-                                  type="xs:string"
-                                  use="optional" />
+                    <xs:attribute name="id" type="positive_id" use="required" />
+                    <xs:attribute name="isotope" type="isotope_name" use="required" />
+                    <xs:attribute name="label" type="xs:string" use="optional" />
                 </xs:complexType>
             </xs:element>
-            <xs:element name="interaction"
-                        type="interaction_term"
-                        minOccurs="0"
-                        maxOccurs="unbounded" />
+
+            <!-- Spin interaction record -->
+            <xs:element name="interaction" type="interaction_term" minOccurs="0" maxOccurs="unbounded" />
+
         </xs:sequence>
+
+        <!-- Spin identifiers must be consecutive from one -->
         <xs:assert test="every $spin_id in 1 to count(spin) satisfies spin[xs:integer(@id)=$spin_id]" />
-        <xs:assert test="count(interaction)=0 or every $inter_id in 1 to count(interaction) satisfies interaction[xs:integer(@id)=$inter_id]" />
-        <xs:assert test="every $inter in interaction[@kind=('hfc','dipolar','jcoupling','exchange')] satisfies exists($inter/@spin_b)" />
-        <xs:assert test="every $inter in interaction[@kind=('shielding','shift','quadrupolar','gtensor','zfs','spinrotation')] satisfies empty($inter/@spin_b)" />
+
+        <!-- Interaction identifiers must be consecutive from one -->
+        <xs:assert
+            test="count(interaction)=0 or every $inter_id in 1 to count(interaction)
+                  satisfies interaction[xs:integer(@id)=$inter_id]" />
+
+        <!-- Two-spin interactions must specify the second spin -->
+        <xs:assert test="every $inter in interaction[@kind='hfc'] satisfies exists($inter/@spin_b)" />
+        <xs:assert test="every $inter in interaction[@kind='dipolar'] satisfies exists($inter/@spin_b)" />
+        <xs:assert test="every $inter in interaction[@kind='jcoupling'] satisfies exists($inter/@spin_b)" />
+        <xs:assert test="every $inter in interaction[@kind='exchange'] satisfies exists($inter/@spin_b)" />
+
+        <!-- One-spin interactions must not specify the second spin -->
+        <xs:assert test="every $inter in interaction[@kind='shielding'] satisfies empty($inter/@spin_b)" />
+        <xs:assert test="every $inter in interaction[@kind='shift'] satisfies empty($inter/@spin_b)" />
+        <xs:assert test="every $inter in interaction[@kind='quadrupolar'] satisfies empty($inter/@spin_b)" />
+        <xs:assert test="every $inter in interaction[@kind='gtensor'] satisfies empty($inter/@spin_b)" />
+        <xs:assert test="every $inter in interaction[@kind='zfs'] satisfies empty($inter/@spin_b)" />
+        <xs:assert test="every $inter in interaction[@kind='spinrotation'] satisfies empty($inter/@spin_b)" />
+
+        <!-- Self-couplings are not physical pair interactions -->
         <xs:assert test="every $inter in interaction[@spin_b] satisfies $inter/@spin_a ne $inter/@spin_b" />
     </xs:complexType>
 
-    <xs:element name="spin_system" 
-                type="spin_system">
+    <!-- Root SpinXML element -->
+    <xs:element name="spin_system" type="spin_system">
+
+        <!-- Spin identifiers must be unique -->
         <xs:key name="spin_id_key">
             <xs:selector xpath="spin" />
             <xs:field xpath="@id" />
         </xs:key>
+
+        <!-- Interaction identifiers must be unique -->
         <xs:key name="interaction_id_key">
             <xs:selector xpath="interaction" />
             <xs:field xpath="@id" />
         </xs:key>
-        <xs:keyref name="spin_a_reference"
-                   refer="spin_id_key">
+
+        <!-- First spin references must resolve -->
+        <xs:keyref name="spin_a_reference" refer="spin_id_key">
             <xs:selector xpath="interaction" />
             <xs:field xpath="@spin_a" />
         </xs:keyref>
-        <xs:keyref name="spin_b_reference"
-                   refer="spin_id_key">
+
+        <!-- Second spin references must resolve when present -->
+        <xs:keyref name="spin_b_reference" refer="spin_id_key">
             <xs:selector xpath="interaction" />
             <xs:field xpath="@spin_b" />
         </xs:keyref>
+
     </xs:element>
 
 </xs:schema>

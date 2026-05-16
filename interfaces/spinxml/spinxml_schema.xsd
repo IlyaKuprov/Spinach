@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           version="1.1">
+
+    <xs:simpleType name="positive_id">
+        <xs:restriction base="xs:positiveInteger" />
+    </xs:simpleType>
 
     <xs:complexType name="vector">
         <xs:attribute name="x"
@@ -189,7 +194,7 @@
             </xs:simpleType>
         </xs:attribute>
         <xs:attribute name="id"
-                      type="xs:integer"
+                      type="positive_id"
                       use="required" />
         <xs:attribute name="units"
                       use="required">
@@ -206,10 +211,10 @@
             </xs:simpleType>
         </xs:attribute>
         <xs:attribute name="spin_a"
-                      type="xs:integer"
+                      type="positive_id"
                       use="required" />
         <xs:attribute name="spin_b"
-                      type="xs:integer"
+                      type="positive_id"
                       use="optional" />
         <xs:attribute name="reference"
                       type="xs:string"
@@ -223,7 +228,7 @@
         <xs:sequence minOccurs="1"
                      maxOccurs="1">
             <xs:element name="spin"
-                        minOccurs="0"
+                        minOccurs="1"
                         maxOccurs="unbounded">
                 <xs:complexType>
                     <xs:sequence minOccurs="0"
@@ -232,7 +237,7 @@
                                     type="vector" />
                     </xs:sequence>
                     <xs:attribute name="id"
-                                  type="xs:integer"
+                                  type="positive_id"
                                   use="required" />
                     <xs:attribute name="isotope"
                                   type="xs:string"
@@ -247,9 +252,33 @@
                         minOccurs="0"
                         maxOccurs="unbounded" />
         </xs:sequence>
+        <xs:assert test="every $spin_id in 1 to count(spin) satisfies spin[xs:integer(@id)=$spin_id]" />
+        <xs:assert test="count(interaction)=0 or every $inter_id in 1 to count(interaction) satisfies interaction[xs:integer(@id)=$inter_id]" />
+        <xs:assert test="every $inter in interaction[@kind=('hfc','dipolar','jcoupling','exchange')] satisfies exists($inter/@spin_b)" />
+        <xs:assert test="every $inter in interaction[@kind=('shielding','shift','quadrupolar','gtensor','zfs','spinrotation')] satisfies empty($inter/@spin_b)" />
+        <xs:assert test="every $inter in interaction[@spin_b] satisfies $inter/@spin_a ne $inter/@spin_b" />
     </xs:complexType>
 
     <xs:element name="spin_system" 
-                type="spin_system" />
+                type="spin_system">
+        <xs:key name="spin_id_key">
+            <xs:selector xpath="spin" />
+            <xs:field xpath="@id" />
+        </xs:key>
+        <xs:key name="interaction_id_key">
+            <xs:selector xpath="interaction" />
+            <xs:field xpath="@id" />
+        </xs:key>
+        <xs:keyref name="spin_a_reference"
+                   refer="spin_id_key">
+            <xs:selector xpath="interaction" />
+            <xs:field xpath="@spin_a" />
+        </xs:keyref>
+        <xs:keyref name="spin_b_reference"
+                   refer="spin_id_key">
+            <xs:selector xpath="interaction" />
+            <xs:field xpath="@spin_b" />
+        </xs:keyref>
+    </xs:element>
 
 </xs:schema>

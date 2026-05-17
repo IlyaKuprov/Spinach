@@ -6,7 +6,7 @@
 % Yujie Zhao, Shebha Anandhi Jegadeesan,
 % Guinevere Mathies, Ilya Kuprov
 
-function kernel_estimation()
+function kernel_from_antenna()
 
 % Read the experimental data
 load('xix_on_resonance.mat','time_ns','real_part','imag_part');

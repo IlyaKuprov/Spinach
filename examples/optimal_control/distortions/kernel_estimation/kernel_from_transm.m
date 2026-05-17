@@ -9,7 +9,7 @@
 % Yujie Zhao, Shebha Anandhi Jegadeesan,
 % Guinevere Mathies, Ilya Kuprov
 
-function kernel_from_trans()
+function kernel_from_transm()
 
 % Load power data and convert to amplitude
 load('power_at_eik.mat','freq_axis_ghz',...

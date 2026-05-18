@@ -1,9 +1,7 @@
-% Phase-sensitive HSQC pulse sequence.
+% Phase-sensitive HSQC pulse sequence from:
 %
-% References:
-%
-%              https://doi.org/10.1016/0009-2614(80)80041-8
-%              https://doi.org/10.1002/cmr.a.10095
+%           https://doi.org/10.1016/0009-2614(80)80041-8
+%           https://doi.org/10.1002/cmr.a.10095
 %
 % Syntax:
 %

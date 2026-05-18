@@ -1,8 +1,6 @@
-% Magnitude-mode HMQC pulse sequence.
+% Magnitude-mode HMQC pulse sequence from:
 %
-% References:
-%
-%              https://doi.org/10.1016/0022-2364(83)90241-X
+%           https://doi.org/10.1016/0022-2364(83)90241-X
 %
 % Syntax:
 %
@@ -64,8 +62,8 @@ rho=state(spin_system,'Lz',parameters.spins{2},'cheap');
 coil=state(spin_system,'L+',parameters.spins{2},'cheap');
 
 % Pulse operators
-Lp=operator(spin_system,'L+',parameters.spins{1}); Lx_F1=(Lp+Lp')/2;
-Lp=operator(spin_system,'L+',parameters.spins{2}); Lx_F2=(Lp+Lp')/2;
+Lx_F1=operator(spin_system,'Lx',parameters.spins{1}); 
+Lx_F2=operator(spin_system,'Lx',parameters.spins{2}); 
 
 % Pulse on F2
 rho=step(spin_system,Lx_F2,rho,pi/2);

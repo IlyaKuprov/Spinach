@@ -1,6 +1,4 @@
-% CLIP-HSQC pulse sequence.
-%
-% References:
+% CLIP-HSQC pulse sequence from:
 %
 %             https://doi.org/10.1016/j.jmr.2008.03.009
 %
@@ -56,10 +54,9 @@ rho=state(spin_system,'Lz',parameters.spins{2},'cheap');
 coil=state(spin_system,'L+',parameters.spins{2},'cheap');
 
 % Pulse operators
-Lp=operator(spin_system,'L+',parameters.spins{1});
-Lx_F1=(Lp+Lp')/2;
-Lp=operator(spin_system,'L+',parameters.spins{2});
-Lx_F2=(Lp+Lp')/2; Ly_F2=(Lp-Lp')/2i;
+Lx_F1=operator(spin_system,'Lx',parameters.spins{1});
+Lx_F2=operator(spin_system,'Lx',parameters.spins{2});
+Ly_F2=operator(spin_system,'Ly',parameters.spins{2});
 
 % First pulse
 report(spin_system,'propagating initial state forwards in time...')

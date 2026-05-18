@@ -1,9 +1,7 @@
-% Magnitude-mode HMBC pulse sequence.
+% Magnitude-mode HMBC pulse sequence from:
 %
-% References:
-%
-%              https://doi.org/10.1021/ja00268a061
-%              https://doi.org/10.1016/0022-2364(88)90172-2
+%            https://doi.org/10.1021/ja00268a061
+%            https://doi.org/10.1016/0022-2364(88)90172-2
 %
 % Syntax:
 %
@@ -38,7 +36,8 @@
 % Note: natural abundance experiments should make use of the iso-
 %       tope dilution functionality. See dilute.m function.
 %
-% Bud Macaulay, Ilya Kuprov
+% b.macaulay@soton.ac.uk 
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=hmbc.m>
 
@@ -61,10 +60,9 @@ delta_b=parameters.delta_b;
 rho0=state(spin_system,'Lz',parameters.spins{2},'cheap');
 coil=state(spin_system,'L+',parameters.spins{2},'cheap');
 
-% Operators
-Cp=operator(spin_system,'L+',parameters.spins{1});
-Hp=operator(spin_system,'L+',parameters.spins{2});
-Cx=(Cp+Cp')/2; Hx=(Hp+Hp')/2; 
+% Pulse operators
+Cx=operator(spin_system,'Lx',parameters.spins{1}); 
+Hx=operator(spin_system,'Lx',parameters.spins{2}); 
 
 % First proton pulse
 rho=step(spin_system,Hx,rho0,pi/2);

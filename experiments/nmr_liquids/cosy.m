@@ -1,13 +1,11 @@
-% Phase-sensitive COSY pulse sequence.
+% Phase-sensitive COSY pulse sequence from:
 %
-% References:
-%
-%               https://doi.org/10.1063/1.432450
-%               https://doi.org/10.1016/0022-2364(82)90279-7
+%           https://doi.org/10.1063/1.432450
+%           https://doi.org/10.1016/0022-2364(82)90279-7
 %
 % Syntax:
 %
-%               fid=cosy(spin_system,parameters,H,R,K)
+%            fid=cosy(spin_system,parameters,H,R,K)
 %
 % Parameters:
 %
@@ -59,10 +57,10 @@ rho=state(spin_system,'Lz',parameters.spins{1},'cheap');
 coil=state(spin_system,'L+',parameters.spins{1},'cheap');
 
 % Get the pulse operator
-Lp=operator(spin_system,'L+',parameters.spins{1});
+Lx=operator(spin_system,'Lx',parameters.spins{1});
 
 % Apply the first pulse
-rho=step(spin_system,(Lp+Lp')/2,rho,pi/2);
+rho=step(spin_system,Lx,rho,pi/2);
 
 % Run the F1 evolution
 rho_stack=evolution(spin_system,L,[],rho,1/parameters.sweep,...
@@ -72,7 +70,7 @@ rho_stack=evolution(spin_system,L,[],rho,1/parameters.sweep,...
 rho_stack=coherence(spin_system,rho_stack,{{parameters.spins{1},+1}});
 
 % Apply the second pulse
-rho_stack=step(spin_system,(Lp+Lp')/2,rho_stack,parameters.angle);
+rho_stack=step(spin_system,Lx,rho_stack,parameters.angle);
  
 % Run the F2 evolution
 fid=evolution(spin_system,L,coil,rho_stack,1/parameters.sweep,...

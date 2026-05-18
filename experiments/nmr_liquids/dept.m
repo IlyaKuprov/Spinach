@@ -1,12 +1,10 @@
-% DEPT pulse sequence.
+% DEPT pulse sequence from:
 %
-% References:
-%
-%                  https://doi.org/10.1016/0022-2364(82)90286-4
+%           https://doi.org/10.1016/0022-2364(82)90286-4
 %
 % Syntax:
 % 
-%                  fid=dept(spin_system,parameters,H,R,K)
+%              fid=dept(spin_system,parameters,H,R,K)
 %
 % Parameters: 
 % 
@@ -62,9 +60,9 @@ rho=equilibrium(spin_system);
 coil=state(spin_system,'L+',parameters.spins{1},'cheap');
 
 % Pulse operators
-Cp=operator(spin_system,'L+',parameters.spins{1});
-Hp=operator(spin_system,'L+',parameters.spins{2}); 
-Cx=(Cp+Cp')/2; Hx=(Hp+Hp')/2; Hy=(Hp-Hp')/2i;
+Cx=operator(spin_system,'Lx',parameters.spins{1});
+Hx=operator(spin_system,'Lx',parameters.spins{2});  
+Hy=operator(spin_system,'Ly',parameters.spins{2}); 
 
 % Proton pulse
 rho=step(spin_system,Hx,rho,pi/2);

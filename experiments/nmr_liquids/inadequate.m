@@ -1,11 +1,9 @@
 % INADEQUATE pulse sequence. Selects double-quantum coherence from
 % coupled carbon pairs, then converts it back into observable single-
 % quantum magnetisation. At natural abundance 13C, this produces only
-% 13C pair subspectra.
+% 13C pair subspectra. Implemented as described in:
 %
-% References:
-%
-%              https://doi.org/10.1021/ja00534a056
+%                https://doi.org/10.1021/ja00534a056
 %
 % Syntax:
 %
@@ -35,7 +33,8 @@
 %
 % Note: use dilute.m to generate carbon pair isotopomers.
 % 
-% Bud Macaulay, Ilya Kuprov
+% b.macaulay@soton.ac.uk 
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=inadequate.m>
 
@@ -59,8 +58,8 @@ rho=state(spin_system,'Lz',parameters.spins{1},'cheap');
 coil=state(spin_system,'L+',parameters.spins{1},'cheap');
 
 % Pulse operators
-Cp=operator(spin_system,'L+',parameters.spins{1});
-Cx=(Cp+Cp')/2; Cy=(Cp-Cp')/2i;
+Cx=operator(spin_system,'Lx',parameters.spins{1});
+Cy=operator(spin_system,'Ly',parameters.spins{1});
 
 % Pulse 90x
 rho=step(spin_system,Cx,rho,pi/2);

@@ -1,13 +1,11 @@
-% Constant-time phase-sensitive HSQC pulse sequence.
+% Constant-time phase-sensitive HSQC pulse sequence from:
 %
-% References:
-%
-%              https://doi.org/10.1016/0022-2364(92)90144-V
-%              https://doi.org/10.1007/BF00227470
+%            https://doi.org/10.1016/0022-2364(92)90144-V
+%            https://doi.org/10.1007/BF00227470
 %
 % Syntax:
 %
-%              fid=ct_hsqc(spin_system,parameters,H,R,K)
+%            fid=ct_hsqc(spin_system,parameters,H,R,K)
 %
 % Parameters:
 %
@@ -71,10 +69,9 @@ if ~isfield(parameters,'coil')
 end
 
 % Pulse operators
-Cp=operator(spin_system,'L+',parameters.spins{1});
-Cx=(Cp+Cp')/2;
-Hp=operator(spin_system,'L+',parameters.spins{2});
-Hx=(Hp+Hp')/2; Hy=(Hp-Hp')/2i;
+Cx=operator(spin_system,'Lx',parameters.spins{1});
+Hx=operator(spin_system,'Lx',parameters.spins{2});
+Hy=operator(spin_system,'Ly',parameters.spins{2});
 
 % Pulse on I spin (1H)
 rho=step(spin_system,Hx,parameters.rho0,pi/2);

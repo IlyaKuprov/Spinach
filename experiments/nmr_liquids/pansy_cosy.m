@@ -1,6 +1,4 @@
-% Magnitude mode PANSY-COSY pulse sequence.
-%
-% References:
+% Magnitude mode PANSY-COSY pulse sequence from:
 %
 %            https://doi.org/10.1021/ja0634876
 %            https://doi.org/10.1016/j.pnmrs.2021.03.001
@@ -62,9 +60,9 @@ coil_h=state(spin_system,'L+',parameters.spins{1},'cheap');
 coil_c=state(spin_system,'L+',parameters.spins{2},'cheap');
 
 % Get pulse operators
-Hp=operator(spin_system,'L+',parameters.spins{1});
-Cp=operator(spin_system,'L+',parameters.spins{2});
-Hx=(Hp+Hp')/2; Hy=(Hp-Hp')/2i; Cy=(Cp-Cp')/2i;
+Hx=operator(spin_system,'Lx',parameters.spins{1}); 
+Hy=operator(spin_system,'Ly',parameters.spins{1}); 
+Cy=operator(spin_system,'Ly',parameters.spins{2});
 
 % Apply the first pulse
 rho_p=step(spin_system,Hx,rho,+pi/2);

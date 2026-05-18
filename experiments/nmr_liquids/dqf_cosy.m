@@ -1,9 +1,8 @@
 % Phase-sensitive double-quantum filtered COSY pulse sequence.
+% Implemented as described in:
 %
-% References:
-%
-%               https://doi.org/10.1016/0006-291X(83)91225-1
-%               https://doi.org/10.1021/ja00388a062
+%              https://doi.org/10.1016/0006-291X(83)91225-1
+%              https://doi.org/10.1021/ja00388a062
 %
 % Syntax:
 %
@@ -56,8 +55,8 @@ rho=state(spin_system,'Lz',parameters.spins{1},'cheap');
 coil=state(spin_system,'L+',parameters.spins{1},'cheap');
 
 % Get the pulse operators
-Lp=operator(spin_system,'L+',parameters.spins{1});
-Lx=(Lp+Lp')/2; Ly=(Lp-Lp')/2i;
+Lx=operator(spin_system,'Lx',parameters.spins{1}); 
+Ly=operator(spin_system,'Ly',parameters.spins{1});
 
 % Apply the first pulse
 rho=step(spin_system,Lx,rho,pi/2);

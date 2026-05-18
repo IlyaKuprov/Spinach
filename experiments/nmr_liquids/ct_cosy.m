@@ -1,7 +1,5 @@
 % Constant-time COSY pulse sequence with analytical coherence selec-
-% tion.
-%
-% References:
+% tion, as described in:
 %
 %             https://doi.org/10.1006/jmra.1994.1095
 %             https://doi.org/10.1080/00387010009350054
@@ -70,10 +68,10 @@ t1_grid=(0:(parameters.npoints(1)-1))/parameters.sweep(1);
 CT=t1_grid(end);
 
 % Get the pulse operator
-Hp=operator(spin_system,'L+',parameters.spins{1});
+Hx=operator(spin_system,'Lx',parameters.spins{1});
 
 % Apply the first 90 degree pulse
-rho=step(spin_system,(Hp+Hp')/2,parameters.rho0,pi/2);
+rho=step(spin_system,Hx,parameters.rho0,pi/2);
 
 % Select "+1" coherence
 rho=coherence(spin_system,rho,{{parameters.spins{1},+1}});
@@ -88,7 +86,7 @@ parfor n=1:parameters.npoints(1)
     rho_current=evolution(spin_system,L,[],rho,CT/2-t1_grid(n)/2,1,'final');
     
     % Run the pi pulse
-    rho_current=step(spin_system,(Hp+Hp')/2,rho_current,pi);
+    rho_current=step(spin_system,Hx,rho_current,pi);
     
     % Run the second delay
     rho_current=evolution(spin_system,L,[],rho_current,CT/2+t1_grid(n)/2,1,'final');
@@ -99,7 +97,7 @@ parfor n=1:parameters.npoints(1)
 end
 
 % Final pulse
-rho_stack=step(spin_system,(Hp+Hp')/2,rho_stack,parameters.angle);
+rho_stack=step(spin_system,Hx,rho_stack,parameters.angle);
 
 % Run the F2 evolution
 fid=evolution(spin_system,L,parameters.coil,rho_stack,1/parameters.sweep(2),...

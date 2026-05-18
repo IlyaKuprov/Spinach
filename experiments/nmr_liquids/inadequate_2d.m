@@ -1,6 +1,4 @@
-% 2D INADEQUATE pulse sequence.
-%
-% References:
+% 2D INADEQUATE pulse sequence from:
 %
 %         https://doi.org/10.1021/ja00398a044
 %         https://doi.org/10.1016/0022-2364(81)90060-3
@@ -66,8 +64,8 @@ rho=state(spin_system,'Lz',parameters.spins{1});
 coil=state(spin_system,'L+',parameters.spins{1});
 
 % Pulse operators
-Lp=operator(spin_system,'L+',parameters.spins{1});
-Lx=(Lp+Lp')/2; Ly=(Lp-Lp')/2i;
+Lx=operator(spin_system,'Lx',parameters.spins{1});
+Ly=operator(spin_system,'Ly',parameters.spins{1});
 Lxy=cos(pi/4)*Lx+sin(pi/4)*Ly;
 
 % 90x pulse
@@ -78,7 +76,7 @@ rho_sin=step(spin_system,Lxy,rho,pi/2);
 rho_cos=evolution(spin_system,L,[],rho_cos,tau,1,'final');
 rho_sin=evolution(spin_system,L,[],rho_sin,tau,1,'final');
 
-% inversion pulse
+% Inversion pulse
 rho_cos=step(spin_system,Lx,rho_cos,pi);
 rho_sin=step(spin_system,Lxy,rho_sin,pi);
 
@@ -102,7 +100,7 @@ rho_stack_sin=evolution(spin_system,L,[],rho_sin,timestep(1),parameters.npoints(
 rho_stack_cos=step(spin_system,Lx,rho_stack_cos,pi/2);
 rho_stack_sin=step(spin_system,Lx,rho_stack_sin,pi/2);
 
-% Run the F2 evolution
+% Run the t2 evolution
 fid.cos=evolution(spin_system,L,coil,rho_stack_cos,timestep(2),parameters.npoints(2)-1,'observable');
 fid.sin=evolution(spin_system,L,coil,rho_stack_sin,timestep(2),parameters.npoints(2)-1,'observable');
 

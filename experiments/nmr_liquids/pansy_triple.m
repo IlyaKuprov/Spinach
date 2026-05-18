@@ -1,9 +1,7 @@
-% Triple-channel PANSY pulse sequence.
+% Triple-channel PANSY pulse sequence from:
 %
-% References:
-%
-%       https://doi.org/10.1021/ja0634876
-%       https://doi.org/10.1007/128_2011_226
+%          https://doi.org/10.1021/ja0634876
+%          https://doi.org/10.1007/128_2011_226
 %
 % Syntax:
 %
@@ -66,11 +64,10 @@ coil_x1=state(spin_system,'L+',parameters.spins{2},'cheap');
 coil_x2=state(spin_system,'L+',parameters.spins{3},'cheap');
 
 % Get pulse operators
-Hp=operator(spin_system,'L+',parameters.spins{1});
-x1p=operator(spin_system,'L+',parameters.spins{2});
-x2p=operator(spin_system,'L+',parameters.spins{3});
-Hx=(Hp+Hp')/2; Hy=(Hp-Hp')/2i; x1y=(x1p-x1p')/2i;
-x2y=(x2p-x2p')/2i;
+Hx=operator(spin_system,'Lx',parameters.spins{1});
+Hy=operator(spin_system,'Ly',parameters.spins{1}); 
+X1y=operator(spin_system,'Ly',parameters.spins{2});
+X2y=operator(spin_system,'Ly',parameters.spins{3});
 
 % Apply the first pulse
 rho_p=step(spin_system,Hx,rho,+pi/2);
@@ -87,8 +84,8 @@ rho_stack_m=evolution(spin_system,L,[],rho_m,timesteps(1),...
                       parameters.npoints(1)-1,'trajectory');
 
 % Apply the second pulse pair
-rho_stack_p=step(spin_system,Hy+x1y+x2y,rho_stack_p,pi/2);
-rho_stack_m=step(spin_system,Hy+x1y+x2y,rho_stack_m,pi/2);
+rho_stack_p=step(spin_system,Hy+X1y+X2y,rho_stack_p,pi/2);
+rho_stack_m=step(spin_system,Hy+X1y+X2y,rho_stack_m,pi/2);
 
 % Perform axial peak elimination
 rho_stack=rho_stack_p-rho_stack_m;

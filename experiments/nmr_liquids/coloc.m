@@ -1,13 +1,11 @@
-% COLOC NMR pulse sequence.
-%
-% References:
+% COLOC NMR pulse sequence from:
 %
 %          https://doi.org/10.1016/0022-2364(84)90136-7
 %
-% Implemented as shown in Figure 1b, without the dashed pulses during
+% Implemented as shown in Fig 1b, without the dashed pulses during
 % the delta(2) period. Delta(1) defaults to half of the maximum F1
-% evolution time implied by the sweep width, delta(2) must be specified.
-% Syntax:
+% evolution time implied by the sweep width, delta(2) must be spe-
+% cified. Syntax:
 %
 %             fid=coloc(spin_system,parameters,H,R,K)
 %
@@ -67,9 +65,9 @@ rho=state(spin_system,'Lz',parameters.spins{1},'cheap');
 coil=state(spin_system,'L+',parameters.spins{2},'cheap');
 
 % Pulse operators
-Hp=operator(spin_system,'L+',parameters.spins{1});
-Cp=operator(spin_system,'L+',parameters.spins{2}); 
-Hx=(Hp+Hp')/2; Cx=(Cp+Cp')/2; Cy=(Cp-Cp')/2i;
+Hx=operator(spin_system,'Lx',parameters.spins{1}); 
+Cx=operator(spin_system,'Lx',parameters.spins{2});
+Cy=operator(spin_system,'Ly',parameters.spins{2});
 
 % 90 degree pulse on H
 rho=step(spin_system,Hx,rho,pi/2);

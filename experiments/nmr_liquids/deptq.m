@@ -1,12 +1,10 @@
-% DEPTQ pulse sequence.
+% DEPTQ pulse sequence from:
 %
-% References:
-%
-%                  https://doi.org/10.1006/jmre.1998.1595
+%               https://doi.org/10.1006/jmre.1998.1595
 %
 % Syntax:
 % 
-%                  fid=deptq(spin_system,parameters,H,R,K)
+%               fid=deptq(spin_system,parameters,H,R,K)
 %
 % Parameters: 
 % 
@@ -40,7 +38,8 @@
 % Note: the sequence differs from dept.m in that quaternary carbons
 %       do appear.
 %
-% Andrew Porter, Ilya Kuprov
+% a.porter@soton.ac.uk 
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=deptq.m>
 
@@ -63,10 +62,10 @@ rho=equilibrium(spin_system);
 coil=state(spin_system,'L+',parameters.spins{1},'cheap');
 
 % Pulse operators
-Cp=operator(spin_system,'L+',parameters.spins{1}); 
-Cx=(Cp+Cp')/2; Cy=(Cp-Cp')/2i;
-Hp=operator(spin_system,'L+',parameters.spins{2}); 
-Hx=(Hp+Hp')/2; Hy=(Hp-Hp')/2i;
+Cx=operator(spin_system,'Lx',parameters.spins{1}); 
+Cy=operator(spin_system,'Ly',parameters.spins{1}); 
+Hx=operator(spin_system,'Lx',parameters.spins{2});
+Hy=operator(spin_system,'Ly',parameters.spins{2});
 
 % Carbon pulse
 rho=step(spin_system,Cy,rho,-pi/2);

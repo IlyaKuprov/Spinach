@@ -1,6 +1,4 @@
-% Phase-sensitive NOESY-HSQC sequence.
-%
-% References:
+% Phase-sensitive NOESY-HSQC sequence described in:
 %
 %         https://doi.org/10.1021/bi00441a004
 %         https://doi.org/10.1016/0022-2364(90)90227-Z
@@ -78,10 +76,9 @@ rho=state(spin_system,'Lz','1H','cheap');
 coil=state(spin_system,'L+','1H','cheap');
 
 % Pulse operators
-Np=operator(spin_system,'L+','15N'); 
-Hp=operator(spin_system,'L+','1H');  
-Hx=(Hp+Hp')/2; Hy=(Hp-Hp')/2i;
-Nx=(Np+Np')/2; 
+Hx=operator(spin_system,'Lx','1H'); 
+Hy=operator(spin_system,'Ly','1H');
+Nx=operator(spin_system,'Lx','15N'); 
 
 % Decouple nitrogen during NOESY
 L_dec=decouple(spin_system,L,[],{'15N'});

@@ -1,8 +1,6 @@
 % Non-refocused INEPT pulse sequence. This returns the directly
 % acquired coupled antiphase spectrum rather than a refocused,
-% broadband-decoupled INEPT variant.
-%
-% References:
+% broadband-decoupled INEPT variant. Implemented as here:
 %
 %           https://doi.org/10.1021/ja00497a058
 %
@@ -57,10 +55,10 @@ rho=equilibrium(spin_system);
 coil=state(spin_system,'L+',parameters.spins{1},'cheap');
 
 % Pulse operators
-Cp=operator(spin_system,'L+',parameters.spins{1}); 
-Cx=(Cp+Cp')/2; Cy=(Cp-Cp')/2i;
-Hp=operator(spin_system,'L+',parameters.spins{2}); 
-Hx=(Hp+Hp')/2; Hy=(Hp-Hp')/2i;
+Cx=operator(spin_system,'Lx',parameters.spins{1});  
+Cy=operator(spin_system,'Ly',parameters.spins{1}); 
+Hx=operator(spin_system,'Lx',parameters.spins{2});
+Hy=operator(spin_system,'Ly',parameters.spins{2});
 
 % 90x pulse on H
 rho=step(spin_system,Hx,rho,pi/2);

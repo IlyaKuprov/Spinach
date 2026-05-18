@@ -1,10 +1,8 @@
-% Amplitude-mode homonuclear TOCSY pulse sequence.
+% Amplitude-mode homonuclear TOCSY pulse sequence from:
 %
-% References:
-%
-%             https://doi.org/10.1016/0022-2364(83)90226-3
-%             https://doi.org/10.1021/ja00295a052
-%             https://doi.org/10.1016/0022-2364(85)90018-6
+%          https://doi.org/10.1016/0022-2364(83)90226-3
+%          https://doi.org/10.1021/ja00295a052
+%          https://doi.org/10.1016/0022-2364(85)90018-6
 %
 % Syntax:
 %
@@ -60,8 +58,8 @@ timestep=1./parameters.sweep;
 coil=state(spin_system,'L+',parameters.spins{1},'cheap');
 
 % Pulse operators
-Lp=operator(spin_system,'L+',parameters.spins{1});
-Lx=(Lp+Lp')/2; Ly=(Lp-Lp')/2i;
+Lx=operator(spin_system,'Lx',parameters.spins{1});
+Ly=operator(spin_system,'Ly',parameters.spins{1});
 
 % First pulse
 rho=step(spin_system,Lx,parameters.rho0,pi/2);

@@ -1,13 +1,11 @@
 % CRAZED pulse sequence. Ideal analytical coherence-pathway version
-% of the sequence described by Warren et al.
+% of the sequence described in:
 %
-% References:
-%
-%                https://doi.org/10.1126/science.8266096
+%              https://doi.org/10.1126/science.8266096
 %
 % Syntax:
 %
-%                fid=crazed(spin_system,parameters,H,R,K)
+%              fid=crazed(spin_system,parameters,H,R,K)
 %
 % Parameters:
 %
@@ -56,13 +54,14 @@ timestep=1/parameters.sweep;
 coil=state(spin_system,'L+',parameters.spins{1});
 
 % Get the pulse operator
-Lp=operator(spin_system,'L+',parameters.spins{1}); Ly=(Lp-Lp')/2i;
+Ly=operator(spin_system,'Ly',parameters.spins{1});
 
 % Apply the first pulse
 rho=step(spin_system,Ly,parameters.rho0,pi/2);
 
 % Run the F1 evolution
-rho_stack=evolution(spin_system,L,[],rho,timestep,parameters.npoints(1)-1,'trajectory');
+rho_stack=evolution(spin_system,L,[],rho,timestep,...
+                    parameters.npoints(1)-1,'trajectory');
 
 % Apply a double-quantum filter:
 rho_stack=coherence(spin_system,rho_stack,{{parameters.spins{1},2}});
@@ -74,7 +73,8 @@ rho_stack=step(spin_system,Ly,rho_stack,parameters.angle);
 rho_stack=coherence(spin_system,rho_stack,{{parameters.spins{1},1}});
 
 % Run the F2 evolution
-fid=evolution(spin_system,L,coil,rho_stack,timestep,parameters.npoints(2)-1,'observable');
+fid=evolution(spin_system,L,coil,rho_stack,timestep,...
+              parameters.npoints(2)-1,'observable');
 
 end
 

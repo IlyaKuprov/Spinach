@@ -1,10 +1,4 @@
-% Gradient-selected COSY pulse sequence.
-%
-% References:
-%
-%               https://doi.org/10.1002/(SICI)1097-458X(199711)35:10%3C680::AID-OMR149%3E3.0.CO;2-%23
-%
-% Syntax:
+% Horne-Morris gradient-selected COSY pulse sequence. Syntax:
 %
 %               fid=gcosy(spin_system,parameters,H,R,K)
 %
@@ -103,8 +97,7 @@ rho=state(spin_system,'Lz',parameters.spins{1},'cheap');
 coil=state(spin_system,'L+',parameters.spins{1},'cheap');
 
 % Get the pulse operator
-Lp=operator(spin_system,'L+',parameters.spins{1});
-Lx=(Lp+Lp')/2;
+Lx=operator(spin_system,'Lx',parameters.spins{1});
 
 % Apply the first pulse
 rho=step(spin_system,Lx,rho,pi/2);

@@ -1,6 +1,4 @@
-% Phase-sensitive heteronuclear NOESY pulse sequence.
-%
-% References:
+% Phase-sensitive heteronuclear NOESY pulse sequence from:
 %
 %            https://doi.org/10.1021/ja00353a071
 %            https://doi.org/10.1039/C8CP00911B
@@ -45,7 +43,8 @@
 %       diffusion attenuation, finite-pulse losses, and experimental
 %       normalisation are outside this pulse sequence function.
 %
-% Zak El-Machachi, Ilya Kuprov
+% z.elmachachi@soton.ac.uk 
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=hoesy.m>
 
@@ -60,14 +59,13 @@ L=H+1i*R+1i*K;
 % Coherent evolution timestep
 timestep=1./parameters.sweep;
 
-% Detection state
+% Detection state up to a constant multiplier
 coil=state(spin_system,'L+',parameters.spins{2},'cheap');
 
 % Pulse operators
-Hp=operator(spin_system,'L+',parameters.spins{1});
-Hx=(Hp+Hp')/2; Hy=(Hp-Hp')/2i;
-Cp=operator(spin_system,'L+',parameters.spins{2});
-Cy=(Cp-Cp')/2i;
+Hx=operator(spin_system,'Lx',parameters.spins{1});
+Hy=operator(spin_system,'Ly',parameters.spins{1});
+Cy=operator(spin_system,'Ly',parameters.spins{2});
 
 % First pulse on F1
 rho=step(spin_system,Hx,parameters.rho0,pi/2);
@@ -78,8 +76,8 @@ rho_stack=evolution(spin_system,L,[],rho,timestep(1)/2,...
 
 % F1 dimension decoupling
 for n=1:numel(parameters.decouple_f1)
-    Lp=operator(spin_system,'L+',parameters.decouple_f1{n});
-    rho_stack=step(spin_system,(Lp+Lp')/2,rho_stack,pi);
+    Dx=operator(spin_system,'Lx',parameters.decouple_f1{n});
+    rho_stack=step(spin_system,Dx,rho_stack,pi);
 end
 
 % Second half of F1 evolution

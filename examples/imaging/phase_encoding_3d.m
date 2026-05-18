@@ -29,7 +29,6 @@ sys.disable={'pt','krylov'};
 
 % This needs a GPU
 sys.enable={'greedy'}; % 'gpu'
-sys.gpu_mem='minimum';
 
 % Basis set
 bas.formalism='sphten-liouv';

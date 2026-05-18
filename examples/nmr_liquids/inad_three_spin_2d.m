@@ -34,6 +34,7 @@ subsystems=dilute(spin_system,'13C',2);
 parameters.offset=17604.78;             % Offset at 100 ppm
 parameters.J=50;
 parameters.spins={'13C'};
+parameters.decouple={};
 parameters.sweep=[35213.086 34722.223]; % Sweep width of 200 ppm
 parameters.npoints=[128 2048];
 parameters.zerofill=[512 8192];
@@ -70,7 +71,9 @@ end
 
 % Do the plotting
 kfigure(); scale_figure([1.5 2.0]); 
-plot_2d(spin_system,real(spectrum),parameters,...
+plot_parameters=parameters;
+plot_parameters.offset=[2*parameters.offset parameters.offset];
+plot_2d(spin_system,real(spectrum),plot_parameters,...
         20,[0.01 0.5 0.01 0.5],2,256,6,'both');
 kylabel('F1: DQ dimension / ppm');
 

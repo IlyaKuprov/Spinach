@@ -39,17 +39,25 @@ parameters.axis_units='ppm';
 parameters.g_amp=3;
 parameters.g_dur=2e-3;
 parameters.g_stab_del=2e-4;
-parameters.pathway='P';
+parameters.s_len=1.5;
+parameters.pathway='P+N';
 
 % Simulation
 fid=liquid(spin_system,@gcosy,parameters,'nmr');
 
 % Apodisation
-fid=apodisation(spin_system,fid,{{'cos'},{'cos'}});
+fid.pos=apodisation(spin_system,fid.pos,{{'cos'},{'cos'}});
+fid.neg=apodisation(spin_system,fid.neg,{{'cos'},{'cos'}});
 
-% Fourier transform
-spectrum=fftshift(fft2(fid,parameters.zerofill(2),...
-                           parameters.zerofill(1)));
+% F2 Fourier transform
+f1_pos=fftshift(fft(fid.pos,parameters.zerofill(2),1),1);
+f1_neg=fftshift(fft(fid.neg,parameters.zerofill(2),1),1);
+
+% Form echo/anti-echo signal
+fid=f1_pos+conj(f1_neg);
+
+% F1 Fourier transform
+spectrum=fftshift(fft(fid,parameters.zerofill(1),2),2);
 
 % Plotting
 kfigure(); scale_figure([1.5 2.0]);
@@ -57,4 +65,3 @@ plot_2d(spin_system,real(spectrum),parameters,...
         20,[0.02 0.2 0.02 0.2],2,256,6,'both');
 
 end
-

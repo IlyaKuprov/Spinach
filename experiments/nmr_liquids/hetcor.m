@@ -33,13 +33,16 @@
 % Note: natural abundance experiments should make use of the iso-
 %       tope dilution functionality. See dilute.m function.
 %
+% Note: the fixed transfer delays are delta_2=1/(2J) and
+%       delta_3=1/(3J), using the absolute value of J.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=hetcor.m>
 
 function fid=hetcor(spin_system,parameters,H,R,K)
 
-% Consistenchy check
+% Consistency check
 grumble(spin_system,parameters,H,R,K);
 
 % Compose Liouvillian
@@ -96,6 +99,9 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,parameters,H,R,K)
+if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
+    error('this function is only available for sphten-liouv formalism.');
+end
 if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
     error('H, R and K arguments must be matrices.');
@@ -107,16 +113,29 @@ if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 elseif numel(parameters.sweep)~=2
     error('parameters.sweep array should have exactly two elements.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
+    error('parameters.sweep must contain two positive real numbers.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
 elseif numel(parameters.spins)~=2
     error('parameters.spins cell array should have exactly two elements.');
+elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))||...
+       (~ischar(parameters.spins{2}))
+    error('parameters.spins must be a two-element cell array of character strings.');
+elseif strcmp(parameters.spins{1},parameters.spins{2})
+    error('parameters.spins must specify two different isotopes.');
+elseif any(~ismember(parameters.spins,spin_system.comp.isotopes))
+    error('parameters.spins contains isotopes that are not present in the system.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
 elseif numel(parameters.npoints)~=2
     error('parameters.npoints array should have exactly two elements.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       any(parameters.npoints<1)||any(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must contain two positive integers.');
 end
 if ~isfield(parameters,'decouple')
     error('list of decoupled spins (or an empty cell array) should be supplied in parameters.decouple variable.');
@@ -131,14 +150,14 @@ if numel(parameters.decouple)>0
     if any(~ismember(parameters.decouple,spin_system.comp.isotopes))
         error('parameters.decouple contains isotopes that are not present in the system.');
     end
-    if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
-        error('analytical decoupling is only available for sphten-liouv formalism.');
-    end
 end
 if ~isfield(parameters,'J')
     error('scalar coupling should be specified in parameters.J variable.');
 elseif numel(parameters.J)~=1
     error('parameters.J array should have exactly one element.');
+elseif (~isnumeric(parameters.J))||(~isreal(parameters.J))||...
+       (~isfinite(parameters.J))||(parameters.J==0)
+    error('parameters.J must be a non-zero real scalar.');
 end
 end
 

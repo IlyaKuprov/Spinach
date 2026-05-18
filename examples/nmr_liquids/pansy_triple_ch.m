@@ -74,28 +74,36 @@ for n=1:numel(subsys)
 
 end
 
+% Store the original spectral axes
+plot_offset=parameters.offset;
+plot_sweep=parameters.sweep;
+plot_zerofill=parameters.zerofill;
+plot_spins=parameters.spins;
+
 % Plotting - 1H-15N block
 kfigure(); scale_figure([3.0 1.5]); subplot(1,3,3);
-parameters.offset=[parameters.offset(1) parameters.offset(3)];
-parameters.sweep=[parameters.sweep(1) parameters.sweep(3)];
-parameters.spins={'1H','15N'};
+parameters.offset=[plot_offset(1) plot_offset(3)];
+parameters.sweep=[plot_sweep(1) plot_sweep(3)];
+parameters.zerofill=[plot_zerofill(1) plot_zerofill(3)];
+parameters.spins=plot_spins([1 3]);
 plot_2d(spin_system,real(spec_c),parameters,20,...
         [0.05 0.25 0.05 0.25],2,256,6,'both');
 
 % Plotting - 1H-13C block
 subplot(1,3,2);
-parameters.offset=[parameters.offset(1) parameters.offset(2)];
-parameters.sweep=[parameters.sweep(1) parameters.sweep(2)];
-parameters.spins={'1H','13C'};
+parameters.offset=[plot_offset(1) plot_offset(2)];
+parameters.sweep=[plot_sweep(1) plot_sweep(2)];
+parameters.zerofill=[plot_zerofill(1) plot_zerofill(2)];
+parameters.spins=plot_spins([1 2]);
 plot_2d(spin_system,real(spec_b),parameters,20,...
         [0.05 0.25 0.05 0.25],2,256,6,'both');
 
 % Plotting - 1H-1H block
 subplot(1,3,1);
-parameters.sweep=parameters.sweep(1);
-parameters.offset=parameters.offset(1);
-parameters.zerofill=parameters.zerofill(1);
-parameters.spins={'1H'};
+parameters.sweep=plot_sweep(1);
+parameters.offset=plot_offset(1);
+parameters.zerofill=plot_zerofill(1);
+parameters.spins=plot_spins(1);
 plot_2d(spin_system,real(spec_a),parameters,20,...
         [0.05 0.25 0.05 0.25],2,256,6,'both');
 

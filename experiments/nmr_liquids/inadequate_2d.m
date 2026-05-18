@@ -10,6 +10,8 @@
 %
 %     parameters.spins              active nucleus, e.g. {'13C'}
 %
+%     parameters.decouple           optional nuclei to decouple, e.g. {'1H'}
+%
 %     parameters.J                  working scalar coupling, Hz
 %
 %     H  - Hamiltonian matrix, received from context function
@@ -22,7 +24,8 @@
 %
 %     fid.cos,fid.sin -  two components of the States signal
 %
-% Notes: use dilute.m to generate carbon pair isotopomers.
+% Notes: use dilute.m to generate carbon pair isotopomers. The F1
+%        axis is a double-quantum frequency coordinate.
 %
 % Theresa Hune
 % Christian Griesinger
@@ -31,11 +34,19 @@
 
 function fid=inadequate_2d(spin_system,parameters,H,R,K)
 
+% Set default decoupling
+if ~isfield(parameters,'decouple')
+    parameters.decouple={};
+end
+
 % Check consistency
 grumble(spin_system,parameters,H,R,K);
 
 % Compose Liouvillian
 L=H+1i*R+1i*K;
+
+% Decoupling
+L=decouple(spin_system,L,[],parameters.decouple);
 
 % Get timing parameters
 tau=abs(1/(4*parameters.J));
@@ -107,7 +118,7 @@ if ~isfield(parameters,'sweep')
 elseif numel(parameters.sweep)~=2
     error('parameters.sweep array should have exactly two elements.');
 elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
-       any(parameters.sweep<=0)
+       any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
     error('parameters.sweep must contain two positive real numbers.');
 end
 if ~isfield(parameters,'spins')
@@ -116,6 +127,14 @@ elseif numel(parameters.spins)~=1
     error('parameters.spins cell array should have exactly one element.');
 elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))
     error('parameters.spins must be a single-element cell array of character strings.');
+elseif ~ismember(parameters.spins{1},spin_system.comp.isotopes)
+    error('parameters.spins refers to an isotope that is not present in the system.');
+end
+if isfield(parameters,'decouple')&&(~iscell(parameters.decouple))
+    error('parameters.decouple, if specified, must be a cell array.');
+elseif isfield(parameters,'decouple')&&...
+       any(~ismember(parameters.decouple,spin_system.comp.isotopes))
+    error('parameters.decouple contains isotopes that are not present in the system.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
@@ -130,7 +149,7 @@ if ~isfield(parameters,'J')
 elseif numel(parameters.J)~=1
     error('parameters.J array should have exactly one element.');
 elseif (~isnumeric(parameters.J))||(~isreal(parameters.J))||...
-       (parameters.J==0)
+       (~isfinite(parameters.J))||(parameters.J==0)
     error('parameters.J must be a non-zero real scalar.');
 end
 end

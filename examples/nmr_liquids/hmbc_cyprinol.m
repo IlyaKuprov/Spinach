@@ -32,8 +32,6 @@ parameters.offset=[5000 1250];
 parameters.npoints=[128 128];
 parameters.zerofill=[512 512];
 parameters.spins={'13C','1H'};
-parameters.decouple_f1={'1H'};
-parameters.decouple_f2={'13C'};
 parameters.axis_units='ppm';
 
 % Create the spin system structure

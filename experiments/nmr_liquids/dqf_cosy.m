@@ -9,7 +9,7 @@
 %    parameters.npoints      number of points for both dimensions
 %
 %    parameters.spins        nuclei on which the sequence runs,
-%                            specified as '1H', '13C', etc.
+%                            specified as {'1H'}, {'13C'}, etc.
 %
 %    H  - Hamiltonian matrix, received from context function
 %
@@ -21,6 +21,10 @@
 %
 %    fid.cos, fid.sin  -  components of the free induction
 %                         decay for hypercomplex processing
+%
+% Note: the double-quantum filter is implemented as an exact
+%       analytical coherence-order projection, not as an explicit
+%       phase cycle or finite-gradient selection block.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -88,16 +92,25 @@ if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 elseif numel(parameters.sweep)~=1
     error('parameters.sweep array should have exactly one element.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       (~isfinite(parameters.sweep))||(parameters.sweep<=0)
+    error('parameters.sweep must be a positive real scalar.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
-elseif numel(parameters.spins)~=1
-    error('parameters.spins cell array should have exactly one element.');
+elseif (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||...
+       (~ischar(parameters.spins{1}))
+    error('parameters.spins must be a one-element cell array of character strings.');
+elseif nnz(strcmp(parameters.spins{1},spin_system.comp.isotopes))<2
+    error('parameters.spins must select an isotope with at least two spins.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
 elseif numel(parameters.npoints)~=2
     error('parameters.npoints array should have exactly two elements.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       any(parameters.npoints<1)||any(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must contain two positive integers.');
 end
 end
 

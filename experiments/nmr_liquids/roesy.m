@@ -29,6 +29,10 @@
 %     fid.cos, fid.sin  -  components of the free induction
 %                          decay for hypercomplex processing
 %
+% Note: this ideal spin-lock model does not represent finite RF
+%       amplitude, RF offset, Hartmann-Hahn matching errors, or
+%       explicit RF phase transients.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=roesy.m>
@@ -87,7 +91,7 @@ if ~isfield(parameters,'sweep')
 elseif numel(parameters.sweep)~=2
     error('parameters.sweep array should have exactly two elements.');
 elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
-       any(parameters.sweep<=0)
+       any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
     error('parameters.sweep must contain two positive real numbers.');
 end
 if ~isfield(parameters,'spins')
@@ -96,6 +100,8 @@ elseif numel(parameters.spins)~=1
     error('parameters.spins cell array should have exactly one element.');
 elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))
     error('parameters.spins must be a single-element cell array of character strings.');
+elseif ~ismember(parameters.spins{1},spin_system.comp.isotopes)
+    error('parameters.spins refers to an isotope that is not present in the system.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
@@ -110,13 +116,15 @@ if ~isfield(parameters,'tmix')
 elseif numel(parameters.tmix)~=1
     error('parameters.tmix array should have exactly one element.');
 elseif (~isnumeric(parameters.tmix))||(~isreal(parameters.tmix))||...
-       (parameters.tmix<0)
+       (~isfinite(parameters.tmix))||(parameters.tmix<0)
     error('parameters.tmix must be a non-negative real scalar.');
 end
 if ~isfield(parameters,'rho0')
     error('initial state should be specified in parameters.rho0 variable.');
 elseif ~isnumeric(parameters.rho0)
     error('parameters.rho0 must be a numeric array.');
+elseif size(parameters.rho0,1)~=size(H,1)
+    error('parameters.rho0 dimension must match the Liouville space dimension.');
 end
 end
 

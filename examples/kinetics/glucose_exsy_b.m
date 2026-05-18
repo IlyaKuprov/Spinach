@@ -73,7 +73,7 @@ inter.tau_c={0.9601e-9 ... % Alpha, inside
              0.9601e-9 ... % Beta,  inside
              0.5255e-9};   % Beta,  outside
 inter.r1_rates={0 0 0 0 0 0 0 0};
-inter.r2_rates=34.0359*{1 1 1 1 1 1 1 1};
+inter.r2_rates=num2cell(34.0359*ones(1,8));
 
 % Do not draw colorbars
 sys.disable={'colorbar'};

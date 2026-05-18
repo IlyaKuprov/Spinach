@@ -1,4 +1,6 @@
-% INEPT pulse sequence. Syntax:
+% Non-refocused INEPT pulse sequence. This returns the directly
+% acquired coupled antiphase spectrum rather than a refocused,
+% broadband-decoupled INEPT variant. Syntax:
 % 
 %           fid=inept(spin_system,parameters,H,R,K)
 %
@@ -32,10 +34,10 @@
 
 function fid=inept(spin_system,parameters,H,R,K)
 
-% consistency check
-grumble(spin_system,parameters,H,R,K)
+% Consistency check
+grumble(spin_system,parameters,H,R,K);
 
-% compose Liouvillian
+% Compose Liouvillian
 L=H+1i*R+1i*K;
 
 % Get timing parameters
@@ -98,21 +100,37 @@ if ~isfield(parameters,'sweep')
     error('inept: sweep width should be specified in parameters.sweep variable.');
 elseif numel(parameters.sweep)~=1
     error('inept: parameters.sweep array should have exactly one element.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       (~isfinite(parameters.sweep))||(parameters.sweep<=0)
+    error('inept: parameters.sweep must be a positive real scalar.');
 end
 if ~isfield(parameters,'spins')
     error('inept: working spins should be specified in parameters.spins variable.');
 elseif numel(parameters.spins)~=2
     error('inept: parameters.spins cell array should have exactly two elements.');
+elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))||...
+       (~ischar(parameters.spins{2}))
+    error('inept: parameters.spins must be a two-element cell array of character strings.');
+elseif strcmp(parameters.spins{1},parameters.spins{2})
+    error('inept: parameters.spins must specify two different isotopes.');
+elseif any(~ismember(parameters.spins,spin_system.comp.isotopes))
+    error('inept: parameters.spins contains isotopes that are not present in the system.');
 end
 if ~isfield(parameters,'npoints')
     error('inept: number of points should be specified in parameters.npoints variable.');
 elseif numel(parameters.npoints)~=1
     error('inept: parameters.npoints array should have exactly one element.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       (parameters.npoints<1)||(mod(parameters.npoints,1)~=0)
+    error('inept: parameters.npoints must be a positive integer.');
 end
 if ~isfield(parameters,'J')
     error('inept: scalar coupling should be specified in parameters.J variable.');
 elseif numel(parameters.J)~=1
     error('inept: parameters.J array should have exactly one element.');
+elseif (~isnumeric(parameters.J))||(~isreal(parameters.J))||...
+       (~isfinite(parameters.J))||(parameters.J==0)
+    error('inept: parameters.J must be a non-zero real scalar.');
 end
 end
 

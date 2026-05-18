@@ -48,7 +48,7 @@ spec=fftshift(fft2(fid,parameters.zerofill(2),...
 % Plot
 kfigure(); scale_figure([1.5 2.0]);
 plot_2d(spin_system,abs(spec),parameters,...
-        20,[0.1 0.5 0.1 0.5],2,256,6,'both');
+        20,[0.1 0.5 0.1 0.5],2,256,6,'positive');
 
 end
 

@@ -32,6 +32,10 @@
 % Note: decoupling with respect to either of the working nuclei 
 %       is impossible in this pulse sequence.
 %
+% Note: this is the magnitude-mode analytical-pathway version.
+%       Gradient echo/anti-echo PANSY-COSY variants should be
+%       implemented as separate pulse sequence functions.
+%
 % Andrew Porter
 % i.ya.kuprov@weizmann.ac.il
 %
@@ -106,7 +110,7 @@ if ~isfield(parameters,'sweep')
 elseif numel(parameters.sweep)~=2
     error('parameters.sweep array should have exactly two elements.');
 elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
-       any(parameters.sweep<=0)
+       any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
     error('parameters.sweep must contain two positive real numbers.');
 end
 if ~isfield(parameters,'spins')
@@ -116,6 +120,8 @@ elseif numel(parameters.spins)~=2
 elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))||...
        (~ischar(parameters.spins{2}))
     error('parameters.spins must be a two-element cell array of character strings.');
+elseif any(~ismember(parameters.spins,spin_system.comp.isotopes))
+    error('parameters.spins contains isotopes that are not present in the system.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');

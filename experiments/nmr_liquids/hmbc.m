@@ -37,7 +37,7 @@
 %
 % Bud Macaulay, Ilya Kuprov
 %
-% <https://spindynamics.org/wiki/index.php?title=hmqc.m>
+% <https://spindynamics.org/wiki/index.php?title=hmbc.m>
 
 function fid=hmbc(spin_system,parameters,H,R,K)
 
@@ -79,8 +79,8 @@ rho=evolution(spin_system,L,[],rho,delta_b,1,'final');
 rho=step(spin_system,Cx,rho,+pi/2)-...
     step(spin_system,Cx,rho,-pi/2);
 
-% % Coherence selection
-rho=coherence(spin_system,rho,{{'13C',+1}});
+% Coherence selection
+rho=coherence(spin_system,rho,{{parameters.spins{1},+1}});
 
 % F1 evolution period, first half
 rho_stack=evolution(spin_system,L,[],rho,timestep(1)/2,...
@@ -118,26 +118,45 @@ if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 elseif numel(parameters.sweep)~=2
     error('parameters.sweep array should have exactly two elements.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
+    error('parameters.sweep must contain two positive real numbers.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
 elseif numel(parameters.spins)~=2
     error('parameters.spins cell array should have exactly two elements.');
+elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))||...
+       (~ischar(parameters.spins{2}))
+    error('parameters.spins must be a two-element cell array of character strings.');
+elseif strcmp(parameters.spins{1},parameters.spins{2})
+    error('parameters.spins must specify two different isotopes.');
+elseif any(~ismember(parameters.spins,spin_system.comp.isotopes))
+    error('parameters.spins contains isotopes that are not present in the system.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
 elseif numel(parameters.npoints)~=2
     error('parameters.npoints array should have exactly two elements.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       any(parameters.npoints<1)||any(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must contain two positive integers.');
 end
 if ~isfield(parameters,'J')
     error('scalar coupling should be specified in parameters.J variable.');
 elseif numel(parameters.J)~=1
     error('parameters.J array should have exactly one element.');
+elseif (~isnumeric(parameters.J))||(~isreal(parameters.J))||...
+       (~isfinite(parameters.J))||(parameters.J==0)
+    error('parameters.J must be a non-zero real scalar.');
 end
 if ~isfield(parameters,'delta_b')
     error('second delay should be specified in parameters.delta_b variable.');
 elseif numel(parameters.delta_b)~=1
     error('parameters.delta_b array should have exactly one element.');
+elseif (~isnumeric(parameters.delta_b))||(~isreal(parameters.delta_b))||...
+       (~isfinite(parameters.delta_b))||(parameters.delta_b<=0)
+    error('parameters.delta_b must be a positive real scalar.');
 end
 end
 

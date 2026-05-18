@@ -1,6 +1,6 @@
 % INADEQUATE spectrum of a three-spin system with J-coupling between
-% two spins only. The sequence filters out double-quantum coherences 
-% and thus only keeps pairs of spins that have a J-coupling.
+% two spins only. The sequence selects double-quantum coherence
+% from coupled 13C pairs and converts it back for detection.
 %
 % Calculation time: seconds
 % 

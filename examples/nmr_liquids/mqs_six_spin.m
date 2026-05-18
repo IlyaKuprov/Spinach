@@ -27,7 +27,6 @@ inter.coupling.scalar{1,3}=2.60;
 inter.coupling.scalar{2,4}=2.60;
 inter.coupling.scalar{3,5}=2.60;
 inter.coupling.scalar{1,6}=2.60;
-inter.coupling.scalar{5,6}=2.60;
 
 % 5J couplings 
 inter.coupling.scalar{1,4}=2.00;

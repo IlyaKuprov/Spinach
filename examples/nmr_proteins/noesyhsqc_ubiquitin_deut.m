@@ -1,5 +1,5 @@
 % 1H-1H-15N NOESY-HSQC spectrum of 15N-labelled ubiquitin at 900
-% MHz with 65 ms mixing time. It is assumed that the protein is 
+% MHz with 90 ms mixing time. It is assumed that the protein is
 % not 13C-labelled. Specific positions are deuterated, and deu-
 % terium nuclei are simulated explicitly as spin-1 particles.
 %

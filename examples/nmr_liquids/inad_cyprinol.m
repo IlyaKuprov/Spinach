@@ -1,6 +1,6 @@
-% INADEQUATE spectrum of cyprinol. The sequence filters out double-
-% quantum coherences and thus only keeps pairs of spins that have
-% a J-coupling. A parallel sum over isotopomers that have adjacent
+% INADEQUATE spectrum of cyprinol. The sequence selects double-
+% quantum coherence from coupled 13C pairs and converts it back
+% for detection. A parallel sum over isotopomers that have adjacent
 % 13C spins is used.
 %
 % Calculation time: minutes

@@ -1,6 +1,6 @@
-% INADEQUATE spectrum of sucrose. The sequence filters out double-
-% quantum coherences and thus only keeps pairs of spins that have
-% a J-coupling.
+% INADEQUATE spectrum of sucrose. The sequence selects double-
+% quantum coherence from coupled 13C pairs and converts it back
+% for detection.
 %
 % Calculation time: minutes
 % 

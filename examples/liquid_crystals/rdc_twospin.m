@@ -35,8 +35,6 @@ parameters.npoints=[128 128];
 parameters.zerofill=[512 512];
 parameters.spins={'13C','1H'};
 parameters.axis_units='ppm';
-parameters.decouple_f1={};
-parameters.decouple_f2={'13C'};
 parameters.needs={'rdc'};
 parameters.J=140;
 

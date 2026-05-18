@@ -1,5 +1,7 @@
 % Constant-time COSY pulse sequence with analytical coherence selec-
 % tion from Figure 3a of (https://doi.org/10.1002/chem.201406283).
+% The F1 trace is flipped at the end to preserve the conventional
+% indirect-dimension sign for the reversed-delay implementation.
 % Syntax:
 %
 %             fid=ct_cosy(spin_system,parameters,H,R,K)
@@ -14,6 +16,9 @@
 %
 %    parameters.spins        nuclei on which the sequence runs,
 %                            specified as {'1H'}, {'13C'}, etc.
+%
+%    parameters.angle        final pulse angle in radians, defaults
+%                            to pi/2
 %
 %    H  - Hamiltonian matrix, received from context function
 %
@@ -32,6 +37,11 @@
 
 function fid=ct_cosy(spin_system,parameters,H,R,K)
 
+% Set default final pulse angle
+if ~isfield(parameters,'angle')
+    parameters.angle=pi/2;
+end
+
 % Check consistency
 grumble(spin_system,parameters,H,R,K);
 
@@ -49,8 +59,8 @@ if ~isfield(parameters,'coil')
 end
 
 % Get the time grid for the CT period
-CT=parameters.npoints(1)/parameters.sweep(1);
-t1_grid=linspace(0,CT,parameters.npoints(1));
+t1_grid=(0:(parameters.npoints(1)-1))/parameters.sweep(1);
+CT=t1_grid(end);
 
 % Get the pulse operator
 Hp=operator(spin_system,'L+',parameters.spins{1});
@@ -81,8 +91,8 @@ parfor n=1:parameters.npoints(1)
     
 end
 
-% Final 90 degree pulse
-rho_stack=step(spin_system,(Hp+Hp')/2,rho_stack,pi/2);
+% Final pulse
+rho_stack=step(spin_system,(Hp+Hp')/2,rho_stack,parameters.angle);
 
 % Run the F2 evolution
 fid=evolution(spin_system,L,parameters.coil,rho_stack,1/parameters.sweep(2),...
@@ -109,16 +119,34 @@ if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 elseif numel(parameters.sweep)~=2
     error('parameters.sweep array should have exactly two elements.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
+    error('parameters.sweep must contain two positive real numbers.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
 elseif numel(parameters.spins)~=1
     error('parameters.spins cell array should have exactly one element.');
+elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))
+    error('parameters.spins must be a one-element cell array of character strings.');
+elseif ~ismember(parameters.spins{1},spin_system.comp.isotopes)
+    error('parameters.spins refers to an isotope that is not present in the system.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
 elseif numel(parameters.npoints)~=2
     error('parameters.npoints array should have exactly two elements.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       any(parameters.npoints<1)||any(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must contain two positive integers.');
+end
+if ~isfield(parameters,'angle')
+    error('final pulse angle should be specified in parameters.angle variable.');
+elseif numel(parameters.angle)~=1
+    error('parameters.angle array should have exactly one element.');
+elseif (~isnumeric(parameters.angle))||(~isreal(parameters.angle))||...
+       (~isfinite(parameters.angle))
+    error('parameters.angle must be a finite real scalar.');
 end
 end
 

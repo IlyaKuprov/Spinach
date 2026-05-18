@@ -34,6 +34,10 @@
 %     fid.cos,fid.sin - two components of the FID for F1 hyper-
 %                       complex processing
 %
+% Note: this is an ideal heteronuclear NOESY model. Gradient and
+%       diffusion attenuation, finite-pulse losses, and experimental
+%       normalisation are outside this pulse sequence function.
+%
 % Zak El-Machachi, Ilya Kuprov
 %
 % <https://spindynamics.org/wiki/index.php?title=hoesy.m>
@@ -121,8 +125,8 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,parameters,H,R,K)
-if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
-    error('this function is only available for sphten-liouv and zeeman-liouv formalisms.');
+if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
+    error('this function is only available for sphten-liouv formalism.');
 end
 if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
@@ -136,7 +140,7 @@ if ~isfield(parameters,'sweep')
 elseif numel(parameters.sweep)~=2
     error('parameters.sweep array should have exactly two elements.');
 elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
-       any(parameters.sweep<=0)
+       any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
     error('parameters.sweep must contain two positive real numbers.');
 end
 if ~isfield(parameters,'spins')
@@ -146,11 +150,17 @@ elseif numel(parameters.spins)~=2
 elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))||...
        (~ischar(parameters.spins{2}))
     error('parameters.spins must be a two-element cell array of character strings.');
+elseif strcmp(parameters.spins{1},parameters.spins{2})
+    error('parameters.spins must specify two different isotopes.');
+elseif any(~ismember(parameters.spins,spin_system.comp.isotopes))
+    error('parameters.spins contains isotopes that are not present in the system.');
 end
 if ~isfield(parameters,'decouple_f1')
     error('decoupling channel list should be specified in parameters.decouple_f1 variable.');
 elseif ~iscell(parameters.decouple_f1)
     error('parameters.decouple_f1 must be a cell array.');
+elseif any(~ismember(parameters.decouple_f1,spin_system.comp.isotopes))
+    error('parameters.decouple_f1 contains isotopes that are not present in the system.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
@@ -165,13 +175,15 @@ if ~isfield(parameters,'tmix')
 elseif numel(parameters.tmix)~=1
     error('parameters.tmix array should have exactly one element.');
 elseif (~isnumeric(parameters.tmix))||(~isreal(parameters.tmix))||...
-       (parameters.tmix<0)
+       (~isfinite(parameters.tmix))||(parameters.tmix<0)
     error('parameters.tmix must be a non-negative real scalar.');
 end
 if ~isfield(parameters,'rho0')
     error('initial state should be specified in parameters.rho0 variable.');
 elseif ~isnumeric(parameters.rho0)
     error('parameters.rho0 must be a numeric array.');
+elseif size(parameters.rho0,1)~=size(H,1)
+    error('parameters.rho0 dimension must match the Liouville space dimension.');
 end
 end
 

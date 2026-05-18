@@ -13,9 +13,6 @@
 %     parameters.decouple_f2        [optional] nuclei to decouple
 %                                   in F2, e.g. {'15N','13C'}
 %
-%     parameters.decouple_f1        [optional] nuclei to decouple 
-%                                   in F1, e.g. {'1H','13C'}
-%
 %     parameters.J                  working scalar coupling, Hz
 %
 %     H  - Hamiltonian matrix, received from context function
@@ -38,6 +35,11 @@
 % <https://spindynamics.org/wiki/index.php?title=ct_hsqc.m>
 
 function fid=ct_hsqc(spin_system,parameters,H,R,K)
+
+% Set default detection decoupling
+if ~isfield(parameters,'decouple_f2')
+    parameters.decouple_f2={};
+end
 
 % Consistency check
 grumble(spin_system,parameters,H,R,K);
@@ -89,8 +91,8 @@ rho=step(spin_system,Cx,rho,pi/2)-step(spin_system,Cx,rho,-pi/2);
 rho_stack=zeros([size(rho,1) parameters.npoints(1)],'like',1i);
 
 % Get the time grid for the CT period
-CT=parameters.npoints(1)/parameters.sweep(1);
-t1_grid=linspace(0,CT,parameters.npoints(1));
+t1_grid=(0:(parameters.npoints(1)-1))/parameters.sweep(1);
+CT=t1_grid(end);
 
 % Loop over the value of t1_grid
 for n=1:parameters.npoints(1)
@@ -147,6 +149,10 @@ fid.pos=evolution(spin_system,L,parameters.coil,rho_stack_pos,...
 fid.neg=evolution(spin_system,L,parameters.coil,rho_stack_neg,...
                   timestep(2),parameters.npoints(2)-1,'observable');
 
+% Flip the indirect dimension into the conventional frequency sense
+fid.pos=fliplr(fid.pos);
+fid.neg=fliplr(fid.neg);
+
 end
 
 % Consistency enforcement
@@ -166,7 +172,7 @@ if ~isfield(parameters,'sweep')
 elseif numel(parameters.sweep)~=2
     error('parameters.sweep array should have exactly two elements.');
 elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
-       any(parameters.sweep<=0)
+       any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
     error('parameters.sweep must contain two positive real numbers.');
 end
 if ~isfield(parameters,'spins')
@@ -176,12 +182,16 @@ elseif numel(parameters.spins)~=2
 elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))||...
        (~ischar(parameters.spins{2}))
     error('parameters.spins must be a two-element cell array of character strings.');
+elseif strcmp(parameters.spins{1},parameters.spins{2})
+    error('parameters.spins must specify two different isotopes.');
+elseif any(~ismember(parameters.spins,spin_system.comp.isotopes))
+    error('parameters.spins contains isotopes that are not present in the system.');
 end
 if isfield(parameters,'decouple_f2')&&(~iscell(parameters.decouple_f2))
     error('parameters.decouple_f2, if specified, must be a cell array.');
-end
-if isfield(parameters,'decouple_f1')&&(~iscell(parameters.decouple_f1))
-    error('parameters.decouple_f1, if specified, must be a cell array.');
+elseif isfield(parameters,'decouple_f2')&&...
+       any(~ismember(parameters.decouple_f2,spin_system.comp.isotopes))
+    error('parameters.decouple_f2 contains isotopes that are not present in the system.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
@@ -196,7 +206,7 @@ if ~isfield(parameters,'J')
 elseif numel(parameters.J)~=1
     error('parameters.J array should have exactly one element.');
 elseif (~isnumeric(parameters.J))||(~isreal(parameters.J))||...
-       (parameters.J==0)
+       (~isfinite(parameters.J))||(parameters.J==0)
     error('parameters.J must be a non-zero real scalar.');
 end
 end

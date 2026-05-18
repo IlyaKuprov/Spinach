@@ -10,7 +10,7 @@
 %                            dimensions
 %
 %      parameters.spins   -  nuclei on which the sequence runs,
-%                            specified as '1H', '13C', etc.
+%                            specified as {'1H'}, {'13C'}, etc.
 %
 %      parameters.tmix    -  mixing time, seconds
 %
@@ -28,6 +28,10 @@
 %
 %      fid.cos, fid.sin   -  sine and cosine components
 %                            of the States quadrature
+%
+% Note: this is an ideal continuous-spin-lock TOCSY, not an
+%       explicit MLEV, DIPSI, WALTZ, or clean-TOCSY composite
+%       pulse-train simulation.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -58,8 +62,8 @@ rho=step(spin_system,Lx,parameters.rho0,pi/2);
 rho_stack=evolution(spin_system,L,[],rho,timestep(1),parameters.npoints(1)-1,'trajectory');
 
 % Mixing time under spin-lock
-rho_stack_cos=evolution(spin_system,H+2*pi*parameters.lamp*Lx,[],rho_stack,parameters.tmix,1,'final');
-rho_stack_sin=evolution(spin_system,H+2*pi*parameters.lamp*Ly,[],rho_stack,parameters.tmix,1,'final');
+rho_stack_cos=evolution(spin_system,L+2*pi*parameters.lamp*Lx,[],rho_stack,parameters.tmix,1,'final');
+rho_stack_sin=evolution(spin_system,L+2*pi*parameters.lamp*Ly,[],rho_stack,parameters.tmix,1,'final');
 
 % F2 evolution
 fid.cos=evolution(spin_system,L,coil,rho_stack_cos,timestep(2),parameters.npoints(2)-1,'observable');
@@ -83,7 +87,7 @@ if ~isfield(parameters,'sweep')
 elseif numel(parameters.sweep)~=2
     error('parameters.sweep array should have exactly two elements.');
 elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
-       any(parameters.sweep<=0)
+       any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
     error('parameters.sweep must contain two positive real numbers.');
 end
 if ~isfield(parameters,'spins')
@@ -92,6 +96,8 @@ elseif numel(parameters.spins)~=1
     error('parameters.spins cell array should have exactly one element.');
 elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))
     error('parameters.spins must be a single-element cell array of character strings.');
+elseif ~ismember(parameters.spins{1},spin_system.comp.isotopes)
+    error('parameters.spins refers to an isotope that is not present in the system.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
@@ -106,20 +112,23 @@ if ~isfield(parameters,'tmix')
 elseif numel(parameters.tmix)~=1
     error('parameters.tmix array should have exactly one element.');
 elseif (~isnumeric(parameters.tmix))||(~isreal(parameters.tmix))||...
-       (parameters.tmix<0)
+       (~isfinite(parameters.tmix))||(parameters.tmix<0)
     error('parameters.tmix must be a non-negative real scalar.');
 end
 if ~isfield(parameters,'lamp')
     error('spin-lock power should be specified in parameters.lamp variable.');
 elseif numel(parameters.lamp)~=1
     error('parameters.lamp array should have exactly one element.');
-elseif (~isnumeric(parameters.lamp))||(~isreal(parameters.lamp))
-    error('parameters.lamp must be a real scalar.');
+elseif (~isnumeric(parameters.lamp))||(~isreal(parameters.lamp))||...
+       (~isfinite(parameters.lamp))||(parameters.lamp<=0)
+    error('parameters.lamp must be a positive real scalar.');
 end
 if ~isfield(parameters,'rho0')
     error('initial state should be specified in parameters.rho0 variable.');
 elseif ~isnumeric(parameters.rho0)
     error('parameters.rho0 must be a numeric array.');
+elseif size(parameters.rho0,1)~=size(H,1)
+    error('parameters.rho0 dimension must match the Liouville space dimension.');
 end
 end
 

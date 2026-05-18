@@ -9,7 +9,7 @@
 %    parameters.npoints      number of points for both dimensions
 %
 %    parameters.spins        nuclei on which the sequence runs,
-%                            specified as '1H', '13C', etc.
+%                            specified as {'1H'}, {'13C'}, etc.
 %
 %    H  - Hamiltonian matrix, received from context function
 %
@@ -22,8 +22,10 @@
 %    fid.cos, fid.sin - real and imaginary components of the
 %                       States quadrature signal
 %
-% Notes: implemented up to six-quantum orders as per the original
-%        paper. Let us know if you need more.
+% Notes: with B0=B1=0, the multiple-quantum filter weights are
+%        B_p=p^2/4 for even p and B_p=(p^2-1)/4 for odd p.
+%        This gives 1, 2, 4, 6, and 9 for p=2..6; coherence
+%        orders above six are a documented implementation limit.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -96,16 +98,25 @@ if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 elseif numel(parameters.sweep)~=1
     error('parameters.sweep array should have exactly one element.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       (~isfinite(parameters.sweep))||(parameters.sweep<=0)
+    error('parameters.sweep must be a positive real scalar.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
-elseif numel(parameters.spins)~=1
-    error('parameters.spins cell array should have exactly one element.');
+elseif (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||...
+       (~ischar(parameters.spins{1}))
+    error('parameters.spins must be a one-element cell array of character strings.');
+elseif ~ismember(parameters.spins{1},spin_system.comp.isotopes)
+    error('parameters.spins refers to an isotope that is not present in the system.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
 elseif numel(parameters.npoints)~=2
     error('parameters.npoints array should have exactly two elements.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       any(parameters.npoints<1)||any(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must contain two positive integers.');
 end
 end
 

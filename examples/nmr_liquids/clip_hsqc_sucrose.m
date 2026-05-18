@@ -54,7 +54,8 @@ spin_system=kill_spin(spin_system,[20,21,22,23,31,32,33,34]);
 subsystems=dilute(spin_system,'13C');
 
 % Preallocate the result
-spectrum=zeros(parameters.zerofill,'like',1i);
+spectrum=zeros(parameters.zerofill(2),...
+               parameters.zerofill(1),'like',1i);
 
 % Run the CLIP-HSQC simulation
 parfor n=1:numel(subsystems)

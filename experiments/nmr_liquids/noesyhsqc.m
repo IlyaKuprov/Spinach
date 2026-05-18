@@ -41,6 +41,8 @@
 % Notes: the sequence starts with a pure Lz on protons at the mo-
 %        ment and assumes that the relaxation superoperator is not
 %        thermalised - the relaxation destination is the zero state.
+%        The first citation is the NOESY-HMQC precursor to this
+%        NOESY-HSQC implementation.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -59,6 +61,7 @@ L=H+1i*R+1i*K;
 if ismember('13C',spin_system.comp.isotopes)
     L=decouple(spin_system,L,[],{'13C'});
     R=decouple(spin_system,R,[],{'13C'});
+    K=decouple(spin_system,K,[],{'13C'});
 end
 
 % Evolution time discretization
@@ -82,6 +85,7 @@ Nx=(Np+Np')/2;
 % Decouple nitrogen during NOESY
 L_dec=decouple(spin_system,L,[],{'15N'});
 R_dec=decouple(spin_system,R,[],{'15N'});
+K_dec=decouple(spin_system,K,[],{'15N'});
 
 % Run NOESY forward
 rho=step(spin_system,Hx,rho,pi/2);
@@ -92,8 +96,8 @@ rho_stack_pos=step(spin_system,Hx,rho_stack_pos,pi/2);
 rho_stack_neg=step(spin_system,Hx,rho_stack_neg,pi/2);
 rho_stack_pos=homospoil(spin_system,rho_stack_pos,'destroy');
 rho_stack_neg=homospoil(spin_system,rho_stack_neg,'destroy');
-rho_stack_pos=evolution(spin_system,1i*R_dec,[],rho_stack_pos,parameters.tmix,1,'final');
-rho_stack_neg=evolution(spin_system,1i*R_dec,[],rho_stack_neg,parameters.tmix,1,'final');
+rho_stack_pos=evolution(spin_system,1i*R_dec+1i*K_dec,[],rho_stack_pos,parameters.tmix,1,'final');
+rho_stack_neg=evolution(spin_system,1i*R_dec+1i*K_dec,[],rho_stack_neg,parameters.tmix,1,'final');
 rho_stack_pos=homospoil(spin_system,rho_stack_pos,'destroy');
 rho_stack_neg=homospoil(spin_system,rho_stack_neg,'destroy');
 rho_stack_pos=step(spin_system,Hx,rho_stack_pos,pi/2); 
@@ -150,7 +154,7 @@ if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))
     error('H, R and K matrices must have the same dimension.');
 end
 if ~isfield(parameters,'npoints')
-    error('number of points must be specificed in parameters.npoints variable.');
+    error('number of points must be specified in parameters.npoints variable.');
 end
 if (~isnumeric(parameters.npoints))||(~isvector(parameters.npoints))||...
    (~isreal(parameters.npoints))||(numel(parameters.npoints)~=3)||...
@@ -158,26 +162,29 @@ if (~isnumeric(parameters.npoints))||(~isvector(parameters.npoints))||...
     error('parameters.npoints must be a vector of three positive integers.');
 end
 if ~isfield(parameters,'sweep')
-    error('sweep widths must be specificed in parameters.sweep variable.');
+    error('sweep widths must be specified in parameters.sweep variable.');
 end
 if (~isnumeric(parameters.sweep))||(~isvector(parameters.sweep))||...
    (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)||...
-   any(parameters.sweep<=0)
+   any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
     error('parameters.sweep must be a vector of three positive real numbers.');
 end
 if ~isfield(parameters,'J')
-    error('HSQC stage J-coupling must be specificed in parameters.J variable.');
+    error('HSQC stage J-coupling must be specified in parameters.J variable.');
 end
 if (~isnumeric(parameters.J))||(~isscalar(parameters.J))||...
-   (~isreal(parameters.J))||(parameters.J==0)
+   (~isreal(parameters.J))||(~isfinite(parameters.J))||(parameters.J==0)
     error('parameters.J must be a non-zero real number.');
 end
 if ~isfield(parameters,'tmix')
-    error('NOESY stage mixing time must be specificed in parameters.tmix variable.');
+    error('NOESY stage mixing time must be specified in parameters.tmix variable.');
 end
 if (~isnumeric(parameters.tmix))||(~isscalar(parameters.tmix))||...
-   (~isreal(parameters.tmix))||(parameters.tmix<0)
+   (~isreal(parameters.tmix))||(~isfinite(parameters.tmix))||(parameters.tmix<0)
     error('parameters.tmix must be a non-negative real number.');
+end
+if any(~ismember({'1H','15N'},spin_system.comp.isotopes))
+    error('noesyhsqc requires both 1H and 15N isotopes to be present.');
 end
 end
 

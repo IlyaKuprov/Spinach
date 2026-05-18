@@ -13,8 +13,9 @@
 %     parameters.decouple_f2        nuclei to decouple in F2, e.g. 
 %                                   {'15N','13C'}
 %
-%     parameters.decouple_f1        nuclei to decouple in F1, e.g. 
-%                                   {'1H','13C'}
+%     parameters.decouple_f1        nuclei that receive midpoint
+%                                   180-degree refocusing pulses in
+%                                   F1, e.g. {'1H','13C'}
 %
 %     parameters.J                  working scalar coupling, Hz
 %
@@ -145,7 +146,7 @@ if ~isfield(parameters,'sweep')
 elseif numel(parameters.sweep)~=2
     error('parameters.sweep array should have exactly two elements.');
 elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
-       any(parameters.sweep<=0)
+       any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
     error('parameters.sweep must contain two positive real numbers.');
 end
 if ~isfield(parameters,'spins')
@@ -155,16 +156,26 @@ elseif numel(parameters.spins)~=2
 elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))||...
        (~ischar(parameters.spins{2}))
     error('parameters.spins must be a two-element cell array of character strings.');
+elseif strcmp(parameters.spins{1},parameters.spins{2})
+    error('parameters.spins must specify two different isotopes.');
+elseif any(~ismember(parameters.spins,spin_system.comp.isotopes))
+    error('parameters.spins contains isotopes that are not present in the system.');
 end
 if ~isfield(parameters,'decouple_f2')
     error('decoupling channel list should be specified in parameters.decouple_f2 variable.');
 elseif ~iscell(parameters.decouple_f2)
     error('parameters.decouple_f2 must be a cell array.');
+elseif any(~ismember(parameters.decouple_f2,spin_system.comp.isotopes))
+    error('parameters.decouple_f2 contains isotopes that are not present in the system.');
 end
 if ~isfield(parameters,'decouple_f1')
     error('decoupling channel list should be specified in parameters.decouple_f1 variable.');
 elseif ~iscell(parameters.decouple_f1)
     error('parameters.decouple_f1 must be a cell array.');
+elseif any(~ismember(parameters.decouple_f1,spin_system.comp.isotopes))
+    error('parameters.decouple_f1 contains isotopes that are not present in the system.');
+elseif ismember(parameters.spins{1},parameters.decouple_f1)
+    error('parameters.decouple_f1 must not contain the active indirect isotope.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
@@ -179,8 +190,18 @@ if ~isfield(parameters,'J')
 elseif numel(parameters.J)~=1
     error('parameters.J array should have exactly one element.');
 elseif (~isnumeric(parameters.J))||(~isreal(parameters.J))||...
-       (parameters.J==0)
+       (~isfinite(parameters.J))||(parameters.J==0)
     error('parameters.J must be a non-zero real scalar.');
+end
+if isfield(parameters,'rho0')
+    if (~isnumeric(parameters.rho0))||(size(parameters.rho0,1)~=size(H,1))
+        error('parameters.rho0 dimension must match the Liouville space dimension.');
+    end
+end
+if isfield(parameters,'coil')
+    if (~isnumeric(parameters.coil))||(size(parameters.coil,1)~=size(H,1))
+        error('parameters.coil dimension must match the Liouville space dimension.');
+    end
 end
 end
 

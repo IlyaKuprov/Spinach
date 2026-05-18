@@ -8,7 +8,7 @@
 %
 %    parameters.npoints            [F1 F2] numbers of points
 %
-%    parameters.spins              {F1 F2} nuclei (e.g. '1H', '13C')
+%    parameters.spins              {F1 F2} nuclei (e.g. {'13C','1H'})
 %
 %    parameters.J                  active scalar coupling, Hz
 %
@@ -143,7 +143,7 @@ if ~isfield(parameters,'sweep')
 elseif numel(parameters.sweep)~=2
     error('clip_hsqc: parameters.sweep array should have exactly two elements.');
 elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
-       any(parameters.sweep<=0)
+       any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
     error('clip_hsqc: parameters.sweep must contain two positive real numbers.');
 end
 if ~isfield(parameters,'spins')
@@ -153,6 +153,10 @@ elseif numel(parameters.spins)~=2
 elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))||...
        (~ischar(parameters.spins{2}))
     error('clip_hsqc: parameters.spins must be a two-element cell array of character strings.');
+elseif strcmp(parameters.spins{1},parameters.spins{2})
+    error('clip_hsqc: parameters.spins must specify two different isotopes.');
+elseif any(~ismember(parameters.spins,spin_system.comp.isotopes))
+    error('clip_hsqc: parameters.spins contains isotopes that are not present in the system.');
 end
 if ~isfield(parameters,'npoints')
     error('clip_hsqc: number of points should be specified in parameters.npoints variable.');
@@ -167,7 +171,7 @@ if ~isfield(parameters,'J')
 elseif numel(parameters.J)~=1
     error('clip_hsqc: parameters.J array should have exactly one element.');
 elseif (~isnumeric(parameters.J))||(~isreal(parameters.J))||...
-       (parameters.J==0)
+       (~isfinite(parameters.J))||(parameters.J==0)
     error('clip_hsqc: parameters.J must be a non-zero real scalar.');
 end
 end

@@ -27,6 +27,9 @@
 %
 %   fid - 2D magnitude-mode free induction decay
 %
+% Note: this is the non-refocused multiple-quantum/MaxQ variant.
+%       Use mqs_refocus.m when post-mixing refocusing is required.
+%
 % mariagrazia.concilio@sjtu.edu.cn
 % jean-nicolas.dumez@univ-nantes.fr
 %
@@ -99,7 +102,7 @@ if ~isfield(parameters,'sweep')
 elseif numel(parameters.sweep)~=2
     error('The parameters.sweep array should have exactly two elements.');
 elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
-       any(parameters.sweep<=0)
+       any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
     error('parameters.sweep must contain two positive real numbers.');
 end
 if ~isfield(parameters,'spins')
@@ -109,6 +112,8 @@ elseif numel(parameters.spins)~=2
 elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))||...
        (~ischar(parameters.spins{2}))
     error('parameters.spins must be a two-element cell array of character strings.');
+elseif any(~ismember(parameters.spins,spin_system.comp.isotopes))
+    error('parameters.spins contains isotopes that are not present in the system.');
 end
 if ~isfield(parameters,'npoints')
     error('The number of points should be specified in parameters.npoints variable.');
@@ -122,15 +127,16 @@ if ~isfield(parameters,'angle')
     error('pulse angle should be specified in parameters.angle variable.');
 elseif numel(parameters.angle)~=1
     error('parameters.angle array should have exactly one element.');
-elseif (~isnumeric(parameters.angle))||(~isreal(parameters.angle))
-    error('parameters.angle must be a real scalar.');
+elseif (~isnumeric(parameters.angle))||(~isreal(parameters.angle))||...
+       (~isfinite(parameters.angle))
+    error('parameters.angle must be a finite real scalar.');
 end
 if ~isfield(parameters,'delay')
     error('evolution delay should be specified in parameters.delay variable.');
 elseif numel(parameters.delay)~=1
     error('parameters.delay array should have exactly one element.');
 elseif (~isnumeric(parameters.delay))||(~isreal(parameters.delay))||...
-       (parameters.delay<0)
+       (~isfinite(parameters.delay))||(parameters.delay<0)
     error('parameters.delay must be a non-negative real scalar.');
 end
 if ~isfield(parameters,'mqorder')
@@ -143,11 +149,15 @@ if ~isfield(parameters,'rho0')
     error('initial state should be specified in parameters.rho0 variable.');
 elseif ~isnumeric(parameters.rho0)
     error('parameters.rho0 must be a numeric array.');
+elseif size(parameters.rho0,1)~=size(H,1)
+    error('parameters.rho0 dimension must match the Liouville space dimension.');
 end
 if ~isfield(parameters,'coil')
     error('detection state should be specified in parameters.coil variable.');
 elseif ~isnumeric(parameters.coil)
     error('parameters.coil must be a numeric array.');
+elseif size(parameters.coil,1)~=size(H,1)
+    error('parameters.coil dimension must match the Liouville space dimension.');
 end
 end
 

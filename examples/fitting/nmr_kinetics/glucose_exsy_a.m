@@ -51,11 +51,11 @@ sys.isotopes={'19F','19F','19F','19F',...
               '19F','19F','19F','19F'};
           
 % Chemical shifts
-inter.zeeman.scalar={-120.5429 -133.9455 -129.3219 -129.5137...    % Alpha, inside
-                     -120.8449 -134.3029 -129.6334 -129.7151...    % Alpha, outside
-                     -136.4588 -139.5504 -131.8493 -132.1227...    % Beta,  inside
-                     -136.8020 -139.7067 -132.2969 -132.1936}...   % Beta,  outside
-                     +num2cell(params(6:21)-0.1*ones(1,16));
+inter.zeeman.scalar=num2cell([-120.5429 -133.9455 -129.3219 -129.5137...    % Alpha, inside
+                              -120.8449 -134.3029 -129.6334 -129.7151...    % Alpha, outside
+                              -136.4588 -139.5504 -131.8493 -132.1227...    % Beta,  inside
+                              -136.8020 -139.7067 -132.2969 -132.1936]+...  % Beta,  outside
+                              params(6:21)-0.1*ones(1,16));
                  
 % J-couplings
 inter.coupling.scalar=cell(16,16);
@@ -135,8 +135,8 @@ inter.relaxation={'redfield','t1_t2'};
 inter.equilibrium='zero';
 inter.rlx_keep='secular';
 inter.tau_c={10^params(3) 10^params(4) 10^params(3) 10^params(4)};
-inter.r1_rates=params(35)*num2cell(ones(1,16));  % Other mechanisms
-inter.r2_rates=params(36)*num2cell(ones(1,16));  % covered here
+inter.r1_rates=num2cell(params(35)*ones(1,16));  % Other mechanisms
+inter.r2_rates=num2cell(params(36)*ones(1,16));  % covered here
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

@@ -108,26 +108,45 @@ if ~isfield(parameters,'sweep')
     error('dept: sweep width should be specified in parameters.sweep variable.');
 elseif numel(parameters.sweep)~=1
     error('dept: parameters.sweep array should have exactly one element.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       (~isfinite(parameters.sweep))||(parameters.sweep<=0)
+    error('dept: parameters.sweep must be a positive real scalar.');
 end
 if ~isfield(parameters,'spins')
     error('dept: working spins should be specified in parameters.spins variable.');
 elseif numel(parameters.spins)~=2
     error('dept: parameters.spins cell array should have exactly two elements.');
+elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))||...
+       (~ischar(parameters.spins{2}))
+    error('dept: parameters.spins must be a two-element cell array of character strings.');
+elseif strcmp(parameters.spins{1},parameters.spins{2})
+    error('dept: parameters.spins must specify two different isotopes.');
+elseif any(~ismember(parameters.spins,spin_system.comp.isotopes))
+    error('dept: parameters.spins contains isotopes that are not present in the system.');
 end
 if ~isfield(parameters,'npoints')
-    error('deptt: number of points should be specified in parameters.npoints variable.');
+    error('dept: number of points should be specified in parameters.npoints variable.');
 elseif numel(parameters.npoints)~=1
     error('dept: parameters.npoints array should have exactly one element.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       (parameters.npoints<1)||(mod(parameters.npoints,1)~=0)
+    error('dept: parameters.npoints must be a positive integer.');
 end
 if ~isfield(parameters,'J')
     error('dept: scalar coupling should be specified in parameters.J variable.');
 elseif numel(parameters.J)~=1
     error('dept: parameters.J array should have exactly one element.');
+elseif (~isnumeric(parameters.J))||(~isreal(parameters.J))||...
+       (~isfinite(parameters.J))||(parameters.J==0)
+    error('dept: parameters.J must be a non-zero real scalar.');
 end
 if ~isfield(parameters,'beta')
     error('dept: beta angle should be specified in parameters.beta variable.');
 elseif numel(parameters.beta)~=1
     error('dept: parameters.beta array should have exactly one element.');
+elseif (~isnumeric(parameters.beta))||(~isreal(parameters.beta))||...
+       (~isfinite(parameters.beta))
+    error('dept: parameters.beta must be a finite real scalar.');
 end
 end
 

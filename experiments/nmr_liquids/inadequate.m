@@ -1,6 +1,6 @@
-% INADEQUATE pulse sequence. Removes uncoupled carbons from the spectra
-% via a double quantum filter, allowing only double quantum coherences
-% states too be detected. At natural abundance 13C, this produces only
+% INADEQUATE pulse sequence. Selects double-quantum coherence from
+% coupled carbon pairs, then converts it back into observable single-
+% quantum magnetisation. At natural abundance 13C, this produces only
 % 13C pair subspectra. Syntax:
 %
 %              fid=inadequate(spin_system,parameters,H,R,K)
@@ -71,7 +71,7 @@ rho=step(spin_system,L,rho,tau);
 % Pulse 90x 
 rho=step(spin_system,Cx,rho,pi/2);
 
-% Select DQC
+% Select double-quantum coherence
 rho=coherence(spin_system,rho,{{parameters.spins{1},[2 -2]}});
 
 % Pulse on 90x

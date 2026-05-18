@@ -45,7 +45,6 @@ parameters.offset=[3000 -70000];
 parameters.npoints=[128 128];
 parameters.zerofill=[512 512];
 parameters.spins={'1H','19F'};
-parameters.decouple_f2={'1H'};
 parameters.decouple_f1={'19F'};
 parameters.axis_units='ppm';
 parameters.needs={'rho_eq'};

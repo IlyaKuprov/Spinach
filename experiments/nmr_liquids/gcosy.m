@@ -28,7 +28,8 @@
 %                            defaults to 1.5
 %
 %    parameters.pathway      optional coherence pathway selection,
-%                            either 'P' or 'N', defaults to 'P'
+%                            either 'P', 'N', or 'P+N', defaults
+%                            to 'P'
 %
 %    H  - Hamiltonian matrix, received from context function
 %
@@ -38,11 +39,16 @@
 %
 % Outputs:
 %
-%    fid  - two-dimensional free induction decay
+%    fid  - two-dimensional free induction decay, or a structure
+%           with P-type fid.pos and N-type fid.neg fields in
+%           'P+N' mode
 %
 % Note: the default P-type pathway uses opposite gradient signs
 %       and is less sensitive to mixing pulse phase errors. The
 %       N-type pathway uses equal gradient signs.
+%
+% Note: 'P+N' mode returns P-type and N-type components for
+%       echo/anti-echo recombination in phase-sensitive processing.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -108,32 +114,62 @@ if parameters.g_stab_del>0
     P=P*propagator(spin_system,L,parameters.g_stab_del);
 end
 
-% Set the gradient signs
+% Select the requested gradient pathway
 switch upper(parameters.pathway)
 
     case 'P'
 
         % Use opposite signs for P-type selection
-        grad_signs=[1 -1];
+        rho_stack=grad_sandw(spin_system,L,rho_stack,P,parameters.g_amp*[1 -1],...
+                             parameters.s_len,parameters.g_dur*[1 1],[1 1]);
+
+        % Run the recovery delay after the second gradient
+        if parameters.g_stab_del>0
+            rho_stack=evolution(spin_system,L,[],rho_stack,parameters.g_stab_del,1,'final');
+        end
+
+        % Run the F2 evolution
+        fid=evolution(spin_system,L,coil,rho_stack,timestep,...
+                      parameters.npoints(2)-1,'observable');
 
     case 'N'
 
         % Use equal signs for N-type selection
-        grad_signs=[1 1];
+        rho_stack=grad_sandw(spin_system,L,rho_stack,P,parameters.g_amp*[1 1],...
+                             parameters.s_len,parameters.g_dur*[1 1],[1 1]);
+
+        % Run the recovery delay after the second gradient
+        if parameters.g_stab_del>0
+            rho_stack=evolution(spin_system,L,[],rho_stack,parameters.g_stab_del,1,'final');
+        end
+
+        % Run the F2 evolution
+        fid=evolution(spin_system,L,coil,rho_stack,timestep,...
+                      parameters.npoints(2)-1,'observable');
+
+    case 'P+N'
+
+        % Select the P-type pathway with opposite gradient signs
+        rho_stack_p=grad_sandw(spin_system,L,rho_stack,P,parameters.g_amp*[1 -1],...
+                               parameters.s_len,parameters.g_dur*[1 1],[1 1]);
+
+        % Select the N-type pathway with equal gradient signs
+        rho_stack_n=grad_sandw(spin_system,L,rho_stack,P,parameters.g_amp*[1 1],...
+                               parameters.s_len,parameters.g_dur*[1 1],[1 1]);
+
+        % Run the recovery delay after the second gradient
+        if parameters.g_stab_del>0
+            rho_stack_p=evolution(spin_system,L,[],rho_stack_p,parameters.g_stab_del,1,'final');
+            rho_stack_n=evolution(spin_system,L,[],rho_stack_n,parameters.g_stab_del,1,'final');
+        end
+
+        % Run the F2 evolution for both pathway components
+        fid.pos=evolution(spin_system,L,coil,rho_stack_p,timestep,...
+                          parameters.npoints(2)-1,'observable');
+        fid.neg=evolution(spin_system,L,coil,rho_stack_n,timestep,...
+                          parameters.npoints(2)-1,'observable');
 
 end
-
-% Select the coherence pathway with a gradient sandwich
-rho_stack=grad_sandw(spin_system,L,rho_stack,P,parameters.g_amp*grad_signs,...
-                     parameters.s_len,parameters.g_dur*[1 1],[1 1]);
-
-% Run the recovery delay after the second gradient
-if parameters.g_stab_del>0
-    rho_stack=evolution(spin_system,L,[],rho_stack,parameters.g_stab_del,1,'final');
-end
-
-% Run the F2 evolution
-fid=evolution(spin_system,L,coil,rho_stack,timestep,parameters.npoints(2)-1,'observable');
 
 end
 
@@ -153,50 +189,68 @@ if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 elseif numel(parameters.sweep)~=1
     error('parameters.sweep array should have exactly one element.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       (~isfinite(parameters.sweep))||(parameters.sweep<=0)
+    error('parameters.sweep must be a positive real scalar.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
 elseif numel(parameters.spins)~=1
     error('parameters.spins cell array should have exactly one element.');
+elseif (~iscell(parameters.spins))||(~ischar(parameters.spins{1}))
+    error('parameters.spins must be a one-element cell array of character strings.');
+elseif ~ismember(parameters.spins{1},spin_system.comp.isotopes)
+    error('parameters.spins refers to an isotope that is not present in the system.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
 elseif numel(parameters.npoints)~=2
     error('parameters.npoints array should have exactly two elements.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       any(parameters.npoints<1)||any(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must contain two positive integers.');
 end
 if ~isfield(parameters,'angle')
     error('second pulse angle should be specified in parameters.angle variable.');
 elseif numel(parameters.angle)~=1
     error('parameters.angle array should have exactly one element.');
+elseif (~isnumeric(parameters.angle))||(~isreal(parameters.angle))||...
+       (~isfinite(parameters.angle))
+    error('parameters.angle must be a finite real scalar.');
 end
 if ~isfield(parameters,'g_amp')
     error('gradient amplitude should be specified in parameters.g_amp variable.');
 elseif (~isnumeric(parameters.g_amp))||(~isreal(parameters.g_amp))||...
-       (~isscalar(parameters.g_amp))||(parameters.g_amp<=0)
+       (~isscalar(parameters.g_amp))||(~isfinite(parameters.g_amp))||...
+       (parameters.g_amp<=0)
     error('parameters.g_amp should be a positive real scalar.');
 end
 if ~isfield(parameters,'g_dur')
     error('gradient duration should be specified in parameters.g_dur variable.');
 elseif (~isnumeric(parameters.g_dur))||(~isreal(parameters.g_dur))||...
-       (~isscalar(parameters.g_dur))||(parameters.g_dur<=0)
+       (~isscalar(parameters.g_dur))||(~isfinite(parameters.g_dur))||...
+       (parameters.g_dur<=0)
     error('parameters.g_dur should be a positive real scalar.');
 end
 if ~isfield(parameters,'g_stab_del')
     error('gradient stabilisation delay should be specified in parameters.g_stab_del variable.');
 elseif (~isnumeric(parameters.g_stab_del))||(~isreal(parameters.g_stab_del))||...
-       (~isscalar(parameters.g_stab_del))||(parameters.g_stab_del<0)
+       (~isscalar(parameters.g_stab_del))||(~isfinite(parameters.g_stab_del))||...
+       (parameters.g_stab_del<0)
     error('parameters.g_stab_del should be a non-negative real scalar.');
 end
 if ~isfield(parameters,'s_len')
     error('sample length should be specified in parameters.s_len variable.');
 elseif (~isnumeric(parameters.s_len))||(~isreal(parameters.s_len))||...
-       (~isscalar(parameters.s_len))||(parameters.s_len<=0)
+       (~isscalar(parameters.s_len))||(~isfinite(parameters.s_len))||...
+       (parameters.s_len<=0)
     error('parameters.s_len should be a positive real scalar.');
 end
 if ~isfield(parameters,'pathway')
     error('coherence pathway should be specified in parameters.pathway variable.');
-elseif (~ischar(parameters.pathway))||(~ismember(upper(parameters.pathway),{'P','N'}))
-    error('parameters.pathway should be either ''P'' or ''N''.');
+elseif (~ischar(parameters.pathway))||...
+       (~ismember(upper(parameters.pathway),{'P','N','P+N'}))
+    error('parameters.pathway should be ''P'', ''N'', or ''P+N''.');
 end
 end
 
@@ -210,4 +264,3 @@ end
 % a flower is a weed with an advertising budget.
 %
 % Rory Sutherland
-

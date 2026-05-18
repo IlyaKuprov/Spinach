@@ -1,4 +1,11 @@
-% Phase-sensitive heteronuclear NOESY pulse sequence. Syntax:
+% Phase-sensitive heteronuclear NOESY pulse sequence.
+%
+% References:
+%
+%            https://doi.org/10.1021/ja00353a071
+%            https://doi.org/10.1039/C8CP00911B
+%
+% Syntax:
 %
 %            fid=hoesy(spin_system,parameters,H,R,K)
 %

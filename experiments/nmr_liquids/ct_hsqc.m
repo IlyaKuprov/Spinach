@@ -1,4 +1,11 @@
-% Constant-time phase-sensitive HSQC pulse sequence. Syntax:
+% Constant-time phase-sensitive HSQC pulse sequence.
+%
+% References:
+%
+%              https://doi.org/10.1016/0022-2364(92)90144-V
+%              https://doi.org/10.1007/BF00227470
+%
+% Syntax:
 %
 %              fid=ct_hsqc(spin_system,parameters,H,R,K)
 %

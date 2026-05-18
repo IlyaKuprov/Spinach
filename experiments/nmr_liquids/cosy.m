@@ -1,4 +1,11 @@
-% Phase-sensitive COSY pulse sequence. Syntax:
+% Phase-sensitive COSY pulse sequence.
+%
+% References:
+%
+%               https://doi.org/10.1063/1.432450
+%               https://doi.org/10.1016/0022-2364(82)90279-7
+%
+% Syntax:
 %
 %               fid=cosy(spin_system,parameters,H,R,K)
 %

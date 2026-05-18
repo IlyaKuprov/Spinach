@@ -1,4 +1,11 @@
-% 2D multiple-quantum NMR pulse sequence. Syntax:
+% 2D multiple-quantum NMR pulse sequence.
+%
+% References:
+%
+%           https://doi.org/10.1002/cphc.201800667
+%           https://doi.org/10.1039/d1cc03079e
+%
+% Syntax:
 %
 %           fid=mqs(spin_system,parameters,H,R,K)
 %

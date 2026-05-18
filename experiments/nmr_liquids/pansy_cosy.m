@@ -1,7 +1,9 @@
-% Magnitude mode PANSY-COSY pulse sequence from Figure 1 in the 
-% paper by Kupce, Freeman, and John:
+% Magnitude mode PANSY-COSY pulse sequence.
 %
-%               http://dx.doi.org/10.1021/ja0634876
+% References:
+%
+%            https://doi.org/10.1021/ja0634876
+%            https://doi.org/10.1016/j.pnmrs.2021.03.001
 %
 % Syntax:
 %

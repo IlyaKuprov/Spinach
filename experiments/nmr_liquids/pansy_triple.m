@@ -1,7 +1,9 @@
-% Triple-channel PANSY pulse sequence from Figure 1 in the 
-% paper by Kupce, Freeman, and John:
+% Triple-channel PANSY pulse sequence.
 %
-%            https://dx.doi.org/10.1021/ja0634876
+% References:
+%
+%       https://doi.org/10.1021/ja0634876
+%       https://doi.org/10.1007/128_2011_226
 %
 % Syntax:
 %

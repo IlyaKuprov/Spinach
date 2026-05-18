@@ -1,4 +1,11 @@
-% Phase-sensitive HSQC pulse sequence. Syntax:
+% Phase-sensitive HSQC pulse sequence.
+%
+% References:
+%
+%              https://doi.org/10.1016/0009-2614(80)80041-8
+%              https://doi.org/10.1002/cmr.a.10095
+%
+% Syntax:
 %
 %              fid=hsqc(spin_system,parameters,H,R,K)
 %

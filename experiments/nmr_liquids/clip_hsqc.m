@@ -1,4 +1,10 @@
-% CLIP-HSQC pulse sequence. Syntax:
+% CLIP-HSQC pulse sequence.
+%
+% References:
+%
+%             https://doi.org/10.1016/j.jmr.2008.03.009
+%
+% Syntax:
 %
 %             fid=clip_hsqc(spin_system,parameters,H,R,K)
 %

@@ -1,4 +1,11 @@
-% Multiple quantum correlation pulse sequence with refocusing. Syntax:
+% Multiple quantum correlation pulse sequence with refocusing.
+%
+% References:
+%
+%            https://doi.org/10.1063/1.432450
+%            https://doi.org/10.1016/0022-2364(80)90096-7
+%
+% Syntax:
 %
 %            fid=mqs_refocus(spin_system,parameters,H,R,K)
 %

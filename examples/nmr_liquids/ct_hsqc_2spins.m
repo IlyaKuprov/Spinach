@@ -50,8 +50,8 @@ parfor n=1:numel(subsystems)
     fid=liquid(subsystem,@ct_hsqc,parameters,'nmr');
     
     % Apodisation
-    fid.pos=apodisation(spin_system,fid.pos,{{'cos'},{'cos'}});
-    fid.neg=apodisation(spin_system,fid.neg,{{'cos'},{'cos'}});
+    fid.pos=apodisation(spin_system,fid.pos,{{'sqcos'},{'sqcos'}});
+    fid.neg=apodisation(spin_system,fid.neg,{{'sqcos'},{'sqcos'}});
     
     % F2 Fourier transform
     f1_pos=fftshift(fft(fid.pos,parameters.zerofill(2),1),1);
@@ -68,6 +68,6 @@ end
 % Plotting
 kfigure(); scale_figure([1.5 2.0]);
 plot_2d(spin_system,real(spectrum),parameters,...
-        20,[0.05 1.0 0.05 1.0],2,256,6,'both');
+        20,[0.05 1.0 0.05 1.0],2,256,6,'negative');
 
 end

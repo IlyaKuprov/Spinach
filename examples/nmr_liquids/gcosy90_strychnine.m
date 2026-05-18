@@ -46,8 +46,8 @@ parameters.pathway='P+N';
 fid=liquid(spin_system,@gcosy,parameters,'nmr');
 
 % Apodisation
-fid.pos=apodisation(spin_system,fid.pos,{{'cos'},{'cos'}});
-fid.neg=apodisation(spin_system,fid.neg,{{'cos'},{'cos'}});
+fid.pos=apodisation(spin_system,fid.pos,{{'sqcos'},{'sqcos'}});
+fid.neg=apodisation(spin_system,fid.neg,{{'sqcos'},{'sqcos'}});
 
 % F2 Fourier transform
 f1_pos=fftshift(fft(fid.pos,parameters.zerofill(2),1),1);

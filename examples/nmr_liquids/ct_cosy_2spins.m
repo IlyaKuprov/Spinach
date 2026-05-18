@@ -14,7 +14,7 @@ sys.isotopes={'1H','1H'};
 
 % Interactions
 sys.magnet=5.9;
-inter.zeeman.scalar={1.00 3.00};
+inter.zeeman.scalar={2.00 5.00};
 inter.coupling.scalar{1,2}=7.0; 
 inter.coupling.scalar{2,2}=0;
 
@@ -38,7 +38,7 @@ spin_system=basis(spin_system,bas);
 fid=liquid(spin_system,@ct_cosy,parameters,'nmr');
 
 % Apodisation
-fid=apodisation(spin_system,fid,{{'cos'},{'cos'}}); 
+fid=apodisation(spin_system,fid,{{'sqcos'},{'sqcos'}}); 
 
 % Fourier transform
 spectrum=fftshift(fft2(fid,parameters.zerofill(2),...

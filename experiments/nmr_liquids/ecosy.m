@@ -22,10 +22,8 @@
 %    fid.cos, fid.sin - real and imaginary components of the
 %                       States quadrature signal
 %
-% Notes: with B0=B1=0, the multiple-quantum filter weights are
-%        B_p=p^2/4 for even p and B_p=(p^2-1)/4 for odd p.
-%        This gives 1, 2, 4, 6, and 9 for p=2..6; coherence
-%        orders above six are a documented implementation limit.
+% Notes: implemented up to six-quantum orders as per the original
+%        paper. Let us know if you need more.
 %
 % ilya.kuprov@weizmann.ac.il
 %

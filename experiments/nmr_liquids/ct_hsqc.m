@@ -149,10 +149,6 @@ fid.pos=evolution(spin_system,L,parameters.coil,rho_stack_pos,...
 fid.neg=evolution(spin_system,L,parameters.coil,rho_stack_neg,...
                   timestep(2),parameters.npoints(2)-1,'observable');
 
-% Flip the indirect dimension into the conventional frequency sense
-fid.pos=fliplr(fid.pos);
-fid.neg=fliplr(fid.neg);
-
 end
 
 % Consistency enforcement

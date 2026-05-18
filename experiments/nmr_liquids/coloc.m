@@ -1,8 +1,10 @@
-% COLOC NMR pulse sequence from 
+% COLOC NMR pulse sequence.
+%
+% References:
 %
 %          https://doi.org/10.1016/0022-2364(84)90136-7
 %
-% implemented as shown in Figure 1b, without the dashed pulses during
+% Implemented as shown in Figure 1b, without the dashed pulses during
 % the delta(2) period. Delta(1) defaults to half of the maximum F1
 % evolution time implied by the sweep width, delta(2) must be specified.
 % Syntax:

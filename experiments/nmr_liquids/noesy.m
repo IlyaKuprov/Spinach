@@ -1,4 +1,12 @@
-% Phase-sensitive homonuclear NOESY pulse sequence. Syntax:
+% Phase-sensitive homonuclear NOESY pulse sequence.
+%
+% References:
+%
+%             https://doi.org/10.1063/1.438208
+%             https://doi.org/10.1016/0006-291X(80)90695-6
+%             https://doi.org/10.1016/0022-2364(82)90279-7
+%
+% Syntax:
 %
 %             fid=noesy(spin_system,parameters,H,R,K)
 %

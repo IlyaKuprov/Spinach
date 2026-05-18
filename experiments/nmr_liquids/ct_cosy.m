@@ -1,5 +1,12 @@
 % Constant-time COSY pulse sequence with analytical coherence selec-
-% tion from Figure 3a of (https://doi.org/10.1002/chem.201406283).
+% tion.
+%
+% References:
+%
+%             https://doi.org/10.1006/jmra.1994.1095
+%             https://doi.org/10.1080/00387010009350054
+%             https://doi.org/10.1002/chem.201406283
+%
 % The F1 trace is flipped at the end to preserve the conventional
 % indirect-dimension sign for the reversed-delay implementation.
 % Syntax:

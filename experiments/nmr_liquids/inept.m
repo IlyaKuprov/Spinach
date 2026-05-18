@@ -1,6 +1,12 @@
 % Non-refocused INEPT pulse sequence. This returns the directly
 % acquired coupled antiphase spectrum rather than a refocused,
-% broadband-decoupled INEPT variant. Syntax:
+% broadband-decoupled INEPT variant.
+%
+% References:
+%
+%           https://doi.org/10.1021/ja00497a058
+%
+% Syntax:
 % 
 %           fid=inept(spin_system,parameters,H,R,K)
 %

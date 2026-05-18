@@ -1,10 +1,11 @@
-% Phase-sensitive NOESY-HSQC sequence from
+% Phase-sensitive NOESY-HSQC sequence.
 %
-%         http://pubs.acs.org/doi/abs/10.1021/bi00441a004 
+% References:
 %
-% using the bidirectional propagation method described in
-%
-%          http://dx.doi.org/10.1016/j.jmr.2014.04.002
+%         https://doi.org/10.1021/bi00441a004
+%         https://doi.org/10.1016/0022-2364(90)90227-Z
+%         https://doi.org/10.1002/9780470034590.emrstm0563
+%         https://doi.org/10.1016/j.jmr.2014.04.002
 %
 % The sequence is hard-wired to {F1,F2,F3}={1H,15N,1H} with carbon
 % decoupled throughout. Syntax:

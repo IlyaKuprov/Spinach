@@ -1,6 +1,9 @@
-% Magnitude-mode HMBC pulse sequence from 
+% Magnitude-mode HMBC pulse sequence.
 %
-%   A. Bax and M.F. Summers, J. Am. Chem. Soc., 108, 2093 (1986)
+% References:
+%
+%              https://doi.org/10.1021/ja00268a061
+%              https://doi.org/10.1016/0022-2364(88)90172-2
 %
 % Syntax:
 %

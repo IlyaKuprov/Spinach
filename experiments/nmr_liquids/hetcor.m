@@ -1,4 +1,10 @@
-% Magnitude-mode HETCOR pulse sequence. Syntax:
+% Magnitude-mode HETCOR pulse sequence.
+%
+% References:
+%
+%            https://doi.org/10.1016/0022-2364(81)90272-9
+%
+% Syntax:
 %
 %            fid=hetcor(spin_system,parameters,H,R,K)
 %

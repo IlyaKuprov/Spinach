@@ -1,4 +1,11 @@
-% Phase-sensitive double-quantum filtered COSY pulse sequence. Syntax:
+% Phase-sensitive double-quantum filtered COSY pulse sequence.
+%
+% References:
+%
+%               https://doi.org/10.1016/0006-291X(83)91225-1
+%               https://doi.org/10.1021/ja00388a062
+%
+% Syntax:
 %
 %               fid=dqf_cosy(spin_system,parameters,H,R,K)
 %

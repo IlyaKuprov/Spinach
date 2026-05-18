@@ -1,4 +1,12 @@
-% Phase-sensitive E.COSY pulse sequence. Syntax:
+% Phase-sensitive E.COSY pulse sequence.
+%
+% References:
+%
+%               https://doi.org/10.1021/ja00308a042
+%               https://doi.org/10.1063/1.451421
+%               https://doi.org/10.1016/0022-2364(87)90102-8
+%
+% Syntax:
 %
 %               fid=ecosy(spin_system,parameters,H,R,K)
 %

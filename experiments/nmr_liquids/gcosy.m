@@ -1,4 +1,10 @@
-% Gradient-selected COSY pulse sequence. Syntax:
+% Gradient-selected COSY pulse sequence.
+%
+% References:
+%
+%               https://doi.org/10.1002/(SICI)1097-458X(199711)35:10%3C680::AID-OMR149%3E3.0.CO;2-%23
+%
+% Syntax:
 %
 %               fid=gcosy(spin_system,parameters,H,R,K)
 %

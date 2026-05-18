@@ -1,5 +1,12 @@
 % Phase-sensitive homonuclear ROESY pulse sequence, assuming ideal
-% spin-lock. Syntax:
+% spin-lock.
+%
+% References:
+%
+%             https://doi.org/10.1021/ja00315a069
+%             https://doi.org/10.1016/0022-2364(85)90171-4
+%
+% Syntax:
 %
 %             fid=roesy(spin_system,parameters,H,R,K)
 %

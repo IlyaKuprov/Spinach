@@ -1,6 +1,11 @@
 % CRAZED pulse sequence. Ideal analytical coherence-pathway version
-% of the sequence described by Warren & Co in
-% http://dx.doi.org/10.1126/science.8266096. Syntax:
+% of the sequence described by Warren et al.
+%
+% References:
+%
+%                https://doi.org/10.1126/science.8266096
+%
+% Syntax:
 %
 %                fid=crazed(spin_system,parameters,H,R,K)
 %

@@ -1,5 +1,10 @@
-% DEPTQ pulse sequence from Figure 1 of the paper by Burger and Bigler:
-% (https://doi.org/10.1006/jmre.1998.1595). Syntax: 
+% DEPTQ pulse sequence.
+%
+% References:
+%
+%                  https://doi.org/10.1006/jmre.1998.1595
+%
+% Syntax:
 % 
 %                  fid=deptq(spin_system,parameters,H,R,K)
 %

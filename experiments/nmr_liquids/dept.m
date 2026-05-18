@@ -1,5 +1,10 @@
-% DEPT pulse sequence from the schematic in the paper by Doddrell, Pegg,
-% and Bendall (https://doi.org/10.1016/0022-2364(82)90286-4). Syntax: 
+% DEPT pulse sequence.
+%
+% References:
+%
+%                  https://doi.org/10.1016/0022-2364(82)90286-4
+%
+% Syntax:
 % 
 %                  fid=dept(spin_system,parameters,H,R,K)
 %

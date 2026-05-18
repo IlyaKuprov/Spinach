@@ -1,7 +1,13 @@
 % INADEQUATE pulse sequence. Selects double-quantum coherence from
 % coupled carbon pairs, then converts it back into observable single-
 % quantum magnetisation. At natural abundance 13C, this produces only
-% 13C pair subspectra. Syntax:
+% 13C pair subspectra.
+%
+% References:
+%
+%              https://doi.org/10.1021/ja00534a056
+%
+% Syntax:
 %
 %              fid=inadequate(spin_system,parameters,H,R,K)
 %

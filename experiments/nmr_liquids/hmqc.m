@@ -1,4 +1,10 @@
-% Magnitude-mode HMQC pulse sequence. Syntax:
+% Magnitude-mode HMQC pulse sequence.
+%
+% References:
+%
+%              https://doi.org/10.1016/0022-2364(83)90241-X
+%
+% Syntax:
 %
 %              fid=hmqc(spin_system,parameters,H,R,K)
 %

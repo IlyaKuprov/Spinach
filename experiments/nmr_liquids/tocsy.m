@@ -1,4 +1,12 @@
-% Amplitude-mode homonuclear TOCSY pulse sequence. Syntax:
+% Amplitude-mode homonuclear TOCSY pulse sequence.
+%
+% References:
+%
+%             https://doi.org/10.1016/0022-2364(83)90226-3
+%             https://doi.org/10.1021/ja00295a052
+%             https://doi.org/10.1016/0022-2364(85)90018-6
+%
+% Syntax:
 %
 %             fid=tocsy(spin_system,parameters,H,R,K)
 %

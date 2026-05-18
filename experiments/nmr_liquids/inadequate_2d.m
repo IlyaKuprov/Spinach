@@ -1,4 +1,11 @@
-% 2D INADEQUATE pulse sequence. Syntax:
+% 2D INADEQUATE pulse sequence.
+%
+% References:
+%
+%         https://doi.org/10.1021/ja00398a044
+%         https://doi.org/10.1016/0022-2364(81)90060-3
+%
+% Syntax:
 %
 %         fid=inadequate_2d(spin_system,parameters,H,R,K)
 %

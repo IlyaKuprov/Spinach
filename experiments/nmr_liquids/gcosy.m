@@ -84,10 +84,10 @@ L=H+1i*R+1i*K;
 % Compute the evolution timestep
 timestep=1/parameters.sweep;
 
-% Initial state
+% Initial state up to a constant multiplier
 rho=state(spin_system,'Lz',parameters.spins{1},'cheap');
 
-% Detection state
+% Detection state up to a constant multiplier
 coil=state(spin_system,'L+',parameters.spins{1},'cheap');
 
 % Get the pulse operator
@@ -200,8 +200,14 @@ elseif (~ischar(parameters.pathway))||(~ismember(upper(parameters.pathway),{'P',
 end
 end
 
-% Bring me into the company of those who seek truth, and deliver me from
-% those who have found it.
+% For economic and political thought to make useful progress, 
+% it needs to be informed by evolutionary biology. This seems
+% a very necessary exercise, since any attempt to understand
+% morality, politics, economics or business without reference
+% to evolutionary biology is ridiculous. As I explain to my
+% children, ants are Marxist, dogs are Burkean conservatives
+% and cats are libertarians. And, as I explain to our clients,
+% a flower is a weed with an advertising budget.
 %
-% Arthur C. Clarke
+% Rory Sutherland
 

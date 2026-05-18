@@ -41,10 +41,10 @@ grumble(spin_system,parameters,H,R,K);
 % Compose Liouvillian
 L=H+1i*R+1i*K;
 
-% Initial state
+% Initial state up to an overall multiplier
 rho=state(spin_system,'Lz',parameters.spins{1},'cheap');
 
-% Detection state
+% Detection state up to an overall multiplier
 coil=state(spin_system,'L+',parameters.spins{1},'cheap');
 
 % Get the pulse operator
@@ -54,7 +54,8 @@ Lp=operator(spin_system,'L+',parameters.spins{1});
 rho=step(spin_system,(Lp+Lp')/2,rho,pi/2);
 
 % Run the F1 evolution
-rho_stack=evolution(spin_system,L,[],rho,1/parameters.sweep,parameters.npoints(1)-1,'trajectory');
+rho_stack=evolution(spin_system,L,[],rho,1/parameters.sweep,...
+                    parameters.npoints(1)-1,'trajectory');
 
 % Select "+1" coherence
 rho_stack=coherence(spin_system,rho_stack,{{parameters.spins{1},+1}});
@@ -63,7 +64,8 @@ rho_stack=coherence(spin_system,rho_stack,{{parameters.spins{1},+1}});
 rho_stack=step(spin_system,(Lp+Lp')/2,rho_stack,parameters.angle);
  
 % Run the F2 evolution
-fid=evolution(spin_system,L,coil,rho_stack,1/parameters.sweep,parameters.npoints(2)-1,'observable');
+fid=evolution(spin_system,L,coil,rho_stack,1/parameters.sweep,...
+              parameters.npoints(2)-1,'observable');
 
 end
 
@@ -101,8 +103,8 @@ elseif numel(parameters.angle)~=1
 end
 end
 
-% Bring me into the company of those who seek truth, and deliver me from
-% those who have found it.
+% Bring me into the company of those who seek truth, 
+% and deliver me from those who have found it.
 %
 % Arthur C. Clarke
 

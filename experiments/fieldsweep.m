@@ -81,22 +81,25 @@ b_axis=linspace(parameters.window(1),...
 % Preallocate the spectrum
 spec=zeros(size(b_axis),'like',1i);
 
+% Convert grid to Cartesian coordinates
+x=sin(bets).*cos(gams); y=sin(bets).*sin(gams); z=cos(bets);
+
 % Eigenfields at grid vertices
-tf=cell(grid_size,1); tm=cell(grid_size,1); 
-tw=cell(grid_size,1); pd=cell(grid_size,1);
-ti=cell(grid_size,1);
+vert=repmat(struct('xyz',zeros(3,1),'tf',[],'tm',[],...
+                  'tw',[],'pd',[],'ti',[]),grid_size,1);
 parfor n=1:grid_size %#ok<*PFBNS>
 
-    % Localise parameters array and set the orientation
+    % Localise parameters array, set the orientation, and create the vertex
     loc_params=parameters; loc_params.orientation=[alps(n) bets(n) gams(n)];
+    loc_vert=struct();
+    loc_vert.xyz=[x(n); y(n); z(n)];
     
     % Transition fields and moments
-    [tf{n},tm{n},tw{n},pd{n},ti{n}]=eigenfields(spin_system,loc_params,Iz,Qz,Ic,Qc,Hmw);
+    [loc_vert.tf,loc_vert.tm,loc_vert.tw,loc_vert.pd,loc_vert.ti]=...
+        eigenfields(spin_system,loc_params,Iz,Qz,Ic,Qc,Hmw);
+    vert(n)=loc_vert;
     
 end
-
-% Convert grid to Cartesian coodinates
-x=sin(bets).*cos(gams); y=sin(bets).*sin(gams); z=cos(bets);
 
 % Voitlander integrator at each triangle
 parfor n=1:size(hull,1)
@@ -104,17 +107,11 @@ parfor n=1:size(hull,1)
     % Extract triangle indices
     a=hull(n,1); b=hull(n,2); c=hull(n,3);
 
-    % Get vertex coordinates
-    xyz_a=[x(a); y(a); z(a)]; 
-    xyz_b=[x(b); y(b); z(b)]; 
-    xyz_c=[x(c); y(c); z(c)];
+    % Build the triangle
+    loc_tri=struct('vert',vert([a b c]));
     
     % Call Voitlander integrator
-    spec=spec+voitlander(spin_system,parameters,xyz_a,xyz_b,xyz_c,...
-                                     tf{a},tf{b},tf{c},tm{a},tm{b},tm{c},...
-                                     tw{a},tw{b},tw{c},pd{a},pd{b},pd{c},...
-                                     ti{a},ti{b},ti{c},...
-                                     Ic,Iz,Qc,Qz,Hmw,b_axis);
+    spec=spec+voitlander(spin_system,parameters,loc_tri,Ic,Iz,Qc,Qz,Hmw,b_axis);
     
 end
 

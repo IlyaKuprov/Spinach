@@ -121,7 +121,7 @@ spec_sub=trint(tf1,tf12,tf31,tm1,tm12,tm31,tw1,tw12,tw31,pd1,pd12,pd31,ti1,ti12,
 spec_dir=trint(tf1,tf2,tf3,tm1,tm2,tm3,tw1,tw2,tw3,pd1,pd2,pd3,ti1,ti2,ti3,r1,r2,r3,b_axis);
 
 % If the accuracy is insufficient, make a recursive call
-if norm(spec_dir-spec_sub,2)>parameters.int_tol
+if sphtarea(r1,r2,r3)*norm(spec_dir-spec_sub,2)>parameters.int_tol
 
     % Four triangles of the subdivision
     spec=voitlander(spin_system,parameters,r1,r12,r31,...
@@ -162,55 +162,10 @@ spec=zeros(size(b_axis),'like',1i);
 
 % Find transitions present at all three vertices
 if isempty(ti1)||isempty(ti2)||isempty(ti3), return; end
-if size(ti1,2)>=3
-
-    % Find level pairs with roots at triangle vertices
-    pair_list=unique([ti1(:,1:2); ti2(:,1:2); ti3(:,1:2)],'rows','stable');
-    idx1=[]; idx2=[]; idx3=[];
-
-    % Match same-pair roots by nearest field continuation
-    for p=1:size(pair_list,1)
-
-        % Get candidate roots for this level pair
-        cand1=find((ti1(:,1)==pair_list(p,1))&(ti1(:,2)==pair_list(p,2)));
-        cand2=find((ti2(:,1)==pair_list(p,1))&(ti2(:,2)==pair_list(p,2)));
-        cand3=find((ti3(:,1)==pair_list(p,1))&(ti3(:,2)==pair_list(p,2)));
-        if isempty(cand1)||isempty(cand2)||isempty(cand3), continue; end
-
-        % Initialise local candidate masks
-        used1=false(size(cand1)); used2=false(size(cand2)); used3=false(size(cand3));
-
-        % Greedily match roots with the smallest field spread
-        while any(~used1)&&any(~used2)&&any(~used3)
-            best_span=Inf; best_pick=[0 0 0];
-            list1=find(~used1).'; list2=find(~used2).'; list3=find(~used3).';
-            for a=list1
-                for b=list2
-                    for c=list3
-                        field_vals=[tf1(cand1(a)) tf2(cand2(b)) tf3(cand3(c))];
-                        field_span=max(field_vals)-min(field_vals);
-                        if field_span<best_span
-                            best_span=field_span; best_pick=[a b c];
-                        end
-                    end
-                end
-            end
-            if ~isfinite(best_span), break; end
-            idx1(end+1)=cand1(best_pick(1)); %#ok<AGROW>
-            idx2(end+1)=cand2(best_pick(2)); %#ok<AGROW>
-            idx3(end+1)=cand3(best_pick(3)); %#ok<AGROW>
-            used1(best_pick(1))=true;
-            used2(best_pick(2))=true;
-            used3(best_pick(3))=true;
-        end
-    end
-    ntrans=numel(idx1);
-else
-    [ti12,idx1,idx2]=intersect(ti1,ti2,'rows','stable');
-    [~,idx12,idx3]=intersect(ti12,ti3,'rows','stable');
-    idx1=idx1(idx12); idx2=idx2(idx12);
-    ntrans=numel(idx1);
-end
+[ti12,idx1,idx2]=intersect(ti1,ti2,'rows','stable');
+[~,idx12,idx3]=intersect(ti12,ti3,'rows','stable');
+idx1=idx1(idx12); idx2=idx2(idx12);
+ntrans=numel(idx1);
 
 % Area of spherical triangle
 S=sphtarea(r1,r2,r3);

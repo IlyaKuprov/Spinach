@@ -70,29 +70,6 @@ result=test_close(result,'eigenfields transition width',tw,parameters.fwhm,1e-14
 result=test_close(result,'eigenfields population difference',pd,1,1e-14,1e-14,...
                   'Liouville-space population differences are currently unit placeholders');
 
-% Check two-root Hilbert-space resonance extraction in a curved level gap
-spin_system=local_minimal_system('zeeman-hilb',2);
-parameters=struct();
-parameters.mw_freq=1/(2*pi);
-parameters.window=[-0.8 0.8];
-parameters.pp_tol=1e-20;
-parameters.tm_tol=0;
-parameters.fwhm=0.01;
-parameters.orientation=[0 0 0];
-parameters.rspt_order=Inf;
-parameters.rho0=diag([1 0]);
-Iz=diag([-1 1]);
-Ic=[0 0.1;0.1 0];
-Qz=local_tiny_rank_one(2);
-Qc=local_tiny_rank_one(2);
-Hmw=[0 1;1 0];
-[tf,~,~,~,ti]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
-root_field=sqrt(0.25-0.01);
-result=test_close(result,'eigenfields two-root fields',tf,[-root_field; root_field],1e-8,1e-10,...
-                  'a symmetric avoided crossing must produce both resonance fields in the sweep window');
-result=test_true(result,'eigenfields two-root identities',isequal(ti,[1 2 1;1 2 2]),...
-                 'multiple roots of the same level pair must receive distinct branch identities');
-
 % Check one-dimensional gradient operator construction in Fokker-Planck space
 spin_system=local_created_system('zeeman-hilb',1);
 fp_par.dims=2;
@@ -160,8 +137,6 @@ result=test_close(result,'symmetry irrep dimension',spin_system.bas.irrep.dimens
 end
 
 
-
-
 function spin_system=local_created_system(formalism,magnet)
 
 % Build a quiet one-proton Spinach object in the requested formalism
@@ -214,3 +189,4 @@ if isempty(current_pool)
 end
 
 end
+

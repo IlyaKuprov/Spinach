@@ -57,9 +57,7 @@
 %
 %     tf     -  vector of transition fields in Tesla
 %
-%     tm     -  vector of field-swept transition weights,
-%               including transition moments and field-
-%               domain Jacobians
+%     tm     -  vector of transition moments
 %
 %     tw     -  vector of transition FWHMs in Tesla
 %
@@ -104,14 +102,13 @@ switch spin_system.bas.formalism
         E= zeros([size(Hz,1) numel(grid)]); % Level energies
         LP=zeros([size(Hz,1) numel(grid)]); % Level populations
         dE=zeros([size(Hz,1) numel(grid)]); % dE/dB derivatives
-        V=cell(1,numel(grid));              % Level eigenvectors
         T=cell(1,numel(grid));              % Transition moments
 
         % Populate initial grid
         for n=1:numel(grid)
 
             % Sorted (ascending) energies, dE/dB derivatives, transition moments, level pops
-            [E(:,n),V{n},dE(:,n),T{n},LP(:,n)]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,grid(n));
+            [E(:,n),~,dE(:,n),T{n},LP(:,n)]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,grid(n));
             
         end
         
@@ -123,7 +120,6 @@ switch spin_system.bas.formalism
             
             % Start at the leftmost point of the grid
             new_E=E(:,1); new_dE=dE(:,1); new_T=T(1);
-            new_V=V(1);
             new_grid=grid(1); new_conv=[]; new_LP=LP(:,1);
             
             % Inspect old grid intervals
@@ -151,8 +147,8 @@ switch spin_system.bas.formalism
                                     
                     % Get eigensystem information for the grid midpoints
                     midp1=grid(n-1)+(1/3)*dx; midp2=grid(n-1)+(2/3)*dx;
-                    [Em1,Vm1,dEm1,Tm1,LPm1]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,midp1);
-                    [Em2,Vm2,dEm2,Tm2,LPm2]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,midp2);
+                    [Em1,~,dEm1,Tm1,LPm1]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,midp1);
+                    [Em2,~,dEm2,Tm2,LPm2]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,midp2);
 
                     % Append midpoints to the new grid
                     new_grid((end+1):(end+2))=[midp1 midp2];
@@ -160,7 +156,6 @@ switch spin_system.bas.formalism
                     new_LP(:,(end+1):(end+2))=[LPm1 LPm2];
                     new_E(:,(end+1):(end+2))=[Em1 Em2];
                     new_T((end+1):(end+2))={Tm1 Tm2};
-                    new_V((end+1):(end+2))={Vm1 Vm2};
 
                     % Check prediction accuracy
                     if (norm(EmP1-Em1,1)<frq_gap_tol)&&...
@@ -183,35 +178,21 @@ switch spin_system.bas.formalism
                 new_dE(:,end+1)=dE(:,n);   %#ok<AGROW>
                 new_E(:,end+1)=E(:,n);     %#ok<AGROW>
                 new_T{end+1}=T{n};         %#ok<AGROW>
-                new_V{end+1}=V{n};         %#ok<AGROW>
                 new_LP(:,end+1)=LP(:,n);   %#ok<AGROW>
                 
             end
             
             % New grid becomes old
             E=new_E; dE=new_dE; grid=new_grid;
-            T=new_T; V=new_V; LP=new_LP; converged=new_conv;
+            T=new_T; LP=new_LP; converged=new_conv;
 
             % Complain and bomb out if the field grid becomes too large
             if numel(grid)>1e3, error('field grid construction failed'); end
             
         end
         
-        % Get the relative transition moment cut-off
-        tm_scale=0;
-        for n=1:numel(T)
-            tm_scale=max([tm_scale; T{n}(:)]);
-        end
-        tm_cutoff=parameters.tm_tol*tm_scale;
-
-        % Mark level pairs that are active anywhere on the converged grid
-        pair_active=false(size(E,1));
-        for n=1:numel(T)
-            pair_active=pair_active|(T{n}>tm_cutoff);
-        end
-
         % Get outputs started
-        tf=[]; tm=[]; tm_raw=[]; tw=[]; pd=[]; ti=zeros(0,3);
+        tf=[]; tm=[]; tw=[]; pd=[]; ti=zeros(0,3);
 
         % Initialise branch counters for each level pair
         pair_branch=zeros(size(E,1));
@@ -226,81 +207,74 @@ switch spin_system.bas.formalism
             interval_max=max(E(:,[n-1, n]),[],2);
             interval_min=min(E(:,[n-1, n]),[],2);
 
-            % Screen by energy and grid-wide transition activity
+            % Screen by energy and transition moment
             deltaE_upper=interval_max'-interval_min;
             deltaE_lower=interval_min'-interval_max;
-            promising_pairs=(omega<deltaE_upper)&...
-                            (omega>deltaE_lower)&pair_active;
+            promising_pairs=(omega<deltaE_upper)&(omega>deltaE_lower)&...
+                            (T{n-1}>parameters.tm_tol|T{n}>parameters.tm_tol);
             [source,destin]=find(promising_pairs);
-
-            % State overlap between field knots
-            if isempty(source), continue; end
-            state_ovlp=abs(V{n-1}'*V{n}).^2;
             
             % Loop over source-destination pairs
             for k=1:numel(source)
                 
-                % Get spline coefficients (x^3 -> x^0) for energies in this interval
-                source_spline=[dE(source(k),n-1)*dx E(source(k),n-1) ...
-                               dE(source(k),n)*dx   E(source(k),n)]*[ 1 -2  1  0;
-                                                                      2 -3  0  1;
-                                                                      1 -1  0  0;
-                                                                     -2  3  0  0];
-                destin_spline=[dE(destin(k),n-1)*dx E(destin(k),n-1) ...
-                               dE(destin(k),n)*dx   E(destin(k),n)]*[ 1 -2  1  0;
-                                                                      2 -3  0  1;
-                                                                      1 -1  0  0;
-                                                                     -2  3  0  0];
-
+                % Source and destination lines
+                source_level=E(source(k),[n-1, n]);
+                source_line=[source_level(2)-source_level(1); source_level(1)];
+                destin_level=E(destin(k),[n-1, n]);
+                destin_line=[destin_level(2)-destin_level(1); destin_level(1)];
+                
                 % Energies must be omega apart
-                destin_spline(4)=destin_spline(4)-omega;
+                destin_line(2)=destin_line(2)-omega;
 
-                % Get the cubic equation coefficients
-                cubic_coeffs=destin_spline-source_spline;
-                poly_coeffs=cubic_coeffs;
-                poly_scale=max(abs(poly_coeffs));
-                if poly_scale==0, continue; end
-                poly_coeffs=poly_coeffs/poly_scale;
+                % Use linear interpolation first
+                line_coeffs=destin_line-source_line;
+                alpha=-line_coeffs(2)/line_coeffs(1);
 
-                % Drop leading numerical zeros
-                lead_idx=find(abs(poly_coeffs)>sqrt(eps),1,'first');
-                if isempty(lead_idx), continue; end
-                poly_coeffs=poly_coeffs(lead_idx:end);
+                % Check level crossing location
+                if (alpha<-0.1)||(alpha>1.1)
+                    
+                    % Outside
+                    continue;
 
-                % Find all real roots inside the field interval
-                root_tol=1e-8;
-                root_list=roots(poly_coeffs);
-                root_list=root_list(abs(imag(root_list))<root_tol);
-                root_list=real(root_list);
-                root_list=root_list((root_list>=-root_tol)&...
-                                    (root_list<=1+root_tol));
-                root_list=min(max(root_list,0),1);
-                root_list=sort(root_list(:).');
-                if isempty(root_list), continue; end
-                root_list=root_list([true abs(diff(root_list))>root_tol]);
+                else
 
-                % Differentiate the unscaled spline
-                deriv_coeffs=[3*cubic_coeffs(1) 2*cubic_coeffs(2) cubic_coeffs(3)];
+                    % Get spline coefficients (x^3 -> x^0) for energies in this interval
+                    source_spline=[dE(source(k),n-1)*dx E(source(k),n-1) ...
+                                   dE(source(k),n)*dx   E(source(k),n)]*[ 1 -2  1  0; 
+                                                                          2 -3  0  1; 
+                                                                          1 -1  0  0; 
+                                                                         -2  3  0  0];
+                    destin_spline=[dE(destin(k),n-1)*dx E(destin(k),n-1) ...
+                                   dE(destin(k),n)*dx   E(destin(k),n)]*[ 1 -2  1  0; 
+                                                                          2 -3  0  1; 
+                                                                          1 -1  0  0; 
+                                                                         -2  3  0  0];
+                    % Energies must be omega apart
+                    destin_spline(4)=destin_spline(4)-omega;
 
-                % Check state labelling stability
-                stable_states=(state_ovlp(source(k),source(k))>0.5)&&...
-                              (state_ovlp(destin(k),destin(k))>0.5);
+                    % Get and stabilise cubic equation coefficients
+                    cubic_coeffs=destin_spline-source_spline;
+                    cubic_coeffs=cubic_coeffs/max(abs(cubic_coeffs));
 
-                % Loop over all roots in this field interval
-                for q=1:numel(root_list)
+                    % Differentiate the spline and store coefficients as (x^2 -> x^0)
+                    deriv_coeffs=[3*cubic_coeffs(1) 2*cubic_coeffs(2) 1*cubic_coeffs(3)];
 
-                    % Get the root coordinate
-                    alpha=root_list(q);
-                    if (alpha<=root_tol)&&(n>2), continue; end
+                    % One iteration of Newton's method to refine the root
+                    numer=cubic_coeffs(1)*alpha^3+cubic_coeffs(2)*alpha^2+...
+                          cubic_coeffs(3)*alpha  +cubic_coeffs(4);
+                    denom=deriv_coeffs(1)*alpha^2+deriv_coeffs(2)*alpha  +...
+                          deriv_coeffs(3);
+                    alpha=alpha-numer/denom;
 
-                    % Compute the field-domain Jacobian
-                    gap_deriv=(deriv_coeffs(1)*alpha^2+...
-                               deriv_coeffs(2)*alpha+...
-                               deriv_coeffs(3))/dx;
-                    if (~isfinite(gap_deriv))||(abs(gap_deriv)<eps)
-                        continue;
-                    end
-                    field_jac=1/abs(gap_deriv);
+                end
+                    
+                % Check level crossing location
+                if (alpha<0)||(alpha>1)
+                    
+                    % Outside
+                    continue;
+
+                else
 
                     % Interval edge transition moments
                     tm_left=T{n-1}(source(k),destin(k));
@@ -309,36 +283,16 @@ switch spin_system.bas.formalism
                     % Interval edge population differences
                     pd_left=LP(source(k),n-1)-LP(destin(k),n-1);
                     pd_right=LP(source(k),n)-LP(destin(k),n);
-
-                    % Interpolate transition properties
-                    tm_base=(1-alpha)*tm_left+alpha*tm_right;
-                    pd_base=(1-alpha)*pd_left+alpha*pd_right;
-
-                    % Rediagonalise at unstable roots
-                    if ~stable_states
-                        reson_field=grid(n-1)+alpha*dx;
-                        [~,~,dE_root,T_root,LP_root]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,reson_field);
-                        tm_base=T_root(source(k),destin(k));
-                        pd_base=LP_root(source(k))-LP_root(destin(k));
-                        gap_deriv=dE_root(destin(k))-dE_root(source(k));
-                        if (~isfinite(gap_deriv))||(abs(gap_deriv)<eps)
-                            continue;
-                        end
-                        field_jac=1/abs(gap_deriv);
-                    end
-
+                
                     % Update the branch count for this level pair
                     pair_branch(source(k),destin(k))=pair_branch(source(k),destin(k))+1;
 
-                    % Store transition moment before field weighting
-                    tm_raw(end+1)=tm_base; %#ok<AGROW>
+                    % Store interpolated transition moment
+                    tm(end+1)=(1-alpha)*tm_left+alpha*tm_right; %#ok<AGROW>
 
-                    % Store transition moment with field-domain weighting
-                    tm(end+1)=tm_base*field_jac; %#ok<AGROW>
-
-                    % Store population difference
-                    pd(end+1)=pd_base; %#ok<AGROW>
-
+                    % Store interpolated population difference
+                    pd(end+1)=(1-alpha)*pd_left+alpha*pd_right; %#ok<AGROW>
+                  
                     % Store the transition field
                     tf(end+1)=grid(n-1)+alpha*dx; %#ok<AGROW>
 
@@ -347,7 +301,7 @@ switch spin_system.bas.formalism
 
                     % Store transition identity
                     ti(end+1,:)=[source(k) destin(k) pair_branch(source(k),destin(k))]; %#ok<AGROW>
-
+                
                 end
                 
             end
@@ -357,24 +311,12 @@ switch spin_system.bas.formalism
     % Liouville space formalism
     case {'zeeman-liouv','sphten-liouv'}
         
-        % Set up the generalised eigenfield pencil
-        left_mat=omega*eye(size(Hc))-full(Hc);
-        right_mat=full(Hz);
-
         % Get all transitions
-        [uv,tf]=eig(left_mat,right_mat,'vector');
+        [uv,tf]=eig(omega*eye(size(Hc))-full(Hc),full(Hz),'vector');
         
         % Prune out unphysical results
-        uv_norm=sqrt(sum(abs(uv).^2,1));
-        resid=vecnorm(left_mat*uv-right_mat*(uv.*tf.'),2,1);
-        resid_scale=norm(left_mat,2)+norm(right_mat,2)*max(1,abs(tf(:).'));
-        complex_tf=abs(imag(tf(:).'))>1e-8*max(1,abs(real(tf(:).')));
-        hit_list=(~isfinite(real(tf(:).')))|...
-                 (~isfinite(imag(tf(:).')))|complex_tf|...
-                 (~isfinite(uv_norm))|(uv_norm<sqrt(eps))|...
-                 (resid>1e-8*resid_scale);
-        tf(hit_list)=[]; uv(:,hit_list)=[];
-        tf=real(tf);
+        hit_list=~isfinite(tf); tf(hit_list)=[];  
+        uv(:,hit_list)=[]; tf=real(tf);
         
         % Prune out-of-window transitions
         hit_list=(tf<min(parameters.window))|...
@@ -382,8 +324,7 @@ switch spin_system.bas.formalism
         uv(:,hit_list)=[]; tf(hit_list)=[];
 
         % Normalise dyadics
-        uv_norm=sqrt(sum(abs(uv).^2,1));
-        uv=uv./uv_norm;
+        uv=uv./sqrt(diag(uv'*uv)');
         
         % Compute transition moments
         tm=abs(Hmw'*uv).^2;
@@ -405,15 +346,8 @@ switch spin_system.bas.formalism
 end
 
 % Prune insignificant transition moments
-if isempty(tm)
-    hit_list=false(size(tm));
-elseif exist('tm_raw','var')
-    hit_list=(tm_raw<tm_cutoff);
-else
-    tm_cutoff=parameters.tm_tol*max(tm(:));
-    hit_list=(tm<tm_cutoff);
-end
-tf(hit_list)=[]; tm(hit_list)=[];
+hit_list=(tm<parameters.tm_tol);
+tf(hit_list)=[]; tm(hit_list)=[]; 
 tw(hit_list)=[]; pd(hit_list)=[]; ti(hit_list,:)=[];
 
 % Reshape into columns and sort
@@ -507,3 +441,4 @@ end
 % sing attention to faddishness, perversity, and the occult.
 %
 % Jack Vance, "The Dying Earth"
+

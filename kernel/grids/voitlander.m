@@ -3,7 +3,8 @@
 % erical triangle. Syntax:
 %
 % spec=voitlander(spin_system,parameters,r1,r2,r3,tf1,tf2,tf3,...
-%                 tm1,tm2,tm3,tw1,tw2,tw3,Ic,Iz,Qc,Qz,Hmw,b_axis)
+%                 tm1,tm2,tm3,tw1,tw2,tw3,pd1,pd2,pd3,...
+%                 ti1,ti2,ti3,Ic,Iz,Qc,Qz,Hmw,b_axis)
 %
 % Parameters:
 %
@@ -47,6 +48,9 @@
 %                   triangle corners, real column vectors, one
 %                   element per transition
 %
+%     ti1,ti2,ti3 - transition identity arrays at the triangle
+%                   corners, one row per transition
+%
 %     parameters.int_tol - recursive integration accuracy
 %                          tolerance
 %
@@ -60,11 +64,36 @@
 % <https://spindynamics.org/wiki/index.php?title=voitlander.m>
 
 function spec=voitlander(spin_system,parameters,r1,r2,r3,tf1,tf2,tf3,...
-                         tm1,tm2,tm3,tw1,tw2,tw3,pd1,pd2,pd3,Ic,Iz,Qc,Qz,Hmw,b_axis)
+                         tm1,tm2,tm3,tw1,tw2,tw3,pd1,pd2,pd3,varargin)
                      
+% Parse optional transition identities
+switch numel(varargin)
+
+    case 6
+
+        % Use transition ordinals for legacy calls
+        ti1=(1:numel(tf1)).';
+        ti2=(1:numel(tf2)).';
+        ti3=(1:numel(tf3)).';
+        [Ic,Iz,Qc,Qz,Hmw,b_axis]=varargin{:};
+
+    case 9
+
+        % Read transition identities from the call
+        ti1=varargin{1}; ti2=varargin{2}; ti3=varargin{3};
+        Ic=varargin{4}; Iz=varargin{5}; Qc=varargin{6};
+        Qz=varargin{7}; Hmw=varargin{8}; b_axis=varargin{9};
+
+    otherwise
+
+        % Complain and bomb out
+        error('incorrect number of input arguments.');
+
+end
+
 % Check consistency
 grumble(parameters,r1,r2,r3,tf1,tf2,tf3,tm1,tm2,tm3,...
-        tw1,tw2,tw3,pd1,pd2,pd3,Ic,Iz,Qc,Qz,b_axis);
+        tw1,tw2,tw3,pd1,pd2,pd3,ti1,ti2,ti3,Ic,Iz,Qc,Qz,b_axis);
 
 % Subdivide the triangle
 [r12,r23,r31]=sphtrsubd(r1,r2,r3);
@@ -72,24 +101,24 @@ grumble(parameters,r1,r2,r3,tf1,tf2,tf3,tm1,tm2,tm3,...
 % Characterise new vertices
 [phi,elev]=cart2sph(r12(1),r12(2),r12(3));
 theta=pi/2-elev; parameters.orientation=[0 theta phi];
-[tf12,tm12,tw12,pd12]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
+[tf12,tm12,tw12,pd12,ti12]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
 
 [phi,elev]=cart2sph(r23(1),r23(2),r23(3)); 
 theta=pi/2-elev; parameters.orientation=[0 theta phi];
-[tf23,tm23,tw23,pd23]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
+[tf23,tm23,tw23,pd23,ti23]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
 
 [phi,elev]=cart2sph(r31(1),r31(2),r31(3));
 theta=pi/2-elev; parameters.orientation=[0 theta phi];
-[tf31,tm31,tw31,pd31]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
+[tf31,tm31,tw31,pd31,ti31]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
 
 % Compute the subdivided integral
-spec_sub=trint(tf1,tf12,tf31,tm1,tm12,tm31,tw1,tw12,tw31,pd1,pd12,pd31,r1,r12,r31,b_axis)+...
-         trint(tf12,tf2,tf23,tm12,tm2,tm23,tw12,tw2,tw23,pd12,pd2,pd23,r12,r2,r23,b_axis)+...
-         trint(tf31,tf23,tf3,tm31,tm23,tm3,tw31,tw23,tw3,pd31,pd23,pd3,r31,r23,r3,b_axis)+...
-         trint(tf12,tf23,tf31,tm12,tm23,tm31,tw12,tw23,tw31,pd12,pd23,pd31,r12,r23,r31,b_axis);
+spec_sub=trint(tf1,tf12,tf31,tm1,tm12,tm31,tw1,tw12,tw31,pd1,pd12,pd31,ti1,ti12,ti31,r1,r12,r31,b_axis)+...
+         trint(tf12,tf2,tf23,tm12,tm2,tm23,tw12,tw2,tw23,pd12,pd2,pd23,ti12,ti2,ti23,r12,r2,r23,b_axis)+...
+         trint(tf31,tf23,tf3,tm31,tm23,tm3,tw31,tw23,tw3,pd31,pd23,pd3,ti31,ti23,ti3,r31,r23,r3,b_axis)+...
+         trint(tf12,tf23,tf31,tm12,tm23,tm31,tw12,tw23,tw31,pd12,pd23,pd31,ti12,ti23,ti31,r12,r23,r31,b_axis);
      
 % Compute the direct integral
-spec_dir=trint(tf1,tf2,tf3,tm1,tm2,tm3,tw1,tw2,tw3,pd1,pd2,pd3,r1,r2,r3,b_axis);
+spec_dir=trint(tf1,tf2,tf3,tm1,tm2,tm3,tw1,tw2,tw3,pd1,pd2,pd3,ti1,ti2,ti3,r1,r2,r3,b_axis);
 
 % If the accuracy is insufficient, make a recursive call
 if sphtarea(r1,r2,r3)*norm(spec_dir-spec_sub,2)>parameters.int_tol
@@ -98,18 +127,22 @@ if sphtarea(r1,r2,r3)*norm(spec_dir-spec_sub,2)>parameters.int_tol
     spec=voitlander(spin_system,parameters,r1,r12,r31,...
                                 tf1,tf12,tf31,tm1,tm12,tm31,...
                                 tw1,tw12,tw31,pd1,pd12,pd31,...
+                                ti1,ti12,ti31,...
                                 Ic,Iz,Qc,Qz,Hmw,b_axis)+...
          voitlander(spin_system,parameters,r12,r2,r23,...
                                 tf12,tf2,tf23,tm12,tm2,tm23,...
                                 tw12,tw2,tw23,pd12,pd2,pd23,...
+                                ti12,ti2,ti23,...
                                 Ic,Iz,Qc,Qz,Hmw,b_axis)+...
          voitlander(spin_system,parameters,r31,r23,r3,...
                                 tf31,tf23,tf3,tm31,tm23,tm3,...
                                 tw31,tw23,tw3,pd31,pd23,pd3,...
+                                ti31,ti23,ti3,...
                                 Ic,Iz,Qc,Qz,Hmw,b_axis)+...
          voitlander(spin_system,parameters,r12,r23,r31,...
                                 tf12,tf23,tf31,tm12,tm23,tm31,...
                                 tw12,tw23,tw31,pd12,pd23,pd31,...
+                                ti12,ti23,ti31,...
                                 Ic,Iz,Qc,Qz,Hmw,b_axis);
 else
     
@@ -122,41 +155,39 @@ end
 
 % Single triangle integrator
 function spec=trint(tf1,tf2,tf3,tm1,tm2,tm3,...
-                    tw1,tw2,tw3,pd1,pd2,pd3,r1,r2,r3,b_axis)
+                    tw1,tw2,tw3,pd1,pd2,pd3,ti1,ti2,ti3,r1,r2,r3,b_axis)
                  
 % Preallocate the spectrum
 spec=zeros(size(b_axis),'like',1i);
 
+% Find transitions present at all three vertices
+if isempty(ti1)||isempty(ti2)||isempty(ti3), return; end
+[ti12,idx1,idx2]=intersect(ti1,ti2,'rows','stable');
+[~,idx12,idx3]=intersect(ti12,ti3,'rows','stable');
+idx1=idx1(idx12); idx2=idx2(idx12);
+ntrans=numel(idx1);
+
 % Area of spherical triangle
 S=sphtarea(r1,r2,r3);
 
-% Ignore hanging transitions
-ntrans=min([numel(tf1) numel(tf2) numel(tf3)]);
-if numel(tf1)>ntrans
-    [~,kill_mask]=mink(tm1,numel(tm1)-ntrans); tf1(kill_mask)=[]; tm1(kill_mask)=[];
-end
-if numel(tf2)>ntrans
-    [~,kill_mask]=mink(tm2,numel(tm2)-ntrans); tf2(kill_mask)=[]; tm2(kill_mask)=[];
-end
-if numel(tf3)>ntrans
-    [~,kill_mask]=mink(tm3,numel(tm3)-ntrans); tf3(kill_mask)=[]; tm3(kill_mask)=[];
-end
-
 % Build spectrum
-for k=1:ntrans
+for n=1:ntrans
+
+    % Get transition indices
+    idx_a=idx1(n); idx_b=idx2(n); idx_c=idx3(n);
 
     % Get signal information
-    min_freq=min([tf1(k) tf2(k) tf3(k)]);
-    max_freq=max([tf1(k) tf2(k) tf3(k)]);
-    tran_mom=mean([tm1(k) tm2(k) tm3(k)]);
-    pop_diff=mean([pd1(k) pd2(k) pd3(k)]);
-    line_width=mean([tw1(k) tw2(k) tw3(k)]);
+    min_freq=min([tf1(idx_a) tf2(idx_b) tf3(idx_c)]);
+    max_freq=max([tf1(idx_a) tf2(idx_b) tf3(idx_c)]);
+    tran_mom=mean([tm1(idx_a) tm2(idx_b) tm3(idx_c)]);
+    pop_diff=mean([pd1(idx_a) pd2(idx_b) pd3(idx_c)]);
+    line_width=mean([tw1(idx_a) tw2(idx_b) tw3(idx_c)]);
 
     % Find the relevant part of the axis
     b_mask=(b_axis>min_freq-3*line_width)&(b_axis<max_freq+3*line_width);
 
     % Convolutions of Lorentzians with triangles
-    spec(b_mask)=spec(b_mask)+S*pop_diff*lorentzcon([tf1(k) tf2(k) tf3(k)],...
+    spec(b_mask)=spec(b_mask)+S*pop_diff*lorentzcon([tf1(idx_a) tf2(idx_b) tf3(idx_c)],...
                                          tran_mom,line_width,b_axis(b_mask));
                   
 end
@@ -165,7 +196,7 @@ end
 
 % Consistency enforcement
 function grumble(parameters,r1,r2,r3,tf1,tf2,tf3,tm1,tm2,tm3,...
-                 tw1,tw2,tw3,pd1,pd2,pd3,Ic,Iz,Qc,Qz,b_axis)
+                 tw1,tw2,tw3,pd1,pd2,pd3,ti1,ti2,ti3,Ic,Iz,Qc,Qz,b_axis)
 if (~isnumeric(r1))||(~isreal(r1))||(~iscolumn(r1))||...
    (numel(r1)~=3)||(abs(norm(r1,2)-1)>1e-6)||...
    (~isnumeric(r2))||(~isreal(r2))||(~iscolumn(r2))||...
@@ -193,6 +224,14 @@ if (~isnumeric(pd1))||(~isreal(pd1))||(~iscolumn(pd1))||...
    (~isnumeric(pd2))||(~isreal(pd2))||(~iscolumn(pd2))||...
    (~isnumeric(pd3))||(~isreal(pd3))||(~iscolumn(pd3))
     error('pd1,pd2,pd3 must be real column vectors.');
+end
+if (~isnumeric(ti1))||(~isreal(ti1))||...
+   (~isnumeric(ti2))||(~isreal(ti2))||...
+   (~isnumeric(ti3))||(~isreal(ti3))||...
+   (size(ti1,1)~=numel(tf1))||(size(ti2,1)~=numel(tf2))||...
+   (size(ti3,1)~=numel(tf3))||(size(ti1,2)~=size(ti2,2))||...
+   (size(ti1,2)~=size(ti3,2))
+    error('ti1,ti2,ti3 must be real arrays with one row per transition.');
 end
 if ~isfield(parameters,'int_tol')
     error('integration accuracy tolerance must be supplied in parameters.int_tol field.');

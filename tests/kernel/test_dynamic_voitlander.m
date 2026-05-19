@@ -50,7 +50,7 @@ Iz=(Iz+Iz')/2;
 Hmw=(state(spin_system,'L+','E')+state(spin_system,'L-','E'))/2;
 
 % Find the isotropic transition at one orientation
-[tf,tm,tw,pd]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
+[tf,tm,tw,pd,ti]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
 result=test_true(result,'voitlander transition count',isscalar(tf),...
                  'an isolated isotropic electron has one allowed EPR transition in the selected field window');
 
@@ -65,6 +65,7 @@ b_axis=tf+linspace(-2*tw,2*tw,parameters.npoints);
 % Integrate the triangle using the production routine
 spec=voitlander(spin_system,parameters,r1,r2,r3,...
                 tf,tf,tf,tm,tm,tm,tw,tw,tw,pd,pd,pd,...
+                ti,ti,ti,...
                 Ic,Iz,Qc,Qz,Hmw,b_axis);
 
 % Build the analytic Lorentzian reference for a constant transition
@@ -79,5 +80,4 @@ result=test_true(result,'voitlander finite real spectrum',isreal(spec)&&all(isfi
                  'a positive population difference and transition moment must give a finite non-negative real spectrum');
 
 end
-
 

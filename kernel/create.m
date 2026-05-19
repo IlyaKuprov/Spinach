@@ -227,24 +227,11 @@ if ~isworkernode
     % Set default parallel profile
     if ~isfield(sys,'parallel')
 
-        % This needs some care
-        ncores=feature('numcores');
-        if ncores>64
+        % Leave one core to the OS
+        nworkers=feature('numcores')-1;
 
-            % Beyond 64 workers, MDCS
-            % needs a personal touch
-            nworkers=64;
-
-        else
-
-            % Leave one core to the 
-            % operating system
-            nworkers=ncores-1;
-
-        end
-
-        % Default to the local parallel pool
-        sys.parallel={'local',max([1 nworkers])};
+        % Default to the local process pool
+        sys.parallel={'processes',max([1 nworkers])};
 
     end
     
@@ -279,7 +266,7 @@ if ~isworkernode
         report(spin_system,'parallel pool ValueStore cleared.');
 
         % Disable pool timeout
-        current_pool.IdleTimeout=inf;
+        current_pool.IdleTimeout=Inf;
         
     else
 
@@ -287,8 +274,8 @@ if ~isworkernode
         spin_system.sys.parallel=sys.parallel; sys=rmfield(sys,'parallel');
         spin_system.sys.parprops=sys.parprops; sys=rmfield(sys,'parprops');
         report(spin_system,'starting a parallel pool with the following parameters:')
-        report(spin_system,['         > parallel profile: ' spin_system.sys.parallel{1}]);
-        report(spin_system,['         > workers to start: ' num2str(spin_system.sys.parallel{2})]);
+        report(spin_system,['         > parallel profile:  ' spin_system.sys.parallel{1}]);
+        report(spin_system,['         > workers requested: ' num2str(spin_system.sys.parallel{2})]);
 
         % Default port range is insufficient
         pool_port_range=[20000 45000];
@@ -306,6 +293,10 @@ if ~isworkernode
 
         % Get cluster object
         c=parcluster(spin_system.sys.parallel{1});
+
+        % Respect the system-wide maximum worker setting
+        spin_system.sys.parallel{2}=min([spin_system.sys.parallel{2} ...
+                                         c.NumWorkers]);
         
         % Point the cluster into the job directory
         c.JobStorageLocation=spin_system.sys.job_dir;
@@ -334,7 +325,7 @@ if ~isworkernode
         else
 
             % Figure out the maximum reasonable per-worker core count
-            c.NumThreads=max([1 floor(feature('numcores')/spmdSize)]);
+            c.NumThreads=max([1 floor(feature('numcores')/spin_system.sys.parallel{2})]);
 
         end
 
@@ -346,7 +337,7 @@ if ~isworkernode
                              'EnvironmentVariables',pool_env_vars);
 
         % Disable pool timeout
-        current_pool.IdleTimeout=inf;
+        current_pool.IdleTimeout=Inf;
     
     end
     

@@ -11,7 +11,9 @@
 %
 %      .orientation  - '111', '110', or '100' crystal plane normal
 %                      aligned with the magnetic field
-%      .nitrogen     - must be '15N'
+%      .nitrogen     - '14N' or '15N'; 14N hyperfine couplings
+%                      are scaled from 15N, with no NQI included
+%                      because none is reported for this state
 %
 % Outputs:
 %
@@ -40,7 +42,16 @@ gmat=((frame)*diag([2.0035 2.0035 2.0029])*(frame)');
 zfs=frame*zfs2mat(1685e6,0,0,0,0)*frame';
 
 % Add the nitrogen hyperfine tensor
-nucleus=struct('iso','15N','A',((frame)*diag([-23.8e6 -23.8e6 -35.7e6])*(frame)'));
+Amat=((frame)*diag([-23.8e6 -23.8e6 -35.7e6])*(frame)');
+switch parameters.nitrogen
+    case '15N'
+        nucleus=struct('iso','15N','A',Amat);
+    case '14N'
+        scale=spin('14N')/spin('15N');
+        nucleus=struct('iso','14N','A',scale*Amat);
+    otherwise
+        error('parameters.nitrogen must be ''14N'' or ''15N''.');
+end
 
 % Build the Spinach structures
 switch parameters.orientation
@@ -83,8 +94,8 @@ end
 if(~ischar(parameters.nitrogen))
     error('parameters.nitrogen must be a character string.');
 end
-if ~strcmp(parameters.nitrogen,'15N')
-    error('NV0 excited-state parameters are only available here for 15N.');
+if(~any(strcmp(parameters.nitrogen,{'14N','15N'})))
+    error('parameters.nitrogen must be ''14N'' or ''15N''.');
 end
 end
 

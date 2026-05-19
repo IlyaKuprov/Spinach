@@ -84,13 +84,14 @@ spec=zeros(size(b_axis),'like',1i);
 % Eigenfields at grid vertices
 tf=cell(grid_size,1); tm=cell(grid_size,1); 
 tw=cell(grid_size,1); pd=cell(grid_size,1);
+ti=cell(grid_size,1);
 parfor n=1:grid_size %#ok<*PFBNS>
 
     % Localise parameters array and set the orientation
     loc_params=parameters; loc_params.orientation=[alps(n) bets(n) gams(n)];
     
     % Transition fields and moments
-    [tf{n},tm{n},tw{n},pd{n}]=eigenfields(spin_system,loc_params,Iz,Qz,Ic,Qc,Hmw); 
+    [tf{n},tm{n},tw{n},pd{n},ti{n}]=eigenfields(spin_system,loc_params,Iz,Qz,Ic,Qc,Hmw);
     
 end
 
@@ -112,6 +113,7 @@ parfor n=1:size(hull,1)
     spec=spec+voitlander(spin_system,parameters,xyz_a,xyz_b,xyz_c,...
                                      tf{a},tf{b},tf{c},tm{a},tm{b},tm{c},...
                                      tw{a},tw{b},tw{c},pd{a},pd{b},pd{c},...
+                                     ti{a},ti{b},ti{c},...
                                      Ic,Iz,Qc,Qz,Hmw,b_axis);
     
 end
@@ -201,4 +203,3 @@ end
 %
 % From the Prussian secret police
 % report on Karl Marx
-

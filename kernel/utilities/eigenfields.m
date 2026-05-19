@@ -3,7 +3,7 @@
 % of Hc+B*Hz is equal to the frequency provided, and the transition
 % moment across the specified operator Hmw is significant. Syntax:
 %
-%  [tf,tm,tw]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw)
+%  [tf,tm,tw,pd,ti]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw)
 %
 % Parameters:
 %
@@ -63,11 +63,13 @@
 %
 %     pd     -  vector of energy level population differences
 %
+%     ti     -  transition identity array, one row per transition
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=eigenfields.m>
 
-function [tf,tm,tw,pd]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw)
+function [tf,tm,tw,pd,ti]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw)
 
 % Check consistency
 grumble(spin_system,parameters,Iz,Qz,Ic,Qc);
@@ -190,7 +192,10 @@ switch spin_system.bas.formalism
         end
         
         % Get outputs started
-        tf=[]; tm=[]; tw=[]; pd=[];
+        tf=[]; tm=[]; tw=[]; pd=[]; ti=zeros(0,3);
+
+        % Initialise branch counters for each level pair
+        pair_branch=zeros(size(E,1));
 
         % Loop over grid intervals
         for n=2:numel(grid)
@@ -279,6 +284,9 @@ switch spin_system.bas.formalism
                     pd_left=LP(source(k),n-1)-LP(destin(k),n-1);
                     pd_right=LP(source(k),n)-LP(destin(k),n);
                 
+                    % Update the branch count for this level pair
+                    pair_branch(source(k),destin(k))=pair_branch(source(k),destin(k))+1;
+
                     % Store interpolated transition moment
                     tm(end+1)=(1-alpha)*tm_left+alpha*tm_right; %#ok<AGROW>
 
@@ -290,6 +298,9 @@ switch spin_system.bas.formalism
 
                     % Get transition width (much to do here)
                     tw(end+1)=parameters.fwhm; %#ok<AGROW> 
+
+                    % Store transition identity
+                    ti(end+1,:)=[source(k) destin(k) pair_branch(source(k),destin(k))]; %#ok<AGROW>
                 
                 end
                 
@@ -324,6 +335,9 @@ switch spin_system.bas.formalism
         % Get transition widths (much to do here)
         tw=ones(size(tm))*parameters.fwhm;
 
+        % Use the generalised eigenvector ordinal as transition identity
+        ti=(1:numel(tf)).';
+
     otherwise
         
         % Complain and bomb out
@@ -334,13 +348,14 @@ end
 % Prune insignificant transition moments
 hit_list=(tm<parameters.tm_tol);
 tf(hit_list)=[]; tm(hit_list)=[]; 
-tw(hit_list)=[]; pd(hit_list)=[];
+tw(hit_list)=[]; pd(hit_list)=[]; ti(hit_list,:)=[];
 
 % Reshape into columns and sort
 [tf,idx]=sort(tf(:)); 
 tm=tm(:); tm=tm(idx);
 tw=tw(:); tw=tw(idx);
 pd=pd(:); pd=pd(idx);
+ti=ti(idx,:);
 
 end
 

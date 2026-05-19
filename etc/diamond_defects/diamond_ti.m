@@ -7,14 +7,14 @@
 %
 % Parameters:
 %
-%    parameters is a structure with the following required fields:
+%    parameters is a structure with the following fields:
 %
 %      .centre       - 'n3' or 'ok1'
 %      .orientation  - '111', '110', or '100' crystal plane normal
 %                      aligned with the magnetic field
 %      .titanium     - titanium isotope label, or 'none'
-%      .include_13c - include reported 13C hyperfine couplings for OK1,
-%                     true or false
+%      .n_13c        - number of reported 13C hyperfine couplings
+%                      to include, from 0 to 2; applies only to OK1
 %
 % Outputs:
 %
@@ -33,6 +33,11 @@ end
 
 % Check consistency
 grumble(parameters);
+
+% Set irrelevant carbon count to zero
+if ~strcmpi(parameters.centre,'ok1')
+    parameters.n_13c=0;
+end
 
 % Set field-unit conversion constants
 hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
@@ -70,11 +75,13 @@ if ~strcmp(titanium,'none')
 end
 
 % Add reported OK1 nearest-neighbour carbons
-if strcmp(centre,'ok1')&&parameters.include_13c
-    Cmat=((diamond_frame_xz([1 1 0],[1 -1 -1]))*diag([2.62 2.62 4.38]*hz_per_mt)*(diamond_frame_xz([1 1 0],[1 -1 -1]))');
-    nuclei{end+1}=struct('iso','13C','A',Cmat);
-    Cmat=((diamond_frame_xz([1 1 0],[-1 1 -1]))*diag([2.62 2.62 4.38]*hz_per_mt)*(diamond_frame_xz([1 1 0],[-1 1 -1]))');
-    nuclei{end+1}=struct('iso','13C','A',Cmat);
+if strcmp(centre,'ok1')&&parameters.n_13c>0
+    cframe{1}=diamond_frame_xz([1 1 0],[1 -1 -1]);
+    cframe{2}=diamond_frame_xz([1 1 0],[-1 1 -1]);
+    for n=1:parameters.n_13c
+        Cmat=((cframe{n})*diag([2.62 2.62 4.38]*hz_per_mt)*(cframe{n})');
+        nuclei{end+1}=struct('iso','13C','A',Cmat);
+    end
 end
 
 % Build the Spinach structures
@@ -126,11 +133,18 @@ end
 if ~ischar(parameters.titanium)
     error('parameters.titanium must be a character string.');
 end
-if ~isfield(parameters,'include_13c')
-    error('parameters.include_13c field is required.');
+if isfield(parameters,'n_13c')&&(~isnumeric(parameters.n_13c)||~isscalar(parameters.n_13c)||...
+        ~isreal(parameters.n_13c)||parameters.n_13c~=round(parameters.n_13c))
+    error('parameters.n_13c must be an integer scalar.');
 end
-if (~islogical(parameters.include_13c))||(~isscalar(parameters.include_13c))
-    error('parameters.include_13c must be a logical scalar.');
+if strcmpi(parameters.centre,'ok1')&&(~isfield(parameters,'n_13c'))
+    error('parameters.n_13c field is required for OK1 centre.');
+end
+if strcmpi(parameters.centre,'ok1')&&(parameters.n_13c<0||parameters.n_13c>2)
+    error('parameters.n_13c must be between 0 and 2.');
+end
+if ~strcmpi(parameters.centre,'ok1')&&isfield(parameters,'n_13c')&&parameters.n_13c~=0
+    error('parameters.n_13c is only supported for OK1 centre.');
 end
 end
 

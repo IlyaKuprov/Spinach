@@ -200,10 +200,16 @@ for n=1:ntrans
     % Get signal information
     min_freq=min([vert1.tf(idx_a) vert2.tf(idx_b) vert3.tf(idx_c)]);
     max_freq=max([vert1.tf(idx_a) vert2.tf(idx_b) vert3.tf(idx_c)]);
-    tran_mom=mean([vert1.tm(idx_a) vert2.tm(idx_b) vert3.tm(idx_c)]);
     pop_diff=mean([vert1.pd(idx_a) vert2.pd(idx_b) vert3.pd(idx_c)]);
     line_width=mean([vert1.tw(idx_a) vert2.tw(idx_b) vert3.tw(idx_c)]);
-    jac_weight=mean([vert1.tj(idx_a) vert2.tj(idx_b) vert3.tj(idx_c)]);
+
+    % Average finite vertex-wise intensity weights
+    tran_prod=[vert1.tm(idx_a)*vert1.tj(idx_a) ...
+               vert2.tm(idx_b)*vert2.tj(idx_b) ...
+               vert3.tm(idx_c)*vert3.tj(idx_c)];
+    tran_prod=tran_prod(isfinite(tran_prod));
+    if isempty(tran_prod), continue; end
+    tran_amp=mean(tran_prod);
 
     % Find the relevant part of the axis
     b_mask=(b_axis>min_freq-3*line_width)&(b_axis<max_freq+3*line_width);
@@ -211,7 +217,7 @@ for n=1:ntrans
     % Convolutions of Lorentzians with triangles
     spec(b_mask)=spec(b_mask)+...
                  S*pop_diff*lorentzcon([vert1.tf(idx_a) vert2.tf(idx_b)...
-                                         vert3.tf(idx_c)],tran_mom*jac_weight,...
+                                         vert3.tf(idx_c)],tran_amp,...
                                         line_width,b_axis(b_mask));
                   
 end

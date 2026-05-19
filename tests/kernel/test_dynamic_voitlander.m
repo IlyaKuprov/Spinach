@@ -61,6 +61,13 @@ r1=[1;0;0];
 r2=[0;1;0];
 r3=[0;0;1];
 
+% Compute the first-level subdivision areas
+[r12,r23,r31]=sphtrsubd(r1,r2,r3);
+area_a=sphtarea(r1,r12,r31);
+area_b=sphtarea(r12,r2,r23);
+area_c=sphtarea(r31,r23,r3);
+area_d=sphtarea(r12,r23,r31);
+
 % Keep all field points inside the internal six-width support window
 b_axis=tf+linspace(-2*tw,2*tw,parameters.npoints);
 
@@ -83,6 +90,35 @@ result=test_close(result,'voitlander constant line',spec,reference,1e-10,1e-12,.
                   'subdivision of a constant transition must preserve total spherical-triangle area');
 result=test_true(result,'voitlander finite real spectrum',isreal(spec)&&all(isfinite(spec(:)))&&all(spec(:)>=0),...
                  'a positive population difference and transition moment must give a finite non-negative real spectrum');
+
+% Check that vertex-wise moment-Jacobian products are averaged directly
+tri_corr=tri;
+tri_corr.vert(1).tm=tm;
+tri_corr.vert(1).tj=4*tj;
+tri_corr.vert(2).tm=2*tm;
+tri_corr.vert(2).tj=2*tj;
+tri_corr.vert(3).tm=4*tm;
+tri_corr.vert(3).tj=tj;
+spec_corr=voitlander(spin_system,parameters,tri_corr,Ic,Iz,Qc,Qz,Hmw,b_axis);
+prod_area=2*area_a+2*area_b+2*area_c+area_d;
+line_shape=(tm*tj/(2*pi*line_width))./(1+((b_axis-tf)/line_width).^2);
+reference=prod_area*pd*line_shape;
+result=test_close(result,'voitlander vertex product amplitude',spec_corr,reference,1e-10,1e-12,...
+                  'triangle amplitudes must average per-vertex products instead of separate moment and Jacobian means');
+
+% Check that singular field-sweep Jacobian vertices are rejected safely
+tri_sing=tri;
+tri_sing.vert(1).tj=Inf;
+tri_sing.vert(2).tj=tj;
+tri_sing.vert(3).tj=2*tj;
+spec_sing=voitlander(spin_system,parameters,tri_sing,Ic,Iz,Qc,Qz,Hmw,b_axis);
+sing_area=area_a+area_b+(4/3)*area_c+area_d;
+line_shape=(tm*tj/(2*pi*line_width))./(1+((b_axis-tf)/line_width).^2);
+reference=sing_area*pd*line_shape;
+result=test_close(result,'voitlander finite Jacobian rejection',spec_sing,reference,1e-10,1e-12,...
+                  'non-finite per-vertex Jacobian products must not reach the Lorentzian convolution');
+result=test_true(result,'voitlander singular Jacobian finite spectrum',isreal(spec_sing)&&all(isfinite(spec_sing(:))),...
+                 'a singular Jacobian at one vertex must not contaminate the triangle integral');
 
 % Build a minimal two-level avoided crossing with two resonance roots
 spin_system.sys.output='hush';

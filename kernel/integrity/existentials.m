@@ -103,16 +103,16 @@ for n=1:numel(top_level)
     end
 end
 
-% Avoid ReFS volumes
+% Windows
 if ispc
 
-    % Find out what the file system is, fail silently
-    own_disk=mfilename('fullpath'); own_disk=own_disk(1:2);
-    [~,cmdout]=system(['fsutil fsinfo volumeinfo ',own_disk]);
+    % Find out which file system Spinach volume has
+    own_disk=mfilename('fullpath'); own_disk=own_disk(1:3);
+    own_disk=System.IO.DriveInfo(own_disk);
 
-    % Refuse to run on ReFS volumes
-    if contains(char(cmdout),'File System Name : ReFS')
-        error('Matlab hates ReFS, move Spinach to an NTFS volume.');
+    % Refuse to run on non-NTFS volumes
+    if ~strcmp(char(own_disk.DriveFormat),'NTFS')
+        error('Move Spinach to an NTFS volume.');
     end
 
 end

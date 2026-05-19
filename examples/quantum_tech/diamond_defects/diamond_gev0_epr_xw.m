@@ -27,8 +27,8 @@ spin_system=basis(spin_system,bas);
 parameters.spins={'E3'};
 parameters.grid=4;
 parameters.fwhm=1e-3;
-parameters.int_tol=0.0001;
-parameters.tm_tol=0.001;
+parameters.int_tol=1e-4;
+parameters.tm_tol=0.01;
 parameters.npoints=2048;
 parameters.rspt_order=Inf;
 

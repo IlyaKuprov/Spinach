@@ -2,26 +2,31 @@
 % mation of an integral of field-swept EPR transition over a sph-
 % erical triangle. Syntax:
 %
-% spec=voitlander(spin_system,parameters,r1,r2,r3,tf1,tf2,tf3,...
-%                 tm1,tm2,tm3,tw1,tw2,tw3,pd1,pd2,pd3,...
-%                 ti1,ti2,ti3,Ic,Iz,Qc,Qz,Hmw,b_axis)
+% spec=voitlander(spin_system,parameters,tri,Ic,Iz,Qc,Qz,Hmw,b_axis)
 %
 % Parameters:
 %
-%     r1,r2,r3    - Cartesian coordinates of the corners of the
-%                   spherical triangle, unit column vectors
+%     tri.vert(n).xyz - Cartesian coordinates of the corners of the
+%                       spherical triangle, unit column vectors
 %
-%     tf1,tf2,tf3 - transition frequencies at the corners of the
-%                   spherical triangle, real column vectors, one
-%                   element per transition
+%     tri.vert(n).tf  - transition fields at the corners of the
+%                       spherical triangle, real column vectors, one
+%                       element per transition
 %
-%     tm1,tm2,tm3 - transition moments at the corners of the sphe-
-%                   rical triangle, positive column vectors, one
-%                   element per transition
+%     tri.vert(n).tm  - transition moments at the corners of the sphe-
+%                       rical triangle, positive column vectors, one
+%                       element per transition
 %
-%     tw1,tw2,tw3 - transition widths at the corners of the sphe-
-%                   rical triangle, positive column vectors, one
-%                   element per transition
+%     tri.vert(n).tw  - transition widths at the corners of the sphe-
+%                       rical triangle, positive column vectors, one
+%                       element per transition
+%
+%     tri.vert(n).pd  - energy level population differences at the
+%                       triangle corners, real column vectors, one
+%                       element per transition
+%
+%     tri.vert(n).ti  - transition identity arrays at the triangle
+%                       corners, one row per transition
 %
 %     Ic          - isotropic part of the coupling Hamiltonian,
 %                   a Hermitian matrix (set retention to 'couplings'
@@ -44,13 +49,6 @@
 %
 %     b_axis      - a vector of magnetic field values, Tesla
 %
-%     pd1,pd2,pd3 - energy level population differences at the
-%                   triangle corners, real column vectors, one
-%                   element per transition
-%
-%     ti1,ti2,ti3 - transition identity arrays at the triangle
-%                   corners, one row per transition
-%
 %     parameters.int_tol - recursive integration accuracy
 %                          tolerance
 %
@@ -63,87 +61,57 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=voitlander.m>
 
-function spec=voitlander(spin_system,parameters,r1,r2,r3,tf1,tf2,tf3,...
-                         tm1,tm2,tm3,tw1,tw2,tw3,pd1,pd2,pd3,varargin)
-                     
-% Parse optional transition identities
-switch numel(varargin)
-
-    case 6
-
-        % Use transition ordinals for legacy calls
-        ti1=(1:numel(tf1)).';
-        ti2=(1:numel(tf2)).';
-        ti3=(1:numel(tf3)).';
-        [Ic,Iz,Qc,Qz,Hmw,b_axis]=varargin{:};
-
-    case 9
-
-        % Read transition identities from the call
-        ti1=varargin{1}; ti2=varargin{2}; ti3=varargin{3};
-        Ic=varargin{4}; Iz=varargin{5}; Qc=varargin{6};
-        Qz=varargin{7}; Hmw=varargin{8}; b_axis=varargin{9};
-
-    otherwise
-
-        % Complain and bomb out
-        error('incorrect number of input arguments.');
-
-end
+function spec=voitlander(spin_system,parameters,tri,Ic,Iz,Qc,Qz,Hmw,b_axis)
 
 % Check consistency
-grumble(parameters,r1,r2,r3,tf1,tf2,tf3,tm1,tm2,tm3,...
-        tw1,tw2,tw3,pd1,pd2,pd3,ti1,ti2,ti3,Ic,Iz,Qc,Qz,b_axis);
+grumble(parameters,tri,Ic,Iz,Qc,Qz,b_axis);
+
+% Extract triangle vertices
+vert1=tri.vert(1); vert2=tri.vert(2); vert3=tri.vert(3);
 
 % Subdivide the triangle
-[r12,r23,r31]=sphtrsubd(r1,r2,r3);
+[r12,r23,r31]=sphtrsubd(vert1.xyz,vert2.xyz,vert3.xyz);
 
 % Characterise new vertices
+vert12=struct(); vert12.xyz=r12;
 [phi,elev]=cart2sph(r12(1),r12(2),r12(3));
-theta=pi/2-elev; parameters.orientation=[0 theta phi];
-[tf12,tm12,tw12,pd12,ti12]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
+theta=pi/2-elev; loc_params=parameters; loc_params.orientation=[0 theta phi];
+[vert12.tf,vert12.tm,vert12.tw,vert12.pd,vert12.ti]=...
+    eigenfields(spin_system,loc_params,Iz,Qz,Ic,Qc,Hmw);
 
+vert23=struct(); vert23.xyz=r23;
 [phi,elev]=cart2sph(r23(1),r23(2),r23(3)); 
-theta=pi/2-elev; parameters.orientation=[0 theta phi];
-[tf23,tm23,tw23,pd23,ti23]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
+theta=pi/2-elev; loc_params=parameters; loc_params.orientation=[0 theta phi];
+[vert23.tf,vert23.tm,vert23.tw,vert23.pd,vert23.ti]=...
+    eigenfields(spin_system,loc_params,Iz,Qz,Ic,Qc,Hmw);
 
+vert31=struct(); vert31.xyz=r31;
 [phi,elev]=cart2sph(r31(1),r31(2),r31(3));
-theta=pi/2-elev; parameters.orientation=[0 theta phi];
-[tf31,tm31,tw31,pd31,ti31]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
+theta=pi/2-elev; loc_params=parameters; loc_params.orientation=[0 theta phi];
+[vert31.tf,vert31.tm,vert31.tw,vert31.pd,vert31.ti]=...
+    eigenfields(spin_system,loc_params,Iz,Qz,Ic,Qc,Hmw);
+
+% Assemble the subdivided triangles
+tri_a.vert=[vert1 vert12 vert31];
+tri_b.vert=[vert12 vert2 vert23];
+tri_c.vert=[vert31 vert23 vert3];
+tri_d.vert=[vert12 vert23 vert31];
 
 % Compute the subdivided integral
-spec_sub=trint(tf1,tf12,tf31,tm1,tm12,tm31,tw1,tw12,tw31,pd1,pd12,pd31,ti1,ti12,ti31,r1,r12,r31,b_axis)+...
-         trint(tf12,tf2,tf23,tm12,tm2,tm23,tw12,tw2,tw23,pd12,pd2,pd23,ti12,ti2,ti23,r12,r2,r23,b_axis)+...
-         trint(tf31,tf23,tf3,tm31,tm23,tm3,tw31,tw23,tw3,pd31,pd23,pd3,ti31,ti23,ti3,r31,r23,r3,b_axis)+...
-         trint(tf12,tf23,tf31,tm12,tm23,tm31,tw12,tw23,tw31,pd12,pd23,pd31,ti12,ti23,ti31,r12,r23,r31,b_axis);
+spec_sub=trint(tri_a,b_axis)+trint(tri_b,b_axis)+...
+         trint(tri_c,b_axis)+trint(tri_d,b_axis);
      
 % Compute the direct integral
-spec_dir=trint(tf1,tf2,tf3,tm1,tm2,tm3,tw1,tw2,tw3,pd1,pd2,pd3,ti1,ti2,ti3,r1,r2,r3,b_axis);
+spec_dir=trint(tri,b_axis);
 
 % If the accuracy is insufficient, make a recursive call
 if norm(spec_dir-spec_sub,2)>parameters.int_tol
 
     % Four triangles of the subdivision
-    spec=voitlander(spin_system,parameters,r1,r12,r31,...
-                                tf1,tf12,tf31,tm1,tm12,tm31,...
-                                tw1,tw12,tw31,pd1,pd12,pd31,...
-                                ti1,ti12,ti31,...
-                                Ic,Iz,Qc,Qz,Hmw,b_axis)+...
-         voitlander(spin_system,parameters,r12,r2,r23,...
-                                tf12,tf2,tf23,tm12,tm2,tm23,...
-                                tw12,tw2,tw23,pd12,pd2,pd23,...
-                                ti12,ti2,ti23,...
-                                Ic,Iz,Qc,Qz,Hmw,b_axis)+...
-         voitlander(spin_system,parameters,r31,r23,r3,...
-                                tf31,tf23,tf3,tm31,tm23,tm3,...
-                                tw31,tw23,tw3,pd31,pd23,pd3,...
-                                ti31,ti23,ti3,...
-                                Ic,Iz,Qc,Qz,Hmw,b_axis)+...
-         voitlander(spin_system,parameters,r12,r23,r31,...
-                                tf12,tf23,tf31,tm12,tm23,tm31,...
-                                tw12,tw23,tw31,pd12,pd23,pd31,...
-                                ti12,ti23,ti31,...
-                                Ic,Iz,Qc,Qz,Hmw,b_axis);
+    spec=voitlander(spin_system,parameters,tri_a,Ic,Iz,Qc,Qz,Hmw,b_axis)+...
+         voitlander(spin_system,parameters,tri_b,Ic,Iz,Qc,Qz,Hmw,b_axis)+...
+         voitlander(spin_system,parameters,tri_c,Ic,Iz,Qc,Qz,Hmw,b_axis)+...
+         voitlander(spin_system,parameters,tri_d,Ic,Iz,Qc,Qz,Hmw,b_axis);
 else
     
     % Original triangle
@@ -154,27 +122,30 @@ end
 end
 
 % Single triangle integrator
-function spec=trint(tf1,tf2,tf3,tm1,tm2,tm3,...
-                    tw1,tw2,tw3,pd1,pd2,pd3,ti1,ti2,ti3,r1,r2,r3,b_axis)
+function spec=trint(tri,b_axis)
                  
 % Preallocate the spectrum
 spec=zeros(size(b_axis),'like',1i);
 
+% Extract triangle vertices
+vert1=tri.vert(1); vert2=tri.vert(2); vert3=tri.vert(3);
+
 % Find transitions present at all three vertices
-if isempty(ti1)||isempty(ti2)||isempty(ti3), return; end
-if size(ti1,2)>=3
+if isempty(vert1.ti)||isempty(vert2.ti)||isempty(vert3.ti), return; end
+if size(vert1.ti,2)>=3
 
     % Find level pairs with roots at triangle vertices
-    pair_list=unique([ti1(:,1:2); ti2(:,1:2); ti3(:,1:2)],'rows','stable');
+    pair_list=unique([vert1.ti(:,1:2); vert2.ti(:,1:2);...
+                      vert3.ti(:,1:2)],'rows','stable');
     idx1=[]; idx2=[]; idx3=[];
 
     % Match same-pair roots by nearest field continuation
     for p=1:size(pair_list,1)
 
         % Get candidate roots for this level pair
-        cand1=find((ti1(:,1)==pair_list(p,1))&(ti1(:,2)==pair_list(p,2)));
-        cand2=find((ti2(:,1)==pair_list(p,1))&(ti2(:,2)==pair_list(p,2)));
-        cand3=find((ti3(:,1)==pair_list(p,1))&(ti3(:,2)==pair_list(p,2)));
+        cand1=find((vert1.ti(:,1)==pair_list(p,1))&(vert1.ti(:,2)==pair_list(p,2)));
+        cand2=find((vert2.ti(:,1)==pair_list(p,1))&(vert2.ti(:,2)==pair_list(p,2)));
+        cand3=find((vert3.ti(:,1)==pair_list(p,1))&(vert3.ti(:,2)==pair_list(p,2)));
         if isempty(cand1)||isempty(cand2)||isempty(cand3), continue; end
 
         % Initialise local candidate masks
@@ -187,7 +158,8 @@ if size(ti1,2)>=3
             for a=list1
                 for b=list2
                     for c=list3
-                        field_vals=[tf1(cand1(a)) tf2(cand2(b)) tf3(cand3(c))];
+                        field_vals=[vert1.tf(cand1(a)) vert2.tf(cand2(b))...
+                                    vert3.tf(cand3(c))];
                         field_span=max(field_vals)-min(field_vals);
                         if field_span<best_span
                             best_span=field_span; best_pick=[a b c];
@@ -206,14 +178,14 @@ if size(ti1,2)>=3
     end
     ntrans=numel(idx1);
 else
-    [ti12,idx1,idx2]=intersect(ti1,ti2,'rows','stable');
-    [~,idx12,idx3]=intersect(ti12,ti3,'rows','stable');
+    [ti12,idx1,idx2]=intersect(vert1.ti,vert2.ti,'rows','stable');
+    [~,idx12,idx3]=intersect(ti12,vert3.ti,'rows','stable');
     idx1=idx1(idx12); idx2=idx2(idx12);
     ntrans=numel(idx1);
 end
 
 % Area of spherical triangle
-S=sphtarea(r1,r2,r3);
+S=sphtarea(vert1.xyz,vert2.xyz,vert3.xyz);
 
 % Build spectrum
 for n=1:ntrans
@@ -222,61 +194,71 @@ for n=1:ntrans
     idx_a=idx1(n); idx_b=idx2(n); idx_c=idx3(n);
 
     % Get signal information
-    min_freq=min([tf1(idx_a) tf2(idx_b) tf3(idx_c)]);
-    max_freq=max([tf1(idx_a) tf2(idx_b) tf3(idx_c)]);
-    tran_mom=mean([tm1(idx_a) tm2(idx_b) tm3(idx_c)]);
-    pop_diff=mean([pd1(idx_a) pd2(idx_b) pd3(idx_c)]);
-    line_width=mean([tw1(idx_a) tw2(idx_b) tw3(idx_c)]);
+    min_freq=min([vert1.tf(idx_a) vert2.tf(idx_b) vert3.tf(idx_c)]);
+    max_freq=max([vert1.tf(idx_a) vert2.tf(idx_b) vert3.tf(idx_c)]);
+    tran_mom=mean([vert1.tm(idx_a) vert2.tm(idx_b) vert3.tm(idx_c)]);
+    pop_diff=mean([vert1.pd(idx_a) vert2.pd(idx_b) vert3.pd(idx_c)]);
+    line_width=mean([vert1.tw(idx_a) vert2.tw(idx_b) vert3.tw(idx_c)]);
 
     % Find the relevant part of the axis
     b_mask=(b_axis>min_freq-3*line_width)&(b_axis<max_freq+3*line_width);
 
     % Convolutions of Lorentzians with triangles
-    spec(b_mask)=spec(b_mask)+S*pop_diff*lorentzcon([tf1(idx_a) tf2(idx_b) tf3(idx_c)],...
-                                         tran_mom,line_width,b_axis(b_mask));
+    spec(b_mask)=spec(b_mask)+...
+                 S*pop_diff*lorentzcon([vert1.tf(idx_a) vert2.tf(idx_b)...
+                                         vert3.tf(idx_c)],tran_mom,...
+                                        line_width,b_axis(b_mask));
                   
 end
 
 end
 
 % Consistency enforcement
-function grumble(parameters,r1,r2,r3,tf1,tf2,tf3,tm1,tm2,tm3,...
-                 tw1,tw2,tw3,pd1,pd2,pd3,ti1,ti2,ti3,Ic,Iz,Qc,Qz,b_axis)
-if (~isnumeric(r1))||(~isreal(r1))||(~iscolumn(r1))||...
-   (numel(r1)~=3)||(abs(norm(r1,2)-1)>1e-6)||...
-   (~isnumeric(r2))||(~isreal(r2))||(~iscolumn(r2))||...
-   (numel(r2)~=3)||(abs(norm(r2,2)-1)>1e-6)||...
-   (~isnumeric(r3))||(~isreal(r3))||(~iscolumn(r3))||...
-   (numel(r3)~=3)||(abs(norm(r3,2)-1)>1e-6)
-    error('r1,r2,r3 must be real unit column 3-vectors.');
+function grumble(parameters,tri,Ic,Iz,Qc,Qz,b_axis)
+if (~isstruct(tri))||(~isfield(tri,'vert'))||(numel(tri.vert)~=3)
+    error('tri.vert must be a three-element vertex structure array.');
 end
-if (~isnumeric(tf1))||(~isreal(tf1))||(~iscolumn(tf1))||...
-   (~isnumeric(tf2))||(~isreal(tf2))||(~iscolumn(tf2))||...
-   (~isnumeric(tf3))||(~isreal(tf3))||(~iscolumn(tf3))
-    error('tf1,tf2,tf3 must be real column vectors.');
+vert_fields={'xyz','tf','tm','tw','pd','ti'};
+for n=1:numel(vert_fields)
+    if ~isfield(tri.vert,vert_fields{n})
+        error('tri.vert entries must contain xyz, tf, tm, tw, pd, and ti fields.');
+    end
 end
-if (~isnumeric(tm1))||(~isreal(tm1))||(~iscolumn(tm1))||...
-   (~isnumeric(tm2))||(~isreal(tm2))||(~iscolumn(tm2))||...
-   (~isnumeric(tm3))||(~isreal(tm3))||(~iscolumn(tm3))
-    error('tm1,tm2,tm3 must be real column vectors.');
+for n=1:3
+    if (~isnumeric(tri.vert(n).xyz))||(~isreal(tri.vert(n).xyz))||...
+       (~iscolumn(tri.vert(n).xyz))||(numel(tri.vert(n).xyz)~=3)||...
+       (abs(norm(tri.vert(n).xyz,2)-1)>1e-6)
+        error('tri.vert(n).xyz must be a real unit column 3-vector.');
+    end
+    if (~isnumeric(tri.vert(n).tf))||(~isreal(tri.vert(n).tf))||...
+       (~iscolumn(tri.vert(n).tf))
+        error('tri.vert(n).tf must be a real column vector.');
+    end
+    if (~isnumeric(tri.vert(n).tm))||(~isreal(tri.vert(n).tm))||...
+       (~iscolumn(tri.vert(n).tm))
+        error('tri.vert(n).tm must be a real column vector.');
+    end
+    if (~isnumeric(tri.vert(n).tw))||(~isreal(tri.vert(n).tw))||...
+       (~iscolumn(tri.vert(n).tw))
+        error('tri.vert(n).tw must be a real column vector.');
+    end
+    if (~isnumeric(tri.vert(n).pd))||(~isreal(tri.vert(n).pd))||...
+       (~iscolumn(tri.vert(n).pd))
+        error('tri.vert(n).pd must be a real column vector.');
+    end
+    if (~isnumeric(tri.vert(n).ti))||(~isreal(tri.vert(n).ti))||...
+       (size(tri.vert(n).ti,1)~=numel(tri.vert(n).tf))
+        error('tri.vert(n).ti must be a real array with one row per transition.');
+    end
+    if (numel(tri.vert(n).tm)~=numel(tri.vert(n).tf))||...
+       (numel(tri.vert(n).tw)~=numel(tri.vert(n).tf))||...
+       (numel(tri.vert(n).pd)~=numel(tri.vert(n).tf))
+        error('tri.vert(n).tf, tm, tw, pd, and ti sizes must agree.');
+    end
 end
-if (~isnumeric(tw1))||(~isreal(tw1))||(~iscolumn(tw1))||...
-   (~isnumeric(tw2))||(~isreal(tw2))||(~iscolumn(tw2))||...
-   (~isnumeric(tw3))||(~isreal(tw3))||(~iscolumn(tw3))
-    error('tw1,tw2,tw3 must be real column vectors.');
-end
-if (~isnumeric(pd1))||(~isreal(pd1))||(~iscolumn(pd1))||...
-   (~isnumeric(pd2))||(~isreal(pd2))||(~iscolumn(pd2))||...
-   (~isnumeric(pd3))||(~isreal(pd3))||(~iscolumn(pd3))
-    error('pd1,pd2,pd3 must be real column vectors.');
-end
-if (~isnumeric(ti1))||(~isreal(ti1))||...
-   (~isnumeric(ti2))||(~isreal(ti2))||...
-   (~isnumeric(ti3))||(~isreal(ti3))||...
-   (size(ti1,1)~=numel(tf1))||(size(ti2,1)~=numel(tf2))||...
-   (size(ti3,1)~=numel(tf3))||(size(ti1,2)~=size(ti2,2))||...
-   (size(ti1,2)~=size(ti3,2))
-    error('ti1,ti2,ti3 must be real arrays with one row per transition.');
+if (size(tri.vert(1).ti,2)~=size(tri.vert(2).ti,2))||...
+   (size(tri.vert(1).ti,2)~=size(tri.vert(3).ti,2))
+    error('tri.vert(n).ti arrays must have the same number of columns.');
 end
 if ~isfield(parameters,'int_tol')
     error('integration accuracy tolerance must be supplied in parameters.int_tol field.');
@@ -293,7 +275,7 @@ if (~iscell(Qc))||(~iscell(Qz))
     error('Qc and Qz must be cell arrays.');
 end
 if (~isnumeric(b_axis))||(~isreal(b_axis))
-    error('b_axis must be a real vactor.');
+    error('b_axis must be a real vector.');
 end         
 end
 

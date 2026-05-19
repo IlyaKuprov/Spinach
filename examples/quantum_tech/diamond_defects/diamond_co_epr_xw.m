@@ -1,16 +1,17 @@
-% Field-swept powder EPR spectra of a P1 centre
+% Field-swept powder EPR spectra of a Co centre
 % in diamond at X and W bands.
 %
 % alexey.bogdanov@weizmann.ac.il
 
-function diamond_p1_epr_xw()
+function diamond_co_epr_xw()
 
-% Set P1 model parameters.
-p1_params.orientation='111';
-p1_params.nitrogen='14N';
+% Set Co centre model parameters.
+co_params.orientation='111';
+co_params.centre='o4';
+%co_params.centre='nlo2';
 
 % Build the spin system.
-[sys,inter]=diamond_p1(p1_params);
+[sys,inter]=diamond_co(co_params);
 
 % Field sweep
 sys.magnet=1;
@@ -34,7 +35,7 @@ parameters.rspt_order=Inf;
 
 % Set X-band parameters
 parameters.mw_freq=9.5e9;
-parameters.window=[0.33 0.35];
+parameters.window=[0.2 0.45];
 
 % Run the X-band simulation
 [b_axis_x,spec_x]=fieldsweep(spin_system,parameters);
@@ -44,12 +45,12 @@ kfigure(); scale_figure([1.50 0.75]);
 subplot(1,2,1); plot(b_axis_x',spec_x');
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
-ktitle('P1 X-band EPR');
+ktitle('Co O4 X-band EPR');
 xlim tight; ylim padded; kgrid;
 
 % Set W-band parameters
 parameters.mw_freq=94e9;
-parameters.window=[3.348 3.36];
+parameters.window=[2.6 4.2];
 
 % Run the W-band simulation
 [b_axis_w,spec_w]=fieldsweep(spin_system,parameters);
@@ -58,7 +59,7 @@ parameters.window=[3.348 3.36];
 subplot(1,2,2); plot(b_axis_w',spec_w');
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
-ktitle('P1 W-band EPR');
+ktitle('Co O4 W-band EPR');
 xlim tight; ylim padded; kgrid;
 
 end

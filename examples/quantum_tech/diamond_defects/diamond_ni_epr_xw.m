@@ -1,16 +1,17 @@
-% Field-swept powder EPR spectra of a P1 centre
+% Field-swept powder EPR spectra of Ni defects
 % in diamond at X and W bands.
 %
 % alexey.bogdanov@weizmann.ac.il
 
-function diamond_p1_epr_xw()
+function diamond_ni_epr_xw()
 
-% Set P1 model parameters.
-p1_params.orientation='111';
-p1_params.nitrogen='14N';
+% Set Ni NE1 centre model parameters.
+ni_params.centre='ne1';
+ni_params.orientation='111';
+ni_params.nickel='61Ni';
 
-% Build the spin system.
-[sys,inter]=diamond_p1(p1_params);
+% Build the spin system
+[sys,inter]=diamond_ni(ni_params);
 
 % Field sweep
 sys.magnet=1;
@@ -23,18 +24,18 @@ bas.approximation='none';
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Set common EPR parameters
+% EPR sim parameters
 parameters.spins={'E'};
-parameters.grid=6;
-parameters.fwhm=1e-4;
-parameters.int_tol=0.01;
-parameters.tm_tol=0.1;
-parameters.npoints=1024;
+parameters.grid=20;
+parameters.fwhm=0.0001;
+parameters.int_tol=0.1;
+parameters.tm_tol=0.01;
+parameters.npoints=2048;
 parameters.rspt_order=Inf;
 
 % Set X-band parameters
 parameters.mw_freq=9.5e9;
-parameters.window=[0.33 0.35];
+parameters.window=[0.3 0.36];
 
 % Run the X-band simulation
 [b_axis_x,spec_x]=fieldsweep(spin_system,parameters);
@@ -44,12 +45,12 @@ kfigure(); scale_figure([1.50 0.75]);
 subplot(1,2,1); plot(b_axis_x',spec_x');
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
-ktitle('P1 X-band EPR');
+ktitle('Ni NE1 X-band EPR');
 xlim tight; ylim padded; kgrid;
 
 % Set W-band parameters
 parameters.mw_freq=94e9;
-parameters.window=[3.348 3.36];
+parameters.window=[3.1 3.4];
 
 % Run the W-band simulation
 [b_axis_w,spec_w]=fieldsweep(spin_system,parameters);
@@ -58,7 +59,7 @@ parameters.window=[3.348 3.36];
 subplot(1,2,2); plot(b_axis_w',spec_w');
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
-ktitle('P1 W-band EPR');
+ktitle('Ni NE1 W-band EPR');
 xlim tight; ylim padded; kgrid;
 
 end

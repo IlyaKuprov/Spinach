@@ -4,6 +4,9 @@
 %
 % W8 magnetic parameters from Ludwig and Woodbury, Phys. Rev. B 41,
 % 3905 (1990), https://doi.org/10.1103/PhysRevB.41.3905
+% The W8 quartet entry assumes zero ZFS: no ZFS parameters were
+% reported in the cited data, and off-central transitions are treated
+% as unresolved rather than explicitly modelled.
 % Other nickel-centre table values from Nadolinny et al., Crystals
 % 7, 237 (2017), https://doi.org/10.3390/cryst7080237
 %

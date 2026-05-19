@@ -71,25 +71,6 @@ sys.isotopes={'E3',parameters.nitrogen};
 inter.zeeman.matrix=cell(1,numel(sys.isotopes));
 inter.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
 
-% Electron relaxation rates
-a1=0.8*parameters.concentration;    % s^-1*ppm^-1
-a2=2.1e3;                           % s^-1
-a3=2.2e-11;                         % K^-5*s^-1
-delta=847.1303254502;               % K
-r1e=a1+a2/(exp(delta/parameters.temperature)-1)+...
-       a3*(parameters.temperature)^5;
-r2e=2.0*r1e;
-
-% Nuclear relaxation rates
-r1n=1e-2; r2n=0.5*r1e;
-
-% Relaxation parameters
-inter.relaxation={'t1_t2'};
-inter.r1_rates={r1e r1n};
-inter.r2_rates={r2e r2n};
-inter.equilibrium='zero';
-inter.rlx_keep='diagonal';
-
 % Rotation matrix for orientation
 switch parameters.orientation
     

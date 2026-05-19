@@ -28,7 +28,7 @@ spin_system=basis(spin_system,bas);
 parameters.spins={'E'};
 parameters.grid=20;
 parameters.fwhm=0.00003;
-parameters.int_tol=0.1;
+parameters.int_tol=0.001;
 parameters.tm_tol=0.01;
 parameters.npoints=1024;
 parameters.rspt_order=Inf;
@@ -43,7 +43,7 @@ parameters.window=[0.347 0.349];
 
 % Plot the X-band spectrum
 kfigure(); scale_figure([1.50 0.75]);
-subplot(1,2,1); plot(b_axis_x',[diff(spec_x'); 0]);
+subplot(1,2,1); plot(b_axis_x,spec_x);
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
 ktitle('N2V$^{-}$ X-band EPR');
@@ -57,7 +57,7 @@ parameters.window=[3.351 3.355];
 [b_axis_w,spec_w]=fieldsweep(spin_system,parameters);
 
 % Plot the W-band spectrum
-subplot(1,2,2); plot(b_axis_w',[diff(spec_w'); 0]);
+subplot(1,2,2); plot(b_axis_w,spec_w);
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
 ktitle('N2V$^{-}$ W-band EPR');

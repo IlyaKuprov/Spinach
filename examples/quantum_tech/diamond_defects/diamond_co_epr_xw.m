@@ -8,7 +8,6 @@ function diamond_co_epr_xw()
 % Set Co centre model parameters.
 co_params.orientation='111';
 co_params.centre='o4';
-%co_params.centre='nlo2';
 
 % Build the spin system.
 [sys,inter]=diamond_co(co_params);
@@ -26,10 +25,10 @@ spin_system=basis(spin_system,bas);
 
 % Set common EPR parameters
 parameters.spins={'E'};
-parameters.grid=6;
+parameters.grid=4;
 parameters.fwhm=1e-4;
-parameters.int_tol=0.01;
-parameters.tm_tol=0.1;
+parameters.int_tol=0.00001;
+parameters.tm_tol=0.01;
 parameters.npoints=1024;
 parameters.rspt_order=Inf;
 

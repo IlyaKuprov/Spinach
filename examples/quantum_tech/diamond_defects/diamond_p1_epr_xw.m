@@ -28,7 +28,7 @@ parameters.spins={'E'};
 parameters.grid=6;
 parameters.fwhm=1e-4;
 parameters.int_tol=0.01;
-parameters.tm_tol=0.1;
+parameters.tm_tol=0.01;
 parameters.npoints=1024;
 parameters.rspt_order=Inf;
 

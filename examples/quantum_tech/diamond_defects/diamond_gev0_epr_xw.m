@@ -25,10 +25,10 @@ spin_system=basis(spin_system,bas);
 
 % Set common EPR parameters
 parameters.spins={'E3'};
-parameters.grid=20;
-parameters.fwhm=1e-4;
-parameters.int_tol=0.01;
-parameters.tm_tol=0.1;
+parameters.grid=4;
+parameters.fwhm=1e-3;
+parameters.int_tol=0.0001;
+parameters.tm_tol=0.001;
 parameters.npoints=2048;
 parameters.rspt_order=Inf;
 
@@ -41,7 +41,7 @@ parameters.window=[0.05 0.45];
 
 % Plot the X-band spectrum
 kfigure(); scale_figure([2.10 0.75]);
-subplot(1,2,1); plot(b_axis_x',spec_x');
+subplot(1,2,1); plot(b_axis_x,spec_x);
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
 ktitle('GeV0 X-band EPR');
@@ -50,15 +50,12 @@ xlim tight; ylim padded; kgrid;
 % Set W-band parameters
 parameters.mw_freq=94e9;
 parameters.window=[3.25 3.46];
-parameters.grid=6;
-parameters.int_tol=0.01;
-parameters.tm_tol=0.1;
 
 % Run the W-band simulation
 [b_axis_w,spec_w]=fieldsweep(spin_system,parameters);
 
 % Plot the W-band spectrum
-subplot(1,2,2); plot(b_axis_w',spec_w');
+subplot(1,2,2); plot(b_axis_w,spec_w);
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
 ktitle('GeV0 W-band EPR');

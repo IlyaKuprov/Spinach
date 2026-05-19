@@ -26,9 +26,9 @@ spin_system=basis(spin_system,bas);
 
 % EPR sim parameters
 parameters.spins={'E3'};
-parameters.grid=20;
+parameters.grid=4;
 parameters.fwhm=0.001;
-parameters.int_tol=0.1;
+parameters.int_tol=0.0001;
 parameters.tm_tol=0.01;
 parameters.npoints=2048;
 parameters.rspt_order=Inf;

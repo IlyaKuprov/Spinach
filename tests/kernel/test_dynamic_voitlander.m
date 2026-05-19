@@ -50,9 +50,11 @@ Iz=(Iz+Iz')/2;
 Hmw=(state(spin_system,'L+','E')+state(spin_system,'L-','E'))/2;
 
 % Find the isotropic transition at one orientation
-[tf,tm,tw,pd,ti]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
+[tf,tm,tw,pd,ti,tj]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
 result=test_true(result,'voitlander transition count',isscalar(tf),...
                  'an isolated isotropic electron has one allowed EPR transition in the selected field window');
+result=test_close(result,'voitlander scaled Jacobian',tj,spin_system.tols.freeg/2.0023,1e-10,1e-12,...
+                  'an isotropic electron field-sweep Jacobian must reduce to the free-g over effective-g ratio');
 
 % Define the positive octant spherical triangle
 r1=[1;0;0];
@@ -65,14 +67,15 @@ b_axis=tf+linspace(-2*tw,2*tw,parameters.npoints);
 % Package the triangle vertices
 tri.vert=struct('xyz',{r1,r2,r3},'tf',{tf,tf,tf},...
                 'tm',{tm,tm,tm},'tw',{tw,tw,tw},...
-                'pd',{pd,pd,pd},'ti',{ti,ti,ti});
+                'pd',{pd,pd,pd},'ti',{ti,ti,ti},...
+                'tj',{tj,tj,tj});
 
 % Integrate the triangle using the production routine
 spec=voitlander(spin_system,parameters,tri,Ic,Iz,Qc,Qz,Hmw,b_axis);
 
 % Build the analytic Lorentzian reference for a constant transition
 line_width=tw/2;
-line_shape=(tm/(2*pi*line_width))./(1+((b_axis-tf)/line_width).^2);
+line_shape=(tm*tj/(2*pi*line_width))./(1+((b_axis-tf)/line_width).^2);
 reference=sphtarea(r1,r2,r3)*pd*line_shape;
 
 % Check the returned spectrum against the constant-transition identity
@@ -110,7 +113,7 @@ Qc=Qz;
 Hmw=[0 1;1 0];
 
 % Get the two resonance roots and their generated branch labels
-[tf,tm,tw,pd,ti]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
+[tf,tm,tw,pd,ti,tj]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
 high_root=2;
 b_axis=tf(high_root)+linspace(-2*tw(high_root),2*tw(high_root),parameters.npoints);
 
@@ -122,13 +125,15 @@ tri_ref.vert=struct('xyz',{r1,r2,r3},...
                     'tm',{tm(high_root),tm,tm(high_root)},...
                     'tw',{tw(high_root),tw,tw(high_root)},...
                     'pd',{pd(high_root),pd,pd(high_root)},...
-                    'ti',{ti_ref,ti,ti_ref});
+                    'ti',{ti_ref,ti,ti_ref},...
+                    'tj',{tj(high_root),tj,tj(high_root)});
 tri_local.vert=struct('xyz',{r1,r2,r3},...
                       'tf',{tf(high_root),tf,tf(high_root)},...
                       'tm',{tm(high_root),tm,tm(high_root)},...
                       'tw',{tw(high_root),tw,tw(high_root)},...
                       'pd',{pd(high_root),pd,pd(high_root)},...
-                      'ti',{ti_local,ti,ti_local});
+                      'ti',{ti_local,ti,ti_local},...
+                      'tj',{tj(high_root),tj,tj(high_root)});
 spec_ref=voitlander(spin_system,parameters,tri_ref,Ic,Iz,Qc,Qz,Hmw,b_axis);
 spec_local=voitlander(spin_system,parameters,tri_local,Ic,Iz,Qc,Qz,Hmw,b_axis);
 

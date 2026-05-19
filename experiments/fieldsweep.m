@@ -86,7 +86,7 @@ x=sin(bets).*cos(gams); y=sin(bets).*sin(gams); z=cos(bets);
 
 % Eigenfields at grid vertices
 vert=repmat(struct('xyz',zeros(3,1),'tf',[],'tm',[],...
-                  'tw',[],'pd',[],'ti',[]),grid_size,1);
+                  'tw',[],'pd',[],'ti',[],'tj',[]),grid_size,1);
 parfor n=1:grid_size %#ok<*PFBNS>
 
     % Localise parameters array, set the orientation, and create the vertex
@@ -95,7 +95,7 @@ parfor n=1:grid_size %#ok<*PFBNS>
     loc_vert.xyz=[x(n); y(n); z(n)];
     
     % Transition fields and moments
-    [loc_vert.tf,loc_vert.tm,loc_vert.tw,loc_vert.pd,loc_vert.ti]=...
+    [loc_vert.tf,loc_vert.tm,loc_vert.tw,loc_vert.pd,loc_vert.ti,loc_vert.tj]=...
         eigenfields(spin_system,loc_params,Iz,Qz,Ic,Qc,Hmw);
     vert(n)=loc_vert;
     

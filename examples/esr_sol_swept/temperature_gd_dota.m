@@ -42,8 +42,8 @@ for T=[100 10 1 0.1]
     parameters.grid=4;
     parameters.mw_freq=90e9;
     parameters.fwhm=2e-4;
-    parameters.int_tol=0.01;
-    parameters.tm_tol=0.01;
+    parameters.int_tol=0.1;
+    parameters.tm_tol=0.1;
     parameters.window=[3.05 3.4];
     parameters.npoints=4096;
     parameters.rspt_order=Inf;
@@ -60,5 +60,6 @@ for T=[100 10 1 0.1]
 
 end
 
-end
 
+
+end

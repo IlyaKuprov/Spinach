@@ -3,7 +3,7 @@
 % of Hc+B*Hz is equal to the frequency provided, and the transition
 % moment across the specified operator Hmw is significant. Syntax:
 %
-%  [tf,tm,tw,pd,ti]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw)
+%  [tf,tm,tw,pd,ti,tj]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw)
 %
 % Parameters:
 %
@@ -65,11 +65,13 @@
 %
 %     ti     -  transition identity array, one row per transition
 %
+%     tj     -  vector of scaled field-sweep Jacobians
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=eigenfields.m>
 
-function [tf,tm,tw,pd,ti]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw)
+function [tf,tm,tw,pd,ti,tj]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw)
 
 % Check consistency
 grumble(spin_system,parameters,Iz,Qz,Ic,Qc);
@@ -209,7 +211,7 @@ switch spin_system.bas.formalism
         end
 
         % Get outputs started
-        tf=[]; tm=[]; tw=[]; pd=[]; ti=zeros(0,3);
+        tf=[]; tm=[]; tw=[]; pd=[]; tj=[]; ti=zeros(0,3);
 
         % Initialise branch counters for each level pair
         pair_branch=zeros(size(E,1));
@@ -254,8 +256,8 @@ switch spin_system.bas.formalism
                 destin_spline(4)=destin_spline(4)-omega;
 
                 % Get the cubic equation coefficients
-                cubic_coeffs=destin_spline-source_spline;
-                poly_coeffs=cubic_coeffs;
+                gap_spline=destin_spline-source_spline;
+                poly_coeffs=gap_spline;
                 poly_scale=max(abs(poly_coeffs));
                 if poly_scale==0, continue; end
                 poly_coeffs=poly_coeffs/poly_scale;
@@ -300,12 +302,23 @@ switch spin_system.bas.formalism
                     tm_base=(1-alpha)*tm_left+alpha*tm_right;
                     pd_base=(1-alpha)*pd_left+alpha*pd_right;
 
+                    % Get the transition frequency slope
+                    jac_slope=polyval(polyder(gap_spline),alpha)/dx;
+
                     % Rediagonalise at unstable roots
                     if ~stable_states
                         reson_field=grid(n-1)+alpha*dx;
-                        [~,~,~,T_root,LP_root]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,reson_field);
+                        [~,~,dE_root,T_root,LP_root]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,reson_field);
                         tm_base=T_root(source(k),destin(k));
                         pd_base=LP_root(source(k))-LP_root(destin(k));
+                        jac_slope=dE_root(destin(k))-dE_root(source(k));
+                    end
+
+                    % Scale the field-sweep Jacobian to electron EPR order
+                    if jac_slope==0
+                        tj_base=Inf;
+                    else
+                        tj_base=abs(spin('E'))/abs(jac_slope);
                     end
 
                     % Update the branch count for this level pair
@@ -316,6 +329,9 @@ switch spin_system.bas.formalism
 
                     % Store population difference
                     pd(end+1)=pd_base; %#ok<AGROW>
+
+                    % Store scaled field-sweep Jacobian
+                    tj(end+1)=tj_base; %#ok<AGROW>
 
                     % Store the transition field
                     tf(end+1)=grid(n-1)+alpha*dx; %#ok<AGROW>
@@ -366,6 +382,10 @@ switch spin_system.bas.formalism
         % Compute transition moments
         tm=abs(Hmw'*uv).^2;
 
+        % Compute scaled field-sweep Jacobians
+        jac_slope=real(sum(conj(uv).*(right_mat*uv),1));
+        tj=abs(spin('E'))./abs(jac_slope);
+
         % Unit pop diffs for now
         pd=ones(size(tm));
 
@@ -392,13 +412,15 @@ else
     hit_list=(tm<tm_cutoff);
 end
 tf(hit_list)=[]; tm(hit_list)=[];
-tw(hit_list)=[]; pd(hit_list)=[]; ti(hit_list,:)=[];
+tw(hit_list)=[]; pd(hit_list)=[]; tj(hit_list)=[];
+ti(hit_list,:)=[];
 
 % Reshape into columns and sort
 [tf,idx]=sort(tf(:)); 
 tm=tm(:); tm=tm(idx);
 tw=tw(:); tw=tw(idx);
 pd=pd(:); pd=pd(idx);
+tj=tj(:); tj=tj(idx);
 ti=ti(idx,:);
 
 end

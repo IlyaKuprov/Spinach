@@ -1,4 +1,4 @@
-% Field-swept powder EPR spectra of an NV centre 
+% Field-swept powder EPR spectra of an NV centre
 % in diamond at X and W bands.
 %
 % alexey.bogdanov@weizmann.ac.il

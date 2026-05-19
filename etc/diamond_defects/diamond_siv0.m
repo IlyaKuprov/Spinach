@@ -12,7 +12,8 @@
 %      .silicon      - '29Si', 'none', or another silicon isotope
 %      .orientation  - '111', '110', or '100' crystal plane normal
 %                      aligned with the magnetic field
-%      .include_13c  - include reported 13C hyperfine couplings
+%      .n_13c       - number of reported nearest-neighbour 13C
+%                     hyperfine couplings, between 0 and 6
 %
 % Outputs:
 %
@@ -50,11 +51,11 @@ elseif ~strcmp(silicon,'none')
 end
 
 % Add reported nearest-neighbour carbons
-if parameters.include_13c
+if parameters.n_13c>0
     Cmat=((frame)*diag([30.2e6 30.2e6 66.2e6])*(frame)');
     nuc_idx=numel(nuclei);
-    nuclei(nuc_idx+1:nuc_idx+6)={[]};
-    for n=1:6
+    nuclei(nuc_idx+1:nuc_idx+parameters.n_13c)={[]};
+    for n=1:parameters.n_13c
         nuclei{nuc_idx+n}=struct('iso','13C','A',Cmat);
     end
 end
@@ -107,11 +108,12 @@ end
 if ~ischar(parameters.silicon)
     error('parameters.silicon must be a character string.');
 end
-if ~isfield(parameters,'include_13c')
-    error('parameters.include_13c field is missing.');
+if ~isfield(parameters,'n_13c')
+    error('parameters.n_13c field is missing.');
 end
-if (~islogical(parameters.include_13c))||(~isscalar(parameters.include_13c))
-    error('parameters.include_13c must be logical.');
+if (~isnumeric(parameters.n_13c))||(~isscalar(parameters.n_13c))||...
+   (parameters.n_13c<0)||(parameters.n_13c>6)||(mod(parameters.n_13c,1)~=0)
+    error('parameters.n_13c must be an integer between 0 and 6.');
 end
 end
 

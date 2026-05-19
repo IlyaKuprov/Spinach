@@ -12,7 +12,7 @@
 %      .centre       - 'war9' or 'war10'
 %      .orientation  - '111', '110', or '100' crystal plane normal
 %                      aligned with the magnetic field
-%      .nitrogen     - must be '15N'
+%      .nitrogen     - '14N' or '15N'
 %
 % Outputs:
 %
@@ -31,11 +31,6 @@ end
 
 % Check consistency
 grumble(parameters);
-
-% Restrict to the verified isotope
-if ~strcmp(parameters.nitrogen,'15N')
-    error('WAR9/WAR10 parameters are only available here for 15N.');
-end
 
 % Build the common frame
 electron='E';
@@ -60,7 +55,15 @@ switch centre
 end
 
 % Add the nitrogen hyperfine tensor
-nucleus=struct('iso','15N','A',Amat);
+switch parameters.nitrogen
+    case '15N'
+        nucleus=struct('iso','15N','A',Amat);
+    case '14N'
+        scale=spin('14N')/spin('15N');
+        nucleus=struct('iso','14N','A',scale*Amat);
+    otherwise
+        error('parameters.nitrogen must be ''14N'' or ''15N''.');
+end
 
 % Build the Spinach structures
 switch parameters.orientation
@@ -103,6 +106,9 @@ if(~isfield(parameters,'nitrogen'))
 end
 if(~ischar(parameters.nitrogen))
     error('parameters.nitrogen must be a character string.');
+end
+if(~any(strcmp(parameters.nitrogen,{'14N','15N'})))
+    error('parameters.nitrogen must be ''14N'' or ''15N''.');
 end
 end
 

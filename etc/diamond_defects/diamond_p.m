@@ -13,7 +13,8 @@
 %                      'np6', 'np8', or 'np9'
 %      .orientation  - '111', '110', or '100' crystal plane normal
 %                      aligned with the magnetic field
-%      .include_13c - include reported 13C hyperfine couplings for MA1
+%      .include_13c  - include the reported 13C hyperfine coupling;
+%                      applies only to MA1 and defaults to false
 %
 % Outputs:
 %
@@ -28,6 +29,11 @@ function [sys,inter]=diamond_p(parameters)
 % Check input count
 if nargin~=1
     error('exactly one input argument is required.');
+end
+
+% Set carbon coupling default
+if isstruct(parameters)&&~isfield(parameters,'include_13c')
+    parameters.include_13c=false;
 end
 
 % Check consistency
@@ -145,11 +151,11 @@ end
 if ~ismember(parameters.orientation,{'111','110','100'})
     error('parameters.orientation must be ''111'', ''110'', or ''100''.');
 end
-if ~isfield(parameters,'include_13c')
-    error('parameters.include_13c field is required.');
+if(~islogical(parameters.include_13c)||~isscalar(parameters.include_13c))
+    error('parameters.include_13c must be a scalar logical.');
 end
-if(~islogical(parameters.include_13c))
-    error('parameters.include_13c must be logical.');
+if ~strcmpi(parameters.centre,'ma1')&&parameters.include_13c
+    error('parameters.include_13c is only supported for MA1 centre.');
 end
 end
 
@@ -159,4 +165,3 @@ end
 % indication of how skewed our perspective tends to be.
 %
 % Douglas Adams
-

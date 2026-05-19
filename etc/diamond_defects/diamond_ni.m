@@ -4,6 +4,9 @@
 %
 % W8 magnetic parameters from Ludwig and Woodbury, Phys. Rev. B 41,
 % 3905 (1990), https://doi.org/10.1103/PhysRevB.41.3905
+% The W8 quartet entry assumes zero ZFS: no ZFS parameters were
+% reported in the cited data, and off-central transitions are treated
+% as unresolved rather than explicitly modelled.
 % Other nickel-centre table values from Nadolinny et al., Crystals
 % 7, 237 (2017), https://doi.org/10.3390/cryst7080237
 %
@@ -18,7 +21,8 @@
 %                      aligned with the magnetic field
 %      .nickel       - '61Ni', 'none', or another nickel isotope;
 %                      required when .centre is 'w8'
-%      .include_13c  - logical flag enabling reported 13C hyperfine couplings
+%      .n_13c        - number of reported 13C hyperfine couplings
+%                      to include, from 0 to 4; applies only to W8
 %
 % Outputs:
 %
@@ -37,6 +41,11 @@ end
 
 % Check consistency
 grumble(parameters);
+
+% Set irrelevant carbon count to zero
+if ~strcmpi(parameters.centre,'w8')
+    parameters.n_13c=0;
+end
 
 % Set field-unit conversion constants
 hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
@@ -60,11 +69,11 @@ switch centre
         elseif ~strcmp(nickel,'none')
             nuclei{end+1}=struct('iso',nickel);
         end
-        if parameters.include_13c
+        if parameters.n_13c>0
             Cmat=((frame_111)*diag([0.340 0.340 1.339]*hz_per_mt)*(frame_111)');
             nuc_idx=numel(nuclei);
-            nuclei(nuc_idx+1:nuc_idx+4)={[]};
-            for n=1:4
+            nuclei(nuc_idx+1:nuc_idx+parameters.n_13c)={[]};
+            for n=1:parameters.n_13c
                 nuclei{nuc_idx+n}=struct('iso','13C','A',Cmat);
             end
         end
@@ -170,7 +179,7 @@ function grumble(parameters)
 if ~isstruct(parameters)
     error('parameters must be a structure.');
 end
-required={'centre','orientation','include_13c'};
+required={'centre','orientation'};
 for n=1:numel(required)
     if ~isfield(parameters,required{n})
         error(['parameters.' required{n} ' field is required.']);
@@ -182,11 +191,21 @@ end
 if ~ischar(parameters.orientation)
     error('parameters.orientation must be a character string.');
 end
-if ~islogical(parameters.include_13c)||~isscalar(parameters.include_13c)
-    error('parameters.include_13c must be a scalar logical.');
+if isfield(parameters,'n_13c')&&(~isnumeric(parameters.n_13c)||~isscalar(parameters.n_13c)||...
+        ~isreal(parameters.n_13c)||parameters.n_13c~=round(parameters.n_13c))
+    error('parameters.n_13c must be an integer scalar.');
 end
 if strcmpi(parameters.centre,'w8')&&(~isfield(parameters,'nickel'))
     error('parameters.nickel field is required for W8 centre.');
+end
+if strcmpi(parameters.centre,'w8')&&(~isfield(parameters,'n_13c'))
+    error('parameters.n_13c field is required for W8 centre.');
+end
+if strcmpi(parameters.centre,'w8')&&(parameters.n_13c<0||parameters.n_13c>4)
+    error('parameters.n_13c must be between 0 and 4.');
+end
+if ~strcmpi(parameters.centre,'w8')&&isfield(parameters,'n_13c')&&parameters.n_13c~=0
+    error('parameters.n_13c is only supported for W8 centre.');
 end
 if isfield(parameters,'nickel')&&(~ischar(parameters.nickel))
     error('parameters.nickel must be a character string.');

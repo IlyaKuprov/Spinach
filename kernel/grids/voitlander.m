@@ -28,6 +28,10 @@
 %     tri.vert(n).ti  - transition identity arrays at the triangle
 %                       corners, one row per transition
 %
+%     tri.vert(n).tj  - scaled field-sweep Jacobians at the triangle
+%                       corners, real column vectors, one element per
+%                       transition
+%
 %     Ic          - isotropic part of the coupling Hamiltonian,
 %                   a Hermitian matrix (set retention to 'couplings'
 %                   in assume.m and then call hamiltonian.m)
@@ -76,19 +80,19 @@ vert1=tri.vert(1); vert2=tri.vert(2); vert3=tri.vert(3);
 vert12=struct(); vert12.xyz=r12;
 [phi,elev]=cart2sph(r12(1),r12(2),r12(3));
 theta=pi/2-elev; loc_params=parameters; loc_params.orientation=[0 theta phi];
-[vert12.tf,vert12.tm,vert12.tw,vert12.pd,vert12.ti]=...
+[vert12.tf,vert12.tm,vert12.tw,vert12.pd,vert12.ti,vert12.tj]=...
     eigenfields(spin_system,loc_params,Iz,Qz,Ic,Qc,Hmw);
 
 vert23=struct(); vert23.xyz=r23;
 [phi,elev]=cart2sph(r23(1),r23(2),r23(3)); 
 theta=pi/2-elev; loc_params=parameters; loc_params.orientation=[0 theta phi];
-[vert23.tf,vert23.tm,vert23.tw,vert23.pd,vert23.ti]=...
+[vert23.tf,vert23.tm,vert23.tw,vert23.pd,vert23.ti,vert23.tj]=...
     eigenfields(spin_system,loc_params,Iz,Qz,Ic,Qc,Hmw);
 
 vert31=struct(); vert31.xyz=r31;
 [phi,elev]=cart2sph(r31(1),r31(2),r31(3));
 theta=pi/2-elev; loc_params=parameters; loc_params.orientation=[0 theta phi];
-[vert31.tf,vert31.tm,vert31.tw,vert31.pd,vert31.ti]=...
+[vert31.tf,vert31.tm,vert31.tw,vert31.pd,vert31.ti,vert31.tj]=...
     eigenfields(spin_system,loc_params,Iz,Qz,Ic,Qc,Hmw);
 
 % Assemble the subdivided triangles
@@ -196,9 +200,16 @@ for n=1:ntrans
     % Get signal information
     min_freq=min([vert1.tf(idx_a) vert2.tf(idx_b) vert3.tf(idx_c)]);
     max_freq=max([vert1.tf(idx_a) vert2.tf(idx_b) vert3.tf(idx_c)]);
-    tran_mom=mean([vert1.tm(idx_a) vert2.tm(idx_b) vert3.tm(idx_c)]);
     pop_diff=mean([vert1.pd(idx_a) vert2.pd(idx_b) vert3.pd(idx_c)]);
     line_width=mean([vert1.tw(idx_a) vert2.tw(idx_b) vert3.tw(idx_c)]);
+
+    % Average finite vertex-wise intensity weights
+    tran_prod=[vert1.tm(idx_a)*vert1.tj(idx_a) ...
+               vert2.tm(idx_b)*vert2.tj(idx_b) ...
+               vert3.tm(idx_c)*vert3.tj(idx_c)];
+    tran_prod=tran_prod(isfinite(tran_prod));
+    if isempty(tran_prod), continue; end
+    tran_amp=mean(tran_prod);
 
     % Find the relevant part of the axis
     b_mask=(b_axis>min_freq-3*line_width)&(b_axis<max_freq+3*line_width);
@@ -206,7 +217,7 @@ for n=1:ntrans
     % Convolutions of Lorentzians with triangles
     spec(b_mask)=spec(b_mask)+...
                  S*pop_diff*lorentzcon([vert1.tf(idx_a) vert2.tf(idx_b)...
-                                         vert3.tf(idx_c)],tran_mom,...
+                                         vert3.tf(idx_c)],tran_amp,...
                                         line_width,b_axis(b_mask));
                   
 end
@@ -218,10 +229,10 @@ function grumble(parameters,tri,Ic,Iz,Qc,Qz,b_axis)
 if (~isstruct(tri))||(~isfield(tri,'vert'))||(numel(tri.vert)~=3)
     error('tri.vert must be a three-element vertex structure array.');
 end
-vert_fields={'xyz','tf','tm','tw','pd','ti'};
+vert_fields={'xyz','tf','tm','tw','pd','ti','tj'};
 for n=1:numel(vert_fields)
     if ~isfield(tri.vert,vert_fields{n})
-        error('tri.vert entries must contain xyz, tf, tm, tw, pd, and ti fields.');
+        error('tri.vert entries must contain xyz, tf, tm, tw, pd, ti, and tj fields.');
     end
 end
 for n=1:3
@@ -250,10 +261,15 @@ for n=1:3
        (size(tri.vert(n).ti,1)~=numel(tri.vert(n).tf))
         error('tri.vert(n).ti must be a real array with one row per transition.');
     end
+    if (~isnumeric(tri.vert(n).tj))||(~isreal(tri.vert(n).tj))||...
+       (~iscolumn(tri.vert(n).tj))
+        error('tri.vert(n).tj must be a real column vector.');
+    end
     if (numel(tri.vert(n).tm)~=numel(tri.vert(n).tf))||...
        (numel(tri.vert(n).tw)~=numel(tri.vert(n).tf))||...
-       (numel(tri.vert(n).pd)~=numel(tri.vert(n).tf))
-        error('tri.vert(n).tf, tm, tw, pd, and ti sizes must agree.');
+       (numel(tri.vert(n).pd)~=numel(tri.vert(n).tf))||...
+       (numel(tri.vert(n).tj)~=numel(tri.vert(n).tf))
+        error('tri.vert(n).tf, tm, tw, pd, ti, and tj sizes must agree.');
     end
 end
 if (size(tri.vert(1).ti,2)~=size(tri.vert(2).ti,2))||...

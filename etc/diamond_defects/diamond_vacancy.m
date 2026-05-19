@@ -2,9 +2,12 @@
 %
 %          [sys,inter]=diamond_vacancy(parameters)
 %
-% Magnetic parameters from Kirui et al., Diam. Relat. Mater. 8,
-% 1569 (1999), https://doi.org/10.1016/S0925-9635(99)00037-0
-% and Iakoubovskii and Stesmans, Phys. Rev. B 66, 045406 (2002),
+% R4/W6 parameters from Twitchen et al., Phys. Rev. B 59, 12900
+% (1999), https://doi.org/10.1103/PhysRevB.59.12900; W29
+% parameters from Kirui et al., Diam. Relat. Mater. 8, 1569
+% (1999), https://doi.org/10.1016/S0925-9635(99)00037-0;
+% R5/O1/R6/R10/R11 parameters from Iakoubovskii and Stesmans,
+% Phys. Rev. B 66, 045406 (2002),
 % https://doi.org/10.1103/PhysRevB.66.045406; ZFS table values
 % cross-checked against Ball, PhD thesis, OIST Graduate University
 % (2021).
@@ -40,41 +43,58 @@ grumble(parameters);
 % Select the vacancy centre
 centre=lower(parameters.centre);
 
-% Set vacancy principal-axis frames
-frame_111=[-1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
-            1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
-            0          2/sqrt(6)  1/sqrt(3)];
+% Set R4/W6 principal-axis frame
+r4_x=[1;-1;0]/sqrt(2);
+r4_z=[sind(54.2)*cosd(45);sind(54.2)*sind(45);cosd(54.2)];
+r4_z=r4_z/norm(r4_z);
+r4_y=cross(r4_z,r4_x);
+r4_y=r4_y/norm(r4_y);
+frame_r4=[r4_x r4_y r4_z];
+
+% Set W29 principal-axis frame
+w29_x=[0;-1;1]/sqrt(2);
+w29_z=[0.619;-0.556;-0.556];
+w29_z=w29_z/norm(w29_z);
+w29_y=cross(w29_z,w29_x);
+w29_y=w29_y/norm(w29_y);
+frame_w29=[w29_x w29_y w29_z];
+
+% Set vacancy-chain principal-axis frame
 frame_110=[-1/sqrt(2) 0 1/sqrt(2);...
             1/sqrt(2) 0 1/sqrt(2);...
             0         1 0];
 switch centre
     case {'r4_w6','w6','r4'}
-        electron='E3'; giso=2.0022;
-        zfs=((frame_111)*diag([105 197 -303]*1e6)*(frame_111)');
+        electron='E3';
+        gmat=((frame_r4)*diag([2.0022 2.0026 2.0013])*(frame_r4)');
+        zfs=((frame_r4)*diag([105 197 -303]*1e6)*(frame_r4)');
     case 'w29'
-        electron='E4'; giso=2.0019;
-        zfs=((frame_111)*diag([297 156 -453]*1e6)*(frame_111)');
+        electron='E4';
+        gmat=((frame_w29)*diag([2.002 1.997 2.005])*(frame_w29)');
+        zfs=((frame_w29)*diag([297 156 -453]*1e6)*(frame_w29)');
     case 'r5'
-        electron='E3'; giso=2.0023;
+        electron='E3';
+        gmat=((frame_110)*diag([2.00275 2.00265 2.00205])*(frame_110)');
         zfs=((frame_110)*diag([283 244 -524]*1e6)*(frame_110)');
     case 'o1'
-        electron='E3'; giso=2.0023;
+        electron='E3';
+        gmat=((frame_110)*diag([2.00299 2.00273 2.00212])*(frame_110)');
         zfs=((frame_110)*diag([109 95 -205]*1e6)*(frame_110)');
     case 'r6'
-        electron='E3'; giso=2.0023;
+        electron='E3';
+        gmat=((frame_110)*diag([2.00299 2.00273 2.00212])*(frame_110)');
         zfs=((frame_110)*diag([62 59 -120]*1e6)*(frame_110)');
     case 'r10'
-        electron='E3'; giso=2.0023;
+        electron='E3';
+        gmat=((frame_110)*diag([2.00295 2.00269 2.00212])*(frame_110)');
         zfs=((frame_110)*diag([36 36 -73]*1e6)*(frame_110)');
     case 'r11'
-        electron='E3'; giso=2.0023;
+        electron='E3';
+        gmat=((frame_110)*diag([2.00301 2.00278 2.00])*(frame_110)');
         zfs=((frame_110)*diag([27 27 -53]*1e6)*(frame_110)');
     otherwise
         error('unknown vacancy centre.');
 end
-
-% Build the electron tensors
-gmat=eye(3)*giso;
 
 % Build the Spinach structures
 switch parameters.orientation
@@ -120,4 +140,3 @@ end
 % an attitude of humility.
 % 
 % C.S. Lewis
-

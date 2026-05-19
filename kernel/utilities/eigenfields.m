@@ -57,9 +57,7 @@
 %
 %     tf     -  vector of transition fields in Tesla
 %
-%     tm     -  vector of field-swept transition weights,
-%               including transition moments and field-
-%               domain Jacobians
+%     tm     -  vector of transition moments
 %
 %     tw     -  vector of transition FWHMs in Tesla
 %
@@ -211,7 +209,7 @@ switch spin_system.bas.formalism
         end
 
         % Get outputs started
-        tf=[]; tm=[]; tm_raw=[]; tw=[]; pd=[]; ti=zeros(0,3);
+        tf=[]; tm=[]; tw=[]; pd=[]; ti=zeros(0,3);
 
         % Initialise branch counters for each level pair
         pair_branch=zeros(size(E,1));
@@ -279,9 +277,6 @@ switch spin_system.bas.formalism
                 if isempty(root_list), continue; end
                 root_list=root_list([true abs(diff(root_list))>root_tol]);
 
-                % Differentiate the unscaled spline
-                deriv_coeffs=[3*cubic_coeffs(1) 2*cubic_coeffs(2) cubic_coeffs(3)];
-
                 % Check state labelling stability
                 stable_states=(state_ovlp(source(k),source(k))>0.5)&&...
                               (state_ovlp(destin(k),destin(k))>0.5);
@@ -292,15 +287,6 @@ switch spin_system.bas.formalism
                     % Get the root coordinate
                     alpha=root_list(q);
                     if (alpha<=root_tol)&&(n>2), continue; end
-
-                    % Compute the field-domain Jacobian
-                    gap_deriv=(deriv_coeffs(1)*alpha^2+...
-                               deriv_coeffs(2)*alpha+...
-                               deriv_coeffs(3))/dx;
-                    if (~isfinite(gap_deriv))||(abs(gap_deriv)<eps)
-                        continue;
-                    end
-                    field_jac=1/abs(gap_deriv);
 
                     % Interval edge transition moments
                     tm_left=T{n-1}(source(k),destin(k));
@@ -317,24 +303,16 @@ switch spin_system.bas.formalism
                     % Rediagonalise at unstable roots
                     if ~stable_states
                         reson_field=grid(n-1)+alpha*dx;
-                        [~,~,dE_root,T_root,LP_root]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,reson_field);
+                        [~,~,~,T_root,LP_root]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,reson_field);
                         tm_base=T_root(source(k),destin(k));
                         pd_base=LP_root(source(k))-LP_root(destin(k));
-                        gap_deriv=dE_root(destin(k))-dE_root(source(k));
-                        if (~isfinite(gap_deriv))||(abs(gap_deriv)<eps)
-                            continue;
-                        end
-                        field_jac=1/abs(gap_deriv);
                     end
 
                     % Update the branch count for this level pair
                     pair_branch(source(k),destin(k))=pair_branch(source(k),destin(k))+1;
 
-                    % Store transition moment before field weighting
-                    tm_raw(end+1)=tm_base; %#ok<AGROW>
-
-                    % Store transition moment with field-domain weighting
-                    tm(end+1)=tm_base*field_jac; %#ok<AGROW>
+                    % Store interpolated transition moment
+                    tm(end+1)=tm_base; %#ok<AGROW>
 
                     % Store population difference
                     pd(end+1)=pd_base; %#ok<AGROW>
@@ -407,8 +385,8 @@ end
 % Prune insignificant transition moments
 if isempty(tm)
     hit_list=false(size(tm));
-elseif exist('tm_raw','var')
-    hit_list=(tm_raw<tm_cutoff);
+elseif exist('tm_cutoff','var')
+    hit_list=(tm<tm_cutoff);
 else
     tm_cutoff=parameters.tm_tol*max(tm(:));
     hit_list=(tm<tm_cutoff);

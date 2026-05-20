@@ -21,6 +21,10 @@
 %    dy         - N-by-M derivative matrix on a unit-step
 %                 uniform grid
 %
+% Note: sgolaydiff(s,1,7,3) is recommended for differentiating
+%       EPR spectra; use a tight integration tolerance and in-
+%       crease the number of field/frequency axis points.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=sgolaydiff.m>
@@ -31,10 +35,7 @@ function dy=sgolaydiff(y,der_order,npoints,poly_order)
 grumble(y,der_order,npoints,poly_order);
 
 % Count the samples
-nsamps=size(y,1);
-
-% Preallocate the derivative estimate
-dy=0*y;
+nsamps=size(y,1); dy=0*y;
 
 % Compute sided and centred local fits
 win_half=(npoints-1)/2; fac=factorial(der_order);

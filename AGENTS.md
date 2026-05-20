@@ -4,7 +4,7 @@
 
 *Spinach* is an open-source spin dynamics simulation library implemented in *MATLAB* (assume version R2024b or later) with small amounts of Java and C++/CUDA. It spans many areas of physics and mathematics, including linear algebra, quantum mechanics, Lie algebras and Lie groups, as well as scientific computing and numerical methods. *Spinach* supports applications such as nuclear magnetic resonance (NMR), electron spin resonance, magnetic resonance imaging, quantum optimal control theory, and other spin dynamics-related domains. This repository contains the *Spinach* codebase. All contributions or AI-generated code must adhere to the established conventions of this codebase. These conventions are summarised below.
 
-## Programming Style Guidelines
+## Spinach Programming Style Guidelines
 
 All code contributions must follow *Spinach*’s existing coding style and structure. When writing code, adhere to the following rules without exception:
 
@@ -40,7 +40,7 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **No residual garbage:** Do not leave any dead code, unused variables, or other redundant items in the functions you create or edit.
 
-## Wiki Documentation Instructions
+## Spinach Wiki Documentation Instructions
 
 *Spinach* maintains a Wiki for function documentation. If you are asked (or if it is required) to create or update a Wiki page for a *Spinach* function, you must follow these instructions:
 
@@ -54,7 +54,7 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Preserve content:** Before proposing any documentation rewrite, you must run an information-preservation gate: compare proposed code against existing documentation, flag content-drop risks, and block any edit that removes substantial existing documentation unless the user explicitly approves that removal.
 
-## Execution Policies
+## Task Execution Policies
 
 * **No Hallucinations, no Lies, no Errors:** You must not lie and must not fabricate information, code, or documentation. All content you generate must be accurate and supported by the *Spinach* codebase or user instructions. If you are unsure about something, refer to the existing code or ask the user for clarification. Above all, do not make mistakes.
 
@@ -68,7 +68,7 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Strict quality control:** After generating the output, you must evaluate the quality of what you have produced. If the output is of low quality (from academic, software engieeting, or numerical efficiency point of view), you must continue improving the output until its quality is high.
 
-## Confession after work is done
+## Confession After Work is Done
 
-After the completion ot each task, you must generate a confession report. Include all aspects of the work that you have skipped, ignored, bypassed, swept under the rug, hallucinated, or did not complete.
+After returning the result to the user, you must generate a confession report. Include all aspects of the work that you have skipped, ignored, bypassed, swept under the rug, hallucinated, or did not complete.
 

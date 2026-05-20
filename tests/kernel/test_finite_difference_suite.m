@@ -39,6 +39,50 @@ result=test_close(result,'fdmat wall quadratic derivative',D*f,2*x,1e-12,1e-12,.
 result=test_close(result,'fdvec quadratic derivative',fdvec(f,5,1),2*x,1e-12,1e-12,...
                   'fdvec applies the same finite-difference derivative to a vector');
 
+% Savitzky-Golay differentiation recovers a cubic exactly on a uniform grid
+xg=(-5:5)';
+f=2*xg.^3-xg.^2+3*xg-1;
+df=6*xg.^2-2*xg+3;
+sg_der=sgolaydiff(f,1,7,3);
+result=test_close(result,'sgolaydiff cubic derivative',sg_der,df,1e-12,1e-12,...
+                  'local cubic least-squares differentiation must recover the exact cubic derivative');
+
+% Matrix signal columns must be processed independently
+sg_mat=sgolaydiff([f 2*f],1,7,3);
+result=test_close(result,'sgolaydiff matrix derivative',sg_mat,[df 2*df],1e-12,1e-12,...
+                  'local least-squares differentiation must process matrix columns independently');
+
+% Savitzky-Golay differentiation requires samples down the rows
+try
+    sgolaydiff(f.',1,7,3);
+    error('FAILED: sgolaydiff() accepted a row-vector signal.');
+catch err
+    result=test_true(result,'sgolaydiff row rejection',...
+                     contains(err.message,'sample rows'),...
+                     'sgolaydiff() must reject inputs without enough sample rows');
+end
+
+% Savitzky-Golay differentiation requires an odd window length
+try
+    sgolaydiff(f,1,6,3);
+    error('FAILED: sgolaydiff() accepted an even window length.');
+catch err
+    result=test_true(result,'sgolaydiff odd window',...
+                     contains(err.message,'npoints must be an odd integer'),...
+                     'sgolaydiff() must reject even local least-squares windows');
+end
+
+% Savitzky-Golay differentiation suppresses deterministic high-frequency noise
+grid=(0:100)'*(2*pi/100);
+clean=sin(grid);
+noisy=clean+0.03*sin(37*grid)+0.02*cos(29*grid);
+raw_der=fdvec(noisy,3,1)/(grid(2)-grid(1));
+sg_der=sgolaydiff(noisy,1,15,3)/(grid(2)-grid(1));
+raw_err=norm(raw_der-cos(grid),2);
+sg_err=norm(sg_der-cos(grid),2);
+result=test_true(result,'sgolaydiff noise suppression',sg_err<raw_err,...
+                 'local least-squares differentiation should reduce high-frequency noise amplification');
+
 % Periodic finite-difference and Laplacian matrices annihilate constants
 Dp=fdmat(8,5,1,'pbc');
 result=test_close(result,'fdmat pbc constant derivative',Dp*ones(8,1),zeros(8,1),1e-14,1e-14,...

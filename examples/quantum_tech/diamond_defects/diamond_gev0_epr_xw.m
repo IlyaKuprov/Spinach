@@ -37,11 +37,11 @@ parameters.mw_freq=9.5e9;
 parameters.window=[0.05 0.45];
 
 % Run the X-band simulation
-[b_axis_x,spec_x]=fieldsweep(spin_system,parameters);
+[spec_x,par_x]=fieldsweep(spin_system,parameters);
 
 % Plot the X-band spectrum
 kfigure(); scale_figure([2.10 0.75]);
-subplot(1,2,1); plot(b_axis_x,spec_x);
+subplot(1,2,1); plot(par_x.b_axis,spec_x);
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
 ktitle('GeV0 X-band EPR');
@@ -52,10 +52,10 @@ parameters.mw_freq=94e9;
 parameters.window=[3.25 3.46];
 
 % Run the W-band simulation
-[b_axis_w,spec_w]=fieldsweep(spin_system,parameters);
+[spec_w,par_w]=fieldsweep(spin_system,parameters);
 
 % Plot the W-band spectrum
-subplot(1,2,2); plot(b_axis_w,spec_w);
+subplot(1,2,2); plot(par_w.b_axis,spec_w);
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
 ktitle('GeV0 W-band EPR');

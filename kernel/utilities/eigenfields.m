@@ -55,33 +55,29 @@
 %
 % Outputs:
 %
-%     tf     -  vector of transition fields in Tesla
+%     tran.tf     -  vector of transition fields in Tesla
 %
-%     tm     -  vector of transition moments
+%     tran.tm     -  vector of transition moments
 %
-%     tw     -  vector of transition FWHMs in Tesla
+%     tran.tw     -  vector of transition FWHMs in Tesla
 %
-%     pd     -  vector of energy level population differences
+%     tran.pd     -  vector of energy level population differences
 %
-%     ti     -  transition identity array, one row per transition
+%     tran.ti     -  transition identity array, one row per transition
 %
-%     tj     -  vector of scaled field-sweep Jacobians
+%     tran.tj     -  vector of scaled field-sweep Jacobians
 %
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=eigenfields.m>
 
-function [tf,tm,tw,pd,ti,tj]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw)
+function tran=eigenfields(spin_system,parameters,Hz,Hc,Hmw)
 
 % Check consistency
-grumble(spin_system,parameters,Iz,Qz,Ic,Qc);
+grumble(spin_system,parameters,Hz,Hc);
 
 % Get frequency gap tolerance in rad/s
 frq_gap_tol=abs(spin('E')*parameters.pp_tol);
-
-% Assemble Zeeman and coupling Hamiltonians
-Hz=Iz+orientation(Qz,parameters.orientation); 
-Hc=Ic+orientation(Qc,parameters.orientation); 
 
 % Get MW frequency in rad/s
 omega=2*pi*parameters.mw_freq;
@@ -107,7 +103,7 @@ switch spin_system.bas.formalism
         V=cell(1,numel(grid));              % Level eigenvectors
         T=cell(1,numel(grid));              % Transition moments
 
-        % Populate initial grid
+        % Populate field grid
         for n=1:numel(grid)
 
             % Sorted (ascending) energies, dE/dB derivatives, transition moments, level pops
@@ -115,18 +111,17 @@ switch spin_system.bas.formalism
             
         end
         
-        % Paint all grid intervals dirty
+        % Paint all intervals dirty
         converged=false(numel(grid)-1,1);
         
-        % Iterative grid trisection
+        % Iterative trisection
         while any(~converged)
             
-            % Start at the leftmost point of the grid
-            new_E=E(:,1); new_dE=dE(:,1); new_T=T(1);
-            new_V=V(1);
-            new_grid=grid(1); new_conv=[]; new_LP=LP(:,1);
+            % Start at the leftmost point of the field grid
+            new_grid=grid(1); new_E=E(:,1); new_dE=dE(:,1);
+            new_T=T(1); new_V=V(1); new_LP=LP(:,1); new_conv=[];
             
-            % Inspect old grid intervals
+            % Inspect old intervals
             for n=2:numel(grid)
                 
                 % Check for prior convergence
@@ -137,7 +132,7 @@ switch spin_system.bas.formalism
                     
                 else
                     
-                    % Grid interval
+                    % Field grid interval
                     dx=grid(n)-grid(n-1);
                     
                     % Predict and sort midpoint energies
@@ -154,7 +149,7 @@ switch spin_system.bas.formalism
                     [Em1,Vm1,dEm1,Tm1,LPm1]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,midp1);
                     [Em2,Vm2,dEm2,Tm2,LPm2]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,midp2);
 
-                    % Append midpoints to the new grid
+                    % Append midpoints to the new field grid
                     new_grid((end+1):(end+2))=[midp1 midp2];
                     new_dE(:,(end+1):(end+2))=[dEm1 dEm2];
                     new_LP(:,(end+1):(end+2))=[LPm1 LPm2];
@@ -188,7 +183,7 @@ switch spin_system.bas.formalism
                 
             end
             
-            % New grid becomes old
+            % New field grid becomes old
             E=new_E; dE=new_dE; grid=new_grid;
             T=new_T; V=new_V; LP=new_LP; converged=new_conv;
 
@@ -204,16 +199,17 @@ switch spin_system.bas.formalism
         end
         tm_cutoff=parameters.tm_tol*tm_scale;
 
-        % Mark level pairs that are active anywhere on the converged grid
+        % Mark active level pairs
         pair_active=false(size(E,1));
         for n=1:numel(T)
             pair_active=pair_active|(T{n}>tm_cutoff);
         end
 
-        % Get outputs started
-        tf=[]; tm=[]; tw=[]; pd=[]; tj=[]; ti=zeros(0,3);
+        % Get the outputs started
+        tran.tf=[]; tran.tm=[]; tran.tw=[]; 
+        tran.pd=[]; tran.tj=[]; tran.ti=zeros(0,3);
 
-        % Initialise branch counters for each level pair
+        % Initialise branch counters
         pair_branch=zeros(size(E,1));
 
         % Loop over grid intervals
@@ -258,6 +254,8 @@ switch spin_system.bas.formalism
                 % Get the cubic equation coefficients
                 gap_spline=destin_spline-source_spline;
                 poly_coeffs=gap_spline;
+
+                % Scale for numerical stability
                 poly_scale=max(abs(poly_coeffs));
                 if poly_scale==0, continue; end
                 poly_coeffs=poly_coeffs/poly_scale;
@@ -268,8 +266,7 @@ switch spin_system.bas.formalism
                 poly_coeffs=poly_coeffs(lead_idx:end);
 
                 % Find all real roots inside the field interval
-                root_tol=1e-8;
-                root_list=roots(poly_coeffs);
+                root_list=roots(poly_coeffs); root_tol=sqrt(eps);
                 root_list=root_list(abs(imag(root_list))<root_tol);
                 root_list=real(root_list);
                 root_list=root_list((root_list>=-root_tol)&...
@@ -325,22 +322,22 @@ switch spin_system.bas.formalism
                     pair_branch(source(k),destin(k))=pair_branch(source(k),destin(k))+1;
 
                     % Store interpolated transition moment
-                    tm(end+1)=tm_base; %#ok<AGROW>
+                    tran.tm(end+1)=tm_base; 
 
                     % Store population difference
-                    pd(end+1)=pd_base; %#ok<AGROW>
+                    tran.pd(end+1)=pd_base; 
 
                     % Store scaled field-sweep Jacobian
-                    tj(end+1)=tj_base; %#ok<AGROW>
+                    tran.tj(end+1)=tj_base; 
 
                     % Store the transition field
-                    tf(end+1)=grid(n-1)+alpha*dx; %#ok<AGROW>
+                    tran.tf(end+1)=grid(n-1)+alpha*dx;
 
                     % Get transition width (much to do here)
-                    tw(end+1)=parameters.fwhm; %#ok<AGROW> 
+                    tran.tw(end+1)=parameters.fwhm; 
 
                     % Store transition identity
-                    ti(end+1,:)=[source(k) destin(k) pair_branch(source(k),destin(k))]; %#ok<AGROW>
+                    tran.ti(end+1,:)=[source(k) destin(k) pair_branch(source(k),destin(k))]; 
 
                 end
                 
@@ -367,33 +364,32 @@ switch spin_system.bas.formalism
                  (~isfinite(imag(tf(:).')))|complex_tf|...
                  (~isfinite(uv_norm))|(uv_norm<sqrt(eps))|...
                  (resid>1e-8*resid_scale);
-        tf(hit_list)=[]; uv(:,hit_list)=[];
-        tf=real(tf);
+        tran.tf(hit_list)=[]; uv(:,hit_list)=[];
+        tran.tf=real(tran.tf);
         
         % Prune out-of-window transitions
-        hit_list=(tf<min(parameters.window))|...
-                 (tf>max(parameters.window));
-        uv(:,hit_list)=[]; tf(hit_list)=[];
+        hit_list=(tran.tf<min(parameters.window))|...
+                 (tran.tf>max(parameters.window));
+        uv(:,hit_list)=[]; tran.tf(hit_list)=[];
 
         % Normalise dyadics
-        uv_norm=sqrt(sum(abs(uv).^2,1));
-        uv=uv./uv_norm;
+        uv_norm=sqrt(sum(abs(uv).^2,1)); uv=uv./uv_norm;
         
         % Compute transition moments
-        tm=abs(Hmw'*uv).^2;
+        tran.tm=abs(Hmw'*uv).^2;
 
         % Compute scaled field-sweep Jacobians
         jac_slope=real(sum(conj(uv).*(right_mat*uv),1));
-        tj=abs(spin('E'))./abs(jac_slope);
+        tran.tj=abs(spin('E'))./abs(jac_slope);
 
         % Unit pop diffs for now
-        pd=ones(size(tm));
+        tran.pd=ones(size(tran.tm));
 
         % Get transition widths (much to do here)
-        tw=ones(size(tm))*parameters.fwhm;
+        tran.tw=ones(size(tran.tm))*parameters.fwhm;
 
         % Use the generalised eigenvector ordinal as transition identity
-        ti=(1:numel(tf)).';
+        tran.ti=(1:numel(tran.tf)).';
 
     otherwise
         
@@ -403,40 +399,40 @@ switch spin_system.bas.formalism
 end
 
 % Prune insignificant transition moments
-if isempty(tm)
-    hit_list=false(size(tm));
+if isempty(tran.tm)
+    hit_list=false(size(tran.tm));
 elseif exist('tm_cutoff','var')
-    hit_list=(tm<tm_cutoff);
+    hit_list=(tran.tm<tm_cutoff);
 else
-    tm_cutoff=parameters.tm_tol*max(tm(:));
-    hit_list=(tm<tm_cutoff);
+    tm_cutoff=parameters.tm_tol*max(tran.tm(:));
+    hit_list=(tran.tm<tm_cutoff);
 end
-tf(hit_list)=[]; tm(hit_list)=[];
-tw(hit_list)=[]; pd(hit_list)=[]; tj(hit_list)=[];
-ti(hit_list,:)=[];
+tran.tf(hit_list)=[]; tran.tm(hit_list)=[];
+tran.tw(hit_list)=[]; tran.pd(hit_list)=[]; 
+tran.tj(hit_list)=[]; tran.ti(hit_list,:)=[];
 
 % Reshape into columns and sort
-[tf,idx]=sort(tf(:)); 
-tm=tm(:); tm=tm(idx);
-tw=tw(:); tw=tw(idx);
-pd=pd(:); pd=pd(idx);
-tj=tj(:); tj=tj(idx);
-ti=ti(idx,:);
+[tran.tf,idx]=sort(tran.tf(:)); 
+tran.tm=tran.tm(:); tran.tm=tran.tm(idx);
+tran.tw=tran.tw(:); tran.tw=tran.tw(idx);
+tran.pd=tran.pd(:); tran.pd=tran.pd(idx);
+tran.tj=tran.tj(:); tran.tj=tran.tj(idx);
+tran.ti=tran.ti(idx,:);
+
+% Blank coordinates for later
+tran.xyz=[NaN; NaN; NaN];
 
 end
 
 % Consistency enforcement
-function grumble(spin_system,parameters,Iz,Qz,Ic,Qc)
-if (~isnumeric(Ic))||(size(Ic,1)~=size(Ic,2))||...
-   (~isnumeric(Iz))||(size(Iz,1)~=size(Iz,2))||...
-   (size(Ic,1)~=size(Iz,1))
-    error('Ic and Iz must be square matrices of the same size.');
+function grumble(spin_system,parameters,Hz,Hc)
+if (~isnumeric(Hc))||(size(Hc,1)~=size(Hc,2))||...
+   (~isnumeric(Hz))||(size(Hz,1)~=size(Hz,2))||...
+   (size(Hc,1)~=size(Hz,1))
+    error('Hc and Hz must be square matrices of the same size.');
 end
-if (~ishermitian(Ic))||(~ishermitian(Iz))
-     error('Ic and Iz must be Hermitian.');
-end
-if (~iscell(Qz))||(~iscell(Qc))
-    error('Qz and Qc must be cell arrays produced by hamiltonian() function.');
+if (~ishermitian(Hc))||(~ishermitian(Hz))
+     error('Hc and Hz must be Hermitian.');
 end
 if ~isfield(parameters,'mw_freq')
     error('resonance frequency must be supplied in parameters.mw_freq field.');
@@ -452,9 +448,6 @@ if ~isfield(parameters,'tm_tol')
 end
 if ~isfield(parameters,'fwhm')
     error('transition FWHM must be supplied in parameters.fwhm field.');
-end
-if ~isfield(parameters,'orientation')
-    error('system orientation must be supplied in parameters.orientation field.');
 end
 if (~isnumeric(parameters.mw_freq))||...
    (~isreal(parameters.mw_freq))||...
@@ -481,11 +474,6 @@ if (~isnumeric(parameters.window))||...
    (~isreal(parameters.window))||...
    (numel(parameters.window)~=2)
     error('parameters.window must have two real elements.');
-end
-if (~isnumeric(parameters.orientation))||...
-   (~isreal(parameters.orientation))||...
-   (numel(parameters.orientation)~=3)
-    error('parameters.orientation must have three real elements.');
 end
 if strcmp(spin_system.bas.formalism,'zeeman-hilb')
     if ~isfield(parameters,'rspt_order')

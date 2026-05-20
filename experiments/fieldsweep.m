@@ -10,29 +10,31 @@
 %                             subdivided spherical quadrature
 %                             grid, 6 is a good choice
 %
-%     parameters.spins     -  a one-element cell array giving
-%                             the spin to couple to the mi-
-%                             crowave field, e.g. {'E'}
+%     parameters.spins     -  a one-element cell array speci-
+%                             fying the spin that is coupled
+%                             couple to the microwave field,
+%                             e.g. {'E'}
 %
 %     parameters.mw_freq   -  microwave frequency, Hz
 %
-%     parameters.fwhm      -  line FWHM, Tesla
+%     parameters.fwhm      -  Lorentzian line FWHM, Tesla
 %
-%     parameters.window    -  field sweep window, [Bmin Bmax]
+%     parameters.window    -  field sweep window in Tesla,
+%                             as a vector [Bmin Bmax]
 %
 %     parameters.npoints   -  number of points in the sweep
 %
-%     parameters.tm_tol    -  relative transition moment
-%                             tolerance passed to eigen-
-%                             fields.m
+%     parameters.tm_tol    -  relative transition moment to-
+%                             lerance, 0.01 is a good start
 %
-%     parameters.rspt_order - perturbation theory order
-%                             passed to rspt_eig.m, Inf
-%                             for exact diagonalisation
+%     parameters.rspt_order - perturbation theory order for
+%                             eigenfields calculation, 2 is
+%                             a good start; specify Inf for
+%                             exact diagonalisation
 %
-%     parameters.int_tol   -  recursive triangle inte-
-%                             gration tolerance passed
-%                             to voitlander.m
+%     parameters.int_tol   -  powder integration tolerance,
+%                             a balance between speed and
+%                             integration accuracy
 %
 % Outputs:
 %
@@ -49,7 +51,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=fieldsweep.m>
 
-function [b_axis,spec]=fieldsweep(spin_system,parameters)
+function [spec,parameters]=fieldsweep(spin_system,parameters)
 
 % Check consistency
 grumble(spin_system,parameters);
@@ -58,60 +60,63 @@ grumble(spin_system,parameters);
 parameters.pp_tol=0.5*(max(parameters.window)-...
                        min(parameters.window))/(parameters.npoints-1);
 
-% Get the Hamiltonians
+% Get the Hamiltonians and tidy up their isotropic parts
 [Ic,Qc]=hamiltonian(assume(spin_system,'labframe','couplings'));
 [Iz,Qz]=hamiltonian(assume(spin_system,'labframe','zeeman'));
-
-% Tidy up Hamiltonians
 Ic=(Ic+Ic')/2; Iz=(Iz+Iz')/2; 
 
-% Get the microwave operator (vector in Liouville space)
-Hmw=(state(spin_system,'L+',parameters.spins{1})+...
-     state(spin_system,'L-',parameters.spins{1}))/2;
+% Get the microwave operator (state in Liouville space)
+Hmw=state(spin_system,'Lx',parameters.spins{1});
 
 % Get the initial grid and compute its convex hull
 [alps,bets,gams]=grid_trian('stoll',parameters.grid); 
 hull=get_hull(bets,gams); grid_size=numel(alps);
 
-% Make the field axis
-b_axis=linspace(parameters.window(1),...
-                parameters.window(2),...
-                parameters.npoints);
+% Make the magnetic field axis
+parameters.b_axis=linspace(parameters.window(1),...
+                           parameters.window(2),...
+                           parameters.npoints);
 
 % Preallocate the spectrum
-spec=zeros(size(b_axis),'like',1i);
+spec=zeros(size(parameters.b_axis),'like',1i);
 
-% Convert grid to Cartesian coordinates
-x=sin(bets).*cos(gams); y=sin(bets).*sin(gams); z=cos(bets);
+% Preallocate the grid eigenset structure
+eigensets=struct('tf',[],'tm',[],'tw',[],'pd',[],...
+                 'ti',[],'tj',[],'xyz',nan(3,1));
+eigensets=repmat(eigensets,grid_size,1);
 
-% Eigenfields at grid vertices
-vert=repmat(struct('xyz',zeros(3,1),'tf',[],'tm',[],...
-                  'tw',[],'pd',[],'ti',[],'tj',[]),grid_size,1);
-parfor n=1:grid_size %#ok<*PFBNS>
+% Over grid vertices
+parfor n=1:grid_size
 
-    % Localise parameters array, set the orientation, and create the vertex
-    loc_params=parameters; loc_params.orientation=[alps(n) bets(n) gams(n)];
-    loc_vert=struct();
-    loc_vert.xyz=[x(n); y(n); z(n)];
+    % Create a local copy and specify system orientation 
+    localpar=parameters; localpar.orientation=[alps(n) bets(n) gams(n)]
+
+    % Assemble Zeeman and coupling Hamiltonians
+    Hz=Iz+orientation(Qz,localpar.orientation); 
+    Hc=Ic+orientation(Qc,localpar.orientation); 
     
-    % Transition fields and moments
-    [loc_vert.tf,loc_vert.tm,loc_vert.tw,loc_vert.pd,loc_vert.ti,loc_vert.tj]=...
-        eigenfields(spin_system,loc_params,Iz,Qz,Ic,Qc,Hmw);
-    vert(n)=loc_vert;
-    
+    % Compute the eigensets at the grid vertices
+    eigensets(n)=eigenfields(spin_system,localpar,Hz,Hc,Hmw);
+
+    % Cartesian coordinates of the vertex
+    eigensets(n).xyz=[sin(bets(n))*cos(gams(n)); 
+                      sin(bets(n))*sin(gams(n)); 
+                      cos(bets(n))];
+
 end
 
-% Voitlander integrator at each triangle
-parfor n=1:size(hull,1)
+% Over grid triangles
+parfor n=1:size(hull,1) %#ok<*PFBNS>
     
-    % Extract triangle indices
+    % Extract triangle vertex indices
     a=hull(n,1); b=hull(n,2); c=hull(n,3);
 
-    % Build the triangle
-    loc_tri=struct('vert',vert([a b c]));
+    % Extract vertex eigensets
+    triangle=eigensets([a b c]); 
     
-    % Call Voitlander integrator
-    spec=spec+voitlander(spin_system,parameters,loc_tri,Ic,Iz,Qc,Qz,Hmw,b_axis);
+    % Call recursive Voitlander integrator
+    spec=spec+voitlander(spin_system,parameters,...
+                         triangle,Ic,Iz,Qc,Qz,Hmw);
     
 end
 

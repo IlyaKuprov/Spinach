@@ -38,11 +38,11 @@ parameters.mw_freq=9.755e9;
 parameters.window=[0.347 0.349];
 
 % Run the X-band simulation
-[b_axis_x,spec_x]=fieldsweep(spin_system,parameters);
+[spec_x,par_x]=fieldsweep(spin_system,parameters);
 
 % Plot the X-band spectrum
 kfigure(); scale_figure([1.50 0.75]);
-subplot(1,2,1); plot(b_axis_x,spec_x);
+subplot(1,2,1); plot(par_x.b_axis,spec_x);
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
 ktitle('WAR9 N interstitial X-band EPR');
@@ -53,10 +53,10 @@ parameters.mw_freq=94e9;
 parameters.window=[3.351 3.355];
 
 % Run the W-band simulation
-[b_axis_w,spec_w]=fieldsweep(spin_system,parameters);
+[spec_w,par_w]=fieldsweep(spin_system,parameters);
 
 % Plot the W-band spectrum
-subplot(1,2,2); plot(b_axis_w,spec_w);
+subplot(1,2,2); plot(par_w.b_axis,spec_w);
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
 ktitle('WAR9 N interstitial W-band EPR');

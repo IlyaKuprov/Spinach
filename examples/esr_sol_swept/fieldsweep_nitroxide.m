@@ -44,10 +44,10 @@ parameters.rspt_order=Inf;
 
 % Run the simulation in the high-T approximation
 parameters.rho0=-state(spin_system,'Lz','E');
-[b_axis,spec]=fieldsweep(spin_system,parameters);
+[spec,parameters]=fieldsweep(spin_system,parameters);
 
 % Plotting
-kfigure(); plot(b_axis',spec');
+kfigure(); plot(parameters.b_axis,spec);
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
 axis tight; kgrid;

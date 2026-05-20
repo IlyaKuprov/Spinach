@@ -49,10 +49,10 @@ for T=[100 10 1 0.1]
     parameters.rspt_order=Inf;
 
     % Run the simulation
-    [b_axis,spec]=fieldsweep(spin_system,parameters);
+    [spec,parameters]=fieldsweep(spin_system,parameters);
 
     % Plotting
-    subplot(2,2,n); plot(b_axis',spec');
+    subplot(2,2,n); plot(parameters.b_axis,spec);
     kxlabel('magnetic field, tesla');
     kylabel('intensity, a.u.'); kgrid;
     ktitle([num2str(T) ' K']);

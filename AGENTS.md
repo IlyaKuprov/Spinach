@@ -36,6 +36,10 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **British spelling throughout:** In all function names, variable names, and comments, use British spelling. Oxford comma is also mandatory. 
 
+* **Options and defaults:** Do not create optional arguments. All functions you write must have fixed signatures. Do not assume or set anything to a default value. Do not write array shape adaptation code, simply tell the user what the function input and output shapes are. Explain inputs and outputs in the documentation header and validate them in the grumbler, and that's it: Spinach has a policy of never guessing or assuming anything. 
+
+* **No residual garbage:** Do not leave any dead code, unused variables, or other redundant items in the functions you create or edit.
+
 ## Wiki Documentation Instructions
 
 *Spinach* maintains a Wiki for function documentation. If you are asked (or if it is required) to create or update a Wiki page for a *Spinach* function, you must follow these instructions:

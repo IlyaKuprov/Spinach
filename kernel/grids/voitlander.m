@@ -268,8 +268,8 @@ for n=1:ntrans
     end
 
     % Find the relevant part of the axis
-    b_mask=(parameters.b_axis>min_freq-3*line_width)&...
-           (parameters.b_axis<max_freq+3*line_width);
+    b_mask=(parameters.b_axis>min_freq-20*line_width)&...
+           (parameters.b_axis<max_freq+20*line_width);
 
     % Convolutions of Lorentzians with triangles
     spec(b_mask)=spec(b_mask)+S*lorentzcon([triangle(1).tf(idx_a) ...

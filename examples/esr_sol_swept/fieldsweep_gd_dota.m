@@ -29,7 +29,7 @@ spin_system=basis(spin_system,bas);
 
 % Experiment parameters
 parameters.spins={'E8'};
-parameters.grid=4;
+parameters.grid=6;
 parameters.mw_freq=90e9;
 parameters.fwhm=2e-4;
 parameters.int_tol=1.0;
@@ -46,7 +46,7 @@ parameters.rho0=-state(spin_system,'Lz','E8');
 kfigure(); plot(parameters.b_axis,spec);
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');
-axis tight; kgrid;
+xlim tight; ylim padded; kgrid;
 
 end
 

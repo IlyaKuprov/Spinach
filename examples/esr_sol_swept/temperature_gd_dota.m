@@ -39,7 +39,7 @@ for T=[100 10 1 0.1]
 
     % Experiment parameters
     parameters.spins={'E8'};
-    parameters.grid=4;
+    parameters.grid=6;
     parameters.mw_freq=90e9;
     parameters.fwhm=2e-4;
     parameters.int_tol=0.1;
@@ -54,9 +54,10 @@ for T=[100 10 1 0.1]
     % Plotting
     subplot(2,2,n); plot(parameters.b_axis,spec);
     kxlabel('magnetic field, tesla');
-    kylabel('intensity, a.u.'); kgrid;
+    kylabel('intensity, a.u.'); 
     ktitle([num2str(T) ' K']);
-    xlim tight; drawnow; n=n+1;
+    xlim tight; ylim padded; 
+    kgrid; drawnow; n=n+1;
 
 end
 

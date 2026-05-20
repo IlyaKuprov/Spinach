@@ -31,7 +31,7 @@ spin_system=basis(spin_system,bas);
 
 % Experiment parameters
 parameters.spins={'E3'};
-parameters.grid=4;
+parameters.grid=6;
 parameters.mw_freq=9e9;           % Hz
 parameters.fwhm=5e-4;             % Tesla
 parameters.int_tol=0.01;
@@ -58,7 +58,7 @@ parameters.rho0=@(B,alp,bet,gam)zftrip(spin_system,euler2dcm(alp,bet,gam)*...
 kfigure(); plot(parameters.b_axis,spec);
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.'); kgrid;
-xlim tight; drawnow;
+xlim tight; ylim padded; drawnow;
 
 end
 

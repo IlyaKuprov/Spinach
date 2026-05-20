@@ -25,7 +25,7 @@ spin_system=basis(spin_system,bas);
 
 % Set common EPR parameters
 parameters.spins={'E3'};
-parameters.grid=4;
+parameters.grid=6;
 parameters.fwhm=1e-3;
 parameters.int_tol=1e-4;
 parameters.tm_tol=0.01;
@@ -40,7 +40,7 @@ parameters.window=[0.05 0.45];
 [spec_x,par_x]=fieldsweep(spin_system,parameters);
 
 % Plot the X-band spectrum
-kfigure(); scale_figure([2.10 0.75]);
+kfigure(); scale_figure([1.50 0.75]);
 subplot(1,2,1); plot(par_x.b_axis,spec_x);
 kxlabel('magnetic field, tesla');
 kylabel('intensity, a.u.');

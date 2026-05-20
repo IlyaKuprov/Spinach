@@ -110,9 +110,11 @@ if ispc
     own_disk=mfilename('fullpath'); own_disk=own_disk(1:3);
     own_disk=System.IO.DriveInfo(own_disk);
 
-    % Refuse to run on non-NTFS volumes
+    % Warn about non-NTFS volumes
     if ~strcmp(char(own_disk.DriveFormat),'NTFS')
-        error('Move Spinach to an NTFS volume.');
+        warning('Spinach:NonNTFSVolume',['Spinach is running from a ' ...
+                char(own_disk.DriveFormat) ' volume; NTFS is recommended ' ...
+                'on Windows for reliable file locking and performance.']);
     end
 
 end

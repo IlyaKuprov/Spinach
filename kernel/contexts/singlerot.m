@@ -113,8 +113,8 @@ grumble(spin_system,pulse_sequence,parameters,assumptions);
 % Set the interaction assumptions
 spin_system=assume(spin_system,assumptions);
 
-% Get isotropic Hamiltonian and rotations basis
-[I,Q]=hamiltonian(assume(spin_system,assumptions));
+% Get isotropic Hamiltonian
+I=hamiltonian(assume(spin_system,assumptions));
 
 % Apply channel frequency offsets
 I=frqoffset(spin_system,I,parameters);
@@ -124,13 +124,6 @@ if ismember('iso_eq',parameters.needs)
     report(spin_system,'WARNING - equilibrium state uses the isotropic Hamitonian.');
     I_labframe=hamiltonian(assume(spin_system,'labframe'),'left');
     parameters.rho0=equilibrium(spin_system,I_labframe);
-end
-
-% Get carrier operators for numerical
-% rotating frame transformations
-C=cell(size(parameters.rframes));
-for n=1:numel(parameters.rframes)
-    C{n}=carrier(spin_system,parameters.rframes{n}{1});
 end
 
 % Get relaxation and kinetics generators
@@ -258,53 +251,13 @@ end
 % Parallel powder averaging loop
 parfor (q=1:n_orients,nworkers) %#ok<*PFBNS>
 
-    % Preallocate Hamiltonian blocks
-    H=cell(2*parameters.max_rank+1,1); H(:)={I};
+    % Set the crystallite orientation in the rotor frame
+    localpar=parameters;
+    localpar.orientation=[alphas(q) betas(q) gammas(q)];
+    localpar.masframe='rotor';
 
     % Build Hamiltonian rotor stack
-    for n=1:(2*parameters.max_rank+1)
-        
-        % Loop over spherical ranks
-        for r=1:numel(Q)
-            
-            % Compute crystallite orientation
-            D_mol2rot=wigner(r,alphas(q),betas(q),gammas(q));
-            
-            % Compute rotor axis tilt
-            D_lab2rot=wigner(r,rotor_phi,rotor_theta,0);
-        
-            % Compute rotor rotation
-            D_rotor=wigner(r,0,0,rotor_phases(n));
-            
-            % Compose rotations
-            D_comp=D_lab2rot*D_rotor*D_mol2rot;
-        
-            % Build the block
-            for k=1:(2*r+1)
-                for m=1:(2*r+1)
-                    H{n}=H{n}+D_comp(k,m)*Q{r}{k,m};
-                end
-            end
-            
-        end
-        
-        % Apply rotating frames
-        for k=1:numel(parameters.rframes)
-
-            % Arithmetic clean-up
-            H{n}=(H{n}+H{n}')/2;
-            
-            % Rotating frame transformation
-            H{n}=rotframe(spin_system,C{k},H{n},...
-                          parameters.rframes{k}{1},...
-                          parameters.rframes{k}{2});
-
-        end
-
-        % H must be sparse
-        H{n}=sparse(H{n});
-        
-    end
+    H=rotor_stack(spin_system,localpar,assumptions);
     
     % Formalism-dependent stage
     switch spin_system.bas.formalism
@@ -332,7 +285,7 @@ parfor (q=1:n_orients,nworkers) %#ok<*PFBNS>
     end
 
     % Report parfor progress
-    if do_diag, send(DQ,n); end
+    if do_diag, send(DQ,q); end
     
 end
 

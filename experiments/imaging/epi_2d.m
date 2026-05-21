@@ -49,19 +49,19 @@ rho=step(spin_system,Ly,parameters.rho0,pi/2);
 
 % Apply diffusion gradient
 if isfield(parameters,'diff_g_amp')
-    parameters.rho0=step(spin_system,B+parameters.diff_g_amp(1)*G{1}+...
-                                       parameters.diff_g_amp(2)*G{2},...
-                         parameters.rho0,parameters.diff_g_dur);
+    rho=step(spin_system,B+parameters.diff_g_amp(1)*G{1}+...
+                         parameters.diff_g_amp(2)*G{2},...
+                         rho,parameters.diff_g_dur);
 end
 
 % Apply an ideal 180-degree pulse
-parameters.rho0=step(spin_system,Lx,parameters.rho0,pi);
+rho=step(spin_system,Lx,rho,pi);
 
 % Apply diffusion gradient
 if isfield(parameters,'diff_g_amp')
-    parameters.rho0=step(spin_system,B+parameters.diff_g_amp(1)*G{1}+...
-                                       parameters.diff_g_amp(2)*G{2},...
-                         parameters.rho0,parameters.diff_g_dur);
+    rho=step(spin_system,B+parameters.diff_g_amp(1)*G{1}+...
+                         parameters.diff_g_amp(2)*G{2},...
+                         rho,parameters.diff_g_dur);
 end
 
 % Preroll the gradients

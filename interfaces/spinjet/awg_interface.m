@@ -69,7 +69,7 @@ switch awg_cmd
         % Compile the definitions file defined in cmd_input
         py_run(spin_system,'Xepr_plsspel_deffile',cmd_input);
         
-    case {'ompile_pspel_exp'}
+    case {'compile_pspel_exp'}
         
         % Compile the experiment file defined in cmd_input
         py_run(spin_system,'Xepr_plsspel_expfile',cmd_input);

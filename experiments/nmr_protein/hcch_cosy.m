@@ -47,7 +47,6 @@
 % TODO: whoever understands how phase cycles and quadratures work in
 %       3D NMR is welcome to add a phase-sensitive version.
 %
-%
 % m.walker@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
@@ -67,7 +66,7 @@ t2.nsteps=parameters.npoints(2); t2.timestep=1./parameters.sweep(2);
 t3.nsteps=parameters.npoints(3); t3.timestep=1./parameters.sweep(3);
 
 % J-coupling evolution time
-tau_ch=abs(1/4*parameters.J_ch);
+tau_ch=abs(1/(4*parameters.J_ch));
 
 % Coherence transfer delays
 tau_cc=abs(1/(8*parameters.J_cc));

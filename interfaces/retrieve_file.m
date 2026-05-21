@@ -13,7 +13,7 @@
 %
 % Outputs:
 %
-%     file_path - full path to the retrieved file
+%     this function writes a file
 %
 % ilya.kuprov@weizmann.ac.il
 %

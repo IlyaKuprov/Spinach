@@ -79,10 +79,10 @@ for n=1:nchannels
     x=inp(2*n-1,:)+1i*inp(2*n,:);
 
     % Build the filter matrix
-    [I,J]=ndgrid(1:ncols,1:ncols);    % Index arrays
-    A=(I==1)&(J==1);                  % First element unchanged
-    B=((I>1)&(I==J)).*(1/(1-z(n)));   % Main diagonal subsequently
-    C=((I>1)&(I==(J+1))).*(-z/(1-z)); % Subdiagonal subsequently
+    [I,J]=ndgrid(1:ncols,1:ncols);          % Index arrays
+    A=(I==1)&(J==1);                        % First element unchanged
+    B=((I>1)&(I==J))*(1/(1-z(n)));          % Main diagonal subsequently
+    C=((I>1)&(I==(J+1)))*(-z(n)/(1-z(n)));  % Subdiagonal subsequently
 
     % Apply the filter
     y=(A+B+C)*transpose(x);

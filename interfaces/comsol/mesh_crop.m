@@ -27,11 +27,11 @@ grumble(mesh,ranges);
 % Remove tessellation and preplot
 if isfield(mesh,'vor')
     mesh=rmfield(mesh,'vor');
-    report(spin_system,'WARNING: out-of-date tessellation information removed.');
+    disp('WARNING: out-of-date tessellation information removed.');
 end
 if isfield(mesh,'plot')
     mesh=rmfield(mesh,'plot');
-    report(spin_system,'WARNING: out-of-date preplot information removed.');
+    disp('WARNING: out-of-date preplot information removed.');
 end
 
 % Find vertices in the user-specified range
@@ -81,7 +81,7 @@ if isfield(mesh,'c'), mesh.c=mesh.c(vertices_in_range,:); end
 
 % First guess active vertices
 if isfield(mesh.idx,'active')
-    report(spin_system,'WARNING: active vertex list was overwritten.');
+    disp('WARNING: active vertex list was overwritten.');
 end
 mesh.idx.active=unique(mesh.idx.triangles(:));
 

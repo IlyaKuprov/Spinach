@@ -73,7 +73,7 @@ t2.nsteps=parameters.npoints(2); t2.timestep=1./parameters.sweep(2);
 t3.nsteps=parameters.npoints(3); t3.timestep=1./parameters.sweep(3);
 
 % J-coupling evolution time
-tau_ch=abs(1/4*parameters.J_ch);
+tau_ch=abs(1/(4*parameters.J_ch));
 
 % Initial condition
 rho0=state(spin_system,'Lz','1H','cheap');

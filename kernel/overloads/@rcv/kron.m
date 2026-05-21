@@ -22,8 +22,8 @@ function C=kron(A,B)
 grumble(A,B);
 
 % Compute the output dimensions
-newRows=A.numRows*B.numRows;
-newCols=A.numCols*B.numCols;
+newNumRows=A.numRows*B.numRows;
+newNumCols=A.numCols*B.numCols;
 
 % Align locations
 if A.isGPU||B.isGPU
@@ -38,10 +38,8 @@ newRow=(A.row(ia)-1)*B.numRows+B.row(ib);
 newCol=(A.col(ia)-1)*B.numCols+B.col(ib);
 newVal=(A.val(ia)).*(B.val(ib));
 
-% Assemble the output object
-C=rcv(newCol,newRow,newVal);
-C.numRows=newRows;
-C.numCols=newCols;
+% Assemble the output RCV object
+C=rcv(newRow,newCol,newVal,newNumRows,newNumCols);
 C.isGPU=A.isGPU||B.isGPU;
 
 end

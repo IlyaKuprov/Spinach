@@ -59,9 +59,8 @@ parameters.rf_dur_list=(pulse_time/pulse_nsteps)*ones(1,pulse_nsteps);
 % Sequence parameters
 parameters.image_size=[201 201];
 parameters.ss_grad_amp=32.0e-3;  % T/m
-parameters.ss_grad_dur=1.0e-3;
-parameters.ro_grad_amp=5.3e-3; % T/m
-parameters.pe_grad_amp=4.8e-3; % T/m
+parameters.ro_grad_amp=5.3e-3;   % T/m
+parameters.pe_grad_amp=4.8e-3;   % T/m
 parameters.ro_grad_dur=4e-3;
 parameters.pe_grad_dur=4e-3;
 parameters.t_echo=20e-3;

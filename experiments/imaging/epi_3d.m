@@ -5,26 +5,25 @@
 % This sequence must be called from the imaging() context, which
 % would provide H,R,K,G, and F. Parameters:
 %
-%  parameters.ss_grad_amp   -  the amplitude of slice selection 
-%                              gradient,T/m
-%
-%  parameters.ss_grad_dur   -  the duration of the slice selection 
-%                              gradient, seconds 
-%
 %  parameters.image_size    -  number of points in each dimension of
 %                              the resulting image
 %
+%  parameters.ss_grad_amp   -  the amplitude of slice selection 
+%                              gradient,T/m
+%
 %  parameters.pe_grad_amp   -  phase encoding gradient amplitude, T/m
+%
+%  parameters.pe_grad_dur   -  phase encoding gradient duration, s
 % 
 %  parameters.ro_grad_amp   -  readout gradient amplitude, T/m
 %
-%  parameters.grad_dur      -  the duration of the gradients, seconds
-%
-%  parameters.t_echo        -  echo time after slice selection, seconds
+%  parameters.ro_grad_dur   -  readout gradient duration, s
 %
 %  parameters.diff_g_amp    -  [optional] a vector of diffusion gra-
 %                              dient pair amplitudes in X,Y (T/m) to
 %                              be active during the echo time
+%
+%  parameters.t_echo        -  echo time after slice selection, seconds
 %
 % Outputs:
 %
@@ -204,13 +203,6 @@ end
 if (~isnumeric(parameters.t_echo))||(~isreal(parameters.t_echo))||...
    (~isscalar(parameters.t_echo))||(parameters.t_echo<=0)
     error('parameters.t_echo must be a positive real scalar.');
-end
-if ~isfield(parameters,'ss_grad_dur')
-    error(' slice selection gradient duration must be specified in parameters.ss_grad_dur field.');
-end
-if (~isnumeric(parameters.ss_grad_dur))||(~isreal(parameters.ss_grad_dur))||...
-   (~isscalar(parameters.ss_grad_dur))||(parameters.ss_grad_dur<=0)
-    error('parameters.ss_grad_dur must be a positive real scalar.');
 end
 if ~isfield(parameters,'ro_grad_dur')
     error('the frequency encoding gradient duration must be specified in parameters.ro_grad_dur field.');

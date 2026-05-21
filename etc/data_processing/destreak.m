@@ -36,6 +36,9 @@ if isstruct(spectrum)
         spectrum.(struct_fieldnames{n})=destreak(spectrum.(struct_fieldnames{n}));
                       
     end
+
+    % Done
+    return;
     
 elseif iscell(spectrum)
     
@@ -46,6 +49,9 @@ elseif iscell(spectrum)
         spectrum{n}=destreak(spectrum{n});
         
     end
+
+    % Done
+    return;
     
 end
 

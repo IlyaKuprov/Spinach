@@ -74,11 +74,11 @@
 
 function fid=apodisation(spin_system,fid,winfuns,fp_half)
 
+% Check consistency
+grumble(fid,winfuns);
+
 % Default is to halve first points
 if ~exist('fp_half','var'), fp_half=true(); end
-
-% Check consistency
-grumble(fid,winfuns,fp_half);
 
 % Find non-singleton dimensions
 rel_dims=true(1,ndims(fid));
@@ -206,7 +206,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(fid,winfuns,fp_half)
+function grumble(fid,winfuns)
 if ~isnumeric(fid)
     error('fid must be a numeric array.');
 end
@@ -243,9 +243,6 @@ for n=1:numel(winfuns)
     elseif numel(winfuns{n})~=1
         error('this window function does not take parameters.');
     end
-end
-if (~islogical(fp_half))||(~isscalar(fp_half))
-    error('fp_half must be a logical scalar.');
 end
 end
 

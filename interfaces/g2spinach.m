@@ -92,7 +92,6 @@
 function [sys,inter]=g2spinach(props,particles,references,options)
 
 % Set default options
-if ~exist('references','var'), references=[]; end
 if ~exist('options','var'), options=[]; end
 
 % Check consistency
@@ -273,7 +272,7 @@ end
 if ~iscell(nuclei)
     error('the second argument must have the form {{''H'',''1H''},{''C'',''13C''},...}');
 end
-if (~isempty(references))&&((~isnumeric(references))||(numel(nuclei)~=numel(references)))
+if (~isnumeric(references))||(numel(nuclei)~=numel(references))
     error('references must be a numerical array with the same number of entries as nuclei.');
 end
 end

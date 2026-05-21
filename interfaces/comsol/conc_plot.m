@@ -37,19 +37,11 @@
 
 function conc_plot(spin_system,conc,obs)
 
-% Initialise empty observables
-if ~exist('obs','var'), obs=[]; end
-
 % Check consistency
 grumble(spin_system,conc,obs);
 
 % Decide the colours
-if isempty(obs)
-    
-    % Neutral grey if no observables supplied
-    RGB=0.5*ones(spin_system.mesh.vor.ncells,3);
-
-elseif size(obs,2)==1
+if size(obs,2)==1
 
     % One observable: assume phase and map into middle hues
     RGB=hsv2rgb(wrapTo2Pi(obs)/(2*pi),...
@@ -178,9 +170,9 @@ if (~isnumeric(conc))||(~isreal(conc))||(~iscolumn(conc))||...
    any(~isfinite(conc))||(numel(conc)~=spin_system.mesh.vor.ncells)
     error('conc must be a column vector with one real value per Voronoi cell.');
 end
-if (~isempty(obs))&&((~isnumeric(obs))||(~isreal(obs))||...
+if (~isnumeric(obs))||(~isreal(obs))||...
    any(~isfinite(obs(:)))||(size(obs,1)~=spin_system.mesh.vor.ncells)||...
-   (size(obs,2)<1)||(size(obs,2)>3))
+   (size(obs,2)<1)||(size(obs,2)>3)
     error('obs must have one, two, or three real columns and one row per Voronoi cell.');
 end
 end

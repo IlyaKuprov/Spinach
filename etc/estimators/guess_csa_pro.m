@@ -19,7 +19,7 @@
 %
 %       coords    - a cell array of coordinate vectors
 %
-%       options.nh_csa - 'tcb' (default) for Tjandra, Curtis,
+%       options.nh_csa - 'tcb' for Tjandra, Curtis,
 %                        and Bodenhausen, 'bax' for Cornilescu
 %                        and Bax, and 'pol' for Case, Polenova
 %                        and Gronenborn eigenvalues and orien-
@@ -40,11 +40,6 @@
 % <https://spindynamics.org/wiki/index.php?title=Guess_csa_pro.m>
 
 function CSAs=guess_csa_pro(aa_nums,pdb_ids,coords,options)
-
-% Set default peptide bond CSA options
-if ~exist('options','var'), options=struct(); end
-if isempty(options), options=struct(); end
-if isstruct(options)&&(~isfield(options,'nh_csa')), options.nh_csa='tcb'; end
 
 % Check consistency
 grumble(aa_nums,pdb_ids,coords,options);
@@ -325,7 +320,8 @@ end
 if (numel(aa_nums)~=numel(pdb_ids))||(numel(pdb_ids)~=numel(coords))
     error('the input parameters must have the same number of elements.');
 end
-if (~isstruct(options))||(~ischar(options.nh_csa))||...
+if (~isstruct(options))||(~isfield(options,'nh_csa'))||...
+   (~ischar(options.nh_csa))||...
    (~ismember(options.nh_csa,{'tcb','bax','pol'}))
     error('options.nh_csa must be ''tcb'', ''bax'', or ''pol''.');
 end

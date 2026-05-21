@@ -166,16 +166,24 @@ end
 % Consistency enforcement
 function grumble(npts,dur,bwidth,smp,type)
 if (~isnumeric(dur))||(~isreal(dur))||...
-   (~isfinite(dur))||(numel(dur)~=1)||(dur<=0)
+   (numel(dur)~=1)||(~isfinite(dur))||(dur<=0)
     error('dur must be a positive real number.');
 end
 if (~isnumeric(bwidth))||(~isreal(bwidth))||...
-   (~isfinite(bwidth))||(numel(bwidth)~=1)||(bwidth<=0)
+   (numel(bwidth)~=1)||(~isfinite(bwidth))||(bwidth<=0)
     error('bwidth must be a positive real number.');
 end
-if (~isnumeric(npts))||(~isreal(npts))||(~isfinite(npts))||...
-   (numel(npts)~=1)||(npts<1)||(mod(npts,1)~=0)
+if (~isnumeric(npts))||(~isreal(npts))||(numel(npts)~=1)||...
+   (~isfinite(npts))||(npts<1)||(mod(npts,1)~=0)
     error('npts must be a positive real integer.');
+end
+if (~ischar(type))||(~ismember(type,{'wurst','wurst-adaptive',...
+                                    'smoothed','smoothed-adaptive',...
+                                    'saltire','saltire-adaptive'}))
+    error('type must be a supported chirp pulse type.');
+end
+if (~isnumeric(smp))||(~isreal(smp))||(numel(smp)~=1)||(~isfinite(smp))
+    error('smp must be a finite real scalar.');
 end
 if contains(type,'wurst')&&(smp<1)
     error('smp for ''wurst'' pulse must be greater than 1.');
@@ -192,4 +200,3 @@ end
 %
 % Unofficial motto of Southampton
 % Chemistry Department
-

@@ -1339,10 +1339,13 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,control) %#ok<INUSD> 
-
-% Add further sanity checks here
-
+function grumble(spin_system,control)
+if ~isstruct(spin_system)
+    error('spin_system must be a Spinach data structure.');
+end
+if ~isstruct(control)
+    error('control must be a structure.');
+end
 end
 
 % Whenever anyone accuses some person of being 'unfeeling' he means that
@@ -1351,5 +1354,4 @@ end
 % is the opposite of charity.
 %
 % Ayn Rand, "Atlas Shrugged"
-
 

@@ -121,24 +121,30 @@ end
 
 % Consistency enforcement
 function grumble(B0,tau_c,isotopes,deltas,coords)
-if (~isnumeric(B0))||(~isreal(B0))||(~isscalar(B0))
-    error('B0 must be a real number.');
+if (~isnumeric(B0))||(~isreal(B0))||(~isscalar(B0))||(~isfinite(B0))
+    error('B0 must be a finite real number.');
 end
 if (~isnumeric(tau_c))||(~isreal(tau_c))||...
-   (~isscalar(tau_c))||(tau_c<=0)
+   (~isscalar(tau_c))||(~isfinite(tau_c))||(tau_c<=0)
     error('tau_c must be a positive real number.');
 end
-if ~iscell(isotopes)
-    error('isotopes must be a cell array of character strings.');
+if (~iscell(isotopes))||(numel(isotopes)~=2)||any(~cellfun(@ischar,isotopes))
+    error('isotopes must be a two-element cell array of character strings.');
 end
-if ~iscell(deltas)
-    error('deltas must be a cell array of 3x3 matrices.');
+if (~iscell(deltas))||(numel(deltas)~=2)
+    error('deltas must be a two-element cell array of 3x3 matrices.');
 end
-if (~issymmetric(deltas{1}))||(~issymmetric(deltas{2}))
-    error('this function only supports symmetric shift tensors.');
+if (~isnumeric(deltas{1}))||(~isreal(deltas{1}))||(~isequal(size(deltas{1}),[3 3]))||...
+   any(~isfinite(deltas{1}(:)))||(~isnumeric(deltas{2}))||(~isreal(deltas{2}))||...
+   (~isequal(size(deltas{2}),[3 3]))||any(~isfinite(deltas{2}(:)))||...
+   (~issymmetric(deltas{1}))||(~issymmetric(deltas{2}))
+    error('this function only supports symmetric 3x3 shift tensors.');
 end
-if ~iscell(coords)
-    error('coords must be a cell array of 1x3 vectors.');
+if (~iscell(coords))||(numel(coords)~=2)||(~isnumeric(coords{1}))||...
+   (~isreal(coords{1}))||(~isrow(coords{1}))||(numel(coords{1})~=3)||...
+   any(~isfinite(coords{1}(:)))||(~isnumeric(coords{2}))||(~isreal(coords{2}))||...
+   (~isrow(coords{2}))||(numel(coords{2})~=3)||any(~isfinite(coords{2}(:)))
+    error('coords must be a two-element cell array of real 1x3 vectors.');
 end
 [~,mult_a]=spin(isotopes{1}); [~,mult_b]=spin(isotopes{2});
 if (mult_a~=2)||(mult_b~=2)
@@ -153,4 +159,3 @@ end
 %  users performed even worse than novice Word users."
 %
 % https://doi.org/10.1371/journal.pone.0125830
-

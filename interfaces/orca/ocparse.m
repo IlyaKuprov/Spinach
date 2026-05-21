@@ -72,6 +72,9 @@ end
 
 % Consistency enforcement
 function grumble(filename,pad_factor)
+if (~ischar(filename))||isempty(filename)
+    error('filename must be a non-empty character string.');
+end
 if ~exist(filename,'file')
     error('the file specified as not found.');
 end
@@ -89,4 +92,3 @@ end
 % means that 'my ignorance is just as good as your knowledge'. 
 %
 % Isaac Asimov
-

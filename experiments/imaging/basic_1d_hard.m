@@ -89,6 +89,13 @@ if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
    (mod(parameters.npts,1)~=0)
     error('parameters.npts must be a positive integer.');
 end
+if ~isfield(parameters,'sweep')
+    error('parameters.sweep field must be present.');
+end
+if (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+   (~isscalar(parameters.sweep))||(parameters.sweep<=0)
+    error('parameters.sweep must be a positive real scalar.');
+end
 if ~isfield(parameters,'rho0')
     error('parameters.rho0 field must be present.');
 end
@@ -116,4 +123,3 @@ end
 % free. As a result, the wild cobra population further increased.
 %
 % Wikipedia
-

@@ -136,8 +136,12 @@ if (~ischar(parameters.deriv{1}))||(~ismember(parameters.deriv{1},{'period','fou
     error('the first element of parameters.deriv must be ''period'' or ''fourier''.');
 end
 if strcmp(parameters.deriv{1},'period')
+    if numel(parameters.deriv)~=2
+        error('periodic differentiation requires a stencil size in the second element of parameters.deriv.');
+    end
     if (~isnumeric(parameters.deriv{2}))||(~isreal(parameters.deriv{2}))||...
-       (numel(parameters.deriv{2})~=1)||mod(parameters.deriv{2},1)
+       (numel(parameters.deriv{2})~=1)||mod(parameters.deriv{2},1)||...
+       (parameters.deriv{2}<1)
         error('stencil size in the second element of parameters.deriv must be a positive integer.');
     end
     if parameters.deriv{2}>7
@@ -158,4 +162,3 @@ end
 % blowing forlornly in the direction indicated.
 %
 % Viktor Shenderovich
-

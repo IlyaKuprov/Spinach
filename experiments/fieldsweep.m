@@ -131,7 +131,8 @@ if ~isfield(parameters,'grid')
     error('stoll grid rank must be specified in parameters.grid variable.');
 end
 if (~isnumeric(parameters.grid))||(~isscalar(parameters.grid))||...
-   (~isreal(parameters.grid))||(parameters.grid<=0)
+   (~isreal(parameters.grid))||(~isfinite(parameters.grid))||...
+   (parameters.grid<=0)||(mod(parameters.grid,1)~=0)
     error('parameters.grid must be a positive real integer.');
 end
 if ~isfield(parameters,'spins')
@@ -159,9 +160,9 @@ if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
 end
 if (~isnumeric(parameters.npoints))||(~isscalar(parameters.npoints))||...
-   (~isreal(parameters.npoints))||(parameters.npoints<=0)||...
+   (~isreal(parameters.npoints))||(parameters.npoints<=1)||...
    (mod(parameters.npoints,1)~=0)
-    error('parameters.npoints must be a positive real integer.');
+    error('parameters.npoints must be a real integer greater than one.');
 end
 if ~isfield(parameters,'window')
     error('sweep window should be specified in parameters.window variable.');
@@ -174,8 +175,8 @@ if ~isfield(parameters,'tm_tol')
     error('transition moment tolerance must be specified in parameters.tm_tol variable.');
 end
 if (~isnumeric(parameters.tm_tol))||(~isscalar(parameters.tm_tol))||...
-   (~isreal(parameters.tm_tol))||(parameters.tm_tol<=0)
-    error('parameters.tm_tol must be a positive real scalar.');
+   (~isreal(parameters.tm_tol))||(parameters.tm_tol<0)
+    error('parameters.tm_tol must be a non-negative real scalar.');
 end
 if ~isfield(parameters,'rspt_order')
     error('perturbation theory order must be specified in parameters.rspt_order variable.');

@@ -96,8 +96,10 @@ if (~isnumeric(Z))||(~isreal(Z))||(size(Z,1)~=3)||...
    (size(Z,2)~=3)||(norm(Z-Z','fro')>1e-6*norm(Z,'fro'))
     error('Z must be a real symmetric 3x3 matrx.');
 end
-if (~isnumeric(pops))||(~isreal(pops))||(numel(pops)~=3)||(sum(pops)~=1)
-    error('pops must be a real three-element vector with a unit sum.');
+if (~isnumeric(pops))||(~isreal(pops))||(numel(pops)~=3)||...
+   any(~isfinite(pops(:)))||any(pops(:)<0)||...
+   (abs(sum(pops)-1)>1e-10)
+    error('pops must be a finite non-negative real three-element vector with a unit sum.');
 end
 if (~isnumeric(B))||(~isreal(B))||(~isscalar(B))
     error('B must be a real scalar.');
@@ -117,4 +119,3 @@ end
 % Lupus dentis, taurus cornis.
 %
 % A Latin proverb
-

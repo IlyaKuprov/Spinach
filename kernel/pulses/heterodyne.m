@@ -72,16 +72,17 @@ end
 
 % Consistency enforcement
 function grumble(dt,signal,freq)
-if (~isnumeric(dt))||(~isreal(dt))||(~isscalar(dt))||(dt<=0)
+if (~isnumeric(dt))||(~isreal(dt))||(~isscalar(dt))||...
+   (~isfinite(dt))||(dt<=0)
     error('dt must be a positive real number.');
 end
 if (~isnumeric(signal))||(~isreal(signal))||(~iscolumn(signal))
     error('signal must be a real column vector.');
 end
-if (~isnumeric(freq))||(~isreal(freq))||(~isscalar(freq))
+if (~isnumeric(freq))||(~isreal(freq))||(~isscalar(freq))||(~isfinite(freq))
     error('freq must be a real number.');
 end
-if (2*dt)>(1/freq)
+if (freq~=0)&&((4*dt)>(1/abs(freq)))
     error('the specified frequency is not sampled well enough.');
 end
 end
@@ -97,4 +98,3 @@ end
 %
 % Malcolm Levitt's email to 
 % his group, July 2023.
-

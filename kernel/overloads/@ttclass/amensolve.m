@@ -431,6 +431,9 @@ if ~all(szy(:,2)==ones(d,1))
     error('The right-hand-side should be a vector.')
 end
 if exist('x0','var')
+    if ~isa(x0,'ttclass')
+        error('Initial guess should be ttclass.');
+    end
     if A.ncores~=x0.ncores
         error('Dimensions of matrix and initial guess do not match.');
     end
@@ -568,4 +571,3 @@ end
 % Tread softly because you tread on my dreams.
 %
 % W.B. Yeats (1865-1939)
-

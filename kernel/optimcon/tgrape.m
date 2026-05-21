@@ -44,7 +44,7 @@
 function [fidelity,grad]=tgrape(spin_system,drift,controls,waveform,...
                                 dt_grid,time_unit,rho_init,rho_targ)
 % Check consistency
-grumble(spin_system,drift,controls,waveform,dt_grid,rho_init,rho_targ);
+grumble(spin_system,drift,controls,waveform,dt_grid,time_unit,rho_init,rho_targ);
     
 % Count the time steps
 nsteps=size(waveform,2);
@@ -114,7 +114,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,drift,controls,waveform,dt_grid,rho_init,rho_targ)
+function grumble(spin_system,drift,controls,waveform,dt_grid,time_unit,rho_init,rho_targ)
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
     error('optimal control module requires Lioville space formalism.');
 end
@@ -149,6 +149,10 @@ end
 if (~isnumeric(dt_grid))||(~isreal(dt_grid))||(~iscolumn(dt_grid))
     error('dt_grid must be a real row vector.');
 end
+if (~isnumeric(time_unit))||(~isreal(time_unit))||(numel(time_unit)~=1)||...
+   (~isfinite(time_unit))||(time_unit<=0)
+    error('time_unit must be a positive real scalar.');
+end
 if numel(dt_grid)~=size(waveform,2)
     error('numel(dt_grid) must be equal to the number waveform columns.');
 end
@@ -160,4 +164,3 @@ end
 % can't make it; but once it's been made they'll talk different!"
 %
 % Karl Popper, "Unended Quest"
-

@@ -330,8 +330,24 @@ if (numel(parameters.npts)==3)
     end
 end
 if isfield(parameters,'diff')
-    if (~isnumeric(parameters.diff))||(~isreal(parameters.diff))
-        error('parameters.diff must a real scalar or matrix.');
+    if (~isnumeric(parameters.diff))||(~isreal(parameters.diff))||...
+       any(~isfinite(parameters.diff(:)))
+        error('parameters.diff must be a finite real scalar or matrix.');
+    end
+    if isscalar(parameters.diff)
+        if parameters.diff<0
+            error('parameters.diff must be non-negative.');
+        end
+    else
+        if ~isequal(size(parameters.diff),numel(parameters.npts)*[1 1])
+            error('parameters.diff matrix dimensions must match the sample dimensionality.');
+        end
+        if norm(parameters.diff-parameters.diff','fro')>1e-10*norm(parameters.diff,'fro')
+            error('parameters.diff matrix must be symmetric.');
+        end
+        if any(eig(parameters.diff,'vector')<0)
+            error('parameters.diff matrix must have non-negative eigenvalues.');
+        end
     end
 end
 if ~isfield(parameters,'dims')
@@ -354,8 +370,12 @@ if (~ischar(parameters.deriv{1}))||(~ismember(parameters.deriv{1},{'period','fou
     error('the first element of parameters.deriv must be ''period'' or ''fourier''.');
 end
 if strcmp(parameters.deriv{1},'period')
+    if numel(parameters.deriv)~=2
+        error('periodic differentiation requires a stencil size in the second element of parameters.deriv.');
+    end
     if (~isnumeric(parameters.deriv{2}))||(~isreal(parameters.deriv{2}))||...
-       (numel(parameters.deriv{2})~=1)||mod(parameters.deriv{2},1)
+       (numel(parameters.deriv{2})~=1)||mod(parameters.deriv{2},1)||...
+       (parameters.deriv{2}<1)
         error('stencil size in the second element of parameters.deriv must be a positive integer.');
     end
     if parameters.deriv{2}>7
@@ -375,4 +395,3 @@ end
 % "He's spending a year dead for tax reasons."
 %
 % Douglas Adams, The Hitchhiker's Guide to the Galaxy
-

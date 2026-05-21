@@ -57,6 +57,7 @@ end
 % Consistency enforcement
 function grumble(nprotons)
 if (~isnumeric(nprotons))||(~isreal(nprotons))||...
+   (~isscalar(nprotons))||(~isfinite(nprotons))||...
    (mod(nprotons,1)~=0)||(mod((nprotons-3)/2,1)~=0)||...
    ((nprotons-3)/2<1)
     error('(nprotons-3)/2 must be a positive integer.');
@@ -67,4 +68,3 @@ end
 % you have ugly people who are intelligent, like scientists.
 %
 % Jose Mourinho
-

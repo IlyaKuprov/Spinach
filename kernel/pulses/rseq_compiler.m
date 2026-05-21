@@ -104,12 +104,25 @@ end
 if (~isnumeric(pulse_phi))||(~isreal(pulse_phi))
     error('pulse_phi must be a real numeric array.');
 end
-if (~isnumeric(pulse_dur))||(~isreal(pulse_dur))
-    error('pulse_dur must be a real numeric array.');
+if (~isnumeric(pulse_dur))||(~isreal(pulse_dur))||...
+   any(~isfinite(pulse_dur(:)))||any(pulse_dur(:)<=0)
+    error('pulse_dur must be a positive real numeric array.');
+end
+if ~ismember(element_type,{'180_pulse','90270_pulse'})
+    error('element_type is not supported.');
+end
+switch element_type
+    case '180_pulse'
+        if numel(pulse_dur)~=1
+            error('pulse_dur must be scalar for 180_pulse elements.');
+        end
+    case '90270_pulse'
+        if (numel(pulse_dur)~=2)||(mod(numel(pulse_phi),2)~=0)
+            error('90270_pulse elements require two durations and an even number of phases.');
+        end
 end
 end
 
 % The more I learn about people, the more I like my dog.
 %
 % Mark Twain
-

@@ -861,6 +861,9 @@ end
 
 % Consistency enforcement
 function grumble(filename,shielding_refs)
+if (~ischar(filename))||isempty(filename)
+    error('filename must be a non-empty character string.');
+end
 if ~exist(filename,'file')
     error('the specified file was not found.');
 end
@@ -887,4 +890,3 @@ end
 % annoyance to those of us who do.
 %
 % Isaac Asimov
-

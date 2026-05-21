@@ -268,8 +268,9 @@ end
 if (~isnumeric(rf_amp_list))||(~isreal(rf_amp_list))||any(~isfinite(rf_amp_list))
     error('rf_amp_list must be a vector of real numbers.');
 end
-if (~isnumeric(rf_dur_list))||(~isreal(rf_dur_list))||any(~isfinite(rf_dur_list))
-    error('rf_amp_list must be a vector of real numbers.');
+if (~isnumeric(rf_dur_list))||(~isreal(rf_dur_list))||...
+   any(~isfinite(rf_dur_list))||any(rf_dur_list<=0)
+    error('rf_dur_list must be a vector of positive real numbers.');
 end
 if (numel(rf_frq_list)~=numel(rf_amp_list))||...
    (numel(rf_amp_list)~=numel(rf_dur_list))
@@ -291,4 +292,3 @@ end
 % of the puddles in the road.
 %
 % Alexander Smith
-

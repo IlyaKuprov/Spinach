@@ -27,7 +27,7 @@
 function y=lorentzcon(offs,ampl,fwhm,x)
 
 % Check consistency
-grumble(x,fwhm);
+grumble(offs,ampl,fwhm,x);
 
 % Width parameter
 gam=fwhm/2;
@@ -80,12 +80,20 @@ end
 end
 
 % Consistency enforcement
-function grumble(x,fwhm)
-if (~isnumeric(x))||(~isreal(x))
-    error('x must be an array of real numbers.');
+function grumble(offs,ampl,fwhm,x)
+if (~isnumeric(offs))||(~isreal(offs))||...
+   (~ismember(numel(offs),[1 3]))||any(~isfinite(offs(:)))
+    error('offs must be a finite real scalar or a three-element vector.');
+end
+if (~isnumeric(ampl))||(~isreal(ampl))||...
+   (numel(ampl)~=1)||(~isfinite(ampl))
+    error('ampl must be a finite real scalar.');
+end
+if (~isnumeric(x))||(~isreal(x))||any(~isfinite(x(:)))
+    error('x must be an array of finite real numbers.');
 end
 if (~isnumeric(fwhm))||(~isreal(fwhm))||...
-   (numel(fwhm)~=1)||(fwhm<=0)
+   (numel(fwhm)~=1)||(~isfinite(fwhm))||(fwhm<=0)
     error('fwhm must be a positive real number.');
 end
 end
@@ -95,4 +103,3 @@ end
 % to have to marry us for.
 %
 % A feminist web site
-

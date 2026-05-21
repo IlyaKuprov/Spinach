@@ -65,7 +65,7 @@ function [traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,
                                                     waveform,rho_init,rho_targ,...
                                                     fidelity_type) %#ok<*PFBNS>
 % Check consistency
-grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ);
+grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type);
     
 % Count the outputs
 n_outputs=nargout();
@@ -786,7 +786,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ)
+function grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv',...
                                         'zeeman-liouv',...
                                         'zeeman-wavef'})
@@ -795,8 +795,11 @@ end
 if (~isnumeric(rho_init))||(~iscolumn(rho_init))
     error('rho_init must be a column vector.');
 end
-if (~isnumeric(rho_targ))||(~iscolumn(rho_init))
+if (~isnumeric(rho_targ))||(~iscolumn(rho_targ))
     error('rho_targ must be a column vector.');
+end
+if (~ischar(fidelity_type))||(~ismember(fidelity_type,{'real','imag','square'}))
+    error('fidelity_type must be ''real'', ''imag'', or ''square''.');
 end
 if ~iscell(drifts)
     error('drifts must be a cell array of matrices.');
@@ -845,4 +848,3 @@ end
 % likely to be heroic exceptions.
 %
 % Nathaniel Branden
-

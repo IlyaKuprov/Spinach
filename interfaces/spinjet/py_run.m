@@ -86,11 +86,12 @@ if isempty(spin_system)||(~isfield(spin_system,'sys'))||...
     error('spinach root directory must be supplied within spin_system.sys.root')
 end
 if isempty(py_script_str)||(~ischar(py_script_str))
-   if ~exist([spin_system.sys.root_dir filesep 'interfaces' filesep 'spinjet' filesep ...
-                                               'Xepr_python' filesep py_script_str '.py'],'file') 
-       error([spin_system.sys.root_dir filesep 'interfaces' filesep 'spinjet' filesep ...
-                                               'Xepr_python' filesep py_script_str '.py does not exist']);
-   end
+   error('py_script_str must be a non-empty character string.');
+end
+if ~exist([spin_system.sys.root_dir filesep 'interfaces' filesep 'spinjet' filesep ...
+                                            'Xepr_python' filesep py_script_str '.py'],'file')
+    error([spin_system.sys.root_dir filesep 'interfaces' filesep 'spinjet' filesep ...
+                                            'Xepr_python' filesep py_script_str '.py does not exist']);
 end
 if ~iscell(python_inputs)
     error(['python_inputs should be a cell array of all inputs to python script ' py_script_str '.py'])
@@ -117,4 +118,3 @@ end
 % specimen No. 1256.
 %
 % Richard Gordon
-

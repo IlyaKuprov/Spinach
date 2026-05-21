@@ -32,6 +32,9 @@
 
 function stack_2d(spin_system,spectrum,parameters,stack_dim,alpha_fun)
 
+% Check spin specification
+grumble(spectrum,parameters,stack_dim,true);
+
 % Set common defaults
 parameters=defaults(spin_system,parameters);
 
@@ -175,7 +178,17 @@ end
 end
 
 % Consistency enforcement
-function grumble(spectrum,parameters,stack_dim)
+function grumble(spectrum,parameters,stack_dim,spins_only)
+
+if (nargin==4)&&spins_only
+    if ~isfield(parameters,'spins')
+        error('working spins should be specified in parameters.spins variable.');
+    elseif isempty(parameters.spins)
+        error('parameters.spins variable cannot be empty.');
+    end
+    return
+end
+
 if (~isnumeric(spectrum))||(~ismatrix(spectrum))
     error('spectrum must be a matrix.');
 end
@@ -199,6 +212,8 @@ if ~ischar(parameters.axis_units)
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
+elseif isempty(parameters.spins)
+    error('parameters.spins variable cannot be empty.');
 end
 if ~iscell(parameters.spins)
     error('parameters.spins should be a cell array of character strings.');

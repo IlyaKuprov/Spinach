@@ -210,13 +210,6 @@ if (~isnumeric(parameters.t_echo))||(~isreal(parameters.t_echo))||...
    (~isscalar(parameters.t_echo))||(parameters.t_echo<=0)
     error('parameters.t_echo must be a positive real scalar.');
 end
-if ~isfield(parameters,'ss_grad_dur')
-    error('slice selection gradient duration must be specified in parameters.ss_grad_dur field.');
-end
-if (~isnumeric(parameters.ss_grad_dur))||(~isreal(parameters.ss_grad_dur))||...
-   (~isscalar(parameters.ss_grad_dur))||(parameters.ss_grad_dur<=0)
-    error('parameters.ss_grad_dur must be a positive real scalar.');
-end
 if ~isfield(parameters,'ro_grad_dur')
     error('readout gradient duration must be specified in parameters.ro_grad_dur field.');
 end
@@ -263,4 +256,3 @@ end
 % fer what they must.
 %
 % Thucydides
-

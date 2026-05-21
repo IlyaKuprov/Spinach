@@ -101,6 +101,9 @@ end
 
 % Consistency enforcement
 function grumble(filename)
+if (~ischar(filename))||isempty(filename)
+    error('filename must be a non-empty character string.');
+end
 if ~exist(filename,'file')
     error('the file specified as not found.');
 end
@@ -132,4 +135,3 @@ end
 % pens, then this is the end of this affair and it goes not further."
 %
 % (IK still thinks that Bloch equations belong to classical physics.)
-

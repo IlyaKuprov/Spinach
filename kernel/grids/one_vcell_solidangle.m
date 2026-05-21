@@ -25,7 +25,11 @@
 function S=one_vcell_solidangle(v,centre)
 
 % Check consistency
-grumble(v,centre);
+if nargin<2
+    grumble(v);
+else
+    grumble(v,centre);
+end
 
 % Straightforward math
 if nargin<2
@@ -54,11 +58,20 @@ end
 
 % Consistency enforcement
 function grumble(v,centre)
+if (~isnumeric(v))||(~isreal(v))||(size(v,1)~=3)||any(~isfinite(v(:)))
+    error('v must be a finite real 3 x n array.');
+end
 if any(abs(sum(v.^2,1)-1)>1e-6)
     error('v must contain unit vectors.');
 end
-if abs(norm(centre,2)-1)>1e-6
-    error('centre muslt be a unit vector.');
+if nargin>1
+    if (~isnumeric(centre))||(~isreal(centre))||(~iscolumn(centre))||...
+       (numel(centre)~=3)||any(~isfinite(centre(:)))
+        error('centre must be a finite real three-element column vector.');
+    end
+    if abs(norm(centre,2)-1)>1e-6
+        error('centre must be a unit vector.');
+    end
 end
 end
 
@@ -67,4 +80,3 @@ end
 % giddy elation and black despair.
 %
 % Steven G. Krantz
-

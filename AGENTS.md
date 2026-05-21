@@ -36,9 +36,9 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **British spelling throughout:** In all function names, variable names, and comments, use British spelling. Oxford comma is also mandatory. 
 
-* **Optional arguments:** Do not create optional arguments. All functions you write must have fixed signatures. Do not assume or set anything to a default value. Do not write array shape adaptation code, simply tell the user what the function input and output shapes are. Explain inputs and outputs in the documentation header and validate them in the grumbler, and that's it: Spinach has a policy of never guessing or assuming anything.
+* **Optional arguments and shapes:** Do not create optional arguments. All functions you write must have fixed signatures. Do not write array shape adaptation code, simply tell the user what the function input and output shapes are. Explain inputs and outputs in the documentation header and validate them in the grumbler.
 
-* **Default values:** Defaults are structly forbidden. If some variable is missing from the user input, that is an error. Simply rely on Matlab to catch it: if a variable is used but not supplied, Matlab would throw a natural informative error. Your grumbler call should assume that all variables specified in the function signature are present.
+* **Default values:** Defaults are strictly forbidden: Spinach has a policy of never guessing or assuming anything. If some variable is missing from the user input, that is an error. Simply rely on Matlab to catch it: if a variable is used but not supplied, Matlab would throw a natural informative error. Your grumbler calls should assume that all variables specified in the function signature are present.
 
 * **No residual garbage:** Do not leave any dead code, unused variables, or other redundant items in the functions you create or edit.
 

@@ -83,15 +83,15 @@ function grumble(npoints_d,npoints_e,tol)
 if (~isnumeric(npoints_d))||(~isreal(npoints_d))||...
    (~isscalar(npoints_d))||(~isfinite(npoints_d))||...
    (npoints_d<5)||(mod(npoints_d,1)~=0)
-    error('npoints_d must be a real integer greater than 5.');
+    error('npoints_d must be a finite real integer at least 5.');
 end
 if (~isnumeric(npoints_e))||(~isreal(npoints_e))||...
    (~isscalar(npoints_e))||(~isfinite(npoints_e))||...
    (npoints_e<5)||(mod(npoints_e,1)~=0)
-    error('npoints_e must be a real integer greater than 5.');
+    error('npoints_e must be a finite real integer at least 5.');
 end
 if (~isnumeric(tol))||(~isreal(tol))||(~isscalar(tol))||(~isfinite(tol))||(tol<0)
-    error('tol must be a positive real number much smaller than 1.');
+    error('tol must be a finite non-negative real scalar.');
 end
 end
 

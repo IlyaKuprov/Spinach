@@ -355,7 +355,7 @@ if ~isfield(parameters,'dims')
 end
 if (~isnumeric(parameters.dims))||(~isreal(parameters.dims))||...
    (any(~isfinite(parameters.dims)))||any(parameters.dims<=0)
-    error('parameters.dims must be a row vector of positive real numbers.');
+    error('parameters.dims must be a row vector of finite positive real numbers.');
 end
 if numel(parameters.dims)~=numel(parameters.npts)
     error('the number of elements in parameters.dims and parameters.npts must be the same.');

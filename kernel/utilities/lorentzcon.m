@@ -94,7 +94,7 @@ if (~isnumeric(x))||(~isreal(x))||any(~isfinite(x(:)))
 end
 if (~isnumeric(fwhm))||(~isreal(fwhm))||...
    (numel(fwhm)~=1)||(~isfinite(fwhm))||(fwhm<=0)
-    error('fwhm must be a positive real number.');
+    error('fwhm must be a finite positive real number.');
 end
 end
 

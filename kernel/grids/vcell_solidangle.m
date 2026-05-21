@@ -57,7 +57,7 @@ for n=1:numel(K)
     if (~isnumeric(K{n}))||(~isreal(K{n}))||isempty(K{n})||...
        any(~isfinite(K{n}(:)))||any(mod(K{n}(:),1)~=0)||...
        any(K{n}(:)<1)||any(K{n}(:)>size(P,2))
-        error('K must contain positive integer indices into P.');
+        error('K must contain finite positive real integer indices into P.');
     end
 end
 if nargin>2

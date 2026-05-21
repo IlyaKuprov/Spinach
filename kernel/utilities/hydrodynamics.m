@@ -121,7 +121,7 @@ end
 if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
    (numel(parameters.npts)<1)||(numel(parameters.npts)>3)||...
    (size(parameters.npts,1)~=1)||any(mod(parameters.npts,1))
-    error('parameters.dims must be a 1, 2, or 3-element row vector of positive real numbers.');
+    error('parameters.npts must be a 1, 2, or 3-element row vector of real integers.');
 end
 if numel(parameters.npts)~=numel(parameters.dims)
     error('parameters.dims and parameters.npts must have the same number of elements.');

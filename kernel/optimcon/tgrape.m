@@ -151,7 +151,7 @@ if (~isnumeric(dt_grid))||(~isreal(dt_grid))||(~iscolumn(dt_grid))
 end
 if (~isnumeric(time_unit))||(~isreal(time_unit))||(numel(time_unit)~=1)||...
    (~isfinite(time_unit))||(time_unit<=0)
-    error('time_unit must be a positive real scalar.');
+    error('time_unit must be a finite positive real scalar.');
 end
 if numel(dt_grid)~=size(waveform,2)
     error('numel(dt_grid) must be equal to the number waveform columns.');

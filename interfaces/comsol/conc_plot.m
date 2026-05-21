@@ -169,7 +169,7 @@ end
 if (~isfield(spin_system.mesh,'zext'))||(~isnumeric(spin_system.mesh.zext))||...
    (~isreal(spin_system.mesh.zext))||(numel(spin_system.mesh.zext)~=2)||...
    any(~isfinite(spin_system.mesh.zext))
-    error('spin_system.mesh.zext must be a real two-element vector.');
+    error('spin_system.mesh.zext must be a finite real two-element vector.');
 end
 if (~isfield(spin_system.mesh.vor,'ncells'))||(~isfield(spin_system.mesh.vor,'cells'))||...
    (~isfield(spin_system.mesh.vor,'vertices'))||(~isfield(spin_system.mesh.vor,'max_cell_size'))
@@ -177,7 +177,7 @@ if (~isfield(spin_system.mesh.vor,'ncells'))||(~isfield(spin_system.mesh.vor,'ce
 end
 if (~isnumeric(conc))||(~isreal(conc))||(~iscolumn(conc))||...
    any(~isfinite(conc))||(numel(conc)~=spin_system.mesh.vor.ncells)
-    error('conc must be a column vector with one real value per Voronoi cell.');
+    error('conc must be a finite real column vector with one value per Voronoi cell.');
 end
 if nargin>2
     if (~isnumeric(obs))||(~isreal(obs))||...

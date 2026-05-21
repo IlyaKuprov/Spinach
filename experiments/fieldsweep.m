@@ -133,7 +133,7 @@ end
 if (~isnumeric(parameters.grid))||(~isscalar(parameters.grid))||...
    (~isreal(parameters.grid))||(~isfinite(parameters.grid))||...
    (parameters.grid<=0)||(mod(parameters.grid,1)~=0)
-    error('parameters.grid must be a positive real integer.');
+    error('parameters.grid must be a finite positive real integer.');
 end
 if ~isfield(parameters,'spins')
     error('spin to couple to the microwave field must be specified in parameters.spins variable.');

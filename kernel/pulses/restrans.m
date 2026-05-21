@@ -159,7 +159,7 @@ end
 function grumble(X_user,Y_user,dt_user,omega,Q,model,up_factor)
 if (~isnumeric(dt_user))||(~isreal(dt_user))||...
    (~isscalar(dt_user))||(~isfinite(dt_user))||(dt_user<=0)
-    error('dt_user must be a real positive scalar.');
+    error('dt_user must be a finite positive real scalar.');
 end
 if (~isnumeric(X_user))||(~isreal(X_user))||(~iscolumn(X_user))||...
    (~isnumeric(Y_user))||(~isreal(Y_user))||(~iscolumn(Y_user))
@@ -170,17 +170,17 @@ if numel(X_user)~=numel(Y_user)
 end
 if (~isnumeric(omega))||(~isreal(omega))||(~isscalar(omega))||...
    (~isfinite(omega))||(omega<=0)
-    error('omega must be a positive real scalar.');
+    error('omega must be a finite positive real scalar.');
 end
 if (~isnumeric(Q))||(~isreal(Q))||(~isscalar(Q))||(~isfinite(Q))||(Q<=0)
-    error('Q must be a positive real scalar.');
+    error('Q must be a finite positive real scalar.');
 end
 if (~ischar(model))||(~ismember(model,{'pwc','pwl','pwl_tsc'}))
     error('model must be ''pwc'', ''pwl'', or ''pwl_tsc''.');
 end
 if (~isnumeric(up_factor))||(~isreal(up_factor))||(~isscalar(up_factor))||...
    (~isfinite(up_factor))||(up_factor<1)||(mod(up_factor,1)~=0)
-    error('up_factor must be a positive real integer.');
+    error('up_factor must be a finite positive real integer.');
 end
 if dt_user<(pi/omega)
     error('dt_user breaks rotating frame approximation.');

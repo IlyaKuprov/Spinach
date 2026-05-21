@@ -74,13 +74,13 @@ end
 function grumble(dt,signal,freq)
 if (~isnumeric(dt))||(~isreal(dt))||(~isscalar(dt))||...
    (~isfinite(dt))||(dt<=0)
-    error('dt must be a positive real number.');
+    error('dt must be a finite positive real number.');
 end
 if (~isnumeric(signal))||(~isreal(signal))||(~iscolumn(signal))
     error('signal must be a real column vector.');
 end
 if (~isnumeric(freq))||(~isreal(freq))||(~isscalar(freq))||(~isfinite(freq))
-    error('freq must be a real number.');
+    error('freq must be a finite real number.');
 end
 if (freq~=0)&&((4*dt)>(1/abs(freq)))
     error('the specified frequency is not sampled well enough.');

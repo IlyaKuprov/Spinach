@@ -40,11 +40,11 @@ end
 % Consistency enforcement
 function grumble(T,N)
 if (~isnumeric(T))||(~isreal(T))||(~isscalar(T))||(~isfinite(T))||(T<=0)
-    error('T must be a positive real scalar.');
+    error('T must be a finite positive real scalar.');
 end
 if (~isnumeric(N))||(~isreal(N))||(~isscalar(N))||(~isfinite(N))||...
    (N<1)||(mod(N,1)~=0)
-    error('N must be a positve real integer.');
+    error('N must be a finite positive real integer.');
 end
 end
 

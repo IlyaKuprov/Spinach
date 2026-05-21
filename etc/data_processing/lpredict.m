@@ -64,11 +64,11 @@ end
 if (~isnumeric(npcoeffs))||(~isreal(npcoeffs))||...
    (~isscalar(npcoeffs))||(~isfinite(npcoeffs))||(npcoeffs<2)||...
    (mod(npcoeffs,1)~=0)||(npcoeffs>numel(x))
-    error('npcoeffs must be a real integer greater than 1.');
+    error('npcoeffs must be a finite real integer from 2 to numel(x).');
 end
 if (~isnumeric(npredps))||(~isreal(npredps))||...
    (~isscalar(npredps))||(~isfinite(npredps))||(npredps<1)||(mod(npredps,1)~=0)
-    error('npredps must be a positive real integer.');
+    error('npredps must be a finite positive real integer.');
 end
 end
 

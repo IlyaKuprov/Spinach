@@ -180,7 +180,7 @@ end
 if (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
    (numel(parameters.npoints)~=3)||any(~isfinite(parameters.npoints))||...
    any(mod(parameters.npoints,1)~=0)||any(parameters.npoints<1)
-    error('parameters.npoints must be a three-element vector of positive integers.');
+    error('parameters.npoints must be a three-element vector of finite positive real integers.');
 end
 if ~isfield(parameters,'zerofill')
     error('zero filling should be specified in parameters.zerofill variable.');
@@ -188,7 +188,7 @@ end
 if (~isnumeric(parameters.zerofill))||(~isreal(parameters.zerofill))||...
    (numel(parameters.zerofill)~=3)||any(~isfinite(parameters.zerofill))||...
    any(mod(parameters.zerofill,1)~=0)||any(parameters.zerofill<1)
-    error('parameters.zerofill must be a three-element vector of positive integers.');
+    error('parameters.zerofill must be a three-element vector of finite positive real integers.');
 end
 if ~isequal(size(spectrum),parameters.zerofill)
     error('spectrum dimensions must match parameters.zerofill.');

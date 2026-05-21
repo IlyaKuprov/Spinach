@@ -167,15 +167,15 @@ end
 function grumble(npts,dur,bwidth,smp,type)
 if (~isnumeric(dur))||(~isreal(dur))||...
    (numel(dur)~=1)||(~isfinite(dur))||(dur<=0)
-    error('dur must be a positive real number.');
+    error('dur must be a finite positive real number.');
 end
 if (~isnumeric(bwidth))||(~isreal(bwidth))||...
    (numel(bwidth)~=1)||(~isfinite(bwidth))||(bwidth<=0)
-    error('bwidth must be a positive real number.');
+    error('bwidth must be a finite positive real number.');
 end
 if (~isnumeric(npts))||(~isreal(npts))||(numel(npts)~=1)||...
    (~isfinite(npts))||(npts<1)||(mod(npts,1)~=0)
-    error('npts must be a positive real integer.');
+    error('npts must be a finite positive real integer.');
 end
 if (~ischar(type))||(~ismember(type,{'wurst','wurst-adaptive',...
                                     'smoothed','smoothed-adaptive',...

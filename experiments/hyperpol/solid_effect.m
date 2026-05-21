@@ -197,7 +197,7 @@ if ismember(parameters.calc_type,{'time_dependence','trajectory'})
     if (~isnumeric(parameters.n_steps))||(~isreal(parameters.n_steps))||...
        (~isscalar(parameters.n_steps))||(~isfinite(parameters.n_steps))||...
        (parameters.n_steps<1)||(mod(parameters.n_steps,1)~=0)
-        error('parameters.n_steps must be a positive real integer.');
+        error('parameters.n_steps must be a finite positive real integer.');
     end
     if ~isfield(parameters,'time_step')
         error('time step length should be specified in parameters.time_step variable.');
@@ -205,7 +205,7 @@ if ismember(parameters.calc_type,{'time_dependence','trajectory'})
     if (~isnumeric(parameters.time_step))||(~isreal(parameters.time_step))||...
        (~isscalar(parameters.time_step))||(~isfinite(parameters.time_step))||...
        (parameters.time_step<=0)
-        error('parameters.time_step must be a positive real scalar.');
+        error('parameters.time_step must be a finite positive real scalar.');
     end
 end
 end

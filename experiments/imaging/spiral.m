@@ -147,7 +147,7 @@ end
 if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
    (~isvector(parameters.npts))||any(~isfinite(parameters.npts))||...
    any(parameters.npts<1)||any(mod(parameters.npts,1)~=0)
-    error('parameters.npts must be a vector of positive integers.');
+    error('parameters.npts must be a vector of finite positive real integers.');
 end
 if ~isfield(parameters,'rho0')
     error('parameters.rho0 field must be present.');
@@ -168,14 +168,14 @@ if ~isfield(parameters,'t_echo')
 end
 if (~isnumeric(parameters.t_echo))||(~isreal(parameters.t_echo))||...
    (~isscalar(parameters.t_echo))||(~isfinite(parameters.t_echo))||(parameters.t_echo<=0)
-    error('parameters.t_echo must be a positive real scalar.');
+    error('parameters.t_echo must be a finite positive real scalar.');
 end
 if ~isfield(parameters,'spiral_frq')
     error('spiral frequency must be specified in parameters.spiral_frq field.');
 end
 if (~isnumeric(parameters.spiral_frq))||(~isreal(parameters.spiral_frq))||...
    (~isscalar(parameters.spiral_frq))||(~isfinite(parameters.spiral_frq))
-    error('parameters.spiral_frq must be a real scalar.');
+    error('parameters.spiral_frq must be a finite real scalar.');
 end
 if ~isfield(parameters,'spiral_dur')
     error('spiral duration must be specified in parameters.spiral_dur field.');
@@ -183,14 +183,14 @@ end
 if (~isnumeric(parameters.spiral_dur))||(~isreal(parameters.spiral_dur))||...
    (~isscalar(parameters.spiral_dur))||(~isfinite(parameters.spiral_dur))||...
    (parameters.spiral_dur<=0)
-    error('parameters.spiral_dur must be a positive real scalar.');
+    error('parameters.spiral_dur must be a finite positive real scalar.');
 end
 if ~isfield(parameters,'grad_amp')
     error('gradient amplitude must be specified in parameters.grad_amp field.');
 end
 if (~isnumeric(parameters.grad_amp))||(~isreal(parameters.grad_amp))||...
    (~isscalar(parameters.grad_amp))||(~isfinite(parameters.grad_amp))
-    error('parameters.grad_amp must be a real scalar.');
+    error('parameters.grad_amp must be a finite real scalar.');
 end
 if ~isfield(parameters,'spiral_npts')
     error('number of spiral points must be specified in parameters.spiral_npts field.');
@@ -198,7 +198,7 @@ end
 if (~isnumeric(parameters.spiral_npts))||(~isreal(parameters.spiral_npts))||...
    (~isscalar(parameters.spiral_npts))||(~isfinite(parameters.spiral_npts))||...
    (parameters.spiral_npts<1)||(mod(parameters.spiral_npts,1)~=0)
-    error('parameters.spiral_npts must be a positive real integer.');
+    error('parameters.spiral_npts must be a finite positive real integer.');
 end
 end
 

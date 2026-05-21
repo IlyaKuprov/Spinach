@@ -46,7 +46,7 @@ if (~isnumeric(rho))||(~iscolumn(rho))
     error('rho must be a column vector.');
 end
 if (~isnumeric(rate))||(~isreal(rate))||(~isscalar(rate))||(~isfinite(rate))
-    error('rate must be a real scalar.');
+    error('rate must be a finite real scalar.');
 end
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
     error('this function is only available in sphten-liouv formalism.');

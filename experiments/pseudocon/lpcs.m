@@ -104,19 +104,19 @@ end
 % Consistency enforcement
 function grumble(nxyz,mxyz,L,Ilm,chi)
 if (~isnumeric(nxyz))||(~isreal(nxyz))||any(~isfinite(nxyz(:)))||(size(nxyz,2)~=3)
-    error('nxyz must be an Nx3 array of atomic coordinates.');
+    error('nxyz must be an Nx3 array of finite real atomic coordinates.');
 end
 if (~isnumeric(mxyz))||(size(mxyz,2)~=3)||(size(mxyz,1)~=1)||...
    (~isreal(mxyz))||any(~isfinite(mxyz(:)))
-    error('mxyz parameter should be a real row vector with three elements.');
+    error('mxyz must be a finite real row vector with three elements.');
 end
 if (~isnumeric(L))||(~isreal(L))||(~isvector(L))||any(~isfinite(L(:)))||...
    any(L(:)<0)||any(mod(L(:),1)~=0)
-    error('L must be a vector of non-negative integers.');
+    error('L must be a vector of finite non-negative real integers.');
 end
 if (~isnumeric(chi))||(~isreal(chi))||any(~isfinite(chi(:)))||...
    (~isequal(size(chi),[3 3])&&(~isvector(chi)||numel(chi)~=5))
-    error('chi must be a real 3x3 matrix or a five-element vector.');
+    error('chi must be a finite real 3x3 matrix or five-element vector.');
 end
 if (~iscell(Ilm))||(numel(Ilm)~=numel(L))
     error('Ilm should be a cell array of the same size as L.');
@@ -125,7 +125,7 @@ for n=1:numel(L)
     l=L(n);
     if (~isnumeric(Ilm{n}))||(~isreal(Ilm{n}))||any(~isfinite(Ilm{n}(:)))||...
        (numel(Ilm{n})~=(2*l+1))
-        error('Ilm{n} should be a real vector with 2*L(n)+1 elements.');
+        error('Ilm{n} must be a finite real vector with 2*L(n)+1 elements.');
     end
 end
 end

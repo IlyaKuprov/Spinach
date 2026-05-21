@@ -87,7 +87,7 @@ end
 if (~isnumeric(mod_id))||(~isreal(mod_id))||...
    (~isscalar(mod_id))||(~isfinite(mod_id))||...
    (mod_id<1)||(mod(mod_id,1)~=0)
-    error('mod_id must be a positive real integer.');
+    error('mod_id must be a finite positive real integer.');
 end
 end
 

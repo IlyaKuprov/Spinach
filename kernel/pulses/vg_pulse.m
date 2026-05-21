@@ -117,11 +117,11 @@ if ~ischar(pulse_name)
 end
 if (numel(npoints)~=1)||(~isnumeric(npoints))||(~isreal(npoints))||...
    (~isfinite(npoints))||(npoints<1)||(mod(npoints,1)~=0)
-    error('npoints must be a positive real integer greater than 1.');
+    error('npoints must be a finite positive real integer.');
 end
 if (numel(duration)~=1)||(~isnumeric(duration))||...
    (~isreal(duration))||(~isfinite(duration))||(duration<=0)
-    error('duration must be a positive real number.');
+    error('duration must be a finite positive real number.');
 end
 end
 

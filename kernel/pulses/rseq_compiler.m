@@ -106,7 +106,7 @@ if (~isnumeric(pulse_phi))||(~isreal(pulse_phi))
 end
 if (~isnumeric(pulse_dur))||(~isreal(pulse_dur))||...
    any(~isfinite(pulse_dur(:)))||any(pulse_dur(:)<=0)
-    error('pulse_dur must be a positive real numeric array.');
+    error('pulse_dur must be a finite positive real numeric array.');
 end
 if ~ismember(element_type,{'180_pulse','90270_pulse'})
     error('element_type is not supported.');

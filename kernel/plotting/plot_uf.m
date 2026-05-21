@@ -164,11 +164,11 @@ end
 if (~isnumeric(parameters.nloops))||(~isreal(parameters.nloops))||...
    (~isscalar(parameters.nloops))||(~isfinite(parameters.nloops))||...
    (parameters.nloops<1)||(mod(parameters.nloops,1)~=0)
-    error('parameters.nloops must be a positive real integer.');
+    error('parameters.nloops must be a finite positive real integer.');
 end
 if (~isnumeric(parameters.Te))||(~isreal(parameters.Te))||...
    (~isscalar(parameters.Te))||(~isfinite(parameters.Te))||(parameters.Te<=0)
-    error('parameters.Te must be a positive real scalar.');
+    error('parameters.Te must be a finite positive real scalar.');
 end
 if (~ischar(parameters.axis_units))||(~ismember(parameters.axis_units,{'ppm','Hz'}))
     error('parameters.axis_units must be ''ppm'' or ''Hz''.');

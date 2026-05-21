@@ -134,7 +134,8 @@ switch parameters.calc_type
         rho_unit=unit_state(spin_system); R=R-kron(rho_unit,rho_unit');
         
         % Run the simulation
-        answer=evolution(spin_system,H+1i*R,coils,-R*rho_eq,[],[],'total');
+        answer=evolution(spin_system,H+1i*R,coils,-R*rho_eq,parameters.time_step,...
+                         parameters.n_steps,'total');
                      
     case 'trajectory' 
      
@@ -216,3 +217,4 @@ end
 % our labs..."
 %
 % Incredulous voice from the audience: "Speak for yourself!"
+

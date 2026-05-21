@@ -494,6 +494,12 @@ end
 if ~ismember(parameters.equation,{'kuprov','poisson'})
     error('parameters.equation may be set to ''kuprov'' and ''poisson''.');
 end
+if ~isfield(parameters,'gpu')
+    error('GPU execution flag must be specified in parameters.gpu field.');
+end
+if (~islogical(parameters.gpu))||(~isscalar(parameters.gpu))
+    error('parameters.gpu must be a logical scalar.');
+end
 if ~isfield(parameters,'xyz')
     error('coordinates of PCS active nuclei must be provided in parameters.xyz field.');
 elseif (~isnumeric(parameters.xyz))||(~isreal(parameters.xyz))||(size(parameters.xyz,2)~=3)
@@ -563,4 +569,3 @@ end
 % I move on to the next thing.
 %
 % James Cameron
-

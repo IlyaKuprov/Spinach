@@ -109,6 +109,12 @@ end
 if (~iscell(crop_ranges))||(numel(crop_ranges)~=2)
     error('crop_ranges must be a cell array with two vectors.');
 end
+for n=1:2
+    if (~isnumeric(crop_ranges{n}))||(~isreal(crop_ranges{n}))||...
+       (numel(crop_ranges{n})~=2)||any(~isfinite(crop_ranges{n}(:)))
+        error('crop_ranges elements must be finite real two-element vectors.');
+    end
+end
 if (crop_ranges{1}(1)>=crop_ranges{1}(2))||(crop_ranges{2}(1)>=crop_ranges{2}(2))
     error('the vectors in the crop_ranges array must have their elements in ascending order.');
 end
@@ -120,4 +126,3 @@ end
 % price increase for dysprosium in 2011.
 %
 % EPSRC reviewer, on one of IK's grant applications
-

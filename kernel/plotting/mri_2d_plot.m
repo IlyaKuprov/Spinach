@@ -121,12 +121,19 @@ end
 % Consistency enforcement
 function grumble(mri,parameters,method)
 if ~ischar(method), error('method must be a character string.'); end
-if ismember(method,{'image','phantom'})
+if ~ismember(method,{'image','phantom','k-space'})
+    error('method must be ''image'', ''phantom'', or ''k-space''.');
+end
+if ismember(method,{'image','phantom','k-space'})
     if (~isnumeric(mri))||(~isreal(mri))||(~ismatrix(mri))
         error('mri must be a real matrix.');
     end
 end
 if ismember(method,{'image','k-space'})
+    if (~isfield(parameters,'spins'))||(~iscell(parameters.spins))||...
+       (numel(parameters.spins)~=1)||(~ischar(parameters.spins{1}))
+        error('parameters.spins must be a one-element cell array of character strings.');
+    end
     if ~isfield(parameters,'ro_grad_amp')
         error('readout gradient amplitude should be specified in parameters.ro_grad_amp variable.');
     end
@@ -139,16 +146,22 @@ if ismember(method,{'image','k-space'})
     if ~isfield(parameters,'pe_grad_dur') 
         error('phase encoding duration gradient should be specified in parameters.pe_grad_dur variable.');
     end
-    if numel(parameters.ro_grad_amp)~=1
+    if (~isnumeric(parameters.ro_grad_amp))||(~isreal(parameters.ro_grad_amp))||...
+       (numel(parameters.ro_grad_amp)~=1)||(~isfinite(parameters.ro_grad_amp))
         error('parameters.ro_grad_amp should have exactly one element.');
     end    
-    if numel(parameters.ro_grad_dur)~=1
+    if (~isnumeric(parameters.ro_grad_dur))||(~isreal(parameters.ro_grad_dur))||...
+       (numel(parameters.ro_grad_dur)~=1)||(~isfinite(parameters.ro_grad_dur))||...
+       (parameters.ro_grad_dur<=0)
         error('parameters.ro_grad_dur should have exactly one element.');
     end   
-    if numel(parameters.pe_grad_amp)~=1 
+    if (~isnumeric(parameters.pe_grad_amp))||(~isreal(parameters.pe_grad_amp))||...
+       (numel(parameters.pe_grad_amp)~=1)||(~isfinite(parameters.pe_grad_amp))
         error('parameters.pe_grad_amp should have exactly one element.');
     end
-    if numel(parameters.pe_grad_dur)~=1  
+    if (~isnumeric(parameters.pe_grad_dur))||(~isreal(parameters.pe_grad_dur))||...
+       (numel(parameters.pe_grad_dur)~=1)||(~isfinite(parameters.pe_grad_dur))||...
+       (parameters.pe_grad_dur<=0)
         error('parameters.pe_grad_dur should have exactly one element.');
     end
 end
@@ -163,4 +176,3 @@ end
 % everybody and everything."
 %
 % From Charles Darwin's diaries
-

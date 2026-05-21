@@ -190,6 +190,9 @@ end
 
 % Consistency enforcement
 function grumble(filename)
+if (~ischar(filename))||isempty(filename)
+    error('filename must be a non-empty character string.');
+end
 if ~exist(filename,'file')
     error('the file specified was not found.');
 end
@@ -200,4 +203,3 @@ end
 % are identical. 
 %
 % Enoch Powell
-

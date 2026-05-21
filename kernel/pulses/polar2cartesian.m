@@ -60,9 +60,6 @@
 
 function [x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy]=polar2cartesian(r,p,Dr,Dp,Drr,Drp,Dpr,Dpp)
 
-% Wrap phase
-p=wrapToPi(p);
-
 % Check consistency
 if nargin==2
     grumble(r,p);
@@ -73,6 +70,9 @@ elseif nargin==8
 else
     error('incorrect number of arguments.');
 end
+
+% Wrap phase
+p=wrapToPi(p);
 
 % Transform coordinates
 x=r.*cos(p); y=r.*sin(p);
@@ -137,7 +137,7 @@ elseif nargin==4
        (~all(size(df_dr)==size(df_dp)))
         error('all input vectors must have the same dimension.');
     end
-elseif nargin==7
+elseif nargin==8
     if (~isnumeric(r))||(~isreal(r))||(~all(r>=0))
         error('amplitude parameter must be a vector of non-negative real numbers.');
     end
@@ -167,8 +167,9 @@ elseif nargin==7
         error('ddf_dAdphi parameter must be a matrix of real numbers.');
     end
     if (size(d2f_dr2,2)~=length(df_dr))||(size(d2f_dr2,1)~=size(d2f_dr2,2))||...
-        all(size(d2f_dr2)~=size(d2f_dp2))||all(size(d2f_dp2)~=size(d2f_drdp))||...
-        all(size(d2f_drdp)~=size(d2f_dpdr))
+        (~isequal(size(d2f_dr2),size(d2f_dp2)))||...
+        (~isequal(size(d2f_dp2),size(d2f_drdp)))||...
+        (~isequal(size(d2f_drdp),size(d2f_dpdr)))
         error('all input matrices must have the same, square dimensions.');
     end
 end
@@ -177,4 +178,3 @@ end
 % A public opinion poll is no substitute for thought.
 %
 % Warren Buffett
-

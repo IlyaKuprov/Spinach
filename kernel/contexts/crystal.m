@@ -157,7 +157,11 @@ if ~isfield(parameters,'rframes')
 end
 if ~isfield(parameters,'offset')
     report(spin_system,'parameters.offset field not set, assuming zero offsets.');
-    parameters.offset=zeros(size(parameters.spins));
+    if isfield(parameters,'spins')
+        parameters.offset=zeros(size(parameters.spins));
+    else
+        parameters.offset=[];
+    end
 end
 if ~isfield(parameters,'verbose')
     report(spin_system,'parameters.verbose field not set, silencing array operations.');
@@ -192,7 +196,9 @@ if ~ischar(assumptions)
 end
 
 % Active spins
-if isempty(parameters.spins)
+if ~isfield(parameters,'spins')
+    error('working spins must be specified in parameters.spins field.');
+elseif isempty(parameters.spins)
     error('parameters.spins variable cannot be empty.');
 elseif ~iscell(parameters.spins)
     error('parameters.spins variable must be a cell array.');
@@ -245,4 +251,3 @@ end
 % greatest kind of courage. I mean, what we really want.
 %
 % Ayn Rand, "The Fountainhead"
-

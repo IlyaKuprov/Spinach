@@ -128,6 +128,32 @@ end
 if ~iscell(G)
     error('the G argument must be a cell array.');
 end
+if ~isfield(parameters,'spins')
+    error('parameters.spins field must be present.');
+end
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||(~ischar(parameters.spins{1}))
+    error('parameters.spins must be a cell array containing one spin name.');
+end
+if ~isfield(parameters,'npts')
+    error('parameters.npts field must be present.');
+end
+if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
+   (~isvector(parameters.npts))||any(parameters.npts<1)||...
+   any(mod(parameters.npts,1)~=0)
+    error('parameters.npts must be a vector of positive integers.');
+end
+if ~isfield(parameters,'rho0')
+    error('parameters.rho0 field must be present.');
+end
+if ~isnumeric(parameters.rho0)
+    error('parameters.rho0 must be numeric.');
+end
+if ~isfield(parameters,'coil')
+    error('parameters.coil field must be present.');
+end
+if ~isnumeric(parameters.coil)
+    error('parameters.coil must be numeric.');
+end
 if ~isfield(parameters,'t_echo')
     error('echo time must be specified in parameters.t_echo field.');
 end
@@ -156,9 +182,16 @@ if (~isnumeric(parameters.grad_amp))||(~isreal(parameters.grad_amp))||...
    (~isscalar(parameters.grad_amp))
     error('parameters.grad_amp must be a real scalar.');
 end
+if ~isfield(parameters,'spiral_npts')
+    error('number of spiral points must be specified in parameters.spiral_npts field.');
+end
+if (~isnumeric(parameters.spiral_npts))||(~isreal(parameters.spiral_npts))||...
+   (~isscalar(parameters.spiral_npts))||(parameters.spiral_npts<1)||...
+   (mod(parameters.spiral_npts,1)~=0)
+    error('parameters.spiral_npts must be a positive real integer.');
+end
 end
 
 % According to a local legend at Oxford's Magdalen College, during the
 % the Second World War meat shortages, the College's deer were reclass-
 % ified as vegetables to avoid requisition by the Ministry of Food.
-

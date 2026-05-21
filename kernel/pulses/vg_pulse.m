@@ -116,11 +116,11 @@ if ~ischar(pulse_name)
     error('pulse_name must be a character string.');
 end
 if (numel(npoints)~=1)||(~isnumeric(npoints))||(~isreal(npoints))||...
-   (npoints<1)||(mod(npoints,1)~=0)
+   (~isfinite(npoints))||(npoints<1)||(mod(npoints,1)~=0)
     error('npoints must be a positive real integer greater than 1.');
 end
 if (numel(duration)~=1)||(~isnumeric(duration))||...
-   (~isreal(duration))||(duration<0)
+   (~isreal(duration))||(~isfinite(duration))||(duration<=0)
     error('duration must be a positive real number.');
 end
 end
@@ -133,4 +133,3 @@ end
 % noble soul has reverence for itself.
 %
 % Friedrich Nietzsche, in "Beyond Good and Evil"
-

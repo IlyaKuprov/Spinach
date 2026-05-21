@@ -58,7 +58,7 @@ rho=step(spin_system,L+parameters.pulse_amp(1)*Lx,...
 rho=coherence(spin_system,rho,{{parameters.spins{1},parameters.mq_order}});
 
 % Run the indirect dimension evolution
-rho_stack=evolution(spin_system,L,[],rho,1/parameters.rate,...
+rho_stack=evolution(spin_system,L,[],rho,1/parameters.sweep,...
                     parameters.npoints(1)-1,'trajectory');
                 
 % Run the second pulse
@@ -69,7 +69,7 @@ rho_stack=step(spin_system,L+parameters.pulse_amp(2)*Lx,...
 rho_stack=coherence(spin_system,rho_stack,{{parameters.spins{1},+1}});
 
 % Run the direct dimension evolution
-fid=evolution(spin_system,L,parameters.coil,rho_stack,1/parameters.rate,...
+fid=evolution(spin_system,L,parameters.coil,rho_stack,1/parameters.sweep,...
                             parameters.npoints(2)-1,'observable');
 
 end
@@ -174,4 +174,3 @@ end
 % Trust not the telly, trust the fridge.
 %
 % A Russian saying
-

@@ -54,15 +54,15 @@ end
 
 % Consistency enforcement
 function grumble(a,b,n)
-if (~isnumeric(a))||(~isreal(a))||(~isfinite(a))||(numel(a)~=1)
+if (~isnumeric(a))||(~isreal(a))||(numel(a)~=1)||(~isfinite(a))
     error('a must be a finite real number.');
 end
-if (~isnumeric(b))||(~isreal(b))||(~isfinite(b))||(numel(b)~=1)
+if (~isnumeric(b))||(~isreal(b))||(numel(b)~=1)||(~isfinite(b))
     error('b must be a finite real number.');
 end
 if a>=b, error('a must be smaller than b.'); end
-if (~isnumeric(n))||(~isreal(n))||(~isfinite(n))||...
-   (numel(b)~=1)||(n<1)||mod(n,1)
+if (~isnumeric(n))||(~isreal(n))||(numel(n)~=1)||...
+   (~isfinite(n))||(n<1)||mod(n,1)
     error('n must be a positive real integer.');
 end
 if n>40, error('n>40 is unreasonable - subdivide the interval.'); end
@@ -72,4 +72,3 @@ end
 % drinks all wells are poisoned.
 %
 % Friedrich Nietzsche
-

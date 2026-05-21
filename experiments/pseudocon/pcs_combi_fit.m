@@ -165,6 +165,14 @@ end
 if ~isfield(parameters,'spin_groups')
     error('parameters.spin_groups field is missing.');
 end
+if ~isfield(parameters,'nel')
+    error('parameters.nel field is missing.');
+end
+if (~isnumeric(parameters.nel))||(~isreal(parameters.nel))||...
+   (~isscalar(parameters.nel))||(~isfinite(parameters.nel))||...
+   (parameters.nel<1)||(mod(parameters.nel,1)~=0)
+    error('parameters.nel must be a positive real integer.');
+end
 if ~isfield(parameters,'d_shifts')
     error('parameters.d_shifts field is missing.');
 end
@@ -183,4 +191,3 @@ end
 % process of digestion?
 %
 % Oliver Heaviside
-

@@ -190,19 +190,21 @@ end
 if numel(parameters.nuclear_frq)~=1
     error('parameters.nuclear_frq array should have exactly one element.');
 end
-if strcmp(parameters.calc_type,'time_dependence')
-    if ~isfield(parameters,'n_steps')
-        error('number of time steps should be specified in parameters.n_steps variable.');
-    end
-    if numel(parameters.n_steps)~=1
-        error('parameters.n_steps array should have exactly one element.');
-    end
-    if ~isfield(parameters,'time_step')
-        error('time step length should be specified in parameters.time_step variable.');
-    end
-    if numel(parameters.time_step)~=1
-        error('parameters.time_step array should have exactly one element.');
-    end
+if ~isfield(parameters,'n_steps')
+    error('number of time steps should be specified in parameters.n_steps variable.');
+end
+if (~isnumeric(parameters.n_steps))||(~isreal(parameters.n_steps))||...
+   (~isscalar(parameters.n_steps))||(~isfinite(parameters.n_steps))||...
+   (parameters.n_steps<1)||(mod(parameters.n_steps,1)~=0)
+    error('parameters.n_steps must be a positive real integer.');
+end
+if ~isfield(parameters,'time_step')
+    error('time step length should be specified in parameters.time_step variable.');
+end
+if (~isnumeric(parameters.time_step))||(~isreal(parameters.time_step))||...
+   (~isscalar(parameters.time_step))||(~isfinite(parameters.time_step))||...
+   (parameters.time_step<=0)
+    error('parameters.time_step must be a positive real scalar.');
 end
 end
 
@@ -213,4 +215,3 @@ end
 % our labs..."
 %
 % Incredulous voice from the audience: "Speak for yourself!"
-

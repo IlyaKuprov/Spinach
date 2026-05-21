@@ -61,6 +61,9 @@ end
 if (~iscell(B))&&(~isnumeric(B))
     error('B must be either numeric or a cell array.');
 end
+if iscell(A)&&iscell(B)&&(~isequal(size(A),size(B)))
+    error('cell arrays must have the same topology.');
+end
 end
 
 % I came into the room, which was half dark, and presently spotted Lord
@@ -74,4 +77,3 @@ end
 % now considering tonight, radium." Behold! The old boy beamed upon me.
 % 
 % Ernest Rutherford
-

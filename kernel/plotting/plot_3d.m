@@ -174,6 +174,25 @@ end
 if numel(parameters.sweep)~=3
     error('parameters.sweep array should have three elements.');
 end
+if ~isfield(parameters,'npoints')
+    error('point counts should be specified in parameters.npoints variable.');
+end
+if (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+   (numel(parameters.npoints)~=3)||any(~isfinite(parameters.npoints))||...
+   any(mod(parameters.npoints,1)~=0)||any(parameters.npoints<1)
+    error('parameters.npoints must be a three-element vector of positive integers.');
+end
+if ~isfield(parameters,'zerofill')
+    error('zero filling should be specified in parameters.zerofill variable.');
+end
+if (~isnumeric(parameters.zerofill))||(~isreal(parameters.zerofill))||...
+   (numel(parameters.zerofill)~=3)||any(~isfinite(parameters.zerofill))||...
+   any(mod(parameters.zerofill,1)~=0)||any(parameters.zerofill<1)
+    error('parameters.zerofill must be a three-element vector of positive integers.');
+end
+if ~isequal(size(spectrum),parameters.zerofill)
+    error('spectrum dimensions must match parameters.zerofill.');
+end
 if ~isfield(parameters,'axis_units')
     error('axis units must be specified in parameters.axis_units variable.');
 end
@@ -216,4 +235,3 @@ end
 % that they are. That is both amusing and dangerous.
 %
 % Mickey Mouse
-

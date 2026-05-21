@@ -150,7 +150,11 @@ if ~isfield(parameters,'rframes')
 end
 if ~isfield(parameters,'offset')
     report(spin_system,'parameters.offset field not set, assuming zero offsets.');
-    parameters.offset=zeros(size(parameters.spins));
+    if isfield(parameters,'spins')
+        parameters.offset=zeros(size(parameters.spins));
+    else
+        parameters.offset=[];
+    end
 end
 if ~isfield(parameters,'needs')
     report(spin_system,'parameters.needs field not set, assumpting empty.');
@@ -230,4 +234,3 @@ end
 % he has committed a sacrilege.
 %
 % Ayn Rand, "The Fountainhead"
-

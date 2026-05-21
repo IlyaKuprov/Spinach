@@ -57,7 +57,7 @@ function [traj_data,fidelity,grad] = grape_hilb(spin_system,drifts,controls,...
                                                 fidelity_type) %#ok<*PFBNS>
 
 % Check consistency
-grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ);
+grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type);
 
 % Hush up the output
 shut_up.sys.output='hush';
@@ -209,15 +209,18 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ)
+function grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)
 if ~ismember(spin_system.bas.formalism,{'zeeman-hilb'})
     error('this function requires a density matrix based formalism.');
 end
 if (~isnumeric(rho_init))||(~ismatrix(rho_init))||(size(rho_init,1)~=size(rho_init,2))
     error('rho_init must be a square matrix.');
 end
-if (~isnumeric(rho_targ))||(~ismatrix(rho_init))||(size(rho_targ,1)~=size(rho_targ,2))
-    error('rho_targ must be a square vector.');
+if (~isnumeric(rho_targ))||(~ismatrix(rho_targ))||(size(rho_targ,1)~=size(rho_targ,2))
+    error('rho_targ must be a square matrix.');
+end
+if (~ischar(fidelity_type))||(~ismember(fidelity_type,{'real','imag','square'}))
+    error('fidelity_type must be ''real'', ''imag'', or ''square''.');
 end
 if ~iscell(drifts)
     error('drifts must be a cell array of matrices.');
@@ -279,4 +282,3 @@ end
 %
 % Dumas concludes: "This is the ultimate monument to journalism. It need not
 % do anything else, for it won't do anything better."
-

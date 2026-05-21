@@ -182,7 +182,11 @@ end
 function parameters=defaults(spin_system,parameters)
 if ~isfield(parameters,'offset')
     report(spin_system,'parameters.offset field not set, assuming zero offsets.');
-    parameters.offset=zeros(size(parameters.spins));
+    if isfield(parameters,'spins')
+        parameters.offset=zeros(size(parameters.spins));
+    else
+        parameters.offset=[];
+    end
 end
 if ~isfield(parameters,'axis_units')
     report(spin_system,'parameters.axis_units field not set, assuming ppm.');
@@ -252,4 +256,3 @@ end
 % promotion.
 %
 % Albert Camus 
-

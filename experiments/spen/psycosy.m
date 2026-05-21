@@ -153,45 +153,93 @@ end
 if ~iscell(G)
     error('the G must be a 1x3 cell array.');
 end
+if numel(G)~=3
+    error('G must contain three gradient operators.');
+end
+if (~isnumeric(G{1}))||(~isnumeric(G{2}))||(~isnumeric(G{3}))
+    error('gradient operators must be numeric matrices.');
+end
 if ~isfield(parameters,'gamp')
     error('the gradient amplitude should be specified in parameters.gamp variable.');
-elseif numel(parameters.gamp)~=1
-    error('parameters.gamp array should have exactly one element.');
+elseif (~isnumeric(parameters.gamp))||(~isreal(parameters.gamp))||...
+       (numel(parameters.gamp)~=1)||(~isfinite(parameters.gamp))
+    error('parameters.gamp must be a finite real scalar.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
-elseif numel(parameters.spins)~=1
-    error('parameters.spins cell array should have exactly one element.');
+elseif (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||...
+       (~ischar(parameters.spins{1}))
+    error('parameters.spins must be a one-element cell array of character strings.');
+end
+if ~isfield(parameters,'rho0')
+    error('initial state should be specified in parameters.rho0 variable.');
+elseif (~isnumeric(parameters.rho0))||(~iscolumn(parameters.rho0))||...
+       (size(parameters.rho0,1)~=size(H,1))
+    error('parameters.rho0 must be a state vector of the same dimension as H.');
+end
+if ~isfield(parameters,'coil')
+    error('detection state should be specified in parameters.coil variable.');
+elseif (~isnumeric(parameters.coil))||(~iscolumn(parameters.coil))||...
+       (size(parameters.coil,1)~=size(H,1))
+    error('parameters.coil must be a state vector of the same dimension as H.');
+end
+if ~isfield(parameters,'sweep')
+    error('sweep width should be specified in parameters.sweep variable.');
+elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+       (numel(parameters.sweep)~=1)||(~isfinite(parameters.sweep))||(parameters.sweep<=0)
+    error('parameters.sweep must be a positive real scalar.');
+end
+if ~isfield(parameters,'npoints')
+    error('point counts should be specified in parameters.npoints variable.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       (numel(parameters.npoints)~=2)||any(~isfinite(parameters.npoints))||...
+       any(parameters.npoints<2)||any(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must contain two integer elements greater than 1.');
+end
+if ~isfield(parameters,'tmix')
+    error('mixing time should be specified in parameters.tmix variable.');
+elseif (~isnumeric(parameters.tmix))||(~isreal(parameters.tmix))||...
+       (numel(parameters.tmix)~=1)||(~isfinite(parameters.tmix))||(parameters.tmix<0)
+    error('parameters.tmix must be a non-negative real scalar.');
 end
 if ~isfield(parameters,'sal_ang')
     error('saltire flip angle should be specified in parameters.sal_ang variable.');
-elseif numel(parameters.sal_ang)~=1
-    error('parameters.sal_ang array should have exactly one element.');
+elseif (~isnumeric(parameters.sal_ang))||(~isreal(parameters.sal_ang))||...
+       (numel(parameters.sal_ang)~=1)||(~isfinite(parameters.sal_ang))
+    error('parameters.sal_ang must be a finite real scalar.');
 end
 if ~isfield(parameters,'sal_dur')
     error('saltire duration should be specified in parameters.sal_dur variable.');
-elseif numel(parameters.sal_dur)~=1
-    error('parameters.sal_dur array should have exactly one element.');
+elseif (~isnumeric(parameters.sal_dur))||(~isreal(parameters.sal_dur))||...
+       (numel(parameters.sal_dur)~=1)||(~isfinite(parameters.sal_dur))||(parameters.sal_dur<=0)
+    error('parameters.sal_dur must be a positive real scalar.');
 end
 if ~isfield(parameters,'sal_del')
     error('gradient duration should be specified in parameters.sal_del variable.');
-elseif numel(parameters.sal_del)~=1
-    error('parameters.sal_del array should have exactly one element.');
+elseif (~isnumeric(parameters.sal_del))||(~isreal(parameters.sal_del))||...
+       (numel(parameters.sal_del)~=1)||(~isfinite(parameters.sal_del))||...
+       (parameters.sal_del<=2*parameters.sal_dur)
+    error('parameters.sal_del must be a real scalar greater than twice parameters.sal_dur.');
 end
 if ~isfield(parameters,'sal_swp')
     error('saltire sweep width should be specified in parameters.sal_swp variable.');
-elseif numel(parameters.sal_swp)~=1
-    error('parameters.sal_swp array should have exactly one element.');
+elseif (~isnumeric(parameters.sal_swp))||(~isreal(parameters.sal_swp))||...
+       (numel(parameters.sal_swp)~=1)||(~isfinite(parameters.sal_swp))||(parameters.sal_swp<=0)
+    error('parameters.sal_swp must be a positive real scalar.');
 end
 if ~isfield(parameters,'sal_npt')
     error('saltire point count should be specified in parameters.sal_npt variable.');
-elseif numel(parameters.sal_npt)~=1
-    error('parameters.sal_npt array should have exactly one element.');
+elseif (~isnumeric(parameters.sal_npt))||(~isreal(parameters.sal_npt))||...
+       (numel(parameters.sal_npt)~=1)||(~isfinite(parameters.sal_npt))||...
+       (parameters.sal_npt<1)||(mod(parameters.sal_npt,1)~=0)
+    error('parameters.sal_npt must be a positive integer scalar.');
 end
 if ~isfield(parameters,'sal_smf')
-    error('saltire smoothing factor should be specified in parameters.sal_swp variable.');
-elseif numel(parameters.sal_smf)~=1
-    error('parameters.sal_smf array should have exactly one element.');
+    error('saltire smoothing factor should be specified in parameters.sal_smf variable.');
+elseif (~isnumeric(parameters.sal_smf))||(~isreal(parameters.sal_smf))||...
+       (numel(parameters.sal_smf)~=1)||(~isfinite(parameters.sal_smf))||...
+       (parameters.sal_smf<0)||(parameters.sal_smf>50)
+    error('parameters.sal_smf must be a real scalar between 0 and 50.');
 end
 end
 
@@ -202,4 +250,3 @@ end
 % beings of their humanity.
 % 
 % Seth Lloyd
-

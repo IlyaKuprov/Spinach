@@ -42,10 +42,12 @@
 function CSAs=guess_csa_pro(aa_nums,pdb_ids,coords,options)
 
 % Set default peptide bond CSA options
-if ~isfield(options,'nh_csa'), options.nh_csa='tcb'; end
+if ~exist('options','var'), options=struct(); end
+if isempty(options), options=struct(); end
+if isstruct(options)&&(~isfield(options,'nh_csa')), options.nh_csa='tcb'; end
 
 % Check consistency
-grumble(aa_nums,pdb_ids,coords);
+grumble(aa_nums,pdb_ids,coords,options);
 
 % Preallocate CSA array
 CSAs=cell(numel(pdb_ids),1);
@@ -310,7 +312,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(aa_nums,pdb_ids,coords)
+function grumble(aa_nums,pdb_ids,coords,options)
 if ~isnumeric(aa_nums)
     error('aa_nums must be a vector of integers.'); 
 end
@@ -323,6 +325,10 @@ end
 if (numel(aa_nums)~=numel(pdb_ids))||(numel(pdb_ids)~=numel(coords))
     error('the input parameters must have the same number of elements.');
 end
+if (~isstruct(options))||(~ischar(options.nh_csa))||...
+   (~ismember(options.nh_csa,{'tcb','bax','pol'}))
+    error('options.nh_csa must be ''tcb'', ''bax'', or ''pol''.');
+end
 end
 
 % "Where's the PCM solvent?"
@@ -330,4 +336,3 @@ end
 % A 3rd year project student,
 % rummaging through IK's sol-
 % vent cabinet.
-

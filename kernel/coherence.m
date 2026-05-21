@@ -101,7 +101,7 @@ end
 if ~isnumeric(rho)
     error('the state vector(s) must be numeric.');
 end
-if mod(numel(rho),size(spin_system.bas.basis))~=0
+if mod(numel(rho),size(spin_system.bas.basis,1))~=0
     error('the number of elements in rho must be a multiple of the dimension of the spin state space.');
 end
 if ~iscell(spec)
@@ -139,4 +139,3 @@ end
 % you're doing?
 %
 % Ayn Rand, "Atlas Shrugged"
-

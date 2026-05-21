@@ -175,8 +175,9 @@ if (~isnumeric(n_cycle_repeats))||(~isreal(n_cycle_repeats))||...
    (n_cycle_repeats<1)
     error('n_cycle_repeats must be a positive real scalar.');
 end
-if (~isnumeric(mas_rate))||(~isreal(mas_rate))||(~isscalar(mas_rate))
-    error('mas_rate must be a real scalar.');
+if (~isnumeric(mas_rate))||(~isreal(mas_rate))||(~isscalar(mas_rate))||...
+   (~isfinite(mas_rate))||(mas_rate<=0)
+    error('mas_rate must be a positive real scalar.');
 end
 if (~isnumeric(phase_factor))||(~isreal(phase_factor))||...
    (~isscalar(phase_factor))
@@ -193,4 +194,3 @@ end
 % Effortlessness is hard.
 %
 % Sarah Sands
-

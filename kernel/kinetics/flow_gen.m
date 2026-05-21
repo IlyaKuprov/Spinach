@@ -133,6 +133,11 @@ end
 if ~isfield(parameters,'diff')
     error('diffusion coefficient must be specified in parameters.diff variable.');
 end
+if (~isnumeric(parameters.diff))||(~isreal(parameters.diff))||...
+   (~isscalar(parameters.diff))||(~isfinite(parameters.diff))||...
+   (parameters.diff<0)
+    error('parameters.diff must be a finite non-negative real scalar.');
+end
 end
 
 % A disbelieving production team on a BBC Radio 4 arts programme
@@ -145,4 +150,3 @@ end
 % use a split infinitive".
 %
 % https://www.spectator.co.uk/article/the-art-of-swearing/
-

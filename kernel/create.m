@@ -2035,13 +2035,13 @@ end
 if isfield(inter,'damp_rate')
 
     % Enforce isotropic damping if damp_rate is specified
-    if ~ismember('damp',inter.relaxation)
+    if (~isfield(inter,'relaxation'))||(~ismember('damp',inter.relaxation))
         error('inter.damp_rate can only be specified with damp relaxation theory.');
     end
 
     % Check type
     if (~isnumeric(inter.damp_rate))||(~isreal(inter.damp_rate))||...
-       ((~isscalar(inter.damp_rate))&&(~all(size(inter.damp_rate)==3)))
+       ((~isscalar(inter.damp_rate))&&(~isequal(size(inter.damp_rate),[3 3])))
         error('inter.damp_rate must be a real scalar or a 3x3 matrix.');
     end
     
@@ -2110,7 +2110,7 @@ if isfield(inter,'r1_rates')
     end
     
     % Enforce T1,T2 theory if inter.r1_rates rates are specified
-    if ~ismember('t1_t2',inter.relaxation)
+    if (~isfield(inter,'relaxation'))||(~ismember('t1_t2',inter.relaxation))
         error('inter.r1_rates may only be specified with T1,T2 relaxation theory.');
     end
     
@@ -2174,7 +2174,7 @@ if isfield(inter,'r2_rates')
     end
     
     % Enforce T1,T2 theory if inter.r2_rates rates are specified
-    if ~ismember('t1_t2',inter.relaxation)
+    if (~isfield(inter,'relaxation'))||(~ismember('t1_t2',inter.relaxation))
         error('inter.r2_rates may only be specified with T1,T2 relaxation theory.');
     end
     
@@ -2195,7 +2195,7 @@ if isfield(inter,'lind_r1_rates')
     end
     
     % Enforce Lindblad theory if inter.lind_r1_rates rates are specified
-    if ~ismember('lindblad',inter.relaxation)
+    if (~isfield(inter,'relaxation'))||(~ismember('lindblad',inter.relaxation))
         error('inter.lind_r1_rates can only be specified with Lindblad relaxation theory.');
     end
     
@@ -2216,7 +2216,7 @@ if isfield(inter,'lind_r2_rates')
     end
     
     % Enforce Lindblad theory if inter.lind_r2_rates rates are specified
-    if ~ismember('lindblad',inter.relaxation)
+    if (~isfield(inter,'relaxation'))||(~ismember('lindblad',inter.relaxation))
         error('inter.lind_r2_rates can only be specified with Lindblad relaxation theory.');
     end
     
@@ -2236,7 +2236,7 @@ if isfield(inter,'weiz_r1e')
     end
     
     % Enforce Weizmann theory if inter.weiz_r1e is specified
-    if ~ismember('weizmann',inter.relaxation)
+    if (~isfield(inter,'relaxation'))||(~ismember('weizmann',inter.relaxation))
         error('inter.weiz_r1e can only be specified with Weizmann DNP relaxation theory.');
     end
     
@@ -2256,7 +2256,7 @@ if isfield(inter,'nott_r1e')
     end
     
     % Enforce Nottingham theory if inter.weiz_r1e is specified
-    if ~ismember('nottingham',inter.relaxation)
+    if (~isfield(inter,'relaxation'))||(~ismember('nottingham',inter.relaxation))
         error('inter.nott_r1e can only be specified with Nottingham DNP relaxation theory.');
     end
     
@@ -2276,7 +2276,7 @@ if isfield(inter,'weiz_r2e')
     end
     
     % Enforce Weizmann theory if inter.weiz_r2e is specified
-    if ~ismember('weizmann',inter.relaxation)
+    if (~isfield(inter,'relaxation'))||(~ismember('weizmann',inter.relaxation))
         error('inter.weiz_r2e can only be specified with Weizmann DNP relaxation theory.');
     end
     
@@ -2296,7 +2296,7 @@ if isfield(inter,'nott_r2e')
     end
     
     % Enforce Nottingham theory if inter.weiz_r1e is specified
-    if ~ismember('nottingham',inter.relaxation)
+    if (~isfield(inter,'relaxation'))||(~ismember('nottingham',inter.relaxation))
         error('inter.nott_r2e can only be specified with Nottingham DNP relaxation theory.');
     end
     
@@ -2316,7 +2316,7 @@ if isfield(inter,'weiz_r1n')
     end
     
     % Enforce Weizmann theory if inter.weiz_r1n is specified
-    if ~ismember('weizmann',inter.relaxation)
+    if (~isfield(inter,'relaxation'))||(~ismember('weizmann',inter.relaxation))
         error('inter.weiz_r1n can only be specified with Weizmann DNP relaxation theory.');
     end
     
@@ -2336,7 +2336,7 @@ if isfield(inter,'nott_r1n')
     end
     
     % Enforce Nottingham theory if inter.weiz_r1n is specified
-    if ~ismember('nottingham',inter.relaxation)
+    if (~isfield(inter,'relaxation'))||(~ismember('nottingham',inter.relaxation))
         error('inter.nott_r1n can only be specified with Nottingham DNP relaxation theory.');
     end
     
@@ -2356,7 +2356,7 @@ if isfield(inter,'weiz_r2n')
     end
     
     % Enforce Weizmann theory if inter.weiz_r2n is specified
-    if ~ismember('weizmann',inter.relaxation)
+    if (~isfield(inter,'relaxation'))||(~ismember('weizmann',inter.relaxation))
         error('inter.weiz_r2n can only be specified with Weizmann DNP relaxation theory.');
     end
     
@@ -2376,7 +2376,7 @@ if isfield(inter,'nott_r2n')
     end
     
     % Enforce Nottingham theory if inter.weiz_r1e is specified
-    if ~ismember('nottingham',inter.relaxation)
+    if (~isfield(inter,'relaxation'))||(~ismember('nottingham',inter.relaxation))
         error('inter.nott_r2n can only be specified with Nottingham DNP relaxation theory.');
     end
     
@@ -2396,7 +2396,7 @@ if isfield(inter,'weiz_r1d')
     end
     
     % Enforce Weizmann theory if inter.weiz_r1d rates are specified
-    if ~strcmp(inter.relaxation,'weizmann')
+    if (~isfield(inter,'relaxation'))||(~ismember('weizmann',inter.relaxation))
         error('inter.weiz_r1d can only be specified with Weizmann DNP relaxation theory.');
     end
     
@@ -2416,7 +2416,7 @@ if isfield(inter,'weiz_r2d')
     end
     
     % Enforce Weizmann theory if R2d rates are specified
-    if ~strcmp(inter.relaxation,'weizmann')
+    if (~isfield(inter,'relaxation'))||(~ismember('weizmann',inter.relaxation))
         error('inter.weiz_r2d can only be specified with Weizmann DNP relaxation theory.');
     end
     
@@ -2588,4 +2588,3 @@ end
 % the soil for those who did not.
 %
 % Benjamin Franklin
-

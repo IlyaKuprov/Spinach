@@ -27,7 +27,11 @@
 function S=vcell_solidangle(P,K,xyz)
 
 % Check consistency
-grumble(P);
+if nargin<3
+    grumble(P,K);
+else
+    grumble(P,K,xyz);
+end
 
 % Adapt to the input
 if nargin<3
@@ -39,9 +43,31 @@ end
 end
 
 % Consistency enforcement
-function grumble(P)
+function grumble(P,K,xyz)
+if (~isnumeric(P))||(~isreal(P))||(size(P,1)~=3)||any(~isfinite(P(:)))
+    error('P must be a finite real 3 x n array.');
+end
 if any(abs(sum(P.^2,1)-1)>1e-6)
     error('P must contain unit vectors.');
+end
+if ~iscell(K)
+    error('K must be a cell array of vertex index lists.');
+end
+for n=1:numel(K)
+    if (~isnumeric(K{n}))||(~isreal(K{n}))||isempty(K{n})||...
+       any(~isfinite(K{n}(:)))||any(mod(K{n}(:),1)~=0)||...
+       any(K{n}(:)<1)||any(K{n}(:)>size(P,2))
+        error('K must contain positive integer indices into P.');
+    end
+end
+if nargin>2
+    if (~isnumeric(xyz))||(~isreal(xyz))||(size(xyz,1)~=3)||...
+       (size(xyz,2)~=numel(K))||any(~isfinite(xyz(:)))
+        error('xyz must be a finite real 3 x numel(K) array.');
+    end
+    if any(abs(sum(xyz.^2,1)-1)>1e-6)
+        error('xyz must contain unit vectors.');
+    end
 end
 end
 
@@ -56,4 +82,3 @@ end
 % of embourgeoisement if the law was changed.
 %
 % Toby Young
-

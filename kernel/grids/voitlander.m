@@ -282,13 +282,76 @@ end
 
 % Consistency enforcement
 function grumble(parameters,tri,Ic,Iz,Qc,Qz,Hmw)
-
-% Talos, please write a grumbler
-
+if (~isfield(parameters,'b_axis'))||(~isnumeric(parameters.b_axis))||...
+   (~isreal(parameters.b_axis))||(~isvector(parameters.b_axis))||...
+   any(~isfinite(parameters.b_axis(:)))
+    error('parameters.b_axis must be a finite real vector.');
+end
+if (~isfield(parameters,'int_tol'))||(~isnumeric(parameters.int_tol))||...
+   (~isreal(parameters.int_tol))||(numel(parameters.int_tol)~=1)||...
+   (~isfinite(parameters.int_tol))||(parameters.int_tol<=0)
+    error('parameters.int_tol must be a positive real scalar.');
+end
+if (~isstruct(tri))||(numel(tri)~=3)
+    error('triangle must be a three-element structure array.');
+end
+for n=1:3
+    if (~isfield(tri(n),'xyz'))||(~isnumeric(tri(n).xyz))||...
+       (~isreal(tri(n).xyz))||(~iscolumn(tri(n).xyz))||...
+       (numel(tri(n).xyz)~=3)||any(~isfinite(tri(n).xyz(:)))||...
+       (abs(norm(tri(n).xyz,2)-1)>1e-6)
+        error('triangle vertices must have unit-vector xyz fields.');
+    end
+    if (~isfield(tri(n),'tf'))||(~isnumeric(tri(n).tf))||...
+       (~isreal(tri(n).tf))||any(~isfinite(tri(n).tf(:)))
+        error('triangle vertices must have finite real tf fields.');
+    end
+    if (~isfield(tri(n),'tm'))||(~isnumeric(tri(n).tm))||...
+       (~isreal(tri(n).tm))||any(~isfinite(tri(n).tm(:)))||...
+       any(tri(n).tm(:)<0)
+        error('triangle vertices must have finite non-negative real tm fields.');
+    end
+    if (~isfield(tri(n),'tw'))||(~isnumeric(tri(n).tw))||...
+       (~isreal(tri(n).tw))||any(~isfinite(tri(n).tw(:)))||...
+       any(tri(n).tw(:)<=0)
+        error('triangle vertices must have finite positive real tw fields.');
+    end
+    if (~isfield(tri(n),'pd'))||(~isnumeric(tri(n).pd))||...
+       (~isreal(tri(n).pd))||any(~isfinite(tri(n).pd(:)))
+        error('triangle vertices must have finite real pd fields.');
+    end
+    if (~isfield(tri(n),'tj'))||(~isnumeric(tri(n).tj))||...
+       (~isreal(tri(n).tj))||any(~isfinite(tri(n).tj(:)))
+        error('triangle vertices must have finite real tj fields.');
+    end
+    if (~isfield(tri(n),'ti'))||(~isnumeric(tri(n).ti))||...
+       any(~isfinite(tri(n).ti(:)))
+        error('triangle vertices must have finite numeric ti fields.');
+    end
+    ntrans=numel(tri(n).tf);
+    if (numel(tri(n).tm)~=ntrans)||(numel(tri(n).tw)~=ntrans)||...
+       (numel(tri(n).pd)~=ntrans)||(numel(tri(n).tj)~=ntrans)||...
+       (size(tri(n).ti,1)~=ntrans)
+        error('transition data counts must match at each triangle vertex.');
+    end
+end
+if (~isnumeric(Ic))||(~isnumeric(Iz))||(~isnumeric(Hmw))||...
+   (size(Ic,1)~=size(Ic,2))||(size(Iz,1)~=size(Iz,2))||...
+   (size(Hmw,1)~=size(Hmw,2))||(~isequal(size(Ic),size(Iz),size(Hmw)))
+    error('Ic, Iz, and Hmw must be numeric square matrices of equal size.');
+end
+if (~iscell(Qc))||(~iscell(Qz))||(~isequal(size(Qc),size(Qz)))
+    error('Qc and Qz must be cell arrays of equal size.');
+end
+for n=1:numel(Qc)
+    if (~isnumeric(Qc{n}))||(~isnumeric(Qz{n}))||...
+       (~isequal(size(Qc{n}),size(Ic)))||(~isequal(size(Qz{n}),size(Iz)))
+        error('Qc and Qz elements must match Ic and Iz dimensions.');
+    end
+end
 end
 
 % "How many divisions?"
 %
 % Joseph Stalin, when told that
 % Vatican was a powerful entity
-

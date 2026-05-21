@@ -61,9 +61,11 @@ end
 if (~iscell(B))&&(~isnumeric(B))
     error('B must be either numeric or a cell array.');
 end
+if iscell(A)&&iscell(B)&&(~isequal(size(A),size(B)))
+    error('cell arrays must have the same topology.');
+end
 end
 
 % I can, therefore I am.
 %
 % Simone Weil
-

@@ -37,8 +37,14 @@
 
 function conc_plot(spin_system,conc,obs)
 
+% Initialise empty observables
+if ~exist('obs','var'), obs=[]; end
+
+% Check consistency
+grumble(spin_system,conc,obs);
+
 % Decide the colours
-if ~exist('obs','var')
+if isempty(obs)
     
     % Neutral grey if no observables supplied
     RGB=0.5*ones(spin_system.mesh.vor.ncells,3);
@@ -70,9 +76,6 @@ else
     error('incorrect number of colour mapped observables.');
 
 end
-
-% Check consistency
-grumble(spin_system,conc);
 
 % Loop over cells
 V=zeros(0,3); patch_idx=0; FRGB=ones(0,3);
@@ -155,16 +158,30 @@ patch('Faces',F,'Vertices',V,'FaceColor','flat',...
 end
 
 % Consistency enforcement
-function grumble(spin_system,conc)
+function grumble(spin_system,conc,obs)
 if ~isfield(spin_system,'mesh')
     error('mesh information is missing from the spin_system structure.');
 end
 if ~isfield(spin_system.mesh,'vor')
     error('Voronoi tessellation information is missing from spin_system.mesh structure.');
 end
+if (~isfield(spin_system.mesh,'zext'))||(~isnumeric(spin_system.mesh.zext))||...
+   (~isreal(spin_system.mesh.zext))||(numel(spin_system.mesh.zext)~=2)||...
+   any(~isfinite(spin_system.mesh.zext))
+    error('spin_system.mesh.zext must be a real two-element vector.');
+end
+if (~isfield(spin_system.mesh.vor,'ncells'))||(~isfield(spin_system.mesh.vor,'cells'))||...
+   (~isfield(spin_system.mesh.vor,'vertices'))||(~isfield(spin_system.mesh.vor,'max_cell_size'))
+    error('Voronoi tessellation information is incomplete.');
+end
 if (~isnumeric(conc))||(~isreal(conc))||(~iscolumn(conc))||...
-   (numel(conc)~=spin_system.mesh.vor.ncells)
+   any(~isfinite(conc))||(numel(conc)~=spin_system.mesh.vor.ncells)
     error('conc must be a column vector with one real value per Voronoi cell.');
+end
+if (~isempty(obs))&&((~isnumeric(obs))||(~isreal(obs))||...
+   any(~isfinite(obs(:)))||(size(obs,1)~=spin_system.mesh.vor.ncells)||...
+   (size(obs,2)<1)||(size(obs,2)>3))
+    error('obs must have one, two, or three real columns and one row per Voronoi cell.');
 end
 end
 
@@ -172,4 +189,3 @@ end
 %
 % Vikings, about Christians,
 % in The Northman (2022)
-

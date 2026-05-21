@@ -117,6 +117,13 @@ if (~isnumeric(parameters.pulse_frq))||(~isreal(parameters.pulse_frq))||...
    (numel(parameters.pulse_frq)~=3)
     error('parameters.pulse_frq must have three real elements.');
 end
+if ~isfield(parameters,'offset')
+    error('receiver offset must be specified in parameters.offset field.');
+end
+if (~isnumeric(parameters.offset))||(~isreal(parameters.offset))||...
+   (~isscalar(parameters.offset))||(~isfinite(parameters.offset))
+    error('parameters.offset must be a finite real scalar.');
+end
 if ~isfield(parameters,'pulse_pwr')
     error('pulse powers must be specified in parameters.pulse_pwr field.');
 end
@@ -188,4 +195,3 @@ end
 % noiselessly.
 %
 % J. Robert Oppenheimer
-

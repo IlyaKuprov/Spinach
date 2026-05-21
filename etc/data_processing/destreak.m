@@ -36,7 +36,10 @@ if isstruct(spectrum)
         spectrum.(struct_fieldnames{n})=destreak(spectrum.(struct_fieldnames{n}));
                       
     end
-    
+
+    % Return processed structure
+    return
+
 elseif iscell(spectrum)
     
     % Loop over cells
@@ -46,7 +49,10 @@ elseif iscell(spectrum)
         spectrum{n}=destreak(spectrum{n});
         
     end
-    
+
+    % Return processed cell array
+    return
+
 end
 
 % Check consistency
@@ -91,4 +97,3 @@ end
 % If it flies, floats or fucks, you are better off renting it.
 %
 % Felix Dennis
-

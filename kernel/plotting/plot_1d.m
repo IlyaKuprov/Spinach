@@ -78,9 +78,13 @@ end
 
 % Default parameters
 function parameters=defaults(spin_system,parameters)
-if (~isfield(parameters,'offset'))&&isscalar(parameters.sweep)
+if (~isfield(parameters,'offset'))&&isfield(parameters,'sweep')&&isscalar(parameters.sweep)
     report(spin_system,'parameters.offset field not set, assuming zero offsets.');
-    parameters.offset=zeros(size(parameters.spins));
+    if isfield(parameters,'spins')
+        parameters.offset=zeros(size(parameters.spins));
+    else
+        parameters.offset=0;
+    end
 end
 if ~isfield(parameters,'axis_units')
     report(spin_system,'parameters.axis_units field not set, assuming ppm.');
@@ -150,4 +154,3 @@ end
 % The only sin on earth is to do things badly.
 %
 % Ayn Rand
-

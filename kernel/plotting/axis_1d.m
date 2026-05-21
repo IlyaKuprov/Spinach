@@ -158,7 +158,7 @@ end
 if (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))
     error('elements of parameters.sweep must be real numbers.');
 end
-if numel(parameters.sweep)>2
+if isempty(parameters.sweep)||(numel(parameters.sweep)>2)
     error('parameters.sweep should have one or two elements.');
 end
 if numel(parameters.sweep)==2
@@ -217,4 +217,3 @@ end
 % cal, sadomasochistic, capriciously malevolent bully.
 %
 % Richard Dawkins, "The God Delusion"
-

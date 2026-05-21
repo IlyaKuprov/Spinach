@@ -134,8 +134,7 @@ switch parameters.calc_type
         rho_unit=unit_state(spin_system); R=R-kron(rho_unit,rho_unit');
         
         % Run the simulation
-        answer=evolution(spin_system,H+1i*R,coils,-R*rho_eq,parameters.time_step,...
-                         parameters.n_steps,'total');
+        answer=evolution(spin_system,H+1i*R,coils,-R*rho_eq,[],[],'total');
                      
     case 'trajectory' 
      
@@ -190,21 +189,23 @@ end
 if numel(parameters.nuclear_frq)~=1
     error('parameters.nuclear_frq array should have exactly one element.');
 end
-if ~isfield(parameters,'n_steps')
-    error('number of time steps should be specified in parameters.n_steps variable.');
-end
-if (~isnumeric(parameters.n_steps))||(~isreal(parameters.n_steps))||...
-   (~isscalar(parameters.n_steps))||(~isfinite(parameters.n_steps))||...
-   (parameters.n_steps<1)||(mod(parameters.n_steps,1)~=0)
-    error('parameters.n_steps must be a positive real integer.');
-end
-if ~isfield(parameters,'time_step')
-    error('time step length should be specified in parameters.time_step variable.');
-end
-if (~isnumeric(parameters.time_step))||(~isreal(parameters.time_step))||...
-   (~isscalar(parameters.time_step))||(~isfinite(parameters.time_step))||...
-   (parameters.time_step<=0)
-    error('parameters.time_step must be a positive real scalar.');
+if ismember(parameters.calc_type,{'time_dependence','trajectory'})
+    if ~isfield(parameters,'n_steps')
+        error('number of time steps should be specified in parameters.n_steps variable.');
+    end
+    if (~isnumeric(parameters.n_steps))||(~isreal(parameters.n_steps))||...
+       (~isscalar(parameters.n_steps))||(~isfinite(parameters.n_steps))||...
+       (parameters.n_steps<1)||(mod(parameters.n_steps,1)~=0)
+        error('parameters.n_steps must be a positive real integer.');
+    end
+    if ~isfield(parameters,'time_step')
+        error('time step length should be specified in parameters.time_step variable.');
+    end
+    if (~isnumeric(parameters.time_step))||(~isreal(parameters.time_step))||...
+       (~isscalar(parameters.time_step))||(~isfinite(parameters.time_step))||...
+       (parameters.time_step<=0)
+        error('parameters.time_step must be a positive real scalar.');
+    end
 end
 end
 

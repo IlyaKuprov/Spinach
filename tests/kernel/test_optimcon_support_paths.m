@@ -76,15 +76,34 @@ result=test_true(result,'penalty DNS Hessian shape',isequal(size(hess_dns),[nume
                  'DNS penalty Hessian must be square over waveform elements');
 
 % Check the amplitude spillout path on Cartesian controls
-amp_waveform=[0.5 2.0 -0.25;...
-              0.5 0.0  1.50];
+amp_waveform=[ 0.50  2.00 -0.25  0.20;...
+               0.50  0.50  1.50 -0.10;...
+              -0.40  0.20  1.20 -1.60;...
+               0.30 -0.10  0.90 -0.40];
 [pen_snsa,grad_snsa,hess_snsa]=penalty(amp_waveform,'SNSA',0,1);
+amp_snsa=[sqrt(amp_waveform(1,:).^2+amp_waveform(2,:).^2);...
+          sqrt(amp_waveform(3,:).^2+amp_waveform(4,:).^2)];
+spill_snsa=max(amp_snsa-1,0);
+pen_snsa_ref=sum(spill_snsa(:).^2)/size(amp_waveform,2);
+ch_map_snsa=(amp_snsa>1);
+rad_scale=zeros(size(amp_snsa));
+rad_scale(ch_map_snsa)=2*(amp_snsa(ch_map_snsa)-1)./...
+                       (amp_snsa(ch_map_snsa)*size(amp_waveform,2));
+grad_snsa_ref=zeros(size(amp_waveform));
+grad_snsa_ref(1,:)=rad_scale(1,:).*amp_waveform(1,:);
+grad_snsa_ref(2,:)=rad_scale(1,:).*amp_waveform(2,:);
+grad_snsa_ref(3,:)=rad_scale(2,:).*amp_waveform(3,:);
+grad_snsa_ref(4,:)=rad_scale(2,:).*amp_waveform(4,:);
+hess_snsa_ref=local_finite_hess(@(x)local_penalty_grad(x,size(amp_waveform),'SNSA',0,1),...
+                                amp_waveform(:));
 result=test_true(result,'penalty SNSA active',pen_snsa>0,...
                  'SNSA penalty must detect amplitudes above the ceiling');
-result=test_true(result,'penalty SNSA gradient shape',isequal(size(grad_snsa),size(amp_waveform)),...
-                 'SNSA penalty gradient must have waveform dimensions');
-result=test_true(result,'penalty SNSA Hessian shape',isequal(size(hess_snsa),[numel(amp_waveform) numel(amp_waveform)]),...
-                 'SNSA penalty Hessian must be square over waveform elements');
+result=test_close(result,'penalty SNSA term',pen_snsa,pen_snsa_ref,1e-14,1e-14,...
+                  'SNSA penalty value must match amplitude spillout beyond the ceiling');
+result=test_close(result,'penalty SNSA gradient',grad_snsa,grad_snsa_ref,1e-14,1e-14,...
+                  'SNSA penalty gradient must match the Cartesian radial projection');
+result=test_close(result,'penalty SNSA Hessian finite diff',hess_snsa,hess_snsa_ref,1e-6,1e-6,...
+                  'SNSA penalty Hessian must match centred finite differences of its gradient');
 
 % Check trapezium derivative matrices against centred finite differences
 S=pauli(2);
@@ -233,6 +252,32 @@ for n=1:numel(x)
     x_minus(n)=x_minus(n)-step_size;
     grad(n)=(fun(x_plus)-fun(x_minus))/(2*step_size);
 end
+
+end
+
+
+function hess=local_finite_hess(fun,x)
+
+% Compute a centred finite-difference Hessian
+step_size=1e-6;
+grad=fun(x);
+hess=zeros(numel(grad),numel(x));
+for n=1:numel(x)
+    x_plus=x;
+    x_minus=x;
+    x_plus(n)=x_plus(n)+step_size;
+    x_minus(n)=x_minus(n)-step_size;
+    hess(:,n)=(fun(x_plus)-fun(x_minus))/(2*step_size);
+end
+
+end
+
+
+function grad=local_penalty_grad(x,wf_size,type,fb,cb)
+
+% Evaluate only the penalty gradient for finite differences
+[~,grad]=penalty(reshape(x,wf_size),type,fb,cb);
+grad=grad(:);
 
 end
 

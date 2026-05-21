@@ -110,6 +110,41 @@ end
 report(spin_system,[pad('Equation of motion integrator',60) ...
                     spin_system.control.integrator]);
 
+% Process optimisation method
+if isfield(control,'method')
+
+    % Input validation
+    if (~ischar(control.method))||(~ismember(control.method,{'lbfgs','rbfgs',...
+                                                             'newton','goodwin'}))
+        error('control.method must be ''lbfgs'', ''rbfgs'', ''newton'', or ''goodwin''.');
+    end
+
+    % Absorb the method
+    spin_system.control.method=control.method;
+    control=rmfield(control,'method');
+
+    % Refuse to run Newton for trapezium integrator
+    if strcmp(spin_system.control.method,'newton')&&...
+       strcmp(spin_system.control.integrator,'trapezium')
+        error('Newton optimiser is not available for trapezium integrator.');
+    end
+
+    % Refuse to run Goodwin for trapezium integrator
+    if strcmp(spin_system.control.method,'goodwin')&&...
+       strcmp(spin_system.control.integrator,'trapezium')
+        error('Goodwin optimiser is not available for trapezium integrator.');
+    end
+
+else
+
+    % Default is LBFGS
+    spin_system.control.method='lbfgs';
+
+end
+
+% Inform the user
+report(spin_system,[pad('Optimisation method',60) spin_system.control.method]);
+
 % Process control operators
 if isfield(control,'operators')
 
@@ -388,11 +423,6 @@ end
 % Process distortion functions
 if isfield(control,'distortion')
 
-    % Disallow Newton-Raphson
-    if ismember(control.method,{'newton','goodwin'})
-        error('distortion handling not implemented for Newton-Raphson methods.');
-    end
-
     % Input validation
     if ~iscell(control.distortion)
         error('control.distortion must be a cell array of function handles.');
@@ -414,10 +444,10 @@ if isfield(control,'distortion')
                         int2str(size(spin_system.control.distortion,1))]);
 
     % Block methods that use exact Hessians
-    if ismember(control.method,{'newton','goodwin'})
+    if ismember(spin_system.control.method,{'newton','goodwin'})
         error('waveform distortions are only available with LBFGS optimiser.');
     end
-                    
+
 else
     
     % Only one function that does nothing
@@ -762,41 +792,6 @@ else
     report(spin_system,[pad('Freeze mask supplied',60) 'no']);
     
 end      
-
-% Process optimisation method
-if isfield(control,'method')
-
-    % Input validation
-    if (~ischar(control.method))||(~ismember(control.method,{'lbfgs','rbfgs',...
-                                                             'newton','goodwin'}))
-        error('control.method must be ''lbfgs'', ''rbfgs'', ''newton'', or ''goodwin''.');
-    end
-    
-    % Absorb the method
-    spin_system.control.method=control.method;
-    control=rmfield(control,'method');
-
-    % Refuse to run Newton for trapezium integrator
-    if strcmp(spin_system.control.method,'newton')&&...
-       strcmp(spin_system.control.integrator,'trapezium')
-        error('Newton optimiser is not available for trapezium integrator.');
-    end
-
-    % Refuse to run Goodwin for trapezium integrator
-    if strcmp(spin_system.control.method,'goodwin')&&...
-       strcmp(spin_system.control.integrator,'trapezium')
-        error('Goodwin optimiser is not available for trapezium integrator.');
-    end
-    
-else    
-
-    % Default is LBFGS
-    spin_system.control.method='lbfgs';
-    
-end
-
-% Inform the user
-report(spin_system,[pad('Optimisation method',60) spin_system.control.method]);
 
 % Process iteration limit
 if isfield(control,'max_iter')

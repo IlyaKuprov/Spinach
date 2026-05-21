@@ -167,27 +167,44 @@ switch type
         end
         
         % Build the amplitude hole inventory
-        ch_map=(amp>cb); ch_wanted=cb.*ch_map;
+        ch_map=(amp>cb); ch_actual=amp.*ch_map; ch_wanted=cb.*ch_map;
         
-        % Preallocated new Cartesian bounds
-        b=zeros(size(wf));
+        % Keep inactive amplitudes away from the polar singularity
+        amp_safe=amp; amp_safe(~ch_map)=1;
         
-        % Transform to Cartesian representation
-        for n=1:size(wf,1)/2
-            [b(2*n-1,:),b(2*n,:)]=polar2cartesian(ch_wanted(n,:),phi(n,:));
+        % Compute the penalty
+        pen_term=sum(sum((ch_actual-ch_wanted).^2));
+        pen_term=pen_term/size(wf,2);
+
+        % Compute the gradient
+        if nargout>1
+            pen_dr=2*(ch_actual-ch_wanted);
+            pen_dr=pen_dr/size(wf,2);
+            pen_dp=zeros(size(amp));
+            for n=1:size(wf,1)/2
+                [~,~,pen_grad(2*n-1,:),pen_grad(2*n,:)]=...
+                    polar2cartesian(amp_safe(n,:),phi(n,:),pen_dr(n,:),pen_dp(n,:));
+            end
         end
         
-        % New Cartesian bounds from amplitude bounds
-        cb=b; cb(cb<=0)=max(max(wf))+1;
-        fb=b; fb(fb>=0)=min(min(wf))-1;
-        
-        % Call the SNS penalty with new bounds
-        if nargout==1
-            [pen_term]=penalty(wf,'SNS',fb,cb);
-        elseif nargout==2
-            [pen_term,pen_grad]=penalty(wf,'SNS',fb,cb);
-        elseif nargout==3
-            [pen_term,pen_grad,pen_hess]=penalty(wf,'SNS',fb,cb);
+        % Compute the Hessian
+        if nargout>2
+            pen_dp=zeros(size(amp));
+            pen_drp=zeros(size(wf,2));
+            pen_dpr=zeros(size(wf,2));
+            pen_dpp=zeros(size(wf,2));
+            for n=1:size(wf,1)/2
+                pen_drr=diag(2*ch_map(n,:)/size(wf,2));
+                [~,~,~,~,Dxx,Dxy,Dyx,Dyy]=...
+                    polar2cartesian(amp_safe(n,:),phi(n,:),pen_dr(n,:),pen_dp(n,:),...
+                                    pen_drr,pen_drp,pen_dpr,pen_dpp);
+                x_idx=2*n-1:size(wf,1):numel(wf);
+                y_idx=2*n:size(wf,1):numel(wf);
+                pen_hess(x_idx,x_idx)=Dxx;
+                pen_hess(x_idx,y_idx)=Dxy;
+                pen_hess(y_idx,x_idx)=Dyx;
+                pen_hess(y_idx,y_idx)=Dyy;
+            end
         end
        
     otherwise

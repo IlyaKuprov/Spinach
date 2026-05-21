@@ -343,11 +343,7 @@ if ~isfield(parameters,'rframes')
 end
 if ~isfield(parameters,'offset')
     report(spin_system,'parameters.offset field not set, assuming zero offsets.');
-    if isfield(parameters,'spins')
-        parameters.offset=zeros(size(parameters.spins));
-    else
-        parameters.offset=[];
-    end
+    parameters.offset=zeros(size(parameters.spins));
 end
 if ~isfield(parameters,'verbose')
     report(spin_system,'parameters.verbose field not set, silencing array operations.');
@@ -481,3 +477,4 @@ end
 % Show me a hero and I'll write you a tragedy.
 %
 % F. Scott Fitzgerald
+

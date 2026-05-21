@@ -166,11 +166,7 @@ end
 function parameters=defaults(spin_system,parameters)
 if ~isfield(parameters,'offset')
     report(spin_system,'parameters.offset field not set, assuming zero offsets.');
-    if isfield(parameters,'spins')
-        parameters.offset=zeros(size(parameters.spins));
-    else
-        parameters.offset=[];
-    end
+    parameters.offset=zeros(size(parameters.spins));
 end
 if ~isfield(parameters,'axis_units')
     report(spin_system,'parameters.axis_units field not set, assuming ppm.');
@@ -203,6 +199,8 @@ if ~ischar(parameters.axis_units)
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
+elseif isempty(parameters.spins)
+    error('parameters.spins variable cannot be empty.');
 end
 if ~iscell(parameters.spins)
     error('parameters.spins should be a cell array of character strings.');
@@ -224,3 +222,4 @@ end
 % insist on being equal.
 %
 % Friedrich Nietzsche
+

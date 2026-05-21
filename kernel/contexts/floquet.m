@@ -292,11 +292,7 @@ if ~isfield(parameters,'decouple')
 end
 if ~isfield(parameters,'offset')
     report(spin_system,'parameters.offset field not set, assuming zero offsets.');
-    if isfield(parameters,'spins')
-        parameters.offset=zeros(size(parameters.spins));
-    else
-        parameters.offset=[];
-    end
+    parameters.offset=zeros(size(parameters.spins));
 end
 if ~isfield(parameters,'verbose')
     report(spin_system,'parameters.verbose field not set, silencing array operations.');
@@ -397,3 +393,4 @@ end
 % easier to ask forgiveness than it is to get permission.
 %
 % Rear Admiral Grace Hopper
+

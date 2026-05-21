@@ -157,11 +157,7 @@ if ~isfield(parameters,'rframes')
 end
 if ~isfield(parameters,'offset')
     report(spin_system,'parameters.offset field not set, assuming zero offsets.');
-    if isfield(parameters,'spins')
-        parameters.offset=zeros(size(parameters.spins));
-    else
-        parameters.offset=[];
-    end
+    parameters.offset=zeros(size(parameters.spins));
 end
 if ~isfield(parameters,'verbose')
     report(spin_system,'parameters.verbose field not set, silencing array operations.');
@@ -251,3 +247,4 @@ end
 % greatest kind of courage. I mean, what we really want.
 %
 % Ayn Rand, "The Fountainhead"
+

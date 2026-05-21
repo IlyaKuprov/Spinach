@@ -5,26 +5,25 @@
 % This sequence must be called from the imaging() context, which
 % would provide H,R,K,G, and F. Parameters:
 %
-%  parameters.ss_grad_amp   -  the amplitude of slice selection 
-%                              gradient,T/m
-%
-%  parameters.ss_grad_dur   -  the duration of the slice selection 
-%                              gradient, seconds 
-%
 %  parameters.image_size    -  number of points in each dimension of
 %                              the resulting image
 %
+%  parameters.ss_grad_amp   -  the amplitude of slice selection
+%                              gradient,T/m
+%
 %  parameters.pe_grad_amp   -  phase encoding gradient amplitude, T/m
+%
+%  parameters.pe_grad_dur   -  phase encoding gradient duration, s
 % 
 %  parameters.ro_grad_amp   -  readout gradient amplitude, T/m
 %
-%  parameters.grad_dur      -  the duration of the gradients, seconds
-%
-%  parameters.t_echo        -  echo time after slice selection, seconds
+%  parameters.ro_grad_dur   -  readout gradient duration, s
 %
 %  parameters.diff_g_amp    -  [optional] a vector of diffusion gra-
 %                              dient pair amplitudes in X,Y (T/m) to
 %                              be active during the echo time
+%
+%  parameters.t_echo        -  echo time after slice selection, seconds
 %
 % Outputs:
 %
@@ -198,14 +197,14 @@ end
 if (~iscell(G))||(numel(G)<3)
     error('the G argument must be a cell array with at least three gradient operators.');
 end
-if (~isnumeric(G{1}))||(~isnumeric(G{2}))||(~isnumeric(G{3}))
+if (~isnumeric(G{1}))||(~isnumeric(G{2}))||(~isnumeric(G{3}))||...
+   (~ismatrix(G{1}))||(~ismatrix(G{2}))||(~ismatrix(G{3}))
     error('gradient operators must be numeric matrices.');
 end
-if ~isfield(parameters,'spins')
-    error('parameters.spins field must be present.');
-end
-if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||(~ischar(parameters.spins{1}))
-    error('parameters.spins must be a cell array containing one spin name.');
+if (~all(size(G{1})==size(H)))||...
+   (~all(size(G{2})==size(H)))||...
+   (~all(size(G{3})==size(H)))
+    error('gradient operators must have the same dimension as H.');
 end
 if ~isfield(parameters,'rho0')
     error('parameters.rho0 field must be present.');
@@ -236,7 +235,7 @@ end
 if (~isnumeric(parameters.dims))||(~isreal(parameters.dims))||...
    (~isvector(parameters.dims))||(numel(parameters.dims)~=3)||...
    any(~isfinite(parameters.dims))||any(parameters.dims<=0)
-    error('parameters.dims must be a vector with three real numbers.');
+    error('parameters.dims must be a vector with three positive real numbers.');
 end
 if ~isfield(parameters,'image_size')
     error('parameters.image_size field must be present.');
@@ -296,7 +295,7 @@ if (~isnumeric(parameters.ro_grad_dur))||(~isreal(parameters.ro_grad_dur))||...
     error('parameters.ro_grad_dur must be a positive real scalar.');
 end
 if ~isfield(parameters,'pe_grad_dur')
-    error('the phase encoding gradient duration must be specified in parameters.grad_dur field.');
+    error('the phase encoding gradient duration must be specified in parameters.pe_grad_dur field.');
 end
 if (~isnumeric(parameters.pe_grad_dur))||(~isreal(parameters.pe_grad_dur))||...
    (~isscalar(parameters.pe_grad_dur))||(~isfinite(parameters.pe_grad_dur))||...
@@ -328,14 +327,6 @@ if isfield(parameters,'diff_g_amp')&&((~isnumeric(parameters.diff_g_amp))||...
    (~isreal(parameters.diff_g_amp))||(~isvector(parameters.diff_g_amp))||...
    (numel(parameters.diff_g_amp)~=3)||any(~isfinite(parameters.diff_g_amp)))
     error('parameters.diff_g_amp must be a vector with three real numbers.');
-end
-if isfield(parameters,'diff_g_amp')&&(~isfield(parameters,'diff_g_dur'))
-    error('parameters.diff_g_dur field must be present when parameters.diff_g_amp is specified.');
-end
-if isfield(parameters,'diff_g_dur')&&((~isnumeric(parameters.diff_g_dur))||...
-   (~isreal(parameters.diff_g_dur))||(~isscalar(parameters.diff_g_dur))||...
-   (~isfinite(parameters.diff_g_dur))||(parameters.diff_g_dur<=0))
-    error('parameters.diff_g_dur must be a positive real scalar.');
 end
 end
 

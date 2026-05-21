@@ -60,6 +60,30 @@ result=test_close(result,'optimcon timing grid',spin_system.control.pulse_dt,pul
 result=test_true(result,'optimcon rectangle grid',spin_system.control.pulse_ntpts==numel(pulse_dt),...
                  'rectangle integration must use one waveform value per interval');
 
+% Check that distortions work when the optimiser method is defaulted
+control_default=rmfield(control,'method');
+control_default.distortion={@no_dist};
+spin_default=optimcon(local_spin_system(),control_default);
+result=test_true(result,'optimcon distortion default method',...
+                 strcmp(spin_default.control.method,'lbfgs'),...
+                 'missing control.method must default before distortion processing');
+result=test_true(result,'optimcon distortion supplied',numel(spin_default.control.distortion)==1,...
+                 'a supplied distortion function must be stored after default method processing');
+
+% Check that exact-Hessian methods remain incompatible with distortions
+control_hessian=control;
+control_hessian.method='newton';
+control_hessian.distortion={@no_dist};
+try
+    optimcon(local_spin_system(),control_hessian);
+    hessian_err='';
+catch err
+    hessian_err=err.message;
+end
+result=test_true(result,'optimcon distortion Hessian block',...
+                 contains(hessian_err,'waveform distortions'),...
+                 'distortions must still reject exact-Hessian optimisation methods');
+
 % Evaluate the GRAPE fidelity and gradient for a non-trivial waveform
 waveform=[7 11];
 [traj_data,fidelity,grad]=grape_hilb(spin_system,{drift},control.operators,...

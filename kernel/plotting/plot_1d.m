@@ -37,9 +37,6 @@
 
 function plot_1d(spin_system,spectrum,parameters,varargin)
 
-% Check spin specification
-grumble(spin_system,spectrum,parameters,true);
-
 % Set common defaults
 parameters=defaults(spin_system,parameters);
 
@@ -99,17 +96,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,spectrum,parameters,spins_only)
-
-if (nargin==4)&&spins_only
-    if ~isfield(parameters,'spins')
-        error('working spins should be specified in parameters.spins variable.');
-    elseif isempty(parameters.spins)
-        error('parameters.spins variable cannot be empty.');
-    end
-    return
-end
-
+function grumble(spin_system,spectrum,parameters)
 if (~isnumeric(spectrum))
     error('spectrum must be a numeric array.');
 end

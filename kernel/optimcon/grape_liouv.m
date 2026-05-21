@@ -428,7 +428,7 @@ if n_outputs>2
                         aux_vec_b=[zero_state; fwd_traj(:,n-1)];
                         
                         % Propagate and extract derivative action
-                        aux_vec_b=step(ss_parfor,Left_DR,aux_vec_b,dt(n));
+                        aux_vec_b=step(ss_parfor,Left_DR,aux_vec_b,dt(n-1));
 
                         % Product rule: [P2]*[dP1]*rho part
                         grad_col(k)=grad_col(k)+bwd_traj(:,n)'*aux_vec_b(1:(end/2));

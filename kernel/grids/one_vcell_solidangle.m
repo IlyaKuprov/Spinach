@@ -74,7 +74,6 @@ if nargin>1
     end
 end
 end
-end
 
 % Being a mathematician is a bit like being a manic 
 % depressive: you spend your life alternating between

@@ -28,7 +28,10 @@
 %
 % Notes:
 %
-%     parameters.sweep should be set equal to parameters.rate
+%     parameters.sweep should be a two-element vector
+%     with both elements set equal to parameters.rate,
+%     this is because this pulse sequence is strobo-
+%     scopic with respect to the rotor period
 %
 % ilya.kuprov@weizmann.ac.il
 % m.carravetta@soton.ac.uk
@@ -142,6 +145,9 @@ end
 if (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
    (~isscalar(parameters.sweep))||(parameters.sweep==0)
     error('parameters.sweep must be a non-zero real scalar.');
+end
+if parameters.sweep~=parameters.rate
+    error('parameters.sweep must be equal to parameters.rate in MQMAS.');
 end
 if ~isfield(parameters,'rho0')
     error('initial state must be specified in parameters.rho0 variable.');

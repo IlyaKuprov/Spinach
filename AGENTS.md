@@ -40,6 +40,8 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **No residual garbage:** Do not leave any dead code, unused variables, or other redundant items in the functions you create or edit.
 
+* **Preserve correct physics:** When making code changes, do not break the physics behind the code. Before making an edit or a refactor, understand the physical meaning of the code you are touching and confirm that the edit you are about to make is appropriate and correct from that point of view.
+
 ## Spinach Wiki Documentation Instructions
 
 *Spinach* maintains a Wiki for function documentation. If you are asked (or if it is required) to create or update a Wiki page for a *Spinach* function, you must follow these instructions:
@@ -66,7 +68,7 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Verify Completion of All Tasks:** After generating the output, you must double-check user instructions against the output produced. If anything is missing, incomplete, or does not strictly follow the instructions and style guidelines, you must continue working. The process is not complete until you have produced everything requested by the user, in full compliance with the guidelines above.
 
-* **Strict quality control:** After generating the output, you must evaluate the quality of what you have produced. If the output is of low quality (from academic, software engieeting, or numerical efficiency point of view), you must continue improving the output until its quality is high.
+* **Strict quality control:** After generating the output, you must evaluate the quality and correctness of what you have produced. If the output is of low quality (from academic, software engineering, or numerical efficiency point of view) or incorrect, you must continue improving the code until its quality is high.
 
 ## Confession After Work is Done
 

@@ -39,7 +39,7 @@ parameters.verbose=0;
 parameters.pulse_amp=2*pi*[250e3 250e3];
 parameters.pulse_dur=[2e-6 1e-6];
 parameters.mq_order=3;
-parameters.sweep=[62.5e3 62.5e3];
+parameters.sweep=parameters.rate;
 
 % Simulation
 fid=singlerot(spin_system,@mqmas,parameters,'labframe');

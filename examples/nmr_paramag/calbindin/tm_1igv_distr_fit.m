@@ -31,7 +31,7 @@ parameters.sharpen=2e3;
 parameters.expt_pcs=expt_pcs;
 parameters.xyz=[x y z];
 parameters.chi=chi;
-parameters.gpu=1;
+parameters.gpu=true();
 
 % Iteratively refine the grid
 for n=[64 128 256 384]

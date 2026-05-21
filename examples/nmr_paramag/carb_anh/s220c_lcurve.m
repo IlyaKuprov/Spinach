@@ -35,7 +35,7 @@ parameters.xyz_all=xyz_all;
 parameters.expt_pcs=expt_pcs;
 parameters.xyz=xyz;
 parameters.chi=chi;
-parameters.gpu=1;
+parameters.gpu=true();
 
 % Regularisation parameter array
 lam=10.^linspace(-2.0,2.0,30);

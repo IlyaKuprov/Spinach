@@ -40,7 +40,7 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **No residual garbage:** Do not leave any dead code, unused variables, or other redundant items in the functions you create or edit.
 
-* **Preserve correct physics:** When making code changes, do not break the physics behind the code. Before making an edit or a refactor, understand the physical meaning of the code you are touching and confirm that the edit you are about to make is appropriate and correct from that point of view.
+* **Preserve correct physics:** When making code changes, do not break the physics behind the code. Before making an edit or a refactor, understand the physical meaning of the code you are touching and confirm that the edit you are about to make is appropriate and correct from that point of view. Run a direct function-load/call check for every changed function after you touch that function's structure.
 
 ## Spinach Wiki Documentation Instructions
 

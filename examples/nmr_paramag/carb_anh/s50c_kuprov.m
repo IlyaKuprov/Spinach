@@ -36,7 +36,7 @@ parameters.xyz_all=xyz_all;
 parameters.expt_pcs=expt_pcs;
 parameters.xyz=xyz;
 parameters.chi=chi;
-parameters.gpu=1;
+parameters.gpu=true();
 
 % Solve and refine the grid
 for n=[64 128 256]

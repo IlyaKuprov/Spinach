@@ -134,8 +134,7 @@ switch parameters.calc_type
         rho_unit=unit_state(spin_system); R=R-kron(rho_unit,rho_unit');
         
         % Run the simulation
-        answer=evolution(spin_system,H+1i*R,coils,-R*rho_eq,parameters.time_step,...
-                         parameters.n_steps,'total');
+        answer=evolution(spin_system,H+1i*R,coils,-R*rho_eq,[],[],'total');
                      
     case 'trajectory' 
      
@@ -190,7 +189,7 @@ end
 if numel(parameters.nuclear_frq)~=1
     error('parameters.nuclear_frq array should have exactly one element.');
 end
-if strcmp(parameters.calc_type,'time_dependence')
+if ismember(parameters.calc_type,{'time_dependence','trajectory'})
     if ~isfield(parameters,'n_steps')
         error('number of time steps should be specified in parameters.n_steps variable.');
     end

@@ -58,6 +58,9 @@
 
 function slice_2d(spin_system,spectrum,parameters,ncont,delta,k,ncol,m,signs)
 
+% Check spin specification
+grumble(spin_system,spectrum,parameters,ncont,delta,k,ncol,m,signs,true);
+
 % Set common defaults
 parameters=defaults(spin_system,parameters);
 
@@ -144,7 +147,17 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,spectrum,parameters,ncont,delta,k,ncol,m,signs)
+function grumble(spin_system,spectrum,parameters,ncont,delta,k,ncol,m,signs,spins_only)
+
+if (nargin==10)&&spins_only
+    if ~isfield(parameters,'spins')
+        error('working spins should be specified in parameters.spins variable.');
+    elseif isempty(parameters.spins)
+        error('parameters.spins variable cannot be empty.');
+    end
+    return
+end
+
 if (~isnumeric(spectrum))||(~ismatrix(spectrum))
     error('spectrum must be a matrix.');
 end

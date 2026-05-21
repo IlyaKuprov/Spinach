@@ -105,6 +105,9 @@ function [answer,sph_grid]=doublerot(spin_system,pulse_sequence,...
 % Show the banner
 banner(spin_system,'sequence_banner');
 
+% Check spin specification
+grumble(spin_system,pulse_sequence,parameters,assumptions,true);
+
 % Set common defaults
 parameters=defaults(spin_system,parameters);
 
@@ -358,7 +361,16 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,pulse_sequence,parameters,assumptions)
+function grumble(spin_system,pulse_sequence,parameters,assumptions,spins_only)
+
+if (nargin==5)&&spins_only
+    if ~isfield(parameters,'spins')
+        error('working spins must be specified in parameters.spins field.');
+    elseif isempty(parameters.spins)
+        error('parameters.spins variable cannot be empty.');
+    end
+    return
+end
 
 % Formalism 
 if ~ismember(spin_system.bas.formalism,{'zeeman-liouv','sphten-liouv'})

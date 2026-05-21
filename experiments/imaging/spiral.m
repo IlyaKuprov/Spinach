@@ -39,7 +39,7 @@ grumble(spin_system,parameters,H,R,K,G,F);
 L=H+F+1i*R+1i*K;
 
 % Make pulse operators
-Hp=operator(spin_system,'L+','1H');
+Hp=operator(spin_system,'L+',parameters.spins{1});
 Hy=kron(speye(prod(parameters.npts)),(Hp-Hp')/2i);
 
 % Apply 90-degree pulse

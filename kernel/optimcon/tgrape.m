@@ -71,7 +71,7 @@ for n=1:nsteps
     % Add current controls
     for k=1:numel(controls)
         L_forw=L_forw+waveform(k,n)*controls{k};
-        L_back=L_back+waveform(k,nsteps+1-n)*controls{k};
+        L_back=L_back+waveform(k,nsteps+1-n)*controls{k}';
     end
 
     % Take time steps forwards and backwards

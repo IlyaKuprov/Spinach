@@ -11,15 +11,13 @@
 #include <cmath>
 #include <cstdint>
 #include <limits>
-#ifdef _OPENMP
-#include <omp.h>
-#endif
 
 struct LinePlan
 {
     int mode;
     double gam;
     double gam2;
+    double inv_gam;
     double centre;
     double edge0;
     double edge1;
@@ -28,31 +26,94 @@ struct LinePlan
     double offs2;
     double scale_lor;
     double scale_seg;
-    double two_ampl_pi;
-    double ampl_gam_pi;
-    double den;
-    double den01;
-    double den02;
-    double den12;
-    double den21;
+    double coef0;
+    double coef1;
+    double coef2;
+    double coef_log0;
+    double coef_log1;
 };
 
 static inline double real_value(const mxArray *array,mwIndex idx);
-static inline double line_value(double x,const LinePlan& plan);
+static inline double line_value0(double x,const LinePlan& plan);
+static inline double line_value1(double x,const LinePlan& plan);
+static inline double line_value2(double x,const LinePlan& plan);
+static inline double line_value3(double x,const LinePlan& plan);
+static inline double line_value4(double x,const LinePlan& plan);
+template<typename XType,typename YType>
+static void fill_direct(const XType *x_data,YType *y_data,mwSize n_elem,const LinePlan& plan);
+template<typename YType>
+static void fill_real(const mxArray *x_arg,YType *y_data,mwSize n_elem,const LinePlan& plan);
 static void grumble(int nlhs,int nrhs,const mxArray *prhs[]);
+
+template<typename XType,typename YType>
+static void fill_direct(const XType *x_data,YType *y_data,mwSize n_elem,const LinePlan& plan)
+{
+    switch (plan.mode)
+    {
+        case 0:
+            for (mwIndex n=0;n<n_elem;n++)
+                y_data[n]=(YType)line_value0((double)x_data[n],plan);
+            return;
+
+        case 1:
+            for (mwIndex n=0;n<n_elem;n++)
+                y_data[n]=(YType)line_value1((double)x_data[n],plan);
+            return;
+
+        case 2:
+            for (mwIndex n=0;n<n_elem;n++)
+                y_data[n]=(YType)line_value2((double)x_data[n],plan);
+            return;
+
+        case 3:
+            for (mwIndex n=0;n<n_elem;n++)
+                y_data[n]=(YType)line_value3((double)x_data[n],plan);
+            return;
+
+        default:
+            for (mwIndex n=0;n<n_elem;n++)
+                y_data[n]=(YType)line_value4((double)x_data[n],plan);
+            return;
+    }
+}
+
+template<typename YType>
+static void fill_real(const mxArray *x_arg,YType *y_data,mwSize n_elem,const LinePlan& plan)
+{
+    switch (plan.mode)
+    {
+        case 0:
+            for (mwIndex n=0;n<n_elem;n++)
+                y_data[n]=(YType)line_value0(real_value(x_arg,n),plan);
+            return;
+
+        case 1:
+            for (mwIndex n=0;n<n_elem;n++)
+                y_data[n]=(YType)line_value1(real_value(x_arg,n),plan);
+            return;
+
+        case 2:
+            for (mwIndex n=0;n<n_elem;n++)
+                y_data[n]=(YType)line_value2(real_value(x_arg,n),plan);
+            return;
+
+        case 3:
+            for (mwIndex n=0;n<n_elem;n++)
+                y_data[n]=(YType)line_value3(real_value(x_arg,n),plan);
+            return;
+
+        default:
+            for (mwIndex n=0;n<n_elem;n++)
+                y_data[n]=(YType)line_value4(real_value(x_arg,n),plan);
+            return;
+    }
+}
 
 void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
 {
 
     // Validate input arguments
     grumble(nlhs,nrhs,prhs);
-
-#ifdef _OPENMP
-
-    // Do what Matlab says
-    omp_set_dynamic(0);
-
-#endif
 
     // Get input arguments
     const mxArray *offs_arg=prhs[0];
@@ -61,6 +122,8 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
     const double ampl=mxGetScalar(prhs[1]);
     const double gam=0.5*mxGetScalar(prhs[2]);
     const double pi=3.141592653589793238462643383279502884;
+    const double two_ampl_pi=2.0*ampl/pi;
+    const double ampl_gam_pi=ampl*gam/pi;
 
     // Read and sort offsets explicitly
     double offs[3]={0.0,0.0,0.0};
@@ -97,6 +160,7 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
     plan.mode=0;
     plan.gam=gam;
     plan.gam2=gam*gam;
+    plan.inv_gam=1.0/gam;
     plan.centre=offs[0];
     plan.edge0=0.0;
     plan.edge1=0.0;
@@ -105,13 +169,11 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
     plan.offs2=offs[2];
     plan.scale_lor=ampl/(pi*gam);
     plan.scale_seg=0.0;
-    plan.two_ampl_pi=2.0*ampl/pi;
-    plan.ampl_gam_pi=ampl*gam/pi;
-    plan.den=0.0;
-    plan.den01=0.0;
-    plan.den02=0.0;
-    plan.den12=0.0;
-    plan.den21=0.0;
+    plan.coef0=0.0;
+    plan.coef1=0.0;
+    plan.coef2=0.0;
+    plan.coef_log0=0.0;
+    plan.coef_log1=0.0;
 
     if (n_offs==2)
     {
@@ -148,7 +210,9 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
             plan.edge0=0.5*(offs[0]+offs[1]);
             plan.edge1=offs[2];
             const double diff=plan.edge0-plan.edge1;
-            plan.den=diff*diff;
+            const double den=diff*diff;
+            plan.coef0=two_ampl_pi/den;
+            plan.coef_log0=ampl_gam_pi/den;
         }
         else if (offs[2]-offs[1]<sim_tol)
         {
@@ -156,15 +220,22 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
             plan.edge0=offs[0];
             plan.edge1=0.5*(offs[1]+offs[2]);
             const double diff=plan.edge0-plan.edge1;
-            plan.den=diff*diff;
+            const double den=diff*diff;
+            plan.coef0=two_ampl_pi/den;
+            plan.coef_log0=ampl_gam_pi/den;
         }
         else
         {
             plan.mode=4;
-            plan.den01=offs[0]-offs[1];
-            plan.den02=offs[0]-offs[2];
-            plan.den12=offs[1]-offs[2];
-            plan.den21=offs[2]-offs[1];
+            const double den01=offs[0]-offs[1];
+            const double den02=offs[0]-offs[2];
+            const double den12=offs[1]-offs[2];
+            const double den21=offs[2]-offs[1];
+            plan.coef0=two_ampl_pi/(den01*den02);
+            plan.coef1=two_ampl_pi/(den01*den12);
+            plan.coef2=two_ampl_pi/(den02*den21);
+            plan.coef_log0=ampl_gam_pi/(den01*den02);
+            plan.coef_log1=ampl_gam_pi/(den02*den21);
         }
     }
 
@@ -200,11 +271,8 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
             mexErrMsgIdAndTxt("Spinach:lorentzcon:dataPtr","Failed to access array data.");
         }
 
-#ifdef _OPENMP
-#pragma omp parallel for schedule(static)
-#endif
-        for (mwSignedIndex n=0;n<(mwSignedIndex)n_elem;n++)
-            y_data[n]=(float)line_value((double)x_data[n],plan);
+        // Evaluate the selected branch in a single pass
+        fill_direct(x_data,y_data,n_elem,plan);
     }
 
     // Fill double-precision output array
@@ -228,19 +296,13 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
                 mexErrMsgIdAndTxt("Spinach:lorentzcon:dataPtr","Failed to access input array data.");
             }
 
-#ifdef _OPENMP
-#pragma omp parallel for schedule(static)
-#endif
-            for (mwSignedIndex n=0;n<(mwSignedIndex)n_elem;n++)
-                y_data[n]=line_value(x_data[n],plan);
+            // Evaluate the selected branch in a single pass
+            fill_direct(x_data,y_data,n_elem,plan);
         }
         else
         {
-#ifdef _OPENMP
-#pragma omp parallel for schedule(static)
-#endif
-            for (mwSignedIndex n=0;n<(mwSignedIndex)n_elem;n++)
-                y_data[n]=line_value(real_value(x_arg,(mwIndex)n),plan);
+            // Evaluate non-floating-point input through scalar conversion
+            fill_real(x_arg,y_data,n_elem,plan);
         }
     }
 
@@ -288,47 +350,58 @@ static inline double real_value(const mxArray *array,mwIndex idx)
     }
 }
 
-static inline double line_value(double x,const LinePlan& plan)
+static inline double line_value0(double x,const LinePlan& plan)
 {
-    if (plan.mode==0)
-    {
-        const double arg=(x-plan.centre)/plan.gam;
-        return plan.scale_lor/(1.0+arg*arg);
-    }
+    const double arg=(x-plan.centre)*plan.inv_gam;
+    return plan.scale_lor/(1.0+arg*arg);
+}
 
-    if (plan.mode==1)
-        return plan.scale_seg*(std::atan2(plan.edge1-x,plan.gam)-
-                               std::atan2(plan.edge0-x,plan.gam));
+static inline double line_value1(double x,const LinePlan& plan)
+{
+    return plan.scale_seg*(std::atan((plan.edge1-x)*plan.inv_gam)-
+                           std::atan((plan.edge0-x)*plan.inv_gam));
+}
 
-    if (plan.mode==2)
-    {
-        const double dx0=plan.edge0-x;
-        const double dx1=plan.edge1-x;
+static inline double line_value2(double x,const LinePlan& plan)
+{
+    const double dx0=plan.edge0-x;
+    const double dx1=plan.edge1-x;
+    const double r0=dx0*dx0+plan.gam2;
+    const double r1=dx1*dx1+plan.gam2;
+    const double ang0=std::atan(dx0*plan.inv_gam);
+    const double ang1=std::atan(dx1*plan.inv_gam);
 
-        return plan.two_ampl_pi*((x-plan.edge1)/plan.den)*std::atan2(dx0,plan.gam)+
-               plan.two_ampl_pi*((plan.edge1-x)/plan.den)*std::atan2(dx1,plan.gam)+
-               (plan.ampl_gam_pi/plan.den)*std::log((dx0*dx0+plan.gam2)/(dx1*dx1+plan.gam2));
-    }
+    return plan.coef0*dx1*(ang1-ang0)+
+           plan.coef_log0*std::log(r0/r1);
+}
 
-    if (plan.mode==3)
-    {
-        const double dx0=plan.edge0-x;
-        const double dx1=plan.edge1-x;
+static inline double line_value3(double x,const LinePlan& plan)
+{
+    const double dx0=plan.edge0-x;
+    const double dx1=plan.edge1-x;
+    const double r0=dx0*dx0+plan.gam2;
+    const double r1=dx1*dx1+plan.gam2;
+    const double ang0=std::atan(dx0*plan.inv_gam);
+    const double ang1=std::atan(dx1*plan.inv_gam);
 
-        return plan.two_ampl_pi*((plan.edge0-x)/plan.den)*std::atan2(dx0,plan.gam)+
-               plan.two_ampl_pi*((x-plan.edge0)/plan.den)*std::atan2(dx1,plan.gam)+
-               (plan.ampl_gam_pi/plan.den)*std::log((dx1*dx1+plan.gam2)/(dx0*dx0+plan.gam2));
-    }
+    return plan.coef0*dx0*(ang0-ang1)+
+           plan.coef_log0*std::log(r1/r0);
+}
 
+static inline double line_value4(double x,const LinePlan& plan)
+{
     const double dx0=plan.offs0-x;
     const double dx1=plan.offs1-x;
     const double dx2=plan.offs2-x;
+    const double r0=dx0*dx0+plan.gam2;
+    const double r1=dx1*dx1+plan.gam2;
+    const double r2=dx2*dx2+plan.gam2;
 
-    return plan.two_ampl_pi*((plan.offs0-x)/(plan.den01*plan.den02))*std::atan2(dx0,plan.gam)+
-           plan.two_ampl_pi*((x-plan.offs1)/(plan.den01*plan.den12))*std::atan2(dx1,plan.gam)+
-           plan.two_ampl_pi*((x-plan.offs2)/(plan.den02*plan.den21))*std::atan2(plan.offs2-x,plan.gam)+
-           (plan.ampl_gam_pi/(plan.den01*plan.den02))*std::log((dx1*dx1+plan.gam2)/(dx0*dx0+plan.gam2))+
-           (plan.ampl_gam_pi/(plan.den02*plan.den21))*std::log((dx2*dx2+plan.gam2)/(dx1*dx1+plan.gam2));
+    return plan.coef0*dx0*std::atan(dx0*plan.inv_gam)-
+           plan.coef1*dx1*std::atan(dx1*plan.inv_gam)-
+           plan.coef2*dx2*std::atan(dx2*plan.inv_gam)+
+           plan.coef_log0*std::log(r1/r0)+
+           plan.coef_log1*std::log(r2/r1);
 }
 
 static void grumble(int nlhs,int nrhs,const mxArray *prhs[])
@@ -385,10 +458,7 @@ static void grumble(int nlhs,int nrhs,const mxArray *prhs[])
 
     const mwSize n_elem=mxGetNumberOfElements(x);
 
-    if (n_elem>(mwSize)std::numeric_limits<mwSignedIndex>::max())
-        mexErrMsgIdAndTxt("Spinach:lorentzcon:xSize","x has too many elements for parallel indexing.");
-
-    for (mwIndex n=0;n<(mwIndex)n_elem;n++)
+    for (mwIndex n=0;n<n_elem;n++)
         if (!std::isfinite(real_value(x,n)))
             mexErrMsgIdAndTxt("Spinach:lorentzcon:xFinite","x must contain finite real numbers.");
 }

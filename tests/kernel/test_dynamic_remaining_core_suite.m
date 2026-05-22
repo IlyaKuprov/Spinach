@@ -129,9 +129,9 @@ result=test_close(result,'sinkhole frozen columns',L_sink,[1 0 0;4 0 0;7 0 0],0,
 % Check the normalised Lorentzian branch analytically
 x_axis=[-1 0 1];
 line_obs=lorentzcon(0,2*pi,2,x_axis);
-line_ref=1./(1+x_axis.^2);
+line_ref=2./(1+x_axis.^2);
 result=test_close(result,'lorentzcon Lorentzian',line_obs,line_ref,1e-14,1e-14,...
-                  'with fwhm two and amplitude 2*pi, the normalised Lorentzian is 1/(1+x^2)');
+                  'with fwhm two and amplitude 2*pi, the normalised Lorentzian is 2/(1+x^2)');
 
 % Check magnetic pumping adds only a source column from the unit state
 spin_system=local_liouvillian_system(3);

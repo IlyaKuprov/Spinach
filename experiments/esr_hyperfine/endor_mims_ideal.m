@@ -31,10 +31,6 @@
 %                            which spins in sys.isotopes are
 %                            nuclei to irradiate
 %
-%     parameters.nsteps    - number of time steps to make
-%                            in the detection period, which
-%                            runs from 0 to 2*paramters.tau
-%
 %     H    - Hamiltonian matrix, received from the context
 %            function, normally powder() in this case
 %
@@ -185,14 +181,6 @@ if (~isnumeric(parameters.nuclei))||(~isreal(parameters.nuclei))||...
    (~isrow(parameters.nuclei))||(numel(parameters.nuclei)<1)||...
    (any(mod(parameters.nuclei,1)~=0))
     error('parameters.nuclei must be a row vector of positive integers.');
-end
-if ~isfield(parameters,'nsteps')
-    error('number of steps in the detection period must be specified in parameters.nsteps field.');
-end
-if (~isnumeric(parameters.nsteps))||(~isreal(parameters.nsteps))||...
-   (~isscalar(parameters.nsteps))||(mod(parameters.nsteps,1)~=0)||...
-   (parameters.nsteps<1)
-    error('parameters.nsteps must be a positive real integer.');
 end
 end
 

@@ -10,7 +10,7 @@ function inad_sucrose()
 
 % Spin system properties (vacuum DFT calculation)
 options.min_j=5.0; options.no_xyz=1;
-[sys,inter]=g2spinach(gparse('..\standard_systems\sucrose.log'),...
+[sys,inter]=g2spinach(gparse('../standard_systems/sucrose.log'),...
             {{'H','1H'},{'C','13C'}},[31.8 189.7],options);
 
 % Set the isotropic parts of shielding tensors to experimental values

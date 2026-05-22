@@ -9,7 +9,7 @@
 function cst_peptide_bond()
     
 % Read the Gaussian log
-props=gparse('..\standard_systems\amino_acids\ala.log');
+props=gparse('../standard_systems/amino_acids/ala.log');
 
 % Do the visualisation
 kfigure(); scale_figure([2.0 1.0]);

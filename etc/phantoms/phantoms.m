@@ -28,7 +28,7 @@ function [R1Ph,R2Ph,PDPh,dims,npts]=phantoms(ph_name)
 % Check consistency
 grumble(ph_name);
 
-% Get the path
+% Get own location
 P=mfilename('fullpath'); P=P(1:(end-9));
 
 switch ph_name

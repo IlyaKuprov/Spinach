@@ -89,7 +89,7 @@ eigensets=repmat(eigensets,grid_size,1);
 parfor n=1:grid_size
 
     % Create a local copy and specify system orientation 
-    localpar=parameters; localpar.orientation=[alps(n) bets(n) gams(n)]
+    localpar=parameters; localpar.orientation=[alps(n) bets(n) gams(n)];
 
     % Assemble Zeeman and coupling Hamiltonians
     Hz=Iz+orientation(Qz,localpar.orientation); 

@@ -2,7 +2,7 @@
 % state with distributions in electron-proton distance and
 % microwave B1 field.
 % 
-% Calculation time: minutes.
+% Calculation time: hours.
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il

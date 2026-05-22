@@ -1,7 +1,7 @@
 % Fast (in the experiment duration sense) spin echo 2D brain 
 % imaging example.
 %
-% Simulation time: minutes, faster with a Tesla V100 GPU.
+% Simulation time: hours, faster with a Tesla V100 GPU.
 %
 % a.j.allami@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il

@@ -1,6 +1,6 @@
 % CT HSQC spectrum of strychnine with natural content of 13C isotope.
 %
-% Calculation time: minutes
+% Calculation time: hours.
 %
 % ilya.kuprov@weizmann.ac.il
 % mrw1g16@soton.ac.uk

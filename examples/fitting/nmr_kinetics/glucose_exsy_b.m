@@ -2,8 +2,8 @@
 % rates in a chemical exchange and the rotational correlation times
 % within Redfield theory.
 %
-% Calculation time: minutes (iteration count is limited 
-%                            in this example file)  
+% Calculation time: hours (iteration count is limited 
+%                          in this example file)  
 %
 % ilya.kuprov@weizmann.ac.il
 % dmitry.shishmarev@sydney.edu.au

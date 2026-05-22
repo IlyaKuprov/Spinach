@@ -4,7 +4,7 @@
 %
 %           https://doi.org/10.1039/d1cp04186j
 %
-% Calculation time: minutes, line-by-line plotting 
+% Calculation time: hours, line-by-line plotting 
 %
 % mariagrazia.concilio@sjtu.edu.cn
 % ilya.kuprov@weizmann.ac.il

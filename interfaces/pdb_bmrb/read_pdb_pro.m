@@ -85,8 +85,9 @@ if ~ischar(pdb_file_name)
     error('pdb_file_name must be a character string.');
 end
 if (~isnumeric(mod_id))||(~isreal(mod_id))||...
+   (~isscalar(mod_id))||(~isfinite(mod_id))||...
    (mod_id<1)||(mod(mod_id,1)~=0)
-    error('mod_id must be a positive real integer.');
+    error('mod_id must be a finite positive real integer.');
 end
 end
 
@@ -105,4 +106,3 @@ end
 % General Director of Hell's Music - Wagner!
 %
 % J.L. Klein, "Geschichte des Dramas", 1871.
-

@@ -47,8 +47,9 @@ if ~isa(A,'rcv')
     error('the first argument must be an RCV sparse matrix.');
 end
 if nargin==2
-    if (~isscalar(dim))||(~isnumeric(dim))
-        error('dimension index must be a numeric scalar.');
+    if (~isscalar(dim))||(~isnumeric(dim))||(~isreal(dim))||...
+       (~isfinite(dim))||(dim<1)||(mod(dim,1)~=0)
+        error('dimension index must be a positive integer scalar.');
     end
 end
 end
@@ -57,4 +58,3 @@ end
 % because I have a long attention span.
 %
 % Charlie Munger
-

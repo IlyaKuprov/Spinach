@@ -36,7 +36,10 @@
 function [traj_data,fidelity,gradient,hessian]=grape_phase(phi_profile,spin_system)
 
 % Check consistency
-grumble(spin_system,spin_system.control.amplitudes,phi_profile);
+grumble(spin_system,phi_profile);
+
+% Extract the amplitude profile
+amplitudes=spin_system.control.amplitudes;
 
 % Count penalty terms
 npenterms=numel(spin_system.control.penalties);
@@ -44,7 +47,7 @@ npenterms=numel(spin_system.control.penalties);
 % Transform into Cartesian coordinates
 waveform_xy=zeros(2*size(phi_profile,1),size(phi_profile,2));
 for n=1:size(phi_profile,1)
-    [waveform_xy(2*n-1,:),waveform_xy(2*n,:)]=polar2cartesian(spin_system.control.amplitudes(n,:),phi_profile(n,:));
+    [waveform_xy(2*n-1,:),waveform_xy(2*n,:)]=polar2cartesian(amplitudes(n,:),phi_profile(n,:));
 end
 
 % Translate the freeze mask to Cartesians
@@ -148,10 +151,14 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,amp_profile,phi_profile)
+function grumble(spin_system,phi_profile)
 if ~isfield(spin_system,'control')
     error('control data missing from spin_system, run optimcon() first.');
 end
+if ~isfield(spin_system.control,'amplitudes')
+    error('control amplitude profile missing from spin_system.control.amplitudes.');
+end
+amp_profile=spin_system.control.amplitudes;
 if mod(numel(spin_system.control.operators),2)~=0
     error('phase-amplitude optimisations must have an even number of controls.');
 end
@@ -197,4 +204,3 @@ end
 % more to add, but rather when there is nothing more to take away.
 %
 % Antoine de Saint-Exupery
-

@@ -45,8 +45,8 @@ end
 if (~isnumeric(rho))||(~iscolumn(rho))
     error('rho must be a column vector.');
 end
-if (~isnumeric(rate))||(~real(rate))||(~isscalar(rate))
-    error('rate must be a real scalar.');
+if (~isnumeric(rate))||(~isreal(rate))||(~isscalar(rate))||(~isfinite(rate))
+    error('rate must be a finite real scalar.');
 end
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
     error('this function is only available in sphten-liouv formalism.');
@@ -65,4 +65,3 @@ end
 % beautiful form of regularity proves to have been latent all along.
 % 
 % Sir Francis Galton
-

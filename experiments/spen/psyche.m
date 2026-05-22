@@ -143,30 +143,117 @@ end
 if ~iscell(G)
     error('the G must be a 1x3 cell array.');
 end
+if numel(G)~=3
+    error('G must contain three gradient operators.');
+end
+if (~isnumeric(G{1}))||(~isnumeric(G{2}))||(~isnumeric(G{3}))
+    error('gradient operators must be numeric matrices.');
+end
 if ~isfield(parameters,'g_amp')
     error('the gradient amplitude should be specified in parameters.g_amp variable.');
-elseif numel(parameters.g_amp)~=1
-    error('parameters.g_amp array should have exactly one element.');
+elseif (~isnumeric(parameters.g_amp))||(~isreal(parameters.g_amp))||...
+       (numel(parameters.g_amp)~=1)||(~isfinite(parameters.g_amp))
+    error('parameters.g_amp must be a finite real scalar.');
 end
 if ~isfield(parameters,'dims')
     error('sample dimension should be specified in parameters.dims variable.');
-elseif numel(parameters.dims)~=1
-    error('parameters.dims array should have exactly one element.');
+elseif (~isnumeric(parameters.dims))||(~isreal(parameters.dims))||...
+       (numel(parameters.dims)~=1)||(~isfinite(parameters.dims))||(parameters.dims<=0)
+    error('parameters.dims must be a positive real scalar.');
 end
 if ~isfield(parameters,'npts')
     error('number of spin packets should be specified in parameters.npts variable.');
-elseif numel(parameters.npts)~=1
-    error('parameters.npts array should have exactly one element.');
+elseif (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
+       (numel(parameters.npts)~=1)||(~isfinite(parameters.npts))||...
+       (parameters.npts<1)||(mod(parameters.npts,1)~=0)
+    error('parameters.npts must be a positive integer scalar.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
-elseif numel(parameters.spins)~=1
-    error('parameters.spins cell array should have exactly one element.');
+elseif (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||...
+       (~ischar(parameters.spins{1}))
+    error('parameters.spins must be a one-element cell array of character strings.');
 end
 if ~isfield(parameters,'diff')
     error('the diffusion coefficient should specified in parameters.diff variable.');
-elseif numel(parameters.diff)~=1
-    error('parameters.diff array should have exactly one element.');
+elseif (~isnumeric(parameters.diff))||(~isreal(parameters.diff))||...
+       (numel(parameters.diff)~=1)||(~isfinite(parameters.diff))||(parameters.diff<0)
+    error('parameters.diff must be a non-negative real scalar.');
+end
+if ~isfield(parameters,'rho0')
+    error('initial state should be specified in parameters.rho0 variable.');
+elseif (~isnumeric(parameters.rho0))||(~iscolumn(parameters.rho0))||...
+       (size(parameters.rho0,1)~=size(H,1))
+    error('parameters.rho0 must be a state vector of the same dimension as H.');
+end
+if ~isfield(parameters,'coil')
+    error('detection state should be specified in parameters.coil variable.');
+elseif (~isnumeric(parameters.coil))||(~iscolumn(parameters.coil))||...
+       (size(parameters.coil,1)~=size(H,1))
+    error('parameters.coil must be a state vector of the same dimension as H.');
+end
+if ~isfield(parameters,'npoints')
+    error('point counts should be specified in parameters.npoints variable.');
+elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+       (numel(parameters.npoints)~=2)||any(~isfinite(parameters.npoints))||...
+       any(parameters.npoints<2)||any(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must contain two integer elements greater than 1.');
+end
+if ~isfield(parameters,'pulsenpoints')
+    error('chirp pulse point count should be specified in parameters.pulsenpoints variable.');
+elseif (~isnumeric(parameters.pulsenpoints))||(~isreal(parameters.pulsenpoints))||...
+       (numel(parameters.pulsenpoints)~=1)||(~isfinite(parameters.pulsenpoints))||...
+       (parameters.pulsenpoints<1)||(mod(parameters.pulsenpoints,1)~=0)
+    error('parameters.pulsenpoints must be a positive integer scalar.');
+end
+if ~isfield(parameters,'duration')
+    error('pulse duration should be specified in parameters.duration variable.');
+elseif (~isnumeric(parameters.duration))||(~isreal(parameters.duration))||...
+       (numel(parameters.duration)~=1)||(~isfinite(parameters.duration))||(parameters.duration<=0)
+    error('parameters.duration must be a positive real scalar.');
+end
+if ~isfield(parameters,'bandwidth')
+    error('pulse bandwidth should be specified in parameters.bandwidth variable.');
+elseif (~isnumeric(parameters.bandwidth))||(~isreal(parameters.bandwidth))||...
+       (numel(parameters.bandwidth)~=1)||(~isfinite(parameters.bandwidth))||(parameters.bandwidth<=0)
+    error('parameters.bandwidth must be a positive real scalar.');
+end
+if ~isfield(parameters,'smfactor')
+    error('chirp smoothing factor should be specified in parameters.smfactor variable.');
+elseif (~isnumeric(parameters.smfactor))||(~isreal(parameters.smfactor))||...
+       (numel(parameters.smfactor)~=1)||(~isfinite(parameters.smfactor))
+    error('parameters.smfactor must be a finite real scalar.');
+end
+if ~isfield(parameters,'chirptype')
+    error('chirp type should be specified in parameters.chirptype variable.');
+elseif (~ischar(parameters.chirptype))||(~ismember(parameters.chirptype,{'wurst','wurst-adaptive',...
+                                                                        'smoothed','smoothed-adaptive',...
+                                                                        'saltire','saltire-adaptive'}))
+    error('parameters.chirptype must be a supported chirp pulse type.');
+end
+if ~isfield(parameters,'beta')
+    error('flip angle should be specified in parameters.beta variable.');
+elseif (~isnumeric(parameters.beta))||(~isreal(parameters.beta))||...
+       (numel(parameters.beta)~=1)||(~isfinite(parameters.beta))
+    error('parameters.beta must be a finite real scalar.');
+end
+if ~isfield(parameters,'timestep1')
+    error('first evolution timestep should be specified in parameters.timestep1 variable.');
+elseif (~isnumeric(parameters.timestep1))||(~isreal(parameters.timestep1))||...
+       (numel(parameters.timestep1)~=1)||(~isfinite(parameters.timestep1))||(parameters.timestep1<=0)
+    error('parameters.timestep1 must be a positive real scalar.');
+end
+if ~isfield(parameters,'timestep2')
+    error('second evolution timestep should be specified in parameters.timestep2 variable.');
+elseif (~isnumeric(parameters.timestep2))||(~isreal(parameters.timestep2))||...
+       (numel(parameters.timestep2)~=1)||(~isfinite(parameters.timestep2))||(parameters.timestep2<=0)
+    error('parameters.timestep2 must be a positive real scalar.');
+end
+if ~isfield(parameters,'delta')
+    error('diffusion delay should be specified in parameters.delta variable.');
+elseif (~isnumeric(parameters.delta))||(~isreal(parameters.delta))||...
+       (numel(parameters.delta)~=1)||(~isfinite(parameters.delta))||(parameters.delta<0)
+    error('parameters.delta must be a non-negative real scalar.');
 end
 end
 
@@ -176,4 +263,3 @@ end
 % ting risk is no virtue.
 %
 % Neil Armstrong
-

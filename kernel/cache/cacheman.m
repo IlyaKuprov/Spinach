@@ -73,6 +73,15 @@ function grumble(spin_system)
 if (~isfield(spin_system,'sys'))||(~isfield(spin_system.sys,'scratch'))
     error('the spin_system object does not specify scratch location.');
 end
+if (~ischar(spin_system.sys.scratch))||isempty(spin_system.sys.scratch)
+    error('scratch location must be a character string.');
+end
+if (~isfield(spin_system,'tols'))||(~isfield(spin_system.tols,'cache_mem'))||...
+   (~isnumeric(spin_system.tols.cache_mem))||(~isreal(spin_system.tols.cache_mem))||...
+   (~isscalar(spin_system.tols.cache_mem))||(~isfinite(spin_system.tols.cache_mem))||...
+   (spin_system.tols.cache_mem<0)
+    error('spin_system.tols.cache_mem must be a finite non-negative real scalar.');
+end
 if ~exist(spin_system.sys.scratch,'dir')
     report(spin_system,'expected scratch directory location:');
     report(spin_system,spin_system.sys.scratch);
@@ -91,4 +100,3 @@ end
 % unced "Eee-sing", is almost universally mispronounced "Eye-sing".
 %
 % Barry Simon
-

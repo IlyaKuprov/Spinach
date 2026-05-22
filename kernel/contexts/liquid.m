@@ -230,4 +230,3 @@ end
 % he has committed a sacrilege.
 %
 % Ayn Rand, "The Fountainhead"
-

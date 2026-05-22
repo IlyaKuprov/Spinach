@@ -133,6 +133,14 @@ end
 if (~iscell(G))||(numel(G)<2)
     error('the G argument must be a cell array with at least two gradient operators.');
 end
+if ~isfield(parameters,'npts')
+    error('parameters.npts field must be present.');
+end
+if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
+   (~isvector(parameters.npts))||any(parameters.npts<1)||...
+   any(mod(parameters.npts,1)~=0)
+    error('parameters.npts must be a vector of positive integers.');
+end
 if ~isfield(parameters,'spins')
     error('parameters.spins field must be present.');
 end
@@ -211,4 +219,3 @@ end
 % to being, say, speech police.
 %
 % John Tooby
-

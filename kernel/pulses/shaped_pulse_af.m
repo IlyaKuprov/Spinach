@@ -263,24 +263,25 @@ if size(L0,2)~=size(rho,1)
     error('matrix dimensions of L0 and rho must agree.');
 end
 if (~isnumeric(rf_frq_list))||(~isreal(rf_frq_list))||any(~isfinite(rf_frq_list))
-    error('rf_frq_list must be a vector of real numbers.');
+    error('rf_frq_list must be a vector of finite real numbers.');
 end
 if (~isnumeric(rf_amp_list))||(~isreal(rf_amp_list))||any(~isfinite(rf_amp_list))
-    error('rf_amp_list must be a vector of real numbers.');
+    error('rf_amp_list must be a vector of finite real numbers.');
 end
-if (~isnumeric(rf_dur_list))||(~isreal(rf_dur_list))||any(~isfinite(rf_dur_list))
-    error('rf_amp_list must be a vector of real numbers.');
+if (~isnumeric(rf_dur_list))||(~isreal(rf_dur_list))||...
+   any(~isfinite(rf_dur_list))||any(rf_dur_list<=0)
+    error('rf_dur_list must be a vector of finite positive real numbers.');
 end
 if (numel(rf_frq_list)~=numel(rf_amp_list))||...
    (numel(rf_amp_list)~=numel(rf_dur_list))
     error('rf_frq_list, rf_amp_list and rf_dur_list must have the same number of elements.');
 end
 if (~isnumeric(rf_phi))||(~isreal(rf_phi))||(~isfinite(rf_phi))||(numel(rf_phi)~=1)
-    error('rf_phi must be a real number.');
+    error('rf_phi must be a finite real number.');
 end
 if (~isnumeric(max_rank))||(~isreal(max_rank))||(~isfinite(max_rank))||...
    (numel(max_rank)~=1)||(max_rank<1)||mod(max_rank,1)
-    error('max_rank must be a positive real integer.');
+    error('max_rank must be a finite positive real integer.');
 end
 if ~ischar(method)
     error('method must be a character string.');
@@ -291,4 +292,3 @@ end
 % of the puddles in the road.
 %
 % Alexander Smith
-

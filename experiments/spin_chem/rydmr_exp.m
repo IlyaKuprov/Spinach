@@ -133,6 +133,12 @@ end
 if spin_system.inter.magnet~=1
     error('unit magnet specification (sys.magnet=1) is required for field sweep experiments.');
 end
+if ~isfield(parameters,'needs')
+    error('parameters.needs must be specified.');
+end
+if (~iscell(parameters.needs))||any(~cellfun(@ischar,parameters.needs))
+    error('parameters.needs must be a cell array of character strings.');
+end
 if ~ismember('zeeman_op',parameters.needs)
     error('this function requires a separate Zeeman operator, add ''zeeman_op'' to parameters.needs'); 
 end
@@ -145,7 +151,8 @@ end
 if ~isfield(parameters,'rates')
     error('singlet recombination rates must be supplied in parameters.rates variable.');
 end
-if (~isnumeric(parameters.rates))||(~isreal(parameters.rates))||any(parameters.rates<0)
+if (~isnumeric(parameters.rates))||(~isreal(parameters.rates))||...
+   any(parameters.rates<=0)
     error('parameters.rates must be a vector of positive real numbers.');
 end
 if ~isfield(parameters,'electrons')
@@ -169,4 +176,3 @@ end
 % fools.
 %
 % Douglas Adams
-

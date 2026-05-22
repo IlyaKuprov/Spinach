@@ -359,7 +359,9 @@ if ~ischar(assumptions)
 end
 
 % Active spins
-if isempty(parameters.spins)
+if ~isfield(parameters,'spins')
+    error('working spins must be specified in parameters.spins field.');
+elseif isempty(parameters.spins)
     error('parameters.spins variable cannot be empty.');
 elseif ~iscell(parameters.spins)
     error('parameters.spins variable must be a cell array.');
@@ -430,4 +432,3 @@ end
 % No. Altruism says: Yes.
 %
 % Ayn Rand
-

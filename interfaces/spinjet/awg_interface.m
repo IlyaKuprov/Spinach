@@ -113,7 +113,7 @@ end
 if ismember(awg_cmd,{'acquire_data'}) && numel(cmd_input)~=3
     error('cmd_input should contain 3 strings when acquire_data is used')
 end
-if ismember(awg_cmd,{'modify_pspel_defs'}) && (numel(cmd_input)<2 || mod(numel(cmd_inputs),2)~=0)
+if ismember(awg_cmd,{'modify_pspel_defs'}) && (numel(cmd_input)<2 || mod(numel(cmd_input),2)~=0)
     error('must provide input cell array of even number of elements to modify definitions')
 end
 if ismember(awg_cmd,{'compile_pspel_exp'}) && numel(cmd_input)~=1
@@ -138,4 +138,3 @@ end
 % If you want to help a fool - you are a fool too.
 %
 % A Russian saying
-

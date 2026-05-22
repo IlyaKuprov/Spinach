@@ -364,10 +364,18 @@ for n=1:numel(controls)
 end
 if (~isnumeric(slice_durs))||(~isreal(slice_durs))||...
      any(~isfinite(slice_durs),'all')||any(slice_durs<0,'all')
-    error('slice_durs must be a vector of non-negative real numbers.');
+    error('slice_durs must be a vector of finite non-negative real numbers.');
+end
+if (~ischar(method))||(~ismember(method,{'expv-pwc','expv-pwl',...
+                                         'expm-pwc','expm-pwl',...
+                                         'evol-pwc','evol-pwl'}))
+    error('method must be a supported propagation method string.');
 end
 if (~iscell(amplitudes))||isempty(amplitudes)
     error('amplitudes must be a cell array of vectors.');
+end
+if numel(amplitudes)~=numel(controls)
+    error('amplitudes must have one element per control operator.');
 end
 for n=1:numel(amplitudes)
     if ~isnumeric(amplitudes{n})
@@ -398,4 +406,3 @@ end
 % PTCL Teaching Lab, but the photographs of the resulting fibre tip
 % were left on Peter's table on Monday. The paper was accepted by 
 % JMR without revisions.
-

@@ -213,9 +213,35 @@ end
 if ~iscell(winfuns)
     error('winfuns must be a cell array.');
 end
+rel_dims=true(1,ndims(fid));
+rel_dims(size(fid)<2)=false();
+rel_dims=find(rel_dims);
+if (~isempty(rel_dims))&&(numel(winfuns)<max(rel_dims))
+    error('winfuns must cover all non-singleton dimensions of fid.');
+end
+if numel(winfuns)>ndims(fid)
+    error('winfuns must not have more elements than fid has dimensions.');
+end
 for n=1:numel(winfuns)
     if ~iscell(winfuns{n})
         error('elements of winfuns must be cell arrays.');
+    end
+    if isempty(winfuns{n})
+        continue;
+    end
+    if (~ischar(winfuns{n}{1}))||...
+       (~ismember(winfuns{n}{1},{'none','crisp','exp','gauss','cos','sin',...
+                                  'sqcos','sqsin','kaiser','bad-z1','bad-z2'}))
+        error('window function type is not supported.');
+    end
+    if ismember(winfuns{n}{1},{'exp','gauss','kaiser','bad-z1','bad-z2'})
+        if (numel(winfuns{n})~=2)||(~isnumeric(winfuns{n}{2}))||...
+           (~isreal(winfuns{n}{2}))||(~isscalar(winfuns{n}{2}))||...
+           (~isfinite(winfuns{n}{2}))
+            error('window function parameter must be a finite real scalar.');
+        end
+    elseif numel(winfuns{n})~=1
+        error('this window function does not take parameters.');
     end
 end
 end
@@ -224,4 +250,3 @@ end
 % know how I am to arrive at them.
 % 
 % Carl Friedrich Gauss
-

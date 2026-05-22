@@ -193,5 +193,7 @@ if ~isfield(parameters,'delta_sml')
 elseif numel(parameters.delta_sml)~=1
     error('parameters.delta_sml array should have exactly one element.');
 end
+if parameters.delta_big<=parameters.delta_sml+parameters.rf_dur
+    error('parameters.delta_big must exceed parameters.delta_sml+parameters.rf_dur.');
 end
-
+end

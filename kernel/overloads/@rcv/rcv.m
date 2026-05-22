@@ -147,12 +147,43 @@ end
 
 % Consistency enforcement
 function grumble(varargin)
-
-% Needs some thought
-
+if nargin==1
+    if (~isa(varargin{1},'rcv'))&&((~isnumeric(varargin{1}))||(~ismatrix(varargin{1})))
+        error('single input must be a numeric matrix or an RCV sparse matrix.');
+    end
+elseif nargin==2
+    if (~isnumeric(varargin{1}))||(~isreal(varargin{1}))||(~isscalar(varargin{1}))||...
+       (~isfinite(varargin{1}))||(varargin{1}<0)||(mod(varargin{1},1)~=0)||...
+       (~isnumeric(varargin{2}))||(~isreal(varargin{2}))||(~isscalar(varargin{2}))||...
+       (~isfinite(varargin{2}))||(varargin{2}<0)||(mod(varargin{2},1)~=0)
+        error('matrix dimensions must be non-negative integer scalars.');
+    end
+elseif nargin==5
+    if (~isnumeric(varargin{1}))||(~isreal(varargin{1}))||any(~isfinite(varargin{1}(:)))||...
+       (~isnumeric(varargin{2}))||(~isreal(varargin{2}))||any(~isfinite(varargin{2}(:)))||...
+       (~isnumeric(varargin{3}))
+        error('row indices, column indices, and values must be numeric arrays.');
+    end
+    if (numel(varargin{1})~=numel(varargin{2}))||...
+       (numel(varargin{2})~=numel(varargin{3}))
+        error('row indices, column indices, and values must have the same number of elements.');
+    end
+    if (~isnumeric(varargin{4}))||(~isreal(varargin{4}))||(~isscalar(varargin{4}))||...
+       (~isfinite(varargin{4}))||(varargin{4}<0)||(mod(varargin{4},1)~=0)||...
+       (~isnumeric(varargin{5}))||(~isreal(varargin{5}))||(~isscalar(varargin{5}))||...
+       (~isfinite(varargin{5}))||(varargin{5}<0)||(mod(varargin{5},1)~=0)
+        error('matrix dimensions must be non-negative integer scalars.');
+    end
+    if any(varargin{1}(:)<1)||any(varargin{1}(:)>varargin{4})||...
+       any(varargin{2}(:)<1)||any(varargin{2}(:)>varargin{5})||...
+       any(mod(varargin{1}(:),1)~=0)||any(mod(varargin{2}(:),1)~=0)
+        error('row and column indices must be positive integers within matrix dimensions.');
+    end
+else
+    error('incorrect number of input arguments.');
+end
 end
 
 % There are weeks when decades happen.
 %
 % Vladimir Lenin
-

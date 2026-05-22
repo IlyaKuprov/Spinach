@@ -24,7 +24,7 @@
 function [vec,cov]=svd_shrink(spin_system,rho,tol)
 
 % Check consistency
-grumble(rho);
+grumble(rho,tol);
 
 % Run the singular value decomposition
 [vec,S,cov]=svd(full(rho)); S=diag(S);
@@ -46,9 +46,13 @@ cov=cov*diag(sqrt(S));
 end
 
 % Consistency enforcement
-function grumble(rho)
+function grumble(rho,tol)
 if (~isnumeric(rho))||(size(rho,1)~=size(rho,2))
     error('rho must be a square matrix.');
+end
+if (~isnumeric(tol))||(~isreal(tol))||(~isscalar(tol))||...
+   (~isfinite(tol))||(tol<0)
+    error('tol must be a finite non-negative real scalar.');
 end
 end
 
@@ -57,4 +61,3 @@ end
 % thing to grasp. Conflict goes with the territory.
 %
 % Andrew Oswald
-

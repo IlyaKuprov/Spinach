@@ -176,6 +176,7 @@ end
 
 % Consistency enforcement
 function grumble(spectrum,parameters,stack_dim)
+
 if (~isnumeric(spectrum))||(~ismatrix(spectrum))
     error('spectrum must be a matrix.');
 end
@@ -199,6 +200,8 @@ if ~ischar(parameters.axis_units)
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
+elseif isempty(parameters.spins)
+    error('parameters.spins variable cannot be empty.');
 end
 if ~iscell(parameters.spins)
     error('parameters.spins should be a cell array of character strings.');
@@ -220,4 +223,3 @@ end
 % insist on being equal.
 %
 % Friedrich Nietzsche
-

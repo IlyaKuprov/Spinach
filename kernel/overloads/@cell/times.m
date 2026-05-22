@@ -29,7 +29,11 @@ if iscell(A)&&isnumeric(B)
     
     % Multiply every cell from the left
     for n=1:numel(A)
-        A{n}=A{n}*B(n);
+        if isscalar(B)
+            A{n}=A{n}*B;
+        else
+            A{n}=A{n}*B(n);
+        end
     end
     C=A;
     
@@ -37,7 +41,11 @@ elseif isnumeric(A)&&iscell(B)
     
     % Multiply every cell from the right
     for n=1:numel(B)
-        B{n}=A(n)*B{n};
+        if isscalar(A)
+            B{n}=A*B{n};
+        else
+            B{n}=A(n)*B{n};
+        end
     end
     C=B;
     
@@ -58,7 +66,13 @@ end
 if (~iscell(B))&&(~isnumeric(B))
     error('B must be either numeric or a cell array.');
 end
-if ~all(size(A)==size(B),'all')
+if iscell(A)&&iscell(B)
+    error('both arguments cannot be cell arrays.');
+end
+if iscell(A)&&isnumeric(B)&&(~isscalar(B))&&(~isequal(size(A),size(B)))
+    error('the array of scalars and the cell array must have the same dimensions.');
+end
+if isnumeric(A)&&iscell(B)&&(~isscalar(A))&&(~isequal(size(A),size(B)))
     error('the array of scalars and the cell array must have the same dimensions.');
 end
 end
@@ -67,4 +81,3 @@ end
 % by their intentions rather than their results.
 %
 % Milton Friedman
-

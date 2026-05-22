@@ -132,6 +132,8 @@ if ~ischar(parameters.axis_units)
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
+elseif isempty(parameters.spins)
+    error('parameters.spins variable cannot be empty.');
 end
 if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)
     error('parameters.spins must be a cell array with exactly one element.');
@@ -150,4 +152,3 @@ end
 % The only sin on earth is to do things badly.
 %
 % Ayn Rand
-

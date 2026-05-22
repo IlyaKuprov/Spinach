@@ -485,6 +485,9 @@ function grumble(LTM,rho_a,dt)
 if ~iscell(LTM)
     error('second input must be a cell array.');
 end
+if numel(LTM)~=3
+    error('second input must contain a generator, a time, and a method.');
+end
 if ~isa(LTM{1},'function_handle')
     error('evolution generator must be a function handle.');
 end
@@ -493,6 +496,10 @@ if (~isnumeric(LTM{2}))||(~isscalar(LTM{2}))
 end
 if ~ischar(LTM{3})
     error('method must be a character string.')
+end
+if ~ismember(LTM{3},{'PWCL','LG2','LG4','LG4A','RKMK4','RKMK-DP5',...
+                    'RKMK-DP8','RKMK-RKF45'})
+    error('method is not supported.')
 end
 if (~isnumeric(dt))||(~isnumeric(rho_a))
     error('rho_a and dt must be numeric.');
@@ -507,4 +514,3 @@ end
 % they didn't look capable of doing either.
 %
 % Ronald Reagan
-

@@ -192,6 +192,7 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,spectrum,parameters,ncont,delta,k,ncol,m,signs) %#ok<INUSL>
+
 if (~isnumeric(spectrum))||(~ismatrix(spectrum))
     error('spectrum must be a matrix.');
 end
@@ -215,6 +216,8 @@ if ~ischar(parameters.axis_units)
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
+elseif isempty(parameters.spins)
+    error('parameters.spins variable cannot be empty.');
 end
 if ~iscell(parameters.spins)
     error('parameters.spins should be a cell array of character strings.');
@@ -251,5 +254,4 @@ end
 % dreadful of deaths, whereas those who kill him risk nothing except
 % promotion.
 %
-% Albert Camus 
-
+% Albert Camus

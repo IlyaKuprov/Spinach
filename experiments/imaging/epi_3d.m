@@ -8,7 +8,7 @@
 %  parameters.image_size    -  number of points in each dimension of
 %                              the resulting image
 %
-%  parameters.ss_grad_amp   -  the amplitude of slice selection 
+%  parameters.ss_grad_amp   -  the amplitude of slice selection
 %                              gradient,T/m
 %
 %  parameters.pe_grad_amp   -  phase encoding gradient amplitude, T/m
@@ -194,43 +194,139 @@ if (~all(size(H)==size(R)))||...
    (~all(size(K)==size(F)))
     error('H,R,K,F matrices must have the same dimension.');
 end
-if ~iscell(G)
-    error('the G argument must be a cell array.');
+if (~iscell(G))||(numel(G)<3)
+    error('the G argument must be a cell array with at least three gradient operators.');
+end
+if (~isnumeric(G{1}))||(~isnumeric(G{2}))||(~isnumeric(G{3}))||...
+   (~ismatrix(G{1}))||(~ismatrix(G{2}))||(~ismatrix(G{3}))
+    error('gradient operators must be numeric matrices.');
+end
+if (~all(size(G{1})==size(H)))||...
+   (~all(size(G{2})==size(H)))||...
+   (~all(size(G{3})==size(H)))
+    error('gradient operators must have the same dimension as H.');
+end
+if ~isfield(parameters,'rho0')
+    error('parameters.rho0 field must be present.');
+end
+if (~isnumeric(parameters.rho0))||(~iscolumn(parameters.rho0))||...
+   (size(parameters.rho0,1)~=size(H,1))
+    error('parameters.rho0 must be a state vector of the same dimension as H.');
+end
+if ~isfield(parameters,'coil')
+    error('parameters.coil field must be present.');
+end
+if (~isnumeric(parameters.coil))||(~iscolumn(parameters.coil))||...
+   (size(parameters.coil,1)~=size(H,1))
+    error('parameters.coil must be a state vector of the same dimension as H.');
+end
+if ~isfield(parameters,'npts')
+    error('parameters.npts field must be present.');
+end
+if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
+   (~isvector(parameters.npts))||(numel(parameters.npts)~=3)||...
+   any(~isfinite(parameters.npts))||any(parameters.npts<1)||...
+   any(mod(parameters.npts,1)~=0)
+    error('parameters.npts must be a vector of three finite positive real integers.');
+end
+if ~isfield(parameters,'dims')
+    error('parameters.dims field must be present.');
+end
+if (~isnumeric(parameters.dims))||(~isreal(parameters.dims))||...
+   (~isvector(parameters.dims))||(numel(parameters.dims)~=3)||...
+   any(~isfinite(parameters.dims))||any(parameters.dims<=0)
+    error('parameters.dims must be a vector with three finite positive real numbers.');
+end
+if ~isfield(parameters,'image_size')
+    error('parameters.image_size field must be present.');
+end
+if (~isnumeric(parameters.image_size))||(~isreal(parameters.image_size))||...
+   (~isvector(parameters.image_size))||(numel(parameters.image_size)~=2)||...
+   any(~isfinite(parameters.image_size))||any(parameters.image_size<2)||...
+   any(mod(parameters.image_size,1)~=0)
+    error('parameters.image_size must be a vector of two finite real integers greater than one.');
+end
+if ~isfield(parameters,'rf_frq_list')
+    error('parameters.rf_frq_list field must be present.');
+end
+if (~isnumeric(parameters.rf_frq_list))||(~isreal(parameters.rf_frq_list))||...
+   (~isvector(parameters.rf_frq_list))||any(~isfinite(parameters.rf_frq_list))
+    error('parameters.rf_frq_list must be a finite real vector.');
+end
+if ~isfield(parameters,'rf_amp_list')
+    error('parameters.rf_amp_list field must be present.');
+end
+if (~isnumeric(parameters.rf_amp_list))||(~isreal(parameters.rf_amp_list))||...
+   (~isvector(parameters.rf_amp_list))||any(~isfinite(parameters.rf_amp_list))
+    error('parameters.rf_amp_list must be a finite real vector.');
+end
+if ~isfield(parameters,'rf_dur_list')
+    error('parameters.rf_dur_list field must be present.');
+end
+if (~isnumeric(parameters.rf_dur_list))||(~isreal(parameters.rf_dur_list))||...
+   (~isvector(parameters.rf_dur_list))||any(~isfinite(parameters.rf_dur_list))||...
+   any(parameters.rf_dur_list<=0)
+    error('parameters.rf_dur_list must be a finite positive real vector.');
+end
+if ~isfield(parameters,'rf_phi')
+    error('parameters.rf_phi field must be present.');
+end
+if (~isnumeric(parameters.rf_phi))||(~isreal(parameters.rf_phi))||...
+   (~isscalar(parameters.rf_phi))||(~isfinite(parameters.rf_phi))
+    error('parameters.rf_phi must be a finite real scalar.');
+end
+if (numel(parameters.rf_frq_list)~=numel(parameters.rf_amp_list))||...
+   (numel(parameters.rf_amp_list)~=numel(parameters.rf_dur_list))
+    error('parameters.rf_frq_list, parameters.rf_amp_list, and parameters.rf_dur_list must have the same number of elements.');
 end
 if ~isfield(parameters,'t_echo')
     error('echo time must be specified in parameters.t_echo field.');
 end
 if (~isnumeric(parameters.t_echo))||(~isreal(parameters.t_echo))||...
-   (~isscalar(parameters.t_echo))||(parameters.t_echo<=0)
-    error('parameters.t_echo must be a positive real scalar.');
+   (~isscalar(parameters.t_echo))||(~isfinite(parameters.t_echo))||(parameters.t_echo<=0)
+    error('parameters.t_echo must be a finite positive real scalar.');
 end
 if ~isfield(parameters,'ro_grad_dur')
     error('the frequency encoding gradient duration must be specified in parameters.ro_grad_dur field.');
 end
 if (~isnumeric(parameters.ro_grad_dur))||(~isreal(parameters.ro_grad_dur))||...
-   (~isscalar(parameters.ro_grad_dur))||(parameters.ro_grad_dur<=0)
-    error('parameters.ro_grad_dur must be a positive real scalar.');
+   (~isscalar(parameters.ro_grad_dur))||(~isfinite(parameters.ro_grad_dur))||...
+   (parameters.ro_grad_dur<=0)
+    error('parameters.ro_grad_dur must be a finite positive real scalar.');
 end
 if ~isfield(parameters,'pe_grad_dur')
-    error('the phase encoding gradient duration must be specified in parameters.grad_dur field.');
+    error('the phase encoding gradient duration must be specified in parameters.pe_grad_dur field.');
 end
 if (~isnumeric(parameters.pe_grad_dur))||(~isreal(parameters.pe_grad_dur))||...
-   (~isscalar(parameters.pe_grad_dur))||(parameters.pe_grad_dur<=0)
-    error('parameters.pe_grad_dur must be a positive real scalar.');
+   (~isscalar(parameters.pe_grad_dur))||(~isfinite(parameters.pe_grad_dur))||...
+   (parameters.pe_grad_dur<=0)
+    error('parameters.pe_grad_dur must be a finite positive real scalar.');
 end
 if ~isfield(parameters,'ro_grad_amp')
     error('readout gradient amplitude must be specified in parameters.ro_grad_amp field.');
 end
 if (~isnumeric(parameters.ro_grad_amp))||(~isreal(parameters.ro_grad_amp))||...
-   (~isscalar(parameters.ro_grad_amp))
-    error('parameters.ro_grad_amp must be a real scalar.');
+   (~isscalar(parameters.ro_grad_amp))||(~isfinite(parameters.ro_grad_amp))
+    error('parameters.ro_grad_amp must be a finite real scalar.');
 end
 if ~isfield(parameters,'pe_grad_amp')
     error('phase encoding gradient amplitude must be specified in parameters.pe_grad_amp field.');
 end
 if (~isnumeric(parameters.pe_grad_amp))||(~isreal(parameters.pe_grad_amp))||...
-   (~isscalar(parameters.pe_grad_amp))
-    error('parameters.pe_grad_amp must be a real scalar.');
+   (~isscalar(parameters.pe_grad_amp))||(~isfinite(parameters.pe_grad_amp))
+    error('parameters.pe_grad_amp must be a finite real scalar.');
+end
+if ~isfield(parameters,'ss_grad_amp')
+    error('slice selection gradient amplitude must be specified in parameters.ss_grad_amp field.');
+end
+if (~isnumeric(parameters.ss_grad_amp))||(~isreal(parameters.ss_grad_amp))||...
+   (~isscalar(parameters.ss_grad_amp))||(~isfinite(parameters.ss_grad_amp))
+    error('parameters.ss_grad_amp must be a finite real scalar.');
+end
+if isfield(parameters,'diff_g_amp')&&((~isnumeric(parameters.diff_g_amp))||...
+   (~isreal(parameters.diff_g_amp))||(~isvector(parameters.diff_g_amp))||...
+   (numel(parameters.diff_g_amp)~=3)||any(~isfinite(parameters.diff_g_amp)))
+    error('parameters.diff_g_amp must be a vector with three finite real numbers.');
 end
 end
 
@@ -239,4 +335,3 @@ end
 % ded from prison officers.
 %
 % Clive James
-

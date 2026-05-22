@@ -125,40 +125,83 @@ if (~all(size(H)==size(R)))||...
    (~all(size(K)==size(F)))
     error('H,R,K,F matrices must have the same dimension.');
 end
-if ~iscell(G)
-    error('the G argument must be a cell array.');
+if (~iscell(G))||(numel(G)<2)
+    error('the G argument must be a cell array with at least two gradient operators.');
+end
+if (~isnumeric(G{1}))||(~isnumeric(G{2}))||...
+   (~ismatrix(G{1}))||(~ismatrix(G{2}))
+    error('gradient operators must be numeric matrices.');
+end
+if (~all(size(G{1})==size(H)))||(~all(size(G{2})==size(H)))
+    error('gradient operators must have the same dimension as H.');
+end
+if ~isfield(parameters,'spins')
+    error('parameters.spins field must be present.');
+end
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||(~ischar(parameters.spins{1}))
+    error('parameters.spins must be a cell array containing one spin name.');
+end
+if ~isfield(parameters,'npts')
+    error('parameters.npts field must be present.');
+end
+if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
+   (~isvector(parameters.npts))||any(~isfinite(parameters.npts))||...
+   any(parameters.npts<1)||any(mod(parameters.npts,1)~=0)
+    error('parameters.npts must be a vector of finite positive real integers.');
+end
+if ~isfield(parameters,'rho0')
+    error('parameters.rho0 field must be present.');
+end
+if (~isnumeric(parameters.rho0))||(~iscolumn(parameters.rho0))||...
+   (size(parameters.rho0,1)~=size(H,1))
+    error('parameters.rho0 must be a state vector of the same dimension as H.');
+end
+if ~isfield(parameters,'coil')
+    error('parameters.coil field must be present.');
+end
+if (~isnumeric(parameters.coil))||(~iscolumn(parameters.coil))||...
+   (size(parameters.coil,1)~=size(H,1))
+    error('parameters.coil must be a state vector of the same dimension as H.');
 end
 if ~isfield(parameters,'t_echo')
     error('echo time must be specified in parameters.t_echo field.');
 end
 if (~isnumeric(parameters.t_echo))||(~isreal(parameters.t_echo))||...
-   (~isscalar(parameters.t_echo))||(parameters.t_echo<=0)
-    error('parameters.t_echo must be a positive real scalar.');
+   (~isscalar(parameters.t_echo))||(~isfinite(parameters.t_echo))||(parameters.t_echo<=0)
+    error('parameters.t_echo must be a finite positive real scalar.');
 end
 if ~isfield(parameters,'spiral_frq')
     error('spiral frequency must be specified in parameters.spiral_frq field.');
 end
 if (~isnumeric(parameters.spiral_frq))||(~isreal(parameters.spiral_frq))||...
-   (~isscalar(parameters.spiral_frq))
-    error('parameters.spiral_frq must be a real scalar.');
+   (~isscalar(parameters.spiral_frq))||(~isfinite(parameters.spiral_frq))
+    error('parameters.spiral_frq must be a finite real scalar.');
 end
 if ~isfield(parameters,'spiral_dur')
     error('spiral duration must be specified in parameters.spiral_dur field.');
 end
 if (~isnumeric(parameters.spiral_dur))||(~isreal(parameters.spiral_dur))||...
-   (~isscalar(parameters.spiral_dur))||(parameters.spiral_dur<=0)
-    error('parameters.spiral_dur must be a positive real scalar.');
+   (~isscalar(parameters.spiral_dur))||(~isfinite(parameters.spiral_dur))||...
+   (parameters.spiral_dur<=0)
+    error('parameters.spiral_dur must be a finite positive real scalar.');
 end
 if ~isfield(parameters,'grad_amp')
     error('gradient amplitude must be specified in parameters.grad_amp field.');
 end
 if (~isnumeric(parameters.grad_amp))||(~isreal(parameters.grad_amp))||...
-   (~isscalar(parameters.grad_amp))
-    error('parameters.grad_amp must be a real scalar.');
+   (~isscalar(parameters.grad_amp))||(~isfinite(parameters.grad_amp))
+    error('parameters.grad_amp must be a finite real scalar.');
+end
+if ~isfield(parameters,'spiral_npts')
+    error('number of spiral points must be specified in parameters.spiral_npts field.');
+end
+if (~isnumeric(parameters.spiral_npts))||(~isreal(parameters.spiral_npts))||...
+   (~isscalar(parameters.spiral_npts))||(~isfinite(parameters.spiral_npts))||...
+   (parameters.spiral_npts<1)||(mod(parameters.spiral_npts,1)~=0)
+    error('parameters.spiral_npts must be a finite positive real integer.');
 end
 end
 
 % According to a local legend at Oxford's Magdalen College, during the
 % the Second World War meat shortages, the College's deer were reclass-
 % ified as vegetables to avoid requisition by the Ministry of Food.
-

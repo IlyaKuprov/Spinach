@@ -382,6 +382,9 @@ end
 
 % Consistency enforcement
 function grumble(filename,options)
+if (~ischar(filename))||isempty(filename)
+    error('filename must be a non-empty character string.');
+end
 if ~exist(filename,'file')
     error('the file specified was not found.');
 end
@@ -396,4 +399,3 @@ end
 % Moral indignation is jealousy with a halo.
 % 
 % H.G. Wells
-

@@ -163,20 +163,21 @@ function grumble(n_rotor_periods,n_blocks_per_period,phase_factor,...
 if (~isnumeric(n_rotor_periods))||(~isreal(n_rotor_periods))||...
    (~isscalar(n_rotor_periods))||(mod(n_rotor_periods,1)~=0)||...
    (n_rotor_periods<1)
-    error('n_rotor_periods must be a positive real scalar.');
+    error('n_rotor_periods must be a positive real integer.');
 end
 if (~isnumeric(n_blocks_per_period))||(~isreal(n_blocks_per_period))||...
    (~isscalar(n_blocks_per_period))||(mod(n_blocks_per_period,1)~=0)||...
    (n_blocks_per_period<1)
-    error('n_blocks_per_period must be a positive real scalar.');
+    error('n_blocks_per_period must be a positive real integer.');
 end
 if (~isnumeric(n_cycle_repeats))||(~isreal(n_cycle_repeats))||...
    (~isscalar(n_cycle_repeats))||(mod(n_cycle_repeats,1)~=0)||...
    (n_cycle_repeats<1)
-    error('n_cycle_repeats must be a positive real scalar.');
+    error('n_cycle_repeats must be a positive real integer.');
 end
-if (~isnumeric(mas_rate))||(~isreal(mas_rate))||(~isscalar(mas_rate))
-    error('mas_rate must be a real scalar.');
+if (~isnumeric(mas_rate))||(~isreal(mas_rate))||(~isscalar(mas_rate))||...
+   (~isfinite(mas_rate))||(mas_rate<=0)
+    error('mas_rate must be a finite positive real scalar.');
 end
 if (~isnumeric(phase_factor))||(~isreal(phase_factor))||...
    (~isscalar(phase_factor))
@@ -193,4 +194,3 @@ end
 % Effortlessness is hard.
 %
 % Sarah Sands
-

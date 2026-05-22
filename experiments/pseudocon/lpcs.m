@@ -103,25 +103,29 @@ end
 
 % Consistency enforcement
 function grumble(nxyz,mxyz,L,Ilm,chi)
-if (~isnumeric(nxyz))||(~isreal(nxyz))||(size(nxyz,2)~=3)
-    error('nxyz must be an Nx3 array of atomic coordinates.');
+if (~isnumeric(nxyz))||(~isreal(nxyz))||any(~isfinite(nxyz(:)))||(size(nxyz,2)~=3)
+    error('nxyz must be an Nx3 array of finite real atomic coordinates.');
 end
-if (~isnumeric(mxyz))||(size(mxyz,2)~=3)||(size(mxyz,1)~=1)||(~isreal(mxyz))
-    error('mxyz parameter should be a real row vector with three elements.');
+if (~isnumeric(mxyz))||(size(mxyz,2)~=3)||(size(mxyz,1)~=1)||...
+   (~isreal(mxyz))||any(~isfinite(mxyz(:)))
+    error('mxyz must be a finite real row vector with three elements.');
 end
-if (~isnumeric(L))||(~isreal(L))
-    error('L must be a real vector.');
+if (~isnumeric(L))||(~isreal(L))||(~isvector(L))||any(~isfinite(L(:)))||...
+   any(L(:)<0)||any(mod(L(:),1)~=0)
+    error('L must be a vector of finite non-negative real integers.');
 end
-if (~isnumeric(chi))||(~isreal(chi))
-    error('chi should be a real');
+if (~isnumeric(chi))||(~isreal(chi))||any(~isfinite(chi(:)))||...
+   (~isequal(size(chi),[3 3])&&(~isvector(chi)||numel(chi)~=5))
+    error('chi must be a finite real 3x3 matrix or five-element vector.');
 end
 if (~iscell(Ilm))||(numel(Ilm)~=numel(L))
-    error('Ilm should be a vell array of the same size as L')
+    error('Ilm should be a cell array of the same size as L.');
 end
 for n=1:numel(L)
     l=L(n);
-    if (size(Ilm{n})~=(2*l+1))
-        error('Ilm{n} should have 2*L(n)+1 elements')
+    if (~isnumeric(Ilm{n}))||(~isreal(Ilm{n}))||any(~isfinite(Ilm{n}(:)))||...
+       (numel(Ilm{n})~=(2*l+1))
+        error('Ilm{n} must be a finite real vector with 2*L(n)+1 elements.');
     end
 end
 end
@@ -131,4 +135,3 @@ end
 % thing that was tested and found working, is working.
 %
 % Unknown source
-

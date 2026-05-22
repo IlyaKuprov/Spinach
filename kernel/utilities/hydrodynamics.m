@@ -121,7 +121,7 @@ end
 if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
    (numel(parameters.npts)<1)||(numel(parameters.npts)>3)||...
    (size(parameters.npts,1)~=1)||any(mod(parameters.npts,1))
-    error('parameters.dims must be a 1, 2, or 3-element row vector of positive real numbers.');
+    error('parameters.npts must be a 1, 2, or 3-element row vector of real integers.');
 end
 if numel(parameters.npts)~=numel(parameters.dims)
     error('parameters.dims and parameters.npts must have the same number of elements.');
@@ -136,8 +136,12 @@ if (~ischar(parameters.deriv{1}))||(~ismember(parameters.deriv{1},{'period','fou
     error('the first element of parameters.deriv must be ''period'' or ''fourier''.');
 end
 if strcmp(parameters.deriv{1},'period')
+    if numel(parameters.deriv)~=2
+        error('periodic differentiation requires a stencil size in the second element of parameters.deriv.');
+    end
     if (~isnumeric(parameters.deriv{2}))||(~isreal(parameters.deriv{2}))||...
-       (numel(parameters.deriv{2})~=1)||mod(parameters.deriv{2},1)
+       (numel(parameters.deriv{2})~=1)||mod(parameters.deriv{2},1)||...
+       (parameters.deriv{2}<1)
         error('stencil size in the second element of parameters.deriv must be a positive integer.');
     end
     if parameters.deriv{2}>7
@@ -158,4 +162,3 @@ end
 % blowing forlornly in the direction indicated.
 %
 % Viktor Shenderovich
-

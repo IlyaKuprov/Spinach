@@ -140,17 +140,38 @@ end
 if (numel(parameters.offset)~=2)
     error('parameters.offset array should have two elements.');
 end
-if ~isfield(parameters,'deltat')  
-    error('the time step of the acquisition gradient should be specified in the parameters.deltat variable.');  
+if ~isfield(parameters,'deltat')
+    error('the time step of the acquisition gradient should be specified in the parameters.deltat variable.');
 end
-if ~isfield(parameters,'npoints')  
-    error('the number of points in the acquisition gradient should be specified in the parameters.npoints variable.');  
+if ~isfield(parameters,'npoints')
+    error('the number of points in the acquisition gradient should be specified in the parameters.npoints variable.');
 end
-if ~isfield(parameters,'Ga')  
-    error('the amplitude of the acquisition gradient should be specified in the parameters.Ga variable.');  
+if ~isfield(parameters,'nloops')
+    error('the number of acquisition loops should be specified in the parameters.nloops variable.');
+end
+if ~isfield(parameters,'Te')
+    error('the echo time should be specified in the parameters.Te variable.');
+end
+if ~isfield(parameters,'axis_units')
+    error('axis units should be specified in the parameters.axis_units variable.');
+end
+if ~isfield(parameters,'Ga')
+    error('the amplitude of the acquisition gradient should be specified in the parameters.Ga variable.');
 end
 if ~isfield(parameters,'dims')  
     error('the sample dimension should be specified in the parameters.dims variable.');  
+end
+if (~isnumeric(parameters.nloops))||(~isreal(parameters.nloops))||...
+   (~isscalar(parameters.nloops))||(~isfinite(parameters.nloops))||...
+   (parameters.nloops<1)||(mod(parameters.nloops,1)~=0)
+    error('parameters.nloops must be a finite positive real integer.');
+end
+if (~isnumeric(parameters.Te))||(~isreal(parameters.Te))||...
+   (~isscalar(parameters.Te))||(~isfinite(parameters.Te))||(parameters.Te<=0)
+    error('parameters.Te must be a finite positive real scalar.');
+end
+if (~ischar(parameters.axis_units))||(~ismember(parameters.axis_units,{'ppm','Hz'}))
+    error('parameters.axis_units must be ''ppm'' or ''Hz''.');
 end
 end
 
@@ -160,4 +181,3 @@ end
 % Gill Reid (Head of Department), 
 % to IK when he asked for a sabba-
 % tical to write his book
-

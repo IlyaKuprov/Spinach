@@ -135,8 +135,10 @@ elseif (~isnumeric(parameters.max_rank))||(~isreal(parameters.max_rank))||...
 end
 if ~isfield(parameters,'rate')
     error('parameters.rate subfield must be present.');
-elseif (~isnumeric(parameters.rate))||(~isreal(parameters.rate))
-    error('parameters.rate must be a real number.');
+elseif (~isnumeric(parameters.rate))||(~isreal(parameters.rate))||...
+       (~isscalar(parameters.rate))||(~isfinite(parameters.rate))||...
+       (parameters.rate<=0)
+    error('parameters.rate must be a positive real scalar.');
 end
 if ~isfield(parameters,'axis')
     error('parameters.axis subfield must be present.');
@@ -199,4 +201,3 @@ end
 % everything you need. 
 %
 % Marcus Tullius Cicero
-

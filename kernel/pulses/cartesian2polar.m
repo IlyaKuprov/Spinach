@@ -171,8 +171,9 @@ elseif nargin==8
         error('all input vectors must have the same dimension.');
     end
     if (size(Dxx,2)~=length(Dx))||(size(Dxx,1)~=size(Dxx,2))||...
-        all(size(Dxx)~=size(Dyy))||all(size(Dyy)~=size(Dxy))||...
-        all(size(Dxy)~=size(Dyx))
+        (~isequal(size(Dxx),size(Dyy)))||...
+        (~isequal(size(Dyy),size(Dxy)))||...
+        (~isequal(size(Dxy),size(Dyx)))
         error('all input matrices must have the same, square dimensions.');
     end
 end
@@ -181,4 +182,3 @@ end
 % Beware of geeks bearing formulas.
 %
 % Warren Buffett
-

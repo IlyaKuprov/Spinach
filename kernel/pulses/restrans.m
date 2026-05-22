@@ -57,7 +57,7 @@
 function [X,Y,dt]=restrans(X_user,Y_user,dt_user,omega,Q,model,up_factor)
 
 % Check consistency
-grumble(X_user,Y_user,dt_user,omega,Q)
+grumble(X_user,Y_user,dt_user,omega,Q,model,up_factor)
 
 % 16 x Nyquist oversampling
 dt=pi/(16*omega);
@@ -156,20 +156,31 @@ end
 end
 
 % Consistency enforcement
-function grumble(X_user,Y_user,dt_user,omega,Q)
+function grumble(X_user,Y_user,dt_user,omega,Q,model,up_factor)
 if (~isnumeric(dt_user))||(~isreal(dt_user))||...
-   (~isscalar(dt_user))||(dt_user<=0)
-    error('dt_user must be a real positive scalar.');
+   (~isscalar(dt_user))||(~isfinite(dt_user))||(dt_user<=0)
+    error('dt_user must be a finite positive real scalar.');
 end
 if (~isnumeric(X_user))||(~isreal(X_user))||(~iscolumn(X_user))||...
    (~isnumeric(Y_user))||(~isreal(Y_user))||(~iscolumn(Y_user))
     error('X_user and Y_user must be real column vectors.');
 end
-if (~isnumeric(omega))||(~isreal(omega))||(~isscalar(omega))
-    error('omega must be a real scalar.');
+if numel(X_user)~=numel(Y_user)
+    error('X_user and Y_user must have the same number of elements.');
 end
-if (~isnumeric(Q))||(~isreal(Q))||(~isscalar(Q))||(Q<=0)
-    error('Q must be a positive real scalar.');
+if (~isnumeric(omega))||(~isreal(omega))||(~isscalar(omega))||...
+   (~isfinite(omega))||(omega<=0)
+    error('omega must be a finite positive real scalar.');
+end
+if (~isnumeric(Q))||(~isreal(Q))||(~isscalar(Q))||(~isfinite(Q))||(Q<=0)
+    error('Q must be a finite positive real scalar.');
+end
+if (~ischar(model))||(~ismember(model,{'pwc','pwl','pwl_tsc'}))
+    error('model must be ''pwc'', ''pwl'', or ''pwl_tsc''.');
+end
+if (~isnumeric(up_factor))||(~isreal(up_factor))||(~isscalar(up_factor))||...
+   (~isfinite(up_factor))||(up_factor<1)||(mod(up_factor,1)~=0)
+    error('up_factor must be a finite positive real integer.');
 end
 if dt_user<(pi/omega)
     error('dt_user breaks rotating frame approximation.');
@@ -182,4 +193,3 @@ end
 % famines, the enslavements - perpetrated by mankind's governments.
 %
 % Ayn Rand
-

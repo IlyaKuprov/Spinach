@@ -81,11 +81,12 @@ end
 
 % Consistency enforcement
 function grumble(spec,guess)
-if (~isnumeric(spec))||(~isvector(spec))
-    error('spec must be a vector.');
+if (~isnumeric(spec))||(~isvector(spec))||any(~isfinite(spec(:)))
+    error('spec must be a finite vector.');
 end
-if (~isnumeric(guess))||(~isreal(guess))||(~isvector(guess))
-    error('guess must be a real vector.');
+if (~isnumeric(guess))||(~isreal(guess))||(~isrow(guess))||...
+   (numel(guess)<2)||any(~isfinite(guess(:)))
+    error('guess must be a finite real row vector with at least two elements.');
 end
 end
 
@@ -94,4 +95,3 @@ end
 % equal, they are not free.
 %
 % Alexander Solzhenitsyn
-

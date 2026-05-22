@@ -39,11 +39,12 @@ end
 
 % Consistency enforcement
 function grumble(T,N)
-if (~isreal(T))||(~isscalar(T))||(T<=0)
-    error('T must be a positive real scalar.');
+if (~isnumeric(T))||(~isreal(T))||(~isscalar(T))||(~isfinite(T))||(T<=0)
+    error('T must be a finite positive real scalar.');
 end
-if (~isreal(N))||(~isscalar(N))||(N<1)||(mod(N,1)~=0)
-    error('N must be a positve real integer.');
+if (~isnumeric(N))||(~isreal(N))||(~isscalar(N))||(~isfinite(N))||...
+   (N<1)||(mod(N,1)~=0)
+    error('N must be a finite positive real integer.');
 end
 end
 
@@ -57,4 +58,3 @@ end
 % is the law of Australia'. Finally, some progress in the war on math!"
 %
 % Laudation for Malcolm Turnbull's Pwnie Award nomination
-

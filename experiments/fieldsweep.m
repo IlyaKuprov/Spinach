@@ -80,13 +80,11 @@ parameters.b_axis=linspace(parameters.window(1),...
 % Preallocate the spectrum
 spec=zeros(size(parameters.b_axis),'like',1i);
 
-% Preallocate the grid eigenset structure
-eigensets=struct('tf',[],'tm',[],'tw',[],'pd',[],...
-                 'ti',[],'tj',[],'xyz',nan(3,1));
-eigensets=repmat(eigensets,grid_size,1);
+% Preallocate asynchronous work outputs
+eigensets(1:grid_size)=parallel.Future;
 
-% Over grid vertices
-parfor n=1:grid_size
+% Schedule work
+for n=1:grid_size
 
     % Create a local copy and specify system orientation 
     localpar=parameters; localpar.orientation=[alps(n) bets(n) gams(n)];
@@ -95,14 +93,19 @@ parfor n=1:grid_size
     Hz=Iz+orientation(Qz,localpar.orientation); 
     Hc=Ic+orientation(Qc,localpar.orientation); 
     
-    % Compute the eigensets at the grid vertices
-    eigensets(n)=eigenfields(spin_system,localpar,Hz,Hc,Hmw);
+    % Submit asynchronous eigenfields calculation job for this vertex
+    eigensets(n)=parfeval(@eigenfields,1,spin_system,localpar,Hz,Hc,Hmw);
 
-    % Cartesian coordinates of the vertex
+end
+
+% Retrieve vertex eigensets
+eigensets=fetchOutputs(eigensets);
+
+% Add coordinates
+for n=1:grid_size
     eigensets(n).xyz=[sin(bets(n))*cos(gams(n)); 
                       sin(bets(n))*sin(gams(n)); 
                       cos(bets(n))];
-
 end
 
 % Over grid triangles

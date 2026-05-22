@@ -30,8 +30,6 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Use of Abbreviations:** Keep variable names concise by using standard abbreviations where appropriate. For example, a variable holding a property index may be named `prop_idx`. Ensure any abbreviation used is commonly understood or documented in the codebase.
 
-* **Matlab and Spinach functionality checks:** Make sure that the functions you are calling in your code actually exist in *Matlab* or *Spinach*. Prefer functions that exist. Never call functions that do not exist without making them first.
-
 * **Content preservation:** Before proposing any code rewrite, you must run an information-preservation gate: compare proposed code against existing code, flag content-drop risks, and block any edit that removes substantial existing code unless the user explicitly approves that removal.
 
 * **British spelling throughout:** In all function names, variable names, and comments, use British spelling. Where British spelling allows both `s` and `z`, use `s`. Oxford comma is also mandatory. 
@@ -45,6 +43,8 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 * **Preserve correct physics:** When making code changes, do not break the physics behind the code. Before making an edit or a refactor, understand the physical meaning of the code you are touching and confirm that the edit you are about to make is appropriate and correct from the physics point of view. Run a direct function-load/call check for every changed function after you touch that function's structure.
 
 * **No stupid creativity:** Do not create new features where existing *Spinach* features may be used. Never implement any option or structure you have not been directly asked to implement. Never add anything that does not need to be added. The use of `varargin` and `varargout` is forbidden. Avoid object-oriented nonsense and use strict functional programming everywhere.
+
+* **Always RTFM:** Before writing code, check Matlab manual and Spinach knowledge base to see if some or all of the required features already exist somewhere in *Matlab* or *Spinach*. If they do, call existing functions to minimize the size and complexity of your code. Make sure that the functions you are calling actually exist in *Matlab* or *Spinach*. Never call functions that do not exist without making them first.
 
 ## Spinach Wiki Documentation Instructions
 

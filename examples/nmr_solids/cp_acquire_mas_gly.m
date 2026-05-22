@@ -9,7 +9,7 @@
 function cp_acquire_mas_gly()
 
 % Spin system properties (PCM DFT calculation)
-[sys,inter]=g2spinach(gparse('..\..\examples\standard_systems\glycine.log'),...
+[sys,inter]=g2spinach(gparse('../../examples/standard_systems/glycine.log'),...
                       {{'H','1H'},{'C','13C'}},[31.8 182.1],[]);
 
 % 400 MHz spectrometer

@@ -163,11 +163,11 @@ used3=false(numel(triangle(3).tf),1);
 
 % Get spherical edge lengths
 edge12=max(acos(max(-1,min(1,dot(triangle(1).xyz(:),...
-                                      triangle(2).xyz(:))))),eps);
+                                 triangle(2).xyz(:))))),eps);
 edge23=max(acos(max(-1,min(1,dot(triangle(2).xyz(:),...
-                                      triangle(3).xyz(:))))),eps);
+                                 triangle(3).xyz(:))))),eps);
 edge31=max(acos(max(-1,min(1,dot(triangle(3).xyz(:),...
-                                      triangle(1).xyz(:))))),eps);
+                                 triangle(1).xyz(:))))),eps);
 
 % Process level pairs
 if (size(triangle(1).ti,2)>=2)&&...

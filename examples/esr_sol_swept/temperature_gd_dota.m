@@ -24,14 +24,16 @@ bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Get figure going
-kfigure(); hold on; n=1;
-scale_figure([2.0 1.5]);
+kfigure(); scale_figure([2.0 1.5]);
+
+% Temperatures
+T=[100 10 1 0.1]; % Kelvin
 
 % Loop over temperatures
-for T=[100 10 1 0.1]
+for n=1:4
 
     % Set the temperature
-    inter.temperature=T;
+    inter.temperature=T(n);
 
     % Spinach housekeeping
     spin_system=create(sys,inter);
@@ -55,12 +57,11 @@ for T=[100 10 1 0.1]
     subplot(2,2,n); plot(parameters.b_axis,spec);
     kxlabel('magnetic field, tesla');
     kylabel('intensity, a.u.'); 
-    ktitle([num2str(T) ' K']);
+    ktitle([num2str(T(n)) ' K']);
     xlim tight; ylim padded; 
-    kgrid; drawnow; n=n+1;
+    kgrid; drawnow;
 
 end
 
-
-
 end
+

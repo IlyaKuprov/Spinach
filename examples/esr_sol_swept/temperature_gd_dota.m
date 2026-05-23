@@ -39,7 +39,7 @@ for T=[100 10 1 0.1]
 
     % Experiment parameters
     parameters.spins={'E8'};
-    parameters.grid=6;
+    parameters.grid='rep_2ang_100pts_sph';
     parameters.mw_freq=90e9;
     parameters.fwhm=2e-4;
     parameters.int_tol=0.1;

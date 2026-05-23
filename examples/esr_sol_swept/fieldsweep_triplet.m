@@ -31,9 +31,9 @@ spin_system=basis(spin_system,bas);
 
 % Experiment parameters
 parameters.spins={'E3'};
-parameters.grid=6;
-parameters.mw_freq=9e9;           % Hz
-parameters.fwhm=5e-4;             % Tesla
+parameters.grid='rep_2ang_100pts_sph';
+parameters.mw_freq=9e9;         % Hz
+parameters.fwhm=5e-4;           % Tesla
 parameters.int_tol=0.01;
 parameters.tm_tol=0.01;
 parameters.window=[0.25 0.40];  % Tesla

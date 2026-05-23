@@ -25,7 +25,7 @@ spin_system=basis(spin_system,bas);
 
 % Set common EPR parameters
 parameters.spins={'E3'};
-parameters.grid=6;
+parameters.grid='rep_2ang_100pts_sph';
 parameters.fwhm=1e-3;
 parameters.int_tol=1e-4;
 parameters.tm_tol=0.01;

@@ -33,7 +33,7 @@ spin_system=basis(spin_system,bas);
 
 % Experiment parameters
 parameters.spins={'E'};
-parameters.grid=6;
+parameters.grid='rep_2ang_100pts_sph';
 parameters.mw_freq=9e9;
 parameters.fwhm=1e-5;
 parameters.int_tol=2.0;

@@ -6,9 +6,11 @@
 %
 % Parameters:
 %
-%     parameters.grid      -  starting rank of the adaptively 
-%                             subdivided spherical quadrature
-%                             grid, 6 is a good choice
+%     parameters.grid      -  initial spherical grid, ideally
+%                             a non-symmetric one to avoid
+%                             transition degeneracies, a good
+%                             start is
+%                             'rep_2ang_100pts_sph'
 %
 %     parameters.spins     -  a one-element cell array speci-
 %                             fying the spin that is coupled
@@ -69,8 +71,9 @@ Ic=(Ic+Ic')/2; Iz=(Iz+Iz')/2;
 Hmw=state(spin_system,'Lx',parameters.spins{1});
 
 % Get the initial grid and compute its convex hull
-[alps,bets,gams]=grid_trian('stoll',parameters.grid); 
-hull=get_hull(bets,gams); grid_size=numel(alps);
+load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ... 
+      filesep parameters.grid],'betas','gammas');
+hull=get_hull(betas,gammas); grid_size=numel(betas);
 
 % Make the magnetic field axis
 parameters.b_axis=linspace(parameters.window(1),...
@@ -84,7 +87,7 @@ eigensets(1:grid_size)=parallel.Future;
 for n=1:grid_size
 
     % Create a local copy and specify system orientation 
-    localpar=parameters; localpar.orientation=[alps(n) bets(n) gams(n)];
+    localpar=parameters; localpar.orientation=[0 betas(n) gammas(n)];
 
     % Assemble Zeeman and coupling Hamiltonians
     Hz=Iz+orientation(Qz,localpar.orientation); 
@@ -100,9 +103,9 @@ eigensets=fetchOutputs(eigensets);
 
 % Add coordinates
 for n=1:grid_size
-    eigensets(n).xyz=[sin(bets(n))*cos(gams(n)); 
-                      sin(bets(n))*sin(gams(n)); 
-                      cos(bets(n))];
+    eigensets(n).xyz=[sin(betas(n))*cos(gammas(n)); 
+                      sin(betas(n))*sin(gammas(n)); 
+                      cos(betas(n))];
 end
 
 % Preallocate asynchronous work outputs
@@ -134,12 +137,10 @@ if spin_system.inter.magnet~=1
     error('field swept experiment, set sys.magnet=1');
 end
 if ~isfield(parameters,'grid')
-    error('stoll grid rank must be specified in parameters.grid variable.');
+    error('grid must be specified in parameters.grid variable.');
 end
-if (~isnumeric(parameters.grid))||(~isscalar(parameters.grid))||...
-   (~isreal(parameters.grid))||(~isfinite(parameters.grid))||...
-   (parameters.grid<=0)||(mod(parameters.grid,1)~=0)
-    error('parameters.grid must be a finite positive real integer.');
+if ~ischar(parameters.grid)
+    error('parameters.grid must be character string.');
 end
 if ~isfield(parameters,'spins')
     error('spin to couple to the microwave field must be specified in parameters.spins variable.');

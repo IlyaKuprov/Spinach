@@ -120,11 +120,16 @@ spec_dir=trint(parameters,triangle);
 % If the accuracy is insufficient, recurse
 if norm(spec_dir-spec_sub,2)>parameters.int_tol
 
-    % Four triangles of the subdivision
-    spec=voitlander(spin_system,parameters,triangle_a,Ic,Iz,Qc,Qz,Hmw)+...
-         voitlander(spin_system,parameters,triangle_b,Ic,Iz,Qc,Qz,Hmw)+...
-         voitlander(spin_system,parameters,triangle_c,Ic,Iz,Qc,Qz,Hmw)+...
-         voitlander(spin_system,parameters,triangle_d,Ic,Iz,Qc,Qz,Hmw);
+    % Compute the four triangles of the subdivision via asynchronous recursion
+    spec_a=parfeval(@voitlander,1,spin_system,parameters,triangle_a,Ic,Iz,Qc,Qz,Hmw);
+    spec_b=parfeval(@voitlander,1,spin_system,parameters,triangle_b,Ic,Iz,Qc,Qz,Hmw);
+    spec_c=parfeval(@voitlander,1,spin_system,parameters,triangle_c,Ic,Iz,Qc,Qz,Hmw);
+    spec_d=parfeval(@voitlander,1,spin_system,parameters,triangle_d,Ic,Iz,Qc,Qz,Hmw);
+
+    % Retrieve the work
+    spec=fetchOutputs(spec_a)+fetchOutputs(spec_b)+...
+         fetchOutputs(spec_c)+fetchOutputs(spec_d);
+
 else
     
     % Original triangle
@@ -300,9 +305,8 @@ if ~isfield(parameters,'int_tol')
     error('integration tolerance must be supplied in parameters.int_tol field.');
 end
 if (~isnumeric(parameters.int_tol))||(~isreal(parameters.int_tol))||...
-   (~isscalar(parameters.int_tol))||(~isfinite(parameters.int_tol))||...
-   (parameters.int_tol<=0)
-    error('parameters.int_tol must be a finite positive real scalar.');
+   (~isscalar(parameters.int_tol))||(parameters.int_tol<=0)
+    error('parameters.int_tol must be a positive real scalar.');
 end
 if ~isfield(parameters,'mw_freq')
     error('resonance frequency must be supplied in parameters.mw_freq field.');

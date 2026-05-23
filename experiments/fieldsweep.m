@@ -77,9 +77,6 @@ parameters.b_axis=linspace(parameters.window(1),...
                            parameters.window(2),...
                            parameters.npoints);
 
-% Preallocate the spectrum
-spec=zeros(size(parameters.b_axis),'like',1i);
-
 % Preallocate asynchronous work outputs
 eigensets(1:grid_size)=parallel.Future;
 
@@ -108,8 +105,11 @@ for n=1:grid_size
                       cos(bets(n))];
 end
 
-% Over grid triangles
-parfor n=1:size(hull,1) %#ok<*PFBNS>
+% Preallocate asynchronous work outputs
+spec(1:size(hull,1))=parallel.Future;
+
+% Schedule work 
+for n=1:size(hull,1)
     
     % Extract triangle vertex indices
     a=hull(n,1); b=hull(n,2); c=hull(n,3);
@@ -118,10 +118,13 @@ parfor n=1:size(hull,1) %#ok<*PFBNS>
     triangle=eigensets([a b c]); 
     
     % Call recursive Voitlander integrator
-    spec=spec+voitlander(spin_system,parameters,...
-                         triangle,Ic,Iz,Qc,Qz,Hmw);
-    
+    spec(n)=parfeval(@voitlander,1,spin_system,parameters,...
+                                   triangle,Ic,Iz,Qc,Qz,Hmw);
+
 end
+
+% Retrieve and sum up cell integrals
+spec=sum(fetchOutputs(spec),1);
 
 end
 

@@ -56,9 +56,9 @@ function [spec,parameters]=fieldsweep(spin_system,parameters)
 % Check consistency
 grumble(spin_system,parameters);
 
-% Set peak position tolerance to half-pixel
-parameters.pp_tol=0.5*(max(parameters.window)-...
-                       min(parameters.window))/(parameters.npoints-1);
+% Peak position tolerance is half a pixel
+window_size=max(parameters.window)-min(parameters.window);
+parameters.pp_tol=0.5*window_size/(parameters.npoints-1);
 
 % Get the Hamiltonians and tidy up their isotropic parts
 [Ic,Qc]=hamiltonian(assume(spin_system,'labframe','couplings'));

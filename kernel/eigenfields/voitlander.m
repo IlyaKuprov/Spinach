@@ -117,6 +117,9 @@ spec_sub=trint(parameters,triangle_a)+...
 % Compute the direct integral
 spec_dir=trint(parameters,triangle);
 
+% Simpson-Richardson correction
+spec_sim=(4*spec_sub-spec_dir)/3;
+
 % If the accuracy is insufficient, recurse
 if norm(spec_dir-spec_sub,2)>parameters.int_tol
 
@@ -132,8 +135,8 @@ if norm(spec_dir-spec_sub,2)>parameters.int_tol
 
 else
     
-    % Original triangle
-    spec=spec_sub;
+    % Good enough
+    spec=spec_sim;
 
 end
 

@@ -220,17 +220,10 @@ switch spin_system.bas.formalism
 
         end
 
-        % Get the relative transition moment cut-off
-        tm_scale=0;
-        for n=1:numel(T)
-            tm_scale=max([tm_scale; T{n}(:)]);
-        end
-        tm_cutoff=parameters.tm_tol*tm_scale;
-
         % Mark active level pairs
         pair_active=false(size(E,1));
         for n=1:numel(T)
-            pair_active=pair_active|(T{n}>tm_cutoff);
+            pair_active=pair_active|(T{n}>parameters.tm_tol);
         end
 
         % Compile the active level pair list
@@ -452,14 +445,7 @@ switch spin_system.bas.formalism
 end
 
 % Prune insignificant transition moments
-if isempty(tran.tm)
-    hit_list=false(size(tran.tm));
-elseif exist('tm_cutoff','var')
-    hit_list=(tran.tm<tm_cutoff);
-else
-    tm_cutoff=parameters.tm_tol*max(tran.tm(:));
-    hit_list=(tran.tm<tm_cutoff);
-end
+hit_list=(tran.tm<parameters.tm_tol);
 tran.tf(hit_list)=[]; tran.tm(hit_list)=[];
 tran.tw(hit_list)=[]; tran.pd(hit_list)=[]; 
 tran.tj(hit_list)=[]; tran.ti(hit_list,:)=[];

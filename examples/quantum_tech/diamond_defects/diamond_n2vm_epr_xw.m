@@ -1,6 +1,8 @@
 % Field-swept powder EPR spectra of an N2V- centre
 % in diamond at X and W bands.
 %
+% Calculation time: seconds.
+%
 % alexey.bogdanov@weizmann.ac.il
 
 function diamond_n2vm_epr_xw()
@@ -28,8 +30,8 @@ spin_system=basis(spin_system,bas);
 parameters.spins={'E'};
 parameters.grid='rep_2ang_100pts_sph';
 parameters.fwhm=0.00003;
-parameters.int_tol=0.01;
-parameters.tm_tol=0.01;
+parameters.int_tol=0.1;
+parameters.tm_tol=0.1;
 parameters.npoints=1024;
 parameters.rspt_order=Inf;
 

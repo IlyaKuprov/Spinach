@@ -46,11 +46,11 @@ spin_system=basis(spin_system,bas);
 
 % Experiment parameters
 parameters.spins={'E'};
-parameters.grid='rep_2ang_400pts_sph';
+parameters.grid='rep_2ang_100pts_sph';
 parameters.mw_freq=9.39e9;
 parameters.fwhm=5e-4;
 parameters.int_tol=1e3;
-parameters.tm_tol=0.01;
+parameters.tm_tol=0.1;
 parameters.window=[0.27 0.35];
 parameters.npoints=512;
 parameters.rspt_order=Inf;

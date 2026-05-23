@@ -1,6 +1,8 @@
 % Field-swept powder EPR spectra of Ni defects
 % in diamond at X and W bands.
 %
+% Calculation time: seconds.
+%
 % alexey.bogdanov@weizmann.ac.il
 
 function diamond_ni_epr_xw()
@@ -29,7 +31,7 @@ parameters.spins={'E'};
 parameters.grid='rep_2ang_100pts_sph';
 parameters.fwhm=0.0001;
 parameters.int_tol=1e-4;
-parameters.tm_tol=0.01;
+parameters.tm_tol=0.1;
 parameters.npoints=2048;
 parameters.rspt_order=Inf;
 

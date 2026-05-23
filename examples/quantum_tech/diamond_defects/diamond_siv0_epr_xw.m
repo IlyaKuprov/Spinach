@@ -1,6 +1,8 @@
 % Field-swept powder EPR spectra of SiV0 centre
 % in diamond at X and W bands.
 %
+% Calculation time: seconds.
+%
 % alexey.bogdanov@weizmann.ac.il
 
 function diamond_siv0_epr_xw()
@@ -29,7 +31,7 @@ parameters.spins={'E3'};
 parameters.grid='rep_2ang_100pts_sph';
 parameters.fwhm=0.001;
 parameters.int_tol=1e-4;
-parameters.tm_tol=0.01;
+parameters.tm_tol=0.001;
 parameters.npoints=2048;
 parameters.rspt_order=Inf;
 

@@ -1,6 +1,8 @@
 % Field-swept powder EPR spectra of GeV0 centre
 % in diamond at X and W bands.
 %
+% Calculation time: seconds.
+%
 % alexey.bogdanov@weizmann.ac.il
 
 function diamond_gev0_epr_xw()
@@ -27,7 +29,7 @@ spin_system=basis(spin_system,bas);
 parameters.spins={'E3'};
 parameters.grid='rep_2ang_100pts_sph';
 parameters.fwhm=1e-3;
-parameters.int_tol=1e-4;
+parameters.int_tol=1e-3;
 parameters.tm_tol=0.01;
 parameters.npoints=2048;
 parameters.rspt_order=Inf;

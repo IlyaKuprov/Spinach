@@ -1,6 +1,8 @@
 % Field-swept powder EPR spectra of a Co centre
 % in diamond at X and W bands.
 %
+% Calculation time: minutes.
+%
 % alexey.bogdanov@weizmann.ac.il
 
 function diamond_co_epr_xw()
@@ -28,7 +30,7 @@ parameters.spins={'E'};
 parameters.grid='rep_2ang_100pts_sph';
 parameters.fwhm=1e-4;
 parameters.int_tol=1e-5;
-parameters.tm_tol=0.01;
+parameters.tm_tol=0.1;
 parameters.npoints=1024;
 parameters.rspt_order=Inf;
 

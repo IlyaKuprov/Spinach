@@ -192,6 +192,34 @@ switch spin_system.bas.formalism
             
         end
         
+        % Reorder eigenstates by maximum overlap between field knots
+        for n=2:numel(grid)
+
+            % Build a one-to-one state assignment
+            state_ovlp=abs(V{n-1}'*V{n});
+            perm=zeros(size(E,1),1);
+            state_hit=false(size(E,1),1);
+            for k=1:size(E,1)
+
+                % Match the largest remaining eigenvector overlap
+                [max_ovlp,linear_idx]=max(state_ovlp(:));
+                if max_ovlp<sqrt(eps), error('state tracking failed'); end
+                [left_idx,right_idx]=ind2sub(size(state_ovlp),linear_idx);
+                perm(left_idx)=right_idx;
+                state_hit(left_idx)=true;
+                state_ovlp(left_idx,:)=-Inf;
+                state_ovlp(:,right_idx)=-Inf;
+
+            end
+            if any(~state_hit), error('state tracking failed'); end
+
+            % Reorder right-knot quantities into left-knot labelling
+            E(:,n)=E(perm,n); dE(:,n)=dE(perm,n);
+            LP(:,n)=LP(perm,n); V{n}=V{n}(:,perm);
+            T{n}=T{n}(perm,perm);
+
+        end
+
         % Get the relative transition moment cut-off
         tm_scale=0;
         for n=1:numel(T)
@@ -205,6 +233,9 @@ switch spin_system.bas.formalism
             pair_active=pair_active|(T{n}>tm_cutoff);
         end
 
+        % Compile the active level pair list
+        [source,destin]=find(pair_active);
+
         % Get the outputs started
         tran.tf=[]; tran.tm=[]; tran.tw=[]; 
         tran.pd=[]; tran.tj=[]; tran.ti=zeros(0,3);
@@ -217,17 +248,6 @@ switch spin_system.bas.formalism
             
             % Grid interval
             dx=grid(n)-grid(n-1);
-
-            % Interval edge analysis
-            interval_max=max(E(:,[n-1, n]),[],2);
-            interval_min=min(E(:,[n-1, n]),[],2);
-
-            % Screen by energy and grid-wide transition activity
-            deltaE_upper=interval_max'-interval_min;
-            deltaE_lower=interval_min'-interval_max;
-            promising_pairs=(omega<deltaE_upper)&...
-                            (omega>deltaE_lower)&pair_active;
-            [source,destin]=find(promising_pairs);
 
             % State overlap between field knots
             if isempty(source), continue; end
@@ -272,7 +292,16 @@ switch spin_system.bas.formalism
                 root_list=root_list((root_list>=-root_tol)&...
                                     (root_list<=1+root_tol));
                 root_list=min(max(root_list,0),1);
-                root_list=sort(root_list(:).');
+
+                % Add tangent roots at spline extrema
+                turn_list=roots(polyder(gap_spline));
+                turn_list=turn_list(abs(imag(turn_list))<root_tol);
+                turn_list=real(turn_list);
+                turn_list=turn_list((turn_list>=-root_tol)&...
+                                    (turn_list<=1+root_tol));
+                turn_list=min(max(turn_list,0),1);
+                turn_list=turn_list(abs(polyval(gap_spline,turn_list))<frq_gap_tol);
+                root_list=sort([root_list(:).' turn_list(:).']);
                 if isempty(root_list), continue; end
                 root_list=root_list([true abs(diff(root_list))>root_tol]);
 
@@ -305,7 +334,30 @@ switch spin_system.bas.formalism
                     % Rediagonalise at unstable roots
                     if ~stable_states
                         reson_field=grid(n-1)+alpha*dx;
-                        [~,~,dE_root,T_root,LP_root]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,reson_field);
+                        [~,V_root,dE_root,T_root,LP_root]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,reson_field);
+
+                        % Match root eigenvectors to the left knot
+                        root_ovlp=abs(V{n-1}'*V_root);
+                        perm=zeros(size(E,1),1);
+                        state_hit=false(size(E,1),1);
+                        for m=1:size(E,1)
+
+                            % Match the largest remaining eigenvector overlap
+                            [max_ovlp,linear_idx]=max(root_ovlp(:));
+                            if max_ovlp<sqrt(eps), error('state tracking failed'); end
+                            [left_idx,right_idx]=ind2sub(size(root_ovlp),linear_idx);
+                            perm(left_idx)=right_idx;
+                            state_hit(left_idx)=true;
+                            root_ovlp(left_idx,:)=-Inf;
+                            root_ovlp(:,right_idx)=-Inf;
+
+                        end
+                        if any(~state_hit), error('state tracking failed'); end
+
+                        % Reorder root quantities into left-knot labelling
+                        dE_root=dE_root(perm);
+                        T_root=T_root(perm,perm);
+                        LP_root=LP_root(perm);
                         tm_base=T_root(source(k),destin(k));
                         pd_base=LP_root(source(k))-LP_root(destin(k));
                         jac_slope=dE_root(destin(k))-dE_root(source(k));
@@ -337,7 +389,7 @@ switch spin_system.bas.formalism
                     tran.tw(end+1)=parameters.fwhm; 
 
                     % Store transition identity
-                    tran.ti(end+1,:)=[source(k) destin(k) pair_branch(source(k),destin(k))]; 
+                    tran.ti(end+1,:)=[source(k) destin(k) pair_branch(source(k),destin(k))];
 
                 end
                 
@@ -354,6 +406,7 @@ switch spin_system.bas.formalism
 
         % Get all transitions
         [uv,tf]=eig(left_mat,right_mat,'vector');
+        tran.tf=tf(:).';
         
         % Prune out unphysical results
         uv_norm=sqrt(sum(abs(uv).^2,1));

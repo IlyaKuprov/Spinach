@@ -10,28 +10,13 @@
 function compile_mex() % #NGRUM #NHEAD
 
 % Get own location
-here=fileparts(mfilename('fullpath'));
-spinach_root=fileparts(fileparts(here));
-
-% Get source and output locations
-src_files={fullfile(spinach_root,'kernel','line_shapes','lorentzcon.cpp'),...
-           fullfile(spinach_root,'kernel','eigenfields','cubic_roots.cpp')};
-out_dirs={fullfile(spinach_root,'kernel','line_shapes'),...
-          fullfile(spinach_root,'kernel','eigenfields')};
-
-% Check source availability
-src_missing=~cellfun(@isfile,src_files);
-if all(src_missing)
-    error('No C++ source files found.');
-elseif any(src_missing)
-    error('Required C++ source file is missing.');
-end
+P=mfilename('fullpath'); P=P(1:(end-20));
 
 % Compile with case-specific options
-mex_args={'-R2018a','-O','COMPFLAGS=$COMPFLAGS','LINKFLAGS=$LINKFLAGS'};
-for n=1:numel(src_files)
-    mex(mex_args{:},src_files{n},'-outdir',out_dirs{n});
-end
+mex('-R2018a','-O','COMPFLAGS=$COMPFLAGS','LINKFLAGS=$LINKFLAGS',...
+    [P '/kernel/line_shapes/lorentzcon.cpp'],'-outdir',[P '/kernel/line_shapes']);
+mex('-R2018a','-O','COMPFLAGS=$COMPFLAGS','LINKFLAGS=$LINKFLAGS',...
+    [P '/kernel/eigenfields/cubic_roots.cpp'],'-outdir',[P '/kernel/eigenfields']);
 
 end
 
@@ -41,3 +26,4 @@ end
 % their equipment.
 %
 % Alan Parsons
+

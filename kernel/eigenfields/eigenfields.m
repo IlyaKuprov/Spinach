@@ -68,6 +68,9 @@ grumble(spin_system,parameters,Hz,Hc);
 % Get frequency gap tolerance in rad/s
 frq_gap_tol=abs(spin('E')*parameters.pp_tol);
 
+% Cubic spline root tolerance
+root_tol=sqrt(eps);
+
 % Get MW frequency in rad/s
 omega=2*pi*parameters.mw_freq;
 
@@ -257,13 +260,16 @@ switch spin_system.bas.formalism
                 gap_spline=destin_spline-source_spline;
 
                 % Find all real roots inside the field interval
-                root_tol=sqrt(eps);
                 root_list=cubic_roots(gap_spline,root_tol);
 
                 % Add tangent roots at spline extrema
-                turn_list=cubic_roots([0 3*gap_spline(1) 2*gap_spline(2) gap_spline(3)],root_tol);
-                turn_gap=gap_spline(1)*turn_list.^3+gap_spline(2)*turn_list.^2+...
-                         gap_spline(3)*turn_list+gap_spline(4);
+                turn_list=cubic_roots([0 3*gap_spline(1) ...
+                                         2*gap_spline(2) ...
+                                           gap_spline(3)],root_tol);
+                turn_gap=gap_spline(1)*turn_list.^3+...
+                         gap_spline(2)*turn_list.^2+...
+                         gap_spline(3)*turn_list+...
+                         gap_spline(4);
                 turn_list=turn_list(abs(turn_gap)<frq_gap_tol);
                 root_list=sort([root_list(:).' turn_list(:).']);
                 if isempty(root_list), continue; end

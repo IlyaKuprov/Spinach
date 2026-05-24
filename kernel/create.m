@@ -250,6 +250,19 @@ if ~isworkernode
     
     % Check for running pools
     if ~isempty(current_pool)
+
+        % Pre-create the file-backed ValueStore directory
+        pool_storage=current_pool.Cluster.JobStorageLocation;
+        if ~isfolder(pool_storage), mkdir(pool_storage); end
+        pool_job_dirs=dir([pool_storage filesep 'Job*']);
+        if isempty(pool_job_dirs), mkdir([pool_storage filesep 'Job1' filesep 'value_store']); end
+        for n=1:numel(pool_job_dirs)
+            if pool_job_dirs(n).isdir
+                value_store_dir=[pool_job_dirs(n).folder filesep ...
+                                 pool_job_dirs(n).name filesep 'value_store'];
+                if ~isfolder(value_store_dir), mkdir(value_store_dir); end
+            end
+        end
         
         % Use the existing pool
         spin_system.sys.parallel{1}=current_pool.Cluster.Profile;

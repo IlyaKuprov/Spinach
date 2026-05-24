@@ -133,6 +133,22 @@ line_ref=2./(1+x_axis.^2);
 result=test_close(result,'lorentzcon Lorentzian',line_obs,line_ref,1e-14,1e-14,...
                   'with fwhm two and amplitude 2*pi, the normalised Lorentzian is 2/(1+x^2)');
 
+% Check the narrow-linewidth Lorentzian peak at exact centre
+tiny_fwhm=1e-308;
+tiny_gam=tiny_fwhm/2;
+line_obs=lorentzcon(0,1,tiny_fwhm,0);
+line_ref=1/(pi*tiny_gam);
+result=test_close(result,'lorentzcon tiny centre',line_obs,line_ref,0,1e-14,...
+                  'exact-centre evaluation must not use a reciprocal-width product that turns zero offset into NaN');
+
+% Check the narrow-linewidth MEX segment branch at exact offsets
+if exist('lorentzcon','file')==3
+    line_obs=lorentzcon([0 1],1,tiny_fwhm,[0 1]);
+    line_ref=[0.5 0.5];
+    result=test_close(result,'lorentzcon MEX tiny segment endpoints',line_obs,line_ref,1e-14,1e-14,...
+                      'two-argument atan2 must keep exact endpoint segment values finite when reciprocal width overflows');
+end
+
 % Check magnetic pumping adds only a source column from the unit state
 spin_system=local_liouvillian_system(3);
 R=zeros(3);

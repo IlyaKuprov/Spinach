@@ -17,7 +17,6 @@ struct LinePlan
     int mode;
     double gam;
     double gam2;
-    double inv_gam;
     double centre;
     double edge0;
     double edge1;
@@ -160,7 +159,6 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
     plan.mode=0;
     plan.gam=gam;
     plan.gam2=gam*gam;
-    plan.inv_gam=1.0/gam;
     plan.centre=offs[0];
     plan.edge0=0.0;
     plan.edge1=0.0;
@@ -352,14 +350,14 @@ static inline double real_value(const mxArray *array,mwIndex idx)
 
 static inline double line_value0(double x,const LinePlan& plan)
 {
-    const double arg=(x-plan.centre)*plan.inv_gam;
+    const double arg=(x-plan.centre)/plan.gam;
     return plan.scale_lor/(1.0+arg*arg);
 }
 
 static inline double line_value1(double x,const LinePlan& plan)
 {
-    return plan.scale_seg*(std::atan((plan.edge1-x)*plan.inv_gam)-
-                           std::atan((plan.edge0-x)*plan.inv_gam));
+    return plan.scale_seg*(std::atan2(plan.edge1-x,plan.gam)-
+                           std::atan2(plan.edge0-x,plan.gam));
 }
 
 static inline double line_value2(double x,const LinePlan& plan)
@@ -368,8 +366,8 @@ static inline double line_value2(double x,const LinePlan& plan)
     const double dx1=plan.edge1-x;
     const double r0=dx0*dx0+plan.gam2;
     const double r1=dx1*dx1+plan.gam2;
-    const double ang0=std::atan(dx0*plan.inv_gam);
-    const double ang1=std::atan(dx1*plan.inv_gam);
+    const double ang0=std::atan2(dx0,plan.gam);
+    const double ang1=std::atan2(dx1,plan.gam);
 
     return plan.coef0*dx1*(ang1-ang0)+
            plan.coef_log0*std::log(r0/r1);
@@ -381,8 +379,8 @@ static inline double line_value3(double x,const LinePlan& plan)
     const double dx1=plan.edge1-x;
     const double r0=dx0*dx0+plan.gam2;
     const double r1=dx1*dx1+plan.gam2;
-    const double ang0=std::atan(dx0*plan.inv_gam);
-    const double ang1=std::atan(dx1*plan.inv_gam);
+    const double ang0=std::atan2(dx0,plan.gam);
+    const double ang1=std::atan2(dx1,plan.gam);
 
     return plan.coef0*dx0*(ang0-ang1)+
            plan.coef_log0*std::log(r1/r0);
@@ -397,9 +395,9 @@ static inline double line_value4(double x,const LinePlan& plan)
     const double r1=dx1*dx1+plan.gam2;
     const double r2=dx2*dx2+plan.gam2;
 
-    return plan.coef0*dx0*std::atan(dx0*plan.inv_gam)-
-           plan.coef1*dx1*std::atan(dx1*plan.inv_gam)-
-           plan.coef2*dx2*std::atan(dx2*plan.inv_gam)+
+    return plan.coef0*dx0*std::atan2(dx0,plan.gam)-
+           plan.coef1*dx1*std::atan2(dx1,plan.gam)-
+           plan.coef2*dx2*std::atan2(dx2,plan.gam)+
            plan.coef_log0*std::log(r1/r0)+
            plan.coef_log1*std::log(r2/r1);
 }

@@ -339,9 +339,6 @@ if isfield(parameters,'diff')
             error('parameters.diff must be non-negative.');
         end
     else
-        if ~isequal(size(parameters.diff),numel(parameters.npts)*[1 1])
-            error('parameters.diff matrix dimensions must match the sample dimensionality.');
-        end
         if norm(parameters.diff-parameters.diff','fro')>1e-10*norm(parameters.diff,'fro')
             error('parameters.diff matrix must be symmetric.');
         end

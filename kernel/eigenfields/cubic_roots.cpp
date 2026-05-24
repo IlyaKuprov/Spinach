@@ -4,11 +4,11 @@
  *
  * Syntax:
  *
- *                    root_list=cubic_roots(poly_coeffs,root_tol)
+ *        root_list=cubic_roots(poly_coeffs,root_tol)
  *
  * Returns sorted real roots in the interval [0,1] of
  *
- *                    y=a*x^3+b*x^2+c*x+d
+ *                  y=a*x^3+b*x^2+c*x+d
  *
  * where poly_coeffs=[a b c d]. Leading numerical zeros are dropped
  * relative to the largest coefficient.

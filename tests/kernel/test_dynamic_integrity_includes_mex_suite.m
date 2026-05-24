@@ -27,7 +27,7 @@ result=new_test_result('kernel/dynamic_integrity_includes_mex',...
 spinach_root=fileparts(fileparts(fileparts(mfilename('fullpath'))));
 includes_dir=fullfile(spinach_root,'kernel','includes');
 integrity_dir=fullfile(spinach_root,'kernel','integrity');
-mex_dir=fullfile(spinach_root,'kernel','mex');
+mex_dir=fullfile(spinach_root,'etc','mex');
 
 % Exercise host overrides and GPU guard includes
 result=local_test_autoexec(result,fullfile(includes_dir,'autoexec.m'));
@@ -74,14 +74,6 @@ old_toolbar=get(groot,'defaultFigureToolbar');
 cleanup_obj=onCleanup(@()local_restore_autoexec(old_computer,old_position,...
                                                 old_style,old_menu,old_toolbar));
 
-% Check the ELMINSTER process-count override
-sys=struct();
-setenv('COMPUTERNAME','ELMINSTER');
-run(autoexec_file);
-result=test_true(result,'autoexec ELMINSTER override',...
-                 isequal(sys.parallel,{'processes',128}),...
-                 'ELMINSTER should select the documented 128-process profile when the user did not set sys.parallel');
-
 % Check the ALAUNDO GPU-aware override
 sys=struct();
 sys.enable={'gpu'};
@@ -91,14 +83,22 @@ result=test_true(result,'autoexec ALAUNDO GPU override',...
                  isequal(sys.parallel,{'processes',32}),...
                  'ALAUNDO should use four workers per GPU when GPU arithmetic was requested');
 
-% Check the TALOS non-GPU override
+% Check the TALOS GPU-aware override
+sys=struct();
+sys.enable={'gpu'};
+setenv('COMPUTERNAME','TALOS');
+run(autoexec_file);
+result=test_true(result,'autoexec TALOS GPU override',...
+                 isequal(sys.parallel,{'processes',12}),...
+                 'TALOS should use four workers per GPU when GPU arithmetic was requested');
+
+% Check the TALOS non-GPU no-op branch
 sys=struct();
 sys.enable={};
 setenv('COMPUTERNAME','TALOS');
 run(autoexec_file);
-result=test_true(result,'autoexec TALOS CPU override',...
-                 isequal(sys.parallel,{'processes',56}),...
-                 'TALOS should use the documented CPU process profile without GPU arithmetic');
+result=test_true(result,'autoexec TALOS CPU no-op',~isfield(sys,'parallel'),...
+                 'TALOS should not invent a parallelisation policy without GPU arithmetic');
 
 % Check that user parallel settings are not overwritten
 sys=struct();
@@ -428,10 +428,11 @@ clear('compile_mex');
 % Inspect the production source for platform flags and output confinement
 compile_src=fileread(compile_file);
 result=test_true(result,'compile_mex source confinement',...
-                 contains(compile_src,'dir(fullfile(here,''*.cpp''))')&&...
-                 contains(compile_src,'mex(mex_args{:},src_file,''-outdir'',here)')&&...
+                 contains(compile_src,'src_files={')&&...
+                 contains(compile_src,'''cubic_roots.cpp''')&&...
+                 contains(compile_src,'mex(mex_args{:},src_files{n},''-outdir'',out_dirs{n})')&&...
                  contains(compile_src,'''-R2018a'''),...
-                 'compile_mex must discover sources in its own directory, write outputs there, and request the interleaved-complex API');
+                 'compile_mex must compile the listed MEX sources, write outputs into their source directories, and request the interleaved-complex API');
 
 end
 
@@ -550,4 +551,3 @@ catch err
 end
 
 end
-

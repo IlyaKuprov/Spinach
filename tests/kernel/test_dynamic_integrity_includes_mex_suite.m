@@ -409,28 +409,66 @@ end
 
 function result=local_test_compile_mex(result,compile_file)
 
-% Create a scratch copy so the no-source branch cannot touch shipped MEX files
+% Create a scratch tree so the compiler helper cannot touch shipped MEX files
 scratch=tempname(tempdir);
-mkdir(scratch);
-copyfile(compile_file,fullfile(scratch,'compile_mex.m'));
+mkdir(fullfile(scratch,'etc','mex'));
+mkdir(fullfile(scratch,'etc','mex','private'));
+mkdir(fullfile(scratch,'kernel','line_shapes'));
+mkdir(fullfile(scratch,'kernel','eigenfields'));
+copyfile(compile_file,fullfile(scratch,'etc','mex','compile_mex.m'));
+
+% Install a path-local mex stub that records compiler calls
+fid=fopen(fullfile(scratch,'etc','mex','private','mex.m'),'w');
+fprintf(fid,'function mex(varargin)\n');
+fprintf(fid,'record_file=fullfile(fileparts(fileparts(mfilename(''fullpath''))),''mex_calls.mat'');\n');
+fprintf(fid,'if exist(record_file,''file'')\n');
+fprintf(fid,'    loaded=load(record_file,''mex_calls'');\n');
+fprintf(fid,'    mex_calls=loaded.mex_calls;\n');
+fprintf(fid,'else\n');
+fprintf(fid,'    mex_calls={};\n');
+fprintf(fid,'end\n');
+fprintf(fid,'mex_calls{end+1}=varargin;\n');
+fprintf(fid,'save(record_file,''mex_calls'');\n');
+fprintf(fid,'end\n\n');
+fclose(fid);
 old_path=path;
 old_dir=pwd;
 cleanup_obj=onCleanup(@()local_restore_remove(old_path,old_dir,scratch));
-addpath(scratch,'-begin');
-clear('compile_mex');
+warning_state=warning('query','MATLAB:dispatcher:nameConflict');
+warning('off','MATLAB:dispatcher:nameConflict');
+warning_cleaner=onCleanup(@()warning(warning_state));
+addpath(fullfile(scratch,'etc','mex'),'-begin');
+clear('compile_mex','mex');
 
-% Exercise the safe early error branch in the scratch copy
-err_text=local_error_text(@()compile_mex());
-result=test_true(result,'compile_mex no-source guard',contains(err_text,'No C++ source files'),...
-                 'compile_mex must refuse to run when its own directory contains no C++ source files');
-clear('compile_mex');
+% Exercise the rewritten compiler helper through the stub
+compile_mex();
+loaded=load(fullfile(scratch,'etc','mex','mex_calls.mat'),'mex_calls');
+line_args=loaded.mex_calls{1};
+cubic_args=loaded.mex_calls{2};
+
+% Normalise recorded paths before comparing with platform-native fullfile output
+line_args_cmp=strrep(strrep(line_args,'/',filesep),'\',filesep);
+cubic_args_cmp=strrep(strrep(cubic_args,'/',filesep),'\',filesep);
+line_out=line_args_cmp{find(strcmp(line_args,'-outdir'),1)+1};
+cubic_out=cubic_args_cmp{find(strcmp(cubic_args,'-outdir'),1)+1};
+result=test_true(result,'compile_mex compiler calls',...
+                 numel(loaded.mex_calls)==2&&...
+                 any(strcmp(line_args,'-R2018a'))&&...
+                 any(strcmp(cubic_args,'-R2018a'))&&...
+                 any(strcmp(line_args_cmp,fullfile(scratch,'kernel','line_shapes','lorentzcon.cpp')))&&...
+                 any(strcmp(cubic_args_cmp,fullfile(scratch,'kernel','eigenfields','cubic_roots.cpp')))&&...
+                 strcmp(line_out,fullfile(scratch,'kernel','line_shapes'))&&...
+                 strcmp(cubic_out,fullfile(scratch,'kernel','eigenfields')),...
+                 'compile_mex must compile the two listed MEX sources into their source directories with the interleaved-complex API');
+clear('compile_mex','mex','warning_cleaner');
 
 % Inspect the production source for platform flags and output confinement
 compile_src=fileread(compile_file);
 result=test_true(result,'compile_mex source confinement',...
-                 contains(compile_src,'src_files={')&&...
-                 contains(compile_src,'''cubic_roots.cpp''')&&...
-                 contains(compile_src,'mex(mex_args{:},src_files{n},''-outdir'',out_dirs{n})')&&...
+                 contains(compile_src,'kernel/line_shapes/lorentzcon.cpp')&&...
+                 contains(compile_src,'kernel/eigenfields/cubic_roots.cpp')&&...
+                 contains(compile_src,'''-outdir'',[P ''/kernel/line_shapes'']')&&...
+                 contains(compile_src,'''-outdir'',[P ''/kernel/eigenfields'']')&&...
                  contains(compile_src,'''-R2018a'''),...
                  'compile_mex must compile the listed MEX sources, write outputs into their source directories, and request the interleaved-complex API');
 

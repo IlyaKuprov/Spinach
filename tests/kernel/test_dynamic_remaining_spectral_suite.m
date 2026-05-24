@@ -60,7 +60,10 @@ Ic=zeros(2);
 Qz=local_tiny_rank_one(2);
 Qc=local_tiny_rank_one(2);
 Hmw=[1;0];
-[tf,tm,tw,pd,~,tj]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
+Hz=Iz+orientation(Qz,parameters.orientation);
+Hc=Ic+orientation(Qc,parameters.orientation);
+tran=eigenfields(spin_system,parameters,Hz,Hc,Hmw);
+tf=tran.tf; tm=tran.tm; tw=tran.tw; pd=tran.pd; tj=tran.tj;
 result=test_close(result,'eigenfields transition field',tf,10,1e-8,1e-12,...
                   'a 100 Hz transition under a 10 Hz/T Liouville pencil occurs at 10 T');
 result=test_close(result,'eigenfields transition moment',tm,1,1e-14,1e-14,...
@@ -88,7 +91,10 @@ Ic=[0 0.1;0.1 0];
 Qz=local_tiny_rank_one(2);
 Qc=local_tiny_rank_one(2);
 Hmw=[0 1;1 0];
-[tf,~,~,~,ti,tj]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw);
+Hz=Iz+orientation(Qz,parameters.orientation);
+Hc=Ic+orientation(Qc,parameters.orientation);
+tran=eigenfields(spin_system,parameters,Hz,Hc,Hmw);
+tf=tran.tf; ti=tran.ti; tj=tran.tj;
 root_field=sqrt(0.25-0.01);
 result=test_close(result,'eigenfields two-root fields',tf,[-root_field; root_field],1e-8,1e-10,...
                   'a symmetric avoided crossing must produce both resonance fields in the sweep window');

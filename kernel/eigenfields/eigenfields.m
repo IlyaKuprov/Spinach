@@ -3,29 +3,18 @@
 % of Hc+B*Hz is equal to the frequency provided, and the transition
 % moment across the specified operator Hmw is significant. Syntax:
 %
-%  [tf,tm,tw,pd,ti,tj]=eigenfields(spin_system,parameters,Iz,Qz,Ic,Qc,Hmw)
+%  tran=eigenfields(spin_system,parameters,Hz,Hc,Hmw)
 %
 % Parameters:
 %
-%     Iz  -  isotropic part of the laboratory frame Hamiltonian 
-%            operator (Hilbert space) or commutation superopera-
-%            tor (Liouville space, containing only Zeeman terms
-%            at 1 Tesla
+%     Hz  -  field-dependent part of the laboratory frame Hamil-
+%            tonian operator (Hilbert space) or commutation supe-
+%            roperator (Liouville space), normalised to 1 Tesla
 %
-%     Qz  -  anisotropic part of the laboratory frame Hamiltoni-
-%            an operator (Hilbert space) or commutation supero-
-%            perator (Liouville space, containing only Zeeman 
-%            terms at 1 Tesla
-%
-%     Ic  -  isotropic part of the laboratory frame Hamiltonian
-%            operator (Hilbert space) or commutation superopera-
-%            tor (Liouville space, containing all spin-spin cou-
-%            plings, but no Zeeman terms
-%
-%     Qc  -  anisotropic part of the laboratory frame Hamiltoni-
-%            an operator (Hilbert space) or commutation supero-
-%            perator (Liouville space, containing all spin-spin
-%            couplings, but no Zeeman terms
+%     Hc  -  field-independent part of the laboratory frame Hamil-
+%            tonian operator (Hilbert space) or commutation supe-
+%            roperator (Liouville space), containing couplings and
+%            offsets
 %
 %     Hmw -  observable operator (Hilbert space) or observable
 %            vector (Liouville space), without the amplitude 
@@ -266,34 +255,16 @@ switch spin_system.bas.formalism
 
                 % Get the cubic equation coefficients
                 gap_spline=destin_spline-source_spline;
-                poly_coeffs=gap_spline;
-
-                % Scale for numerical stability
-                poly_scale=max(abs(poly_coeffs));
-                if poly_scale==0, continue; end
-                poly_coeffs=poly_coeffs/poly_scale;
-
-                % Drop leading numerical zeros
-                lead_idx=find(abs(poly_coeffs)>sqrt(eps),1,'first');
-                if isempty(lead_idx), continue; end
-                poly_coeffs=poly_coeffs(lead_idx:end);
 
                 % Find all real roots inside the field interval
-                root_list=roots(poly_coeffs); root_tol=sqrt(eps);
-                root_list=root_list(abs(imag(root_list))<root_tol);
-                root_list=real(root_list);
-                root_list=root_list((root_list>=-root_tol)&...
-                                    (root_list<=1+root_tol));
-                root_list=min(max(root_list,0),1);
+                root_tol=sqrt(eps);
+                root_list=cubic_roots(gap_spline,root_tol);
 
                 % Add tangent roots at spline extrema
-                turn_list=roots(polyder(gap_spline));
-                turn_list=turn_list(abs(imag(turn_list))<root_tol);
-                turn_list=real(turn_list);
-                turn_list=turn_list((turn_list>=-root_tol)&...
-                                    (turn_list<=1+root_tol));
-                turn_list=min(max(turn_list,0),1);
-                turn_list=turn_list(abs(polyval(gap_spline,turn_list))<frq_gap_tol);
+                turn_list=cubic_roots([0 3*gap_spline(1) 2*gap_spline(2) gap_spline(3)],root_tol);
+                turn_gap=gap_spline(1)*turn_list.^3+gap_spline(2)*turn_list.^2+...
+                         gap_spline(3)*turn_list+gap_spline(4);
+                turn_list=turn_list(abs(turn_gap)<frq_gap_tol);
                 root_list=sort([root_list(:).' turn_list(:).']);
                 if isempty(root_list), continue; end
                 root_list=root_list([true abs(diff(root_list))>root_tol]);
@@ -322,7 +293,7 @@ switch spin_system.bas.formalism
                     pd_base=(1-alpha)*pd_left+alpha*pd_right;
 
                     % Get the transition frequency slope
-                    jac_slope=polyval(polyder(gap_spline),alpha)/dx;
+                    jac_slope=(3*gap_spline(1)*alpha^2+2*gap_spline(2)*alpha+gap_spline(3))/dx;
 
                     % Rediagonalise at unstable roots
                     if ~stable_states

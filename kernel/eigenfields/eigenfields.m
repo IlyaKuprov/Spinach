@@ -189,18 +189,24 @@ switch spin_system.bas.formalism
 
             % Build a one-to-one state assignment
             state_ovlp=abs(V{n-1}'*V{n});
+            ovlp_vec=state_ovlp(:);
+            sort_tab=[-ovlp_vec (1:numel(ovlp_vec)).'];
+            [~,sort_idx]=sortrows(sort_tab,[1 2]);
+            sorted_ovlp=ovlp_vec(sort_idx);
             perm=zeros(size(E,1),1);
             state_hit=false(size(E,1),1);
-            for k=1:size(E,1)
+            right_used=false(size(E,1),1);
+            for k=1:numel(sort_idx)
 
-                % Match the largest remaining eigenvector overlap
-                [max_ovlp,linear_idx]=max(state_ovlp(:));
-                if max_ovlp<sqrt(eps), error('state tracking failed'); end
-                [left_idx,right_idx]=ind2sub(size(state_ovlp),linear_idx);
-                perm(left_idx)=right_idx;
-                state_hit(left_idx)=true;
-                state_ovlp(left_idx,:)=-Inf;
-                state_ovlp(:,right_idx)=-Inf;
+                % Accept the next unused row-column pair
+                if sorted_ovlp(k)<sqrt(eps), break; end
+                [left_idx,right_idx]=ind2sub(size(state_ovlp),sort_idx(k));
+                if (~state_hit(left_idx))&&(~right_used(right_idx))
+                    perm(left_idx)=right_idx;
+                    state_hit(left_idx)=true;
+                    right_used(right_idx)=true;
+                    if all(state_hit), break; end
+                end
 
             end
             if any(~state_hit), error('state tracking failed'); end
@@ -308,18 +314,24 @@ switch spin_system.bas.formalism
 
                         % Match root eigenvectors to the left knot
                         root_ovlp=abs(V{n-1}'*V_root);
+                        ovlp_vec=root_ovlp(:);
+                        sort_tab=[-ovlp_vec (1:numel(ovlp_vec)).'];
+                        [~,sort_idx]=sortrows(sort_tab,[1 2]);
+                        sorted_ovlp=ovlp_vec(sort_idx);
                         perm=zeros(size(E,1),1);
                         state_hit=false(size(E,1),1);
-                        for m=1:size(E,1)
+                        right_used=false(size(E,1),1);
+                        for m=1:numel(sort_idx)
 
-                            % Match the largest remaining eigenvector overlap
-                            [max_ovlp,linear_idx]=max(root_ovlp(:));
-                            if max_ovlp<sqrt(eps), error('state tracking failed'); end
-                            [left_idx,right_idx]=ind2sub(size(root_ovlp),linear_idx);
-                            perm(left_idx)=right_idx;
-                            state_hit(left_idx)=true;
-                            root_ovlp(left_idx,:)=-Inf;
-                            root_ovlp(:,right_idx)=-Inf;
+                            % Accept the next unused row-column pair
+                            if sorted_ovlp(m)<sqrt(eps), break; end
+                            [left_idx,right_idx]=ind2sub(size(root_ovlp),sort_idx(m));
+                            if (~state_hit(left_idx))&&(~right_used(right_idx))
+                                perm(left_idx)=right_idx;
+                                state_hit(left_idx)=true;
+                                right_used(right_idx)=true;
+                                if all(state_hit), break; end
+                            end
 
                         end
                         if any(~state_hit), error('state tracking failed'); end

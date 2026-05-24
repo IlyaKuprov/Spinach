@@ -7,8 +7,9 @@
 %     result  - regression test result with explanatory messages
 %
 % The test checks finite-difference weights, finite-difference matrices,
-% Fourier differentiation, Laplacians, FFT differentiation kernels, and
-% matrix-exponential directional derivatives against exact simple cases.
+% Fourier differentiation, Laplacians, FFT differentiation kernels,
+% pseudomodulation, and matrix-exponential directional derivatives
+% against exact simple cases.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -20,7 +21,7 @@ fprintf('TESTING: Finite-difference and spectral differentiation functions\n');
 % State the differentiation target of the test
 result=new_test_result('kernel/finite_difference_suite',...
                        'Finite-difference and spectral differentiation functions',...
-                       'differentiation helpers must reproduce exact low-order polynomial and Fourier derivatives.');
+                       'differentiation and pseudomodulation helpers must reproduce exact limiting cases.');
 
 % Three-point centred finite-difference weights at zero are exact and familiar
 w=fdweights(0,[-1 0 1],2);
@@ -110,6 +111,46 @@ result=test_close(result,'fourlap sine eigenfunction',Lf*s,-s,1e-12,1e-12,...
 kern=fftdiff(1,N,2*pi/N); kern=kern(:);
 result=test_close(result,'fftdiff sine derivative',real(ifft(fft(s).*kern)),cos(grid),1e-12,1e-12,...
                   'fftdiff kernel differentiates periodic signals through Fourier multipliers');
+
+% Pseudomodulation zeroth harmonic with zero amplitude is the input spectrum
+pm_field=(0:31)'*(2*pi/32);
+pm_spec=[sin(2*pm_field) cos(3*pm_field)];
+pm_zero=pseudomodulation(pm_field,pm_spec,0,0);
+result=test_close(result,'pseudomodulation zero amplitude',pm_zero,pm_spec,1e-14,1e-14,...
+                  'zero-amplitude zeroth harmonic must return the input spectrum');
+
+% Pseudomodulation first harmonic tends to half the modulation amplitude times the derivative
+pm_amp=1e-4;
+pm_first=pseudomodulation(pm_field,sin(2*pm_field),pm_amp,1);
+pm_first_ref=pm_amp*cos(2*pm_field);
+result=test_close(result,'pseudomodulation first derivative limit',pm_first,pm_first_ref,1e-9,1e-12,...
+                  'small-amplitude first harmonic must match the Hyde derivative limit');
+
+% Pseudomodulation second harmonic tends to minus one sixteenth of amplitude squared times the second derivative
+pm_second=pseudomodulation(pm_field,sin(2*pm_field),pm_amp,2);
+pm_second_ref=(pm_amp^2/4)*sin(2*pm_field);
+result=test_close(result,'pseudomodulation second derivative limit',pm_second,pm_second_ref,1e-13,1e-14,...
+                  'small-amplitude second harmonic must match the Hyde derivative limit');
+
+% Pseudomodulation requires spectra down the rows
+try
+    pseudomodulation(pm_field,pm_spec.',pm_amp,1);
+    error('FAILED: pseudomodulation() accepted spectra across columns.');
+catch err
+    result=test_true(result,'pseudomodulation row convention',...
+                     contains(err.message,'same number of rows'),...
+                     'pseudomodulation() must follow the sgolaydiff() row convention');
+end
+
+% Pseudomodulation requires a column field axis
+try
+    pseudomodulation(pm_field.',pm_spec,pm_amp,1);
+    error('FAILED: pseudomodulation() accepted a row-vector field axis.');
+catch err
+    result=test_true(result,'pseudomodulation field convention',...
+                     contains(err.message,'column vector'),...
+                     'pseudomodulation() must require a column field axis');
+end
 
 % Directional derivative of a commuting matrix exponential has a closed form
 spin_system.sys.output='hush';

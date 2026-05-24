@@ -105,11 +105,12 @@ tri_corr(2).tj=2*tj;
 tri_corr(3).tm=4*tm;
 tri_corr(3).tj=tj;
 spec_corr=voitlander(spin_system,parameters,tri_corr,Ic,Iz,Qc,Qz,Hmw);
-prod_area=2*area_a+2*area_b+2*area_c+area_d;
+prod_area=(4*(2*area_a+2*area_b+2*area_c+area_d)-...
+           4*sphtarea(r1,r2,r3))/3;
 line_shape=(tm*tj/(pi*line_width))./(1+((parameters.b_axis-tf)/line_width).^2);
 reference=prod_area*pd*line_shape;
 result=test_close(result,'voitlander vertex product amplitude',spec_corr,reference,1e-10,1e-12,...
-                  'triangle amplitudes must average per-vertex products instead of separate moment and Jacobian means');
+                  'the Simpson-Richardson correction must average finite per-vertex products');
 
 % Check that singular field-sweep Jacobian vertices are rejected safely
 tri_sing=triangle;
@@ -117,11 +118,12 @@ tri_sing(1).tj=Inf;
 tri_sing(2).tj=tj;
 tri_sing(3).tj=2*tj;
 spec_sing=voitlander(spin_system,parameters,tri_sing,Ic,Iz,Qc,Qz,Hmw);
-sing_area=area_a+area_b+(4/3)*area_c+area_d;
+sing_area=(4*(area_a+area_b+(4/3)*area_c+area_d)-...
+           (3/2)*sphtarea(r1,r2,r3))/3;
 line_shape=(tm*tj/(pi*line_width))./(1+((parameters.b_axis-tf)/line_width).^2);
 reference=sing_area*pd*line_shape;
 result=test_close(result,'voitlander finite Jacobian rejection',spec_sing,reference,1e-10,1e-12,...
-                  'non-finite per-vertex Jacobian products must not reach the Lorentzian convolution');
+                  'non-finite per-vertex Jacobian products must be rejected before the Simpson-Richardson correction');
 result=test_true(result,'voitlander singular Jacobian finite spectrum',all(abs(imag(spec_sing(:)))<1e-14)&&...
                  all(isfinite(real(spec_sing(:)))),...
                  'a singular Jacobian at one vertex must not contaminate the triangle integral');

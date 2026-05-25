@@ -149,6 +149,36 @@ if exist('lorentzcon','file')==3
                       'two-argument atan2 must keep exact endpoint segment values finite when reciprocal width overflows');
 end
 
+% Check the normalised Gaussian branch analytically
+x_axis=[-1 0 1];
+line_obs=gausscon(0,2,2,x_axis);
+line_ref=2*gaussfun(x_axis,2);
+result=test_close(result,'gausscon Gaussian',line_obs,line_ref,1e-14,1e-14,...
+                  'scalar offset branch must match the normalised Gaussian line shape');
+
+% Check that coincident triangle vertices collapse to a Gaussian
+line_obs=gausscon([0 0 0],2,2,0);
+line_ref=2*gaussfun(0,2);
+result=test_close(result,'gausscon coincident vertices',line_obs,line_ref,1e-14,1e-14,...
+                  'three identical triangle vertices must collapse to the scalar-offset Gaussian line shape');
+
+% Check the Gaussian convolution with a general triangle by quadrature
+offs=[-1 0.25 2];
+x_axis=[-0.5 0.25 1.75];
+line_obs=gausscon(offs,1,0.6,x_axis);
+line_ref=zeros(size(x_axis));
+for n=1:numel(x_axis)
+    line_ref(n)=integral(@(offset) ...
+        ((((offset>=offs(1)).*(offset<=offs(2))).*...
+          (2*(offset-offs(1))/((offs(2)-offs(1))*(offs(3)-offs(1)))))+...
+         (((offset>=offs(2)).*(offset<=offs(3))).*...
+          (2*(offs(3)-offset)/((offs(3)-offs(2))*(offs(3)-offs(1)))))).*...
+        gaussfun(x_axis(n)-offset,0.6),offs(1),offs(3),...
+        'Waypoints',offs(2),'AbsTol',1e-12,'RelTol',1e-12);
+end
+result=test_close(result,'gausscon triangle quadrature',line_obs,line_ref,1e-10,1e-10,...
+                  'closed-form Gaussian triangle convolution must match direct numerical quadrature');
+
 % Check magnetic pumping adds only a source column from the unit state
 spin_system=local_liouvillian_system(3);
 R=zeros(3);

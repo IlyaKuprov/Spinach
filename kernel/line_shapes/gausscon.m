@@ -126,3 +126,8 @@ if (~isnumeric(fwhm))||(~isreal(fwhm))||...
     error('fwhm must be a finite positive real number.');
 end
 end
+
+% As for our majority... one is enough. 
+%
+% Benjamin Disraeli
+

@@ -202,6 +202,9 @@ if ~isfield(parameters,'verbose')||(parameters.verbose==0)
     spin_system.sys.output='hush';
 end
 
+% Strip the spin system object down to minimum size
+ss_parfor=stripper(spin_system,'context');
+
 % Parfor rigging
 if ~isworkernode
     DQ=parallel.pool.DataQueue;
@@ -222,7 +225,6 @@ function parfor_progr()
     end
 end
 
-% Parallel powder averaging loop
 parfor (n=1:n_orients,nworkers)
     
     % Localise parameter array
@@ -244,7 +246,7 @@ parfor (n=1:n_orients,nworkers)
     if ismember('aniso_eq',parameters.needs)
 
         % Anisotropic thermal equilibrium state from Hamiltonian and temperature
-        localpar.rho0=equilibrium(spin_system,HL,QL,[alphas(n) betas(n) gammas(n)]);
+        localpar.rho0=equilibrium(ss_parfor,HL,QL,[alphas(n) betas(n) gammas(n)]);
 
     elseif isfield(parameters,'rho0')&&isa(parameters.rho0,'function_handle')
 
@@ -255,25 +257,24 @@ parfor (n=1:n_orients,nworkers)
     
     % Apply rotating frames
     for k=1:numel(localpar.rframes)
-        H=rotframe(spin_system,C{k},H,localpar.rframes{k}{1},...
+        H=rotframe(ss_parfor,C{k},H,localpar.rframes{k}{1},...
                                       localpar.rframes{k}{2}); %#ok<PFBNS>
     end
     
     % Get the relaxation superoperator at the current orientation
-    R=relaxation(spin_system,[alphas(n) betas(n) gammas(n)]);
+    R=relaxation(ss_parfor,[alphas(n) betas(n) gammas(n)]);
     
     % Report to the user
-    report(spin_system,'running the pulse sequence...');
+    report(ss_parfor,'running the pulse sequence...');
     
     % Run the simulation (it might return a structure)
-    ans_array{n}=pulse_sequence(spin_system,localpar,H,R,K); %#ok<PFBNS>
+    ans_array{n}=pulse_sequence(ss_parfor,localpar,H,R,K); %#ok<PFBNS>
 
     % Report parfor progress
     if do_diag, send(DQ,n); end
     
 end
 
-% Unsilence the output
 spin_system.sys.output=prev_setting;
 
 % Decide the return array

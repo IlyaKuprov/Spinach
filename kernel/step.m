@@ -62,6 +62,9 @@ if time_step==0, return; end
 % Do we want to run on GPU?
 want_gpu=ismember('gpu',spin_system.sys.enable);
 
+% Strip the spin system object down to minimum size
+ss_parfor=stripper(spin_system,'step');
+
 % Is the generator already on GPU?
 if isnumeric(L)
     if want_gpu&&(~isa(L,'gpuArray'))
@@ -175,7 +178,7 @@ if ~expm_times_vec
             parfor k=1:numel(rho)
 
                 % Call the commutator series procedure
-                rho{k}=comm_series(spin_system,L,rho{k},time_step,nsteps);
+                rho{k}=comm_series(ss_parfor,L,rho{k},time_step,nsteps);
 
             end
 
@@ -185,7 +188,7 @@ if ~expm_times_vec
             for k=1:numel(rho)
 
                 % Call the commutator series procedure
-                rho{k}=comm_series(spin_system,L,rho{k},time_step,nsteps);
+                rho{k}=comm_series(ss_parfor,L,rho{k},time_step,nsteps);
 
             end
 

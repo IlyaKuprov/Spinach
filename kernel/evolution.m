@@ -105,10 +105,13 @@ function answer=evolution(spin_system,L,coil,rho,timestep,nsteps,output,destinat
 % Check consistency
 grumble(L,coil,rho,timestep,nsteps,output);
 
+% Strip the spin system object down to minimum size
+ss_parfor=stripper(spin_system,'evolution');
+
 % Call Krylov propagation for polyadics
 if isa(L,'polyadic')
-    report(spin_system,'polyadic generator received, forwarding to krylov()...');
-    answer=krylov(spin_system,L,coil,rho,timestep,nsteps,output); return;
+    report(ss_parfor,'polyadic generator received, forwarding to krylov()...');
+    answer=krylov(ss_parfor,L,coil,rho,timestep,nsteps,output); return;
 end
 
 % Gather state vectors from GPUs
@@ -120,31 +123,31 @@ switch spin_system.bas.formalism
     case {'sphten-liouv','zeeman-liouv'}
         
         % Apply trajectory-level reduction algorithms
-        report(spin_system,'trying to reduce the problem dimension...');
+        report(ss_parfor,'trying to reduce the problem dimension...');
         
         % Decide the screening algorithm
-        if ismember('dss',spin_system.sys.disable)
+        if ismember('dss',ss_parfor.sys.disable)
             
             % If DSS is disabled, run forward reduction
-            report(spin_system,'WARNING - destination state screening is disabled.');
+            report(ss_parfor,'WARNING - destination state screening is disabled.');
             projectors=reduce(spin_system,L,rho);
             
         elseif exist('destination','var')&&(~isempty(destination))
             
             % If destination state is supplied, use it for DSS
-            report(spin_system,'destination state screening using supplied state.');
+            report(ss_parfor,'destination state screening using supplied state.');
             projectors=reduce(spin_system,L',destination);
             
         elseif ismember(output,{'observable'})
             
             % If coil state is supplied, use it for DSS
-            report(spin_system,'destination state screening using coil state.');
+            report(ss_parfor,'destination state screening using coil state.');
             projectors=reduce(spin_system,L',coil);
             
         else
             
             % Default to the usual forward screening
-            report(spin_system,'destination state screening is not applicable.');
+            report(ss_parfor,'destination state screening is not applicable.');
             projectors=reduce(spin_system,L,rho);
             
         end
@@ -167,7 +170,7 @@ switch spin_system.bas.formalism
                 % Create arrays of projections
                 L_sub=cell(nsubs,1); rho_sub=cell(nsubs,1); 
                 rows=cell(nsubs,1); cols=cell(nsubs,1); vals=cell(nsubs,1);
-                report(spin_system,'splitting the space...');
+                report(ss_parfor,'splitting the space...');
                 for sub=1:nsubs
                     L_sub{sub}=projectors{sub}'*L*projectors{sub};
                     rho_sub{sub}=projectors{sub}'*rho;
@@ -177,17 +180,17 @@ switch spin_system.bas.formalism
                 parfor (sub=1:nsubs,nworkers)
                     
                     % Inform the user
-                    report(spin_system,['evolving subspace ' num2str(sub) ' of ' num2str(nsubs) '...']);
+                    report(ss_parfor,['evolving subspace ' num2str(sub) ' of ' num2str(nsubs) '...']);
                     
                     % Grab local copies
                     L_loc=L_sub{sub}; rho_loc=rho_sub{sub}; proj_loc=projectors{sub};
-                    L_loc=clean_up(spin_system,L_loc,spin_system.tols.liouv_zero);
-                    rho_loc=clean_up(spin_system,rho_loc,spin_system.tols.zte_tol);
+                    L_loc=clean_up(ss_parfor,L_loc,ss_parfor.tols.liouv_zero);
+                    rho_loc=clean_up(ss_parfor,rho_loc,ss_parfor.tols.zte_tol);
                     
                     % Decide if Krylov should be used
-                    if ((size(L_loc,2)<spin_system.tols.krylov_tol)||...
-                        ismember('krylov',spin_system.sys.disable))&&...
-                      (~ismember('krylov',spin_system.sys.enable))
+                    if ((size(L_loc,2)<ss_parfor.tols.krylov_tol)||...
+                        ismember('krylov',ss_parfor.sys.disable))&&...
+                      (~ismember('krylov',ss_parfor.sys.enable))
                         
                         % Ignore user timing and use optimal one
                         nsteps_opt=ceil(log2(size(L_loc,1)/(size(rho_loc,2)*log(2)))); 
@@ -195,19 +198,19 @@ switch spin_system.bas.formalism
                         timestep_loc=total_time/nsteps_opt;
                         
                         % Inform the user
-                        report(spin_system,['dim(L)=' num2str(size(L_loc,1)) ...
+                        report(ss_parfor,['dim(L)=' num2str(size(L_loc,1)) ...
                                             ', rho stack size ' num2str(size(rho_loc,2)) ', ' ...
                                             num2str(nsteps_opt) ' substeps in optimal stepping.']); 
                   
                         % Get the exponential propagator
-                        report(spin_system,'building the propagator...');
-                        P=propagator(spin_system,L_loc,timestep_loc);
+                        report(ss_parfor,'building the propagator...');
+                        P=propagator(ss_parfor,L_loc,timestep_loc);
                         
                         % Adapt to the target device
-                        if ismember('gpu',spin_system.sys.enable)
+                        if ismember('gpu',ss_parfor.sys.enable)
                             
                             % Inform the user
-                            report(spin_system,'propagating the system on GPU...');
+                            report(ss_parfor,'propagating the system on GPU...');
                             
                             % Move things to GPU
                             P=gpuArray(P); rho_loc=gpuArray(rho_loc);
@@ -223,7 +226,7 @@ switch spin_system.bas.formalism
                         else
                             
                             % Inform the user
-                            report(spin_system,'propagating the system on CPU...');
+                            report(ss_parfor,'propagating the system on CPU...');
                             
                             % Run the propagation
                             for n=1:nsteps_opt
@@ -235,13 +238,13 @@ switch spin_system.bas.formalism
                     else
                         
                         % For very large subspaces use Krylov propagation
-                        report(spin_system,'large Liouvillian, propagating using Krylov algorithm... ');
-                        rho_loc=krylov(spin_system,L_loc,[],rho_loc,timestep,nsteps,'final');
+                        report(ss_parfor,'large Liouvillian, propagating using Krylov algorithm... ');
+                        rho_loc=krylov(ss_parfor,L_loc,[],rho_loc,timestep,nsteps,'final');
                         
                     end
                     
                     % Project back into the full space and convert into i,j,v
-                    rho_loc=clean_up(spin_system,rho_loc,spin_system.tols.zte_tol);
+                    rho_loc=clean_up(ss_parfor,rho_loc,ss_parfor.tols.zte_tol);
                     [rows{sub},cols{sub},vals{sub}]=find(proj_loc*sparse(rho_loc));
                     
                     % Deallocate memory in a transparent way
@@ -250,24 +253,24 @@ switch spin_system.bas.formalism
                 end
                 
                 % Update the user
-                report(spin_system,'propagation finished.');
+                report(ss_parfor,'propagation finished.');
                 
                 % Deallocate memory
                 clear('L_sub','rho_sub','projectors');
                 
                 % Recombine the subspaces
-                report(spin_system,'recombining subspaces...');
+                report(ss_parfor,'recombining subspaces...');
                 rows=cell2mat(rows); cols=cell2mat(cols); vals=cell2mat(vals);
                 answer=sparse(rows,cols,vals,size(rho,1),size(rho,2));
-                answer=clean_up(spin_system,answer,spin_system.tols.zte_tol);
-                report(spin_system,'data retrieval finished.');
+                answer=clean_up(ss_parfor,answer,ss_parfor.tols.zte_tol);
+                report(ss_parfor,'data retrieval finished.');
                 
             case 'total'
                 
                 % Create arrays of projections
                 L_sub=cell(nsubs,1); 
                 rho_sub=cell(nsubs,1); coil_sub=cell(nsubs,1);
-                report(spin_system,'splitting the space...');
+                report(ss_parfor,'splitting the space...');
                 for sub=1:nsubs
                     L_sub{sub}=projectors{sub}'*L*projectors{sub};
                     rho_sub{sub}=full(projectors{sub}'*rho);
@@ -281,23 +284,23 @@ switch spin_system.bas.formalism
                 parfor (sub=1:nsubs,nworkers)
                     
                     % Inform the user
-                    report(spin_system,['evolving subspace ' num2str(sub) ' of ' num2str(nsubs) '...']);
+                    report(ss_parfor,['evolving subspace ' num2str(sub) ' of ' num2str(nsubs) '...']);
                     
                     % Grab local copies
                     L_loc=L_sub{sub}; rho_loc=rho_sub{sub}; coil_loc=coil_sub{sub}; 
-                    L_loc=clean_up(spin_system,L_loc,spin_system.tols.liouv_zero);
-                    rho_loc=clean_up(spin_system,rho_loc,spin_system.tols.zte_tol);
-                    coil_loc=clean_up(spin_system,coil_loc,spin_system.tols.zte_tol);
+                    L_loc=clean_up(ss_parfor,L_loc,ss_parfor.tols.liouv_zero);
+                    rho_loc=clean_up(ss_parfor,rho_loc,ss_parfor.tols.zte_tol);
+                    coil_loc=clean_up(ss_parfor,coil_loc,ss_parfor.tols.zte_tol);
                     
                     % Compute the integral
-                    report(spin_system,'integrating the trajectory...');
+                    report(ss_parfor,'integrating the trajectory...');
                     answer_loc=real(coil_loc'*((1i*L_loc)\rho_loc));
                     
                     % Add the subspace to the total
                     answer=answer+answer_loc;
                     
                     % Update the user
-                    report(spin_system,'integration finished.');
+                    report(ss_parfor,'integration finished.');
                     
                 end
                 
@@ -309,7 +312,7 @@ switch spin_system.bas.formalism
                 % Create arrays of projections
                 L_sub=cell(nsubs,1); rho_sub=cell(nsubs,1);
                 rows=cell(nsubs,1); cols=cell(nsubs,1); vals=cell(nsubs,1);
-                report(spin_system,'splitting the space...');
+                report(ss_parfor,'splitting the space...');
                 for sub=1:nsubs
                     L_sub{sub}=projectors{sub}'*L*projectors{sub};
                     rho_sub{sub}=projectors{sub}'*rho;
@@ -319,30 +322,30 @@ switch spin_system.bas.formalism
                 parfor (sub=1:nsubs,nworkers)
                     
                     % Inform the user
-                    report(spin_system,['evolving subspace ' num2str(sub) ' of ' num2str(nsubs) '...']);
+                    report(ss_parfor,['evolving subspace ' num2str(sub) ' of ' num2str(nsubs) '...']);
                     
                      % Grab local copies
                     L_loc=L_sub{sub}; rho_loc=rho_sub{sub}; proj_loc=projectors{sub};
-                    L_loc=clean_up(spin_system,L_loc,spin_system.tols.liouv_zero);
-                    rho_loc=clean_up(spin_system,rho_loc,spin_system.tols.zte_tol);
+                    L_loc=clean_up(ss_parfor,L_loc,ss_parfor.tols.liouv_zero);
+                    rho_loc=clean_up(ss_parfor,rho_loc,ss_parfor.tols.zte_tol);
                     
                     % Propagate the system
-                    if ((size(L_loc,2)<spin_system.tols.krylov_tol)||...
-                        ismember('krylov',spin_system.sys.disable))&&...
-                      (~ismember('krylov',spin_system.sys.enable))
+                    if ((size(L_loc,2)<ss_parfor.tols.krylov_tol)||...
+                        ismember('krylov',ss_parfor.sys.disable))&&...
+                      (~ismember('krylov',ss_parfor.sys.enable))
                         
                         % Preallocate the answer
                         answer=zeros([size(rho_loc,1) (nsteps+1)],'like',1i);
                   
                         % Get the exponential propagator
-                        report(spin_system,'building the propagator...');
-                        P=propagator(spin_system,L_loc,timestep);
+                        report(ss_parfor,'building the propagator...');
+                        P=propagator(ss_parfor,L_loc,timestep);
                     
                         % Adapt to the target device
-                        if ismember('gpu',spin_system.sys.enable)
+                        if ismember('gpu',ss_parfor.sys.enable)
                             
                             % Inform the user
-                            report(spin_system,'propagating the system on GPU...');
+                            report(ss_parfor,'propagating the system on GPU...');
                             
                             % Move things to GPU
                             rho_loc=gpuArray(rho_loc); P=gpuArray(P);
@@ -356,7 +359,7 @@ switch spin_system.bas.formalism
                         else
                             
                             % Inform the user
-                            report(spin_system,'propagating the system on CPU...');
+                            report(ss_parfor,'propagating the system on CPU...');
                             
                             % Propagate the system
                             for n=1:(nsteps+1)
@@ -369,13 +372,13 @@ switch spin_system.bas.formalism
                     else
                         
                         % For very large subspaces use Krylov propagation
-                        report(spin_system,'large Liouvillian, propagating using Krylov algorithm... ');
-                        answer=krylov(spin_system,L_loc,[],rho_loc,timestep,nsteps,'trajectory')
+                        report(ss_parfor,'large Liouvillian, propagating using Krylov algorithm... ');
+                        answer=krylov(ss_parfor,L_loc,[],rho_loc,timestep,nsteps,'trajectory')
                         
                     end
                     
                     % Project back into the full space
-                    answer=clean_up(spin_system,answer,spin_system.tols.zte_tol);
+                    answer=clean_up(ss_parfor,answer,ss_parfor.tols.zte_tol);
                     [rows{sub},cols{sub},vals{sub}]=find(proj_loc*sparse(answer));
                     
                     % Deallocate memory in a transparent way
@@ -384,24 +387,24 @@ switch spin_system.bas.formalism
                 end
                 
                 % Update the user
-                report(spin_system,'propagation finished.');
+                report(ss_parfor,'propagation finished.');
                 
                 % Deallocate memory
                 clear('L_sub','rho_sub','projectors');
                 
                 % Recombine the subspaces
-                report(spin_system,'recombining subspaces...');
+                report(ss_parfor,'recombining subspaces...');
                 rows=cell2mat(rows); cols=cell2mat(cols); vals=cell2mat(vals);
                 answer=sparse(rows,cols,vals,size(rho,1),nsteps+1);
-                answer=clean_up(spin_system,answer,spin_system.tols.zte_tol);
-                report(spin_system,'data retrieval finished.');
+                answer=clean_up(ss_parfor,answer,ss_parfor.tols.zte_tol);
+                report(ss_parfor,'data retrieval finished.');
                 
             case 'refocus'
                 
                 % Create arrays of projections
                 L_sub=cell(nsubs,1); rho_sub=cell(nsubs,1);
                 rows=cell(nsubs,1); cols=cell(nsubs,1); vals=cell(nsubs,1);
-                report(spin_system,'splitting the space...');
+                report(ss_parfor,'splitting the space...');
                 for sub=1:nsubs
                     L_sub{sub}=projectors{sub}'*L*projectors{sub};
                     rho_sub{sub}=projectors{sub}'*rho;
@@ -411,27 +414,27 @@ switch spin_system.bas.formalism
                 parfor (sub=1:nsubs,nworkers)
                     
                     % Inform the user
-                    report(spin_system,['evolving subspace ' num2str(sub) ' of ' num2str(nsubs) '...']);
+                    report(ss_parfor,['evolving subspace ' num2str(sub) ' of ' num2str(nsubs) '...']);
                     
                     % Grab local copies
                     L_loc=L_sub{sub}; rho_loc=rho_sub{sub}; proj_loc=projectors{sub};
-                    L_loc=clean_up(spin_system,L_loc,spin_system.tols.liouv_zero);
-                    rho_loc=clean_up(spin_system,rho_loc,spin_system.tols.zte_tol);
+                    L_loc=clean_up(ss_parfor,L_loc,ss_parfor.tols.liouv_zero);
+                    rho_loc=clean_up(ss_parfor,rho_loc,ss_parfor.tols.zte_tol);
                     
                     % Propagate the system
-                    if ((size(L_loc,2)<spin_system.tols.krylov_tol)||...
-                        ismember('krylov',spin_system.sys.disable))&&...
-                      (~ismember('krylov',spin_system.sys.enable))
+                    if ((size(L_loc,2)<ss_parfor.tols.krylov_tol)||...
+                        ismember('krylov',ss_parfor.sys.disable))&&...
+                      (~ismember('krylov',ss_parfor.sys.enable))
                         
                         % Get the exponential propagator
-                        report(spin_system,'building the propagator...');
-                        P=propagator(spin_system,L_loc,timestep);
+                        report(ss_parfor,'building the propagator...');
+                        P=propagator(ss_parfor,L_loc,timestep);
                         
                         % Adapt to the target device
-                        if ismember('gpu',spin_system.sys.enable)
+                        if ismember('gpu',ss_parfor.sys.enable)
                             
                             % Inform the user
-                            report(spin_system,'propagating the system on GPU...');
+                            report(ss_parfor,'propagating the system on GPU...');
                             
                             % Move propagator to GPU
                             P=gpuArray(P);
@@ -458,7 +461,7 @@ switch spin_system.bas.formalism
                         else
                             
                             % Inform the user
-                            report(spin_system,'propagating the system on CPU...');
+                            report(ss_parfor,'propagating the system on CPU...');
                             
                             % Propagate the system
                             for n=2:size(rho_loc,2)
@@ -470,13 +473,13 @@ switch spin_system.bas.formalism
                     else
                         
                         % For very large subspaces use Krylov propagation
-                        report(spin_system,'large Liouvillian, propagating using Krylov algorithm... ');
-                        rho_loc=krylov(spin_system,L_loc,[],rho_loc,timestep,[],'refocus');
+                        report(ss_parfor,'large Liouvillian, propagating using Krylov algorithm... ');
+                        rho_loc=krylov(ss_parfor,L_loc,[],rho_loc,timestep,[],'refocus');
                         
                     end
                     
                     % Project back into the full space
-                    rho_loc=clean_up(spin_system,rho_loc,spin_system.tols.zte_tol);
+                    rho_loc=clean_up(ss_parfor,rho_loc,ss_parfor.tols.zte_tol);
                     [rows{sub},cols{sub},vals{sub}]=find(proj_loc*sparse(rho_loc));
                     
                     % Deallocate memory in a transparent way
@@ -485,24 +488,24 @@ switch spin_system.bas.formalism
                 end
                 
                 % Update the user
-                report(spin_system,'propagation finished.');
+                report(ss_parfor,'propagation finished.');
                 
                 % Deallocate memory
                 clear('L_sub','rho_sub','projectors');
                 
                 % Recombine the subspaces
-                report(spin_system,'recombining subspaces...');
+                report(ss_parfor,'recombining subspaces...');
                 rows=cell2mat(rows); cols=cell2mat(cols); vals=cell2mat(vals);
                 answer=sparse(rows,cols,vals,size(rho,1),nsteps+1);
-                answer=clean_up(spin_system,answer,spin_system.tols.zte_tol);
-                report(spin_system,'data retrieval finished.');
+                answer=clean_up(ss_parfor,answer,ss_parfor.tols.zte_tol);
+                report(ss_parfor,'data retrieval finished.');
                 
             case 'observable'
                 
                 % Create arrays of projections
                 L_sub=cell(nsubs,1); 
                 rho_sub=cell(nsubs,1); coil_sub=cell(nsubs,1);
-                report(spin_system,'splitting the space...');
+                report(ss_parfor,'splitting the space...');
                 for sub=1:nsubs
                     L_sub{sub}=projectors{sub}'*L*projectors{sub};
                     rho_sub{sub}=projectors{sub}'*rho;
@@ -516,31 +519,31 @@ switch spin_system.bas.formalism
                 parfor (sub=1:nsubs,nworkers)
                     
                     % Inform the user
-                    report(spin_system,['evolving subspace ' num2str(sub) ' of ' num2str(nsubs) '...']);
+                    report(ss_parfor,['evolving subspace ' num2str(sub) ' of ' num2str(nsubs) '...']);
                     
                     % Grab local copies
                     L_loc=L_sub{sub}; rho_loc=rho_sub{sub}; coil_loc=coil_sub{sub}; 
-                    L_loc=clean_up(spin_system,L_loc,spin_system.tols.liouv_zero);
-                    rho_loc=clean_up(spin_system,rho_loc,spin_system.tols.zte_tol);
-                    coil_loc=clean_up(spin_system,coil_loc,spin_system.tols.zte_tol);
+                    L_loc=clean_up(ss_parfor,L_loc,ss_parfor.tols.liouv_zero);
+                    rho_loc=clean_up(ss_parfor,rho_loc,ss_parfor.tols.zte_tol);
+                    coil_loc=clean_up(ss_parfor,coil_loc,ss_parfor.tols.zte_tol);
                     
                     % Propagate the system
-                    if ((size(L_loc,2)<spin_system.tols.krylov_tol)||...
-                        ismember('krylov',spin_system.sys.disable))&&...
-                      (~ismember('krylov',spin_system.sys.enable))
+                    if ((size(L_loc,2)<ss_parfor.tols.krylov_tol)||...
+                        ismember('krylov',ss_parfor.sys.disable))&&...
+                      (~ismember('krylov',ss_parfor.sys.enable))
                         
                         % Get the exponential propagator
-                        report(spin_system,'building the propagator...');
-                        P=propagator(spin_system,L_loc,timestep);
+                        report(ss_parfor,'building the propagator...');
+                        P=propagator(ss_parfor,L_loc,timestep);
                         
                         % Preallocate the local answer
                         answer_loc=zeros([(nsteps+1) size(rho_loc,2)],'like',1i);
                         
                         % Adapt to the target device
-                        if ismember('gpu',spin_system.sys.enable)
+                        if ismember('gpu',ss_parfor.sys.enable)
                             
                             % Inform the user
-                            report(spin_system,'propagating the system on GPU...');
+                            report(ss_parfor,'propagating the system on GPU...');
                             
                             % Upload things to GPU
                             P=gpuArray(P); coil_loc=gpuArray(coil_loc); rho_loc=gpuArray(rho_loc);
@@ -554,7 +557,7 @@ switch spin_system.bas.formalism
                         else
                             
                             % Inform the user
-                            report(spin_system,'propagating the system on CPU...');
+                            report(ss_parfor,'propagating the system on CPU...');
                             
                             % Propagate and detect
                             for n=1:(nsteps+1)
@@ -567,8 +570,8 @@ switch spin_system.bas.formalism
                     else
                         
                         % For very large subspaces use Krylov propagation
-                        report(spin_system,'large Liouvillian, propagating using Krylov algorithm... ');
-                        answer_loc=krylov(spin_system,L_loc,coil_loc,rho_loc,timestep,nsteps,'observable');
+                        report(ss_parfor,'large Liouvillian, propagating using Krylov algorithm... ');
+                        answer_loc=krylov(ss_parfor,L_loc,coil_loc,rho_loc,timestep,nsteps,'observable');
                         
                     end
                     
@@ -579,7 +582,7 @@ switch spin_system.bas.formalism
                     rho_loc=[]; L_loc=[]; P=[]; answer_loc=[]; %#ok<NASGU>
                     
                     % Update the user
-                    report(spin_system,'propagation finished.');
+                    report(ss_parfor,'propagation finished.');
                     
                 end
                 
@@ -588,7 +591,7 @@ switch spin_system.bas.formalism
                 % Create arrays of projections
                 L_sub=cell(nsubs,1); 
                 rho_sub=cell(nsubs,1); coil_sub=cell(nsubs,1);
-                report(spin_system,'splitting the space...');
+                report(ss_parfor,'splitting the space...');
                 for sub=1:nsubs
                     L_sub{sub}=projectors{sub}'*L*projectors{sub};
                     rho_sub{sub}=projectors{sub}'*rho;
@@ -602,31 +605,31 @@ switch spin_system.bas.formalism
                 parfor (sub=1:nsubs,nworkers)
                     
                     % Inform the user
-                    report(spin_system,['evolving subspace ' num2str(sub) ' of ' num2str(numel(projectors)) '...']);
+                    report(ss_parfor,['evolving subspace ' num2str(sub) ' of ' num2str(numel(projectors)) '...']);
                     
                     % Grab local copies
                     L_loc=L_sub{sub}; rho_loc=rho_sub{sub}; coil_loc=coil_sub{sub}; 
-                    L_loc=clean_up(spin_system,L_loc,spin_system.tols.liouv_zero);
-                    rho_loc=clean_up(spin_system,rho_loc,spin_system.tols.zte_tol);
-                    coil_loc=clean_up(spin_system,coil_loc,spin_system.tols.zte_tol);
+                    L_loc=clean_up(ss_parfor,L_loc,ss_parfor.tols.liouv_zero);
+                    rho_loc=clean_up(ss_parfor,rho_loc,ss_parfor.tols.zte_tol);
+                    coil_loc=clean_up(ss_parfor,coil_loc,ss_parfor.tols.zte_tol);
                     
                     % Propagate the system
-                    if ((size(L_loc,2)<spin_system.tols.krylov_tol)||...
-                        ismember('krylov',spin_system.sys.disable))&&...
-                      (~ismember('krylov',spin_system.sys.enable))
+                    if ((size(L_loc,2)<ss_parfor.tols.krylov_tol)||...
+                        ismember('krylov',ss_parfor.sys.disable))&&...
+                      (~ismember('krylov',ss_parfor.sys.enable))
                         
                         % Get the exponential propagator
-                        report(spin_system,'building the propagator...');
-                        P=propagator(spin_system,L_loc,timestep);
+                        report(ss_parfor,'building the propagator...');
+                        P=propagator(ss_parfor,L_loc,timestep);
                         
                         % Preallocate the local answer
                         answer_loc=zeros([size(coil_loc,2) (nsteps+1)],'like',1i);
                         
                         % Adapt to the target device
-                        if ismember('gpu',spin_system.sys.enable)
+                        if ismember('gpu',ss_parfor.sys.enable)
                             
                             % Inform the user
-                            report(spin_system,'propagating the system on GPU...');
+                            report(ss_parfor,'propagating the system on GPU...');
                             
                             % Upload things to GPU
                             P=gpuArray(P); rho_loc=gpuArray(rho_loc); coil_loc=gpuArray(coil_loc);
@@ -640,7 +643,7 @@ switch spin_system.bas.formalism
                         else
                             
                             % Inform the user
-                            report(spin_system,'propagating the system on CPU...');
+                            report(ss_parfor,'propagating the system on CPU...');
                             
                             % Propagate the system
                             for n=1:(nsteps+1)
@@ -653,8 +656,8 @@ switch spin_system.bas.formalism
                     else
                         
                         % For very large subspaces use Krylov propagation
-                        report(spin_system,'large Liouvillian, propagating using Krylov algorithm... ');
-                        answer_loc=krylov(spin_system,L_loc,coil_loc,rho_loc,timestep,nsteps,'multichannel');
+                        report(ss_parfor,'large Liouvillian, propagating using Krylov algorithm... ');
+                        answer_loc=krylov(ss_parfor,L_loc,coil_loc,rho_loc,timestep,nsteps,'multichannel');
                         
                     end
                     
@@ -665,7 +668,7 @@ switch spin_system.bas.formalism
                     rho_loc=[]; L_loc=[]; P=[]; answer_loc=[]; %#ok<NASGU>
                     
                     % Update the user
-                    report(spin_system,'propagation finished.');
+                    report(ss_parfor,'propagation finished.');
                     
                 end
                 
@@ -695,10 +698,10 @@ switch spin_system.bas.formalism
                     case 'none'
                         
                         % Compute the exponential propagator
-                        P=propagator(spin_system,L,total_time);
+                        P=propagator(ss_parfor,L,total_time);
                         
                         % Report to the user
-                        report(spin_system,'propagating the system...');
+                        report(ss_parfor,'propagating the system...');
                         
                         % Parallelise if possible
                         if iscell(rho)
@@ -719,7 +722,7 @@ switch spin_system.bas.formalism
                         end
                         
                         % Report to the user
-                        report(spin_system,'propagation finished.');
+                        report(ss_parfor,'propagation finished.');
                         
                     otherwise
                         
@@ -739,13 +742,13 @@ switch spin_system.bas.formalism
                         if iscell(rho)
                             
                             % Compute the exponential propagator
-                            P=propagator(spin_system,L,timestep);
+                            P=propagator(ss_parfor,L,timestep);
                             
                             % Preallocate the answer
                             answer=zeros([(nsteps+1) numel(rho)],'like',1i);
                             
                             % Report to the user
-                            report(spin_system,'propagating the system (parfor over stack)...');
+                            report(ss_parfor,'propagating the system (parfor over stack)...');
                             
                             % Loop over the elements of the stack
                             parfor k=1:numel(rho)
@@ -774,13 +777,13 @@ switch spin_system.bas.formalism
                         elseif isworkernode
                             
                             % Compute the exponential propagator
-                            P=propagator(spin_system,L,timestep);
+                            P=propagator(ss_parfor,L,timestep);
                             
                             % Preallocate the answer
                             answer=zeros([(nsteps+1) 1],'like',1i);
                             
                             % Report to the user
-                            report(spin_system,'propagating the system (worker node)...');
+                            report(ss_parfor,'propagating the system (worker node)...');
                             
                             % Loop over time steps
                             for n=1:(nsteps+1)
@@ -800,13 +803,13 @@ switch spin_system.bas.formalism
                             answer=zeros([(nsteps+1) 1],'like',1i);
                             
                             % Report to the user
-                            report(spin_system,'propagating the system (Kuprov-Edwards parallel split)...');
+                            report(ss_parfor,'propagating the system (Kuprov-Edwards parallel split)...');
                             
                             % Loop over the irreps
                             for sub=1:numel(projectors)
                                 
                                 % Report to the user
-                                report(spin_system,['irreducible representation ' int2str(sub) ...
+                                report(ss_parfor,['irreducible representation ' int2str(sub) ...
                                                     '/' int2str(numel(projectors)) '...']);
                                 
                                 % Project the calculation
@@ -815,7 +818,7 @@ switch spin_system.bas.formalism
                                 coil_sub=projectors{sub}'*coil*projectors{sub};
                             
                                 % Compute the exponential propagator
-                                P_sub=propagator(spin_system,L_sub,timestep);
+                                P_sub=propagator(ss_parfor,L_sub,timestep);
                                 
                                 % Distribute the initial condition
                                 rho_sub=distrib_dim(rho_sub,2);
@@ -857,7 +860,7 @@ switch spin_system.bas.formalism
                         end
                         
                         % Report to the user
-                        report(spin_system,'propagation finished.');
+                        report(ss_parfor,'propagation finished.');
                                                      
                     otherwise
                         
@@ -877,17 +880,17 @@ switch spin_system.bas.formalism
                     case 'none'
                         
                         % Compute the exponential propagator
-                        P=propagator(spin_system,L,timestep);
+                        P=propagator(ss_parfor,L,timestep);
                         
                         % Preallocate the answer
                         answer=cell(1,nsteps+1);
                         
                         % Compute the trajectory
-                        report(spin_system,'propagating the system...');
+                        report(ss_parfor,'propagating the system...');
                         for n=1:(nsteps+1)
                             answer{n}=rho; rho=P*rho*P';
                         end
-                        report(spin_system,'propagation finished.');
+                        report(ss_parfor,'propagation finished.');
                         
                     otherwise
                         
@@ -904,10 +907,10 @@ switch spin_system.bas.formalism
                     case 'none'
                         
                         % Compute the exponential propagator
-                        P=propagator(spin_system,L,timestep);
+                        P=propagator(ss_parfor,L,timestep);
                         
                         % Propagate the system
-                        report(spin_system,'propagating the system...');
+                        report(ss_parfor,'propagating the system...');
                         parfor k=2:numel(rho)
                             
                             % Grab a local copy
@@ -922,7 +925,7 @@ switch spin_system.bas.formalism
                             rho{k}=rho_local;
                             
                         end
-                        answer=rho; report(spin_system,'propagation finished.');
+                        answer=rho; report(ss_parfor,'propagation finished.');
                         
                     otherwise
                         
@@ -979,4 +982,3 @@ end
 % independence.
 %
 % Ayn Rand, "The Fountainhead"
-

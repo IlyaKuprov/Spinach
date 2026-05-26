@@ -79,17 +79,20 @@ rho=coherence(spin_system,rho,{{parameters.spins{1},+1}});
 % Preallocate rho stack
 rho_stack=zeros([size(rho,1) parameters.npoints(1)],'like',1i);
 
+% Strip the spin system object down to minimum size
+ss_parfor=stripper(spin_system,'evolution');
+
 % Loop over the value of t1
 parfor n=1:parameters.npoints(1)
     
     % Run the first delay
-    rho_current=evolution(spin_system,L,[],rho,CT/2-t1_grid(n)/2,1,'final');
+    rho_current=evolution(ss_parfor,L,[],rho,CT/2-t1_grid(n)/2,1,'final');
     
     % Run the pi pulse
-    rho_current=step(spin_system,Hx,rho_current,pi);
+    rho_current=step(ss_parfor,Hx,rho_current,pi);
     
     % Run the second delay
-    rho_current=evolution(spin_system,L,[],rho_current,CT/2+t1_grid(n)/2,1,'final');
+    rho_current=evolution(ss_parfor,L,[],rho_current,CT/2+t1_grid(n)/2,1,'final');
     
     % Assign the stack element
     rho_stack(:,n)=rho_current;
@@ -161,4 +164,3 @@ end
 % Student feedback received by 
 % Michael Berry on one of his
 % modules
-

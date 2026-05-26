@@ -89,6 +89,9 @@ end
 % Preallocate Liouvillian blocks
 L=cell(2*parameters.max_rank+1,1);
 
+% Strip the spin system object down to minimum size
+ss_parfor=stripper(spin_system,'context');
+
 % Build Liouvillian blocks
 parfor n=1:(2*parameters.max_rank+1) %#ok<*PFBNS>
     
@@ -139,12 +142,12 @@ parfor n=1:(2*parameters.max_rank+1) %#ok<*PFBNS>
     
     % Apply interaction representations
     for k=1:numel(parameters.rframes)
-        L{n}=rotframe(spin_system,C{k},(L{n}+L{n}')/2,parameters.rframes{k}{1},...
-                                                      parameters.rframes{k}{2});
+        L{n}=rotframe(ss_parfor,C{k},(L{n}+L{n}')/2,parameters.rframes{k}{1},...
+                                                    parameters.rframes{k}{2});
     end
     
     % Clean up the result
-    L{n}=clean_up(spin_system,L{n},spin_system.tols.liouv_zero);
+    L{n}=clean_up(ss_parfor,L{n},ss_parfor.tols.liouv_zero);
     
 end
 
@@ -243,4 +246,3 @@ end
 % Never complain and never explain. 
 %
 % Benjamin Disraeli
-

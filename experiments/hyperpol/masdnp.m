@@ -81,6 +81,9 @@ end
 % Get the answer going
 dnp=0;
 
+% Strip the spin system object down to minimum size
+ss_parfor=stripper(spin_system,'context');
+
 % Loop over the grid weights
 parfor n=1:numel(sph_grid.weights) %#ok<*PFBNS>
     
@@ -92,25 +95,25 @@ parfor n=1:numel(sph_grid.weights) %#ok<*PFBNS>
     localpar.masframe='rotor'; localpar.rframes={};
     
     % Rotor stack generation
-    H=rotor_stack(spin_system,localpar,'esr');
+    H=rotor_stack(ss_parfor,localpar,'esr');
     nsteps=numel(H); dt=1/(nsteps*localpar.rate);
     
     % Rotor period integration
     nsteps=numel(H); P=speye(size(H{1}));
     for k=1:nsteps
-        P=propagator(spin_system,H{k}+localpar.mw_pwr*Hmw+1i*R,dt)*P; 
+        P=propagator(ss_parfor,H{k}+localpar.mw_pwr*Hmw+1i*R,dt)*P;
     end
     
     % Effective rotor period Liouvillian
     L_eff=1i*localpar.rate*logm(P);
 
     % Evolve for the equilibration time
-    rho_st=evolution(spin_system,L_eff,[],rho_eq,parameters.mw_time,1,'final');
+    rho_st=evolution(ss_parfor,L_eff,[],rho_eq,parameters.mw_time,1,'final');
 
     % Rotor period trajectory
     rho=zeros([numel(rho_eq) nsteps],'like',1i); rho(:,1)=rho_st;
     for k=2:nsteps
-        rho(:,k)=step(spin_system,H{k}+localpar.mw_pwr*Hmw+1i*R,rho(:,k-1),dt);
+        rho(:,k)=step(ss_parfor,H{k}+localpar.mw_pwr*Hmw+1i*R,rho(:,k-1),dt);
     end
 
     % Enhancement factor

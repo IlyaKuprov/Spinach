@@ -314,6 +314,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
     % Populate the basis descriptor array
     report(spin_system,'building basis set descriptor...');
     basis_spec=cell(size(subgraphs,1),1);
+    parfor_ss=stripper(spin_system,'basis');
     parfor n=1:size(subgraphs,1)
         
         % Determine the total number of states in the current subgraph
@@ -323,7 +324,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
         spins_involved=find(subgraphs(n,:));
         
         % Preallocate the local descriptor array
-        local_basis_spec=spalloc(nstates,spin_system.comp.nspins,nstates*nnz(subgraphs(n,:))); %#ok<PFBNS>
+        local_basis_spec=spalloc(nstates,parfor_ss.comp.nspins,nstates*nnz(subgraphs(n,:))); %#ok<PFBNS>
         
         % Populate the local descriptor array
         for k=1:numel(spins_involved)
@@ -375,7 +376,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
                 if isnumeric(bas.zero_quantum{k})
                     spins_in_question=bas.zero_quantum{k};
                 else
-                    spins_in_question=strcmp(bas.zero_quantum{k},spin_system.comp.isotopes);
+                    spins_in_question=strcmp(bas.zero_quantum{k},parfor_ss.comp.isotopes);
                 end
                 
                 % Analyze the basis
@@ -398,7 +399,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
     
     % Deallocate variables
     clear('spin_state_lists','local_basis_spec','subgraphs','spin_dims',...
-          'current_states','subgraph_sizes','local_basis_hash');
+          'current_states','subgraph_sizes','local_basis_hash','parfor_ss');
     if isfield(bas,'projections')
         clear('state_mask','M','projection_numbers');
     end
@@ -759,4 +760,3 @@ end
 % make it worth defending".
 %
 % http://www.theregister.co.uk/2009/02/09/woudhuysen_energise_1/
-

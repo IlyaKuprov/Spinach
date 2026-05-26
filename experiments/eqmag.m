@@ -59,6 +59,9 @@ betas=sph_grid.betas; gammas=sph_grid.gammas;
 % Get the magnetization vector started
 magn=[0 0 0];
 
+% Strip the spin system object down to minimum size
+ss_parfor=stripper(spin_system,'equilibrium');
+
 % Loop over the grid
 parfor k=1:numel(weights) %#ok<*PFBNS>
     
@@ -84,7 +87,7 @@ parfor k=1:numel(weights) %#ok<*PFBNS>
     end
     
     % Get the equilibrium density matrix
-    rho=equilibrium(spin_system,I,Q,[alphas(k) betas(k) gammas(k)]);
+    rho=equilibrium(ss_parfor,I,Q,[alphas(k) betas(k) gammas(k)]);
     
     % Normalize density
     rho=rho./trace(rho);
@@ -117,4 +120,3 @@ end
 % has written with his own blood.
 %
 % Friedrich Nietzsche
-

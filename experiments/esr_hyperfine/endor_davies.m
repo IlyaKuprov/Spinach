@@ -98,22 +98,25 @@ rho0=shaped_pulse_af(spin_system,L,Ex,Ey,parameters.rho0, parameters.e_frq,...
 % Preallocate the answer
 answer=zeros(size(parameters.n_frq),'like',1i);
 
+% Strip the spin system object down to minimum size
+ss_parfor=stripper(spin_system,'evolution');
+
 % Loop over radiofrequency offsets
 parfor n=1:numel(parameters.n_frq)
              
     % Either pi pulse on the nuclei or a delay of the same length for reference
-    rho_a=shaped_pulse_af(spin_system,L,Nx,Ny,rho0,parameters.n_frq(n),parameters.n_pwr,...
+    rho_a=shaped_pulse_af(ss_parfor,L,Nx,Ny,rho0,parameters.n_frq(n),parameters.n_pwr,...
                                                    parameters.n_dur,   parameters.n_phi,...
                                                    parameters.n_rnk,   parameters.method); %#ok<PFBNS>
-    rho_b=shaped_pulse_af(spin_system,L,Nx,Ny,rho0,parameters.n_frq(n),0*parameters.n_pwr,...
+    rho_b=shaped_pulse_af(ss_parfor,L,Nx,Ny,rho0,parameters.n_frq(n),0*parameters.n_pwr,...
                                                    parameters.n_dur,     parameters.n_phi,...
                                                    parameters.n_rnk,     parameters.method);
 
     % Pi/2 pulse on the electron
-    rho_a=shaped_pulse_af(spin_system,L,Ex,Ey,rho_a,parameters.e_frq,  parameters.e_pwr,...
+    rho_a=shaped_pulse_af(ss_parfor,L,Ex,Ey,rho_a,parameters.e_frq,  parameters.e_pwr,...
                                                     parameters.e_dur/2,parameters.e_phi,...
                                                     parameters.e_rnk,  parameters.method);
-    rho_b=shaped_pulse_af(spin_system,L,Ex,Ey,rho_b,parameters.e_frq,  parameters.e_pwr,...
+    rho_b=shaped_pulse_af(ss_parfor,L,Ex,Ey,rho_b,parameters.e_frq,  parameters.e_pwr,...
                                                     parameters.e_dur/2,parameters.e_phi,...
                                                     parameters.e_rnk,  parameters.method);
 
@@ -121,20 +124,20 @@ parfor n=1:numel(parameters.n_frq)
     if isfield(parameters,'tau')&&(parameters.tau~=0)
         
         % First evolution period
-        rho_a=evolution(spin_system,L,[],rho_a,parameters.tau,1,'final');
-        rho_b=evolution(spin_system,L,[],rho_b,parameters.tau,1,'final');
+        rho_a=evolution(ss_parfor,L,[],rho_a,parameters.tau,1,'final');
+        rho_b=evolution(ss_parfor,L,[],rho_b,parameters.tau,1,'final');
     
         % Pi pulse on the electron
-        rho_a=shaped_pulse_af(spin_system,L,Ex,Ey,rho_a,parameters.e_frq,parameters.e_pwr,...
+        rho_a=shaped_pulse_af(ss_parfor,L,Ex,Ey,rho_a,parameters.e_frq,parameters.e_pwr,...
                                                         parameters.e_dur,parameters.e_phi,...
                                                         parameters.e_rnk,parameters.method);
-        rho_b=shaped_pulse_af(spin_system,L,Ex,Ey,rho_b,parameters.e_frq,parameters.e_pwr,...
+        rho_b=shaped_pulse_af(ss_parfor,L,Ex,Ey,rho_b,parameters.e_frq,parameters.e_pwr,...
                                                         parameters.e_dur,parameters.e_phi,...
-                                                        parameters.e_rnk,parameters.method);  
-                                                            
+                                                        parameters.e_rnk,parameters.method);
+
         % Second evolution period
-        rho_a=evolution(spin_system,L,[],rho_a,parameters.tau,1,'final');
-        rho_b=evolution(spin_system,L,[],rho_b,parameters.tau,1,'final');
+        rho_a=evolution(ss_parfor,L,[],rho_a,parameters.tau,1,'final');
+        rho_b=evolution(ss_parfor,L,[],rho_b,parameters.tau,1,'final');
         
     end
     
@@ -263,4 +266,3 @@ end
 %
 % A poster seen at the Chemistry Department
 % of Munich University of Technology
-

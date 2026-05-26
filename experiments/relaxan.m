@@ -54,11 +54,15 @@ r2=zeros(spin_system.comp.nspins,1);
 t1=zeros(spin_system.comp.nspins,1);
 t2=zeros(spin_system.comp.nspins,1);
 
+% Strip the spin system object down to minimum size
+ss_parfor=stripper(spin_system,'state');
+nspins=spin_system.comp.nspins;
+
 % Fill the arrays
-parfor n=1:spin_system.comp.nspins
-    Lz=state(spin_system,{'Lz'},{n},'cheap');
+parfor n=1:nspins
+    Lz=state(ss_parfor,{'Lz'},{n},'cheap');
     r1(n)=-real((Lz'*R*Lz)/(Lz'*Lz)); t1(n)=1/r1(n);
-    Lp=state(spin_system,{'L+'},{n},'cheap');
+    Lp=state(ss_parfor,{'L+'},{n},'cheap');
     r2(n)=-real((Lp'*R*Lp)/(Lp'*Lp)); t2(n)=1/r2(n);
 end
 
@@ -92,4 +96,3 @@ end
 % own happiness is his highest moral purpose.
 %
 % Ayn Rand, "Atlas Shrugged"
-

@@ -36,20 +36,23 @@ P=spalloc(prod(spin_system.comp.mults.^2),...
 % Destination basis is not normalised
 destin_norm=sqrt(prod(spin_system.comp.mults));
 
+% Strip the spin system object down to minimum size
+parfor_ss=stripper(spin_system,'basis_projection');
+
 % Loop over the basis set
-parfor n=1:size(spin_system.bas.basis,1) %#ok<*PFBNS>
+parfor n=1:size(parfor_ss.bas.basis,1) %#ok<*PFBNS>
 
     % Get the state going
     rho=sparse(1);
     
     % Loop over the elements
-    for k=1:size(spin_system.bas.basis,2) 
+    for k=1:size(parfor_ss.bas.basis,2)
         
         % Get the spherical tensors for the current spin
-        ists=irr_sph_ten(spin_system.comp.mults(k));
+        ists=irr_sph_ten(parfor_ss.comp.mults(k));
         
         % Multiply into the state
-        rho=kron(rho,ists{spin_system.bas.basis(n,k)+1});
+        rho=kron(rho,ists{parfor_ss.bas.basis(n,k)+1});
         
     end
     
@@ -74,4 +77,3 @@ end
 % in the heroic makes heroes.
 %
 % Benjamin Disraeli
-

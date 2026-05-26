@@ -174,8 +174,7 @@ if ~isempty(spin_system.control.suffix)
 end
 
 % Strip the spin system object for communication efficiency
-ss_parfor.sys=spin_system.sys; ss_parfor.tols=spin_system.tols;
-ss_parfor.bas.formalism=spin_system.bas.formalism;
+ss_parfor=stripper(spin_system,'propagator');
 
 % Define a vector and a matrix of zeroes for auxiliary systems
 zero_state=complex(spalloc(size(rho_init,1),size(rho_init,2),0));
@@ -571,7 +570,7 @@ if strcmp(spin_system.control.integrator,'rectangle')&&(n_outputs>3)
                     aux_vec=[zero_state; zero_state; fwd_traj(:,n)];
 
                     % Propagate the auxiliary vector
-                    aux_vec=step(spin_system,aux_matrix,aux_vec,dt(n));
+                    aux_vec=step(ss_parfor,aux_matrix,aux_vec,dt(n));
 
                     % Only store acton by dP on rho
                     fwd_dP_col{k}=aux_vec((end/3+1):(2*end/3));
@@ -587,7 +586,7 @@ if strcmp(spin_system.control.integrator,'rectangle')&&(n_outputs>3)
                     aux_vec=[zero_state; bwd_traj(:,n)];
 
                     % Propagate the auxiliary vector
-                    aux_vec=step(spin_system,aux_matrix,aux_vec,-dt(nsteps+1-n));
+                    aux_vec=step(ss_parfor,aux_matrix,aux_vec,-dt(nsteps+1-n));
 
                     % Only store the action by dP on rho
                     bwd_dP_col{k}=aux_vec(1:(end/2));
@@ -604,7 +603,7 @@ if strcmp(spin_system.control.integrator,'rectangle')&&(n_outputs>3)
                     aux_vec=[zero_state; zero_state; fwd_traj(:,n)];
 
                     % Propagate the auxiliary vector
-                    aux_vec=step(spin_system,aux_matrix,aux_vec,dt(n));
+                    aux_vec=step(ss_parfor,aux_matrix,aux_vec,dt(n));
 
                     % Only store action by d2P on rho
                     fwd_d2P_block{k,j}=2*aux_vec(1:(end/3));
@@ -745,7 +744,7 @@ if strcmp(spin_system.control.integrator,'rectangle')&&(n_outputs>3)
                             end
 
                             % Propagate left derivative backwards
-                            bwd_dPk=(step(spin_system,L_back,bwd_dPk,-dt(m+1)));
+                            bwd_dPk=(step(ss_parfor,L_back,bwd_dPk,-dt(m+1)));
 
                             % Inner control loop
                             for j=1:numel(controls)
@@ -967,4 +966,3 @@ end
 % likely to be heroic exceptions.
 %
 % Nathaniel Branden
-

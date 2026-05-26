@@ -90,13 +90,16 @@ rho=step(spin_system,Ex,rho,pi/2);
 % Kron up to make array over radiofrequencies
 rho=kron(rho,ones(1,numel(parameters.n_frq)));
 
+% Strip the spin system object down to minimum size
+ss_parfor=stripper(spin_system,'evolution');
+
 % Loop over the radiofrequency array
 parfor n=1:numel(parameters.n_frq)                                  %#ok<*PFBNS>
 
     % Blast the nuclei and subtract the background
-    rho(:,n)=shaped_pulse_af(spin_system,L,Nx,Ny,rho(:,n),parameters.n_frq(n),1, ...
+    rho(:,n)=shaped_pulse_af(ss_parfor,L,Nx,Ny,rho(:,n),parameters.n_frq(n),1, ...
                              parameters.n_dur,0,parameters.n_rnk,'expm')-        ...
-             shaped_pulse_af(spin_system,L,Nx,Ny,rho(:,n),parameters.n_frq(n),0, ...
+             shaped_pulse_af(ss_parfor,L,Nx,Ny,rho(:,n),parameters.n_frq(n),0, ...
                              parameters.n_dur,0,parameters.n_rnk,'expm');       
 
 end
@@ -190,4 +193,3 @@ end
 % A forest ranger at the Yosemite national Park,
 % about why it is hard to design the perfect gar-
 % bage bin to keep bears from breaking into it.
-

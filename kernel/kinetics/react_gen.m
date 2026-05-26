@@ -43,11 +43,14 @@ nstates=size(spin_system.bas.basis,1);
 drain_gen_idx=zeros(nstates,4); 
 fill_gen_idx=zeros(nstates,4);
 
+% Strip the spin system object down to minimum size
+ss_parfor=stripper(spin_system,'kinetics');
+
 % Loop over the basis set
 parfor n=1:nstates %#ok<*PFBNS>
     
     % Extract the state
-    source_state=spin_system.bas.basis(n,:); 
+    source_state=ss_parfor.bas.basis(n,:);
 
     % Find participating spins
     [~,spins_involved]=find(source_state);
@@ -57,7 +60,7 @@ parfor n=1:nstates %#ok<*PFBNS>
 
         % Determine the host substance
         host_subst=cellfun(@(x)all(ismember(spins_involved,x)),...
-                           spin_system.chem.parts);
+                           ss_parfor.chem.parts);
         [~,host_subst]=find(host_subst);
 
         % Double-check basis state indexing
@@ -85,7 +88,7 @@ parfor n=1:nstates %#ok<*PFBNS>
             destin_state=sparse(destin_state);
 
             % Look for the destination state in the basis set and double-check indexing
-            [destin_exists,destin_index]=ismember(destin_state,spin_system.bas.basis,'rows');
+            [destin_exists,destin_index]=ismember(destin_state,ss_parfor.bas.basis,'rows');
             if numel(destin_index)>1, error('invalid basis set specification'); end
 
             % Build product fill generator
@@ -96,7 +99,7 @@ parfor n=1:nstates %#ok<*PFBNS>
 
                 % Determine the host substance
                 host_subst=cellfun(@(x)all(ismember(spins_involved,x)),...
-                                   spin_system.chem.parts);
+                                   ss_parfor.chem.parts);
                 [~,host_subst]=find(host_subst);
 
                 % Double-check indexing
@@ -162,4 +165,3 @@ end
 %  she declined."
 %
 % Gyles Brandreth
-

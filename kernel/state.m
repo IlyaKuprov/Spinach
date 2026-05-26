@@ -117,6 +117,9 @@ switch spin_system.bas.formalism
                 
                 % Compute correlation orders
                 correlation_orders=sum(logical(spin_system.bas.basis),2);
+
+                % Strip the spin system object down to minimum size
+                parfor_ss=stripper(spin_system,'state');
                 
                 % Locate each operator in the basis
                 indices=zeros(size(coeffs));
@@ -127,7 +130,7 @@ switch spin_system.bas.formalism
                     
                     % Pin down the required state
                     for k=find(opspecs{n})
-                        possibilities=and(possibilities,spin_system.bas.basis(:,k)==opspecs{n}(k)); 
+                        possibilities=and(possibilities,parfor_ss.bas.basis(:,k)==opspecs{n}(k));
                     end
 
                     % Double-check
@@ -145,6 +148,9 @@ switch spin_system.bas.formalism
                 % Assemble the state vector
                 nrows=size(spin_system.bas.basis,1); ncols=1;
                 rho=sparse(indices,ones(size(indices)),coeffs,nrows,ncols);
+
+                % Release the stripped copy
+                clear('parfor_ss');
 
             % Careful normalisation
             case 'exact'
@@ -312,4 +318,3 @@ end
 % the morally deplorable hide.
 %
 % Milo Yiannopoulos
-

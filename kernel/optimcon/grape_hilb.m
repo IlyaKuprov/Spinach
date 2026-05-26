@@ -92,8 +92,7 @@ switch spin_system.control.integrator
 end
 
 % Hush up the output
-ss_parfor.sys=spin_system.sys; ss_parfor.tols=spin_system.tols;
-ss_parfor.bas.formalism=spin_system.bas.formalism;
+ss_parfor=stripper(spin_system,'propagator');
 ss_parfor.sys.output='hush';
 
 % Pull the target back through the dead time using

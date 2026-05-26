@@ -104,17 +104,18 @@ H1=reshape(H1,[n_tau_int_steps nstripes]);
 % Compute trajectory stripe integrals
 report(spin_system,'computing Redfield''s integral...');
 rows=cell(nstripes,1); cols=cell(nstripes,1); vals=cell(nstripes,1);
+ss_parfor=stripper(spin_system,'redfield_integral');
 parfor s=1:nstripes % Inefficient, investigate
     
     % Get the stripe started
     H1s=H1(:,s); Ps=P; F=sparse(0);
     
     % Trapezium rule for tau integral
-    f_curr=clean_up(spin_system,-dt*H1s{1}*Ps{1}*H1s{1}*Ps{1}',...
-                    spin_system.tols.liouv_zero);
+    f_curr=clean_up(ss_parfor,-dt*H1s{1}*Ps{1}*H1s{1}*Ps{1}',...
+                    ss_parfor.tols.liouv_zero);
     for tau=2:n_tau_int_steps
-        f_next=clean_up(spin_system,-dt*H1s{1}*Ps{tau}*H1s{tau}*Ps{tau}',...
-                        spin_system.tols.liouv_zero);
+        f_next=clean_up(ss_parfor,-dt*H1s{1}*Ps{tau}*H1s{tau}*Ps{tau}',...
+                        ss_parfor.tols.liouv_zero);
         F=F+(f_curr+f_next)/2; f_curr=f_next;
     end
     
@@ -162,4 +163,3 @@ end
 % with a similar dumbass."
 %
 % A Russian hand-to-hand combat instructor
-

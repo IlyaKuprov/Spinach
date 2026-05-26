@@ -70,6 +70,9 @@ Ic=(Ic+Ic')/2; Iz=(Iz+Iz')/2;
 % Get the microwave operator (state in Liouville space)
 Hmw=state(spin_system,'Lx',parameters.spins{1});
 
+% Strip the spin system object down to minimum size
+ss_parfor=stripper(spin_system,'field_sweep');
+
 % Get the initial grid and compute its convex hull
 load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ... 
       filesep parameters.grid],'betas','gammas');
@@ -94,7 +97,7 @@ for n=1:grid_size
     Hc=Ic+orientation(Qc,localpar.orientation); 
     
     % Submit asynchronous eigenfields calculation job for this vertex
-    eigensets(n)=parfeval(@eigenfields,1,spin_system,localpar,Hz,Hc,Hmw);
+    eigensets(n)=parfeval(@eigenfields,1,ss_parfor,localpar,Hz,Hc,Hmw);
 
 end
 
@@ -121,7 +124,7 @@ for n=1:size(hull,1)
     triangle=eigensets([a b c]); 
     
     % Call recursive Voitlander integrator
-    spec(n)=parfeval(@voitlander,1,spin_system,parameters,...
+    spec(n)=parfeval(@voitlander,1,ss_parfor,parameters,...
                                    triangle,Ic,Iz,Qc,Qz,Hmw);
 
 end

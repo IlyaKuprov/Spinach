@@ -182,6 +182,9 @@ if ~isfield(parameters,'verbose')||(parameters.verbose==0)
     spin_system.sys.output='hush';
 end
 
+% Strip the spin system object down to minimum size
+ss_parfor=stripper(spin_system,'context');
+
 % Parfor rigging
 if ~isworkernode
     DQ=parallel.pool.DataQueue;
@@ -202,7 +205,6 @@ function parfor_progr()
     end
 end
 
-% Powder averaged spectrum
 parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
 
     % Set the crystal reference frame
@@ -236,20 +238,19 @@ parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
     end
     
     % Add the MAS part and clean up
-    F=clean_up(spin_system,F+M,spin_system.tols.liouv_zero);
+    F=clean_up(ss_parfor,F+M,ss_parfor.tols.liouv_zero);
     
     % Report to the user
-    report(spin_system,'running the pulse sequence...');
+    report(ss_parfor,'running the pulse sequence...');
     
     % Run the pulse sequence
-    ans_array{q}=pulse_sequence(spin_system,parameters,F,R,K);
+    ans_array{q}=pulse_sequence(ss_parfor,parameters,F,R,K);
 
     % Report parfor progress
     if do_diag, send(DQ,n); end
 
 end
 
-% Unsilence the output
 spin_system.sys.output=prev_setting;
 
 % Decide the return array

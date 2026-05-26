@@ -235,6 +235,9 @@ if ~isfield(parameters,'verbose')||(parameters.verbose==0)
     spin_system.sys.output='hush';
 end
 
+% Strip the spin system object down to minimum size
+ss_parfor=stripper(spin_system,'context');
+
 % Parfor rigging
 if ~isworkernode
     DQ=parallel.pool.DataQueue;
@@ -255,7 +258,6 @@ function parfor_progr()
     end
 end
 
-% Parallel powder averaging loop
 parfor (q=1:n_orients,nworkers) %#ok<*PFBNS>
 
     % Preallocate Hamiltonian blocks
@@ -295,7 +297,7 @@ parfor (q=1:n_orients,nworkers) %#ok<*PFBNS>
             H{n}=(H{n}+H{n}')/2;
             
             % Rotating frame transformation
-            H{n}=rotframe(spin_system,C{k},H{n},...
+            H{n}=rotframe(ss_parfor,C{k},H{n},...
                           parameters.rframes{k}{1},...
                           parameters.rframes{k}{2});
 
@@ -307,22 +309,22 @@ parfor (q=1:n_orients,nworkers) %#ok<*PFBNS>
     end
     
     % Formalism-dependent stage
-    switch spin_system.bas.formalism
+    switch ss_parfor.bas.formalism
 
         % Liouville space
         case {'sphten-liouv','zeeman-liouv'}
 
             % Assemble the Fokker-Planck evolution generator
-            G=clean_up(spin_system,blkdiag(H{:})+1i*M,spin_system.tols.liouv_zero);
+            G=clean_up(ss_parfor,blkdiag(H{:})+1i*M,ss_parfor.tols.liouv_zero);
     
             % Run the pulse sequence
-            ans_array{q}=pulse_sequence(spin_system,parameters,G,R,K);
+            ans_array{q}=pulse_sequence(ss_parfor,parameters,G,R,K);
 
         % Hilbert space
         case {'zeeman-hilb','zeeman-wavef'}
 
             % Run the pulse sequence with a Hamiltonian stack
-            ans_array{q}=pulse_sequence(spin_system,parameters,H,R,K);
+            ans_array{q}=pulse_sequence(ss_parfor,parameters,H,R,K);
 
         otherwise
 
@@ -336,7 +338,6 @@ parfor (q=1:n_orients,nworkers) %#ok<*PFBNS>
     
 end
 
-% Unsilence the output
 spin_system.sys.output=prev_setting;
 
 % Decide the return array

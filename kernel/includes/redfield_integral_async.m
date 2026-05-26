@@ -21,6 +21,9 @@
 % Async job counter
 job_number=0;
 
+% Strip the spin system object down to minimum size
+ss_parfor=stripper(spin_system,'redfield_integral');
+
 % Sum over spherical ranks
 for n=1:numel(Q)
     
@@ -83,7 +86,7 @@ for n=1:numel(Q)
                                                    ['brw_integrator_batch_' num2str(job_number) '_D']},{A,B,C,D});
                                        
                                         % Queue up Redfield integral using the auxiliary matrix method
-                                        F(job_number)=parfeval(@brw_compute_kernel,1,spin_system,...
+                                        F(job_number)=parfeval(@brw_compute_kernel,1,ss_parfor,...
                                                                weights{s}(j),job_number,upper_limit); %#ok<SAGROW>
                                                                
                                     end
@@ -176,4 +179,3 @@ end
 % Ramona Arnett
 
 % #NHEAD
-

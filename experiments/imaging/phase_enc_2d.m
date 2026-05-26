@@ -90,20 +90,23 @@ pe_grad_amps=linspace(-parameters.pe_grad_amp,...
 % Preallocate the image
 fid=zeros(parameters.image_size,'like',1i);
 
+% Strip the spin system object down to minimum size
+ss_parfor=stripper(spin_system,'evolution');
+
 % Phase encoding loop
 parfor n=1:parameters.image_size(1) %#ok<*PFBNS>
     
     % Phase encoding gradient
-    rho=evolution(spin_system,B+pe_grad_amps(n)*G{1},[],parameters.rho0,parameters.pe_grad_dur,1,'final');
+    rho=evolution(ss_parfor,B+pe_grad_amps(n)*G{1},[],parameters.rho0,parameters.pe_grad_dur,1,'final');
        
     % Get the timing parameters
     nsteps=parameters.image_size(2)-1; step_length=parameters.ro_grad_dur/nsteps;
     
     % Run the pre-roll gradient
-    rho=evolution(spin_system,B-parameters.ro_grad_amp*G{2},[],rho,step_length/2,nsteps,'final');
+    rho=evolution(ss_parfor,B-parameters.ro_grad_amp*G{2},[],rho,step_length/2,nsteps,'final');
     
     % Detect under the readout gradient
-    fid(n,:)=evolution(spin_system,B+parameters.ro_grad_amp*G{2},parameters.coil,rho,step_length,nsteps,'observable');   
+    fid(n,:)=evolution(ss_parfor,B+parameters.ro_grad_amp*G{2},parameters.coil,rho,step_length,nsteps,'observable');
 
 end
 

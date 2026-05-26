@@ -69,6 +69,9 @@ switch spin_system.bas.formalism
         % Normalise the singlet
         S=S/norm(S,2);
 
+        % Strip the spin system object down to minimum size
+        ss_parfor=stripper(spin_system,'evolution');
+
         % Merged parfor loop
         parfor nm=1:(N*M)
             
@@ -79,10 +82,10 @@ switch spin_system.bas.formalism
             L_current=L+fields(m)*Z-1i*rates(n)*speye(size(L)); %#ok<PFBNS>
             
             % Compute RYDMR
-            answer(nm)=rates(n)*evolution(spin_system,L_current,S,S,[],[],'total');
+            answer(nm)=rates(n)*evolution(ss_parfor,L_current,S,S,[],[],'total');
             
         end
-        
+
     case {'zeeman-hilb'}
         
         % Normalize the singlet
@@ -91,6 +94,9 @@ switch spin_system.bas.formalism
         % Get the unit operator
         Id=unit_state(spin_system);
         
+        % Strip the spin system object down to minimum size
+        ss_parfor=stripper(spin_system,'propagator');
+
         % Merged parfor loop
         parfor nm=1:(N*M)
             
@@ -105,7 +111,7 @@ switch spin_system.bas.formalism
             t_end=10/rates(n); %#ok<PFBNS>
             
             % Compute RYDMR (rates inside for roundoff reasons)
-            answer(nm)=hdot(S,expmint(spin_system,H_curr,S*rates(n),H_curr+1i*rates(n)*Id,t_end));
+            answer(nm)=hdot(S,expmint(ss_parfor,H_curr,S*rates(n),H_curr+1i*rates(n)*Id,t_end));
             
         end
         

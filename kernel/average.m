@@ -149,15 +149,18 @@ switch theory
         
         % Discretise the period of the rotating frame, 16 intervals are enough
         nslices=16; time_grid=linspace(0,2*pi/omega,nslices+1); time_step=time_grid(2);
+
+        % Strip the spin system object down to minimum size
+        ss_parfor=stripper(spin_system,'propagator');
         
         % Compute the product integral using 4th order Lie quadrature
         P=eye(size(H0)); report(spin_system,'computing product integral...');
         parfor n=1:nslices
-            report(spin_system,['interval ' num2str(n) ' out of ' num2str(nslices) '...']);
+            report(ss_parfor,['interval ' num2str(n) ' out of ' num2str(nslices) '...']);
             HL=H0+exp(+1i*omega*(time_grid(n)+0.0*time_step))*Hp+exp(-1i*omega*(time_grid(n)+0.0*time_step))*Hm;
             HM=H0+exp(+1i*omega*(time_grid(n)+0.5*time_step))*Hp+exp(-1i*omega*(time_grid(n)+0.5*time_step))*Hm;
             HR=H0+exp(+1i*omega*(time_grid(n)+1.0*time_step))*Hp+exp(-1i*omega*(time_grid(n)+1.0*time_step))*Hm;
-            P=propagator(spin_system,isergen(HL,HM,HR,time_step),time_step)*P;
+            P=propagator(ss_parfor,isergen(HL,HM,HR,time_step),time_step)*P;
         end
         
         % Compute matrix logarithm (slow, needs work)
@@ -205,4 +208,3 @@ end
 % wiped.
 %
 % Terry Pratchett
-

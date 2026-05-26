@@ -129,10 +129,13 @@ end
 % Get the full spin list    
 full_spin_list=num2cell(1:spin_system.comp.nspins);
 
+% Strip the spin system object down to minimum size
+parfor_ss=stripper(spin_system,'state');
+
 % Generate the states
 A=cell(1,numel(descr));
 parfor n=1:numel(descr)
-    A{n}=state(spin_system,descr{n},full_spin_list);
+    A{n}=state(parfor_ss,descr{n},full_spin_list);
 end
 
 end
@@ -205,4 +208,3 @@ end
 % Challenges improve those who survive.
 %
 % Frank Herbert
-

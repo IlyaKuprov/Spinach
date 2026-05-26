@@ -85,7 +85,7 @@ else
     
     % Compute group direct product if necessary
     if numel(spin_system.comp.sym_group)>1
-        
+
         % Lift constituent groups from the database
         ngroups=numel(spin_system.comp.sym_group); groups=cell(1,ngroups);
         for n=1:ngroups
@@ -135,11 +135,14 @@ else
         % Preallocate the permutation table
         permutation_table=zeros(size(spin_system.bas.basis,1),group.order);
         
+        % Strip the spin system object down to minimum size
+        parfor_ss=stripper(spin_system,'symmetry');
+
         % Compute the permutation table
         parfor n=1:group.order %#ok<*PFBNS>
-            group_element=1:spin_system.comp.nspins;
+            group_element=1:parfor_ss.comp.nspins;
             group_element(spins)=group_element(spins(group.elements(n,:)));
-            permuted_basis=spin_system.bas.basis(:,group_element);
+            permuted_basis=parfor_ss.bas.basis(:,group_element);
             [~,index]=sortrows(permuted_basis);
             permutation_table(:,n)=index;
         end
@@ -336,4 +339,3 @@ end
 % "nothing, you're screwed".
 %
 % Bruce Schneier
-

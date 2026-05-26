@@ -165,13 +165,14 @@ fid=zeros([parameters.npoints1 ...
 
 % Propagate the system
 report(spin_system,'computing loop bodies...');
+use_gpu=ismember('gpu',spin_system.sys.enable);
 parfor m=1:parameters.nloops %#ok<*PFBNS>
 
     % Get the current stack
     cosy_stack=loop_stack{m};
 
     % Move to GPU if appropriate
-    if ismember('gpu',spin_system.sys.enable)
+    if use_gpu
         cosy_stack=gpuArray(cosy_stack);
         coil=gpuArray(parameters.coil);
     else
@@ -308,4 +309,3 @@ end
 % have to work in order to survive.
 %
 % Thomas Sowell
-

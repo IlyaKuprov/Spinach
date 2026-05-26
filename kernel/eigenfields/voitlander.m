@@ -123,11 +123,14 @@ spec_sim=(4*spec_sub-spec_dir)/3;
 % If the accuracy is insufficient, recurse
 if norm(spec_dir-spec_sub,2)>parameters.int_tol
 
+    % Strip the spin system object down to minimum size
+    ss_parfor=stripper(spin_system,'field_sweep');
+
     % Compute the four triangles of the subdivision via asynchronous recursion
-    spec_a=parfeval(@voitlander,1,spin_system,parameters,triangle_a,Ic,Iz,Qc,Qz,Hmw);
-    spec_b=parfeval(@voitlander,1,spin_system,parameters,triangle_b,Ic,Iz,Qc,Qz,Hmw);
-    spec_c=parfeval(@voitlander,1,spin_system,parameters,triangle_c,Ic,Iz,Qc,Qz,Hmw);
-    spec_d=parfeval(@voitlander,1,spin_system,parameters,triangle_d,Ic,Iz,Qc,Qz,Hmw);
+    spec_a=parfeval(@voitlander,1,ss_parfor,parameters,triangle_a,Ic,Iz,Qc,Qz,Hmw);
+    spec_b=parfeval(@voitlander,1,ss_parfor,parameters,triangle_b,Ic,Iz,Qc,Qz,Hmw);
+    spec_c=parfeval(@voitlander,1,ss_parfor,parameters,triangle_c,Ic,Iz,Qc,Qz,Hmw);
+    spec_d=parfeval(@voitlander,1,ss_parfor,parameters,triangle_d,Ic,Iz,Qc,Qz,Hmw);
 
     % Retrieve the work
     spec=fetchOutputs(spec_a)+fetchOutputs(spec_b)+...

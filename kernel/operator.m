@@ -106,6 +106,9 @@ end
 % Start a cell array
 A=cell(numel(opspecs),1);
 
+% Strip the spin system object down to minimum size
+parfor_ss=stripper(spin_system,'operator');
+
 % Decide how to proceed
 switch spin_system.bas.formalism
     
@@ -116,7 +119,7 @@ switch spin_system.bas.formalism
         parfor n=1:numel(opspecs)
 
             % Get the superoperator
-            A{n}=superop(spin_system,opspecs{n},operator_type);
+            A{n}=superop(parfor_ss,opspecs{n},operator_type);
 
             % Apply the coefficient
             A{n}(:,3)=coeffs(n)*A{n}(:,3);
@@ -171,6 +174,9 @@ end
 
 % XYZ format sum
 A=cell2mat(A);
+
+% Release the stripped copy
+clear('parfor_ss');
 
 % Convert to CSC format
 if strcmp(format,'csc')
@@ -268,4 +274,3 @@ end
 % problem. But I would like to understand it too.
 %
 % Eugene Wigner
-

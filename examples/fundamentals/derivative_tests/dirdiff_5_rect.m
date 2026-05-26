@@ -61,7 +61,7 @@ for n=1:numel(formalisms)
     if norm(newton_hess_xy(:)-goodwin_hess_xy(:),1)>1e-6*norm(newton_hess_xy(:),1)
         error([formalisms{n} ' Cartesian Hessian internal consistency test failed.']);
     else
-        disp([formalisms{n} ' Cartesian internal consistency test passed.']);
+        disp([formalisms{n} ' Cartesian Hessian internal consistency test passed.']);
     end
 
 end

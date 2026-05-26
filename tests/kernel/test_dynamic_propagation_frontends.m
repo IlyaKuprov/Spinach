@@ -36,6 +36,7 @@ result=local_test_reduce(result);
 end
 
 
+
 function result=local_test_propagator_step(result)
 
 % Build a one-spin Liouville-space system and force Taylor propagation
@@ -140,6 +141,19 @@ total_ref=real(coil_x'*rho);
 result=test_close(result,'evolution total output',total_obs,total_ref,1e-12,1e-12,...
                   'evolution() total mode must compute the infinite-time damped observable integral');
 
+% Check Hilbert-space evolution through a stripped worker payload
+spin_system=local_hilbert_system();
+S=pauli(2);
+H=2*pi*123*S.z;
+rho=S.x+0.25*S.y;
+nsteps=2;
+P=expm(-1i*H*dt*nsteps);
+ss_evol=stripper(spin_system,'evolution');
+rho_obs=evolution(ss_evol,H,[],rho,dt,nsteps,'final');
+rho_ref=P*rho*P';
+result=test_close(result,'evolution stripped Hilbert payload',rho_obs,rho_ref,1e-12,1e-12,...
+                  'stripped evolution payloads must preserve the Hilbert approximation selector');
+
 end
 
 
@@ -207,6 +221,22 @@ for n=1:numel(projectors)
 end
 result=test_close(result,'reduce state preservation',rho_rec,rho,1e-14,1e-14,...
                   'reduce() must retain the source state in the projected subspaces');
+
+% Check that stripped evolution payloads retain symmetry projectors
+sym_spin_system=local_liouville_system();
+dim=size(sym_spin_system.bas.basis,1);
+sym_spin_system.sys.disable=unique([sym_spin_system.sys.disable {'zte','pt'}]);
+sym_spin_system.bas.irrep(1).projector=sparse(1,1,1,dim,1);
+sym_spin_system.bas.irrep(1).dimension=1;
+sym_spin_system.bas.irrep(2).projector=speye(dim);
+sym_spin_system.bas.irrep(2).projector(:,1)=[];
+sym_spin_system.bas.irrep(2).dimension=dim-1;
+ss_evol=stripper(sym_spin_system,'evolution');
+ss_evol=stripper(ss_evol,'evolution');
+projectors=reduce(ss_evol,speye(dim),ones(dim,1));
+result=test_true(result,'evolution stripped irrep payload',isfield(ss_evol.bas,'irrep')&&...
+                 isfield(ss_evol.bas,'approximation')&&(numel(projectors)==2),...
+                 'double-stripped evolution payloads must keep reduction selectors for reduce()');
 
 % Check the blanket trajectory-level disable branch
 spin_system.sys.disable=unique([spin_system.sys.disable {'trajlevel'}]);

@@ -32,7 +32,8 @@
 %                  'step'              - state propagation steps
 %
 %                  'evolution'         - independent subspace evolution:
-%                                        sys, tols, bas.formalism
+%                                        sys, tols, bas.formalism,
+%                                        selected bas fields
 %
 %                  'context'           - powder, MAS, Floquet, and DOR
 %                                        pulse sequence calls
@@ -42,7 +43,8 @@
 %                                        rlx.temperature, comp.mults
 %
 %                  'field_sweep'       - EPR field-sweep workers:
-%                                        sys.output, bas.formalism
+%                                        sys, tols, bas.formalism,
+%                                        selected bas, comp, and rlx fields
 %
 %                  'redfield_integral' - asynchronous Redfield integral
 %
@@ -137,12 +139,22 @@ switch stage
         parfor_ss.tols=spin_system.tols;
         parfor_ss.bas.formalism=spin_system.bas.formalism;
 
+        % Keep approximation selector for Hilbert-space evolution branches
+        if strcmp(stage,'evolution')&&isfield(spin_system.bas,'approximation')
+            parfor_ss.bas.approximation=spin_system.bas.approximation;
+        end
+
         % Keep multiplicities for unit operators and Liouville dimensions
         if isfield(spin_system,'comp')&&isfield(spin_system.comp,'mults')
             parfor_ss.comp.mults=spin_system.comp.mults;
         end
         if isfield(spin_system.bas,'basis')
             parfor_ss.bas.basis=spin_system.bas.basis;
+        end
+
+        % Keep irrep projectors for trajectory-level symmetry reduction
+        if strcmp(stage,'evolution')&&isfield(spin_system.bas,'irrep')
+            parfor_ss.bas.irrep=spin_system.bas.irrep;
         end
 
     case 'context'
@@ -171,9 +183,23 @@ switch stage
 
     case 'field_sweep'
 
-        % Keep the formalism selector and reporting target
-        parfor_ss.sys.output=spin_system.sys.output;
+        % Keep data needed by eigenfields and equilibrium fallback
+        parfor_ss.sys=spin_system.sys;
+        parfor_ss.tols=spin_system.tols;
         parfor_ss.bas.formalism=spin_system.bas.formalism;
+
+        % Keep thermal equilibrium data when it exists
+        if isfield(spin_system,'rlx')&&isfield(spin_system.rlx,'temperature')
+            parfor_ss.rlx.temperature=spin_system.rlx.temperature;
+        end
+        if isfield(spin_system,'comp')&&isfield(spin_system.comp,'mults')
+            parfor_ss.comp.mults=spin_system.comp.mults;
+        end
+
+        % Keep irrep projectors for Hilbert-space block diagonalisation
+        if isfield(spin_system.bas,'irrep')
+            parfor_ss.bas.irrep=spin_system.bas.irrep;
+        end
 
     case 'optimcon'
 

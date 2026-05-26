@@ -60,6 +60,11 @@ function [E,V,dE,T,LP]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,B)
 % Check consistency
 grumble(parameters,Hz,Hc,Hmw,B);
 
+% Precompute full Hamiltonian when thermal populations need it
+if (nargout>4)&&(~isfield(parameters,'rho0'))
+    H=B*Hz+Hc; H=full((H+H')/2);
+end
+
 % Recursive call for symmetry
 if isfield(spin_system.bas,'irrep')
 
@@ -97,7 +102,9 @@ if isfield(spin_system.bas,'irrep')
 else
 
     % Hamiltonian
-    H=B*Hz+Hc; H=full((H+H')/2);
+    if ~exist('H','var')
+        H=B*Hz+Hc; H=full((H+H')/2);
+    end
 
     % Decide the method
     switch parameters.rspt_order

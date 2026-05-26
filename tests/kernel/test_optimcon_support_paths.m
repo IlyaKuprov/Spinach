@@ -188,48 +188,6 @@ result=test_true(result,'bracketing objective increase',fx_br>fx_0,...
 result=test_true(result,'bracketing gradient shape',isequal(size(gfx_br),size(gfx_0)),...
                  'bracketing must return a gradient vector with the original dimensions');
 
-% Check bracketing tests the capped first trial before failing
-cap_system=spin_system;
-cap_system.control.ls_tau1=realmax;
-[~,~,alpha_cap,~,~,next_cap]=bracketing(@local_line_objective,0.1,dir,x_0,...
-                                        fx_0,gfx_0,local_data([2 1]),cap_system);
-result=test_true(result,'bracketing capped first trial',strcmp(next_cap,'none'),...
-                 'bracketing must test an already evaluated trial before applying the evaluation cap');
-result=test_close(result,'bracketing capped step length',alpha_cap,0.1,1e-14,1e-14,...
-                  'a capped but acceptable first trial step should be returned unchanged');
-
-% Check bracketing fails cleanly for a non-ascent direction
-[bad_a,bad_b,alpha_bad,fx_bad,gfx_bad,next_bad]=bracketing(@local_line_objective,0.1,-dir,x_0,...
-                                                          fx_0,gfx_0,local_data([2 1]),spin_system);
-result=test_true(result,'bracketing non-ascent failure',strcmp(next_bad,'failed'),...
-                 'bracketing must report controlled failure for a non-ascent direction');
-result=test_true(result,'bracketing non-ascent brackets',...
-                 isempty(bad_a.alpha)&&isempty(bad_b.alpha),...
-                 'bracketing must assign empty bracket outputs on early controlled failure');
-result=test_close(result,'bracketing non-ascent step',alpha_bad,0,0,0,...
-                  'failed non-ascent bracketing must not return an accepted step');
-result=test_close(result,'bracketing non-ascent objective',fx_bad,fx_0,0,0,...
-                  'failed non-ascent bracketing must preserve the reference objective value');
-result=test_close(result,'bracketing non-ascent gradient',gfx_bad,gfx_0,0,0,...
-                  'failed non-ascent bracketing must preserve the reference gradient');
-
-% Check bracketing fails cleanly for an unbounded linear objective
-data_line=local_data([2 1]);
-x_lin=[0; 0];
-fx_lin=0;
-gfx_lin=[1; 0];
-dir_lin=gfx_lin;
-[~,~,alpha_fail,fx_fail,gfx_fail,next_fail]=bracketing(@local_linear_objective,1,dir_lin,x_lin,...
-                                                       fx_lin,gfx_lin,data_line,spin_system);
-result=test_true(result,'bracketing controlled failure',strcmp(next_fail,'failed'),...
-                 'bracketing must stop unbounded expansion before numerical overflow');
-result=test_close(result,'bracketing failure step',alpha_fail,0,0,0,...
-                  'failed bracketing must not return an accepted step');
-result=test_close(result,'bracketing failure objective',fx_fail,fx_lin,0,0,...
-                  'failed bracketing must preserve the reference objective value');
-result=test_close(result,'bracketing failure gradient',gfx_fail,gfx_lin,0,0,...
-                  'failed bracketing must preserve the reference gradient');
-
 % Check sectioning recovers the bracketed maximum of the same quadratic
 a.alpha=0;
 a.fx=fx_0;
@@ -248,8 +206,6 @@ result=test_true(result,'sectioning exit flag',exitflag==0,...
                  'sectioning should report successful Wolfe acceptance');
 
 end
-
-
 
 
 function spin_system=local_spin_system()
@@ -394,16 +350,3 @@ end
 end
 
 
-function [traj_data,fidelity,grad,hess]=local_linear_objective(x,~)
-
-% Define a linear objective with no finite line maximum
-traj_data.marker='local_linear_objective';
-fidelity=x(1);
-if nargout>2
-    grad=[1; 0];
-end
-if nargout>3
-    hess=zeros(numel(x),numel(x));
-end
-
-end

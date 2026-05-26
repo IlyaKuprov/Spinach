@@ -29,7 +29,7 @@
 %
 %    data.x_shape    - output of size(guess)
 %
-%    data.*          - further fields may be set by the
+%    data.*          - further fields may be set by the 
 %                      objective functon
 %
 % david.goodwin@inano.au.dk
@@ -45,7 +45,7 @@ grumble(spin_system,cost_function,guess);
 % Initialise counters
 data.count.iter=0; data.count.fx=0;
 data.count.gfx=0;  data.count.hfx=0;
-data.count.rfo=0;
+data.count.rfo=0;        
 
 % Look for checkpoint file
 if isfield(spin_system.control,'checkpoint')&&...
@@ -55,17 +55,17 @@ if isfield(spin_system.control,'checkpoint')&&...
     % Read the initial guess from checkpoint file in global scratch
     report(spin_system,'WARNING: optimisation restarted from the checkpoint file');
     load([spin_system.sys.scratch filesep ...
-          spin_system.control.checkpoint],'x');
+          spin_system.control.checkpoint],'x'); 
     if numel(x)~=numel(guess)
         error('waveform size mismatch between guess and checkpoint.');
     end
     data.x_shape=size(guess);
-
+    
 else
-
+    
     % Stretch the guess supplied by user
     data.x_shape=size(guess); x=guess(:);
-
+    
 end
 
 % Prepare the freeze mask
@@ -108,36 +108,38 @@ for n=1:spin_system.control.max_iter
 
     % Default exit flag
     exitflag=0;
-
+    
     % Update iteration counter
     data.count.iter=data.count.iter+1;
-
+    
     % Get the search direction
     switch spin_system.control.method
-
+        
         case {'lbfgs','rbfgs'}
-
+            
             if n==1
-
+                
                 % Get objective and gradient
                 [data,fx,g]=objeval(x,cost_function,data,spin_system);
 
-                % Start history arrays
-                old_x=x(~frozen); dx_hist=[];
-                old_g=g(~frozen); dg_hist=[];
-
-                % Take a conservative step at first iteration
-                dir=zeros(size(frozen));
-                if norm(g(~frozen),2)>=spin_system.control.tol_g
-                    dir=g.*(~frozen); dir=0.01*dir/max(abs(dir));
+                % Catch unreasonably small initial fidelities and gradients
+                if (abs(data.fx_sep_pen(1))<1e-6)||(norm(g(~frozen),2)<1e-6)
+                    error('fidelity or gradient too small at iter 1, find a better guess.');
                 end
-
+                
+                % Start history arrays
+                old_x=x(~frozen); dx_hist=[]; 
+                old_g=g(~frozen); dg_hist=[]; 
+                
+                % Take a conservative step at first iteration
+                dir=g.*(~frozen); dir=0.01*dir/max(abs(dir));
+                
             else
-
+                
                 % Update the history of dx and dg
                 dx_hist=[x(~frozen)-old_x dx_hist]; old_x=x(~frozen); %#ok<AGROW>
                 dg_hist=[g(~frozen)-old_g dg_hist]; old_g=g(~frozen); %#ok<AGROW>
-
+                
                 % Truncate the history
                 if size(dx_hist,2)>spin_system.control.n_grads
                     dx_hist=dx_hist(:,1:spin_system.control.n_grads);
@@ -145,7 +147,7 @@ for n=1:spin_system.control.max_iter
                 if size(dg_hist,2)>spin_system.control.n_grads
                     dg_hist=dg_hist(:,1:spin_system.control.n_grads);
                 end
-
+                
                 % Get ascent direction
                 dir=zeros(size(frozen));
                 if strcmp(spin_system.control.method,'lbfgs')
@@ -154,108 +156,79 @@ for n=1:spin_system.control.max_iter
                     dir(~frozen)=lbfgs(dx_hist,dg_hist,g(~frozen));
 
                 else
-
+                    
                     % Full BFGS pseudo-Hessian
                     H=bfgs(dx_hist,dg_hist,g(~frozen));
 
-                    % Regularise the pseudo-Hessian
+                    % Regularise the pseudo-Hessian 
                     [H,data]=hessreg(spin_system,H,g(~frozen),data);
-
+                    
                     % Get the search direction
                     dir=zeros(size(frozen));
                     dir(~frozen)=H\g(~frozen);
 
                 end
-
+                
             end
 
         case {'newton','goodwin'}
-
+            
             % Get objective, gradient, and Hessian
             [data,fx,g,H]=objeval(x,cost_function,data,spin_system);
-
+            
             % Tidy up the inputs
             H=real(H+H')/2; g=real(g);
-
+            
             % Apply freeze mask
             H=H(~frozen,~frozen);
-
+            
             % Regularise the Hessian
             [H,data]=hessreg(spin_system,-H,g(~frozen),data);
-
+            
             % Get the search direction
             dir=zeros(size(frozen));
             dir(~frozen)=H\g(~frozen);
-
+            
     end
 
     % Store the reference point
     g_ref=g(~frozen); dir_ref=dir(~frozen);
 
-    % Recognise convergence before line search
-    if norm(g_ref,2)<spin_system.control.tol_g
-        alpha=0; exitflag=1;
-    end
+    % If line search would be worthwhile, get a bracket [A B] of acceptable points
+    [A,B,alpha,fx_new,g_new,next_act,data]=bracketing(cost_function,1,dir,x,fx,...
+                                                      g.*(~frozen),data,spin_system);
 
-    % Fall back to steepest ascent for unusable directions
-    if (exitflag==0)&&((~all(isfinite(dir_ref)))||...
-       (norm(dir_ref,2)==0)||((g_ref'*dir_ref)<=0))
-        dir=zeros(size(frozen));
-        dir(~frozen)=g_ref;
-        dir_ref=dir(~frozen);
-    end
+    % Run sectioning if necessary
+    if strcmp(next_act,'sectioning')
+    
+        % Find an acceptable point within the [A B] bracket    
+       [alpha,fx,g,exitflag,data]=sectioning(cost_function,A,B,x,fx,g.*(~frozen),...
+                                             dir,data,spin_system);
+                                 
+    else
 
-    % Stop if no ascent direction is available
-    if (exitflag==0)&&((~all(isfinite(dir_ref)))||...
-       (norm(dir_ref,2)==0)||((g_ref'*dir_ref)<=0))
-        alpha=0; exitflag=-2;
-    end
-
-    % Run line search when a usable direction is available
-    if exitflag==0
-
-        % Get a bracket [A B] of acceptable points
-        [A,B,alpha,fx_new,g_new,next_act,data]=bracketing(cost_function,1,dir,x,fx,...
-                                                          g.*(~frozen),data,spin_system);
-
-        % Run sectioning if necessary
-        if strcmp(next_act,'sectioning')
-
-            % Find an acceptable point within the [A B] bracket
-            [alpha,fx,g,exitflag,data]=sectioning(cost_function,A,B,x,fx,g.*(~frozen),...
-                                                  dir,data,spin_system);
-
-        elseif strcmp(next_act,'failed')
-
-            % Report a controlled line search failure
-            alpha=0; exitflag=-2;
-
-        else
-
-            % History update
-            fx=fx_new; g=g_new;
-
-        end
+        % History update
+        fx=fx_new; g=g_new;
 
     end
 
     % Report reference point diagnostics to user
     itrep(spin_system,fx,g_ref,dir_ref,alpha,data);
-
+                                         
     % If all good
     if exitflag~=-2
-
+        
         % Update x
-        x=x+alpha*dir;
+        x=x+alpha*dir; 
 
         % Save checkpoint
         if isfield(spin_system.control,'checkpoint')
-            save([spin_system.sys.scratch filesep ...
+            save([spin_system.sys.scratch filesep ... 
                   spin_system.control.checkpoint],'x','-v7.3','-nocompression');
         end
 
     end
-
+    
     % If all good
     if exitflag==0
 
@@ -278,10 +251,10 @@ for n=1:spin_system.control.max_iter
     if isfield(spin_system.control,'video_file')
         writeVideo(VW,getframe(gcf));
     end
-
+       
     % Exit if necessary
     if exitflag, break; end
-
+   
 end
 
 % When no iterations were taken
@@ -315,7 +288,7 @@ switch(spin_system.control.method)
     case 'goodwin', data.algorithm='Regularised Newton-Raphson method with Goodwin acceleration';
 end
 switch exitflag
-    case  1, message='norm(gradient,2) < tol_g';
+    case  1, message='norm(gradient,2) < tol_gfx';
     case  2, message='norm(step,1) < tol_x';
     case  0, message='number of iterations exceeded';
     case -2, message='line search found no maximum';
@@ -337,12 +310,7 @@ fid=data.fx_sep_pen(1);
 pens=sum(data.fx_sep_pen(2:end));
 
 % Angle between search direction and gradient
-grad_norm=norm(g,2); dir_norm=norm(dir,2);
-if (grad_norm==0)||(dir_norm==0)
-    dga=0;
-else
-    dga=abs(acosd((g'*dir)/(grad_norm*dir_norm)));
-end
+dga=abs(acosd((g'*dir)/(norm(g,2)*norm(dir,2))));
 
 % Print iteration data
 report(spin_system,[pad(num2str(data.count.iter,'%4.0f'),6),...
@@ -356,11 +324,11 @@ report(spin_system,[pad(num2str(data.count.iter,'%4.0f'),6),...
                     pad(num2str(alpha,'%4.0e'),9),...
                     pad(num2str(norm(g(:),2),'%0.2e'),12),...
                     pad(num2str(dga,'%9.1f'),10)]);
-
+                
 end
 
 % Consistency enforcement
-function grumble(spin_system,cost_function,guess)
+function grumble(spin_system,cost_function,guess) 
 if ~isa(cost_function,'function_handle')
     error('cost_function must be a function handle.');
 end
@@ -383,7 +351,7 @@ switch spin_system.control.integrator
             if size(guess,2)~=size(spin_system.control.basis,1)
                 error('the number of columns in guess must be equal to the number of basis functions.');
             end
-        end
+        end 
     case 'trapezium'
         if isempty(spin_system.control.basis)
             if size(guess,2)~=(spin_system.control.pulse_nsteps+1)
@@ -402,7 +370,7 @@ switch spin_system.control.integrator
 end
 end
 
-% There is a sacred horror about everything grand. It is easy to
+% There is a sacred horror about everything grand. It is easy to 
 % admire mediocrity and hills; but whatever is too lofty, a geni-
 % us as well as a mountain, an assembly as well as a masterpiece,
 % seen too near, is appalling... People have a strange feeling of
@@ -410,3 +378,4 @@ end
 % sublimity; they see the monster, they do not see the prodigy.
 %
 % Victor Hugo - Ninety-three
+

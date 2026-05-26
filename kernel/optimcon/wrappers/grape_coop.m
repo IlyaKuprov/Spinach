@@ -50,9 +50,6 @@ end
 % Make sure final states are available
 spin_system.control.return_traj=true();
 
-% Preserve the caller's ensemble correlations
-ens_corrs=spin_system.control.ens_corrs;
-
 % Run both experiments
 [traj_data_a,fidelity_a,gradient_a]=grape_phase(profile_a,spin_system);
 [traj_data_b,fidelity_b,gradient_b]=grape_phase(profile_b,spin_system);
@@ -82,84 +79,6 @@ dirt_sum=cell(size(dirt_a));
 for n=1:numel(dirt_sum)
     dirt_sum{n}=dirt_a{n}+dirt_b{n};
 end
-
-% Get offset ensemble size
-off_ens_sizes=cellfun(@numel,spin_system.control.offsets);
-if ~isempty(off_ens_sizes)
-    n_offset_vals=prod(off_ens_sizes);
-else
-    n_offset_vals=1;
-end
-
-% Extract ensemble grid dimensions
-n_state_pairs=1;
-n_ens_systems=spin_system.control.ndrifts;
-n_power_levls=numel(spin_system.control.pwr_levels);
-n_phase_specs=size(spin_system.control.phase_cycle,1);
-n_distortions=size(spin_system.control.distortion,1);
-
-% Recreate the original ensemble catalogue
-catalog=(1:n_state_pairs)';
-catalog=[kron(ones(n_ens_systems,1),catalog) kron((1:n_ens_systems)',ones(size(catalog,1),1))];
-catalog=[kron(ones(n_power_levls,1),catalog) kron((1:n_power_levls)',ones(size(catalog,1),1))];
-catalog=[kron(ones(n_offset_vals,1),catalog) kron((1:n_offset_vals)',ones(size(catalog,1),1))];
-catalog=[kron(ones(n_phase_specs,1),catalog) kron((1:n_phase_specs)',ones(size(catalog,1),1))];
-catalog=[kron(ones(n_distortions,1),catalog) kron((1:n_distortions)',ones(size(catalog,1),1))];
-
-% Preserve own-state-per-member filtering from the main pass
-if ismember('rho_ens',ens_corrs)
-    catalog=catalog(:,2:end);
-    catalog=unique(catalog,'rows');
-    catalog=[(1:size(catalog,1))' catalog];
-end
-
-% Preserve own-state-per-drift filtering from the main pass
-if ismember('rho_drift',ens_corrs)
-    catalog(catalog(:,1)~=catalog(:,2),:)=[];
-end
-
-% Preserve own-power-per-drift filtering from the main pass
-if ismember('power_drift',ens_corrs)
-    catalog(catalog(:,2)~=catalog(:,1),:)=[];
-end
-
-% Count the full impurity ensemble size
-n_cases=size(catalog,1);
-
-% Get ensemble budget
-if isfield(spin_system.control,'budget')
-    ens_budget=spin_system.control.budget;
-else
-    ens_budget=Inf;
-end
-
-% Convert fractional budget into sample count
-if isfinite(ens_budget)&&(ens_budget<=1)
-    ens_budget=round(n_cases*ens_budget);
-    ens_budget=max(1,ens_budget);
-end
-
-% Apply ensemble budget
-if ens_budget<n_cases
-
-    % Get RNG into a reproducible state
-    rng_state=rng; rng(5318008,'twister');
-
-    % Draw the same random subset of the ensemble
-    catalog=catalog(randperm(n_cases,ens_budget),:);
-
-    % Release RNG
-    rng(rng_state);
-
-end
-
-% Replace original state-pair index with impurity-target index
-catalog(:,1)=(1:size(catalog,1))';
-
-% Check that each impurity target has one ensemble case
-if size(catalog,1)~=numel(dirt_sum)
-    error('impurity target count does not match the cooperative ensemble catalogue.');
-end
 spin_system.control.rho_targ=dirt_sum;
 
 % Replicate the initial state
@@ -168,10 +87,7 @@ spin_system.control.rho_init=cell(size(spin_system.control.rho_targ));
 spin_system.control.rho_init(:)={rho};
 
 % Impurity cancellation gradients
-spin_system.control.ens_corrs={};
-spin_system.control.ens_catalog=catalog;
-spin_system.control.penalties={'none'};
-spin_system.control.p_weights=0;
+spin_system.control.ens_corrs={'rho_match'};
 [~,~,gradient_c]=grape_phase(profile_a,spin_system);
 [~,~,gradient_d]=grape_phase(profile_b,spin_system);
 
@@ -186,9 +102,8 @@ switch spin_system.bas.formalism
         fidelity(1)=fidelity(1)-mean(cellfun(@(x)norm(x,2)^2,dirt_sum));
 end
 
-% Assemble the physical-fidelity gradient
-gradient=cat(1,gradient_a,gradient_b)/2;
-gradient(:,:,1)=gradient(:,:,1)-2*cat(1,gradient_c(:,:,1),gradient_d(:,:,1));
+% Assemble the gradient
+gradient=cat(1,gradient_a,gradient_b)/2-2*cat(1,gradient_c,gradient_d);
 
 % Return both trajectories
 traj_data={traj_data_a,traj_data_b};

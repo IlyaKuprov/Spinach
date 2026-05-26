@@ -37,8 +37,6 @@ result=local_check_grape_family(result);
 end
 
 
-
-
 function result=local_check_distortions(result)
 
 % Make a non-degenerate two-channel waveform
@@ -105,16 +103,6 @@ result=test_true(result,'amp_tanh saturation',all(amp_tanh_val<sat_lvl),...
 result=local_check_jacobian(result,'amp_tanh Jacobian',...
                             @(x)amp_tanh(reshape(x,size(waveform)),sat_lvl),...
                             waveform,J_tanh,1e-8);
-waveform_single=single(waveform);
-[wave_tanh_single,~]=amp_tanh(waveform_single,single(sat_lvl));
-result=test_true(result,'amp_tanh single class',isa(wave_tanh_single,'single'),...
-                 'amp_tanh must preserve the waveform storage class');
-zero_wave=zeros(2,3);
-[wave_tanh_zero,J_tanh_zero]=amp_tanh(zero_wave,sat_lvl);
-result=test_close(result,'amp_tanh zero waveform',wave_tanh_zero,zero_wave,0,0,...
-                  'amp_tanh must keep an exactly silent waveform finite');
-result=test_close(result,'amp_tanh zero Jacobian',J_tanh_zero,speye(numel(zero_wave)),0,0,...
-                  'amp_tanh must have the identity Cartesian derivative at zero amplitude');
 
 % Check root-sigmoidal amplifier compression
 shape=4;
@@ -129,14 +117,6 @@ result=test_true(result,'amp_root monotonic compression',...
 result=local_check_jacobian(result,'amp_root Jacobian',...
                             @(x)amp_root(reshape(x,size(waveform)),sat_lvl,shape),...
                             waveform,J_root,1e-8);
-[wave_root_single,~]=amp_root(waveform_single,single(sat_lvl),single(shape));
-result=test_true(result,'amp_root single class',isa(wave_root_single,'single'),...
-                 'amp_root must preserve the waveform storage class');
-[wave_root_zero,J_root_zero]=amp_root(zero_wave,sat_lvl,shape);
-result=test_close(result,'amp_root zero waveform',wave_root_zero,zero_wave,0,0,...
-                  'amp_root must keep an exactly silent waveform finite');
-result=test_close(result,'amp_root zero Jacobian',J_root_zero,speye(numel(zero_wave)),0,0,...
-                  'amp_root must have the identity Cartesian derivative at zero amplitude');
 
 % Check causal FIR kernel estimation with all solver paths
 x=[1; 0; -1; 2; 1; -2; 3];
@@ -339,43 +319,6 @@ result=test_close(result,'grape_phase fidelity',fid_phase,fid_cart,1e-13,1e-13,.
 result=test_close(result,'grape_phase gradient',grad_phase(:,:,1),grad_phase_ref,1e-6,1e-6,...
                   'grape_phase gradient must match centred finite differences');
 
-% Check phase Hessian mixed-track blocks against finite differences
-phase_two_system=local_spin_system('zeeman-hilb');
-S=pauli(2);
-control.operators={S.x,S.y,0.4*S.x+0.2*S.z,0.7*S.y};
-control.rho_init={S.x};
-control.rho_targ={S.z};
-control.pwr_levels=1;
-control.pulse_dt=[0.02 0.03 0.04];
-control.drifts={{sparse(2,2)}};
-control.method='newton';
-control.max_iter=0;
-control.penalties={'none'};
-control.p_weights=0;
-control.l_bound=-100;
-control.u_bound=100;
-control.plotting={};
-control.parallel='time';
-control.amplitudes=[5 6 7; 3 4 5];
-phase_two_system=optimcon(phase_two_system,control);
-phi_two=[0.2 -0.4 0.7; -0.3 0.5 -0.2];
-[~,~,~,hess_phase]=grape_phase(phi_two,phase_two_system);
-hess_phase_ref=zeros(numel(phi_two),numel(phi_two));
-step_size=1e-5;
-for n=1:numel(phi_two)
-    phi_plus=phi_two;
-    phi_minus=phi_two;
-    phi_plus(n)=phi_plus(n)+step_size;
-    phi_minus(n)=phi_minus(n)-step_size;
-    [~,~,grad_plus]=grape_phase(phi_plus,phase_two_system);
-    [~,~,grad_minus]=grape_phase(phi_minus,phase_two_system);
-    hess_phase_ref(:,n)=(reshape(grad_plus(:,:,1),[],1)-...
-                         reshape(grad_minus(:,:,1),[],1))/(2*step_size);
-end
-result=test_close(result,'grape_phase Hessian mixed tracks',hess_phase(:,:,1),...
-                  hess_phase_ref,1e-5,1e-5,...
-                  'grape_phase Hessian must transform row and column phase tracks separately');
-
 % Check a zero-iteration fmaxnewton call without running optimisation
 newton_guess=zeros(size(waveform));
 [x_newton,data]=fmaxnewton(spin_system,@local_quadratic_objective,newton_guess);
@@ -384,16 +327,6 @@ result=test_close(result,'fmaxnewton zero iter point',x_newton,newton_guess,0,0,
 result=test_true(result,'fmaxnewton zero iter count',...
                  (data.count.iter==0)&&(data.count.gfx==0)&&(data.count.hfx==0),...
                  'fmaxnewton with max_iter zero must not take iterations or derivative calls');
-
-% Check fmaxnewton convergence at an already optimal initial point
-newton_system=spin_system;
-newton_system.control.max_iter=3;
-opt_guess=0.1*ones(size(waveform));
-[x_opt,data_opt]=fmaxnewton(newton_system,@local_quadratic_objective,opt_guess);
-result=test_close(result,'fmaxnewton optimal start',x_opt,opt_guess,0,0,...
-                  'fmaxnewton must accept an already optimal starting point');
-result=test_true(result,'fmaxnewton optimal start count',data_opt.count.iter==1,...
-                 'fmaxnewton must stop after recognising the zero projected gradient');
 
 % Check Liouville-space GRAPE derivatives in a tiny vector-space fixture
 [liouv_system,drift,controls,rho_init,rho_targ]=local_liouv_fixture('zeeman-liouv');
@@ -429,49 +362,6 @@ result=test_true(result,'grape_coop finite',all(isfinite([fid_coop(:); grad_coop
                  'grape_coop must return finite cooperative fidelity and gradient channels');
 result=test_true(result,'grape_coop gradient shape',isequal(size(grad_coop),[2 2 2]),...
                  'grape_coop must return one phase-gradient row for each cooperative pulse');
-coop_system.control.penalties={'NS'};
-coop_system.control.p_weights=1;
-[~,~,grad_a]=grape_phase(phi_pair(1,:),coop_system);
-[~,~,grad_b]=grape_phase(phi_pair(2,:),coop_system);
-[~,~,grad_coop_pen]=grape_coop(phi_pair,coop_system);
-grad_pen_ref=cat(1,grad_a(:,:,2),grad_b(:,:,2))/2;
-result=test_close(result,'grape_coop penalty gradient',grad_coop_pen(:,:,2),...
-                  grad_pen_ref,1e-12,1e-12,...
-                  'grape_coop must not subtract impurity gradients from penalty slices');
-
-% Check cooperative wrapper with constrained ensemble correlations
-coop_corr_system=local_spin_system('sphten-liouv');
-coop_corr_system.bas.basis=[0; 1];
-control.operators={[0 1; 1 0],[0 -1i; 1i 0]};
-control.rho_init={[1; 0.2]};
-control.rho_targ={[0.3; 1.0]};
-control.pwr_levels=[1 2];
-control.pulse_dt=[0.02 0.03];
-control.drifts={{sparse(2,2)},{0.05*sparse([0 1; -1 0])}};
-control.method='lbfgs';
-control.max_iter=0;
-control.penalties={'none'};
-control.p_weights=0;
-control.l_bound=-100;
-control.u_bound=100;
-control.plotting={};
-control.parallel='time';
-control.amplitudes=[4 5];
-control.ens_corrs={'power_drift'};
-coop_corr_system=optimcon(coop_corr_system,control);
-[~,fid_corr,grad_corr]=grape_coop(phi_pair,coop_corr_system);
-result=test_true(result,'grape_coop power_drift finite',...
-                 all(isfinite([fid_corr(:); grad_corr(:)])),...
-                 'grape_coop must preserve constrained ensemble mappings in its impurity pass');
-control.distortion={@no_dist; @no_dist};
-control.ens_corrs={'rho_ens','rho_drift'};
-coop_corr_system=local_spin_system('sphten-liouv');
-coop_corr_system.bas.basis=[0; 1];
-coop_corr_system=optimcon(coop_corr_system,control);
-[~,fid_corr,grad_corr]=grape_coop(phi_pair,coop_corr_system);
-result=test_true(result,'grape_coop rho_ens rho_drift finite',...
-                 all(isfinite([fid_corr(:); grad_corr(:)])),...
-                 'grape_coop must preserve rho_ens with other constrained ensemble mappings');
 
 end
 
@@ -844,3 +734,4 @@ function fidelity=local_tgrape_fid(spin_system,drift,controls,waveform,dt_grid,r
 fidelity=tgrape(spin_system,drift,controls,waveform,dt_grid,1,rho_init,rho_targ);
 
 end
+

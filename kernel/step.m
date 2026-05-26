@@ -114,16 +114,19 @@ if ~expm_times_vec
         % Use Matlab's expm
         P=expm(-1i*L*time_step);
 
-        % Handle horizontal stacks of density matrices
-        if isnumeric(rho)&&(size(rho,1)==size(P,1))&&...
-           (mod(size(rho,2),size(P,1))==0)&&(size(rho,2)>size(P,1))
-            dim=size(P,1); rho_stack=cell(1,size(rho,2)/dim);
-            for n=1:numel(rho_stack)
-                rho_stack{n}=P*rho(:,(1:dim)+(n-1)*dim)*P';
+        % Propagate a cell array of density matrices
+        if iscell(rho)
+            for n=1:numel(rho)
+                rho{n}=P*rho{n}*P';
             end
-            rho=cell2mat(rho_stack); return;
+
+            return;
+
         else
+
+            % Propagate a single density matrix
             rho=P*rho*P'; return;
+
         end
 
     else
@@ -149,22 +152,12 @@ if ~expm_times_vec
         if isnumeric(rho)
 
             % Encapsulate into a cell array
-            return_numeric=true(); return_stack=false();
-            if (size(rho,1)==size(L,1))&&...
-               (mod(size(rho,2),size(L,1))==0)&&(size(rho,2)>size(L,1))
-                dim=size(L,1); rho_stack=cell(1,size(rho,2)/dim);
-                for n=1:numel(rho_stack)
-                    rho_stack{n}=rho(:,(1:dim)+(n-1)*dim);
-                end
-                rho=rho_stack; return_stack=true();
-            else
-                rho={rho};
-            end
+            return_numeric=true(); rho={rho};
 
         elseif iscell(rho)
 
             % Keep the cell array
-            return_numeric=false(); return_stack=false();
+            return_numeric=false();
 
         end
 
@@ -196,13 +189,7 @@ if ~expm_times_vec
         end
 
         % Strip the cell array if needed
-        if return_numeric
-            if return_stack
-                rho=cell2mat(rho);
-            else
-                rho=rho{1};
-            end
-        end
+        if return_numeric, rho=rho{1}; end
 
     end
 

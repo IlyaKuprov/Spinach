@@ -342,8 +342,11 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
                                                        spin_system.control.fidelity);
             case 'zeeman-hilb'
 
-                % Complain and bomb out
-                error('Newton-Raphson methods are not available in Hilbert space, use LBFGS.');
+                % Call Hilbert space version of the GRAPE function
+                [traj_data{n},fidelities{n},...
+                 gradients{n},hessians{n}]=grape_hilb(spin_system,L,spin_system.control.operators,...
+                                                      local_waveform,rho_init,rho_targ,...
+                                                      spin_system.control.fidelity);
 
             case 'zeeman-wavef'
 
@@ -519,9 +522,6 @@ switch spin_system.control.integrator
         if size(waveform,2)~=(spin_system.control.pulse_nsteps+1)
             error('the number of columns in waveform must be (number of time steps)+1.');
         end
-        if strcmp(spin_system.bas.formalism,'zeeman-hilb')
-            error('trapezium integration is not available in Hilbert space.');
-        end
     otherwise
         error('unknown time propagation algorithm.');
 end
@@ -533,4 +533,3 @@ end
 % 12-bore shotguns."
 %
 % https://doi.org/10.1016/0035-9203(82)90161-4
-

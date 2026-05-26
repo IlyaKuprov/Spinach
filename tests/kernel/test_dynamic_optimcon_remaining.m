@@ -463,6 +463,15 @@ coop_corr_system=optimcon(coop_corr_system,control);
 result=test_true(result,'grape_coop power_drift finite',...
                  all(isfinite([fid_corr(:); grad_corr(:)])),...
                  'grape_coop must preserve constrained ensemble mappings in its impurity pass');
+control.distortion={@no_dist; @no_dist};
+control.ens_corrs={'rho_ens','rho_drift'};
+coop_corr_system=local_spin_system('sphten-liouv');
+coop_corr_system.bas.basis=[0; 1];
+coop_corr_system=optimcon(coop_corr_system,control);
+[~,fid_corr,grad_corr]=grape_coop(phi_pair,coop_corr_system);
+result=test_true(result,'grape_coop rho_ens rho_drift finite',...
+                 all(isfinite([fid_corr(:); grad_corr(:)])),...
+                 'grape_coop must preserve rho_ens with other constrained ensemble mappings');
 
 end
 

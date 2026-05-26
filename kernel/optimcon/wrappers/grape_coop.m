@@ -91,22 +91,31 @@ else
     n_offset_vals=1;
 end
 
-% Extract non-rho ensemble grid dimensions
+% Extract ensemble grid dimensions
+n_state_pairs=1;
 n_ens_systems=spin_system.control.ndrifts;
 n_power_levls=numel(spin_system.control.pwr_levels);
 n_phase_specs=size(spin_system.control.phase_cycle,1);
 n_distortions=size(spin_system.control.distortion,1);
 
-% Recreate the original non-rho ensemble catalogue
-catalog=(1:n_ens_systems)';
+% Recreate the original ensemble catalogue
+catalog=(1:n_state_pairs)';
+catalog=[kron(ones(n_ens_systems,1),catalog) kron((1:n_ens_systems)',ones(size(catalog,1),1))];
 catalog=[kron(ones(n_power_levls,1),catalog) kron((1:n_power_levls)',ones(size(catalog,1),1))];
 catalog=[kron(ones(n_offset_vals,1),catalog) kron((1:n_offset_vals)',ones(size(catalog,1),1))];
 catalog=[kron(ones(n_phase_specs,1),catalog) kron((1:n_phase_specs)',ones(size(catalog,1),1))];
 catalog=[kron(ones(n_distortions,1),catalog) kron((1:n_distortions)',ones(size(catalog,1),1))];
 
+% Preserve own-state-per-member filtering from the main pass
+if ismember('rho_ens',ens_corrs)
+    catalog=catalog(:,2:end);
+    catalog=unique(catalog,'rows');
+    catalog=[(1:size(catalog,1))' catalog];
+end
+
 % Preserve own-state-per-drift filtering from the main pass
 if ismember('rho_drift',ens_corrs)
-    catalog(catalog(:,1)~=1,:)=[];
+    catalog(catalog(:,1)~=catalog(:,2),:)=[];
 end
 
 % Preserve own-power-per-drift filtering from the main pass
@@ -144,6 +153,9 @@ if ens_budget<n_cases
 
 end
 
+% Replace original state-pair index with impurity-target index
+catalog(:,1)=(1:size(catalog,1))';
+
 % Check that each impurity target has one ensemble case
 if size(catalog,1)~=numel(dirt_sum)
     error('impurity target count does not match the cooperative ensemble catalogue.');
@@ -157,7 +169,7 @@ spin_system.control.rho_init(:)={rho};
 
 % Impurity cancellation gradients
 spin_system.control.ens_corrs={};
-spin_system.control.ens_catalog=[(1:size(catalog,1))' catalog];
+spin_system.control.ens_catalog=catalog;
 spin_system.control.penalties={'none'};
 spin_system.control.p_weights=0;
 [~,~,gradient_c]=grape_phase(profile_a,spin_system);

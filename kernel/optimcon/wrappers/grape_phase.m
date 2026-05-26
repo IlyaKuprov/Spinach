@@ -1,4 +1,4 @@
-% Cost function for optimal control using the GRAPE algorithm. Returns 
+% Cost function for optimal control using the GRAPE algorithm. Returns
 % fidelity, gradient and Hessian for a given waveform, specified in po-
 % lar coordinates. Only the phase channel gradient is returned, the am-
 % plitude profile is taken as a given. Syntax:
@@ -7,7 +7,7 @@
 %
 % Parameters:
 %
-%   phi_profile   - set of control pulse phases from an amplitude-phase 
+%   phi_profile   - set of control pulse phases from an amplitude-phase
 %                   description.
 %
 % Outputs:
@@ -18,12 +18,12 @@
 %                   ray separating the penalties from the simulation
 %                   fidelity.
 %
-%   gradient      - gradient of the fidelity with respect to the control 
+%   gradient      - gradient of the fidelity with respect to the control
 %                   sequence. When penalty methods are specified, gradi-
 %                   ent is returned as an array separating penalty gra-
 %                   dients from the fidelity gradient.
 %
-%   hessian       - Hessian of the fidelity with respect to the control 
+%   hessian       - Hessian of the fidelity with respect to the control
 %                   sequence. When penalty methods are specified, gradi-
 %                   ent is returned as an array separating penalty Hes-
 %                   sians from the fidelity Hessian.
@@ -58,94 +58,108 @@ if nargout==2
 
     % Call Cartesian GRAPE
     [traj_data,fidelity]=grape_xy(waveform_xy,spin_system);
-    
+
 % Fidelity and gradient
 elseif nargout==3
-    
+
     % Call Cartesian GRAPE
     [traj_data,fidelity,grad_xy]=grape_xy(waveform_xy,spin_system);
-    
+
     % Preallocate the answer
     gradient=zeros(size(phi_profile,1),size(phi_profile,2),npenterms+1);
-    
+
     % Loop over phase tracks
     for n=1:size(phi_profile,1)
-        
+
         % Loop over penalites
         for k=1:(npenterms+1)
-            
+
             % Translate derivatives
             [~,~,~,gradient(n,:,k)]=cartesian2polar(waveform_xy(2*n-1,:),waveform_xy(2*n,:),...
                                                     grad_xy(2*n-1,:,k),  grad_xy(2*n,:,k));
-                                                
+
         end
-        
+
     end
 
 % Fidelity, gradient and Hessian
 elseif nargout==4
-    
+
     % Call Cartesian ensemble GRAPE
     [traj_data,fidelity,grad_xy,hess_xy]=grape_xy(waveform_xy,spin_system);
-    
+
     % Preallocate the answer
     gradient=zeros(size(phi_profile,1),size(phi_profile,2),npenterms+1);
     hessian=zeros(numel(phi_profile),numel(phi_profile),npenterms+1);
-    
+
     % Loop over phase tracks
     for n=1:size(phi_profile,1)
-        
+
         % Loop over penalites
         for k=1:(npenterms+1)
-            
+
             % Translate derivatives
             [~,~,~,gradient(n,:,k)]=cartesian2polar(waveform_xy(2*n-1,:),waveform_xy(2*n,:),...
                                                     grad_xy(2*n-1,:,k),  grad_xy(2*n,:,k));
-                                                
+
         end
-        
+
     end
-    
+
     % Transform Hessian from n^2 kxk block matrices to k^2 nxn matrices
     for n=1:size(hess_xy,3)
         hess_xy(:,:,n)=hess_reorder(hess_xy(:,:,n),numel(spin_system.control.operators),...
                                                    spin_system.control.pulse_nsteps);
     end
-    
+
     % Loop over phase tracks
     for n=1:size(phi_profile,1)
         for k=1:size(phi_profile,1)
-            
-            % Waveforms
-            fx=waveform_xy(2*n-1,:);
-            fy=waveform_xy(2*n,:);
-            
+
+            % Row-side waveform
+            row_x=waveform_xy(2*n-1,:);
+            row_y=waveform_xy(2*n,:);
+
+            % Column-side waveform
+            col_x=waveform_xy(2*k-1,:);
+            col_y=waveform_xy(2*k,:);
+
             % Loop over penalties
             for m=1:(npenterms+1)
-            
+
                 % Gradients
                 Dx=grad_xy(2*n-1,:,m);
                 Dy=grad_xy(2*n,:,m);
-                
+
                 % Hessian blocks
                 hess_block=hess_xy(1+2*spin_system.control.pulse_nsteps*(n-1):2*spin_system.control.pulse_nsteps*(n),...
                                    1+2*spin_system.control.pulse_nsteps*(k-1):2*spin_system.control.pulse_nsteps*(k),m);
                 Dxx=hess_block(1:end/2,1:end/2);     Dxy=hess_block(1:end/2,1+end/2:end);
                 Dyx=hess_block(1+end/2:end,1:end/2); Dyy=hess_block(1+end/2:end,1+end/2:end);
-            
+
                 % Translate second derivatives
-                [~,~,~,~,~,~,~,Dpp]=cartesian2polar(fx,fy,Dx,Dy,Dxx,Dxy,Dyx,Dyy);
-            
+                Dpp=(row_y'*col_y).*Dxx +(row_x'*col_x).*Dyy...
+                   -(row_x'*col_y).*Dyx -(row_y'*col_x).*Dxy;
+                if n==k
+                    Dpp=Dpp-diag(row_x.*Dx)-diag(row_y.*Dy);
+                end
+
                 % Make the phase Hessian
                 hessian(1+spin_system.control.pulse_nsteps*(n-1):spin_system.control.pulse_nsteps*(n),...
                         1+spin_system.control.pulse_nsteps*(k-1):spin_system.control.pulse_nsteps*(k),m)=Dpp;
-                    
+
             end
-                    
+
         end
-        
+
     end
-    
+
+    % Match the Hessian ordering to Matlab vectorisation
+    for n=1:(npenterms+1)
+        hessian(:,:,n)=hess_reorder(hessian(:,:,n),spin_system.control.pulse_nsteps,...
+                                                   size(phi_profile,1));
+    end
+
 end
 
 end
@@ -200,7 +214,7 @@ switch spin_system.control.integrator
 end
 end
 
-% Perfection (in design) is achieved not when there is nothing 
+% Perfection (in design) is achieved not when there is nothing
 % more to add, but rather when there is nothing more to take away.
 %
 % Antoine de Saint-Exupery

@@ -1,7 +1,7 @@
 % 4Q ultrafast MaxQ NMR spectrum for a coupled four-spin 
 % system in the presence of realistic diffusion.
 %
-% Calculation time: minutes on NVidia Tesla A100, much longer on CPU
+% Calculation time: hours, much faster on GPU
 %
 % mariagrazia.concilio@sjtu.edu.cn
 % ilya.kuprov@weizmann.ac.il

@@ -113,7 +113,18 @@ if ~expm_times_vec
 
         % Use Matlab's expm
         P=expm(-1i*L*time_step);
-        rho=P*rho*P'; return;
+
+        % Handle horizontal stacks of density matrices
+        if isnumeric(rho)&&(size(rho,1)==size(P,1))&&...
+           (mod(size(rho,2),size(P,1))==0)&&(size(rho,2)>size(P,1))
+            dim=size(P,1); rho_stack=cell(1,size(rho,2)/dim);
+            for n=1:numel(rho_stack)
+                rho_stack{n}=P*rho(:,(1:dim)+(n-1)*dim)*P';
+            end
+            rho=cell2mat(rho_stack); return;
+        else
+            rho=P*rho*P'; return;
+        end
 
     else
 
@@ -138,12 +149,22 @@ if ~expm_times_vec
         if isnumeric(rho)
 
             % Encapsulate into a cell array
-            return_numeric=true(); rho={rho};
+            return_numeric=true(); return_stack=false();
+            if (size(rho,1)==size(L,1))&&...
+               (mod(size(rho,2),size(L,1))==0)&&(size(rho,2)>size(L,1))
+                dim=size(L,1); rho_stack=cell(1,size(rho,2)/dim);
+                for n=1:numel(rho_stack)
+                    rho_stack{n}=rho(:,(1:dim)+(n-1)*dim);
+                end
+                rho=rho_stack; return_stack=true();
+            else
+                rho={rho};
+            end
 
         elseif iscell(rho)
 
             % Keep the cell array
-            return_numeric=false();
+            return_numeric=false(); return_stack=false();
 
         end
 
@@ -175,7 +196,13 @@ if ~expm_times_vec
         end
 
         % Strip the cell array if needed
-        if return_numeric, rho=rho{1}; end
+        if return_numeric
+            if return_stack
+                rho=cell2mat(rho);
+            else
+                rho=rho{1};
+            end
+        end
 
     end
 
@@ -395,4 +422,3 @@ end
 % the spectra shown in Figure 8.
 %
 % A.J. Mehrer and R.S. Mulliken, Chem. Rev. 69 (1969) 639-656.
-

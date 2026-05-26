@@ -61,6 +61,10 @@ if ~isempty(spin_system.control.freeze)
     gfx_0=gfx_0.*(~spin_system.control.freeze(:));
 end
 
+% Initialise empty bracket records
+a.alpha=[]; a.fx=[]; a.gfx=[];
+b.alpha=[]; b.fx=[]; b.gfx=[];
+
 % Compute the initial directional derivative
 dir_deriv=gfx_0'*dir;
 
@@ -72,7 +76,7 @@ end
 
 % Determine a finite maximum step length
 max_alpha=(sqrt(realmax)-norm(x_0,inf))/max(1,norm(dir,inf));
-max_evals=ceil(log(realmax)/log(1+spin_system.control.ls_tau1));
+max_evals=max(1,ceil(log(realmax)/log(1+spin_system.control.ls_tau1)));
 if (~isfinite(max_alpha))||(max_alpha<=0)
     alpha=0; fx=fx_0; gfx=gfx_0;
     next_act='failed'; return;
@@ -97,10 +101,6 @@ if ~isempty(spin_system.control.freeze)
     gfx_2=gfx_2.*(~spin_system.control.freeze(:));
 end
 
-% Initialise empty bracket records
-a.alpha=[]; a.fx=[]; a.gfx=[];
-b.alpha=[]; b.fx=[]; b.gfx=[];
-
 % Initialise bracketing history variables
 fx=fx_0; fx_1=fx_0;
 gfx=gfx_0; gfx_1=gfx_0;
@@ -109,12 +109,6 @@ eval_count=1;
 
 % Expand bracket until acceptance or interval capture
 while true
-
-    % Stop if the line search is not converging before overflow
-    if eval_count>=max_evals
-        alpha=0; fx=fx_0; gfx=gfx_0;
-        next_act='failed'; return;
-    end
 
     % Capture bracket when Armijo or monotonicity fails
     if (~alpha_conds(1,alpha_2,fx_0,fx_2,gfx_0,[],dir,spin_system))||...
@@ -150,6 +144,12 @@ while true
         % Hand over to sectioning stage
         next_act='sectioning'; return;
 
+    end
+
+    % Stop if another trial would exceed the evaluation cap
+    if eval_count>=max_evals
+        alpha=0; fx=fx_0; gfx=gfx_0;
+        next_act='failed'; return;
     end
 
     % Build interpolation window ahead of current trial point

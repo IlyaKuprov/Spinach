@@ -105,6 +105,10 @@ result=test_true(result,'amp_tanh saturation',all(amp_tanh_val<sat_lvl),...
 result=local_check_jacobian(result,'amp_tanh Jacobian',...
                             @(x)amp_tanh(reshape(x,size(waveform)),sat_lvl),...
                             waveform,J_tanh,1e-8);
+waveform_single=single(waveform);
+[wave_tanh_single,~]=amp_tanh(waveform_single,single(sat_lvl));
+result=test_true(result,'amp_tanh single class',isa(wave_tanh_single,'single'),...
+                 'amp_tanh must preserve the waveform storage class');
 zero_wave=zeros(2,3);
 [wave_tanh_zero,J_tanh_zero]=amp_tanh(zero_wave,sat_lvl);
 result=test_close(result,'amp_tanh zero waveform',wave_tanh_zero,zero_wave,0,0,...
@@ -125,6 +129,9 @@ result=test_true(result,'amp_root monotonic compression',...
 result=local_check_jacobian(result,'amp_root Jacobian',...
                             @(x)amp_root(reshape(x,size(waveform)),sat_lvl,shape),...
                             waveform,J_root,1e-8);
+[wave_root_single,~]=amp_root(waveform_single,single(sat_lvl),single(shape));
+result=test_true(result,'amp_root single class',isa(wave_root_single,'single'),...
+                 'amp_root must preserve the waveform storage class');
 [wave_root_zero,J_root_zero]=amp_root(zero_wave,sat_lvl,shape);
 result=test_close(result,'amp_root zero waveform',wave_root_zero,zero_wave,0,0,...
                   'amp_root must keep an exactly silent waveform finite');
@@ -431,6 +438,31 @@ grad_pen_ref=cat(1,grad_a(:,:,2),grad_b(:,:,2))/2;
 result=test_close(result,'grape_coop penalty gradient',grad_coop_pen(:,:,2),...
                   grad_pen_ref,1e-12,1e-12,...
                   'grape_coop must not subtract impurity gradients from penalty slices');
+
+% Check cooperative wrapper with constrained ensemble correlations
+coop_corr_system=local_spin_system('sphten-liouv');
+coop_corr_system.bas.basis=[0; 1];
+control.operators={[0 1; 1 0],[0 -1i; 1i 0]};
+control.rho_init={[1; 0.2]};
+control.rho_targ={[0.3; 1.0]};
+control.pwr_levels=[1 2];
+control.pulse_dt=[0.02 0.03];
+control.drifts={{sparse(2,2)},{0.05*sparse([0 1; -1 0])}};
+control.method='lbfgs';
+control.max_iter=0;
+control.penalties={'none'};
+control.p_weights=0;
+control.l_bound=-100;
+control.u_bound=100;
+control.plotting={};
+control.parallel='time';
+control.amplitudes=[4 5];
+control.ens_corrs={'power_drift'};
+coop_corr_system=optimcon(coop_corr_system,control);
+[~,fid_corr,grad_corr]=grape_coop(phi_pair,coop_corr_system);
+result=test_true(result,'grape_coop power_drift finite',...
+                 all(isfinite([fid_corr(:); grad_corr(:)])),...
+                 'grape_coop must preserve constrained ensemble mappings in its impurity pass');
 
 end
 

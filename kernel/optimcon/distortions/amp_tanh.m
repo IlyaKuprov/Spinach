@@ -56,7 +56,7 @@ end
 function [w_dist,J]=distort(w,sat_lvls)
 
 % Preallocate output
-w_dist=zeros(size(w));
+w_dist=zeros(size(w),'like',w);
 if nargout>1
     rows=zeros(2*numel(w),1);
     cols=zeros(2*numel(w),1);
@@ -93,10 +93,16 @@ for n=1:(size(w,1)/2)
         if nargout>1
             idx_x=2*n-1+size(w,1)*(k-1);
             idx_y=2*n+size(w,1)*(k-1);
+            jac_vals=[scale+curv*x^2; curv*x*y; ...
+                      curv*x*y; scale+curv*y^2];
+
+            % Keep the sparse Jacobian triplets in host memory
+            if isa(jac_vals,'gpuArray')
+                jac_vals=gather(jac_vals);
+            end
             rows(jac_idx+(1:4))=[idx_x; idx_x; idx_y; idx_y];
             cols(jac_idx+(1:4))=[idx_x; idx_y; idx_x; idx_y];
-            vals(jac_idx+(1:4))=[scale+curv*x^2; curv*x*y; ...
-                                 curv*x*y; scale+curv*y^2];
+            vals(jac_idx+(1:4))=jac_vals;
             jac_idx=jac_idx+4;
         end
 

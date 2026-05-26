@@ -56,58 +56,68 @@ n_power_levls=numel(spin_system.control.pwr_levels);   % Power level count
 n_phase_specs=size(spin_system.control.phase_cycle,1); % Phase cycle line count
 n_distortions=size(spin_system.control.distortion,1);  % Distortion function ensemble size
 
-% Create a catalog of the ensemble
-catalog=(1:n_state_pairs)';
-catalog=[kron(ones(n_ens_systems,1),catalog) kron((1:n_ens_systems)',ones(size(catalog,1),1))];
-catalog=[kron(ones(n_power_levls,1),catalog) kron((1:n_power_levls)',ones(size(catalog,1),1))];
-catalog=[kron(ones(n_offset_vals,1),catalog) kron((1:n_offset_vals)',ones(size(catalog,1),1))];
-catalog=[kron(ones(n_phase_specs,1),catalog) kron((1:n_phase_specs)',ones(size(catalog,1),1))];
-catalog=[kron(ones(n_distortions,1),catalog) kron((1:n_distortions)',ones(size(catalog,1),1))];
+% Use a precomputed catalogue when supplied by an internal wrapper
+if isfield(spin_system.control,'ens_catalog')
 
-% Ensemble correlation: own state pair for each member
-if ismember('rho_ens',spin_system.control.ens_corrs)
-    catalog=catalog(:,2:end); 
-    catalog=unique(catalog,'rows');
-    catalog=[(1:size(catalog,1))' catalog];
-end
+    % Import the internal ensemble catalogue
+    catalog=spin_system.control.ens_catalog;
 
-% Ensemble correlation: own state pair for each drift
-if ismember('rho_drift',spin_system.control.ens_corrs)
-    catalog(catalog(:,1)~=catalog(:,2),:)=[];
-end
-
-% Ensemble correlation: own control power for each drift
-if ismember('power_drift',spin_system.control.ens_corrs)
-    catalog(catalog(:,3)~=catalog(:,2),:)=[];
-end
-
-% Count the full ensemble size
-n_cases=size(catalog,1);
-
-% Get ensemble budget
-if isfield(spin_system.control,'budget')
-    ens_budget=spin_system.control.budget;
 else
-    ens_budget=Inf;
-end
 
-% Convert fractional budget into sample count
-if isfinite(ens_budget)&&(ens_budget<=1)
-    ens_budget=round(n_cases*ens_budget);
-    ens_budget=max(1,ens_budget);
-end
+    % Create a catalog of the ensemble
+    catalog=(1:n_state_pairs)';
+    catalog=[kron(ones(n_ens_systems,1),catalog) kron((1:n_ens_systems)',ones(size(catalog,1),1))];
+    catalog=[kron(ones(n_power_levls,1),catalog) kron((1:n_power_levls)',ones(size(catalog,1),1))];
+    catalog=[kron(ones(n_offset_vals,1),catalog) kron((1:n_offset_vals)',ones(size(catalog,1),1))];
+    catalog=[kron(ones(n_phase_specs,1),catalog) kron((1:n_phase_specs)',ones(size(catalog,1),1))];
+    catalog=[kron(ones(n_distortions,1),catalog) kron((1:n_distortions)',ones(size(catalog,1),1))];
 
-% Apply ensemble budget
-if ens_budget<n_cases
+    % Ensemble correlation: own state pair for each member
+    if ismember('rho_ens',spin_system.control.ens_corrs)
+        catalog=catalog(:,2:end);
+        catalog=unique(catalog,'rows');
+        catalog=[(1:size(catalog,1))' catalog];
+    end
 
-    % Get RNG into a reproducible state
-    rng_state=rng; rng(5318008,'twister');
+    % Ensemble correlation: own state pair for each drift
+    if ismember('rho_drift',spin_system.control.ens_corrs)
+        catalog(catalog(:,1)~=catalog(:,2),:)=[];
+    end
 
-    % Draw a random subset of the ensemble
-    catalog=catalog(randperm(n_cases,ens_budget),:);
+    % Ensemble correlation: own control power for each drift
+    if ismember('power_drift',spin_system.control.ens_corrs)
+        catalog(catalog(:,3)~=catalog(:,2),:)=[];
+    end
 
-    % Release RNG
-    rng(rng_state);
+    % Count the full ensemble size
+    n_cases=size(catalog,1);
+
+    % Get ensemble budget
+    if isfield(spin_system.control,'budget')
+        ens_budget=spin_system.control.budget;
+    else
+        ens_budget=Inf;
+    end
+
+    % Convert fractional budget into sample count
+    if isfinite(ens_budget)&&(ens_budget<=1)
+        ens_budget=round(n_cases*ens_budget);
+        ens_budget=max(1,ens_budget);
+    end
+
+    % Apply ensemble budget
+    if ens_budget<n_cases
+
+        % Get RNG into a reproducible state
+        rng_state=rng; rng(5318008,'twister');
+
+        % Draw a random subset of the ensemble
+        catalog=catalog(randperm(n_cases,ens_budget),:);
+
+        % Release RNG
+        rng(rng_state);
+
+    end
 
 end
 
@@ -512,6 +522,15 @@ if (~isnumeric(waveform))||(~isreal(waveform))
 end
 if size(waveform,1)~=numel(spin_system.control.operators)
     error('the number of rows in waveform must equal to the number of controls.');
+end
+if isfield(spin_system.control,'ens_catalog')
+    if (~isnumeric(spin_system.control.ens_catalog))||...
+       (~isreal(spin_system.control.ens_catalog))||...
+       (size(spin_system.control.ens_catalog,2)~=6)||...
+       any(spin_system.control.ens_catalog<1,'all')||...
+       any(mod(spin_system.control.ens_catalog,1)~=0,'all')
+        error('spin_system.control.ens_catalog must be a positive integer array with six columns.');
+    end
 end
 switch spin_system.control.integrator
     case 'rectangle'

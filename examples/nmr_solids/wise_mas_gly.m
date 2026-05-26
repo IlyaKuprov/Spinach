@@ -1,7 +1,6 @@
 % WISE of alpha-glycine powder under MAS.
 %
-% Calculation time: minutes on NVidia Tesla A100,
-%                   much longer on CPU
+% Calculation time: hours, much faster on GPU
 %
 % guinevere.mathies@uni-konstanz.de
 

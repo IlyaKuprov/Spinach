@@ -3,7 +3,7 @@
 %
 %           https://doi.org/10.1007/s00723-020-01269-z
 %
-% Calculation time: minutes.
+% Calculation time: hours, much faster on GPU
 %
 % ilya.kuprov@weizmann.ac.il
 % annemarie.kehl@mpinat.mpg.de

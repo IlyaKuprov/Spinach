@@ -108,26 +108,29 @@ if ~expm_times_vec
 
     end
 
-    % Fast serial bypass for small matrices
+    % Fast bypass for small density matrices
     if size(L,1)<spin_system.tols.small_matrix
 
         % Use Matlab's expm
         P=expm(-1i*L*time_step);
 
-        % Propagate a cell array of density matrices
+        % A cell array
         if iscell(rho)
-            for n=1:numel(rho)
+
+            % Parallel over cells
+            parfor n=1:numel(rho)
                 rho{n}=P*rho{n}*P';
             end
 
-            return;
-
         else
 
-            % Propagate a single density matrix
-            rho=P*rho*P'; return;
+            % A martrix
+            rho=P*rho*P';
 
         end
+
+        % Shortcut
+        return;
 
     else
 

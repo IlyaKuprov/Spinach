@@ -5,9 +5,10 @@
 % with respect to amplitudes of all control operators at every time step
 % of the shaped pulse. Uses Liouville-space formalism. Syntax:
 %
-%  [traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,...
-%                                       waveform,rho_init,rho_targ,...
-%                                       fidelity_type)
+%        [traj_data,fidelity,...
+%         grad,hess]=grape_liouv(spin_system,drifts,controls,...
+%                                waveform,rho_init,rho_targ,...
+%                                fidelity_type)
 % Parameters:
 %
 %   spin_system         - Spinach data object that has been through 
@@ -15,18 +16,19 @@
 % 
 %   drifts              - the drift Liouvillians: a cell array con-
 %                         taining one matrix (for time-independent 
-%                         drift) or multiple matrices (for time-de-
-%                         pendent drift).
+%                         drift) or multiple matrices (one per time
+%                         slice / point, for time-dependent drift).
 %
 %   controls            - control operators in Liouville space (cell 
 %                         array of matrices).
 %
 %   waveform            - control coefficients for each control ope-
 %                         rator (in vertical dimension) at each time
-%                         step (in horizonal dimension), rad/s
+%                         slice / point (horizonal dimension), rad/s
 %
 %   rho_init            - initial state of the system as a vector in
-%                         Liouville space.
+%                         Liouville space, ignored in stroboscopic
+%                         steady state optimisations
 %
 %   rho_targ            - target state of the system as a vector in
 %                         Liouville space.
@@ -42,14 +44,18 @@
 %   grad                - gradient of the fidelity with respect to
 %                         the control sequence
 %
-%   hess                - Hessian of the fidelity with respect to the 
-%                         control sequence
+%   hess                - Hessian of the fidelity with respect to 
+%                         the control sequence, not available for
+%                         piecewise-linear and stroboscopic stea-
+%                         dy state optimisations
 %
-%   traj_data.forward   - forward trajectory from the initial condi-
-%                         tion(a stack of state vectors)
+%   traj_data.forward   - forward trajectory from the initial con-
+%                         dition or stroboscopic steady state (a 
+%                         stack of state vectors)
 %
 % Note: this is a low level function that is not designed to be called 
-%       directly. Use grape_xy.m and grape_phase.m instead.
+%       directly. Use grape_xy.m, grape_phase.m, or other wrapper func-
+%       tions instead.
 %
 % david.goodwin@inano.au.dk
 % u.rasulov@soton.ac.uk
@@ -65,13 +71,21 @@ function [traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,
                                                     waveform,rho_init,rho_targ,...
                                                     fidelity_type) %#ok<*PFBNS>
 % Check consistency
-grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type);
+grumble(spin_system,drifts,controls,waveform,...
+        rho_init,rho_targ,fidelity_type);
     
 % Count the outputs
 n_outputs=nargout();
 
 % Extract the timing grid
 dt=spin_system.control.pulse_dt;
+
+% Make freeze mask explicit
+if isempty(spin_system.control.freeze)
+    frozen=false(size(waveform));
+else
+    frozen=spin_system.control.freeze;
+end
 
 % Run array preallocations
 switch spin_system.control.integrator
@@ -94,16 +108,24 @@ switch spin_system.control.integrator
             bwd_dP=cell(nctrls,nsteps); 
             fwd_d2P=cell(nctrls,nctrls,nsteps);
 
-            % Goodwin method precomputes propagators
+            % Goodwin Hessian route needs
+            % cumulative propagators
             if strcmp(spin_system.control.method,'goodwin')
-                P=cell(1,nsteps);
+                P_cum=cell(1,nsteps);
             end
 
         else
 
             % Parfor needs these empty declarations
-            fwd_dP={}; bwd_dP={}; fwd_d2P={}; P={};
+            fwd_dP={}; bwd_dP={}; fwd_d2P={}; P_cum={};
 
+        end
+
+        % Steady state needs propagators
+        if spin_system.control.steady
+            P=cell(1,nsteps);
+        else
+            P={}; % Needed by parfor
         end
 
     % Piecewise-linear
@@ -117,7 +139,7 @@ switch spin_system.control.integrator
         bwd_traj=zeros([size(rho_init,1) (nsteps+1)],'like',1i);
 
         % Cannot do trapezium Hessians yet
-        fwd_dP={}; bwd_dP={}; fwd_d2P={}; P={};
+        fwd_dP={}; bwd_dP={}; fwd_d2P={}; P_cum={};
         
     otherwise
 
@@ -151,21 +173,16 @@ if ~isempty(spin_system.control.suffix)
     rho_targ=suffix(spin_system,drifts{end},rho_targ);
 end
 
+% Strip the spin system object for communication efficiency
+ss_parfor.sys=spin_system.sys; ss_parfor.tols=spin_system.tols;
+ss_parfor.bas.formalism=spin_system.bas.formalism;
+
+% Define a vector and a matrix of zeroes for auxiliary systems
+zero_state=complex(spalloc(size(rho_init,1),size(rho_init,2),0));
+zero_drift=complex(spalloc(size(drifts{1},1),size(drifts{1},2),0));
+
 % Initialise forward and backward trajectories
 fwd_traj(:,1)=rho_init; bwd_traj(:,1)=rho_targ;
-
-% Parallelisation prep
-if n_outputs>2
-
-    % Strip the spin system object for communication efficiency
-    ss_parfor.sys=spin_system.sys; ss_parfor.tols=spin_system.tols;
-    ss_parfor.bas.formalism=spin_system.bas.formalism;
-
-    % Define a vector and a matrix of zeroes for auxiliary systems
-    zero_state=complex(spalloc(size(rho_init,1),size(rho_init,2),0));
-    zero_drift=complex(spalloc(size(drifts{1},1),size(drifts{1},2),0));
-
-end
 
 % Count the drifts
 ndrifts=numel(drifts);
@@ -180,6 +197,7 @@ switch spin_system.control.integrator
         L_forw=cell(1,nsteps); L_back=cell(1,nsteps);
         
         % Precompute evolution generators
+        % (this is surprisingly expensive)
         parfor n=1:nsteps
 
             % Cycle through the drifts array
@@ -201,6 +219,48 @@ switch spin_system.control.integrator
 
         end
 
+        % Set the stage for StStSt
+        if spin_system.control.steady
+
+            % Compute all propagators
+            P_tot=speye(size(rho_init,1));
+            for n=1:nsteps
+
+                % Get the step propagator
+                P{n}=propagator(ss_parfor,L_forw{n},dt(n));
+
+                % Merge into the total (physical: no keyholes)
+                P_tot=clean_up(spin_system,P{n}*P_tot,...
+                               spin_system.tols.prop_chop);
+
+            end
+
+            % Overwrite the initial state
+            rho_init=steady(spin_system,P_tot);
+
+            % Start trajectory
+            fwd_traj(:,1)=rho_init;
+
+            % Make sure the target state is a valid observable
+            if rho_targ(1)~=0 
+                error('target state must have a zero trace.'); 
+            end
+
+            % Tiptoe around the unit state singularity
+            Q=(speye(size(P_tot))-P_tot)'; Q=Q(2:end,2:end);
+            rho_targ_dressed=zeros(size(rho_targ),'like',1i);
+            rho_targ_dressed(2:end)=Q\rho_targ(2:end);
+            
+            % Check if destination state dressing succeeded
+            if any(~isfinite(rho_targ_dressed))
+                error('destination state dressing failed.');
+            end
+
+            % Overwrite backward traj start
+            bwd_traj(:,1)=rho_targ_dressed;
+             
+        end
+
         % Loop over time steps
         for n=1:nsteps
 
@@ -208,24 +268,40 @@ switch spin_system.control.integrator
             keyhole_forw=spin_system.control.keyholes{n};
             keyhole_back=spin_system.control.keyholes{nsteps+1-n};
 
-            % Apply keyhole to the backward trajectory
-            if ~isempty(keyhole_back), bwd_traj(:,n)=keyhole_back(bwd_traj(:,n)); end
+            % Apply keyhole to backward trajectory
+            if ~isempty(keyhole_back) 
+                bwd_traj(:,n)=keyhole_back(bwd_traj(:,n));
+            end
 
-            % Goodwin's Hessian method pre-computes cumulative propagators
+            % Goodwin's optimiser needs cumulative propagators
             if strcmp(spin_system.control.method,'goodwin')&&(n_outputs>3)
-                P{n}=propagator(ss_parfor,L_forw{n},dt(n));
+                P_cum{n}=propagator(ss_parfor,L_forw{n},dt(n));
                 if n>1
-                    P{n}=P{n}*P{n-1};
-                    P{n}=clean_up(spin_system,P{n},spin_system.tols.prop_chop);
+                    P_cum{n}=P_cum{n}*P_cum{n-1};
+                    P_cum{n}=clean_up(spin_system,P_cum{n},...
+                                      spin_system.tols.prop_chop);
                 end
             end
 
             % Take a time step forwards and backwards
-            fwd_traj(:,n+1)=step(spin_system,L_forw{n},fwd_traj(:,n),+dt(n));
-            bwd_traj(:,n+1)=step(spin_system,L_back{n},bwd_traj(:,n),-dt(nsteps+1-n));
+            if (~isempty(P))&&(~isempty(P{n}))
 
-            % Apply keyhole to the forward trajectory
-            if ~isempty(keyhole_forw), fwd_traj(:,n+1)=keyhole_forw(fwd_traj(:,n+1)); end
+                % Use precomputed propagators
+                fwd_traj(:,n+1)=P{n}*fwd_traj(:,n);
+                bwd_traj(:,n+1)=P{nsteps+1-n}'*bwd_traj(:,n);
+
+            else
+
+                % Memory-efficient Liouville space propagation
+                fwd_traj(:,n+1)=step(spin_system,L_forw{n},fwd_traj(:,n),+dt(n));
+                bwd_traj(:,n+1)=step(spin_system,L_back{n},bwd_traj(:,n),-dt(nsteps+1-n));
+
+            end
+
+            % Apply keyhole to forward trajectory
+            if ~isempty(keyhole_forw) 
+                fwd_traj(:,n+1)=keyhole_forw(fwd_traj(:,n+1));
+            end
 
         end
 
@@ -264,8 +340,10 @@ switch spin_system.control.integrator
             keyhole_forw=spin_system.control.keyholes{n};
             keyhole_back=spin_system.control.keyholes{nsteps+1-n};
 
-            % Apply keyhole to the backward trajectory
-            if ~isempty(keyhole_back), bwd_traj(:,n)=keyhole_back(bwd_traj(:,n)); end
+            % Apply keyhole to backward trajectory
+            if ~isempty(keyhole_back) 
+                bwd_traj(:,n)=keyhole_back(bwd_traj(:,n));
+            end
 
             % Take a time step forwards and backwards
             fwd_traj(:,n+1)=step(spin_system,{ L_forw_left{n},...
@@ -275,8 +353,10 @@ switch spin_system.control.integrator
                                               (L_back_right{n}+L_back_left{n})/2,...
                                                L_back_left{n}},bwd_traj(:,n),-dt(nsteps+1-n));
 
-            % Apply keyhole to the forward trajectory
-            if ~isempty(keyhole_forw), fwd_traj(:,n+1)=keyhole_forw(fwd_traj(:,n+1)); end
+            % Apply keyhole to forward trajectory
+            if ~isempty(keyhole_forw)
+                fwd_traj(:,n+1)=keyhole_forw(fwd_traj(:,n+1));
+            end
             
         end
 
@@ -305,27 +385,37 @@ if n_outputs>2
         % Piecewise-constant
         case 'rectangle'
 
-            % Loop over control sequence
+            % Over time steps
             parfor n=1:nsteps
                 
-                % Allocate local gradient column
+                % Preallocate local gradient column
                 grad_col=zeros(nctrls,1,'like',1i);
 
-                % Calculate gradient at this timestep
+                % Over channels
                 for k=1:nctrls
-            
-                    % Create auxiliary system
-                    aux_matrix=[ L_forw{n}   controls{k}
-                                 zero_drift  L_forw{n}   ];
 
-                    % Build the auxiliary vector
-                    aux_vec=[zero_state; fwd_traj(:,n)];
+                    % Check the freeze mask
+                    if ~frozen(k,n)
             
-                    % Propagate the auxiliary vector
-                    aux_vec=step(ss_parfor,aux_matrix,aux_vec,dt(n));
+                        % Create auxiliary system
+                        aux_matrix=[ L_forw{n}   controls{k}
+                                     zero_drift  L_forw{n}   ];
+
+                        % Build the auxiliary vector
+                        aux_vec=[zero_state; fwd_traj(:,n)];
             
-                    % Compute the derivative
-                    grad_col(k)=bwd_traj(:,n+1)'*aux_vec(1:(end/2));
+                        % Propagate the auxiliary vector
+                        aux_vec=step(ss_parfor,aux_matrix,aux_vec,dt(n));
+                
+                        % Compute the derivative
+                        grad_col(k)=bwd_traj(:,n+1)'*aux_vec(1:(end/2));
+
+                    else
+
+                        % No step
+                        grad_col(k)=0;
+
+                    end
             
                 end
         
@@ -552,14 +642,14 @@ if strcmp(spin_system.control.integrator,'rectangle')&&(n_outputs>3)
 
                     % Propagate forward derivatives
                     % to first time step
-                    fwd_dP{k,n}=P{n}'*fwd_dP{k,n};
+                    fwd_dP{k,n}=P_cum{n}'*fwd_dP{k,n};
 
                     % From second step
                     if n>1
 
                         % Propagate backward derivatives
                         % to first time step
-                        bwd_dP{k,n}=bwd_dP{k,n}'*P{n-1};
+                        bwd_dP{k,n}=bwd_dP{k,n}'*P_cum{n-1};
 
                     end
 
@@ -734,12 +824,14 @@ switch fidelity_type
         if exist('hess','var')
             
             % Product rule
-            hess=hess*conj(overlap)+grad(:)*transpose(conj(grad(:)))+...
-                 conj(grad(:))*transpose(grad(:))+conj(hess)*overlap;
+            hess=hess*conj(overlap)+...
+                 grad(:)*transpose(conj(grad(:)))+...
+                 conj(grad(:))*transpose(grad(:))+...
+                 conj(hess)*overlap;
             
             % Cleaning up
             hess=real(hess);
-        
+
         end
         
         % Update gradient
@@ -758,6 +850,13 @@ switch fidelity_type
         % Complain and bomb out
         error('unknown fidelity type');
         
+end
+
+% Decouple frozen directions
+if exist('hess','var')
+    hess(frozen(:),:)=0; 
+    hess(:,frozen(:))=0; 
+    hess(frozen(:),frozen(:))=1;
 end
 
 % Return the trajectory (a huge array) only if needed
@@ -787,11 +886,30 @@ end
 end
 
 % Consistency enforcement
-function grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)
+function grumble(spin_system,drifts,controls,waveform,...
+                 rho_init,rho_targ,fidelity_type)
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv',...
                                         'zeeman-liouv',...
                                         'zeeman-wavef'})
     error('this function requires a state vector based formalism.');
+end
+if isfield(spin_system.control,'steady')&&spin_system.control.steady
+    if ismember(spin_system.control.method,{'newton','goodwin'})
+        error('Newton-Raphson unavailable for stroboscopic steady states.');
+    end
+    if ~strcmp(spin_system.control.integrator,'rectangle')
+        error('only rectangle integrator supported for stroboscopic steady states.');
+    end
+    if spin_system.control.dead_time~=0
+        error('dead times are inapplicable to stroboscopic steady states.');
+    end
+    if ~isempty(spin_system.control.prefix) || ...
+       ~isempty(spin_system.control.suffix)
+        error('prefixes and suffixes are inapplicable to stroboscopic steady states.');
+    end
+    if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
+        error('sphten-liouv formalism is required for stroboscopic steady states.');
+    end
 end
 if (~isnumeric(rho_init))||(~iscolumn(rho_init))
     error('rho_init must be a column vector.');
@@ -849,3 +967,4 @@ end
 % likely to be heroic exceptions.
 %
 % Nathaniel Branden
+

@@ -236,12 +236,10 @@ if ~isfield(parameters,'verbose')||(parameters.verbose==0)
     spin_system.sys.output='hush';
 end
 
-% Strip the spin system object down to minimum size
-ss_parfor=stripper(spin_system,'context');
-
 % MDCS diagnostics
 parallel_profiler_start;
 
+% Powder averaged spectrum
 parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
     
     % Preallocate Liouvillian blocks
@@ -287,22 +285,23 @@ parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
         
         % Apply rotating frames
         for k=1:numel(parameters.rframes)
-            L{n,n}=rotframe(ss_parfor,C{k},(L{n,n}+L{n,n}')/2,parameters.rframes{k}{1},parameters.rframes{k}{2});
+            L{n,n}=rotframe(spin_system,C{k},(L{n,n}+L{n,n}')/2,parameters.rframes{k}{1},parameters.rframes{k}{2});
         end
         
     end
     
     % Assemble the liouvillian
-    L=clean_up(ss_parfor,cell2mat(L),ss_parfor.tols.liouv_zero);
+    L=clean_up(spin_system,cell2mat(L),spin_system.tols.liouv_zero);
     
     % Report to the user
-    report(ss_parfor,'running the pulse sequence...');
+    report(spin_system,'running the pulse sequence...');
     
     % Run the pulse sequence
-    ans_array{q}=pulse_sequence(ss_parfor,parameters,L+1i*M,R,K);
+    ans_array{q}=pulse_sequence(spin_system,parameters,L+1i*M,R,K);
     
 end
 
+% Unsilence the output
 spin_system.sys.output=prev_setting;
 
 % Get MDCS diagnostics

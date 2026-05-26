@@ -141,10 +141,8 @@ else
     error('unknown parallelisation strategy.');
 
 end
-
-% Strip the spin system object down to minimum size
-ss_parfor=stripper(spin_system,'optimcon');
-
+    
+% Run the ensemble loop
 parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     
     % Extract ensemble indices
@@ -153,21 +151,21 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     n_phi=catalog(n,5); n_dis=catalog(n,6);
     
     % Get initial and target state
-    rho_init=ss_parfor.control.rho_init{n_rho};
-    rho_targ=ss_parfor.control.rho_targ{n_rho};
+    rho_init=spin_system.control.rho_init{n_rho};
+    rho_targ=spin_system.control.rho_targ{n_rho};
     
     % Localise the waveform
     local_waveform=waveform;
     
     % Apply the phase cycle
-    if ~isempty(ss_parfor.control.phase_cycle)
+    if ~isempty(spin_system.control.phase_cycle)
         
         % Apply phase to the initial state
-        phi=ss_parfor.control.phase_cycle(n_phi,1);
+        phi=spin_system.control.phase_cycle(n_phi,1);
         rho_init=exp(1i*phi)*rho_init;
         
         % Apply phase to the target state
-        phi=ss_parfor.control.phase_cycle(n_phi,end);
+        phi=spin_system.control.phase_cycle(n_phi,end);
         rho_targ=exp(1i*phi)*rho_targ;
         
         % Apply phases to the waveform
@@ -178,7 +176,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
                    1i*local_waveform(2*k,:);
             
             % Get the phase
-            phi=ss_parfor.control.phase_cycle(n_phi,k+1);
+            phi=spin_system.control.phase_cycle(n_phi,k+1);
             
             % Apply the phase
             cplx_wave=exp(1i*phi)*cplx_wave;
@@ -214,8 +212,8 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
             oper_idx=numel(off_ens_sizes)-k+1;
 
             % Add to the drift (user specifies offsets in Hz)
-            L=L+sparse(2*pi*ss_parfor.control.offsets{oper_idx}(vj)*...
-                            ss_parfor.control.off_ops{oper_idx});
+            L=L+sparse(2*pi*spin_system.control.offsets{oper_idx}(vj)*...
+                            spin_system.control.off_ops{oper_idx});
 
             % Next channel
             lin_idx=vi;
@@ -225,17 +223,17 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     end
 
     % Move the waveform into physical units
-    power_lvl=ss_parfor.control.pwr_levels(n_pwr);
+    power_lvl=spin_system.control.pwr_levels(n_pwr);
     local_waveform=power_lvl*local_waveform;
 
     % Call GRAPE
     if n_outputs==2
 
         % Apply waveform distortions
-        for k=1:size(ss_parfor.control.distortion,2)
+        for k=1:size(spin_system.control.distortion,2)
 
             % Get distortion function
-            dist_function=ss_parfor.control.distortion{n_dis,k};
+            dist_function=spin_system.control.distortion{n_dis,k};
 
             % Apply distortion function
             local_waveform=dist_function(local_waveform);
@@ -243,27 +241,27 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
         end
             
         % Fidelity and trajectory
-        switch ss_parfor.bas.formalism
+        switch spin_system.bas.formalism
 
             case {'sphten-liouv','zeeman-liouv'}
                 
                 % Call Liouville space version of the GRAPE function
-                [traj_data{n},fidelities{n}]=grape_liouv(ss_parfor,L,ss_parfor.control.operators,...
+                [traj_data{n},fidelities{n}]=grape_liouv(spin_system,L,spin_system.control.operators,...
                                                          local_waveform,rho_init,rho_targ,...
-                                                         ss_parfor.control.fidelity);
+                                                         spin_system.control.fidelity);
             case 'zeeman-hilb'
 
                 % Call Hilbert space version of the GRAPE function
-                [traj_data{n},fidelities{n}]=grape_hilb(ss_parfor,L,ss_parfor.control.operators,...
+                [traj_data{n},fidelities{n}]=grape_hilb(spin_system,L,spin_system.control.operators,...
                                                         local_waveform,rho_init,rho_targ,...
-                                                        ss_parfor.control.fidelity);
+                                                        spin_system.control.fidelity);
 
             case 'zeeman-wavef'
 
                 % Call Liouville space version of the GRAPE function (homomorphism)
-                [traj_data{n},fidelities{n}]=grape_liouv(ss_parfor,L,ss_parfor.control.operators,...
+                [traj_data{n},fidelities{n}]=grape_liouv(spin_system,L,spin_system.control.operators,...
                                                          local_waveform,rho_init,rho_targ,...
-                                                         ss_parfor.control.fidelity);
+                                                         spin_system.control.fidelity);
 
             otherwise
 
@@ -278,10 +276,10 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
         J=speye(numel(local_waveform));
 
         % Apply waveform distortions
-        for k=1:size(ss_parfor.control.distortion,2)
+        for k=1:size(spin_system.control.distortion,2)
 
             % Get distortion function
-            dist_function=ss_parfor.control.distortion{n_dis,k};
+            dist_function=spin_system.control.distortion{n_dis,k};
 
             % Apply distortion and get its Jacobian
             [local_waveform,stage_jacobian]=dist_function(local_waveform);
@@ -292,27 +290,27 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
         end
             
         % Fidelity and trajectory
-        switch ss_parfor.bas.formalism
+        switch spin_system.bas.formalism
 
             case {'sphten-liouv','zeeman-liouv'}
                 
                 % Call Liouville space version of the GRAPE function
-                [traj_data{n},fidelities{n},gradients{n}]=grape_liouv(ss_parfor,L,ss_parfor.control.operators,...
+                [traj_data{n},fidelities{n},gradients{n}]=grape_liouv(spin_system,L,spin_system.control.operators,...
                                                                       local_waveform,rho_init,rho_targ,...
-                                                                      ss_parfor.control.fidelity);
+                                                                      spin_system.control.fidelity);
             case 'zeeman-hilb'
 
                 % Call Hilbert space version of the GRAPE function
-                [traj_data{n},fidelities{n},gradients{n}]=grape_hilb(ss_parfor,L,ss_parfor.control.operators,...
+                [traj_data{n},fidelities{n},gradients{n}]=grape_hilb(spin_system,L,spin_system.control.operators,...
                                                                      local_waveform,rho_init,rho_targ,...
-                                                                     ss_parfor.control.fidelity);
+                                                                     spin_system.control.fidelity);
 
             case 'zeeman-wavef'
 
                 % Call Liouville space version of the GRAPE function (homomorphism)
-                [traj_data{n},fidelities{n},gradients{n}]=grape_liouv(ss_parfor,L,ss_parfor.control.operators,...
+                [traj_data{n},fidelities{n},gradients{n}]=grape_liouv(spin_system,L,spin_system.control.operators,...
                                                                       local_waveform,rho_init,rho_targ,...
-                                                                      ss_parfor.control.fidelity);
+                                                                      spin_system.control.fidelity);
 
             otherwise
 
@@ -333,30 +331,30 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     elseif n_outputs==4
 
         % Fidelity and trajectory
-        switch ss_parfor.bas.formalism
+        switch spin_system.bas.formalism
 
             case {'sphten-liouv','zeeman-liouv'}
                 
                 % Call Liouville space version of the GRAPE function
                 [traj_data{n},fidelities{n},...
-                 gradients{n},hessians{n}]=grape_liouv(ss_parfor,L,ss_parfor.control.operators,...
+                 gradients{n},hessians{n}]=grape_liouv(spin_system,L,spin_system.control.operators,...
                                                        local_waveform,rho_init,rho_targ,...
-                                                       ss_parfor.control.fidelity);
+                                                       spin_system.control.fidelity);
             case 'zeeman-hilb'
 
                 % Call Hilbert space version of the GRAPE function
                 [traj_data{n},fidelities{n},...
-                 gradients{n},hessians{n}]=grape_hilb(ss_parfor,L,ss_parfor.control.operators,...
+                 gradients{n},hessians{n}]=grape_hilb(spin_system,L,spin_system.control.operators,...
                                                       local_waveform,rho_init,rho_targ,...
-                                                      ss_parfor.control.fidelity);
+                                                      spin_system.control.fidelity);
 
             case 'zeeman-wavef'
 
                 % Call Liouville space version of the GRAPE function (homomorphism)
                 [traj_data{n},fidelities{n},...
-                 gradients{n},hessians{n}]=grape_liouv(ss_parfor,L,ss_parfor.control.operators,...
+                 gradients{n},hessians{n}]=grape_liouv(spin_system,L,spin_system.control.operators,...
                                                        local_waveform,rho_init,rho_targ,...
-                                                       ss_parfor.control.fidelity);
+                                                       spin_system.control.fidelity);
 
             otherwise
 
@@ -368,7 +366,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     end
     
     % Post-process gradient
-    if (~isempty(ss_parfor.control.phase_cycle))&&(n_outputs>2)
+    if (~isempty(spin_system.control.phase_cycle))&&(n_outputs>2)
         
         % Un-apply phases to gradient
         for k=1:(size(gradients{n},1)/2)
@@ -378,7 +376,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
                    1i*gradients{n}(2*k,:);
             
             % Get the phase
-            phi=ss_parfor.control.phase_cycle(n_phi,k+1);
+            phi=spin_system.control.phase_cycle(n_phi,k+1);
             
             % Un-apply the phase
             cplx_grad=exp(-1i*phi)*cplx_grad;
@@ -392,7 +390,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     end
     
     % Post-process Hessian
-    if (~isempty(ss_parfor.control.phase_cycle))&&(n_outputs>3)
+    if (~isempty(spin_system.control.phase_cycle))&&(n_outputs>3)
         
         % Re-shape the Hessian as [ncont x nsteps x nsteps x ncont]
         hessians{n}=reshape(hessians{n},[ncont nsteps ncont nsteps]);
@@ -401,7 +399,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
         for k=1:(size(gradients{n},1)/2)
             
             % Get the phase
-            phi=ss_parfor.control.phase_cycle(n_phi,k+1);
+            phi=spin_system.control.phase_cycle(n_phi,k+1);
             
             % Assemble complex Hessian - left
             cplx_hess=hessians{n}(2*k-1,:,:,:)+...
@@ -442,9 +440,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     
 end
 
-% Reclaim the reduced worker object
-clear('ss_parfor');
-
+% Apply trajectory options
 if ismember('average',spin_system.control.traj_opts)
 
     % Return average trajectory

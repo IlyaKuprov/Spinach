@@ -46,47 +46,6 @@ result=test_close(result,'rspt_eig transition moments',T_obs,T_ref,1e-14,1e-14,.
 result=test_close(result,'rspt_eig level populations',LP_obs,LP_ref,1e-14,1e-14,...
                   'level populations are equilibrium density-matrix expectations');
 
-% Check stripped field-sweep payload with symmetry and thermal fallback
-spin_system=local_minimal_system('zeeman-hilb',2);
-spin_system.tols.hbar=1.054571817e-34;
-spin_system.tols.kbol=1.380649e-23;
-spin_system.tols.irrep_drop=1e-12;
-spin_system.rlx.temperature=300;
-spin_system.bas.irrep(1).projector=sparse([1;0]);
-spin_system.bas.irrep(1).dimension=1;
-spin_system.bas.irrep(2).projector=sparse([0;1]);
-spin_system.bas.irrep(2).dimension=1;
-parameters=struct();
-parameters.rspt_order=Inf;
-Hz=diag([1 2]);
-Hc=diag([0 0.1]);
-Hmw=[0 1;1 0];
-field=1;
-ss_field=stripper(spin_system,'field_sweep');
-irrep_payload=isfield(ss_field.bas,'irrep');
-therm_payload=isfield(ss_field,'tols')&&isfield(ss_field,'rlx')&&...
-              isfield(ss_field.rlx,'temperature')&&...
-              isfield(ss_field,'comp')&&isfield(ss_field.comp,'mults');
-[E_obs,~,dE_obs,T_obs,LP_obs]=rspt_eig(ss_field,parameters,Hz,Hc,Hmw,field);
-H=field*Hz+Hc;
-[V_ref,E_ref]=eig(H,'vector');
-[E_ref,sort_idx]=sort(E_ref,'ascend');
-V_ref=V_ref(:,sort_idx);
-dE_ref=real(diag(V_ref'*Hz*V_ref));
-T_ref=abs(V_ref'*Hmw*V_ref).^2;
-rho_ref=equilibrium(spin_system,H);
-LP_ref=real(diag(V_ref'*rho_ref*V_ref));
-result=test_true(result,'field sweep stripped payload fields',irrep_payload&&therm_payload,...
-                 'field-sweep workers must retain symmetry projectors and thermal-equilibrium data');
-result=test_close(result,'field sweep stripped payload energies',E_obs,E_ref,1e-14,1e-14,...
-                  'stripped field-sweep payload must preserve Hilbert-space exact energies');
-result=test_close(result,'field sweep stripped payload derivatives',dE_obs,dE_ref,1e-14,1e-14,...
-                  'stripped field-sweep payload must preserve Hellmann-Feynman derivatives');
-result=test_close(result,'field sweep stripped payload moments',T_obs,T_ref,1e-14,1e-14,...
-                  'stripped field-sweep payload must preserve transition moments');
-result=test_close(result,'field sweep stripped payload populations',LP_obs,LP_ref,1e-14,1e-14,...
-                  'stripped field-sweep payload must support thermal population fallback');
-
 % Check Liouville-space resonance-field extraction for a diagonal pencil
 spin_system=local_minimal_system('sphten-liouv',2);
 parameters=struct();

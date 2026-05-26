@@ -36,7 +36,6 @@ result=local_test_reduce(result);
 end
 
 
-
 function result=local_test_propagator_step(result)
 
 % Build a one-spin Liouville-space system and force Taylor propagation
@@ -272,5 +271,4 @@ bas.approximation='none';
 spin_system=test_spin_system(sys,inter,bas);
 
 end
-
 

@@ -35,21 +35,13 @@
 %                                        sys, tols, bas.formalism,
 %                                        selected bas fields
 %
-%                  'context'           - powder, MAS, Floquet, and DOR
-%                                        pulse sequence calls
+%                  'context'           - MAS rotor-stack workers
 %
 %                  'equilibrium'       - thermal equilibrium workers:
 %                                        sys, tols, bas.formalism,
 %                                        rlx.temperature, comp.mults
 %
-%                  'field_sweep'       - EPR field-sweep workers:
-%                                        sys, tols, bas.formalism,
-%                                        selected bas, comp, and rlx fields
-%
 %                  'redfield_integral' - asynchronous Redfield integral
-%
-%                  'optimcon'          - GRAPE ensemble and time-slice
-%                                        workers
 %
 %                  'kinetics'          - chemical kinetics generators
 %
@@ -159,7 +151,7 @@ switch stage
 
     case 'context'
 
-        % Keep data that context-level pulse sequences may query
+        % Keep data used by rotor-stack context workers
         parfor_ss.sys=spin_system.sys;
         parfor_ss.tols=spin_system.tols;
         parfor_ss.bas=spin_system.bas;
@@ -180,49 +172,6 @@ switch stage
         parfor_ss.bas.formalism=spin_system.bas.formalism;
         parfor_ss.comp.mults=spin_system.comp.mults;
         parfor_ss.rlx.temperature=spin_system.rlx.temperature;
-
-    case 'field_sweep'
-
-        % Keep data needed by eigenfields and equilibrium fallback
-        parfor_ss.sys=spin_system.sys;
-        parfor_ss.tols=spin_system.tols;
-        parfor_ss.bas.formalism=spin_system.bas.formalism;
-
-        % Keep thermal equilibrium data when it exists
-        if isfield(spin_system,'rlx')&&isfield(spin_system.rlx,'temperature')
-            parfor_ss.rlx.temperature=spin_system.rlx.temperature;
-        end
-        if isfield(spin_system,'comp')&&isfield(spin_system.comp,'mults')
-            parfor_ss.comp.mults=spin_system.comp.mults;
-        end
-
-        % Keep irrep projectors for Hilbert-space block diagonalisation
-        if isfield(spin_system.bas,'irrep')
-            parfor_ss.bas.irrep=spin_system.bas.irrep;
-        end
-
-    case 'optimcon'
-
-        % Keep optimal-control context, without drift generators
-        parfor_ss.sys=spin_system.sys;
-        parfor_ss.tols=spin_system.tols;
-        parfor_ss.bas=spin_system.bas;
-        if isfield(spin_system,'comp')
-            parfor_ss.comp=spin_system.comp;
-        end
-        if isfield(spin_system,'inter')
-            parfor_ss.inter=spin_system.inter;
-        end
-        if isfield(spin_system,'rlx')
-            parfor_ss.rlx=spin_system.rlx;
-        end
-        if isfield(spin_system,'chem')
-            parfor_ss.chem=spin_system.chem;
-        end
-        parfor_ss.control=spin_system.control;
-        if isfield(parfor_ss.control,'drifts')
-            parfor_ss.control=rmfield(parfor_ss.control,'drifts');
-        end
 
     case 'kinetics'
 
@@ -247,8 +196,8 @@ if ~isstruct(spin_system)
 end
 if (~ischar(stage))||(~ismember(stage,{'report','basis','operator',...
        'basis_projection','symmetry','state','propagator','step',...
-       'evolution','context','equilibrium','field_sweep',...
-       'redfield_integral','optimcon','kinetics'}))
+       'evolution','context','equilibrium','redfield_integral',...
+       'kinetics'}))
     error('stage must be a valid character string.');
 end
 end

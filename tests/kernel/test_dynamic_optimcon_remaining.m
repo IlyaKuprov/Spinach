@@ -274,6 +274,7 @@ plot_system.control.pwr_levels=1;
 plot_system.control.integrator='rectangle';
 plot_system.control.l_bound=-10;
 plot_system.control.u_bound=10;
+plot_system.control.freeze=[];
 plot_wave=[1 2 3; -1 0 1];
 ctrl_trajan(plot_system,plot_wave,{struct()},0.5);
 result.messages{end+1}='PASS: ctrl_trajan xy_controls -- plotting smoke path completed offscreen';
@@ -589,6 +590,8 @@ spin_system.control.keyholes=cell(1,2);
 spin_system.control.method='newton';
 spin_system.control.plotting={};
 spin_system.control.parallel='time';
+spin_system.control.freeze=[];
+spin_system.control.steady=false();
 drift=[0.20 0.10; -0.05 -0.10];
 controls={[0 1; 1 0],[0 -1i; 1i 0]};
 rho_init=[1; 0.2];
@@ -731,5 +734,4 @@ function fidelity=local_tgrape_fid(spin_system,drift,controls,waveform,dt_grid,r
 fidelity=tgrape(spin_system,drift,controls,waveform,dt_grid,1,rho_init,rho_targ);
 
 end
-
 

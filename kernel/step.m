@@ -113,7 +113,21 @@ if ~expm_times_vec
 
         % Use Matlab's expm
         P=expm(-1i*L*time_step);
-        rho=P*rho*P'; return;
+
+        % Propagate a cell array of density matrices
+        if iscell(rho)
+            for n=1:numel(rho)
+                rho{n}=P*rho{n}*P';
+            end
+
+            return;
+
+        else
+
+            % Propagate a single density matrix
+            rho=P*rho*P'; return;
+
+        end
 
     else
 
@@ -395,4 +409,3 @@ end
 % the spectra shown in Figure 8.
 %
 % A.J. Mehrer and R.S. Mulliken, Chem. Rev. 69 (1969) 639-656.
-

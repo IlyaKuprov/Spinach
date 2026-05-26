@@ -188,6 +188,23 @@ result=test_true(result,'bracketing objective increase',fx_br>fx_0,...
 result=test_true(result,'bracketing gradient shape',isequal(size(gfx_br),size(gfx_0)),...
                  'bracketing must return a gradient vector with the original dimensions');
 
+% Check bracketing fails cleanly for an unbounded linear objective
+data_line=local_data([2 1]);
+x_lin=[0; 0];
+fx_lin=0;
+gfx_lin=[1; 0];
+dir_lin=gfx_lin;
+[~,~,alpha_fail,fx_fail,gfx_fail,next_fail]=bracketing(@local_linear_objective,1,dir_lin,x_lin,...
+                                                       fx_lin,gfx_lin,data_line,spin_system);
+result=test_true(result,'bracketing controlled failure',strcmp(next_fail,'failed'),...
+                 'bracketing must stop unbounded expansion before numerical overflow');
+result=test_close(result,'bracketing failure step',alpha_fail,0,0,0,...
+                  'failed bracketing must not return an accepted step');
+result=test_close(result,'bracketing failure objective',fx_fail,fx_lin,0,0,...
+                  'failed bracketing must preserve the reference objective value');
+result=test_close(result,'bracketing failure gradient',gfx_fail,gfx_lin,0,0,...
+                  'failed bracketing must preserve the reference gradient');
+
 % Check sectioning recovers the bracketed maximum of the same quadratic
 a.alpha=0;
 a.fx=fx_0;
@@ -206,6 +223,8 @@ result=test_true(result,'sectioning exit flag',exitflag==0,...
                  'sectioning should report successful Wolfe acceptance');
 
 end
+
+
 
 
 function spin_system=local_spin_system()
@@ -350,3 +369,16 @@ end
 end
 
 
+function [traj_data,fidelity,grad,hess]=local_linear_objective(x,~)
+
+% Define a linear objective with no finite line maximum
+traj_data.marker='local_linear_objective';
+fidelity=x(1);
+if nargout>2
+    grad=[1; 0];
+end
+if nargout>3
+    hess=zeros(numel(x),numel(x));
+end
+
+end

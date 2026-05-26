@@ -40,7 +40,7 @@
 %    gfx               - gradient at accepted step
 %
 %    next_act          - continuation tag, either
-%                        'sectioning' or 'none'
+%                        'sectioning', 'none', or 'failed'
 %
 %    data              - updated optimisation workspace
 %
@@ -61,8 +61,36 @@ if ~isempty(spin_system.control.freeze)
     gfx_0=gfx_0.*(~spin_system.control.freeze(:));
 end
 
+% Compute the initial directional derivative
+dir_deriv=gfx_0'*dir;
+
+% Stop when the supplied direction is not usable
+if (~isfinite(dir_deriv))||(dir_deriv<=0)
+    alpha=0; fx=fx_0; gfx=gfx_0;
+    next_act='failed'; return;
+end
+
+% Determine a finite maximum step length
+max_alpha=(sqrt(realmax)-norm(x_0,inf))/max(1,norm(dir,inf));
+max_evals=ceil(log(realmax)/log(1+spin_system.control.ls_tau1));
+if (~isfinite(max_alpha))||(max_alpha<=0)
+    alpha=0; fx=fx_0; gfx=gfx_0;
+    next_act='failed'; return;
+end
+
+% Build the first trial point
+x_trial=x_0+alpha*dir;
+if (~all(isfinite(x_trial)))||(alpha>max_alpha)
+    alpha=0; fx=fx_0; gfx=gfx_0;
+    next_act='failed'; return;
+end
+
 % Evaluate objective and gradient at the first trial point
-[data,fx_2,gfx_2]=objeval(x_0+alpha*dir,cost_function,data,spin_system);
+[data,fx_2,gfx_2]=objeval(x_trial,cost_function,data,spin_system);
+if (~isfinite(fx_2))||(~all(isfinite(gfx_2)))
+    alpha=0; fx=fx_0; gfx=gfx_0;
+    next_act='failed'; return;
+end
 
 % Apply coordinate freezing mask when requested
 if ~isempty(spin_system.control.freeze)
@@ -77,9 +105,16 @@ b.alpha=[]; b.fx=[]; b.gfx=[];
 fx=fx_0; fx_1=fx_0;
 gfx=gfx_0; gfx_1=gfx_0;
 alpha_1=0; alpha_2=alpha;
+eval_count=1;
 
 % Expand bracket until acceptance or interval capture
 while true
+
+    % Stop if the line search is not converging before overflow
+    if eval_count>=max_evals
+        alpha=0; fx=fx_0; gfx=gfx_0;
+        next_act='failed'; return;
+    end
 
     % Capture bracket when Armijo or monotonicity fails
     if (~alpha_conds(1,alpha_2,fx_0,fx_2,gfx_0,[],dir,spin_system))||...
@@ -120,17 +155,35 @@ while true
     % Build interpolation window ahead of current trial point
     br_end_pt_A=2*alpha_2-alpha_1;
     br_end_pt_B=alpha_2+spin_system.control.ls_tau1*(alpha_2-alpha_1);
+    if (~all(isfinite([br_end_pt_A br_end_pt_B])))||...
+       (br_end_pt_A<=alpha_2)||(br_end_pt_B<=br_end_pt_A)
+        alpha=0; fx=fx_0; gfx=gfx_0;
+        next_act='failed'; return;
+    end
 
     % Maximise the cubic model inside interpolation bounds
     alpha_new=cubic_interp(br_end_pt_A,br_end_pt_B,alpha_1,alpha_2,...
                            fx_1,gfx_1'*dir,fx_2,gfx_2'*dir);
+    if (~isfinite(alpha_new))||(alpha_new<=alpha_2)||(alpha_new>max_alpha)
+        alpha=0; fx=fx_0; gfx=gfx_0;
+        next_act='failed'; return;
+    end
 
     % Shift history to the new trial point
     alpha_1=alpha_2; alpha_2=alpha_new;
     fx_1=fx_2; gfx_1=gfx_2; x_1=x_0+alpha_2*dir;
+    if ~all(isfinite(x_1))
+        alpha=0; fx=fx_0; gfx=gfx_0;
+        next_act='failed'; return;
+    end
 
     % Evaluate objective and gradient at the new trial point
     [data,fx_2,gfx_2]=objeval(x_1,cost_function,data,spin_system);
+    if (~isfinite(fx_2))||(~all(isfinite(gfx_2)))
+        alpha=0; fx=fx_0; gfx=gfx_0;
+        next_act='failed'; return;
+    end
+    eval_count=eval_count+1;
 
     % Apply coordinate freezing mask to the new gradient
     if ~isempty(spin_system.control.freeze)
@@ -169,4 +222,3 @@ end
 % Одной рукой бунтую, другой пишу донос.
 %
 % Михаил Щербаков
-

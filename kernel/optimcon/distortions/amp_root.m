@@ -1,4 +1,4 @@
-% Amplifier compression distortion model. Applies a saturating 
+% Amplifier compression distortion model. Applies a saturating
 % root-sigmoidal distortion to the waveform amplitude:
 %
 %                     y=x/(1+(x/a)^s)^(1/s)
@@ -27,7 +27,7 @@
 %
 % Outputs:
 %
-%    w         - distorted waveform in the same units and 
+%    w         - distorted waveform in the same units and
 %                layout as the input
 %
 %    J         - distortion Jacobian matrix with respect to
@@ -43,26 +43,16 @@ function [w,J]=amp_root(w,sat_lvls,s)
 % Check consistency
 grumble(w,sat_lvls,s);
 
-% Autodiff wrapper
+% Call the distortion function
 if nargout<2
-    
+
     % Plain call
     w=distort(w,sat_lvls,s);
 
 else
 
-    % Autodiff call including Jacobian
-    [w,J]=dlfeval(@distort,dlarray(w),sat_lvls,s);
-
-    % Strip the autodiff rigging
-    w=extractdata(w); J=extractdata(J);
-
-    % Flatten out the Jacobian
-    J=squeeze(num2cell(J,[1 2])); 
-    for n=1:numel(J)
-        J{n}=sparse(J{n});
-    end
-    J=blkdiag(J{:});
+    % Distortion call including Jacobian
+    [w,J]=distort(w,sat_lvls,s);
 
 end
 
@@ -72,26 +62,59 @@ end
 function [w_dist,J]=distort(w,sat_lvls,s)
 
 % Preallocate output
-w_dist=zeros(size(w),'like',w);
+w_dist=zeros(size(w));
+if nargout>1
+    rows=zeros(2*numel(w),1);
+    cols=zeros(2*numel(w),1);
+    vals=zeros(2*numel(w),1);
+    jac_idx=0;
+end
 
 % Loop over channels
 for n=1:(size(w,1)/2)
 
-    % Get amplitude and phase
-    amp=sqrt(w(2*n-1,:).^2+w(2*n,:).^2);
-    phi=atan2(w(2*n,:),w(2*n-1,:));
+    % Loop over time points
+    for k=1:size(w,2)
 
-    % Distort the amplitude
-    amp=amp./(1+(amp/sat_lvls(n)).^s(n)).^(1/s(n));
+        % Get Cartesian components
+        x=w(2*n-1,k); y=w(2*n,k);
 
-    % Get X and Y components back
-    w_dist(2*n-1,:)=amp.*cos(phi); 
-    w_dist(2*n,:)=amp.*sin(phi);
+        % Get radial amplitude
+        amp=sqrt(x^2+y^2);
+
+        % Compute radial scale and curvature
+        if amp==0
+            scale=1; curv=0;
+        else
+            amp_pwr=(amp/sat_lvls(n))^s(n);
+            scale=(1+amp_pwr)^(-1/s(n));
+            curv=-(amp^(s(n)-2))/(sat_lvls(n)^s(n))*...
+                 (1+amp_pwr)^(-1/s(n)-1);
+        end
+
+        % Apply radial compression
+        w_dist(2*n-1,k)=scale*x;
+        w_dist(2*n,k)=scale*y;
+
+        % Fill the Cartesian Jacobian block
+        if nargout>1
+            idx_x=2*n-1+size(w,1)*(k-1);
+            idx_y=2*n+size(w,1)*(k-1);
+            rows(jac_idx+(1:4))=[idx_x; idx_x; idx_y; idx_y];
+            cols(jac_idx+(1:4))=[idx_x; idx_y; idx_x; idx_y];
+            vals(jac_idx+(1:4))=[scale+curv*x^2; curv*x*y; ...
+                                 curv*x*y; scale+curv*y^2];
+            jac_idx=jac_idx+4;
+        end
+
+    end
 
 end
 
-% Compute non-zero blocks of the Jacobian
-if nargout>1, J=dljacobian(w_dist,w,1); end
+% Assemble the sparse Jacobian
+if nargout>1
+    J=sparse(rows,cols,vals,numel(w),numel(w));
+end
 
 end
 
@@ -115,4 +138,3 @@ end
 % something entirely different.
 %
 % Johann Wolfgang von Goethe
-

@@ -87,7 +87,9 @@ spin_system.control.rho_init=cell(size(spin_system.control.rho_targ));
 spin_system.control.rho_init(:)={rho};
 
 % Impurity cancellation gradients
-spin_system.control.ens_corrs={'rho_match'};
+spin_system.control.ens_corrs={'rho_ens'};
+spin_system.control.penalties={'none'};
+spin_system.control.p_weights=0;
 [~,~,gradient_c]=grape_phase(profile_a,spin_system);
 [~,~,gradient_d]=grape_phase(profile_b,spin_system);
 
@@ -102,8 +104,9 @@ switch spin_system.bas.formalism
         fidelity(1)=fidelity(1)-mean(cellfun(@(x)norm(x,2)^2,dirt_sum));
 end
 
-% Assemble the gradient
-gradient=cat(1,gradient_a,gradient_b)/2-2*cat(1,gradient_c,gradient_d);
+% Assemble the physical-fidelity gradient
+gradient=cat(1,gradient_a,gradient_b)/2;
+gradient(:,:,1)=gradient(:,:,1)-2*cat(1,gradient_c(:,:,1),gradient_d(:,:,1));
 
 % Return both trajectories
 traj_data={traj_data_a,traj_data_b};

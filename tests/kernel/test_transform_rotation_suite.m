@@ -30,6 +30,18 @@ result=test_close(result,'euler2dcm active Z rotation',R,R_ref,1e-15,1e-15,...
 result=test_close(result,'euler2dcm vector input',euler2dcm([pi/2 0 0]),R_ref,1e-15,1e-15,...
                   'the one-vector syntax must match the three-scalar syntax');
 
+% Compare equivalent rotations through their Euler angle degeneracy
+result=test_true(result,'euler_equiv zero-beta degeneracy',euler_equiv([0.3 0 0.4],[0.7 0 0],1e-14),...
+                 'for beta equal to zero, alpha and gamma only enter through their sum');
+
+% Check angular tolerance acceptance
+result=test_true(result,'euler_equiv tolerance pass',euler_equiv([0 0 0],[5e-7 0 0],1e-6),...
+                 'relative rotations inside the angular tolerance must pass');
+
+% Check angular tolerance rejection
+result=test_true(result,'euler_equiv tolerance fail',~euler_equiv([0 0 0],[2e-6 0 0],1e-6),...
+                 'relative rotations outside the angular tolerance must fail');
+
 % Recover a non-singular Euler rotation through its DCM
 angles=[0.37 0.91 -0.42];
 R=euler2dcm(angles);

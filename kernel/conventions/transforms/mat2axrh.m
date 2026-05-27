@@ -12,10 +12,10 @@
 %        iso  - isotropic part of the interaction, defined as
 %               (xx+yy+zz)/3 in terms of eigenvaues
 %
-%         ax  - interaction axiality, defined as zz-(xx+yy)/2
+%         ax  - interaction axiality, defined as 2*zz-(xx+yy)
 %               in terms of eigenvalues
 %
-%         rh  - interaction rhombicity, defined as (xx-yy) in
+%         rh  - interaction rhombicity, defined as (yy-xx) in
 %               terms of eigenvalues
 %
 %    eigvals  - interaction tensor eigenvalues in Mehring order
@@ -36,16 +36,15 @@ function [iso,ax,rh,eigvals]=mat2axrh(M)
 grumble(M);
 
 % Get the eigenvalues
-[~,eigvals]=eig(M); 
-eigvals=diag(eigvals);
+[~,eigvals]=eig(M,'vector'); 
 
-% Put eigenvalues in Mehring order
+% Sort in Mehring order
 eigvals=sort(eigvals,'ascend');
 
-% Get the outputs
+% Get the interaction parameters
+ax=2*eigvals(3)-(eigvals(1)+eigvals(2));
+rh=eigvals(2)-eigvals(1);
 iso=mean(eigvals);
-ax=eigvals(3)-(eigvals(1)+eigvals(2))/2;
-rh=eigvals(1)-eigvals(2);
 
 end
 

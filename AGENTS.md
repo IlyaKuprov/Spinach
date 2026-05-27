@@ -2,7 +2,7 @@
 
 ## General Context
 
-*Spinach* is an open-source spin dynamics simulation library implemented in *MATLAB* (assume version R2024b or later) with small amounts of Java and C++/CUDA. It spans many areas of physics and mathematics, including linear algebra, quantum mechanics, Lie algebras and Lie groups, as well as scientific computing and numerical methods. *Spinach* supports applications such as nuclear magnetic resonance (NMR), electron spin resonance, magnetic resonance imaging, quantum optimal control theory, and other spin dynamics-related domains. This repository contains the *Spinach* codebase. All contributions or AI-generated code must adhere to the established conventions of this codebase. These conventions are summarised below.
+*Spinach* is an open-source spin dynamics simulation library implemented in *MATLAB* (assume version R2024b or later) with small amounts of Java and C++/CUDA MEX. It spans many areas of physics and mathematics, including linear algebra, quantum mechanics, Lie algebras and Lie groups, as well as scientific computing and numerical methods. *Spinach* supports applications such as nuclear magnetic resonance (NMR), electron spin resonance, magnetic resonance imaging, quantum optimal control theory, and other spin dynamics-related domains. This repository contains the *Spinach* codebase. All contributions or AI-generated code must adhere to the established conventions of this codebase. These conventions are summarised below.
 
 ## Spinach Programming Style Guidelines
 
@@ -12,7 +12,7 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Naming Conventions:** Use descriptive, abbreviated, all-lowercase names with underscores for variables and function names. One-letter variables commonly used in physics textbooks to denote operators or matrices (H, R, K, P, Q) are premitted and should be capitalised, all other variables should be descriptive and lowercase. For example, follow naming patterns seen in the codebase such as `zeeman_iso`, `spin_system`, or `norm_est`. Avoid ambiguous variable names. Variable and function names should not be longer than 20 characters; use abbreviations as necessary to make this possible.
 
-* **Code Comments:** Above every conceptually distinct operation performed in the code, write a one-line comment explaining the purpose of the operation. Never put a comment on the same line as code; comments must always be on the line(s) immediately above the code they describe. Each comment block must be preceded by a blank line. If the comment only contans one sentence, omit the full stop at the end of the sentence.
+* **Code Comments:** Above every conceptually distinct operation performed in the code, write a one-line comment explaining the purpose of the operation. Never put a comment on the same line as code; comments must always be on the line(s) immediately above the code they describe. Each comment block must be preceded by a blank line. If the comment only contains one sentence, omit the full stop at the end of the sentence.
 
 * **Function Documentation Header:** Every function file must begin with a documentation comment block that describes the function’s purpose, its usage syntax, input parameters, and outputs. Always format this documentation header exactly as seen in existing functions (refer to the `kernel` and `experiments` directories for examples). Do not omit any expected sections in the header.
 
@@ -26,7 +26,7 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Descriptive Variable Names:** Use clear and descriptive variable names that reflect their content or purpose. Do not use vague names. The only exceptions are simple loop indices (e.g., `n`, `k` for loop counters). Do not use `i` and `l` as variables. 
 
-* **Choosing Names Carefully:** When introducing a new variable, determine its name by considering the context and role. Read the function’s documentation and understand what the function does and what the variable represents. Then choose a concise name that conveys that meaning.
+* **Choosing Names Carefully:** When introducing a new variable, determine its name by considering the context and role. Read the current function documentation and understand what the function does and what the variable represents. Then choose a concise name that conveys its meaning.
 
 * **Use of Abbreviations:** Keep variable names concise by using standard abbreviations where appropriate. For example, a variable holding a property index may be named `prop_idx`. Ensure any abbreviation used is commonly understood or documented in the codebase.
 

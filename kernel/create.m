@@ -460,34 +460,34 @@ report(spin_system,['magnetic induction of ' num2str(spin_system.inter.magnet,'%
 % Compute carrier frequencies
 spin_system.inter.basefrqs=-spin_system.inter.gammas*spin_system.inter.magnet;
 
-% Absorb transmon parameters
-if isfield(inter,'duffing')
-
-    % Absorb parameters and parse out
-    spin_system.inter.duffing.offset=inter.duffing.offset;
-    spin_system.inter.duffing.anharm=inter.duffing.anharm;
-    inter=rmfield(inter,'duffing');
-
-    % Print report header
-    report(spin_system,' ');
-    report(spin_system,'Duffing approximation parameters for transmons');
-    report(spin_system,'=================================================');
-    report(spin_system,' Number    Levels    Offset, Hz    Anharm, Hz    ');
-    report(spin_system,'-------------------------------------------------');
-
-    % Report transmons
-    for n=1:spin_system.comp.nspins
-        if strcmp(spin_system.comp.types{n},'T')
-            report(spin_system,['  ' pad(int2str(n),10) pad(int2str(spin_system.comp.mults(n)),9) ...
-                                     pad(num2str(spin_system.inter.duffing.offset{n},'%+4.3e'),14)   ...
-                                     pad(num2str(spin_system.inter.duffing.anharm{n},'%+4.3e'),14)]);
-        end
-    end
-
-    % Finish up transmon reporting
-    report(spin_system,'=================================================');
-
-end
+% % Absorb transmon parameters (work in progress)
+% if isfield(inter,'duffing')
+% 
+%     % Absorb parameters and parse out
+%     spin_system.inter.duffing.offset=inter.duffing.offset;
+%     spin_system.inter.duffing.anharm=inter.duffing.anharm;
+%     inter=rmfield(inter,'duffing');
+% 
+%     % Print report header
+%     report(spin_system,' ');
+%     report(spin_system,'Duffing approximation parameters for transmons');
+%     report(spin_system,'=================================================');
+%     report(spin_system,' Number    Levels    Offset, Hz    Anharm, Hz    ');
+%     report(spin_system,'-------------------------------------------------');
+% 
+%     % Report transmons
+%     for n=1:spin_system.comp.nspins
+%         if strcmp(spin_system.comp.types{n},'T')
+%             report(spin_system,['  ' pad(int2str(n),10) pad(int2str(spin_system.comp.mults(n)),9) ...
+%                                      pad(num2str(spin_system.inter.duffing.offset{n},'%+4.3e'),14)   ...
+%                                      pad(num2str(spin_system.inter.duffing.anharm{n},'%+4.3e'),14)]);
+%         end
+%     end
+% 
+%     % Finish up transmon reporting
+%     report(spin_system,'=================================================');
+% 
+% end
 
 % Preallocate Zeeman tensor array
 spin_system.inter.zeeman.matrix=mat2cell(zeros(3*spin_system.comp.nspins,3),3*ones(spin_system.comp.nspins,1));
@@ -2082,7 +2082,8 @@ if isfield(inter,'r1_rates')
         % Check scalar relaxation rates
         if isnumeric(inter.r1_rates{n})&&isscalar(inter.r1_rates{n})
 
-            % Must be real numbers
+            % Must be real numbers, negative values allowed
+            % because rate subtraction scenarios can exist
             if ~isreal(inter.r1_rates{n})
                 error('scalars in inter.r1_rates must be real.');
             end
@@ -2090,7 +2091,8 @@ if isfield(inter,'r1_rates')
         % Check 3x3 relaxation rate tensors
         elseif isnumeric(inter.r1_rates{n})&&all(size(inter.r1_rates{n})==[3 3])
 
-            % Must be real symmetric
+            % Must be real symmetric, negative definite allowed
+            % because rate subtraction scenarios can exist
             if ~isreal(inter.r1_rates{n})
                 error('3x3 matrices in inter.r1_rates must be real.');
             end
@@ -2101,7 +2103,7 @@ if isfield(inter,'r1_rates')
         % Check function handles
         elseif isa(inter.r1_rates{n},'function_handle')
             
-            % The function handles must be 2*pi periodic
+            % A good sanity test is that the function handles must be 2*pi periodic
             r1_func=inter.r1_rates{n}; test_angles=[2*pi*rand(), pi*rand(), 2*pi*rand()];
             test_values=[r1_func(test_angles(1)     ,test_angles(2)     ,test_angles(3)     ),...
                          r1_func(test_angles(1)+2*pi,test_angles(2)     ,test_angles(3)     ),...
@@ -2146,7 +2148,8 @@ if isfield(inter,'r2_rates')
         % Check scalar relaxation rates
         if isnumeric(inter.r2_rates{n})&&isscalar(inter.r2_rates{n})
 
-            % Must be non-negative real numbers
+            % Must be real numbers, negative values allowed
+            % because rate subtraction scenarios can exist
             if ~isreal(inter.r2_rates{n})
                 error('scalars in inter.r2_rates must be real.');
             end
@@ -2154,7 +2157,8 @@ if isfield(inter,'r2_rates')
         % Check 3x3 relaxation rate tensors
         elseif isnumeric(inter.r2_rates{n})&&all(size(inter.r2_rates{n})==[3 3])
 
-            % Must be real symmetric
+            % Must be real symmetric, negative definite allowed
+            % because rate subtraction scenarios can exist
             if ~isreal(inter.r2_rates{n})
                 error('3x3 matrices in inter.r2_rates must be real.');
             end
@@ -2165,7 +2169,7 @@ if isfield(inter,'r2_rates')
         % Check function handles
         elseif isa(inter.r2_rates{n},'function_handle')
             
-            % The function handles must be 2*pi periodic
+            % A good sanity test is that the function handles must be 2*pi periodic
             r2_func=inter.r2_rates{n}; test_angles=[2*pi*rand(), pi*rand(), 2*pi*rand()];
             test_values=[r2_func(test_angles(1)     ,test_angles(2)     ,test_angles(3)     ),...
                          r2_func(test_angles(1)+2*pi,test_angles(2)     ,test_angles(3)     ),...
@@ -2191,6 +2195,12 @@ if isfield(inter,'r2_rates')
         error('inter.r2_rates may only be specified with T1,T2 relaxation theory.');
     end
     
+end
+
+% Check simultaneous presence of both Lindblad rate sets
+if (isfield(inter,'lind_r1_rates')&&(~isfield(inter,'lind_r2_rates')))||...
+   (~isfield(inter,'lind_r1_rates')&&(isfield(inter,'lind_r2_rates')))
+    error('inter.lind_r1_rates and inter.lind_r2_rates are required simultaneously.');
 end
 
 % Check R1 rates for Lindblad
@@ -2235,6 +2245,18 @@ if isfield(inter,'lind_r2_rates')
     
 end
 
+% Check Lindblad relaxation rate sanity
+if isfield(inter,'lind_r1_rates')&&isfield(inter,'lind_r2_rates')&&...
+   any(inter.lind_r2_rates(:)<inter.lind_r1_rates(:)/2)
+    error('Lindblad relaxation theory forbids R2 < 0.5*R1 on thermodynamic grounds.');
+end
+
+% Check simultaneous presence of both Weizmann DNP rates
+if (isfield(inter,'weiz_r1e')&&(~isfield(inter,'weiz_r2e')))||...
+   (~isfield(inter,'weiz_r1e')&&(isfield(inter,'weiz_r2e')))
+    error('inter.weiz_r1e and inter.weiz_r2e are required simultaneously.');
+end
+
 % Check R1e rate for Weizmann DNP theory
 if isfield(inter,'weiz_r1e')
     
@@ -2251,26 +2273,6 @@ if isfield(inter,'weiz_r1e')
     % Enforce Weizmann theory if inter.weiz_r1e is specified
     if (~isfield(inter,'relaxation'))||(~ismember('weizmann',inter.relaxation))
         error('inter.weiz_r1e can only be specified with Weizmann DNP relaxation theory.');
-    end
-    
-end
-
-% Check R1e rate for Nottingham DNP theory
-if isfield(inter,'nott_r1e')
-    
-    % Check type and value
-    if (~isnumeric(inter.nott_r1e))||any(inter.nott_r1e<0)||any(~isreal(inter.nott_r1e))
-        error('inter.nott_r1e must be a positive real number.');
-    end
-    
-    % Check dimension
-    if numel(inter.nott_r1e)~=1
-        error('inter.nott_r1e must have a single element.');
-    end
-    
-    % Enforce Nottingham theory if inter.weiz_r1e is specified
-    if (~isfield(inter,'relaxation'))||(~ismember('nottingham',inter.relaxation))
-        error('inter.nott_r1e can only be specified with Nottingham DNP relaxation theory.');
     end
     
 end
@@ -2295,6 +2297,38 @@ if isfield(inter,'weiz_r2e')
     
 end
 
+% Check Weizmann relaxation rate sanity
+if isfield(inter,'weiz_r1e')&&isfield(inter,'weiz_r2e')&&...
+   any(inter.weiz_r1e(:)<inter.weiz_r2e(:)/2)
+    error('Weizmann DNP relaxation theory forbids R2e < 0.5*R1e on thermodynamic grounds.');
+end
+
+% Check simultaneous presence of both Nottingham DNP rates
+if (isfield(inter,'nott_r1e')&&(~isfield(inter,'nott_r2e')))||...
+   (~isfield(inter,'nott_r1e')&&(isfield(inter,'nott_r2e')))
+    error('inter.nott_r1e and inter.nott_r2e are required simultaneously.');
+end
+
+% Check R1e rate for Nottingham DNP theory
+if isfield(inter,'nott_r1e')
+
+    % Check type and value
+    if (~isnumeric(inter.nott_r1e))||any(inter.nott_r1e<0)||any(~isreal(inter.nott_r1e))
+        error('inter.nott_r1e must be a positive real number.');
+    end
+
+    % Check dimension
+    if numel(inter.nott_r1e)~=1
+        error('inter.nott_r1e must have a single element.');
+    end
+
+    % Enforce Nottingham theory if inter.weiz_r1e is specified
+    if (~isfield(inter,'relaxation'))||(~ismember('nottingham',inter.relaxation))
+        error('inter.nott_r1e can only be specified with Nottingham DNP relaxation theory.');
+    end
+
+end
+
 % Check R2e rate for Nottingham DNP theory
 if isfield(inter,'nott_r2e')
     
@@ -2315,6 +2349,18 @@ if isfield(inter,'nott_r2e')
     
 end
 
+% Check Nottingham DNP relaxation rate sanity
+if isfield(inter,'nott_r1e')&&isfield(inter,'nott_r2e')&&...
+   any(inter.nott_r1e(:)<inter.nott_r2e(:)/2)
+    error('Nottingham DNP relaxation theory forbids R2e < 0.5*R1e on thermodynamic grounds.');
+end
+
+% Check simultaneous presence of both Weizmann DNP rates
+if (isfield(inter,'weiz_r1n')&&(~isfield(inter,'weiz_r2n')))||...
+   (~isfield(inter,'weiz_r1n')&&(isfield(inter,'weiz_r2n')))
+    error('inter.weiz_r1n and inter.weiz_r2n are required simultaneously.');
+end
+
 % Check R1n rate for Weizmann DNP theory
 if isfield(inter,'weiz_r1n')
     
@@ -2331,26 +2377,6 @@ if isfield(inter,'weiz_r1n')
     % Enforce Weizmann theory if inter.weiz_r1n is specified
     if (~isfield(inter,'relaxation'))||(~ismember('weizmann',inter.relaxation))
         error('inter.weiz_r1n can only be specified with Weizmann DNP relaxation theory.');
-    end
-    
-end
-
-% Check R1n rate for Nottingham DNP theory
-if isfield(inter,'nott_r1n')
-    
-    % Check type and value
-    if (~isnumeric(inter.nott_r1n))||any(inter.nott_r1n<0)||any(~isreal(inter.nott_r1n))
-        error('inter.nott_r1n must be a positive real number.');
-    end
-    
-    % Check dimension
-    if numel(inter.nott_r1n)~=1
-        error('inter.nott_r1n must have a single element.');
-    end
-    
-    % Enforce Nottingham theory if inter.weiz_r1n is specified
-    if (~isfield(inter,'relaxation'))||(~ismember('nottingham',inter.relaxation))
-        error('inter.nott_r1n can only be specified with Nottingham DNP relaxation theory.');
     end
     
 end
@@ -2375,6 +2401,38 @@ if isfield(inter,'weiz_r2n')
     
 end
 
+% Check Weizmann relaxation rate sanity
+if isfield(inter,'weiz_r1n')&&isfield(inter,'weiz_r2n')&&...
+   any(inter.weiz_r1n(:)<inter.weiz_r2n(:)/2)
+    error('Weizmann DNP relaxation theory forbids R2n < 0.5*R1n on thermodynamic grounds.');
+end
+
+% Check simultaneous presence of both Nottingham DNP rates
+if (isfield(inter,'nott_r1n')&&(~isfield(inter,'nott_r2n')))||...
+   (~isfield(inter,'nott_r1n')&&(isfield(inter,'nott_r2n')))
+    error('inter.nott_r1n and inter.nott_r2n are required simultaneously.');
+end
+
+% Check R1n rate for Nottingham DNP theory
+if isfield(inter,'nott_r1n')
+
+    % Check type and value
+    if (~isnumeric(inter.nott_r1n))||any(inter.nott_r1n<0)||any(~isreal(inter.nott_r1n))
+        error('inter.nott_r1n must be a positive real number.');
+    end
+
+    % Check dimension
+    if numel(inter.nott_r1n)~=1
+        error('inter.nott_r1n must have a single element.');
+    end
+
+    % Enforce Nottingham theory if inter.weiz_r1n is specified
+    if (~isfield(inter,'relaxation'))||(~ismember('nottingham',inter.relaxation))
+        error('inter.nott_r1n can only be specified with Nottingham DNP relaxation theory.');
+    end
+
+end
+
 % Check R2n rate for Nottingham DNP theory
 if isfield(inter,'nott_r2n')
     
@@ -2393,6 +2451,18 @@ if isfield(inter,'nott_r2n')
         error('inter.nott_r2n can only be specified with Nottingham DNP relaxation theory.');
     end
     
+end
+
+% Check Nottingham DNP relaxation rate sanity
+if isfield(inter,'nott_r1n')&&isfield(inter,'nott_r2n')&&...
+   any(inter.nott_r1n(:)<inter.nott_r2n(:)/2)
+    error('Nottingham DNP relaxation theory forbids R2n < 0.5*R1n on thermodynamic grounds.');
+end
+
+% Check simultaneous presence of both Weizmann DNP rates
+if (isfield(inter,'weiz_r1d')&&(~isfield(inter,'weiz_r2d')))||...
+        (~isfield(inter,'weiz_r1d')&&(isfield(inter,'weiz_r2d')))
+    error('inter.weiz_r1d and inter.weiz_r2d are required simultaneously.');
 end
 
 % Check R1d rates for Weizmann DNP theory
@@ -2433,6 +2503,12 @@ if isfield(inter,'weiz_r2d')
         error('inter.weiz_r2d can only be specified with Weizmann DNP relaxation theory.');
     end
     
+end
+
+% Check Weizmann relaxation rate sanity
+if isfield(inter,'weiz_r1d')&&isfield(inter,'weiz_r2d')&&...
+   any(inter.weiz_r1d(:)<inter.weiz_r2d(:)/2)
+    error('Weizmann DNP relaxation theory forbids R2d < 0.5*R1d on thermodynamic grounds.');
 end
 
 % Check chemical kinetics

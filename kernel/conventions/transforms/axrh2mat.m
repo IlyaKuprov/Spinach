@@ -9,10 +9,12 @@
 %               (xx+yy+zz)/3 in terms of eigenvaues
 %
 %         ax  - interaction axiality, defined as 2*zz-(xx+yy)
-%               in terms of eigenvalues (Mehring order)
+%               in terms of eigenvalues (Mehring order, that 
+%               is xx<=yy<=zz)
 %
 %         rh  - interaction rhombicity, defined as (yy-xx) in
-%               terms of eigenvalues (Mehring order)
+%               terms of eigenvalues (Mehring order, that is
+%               xx<=yy<=zz)
 %
 %        alp  - alpha Euler angle in radians
 %
@@ -40,7 +42,7 @@ xx=iso-(ax+3*rh)/6;
 yy=iso-(ax-3*rh)/6;
 zz=iso+ax/3;
 
-% Rotate the molecule
+% Rotate the interaction
 R=euler2dcm(alp,bet,gam);
 M=R*diag([xx yy zz])*R';
 
@@ -59,6 +61,8 @@ if (~isnumeric(iso))||(~isreal(iso))||(~isscalar(iso))||...
    (~isnumeric(gam))||(~isreal(gam))||(~isscalar(gam))
     error('all inputs must be real scalars.');
 end
+if rh<0, error('rhombicity cannot be negative.'); end
+if ax<rh, error('rhombicity cannot exceed axiality.'); end
 end
 
 % I'm working to improve my methods, and every hour

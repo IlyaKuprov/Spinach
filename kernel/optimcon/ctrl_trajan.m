@@ -95,9 +95,14 @@ if ismember('spectrogram',spin_system.control.plotting)
         % Mirror replication at the edges
         padded_wf=[fliplr(cplx_ch_wf) cplx_ch_wf fliplr(cplx_ch_wf)];
 
-        % Get the spectrogram
-        window_size=ceil(sqrt(numel(timing_grid)));
-        window_overlap=ceil(window_size/2); n_freq_bins=2*window_size;
+        % Optimal spectrogram settings
+        n_slices=numel(timing_grid);
+        window_size=min(n_slices,ceil(sqrt(2*n_slices)));
+        window_step=max(1,ceil(window_size/4));
+        window_overlap=window_size-window_step;
+        n_freq_bins=2*window_size;
+
+        % Get the spectrogram at the optimal visually informative settings
         [st_fft,f_axis,t_axis]=spectrogram(padded_wf,window_size,window_overlap,...
                                            n_freq_bins,sampl_rate,'yaxis','center');
 

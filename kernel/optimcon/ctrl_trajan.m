@@ -623,8 +623,8 @@ if ismember('robustness',spin_system.control.plotting)
     subplot(n_plots_x,n_plots_y,current_plot);
     
     % Plot fidelity histogram
-    histogram(fidelities(:),ceil(sqrt(numel(fidelities))));
-    ktitle('ensemble'); kxlabel('fidelity'); 
+    h=histogram(fidelities(:),ceil(sqrt(numel(fidelities))));
+    h.EdgeColor='none'; ktitle('ensemble'); kxlabel('fidelity'); 
     kylabel('number of systems'); kgrid;
 
     % Get histogram range + 10% margin

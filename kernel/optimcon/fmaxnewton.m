@@ -98,9 +98,10 @@ if isfield(spin_system.control,'video_file')
 
 end
 
-% If zero iterations, still display graphics
+% If zero iterations, still display graphics,
+% return fidelity and the procedural data
 if spin_system.control.max_iter==0
-    [~,~]=objeval(x,cost_function,data,spin_system);
+    [data,fx]=objeval(x,cost_function,data,spin_system);
 end
 
 % Start the iteration loop

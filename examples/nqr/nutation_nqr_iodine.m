@@ -60,7 +60,7 @@ for n=1:10
                       parameters.npoints);
     subplot(1,10,n); plot(1e-6*frq_axis',imag(spectrum));
     ktitle([num2str(n/2) ' $\mu$s']); kxlabel('MHz'); 
-    xlim tight; ylim([-3e-11 3e-11]); 
+    xlim tight; ylim([-3.0059e-5 3.0059e-5]);
     set(gca,'YTick',[]); drawnow();
  
 end

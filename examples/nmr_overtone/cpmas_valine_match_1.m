@@ -83,7 +83,7 @@ for n=1:15
        
     % Plotting
     plot_1d(spin_system,real(spectrum),parameters);
-    axis([70 105 -2.5e-8 2.5e-8]); set(gca,'YTick',[]);
+    axis([70 105 -8.7843e-4 8.7843e-4]); set(gca,'YTick',[]);
     ktitle([num2str(rf_powers(n)/1e3) ' kHz']); 
     kxlabel(''); set(gca,'XTick',[]); drawnow(); 
     

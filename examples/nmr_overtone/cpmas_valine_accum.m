@@ -83,7 +83,7 @@ for n=1:10
     
     % Plotting
     plot_1d(spin_system,real(spectrum),parameters);
-    axis([70 105 -5e-8 5e-8]); set(gca,'YTick',[]);
+    axis([70 105 -1.7569e-3 1.7569e-3]); set(gca,'YTick',[]);
     ktitle([num2str(1e6*parameters.rf_dur) ' $\mu$s']); 
     kxlabel(''); set(gca,'XTick',[]); drawnow();
     

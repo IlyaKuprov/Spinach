@@ -153,6 +153,15 @@ for k=1:numel(projectors)
     
 end
 
+% Get the sampling rate implied by the frequency grid
+sample_rate=abs(parameters.sweep(2)-parameters.sweep(1));
+if parameters.npoints>1
+    sample_rate=sample_rate*parameters.npoints/(parameters.npoints-1);
+end
+
+% Match the unnormalised FFT amplitude convention
+spectrum=spectrum*sample_rate;
+
 end
 
 % Consistency enforcement

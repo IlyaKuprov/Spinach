@@ -62,5 +62,20 @@ peak_idx=parameters.npoints/2+1;
 result=test_close(result,'slowpass FFT amplitude',spectrum_slow(peak_idx),spectrum_fft(peak_idx),1e-6,2e-3,...
                   'frequency-domain acquisition should match the unnormalised FFT amplitude of the same damped FID');
 
+% Check that single-point spectra are rejected before scaling
+parameters_single=parameters;
+parameters_single.sweep=[0 0];
+parameters_single.npoints=1;
+try
+    slowpass(spin_system,parameters_single,H,R,K);
+    single_rejected=false;
+catch err
+    single_rejected=contains(err.message,'integer greater than one');
+end
+
+
+result=test_true(result,'slowpass single-point grumbler',single_rejected,...
+                 'single-point slowpass spectra cannot be normalised to the unnormalised FFT convention');
+
 end
 

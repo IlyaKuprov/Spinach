@@ -154,10 +154,8 @@ for k=1:numel(projectors)
 end
 
 % Get the sampling rate implied by the frequency grid
-sample_rate=abs(parameters.sweep(2)-parameters.sweep(1));
-if parameters.npoints>1
-    sample_rate=sample_rate*parameters.npoints/(parameters.npoints-1);
-end
+sample_rate=abs(parameters.sweep(2)-parameters.sweep(1))*...
+            parameters.npoints/(parameters.npoints-1);
 
 % Match the unnormalised FFT amplitude convention
 spectrum=spectrum*sample_rate;
@@ -183,8 +181,8 @@ if ~isfield(parameters,'npoints')
     error('number of points must be specified in parameters.npoints variable.');
 end
 if (~isnumeric(parameters.npoints))||(numel(parameters.npoints)~=1)||...
-   (~isreal(parameters.npoints))||(parameters.npoints<1)||(mod(parameters.npoints,1)~=0)
-    error('parameters.npoints should be a positive integer.');
+   (~isreal(parameters.npoints))||(parameters.npoints<2)||(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints should be an integer greater than one.');
 end
 if ~isfield(parameters,'rho0')
     error('the initial state must be specified in parameters.rho0 variable.');

@@ -22,8 +22,7 @@
 %   The phase and frequency buttons switch the plot between unwrapped
 %   phase in radians and instantaneous frequency in Hz. The sticky wrap
 %   button switches the phase plot into the [0,2*pi] interval.
-%   The slider range expands when its end stops are reached or when a
-%   selected step size does not fit inside the current range.
+%   The slider range is a moving 100-step window in the selected units.
 %   The save button returns the current demodulated waveform and exits.
 %   The complex waveform in_phase+1i*out_phase is multiplied by
 %   exp(2*pi*1i*freq*time_grid).
@@ -43,14 +42,15 @@ complex_pulse=in_phase+1i*out_phase;
 % Initialise the returned waveform
 demod_pulse=complex_pulse;
 
-% Set the initial slider range from the sampling limit
-init_range=1/(2*min(diff(time_grid)));
-freq_low=-init_range; freq_high=+init_range;
-
 % Start at zero-frequency demodulation
 freq=0; freq_step=1; step_name='Hz';
 plot_mode='phase'; phase_wrapped=false;
 shown_mode='phase'; shown_wrapped=false;
+
+% Set the initial slider range from the active step
+range_steps=100;
+freq_low=-range_steps*freq_step/2;
+freq_high=+range_steps*freq_step/2;
 
 % Create the figure window
 fig_handle=kfigure('Name','Pulse demodulation',...
@@ -174,7 +174,7 @@ end
         freq_step=new_mult; step_name=new_name;
 
         % Update the slider without changing the frequency
-        set_slider();
+        set_slider(true);
 
         % Update the active button and plot
         select_button(); update_plot();
@@ -211,7 +211,7 @@ end
 
         % Update the frequency display
         set(edit_handle,'String',num2str(freq,'%.12g'));
-        set_slider(); update_plot();
+        set_slider(false); update_plot();
 
     end
 
@@ -231,34 +231,36 @@ end
         freq=edit_value;
 
         % Update the slider and plot
-        set_slider(); update_plot();
+        set_slider(true); update_plot();
 
     end
 
     % Update the slider range and step size
-    function set_slider()
+    function set_slider(centre_range)
+
+        % Set the slider window size in active units
+        target_span=range_steps*freq_step;
 
         % Measure the current slider range
         freq_span=freq_high-freq_low;
 
-        % Expand the lower end if the selected step does not fit
+        % Recentre the window after typed or unit changes
+        if centre_range||(freq_span>target_span)
+            freq_low=freq-target_span/2;
+            freq_high=freq+target_span/2;
+            freq_span=target_span;
+        end
+
+        % Shift the lower end when the thumb approaches it
         if (freq-freq_low)<10*freq_step
             freq_low=freq-10*freq_step;
+            freq_high=freq_low+freq_span;
         end
 
-        % Expand the upper end if the selected step does not fit
+        % Shift the upper end when the thumb approaches it
         if (freq_high-freq)<10*freq_step
             freq_high=freq+10*freq_step;
-        end
-
-        % Create upper headroom if the upper stop is reached
-        if freq>=freq_high
-            freq_high=freq+freq_span;
-        end
-
-        % Create lower headroom if the lower stop is reached
-        if freq<=freq_low
-            freq_low=freq-freq_span;
+            freq_low=freq_high-freq_span;
         end
 
         % Set one small slider step to one multiplier unit

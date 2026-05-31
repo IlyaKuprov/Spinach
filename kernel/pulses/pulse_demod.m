@@ -18,10 +18,11 @@
 % Notes:
 %
 %   The frequency entry field uses Hz. The GHz, MHz, kHz, and Hz buttons
-%   set the slider multiplier without changing the demodulation frequency.
-%   The phase and frequency buttons switch the plot between quadrature
-%   amplitudes and instantaneous frequency.
-%   The slider range expands when its end stops are reached.
+%   set the slider step size without changing the demodulation frequency.
+%   The phase and frequency buttons switch the plot between unwrapped
+%   phase in radians and instantaneous frequency in Hz.
+%   The slider range expands when its end stops are reached or when a
+%   selected step size does not fit inside the current range.
 %   The save button returns the current demodulated waveform and exits.
 %   The complex waveform in_phase+1i*out_phase is multiplied by
 %   exp(2*pi*1i*freq*time_grid).
@@ -46,7 +47,7 @@ init_range=1/(2*min(diff(time_grid)));
 freq_low=-init_range; freq_high=+init_range;
 
 % Start at zero-frequency demodulation
-freq=0; slider_mult=1; slider_name='Hz';
+freq=0; freq_step=1; step_name='Hz';
 plot_mode='phase'; shown_mode='phase';
 
 % Create the figure window
@@ -59,15 +60,13 @@ axis_handle=axes('Parent',fig_handle,...
                  'Units','normalized',...
                  'Position',[0.10 0.40 0.70 0.54]);
 
-% Plot the initial waveform components
-in_line=plot(axis_handle,time_grid,in_phase,'b-');
-hold(axis_handle,'on');
-out_line=plot(axis_handle,time_grid,out_phase,'r-');
+% Plot the initial waveform representation
+plot_line=plot(axis_handle,time_grid,zeros(size(time_grid)),'b-');
 axis(axis_handle,'tight'); kgrid;
 ktitle('demodulation frequency: 0 Hz');
-kxlabel('time, s'); kylabel('pulse amplitude');
-legend_handle=klegend(axis_handle,[in_line out_line],...
-                      {'in-phase','out-of-phase'},...
+kxlabel('time, s'); kylabel('phase, rad');
+legend_handle=klegend(axis_handle,plot_line,...
+                      {'phase'},...
                       'Location','best');
 title_handle=get(axis_handle,'Title');
 ylabel_handle=get(axis_handle,'YLabel');
@@ -83,6 +82,13 @@ button_freq=uicontrol('Parent',fig_handle,'Style','pushbutton',...
                       'Position',[0.84 0.74 0.12 0.06],...
                       'String','frequency',...
                       'Callback',{@set_plot,'frequency'});
+
+% Label the slider step controls
+uicontrol('Parent',fig_handle,'Style','text',...
+          'Units','normalized',...
+          'Position',[0.28 0.27 0.54 0.035],...
+          'String','slider step',...
+          'HorizontalAlignment','left');
 
 % Create the order-of-magnitude buttons
 button_ghz=uicontrol('Parent',fig_handle,'Style','pushbutton',...
@@ -120,22 +126,30 @@ edit_handle=uicontrol('Parent',fig_handle,'Style','edit',...
                       'String','0',...
                       'Callback',@edit_freq);
 
+% Label the frequency entry field
+uicontrol('Parent',fig_handle,'Style','text',...
+          'Units','normalized',...
+          'Position',[0.10 0.16 0.14 0.035],...
+          'String','frequency, Hz',...
+          'HorizontalAlignment','left');
+
 % Set the slider step from the initial multiplier
-minor_step=max(min(slider_mult/(freq_high-freq_low),1),eps);
+minor_step=max(min(freq_step/(freq_high-freq_low),1),eps);
 major_step=max(min(10*minor_step,1),minor_step);
 
 % Create the frequency slider
 slider_handle=uicontrol('Parent',fig_handle,'Style','slider',...
                         'Units','normalized',...
                         'Position',[0.28 0.10 0.68 0.06],...
-                        'Min',freq_low/slider_mult,...
-                        'Max',freq_high/slider_mult,...
+                        'Min',freq_low,...
+                        'Max',freq_high,...
                         'Value',0,...
                         'SliderStep',[minor_step major_step],...
                         'Callback',@slide_freq);
 
-% Highlight the initial slider multiplier
+% Highlight the initial slider step and plot mode
 select_button(); select_plot();
+update_plot();
 
 % Wait until the user saves or closes the figure
 uiwait(fig_handle);
@@ -146,13 +160,13 @@ if ishandle(fig_handle)
 end
 
 
-    % Change the active slider multiplier
+    % Change the active slider step size
     function set_mult(~,~,new_mult,new_name)
 
-        % Store the new multiplier
-        slider_mult=new_mult; slider_name=new_name;
+        % Store the new slider step size
+        freq_step=new_mult; step_name=new_name;
 
-        % Rescale the slider without changing the frequency
+        % Update the slider without changing the frequency
         set_slider();
 
         % Update the active button and plot
@@ -175,20 +189,7 @@ end
     function slide_freq(~,~)
 
         % Update the demodulation frequency
-        freq=get(slider_handle,'Value')*slider_mult;
-
-        % Measure the current slider range
-        freq_span=freq_high-freq_low;
-
-        % Create upper headroom if the upper stop is reached
-        if freq>=freq_high
-            freq_high=freq+freq_span;
-        end
-
-        % Create lower headroom if the lower stop is reached
-        if freq<=freq_low
-            freq_low=freq-freq_span;
-        end
+        freq=get(slider_handle,'Value');
 
         % Update the frequency display
         set(edit_handle,'String',num2str(freq,'%.12g'));
@@ -211,8 +212,26 @@ end
         % Update the demodulation frequency
         freq=edit_value;
 
+        % Update the slider and plot
+        set_slider(); update_plot();
+
+    end
+
+    % Update the slider range and step size
+    function set_slider()
+
         % Measure the current slider range
         freq_span=freq_high-freq_low;
+
+        % Expand the lower end if the selected step does not fit
+        if (freq-freq_low)<10*freq_step
+            freq_low=freq-10*freq_step;
+        end
+
+        % Expand the upper end if the selected step does not fit
+        if (freq_high-freq)<10*freq_step
+            freq_high=freq+10*freq_step;
+        end
 
         % Create upper headroom if the upper stop is reached
         if freq>=freq_high
@@ -224,27 +243,19 @@ end
             freq_low=freq-freq_span;
         end
 
-        % Update the slider and plot
-        set_slider(); update_plot();
-
-    end
-
-    % Update the slider range and step size
-    function set_slider()
-
         % Set one small slider step to one multiplier unit
-        minor_step=max(min(slider_mult/(freq_high-freq_low),1),eps);
+        minor_step=max(min(freq_step/(freq_high-freq_low),1),eps);
         major_step=max(min(10*minor_step,1),minor_step);
 
-        % Update slider geometry without changing the frequency
-        set(slider_handle,'Min',freq_low/slider_mult,...
-                          'Max',freq_high/slider_mult,...
-                          'Value',freq/slider_mult,...
+        % Update slider geometry in Hz
+        set(slider_handle,'Min',freq_low,...
+                          'Max',freq_high,...
+                          'Value',freq,...
                           'SliderStep',[minor_step major_step]);
 
     end
 
-    % Show the active slider multiplier
+    % Show the active slider step size
     function select_button()
 
         % Clear all button highlights
@@ -252,7 +263,7 @@ end
             'FontWeight','normal');
 
         % Highlight the active button
-        switch slider_name
+        switch step_name
 
             case 'GHz'
 
@@ -312,40 +323,35 @@ end
         % Apply the demodulation multiplier
         demod_pulse=complex_pulse.*exp(2*pi*1i*freq*time_grid);
 
+        % Compute the demodulated phase
+        pulse_phase=unwrap(angle(demod_pulse));
+
         % Display the selected waveform representation
         switch plot_mode
 
             case 'phase'
 
-                set(in_line,'XData',time_grid,...
-                            'YData',real(demod_pulse),...
-                            'Visible','on');
-                set(out_line,'XData',time_grid,...
-                             'YData',imag(demod_pulse),...
-                             'Visible','on');
+                set(plot_line,'XData',time_grid,...
+                              'YData',pulse_phase);
                 if ~strcmp(shown_mode,'phase')
-                    set(ylabel_handle,'String','pulse amplitude');
+                    set(ylabel_handle,'String','phase, rad');
                     delete(legend_handle);
-                    legend_handle=klegend(axis_handle,[in_line out_line],...
-                                          {'in-phase','out-of-phase'},...
+                    legend_handle=klegend(axis_handle,plot_line,...
+                                          {'phase'},...
                                           'Location','best');
                     shown_mode='phase';
                 end
 
             case 'frequency'
 
-                pulse_phase=unwrap(angle(demod_pulse));
-                inst_freq=gradient(pulse_phase,time_grid)/(2*pi);
-                set(in_line,'XData',time_grid,...
-                            'YData',inst_freq,...
-                            'Visible','on');
-                set(out_line,'XData',time_grid,...
-                             'YData',nan(size(time_grid)),...
-                             'Visible','off');
+                freq_grid=(time_grid(1:(end-1))+time_grid(2:end))/2;
+                inst_freq=diff(pulse_phase)./(2*pi*diff(time_grid));
+                set(plot_line,'XData',freq_grid,...
+                              'YData',inst_freq);
                 if ~strcmp(shown_mode,'frequency')
                     set(ylabel_handle,'String','instantaneous frequency, Hz');
                     delete(legend_handle);
-                    legend_handle=klegend(axis_handle,in_line,...
+                    legend_handle=klegend(axis_handle,plot_line,...
                                           {'instantaneous frequency'},...
                                           'Location','best');
                     shown_mode='frequency';
@@ -356,7 +362,7 @@ end
         % Update the plot annotations
         set(title_handle,'String',['\textbf{demodulation frequency: '...
                          num2str(freq,'%.12g') ' Hz}']);
-        axis(axis_handle,'tight'); drawnow;
+        axis(axis_handle,'tight'); drawnow nocallbacks;
 
     end
 
@@ -384,4 +390,5 @@ if (~all(size(time_grid)==size(in_phase)))||...
     error('time_grid, in_phase, and out_phase must have the same dimension.');
 end
 end
+
 

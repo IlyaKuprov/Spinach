@@ -20,7 +20,8 @@
 %   The frequency entry field uses Hz. The GHz, MHz, kHz, and Hz buttons
 %   set the slider step size without changing the demodulation frequency.
 %   The phase and frequency buttons switch the plot between unwrapped
-%   phase in radians and instantaneous frequency in Hz.
+%   phase in radians and instantaneous frequency in Hz. The sticky wrap
+%   button switches the phase plot into the [0,2*pi] interval.
 %   The slider range expands when its end stops are reached or when a
 %   selected step size does not fit inside the current range.
 %   The save button returns the current demodulated waveform and exits.
@@ -48,7 +49,8 @@ freq_low=-init_range; freq_high=+init_range;
 
 % Start at zero-frequency demodulation
 freq=0; freq_step=1; step_name='Hz';
-plot_mode='phase'; shown_mode='phase';
+plot_mode='phase'; phase_wrapped=false;
+shown_mode='phase'; shown_wrapped=false;
 
 % Create the figure window
 fig_handle=kfigure('Name','Pulse demodulation',...
@@ -66,12 +68,12 @@ axis(axis_handle,'tight'); kgrid;
 ktitle('demodulation frequency: 0 Hz');
 kxlabel('time, s'); kylabel('phase, rad');
 legend_handle=klegend(axis_handle,plot_line,...
-                      {'phase'},...
+                      {'unwrapped phase'},...
                       'Location','best');
 title_handle=get(axis_handle,'Title');
 ylabel_handle=get(axis_handle,'YLabel');
 
-% Create the plot mode buttons
+% Create the right-side display buttons
 button_phase=uicontrol('Parent',fig_handle,'Style','pushbutton',...
                        'Units','normalized',...
                        'Position',[0.84 0.82 0.12 0.06],...
@@ -82,6 +84,11 @@ button_freq=uicontrol('Parent',fig_handle,'Style','pushbutton',...
                       'Position',[0.84 0.74 0.12 0.06],...
                       'String','frequency',...
                       'Callback',{@set_plot,'frequency'});
+button_wrap=uicontrol('Parent',fig_handle,'Style','togglebutton',...
+                      'Units','normalized',...
+                      'Position',[0.84 0.66 0.12 0.06],...
+                      'String','wrap',...
+                      'Callback',@set_wrap);
 
 % Label the slider step controls
 uicontrol('Parent',fig_handle,'Style','text',...
@@ -147,8 +154,8 @@ slider_handle=uicontrol('Parent',fig_handle,'Style','slider',...
                         'SliderStep',[minor_step major_step],...
                         'Callback',@slide_freq);
 
-% Highlight the initial slider step and plot mode
-select_button(); select_plot();
+% Highlight the initial slider step and display mode
+select_button(); select_plot(); select_wrap();
 update_plot();
 
 % Wait until the user saves or closes the figure
@@ -182,6 +189,17 @@ end
 
         % Update the active button and plot
         select_plot(); update_plot();
+
+    end
+
+    % Change the active phase wrapping state
+    function set_wrap(~,~)
+
+        % Store the wrapping button state
+        phase_wrapped=get(button_wrap,'Value')>0;
+
+        % Update the button text and plot
+        select_wrap(); update_plot();
 
     end
 
@@ -306,6 +324,22 @@ end
 
     end
 
+    % Show the active phase wrapping state
+    function select_wrap()
+
+        % Label the button with the available action
+        if phase_wrapped
+            set(button_wrap,'String','unwrap',...
+                            'Value',1,...
+                            'FontWeight','bold');
+        else
+            set(button_wrap,'String','wrap',...
+                            'Value',0,...
+                            'FontWeight','normal');
+        end
+
+    end
+
     % Save the current waveform and leave the GUI
     function save_pulse(~,~)
 
@@ -331,15 +365,25 @@ end
 
             case 'phase'
 
+                % Apply phase wrapping if requested
+                if phase_wrapped
+                    plot_phase=mod(pulse_phase,2*pi);
+                    legend_text='wrapped phase';
+                else
+                    plot_phase=pulse_phase;
+                    legend_text='unwrapped phase';
+                end
+
                 set(plot_line,'XData',time_grid,...
-                              'YData',pulse_phase);
-                if ~strcmp(shown_mode,'phase')
+                              'YData',plot_phase);
+                if (~strcmp(shown_mode,'phase'))||...
+                   (shown_wrapped~=phase_wrapped)
                     set(ylabel_handle,'String','phase, rad');
                     delete(legend_handle);
                     legend_handle=klegend(axis_handle,plot_line,...
-                                          {'phase'},...
+                                          {legend_text},...
                                           'Location','best');
-                    shown_mode='phase';
+                    shown_mode='phase'; shown_wrapped=phase_wrapped;
                 end
 
             case 'frequency'

@@ -19,6 +19,8 @@
 %
 %   The frequency entry field uses Hz. The GHz, MHz, kHz, and Hz buttons
 %   set the slider multiplier without changing the demodulation frequency.
+%   The phase and frequency buttons switch the plot between quadrature
+%   amplitudes and instantaneous frequency.
 %   The slider range expands when its end stops are reached.
 %   The save button returns the current demodulated waveform and exits.
 %   The complex waveform in_phase+1i*out_phase is multiplied by
@@ -45,6 +47,7 @@ freq_low=-init_range; freq_high=+init_range;
 
 % Start at zero-frequency demodulation
 freq=0; slider_mult=1; slider_name='Hz';
+plot_mode='phase'; shown_mode='phase';
 
 % Create the figure window
 fig_handle=kfigure('Name','Pulse demodulation',...
@@ -54,7 +57,7 @@ scale_figure([1.4 1.2]);
 % Create the waveform axis
 axis_handle=axes('Parent',fig_handle,...
                  'Units','normalized',...
-                 'Position',[0.10 0.40 0.86 0.54]);
+                 'Position',[0.10 0.40 0.70 0.54]);
 
 % Plot the initial waveform components
 in_line=plot(axis_handle,time_grid,in_phase,'b-');
@@ -63,8 +66,23 @@ out_line=plot(axis_handle,time_grid,out_phase,'r-');
 axis(axis_handle,'tight'); kgrid;
 ktitle('demodulation frequency: 0 Hz');
 kxlabel('time, s'); kylabel('pulse amplitude');
-klegend(axis_handle,{'in-phase','out-of-phase'},'Location','best');
+legend_handle=klegend(axis_handle,[in_line out_line],...
+                      {'in-phase','out-of-phase'},...
+                      'Location','best');
 title_handle=get(axis_handle,'Title');
+ylabel_handle=get(axis_handle,'YLabel');
+
+% Create the plot mode buttons
+button_phase=uicontrol('Parent',fig_handle,'Style','pushbutton',...
+                       'Units','normalized',...
+                       'Position',[0.84 0.82 0.12 0.06],...
+                       'String','phase',...
+                       'Callback',{@set_plot,'phase'});
+button_freq=uicontrol('Parent',fig_handle,'Style','pushbutton',...
+                      'Units','normalized',...
+                      'Position',[0.84 0.74 0.12 0.06],...
+                      'String','frequency',...
+                      'Callback',{@set_plot,'frequency'});
 
 % Create the order-of-magnitude buttons
 button_ghz=uicontrol('Parent',fig_handle,'Style','pushbutton',...
@@ -117,7 +135,7 @@ slider_handle=uicontrol('Parent',fig_handle,'Style','slider',...
                         'Callback',@slide_freq);
 
 % Highlight the initial slider multiplier
-select_button();
+select_button(); select_plot();
 
 % Wait until the user saves or closes the figure
 uiwait(fig_handle);
@@ -139,6 +157,17 @@ end
 
         % Update the active button and plot
         select_button(); update_plot();
+
+    end
+
+    % Change the active plot mode
+    function set_plot(~,~,new_mode)
+
+        % Store the new plot mode
+        plot_mode=new_mode;
+
+        % Update the active button and plot
+        select_plot(); update_plot();
 
     end
 
@@ -245,6 +274,27 @@ end
 
     end
 
+    % Show the active plot mode
+    function select_plot()
+
+        % Clear all button highlights
+        set([button_phase button_freq],'FontWeight','normal');
+
+        % Highlight the active button
+        switch plot_mode
+
+            case 'phase'
+
+                set(button_phase,'FontWeight','bold');
+
+            case 'frequency'
+
+                set(button_freq,'FontWeight','bold');
+
+        end
+
+    end
+
     % Save the current waveform and leave the GUI
     function save_pulse(~,~)
 
@@ -262,9 +312,46 @@ end
         % Apply the demodulation multiplier
         demod_pulse=complex_pulse.*exp(2*pi*1i*freq*time_grid);
 
-        % Update the in-phase and out-of-phase traces
-        set(in_line,'YData',real(demod_pulse));
-        set(out_line,'YData',imag(demod_pulse));
+        % Display the selected waveform representation
+        switch plot_mode
+
+            case 'phase'
+
+                set(in_line,'XData',time_grid,...
+                            'YData',real(demod_pulse),...
+                            'Visible','on');
+                set(out_line,'XData',time_grid,...
+                             'YData',imag(demod_pulse),...
+                             'Visible','on');
+                if ~strcmp(shown_mode,'phase')
+                    set(ylabel_handle,'String','pulse amplitude');
+                    delete(legend_handle);
+                    legend_handle=klegend(axis_handle,[in_line out_line],...
+                                          {'in-phase','out-of-phase'},...
+                                          'Location','best');
+                    shown_mode='phase';
+                end
+
+            case 'frequency'
+
+                pulse_phase=unwrap(angle(demod_pulse));
+                inst_freq=gradient(pulse_phase,time_grid)/(2*pi);
+                set(in_line,'XData',time_grid,...
+                            'YData',inst_freq,...
+                            'Visible','on');
+                set(out_line,'XData',time_grid,...
+                             'YData',nan(size(time_grid)),...
+                             'Visible','off');
+                if ~strcmp(shown_mode,'frequency')
+                    set(ylabel_handle,'String','instantaneous frequency, Hz');
+                    delete(legend_handle);
+                    legend_handle=klegend(axis_handle,in_line,...
+                                          {'instantaneous frequency'},...
+                                          'Location','best');
+                    shown_mode='frequency';
+                end
+
+        end
 
         % Update the plot annotations
         set(title_handle,'String',['\textbf{demodulation frequency: '...
@@ -297,5 +384,4 @@ if (~all(size(time_grid)==size(in_phase)))||...
     error('time_grid, in_phase, and out_phase must have the same dimension.');
 end
 end
-
 

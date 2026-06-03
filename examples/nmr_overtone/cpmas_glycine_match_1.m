@@ -66,7 +66,7 @@ parameters.rf_dur=1e-4;
 rf_powers=linspace(25e3,39e3,15);
 
 % Start a new figure
-kfigure(); scale_figure([2.5 1.0]);
+kfigure(); scale_figure([3.0 1.0]);
 
 % Proton RF power scan
 for n=1:15
@@ -82,7 +82,7 @@ for n=1:15
        
     % Plotting
     plot_1d(spin_system,real(spectrum),parameters);
-    axis([44 52 -8.0314e-4 8.0314e-4]); set(gca,'YTick',[]);
+    axis([44 52 -9e-4 9e-4]); set(gca,'YTick',[]);
     ktitle([num2str(rf_powers(n)/1e3) ' kHz']); 
     kxlabel(''); set(gca,'XTick',[]); drawnow(); 
      

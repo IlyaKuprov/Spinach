@@ -36,7 +36,7 @@
 %   props.srt              - spin-rotation tensor
 %   props.nqi              - nuclear quadrupolar tensors
 %   props.chi              - susceptibility tensor
-%   props.gibbs            - Gibbs free energy
+%   props.gibbs            - Gibbs free energy (Hartree)
 %   props.symbols          - atomic symbols
 %   props.isotopes         - nuclear isotopes used by Gaussian
 %   props.atomic_numbers   - atomic numbers

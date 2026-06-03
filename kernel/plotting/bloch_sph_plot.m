@@ -86,8 +86,19 @@ axis_z(~good_axis)=NaN;
 
 % Static trajectory and instantaneous axis-tip curve
 if isempty(file_name)
-    plot3(x,y,z,varargin{:});
-    plot3(axis_x,axis_y,axis_z,'r--','LineWidth',1.5,...
+
+    % Pack rows into NaN-separated plot streams
+    traj_x=[x NaN(size(x,1),1)]';
+    traj_y=[y NaN(size(y,1),1)]';
+    traj_z=[z NaN(size(z,1),1)]';
+    axis_curve_x=[axis_x NaN(size(axis_x,1),1)]';
+    axis_curve_y=[axis_y NaN(size(axis_y,1),1)]';
+    axis_curve_z=[axis_z NaN(size(axis_z,1),1)]';
+
+    % Plot the trajectory and instantaneous axis curve
+    plot3(traj_x(:),traj_y(:),traj_z(:),varargin{:});
+    plot3(axis_curve_x(:),axis_curve_y(:),axis_curve_z(:),...
+          'r--','LineWidth',1.5,...
           'Tag','InstantaneousAxis');
 
 else

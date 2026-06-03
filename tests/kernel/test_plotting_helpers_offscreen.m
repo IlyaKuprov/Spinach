@@ -234,6 +234,26 @@ result=test_true(result,'bloch_sph_plot axis normalisation',...
                  'bloch_sph_plot keeps the instantaneous axis inside the unit sphere');
 close(fig);
 
+% Check row-wise static plotting of multiple trajectories
+multi_time=linspace(0,pi/2,5);
+x_multi=[cos(multi_time); cos(multi_time)];
+y_multi=[sin(multi_time); -sin(multi_time)];
+z_multi=zeros(size(x_multi));
+bloch_sph_plot(x_multi,y_multi,z_multi,'k-');
+fig=gcf();
+axis_obj=findobj(fig,'Type','line','Tag','InstantaneousAxis');
+axis_zdata=[];
+if isscalar(axis_obj)
+    axis_zdata=get(axis_obj,'ZData');
+end
+npoints=numel(multi_time);
+result=test_true(result,'bloch_sph_plot static multirow axis',...
+                 isscalar(axis_obj)&&numel(axis_zdata)==2*(npoints+1)&&...
+                 all(axis_zdata(1:npoints)>0)&&isnan(axis_zdata(npoints+1))&&...
+                 all(axis_zdata((npoints+2):(2*npoints+1))<0)&&isnan(axis_zdata(end)),...
+                 'bloch_sph_plot traces each row trajectory separately in static instantaneous-axis plotting');
+close(fig);
+
 % Optionally exercise the Bloch-sphere movie path
 if strcmp(getenv('SPINACH_RUN_SLOW_PLOTTING'),'1')
     movie_file=[tempname '.avi'];

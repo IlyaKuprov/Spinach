@@ -166,8 +166,10 @@ coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.delta,1,'final');
 % Effective carbon isotropic mixing Liouvillian
 isomix_system=spin_system;
 isomix_system=dictum(isomix_system,{'13C'},'ignore');
+isomix_system=dictum(isomix_system,{'1H'},'ignore');
 isomix_system=dictum(isomix_system,{'13C','13C'},'strong');
 isomix_system=dictum(isomix_system,{'1H','13C'},'ignore');
+isomix_system=dictum(isomix_system,{'13C','1H'},'ignore');
 isomix_system=dictum(isomix_system,{'1H','1H'},'ignore');
 L_isomix=hamiltonian(isomix_system)+1i*R+1i*K;
 

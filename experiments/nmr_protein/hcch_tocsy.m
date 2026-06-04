@@ -128,33 +128,33 @@ rho_stack=step(spin_system,Hx+Cx,rho_stack,pi/2);
 % Get decoupled evolution generator
 [L_dec,~]=decouple(spin_system,L,[],parameters.decouple_f3);
 
-% Backward detection on 1H
-coil_stack=evolution(spin_system,L_dec,[],coil,-t3.timestep,...
+% Detection on 1H backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L_dec',[],coil,-t3.timestep,...
                      t3.nsteps-1,'trajectory');
                  
 % Select single quantum coherence
 coil_stack=coherence(spin_system,coil_stack,{{'1H',1}});                 
 
-% Backward tau evolution
-coil_stack=evolution(spin_system,L,[],coil_stack,-tau_ch,1,'final');
+% tau evolution backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L',[],coil_stack,-tau_ch,1,'final');
 
 % Backward inversion pulses on 1H and 13C
 coil_stack=step(spin_system,Hx+Cx,coil_stack,-pi);
 
-% Backward tau evolution
-coil_stack=evolution(spin_system,L,[],coil_stack,-tau_ch,1,'final');
+% tau evolution backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L',[],coil_stack,-tau_ch,1,'final');
 
 % Backward pulses on 1H and 13C
 coil_stack=step(spin_system,Hx+Cx,coil_stack,-pi/2);
 
-% Backward delta evolution
-coil_stack=evolution(spin_system,L,[],coil_stack,-parameters.delta,1,'final');
+% delta evolution backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.delta,1,'final');
 
 % Backward inversion pulses on 1H and 13C
 coil_stack=step(spin_system,Hx+Cx,coil_stack,-pi);
 
-% Backward delta evolution
-coil_stack=evolution(spin_system,L,[],coil_stack,-parameters.delta,1,'final');
+% delta evolution backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.delta,1,'final');
 
 % Effective isotropic mixing Liouvillian
 spin_system=dictum(spin_system,{'1H'},'ignore');       % Ignore Zeeman term for 1H
@@ -162,15 +162,15 @@ spin_system=dictum(spin_system,{'13C'},'ignore');      % Ignore Zeeman term for 
 spin_system=dictum(spin_system,{'1H','13C'},'strong'); % Enforce strong 1H-13C coupling
 L_isomix=hamiltonian(spin_system)+1i*R+1i*K;       
 
-% Backward evolution during isotropic mixing
-coil_stack=evolution(spin_system,L_isomix,[],coil_stack,-parameters.dipsi_dur,1,'final');
+% Evolution during isotropic mixing backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L_isomix',[],coil_stack,-parameters.dipsi_dur,1,'final');
 
-% Backward spin lock
-coil_stack=evolution(spin_system,L+2*pi*parameters.lamp*(Hy+Cy),[],coil_stack,...
+% Spin lock backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L'+2*pi*parameters.lamp*(Hy+Cy),[],coil_stack,...
                      -parameters.sl_tmix,1,'final');
 
-% Backward delta evolution
-coil_stack=evolution(spin_system,L,[],coil_stack,-parameters.delta,1,'final');
+% delta evolution backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.delta,1,'final');
 
 % Backward inversion pulse on 13C
 coil_stack=step(spin_system,Cx,coil_stack,-pi);

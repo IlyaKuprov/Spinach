@@ -134,47 +134,47 @@ rho_stack=step(spin_system,CAy+COx,rho_stack,pi/2);
 % Get decoupled evolution generator
 [L_decN,~]=decouple(spin_system,L,[],{'15N'});
 
-% Detection on 1H
-coil_stack=evolution(spin_system,L_decN,[],coil,...
+% Detection on 1H backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L_decN',[],coil,...
                      -t3.timestep,t3.nsteps-1,'trajectory');
 
-% tau evolution
-coil_stack=evolution(spin_system,L,[],coil_stack,-tau,1,'final');
+% tau evolution backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L',[],coil_stack,-tau,1,'final');
 
-% Inversion pulses on 1H and 15N
+% Backward inversion pulses on 1H and 15N
 coil_stack=step(spin_system,Hx+Nx,coil_stack,-pi);
 
-% tau evolution
-coil_stack=evolution(spin_system,L,[],coil_stack,-tau,1,'final');
+% tau evolution backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L',[],coil_stack,-tau,1,'final');
 
-% Pulses on 1H and 15N
+% Backward pulses on 1H and 15N
 coil_stack=step(spin_system,Hy+Nx,coil_stack,-pi/2);
 
-% delta evolution
-coil_stack=evolution(spin_system,L,[],coil_stack,-delta,1,'final');
+% delta evolution backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L',[],coil_stack,-delta,1,'final');
 
-% T/2 - delta evolution
-coil_stack=evolution(spin_system,L_decH,[],coil_stack,-parameters.T/2+delta,1,'final');
+% T/2 - delta evolution backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L_decH',[],coil_stack,-parameters.T/2+delta,1,'final');
 
-% Inversion pulses on 13CA and 15N
+% Backward inversion pulses on 13CA and 15N
 coil_stack=step(spin_system,CAx+Nx,coil_stack,-pi);
 
-% T/2 evolution
-coil_stack=evolution(spin_system,L_decH,[],coil_stack,-parameters.T/2,1,'final');
+% T/2 evolution backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L_decH',[],coil_stack,-parameters.T/2,1,'final');
 
-% Pulse on 15N, y pulse on 13CA
+% Backward pulse on 15N, y pulse on 13CA
 coil_stack=step(spin_system,CAy+Nx,coil_stack,-pi/2);
 
-% delta2 evolution
-coil_stack=evolution(spin_system,L_decH,[],coil_stack,-parameters.delta2,1,'final');
+% delta2 evolution backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L_decH',[],coil_stack,-parameters.delta2,1,'final');
 
-% Inversion pulses on 13CA and 13CO
+% Backward inversion pulses on 13CA and 13CO
 coil_stack=step(spin_system,CAx+COx,coil_stack,-pi);
 
-% delta2 evolution
-coil_stack=evolution(spin_system,L_decH,[],coil_stack,-parameters.delta2,1,'final');
+% delta2 evolution backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L_decH',[],coil_stack,-parameters.delta2,1,'final');
 
-% Pulses on 13CA and 13CO
+% Backward pulses on 13CA and 13CO
 coil_stack=step(spin_system,CAx+COx,coil_stack,-pi/2);
 
 %% Stitch the halves

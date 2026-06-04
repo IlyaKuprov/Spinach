@@ -41,7 +41,6 @@
 % TODO: whoever understands how phase cycles and quadratures work in
 %       3D NMR is welcome to add a phase-sensitive version.
 %
-%  
 % m.walker@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
@@ -155,29 +154,29 @@ rho_stack=evolution(spin_system,L_decCO,[],rho_stack,delta3,1,'final');
 % Get decoupled evolution generator
 [L_decCA,~]=decouple(spin_system,L,[],find(CAs));
 
-% Detection on 1H
-coil_stack=evolution(spin_system,L_decCA,[],parameters.coil,...
+% Detection on 1H backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L_decCA',[],parameters.coil,...
                      -t3.timestep,t3.nsteps-1,'trajectory');
                  
 % Select single quantum coherence
 coil_stack=coherence(spin_system,coil_stack,{{parameters.spins{1},1}});                 
 
-% tau2 evolution
-coil_stack=evolution(spin_system,L,[],coil_stack,-tau2,1,'final');
+% tau2 evolution backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L',[],coil_stack,-tau2,1,'final');
 
-% Inversion pulses on 1H and 15N
+% Backward inversion pulses on 1H and 15N
 coil_stack=step(spin_system,Hx+Nx,coil_stack,-pi);
 
-% tau2 evolution
-coil_stack=evolution(spin_system,L,[],coil_stack,-tau2,1,'final');
+% tau2 evolution backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L',[],coil_stack,-tau2,1,'final');
 
-% Pulses on 1H and 15N
+% Backward pulses on 1H and 15N
 coil_stack=step(spin_system,Hx+Nx,coil_stack,-pi/2);
 
-% delta4 evolution
-coil_stack=evolution(spin_system,L_decCO,[],coil_stack,-delta4,1,'final');
+% delta4 evolution backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L_decCO',[],coil_stack,-delta4,1,'final');
 
-% Inversion pulse on 15N
+% Backward inversion pulse on 15N
 coil_stack=step(spin_system,Nx,coil_stack,-pi);
 
 %% Stitch the halves

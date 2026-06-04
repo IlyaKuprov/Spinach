@@ -17,9 +17,6 @@ sys.magnet=5.9;
 % Chemical shifts
 inter.zeeman.scalar={0.0};
 
-% Disable path tracing
-sys.disable={'pt'};
-
 % This needs a GPU
 % sys.enable={'gpu'};
 

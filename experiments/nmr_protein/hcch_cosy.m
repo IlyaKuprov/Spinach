@@ -69,7 +69,7 @@ tau_ch=abs(1/(4*parameters.J_ch));
 
 % Coherence transfer delays
 tau_cc=abs(1/(8*parameters.J_cc));
-DELTA=abs(tau_cc-parameters.delta);
+DELTA=tau_cc-parameters.delta;
 
 % Initial condition
 rho0=state(spin_system,'Lz','1H','cheap');
@@ -218,8 +218,9 @@ if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
 end
 if (~isnumeric(parameters.sweep))||(~isvector(parameters.sweep))||...
-   (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)
-    error('parameters.sweep must be a vector of three real numbers.');
+   (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)||...
+   any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
+    error('parameters.sweep must be a vector of three positive real numbers.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
@@ -234,18 +235,30 @@ if ~isfield(parameters,'J_ch')
 elseif numel(parameters.J_ch)~=1
     error('parameters.J_ch array should have exactly one element.');
 end
+if (~isnumeric(parameters.J_ch))||(~isreal(parameters.J_ch))||...
+   (~isfinite(parameters.J_ch))||(parameters.J_ch<=0)
+    error('parameters.J_ch must be a positive real scalar.');
+end
 if ~isfield(parameters,'J_cc')
     error('scalar coupling should be specified in parameters.J_cc variable.');
 elseif numel(parameters.J_cc)~=1
     error('parameters.J_cc array should have exactly one element.');
+end
+if (~isnumeric(parameters.J_cc))||(~isreal(parameters.J_cc))||...
+   (~isfinite(parameters.J_cc))||(parameters.J_cc<=0)
+    error('parameters.J_cc must be a positive real scalar.');
 end
 if ~isfield(parameters,'delta')
     error('delta delay should be specified in parameters.delta variable.');
 elseif numel(parameters.delta)~=1
     error('parameters.delta array should have exactly one element.');
 end
-if (~isnumeric(parameters.delta))||(~isreal(parameters.delta))
-    error('parameters.delta must be a real scalar.');
+if (~isnumeric(parameters.delta))||(~isreal(parameters.delta))||...
+   (~isfinite(parameters.delta))||(parameters.delta<=0)
+    error('parameters.delta must be a positive real scalar.');
+end
+if parameters.delta>=1/(8*parameters.J_cc)
+    error('parameters.delta must be shorter than the C-C transfer delay.');
 end
 if ~isfield(parameters,'decouple_f3')
     error('decoupling list should be specified in parameters.decouple_f3 variable.');
@@ -253,6 +266,9 @@ end
 if (~iscell(parameters.decouple_f3))||...
    any(~cellfun(@ischar,parameters.decouple_f3))
     error('parameters.decouple_f3 must be a cell array of strings.');
+end
+if ~isequal(parameters.spins,{'1H','13C','1H'})
+    error('parameters.spins must be set to {''1H'',''13C'',''1H''}.');
 end
 end
 

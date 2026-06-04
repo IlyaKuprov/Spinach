@@ -84,8 +84,9 @@ COs=strcmp('C',spin_system.comp.labels);
 COp=operator(spin_system,'L+',find(COs));
 COx=(COp+COp')/2;
 
-% Detection state is protons
-coil=state(spin_system,'L+','1H');
+% Detection state - NH protons
+HNs=strcmp('H',spin_system.comp.labels);
+coil=state(spin_system,'L+',find(HNs));
 
 %% Run the first half forward
 
@@ -191,8 +192,8 @@ coil_stack=step(spin_system,CAx+COx,coil_stack,-pi/2);
 %% Stitch the halves
 
 % Coherence selection for States quadrature in F2
-coil_stack_pos=coherence(spin_system,coil_stack,{{'13C',+1}});
-coil_stack_neg=coherence(spin_system,coil_stack,{{'13C',-1}});
+coil_stack_pos=coherence(spin_system,coil_stack,{{find(COs),+1}});
+coil_stack_neg=coherence(spin_system,coil_stack,{{find(COs),-1}});
 
 % Stitching
 fid.pos_pos=stitch(spin_system,L_decH,rho_stack_pos,coil_stack_pos,{Nx+CAx},{pi},t1,t2,t3);
@@ -232,32 +233,39 @@ if ~isfield(parameters,'sweep')
     error('sweep widths must be specificed in parameters.sweep variable.');
 end
 if (~isnumeric(parameters.sweep))||(~isvector(parameters.sweep))||...
-   (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)
-    error('parameters.sweep must be a vector of three real numbers.');
+   (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)||...
+   any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
+    error('parameters.sweep must be a vector of three positive real numbers.');
 end
 if ~isfield(parameters,'J_nh')
     error('scalar coupling should be specified in parameters.J_nh variable.');
 elseif numel(parameters.J_nh)~=1
     error('parameters.J_nh array should have exactly one element.');
 end
-if (~isnumeric(parameters.J_nh))||(~isreal(parameters.J_nh))
-    error('parameters.J_nh must be a real scalar.');
+if (~isnumeric(parameters.J_nh))||(~isreal(parameters.J_nh))||...
+   (~isfinite(parameters.J_nh))||(parameters.J_nh<=0)
+    error('parameters.J_nh must be a positive real scalar.');
 end
 if ~isfield(parameters,'T')
     error('evolution delay should be specified in parameters.T variable.');
 elseif numel(parameters.T)~=1
     error('parameters.T array should have exactly one element.');
 end
-if (~isnumeric(parameters.T))||(~isreal(parameters.T))
-    error('parameters.T must be a real scalar.');
+if (~isnumeric(parameters.T))||(~isreal(parameters.T))||...
+   (~isfinite(parameters.T))||(parameters.T<=0)
+    error('parameters.T must be a positive real scalar.');
 end
 if ~isfield(parameters,'delta2')
     error('coherence transfer delay should be specified in parameters.delta2 variable.');
 elseif numel(parameters.delta2)~=1
     error('parameters.delta2 array should have exactly one element.');
 end
-if (~isnumeric(parameters.delta2))||(~isreal(parameters.delta2))
-    error('parameters.delta2 must be a real scalar.');
+if (~isnumeric(parameters.delta2))||(~isreal(parameters.delta2))||...
+   (~isfinite(parameters.delta2))||(parameters.delta2<=0)
+    error('parameters.delta2 must be a positive real scalar.');
+end
+if parameters.T<=1/parameters.J_nh
+    error('parameters.T must be longer than two N-H transfer delays.');
 end
 end
 

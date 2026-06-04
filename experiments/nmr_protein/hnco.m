@@ -63,16 +63,17 @@ t1.nsteps=parameters.npoints(1); t1.timestep=1./parameters.sweep(1);
 t2.nsteps=parameters.npoints(2); t2.timestep=1./parameters.sweep(2);
 t3.nsteps=parameters.npoints(3); t3.timestep=1./parameters.sweep(3);
 
-% Initial condition - all protons
-rho=state(spin_system,'Lz','1H','cheap');
-
-% Detection state - all protons
-coil=state(spin_system,'L+','1H','cheap');
-
 % Spin indices
+HNs=strcmp('H',spin_system.comp.labels);
 COs=strcmp('C',spin_system.comp.labels);
 CAs=strcmp('CA',spin_system.comp.labels);
 Ns=strcmp('N',spin_system.comp.labels);
+
+% Initial condition - NH protons
+rho=state(spin_system,'Lz',find(HNs),'cheap');
+
+% Detection state - NH protons
+coil=state(spin_system,'L+',find(HNs),'cheap');
 
 % Pulse operators on 13CO carbons
 COp=operator(spin_system,'L+',find(COs));
@@ -224,20 +225,21 @@ if ~isfield(parameters,'sweep')
     error('sweep widths must be specificed in parameters.sweep variable.');
 end
 if (~isnumeric(parameters.sweep))||(~isvector(parameters.sweep))||(~isreal(parameters.sweep))||...
-   (numel(parameters.sweep)~=3)
-    error('parameters.sweep must be a vector of three real numbers.');
+   (numel(parameters.sweep)~=3)||any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
+    error('parameters.sweep must be a vector of three positive real numbers.');
 end
 if ~isfield(parameters,'tau')
     error('sequence delays must be specificed in parameters.tau variable.');
 end
 if (~isnumeric(parameters.tau))||(~isvector(parameters.tau))||(~isreal(parameters.tau))||...
-   (numel(parameters.tau)~=3)
-    error('parameters.tau must be a vector of three real numbers.');
+   (numel(parameters.tau)~=3)||any(~isfinite(parameters.tau))||any(parameters.tau<=0)
+    error('parameters.tau must be a vector of three positive real numbers.');
 end
 if ~isfield(parameters,'f1_decouple')
     error('F1 decoupling switch must be supplied in parameters.f1_decouple variable.');
 end
-if (~isnumeric(parameters.f1_decouple))||(~isscalar(parameters.f1_decouple))||...
+if ((~isnumeric(parameters.f1_decouple))&&(~islogical(parameters.f1_decouple)))||...
+   (~isscalar(parameters.f1_decouple))||...
    ((parameters.f1_decouple~=0)&&(parameters.f1_decouple~=1))
     error('parameters.f1_decouple must be set to 1 or 0.');
 end

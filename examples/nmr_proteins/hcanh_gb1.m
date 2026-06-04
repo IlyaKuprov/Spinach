@@ -1,4 +1,4 @@
-% Simulated H(CA)NH spectrum of of GB1 protein. It is assumed that
+% Simulated H(CA)NH spectrum of GB1 protein. It is assumed that
 % only the backbone is 13C,15N-labelled.
 %
 % Calculation time: minutes, faster with a Tesla A100 GPU.

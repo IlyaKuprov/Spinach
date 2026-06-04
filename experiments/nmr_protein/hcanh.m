@@ -23,7 +23,7 @@
 %
 %    parameters.spins       - isotopes affected by ideal broadband
 %                             pulses, specified as a cell array of
-%                             strings, e.g. {'1H'}.
+%                             strings, e.g. {'1H','15N','1H'}.
 %
 %    H   - Hamiltonian matrix, received from context function
 %
@@ -239,12 +239,13 @@ if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
 end
 if (~isnumeric(parameters.sweep))||(~isvector(parameters.sweep))||...
-   (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)
-    error('parameters.sweep must be a vector of three real numbers.');
+   (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)||...
+   any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
+    error('parameters.sweep must be a vector of three positive real numbers.');
 end
-if (~iscell(parameters.spins))||isempty(parameters.spins)||...
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=3)||...
    any(~cellfun(@ischar,parameters.spins))
-    error('parameters.spins must be a non-empty cell array of strings.');
+    error('parameters.spins must be a three-element cell array of strings.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
@@ -253,6 +254,9 @@ if (~isnumeric(parameters.npoints))||(~isvector(parameters.npoints))||...
    (~isreal(parameters.npoints))||(numel(parameters.npoints)~=3)||...
     any(parameters.npoints<1)||any(mod(parameters.npoints,1)~=0)
     error('parameters.npoints must be a vector of three positive integers.');
+end
+if ~isequal(parameters.spins,{'1H','15N','1H'})
+    error('parameters.spins must be set to {''1H'',''15N'',''1H''}.');
 end
 end
 

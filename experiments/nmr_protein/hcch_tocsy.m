@@ -26,10 +26,10 @@
 %                             seconds, see the pulse sequence diag-
 %                             ram, typically 1.1e-3
 %
-%    parameters.lamp        - 1H-13C spin-lock amplitude in Hz, ty-
-%                             pically 10000
+%    parameters.lamp        - 13C spin-lock amplitude in Hz, typi-
+%                             cally 10000
 %
-%    parameters.sl_tmix     - spin-lock mixing time, typically 2e-3
+%    parameters.sl_tmix     - carbon trim pulse time, typically 2e-3
 %                             seconds
 %
 %    parameters.dipsi_dur   - DIPSI period duration, typically
@@ -82,7 +82,7 @@ coil=state(spin_system,'L+','1H','cheap');
 
 % Pulse operators all protons
 Hp=operator(spin_system,'L+','1H');
-Hx=(Hp+Hp')/2; Hy=(Hp-Hp')/2i;
+Hx=(Hp+Hp')/2;
 
 % Pulse operators all carbons
 Cp=operator(spin_system,'L+','13C');
@@ -163,17 +163,19 @@ coil_stack=step(spin_system,Hx+Cx,coil_stack,-pi);
 % delta evolution backwards in time under adjoint Liouvillian
 coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.delta,1,'final');
 
-% Effective isotropic mixing Liouvillian
-spin_system=dictum(spin_system,{'1H'},'ignore');       % Ignore Zeeman term for 1H
-spin_system=dictum(spin_system,{'13C'},'ignore');      % Ignore Zeeman term for 13C
-spin_system=dictum(spin_system,{'1H','13C'},'strong'); % Enforce strong 1H-13C coupling
-L_isomix=hamiltonian(spin_system)+1i*R+1i*K;
+% Effective carbon isotropic mixing Liouvillian
+isomix_system=spin_system;
+isomix_system=dictum(isomix_system,{'13C'},'ignore');
+isomix_system=dictum(isomix_system,{'13C','13C'},'strong');
+isomix_system=dictum(isomix_system,{'1H','13C'},'ignore');
+isomix_system=dictum(isomix_system,{'1H','1H'},'ignore');
+L_isomix=hamiltonian(isomix_system)+1i*R+1i*K;
 
 % Evolution during isotropic mixing backwards in time under adjoint Liouvillian
-coil_stack=evolution(spin_system,L_isomix',[],coil_stack,-parameters.dipsi_dur,1,'final');
+coil_stack=evolution(isomix_system,L_isomix',[],coil_stack,-parameters.dipsi_dur,1,'final');
 
-% Spin lock backwards in time under adjoint Liouvillian
-coil_stack=evolution(spin_system,L'+2*pi*parameters.lamp*(Hy+Cy),[],coil_stack,...
+% Carbon trim pulse backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L'+2*pi*parameters.lamp*Cy,[],coil_stack,...
                      -parameters.sl_tmix,1,'final');
 
 % delta evolution backwards in time under adjoint Liouvillian
@@ -227,8 +229,9 @@ if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
 end
 if (~isnumeric(parameters.sweep))||(~isvector(parameters.sweep))||...
-   (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)
-    error('parameters.sweep must be a vector of three real numbers.');
+   (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)||...
+   any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
+    error('parameters.sweep must be a vector of three positive real numbers.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
@@ -243,28 +246,45 @@ if ~isfield(parameters,'J_ch')
 elseif numel(parameters.J_ch)~=1
     error('parameters.J_ch array should have exactly one element.');
 end
+if (~isnumeric(parameters.J_ch))||(~isreal(parameters.J_ch))||...
+   (~isfinite(parameters.J_ch))||(parameters.J_ch<=0)
+    error('parameters.J_ch must be a positive real scalar.');
+end
 if ~isfield(parameters,'delta')
     error('delta delay should be specified in parameters.delta variable.');
 elseif numel(parameters.delta)~=1
     error('parameters.delta array should have exactly one element.');
+end
+if (~isnumeric(parameters.delta))||(~isreal(parameters.delta))||...
+   (~isfinite(parameters.delta))||(parameters.delta<=0)
+    error('parameters.delta must be a positive real scalar.');
 end
 if ~isfield(parameters,'sl_tmix')
     error('spin lock duration should be specified in parameters.sl_tmix variable.');
 elseif numel(parameters.sl_tmix)~=1
     error('parameters.sl_tmix array should have exactly one element.');
 end
+if (~isnumeric(parameters.sl_tmix))||(~isreal(parameters.sl_tmix))||...
+   (~isfinite(parameters.sl_tmix))||(parameters.sl_tmix<=0)
+    error('parameters.sl_tmix must be a positive real scalar.');
+end
 if ~isfield(parameters,'lamp')
     error('amplitude should be specified in parameters.lamp variable.');
 elseif numel(parameters.lamp)~=1
     error('parameters.lamp array should have exactly one element.');
+end
+if (~isnumeric(parameters.lamp))||(~isreal(parameters.lamp))||...
+   (~isfinite(parameters.lamp))||(parameters.lamp<=0)
+    error('parameters.lamp must be a positive real scalar.');
 end
 if ~isfield(parameters,'dipsi_dur')
     error('DIPSI duration should be specified in parameters.dipsi_dur variable.');
 elseif numel(parameters.dipsi_dur)~=1
     error('parameters.dipsi_dur array should have exactly one element.');
 end
-if (~isnumeric(parameters.dipsi_dur))||(~isreal(parameters.dipsi_dur))
-    error('parameters.dipsi_dur must be a real scalar.');
+if (~isnumeric(parameters.dipsi_dur))||(~isreal(parameters.dipsi_dur))||...
+   (~isfinite(parameters.dipsi_dur))||(parameters.dipsi_dur<=0)
+    error('parameters.dipsi_dur must be a positive real scalar.');
 end
 if ~isfield(parameters,'decouple_f3')
     error('decoupling list should be specified in parameters.decouple_f3 variable.');
@@ -273,9 +293,11 @@ if (~iscell(parameters.decouple_f3))||...
    any(~cellfun(@ischar,parameters.decouple_f3))
     error('parameters.decouple_f3 must be a cell array of strings.');
 end
+if ~isequal(parameters.spins,{'1H','13C','1H'})
+    error('parameters.spins must be set to {''1H'',''13C'',''1H''}.');
+end
 end
 
 % Talk is cheap, show me the code!
 %
 % Linus Torvalds
-

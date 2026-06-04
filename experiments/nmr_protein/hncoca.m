@@ -251,7 +251,7 @@ if ~isfield(parameters,'sweep')
 end
 if (~isnumeric(parameters.sweep))||(~isvector(parameters.sweep))||...
    (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)||...
-   any(parameters.sweep<=0)
+   any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
     error('parameters.sweep must be a vector of three positive real numbers.');
 end
 if ~isfield(parameters,'tau')
@@ -259,7 +259,7 @@ if ~isfield(parameters,'tau')
 end
 if (~isnumeric(parameters.tau))||(~isvector(parameters.tau))||...
    (~isreal(parameters.tau))||(numel(parameters.tau)~=4)||...
-   any(parameters.tau<=0)
+   any(~isfinite(parameters.tau))||any(parameters.tau<=0)
     error('parameters.tau must be a vector of four positive real numbers.');
 end
 end

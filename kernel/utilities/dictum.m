@@ -48,6 +48,7 @@ if isnumeric(spins)&&(numel(spins)==2)
                                  
     % Modify the assumption
     spin_system.inter.coupling.strength{spins(1),spins(2)}=strength;
+    spin_system.inter.coupling.strength{spins(2),spins(1)}=strength;
     
     % Report the new assumption
     report(spin_system,['changed on user''s request to: ' spin_system.inter.coupling.strength{spins(1),spins(2)}]);
@@ -79,6 +80,7 @@ elseif iscell(spins)&&(numel(spins)==2)
             
             % Modify the assumption
             spin_system.inter.coupling.strength{n,k}=strength;
+            spin_system.inter.coupling.strength{k,n}=strength;
             
             % Report the new assumption
             report(spin_system,['changed on user''s request to: ' spin_system.inter.coupling.strength{n,k}]);

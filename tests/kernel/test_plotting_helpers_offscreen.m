@@ -88,6 +88,30 @@ result=test_true(result,'kcolourbar object',isscalar(colour_obj),...
                  'kcolourbar creates one colour-bar object');
 close(fig);
 
+% Exercise kgrid before a three-dimensional caller adds data
+fig=kfigure('Visible','off');
+hold('on'); kgrid();
+plot3([0 1],[0 1],[0 1],'k-');
+drawnow();
+ax=gca();
+grid_state=getappdata(ax,'SpinachKGrid');
+listener_events=cellfun(@(listener)listener.EventName,grid_state.listeners,...
+                        'UniformOutput',false);
+major_data=get(grid_state.major_line,'XData');
+cam_before=get(ax,'CameraPosition');
+for n=1:12
+    camorbit(ax,5,3,'camera');
+    drawnow();
+end
+cam_after=get(ax,'CameraPosition');
+result=test_true(result,'kgrid pre-plot major strip',~isempty(major_data),...
+                 'kgrid creates a major grid strip when plot3 data arrives after kgrid');
+result=test_true(result,'kgrid no redraw listener',~any(strcmp(listener_events,'MarkedClean')),...
+                 'kgrid does not listen to redraw events during camera motion');
+result=test_true(result,'kgrid camera motion',norm(cam_after-cam_before)>0,...
+                 'caller-created kgrid axes remain responsive to camera motion');
+close(fig);
+
 end
 
 

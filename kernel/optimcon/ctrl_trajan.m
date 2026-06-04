@@ -144,6 +144,9 @@ if ismember('spectrogram',spin_system.control.plotting)
         % Increment plot number
         current_plot=current_plot+1;
 
+        % Disable the toolbar
+        ax=gca; ax.Toolbar=[];
+
     end
 
 end
@@ -302,6 +305,9 @@ if ismember('xy_controls',spin_system.control.plotting)
 
     % Increment plot counter
     current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
     
 end
 
@@ -374,6 +380,9 @@ if ismember('phi_controls',spin_system.control.plotting)
 
     % Increment plot counter
     current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
     
 end
 
@@ -442,6 +451,9 @@ if ismember('amp_controls',spin_system.control.plotting)
     
     % Increment plot counter
     current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
     
 end
 
@@ -478,6 +490,9 @@ if ismember('correlation_order',spin_system.control.plotting)
     
     % Increment plot counter
     current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
     
 end
 
@@ -514,6 +529,9 @@ if ismember('coherence_order',spin_system.control.plotting)
     
     % Increment plot counter
     current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
     
 end
 
@@ -550,6 +568,9 @@ if ismember('local_each_spin',spin_system.control.plotting)
     
     % Increment plot counter
     current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
     
 end
 
@@ -586,6 +607,9 @@ if ismember('total_each_spin',spin_system.control.plotting)
     
     % Increment plot counter
     current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
     
 end
 
@@ -622,6 +646,9 @@ if ismember('level_populations',spin_system.control.plotting)
     
     % Increment plot counter
     current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
     
 end
 
@@ -645,6 +672,9 @@ if ismember('robustness',spin_system.control.plotting)
     text(0.050,0.875,{['$\mu = '    num2str(mean(fidelities),4) '$'],...
                       ['$\sigma = ' num2str(std(fidelities),4)  '$']},...
                        'Interpreter','latex','Units','normalized');
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
 
 end
 

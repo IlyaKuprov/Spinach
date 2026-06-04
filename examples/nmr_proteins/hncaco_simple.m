@@ -47,10 +47,10 @@ parameters.axis_units='ppm';
 fid=liquid(spin_system,@hncaco,parameters,'nmr');
 
 % Apodisation
-fid.pos_pos=apodisation(spin_system,fid.pos_pos,{{'cos'},{'cos'},{'cos'}});
-fid.pos_neg=apodisation(spin_system,fid.pos_neg,{{'cos'},{'cos'},{'cos'}});
-fid.neg_pos=apodisation(spin_system,fid.neg_pos,{{'cos'},{'cos'},{'cos'}});
-fid.neg_neg=apodisation(spin_system,fid.neg_neg,{{'cos'},{'cos'},{'cos'}});
+fid.pos_pos=apodisation(spin_system,fid.pos_pos,{{'sqcos'},{'sqcos'},{'sqcos'}});
+fid.pos_neg=apodisation(spin_system,fid.pos_neg,{{'sqcos'},{'sqcos'},{'sqcos'}});
+fid.neg_pos=apodisation(spin_system,fid.neg_pos,{{'sqcos'},{'sqcos'},{'sqcos'}});
+fid.neg_neg=apodisation(spin_system,fid.neg_neg,{{'sqcos'},{'sqcos'},{'sqcos'}});
 
 % F3 Fourier transform
 f3_pos_pos=fftshift(fft(fid.pos_pos,parameters.zerofill(3),3),3);

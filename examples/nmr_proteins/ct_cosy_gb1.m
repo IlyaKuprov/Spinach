@@ -52,7 +52,7 @@ spin_system=basis(spin_system,bas);
 fid=liquid(spin_system,@ct_cosy,parameters,'nmr');
 
 % Apodisation
-fid=apodisation(spin_system,fid,{{'cos'},{'cos'}});
+fid=apodisation(spin_system,fid,{{'sqcos'},{'sqcos'}});
 
 % Fourier transform
 spectrum=fftn(fid,parameters.zerofill);

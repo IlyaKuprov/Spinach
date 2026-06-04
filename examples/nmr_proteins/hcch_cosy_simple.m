@@ -74,8 +74,8 @@ f3f2=f3f2_pos+conj(f3f2_neg);
 spectrum=fftshift(fft(f3f2,parameters.zerofill(1),1),1);
 
 % Plotting
-kfigure(); plot_3d(spin_system,real(spectrum),parameters,...
-                  10,[0.05 0.25 0.05 0.25],2,'positive');
+kfigure(); plot_3d(spin_system,imag(spectrum),parameters,...
+                   10,[0.05 0.25 0.05 0.25],2,'positive');
 
 end
 

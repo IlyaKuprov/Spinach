@@ -129,7 +129,7 @@ if ismember('spectrogram',spin_system.control.plotting)
         image(t_axis,f_axis,hsv2rgb(hsv)); box off;
         ktitle(['channels ' num2str(2*n-1) ',' num2str(2*n)]);
         set(gca,'YDir','normal','TickDir','out');
-        kylabel('frequency offset, Hz'); 
+        kylabel('frequency offset, Hz'); kbox;
         
         % Warn the user when the time axis is truncated
         if last_slice_to_plot==numel(spin_system.control.pulse_dt)
@@ -138,8 +138,8 @@ if ismember('spectrogram',spin_system.control.plotting)
             kxlabel('time, s (truncated)');
         end
 
-        % Physically relevant interval
-        xlim([0 sum(timing_grid)]-timing_grid(1)/2);
+        % Physically relevant time interval
+        xlim([0 sum(timing_grid)]);
 
         % Increment plot number
         current_plot=current_plot+1;

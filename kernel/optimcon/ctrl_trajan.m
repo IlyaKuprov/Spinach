@@ -126,10 +126,11 @@ if ismember('spectrogram',spin_system.control.plotting)
         hsv=cat(3,ones(size(phi)),ones(size(phi)),amp);
 
         % Plot the spectrogram
-        image(t_axis,f_axis,hsv2rgb(hsv));
+        image(t_axis,f_axis,hsv2rgb(hsv)); box off;
         ktitle(['channels ' num2str(2*n-1) ',' num2str(2*n)]);
-        kylabel('frequency offset, Hz'); set(gca,'YDir','normal');
-
+        set(gca,'YDir','normal','TickDir','out');
+        kylabel('frequency offset, Hz'); 
+        
         % Warn the user when the time axis is truncated
         if last_slice_to_plot==numel(spin_system.control.pulse_dt)
             kxlabel('time, seconds');

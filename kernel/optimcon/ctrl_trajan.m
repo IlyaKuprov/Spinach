@@ -34,8 +34,16 @@ if isempty(spin_system.control.plotting), return; end
 % Check consistency
 grumble(spin_system,waveform,traj_data,fidelities);
 
+% Trajectory is not plotted, that key exists to trigger a trajectory return
+spin_system.control.plotting=setdiff(spin_system.control.plotting,{'trajectory'});
+
 % Count the plots
-n_plots=numel(spin_system.control.plotting); 
+n_plots=numel(spin_system.control.plotting);
+
+% Exit if nothing to plot
+if n_plots==0, return; end
+
+% Find out how many plot panels are needed
 if ismember('spectrogram',spin_system.control.plotting)
     n_plots=n_plots+size(waveform,1)/2-1;
 end

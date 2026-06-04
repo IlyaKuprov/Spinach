@@ -49,13 +49,13 @@
 
 function fid=hncoca(spin_system,parameters,H,R,K)
 
-% Check consistency
+% Consistency check
 grumble(spin_system,parameters,H,R,K);
 
 % Compose Liouvillian
 L=H+1i*R+1i*K;
 
-% Evolution time discretization
+% Coherent evolution timesteps
 t1.nsteps=parameters.npoints(1); t1.timestep=1/parameters.sweep(1);
 t2.nsteps=parameters.npoints(2); t2.timestep=1/parameters.sweep(2);
 t3.nsteps=parameters.npoints(3); t3.timestep=1/parameters.sweep(3);
@@ -77,72 +77,148 @@ COs=strcmp('C',spin_system.comp.labels);
 CAs=strcmp('CA',spin_system.comp.labels);
 Ns=strcmp('N',spin_system.comp.labels);
 
-% Pulse operators
+% Pulse operators on 13CO carbons
 COp=operator(spin_system,'L+',find(COs));
+
+% Pulse operators on 13CA carbons
 CAp=operator(spin_system,'L+',find(CAs));
+
+% Pulse operators on all protons
 Hp=operator(spin_system,'L+','1H');
+
+% Pulse operators on all nitrogens
 Np=operator(spin_system,'L+','15N');
+
+% Cartesian pulse operators
 Hx=(Hp+Hp')/2; Hy=(Hp-Hp')/2i;
 Nx=(Np+Np')/2; Ny=(Np-Np')/2i;
 COx=(COp+COp')/2; CAx=(CAp+CAp')/2;
 
-% Run the first half forward
+%% Run the first half forward
+
+% Pulse on 1H
 rho=step(spin_system,Hx,parameters.rho0,pi/2);
+
+% tau1 evolution
 rho=evolution(spin_system,L,[],rho,parameters.tau(1),1,'final');
+
+% Inversion pulse on 1H, y inversion pulse on 15N
 rho=step(spin_system,Hx+Ny,rho,pi);
+
+% tau1 evolution
 rho=evolution(spin_system,L,[],rho,parameters.tau(1),1,'final');
+
+% Pulse on 15N, y pulse on 1H
 rho=step(spin_system,Hy+Nx,rho,pi/2);
+
+% tau2 evolution
 rho=evolution(spin_system,L,[],rho,parameters.tau(2),1,'final');
+
+% Coherence selection for States quadrature in F1
 rho_pos=coherence(spin_system,rho,{{find(Ns),+1}});
 rho_neg=coherence(spin_system,rho,{{find(Ns),-1}});
+
+% t1 evolution
 rho_stack_pos=evolution(spin_system,L,[],rho_pos,t1.timestep/2,t1.nsteps-1,'trajectory');
 rho_stack_neg=evolution(spin_system,L,[],rho_neg,t1.timestep/2,t1.nsteps-1,'trajectory');
+
+% Inversion pulse on 1H
 rho_stack_pos=step(spin_system,Hx,rho_stack_pos,pi);
 rho_stack_neg=step(spin_system,Hx,rho_stack_neg,pi);
+
+% t1 rest of the evolution
 rho_stack_pos=evolution(spin_system,L,[],rho_stack_pos,t1.timestep/2,t1.nsteps-1,'refocus');
 rho_stack_neg=evolution(spin_system,L,[],rho_stack_neg,t1.timestep/2,t1.nsteps-1,'refocus');
+
+% tau3 evolution
 rho_stack_pos=evolution(spin_system,L,[],rho_stack_pos,parameters.tau(3),1,'final');
 rho_stack_neg=evolution(spin_system,L,[],rho_stack_neg,parameters.tau(3),1,'final');
+
+% Inversion pulses on 15N and 13CO
 rho_stack_pos=step(spin_system,Nx+COx,rho_stack_pos,pi);
 rho_stack_neg=step(spin_system,Nx+COx,rho_stack_neg,pi);
+
+% tau2 evolution
 rho_stack_pos=evolution(spin_system,L,[],rho_stack_pos,parameters.tau(2),1,'final');
 rho_stack_neg=evolution(spin_system,L,[],rho_stack_neg,parameters.tau(2),1,'final');
+
+% tau3 evolution
 rho_stack_pos=evolution(spin_system,L,[],rho_stack_pos,parameters.tau(3),1,'final');
 rho_stack_neg=evolution(spin_system,L,[],rho_stack_neg,parameters.tau(3),1,'final');
+
+% Pulses on 15N and 13CO
 rho_stack_pos=step(spin_system,Nx+COx,rho_stack_pos,pi/2);
 rho_stack_neg=step(spin_system,Nx+COx,rho_stack_neg,pi/2);
+
+% tau4 evolution
 rho_stack_pos=evolution(spin_system,L,[],rho_stack_pos,parameters.tau(4),1,'final');
 rho_stack_neg=evolution(spin_system,L,[],rho_stack_neg,parameters.tau(4),1,'final');
+
+% Pulse on 13CA
 rho_stack_pos=step(spin_system,CAx,rho_stack_pos,pi/2);
 rho_stack_neg=step(spin_system,CAx,rho_stack_neg,pi/2);
 
-% Run the second half backward
+%% Run the second half backward
+
+% Get decoupled evolution generator
 [L_dec,coil]=decouple(spin_system,L,parameters.coil,find(strcmp('15N',spin_system.comp.isotopes)));
+
+% Detection on 1H backwards in time under adjoint Liouvillian
 coil_stack=evolution(spin_system,L_dec',[],coil,-t3.timestep,t3.nsteps-1,'trajectory');
+
+% tau1 evolution backwards in time under adjoint Liouvillian
 coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.tau(1),1,'final');
+
+% Backward inversion pulses on 1H and 15N
 coil_stack=step(spin_system,Hx+Nx,coil_stack,-pi);
+
+% tau1 evolution backwards in time under adjoint Liouvillian
 coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.tau(1),1,'final');
+
+% Backward pulses on 1H and 15N
 coil_stack=step(spin_system,Hx+Nx,coil_stack,-pi/2);
+
+% tau2 evolution backwards in time under adjoint Liouvillian
 coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.tau(2),1,'final');
+
+% Backward inversion pulse on 1H
 coil_stack=step(spin_system,Hx,coil_stack,-pi);
+
+% tau3 evolution backwards in time under adjoint Liouvillian
 coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.tau(3),1,'final');
+
+% Backward inversion pulses on 15N and 13CO
 coil_stack=step(spin_system,Nx+COx,coil_stack,-pi);
+
+% tau2 evolution backwards in time under adjoint Liouvillian
 coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.tau(2),1,'final');
+
+% tau3 evolution backwards in time under adjoint Liouvillian
 coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.tau(3),1,'final');
+
+% Backward pulses on 15N and 13CO
 coil_stack=step(spin_system,Nx+COx,coil_stack,-pi/2);
+
+% tau4 evolution backwards in time under adjoint Liouvillian
 coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.tau(4),1,'final');
+
+% Backward pulse on 13CA
 coil_stack=step(spin_system,CAx,coil_stack,-pi/2);
+
+% Coherence selection for States quadrature in F2
 coil_stack_pos=coherence(spin_system,coil_stack,{{find(CAs),+1}});
 coil_stack_neg=coherence(spin_system,coil_stack,{{find(CAs),-1}});
 
-% Stitch the halves
+%% Stitch the halves
+
+% Stitching
 report(spin_system,'stitching forward and backward trajectories...');
 fid.pos_pos=stitch(spin_system,L,rho_stack_pos,coil_stack_pos,{COx+Hx},{pi},t1,t2,t3);
 fid.pos_neg=stitch(spin_system,L,rho_stack_pos,coil_stack_neg,{COx+Hx},{pi},t1,t2,t3);
 fid.neg_pos=stitch(spin_system,L,rho_stack_neg,coil_stack_pos,{COx+Hx},{pi},t1,t2,t3);
 fid.neg_neg=stitch(spin_system,L,rho_stack_neg,coil_stack_neg,{COx+Hx},{pi},t1,t2,t3);
 
-% Permute dimensions
+% Dimension reordering
 fid_names=fieldnames(fid);
 for name_idx=1:numel(fid_names)
     fid.(fid_names{name_idx})=permute(fid.(fid_names{name_idx}),[3 2 1]);

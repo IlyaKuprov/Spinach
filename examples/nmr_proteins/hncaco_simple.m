@@ -59,15 +59,15 @@ f3_neg_pos=fftshift(fft(fid.neg_pos,parameters.zerofill(3),3),3);
 f3_neg_neg=fftshift(fft(fid.neg_neg,parameters.zerofill(3),3),3);
 
 % Absorption part of F3 signal
-f3_pos=f3_pos_pos+conj(f3_neg_neg);
-f3_neg=f3_neg_pos+conj(f3_pos_neg);
+f3_pos=f3_pos_pos+1i*conj(f3_neg_neg);
+f3_neg=f3_neg_pos-conj(f3_pos_neg);
 
 % F2 Fourier transform
 f3f2_pos=fftshift(fft(f3_pos,parameters.zerofill(2),2),2);
 f3f2_neg=fftshift(fft(f3_neg,parameters.zerofill(2),2),2);
 
 % Absorption part of F2 signal
-f3f2=f3f2_pos+conj(f3f2_neg);
+f3f2=f3f2_pos+1i*conj(f3f2_neg);
 
 % F1 Fourier transform
 spectrum=fftshift(fft(f3f2,parameters.zerofill(1),1),1);

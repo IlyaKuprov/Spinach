@@ -283,7 +283,7 @@ end
 function footer(spin_system,exitflag,data)
 report(spin_system,'----------------------------------------------------------------------------------------------');
 switch(spin_system.control.method)
-    case 'lbfgs',   data.algorithm='LBFGS method';
+    case 'lbfgs',   data.algorithm='Low-memory unregularised BFGS method';
     case 'rbfgs',   data.algorithm='Regularised BFGS method';
     case 'newton',  data.algorithm='Regularised Newton-Raphson method';
     case 'goodwin', data.algorithm='Regularised Newton-Raphson method with Goodwin acceleration';
@@ -300,7 +300,7 @@ report(spin_system,['    Iterations         : ' int2str(data.count.iter)]);
 report(spin_system,['    Function Count     : ' int2str(data.count.fx)]);
 report(spin_system,['    Gradient Count     : ' int2str(data.count.gfx)]);
 report(spin_system,['    Hessian Count      : ' int2str(data.count.hfx)]);
-report(spin_system,'========================================================================================');
+report(spin_system,'==============================================================================================');
 end
 
 % Iteration report function

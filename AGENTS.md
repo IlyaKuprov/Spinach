@@ -38,11 +38,9 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Default values:** Defaults are forbidden: *Spinach* has a policy of never guessing or assuming anything. If some variable is missing from the user input, that is an error. Simply rely on *Matlab* to catch it: if a variable is used but not supplied, *Matlab* would throw a natural informative error. Your grumbler calls should assume that all variables specified in the function signature are present.
 
-* **No residual garbage:** Do not leave any dead code, unused variables, or other redundant items in the functions you create or edit. Trivial helper functions are forbidden. Never create a separate function that is only called once.
+* **No bloat, no garbage:** You code must be minimalist. Do not leave any dead code, unused variables, or other redundant items in the functions you create or edit. Trivial helper functions are forbidden. Never create a separate function or a helper that is only called once. Do not create new features where existing *Spinach* features may be used. Never implement any option or structure you have not been directly asked to implement. Never add anything that does not need to be added. The use of `varargin` and `varargout` is forbidden. Avoid object-oriented nonsense and use strict functional programming everywhere.
 
 * **Preserve correct physics:** When making code changes, do not break the physics behind the code. Before making an edit or a refactor, understand the physical meaning of the code you are touching and confirm that the edit you are about to make is appropriate and correct from the physics point of view. Run a direct function-load/call check for every changed function after you touch that function's structure.
-
-* **No stupid creativity:** Do not create new features where existing *Spinach* features may be used. Never implement any option or structure you have not been directly asked to implement. Never add anything that does not need to be added. The use of `varargin` and `varargout` is forbidden. Avoid object-oriented nonsense and use strict functional programming everywhere.
 
 * **Always RTFM:** Before writing code, check Matlab manual and Spinach knowledge base to see if some or all of the required features already exist somewhere in *Matlab* or *Spinach*. If they do, call existing functions to minimize the size and complexity of your code. Make sure that the functions you are calling actually exist in *Matlab* or *Spinach*. Never call functions that do not exist without making them first.
 

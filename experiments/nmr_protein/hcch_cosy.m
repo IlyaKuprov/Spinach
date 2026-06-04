@@ -39,13 +39,12 @@
 %
 % Outputs:
 %
-%    fid - three-dimensional free induction decay
+%    fid - a structure with four fields: fid.pos_pos, fid.pos_neg,
+%          fid.neg_pos, fid.neg_neg that are used in the subsequ-
+%          ent States quadrature processing
 %
 % Note: spin labels must be set to PDB atom IDs ('CA', 'HA', etc.) in
 %       sys.labels for this sequence to work properly.
-%
-% TODO: whoever understands how phase cycles and quadratures work in
-%       3D NMR is welcome to add a phase-sensitive version.
 %
 % m.walker@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -94,29 +93,37 @@ COx=(COp+COp')/2;
 % Pulse on 1H 
 rho=step(spin_system,Hx,rho0,pi/2);
 
-% Coherence selection on protons
-rho=coherence(spin_system,rho,{{'1H',+1}});
+% Coherence selection for States quadrature in F1
+rho_pos=coherence(spin_system,rho,{{'1H',+1}});
+rho_neg=coherence(spin_system,rho,{{'1H',-1}});
 
 % t1 evolution
-rho_stack=evolution(spin_system,L,[],rho,t1.timestep/2,t1.nsteps-1,'trajectory');
+rho_stack_pos=evolution(spin_system,L,[],rho_pos,t1.timestep/2,t1.nsteps-1,'trajectory');
+rho_stack_neg=evolution(spin_system,L,[],rho_neg,t1.timestep/2,t1.nsteps-1,'trajectory');
 
 % Inversion pulse on 13C
-rho_stack=step(spin_system,Cx,rho_stack,pi);
+rho_stack_pos=step(spin_system,Cx,rho_stack_pos,pi);
+rho_stack_neg=step(spin_system,Cx,rho_stack_neg,pi);
 
 % t1 rest of the evolution
-rho_stack=evolution(spin_system,L,[],rho_stack,t1.timestep/2,t1.nsteps-1,'refocus');
+rho_stack_pos=evolution(spin_system,L,[],rho_stack_pos,t1.timestep/2,t1.nsteps-1,'refocus');
+rho_stack_neg=evolution(spin_system,L,[],rho_stack_neg,t1.timestep/2,t1.nsteps-1,'refocus');
 
 % tau evolution
-rho_stack=evolution(spin_system,L,[],rho_stack,tau_ch,1,'final');
+rho_stack_pos=evolution(spin_system,L,[],rho_stack_pos,tau_ch,1,'final');
+rho_stack_neg=evolution(spin_system,L,[],rho_stack_neg,tau_ch,1,'final');
 
 % Inversion pulses on 1H and 13C
-rho_stack=step(spin_system,Hx+Cx,rho_stack,pi);
+rho_stack_pos=step(spin_system,Hx+Cx,rho_stack_pos,pi);
+rho_stack_neg=step(spin_system,Hx+Cx,rho_stack_neg,pi);
 
 % tau evolution
-rho_stack=evolution(spin_system,L,[],rho_stack,tau_ch,1,'final');
+rho_stack_pos=evolution(spin_system,L,[],rho_stack_pos,tau_ch,1,'final');
+rho_stack_neg=evolution(spin_system,L,[],rho_stack_neg,tau_ch,1,'final');
 
 % Pulses on 1H and 13C
-rho_stack=step(spin_system,Hx+Cx,rho_stack,pi/2);
+rho_stack_pos=step(spin_system,Hx+Cx,rho_stack_pos,pi/2);
+rho_stack_neg=step(spin_system,Hx+Cx,rho_stack_neg,pi/2);
 
 %% Backward sim from coil up to t2 period 
 
@@ -168,12 +175,25 @@ coil_stack=step(spin_system,Cx,coil_stack,-pi);
 
 %% Stitch the halves
 
-% Coherence selection
-rho_stack=coherence(spin_system,rho_stack,{{'13C',+1}});
-coil_stack=coherence(spin_system,coil_stack,{{'13C',+1}});
+% Coherence selection for States quadrature in F2
+coil_stack_pos=coherence(spin_system,coil_stack,{{'13C',+1}});
+coil_stack_neg=coherence(spin_system,coil_stack,{{'13C',-1}});
 
 % Bidirectional evolution and stitching
-fid=stitch(spin_system,L,rho_stack,coil_stack,{COx,L,Hx},{pi,parameters.delta,pi},t1,t2,t3);
+fid.pos_pos=stitch(spin_system,L,rho_stack_pos,coil_stack_pos,...
+                   {COx,L,Hx},{pi,parameters.delta,pi},t1,t2,t3);
+fid.pos_neg=stitch(spin_system,L,rho_stack_pos,coil_stack_neg,...
+                   {COx,L,Hx},{pi,parameters.delta,pi},t1,t2,t3);
+fid.neg_pos=stitch(spin_system,L,rho_stack_neg,coil_stack_pos,...
+                   {COx,L,Hx},{pi,parameters.delta,pi},t1,t2,t3);
+fid.neg_neg=stitch(spin_system,L,rho_stack_neg,coil_stack_neg,...
+                   {COx,L,Hx},{pi,parameters.delta,pi},t1,t2,t3);
+
+% Dimension reordering
+fid_names=fieldnames(fid);
+for name_idx=1:numel(fid_names)
+    fid.(fid_names{name_idx})=permute(fid.(fid_names{name_idx}),[3 2 1]);
+end
 
 end
 

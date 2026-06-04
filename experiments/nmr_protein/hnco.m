@@ -1,4 +1,4 @@
-% Magnitude-mode HNCO pulse sequence from 
+% Phase-sensitive HNCO pulse sequence from
 %
 %             http://dx.doi.org/10.1016/0022-2364(90)90333-5
 %
@@ -38,13 +38,12 @@
 %
 % Outputs:
 %
-%    fid - three-dimensional free induction decay
+%    fid - a structure with four fields: fid.pos_pos, fid.pos_neg,
+%          fid.neg_pos, fid.neg_neg that are used in the subsequ-
+%          ent States quadrature processing
 %
 % Note: spin labels must be set to PDB atom IDs ('CA', 'HA', etc.) in
 %       sys.labels for this sequence to work properly.
-%
-% TODO: whoever understands how phase cycles and quadratures work in
-%       3D NMR is welcome to add a phase-sensitive version.
 %
 % ledwards@cbs.mpg.de
 % ilya.kuprov@weizmann.ac.il
@@ -69,16 +68,16 @@ rho=state(spin_system,'Lz','1H','cheap');
 coil=state(spin_system,'L+','1H','cheap');
 
 % Spin indices
-COs=strcmp('C',spin_system.comp.labels); 
+COs=strcmp('C',spin_system.comp.labels);
 CAs=strcmp('CA',spin_system.comp.labels);
 Ns=strcmp('N',spin_system.comp.labels);
 
 % Pulse operators
 COp=operator(spin_system,'L+',find(COs));
 CAp=operator(spin_system,'L+',find(CAs));
-Hp=operator(spin_system,'L+','1H'); 
-Np=operator(spin_system,'L+','15N'); 
-Nx=(Np+Np')/2; COx=(COp+COp')/2; 
+Hp=operator(spin_system,'L+','1H');
+Np=operator(spin_system,'L+','15N');
+Nx=(Np+Np')/2; COx=(COp+COp')/2;
 CAx=(CAp+CAp')/2; Hx=(Hp+Hp')/2;
 Hy=(Hp-Hp')/2i;
 
@@ -88,19 +87,27 @@ rho=evolution(spin_system,L,[],rho,parameters.tau(1),1,'final');
 rho=step(spin_system,Hx+Nx,rho,pi);
 rho=evolution(spin_system,L,[],rho,parameters.tau(1),1,'final');
 rho=step(spin_system,Hy+Nx,rho,pi/2);
-rho=coherence(spin_system,rho,{{find(Ns),1}});
-rho_stack=evolution(spin_system,L,[],rho,t1.timestep/2,t1.nsteps-1,'trajectory');
+rho_pos=coherence(spin_system,rho,{{find(Ns),+1}});
+rho_neg=coherence(spin_system,rho,{{find(Ns),-1}});
+rho_stack_pos=evolution(spin_system,L,[],rho_pos,t1.timestep/2,t1.nsteps-1,'trajectory');
+rho_stack_neg=evolution(spin_system,L,[],rho_neg,t1.timestep/2,t1.nsteps-1,'trajectory');
 if parameters.f1_decouple
-    rho_stack=step(spin_system,Hx+COx+CAx,rho_stack,pi);
+    rho_stack_pos=step(spin_system,Hx+COx+CAx,rho_stack_pos,pi);
+    rho_stack_neg=step(spin_system,Hx+COx+CAx,rho_stack_neg,pi);
 else
-    rho_stack=step(spin_system,COx+CAx,rho_stack,pi);
+    rho_stack_pos=step(spin_system,COx+CAx,rho_stack_pos,pi);
+    rho_stack_neg=step(spin_system,COx+CAx,rho_stack_neg,pi);
 end
-rho_stack=evolution(spin_system,L,[],rho_stack,t1.timestep/2,t1.nsteps-1,'refocus');
-rho_stack=evolution(spin_system,L,[],rho_stack,parameters.tau(2),1,'final');
-rho_stack=step(spin_system,CAx,rho_stack,pi);
-rho_stack=evolution(spin_system,L,[],rho_stack,parameters.tau(3),1,'final');
-rho_stack=step(spin_system,COx,rho_stack,pi/2);
-rho_stack=coherence(spin_system,rho_stack,{{find(COs),1}});
+rho_stack_pos=evolution(spin_system,L,[],rho_stack_pos,t1.timestep/2,t1.nsteps-1,'refocus');
+rho_stack_neg=evolution(spin_system,L,[],rho_stack_neg,t1.timestep/2,t1.nsteps-1,'refocus');
+rho_stack_pos=evolution(spin_system,L,[],rho_stack_pos,parameters.tau(2),1,'final');
+rho_stack_neg=evolution(spin_system,L,[],rho_stack_neg,parameters.tau(2),1,'final');
+rho_stack_pos=step(spin_system,CAx,rho_stack_pos,pi);
+rho_stack_neg=step(spin_system,CAx,rho_stack_neg,pi);
+rho_stack_pos=evolution(spin_system,L,[],rho_stack_pos,parameters.tau(3),1,'final');
+rho_stack_neg=evolution(spin_system,L,[],rho_stack_neg,parameters.tau(3),1,'final');
+rho_stack_pos=step(spin_system,COx,rho_stack_pos,pi/2);
+rho_stack_neg=step(spin_system,COx,rho_stack_neg,pi/2);
 
 % Run the second half backward
 [L_dec,coil]=decouple(spin_system,L,coil,{'15N','13C'});
@@ -113,14 +120,21 @@ coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.tau(2),1,'final');
 coil_stack=step(spin_system,CAx,coil_stack,-pi);
 coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.tau(3),1,'final');
 coil_stack=step(spin_system,COx,coil_stack,-pi/2);
-coil_stack=coherence(spin_system,coil_stack,{{find(COs),1}});
+coil_stack_pos=coherence(spin_system,coil_stack,{{find(COs),+1}});
+coil_stack_neg=coherence(spin_system,coil_stack,{{find(COs),-1}});
 
 % Stitch the halves
 report(spin_system,'stitching forward and backward trajectories...');
-fid=stitch(spin_system,L,rho_stack,coil_stack,{Nx+CAx},{pi},t1,t2,t3);
+fid.pos_pos=stitch(spin_system,L,rho_stack_pos,coil_stack_pos,{Nx+CAx},{pi},t1,t2,t3);
+fid.pos_neg=stitch(spin_system,L,rho_stack_pos,coil_stack_neg,{Nx+CAx},{pi},t1,t2,t3);
+fid.neg_pos=stitch(spin_system,L,rho_stack_neg,coil_stack_pos,{Nx+CAx},{pi},t1,t2,t3);
+fid.neg_neg=stitch(spin_system,L,rho_stack_neg,coil_stack_neg,{Nx+CAx},{pi},t1,t2,t3);
 
 % Permute dimensions
-fid=permute(fid,[3 2 1]);
+fid_names=fieldnames(fid);
+for name_idx=1:numel(fid_names)
+    fid.(fid_names{name_idx})=permute(fid.(fid_names{name_idx}),[3 2 1]);
+end
 
 end
 

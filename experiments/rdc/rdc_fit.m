@@ -1,8 +1,8 @@
-% Linear least squares fitter for residual dipolar couplings. Isotope 
-% pairs are arbitrary; multiple isotope pairs may be supplied at the
-% same time. Syntax:
+% Linear least squares fitter for residual dipolar couplings. Iso-
+% tope pairs are arbitrary heteronuclear; multiple isotope pairs
+% may be supplied at the same time. Syntax:
 %
-%                     S=rdc_fit(isotopes,xyz,rdc)
+%                    S=rdc_fit(isotopes,xyz,rdc)
 %
 % Parameters:
 %

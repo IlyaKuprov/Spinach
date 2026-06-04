@@ -88,6 +88,69 @@ result=test_true(result,'kcolourbar object',isscalar(colour_obj),...
                  'kcolourbar creates one colour-bar object');
 close(fig);
 
+% Exercise kgrid before a three-dimensional caller adds data
+fig=kfigure('Visible','off');
+hold('on'); kgrid();
+plot3([0 1],[0 1],[0 1],'k-');
+drawnow();
+ax=gca();
+grid_state=getappdata(ax,'SpinachKGrid');
+listener_events=cellfun(@(listener)listener.EventName,grid_state.listeners,...
+                        'UniformOutput',false);
+minor_data=get(grid_state.minor_line,'XData');
+major_data=get(grid_state.major_line,'XData');
+cam_before=get(ax,'CameraPosition');
+for n=1:12
+    camorbit(ax,5,3,'camera');
+    drawnow();
+end
+cam_after=get(ax,'CameraPosition');
+result=test_true(result,'kgrid pre-plot minor strip',nnz(isfinite(minor_data))>0,...
+                 'kgrid creates a minor grid strip when plot3 data arrives after kgrid');
+result=test_true(result,'kgrid pre-plot major strip',nnz(isfinite(major_data))>0,...
+                 'kgrid creates a major grid strip when plot3 data arrives after kgrid');
+result=test_true(result,'kgrid no redraw listener',~any(strcmp(listener_events,'MarkedClean')),...
+                 'kgrid does not listen to redraw events during camera motion');
+result=test_true(result,'kgrid camera motion',norm(cam_after-cam_before)>0,...
+                 'caller-created kgrid axes remain responsive to camera motion');
+close(fig);
+
+% Check that kgrid does not consume caller plot colours
+fig=kfigure('Visible','off');
+ax=axes('Parent',fig); hold(ax,'on');
+colour_order=get(ax,'ColorOrder');
+colour_idx=get(ax,'ColorOrderIndex');
+expected_colour=colour_order(1+mod(colour_idx-1,size(colour_order,1)),:);
+kgrid();
+data_line=plot(ax,[0 1],[0 1]);
+result=test_close(result,'kgrid colour order',get(data_line,'Color'),expected_colour,1e-12,1e-12,...
+                  'kgrid helper lines do not advance the caller colour order');
+close(fig);
+
+% Check that listened grid style changes refresh cached overlay data
+fig=kfigure('Visible','off');
+plot(0:10,0:10,'k-');
+kgrid(); ax=gca();
+set(ax,'MinorGridLineStyle',':','GridLineStyle','--');
+drawnow();
+grid_state=getappdata(ax,'SpinachKGrid');
+result=test_true(result,'kgrid cached minor style',strcmp(get(grid_state.minor_line,'LineStyle'),':'),...
+                 'kgrid refreshes minor line style after axes style changes');
+result=test_true(result,'kgrid cached major style',strcmp(get(grid_state.major_line,'LineStyle'),'--'),...
+                 'kgrid refreshes major line style after axes style changes');
+close(fig);
+
+% Check that ordinary axes clears remove the overlay
+fig=kfigure('Visible','off');
+plot(0:10,0:10,'k-');
+kgrid(); ax=gca();
+cla(ax); drawnow();
+result=test_true(result,'kgrid cla cleanup',~isappdata(ax,'SpinachKGrid')&&...
+                 isempty(findall(ax,'Tag','SpinachKGridMinor'))&&...
+                 isempty(findall(ax,'Tag','SpinachKGridMajor')),...
+                 'ordinary axes clearing removes kgrid overlay state and line strips');
+close(fig);
+
 end
 
 

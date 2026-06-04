@@ -59,11 +59,12 @@ for n=1:numel(lim_props)
     end
 end
 
-% Update only on data-space changes, not on camera motion
+% Update on data-space and camera changes
 props={'XLim','YLim','ZLim','XTick','YTick','ZTick',...
        'XMinorTick','YMinorTick','ZMinorTick','GridColor',...
-       'MinorGridColor','GridLineStyle','MinorGridLineStyle','LineWidth',...
-       'Children'};
+       'MinorGridColor','GridLineStyle','MinorGridLineStyle',...
+       'LineWidth','XDir','YDir','ZDir','View','CameraPosition',...
+       'CameraTarget','CameraUpVector','CameraViewAngle','Children'};
 state.listeners={};
 for n=1:numel(props)
     prop=findprop(ax,props{n});
@@ -104,19 +105,30 @@ end
 
 % Collect axes geometry
 xl=get(ax,'XLim'); yl=get(ax,'YLim'); zl=get(ax,'ZLim');
+is3d=(abs(get(ax,'View')*[0;1]-90)>sqrt(eps))||...
+     any(arrayfun(@(h)isprop(h,'ZData')&&~isempty(get(h,'ZData')),data_kids));
+
+% Select the plotting-box faces opposite to the camera
+face_pos=[];
+if is3d
+    cam_pos=get(ax,'CameraPosition');
+    box_ctr=[sum(xl)/2 sum(yl)/2 sum(zl)/2];
+    face_pos=[xl(1) yl(1) zl(1)];
+    if cam_pos(1)<box_ctr(1), face_pos(1)=xl(2); end
+    if cam_pos(2)<box_ctr(2), face_pos(2)=yl(2); end
+    if cam_pos(3)<box_ctr(3), face_pos(3)=zl(2); end
+end
 signature={numel(kids),xl,yl,zl,get(ax,'XTick'),get(ax,'YTick'),...
            get(ax,'ZTick'),get(ax,'XMinorTick'),get(ax,'YMinorTick'),...
            get(ax,'ZMinorTick'),get(ax,'XMinorGrid'),...
            get(ax,'YMinorGrid'),get(ax,'ZMinorGrid'),...
            get(ax,'GridLineStyle'),get(ax,'MinorGridLineStyle'),...
            get(ax,'LineWidth'),get(ax,'GridColor'),...
-           get(ax,'MinorGridColor')};
+           get(ax,'MinorGridColor'),get(ax,'View'),face_pos};
 if isfield(state,'signature')&&isequaln(signature,state.signature)
     state.busy=false; setappdata(ax,'SpinachKGrid',state); return
 end
 state.signature=signature;
-is3d=(abs(get(ax,'View')*[0;1]-90)>sqrt(eps))||...
-     any(arrayfun(@(h)isprop(h,'ZData')&&~isempty(get(h,'ZData')),data_kids));
 
 % Draw minor and major strips
 for k=1:2
@@ -129,12 +141,12 @@ for k=1:2
     end
     x=[]; y=[]; z=[];
     if is3d
-        for q=ticks{1}, [x,y,z]=local_seg(x,y,z,[q yl(1) zl(1)],[q yl(2) zl(1)]); end
-        for q=ticks{2}, [x,y,z]=local_seg(x,y,z,[xl(1) q zl(1)],[xl(2) q zl(1)]); end
-        for q=ticks{1}, [x,y,z]=local_seg(x,y,z,[q yl(1) zl(1)],[q yl(1) zl(2)]); end
-        for q=ticks{3}, [x,y,z]=local_seg(x,y,z,[xl(1) yl(1) q],[xl(2) yl(1) q]); end
-        for q=ticks{2}, [x,y,z]=local_seg(x,y,z,[xl(1) q zl(1)],[xl(1) q zl(2)]); end
-        for q=ticks{3}, [x,y,z]=local_seg(x,y,z,[xl(1) yl(1) q],[xl(1) yl(2) q]); end
+        for q=ticks{1}, [x,y,z]=local_seg(x,y,z,[q yl(1) face_pos(3)],[q yl(2) face_pos(3)]); end
+        for q=ticks{2}, [x,y,z]=local_seg(x,y,z,[xl(1) q face_pos(3)],[xl(2) q face_pos(3)]); end
+        for q=ticks{1}, [x,y,z]=local_seg(x,y,z,[q face_pos(2) zl(1)],[q face_pos(2) zl(2)]); end
+        for q=ticks{3}, [x,y,z]=local_seg(x,y,z,[xl(1) face_pos(2) q],[xl(2) face_pos(2) q]); end
+        for q=ticks{2}, [x,y,z]=local_seg(x,y,z,[face_pos(1) q zl(1)],[face_pos(1) q zl(2)]); end
+        for q=ticks{3}, [x,y,z]=local_seg(x,y,z,[face_pos(1) yl(1) q],[face_pos(1) yl(2) q]); end
     else
         for q=ticks{1}, x=[x q q nan]; y=[y yl nan]; end %#ok<AGROW>
         for q=ticks{2}, x=[x xl nan]; y=[y q q nan]; end %#ok<AGROW>

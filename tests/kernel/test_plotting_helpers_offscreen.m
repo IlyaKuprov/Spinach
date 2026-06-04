@@ -90,27 +90,34 @@ close(fig);
 
 % Exercise kgrid before a three-dimensional caller adds data
 fig=kfigure('Visible','off');
-hold('on'); kgrid();
-plot3([0 1],[0 1],[0 1],'k-');
-drawnow();
 ax=gca();
+hold(ax,'on'); kgrid();
+plot3(ax,[0 1],[0 1],[0 1],'k-');
+axis(ax,[0 1 0 1 0 1]);
+view(ax,[-35 25]);
+drawnow();
 grid_state=getappdata(ax,'SpinachKGrid');
-listener_events=cellfun(@(listener)listener.EventName,grid_state.listeners,...
-                        'UniformOutput',false);
 minor_data=get(grid_state.minor_line,'XData');
 major_data=get(grid_state.major_line,'XData');
+face_before=local_grid_faces(ax,grid_state.major_line);
+expected_before=local_expected_faces(ax);
 cam_before=get(ax,'CameraPosition');
-for n=1:12
-    camorbit(ax,5,3,'camera');
-    drawnow();
-end
+camorbit(ax,180,0,'camera');
+drawnow();
+grid_state=getappdata(ax,'SpinachKGrid');
+face_after=local_grid_faces(ax,grid_state.major_line);
+expected_after=local_expected_faces(ax);
 cam_after=get(ax,'CameraPosition');
 result=test_true(result,'kgrid pre-plot minor strip',nnz(isfinite(minor_data))>0,...
                  'kgrid creates a minor grid strip when plot3 data arrives after kgrid');
 result=test_true(result,'kgrid pre-plot major strip',nnz(isfinite(major_data))>0,...
                  'kgrid creates a major grid strip when plot3 data arrives after kgrid');
-result=test_true(result,'kgrid no redraw listener',~any(strcmp(listener_events,'MarkedClean')),...
-                 'kgrid does not listen to redraw events during camera motion');
+result=test_close(result,'kgrid initial 3D faces',face_before,expected_before,1e-12,1e-12,...
+                  'kgrid starts on the MATLAB back faces for the initial camera view');
+result=test_close(result,'kgrid rotated 3D faces',face_after,expected_after,1e-12,1e-12,...
+                  'kgrid follows MATLAB back-face switching during camera rotation');
+result=test_true(result,'kgrid face switch',~isequaln(face_before,face_after),...
+                 'camera rotation moves the kgrid overlay between plotting-box faces');
 result=test_true(result,'kgrid camera motion',norm(cam_after-cam_before)>0,...
                  'caller-created kgrid axes remain responsive to camera motion');
 close(fig);
@@ -344,6 +351,57 @@ spectrum=pos_peak-neg_peak;
 end
 
 
+function faces=local_grid_faces(ax,line_obj)
+
+% Read axis limits and grid line-strip data
+x_lim=get(ax,'XLim'); y_lim=get(ax,'YLim'); z_lim=get(ax,'ZLim');
+x_data=get(line_obj,'XData'); y_data=get(line_obj,'YData');
+z_data=get(line_obj,'ZData');
+
+% Count interior major ticks in each direction
+x_ticks=local_interior_ticks(get(ax,'XTick'),x_lim);
+y_ticks=local_interior_ticks(get(ax,'YTick'),y_lim);
+z_ticks=local_interior_ticks(get(ax,'ZTick'),z_lim);
+
+% Locate the first segment on each plotting-box face
+segments=reshape(1:numel(x_data),3,[]).';
+x_face=numel(x_ticks)+numel(y_ticks)+numel(x_ticks)+numel(z_ticks)+1;
+y_face=numel(x_ticks)+numel(y_ticks)+1;
+z_face=1;
+faces=[x_data(segments(x_face,1)) ...
+       y_data(segments(y_face,1)) ...
+       z_data(segments(z_face,1))];
+
+end
+
+
+function ticks=local_interior_ticks(ticks,axis_lim)
+
+% Keep finite tick locations away from the plotting-box boundary
+axis_tol=1024*eps(max([1 abs(axis_lim)]));
+ticks=double(ticks(:)).';
+ticks=ticks(isfinite(ticks)&(ticks>min(axis_lim)+axis_tol)&...
+            (ticks<max(axis_lim)-axis_tol));
+
+end
+
+
+function faces=local_expected_faces(ax)
+
+% Read the current plotting box and camera position
+x_lim=get(ax,'XLim'); y_lim=get(ax,'YLim'); z_lim=get(ax,'ZLim');
+cam_pos=get(ax,'CameraPosition');
+box_ctr=[sum(x_lim)/2 sum(y_lim)/2 sum(z_lim)/2];
+
+% Select the back face in each Cartesian direction
+faces=[x_lim(1) y_lim(1) z_lim(1)];
+if cam_pos(1)<box_ctr(1), faces(1)=x_lim(2); end
+if cam_pos(2)<box_ctr(2), faces(2)=y_lim(2); end
+if cam_pos(3)<box_ctr(3), faces(3)=z_lim(2); end
+
+end
+
+
 function local_cleanup(old_visibility)
 
 % Restore figure state after success or failure
@@ -351,5 +409,3 @@ close all force;
 set(groot,'defaultFigureVisible',old_visibility);
 
 end
-
-

@@ -62,10 +62,9 @@ for n=1:numel(props)
     end
 end
 state.listeners{end+1}=addlistener(ax,'MarkedClean',@(~,~)local_update(ax));
-state.busy=false;
-setappdata(ax,'SpinachKBox',state);
+state.busy=false; setappdata(ax,'SpinachKBox',state);
 
-% Draw the box immediately
+% Draw the box
 local_update(ax);
 
 end

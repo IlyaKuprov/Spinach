@@ -90,7 +90,7 @@ if strcmp(parameters.output,'detailed')
     deer.prob_pulse_fid=evolution(spin_system,L,parameters.coil_prob,rho,1/parameters.spectrum_sweep,...
                                   parameters.spectrum_nsteps,'observable');
     
-    % Apply a selective 180-degree pulse on the pump spin
+    % Apply a selective 90-degree pulse on the pump spin
     rho=step(spin_system,parameters.ex_pump,parameters.rho0,pi/2);
     
     % Return the free induction decay on the pump spin

@@ -19,20 +19,20 @@
 %                             the sweep widths in the three frequen-
 %                             cy dimensions, ordered as [f1 f2 f3]
 %
-%    parameters.J_ch        - 1H-13C J-coupling in Hz to be used for 
+%    parameters.J_ch        - 1H-13C J-coupling in Hz to be used for
 %                             magnetisation transfer, typically 140
 %
 %    parameters.delta       - coherence transfer evolution delay in
 %                             seconds, see the pulse sequence diag-
 %                             ram, typically 1.1e-3
 %
-%    parameters.lamp        - 1H-13C spin-lock amplitude in Hz, ty-
-%                             pically 10000
+%    parameters.lamp        - 13C spin-lock amplitude in Hz, typi-
+%                             cally 10000
 %
-%    parameters.sl_tmix     - spin-lock mixing time, typically 2e-3
+%    parameters.sl_tmix     - carbon trim pulse time, typically 2e-3
 %                             seconds
 %
-%    parameters.dipsi_dur   - DIPSI period duration, typically 
+%    parameters.dipsi_dur   - DIPSI period duration, typically
 %                             22.5e-3 seconds
 %
 %    parameters.decouple_f3 - list of spins to be decoupled during
@@ -46,13 +46,12 @@
 %
 % Outputs:
 %
-%    fid - three-dimensional free induction decay
+%    fid - a structure with four fields: fid.pos_pos, fid.pos_neg,
+%          fid.neg_pos, fid.neg_neg that are used in the subsequ-
+%          ent States quadrature processing
 %
 % Note: spin labels must be set to PDB atom IDs ('CA', 'HA', etc.) in
 %       sys.labels for this sequence to work properly.
-%
-% TODO: whoever understands how phase cycles and quadratures work in
-%       3D NMR is welcome to add a phase-sensitive version.
 %
 % m.walker@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -83,47 +82,55 @@ coil=state(spin_system,'L+','1H','cheap');
 
 % Pulse operators all protons
 Hp=operator(spin_system,'L+','1H');
-Hx=(Hp+Hp')/2; Hy=(Hp-Hp')/2i; 
+Hx=(Hp+Hp')/2;
 
 % Pulse operators all carbons
 Cp=operator(spin_system,'L+','13C');
 Cx=(Cp+Cp')/2; Cy=(Cp-Cp')/2i;
 
 % Selective pulse on CO carbons
-COs=strcmp('C',spin_system.comp.labels); 
+COs=strcmp('C',spin_system.comp.labels);
 COp=operator(spin_system,'L+',find(COs));
 COx=(COp+COp')/2;
 
-%% Forward sim from rho0 up to t2 period 
+%% Forward sim from rho0 up to t2 period
 
-% Pulse on 1H 
+% Pulse on 1H
 rho=step(spin_system,Hx,rho0,pi/2);
 
-% Coherence selection on protons
-rho=coherence(spin_system,rho,{{'1H',+1}});
+% Coherence selection for States quadrature in F1
+rho_pos=coherence(spin_system,rho,{{'1H',+1}});
+rho_neg=coherence(spin_system,rho,{{'1H',-1}});
 
 % tau evolution
-rho=evolution(spin_system,L,[],rho,tau_ch,1,'final');
+rho_pos=evolution(spin_system,L,[],rho_pos,tau_ch,1,'final');
+rho_neg=evolution(spin_system,L,[],rho_neg,tau_ch,1,'final');
 
 % First part of t1 evolution
-rho_stack=evolution(spin_system,L,[],rho,t1.timestep/2,t1.nsteps-1,'trajectory');
+rho_stack_pos=evolution(spin_system,L,[],rho_pos,t1.timestep/2,t1.nsteps-1,'trajectory');
+rho_stack_neg=evolution(spin_system,L,[],rho_neg,t1.timestep/2,t1.nsteps-1,'trajectory');
 
 % Inversion pulse on 13C
-rho_stack=step(spin_system,Cx,rho_stack,pi);
+rho_stack_pos=step(spin_system,Cx,rho_stack_pos,pi);
+rho_stack_neg=step(spin_system,Cx,rho_stack_neg,pi);
 
 % The rest of t1 evolution
-rho_stack=evolution(spin_system,L,[],rho_stack,t1.timestep/2,t1.nsteps-1,'refocus');    
+rho_stack_pos=evolution(spin_system,L,[],rho_stack_pos,t1.timestep/2,t1.nsteps-1,'refocus');
+rho_stack_neg=evolution(spin_system,L,[],rho_stack_neg,t1.timestep/2,t1.nsteps-1,'refocus');
 
 % Inversion pulse on 1H
-rho_stack=step(spin_system,Hx,rho_stack,pi);
+rho_stack_pos=step(spin_system,Hx,rho_stack_pos,pi);
+rho_stack_neg=step(spin_system,Hx,rho_stack_neg,pi);
 
 % tau evolution
-rho_stack=evolution(spin_system,L,[],rho_stack,tau_ch,1,'final');
+rho_stack_pos=evolution(spin_system,L,[],rho_stack_pos,tau_ch,1,'final');
+rho_stack_neg=evolution(spin_system,L,[],rho_stack_neg,tau_ch,1,'final');
 
 % Pulses on 1H and 13C
-rho_stack=step(spin_system,Hx+Cx,rho_stack,pi/2);
+rho_stack_pos=step(spin_system,Hx+Cx,rho_stack_pos,pi/2);
+rho_stack_neg=step(spin_system,Hx+Cx,rho_stack_neg,pi/2);
 
-%% Backward sim from coil up to t2 period 
+%% Backward sim from coil up to t2 period
 
 % Get decoupled evolution generator
 [L_dec,~]=decouple(spin_system,L,[],parameters.decouple_f3);
@@ -131,9 +138,9 @@ rho_stack=step(spin_system,Hx+Cx,rho_stack,pi/2);
 % Detection on 1H backwards in time under adjoint Liouvillian
 coil_stack=evolution(spin_system,L_dec',[],coil,-t3.timestep,...
                      t3.nsteps-1,'trajectory');
-                 
+
 % Select single quantum coherence
-coil_stack=coherence(spin_system,coil_stack,{{'1H',1}});                 
+coil_stack=coherence(spin_system,coil_stack,{{'1H',1}});
 
 % tau evolution backwards in time under adjoint Liouvillian
 coil_stack=evolution(spin_system,L',[],coil_stack,-tau_ch,1,'final');
@@ -156,17 +163,19 @@ coil_stack=step(spin_system,Hx+Cx,coil_stack,-pi);
 % delta evolution backwards in time under adjoint Liouvillian
 coil_stack=evolution(spin_system,L',[],coil_stack,-parameters.delta,1,'final');
 
-% Effective isotropic mixing Liouvillian
-spin_system=dictum(spin_system,{'1H'},'ignore');       % Ignore Zeeman term for 1H
-spin_system=dictum(spin_system,{'13C'},'ignore');      % Ignore Zeeman term for 13C
-spin_system=dictum(spin_system,{'1H','13C'},'strong'); % Enforce strong 1H-13C coupling
-L_isomix=hamiltonian(spin_system)+1i*R+1i*K;       
+% Effective carbon isotropic mixing Liouvillian
+isomix_system=spin_system;
+isomix_system=dictum(isomix_system,{'13C'},'ignore');
+isomix_system=dictum(isomix_system,{'13C','13C'},'strong');
+isomix_system=dictum(isomix_system,{'1H','13C'},'ignore');
+isomix_system=dictum(isomix_system,{'1H','1H'},'ignore');
+L_isomix=hamiltonian(isomix_system)+1i*R+1i*K;
 
 % Evolution during isotropic mixing backwards in time under adjoint Liouvillian
-coil_stack=evolution(spin_system,L_isomix',[],coil_stack,-parameters.dipsi_dur,1,'final');
+coil_stack=evolution(isomix_system,L_isomix',[],coil_stack,-parameters.dipsi_dur,1,'final');
 
-% Spin lock backwards in time under adjoint Liouvillian
-coil_stack=evolution(spin_system,L'+2*pi*parameters.lamp*(Hy+Cy),[],coil_stack,...
+% Carbon trim pulse backwards in time under adjoint Liouvillian
+coil_stack=evolution(spin_system,L'+2*pi*parameters.lamp*Cy,[],coil_stack,...
                      -parameters.sl_tmix,1,'final');
 
 % delta evolution backwards in time under adjoint Liouvillian
@@ -177,12 +186,25 @@ coil_stack=step(spin_system,Cx,coil_stack,-pi);
 
 %% Stitch the halves
 
-% Coherence selection
-rho_stack=coherence(spin_system,rho_stack,{{'13C',+1}});
-coil_stack=coherence(spin_system,coil_stack,{{'13C',+1}});
+% Coherence selection for States quadrature in F2
+coil_stack_pos=coherence(spin_system,coil_stack,{{'13C',+1}});
+coil_stack_neg=coherence(spin_system,coil_stack,{{'13C',-1}});
 
 % Bidirectional evolution and stitching
-fid=stitch(spin_system,L,rho_stack,coil_stack,{COx,L,Hx},{pi,parameters.delta,pi},t1,t2,t3);
+fid.pos_pos=stitch(spin_system,L,rho_stack_pos,coil_stack_pos,...
+                   {COx,L,Hx},{pi,parameters.delta,pi},t1,t2,t3);
+fid.pos_neg=stitch(spin_system,L,rho_stack_pos,coil_stack_neg,...
+                   {COx,L,Hx},{pi,parameters.delta,pi},t1,t2,t3);
+fid.neg_pos=stitch(spin_system,L,rho_stack_neg,coil_stack_pos,...
+                   {COx,L,Hx},{pi,parameters.delta,pi},t1,t2,t3);
+fid.neg_neg=stitch(spin_system,L,rho_stack_neg,coil_stack_neg,...
+                   {COx,L,Hx},{pi,parameters.delta,pi},t1,t2,t3);
+
+% Dimension reordering
+fid_names=fieldnames(fid);
+for name_idx=1:numel(fid_names)
+    fid.(fid_names{name_idx})=permute(fid.(fid_names{name_idx}),[3 2 1]);
+end
 
 end
 
@@ -207,8 +229,9 @@ if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
 end
 if (~isnumeric(parameters.sweep))||(~isvector(parameters.sweep))||...
-   (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)
-    error('parameters.sweep must be a vector of three real numbers.');
+   (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)||...
+   any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
+    error('parameters.sweep must be a vector of three positive real numbers.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
@@ -223,28 +246,45 @@ if ~isfield(parameters,'J_ch')
 elseif numel(parameters.J_ch)~=1
     error('parameters.J_ch array should have exactly one element.');
 end
+if (~isnumeric(parameters.J_ch))||(~isreal(parameters.J_ch))||...
+   (~isfinite(parameters.J_ch))||(parameters.J_ch<=0)
+    error('parameters.J_ch must be a positive real scalar.');
+end
 if ~isfield(parameters,'delta')
     error('delta delay should be specified in parameters.delta variable.');
 elseif numel(parameters.delta)~=1
     error('parameters.delta array should have exactly one element.');
+end
+if (~isnumeric(parameters.delta))||(~isreal(parameters.delta))||...
+   (~isfinite(parameters.delta))||(parameters.delta<=0)
+    error('parameters.delta must be a positive real scalar.');
 end
 if ~isfield(parameters,'sl_tmix')
     error('spin lock duration should be specified in parameters.sl_tmix variable.');
 elseif numel(parameters.sl_tmix)~=1
     error('parameters.sl_tmix array should have exactly one element.');
 end
+if (~isnumeric(parameters.sl_tmix))||(~isreal(parameters.sl_tmix))||...
+   (~isfinite(parameters.sl_tmix))||(parameters.sl_tmix<=0)
+    error('parameters.sl_tmix must be a positive real scalar.');
+end
 if ~isfield(parameters,'lamp')
     error('amplitude should be specified in parameters.lamp variable.');
 elseif numel(parameters.lamp)~=1
     error('parameters.lamp array should have exactly one element.');
+end
+if (~isnumeric(parameters.lamp))||(~isreal(parameters.lamp))||...
+   (~isfinite(parameters.lamp))||(parameters.lamp<=0)
+    error('parameters.lamp must be a positive real scalar.');
 end
 if ~isfield(parameters,'dipsi_dur')
     error('DIPSI duration should be specified in parameters.dipsi_dur variable.');
 elseif numel(parameters.dipsi_dur)~=1
     error('parameters.dipsi_dur array should have exactly one element.');
 end
-if (~isnumeric(parameters.dipsi_dur))||(~isreal(parameters.dipsi_dur))
-    error('parameters.dipsi_dur must be a real scalar.');
+if (~isnumeric(parameters.dipsi_dur))||(~isreal(parameters.dipsi_dur))||...
+   (~isfinite(parameters.dipsi_dur))||(parameters.dipsi_dur<=0)
+    error('parameters.dipsi_dur must be a positive real scalar.');
 end
 if ~isfield(parameters,'decouple_f3')
     error('decoupling list should be specified in parameters.decouple_f3 variable.');
@@ -253,9 +293,11 @@ if (~iscell(parameters.decouple_f3))||...
    any(~cellfun(@ischar,parameters.decouple_f3))
     error('parameters.decouple_f3 must be a cell array of strings.');
 end
+if ~isequal(parameters.spins,{'1H','13C','1H'})
+    error('parameters.spins must be set to {''1H'',''13C'',''1H''}.');
+end
 end
 
 % Talk is cheap, show me the code!
 %
 % Linus Torvalds
-

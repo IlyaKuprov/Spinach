@@ -55,7 +55,8 @@ t2.nsteps=parameters.npoints(2); t2.timestep=1./parameters.sweep(2);
 t3.nsteps=parameters.npoints(3); t3.timestep=1./parameters.sweep(3);
 
 % Hard-coded J-couplings and delays
-J_nh=92; tau=abs(1/(4*J_nh)); delta=abs(2/J_nh);
+J_nh=92; tau=abs(1/(4*J_nh));
+J_nca=11.5; delta=abs(1/(4*J_nca));
 
 % Initial condition - NH protons
 if ~isfield(parameters,'rho0')
@@ -164,8 +165,8 @@ coil_stack=step(spin_system,Hx+CAx,coil_stack,-pi/2);
 %% Stitch the halves
 
 % Coherence selection for States quadrature in F2
-coil_stack_pos=coherence(spin_system,coil_stack,{{'13C',+1}});
-coil_stack_neg=coherence(spin_system,coil_stack,{{'13C',-1}});
+coil_stack_pos=coherence(spin_system,coil_stack,{{find(CAs),+1}});
+coil_stack_neg=coherence(spin_system,coil_stack,{{find(CAs),-1}});
 
 % Stitching
 fid.pos_pos=stitch(spin_system,L,rho_stack_pos,coil_stack_pos,{Hx+Nx+COx},{pi},t1,t2,t3);
@@ -206,7 +207,7 @@ if ~isfield(parameters,'sweep')
 end
 if (~isnumeric(parameters.sweep))||(~isvector(parameters.sweep))||...
    (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)||...
-   any(parameters.sweep<=0)
+   any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
     error('parameters.sweep must be a vector of three positive real numbers.');
 end
 end

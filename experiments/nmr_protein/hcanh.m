@@ -1,6 +1,6 @@
-% Protein-specific H(CA)NH experiment (Figure 7.37 of "Protein NMR 
+% Protein-specific H(CA)NH experiment (Figure 7.37 of "Protein NMR
 % Spectroscopy", 2nd edition) using pre-set values of J-couplings
-% used in the magnetisation transfer stages. The simulation uses 
+% used in the magnetisation transfer stages. The simulation uses
 % the bidirectional propagation method described in
 %
 %              http://dx.doi.org/10.1016/j.jmr.2014.04.002
@@ -23,7 +23,7 @@
 %
 %    parameters.spins       - isotopes affected by ideal broadband
 %                             pulses, specified as a cell array of
-%                             strings, e.g. {'1H'}.
+%                             strings, e.g. {'1H','15N','1H'}.
 %
 %    H   - Hamiltonian matrix, received from context function
 %
@@ -33,13 +33,12 @@
 %
 % Outputs:
 %
-%    fid - three-dimensional free induction decay
+%    fid - a structure with four fields: fid.pos_pos, fid.pos_neg,
+%          fid.neg_pos, fid.neg_neg that are used in the subsequ-
+%          ent States quadrature processing
 %
 % Note: spin labels must be set to PDB atom IDs ('CA', 'HA', etc.) in
 %       sys.labels for this sequence to work properly.
-%
-% TODO: whoever understands how phase cycles and quadratures work in
-%       3D NMR is welcome to add a phase-sensitive version.
 %
 % m.walker@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -70,86 +69,102 @@ delta4=23.0e-3;           % Sequence description
 
 % Initial condition - CA protons
 if ~isfield(parameters,'rho0')
-    HAs=ismember(spin_system.comp.labels,{'HA','HA1','HA2','HA3'}); 
+    HAs=ismember(spin_system.comp.labels,{'HA','HA1','HA2','HA3'});
     parameters.rho0=state(spin_system,'Lz',find(HAs),'cheap');
 end
 
 % Detection state - NH protons
 if ~isfield(parameters,'coil')
-    HNs=ismember(spin_system.comp.labels,{'H'}); 
+    HNs=ismember(spin_system.comp.labels,{'H'});
     parameters.coil=state(spin_system,'L+',find(HNs),'cheap');
 end
 
 % Pulse operators all protons
 Hp=operator(spin_system,'L+',parameters.spins{1});
-Hx=(Hp+Hp')/2; Hy=(Hp-Hp')/2i; 
+Hx=(Hp+Hp')/2; Hy=(Hp-Hp')/2i;
 
 % Spin indices and pulse operator - only on CA carbons
-CAs=strcmp('CA',spin_system.comp.labels); 
+CAs=strcmp('CA',spin_system.comp.labels);
 CAp=operator(spin_system,'L+',find(CAs));
 CAx=(CAp+CAp')/2;
 
 % Pulse operators all N
 Np=operator(spin_system,'L+','15N');
-Nx=(Np+Np')/2; 
+Nx=(Np+Np')/2;
 
 % Spin indices on CO carbons
 COs=strcmp('C',spin_system.comp.labels);
 
-%% Forward sim from rho0 up to t2 period 
+%% Forward sim from rho0 up to t2 period
 
-% Pulse on 1H 
+% Pulse on 1H
 rho=step(spin_system,Hx,parameters.rho0,pi/2);
 
-% Coherence selection
-rho=coherence(spin_system,rho,{{'1H',1}});
+% Coherence selection for States quadrature in F1
+rho_pos=coherence(spin_system,rho,{{'1H',+1}});
+rho_neg=coherence(spin_system,rho,{{'1H',-1}});
 
 % tau1 evolution
-rho=evolution(spin_system,L,[],rho,tau1,1,'final');
+rho_pos=evolution(spin_system,L,[],rho_pos,tau1,1,'final');
+rho_neg=evolution(spin_system,L,[],rho_neg,tau1,1,'final');
 
 % t1 evolution
-rho_stack=evolution(spin_system,L,[],rho,t1.timestep/2,t1.nsteps-1,'trajectory');
+rho_stack_pos=evolution(spin_system,L,[],rho_pos,t1.timestep/2,t1.nsteps-1,'trajectory');
+rho_stack_neg=evolution(spin_system,L,[],rho_neg,t1.timestep/2,t1.nsteps-1,'trajectory');
 
 % Inversion pulse on 13CA
-rho_stack=step(spin_system,CAx,rho_stack,pi);
+rho_stack_pos=step(spin_system,CAx,rho_stack_pos,pi);
+rho_stack_neg=step(spin_system,CAx,rho_stack_neg,pi);
 
 % t1 rest of the evolution
-rho_stack=evolution(spin_system,L,[],rho_stack,t1.timestep/2,t1.nsteps-1,'refocus');    
+rho_stack_pos=evolution(spin_system,L,[],rho_stack_pos,t1.timestep/2,t1.nsteps-1,'refocus');
+rho_stack_neg=evolution(spin_system,L,[],rho_stack_neg,t1.timestep/2,t1.nsteps-1,'refocus');
 
 % Inversion pulse on 1H
-rho_stack=step(spin_system,Hx,rho_stack,pi);
+rho_stack_pos=step(spin_system,Hx,rho_stack_pos,pi);
+rho_stack_neg=step(spin_system,Hx,rho_stack_neg,pi);
 
 % tau1 evolution
-rho_stack=evolution(spin_system,L,[],rho_stack,tau1,1,'final');
+rho_stack_pos=evolution(spin_system,L,[],rho_stack_pos,tau1,1,'final');
+rho_stack_neg=evolution(spin_system,L,[],rho_stack_neg,tau1,1,'final');
 
 % Pulse on 13CA, y pulse on 1H
-rho_stack=step(spin_system,Hy+CAx,rho_stack,pi/2);
+rho_stack_pos=step(spin_system,Hy+CAx,rho_stack_pos,pi/2);
+rho_stack_neg=step(spin_system,Hy+CAx,rho_stack_neg,pi/2);
 
 % Decoupling of 13CO
-[L_decCO,rho_stack]=decouple(spin_system,L,rho_stack,find(COs));
+[L_decCO,rho_stack_pos]=decouple(spin_system,L,rho_stack_pos,find(COs));
+[~,rho_stack_neg]=decouple(spin_system,L,rho_stack_neg,find(COs));
 
 % delta1 evolution
-rho_stack=evolution(spin_system,L_decCO,[],rho_stack,delta1,1,'final');
+rho_stack_pos=evolution(spin_system,L_decCO,[],rho_stack_pos,delta1,1,'final');
+rho_stack_neg=evolution(spin_system,L_decCO,[],rho_stack_neg,delta1,1,'final');
 
 % Inversion pulse on 1H
-rho_stack=step(spin_system,Hx,rho_stack,pi);
+rho_stack_pos=step(spin_system,Hx,rho_stack_pos,pi);
+rho_stack_neg=step(spin_system,Hx,rho_stack_neg,pi);
 
 % delta2-delta1 evolution
-rho_stack=evolution(spin_system,L_decCO,[],rho_stack,delta2-delta1,1,'final');
+rho_stack_pos=evolution(spin_system,L_decCO,[],rho_stack_pos,delta2-delta1,1,'final');
+rho_stack_neg=evolution(spin_system,L_decCO,[],rho_stack_neg,delta2-delta1,1,'final');
 
 % Inversion pulses on 13CA and 15N
-rho_stack=step(spin_system,CAx+Nx,rho_stack,pi);
+rho_stack_pos=step(spin_system,CAx+Nx,rho_stack_pos,pi);
+rho_stack_neg=step(spin_system,CAx+Nx,rho_stack_neg,pi);
 
 % delta2 evolution
-rho_stack=evolution(spin_system,L_decCO,[],rho_stack,delta2,1,'final');
+rho_stack_pos=evolution(spin_system,L_decCO,[],rho_stack_pos,delta2,1,'final');
+rho_stack_neg=evolution(spin_system,L_decCO,[],rho_stack_neg,delta2,1,'final');
 
 % Pulses on 13CA and 15N
-rho_stack=step(spin_system,CAx+Nx,rho_stack,pi/2);
+rho_stack_pos=step(spin_system,CAx+Nx,rho_stack_pos,pi/2);
+rho_stack_neg=step(spin_system,CAx+Nx,rho_stack_neg,pi/2);
 
 % delta3 evolution
-rho_stack=evolution(spin_system,L_decCO,[],rho_stack,delta3,1,'final');
+rho_stack_pos=evolution(spin_system,L_decCO,[],rho_stack_pos,delta3,1,'final');
+rho_stack_neg=evolution(spin_system,L_decCO,[],rho_stack_neg,delta3,1,'final');
 
-%% Backward sim from coil up to t2 period 
+%% Backward sim from coil up to t2 period
 
 % Get decoupled evolution generator
 [L_decCA,~]=decouple(spin_system,L,[],find(CAs));
@@ -157,9 +172,9 @@ rho_stack=evolution(spin_system,L_decCO,[],rho_stack,delta3,1,'final');
 % Detection on 1H backwards in time under adjoint Liouvillian
 coil_stack=evolution(spin_system,L_decCA',[],parameters.coil,...
                      -t3.timestep,t3.nsteps-1,'trajectory');
-                 
+
 % Select single quantum coherence
-coil_stack=coherence(spin_system,coil_stack,{{parameters.spins{1},1}});                 
+coil_stack=coherence(spin_system,coil_stack,{{parameters.spins{1},1}});
 
 % tau2 evolution backwards in time under adjoint Liouvillian
 coil_stack=evolution(spin_system,L',[],coil_stack,-tau2,1,'final');
@@ -181,13 +196,25 @@ coil_stack=step(spin_system,Nx,coil_stack,-pi);
 
 %% Stitch the halves
 
-% Coherence selection
-rho_stack=coherence(spin_system,rho_stack,{{'15N',+1}});
-coil_stack=coherence(spin_system,coil_stack,{{'15N',+1}});
+% Coherence selection for States quadrature in F2
+coil_stack_pos=coherence(spin_system,coil_stack,{{'15N',+1}});
+coil_stack_neg=coherence(spin_system,coil_stack,{{'15N',-1}});
 
 % Stitching
-fid=stitch(spin_system,L_decCO,rho_stack,coil_stack,{Hx,L_decCO,CAx},...
-           {pi,abs(delta4-delta3),pi},t1,t2,t3);
+fid.pos_pos=stitch(spin_system,L_decCO,rho_stack_pos,coil_stack_pos,...
+                   {Hx,L_decCO,CAx},{pi,abs(delta4-delta3),pi},t1,t2,t3);
+fid.pos_neg=stitch(spin_system,L_decCO,rho_stack_pos,coil_stack_neg,...
+                   {Hx,L_decCO,CAx},{pi,abs(delta4-delta3),pi},t1,t2,t3);
+fid.neg_pos=stitch(spin_system,L_decCO,rho_stack_neg,coil_stack_pos,...
+                   {Hx,L_decCO,CAx},{pi,abs(delta4-delta3),pi},t1,t2,t3);
+fid.neg_neg=stitch(spin_system,L_decCO,rho_stack_neg,coil_stack_neg,...
+                   {Hx,L_decCO,CAx},{pi,abs(delta4-delta3),pi},t1,t2,t3);
+
+% Dimension reordering
+fid_names=fieldnames(fid);
+for name_idx=1:numel(fid_names)
+    fid.(fid_names{name_idx})=permute(fid.(fid_names{name_idx}),[3 2 1]);
+end
 
 end
 
@@ -212,12 +239,13 @@ if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');
 end
 if (~isnumeric(parameters.sweep))||(~isvector(parameters.sweep))||...
-   (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)
-    error('parameters.sweep must be a vector of three real numbers.');
+   (~isreal(parameters.sweep))||(numel(parameters.sweep)~=3)||...
+   any(~isfinite(parameters.sweep))||any(parameters.sweep<=0)
+    error('parameters.sweep must be a vector of three positive real numbers.');
 end
-if (~iscell(parameters.spins))||isempty(parameters.spins)||...
+if (~iscell(parameters.spins))||(numel(parameters.spins)~=3)||...
    any(~cellfun(@ischar,parameters.spins))
-    error('parameters.spins must be a non-empty cell array of strings.');
+    error('parameters.spins must be a three-element cell array of strings.');
 end
 if ~isfield(parameters,'npoints')
     error('number of points should be specified in parameters.npoints variable.');
@@ -227,14 +255,17 @@ if (~isnumeric(parameters.npoints))||(~isvector(parameters.npoints))||...
     any(parameters.npoints<1)||any(mod(parameters.npoints,1)~=0)
     error('parameters.npoints must be a vector of three positive integers.');
 end
+if ~isequal(parameters.spins,{'1H','15N','1H'})
+    error('parameters.spins must be set to {''1H'',''15N'',''1H''}.');
+end
 end
 
 % The running craze is a symptom of our deplorable age [...] Jogging
 % is not only undignified but absurd. It is a confession that people
 % feel that they lead displeasingly unhealthy lives, but are not pre-
 % pared to do anything preventative, rather than remedial, about it.
-% The answer for someone who thinks that he is overweight is to eat 
-% less for a while, not to leap around at unseemly exercises. And 
+% The answer for someone who thinks that he is overweight is to eat
+% less for a while, not to leap around at unseemly exercises. And
 % the way to eat less is, simply, to eat less.
 %
 % Geoffrey Wheatcroft

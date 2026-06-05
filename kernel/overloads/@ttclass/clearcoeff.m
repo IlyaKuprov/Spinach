@@ -1,9 +1,16 @@
-% Absorbs the physical coefficient of the tensor train into
-% its cores. Syntax: 
+% Absorbs physical coefficients into tensor train cores without
+% changing the value represented by the tensor train. Syntax:
 % 
 %                     tt=clearcoeff(tt)
 %
-% The value of the tensor train remains the same.
+% Parameters:
+%
+%    tt - tensor train object
+%
+% Outputs:
+%
+%    tt - tensor train object with each coefficient distributed
+%         into its cores and the coefficient array set to one
 %
 % d.savostyanov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -37,5 +44,5 @@ end
 %
 % Anonymous philosophy professor
 
-% #NGRUM #NHEAD
+% #NGRUM
 

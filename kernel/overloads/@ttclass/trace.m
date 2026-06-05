@@ -2,6 +2,14 @@
 %
 %                     tttrace=trace(tt)
 %
+% Parameters:
+%
+%    tt - tensor train operator
+%
+% Outputs:
+%
+%    tttrace - trace of the tensor train operator
+%
 % d.savostyanov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
@@ -48,5 +56,5 @@ end
 %
 % Leo Szilard
 
-% #NHEAD #NGRUM
+% #NGRUM
 

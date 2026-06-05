@@ -1,7 +1,7 @@
-% Instantaneous frequency trajectory from a complex time-domain 
-% signal. Uses product-phase finite differences. Syntax:
+% Instantaneous frequency trajectory from a complex time-domain
+% signal by regularised phase differentiation. Syntax:
 %
-%                   freq=inst_freq(signal,dt)
+%          freq=inst_freq(signal,dt,npoints,poly_order)
 %
 % Parameters:
 %
@@ -11,47 +11,40 @@
 %    dt     - time step duration between 
 %             signal points (seconds)
 %
+%    npoints    - odd number of signal points in the
+%                 local least-squares window
+%
+%    poly_order - local polynomial order used for
+%                 phase differentiation
+%
 % Outputs:
 %
 %    freq   - instantaneous frequency trajec-
 %             tory (Hz), same size as signal
 %             and on the same time grid
 %
-% Note: central second-order phase-difference approximation is 
-%       used in the interior, second-order one-sided approxi-
-%       mations are used at the boundaries; all formulas use
-%       one-step phase differences.
+% Note: signal phase is unwrapped first and then differentiated
+%       by Savitzky-Golay local least-squares polynomial fits.
+%       This regularises numerical phase noise before the deri-
+%       vative is taken.
 %
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=inst_freq.m>
 
-function freq=inst_freq(signal,dt)
+function freq=inst_freq(signal,dt,npoints,poly_order)
 
 % Check consistency
-grumble(signal,dt);
+grumble(signal,dt,npoints,poly_order);
 
 % Input into column
 signal_col=signal(:);
 
-% Preallocate output array
-freq=zeros(size(signal_col));
+% Unwrap the phase trajectory
+phase_col=unwrap(angle(signal_col));
 
-% Compute interior points using central second-order 
-% formula from one-step phase differences
-phase_fwd=angle(signal_col(3:end).*conj(signal_col(2:(end-1))));
-phase_bwd=angle(signal_col(2:(end-1)).*conj(signal_col(1:(end-2))));
-freq(2:(end-1))=(phase_fwd+phase_bwd)/(4*pi*dt);
-
-% Compute first point using forward second-order formula
-phase_01=angle(signal_col(2)*conj(signal_col(1)));
-phase_12=angle(signal_col(3)*conj(signal_col(2)));
-freq(1)=(3*phase_01-phase_12)/(4*pi*dt);
-
-% Compute last point using backward second-order formula
-phase_n1=angle(signal_col(end)*conj(signal_col(end-1)));
-phase_n2=angle(signal_col(end-1)*conj(signal_col(end-2)));
-freq(end)=(3*phase_n1-phase_n2)/(4*pi*dt);
+% Differentiate the phase using local least-squares fits
+freq=sgolaydiff(phase_col,1,npoints,poly_order)/(2*pi*dt);
 
 % Shape back to input shape
 freq=reshape(freq,size(signal));
@@ -59,7 +52,7 @@ freq=reshape(freq,size(signal));
 end
 
 % Consistency enforcement
-function grumble(signal,dt)
+function grumble(signal,dt,npoints,poly_order)
 if (~isnumeric(signal))||(~isvector(signal))||isempty(signal)||isreal(signal)
     error('signal must be a non-empty complex numeric vector.');
 end
@@ -71,6 +64,23 @@ if any(~isfinite(signal))
 end
 if (~isnumeric(dt))||(~isreal(dt))||(~isscalar(dt))||(~isfinite(dt))||(dt<=0)
     error('dt must be a positive real scalar.');
+end
+if (~isnumeric(npoints))||(~isreal(npoints))||(numel(npoints)~=1)||...
+   (npoints<3)||(mod(npoints,1)~=0)
+    error('npoints must be a positive odd integer greater than two.');
+end
+if mod(npoints,2)~=1
+    error('npoints must be an odd integer.');
+end
+if npoints>numel(signal)
+    error('npoints must not exceed the number of signal points.');
+end
+if (~isnumeric(poly_order))||(~isreal(poly_order))||(numel(poly_order)~=1)||...
+   (poly_order<1)||(mod(poly_order,1)~=0)
+    error('poly_order must be a positive real integer.');
+end
+if poly_order>=npoints
+    error('poly_order must be smaller than npoints.');
 end
 end
 

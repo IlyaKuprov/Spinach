@@ -218,7 +218,7 @@ base_freq=3;
 chirp_rate=4;
 signal=exp(1i*2*pi*(base_freq*time_axis+0.5*chirp_rate*time_axis.^2));
 freq_ref=base_freq+chirp_rate*time_axis;
-freq=inst_freq(signal,sample_dt);
+freq=inst_freq(signal,sample_dt,5,2);
 result=test_close(result,'inst_freq chirp',freq,freq_ref,1e-10,1e-10,...
                   'inst_freq must recover the exact frequency of a quadratic phase');
 
@@ -278,6 +278,22 @@ plot_system.control.freeze=[];
 plot_wave=[1 2 3; -1 0 1];
 ctrl_trajan(plot_system,plot_wave,{struct()},0.5);
 result.messages{end+1}='PASS: ctrl_trajan xy_controls -- plotting smoke path completed offscreen';
+
+% Check instantaneous frequency plotting on a linear phase track
+time_step=1e-4;
+npoints=65;
+freq_ref=123.4;
+time_axis=(0:(npoints-1))*time_step;
+signal=exp(2i*pi*freq_ref*time_axis);
+plot_system.control.plotting={'frq_controls'};
+plot_system.control.pulse_dt=time_step*ones(1,npoints);
+plot_wave=[real(signal); -imag(signal)];
+ctrl_trajan(plot_system,plot_wave,{struct()},0.5);
+line_obj=findobj(gca,'Type','line');
+freq_plot=get(line_obj(1),'YData');
+result=test_close(result,'ctrl_trajan frq_controls',freq_plot,freq_ref*ones(size(freq_plot)),...
+                  1e-10,1e-10,...
+                  'ctrl_trajan must recover the instantaneous frequency of a linear phase');
 
 end
 

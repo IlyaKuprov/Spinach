@@ -391,9 +391,9 @@ end
             case 'frequency'
 
                 freq_grid=(time_grid(1:(end-1))+time_grid(2:end))/2;
-                inst_freq=diff(pulse_phase)./(2*pi*diff(time_grid));
+                inst_frq=diff(pulse_phase)./(2*pi*diff(time_grid));
                 set(plot_line,'XData',freq_grid,...
-                              'YData',inst_freq);
+                              'YData',inst_frq);
                 if ~strcmp(shown_mode,'frequency')
                     set(ylabel_handle,'String','instantaneous frequency, Hz');
                     delete(legend_handle);

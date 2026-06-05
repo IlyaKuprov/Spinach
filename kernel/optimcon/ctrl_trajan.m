@@ -469,6 +469,16 @@ if ismember('frq_controls',spin_system.control.plotting)
     % Get the time grid stepping
     dt=spin_system.control.pulse_dt(1);
 
+    % Set half-window to the geometric mean of one slice and pulse duration
+    win_half=ceil(sqrt(last_slice_to_plot));
+
+    % Count the local least-squares averaging window
+    npoints=min(last_slice_to_plot,2*win_half+1);
+    if mod(npoints,2)==0, npoints=npoints-1; end
+
+    % Set the local polynomial order
+    poly_order=min(3,npoints-2);
+
     % Preallocate the instantaneous frequency array
     frq_profile=zeros(size(waveform,1)/2,last_slice_to_plot);
 
@@ -479,14 +489,13 @@ if ismember('frq_controls',spin_system.control.plotting)
         cplx_ch_wf=    waveform(2*n-1,1:last_slice_to_plot)...
                    -1i*waveform(2*n  ,1:last_slice_to_plot);
 
-        % Compute instantaneous frequencies
-        frq_profile(n,:)=inst_freq(cplx_ch_wf,dt);
+        % Compute the unwrapped phase
+        phase_profile=unwrap(angle(cplx_ch_wf(:)));
+
+        % Differentiate the phase using local least-squares fits
+        frq_profile(n,:)=sgolaydiff(phase_profile,1,npoints,poly_order)'/(2*pi*dt);
 
     end
-
-    % Apply the frequency stability filter
-    filter_order=2*ceil(sqrt(size(frq_profile,2)))+1;
-    frq_profile=medfilt1(frq_profile,filter_order,[],2);
 
     % Plot with predictable colours
     p=plot(t_axis(1:last_slice_to_plot)',frq_profile');
@@ -762,11 +771,14 @@ if ismember('spectrogram',spin_system.control.plotting)
         error('spectrograms require an even number of control channels.');
     end
 end
+if ismember('frq_controls',spin_system.control.plotting)
+    if ~(mod(size(waveform,1),2)==0)
+        error('instantaneous frequency plots require an even number of control channels.');
+    end
+end
 end
 
 % If you can't explain it simply, you don't
 % understand it well enough.
 %
 % Albert Einstein
-
-

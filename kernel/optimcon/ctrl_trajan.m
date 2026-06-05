@@ -286,13 +286,9 @@ if ismember('xy_controls',spin_system.control.plotting)
     for n=1:size(waveform,1)
         control_labels{n}=int2str(n);
     end
-
-    % Make a translucent legend
-    leg_obj=legend(control_labels,'Location','NorthEast');  
-    set(leg_obj.BoxFace,'ColorType','truecoloralpha',...
-                        'ColorData',uint8([200 200 200 64]')); 
     
-    % Labels and the grid
+    % Legend, labels and the grid
+    klegend(control_labels,'Location','NorthEast'); 
     kxlabel(t_axis_label); ktitle('controls');
     kylabel('ens. average value, Hz'); kgrid; 
 
@@ -321,12 +317,14 @@ if ismember('phi_controls',spin_system.control.plotting)||...
     
     % Fill the arrays
     for n=1:(size(waveform,1)/2)
-        [amp_profile(n,:),phi_profile(n,:)]=cartesian2polar(waveform(2*n-1,:),waveform(2*n,:));
+        [amp_profile(n,:),...
+         phi_profile(n,:)]=cartesian2polar(waveform(2*n-1,:),...
+                                           waveform(2*n,:));
     end
     
 end
 
-% Plot phase controls
+% Control channel pair phases
 if ismember('phi_controls',spin_system.control.plotting)
     
     % Set the current plot
@@ -364,13 +362,9 @@ if ismember('phi_controls',spin_system.control.plotting)
     for k=1:(size(waveform,1)/2)
         control_labels{k}=['Ch ' int2str(2*k-1) ',' int2str(2*k)];
     end
-
-    % Make a translucent legend
-    leg_obj=legend(control_labels,'Location','NorthEast');  
-    set(leg_obj.BoxFace,'ColorType','truecoloralpha',...
-                        'ColorData',uint8([200 200 200 64]')); 
     
-    % Labels and the grid
+    % Legend, labels and the grid
+    klegend(control_labels,'Location','NorthEast'); 
     kxlabel(t_axis_label); ktitle('control phases');
     kylabel('phase, radians'); kgrid;
     
@@ -386,7 +380,7 @@ if ismember('phi_controls',spin_system.control.plotting)
     
 end
 
-% Plot amplitude controls
+% Plot control channel pair amplitudes
 if ismember('amp_controls',spin_system.control.plotting)
     
     % Set the current plot
@@ -440,12 +434,8 @@ if ismember('amp_controls',spin_system.control.plotting)
         control_labels{k}=['Ch ' int2str(2*k-1) ',' int2str(2*k)];
     end
     
-    % Make a translucent legend
-    leg_obj=legend(control_labels,'Location','NorthEast');  
-    set(leg_obj.BoxFace,'ColorType','truecoloralpha',...
-                        'ColorData',uint8([200 200 200 64]')); 
-    
-    % Labels and the grid
+    % Legend, labels and the grid
+    klegend(control_labels,'Location','NorthEast');  
     kxlabel(t_axis_label); ktitle('control moduli');
     kylabel('ens. average value, Hz'); kgrid; 
     
@@ -455,6 +445,79 @@ if ismember('amp_controls',spin_system.control.plotting)
     % Disable the toolbar
     ax=gca; ax.Toolbar=[];
     
+end
+
+% Plot inst. freqs for as long as timing grid permits
+if ismember('frq_controls',spin_system.control.plotting)
+
+    % Count uniform slices
+    last_slice_to_plot=1; % Move to optimcon.m
+    for n=1:numel(spin_system.control.pulse_dt)
+        if spin_system.control.pulse_dt(n)==...
+                spin_system.control.pulse_dt(1)
+            last_slice_to_plot=n;
+        else
+            break;
+        end
+    end
+
+    % Refuse when too few
+    if last_slice_to_plot<5
+        error('instantaneous frequencies need at least five equal duration slices.');
+    end
+
+    % Get the time grid stepping
+    dt=spin_system.control.pulse_dt(1);
+
+    % Preallocate the instantaneous frequency array
+    frq_profile=zeros(size(waveform,1)/2,last_slice_to_plot);
+
+    % Fill the array
+    for n=1:(size(waveform,1)/2)
+
+        % Get the complex channel waveform
+        cplx_ch_wf=    waveform(2*n-1,1:last_slice_to_plot)...
+                   -1i*waveform(2*n  ,1:last_slice_to_plot);
+
+        % Compute instantaneous frequencies
+        frq_profile(n,:)=inst_freq(cplx_ch_wf,dt);
+
+    end
+
+    % Apply the frequency stability filter
+    filter_order=2*ceil(sqrt(size(frq_profile,2)))+1;
+    frq_profile=medfilt1(frq_profile,filter_order,[],2);
+
+    % Plot with predictable colours
+    p=plot(t_axis(1:last_slice_to_plot)',frq_profile');
+    for n=1:numel(p)
+        p(n).Color=hsv2rgb([n/numel(p) 0.75 0.75]);
+    end
+
+    % Set labels and title
+    control_labels=cell(1,size(waveform,1)/2);
+    for k=1:(size(waveform,1)/2)
+        control_labels{k}=['Ch ' int2str(2*k-1) ',' int2str(2*k)];
+    end
+
+    % Legend, frequency axis label and the grid
+    ktitle('inst. frequencies'); xlim tight; ylim padded; 
+    klegend(control_labels,'Location','SouthEast');
+    kylabel('frequency, Hz');  kgrid;
+    
+    % Warn the user when the time axis is truncated
+    if last_slice_to_plot==numel(spin_system.control.pulse_dt)
+        kxlabel('time, seconds');
+    else
+        kxlabel('time, s (truncated)');
+    end
+
+    % Increment plot number
+    current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
+
 end
 
 % Plot correlation orders

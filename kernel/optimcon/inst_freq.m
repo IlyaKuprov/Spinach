@@ -13,8 +13,9 @@
 %
 % Outputs:
 %
-%    freq   - instantaneous frequency tra-
-%             jectory (Hz), same size as signal
+%    freq   - instantaneous frequency trajec-
+%             tory (Hz), same size as signal
+%             and on the same time grid
 %
 % Note: central second-order phase-difference approximation is 
 %       used in the interior, second-order one-sided approxi-

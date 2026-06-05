@@ -218,7 +218,7 @@ base_freq=3;
 chirp_rate=4;
 signal=exp(1i*2*pi*(base_freq*time_axis+0.5*chirp_rate*time_axis.^2));
 freq_ref=base_freq+chirp_rate*time_axis;
-freq=inst_freq(signal,sample_dt);
+freq=inst_freq(signal,sample_dt,5,2);
 result=test_close(result,'inst_freq chirp',freq,freq_ref,1e-10,1e-10,...
                   'inst_freq must recover the exact frequency of a quadratic phase');
 

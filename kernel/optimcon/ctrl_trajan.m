@@ -489,11 +489,8 @@ if ismember('frq_controls',spin_system.control.plotting)
         cplx_ch_wf=    waveform(2*n-1,1:last_slice_to_plot)...
                    -1i*waveform(2*n  ,1:last_slice_to_plot);
 
-        % Compute the unwrapped phase
-        phase_profile=unwrap(angle(cplx_ch_wf(:)));
-
-        % Differentiate the phase using local least-squares fits
-        frq_profile(n,:)=sgolaydiff(phase_profile,1,npoints,poly_order)'/(2*pi*dt);
+        % Compute the instantaneous frequency profile
+        frq_profile(n,:)=inst_freq(cplx_ch_wf,dt,npoints,poly_order);
 
     end
 

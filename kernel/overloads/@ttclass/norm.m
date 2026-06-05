@@ -1,6 +1,6 @@
 % Computes the norm of the matrix represented by a tensor train. Syntax:
 %
-% #NORMOK               ttnorm=norm(ttrain,norm_type)
+%                    ttnorm=norm(ttrain,norm_type)
 %
 % Parameters:
 %
@@ -8,16 +8,17 @@
 %
 %    norm_type:
 %
-%       norm_type=1         returns the 1-norm
-%       norm_type=inf       returns the inf-norm
-%       norm_type=2         returns the 2-norm
+%       norm_type=1         not available for ttclass
+%       norm_type=inf       not available for ttclass
+%       norm_type=2         not available for ttclass
 %       norm_type='fro'     returns the Frobenius norm
 %
 % Outputs:
 %
 %    ttnorm - a positive real number
 %
-% Note: norms other than Frobenius norm are expensive for tensor trains.
+% Note: only Frobenius norm is currently available for tensor trains;
+%       other norm types raise errors.
 %
 % d.savostyanov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il

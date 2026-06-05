@@ -1,4 +1,18 @@
 % Dot and bracket property specifications for the tensor train class.
+% Syntax:
+%
+%                answer=subsref(ttrain,reference)
+%
+% Parameters:
+%
+%    ttrain    - tensor train object
+%
+%    reference - Matlab subscript reference structure
+%
+% Outputs:
+%
+%    answer    - requested tensor train property, scalar
+%                matrix element, or nested subscript result
 %
 % d.savostyanov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -79,5 +93,5 @@ end
 %
 % A Russian saying
 
-% #NGRUM #NHEAD
+% #NGRUM
 

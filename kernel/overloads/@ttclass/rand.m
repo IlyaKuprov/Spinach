@@ -1,5 +1,5 @@
 % Generates a tensor train representation of a matrix with random
-% tensor train cores, same physical index topology at the tensor
+% tensor train cores, same physical index topology as the tensor
 % train supplied, and user-specified bond ranks. Syntax:
 %
 %                        tt=rand(tt,ttrank)

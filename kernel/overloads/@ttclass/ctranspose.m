@@ -3,6 +3,14 @@
 %
 %                   ttrain=ctranspose(ttrain)
 %
+% Parameters:
+%
+%    ttrain - tensor train representation of a matrix
+%
+% Outputs:
+%
+%    ttrain - Hermitian conjugate of the input tensor train
+%
 % d.savostyanov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
@@ -29,5 +37,5 @@ end
 %
 % Igor Stravinsky
 
-% #NGRUM #NHEAD
+% #NGRUM
 

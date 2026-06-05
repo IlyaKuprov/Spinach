@@ -2,6 +2,14 @@
 %
 %                  ttrain=transpose(ttrain)
 %
+% Parameters:
+%
+%    ttrain - tensor train representation of a matrix
+%
+% Outputs:
+%
+%    ttrain - transpose of the input tensor train
+%
 % d.savostyanov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
@@ -26,5 +34,5 @@ end
 %
 % Ayn Rand, "Atlas Shrugged"
 
-% #NHEAD #NGRUM
+% #NGRUM
 

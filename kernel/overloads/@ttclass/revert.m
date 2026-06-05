@@ -1,7 +1,16 @@
-% Bit-revert permutation for the tensor train operator. Syntax:
+% Applies a bit-revert permutation to a tensor train operator by
+% reversing the core order and swapping bond indices. Syntax:
 %
 %                       tt=revert(tt)
 % 
+% Parameters:
+%
+%    tt - tensor train operator
+%
+% Outputs:
+%
+%    tt - tensor train operator with reversed core order
+%
 % d.savostyanov@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=ttclass/revert.m>
@@ -29,5 +38,5 @@ end
 %
 % Gerald M. Weinberg, "The psychology of computer programming"
 
-% #NHEAD #NGRUM
+% #NGRUM
 

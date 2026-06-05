@@ -1,6 +1,15 @@
-% Returns TRUE for the real-valued ttclass. Syntax: 
+% Returns TRUE for real-valued tensor train objects. Syntax:
 %
 %                answer=isreal(tt)
+%
+% Parameters:
+%
+%    tt - tensor train object
+%
+% Outputs:
+%
+%    answer - logical true when all coefficients and core
+%             elements of the tensor train are real
 %
 % d.savostyanov@soton.ac.uk
 %
@@ -38,5 +47,5 @@ end
 %
 % H.L. Mencken
 
-% #NHEAD #NGRUM
+% #NGRUM
 

@@ -11,9 +11,9 @@
 %
 % Outputs:
 %
-%    m,n - integers sepcifying the dimensions
+%    m,n - integers specifying the dimensions
 %
-% Note: for large tt matrices, n and n may be too large to fit
+% Note: for large tt matrices, m and n may be too large to fit
 %       into the maximum integer permitted by Matlab.
 %
 % d.savostyanov@soton.ac.uk

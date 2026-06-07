@@ -6,30 +6,9 @@
 %
 %     S. Felton et al., Phys. Rev. B 79 (2009) 075203
 %
-% Spin-lattice relaxation according to Eq. 1 in:
-%
-%       A. Jarmola et al., PRL 108 (2012) 197601
-%
-% Electron spin T2 times assumed to be equal to T2=0.5*T1 as
-% in CPMG experiments reported in:
-%
-%     N. Bar-Gill et al., Nat. Comm. 4 (2013) 1743
-%
-% in the strong spin-phonon coupling regime. Nuclear relaxa-
-% tion rartes are intelligent guesses based on:
-%
-%        Pfender et al., Nat.Comm. 8 (2017) 834
-%
-%    Soshenko et al. Quant. Electronics 51 (2021) 1144
-%
 % Parameters: 
 % 
 %  the following is needed in the parameters.* structure:
-%
-%   .temperature   - temperature, K (default: 298)
-%
-%   .concentration - defect concentration in ppm for the 
-%                    relaxation model, default is 0.001
 %
 %   .orientation   - '111', '110', or '100' crystal 
 %                     plane normal aligned with the
@@ -53,12 +32,6 @@ function [sys,inter]=diamond_nvm_gs(parameters)
 grumble(parameters);
 
 % Set default parameters
-if ~isfield(parameters,'concentration')
-    parameters.concentration=0.001;
-end
-if ~isfield(parameters,'temperature')
-    parameters.temperature=298;
-end
 if ~isfield(parameters,'orientation')
     parameters.orientation='111';
 end
@@ -94,7 +67,7 @@ switch parameters.orientation
     otherwise
 
         % Complain and bomb out
-        error('unknown oritentation specification');
+        error('unknown orientation specification');
 
 end
 
@@ -131,18 +104,6 @@ end
 function grumble(parameters)
 if(~isstruct(parameters))
     error('parameters must be a structure.');
-end
-if isfield(parameters,'temperature')
-    if(~isnumeric(parameters.temperature))||(~isreal(parameters.temperature))||...
-       (~isscalar(parameters.temperature))||(parameters.temperature<=0)
-        error('parameters.temperature must be a positive real scalar.');
-    end
-end
-if isfield(parameters,'concentration')
-    if(~isnumeric(parameters.concentration))||(~isreal(parameters.concentration))||...
-       (~isscalar(parameters.concentration))||(parameters.concentration<=0)
-        error('parameters.concentration must be a positive real scalar.');
-    end
 end
 if isfield(parameters,'orientation')
     if(~ischar(parameters.orientation))

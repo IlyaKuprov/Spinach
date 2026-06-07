@@ -18,9 +18,8 @@
 
 function kytickfix()
 
-% Pull out the current Y axis ruler
-ax=gca;
-ruler=ax.YAxis;
+% Current Y axis ruler
+ax=gca; ruler=ax.YAxis;
 
 % Check consistency
 grumble(ruler);
@@ -106,4 +105,10 @@ if ~strcmp(ruler.Scale,'linear')
     error('Y axis scale must be linear.');
 end
 end
+
+% "Times are bad. Children no longer 
+%  obey their parents and everyone is
+%  writing a book."
+%
+%  Cicero, 43 BCE
 

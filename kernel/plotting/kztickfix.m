@@ -18,9 +18,8 @@
 
 function kztickfix()
 
-% Pull out the current Z axis ruler
-ax=gca;
-ruler=ax.ZAxis;
+% Current Z axis ruler
+ax=gca; ruler=ax.ZAxis;
 
 % Check consistency
 grumble(ruler);
@@ -106,4 +105,13 @@ if ~strcmp(ruler.Scale,'linear')
     error('Z axis scale must be linear.');
 end
 end
+
+% Qualified candidates will demonstrate 
+% an affinity with the academic purpose
+% of the College and possess the intel-
+% lectual stature to command the respect
+% of the Fellowship.
+%
+% 2023 rector vacancy announcement
+% by Lincoln College, Oxford
 

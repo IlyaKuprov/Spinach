@@ -18,9 +18,8 @@
 
 function kxtickfix()
 
-% Pull out the current X axis ruler
-ax=gca;
-ruler=ax.XAxis;
+% Current X axis ruler
+ax=gca; ruler=ax.XAxis;
 
 % Check consistency
 grumble(ruler);
@@ -106,4 +105,11 @@ if ~strcmp(ruler.Scale,'linear')
     error('X axis scale must be linear.');
 end
 end
+
+% "Never bring that fucking cretin in here 
+%  again. He didn't drop the bomb. I did.
+%  That kind of weepiness makes me sick."
+%
+% Harry Truman, to Dean Acheson,
+% about J. Robert Oppenheimer
 

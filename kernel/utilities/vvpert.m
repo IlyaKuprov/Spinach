@@ -11,8 +11,9 @@
 %     H1    - perturbation, written in the basis that di-
 %             agonalises H0
 %
-%     order - order of perturbation theory to be used, 5
-%             is the maximum available
+%     order - order of perturbation theory to be used; numerical
+%             artefacts appear beyond about 10-12 for typical
+%             problems
 %
 % Outputs:
 %
@@ -27,8 +28,8 @@
 %
 % Notes: there must be no degeneracies in H0; H1 must be Hermitian,
 %        the theory only converges when norm(H1,2) is much smaller
-%        than the smallest energy gap in H0; complexity is linear
-%        in the order and cubic in the matrix dimension.
+%        than the smallest energy gap in H0; complexity is cubic
+%        both in the order and in the matrix dimension.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -45,72 +46,57 @@ if any(~isfinite(Q),'all')
     error('H0 has degenerate energy levels.');
 end
 
-% Split the perturbation
-H1d=diag(diag(H1)); H1x=H1-H1d;
+% Energy differences
+delta=E0-E0.';
 
-% Compute to specified order
-G={}; W={};
+% Baker-Campbell-Hausdorff coefficients
+bch=1./factorial(0:order);
 
-% First
-if order>0
-    G{1}=Q.*H1x; W{1}=H1d;                       
+% Allocate recursion storage
+G=cell(order,1); W=cell(order,1);
+C=cell(order+1,order+1);
+
+% Compute each perturbation order
+for n=1:order
+
+    % Build higher nested commutators independent of the current generator
+    for m=2:n
+        K=zeros(size(H1),'like',H1);
+        for k=(m-1):(n-1)
+            K=K+comm(C{m,k+1},G{n-k});
+        end
+        C{m+1,n+1}=K;
+    end
+
+    % Build the transformed Hamiltonian term without the H0 commutator
+    if n==1
+        K=H1;
+    else
+        K=comm(H1,G{n-1});
+    end
+    for m=2:n
+        K=K+bch(m+1)*C{m+1,n+1};
+    end
+
+    % Split the term into the effective Hamiltonian and generator
+    W{n}=diag(diag(K));
+    G{n}=Q.*(K-W{n});
+
+    % Store the first nested commutator for future orders
+    C{2,n+1}=delta.*G{n};
+    if n>1
+        C{2,n+1}=C{2,n+1}+comm(H1,G{n-1});
+    end
+
 end
 
-% Second
-if order>1
-    K2=      rocomm({H1d,G{1}})+ ...
-       (1/2)*rocomm({H1x,G{1}});
-    G{2}=Q.*K2; W{2}=diag(diag(K2));          
+% Sum the energy corrections
+Ep=E0;
+for n=1:order
+    Ep=Ep+real(diag(W{n}));
 end
 
-% Third
-if order>2
-    K3=       rocomm({H1d,G{2}})+      ...
-       (1/2)* rocomm({H1x,G{2}})+      ...
-       (1/12)*rocomm({H1x,G{1},G{1}})+ ...
-       (1/2)* rocomm({W{2},G{1}});
-    G{3}=Q.*K3; W{3}=diag(diag(K3));
-end
-
-% Fourth
-if order>3
-    K4=       rocomm({H1d,G{3}})+      ...
-       (1/2)* rocomm({H1x,G{3}})+      ...
-       (1/12)*rocomm({H1x,G{1},G{2}})+ ...
-       (1/12)*rocomm({H1x,G{2},G{1}})+ ...
-       (1/2)* rocomm({W{2},G{2}})+     ...
-       (1/2)* rocomm({W{3},G{1}})-     ...
-       (1/12)*rocomm({W{2},G{1},G{1}});
-    G{4}=Q.*K4; W{4}=diag(diag(K4));
-end
-
-% Fifth
-if order>4
-    K5=        rocomm({H1d,G{4}})+                ...
-       (1/2)*  rocomm({H1x,G{4}})+                ...
-       (1/12)* rocomm({H1x,G{1},G{3}})+           ...
-       (1/12)* rocomm({H1x,G{2},G{2}})+           ...
-       (1/12)* rocomm({H1x,G{3},G{1}})-           ...
-       (1/720)*rocomm({H1x,G{1},G{1},G{1},G{1}})+ ...
-       (1/2)*  rocomm({W{2},G{3}})+               ...
-       (1/2)*  rocomm({W{3},G{2}})+               ...
-       (1/2)*  rocomm({W{4},G{1}})-               ...
-       (1/12)* rocomm({W{2},G{1},G{2}})-          ...
-       (1/12)* rocomm({W{2},G{2},G{1}})-          ...
-       (1/12)* rocomm({W{3},G{1},G{1}});
-    G{5}=Q.*K5; W{5}=diag(diag(K5));
-end
-
-% Higher
-if order>5
-    error('VVPT not implemented for orders higher than five.');
-end
-
-% Get the energies
-W=cellfun(@diag,W,'UniformOutput',0);
-Ep=E0+sum(cell2mat(W),2);
-
-% Get the generator
+% Sum the generator corrections
 G=reshape(G,[1 1 numel(G)]);
 G=sum(cell2mat(G),3);
 
@@ -121,13 +107,15 @@ function grumble(E0,H1,order)
 if (~isnumeric(E0))||(~isreal(E0))||(~iscolumn(E0))
     error('E0 must be a real column vector.');
 end
-if (~isnumeric(H1))||(size(H1,1)~=numel(E0))||...
-   (size(H1,2)~=numel(E0))
-    error('H1 must be a Hermitian matrix with dimensions matching E0');
+if (~isnumeric(H1))||(~ishermitian(H1))
+    error('H1 must be a Hermitian matrix.');
+end
+if (numel(E0)~=size(H1,1))||(numel(E0)~=size(H1,2))
+    error('dimensions of E0 and H1 must be consistent.');
 end
 if (~isnumeric(order))||(~isreal(order))||(~isscalar(order))||...
-   (mod(order,1)~=0)||(order<1)||(order>5)
-    error('order must be a real integer between 1 and 5');
+   (mod(order,1)~=0)||(order<1)
+    error('order must be a positive real integer.');
 end
 end
 

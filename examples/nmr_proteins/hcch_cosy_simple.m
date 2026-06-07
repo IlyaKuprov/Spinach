@@ -48,14 +48,34 @@ spin_system=basis(spin_system,bas);
 fid=liquid(spin_system,@hcch_cosy,parameters,'nmr');
 
 % Apodisation
-fid=apodisation(spin_system,fid,{{'cos'},{'cos'},{'cos'}});
+fid.pos_pos=apodisation(spin_system,fid.pos_pos,{{'sqcos'},{'sqcos'},{'sqcos'}});
+fid.pos_neg=apodisation(spin_system,fid.pos_neg,{{'sqcos'},{'sqcos'},{'sqcos'}});
+fid.neg_pos=apodisation(spin_system,fid.neg_pos,{{'sqcos'},{'sqcos'},{'sqcos'}});
+fid.neg_neg=apodisation(spin_system,fid.neg_neg,{{'sqcos'},{'sqcos'},{'sqcos'}});
 
-% Fourier transform
-spectrum=fftshift(fftn(fid,parameters.zerofill));
+% F3 Fourier transform
+f3_pos_pos=fftshift(fft(fid.pos_pos,parameters.zerofill(3),3),3);
+f3_pos_neg=fftshift(fft(fid.pos_neg,parameters.zerofill(3),3),3);
+f3_neg_pos=fftshift(fft(fid.neg_pos,parameters.zerofill(3),3),3);
+f3_neg_neg=fftshift(fft(fid.neg_neg,parameters.zerofill(3),3),3);
+
+% Absorption part of F3 signal
+f3_pos=f3_pos_pos+conj(f3_neg_neg);
+f3_neg=f3_neg_pos+conj(f3_pos_neg);
+
+% F2 Fourier transform
+f3f2_pos=fftshift(fft(f3_pos,parameters.zerofill(2),2),2);
+f3f2_neg=fftshift(fft(f3_neg,parameters.zerofill(2),2),2);
+
+% Absorption part of F2 signal
+f3f2=f3f2_pos+conj(f3f2_neg);
+
+% F1 Fourier transform
+spectrum=fftshift(fft(f3f2,parameters.zerofill(1),1),1);
 
 % Plotting
-kfigure(); plot_3d(spin_system,abs(spectrum),parameters,...
-                  10,[0.05 0.25 0.05 0.25],2,'positive');
+kfigure(); plot_3d(spin_system,imag(spectrum),parameters,...
+                   10,[0.05 0.25 0.05 0.25],2,'positive');
 
 end
 

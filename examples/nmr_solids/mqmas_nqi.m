@@ -1,4 +1,5 @@
-% Rotor-synchronous MQMAS spectrum of a 87Rb compound.
+% Rotor-synchronous MQMAS spectrum of a 87Rb compound,
+% transmitter set to the isotropic chemical shift.
 %
 % Calculation time: minutes
 %
@@ -6,12 +7,11 @@
 
 function mqmas_nqi()
 
-% System specification
+% System specification: just the NQI
 sys.magnet=9.4; sys.isotopes={'87Rb'};
-inter.coupling.matrix{1,1}=eeqq2nqi(1.18e6,0.50,1,[0 0 0]);
-inter.zeeman.scalar{1,1}=40;
+inter.coupling.matrix{1,1}=eeqq2nqi(5e6,0.50,3/2,[0 0 0]);
 
-% Basis set
+% Formalism and basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
@@ -25,27 +25,26 @@ spin_system=basis(spin_system,bas);
 % Experiment setup
 parameters.rate=62.5e3;
 parameters.axis=[1 1 1];
-parameters.max_rank=35;
-parameters.grid='rep_2ang_400pts_sph';
+parameters.max_rank=7;
+parameters.grid='rep_2ang_1600pts_sph';
 parameters.npoints=[128 128];
 parameters.zerofill=[256 256];
+parameters.sweep=parameters.rate;
 parameters.offset=0;
 parameters.spins={'87Rb'};
 parameters.rframes={{'87Rb',2}};
+parameters.mq_order=3;
 parameters.axis_units='ppm';
 parameters.rho0=state(spin_system,'Lz','87Rb');
 parameters.coil=state(spin_system,'L+','87Rb');
-parameters.verbose=0;
 parameters.pulse_amp=2*pi*[250e3 250e3];
 parameters.pulse_dur=[2e-6 1e-6];
-parameters.mq_order=3;
-parameters.sweep=parameters.rate;
 
 % Simulation
 fid=singlerot(spin_system,@mqmas,parameters,'labframe');
 
 % Apodisation
-fid=apodisation(spin_system,fid,{{'cos'},{'cos'}});
+fid=apodisation(spin_system,fid,{{'sqcos'},{'sqcos'}});
     
 % Fourier transform
 spectrum=fftshift(fft2(fid,parameters.zerofill(2),...

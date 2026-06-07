@@ -34,8 +34,16 @@ if isempty(spin_system.control.plotting), return; end
 % Check consistency
 grumble(spin_system,waveform,traj_data,fidelities);
 
+% Trajectory is not plotted, that key exists to trigger a trajectory return
+spin_system.control.plotting=setdiff(spin_system.control.plotting,{'trajectory'});
+
 % Count the plots
-n_plots=numel(spin_system.control.plotting); 
+n_plots=numel(spin_system.control.plotting);
+
+% Exit if nothing to plot
+if n_plots==0, return; end
+
+% Find out how many plot panels are needed
 if ismember('spectrogram',spin_system.control.plotting)
     n_plots=n_plots+size(waveform,1)/2-1;
 end
@@ -118,10 +126,11 @@ if ismember('spectrogram',spin_system.control.plotting)
         hsv=cat(3,ones(size(phi)),ones(size(phi)),amp);
 
         % Plot the spectrogram
-        image(t_axis,f_axis,hsv2rgb(hsv));
+        image(t_axis,f_axis,hsv2rgb(hsv)); box off;
         ktitle(['channels ' num2str(2*n-1) ',' num2str(2*n)]);
-        kylabel('frequency offset, Hz'); set(gca,'YDir','normal');
-
+        set(gca,'YDir','normal','TickDir','out');
+        kylabel('frequency offset, Hz'); kbox;
+        
         % Warn the user when the time axis is truncated
         if last_slice_to_plot==numel(spin_system.control.pulse_dt)
             kxlabel('time, seconds');
@@ -129,11 +138,14 @@ if ismember('spectrogram',spin_system.control.plotting)
             kxlabel('time, s (truncated)');
         end
 
-        % Physically relevant interval
-        xlim([0 sum(timing_grid)]-timing_grid(1)/2);
+        % Physically relevant time interval
+        xlim([0 sum(timing_grid)]);
 
         % Increment plot number
         current_plot=current_plot+1;
+
+        % Disable the toolbar
+        ax=gca; ax.Toolbar=[];
 
     end
 
@@ -274,13 +286,9 @@ if ismember('xy_controls',spin_system.control.plotting)
     for n=1:size(waveform,1)
         control_labels{n}=int2str(n);
     end
-
-    % Make a translucent legend
-    leg_obj=legend(control_labels,'Location','NorthEast');  
-    set(leg_obj.BoxFace,'ColorType','truecoloralpha',...
-                        'ColorData',uint8([200 200 200 64]')); 
     
-    % Labels and the grid
+    % Legend, labels and the grid
+    klegend(control_labels,'Location','NorthEast'); 
     kxlabel(t_axis_label); ktitle('controls');
     kylabel('ens. average value, Hz'); kgrid; 
 
@@ -293,6 +301,9 @@ if ismember('xy_controls',spin_system.control.plotting)
 
     % Increment plot counter
     current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
     
 end
 
@@ -306,12 +317,14 @@ if ismember('phi_controls',spin_system.control.plotting)||...
     
     % Fill the arrays
     for n=1:(size(waveform,1)/2)
-        [amp_profile(n,:),phi_profile(n,:)]=cartesian2polar(waveform(2*n-1,:),waveform(2*n,:));
+        [amp_profile(n,:),...
+         phi_profile(n,:)]=cartesian2polar(waveform(2*n-1,:),...
+                                           waveform(2*n,:));
     end
     
 end
 
-% Plot phase controls
+% Control channel pair phases
 if ismember('phi_controls',spin_system.control.plotting)
     
     % Set the current plot
@@ -349,13 +362,9 @@ if ismember('phi_controls',spin_system.control.plotting)
     for k=1:(size(waveform,1)/2)
         control_labels{k}=['Ch ' int2str(2*k-1) ',' int2str(2*k)];
     end
-
-    % Make a translucent legend
-    leg_obj=legend(control_labels,'Location','NorthEast');  
-    set(leg_obj.BoxFace,'ColorType','truecoloralpha',...
-                        'ColorData',uint8([200 200 200 64]')); 
     
-    % Labels and the grid
+    % Legend, labels and the grid
+    klegend(control_labels,'Location','NorthEast'); 
     kxlabel(t_axis_label); ktitle('control phases');
     kylabel('phase, radians'); kgrid;
     
@@ -365,10 +374,13 @@ if ismember('phi_controls',spin_system.control.plotting)
 
     % Increment plot counter
     current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
     
 end
 
-% Plot amplitude controls
+% Plot control channel pair amplitudes
 if ismember('amp_controls',spin_system.control.plotting)
     
     % Set the current plot
@@ -422,18 +434,96 @@ if ismember('amp_controls',spin_system.control.plotting)
         control_labels{k}=['Ch ' int2str(2*k-1) ',' int2str(2*k)];
     end
     
-    % Make a translucent legend
-    leg_obj=legend(control_labels,'Location','NorthEast');  
-    set(leg_obj.BoxFace,'ColorType','truecoloralpha',...
-                        'ColorData',uint8([200 200 200 64]')); 
-    
-    % Labels and the grid
+    % Legend, labels and the grid
+    klegend(control_labels,'Location','NorthEast');  
     kxlabel(t_axis_label); ktitle('control moduli');
     kylabel('ens. average value, Hz'); kgrid; 
     
     % Increment plot counter
     current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
     
+end
+
+% Plot inst. freqs for as long as timing grid permits
+if ismember('frq_controls',spin_system.control.plotting)
+
+    % Count uniform slices
+    last_slice_to_plot=1; % Move to optimcon.m
+    for n=1:numel(spin_system.control.pulse_dt)
+        if spin_system.control.pulse_dt(n)==...
+                spin_system.control.pulse_dt(1)
+            last_slice_to_plot=n;
+        else
+            break;
+        end
+    end
+
+    % Refuse when too few
+    if last_slice_to_plot<5
+        error('instantaneous frequencies need at least five equal duration slices.');
+    end
+
+    % Get the time grid stepping
+    dt=spin_system.control.pulse_dt(1);
+
+    % Set half-window to the geometric mean of one slice and pulse duration
+    win_half=ceil(sqrt(last_slice_to_plot));
+
+    % Count the local least-squares averaging window
+    npoints=min(last_slice_to_plot,2*win_half+1);
+    if mod(npoints,2)==0, npoints=npoints-1; end
+
+    % Set the local polynomial order
+    poly_order=min(3,npoints-2);
+
+    % Preallocate the instantaneous frequency array
+    frq_profile=zeros(size(waveform,1)/2,last_slice_to_plot);
+
+    % Fill the array
+    for n=1:(size(waveform,1)/2)
+
+        % Get the complex channel waveform
+        cplx_ch_wf=    waveform(2*n-1,1:last_slice_to_plot)...
+                   -1i*waveform(2*n  ,1:last_slice_to_plot);
+
+        % Compute the instantaneous frequency profile
+        frq_profile(n,:)=inst_freq(cplx_ch_wf,dt,npoints,poly_order);
+
+    end
+
+    % Plot with predictable colours
+    p=plot(t_axis(1:last_slice_to_plot)',frq_profile');
+    for n=1:numel(p)
+        p(n).Color=hsv2rgb([n/numel(p) 0.75 0.75]);
+    end
+
+    % Set labels and title
+    control_labels=cell(1,size(waveform,1)/2);
+    for k=1:(size(waveform,1)/2)
+        control_labels{k}=['Ch ' int2str(2*k-1) ',' int2str(2*k)];
+    end
+
+    % Legend, frequency axis label and the grid
+    ktitle('inst. frequencies'); xlim tight; ylim padded; 
+    klegend(control_labels,'Location','SouthEast');
+    kylabel('frequency, Hz');  kgrid;
+    
+    % Warn the user when the time axis is truncated
+    if last_slice_to_plot==numel(spin_system.control.pulse_dt)
+        kxlabel('time, seconds');
+    else
+        kxlabel('time, s (truncated)');
+    end
+
+    % Increment plot number
+    current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
+
 end
 
 % Plot correlation orders
@@ -469,6 +559,9 @@ if ismember('correlation_order',spin_system.control.plotting)
     
     % Increment plot counter
     current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
     
 end
 
@@ -505,6 +598,9 @@ if ismember('coherence_order',spin_system.control.plotting)
     
     % Increment plot counter
     current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
     
 end
 
@@ -541,6 +637,9 @@ if ismember('local_each_spin',spin_system.control.plotting)
     
     % Increment plot counter
     current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
     
 end
 
@@ -577,6 +676,9 @@ if ismember('total_each_spin',spin_system.control.plotting)
     
     % Increment plot counter
     current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
     
 end
 
@@ -613,6 +715,9 @@ if ismember('level_populations',spin_system.control.plotting)
     
     % Increment plot counter
     current_plot=current_plot+1;
+
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
     
 end
 
@@ -637,6 +742,9 @@ if ismember('robustness',spin_system.control.plotting)
                       ['$\sigma = ' num2str(std(fidelities),4)  '$']},...
                        'Interpreter','latex','Units','normalized');
 
+    % Disable the toolbar
+    ax=gca; ax.Toolbar=[];
+
 end
 
 % Flush the graphics
@@ -660,11 +768,14 @@ if ismember('spectrogram',spin_system.control.plotting)
         error('spectrograms require an even number of control channels.');
     end
 end
+if ismember('frq_controls',spin_system.control.plotting)
+    if ~(mod(size(waveform,1),2)==0)
+        error('instantaneous frequency plots require an even number of control channels.');
+    end
+end
 end
 
 % If you can't explain it simply, you don't
 % understand it well enough.
 %
 % Albert Einstein
-
-

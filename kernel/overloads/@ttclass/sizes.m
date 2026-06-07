@@ -1,9 +1,16 @@
 % Returns mode sizes (physical dimensions of each core) of
-% a tensor train. Syntax: 
+% a tensor train. Syntax:
 %
 %                   modesizes=sizes(tt)
 %
-% The output is an array with ncores rows and two columns.
+% Parameters:
+%
+%    tt - tensor train object
+%
+% Outputs:
+%
+%    modesizes - ncores by 2 array of physical dimensions
+%                of tensor train cores
 %
 % d.savostyanov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -32,5 +39,5 @@ end
 % 
 % Jim Hacker, in "Yes, Prime Minister" (a BBC documentary)
 
-% #NGRUM #NHEAD
+% #NGRUM
 

@@ -1,4 +1,4 @@
-% Mimics the diag behavior for tensor train matrix. Syntax:
+% Mimics the diag behaviour for tensor train matrix. Syntax:
 %
 %                         tt=diag(tt)
 %

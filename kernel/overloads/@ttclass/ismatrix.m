@@ -1,6 +1,14 @@
-% Returns TRUE for the tensor train class. Syntax:
+% Returns TRUE for non-empty tensor train objects. Syntax:
 %
 %                answer=ismatrix(tt)
+%
+% Parameters:
+%
+%    tt - tensor train object
+%
+% Outputs:
+%
+%    answer - logical true for non-empty tensor train objects
 %
 % d.savostyanov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -22,5 +30,5 @@ end
 %
 % The Law of Three Little Pigs
 
-% #NHEAD #NGRUM
+% #NGRUM
 

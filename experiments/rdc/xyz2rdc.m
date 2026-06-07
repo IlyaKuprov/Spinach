@@ -1,5 +1,6 @@
 % Converts Cartesian coordinates of a pair of nuclei and an 
-% order matrix into residual dipolar coupling. Syntax:
+% order matrix into residual dipolar coupling; only hetero-
+% nuclear spin pairs are supported. Syntax:
 %
 %         rdc=xyz2rdc(spin_a,spin_b,xyz_a,xyz_b,chi)
 %
@@ -71,7 +72,7 @@ if (~ischar(spin_a))||(~ischar(spin_b))
     error('spin_a and spin_b must be character strings.');
 end
 if strcmp(spin_a,spin_b)
-    error('spins A and B must be different.');
+    error('spins A and B must belong to different isotopes.');
 end
 if (~isreal(xyz_a))||(~isnumeric(xyz_a))||(numel(xyz_a)~=3)||...
    (~isreal(xyz_b))||(~isnumeric(xyz_b))||(numel(xyz_b)~=3)

@@ -1,4 +1,4 @@
-% Haramard dot product between two tensor train matrices. Syntax:
+% Hadamard dot product between two tensor train matrices. Syntax:
 %
 %                         c=hdot(a,b)
 %

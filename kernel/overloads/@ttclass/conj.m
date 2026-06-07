@@ -1,6 +1,16 @@
-% Conjugate the elements of the tensor train matrix. Syntax:
+% Conjugates all core elements and coefficients of a tensor
+% train object. Syntax:
 %
 %                         tt=conj(tt)
+%
+% Parameters:
+%
+%    tt - tensor train object
+%
+% Outputs:
+%
+%    tt - tensor train object with complex-conjugated cores
+%         and coefficients
 %
 % d.savostyanov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -30,5 +40,5 @@ end
 %
 % Al Pacino
 
-% #NGRUM #NHEAD
+% #NGRUM
 

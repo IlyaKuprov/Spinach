@@ -6,7 +6,7 @@
 %
 %    A - ttclass matrix 
 %
-%    x - ttclass vector
+%    y - ttclass vector
 %
 % Outputs:
 %

@@ -1,6 +1,14 @@
-% Number of nonzeros in all cores of a tensor train. Syntax: 
+% Counts non-zero elements in all cores of a tensor train. Syntax:
 %
 %                     answer=nnz(ttrain)
+%
+% Parameters:
+%
+%    ttrain - tensor train object
+%
+% Outputs:
+%
+%    answer - number of non-zero elements in all tensor train cores
 %
 % d.savostyanov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -21,5 +29,5 @@ end
 %
 % Vladimir Lenin
 
-% #NHEAD #NGRUM
+% #NGRUM
 

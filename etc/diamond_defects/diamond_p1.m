@@ -107,3 +107,8 @@ if isfield(parameters,'orientation')
     end
 end
 end
+
+% One observes the survivors and learns from them.
+%
+% Frank Herbert, in the Dune series
+

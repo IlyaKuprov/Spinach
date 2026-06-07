@@ -1,6 +1,14 @@
-% Returns TRUE for the tensor train class. Syntax: 
+% Returns TRUE for non-empty tensor train objects. Syntax:
 %
 %                answer=isnumeric(tt)
+%
+% Parameters:
+%
+%    tt - tensor train object
+%
+% Outputs:
+%
+%    answer - logical true for non-empty tensor train objects
 %
 % d.savostyanov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -22,6 +30,4 @@ end
 % attitude towards the public.
 %
 % Johann Wolfgang von Goethe
-
-% #NHEAD
 

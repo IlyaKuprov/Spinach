@@ -49,6 +49,11 @@ if isa(a,'hamiltonian_action')&&isnumeric(b)
 
     end
 
+    % Add the oriented giant spin contribution
+    if nnz(a.giant)>0
+        c=c+a.giant*b;
+    end
+
     % Return the result
     return
 

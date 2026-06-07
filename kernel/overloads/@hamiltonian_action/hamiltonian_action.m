@@ -36,6 +36,7 @@ classdef (InferiorClasses={?gpuArray}) hamiltonian_action
         dim
         coeff_iso
         coeff_aniso
+        giant
         zero_tol
     end
 
@@ -87,6 +88,72 @@ classdef (InferiorClasses={?gpuArray}) hamiltonian_action
                 end
 
             end
+
+            % Preallocate the oriented giant spin contribution
+            H.giant=spalloc(H.dim,H.dim,0);
+
+            % Build the oriented giant spin contribution
+            for n=1:spin_system.comp.nspins
+                for r=1:numel(spin_system.inter.giant.coeff{n})
+
+                    % Compute the Wigner matrix
+                    W=wigner(r,H.euler_angles(1),...
+                               H.euler_angles(2),...
+                               H.euler_angles(3));
+
+                    % Process the giant spin assumption
+                    switch spin_system.inter.giant.strength{n}
+
+                        case 'strong'
+
+                            % Loop over spherical tensor indices
+                            for k=1:(2*r+1)
+
+                                % Contract coefficient components
+                                coeff=W(k,:)*spin_system.inter.giant.coeff{n}{r}(:);
+
+                                % Add the operator contribution
+                                if abs(coeff)>H.zero_tol
+                                    ist_spec=['T' num2str(r) ',' num2str(r-k+1)];
+                                    xyz=operator(H.spin_system,{ist_spec},{n},...
+                                                 H.operator_type,'xyz');
+                                    H.giant=H.giant+sparse(xyz(:,1),xyz(:,2),...
+                                                           coeff*xyz(:,3),H.dim,H.dim);
+                                end
+
+                            end
+
+                        case 'secular'
+
+                            % Contract coefficient components
+                            coeff=W(r+1,:)*spin_system.inter.giant.coeff{n}{r}(:);
+
+                            % Add the operator contribution
+                            if abs(coeff)>H.zero_tol
+                                ist_spec=['T' num2str(r) ',0'];
+                                xyz=operator(H.spin_system,{ist_spec},{n},...
+                                             H.operator_type,'xyz');
+                                H.giant=H.giant+sparse(xyz(:,1),xyz(:,2),...
+                                                       coeff*xyz(:,3),H.dim,H.dim);
+                            end
+
+                        case 'ignore'
+
+                            % Move to the next term
+                            continue
+
+                        otherwise
+
+                            % Bomb out with unexpected strength parameters
+                            error('unknown giant spin interaction strength specification.');
+
+                    end
+
+                end
+            end
+
+            % Match orientation.m Hermitisation
+            H.giant=(H.giant+H.giant')/2;
 
         end
 

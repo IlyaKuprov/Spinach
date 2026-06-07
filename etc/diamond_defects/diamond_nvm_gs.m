@@ -71,20 +71,25 @@ sys.isotopes={'E3',parameters.nitrogen};
 inter.zeeman.matrix=cell(1,numel(sys.isotopes));
 inter.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
 
+% Set the trigonal principal-axis frame
+frame=[-1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
+        1/sqrt(2) -1/sqrt(6) 1/sqrt(3);...
+        0          2/sqrt(6)  1/sqrt(3)];
+
 % Rotation matrix for orientation
 switch parameters.orientation
     
     case '100'
 
-        R=rotmat_align([1 1 1],[1 0 0]);
+        C=rotmat_align([1 0 0],[0 0 1]);
 
     case '110'
 
-        R=rotmat_align([1 1 1],[1 1 0]);
+        C=rotmat_align([1 1 0],[0 0 1]);
 
     case '111'
 
-        R=eye(3);
+        C=rotmat_align([1 1 1],[0 0 1]);
 
     otherwise
 
@@ -94,10 +99,10 @@ switch parameters.orientation
 end
 
 % Electron g-tensor
-inter.zeeman.matrix{1}=R*diag([2.0031 2.0031 2.0029])*R';
+inter.zeeman.matrix{1}=C*frame*diag([2.0031 2.0031 2.0029])*frame'*C';
 
 % Electron ZFS tensor
-inter.coupling.matrix{1,1}=R*zfs2mat(2872e6,0,0,0,0)*R';
+inter.coupling.matrix{1,1}=C*frame*zfs2mat(2872e6,0,0,0,0)*frame'*C';
 
 % HFC and NQI tensor
 switch parameters.nitrogen
@@ -105,13 +110,13 @@ switch parameters.nitrogen
     case '14N'
         
         % Hyperfine and quadrupolar coupling
-        inter.coupling.matrix{1,2}=R*diag([-2.70e6 -2.70e6 -2.14e6])*R';
-        inter.coupling.matrix{2,2}=R*zfs2mat(-5.01e6,0,0,0,0)*R';
+        inter.coupling.matrix{1,2}=C*frame*diag([-2.70e6 -2.70e6 -2.14e6])*frame'*C';
+        inter.coupling.matrix{2,2}=C*frame*zfs2mat(-5.01e6,0,0,0,0)*frame'*C';
 
     case '15N'
 
         % Only hyperfine coupling, opposite sign
-        inter.coupling.matrix{1,2}=R*diag([3.65e6 3.65e6 3.03e6])*R';
+        inter.coupling.matrix{1,2}=C*frame*diag([3.65e6 3.65e6 3.03e6])*frame'*C';
 
     otherwise
 

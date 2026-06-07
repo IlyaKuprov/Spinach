@@ -151,3 +151,15 @@ if isfield(parameters,'orientation')
 end
 end
 
+% Once, when sheltering under a tree during a storm near Lichfield,
+% he was asked to marry a heavily pregnant bride to a rather guilty
+% looking groom. Asked to provide evidence that he had performed
+% the shotgun wedding, Swift found a piece of paper and wrote:
+%
+%   Under an oak, in stormy weather,
+%   I joined this rogue and whore together;
+%   And none but He who rules the thunder
+%   Can put this rogue and whore asunder.
+%
+% Madeline Grant, about Jonathan Swift
+

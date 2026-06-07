@@ -49,18 +49,14 @@ if isa(a,'hamiltonian_action')&&isnumeric(b)
 
     end
 
-    % Add the oriented giant spin contribution
-    if nnz(a.giant)>0
-        c=c+a.giant*b;
-    end
-
     % Return the result
     return
 
 end
 
+
+
 % Complain and bomb out
 error('left operand must be a Hamiltonian action object and right operand must be numeric.');
 
 end
-

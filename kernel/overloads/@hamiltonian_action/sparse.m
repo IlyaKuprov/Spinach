@@ -41,8 +41,6 @@ for n=1:height(H.descr)
 
 end
 
-% Add the oriented giant spin contribution
-S=S+H.giant;
+
 
 end
-

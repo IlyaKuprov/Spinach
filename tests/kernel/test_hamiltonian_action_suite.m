@@ -29,10 +29,15 @@ result=local_case(result,'zeeman-liouv','none',false);
 % Check reduced spherical-tensor Liouville-space action
 result=local_case(result,'sphten-liouv','IK-0',true);
 
-% Check giant spin terms in Zeeman Liouville space
-result=local_giant_case(result);
+% Check complete giant spin terms in Zeeman Liouville space
+result=local_giant_case(result,'labframe','strong',[0.41 0.29 0.13]);
+
+% Check secular giant spin terms in Zeeman Liouville space
+result=local_giant_case(result,'deer-zz','secular',[0.17 0.39 0.51]);
 
 end
+
+
 
 
 
@@ -116,36 +121,43 @@ end
 
 
 
-function result=local_giant_case(result)
+function result=local_giant_case(result,assumption,strength,euler_angles)
 
-% Build a compact giant spin system
+% Build a compact high-rank giant spin system
 sys.magnet=1;
-sys.isotopes={'E3'};
+sys.isotopes={'E4'};
 inter.zeeman.matrix={diag([2.00 2.01 2.02])};
-inter.giant.coeff={{[0 0 0],[0.11e6 -0.03e6 0.07e6 0.02e6 -0.05e6]}};
-inter.giant.euler={{[0 0 0],[0.17 0.23 0.31]}};
+inter.giant.coeff={{[0.07e6 -0.01e6 0.03e6],...
+                    [0.11e6 -0.03e6 0.07e6 0.02e6 -0.05e6],...
+                    [0.02e6 -0.04e6 0.01e6 0.05e6 -0.03e6 0.06e6 -0.02e6]}};
+inter.giant.euler={{[0.11 0.13 0.17],...
+                    [0.17 0.23 0.31],...
+                    [0.19 0.29 0.37]}};
 bas.formalism='zeeman-liouv';
 bas.approximation='none';
 spin_system=test_spin_system(sys,inter,bas);
-spin_system=assume(spin_system,'labframe');
+spin_system=assume(spin_system,assumption);
 
 % Build explicit and descriptor-backed Hamiltonians
-euler_angles=[0.41 0.29 0.13];
 [I,Q,descr]=hamiltonian(spin_system,'comm');
 H_ref=I+orientation(Q,euler_angles);
 H_act=hamiltonian_action(spin_system,descr,euler_angles,'comm');
 
+% Check that high-rank giant spin columns are present
+result=test_close(result,['Hamiltonian descriptor giant spin columns ' strength],...
+                  size(descr.ist_coeff,2),15,0,0,...
+                  'rank-three giant spin terms must extend the descriptor coefficient columns');
+
 % Compare action on deterministic dense right-hand sides
 rng(260607951);
 x=randn(size(H_ref,2),2)+1i*randn(size(H_ref,2),2);
-result=test_close(result,'Hamiltonian action giant spin',H_act*x,H_ref*x,...
+result=test_close(result,['Hamiltonian action giant spin ' strength],H_act*x,H_ref*x,...
                   1e-9,1e-12,...
                   'descriptor-backed action must include giant spin terms');
 
 % Compare sparse conversion on the same compact system
-result=test_close(result,'Hamiltonian sparse giant spin',sparse(H_act),H_ref,...
+result=test_close(result,['Hamiltonian sparse giant spin ' strength],sparse(H_act),H_ref,...
                   1e-9,1e-12,...
                   'sparse conversion must include giant spin terms');
 
 end
-

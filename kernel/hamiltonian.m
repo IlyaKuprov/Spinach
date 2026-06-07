@@ -50,6 +50,15 @@ grumble(spin_system,operator_type);
 % Decide if the Q part is required
 build_aniso=(nargout>1);
 
+% Set the maximum spherical rank
+max_rank=2;
+if build_aniso
+    max_rank=max([max_rank; cellfun(@numel,spin_system.inter.giant.coeff(:))]);
+end
+
+% Count spherical coefficient columns
+ncoeffs=max_rank*(max_rank+2);
+
 % Inform the user
 report(spin_system,'building Hamiltonian descriptor...');
 
@@ -65,12 +74,16 @@ opS(1:spin_system.comp.nspins,1:8)={'E'};
 isotropic=zeros(spin_system.comp.nspins,8);
 
 % Preallocate spherical tensor coefficients
-ist_coeff{1}=zeros([spin_system.comp.nspins 8 3],'like',1i); % Rank 1 [+1, 0, -1]
-ist_coeff{2}=zeros([spin_system.comp.nspins 8 5],'like',1i); % Rank 2 [+2, +1, 0, -1, 2]
+ist_coeff=cell(1,max_rank);
+for r=1:max_rank
+    ist_coeff{r}=zeros([spin_system.comp.nspins 8 2*r+1],'like',1i);
+end
 
 % Preallocate irreducible components
-irr_comp{1}=zeros([spin_system.comp.nspins 8 3],'like',1i);  % Rank 1 [+1, 0, -1]
-irr_comp{2}=zeros([spin_system.comp.nspins 8 5],'like',1i);  % Rank 2 [+2, +1, 0, -1, 2]
+irr_comp=cell(1,max_rank);
+for r=1:max_rank
+    irr_comp{r}=zeros([spin_system.comp.nspins 8 2*r+1],'like',1i);
+end
 
 % Process Zeeman interactions and NQI
 for n=1:spin_system.comp.nspins
@@ -251,16 +264,21 @@ for n=1:spin_system.comp.nspins
     
 end
 
+% Flatten spherical coefficient arrays
+ist_flat=cell(1,max_rank); irr_flat=cell(1,max_rank);
+for r=1:max_rank
+    ist_flat{r}=reshape(ist_coeff{r},[8*spin_system.comp.nspins 2*r+1]);
+    irr_flat{r}=reshape(irr_comp{r},[8*spin_system.comp.nspins 2*r+1]);
+end
+
 % Pack single-spin descriptor table
 D1=table(reshape(nL, [8*spin_system.comp.nspins 1]),...
          reshape(nS, [8*spin_system.comp.nspins 1]),...
          reshape(opL,[8*spin_system.comp.nspins 1]),...
          reshape(opS,[8*spin_system.comp.nspins 1]),...
          reshape(isotropic,[8*spin_system.comp.nspins 1]),...
-         [reshape(ist_coeff{1},[8*spin_system.comp.nspins 3])...
-          reshape(ist_coeff{2},[8*spin_system.comp.nspins 5])],...
-         [reshape(irr_comp{1}, [8*spin_system.comp.nspins 3])...
-          reshape(irr_comp{2}, [8*spin_system.comp.nspins 5])],...
+         [ist_flat{:}],...
+         [irr_flat{:}],...
          'VariableNames',{'nL','nS','opL','opS','isotropic',...
                           'ist_coeff','irr_comp'});
 
@@ -272,7 +290,7 @@ D1(mask_a&(mask_b|mask_c),:)=[];
 
 % Tightest possible variable clean-up
 clear('nL','nS','opL','opS','isotropic','ist_coeff','irr_comp',...
-      'mask_a','mask_b','mask_c','zeeman_iso','n');
+      'ist_flat','irr_flat','mask_a','mask_b','mask_c','zeeman_iso','n');
 
 % Discover significant coupling tensors and build interacting pair list
 [L,S]=find(cellfun(@(x)norm(x,2),spin_system.inter.coupling.matrix)>...
@@ -292,12 +310,16 @@ opS(1:size(pair_list,1),1:3,1:3)={'E'};
 isotropic=zeros([size(pair_list,1) 3 3],'like',1i);
 
 % Preallocate spherical tensor coefficients
-ist_coeff{1}=zeros(size(pair_list,1),3,3,3);
-ist_coeff{2}=zeros(size(pair_list,1),3,3,5);
+ist_coeff=cell(1,max_rank);
+for r=1:max_rank
+    ist_coeff{r}=zeros(size(pair_list,1),3,3,2*r+1,'like',1i);
+end
 
 % Preallocate ireducible components
-irr_comp{1}=zeros(size(pair_list,1),3,3,3);
-irr_comp{2}=zeros(size(pair_list,1),3,3,5);
+irr_comp=cell(1,max_rank);
+for r=1:max_rank
+    irr_comp{r}=zeros(size(pair_list,1),3,3,2*r+1,'like',1i);
+end
 
 % Loop over the pair list
 for n=1:size(pair_list,1)
@@ -566,16 +588,21 @@ for n=1:size(pair_list,1)
     
 end
     
+% Flatten spherical coefficient arrays
+ist_flat=cell(1,max_rank); irr_flat=cell(1,max_rank);
+for r=1:max_rank
+    ist_flat{r}=reshape(ist_coeff{r},[9*size(pair_list,1) 2*r+1]);
+    irr_flat{r}=reshape(irr_comp{r},[9*size(pair_list,1) 2*r+1]);
+end
+
 % Pack two-spin descriptor table
 D2=table(reshape(nL, [9*size(pair_list,1) 1]),...
          reshape(nS, [9*size(pair_list,1) 1]),...
          reshape(opL,[9*size(pair_list,1) 1]),...
          reshape(opS,[9*size(pair_list,1) 1]),...
          reshape(isotropic,[9*size(pair_list,1) 1]),...
-        [reshape(ist_coeff{1},[9*size(pair_list,1) 3])...
-         reshape(ist_coeff{2},[9*size(pair_list,1) 5])],...
-        [reshape(irr_comp{1}, [9*size(pair_list,1) 3])...
-         reshape(irr_comp{2}, [9*size(pair_list,1) 5])],...
+        [ist_flat{:}],...
+        [irr_flat{:}],...
          'VariableNames',{'nL','nS','opL','opS','isotropic',...
                           'ist_coeff','irr_comp'});
 
@@ -585,14 +612,111 @@ mask_b=(sum(abs(D2.irr_comp),2) <spin_system.tols.liouv_zero);
 mask_c=(sum(abs(D2.ist_coeff),2)<spin_system.tols.liouv_zero);
 D2(mask_a&(mask_b|mask_c),:)=[];
 
+% Count giant spin descriptor rows
+giant_rows=0;
+if build_aniso
+    for n=1:spin_system.comp.nspins
+        for r=1:numel(spin_system.inter.giant.coeff{n})
+            switch spin_system.inter.giant.strength{n}
+                case 'strong'
+                    giant_rows=giant_rows+2*r+1;
+                case 'secular'
+                    giant_rows=giant_rows+1;
+            end
+        end
+    end
+end
+
+% Preallocate giant spin descriptor arrays
+nL=zeros(giant_rows,1); nS=zeros(giant_rows,1);
+opL=cell(giant_rows,1); opS=cell(giant_rows,1);
+opL(:)={'E'}; opS(:)={'E'}; isotropic=zeros(giant_rows,1);
+ist_coeff=zeros(giant_rows,ncoeffs,'like',1i);
+irr_comp=zeros(giant_rows,ncoeffs,'like',1i);
+
+% Fill giant spin descriptor arrays
+curr_idx=0;
+if build_aniso
+    if giant_rows>0
+        report(spin_system,['maximum spherical rank in the giant spin Hamiltonian: ' num2str(max_rank)]);
+    end
+    for n=1:spin_system.comp.nspins
+        for r=1:numel(spin_system.inter.giant.coeff{n})
+            rank_cols=r^2:(r^2+2*r);
+            switch spin_system.inter.giant.strength{n}
+
+                case 'strong'
+
+                    % Inform the user
+                    report(spin_system,['complete giant spin Hamiltonian of rank ' num2str(r) ' for spin ' num2str(n) '...']);
+
+                    % Loop over spherical tensor indices
+                    for k=1:(2*r+1)
+
+                        % Build the tensor spec
+                        ist_spec=['T' num2str(r) ',' num2str(r-k+1)];
+
+                        % Inform the user
+                        report(spin_system,['           ' ist_spec ' x ' ...
+                               num2str(spin_system.inter.giant.coeff{n}{r}(k)/(2*pi),'%+0.5e') ' Hz']);
+
+                        % Store the descriptor row
+                        curr_idx=curr_idx+1; ist_col=r^2+k-1;
+                        nL(curr_idx)=n; opL(curr_idx)={ist_spec};
+                        ist_coeff(curr_idx,ist_col)=1;
+                        irr_comp(curr_idx,rank_cols)=spin_system.inter.giant.coeff{n}{r}(:).';
+
+                    end
+
+                case 'secular'
+
+                    % Inform the user
+                    report(spin_system,['secular giant spin Hamiltonian of rank ' num2str(r) ' for spin ' num2str(n) '...']);
+
+                    % Build the tensor spec
+                    ist_spec=['T' num2str(r) ',0'];
+
+                    % Inform the user
+                    report(spin_system,['           ' ist_spec ' x ' ...
+                           num2str(spin_system.inter.giant.coeff{n}{r}(r+1)/(2*pi),'%+0.5e') ' Hz']);
+
+                    % Store the descriptor row
+                    curr_idx=curr_idx+1; ist_col=r^2+r;
+                    nL(curr_idx)=n; opL(curr_idx)={ist_spec};
+                    ist_coeff(curr_idx,ist_col)=1;
+                    irr_comp(curr_idx,rank_cols)=spin_system.inter.giant.coeff{n}{r}(:).';
+
+                case 'ignore'
+
+                    % Tell the user
+                    report(spin_system,['giant spin Hamiltonian terms of rank ' num2str(r)...
+                                        ' for spin ' num2str(n) ' have been ignored.']);
+
+            end
+        end
+    end
+end
+
+% Pack giant spin descriptor table
+Dg=table(nL,nS,opL,opS,isotropic,ist_coeff,irr_comp,...
+         'VariableNames',{'nL','nS','opL','opS','isotropic',...
+                          'ist_coeff','irr_comp'});
+
+% Kill insignificant rows
+mask_a=(abs(Dg.isotropic)       <spin_system.tols.liouv_zero);
+mask_b=(sum(abs(Dg.irr_comp),2) <spin_system.tols.liouv_zero);
+mask_c=(sum(abs(Dg.ist_coeff),2)<spin_system.tols.liouv_zero);
+Dg(mask_a&(mask_b|mask_c),:)=[];
+
 % Merge descriptors 
-descr=[D1; D2]; nterms=size(descr,1);
+descr=[D1; D2; Dg]; nterms=size(descr,1);
 report(spin_system,[num2str(nterms) ' unique operators in the Hamiltonian descriptor.']);
 
 % Tightest possible variable clean-up
-clear('D1','D2','nL','nS','opL','opS','isotropic','ist_coeff',...
-      'irr_comp','mask_a','mask_b','mask_c','L','S','coupling_iso',...
-      'n','pair_list','quad_couplings');
+clear('D1','D2','Dg','nL','nS','opL','opS','isotropic','ist_coeff',...
+      'irr_comp','ist_flat','irr_flat','mask_a','mask_b','mask_c','L','S',...
+      'coupling_iso','n','pair_list','quad_couplings','giant_rows',...
+      'curr_idx','rank_cols','ist_spec','ist_col','k');
 
 % Use the cache record if one exists
 if ismember('ham_cache',spin_system.sys.enable)
@@ -733,7 +857,7 @@ end
 if build_aniso
 
     % Rank loop
-    for r=1:2
+    for r=1:max_rank
 
         % Preallocate output
         Q{r}=cell(2*r+1,2*r+1); %#ok<AGROW>
@@ -785,94 +909,6 @@ end
 
 % Inform the user
 report(spin_system,['Hamiltonian assembly took ' num2str(toc()) ' seconds']);
-
-% Process giant spin Hamiltonian terms
-if build_aniso
-
-    % Detect the maximum spherical rank
-    max_rank=max(cellfun(@numel,spin_system.inter.giant.coeff));
-    report(spin_system,['maximum spherical rank in the giant spin Hamiltonian: ' num2str(max_rank)]);
-    
-    % Expand the data structure
-    for r=1:max_rank
-        if numel(Q)<r
-            Q{r}=cell(2*r+1,2*r+1);
-            Q{r}(1:(2*r+1),1:(2*r+1))={mprealloc(spin_system,0)};
-        end
-    end
-
-    % Build the Hamiltonian
-    for n=1:spin_system.comp.nspins
-        
-        % Loop over spherical ranks
-        for r=1:numel(spin_system.inter.giant.coeff{n})
-            
-            switch spin_system.inter.giant.strength{n}
-                
-                case 'strong'
-                   
-                    % Inform the user
-                    report(spin_system,['complete giant spin Hamiltonian of rank ' num2str(r) ' for spin ' num2str(n) '...']);
-                    
-                    % Loop over spherical tensor indices
-                    for k=1:(2*r+1)
-                        
-                        % Build the tensor spec
-                        ist_spec=['T' num2str(r) ',' num2str(r-k+1)];
-                        
-                        % Inform the user
-                        report(spin_system,['           ' ist_spec ' x ' ...
-                               num2str(spin_system.inter.giant.coeff{n}{r}(k)/(2*pi),'%+0.5e') ' Hz']);
-                        
-                        % Get the irreducible spherical tensor
-                        T=operator(spin_system,{ist_spec},{n},operator_type);
-                        
-                        % Loop over coefficient indices
-                        for m=1:(2*r+1)
-                            
-                            % Operator building
-                            Q{r}{k,m}=Q{r}{k,m}+T*spin_system.inter.giant.coeff{n}{r}(m);
-                            
-                        end
-                        
-                    end
-                    
-                case 'secular'
-                    
-                    % Inform the user
-                    report(spin_system,['secular giant spin Hamiltonian of rank ' num2str(r) ' for spin ' num2str(n) '...']);
-                    
-                    % Build the tensor spec
-                    ist_spec=['T' num2str(r) ',' num2str(0)];
-                    
-                    % Inform the user
-                    report(spin_system,['           ' ist_spec ' x ' ...
-                           num2str(spin_system.inter.giant.coeff{n}{r}(r+1)/(2*pi),'%+0.5e') ' Hz']);
-                    
-                    % Only use the zero projection for T_lm
-                    T=operator(spin_system,{ist_spec},{n},operator_type);
-                    
-                    % Loop over coefficient indices
-                    for m=1:(2*r+1)
-                        
-                        % Operator building
-                        Q{r}{r+1,m}=Q{r}{r+1,m}+T*spin_system.inter.giant.coeff{n}{r}(m);
-                        
-                    end
-                    
-                case 'ignore'
-                    
-                    % Tell the user
-                    report(spin_system,['giant spin Hamiltonian terms of rank ' num2str(r)...
-                                        ' for spin ' num2str(n) ' have been ignored.']); 
-                    
-            end
-            
-        end
-                    
-    end
-    
-end
 
 % Remind the user about the anisotropic part
 if ~build_aniso

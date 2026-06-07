@@ -3,8 +3,7 @@
 %           [sys,inter]=diamond_p1(parameters)
 %
 % Magnetic parameters from: Nir-Orad et al. PCCP 2024, and
-% Smith et al. Phys. Rev. 115, 1546 (1959), relaxation ra-
-% tes from Carroll et al. JMR 2021.
+% Smith et al. Phys. Rev. 115, 1546 (1959).
 %
 % Parameters:
 %

@@ -8,8 +8,6 @@
 function diamond_nvm_epr_xw()
 
 % Set NV centre parameters
-nv_params.temperature=296;
-nv_params.concentration=0.001;
 nv_params.orientation='111';
 nv_params.nitrogen='14N';
 

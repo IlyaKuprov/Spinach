@@ -1,7 +1,7 @@
 % Hamiltonian operator or superoperator and its rotational decomposi-
 % tion. Descriptor and operator generation are parallelised. Syntax:
 %
-%             [I,Q]=hamiltonian(spin_system,operator_type)
+%             [I,Q,D]=hamiltonian(spin_system,operator_type)
 %
 % Parameters: 
 %
@@ -25,6 +25,9 @@
 %           use orientation.m to get the full Hamiltonian
 %           at each specific orientation
 %
+%     D   - Hamiltonian descriptor table, for use with
+%           descriptor-backed Hamiltonian action objects
+%
 % Note: the code has a few rather eccentric blocks that bring the 
 %       memory footprint to the absolute minimum and work around 
 %       the sparse matrix addition efficiency problem.
@@ -36,7 +39,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=hamiltonian.m>
 
-function [I,Q]=hamiltonian(spin_system,operator_type)
+function [I,Q,descr]=hamiltonian(spin_system,operator_type)
 
 % Set the default for the type
 if ~exist('operator_type','var'), operator_type='comm'; end

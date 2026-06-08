@@ -42,7 +42,7 @@ kfigure();
 plot(lags(1:nlags),real(cf_mc(1:nlags)),'b-');
 xlim('tight'); kgrid; kxlabel('lag, points');
 kylabel('correlation function'); 
-klegend({'Monte-Carlo'},'Location','NorthEast');
+klegend({'Monte-Carlo'},'Location','Best');
 
 end
 

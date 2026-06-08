@@ -72,14 +72,14 @@ kfigure(); scale_figure([1.75 0.75]);
 subplot(1,2,1); plot(time_axis,real(answer(1,:)));
 kylabel('$S_\textrm{z}$ expectation value'); 
 kxlabel('time, seconds'); kgrid;
-klegend({'electron'},'Location','SouthEast'); 
+klegend({'electron'},'Location','Best');
 set(gca,'XScale','log'); axis tight; 
 subplot(1,2,2); plot(time_axis,real(answer(2:end,:))); 
 kylabel('$S_\textrm{z}$ expectation value'); 
 kxlabel('time, seconds'); kgrid;
 set(gca,'XScale','log'); axis tight;
 klegend({'Proton 1','Proton 2','Proton 3'},...
-         'Location','NorthWest'); drawnow;
+         'Location','Best'); drawnow;
 
 % Steady state simulation
 parameters.calc_type='steady_state';

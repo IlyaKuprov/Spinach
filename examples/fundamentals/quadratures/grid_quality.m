@@ -27,7 +27,7 @@ for n=[100 200 400 800 1600 3200 6400 12800]
 
     % Residual cosmetics
     kxlabel('spherical rank'); kylabel('integration error');
-    klegend(legend_txt,'Location','southeast'); drawnow;
+    klegend(legend_txt,'Location','Best'); drawnow;
     
 end
 
@@ -53,7 +53,7 @@ for n=[100 200 400 800 1600 3200 6400 12800]
 
     % Residual cosmetics
     kxlabel('spherical rank'); kylabel('integration error');
-    klegend(legend_txt,'Location','southeast'); drawnow;
+    klegend(legend_txt,'Location','Best'); drawnow;
     
 end
 
@@ -82,7 +82,7 @@ for n=[5 17 29 41 53]
 
     % Residual cosmetics
     kxlabel('spherical rank'); kylabel('integration error');
-    klegend(legend_txt,'Location','southeast'); drawnow;
+    klegend(legend_txt,'Location','Best'); drawnow;
     
 end
 

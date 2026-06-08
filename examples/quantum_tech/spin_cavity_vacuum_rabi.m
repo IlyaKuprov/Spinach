@@ -61,6 +61,6 @@ kfigure(); plot(time_axis,real([pop_s pop_c]),'LineWidth',1.5);
 axis tight; ylim([-0.05 1.05]); kgrid; kxlabel('time, ns');
 kylabel('excitation population');
 ktitle('spin-cavity vacuum Rabi oscillation');
-klegend({'spin','cavity'},'Location','East');
+klegend({'spin','cavity'},'Location','Best');
 
 end

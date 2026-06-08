@@ -32,7 +32,7 @@ plot([0 1 NaN 1 0],[3e4 3e4 NaN -3e4 -3e4],'k--');
 kxlabel('time, ms');
 kylabel('nutation frequency, rad/s');
 klegend({'input','output, tanh','output, $s=10$',...
-         'saturation level'},'Location','SouthWest');
+         'saturation level'},'Location','Best');
 kgrid; xlim tight; box on; drawnow;
 
 end

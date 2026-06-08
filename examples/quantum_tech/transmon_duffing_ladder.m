@@ -51,7 +51,7 @@ kfigure(); plot(-anharm/(2*pi*1e6),trans_frq/1e9,'LineWidth',1.5);
 axis tight; kgrid; kxlabel('$-\alpha/2\pi$, MHz');
 kylabel('transition frequency, GHz');
 ktitle('Duffing transmon ladder');
-klegend({'0-1','1-2','2-3','3-4'},'Location','SouthWest');
+klegend({'0-1','1-2','2-3','3-4'},'Location','Best');
 
 end
 

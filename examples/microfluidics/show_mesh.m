@@ -28,7 +28,7 @@ spin_system.mesh=mesh;
 kfigure(); mesh_plot(spin_system,2,0); 
 xlim([286.88  287.42]); ylim([578.07  578.50]);
 klegend({'triangles','rectangles',...
-         'tessellation','velocities'},'Location','NorthEast');
+         'tessellation','velocities'},'Location','Best');
 
 end
 

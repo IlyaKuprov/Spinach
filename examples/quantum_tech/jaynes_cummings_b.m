@@ -80,7 +80,7 @@ L5=evolution(spin_system,H,L5,rho,10e-9,250,'observable');
 kfigure(); plot(time_axis,real([L1 L2 L3 L4 L5])); 
 xlim tight; ylim padded; kxlabel('time, $\mu$s');
 kylabel('cavity level population'); kgrid;
-klegend({'L1','L2','L3','L4','L5'},'Location','East');
+klegend({'L1','L2','L3','L4','L5'},'Location','Best');
 
 end
 

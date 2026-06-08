@@ -120,7 +120,7 @@ set(gca,'GridColor',0.9*[1 1 1]);
 kxlabel('number of points in the rotor grid');
 kylabel('$\|$difference$\|$/$\|$exact$\|$'); 
 klegend({'LP','MP','LG-2','LG-4'},...
-        'Location','SouthWest');
+        'Location','Best');
 kgrid; xlim tight; ylim([1e-13 1e-2]);
 scale_figure([1.00 0.65]);
 

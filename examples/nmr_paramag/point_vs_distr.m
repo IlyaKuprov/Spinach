@@ -105,7 +105,7 @@ disp('Standard deviation (cubic Angstrom):   ');  disp(s_chi_m);
 kfigure();   plot(sqrt(x.^2+y.^2+z.^2),theo_pcs_p-expt_pcs,'bo');
 hold('on'); plot(sqrt(x.^2+y.^2+z.^2),theo_pcs_m-expt_pcs,'ro'); kgrid;
 kxlabel('Distance from the origin, Angstrom'); kylabel('PCS fitting error (ppm)')
-klegend('point model','delocalised model','Location','northeast'); hold('off');
+klegend('point model','delocalised model','Location','Best'); hold('off');
 
 % Compare fitted multipole moments with the original ones
 Ilm0=points2mult([X(:) Y(:) Z(:)],mxyz_m,rho(:),[0 1 2],'grid');

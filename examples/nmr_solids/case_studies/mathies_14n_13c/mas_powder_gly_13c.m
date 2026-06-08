@@ -97,7 +97,7 @@ end
 
 % Legend
 klegend({'4.7 Tesla','9.4 Tesla','14.1 Tesla'},...
-        'Location','NorthEast');
+        'Location','Best');
 
 end
 

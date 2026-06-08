@@ -96,7 +96,7 @@ for n=1:numel(field_grid)
     % Set the legend
     klegend({'$\tau_c = 300$ ps','$\tau_c = 400$ ps',...
              '$\tau_c = 500$ ps','$\tau_c = 600$ ps'},...
-             'location','southeast');
+             'location','Best');
     
 end
 

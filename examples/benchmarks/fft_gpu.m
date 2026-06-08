@@ -46,6 +46,6 @@ xlim([100 600]); box on; kgrid;
 set(gca,'xscale','log'); set(gca,'yscale','log');
 xlabel('number of points in each dimension');
 ylabel('3D FFT calculation time, seconds');
-legend({'CPU','GPU'},'Location','northwest');
+legend({'CPU','GPU'},'Location','Best');
 
 end

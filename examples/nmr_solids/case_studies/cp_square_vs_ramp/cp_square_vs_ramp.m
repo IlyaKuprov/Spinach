@@ -70,12 +70,12 @@ xlim tight; kgrid; kxlabel('time, seconds');
 kylabel('nutation frequency, Hz'); ylim([-5e4 6e4]);
 klegend({'constant ampl.','constant ampl.',...
          'linear ramp',   'linear ramp',   ...
-         'tangent ramp',  'tangent ramp'},'Location','South');
+         'tangent ramp',  'tangent ramp'},'Location','Best');
 subplot(1,2,2); plot(time_axis,real([fid_a; fid_b; fid_c]));
 xlim tight; kgrid; kxlabel('time, seconds'); 
 kylabel('$S_{\rm{X}}$ expectation value on $^{15}N$'); 
 klegend({'constant ampl.','linear ramp','tangent ramp'},...
-         'Location','SouthWest');
+         'Location','Best');
 
 end
 

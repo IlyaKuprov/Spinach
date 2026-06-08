@@ -69,7 +69,7 @@ ktitle('demodulation frequency: 0 Hz');
 kxlabel('time, s'); kylabel('phase, rad');
 legend_handle=klegend(axis_handle,plot_line,...
                       {'unwrapped phase'},...
-                      'Location','best');
+                      'Location','Best');
 title_handle=get(axis_handle,'Title');
 ylabel_handle=get(axis_handle,'YLabel');
 
@@ -384,7 +384,7 @@ end
                     delete(legend_handle);
                     legend_handle=klegend(axis_handle,plot_line,...
                                           {legend_text},...
-                                          'Location','best');
+                                          'Location','Best');
                     shown_mode='phase'; shown_wrapped=phase_wrapped;
                 end
 
@@ -399,7 +399,7 @@ end
                     delete(legend_handle);
                     legend_handle=klegend(axis_handle,plot_line,...
                                           {'instantaneous frequency'},...
-                                          'Location','best');
+                                          'Location','Best');
                     shown_mode='frequency';
                 end
 

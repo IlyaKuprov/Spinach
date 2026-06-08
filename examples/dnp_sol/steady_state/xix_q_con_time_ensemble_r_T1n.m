@@ -27,7 +27,7 @@ end
 % Add the legend and save the plot
 klegend({'$T_{1n}$ = 50 s', '$T_{1n}$ = 5 s',...
          '$T_{1n}$ = 0.5 s','$T_{1n}$ = 0.05 s',...
-         '$T_{1n}$ = 0.005 s'},'Location','NorthEast');
+         '$T_{1n}$ = 0.005 s'},'Location','Best');
 savefig(gcf,'xix_q_con_time_ensemble_r_T1n.fig');
 
 end

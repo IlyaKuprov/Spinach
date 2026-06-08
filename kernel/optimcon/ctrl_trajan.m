@@ -288,7 +288,7 @@ if ismember('xy_controls',spin_system.control.plotting)
     end
     
     % Legend, labels and the grid
-    klegend(control_labels,'Location','Best'); 
+    klegend(control_labels,'Location','Best');
     kxlabel(t_axis_label); ktitle('controls');
     kylabel('ens. average value, Hz'); 
     kgrid; kytickfix;
@@ -365,7 +365,7 @@ if ismember('phi_controls',spin_system.control.plotting)
     end
     
     % Legend, labels and the grid
-    klegend(control_labels,'Location','Best'); 
+    klegend(control_labels,'Location','Best');
     kxlabel(t_axis_label); ktitle('control phases');
     kylabel('phase, radians'); kgrid; kytickfix;
     
@@ -436,7 +436,7 @@ if ismember('amp_controls',spin_system.control.plotting)
     end
     
     % Legend, labels and the grid
-    klegend(control_labels,'Location','Best');  
+    klegend(control_labels,'Location','Best');
     kxlabel(t_axis_label); ktitle('control moduli');
     kylabel('ens. average value, Hz'); 
     kgrid; kytickfix; 
@@ -512,7 +512,7 @@ if ismember('frq_controls',spin_system.control.plotting)
     end
 
     % Legend, frequency axis label and the grid
-    klegend(control_labels,'Location','Best');  
+    klegend(control_labels,'Location','Best');
     kxlabel(t_axis_label); ktitle('inst. frequencies');
     kylabel('frequency, Hz'); kgrid; kytickfix; 
 

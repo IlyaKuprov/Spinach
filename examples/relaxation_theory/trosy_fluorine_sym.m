@@ -50,7 +50,7 @@ plot(lin_freq',[f_bro' r2f' f_nar']); ylim([0 1200]);
 kxlabel('Proton Larmor frequency, MHz'); kgrid;
 kylabel('Relaxation matrix element, Hz');
 klegend({'TROSY, broad','$R_2$ relax. rate','TROSY, narrow'},...
-         'Location','northwest','FontSize',12);
+         'Location','Best','FontSize',12);
 ktitle('3-fluoro-Tyr, $^{19}$F TROSY line relaxation rates');
     
 kfigure();
@@ -58,7 +58,7 @@ plot(lin_freq',[c_bro' r2c' c_nar']); ylim([0 140]);
 kxlabel('Proton Larmor frequency, MHz'); kgrid;
 kylabel('Relaxation matrix element, Hz');
 klegend({'TROSY, broad',' $R_2$ relax. rate',' TROSY, narrow'},...
-         'Location','northwest','FontSize',12);
+         'Location','Best','FontSize',12);
 ktitle('3-fluoro-Tyr, $^{13}$C TROSY line relaxation rates');
     
 % TROSY rate by mechanism
@@ -66,7 +66,7 @@ kfigure();
 bar(lin_freq,[c_tro_dd' c_tro_csa' -abs(c_tro_xc')],'stacked'); 
 kxlabel('Proton Larmor frequency, MHz'); kgrid;
 kylabel('Relaxation matrix element, Hz');
-klegend({'DD','CSA','DD-CSA'},'Location','northwest','FontSize',12);
+klegend({'DD','CSA','DD-CSA'},'Location','Best','FontSize',12);
 ktitle('3-fluoro-Tyr, $^{13}$C TROSY rate by mechanism');
 
 end

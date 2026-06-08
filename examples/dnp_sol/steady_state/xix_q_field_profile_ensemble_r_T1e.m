@@ -26,7 +26,7 @@ end
 % Add the legend and save the plot
 klegend({'$T_{1e}$ = 10 ms', '$T_{1e}$ = 3.0 ms',...
          '$T_{1e}$ = 1.0 ms','$T_{1e}$ = 0.3 ms',...
-         '$T_{1e}$ = 0.1 ms'},'Location','SouthEast');
+         '$T_{1e}$ = 0.1 ms'},'Location','Best');
 savefig(gcf,'xix_q_field_profile_ensemble_r_T1e.fig');
 
 end

@@ -95,7 +95,7 @@ figure('Name','HA and CH3 magnetisation evolution');
 scale_figure([1.00 0.65]); plot(time_axis,real(result)); 
 kxlabel('time, seconds'); xlim tight; kgrid;
 kylabel('magnetisation, a.u.'); ylim padded; 
-klegend({'CH$_{3}$','H$_{\alpha}$'},'Location','SouthEast'); 
+klegend({'CH$_{3}$','H$_{\alpha}$'},'Location','Best');
 
 end
 

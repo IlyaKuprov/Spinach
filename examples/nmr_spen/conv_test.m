@@ -142,13 +142,13 @@ set(true_val,'Color','k','LineStyle','--');
 kxlabel('grid point count');
 kylabel('$D / 10^{-10} m^2/s$');
 klegend({'3-point stencil','5-point stencil',...
-         '7-point stencil'},'Location','SouthEast');
+         '7-point stencil'},'Location','Best');
 subplot(2,1,2); plot(grid_sizes',T); 
 kgrid; axis tight;
 kxlabel('grid point count');
 kylabel('wall clock time / s');
 klegend({'3-point finite difference','5-point finite difference',...
-         '7-point finite difference'},'Location','NorthWest');
+         '7-point finite difference'},'Location','Best');
 
 % Generate convergence plot B
 kfigure(); scale_figure([2.0 1.5]);
@@ -184,7 +184,7 @@ subplot(2,3,3); klegend({[num2str(grid_sizes(3))  ' points'],...
                          [num2str(grid_sizes(8))  ' points'],...
                          [num2str(grid_sizes(9))  ' points'],...
                          [num2str(grid_sizes(10)) ' points']},...
-                         'Location','SouthWest');
+                         'Location','Best');
 
 end
 

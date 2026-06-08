@@ -106,7 +106,7 @@ kgrid; xlim tight; ylim padded;
 kxlabel('time, seconds');
 kylabel('magnetisation, a.u.');
 klegend({'x-magnetisation','y-magnetisation',...
-         'z-magnetisation'},'Location','SouthEast');
+         'z-magnetisation'},'Location','Best');
 subplot(1,2,2); plot(np',bench);
 kgrid; xlim tight; ylim([1e-7 1e0]);
 set(gca,'YScale','log','XScale','log');
@@ -114,7 +114,7 @@ kxlabel('number of points in the time grid');
 kylabel('$\|$difference$\|$/$\|$exact$\|$');
 klegend({'LP','LG-2','LG-4','LG-4A',...
          'RKMK4','RKMK-DP5','RKMK-DP8'},...
-        'Location','NorthEast');
+        'Location','Best');
 set(gca,'YTick',10.^(-7:2:0));
 set(gca,'MinorGridLineStyle','-'); 
 set(gca,'MinorGridColor',0.9*[1 1 1]);

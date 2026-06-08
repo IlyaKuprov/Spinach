@@ -33,7 +33,7 @@ plot(1e6*time_grid,wave_spf(2,:),'b:','LineWidth',1);
 kgrid; xlim tight; ylim padded;
 klegend({'input, in-phase','input, quadr.',...
          'output, in-phase','output, quadr.'},...
-         'Location','NorthEast');
+         'Location','Best');
 kxlabel('time, $\mu$s'); kylabel('$B_1$, mT');
 
 % Apply a cascade of three single-zero filters
@@ -50,7 +50,7 @@ plot(1e6*time_grid,wave_szf(2,:),'b:','LineWidth',1);
 kgrid; xlim tight; ylim padded;
 klegend({'input, in-phase','input, quadr.',...
          'output, in-phase','output, quadr.'},...
-         'Location','NorthEast');
+         'Location','Best');
 kxlabel('time, $\mu$s'); kylabel('$B_1$, mT');
 
 % Apply an RLC filter
@@ -66,7 +66,7 @@ plot(1e6*time_grid,wave_spf(2,:),'b:','LineWidth',1);
 kgrid; xlim tight; ylim padded;
 klegend({'input, in-phase','input, quadr.',...
          'output, in-phase','output, quadr.'},...
-         'Location','NorthEast');
+         'Location','Best');
 kxlabel('time, $\mu$s'); kylabel('$B_1$, mT');
 
 end

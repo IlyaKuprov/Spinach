@@ -122,43 +122,43 @@ save('gb1_workspace.mat','-v7.3','-nocompression');
 kfigure(); scale_figure([2.0 3.0])
 time_axis=linspace(0,nsteps*dt,nsteps);
 subplot(6,2,1); plot(time_axis,cHx/(2*pi)); ktitle('controls');
-axis tight; kgrid; klegend({'Hx'},'Location','NorthEast');
+axis tight; kgrid; klegend({'Hx'},'Location','Best');
 kxlabel('time, seconds'); kylabel('nut. freq., Hz');
 subplot(6,2,3); plot(time_axis,cHy/(2*pi)); 
-axis tight; kgrid; klegend({'Hy'},'Location','NorthEast');
+axis tight; kgrid; klegend({'Hy'},'Location','Best');
 kxlabel('time, seconds'); kylabel('nut. freq., Hz');
 subplot(6,2,5); plot(time_axis,cCx/(2*pi)); 
-axis tight; kgrid; klegend({'Cx'},'Location','NorthEast');
+axis tight; kgrid; klegend({'Cx'},'Location','Best');
 kxlabel('time, seconds'); kylabel('nut. freq., Hz');
 subplot(6,2,7); plot(time_axis,cCy/(2*pi)); 
-axis tight; kgrid; klegend({'Cy'},'Location','NorthEast');
+axis tight; kgrid; klegend({'Cy'},'Location','Best');
 kxlabel('time, seconds'); kylabel('nut. freq., Hz');
 subplot(6,2,9); plot(time_axis,cNx/(2*pi)); 
-axis tight; kgrid; klegend({'Nx'},'Location','NorthEast');
+axis tight; kgrid; klegend({'Nx'},'Location','Best');
 kxlabel('time, seconds'); kylabel('nut. freq., Hz');
 subplot(6,2,11); plot(time_axis,cNy/(2*pi)); 
-axis tight; kgrid; klegend({'Ny'},'Location','NorthEast');
+axis tight; kgrid; klegend({'Ny'},'Location','Best');
 kxlabel('time, seconds'); kylabel('nut. freq., Hz');
 
 % Plotting - trajectories
 time_axis=linspace(0,nsteps*dt,nsteps);
 subplot(6,2,2); plot(time_axis,fids(1,:)); ktitle('observables');
-axis tight; kgrid; klegend({'Hx'},'Location','NorthEast');
+axis tight; kgrid; klegend({'Hx'},'Location','Best');
 kxlabel('time, seconds'); kylabel('expect. value');
 subplot(6,2,4); plot(time_axis,fids(2,:));
-axis tight; kgrid; klegend({'Hy'},'Location','NorthEast');
+axis tight; kgrid; klegend({'Hy'},'Location','Best');
 kxlabel('time, seconds'); kylabel('expect. value');
 subplot(6,2,6); plot(time_axis,fids(3,:)); 
-axis tight; kgrid; klegend({'Cx'},'Location','NorthEast');
+axis tight; kgrid; klegend({'Cx'},'Location','Best');
 kxlabel('time, seconds'); kylabel('expect. value');
 subplot(6,2,8); plot(time_axis,fids(4,:));
-axis tight; kgrid; klegend({'Cy'},'Location','NorthEast');
+axis tight; kgrid; klegend({'Cy'},'Location','Best');
 kxlabel('time, seconds'); kylabel('expect. value');
 subplot(6,2,10); plot(time_axis,fids(5,:)); 
-axis tight; kgrid; klegend({'Nx'},'Location','NorthEast');
+axis tight; kgrid; klegend({'Nx'},'Location','Best');
 kxlabel('time, seconds'); kylabel('expect. value');
 subplot(6,2,12); plot(time_axis,fids(6,:));
-axis tight; kgrid; klegend({'Ny'},'Location','NorthEast');
+axis tight; kgrid; klegend({'Ny'},'Location','Best');
 kxlabel('time, seconds'); kylabel('expect. value');
 
 end

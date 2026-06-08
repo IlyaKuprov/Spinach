@@ -106,20 +106,20 @@ plot(t_axis(2:end),real(answer(6,2:end)),'r-');
 kxlabel('time / seconds'); kylabel('state population');
 klegend({'${T_{+,\alpha}}$','${T_{-,\alpha}}$','${T_{0,\alpha}}$',...
          '${T_{+,\beta}}$','${T_{-,\beta}}$','${T_{0,\beta}}$'},...
-         'interpreter','latex','Location','northeast');
+         'interpreter','latex','Location','Best');
 kgrid; xlim tight; ylim padded;
 subplot(1,3,2);
 plot(t_axis(2:end),real(answer(7,2:end)),'b-'); hold on;
 plot(t_axis(2:end),real(answer(8,2:end)),'r-'); kgrid;
 kxlabel('time / seconds'); kylabel('state population');
 klegend({'${S_{\alpha}}$','${S_{\beta}}$'},...
-         'interpreter','latex','Location','southeast');
+         'interpreter','latex','Location','Best');
 xlim tight; ylim padded;
 subplot(1,3,3);
 plot(t_axis(2:end),real(answer(15,2:end)),'b-'); hold on;
 kxlabel('time / seconds','interpreter','latex');
 kylabel('state population','interpreter','latex');
-klegend({'${N_{\rm{Z}}}$'},'interpreter','latex','Location','southeast');
+klegend({'${N_{\rm{Z}}}$'},'interpreter','latex','Location','Best');
 kgrid; xlim tight; ylim padded;
 
 end

@@ -118,11 +118,11 @@ subplot(1,2,1); plot(detuning/(2*pi*1e6),rates/(2*pi*1e3),'LineWidth',1.5);
 axis tight; kgrid; kxlabel('spin-cavity detuning, MHz');
 kylabel('$\Gamma_P/2\pi$, kHz');
 ktitle('Liouvillian Purcell rate');
-klegend({'2 MHz','4 MHz','8 MHz','16 MHz'},'Location','NorthEast');
+klegend({'2 MHz','4 MHz','8 MHz','16 MHz'},'Location','Best');
 subplot(1,2,2); plot(1e6*time_axis,survival,'LineWidth',1.5);
 axis tight; kgrid; kxlabel('time, $\mu$s');
 kylabel('spin excitation survival');
 ktitle('relaxation of the second kind');
-klegend({'0 MHz','2 MHz','6 MHz'},'Location','NorthEast');
+klegend({'0 MHz','2 MHz','6 MHz'},'Location','Best');
 
 end

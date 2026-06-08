@@ -82,13 +82,13 @@ figure('Name',namestring,'NumberTitle','off');
 subplot(1,2,1); hold on; kgrid; box on;
 plot(sizes,send_bandwidth,'bo',...
      sizes,gather_bandwidth,'ro');
-klegend({'To GPU','From GPU'},'Location','NorthWest');
+klegend({'To GPU','From GPU'},'Location','Best');
 set(gca,'XScale','log'); kxlabel('Array size (bytes)');
 kylabel('Transfer bandwidth (GB/s)');
 subplot(1,2,2); hold on; kgrid; box on;
 plot(sizes,memory_bandwidth_gpu,'bo',...
      sizes,memory_bandwidth_host,'ro');
-klegend('On GPU','On Host','Location','NorthWest');
+klegend('On GPU','On Host','Location','Best');
 set(gca,'XScale','log','YScale','log'); 
 kxlabel('Array size (bytes)'); kylabel('Bandwidth (GB/s)'); 
 scale_figure([1.5 0.75]); drawnow();

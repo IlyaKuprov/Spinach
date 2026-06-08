@@ -27,7 +27,7 @@ end
 % Add the legend and save the plot
 klegend({'$T_{2n}$ = 2000 $\mu$s', '$T_{2n}$ = 200 $\mu$s',...
          '$T_{2n}$ = 20 $\mu$s','$T_{2n}$ = 2 $\mu$s',...
-         '$T_{2n}$ = 0.2 $\mu$s'},'Location','SouthEast');
+         '$T_{2n}$ = 0.2 $\mu$s'},'Location','Best');
 savefig(gcf,'xix_q_field_profile_ensemble_r_T2n.fig');
 
 end

@@ -54,7 +54,7 @@ kfigure();
 plot(linspace(0,10,1001),real(answer));
 kxlabel('time, seconds'); kgrid;
 kylabel('$S_{\rm{Z}}$ expectation value');
-klegend({'Proton A','Proton B'},'Location','southeast');
+klegend({'Proton A','Proton B'},'Location','Best');
 
 end
 

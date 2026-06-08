@@ -73,7 +73,7 @@ kxlabel('time, microseconds'); kgrid;
 kylabel('$\langle H_{\rm{Z}} \rangle$');
 klegend({'0.5 Angstrom from electron',...
          '1.5 Angstrom from electron'},...
-         'Location','SouthEast');
+         'Location','Best');
 xlim tight; ylim padded;
 
 end

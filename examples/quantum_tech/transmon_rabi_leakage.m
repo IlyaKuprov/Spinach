@@ -57,7 +57,7 @@ kfigure(); plot(time_axis,real([p1 p2 p3 p4]),'LineWidth',1.5);
 axis tight; kgrid; kxlabel('time, ns');
 kylabel('level population');
 ktitle('transmon Rabi dynamics with leakage');
-klegend({'L1','L2','L3','L4'},'Location','East');
+klegend({'L1','L2','L3','L4'},'Location','Best');
 
 end
 

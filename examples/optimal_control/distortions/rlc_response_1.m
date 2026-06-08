@@ -53,7 +53,7 @@ subplot(2,2,2); plot(1e6*time_grid,[inp_real; inp_imag]);
 kxlabel('time, $\mu$s'); kylabel('voltage, a.u.');
 ktitle('input, heterodyne at $\omega_{0}$');
 kgrid; axis tight; ylim([-1.1 1.1]);
-klegend({'real','imag'},'Location','NorthEast');
+klegend({'real','imag'},'Location','Best');
 
 % Build the RLC bandpass response kernel
 sys=tf([1/(omega*Q) 0],[1/(omega^2) 1/(omega*Q) 1]);
@@ -74,7 +74,7 @@ subplot(2,2,4); plot(1e6*time_grid,[out_real out_imag]);
 kxlabel('time, $\mu$s'); kylabel('voltage, a.u.');
 ktitle('output, heterodyne at $\omega_{0}$'); 
 kgrid; axis tight; ylim([-1.1 1.1]);
-klegend({'real','imag'},'Location','NorthEast');
+klegend({'real','imag'},'Location','Best');
 
 end
 

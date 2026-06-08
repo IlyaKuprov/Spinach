@@ -110,7 +110,7 @@ kxlabel('Magnetic field / Tesla');
 kylabel('NOE coupling factor Rx/R1n'); 
 kgrid; axis([1e-2 30 -1 0]);
 legend({'simulation','experiment'},...
-       'Location','NorthWest');
+       'Location','Best');
 
 end
 

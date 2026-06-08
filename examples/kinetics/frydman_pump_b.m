@@ -92,15 +92,15 @@ COz=real(COz'*traj); COx=real(COx'*traj);
 kfigure(); scale_figure([1.0 2.0]);
 subplot(3,1,1); plot([Hz' Hx']); 
 klegend({'H$_{\rm{Z}}$','H$_{\rm{X}}$'},...
-        'Location','SouthEast'); xlim tight; kgrid;
+        'Location','Best'); xlim tight; kgrid;
 kylabel('expectation value'); kxlabel('time, ms');
 subplot(3,1,2); plot([Nz' Nx']); 
 klegend({'N$_{\rm{Z}}$','N$_{\rm{X}}$'},...
-        'Location','SouthEast'); xlim tight; kgrid;
+        'Location','Best'); xlim tight; kgrid;
 kylabel('expectation value'); kxlabel('time, ms');
 subplot(3,1,3); plot([COz' COx']); 
 klegend({'C$^{(\rm{O})}_{\rm{Z}}$','C$^{(\rm{O})}_{\rm{X}}$'},...
-        'Location','SouthEast'); xlim tight; kgrid;
+        'Location','Best'); xlim tight; kgrid;
 kxlabel('time, ms'); kylabel('expectation value'); 
 
 end

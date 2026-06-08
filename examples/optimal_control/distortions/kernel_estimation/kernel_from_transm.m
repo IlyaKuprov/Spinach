@@ -38,7 +38,7 @@ freq_axis_ghz=linspace(freq_axis_ghz(1),...
 plot(freq_axis_ghz,weights(1:1000:end),'r-');
 plot(freq_axis_ghz,amp,'k-'); 
 klegend({'spectrum raw','window function',...
-         'spectrum filtered'},'Location','South');
+         'spectrum filtered'},'Location','Best');
 
 % Get the convolution kernel with a 0.5 ns time step
 h=ifft(ifftshift([zeros(size(amp)); zeros(size(amp)); amp;

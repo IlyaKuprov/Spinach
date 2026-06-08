@@ -113,7 +113,7 @@ xlabel('time / seconds','interpreter','latex');
 ylabel('state population','interpreter','latex');
 legend({'${T_{+,\alpha}}$','${T_{-,\alpha}}$','${T_{0,\alpha}}$',...
         '${T_{+,\beta}}$','${T_{-,\beta}}$','${T_{0,\beta}}$'},...
-        'interpreter','latex','Location','northeast');
+        'interpreter','latex','Location','Best');
 set(gca,'TickLabelInterpreter','latex'); axis tight;
 subplot(1,3,2);
 plot(time_axis,answer(7,:),'b-'); hold on;
@@ -121,13 +121,13 @@ plot(time_axis,answer(8,:),'r-'); kgrid;
 xlabel('time / seconds','interpreter','latex');
 ylabel('state population','interpreter','latex');
 legend({'${S_{\alpha}}$','${S_{\beta}}$'},...
-        'interpreter','latex','Location','southeast');
+        'interpreter','latex','Location','Best');
 set(gca,'TickLabelInterpreter','latex'); axis tight;
 subplot(1,3,3);
 plot(time_axis,answer(15,:),'b-'); hold on;
 xlabel('time / seconds','interpreter','latex');
 ylabel('state population','interpreter','latex');
-legend({'${N_{\rm{Z}}}$'},'interpreter','latex','Location','southeast');
+legend({'${N_{\rm{Z}}}$'},'interpreter','latex','Location','Best');
 set(gca,'TickLabelInterpreter','latex'); kgrid; axis tight;
 
 end

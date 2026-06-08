@@ -306,7 +306,7 @@ end
 
 % Do not redraw the legend (expensive)
 if exist('legend_text','var')&&isempty(gca().Legend)  
-    klegend(gca,legend_text,'Location','NorthEast',...
+    klegend(gca,legend_text,'Location','Best',...
                             'AutoUpdate','off');  
 end
 

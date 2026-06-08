@@ -109,7 +109,7 @@ kfigure(); plot(1e3*time_axis,real(contact_curves));
 kxlabel('contact time, ms'); grid on;
 kylabel('$^{13}$C NMR signal, a.u.');
 legend('10 Hz','100 Hz','1 kHz','10 kHz',...
-       '100 kHz','1 MHz','Location','northeast');
+       '100 kHz','1 MHz','Location','Best');
 
 end
 

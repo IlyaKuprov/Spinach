@@ -125,7 +125,7 @@ set(gca,'XScale','log'); kgrid;
 set(gca,'xminorgrid','off');
 set(gca,'yminorgrid','off');
 klegend({'LP','MP','LG-2','LG-4'},...
-         'Location','southwest');
+         'Location','Best');
 kxlabel('number of points in the time grid');
 kylabel('$\|$difference$\|$/$\|$exact$\|$');
 set(gca,'XTick',[100 200 400 800]);

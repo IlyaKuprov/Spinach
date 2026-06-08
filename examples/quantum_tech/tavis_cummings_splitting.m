@@ -77,6 +77,6 @@ hold on; plot(spin_counts,analytical/(2*pi*1e6),'r-','LineWidth',1.5);
 hold off; axis tight; kgrid; kxlabel('number of spins');
 kylabel('normal-mode splitting, MHz');
 ktitle('Tavis-Cummings square-root scaling');
-klegend({'Spinach','2g\surd N'},'Location','NorthWest');
+klegend({'Spinach','2g\surd N'},'Location','Best');
 
 end

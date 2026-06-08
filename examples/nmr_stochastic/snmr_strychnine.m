@@ -90,7 +90,7 @@ kfigure(); subplot(1,2,1);
 time_axis=linspace(0,nsteps*dt,nsteps);
 plot(time_axis,[Cx Cy]');
 axis tight; kgrid; title('controls');
-legend({'Cx','Cy'},'Location','NorthEast');
+legend({'Cx','Cy'},'Location','Best');
 kxlabel('time, seconds'); 
 kylabel('nutation frequency, rad/s');
 
@@ -99,7 +99,7 @@ subplot(1,2,2); scale_figure([1.5 1]);
 time_axis=linspace(0,nsteps*dt,nsteps+1);
 plot(time_axis,[real(fid); imag(fid)]);
 axis tight; kgrid; title('trajectory');
-legend({'Hx','Hy'},'Location','NorthEast');
+legend({'Hx','Hy'},'Location','Best');
 kxlabel('time, seconds');
 kylabel('absolute polarisation');
 

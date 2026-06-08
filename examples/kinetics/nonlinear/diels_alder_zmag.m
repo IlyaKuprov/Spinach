@@ -105,7 +105,7 @@ C=griddedInterpolant(time_axis,x(3,:),'makima','none');
 kfigure(); plot(time_axis',real(x(1:3,:)')); xlim tight; kgrid;
 kxlabel('time, seconds'); kylabel('concentration, mol/L');
 klegend({'acetylene','butadiene','cyclohexadiene'},...
-        'Location','northeast'); 
+        'Location','Best');
 scale_figure([1.00 0.75]); axis tight; drawnow;
 
 % Build kinetics generators 
@@ -163,7 +163,7 @@ kylabel('conc.-weighted expt. value, 300K');
 klegend({'Acetylene $\hat L_{\rm{Z}}$',...
          'Butadiene $\hat L_{\rm{Z}}$',...
          'Cyclohexadiene $\hat L_{\rm{Z}}$'},...
-         'Location','northeast'); 
+         'Location','Best');
 scale_figure([1.00 0.75]); axis tight;
 
 end

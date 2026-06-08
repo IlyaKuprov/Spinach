@@ -54,7 +54,7 @@ subplot(2,2,1); plot(time_axis(2:end),irr_powers_a);
 xlim tight; kgrid; kxlabel('time, seconds');
 kylabel('nutation frequency, Hz'); ylim([-2e4 6e4]);
 klegend({'Tangent ramp $^{1}$H',...
-         'Tangent ramp $^{15}$N'},'Location','South');
+         'Tangent ramp $^{15}$N'},'Location','Best');
 
 % Plotting - trajectory
 subplot(2,2,4); plot(time_axis,real(fid_a)); hold on;
@@ -109,7 +109,7 @@ subplot(2,2,2); plot(time_axis(2:end),irr_powers_b);
 xlim tight; kgrid; kxlabel('time, seconds');
 kylabel('nutation frequency, Hz'); ylim([-2e4 6e4]);
 klegend({'GRAPE (same time) $^{1}$H',...
-         'GRAPE (same time) $^{15}$N'},'Location','South');
+         'GRAPE (same time) $^{15}$N'},'Location','Best');
 subplot(2,2,4); plot(time_axis,real(fid_b)); drawnow();
 
 %% GRAPE optimisation with a half of the time
@@ -137,10 +137,10 @@ kylabel('nutation frequency, Hz');
 xlim([0 1e-3]); ylim([-2e4 6e4]);
 klegend({'GRAPE (half time) $^{1}$H',...
          'GRAPE (half time) $^{15}$N'},...
-         'Location','South');
+         'Location','Best');
 subplot(2,2,4); plot(time_axis,real(fid_c)); drawnow();
 klegend({'Adiabatic, tan ramp','GRAPE, same time',...
-         'GRAPE, half time'},'Location','NorthEast');
+         'GRAPE, half time'},'Location','Best');
 
 end
 

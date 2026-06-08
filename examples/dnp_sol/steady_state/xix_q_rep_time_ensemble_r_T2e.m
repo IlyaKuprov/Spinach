@@ -27,7 +27,7 @@ end
 % Add the legend and save the plot
 klegend({'$T_{2e}$ = 50 $\mu$s', '$T_{2e}$ = 15 $\mu$s',...
          '$T_{2e}$ = 5 $\mu$s','$T_{2e}$ = 1.5 $\mu$s',...
-         '$T_{2e}$ = 0.5 $\mu$s'},'Location','NorthEast');
+         '$T_{2e}$ = 0.5 $\mu$s'},'Location','Best');
 savefig(gcf,'xix_q_rep_time_ensemble_r_T2e.fig');
 
 end

@@ -60,6 +60,6 @@ kfigure(); plot(time_axis,real([pop_s pop_v]),'LineWidth',1.5);
 axis tight; ylim([-0.05 1.05]); kgrid; kxlabel('time, ns');
 kylabel('excitation population');
 ktitle('spin-phonon excitation swap');
-klegend({'spin','phonon'},'Location','East');
+klegend({'spin','phonon'},'Location','Best');
 
 end

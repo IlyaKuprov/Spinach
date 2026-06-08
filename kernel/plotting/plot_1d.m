@@ -49,7 +49,7 @@ if ~isreal(spectrum)
     % Recursively plot the real and imaginary components
     plot_1d(spin_system,real(spectrum),parameters,varargin{:}); hold on;
     plot_1d(spin_system,imag(spectrum),parameters,varargin{:});
-    legend({'real','imag'},'Location','NorthEast'); return;
+    legend({'real','imag'},'Location','Best'); return;
     
 end
 

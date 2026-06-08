@@ -117,7 +117,7 @@ kfigure(); plot(chem_time_grid,real(conc_traj(1:3,:)));
 xlim tight; ylim padded; kgrid;
 kxlabel('time, seconds'); kylabel('concentration, mol/L');
 klegend({'acetylene','butadiene','cyclohexadiene'}, ...
-         'Location','northeast'); 
+         'Location','Best');
 scale_figure([1.00 0.75]); axis tight; drawnow;
 
 % Interpolate concentrations as functions of time

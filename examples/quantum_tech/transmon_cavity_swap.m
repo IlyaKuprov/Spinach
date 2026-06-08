@@ -55,7 +55,7 @@ kfigure(); plot(time_axis,real([pop_t pop_c]),'LineWidth',1.5);
 axis tight; kgrid; kxlabel('time, ns');
 kylabel('excitation population');
 ktitle('transmon-cavity vacuum Rabi swap');
-klegend({'transmon','cavity'},'Location','East');
+klegend({'transmon','cavity'},'Location','Best');
 
 end
 

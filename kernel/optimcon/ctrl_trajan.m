@@ -128,8 +128,8 @@ if ismember('spectrogram',spin_system.control.plotting)
         % Plot the spectrogram
         image(t_axis,f_axis,hsv2rgb(hsv)); box off;
         ktitle(['channels ' num2str(2*n-1) ',' num2str(2*n)]);
-        set(gca,'YDir','normal','TickDir','out');
-        kylabel('frequency offset, Hz'); kbox;
+        set(gca,'YDir','normal','TickDir','out'); kbox;
+        kylabel('frequency offset, Hz'); kytickfix; 
         
         % Warn the user when the time axis is truncated
         if last_slice_to_plot==numel(spin_system.control.pulse_dt)
@@ -288,9 +288,10 @@ if ismember('xy_controls',spin_system.control.plotting)
     end
     
     % Legend, labels and the grid
-    klegend(control_labels,'Location','NorthEast'); 
+    klegend(control_labels,'Location','Best'); 
     kxlabel(t_axis_label); ktitle('controls');
-    kylabel('ens. average value, Hz'); kgrid; 
+    kylabel('ens. average value, Hz'); 
+    kgrid; kytickfix;
 
     % Report maximum nutation angle
     text(x_lower+0.05*(x_upper-x_lower),...
@@ -364,9 +365,9 @@ if ismember('phi_controls',spin_system.control.plotting)
     end
     
     % Legend, labels and the grid
-    klegend(control_labels,'Location','NorthEast'); 
+    klegend(control_labels,'Location','Best'); 
     kxlabel(t_axis_label); ktitle('control phases');
-    kylabel('phase, radians'); kgrid;
+    kylabel('phase, radians'); kgrid; kytickfix;
     
     % Custom axis limits and ticks
     xlim('tight'); ylim([0 2*pi]); yticks(0:pi/2:2*pi);
@@ -435,9 +436,10 @@ if ismember('amp_controls',spin_system.control.plotting)
     end
     
     % Legend, labels and the grid
-    klegend(control_labels,'Location','NorthEast');  
+    klegend(control_labels,'Location','Best');  
     kxlabel(t_axis_label); ktitle('control moduli');
-    kylabel('ens. average value, Hz'); kgrid; 
+    kylabel('ens. average value, Hz'); 
+    kgrid; kytickfix; 
     
     % Increment plot counter
     current_plot=current_plot+1;
@@ -510,9 +512,9 @@ if ismember('frq_controls',spin_system.control.plotting)
     end
 
     % Legend, frequency axis label and the grid
-    klegend(control_labels,'Location','NorthEast');  
+    klegend(control_labels,'Location','Best');  
     kxlabel(t_axis_label); ktitle('inst. frequencies');
-    kylabel('frequency, Hz'); kgrid; 
+    kylabel('frequency, Hz'); kgrid; kytickfix; 
 
     % Increment plot number
     current_plot=current_plot+1;
@@ -549,9 +551,8 @@ if ismember('correlation_order',spin_system.control.plotting)
         
     end
     
-    % Update the axes
-    kxlabel(t_axis_label);
-    xlim tight; ylim padded;
+    % Update the axes and set padded limits
+    kxlabel(t_axis_label); xlim tight; ylim padded;
     
     % Increment plot counter
     current_plot=current_plot+1;
@@ -588,9 +589,8 @@ if ismember('coherence_order',spin_system.control.plotting)
         
     end
     
-    % Update the axes
-    kxlabel(t_axis_label);
-    xlim tight; ylim padded;
+    % Update the axes and set padded limits
+    kxlabel(t_axis_label); xlim tight; ylim padded;
     
     % Increment plot counter
     current_plot=current_plot+1;
@@ -627,9 +627,8 @@ if ismember('local_each_spin',spin_system.control.plotting)
         
     end
     
-    % Update the axes
-    kxlabel(t_axis_label);
-    xlim tight; ylim padded;
+    % Update the axes and set padded limits
+    kxlabel(t_axis_label); xlim tight; ylim padded;
     
     % Increment plot counter
     current_plot=current_plot+1;
@@ -666,9 +665,8 @@ if ismember('total_each_spin',spin_system.control.plotting)
         
     end
     
-    % Update the axes
-    kxlabel(t_axis_label);
-    xlim tight; ylim padded;
+    % Update the axes and set padded limits
+    kxlabel(t_axis_label); xlim tight; ylim padded;
     
     % Increment plot counter
     current_plot=current_plot+1;
@@ -705,9 +703,8 @@ if ismember('level_populations',spin_system.control.plotting)
         
     end
     
-    % Update the axes
-    kxlabel(t_axis_label);
-    xlim tight; ylim padded;
+    % Update the axes and set padded limits
+    kxlabel(t_axis_label); xlim tight; ylim padded;
     
     % Increment plot counter
     current_plot=current_plot+1;
@@ -726,8 +723,8 @@ if ismember('robustness',spin_system.control.plotting)
     % Plot fidelity histogram
     h=histogram(fidelities(:),ceil(sqrt(numel(fidelities))),...
                 'normalization','pdf'); h.EdgeColor='none';
-    ktitle('ensemble'); kxlabel('fidelity'); 
-    kylabel('prob. density'); kgrid;
+    ktitle('ensemble'); kxlabel('fidelity'); kgrid;
+    kylabel('prob. density'); kytickfix; 
 
     % Get histogram range + 10% margin
     edge_val=1.1*max(abs(fidelities),[],'all');

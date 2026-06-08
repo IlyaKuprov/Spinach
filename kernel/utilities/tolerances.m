@@ -108,17 +108,6 @@ else
                         pad(num2str(spin_system.tols.prop_chop,'%0.8e'),20) ' (safe default)']);
 end
 
-% Propagator squaring zero tolerance
-if isfield(sys,'tols')&&isfield(sys.tols,'prop_zero')
-    spin_system.tols.prop_zero=sys.tols.prop_zero; sys.tols=rmfield(sys.tols,'prop_zero');
-    report(spin_system,[pad('Drop propagator square elements with norm below',65) ...
-                        pad(num2str(spin_system.tols.prop_zero,'%0.8e'),20) ' (user-specified)']);
-else
-    spin_system.tols.prop_zero=spin_system.tols.prop_chop;
-    report(spin_system,[pad('Drop propagator square elements with norm below',65) ...
-                        pad(num2str(spin_system.tols.prop_zero,'%0.8e'),20) ' (safe default)']);
-end
-
 % Subspace population tolerance
 if isfield(sys,'tols')&&isfield(sys.tols,'subs_drop')
     spin_system.tols.subs_drop=sys.tols.subs_drop; sys.tols=rmfield(sys.tols,'subs_drop');
@@ -415,12 +404,6 @@ if isfield(sys,'tols')&&isfield(sys.tols,'prop_chop')
     if (~isnumeric(sys.tols.prop_chop))||(~isreal(sys.tols.prop_chop))||...
        (~isscalar(sys.tols.prop_chop))||(sys.tols.prop_chop<0)
         error('sys.tols.prop_chop must be a non-negative real number.');
-    end
-end
-if isfield(sys,'tols')&&isfield(sys.tols,'prop_zero')
-    if (~isnumeric(sys.tols.prop_zero))||(~isreal(sys.tols.prop_zero))||...
-       (~isscalar(sys.tols.prop_zero))||(sys.tols.prop_zero<0)
-        error('sys.tols.prop_zero must be a non-negative real number.');
     end
 end
 if isfield(sys,'tols')&&isfield(sys.tols,'subs_drop')

@@ -7,8 +7,8 @@
 %     result  - regression test result with explanatory messages
 %
 % The test checks binary adaptive squaring in multiprop() against explicit
-% matrix-power references for state vectors, density matrices, and diagonal
-% propagators, and verifies clean-up after propagator squaring.
+% matrix-power references for state vectors and density matrices, and
+% verifies clean-up after propagator squaring.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -25,7 +25,7 @@ result=new_test_result('kernel/multiprop_adaptive',...
 % Build the minimum Spinach system fields required by clean_up()
 spin_system.sys.enable={};
 spin_system.sys.disable={};
-spin_system.tols.prop_zero=0;
+spin_system.tols.prop_chop=0;
 spin_system.tols.dense_matrix=0.15;
 spin_system.tols.small_matrix=200;
 
@@ -45,11 +45,11 @@ P=spdiags([0.95;0.80;0.65],0,3,3);
 rho=[1.0;2.0;3.0];
 N=uint64(11);
 
-% Compare diagonal state-vector propagation with an element-wise reference
+% Compare sparse diagonal state-vector propagation with a matrix-power reference
 rho_obs=multiprop(spin_system,P,rho,N);
-rho_ref=(diag(P).^double(N)).*rho;
-result=test_close(result,'diagonal vector propagation',rho_obs,rho_ref,1e-14,1e-14,...
-                  'diagonal propagators use element-wise powers for state vectors');
+rho_ref=(P^double(N))*rho;
+result=test_close(result,'sparse diagonal vector propagation',rho_obs,rho_ref,1e-14,1e-14,...
+                  'sparse diagonal propagators follow the generic squaring path');
 
 % Check the zero-step shortcut
 rho_obs=multiprop(spin_system,P,rho,0);
@@ -85,22 +85,22 @@ P_ref=P^double(N);
 rho_obs=multiprop(spin_system,P,rho,N);
 rho_ref=P_ref*rho*P_ref';
 result=test_close(result,'sparse density propagation',rho_obs,rho_ref,1e-14,1e-14,...
-                  'sparse Hilbert-space density matrices follow the accumulated propagator path');
+                  'sparse Hilbert-space density matrices follow direct binary-power action');
 
-% Define a diagonal dense propagator and a density matrix
-P=diag(exp(1i*[0.10;0.20;0.30]));
+% Define a diagonal sparse propagator and a density matrix
+P=spdiags(exp(1i*[0.10;0.20;0.30]),0,3,3);
 rho=[1.0 0.2+0.1i 0.0;0.2-0.1i 0.6 0.1;0.0 0.1 0.4];
 N=uint64(7);
 
-% Compare diagonal density-matrix propagation with an explicit matrix power
+% Compare sparse diagonal density-matrix propagation with an explicit matrix power
 P_ref=P^double(N);
 rho_obs=multiprop(spin_system,P,rho,N);
 rho_ref=P_ref*rho*P_ref';
-result=test_close(result,'diagonal density propagation',rho_obs,rho_ref,1e-13,1e-13,...
-                  'diagonal propagators use element-wise powers for density matrices');
+result=test_close(result,'sparse diagonal density propagation',rho_obs,rho_ref,1e-13,1e-13,...
+                  'sparse diagonal propagators follow the generic density-matrix path');
 
 % Enable clean-up after propagator squaring
-spin_system.tols.prop_zero=1e-6;
+spin_system.tols.prop_chop=1e-6;
 
 % Check cleanup after state-vector branch squaring
 P=speye(2)+sparse([0 1e-8;0 0]);

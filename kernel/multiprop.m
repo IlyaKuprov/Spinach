@@ -8,8 +8,9 @@
 %
 %     P   - propagator matrix
 %
-%     rho - state vector in Liouville space or wavefunction formalism,
-%           or a density matrix in Hilbert space formalism
+%     rho - state vector or state-vector stack in Liouville space or
+%           wavefunction formalism, or a density matrix in Hilbert space
+%           formalism
 %
 %     N   - number of times to apply the propagator
 %
@@ -37,18 +38,20 @@ if N==0, return; end
 % Convert the step count into a bit-addressable integer
 if ~isa(N,'uint64'), N=uint64(N); end
 
-% Determine whether density-matrix action is needed
-rho_is_matrix=~isvector(rho);
+% Determine propagation style from Spinach formalism
+single_side=ismember(spin_system.bas.formalism,{'sphten-liouv',...
+                                                'zeeman-liouv',...
+                                                'zeeman-wavef'});
 
 % Process the binary expansion of the step count
 while N>0
 
     % Apply the current binary power if present
     if bitand(N,uint64(1))>0
-        if rho_is_matrix
-            rho=P*rho*P';
-        else
+        if single_side
             rho=P*rho;
+        else
+            rho=P*rho*P';
         end
     end
 
@@ -64,7 +67,16 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,P,rho,N)
-if (~isstruct(spin_system))||(~isfield(spin_system,'tols'))||...
+if (~isstruct(spin_system))||(~isfield(spin_system,'bas'))||...
+   (~isfield(spin_system.bas,'formalism'))
+    error('spin_system.bas.formalism must exist.');
+end
+if (~ischar(spin_system.bas.formalism))||...
+   (~ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv',...
+                                         'sphten-liouv','zeeman-wavef'}))
+    error('spin_system.bas.formalism is not recognised.');
+end
+if (~isfield(spin_system,'tols'))||...
    (~isfield(spin_system.tols,'prop_chop'))
     error('spin_system.tols.prop_chop must exist.');
 end
@@ -95,15 +107,13 @@ end
 if (~allfinite(P))||(~allfinite(rho))
     error('P and rho must be finite.');
 end
-if isvector(rho)
-    if ~iscolumn(rho)
-        error('rho must be a column vector or a square matrix.');
-    end
+if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv',...
+                                       'zeeman-wavef'})
     if size(P,1)~=size(rho,1)
         error('dimensions of P and rho must be consistent.');
     end
 elseif size(rho,1)~=size(rho,2)
-    error('rho must be a column vector or a square matrix.');
+    error('rho must be a square matrix in Hilbert space formalism.');
 elseif size(P,1)~=size(rho,1)
     error('dimensions of P and rho must be consistent.');
 end

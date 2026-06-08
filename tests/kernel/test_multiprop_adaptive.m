@@ -25,6 +25,7 @@ result=new_test_result('kernel/multiprop_adaptive',...
 % Build the minimum Spinach system fields required by clean_up()
 spin_system.sys.enable={};
 spin_system.sys.disable={};
+spin_system.bas.formalism='zeeman-liouv';
 spin_system.tols.prop_chop=0;
 spin_system.tols.dense_matrix=0.15;
 spin_system.tols.small_matrix=200;
@@ -51,17 +52,30 @@ rho_ref=(P^double(N))*rho;
 result=test_close(result,'sparse diagonal vector propagation',rho_obs,rho_ref,1e-14,1e-14,...
                   'sparse diagonal propagators follow the generic squaring path');
 
+% Define a square Liouville-space vector stack
+P=sparse([0.90 0.10 0.00;0.00 0.80 0.20;0.05 0.00 0.70]);
+rho=eye(3);
+N=uint64(5);
+
+% Compare vector-stack propagation with an explicit matrix-power reference
+rho_obs=multiprop(spin_system,P,rho,N);
+rho_ref=(P^double(N))*rho;
+result=test_close(result,'square Liouville vector-stack propagation',rho_obs,rho_ref,1e-14,1e-14,...
+                  'Liouville-space vector stacks are propagated by left multiplication');
+
 % Check the zero-step shortcut
 rho_obs=multiprop(spin_system,P,rho,0);
 result=test_close(result,'zero-step propagation',rho_obs,rho,1e-15,1e-15,...
                   'zero applications of a propagator leave the state unchanged');
 
 % Check scalar vector branch consistency
+spin_system.bas.formalism='zeeman-wavef';
 rho_obs=multiprop(spin_system,0.5,2.0,3);
 result=test_close(result,'scalar vector propagation',rho_obs,0.25,1e-15,1e-15,...
                   'one-dimensional state vectors follow the vector propagation branch');
 
 % Define a Hilbert-space unitary propagator and a density matrix
+spin_system.bas.formalism='zeeman-hilb';
 S=pauli(2);
 H=2*pi*(0.30*S.x+0.70*S.z);
 P=expm(-1i*H*0.125);
@@ -100,6 +114,7 @@ result=test_close(result,'sparse diagonal density propagation',rho_obs,rho_ref,1
                   'sparse diagonal propagators follow the generic density-matrix path');
 
 % Enable clean-up after propagator squaring
+spin_system.bas.formalism='zeeman-liouv';
 spin_system.tols.prop_chop=1e-6;
 
 % Check cleanup after state-vector branch squaring

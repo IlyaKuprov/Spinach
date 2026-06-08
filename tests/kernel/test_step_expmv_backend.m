@@ -74,4 +74,46 @@ rho_ref=step(spin_default,L,rho,1i*dt);
 result=test_close(result,'step complex-time backend fallback',rho_obs,rho_ref,1e-12,1e-12,...
                   'automatic backend selection must preserve complex-time propagation');
 
+% Malformed heuristic inputs must trigger Spinach validation
+heuristic_err=false();
+try
+    step_heuristics(struct(),struct());
+catch err
+    heuristic_err=contains(err.message,'missing required fields');
 end
+
+result=test_true(result,'step heuristics grumble',heuristic_err,...
+                 'malformed heuristic inputs must produce a clear validation error');
+
+% Large-alpha scalar propagation must remain stable
+spin_auto.sys.output='hush';
+spin_default.sys.output='hush';
+rho_obs=step(spin_auto,1000,1,1);
+rho_ref=step(spin_default,1000,1,1);
+result=test_close(result,'step large-alpha scalar backend',rho_obs,rho_ref,1e-10,1e-10,...
+                  'automatic backend selection must remain stable for large scalar generators');
+
+% Sparse automatic Taylor backend must avoid dense history arrays
+sparse_dim=20000;
+sparse_op=spdiags([ones(sparse_dim,1) -2*ones(sparse_dim,1) ones(sparse_dim,1)],...
+                 -1:1,sparse_dim,sparse_dim);
+sparse_op=(40/cheap_norm(sparse_op))*sparse_op;
+sparse_rho=ones(sparse_dim,1);
+profile clear
+profile('-memory','on');
+step(spin_auto,sparse_op,sparse_rho,1);
+profile off
+prof_info=profile('info');
+prof_names={prof_info.FunctionTable.FunctionName};
+tay_rows=contains(prof_names,'step_expmv_tay');
+if any(tay_rows)
+    sparse_peak=max([prof_info.FunctionTable(tay_rows).PeakMem]);
+else
+    sparse_peak=Inf;
+end
+dense_hist=16*sparse_dim*61;
+result=test_true(result,'step sparse rolling storage',sparse_peak<dense_hist/2,...
+                 'sparse automatic Taylor backends must not allocate dense history arrays');
+
+end
+

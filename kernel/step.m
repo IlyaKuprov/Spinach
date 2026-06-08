@@ -486,43 +486,37 @@ end
 function w=step_expmv_tay1(A,v,t)
 
 % Set algorithm parameters
-m_min=40; m_max=60; s_max=45; u=2^(-53);
+m_min=40; m_max=60; u=2^(-53);
 fact=cumprod([1 1:double(m_max+3)]);
 
 % Fold time into the generator
 if t~=1, A=t*A; end
 
-% Get problem dimension
-n=size(A,1);
-
-% Precompute powers of the generator acting on the vector
-V=zeros(n,m_max+2,'like',v);
-V(:,1)=A*v;
-for k=2:(m_min+2)
-    V(:,k)=A*V(:,k-1);
+% Initialise generator powers
+power_m1=A*v;
+for k=2:(m_min+1)
+    power_m1=A*power_m1;
 end
-n_stored=m_min+2;
+power_m2=A*power_m1;
 
 % Search for Taylor degree and scaling
 m=m_min; s=1; found=false();
-while (~found)&&(m<=m_max)
+while ~found
 
     % Estimate the required scaling
-    norm_v=norm(V(:,m+1));
+    norm_v=norm(power_m1);
     s=ceil((norm_v/(fact(m+2)*u))^(1/(m+1)));
-    s=max([1 min([s_max s])]);
+    s=max([1 s]);
 
     % Check the two-term backward error condition
-    err=norm(V(:,m+1)*(1/(s^(m+1)*fact(m+2)))+...
-             V(:,m+2)*(1/(s^(m+2)*fact(m+3))));
-    if err<=u
+    err=norm(power_m1*(1/(s^(m+1)*fact(m+2)))+...
+             power_m2*(1/(s^(m+2)*fact(m+3))));
+    if (err<=u)||(m==m_max)
         found=true();
     else
         m=m+1;
-        if m+2>n_stored
-            V(:,m+2)=A*V(:,m+1);
-            n_stored=m+2;
-        end
+        power_m1=power_m2;
+        power_m2=A*power_m2;
     end
 
 end
@@ -530,16 +524,22 @@ end
 % Use the maximum degree if no pair passed the test
 if ~found
     m=m_max;
-    norm_v=norm(V(:,m+1));
     s=ceil((norm_v/(fact(m+2)*u))^(1/(m+1)));
-    s=max([1 min([s_max s])]);
+    s=max([1 s]);
 end
 
+% Adjust scaling by checking the last Taylor term
+s=scale_taylor(A,v,m,s,fact,u);
+
 % Evaluate the first scaled Taylor polynomial
-w=v; sk=1;
+w=v; term=v;
 for k=1:m
-    sk=sk*s;
-    w=w+V(:,k)*(1/(sk*fact(k+1)));
+
+    % Compute the next scaled Taylor term
+    term=(A*term)*(1/s);
+
+    % Add the term to the polynomial
+    w=w+term*(1/fact(k+1));
 end
 
 % Apply the remaining scaled Taylor passes
@@ -558,38 +558,34 @@ end
 function w=step_expmv_tay2(A,v,t)
 
 % Set algorithm parameters
-m_min=40; m_max=60; s_max=45; u=2^(-53);
+m_min=40; m_max=60; u=2^(-53);
 fact=cumprod([1 1:double(m_max+2)]);
 
 % Fold time into the generator
 if t~=1, A=t*A; end
 
-% Get problem dimension
-n=size(A,1);
-
-% Precompute powers of the generator acting on the vector
-V=zeros(n,m_max+1,'like',v);
-V(:,1)=A*v;
+% Initialise generator powers
+power_next=A*v;
 for k=2:(m_min+1)
-    V(:,k)=A*V(:,k-1);
+    power_next=A*power_next;
 end
-n_stored=m_min+1;
 
 % Initialise degree and scaling search
 m=m_min;
-norm_v=norm(V(:,m+1));
-s=max([1 min([s_max ceil((norm_v/(fact(m+2)*u))^(1/(m+1)))])]);
+norm_v=norm(power_next);
+s=max([1 ceil((norm_v/(fact(m+2)*u))^(1/(m+1)))]);
 p=m*s; found=false();
 
 % Search for the lowest matrix-vector product count
 while (~found)&&(m<m_max)
+
+    % Advance the Taylor degree
     m_next=m+1;
-    if m_next+1>n_stored
-        V(:,m_next+1)=A*V(:,m_next);
-        n_stored=m_next+1;
-    end
-    norm_next=norm(V(:,m_next+1));
-    s_next=max([1 min([s_max ceil((norm_next/(fact(m_next+2)*u))^(1/(m_next+1)))])]);
+    power_next=A*power_next;
+
+    % Estimate the required scaling
+    norm_next=norm(power_next);
+    s_next=max([1 ceil((norm_next/(fact(m_next+2)*u))^(1/(m_next+1)))]);
     p_next=m_next*s_next;
     if p_next<=p
         m=m_next; s=s_next; p=p_next;
@@ -598,11 +594,18 @@ while (~found)&&(m<m_max)
     end
 end
 
+% Adjust scaling by checking the last Taylor term
+s=scale_taylor(A,v,m,s,fact,u);
+
 % Evaluate the first scaled Taylor polynomial
-w=v; sk=1;
+w=v; term=v;
 for k=1:m
-    sk=sk*s;
-    w=w+V(:,k)*(1/(sk*fact(k+1)));
+
+    % Compute the next scaled Taylor term
+    term=(A*term)*(1/s);
+
+    % Add the term to the polynomial
+    w=w+term*(1/fact(k+1));
 end
 
 % Apply the remaining scaled Taylor passes
@@ -613,6 +616,35 @@ for n=2:s
         z=A_scaled*z;
         w=w+z*(1/fact(k+1));
     end
+end
+
+end
+
+% Adjust Taylor scaling using the last polynomial term
+function s=scale_taylor(A,v,m,s,fact,u)
+
+% Search for sufficient scaling
+while true
+
+    % Compute the last scaled Taylor term
+    last_term=v;
+    for k=1:m
+        last_term=(A*last_term)*(1/s);
+    end
+    last_max=max(abs(last_term),[],'all')*(1/fact(m+1));
+    if isa(last_max,'gpuArray'), last_max=gather(last_max); end
+    term_tol=u/max([1 s]);
+
+    % Stop when the last term is below per-pass roundoff
+    if last_max<=term_tol, return; end
+
+    % Increase scaling without dense history storage
+    if isfinite(last_max)
+        s=max([s+1 ceil(s*(last_max/term_tol)^(1/m))]);
+    else
+        s=2*s;
+    end
+
 end
 
 end
@@ -659,3 +691,4 @@ end
 % the spectra shown in Figure 8.
 %
 % A.J. Mehrer and R.S. Mulliken, Chem. Rev. 69 (1969) 639-656.
+

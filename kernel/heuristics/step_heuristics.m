@@ -1,4 +1,18 @@
-% Heuristic backend selector for step().
+% Heuristic backend selector for step(). Syntax:
+%
+%                  backend=step_heuristics(stats,backends)
+%
+% Parameters:
+%
+%      stats    -  structure with matrix, time_step, dimension, is_sparse,
+%                  is_gpu, and norm_mat fields
+%
+%      backends -  structure with default, expmv, tay1, and tay2 fields
+%                  containing function handles
+%
+% Outputs:
+%
+%      backend  -  function handle to the selected step() backend
 %
 % The function returns a function handle from the supplied backend table. If
 % the selected accelerated backend is unavailable or not beneficial, the
@@ -7,6 +21,9 @@
 % ilya.kuprov@weizmann.ac.il
 
 function backend=step_heuristics(stats,backends)
+
+% Check consistency
+grumble(stats,backends);
 
 % Cache path lookup for MATLAB's expmv()
 persistent expmv_available
@@ -52,6 +69,7 @@ switch backend_name
         backend=backends.default;
 
 end
+
 
 end
 
@@ -200,3 +218,51 @@ else
 end
 
 end
+
+% Consistency enforcement
+function grumble(stats,backends)
+if ~isstruct(stats)
+    error('stats must be a structure.');
+end
+if ~isstruct(backends)
+    error('backends must be a structure.');
+end
+if ~all(isfield(stats,{'matrix','time_step','dimension','is_sparse','is_gpu','norm_mat'}))
+    error('stats structure is missing required fields.');
+end
+if ~isnumeric(stats.matrix)
+    error('stats.matrix must be numeric.');
+end
+if ~allfinite(stats.matrix)
+    error('stats.matrix must be finite.');
+end
+if (size(stats.matrix,1)~=size(stats.matrix,2))||(size(stats.matrix,1)~=stats.dimension)
+    error('stats.matrix must be square and match stats.dimension.');
+end
+if (~isnumeric(stats.time_step))||(~isreal(stats.time_step))||(~isscalar(stats.time_step))||...
+   (~isfinite(stats.time_step))
+    error('stats.time_step must be a finite real scalar.');
+end
+if (~isnumeric(stats.dimension))||(~isreal(stats.dimension))||(~isscalar(stats.dimension))||...
+   (mod(stats.dimension,1)~=0)||(stats.dimension<0)
+    error('stats.dimension must be a non-negative real integer.');
+end
+if (~islogical(stats.is_sparse))||(~isscalar(stats.is_sparse))||(stats.is_sparse~=issparse(stats.matrix))
+    error('stats.is_sparse must match stats.matrix.');
+end
+if (~islogical(stats.is_gpu))||(~isscalar(stats.is_gpu))||(stats.is_gpu~=isa(stats.matrix,'gpuArray'))
+    error('stats.is_gpu must match stats.matrix.');
+end
+if (~isnumeric(stats.norm_mat))||(~isreal(stats.norm_mat))||(~isscalar(stats.norm_mat))||...
+   (~isfinite(stats.norm_mat))||(stats.norm_mat<0)
+    error('stats.norm_mat must be a finite non-negative real scalar.');
+end
+if ~all(isfield(backends,{'default','expmv','tay1','tay2'}))
+    error('backends structure is missing required fields.');
+end
+if (~isa(backends.default,'function_handle'))||(~isa(backends.expmv,'function_handle'))||...
+   (~isa(backends.tay1,'function_handle'))||(~isa(backends.tay2,'function_handle'))
+    error('backends fields must be function handles.');
+end
+end
+

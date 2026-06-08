@@ -291,7 +291,7 @@ if ~isworkernode
         report(spin_system,['         > workers requested: ' num2str(spin_system.sys.parallel{2})]);
 
         % Default port range is insufficient
-        pool_port_range=[20000 45000];
+        pool_port_range=[20001 44999];
         port_rng_str=[num2str(pool_port_range(1)) ' ' ...
                       num2str(pool_port_range(2))];
         pctconfig('portrange',pool_port_range);

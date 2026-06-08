@@ -62,7 +62,7 @@ try
     set(groot,'CurrentFigure',1); clf;
 catch
     figure(1); set(groot,'CurrentFigure',1);
-    scale_figure([0.70*n_plots_y 0.70*n_plots_x]);
+    scale_figure([0.90*n_plots_y 0.70*n_plots_x]);
 end
 
 % Plot spectrograms for as long as timing grid permits
@@ -450,6 +450,9 @@ end
 % Plot inst. freqs for as long as timing grid permits
 if ismember('frq_controls',spin_system.control.plotting)
 
+    % Set the current plot
+    subplot(n_plots_x,n_plots_y,current_plot);
+
     % Count uniform slices
     last_slice_to_plot=1; % Move to optimcon.m
     for n=1:numel(spin_system.control.pulse_dt)
@@ -507,16 +510,9 @@ if ismember('frq_controls',spin_system.control.plotting)
     end
 
     % Legend, frequency axis label and the grid
-    ktitle('inst. frequencies'); xlim tight; ylim padded; 
-    klegend(control_labels,'Location','SouthEast');
-    kylabel('frequency, Hz');  kgrid;
-    
-    % Warn the user when the time axis is truncated
-    if last_slice_to_plot==numel(spin_system.control.pulse_dt)
-        kxlabel('time, seconds');
-    else
-        kxlabel('time, s (truncated)');
-    end
+    klegend(control_labels,'Location','NorthEast');  
+    kxlabel(t_axis_label); ktitle('inst. frequencies');
+    kylabel('frequency, Hz'); kgrid; 
 
     % Increment plot number
     current_plot=current_plot+1;

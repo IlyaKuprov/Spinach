@@ -1,8 +1,10 @@
 % Applies a propagator repeatedly by binary adaptive squaring. Syntax:
 %
-%                     rho=multiprop(P,rho,N)
+%              rho=multiprop(spin_system,P,rho,N)
 %
 % Parameters:
+%
+%     spin_system - Spinach spin system object
 %
 %     P   - propagator matrix
 %
@@ -17,16 +19,17 @@
 %
 % Note: the algorithm expands N into binary powers, squares P successively,
 %       and applies only the active powers to rho. This avoids constructing
-%       P^N explicitly.
+%       P^N explicitly. Propagator squares are cleaned up using
+%       spin_system.tols.prop_zero.
 %
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=multiprop.m>
 
-function rho=multiprop(P,rho,N)
+function rho=multiprop(spin_system,P,rho,N)
 
 % Check consistency
-grumble(P,rho,N);
+grumble(spin_system,P,rho,N);
 
 % Zero-step shortcut
 if N==0, return; end
@@ -58,7 +61,7 @@ if isdiag(P)
         N=bitshift(N,-1);
 
         % Square the diagonal only if higher powers remain
-        if N>0, P_diag=P_diag.*P_diag; end
+        if N>0, P_diag=clean_up(spin_system,P_diag.*P_diag,spin_system.tols.prop_zero); end
 
     end
 
@@ -96,7 +99,7 @@ if rho_is_matrix
         N=bitshift(N,-1);
 
         % Square the propagator only if higher powers remain
-        if N>0, P=P*P; end
+        if N>0, P=clean_up(spin_system,P*P,spin_system.tols.prop_zero); end
 
     end
 
@@ -126,14 +129,24 @@ while N>0
     end
 
     % Square the propagator only if higher powers remain
-    if N>0, P=P*P; end
+    if N>0, P=clean_up(spin_system,P*P,spin_system.tols.prop_zero); end
 
 end
 
 end
 
 % Consistency enforcement
-function grumble(P,rho,N)
+function grumble(spin_system,P,rho,N)
+if (~isstruct(spin_system))||(~isfield(spin_system,'tols'))||...
+   (~isfield(spin_system.tols,'prop_zero'))
+    error('spin_system.tols.prop_zero must exist.');
+end
+if (~isnumeric(spin_system.tols.prop_zero))||...
+   (~isreal(spin_system.tols.prop_zero))||...
+   (~isscalar(spin_system.tols.prop_zero))||...
+   (spin_system.tols.prop_zero<0)
+    error('spin_system.tols.prop_zero must be a non-negative real number.');
+end
 if (~isnumeric(P))||(~ismatrix(P))||(size(P,1)~=size(P,2))
     error('P must be a square matrix.');
 end

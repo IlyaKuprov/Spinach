@@ -1,7 +1,7 @@
 % Simulation of TOP DNP contact time dependence in the 
 % steady state.
 %
-% Calculation time: seconds.
+% Calculation time: minutes.
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il

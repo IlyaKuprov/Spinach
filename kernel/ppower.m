@@ -15,10 +15,10 @@
 %
 %     P   - propagator matrix raised to the power of N
 %
-% Note: the algorithm expands N into binary powers, squares P successively,
-%       and multiplies only the active powers into the result. This avoids
-%       explicit repeated multiplication. Propagator powers are cleaned up using
-%       spin_system.tols.prop_chop.
+% Note: the algorithm expands N into binary powers, squares P succes-
+%       sively, and multiplies only the active powers into the result.
+%       This avoids explicit repeated multiplication. Propagator pow-
+%       ers are cleaned up using spin_system.tols.prop_chop.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -105,9 +105,9 @@ if ~allfinite(P)
 end
 end
 
-% Your mind is software. Program it. Your body is a shell. Change it.
-% Death is a disease. Cure it. Extinction is approaching. Fight it.
+% There are six species of deer in Britain,
+% all of which make good eating.
 %
-% Eclipse Phase
-
+% Melanie McDonagh,
+% in The Spectator
 

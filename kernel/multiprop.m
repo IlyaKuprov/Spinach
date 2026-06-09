@@ -119,8 +119,9 @@ elseif size(P,1)~=size(rho,1)
 end
 end
 
-% Your mind is software. Program it. Your body is a shell. Change it.
-% Death is a disease. Cure it. Extinction is approaching. Fight it.
+% Few forces can match the power of fanaticism. One
+% that comes close is wounded pride.
 %
-% Eclipse Phase
+% Frank Herbert, in
+% the Dune series
 

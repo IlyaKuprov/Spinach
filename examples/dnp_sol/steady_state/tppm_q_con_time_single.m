@@ -1,7 +1,7 @@
 % Simulation of TPPM DNP contact time dependence in the 
 % steady state.
 %
-% Calculation time: seconds.
+% Calculation time: minutes.
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il
@@ -66,20 +66,17 @@ parameters.el_offs=2e6;
        
 % Over loop counts
 dnp=zeros(size(loop_counts),'like',1i);
-parfor m=1:numel(loop_counts)
-
-    % Localise parameters
-    localpar=parameters;
+for m=1:numel(loop_counts)
 
     % Set the number of loops
-    localpar.nloops=loop_counts(m);
+    parameters.nloops=loop_counts(m);
 
     % Update the shot spacing
-    pulses_dur=2*localpar.nloops*localpar.pulse_dur;
-    localpar.shot_spacing=816e-6 - pulses_dur;
+    pulses_dur=2*parameters.nloops*parameters.pulse_dur;
+    parameters.shot_spacing=816e-6 - pulses_dur;
 
     % Run the steady state simulation
-    dnp(m)=powder(spin_system,@xixdnp_steady,localpar,'esr');
+    dnp(m)=powder(spin_system,@xixdnp_steady,parameters,'esr');
 
 end
 

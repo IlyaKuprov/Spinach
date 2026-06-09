@@ -87,9 +87,11 @@ PE=propagator(spin_system,H,cycle_length-parameters.pulse_dur);
 % Combine the propagators
 P=clean_up(spin_system,PE*PP,spin_system.tols.prop_chop);
 
-% Apply the DANTE pulse train
-parameters.rho0=multiprop(spin_system,P,parameters.rho0,...
-                          parameters.n_periods*parameters.pulse_num);
+% Compute the DANTE pulse train propagator
+P=multiprop(spin_system,P,parameters.n_periods*parameters.pulse_num);
+
+% Apply the DANTE pulse train propagator
+parameters.rho0=P*parameters.rho0;
 
 % Call the acquisition
 spectrum=overtone_a(spin_system,parameters,H,R,K);

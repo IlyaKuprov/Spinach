@@ -79,24 +79,18 @@ pulseop=parameters.pulse_amp*Lx;
 pulseop=average(spin_system,pulseop/2,H,pulseop/2,omega,'matrix_log');
 
 % Precompute pulse propagator
-P_pulse=propagator(spin_system,pulseop,parameters.pulse_dur);
+PP=propagator(spin_system,pulseop,parameters.pulse_dur);
 
 % Precompute evolution propagator
-P_evol=propagator(spin_system,H,cycle_length-parameters.pulse_dur);
+PE=propagator(spin_system,H,cycle_length-parameters.pulse_dur);
 
-% Loop over rotor cycles
-for k=1:parameters.n_periods
-    
-    % Loop over pulses within the rotor cycle
-    for n=1:parameters.pulse_num
-        
-        % Pulse and evolution
-        parameters.rho0=P_evol*P_pulse*parameters.rho0;
-        
-    end
-    
-end
-    
+% Combine the propagators
+P=clean_up(spin_system,PE*PP,spin_system.tols.prop_chop);
+
+% Apply the DANTE pulse train
+parameters.rho0=multiprop(spin_system,P,parameters.rho0,...
+                          parameters.n_periods*parameters.pulse_num);
+
 % Call the acquisition
 spectrum=overtone_a(spin_system,parameters,H,R,K);
 

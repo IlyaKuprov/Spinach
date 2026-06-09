@@ -60,4 +60,10 @@ if ~isfile(file_name)
 end
 end
 
+% If some "pacifist" society renounced the retaliatory use of force, it
+% would be left helplessly at the mercy of the first thug who decided 
+% to be immoral. Such a society would achieve the opposite of its inten-
+% tion: instead of abolishing evil, it would encourage and reward it.
+%
+% Ayn Rand, "The Virtue of Selfishness"
 

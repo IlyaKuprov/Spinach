@@ -4,7 +4,7 @@
 %
 %            http://dx.doi.org/10.1016/j.cplett.2011.08.030
 %
-% Calculation time: hours
+% Calculation time: minutes
 %
 % ilya.kuprov@weizmann.ac.il
 % m.carravetta@soton.ac.uk

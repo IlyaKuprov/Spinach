@@ -64,8 +64,8 @@ spin_system.comp.isotopes={'1H'};
 spin_system.comp.labels={'proton'};
 spin_system.comp.mults=2;
 spin_system.inter.coordinates={[0 0 0]};
-summary(spin_system,'coordinates','coordinate summary');
-result.messages{end+1}='PASS: summary coordinates -- direct silent metadata summary call completed';
+summary_coordinates(spin_system,'coordinate summary');
+result.messages{end+1}='PASS: summary_coordinates -- direct silent metadata summary call completed';
 
 % Check impound cell packaging preserves values and types
 payload=impound(17,'spinach',{speye(2)});

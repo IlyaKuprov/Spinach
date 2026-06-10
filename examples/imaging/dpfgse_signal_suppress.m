@@ -32,7 +32,7 @@ inter.coupling.scalar{7,7}=0;
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-2';
-bas.space_level=1;
+bas.prox_level=1;
 bas.connectivity='scalar_couplings';
 
 % Disable path tracing

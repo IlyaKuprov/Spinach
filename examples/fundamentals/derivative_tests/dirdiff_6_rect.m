@@ -11,8 +11,17 @@ formalisms={'sphten-liouv','zeeman-liouv','zeeman-hilb'};
 % Loop over formalisms
 for n=1:numel(formalisms)
 
+<<<<<<< HEAD
+% Select a basis set - IK-2 keeps complete basis on each 
+% spin in this case, but ignores multi-spin orders
+bas.formalism='sphten-liouv';
+bas.approximation='IK-2';
+bas.prox_level=1;
+bas.connectivity='scalar_couplings';
+=======
     % Build the derivative-test system
     [spin_system,Sx,Sy,Sz,Lx,Ly,H]=dirdiff_test_system(formalisms{n});
+>>>>>>> e62359ebcd9e87aa7014f3e35e648ac369eebbe3
 
     % Define control parameters
     control.drifts={{H}};                           % Drift

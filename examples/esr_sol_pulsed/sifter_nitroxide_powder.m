@@ -35,7 +35,7 @@ inter.coupling.euler{2,4}=[0 0 0];
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-bas.longitudinals={'14N'};
+bas.longitudinal={{'14N'}};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

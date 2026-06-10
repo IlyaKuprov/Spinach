@@ -31,25 +31,25 @@ function I=lm2lin(L,M)
 % Check consistency
 grumble(L,M);
 
-% Get the linear index
+% Linear index
 I=L.^2+L-M;
 
 end
 
 % Consistency enforcement
 function grumble(L,M)
-if (~isnumeric(L))||(~isreal(L))||any(mod(L(:),1)~=0)||...
-   (~isnumeric(M))||(~isreal(M))||any(mod(M(:),1)~=0)
-    error('all elements of the inputs must be real integers.');
+if (~isnumeric(L))||(~isreal(L))||(nnz(mod(L,1))>0)||...
+   (~isnumeric(M))||(~isreal(M))||(nnz(mod(M,1))>0)
+    error('L and M must contain real integers.');
 end
-if any(abs(M(:))>L(:))
-    error('unacceptable projection number.');
+if any(size(L)~=size(M),'all')
+    error('dimensions of L and M must be the same.');
 end
-if any(L(:)<0)
-    error('unacceptable total angular momentum.');
+if nnz(abs(M)>L)>0
+    error('each M must be betwen -L and L.');
 end
-if any(size(L)~=size(M))
-    error('array dimensions are inconsistent.');
+if nnz(L<0)>0
+    error('elements of L must be non-negative.');
 end
 end
 

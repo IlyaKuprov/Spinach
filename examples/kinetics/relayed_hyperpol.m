@@ -53,8 +53,8 @@ inter.r2_rates=num2cell([zeros(1,10) 0.1*ones(1,20)]);
 bas.formalism='sphten-liouv';
 bas.approximation='IK-1';
 bas.connectivity='full_tensors';
-bas.space_level=3;
-bas.level=1;
+bas.prox_level=3;
+bas.inter_level=1;
 
 % Exchange flux matrix
 inter.chem.flux_rate=zeros(30,30);

@@ -3,11 +3,11 @@
 %
 %        A=operator(spin_system,operators,spins,operator_type,format)
 %
-% Parameters:
+% This function supports three types of calls:
 %
 % 1. If operators is a string and spins is a string
 %
-%                      operators='Lz'; spins='13C';
+%	                    operators='Lz'; spins='13C';
 %
 % the function returns the sum of the corresponding single-spin operators 
 % (Hilbert space) or superoperators (Liouville space) on all spins of that
@@ -76,8 +76,9 @@ if ~exist('operator_type','var'), operator_type='comm'; end
 % The default sparse matrix format is CSC
 if ~exist('format','var'), format='csc'; end
 
-% Check consistency
-grumble(spin_system,operators,spins,operator_type,format); tic;
+% Check consistency and start the clock
+grumble(spin_system,operators,spins,...
+        operator_type,format); tic;
 
 % Load the cache record if one exists
 if ismember('op_cache',spin_system.sys.enable)
@@ -86,17 +87,33 @@ if ismember('op_cache',spin_system.sys.enable)
     op_hash=md5_hash({operators,spins,operator_type,...
                       format,spin_system.comp.iso_hash,...
                       spin_system.bas.basis_hash});
-    op_hash=[op_hash ':O']; % Mark as operator
 
-    % Get ValueStore
-    if ~isworkernode
-        store=gcp('nocreate').ValueStore; 
-    else
-        store=getCurrentValueStore(); 
+    % Generate the cache record name in the scratch directory
+    filename=[spin_system.sys.scratch filesep 'spinach_op_' op_hash '.mat'];
+
+    % Check if the file exists
+    if exist(filename,'file')
+
+        % Try to use
+        try
+
+            % Try to load
+            load(filename,'A');
+
+            % Check load success
+            if exist('A','var')
+                return; 
+            else
+                % Do not make a fuss on fail
+            end
+
+        catch
+
+            % Do not make a fuss on fail
+            
+        end
+
     end
-
-    % Try to retrieve the operator from the ValueStore
-    if isKey(store,op_hash), A=store(op_hash); return; end
     
 end
 
@@ -106,20 +123,33 @@ end
 % Start a cell array
 A=cell(numel(opspecs),1);
 
-% Decide how to proceed
+% This is formalism-dependent
 switch spin_system.bas.formalism
     
-    % Spherical tensor basis
+    % Spherical tensors
     case 'sphten-liouv'
 
+        % Parallelisation efficiency
+        types=spin_system.comp.types;
+        
         % Build summation terms
         parfor n=1:numel(opspecs)
 
-            % Get the superoperator
-            A{n}=superop(spin_system,opspecs{n},operator_type);
+            % Check physics type
+            if all(strcmp('S',types),'all')
 
-            % Apply the coefficient
-            A{n}(:,3)=coeffs(n)*A{n}(:,3);
+                % For spins: get the superoperator in XYZ format
+                A{n}=p_superop(spin_system,opspecs{n},operator_type);
+
+                % For spins: apply coefficient
+                A{n}(:,3)=coeffs(n)*A{n}(:,3);
+
+            else
+
+                % For cavities and phonons: Sarbojoy's PhD project :) :) :)
+                error('Cavities and phonons not yet available in sphten-liouv.');
+
+            end
 
         end
                 
@@ -128,28 +158,63 @@ switch spin_system.bas.formalism
           'zeeman-hilb',...
           'zeeman-liouv'}
 
+       
         % Parallelisation efficiency
         mults=spin_system.comp.mults;
         formalism=spin_system.bas.formalism;
-        
+        types=spin_system.comp.types;
+
         % Build summation terms
         parfor n=1:numel(opspecs)
+
+            % Index pertinent spins
+            active_spins=find(opspecs{n});
+
+            % Find out which substance hosts the opspec
+            % and narrow it down to that substance
+            subst=which_subst(spin_system,active_spins);
+            spins_in_subst=spin_system.chem.parts{subst}(:);
+            opspec_in_subst=opspecs{n}(spins_in_subst);
+
+            % Pull out spin multiplicities in the substance
+            mults_in_subst=spin_system.comp.mults(spins_in_subst);
 
             % Start the kron
             B=sparse(coeffs(n));
             
-            % Over particles
-            for k=1:numel(opspecs{n})
+            % Over the substance content
+            for k=1:numel(opspec_in_subst)
 
-                % Get state indices
-                [L,M]=lin2lm(opspecs{n}(k));
+                % Check physics type
+                switch types{k} %#ok<PFBNS>
+                
+                    case 'S' % Spins
 
-                % Get irreducible spherical tensors
-                IST=irr_sph_ten(mults(k),L); %#ok<PFBNS>
+                    % Spin: get spin state indices
+                    [L,M]=lin2lm(opspec_in_subst(k));
 
-                % Update the kron
-                B=kron(B,IST{L-M+1});
+                    % Spin: get irreducible spherical tensors
+                    ist=irr_sph_ten(mults_in_subst(k),L);
 
+                        % Update the kron
+                        B=kron(B,ist{L-M+1});
+
+                    case {'C','V','T'} % Cavities, phonons, transmons
+
+                    % Cavities and phonons: get operator
+                    T=boson_oper(mults_in_subst(k),...
+                                 opspec_in_subst(k));
+
+                        % Update the kron
+                        B=kron(B,bmon{opspecs{n}(k)+1});
+
+                    otherwise
+
+                        % Complain and bomb out
+                        error('unknown particle type.');
+
+                end
+                
             end
             
             % Move to Liouville space if necessary
@@ -159,6 +224,13 @@ switch spin_system.bas.formalism
 
             % Convert sparse array from CSC to XYZ indexing
             [rows,cols,vals]=find(B); A{n}=[rows cols vals];
+
+            % Get the global multi-substance basis index offset
+            idx_offset=sum(spin_system.bas.nstates(1:(subst-1)));
+
+            % Apply the offset
+            A{n}(:,1)=A{n}(:,1)+idx_offset;
+            A{n}(:,2)=A{n}(:,2)+idx_offset;
 
         end
         
@@ -175,52 +247,44 @@ A=cell2mat(A);
 % Convert to CSC format
 if strcmp(format,'csc')
 
-    % Decide operator dimension
-    switch spin_system.bas.formalism
+    % Get the global operator dimension
+    matrix_dim=sum(spin_system.bas.nstates);
 
-        case 'sphten-liouv'
-
-            % As per the basis set specification
-            matrix_dim=size(spin_system.bas.basis,1);
-
-        case {'zeeman-wavef','zeeman-hilb'}
-            
-            % Entire Hilbert space
-            matrix_dim=prod(spin_system.comp.mults);
-
-        case 'zeeman-liouv'
-            
-            % Entire Liouville space
-            matrix_dim=prod(spin_system.comp.mults)^2;
-
-        otherwise
-        
-            % Complain and bomb out
-            error('unknown formalism.');
-
-    end
-
-    % Make a sparse matrix, making sure it's complex for later
+    % Make a sparse matrix, making sure it is complex for later
     A=sparse(A(:,1),A(:,2),complex(A(:,3)),matrix_dim,matrix_dim);
 
 end
 
-% Write the cache record
-if ismember('op_cache',spin_system.sys.enable)
+% Write the cache record if caching is beneficial
+if ismember('op_cache',spin_system.sys.enable)&&(toc>0.1)
 
-    % Update the ValueStore
-    if ~isKey(store,op_hash)
-        put(store,{op_hash},{A});
+    % Do not fight other workers
+    if ~exist(filename,'file')
+
+        % Try to save
+        try
+
+            % Modern format, compressed
+            save(filename,'A','-v7.3'); drawnow;
+
+        catch
+
+            % Do not make a fuss on fail, this can happen
+            % for large parallel pools where many workers
+            % may be trying to write the same file.
+
+        end
+
     end
 
 end
 
 end
 
-% Input validation function
+% Consistency enforcement
 function grumble(spin_system,operators,spins,operator_type,format)
 if ~isfield(spin_system,'bas')
-    error('basis set information is missing, run basis() before calling this function.');
+    error('basis set information is missing, run basis() first.');
 end
 if (~(ischar(operators)&&ischar(spins)))&&...
    (~(iscell(operators)&&iscell(spins)))&&...
@@ -228,10 +292,10 @@ if (~(ischar(operators)&&ischar(spins)))&&...
     error('invalid operator specification.');
 end
 if iscell(operators)&&iscell(spins)&&(numel(operators)~=numel(spins))
-    error('spins and operators cell arrays should have the same number of elements.');
+    error('spins and operators cell arrays must have the same number of elements.');
 end
 if iscell(operators)&&any(~cellfun(@ischar,operators))
-    error('all elements of the operators cell array should be strings.');
+    error('all elements of the operators cell array must be strings.');
 end
 if isnumeric(spins)
     if (~isreal(spins))||(~isrow(spins))||any(mod(spins,1)~=0)||any(spins<1)

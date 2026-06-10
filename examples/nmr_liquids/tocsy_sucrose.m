@@ -17,7 +17,7 @@ sys.magnet=5.9;
 bas.formalism='sphten-liouv';
 bas.approximation='IK-2';
 bas.connectivity='scalar_couplings';
-bas.space_level=1;
+bas.prox_level=1;
 
 % Algorithmic options
 sys.enable={'greedy'};

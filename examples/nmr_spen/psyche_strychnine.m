@@ -21,7 +21,7 @@ sys.magnet=11.7;
 bas.formalism='sphten-liouv';
 bas.connectivity='scalar_couplings';
 bas.approximation='IK-2';
-bas.space_level=1;
+bas.prox_level=1;
 
 % Algorithmic options
 sys.tols.inter_cutoff=2.0;

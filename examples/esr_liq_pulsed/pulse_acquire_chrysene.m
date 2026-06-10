@@ -28,8 +28,8 @@ inter.damp_rate=1e6;
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-bas.longitudinals={'1H'};
-bas.projections=+1;
+bas.longitudinal={{'1H'}};
+bas.projections={1};
 
 % Symmetry
 bas.sym_spins={[1 7],[2 8],[3 9],[4 10],[5 11],[6 12]};

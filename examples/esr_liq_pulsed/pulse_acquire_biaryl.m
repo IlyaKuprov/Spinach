@@ -22,8 +22,8 @@ sys.isotopes={'E','14N','1H','1H','1H','1H','1H',...
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-bas.longitudinals={'1H','14N'};
-bas.projections=+1;
+bas.longitudinal={{'1H','14N'}};
+bas.projections={1};
 bas.sym_group={'S2','S2','S2','S2','S2','S2'};
 bas.sym_spins={[2 8],[3 9],[4 10],[5 11],[6 12],[7 13]};
 

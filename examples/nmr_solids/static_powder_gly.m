@@ -19,8 +19,8 @@ sys.disable={'trajlevel'};
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-bas.longitudinals={'15N'};
-bas.projections=+1;
+bas.longitudinal={{'15N'}};
+bas.projections={1};
 
 % Algorithmic options
 sys.tols.inter_cutoff=5.0;

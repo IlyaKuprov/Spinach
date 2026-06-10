@@ -19,8 +19,8 @@ sys.magnet=3.5;
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-bas.longitudinals={'1H'};
-bas.projections=+1;
+bas.longitudinal={{'1H'}};
+bas.projections={1};
 
 % Relaxation theory
 inter.relaxation={'damp'};

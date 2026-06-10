@@ -54,8 +54,8 @@ parameters.nuclear_frq=2*pi*144.76e6;
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-0';
-bas.level=5;
-bas.projections=[+2 +1 0 -1 -2];
+bas.inter_level=5;
+bas.projections={[+2 +1 0 -1 -2]};
 
 % Algorithmic options
 sys.disable={'krylov'};

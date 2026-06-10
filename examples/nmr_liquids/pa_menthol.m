@@ -14,8 +14,8 @@ load('menthol.mat','sys','inter');
 bas.formalism='sphten-liouv';
 bas.connectivity='scalar_couplings';
 bas.approximation='IK-2';
-bas.space_level=1;
-bas.projections=+1;
+bas.prox_level=1;
+bas.projections={1};
 bas.sym_group={'S3','S3','S3'};
 bas.sym_spins={[4 5 6],[9 10 11],[12 13 14]};
 

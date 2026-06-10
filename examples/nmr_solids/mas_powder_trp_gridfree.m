@@ -39,9 +39,9 @@ inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,12,174.4);
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-0';
-bas.longitudinals={'15N'};
-bas.projections=+1;
-bas.level=3;
+bas.longitudinal={{'15N'}};
+bas.projections={1};
+bas.inter_level=3;
 
 % Algorithmic options
 sys.tols.inter_cutoff=5.0;

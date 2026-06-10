@@ -33,11 +33,14 @@
 
 function summary(spin_system,topic,header)
 
+% The default header is empty
+if ~exist('header','var'), header=''; end
+
 % Check consistency
-if ~exist('header','var')
-    header='';
-end
 grumble(topic,header);
+
+% If console output is disabled, simply exit
+if strcmp(spin_system.sys.output,'hush'), return; end
 
 % Do the necessary
 switch topic
@@ -242,85 +245,177 @@ switch topic
         report(spin_system,'=====================');
         report(spin_system,' Group    Spins      ');
         report(spin_system,'---------------------');
-        for n=1:length(spin_system.comp.sym_spins)
-            report(spin_system,['  ' spin_system.comp.sym_group{n} '     ' num2str(spin_system.comp.sym_spins{n})]);
+        for n=1:length(spin_system.bas.sym_spins)
+            report(spin_system,['  ' spin_system.bas.sym_group{n} '     ' ...
+                                     num2str(spin_system.bas.sym_spins{n})]);
         end
-        report(spin_system,'=====================');
+        report(spin_system,'====================='); report(spin_system,' ');
         
-    case 'basis'
-        nstates=size(spin_system.bas.basis,1);
-        if nstates > spin_system.tols.basis_hush
-            report(spin_system,['over ' num2str(spin_system.tols.basis_hush) ' states in the basis - printing suppressed.']);
-        else
-            report(spin_system,'final basis set summary (L,M quantum numbers in irreducible spherical tensor products).')
-            report(spin_system,['N       ' blanks(length(num2str(spin_system.comp.nspins))) ...
-                                num2str(1:spin_system.comp.nspins,['%d ' blanks(7-length(num2str(spin_system.comp.nspins)))])]);
-            for n=1:nstates
-                current_line=blanks(7+8*spin_system.comp.nspins); spin_number=num2str(n);
-                current_line(1:length(spin_number))=spin_number;
-                for k=1:spin_system.comp.nspins
-                    [L,M]=lin2lm(spin_system.bas.basis(n,k));
-                    current_line(7+8*(k-1)+1)='(';
-                    current_line(7+8*(k-1)+2)=num2str(L);
-                    current_line(7+8*(k-1)+3)=',';
-                    proj=num2str(M);
-                    switch length(proj)
-                        case 1
-                            current_line(7+8*(k-1)+4)=proj;
-                            current_line(7+8*(k-1)+5)=')';
-                        case 2
-                            current_line(7+8*(k-1)+4)=proj(1);
-                            current_line(7+8*(k-1)+5)=proj(2);
-                            current_line(7+8*(k-1)+6)=')';
-                    end
+    case 'basis_summary' % Detailed summary of spherical tensor basis sets
+
+        % Loop over substances
+        for n=1:spin_system.bas.nsubst
+            
+            % Header for the current substance
+            report(spin_system, '=============================================================');
+            report(spin_system,[' Basis set, substance ' int2str(n) ': (L,M) in IST products']);
+            report(spin_system, '-------------------------------------------------------------');
+
+            % Decide if the basis should be printed
+            if spin_system.bas.nstates(n)>spin_system.tols.basis_hush
+
+                % Report that the basis set table is too long
+                report(spin_system,[' over ' num2str(spin_system.tols.basis_hush) ...
+                                    ' states in the basis - printing suppressed.']);
+
+            else
+     
+                % Get spin list and count for current substance
+                spins_in_subst=spin_system.chem.parts{n}(:);
+                nspins_in_subst=numel(spins_in_subst);
+
+                % Get single-particle ranks and projections
+                [sp_ranks,sp_projs]=lin2lm(spin_system.bas.basis{n});
+
+                % Single-particle rank range
+                max_sp_rank=max(sp_ranks,[],'all');
+                min_sp_rank=min(sp_ranks,[],'all');
+        
+                % Single-particle proj range
+                max_sp_proj=max(sp_projs,[],'all');
+                min_sp_proj=min(sp_projs,[],'all');
+        
+                % Decide basis specification table column width
+                MxR=int2str(max_sp_rank); MnR=int2str(min_sp_rank);
+                MxP=int2str(max_sp_proj); MnP=int2str(min_sp_proj);
+                colw=1+1+max([numel(MxR) numel(MnR)])+...
+                       1+max([numel(MxP) numel(MnP)])+1+1;
+
+                % Construct and print the header line with spin numbers
+                header_line=['N' repmat(blanks(colw),1,nspins_in_subst-1)];
+                for k=1:nspins_in_subst
+                    spin_number=int2str(spins_in_subst(k));
+                    l_pos=colw*k-numel(spin_number)+1; r_pos=colw*k;
+                    header_line(l_pos:r_pos)=spin_number;
                 end
-                report(spin_system,current_line);
+                report(spin_system,header_line);
+                
+                % Over states in the current substance
+                for k=1:spin_system.bas.nstates(n)
+
+                    % Preallocate the state specification line
+                    current_line=repmat(blanks(colw),1,nspins_in_subst);
+                 
+                    % Over spins in the current substance
+                    for m=1:nspins_in_subst
+
+                        % Assemble the current state specification 
+                        current_spec=['(' int2str(sp_ranks(k,m)) ...
+                                      ',' int2str(sp_projs(k,m)) ')'];
+
+                        % Write the state specification string
+                        l_pos=colw*m-numel(current_spec)+1; r_pos=colw*m;
+                        current_line(l_pos:r_pos)=current_spec;
+                  
+                    end
+
+                    % Print the state specification string
+                    report(spin_system,[blanks(floor((colw-4)/2)) current_line]);
+
+                end
+
             end
+
+            % Terminate the current substance basis set table
+            report(spin_system,'-------------------------------------------------------------');
             report(spin_system,' ');
+
         end
-        report(spin_system,['state space dimension ' num2str(nstates) ...
-                            ' (' num2str(100*nstates/(prod(spin_system.comp.mults)^2))...
-                            '% of the full state space).']);
         
     case 'basis_settings'
         
-        % Report the formalism
+        % Report formalism and layout
         switch spin_system.bas.formalism
+
             case 'zeeman-wavef'
-                report(spin_system,'Zeeman basis set using wavefunction formalism.');
+
+                % Schrodinger equation for the wavefunction
+                report(spin_system,'Zeeman basis set using wavefunction formalism:');
+                report(spin_system,'operators are matrices, states are vectors.');
+
             case 'zeeman-hilb'
-                report(spin_system,'Zeeman basis set using Hilbert space matrix formalism.');
+
+                % Density operator formalism with LvN equation
+                report(spin_system,'Zeeman basis set using Hilbert space formalism:');
+                report(spin_system,'operators are matrices, states are matrices.');
+
             case 'zeeman-liouv'
-                report(spin_system,'Zeeman basis set using Liouville space matrix formalism.');
+
+                % Adjoint representation of the density operator formalism
+                report(spin_system,'Zeeman basis set using Liouville space formalism:');
+                report(spin_system,'superoperators are matrices, states are vectors.');
+
             case 'sphten-liouv'
-                report(spin_system,'spherical tensor basis set using Liouville space matrix formalism.');
+
+                % Adjoint representation of the density oeprator formalism, IST basis set
+                report(spin_system,'Spherical tensor basis set using Liouville space formalism:');
+                report(spin_system,'superoperators are matrices, states are vectors.');
+
             otherwise
-                error('unrecognized formalism - see the basis preparation section of the manual.');
+
+                % Complain and bomb out
+                error('unrecognised formalism - see the basis section of the manual.');
+
         end
         
-        % Report the approximation
+        % Report basis set approximations
         if strcmp(spin_system.bas.formalism,'sphten-liouv')
             switch spin_system.bas.approximation
                 case 'IK-0'
-                    report(spin_system,['IK-0 approximation - all correlations of all spins up to order ' int2str(spin_system.bas.level)]);
+                    report(spin_system,['IK-0 approximation | All product states between up to ' int2str(spin_system.bas.inter_level) ' spins']);
+                    report(spin_system, 'IK-0 approximation | within the same chemical substance, irrespec-');
+                    report(spin_system, 'IK-0 approximation | tive of proximity or interaction amplitude.');
                 case 'IK-1'
-                    report(spin_system,['IK-1 approximation - spin correlations up to order ' int2str(spin_system.bas.level)...
-                                        ' between directly coupled spins.']);
-                    report(spin_system,['IK-1 approximation - spin correlations up to order ' int2str(spin_system.bas.space_level)...
-                                        ' between all spins within ' num2str(spin_system.tols.prox_cutoff) ' Angstrom of each other.']);
+                    report(spin_system,['IK-1 approximation | Product states between up to ' int2str(spin_system.bas.inter_level) ' interacting ']);
+                    report(spin_system, 'IK-1 approximation | spins; interaction graph to be obtained using');
+                    if strcmp(spin_system.bas.connectivity,'scalar_couplings')
+                        report(spin_system,'IK-1 approximation | isotropic parts of interaction tensors.');
+                    elseif strcmp(spin_system.bas.connectivity,'full_tensors')
+                        report(spin_system,'IK-1 approximation | full 3x3 interaction tensors.');
+                    else 
+                        error('unrecognised connectivity type - see basis set preparation manual.');
+                    end
+                    report(spin_system, 'IK-1 approximation |');
+                    report(spin_system,['IK-1 approximation | Interaction tensor drop tolerance (2-norm): ' num2str(spin_system.tols.inter_cutoff) ' Hz']);
+                    report(spin_system, 'IK-1 approximation |');
+                    report(spin_system,['IK-1 approximation | Product states between up to ' int2str(spin_system.bas.prox_level) ' spins']);
+                    report(spin_system,['IK-1 approximation | within ' num2str(spin_system.tols.prox_cutoff) ' Angstrom of each other.']);
                 case 'IK-2'
-                    report(spin_system, 'IK-2 approximation - spin correlations involving all nearest neighbours of each spin on the coupling graph.');
-                    report(spin_system,['IK-2 approximation - spin correlations up to order ' int2str(spin_system.bas.space_level)...
-                                        ' between all spins within ' num2str(spin_system.tols.prox_cutoff) ' Angstrom of each other.']);
+                    report(spin_system, 'IK-2 approximation | Product states involving interaction partners of');
+                    report(spin_system, 'IK-2 approximation | each spin; interaction graph to be obtained using');
+                    if strcmp(spin_system.bas.connectivity,'scalar_couplings')
+                        report(spin_system,'IK-2 approximation | isotropic parts of interaction tensors.');
+                    elseif strcmp(spin_system.bas.connectivity,'full_tensors')
+                        report(spin_system,'IK-2 approximation | full 3x3 interaction tensors.');
+                    else 
+                        error('unrecognised connectivity type - see basis set preparation manual.');
+                    end
+                    report(spin_system, 'IK-2 approximation |');
+                    report(spin_system,['IK-2 approximation | Interaction tensor drop tolerance (2-norm): ' num2str(spin_system.tols.inter_cutoff) ' Hz']);
+                    report(spin_system, 'IK-2 approximation |');
+                    report(spin_system,['IK-2 approximation | Product states between up to ' int2str(spin_system.bas.prox_level) ' spins within']);
+                    report(spin_system,['IK-2 approximation | ' num2str(spin_system.tols.prox_cutoff) ' Angstrom of each other.']);
                 case 'IK-DNP'
-                    report(spin_system,['IK-DNP approximation | Max inter-electron correlation level:   ' int2str(spin_system.bas.level(1))]);
-                    report(spin_system,['IK-DNP approximation | max electron-nuclear correlation level: ' int2str(spin_system.bas.level(2))]);
-                    report(spin_system,['IK-DNP approximation | max inter-nuclear correlation level:    ' int2str(spin_system.bas.level(3))]);
-                    report(spin_system, 'IK-DNP approximation | with nearest neighbours on the coupling graph.');
+                    report(spin_system,['IK-DNP approximation | max inter-electron correlation level:   ' int2str(spin_system.bas.inter_level(1))]);
+                    report(spin_system,['IK-DNP approximation | max electron-nuclear correlation level: ' int2str(spin_system.bas.inter_level(2))]);
+                    report(spin_system,['IK-DNP approximation | max inter-nuclear correlation level:    ' int2str(spin_system.bas.inter_level(3))]);
+                    report(spin_system, 'IK-DNP approximation | with nearest neighbours on the interaction graph.');
+                    report(spin_system, 'IK-DNP approximation |');
+                    report(spin_system,['IK-DNP approximation | Interaction tensor drop tolerance (2-norm): ' num2str(spin_system.tols.inter_cutoff) ' Hz']);
                 case 'none'
-                    report(spin_system, 'starting with complete basis set on all spins...');
+                    report(spin_system, 'starting with the complete basis set...');
                 otherwise
-                    error('unrecognized approximation level - see the basis set preparation manual.');
+                    error('unrecognized approximation level - see basis set preparation manual.');
             end
         end
         

@@ -17,8 +17,8 @@ sys.magnet=14.1;
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-0';
-bas.projections=+1;
-bas.level=3;
+bas.projections={1};
+bas.inter_level=3;
 
 % Algorithmic options
 sys.tols.inter_cutoff=5.0;

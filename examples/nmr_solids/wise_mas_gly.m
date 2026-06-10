@@ -25,7 +25,7 @@ inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,7,8.0);   % H_N
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-0';
-bas.level=3;
+bas.inter_level=3;
 
 % Ignore interactions below 200 Hz
 sys.tols.inter_cutoff=2*pi*200;

@@ -40,7 +40,7 @@ inter.coupling.scalar{22,22}=0;
 bas.formalism='sphten-liouv';
 bas.approximation='IK-2';
 bas.connectivity='scalar_couplings';
-bas.space_level=1;
+bas.prox_level=1;
 
 % Algorithmic options
 sys.disable={'pt','colorbar'};

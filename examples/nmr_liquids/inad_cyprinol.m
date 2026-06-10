@@ -23,8 +23,8 @@ sys.tols.prox_cutoff=4.0;
 bas.formalism='sphten-liouv';
 bas.approximation='IK-1';
 bas.connectivity='scalar_couplings';
-bas.space_level=1;
-bas.level=4;
+bas.prox_level=1;
+bas.inter_level=4;
 
 % seq parameters
 parameters.spins={'13C'};

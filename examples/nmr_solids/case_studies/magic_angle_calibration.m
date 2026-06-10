@@ -23,7 +23,7 @@ inter.zeeman.scalar={60.0933};
 % Formalism and basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-bas.projections=+1;
+bas.projections={1};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

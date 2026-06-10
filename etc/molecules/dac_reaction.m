@@ -159,7 +159,11 @@ inter.chem.concs=[1 1 1 1 1];
 bas.formalism='sphten-liouv';
 bas.approximation='IK-2';
 bas.connectivity='scalar_couplings';
-bas.space_level=1;
+bas.prox_level=1;
+
+% Permutation symmetries
+bas.sym_group={'S2','S2','S3'};
+bas.sym_spins={[5 6],[25 26],[28 29 30]};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield','t1_t2'};

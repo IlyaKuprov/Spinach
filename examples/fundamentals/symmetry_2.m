@@ -33,8 +33,8 @@ bas.approximation='IK-2';
 bas.sym_group={'S3','S3','S3'};
 bas.sym_spins={[1 2 3],[4 5 6],[7 8 9]};
 bas.connectivity='scalar_couplings';
-bas.space_level=1;
-bas.projections=+1;
+bas.prox_level=1;
+bas.projections={1};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

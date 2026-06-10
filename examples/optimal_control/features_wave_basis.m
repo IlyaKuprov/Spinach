@@ -28,7 +28,7 @@ inter.zeeman.scalar=num2cell(linspace(-160,160,n_spins));
 % spin in this case, but ignores multi-spin orders
 bas.formalism='sphten-liouv';
 bas.approximation='IK-2';
-bas.space_level=1;
+bas.prox_level=1;
 bas.connectivity='scalar_couplings';
 
 % Run Spinach housekeeping

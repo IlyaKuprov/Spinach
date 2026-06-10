@@ -1,85 +1,106 @@
-% Sided product superoperator in the spherical tensor basis set. Returns
-% superoperators corresponding to right or left multiplication of a den-
-% sity matrix by a user-specified operator. Syntax:
+% Product, commutation, and anticommutation superoperators in the 
+% spherical tensor basis set for the specified substance. Syntax:
 %
-%                  A=superop(spin_system,opspec,side)
+%              A=p_superop(spin_system,opspec,side)
 %
 % Arguments:
 %
-%     opspec - Spinach operator specification described in Sections 2.1
-%              and 3.3 of the following paper:
+%     opspec - Spinach operator specification described in Sec-
+%              tions 2.1 and 3.3 of the following paper:
 %
-%                     http://dx.doi.org/10.1016/j.jmr.2010.11.008
+%                http://dx.doi.org/10.1016/j.jmr.2010.11.008
 %
-%     side   - 'left' or 'right' causes the function to return a product
-%              superoperator corresponding to a product from that side;
-%              'comm' or 'acomm' results in commutation and anticommuta-
-%              tion superoperator respectively.
+%     side   - 'left' or 'right' causes the function to return
+%              a product superoperator corresponding to a pro-
+%              duct from that side; 'comm' or 'acomm' results
+%              in commutation and anticommutation superopera-
+%              tor respectively.
 %
 % Outputs:
 %
-%          A - a three-column array of row indices (first column),
-%              column indices (second column) and values (third column).
+%          A - a three-column array of row indices (first col-
+%              umn), column indices (second column) and values
+%              (third column)
 %
-% Note: this is a very general function to which direct calls are not
-%       usually required - please use the (much friendlier) operator()
-%       function.
+% Note: direct calls to this function are not usually required,
+%       use the friendlier operator() function.
 %
-% Note: the superoperator is returned in XYZ sparse format, which is 
-%       different from Matlab's CSC format.
+% Note: the superoperator is returned in XYZ sparse format.
 %
 % ilya.kuprov@weizmann.ac.il
 % hannah.hogben@chem.ox.ac.uk
 %
-% <https://spindynamics.org/wiki/index.php?title=superop.m>
+% <https://spindynamics.org/wiki/index.php?title=p_superop.m>
 
-function A=superop(spin_system,opspec,side)
+function A=p_superop(spin_system,opspec,side)
 
-% Issue a recursive call if appropriate
-if strcmp(side,'comm')
-    A=superop(spin_system,opspec,'leftofcomm');
-    B=superop(spin_system,opspec,'rightofcomm');
-    B(:,3)=-B(:,3); A=[A; B]; return;
-elseif strcmp(side,'acomm')
-    A=[superop(spin_system,opspec,'left');
-       superop(spin_system,opspec,'right')]; return;
+% Recursions
+switch side
+
+    case 'comm'
+
+        % Efficient left and right commutator parts,
+        % skipping elements that would cancel anyway
+        A=p_superop(spin_system,opspec, 'leftofcomm');
+        B=p_superop(spin_system,opspec,'rightofcomm');
+
+        % XYZ sparse indexed subtraction
+        B(:,3)=-B(:,3); A=[A; B]; return;
+
+    case 'acomm'
+
+        % Full left and right anticommutator parts
+        A=p_superop(spin_system,opspec, 'left');
+        B=p_superop(spin_system,opspec,'right');
+
+        % XYZ sparse indexed addition
+        A=[A; B]; return;
+
+    case {'left','right','leftofcomm','rightofcomm'}
+
+        % Validate the input
+        grumble(spin_system,opspec);
+
+    otherwise
+
+        % Complain and bomb out
+        error('unrecognised side specification.');
+
 end
 
-% Validate the input
-grumble(spin_system,opspec);
+% Index relevant spins
+opspec_mask=logical(opspec);
+active_spins=find(opspec_mask);
 
-% Determine the relevant spins
-active_spins=find(opspec);
+% Find out which substance we are in
+subst=which_subst(spin_system,active_spins);
 
-% For unit operator use a shortcut
-if isempty(active_spins)
-    A=unit_oper(spin_system); 
-    [rows,cols,vals]=find(A);
-    A=[rows cols vals];
-    return;
-end
+% Get relevant spins from substance list
+spins_in_subst=spin_system.chem.parts{subst};
 
-% Preallocate source state index
-source=cell(1,numel(active_spins));
+% Get the relevant multiplicities from the spin list
+mults_in_subst=spin_system.comp.mults(spins_in_subst);
 
-% Preallocate destination state index
-destin=cell(1,numel(active_spins));
+% Start state tables and the
+% structure coefficient table
+source=cell(0,numel(active_spins));
+destin=cell(0,numel(active_spins));
+struct=cell(0,numel(active_spins));
 
-% Preallocate structure coefficients table
-struct=cell(1,numel(active_spins));
+% Get action tables
+for n=active_spins
 
-% Loop over the relevant spins
-for n=1:length(active_spins)
+    % Spin multiplicity
+    mult=mults_in_subst(n);
 
-    % Current spin multiplicity and state index
-    mult=spin_system.comp.mults(active_spins(n));
-    table_idx=opspec(active_spins(n))+1;
-
-    % Extract pages corresponding to the current state
+    % 1-base indexing
+    table_idx=opspec(n)+1;
+   
+    % Extract pages
     switch side
 
         case {'left','leftofcomm'}
-
+            
             % Extract left product pages from Lie structure tables
             pt=squeeze(spin_system.bas.lpst{mult}(table_idx,:,:));
 
@@ -87,55 +108,54 @@ for n=1:length(active_spins)
 
             % Extract right product pages from Lie structure tables
             pt=squeeze(spin_system.bas.rpst{mult}(table_idx,:,:));
-
+        
         otherwise
 
             % Complain and bomb out
             error('invalid side specification.');
 
     end
-
+    
     % Convert product action table to indices
     [destin{n},source{n},struct{n}]=find(pt);
-
+    
     % Spinach uses 0 index for the unit matrix
     source{n}=source{n}-1; destin{n}=destin{n}-1;
-
+    
 end
     
-% Compute the structure coefficients for the relevant sub-algebra
+% Get structure coeffs for the sub-algebra
 from=source{1}; to=destin{1}; coeff=struct{1};
 for n=2:numel(active_spins)
-    from=[kron(from,ones(size(source{n},1),1)) ...
-          kron(ones(size(from,1),1),source{n})];
-    to=[kron(to,ones(size(destin{n},1),1)) ...
-        kron(ones(size(to,1),1),destin{n})];
+    from=[repelem(from,height(source{n}),1) repmat(source{n},height(from),1)];
+    to=  [repelem(to,height(destin{n}),1)   repmat(destin{n},height(to),1)  ];
     coeff=kron(coeff,struct{n});
 end
 
-% Lift the basis columns corresponding to the relevant spins
-basis_cols=spin_system.bas.basis(:,active_spins);
+% Get basis columns corresponding to the relevant spins
+basis_cols=spin_system.bas.basis{subst}(:,opspec_mask);
 
-% For commutation superoperators remove commuting paths
+% For commutation superoperators, remove commuting paths
 if ismember(side,{'leftofcomm','rightofcomm'})
-    kill_mask=(sum(from,2)==0)|(sum(to,2)==0);
-    from(kill_mask,:)=[]; to(kill_mask,:)=[]; coeff(kill_mask,:)=[];
+    idx=(sum(from,2)==0)|(sum(to,2)==0);
+    from(idx,:)=[]; to(idx,:)=[]; coeff(idx,:)=[];
 end
 
-% Get the index array going
-A=cell(size(from,1),1);
+% Get the answer going
+A=cell(height(from),1);
 
 % Loop over source states
 for n=1:size(from,1)
     
     % Retrieve the source subspace
-    source_subsp_idx=true(size(basis_cols,1),1);
-    for m=1:size(from,2)
-        source_subsp_idx=and(source_subsp_idx,(basis_cols(:,m)==from(n,m)));
+    source_subsp_idx=true(height(basis_cols),1);
+    for m=1:width(from)
+        source_subsp_idx=and(source_subsp_idx,...
+                             basis_cols(:,m)==from(n,m));
     end
-    source_subsp=spin_system.bas.basis(source_subsp_idx,:);
+    source_subsp=spin_system.bas.basis{subst}(source_subsp_idx,...
+                                              ~opspec_mask);
     source_subsp_idx=find(source_subsp_idx);
-    source_subsp(:,active_spins)=[];
     
     % Get source subspace dimension
     subsp_dim=size(source_subsp,1);
@@ -144,27 +164,29 @@ for n=1:size(from,1)
     if subsp_dim>0
     
         % Retrieve the destination subspace
-        destin_subsp_idx=true(size(basis_cols,1),1);
-        for m=1:size(to,2)
-            destin_subsp_idx=and(destin_subsp_idx,(basis_cols(:,m)==to(n,m)));
+        destin_subsp_idx=true(height(basis_cols),1);
+        for m=1:width(to)
+            destin_subsp_idx=and(destin_subsp_idx,...
+                                 basis_cols(:,m)==to(n,m));
         end
-        destin_subsp=spin_system.bas.basis(destin_subsp_idx,:);
+        destin_subsp=spin_system.bas.basis{subst}(destin_subsp_idx,...
+                                                  ~opspec_mask);
         destin_subsp_idx=find(destin_subsp_idx);
-        destin_subsp(:,active_spins)=[];
         
         % Fill the operator
         if isequal(source_subsp,destin_subsp)
             
             % If the subspaces fully match, use the raw indices
-            A{n}=[source_subsp_idx destin_subsp_idx coeff(n)*ones(subsp_dim,1)];
+            A{n}=[source_subsp_idx destin_subsp_idx repelem(coeff(n),subsp_dim,1)];
             
         else
         
             % Otherwise, use brute-force state-by-state matching
-            [does_it_go_anywhere,where_it_goes_if_it_does]=ismember(source_subsp,destin_subsp,'rows');
+            [does_it_go_anywhere,where_it_goes_if_it_does]=ismember(source_subsp, ...
+                                                                    destin_subsp,'rows');
             A{n}=[source_subsp_idx(does_it_go_anywhere)                           ...
                   destin_subsp_idx(where_it_goes_if_it_does(does_it_go_anywhere)) ...
-                  coeff(n)*ones(nnz(does_it_go_anywhere),1)];
+                  repelem(coeff(n),nnz(does_it_go_anywhere),1)];
         
         end
         
@@ -182,25 +204,42 @@ else
     A=cell2mat(A);
 end
 
+% Get the global multi-substance basis index offset
+idx_offset=sum(spin_system.bas.nstates(1:(subst-1)));
+
+% Apply the offset
+A(:,1)=A(:,1)+idx_offset;
+A(:,2)=A(:,2)+idx_offset;
+
 end
 
 % Consistency enforcement
 function grumble(spin_system,opspec)
+
+% Basis information must exist
 if ~isfield(spin_system,'bas')
-    error('basis set information is missing, run basis() before calling this function.');
+    error('basis set information is missing, call basis() first.');
 end
-if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
-    error('this function only supports sphten-liouv formalism.');
+
+% Spherical tensors in Liouville space only
+if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
+    error('p_superop() requires sphten-liouv formalism.');
 end
+
+% Opspec must be sensible and physically valid
 if (~isnumeric(opspec))||(~isrow(opspec))||any(mod(opspec,1)~=0)
     error('opspec must be a row vector of integers.');
 end
 if numel(opspec)~=spin_system.comp.nspins
-    error('the number of elements in the opspec array must be equal to the number of spins.');
+    error('numel(opspec) must be equal to the number of spins.');
 end
 if any((opspec+1)>spin_system.comp.mults.^2)
     error('physically impossible state requested in opspec.');
 end
+if nnz(opspec)==0
+    error('for all-zero opspec call unit_state() instead.'); 
+end
+
 end
 
 % My philosophy, in essence, is the concept of man as a heroic being,

@@ -4,7 +4,7 @@
 % irreducible representations of the direct product symmetry 
 % group. Syntax:
 %
-%             spin_system=symmetry(spin_system,bas)
+%             spin_system=symmetry(spin_system)
 %
 % Parameters:
 %
@@ -13,18 +13,11 @@
 %                    and basis specification sections, of the
 %                    of the online manual.
 %
-%    bas          -  basis input structure described in the
-%                    basis specification section of the manual
+% Outputs: symmetry factorisation information is written, for
+%          each substance into the following fields
 %
-% Outputs:
-%
-%    spin_system.bas.irrep(n).projector - projector matrices
-%                                         into each irreducible
-%                                         representation
-%
-%    spin_system.bas.irrep(n).dimension - dimension of each ir-
-%                                         reducible representa-
-%                                         tion
+%              spin_system.bas.sym_fact(s).irr_dimensions
+%              spin_system.bas.sym_fact(s).irr_projectors
 %
 % Note: this is a service function of the Spinach kernel that
 %       should not be called directly; it is called by basis.m
@@ -37,59 +30,94 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=symmetry.m>
 
-function spin_system=symmetry(spin_system,bas)
-
-% Check consistency
-grumble(spin_system,bas);
+function spin_system=symmetry(spin_system)
 
 % Check the disable switch
 if ismember('symmetry',spin_system.sys.disable)
     
     % Issue a reminder to the user
-    report(spin_system,'WARNING - symmetry factorization disabled by the user.');
+    report(spin_system,'WARNING - symmetry factorisation disabled by the user.');
     
-    % Write empty cells
-    spin_system.comp.sym_group={};
-    spin_system.comp.sym_spins={};
-    spin_system.comp.sym_a1g_only=true();
+    % Write empty cells and bounce out
+    spin_system.bas.sym_a1g_only=NaN;
+    spin_system.bas.sym_group={};
+    spin_system.bas.sym_spins={}; return;
     
-else
+end
 
-    % Symmetry group
-    if isfield(bas,'sym_group')
-        spin_system.comp.sym_group=bas.sym_group;
+% The default is no symmetry
+if ~isfield(spin_system.bas,'sym_group'), spin_system.bas.sym_group={}; end
+if ~isfield(spin_system.bas,'sym_spins'), spin_system.bas.sym_spins={}; end
+    
+% Default A1g irrep switch
+if ~isfield(spin_system.bas,'sym_a1g_only')
+
+    % Depends on the formalism
+    if strcmp(spin_system.bas.formalism,'zeeman-hilb')||...
+       strcmp(spin_system.bas.formalism,'zeeman-wavef')
+
+        % Hilbert space needs all irreps
+        spin_system.bas.sym_a1g_only=false();
+
     else
-        spin_system.comp.sym_group={};
+
+        % Liouville space needs A1g only
+        spin_system.bas.sym_a1g_only=true();
+
     end
+
+end
+
+% Check consistency
+grumble(spin_system);
     
-    % Symmetry-related spins
-    if isfield(bas,'sym_spins')
-        spin_system.comp.sym_spins=bas.sym_spins;
-    else
-        spin_system.comp.sym_spins={};
+% Report back to the user if necessary
+if ~isempty(spin_system.bas.sym_group)
+    summary(spin_system,'symmetry','Symmetry summary');
+end
+
+% Loop over chemical substances
+for s=1:spin_system.bas.nsubst
+
+    % Get spin list and count for current substance
+    spins_in_subst=spin_system.chem.parts{s}(:); 
+    nspins_in_subst=numel(spins_in_subst);
+
+    % Find out which symmetry groups belong to this substance
+    groups_in_subst=false(1,numel(spin_system.bas.sym_group));
+    for g=1:numel(spin_system.bas.sym_group)
+        if all(ismember(spin_system.bas.sym_spins{g}(:),...
+                        spins_in_subst))
+            groups_in_subst(g)=true();
+        end
     end
-    
-    % Irreducible representation composition
-    if isfield(bas,'sym_a1g_only')
-        spin_system.comp.sym_a1g_only=bas.sym_a1g_only;
-    elseif strcmp(spin_system.bas.formalism,'zeeman-hilb')
-        spin_system.comp.sym_a1g_only=false();
-    else
-        spin_system.comp.sym_a1g_only=true();
+
+    % Pull out symmetry groups of the current substance
+    sym_group_subst=spin_system.bas.sym_group(groups_in_subst);
+    sym_spins_subst=spin_system.bas.sym_spins(groups_in_subst);
+
+    % Translate indices to refer to the current substance
+    for n=1:numel(sym_spins_subst)
+        sym_spins_subst{n}=find(ismember(spins_in_subst,...
+                                         sym_spins_subst{n}));
     end
-    
-    % Report back to the user
-    if ~isempty(spin_system.comp.sym_group)
-        summary(spin_system,'symmetry','permutation symmetry summary');
+
+    % Skip if the list is empty
+    if isempty(sym_group_subst)
+        spin_system.bas.sym_fact(s).irr_dimensions=[];
+        spin_system.bas.sym_fact(s).irr_projectors={}; continue;
     end
-    
+
+    % Print substance header if some symmetry exists
+    report(spin_system,['SYMMETRY TREATMENT, substance ' int2str(s)]);
+
     % Compute group direct product if necessary
-    if numel(spin_system.comp.sym_group)>1
+    if numel(sym_group_subst)>1
         
         % Lift constituent groups from the database
-        ngroups=numel(spin_system.comp.sym_group); groups=cell(1,ngroups);
+        ngroups=numel(sym_group_subst); groups=cell(1,ngroups);
         for n=1:ngroups
-            groups{n}=perm_group(spin_system.comp.sym_group{n});
+            groups{n}=perm_group(sym_group_subst{n});
         end
         
         % Compute direct product character table
@@ -99,234 +127,333 @@ else
         end
         group.irrep_dims=group.characters(:,1)';
         group.n_irreps=size(group.characters,1);
-        report(spin_system,['' num2str(group.n_irreps) ' irreps in the group direct product.']);
-        report(spin_system,['dimensions of the irreps ' num2str(group.irrep_dims)]);
+        report(spin_system,['    ' num2str(group.n_irreps) ' irreps in the group direct product.']);
+        report(spin_system,['    dimensions of the irreps ' num2str(group.irrep_dims)]);
         
         % Compute direct product element list
         group.elements=groups{1}.elements; group.order=groups{1}.order;
         for n=2:ngroups
-            group.elements=[kron(group.elements,ones(groups{n}.order,1))...
-                kron(ones(group.order,1),groups{n}.elements+size(group.elements,2))];
+            group.elements=[kron(group.elements,ones(groups{n}.order,1)) ...
+                            kron(ones(group.order,1),groups{n}.elements+size(group.elements,2))];
             group.order=group.order*groups{n}.order;
         end
-        report(spin_system,['' num2str(size(group.elements,1)) ' symmetry operations in the group direct product.']);
-        
-        % Concatenate spin lists
-        spins=horzcat(spin_system.comp.sym_spins{:});
-        
-    elseif isscalar(spin_system.comp.sym_group)
-        
-        % Lift the group from the database
-        spins=spin_system.comp.sym_spins{1};
-        group=perm_group(spin_system.comp.sym_group{1});
-        report(spin_system,['' num2str(group.n_irreps) ' irreps in the symmetry group.']);
-        report(spin_system,['dimensions of the irreps ' num2str(group.irrep_dims)]);
+        report(spin_system,['    ' num2str(size(group.elements,1)) ' elements in the group direct product.']);
         
     else
         
-        % Remind the user that symmetry is not operational
-        report(spin_system,'no symmetry information available.');
-        
+        % Lift the group from the database
+        group=perm_group(sym_group_subst{1});
+        report(spin_system,['    ' num2str(group.n_irreps) ' irreps in the symmetry group.']);
+        report(spin_system,['    dimensions of the irreps ' num2str(group.irrep_dims)]);
+    
     end
+
+    % Concatenate spin lists
+    spins=horzcat(sym_spins_subst{:});
     
     % Run the SALC procedure
     if exist('group','var')
         
-        % Preallocate the permutation table
-        permutation_table=zeros(size(spin_system.bas.basis,1),group.order);
-        
+        % Pull out the current substance basis
+        substance_basis=spin_system.bas.basis{s};
+        bas_dimension=size(substance_basis,1);
+
+        % Decide permutation table data type
+        perm_tab_type=min_int_type(bas_dimension,'unsigned');
+
+        % Preallocate basis set permutation table
+        permutation_table=zeros(bas_dimension,group.order,perm_tab_type);
+
         % Compute the permutation table
+        report(spin_system,'    computing the permutation table...');
         parfor n=1:group.order %#ok<*PFBNS>
-            group_element=1:spin_system.comp.nspins;
+
+            % Sequentially numbered spins
+            group_element=1:nspins_in_subst;
+
+            % Permutation of symmetry-related spins by a group element
             group_element(spins)=group_element(spins(group.elements(n,:)));
-            permuted_basis=spin_system.bas.basis(:,group_element);
-            [~,index]=sortrows(permuted_basis);
-            permutation_table(:,n)=index;
+
+            % Corresponding permutation of basis set columns
+            permuted_basis=substance_basis(:,group_element);
+
+            % Find where symmetry-transformed states are in the old basis
+            [~,index]=sortrows(permuted_basis); permuted_basis=[]; %#ok<NASGU>
+            permutation_table(:,n)=cast(index,perm_tab_type);
+
         end
-        
+
+        % Clear a large array
+        clear('substance_basis');
+
         % Compute irreducible representations
-        if spin_system.comp.sym_a1g_only
+        if spin_system.bas.sym_a1g_only
             
-            % Inform the user
-            report(spin_system,'Liouville space mode - fully symmetric irrep only.');
+            % Tell the user that only one irrep is pertinent
+            report(spin_system,'    Liouville space mode - A1g only.');
+            report(spin_system,'    building the fully symmetric irrep...');
             
-            % Prune the permutation table
-            symmetry_related_states=unique(sort(permutation_table,2,'ascend'),'rows');
-            dimension=size(symmetry_related_states,1);
+            % Sort and prune the permutation table
+            if (~isworkernode)&&(bas_dimension>1e4)
+                
+                % Distributed sorting of rows
+                permutation_table=distrib_dim(permutation_table,1);
+                permutation_table=sort(permutation_table,2,'ascend');
+                permutation_table=gather(permutation_table);
+
+            else
+
+                % Single-thread sorting of rows
+                permutation_table=sort(permutation_table,2,'ascend');
+
+            end
+
+            % Not sparse, so unihash() is not needed
+            permutation_table=unique(permutation_table,'rows');
+
+            % Get symmetrised subspace dimension
+            irr_dimension=size(permutation_table,1);
+
+            % Decide sparse constructor index data type
+            idx_data_type=min_int_type(irr_dimension,'unsigned');
+
+            % Construct the projector into the symmetrised subspace
+            state_list=cast(1:irr_dimension,idx_data_type); state_list=state_list(:);
+            index=[repmat(state_list,group.order,1) permutation_table(:)]; 
+            clear('permutation_table'); index=unique(index,'rows');
+            irr_projector=sparse(index(:,1),index(:,2),... % this needs
+                                 ones(size(index,1),1),... % to be FP64
+                                 irr_dimension,bas_dimension); clear('index');
+
+            % Normalise the rows of the projector
+            row_norms=sqrt(sum(irr_projector.^2,2));
+            irr_projector=irr_projector./row_norms;
+
+            % Convert into a single cell
+            irr_projector={irr_projector};
             
-            % Populate the coefficient matrix
-            index=unique([kron(ones(group.order,1),(1:dimension)') symmetry_related_states(:) ones(dimension*group.order,1)],'rows');
-            coeff_matrix=sparse(index(:,1),index(:,2),index(:,3),dimension,size(spin_system.bas.basis,1));
-            
-            % Normalize the coefficient matrix
-            norms=sqrt(sum(coeff_matrix.^2,2));
-            coeff_matrix=spdiags(norms.^(-1),0,dimension,dimension)*coeff_matrix;
-            
-            % Report back to the user
-            report(spin_system,['A1g irrep, ' num2str(dimension) ' states.']);
-            
-            % Return the projector and dimension
-            spin_system.bas.irrep.projector=coeff_matrix';
-            spin_system.bas.irrep.dimension=dimension;
+            % Report the symmetrised subspace dimension back to the user
+            report(spin_system,['    A1g irrep, ' int2str(irr_dimension) ' states.']);
             
         else
             
-            % Inform the user
-            report(spin_system,'full symmetry treatment - all irreps will be included.');
-            report(spin_system,'processing irreducible representations...');
+            % Tell the user that all irreps will be included
+            report(spin_system,'    Hilbert space mode - all irreps included.');
+            report(spin_system,'    building irreducible representations...');
+
+            % Preallocate pertinent arrays
+            irr_dimension=nan(group.n_irreps,1);
+            irr_projector=cell(group.n_irreps,1);
             
-            % Determine the problem dimension
-            basis_dim=size(spin_system.bas.basis,1);
-            
-            % Loop over irreducible representations
+            % Loop over irreps
             for n=1:group.n_irreps
-                
-                % Build the transformation matrix
+
+                % Make SALC coefficient matrix element index
+                vals=repmat(group.characters(n,:),bas_dimension,1);
+                cols=cast(1:bas_dimension,perm_tab_type);
+                cols=repmat(cols(:),1,group.order);
                 rows=permutation_table;
-                cols=kron((1:basis_dim)',ones(1,group.order));
-                vals=kron(ones(basis_dim,1),group.characters(n,:));
-                coeff_matrix=sparse(rows(:),cols(:),vals(:));
+
+                % Prune SALC coeff matrix element index
+                rows=rows(:); cols=cols(:); vals=vals(:);
+                kill_list=(vals==0); rows(kill_list)=[];
+                cols(kill_list)=[];  vals(kill_list)=[];
+
+                % Build SALC coefficient matrix
+                coeff_matrix=sparse(rows,cols,vals);
                 clear('rows','cols','vals');
+
+                % Keep only non-zero SALCs in the projector
+                coeff_matrix=coeff_matrix(:,any(coeff_matrix,1));
                 
-                % Remove sign ambiguity and clean up
-                for k=1:basis_dim
-                    non_zero_elements=nonzeros(coeff_matrix(:,k));
-                    if any(non_zero_elements)
-                        coeff_matrix(:,k)=coeff_matrix(:,k)*sign(non_zero_elements(1)); %#ok<SPRIX>
-                    end
+                % For non-empty irreps
+                if nnz(coeff_matrix)>0
+
+                    % Row index of the first NZ in each column
+                    [~,fnz_row]=max(spones(coeff_matrix),[],1);
+                    
+                    % Convert to linear index of the first non-zero in each column
+                    fnz_lin=sub2ind(size(coeff_matrix),fnz_row,1:size(coeff_matrix,2));
+                    
+                    % Sign of first NZ in each column
+                    signs=sign(coeff_matrix(fnz_lin));
+
+                    % Remove SALC sign ambiguity
+                    coeff_matrix=signs.*coeff_matrix;
+
+                    % Remove identical SALCs (columns)
+                    coeff_matrix=transpose(coeff_matrix);
+                    coeff_matrix=unihash(coeff_matrix);
+                    coeff_matrix=transpose(coeff_matrix);
+
                 end
-                coeff_matrix=clean_up(spin_system,coeff_matrix,spin_system.tols.liouv_zero);
-                
-                % Remove zero columns
-                hit_index=(sum(abs(coeff_matrix),1)==0); coeff_matrix(:,hit_index)=[];
-                
-                % Remove identical columns
-                coeff_matrix=unique(coeff_matrix','rows')';
                 
                 % Decide how to proceed
                 if size(coeff_matrix,2)==0
                     
-                    % Do nothing
+                    % Do nothing, this irrep is empty
                     
+                % SALC orthogonalisation
                 elseif group.irrep_dims(n)>1
                     
-                    % Get the overlap matrix
-                    overlap=logical(coeff_matrix'*coeff_matrix);
+                    % Get the overlap connectivity matrix
+                    overlap=coeff_matrix'*coeff_matrix;
+                    overlap=(abs(overlap)>spin_system.tols.liouv_zero);
                     
-                    % Find non-orthogonal subspaces
-                    member_states=scomponents(overlap); n_subspaces=max(member_states);
+                    % Find the target subspaces
+                    member_states=scomponents(overlap); 
+                    n_subspaces=max(member_states);
                     
                     % Preallocate the result
                     orth_coeff_matrix=cell(1,n_subspaces);
                     
                     % Fill the result
                     for k=1:n_subspaces
-                        vectors=full(coeff_matrix(:,member_states==k));
-                        vectors=clean_up(spin_system,orth(vectors),spin_system.tols.liouv_zero);
-                        orth_coeff_matrix{k}=sparse(vectors);
+
+                        % Get subspace index
+                        idx=(member_states==k);
+
+                        % Inspect the subspace
+                        if nnz(idx)==1
+
+                            % Normalise one-vector SALCs
+                            salc_vector=coeff_matrix(:,idx);
+                            orth_coeff_matrix{k}=salc_vector/norm(salc_vector,2);
+
+                        else
+                            
+                            % Orthonormalise bigger SALCs
+                            vectors=full(coeff_matrix(:,idx));
+                            vectors=clean_up(spin_system,orth(vectors),...
+                                             spin_system.tols.liouv_zero);
+                            orth_coeff_matrix{k}=sparse(vectors);
+
+                        end
+
                     end
                     
-                    % Build the matrix
+                    % Reassemble the SALC coefficient matrix
                     coeff_matrix=cell2mat(orth_coeff_matrix);
                     
                 else
                     
-                    % Just normalize the SALCs
+                    % For one-dimensional irreps, just normalize all SALCs
                     coeff_matrix=coeff_matrix./sqrt(sum(coeff_matrix.^2,1));
                     
                 end
                 
-                % Inform the user and write the irrep into the data structure
-                report(spin_system,['irreducible representation #' num2str(n) ...
-                                    ', ' num2str(group.irrep_dims(n)) '-dimensional, ' ...
-                                         num2str(size(coeff_matrix,2)) ' states.']);
-                spin_system.bas.irrep(n).projector=coeff_matrix;
-                spin_system.bas.irrep(n).dimension=size(coeff_matrix,2);
+                % Assign projector arrays
+                irr_projector{n}=coeff_matrix; 
+                irr_dimension(n)=size(coeff_matrix,2);
+
+                % Inform the user 
+                report(spin_system,['    irrep #' int2str(n) ', ' ...
+                                    int2str(group.irrep_dims(n)) '-dimensional, ' ...
+                                    int2str(irr_dimension(n))    ' states.']);
                 
             end
             
             % Remove zero-dimensional irreps
-            kill_mask=([spin_system.bas.irrep.dimension]==0);
-            spin_system.bas.irrep(kill_mask)=[];
-            if nnz(kill_mask)>0
-                report(spin_system,'zero-dimensional irreps removed.');
+            keep_mask=logical(irr_dimension); 
+            irr_dimension(~keep_mask)=[];
+            irr_projector(~keep_mask)=[];
+
+            % Let the user know
+            if nnz(~keep_mask)>0
+                report(spin_system,'    zero-dimensional irrep(s) removed.');
             end
             
         end
         
     end
+
+    % Store symetry factorisations in the data structure
+    spin_system.bas.sym_fact(s).irr_dimensions=irr_dimension;
+    spin_system.bas.sym_fact(s).irr_projectors=irr_projector;
     
 end
 
 end
 
 % Consistency enforcement
-function grumble(spin_system,bas)
+function grumble(spin_system)
 
-% Check symmetry parameters
-if isfield(bas,'sym_group')
-    
-    % Check the type
-    if (~iscell(bas.sym_group))||any(~cellfun(@ischar,bas.sym_group))
+% Check data types
+if ~iscell(spin_system.bas.sym_group)
+    error('bas.sym_group must be a cell array of strings.');
+end
+if ~iscell(spin_system.bas.sym_spins)
+    error('bas.sym_spins must be a cell array of vectors.');
+end
+
+% Check dimensions
+if numel(spin_system.bas.sym_spins)~=numel(spin_system.bas.sym_group)
+    error('bas.sym_group and bas.sym_spins must have the same number of elements.');
+end
+
+% For non-empty specifications
+if ~isempty(spin_system.bas.sym_group)
+
+    % Check contents
+    if any(~cellfun(@ischar,spin_system.bas.sym_group),'all')
         error('bas.sym_group must be a cell array of strings.');
     end
-    
-    % Check that bas.sym_spins exists
-    if ~isfield(bas,'sym_spins')
-        error('bas.sym_spins must be specified alongside bas.sym_group.');
-    end
-    
-    % Check the type
-    if (~iscell(bas.sym_spins))||any(~cellfun(@isnumeric,bas.sym_spins))
+    if any(~cellfun(@isnumeric,spin_system.bas.sym_spins),'all')
         error('bas.sym_spins must be a cell array of vectors.');
     end
-    
-    % Check the dimensions
-    if numel(bas.sym_spins)~=numel(bas.sym_group)
-        error('bas.sym_group and bas.sym_spins arrays must have the same number of elements.');
-    end
-    
+
     % Check the spin indices
-    for m=1:length(bas.sym_spins)
-        
-        % Check for sense
-        if any(bas.sym_spins{m}>spin_system.comp.nspins)||any(bas.sym_spins{m}<1)||(numel(bas.sym_spins{m})<2)
+    for m=1:numel(spin_system.bas.sym_spins)
+
+        % Check for common sense 
+        if any(spin_system.bas.sym_spins{m}>spin_system.comp.nspins,'all')||...
+           any(spin_system.bas.sym_spins{m}<1,'all')||...
+           any(mod(spin_system.bas.sym_spins{m},1)~=0,'all')||...
+              (numel(spin_system.bas.sym_spins{m})<2)
             error('incorrect spin labels in bas.sym_spins.');
         end
-        
-        % Check for intersections
-        for n=1:length(bas.sym_spins)
-            if (n~=m)&&(~isempty(intersect(bas.sym_spins{m},bas.sym_spins{n})))
-                error('same spin is listed in multiple symmetry groups in bas.sym_spins.');
+
+        % Check for group boundary violations
+        for n=1:numel(spin_system.bas.sym_spins)
+            if (n~=m)&&(~isempty(intersect(spin_system.bas.sym_spins{m},...
+                                           spin_system.bas.sym_spins{n})))
+                error('same spin is listed in multiple symmetry groups.');
             end
         end
-        
+
+        % Check for chemical boundary violations
+        for n=1:numel(spin_system.chem.parts)
+
+            % Get the intersection of symmetry and chemistry 
+            common_spins=intersect(spin_system.bas.sym_spins{m}(:),...
+                                   spin_system.chem.parts{n}(:));
+            
+            % Either all spins should be in a given substance, or none
+            if (numel(common_spins)~=numel(spin_system.bas.sym_spins{m}))&&...
+               (numel(common_spins)~=0)
+                error('symmetries violate chemical partitions.');
+            end
+
+        end
+
     end
     
     % Check the group names
-    for n=1:length(bas.sym_group)
-        if ~ismember(bas.sym_group{n},{'S2','S3','S4','S4A','S5','S6'})
-            error('the group requested in bas.sym_group is not available.');
+    for n=1:numel(spin_system.bas.sym_group)
+        if ~ismember(spin_system.bas.sym_group{n},...
+                     {'S2','S3','S4','S4A','S5','S6'})
+            error('a group specified in bas.sym_group is not available.');
         end
     end
-    
-    % Check the irrep switch
-    if isfield(bas,'sym_a1g_only')&&(~isnumeric(bas.sym_a1g_only))&&(~islogical(bas.sym_a1g_only))&&((bas.sym_a1g_only~=1)||(bas.sym_a1g_only~=0))
-        error('the allowed values for bas.sym_a1g_only are 0 and 1.');
-    end
-    
-else
-    
-    % Enforce no sys.sym_spins without sys.sym_group
-    if isfield(bas,'sym_spins')
-        error('bas.sym_group must be specified alongside bas.sym_spins.');
-    end
-    
-    % Enforce no sys.sym_a1g_only without sys.sym_group
-    if isfield(bas,'sym_a1g_only')
-        error('bas.sym_group must be specified alongside bas.sym_a1g_only.');
-    end
-    
+
+end
+
+% Check the A1g irrep switch
+if (~isnumeric(spin_system.bas.sym_a1g_only))&&...
+   (~islogical(spin_system.bas.sym_a1g_only))&&...
+   ((spin_system.bas.sym_a1g_only~=1)||...
+    (spin_system.bas.sym_a1g_only~=0))
+    error('the allowed values for bas.sym_a1g_only are 0 and 1.');
 end
 
 end

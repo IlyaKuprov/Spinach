@@ -31,20 +31,19 @@ function [L,M]=lin2lm(I)
 % Check consistency
 grumble(I);
 
-% Get the ranks and projections
-L=fix(sqrt(I)); M=L.^2+L-I;
+% A floating point root
+L=floor(sqrt(double(I)));
 
-% Make sure the conversion is correct
-if nnz(lm2lin(L,M)~=I)>0
-    error('IEEE arithmetic breakdown, please contact the developer.');
-end
+% Back into same type
+L=cast(L,'like',I);
+M=cast(L.^2+L-I,'like',I);
 
 end
 
 % Consistency enforcement
 function grumble(I)
-if (~isnumeric(I))||(~isreal(I))||any(mod(I(:),1)~=0)||any(I(:)<0)
-    error('all elements of the input array must be non-negative integers.');
+if (~isnumeric(I))||(~isreal(I))||(nnz(mod(I,1))>0)||(nnz(I<0)>0)
+    error('the input must contain non-negative real integers.');
 end
 end
 

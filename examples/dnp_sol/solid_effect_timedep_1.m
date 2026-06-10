@@ -50,7 +50,7 @@ parameters.nuclear_frq=2*pi*144.76e6;
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-bas.projections=[-2 -1 0 1 2];
+bas.projections={[-2 -1 0 1 2]};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

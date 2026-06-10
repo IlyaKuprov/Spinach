@@ -37,8 +37,8 @@ inter.damp_rate=1e6;
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-bas.longitudinals={'1H'};
-bas.projections=+1;
+bas.longitudinal={{'1H'}};
+bas.projections={1};
 bas.sym_group={'S3'};
 bas.sym_spins={[2 3 4]};
 

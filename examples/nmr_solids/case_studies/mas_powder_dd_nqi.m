@@ -25,7 +25,7 @@ inter.coupling.matrix{2,2}=castep2nqi([ 0.1580  0.0340 -0.5562
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-bas.projections=+1;
+bas.projections={1};
 
 % Enable GPU
 % sys.enable={'gpu'};

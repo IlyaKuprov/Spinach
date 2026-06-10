@@ -1,6 +1,6 @@
 % 2D parameter scan of XiX DNP in the steady state.
 % 
-% Calculation time: minutes.
+% Calculation time: hours.
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il

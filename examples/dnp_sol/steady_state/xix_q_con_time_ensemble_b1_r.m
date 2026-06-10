@@ -2,7 +2,7 @@
 % steady state with electron-proton distance and elec-
 % tron Rabi frequency ensembles.
 %
-% Calculation time: minutes.
+% Calculation time: hours.
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il

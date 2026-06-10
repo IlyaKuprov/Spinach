@@ -2299,7 +2299,7 @@ end
 
 % Check Weizmann relaxation rate sanity
 if isfield(inter,'weiz_r1e')&&isfield(inter,'weiz_r2e')&&...
-   any(inter.weiz_r1e(:)<inter.weiz_r2e(:)/2)
+   any(inter.weiz_r2e(:)<inter.weiz_r1e(:)/2)
     error('Weizmann DNP relaxation theory forbids R2e < 0.5*R1e on thermodynamic grounds.');
 end
 
@@ -2351,7 +2351,7 @@ end
 
 % Check Nottingham DNP relaxation rate sanity
 if isfield(inter,'nott_r1e')&&isfield(inter,'nott_r2e')&&...
-   any(inter.nott_r1e(:)<inter.nott_r2e(:)/2)
+   any(inter.nott_r2e(:)<inter.nott_r1e(:)/2)
     error('Nottingham DNP relaxation theory forbids R2e < 0.5*R1e on thermodynamic grounds.');
 end
 
@@ -2403,7 +2403,7 @@ end
 
 % Check Weizmann relaxation rate sanity
 if isfield(inter,'weiz_r1n')&&isfield(inter,'weiz_r2n')&&...
-   any(inter.weiz_r1n(:)<inter.weiz_r2n(:)/2)
+   any(inter.weiz_r2n(:)<inter.weiz_r1n(:)/2)
     error('Weizmann DNP relaxation theory forbids R2n < 0.5*R1n on thermodynamic grounds.');
 end
 
@@ -2455,7 +2455,7 @@ end
 
 % Check Nottingham DNP relaxation rate sanity
 if isfield(inter,'nott_r1n')&&isfield(inter,'nott_r2n')&&...
-   any(inter.nott_r1n(:)<inter.nott_r2n(:)/2)
+   any(inter.nott_r2n(:)<inter.nott_r1n(:)/2)
     error('Nottingham DNP relaxation theory forbids R2n < 0.5*R1n on thermodynamic grounds.');
 end
 
@@ -2507,7 +2507,7 @@ end
 
 % Check Weizmann relaxation rate sanity
 if isfield(inter,'weiz_r1d')&&isfield(inter,'weiz_r2d')&&...
-   any(inter.weiz_r1d(:)<inter.weiz_r2d(:)/2)
+   any(inter.weiz_r2d(:)<inter.weiz_r1d(:)/2)
     error('Weizmann DNP relaxation theory forbids R2d < 0.5*R1d on thermodynamic grounds.');
 end
 

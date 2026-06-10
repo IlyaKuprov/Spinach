@@ -80,7 +80,7 @@ else
     
     % Report back to the user
     if ~isempty(spin_system.comp.sym_group)
-        summary(spin_system,'symmetry','permutation symmetry summary');
+        summary_symmetry(spin_system,'permutation symmetry summary');
     end
     
     % Compute group direct product if necessary

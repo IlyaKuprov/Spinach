@@ -579,7 +579,7 @@ if isfield(inter,'zeeman')
     end
 
     % Report back to the user
-    summary(spin_system,'zeeman','summary of Zeeman tensors and their anisotropies (ppm for nuclei, g-tensor for electrons)');
+    summary_zeeman(spin_system,'summary of Zeeman tensors and their anisotropies (ppm for nuclei, g-tensor for electrons)');
 
 end
 
@@ -728,7 +728,7 @@ else
 end
 
 % Report back to the user
-summary(spin_system,'chemistry','chemical process summary');
+summary_chemistry(spin_system);
 
 % Order matrices
 if isfield(inter,'order_matrix')
@@ -763,7 +763,7 @@ if isfield(inter,'coordinates')
     spin_system.inter.coordinates=inter.coordinates;
     
     % Report back to the user
-    summary(spin_system,'coordinates','atomic coordinates (Angstrom)');
+    summary_coordinates(spin_system,'atomic coordinates (Angstrom)');
     
     % Process periodic boundary conditions
     if isfield(inter,'pbc')
@@ -772,7 +772,7 @@ if isfield(inter,'coordinates')
         spin_system.inter.pbc=inter.pbc;
         
         % Report back to the user
-        summary(spin_system,'pbc','PBC translation vectors (Angstrom)');
+        summary_pbc(spin_system,'PBC translation vectors (Angstrom)');
         
     else
         
@@ -909,7 +909,7 @@ for n=1:numel(spin_system.chem.parts)
 end
 
 % Report back to the user
-summary(spin_system,'couplings','summary of coupling tensors and their anisotropies (Hz)');
+summary_couplings(spin_system,'summary of coupling tensors and their anisotropies (Hz)');
 
 % Temperature
 if ~isfield(inter,'temperature')
@@ -1238,16 +1238,16 @@ end
 
 % Report relaxation rates back to the user
 if isfield(inter,'lind_r1_rates')&&isfield(inter,'lind_r2_rates')
-    summary(spin_system,'rlx_rates_lindblad','relaxation rates (Hz) for Lindblad theory');
+    summary_rlx_lindblad(spin_system,'relaxation rates (Hz) for Lindblad theory');
 end
 if isfield(inter,'nott_r1e')&&isfield(inter,'nott_r2e')&&...
    isfield(inter,'nott_r1n')&&isfield(inter,'nott_r2n')
-    summary(spin_system,'rlx_rates_nott','relaxation rates (Hz) for Nottingham DNP theory');
+    summary_rlx_nott(spin_system);
 end
 if isfield(inter,'weiz_r1e')&&isfield(inter,'weiz_r2e')&&...
    isfield(inter,'weiz_r1n')&&isfield(inter,'weiz_r2n')&&...
    isfield(inter,'weiz_r1d')&&isfield(inter,'weiz_r2d')
-    summary(spin_system,'rlx_rates_weiz','relaxation rates (Hz) for Weizmann DNP theory');
+    summary_rlx_weiz(spin_system);
 end
 
 % Absorb radical recombination parameters

@@ -40,7 +40,7 @@ grumble(spin_system,bas);
 spin_system.bas=bas;
 
 % Report back to the user
-summary(spin_system,'basis_settings');
+summary_basis_opts(spin_system);
 
 % Process spherical tensor basis sets
 if strcmp(spin_system.bas.formalism,'sphten-liouv')
@@ -476,7 +476,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
     end 
     
     % Print the summary
-    summary(spin_system,'basis');
+    summary_basis(spin_system);
 
     % Run the symmetry treatment
     spin_system=symmetry(spin_system,bas);

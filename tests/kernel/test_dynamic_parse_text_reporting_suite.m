@@ -63,9 +63,9 @@ result=test_true(result,'banner hush output',isempty(banner_text),...
                  'banner must complete silently when reporting is hushed');
 
 % Check that summary can traverse coordinate metadata without printing
-summary_text=evalc('summary(spin_system,''coordinates'',''coordinate summary'');');
+summary_text=evalc('summary_coordinates(spin_system,''coordinate summary'');');
 result=test_true(result,'summary hush output',isempty(summary_text),...
-                 'summary must respect hush-mode reporting while reading coordinate metadata');
+                 'summary_coordinates must respect hush-mode reporting while reading coordinate metadata');
 
 % Check polyadic text diagnostics on a small unopened Kronecker product
 info_text=evalc('polinfo(polyadic({{speye(2),sparse(1)}}));');

@@ -36,6 +36,11 @@
 % Note: the peculiar sequence of algebraic operations in the code below
 %       is designed to minimise the memory footprint in large cases.
 %
+% Note: set sys.expmv_backend='auto' to enable heuristic selection of the
+%       exponential-action backend in single-vector numeric propagation.
+%       The default value is 'default', which uses the native reordered
+%       Taylor procedure.
+%
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 % a.acharya@soton.ac.uk
@@ -239,8 +244,26 @@ else
     parfor_makes_sense=(size(rho,1)>256)&&(size(rho,2)>32)&&...
                        (poolsize>0)&&(~want_gpu);
 
+    % Choose the single-vector propagation backend. The default handle below
+    % is the native reordered Taylor route; the heuristic selector is called
+    % only when sys.expmv_backend='auto'.
+    step_backend=@(state)reordered_taylor(L,state,time_step,nsteps);
+    use_backend_heuristics=isnumeric(L)&&isreal(time_step)&&(size(rho,2)==1)&&...
+                           isfield(spin_system.sys,'expmv_backend')&&...
+                           strcmp(spin_system.sys.expmv_backend,'auto')&&...
+                           (~ismember('expv',spin_system.sys.disable));
+    if use_backend_heuristics
+        step_backend=step_heuristics(local_step_stats(L,time_step,norm_mat),...
+                                     local_step_backends(step_backend,L,time_step));
+    end
+
     % Proceed with the propagation
-    if parfor_makes_sense
+    if use_backend_heuristics
+
+        % Call the selected single-vector backend
+        rho=step_backend(rho);
+
+    elseif parfor_makes_sense
 
         % Parallel loop over rho stack
         parfor m=1:size(rho,2)
@@ -370,6 +393,262 @@ end
 
 end
 
+% Step backend statistics
+function stats=local_step_stats(L,time_step,norm_mat)
+
+% These are the only data used by the heuristic selector. Keep the
+% propagation state out of the policy function.
+stats.matrix=L;
+stats.time_step=time_step;
+stats.dimension=size(L,1);
+stats.is_sparse=issparse(L);
+stats.is_gpu=isa(L,'gpuArray');
+stats.norm_mat=norm_mat;
+
+end
+
+% Step backend handles
+function backends=local_step_backends(default_backend,L,time_step)
+
+% Fold the Spinach sign convention into the exponential-action backends.
+% The heuristic module receives only callable handles, keeping policy
+% decisions outside step() while preserving access to local subfunctions.
+A=-1i*L;
+
+% Available single-vector propagation backends. The default handle is the
+% original step() Taylor path, used whenever heuristics are disabled or the
+% selector chooses the legacy-like route.
+backends.default=default_backend;
+backends.vik=@(state)step_expmv_vik(A,state,time_step);
+backends.tay1=@(state)step_expmv_tay1(A,state,time_step);
+backends.tay2=@(state)step_expmv_tay2(A,state,time_step);
+backends.expmv=@(state)expmv(A,state,time_step);
+
+end
+
+% Spinach reordered Taylor expmv backend
+function w=step_expmv_vik(A,v,t)
+
+% Estimate the generator norm
+if issparse(A)&&(~isa(A,'gpuArray'))
+    norm_a=normest(A,1e-2);
+else
+    norm_a=norm(A,1);
+end
+
+% Choose the number of substeps
+nsteps=max([1 ceil(norm_a*abs(t)/2)]);
+
+% Refuse badly scaled problems
+if nsteps>1e4
+    error('either dt is too long, or L is too big: |L*dt|>1e4, check both.');
+end
+
+% Get the scaling factor
+scaling=max(abs(v),[],'all');
+
+% Catch zeros
+if scaling==0
+    w=v; return;
+end
+
+% Scale the vector
+w=v/scaling;
+
+% Set the substep
+dt=t/nsteps;
+
+% Loop over substeps
+for n=1:nsteps
+
+    % Start the Taylor series
+    term=w; k=1; tol=eps('double');
+
+    % Loop until convergence
+    while nnz(abs(term)>tol)>0
+
+        % Taylor recurrence for the action of exp(dt*A)
+        term=(dt/k)*(A*term);
+
+        % Add the next term and increment
+        w=w+term; k=k+1;
+
+    end
+
+end
+
+% Scale the result back
+w=scaling*w;
+
+end
+
+% Ibanez Algorithm 1 expmv backend
+function w=step_expmv_tay1(A,v,t)
+
+% Set algorithm parameters
+m_min=40; m_max=60; u=2^(-53);
+fact=cumprod([1 1:double(m_max+3)]);
+
+% Fold time into the generator
+if t~=1, A=t*A; end
+
+% Initialise generator powers
+power_m1=A*v;
+for k=2:(m_min+1)
+    power_m1=A*power_m1;
+end
+power_m2=A*power_m1;
+
+% Search for Taylor degree and scaling
+m=m_min; s=1; found=false();
+while ~found
+
+    % Estimate the required scaling
+    norm_v=norm(power_m1);
+    s=ceil((norm_v/(fact(m+2)*u))^(1/(m+1)));
+    s=max([1 s]);
+
+    % Check the two-term backward error condition
+    err=norm(power_m1*(1/(s^(m+1)*fact(m+2)))+...
+             power_m2*(1/(s^(m+2)*fact(m+3))));
+    if (err<=u)||(m==m_max)
+        found=true();
+    else
+        m=m+1;
+        power_m1=power_m2;
+        power_m2=A*power_m2;
+    end
+
+end
+
+% Use the maximum degree if no pair passed the test
+if ~found
+    m=m_max;
+    s=ceil((norm_v/(fact(m+2)*u))^(1/(m+1)));
+    s=max([1 s]);
+end
+
+% Adjust scaling by checking the last Taylor term
+s=scale_taylor(A,v,m,s,fact,u);
+
+% Evaluate the first scaled Taylor polynomial
+w=v; term=v;
+for k=1:m
+
+    % Compute the next scaled Taylor term
+    term=(A*term)*(1/s);
+
+    % Add the term to the polynomial
+    w=w+term*(1/fact(k+1));
+end
+
+% Apply the remaining scaled Taylor passes
+A_scaled=A*(1/s);
+for n=2:s
+    z=w;
+    for k=1:m
+        z=A_scaled*z;
+        w=w+z*(1/fact(k+1));
+    end
+end
+
+end
+
+% Ibanez Algorithm 2 expmv backend
+function w=step_expmv_tay2(A,v,t)
+
+% Set algorithm parameters
+m_min=40; m_max=60; u=2^(-53);
+fact=cumprod([1 1:double(m_max+2)]);
+
+% Fold time into the generator
+if t~=1, A=t*A; end
+
+% Initialise generator powers
+power_next=A*v;
+for k=2:(m_min+1)
+    power_next=A*power_next;
+end
+
+% Initialise degree and scaling search
+m=m_min;
+norm_v=norm(power_next);
+s=max([1 ceil((norm_v/(fact(m+2)*u))^(1/(m+1)))]);
+p=m*s; found=false();
+
+% Search for the lowest matrix-vector product count
+while (~found)&&(m<m_max)
+
+    % Advance the Taylor degree
+    m_next=m+1;
+    power_next=A*power_next;
+
+    % Estimate the required scaling
+    norm_next=norm(power_next);
+    s_next=max([1 ceil((norm_next/(fact(m_next+2)*u))^(1/(m_next+1)))]);
+    p_next=m_next*s_next;
+    if p_next<=p
+        m=m_next; s=s_next; p=p_next;
+    else
+        found=true();
+    end
+end
+
+% Adjust scaling by checking the last Taylor term
+s=scale_taylor(A,v,m,s,fact,u);
+
+% Evaluate the first scaled Taylor polynomial
+w=v; term=v;
+for k=1:m
+
+    % Compute the next scaled Taylor term
+    term=(A*term)*(1/s);
+
+    % Add the term to the polynomial
+    w=w+term*(1/fact(k+1));
+end
+
+% Apply the remaining scaled Taylor passes
+A_scaled=A*(1/s);
+for n=2:s
+    z=w;
+    for k=1:m
+        z=A_scaled*z;
+        w=w+z*(1/fact(k+1));
+    end
+end
+
+end
+
+% Adjust Taylor scaling using the last polynomial term
+function s=scale_taylor(A,v,m,s,fact,u)
+
+% Search for sufficient scaling
+while true
+
+    % Compute the last scaled Taylor term
+    last_term=v;
+    for k=1:m
+        last_term=(A*last_term)*(1/s);
+    end
+    last_max=max(abs(last_term),[],'all')*(1/fact(m+1));
+    if isa(last_max,'gpuArray'), last_max=gather(last_max); end
+    term_tol=u/max([1 s]);
+
+    % Stop when the last term is below per-pass roundoff
+    if last_max<=term_tol, return; end
+
+    % Increase scaling without dense history storage
+    if isfinite(last_max)
+        s=max([s+1 ceil(s*(last_max/term_tol)^(1/m))]);
+    else
+        s=2*s;
+    end
+
+end
+
+end
+
 % Consistency enforcement
 function grumble(L,rho,time_step)
 if (~isnumeric(time_step))||(~isscalar(time_step))
@@ -412,3 +691,4 @@ end
 % the spectra shown in Figure 8.
 %
 % A.J. Mehrer and R.S. Mulliken, Chem. Rev. 69 (1969) 639-656.
+

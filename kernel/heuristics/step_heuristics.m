@@ -1,0 +1,268 @@
+% Heuristic backend selector for step(). Syntax:
+%
+%                  backend=step_heuristics(stats,backends)
+%
+% Parameters:
+%
+%      stats    -  structure with matrix, time_step, dimension, is_sparse,
+%                  is_gpu, and norm_mat fields
+%
+%      backends -  structure with default, expmv, tay1, and tay2 fields
+%                  containing function handles
+%
+% Outputs:
+%
+%      backend  -  function handle to the selected step() backend
+%
+% The function returns a function handle from the supplied backend table. If
+% the selected accelerated backend is unavailable or not beneficial, the
+% default Spinach Taylor backend is returned.
+%
+% ilya.kuprov@weizmann.ac.il
+
+function backend=step_heuristics(stats,backends)
+
+% Check consistency
+grumble(stats,backends);
+
+% Cache path lookup for MATLAB's expmv()
+persistent expmv_available
+
+% Default to the native Spinach backend
+backend=backends.default;
+
+% Trivial cases should stay on the default path
+if (stats.time_step==0)||(stats.dimension==0), return; end
+
+% Use the scale already computed by step(); it is invariant under the
+% Spinach sign convention A=-1i*L, and avoiding a second matrix norm keeps
+% the selector cheap enough for short propagation calls.
+L=stats.matrix;
+alpha=stats.norm_mat;
+if isa(alpha,'gpuArray'), alpha=gather(alpha); end
+backend_name=local_backend_name(L,alpha);
+if strcmp(backend_name,'vik'), return; end
+
+% Return the selected backend handle
+switch backend_name
+
+    case 'expmv'
+
+        % Fall back if Matlab expmv is unavailable
+        if isempty(expmv_available)
+            expmv_available=(exist('expmv','file')==2);
+        end
+        if expmv_available
+            backend=backends.expmv;
+        end
+
+    case 'tay1'
+
+        backend=backends.tay1;
+
+    case 'tay2'
+
+        backend=backends.tay2;
+
+    otherwise
+
+        backend=backends.default;
+
+end
+
+
+end
+
+% Backend selector
+function backend=local_backend_name(A,alpha)
+
+% Get problem dimension
+n=size(A,1);
+
+% Dispatch by storage type, dimension, and scale
+if isa(A,'gpuArray')
+
+    % Dense GPU rule
+    if alpha<=5
+        backend='vik';
+    elseif alpha<10
+        if n>=1024
+            backend='vik';
+        else
+            backend='tay1';
+        end
+    elseif alpha<50
+        backend='tay2';
+    elseif alpha<80
+        backend='tay1';
+    else
+        if n<=256
+            backend='tay2';
+        else
+            backend='tay1';
+        end
+    end
+
+elseif issparse(A)
+
+    % Sparse CPU rule
+    if n>=4096
+        if alpha<=25
+            backend='expmv';
+        elseif alpha<50
+            backend='tay2';
+        elseif alpha<80
+            backend='tay1';
+        else
+            backend='tay2';
+        end
+    elseif n>=2048
+        if alpha<15
+            backend='expmv';
+        elseif alpha<50
+            backend='tay1';
+        elseif alpha<80
+            backend='tay2';
+        else
+            backend='tay1';
+        end
+    elseif n>=1024
+        if alpha<4
+            backend='vik';
+        elseif alpha<10
+            backend='expmv';
+        elseif alpha<80
+            backend='tay2';
+        else
+            backend='tay1';
+        end
+    elseif n>=512
+        if alpha<5
+            backend='vik';
+        elseif alpha<9
+            backend='expmv';
+        else
+            backend='tay2';
+        end
+    elseif n>=256
+        if alpha<8
+            backend='vik';
+        elseif alpha<15
+            backend='tay2';
+        elseif alpha<80
+            backend='tay1';
+        else
+            backend='tay2';
+        end
+    else
+        if alpha<5
+            backend='vik';
+        elseif alpha<50
+            backend='tay1';
+        elseif alpha<80
+            backend='tay2';
+        else
+            backend='tay1';
+        end
+    end
+
+else
+
+    % Dense CPU rule
+    if n>=512
+        if alpha<=8
+            backend='vik';
+        elseif alpha<50
+            backend='expmv';
+        else
+            backend='tay1';
+        end
+    elseif n>=256
+        if alpha<=6
+            backend='vik';
+        elseif alpha<10
+            backend='expmv';
+        elseif alpha<=12
+            backend='vik';
+        elseif alpha<25
+            backend='expmv';
+        elseif alpha<80
+            backend='tay2';
+        else
+            backend='tay1';
+        end
+    elseif n>=128
+        if alpha<=4
+            backend='vik';
+        elseif alpha<10
+            backend='expmv';
+        elseif alpha<15
+            backend='tay2';
+        elseif alpha<25
+            backend='tay1';
+        elseif alpha<50
+            backend='tay2';
+        else
+            backend='tay1';
+        end
+    else
+        if alpha<=5
+            backend='vik';
+        elseif alpha<50
+            backend='tay1';
+        else
+            backend='tay2';
+        end
+    end
+
+end
+
+end
+
+% Consistency enforcement
+function grumble(stats,backends)
+if ~isstruct(stats)
+    error('stats must be a structure.');
+end
+if ~isstruct(backends)
+    error('backends must be a structure.');
+end
+if ~all(isfield(stats,{'matrix','time_step','dimension','is_sparse','is_gpu','norm_mat'}))
+    error('stats structure is missing required fields.');
+end
+if ~isnumeric(stats.matrix)
+    error('stats.matrix must be numeric.');
+end
+if ~allfinite(stats.matrix)
+    error('stats.matrix must be finite.');
+end
+if (size(stats.matrix,1)~=size(stats.matrix,2))||(size(stats.matrix,1)~=stats.dimension)
+    error('stats.matrix must be square and match stats.dimension.');
+end
+if (~isnumeric(stats.time_step))||(~isreal(stats.time_step))||(~isscalar(stats.time_step))||...
+   (~isfinite(stats.time_step))
+    error('stats.time_step must be a finite real scalar.');
+end
+if (~isnumeric(stats.dimension))||(~isreal(stats.dimension))||(~isscalar(stats.dimension))||...
+   (mod(stats.dimension,1)~=0)||(stats.dimension<0)
+    error('stats.dimension must be a non-negative real integer.');
+end
+if (~islogical(stats.is_sparse))||(~isscalar(stats.is_sparse))||(stats.is_sparse~=issparse(stats.matrix))
+    error('stats.is_sparse must match stats.matrix.');
+end
+if (~islogical(stats.is_gpu))||(~isscalar(stats.is_gpu))||(stats.is_gpu~=isa(stats.matrix,'gpuArray'))
+    error('stats.is_gpu must match stats.matrix.');
+end
+if (~isnumeric(stats.norm_mat))||(~isreal(stats.norm_mat))||(~isscalar(stats.norm_mat))||...
+   (~isfinite(stats.norm_mat))||(stats.norm_mat<0)
+    error('stats.norm_mat must be a finite non-negative real scalar.');
+end
+if ~all(isfield(backends,{'default','expmv','tay1','tay2'}))
+    error('backends structure is missing required fields.');
+end
+if (~isa(backends.default,'function_handle'))||(~isa(backends.expmv,'function_handle'))||...
+   (~isa(backends.tay1,'function_handle'))||(~isa(backends.tay2,'function_handle'))
+    error('backends fields must be function handles.');
+end
+end
+

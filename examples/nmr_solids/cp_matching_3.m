@@ -2,7 +2,7 @@
 % experiment between a proton and a 15N nucleus. A 2D scan of
 % power levels at a specific spinning rate.
 %
-% Calculation time: minutes
+% Calculation time: hours
 %
 % ilya.kuprov@weizmann.ac.il
 

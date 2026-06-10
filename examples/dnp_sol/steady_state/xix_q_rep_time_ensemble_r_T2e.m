@@ -2,7 +2,7 @@
 % profile in the steady state with electron-proton distan-
 % ce ensemble.
 % 
-% Calculation time: minutes
+% Calculation time: hours
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % guinevere.mathies@uni-konstanz.de

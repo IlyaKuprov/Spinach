@@ -1,6 +1,6 @@
 % PSYCHE pure-shift NMR spectrum of strychnine.
 %
-% Calculation time: minutes on a Tesla A800, 
+% Calculation time: hours on a Tesla A800,
 %                   much longer on CPU
 %
 % mohammadali.foroozandeh@chem.ox.ac.uk

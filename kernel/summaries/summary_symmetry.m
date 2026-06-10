@@ -42,3 +42,13 @@ if ~ischar(header)
 end
 end
 
+% He was clumsy to the point of hamfistedness. After
+% 20 attempts he was asked to stop taking the driving
+% test, having crashed the car, with the frazzled exa-
+% miner inside, at the bottom of the Headington Hill 
+% in Oxford, where, on top of the bus going back to 
+% the Kilns [...] he once had a sort of a mystical
+% experience.
+%
+% A.N. Wilson, about C.S. Lewis
+

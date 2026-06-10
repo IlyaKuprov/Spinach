@@ -70,3 +70,11 @@ if ~ischar(header)
 end
 end
 
+% A gentleman a few rows in front of us took grave
+% exception to the behaviour of an opposing player
+% and identified him, very loudly, as the author
+% of The Critique of Pure Reason - repeatedly and
+% with venom.
+%
+% Toby Young
+

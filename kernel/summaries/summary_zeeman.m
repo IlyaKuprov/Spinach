@@ -68,3 +68,9 @@ if ~ischar(header)
 end
 end
 
+% Jim wants me to go out with other men so that
+% he will have something to write about.
+%
+% Nora Barnacle, the
+% wife of James Joyce
+

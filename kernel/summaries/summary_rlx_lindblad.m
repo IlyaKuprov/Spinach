@@ -46,3 +46,11 @@ if ~ischar(header)
 end
 end
 
+% Tay's Law: the tendency for artificial intelligence 
+% systems to become racist, sexist, anti-semitic, ho-
+% mophobic, and transphobic when given unrestricted
+% access to data and statistics.
+%
+% Urban Dictionary
+
+

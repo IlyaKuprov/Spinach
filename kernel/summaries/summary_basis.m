@@ -62,3 +62,7 @@ if ~isstruct(spin_system)
 end
 end
 
+% Linux is only free if your time has no value.
+%
+% Jamie Zawinski
+

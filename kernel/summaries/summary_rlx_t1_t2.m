@@ -46,3 +46,9 @@ if ~ischar(header)
 end
 end
 
+% Whether you are more afraid of the forces of 
+% order or the forces of chaos is generally a
+% matter of disposition.
+%
+% Lionel Shriver
+

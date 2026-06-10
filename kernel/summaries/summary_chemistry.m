@@ -68,4 +68,9 @@ if ~isstruct(spin_system)
 end
 end
 
+% Always code as if the guy who ends up maintaining 
+% your code will be a violent psychopath who knows 
+% where you live.
+%
+% Martin Golding
 

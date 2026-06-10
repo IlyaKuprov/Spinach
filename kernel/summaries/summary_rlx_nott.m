@@ -36,3 +36,8 @@ if ~isstruct(spin_system)
 end
 end
 
+% As a man, sometimes you have to make a choice
+% between mocking astrology and getting laid.
+%
+% Internet wisdom
+

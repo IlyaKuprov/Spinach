@@ -44,3 +44,12 @@ if ~isstruct(spin_system)
 end
 end
 
+% The human subjects had not been willing participants,
+% but throughout the history of science, what laboratory
+% animal had happily sacrificed its life for the greater
+% benefit of knowledge? In his research, Erasmus had come
+% across an old saying: there were may ways to skin a cat
+% and cats liked none of them.
+%
+% Frank Herbert, in the Dune series
+

@@ -44,3 +44,8 @@ if ~ischar(header)
 end
 end
 
+% To anger a conservative, lie to him. To
+% anger a liberal, tell him the truth.
+%
+% Theodore Roosevelt
+

@@ -36,7 +36,8 @@ for n=1:numel(xyz)
     B0G{n}(2)=B0G{n}(2)+currents(2)*F_B1_22(xyz{n}(1),xyz{n}(2),xyz{n}(3));
     B0G{n}(3)=B0G{n}(3)+currents(2)*F_B1_23(xyz{n}(1),xyz{n}(2),xyz{n}(3));
 
-    % Z coil fields
+    % Z coil fields (should we subtract the static field first before
+    % multiplying with the currents?)
     B0G{n}(1)=B0G{n}(1)+currents(3)*F_B1_31(xyz{n}(1),xyz{n}(2),xyz{n}(3));
     B0G{n}(2)=B0G{n}(2)+currents(3)*F_B1_32(xyz{n}(1),xyz{n}(2),xyz{n}(3));
     B0G{n}(3)=B0G{n}(3)+currents(3)*F_B1_33(xyz{n}(1),xyz{n}(2),xyz{n}(3));

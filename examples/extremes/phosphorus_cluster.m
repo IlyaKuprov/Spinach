@@ -1,8 +1,8 @@
 % Phosphorus system simulation for Gerhard Hagele. Done by brute
 % force Liouville space time propagation.
 %
-% WARNING: needs 32 CPU cores, 128 GB of RAM and
-%          a Titan V or later.
+% WARNING: needs 32+ CPU cores, 128+ GB of RAM and
+%          a strong FP64 capable Nvidia GPU.
 %
 % Run time on the above: hours
 %

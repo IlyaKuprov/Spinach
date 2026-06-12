@@ -218,7 +218,7 @@ for n=1:numel(T)
     % Do the plotting (experiment)
     load('triple_tb_eqmag.mat','temperature','chiT');
     plot(temperature,chiT,'o'); hold off;
-    kgrid; box on; axis tight; drawnow();
+    kgrid; box on; ylim padded; drawnow();
 
 end
 

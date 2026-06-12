@@ -138,9 +138,9 @@ for n=1:numel(B0)
     kylabel('Magnetisation, Bohr magneton');
     
     % Do the plotting (experiment)
-    load('triple_tb_eqmag.mat','field','magn');
+    load('triple_dy_eqmag.mat','field','magn');
     plot(field,magn,'o'); hold off;
-    kgrid; box on; axis tight; drawnow();
+    kgrid; box on; ylim padded; drawnow();
     
 end
 

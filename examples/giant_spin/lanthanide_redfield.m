@@ -57,6 +57,7 @@ kfigure(); plot(b20,[T1; T2],'o');
 set(gca,'yscale','log'); kgrid;
 kxlabel('ZFS $B_{2}^{0} (cm^{-1})$');
 kylabel('Relaxation time, seconds');
+xlim tight; ylim padded;
 
 end
 

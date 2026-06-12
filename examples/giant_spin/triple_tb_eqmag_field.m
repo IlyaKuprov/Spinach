@@ -214,7 +214,7 @@ for n=1:numel(B0)
     % Do the plotting (experiment)
     load('triple_tb_eqmag.mat','field','magn');
     plot(field,magn,'o'); hold off;
-    kgrid; box on; axis tight; drawnow();
+    kgrid; box on; ylim padded; drawnow();
     
 end
 

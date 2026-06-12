@@ -46,6 +46,7 @@ parameters.nstates=4;
 kfigure(); plot(fields,z_magn); kgrid;
 kxlabel('Magnetic field, Tesla');
 kylabel('Sample magnetisation');
+xlim tight; ylim padded;
 
 end
 

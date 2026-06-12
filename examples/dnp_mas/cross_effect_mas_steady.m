@@ -79,7 +79,7 @@ R=relaxation(spin_system);
 % Rotor period integration
 nsteps=numel(H); P=speye(size(H{1}));
 spin_system.sys.output='hush';
-parfor n=1:nsteps %#ok<*PFBNS>
+for n=1:nsteps
     P=propagator(spin_system,H{n}+2*pi*parameters.mw_pwr*Hmw+...
                                   2*pi*parameters.mw_off*HzE+1i*R,...
                                   1/(nsteps*parameters.rate))*P; 

@@ -1,22 +1,22 @@
 % Makes Spinach data structures from parsed outputs of electronic
 % structure theory packages, such as Gaussian and ORCA. Syntax:
 %
-%     [sys,inter]=g2spinach(props,nuclei,references,options)
+%    [sys,inter]=g2spinach(props,particles,references,options)
 %
 % Parameters:
 %
-%    props  - the output of gparse() function
+%    props      - the output of gparse() function
 %
-%    nuclei - a cell array of the following form:
+%    particles  - a cell array of the following form:
 %
-%                       {{'H','1H'},{'N','15N'}...}
+%                         {{'H','1H'},{'N','15N'}...}
 %
-%             giving the list of elements and isotopes that
-%             should be imported. If the isotope list contains
-%             an electron, e.g. {{'E','E'},{'H','1H'}...}, 
-%             then EPR mode is assumed - chemical shielding 
-%             and scalar couplings are ignored, but g-tensor
-%             and hyperfine couplings are included.
+%                 giving the list of elements and isotopes that
+%                 should be imported. If the isotope list contains
+%                 an electron, e.g. {{'E','E'},{'H','1H'}...}, 
+%                 then EPR mode is assumed - chemical shielding 
+%                 and scalar couplings are ignored, but g-tensor
+%                 and hyperfine couplings are included.
 %
 %    references - a vector of absolute shielding values for 
 %                 the reference substances that are to be

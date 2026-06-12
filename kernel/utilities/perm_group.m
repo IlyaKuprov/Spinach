@@ -49,6 +49,7 @@ grumble(group_name);
 switch group_name
     
     case 'S2'
+
         group.name='S2 permutation group (Abelian)';
         group.order=2;
         group.nclasses=2;
@@ -61,6 +62,7 @@ switch group_name
                                 1 -1];
                             
     case 'S3'
+
         group.name='S3 permutation group (non-Abelian)';
         group.order=6;
         group.nclasses=3;
@@ -75,6 +77,7 @@ switch group_name
                                 2 -1  0];
                             
     case 'S4'
+
         group.name='S4 permutation group (non-Abelian)';
         group.order=24;
         group.nclasses=5;
@@ -91,8 +94,26 @@ switch group_name
                                 2  0 -1  0  2;...
                                 3  1  0 -1 -1;...
                                 3 -1  0  1 -1];
-                            
+
+    case 'S4A'
+          
+        group.name='Largest Abelian subgroup of S4 permutation group';
+        group.order=4;
+        group.nclasses=4;
+        group.class_sizes=[1 1 1 1];
+        group.class{1}=[1 2 3 4];
+        group.class{2}=[2 1 4 3];
+        group.class{3}=[3 4 1 2];
+        group.class{4}=[4 3 2 1];
+        group.n_irreps=4;
+        group.irrep_dims=[1 1 1 1];
+        group.class_characters=[1  1  1  1;
+                                1  1 -1 -1;
+                                1 -1  1 -1;
+                                1 -1 -1  1];
+
     case 'S5'
+
         group.name='S5 permutation group (non-Abelian)';
         group.order=120;
         group.nclasses=7;
@@ -133,6 +154,7 @@ switch group_name
                                 5 -1 -1  1  1 -1  0];
                             
     case 'S6'
+
         group.name='S6 permutation group (non-Abelian)';
         group.order=720;
         group.nclasses=11;
@@ -226,32 +248,9 @@ switch group_name
                                 5  -1 -1  1  1 -1  0  3  2 -1  0;
                                 16  0 -2  0  0  0  1  0 -2  0  0];
                                             
-      case 'S4A'
-        group.name='Largest Abelian subgroup of S4 permutation group';
-        group.order=8;
-        group.nclasses=8;
-        group.class_sizes=[1 1 1 1 1 1 1 1];
-        group.class{1}=[1 2 3 4];
-        group.class{2}=[4 3 2 1];
-        group.class{3}=[2 1 4 3];
-        group.class{4}=[3 4 1 2];
-        group.class{5}=[4 3 2 1];
-        group.class{6}=[1 2 3 4];
-        group.class{7}=[3 4 1 2];
-        group.class{8}=[2 1 4 3];
-        group.n_irreps=8;
-        group.irrep_dims=[1 1 1 1 1 1 1 1];
-        group.class_characters=[1  1  1  1  1  1  1  1;
-                                1  1 -1 -1  1  1 -1 -1;
-                                1 -1  1 -1  1 -1  1 -1;
-                                1 -1 -1  1  1 -1 -1  1;
-                                1  1  1  1 -1 -1 -1 -1;
-                                1  1 -1 -1 -1 -1  1  1;
-                                1 -1  1 -1 -1  1 -1  1;
-                                1 -1 -1  1 -1  1  1 -1];
-    
     otherwise
         
+        % Complain and bomb out
         error(['permutation group ' group_name ' is not available.']);
         
 end

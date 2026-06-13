@@ -166,7 +166,6 @@ if ishandle(fig_handle)
     delete(fig_handle);
 end
 
-
     % Change the active slider step size
     function set_mult(~,~,new_mult,new_name)
 
@@ -437,4 +436,7 @@ if (~all(size(time_grid)==size(in_phase)))||...
 end
 end
 
+% Gods do not like happy people.
+%
+% Herodotus
 

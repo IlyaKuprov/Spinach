@@ -21,6 +21,8 @@
 %
 %    inter - Spinach interaction specification structure
 %
+% alexey.bogdanov@weizmann.ac.il
+%
 % <https://spindynamics.org/wiki/index.php?title=diamond_siv0.m>
 
 function [sys,inter]=diamond_siv0(parameters)

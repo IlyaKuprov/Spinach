@@ -197,3 +197,10 @@ if parameters.delta_big<=parameters.delta_sml+parameters.rf_dur
     error('parameters.delta_big must exceed parameters.delta_sml+parameters.rf_dur.');
 end
 end
+
+% Each age looks back at the moral or political panics
+% of earlier ages and wonders how anyone could have ta-
+% ken seriously the alarum in question.
+%
+% Matthew Parris
+

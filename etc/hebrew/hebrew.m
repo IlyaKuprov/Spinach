@@ -37,7 +37,7 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function ncards=hebrew(mode,max_cards) %#NHEAD
+function ncards=hebrew(mode,max_cards) % #NWIKI #NHEAD
 
     % Set default direction mode
     if nargin<1
@@ -108,7 +108,6 @@ function ncards=hebrew(mode,max_cards) %#NHEAD
 
 end
 
-
 function cards=load_cards(root_dir)
 
     % Start from an empty table
@@ -140,7 +139,7 @@ function cards=load_cards(root_dir)
     % Load noun-like and invariant word classes
     for n=1:size(lex_files,1)
         lex_file=fullfile(root_dir,lex_files{n,1});
-        cards=[cards;read_cards(lex_file,lex_files{n,2},noun_forms,2:6)];
+        cards=[cards;read_cards(lex_file,lex_files{n,2},noun_forms,2:6)]; %#ok<AGROW>
     end
 
     % Load adjective forms
@@ -161,7 +160,6 @@ function cards=load_cards(root_dir)
     end
 
 end
-
 
 function cards=read_cards(file_name,source,form_names,form_cols)
 
@@ -202,7 +200,6 @@ function cards=read_cards(file_name,source,form_names,form_cols)
 
 end
 
-
 function text=clean_text(text)
 
     % Convert spreadsheet cells into trimmed strings
@@ -212,14 +209,12 @@ function text=clean_text(text)
 
 end
 
-
 function tf=contains_hebrew(text)
 
     % Detect Hebrew code points
     tf=~isempty(regexp(char(text),'[\x{0590}-\x{05FF}]','once'));
 
 end
-
 
 function show_card(card,mode)
 
@@ -240,7 +235,6 @@ function show_card(card,mode)
     end
 
 end
-
 
 function show_gui(cards)
 
@@ -332,7 +326,6 @@ function show_gui(cards)
 
 end
 
-
 function [prompt_text,answer_text,context_text]=card_sides(card,mode)
 
     % Build the English side of the card
@@ -351,7 +344,6 @@ function [prompt_text,answer_text,context_text]=card_sides(card,mode)
     end
 
 end
-
 
 function font_name=select_font()
 
@@ -379,7 +371,6 @@ function font_name=select_font()
 
 end
 
-
 function grumble(mode,max_cards)
 if ~isscalar(mode)||~ismember(mode,["forward","backward","both","gui"])
     error('mode must be ''forward'', ''backward'', ''both'', or ''gui''.');
@@ -395,7 +386,4 @@ end
 % Michal Leskes to IK, in November 2023,
 % as walls were shaking from missiles
 % being intercepted over Rehovot
-
-% #NWIKI
-
 

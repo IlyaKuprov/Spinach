@@ -28,6 +28,8 @@
 %
 %    inter - Spinach interaction specification structure
 %
+% alexey.bogdanov@weizmann.ac.il
+%
 % <https://spindynamics.org/wiki/index.php?title=diamond_vacancy.m>
 
 function [sys,inter]=diamond_vacancy(parameters)
@@ -46,17 +48,17 @@ centre=lower(parameters.centre);
 % Set R4/W6 principal-axis frame
 r4_x=[1;-1;0]/sqrt(2);
 r4_z=[sind(54.2)*cosd(45);sind(54.2)*sind(45);cosd(54.2)];
-r4_z=r4_z/norm(r4_z);
+r4_z=r4_z/norm(r4_z,2);
 r4_y=cross(r4_z,r4_x);
-r4_y=r4_y/norm(r4_y);
+r4_y=r4_y/norm(r4_y,2);
 frame_r4=[r4_x r4_y r4_z];
 
 % Set W29 principal-axis frame
 w29_x=[0;-1;1]/sqrt(2);
 w29_z=[0.619;-0.556;-0.556];
-w29_z=w29_z/norm(w29_z);
+w29_z=w29_z/norm(w29_z,2);
 w29_y=cross(w29_z,w29_x);
-w29_y=w29_y/norm(w29_y);
+w29_y=w29_y/norm(w29_y,2);
 frame_w29=[w29_x w29_y w29_z];
 
 % Set vacancy-chain principal-axis frame

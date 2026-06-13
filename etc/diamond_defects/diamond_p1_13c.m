@@ -312,9 +312,9 @@ end
 %   team members:
 %
 %       Dave Willard,    Senior Quality and Compliance Manager
-%	    Sarah Puckett,   Environment and Sustainability Manager
-%	    Wingki Tang,     Quality Management System Administrator
-%	    Siobhan Balfour, Programme Administrator
+%       Sarah Puckett,   Environment and Sustainability Manager
+%       Wingki Tang,     Quality Management System Administrator
+%       Siobhan Balfour, Programme Administrator
 % 
 %   I [facilities manager] will be accompanying the team throughout all four 
 %   buildings and assist with gathering the necessary data.

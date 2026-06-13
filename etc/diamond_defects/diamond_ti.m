@@ -22,6 +22,8 @@
 %
 %    inter - Spinach interaction specification structure
 %
+% alexey.bogdanov@weizmann.ac.il
+%
 % <https://spindynamics.org/wiki/index.php?title=diamond_ti.m>
 
 function [sys,inter]=diamond_ti(parameters)
@@ -80,7 +82,7 @@ if strcmp(centre,'ok1')&&parameters.n_13c>0
     cframe{2}=diamond_frame_xz([1 1 0],[-1 1 -1]);
     for n=1:parameters.n_13c
         Cmat=((cframe{n})*diag([2.62 2.62 4.38]*hz_per_mt)*(cframe{n})');
-        nuclei{end+1}=struct('iso','13C','A',Cmat);
+        nuclei{end+1}=struct('iso','13C','A',Cmat); %#ok<AGROW>
     end
 end
 
@@ -108,6 +110,34 @@ for n=1:numel(nuclei)
     end
 end
 
+end
+
+% Make a principal-axis frame from three vectors
+function frame=diamond_frame_xyz(xaxis,yaxis,zaxis)
+frame=[xaxis(:) yaxis(:) zaxis(:)];
+[frame,~]=qr(frame,0);
+if det(frame)<0
+    frame(:,3)=-frame(:,3);
+end
+end
+
+% Frame used in the Nadolinny nickel and titanium tables
+function frame=diamond_frame_alpha(alpha)
+xaxis=[1;-1;0]/sqrt(2);
+ybase=[1;1;0]/sqrt(2);
+zbase=[0;0;1];
+yaxis=cosd(alpha)*ybase+sind(alpha)*zbase;
+zaxis=cross(xaxis,yaxis);
+frame=diamond_frame_xyz(xaxis,yaxis,zaxis);
+end
+
+% Principal-axis frame from a specified x axis and z axis
+function frame=diamond_frame_xz(xaxis,zaxis)
+xaxis=xaxis(:)/norm(xaxis,2);
+zaxis=zaxis(:)-xaxis*dot(xaxis,zaxis(:));
+zaxis=zaxis/norm(zaxis,2);
+yaxis=cross(zaxis,xaxis);
+frame=diamond_frame_xyz(xaxis,yaxis,zaxis);
 end
 
 % Consistency enforcement
@@ -146,34 +176,6 @@ end
 if ~strcmpi(parameters.centre,'ok1')&&isfield(parameters,'n_13c')&&parameters.n_13c~=0
     error('parameters.n_13c is only supported for OK1 centre.');
 end
-end
-
-% Make a principal-axis frame from three vectors
-function frame=diamond_frame_xyz(xaxis,yaxis,zaxis)
-frame=[xaxis(:) yaxis(:) zaxis(:)];
-[frame,~]=qr(frame,0);
-if det(frame)<0
-    frame(:,3)=-frame(:,3);
-end
-end
-
-% Frame used in the Nadolinny nickel and titanium tables
-function frame=diamond_frame_alpha(alpha)
-xaxis=[1;-1;0]/sqrt(2);
-ybase=[1;1;0]/sqrt(2);
-zbase=[0;0;1];
-yaxis=cosd(alpha)*ybase+sind(alpha)*zbase;
-zaxis=cross(xaxis,yaxis);
-frame=diamond_frame_xyz(xaxis,yaxis,zaxis);
-end
-
-% Principal-axis frame from a specified x axis and z axis
-function frame=diamond_frame_xz(xaxis,zaxis)
-xaxis=xaxis(:)/norm(xaxis,2);
-zaxis=zaxis(:)-xaxis*dot(xaxis,zaxis(:));
-zaxis=zaxis/norm(zaxis,2);
-yaxis=cross(zaxis,xaxis);
-frame=diamond_frame_xyz(xaxis,yaxis,zaxis);
 end
 
 % Hence it comes that all armed prophets 

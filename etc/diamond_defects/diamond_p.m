@@ -22,6 +22,8 @@
 %
 %    inter - Spinach interaction specification structure
 %
+% alexey.bogdanov@weizmann.ac.il
+%
 % <https://spindynamics.org/wiki/index.php?title=diamond_p.m>
 
 function [sys,inter]=diamond_p(parameters)
@@ -165,3 +167,4 @@ end
 % indication of how skewed our perspective tends to be.
 %
 % Douglas Adams
+

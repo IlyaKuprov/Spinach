@@ -30,6 +30,8 @@
 %
 %    inter - Spinach interaction specification structure
 %
+% alexey.bogdanov@weizmann.ac.il
+%
 % <https://spindynamics.org/wiki/index.php?title=diamond_ni.m>
 
 function [sys,inter]=diamond_ni(parameters)
@@ -174,6 +176,15 @@ end
 
 end
 
+% Make a principal-axis frame from three vectors
+function frame=diamond_frame_xyz(xaxis,yaxis,zaxis)
+frame=[xaxis(:) yaxis(:) zaxis(:)];
+[frame,~]=qr(frame,0);
+if det(frame)<0
+    frame(:,3)=-frame(:,3);
+end
+end
+
 % Consistency enforcement
 function grumble(parameters)
 if ~isstruct(parameters)
@@ -209,15 +220,6 @@ if ~strcmpi(parameters.centre,'w8')&&isfield(parameters,'n_13c')&&parameters.n_1
 end
 if isfield(parameters,'nickel')&&(~ischar(parameters.nickel))
     error('parameters.nickel must be a character string.');
-end
-end
-
-% Make a principal-axis frame from three vectors
-function frame=diamond_frame_xyz(xaxis,yaxis,zaxis)
-frame=[xaxis(:) yaxis(:) zaxis(:)];
-[frame,~]=qr(frame,0);
-if det(frame)<0
-    frame(:,3)=-frame(:,3);
 end
 end
 

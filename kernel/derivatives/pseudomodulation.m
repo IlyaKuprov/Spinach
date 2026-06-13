@@ -113,3 +113,8 @@ if (~isnumeric(mod_order))||(~isreal(mod_order))||(numel(mod_order)~=1)||...
     error('mod_order must be 0, 1, or 2.');
 end
 end
+
+% Assumption is the mother of all screw-ups.
+%
+% Internet wisdom
+

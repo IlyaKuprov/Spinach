@@ -79,7 +79,8 @@ for k=1:numel(mfiles)
         end
 
         % Apply exceptions
-        grumbler_ex=false; header_ex=false; wiki_ex=false;
+        grumbler_ex=false; header_ex=false; 
+        wiki_ex=false; norm_ex=false;
         for m=1:numel(content)
             if contains(content{m},'#NGRUM')
                 grumbler_ex=true;
@@ -89,6 +90,9 @@ for k=1:numel(mfiles)
             end
             if contains(content{m},'#NWIKI')
                 wiki_ex=true;
+            end
+            if contains(content{m},'#NORMOK')
+                norm_ex=true;
             end
         end
         
@@ -224,7 +228,7 @@ for k=1:numel(mfiles)
             if (~isempty(content{m}))&&contains(content{m},'norm(')&&...               % #NORMOK
                  isempty(regexp(content{m},'[norm(]*[,]\d[)]','once'))&&...            % #NORMOK
                (~contains(content{m},'fro'))&&(~contains(content{m},'inf'))&&...
-               (~contains(content{m},'cheap'))&&(~contains(content{m},'#NORMOK'))
+               (~contains(content{m},'cheap'))&&(~norm_ex)
                 edit(file_name); error(['unspecified norm type in line ' num2str(m)]);
             end
         end

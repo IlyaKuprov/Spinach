@@ -1,6 +1,44 @@
-% Global order-preserving root matching
+% Global order-preserving root matching between three magnetic field root
+% lists. The routine returns indices into the input lists that identify
+% matching roots with minimum field-continuation cost. Syntax:
+%
+%           [idx1,idx2,idx3]=rootmatch(field1,field2,field3,...
+%                                      edge12,edge23,edge31)
+%
+% Parameters:
+%
+%     field1 - real vector of roots at the first triangle vertex
+%
+%     field2 - real vector of roots at the second triangle vertex
+%
+%     field3 - real vector of roots at the third triangle vertex
+%
+%     edge12 - positive distance between the first and the second
+%              triangle vertices
+%
+%     edge23 - positive distance between the second and the third
+%              triangle vertices
+%
+%     edge31 - positive distance between the third and the first
+%              triangle vertices
+%
+% Outputs:
+%
+%     idx1   - indices of matched roots in field1
+%
+%     idx2   - indices of matched roots in field2
+%
+%     idx3   - indices of matched roots in field3
+%
+% ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=rootmatch.m>
+
 function [idx1,idx2,idx3]=rootmatch(field1,field2,field3,...
                                     edge12,edge23,edge31)
+
+% Check consistency
+grumble(field1,field2,field3,edge12,edge23,edge31);
 
 % Initialise empty output
 idx1=[]; idx2=[]; idx3=[];
@@ -136,6 +174,37 @@ idx1=fliplr(idx1);
 idx2=fliplr(idx2);
 idx3=fliplr(idx3);
 
+end
+
+% Consistency enforcement
+function grumble(field1,field2,field3,edge12,edge23,edge31)
+if (~isnumeric(field1))||(~isreal(field1))||...
+   ((~isempty(field1))&&(~isvector(field1)))||...
+   any(~isfinite(field1(:)))
+    error('field1 must be a finite real vector.');
+end
+if (~isnumeric(field2))||(~isreal(field2))||...
+   ((~isempty(field2))&&(~isvector(field2)))||...
+   any(~isfinite(field2(:)))
+    error('field2 must be a finite real vector.');
+end
+if (~isnumeric(field3))||(~isreal(field3))||...
+   ((~isempty(field3))&&(~isvector(field3)))||...
+   any(~isfinite(field3(:)))
+    error('field3 must be a finite real vector.');
+end
+if (~isnumeric(edge12))||(~isreal(edge12))||...
+   (~isscalar(edge12))||(~isfinite(edge12))||(edge12<=0)
+    error('edge12 must be a finite positive real scalar.');
+end
+if (~isnumeric(edge23))||(~isreal(edge23))||...
+   (~isscalar(edge23))||(~isfinite(edge23))||(edge23<=0)
+    error('edge23 must be a finite positive real scalar.');
+end
+if (~isnumeric(edge31))||(~isreal(edge31))||...
+   (~isscalar(edge31))||(~isfinite(edge31))||(edge31<=0)
+    error('edge31 must be a finite positive real scalar.');
+end
 end
 
 % Of all that is written, I love only what a man 

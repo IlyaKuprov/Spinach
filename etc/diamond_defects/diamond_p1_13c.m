@@ -303,3 +303,28 @@ if ~ismember(parameters.nitrogen,{'14N','15N'})
     error('parameters.nitrogen must be ''14N'' or ''15N''.');
 end
 end
+
+% Staff email at the University of Southampton, 09/12/2024:
+% --------------------------------------------------------
+%
+%   Please be advised that an internal environmental audit [...] will take
+%   place today at 10:00 am. The audit will be conducted by the following 
+%   team members:
+%
+%       Dave Willard,    Senior Quality and Compliance Manager
+%	    Sarah Puckett,   Environment and Sustainability Manager
+%	    Wingki Tang,     Quality Management System Administrator
+%	    Siobhan Balfour, Programme Administrator
+% 
+%   I [facilities manager] will be accompanying the team throughout all four 
+%   buildings and assist with gathering the necessary data.
+%
+% Staff email at the University of Southampton, 21/11/2025:
+% --------------------------------------------------------
+%
+%   Yesterday you will have received a communication from our Vice-Chancellor
+%   outlining the challenges and pressures we are now facing as an institution
+%   and the cost saving measures we need to apply, including a Voluntary Seve-
+%   rance (VS) scheme. I appreciate that hearing this news will be unsettling
+%   and for some will come as a surprise.
+

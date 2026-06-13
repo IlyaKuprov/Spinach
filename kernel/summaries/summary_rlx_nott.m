@@ -12,6 +12,8 @@
 %    output via report.m function
 %
 % ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=summary_rlx_nott.m>
 
 function summary_rlx_nott(spin_system)
 

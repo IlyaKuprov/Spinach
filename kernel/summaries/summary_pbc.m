@@ -14,6 +14,8 @@
 %    output via report.m function
 %
 % ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=summary_pbc.m>
 
 function summary_pbc(spin_system,header)
 

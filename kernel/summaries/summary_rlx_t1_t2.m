@@ -14,6 +14,8 @@
 %    output via report.m function
 %
 % ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=summary_rlx_t1_t2.m>
 
 function summary_rlx_t1_t2(spin_system,header)
 

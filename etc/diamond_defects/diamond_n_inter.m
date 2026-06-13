@@ -84,6 +84,15 @@ inter.coupling.matrix{1,2}=C*nucleus.A*C';
 
 end
 
+% Make a principal-axis frame from three vectors
+function frame=diamond_frame_xyz(xaxis,yaxis,zaxis)
+frame=[xaxis(:) yaxis(:) zaxis(:)];
+[frame,~]=qr(frame,0);
+if det(frame)<0
+    frame(:,3)=-frame(:,3);
+end
+end
+
 % Consistency enforcement
 function grumble(parameters)
 if(~isstruct(parameters))
@@ -109,15 +118,6 @@ if(~ischar(parameters.nitrogen))
 end
 if(~any(strcmp(parameters.nitrogen,{'14N','15N'})))
     error('parameters.nitrogen must be ''14N'' or ''15N''.');
-end
-end
-
-% Make a principal-axis frame from three vectors
-function frame=diamond_frame_xyz(xaxis,yaxis,zaxis)
-frame=[xaxis(:) yaxis(:) zaxis(:)];
-[frame,~]=qr(frame,0);
-if det(frame)<0
-    frame(:,3)=-frame(:,3);
 end
 end
 

@@ -135,8 +135,8 @@ if ~ischar(parameters.orientation)
 end
 end
 
-
 % A man is never so proud as when striking 
 % an attitude of humility.
 % 
 % C.S. Lewis
+

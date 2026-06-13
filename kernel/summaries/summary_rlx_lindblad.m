@@ -14,6 +14,8 @@
 %    output via report.m function
 %
 % ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=summary_rlx_lindblad.m>
 
 function summary_rlx_lindblad(spin_system,header)
 

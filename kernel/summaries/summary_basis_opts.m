@@ -12,6 +12,8 @@
 %    output via report.m function
 %
 % ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=summary_basis_opts.m>
 
 function summary_basis_opts(spin_system)
 

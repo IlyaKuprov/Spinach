@@ -12,6 +12,8 @@
 %    output via report.m function
 %
 % ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=summary_chemistry.m>
 
 function summary_chemistry(spin_system)
 

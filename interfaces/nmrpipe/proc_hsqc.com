@@ -10,7 +10,9 @@ set file_root=$1
 set out_file=$2
 set work_dir="${file_root}_nmrpipe_work"
 
-mkdir -p "$work_dir"
+rm -rf -- "$work_dir"
+mkdir -- "$work_dir"
+if ($status != 0) exit 1
 
 if ($?NMRBIN) then
     set nmrpipe="$NMRBIN/nmrPipe"
@@ -20,21 +22,26 @@ else
     set addnmr=addNMR
 endif
 
-$nmrpipe -in "${file_root}_pos.fid"                         \
-| $nmrpipe -fn FT                                            \
+$nmrpipe -in "${file_root}_pos.fid" -fn FT                   \
           -out "$work_dir/pos_f2.ft" -ov
+if ($status != 0) exit 1
 
-$nmrpipe -in "${file_root}_neg.fid"                         \
-| $nmrpipe -fn FT                                            \
-| $nmrpipe -fn SIGN -i                                       \
+$nmrpipe -in "${file_root}_neg.fid" -fn FT                   \
+          -out "$work_dir/neg_f2.ft" -ov
+if ($status != 0) exit 1
+
+$nmrpipe -in "$work_dir/neg_f2.ft" -fn SIGN -i               \
           -out "$work_dir/neg_f2_conj.ft" -ov
+if ($status != 0) exit 1
 
 $addnmr -in1 "$work_dir/pos_f2.ft"                           \
         -in2 "$work_dir/neg_f2_conj.ft"                      \
         -out "$work_dir/states_f2.ft" -add
+if ($status != 0) exit 1
 
 $nmrpipe -in "$work_dir/states_f2.ft"                        \
 | $nmrpipe -fn TP                                            \
 | $nmrpipe -fn FT                                            \
 | $nmrpipe -fn TP                                            \
           -out "$out_file" -ov
+if ($status != 0) exit 1

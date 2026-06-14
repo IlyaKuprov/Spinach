@@ -7,8 +7,9 @@
 %
 %    spin_system  - Spinach spin system structure
 %
-%    file_root    - output file name root; the function writes
-%                   <file_root>_pos.fid and <file_root>_neg.fid
+%    file_root    - output file name root without shell metacharacters;
+%                   the function writes <file_root>_pos.fid and
+%                   <file_root>_neg.fid
 %
 %    fid          - structure with fid.pos and fid.neg complex matrices;
 %                   rows are direct-dimension points, and columns are
@@ -56,13 +57,14 @@ if isfolder(fullfile(nmrbin,'openwin'))
     setenv('OPENWINHOME',fullfile(nmrbin,'openwin'));
 end
 
+
 % Convert spectrometer frequencies into MHz
 obs_f2=abs(spin(parameters.spins{2})*spin_system.inter.magnet/(2*pi))*1e-6;
 obs_f1=abs(spin(parameters.spins{1})*spin_system.inter.magnet/(2*pi))*1e-6;
 
-% Convert carrier offsets into ppm
-car_f2=parameters.offset(2)/obs_f2;
-car_f1=parameters.offset(1)/obs_f1;
+% Convert carrier offsets into signed ppm
+car_f2=hz2ppm(parameters.offset(2),spin_system.inter.magnet,parameters.spins{2});
+car_f1=hz2ppm(parameters.offset(1),spin_system.inter.magnet,parameters.spins{1});
 
 % Get acquisition dimensions
 npts_f2=size(fid.pos,1);
@@ -98,12 +100,12 @@ for n=1:numel(branches)
              ' -xCAR ' num2str(car_f2,16) ...
              ' -xLAB ' parameters.spins{2} ...
              ' -yN ' num2str(npts_f1) ...
-             ' -yT ' num2str(npts_f1) ' -yMODE Real' ...
+             ' -yT ' num2str(npts_f1) ' -yMODE Complex' ...
              ' -ySW ' num2str(parameters.sweep(1),16) ...
              ' -yOBS ' num2str(obs_f1,16) ...
              ' -yCAR ' num2str(car_f1,16) ...
              ' -yLAB ' parameters.spins{1} ...
-             ' -ndim 2 -aq2D Real > ' pipe_file];
+             ' -ndim 2 -aq2D States > ' pipe_file];
     [status,cmdout]=system(command);
 
     % Remove the temporary text file
@@ -133,8 +135,9 @@ if (~isfield(spin_system,'comp'))||(~isfield(spin_system.comp,'isotopes'))||...
    (~iscell(spin_system.comp.isotopes))
     error('spin_system.comp.isotopes must be a cell array.');
 end
-if (~ischar(file_root))||isempty(file_root)||any(isspace(file_root))
-    error('file_root must be a non-empty character string without whitespace.');
+if (~ischar(file_root))||isempty(file_root)||any(isspace(file_root))||...
+   any((~isstrprop(file_root,'alphanum'))&(~ismember(file_root,'/_.-')))
+    error('file_root must be a non-empty character string without shell metacharacters.');
 end
 [out_dir,~,~]=fileparts(file_root);
 if (~isempty(out_dir))&&(~isfolder(out_dir))
@@ -175,10 +178,11 @@ if (~iscell(parameters.spins))||(numel(parameters.spins)~=2)||...
     error('parameters.spins must contain two isotope names present in spin_system.');
 end
 if (~ischar(nmrpipe_root))||isempty(nmrpipe_root)||any(isspace(nmrpipe_root))||...
+   any((~isstrprop(nmrpipe_root,'alphanum'))&(~ismember(nmrpipe_root,'/_.-')))||...
    (~isfolder(nmrpipe_root))||...
    (~isfile(fullfile(nmrpipe_root,'com','txt2pipe.tcl')))||...
    (~isfile(fullfile(nmrpipe_root,'nmrbin.linux212_64','nmrPipe')))
-    error('nmrpipe_root must be a valid NMRPipe installation root.');
+    error('nmrpipe_root must be a valid NMRPipe installation root without shell metacharacters.');
 end
 end
 

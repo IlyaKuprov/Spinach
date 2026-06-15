@@ -4,7 +4,7 @@
 %
 %            http://dx.doi.org/10.1039/c4cp03994g
 %
-% Calculation time: hours
+% Calculation time: hours.
 %
 % ilya.kuprov@weizmann.ac.il
 % m.carravetta@soton.ac.uk
@@ -16,7 +16,7 @@ function cpmas_valine_simple()
 sys.magnet=14.10220742; sys.isotopes={'14N','1H'};
 inter.coupling.matrix{1,1}=eeqq2nqi(3.21e6,0.27,1,[0 0 0]);
 inter.zeeman.eigs={[57.5 81.0 227.0],[0 0 0]};
-inter.zeeman.euler={[-90 -90 -17],[0 0 0]};
+inter.zeeman.euler={[-90 -90 -17]/(pi*180),[0 0 0]};
 inter.coupling.matrix{2,2}=[];
 inter.coordinates={[0.00 0.00 0.00]
                    [1.00 0.00 0.00]};

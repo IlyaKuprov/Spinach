@@ -2,7 +2,7 @@
 % respect to the chemical shielding anisotropy and quadrupole
 % coupling tensor parameters.
 %
-% Calculation time: hours, much faster with a Tesla A100 GPU.
+% Calculation time: hours, much faster with a GPU.
 %
 % m.carravetta@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -121,28 +121,28 @@ parameters.rate=41000;
 fida=singlerot(spin_system,@acquire,parameters,'nmr');
 fida=apodisation(spin_system,fida,{{'gauss',lw}});
 sim_speca=fftshift(fft(fida, parameters.zerofill));
-sim_speca=sim_speca/max(sim_speca);
+sim_speca=sim_speca/max(abs(sim_speca));
 
 % Simulation B
 parameters.rate=38500;
 fidb=singlerot(spin_system,@acquire,parameters,'nmr');
 fidb=apodisation(spin_system,fidb,{{'gauss',lw}});
 sim_specb=fftshift(fft(fidb,parameters.zerofill));
-sim_specb=sim_specb/max(sim_specb);
+sim_specb=sim_specb/max(abs(sim_specb));
 
 % Simulation C
 parameters.rate=36000;
 fidc=singlerot(spin_system,@acquire,parameters,'nmr');
 fidc=apodisation(spin_system,fidc,{{'gauss',lw}});
 sim_specc=fftshift(fft(fidc,parameters.zerofill));
-sim_specc=sim_specc/max(sim_specc);
+sim_specc=sim_specc/max(abs(sim_specc));
 
 % Simulation D
 parameters.rate=34000;
 fidd=singlerot(spin_system,@acquire,parameters,'nmr');
 fidd=apodisation(spin_system,fidd,{{'gauss',lw}});
 sim_specd=fftshift(fft(fidd,parameters.zerofill));
-sim_specd=sim_specd/max(sim_specd);
+sim_specd=sim_specd/max(abs(sim_specd));
 
 % Plotting
 subplot(2,2,1); plot(A35,real(S35),'ro','MarkerSize',1);

@@ -1,6 +1,6 @@
 % PSYCOSY of Acrolein.
 %
-% Calculation time: hours on NVidia Tesla A100, much longer on CPU
+% Calculation time: hours, faster on a GPU.
 % 
 % a.m.kenwright@durham.ac.uk
 

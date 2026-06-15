@@ -1,7 +1,7 @@
 % Simultaneous fitting of 1H and 13C NMR spectra of a slightly
 % asymmetric maleate diester.
 %
-% Calculation time: minutes
+% Calculation time: hours
 %
 % g.pileio@soton.ac.uk
 % g.stevanato@soton.ac.uk

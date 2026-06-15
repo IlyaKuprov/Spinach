@@ -62,7 +62,7 @@ if (~isnumeric(order_spec{1}))||(~ismatrix(order_spec{1}))||...
    (any(size(order_spec{1})~=[3 3]))||(~isreal(order_spec{1}))
     error('order_spec{1} must be a real 3x3 matrix.');
 end
-if trace(order_spec{1})>10*norm(order_spec{1},2)*eps()
+if abs(trace(order_spec{1}))>10*norm(order_spec{1},2)*eps()
     error('order_spec{1} must be traceless.');
 end
 if norm(order_spec{1}-order_spec{1}.',1)>10*norm(order_spec{1},2)*eps()

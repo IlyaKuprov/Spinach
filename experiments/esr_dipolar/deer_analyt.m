@@ -40,14 +40,14 @@ end
 
 % Consistency enforcement
 function grumble(D,J,t)
-if (~isnumeric(D))||(~isreal(D))||(~isscalar(D))
-    error('D must be a real number.');
+if (~isnumeric(D))||(~isreal(D))||(~isscalar(D))||(~(D>0))
+    error('D must be a positive real number.');
 end
 if (~isnumeric(J))||(~isreal(J))||(~isscalar(J))
     error('J must be a real number.');
 end
-if (~isnumeric(t))||(~isreal(t))
-    error('t must be an array of real numbers.');
+if (~isnumeric(t))||(~isreal(t))||any(~(t(:)>=0))
+    error('t must be an array of non-negative real numbers.');
 end
 end
 

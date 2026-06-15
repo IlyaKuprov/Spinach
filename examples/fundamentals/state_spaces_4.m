@@ -1,7 +1,7 @@
 % Trajectory analysis for a MAS simulation of isotopically labelled 
 % glycine powder, starting from L+ on protons.
 %
-% Calculation time: minutes on a Tesla A100 GPU.
+% Calculation time: hours on a Tesla A100 GPU.
 %
 % ilya.kuprov@weizmann.ac.il
 

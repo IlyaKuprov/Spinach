@@ -159,6 +159,22 @@ else
     
 end
 
+% Matrix exponential backend inside step()
+if isfield(sys,'expmv_backend')
+
+    % Absorb user-specified value
+    spin_system.sys.expmv_backend=sys.expmv_backend;
+
+    % Parse out
+    sys=rmfield(sys,'expmv_backend');
+
+else
+
+    % Use native Spinach Taylor step by default
+    spin_system.sys.expmv_backend='default';
+
+end
+
 % Process internal tolerances
 [spin_system,sys]=tolerances(spin_system,sys);
 
@@ -193,6 +209,11 @@ if ~isempty(spin_system.sys.enable)
     if ismember('polyadic',spin_system.sys.enable),   report(spin_system,'         > polyadic arithmetic with spatial degrees of freedom'); end
     if ismember('dafuq',spin_system.sys.enable),      report(spin_system,'         > detailed parallel profiling'); end
     if ismember('sodd',spin_system.sys.enable),       report(spin_system,'         > spin-orbit corrections to dipolar couplings'); end
+end
+
+% Step exponential backend report
+if strcmp(spin_system.sys.expmv_backend,'auto')
+    report(spin_system,'automatic step() exponential backend selection enabled');
 end
 
 % Get a unique job identifier by hashing the clock and the process identifier
@@ -1337,6 +1358,16 @@ if isfield(sys,'enable')
     if any(~ismember(sys.enable,{'gpu','op_cache','xmemlist','greedy','paranoia','sodd',...
                                  'cowboy','polyadic','dafuq','prop_cache','ham_cache'}))
         error('unrecognised switch in sys.enable field.');
+    end
+end
+
+% Check step() exponential backend selection
+if isfield(sys,'expmv_backend')
+    if ~ischar(sys.expmv_backend)
+        error('sys.expmv_backend must be a character string.');
+    end
+    if ~ismember(sys.expmv_backend,{'default','auto'})
+        error('sys.expmv_backend must be ''default'' or ''auto''.');
     end
 end
 

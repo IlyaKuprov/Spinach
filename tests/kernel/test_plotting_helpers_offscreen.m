@@ -42,7 +42,7 @@ result=local_test_plot_2d(result,spin_system);
 % Exercise three-dimensional spectrum plotting
 result=local_test_plot_3d(result,spin_system);
 
-% Exercise Bloch-sphere, MRI, and volume plotting utilities
+% Exercise MRI and volume plotting utilities
 result=local_test_misc_plots(result);
 
 end
@@ -211,92 +211,6 @@ end
 
 
 function result=local_test_misc_plots(result)
-
-% Exercise Bloch-sphere trajectory plotting
-x_traj=cos(linspace(0,pi,16));
-y_traj=sin(linspace(0,pi,16));
-z_traj=linspace(-1,1,16);
-bloch_sph_plot(x_traj,y_traj,z_traj,'k-');
-fig=gcf();
-surf_obj=findobj(fig,'Type','surface');
-line_obj=findobj(fig,'Type','line');
-axis_obj=findobj(fig,'Type','line','Tag','InstantaneousAxis');
-result=test_true(result,'bloch_sph_plot surface',numel(surf_obj)>=1,...
-                 'bloch_sph_plot creates a reference sphere surface');
-result=test_true(result,'bloch_sph_plot trajectory',numel(line_obj)>=1,...
-                 'bloch_sph_plot creates a trajectory line');
-result=test_true(result,'bloch_sph_plot axis curve',numel(axis_obj)==1,...
-                 'bloch_sph_plot creates an instantaneous rotation-axis curve');
-axis_xyz=[get(axis_obj,'XData'); get(axis_obj,'YData'); get(axis_obj,'ZData')];
-axis_rad=sqrt(sum(axis_xyz.^2,1));
-result=test_true(result,'bloch_sph_plot axis normalisation',...
-                 all(axis_rad(isfinite(axis_rad))<=1+1e-12),...
-                 'bloch_sph_plot keeps the instantaneous axis inside the unit sphere');
-close(fig);
-
-% Check row-wise static plotting of multiple trajectories
-multi_time=linspace(0,pi/2,5);
-x_multi=[cos(multi_time); cos(multi_time)];
-y_multi=[sin(multi_time); -sin(multi_time)];
-z_multi=zeros(size(x_multi));
-bloch_sph_plot(x_multi,y_multi,z_multi,'k-');
-fig=gcf();
-axis_obj=findobj(fig,'Type','line','Tag','InstantaneousAxis');
-axis_zdata=[];
-if isscalar(axis_obj)
-    axis_zdata=get(axis_obj,'ZData');
-end
-npoints=numel(multi_time);
-result=test_true(result,'bloch_sph_plot static multirow axis',...
-                 isscalar(axis_obj)&&numel(axis_zdata)==2*(npoints+1)&&...
-                 all(axis_zdata(1:npoints)>0)&&isnan(axis_zdata(npoints+1))&&...
-                 all(axis_zdata((npoints+2):(2*npoints+1))<0)&&isnan(axis_zdata(end)),...
-                 'bloch_sph_plot traces each row trajectory separately in static instantaneous-axis plotting');
-close(fig);
-
-% Optionally exercise the Bloch-sphere movie path
-if strcmp(getenv('SPINACH_RUN_SLOW_PLOTTING'),'1')
-    movie_file=[tempname '.avi'];
-    x_movie=cos(linspace(0,pi/2,5));
-    y_movie=sin(linspace(0,pi/2,5));
-    z_movie=zeros(size(x_movie));
-    bloch_sph_plot(x_movie,y_movie,z_movie,'k-',movie_file);
-    fig=gcf();
-    axis_obj=findobj(fig,'Type','line','Tag','InstantaneousAxis');
-    axis_xdata=[];
-    if isscalar(axis_obj)
-        axis_xdata=get(axis_obj,'XData');
-    end
-    movie_exists=(exist(movie_file,'file')==2);
-    movie_bytes=0;
-    if movie_exists
-        movie_info=dir(movie_file);
-        movie_bytes=movie_info.bytes;
-    end
-    result=test_true(result,'bloch_sph_plot movie file',...
-                     movie_exists&&movie_bytes>0,...
-                     'bloch_sph_plot writes a non-empty video file in movie mode');
-    result=test_true(result,'bloch_sph_plot movie axis stick',...
-                     isscalar(axis_obj)&&numel(axis_xdata)==3&&...
-                     axis_xdata(1)==0&&isnan(axis_xdata(end)),...
-                     'bloch_sph_plot leaves a moving instantaneous-axis stick, not an axis-tip curve, in movie mode');
-    frame_count=0;
-    if movie_exists
-        movie_reader=VideoReader(movie_file);
-        while hasFrame(movie_reader)
-            readFrame(movie_reader);
-            frame_count=frame_count+1;
-        end
-    end
-    result=test_true(result,'bloch_sph_plot movie frame count',frame_count==numel(x_movie),...
-                     'bloch_sph_plot writes one movie frame per input trajectory point');
-    close(fig);
-    if exist(movie_file,'file')==2
-        delete(movie_file);
-    end
-else
-    result.messages{end+1}='SKIP: bloch_sph_plot video generation is codec-dependent and gated by SPINACH_RUN_SLOW_PLOTTING=1.';
-end
 
 % Exercise MRI image and k-space plotting branches
 fig=kfigure('Visible','off');

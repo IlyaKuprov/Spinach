@@ -77,6 +77,8 @@ result=test_close(result,'cubic_roots derivative quadratic',...
                   'the derivative quadratic should return both turning points');
 
 % Check a random set of well separated roots
+rng_state=rng;
+rng_cleanup=onCleanup(@()rng(rng_state));
 rng(1);
 rand_ok=true; rand_err=0;
 for n=1:200
@@ -91,8 +93,11 @@ for n=1:200
     end
     rand_err=max(rand_err,max(abs(obs_roots-test_roots)));
 end
+
+
+
 result=test_true(result,'cubic_roots random cubic set',rand_ok&&(rand_err<1e-10),...
                  'well-separated random cubic roots should round-trip through polynomial coefficients');
+clear('rng_cleanup');
 
 end
-

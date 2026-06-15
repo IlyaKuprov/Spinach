@@ -28,6 +28,8 @@
 %
 %     t2.nsteps - number of time steps in t2
 %
+%   t2.timestep - duration of each time step in t2
+%
 %     t3.nsteps - number of time steps in t3
 %
 %          tdir - time direction for state and coil propagation,
@@ -151,6 +153,11 @@ end
 if (~isfield(t2,'nsteps'))||(~isnumeric(t2.nsteps))||...
    (~isreal(t2.nsteps))||(mod(t2.nsteps,1)~=0)||(t2.nsteps<1)
     error('t2.nsteps must exist and must be a positive real integer.');
+end
+if (~isfield(t2,'timestep'))||(~isnumeric(t2.timestep))||...
+   (~isreal(t2.timestep))||(~isscalar(t2.timestep))||...
+   (~isfinite(t2.timestep))||(t2.timestep<=0)
+    error('t2.timestep must exist and must be a finite positive real scalar.');
 end
 if (~isfield(t3,'nsteps'))||(~isnumeric(t3.nsteps))||...
    (~isreal(t3.nsteps))||(mod(t3.nsteps,1)~=0)||(t3.nsteps<1)

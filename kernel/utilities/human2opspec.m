@@ -235,7 +235,7 @@ elseif iscell(operators)&&iscell(spins)
                             opspecs(:,spins{n})=lm2lin(l,m); coeffs=1*coeffs;
 
                         % Specific Zeeman energy level
-                        elseif strcmp(operators{n}(1:2),'ZL')
+                        elseif (numel(operators{n})>1)&&strcmp(operators{n}(1:2),'ZL')
 
                             % Validate Zeeman energy level specification
                             if isempty(regexp(operators{n},'^ZL([1-9]\d*)$','once'))

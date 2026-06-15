@@ -28,12 +28,35 @@ for n=1:2:numel(varargin)
         case 'pattern'
             options.pattern=varargin{n+1};
         case 'verbose'
-            options.verbose=logical(varargin{n+1});
+            if islogical(varargin{n+1})&&isscalar(varargin{n+1})
+                options.verbose=varargin{n+1};
+            elseif ischar(varargin{n+1})&&strcmp(varargin{n+1},'true')
+                options.verbose=true;
+            elseif ischar(varargin{n+1})&&strcmp(varargin{n+1},'false')
+                options.verbose=false;
+            elseif isstring(varargin{n+1})&&isscalar(varargin{n+1})&&(varargin{n+1}=="true")
+                options.verbose=true;
+            elseif isstring(varargin{n+1})&&isscalar(varargin{n+1})&&(varargin{n+1}=="false")
+                options.verbose=false;
+            else
+                error('verbose option must be true or false.');
+            end
         case 'stop_on_fail'
-            options.stop_on_fail=logical(varargin{n+1});
+            if islogical(varargin{n+1})&&isscalar(varargin{n+1})
+                options.stop_on_fail=varargin{n+1};
+            elseif ischar(varargin{n+1})&&strcmp(varargin{n+1},'true')
+                options.stop_on_fail=true;
+            elseif ischar(varargin{n+1})&&strcmp(varargin{n+1},'false')
+                options.stop_on_fail=false;
+            elseif isstring(varargin{n+1})&&isscalar(varargin{n+1})&&(varargin{n+1}=="true")
+                options.stop_on_fail=true;
+            elseif isstring(varargin{n+1})&&isscalar(varargin{n+1})&&(varargin{n+1}=="false")
+                options.stop_on_fail=false;
+            else
+                error('stop_on_fail option must be true or false.');
+            end
         otherwise
             error(['unknown option: ' varargin{n}]);
     end
 end
-
 end

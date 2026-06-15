@@ -177,8 +177,10 @@ if ~isfield(parameters,'orientation')
     error('system orientation must be specified in parameters.orientation variable.');
 elseif ~all(size(parameters.orientation)==[1 3])
     error('parameters.orientation variable must be a row vector with three numbers.');
-elseif ~isnumeric(parameters.orientation)
-    error('elements of parameters.orientation vector must be real numbers.');
+elseif (~isnumeric(parameters.orientation))||...
+       (~isreal(parameters.orientation))||...
+       any(~isfinite(parameters.orientation))
+    error('elements of parameters.orientation vector must be real finite numbers.');
 end
 
 % Pulse sequence

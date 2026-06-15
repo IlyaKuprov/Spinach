@@ -422,6 +422,8 @@ backends.default=default_backend;
 backends.vik=@(state)step_expmv_vik(A,state,time_step);
 backends.tay1=@(state)step_expmv_tay1(A,state,time_step);
 backends.tay2=@(state)step_expmv_tay2(A,state,time_step);
+
+% Matlab expmv() uses the A, vector, time ordering
 backends.expmv=@(state)expmv(A,state,time_step);
 
 end
@@ -505,12 +507,14 @@ while ~found
 
     % Estimate the required scaling
     norm_v=norm(power_m1);
+    if isa(norm_v,'gpuArray'), norm_v=gather(norm_v); end
     s=ceil((norm_v/(fact(m+2)*u))^(1/(m+1)));
     s=max([1 s]);
 
     % Check the two-term backward error condition
     err=norm(power_m1*(1/(s^(m+1)*fact(m+2)))+...
              power_m2*(1/(s^(m+2)*fact(m+3))));
+    if isa(err,'gpuArray'), err=gather(err); end
     if (err<=u)||(m==m_max)
         found=true();
     else
@@ -573,6 +577,7 @@ end
 % Initialise degree and scaling search
 m=m_min;
 norm_v=norm(power_next);
+if isa(norm_v,'gpuArray'), norm_v=gather(norm_v); end
 s=max([1 ceil((norm_v/(fact(m+2)*u))^(1/(m+1)))]);
 p=m*s; found=false();
 
@@ -585,6 +590,7 @@ while (~found)&&(m<m_max)
 
     % Estimate the required scaling
     norm_next=norm(power_next);
+    if isa(norm_next,'gpuArray'), norm_next=gather(norm_next); end
     s_next=max([1 ceil((norm_next/(fact(m_next+2)*u))^(1/(m_next+1)))]);
     p_next=m_next*s_next;
     if p_next<=p
@@ -622,6 +628,9 @@ end
 
 % Adjust Taylor scaling using the last polynomial term
 function s=scale_taylor(A,v,m,s,fact,u)
+
+% Keep scalar policy values on the CPU
+if isa(s,'gpuArray'), s=gather(s); end
 
 % Search for sufficient scaling
 while true
@@ -691,4 +700,3 @@ end
 % the spectra shown in Figure 8.
 %
 % A.J. Mehrer and R.S. Mulliken, Chem. Rev. 69 (1969) 639-656.
-

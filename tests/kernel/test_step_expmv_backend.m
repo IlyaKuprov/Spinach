@@ -56,6 +56,38 @@ rho_ref=step(spin_default,L,rho,fast_dt);
 result=test_close(result,'step auto backend single vector',rho_obs,rho_ref,1e-12,1e-12,...
                   'automatic single-vector backend selection must match the native Taylor path');
 
+% Dense CPU problems in this range are routed through Matlab expmv()
+dense_dim=128;
+dense_op=diag(linspace(-6,6,dense_dim));
+dense_rho=sin((1:dense_dim).'/dense_dim);
+stats=struct('matrix',dense_op,'time_step',1,'dimension',dense_dim,...
+             'is_sparse',false,'is_gpu',false,'norm_mat',6);
+backends=struct('default',@(~)'default','expmv',@(~)'expmv',...
+                'tay1',@(~)'tay1','tay2',@(~)'tay2');
+backend=step_heuristics(stats,backends);
+result=test_true(result,'step dense expmv selection',strcmp(backend([]),'expmv'),...
+                 'dense CPU heuristic must select Matlab expmv in its documented range');
+rho_obs=step(spin_auto,dense_op,dense_rho,1);
+rho_ref=step(spin_default,dense_op,dense_rho,1);
+result=test_close(result,'step dense expmv backend',rho_obs,rho_ref,1e-11,1e-11,...
+                  'Matlab expmv backend must match the native Taylor path');
+
+% GPU Taylor backends must keep scalar policy values on the CPU
+if (exist('gpuDeviceCount','file')==2)&&(gpuDeviceCount>0)
+    spin_gpu=spin_auto; spin_gpu.sys.enable={'gpu'};
+    spin_gpu_def=spin_default; spin_gpu_def.sys.enable={'gpu'};
+    gpu_dim=64;
+    gpu_rho=cos((1:gpu_dim).'/gpu_dim);
+    for alpha=[6 20]
+        gpu_op=diag(linspace(-alpha,alpha,gpu_dim));
+        rho_obs=gather(step(spin_gpu,gpu_op,gpu_rho,1));
+        rho_ref=gather(step(spin_gpu_def,gpu_op,gpu_rho,1));
+        result=test_close(result,['step GPU auto backend alpha=' num2str(alpha)],...
+                          rho_obs,rho_ref,1e-10,1e-10,...
+                          'GPU automatic Taylor backends must match the native Taylor path');
+    end
+end
+
 % Product quadrature inputs are not eligible for the automatic selector
 Lx=operator(spin_system,'Lx','1H');
 rho_obs=step(spin_auto,{L+0.5*Lx,L-0.25*Lx},rho,dt);
@@ -116,4 +148,3 @@ result=test_true(result,'step sparse rolling storage',sparse_peak<dense_hist/2,.
                  'sparse automatic Taylor backends must not allocate dense history arrays');
 
 end
-

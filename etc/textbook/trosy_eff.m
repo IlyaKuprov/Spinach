@@ -75,8 +75,9 @@ if (~isnumeric(csa))||(~isreal(csa))||...
    (~ismatrix(csa))||any(size(csa)~=[3 3])
     error('csa must be a real 3x3 matrix.');
 end
-if norm(csa-eye(3)*trace(csa)/3,'fro')==0
-    error('csa must have a non-zero anisotropic component.');
+[~,dsq_csa]=blinv(csa-eye(3)*trace(csa)/3);
+if dsq_csa==0
+    error('csa must have a non-zero second-rank anisotropic component.');
 end
 [~,mult_a]=spin(isotopes{1}); [~,mult_b]=spin(isotopes{2});
 if (mult_a~=2)||(mult_b~=2)

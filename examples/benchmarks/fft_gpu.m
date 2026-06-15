@@ -8,6 +8,7 @@ function fft_gpu()
 if gpuDeviceCount==0
     disp('no CUDA GPUs detected'); return;
 end
+
 % Initialise GPU device
 dev=gpuDevice;
 

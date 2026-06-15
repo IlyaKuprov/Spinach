@@ -58,8 +58,8 @@ end
 
 % Consistency enforcement
 function grumble(x,npcoeffs,npredps)
-if (~isnumeric(x))||(~isreal(x))||(~iscolumn(x))
-    error('x must be a real column vector.');
+if (~isnumeric(x))||(~isreal(x))||(~iscolumn(x))||(std(x)==0)
+    error('x must be a real column vector with a non-zero standard deviation.');
 end
 if (~isnumeric(npcoeffs))||(~isreal(npcoeffs))||...
    (~isscalar(npcoeffs))||(~isfinite(npcoeffs))||(npcoeffs<2)||...

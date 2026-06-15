@@ -112,6 +112,9 @@ end
 if numel(z)~=size(w,1)/2
     error('z must have one element per X,Y control pair.');
 end
+if any(~isfinite(z(:)))||any(z(:)==1)
+    error('z elements must be finite and different from 1.');
+end
 end
 
 % Bessie Braddock MP: "Winston, you are drunk, and what's more 

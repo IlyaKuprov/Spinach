@@ -210,8 +210,9 @@ if ~isfield(parameters,'echo_time')
     error('width of the echo window must be specified in parameters.echo_time field.');
 end
 if (~isnumeric(parameters.echo_time))||(~isreal(parameters.echo_time))||...
-   (~isscalar(parameters.echo_time))||(parameters.echo_time<=0)
-    error('parameters.echo_time must be a positive real scalar.');
+   (~isscalar(parameters.echo_time))||(~isfinite(parameters.echo_time))||...
+   (parameters.echo_time<=0)
+    error('parameters.echo_time must be a finite positive real scalar.');
 end
 if ~isfield(parameters,'echo_npts')
     error('number of points in the echo must be specified in parameters.echo_npts field.');
@@ -225,15 +226,20 @@ if ~isfield(parameters,'p1_p2_gap')
     error('p1-p2 time gap must be specified in parameters.p1_p2_gap field.');
 end
 if (~isnumeric(parameters.p1_p2_gap))||(~isreal(parameters.p1_p2_gap))||...
-   (~isscalar(parameters.p1_p2_gap))||(parameters.p1_p2_gap<=0)
-    error('parameters.p1_p2_gap must be a positive real scalar.');
+   (~isscalar(parameters.p1_p2_gap))||(~isfinite(parameters.p1_p2_gap))||...
+   (parameters.p1_p2_gap<=0)
+    error('parameters.p1_p2_gap must be a finite positive real scalar.');
 end
 if ~isfield(parameters,'p2_p4_gap')
     error('p2-p4 time gap must be specified in parameters.p2_p4_gap field.');
 end
 if (~isnumeric(parameters.p2_p4_gap))||(~isreal(parameters.p2_p4_gap))||...
-   (~isscalar(parameters.p2_p4_gap))||(parameters.p2_p4_gap<=0)
-    error('parameters.p2_p4_gap must be a positive real scalar.');
+   (~isscalar(parameters.p2_p4_gap))||(~isfinite(parameters.p2_p4_gap))||...
+   (parameters.p2_p4_gap<=0)
+    error('parameters.p2_p4_gap must be a finite positive real scalar.');
+end
+if parameters.p2_p4_gap<=parameters.p1_p2_gap
+    error('parameters.p2_p4_gap must exceed parameters.p1_p2_gap.');
 end
 if ~isfield(parameters,'p3_nsteps')
     error('number of points in the trace must be specified in parameters.p3_nsteps field.');
@@ -242,6 +248,11 @@ if (~isnumeric(parameters.p3_nsteps))||(~isreal(parameters.p3_nsteps))||...
    (~isscalar(parameters.p3_nsteps))||(parameters.p3_nsteps<1)||...
    (mod(parameters.p3_nsteps,1)~=0)
     error('parameters.p3_nsteps must be a positive real integer.');
+end
+echo_start=(parameters.p2_p4_gap-parameters.p1_p2_gap)+...
+           parameters.pulse_dur(3)-parameters.echo_time/2;
+if (~isfinite(echo_start))||(echo_start<0)
+    error('the echo window must start at a non-negative finite time.');
 end
 end
 

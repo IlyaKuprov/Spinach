@@ -58,6 +58,9 @@ l_bound_f1=find(axis_f1_ppm>crop_ranges{1}(1),1);
 r_bound_f1=find(axis_f1_ppm>crop_ranges{1}(2),1);
 l_bound_f2=find(axis_f2_ppm>crop_ranges{2}(1),1);
 r_bound_f2=find(axis_f2_ppm>crop_ranges{2}(2),1);
+if isempty(l_bound_f1)||isempty(r_bound_f1)||isempty(l_bound_f2)||isempty(r_bound_f2)
+    error('crop_ranges must lie inside the spectrum axes.');
+end
 
 % Find the new offsets
 parameters.offset=[(axis_f1_hz(l_bound_f1)+axis_f1_hz(r_bound_f1))/2 ...

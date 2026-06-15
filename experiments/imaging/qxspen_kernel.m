@@ -89,6 +89,12 @@ if (~isnumeric(FOVy))||(~isreal(FOVy))||(~isscalar(FOVy))||...
    (~isnumeric(del))||(~isreal(del))||(~isscalar(del))
     error('all arguments must be real scalars.');
 end
+if (~isfinite(NSR))||(NSR<2)||(mod(NSR,1)~=0)
+    error('NSR must be a finite real integer greater than or equal to 2.');
+end
+if (~isfinite(Nyacq))||(Nyacq<1)||(mod(Nyacq,1)~=0)
+    error('Nyacq must be a finite positive real integer.');
+end
 end
 
 % Editors are short-sighted fear-based 

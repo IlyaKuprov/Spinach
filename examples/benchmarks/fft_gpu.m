@@ -9,6 +9,9 @@ if gpuDeviceCount==0
     disp('no CUDA GPUs detected'); return;
 end
 
+% Initialise GPU device
+dev=gpuDevice;
+
 % FFT dimensions (reduce if card runs out of memory)
 sizes=[128 192 256 384 512];
 
@@ -28,7 +31,7 @@ for n=1:numel(sizes)
         
         % GPU benchmark
         b=randn(sizes(n),sizes(n),sizes(n),'gpuArray');
-        tic; fftn(b); timings(n,2,k)=toc;
+        wait(dev); tic; fftn(b); wait(dev); timings(n,2,k)=toc;
         disp(['n=' num2str(sizes(n)) ', GPU time ' num2str(timings(n,2,k)) ' seconds']);
         
     end

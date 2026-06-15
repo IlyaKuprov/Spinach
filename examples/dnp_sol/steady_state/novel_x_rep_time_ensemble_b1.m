@@ -1,7 +1,7 @@
 % Simulation of NOVEL DNP repetition time scan in the steady 
 % state with distributions in microwave B1 field.
 % 
-% Calculation time: minutes.
+% Calculation time: hours.
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il

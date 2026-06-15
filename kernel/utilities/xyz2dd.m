@@ -80,6 +80,9 @@ end
 if ~all(size(r1)==size(r2))
     error('r1 and r2 must have the same dimension.');
 end
+if norm(r2-r1,2)==0
+    error('r1 and r2 coordinates must be different.');
+end
 if (~ischar(isotope1))||(~ischar(isotope2))
     error('isotope specifications mst be character strings.');
 end

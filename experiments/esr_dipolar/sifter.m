@@ -79,9 +79,10 @@ if ~isfield(parameters,'npoints')
     error('number of points in the first echo must be specified in parameters.npoints field.');
 end
 if (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
-   (~isscalar(parameters.npoints))||(parameters.npoints<1)||...
-   (mod(parameters.npoints,1)~=0)
-    error('parameters.npoints must be a positive real integer.');
+   (~isscalar(parameters.npoints))||(~isfinite(parameters.npoints))||...
+   (parameters.npoints<2)||(mod(parameters.npoints,1)~=0)||...
+   (mod(parameters.npoints,2)~=0)
+    error('parameters.npoints must be a finite even real integer greater than or equal to 2.');
 end
 if ~isfield(parameters,'timestep')
     error('time step must be specified in parameters.timestep field.');

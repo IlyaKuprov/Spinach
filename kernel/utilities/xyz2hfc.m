@@ -54,15 +54,18 @@ A=C*D;
 end
 
 % Consistency enforcement
-function grumble(mxyz,nxyz,isotope,nel)
-if (~isnumeric(mxyz))||(~isreal(mxyz))||(numel(mxyz)~=3)
+function grumble(exyz,nxyz,isotope,nel)
+if (~isnumeric(exyz))||(~isreal(exyz))||(numel(exyz)~=3)
     error('e_xyz must be a three-element real vector.');
 end
 if (~isnumeric(nxyz))||(~isreal(nxyz))||(numel(nxyz)~=3)
     error('n_xyz must be a three-element real vector.');
 end
-if ~all(size(mxyz)==size(nxyz))
+if ~all(size(exyz)==size(nxyz))
     error('e_xyz and n_xyz must have the same dimension.');
+end
+if norm(nxyz-exyz,2)==0
+    error('e_xyz and n_xyz coordinates must be different.');
 end
 if ~ischar(isotope)
     error('isotope specification must be a character string.');

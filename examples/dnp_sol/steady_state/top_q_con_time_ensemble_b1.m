@@ -1,7 +1,7 @@
 % Simulation of TOP DNP contact time dependence in the 
 % steady state with electron Rabi frequency ensemble.
 %
-% Calculation time: minutes.
+% Calculation time: hours.
 % 
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il

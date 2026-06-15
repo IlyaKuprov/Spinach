@@ -9,7 +9,7 @@
 % All parameters, except for the isotropic chemical shifts, exchange ra-
 % tes and correlation times come from a DFT calculation.
 %
-% Calculation time: hours on a Tesla V100 GPU, much longer on CPU
+% Calculation time: hours, faster on a GPU.
 %
 % ilya.kuprov@weizmann.ac.il
 % barbara.odell@chem.ox.ac.uk

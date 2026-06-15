@@ -1,7 +1,6 @@
 % PSYCHE pure-shift NMR spectrum of rotenone.
 %
-% Calculation time: hours on a Tesla A800,
-%                   much longer on CPU
+% Calculation time: hours, faster on a GPU.
 %
 % mohammadali.foroozandeh@chem.ox.ac.uk
 % ilya.kuprov@weizmann.ac.il

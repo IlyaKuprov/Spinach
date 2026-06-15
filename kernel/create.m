@@ -1340,21 +1340,6 @@ if isfield(sys,'enable')
     end
 end
 
-% Check GPU parameters
-if isfield(sys,'gpuids')
-    
-    % Check the specification
-    if ~isnumeric(sys.gpuids)||any(mod(sys.gpuids,1)~=0)
-        error('sys.gpuids must be a vector of integers.');
-    end
-    
-    % Check if the devices are there
-    if any(sys.gpuids>gpuDeviceCount)
-        error('GPU device with the specified ID does not exist.');
-    end
-    
-end
-
 % Check isotopes variable
 if ~isfield(sys,'isotopes')
     error('sys.isotopes subfield must be present.');

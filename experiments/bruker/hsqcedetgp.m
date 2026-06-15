@@ -248,4 +248,8 @@ elseif (~isnumeric(parameters.edit_time))||(~isreal(parameters.edit_time))||...
 end
 end
 
+% I am not afraid of witches, I am afraid 
+% of people who are burning them. 
+%
+% Bertolt Brecht
 

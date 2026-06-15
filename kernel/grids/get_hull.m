@@ -1,7 +1,7 @@
 % Generates a convex hull of a two-angle grid for 2D 
 % surface plotting. Syntax:
 %
-%       hull=get_hull(theta_angles,phi_angles)
+%   [hull,edges]=get_hull(theta_angles,phi_angles)
 %
 % Parameters:
 %
@@ -42,7 +42,8 @@ hull=convhull(x,y,z);
 
 % Get the edges
 edges=unique([hull(:,1) hull(:,2);
-              hull(:,2) hull(:,3)],'rows');
+              hull(:,2) hull(:,3);
+              hull(:,3) hull(:,1)],'rows');
 edges=unique([edges; edges(:,[2 1])],'rows');
 edges(edges(:,1)==edges(:,2),:)=[];
 

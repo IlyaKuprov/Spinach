@@ -271,4 +271,24 @@ elseif (~isnumeric(parameters.si_time))||(~isreal(parameters.si_time))||...
 end
 end
 
+% It's thus become a very poorly kept secret that a very large number of 
+% public vegans these days regularly sneak off to the next town or the
+% next county for a big meal of meat. The next time you eat at a steak-
+% house close to a freeway interchange - the kind of place that has no
+% windows and relatively low lighting - keep an eye out for somebody with
+% the classic unhealthy-vegan look, thin, pale, and rigid, sitting ner-
+% vously by himself or herself at a back table, and chowing down on a 16
+% ounce porterhouse steak. It's probably a prominent vegan from a commu-
+% nity just far enough away that he or she doesn't expect to get caught.
+% [...] It's not just a matter of simple hypocrisy. [...] the people hea-
+% ding shamefacedly across county lines to do something that contradicts
+% their public personas believe with all their hearts that the ideals 
+% they uphold in public are right and true and good; it's just that they
+% themselves can't live up to those ideals. So they live divided lives,
+% earnestly praising the virtues they themselves can't bear to uphold, 
+% wallowing in guilt and shame at their failings, and by and large reac-
+% ting with frantic savagery when someone does in public what they do in
+% private.
+%
+% John Michael Greer
 

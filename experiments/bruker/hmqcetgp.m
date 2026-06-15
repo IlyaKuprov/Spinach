@@ -195,4 +195,8 @@ elseif (~isnumeric(parameters.J))||(~isreal(parameters.J))||...
 end
 end
 
+% Markets can remain irrational longer than 
+% you can remain solvent.
+%
+% John Maynard Keynes
 

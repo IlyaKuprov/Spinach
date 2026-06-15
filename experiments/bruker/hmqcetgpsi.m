@@ -227,4 +227,8 @@ elseif (~isnumeric(parameters.J))||(~isreal(parameters.J))||...
 end
 end
 
+% Achieving a dream is more important than avoiding pain.
+%
+% Unknown source, 
+% likely Greek Stoics
 

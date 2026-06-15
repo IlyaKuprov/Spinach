@@ -224,4 +224,7 @@ elseif (~isnumeric(parameters.trim_angle))||(~isreal(parameters.trim_angle))||..
 end
 end
 
+% What happens to the hole when the cheese is gone?
+%
+% Bertolt Brecht
 

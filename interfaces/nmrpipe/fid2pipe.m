@@ -1,7 +1,7 @@
 % Exports phase-sensitive 2D Spinach free induction decays into native
 % NMRPipe time-domain files. Syntax:
 %
-%          fid2pipe(spin_system,file_root,fid,parameters,nmrpipe_root)
+%     fid2pipe(spin_system,file_root,fid,parameters,nmrpipe_root)
 %
 % Parameters:
 %
@@ -30,6 +30,8 @@
 %       processing script after the direct-dimension Fourier transform
 %
 % ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=fid2pipe.m>
 
 function fid2pipe(spin_system,file_root,fid,parameters,nmrpipe_root)
 
@@ -56,7 +58,6 @@ setenv('NMRTXT',fullfile(nmrpipe_root,'nmrtxt'));
 if isfolder(fullfile(nmrbin,'openwin'))
     setenv('OPENWINHOME',fullfile(nmrbin,'openwin'));
 end
-
 
 % Convert spectrometer frequencies into MHz
 obs_f2=abs(spin(parameters.spins{2})*spin_system.inter.magnet/(2*pi))*1e-6;
@@ -186,4 +187,9 @@ if (~ischar(nmrpipe_root))||isempty(nmrpipe_root)||any(isspace(nmrpipe_root))||.
 end
 end
 
+% "Recollections may vary."
+%
+% Elizabeth II's response to 
+% a litany of outlandish claims
+% from Prince Harry
 

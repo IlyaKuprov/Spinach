@@ -72,14 +72,14 @@ spin_system=basis(spin_system,bas);
 % Initial concentrations, mol/L
 A0=1e-2; B0=2e-2; C0=0; D0=0.1;
 
-% 2nd order rate constant
-k=25.0;  % mol/(L*s)
+% Reaction rate constant
+rrc=25.0;    % mol/(L*s)
 
 % 2nd order reaction generator
-K=@(t,x)(1i*[-k*x(2)   0        0        0; 
-              0       -k*x(1)   0        0;
-              0        k*x(1)   0        0;
-              0        0        0        0]);
+K=@(t,x)(1i*[-rrc*x(2)   0       0        0; 
+              0       -rrc*x(1)  0        0;
+              0        rrc*x(1)  0        0;
+              0        0         0        0]);
 
 % Time grid (ten seconds)
 nsteps=100; tmax=10.0; dt=tmax/nsteps;
@@ -139,12 +139,12 @@ for n=1:nsteps
                         '/' int2str(nsteps)]);
 
     % Build the left interval edge composite evolution generator
-    F_L=1i*k*G{1}*B(time_axis(n))...   % Reaction from substance A
-       +1i*k*A(time_axis(n))*G{2};     % Reaction from substance B
+    F_L=1i*rrc*G{1}*B(time_axis(n))...   % Reaction from substance A
+       +1i*rrc*A(time_axis(n))*G{2};     % Reaction from substance B
 
     % Build the right interval edge composite evolution generator
-    F_R=1i*k*G{1}*B(time_axis(n+1))... % Reaction from substance A
-       +1i*k*A(time_axis(n+1))*G{2};   % Reaction from substance B
+    F_R=1i*rrc*G{1}*B(time_axis(n+1))... % Reaction from substance A
+       +1i*rrc*A(time_axis(n+1))*G{2};   % Reaction from substance B
 
     % Take the time step using the two-point Lie quadrature
     traj(:,n+1)=step(spin_system,{F_L,F_R},traj(:,n),dt);
@@ -159,7 +159,7 @@ hold on;  plot(time_axis,real(coil'*traj));
 coil=state(spin_system,{'Lz'},{9});
 hold on;  plot(time_axis,real(coil'*traj));
 xlim tight; kgrid; kxlabel('time, seconds'); 
-kylabel('conc.-weighted expt. value, 300K');
+kylabel('conc.-weighted exp. value, 300K');
 klegend({'Acetylene $\hat L_{\rm{Z}}$',...
          'Butadiene $\hat L_{\rm{Z}}$',...
          'Cyclohexadiene $\hat L_{\rm{Z}}$'},...

@@ -2,7 +2,7 @@
 % addition of acetylene to butadiene, demonstrating the non-linear
 % kinetics module.
 %
-% Calculation time: hours, much faster on GPU.
+% Calculation time: hours, GPU is hard-coded.
 %
 % ilya.kuprov@weizmann.ac.il
 % a.acharya@soton.ac.uk
@@ -58,8 +58,8 @@ inter_d.coupling.scalar=num2cell(inter_d.coupling.scalar);
 % Magnet field
 sys.magnet=14.1;
 
-% This needs a GPU
-sys.enable={'greedy'}; % 'gpu'
+% Greedy parallelisation
+sys.enable={'greedy'};
 
 % Relaxation theory parameters
 inter.relaxation={'redfield','t1_t2'};
@@ -86,14 +86,14 @@ bas.approximation='none';
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% 2nd order rate constant
-k=25.0;  % mol/(L*s)
+% Reaction rate constant
+rrc=25.0;    % mol/(L*s)
 
 % 2nd order reaction generator
-K=@(t,x)(1i*[-k*x(2)   0        0        0; 
-              0       -k*x(1)   0        0;
-              0        k*x(1)   0        0;
-              0        0        0        0]);
+K=@(t,x)(1i*[-rrc*x(2)   0       0        0; 
+              0       -rrc*x(1)  0        0;
+              0        rrc*x(1)  0        0;
+              0        0         0        0]);
 
 % Kinetic time grid, 10 seconds
 chem_nsteps=100; chem_tmax=10; 
@@ -156,12 +156,12 @@ for n=1:chem_nsteps
                         '/' int2str(chem_nsteps)]);
 
     % Build the left interval edge composite evolution generator
-    F_L=1i*k*B(chem_time_grid(n))*G{1}   ... % Reaction from substance A
-       +1i*k*A(chem_time_grid(n))*G{2};      % Reaction from substance B
+    F_L=1i*rrc*B(chem_time_grid(n))*G{1}   ... % Reaction from substance A
+       +1i*rrc*A(chem_time_grid(n))*G{2};      % Reaction from substance B
 
     % Build the right interval edge composite evolution generator
-    F_R=1i*k*B(chem_time_grid(n+1))*G{1} ... % Reaction from substance A
-       +1i*k*A(chem_time_grid(n+1))*G{2};    % Reaction from substance B
+    F_R=1i*rrc*B(chem_time_grid(n+1))*G{1} ... % Reaction from substance A
+       +1i*rrc*A(chem_time_grid(n+1))*G{2};    % Reaction from substance B
 
     % Take the time step using the two-point Lie quadrature
     chem_traj(:,n+1)=step(spin_system,{F_L,F_R},chem_traj(:,n),chem_dt);
@@ -220,12 +220,12 @@ parfor n=0:8 %#ok<*PFBNS>
                             '/' int2str(parameters.nsteps)]);
 
         % Build the left interval edge composite evolution generator
-        F_L=L+1i*k*G1*B(timing_grid(k))   ... % Reaction from substance A
-             +1i*k*A(timing_grid(k))*G2;      % Reaction from substance B
+        F_L=L+1i*rrc*G1*B(timing_grid(k))   ... % Reaction from substance A
+             +1i*rrc*A(timing_grid(k))*G2;      % Reaction from substance B
 
         % Build the right interval edge composite evolution generator
-        F_R=L+1i*k*G1*B(timing_grid(k+1)) ... % Reaction from substance A
-             +1i*k*A(timing_grid(k+1))*G2;    % Reaction from substance B
+        F_R=L+1i*rrc*G1*B(timing_grid(k+1)) ... % Reaction from substance A
+             +1i*rrc*A(timing_grid(k+1))*G2;    % Reaction from substance B
 
         % Take the time step using the two-point Lie quadrature
         eta=step(spin_system,{F_L,F_R},eta,nmr_dt);
@@ -235,8 +235,8 @@ parfor n=0:8 %#ok<*PFBNS>
 
     end
 
-    % Store the FID
-    fids{n+1}=current_fid;
+    % Return and store the FID
+    fids{n+1}=gather(current_fid);
 
 end
 

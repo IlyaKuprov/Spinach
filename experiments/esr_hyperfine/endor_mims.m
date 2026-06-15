@@ -89,8 +89,10 @@ elseif numel(parameters.npoints)~=1
 end
 if ~isfield(parameters,'tau')
     error('endor_mims: echo time should be specified in parameters.tau variable.');
-elseif numel(parameters.npoints)~=1
-    error('endor_mims: parameters.tau array should have exactly one element.');
+elseif (~isnumeric(parameters.tau))||(~isreal(parameters.tau))||...
+       (numel(parameters.tau)~=1)||(~isfinite(parameters.tau))||...
+       (parameters.tau<=0)
+    error('endor_mims: parameters.tau must be a finite positive real scalar.');
 end
 end
 

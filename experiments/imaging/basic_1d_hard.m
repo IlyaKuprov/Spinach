@@ -89,6 +89,14 @@ if (~isnumeric(parameters.npts))||(~isreal(parameters.npts))||...
    (mod(parameters.npts,1)~=0)
     error('parameters.npts must be a positive integer.');
 end
+if ~isfield(parameters,'npoints')
+    error('parameters.npoints field must be present.');
+end
+if (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
+   (~isscalar(parameters.npoints))||(~isfinite(parameters.npoints))||...
+   (parameters.npoints<1)||(mod(parameters.npoints,1)~=0)
+    error('parameters.npoints must be a finite positive integer.');
+end
 if ~isfield(parameters,'sweep')
     error('parameters.sweep field must be present.');
 end

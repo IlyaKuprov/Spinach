@@ -81,8 +81,9 @@ end
 
 % Consistency enforcement
 function grumble(spec,guess)
-if (~isnumeric(spec))||(~isvector(spec))||any(~isfinite(spec(:)))
-    error('spec must be a finite vector.');
+if (~isnumeric(spec))||(~isvector(spec))||any(~isfinite(spec(:)))||...
+   (std(spec(:))==0)
+    error('spec must be a finite vector with a non-zero standard deviation.');
 end
 if (~isnumeric(guess))||(~isreal(guess))||(~isrow(guess))||...
    (numel(guess)<2)||any(~isfinite(guess(:)))

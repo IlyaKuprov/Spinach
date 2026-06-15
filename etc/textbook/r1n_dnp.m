@@ -60,8 +60,9 @@ end
 
 % Consistency enforcement
 function grumble(B0,T,g,T1e,T1n_bulk,r,bet)
-if (~isnumeric(B0))||(~isreal(B0))||(~isscalar(B0))
-    error('B0 must be a real number.');
+if (~isnumeric(B0))||(~isreal(B0))||(~isscalar(B0))||...
+   (~isfinite(B0))||(B0==0)
+    error('B0 must be a finite non-zero real number.');
 end
 if (~isnumeric(T))||(~isreal(T))||(~isscalar(T))||(T<=0)
     error('T must be a positive real number.');

@@ -39,6 +39,10 @@ grumble(spin_system,bas);
 % Store the settings
 spin_system.bas=bas;
 
+% Find electrons and nuclei
+e_idx=cellfun(@iselectron,spin_system.comp.isotopes);
+n_idx=cellfun(@isnucleus,spin_system.comp.isotopes);
+
 % Report back to the user
 summary_basis_opts(spin_system);
 
@@ -53,10 +57,6 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
     % Run connectivity analysis for IK-DNP basis set
     if strcmp(spin_system.bas.approximation,'IK-DNP')
 
-        % Find electrons and nuclei
-        e_idx=cellfun(@iselectron,spin_system.comp.isotopes);
-        n_idx=cellfun(@isnucleus,spin_system.comp.isotopes);
-
         % Make sure there are only electrons and nuclei
         if (nnz(e_idx)==0)||(nnz(n_idx)==0)
             error('IK-DNP approximation requires both electrons and nuclei.');
@@ -65,16 +65,17 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
             error('IK-DNP approximation can only handle electrons and nuclei.');
         end
 
-        % Isolate three types of interactions (e-e, e-n, n-n)
+        % Isolate three types of interactions (e-e, n-n, e-n)
         ee_couplings=spin_system.inter.coupling.matrix;
-        ee_couplings(:,n_idx)={[]}; ee_couplings(n_idx,:)={[]};         % Electron-electron
-        nn_couplings=spin_system.inter.coupling.matrix;
-        nn_couplings(:,e_idx)={[]}; nn_couplings(e_idx,:)={[]};         % Electron-nuclear
+        ee_couplings(:,n_idx)={[]}; ee_couplings(n_idx,:)={[]};         % Inter-electron
         en_couplings=spin_system.inter.coupling.matrix;
-        en_couplings(e_idx,e_idx)={[]}; en_couplings(n_idx,n_idx)={[]}; % Inter-nuclear
+        en_couplings(e_idx,e_idx)={[]}; en_couplings(n_idx,n_idx)={[]}; % Electron-nuclear
+        nn_couplings=spin_system.inter.coupling.matrix;
+        nn_couplings(:,e_idx)={[]}; nn_couplings(e_idx,:)={[]};         % Inter-nuclear
 
         % Remind the user about the amplitude cut-off
-        report(spin_system,['coupling tensors with norm below ' num2str(spin_system.tols.inter_cutoff) ' Hz will be ignored.']);
+        report(spin_system,['coupling tensors with norm below ' num2str(spin_system.tols.inter_cutoff) ...
+                            ' Hz will be ignored.']);
 
         % Generate three types of connectivity graphs (e-e, e-n, n-n)
         ee_conmatrix=sparse(cellfun(@(x)norm(x,2),ee_couplings)>2*pi*spin_system.tols.inter_cutoff);
@@ -389,6 +390,23 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
             % Kill the states
             local_basis_spec(state_mask,:)=[]; %#ok<SPRIX>
             
+        end
+
+        % Drop excessive inter-nuclear correlations
+        if strcmp(spin_system.bas.approximation,'IK-DNP')
+
+            % Identify inter-nuclear correlations
+            corr_order=sum(logical(local_basis_spec),2);
+            nn_corr_order=sum(logical(local_basis_spec(:,n_idx)),2);
+            pure_nn_state=(corr_order==nn_corr_order);
+            pure_nn_state(1)=false;
+
+            % Build the drop mask
+            state_mask=pure_nn_state&(nn_corr_order>bas.level(3));
+            
+            % Kill the states
+            local_basis_spec(state_mask,:)=[]; %#ok<SPRIX>
+
         end
         
         % Assign the global variable

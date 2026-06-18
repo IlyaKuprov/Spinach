@@ -4,7 +4,8 @@
 %
 % Calculation time: seconds
 % 
-% bud.macaulay@soton.ac.uk, Ilya Kuprov
+% bud.macaulay@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function inad_three_spin()
 

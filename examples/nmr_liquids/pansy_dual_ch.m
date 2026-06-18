@@ -3,7 +3,7 @@
 %
 % Calculation time: seconds
 %
-% Andrew Porter
+% andrew.porter@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 
 function pansy_dual_ch()

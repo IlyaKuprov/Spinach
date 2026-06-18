@@ -4,7 +4,7 @@
 % Calculation time: minutes
 %
 % ilya.kuprov@weizmann.ac.il
-% zem1g16@soton.ac.uk
+% zak.elmachachi@soton.ac.uk
 
 function hoesy_strychnine()
 

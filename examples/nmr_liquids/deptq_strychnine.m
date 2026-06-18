@@ -2,7 +2,8 @@
 %
 % Calculation time: minutes
 %
-% Andrew Porter, Ilya Kuprov
+% andrew.porter@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function deptq_strychnine()
 

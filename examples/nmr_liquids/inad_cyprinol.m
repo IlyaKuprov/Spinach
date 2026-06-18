@@ -5,7 +5,8 @@
 %
 % Calculation time: minutes
 % 
-% bud.macaulay@soton.ac.uk, Ilya Kuprov
+% bud.macaulay@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 
 function inad_cyprinol()
 

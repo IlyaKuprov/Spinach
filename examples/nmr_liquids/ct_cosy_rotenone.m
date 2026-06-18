@@ -4,7 +4,7 @@
 % Calculation time: minutes
 %
 % ilya.kuprov@weizmann.ac.il
-% mrw1g16@soton.ac.uk
+% matthew.wright@soton.ac.uk
 
 function ct_cosy_rotenone()
 

@@ -24,7 +24,8 @@
 %
 % Notes: this function implements the five-stage fourth-order modified
 %        Cayley-Magnus integrator from Blanes, Casas, and Iserles,
-%        arXiv:2606.19614. Each Cayley transform is applied by GMRES.
+%        arXiv:2606.19614. Each Cayley transform is applied by BiCGSTAB,
+%        with GMRES fallback if convergence fails.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -174,25 +175,36 @@ function rho=apply_cayley(X,rho)
 tol=1e-12; maxit=min(size(X,1),max(32,ceil(size(X,1)/4)));
 A=speye(size(X,1))-X/2; B=speye(size(X,1))+X/2;
 
+% Precompute the right-hand side stack
+rhs=B*rho; next_rho=zeros(size(rhs),'like',rhs);
+
 % Loop over right-hand sides
 for n=1:size(rho,2)
 
-    % GMRES solve
-    [rho(:,n),flag]=gmres(A,B*rho(:,n),[],tol,maxit);
+    % BiCGSTAB solve
+    [next_rho(:,n),flag]=bicgstab(A,rhs(:,n),tol,maxit,[],[],rhs(:,n));
+
+    % Fall back to GMRES on solver failure
+    if flag~=0
+        [next_rho(:,n),flag]=gmres(A,rhs(:,n),[],tol,maxit,[],[],rhs(:,n));
+    end
 
     % Report solver failure
     if flag~=0
-        error('GMRES failed to converge in a Cayley-Magnus stage.');
+        error('linear solver failed to converge in a Cayley-Magnus stage.');
     end
 
 end
+
+% Return the solved stack
+rho=next_rho;
 
 end
 
 % Consistency enforcement
 function grumble(L,rho,time_step)
-if (~isnumeric(time_step))||(~isscalar(time_step))
-    error('time_step must be a scalar.');
+if (~isnumeric(time_step))||(~isscalar(time_step))||(~isfinite(time_step))
+    error('time_step must be a finite scalar.');
 end
 if (~isnumeric(L))&&(~iscell(L))
     error('L must be a matrix or a cell array of matrices.');
@@ -225,4 +237,3 @@ if ~allfinite(rho)
     error('state descriptor is not finite.');
 end
 end
-

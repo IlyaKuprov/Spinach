@@ -41,6 +41,16 @@ rho_obs=step_cayley(spin_system,L,rho,dt);
 result=test_close(result,'step_cayley versus expm',rho_obs,rho_ref,1e-10,1e-10,...
                   'constant-generator vector propagation matches matrix exponentiation');
 
+% Check non-finite time step rejection
+try
+    step_cayley(spin_system,L,rho,Inf);
+    finite_rejected=false();
+catch err
+    finite_rejected=contains(err.message,'finite scalar');
+end
+result=test_true(result,'non-finite time step rejection',finite_rejected,...
+                 'non-finite time steps must be rejected at input validation');
+
 % Define a linearly varying non-commuting generator
 S=pauli(2);
 dt=0.2; nsteps=400;
@@ -69,4 +79,3 @@ result=test_close(result,'step_cayley endpoint samples',rho_obs,rho_ref,3e-2,3e-
                   'endpoint-sampled time-dependent propagation matches midpoint reference');
 
 end
-

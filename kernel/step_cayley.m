@@ -67,19 +67,67 @@ end
 % Scale the state
 rho=rho/scaling;
 
-% Estimate the step norm
+% Cay5_4 coefficients from Blanes-Casas-Iserles, Table 1
+w31=1/(4-4^(1/3)); w21=w31; w11=1-4*w21;
+w32=7/(240*(1-2*w21));
+w22=(1-12*(1-w21)*w32)/(12*(1-3*w21));
+
+% Symmetric five-stage composition
+weights=[ w31  w32
+          w21  w22
+          w11  0
+          w21 -w22
+          w31 -w32 ];
+
+% Set the linear solve tolerance
+solve_tol=1e-12;
+
+% Estimate the interval norm
 if isnumeric(L)
     norm_mat=cheap_norm(L)*abs(time_step);
 else
     norm_mat=max(cellfun(@cheap_norm,L))*abs(time_step);
 end
 
-% Sampled time-dependent intervals cannot be subdivided without resampling
-if isnumeric(L)
-    nsteps=ceil(norm_mat/2);
-else
-    nsteps=1;
+% Estimate the Cayley defect tolerance
+err_tol=sqrt(1e-10)/2;
+
+% Use Spinach propagation tolerance if available
+if isfield(spin_system,'tols')&&isfield(spin_system.tols,'prop_chop')&&...
+   (spin_system.tols.prop_chop>0)
+    err_tol=sqrt(max(spin_system.tols.prop_chop,eps('double')))/2;
 end
+
+% Estimate the leading fourth-order Cayley rational defect
+if isnumeric(L)
+    err_coeff=abs(sum(weights(:,1).^5))/80;
+
+    % Apply the leading defect operator to the state stack
+    err_state=rho;
+    for k=1:5
+        err_state=(-1i*time_step)*(L*err_state);
+    end
+
+    % Estimate the relative Cayley defect on the supplied state
+    state_norm=max(norm(rho,'fro'),eps('double'));
+    cayley_err=err_coeff*norm(err_state,'fro')/state_norm;
+else
+    wgt_norm=abs(weights(:,1))+2*abs(weights(:,2));
+    err_coeff=sum(wgt_norm.^5)/80;
+
+    % Use a norm bound for sampled time-dependent generators
+    cayley_err=err_coeff*norm_mat^5;
+end
+
+% Estimate the Cayley stage norm
+if isnumeric(L)
+    stage_norm=max(abs(weights(:,1)))*norm_mat/2;
+else
+    stage_norm=max(wgt_norm)*norm_mat/2;
+end
+
+% Choose the subdivision count from accuracy and conditioning
+nsteps=max([1 ceil((cayley_err/err_tol)^(1/4)) ceil(stage_norm)]);
 
 % Step checks
 if norm_mat>1e4
@@ -101,7 +149,7 @@ elseif iscell(L)&&(norm_mat>100)
 end
 
 % Propagate the vector stack
-rho=cayley_magnus(L,rho,time_step,nsteps);
+rho=cayley_magnus(L,rho,time_step,nsteps,weights,solve_tol);
 
 % Scale the result back
 rho=scaling*rho;
@@ -109,29 +157,58 @@ rho=scaling*rho;
 end
 
 % Fourth-order modified Cayley-Magnus integrator
-function rho=cayley_magnus(L,rho,t,nsteps)
-
-% Cay5_4 coefficients from Blanes-Casas-Iserles, Table 1
-w31=1/(4-4^(1/3)); w21=w31; w11=1-4*w21;
-w32=7/(240*(1-2*w21));
-w22=(1-12*(1-w21)*w32)/(12*(1-3*w21));
-
-% Symmetric five-stage composition
-weights=[ w31  w32
-          w21  w22
-          w11  0
-          w21 -w22
-          w31 -w32 ];
+function rho=cayley_magnus(L,rho,t,nsteps,weights,solve_tol)
 
 % Loop over substeps
 for n=1:nsteps
 
+    % Resample the supplied interpolation model
+    if iscell(L)&&(nsteps>1)
+
+        % Get the local left interval position
+        pos_l=(n-1)/nsteps;
+
+        % Get the local right interval position
+        pos_r=n/nsteps;
+
+        % Piecewise-linear interpolation
+        if numel(L)==2
+
+            % Interpolate the local endpoint generators
+            L_sub={L{1}+pos_l*(L{2}-L{1}),L{1}+pos_r*(L{2}-L{1})};
+
+        % Piecewise-quadratic interpolation
+        elseif numel(L)==3
+
+            % Get the local midpoint position
+            pos_m=(n-1/2)/nsteps;
+
+            % Interpolate the local three-point generators
+            L_sub={((2*pos_l^2-3*pos_l+1)*L{1})+...
+                   ((4*pos_l-4*pos_l^2)*L{2})+...
+                   ((2*pos_l^2-pos_l)*L{3}),...
+                   ((2*pos_m^2-3*pos_m+1)*L{1})+...
+                   ((4*pos_m-4*pos_m^2)*L{2})+...
+                   ((2*pos_m^2-pos_m)*L{3}),...
+                   ((2*pos_r^2-3*pos_r+1)*L{1})+...
+                   ((4*pos_r-4*pos_r^2)*L{2})+...
+                   ((2*pos_r^2-pos_r)*L{3})};
+
+        end
+
+    else
+
+        % Use the supplied generator representation directly
+        L_sub=L;
+
+    end
+
     % Generate Cayley-Magnus basis matrices
-    [alpha1,alpha2]=alphas(L,t/nsteps);
+    [alpha1,alpha2]=alphas(L_sub,t/nsteps);
 
     % Apply the Cayley maps
     for k=size(weights,1):-1:1
-        rho=apply_cayley(weights(k,1)*alpha1+weights(k,2)*alpha2,rho);
+        rho=apply_cayley(weights(k,1)*alpha1+weights(k,2)*alpha2,rho,solve_tol);
     end
 
 end
@@ -169,10 +246,10 @@ end
 end
 
 % Cayley transform action, (I-X/2)\(I+X/2)*rho
-function rho=apply_cayley(X,rho)
+function rho=apply_cayley(X,rho,tol)
 
 % Common parameters
-tol=1e-12; maxit=min(size(X,1),max(32,ceil(size(X,1)/4)));
+maxit=min(size(X,1),max(32,ceil(size(X,1)/4)));
 A=speye(size(X,1))-X/2; B=speye(size(X,1))+X/2;
 
 % Precompute the right-hand side stack

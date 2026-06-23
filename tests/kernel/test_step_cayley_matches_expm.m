@@ -41,6 +41,17 @@ rho_obs=step_cayley(spin_system,L,rho,dt);
 result=test_close(result,'step_cayley versus expm',rho_obs,rho_ref,1e-10,1e-10,...
                   'constant-generator vector propagation matches matrix exponentiation');
 
+% Increase the step to exercise norm-estimated Cayley subdivision
+dt=0.25;
+
+% Build the independent exact propagator
+rho_ref=expm(-1i*L*dt)*rho;
+rho_obs=step_cayley(spin_system,L,rho,dt);
+
+% Check scaled vector propagation
+result=test_close(result,'step_cayley norm-estimated scaling',rho_obs,rho_ref,1e-6,1e-6,...
+                  'norm-estimated Cayley subdivision controls the rational defect');
+
 % Check non-finite time step rejection
 try
     step_cayley(spin_system,L,rho,Inf);

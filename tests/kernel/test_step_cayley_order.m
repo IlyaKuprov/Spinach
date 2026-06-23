@@ -28,7 +28,7 @@ spin_system=test_spin_system(sys,inter,bas);
 
 % Define a non-commuting constant generator
 S=pauli(2); L=2*pi*(S.x+0.7*S.y+0.2*S.z);
-rho=[1; -0.5]; dt=0.25;
+rho=[1; -0.5]; dt=0.05;
 
 % Compare two Cayley-Magnus refinements against expm
 rho_ref=expm(-1i*L*dt)*rho;

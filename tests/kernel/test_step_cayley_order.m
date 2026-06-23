@@ -33,7 +33,11 @@ rho=[1; -0.5]; dt=0.25;
 % Compare two Cayley-Magnus refinements against expm
 rho_ref=expm(-1i*L*dt)*rho;
 err_1=norm(step_cayley(spin_system,L,rho,dt)-rho_ref,2);
-err_2=norm(step_cayley(spin_system,L,rho,dt/2)-expm(-1i*L*dt/2)*rho,2);
+
+% Take two half steps to reach the same final time
+rho_half=step_cayley(spin_system,L,rho,dt/2);
+rho_half=step_cayley(spin_system,L,rho_half,dt/2);
+err_2=norm(rho_half-rho_ref,2);
 
 % Check that halving the step improves by fourth-order margin
 result=test_true(result,'fourth-order error reduction',err_1/err_2>10,...

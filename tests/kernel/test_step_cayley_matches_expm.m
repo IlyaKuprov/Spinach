@@ -41,5 +41,32 @@ rho_obs=step_cayley(spin_system,L,rho,dt);
 result=test_close(result,'step_cayley versus expm',rho_obs,rho_ref,1e-10,1e-10,...
                   'constant-generator vector propagation matches matrix exponentiation');
 
+% Define a linearly varying non-commuting generator
+S=pauli(2);
+dt=0.2; nsteps=400;
+L_left=12*(S.x+0.7*S.y);
+L_right=12*(S.x+0.7*S.y+0.9*S.z);
+rho=[1; -0.3+0.2i];
+
+% Build the midpoint product reference
+rho_ref=rho; time_slice=dt/nsteps;
+for n=1:nsteps
+
+    % Evaluate the linearly interpolated generator
+    time_pos=(n-1/2)*time_slice;
+    L_inst=L_left+(time_pos/dt)*(L_right-L_left);
+
+    % Apply the local midpoint exponential
+    rho_ref=expm(-1i*L_inst*time_slice)*rho_ref;
+
+end
+
+% Propagate from endpoint samples
+rho_obs=step_cayley(spin_system,{L_left,L_right},rho,dt);
+
+% Check sampled time-dependent propagation
+result=test_close(result,'step_cayley endpoint samples',rho_obs,rho_ref,3e-2,3e-2,...
+                  'endpoint-sampled time-dependent propagation matches midpoint reference');
+
 end
 

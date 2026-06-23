@@ -8,9 +8,11 @@
 %
 %      L          -  Liouvillian or Hamiltonian to be used for
 %                    propagation; centre point piecewise-constant
-%                    rule if one matrix is supplied, fourth order
-%                    Gauss-Legendre product quadrature if two
-%                    matrices {left, right} are supplied.
+%                    rule if one matrix is supplied, fourth-order
+%                    piecewise-linear rule if two matrices {left,
+%                    right} are supplied, and fourth-order piecewise-
+%                    quadratic rule if three matrices {left, midpoint,
+%                    right} are supplied.
 %
 %      rho        -  state vector, or a stack of state vectors
 %
@@ -64,16 +66,22 @@ end
 % Scale the state
 rho=rho/scaling;
 
-% Subdivide the time step
+% Estimate the step norm
 if isnumeric(L)
     norm_mat=cheap_norm(L)*abs(time_step);
 else
     norm_mat=max(cellfun(@cheap_norm,L))*abs(time_step);
 end
-nsteps=ceil(norm_mat/2);
+
+% Sampled time-dependent intervals cannot be subdivided without resampling
+if isnumeric(L)
+    nsteps=ceil(norm_mat/2);
+else
+    nsteps=1;
+end
 
 % Step checks
-if nsteps>1e4
+if norm_mat>1e4
 
     % Catch the common mistake of supplying wildly unreasonable |L*dt|
     error('either dt is too long, or L is too big: |L*dt|>1e4, check both.');
@@ -83,6 +91,11 @@ elseif nsteps>100
     % Warn user if too many substeps are needed
     report(spin_system,['WARNING: ' num2str(nsteps)...
                         ' substeps required, consider using evolution() here.']);
+
+elseif iscell(L)&&(norm_mat>100)
+
+    % Warn user if sampled interval is too long
+    report(spin_system,'WARNING: large sampled interval, consider shorter external time steps.');
 
 end
 
@@ -116,7 +129,7 @@ for n=1:nsteps
     [alpha1,alpha2]=alphas(L,t/nsteps);
 
     % Apply the Cayley maps
-    for k=1:size(weights,1)
+    for k=size(weights,1):-1:1
         rho=apply_cayley(weights(k,1)*alpha1+weights(k,2)*alpha2,rho);
     end
 
@@ -135,15 +148,15 @@ if isnumeric(L)
 
 elseif numel(L)==2
 
-    % Fourth order Gauss-Legendre product quadrature
+    % Fourth-order piecewise-linear rule
     alpha1=(-1i*t/2)*(L{1}+L{2});
-    alpha2=(-1i*sqrt(3)*t)*(L{2}-L{1});
+    alpha2=(-1i*t)*(L{2}-L{1});
 
 elseif numel(L)==3
 
-    % Three supplied matrices are collapsed to the fourth-order rule
+    % Fourth-order piecewise-quadratic rule
     alpha1=(-1i*t/6)*(L{1}+4*L{2}+L{3});
-    alpha2=(-1i*t)*(L{3}-L{1})/2;
+    alpha2=(-1i*t)*(L{3}-L{1});
 
 else
 
@@ -212,3 +225,4 @@ if ~allfinite(rho)
     error('state descriptor is not finite.');
 end
 end
+

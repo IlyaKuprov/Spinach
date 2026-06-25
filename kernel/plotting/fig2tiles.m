@@ -22,18 +22,29 @@ function [fig_obj,tile_obj]=fig2tiles(fig_files)
 % Check consistency
 grumble(fig_files);
 
+% Get the tile grid size
+tile_rows=size(fig_files,1);
+tile_cols=size(fig_files,2);
+
+% Map cell array entries to tiled layout positions
+tile_nums=zeros(numel(fig_files),1);
+for n=1:numel(fig_files)
+    [row_num,col_num]=ind2sub(size(fig_files),n);
+    tile_nums(n)=(row_num-1)*tile_cols+col_num;
+end
+
 % Create the new figure
 fig_obj=kfigure();
 
 % Create a loose tiled layout
-tile_obj=tiledlayout(fig_obj,'flow','TileSpacing','loose',...
+tile_obj=tiledlayout(fig_obj,tile_rows,tile_cols,'TileSpacing','loose',...
                     'Padding','loose');
 
 % Allocate all outer tiles
 tile_axes=gobjects(numel(fig_files),1);
 tile_pos=zeros(numel(fig_files),4);
 for n=1:numel(fig_files)
-    tile_axes(n)=nexttile(tile_obj,n);
+    tile_axes(n)=nexttile(tile_obj,tile_nums(n));
     tile_axes(n).Visible='off';
 end
 
@@ -89,7 +100,7 @@ for n=1:numel(fig_files)
             delete(tile_axes(n));
             copy_obj=copyobj(src_obj,tile_obj);
             tile_idx=find(src_obj==src_tiles,1);
-            copy_obj(tile_idx).Layout.Tile=n;
+            copy_obj(tile_idx).Layout.Tile=tile_nums(n);
             for k=1:numel(copy_obj)
                 if isprop(copy_obj(k),'Type')
                     obj_type=get(copy_obj(k),'Type');
@@ -101,7 +112,7 @@ for n=1:numel(fig_files)
                    (~strcmp(obj_type,'colorbar'))
                     layout_obj=copy_obj(k).Layout;
                     if (~isempty(layout_obj))&&isprop(layout_obj,'Tile')
-                        copy_obj(k).Layout.Tile=n;
+                        copy_obj(k).Layout.Tile=tile_nums(n);
                     end
                 end
             end
@@ -147,7 +158,7 @@ for n=1:numel(fig_files)
                        (~strcmp(obj_type,'colorbar'))
                         layout_obj=copy_obj(k).Layout;
                         if (~isempty(layout_obj))&&isprop(layout_obj,'Tile')
-                            copy_obj(k).Layout.Tile=n;
+                            copy_obj(k).Layout.Tile=tile_nums(n);
                             tile_found=true;
                         end
                     end
@@ -234,7 +245,7 @@ for n=1:numel(fig_files)
                     delete(tile_axes(n));
                     nest_obj=tiledlayout(tile_obj,numel(row_grid),numel(col_grid),...
                                          'TileSpacing','loose','Padding','loose');
-                    nest_obj.Layout.Tile=n;
+                    nest_obj.Layout.Tile=tile_nums(n);
 
                     % Copy source graphics into the nested layout
                     copy_obj=copyobj(src_obj,nest_obj);
@@ -325,8 +336,8 @@ end
 
 % Consistency enforcement
 function grumble(fig_files)
-if (~iscell(fig_files))||isempty(fig_files)||(~isvector(fig_files))
-    error('fig_files must be a non-empty cell array of file names.');
+if (~iscell(fig_files))||isempty(fig_files)||(~ismatrix(fig_files))
+    error('fig_files must be a non-empty two-dimensional cell array of file names.');
 end
 for n=1:numel(fig_files)
     if (~ischar(fig_files{n}))||(~isrow(fig_files{n}))||isempty(fig_files{n})
@@ -340,3 +351,4 @@ for n=1:numel(fig_files)
     end
 end
 end
+

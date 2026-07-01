@@ -48,12 +48,18 @@ elseif ismac
     elseif isfile('/usr/local/opt/libomp/include/omp.h')
         omp_inc='/usr/local/opt/libomp/include';
         omp_lib='/usr/local/opt/libomp/lib';
+    elseif isfile('/opt/homebrew/include/omp.h')
+        omp_inc='/opt/homebrew/include';
+        omp_lib='/opt/homebrew/lib';
+    elseif isfile('/usr/local/include/omp.h')
+        omp_inc='/usr/local/include';
+        omp_lib='/usr/local/lib';
     elseif isfile('/opt/local/include/libomp/omp.h')
         omp_inc='/opt/local/include/libomp';
         omp_lib='/opt/local/lib/libomp';
     elseif isfile('/opt/local/include/omp.h')
         omp_inc='/opt/local/include';
-        omp_lib='/opt/local/lib/libomp';
+        omp_lib='/opt/local/lib';
     end
 
     % Fall back to serial compilation if OpenMP is missing

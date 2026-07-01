@@ -47,7 +47,7 @@ end
 
 % Build the serpentine index
 [rows,cols]=ndgrid(1:nlevels);
-[~,idx]=sortrows([rows(:)+cols(:), -rows(:)]);
+idx=spsortrows(sparse([rows(:)+cols(:), -rows(:)]));
 
 % Arrange
 B=B(idx);

@@ -37,7 +37,7 @@ grumble(nlevels,idx_base);
 
 % Build the serpentine matrix
 [rows,cols]=ndgrid(1:nlevels);
-[~,idx]=sortrows([rows(:)+cols(:), -rows(:)]);
+idx=spsortrows(sparse([rows(:)+cols(:), -rows(:)]));
 S=zeros(nlevels,nlevels); S(idx)=1:nlevels^2;
 
 % Adjust the indexing base

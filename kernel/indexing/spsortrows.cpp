@@ -23,10 +23,6 @@
 
 #if defined(_OPENMP)
 #include <omp.h>
-#if defined(__GLIBCXX__) && !defined(__clang__)
-#include <parallel/algorithm>
-#define SPSORTROWS_HAVE_GNU_PARALLEL 1
-#endif
 #endif
 
 struct sparse_row_less
@@ -117,10 +113,80 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
         row_less.col_idx=col_idx.data();
         row_less.values=values.data();
 
-#if defined(SPSORTROWS_HAVE_GNU_PARALLEL)
+#if defined(_OPENMP)
 
-        // Use libstdc++ parallel sort when OpenMP is available
-        __gnu_parallel::sort(order.begin(),order.end(),row_less);
+        // Get OpenMP team size
+        const int max_threads=omp_get_max_threads();
+
+        if ((max_threads>1)&&(n_rows>1))
+        {
+            // Cap the team at one thread per row
+            int n_threads=max_threads;
+
+            if ((mwSize)n_threads>n_rows)
+                n_threads=(int)n_rows;
+
+            // Split the row permutation into balanced blocks
+            std::vector<mwIndex> run_start((mwIndex)n_threads+1);
+            const mwIndex chunk=(mwIndex)(n_rows/(mwSize)n_threads);
+            const mwIndex rem=(mwIndex)(n_rows%(mwSize)n_threads);
+            mwIndex run_pos=0;
+
+            for (int n=0;n<n_threads;n++)
+            {
+                run_start[(mwIndex)n]=run_pos;
+                run_pos+=chunk+((n<(int)rem)?1:0);
+            }
+
+            run_start[(mwIndex)n_threads]=run_pos;
+
+            // Sort local blocks in parallel
+#pragma omp parallel for schedule(static) num_threads(n_threads)
+            for (int n=0;n<n_threads;n++)
+                std::sort(order.begin()+run_start[(mwIndex)n],
+                          order.begin()+run_start[(mwIndex)n+1],row_less);
+
+            // Allocate merge workspace
+            std::vector<mwIndex> buffer(n_rows);
+            std::vector<mwIndex> *src=&order;
+            std::vector<mwIndex> *dst=&buffer;
+
+            // Merge sorted blocks using a reduced GNU-style sort/merge schedule
+            for (int run_len=1;run_len<n_threads;run_len*=2)
+            {
+                const int pair_count=(n_threads+2*run_len-1)/(2*run_len);
+
+#pragma omp parallel for schedule(static) num_threads(n_threads)
+                for (int pair=0;pair<pair_count;pair++)
+                {
+                    const int left_run=pair*2*run_len;
+                    const int mid_run=std::min(left_run+run_len,n_threads);
+                    const int right_run=std::min(left_run+2*run_len,n_threads);
+                    const mwIndex left=run_start[(mwIndex)left_run];
+                    const mwIndex mid=run_start[(mwIndex)mid_run];
+                    const mwIndex right=run_start[(mwIndex)right_run];
+
+                    if (mid<right)
+                        std::merge(src->begin()+left,src->begin()+mid,
+                                   src->begin()+mid,src->begin()+right,
+                                   dst->begin()+left,row_less);
+                    else
+                        std::copy(src->begin()+left,src->begin()+right,
+                                  dst->begin()+left);
+                }
+
+                std::swap(src,dst);
+            }
+
+            // Copy the final pass back if it ended in the workspace
+            if (src!=&order)
+                std::copy(src->begin(),src->end(),order.begin());
+        }
+        else
+        {
+            // Use standard introsort when there is no useful OpenMP team
+            std::sort(order.begin(),order.end(),row_less);
+        }
 
 #else
 

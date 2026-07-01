@@ -19,6 +19,13 @@ mex('-R2018a','-O','-DNDBUG','COMPFLAGS=$COMPFLAGS','LINKFLAGS=$LINKFLAGS',...
     [P '/kernel/line_shapes/gausscon.cpp'],'-outdir',[P '/kernel/line_shapes']);
 mex('-R2018a','-O','-DNDBUG','COMPFLAGS=$COMPFLAGS','LINKFLAGS=$LINKFLAGS',...
     [P '/kernel/eigenfields/cubic_roots.cpp'],'-outdir',[P '/kernel/eigenfields']);
+if isunix&&(~ismac)
+    mex('-R2018a','-O','-DNDEBUG','CXXFLAGS=$CXXFLAGS -fopenmp','LDFLAGS=$LDFLAGS -fopenmp',...
+        [P '/kernel/indexing/spsortrows.cpp'],'-outdir',[P '/kernel/indexing']);
+else
+    mex('-R2018a','-O','-DNDEBUG',...
+        [P '/kernel/indexing/spsortrows.cpp'],'-outdir',[P '/kernel/indexing']);
+end
 
 end
 

@@ -440,15 +440,22 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
     
     % Sort the basis explicitly
     report(spin_system,'sorting the basis...');
-
-    % Compute the basis sorting index
-    index=spsortrows(basis_spec);
-
-    % Apply the basis sorting index
-    spin_system.bas.basis=basis_spec(index,:);
+    if (~isworkernode)&&(nnz(basis_spec)>1e5)
+        
+        % Run multithreaded sorting
+        basis_spec=distrib_dim(basis_spec,2);
+        basis_spec=sortrows(basis_spec);
+        spin_system.bas.basis=gather(basis_spec);
+        
+    else
+        
+        % Run sorting in a single thread
+        spin_system.bas.basis=sortrows(basis_spec);
+        
+    end
     
     % Deallocate variables
-    clear('basis_spec','index');
+    clear('basis_spec');
    
     % Report on chemical species
     chem_idx=false(size(spin_system.bas.basis,1),numel(spin_system.chem.parts));

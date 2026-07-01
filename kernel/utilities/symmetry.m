@@ -140,7 +140,7 @@ else
             group_element=1:spin_system.comp.nspins;
             group_element(spins)=group_element(spins(group.elements(n,:)));
             permuted_basis=spin_system.bas.basis(:,group_element);
-            [~,index]=sortrows(permuted_basis);
+            index=spsortrows(sparse(permuted_basis));
             permutation_table(:,n)=index;
         end
         

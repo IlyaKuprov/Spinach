@@ -488,6 +488,19 @@ result=test_true(result,'compile_mex source confinement',...
                  contains(compile_src,'''-R2018a'''),...
                  'compile_mex must compile the listed MEX sources, write outputs into their source directories, and request the interleaved-complex API');
 
+% Inspect sparse sorter sources for platform-specific OpenMP rigging
+repo_root=fileparts(fileparts(fileparts(compile_file)));
+spsort_src=fileread(fullfile(repo_root,'kernel','indexing','spsortrows.cpp'));
+openmp_markers={'_OPENMP','omp_set','omp_get','omp.h','#pragma omp',...
+                'fopenmp','libomp','gnu_parallel','parallel/algorithm','OpenMP'};
+no_openmp=true();
+for n=1:numel(openmp_markers)
+    no_openmp=no_openmp&&~contains(compile_src,openmp_markers{n})&&...
+              ~contains(spsort_src,openmp_markers{n});
+end
+result=test_true(result,'compile_mex no OpenMP rigging',no_openmp,...
+                 'spsortrows compile and source paths must not depend on OpenMP');
+
 end
 
 

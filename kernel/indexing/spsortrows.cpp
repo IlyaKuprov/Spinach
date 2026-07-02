@@ -21,10 +21,6 @@
 #include <numeric>
 #include <vector>
 
-#if defined(_OPENMP)
-#include <omp.h>
-#endif
-
 struct sparse_row_less
 {
     const mwIndex *row_ptr;
@@ -42,13 +38,6 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
 
     // Validate input arguments
     grumble(nlhs,nrhs,prhs);
-
-#ifdef _OPENMP
-
-    // Do what Matlab says
-    omp_set_dynamic(0);
-
-#endif
 
     // Get input matrix descriptor and dimensions
     const mxArray *A=prhs[0];
@@ -113,87 +102,8 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
         row_less.col_idx=col_idx.data();
         row_less.values=values.data();
 
-#if defined(_OPENMP)
-
-        // Get OpenMP team size
-        const int max_threads=omp_get_max_threads();
-
-        if ((max_threads>1)&&(n_rows>1))
-        {
-            // Cap the team at one thread per row
-            int n_threads=max_threads;
-
-            if ((mwSize)n_threads>n_rows)
-                n_threads=(int)n_rows;
-
-            // Split the row permutation into balanced blocks
-            std::vector<mwIndex> run_start((mwIndex)n_threads+1);
-            const mwIndex chunk=(mwIndex)(n_rows/(mwSize)n_threads);
-            const mwIndex rem=(mwIndex)(n_rows%(mwSize)n_threads);
-            mwIndex run_pos=0;
-
-            for (int n=0;n<n_threads;n++)
-            {
-                run_start[(mwIndex)n]=run_pos;
-                run_pos+=chunk+((n<(int)rem)?1:0);
-            }
-
-            run_start[(mwIndex)n_threads]=run_pos;
-
-            // Sort local blocks in parallel
-#pragma omp parallel for schedule(static) num_threads(n_threads)
-            for (int n=0;n<n_threads;n++)
-                std::sort(order.begin()+run_start[(mwIndex)n],
-                          order.begin()+run_start[(mwIndex)n+1],row_less);
-
-            // Allocate merge workspace
-            std::vector<mwIndex> buffer(n_rows);
-            std::vector<mwIndex> *src=&order;
-            std::vector<mwIndex> *dst=&buffer;
-
-            // Merge sorted blocks using a reduced GNU-style sort/merge schedule
-            for (int run_len=1;run_len<n_threads;run_len*=2)
-            {
-                const int pair_count=(n_threads+2*run_len-1)/(2*run_len);
-
-#pragma omp parallel for schedule(static) num_threads(n_threads)
-                for (int pair=0;pair<pair_count;pair++)
-                {
-                    const int left_run=pair*2*run_len;
-                    const int mid_run=std::min(left_run+run_len,n_threads);
-                    const int right_run=std::min(left_run+2*run_len,n_threads);
-                    const mwIndex left=run_start[(mwIndex)left_run];
-                    const mwIndex mid=run_start[(mwIndex)mid_run];
-                    const mwIndex right=run_start[(mwIndex)right_run];
-
-                    if (mid<right)
-                        std::merge(src->begin()+left,src->begin()+mid,
-                                   src->begin()+mid,src->begin()+right,
-                                   dst->begin()+left,row_less);
-                    else
-                        std::copy(src->begin()+left,src->begin()+right,
-                                  dst->begin()+left);
-                }
-
-                std::swap(src,dst);
-            }
-
-            // Copy the final pass back if it ended in the workspace
-            if (src!=&order)
-                std::copy(src->begin(),src->end(),order.begin());
-        }
-        else
-        {
-            // Use standard introsort when there is no useful OpenMP team
-            std::sort(order.begin(),order.end(),row_less);
-        }
-
-#else
-
-        // Use standard introsort otherwise
+        // Sort rows with standard introsort
         std::sort(order.begin(),order.end(),row_less);
-
-#endif
 
         // Allocate output permutation vector
         plhs[0]=mxCreateDoubleMatrix(n_rows,1,mxREAL);
@@ -207,11 +117,8 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
         if ((n_rows!=0)&&(idx==nullptr))
             mexErrMsgIdAndTxt("Spinach:spsortrows:dataOut","Failed to access output index data.");
 
-#ifdef _OPENMP
-#pragma omp parallel for schedule(static)
-#endif
-        for (mwSignedIndex n=0;n<(mwSignedIndex)n_rows;n++)
-            idx[(mwIndex)n]=(double)(order[(mwIndex)n]+1);
+        for (mwIndex n=0;n<(mwIndex)n_rows;n++)
+            idx[n]=(double)(order[n]+1);
     }
     catch (const std::bad_alloc&)
     {
@@ -322,11 +229,6 @@ static void grumble(int nlhs,int nrhs,const mxArray *prhs[])
 
     const mwSize n_rows=mxGetM(A);
     const mwSize n_cols=mxGetN(A);
-    const mwSize row_lim=(mwSize)std::numeric_limits<mwSignedIndex>::max();
-
-    if (n_rows>row_lim)
-        mexErrMsgIdAndTxt("Spinach:spsortrows:rowLim","A has too many rows for index conversion.");
-
     const mwSize max_elem=std::numeric_limits<mwSize>::max();
 
     if ((n_cols!=0)&&(n_rows>(max_elem/n_cols)))

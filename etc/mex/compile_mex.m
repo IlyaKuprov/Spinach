@@ -20,6 +20,10 @@ mex('-R2018a','-O','-DNDBUG','COMPFLAGS=$COMPFLAGS','LINKFLAGS=$LINKFLAGS',...
 mex('-R2018a','-O','-DNDBUG','COMPFLAGS=$COMPFLAGS','LINKFLAGS=$LINKFLAGS',...
     [P '/kernel/eigenfields/cubic_roots.cpp'],'-outdir',[P '/kernel/eigenfields']);
 
+% Compile sparse row sorter
+mex('-R2018a','-O','-DNDEBUG',...
+    [P '/kernel/indexing/spsortrows.cpp'],'-outdir',[P '/kernel/indexing']);
+
 end
 
 % Audiophiles don't use their equip-
@@ -28,4 +32,3 @@ end
 % their equipment.
 %
 % Alan Parsons
-

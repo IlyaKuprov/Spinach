@@ -33,4 +33,31 @@ if (~isnumeric(A))||(~issparse(A))||(~isreal(A))||...
 end
 end
 
+% Nihilistic Password Security Questions
+%
+%   What is the name of your least favorite child?
+%
+%   In what year did you abandon your dreams?
+%
+%   What is the maiden name of your father's mistress?
+% 
+%   At what age did your childhood pet run away?
+%
+%   What was the name of your favorite unpaid internship?
+%
+%   In what city did you first experience ennui?
+%
+%   What is your ex-wife's newest last name?
+%
+%   What sports team do you fetishise to avoid meaningful discussion with others?
+%
+%   What is the name of your favorite cancelled TV show?
+%
+%   What was the middle name of your first rebound?
+%
+%   On what street did you lose your childlike sense of wonder?
+%
+%   When did you stop trying?
+%
+% Soheil Rezayazdi
 

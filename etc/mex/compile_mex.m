@@ -12,15 +12,19 @@ function compile_mex() % #NGRUM #NHEAD
 % Get own location
 P=mfilename('fullpath'); P=P(1:(end-20));
 
-% Compile with case-specific options
+% Lorentzian convolution
 mex('-R2018a','-O','-DNDBUG','COMPFLAGS=$COMPFLAGS','LINKFLAGS=$LINKFLAGS',...
     [P '/kernel/line_shapes/lorentzcon.cpp'],'-outdir',[P '/kernel/line_shapes']);
+
+% Gaussian convolution
 mex('-R2018a','-O','-DNDBUG','COMPFLAGS=$COMPFLAGS','LINKFLAGS=$LINKFLAGS',...
     [P '/kernel/line_shapes/gausscon.cpp'],'-outdir',[P '/kernel/line_shapes']);
+
+% Cubic polynomial roots
 mex('-R2018a','-O','-DNDBUG','COMPFLAGS=$COMPFLAGS','LINKFLAGS=$LINKFLAGS',...
     [P '/kernel/eigenfields/cubic_roots.cpp'],'-outdir',[P '/kernel/eigenfields']);
 
-% Compile sparse row sorter
+% Sparse double row sorter
 mex('-R2018a','-O','-DNDEBUG',...
     [P '/kernel/indexing/spsortrows.cpp'],'-outdir',[P '/kernel/indexing']);
 

@@ -1,6 +1,7 @@
 % Permutation group database. Returns complete data for permutation
-% groups. The following group names are available: S2, S3, S4, S4A
-% (the largest abelian subgroup of S4), S5, S6.  Syntax:
+% groups. The following group names are available: S2, S3, S4,
+% S4A, S5, S6, S6A, S8A. The options ending in A are the
+% largest real-valued-character Abelian subgroups. Syntax:
 %
 %                      group=perm_group(group_name)
 %
@@ -75,7 +76,7 @@ switch group_name
         group.class_characters=[1  1  1;
                                 1  1 -1;
                                 2 -1  0];
-                            
+
     case 'S4'
 
         group.name='S4 permutation group (non-Abelian)';
@@ -152,7 +153,7 @@ switch group_name
                                 6  0  0 -2  0  0  1;
                                 5  1 -1  1 -1  1  0;
                                 5 -1 -1  1  1 -1  0];
-                            
+
     case 'S6'
 
         group.name='S6 permutation group (non-Abelian)';
@@ -247,6 +248,72 @@ switch group_name
                                 5   1 -1  1 -1  1  0 -3  2 -1  0;
                                 5  -1 -1  1  1 -1  0  3  2 -1  0;
                                 16  0 -2  0  0  0  1  0 -2  0  0];
+
+    case 'S6A'
+
+        group.name='Largest real-valued-character Abelian subgroup of S6 permutation group';
+        group.order=8;
+        group.nclasses=8;
+        group.class_sizes=[1 1 1 1 1 1 1 1];
+        group.class{1}=[1 2 3 4 5 6];
+        group.class{2}=[2 1 4 3 5 6];
+        group.class{3}=[3 4 1 2 5 6];
+        group.class{4}=[4 3 2 1 5 6];
+        group.class{5}=[1 2 3 4 6 5];
+        group.class{6}=[2 1 4 3 6 5];
+        group.class{7}=[3 4 1 2 6 5];
+        group.class{8}=[4 3 2 1 6 5];
+        group.n_irreps=8;
+        group.irrep_dims=[1 1 1 1 1 1 1 1];
+        group.class_characters=[1  1  1  1  1  1  1  1;
+                                1  1 -1 -1  1  1 -1 -1;
+                                1 -1  1 -1  1 -1  1 -1;
+                                1 -1 -1  1  1 -1 -1  1;
+                                1  1  1  1 -1 -1 -1 -1;
+                                1  1 -1 -1 -1 -1  1  1;
+                                1 -1  1 -1 -1  1 -1  1;
+                                1 -1 -1  1 -1  1  1 -1];
+
+    case 'S8A'
+
+        group.name='Largest real-valued-character Abelian subgroup of S8 permutation group';
+        group.order=16;
+        group.nclasses=16;
+        group.class_sizes=[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1];
+        group.class{1}=[1 2 3 4 5 6 7 8];
+        group.class{2}=[2 1 4 3 5 6 7 8];
+        group.class{3}=[3 4 1 2 5 6 7 8];
+        group.class{4}=[4 3 2 1 5 6 7 8];
+        group.class{5}=[1 2 3 4 6 5 8 7];
+        group.class{6}=[2 1 4 3 6 5 8 7];
+        group.class{7}=[3 4 1 2 6 5 8 7];
+        group.class{8}=[4 3 2 1 6 5 8 7];
+        group.class{9}=[1 2 3 4 7 8 5 6];
+        group.class{10}=[2 1 4 3 7 8 5 6];
+        group.class{11}=[3 4 1 2 7 8 5 6];
+        group.class{12}=[4 3 2 1 7 8 5 6];
+        group.class{13}=[1 2 3 4 8 7 6 5];
+        group.class{14}=[2 1 4 3 8 7 6 5];
+        group.class{15}=[3 4 1 2 8 7 6 5];
+        group.class{16}=[4 3 2 1 8 7 6 5];
+        group.n_irreps=16;
+        group.irrep_dims=[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1];
+        group.class_characters=[1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1;
+                                1  1 -1 -1  1  1 -1 -1  1  1 -1 -1  1  1 -1 -1;
+                                1 -1  1 -1  1 -1  1 -1  1 -1  1 -1  1 -1  1 -1;
+                                1 -1 -1  1  1 -1 -1  1  1 -1 -1  1  1 -1 -1  1;
+                                1  1  1  1  1  1  1  1 -1 -1 -1 -1 -1 -1 -1 -1;
+                                1  1 -1 -1  1  1 -1 -1 -1 -1  1  1 -1 -1  1  1;
+                                1 -1  1 -1  1 -1  1 -1 -1  1 -1  1 -1  1 -1  1;
+                                1 -1 -1  1  1 -1 -1  1 -1  1  1 -1 -1  1  1 -1;
+                                1  1  1  1 -1 -1 -1 -1  1  1  1  1 -1 -1 -1 -1;
+                                1  1 -1 -1 -1 -1  1  1  1  1 -1 -1 -1 -1  1  1;
+                                1 -1  1 -1 -1  1 -1  1  1 -1  1 -1 -1  1 -1  1;
+                                1 -1 -1  1 -1  1  1 -1  1 -1 -1  1 -1  1  1 -1;
+                                1  1  1  1 -1 -1 -1 -1 -1 -1 -1 -1  1  1  1  1;
+                                1  1 -1 -1 -1 -1  1  1 -1 -1  1  1  1  1 -1 -1;
+                                1 -1  1 -1 -1  1 -1  1 -1  1 -1  1  1 -1  1 -1;
+                                1 -1 -1  1 -1  1  1 -1 -1  1  1 -1  1 -1 -1  1];
                                             
     otherwise
         

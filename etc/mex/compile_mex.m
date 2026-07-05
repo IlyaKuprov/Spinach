@@ -28,6 +28,10 @@ mex('-R2018a','-O','-DNDBUG','COMPFLAGS=$COMPFLAGS','LINKFLAGS=$LINKFLAGS',...
 mex('-R2018a','-O','-DNDEBUG',...
     [P '/kernel/indexing/spsortrows.cpp'],'-outdir',[P '/kernel/indexing']);
 
+% Sparse double unique columns
+mex('-R2018a','-O','-DNDEBUG',...
+    [P '/kernel/indexing/spunicols.cpp'],'-outdir',[P '/kernel/indexing']);
+
 end
 
 % Audiophiles don't use their equip-

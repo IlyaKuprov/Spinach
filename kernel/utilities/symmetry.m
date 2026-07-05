@@ -305,7 +305,7 @@ if isfield(bas,'sym_group')
     
     % Check the group names
     for n=1:length(bas.sym_group)
-        if ~ismember(bas.sym_group{n},{'S2','S3','S4','S4A','S5','S6'})
+        if ~ismember(bas.sym_group{n},{'S2','S3','S3A','S4','S4A','S5','S5A','S6','S6A'})
             error('the group requested in bas.sym_group is not available.');
         end
     end

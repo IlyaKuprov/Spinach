@@ -1,6 +1,7 @@
 % Permutation group database. Returns complete data for permutation
-% groups. The following group names are available: S2, S3, S4, S4A
-% (the largest abelian subgroup of S4), S5, S6.  Syntax:
+% groups. The following group names are available: S2, S3, S3A,
+% S4, S4A, S5, S5A, S6, S6A. The options ending in A are the
+% largest real-valued-character Abelian subgroups. Syntax:
 %
 %                      group=perm_group(group_name)
 %
@@ -75,6 +76,19 @@ switch group_name
         group.class_characters=[1  1  1;
                                 1  1 -1;
                                 2 -1  0];
+
+    case 'S3A'
+
+        group.name='Largest real-valued-character Abelian subgroup of S3 permutation group';
+        group.order=2;
+        group.nclasses=2;
+        group.class_sizes=[1 1];
+        group.class{1}=[1 2 3];
+        group.class{2}=[2 1 3];
+        group.n_irreps=2;
+        group.irrep_dims=[1 1];
+        group.class_characters=[1  1;
+                                1 -1];
                             
     case 'S4'
 
@@ -152,6 +166,23 @@ switch group_name
                                 6  0  0 -2  0  0  1;
                                 5  1 -1  1 -1  1  0;
                                 5 -1 -1  1  1 -1  0];
+
+    case 'S5A'
+
+        group.name='Largest real-valued-character Abelian subgroup of S5 permutation group';
+        group.order=4;
+        group.nclasses=4;
+        group.class_sizes=[1 1 1 1];
+        group.class{1}=[1 2 3 4 5];
+        group.class{2}=[2 1 4 3 5];
+        group.class{3}=[3 4 1 2 5];
+        group.class{4}=[4 3 2 1 5];
+        group.n_irreps=4;
+        group.irrep_dims=[1 1 1 1];
+        group.class_characters=[1  1  1  1;
+                                1  1 -1 -1;
+                                1 -1  1 -1;
+                                1 -1 -1  1];
                             
     case 'S6'
 
@@ -247,6 +278,31 @@ switch group_name
                                 5   1 -1  1 -1  1  0 -3  2 -1  0;
                                 5  -1 -1  1  1 -1  0  3  2 -1  0;
                                 16  0 -2  0  0  0  1  0 -2  0  0];
+
+    case 'S6A'
+
+        group.name='Largest real-valued-character Abelian subgroup of S6 permutation group';
+        group.order=8;
+        group.nclasses=8;
+        group.class_sizes=[1 1 1 1 1 1 1 1];
+        group.class{1}=[1 2 3 4 5 6];
+        group.class{2}=[2 1 4 3 5 6];
+        group.class{3}=[3 4 1 2 5 6];
+        group.class{4}=[4 3 2 1 5 6];
+        group.class{5}=[1 2 3 4 6 5];
+        group.class{6}=[2 1 4 3 6 5];
+        group.class{7}=[3 4 1 2 6 5];
+        group.class{8}=[4 3 2 1 6 5];
+        group.n_irreps=8;
+        group.irrep_dims=[1 1 1 1 1 1 1 1];
+        group.class_characters=[1  1  1  1  1  1  1  1;
+                                1  1 -1 -1  1  1 -1 -1;
+                                1 -1  1 -1  1 -1  1 -1;
+                                1 -1 -1  1  1 -1 -1  1;
+                                1  1  1  1 -1 -1 -1 -1;
+                                1  1 -1 -1 -1 -1  1  1;
+                                1 -1  1 -1 -1  1 -1  1;
+                                1 -1 -1  1 -1  1  1 -1];
                                             
     otherwise
         

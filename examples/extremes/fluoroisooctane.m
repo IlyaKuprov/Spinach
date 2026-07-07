@@ -39,16 +39,24 @@ inter.coupling.scalar{12,16}= 6.0;
 inter.coupling.scalar{12,17}= 6.0;
 inter.coupling.scalar{12,18}= 6.0;
 
-% Smaller J-couplings
-inter.coupling.scalar{1,11}= 1.0;
-inter.coupling.scalar{2,11}= 1.0;
-inter.coupling.scalar{3,11}= 1.0;
-inter.coupling.scalar{4,11}= 1.0;
-inter.coupling.scalar{5,11}= 1.0;
-inter.coupling.scalar{6,11}= 1.0;
-inter.coupling.scalar{7,11}= 1.0;
-inter.coupling.scalar{8,11}= 1.0;
-inter.coupling.scalar{9,11}= 1.0;
+% Smaller J-couplings, tert-butyl
+inter.coupling.scalar{1,11}=1.0;
+inter.coupling.scalar{2,11}=1.0;
+inter.coupling.scalar{3,11}=1.0;
+inter.coupling.scalar{4,11}=1.0;
+inter.coupling.scalar{5,11}=1.0;
+inter.coupling.scalar{6,11}=1.0;
+inter.coupling.scalar{7,11}=1.0;
+inter.coupling.scalar{8,11}=1.0;
+inter.coupling.scalar{9,11}=1.0;
+
+% Smaller J-couplings, isopropyl
+inter.coupling.scalar{13,11}=1.0;
+inter.coupling.scalar{14,11}=1.0;
+inter.coupling.scalar{15,11}=1.0;
+inter.coupling.scalar{16,11}=1.0;
+inter.coupling.scalar{17,11}=1.0;
+inter.coupling.scalar{18,11}=1.0;
 
 % Basis set
 bas.formalism='zeeman-hilb';

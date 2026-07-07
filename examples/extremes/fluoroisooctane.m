@@ -29,14 +29,15 @@ inter.zeeman.scalar={0.994, 0.994, 0.994, ...
 
 % Larger J-couplings
 inter.coupling.scalar=cell(18,18);
-inter.coupling.scalar{10,11}= 48.2;
-inter.coupling.scalar{11,12}= 23.6;
-inter.coupling.scalar{12,13}=  6.0;
-inter.coupling.scalar{12,14}=  6.0;
-inter.coupling.scalar{12,15}=  6.0;
-inter.coupling.scalar{12,16}=  6.0;
-inter.coupling.scalar{12,17}=  6.0;
-inter.coupling.scalar{12,18}=  6.0;
+inter.coupling.scalar{10,11}=48.2;
+inter.coupling.scalar{11,12}=23.6;
+inter.coupling.scalar{10,12}= 6.5;
+inter.coupling.scalar{12,13}= 6.0;
+inter.coupling.scalar{12,14}= 6.0;
+inter.coupling.scalar{12,15}= 6.0;
+inter.coupling.scalar{12,16}= 6.0;
+inter.coupling.scalar{12,17}= 6.0;
+inter.coupling.scalar{12,18}= 6.0;
 
 % Smaller J-couplings
 inter.coupling.scalar{1,11}= 1.0;
@@ -48,7 +49,6 @@ inter.coupling.scalar{6,11}= 1.0;
 inter.coupling.scalar{7,11}= 1.0;
 inter.coupling.scalar{8,11}= 1.0;
 inter.coupling.scalar{9,11}= 1.0;
-inter.coupling.scalar{10,12}=1.4;
 
 % Basis set
 bas.formalism='zeeman-hilb';

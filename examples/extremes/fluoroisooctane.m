@@ -29,15 +29,6 @@ inter.zeeman.scalar={0.994, 0.994, 0.994, ...
 
 % Larger J-couplings
 inter.coupling.scalar=cell(18,18);
-inter.coupling.scalar{1,2}=  -14.4; 
-inter.coupling.scalar{1,3}=  -14.4;
-inter.coupling.scalar{2,3}=  -14.4;
-inter.coupling.scalar{4,5}=  -14.4;
-inter.coupling.scalar{4,6}=  -14.4;
-inter.coupling.scalar{5,6}=  -14.4;
-inter.coupling.scalar{7,8}=  -14.4;
-inter.coupling.scalar{7,9}=  -14.4;
-inter.coupling.scalar{8,9}=  -14.4;
 inter.coupling.scalar{10,11}= 48.2;
 inter.coupling.scalar{11,12}= 23.6;
 inter.coupling.scalar{12,13}=  6.0;
@@ -46,12 +37,6 @@ inter.coupling.scalar{12,15}=  6.0;
 inter.coupling.scalar{12,16}=  6.0;
 inter.coupling.scalar{12,17}=  6.0;
 inter.coupling.scalar{12,18}=  6.0;
-inter.coupling.scalar{13,14}=-14.4;
-inter.coupling.scalar{13,15}=-14.4;
-inter.coupling.scalar{14,15}=-14.4;
-inter.coupling.scalar{16,17}=-14.4;
-inter.coupling.scalar{16,18}=-14.4;
-inter.coupling.scalar{17,18}=-14.4;
 
 % Smaller J-couplings
 inter.coupling.scalar{1,11}= 1.0;
@@ -68,8 +53,8 @@ inter.coupling.scalar{10,12}=1.4;
 % Basis set
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
-bas.sym_group={'S3','S3'};
-bas.sym_spins={[13 14 15],[16 17 18]};
+bas.sym_group={'S3','S3','S3'};
+bas.sym_spins={[1 2 3],[4 5 6],[7 8 9]};
 
 % Spinach housekeeping 
 spin_system=create(sys,inter); 

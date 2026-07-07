@@ -201,7 +201,7 @@ else
                 hit_index=(sum(abs(coeff_matrix),1)==0); coeff_matrix(:,hit_index)=[];
                 
                 % Remove identical columns
-                coeff_matrix=unique(coeff_matrix','rows')';
+                coeff_matrix=spunicols(coeff_matrix);
                 
                 % Decide how to proceed
                 if size(coeff_matrix,2)==0
@@ -214,19 +214,25 @@ else
                     overlap=logical(coeff_matrix'*coeff_matrix);
                     
                     % Find non-orthogonal subspaces
-                    member_states=scomponents(overlap); n_subspaces=max(member_states);
+                    member_states=scomponents(overlap); 
+                    n_subspaces=max(member_states);
                     
-                    % Preallocate the result
+                    % Pull subspaces
                     orth_coeff_matrix=cell(1,n_subspaces);
-                    
-                    % Fill the result
                     for k=1:n_subspaces
-                        vectors=full(coeff_matrix(:,member_states==k));
-                        vectors=clean_up(spin_system,orth(vectors),spin_system.tols.liouv_zero);
+                        orth_coeff_matrix{k}=coeff_matrix(:,member_states==k);
+                    end
+                    
+                    % Orthogonalise
+                    parfor k=1:n_subspaces
+                        vectors=full(orth_coeff_matrix{k});
+                        vectors=orth(vectors);
+                        vectors=clean_up(spin_system,vectors,...
+                                         spin_system.tols.liouv_zero);
                         orth_coeff_matrix{k}=sparse(vectors);
                     end
                     
-                    % Build the matrix
+                    % Build the coefficient matrix
                     coeff_matrix=cell2mat(orth_coeff_matrix);
                     
                 else

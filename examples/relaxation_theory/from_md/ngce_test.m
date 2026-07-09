@@ -48,19 +48,22 @@ parfor n=1:size(eulers,1)
 end
 
 % Get the GCE relaxation matrix
-R_gce=ngce(spin_system,H0,H1,dt,tau_c,1e-3);
+[R_gce,dR_gce]=ngce(spin_system,H0,H1,dt,tau_c,1e-3);
 
 % Get the answers to the user
 disp('Relaxation superoperator, numerical'); disp(full(R_gce));
+disp('Relaxation superoperator standard deviation of the mean'); disp(full(dR_gce));
 disp('Relaxation superoperator, analytical'); disp(full(R_red));
 
 % Do diagnostic plotting
 kfigure();
 gce_rates=diag(R_gce);
+dR_rates=diag(dR_gce);
 red_rates=diag(R_red);
-min_rate=min([R_gce; R_red]);
-max_rate=max([R_gce; R_red]);
-plot(gce_rates,red_rates,'ro'); hold on;
+min_rate=min([gce_rates-dR_rates; red_rates]);
+max_rate=max([gce_rates+dR_rates; red_rates]);
+errorbar(gce_rates,red_rates,dR_rates,'horizontal',...
+         'LineStyle','none','Marker','o','Color','r'); hold on;
 plot([min_rate max_rate],[min_rate max_rate],'b-');
 axis tight; box on; kgrid;
 kxlabel('numerical relaxation rates');

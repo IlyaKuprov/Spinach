@@ -61,7 +61,7 @@ current_plot=1;
 try
     set(groot,'CurrentFigure',1); clf;
 catch
-    figure(1); set(groot,'CurrentFigure',1);
+    kfigure; set(groot,'CurrentFigure',1);
     scale_figure([0.90*n_plots_y 0.70*n_plots_x]);
 end
 

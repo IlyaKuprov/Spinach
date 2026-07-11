@@ -12,6 +12,10 @@
 %                    linear rule if two matrices {left, right} 
 %                    are supplied, piecewise-quadratic if three
 %                    matrices {left, midpoint, right} are given.
+%                    If L is assembled manually from Hamiltonian
+%                    commutation superoperator H, relaxation
+%                    superoperator R, and kinetics superoperator
+%                    K, use L=H+1i*R+1i*K
 %
 %                    State-dependent evolution generators are 
 %                    supported: if L{1} is a function handle (see

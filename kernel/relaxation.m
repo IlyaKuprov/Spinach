@@ -13,7 +13,10 @@
 %                    
 % Outputs:
 %
-%     R             - relaxation superoperator
+%     R             - relaxation superoperator. If a Liouvillian is
+%                     assembled manually, this dissipative superoperator
+%                     must enter as 1i*R, for example
+%                     L=H+1i*R+1i*K; do not use H+R+K.
 %
 % Note: a variety of relaxation theories are supported, see the relax-
 %       ation theory parameters section of the online manual.

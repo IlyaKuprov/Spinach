@@ -19,8 +19,8 @@
 %       see the chemical kinetics parameters section of the onli-
 %       ne manual.
 %
-% Note: Spinach context functions include kinetics superoperators
-%       into the total Liovillian automatically.
+% Note: Spinach context functions include relaxation and kinetics
+%       superoperators into the total Liovillian automatically.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de

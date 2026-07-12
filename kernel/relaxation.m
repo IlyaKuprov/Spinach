@@ -18,6 +18,9 @@
 % Note: a variety of relaxation theories are supported, see the relax-
 %       ation theory parameters section of the online manual.
 %
+% Note: Spinach context functions include relaxation and kinetics
+%       superoperators into the total Liovillian automatically.
+%
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 % alexander.karabanov@nottingham.ac.uk

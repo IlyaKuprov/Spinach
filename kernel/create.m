@@ -2559,8 +2559,8 @@ if isfield(inter,'chem')
         if any(size(inter.chem.rates)~=numel(inter.chem.parts))
             error('both dimensions of inter.chem.rates matrix must be equal to the number of chemical subsystems.');
         end
-        if ~all(abs(sum(inter.chem.rates,1))<10*eps('double'))
-            error('inter.chem.rates violates conservation of matter: column sums must be zero.');
+        if ~all(abs(sum(inter.chem.rates,1))<10*eps('double')*norm(inter.chem.rates,1))
+            error('inter.chem.rates violates conservation of matter: column sums must be negligible.');
         end
     end
     

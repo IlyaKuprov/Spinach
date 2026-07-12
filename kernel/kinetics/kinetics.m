@@ -13,7 +13,10 @@
 %
 % Outputs:
 %
-%    K            -  kinetics superoperator
+%    K            -  kinetics superoperator. If a Liouvillian is
+%                    assembled manually, this dissipative super-
+%                    operator must enter as 1i*K, for example 
+%                    L=H+1i*R+1i*K
 %
 % Note: a large variety of chemical reaction models is supported,
 %       see the chemical kinetics parameters section of the onli-

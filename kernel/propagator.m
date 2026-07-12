@@ -5,7 +5,10 @@
 %
 % Parameters:
 %
-%    L          -  Hamiltonian or Liouvillian matrix
+%    L          -  Hamiltonian or Liouvillian matrix. If L is
+%                  assembled manually from Hamiltonian commutation
+%                  superoperator H, relaxation superoperator R,
+%                  and kinetics superoperator K, use L=H+1i*R+1i*K
 %
 %    timestep   -  propagation time step
 %

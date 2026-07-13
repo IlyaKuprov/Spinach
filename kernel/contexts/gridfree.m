@@ -68,7 +68,7 @@
 %       currently supported.
 %
 % Note: perturbative corrections to the rotating frame transformation are 
-%       not supported - use singlerot.m instead.
+%       not supported - use singlerot.m if you need them.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -102,6 +102,14 @@ if numel(Q)>2, error('giant spin model is not supported in this module.'); end
 
 % Apply offsets
 H=frqoffset(spin_system,H,parameters);
+
+% Add user-specified operators
+if isfield(parameters,'add_terms')
+    for n=1:numel(parameters.add_terms)
+        H=H+parameters.add_terms{n}{1}*...
+            parameters.add_terms{n}{2};
+    end
+end
 
 % Compute isotropic thermal equilibrium
 if ismember('iso_eq',parameters.needs)

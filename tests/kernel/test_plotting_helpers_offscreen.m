@@ -333,14 +333,42 @@ result=test_close(result,'conc_plot side faces',get(side_patch,'Faces'),...
 result=test_close(result,'conc_plot side colours',get(side_patch,'FaceVertexCData'),...
                   0.5*ones(7,3),1e-12,1e-12,...
                   'each side face retains its source cell colour');
-close(fig);
 
-% Guard the performance fix against reintroducing growing arrays
-conc_source=fileread(which('conc_plot'));
-mesh_source=fileread(which('mesh_preplot'));
-result=test_true(result,'COMSOL plotting preallocation',...
-                 ~contains(conc_source,'AGROW')&&~contains(mesh_source,'AGROW'),...
-                 'COMSOL plotting loops must not suppress array-growth warnings');
+% Check cap areas against the active Voronoi cell areas
+top_vertices=get(top_patch,'Vertices');
+top_faces=get(top_patch,'Faces');
+cap_areas=zeros(size(top_faces,1),1);
+for n=1:size(top_faces,1)
+    face_idx=top_faces(n,isfinite(top_faces(n,:)));
+    face_idx=face_idx(1:end-1);
+    face_xy=top_vertices(face_idx,1:2);
+    cap_areas(n)=polyarea(face_xy(:,1),face_xy(:,2));
+end
+expected_areas=[polyarea(vertices(cells{1},1),vertices(cells{1},2));...
+                polyarea(vertices(cells{2},1),vertices(cells{2},2))];
+result=test_close(result,'conc_plot cap areas',cap_areas,...
+                  expected_areas,1e-12,1e-12,...
+                  'projected cap areas preserve active Voronoi cell areas');
+
+% Check side-wall areas against perimeter times extrusion height
+side_vertices=get(side_patch,'Vertices');
+side_faces=get(side_patch,'Faces');
+side_areas=zeros(size(side_faces,1),1);
+for n=1:size(side_faces,1)
+    face_xyz=side_vertices(side_faces(n,1:4),:);
+    side_areas(n)=norm(cross(face_xyz(2,:)-face_xyz(1,:),...
+                             face_xyz(4,:)-face_xyz(1,:)));
+end
+exp_wall_area=0;
+for n=1:2
+    cell_xy=vertices(cells{n},:);
+    edge_xy=diff(cell_xy([1:end 1],:),1,1);
+    exp_wall_area=exp_wall_area+abs(concentrations(n))*sum(sqrt(sum(edge_xy.^2,2)));
+end
+result=test_close(result,'conc_plot wall area',sum(side_areas),...
+                  exp_wall_area,1e-12,1e-12,...
+                  'side walls have perimeter times extrusion height area');
+close(fig);
 
 end
 

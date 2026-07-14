@@ -78,31 +78,36 @@ else
 
 end
 
-% Loop over cells
-V=zeros(0,3); patch_idx=0; FRGB=ones(0,3);
-F=nan(0,spin_system.mesh.vor.max_cell_size+1);
-for n=1:spin_system.mesh.vor.ncells
+% Find cells with significant bar heights
+active_cells=find(abs(conc)>1e-3*diff(spin_system.mesh.zext));
+cell_sizes=cellfun(@numel,spin_system.mesh.vor.cells(active_cells));
+total_vertices=sum(cell_sizes);
 
-    % For significant bar heights
-    if abs(conc(n))>1e-3*diff(spin_system.mesh.zext)
+% Preallocate cap geometry and colours
+V=zeros(total_vertices,3);
+F=nan(numel(active_cells),spin_system.mesh.vor.max_cell_size+1);
+FRGB=zeros(numel(active_cells),3);
+vertex_offset=0;
 
-        % Get the vertices of the Voronoi cell
-        vor_cell_x=spin_system.mesh.vor.vertices(spin_system.mesh.vor.cells{n},1);
-        vor_cell_y=spin_system.mesh.vor.vertices(spin_system.mesh.vor.cells{n},2);
-        vor_cell_z=conc(n)*ones(size(vor_cell_x));
-        V=[V; vor_cell_x(:) vor_cell_y(:) vor_cell_z(:)]; %#ok<AGROW> 
-        
-        % Build the face connectivity index
-        F_current=nan([1 spin_system.mesh.vor.max_cell_size+1]);
-        new_face=[1:numel(vor_cell_z) 1]+patch_idx;
-        F_current(1:numel(new_face))=new_face;
-        F=[F; F_current]; patch_idx=new_face(end-1);      %#ok<AGROW>
+% Build lids and bottoms
+for m=1:numel(active_cells)
 
-        % Add the colour spec
-        FRGB=[FRGB; RGB(n,:)];                            %#ok<AGROW>
-        
-    end
-    
+    % Get the vertices of the Voronoi cell
+    n=active_cells(m); nvert=cell_sizes(m);
+    vor_cell_x=spin_system.mesh.vor.vertices(spin_system.mesh.vor.cells{n},1);
+    vor_cell_y=spin_system.mesh.vor.vertices(spin_system.mesh.vor.cells{n},2);
+    vor_cell_z=conc(n)*ones(size(vor_cell_x));
+    vertex_range=vertex_offset+(1:nvert);
+    V(vertex_range,:)=[vor_cell_x(:) vor_cell_y(:) vor_cell_z(:)];
+
+    % Build the face connectivity index
+    face=[1:nvert 1]+vertex_offset;
+    F(m,1:numel(face))=face;
+
+    % Add the colour spec and advance the vertex offset
+    FRGB(m,:)=RGB(n,:);
+    vertex_offset=vertex_offset+nvert;
+
 end
 
 % Draw lids and bottoms of the bars as a multifaceted patch
@@ -113,42 +118,37 @@ patch('Faces',F,'Vertices',V,'FaceColor','flat',...
       'FaceVertexCData',FRGB,'EdgeColor','black',...
       'LineWidth',0.125,'LineJoin','round');
 
-% Loop over cells
-V=zeros(0,3); patch_idx=0; 
-F=nan(0,5); FRGB=ones(0,3);
-for n=1:spin_system.mesh.vor.ncells
+% Preallocate side geometry and colours
+V=zeros(2*total_vertices,3);
+F=zeros(total_vertices,5);
+FRGB=zeros(total_vertices,3);
+vertex_offset=0; face_offset=0;
 
-    % For significant bar heights
-    if abs(conc(n))>1e-3*diff(spin_system.mesh.zext)
+% Build sides
+for m=1:numel(active_cells)
 
-        % Get the vertices of the Voronoi cell
-        vor_cell_x=spin_system.mesh.vor.vertices(spin_system.mesh.vor.cells{n},1);
-        vor_cell_y=spin_system.mesh.vor.vertices(spin_system.mesh.vor.cells{n},2);
-        vor_cell_z=conc(n)*ones(size(vor_cell_x));
-        V=[V; vor_cell_x(:) vor_cell_y(:)   vor_cell_z(:); 
-              vor_cell_x(:) vor_cell_y(:) 0*vor_cell_z(:)]; %#ok<AGROW> 
-        nvert=numel(vor_cell_z);
-        
-        % Build the face connectivity index
-        F_current=nan(nvert,5); FRGB_current=nan(nvert,3);
-        for k=1:(nvert-1)
+    % Get the vertices of the Voronoi cell
+    n=active_cells(m); nvert=cell_sizes(m);
+    vor_cell_x=spin_system.mesh.vor.vertices(spin_system.mesh.vor.cells{n},1);
+    vor_cell_y=spin_system.mesh.vor.vertices(spin_system.mesh.vor.cells{n},2);
+    vor_cell_z=conc(n)*ones(size(vor_cell_x));
+    top_range=vertex_offset+(1:nvert);
+    bottom_range=vertex_offset+nvert+(1:nvert);
+    V(top_range,:)=[vor_cell_x(:) vor_cell_y(:) vor_cell_z(:)];
+    V(bottom_range,:)=[vor_cell_x(:) vor_cell_y(:) zeros(nvert,1)];
 
-            % Build each wall
-            F_current(k,:)=[k k+1 k+nvert+1 k+nvert k]+patch_idx;
+    % Build all walls for this cell
+    local_idx=(1:nvert)';
+    next_idx=[(2:nvert)';1];
+    face_range=face_offset+(1:nvert);
+    F(face_range,:)=[local_idx next_idx next_idx+nvert ...
+                     local_idx+nvert local_idx]+vertex_offset;
+    FRGB(face_range,:)=repmat(RGB(n,:),nvert,1);
 
-            % Add the colour spec
-            FRGB_current(k,:)=RGB(n,:);
+    % Advance the vertex and face offsets
+    vertex_offset=vertex_offset+2*nvert;
+    face_offset=face_offset+nvert;
 
-        end
-        F_current(nvert,:)=[nvert 1 nvert+1 2*nvert nvert]+patch_idx;
-        FRGB_current(nvert,:)=RGB(n,:);
-        
-        % Add walls to the total
-        patch_idx=patch_idx+2*nvert;
-        F=[F; F_current]; FRGB=[FRGB; FRGB_current]; %#ok<AGROW>
-        
-    end
-    
 end
 
 % Draw the sides of the bars as a multifaceted patch
@@ -192,4 +192,3 @@ end
 %
 % Vikings, about Christians,
 % in The Northman (2022)
-

@@ -45,6 +45,9 @@ result=local_test_plot_3d(result,spin_system);
 % Exercise MRI and volume plotting utilities
 result=local_test_misc_plots(result);
 
+% Exercise COMSOL mesh and concentration plotting
+result=local_test_comsol_plots(result);
+
 end
 
 
@@ -241,6 +244,103 @@ surf_obj=findobj(fig,'Type','surface');
 result=test_true(result,'volplot surfaces',numel(surf_obj)>=1,...
                  'volplot creates semitransparent surfaces for non-zero volume slices');
 close(fig);
+
+end
+
+
+function result=local_test_comsol_plots(result)
+
+% Build a compact mesh with heterogeneous Voronoi cells
+vertices=[0 0;1 0;0 1;1 0;2 0;2 1;1 1;3 0;3 1;2 1];
+cells={[1 2 3],[4 5 6 7],[8 9 10]};
+mesh.x=vertices(:,1); mesh.y=vertices(:,2);
+mesh.idx.edges=[1 2];
+mesh.idx.triangles=[1 2 3];
+mesh.idx.rectangles=[1 2 4 3];
+mesh.vor.vertices=vertices;
+mesh.vor.cells=cells;
+mesh.vor.ncells=numel(cells);
+mesh.vor.max_cell_size=4;
+
+% Check precomputed Voronoi plotting arrays and separators
+mesh=mesh_preplot(mesh);
+expected_x=[0;1;0;0;NaN;1;2;2;1;1;NaN;3;3;2;3;NaN];
+expected_y=[0;0;1;0;NaN;0;0;1;1;0;NaN;0;1;1;0;NaN];
+result=test_true(result,'mesh_preplot Voronoi x values',isequaln(mesh.plot.vor_a,expected_x),...
+                 'mesh_preplot preserves each cell boundary and its NaN separator');
+result=test_true(result,'mesh_preplot Voronoi y values',isequaln(mesh.plot.vor_b,expected_y),...
+                 'mesh_preplot preserves y coordinates for heterogeneous cells');
+
+% Preserve the empty-tessellation output shape
+empty_mesh=mesh; empty_mesh.vor.cells={};
+empty_mesh=mesh_preplot(empty_mesh);
+result=test_true(result,'mesh_preplot empty Voronoi arrays',...
+                 isequal(size(empty_mesh.plot.vor_a),[0 0])&&...
+                 isequal(size(empty_mesh.plot.vor_b),[0 0]),...
+                 'empty tessellations retain the original empty matrix shape');
+
+% Plot two active concentration bars and leave the third inactive
+spin_system.mesh=mesh;
+spin_system.mesh.zext=[-1 1];
+concentrations=[1;-0.5;0];
+fig=figure('Visible','off');
+conc_plot(spin_system,concentrations);
+patch_obj=findobj(fig,'Type','patch');
+vertex_counts=arrayfun(@(obj)size(get(obj,'Vertices'),1),patch_obj);
+side_patch=patch_obj(vertex_counts==14);
+cap_patches=patch_obj(vertex_counts==7);
+cap_a_vertices=get(cap_patches(1),'Vertices');
+if any(cap_a_vertices(:,3))
+    top_patch=cap_patches(1); bottom_patch=cap_patches(2);
+else
+    top_patch=cap_patches(2); bottom_patch=cap_patches(1);
+end
+
+% Check cap geometry, connectivity, and per-cell colours
+expected_cap_vertices=[vertices(cells{1},:) ones(3,1);...
+                       vertices(cells{2},:) -0.5*ones(4,1)];
+expected_cap_faces=[1 2 3 1 NaN;4 5 6 7 4];
+result=test_true(result,'conc_plot patch partition',...
+                 isscalar(side_patch)&&numel(cap_patches)==2,...
+                 'conc_plot creates one side patch and two cap patches');
+result=test_close(result,'conc_plot top vertices',get(top_patch,'Vertices'),...
+                  expected_cap_vertices,1e-12,1e-12,...
+                  'top cap vertices preserve active cell order and concentrations');
+result=test_true(result,'conc_plot cap faces',...
+                 isequaln(get(top_patch,'Faces'),expected_cap_faces),...
+                 'cap connectivity closes each heterogeneous Voronoi cell');
+result=test_close(result,'conc_plot bottom vertices',get(bottom_patch,'Vertices'),...
+                  [expected_cap_vertices(:,1:2) zeros(7,1)],1e-12,1e-12,...
+                  'bottom caps reuse the active cell geometry at zero height');
+result=test_close(result,'conc_plot cap colours',get(top_patch,'FaceVertexCData'),...
+                  0.5*ones(2,3),1e-12,1e-12,...
+                  'neutral colours are retained for each active cap');
+
+% Check side geometry, connectivity, and per-face colours
+expected_side_vertices=[vertices(cells{1},:) ones(3,1);...
+                        vertices(cells{1},:) zeros(3,1);...
+                        vertices(cells{2},:) -0.5*ones(4,1);...
+                        vertices(cells{2},:) zeros(4,1)];
+expected_side_faces=[1 2 5 4 1;2 3 6 5 2;3 1 4 6 3;...
+                     7 8 12 11 7;8 9 13 12 8;...
+                     9 10 14 13 9;10 7 11 14 10];
+result=test_close(result,'conc_plot side vertices',get(side_patch,'Vertices'),...
+                  expected_side_vertices,1e-12,1e-12,...
+                  'side vertices retain paired top and bottom cell boundaries');
+result=test_close(result,'conc_plot side faces',get(side_patch,'Faces'),...
+                  expected_side_faces,1e-12,1e-12,...
+                  'side connectivity closes every wall without cross-cell indices');
+result=test_close(result,'conc_plot side colours',get(side_patch,'FaceVertexCData'),...
+                  0.5*ones(7,3),1e-12,1e-12,...
+                  'each side face retains its source cell colour');
+close(fig);
+
+% Guard the performance fix against reintroducing growing arrays
+conc_source=fileread(which('conc_plot'));
+mesh_source=fileread(which('mesh_preplot'));
+result=test_true(result,'COMSOL plotting preallocation',...
+                 ~contains(conc_source,'AGROW')&&~contains(mesh_source,'AGROW'),...
+                 'COMSOL plotting loops must not suppress array-growth warnings');
 
 end
 

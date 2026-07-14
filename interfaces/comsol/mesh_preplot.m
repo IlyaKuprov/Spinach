@@ -51,12 +51,20 @@ end
 mesh.plot.rec_a=A; mesh.plot.rec_b=B;
 
 % Prepare Voronoi cell array for plotting
-A=[]; B=[];
+cell_sizes=cellfun(@numel,mesh.vor.cells);
+array_size=sum(cell_sizes)+2*numel(mesh.vor.cells);
+A=nan(array_size,1); B=nan(array_size,1); array_offset=0;
 for n=1:numel(mesh.vor.cells)
-    A=[A; mesh.vor.vertices(mesh.vor.cells{n},1); ...
-          mesh.vor.vertices(mesh.vor.cells{n}(1),1); NaN]; %#ok<AGROW> 
-    B=[B; mesh.vor.vertices(mesh.vor.cells{n},2); ...
-          mesh.vor.vertices(mesh.vor.cells{n}(1),2); NaN]; %#ok<AGROW> 
+    cell_idx=mesh.vor.cells{n}; nvert=cell_sizes(n);
+    boundary_range=array_offset+(1:(nvert+1));
+    A(boundary_range)=[mesh.vor.vertices(cell_idx,1); ...
+                       mesh.vor.vertices(cell_idx(1),1)];
+    B(boundary_range)=[mesh.vor.vertices(cell_idx,2); ...
+                       mesh.vor.vertices(cell_idx(1),2)];
+    array_offset=array_offset+nvert+2;
+end
+if isempty(cell_sizes)
+    A=[]; B=[];
 end
 mesh.plot.vor_a=A; mesh.plot.vor_b=B;
 
@@ -76,4 +84,3 @@ end
 % and a comedy for those who think.
 %
 % Jean de la Bruyere
-

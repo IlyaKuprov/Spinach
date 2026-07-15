@@ -7,7 +7,7 @@
 function trosy_methyl()
 
 % Magnet field
-sys_big.magnet=14.1;
+sys.magnet=14.1;
 
 % Cartesian coordinates
 me_xyz=[-1.290651 1.279824 -0.248354;  % C
@@ -53,7 +53,7 @@ j_coupling{2,4}=-12;
 j_coupling{3,4}=-12;
 
 % Spin system instances for the three methyl rotamers
-sys_big.isotopes=repmat({'13C','1H','1H','1H'},1,3);
+sys.isotopes=repmat({'13C','1H','1H','1H'},1,3);
 inter.coordinates=cell(1,12);
 inter.zeeman.matrix=cell(1,12);
 inter.coupling.scalar=cell(12,12);
@@ -108,7 +108,7 @@ inter.chem.rates=k_jump*[-2  1  1;
                           1  1 -2];
 
 % Spinach housekeeping
-spin_system=create(sys_big,inter);
+spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Get a figure going

@@ -360,6 +360,11 @@ for n=1:length(g03_output)
    end
    
 end
+
+% Warn about incomplete logs
+if (~props.error)&&(~props.complete)
+   warning('Gaussian import: incomplete log detected.');
+end
    
 % Assign atomic symbols
 periodic_table={'H','He','Li','Be','B','C','N','O','F','Ne','Na','Mg','Al','Si','P','S','Cl','Ar',...

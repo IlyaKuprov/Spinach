@@ -101,6 +101,9 @@ inter.coupling.scalar(9:12,9:12)=j_coupling;
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
+% High accuracy
+sys.disable={'zte'};
+
 % Methyl turning generator
 tau_m=1e-11; k_jump=1/(2*tau_m);
 inter.chem.rates=k_jump*[-2  1  1;

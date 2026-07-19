@@ -4,7 +4,8 @@
 %
 % Magnetic parameters from:
 %
-%     S. Felton et al., Phys. Rev. B 79 (2009) 075203
+%     S. Felton et al., Phys. Rev. B 79, 075203 (2009),
+%     <https://doi.org/10.1103/PhysRevB.79.075203>
 %
 % Parameters: 
 % 

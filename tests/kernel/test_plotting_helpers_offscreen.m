@@ -68,14 +68,14 @@ result=test_close(result,'scale_figure height',fig_pos(4),0.75*def_pos(4),1e-12,
                   'scale_figure scales height from the root default figure size');
 
 % Exercise subplot and labelling helpers on a 3D line
-ksubplot(1,2,1);
+subplot(1,2,1);
 plot3([0 1],[0 1],[0 1],'k-');
 kgrid(); ktitle('helper title');
 kxlabel('X axis'); kylabel('Y axis'); kzlabel('Z axis');
 leg_obj=klegend({'trace'});
 
 % Exercise super-title and colour-bar helpers
-ksubplot(1,2,2);
+subplot(1,2,2);
 imagesc(magic(3));
 kcolourbar('intensity');
 ksgtitle('helper grid');
@@ -83,8 +83,8 @@ ksgtitle('helper grid');
 % Check that helper calls populated graphics metadata
 axes_obj=findall(fig,'Type','axes');
 colour_obj=findall(fig,'Type','colorbar');
-result=test_true(result,'ksubplot axes count',numel(axes_obj)>=2,...
-                 'ksubplot creates ordinary axes objects');
+result=test_true(result,'subplot axes count',numel(axes_obj)>=2,...
+                 'subplot creates ordinary axes objects');
 result=test_true(result,'klegend object',ishandle(leg_obj),...
                  'klegend returns a valid legend object');
 result=test_true(result,'kcolourbar object',isscalar(colour_obj),...

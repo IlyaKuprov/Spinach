@@ -2,8 +2,10 @@
 %
 %           [sys,inter]=diamond_p1(parameters)
 %
-% Magnetic parameters from: Nir-Orad et al. PCCP 2024, and
-% Smith et al. Phys. Rev. 115, 1546 (1959).
+% Magnetic parameters from: Nir-Arad et al. Phys. Chem. Chem. Phys. 26,
+% 27633 (2024), <https://doi.org/10.1039/d4cp03055a>, and
+% Smith et al. Phys. Rev. 115, 1546 (1959),
+% <https://doi.org/10.1103/PhysRev.115.1546>.
 %
 % Parameters:
 %

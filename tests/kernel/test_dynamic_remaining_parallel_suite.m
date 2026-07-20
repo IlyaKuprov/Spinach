@@ -40,9 +40,11 @@ end
 spin_system=local_liouvillian_system(1);
 H0=sparse(1,1,1e-3,1,1);
 H1=repmat({sparse(1,1)},2001,1);
-R=ngce(spin_system,H0,H1,1,10,0);
+[R,dR]=ngce(spin_system,H0,H1,1,10,0);
 result=test_close(result,'ngce zero stochastic Hamiltonian',R,sparse(1,1),1e-14,1e-14,...
                   'a zero stochastic Hamiltonian trajectory must integrate to a zero relaxation superoperator');
+result=test_close(result,'ngce zero stochastic uncertainty',dR,sparse(1,1),1e-14,1e-14,...
+                  'a zero stochastic Hamiltonian trajectory must have zero relaxation uncertainty');
 
 % Check overwinding diagnostics complete and draw a spectrum for a safe one-dimensional grid
 figures_before=numel(findall(0,'Type','figure'));

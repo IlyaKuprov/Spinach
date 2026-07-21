@@ -495,7 +495,7 @@ if ismember('frq_controls',spin_system.control.plotting)
                    -1i*waveform(2*n  ,1:last_slice_to_plot);
 
         % Compute the instantaneous frequency profile
-        frq_profile(n,:)=inst_freq(cplx_ch_wf,dt,npoints,poly_order);
+        frq_profile(n,:)=inst_freq(cplx_ch_wf,dt,npoints,poly_order,0);
 
     end
 

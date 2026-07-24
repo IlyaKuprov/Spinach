@@ -15,15 +15,13 @@ nucleus='1H';
 % Paramagnetic centre parameters
 e_spin=15/2;
 g_eff=4/3;
+t1e=0.2e-12;
+t2e=0.2e-12;
 tau_r=140e-12;
-tau_e=[0.2e-12 0.2e-12];
 
 % H1 position relative to the metal centre
 dist=4.3702201672;
 a_iso=0;
-
-% Combined correlation times
-tau_c=1./(1/tau_r+1./tau_e);
 
 % Preallocate relaxation rates
 r1=zeros(size(fields));
@@ -32,7 +30,7 @@ r2=zeros(size(fields));
 % Compute field dependence
 for n=1:numel(fields)
     [r1_parts,r2_parts]=rlx_sbm(fields(n),nucleus,dist,a_iso,...
-                                e_spin,g_eff,tau_c,tau_e);
+                                e_spin,g_eff,t1e,t2e,tau_r);
     r1(n)=sum(r1_parts);
     r2(n)=sum(r2_parts);
 end

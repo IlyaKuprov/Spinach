@@ -1,7 +1,7 @@
 % Solomon-Bloembergen-Morgan nuclear relaxation rates due to a
 % paramagnetic centre. Syntax:
 %
-%       [r1,r2]=rlx_sbm(B0,nucleus,dist,a_iso,e_spin,g_eff,tau_c,tau_e)
+%       [r1,r2]=rlx_sbm(B0,nucleus,dist,a_iso,e_spin,g_eff,t1e,t2e,tau_r)
 %
 % Parameters:
 %
@@ -17,9 +17,11 @@
 %
 %    g_eff    - effective electron g-factor
 %
-%    tau_c    - dipolar correlation times [tau_c1 tau_c2], seconds
+%    t1e      - longitudinal electron relaxation time, seconds
 %
-%    tau_e    - electron correlation times [tau_e1 tau_e2], seconds
+%    t2e      - transverse electron relaxation time, seconds
+%
+%    tau_r    - rotational correlation time, seconds
 %
 % Outputs:
 %
@@ -33,10 +35,10 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=rlx_sbm.m>
 
-function [r1,r2]=rlx_sbm(B0,nucleus,dist,a_iso,e_spin,g_eff,tau_c,tau_e)
+function [r1,r2]=rlx_sbm(B0,nucleus,dist,a_iso,e_spin,g_eff,t1e,t2e,tau_r)
 
 % Check consistency
-grumble(B0,nucleus,dist,a_iso,e_spin,g_eff,tau_c,tau_e);
+grumble(B0,nucleus,dist,a_iso,e_spin,g_eff,t1e,t2e,tau_r);
 
 % Physical constants
 mu0=1.25663706127e-6;
@@ -47,30 +49,34 @@ hbar=6.62607015e-34/(2*pi);
 omega_i=abs(spin(nucleus)*B0);
 omega_s=abs(g_eff*muB*B0/hbar);
 
+% Effective dipolar correlation times
+tau_c1=1/(1/tau_r+1/t1e);
+tau_c2=1/(1/tau_r+1/t2e);
+
 % Dipolar relaxation prefactor
 spin_sq=e_spin*(e_spin+1);
 dist=dist*1e-10;
 pref_dd=(mu0/(4*pi))^2*(spin(nucleus)*g_eff*muB)^2*spin_sq/dist^6;
 
 % Dipolar longitudinal relaxation rate
-r1_dd=(2/15)*pref_dd*(3*tau_c(1)/(1+(omega_i*tau_c(1))^2)+...
-                      6*tau_c(2)/(1+((omega_i+omega_s)*tau_c(2))^2)+...
-                        tau_c(2)/(1+((omega_i-omega_s)*tau_c(2))^2));
+r1_dd=(2/15)*pref_dd*(3*tau_c1/(1+(omega_i*tau_c1)^2)+...
+                      6*tau_c2/(1+((omega_i+omega_s)*tau_c2)^2)+...
+                        tau_c2/(1+((omega_i-omega_s)*tau_c2)^2));
 
 % Dipolar transverse relaxation rate
-r2_dd=(1/15)*pref_dd*(4*tau_c(1)+...
-                      3*tau_c(1)/(1+(omega_i*tau_c(1))^2)+...
-                      6*tau_c(2)/(1+(omega_s*tau_c(2))^2)+...
-                      6*tau_c(2)/(1+((omega_i+omega_s)*tau_c(2))^2)+...
-                        tau_c(2)/(1+((omega_i-omega_s)*tau_c(2))^2));
+r2_dd=(1/15)*pref_dd*(4*tau_c1+...
+                      3*tau_c1/(1+(omega_i*tau_c1)^2)+...
+                      6*tau_c2/(1+(omega_s*tau_c2)^2)+...
+                      6*tau_c2/(1+((omega_i+omega_s)*tau_c2)^2)+...
+                        tau_c2/(1+((omega_i-omega_s)*tau_c2)^2));
 
 % Contact longitudinal relaxation rate
-r1_sc=(2/3)*a_iso^2*spin_sq*tau_e(2)/...
-      (1+((omega_i-omega_s)*tau_e(2))^2);
+r1_sc=(2/3)*a_iso^2*spin_sq*t2e/...
+      (1+((omega_i-omega_s)*t2e)^2);
 
 % Contact transverse relaxation rate
-r2_sc=(1/3)*a_iso^2*spin_sq*(tau_e(1)+tau_e(2)/...
-      (1+((omega_i-omega_s)*tau_e(2))^2));
+r2_sc=(1/3)*a_iso^2*spin_sq*(t1e+t2e/...
+      (1+((omega_i-omega_s)*t2e)^2));
 
 % Package contributions by mechanism
 r1=[r1_dd r1_sc];
@@ -79,7 +85,7 @@ r2=[r2_dd r2_sc];
 end
 
 % Consistency enforcement
-function grumble(B0,nucleus,dist,a_iso,e_spin,g_eff,tau_c,tau_e)
+function grumble(B0,nucleus,dist,a_iso,e_spin,g_eff,t1e,t2e,tau_r)
 if (~isnumeric(B0))||(~isreal(B0))||(~isscalar(B0))||...
    (~isfinite(B0))||(B0<=0)
     error('B0 must be a positive real finite scalar.');
@@ -104,13 +110,17 @@ if (~isnumeric(g_eff))||(~isreal(g_eff))||(~isscalar(g_eff))||...
    (~isfinite(g_eff))||(g_eff<=0)
     error('g_eff must be a positive real finite scalar.');
 end
-if (~isnumeric(tau_c))||(~isreal(tau_c))||(~isrow(tau_c))||...
-   (numel(tau_c)~=2)||any(~isfinite(tau_c))||any(tau_c<=0)
-    error('tau_c must be a row vector containing two positive real finite numbers.');
+if (~isnumeric(t1e))||(~isreal(t1e))||(~isscalar(t1e))||...
+   (~isfinite(t1e))||(t1e<=0)
+    error('t1e must be a positive real finite scalar.');
 end
-if (~isnumeric(tau_e))||(~isreal(tau_e))||(~isrow(tau_e))||...
-   (numel(tau_e)~=2)||any(~isfinite(tau_e))||any(tau_e<=0)
-    error('tau_e must be a row vector containing two positive real finite numbers.');
+if (~isnumeric(t2e))||(~isreal(t2e))||(~isscalar(t2e))||...
+   (~isfinite(t2e))||(t2e<=0)
+    error('t2e must be a positive real finite scalar.');
+end
+if (~isnumeric(tau_r))||(~isreal(tau_r))||(~isscalar(tau_r))||...
+   (~isfinite(tau_r))||(tau_r<=0)
+    error('tau_r must be a positive real finite scalar.');
 end
 end
 

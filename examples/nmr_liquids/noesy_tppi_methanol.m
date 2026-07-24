@@ -1,14 +1,13 @@
-% NOESY spectrum of 13C methanol with States-Haberkorn-Ruben
-% processing. J-couplings are from Pecul and Helgaker, and CSA
-% tensors are from DFT. Note the cross-peaks between 13C doublet
-% components.
+% NOESY spectrum of 13C methanol with time-proportional phase
+% incrementation (TPPI) acquisition and processing. J-couplings are
+% from Pecul and Helgaker, and CSA tensors are from DFT.
 %
 % Calculation time: seconds
 %
 % tim.claridge@chem.ox.ac.uk
 % ilya.kuprov@weizmann.ac.il
 
-function noesy_methanol()
+function noesy_tppi_methanol()
 
 % Spin system properties (vacuum DFT calculation)
 [sys,inter]=g2spinach(gparse('../standard_systems/methanol.log'),...
@@ -56,7 +55,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.tmix=0.5;
 parameters.offset=0;
-parameters.sweep=[300 300];
+parameters.sweep=[600 300];
 parameters.npoints=[256 256];
 parameters.zerofill=[1024 1024];
 parameters.spins={'1H'};
@@ -66,19 +65,25 @@ parameters.needs={'rho_eq'};
 % Simulation
 fid=liquid(spin_system,@noesy,parameters,'nmr');
 
-% Apodisation
-fid.cos=apodisation(spin_system,fid.cos,{{'sqcos'},{'sqcos'}});
-fid.sin=apodisation(spin_system,fid.sin,{{'sqcos'},{'sqcos'}});
+% Apply the phase increment to the indirect quadrature channels
+phase_inc=(0:(parameters.npoints(1)-1))*pi/2;
+fid_tppi=fid.cos.*cos(phase_inc)-fid.sin.*sin(phase_inc);
 
-% F2 Fourier transform
-f1_cos=real(fftshift(fft(fid.cos,parameters.zerofill(2),1),1));
-f1_sin=real(fftshift(fft(fid.sin,parameters.zerofill(2),1),1));
+% Apodise the phase-incremented signal
+fid_tppi=apodisation(spin_system,fid_tppi,{{'sqcos'},{'sqcos'}});
 
-% Form States-Haberkorn-Ruben signal
-f1_states=f1_cos-1i*f1_sin;
+% F2 Fourier transform and absorptive component selection
+f2_spec=real(fftshift(fft(fid_tppi,parameters.zerofill(2),1),1));
 
-% F1 Fourier transform
-spectrum=fftshift(fft(f1_states,parameters.zerofill(1),2),2);
+% Real F1 Fourier transform
+tppi_spec=fftshift(fft(f2_spec,parameters.zerofill(1),2),2);
+
+% Retain the non-redundant F1 spectral half
+spectrum=tppi_spec(:,(parameters.zerofill(1)/2+1):end);
+
+% Restore the physical F1 sweep width
+parameters.sweep=[300 300];
+parameters.zerofill(1)=parameters.zerofill(1)/2;
 
 % Plotting
 kfigure(); scale_figure([1.5 2.0]);
@@ -86,4 +91,5 @@ plot_2d(spin_system,-real(spectrum),parameters,...
         20,[0.05 0.5 0.05 0.5],2,256,6,'both');
 
 end
+
 

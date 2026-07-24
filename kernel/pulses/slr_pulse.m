@@ -75,31 +75,20 @@ if (pass_edge<=0)||(pass_edge>=stop_edge)||(stop_edge>=1)
     error('the specified sampling, bandwidth, and ripples do not produce a valid transition band.');
 end
 
-% Build the exact weighted least-squares normal equations
-half_n=npts/2;
-orders=(0:(half_n-1))+0.5;
-diff_orders=orders'-orders;
-sum_orders=orders'+orders;
+% Build the continuous least-squares system
+orders=(0:(npts/2-1))+0.5;
 pass_lim=pi*pass_edge;
 stop_lim=pi*stop_edge;
-zero_mask=(diff_orders==0);
-pass_diff=sin(diff_orders*pass_lim)./diff_orders;
-pass_diff(zero_mask)=pass_lim;
-pass_sum=sin(sum_orders*pass_lim)./sum_orders;
-stop_diff=(sin(diff_orders*pi)-sin(diff_orders*stop_lim))./diff_orders;
-stop_diff(zero_mask)=pi-stop_lim;
-stop_sum=(sin(sum_orders*pi)-sin(sum_orders*stop_lim))./sum_orders;
+basis_fun=@(x)cos(x*orders);
 stop_weight=beta_pass/beta_stop;
-gram=0.5*(pass_diff+pass_sum)+0.5*stop_weight*(stop_diff+stop_sum);
-moment=sin(orders'*pass_lim)./orders';
+gram=integral(@(x)basis_fun(x)'*basis_fun(x),0,pass_lim,...
+              'ArrayValued',true)+stop_weight*...
+     integral(@(x)basis_fun(x)'*basis_fun(x),stop_lim,pi,...
+              'ArrayValued',true);
+moment=integral(@(x)basis_fun(x)',0,pass_lim,'ArrayValued',true);
 
-% Solve the positive-definite least-squares system
-gram=(gram+gram')/2;
-[chol_factor,chol_flag]=chol(gram,'lower');
-if chol_flag~=0
-    error('the SLR least-squares filter design is numerically singular.');
-end
-cos_coeff=chol_factor'\(chol_factor\moment);
+% Solve for the linear-phase beta polynomial
+cos_coeff=decomposition((gram+gram')/2,'chol')\moment;
 left_half=flipud(cos_coeff)/2;
 beta=[left_half;flipud(left_half)]';
 

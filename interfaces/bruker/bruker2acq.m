@@ -9,9 +9,8 @@
 %                     array of structures ordered from the slowest to
 %                     the directly detected dimension
 %
-%    point_factors  - optional divisor converting Bruker TD values into
-%                     complex time-domain points; defaults to 1 for
-%                     indirect dimensions and 2 for the direct dimension
+%    point_factors  - divisors converting Bruker TD values into complex
+%                     time-domain points, one per acquisition dimension
 %
 % Outputs:
 %
@@ -29,12 +28,6 @@ function parameters=bruker2acq(acqus,point_factors)
 
 % Normalize the dimension list
 if isstruct(acqus), acqus={acqus}; end
-
-% Set default point conversion factors
-if nargin==1
-    point_factors=ones(1,numel(acqus));
-    point_factors(end)=2;
-end
 
 % Check consistency
 grumble(acqus,point_factors);
@@ -58,7 +51,7 @@ for n=1:n_dims
 
     % Point count and transmitter offset
     npoints=getpar(acqus{n},'TD',[])/point_factors(n);
-    offset=getpar(acqus{n},'O1',0);
+    offset=getpar(acqus{n},'O1',[]);
 
     % Store Spinach acquisition settings
     parameters.sweep(n)=sweep;
@@ -101,7 +94,7 @@ for n=1:numel(acqus)
     sw=getpar(acqus{n},'SW',[]);
     sfo1=getpar(acqus{n},'SFO1',[]);
     td=getpar(acqus{n},'TD',[]);
-    o1=getpar(acqus{n},'O1',0);
+    o1=getpar(acqus{n},'O1',[]);
     if isempty(sw_h)&&(isempty(sw)||isempty(sfo1))
         error('each acquisition structure must contain SW_h or both SW and SFO1.');
     end
@@ -118,8 +111,9 @@ for n=1:numel(acqus)
        (~isfinite(td))||(td<=0)||(mod(td,point_factors(n))~=0)
         error('TD values must be positive integers divisible by point_factors.');
     end
-    if (~isnumeric(o1))||(~isreal(o1))||(~isscalar(o1))||(~isfinite(o1))
-        error('O1 values must be real finite scalars.');
+    if isempty(o1)||(~isnumeric(o1))||(~isreal(o1))||...
+       (~isscalar(o1))||(~isfinite(o1))
+        error('each acquisition structure must contain an O1 real finite scalar.');
     end
 end
 end

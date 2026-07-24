@@ -112,9 +112,8 @@ for n=1:numel(procs)
        (~isfinite(wdw))||(mod(wdw,1)~=0)
         error('WDW values must be real finite integer scalars.');
     end
-    if (~isnumeric(lb))||(~isreal(lb))||(~isscalar(lb))||...
-       (~isfinite(lb))||(lb<0)
-        error('LB values must be non-negative real finite scalars.');
+    if (~isnumeric(lb))||(~isreal(lb))||(~isscalar(lb))||(~isfinite(lb))
+        error('LB values must be real finite scalars.');
     end
     axis_fields={axis_edge,obs_freq,proc_sweep};
     if any(cellfun(@isempty,axis_fields))&&(~all(cellfun(@isempty,axis_fields)))

@@ -41,10 +41,10 @@ Ly=operator(spin_system,'Ly','1H');
 % Initial state
 rho=state(spin_system,'Lz','1H');
 
-% SLR pulse waveform
-[Cx,Cy,durs]=slr_pulse(128,15e-3,4,pi/2,0.01,0.01);
+% Inversion SLR pulse waveform
+[Cx,Cy,durs]=slr_pulse(256,15e-3,32,pi/2,0.01,0.01);
 
-% Pulse execution
+% Run the SLR pulse
 rho=shaped_pulse_xy(spin_system,H,{Lx,Ly},{Cx,Cy},...
                     durs,rho,'expv-pwc');
 
@@ -73,7 +73,7 @@ kfigure(); scale_figure([2.0 1.0]);
 subplot(1,2,1); plot(cumsum(durs),[Cx;Cy]);
 kxlabel('time, seconds'); ktitle('SLR pulse');
 kylabel('amplitude, rad/s'); kgrid; xlim tight;
-subplot(1,2,2); plot_1d(spin_system,imag(spectrum),parameters);
+subplot(1,2,2); plot_1d(spin_system,abs(spectrum),parameters);
 ktitle('band-selective excitation');
 
 end

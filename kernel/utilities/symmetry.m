@@ -82,7 +82,10 @@ else
     if ~isempty(spin_system.comp.sym_group)
         summary_symmetry(spin_system,'permutation symmetry summary');
     end
-    
+
+    % Validate that the interactions respect the declared symmetry
+    validate_sym(spin_system,bas);
+
     % Compute group direct product if necessary
     if numel(spin_system.comp.sym_group)>1
         

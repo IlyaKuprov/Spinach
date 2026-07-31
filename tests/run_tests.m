@@ -20,6 +20,7 @@ root_dir=fileparts(mfilename('fullpath'));
 addpath(root_dir);
 addpath(fullfile(root_dir,'lib'));
 addpath(genpath(fullfile(root_dir,'kernel')));
+addpath(genpath(fullfile(root_dir,'interfaces')));
 
 % Parse options
 options=test_options(varargin{:});

@@ -48,8 +48,16 @@ rho=step(spin_system,Ey,rho,pi/2);
 rho=evolution(spin_system,L,[],rho,parameters.tau,1,'final');
 rho=step(spin_system,Ey,rho,pi/2);
 
+% Analytical coherence selection
+rho=coherence(spin_system,rho,{{'E',0}});
+
 % Apply pulses on nuclear spins
 rho=step(spin_system,Ny,rho,pi/2);
+
+% Analytical coherence selection
+rho=coherence(spin_system,rho,{{'1H',[-1 1]}});
+
+% Indirect dimension evolution
 rho_stack=evolution(spin_system,L,[],rho,1/parameters.sweep,...
                     parameters.npoints-1,'trajectory');
 rho_stack=+step(spin_system,+Ny,rho_stack,pi/2) ...

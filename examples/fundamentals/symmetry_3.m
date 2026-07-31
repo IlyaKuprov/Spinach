@@ -1,5 +1,5 @@
 % 1H NMR spectrum of valine. Uses the fully symmetric 
-% irreducible representation of the complete S6 group.
+% irreducible representation of the S3(x)S3 group.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -8,7 +8,8 @@ function symmetry_3()
 % System specificaton
 sys.magnet=11.7;
 sys.isotopes={'1H','1H','1H','1H','1H','1H','1H','1H'};
-inter.zeeman.scalar={3.5950 2.2580 1.0270 1.0270 1.0270 0.9760 0.9760 0.9760};
+inter.zeeman.scalar={3.5950 2.2580 1.0270 1.0270 1.0270 ...
+                                   0.9760 0.9760 0.9760};
 inter.coupling.scalar{1,2}=4.34;
 inter.coupling.scalar{2,3}=7.00;
 inter.coupling.scalar{2,4}=7.00;
@@ -21,8 +22,8 @@ inter.coupling.scalar{8,8}=0.00;
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-bas.sym_spins={[3 4 5 6 7 8]};
-bas.sym_group={'S6'};
+bas.sym_spins={[3 4 5],[6 7 8]};
+bas.sym_group={'S3','S3'};
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

@@ -114,6 +114,28 @@ end
 if ~iscell(spec)
     error('spec must be a cell array of cell arrays, e.g. {{''13C'',[1 -1]},{''1H'',-1}}');
 end
+for n=1:numel(spec)
+    if (~iscell(spec{n}))||(numel(spec{n})~=2)
+        error('each element of spec must be a two-element cell array.');
+    end
+    if ischar(spec{n}{1})
+        if (~ismember(spec{n}{1},{'all','electrons','nuclei'}))&&...
+           (~ismember(spec{n}{1},spin_system.comp.isotopes))
+            error('spec spin string must be ''all'', ''electrons'', ''nuclei'', or an isotope present in the system.');
+        end
+    elseif isnumeric(spec{n}{1})
+        if (~isvector(spec{n}{1}))||(~isreal(spec{n}{1}))||any(spec{n}{1}<1)||...
+           any(mod(spec{n}{1},1)~=0)||any(spec{n}{1}>spin_system.comp.nspins)
+            error('spin numbers in spec must be a vector of positive integers within the system bounds.');
+        end
+    else
+        error('spin specification in spec must be ''all'', ''electrons'', ''nuclei'', an isotope string, or a vector of spin numbers.');
+    end
+    if (~isnumeric(spec{n}{2}))||(~isvector(spec{n}{2}))||(~isreal(spec{n}{2}))||...
+       any(mod(spec{n}{2},1)~=0)
+        error('coherence orders in spec must be a vector of real integers.');
+    end
+end
 end
 
 % There was a time when men were afraid that somebody would reveal

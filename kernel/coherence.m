@@ -17,6 +17,9 @@
 %
 %                      ((1 OR -1 on 13C) AND (-1 on 1H))
 %
+%               instead of specific spins, it is possible to
+%               specify 'electrons', 'nuclei', and 'all'
+%
 % Outputs:
 %
 %   rho     - the state vector with the undesired orders of

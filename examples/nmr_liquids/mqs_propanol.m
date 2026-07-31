@@ -5,6 +5,7 @@
 % 
 % mariagrazia.concilio@sjtu.edu.cn
 % jean-nicolas.dumez@univ-nantes.fr
+% ilya.kuprov@weizmann.ac.il
 
 function mqs_propanol()
 
@@ -18,14 +19,22 @@ inter.zeeman.scalar={3.438,3.438,1.429,1.429,0.775,0.775,0.775};
 % 2J couplings
 inter.coupling.scalar{1,3}=7.5;
 inter.coupling.scalar{1,4}=7.5;
+inter.coupling.scalar{2,3}=7.5;
+inter.coupling.scalar{2,4}=7.5;
 inter.coupling.scalar{3,5}=7.0;
 inter.coupling.scalar{3,6}=7.0;
 inter.coupling.scalar{3,7}=7.0;
+inter.coupling.scalar{4,5}=7.0;
+inter.coupling.scalar{4,6}=7.0;
+inter.coupling.scalar{4,7}=7.0;
 
 % 3J couplings
 inter.coupling.scalar{1,5}=0.5;
 inter.coupling.scalar{1,6}=0.5;
 inter.coupling.scalar{1,7}=0.5;
+inter.coupling.scalar{2,5}=0.5;
+inter.coupling.scalar{2,6}=0.5;
+inter.coupling.scalar{2,7}=0.5;
 inter.coupling.scalar{7,7}=0;
 
 % Basis set

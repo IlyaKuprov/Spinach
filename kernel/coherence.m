@@ -124,16 +124,16 @@ for n=1:numel(spec)
             error('spec spin string must be ''all'', ''electrons'', ''nuclei'', or an isotope present in the system.');
         end
     elseif isnumeric(spec{n}{1})
-        if (~isreal(spec{n}{1}))||any(spec{n}{1}<1)||...
+        if (~isvector(spec{n}{1}))||(~isreal(spec{n}{1}))||any(spec{n}{1}<1)||...
            any(mod(spec{n}{1},1)~=0)||any(spec{n}{1}>spin_system.comp.nspins)
-            error('spin numbers in spec must be positive integers within the system bounds.');
+            error('spin numbers in spec must be a vector of positive integers within the system bounds.');
         end
     else
         error('spin specification in spec must be ''all'', ''electrons'', ''nuclei'', an isotope string, or a vector of spin numbers.');
     end
-    if (~isnumeric(spec{n}{2}))||(~isreal(spec{n}{2}))||...
+    if (~isnumeric(spec{n}{2}))||(~isvector(spec{n}{2}))||(~isreal(spec{n}{2}))||...
        any(mod(spec{n}{2},1)~=0)
-        error('coherence orders in spec must be real integers.');
+        error('coherence orders in spec must be a vector of real integers.');
     end
 end
 end

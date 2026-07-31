@@ -3,19 +3,20 @@
 %
 % Calculation time: seconds
 %
-% ledwards@cbs.mpg.de
 % ilya.kuprov@weizmann.ac.il
 
 function endor_methyl()
 
-% Ignore coordinate information (HFCs provided)
-options.no_xyz=1;
-
-% System properties (vacuum DFT calculation)
-[sys,inter]=g2spinach(gparse('../standard_systems/methyl.log'),...
-                         {{'E','E'},{'H','1H'}},[0 0],options);
 % Magnet field
-sys.magnet=0.33;
+sys.magnet=0.346;
+
+% Spin system and interactions
+sys.isotopes={'1H','1H','1H','E'};
+inter.zeeman.scalar={0 0 0 2.0026};
+inter.coupling.scalar=cell(4,4);
+inter.coupling.scalar{1,4}=-64.4e6;
+inter.coupling.scalar{2,4}=-64.4e6;
+inter.coupling.scalar{3,4}=-64.4e6;
 
 % Basis set
 bas.formalism='sphten-liouv';
@@ -26,7 +27,7 @@ bas.sym_spins={[1 2 3]};
 % Sequence parameters
 parameters.offset=0;
 parameters.npoints=512;
-parameters.sweep=4e8;
+parameters.sweep=1.2e8;
 parameters.tau=100e-9;
 parameters.zerofill=4096;
 parameters.spins={'E'};

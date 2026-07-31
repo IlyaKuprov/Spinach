@@ -1,10 +1,13 @@
 % Extended validation of user-declared permutation symmetry. Confirms
-% that the Zeeman and coupling interaction tensors stored in the spin
-% system object are invariant under every operation of each declared
-% symmetry group, so that the irreducible representation projectors
-% built by symmetry.m correspond to a symmetry that the interactions
-% actually possess. When no symmetry is declared, the function returns
-% without performing any checks. Syntax:
+% that the Zeeman, coupling, and giant-spin interactions stored in the
+% spin system object are strictly invariant under every operation of
+% each declared permutation group, so that the irreducible representa-
+% tion projectors built by symmetry.m correspond to a symmetry that
+% the interactions actually possess. The declared symmetry is a permu-
+% tation of spin labels, not a spatial rotation; interaction tensors
+% related by a rotation rather than being identical are not accepted.
+% When no symmetry is declared, the function returns without perfor-
+% ming any checks. Syntax:
 %
 %                    validate_sym(spin_system,bas)
 %
@@ -48,15 +51,21 @@ tol=2*pi*spin_system.tols.inter_cutoff;
 % Number of spins in the system
 nspins=spin_system.comp.nspins;
 
-% Zeeman and coupling interaction arrays
+% Zeeman and giant-spin interaction arrays
 zeeman=spin_system.inter.zeeman.matrix;
-coupling=spin_system.inter.coupling.matrix;
+giant=spin_system.inter.giant.coeff;
 
 % Loop over declared symmetry groups
 for m=1:numel(bas.sym_group)
 
     % Spins in the current symmetry group
     spins=bas.sym_spins{m};
+
+    % All spins in a symmetry group must be the same isotope
+    if any(~strcmp(spin_system.comp.isotopes(spins),spin_system.comp.isotopes{spins(1)}))
+        error(['spins declared symmetric under ' bas.sym_group{m} ...
+               ' are not all of the same isotope.']);
+    end
 
     % Permutation elements of the declared group
     group=perm_group(bas.sym_group{m});
@@ -70,17 +79,31 @@ for m=1:numel(bas.sym_group)
         % Loop over spins in the symmetry group
         for k=1:numel(spins)
 
-            % Check Zeeman tensor invariance under the permutation
+            % Check Zeeman tensor invariance
             if norm(zeeman{perm(spins(k))}-zeeman{spins(k)},2)>tol
                 error(['spins ' num2str(spins(k)) ' and ' num2str(perm(spins(k))) ...
                        ' are declared symmetric under ' bas.sym_group{m} ', but their '...
                        'Zeeman interaction tensors are not identical.']);
             end
 
-            % Check interaction tensor invariance against every spin
+            % Check giant-spin coefficient invariance across all ranks
+            coeff_a=giant{spins(k)}; coeff_b=giant{perm(spins(k))};
+            giant_mismatch=(numel(coeff_a)~=numel(coeff_b));
+            for r=1:numel(coeff_a)
+                if (~giant_mismatch)&&(norm(coeff_b{r}-coeff_a{r},2)>tol)
+                    giant_mismatch=true;
+                end
+            end
+            if giant_mismatch
+                error(['spins ' num2str(spins(k)) ' and ' num2str(perm(spins(k))) ...
+                       ' are declared symmetric under ' bas.sym_group{m} ', but their '...
+                       'giant-spin interactions are not identical.']);
+            end
+
+            % Check coupling tensor invariance against every spin
             for q=1:nspins
-                if norm(pair_coupling(coupling,perm(spins(k)),perm(q))-...
-                        pair_coupling(coupling,spins(k),q),2)>tol
+                if norm(get_coupling(spin_system,perm(spins(k)),perm(q))-...
+                        get_coupling(spin_system,spins(k),q),2)>tol
                     error(['the interaction between spins ' num2str(spins(k)) ' and ' ...
                            num2str(q) ' is not preserved by the ' bas.sym_group{m} ...
                            ' symmetry; it differs from the interaction between spins ' ...
@@ -96,19 +119,6 @@ end
 
 % Confirm success to the user
 report(spin_system,'declared permutation symmetry is consistent with the interaction data.');
-
-end
-
-% Interaction tensor acting on spins p and q, with empty blocks read as zeros
-function A=pair_coupling(coupling,p,q)
-
-if ~isempty(coupling{p,q})
-    A=coupling{p,q};
-elseif ~isempty(coupling{q,p})
-    A=coupling{q,p}';
-else
-    A=zeros(3);
-end
 
 end
 

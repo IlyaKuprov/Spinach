@@ -37,8 +37,8 @@ orca_log=textscan(file_id,'%s','delimiter','\n');
 fclose(file_id); orca_log=orca_log{1};
 props.filename=file_name;
 
-% Deblank all lines
-for n=1:numel(orca_log), orca_log(n)=deblank(orca_log(n)); end
+% Trim whitespace on all lines
+for n=1:numel(orca_log), orca_log(n)=strtrim(orca_log(n)); end
 
 % Parse the file
 for n=1:length(orca_log)
@@ -64,7 +64,7 @@ for n=1:length(orca_log)
        disp('ORCA import: found electric dipole moment.');
    end
    
-   % Read the g-tensor - BROKEN BY ORCA SYNTAX CHANGE
+   % Read the g-tensor
    if strcmp(orca_log{n},'The g-matrix:')
       props.g_tensor.matrix=zeros(3,3);
       S=textscan(orca_log{n+1},'%f %f %f'); props.g_tensor.matrix(1,:)=cell2mat(S);
@@ -75,14 +75,14 @@ for n=1:length(orca_log)
       disp('ORCA import: found the g-tensor.');
    end
    
-   % Read HFCs and EFGs - BROKEN BY ORCA SYNTAX CHANGE
+   % Read HFCs and EFGs (ORCA 5 'Raw', ORCA 6 'Total' headers)
    if strfind(orca_log{n},'Nucleus ')==1
        atom=textscan(orca_log{n},'%*s %f%*s');
        idx=atom{:}(1)+1;
        k=n+1;
        while isempty(strfind(orca_log{k},'Nucleus '))&&k<length(orca_log)
            k=k+1;
-           if strcmp(orca_log{k},'Raw HFC matrix (all values in MHz):')==1
+           if endsWith(orca_log{k},'HFC matrix (all values in MHz):')
                S=textscan(orca_log{k+2},'%f %f %f'); props.hfc.full.matrix{idx}(1,:)=[S{1} S{2} S{3}]; 
                S=textscan(orca_log{k+3},'%f %f %f'); props.hfc.full.matrix{idx}(2,:)=[S{1} S{2} S{3}];
                S=textscan(orca_log{k+4},'%f %f %f'); props.hfc.full.matrix{idx}(3,:)=[S{1} S{2} S{3}];
@@ -91,7 +91,7 @@ for n=1:length(orca_log)
                props.hfc.full.eigvals{idx}=diag(B);
                props.hfc.full.eigvecs{idx}=A;               
            end
-           if strcmp(orca_log{k},'Raw EFG matrix (all values in a.u.**-3):')==1
+           if endsWith(orca_log{k},'EFG matrix (all values in a.u.**-3):')
                S=textscan(orca_log{k+1},'%f %f %f'); props.efg{idx}(1,:)=[S{1} S{2} S{3}];
                S=textscan(orca_log{k+2},'%f %f %f'); props.efg{idx}(2,:)=[S{1} S{2} S{3}];
                S=textscan(orca_log{k+3},'%f %f %f'); props.efg{idx}(3,:)=[S{1} S{2} S{3}];

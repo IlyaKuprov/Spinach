@@ -37,7 +37,7 @@ quats1=angle2quat(angles1(:,1),angles1(:,2),angles1(:,3),'ZYZ');
 quats2=angle2quat(angles2(:,1),angles2(:,2),angles2(:,3),'ZYZ');
 
 % Build a table of quaternion products
-quats=[kron(quats1,ones(size(quats2,1),1)) kron(ones(size(quats1,1)),quats2)];
+quats=[kron(quats1,ones(size(quats2,1),1)) kron(ones(size(quats1,1),1),quats2)];
 
 % Multiply up quaternions
 quats=[quats(:,1).*quats(:,5)-quats(:,2).*quats(:,6)-quats(:,3).*quats(:,7)-quats(:,4).*quats(:,8),...

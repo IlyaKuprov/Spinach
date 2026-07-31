@@ -20,15 +20,17 @@ sys.magnet=0.33;
 sys.isotopes={'E','1H','1H','1H','1H','1H'};
 
 % Phenyl radical isotropic g-factor
-inter.zeeman.scalar={2.0024 0 0 0 0 0};
+g_phenyl=2.0024;
+inter.zeeman.scalar={g_phenyl 0 0 0 0 0};
 
 % Isotropic proton hyperfine couplings, converted from milliTesla
+% using the phenyl radical g-factor
 inter.coupling.scalar=cell(6,6);
-inter.coupling.scalar{2,1}=mt2hz(1.74);
-inter.coupling.scalar{3,1}=mt2hz(1.74);
-inter.coupling.scalar{4,1}=mt2hz(0.59);
-inter.coupling.scalar{5,1}=mt2hz(0.59);
-inter.coupling.scalar{6,1}=mt2hz(0.19);
+inter.coupling.scalar{2,1}=mt2hz(1.74,g_phenyl);
+inter.coupling.scalar{3,1}=mt2hz(1.74,g_phenyl);
+inter.coupling.scalar{4,1}=mt2hz(0.59,g_phenyl);
+inter.coupling.scalar{5,1}=mt2hz(0.59,g_phenyl);
+inter.coupling.scalar{6,1}=mt2hz(0.19,g_phenyl);
 
 % Basis set
 bas.formalism='sphten-liouv';

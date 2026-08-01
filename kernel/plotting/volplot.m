@@ -89,8 +89,10 @@ nx=size(data_cube,3); xmin=axis_ranges(1); xmax=axis_ranges(2);
 ny=size(data_cube,2); ymin=axis_ranges(3); ymax=axis_ranges(4);
 nz=size(data_cube,1); zmin=axis_ranges(5); zmax=axis_ranges(6);
 
-% Get a persistent graphics window
-clf reset; hold on; set(gcf,'Renderer','OpenGL');
+% Clear the current figure without a full reset: on the web figure
+% stack a per-call reset makes the window re-apply stored geometry
+% and jump if the user has moved it during an iterative calculation
+clf; hold on;
 set(gca,'Projection','perspective','Box','on','XGrid','on','YGrid','on',...
         'ZGrid','on','CameraPosition',5*[xmax ymax zmax]); camorbit(15,0);
 
@@ -124,7 +126,9 @@ end
 % Set blue -> white -> red colormap
 colormap(bwr_cmap());
 
-% Interpolate alpha map
+% Reset the alpha map explicitly, because the figure is no longer
+% fully reset between the calls, then interpolate it
+alphamap('default');
 new_alpha=interp1(1:64,alphamap,1:0.25:64,'pchip');
 
 % Scale and filter alpha map

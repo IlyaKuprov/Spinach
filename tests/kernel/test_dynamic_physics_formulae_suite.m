@@ -45,7 +45,7 @@ result=test_close(result,'xyz2dd tensor',M,d_ref*diag([1 1 -2]),1e-6,1e-12,...
                   'a z-axis point dipole has traceless principal values d, d, and -2d');
 
 % Check point electron-nucleus hyperfine tensor for a z-axis displacement
-A=xyz2hfc([0 0 0],[0 0 1],'1H',1);
+A=xyz2hfc([0 0 0],[0 0 1],'1H');
 C=1e4*spin('1H')*hbar*mu0/(4*pi*(1e-10)^3);
 result=test_close(result,'xyz2hfc point tensor',A,C*diag([-1 -1 2]),1e-4,1e-12,...
                   'a z-axis point electron gives a Gauss hyperfine tensor proportional to diag(-1,-1,2)');

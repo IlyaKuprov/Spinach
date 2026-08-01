@@ -3,7 +3,7 @@
 % ponent of the susceptibility tensor from DFT hyperfine coupling
 % tensors and experimentally observed pseudocontact shifts. Syntax:
 % 
-%             [chi,err]=pcs2chi(hfcs,shifts,isotopes,nel)
+%               [chi,err]=pcs2chi(hfcs,shifts,isotopes)
 %
 % Parameters:
 %
@@ -16,8 +16,6 @@
 %    isotopes   - cell array of character strings specifying
 %                 isotopes that exhibit each of the chemical
 %                 shifts supplied, for example {'1H','13C'}
-%
-%         nel   - number of unpaired electrons involved
 %
 % Outputs:
 %
@@ -34,10 +32,10 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=pcs2chi.m>
 
-function [chi,err]=pcs2chi(hfcs,shifts,isotopes,nel)
+function [chi,err]=pcs2chi(hfcs,shifts,isotopes)
 
 % Check consistency
-grumble(hfcs,shifts,isotopes,nel);
+grumble(hfcs,shifts,isotopes);
 
 % Set minimizer parameters
 options=optimoptions('fminunc','Algorithm','quasi-newton','Display','iter',...
@@ -51,7 +49,7 @@ guess=[0 0 0 0 0];
 [chi,err]=fminunc(@(x)lsq_err([x(1) x(2)   x(3); 
                                x(2) x(4)   x(5);
                                x(3) x(5) -(x(1)+x(4))],...
-          hfcs,shifts,isotopes,nel),guess,options);
+          hfcs,shifts,isotopes),guess,options);
 
 % Form the answer
 chi=[chi(1) chi(2)   chi(3);
@@ -61,7 +59,7 @@ chi=[chi(1) chi(2)   chi(3);
 end
 
 % Least squares error function
-function err=lsq_err(chi,hfcs,shifts,isotopes,nel)
+function err=lsq_err(chi,hfcs,shifts,isotopes)
 
 % Get the error going
 err=0;
@@ -69,14 +67,14 @@ err=0;
 % Build the list squares error
 for n=1:numel(hfcs)
     shift_expt=shifts(n);
-    shift_theo=hfc2pcs(hfcs{n},chi,isotopes{n},nel);
+    shift_theo=hfc2pcs(hfcs{n},chi,isotopes{n});
     err=err+(shift_expt-shift_theo)^2;
 end
 
 end
 
 % Consistency enforcement
-function grumble(hfcs,shifts,isotopes,nel)
+function grumble(hfcs,shifts,isotopes)
 if ~iscell(hfcs)
     error('hfcs must be a cell array of matrices.');
 end
@@ -102,10 +100,6 @@ for n=1:numel(isotopes)
     if ~ischar(isotopes{n})
         error('all elements of the isotopes cell array must be character strings.');
     end
-end
-if (~isnumeric(nel))||(~isreal(nel))||...
-   (numel(nel)~=1)||(mod(nel,1)~=0)||(nel<1)
-    error('nel must be a non-negative real integer.');
 end
 end
 

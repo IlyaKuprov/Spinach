@@ -98,16 +98,12 @@ result=test_close(result,'xyz2dd inverse-cube scaling',dip_half,dip_coupling/8,.
                   1e-8,1e-12,...
                   'doubling the internuclear distance divides the dipolar coupling by eight');
 
-% Check coordinate-derived hyperfine tensor symmetry and electron-count scaling
-hfc_one=xyz2hfc([0 0 0],[0 0 1],'1H',1);
-hfc_two=xyz2hfc([0 0 0],[0 0 1],'1H',2);
+% Check coordinate-derived hyperfine tensor symmetry and tracelessness
+hfc_one=xyz2hfc([0 0 0],[0 0 1],'1H');
 result=test_close(result,'xyz2hfc symmetry',hfc_one,hfc_one',1e-12,1e-12,...
                   'the point-dipole hyperfine tensor is symmetric');
 result=test_close(result,'xyz2hfc tracelessness',trace(hfc_one),0,1e-12,1e-12,...
                   'the point-dipole hyperfine tensor is traceless');
-result=test_close(result,'xyz2hfc electron-count scaling',hfc_two,2*hfc_one,...
-                  1e-12,1e-12,...
-                  'the point-dipole hyperfine tensor scales linearly with the number of electrons');
 
 end
 

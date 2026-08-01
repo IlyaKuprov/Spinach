@@ -1,7 +1,7 @@
 % Converts point electron and nuclear coordinates into a hyper-
 % fine interaction tensor. Syntax:
 %
-%                A=xyz2hfc(mxyz,exyz,isotope,nel)
+%                  A=xyz2hfc(mxyz,exyz,isotope)
 %
 % Parameters:
 %
@@ -13,8 +13,6 @@
 %
 %     isotope  - isitope specification, e.g. '13C'
 %
-%     nel      - number of unpaired electrons 
-%
 % Outputs:
 %
 %     A        - hyperfine coupling tensor, Gauss
@@ -22,15 +20,20 @@
 % Note: Gauss units are used for hyperfine couplings because 
 %       they do not depend on the electron g-tensor.
 %
+% Note: the tensor returned is the one that enters the spin
+%       Hamiltonian as S*A*I; it does not scale with the num-
+%       ber of unpaired electrons because the electron spin
+%       operator already carries that magnitude.
+%
 % ilya.kuprov@weizmann.ac.il
 % e.suturina@bath.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=xyz2hfc.m>
 
-function A=xyz2hfc(exyz,nxyz,isotope,nel)
+function A=xyz2hfc(exyz,nxyz,isotope)
 
 % Check consistency
-grumble(exyz,nxyz,isotope,nel);
+grumble(exyz,nxyz,isotope);
 
 % Fundamental constants
 hbar=1.054571730e-34; 
@@ -43,7 +46,7 @@ gamma_n=spin(isotope);
 nxyz=nxyz-exyz;
         
 % Collect fundamental constants
-C=10^4*gamma_n*hbar*mu0*nel/(4*pi*(1e-10)^3);
+C=10^4*gamma_n*hbar*mu0/(4*pi*(1e-10)^3);
 
 % Compute the dipolar matrix
 D=3*(nxyz'*nxyz)/norm(nxyz,2)^5-eye(3)/norm(nxyz,2)^3;
@@ -54,7 +57,7 @@ A=C*D;
 end
 
 % Consistency enforcement
-function grumble(exyz,nxyz,isotope,nel)
+function grumble(exyz,nxyz,isotope)
 if (~isnumeric(exyz))||(~isreal(exyz))||(numel(exyz)~=3)
     error('e_xyz must be a three-element real vector.');
 end
@@ -69,10 +72,6 @@ if norm(nxyz-exyz,2)==0
 end
 if ~ischar(isotope)
     error('isotope specification must be a character string.');
-end
-if (~isnumeric(nel))||(~isreal(nel))||...
-   (numel(nel)~=1)||(mod(nel,1)~=0)||(nel<1)
-    error('nel must be a non-negative real integer.');
 end
 end
 

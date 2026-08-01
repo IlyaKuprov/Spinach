@@ -18,9 +18,9 @@ end
 % xyz2hfc + hfc2pms against xyz2pms
 chi=randn(3); chi=(chi+chi')/2;
 nxyz=randn(1,3); mxyz=randn(1,3);
-nel=randi(10); isotope='15N';
-A=xyz2hfc(mxyz,nxyz,isotope,nel);
-[~,pms_tensor_a]=hfc2pms(A,chi,isotope,nel);
+isotope='15N';
+A=xyz2hfc(mxyz,nxyz,isotope);
+[~,pms_tensor_a]=hfc2pms(A,chi,isotope);
 pms_tensor_b=xyz2pms(nxyz,mxyz,chi);
 if norm(pms_tensor_a-pms_tensor_b,'fro')<1e-6
     disp('Test 2 passed.');

@@ -95,7 +95,72 @@ result=test_true(result,'merge_inp sys fields',sys.magnet==14.1&&...
 result=test_true(result,'merge_inp coordinates',numel(inter.coordinates)==3&&...
                  isequal(inter.coordinates{1},[0 0 0])&&isequal(inter.coordinates{3},[0 1 0]),...
                  'merge_inp must concatenate coordinate column-cell fields in subsystem order');
+result=test_true(result,'merge_inp common values',isequal(inter.temperature,298)&&...
+                 isequal(inter.relaxation,{'redfield'})&&isequal(sys.enable,{'greedy'}),...
+                 'merge_inp must keep non-extensive fields that are identical in all subsystems');
+result=test_true(result,'merge_inp square blocks',isequal(size(inter.coupling.scalar),[3 3])&&...
+                 isequal(inter.coupling.scalar{2,3},5.0)&&isempty(inter.coupling.scalar{1,3})&&...
+                 isequal(inter.srfk_mdepth{3,2},7.0)&&isempty(inter.srfk_mdepth{1,2})&&...
+                 isequal(inter.weiz_r1d,blkdiag(0.1,[0 0.2; 0.2 0])),...
+                 'merge_inp must block-merge square fields with empty cell or zero numeric padding');
+result=test_true(result,'merge_inp rate arrays',isequal(inter.r1_rates,{0.1;0.2;0.3})&&...
+                 isequal(inter.r2_rates,{1.1;1.2;1.3}),...
+                 'merge_inp must merge per-spin rate cell arrays of either orientation into columns');
+result=test_true(result,'merge_inp index offsets',isequal(inter.srsk_sources,[1 3])&&...
+                 isequal(inter.ignore,{[2 3]})&&isequal(inter.chem.parts,{1,[2 3]})&&...
+                 isequal(inter.chem.rates,zeros(2))&&isequal(inter.chem.concs,[1 1]),...
+                 'merge_inp must offset spin and subsystem indices by preceding spin counts');
+result=test_true(result,'merge_inp suscept centres',isequal(inter.suscept.chi,{0.01*eye(3)})&&...
+                 isequal(inter.suscept.xyz,{[5 5 5]}),...
+                 'merge_inp must concatenate susceptibility centre lists across subsystems');
 
+% Check column-oriented subsystem lists and partless chemistry
+[sys_parts,inter_parts]=local_merge_parts();
+inter_parts{2}.chem.parts={1;2};
+[~,inter]=merge_inp(sys_parts,inter_parts);
+result=test_true(result,'merge_inp column parts',isequal(inter.chem.parts,{1,2,3}),...
+                 'column-oriented chemical part lists must merge into offset row lists');
+[sys_parts,inter_parts]=local_merge_parts();
+inter_parts{1}.chem=struct('rp_theory','haberkorn','rp_electrons',1,'rp_rates',[1e6 2e6]);
+inter_parts{2}.chem=struct('rp_theory','haberkorn','rp_electrons',1,'rp_rates',[1e6 2e6]);
+inter_parts{1}.tau_c={1e-9}; inter_parts{2}.tau_c={1e-9};
+[~,inter]=merge_inp(sys_parts,inter_parts);
+result=test_true(result,'merge_inp partless chem',isequal(inter.tau_c,{1e-9})&&...
+                 isequal(inter.chem.rp_electrons,[1 2]),...
+                 'chemistry without a species split must keep tau_c common and offset electron indices');
+
+% Check that non-extensive differences and malformed inputs are refused
+[sys_parts,inter_parts]=local_merge_parts();
+inter_parts{2}.temperature=300;
+result=test_true(result,'merge_inp value mismatch',local_merge_fails(sys_parts,inter_parts),...
+                 'differing non-extensive field values must be refused');
+[sys_parts,inter_parts]=local_merge_parts();
+inter_parts{2}=rmfield(inter_parts{2},'chem');
+result=test_true(result,'merge_inp partial group',local_merge_fails(sys_parts,inter_parts),...
+                 'a nested group present in only some subsystems must be refused');
+[sys_parts,inter_parts]=local_merge_parts();
+inter_parts{1}.bogus=1;
+result=test_true(result,'merge_inp unknown field',local_merge_fails(sys_parts,inter_parts),...
+                 'unknown inter subfields must be refused');
+[sys_parts,inter_parts]=local_merge_parts();
+inter_parts{2}.zeeman.bogus=1;
+result=test_true(result,'merge_inp unknown group field',local_merge_fails(sys_parts,inter_parts),...
+                 'unknown subfields inside nested groups must be refused');
+[sys_parts,inter_parts]=local_merge_parts();
+sys_parts{2}=rmfield(sys_parts{2},'isotopes');
+result=test_true(result,'merge_inp missing isotopes',local_merge_fails(sys_parts,inter_parts),...
+                 'sys structures without isotope lists must be refused');
+
+end
+
+
+% Check that a merge attempt throws an error
+function failed=local_merge_fails(sys_parts,inter_parts)
+try
+    merge_inp(sys_parts,inter_parts); failed=false();
+catch
+    failed=true();
+end
 end
 
 
@@ -160,17 +225,45 @@ function [sys_parts,inter_parts]=local_merge_parts()
 sys_parts{1}.magnet=14.1;
 sys_parts{1}.isotopes={'1H'};
 sys_parts{1}.labels={'h'};
+sys_parts{1}.enable={'greedy'};
 inter_parts{1}.coordinates={[0 0 0]};
+inter_parts{1}.temperature=298;
+inter_parts{1}.relaxation={'redfield'};
 inter_parts{1}.zeeman=struct();
-inter_parts{1}.coupling=struct();
+inter_parts{1}.coupling.scalar={0.0};
+inter_parts{1}.r1_rates={0.1};
+inter_parts{1}.r2_rates={1.1};
+inter_parts{1}.srfk_mdepth=cell(1,1);
+inter_parts{1}.weiz_r1d=0.1;
+inter_parts{1}.srsk_sources=1;
+inter_parts{1}.ignore={};
+inter_parts{1}.suscept.chi={0.01*eye(3)};
+inter_parts{1}.suscept.xyz={[5 5 5]};
+inter_parts{1}.chem.parts={1};
+inter_parts{1}.chem.rates=0;
+inter_parts{1}.chem.concs=1;
 
 % Build second subsystem input structures
 sys_parts{2}.magnet=14.1;
 sys_parts{2}.isotopes={'13C','15N'};
 sys_parts{2}.labels={'c','n'};
+sys_parts{2}.enable={'greedy'};
 inter_parts{2}.coordinates={[1 0 0];[0 1 0]};
+inter_parts{2}.temperature=298;
+inter_parts{2}.relaxation={'redfield'};
 inter_parts{2}.zeeman=struct();
-inter_parts{2}.coupling=struct();
+inter_parts{2}.coupling.scalar={0.0 5.0; 0.0 0.0};
+inter_parts{2}.r1_rates={0.2;0.3};
+inter_parts{2}.r2_rates={1.2;1.3};
+inter_parts{2}.srfk_mdepth={[] []; 7.0 []};
+inter_parts{2}.weiz_r1d=[0 0.2; 0.2 0];
+inter_parts{2}.srsk_sources=2;
+inter_parts{2}.ignore={[1 2]};
+inter_parts{2}.suscept.chi={};
+inter_parts{2}.suscept.xyz={};
+inter_parts{2}.chem.parts={[1 2]};
+inter_parts{2}.chem.rates=0;
+inter_parts{2}.chem.concs=1;
 
 end
 

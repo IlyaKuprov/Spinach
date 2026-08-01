@@ -375,7 +375,7 @@ end
                   min([parameters.xyz_all(:,3); a(5)]) max([parameters.xyz_all(:,3); a(6)])]);
         end
         if ismember('diagnostics',parameters.plot)
-            set(groot,'CurrentFigure',2); clf reset; hold on; plot(expt_pcs,theo_pcs,'ro');
+            set(groot,'CurrentFigure',2); clf; hold on; plot(expt_pcs,theo_pcs,'ro');
             plot([min(expt_pcs) max(expt_pcs)],[min(expt_pcs) max(expt_pcs)],'b-');
             annotation('textbox',[0.15 0.7 0.2 0.2],...
                        'String',{['Density integral: '  num2str(normint)],...

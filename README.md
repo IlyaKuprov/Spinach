@@ -18,4 +18,4 @@ https://spindynamics.org/wiki/index.php?title=Main_Page
 
 Spinach requires Matlab R2024b or later with the following toolboxes: Parallel Computing, 
 Deep Learning, Reinforcement Lerning, Optimisation, Statistics and Machine Learning, 
-Aerospace, Mapping.
+Aerospace, Mapping, Curve Fitting.

@@ -4,19 +4,39 @@
 %
 % Parameters:
 %
-%       lam - row vector of regularisation parameters
+%       lam - row vector of regularisation parameters, must
+%             be positive and in ascending order
 %
-%       err - row vector of least squares errors
+%       err - row vector of least squares errors, must be
+%             positive and increasing with lam
 %
-%       reg - row vector of regularisation functional values
+%       reg - row vector of regularisation functional values,
+%             must be positive and decreasing with lam. This
+%             is the regularisation functional itself, not the
+%             penalty term of the error functional: when the
+%             optimiser reports lam*||L*x||^2, divide it by lam
+%             once before calling this function
 %
 %      mode - 'log' for logarithmic coordinates and 'linear'
 %             for linear ones; 'log' is recommended
 %
 % Outputs:
-%   
-%   lam_opt - the regularisation parameter at the point 
+%
+%   lam_opt - the regularisation parameter at the point
 %             of the maximum curvature of the L-curve
+%
+% Notes: the corner is the point of the greatest curvature, which for a
+%        smooth asymmetric bend is not the intersection of the asymptotes;
+%        the criterion locates the regularisation parameter to within a
+%        factor of a few and is not convergent in the zero noise limit
+%        (Vogel, SIAM J. Numer. Anal. 34, 1996). Treat the answer as an
+%        order of magnitude estimate and inspect the plotted curve.
+%
+%        The curvature maximum must fall inside the sampled interval; if
+%        it falls on either end, the corner is outside the range and this
+%        function refuses to return the endpoint as an answer.
+%
+%        This function requires the Curve Fitting Toolbox.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -26,6 +46,12 @@ function lam_opt=lcurve(lam,err,reg,mode)
 
 % Check consistency
 grumble(lam,err,reg,mode);
+
+% The corner is only meaningful when the sweep is a trade-off curve;
+% warn rather than bomb out, an expensive sweep is worth inspecting
+if any(diff(err)<=0)||any(diff(reg)>=0)
+    warning('err should increase and reg should decrease with lam, inspect the sweep.');
+end
 
 % Move to logarithmic coordinates
 log_lam=log10(lam); log_err=log10(err); log_reg=log10(reg);
@@ -81,8 +107,20 @@ kxlabel('regularisation parameter');
 kylabel('L-curve curvature'); 
 axis tight; kgrid;
 
-% Find the optimum point
-[~,index]=max(kappa); lam_opt=lam(index);
+% Find the maximum curvature point away from the ends, where the
+% sided finite difference stencils and the spline end conditions
+% are unreliable
+margin=ceil(numel(kappa)/40);
+[~,index]=max(kappa((1+margin):(end-margin))); index=index+margin;
+
+% A corner adjacent to either end means that it is outside the
+% sampled interval and the analysis has not found it
+if (index<=(2*margin))||(index>=(numel(kappa)-2*margin))
+    error('L-curve corner is outside the regularisation parameter range, widen it.');
+end
+
+% Report the optimum point
+lam_opt=lam(index);
 subplot(1,2,1); plot(err(index),reg(index),'ro');
 subplot(1,2,2); plot(lam(index),kappa(index),'ro');
 
@@ -90,23 +128,29 @@ end
 
 % Consistency enforcement
 function grumble(lam,err,reg,mode)
-if (~isnumeric(lam))||(~isreal(lam))||...
-   (any(~isfinite(lam)))||(size(lam,1)~=1)
-    error('lam must be a row vector of real numbers.');
+if (~isnumeric(lam))||(~isreal(lam))||(any(~isfinite(lam)))||...
+   (size(lam,1)~=1)||any(lam<=0)
+    error('lam must be a row vector of positive real numbers.');
 end
-if (~isnumeric(err))||(~isreal(err))||...
-   (any(~isfinite(err)))||(size(err,1)~=1)
-    error('err must be a row vector of real numbers.');
+if (~isnumeric(err))||(~isreal(err))||(any(~isfinite(err)))||...
+   (size(err,1)~=1)||any(err<=0)
+    error('err must be a row vector of positive real numbers.');
 end
-if (~isnumeric(reg))||(~isreal(reg))||...
-   (any(~isfinite(reg)))||(size(reg,1)~=1)
-    error('reg must be a row vector of real numbers.');
+if (~isnumeric(reg))||(~isreal(reg))||(any(~isfinite(reg)))||...
+   (size(reg,1)~=1)||any(reg<=0)
+    error('reg must be a row vector of positive real numbers.');
 end
 if (numel(lam)~=numel(err))||(numel(err)~=numel(reg))
     error('lam, err and reg must have the same number of elements.');
 end
-if ~ischar(mode)
-    error('mode must be a character string.');
+if numel(lam)<6
+    error('at least six regularisation parameter values are required.');
+end
+if any(diff(lam)<=0)
+    error('lam must be in ascending order.');
+end
+if (~ischar(mode))||(~ismember(mode,{'log','linear'}))
+    error('mode must be either ''log'' or ''linear''.');
 end
 end
 

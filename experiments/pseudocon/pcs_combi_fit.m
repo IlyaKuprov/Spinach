@@ -163,6 +163,9 @@ end
 if ~isfield(parameters,'spin_groups')
     error('parameters.spin_groups field is missing.');
 end
+if isfield(parameters,'nel')
+    error('parameters.nel is obsolete: hyperfine tensors are now normalised per unpaired electron, remove the field.');
+end
 if ~isfield(parameters,'d_shifts')
     error('parameters.d_shifts field is missing.');
 end

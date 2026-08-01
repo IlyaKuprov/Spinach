@@ -179,9 +179,15 @@ for n=1:length(g03_output)
          baa=g03_output(n+4*k+1); baa=char(baa); baa=eval(['[' baa(4:end) ']']);
          bbb=g03_output(n+4*k+2); bbb=char(bbb); bbb=eval(['[' bbb(15:end) ']']);
          bcc=g03_output(n+4*k+3); bcc=char(bcc); bcc=eval(['[' bcc(4:end) ']']);
-         props.hfc.full.eigvals{k}=[baa(3) bbb(3) bcc(3)]/(props.multiplicity-1)+props.hfc.iso(k);
+
+         % Renormalise the dipolar part and add the isotropic part in the
+         % laboratory basis, where it stays exactly isotropic even though
+         % Gaussian's four-decimal eigenvectors are not exactly orthonormal
+         dip_part=[baa(3) bbb(3) bcc(3)]/(props.multiplicity-1);
+         props.hfc.full.eigvals{k}=dip_part+props.hfc.iso(k);
          props.hfc.full.eigvecs{k}=[baa(5:7)' bbb(5:7)' bcc(5:7)'];
-         props.hfc.full.matrix{k}=props.hfc.full.eigvecs{k}*diag(props.hfc.full.eigvals{k})*props.hfc.full.eigvecs{k}';
+         props.hfc.full.matrix{k}=props.hfc.full.eigvecs{k}*diag(dip_part)*...
+                                  props.hfc.full.eigvecs{k}'+props.hfc.iso(k)*eye(3);
          if (~exist('options','var'))||(~ismember('hfc_nosymm',options))
             props.hfc.full.matrix{k}=(props.hfc.full.matrix{k}+props.hfc.full.matrix{k}')/2;
          end

@@ -10,8 +10,6 @@
 %                         in Gauss, usually out of gparse() or
 %                         something similar
 %
-%     parameters.nel    - number of unpaired electrons involved
-%
 %     parameters.isotopes - cell array of isotope specificati-
 %                           ons, e.g. {'1H','1H'}
 %
@@ -112,7 +110,7 @@ parfor n=1:N*M %#ok<*PFBNS>
     end
     
     % Get the assignment score
-    [~,score(n)]=pcs2chi(hfcs,pcs_expt,parameters.isotopes,parameters.nel);
+    [~,score(n)]=pcs2chi(hfcs,pcs_expt,parameters.isotopes);
     
 end
 
@@ -134,12 +132,12 @@ for k=1:numel(parameters.spin_groups)
 end
 
 % Recover the susceptibility
-chi=pcs2chi(hfcs,pcs_expt,parameters.isotopes,parameters.nel);
+chi=pcs2chi(hfcs,pcs_expt,parameters.isotopes);
 
 % Compute the predicted pseudocontact shifts
 pcs_theo=zeros(numel(hfcs),1);
 for k=1:numel(hfcs)
-    pcs_theo(k)=hfc2pcs(hfcs{k},chi,parameters.isotopes{k},parameters.nel);
+    pcs_theo(k)=hfc2pcs(hfcs{k},chi,parameters.isotopes{k});
 end
 
 % Compute the predicted total shifts
@@ -165,13 +163,8 @@ end
 if ~isfield(parameters,'spin_groups')
     error('parameters.spin_groups field is missing.');
 end
-if ~isfield(parameters,'nel')
-    error('parameters.nel field is missing.');
-end
-if (~isnumeric(parameters.nel))||(~isreal(parameters.nel))||...
-   (~isscalar(parameters.nel))||(~isfinite(parameters.nel))||...
-   (parameters.nel<1)||(mod(parameters.nel,1)~=0)
-    error('parameters.nel must be a finite positive real integer.');
+if isfield(parameters,'nel')
+    error('parameters.nel is obsolete: hyperfine tensors are now normalised per unpaired electron, remove the field.');
 end
 if ~isfield(parameters,'d_shifts')
     error('parameters.d_shifts field is missing.');

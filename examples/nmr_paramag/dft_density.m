@@ -47,7 +47,7 @@ for n=1:(props.natoms-1) %#ok<*AGROW>
     end
     
     % Compute DFT PCS
-    pcs_hfc(n)=hfc2pcs(props.hfc.full.matrix{n},chi,isotope,6); 
+    pcs_hfc(n)=hfc2pcs(props.hfc.full.matrix{n},chi,isotope); 
     
 end
 

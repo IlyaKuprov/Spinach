@@ -65,7 +65,7 @@ hfcs=props.hfc.full.matrix(26:37);
 % Compute DFT PCS
 dft_pcs_cu=zeros(size(point_pcs_cu));
 for n=1:numel(hfcs)
-    dft_pcs_cu(n)=hfc2pcs(hfcs{n},chi_cu,'1H',1);
+    dft_pcs_cu(n)=hfc2pcs(hfcs{n},chi_cu,'1H');
 end
 
 % Comparison of point with distributed with DFT

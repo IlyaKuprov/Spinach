@@ -42,7 +42,7 @@ hfcs=props.hfc.full.matrix(26:37);
 % Compute HFC PCS
 hfc_pcs_cu=zeros(numel(hfcs),1);
 for n=1:numel(hfcs)
-    hfc_pcs_cu(n)=hfc2pcs(hfcs{n},chi_cu,'1H',1);
+    hfc_pcs_cu(n)=hfc2pcs(hfcs{n},chi_cu,'1H');
 end
 
 % Parse ORCA cube and pad the density with zeros to avoid PBC effects 

@@ -12,7 +12,6 @@ function combi_fit_2()
 % Read DFT HFCs in Gauss
 props=gparse('l2_parker_funk_yb.log');
 parameters.hfcs=props.hfc.full.matrix;
-parameters.nel=1;
 
 % Isotope list
 parameters.isotopes=cell(27,1);

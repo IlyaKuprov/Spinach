@@ -23,7 +23,7 @@
 %   props.natoms           - number of atoms
 %   props.method           - energy method
 %   props.energy           - SCF energy (Hartree)
-%   props.hfc.iso          - isotropic hyperfines
+%   props.hfc.iso          - isotropic hyperfines (Gauss)
 %   props.hfc.full.eigvals - HFC eigenvalues (Gauss)
 %   props.hfc.full.eigvecs - HFC eigenvectors
 %   props.hfc.full.matrix  - HFC tensors (Gauss)
@@ -53,6 +53,14 @@
 %
 %          #p nmr=(giao,spinspin,susceptibility) 
 %             output=pickett pop=minimal IOp(6/82=1)
+%
+%        Gaussian divides its isotropic Fermi contact couplings
+%        by 2S=multiplicity-1, but prints the anisotropic spin
+%        dipole couplings without that normalisation; the two
+%        blocks therefore disagree by 2S for anything above a
+%        doublet. This is corrected here, and the hyperfine
+%        tensors returned are the ones that enter the spin
+%        Hamiltonian as S*A*I, in agreement with oparse.m
 %
 % gareth.charnock@oerc.ox.ac.uk
 % jennifer.handsel@stx.ox.ac.uk
@@ -159,8 +167,11 @@ for n=1:length(g03_output)
       disp('Gaussian import: found found isotope numbers.');
    end
 
-   % Read and symmetrize anisotropic hyperfine couplings
+   % Read, renormalise, and symmetrize anisotropic hyperfine couplings
    if strcmp(g03_output(n),'Anisotropic Spin Dipole Couplings in Principal Axis System')
+      if props.multiplicity==1
+         error('Gaussian hyperfine normalisation is undefined at multiplicity 1.');
+      end
       props.hfc.full.eigvals=cell(natoms,1);
       props.hfc.full.eigvecs=cell(natoms,1);
       props.hfc.full.matrix=cell(natoms,1);
@@ -168,9 +179,15 @@ for n=1:length(g03_output)
          baa=g03_output(n+4*k+1); baa=char(baa); baa=eval(['[' baa(4:end) ']']);
          bbb=g03_output(n+4*k+2); bbb=char(bbb); bbb=eval(['[' bbb(15:end) ']']);
          bcc=g03_output(n+4*k+3); bcc=char(bcc); bcc=eval(['[' bcc(4:end) ']']);
-         props.hfc.full.eigvals{k}=[baa(3) bbb(3) bcc(3)]+props.hfc.iso(k);
+
+         % Renormalise the dipolar part and add the isotropic part in the
+         % laboratory basis, where it stays exactly isotropic even though
+         % Gaussian's four-decimal eigenvectors are not exactly orthonormal
+         dip_part=[baa(3) bbb(3) bcc(3)]/(props.multiplicity-1);
+         props.hfc.full.eigvals{k}=dip_part+props.hfc.iso(k);
          props.hfc.full.eigvecs{k}=[baa(5:7)' bbb(5:7)' bcc(5:7)'];
-         props.hfc.full.matrix{k}=props.hfc.full.eigvecs{k}*diag(props.hfc.full.eigvals{k})*props.hfc.full.eigvecs{k}';
+         props.hfc.full.matrix{k}=props.hfc.full.eigvecs{k}*diag(dip_part)*...
+                                  props.hfc.full.eigvecs{k}'+props.hfc.iso(k)*eye(3);
          if (~exist('options','var'))||(~ismember('hfc_nosymm',options))
             props.hfc.full.matrix{k}=(props.hfc.full.matrix{k}+props.hfc.full.matrix{k}')/2;
          end

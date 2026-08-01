@@ -25,7 +25,10 @@
 %       any difference is treated as an error. Nested groups
 %       (zeeman, coupling, giant, suscept, chem) and every field
 %       must be present in all subsystems or in none. An error is
-%       thrown for unhandled subfields.
+%       thrown for unhandled subfields. Coordinates and suscepti-
+%       bility centres from all subsystems are assumed to refer
+%       to one common frame of reference; spin index lists are
+%       returned as row vectors.
 %
 % ilya.kuprov@weizmann.ac.il
 % a.acharya@soton.ac.uk
@@ -63,8 +66,9 @@ for n=1:numel(inter_common)
     [inter,inter_parts]=merge_like_magnet(inter,inter_parts,inter_common{n});
 end
 
-% Fields that are per chemical species when chemistry is present
-if group_check(inter_parts,'chem')
+% Fields that are per chemical species when a species split is present
+if group_check(inter_parts,'chem')&&...
+   all(cellfun(@(x)isfield(x.chem,'parts'),inter_parts))
     [inter,inter_parts]=merge_like_isotopes(inter,inter_parts,'tau_c');
     [inter,inter_parts]=merge_like_isotopes(inter,inter_parts,'order_matrix');
 else
@@ -351,14 +355,15 @@ end
 function [spec,spec_parts]=merge_like_sources(spec,spec_parts,field_name,part_sizes)
 offsets=cumsum([0 part_sizes(1:end-1)]);
 if isfield(spec_parts{1},field_name)
-    spec.(field_name)=spec_parts{1}.(field_name);
+    spec.(field_name)=reshape(spec_parts{1}.(field_name),1,[]);
     spec_parts{1}=rmfield(spec_parts{1},field_name);
     for n=2:numel(spec_parts)
         if isfield(spec_parts{n},field_name)
             if ~isfield(spec,field_name)
                 error([field_name ' is not present in all subsystems.']);
             else
-                spec.(field_name)=[spec.(field_name) spec_parts{n}.(field_name)+offsets(n)];
+                spec.(field_name)=[spec.(field_name) ...
+                                   reshape(spec_parts{n}.(field_name),1,[])+offsets(n)];
                 spec_parts{n}=rmfield(spec_parts{n},field_name);
             end
         else
@@ -380,14 +385,15 @@ end
 function [spec,spec_parts]=merge_like_parts(spec,spec_parts,field_name,part_sizes)
 offsets=cumsum([0 part_sizes(1:end-1)]);
 if isfield(spec_parts{1},field_name)
-    spec.(field_name)=spec_parts{1}.(field_name);
+    spec.(field_name)=reshape(spec_parts{1}.(field_name),1,[]);
     spec_parts{1}=rmfield(spec_parts{1},field_name);
     for n=2:numel(spec_parts)
         if isfield(spec_parts{n},field_name)
             if ~isfield(spec,field_name)
                 error([field_name ' is not present in all subsystems.']);
             else
-                shifted=cellfun(@(x)x+offsets(n),spec_parts{n}.(field_name),...
+                shifted=cellfun(@(x)x+offsets(n),...
+                                reshape(spec_parts{n}.(field_name),1,[]),...
                                 'UniformOutput',false);
                 spec.(field_name)=[spec.(field_name) shifted];
                 spec_parts{n}=rmfield(spec_parts{n},field_name);

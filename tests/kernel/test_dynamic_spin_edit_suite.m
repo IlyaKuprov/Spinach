@@ -114,6 +114,21 @@ result=test_true(result,'merge_inp suscept centres',isequal(inter.suscept.chi,{0
                  isequal(inter.suscept.xyz,{[5 5 5]}),...
                  'merge_inp must concatenate susceptibility centre lists across subsystems');
 
+% Check column-oriented subsystem lists and partless chemistry
+[sys_parts,inter_parts]=local_merge_parts();
+inter_parts{2}.chem.parts={1;2};
+[~,inter]=merge_inp(sys_parts,inter_parts);
+result=test_true(result,'merge_inp column parts',isequal(inter.chem.parts,{1,2,3}),...
+                 'column-oriented chemical part lists must merge into offset row lists');
+[sys_parts,inter_parts]=local_merge_parts();
+inter_parts{1}.chem=struct('rp_theory','haberkorn','rp_electrons',1,'rp_rates',[1e6 2e6]);
+inter_parts{2}.chem=struct('rp_theory','haberkorn','rp_electrons',1,'rp_rates',[1e6 2e6]);
+inter_parts{1}.tau_c={1e-9}; inter_parts{2}.tau_c={1e-9};
+[~,inter]=merge_inp(sys_parts,inter_parts);
+result=test_true(result,'merge_inp partless chem',isequal(inter.tau_c,{1e-9})&&...
+                 isequal(inter.chem.rp_electrons,[1 2]),...
+                 'chemistry without a species split must keep tau_c common and offset electron indices');
+
 % Check that non-extensive differences and malformed inputs are refused
 [sys_parts,inter_parts]=local_merge_parts();
 inter_parts{2}.temperature=300;

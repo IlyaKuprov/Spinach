@@ -47,8 +47,7 @@ function lam_opt=lcurve(lam,err,reg,mode)
 % Check consistency
 grumble(lam,err,reg,mode);
 
-% The corner is only meaningful when the sweep is a trade-off curve;
-% warn rather than bomb out, an expensive sweep is worth inspecting
+% Warn about a sweep that is not a trade-off curve, but do not bomb out
 if any(diff(err)<=0)||any(diff(reg)>=0)
     warning('err should increase and reg should decrease with lam, inspect the sweep.');
 end
@@ -107,14 +106,11 @@ kxlabel('regularisation parameter');
 kylabel('L-curve curvature'); 
 axis tight; kgrid;
 
-% Find the maximum curvature point away from the ends, where the
-% sided finite difference stencils and the spline end conditions
-% are unreliable
+% Find the maximum curvature away from the unreliable stencil ends
 margin=ceil(numel(kappa)/40);
 [~,index]=max(kappa((1+margin):(end-margin))); index=index+margin;
 
-% A corner adjacent to either end means that it is outside the
-% sampled interval and the analysis has not found it
+% A corner at the edge means it is outside the sampled interval
 if (index<=(2*margin))||(index>=(numel(kappa)-2*margin))
     error('L-curve corner is outside the regularisation parameter range, widen it.');
 end

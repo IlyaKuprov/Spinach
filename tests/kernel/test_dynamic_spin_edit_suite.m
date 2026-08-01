@@ -34,6 +34,33 @@ result=test_true(result,'kill_spin numeric dimensions',numel(trimmed.inter.coord
                  'coordinate, coupling, and proximity arrays must shrink with the spin count');
 result=test_true(result,'kill_spin chemical part update',isequal(trimmed.chem.parts,{[1 2]}),...
                  'chemical part indices must be renumbered after a spin is removed');
+result=test_true(result,'kill_spin particle types',isequal(trimmed.comp.types,{'S','S'}),...
+                 'particle type codes must shrink with the spin count');
+result=test_true(result,'kill_spin isotope hash',strcmp(trimmed.comp.iso_hash,md5_hash({'1H','13C'})),...
+                 'the isotope list hash must be recomputed after spin removal');
+result=test_true(result,'kill_spin SRSK sources',isequal(trimmed.rlx.srsk_sources,[1 2]),...
+                 'scalar relaxation source spins must be renumbered after spin removal');
+
+% Check chemical part renumbering across multiple subsystems
+multipart=spin_system; multipart.chem.parts={[1 2],3};
+multipart=kill_spin(multipart,3);
+result=test_true(result,'kill_spin multi-part update',isequal(multipart.chem.parts,{[1 2],zeros(1,0)}),...
+                 'killing the last spin must renumber every chemical subsystem without an error');
+
+% Check destruction of stale basis, connectivity, symmetry, and assumption data
+stale=spin_system; stale.bas.formalism='sphten-liouv';
+stale.inter.conmatrix=logical(speye(3));
+stale.comp.sym_group={'S2'}; stale.comp.sym_spins={[2 3]}; stale.comp.sym_a1g_only=true();
+stale.inter.assumptions='nmr';
+stale.inter.zeeman.strength={'secular','secular','secular'};
+stale.inter.giant.strength={[],[],[]};
+stale.inter.coupling.strength=cell(3,3);
+stale=kill_spin(stale,2);
+result=test_true(result,'kill_spin stale metadata',~isfield(stale,'bas')&&...
+                 ~isfield(stale.inter,'conmatrix')&&~isfield(stale.comp,'sym_group')&&...
+                 ~isfield(stale.inter,'assumptions')&&~isfield(stale.inter.zeeman,'strength')&&...
+                 ~isfield(stale.inter.giant,'strength')&&~isfield(stale.inter.coupling,'strength'),...
+                 'basis, connectivity, symmetry, and assumption data must be destroyed on spin removal');
 
 % Check logical spin removal follows the same path
 logical_trimmed=kill_spin(spin_system,[false true false]);
@@ -82,6 +109,7 @@ spin_system.sys.disable={};
 % Define spin identities and basis-independent metadata
 spin_system.comp.nspins=3;
 spin_system.comp.isotopes={'1H','13C','13C'};
+spin_system.comp.types={'S','S','S'};
 spin_system.comp.labels={'h','c1','c2'};
 spin_system.comp.mults=[2 2 2];
 spin_system.comp.iso_hash='unused';
@@ -104,6 +132,7 @@ spin_system.rlx.lind_r2_rates=[];
 spin_system.rlx.srfk_mdepth=[];
 spin_system.rlx.weiz_r1d=[];
 spin_system.rlx.weiz_r2d=[];
+spin_system.rlx.srsk_sources=[1 3];
 
 % Define chemistry arrays affected by spin removal
 spin_system.chem.parts={[1 2 3]};

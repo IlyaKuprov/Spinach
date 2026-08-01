@@ -17,9 +17,9 @@
 %                     ted spins and all dependent infor-
 %                     mation (basis, assumptions) removed
 %
-% Notes: basis and assumption information is destroyed by this
-%        function; you would need to call basis.m and assume.m
-%        again.
+% Notes: basis, connectivity, symmetry, and assumption information
+%        is destroyed by this function; you would need to call the
+%        basis.m and assume.m functions again.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -32,15 +32,18 @@ function spin_system=kill_spin(spin_system,hit_list)
 grumble(spin_system,hit_list)
 
 % Catch logical indexing
-if any(hit_list==0), hit_list=find(hit_list); end
+if islogical(hit_list), hit_list=find(hit_list); end
 
 % Inform the user
 report(spin_system,['removing ' num2str(numel(hit_list)) ...
                     ' spins from the system...']);
 
-% Update isotopes list and its hash
+% Update isotope and particle type lists
 spin_system.comp.isotopes(hit_list)=[];
-if ismember('op_cache',spin_system.sys.enable)
+spin_system.comp.types(hit_list)=[];
+
+% Update the isotope list hash
+if isfield(spin_system.comp,'iso_hash')
     spin_system.comp.iso_hash=md5_hash(spin_system.comp.isotopes);
 end
 
@@ -103,9 +106,16 @@ if ~isempty(spin_system.rlx.weiz_r2d)
     spin_system.rlx.weiz_r2d(:,hit_list)=[];
 end
 
+% Update scalar relaxation source spins
+if ~isempty(spin_system.rlx.srsk_sources)
+    srsk_spins=zeros(1,spin_system.comp.nspins+numel(hit_list));
+    srsk_spins(spin_system.rlx.srsk_sources)=1; srsk_spins(hit_list)=[];
+    spin_system.rlx.srsk_sources=find(srsk_spins);
+end
+
 % Update kinetics parameters
 for n=1:numel(spin_system.chem.parts)
-    subsystem_idx=false(1,spin_system.comp.nspins);
+    subsystem_idx=false(1,spin_system.comp.nspins+numel(hit_list));
     subsystem_idx(spin_system.chem.parts{n})=true();
     subsystem_idx(hit_list)=[];
     spin_system.chem.parts{n}=find(subsystem_idx);
@@ -129,9 +139,27 @@ if isfield(spin_system,'bas')
     report(spin_system,'WARNING - basis set information must be re-created.');
 end
 
+% If any connectivity information is found, destroy it
+if isfield(spin_system.inter,'conmatrix')
+    spin_system.inter=rmfield(spin_system.inter,'conmatrix');
+end
+
+% If any symmetry information is found, destroy it
+if isfield(spin_system.comp,'sym_group')
+    spin_system.comp=rmfield(spin_system.comp,{'sym_group','sym_spins','sym_a1g_only'});
+end
+
 % If any assumption information is found, destroy it
+if isfield(spin_system.inter,'assumptions')
+    spin_system.inter=rmfield(spin_system.inter,'assumptions');
+    report(spin_system,'WARNING - assumption information must be re-created.');
+end
 if isfield(spin_system.inter.zeeman,'strength')
     spin_system.inter.zeeman=rmfield(spin_system.inter.zeeman,'strength');
+    report(spin_system,'WARNING - assumption information must be re-created.');
+end
+if isfield(spin_system.inter.giant,'strength')
+    spin_system.inter.giant=rmfield(spin_system.inter.giant,'strength');
     report(spin_system,'WARNING - assumption information must be re-created.');
 end
 if isfield(spin_system.inter.coupling,'strength')
@@ -148,8 +176,8 @@ if islogical(hit_list)
         error('the size of the hit mask does not match the number of spins in the system.');
     end
 else
-    if (~isnumeric(hit_list))||any(hit_list<1)
-        error('hit_list must be a logical matrix or an array of positive numbers.');
+    if (~isnumeric(hit_list))||any(hit_list<1)||any(mod(hit_list,1)~=0)
+        error('hit_list must be a logical mask or an array of positive integers.');
     end
     if any(hit_list>spin_system.comp.nspins)
         error('at least one number in hit_list exceeds the number of spins.');
@@ -162,4 +190,5 @@ end
 % a bath house.
 %
 % David Hilbert, about Emmy Noether, in 1915.
+
 

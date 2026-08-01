@@ -75,6 +75,12 @@ function [source_cube,ranges,pred_pcs,err_ls,reg_a,reg_b]=ipcs(parameters,npoint
 % Check consistency
 grumble(parameters,npoints,lambda);
 
+% Kill stupid ass figure defaults in R2025a and later 
+set(groot,'defaultFigurePosition',[680 458 560 420]); 
+set(groot,'defaultFigureWindowStyle','normal'); 
+set(groot,'defaultFigureMenuBar','figure'); 
+set(groot,'defaultFigureToolbar','figure'); 
+
 % Allow GPUs Matlab has not yet seen
 parallel.gpu.enableCUDAForwardCompatibility(true);
 

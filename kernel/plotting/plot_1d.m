@@ -14,7 +14,9 @@
 %    parameters.offset             transmitter offset, Hz
 %
 %    parameters.axis_units         axis units ('ppm','Gauss',
-%                                  'mT','T','Hz','kHz','MHz')
+%                                  'mT','Hz','kHz','MHz',
+%                                  'MHz-labframe','GHz','GHz-labframe',
+%                                  'gtensor','points')
 %
 %    parameters.derivative         if set to 1, the spectrum is
 %                                  differentiated before plotting

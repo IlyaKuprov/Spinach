@@ -28,7 +28,7 @@
 % following way:
 %
 %                 parameters.rho0_ph={Ph1,Ph2,...,PhN}
-%                 parameters.rho0_op={rho1,rho2,...,rhoN}
+%                 parameters.rho0_st={rho1,rho2,...,rhoN}
 %
 % where PhN have the same dimension as the sample voxel grid and rhoN are 
 % spin states obtained from state() function.
@@ -38,7 +38,7 @@
 % must be specified in the following way:
 %
 %                 parameters.coil_ph={Ph1,Ph2,...,PhN}
-%                 parameters.coil_op={rho1,rho2,...,rhoN}
+%                 parameters.coil_st={rho1,rho2,...,rhoN}
 %
 % where PhN have the same dimension as the sample voxel grid and rhoN are 
 % spin states obtained from state() function.

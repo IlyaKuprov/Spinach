@@ -190,8 +190,8 @@ current orientation.
 
 Pulse sequences ask for a thermal initial state through `parameters.needs`,
 which places the result in `parameters.rho0`: `'rho_eq'` in `liquid`,
-`'iso_eq'` in `powder`, `singlerot`, and `doublerot`, `'aniso_eq'` in
-`powder` and `crystal`.
+`'iso_eq'` in `powder`, `singlerot`, `doublerot`, `floquet`, and `gridfree`,
+`'aniso_eq'` in `powder` and `crystal`.
 
 Run `[r1,r2,t1,t2,R]=relaxan(spin_system)` before trusting any of this: it
 prints longitudinal and transverse rates and times for every spin, dynamic

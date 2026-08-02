@@ -87,7 +87,8 @@ The leading minus is the NOESY sign convention; HSQC-type spectra omit it.
 States quadrature, and a split into natural-abundance isotopomers.
 
 ```matlab
-subsystems=dilute(create(sys,inter),'13C');
+spin_system=create(sys,inter);
+subsystems=dilute(spin_system,'13C');
 parfor n=1:numel(subsystems)
     subsystem=basis(subsystems{n},bas);          % basis inside the loop
     fid=liquid(subsystem,@hsqc,parameters,'nmr');
@@ -188,8 +189,9 @@ parameters.rho0=-state(spin_system,'Lz','E');  % high-temperature approximation
 [spec,parameters]=fieldsweep(spin_system,parameters);
 ```
 
-Hyperfine couplings quoted in gauss or millitesla must pass through
-`gauss2mhz` or `mt2hz` first. Liquid-phase FFT EPR is
+Hyperfine couplings quoted in gauss must pass through `gauss2mhz` and then be
+multiplied by `1e6` to convert MHz to Hz; millitesla values can pass through
+`mt2hz` directly. Liquid-phase FFT EPR is
 `esr_liq_pulsed/pulse_acquire_methyl.m`, using `liquid` with `'esr'`
 assumptions and a common line width. Slow tumbling needs the stochastic
 Liouville equation: `relaxation_theory/sle_esr_nitroxide_1.m`.

@@ -171,9 +171,10 @@ construction, not by inspection of the output alone.
 **Unit mistakes.** Chemical shifts are ppm, all couplings are Hz, Euler angles
 are radians, times are seconds (full table in the main skill file). Classic
 slips: a shift entered in Hz into `inter.zeeman.scalar`; a hyperfine coupling
-in gauss or millitesla not converted with `gauss2mhz`/`mt2hz`; degrees
-instead of radians in Euler angles, which distorts powder patterns smoothly -
-no crash, wrong lineshape.
+in gauss passed through `gauss2mhz` without converting its MHz output to Hz, or
+a millitesla value not converted with `mt2hz`; degrees instead of radians in
+Euler angles, which distorts powder patterns smoothly - no crash, wrong
+lineshape.
 
 **Doubled couplings.** `create` adds `inter.coupling.scalar{i,j}` and
 `inter.coupling.scalar{j,i}` independently into the coupling matrix.
@@ -226,11 +227,16 @@ The Liouville-space dimension grows as 4^N for N spin-1/2 particles (2^N in
 Hilbert space). A complete `sphten-liouv` basis is practical to roughly ten
 spins; beyond that, the basis restriction is the tool, not a bigger machine:
 
-- `IK-1`/`IK-2` with `bas.level` 3-4 handles large organic molecules
-  routinely; converge by incrementing `bas.level` until the spectrum stops
-  changing.
-- `bas.longitudinals` (spectator nuclei) and `bas.projections` (keep one
-  coherence order) cost nothing physically.
+- `IK-1`/`IK-2` handles large organic molecules routinely. For `IK-1`, converge
+  by incrementing `bas.level` and, when relevant, `bas.space_level`; for
+  `IK-2`, `bas.level` does not control basis construction, so increment
+  `bas.space_level` instead until the spectrum stops changing.
+- `bas.longitudinals` and `bas.projections` are physical approximations, not
+  free reductions: the former deletes transverse states on selected spins,
+  while the latter deletes total-coherence blocks that are not retained. Use
+  them only when the initial state, pulse sequence, Hamiltonian, relaxation,
+  and observable cannot enter the discarded blocks, and validate against an
+  unfiltered basis when practical.
 - `bas.sym_group`/`bas.sym_spins` exploit permutation symmetry - large
   savings for methyl groups and symmetric aromatics.
 
@@ -301,15 +307,18 @@ Then read positions off the axis vector and compare numerically, not
 visually. The log's per-spin Zeeman terms in Hz are the same numbers from the
 other end and must agree.
 
-**2. Invariants are intact.** `all(isfinite(fid))` must be true; `max(abs(fid))`
-must be bounded by its t=0 value when relaxation is on and must not grow;
-thermal states must have positive populations; in Hilbert-space formalisms
-the density matrix trace is conserved. Print these in the script so they are
-checked on every run, not once.
+**2. Invariants are intact.** `all(isfinite(fid))` must be true. A detected FID
+is not generally monotonic: coherent transfer, J modulation, echoes, and an
+observable initially orthogonal to the state can make its magnitude grow even
+with dissipative relaxation. Require bounded or monotonic decay only when the
+specific dynamics guarantee it; thermal states must have positive populations,
+and in Hilbert-space formalisms the density matrix trace is conserved. Print
+these checks in the script so they are run every time, not once.
 
-**3. The result is converged.** Rerun with `bas.level` incremented, the powder
-grid one rank finer, and the time step halved, one factor at a time, and
-compare spectra numerically - `norm(s1-s2)/norm(s1)` below a stated
+**3. The result is converged.** Rerun with the active basis restriction
+parameter incremented (`bas.level` for `IK-1`, `bas.space_level` for `IK-2`),
+the powder grid one rank finer, and the time step halved, one factor at a time,
+and compare spectra numerically - `norm(s1-s2)/norm(s1)` below a stated
 tolerance, not "looks the same". A converged result stops moving under
 refinement; an unconverged one can look entirely reasonable.
 

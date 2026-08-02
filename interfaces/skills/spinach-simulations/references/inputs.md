@@ -11,9 +11,11 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 ```
 
-`create` refuses to run in MATLAB script mode; wrap every simulation in a
-`function ... end` block. Unrecognised fields in `sys` are fatal: `create`
-strips the fields it understands and errors on whatever is left.
+`create` refuses to run when called directly from MATLAB's base workspace; a
+named script or function adds a caller stack frame and is accepted. Keep
+simulations in a named script or function rather than calling `create`
+interactively. Unrecognised fields in `sys` are fatal: `create` strips the
+fields it understands and errors on whatever is left.
 
 ## The `sys` structure
 
@@ -377,8 +379,8 @@ from a multi-molecule PDB; `options.noshift` is `'keep'` (unassigned atoms
 placed between -1 and 0 ppm) or `'delete'`; `options.deuterate` is a cell array
 of PDB identifiers, or `'non-Me'`; `options.nh_csa` selects the peptide bond
 CSA set, `'bax'`, `'tcb'` (default) or `'pol'`. Outputs include `sys.labels`
-with IUPAC atom labels, `inter.coordinates` in angstrom, `inter.zeeman.iso` and
-`inter.zeeman.matrix` in ppm, `inter.coupling.scalar` in Hz, and `aux` with
+with IUPAC atom labels, `inter.coordinates` in angstrom, `inter.zeeman.scalar`
+and `inter.zeeman.matrix` in ppm, `inter.coupling.scalar` in Hz, and `aux` with
 residue numbers and types.
 
 `[sys,inter]=nuclacid(pdb_file,shift_file,options)` does the same for nucleic

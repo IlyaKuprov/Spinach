@@ -44,7 +44,7 @@ context can compute. The accepted strings differ by context:
 | `'zeeman_op'` | lab-frame Zeeman part of the Hamiltonian, placed in `parameters.hzeeman` | `liquid`, `crystal`, `powder` |
 | `'rdc'` | processes residual anisotropic couplings from the user order matrix | `liquid` |
 | `'rho_eq'` | thermal equilibrium with respect to the isotropic Hamiltonian, placed in `parameters.rho0` | `liquid` |
-| `'iso_eq'` | thermal equilibrium of the isotropic Hamiltonian into `parameters.rho0` | `powder`, `singlerot`, `doublerot` |
+| `'iso_eq'` | thermal equilibrium of the isotropic Hamiltonian into `parameters.rho0` | `powder`, `singlerot`, `doublerot`, `floquet`, `gridfree` |
 | `'aniso_eq'` | equilibrium recomputed from the full anisotropic Hamiltonian at the current orientation | `crystal`, `powder` |
 
 ### Context-specific parameters
@@ -141,13 +141,15 @@ generator as `B=H+F+1i*R+1i*K`.
 | `krylov` | `answer=krylov(spin_system,L,coil,rho,time_step,nsteps,output)` |
 | `propagator` | `P=propagator(spin_system,L,timestep)` |
 
-`evolution` and `krylov` share the `output` strings:
+`evolution` supports all of the following `output` strings. `krylov` supports
+all of them except `'total'`, which requires the infinite-time integration
+implemented by `evolution`.
 
 | String | Returns |
 |---|---|
 | `'final'` | final state vector, or a horizontal stack thereof |
 | `'trajectory'` | the stack of state vectors over the requested steps |
-| `'total'` | integral of the observable trace from start to infinity; requires relaxation |
+| `'total'` | integral of the observable trace from start to infinity; requires relaxation and is supported by `evolution` only |
 | `'refocus'` | evolves the first vector zero steps, the second one step, the third two, matching indirect evolution after a refocusing pulse |
 | `'observable'` | time dynamics of one observable against `coil` |
 | `'multichannel'` | several observables as rows, `coil` carrying one column each |

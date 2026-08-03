@@ -220,10 +220,10 @@ for n=1:numel(parameters.rframes)
     end
 end
 
-if (~iscell(parameters.needs))||any(~cellfun(@ischar,parameters.needs))
+if (~iscell(parameters.needs))||any(~cellfun(@ischar,parameters.needs(:)))
     error('parameters.needs must be a cell array of character strings.');
 end
-if any(~ismember(parameters.needs,{'rdc','zeeman_op','rho_eq'}))
+if any(~ismember(parameters.needs(:),{'rdc','zeeman_op','rho_eq'}))
     error('parameters.needs may only contain ''rdc'', ''zeeman_op'', and ''rho_eq'' in this context.');
 end
 

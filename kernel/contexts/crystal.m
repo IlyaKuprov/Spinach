@@ -241,6 +241,13 @@ for n=1:numel(parameters.rframes)
     end
 end
 
+if (~iscell(parameters.needs))||any(~cellfun(@ischar,parameters.needs(:)))
+    error('parameters.needs must be a cell array of character strings.');
+end
+if any(~ismember(parameters.needs(:),{'zeeman_op','aniso_eq'}))
+    error('parameters.needs may only contain ''zeeman_op'' and ''aniso_eq'' in this context.');
+end
+
 end
 
 % Why do they always teach us that it's easy and evil to do what we 

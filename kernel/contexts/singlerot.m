@@ -400,6 +400,13 @@ end
 % Consistency enforcement
 function grumble(spin_system,pulse_sequence,parameters,assumptions)
 
+if (~iscell(parameters.needs))||any(~cellfun(@ischar,parameters.needs(:)))
+    error('parameters.needs must be a cell array of character strings.');
+end
+if any(~ismember(parameters.needs(:),{'iso_eq'}))
+    error('parameters.needs may only contain ''iso_eq'' in this context.');
+end
+
 % Option combination restrictions
 if isfield(parameters,'rho0')&&isfield(parameters,'needs')&&...
    ismember('iso_eq',parameters.needs)

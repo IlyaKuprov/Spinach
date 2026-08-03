@@ -472,6 +472,13 @@ for n=1:numel(parameters.rframes)
     end
 end
 
+if (~iscell(parameters.needs))||any(~cellfun(@ischar,parameters.needs(:)))
+    error('parameters.needs must be a cell array of character strings.');
+end
+if any(~ismember(parameters.needs(:),{'iso_eq'}))
+    error('parameters.needs may only contain ''iso_eq'' in this context.');
+end
+
 end
 
 % Show me a hero and I'll write you a tragedy.

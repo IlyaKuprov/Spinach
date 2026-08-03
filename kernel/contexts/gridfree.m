@@ -319,6 +319,13 @@ elseif numel(parameters.offset)~=numel(parameters.spins)
     error('parameters.offset variable must have the same number of elements as parameters.spins.');
 end
 
+if (~iscell(parameters.needs))||any(~cellfun(@ischar,parameters.needs(:)))
+    error('parameters.needs must be a cell array of character strings.');
+end
+if any(~ismember(parameters.needs(:),{'iso_eq'}))
+    error('parameters.needs may only contain ''iso_eq'' in this context.');
+end
+
 end
 
 % No god and no religion can survive ridicule. No political church, 

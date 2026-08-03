@@ -408,6 +408,12 @@ end
 
 % Additional needs
 if isfield(parameters,'needs')
+    if (~iscell(parameters.needs))||any(~cellfun(@ischar,parameters.needs(:)))
+        error('parameters.needs must be a cell array of character strings.');
+    end
+    if any(~ismember(parameters.needs(:),{'zeeman_op','iso_eq','aniso_eq'}))
+        error('parameters.needs may only contain ''zeeman_op'', ''iso_eq'', and ''aniso_eq'' in this context.');
+    end
     if ismember('iso_eq',parameters.needs)&&ismember('aniso_eq',parameters.needs)
         error('iso_eq and aniso_eq needs cannot be specified simultaneously.');
     end

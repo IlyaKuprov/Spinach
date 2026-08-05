@@ -2924,8 +2924,8 @@ if isfield(inter,'modes')
                                     end
                                 end
                             else
-                                if (~iscell(block))||(numel(block)~=numel(sys.isotopes))
-                                    error('field derivative blocks must be cell arrays with one element per particle.');
+                                if (~iscell(block))||(~isrow(block))||(numel(block)~=numel(sys.isotopes))
+                                    error('field derivative blocks must be row cell arrays with one element per particle.');
                                 end
                                 for p=1:numel(sys.isotopes)
                                     if ~isempty(block{p})

@@ -602,7 +602,8 @@ if ismember('ham_cache',spin_system.sys.enable)
     % Combine descriptor, isotopes, basis, and mode information hash
     if isfield(spin_system.inter,'modes')
         ham_hash=md5_hash({descr,spin_system.comp.iso_hash, ...
-                           spin_system.bas.basis_hash,spin_system.inter.modes});
+                           spin_system.bas.basis_hash,spin_system.inter.modes, ...
+                           spin_system.inter.basefrqs});
     else
         ham_hash=md5_hash({descr,spin_system.comp.iso_hash, ...
                            spin_system.bas.basis_hash});
@@ -899,9 +900,14 @@ if isfield(spin_system.inter,'modes')
     mode_refs=zeros(1,spin_system.comp.nspins);
     if strcmp(mstr.frqs,'offset')
 
-        % Build the exchange coupling graph
-        conmat=~cellfun(@isempty,modes.exchange);
-        conmat=sparse(conmat|conmat'|logical(eye(size(conmat))));
+        % Build the particle connectivity graph from every coupling channel
+        chan_flds={'exchange','dispersive','kerr','longitudinal',...
+                   'coupling_mod','zeeman_mod'};
+        conmat=logical(eye(spin_system.comp.nspins));
+        for n=1:numel(chan_flds)
+            conmat=conmat|(~cellfun(@isempty,modes.(chan_flds{n})));
+        end
+        conmat=sparse(conmat|conmat');
 
         % Loop over connected subgraphs
         sci=scomponents(conmat);
@@ -914,18 +920,27 @@ if isfield(spin_system.inter,'modes')
             % Move on if the subgraph has no modes
             if ~any(ismember(members,mode_list)), continue; end
 
-            % Reference is the Zeeman carrier of the connected spin species
+            % Mode frame runs at the magnitude of the connected spin carrier
             if isempty(spins_in)
                 omega_ref=0;
             elseif isscalar(unique(spin_system.comp.isotopes(spins_in)))
                 omega_ref=abs(spin_system.inter.basefrqs(spins_in(1)));
             else
-                error('modes exchange-coupled to multiple spin species do not have a unique carrier.');
+                error('modes coupled to multiple spin species do not have a unique carrier.');
             end
 
             % Assign the reference to the member modes
             mode_refs(intersect(members,mode_list))=omega_ref;
 
+        end
+
+        % Report modes that have been left at their laboratory frequency
+        stray_modes=mode_list((mode_refs(mode_list)==0)&...
+                              (abs(modes.frqs(mode_list))>spin_system.tols.liouv_zero));
+        for k=stray_modes
+            report(spin_system,['WARNING - bosonic mode ' num2str(k) ' has no carrier reference, '...
+                                'it stays at its laboratory frequency of ' ...
+                                num2str(modes.frqs(k)/(2*pi)) ' Hz.']);
         end
 
     end
@@ -1037,24 +1052,31 @@ if isfield(spin_system.inter,'modes')
                     % Identify the spin and the mode
                     if ismember(xr,mode_list), ms=xr; ss=xc; else, ms=xc; ss=xr; end
 
+                    % Co-rotating branch follows the sign of the spin carrier
+                    if spin_system.inter.basefrqs(ss)<0
+                        co_ops={'C','A'}; co_tag='(L+Cr+L-An)'; ctr_tag='(L+An+L-Cr)';
+                    else
+                        co_ops={'A','C'}; co_tag='(L+An+L-Cr)'; ctr_tag='(L+Cr+L-An)';
+                    end
+
                     % Inform the user
                     report(spin_system,['Jaynes-Cummings exchange coupling for spin ' num2str(ss) ...
                                         ' and mode ' num2str(ms) '...']);
-                    report(spin_system,['           (L+An+L-Cr) x ' num2str(xj/(2*pi)) ' Hz']);
+                    report(spin_system,['           ' co_tag ' x ' num2str(xj/(2*pi)) ' Hz']);
 
                     % Add the flip-flop terms between the spin and the mode
-                    I=I+xj*(operator(spin_system,{'L+','A'},{ss,ms},operator_type)+...
-                            operator(spin_system,{'L-','C'},{ss,ms},operator_type));
+                    I=I+xj*(operator(spin_system,{'L+',co_ops{1}},{ss,ms},operator_type)+...
+                            operator(spin_system,{'L-',co_ops{2}},{ss,ms},operator_type));
 
                     % Add the counter-rotating terms in the strong case
                     if strcmp(mstr.exchange,'strong')
 
                         % Inform the user
-                        report(spin_system,['           (L+Cr+L-An) x ' num2str(xj/(2*pi)) ' Hz']);
+                        report(spin_system,['           ' ctr_tag ' x ' num2str(xj/(2*pi)) ' Hz']);
 
                         % Add the counter-rotating terms
-                        I=I+xj*(operator(spin_system,{'L+','C'},{ss,ms},operator_type)+...
-                                operator(spin_system,{'L-','A'},{ss,ms},operator_type));
+                        I=I+xj*(operator(spin_system,{'L+',co_ops{2}},{ss,ms},operator_type)+...
+                                operator(spin_system,{'L-',co_ops{1}},{ss,ms},operator_type));
 
                     end
 

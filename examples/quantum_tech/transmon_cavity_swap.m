@@ -34,17 +34,18 @@ parameters.rho0=state(spin_system,{'BL2','BL1'},{1,2});
 parameters.sweep=2e9;
 parameters.npoints=301;
 
-% Transmon excitation population through the device context
-parameters.coil=state(spin_system,{'BL2','E'},{1,2});
-pop_t=device(spin_system,@acquire,parameters,'cavity');
+% Trajectory through the device context
+traj=device(spin_system,@traject,parameters,'cavity');
 
-% Cavity excitation population through the device context
-parameters.coil=state(spin_system,{'E','BL2'},{1,2});
-pop_c=device(spin_system,@acquire,parameters,'cavity');
+% Project out the transmon and cavity excitation populations
+coil_t=state(spin_system,{'BL2','E'},{1,2});
+coil_c=state(spin_system,{'E','BL2'},{1,2});
+pop_t=cellfun(@(rho)full(hdot(coil_t,rho)),traj);
+pop_c=cellfun(@(rho)full(hdot(coil_c,rho)),traj);
 
 % Plot the swap dynamics
 time_axis=linspace(0,150,301);
-kfigure(); plot(time_axis,real([pop_t pop_c]),'LineWidth',1.5);
+kfigure(); plot(time_axis,real([pop_t; pop_c]),'LineWidth',1.5);
 axis tight; kgrid; kxlabel('time, ns');
 kylabel('excitation population');
 ktitle('transmon-cavity vacuum Rabi swap');

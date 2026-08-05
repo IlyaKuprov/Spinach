@@ -1,8 +1,10 @@
 % Rabi dynamics of a driven four-level transmon in the Duffing
 % approximation, including leakage into the second and third
-% excited states. Inspired by standard circuit-QED transmon
-% treatments, e.g. Krantz et al., Appl. Phys. Rev. 6, 021318
-% (2019).
+% excited states. The resonant drive is a part of the rotating
+% frame Hamiltonian, and all four level populations come from
+% a single trajectory. Inspired by standard circuit-QED trans-
+% mon treatments, e.g. Krantz et al., Appl. Phys. Rev. 6,
+% 021318 (2019).
 %
 % Calculation time: seconds
 %
@@ -28,29 +30,27 @@ bas.approximation='none';
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Resonant drive through the homodecoupling channel of acquire.m
-parameters.homodec_oper=(operator(spin_system,'C',1)+...
-                         operator(spin_system,'A',1))/2;
-parameters.homodec_pwr=25e6;
+% Drift Hamiltonian from the declared interactions
+H=hamiltonian(assume(spin_system,'cavity'));
 
-% Sequence parameters
-parameters.rho0=state(spin_system,'BL1',1);
-parameters.sweep=1e9;
-parameters.npoints=401;
+% Resonant drive on the transmon quadrature
+Cr=operator(spin_system,'C',1); An=operator(spin_system,'A',1);
+H=H+2*pi*25e6*(Cr+An)/2;
 
-% Level populations through the device context
-parameters.coil=state(spin_system,'BL1',1);
-p1=device(spin_system,@acquire,parameters,'cavity');
-parameters.coil=state(spin_system,'BL2',1);
-p2=device(spin_system,@acquire,parameters,'cavity');
-parameters.coil=state(spin_system,'BL3',1);
-p3=device(spin_system,@acquire,parameters,'cavity');
-parameters.coil=state(spin_system,'BL4',1);
-p4=device(spin_system,@acquire,parameters,'cavity');
+% Trajectory of the driven transmon
+traj=evolution(spin_system,H,[],state(spin_system,'BL1',1),...
+               1e-9,400,'trajectory');
+
+% Project out the level populations
+pops=zeros(4,401);
+for n=1:4
+    coil=state(spin_system,['BL' int2str(n)],1);
+    pops(n,:)=real(cellfun(@(rho)full(hdot(coil,rho)),traj));
+end
 
 % Plot the leakage dynamics
 time_axis=linspace(0,400,401);
-kfigure(); plot(time_axis,real([p1 p2 p3 p4]),'LineWidth',1.5);
+kfigure(); plot(time_axis,pops','LineWidth',1.5);
 axis tight; kgrid; kxlabel('time, ns');
 kylabel('level population');
 ktitle('transmon Rabi dynamics with leakage');

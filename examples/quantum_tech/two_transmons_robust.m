@@ -29,10 +29,6 @@ spin_system=basis(spin_system,bas);
 % Drift Hamiltonian from the declared interactions
 H=hamiltonian(assume(spin_system,'cavity'));
 
-% Drive parameters
-gammas=2*pi*0;
-Omega_0=2*pi*17.7;
-
 % Build the intial control pulses (FROG)
 % Scaled Hamiltonian parameters - MHz & us
 N=224;   % No. of Time Steps
@@ -49,27 +45,23 @@ for n=1:length(Fa)
     Omega_y=Omega_y+Fb(n)*sin((2*n*pi*t)/t_g);
 end
 
-Omega_x=Omega_0*Omega_x;
-Omega_y=Omega_0*Omega_y;
-
-% Build Control Operators
-scale=(1+(gammas/Omega_0));
-H_x=0.5*scale*sparse([0 1 0; 1 0 sqrt(2); 0 sqrt(2) 0]/2);
-H_y=0.5*scale*sparse([0 -1i 0; 1i 0 -1i*sqrt(2); 0 1i*sqrt(2) 0]/2);
+% Quadrature control operators of the transmon mode
+Cr=operator(spin_system,'C',1); An=operator(spin_system,'A',1);
+Cx=(Cr+An)/2; Cy=1i*(Cr-An)/2;
 
 % Build source and destination states - TARGET GATE = X_pi/2
-rho_init = state(spin_system,'BL1',1);   % |0>
-rho_targ = (state(spin_system,'BL1',1)-1i*state(spin_system,'BL2',1))/sqrt(2);   % (|0>-i|1>)/sqrt(2)
-
+psi_targ=[1; -1i; 0]/sqrt(2);
+rho_init=state(spin_system,'BL1',1);
+rho_targ=hilb2liouv(psi_targ*psi_targ','statevec');
 rho_init=rho_init/norm(rho_init,'fro');
-rho_targ=(rho_targ*sqrt(2))/norm(rho_targ,'fro');
+rho_targ=rho_targ/norm(rho_targ,'fro');
 
 % Unit fidelity is Sorensen bound
 %rho_targ=rho_targ/sorensen(rho_init,rho_targ);
 
 % Define control parameters
 control.drifts={{H}};                             % Drift
-control.operators={hilb2liouv(H_x,'comm'),hilb2liouv(H_y,'comm')};     % Control
+control.operators={Cx,Cy};                        % Control
 control.rho_init={rho_init};                      % Starting state
 control.rho_targ={rho_targ};                      % Destination state
 %control.basis=[wave_basis('sine_waves',5,N) wave_basis('cosine_waves',5,N)]';    % Basis set
@@ -87,7 +79,7 @@ control.plotting={'xy_controls','spectrogram','robustness'};
 % Spinach housekeeping
 spin_system=optimcon(spin_system,control);
 
-% Initial guess - random
+% Initial guess - normalised FROG waveform, scaled by the power levels
 pulse=[Omega_x; Omega_y];
 
 % Run the optimisation, get normalised pulse

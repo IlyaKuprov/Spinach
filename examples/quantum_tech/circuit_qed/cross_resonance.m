@@ -1,11 +1,18 @@
 % Cross-resonance gate mechanism between two fixed-frequency
 % transmons in the laboratory frame. The control transmon is
 % driven at the frequency of the target transmon; through the
-% static quadrature coupling, the target then rotates about the
-% x axis in a direction conditioned on the state of the control,
-% which is the mechanism behind the native two-qubit gate of
-% fixed-frequency superconducting processors. A weak direct tone
-% on the target sets the gate phases. Model and parameters from
+% static quadrature coupling, the target then rotates about an
+% axis in its equatorial plane by an angle conditioned on the
+% state of the control. The difference between the two condi-
+% tional rotations is the ZX interaction behind the native two-
+% qubit gate of fixed-frequency superconducting processors; at
+% these parameters the unconditional part is the larger of the
+% two, and an echo sequence would be needed to remove it. A weak
+% direct tone on the target sets the gate phases. The simulation
+% runs in the laboratory frame, but the recorded kets are rotated
+% into the frame of the drive before the Bloch components are
+% evaluated; laboratory frame transverse components would alias
+% at any reasonable recording interval. Model and parameters from
 % the cross-resonance example of the paraqeet package.
 %
 % Calculation time: minutes
@@ -59,6 +66,9 @@ Sz=kron(eye(3),[1 0 0; 0 -1 0; 0 0 0]);
 % Control transmon in the ground and first excited state
 unit_mat=eye(9); psi_zero=unit_mat(:,1); psi_one=unit_mat(:,4);
 
+% Excitation number of the target transmon in the product basis
+n_targ=kron(ones(3,1),(0:2)');
+
 % Internal time stepping of the source calculation
 nsub=15000; dts=1e-11; nrec=75;
 
@@ -81,14 +91,16 @@ for k=1:nsub
     U=expm(-1i*(H0+sig_one*D1+sig_two*D2)*dts);
     psi_zero=U*psi_zero; psi_one=U*psi_one;
 
-    % Record the conditional Bloch vectors of the target
+    % Record the conditional Bloch vectors of the target in the drive frame
     if mod(k,nrec)==0
-        bloch(:,k/nrec+1,1)=real([psi_zero'*Sx*psi_zero;
-                                  psi_zero'*Sy*psi_zero;
-                                  psi_zero'*Sz*psi_zero]);
-        bloch(:,k/nrec+1,2)=real([psi_one'*Sx*psi_one;
-                                  psi_one'*Sy*psi_one;
-                                  psi_one'*Sz*psi_one]);
+        phases=exp(1i*w_lo*k*dts*n_targ);
+        rot_zero=phases.*psi_zero; rot_one=phases.*psi_one;
+        bloch(:,k/nrec+1,1)=real([rot_zero'*Sx*rot_zero;
+                                  rot_zero'*Sy*rot_zero;
+                                  rot_zero'*Sz*rot_zero]);
+        bloch(:,k/nrec+1,2)=real([rot_one'*Sx*rot_one;
+                                  rot_one'*Sy*rot_one;
+                                  rot_one'*Sz*rot_one]);
     end
 
 end
@@ -98,20 +110,27 @@ if (abs(norm(psi_zero)-1)>1e-6)||(abs(norm(psi_one)-1)>1e-6)
     error('propagation did not conserve the norm.');
 end
 
-% Validate the conditional divergence of the target trajectories
-if norm(bloch(:,end,1)-bloch(:,end,2))<1
-    error('target rotation is not conditioned on the control state.');
+% Validate the signed sense of the rotation with the control in the ground state
+if ~((bloch(2,end,1)>0.5)&&(bloch(3,end,1)>0.2))
+    error('target rotation under the ground state control has the wrong sense.');
+end
+
+% Validate the signed sense of the rotation with the control excited
+if ~((bloch(2,end,2)>0)&&(bloch(3,end,2)<-0.5))
+    error('target rotation under the excited control has the wrong sense.');
 end
 
 % Plot the conditional Bloch trajectories of the target
 time_axis=1e9*dts*nrec*(0:(nsub/nrec));
 kfigure(); scale_figure([2.0 0.75]);
 subplot(1,2,1); plot(time_axis,squeeze(bloch(:,:,1))','LineWidth',1.5);
-axis tight; kgrid; kxlabel('time, ns'); kylabel('target Bloch vector');
+axis tight; kgrid; kxlabel('time, ns');
+kylabel('target Bloch vector, drive frame');
 ktitle('control transmon in $|0\rangle$');
 klegend({'$\sigma_x$','$\sigma_y$','$\sigma_z$'},'Location','Best');
 subplot(1,2,2); plot(time_axis,squeeze(bloch(:,:,2))','LineWidth',1.5);
-axis tight; kgrid; kxlabel('time, ns'); kylabel('target Bloch vector');
+axis tight; kgrid; kxlabel('time, ns');
+kylabel('target Bloch vector, drive frame');
 ktitle('control transmon in $|1\rangle$');
 klegend({'$\sigma_x$','$\sigma_y$','$\sigma_z$'},'Location','Best');
 

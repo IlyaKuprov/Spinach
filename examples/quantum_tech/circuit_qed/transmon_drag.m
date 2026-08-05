@@ -4,8 +4,18 @@
 % quadrature channel of the IQ mixer; this suppresses the leakage
 % into the second excited state and improves the fidelity of the
 % 90 degree rotation on the qubit subspace. A further improvement
-% comes from numerical optimisation of the mixer parameters. Model
-% and parameters from the DRAG example of the paraqeet package.
+% comes from numerical optimisation of the mixer parameters. The
+% rows of pulse_params are the plain Gaussian, the analytically
+% corrected DRAG, and the numerically optimised DRAG pulse; the
+% columns are the envelope amplitude, the DRAG detuning, the lo-
+% cal oscillator frequency, the mixer phase, and the DRAG quad-
+% rature switch. The propagator is taken into the frame of the
+% drift Hamiltonian before it is compared with the target gate,
+% which is specified in that frame; without this the comparison
+% would only be meaningful when every transmon level phase hap-
+% pens to close on a multiple of two pi over the pulse duration.
+% Model and parameters from the DRAG example of the paraqeet
+% package.
 %
 % Calculation time: seconds
 %
@@ -20,8 +30,9 @@ sys.magnet=0;
 sys.isotopes={'T3'};
 
 % Transmon frequency and anharmonicity
-inter.modes.frqs={4.8e9};
-inter.modes.anharms={-200e6};
+frq_01=4.8e9; anharm=-200e6;
+inter.modes.frqs={frq_01};
+inter.modes.anharms={anharm};
 
 % Formalism and basis
 bas.formalism='zeeman-hilb';
@@ -41,9 +52,12 @@ Dx=full(Cr+An); H0=full(H0);
 % Pulse duration and Gaussian envelope width
 t_dur=20e-9; sigma=t_dur/8;
 
+% Analytical DRAG detuning parameter for a Duffing transmon
+drag_det=2*(2*pi)*anharm;
+
 % Rows: plain Gaussian, analytical DRAG, optimised DRAG
-pulse_params=[3.000000000000000e8 -2.513274122871834e9 2*pi*4.8e9 0 0;
-              3.000000000000000e8 -2.513274122871834e9 2*pi*4.8e9 0 1;
+pulse_params=[3.000000000000000e8 drag_det 2*pi*frq_01 0 0;
+              3.000000000000000e8 drag_det 2*pi*frq_01 0 1;
               2.455066180403117e8 -2.492899680375753e9 3.015929426382811e10 -1.886372179487061e-4 1];
 
 % Target gate is a 90 degree rotation on the qubit subspace
@@ -81,7 +95,10 @@ for m=1:3
 
     end
 
-    % Average gate fidelity over all three levels
+    % Move the propagator into the frame of the drift Hamiltonian
+    U=expm(1i*H0*t_dur)*U;
+
+    % Process fidelity of the gate over all three levels
     fids(m)=abs(mean(diag(target'*U)))^2;
 
 end

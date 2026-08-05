@@ -67,7 +67,7 @@ control.pulse_dt=1e-9*ones(1,300);                % Slice durations
 control.penalties={'NS'};                         % Penalties
 control.p_weights=0.1;                            % Penalty weights
 control.method='goodwin';                         % Optimisation method
-control.max_iter=300;                             % Termination condition
+control.max_iter=5;                               % Termination condition
 control.parallel='ensemble';                      % Parallelisation mode
 
 % Plots during optimisation

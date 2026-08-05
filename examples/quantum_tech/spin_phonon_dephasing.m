@@ -2,7 +2,11 @@
 % modulation and spin-conditioned displacement of a quantised
 % vibrational mode. This is a minimal Weyl-algebra version of
 % strain-modulated spin Hamiltonians used for NV-centre and
-% molecular spin-phonon dynamics.
+% molecular spin-phonon dynamics. Both observables come from a
+% single trajectory: the drift commutes with the spin projec-
+% tion operator, so the coherence and the population sectors
+% of the initial condition evolve and are detected without
+% mixing.
 %
 % Calculation time: seconds
 %
@@ -32,16 +36,17 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.sweep=5e8;
 parameters.npoints=501;
+parameters.rho0=state(spin_system,{'Lx','BL1'},{1,2})+...
+                state(spin_system,{'ZL2','BL1'},{1,2});
 
-% Spin coherence through the device context
-parameters.rho0=state(spin_system,{'Lx','BL1'},{1,2});
-parameters.coil=state(spin_system,'Lx',1);
-traj_s=device(spin_system,@acquire,parameters,'spin-phonon');
+% Trajectory through the device context
+traj=device(spin_system,@traject,parameters,'spin-phonon');
 
-% Conditional phonon displacement through the device context
-parameters.rho0=state(spin_system,{'ZL2','BL1'},{1,2});
-parameters.coil=state(spin_system,'C',2)+state(spin_system,'A',2);
-traj_q=device(spin_system,@acquire,parameters,'spin-phonon');
+% Project out the spin coherence and the conditional displacement
+coil_s=state(spin_system,'Lx',1);
+coil_q=state(spin_system,'C',2)+state(spin_system,'A',2);
+traj_s=cellfun(@(rho)full(hdot(coil_s,rho)),traj);
+traj_q=cellfun(@(rho)full(hdot(coil_q,rho)),traj);
 
 % Validate visible oscillator displacement
 if max(abs(real(traj_q)))<0.2

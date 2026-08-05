@@ -40,8 +40,8 @@ H=hamiltonian(assume(spin_system,'cavity'));
 
 % Quadrature control operators of the cavity and the qubit
 Cr=operator(spin_system,'C',1); An=operator(spin_system,'A',1);
-Lp=operator(spin_system,'L+',2); Lm=operator(spin_system,'L-',2);
-ops={Cr+An,1i*(An-Cr),Lp+Lm,1i*(Lp-Lm)};
+Lx=operator(spin_system,'Lx',2); Ly=operator(spin_system,'Ly',2);
+ops={(Cr+An)/2,1i*(Cr-An)/2,Lx,Ly};
 
 % Vacuum cavity and cavity Fock state two, qubit in the ground state
 rho_init=state(spin_system,{'BL1','ZL2'},{1,2});
@@ -58,7 +58,7 @@ control.operators=ops;
 control.rho_init={rho_init};
 control.rho_targ={rho_targ};
 control.basis=wave_set;
-control.pwr_levels=8.8414e6;
+control.pwr_levels=1.76828e7;
 control.pulse_dt=33e-9*ones(1,40);
 control.penalties={'NS'};
 control.p_weights=0.001;
@@ -84,10 +84,11 @@ pulse=coeffs*wave_set;
 
 % Recompute the transfer fidelity by direct propagation
 rho=rho_init;
-for n=1:40
-    slice_ham=H+8.8414e6*(pulse(1,n)*ops{1}+pulse(2,n)*ops{2}+...
-                          pulse(3,n)*ops{3}+pulse(4,n)*ops{4});
-    P=propagator(spin_system,slice_ham,33e-9);
+for n=1:numel(spin_system.control.pulse_dt)
+    slice_ham=H+spin_system.control.pwr_levels*...
+                (pulse(1,n)*ops{1}+pulse(2,n)*ops{2}+...
+                 pulse(3,n)*ops{3}+pulse(4,n)*ops{4});
+    P=propagator(spin_system,slice_ham,spin_system.control.pulse_dt(n));
     rho=P*rho*P';
 end
 fid=real(trace(rho_targ'*rho));
@@ -97,8 +98,11 @@ if fid<0.80
     error('band-limited GRAPE optimisation did not converge.');
 end
 
+% Slice midpoint time axis of the optimised pulse
+dts=spin_system.control.pulse_dt; time_axis=1e6*(cumsum(dts)-dts/2);
+
 % Plot the smooth control envelopes
-kfigure(); plot(1e6*33e-9*((1:40)-0.5),8.8414e6*pulse'/(2*pi*1e6),'LineWidth',1.5);
+kfigure(); plot(time_axis,spin_system.control.pwr_levels*pulse'/(2*pi*1e6),'LineWidth',1.5);
 axis tight; kgrid; kxlabel('time, $\mu$s');
 kylabel('control amplitudes, MHz');
 ktitle('band-limited optimal controls');

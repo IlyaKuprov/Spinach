@@ -34,13 +34,14 @@ parameters.rho0=state(spin_system,{'ZL2','BL1'},{1,2});
 parameters.sweep=1e9;
 parameters.npoints=501;
 
-% Spin excitation population through the device context
-parameters.coil=state(spin_system,{'ZL2','E'},{1,2});
-pop_s=device(spin_system,@acquire,parameters,'cavity');
+% Trajectory through the device context
+traj=device(spin_system,@traject,parameters,'cavity');
 
-% Cavity excitation population through the device context
-parameters.coil=state(spin_system,{'ZL1','BL2'},{1,2});
-pop_c=device(spin_system,@acquire,parameters,'cavity');
+% Project out the spin and cavity excitation populations
+coil_s=state(spin_system,{'ZL2','E'},{1,2});
+coil_c=state(spin_system,{'ZL1','BL2'},{1,2});
+pop_s=cellfun(@(rho)full(hdot(coil_s,rho)),traj);
+pop_c=cellfun(@(rho)full(hdot(coil_c,rho)),traj);
 
 % Validate visible excitation exchange
 if (max(real(pop_c))<0.95)||(min(real(pop_s))>0.05)
@@ -54,7 +55,7 @@ end
 
 % Plot the vacuum Rabi dynamics
 time_axis=linspace(0,500,501);
-kfigure(); plot(time_axis,real([pop_s pop_c]),'LineWidth',1.5);
+kfigure(); plot(time_axis,real([pop_s; pop_c]),'LineWidth',1.5);
 axis tight; ylim([-0.05 1.05]); kgrid; kxlabel('time, ns');
 kylabel('excitation population');
 ktitle('spin-cavity vacuum Rabi oscillation');

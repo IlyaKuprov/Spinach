@@ -31,20 +31,8 @@ rates=zeros(numel(detuning),numel(loss_rates));
 % Loop over cavity loss rates
 for n=1:numel(loss_rates)
 
-    % Resonant damped cavity in the rotating frame
-    inter.modes.frqs={[] 0};
-    inter.modes.linewidths={[] loss_rates(n)/(2*pi)};
-    inter.modes.exchange=cell(2,2);
-    inter.modes.exchange{1,2}=coupling;
-    inter.temperature=0;
-
-    % Spinach housekeeping
-    spin_system=create(sys,inter);
-    spin_system=basis(spin_system,bas);
-
-    % Generators from the declared interactions
-    Hjc=hamiltonian(assume(spin_system,'cavity'));
-    R=relaxation(spin_system);
+    % Generators of the resonant damped spin-cavity device
+    [spin_system,Hjc,R]=purcell_device(sys,bas,coupling,loss_rates(n));
 
     % Spin detuning superoperator
     spin_ham=operator(spin_system,'Lz',1);
@@ -69,23 +57,15 @@ if rates(ceil(end/2),2)<=rates(1,2)
     error('Purcell rate is not resonantly enhanced.');
 end
 
-% Validate the resonant rate against the analytical Purcell formula
+% Validate the resonant rate against the exact two-level Purcell rate
 g_rad=2*pi*coupling; kappa_ref=loss_rates(2);
-purcell=4*g_rad^2/kappa_ref;
-if abs(rates(ceil(end/2),2)-purcell)>0.05*purcell
-    error('resonant Purcell rate does not match the analytical formula.');
+purcell=kappa_ref/2-sqrt(kappa_ref^2/4-4*g_rad^2);
+if abs(rates(ceil(end/2),2)-purcell)>1e-4*purcell
+    error('resonant Purcell rate does not match the exact expression.');
 end
 
 % Rebuild the generators at the reference loss rate
-inter.modes.frqs={[] 0};
-inter.modes.linewidths={[] loss_rates(2)/(2*pi)};
-inter.modes.exchange=cell(2,2);
-inter.modes.exchange{1,2}=coupling;
-inter.temperature=0;
-spin_system=create(sys,inter);
-spin_system=basis(spin_system,bas);
-Hjc=hamiltonian(assume(spin_system,'cavity'));
-R=relaxation(spin_system);
+[spin_system,Hjc,R]=purcell_device(sys,bas,coupling,loss_rates(2));
 spin_ham=operator(spin_system,'Lz',1);
 
 % Pick representative detunings for survival curves
@@ -127,5 +107,18 @@ kylabel('spin excitation survival');
 ktitle('Purcell decay curves');
 klegend({'0 MHz','2 MHz','6 MHz'},'Location','Best');
 
+end
+
+% Generators of a resonant damped spin-cavity device
+function [spin_system,Hjc,R]=purcell_device(sys,bas,coupling,loss_rate)
+inter.modes.frqs={[] 0};
+inter.modes.linewidths={[] loss_rate/(2*pi)};
+inter.modes.exchange=cell(2,2);
+inter.modes.exchange{1,2}=coupling;
+inter.temperature=0;
+spin_system=create(sys,inter);
+spin_system=basis(spin_system,bas);
+Hjc=hamiltonian(assume(spin_system,'cavity'));
+R=relaxation(spin_system);
 end
 

@@ -69,10 +69,11 @@ guess=[0.1*sin(pi*(1:200)/200); 0.3*cos(pi*(1:200)/200)];
 pulse=fmaxnewton(spin_system,@grape_xy,guess);
 
 % Propagate the optimal pulse and record populations
-rho=rho_init; pops=zeros(4,201); pops(:,1)=real(diag(rho));
-for n=1:200
-    slice_ham=H+2*pi*100e6*(pulse(1,n)*Cx+pulse(2,n)*Cy);
-    P=propagator(spin_system,slice_ham,1e-10);
+dts=spin_system.control.pulse_dt; nslices=numel(dts);
+rho=rho_init; pops=zeros(4,nslices+1); pops(:,1)=real(diag(rho));
+for n=1:nslices
+    slice_ham=H+spin_system.control.pwr_levels*(pulse(1,n)*Cx+pulse(2,n)*Cy);
+    P=propagator(spin_system,slice_ham,dts(n));
     rho=P*rho*P'; pops(:,n+1)=real(diag(rho));
 end
 
@@ -82,7 +83,7 @@ if pops(3,end)<0.99
 end
 
 % Plot the level populations under the optimal pulse
-kfigure(); plot(1e9*1e-10*(0:200),pops','LineWidth',1.5);
+kfigure(); plot(1e9*[0 cumsum(dts)],pops','LineWidth',1.5);
 axis tight; kgrid; kxlabel('time, ns');
 kylabel('level populations');
 ktitle('two-photon transition');

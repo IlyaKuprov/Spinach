@@ -11,7 +11,7 @@
 function tavis_cummings_splitting()
 
 % Coupling strength
-coupling=2*pi*3e6;
+coupling=3e6;
 
 % Preallocate the splitting array
 spin_counts=1:4;
@@ -26,22 +26,25 @@ for n=spin_counts
     % Particle specification
     sys.isotopes=[repmat({'E'},1,n) {'C3'}];
 
+    % Resonant cavity coupled to every spin
+    clear('inter');
+    inter.modes.frqs=[repmat({[]},1,n) {0}];
+    inter.modes.exchange=cell(n+1,n+1);
+    for k=1:n
+        inter.modes.exchange{k,n+1}=coupling;
+    end
+
     % Formalism and basis
     bas.formalism='zeeman-hilb';
     bas.approximation='none';
 
     % Spinach housekeeping
-    spin_system=create(sys,[]);
+    spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);
 
-    % Build the Tavis-Cummings Hamiltonian
-    H=sparse(prod(spin_system.comp.mults),prod(spin_system.comp.mults));
-    for k=1:n
-        H=H+coupling*(operator(spin_system,{'L+','A'},{k,n+1})+...
-                      operator(spin_system,{'L-','C'},{k,n+1}));
-    end
-
-    % Clean up numerical asymmetry
+    % Tavis-Cummings Hamiltonian from the declared couplings
+    spin_system=assume(spin_system,'cavity');
+    H=hamiltonian(spin_system);
     H=(H+H')/2;
 
     % Locate the one-excitation manifold
@@ -64,7 +67,7 @@ for n=spin_counts
 end
 
 % Compute the analytical splitting
-analytical=2*sqrt(spin_counts)*coupling;
+analytical=2*sqrt(spin_counts)*2*pi*coupling;
 
 % Validate the square-root scaling
 if max(abs(splitting-analytical)./analytical)>1e-10
@@ -75,8 +78,9 @@ end
 kfigure(); plot(spin_counts,splitting/(2*pi*1e6),'ko','MarkerFaceColor','k');
 hold on; plot(spin_counts,analytical/(2*pi*1e6),'r-','LineWidth',1.5);
 hold off; axis tight; kgrid; kxlabel('number of spins');
-kylabel('normal-mode splitting, MHz');
+kylabel('bright-mode splitting, MHz');
 ktitle('Tavis-Cummings square-root scaling');
-klegend({'Spinach','2g\surd N'},'Location','Best');
+klegend({'numerical','analytical'},'Location','Best');
 
 end
+

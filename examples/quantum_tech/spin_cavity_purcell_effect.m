@@ -17,57 +17,31 @@ sys.magnet=0;
 sys.isotopes={'E','C3'};
 
 % Formalism and basis
-bas.formalism='zeeman-hilb';
+bas.formalism='zeeman-liouv';
 bas.approximation='none';
 
-% Spinach housekeeping
-spin_system=create(sys,[]);
-spin_system=basis(spin_system,bas);
-
 % Purcell parameters
-coupling=2*pi*0.35e6;
+coupling=0.35e6;
 detuning=2*pi*linspace(-8e6,8e6,301);
 loss_rates=2*pi*[2e6 4e6 8e6 16e6];
 
-% Spin detuning Hamiltonian
-spin_ham=operator(spin_system,'Lz',1);
-
-% Jaynes-Cummings exchange Hamiltonian
-Hjc=coupling*(operator(spin_system,{'L+','A'},{1,2})+...
-              operator(spin_system,{'L-','C'},{1,2}));
-
-% Clean up numerical asymmetry
-Hjc=(Hjc+Hjc')/2;
-
-% Project the Hamiltonian coupling into the active doublet
-spin_exc=state(spin_system,{'ZL2','BL1'},{1,2});
-cav_exc=state(spin_system,{'ZL1','BL2'},{1,2});
-jc_coupling=norm(cav_exc*Hjc*spin_exc,'fro');
-
-% Validate the active matrix element
-if abs(jc_coupling-coupling)>1e-10*coupling
-    error('Jaynes-Cummings matrix element is inconsistent.');
-end
-
-% Build the cavity loss Lindblad dissipator in Liouville space
-cav_ann=operator(spin_system,'A',2);
-cav_pop=cav_ann'*cav_ann;
-unit=speye(size(Hjc,1));
-loss_gen=kron(conj(cav_ann),cav_ann)-...
-         0.5*kron(unit,cav_pop)-...
-         0.5*kron(cav_pop.',unit);
-
-% Extract Purcell rates from Liouvillian slow modes
+% Preallocate rate array
 rates=zeros(numel(detuning),numel(loss_rates));
+
+% Loop over cavity loss rates
 for n=1:numel(loss_rates)
+
+    % Generators of the resonant damped spin-cavity device
+    [spin_system,Hjc,R]=purcell_device(sys,bas,coupling,loss_rates(n));
+
+    % Spin detuning superoperator
+    spin_ham=operator(spin_system,'Lz',1);
+
+    % Extract Purcell rates from Liouvillian slow modes
     for k=1:numel(detuning)
 
-        % Assemble the coherent Hamiltonian at this detuning
-        H=detuning(k)*spin_ham+Hjc;
-        H=(H+H')/2;
-
-        % Assemble the Hamiltonian and dissipative Liouvillian
-        L=-1i*(kron(unit,H)-kron(H.',unit))+loss_rates(n)*loss_gen;
+        % Assemble the dissipative Liouvillian at this detuning
+        L=-1i*(Hjc+detuning(k)*spin_ham)+R;
 
         % Convert the slow spin-amplitude mode into a population rate
         decay_modes=eig(full(L));
@@ -75,6 +49,7 @@ for n=1:numel(loss_rates)
         rates(k,n)=-2*max(real(decay_modes));
 
     end
+
 end
 
 % Validate resonant second-kind relaxation
@@ -82,23 +57,29 @@ if rates(ceil(end/2),2)<=rates(1,2)
     error('Purcell rate is not resonantly enhanced.');
 end
 
+% Validate the resonant rate against the exact two-level Purcell rate
+g_rad=2*pi*coupling; kappa_ref=loss_rates(2);
+purcell=kappa_ref/2-sqrt(kappa_ref^2/4-4*g_rad^2);
+if abs(rates(ceil(end/2),2)-purcell)>1e-4*purcell
+    error('resonant Purcell rate does not match the exact expression.');
+end
+
+% Rebuild the generators at the reference loss rate
+[spin_system,Hjc,R]=purcell_device(sys,bas,coupling,loss_rates(2));
+spin_ham=operator(spin_system,'Lz',1);
+
 % Pick representative detunings for survival curves
 time_axis=linspace(0,40e-6,250);
 det_pick=2*pi*[0 2e6 6e6];
 survival=zeros(numel(time_axis),numel(det_pick));
-rho_vec=spin_exc(:);
-spin_obs=spin_exc(:)';
-loss_ref=2*pi*4e6;
+rho_vec=state(spin_system,{'ZL2','BL1'},{1,2});
+spin_obs=rho_vec';
 
 % Simulate spin excitation survival under cavity damping
 for n=1:numel(det_pick)
 
-    % Assemble the coherent Hamiltonian at this detuning
-    H=det_pick(n)*spin_ham+Hjc;
-    H=(H+H')/2;
-
-    % Assemble the Hamiltonian and dissipative Liouvillian
-    L=-1i*(kron(unit,H)-kron(H.',unit))+loss_ref*loss_gen;
+    % Assemble the dissipative Liouvillian at this detuning
+    L=-1i*(Hjc+det_pick(n)*spin_ham)+R;
 
     % Propagate the density matrix in Liouville space
     for k=1:numel(time_axis)
@@ -118,11 +99,26 @@ subplot(1,2,1); plot(detuning/(2*pi*1e6),rates/(2*pi*1e3),'LineWidth',1.5);
 axis tight; kgrid; kxlabel('spin-cavity detuning, MHz');
 kylabel('$\Gamma_P/2\pi$, kHz');
 ktitle('Liouvillian Purcell rate');
-klegend({'2 MHz','4 MHz','8 MHz','16 MHz'},'Location','Best');
+klegend({'$\kappa/2\pi$=2 MHz','$\kappa/2\pi$=4 MHz',...
+         '$\kappa/2\pi$=8 MHz','$\kappa/2\pi$=16 MHz'},'Location','Best');
 subplot(1,2,2); plot(1e6*time_axis,survival,'LineWidth',1.5);
 axis tight; kgrid; kxlabel('time, $\mu$s');
 kylabel('spin excitation survival');
-ktitle('relaxation of the second kind');
+ktitle('Purcell decay curves');
 klegend({'0 MHz','2 MHz','6 MHz'},'Location','Best');
 
 end
+
+% Generators of a resonant damped spin-cavity device
+function [spin_system,Hjc,R]=purcell_device(sys,bas,coupling,loss_rate)
+inter.modes.frqs={[] 0};
+inter.modes.linewidths={[] loss_rate/(2*pi)};
+inter.modes.exchange=cell(2,2);
+inter.modes.exchange{1,2}=coupling;
+inter.temperature=0;
+spin_system=create(sys,inter);
+spin_system=basis(spin_system,bas);
+Hjc=hamiltonian(assume(spin_system,'cavity'));
+R=relaxation(spin_system);
+end
+

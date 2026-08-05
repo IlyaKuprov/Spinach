@@ -13,32 +13,28 @@ sys.magnet=0;
 % Particle specification
 sys.isotopes={'T3','T3'};
 
+% Rotating frame transmon parameters
+inter.modes.frqs={-86.6e6 0};
+inter.modes.anharms={-310.5e6 -313.9e6};
+inter.modes.exchange=cell(2,2);
+inter.modes.exchange{1,2}=2.2e6;
+
 % Formalism and basis
 bas.formalism='zeeman-liouv';
 bas.approximation='none';
 
 % Spinach housekeeping
-spin_system=create(sys);
+spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
+
+% Drift Hamiltonian from the declared interactions
+H=hamiltonian(assume(spin_system,'cavity'));
 
 % Get elementary operators
 CrA=operator(spin_system,'C',1);
 AnA=operator(spin_system,'A',1);
 CrB=operator(spin_system,'C',2);
 AnB=operator(spin_system,'A',2);
-
-% Hamiltonian parameters
-deltas=2*pi*[-86.6e6 0];
-alphas=2*pi*[-310.5e6 -313.9e6];
-J=2*pi*2.2e6;
-
-% Build the Hamiltonian
-H=    deltas(1)*operator(spin_system,'N',1)+...
-      deltas(2)*operator(spin_system,'N',2)+...
-  (alphas(1)/2)*operator(spin_system,'CCAA',1)+...
-  (alphas(2)/2)*operator(spin_system,'CCAA',2)+...
-             J*(operator(spin_system,{'C','A'},{1,2})+...
-                operator(spin_system,{'A','C'},{1,2}));
 
 % Build control operators
 C_A=(CrA+AnA)/2; C_B=(CrB+AnB)/2;
@@ -71,7 +67,7 @@ control.pulse_dt=1e-9*ones(1,300);                % Slice durations
 control.penalties={'NS'};                         % Penalties
 control.p_weights=0.1;                            % Penalty weights
 control.method='goodwin';                         % Optimisation method
-control.max_iter=300;                             % Termination condition
+control.max_iter=5;                               % Termination condition
 control.parallel='ensemble';                      % Parallelisation mode
 
 % Plots during optimisation
@@ -88,5 +84,3 @@ fmaxnewton(spin_system,@grape_xy,pulse);
 
 end
 
-%control.offsets={linspace(-10e6,10e6,5)...
-%                 linspace(-10e6,10e6,5)};             % Offset distribution

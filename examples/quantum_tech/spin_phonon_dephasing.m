@@ -2,7 +2,11 @@
 % modulation and spin-conditioned displacement of a quantised
 % vibrational mode. This is a minimal Weyl-algebra version of
 % strain-modulated spin Hamiltonians used for NV-centre and
-% molecular spin-phonon dynamics.
+% molecular spin-phonon dynamics. Both observables come from a
+% single trajectory: the drift commutes with the spin projec-
+% tion operator, so the coherence and the population sectors
+% of the initial condition evolve and are detected without
+% mixing.
 %
 % Calculation time: seconds
 %
@@ -16,40 +20,33 @@ sys.magnet=0;
 % Particle specification
 sys.isotopes={'E','V7'};
 
+% Phonon mode with a longitudinal coupling
+inter.modes.frqs={[] 20e6};
+inter.modes.longitudinal=cell(2,2);
+inter.modes.longitudinal{1,2}=4e6*sqrt(2);
+
 % Formalism and basis
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Spinach housekeeping
-spin_system=create(sys,[]);
+spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Spin and phonon operators
-Sz=operator(spin_system,'Lz',1);
-N=operator(spin_system,'N',2);
-Q=operator(spin_system,'C',2)+operator(spin_system,'A',2);
+% Sequence parameters
+parameters.sweep=5e8;
+parameters.npoints=501;
+parameters.rho0=state(spin_system,{'Lx','BL1'},{1,2})+...
+                state(spin_system,{'ZL2','BL1'},{1,2});
 
-% Longitudinal spin-phonon Hamiltonian parameters
-omega_v=2*pi*20e6;
-g=2*pi*4e6;
+% Trajectory through the device context
+traj=device(spin_system,@traject,parameters,'spin-phonon');
 
-% Longitudinal spin-phonon Hamiltonian
-H=omega_v*N+g*Sz*Q;
-
-% Clean up numerical asymmetry
-H=(H+H')/2;
-
-% Initial states for coherence and displacement
-rho_coh=state(spin_system,{'Lx','BL1'},{1,2});
-rho_disp=state(spin_system,{'ZL2','BL1'},{1,2});
-
-% Detection operators
-Sx=state(spin_system,'Lx',1);
-Qd=state(spin_system,'C',2)+state(spin_system,'A',2);
-
-% Propagate spin coherence and spin-conditioned phonon displacement
-traj_s=evolution(spin_system,H,Sx,rho_coh,2e-9,500,'observable');
-traj_q=evolution(spin_system,H,Qd,rho_disp,2e-9,500,'observable');
+% Project out the spin coherence and the conditional displacement
+coil_s=state(spin_system,'Lx',1);
+coil_q=state(spin_system,'C',2)+state(spin_system,'A',2);
+traj_s=cellfun(@(rho)full(hdot(coil_s,rho)),traj);
+traj_q=cellfun(@(rho)full(hdot(coil_q,rho)),traj);
 
 % Validate visible oscillator displacement
 if max(abs(real(traj_q)))<0.2
@@ -72,3 +69,4 @@ axis tight; kgrid; kxlabel('time, $\mu$s');
 kylabel('$a+a^+$'); ktitle('conditional displacement');
 
 end
+

@@ -19,13 +19,38 @@
 %                            flip-flop terms removed
 %
 %                  'labframe' for full laboratory frame simulation
-%                             with all Hamiltonian terms retained
+%                             with all Hamiltonian terms retained;
+%                             bosonic modes are allowed and stay in
+%                             the laboratory frame with all of their
+%                             interaction terms retained
 %
-%                  'qnmr'     for quadrupolar NMR with numerical 
+%                  'qnmr'     for quadrupolar NMR with numerical
 %                             rotating frames: spin-1/2 particles
 %                             will be in the rotating frame but
 %                             spin>1/2 particles initially in the
 %                             laboratory frame
+%
+%                  'cavity'   for cavity QED: spins and bosonic
+%                             modes in a common rotating frame with
+%                             the rotating wave approximation, mode
+%                             energies to be built as detunings from
+%                             the carrier frequency, exchange terms
+%                             keeping flip-flop components only,
+%                             anharmonicity, Kerr, and dispersive
+%                             terms in full; longitudinal and modu-
+%                             lation terms are disallowed because
+%                             they average out
+%
+%                  'spin-phonon' for spins in their usual rotating
+%                             frames with bosonic modes in the la-
+%                             boratory frame: electron and nuclear
+%                             terms as in the 'esr' set, electron-
+%                             mode exchange terms dropped as non-
+%                             secular, mode-mode and nucleus-mode
+%                             exchange terms retained in full,
+%                             longitudinal, dispersive, and modula-
+%                             tion terms and all diagonal mode
+%                             terms retained
 %
 %    retention  -  'zeeman' drops all spin-spin interactions 
 %
@@ -252,11 +277,6 @@ switch assumptions
         
     case {'labframe'}
 
-        % Disallow particles that are not spins
-        if any(ismember({'C','V','T'},spin_system.comp.types),'all')
-            error('Cavities, phonons, and transmons are not allowed under this assumption set.');
-        end
-        
         % Do the reporting
         report(spin_system,'lab frame assumption set - no assumptions:');
         report(spin_system,'  laboratory frame simulation for electrons,');
@@ -265,29 +285,49 @@ switch assumptions
         report(spin_system,'  all terms for nuclear Zeeman interactions,');
         report(spin_system,'  all terms for giant spin model interactions,');
         report(spin_system,'  all terms for all couplings.');
-        
+
+        % Do the reporting for bosonic modes
+        if any(ismember({'C','V','T'},spin_system.comp.types),'all')
+            report(spin_system,'  laboratory frame simulation for bosonic modes,');
+            report(spin_system,'  exchange terms keep counter-rotating components,');
+            report(spin_system,'  all anharmonicity, Kerr, longitudinal, and dispersive terms retained,');
+            report(spin_system,'  all Hamiltonian modulation terms retained.');
+        end
+
         % Process Zeeman interactions
         for n=1:spin_system.comp.nspins
-            
+
             % Full Zeeman tensors should be used for all spins
             spin_system.inter.zeeman.strength{n}='full';
-            
+
         end
-        
+
         % Process couplings
         for n=1:spin_system.comp.nspins
-            
+
             % Giant spin terms should be full
             spin_system.inter.giant.strength{n}='strong';
-            
+
             % The same applies to all couplings
             for k=1:spin_system.comp.nspins
-                
+
                 % Full coupling tensors should be used for all spins
                 spin_system.inter.coupling.strength{n,k}='strong';
-                
+
             end
-            
+
+        end
+
+        % Process bosonic mode terms
+        if isfield(spin_system.inter,'modes')
+            spin_system.inter.modes.strength.frqs='full';
+            spin_system.inter.modes.strength.anharms='full';
+            spin_system.inter.modes.strength.exchange='strong';
+            spin_system.inter.modes.strength.kerr='full';
+            spin_system.inter.modes.strength.longitudinal='full';
+            spin_system.inter.modes.strength.dispersive='full';
+            spin_system.inter.modes.strength.coupling_mod='full';
+            spin_system.inter.modes.strength.zeeman_mod='full';
         end
         
     case {'se_dnp_h+'}
@@ -545,42 +585,152 @@ switch assumptions
             
         end
 
-    % case 'duffing' (work in progress)
-    % 
-    %     % Disallow particles that are not transmons
-    %     if any(ismember({'C','V','S'},spin_system.comp.types),'all')
-    %         error('Cavities, phonons, and spins are not allowed under this assumption set.');
-    %     end
-    % 
-    %     % Do the reporting
-    %     report(spin_system,'transmon assumption set - Duffing model:');
-    %     report(spin_system,'  offset term is omega*Cr*An,');
-    %     report(spin_system,'  anharmonicity term is (alpha/2)*Cr*Cr*An*An,');
-    %     report(spin_system,'  coupling terms are J*(AnA*CrB+CrA*AnB).');
-    % 
-    %     % Process Zeeman interactions
-    %     for n=1:spin_system.comp.nspins
-    % 
-    %         % Full Duffing offsets for all transmons
-    %         spin_system.inter.duffing.strength{n}='full';
-    % 
-    %     end
-    % 
-    %     % Process couplings
-    %     for n=1:spin_system.comp.nspins
-    %         for k=1:spin_system.comp.nspins
-    % 
-    %             % The word for XX+YY coupling was invented here
-    %             spin_system.inter.coupling.strength{n,k}='tough';
-    % 
-    %         end
-    %     end
-        
+    case {'cavity'}
+
+        % Do the reporting
+        report(spin_system,'cavity QED assumption set - common rotating frame with RWA:');
+        report(spin_system,'  rotating frame approximation for all spins,');
+        report(spin_system,'  secular terms for all Zeeman interactions,');
+        report(spin_system,'  secular terms for giant spin model interactions,');
+        report(spin_system,'  secular terms for all spin-spin couplings,');
+        report(spin_system,'  mode energies to be built as carrier detunings,');
+        report(spin_system,'  exchange terms keep flip-flop components only,');
+        report(spin_system,'  anharmonicity, Kerr, and dispersive terms retained in full.');
+
+        % Process Zeeman interactions
+        for n=1:spin_system.comp.nspins
+
+            % All Zeeman interactions should be secular
+            spin_system.inter.zeeman.strength{n}='secular';
+
+        end
+
+        % Process couplings
+        for n=1:spin_system.comp.nspins
+
+            % Giant spin terms should be secular
+            spin_system.inter.giant.strength{n}='secular';
+
+            % All spin-spin couplings should be secular
+            for k=1:spin_system.comp.nspins
+                spin_system.inter.coupling.strength{n,k}='secular';
+            end
+
+        end
+
+        % Process bosonic mode terms
+        if isfield(spin_system.inter,'modes')
+
+            % Disallow longitudinal terms that average out under the RWA
+            if ~all(cellfun(@isempty,spin_system.inter.modes.longitudinal(:)))
+                error('longitudinal couplings average to zero in this frame, use spin-phonon or labframe.');
+            end
+
+            % Disallow modulation terms that average out under the RWA
+            if (~all(cellfun(@isempty,spin_system.inter.modes.coupling_mod(:))))||...
+               (~all(cellfun(@isempty,spin_system.inter.modes.zeeman_mod(:))))
+                error('Hamiltonian modulation terms average to zero in this frame, use spin-phonon or labframe.');
+            end
+
+            % Set mode term strengths
+            spin_system.inter.modes.strength.frqs='offset';
+            spin_system.inter.modes.strength.anharms='full';
+            spin_system.inter.modes.strength.exchange='rwa';
+            spin_system.inter.modes.strength.kerr='full';
+            spin_system.inter.modes.strength.longitudinal='ignore';
+            spin_system.inter.modes.strength.dispersive='full';
+            spin_system.inter.modes.strength.coupling_mod='ignore';
+            spin_system.inter.modes.strength.zeeman_mod='ignore';
+
+        end
+
+    case {'spin-phonon'}
+
+        % Do the reporting
+        report(spin_system,'spin-phonon assumption set - lab frame bosonic modes:');
+        report(spin_system,'  rotating frame approximation for electrons,');
+        report(spin_system,'  laboratory frame simulation for nuclei,');
+        report(spin_system,'  laboratory frame simulation for bosonic modes,');
+        report(spin_system,'  secular terms for electron Zeeman interactions,');
+        report(spin_system,'  all terms for nuclear Zeeman interactions,');
+        report(spin_system,'  secular terms for inter-electron couplings,');
+        report(spin_system,'  secular terms for giant spin model interactions,');
+        report(spin_system,'  weak and pseudosecular terms for hyperfine couplings,');
+        report(spin_system,'  all terms for inter-nuclear couplings,');
+        report(spin_system,'  electron-mode exchange terms dropped as non-secular in this frame,');
+        report(spin_system,'  mode-mode and nucleus-mode exchange terms retained in full,');
+        report(spin_system,'  all longitudinal, dispersive, and modulation terms retained.');
+
+        % Process Zeeman interactions
+        for n=1:spin_system.comp.nspins
+            if strcmp(spin_system.comp.isotopes{n}(1),'E')
+
+                % Electron Zeeman interactions should be secular
+                spin_system.inter.zeeman.strength{n}='secular';
+
+            else
+
+                % Full Zeeman tensors should be used for nuclei
+                spin_system.inter.zeeman.strength{n}='full';
+
+            end
+        end
+
+        % Process couplings
+        for n=1:spin_system.comp.nspins
+
+            % Giant spin terms should be secular
+            spin_system.inter.giant.strength{n}='secular';
+
+            % For spin-spin couplings, it depends
+            for k=1:spin_system.comp.nspins
+                if strcmp(spin_system.comp.isotopes{n}(1),'E')&&(~strcmp(spin_system.comp.isotopes{k}(1),'E'))
+
+                    % Couplings from electrons to nuclei should be left-secular
+                    spin_system.inter.coupling.strength{n,k}='z*';
+
+                elseif strcmp(spin_system.comp.isotopes{k}(1),'E')&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
+
+                    % Couplings from nuclei to electrons should be right-secular
+                    spin_system.inter.coupling.strength{n,k}='*z';
+
+                elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(strcmp(spin_system.comp.isotopes{k}(1),'E'))
+
+                    % Couplings between electrons should be secular
+                    spin_system.inter.coupling.strength{n,k}='secular';
+
+                else
+
+                    % Couplings between nuclei should be strong
+                    spin_system.inter.coupling.strength{n,k}='strong';
+
+                end
+            end
+        end
+
+        % Process bosonic mode terms
+        if isfield(spin_system.inter,'modes')
+            spin_system.inter.modes.strength.frqs='full';
+            spin_system.inter.modes.strength.anharms='full';
+            spin_system.inter.modes.strength.exchange='nonelec';
+            spin_system.inter.modes.strength.kerr='full';
+            spin_system.inter.modes.strength.longitudinal='full';
+            spin_system.inter.modes.strength.dispersive='full';
+            spin_system.inter.modes.strength.coupling_mod='full';
+            spin_system.inter.modes.strength.zeeman_mod='full';
+        end
+
     otherwise
         
         % Complain and bomb out
         error('unrecognized assumption set.')
         
+end
+
+% Refuse retention options when bosonic modes are present
+if exist('retention','var')&&ismember(retention,{'zeeman','couplings'})&&...
+   isfield(spin_system.inter,'modes')
+    error('retention options are undefined for spin-boson systems.');
 end
 
 % Choose the terms to retain

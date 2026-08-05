@@ -16,34 +16,32 @@ sys.magnet=0;
 % Particle specification
 sys.isotopes={'E','C3'};
 
+% Resonant cavity in the rotating frame
+inter.modes.frqs={[] 0};
+inter.modes.exchange=cell(2,2);
+inter.modes.exchange{1,2}=8e6;
+
 % Formalism and basis
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Spinach housekeeping
-spin_system=create(sys,[]);
+spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Coupling parameters
-delta=0;
-g=2*pi*8e6;
+% Sequence parameters
+parameters.rho0=state(spin_system,{'ZL2','BL1'},{1,2});
+parameters.sweep=1e9;
+parameters.npoints=501;
 
-% Jaynes-Cummings Hamiltonian
-H=delta*operator(spin_system,'Lz',1)+...
-  g*(operator(spin_system,{'L+','A'},{1,2})+...
-     operator(spin_system,{'L-','C'},{1,2}));
+% Trajectory through the device context
+traj=device(spin_system,@traject,parameters,'cavity');
 
-% Clean up numerical asymmetry
-H=(H+H')/2;
-
-% Initial spin excitation and observables
-rho=state(spin_system,{'ZL2','BL1'},{1,2});
-Ps=state(spin_system,{'ZL2','E'},{1,2});
-Pc=state(spin_system,{'ZL1','BL2'},{1,2});
-
-% Propagate the excitation swap
-pop_s=evolution(spin_system,H,Ps,rho,1e-9,500,'observable');
-pop_c=evolution(spin_system,H,Pc,rho,1e-9,500,'observable');
+% Project out the spin and cavity excitation populations
+coil_s=state(spin_system,{'ZL2','E'},{1,2});
+coil_c=state(spin_system,{'ZL1','BL2'},{1,2});
+pop_s=cellfun(@(rho)full(hdot(coil_s,rho)),traj);
+pop_c=cellfun(@(rho)full(hdot(coil_c,rho)),traj);
 
 % Validate visible excitation exchange
 if (max(real(pop_c))<0.95)||(min(real(pop_s))>0.05)
@@ -57,10 +55,11 @@ end
 
 % Plot the vacuum Rabi dynamics
 time_axis=linspace(0,500,501);
-kfigure(); plot(time_axis,real([pop_s pop_c]),'LineWidth',1.5);
+kfigure(); plot(time_axis,real([pop_s; pop_c]),'LineWidth',1.5);
 axis tight; ylim([-0.05 1.05]); kgrid; kxlabel('time, ns');
 kylabel('excitation population');
 ktitle('spin-cavity vacuum Rabi oscillation');
 klegend({'spin','cavity'},'Location','Best');
 
 end
+

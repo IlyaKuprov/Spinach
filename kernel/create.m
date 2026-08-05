@@ -20,6 +20,21 @@
 %  spin_system   - the primary object used by Spinach
 %                  to store simulation information
 %
+% Note: inter.modes.carriers declares, for each bosonic mode, the labo-
+%       ratory frequency of the rotating frame in which inter.modes.frqs
+%       is specified; declared frequencies are then detunings and may be
+%       negative, and thermal occupations are computed from the physical
+%       frequency, meaning the sum of the carrier and the detuning.
+%
+% Note: inter.modes.t2_times is interpreted at the declared temperature:
+%       the pure dephasing rate is extracted as 1/T2-kappa*(1+2*nbar)/2,
+%       where kappa is the amplitude damping rate and nbar the thermal
+%       occupation at the physical mode frequency.
+%
+% Note: quadrature operators of bosonic modes follow the (a+a')/sqrt(2)
+%       normalisation everywhere, in inter.modes.longitudinal as well as
+%       in the modulation channels.
+%
 % ilya.kuprov@weizmann.ac.il
 % hannah.hogben@chem.ox.ac.uk
 % kpervushin@ntu.edu.sg
@@ -395,21 +410,11 @@ for n=1:spin_system.comp.nspins
     
     % Determine the particle type
     name=spin_system.comp.isotopes{n};
-    if strcmp(name(1),'C')&&(~isempty(regexp(name,'^C\d','once')))
+    if ~isempty(regexp(name,'^[CVT]\d+$','once'))
 
-        % Cavity mode, Weil algebra
-        spin_system.comp.types{n}='C';
+        % Cavity mode, phonon mode, or transmon, Weil algebra
+        spin_system.comp.types{n}=name(1);
 
-    elseif strcmp(name(1),'V')&&(~isempty(regexp(name,'^V\d','once')))
-
-        % Phonon mode, Weil algebra 
-        spin_system.comp.types{n}='V';
-
-    elseif strcmp(name(1),'T')&&(~isempty(regexp(name,'^T\d','once')))
-
-        % Transmon, Weil algebra 
-        spin_system.comp.types{n}='T';
-        
     else
 
         % Spin, Lie algebra
@@ -460,34 +465,228 @@ report(spin_system,['magnetic induction of ' num2str(spin_system.inter.magnet,'%
 % Compute carrier frequencies
 spin_system.inter.basefrqs=-spin_system.inter.gammas*spin_system.inter.magnet;
 
-% % Absorb transmon parameters (work in progress)
-% if isfield(inter,'duffing')
-% 
-%     % Absorb parameters and parse out
-%     spin_system.inter.duffing.offset=inter.duffing.offset;
-%     spin_system.inter.duffing.anharm=inter.duffing.anharm;
-%     inter=rmfield(inter,'duffing');
-% 
-%     % Print report header
-%     report(spin_system,' ');
-%     report(spin_system,'Duffing approximation parameters for transmons');
-%     report(spin_system,'=================================================');
-%     report(spin_system,' Number    Levels    Offset, Hz    Anharm, Hz    ');
-%     report(spin_system,'-------------------------------------------------');
-% 
-%     % Report transmons
-%     for n=1:spin_system.comp.nspins
-%         if strcmp(spin_system.comp.types{n},'T')
-%             report(spin_system,['  ' pad(int2str(n),10) pad(int2str(spin_system.comp.mults(n)),9) ...
-%                                      pad(num2str(spin_system.inter.duffing.offset{n},'%+4.3e'),14)   ...
-%                                      pad(num2str(spin_system.inter.duffing.anharm{n},'%+4.3e'),14)]);
-%         end
-%     end
-% 
-%     % Finish up transmon reporting
-%     report(spin_system,'=================================================');
-% 
-% end
+% Absorb bosonic mode parameters
+if isfield(inter,'modes')
+
+    % Locate bosonic modes
+    mode_mask=ismember(spin_system.comp.types,{'C','V','T'});
+
+    % Preallocate per-mode parameter arrays
+    spin_system.inter.modes.frqs=zeros(1,spin_system.comp.nspins);
+    spin_system.inter.modes.carriers=zeros(1,spin_system.comp.nspins);
+    spin_system.inter.modes.anharms=zeros(1,spin_system.comp.nspins);
+    spin_system.inter.modes.damp=zeros(1,spin_system.comp.nspins);
+    spin_system.inter.modes.dephase=zeros(1,spin_system.comp.nspins);
+
+    % Preallocate pairwise coupling arrays
+    spin_system.inter.modes.exchange=cell(spin_system.comp.nspins);
+    spin_system.inter.modes.kerr=cell(spin_system.comp.nspins);
+    spin_system.inter.modes.longitudinal=cell(spin_system.comp.nspins);
+    spin_system.inter.modes.dispersive=cell(spin_system.comp.nspins);
+    spin_system.inter.modes.coupling_mod=cell(spin_system.comp.nspins);
+    spin_system.inter.modes.zeeman_mod=cell(spin_system.comp.nspins);
+
+    % Absorb mode frequencies
+    if isfield(inter.modes,'frqs')
+        for n=find(mode_mask)
+            if ~isempty(inter.modes.frqs{n})
+                spin_system.inter.modes.frqs(n)=2*pi*inter.modes.frqs{n};
+            end
+        end
+    end
+
+    % Absorb rotating frame carrier frequencies
+    if isfield(inter.modes,'carriers')
+        for n=find(mode_mask)
+            if ~isempty(inter.modes.carriers{n})
+                spin_system.inter.modes.carriers(n)=2*pi*inter.modes.carriers{n};
+            end
+        end
+    end
+
+    % Absorb mode anharmonicities
+    if isfield(inter.modes,'anharms')
+        for n=find(mode_mask)
+            if ~isempty(inter.modes.anharms{n})
+                spin_system.inter.modes.anharms(n)=2*pi*inter.modes.anharms{n};
+                if (inter.modes.anharms{n}>0)&&strcmp(spin_system.comp.types{n},'T')
+                    report(spin_system,['WARNING - positive anharmonicity on transmon ' int2str(n)]);
+                end
+            end
+        end
+    end
+
+    % Absorb mode damping in its three equivalent forms
+    for n=find(mode_mask)
+        if isfield(inter.modes,'lifetimes')&&(~isempty(inter.modes.lifetimes{n}))
+            spin_system.inter.modes.damp(n)=1/inter.modes.lifetimes{n};
+        elseif isfield(inter.modes,'linewidths')&&(~isempty(inter.modes.linewidths{n}))
+            spin_system.inter.modes.damp(n)=2*pi*inter.modes.linewidths{n};
+        elseif isfield(inter.modes,'qfactors')&&(~isempty(inter.modes.qfactors{n}))
+            spin_system.inter.modes.damp(n)=abs(spin_system.inter.modes.frqs(n))/inter.modes.qfactors{n};
+        end
+    end
+
+    % Physical mode frequencies, laboratory carriers included where declared
+    phys_frqs=abs(spin_system.inter.modes.frqs);
+    carr_mask=spin_system.inter.modes.carriers>0;
+    phys_frqs(carr_mask)=spin_system.inter.modes.carriers(carr_mask)+...
+                         spin_system.inter.modes.frqs(carr_mask);
+
+    % Refuse the default temperature when the modes are damped
+    if (~isfield(inter,'temperature'))&&any(spin_system.inter.modes.damp>0)
+        nbar_list='';
+        for n=find(spin_system.inter.modes.damp>0)
+            nbar_298=1/(exp(spin_system.tols.hbar*phys_frqs(n)/...
+                            (spin_system.tols.kbol*298))-1);
+            nbar_list=[nbar_list ' mode ' int2str(n) ...
+                       ': nbar=' num2str(nbar_298,'%0.4g') ';']; %#ok<AGROW>
+        end
+        error(['bosonic mode damping is specified, but inter.temperature is not; '...
+               'the 298 Kelvin default would give' nbar_list ' supply inter.temperature '...
+               'explicitly, zero selects the zero temperature limit for mode baths.']);
+    end
+
+    % Temperature at which mode thermal occupations are computed
+    if isfield(inter,'temperature')
+        mode_temp=inter.temperature;
+    else
+        mode_temp=298;
+    end
+
+    % Thermal occupations of the damped modes at the declared temperature
+    nbars=zeros(1,spin_system.comp.nspins);
+    therm_mask=(spin_system.inter.modes.damp>0)&...
+               (phys_frqs>2*pi*spin_system.tols.inter_cutoff);
+    if mode_temp>0
+        beta_facs=spin_system.tols.hbar*phys_frqs(therm_mask)/...
+                  (spin_system.tols.kbol*mode_temp);
+        nbars(therm_mask)=1./(exp(beta_facs)-1);
+    end
+
+    % Absorb mode coherence times as pure dephasing rates
+    if isfield(inter.modes,'t2_times')
+        for n=find(mode_mask)
+            if ~isempty(inter.modes.t2_times{n})
+                kappa=spin_system.inter.modes.damp(n);
+                if 1/inter.modes.t2_times{n}<kappa*(1+2*nbars(n))/2
+                    error(['inter.modes.t2_times for mode ' int2str(n) ' exceeds the '...
+                           'coherence lifetime floor of ' num2str(2/(kappa*(1+2*nbars(n))),'%0.6g') ...
+                           ' seconds set by the damping at ' num2str(mode_temp) ' Kelvin.']);
+                end
+                spin_system.inter.modes.dephase(n)=1/inter.modes.t2_times{n}-...
+                                                   kappa*(1+2*nbars(n))/2;
+            end
+        end
+    end
+
+    % Absorb significant exchange couplings
+    if isfield(inter.modes,'exchange')
+        [rows,cols]=find(~cellfun(@isempty,inter.modes.exchange));
+        for n=1:numel(rows)
+            if abs(inter.modes.exchange{rows(n),cols(n)})>spin_system.tols.inter_cutoff
+                spin_system.inter.modes.exchange{rows(n),cols(n)}=...
+                2*pi*inter.modes.exchange{rows(n),cols(n)};
+            else
+                report(spin_system,['WARNING - exchange coupling ' int2str(rows(n)) ',' ...
+                                    int2str(cols(n)) ' is below the interaction cutoff, ignored.']);
+            end
+        end
+    end
+
+    % Absorb significant cross-Kerr couplings
+    if isfield(inter.modes,'kerr')
+        [rows,cols]=find(~cellfun(@isempty,inter.modes.kerr));
+        for n=1:numel(rows)
+            if abs(inter.modes.kerr{rows(n),cols(n)})>spin_system.tols.inter_cutoff
+                spin_system.inter.modes.kerr{rows(n),cols(n)}=...
+                2*pi*inter.modes.kerr{rows(n),cols(n)};
+            else
+                report(spin_system,['WARNING - cross-Kerr coupling ' int2str(rows(n)) ',' ...
+                                    int2str(cols(n)) ' is below the interaction cutoff, ignored.']);
+            end
+        end
+    end
+
+    % Absorb significant longitudinal couplings
+    if isfield(inter.modes,'longitudinal')
+        [rows,cols]=find(~cellfun(@isempty,inter.modes.longitudinal));
+        for n=1:numel(rows)
+            if abs(inter.modes.longitudinal{rows(n),cols(n)})>spin_system.tols.inter_cutoff
+                spin_system.inter.modes.longitudinal{rows(n),cols(n)}=...
+                2*pi*inter.modes.longitudinal{rows(n),cols(n)};
+            else
+                report(spin_system,['WARNING - longitudinal coupling ' int2str(rows(n)) ',' ...
+                                    int2str(cols(n)) ' is below the interaction cutoff, ignored.']);
+            end
+        end
+    end
+
+    % Absorb significant dispersive couplings
+    if isfield(inter.modes,'dispersive')
+        [rows,cols]=find(~cellfun(@isempty,inter.modes.dispersive));
+        for n=1:numel(rows)
+            if abs(inter.modes.dispersive{rows(n),cols(n)})>spin_system.tols.inter_cutoff
+                spin_system.inter.modes.dispersive{rows(n),cols(n)}=...
+                2*pi*inter.modes.dispersive{rows(n),cols(n)};
+            else
+                report(spin_system,['WARNING - dispersive coupling ' int2str(rows(n)) ',' ...
+                                    int2str(cols(n)) ' is below the interaction cutoff, ignored.']);
+            end
+        end
+    end
+
+    % Absorb coupling tensor derivatives
+    if isfield(inter.modes,'coupling_mod')
+        [rows,cols]=find(~cellfun(@isempty,inter.modes.coupling_mod));
+        for n=1:numel(rows)
+            deriv_orders=inter.modes.coupling_mod{rows(n),cols(n)};
+            for m=1:numel(deriv_orders)
+                if ~isempty(deriv_orders{m})
+                    spin_system.inter.modes.coupling_mod{rows(n),cols(n)}{m}=...
+                    cellfun(@(x)2*pi*x,deriv_orders{m},'UniformOutput',false);
+                end
+            end
+        end
+    end
+
+    % Absorb effective field derivatives
+    if isfield(inter.modes,'zeeman_mod')
+        [rows,cols]=find(~cellfun(@isempty,inter.modes.zeeman_mod));
+        for n=1:numel(rows)
+            deriv_orders=inter.modes.zeeman_mod{rows(n),cols(n)};
+            for m=1:numel(deriv_orders)
+                if ~isempty(deriv_orders{m})
+                    spin_system.inter.modes.zeeman_mod{rows(n),cols(n)}{m}=...
+                    cellfun(@(x)2*pi*x,deriv_orders{m},'UniformOutput',false);
+                end
+            end
+        end
+    end
+
+    % Report mode parameters to the user
+    summary_modes(spin_system,'bosonic mode summary');
+
+    % Report mode couplings to the user
+    if ~all(cellfun(@isempty,[spin_system.inter.modes.exchange(:);
+                              spin_system.inter.modes.kerr(:);
+                              spin_system.inter.modes.longitudinal(:);
+                              spin_system.inter.modes.dispersive(:)]))
+        summary_mode_coup(spin_system,'summary of bosonic mode couplings (Hz)');
+    end
+
+    % Report modulation tensors to the user
+    if ~all(cellfun(@isempty,[spin_system.inter.modes.coupling_mod(:);
+                              spin_system.inter.modes.zeeman_mod(:)]))
+        summary_mode_mods(spin_system,'summary of spin Hamiltonian modulation by modes');
+    end
+
+elseif any(ismember(spin_system.comp.types,{'C','V','T'}))
+
+    % Warn the user that mode parameters have not been found
+    report(spin_system,'WARNING - no bosonic mode parameters given, zeros assumed.');
+
+end
 
 % Preallocate Zeeman tensor array
 spin_system.inter.zeeman.matrix=mat2cell(zeros(3*spin_system.comp.nspins,3),3*ones(spin_system.comp.nspins,1));
@@ -2635,6 +2834,260 @@ if isfield(inter,'chem')
         end
     end
     
+end
+
+% Check bosonic mode parameters
+boson_mask=~cellfun(@isempty,regexp(sys.isotopes,'^[CVT]\d+$','once'));
+if isfield(inter,'modes')
+    if ~isstruct(inter.modes)
+        error('inter.modes must be a structure.');
+    end
+    odd_fields=setdiff(fieldnames(inter.modes),{'frqs','carriers','anharms',...
+               'lifetimes','linewidths','qfactors','t2_times','exchange','kerr',...
+               'longitudinal','dispersive','coupling_mod','zeeman_mod'});
+    if ~isempty(odd_fields)
+        error(['unrecognised inter.modes field: ' odd_fields{1}]);
+    end
+    if ~any(boson_mask)
+        error('inter.modes is specified, but sys.isotopes contains no bosonic modes.');
+    end
+    if ~isfield(inter.modes,'frqs')
+        error('inter.modes.frqs must be specified when inter.modes is present.');
+    end
+    scalar_flds={'frqs','carriers','anharms','lifetimes','linewidths',...
+                 'qfactors','t2_times'};
+    for m=1:numel(scalar_flds)
+        if isfield(inter.modes,scalar_flds{m})
+            fld=inter.modes.(scalar_flds{m});
+            if (~iscell(fld))||(numel(fld)~=numel(sys.isotopes))
+                error(['inter.modes.' scalar_flds{m} ' must be a cell array with one element per particle.']);
+            end
+            for n=1:numel(sys.isotopes)
+                if ~isempty(fld{n})
+                    if (~isnumeric(fld{n}))||(~isreal(fld{n}))||...
+                       (~isscalar(fld{n}))||(~isfinite(fld{n}))
+                        error(['non-empty elements of inter.modes.' scalar_flds{m} ' must be real finite scalars.']);
+                    end
+                    if ~boson_mask(n)
+                        error(['inter.modes.' scalar_flds{m} ' is specified for particle ' int2str(n) ', which is not a bosonic mode.']);
+                    end
+                end
+            end
+        end
+    end
+    for n=find(boson_mask)
+        if isempty(inter.modes.frqs{n})
+            error(['inter.modes.frqs must be specified for bosonic mode ' int2str(n)]);
+        end
+        carrier_n=[];
+        if isfield(inter.modes,'carriers')&&(~isempty(inter.modes.carriers{n}))
+            carrier_n=inter.modes.carriers{n};
+            if carrier_n<=0
+                error(['inter.modes.carriers element for mode ' int2str(n) ' must be positive.']);
+            end
+        end
+        if (inter.modes.frqs{n}<0)&&(~strcmp(sys.isotopes{n}(1),'T'))&&isempty(carrier_n)
+            error(['negative frequency specified for bosonic mode ' int2str(n) ...
+                   ', declare inter.modes.carriers to make it a detuning.']);
+        end
+        damp_count=0; kappa=0;
+        if isfield(inter.modes,'lifetimes')&&(~isempty(inter.modes.lifetimes{n}))
+            if inter.modes.lifetimes{n}<=0
+                error(['inter.modes.lifetimes element for mode ' int2str(n) ' must be positive.']);
+            end
+            damp_count=damp_count+1; kappa=1/inter.modes.lifetimes{n};
+        end
+        if isfield(inter.modes,'linewidths')&&(~isempty(inter.modes.linewidths{n}))
+            if inter.modes.linewidths{n}<=0
+                error(['inter.modes.linewidths element for mode ' int2str(n) ' must be positive.']);
+            end
+            damp_count=damp_count+1; kappa=2*pi*inter.modes.linewidths{n};
+        end
+        if isfield(inter.modes,'qfactors')&&(~isempty(inter.modes.qfactors{n}))
+            if inter.modes.qfactors{n}<=0
+                error(['inter.modes.qfactors element for mode ' int2str(n) ' must be positive.']);
+            end
+            if inter.modes.frqs{n}==0
+                error(['inter.modes.qfactors for mode ' int2str(n) ' needs a non-zero mode '...
+                       'frequency, use inter.modes.lifetimes or inter.modes.linewidths.']);
+            end
+            damp_count=damp_count+1; kappa=2*pi*abs(inter.modes.frqs{n})/inter.modes.qfactors{n};
+        end
+        if damp_count>1
+            error(['multiple damping specifications for bosonic mode ' int2str(n)]);
+        end
+        if (kappa>0)&&(~isempty(carrier_n))&&((carrier_n+inter.modes.frqs{n})<=0)
+            error(['the physical frequency of damped bosonic mode ' int2str(n) ...
+                   ' must be positive, check inter.modes.carriers and inter.modes.frqs.']);
+        end
+        if isfield(inter.modes,'t2_times')&&(~isempty(inter.modes.t2_times{n}))
+            if inter.modes.t2_times{n}<=0
+                error(['inter.modes.t2_times element for mode ' int2str(n) ' must be positive.']);
+            end
+        end
+    end
+    pair_flds={'exchange','kerr','longitudinal','dispersive'};
+    for m=1:numel(pair_flds)
+        if isfield(inter.modes,pair_flds{m})
+            fld=inter.modes.(pair_flds{m});
+            if (~iscell(fld))||(size(fld,1)~=numel(sys.isotopes))||...
+               (size(fld,2)~=numel(sys.isotopes))
+                error(['inter.modes.' pair_flds{m} ' must be a cell array with dimensions nspins x nspins.']);
+            end
+            for n=1:numel(sys.isotopes)
+                for k=1:numel(sys.isotopes)
+                    if ~isempty(fld{n,k})
+                        if (~isnumeric(fld{n,k}))||(~isreal(fld{n,k}))||...
+                           (~isscalar(fld{n,k}))||(~isfinite(fld{n,k}))
+                            error(['non-empty elements of inter.modes.' pair_flds{m} ' must be real finite scalars.']);
+                        end
+                        if strcmp(pair_flds{m},'longitudinal')
+                            if n==k
+                                error('inter.modes.longitudinal must not have entries on the main diagonal.');
+                            end
+                            if ~isempty(fld{k,n})
+                                error(['inter.modes.longitudinal is declared for both {' int2str(n) ','...
+                                       int2str(k) '} and {' int2str(k) ',' int2str(n) '}, which is ambiguous.']);
+                            end
+                        elseif n>=k
+                            error(['inter.modes.' pair_flds{m} ' must only have entries above the main diagonal.']);
+                        end
+                        nbosons=nnz(boson_mask([n k]));
+                        if strcmp(pair_flds{m},'exchange')&&(nbosons==0)
+                            error(['inter.modes.exchange between particles ' int2str(n) ' and ' int2str(k) ': spin-spin couplings belong in inter.coupling.']);
+                        end
+                        if strcmp(pair_flds{m},'kerr')&&(nbosons~=2)
+                            error(['inter.modes.kerr between particles ' int2str(n) ' and ' int2str(k) ' requires two bosonic modes.']);
+                        end
+                        if strcmp(pair_flds{m},'longitudinal')&&(nbosons==0)
+                            error(['inter.modes.longitudinal between particles ' int2str(n) ' and ' int2str(k) ' requires at least one bosonic mode.']);
+                        end
+                        if strcmp(pair_flds{m},'dispersive')&&(nbosons~=1)
+                            error(['inter.modes.dispersive between particles ' int2str(n) ' and ' int2str(k) ' requires one spin and one bosonic mode; number-number couplings between modes belong in inter.modes.kerr.']);
+                        end
+                    end
+                end
+            end
+        end
+    end
+    deriv_flds={'coupling_mod','zeeman_mod'};
+    for m=1:numel(deriv_flds)
+        if isfield(inter.modes,deriv_flds{m})
+            fld=inter.modes.(deriv_flds{m});
+            if (~iscell(fld))||(size(fld,1)~=numel(sys.isotopes))||...
+               (size(fld,2)~=numel(sys.isotopes))
+                error(['inter.modes.' deriv_flds{m} ' must be a cell array with dimensions nspins x nspins.']);
+            end
+            for n=1:numel(sys.isotopes)
+                for k=1:numel(sys.isotopes)
+                    if ~isempty(fld{n,k})
+                        if nnz(boson_mask([n k]))~=2
+                            error(['inter.modes.' deriv_flds{m} ' entry {' int2str(n) ',' int2str(k) '} requires two bosonic mode indices.']);
+                        end
+                        if n>k
+                            error(['inter.modes.' deriv_flds{m} ' must only have entries on or above the main diagonal.']);
+                        end
+                        if (~iscell(fld{n,k}))||(numel(fld{n,k})>2)
+                            error(['inter.modes.' deriv_flds{m} ' entries must be cell arrays with at most two derivative orders.']);
+                        end
+                        if (numel(fld{n,k})>=1)&&(~isempty(fld{n,k}{1}))&&(n~=k)
+                            error(['first derivative in inter.modes.' deriv_flds{m} ' entry {' int2str(n) ',' int2str(k) '} requires a diagonal mode pair.']);
+                        end
+                        for m2=1:numel(fld{n,k})
+                            block=fld{n,k}{m2};
+                            if isempty(block), continue; end
+                            if strcmp(deriv_flds{m},'coupling_mod')
+                                if (~iscell(block))||(size(block,1)~=numel(sys.isotopes))||...
+                                   (size(block,2)~=numel(sys.isotopes))
+                                    error('coupling derivative blocks must be cell arrays with dimensions nspins x nspins.');
+                                end
+                                for p=1:numel(sys.isotopes)
+                                    for q=1:numel(sys.isotopes)
+                                        if ~isempty(block{p,q})
+                                            if boson_mask(p)||boson_mask(q)
+                                                error('coupling derivative tensors may only connect spin index pairs.');
+                                            end
+                                            if (~isnumeric(block{p,q}))||(~isreal(block{p,q}))||...
+                                               (~all(size(block{p,q})==[3 3]))||...
+                                               (~all(isfinite(block{p,q}(:))))
+                                                error('coupling derivative tensors must be real finite 3x3 matrices.');
+                                            end
+                                        end
+                                    end
+                                end
+                            else
+                                if (~iscell(block))||(~isrow(block))||(numel(block)~=numel(sys.isotopes))
+                                    error('field derivative blocks must be row cell arrays with one element per particle.');
+                                end
+                                for p=1:numel(sys.isotopes)
+                                    if ~isempty(block{p})
+                                        if boson_mask(p)
+                                            error('field derivative vectors may only be specified for spins.');
+                                        end
+                                        if (~isnumeric(block{p}))||(~isreal(block{p}))||...
+                                           (~all(size(block{p})==[1 3]))||...
+                                           (~all(isfinite(block{p})))
+                                            error('field derivative vectors must be real finite 1x3 vectors.');
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+% Check that bosonic modes carry no spin interactions
+if any(boson_mask)
+    zeeman_flds={'eigs','euler','matrix','scalar'};
+    for m=1:numel(zeeman_flds)
+        if isfield(inter,'zeeman')&&isfield(inter.zeeman,zeeman_flds{m})
+            for n=find(boson_mask)
+                if ~isempty(inter.zeeman.(zeeman_flds{m}){n})
+                    error(['Zeeman interactions cannot be specified for bosonic modes, particle ' int2str(n)]);
+                end
+            end
+        end
+    end
+    for m=1:numel(zeeman_flds)
+        if isfield(inter,'coupling')&&isfield(inter.coupling,zeeman_flds{m})
+            for n=1:numel(sys.isotopes)
+                for k=1:numel(sys.isotopes)
+                    if (boson_mask(n)||boson_mask(k))&&...
+                       (~isempty(inter.coupling.(zeeman_flds{m}){n,k}))
+                        error(['spin-spin couplings cannot be specified for bosonic modes, particle pair {' int2str(n) ',' int2str(k) '}']);
+                    end
+                end
+            end
+        end
+    end
+    if isfield(inter,'coordinates')
+        for n=find(boson_mask)
+            if ~isempty(inter.coordinates{n})
+                error(['coordinates cannot be specified for bosonic modes, particle ' int2str(n)]);
+            end
+        end
+    end
+    rate_flds={'r1_rates','r2_rates'};
+    for m=1:numel(rate_flds)
+        if isfield(inter,rate_flds{m})
+            for n=find(boson_mask)
+                entry=inter.(rate_flds{m}){n};
+                if (~isnumeric(entry))||(~isscalar(entry))||(entry~=0)
+                    error(['inter.' rate_flds{m} ' must be zero for bosonic modes, particle ' int2str(n) '; use inter.modes damping instead.']);
+                end
+            end
+        end
+    end
+    rate_flds={'lind_r1_rates','lind_r2_rates'};
+    for m=1:numel(rate_flds)
+        if isfield(inter,rate_flds{m})&&any(inter.(rate_flds{m})(boson_mask)~=0)
+            error(['inter.' rate_flds{m} ' must be zero for bosonic modes; use inter.modes damping instead.']);
+        end
+    end
 end
 
 % Check the drop list

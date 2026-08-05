@@ -14,27 +14,30 @@ sys.magnet=0;
 % Particle specification
 sys.isotopes={'E','V3'};
 
+% Resonant phonon mode in the rotating frame
+inter.modes.frqs={[] 0};
+inter.modes.exchange=cell(2,2);
+inter.modes.exchange{1,2}=4e6;
+
 % Formalism and basis
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Spinach housekeeping
-spin_system=create(sys,[]);
+spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
+
+% Exchange Hamiltonian, 'cavity' is the set that keeps spin-mode exchange
+spin_system=assume(spin_system,'cavity');
+action=hamiltonian(spin_system);
+action=(action+action')/2;
 
 % Spin operator
 electron_z=operator(spin_system,'Lz',1);
 
 % Coupling parameters
-g=2*pi*4e6;
+g=2*pi*inter.modes.exchange{1,2};
 detuning=2*pi*linspace(-20e6,20e6,121);
-
-% Exchange Hamiltonian
-action=g*(operator(spin_system,{'L+','A'},{1,2})+...
-          operator(spin_system,{'L-','C'},{1,2}));
-
-% Clean up numerical asymmetry
-action=(action+action')/2;
 
 % Locate the one-excitation manifold
 spin_exc=state(spin_system,{'ZL2','BL1'},{1,2});
@@ -72,3 +75,4 @@ kylabel('dressed energy, MHz');
 ktitle('spin-phonon avoided crossing');
 
 end
+

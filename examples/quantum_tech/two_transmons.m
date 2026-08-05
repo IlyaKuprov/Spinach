@@ -11,32 +11,28 @@ sys.magnet=0;
 % Particle specification
 sys.isotopes={'T3','T5'};
 
+% Rotating frame transmon parameters
+inter.modes.frqs={100 -200};
+inter.modes.anharms={-10 -20};
+inter.modes.exchange=cell(2,2);
+inter.modes.exchange{1,2}=50;
+
 % Formalism and basis
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Spinach housekeeping
-spin_system=create(sys);
+spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
+
+% Drift Hamiltonian from the declared interactions
+H=hamiltonian(assume(spin_system,'cavity'));
 
 % Get elementary operators
 CrA=operator(spin_system,'C',1);
 AnA=operator(spin_system,'A',1);
 CrB=operator(spin_system,'C',2);
 AnB=operator(spin_system,'A',2);
-
-% Hamiltonian parameters
-deltas=2*pi*[100 -200];
-alphas=2*pi*[10   20];
-J=2*pi*50;
-
-% Build the Hamiltonian
-H=    deltas(1)*operator(spin_system,'N',1)+...
-      deltas(2)*operator(spin_system,'N',2)+...
-  (alphas(1)/2)*operator(spin_system,'CCAA',1)+...
-  (alphas(2)/2)*operator(spin_system,'CCAA',2)+...
-             J*(operator(spin_system,{'C','A'},{1,2})+...
-                operator(spin_system,{'A','C'},{1,2}));
 
 % Build control operators
 C_A=(CrA+AnA)/2; C_B=(CrB+AnB)/2;

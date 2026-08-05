@@ -1,7 +1,7 @@
-% An exchange-coupled two-electron system with the electrons 
+% An exchange-coupled two-electron system with the electrons
 % having independent Jaynes-Cummings couplings to the same
 % mode of an electromagnetic cavity. A time-domain simulati-
-% on starting with transverse spin magnetisation and empty 
+% on starting with transverse spin magnetisation and empty
 % cavity mode. Detected on the Lx operator of the spin and
 % magnetic field operator of the cavity mode.
 %
@@ -17,42 +17,34 @@ sys.magnet=0.33;
 % System
 sys.isotopes={'E','E','C5'};
 
+% Exchange coupling between the electrons
+inter.coupling.scalar=cell(3,3);
+inter.coupling.scalar{1,2}=5e6;
+
+% Cavity resonant with the electrons
+inter.modes.frqs={[] [] -sys.magnet*spin('E')/(2*pi)};
+inter.modes.exchange=cell(3,3);
+inter.modes.exchange{1,3}=2.828e6;
+inter.modes.exchange{2,3}=2.728e6;
+
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
 % Spinach housekeeping
-spin_system=create(sys,[]);
+spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Interaction parameters
-g1=2*pi*2.828e6; % J-C, first electron
-g2=2*pi*2.728e6; % J-C, second electron
-J=2*pi*5e6;      % Exchange coupling
+% Sequence parameters
+parameters.spins={'E'};
+parameters.offset=5e6;
+parameters.rho0=state(spin_system,{'Lx','BL1'},{1,3})+...
+                state(spin_system,{'Lx','BL1'},{2,3});
+parameters.sweep=1e8;
+parameters.npoints=251;
 
-% Exchange coupling Hamiltonian
-H_EX=J*(operator(spin_system,{'Lx','Lx'},{1,2})+...
-        operator(spin_system,{'Ly','Ly'},{1,2})+...
-        operator(spin_system,{'Lz','Lz'},{1,2}));
-
-% Jaynes-Cummings Hamiltonian
-H_JC=g1*(operator(spin_system,{'L+','A'},{1,3})+ ...
-         operator(spin_system,{'L-','C'},{1,3}))+...
-     g2*(operator(spin_system,{'L+','A'},{2,3})+ ...
-         operator(spin_system,{'L-','C'},{2,3}));
-
-% Detuning operators and values
-delta1=2*pi*5e6; delta2=2*pi*5e6;
-Ez1=operator(spin_system,{'Lz'},{1});
-Ez2=operator(spin_system,{'Lz'},{2});
-
-% Rotating frame Hamiltonian
-H=delta1*Ez1+delta2*Ez2+H_JC+H_EX;
-
-% Initial state Sx on electrons
-% in an empty cavity mode
-rho=state(spin_system,{'Lx','BL1'},{1,3})+...
-    state(spin_system,{'Lx','BL1'},{2,3});
+% Trajectory through the device context
+traj=device(spin_system,@traject,parameters,'cavity');
 
 % Detection state, spins
 S=state(spin_system,{'Lx'},{1})+...
@@ -62,9 +54,8 @@ S=state(spin_system,{'Lx'},{1})+...
 B=(state(spin_system,{'C'},{3})-...
    state(spin_system,{'A'},{3}))/2i;
 
-% Run evolution
-traj_s=evolution(spin_system,H,S,rho,10e-9,250,'observable');
-traj_c=evolution(spin_system,H,B,rho,10e-9,250,'observable');
+% Project out the observables
+traj_s=S'*traj; traj_c=B'*traj;
 
 % Plot the observables
 time_axis=linspace(0,2.5,251); % us

@@ -24,6 +24,11 @@
 % Note: Spinach context functions include relaxation and kinetics
 %       superoperators into the total Liovillian automatically.
 %
+% Note: dissipative bosonic modes declared in inter.modes receive
+%       thermalised GKSL dissipators from rlx_modes.m in Liouville
+%       space formalisms; the euler_angles parameter refers to the
+%       spin subsystem only and has no effect on the mode terms.
+%
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 % alexander.karabanov@nottingham.ac.uk
@@ -42,15 +47,25 @@ grumble(spin_system);
 % Get the matrix going
 R=mprealloc(spin_system,1);
 
+% Detect dissipative bosonic modes
+boson_terms=isfield(spin_system.inter,'modes')&&...
+            any([spin_system.inter.modes.damp spin_system.inter.modes.dephase]>0);
+
+% Warn when mode dissipation cannot be represented
+if boson_terms&&(~ismember(spin_system.bas.formalism,{'zeeman-liouv','sphten-liouv'}))
+    report(spin_system,'WARNING - bosonic mode dissipation requires Liouville space, not added.');
+    boson_terms=false;
+end
+
 % Do nothing if none specified
-if isempty(spin_system.rlx.theories)
-    
+if isempty(spin_system.rlx.theories)&&(~boson_terms)
+
     % Update the user
     report(spin_system,'relaxation superoperator set to zero.');
-    
+
     % Exit the function
     return;
-    
+
 end
 
 % Add extended T1/T2 model terms
@@ -671,6 +686,17 @@ switch spin_system.rlx.equilibrium
         
 end
 
+% Add bosonic mode dissipators
+if boson_terms
+
+    % Update the user
+    report(spin_system,'adding bosonic mode dissipators...');
+
+    % Add thermalised GKSL dissipators for the modes
+    R=R+rlx_modes(spin_system);
+
+end
+
 % Perform final clean-up and make array complex for later
 R=complex(clean_up(spin_system,R,spin_system.tols.rlx_zero));
 
@@ -691,6 +717,12 @@ end
 if ~isfield(spin_system.rlx,'dfs')
     report(spin_system,'dynamic frequency shift policy not specified, DFS will be ignored.');
     spin_system.rlx.dfs='ignore';
+end
+if ~isfield(spin_system.rlx,'keep')
+    if isfield(spin_system.inter,'modes')
+        report(spin_system,'retention policy not specified, complete superoperator will be returned.');
+    end
+    spin_system.rlx.keep='labframe';
 end
 end
 

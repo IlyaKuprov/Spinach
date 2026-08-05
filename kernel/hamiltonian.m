@@ -25,9 +25,14 @@
 %           use orientation.m to get the full Hamiltonian
 %           at each specific orientation
 %
-% Note: the code has a few rather eccentric blocks that bring the 
-%       memory footprint to the absolute minimum and work around 
+% Note: the code has a few rather eccentric blocks that bring the
+%       memory footprint to the absolute minimum and work around
 %       the sparse matrix addition efficiency problem.
+%
+% Note: bosonic mode terms declared in inter.modes are added to the
+%       invariant part I at their input orientation; the Q part and
+%       the orientation machinery refer to the spin subsystem only,
+%       for which rotations are well-defined.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -594,9 +599,15 @@ clear('D1','D2','nL','nS','opL','opS','isotropic','ist_coeff',...
 % Use the cache record if one exists
 if ismember('ham_cache',spin_system.sys.enable)
 
-    % Combine descriptor, isotopes, and basis hash
-    ham_hash=md5_hash({descr,spin_system.comp.iso_hash, ...
-                       spin_system.bas.basis_hash});
+    % Combine descriptor, isotopes, basis, and mode information hash
+    if isfield(spin_system.inter,'modes')
+        ham_hash=md5_hash({descr,spin_system.comp.iso_hash, ...
+                           spin_system.bas.basis_hash,spin_system.inter.modes, ...
+                           spin_system.inter.basefrqs});
+    else
+        ham_hash=md5_hash({descr,spin_system.comp.iso_hash, ...
+                           spin_system.bas.basis_hash});
+    end
 
     % Get ValueStore
     if ~isworkernode
@@ -871,6 +882,471 @@ if build_aniso
     
 end
 
+% Process bosonic mode terms
+if isfield(spin_system.inter,'modes')
+
+    % Catch missing mode assumption information
+    if ~isfield(spin_system.inter.modes,'strength')
+        error('mode assumption information is missing, run assume() before calling this function.');
+    end
+
+    % Shorthands for mode information and term strengths
+    modes=spin_system.inter.modes; mstr=modes.strength;
+
+    % Locate bosonic modes
+    mode_list=find(ismember(spin_system.comp.types,{'C','V','T'}));
+
+    % Decide mode energy reference frequencies
+    mode_refs=zeros(1,spin_system.comp.nspins);
+    if strcmp(mstr.frqs,'offset')
+
+        % Build the particle connectivity graph from every coupling channel
+        chan_flds={'exchange','dispersive','kerr','longitudinal',...
+                   'coupling_mod','zeeman_mod'};
+        conmat=logical(eye(spin_system.comp.nspins));
+        for n=1:numel(chan_flds)
+            conmat=conmat|(~cellfun(@isempty,modes.(chan_flds{n})));
+        end
+        conmat=sparse(conmat|conmat');
+
+        % Loop over connected subgraphs
+        sci=scomponents(conmat);
+        for n=unique(sci)'
+
+            % Find member particles and member spins
+            members=find(sci==n);
+            spins_in=members(strcmp(spin_system.comp.types(members),'S'));
+
+            % Move on if the subgraph has no modes
+            if ~any(ismember(members,mode_list)), continue; end
+
+            % Mode frame runs at the magnitude of the connected spin carrier
+            if isempty(spins_in)
+                omega_ref=0;
+            else
+                carrier_frqs=spin_system.inter.basefrqs(spins_in);
+                if any(abs(carrier_frqs-carrier_frqs(1))>spin_system.tols.liouv_zero)
+                    error('modes coupled to multiple spin species do not have a unique carrier.');
+                end
+                omega_ref=abs(carrier_frqs(1));
+            end
+
+            % Assign the reference to the member modes
+            sub_modes=reshape(intersect(members,mode_list),1,[]);
+            mode_refs(sub_modes)=omega_ref;
+
+            % Declared carriers must agree with the connected spin carrier
+            for k=sub_modes
+                if (modes.carriers(k)>0)&&(omega_ref>0)&&...
+                   (abs(modes.carriers(k)-omega_ref)>spin_system.tols.liouv_zero*omega_ref)
+                    error(['bosonic mode ' num2str(k) ' declares a carrier of ' ...
+                           num2str(modes.carriers(k)/(2*pi)) ' Hz, but the spins it is '...
+                           'connected to have a carrier of ' num2str(omega_ref/(2*pi)) ' Hz.']);
+                end
+            end
+
+        end
+
+        % Report modes that have been left at their laboratory frequency
+        stray_modes=mode_list((mode_refs(mode_list)==0)&...
+                              (modes.carriers(mode_list)==0)&...
+                              (abs(modes.frqs(mode_list))>spin_system.tols.liouv_zero));
+        for k=stray_modes
+            report(spin_system,['WARNING - bosonic mode ' num2str(k) ' has no carrier reference, '...
+                                'it stays at its laboratory frequency of ' ...
+                                num2str(modes.frqs(k)/(2*pi)) ' Hz.']);
+        end
+
+    end
+
+    % Process mode energy terms
+    for k=mode_list
+        switch mstr.frqs
+
+            case {'full','offset'}
+
+                % Subtract the reference frequency
+                omega=modes.frqs(k)-mode_refs(k);
+
+                % Update the Hamiltonian
+                if abs(omega)>spin_system.tols.liouv_zero
+
+                    % Inform the user
+                    report(spin_system,['energy term for bosonic mode ' num2str(k) '...']);
+                    report(spin_system,['           (N) x ' num2str(omega/(2*pi)) ' Hz']);
+
+                    % Add to the invariant part
+                    I=I+omega*operator(spin_system,{'N'},{k},operator_type);
+
+                elseif mode_refs(k)~=0
+
+                    % Inform the user
+                    report(spin_system,['bosonic mode ' num2str(k) ' is on resonance with its carrier.']);
+
+                end
+
+            case 'ignore'
+
+                % Inform the user
+                report(spin_system,['energy term ignored for bosonic mode ' num2str(k) '.']);
+
+            otherwise
+
+                % Bomb out with unexpected strength parameters
+                error(['unknown strength specification for the energy of mode ' num2str(k)]);
+
+        end
+    end
+
+    % Process mode anharmonicity terms
+    for k=mode_list
+        if abs(modes.anharms(k))>spin_system.tols.liouv_zero
+            switch mstr.anharms
+
+                case 'full'
+
+                    % Inform the user
+                    report(spin_system,['anharmonicity term for bosonic mode ' num2str(k) '...']);
+                    report(spin_system,['           (1/2)*(CCAA) x ' num2str(modes.anharms(k)/(2*pi)) ' Hz']);
+
+                    % Add to the invariant part
+                    I=I+(modes.anharms(k)/2)*operator(spin_system,{'CCAA'},{k},operator_type);
+
+                case 'ignore'
+
+                    % Inform the user
+                    report(spin_system,['anharmonicity term ignored for bosonic mode ' num2str(k) '.']);
+
+                otherwise
+
+                    % Bomb out with unexpected strength parameters
+                    error(['unknown strength specification for the anharmonicity of mode ' num2str(k)]);
+
+            end
+        end
+    end
+
+    % Process exchange coupling terms
+    [xrows,xcols]=find(~cellfun(@isempty,modes.exchange));
+    for n=1:numel(xrows)
+
+        % Extract indices and the coupling constant
+        xr=xrows(n); xc=xcols(n); xj=modes.exchange{xr,xc};
+
+        % Process the coupling
+        switch mstr.exchange
+
+            case {'strong','rwa','nonelec'}
+
+                % Distinguish mode-mode and spin-mode pairs
+                if ismember(xr,mode_list)&&ismember(xc,mode_list)
+
+                    % Inform the user
+                    report(spin_system,['flip-flop exchange coupling for modes ' num2str(xr) ',' num2str(xc) '...']);
+                    report(spin_system,['           (CrAn+AnCr) x ' num2str(xj/(2*pi)) ' Hz']);
+
+                    % Add the flip-flop terms between modes
+                    I=I+xj*(operator(spin_system,{'C','A'},{xr,xc},operator_type)+...
+                            operator(spin_system,{'A','C'},{xr,xc},operator_type));
+
+                    % Add the counter-rotating terms unless the RWA applies
+                    if ~strcmp(mstr.exchange,'rwa')
+
+                        % Inform the user
+                        report(spin_system,['           (CrCr+AnAn) x ' num2str(xj/(2*pi)) ' Hz']);
+
+                        % Add the counter-rotating terms
+                        I=I+xj*(operator(spin_system,{'C','C'},{xr,xc},operator_type)+...
+                                operator(spin_system,{'A','A'},{xr,xc},operator_type));
+
+                    end
+
+                else
+
+                    % Identify the spin and the mode
+                    if ismember(xr,mode_list), ms=xr; ss=xc; else, ms=xc; ss=xr; end
+
+                    % Electron-mode exchange is not secular in the rotating frame
+                    if strcmp(mstr.exchange,'nonelec')&&...
+                       strcmp(spin_system.comp.isotopes{ss}(1),'E')
+
+                        % Inform the user and move on
+                        report(spin_system,['exchange coupling ignored for particles ' ...
+                                            num2str(xr) ',' num2str(xc) '.']);
+                        continue;
+
+                    end
+
+                    % Co-rotating branch follows the sign of the spin carrier
+                    if spin_system.inter.basefrqs(ss)<0
+                        co_ops={'C','A'}; co_tag='(L+Cr+L-An)'; ctr_tag='(L+An+L-Cr)';
+                    else
+                        co_ops={'A','C'}; co_tag='(L+An+L-Cr)'; ctr_tag='(L+Cr+L-An)';
+                    end
+
+                    % Inform the user
+                    report(spin_system,['Jaynes-Cummings exchange coupling for spin ' num2str(ss) ...
+                                        ' and mode ' num2str(ms) '...']);
+                    report(spin_system,['           ' co_tag ' x ' num2str(xj/(2*pi)) ' Hz']);
+
+                    % Add the flip-flop terms between the spin and the mode
+                    I=I+xj*(operator(spin_system,{'L+',co_ops{1}},{ss,ms},operator_type)+...
+                            operator(spin_system,{'L-',co_ops{2}},{ss,ms},operator_type));
+
+                    % Add the counter-rotating terms unless the RWA applies
+                    if ~strcmp(mstr.exchange,'rwa')
+
+                        % Inform the user
+                        report(spin_system,['           ' ctr_tag ' x ' num2str(xj/(2*pi)) ' Hz']);
+
+                        % Add the counter-rotating terms
+                        I=I+xj*(operator(spin_system,{'L+',co_ops{2}},{ss,ms},operator_type)+...
+                                operator(spin_system,{'L-',co_ops{1}},{ss,ms},operator_type));
+
+                    end
+
+                end
+
+            case 'ignore'
+
+                % Inform the user
+                report(spin_system,['exchange coupling ignored for particles ' num2str(xr) ',' num2str(xc) '.']);
+
+            otherwise
+
+                % Bomb out with unexpected strength parameters
+                error(['unknown strength specification for the exchange coupling of particles ' ...
+                       num2str(xr) ',' num2str(xc)]);
+
+        end
+
+    end
+
+    % Process cross-Kerr coupling terms
+    [xrows,xcols]=find(~cellfun(@isempty,modes.kerr));
+    for n=1:numel(xrows)
+
+        % Extract indices and the coupling constant
+        xr=xrows(n); xc=xcols(n); xj=modes.kerr{xr,xc};
+
+        % Process the coupling
+        switch mstr.kerr
+
+            case 'full'
+
+                % Inform the user
+                report(spin_system,['cross-Kerr coupling for modes ' num2str(xr) ',' num2str(xc) '...']);
+                report(spin_system,['           (N)x(N) x ' num2str(xj/(2*pi)) ' Hz']);
+
+                % Add to the invariant part
+                I=I+xj*operator(spin_system,{'N','N'},{xr,xc},operator_type);
+
+            case 'ignore'
+
+                % Inform the user
+                report(spin_system,['cross-Kerr coupling ignored for modes ' num2str(xr) ',' num2str(xc) '.']);
+
+            otherwise
+
+                % Bomb out with unexpected strength parameters
+                error(['unknown strength specification for the cross-Kerr coupling of modes ' ...
+                       num2str(xr) ',' num2str(xc)]);
+
+        end
+
+    end
+
+    % Process longitudinal coupling terms
+    [xrows,xcols]=find(~cellfun(@isempty,modes.longitudinal));
+    for n=1:numel(xrows)
+
+        % Extract indices and the coupling constant
+        xr=xrows(n); xc=xcols(n); xj=modes.longitudinal{xr,xc};
+
+        % Process the coupling
+        switch mstr.longitudinal
+
+            case 'full'
+
+                % Distinguish mode-mode and spin-mode pairs
+                if ismember(xr,mode_list)&&ismember(xc,mode_list)
+
+                    % Inform the user
+                    report(spin_system,['radiation pressure coupling with the number '...
+                                        'operator on mode ' num2str(xr) ' and the '...
+                                        'quadrature on mode ' num2str(xc) '...']);
+                    report(spin_system,['           N(Cr+An)/sqrt(2) x ' num2str(xj/(2*pi)) ' Hz']);
+
+                    % Add to the invariant part
+                    I=I+(xj/sqrt(2))*(operator(spin_system,{'N','C'},{xr,xc},operator_type)+...
+                                      operator(spin_system,{'N','A'},{xr,xc},operator_type));
+
+                else
+
+                    % Identify the spin and the mode
+                    if ismember(xr,mode_list), ms=xr; ss=xc; else, ms=xc; ss=xr; end
+
+                    % Inform the user
+                    report(spin_system,['longitudinal coupling for spin ' num2str(ss) ...
+                                        ' and mode ' num2str(ms) '...']);
+                    report(spin_system,['           Lz(Cr+An)/sqrt(2) x ' num2str(xj/(2*pi)) ' Hz']);
+
+                    % Add to the invariant part
+                    I=I+(xj/sqrt(2))*(operator(spin_system,{'Lz','C'},{ss,ms},operator_type)+...
+                                      operator(spin_system,{'Lz','A'},{ss,ms},operator_type));
+
+                end
+
+            case 'ignore'
+
+                % Inform the user
+                report(spin_system,['longitudinal coupling ignored for particles ' ...
+                                    num2str(xr) ',' num2str(xc) '.']);
+
+            otherwise
+
+                % Bomb out with unexpected strength parameters
+                error(['unknown strength specification for the longitudinal coupling of particles ' ...
+                       num2str(xr) ',' num2str(xc)]);
+
+        end
+
+    end
+
+    % Process dispersive coupling terms
+    [xrows,xcols]=find(~cellfun(@isempty,modes.dispersive));
+    for n=1:numel(xrows)
+
+        % Extract indices and the coupling constant
+        xr=xrows(n); xc=xcols(n); xj=modes.dispersive{xr,xc};
+
+        % Identify the spin and the mode
+        if ismember(xr,mode_list), ms=xr; ss=xc; else, ms=xc; ss=xr; end
+
+        % Process the coupling
+        switch mstr.dispersive
+
+            case 'full'
+
+                % Inform the user
+                report(spin_system,['dispersive coupling for spin ' num2str(ss) ...
+                                    ' and mode ' num2str(ms) '...']);
+                report(spin_system,['           Lz(N) x ' num2str(xj/(2*pi)) ' Hz']);
+
+                % Add to the invariant part
+                I=I+xj*operator(spin_system,{'Lz','N'},{ss,ms},operator_type);
+
+            case 'ignore'
+
+                % Inform the user
+                report(spin_system,['dispersive coupling ignored for particles ' ...
+                                    num2str(xr) ',' num2str(xc) '.']);
+
+            otherwise
+
+                % Bomb out with unexpected strength parameters
+                error(['unknown strength specification for the dispersive coupling of particles ' ...
+                       num2str(xr) ',' num2str(xc)]);
+
+        end
+
+    end
+
+    % Process spin Hamiltonian modulation terms
+    mod_names={'coupling_mod','zeeman_mod'};
+    for f=1:2
+
+        % Find declared modulation entries
+        [xrows,xcols]=find(~cellfun(@isempty,modes.(mod_names{f})));
+
+        % Move on if no entries are declared
+        if isempty(xrows), continue; end
+
+        % Decide the retention
+        switch mstr.(mod_names{f})
+
+            case 'ignore'
+
+                % Inform the user
+                report(spin_system,[mod_names{f} ' terms ignored.']);
+
+            case 'full'
+
+                % Loop over mode pairs
+                for n=1:numel(xrows)
+
+                    % Extract mode indices and derivative orders
+                    k1=xrows(n); k2=xcols(n);
+                    dorders=modes.(mod_names{f}){k1,k2};
+
+                    % Loop over derivative orders
+                    for ord=1:numel(dorders)
+
+                        % Move on if this order is not declared
+                        if isempty(dorders{ord}), continue; end
+
+                        % Get the mode quadrature factor expansion
+                        [mops,midx,mcoeff]=mode_quads(ord,k1,k2);
+
+                        % Find declared spin blocks
+                        [srows,scols]=find(~cellfun(@isempty,dorders{ord}));
+
+                        % Loop over spin blocks
+                        for m=1:numel(srows)
+
+                            % Extract the spin indices and the derivative block
+                            ns=srows(m); ps=scols(m); dblock=dorders{ord}{ns,ps};
+
+                            % Adjust indexing for field derivative vectors
+                            if f==2, ns=ps; end
+
+                            % Move on if the block is insignificant
+                            if norm(dblock(:),2)<spin_system.tols.liouv_zero, continue; end
+
+                            % Catch spin-1/2 quadratic forms
+                            if (f==1)&&(ns==ps)&&(spin_system.comp.mults(ns)==2)
+                                report(spin_system,['same-spin modulation term is zero for spin-1/2 particle ' ...
+                                                    num2str(ns) ', skipped.']);
+                                continue;
+                            end
+
+                            % Inform the user
+                            report(spin_system,[mod_names{f} ' term, order ' num2str(ord) ...
+                                                ', modes ' num2str(k1) ',' num2str(k2) ...
+                                                ', spin block ' num2str(ns) ',' num2str(ps) ...
+                                                ', norm ' num2str(norm(dblock(:),2)/(2*pi)) ' Hz']);
+
+                            % Get the spin operator factor expansion
+                            [sops,sidx,scoeff]=spin_facts(dblock,ns,ps);
+
+                            % Assemble the operator products
+                            for p=1:numel(sops)
+                                for q=1:numel(mops)
+                                    coeff=scoeff(p)*mcoeff(q);
+                                    if abs(coeff)>spin_system.tols.liouv_zero
+                                        I=I+coeff*operator(spin_system,[sops{p} mops{q}],...
+                                                           [sidx{p} midx{q}],operator_type);
+                                    end
+                                end
+                            end
+
+                        end
+
+                    end
+
+                end
+
+            otherwise
+
+                % Bomb out with unexpected strength parameters
+                error(['unknown strength specification for ' mod_names{f} ' terms.']);
+
+        end
+
+    end
+
+end
+
 % Remind the user about the anisotropic part
 if ~build_aniso
     report(spin_system,'WARNING - only the isotropic part has been returned.');
@@ -902,6 +1378,66 @@ if ismember('ham_cache',spin_system.sys.enable)
 
 end
 
+end
+
+% Mode quadrature factor expansion into ladder operator products
+function [mops,midx,mcoeff]=mode_quads(order,k1,k2)
+if order==1
+
+    % First derivative quadrature is sqrt(1/2)*(Cr+An)
+    mops={{'C'},{'A'}}; midx={{k1},{k1}};
+    mcoeff=[sqrt(1/2) sqrt(1/2)];
+
+elseif k1==k2
+
+    % Same-mode Raman quadrature is (1/4)*(Cr+An)^2
+    mops={{'CC'},{'CA'},{'AC'},{'AA'}};
+    midx={{k1},{k1},{k1},{k1}};
+    mcoeff=[1/4 1/4 1/4 1/4];
+
+else
+
+    % Mixed-mode Raman quadrature is (1/2)*(Cr+An)x(Cr+An)
+    mops={{'C','C'},{'C','A'},{'A','C'},{'A','A'}};
+    midx={{k1,k2},{k1,k2},{k1,k2},{k1,k2}};
+    mcoeff=[1/2 1/2 1/2 1/2];
+
+end
+end
+
+% Spin operator factor expansion for Hamiltonian modulation blocks
+function [sops,sidx,scoeff]=spin_facts(dblock,ns,ps)
+if isequal(size(dblock),[1 3])
+
+    % Effective field vectors expand into single-spin operators
+    sops={{'L+'},{'L-'},{'Lz'}}; sidx={{ns},{ns},{ns}};
+    scoeff=[(dblock(1)-1i*dblock(2))/2 (dblock(1)+1i*dblock(2))/2 dblock(3)];
+
+elseif ns==ps
+
+    % Same-spin quadratic forms expand into second-rank tensors
+    [iso,lam,phi]=mat2sphten(dblock);
+    if (abs(iso)>1e-6*norm(phi,2))||(norm(lam,2)>1e-6*norm(phi,2))
+        error('same-spin modulation tensors must be traceless and symmetric.');
+    end
+    sops={{'T2,+2'},{'T2,+1'},{'T2,0'},{'T2,-1'},{'T2,-2'}};
+    sidx={{ns},{ns},{ns},{ns},{ns}}; scoeff=phi;
+
+else
+
+    % Bilinear forms expand into raising, lowering, and z operator pairs
+    wmat=[1/2 1/2 0; -1i/2 1i/2 0; 0 0 1];
+    bmat=wmat.'*dblock*wmat; base={'L+','L-','Lz'};
+    sops=cell(1,9); sidx=cell(1,9); scoeff=zeros(1,9);
+    for p=1:3
+        for q=1:3
+            sops{3*(p-1)+q}={base{p},base{q}};
+            sidx{3*(p-1)+q}={ns,ps};
+            scoeff(3*(p-1)+q)=bmat(p,q);
+        end
+    end
+
+end
 end
 
 % Consistency enforcement

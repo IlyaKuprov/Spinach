@@ -1,7 +1,10 @@
 % Rabi dynamics of a driven four-level transmon in the Duffing
 % approximation, including leakage into the second and third
-% excited states. Inspired by standard circuit-QED transmon
-% control models.
+% excited states. The resonant drive is a part of the rotating
+% frame Hamiltonian, and all four level populations come from
+% a single trajectory. Inspired by standard circuit-QED trans-
+% mon treatments, e.g. Krantz et al., Appl. Phys. Rev. 6,
+% 021318 (2019).
 %
 % Calculation time: seconds
 %
@@ -15,45 +18,39 @@ sys.magnet=0;
 % Particle specification
 sys.isotopes={'T4'};
 
+% Resonantly driven transmon in the rotating frame
+inter.modes.frqs={0};
+inter.modes.anharms={-250e6};
+
 % Formalism and basis
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Spinach housekeeping
-spin_system=create(sys,[]);
+spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Transmon operators
-Cr=operator(spin_system,'C',1);
-An=operator(spin_system,'A',1);
-K=operator(spin_system,'CCAA',1);
+% Drift Hamiltonian from the declared interactions
+H=hamiltonian(assume(spin_system,'cavity'));
 
-% Rotating-frame drive parameters
-anharm=-2*pi*250e6;
-omega_1=2*pi*25e6;
+% Resonant drive on the transmon quadrature
+Cr=operator(spin_system,'C',1); An=operator(spin_system,'A',1);
+H=H+2*pi*25e6*(Cr+An)/2;
 
-% Driven Duffing Hamiltonian
-H=(anharm/2)*K+(omega_1/2)*(Cr+An);
+% Trajectory of the driven transmon
+traj=evolution(spin_system,H,[],state(spin_system,'BL1',1),...
+               1e-9,400,'trajectory');
 
-% Clean up numerical asymmetry
-H=(H+H')/2;
-
-% Initial state and level projectors
-rho=state(spin_system,'BL1',1);
-L1=state(spin_system,'BL1',1);
-L2=state(spin_system,'BL2',1);
-L3=state(spin_system,'BL3',1);
-L4=state(spin_system,'BL4',1);
-
-% Propagate level populations
-p1=evolution(spin_system,H,L1,rho,1e-9,400,'observable');
-p2=evolution(spin_system,H,L2,rho,1e-9,400,'observable');
-p3=evolution(spin_system,H,L3,rho,1e-9,400,'observable');
-p4=evolution(spin_system,H,L4,rho,1e-9,400,'observable');
+% Project out the level populations
+pops=zeros(4,401);
+for n=1:4
+    coil=state(spin_system,['BL' int2str(n)],1);
+    pops(n,:)=real(cellfun(@(rho)full(hdot(coil,rho)),traj));
+end
 
 % Plot the leakage dynamics
 time_axis=linspace(0,400,401);
-kfigure(); plot(time_axis,real([p1 p2 p3 p4]),'LineWidth',1.5);
+kfigure(); plot(time_axis,pops','LineWidth',1.5);
 axis tight; kgrid; kxlabel('time, ns');
 kylabel('level population');
 ktitle('transmon Rabi dynamics with leakage');

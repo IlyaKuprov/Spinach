@@ -14,22 +14,28 @@ sys.magnet=0;
 % Particle specification
 sys.isotopes={'T3'};
 
+% Transmon in the rotating frame
+inter.modes.frqs={0};
+inter.modes.anharms={-260e6};
+
 % Formalism and basis
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Spinach housekeeping
-spin_system=create(sys,[]);
+spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
+
+% Anharmonicity part from the declared interactions
+spin_system=assume(spin_system,'cavity');
+H0=hamiltonian(spin_system);
 
 % Transmon operators
 Cr=operator(spin_system,'C',1);
 An=operator(spin_system,'A',1);
 N=operator(spin_system,'N',1);
-K=operator(spin_system,'CCAA',1);
 
 % Free-evolution parameters
-anharm=-2*pi*260e6;
 detunings=2*pi*linspace(-20e6,20e6,81);
 time_axis=linspace(0,1.0e-6,151);
 
@@ -47,7 +53,7 @@ answer=zeros(numel(detunings),numel(time_axis));
 for n=1:numel(detunings)
 
     % Build the free-evolution Hamiltonian
-    H=detunings(n)*N+(anharm/2)*K;
+    H=detunings(n)*N+H0;
 
     % Clean up numerical asymmetry
     H=(H+H')/2;

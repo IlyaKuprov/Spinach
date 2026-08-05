@@ -16,32 +16,29 @@ sys.magnet=0.33;
 % System
 sys.isotopes={'E','C5'};
 
+% Cavity resonant with the electron
+inter.modes.frqs={[] -sys.magnet*spin('E')/(2*pi)};
+inter.modes.exchange=cell(2,2);
+inter.modes.exchange{1,2}=2.828e6;
+
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 
 % Spinach housekeeping
-spin_system=create(sys,[]);
+spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Zeeman interaction operator, spin
-Ez=operator(spin_system,{'Lz'},{1});
+% Sequence parameters
+parameters.spins={'E'};
+parameters.offset=5e6;
+parameters.rho0=state(spin_system,{'Lx','E'  },{1,2})+...
+                state(spin_system,{'E' ,'BL1'},{1,2})/2;
+parameters.sweep=1e8;
+parameters.npoints=251;
 
-% Jaynes-Cummings term
-g=2*pi*2.828e6;
-H_JC=g*(operator(spin_system,{'L+','A'},{1,2})+...
-        operator(spin_system,{'L-','C'},{1,2}));
-
-% Detuning of 5 MHz
-delta=2*pi*5e6;
-
-% Rotating frame Hamiltonian
-H=delta*Ez+H_JC;
-
-% Initial state - uncorrelated Sx on spin
-% and the cavity mode initially empty
-rho=state(spin_system,{'Lx','E'  },{1,2})+...
-    state(spin_system,{'E' ,'BL1'},{1,2})/2;
+% Trajectory through the device context
+traj=device(spin_system,@traject,parameters,'cavity');
 
 % Detection state, spin
 S=state(spin_system,{'Lx'},{1});
@@ -50,9 +47,8 @@ S=state(spin_system,{'Lx'},{1});
 B=(state(spin_system,{'C'},{2})-...
    state(spin_system,{'A'},{2}))/2i;
 
-% Run observables evolution
-traj_s=evolution(spin_system,H,S,rho,10e-9,250,'observable');
-traj_c=evolution(spin_system,H,B,rho,10e-9,250,'observable');
+% Project out the observables
+traj_s=S'*traj; traj_c=B'*traj;
 
 % Plot the observables
 time_axis=linspace(0,2.5,251); % us
@@ -68,19 +64,16 @@ ktitle('cavity mode dynamics');
 
 % Cavity energy level population evolution
 L1=state(spin_system,{'E','BL1'},{1,2});
-L1=evolution(spin_system,H,L1,rho,10e-9,250,'observable');
 L2=state(spin_system,{'E','BL2'},{1,2});
-L2=evolution(spin_system,H,L2,rho,10e-9,250,'observable');
 L3=state(spin_system,{'E','BL3'},{1,2});
-L3=evolution(spin_system,H,L3,rho,10e-9,250,'observable');
-L4=state(spin_system,{'E','BL4'},{1,2});
-L4=evolution(spin_system,H,L4,rho,10e-9,250,'observable');
-L5=state(spin_system,{'E','BL5'},{1,2});
-L5=evolution(spin_system,H,L5,rho,10e-9,250,'observable');
-kfigure(); plot(time_axis,real([L1 L2 L3 L4 L5])); 
-xlim tight; ylim padded; kxlabel('time, $\mu$s');
-kylabel('cavity level population'); kgrid;
-klegend({'L1','L2','L3','L4','L5'},'Location','Best');
+pop_1=L1'*traj; pop_2=L2'*traj; pop_3=L3'*traj;
+
+% Plot the level populations
+kfigure(); plot(time_axis,real([pop_1; pop_2; pop_3]));
+axis tight; kgrid; kxlabel('time, $\mu$s');
+kylabel('population');
+klegend({'BL1','BL2','BL3'},'Location','Best');
+ktitle('cavity level populations');
 
 end
 

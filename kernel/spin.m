@@ -65,9 +65,7 @@ if strcmp(name(1),'E')&&(~isempty(regexp(name,'^E\d','once')))
         error('electrons need at least two energy levels.');
     end
 
-elseif (strcmp(name(1),'C')&&(~isempty(regexp(name,'^C\d','once'))))||...
-       (strcmp(name(1),'V')&&(~isempty(regexp(name,'^V\d','once'))))||...
-       (strcmp(name(1),'T')&&(~isempty(regexp(name,'^T\d','once'))))
+elseif ~isempty(regexp(name,'^[CVT]\d+$','once'))
 
     % Cavity modes, phonon modes, and transmons
     % are special cases, no Zeeman interactions

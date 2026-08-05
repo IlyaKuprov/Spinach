@@ -13,7 +13,7 @@ sys.isotopes={'T3','T5'};
 
 % Rotating frame transmon parameters
 inter.modes.frqs={100 -200};
-inter.modes.anharms={10 20};
+inter.modes.anharms={-10 -20};
 inter.modes.exchange=cell(2,2);
 inter.modes.exchange{1,2}=50;
 

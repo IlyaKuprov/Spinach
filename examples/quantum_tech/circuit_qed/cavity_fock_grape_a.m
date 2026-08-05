@@ -54,7 +54,7 @@ for m=1:2
     Lx=operator(spin_system,'Lx',2); Ly=operator(spin_system,'Ly',2);
     ops={(Cr+An)/2,1i*(Cr-An)/2,Lx,Ly};
 
-    % Vacuum cavity and cavity Fock state two, qubit in the ground state
+    % Vacuum cavity and cavity Fock state two, qubit in the upper level
     rho_init=state(spin_system,{'BL1','ZL2'},{1,2});
     rho_targ=state(spin_system,{'BL3','ZL2'},{1,2});
     rho_init=rho_init/norm(rho_init,'fro');

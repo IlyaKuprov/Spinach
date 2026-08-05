@@ -410,21 +410,11 @@ for n=1:spin_system.comp.nspins
     
     % Determine the particle type
     name=spin_system.comp.isotopes{n};
-    if strcmp(name(1),'C')&&(~isempty(regexp(name,'^C\d','once')))
+    if ~isempty(regexp(name,'^[CVT]\d+$','once'))
 
-        % Cavity mode, Weil algebra
-        spin_system.comp.types{n}='C';
+        % Cavity mode, phonon mode, or transmon, Weil algebra
+        spin_system.comp.types{n}=name(1);
 
-    elseif strcmp(name(1),'V')&&(~isempty(regexp(name,'^V\d','once')))
-
-        % Phonon mode, Weil algebra 
-        spin_system.comp.types{n}='V';
-
-    elseif strcmp(name(1),'T')&&(~isempty(regexp(name,'^T\d','once')))
-
-        % Transmon, Weil algebra 
-        spin_system.comp.types{n}='T';
-        
     else
 
         % Spin, Lie algebra
@@ -597,6 +587,9 @@ if isfield(inter,'modes')
             if abs(inter.modes.exchange{rows(n),cols(n)})>spin_system.tols.inter_cutoff
                 spin_system.inter.modes.exchange{rows(n),cols(n)}=...
                 2*pi*inter.modes.exchange{rows(n),cols(n)};
+            else
+                report(spin_system,['WARNING - exchange coupling ' int2str(rows(n)) ',' ...
+                                    int2str(cols(n)) ' is below the interaction cutoff, ignored.']);
             end
         end
     end
@@ -608,6 +601,9 @@ if isfield(inter,'modes')
             if abs(inter.modes.kerr{rows(n),cols(n)})>spin_system.tols.inter_cutoff
                 spin_system.inter.modes.kerr{rows(n),cols(n)}=...
                 2*pi*inter.modes.kerr{rows(n),cols(n)};
+            else
+                report(spin_system,['WARNING - cross-Kerr coupling ' int2str(rows(n)) ',' ...
+                                    int2str(cols(n)) ' is below the interaction cutoff, ignored.']);
             end
         end
     end
@@ -619,6 +615,9 @@ if isfield(inter,'modes')
             if abs(inter.modes.longitudinal{rows(n),cols(n)})>spin_system.tols.inter_cutoff
                 spin_system.inter.modes.longitudinal{rows(n),cols(n)}=...
                 2*pi*inter.modes.longitudinal{rows(n),cols(n)};
+            else
+                report(spin_system,['WARNING - longitudinal coupling ' int2str(rows(n)) ',' ...
+                                    int2str(cols(n)) ' is below the interaction cutoff, ignored.']);
             end
         end
     end
@@ -630,6 +629,9 @@ if isfield(inter,'modes')
             if abs(inter.modes.dispersive{rows(n),cols(n)})>spin_system.tols.inter_cutoff
                 spin_system.inter.modes.dispersive{rows(n),cols(n)}=...
                 2*pi*inter.modes.dispersive{rows(n),cols(n)};
+            else
+                report(spin_system,['WARNING - dispersive coupling ' int2str(rows(n)) ',' ...
+                                    int2str(cols(n)) ' is below the interaction cutoff, ignored.']);
             end
         end
     end

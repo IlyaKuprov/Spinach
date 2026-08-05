@@ -43,6 +43,16 @@ coil_c=state(spin_system,{'E','BL2'},{1,2});
 pop_t=cellfun(@(rho)full(hdot(coil_t,rho)),traj);
 pop_c=cellfun(@(rho)full(hdot(coil_c,rho)),traj);
 
+% Validate visible excitation exchange
+if (max(real(pop_c))<0.95)||(min(real(pop_t))>0.05)
+    error('transmon-cavity exchange is not visible.');
+end
+
+% Validate population conservation in the active doublet
+if max(abs(real(pop_t+pop_c)-1))>1e-6
+    error('active-doublet population is not conserved.');
+end
+
 % Plot the swap dynamics
 time_axis=linspace(0,150,301);
 kfigure(); plot(time_axis,real([pop_t; pop_c]),'LineWidth',1.5);

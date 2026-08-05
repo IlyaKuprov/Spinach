@@ -26,14 +26,15 @@ inter.modes.frqs={6.02e9};
 % Energy relaxation lifetime
 inter.modes.lifetimes={10e-9};
 
-% Bose-Einstein occupation at the environment temperature
-n_eq=1/(exp(6.62607015e-34*6.02e9/(1.380649e-23*0.050))-1);
-
-% Total coherence time from a five microsecond pure dephasing time
-inter.modes.t2_times={1/(1/5e-6+(1+2*n_eq)/(2*10e-9))};
-
 % Temperature of the environment
 inter.temperature=0.050;
+
+% Bose-Einstein occupation at the environment temperature
+n_eq=1/(exp(6.62607015e-34*inter.modes.frqs{1}/...
+            (1.380649e-23*inter.temperature))-1);
+
+% Total coherence time from a five microsecond pure dephasing time
+inter.modes.t2_times={1/(1/5e-6+(1+2*n_eq)/(2*inter.modes.lifetimes{1}))};
 
 % Formalism and basis
 bas.formalism='zeeman-liouv';
@@ -77,7 +78,7 @@ end
 n_fock=(0:4)*pops_fock; n_coh=(0:4)*pops_coh;
 
 % Validate against the analytical solution, Fock truncation limits accuracy
-kappa=1/10e-9;
+kappa=1/inter.modes.lifetimes{1};
 n_fock_ref=(n_fock(1)-n_eq)*exp(-kappa*time_axis)+n_eq;
 n_coh_ref=(n_coh(1)-n_eq)*exp(-kappa*time_axis)+n_eq;
 if max(abs(n_fock-n_fock_ref))>5e-3

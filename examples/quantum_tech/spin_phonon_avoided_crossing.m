@@ -27,7 +27,7 @@ bas.approximation='none';
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Exchange Hamiltonian from the declared couplings
+% Exchange Hamiltonian, 'cavity' is the set that keeps spin-mode exchange
 spin_system=assume(spin_system,'cavity');
 action=hamiltonian(spin_system);
 action=(action+action')/2;
@@ -36,7 +36,7 @@ action=(action+action')/2;
 electron_z=operator(spin_system,'Lz',1);
 
 % Coupling parameters
-g=2*pi*4e6;
+g=2*pi*inter.modes.exchange{1,2};
 detuning=2*pi*linspace(-20e6,20e6,121);
 
 % Locate the one-excitation manifold

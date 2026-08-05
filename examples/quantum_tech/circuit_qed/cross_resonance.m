@@ -12,8 +12,13 @@
 % runs in the laboratory frame, but the recorded kets are rotated
 % into the frame of the drive before the Bloch components are
 % evaluated; laboratory frame transverse components would alias
-% at any reasonable recording interval. Model and parameters from
-% the cross-resonance example of the paraqeet package.
+% at any reasonable recording interval. Both tones run at the local
+% oscillator frequency of 6.0002 GHz, which is 200 kHz above the de-
+% clared bare frequency of the target transmon; that offset is the
+% calibrated cross-resonance drive setting of the reference imple-
+% mentation, where it is held fixed rather than derived or optimi-
+% sed. Model and parameters from the cross-resonance example of the
+% paraqeet package.
 %
 % Calculation time: minutes
 %
@@ -50,7 +55,7 @@ H0=full(hamiltonian(assume(spin_system,'labframe')));
 D1=full(operator(spin_system,'C',1)+operator(spin_system,'A',1));
 D2=full(operator(spin_system,'C',2)+operator(spin_system,'A',2));
 
-% Drive tone parameters, both at the target transmon frequency
+% Drive tone parameters, both at the calibrated local oscillator frequency
 w_lo=2*pi*6.0002e9;
 amp_one=5.969026041820607e8; phi_one=0;
 amp_two=2.883982055995430e7; phi_two=-0.39720756;

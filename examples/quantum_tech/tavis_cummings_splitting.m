@@ -77,7 +77,7 @@ end
 % Plot numerical and analytical splittings
 kfigure(); plot(spin_counts,splitting/(2*pi*1e6),'ko','MarkerFaceColor','k');
 hold on; plot(spin_counts,analytical/(2*pi*1e6),'r-','LineWidth',1.5);
-axis tight; kgrid; kxlabel('number of spins');
+hold off; axis tight; kgrid; kxlabel('number of spins');
 kylabel('bright-mode splitting, MHz');
 ktitle('Tavis-Cummings square-root scaling');
 klegend({'numerical','analytical'},'Location','Best');

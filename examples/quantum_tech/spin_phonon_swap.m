@@ -33,7 +33,7 @@ parameters.rho0=state(spin_system,{'ZL2','BL1'},{1,2});
 parameters.sweep=1e9;
 parameters.npoints=801;
 
-% Trajectory through the device context
+% Trajectory, 'cavity' is the set that keeps spin-mode exchange
 traj=device(spin_system,@traject,parameters,'cavity');
 
 % Project out the spin and phonon excitation populations

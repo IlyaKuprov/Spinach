@@ -1020,6 +1020,18 @@ if isfield(spin_system.inter,'modes')
                     I=I+xj*(operator(spin_system,{'C','A'},{xr,xc},operator_type)+...
                             operator(spin_system,{'A','C'},{xr,xc},operator_type));
 
+                    % Add the counter-rotating terms in the strong case
+                    if strcmp(mstr.exchange,'strong')
+
+                        % Inform the user
+                        report(spin_system,['           (CrCr+AnAn) x ' num2str(xj/(2*pi)) ' Hz']);
+
+                        % Add the counter-rotating terms
+                        I=I+xj*(operator(spin_system,{'C','C'},{xr,xc},operator_type)+...
+                                operator(spin_system,{'A','A'},{xr,xc},operator_type));
+
+                    end
+
                 else
 
                     % Identify the spin and the mode
@@ -1104,22 +1116,38 @@ if isfield(spin_system.inter,'modes')
         % Extract indices and the coupling constant
         xr=xrows(n); xc=xcols(n); xj=modes.longitudinal{xr,xc};
 
-        % Identify the spin and the mode
-        if ismember(xr,mode_list), ms=xr; ss=xc; else, ms=xc; ss=xr; end
-
         % Process the coupling
         switch mstr.longitudinal
 
             case 'full'
 
-                % Inform the user
-                report(spin_system,['longitudinal coupling for spin ' num2str(ss) ...
-                                    ' and mode ' num2str(ms) '...']);
-                report(spin_system,['           Lz(Cr+An) x ' num2str(xj/(2*pi)) ' Hz']);
+                % Distinguish mode-mode and spin-mode pairs
+                if ismember(xr,mode_list)&&ismember(xc,mode_list)
 
-                % Add to the invariant part
-                I=I+xj*(operator(spin_system,{'Lz','C'},{ss,ms},operator_type)+...
-                        operator(spin_system,{'Lz','A'},{ss,ms},operator_type));
+                    % Inform the user
+                    report(spin_system,['radiation pressure coupling for modes ' ...
+                                        num2str(xr) ',' num2str(xc) '...']);
+                    report(spin_system,['           N(Cr+An) x ' num2str(xj/(2*pi)) ' Hz']);
+
+                    % Add to the invariant part
+                    I=I+xj*(operator(spin_system,{'N','C'},{xr,xc},operator_type)+...
+                            operator(spin_system,{'N','A'},{xr,xc},operator_type));
+
+                else
+
+                    % Identify the spin and the mode
+                    if ismember(xr,mode_list), ms=xr; ss=xc; else, ms=xc; ss=xr; end
+
+                    % Inform the user
+                    report(spin_system,['longitudinal coupling for spin ' num2str(ss) ...
+                                        ' and mode ' num2str(ms) '...']);
+                    report(spin_system,['           Lz(Cr+An) x ' num2str(xj/(2*pi)) ' Hz']);
+
+                    % Add to the invariant part
+                    I=I+xj*(operator(spin_system,{'Lz','C'},{ss,ms},operator_type)+...
+                            operator(spin_system,{'Lz','A'},{ss,ms},operator_type));
+
+                end
 
             case 'ignore'
 
@@ -1131,6 +1159,45 @@ if isfield(spin_system.inter,'modes')
 
                 % Bomb out with unexpected strength parameters
                 error(['unknown strength specification for the longitudinal coupling of particles ' ...
+                       num2str(xr) ',' num2str(xc)]);
+
+        end
+
+    end
+
+    % Process dispersive coupling terms
+    [xrows,xcols]=find(~cellfun(@isempty,modes.dispersive));
+    for n=1:numel(xrows)
+
+        % Extract indices and the coupling constant
+        xr=xrows(n); xc=xcols(n); xj=modes.dispersive{xr,xc};
+
+        % Identify the spin and the mode
+        if ismember(xr,mode_list), ms=xr; ss=xc; else, ms=xc; ss=xr; end
+
+        % Process the coupling
+        switch mstr.dispersive
+
+            case 'full'
+
+                % Inform the user
+                report(spin_system,['dispersive coupling for spin ' num2str(ss) ...
+                                    ' and mode ' num2str(ms) '...']);
+                report(spin_system,['           Lz(N) x ' num2str(xj/(2*pi)) ' Hz']);
+
+                % Add to the invariant part
+                I=I+xj*operator(spin_system,{'Lz','N'},{ss,ms},operator_type);
+
+            case 'ignore'
+
+                % Inform the user
+                report(spin_system,['dispersive coupling ignored for particles ' ...
+                                    num2str(xr) ',' num2str(xc) '.']);
+
+            otherwise
+
+                % Bomb out with unexpected strength parameters
+                error(['unknown strength specification for the dispersive coupling of particles ' ...
                        num2str(xr) ',' num2str(xc)]);
 
         end

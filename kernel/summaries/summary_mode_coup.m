@@ -1,6 +1,7 @@
 % Prints bosonic mode coupling summary for a Spinach system. This
 % covers mode-mode exchange couplings, cross-Kerr couplings, spin-
-% mode exchange couplings, and longitudinal couplings. Syntax:
+% mode exchange couplings, longitudinal and radiation pressure
+% couplings, and dispersive couplings. Syntax:
 %
 %               summary_mode_coup(spin_system,header)
 %
@@ -46,12 +47,25 @@ for n=1:numel(rows)
                         num2str(spin_system.inter.modes.kerr{rows(n),cols(n)}/(2*pi),'%+10.4e')]);
 end
 
-% Print longitudinal couplings
+% Print longitudinal and radiation pressure couplings
 [rows,cols]=find(~cellfun(@isempty,spin_system.inter.modes.longitudinal));
 for n=1:numel(rows)
+    if all(ismember(spin_system.comp.types([rows(n) cols(n)]),{'C','V','T'}))
+        coup_name='radiation pressure';
+    else
+        coup_name='longitudinal';
+    end
     report(spin_system,[pad(num2str(rows(n)),8) pad(num2str(cols(n)),8)...
-                        pad('longitudinal',20)...
+                        pad(coup_name,20)...
                         num2str(spin_system.inter.modes.longitudinal{rows(n),cols(n)}/(2*pi),'%+10.4e')]);
+end
+
+% Print dispersive couplings
+[rows,cols]=find(~cellfun(@isempty,spin_system.inter.modes.dispersive));
+for n=1:numel(rows)
+    report(spin_system,[pad(num2str(rows(n)),8) pad(num2str(cols(n)),8)...
+                        pad('dispersive',20)...
+                        num2str(spin_system.inter.modes.dispersive{rows(n),cols(n)}/(2*pi),'%+10.4e')]);
 end
 report(spin_system,'====================================================');
 

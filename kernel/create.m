@@ -476,6 +476,7 @@ if isfield(inter,'modes')
     spin_system.inter.modes.exchange=cell(spin_system.comp.nspins);
     spin_system.inter.modes.kerr=cell(spin_system.comp.nspins);
     spin_system.inter.modes.longitudinal=cell(spin_system.comp.nspins);
+    spin_system.inter.modes.dispersive=cell(spin_system.comp.nspins);
     spin_system.inter.modes.coupling_mod=cell(spin_system.comp.nspins);
     spin_system.inter.modes.zeeman_mod=cell(spin_system.comp.nspins);
 
@@ -554,6 +555,17 @@ if isfield(inter,'modes')
         end
     end
 
+    % Absorb significant dispersive couplings
+    if isfield(inter.modes,'dispersive')
+        [rows,cols]=find(~cellfun(@isempty,inter.modes.dispersive));
+        for n=1:numel(rows)
+            if abs(inter.modes.dispersive{rows(n),cols(n)})>spin_system.tols.inter_cutoff
+                spin_system.inter.modes.dispersive{rows(n),cols(n)}=...
+                2*pi*inter.modes.dispersive{rows(n),cols(n)};
+            end
+        end
+    end
+
     % Absorb coupling tensor derivatives
     if isfield(inter.modes,'coupling_mod')
         [rows,cols]=find(~cellfun(@isempty,inter.modes.coupling_mod));
@@ -588,7 +600,8 @@ if isfield(inter,'modes')
     % Report mode couplings to the user
     if ~all(cellfun(@isempty,[spin_system.inter.modes.exchange(:);
                               spin_system.inter.modes.kerr(:);
-                              spin_system.inter.modes.longitudinal(:)]))
+                              spin_system.inter.modes.longitudinal(:);
+                              spin_system.inter.modes.dispersive(:)]))
         summary_mode_coup(spin_system,'summary of bosonic mode couplings (Hz)');
     end
 
@@ -2761,7 +2774,7 @@ if isfield(inter,'modes')
     end
     odd_fields=setdiff(fieldnames(inter.modes),{'frqs','anharms','lifetimes',...
                'linewidths','qfactors','t2_times','exchange','kerr',...
-               'longitudinal','coupling_mod','zeeman_mod'});
+               'longitudinal','dispersive','coupling_mod','zeeman_mod'});
     if ~isempty(odd_fields)
         error(['unrecognised inter.modes field: ' odd_fields{1}]);
     end
@@ -2829,7 +2842,7 @@ if isfield(inter,'modes')
             end
         end
     end
-    pair_flds={'exchange','kerr','longitudinal'};
+    pair_flds={'exchange','kerr','longitudinal','dispersive'};
     for m=1:numel(pair_flds)
         if isfield(inter.modes,pair_flds{m})
             fld=inter.modes.(pair_flds{m});
@@ -2854,8 +2867,11 @@ if isfield(inter,'modes')
                         if strcmp(pair_flds{m},'kerr')&&(nbosons~=2)
                             error(['inter.modes.kerr between particles ' int2str(n) ' and ' int2str(k) ' requires two bosonic modes.']);
                         end
-                        if strcmp(pair_flds{m},'longitudinal')&&(nbosons~=1)
-                            error(['inter.modes.longitudinal between particles ' int2str(n) ' and ' int2str(k) ' requires one spin and one bosonic mode.']);
+                        if strcmp(pair_flds{m},'longitudinal')&&(nbosons==0)
+                            error(['inter.modes.longitudinal between particles ' int2str(n) ' and ' int2str(k) ' requires at least one bosonic mode.']);
+                        end
+                        if strcmp(pair_flds{m},'dispersive')&&(nbosons~=1)
+                            error(['inter.modes.dispersive between particles ' int2str(n) ' and ' int2str(k) ' requires one spin and one bosonic mode; number-number couplings between modes belong in inter.modes.kerr.']);
                         end
                     end
                 end

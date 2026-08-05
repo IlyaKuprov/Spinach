@@ -36,17 +36,19 @@
 %                             energies to be built as detunings from
 %                             the carrier frequency, exchange terms
 %                             keeping flip-flop components only,
-%                             anharmonicity and Kerr terms in full;
-%                             longitudinal and modulation terms are
-%                             disallowed because they average out
+%                             anharmonicity, Kerr, and dispersive
+%                             terms in full; longitudinal and modu-
+%                             lation terms are disallowed because
+%                             they average out
 %
 %                  'spin-phonon' for spins in their usual rotating
 %                             frames with bosonic modes in the la-
 %                             boratory frame: electron and nuclear
 %                             terms as in the 'esr' set, spin-mode
 %                             exchange terms dropped as non-secular,
-%                             longitudinal and modulation terms and
-%                             all diagonal mode terms retained
+%                             longitudinal, dispersive, and modula-
+%                             tion terms and all diagonal mode
+%                             terms retained
 %
 %    retention  -  'zeeman' drops all spin-spin interactions 
 %
@@ -286,7 +288,7 @@ switch assumptions
         if any(ismember({'C','V','T'},spin_system.comp.types),'all')
             report(spin_system,'  laboratory frame simulation for bosonic modes,');
             report(spin_system,'  exchange terms keep counter-rotating components,');
-            report(spin_system,'  all anharmonicity, Kerr, and longitudinal terms retained,');
+            report(spin_system,'  all anharmonicity, Kerr, longitudinal, and dispersive terms retained,');
             report(spin_system,'  all Hamiltonian modulation terms retained.');
         end
 
@@ -321,6 +323,7 @@ switch assumptions
             spin_system.inter.modes.strength.exchange='strong';
             spin_system.inter.modes.strength.kerr='full';
             spin_system.inter.modes.strength.longitudinal='full';
+            spin_system.inter.modes.strength.dispersive='full';
             spin_system.inter.modes.strength.coupling_mod='full';
             spin_system.inter.modes.strength.zeeman_mod='full';
         end
@@ -590,7 +593,7 @@ switch assumptions
         report(spin_system,'  secular terms for all spin-spin couplings,');
         report(spin_system,'  mode energies to be built as carrier detunings,');
         report(spin_system,'  exchange terms keep flip-flop components only,');
-        report(spin_system,'  anharmonicity and Kerr terms retained in full.');
+        report(spin_system,'  anharmonicity, Kerr, and dispersive terms retained in full.');
 
         % Process Zeeman interactions
         for n=1:spin_system.comp.nspins
@@ -633,6 +636,7 @@ switch assumptions
             spin_system.inter.modes.strength.exchange='rwa';
             spin_system.inter.modes.strength.kerr='full';
             spin_system.inter.modes.strength.longitudinal='ignore';
+            spin_system.inter.modes.strength.dispersive='full';
             spin_system.inter.modes.strength.coupling_mod='ignore';
             spin_system.inter.modes.strength.zeeman_mod='ignore';
 
@@ -652,7 +656,7 @@ switch assumptions
         report(spin_system,'  weak and pseudosecular terms for hyperfine couplings,');
         report(spin_system,'  all terms for inter-nuclear couplings,');
         report(spin_system,'  exchange terms dropped as non-secular in this frame,');
-        report(spin_system,'  all longitudinal and Hamiltonian modulation terms retained.');
+        report(spin_system,'  all longitudinal, dispersive, and modulation terms retained.');
 
         % Process Zeeman interactions
         for n=1:spin_system.comp.nspins
@@ -708,6 +712,7 @@ switch assumptions
             spin_system.inter.modes.strength.exchange='ignore';
             spin_system.inter.modes.strength.kerr='full';
             spin_system.inter.modes.strength.longitudinal='full';
+            spin_system.inter.modes.strength.dispersive='full';
             spin_system.inter.modes.strength.coupling_mod='full';
             spin_system.inter.modes.strength.zeeman_mod='full';
         end

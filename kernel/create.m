@@ -2828,6 +2828,10 @@ if isfield(inter,'modes')
             if inter.modes.qfactors{n}<=0
                 error(['inter.modes.qfactors element for mode ' int2str(n) ' must be positive.']);
             end
+            if inter.modes.frqs{n}==0
+                error(['inter.modes.qfactors for mode ' int2str(n) ' needs a non-zero mode '...
+                       'frequency, use inter.modes.lifetimes or inter.modes.linewidths.']);
+            end
             damp_count=damp_count+1; kappa=2*pi*abs(inter.modes.frqs{n})/inter.modes.qfactors{n};
         end
         if damp_count>1

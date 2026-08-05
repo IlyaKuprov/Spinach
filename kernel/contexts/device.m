@@ -86,7 +86,8 @@ K=kinetics(spin_system);
 % Get the thermal equilibrium if needed
 if ismember('rho_eq',parameters.needs)
     report(spin_system,'building the thermal equilibrium state...');
-    parameters.rho0=equilibrium(spin_system);
+    [HL,QL]=hamiltonian(assume(spin_system,'labframe'),'left');
+    parameters.rho0=equilibrium(spin_system,HL,QL,parameters.orientation);
 end
 
 % Process spin channel offsets
@@ -176,7 +177,8 @@ if ~any(ismember({'C','V','T'},spin_system.comp.types),'all')
     error('no bosonic modes in the system, use liquid, crystal, or powder contexts.');
 end
 
-if isfield(spin_system.inter,'modes')&&strcmp(spin_system.bas.formalism,'zeeman-hilb')&&...
+if isfield(spin_system.inter,'modes')&&...
+   (~ismember(spin_system.bas.formalism,{'zeeman-liouv','sphten-liouv'}))&&...
    any([spin_system.inter.modes.damp spin_system.inter.modes.dephase]>0)
     error('dissipative bosonic modes require a Liouville space formalism.');
 end

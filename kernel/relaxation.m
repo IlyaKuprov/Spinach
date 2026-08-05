@@ -719,7 +719,9 @@ if ~isfield(spin_system.rlx,'dfs')
     spin_system.rlx.dfs='ignore';
 end
 if ~isfield(spin_system.rlx,'keep')
-    report(spin_system,'retention policy not specified, complete superoperator will be returned.');
+    if isfield(spin_system.inter,'modes')
+        report(spin_system,'retention policy not specified, complete superoperator will be returned.');
+    end
     spin_system.rlx.keep='labframe';
 end
 end

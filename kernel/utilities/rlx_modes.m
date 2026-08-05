@@ -49,8 +49,8 @@ for k=mode_list
     % Move on if the mode is not dissipative
     if (kappa==0)&&(gphi==0), continue; end
 
-    % Get the thermal occupation number
-    if spin_system.rlx.temperature>0
+    % Get the thermal occupation number, only damping needs it
+    if (kappa>0)&&(spin_system.rlx.temperature>0)
 
         % Catch modes whose thermal occupation is undefined
         if abs(spin_system.inter.modes.frqs(k))<2*pi*spin_system.tols.inter_cutoff
@@ -65,7 +65,7 @@ for k=mode_list
 
     else
 
-        % Zero occupation in the zero-temperature limit
+        % Zero occupation without damping or at zero temperature
         nbar=0;
 
     end

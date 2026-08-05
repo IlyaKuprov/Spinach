@@ -923,10 +923,12 @@ if isfield(spin_system.inter,'modes')
             % Mode frame runs at the magnitude of the connected spin carrier
             if isempty(spins_in)
                 omega_ref=0;
-            elseif isscalar(unique(spin_system.comp.isotopes(spins_in)))
-                omega_ref=abs(spin_system.inter.basefrqs(spins_in(1)));
             else
-                error('modes coupled to multiple spin species do not have a unique carrier.');
+                carrier_frqs=spin_system.inter.basefrqs(spins_in);
+                if any(abs(carrier_frqs-carrier_frqs(1))>spin_system.tols.liouv_zero)
+                    error('modes coupled to multiple spin species do not have a unique carrier.');
+                end
+                omega_ref=abs(carrier_frqs(1));
             end
 
             % Assign the reference to the member modes
@@ -1022,7 +1024,7 @@ if isfield(spin_system.inter,'modes')
         % Process the coupling
         switch mstr.exchange
 
-            case {'strong','rwa'}
+            case {'strong','rwa','nonelec'}
 
                 % Distinguish mode-mode and spin-mode pairs
                 if ismember(xr,mode_list)&&ismember(xc,mode_list)
@@ -1035,8 +1037,8 @@ if isfield(spin_system.inter,'modes')
                     I=I+xj*(operator(spin_system,{'C','A'},{xr,xc},operator_type)+...
                             operator(spin_system,{'A','C'},{xr,xc},operator_type));
 
-                    % Add the counter-rotating terms in the strong case
-                    if strcmp(mstr.exchange,'strong')
+                    % Add the counter-rotating terms unless the RWA applies
+                    if ~strcmp(mstr.exchange,'rwa')
 
                         % Inform the user
                         report(spin_system,['           (CrCr+AnAn) x ' num2str(xj/(2*pi)) ' Hz']);
@@ -1051,6 +1053,17 @@ if isfield(spin_system.inter,'modes')
 
                     % Identify the spin and the mode
                     if ismember(xr,mode_list), ms=xr; ss=xc; else, ms=xc; ss=xr; end
+
+                    % Electron-mode exchange is not secular in the rotating frame
+                    if strcmp(mstr.exchange,'nonelec')&&...
+                       strcmp(spin_system.comp.isotopes{ss}(1),'E')
+
+                        % Inform the user and move on
+                        report(spin_system,['exchange coupling ignored for particles ' ...
+                                            num2str(xr) ',' num2str(xc) '.']);
+                        continue;
+
+                    end
 
                     % Co-rotating branch follows the sign of the spin carrier
                     if spin_system.inter.basefrqs(ss)<0
@@ -1068,8 +1081,8 @@ if isfield(spin_system.inter,'modes')
                     I=I+xj*(operator(spin_system,{'L+',co_ops{1}},{ss,ms},operator_type)+...
                             operator(spin_system,{'L-',co_ops{2}},{ss,ms},operator_type));
 
-                    % Add the counter-rotating terms in the strong case
-                    if strcmp(mstr.exchange,'strong')
+                    % Add the counter-rotating terms unless the RWA applies
+                    if ~strcmp(mstr.exchange,'rwa')
 
                         % Inform the user
                         report(spin_system,['           ' ctr_tag ' x ' num2str(xj/(2*pi)) ' Hz']);

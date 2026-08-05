@@ -114,9 +114,21 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
                 
         end
         
+        % Add every bosonic mode coupling channel to the coupling graph
+        if isfield(spin_system.inter,'modes')
+            report(spin_system,'bosonic mode couplings added to the coupling graph.');
+            chan_flds={'exchange','dispersive','kerr','longitudinal',...
+                       'coupling_mod','zeeman_mod'};
+            mode_conmat=false(spin_system.comp.nspins);
+            for n=1:numel(chan_flds)
+                mode_conmat=mode_conmat|(~cellfun(@isempty,spin_system.inter.modes.(chan_flds{n})));
+            end
+            spin_system.inter.conmatrix=spin_system.inter.conmatrix|sparse(mode_conmat);
+        end
+
         % Remind the user about the amplitude cut-off
         report(spin_system,['coupling tensors with norm below ' num2str(spin_system.tols.inter_cutoff) ' Hz will be ignored.']);
-        
+
         % Make sure each spin is connected and proximate to itself
         spin_system.inter.conmatrix=spin_system.inter.conmatrix|speye(size(spin_system.inter.conmatrix));
         spin_system.inter.proxmatrix=spin_system.inter.proxmatrix|speye(size(spin_system.inter.proxmatrix));

@@ -44,8 +44,10 @@
 %                  'spin-phonon' for spins in their usual rotating
 %                             frames with bosonic modes in the la-
 %                             boratory frame: electron and nuclear
-%                             terms as in the 'esr' set, spin-mode
-%                             exchange terms dropped as non-secular,
+%                             terms as in the 'esr' set, electron-
+%                             mode exchange terms dropped as non-
+%                             secular, mode-mode and nucleus-mode
+%                             exchange terms retained in full,
 %                             longitudinal, dispersive, and modula-
 %                             tion terms and all diagonal mode
 %                             terms retained
@@ -655,7 +657,8 @@ switch assumptions
         report(spin_system,'  secular terms for giant spin model interactions,');
         report(spin_system,'  weak and pseudosecular terms for hyperfine couplings,');
         report(spin_system,'  all terms for inter-nuclear couplings,');
-        report(spin_system,'  exchange terms dropped as non-secular in this frame,');
+        report(spin_system,'  electron-mode exchange terms dropped as non-secular in this frame,');
+        report(spin_system,'  mode-mode and nucleus-mode exchange terms retained in full,');
         report(spin_system,'  all longitudinal, dispersive, and modulation terms retained.');
 
         % Process Zeeman interactions
@@ -709,7 +712,7 @@ switch assumptions
         if isfield(spin_system.inter,'modes')
             spin_system.inter.modes.strength.frqs='full';
             spin_system.inter.modes.strength.anharms='full';
-            spin_system.inter.modes.strength.exchange='ignore';
+            spin_system.inter.modes.strength.exchange='nonelec';
             spin_system.inter.modes.strength.kerr='full';
             spin_system.inter.modes.strength.longitudinal='full';
             spin_system.inter.modes.strength.dispersive='full';

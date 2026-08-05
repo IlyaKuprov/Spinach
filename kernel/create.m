@@ -507,7 +507,7 @@ if isfield(inter,'modes')
         elseif isfield(inter.modes,'linewidths')&&(~isempty(inter.modes.linewidths{n}))
             spin_system.inter.modes.damp(n)=2*pi*inter.modes.linewidths{n};
         elseif isfield(inter.modes,'qfactors')&&(~isempty(inter.modes.qfactors{n}))
-            spin_system.inter.modes.damp(n)=spin_system.inter.modes.frqs(n)/inter.modes.qfactors{n};
+            spin_system.inter.modes.damp(n)=abs(spin_system.inter.modes.frqs(n))/inter.modes.qfactors{n};
         end
     end
 
@@ -2768,6 +2768,9 @@ if isfield(inter,'modes')
     if ~any(boson_mask)
         error('inter.modes is specified, but sys.isotopes contains no bosonic modes.');
     end
+    if ~isfield(inter.modes,'frqs')
+        error('inter.modes.frqs must be specified when inter.modes is present.');
+    end
     scalar_flds={'frqs','anharms','lifetimes','linewidths','qfactors','t2_times'};
     for m=1:numel(scalar_flds)
         if isfield(inter.modes,scalar_flds{m})
@@ -2789,8 +2792,10 @@ if isfield(inter,'modes')
         end
     end
     for n=find(boson_mask)
-        if isfield(inter.modes,'frqs')&&(~isempty(inter.modes.frqs{n}))&&...
-           (inter.modes.frqs{n}<0)&&(~strcmp(sys.isotopes{n}(1),'T'))
+        if isempty(inter.modes.frqs{n})
+            error(['inter.modes.frqs must be specified for bosonic mode ' int2str(n)]);
+        end
+        if (inter.modes.frqs{n}<0)&&(~strcmp(sys.isotopes{n}(1),'T'))
             error(['negative frequency specified for bosonic mode ' int2str(n)]);
         end
         damp_count=0; kappa=0;
@@ -2810,10 +2815,7 @@ if isfield(inter,'modes')
             if inter.modes.qfactors{n}<=0
                 error(['inter.modes.qfactors element for mode ' int2str(n) ' must be positive.']);
             end
-            if (~isfield(inter.modes,'frqs'))||isempty(inter.modes.frqs{n})
-                error(['inter.modes.qfactors requires inter.modes.frqs to be set for mode ' int2str(n)]);
-            end
-            damp_count=damp_count+1; kappa=2*pi*inter.modes.frqs{n}/inter.modes.qfactors{n};
+            damp_count=damp_count+1; kappa=2*pi*abs(inter.modes.frqs{n})/inter.modes.qfactors{n};
         end
         if damp_count>1
             error(['multiple damping specifications for bosonic mode ' int2str(n)]);
@@ -2898,8 +2900,9 @@ if isfield(inter,'modes')
                                                 error('coupling derivative tensors may only connect spin index pairs.');
                                             end
                                             if (~isnumeric(block{p,q}))||(~isreal(block{p,q}))||...
-                                               (~all(size(block{p,q})==[3 3]))
-                                                error('coupling derivative tensors must be real 3x3 matrices.');
+                                               (~all(size(block{p,q})==[3 3]))||...
+                                               (~all(isfinite(block{p,q}(:))))
+                                                error('coupling derivative tensors must be real finite 3x3 matrices.');
                                             end
                                         end
                                     end
@@ -2914,8 +2917,9 @@ if isfield(inter,'modes')
                                             error('field derivative vectors may only be specified for spins.');
                                         end
                                         if (~isnumeric(block{p}))||(~isreal(block{p}))||...
-                                           (~all(size(block{p})==[1 3]))
-                                            error('field derivative vectors must be real 1x3 vectors.');
+                                           (~all(size(block{p})==[1 3]))||...
+                                           (~all(isfinite(block{p})))
+                                            error('field derivative vectors must be real finite 1x3 vectors.');
                                         end
                                     end
                                 end

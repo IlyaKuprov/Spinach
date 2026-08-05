@@ -21,11 +21,19 @@
 %                  'labframe' for full laboratory frame simulation
 %                             with all Hamiltonian terms retained
 %
-%                  'qnmr'     for quadrupolar NMR with numerical 
+%                  'qnmr'     for quadrupolar NMR with numerical
 %                             rotating frames: spin-1/2 particles
 %                             will be in the rotating frame but
 %                             spin>1/2 particles initially in the
 %                             laboratory frame
+%
+%                  'spin-boson' for spin systems coupled to bosonic
+%                               modes, laboratory frame throughout,
+%                               with all exchange terms retained
+%
+%                  'spin-boson-rwa' as spin-boson, but keeping only
+%                               the flip-flop part of the exchange
+%                               terms between modes and spins
 %
 %    retention  -  'zeeman' drops all spin-spin interactions 
 %
@@ -545,37 +553,62 @@ switch assumptions
             
         end
 
-    % case 'duffing' (work in progress)
-    % 
-    %     % Disallow particles that are not transmons
-    %     if any(ismember({'C','V','S'},spin_system.comp.types),'all')
-    %         error('Cavities, phonons, and spins are not allowed under this assumption set.');
-    %     end
-    % 
-    %     % Do the reporting
-    %     report(spin_system,'transmon assumption set - Duffing model:');
-    %     report(spin_system,'  offset term is omega*Cr*An,');
-    %     report(spin_system,'  anharmonicity term is (alpha/2)*Cr*Cr*An*An,');
-    %     report(spin_system,'  coupling terms are J*(AnA*CrB+CrA*AnB).');
-    % 
-    %     % Process Zeeman interactions
-    %     for n=1:spin_system.comp.nspins
-    % 
-    %         % Full Duffing offsets for all transmons
-    %         spin_system.inter.duffing.strength{n}='full';
-    % 
-    %     end
-    % 
-    %     % Process couplings
-    %     for n=1:spin_system.comp.nspins
-    %         for k=1:spin_system.comp.nspins
-    % 
-    %             % The word for XX+YY coupling was invented here
-    %             spin_system.inter.coupling.strength{n,k}='tough';
-    % 
-    %         end
-    %     end
-        
+    case {'spin-boson','spin-boson-rwa'}
+
+        % Decide the exchange term treatment
+        if strcmp(assumptions,'spin-boson-rwa')
+            xchg_strength='rwa';
+        else
+            xchg_strength='strong';
+        end
+
+        % Do the reporting
+        report(spin_system,[assumptions ' assumption set:']);
+        report(spin_system,'  laboratory frame simulation for all spins,');
+        report(spin_system,'  full Zeeman and coupling tensors for all spins,');
+        report(spin_system,'  mode energy terms are omega*Cr*An,');
+        report(spin_system,'  anharmonicity terms are (alpha/2)*Cr*Cr*An*An,');
+        if strcmp(xchg_strength,'rwa')
+            report(spin_system,'  exchange terms keep flip-flop components only,');
+        else
+            report(spin_system,'  exchange terms keep counter-rotating components,');
+        end
+        report(spin_system,'  all cross-Kerr and longitudinal terms retained,');
+        report(spin_system,'  all Hamiltonian modulation terms retained.');
+
+        % Process Zeeman interactions
+        for n=1:spin_system.comp.nspins
+
+            % Full Zeeman tensors should be used for all spins
+            spin_system.inter.zeeman.strength{n}='full';
+
+        end
+
+        % Process couplings
+        for n=1:spin_system.comp.nspins
+
+            % Giant spin terms should be full
+            spin_system.inter.giant.strength{n}='strong';
+
+            % The same applies to all couplings
+            for k=1:spin_system.comp.nspins
+
+                % Full coupling tensors should be used for all spins
+                spin_system.inter.coupling.strength{n,k}='strong';
+
+            end
+
+        end
+
+        % Process bosonic mode terms
+        spin_system.inter.modes.strength.frqs='full';
+        spin_system.inter.modes.strength.anharms='full';
+        spin_system.inter.modes.strength.exchange=xchg_strength;
+        spin_system.inter.modes.strength.kerr='full';
+        spin_system.inter.modes.strength.longitudinal='full';
+        spin_system.inter.modes.strength.coupling_mod='full';
+        spin_system.inter.modes.strength.zeeman_mod='full';
+
     otherwise
         
         % Complain and bomb out

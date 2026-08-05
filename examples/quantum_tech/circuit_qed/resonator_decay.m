@@ -26,8 +26,11 @@ inter.modes.frqs={6.02e9};
 % Energy relaxation lifetime
 inter.modes.lifetimes={10e-9};
 
-% Total coherence time from the pure dephasing time
-inter.modes.t2_times={1/(1/5e-6+1/(2*10e-9))};
+% Bose-Einstein occupation at the environment temperature
+n_eq=1/(exp(6.62607015e-34*6.02e9/(1.380649e-23*0.050))-1);
+
+% Total coherence time from a five microsecond pure dephasing time
+inter.modes.t2_times={1/(1/5e-6+(1+2*n_eq)/(2*10e-9))};
 
 % Temperature of the environment
 inter.temperature=0.050;
@@ -72,9 +75,6 @@ end
 
 % Mean photon numbers from the populations
 n_fock=(0:4)*pops_fock; n_coh=(0:4)*pops_coh;
-
-% Bose-Einstein occupation at the system temperature
-n_eq=1/(exp(6.62607015e-34*6.02e9/(1.380649e-23*0.050))-1);
 
 % Validate against the analytical solution, Fock truncation limits accuracy
 kappa=1/10e-9;

@@ -3,7 +3,9 @@
 % the bosonic modes declared in inter.modes, using the amplitude
 % damping rates and the pure dephasing rates ingested by create.m
 % and the Bose-Einstein thermal occupation numbers computed from
-% the mode frequencies and the system temperature. Syntax:
+% the physical mode frequencies, meaning the sum of the declared
+% carrier and the declared frequency where inter.modes.carriers
+% is present, and the system temperature. Syntax:
 %
 %                     R=rlx_modes(spin_system)
 %
@@ -52,16 +54,28 @@ for k=mode_list
     % Get the thermal occupation number, only damping needs it
     if (kappa>0)&&(spin_system.rlx.temperature>0)
 
+        % Physical frequency, laboratory carrier included where declared
+        if spin_system.inter.modes.carriers(k)>0
+            phys_frq=spin_system.inter.modes.carriers(k)+...
+                     spin_system.inter.modes.frqs(k);
+        else
+            phys_frq=abs(spin_system.inter.modes.frqs(k));
+        end
+
         % Catch modes whose thermal occupation is undefined
-        if abs(spin_system.inter.modes.frqs(k))<2*pi*spin_system.tols.inter_cutoff
+        if phys_frq<2*pi*spin_system.tols.inter_cutoff
             error(['thermal occupation of zero-frequency mode ' num2str(k) ...
                    ' is undefined, supply the laboratory frame frequency.']);
         end
 
-        % Bose-Einstein statistics at the declared frequency
-        beta_factor=spin_system.tols.hbar*abs(spin_system.inter.modes.frqs(k))/...
+        % Bose-Einstein statistics at the physical frequency
+        beta_factor=spin_system.tols.hbar*phys_frq/...
                     (spin_system.tols.kbol*spin_system.rlx.temperature);
         nbar=1/(exp(beta_factor)-1);
+
+        % Inform the user which frequency has been used
+        report(spin_system,['bosonic mode ' num2str(k) ': thermal occupation from a '...
+                            'physical frequency of ' num2str(phys_frq/(2*pi)) ' Hz, nbar = ' num2str(nbar)]);
 
     else
 

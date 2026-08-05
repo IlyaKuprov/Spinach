@@ -727,6 +727,12 @@ switch assumptions
         
 end
 
+% Refuse retention options when bosonic modes are present
+if exist('retention','var')&&ismember(retention,{'zeeman','couplings'})&&...
+   isfield(spin_system.inter,'modes')
+    error('retention options are undefined for spin-boson systems.');
+end
+
 % Choose the terms to retain
 if exist('retention','var')&&strcmp(retention,'couplings')
     for n=1:spin_system.comp.nspins

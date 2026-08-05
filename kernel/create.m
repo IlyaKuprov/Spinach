@@ -20,6 +20,21 @@
 %  spin_system   - the primary object used by Spinach
 %                  to store simulation information
 %
+% Note: inter.modes.carriers declares, for each bosonic mode, the labo-
+%       ratory frequency of the rotating frame in which inter.modes.frqs
+%       is specified; declared frequencies are then detunings and may be
+%       negative, and thermal occupations are computed from the physical
+%       frequency, meaning the sum of the carrier and the detuning.
+%
+% Note: inter.modes.t2_times is interpreted at the declared temperature:
+%       the pure dephasing rate is extracted as 1/T2-kappa*(1+2*nbar)/2,
+%       where kappa is the amplitude damping rate and nbar the thermal
+%       occupation at the physical mode frequency.
+%
+% Note: quadrature operators of bosonic modes follow the (a+a')/sqrt(2)
+%       normalisation everywhere, in inter.modes.longitudinal as well as
+%       in the modulation channels.
+%
 % ilya.kuprov@weizmann.ac.il
 % hannah.hogben@chem.ox.ac.uk
 % kpervushin@ntu.edu.sg
@@ -468,6 +483,7 @@ if isfield(inter,'modes')
 
     % Preallocate per-mode parameter arrays
     spin_system.inter.modes.frqs=zeros(1,spin_system.comp.nspins);
+    spin_system.inter.modes.carriers=zeros(1,spin_system.comp.nspins);
     spin_system.inter.modes.anharms=zeros(1,spin_system.comp.nspins);
     spin_system.inter.modes.damp=zeros(1,spin_system.comp.nspins);
     spin_system.inter.modes.dephase=zeros(1,spin_system.comp.nspins);
@@ -485,6 +501,15 @@ if isfield(inter,'modes')
         for n=find(mode_mask)
             if ~isempty(inter.modes.frqs{n})
                 spin_system.inter.modes.frqs(n)=2*pi*inter.modes.frqs{n};
+            end
+        end
+    end
+
+    % Absorb rotating frame carrier frequencies
+    if isfield(inter.modes,'carriers')
+        for n=find(mode_mask)
+            if ~isempty(inter.modes.carriers{n})
+                spin_system.inter.modes.carriers(n)=2*pi*inter.modes.carriers{n};
             end
         end
     end
@@ -512,12 +537,55 @@ if isfield(inter,'modes')
         end
     end
 
+    % Physical mode frequencies, laboratory carriers included where declared
+    phys_frqs=abs(spin_system.inter.modes.frqs);
+    carr_mask=spin_system.inter.modes.carriers>0;
+    phys_frqs(carr_mask)=spin_system.inter.modes.carriers(carr_mask)+...
+                         spin_system.inter.modes.frqs(carr_mask);
+
+    % Refuse the default temperature when the modes are damped
+    if (~isfield(inter,'temperature'))&&any(spin_system.inter.modes.damp>0)
+        nbar_list='';
+        for n=find(spin_system.inter.modes.damp>0)
+            nbar_298=1/(exp(spin_system.tols.hbar*phys_frqs(n)/...
+                            (spin_system.tols.kbol*298))-1);
+            nbar_list=[nbar_list ' mode ' int2str(n) ...
+                       ': nbar=' num2str(nbar_298,'%0.4g') ';']; %#ok<AGROW>
+        end
+        error(['bosonic mode damping is specified, but inter.temperature is not; '...
+               'the 298 Kelvin default would give' nbar_list ' supply inter.temperature '...
+               'explicitly, zero selects the zero temperature limit for mode baths.']);
+    end
+
+    % Temperature at which mode thermal occupations are computed
+    if isfield(inter,'temperature')
+        mode_temp=inter.temperature;
+    else
+        mode_temp=298;
+    end
+
+    % Thermal occupations of the damped modes at the declared temperature
+    nbars=zeros(1,spin_system.comp.nspins);
+    therm_mask=(spin_system.inter.modes.damp>0)&...
+               (phys_frqs>2*pi*spin_system.tols.inter_cutoff);
+    if mode_temp>0
+        beta_facs=spin_system.tols.hbar*phys_frqs(therm_mask)/...
+                  (spin_system.tols.kbol*mode_temp);
+        nbars(therm_mask)=1./(exp(beta_facs)-1);
+    end
+
     % Absorb mode coherence times as pure dephasing rates
     if isfield(inter.modes,'t2_times')
         for n=find(mode_mask)
             if ~isempty(inter.modes.t2_times{n})
+                kappa=spin_system.inter.modes.damp(n);
+                if 1/inter.modes.t2_times{n}<kappa*(1+2*nbars(n))/2
+                    error(['inter.modes.t2_times for mode ' int2str(n) ' exceeds the '...
+                           'coherence lifetime floor of ' num2str(2/(kappa*(1+2*nbars(n))),'%0.6g') ...
+                           ' seconds set by the damping at ' num2str(mode_temp) ' Kelvin.']);
+                end
                 spin_system.inter.modes.dephase(n)=1/inter.modes.t2_times{n}-...
-                                                   spin_system.inter.modes.damp(n)/2;
+                                                   kappa*(1+2*nbars(n))/2;
             end
         end
     end
@@ -2772,8 +2840,8 @@ if isfield(inter,'modes')
     if ~isstruct(inter.modes)
         error('inter.modes must be a structure.');
     end
-    odd_fields=setdiff(fieldnames(inter.modes),{'frqs','anharms','lifetimes',...
-               'linewidths','qfactors','t2_times','exchange','kerr',...
+    odd_fields=setdiff(fieldnames(inter.modes),{'frqs','carriers','anharms',...
+               'lifetimes','linewidths','qfactors','t2_times','exchange','kerr',...
                'longitudinal','dispersive','coupling_mod','zeeman_mod'});
     if ~isempty(odd_fields)
         error(['unrecognised inter.modes field: ' odd_fields{1}]);
@@ -2784,7 +2852,8 @@ if isfield(inter,'modes')
     if ~isfield(inter.modes,'frqs')
         error('inter.modes.frqs must be specified when inter.modes is present.');
     end
-    scalar_flds={'frqs','anharms','lifetimes','linewidths','qfactors','t2_times'};
+    scalar_flds={'frqs','carriers','anharms','lifetimes','linewidths',...
+                 'qfactors','t2_times'};
     for m=1:numel(scalar_flds)
         if isfield(inter.modes,scalar_flds{m})
             fld=inter.modes.(scalar_flds{m});
@@ -2808,8 +2877,16 @@ if isfield(inter,'modes')
         if isempty(inter.modes.frqs{n})
             error(['inter.modes.frqs must be specified for bosonic mode ' int2str(n)]);
         end
-        if (inter.modes.frqs{n}<0)&&(~strcmp(sys.isotopes{n}(1),'T'))
-            error(['negative frequency specified for bosonic mode ' int2str(n)]);
+        carrier_n=[];
+        if isfield(inter.modes,'carriers')&&(~isempty(inter.modes.carriers{n}))
+            carrier_n=inter.modes.carriers{n};
+            if carrier_n<=0
+                error(['inter.modes.carriers element for mode ' int2str(n) ' must be positive.']);
+            end
+        end
+        if (inter.modes.frqs{n}<0)&&(~strcmp(sys.isotopes{n}(1),'T'))&&isempty(carrier_n)
+            error(['negative frequency specified for bosonic mode ' int2str(n) ...
+                   ', declare inter.modes.carriers to make it a detuning.']);
         end
         damp_count=0; kappa=0;
         if isfield(inter.modes,'lifetimes')&&(~isempty(inter.modes.lifetimes{n}))
@@ -2837,12 +2914,13 @@ if isfield(inter,'modes')
         if damp_count>1
             error(['multiple damping specifications for bosonic mode ' int2str(n)]);
         end
+        if (kappa>0)&&(~isempty(carrier_n))&&((carrier_n+inter.modes.frqs{n})<=0)
+            error(['the physical frequency of damped bosonic mode ' int2str(n) ...
+                   ' must be positive, check inter.modes.carriers and inter.modes.frqs.']);
+        end
         if isfield(inter.modes,'t2_times')&&(~isempty(inter.modes.t2_times{n}))
             if inter.modes.t2_times{n}<=0
                 error(['inter.modes.t2_times element for mode ' int2str(n) ' must be positive.']);
-            end
-            if (kappa>0)&&(1/inter.modes.t2_times{n}<kappa/2)
-                error(['inter.modes.t2_times for mode ' int2str(n) ' exceeds twice the energy lifetime.']);
             end
         end
     end
@@ -2861,7 +2939,15 @@ if isfield(inter,'modes')
                            (~isscalar(fld{n,k}))||(~isfinite(fld{n,k}))
                             error(['non-empty elements of inter.modes.' pair_flds{m} ' must be real finite scalars.']);
                         end
-                        if n>=k
+                        if strcmp(pair_flds{m},'longitudinal')
+                            if n==k
+                                error('inter.modes.longitudinal must not have entries on the main diagonal.');
+                            end
+                            if ~isempty(fld{k,n})
+                                error(['inter.modes.longitudinal is declared for both {' int2str(n) ','...
+                                       int2str(k) '} and {' int2str(k) ',' int2str(n) '}, which is ambiguous.']);
+                            end
+                        elseif n>=k
                             error(['inter.modes.' pair_flds{m} ' must only have entries above the main diagonal.']);
                         end
                         nbosons=nnz(boson_mask([n k]));

@@ -932,12 +932,24 @@ if isfield(spin_system.inter,'modes')
             end
 
             % Assign the reference to the member modes
-            mode_refs(intersect(members,mode_list))=omega_ref;
+            sub_modes=reshape(intersect(members,mode_list),1,[]);
+            mode_refs(sub_modes)=omega_ref;
+
+            % Declared carriers must agree with the connected spin carrier
+            for k=sub_modes
+                if (modes.carriers(k)>0)&&(omega_ref>0)&&...
+                   (abs(modes.carriers(k)-omega_ref)>spin_system.tols.liouv_zero*omega_ref)
+                    error(['bosonic mode ' num2str(k) ' declares a carrier of ' ...
+                           num2str(modes.carriers(k)/(2*pi)) ' Hz, but the spins it is '...
+                           'connected to have a carrier of ' num2str(omega_ref/(2*pi)) ' Hz.']);
+                end
+            end
 
         end
 
         % Report modes that have been left at their laboratory frequency
         stray_modes=mode_list((mode_refs(mode_list)==0)&...
+                              (modes.carriers(mode_list)==0)&...
                               (abs(modes.frqs(mode_list))>spin_system.tols.liouv_zero));
         for k=stray_modes
             report(spin_system,['WARNING - bosonic mode ' num2str(k) ' has no carrier reference, '...
@@ -1160,13 +1172,14 @@ if isfield(spin_system.inter,'modes')
                 if ismember(xr,mode_list)&&ismember(xc,mode_list)
 
                     % Inform the user
-                    report(spin_system,['radiation pressure coupling for modes ' ...
-                                        num2str(xr) ',' num2str(xc) '...']);
-                    report(spin_system,['           N(Cr+An) x ' num2str(xj/(2*pi)) ' Hz']);
+                    report(spin_system,['radiation pressure coupling with the number '...
+                                        'operator on mode ' num2str(xr) ' and the '...
+                                        'quadrature on mode ' num2str(xc) '...']);
+                    report(spin_system,['           N(Cr+An)/sqrt(2) x ' num2str(xj/(2*pi)) ' Hz']);
 
                     % Add to the invariant part
-                    I=I+xj*(operator(spin_system,{'N','C'},{xr,xc},operator_type)+...
-                            operator(spin_system,{'N','A'},{xr,xc},operator_type));
+                    I=I+(xj/sqrt(2))*(operator(spin_system,{'N','C'},{xr,xc},operator_type)+...
+                                      operator(spin_system,{'N','A'},{xr,xc},operator_type));
 
                 else
 
@@ -1176,11 +1189,11 @@ if isfield(spin_system.inter,'modes')
                     % Inform the user
                     report(spin_system,['longitudinal coupling for spin ' num2str(ss) ...
                                         ' and mode ' num2str(ms) '...']);
-                    report(spin_system,['           Lz(Cr+An) x ' num2str(xj/(2*pi)) ' Hz']);
+                    report(spin_system,['           Lz(Cr+An)/sqrt(2) x ' num2str(xj/(2*pi)) ' Hz']);
 
                     % Add to the invariant part
-                    I=I+xj*(operator(spin_system,{'Lz','C'},{ss,ms},operator_type)+...
-                            operator(spin_system,{'Lz','A'},{ss,ms},operator_type));
+                    I=I+(xj/sqrt(2))*(operator(spin_system,{'Lz','C'},{ss,ms},operator_type)+...
+                                      operator(spin_system,{'Lz','A'},{ss,ms},operator_type));
 
                 end
 

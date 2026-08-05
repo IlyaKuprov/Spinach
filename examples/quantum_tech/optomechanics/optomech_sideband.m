@@ -24,7 +24,7 @@ inter.modes.frqs={10/(2*pi) 10/(2*pi)};
 
 % Radiation pressure coupling, cavity number times phonon coordinate
 inter.modes.longitudinal=cell(2,2);
-inter.modes.longitudinal{1,2}=-1/(2*pi);
+inter.modes.longitudinal{1,2}=-sqrt(2)/(2*pi);
 
 % Formalism and basis
 bas.formalism='zeeman-hilb';

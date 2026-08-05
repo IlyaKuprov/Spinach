@@ -21,8 +21,16 @@
 %
 %  parameters.mode_offset - detuning offsets in Hz, one for each
 %                           bosonic mode in the order of declaration;
-%                           each offset enters the Hamiltonian multi-
-%                           plied by the number operator of its mode
+%                           the transmitter sign convention of para-
+%                           meters.offset applies: each offset enters
+%                           the Hamiltonian as minus the offset times
+%                           the number operator of its mode, so that a
+%                           positive offset lowers the mode frequency
+%
+%  parameters.decouple    - a cell array of spin species to be wiped
+%                           from the evolution generators and from the
+%                           initial state, e.g. {'1H'}; the default is
+%                           an empty cell array, meaning no decoupling
 %
 %  parameters.orientation - Euler angles (ZYZ active convention, ra-
 %                           dians) giving the orientation of the spin
@@ -101,7 +109,7 @@ for n=1:numel(mode_list)
     if abs(parameters.mode_offset(n))>0
         report(spin_system,['detuning offset for bosonic mode ' num2str(mode_list(n)) ...
                             ': ' num2str(parameters.mode_offset(n)) ' Hz']);
-        H=H+2*pi*parameters.mode_offset(n)*operator(spin_system,{'N'},{mode_list(n)});
+        H=H-2*pi*parameters.mode_offset(n)*operator(spin_system,{'N'},{mode_list(n)});
     end
 end
 
@@ -114,6 +122,14 @@ end
 % Apply rotating frames
 for k=1:numel(parameters.rframes)
     H=rotframe(spin_system,C{k},H,parameters.rframes{k}{1},parameters.rframes{k}{2});
+end
+
+% Wipe the states of the decoupled spins
+H=decouple(spin_system,H,[],parameters.decouple);
+R=decouple(spin_system,R,[],parameters.decouple);
+K=decouple(spin_system,K,[],parameters.decouple);
+if ismember('rho_eq',parameters.needs)
+    [~,parameters.rho0]=decouple(spin_system,[],parameters.rho0,parameters.decouple);
 end
 
 % Get problem dimensions

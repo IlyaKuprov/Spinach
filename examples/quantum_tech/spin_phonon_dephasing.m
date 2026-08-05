@@ -19,7 +19,7 @@ sys.isotopes={'E','V7'};
 % Phonon mode with a longitudinal coupling
 inter.modes.frqs={[] 20e6};
 inter.modes.longitudinal=cell(2,2);
-inter.modes.longitudinal{1,2}=4e6;
+inter.modes.longitudinal{1,2}=4e6*sqrt(2);
 
 % Formalism and basis
 bas.formalism='zeeman-hilb';

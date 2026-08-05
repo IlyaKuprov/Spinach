@@ -15,20 +15,25 @@ sys.magnet=0;
 % Particle specification
 sys.isotopes={'T5'};
 
+% Transmon mode frequency
+inter.modes.frqs={5.0e9};
+
 % Formalism and basis
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Spinach housekeeping
-spin_system=create(sys,[]);
+spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Transmon number and anharmonicity operators
-N=operator(spin_system,'N',1);
+% Harmonic part from the declared frequency
+spin_system=assume(spin_system,'labframe');
+H0=hamiltonian(spin_system);
+
+% Anharmonicity operator
 K=operator(spin_system,'CCAA',1);
 
-% Model parameters
-omega=2*pi*5.0e9;
+% Anharmonicity sweep range
 anharm=2*pi*linspace(-400e6,-50e6,80);
 
 % Preallocate transition frequency array
@@ -38,7 +43,7 @@ trans_frq=zeros(numel(anharm),4);
 for n=1:numel(anharm)
 
     % Build the Duffing Hamiltonian
-    H=omega*N+(anharm(n)/2)*K;
+    H=H0+(anharm(n)/2)*K;
 
     % Extract adjacent transition frequencies
     energies=sort(real(eig(full(H))));

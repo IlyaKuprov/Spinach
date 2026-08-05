@@ -13,21 +13,25 @@ sys.magnet=0;
 % Particle specification
 sys.isotopes={'T3'};
 
+% Rotating frame transmon parameters
+% Scaled Hamiltonian parameters - MHz & us
+inter.modes.frqs={0.5};
+inter.modes.anharms={-295.1};
+
 % Formalism and basis
 bas.formalism='zeeman-liouv';
 bas.approximation='none';
 
 % Spinach housekeeping
-spin_system=create(sys);
+spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Hamiltonian parameters
-% Scaled Hamiltonian parameters - MHz & us
-deltas=2*pi*0.5;                      % TBD - READING PAPER FOR SPECIFICS
+% Drift Hamiltonian from the declared interactions
+H=hamiltonian(assume(spin_system,'cavity'));
+
+% Drive parameters
 gammas=2*pi*0;
 Omega_0=2*pi*17.7;
-alphas=2*pi*-295.1;
-
 
 % Build the intial control pulses (FROG)
 % Scaled Hamiltonian parameters - MHz & us
@@ -36,9 +40,6 @@ t_g=112e-3;
 t=linspace(0, t_g, N);
 Fa=[-0.6137 -0.0247 0.0742 0.0507 0.0149];
 Fb=[-0.0106 0.0334 0.0579 0.0140 -0.0416];
-
-%Fa=[-0.0643    0.0718   -0.0754    0.0486    0.0234    0.0043   -0.0155    0.0105   -0.0029   -0.0683];
-%Fb=[ 0.1157    0.0494   -0.0031    0.0134    0.0905    0.0027    0.0248   -0.0234   -0.0620    0.0279];
 
 Omega_x=zeros(1,N);
 Omega_y=zeros(1,N);
@@ -50,9 +51,6 @@ end
 
 Omega_x=Omega_0*Omega_x;
 Omega_y=Omega_0*Omega_y;
-
-% Build the Hamiltonian
-H=sparse([0 0 0; 0 deltas 0; 0 0 (2*deltas+alphas)]);
 
 % Build Control Operators
 scale=(1+(gammas/Omega_0));
@@ -70,7 +68,7 @@ rho_targ=(rho_targ*sqrt(2))/norm(rho_targ,'fro');
 %rho_targ=rho_targ/sorensen(rho_init,rho_targ);
 
 % Define control parameters
-control.drifts={{hilb2liouv(H,'comm')}};                  % Drift
+control.drifts={{H}};                             % Drift
 control.operators={hilb2liouv(H_x,'comm'),hilb2liouv(H_y,'comm')};     % Control
 control.rho_init={rho_init};                      % Starting state
 control.rho_targ={rho_targ};                      % Destination state
@@ -102,3 +100,4 @@ fmaxnewton(spin_system,@grape_xy,pulse);
 %basis_coeffs=fmaxnewton(spin_system,@grape_xy,guess);
 
 end
+

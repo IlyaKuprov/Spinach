@@ -1,7 +1,8 @@
 % Rabi dynamics of a driven four-level transmon in the Duffing
 % approximation, including leakage into the second and third
 % excited states. Inspired by standard circuit-QED transmon
-% control models.
+% treatments, e.g. Krantz et al., Appl. Phys. Rev. 6, 021318
+% (2019).
 %
 % Calculation time: seconds
 %
@@ -15,41 +16,37 @@ sys.magnet=0;
 % Particle specification
 sys.isotopes={'T4'};
 
+% Resonantly driven transmon in the rotating frame
+inter.modes.frqs={0};
+inter.modes.anharms={-250e6};
+
 % Formalism and basis
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Spinach housekeeping
-spin_system=create(sys,[]);
+spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Transmon operators
-Cr=operator(spin_system,'C',1);
-An=operator(spin_system,'A',1);
-K=operator(spin_system,'CCAA',1);
+% Resonant drive through the homodecoupling channel of acquire.m
+parameters.homodec_oper=(operator(spin_system,'C',1)+...
+                         operator(spin_system,'A',1))/2;
+parameters.homodec_pwr=25e6;
 
-% Rotating-frame drive parameters
-anharm=-2*pi*250e6;
-omega_1=2*pi*25e6;
+% Sequence parameters
+parameters.rho0=state(spin_system,'BL1',1);
+parameters.sweep=1e9;
+parameters.npoints=401;
 
-% Driven Duffing Hamiltonian
-H=(anharm/2)*K+(omega_1/2)*(Cr+An);
-
-% Clean up numerical asymmetry
-H=(H+H')/2;
-
-% Initial state and level projectors
-rho=state(spin_system,'BL1',1);
-L1=state(spin_system,'BL1',1);
-L2=state(spin_system,'BL2',1);
-L3=state(spin_system,'BL3',1);
-L4=state(spin_system,'BL4',1);
-
-% Propagate level populations
-p1=evolution(spin_system,H,L1,rho,1e-9,400,'observable');
-p2=evolution(spin_system,H,L2,rho,1e-9,400,'observable');
-p3=evolution(spin_system,H,L3,rho,1e-9,400,'observable');
-p4=evolution(spin_system,H,L4,rho,1e-9,400,'observable');
+% Level populations through the device context
+parameters.coil=state(spin_system,'BL1',1);
+p1=device(spin_system,@acquire,parameters,'cavity');
+parameters.coil=state(spin_system,'BL2',1);
+p2=device(spin_system,@acquire,parameters,'cavity');
+parameters.coil=state(spin_system,'BL3',1);
+p3=device(spin_system,@acquire,parameters,'cavity');
+parameters.coil=state(spin_system,'BL4',1);
+p4=device(spin_system,@acquire,parameters,'cavity');
 
 % Plot the leakage dynamics
 time_axis=linspace(0,400,401);

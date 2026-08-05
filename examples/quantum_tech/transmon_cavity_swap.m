@@ -1,7 +1,7 @@
 % Vacuum Rabi swap between a transmon and a microwave cavity
 % mode, both represented by truncated bosonic Weyl algebras.
 % This is the circuit-QED Jaynes-Cummings limit of Blais et
-% al., Phys. Rev. A 69, 062320 (2004).
+% al., Rev. Mod. Phys. 93, 025005 (2021).
 %
 % Calculation time: seconds
 %
@@ -15,39 +15,32 @@ sys.magnet=0;
 % Particle specification
 sys.isotopes={'T3','C3'};
 
+% Resonant transmon-cavity pair in the rotating frame
+inter.modes.frqs={0 0};
+inter.modes.anharms={-250e6 []};
+inter.modes.exchange=cell(2,2);
+inter.modes.exchange{1,2}=20e6;
+
 % Formalism and basis
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Spinach housekeeping
-spin_system=create(sys,[]);
+spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Transmon and cavity operators
-Nt=operator(spin_system,'N',1);
-Kt=operator(spin_system,'CCAA',1);
+% Sequence parameters
+parameters.rho0=state(spin_system,{'BL2','BL1'},{1,2});
+parameters.sweep=2e9;
+parameters.npoints=301;
 
-% Coupling parameters
-anharm=-2*pi*250e6;
-delta=0;
-g=2*pi*20e6;
+% Transmon excitation population through the device context
+parameters.coil=state(spin_system,{'BL2','E'},{1,2});
+pop_t=device(spin_system,@acquire,parameters,'cavity');
 
-% Transmon-cavity exchange Hamiltonian
-H=delta*Nt+(anharm/2)*Kt+...
-  g*(operator(spin_system,{'C','A'},{1,2})+...
-     operator(spin_system,{'A','C'},{1,2}));
-
-% Clean up numerical asymmetry
-H=(H+H')/2;
-
-% Initial state and observables
-rho=state(spin_system,{'BL2','BL1'},{1,2});
-Pt=state(spin_system,{'BL2','E'},{1,2});
-Pc=state(spin_system,{'E','BL2'},{1,2});
-
-% Propagate the excitation swap
-pop_t=evolution(spin_system,H,Pt,rho,0.5e-9,300,'observable');
-pop_c=evolution(spin_system,H,Pc,rho,0.5e-9,300,'observable');
+% Cavity excitation population through the device context
+parameters.coil=state(spin_system,{'E','BL2'},{1,2});
+pop_c=device(spin_system,@acquire,parameters,'cavity');
 
 % Plot the swap dynamics
 time_axis=linspace(0,150,301);

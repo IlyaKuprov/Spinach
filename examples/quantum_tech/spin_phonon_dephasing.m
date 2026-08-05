@@ -16,40 +16,32 @@ sys.magnet=0;
 % Particle specification
 sys.isotopes={'E','V7'};
 
+% Phonon mode with a longitudinal coupling
+inter.modes.frqs={[] 20e6};
+inter.modes.longitudinal=cell(2,2);
+inter.modes.longitudinal{1,2}=4e6;
+
 % Formalism and basis
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Spinach housekeeping
-spin_system=create(sys,[]);
+spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Spin and phonon operators
-Sz=operator(spin_system,'Lz',1);
-N=operator(spin_system,'N',2);
-Q=operator(spin_system,'C',2)+operator(spin_system,'A',2);
+% Sequence parameters
+parameters.sweep=5e8;
+parameters.npoints=501;
 
-% Longitudinal spin-phonon Hamiltonian parameters
-omega_v=2*pi*20e6;
-g=2*pi*4e6;
+% Spin coherence through the device context
+parameters.rho0=state(spin_system,{'Lx','BL1'},{1,2});
+parameters.coil=state(spin_system,'Lx',1);
+traj_s=device(spin_system,@acquire,parameters,'spin-phonon');
 
-% Longitudinal spin-phonon Hamiltonian
-H=omega_v*N+g*Sz*Q;
-
-% Clean up numerical asymmetry
-H=(H+H')/2;
-
-% Initial states for coherence and displacement
-rho_coh=state(spin_system,{'Lx','BL1'},{1,2});
-rho_disp=state(spin_system,{'ZL2','BL1'},{1,2});
-
-% Detection operators
-Sx=state(spin_system,'Lx',1);
-Qd=state(spin_system,'C',2)+state(spin_system,'A',2);
-
-% Propagate spin coherence and spin-conditioned phonon displacement
-traj_s=evolution(spin_system,H,Sx,rho_coh,2e-9,500,'observable');
-traj_q=evolution(spin_system,H,Qd,rho_disp,2e-9,500,'observable');
+% Conditional phonon displacement through the device context
+parameters.rho0=state(spin_system,{'ZL2','BL1'},{1,2});
+parameters.coil=state(spin_system,'C',2)+state(spin_system,'A',2);
+traj_q=device(spin_system,@acquire,parameters,'spin-phonon');
 
 % Validate visible oscillator displacement
 if max(abs(real(traj_q)))<0.2
@@ -72,3 +64,4 @@ axis tight; kgrid; kxlabel('time, $\mu$s');
 kylabel('$a+a^+$'); ktitle('conditional displacement');
 
 end
+

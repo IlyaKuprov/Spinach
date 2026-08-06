@@ -36,27 +36,26 @@ An=operator(spin_system,'A',1);
 N=operator(spin_system,'N',1);
 
 % Free-evolution parameters
-detunings=2*pi*linspace(-20e6,20e6,81);
-time_axis=linspace(0,1.0e-6,151);
+detunings=2*pi*linspace(-20e6,20e6,256);
+time_axis=linspace(0,1.0e-6,256);
 
-% Nominal pi/2 pulse and initial density matrix
-X=(Cr+An)/2;
-U90=expm(-1i*(pi/2)*full(X));
+% Nominal pi/2 pulse propagator
+X=(Cr+An)/2; U90=expm(-1i*(pi/2)*full(X));
+
+% Initial density matrix
 rho=state(spin_system,'BL1',1);
 rho=U90*rho*U90';
 
-% Detection after the second pi/2 pulse
+% Detection state
 L2=state(spin_system,'BL2',1);
-answer=zeros(numel(detunings),numel(time_axis));
 
 % Loop over offsets
+answer=zeros(numel(detunings),...
+             numel(time_axis));
 for n=1:numel(detunings)
 
     % Build the free-evolution Hamiltonian
-    H=detunings(n)*N+H0;
-
-    % Clean up numerical asymmetry
-    H=(H+H')/2;
+    H=detunings(n)*N+H0; H=(H+H')/2;
 
     % Propagate the Ramsey interferometer
     for k=1:numel(time_axis)

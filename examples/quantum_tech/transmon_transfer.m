@@ -1,26 +1,30 @@
-% Basic two-transmon system with Duffing model inter-
-% actions and coupling: Coherence transfer from transmon 1 to transmon 2.
-% System Hamiltonian and paramaters sourced from: https://doi.org/10.1088/2632-2153/ad4f4d
+% Basic two-transmon system with Duffing model interacti-
+% ons and a flip-flop coupling; coherence transfer from
+% transmon 1 to transmon 2. GRAPE optimisation with a
+% distribution control powers and transmon offsets. Time
+% units are scaled: microseconds, MHz.
+%
+% Calculation time: minutes.
 %
 % c.musselwhite@soton.ac.uk
-%
+% ilya.kuprov@weizmann.ac.il
 
-function two_transmons_RL()
+function transmon_transfer()
 
 % Magnet field
 sys.magnet=0;
 
 % Particle specification
-sys.isotopes={'T3','T3'};
+sys.isotopes={'T3','T5'};
 
 % Rotating frame transmon parameters
-inter.modes.frqs={-86.6e6 0};
-inter.modes.anharms={-310.5e6 -313.9e6};
+inter.modes.frqs={100 -200};
+inter.modes.anharms={-10 -20};
 inter.modes.exchange=cell(2,2);
-inter.modes.exchange{1,2}=2.2e6;
+inter.modes.exchange{1,2}=50;
 
 % Formalism and basis
-bas.formalism='zeeman-liouv';
+bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Spinach housekeeping
@@ -51,23 +55,27 @@ rho_targ=state(spin_system,{'BL1','C'},{1 2})+...
 rho_init=rho_init/norm(rho_init,'fro');
 rho_targ=rho_targ/norm(rho_targ,'fro');
 
-% Unit fidelity is Sorensen bound ('zeeman-hilb')
-%rho_targ=rho_targ/sorensen(rho_init,rho_targ);
+% Clean up rounding errors
+rho_init=(rho_init+rho_init')/2;
+rho_targ=(rho_targ+rho_targ')/2;
+
+% Unit fidelity is Sorensen bound
+rho_targ=rho_targ/sorensen(rho_init,rho_targ);
 
 % Define control parameters
 control.drifts={{H}};                             % Drift
 control.operators={C_A,C_B};                      % Controls
 control.off_ops={O_A,O_B};                        % Offset operator
-control.offsets={linspace(-200,200,5)...
-                 linspace(-200,200,5)};
+control.offsets={linspace(-10,10,5)...
+                 linspace(-10,10,5)};             % Offset distribution
 control.rho_init={rho_init};                      % Starting state
 control.rho_targ={rho_targ};                      % Destination state
-control.pwr_levels=2*pi*[100e6 150e6 200e6 250e6 300e6];       % Pulse power ensemble
-control.pulse_dt=1e-9*ones(1,300);                % Slice durations
+control.pwr_levels=2*pi*[40 45 50 55 60]*5;       % Pulse power ensemble
+control.pulse_dt=1e-3*ones(1,100);                % Slice durations
 control.penalties={'NS'};                         % Penalties
 control.p_weights=0.1;                            % Penalty weights
-control.method='goodwin';                         % Optimisation method
-control.max_iter=5;                               % Termination condition
+control.method='lbfgs';                           % Optimisation method
+control.max_iter=100;                             % Termination condition
 control.parallel='ensemble';                      % Parallelisation mode
 
 % Plots during optimisation
@@ -77,7 +85,7 @@ control.plotting={'xy_controls','spectrogram','robustness'};
 spin_system=optimcon(spin_system,control);
 
 % Initial guess - random
-pulse=(1/8)*randn(2,300);
+pulse=(1/10)*randn(2,100);
 
 % Run the optimisation, get normalised pulse
 fmaxnewton(spin_system,@grape_xy,pulse);

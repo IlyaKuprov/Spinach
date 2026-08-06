@@ -1,13 +1,17 @@
 % Basic single transmon system with Duffing model inter-
-% actions, parameters and model based off of (https://doi.org/10.1038/ncomms10628)
-% by K.S.Kumar et al. - STIRAP PROTOCOL
+% actions, parameters and model from:
 %
-% c.musselwhite@soton.ac.uk
+%         https://doi.org/10.1038/ncomms10628
 %
 % Frequencies are in scaled units of MHz and times in
-% scaled units of microseconds.
+% scaled units of microseconds. Ensemble GRAPE opti-
+% misation with a distribution of control powers.
+%
+% Calculation time: minutes
+%
+% c.musselwhite@soton.ac.uk
 
-function two_transmons_STIRAP()
+function transmon_stirap()
 
 % Magnet field
 sys.magnet=0;
@@ -15,7 +19,7 @@ sys.magnet=0;
 % Particle specification
 sys.isotopes={'T3'};
 
-% Rotating frame ladder detunings as a Duffing transmon
+% Rotating frame ladder detunings
 inter.modes.frqs={10};
 inter.modes.anharms={-20};
 
@@ -35,8 +39,7 @@ pwr_levels=2*pi*[30 35 40 45 50];
 
 % Gaussian STIRAP pulse pair, normalised to the top power level
 t=1e-3*linspace(-150,150,300);
-ts=-90e-3;
-sigma=45e-3;
+ts=-90e-3; sigma=45e-3;
 omega01=2*pi*43.4/max(pwr_levels);
 omega12=2*pi*38.2/max(pwr_levels);
 omega01_t=omega01*exp(-((t.^2)/(2*sigma^2)));

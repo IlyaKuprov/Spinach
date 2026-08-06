@@ -22,7 +22,8 @@ inter.coupling.scalar=cell(3,3);
 inter.coupling.scalar{1,2}=5e6;
 
 % Cavity resonant with the electrons
-inter.modes.frqs={[] [] -sys.magnet*spin('E')/(2*pi)};
+e_frq=-sys.magnet*spin('E')/(2*pi);
+inter.modes.frqs={[] [] e_frq};
 inter.modes.exchange=cell(3,3);
 inter.modes.exchange{1,3}=2.828e6;
 inter.modes.exchange{2,3}=2.728e6;

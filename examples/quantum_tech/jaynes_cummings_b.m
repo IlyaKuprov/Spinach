@@ -17,7 +17,8 @@ sys.magnet=0.33;
 sys.isotopes={'E','C5'};
 
 % Cavity resonant with the electron
-inter.modes.frqs={[] -sys.magnet*spin('E')/(2*pi)};
+e_frq=-sys.magnet*spin('E')/(2*pi);
+inter.modes.frqs={[] e_frq};
 inter.modes.exchange=cell(2,2);
 inter.modes.exchange{1,2}=2.828e6;
 
@@ -70,10 +71,9 @@ pop_1=L1'*traj; pop_2=L2'*traj; pop_3=L3'*traj;
 
 % Plot the level populations
 kfigure(); plot(time_axis,real([pop_1; pop_2; pop_3]));
-axis tight; kgrid; kxlabel('time, $\mu$s');
-kylabel('population');
+kxlabel('time, $\mu$s'); kylabel('population'); kgrid;
+axis tight; ktitle('cavity level populations');
 klegend({'BL1','BL2','BL3'},'Location','Best');
-ktitle('cavity level populations');
 
 end
 

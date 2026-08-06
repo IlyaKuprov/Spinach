@@ -16,7 +16,8 @@ sys.magnet=0.33;
 sys.isotopes={'E','C5'};
 
 % Cavity resonant with the electron
-inter.modes.frqs={[] -sys.magnet*spin('E')/(2*pi)};
+e_frq=-sys.magnet*spin('E')/(2*pi);
+inter.modes.frqs={[] e_frq};
 inter.modes.exchange=cell(2,2);
 inter.modes.exchange{1,2}=2.828e6;
 
@@ -28,7 +29,7 @@ bas.approximation='none';
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Rotating frame Hamiltonian from the declared couplings
+% Rotating frame Hamiltonian
 spin_system=assume(spin_system,'cavity');
 H_JC=hamiltonian(spin_system);
 

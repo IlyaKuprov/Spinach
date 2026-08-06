@@ -36,7 +36,7 @@ An=operator(spin_system,'A',1);
 N=operator(spin_system,'N',1);
 
 % Free-evolution parameters
-detunings=2*pi*linspace(-20e6,20e6,256);
+detunings=linspace(-20e6,20e6,256);
 time_axis=linspace(0,1.0e-6,256);
 
 % Nominal pi/2 pulse propagator
@@ -54,22 +54,32 @@ answer=zeros(numel(detunings),...
              numel(time_axis));
 for n=1:numel(detunings)
 
-    % Build the free-evolution Hamiltonian
-    H=detunings(n)*N+H0; H=(H+H')/2;
+    % Build the evolution Hamiltonian
+    H=H0+2*pi*detunings(n)*N; H=(H+H')/2;
 
     % Propagate the Ramsey interferometer
     for k=1:numel(time_axis)
+
+        % Evolution propagator (small)
         U=expm(-1i*full(H)*time_axis(k));
-        rho_t=U90*U*rho*U'*U90';
-        answer(n,k)=real(trace(L2*rho_t));
+
+        % Time evolution
+        rho_t=U*rho*U';
+
+        % Final pulse
+        rho_t=U90*rho_t*U90';
+
+        % Detection
+        answer(n,k)=real(hdot(L2,rho_t));
+
     end
 
 end
 
 % Plot the Ramsey chevron
-kfigure(); imagesc(1e6*time_axis,detunings/(2*pi*1e6),answer);
-axis xy tight; kxlabel('time, $\mu$s');
-kylabel('detuning, MHz'); kcolourbar;
+kfigure(); imagesc(time_axis,detunings,answer);
+kxtickfix; kytickfix; kxlabel('time, s');
+kylabel('detuning, Hz'); kcolourbar;
 ktitle('transmon Ramsey chevron');
 
 end

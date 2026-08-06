@@ -1,8 +1,8 @@
 % Basic two-transmon system with Duffing model interacti-
 % ons and a flip-flop coupling; coherence transfer from
 % transmon 1 to transmon 2. GRAPE optimisation with a
-% distribution control powers and transmon offsets. Time
-% units are scaled: microseconds, MHz.
+% distribution control powers and transmon offsets with
+% a penalty on excess power.
 %
 % Calculation time: minutes.
 %
@@ -18,10 +18,10 @@ sys.magnet=0;
 sys.isotopes={'T3','T5'};
 
 % Rotating frame transmon parameters
-inter.modes.frqs={100 -200};
-inter.modes.anharms={-10 -20};
+inter.modes.frqs={100e6 -200e6};
+inter.modes.anharms={-10e6 -20e6};
 inter.modes.exchange=cell(2,2);
-inter.modes.exchange{1,2}=50;
+inter.modes.exchange{1,2}=50e6;
 
 % Formalism and basis
 bas.formalism='zeeman-hilb';
@@ -63,20 +63,20 @@ rho_targ=(rho_targ+rho_targ')/2;
 rho_targ=rho_targ/sorensen(rho_init,rho_targ);
 
 % Define control parameters
-control.drifts={{H}};                             % Drift
-control.operators={C_A,C_B};                      % Controls
-control.off_ops={O_A,O_B};                        % Offset operator
-control.offsets={linspace(-10,10,5)...
-                 linspace(-10,10,5)};             % Offset distribution
-control.rho_init={rho_init};                      % Starting state
-control.rho_targ={rho_targ};                      % Destination state
-control.pwr_levels=2*pi*[40 45 50 55 60]*5;       % Pulse power ensemble
-control.pulse_dt=1e-3*ones(1,100);                % Slice durations
-control.penalties={'NS'};                         % Penalties
-control.p_weights=0.1;                            % Penalty weights
-control.method='lbfgs';                           % Optimisation method
-control.max_iter=100;                             % Termination condition
-control.parallel='ensemble';                      % Parallelisation mode
+control.drifts={{H}};                                  % Drift
+control.operators={C_A,C_B};                           % Controls
+control.off_ops={O_A,O_B};                             % Offset operators
+control.offsets={linspace(-10e6,10e6,5)...
+                 linspace(-10e6,10e6,5)};              % Offset distributions
+control.rho_init={rho_init};                           % Starting state
+control.rho_targ={rho_targ};                           % Destination state
+control.pwr_levels=2*pi*[40e6 45e6 50e6 55e6 60e6]*5;  % Pulse power ensemble
+control.pulse_dt=0.25e-9*ones(1,200);                  % Slice durations
+control.penalties={'SNSA'};                            % Penalties
+control.p_weights=1.0;                                 % Penalty weights
+control.method='rbfgs';                                % Optimisation method
+control.max_iter=200;                                  % Termination condition
+control.parallel='ensemble';                           % Parallelisation mode
 
 % Plots during optimisation
 control.plotting={'xy_controls','spectrogram','robustness'};
@@ -85,7 +85,7 @@ control.plotting={'xy_controls','spectrogram','robustness'};
 spin_system=optimcon(spin_system,control);
 
 % Initial guess - random
-pulse=(1/10)*randn(2,100);
+pulse=(1/10)*randn(2,200);
 
 % Run the optimisation, get normalised pulse
 fmaxnewton(spin_system,@grape_xy,pulse);

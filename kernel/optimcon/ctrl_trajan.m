@@ -129,7 +129,8 @@ if ismember('spectrogram',spin_system.control.plotting)
         image(t_axis,f_axis,hsv2rgb(hsv)); box off;
         ktitle(['channels ' num2str(2*n-1) ',' num2str(2*n)]);
         set(gca,'YDir','normal','TickDir','out'); kbox;
-        kylabel('frequency offset, Hz'); kytickfix; 
+        kylabel('frequency offset, Hz'); 
+        kxtickfix; kytickfix; 
         
         % Warn the user when the time axis is truncated
         if last_slice_to_plot==numel(spin_system.control.pulse_dt)
@@ -291,7 +292,7 @@ if ismember('xy_controls',spin_system.control.plotting)
     klegend(control_labels,'Location','Best');
     kxlabel(t_axis_label); ktitle('controls');
     kylabel('ens. average value, Hz'); 
-    kgrid; kytickfix;
+    kgrid; kxtickfix; kytickfix;
 
     % Report maximum nutation angle
     text(x_lower+0.05*(x_upper-x_lower),...

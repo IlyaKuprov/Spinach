@@ -1,11 +1,10 @@
-% Basic single transmon system with Duffing model inter-
-% actions, parameters and model from:
+% Basic single transmon system with Duffing model in-
+% teractions, parameters and model from:
 %
 %         https://doi.org/10.1038/ncomms10628
 %
-% Frequencies are in scaled units of MHz and times in
-% scaled units of microseconds. Ensemble GRAPE opti-
-% misation with a distribution of control powers.
+% Ensemble GRAPE optimisation with a distribution of 
+% control powers and a penalty on excess power.
 %
 % Calculation time: minutes
 %
@@ -20,8 +19,8 @@ sys.magnet=0;
 sys.isotopes={'T3'};
 
 % Rotating frame ladder detunings
-inter.modes.frqs={10};
-inter.modes.anharms={-20};
+inter.modes.frqs={10e6};
+inter.modes.anharms={-20e6};
 
 % Formalism and basis
 bas.formalism='zeeman-liouv';
@@ -35,13 +34,13 @@ spin_system=basis(spin_system,bas);
 H=hamiltonian(assume(spin_system,'cavity'));
 
 % Pulse power ensemble
-pwr_levels=2*pi*[30 35 40 45 50];
+pwr_levels=2*pi*[30e6 35e6 40e6 45e6 50e6];
 
 % Gaussian STIRAP pulse pair, normalised to the top power level
-t=1e-3*linspace(-150,150,300);
-ts=-90e-3; sigma=45e-3;
-omega01=2*pi*43.4/max(pwr_levels);
-omega12=2*pi*38.2/max(pwr_levels);
+t=1e-9*linspace(-150,150,300);
+ts=-90e-9; sigma=45e-9;
+omega01=2*pi*43.4e6/max(pwr_levels);
+omega12=2*pi*38.2e6/max(pwr_levels);
 omega01_t=omega01*exp(-((t.^2)/(2*sigma^2)));
 omega12_t=omega12*exp(-(((t-(ts/2)).^2)/(2*sigma^2)));
 
@@ -63,10 +62,10 @@ control.rho_init={rho_init};                      % Starting state
 control.rho_targ={rho_targ};                      % Destination state
 control.pwr_levels=pwr_levels;                    % Pulse power ensemble
 control.pulse_dt=(t(2)-t(1))*ones(1,300);         % Slice durations
-control.penalties={'NS'};                         % Penalties
-control.p_weights=10e-7;                          % Penalty weights
+control.penalties={'SNSA'};                       % Penalties
+control.p_weights=1.0;                            % Penalty weights
 control.method='goodwin';                         % Optimisation method
-control.max_iter=100;                             % Termination condition
+control.max_iter=50;                              % Termination condition
 control.parallel='ensemble';                      % Parallelisation mode
 
 % Plots during optimisation

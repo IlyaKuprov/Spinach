@@ -84,7 +84,7 @@ end
 
 % Get MD relaxation superoperator
 tau_est=inter.tau_c{1}; tic;
-R_gce=ngce(spin_system,H0,H1,dt,tau_est,0);
+[R_gce,dR_gce]=ngce(spin_system,H0,H1,dt,tau_est,0);
 ngce_run_time=toc;
 
 % Load reference frame coordinates
@@ -103,11 +103,15 @@ R_red=relaxation(spin_system);
 
 % Plotting
 kfigure();
-plot(diag(R_gce),diag(R_red),'ro');
+gce_rates=diag(R_gce);
+dR_rates=diag(dR_gce);
+red_rates=diag(R_red);
+errorbar(gce_rates,red_rates,dR_rates,'horizontal',...
+         'LineStyle','none','Marker','o','Color','r');
 kxlabel('Redfield matrix elements, mol. dyn.');
 kylabel('Redfield matrix elements, rot. diff.');
-edges=[min([diag(R_gce); diag(R_red)]),...
-       max([diag(R_gce); diag(R_red)])];
+edges=[min([gce_rates-dR_rates; red_rates]),...
+       max([gce_rates+dR_rates; red_rates])];
 xlim(edges); ylim(edges); 
 kgrid; box on; axis square;
 disp(['NGCE stage run time, seconds: ' ...

@@ -1,7 +1,7 @@
 % Numerical integral route to the Redfield relaxation superopera-
 % tor. Syntax:
 %
-%            R=ngce(spin_system,H0,H1,dt,tau_est,reg)
+%            [R,dR]=ngce(spin_system,H0,H1,dt,tau_est,reg)
 %
 % Parameters:
 %
@@ -27,6 +27,8 @@
 %
 %  R  - laboratory frame relaxation superoperator
 %
+%  dR - standard deviation of the mean of R, element by element
+%
 % Note: enough trajectory points must be present to converge 
 %       the ensemble averages and Redfield's integral.
 %
@@ -38,7 +40,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=ngce.m>
 
-function R=ngce(spin_system,H0,H1,dt,tau_est,reg)
+function [R,dR]=ngce(spin_system,H0,H1,dt,tau_est,reg)
 
 % Check consistency
 grumble(H0,H1,dt,tau_est);
@@ -101,9 +103,14 @@ report(spin_system,['trajectory cut into ' ...
 H1=H1(1:nstripes*n_tau_int_steps);
 H1=reshape(H1,[n_tau_int_steps nstripes]);
 
+% Get unit state projector
+U=unit_state(spin_system); UU=U*U';
+
 % Compute trajectory stripe integrals
 report(spin_system,'computing Redfield''s integral...');
-rows=cell(nstripes,1); cols=cell(nstripes,1); vals=cell(nstripes,1);
+calc_err=nargout>1;
+rows=cell(nstripes,1); cols=cell(nstripes,1);
+vals=cell(nstripes,1); vals_sq=cell(nstripes,1);
 parfor s=1:nstripes % Inefficient, investigate
     
     % Get the stripe started
@@ -117,15 +124,34 @@ parfor s=1:nstripes % Inefficient, investigate
                         spin_system.tols.liouv_zero);
         F=F+(f_curr+f_next)/2; f_curr=f_next;
     end
+
+    % Keep real symmetric trace-preserving part
+    F=real(F+F')/2; F=F-(U'*F*U)*UU;
     
     % Get stripe integral as a sparse array
-    [rows{s},cols{s},vals{s}]=find(F/nstripes);
+    [stripe_rows,stripe_cols,stripe_vals]=find(F);
+    rows{s}=stripe_rows; cols{s}=stripe_cols; vals{s}=stripe_vals;
+
+    % Get stripe integral squared element by element
+    if calc_err
+        vals_sq{s}=stripe_vals.^2;
+    end
     
 end
 
 % Assemble the superoperator and keep real symmetric part
 rows=cell2mat(rows); cols=cell2mat(cols); vals=cell2mat(vals);
-R=sparse(rows,cols,vals,size(H0,1),size(H0,2)); R=real(R+R')/2;
+R_sum=sparse(rows,cols,vals,size(H0,1),size(H0,2));
+R=R_sum/nstripes;
+
+% Assemble standard deviation of the mean
+if calc_err
+    vals_sq=cell2mat(vals_sq);
+    R_sq_sum=sparse(rows,cols,vals_sq,size(H0,1),size(H0,2));
+    dR_var=(R_sq_sum-(R_sum.^2)/nstripes)/(nstripes*(nstripes-1));
+    [rows,cols,vals]=find(dR_var);
+    dR=sparse(rows,cols,sqrt(max(real(vals),0)),size(H0,1),size(H0,2));
+end
 
 % Apply regularisation
 if exist('reg','var')&&(reg~=0)
@@ -133,8 +159,7 @@ if exist('reg','var')&&(reg~=0)
 end
 
 % Make sure the unit state is not damped
-U=unit_state(spin_system);
-R=R-(U'*R*U)*(U*U');
+R=R-(U'*R*U)*UU;
 
 end
 

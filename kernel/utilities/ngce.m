@@ -1,7 +1,7 @@
 % Numerical integral route to the Redfield relaxation superopera-
 % tor. Syntax:
 %
-%            [R,dR]=ngce(spin_system,H0,H1,dt,tau_est,reg)
+%          [R,dR]=ngce(spin_system,H0,H1,dt,tau_est,reg)
 %
 % Parameters:
 %
@@ -10,7 +10,7 @@
 %
 %  H1 - stochastic part (zero mean) of the laboratory frame
 %       Hamiltonian commutation superoperator, a cell array
-%       of matrices for each point in the MD trajectory.
+%       of matrices, one for each steo of the MD trajectory.
 %
 %  dt - time step of the MD trajectory, seconds
 %
@@ -103,12 +103,14 @@ report(spin_system,['trajectory cut into ' ...
 H1=H1(1:nstripes*n_tau_int_steps);
 H1=reshape(H1,[n_tau_int_steps nstripes]);
 
-% Get unit state projector
-U=unit_state(spin_system); UU=U*U';
+% Get the unit state projector
+U=unit_state(spin_system); USP=U*U';
+
+% Error analysis switch
+calc_err=nargout>1;
 
 % Compute trajectory stripe integrals
 report(spin_system,'computing Redfield''s integral...');
-calc_err=nargout>1;
 rows=cell(nstripes,1); cols=cell(nstripes,1);
 vals=cell(nstripes,1); vals_sq=cell(nstripes,1);
 parfor s=1:nstripes % Inefficient, investigate
@@ -126,16 +128,14 @@ parfor s=1:nstripes % Inefficient, investigate
     end
 
     % Keep real symmetric trace-preserving part
-    F=real(F+F')/2; F=F-(U'*F*U)*UU;
+    F=real(F+F')/2; F=F-(U'*F*U)*USP;
     
     % Get stripe integral as a sparse array
     [stripe_rows,stripe_cols,stripe_vals]=find(F);
     rows{s}=stripe_rows; cols{s}=stripe_cols; vals{s}=stripe_vals;
 
     % Get stripe integral squared element by element
-    if calc_err
-        vals_sq{s}=stripe_vals.^2;
-    end
+    if calc_err, vals_sq{s}=stripe_vals.^2; end
     
 end
 
@@ -144,13 +144,16 @@ rows=cell2mat(rows); cols=cell2mat(cols); vals=cell2mat(vals);
 R_sum=sparse(rows,cols,vals,size(H0,1),size(H0,2));
 R=R_sum/nstripes;
 
-% Assemble standard deviation of the mean
+% Error analysis
 if calc_err
-    vals_sq=cell2mat(vals_sq);
-    R_sq_sum=sparse(rows,cols,vals_sq,size(H0,1),size(H0,2));
+
+    % Assemble the matrix of variances
+    R_sq_sum=sparse(rows,cols,cell2mat(vals_sq),size(H0,1),size(H0,2));
     dR_var=(R_sq_sum-(R_sum.^2)/nstripes)/(nstripes*(nstripes-1));
-    [rows,cols,vals]=find(dR_var);
-    dR=sparse(rows,cols,sqrt(max(real(vals),0)),size(H0,1),size(H0,2));
+
+    % Get the standard deviations of the mean
+    dR_var=real(dR_var); dR_var(dR_var<0)=0; dR=sqrt(dR_var);
+
 end
 
 % Apply regularisation
@@ -159,7 +162,7 @@ if exist('reg','var')&&(reg~=0)
 end
 
 % Make sure the unit state is not damped
-R=R-(U'*R*U)*UU;
+R=R-(U'*R*U)*USP;
 
 end
 

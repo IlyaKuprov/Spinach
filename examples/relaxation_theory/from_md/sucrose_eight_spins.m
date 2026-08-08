@@ -4,7 +4,7 @@
 %
 % The experimental value of tau_c for sucrose is around 90 ps (and this
 % is correctly reproduced by OPC and TIP5P water), but TIP3P only agrees
-% with Redfield theory when tau_c is set to 39 ps in the latter.
+% with Redfield theory when tau_c is set to 37 ps in the latter.
 %
 % Here, numerical relaxation superoperator computed from a long MD tra-
 % jectory is compared with the analytical one computed using the isotro-
@@ -24,7 +24,7 @@ function sucrose_eight_spins()
 sys.magnet=14.1;
 sys.isotopes={'1H','1H','1H','1H','1H','1H','1H','1H'};
 
-% Complete basis set
+% Reduced basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-0';
 bas.level=3;
@@ -33,7 +33,7 @@ bas.level=3;
 inter.relaxation={'redfield'};
 inter.equilibrium='zero';
 inter.rlx_keep='labframe';
-inter.tau_c={39e-12};
+inter.tau_c={37e-12};
 inter.temperature=298;
 
 % Run Spinach housekeeping
@@ -82,10 +82,8 @@ parfor n=1:size(traj,3)
     
 end
 
-% Get MD relaxation superoperator
-tau_est=inter.tau_c{1}; tic;
-[R_gce,dR_gce]=ngce(spin_system,H0,H1,dt,tau_est,0);
-ngce_run_time=toc;
+% Get relaxation superoperator from the MD trajectory
+[R_gce,dR_gce]=ngce(spin_system,H0,H1,dt,inter.tau_c{1},0);
 
 % Load reference frame coordinates
 spin_system.inter.coordinates={double(traj(:,1,ref_frame)'); 
@@ -101,21 +99,25 @@ spin_system.inter.pbc={}; spin_system=dipolar(spin_system);
 % Get analytical Redfield matrix
 R_red=relaxation(spin_system);
 
-% Plotting
-kfigure();
+% Get relaxation rates
+gce_rates_stdm=diag(dR_gce);
 gce_rates=diag(R_gce);
-dR_rates=diag(dR_gce);
 red_rates=diag(R_red);
-errorbar(gce_rates,red_rates,dR_rates,'horizontal',...
-         'LineStyle','none','Marker','o','Color','r');
-kxlabel('Redfield matrix elements, mol. dyn.');
-kylabel('Redfield matrix elements, rot. diff.');
-edges=[min([gce_rates-dR_rates; red_rates]),...
-       max([gce_rates+dR_rates; red_rates])];
-xlim(edges); ylim(edges); 
-kgrid; box on; axis square;
-disp(['NGCE stage run time, seconds: ' ...
-      num2str(ngce_run_time)]);
+
+% Draw a diagonal straight line
+min_rate=min([gce_rates; red_rates]);
+max_rate=max([gce_rates; red_rates]);
+kfigure(); hold on;
+plot([min_rate max_rate],...
+    [min_rate max_rate],'b-');
+
+% Plot with 95% confidence intervals
+errorbar(gce_rates,red_rates,2*gce_rates_stdm,...
+    'horizontal','LineStyle','none',...
+    'Marker','o','Color','r');
+kxlabel('relaxation rates, mol. dyn.');
+kylabel('relaxation rates, rot. diff.');
+xlim padded; ylim padded; kgrid; box on;
 
 end
 

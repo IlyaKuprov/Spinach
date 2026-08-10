@@ -10,7 +10,7 @@
 %
 %  H1 - stochastic part (zero mean) of the laboratory frame
 %       Hamiltonian commutation superoperator, a cell array
-%       of matrices, one for each steo of the MD trajectory.
+%       of matrices, one for each step of the MD trajectory.
 %
 %  dt - time step of the MD trajectory, seconds
 %

@@ -5,7 +5,9 @@
 %
 % Parameters: 
 %
-%     probden - electron probability density cube.
+%     probden - electron spin density cube, signed, normalised
+%               to unit integral; negative spin-polarisation
+%               lobes are permitted.
 %
 %     chi     - electron magnetic susceptibility tensor in cubic Angstroms.
 %
@@ -106,7 +108,7 @@ if (~isnumeric(chi))||(size(chi,1)~=3)||(size(chi,2)~=3)||(~isreal(chi))
     error('chi parameter should be a real 3x3 matrix.');
 end
 if (~isnumeric(probden))||(ndims(probden)~=3)||(~isreal(probden))
-    error('probden parameter should be a real non-negative 3D array.');
+    error('probden parameter should be a real 3D array.');
 end
 if (~isnumeric(ranges))||(numel(ranges)~=6)||(~isreal(ranges))||...
    (ranges(1)>=ranges(2))||(ranges(3)>=ranges(4))||(ranges(5)>=ranges(6))

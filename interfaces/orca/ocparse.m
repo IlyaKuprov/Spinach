@@ -53,8 +53,14 @@ corner_xyz=str2num(A.textdata{3}); %#ok<ST2NM>
 dxdydz=str2num(A.textdata{4}); %#ok<ST2NM>
 dx=dxdydz(1); dy=dxdydz(2); dz=dxdydz(3);
 
-% Normalise the spin density to unit integral
+% Refuse densities with a negligible net spin
 total_spin=trapz(trapz(trapz(density)))*dx*dy*dz;
+total_abs=trapz(trapz(trapz(abs(density))))*dx*dy*dz;
+if abs(total_spin)<1e-3*total_abs
+    error('spin density integrates to zero, normalisation is not possible.');
+end
+
+% Normalise the spin density to unit integral
 density=density/total_spin;
 
 % Compute grid extents

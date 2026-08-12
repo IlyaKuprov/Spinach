@@ -102,6 +102,11 @@ spin_system=assume(spin_system,assumptions);
 % Disallow giant spin
 if numel(Q)>2, error('giant spin model is not supported in this module.'); end
 
+% Disallow rank-1 anisotropy
+if any(cellfun(@nnz,Q{1}),'all')
+    error('rank-1 Hamiltonian anisotropy is not supported in this module.');
+end
+
 % Apply offsets
 H=frqoffset(spin_system,H,parameters);
 

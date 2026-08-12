@@ -83,7 +83,7 @@ if contains(type,'saltire')
     [Cx,Cy,durs,ints]=chirp_pulse(npts,dur,bwidth,smp,type);
 
     % Zero out Y component and update parameters
-    Cy=zeros(size(Cy)); amps=abs(Cx); phis=(pi/2)*sign(Cy); return;
+    Cy=zeros(size(Cy)); amps=abs(Cx); phis=pi*(Cx<0); return;
 
 end
 

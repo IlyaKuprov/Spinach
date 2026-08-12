@@ -48,33 +48,40 @@ function [P,T]=rseq_compiler(spin_system,L,Sx,Sy,pulse_phi,...
 % Check consistency
 grumble(L,Sx,Sy,pulse_phi,pulse_amp,pulse_dur,element_type);
 
-% Find unique phases
-[phi,~,T]=unique(pulse_phi);
-
-% Preallocate propagators
-P=cell(numel(phi),1);
-
 % Compute propagators
 switch element_type
-    
+
     % Sequence of pi pulses
     case '180_pulse'
-        
+
+        % Find unique phases
+        [phi,~,T]=unique(pulse_phi);
+
+        % Preallocate propagators
+        P=cell(numel(phi),1);
+
         % Run matrix exponentials
         for n=1:numel(phi)
             LP=L+pulse_amp*(Sx*cos(phi(n))+Sy*sin(phi(n)));
             P{n}=propagator(spin_system,LP,pulse_dur);
         end
-    
+
     % Sequence of composite pulses
     case '90270_pulse'
-        
+
+        % Alternating segment durations
+        seg_durs=repmat([pulse_dur(1); pulse_dur(2)],numel(pulse_phi)/2,1);
+
+        % Find unique phase-duration pairs
+        [phi_dur,~,T]=unique([pulse_phi(:) seg_durs],'rows');
+
+        % Preallocate propagators
+        P=cell(size(phi_dur,1),1);
+
         % Run matrix exponentials
-        for n=1:2:numel(phi)
-            LP=L+pulse_amp*(Sx*cos(phi(n))+Sy*sin(phi(n)));
-            P{n}=propagator(spin_system,LP,pulse_dur(1));
-            LP=L+pulse_amp*(Sx*cos(phi(n+1))+Sy*sin(phi(n+1)));
-            P{n+1}=propagator(spin_system,LP,pulse_dur(2));
+        for n=1:size(phi_dur,1)
+            LP=L+pulse_amp*(Sx*cos(phi_dur(n,1))+Sy*sin(phi_dur(n,1)));
+            P{n}=propagator(spin_system,LP,phi_dur(n,2));
         end
         
     otherwise

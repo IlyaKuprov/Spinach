@@ -278,6 +278,12 @@ end
 if isnumeric(states)&&any(mod(states,0.5)~=0,'all')
     error('spin projection numbers must be integer or half-integer.');
 end
+if isnumeric(states)
+    spin_qn=(spin_system.comp.mults(:).'-1)/2;
+    if any(abs(states(:).')>spin_qn)||any(mod(states(:).'+spin_qn,1)~=0)
+        error('each projection quantum number must be an allowed level of its spin.');
+    end
+end
 if iscell(states)&&iscell(spins)&&(numel(states)~=numel(spins))
     error('spins and operators cell arrays should have the same number of elements.');
 end

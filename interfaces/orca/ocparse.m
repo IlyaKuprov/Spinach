@@ -1,6 +1,6 @@
-% ORCA cube file parser. Extracts the normalised probability density and
-% the associated metric information from ORCA spin density in "3D simple
-% format" (see ORCA manual). Syntax:
+% ORCA cube file parser. Extracts the signed spin density, normalised
+% to unit integral, and the associated metric information from an ORCA
+% spin density file in "3D simple format" (see ORCA manual). Syntax:
 %
 %            [density,ext,dx,dy,dz]=ocparse(filename,pad_factor)
 %
@@ -14,8 +14,8 @@
 %
 % Outputs:
 %
-%    density  - probability density cube with dimensions
-%               ordered as [X Y Z]
+%    density  - signed spin density cube, normalised to unit
+%               integral, with dimensions ordered as [X Y Z]
 %
 %    ext      - grid extents in Angstrom, ordered as
 %               [xmin xmax ymin ymax zmin zmax]
@@ -42,8 +42,8 @@ A=importdata(filename,' ',4);
 % Get the number of points along [x y z]
 npts=str2num(A.textdata{2}); %#ok<ST2NM>
 
-% Make the probability density cube
-density=reshape(abs(A.data),npts(2),npts(3),npts(1));
+% Make the spin density cube
+density=reshape(A.data,npts(2),npts(3),npts(1));
 density=permute(density,[3 2 1]);
 
 % Get the corner coordinates 
@@ -53,9 +53,9 @@ corner_xyz=str2num(A.textdata{3}); %#ok<ST2NM>
 dxdydz=str2num(A.textdata{4}); %#ok<ST2NM>
 dx=dxdydz(1); dy=dxdydz(2); dz=dxdydz(3);
 
-% Integrate and normalise probability density
-total_prob=trapz(trapz(trapz(density)))*dx*dy*dz;
-density=density/total_prob;
+% Normalise the spin density to unit integral
+total_spin=trapz(trapz(trapz(density)))*dx*dy*dz;
+density=density/total_spin;
 
 % Compute grid extents
 ext=[corner_xyz(1) (corner_xyz(1)+(npts(1)-1)*dx)...

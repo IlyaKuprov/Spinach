@@ -288,9 +288,12 @@ if isfield(parameters,'tau_c')
     if isscalar(parameters.tau_c)&&(parameters.tau_c<=0)
         error('parameters.tau_c must be positive.');
     end
-    if (numel(parameters.tau_c)==9)&&((~issymmetric(parameters.tau_c))||...
-       any(eig(parameters.tau_c)<=0))
-        error('3x3 parameters.tau_c must be symmetric positive definite.');
+    if numel(parameters.tau_c)==9
+        tau_c_asym=norm(parameters.tau_c-parameters.tau_c','fro');
+        if (tau_c_asym>1e-12*norm(parameters.tau_c,'fro'))||...
+           any(eig((parameters.tau_c+parameters.tau_c')/2)<=0)
+            error('3x3 parameters.tau_c must be symmetric positive definite.');
+        end
     end
 end
 

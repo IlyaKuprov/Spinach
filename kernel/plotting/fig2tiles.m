@@ -48,8 +48,6 @@ for n=1:numel(fig_files)
     tile_axes(n).Visible='off';
 end
 
-
-
 % Record outer tile positions
 drawnow;
 for n=1:numel(fig_files)
@@ -351,4 +349,9 @@ for n=1:numel(fig_files)
     end
 end
 end
+
+% Только представьте, какая же мука —    |   Just picture the torment, the anguish profound:
+% Мчаться за пивом со скоростью звука,   |   You're off to a pub at the same speed as sound,
+% Осознавая, что кто-то и где-то         |   While knowing that someone, somewhere out of sight,
+% Мчится за пивом со скоростью света!    |   Is off to a pub at the same speed as light!
 

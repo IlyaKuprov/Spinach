@@ -20,7 +20,8 @@
 %       ated, and so the figure must already have its final size at
 %       that point. Matlab shrinks a visible figure to fit the disp-
 %       lay; the merge therefore runs off the screen, and the figure
-%       is only shown at the end when the size requested does fit.
+%       is only shown at the end, at the visibility the caller has
+%       set as the figure default, when its outer extent fits.
 %       Figures bigger than the screen stay invisible and must be
 %       written out with exportgraphics.m or print.m; if they are
 %       reopened later with openfig.m, Matlab refits them to the
@@ -45,6 +46,9 @@ for n=1:numel(fig_files)
     [row_num,col_num]=ind2sub(size(fig_files),n);
     tile_nums(n)=(row_num-1)*tile_cols+col_num;
 end
+
+% Note the figure visibility the caller has set as the default
+def_visible=get(groot,'defaultFigureVisible');
 
 % Create the new figure off the screen at the size requested
 fig_obj=kfigure('Units','pixels','Position',[0 0 fig_size],...
@@ -313,8 +317,9 @@ for n=1:numel(fig_files)
 
     catch err
 
-        % Delete the invisible source figure
+        % Delete the source and the incomplete destination figure
         delete(src_fig);
+        delete(fig_obj);
 
         % Rethrow the error
         rethrow(err);
@@ -335,10 +340,16 @@ if panel_count>0
                             panel_objs(1:panel_count)};
 end
 
-% Show the figure when the size requested fits on the screen
+% Get the screen size in pixels whatever the root units are
+root_units=get(groot,'Units');
+set(groot,'Units','pixels');
 screen_size=get(groot,'ScreenSize');
-if all(fig_size<=screen_size(3:4))
-    set(fig_obj,'Visible','on');
+set(groot,'Units',root_units);
+
+% Show the figure at the caller's default when its outer extent fits
+outer_size=get(fig_obj,'OuterPosition');
+if all(outer_size(3:4)<=screen_size(3:4))
+    set(fig_obj,'Visible',def_visible);
 end
 
 end

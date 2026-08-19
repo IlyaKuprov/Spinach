@@ -1,5 +1,5 @@
 % Solves the inverse problem for pseudocontact shift by recovering the
-% source term in the Kuprov equation using Tikhonov regularization 
+% source term in the Kuprov equation using Tikhonov regularisation 
 % procedure. Syntax: 
 %
 %     [source_cube,ranges,pred_pcs,err_ls,reg_a,reg_b]=...
@@ -9,25 +9,26 @@
 % Parameters:
 % 
 %     nxyz     - nuclear coordinates as [x y z] with multiple rows 
-%                at which PCS has been measured, in Angstroms.
+%                at which PCS has been measured, in Angstroms
 %
-%     expt_pcs - pseudocontact shift in ppm at each nucleus.
+%     expt_pcs - pseudocontact shift in ppm at each nucleus
 %
 %     chi      - electron magnetic susceptibility tensor, in units
-%                of Angstrom^3.
+%                of Angstrom^3
 %
 %     npoints  - number of points in each dimension of the source
-%                cube, a positive integer greater than 10.
+%                cube, a positive integer greater than 10
 %
-%     lambda   - regularization parameters, the first element is 
+%     lambda   - regularisation parameters, the first element is 
 %                the coefficient in front of the contrast term
 %                and the second element is the coefficient in
-%                front of the Tikhonov term.
+%                front of the Tikhonov term
 %
 %     margins  - a six-element vector specifying margins to take
 %                around the bounding box of the nuclear coordina-
 %                tes supplied, to account for the possibility that
-%                the electron may be located on the periphery.
+%                some unpaired electron may be located on the pe-
+%                riphery and require adequare margins
 %
 %     box_centre - a three-element vector in Angstrom specifying 
 %                  the centre of the solution box
@@ -37,7 +38,7 @@
 %
 %     equation   - 'poisson' to recover the right hand side of the
 %                   Poisson's equation, 'kuprov' to recover the
-%                   probability density.
+%                   unpaired electron probability density
 %
 %     gpu        - set to 1 to enable GPU processing (much faster)
 %
@@ -56,10 +57,7 @@
 %
 %     reg_a       - contrast penalty term
 %
-%     reg_b       - Tikhonov penalty term the second element is the entropy
-%                   penalty in the error functional, the third
-%                   element is the tikhonov penalty in the error
-%                   functional
+%     reg_b       - Tikhonov penalty term
 %
 % Note: for further information on the equations and algorithms used
 %       in this function see http://dx.doi.org/10.1039/C4CP03106G
@@ -68,7 +66,7 @@
 % ilya.kuprov@weizmann.ac.il
 % e.suturina@bath.ac.uk
 %
-% <https://spindynamics.org/wiki/index.php?title=Ipcs.m>
+% <https://spindynamics.org/wiki/index.php?title=ipcs.m>
 
 function [source_cube,ranges,pred_pcs,err_ls,reg_a,reg_b]=ipcs(parameters,npoints,lambda)
 

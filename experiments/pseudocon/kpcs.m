@@ -5,22 +5,22 @@
 %
 % Parameters: 
 %
-%     probden - electron probability density cube.
+%     probden - unpaired electron probability density (not spin density) cube
 %
-%     chi     - electron magnetic susceptibility tensor in cubic Angstroms.
+%     chi     - electron magnetic susceptibility tensor in cubic Angstroms
 %
-%     ranges  - Cartesian axis extents for the electron spin density cube
-%               as [xmin xmax ymin ymax zmin zmax] in angstroms.
+%     ranges  - Cartesian axis extents for the unpaired electron probability 
+%               density cube as [xmin xmax ymin ymax zmin zmax] in Angstroms
 %
 %     nxyz    - nuclear coordinates as [x y z] with multiple rows) at which
-%               PCS is to be evaluated, in Angstroms.
+%               PCS is to be evaluated, in Angstroms
 %
 % Output:
 % 
-%     pcs_vals - pseudocontact shift in ppm at each nucleus.
+%     pcs_vals - pseudocontact shift in ppm at each nucleus
 %
-%     pcs_cube - pseudocontact shift field on the same grid as the spin 
-%                density supplied.
+%     pcs_cube - pseudocontact shift field on the same grid as the unpaired 
+%                electron probability density supplied
 %
 % Note: minimal three-point schemes are used for the finite difference
 %       operators. Increase stencil size if you have enough memory.

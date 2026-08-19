@@ -1,7 +1,7 @@
 % Packs multipole moments from a linear stream into a cell array
 % that is arranged by ranks. Syntax:
 %
-%                     Ilm=multipack(ranks,moments)
+%                 Ilm=multipack(ranks,moments)
 %
 % Parameters:
 %

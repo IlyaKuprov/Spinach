@@ -21,9 +21,9 @@
 %      mri - MRI image with square sinebell apodisation
 %
 % Prior to being Fourier transformed, the spiral is resampled onto
-% a suitable square grid - change the sequence to output spiral_x,
-% spiral_y and spiral_z variables if you plan to process the data
-% in a different way.
+% a suitable square k-space grid - change the sequence to output
+% spiral_kx, spiral_ky and spiral_z variables if you plan to pro-
+% cess the data in a different way.
 %
 % ilya.kuprov@weizmann.ac.il
 % a.j.allami@soton.ac.uk
@@ -59,16 +59,21 @@ time_grid=linspace(0,parameters.spiral_dur,parameters.spiral_npts);
 spiral_x=time_grid*(parameters.grad_amp/parameters.spiral_dur).*cos(parameters.spiral_frq*time_grid);
 spiral_y=time_grid*(parameters.grad_amp/parameters.spiral_dur).*sin(parameters.spiral_frq*time_grid);
 
+% Get the time step
+time_step=(parameters.spiral_dur/parameters.spiral_npts);
+
+% Accumulate the k-space trajectory in cycles per metre
+gam=spin(parameters.spins{1});
+spiral_kx=(gam/(2*pi))*time_step*[0 cumsum(spiral_x(1:(end-1)))];
+spiral_ky=(gam/(2*pi))*time_step*[0 cumsum(spiral_y(1:(end-1)))];
+
 % Report the sampling spiral to the user
-kfigure(); plot(spiral_x,spiral_y,'b-'); ktitle('$k$-space sampling spiral');
-kxlabel('X gradient amplitude, T/m'); kylabel('Y gradient amplitude, T/m'); 
+kfigure(); plot(spiral_kx,spiral_ky,'b-'); ktitle('$k$-space sampling spiral');
+kxlabel('$k_x$, cycles per metre'); kylabel('$k_y$, cycles per metre');
 kgrid; axis equal; drawnow();
 
 % Prelocate the spiral trajectory array
 spiral_z=zeros([parameters.spiral_npts 1],'like',1i);
-
-% Get the time step
-time_step=(parameters.spiral_dur/parameters.spiral_npts);
 
 % Start feedback timer
 feedback=tic();
@@ -92,9 +97,10 @@ for n=1:parameters.spiral_npts
 end
 
 % Resample onto square grid
-x_grid=linspace(-parameters.grad_amp,parameters.grad_amp,sqrt(parameters.spiral_npts)/2);
-y_grid=linspace(-parameters.grad_amp,parameters.grad_amp,sqrt(parameters.spiral_npts)/2);
-[X,Y]=ndgrid(x_grid,y_grid); fid=griddata(spiral_x,spiral_y,spiral_z,X,Y,'cubic');
+k_max=max(hypot(spiral_kx,spiral_ky));
+x_grid=linspace(-k_max,k_max,sqrt(parameters.spiral_npts)/2);
+y_grid=linspace(-k_max,k_max,sqrt(parameters.spiral_npts)/2);
+[X,Y]=ndgrid(x_grid,y_grid); fid=griddata(spiral_kx,spiral_ky,spiral_z,X,Y,'cubic');
 
 % Replace NaN values with zeros
 fid(isnan(fid))=0;
@@ -104,9 +110,6 @@ fid=apodisation(spin_system,fid,{{'sqsin'},{'sqsin'}});
 
 % Fourier transform
 mri=real(fftshift(fft2(ifftshift(fid))));
-
-% Transpose and flip around
-mri=fliplr(mri');
 
 end
 

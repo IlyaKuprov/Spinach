@@ -115,8 +115,8 @@ if isfield(control,'method')
 
     % Input validation
     if (~ischar(control.method))||(~ismember(control.method,{'lbfgs','rbfgs',...
-                                                             'newton','goodwin'}))
-        error('control.method must be ''lbfgs'', ''rbfgs'', ''newton'', or ''goodwin''.');
+                                                             'newton','goodwin','mma'}))
+        error('control.method must be ''lbfgs'', ''rbfgs'', ''newton'', ''goodwin'', or ''mma''.');
     end
 
     % Absorb the method

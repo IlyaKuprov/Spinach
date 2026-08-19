@@ -1,5 +1,16 @@
-% Finds a local maximum of a function of several variables using Newton
-% and quasi-Newton algorithms. Syntax:
+% Finds a local maximum of a function of several variables using Newton,
+% quasi-Newton, and moving asymptote algorithms. The algorithm is chosen
+% by control.method in optimcon.m; 'lbfgs', 'rbfgs', 'newton', and 'good-
+% win' take a line search along a search direction, whereas 'mma' solves
+% a convex separable subproblem with poles at the moving asymptotes and
+% accepts its solution as the next iterate, as described in
+%
+%             https://doi.org/10.1002/nme.1620240207
+%
+% The amplitude bounds set in optimcon.m are hard box constraints in the
+% moving asymptote method, but only soft penalties in the other methods;
+% the penalties listed in control.penalties are folded into the objecti-
+% ve by objeval.m in all cases. Syntax:
 %
 %          [x,data]=fmaxnewton(spin_system,cost_function,guess)
 %
@@ -11,7 +22,9 @@
 %    cost_function - a function handle that takes the input
 %                    the size of guess
 %
-%    guess         - the initial point of the optimisation
+%    guess         - the initial point of the optimisation,
+%                    which must be within the amplitude bo-
+%                    unds when control.method is 'mma'
 %
 % Outputs:
 %
@@ -85,6 +98,11 @@ else
     frozen=false(size(x));
 
 end
+
+% Stretch the amplitude bounds and get their span
+lo_bound=spin_system.control.l_bound.*ones(data.x_shape); lo_bound=lo_bound(:);
+up_bound=spin_system.control.u_bound.*ones(data.x_shape); up_bound=up_bound(:);
+bnd_span=up_bound-lo_bound;
 
 % Print the header
 header(spin_system);
@@ -189,27 +207,89 @@ for n=1:spin_system.control.max_iter
             % Get the search direction
             dir=zeros(size(frozen));
             dir(~frozen)=H\g(~frozen);
-            
+
+        case 'mma'
+
+            % Get objective and gradient
+            [data,fx,g]=objeval(x,cost_function,data,spin_system);
+
+            % Tidy up the gradient
+            g=real(g);
+
+            % Switch to the minimisation convention of the method
+            grad=-g;
+
+            % Place the asymptotes symmetrically at the first two iterations
+            if n<3
+
+                lo_asym=x-0.05*bnd_span; up_asym=x+0.05*bnd_span;
+
+            else
+
+                % Contract the asymptotes on oscillation and relax them otherwise
+                adapt=ones(size(x)); osc=(x-x_prev).*(x_prev-x_prev2);
+                adapt(osc<0)=0.7; adapt(osc>0)=1.2;
+                lo_asym=x-adapt.*(x_prev-lo_asym);
+                up_asym=x+adapt.*(up_asym-x_prev);
+
+                % Keep the asymptote distances within the standard safeguards
+                lo_asym=max(min(lo_asym,x-0.01*bnd_span),x-10*bnd_span);
+                up_asym=min(max(up_asym,x+0.01*bnd_span),x+10*bnd_span);
+
+            end
+
+            % Set the move limits of the subproblem
+            mov_lo=max(lo_bound,lo_asym+0.1*(x-lo_asym));
+            mov_up=min(up_bound,up_asym-0.1*(up_asym-x));
+
+            % Build the convex separable approximation
+            grad_pos=max(grad,0); grad_neg=max(-grad,0);
+            p_term=((up_asym-x).^2).*(1.001*grad_pos+0.001*grad_neg+1e-5./bnd_span);
+            q_term=((x-lo_asym).^2).*(0.001*grad_pos+1.001*grad_neg+1e-5./bnd_span);
+
+            % Solve the subproblem in closed form and clip to the move limits
+            x_new=(sqrt(p_term).*lo_asym+sqrt(q_term).*up_asym)./...
+                  (sqrt(p_term)+sqrt(q_term));
+            x_new=min(max(x_new,mov_lo),mov_up);
+
+            % Shift the iterate history
+            if n>1, x_prev2=x_prev; end
+            x_prev=x;
+
+            % Get the search direction
+            dir=zeros(size(frozen));
+            dir(~frozen)=x_new(~frozen)-x(~frozen);
+
     end
 
     % Store the reference point
     g_ref=g(~frozen); dir_ref=dir(~frozen);
 
-    % If line search would be worthwhile, get a bracket [A B] of acceptable points
-    [A,B,alpha,fx_new,g_new,next_act,data]=bracketing(cost_function,1,dir,x,fx,...
-                                                      g.*(~frozen),data,spin_system);
+    % The moving asymptote subproblem already returns the step
+    if strcmp(spin_system.control.method,'mma')
 
-    % Run sectioning if necessary
-    if strcmp(next_act,'sectioning')
-    
-        % Find an acceptable point within the [A B] bracket    
-       [alpha,fx,g,exitflag,data]=sectioning(cost_function,A,B,x,fx,g.*(~frozen),...
-                                             dir,data,spin_system);
-                                 
+        % Accept the solution of the subproblem
+        alpha=1;
+
     else
 
-        % History update
-        fx=fx_new; g=g_new;
+        % If line search would be worthwhile, get a bracket [A B] of acceptable points
+        [A,B,alpha,fx_new,g_new,next_act,data]=bracketing(cost_function,1,dir,x,fx,...
+                                                          g.*(~frozen),data,spin_system);
+
+        % Run sectioning if necessary
+        if strcmp(next_act,'sectioning')
+
+            % Find an acceptable point within the [A B] bracket
+            [alpha,fx,g,exitflag,data]=sectioning(cost_function,A,B,x,fx,g.*(~frozen),...
+                                                  dir,data,spin_system);
+
+        else
+
+            % History update
+            fx=fx_new; g=g_new;
+
+        end
 
     end
 
@@ -287,6 +367,7 @@ switch(spin_system.control.method)
     case 'rbfgs',   data.algorithm='Regularised BFGS method';
     case 'newton',  data.algorithm='Regularised Newton-Raphson method';
     case 'goodwin', data.algorithm='Regularised Newton-Raphson method with Goodwin acceleration';
+    case 'mma',     data.algorithm='Method of moving asymptotes';
 end
 switch exitflag
     case  1, message='norm(gradient,2) < tol_gfx';
@@ -338,6 +419,18 @@ if ~isfield(spin_system,'control')
 end
 if (~isnumeric(guess))||(~isreal(guess))
     error('guess must be an array of real numbers.');
+end
+if strcmp(spin_system.control.method,'mma')
+    if ~isempty(spin_system.control.basis)
+        error('moving asymptote optimiser is not available with a waveform basis.');
+    end
+    if isfield(spin_system.control,'amplitudes')
+        error('moving asymptote optimiser is not available for phase-modulated optimisations.');
+    end
+    if any(guess>spin_system.control.u_bound,'all')||...
+       any(guess<spin_system.control.l_bound,'all')
+        error('guess must be within control.l_bound and control.u_bound.');
+    end
 end
 switch spin_system.control.integrator
     case 'rectangle'

@@ -35,10 +35,12 @@
 %                     equal to the number of spinning si-
 %                     debands in the spectrum)
 %
-%         .tau_c   - correlation times (in seconds) for rotational 
+%         .tau_c   - correlation times (in seconds) for rotational
 %                    diffusion. Single number for isotropic rotati-
-%                    onal diffusion, and a 3x3 matrix for anisotro-
-%                    pic rotational diffusion.
+%                    onal diffusion, and a symmetric positive defi-
+%                    nite 3x3 correlation time tensor for anisotro-
+%                    pic rotational diffusion; the rotational dif-
+%                    fusion tensor is inv(6*tau_c).
 %
 %         .*       - additional subfields may be required by your
 %                    pulse sequence - check its documentation page 
@@ -177,7 +179,7 @@ if isfield(parameters,'tau_c')
            (size(parameters.tau_c,2)==3)
         
         % Anisotropic rotational diffusion
-        dten=1./(6*parameters.tau_c);
+        dten=inv(6*parameters.tau_c);
         Rd=dten(1,1)*Lx*Lx+dten(1,2)*Lx*Ly+dten(1,3)*Lx*Lz+...
            dten(2,1)*Ly*Lx+dten(2,2)*Ly*Ly+dten(2,3)*Ly*Lz+...
            dten(3,1)*Lz*Lx+dten(3,2)*Lz*Ly+dten(3,3)*Lz*Lz;
@@ -282,6 +284,16 @@ if isfield(parameters,'tau_c')
     end
     if (numel(parameters.tau_c)~=1)&&(numel(parameters.tau_c)~=9)
         error('parameters.tau_c must be a scalar or a 3x3 matrix.');
+    end
+    if isscalar(parameters.tau_c)&&(parameters.tau_c<=0)
+        error('parameters.tau_c must be positive.');
+    end
+    if numel(parameters.tau_c)==9
+        tau_c_asym=norm(parameters.tau_c-parameters.tau_c','fro');
+        if (tau_c_asym>1e-12*norm(parameters.tau_c,'fro'))||...
+           any(eig((parameters.tau_c+parameters.tau_c')/2)<=0)
+            error('3x3 parameters.tau_c must be symmetric positive definite.');
+        end
     end
 end
 

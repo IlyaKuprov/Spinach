@@ -10,8 +10,10 @@
 %   spin_b  - the number of the second spin 
 %
 %   options.dephasing - set to 1 to eliminate the states that are
-%                       not stationary under Az+Bz Hamiltonian, 
-%                       the default is to keep everything
+%                       not stationary under the Zeeman Hamilto-
+%                       nian of two inequivalent spins, i.e. to
+%                       keep only zero-projection products; the
+%                       default is to keep everything
 %
 % Outputs:
 %
@@ -73,7 +75,7 @@ for n=1:numel(IST)
         [L1,M1]=lin2lm(n-1); [L2,M2]=lin2lm(k-1);
 
         % Skip non-stationary states on user request
-        if (M1~=0)&&(M2~=0)&&(options.dephasing==1), continue; end
+        if ((M1~=0)||(M2~=0))&&(options.dephasing==1), continue; end
 
         % Build Spinach state descriptor
         descr_a=['T' int2str(L1) ',' int2str(M1)];

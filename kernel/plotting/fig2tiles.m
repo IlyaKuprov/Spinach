@@ -1,11 +1,14 @@
 % Combines Matlab figure files into a single tiled figure. Syntax:
 %
-%              [fig_obj,tile_obj]=fig2tiles(fig_files)
+%          [fig_obj,tile_obj]=fig2tiles(fig_files,fig_size)
 %
 % Parameters:
 %
 %    fig_files - cell array of character strings containing
 %                Matlab *.fig file names
+%
+%    fig_size  - width and height of the merged figure in scr-
+%                een pixels, a two-element row vector
 %
 % Outputs:
 %
@@ -13,14 +16,25 @@
 %
 %    tile_obj - handle of the tiled layout object
 %
+% Note: tile geometry is measured at the moment the layout is cre-
+%       ated, and so the figure must already have its final size at
+%       that point. Matlab shrinks a visible figure to fit the disp-
+%       lay; the merge therefore runs off the screen, and the figure
+%       is only shown at the end, at the visibility the caller has
+%       set as the figure default, when its outer extent fits.
+%       Figures bigger than the screen stay invisible and must be
+%       written out with exportgraphics.m or print.m; if they are
+%       reopened later with openfig.m, Matlab refits them to the
+%       screen and the size requested here is lost.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=fig2tiles.m>
 
-function [fig_obj,tile_obj]=fig2tiles(fig_files)
+function [fig_obj,tile_obj]=fig2tiles(fig_files,fig_size)
 
 % Check consistency
-grumble(fig_files);
+grumble(fig_files,fig_size);
 
 % Get the tile grid size
 tile_rows=size(fig_files,1);
@@ -33,8 +47,12 @@ for n=1:numel(fig_files)
     tile_nums(n)=(row_num-1)*tile_cols+col_num;
 end
 
-% Create the new figure
-fig_obj=kfigure();
+% Note the figure visibility the caller has set as the default
+def_visible=get(groot,'defaultFigureVisible');
+
+% Create the new figure off the screen at the size requested
+fig_obj=kfigure('Units','pixels','Position',[0 0 fig_size],...
+                'Visible','off');
 
 % Create a loose tiled layout
 tile_obj=tiledlayout(fig_obj,tile_rows,tile_cols,'TileSpacing','loose',...
@@ -299,8 +317,9 @@ for n=1:numel(fig_files)
 
     catch err
 
-        % Delete the invisible source figure
+        % Delete the source and the incomplete destination figure
         delete(src_fig);
+        delete(fig_obj);
 
         % Rethrow the error
         rethrow(err);
@@ -321,6 +340,22 @@ if panel_count>0
                             panel_objs(1:panel_count)};
 end
 
+% Get the screen size in pixels whatever the root units are
+root_units=get(groot,'Units');
+set(groot,'Units','pixels');
+screen_size=get(groot,'ScreenSize');
+set(groot,'Units',root_units);
+
+% Show the figure at the caller's default when its outer extent fits
+outer_size=get(fig_obj,'OuterPosition');
+if all(outer_size(3:4)<=screen_size(3:4))
+    set(fig_obj,'Visible',def_visible);
+else
+    warning(['the merged figure is bigger than the screen, it stays '...
+             'off the screen and does not appear; use savefig.m to '...
+             'keep it and exportgraphics.m to write it out.']);
+end
+
 end
 
 % Synchronises overlay panels with their tiled placeholders
@@ -333,7 +368,11 @@ end
 end
 
 % Consistency enforcement
-function grumble(fig_files)
+function grumble(fig_files,fig_size)
+if (~isnumeric(fig_size))||(~isreal(fig_size))||(~isrow(fig_size))||...
+   (numel(fig_size)~=2)||any(fig_size<1)||any(mod(fig_size,1)~=0)
+    error('fig_size must be a row vector of two positive whole numbers.');
+end
 if (~iscell(fig_files))||isempty(fig_files)||(~ismatrix(fig_files))
     error('fig_files must be a non-empty two-dimensional cell array of file names.');
 end

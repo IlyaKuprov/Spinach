@@ -350,6 +350,10 @@ set(groot,'Units',root_units);
 outer_size=get(fig_obj,'OuterPosition');
 if all(outer_size(3:4)<=screen_size(3:4))
     set(fig_obj,'Visible',def_visible);
+else
+    warning(['the merged figure is bigger than the screen, it stays '...
+             'off the screen and does not appear; use savefig.m to '...
+             'keep it and exportgraphics.m to write it out.']);
 end
 
 end

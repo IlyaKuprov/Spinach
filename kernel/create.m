@@ -1154,10 +1154,6 @@ end
 % Nakajima-Zwanzig kernel evaluation point
 if isfield(inter,'nz_shift')
     spin_system.rlx.nz_shift=inter.nz_shift;
-else
-    spin_system.rlx.nz_shift=0;
-end
-if ismember('naka-zwan',spin_system.rlx.theories)
     if ischar(spin_system.rlx.nz_shift)
         report(spin_system,'NZ kernel evaluation point: from radical pair kinetics');
     else
@@ -1168,10 +1164,6 @@ end
 % Nakajima-Zwanzig kernel form
 if isfield(inter,'nz_onshell')
     spin_system.rlx.nz_onshell=inter.nz_onshell;
-else
-    spin_system.rlx.nz_onshell=false;
-end
-if ismember('naka-zwan',spin_system.rlx.theories)
     if spin_system.rlx.nz_onshell
         report(spin_system,'NZ kernel form: on-shell, back-rotated');
     else
@@ -2060,6 +2052,16 @@ if isfield(inter,'relaxation')
         error('correlation time(s) must be specified with Nakajima-Zwanzig theory.');
     end
 
+    % Enforce kernel evaluation point with Nakajima-Zwanzig theory
+    if ismember('naka-zwan',inter.relaxation)&&(~isfield(inter,'nz_shift'))
+        error('kernel evaluation point must be specified in inter.nz_shift with Nakajima-Zwanzig theory.');
+    end
+
+    % Enforce kernel form with Nakajima-Zwanzig theory
+    if ismember('naka-zwan',inter.relaxation)&&(~isfield(inter,'nz_onshell'))
+        error('kernel form must be specified in inter.nz_onshell with Nakajima-Zwanzig theory.');
+    end
+
     % Check the Nakajima-Zwanzig kernel evaluation point
     if isfield(inter,'nz_shift')
         if ~ismember('naka-zwan',inter.relaxation)
@@ -2073,8 +2075,8 @@ if isfield(inter,'relaxation')
                 error('inter.nz_shift=''chem'' requires radical pair kinetics in inter.chem.');
             end
         elseif (~isnumeric(inter.nz_shift))||(~isscalar(inter.nz_shift))||...
-               (real(inter.nz_shift)<0)
-            error('inter.nz_shift must be ''chem'' or a scalar with a non-negative real part.');
+               (~isfinite(inter.nz_shift))||(real(inter.nz_shift)<0)
+            error('inter.nz_shift must be ''chem'' or a finite scalar with a non-negative real part.');
         end
     end
 

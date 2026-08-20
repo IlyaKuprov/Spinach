@@ -809,12 +809,6 @@ if ~isfield(spin_system.rlx,'keep')
     end
     spin_system.rlx.keep='labframe';
 end
-if ~isfield(spin_system.rlx,'nz_shift')
-    spin_system.rlx.nz_shift=0;
-end
-if ~isfield(spin_system.rlx,'nz_onshell')
-    spin_system.rlx.nz_onshell=false;
-end
 end
 
 % Consistency enforcement
@@ -848,8 +842,12 @@ if ( ismember('redfield',spin_system.rlx.theories))&&...
     error('Redfield relaxation theory is only available in Liouville space.');
 end
 if ( ismember('naka-zwan',spin_system.rlx.theories))&&...
-   (~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'}))
-    error('Nakajima-Zwanzig relaxation theory is only available in Liouville space.');
+   (~strcmp(spin_system.bas.formalism,'sphten-liouv'))
+    error('Nakajima-Zwanzig relaxation theory is only available for sphten-liouv formalism.');
+end
+if ismember('naka-zwan',spin_system.rlx.theories)&&...
+   ((~isfield(spin_system.rlx,'nz_shift'))||(~isfield(spin_system.rlx,'nz_onshell')))
+    error('Nakajima-Zwanzig theory requires nz_shift and nz_onshell in spin_system.rlx.');
 end
 if ( ismember('lindblad',spin_system.rlx.theories))&&...
    (~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'}))

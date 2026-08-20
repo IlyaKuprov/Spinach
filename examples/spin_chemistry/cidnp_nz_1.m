@@ -100,7 +100,6 @@ K=kinetics(spin_system);
 
 % Singlet-born initial condition
 rho=singlet(spin_system,1,2);
-rho=rho/norm(rho,2);
 
 % Double up the problem, products carry no dynamics
 H=[1*H 0*H; 0*H 0*H];

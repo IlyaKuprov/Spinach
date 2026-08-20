@@ -529,7 +529,8 @@ end
 if ismember('correlation_order',spin_system.control.plotting)
 
     % Disallow Zeeman formalisms
-    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv'})
+    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv',...
+                                           'zeeman-wavef'})
         error('trajectory analysis is not available in Zeeman formalisms, use sphten-liouv.');
     end
     
@@ -567,7 +568,8 @@ end
 if ismember('coherence_order',spin_system.control.plotting)
 
     % Disallow Zeeman formalisms
-    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv'})
+    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv',...
+                                           'zeeman-wavef'})
         error('trajectory analysis is not available in Zeeman formalisms, use sphten-liouv.');
     end
     
@@ -605,7 +607,8 @@ end
 if ismember('local_each_spin',spin_system.control.plotting)
 
     % Disallow Zeeman formalisms
-    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv'})
+    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv',...
+                                           'zeeman-wavef'})
         error('trajectory analysis is not available in Zeeman formalisms, use sphten-liouv.');
     end
     
@@ -643,7 +646,8 @@ end
 if ismember('total_each_spin',spin_system.control.plotting)
 
     % Disallow Zeeman formalisms
-    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv'})
+    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv',...
+                                           'zeeman-wavef'})
         error('trajectory analysis is not available in Zeeman formalisms, use sphten-liouv.');
     end
     
@@ -681,7 +685,8 @@ end
 if ismember('level_populations',spin_system.control.plotting)
 
     % Disallow Zeeman formalisms
-    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv'})
+    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv',...
+                                           'zeeman-wavef'})
         error('trajectory analysis is not available in Zeeman formalisms, use sphten-liouv.');
     end
     

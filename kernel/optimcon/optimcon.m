@@ -145,6 +145,11 @@ end
 % Inform the user
 report(spin_system,[pad('Optimisation method',60) spin_system.control.method]);
 
+% Hilbert space, wavefunctions, and Goodwin's Hessian need unitary propagation
+herm_gens=ismember(spin_system.bas.formalism,...
+                   {'zeeman-hilb','zeeman-wavef'})||...
+          strcmp(spin_system.control.method,'goodwin');
+
 % Process control operators
 if isfield(control,'operators')
 
@@ -153,24 +158,9 @@ if isfield(control,'operators')
         error('control.operators must be a cell array of matrices.');
     end
 
-    % In Hilbert space, disallow non-Hermitian controls
-    if strcmp('zeeman-hilb',spin_system.bas.formalism)
-
-        % Over controls
-        for n=1:numel(control.operators)
-
-            % Get pertinent norms
-            norm_a=cheap_norm(control.operators{n}-...
-                              control.operators{n}');
-            norm_b=cheap_norm(control.operators{n});
-
-            % Check the norms
-            if norm_a>1e-10*norm_b
-                error('all control generators must be Hermitian in Hilbert space.');
-            end
-
-        end
-
+    % Reject non-Hermitian controls where unitarity is required
+    if herm_gens
+        check_hermiticity(control.operators,'control generators');
     end
 
     % Control operator count
@@ -538,8 +528,13 @@ if isfield(control,'offsets')&&isfield(control,'off_ops')
         end
     end
 
+    % Reject non-Hermitian offsets where unitarity is required
+    if herm_gens
+        check_hermiticity(control.off_ops,'offset operators');
+    end
+
     % Absorb offset distributions
-    spin_system.control.offsets=control.offsets; 
+    spin_system.control.offsets=control.offsets;
     control=rmfield(control,'offsets');
 
     % Clean up and absorb offset operators
@@ -706,29 +701,11 @@ if isfield(control,'drifts')
         error('all time-dependent drifts must have the same number of time slices.');
     end
 
-    % In Hilbert space, disallow non-Hermitian drifts
-    if strcmp('zeeman-hilb',spin_system.bas.formalism)
-        
-        % Over drift ensemble
+    % Reject non-Hermitian drifts where unitarity is required
+    if herm_gens
         for n=1:numel(control.drifts)
-
-            % Over time slices
-            for k=1:numel(control.drifts{n})
-
-                % Get pertinent norms
-                norm_a=cheap_norm(control.drifts{n}{k}-...
-                                  control.drifts{n}{k}');
-                norm_b=cheap_norm(control.drifts{n}{k});
-
-                % Check the norms
-                if norm_a>1e-10*norm_b
-                    error('all drift generators must be Hermitian in Hilbert space.');
-                end
-
-            end
-
+            check_hermiticity(control.drifts{n},'drift generators');
         end
-
     end
     
     % Inform the user
@@ -1334,6 +1311,27 @@ if ~isempty(unparsed)
         report(spin_system,['ERROR: unrecognised or mismatched option - ' unparsed{n}]);
     end
     error('there are problems with the control structure.');
+end
+
+end
+
+% Refuses a set of generators when any of them is not Hermitian
+function check_hermiticity(generators,generator_kind)
+
+% Over the supplied generators
+for n=1:numel(generators)
+
+    % Get pertinent norms
+    norm_a=cheap_norm(generators{n}-generators{n}');
+    norm_b=cheap_norm(generators{n});
+
+    % Check the norms
+    if norm_a>1e-10*norm_b
+        error(['all ' generator_kind ' must be Hermitian in zeeman-hilb '...
+               'and zeeman-wavef formalisms, and under '...
+               'control.method=''goodwin''.']);
+    end
+
 end
 
 end

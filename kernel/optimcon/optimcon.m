@@ -153,8 +153,9 @@ if isfield(control,'operators')
         error('control.operators must be a cell array of matrices.');
     end
 
-    % In Hilbert space, disallow non-Hermitian controls
-    if strcmp('zeeman-hilb',spin_system.bas.formalism)
+    % Hilbert space and Goodwin's Hessian disallow non-Hermitian controls
+    if strcmp('zeeman-hilb',spin_system.bas.formalism)||...
+       strcmp('goodwin',spin_system.control.method)
 
         % Over controls
         for n=1:numel(control.operators)
@@ -166,7 +167,8 @@ if isfield(control,'operators')
 
             % Check the norms
             if norm_a>1e-10*norm_b
-                error('all control generators must be Hermitian in Hilbert space.');
+                error(['all control generators must be Hermitian in Hilbert '...
+                       'space and under control.method=''goodwin''.']);
             end
 
         end
@@ -706,9 +708,10 @@ if isfield(control,'drifts')
         error('all time-dependent drifts must have the same number of time slices.');
     end
 
-    % In Hilbert space, disallow non-Hermitian drifts
-    if strcmp('zeeman-hilb',spin_system.bas.formalism)
-        
+    % Hilbert space and Goodwin's Hessian disallow non-Hermitian drifts
+    if strcmp('zeeman-hilb',spin_system.bas.formalism)||...
+       strcmp('goodwin',spin_system.control.method)
+
         % Over drift ensemble
         for n=1:numel(control.drifts)
 
@@ -722,7 +725,8 @@ if isfield(control,'drifts')
 
                 % Check the norms
                 if norm_a>1e-10*norm_b
-                    error('all drift generators must be Hermitian in Hilbert space.');
+                    error(['all drift generators must be Hermitian in Hilbert '...
+                           'space and under control.method=''goodwin''.']);
                 end
 
             end

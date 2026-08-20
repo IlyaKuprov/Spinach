@@ -1,11 +1,16 @@
-% Wigner D function basis set and rotation generators required by 
+% Wigner D function basis set and rotation generators required by
 % the SLE module. Syntax:
 %
-%        [Lx,Ly,Lz,D,space_basis]=sle_operators(max_rank)
+%     [Lx,Ly,Lz,D,space_basis]=sle_operators(max_rank,int_ranks)
 %
 % Parameters:
 %
 %     max_rank   - maximum L rank for Wigner D functions
+%
+%     int_ranks  - row vector of interaction ranks for which
+%                  product superoperators are required; may
+%                  be empty if only rotation generators are
+%                  needed
 %
 % Outputs:
 %
@@ -18,30 +23,37 @@
 %                 to be used in the building of the lab
 %                 space diffusion operator.
 %
-%     D         - a cell array of Wigner function product
-%                 superoperators, corresponding to multi-
-%                 plication by D[2,M,N] of the basis Wig-
-%                 ner functions, to be used in the build-
-%                 ing of the spin Hamiltonian operator.
+%     D         - a cell array with one element per interac-
+%                 tion rank r in int_ranks, each a cell array
+%                 of Wigner function product superoperators,
+%                 corresponding to multiplication by D[r,M,N]
+%                 of the basis Wigner functions, to be used
+%                 in the building of the spin Hamiltonian
+%                 operator; D{r} has dimensions (2r+1)x(2r+1)
 %
 % Automatic caching is implemented - the function would not re-
 % compute operator sets that it can find on disk.
+%
+% Note: building product superoperators for interaction ranks other
+%       than 2 calls clebsch_gordan.m, which requires the Java virtual
+%       machine; cached operator sets load without it.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 %
 % <https://spindynamics.org/wiki/index.php?title=sle_operators.m>
 
-function [Lx,Ly,Lz,D,space_basis]=sle_operators(max_rank)
+function [Lx,Ly,Lz,D,space_basis]=sle_operators(max_rank,int_ranks)
 
 % Check consistency
-grumble(max_rank);
+grumble(max_rank,int_ranks);
 
 % Generate cache record name
-own_path=mfilename('fullpath'); 
+own_path=mfilename('fullpath');
 own_path=own_path(1:(end-13));
 cache_file=[own_path 'sle_operators_rank_' ...
-            num2str(max_rank) '.mat'];
+            num2str(max_rank) '_int' ...
+            sprintf('_%d',int_ranks) '.mat'];
 
 % Check the cache
 if exist(cache_file,'file')
@@ -106,65 +118,79 @@ else
     clear('source_states','destin_states','matrix_elements','L','M','N',...
           'source_state_indices','destin_state_indices','Lp');
 
-    % Preallocate product action matrices for second-rank Wigner functions
-    D=cell(5);
+    % Preallocate product action matrices
+    D=cell(1,max([int_ranks 0]));
 
-    % Build the source state list
-    sources=kron(space_basis,ones(5,1));
-    
-    % Loop over the left projection index
-    for m=1:5
-        
-        % Loop over the right projection index
-        for n=1:5
-            
-            % Get the indices of the acting Wigner function
-            L1=2; M1=3-m; N1=3-n;
-            
-            % Preallocate destination state list
-            destinations=zeros(5*basis_dim,3);
-            
-            % Loop over the basis set
-            for k=1:basis_dim
-                
-                % Get the source indices
-                L2=space_basis(k,1); M2=space_basis(k,2); N2=space_basis(k,3);
-                
-                % Determine destination indices
-                ranks=((L2-L1):(L2+L1))';
-                prj_m=(M1+M2)*ones(size(ranks));
-                prj_n=(N1+N2)*ones(size(ranks));
-                
-                % Build the destination state list
-                destinations((5*(k-1)+1):(5*(k-1)+5),:)=[ranks prj_m prj_n];
-                
+    % Loop over the requested interaction ranks
+    for int_rank=int_ranks
+
+        % Preallocate the current rank
+        n_prj=2*int_rank+1; D{int_rank}=cell(n_prj);
+
+        % Build the source state list
+        sources=kron(space_basis,ones(n_prj,1));
+
+        % Loop over the left projection index
+        for m=1:n_prj
+
+            % Loop over the right projection index
+            for n=1:n_prj
+
+                % Get the indices of the acting Wigner function
+                L1=int_rank; M1=int_rank+1-m; N1=int_rank+1-n;
+
+                % Preallocate destination state list
+                destinations=zeros(n_prj*basis_dim,3);
+
+                % Loop over the basis set
+                for k=1:basis_dim
+
+                    % Get the source indices
+                    L2=space_basis(k,1); M2=space_basis(k,2); N2=space_basis(k,3);
+
+                    % Determine destination indices
+                    ranks=((L2-L1):(L2+L1))';
+                    prj_m=(M1+M2)*ones(size(ranks));
+                    prj_n=(N1+N2)*ones(size(ranks));
+
+                    % Build the destination state list
+                    destinations((n_prj*(k-1)+1):(n_prj*k),:)=[ranks prj_m prj_n];
+
+                end
+
+                % Screen source and destination lists
+                L=destinations(:,1); L2=sources(:,1);
+                M=destinations(:,2); M2=sources(:,2);
+                N=destinations(:,3); N2=sources(:,3);
+                hit_list=(L>=max(0,abs(L2-L1)))&(abs(M)<=L)&(abs(N)<=L)&(L<=max_rank);
+                L=L(hit_list); L1=L1*ones(size(L)); L2=L2(hit_list);
+                M=M(hit_list); M1=M1*ones(size(M)); M2=M2(hit_list);
+                N=N(hit_list); N1=N1*ones(size(N)); N2=N2(hit_list);
+
+                % Scaling factor equivalent to normalizing the Wigner D functions
+                normalization_factor=sqrt((2*L2+1)./(2*L+1));
+
+                % Compute the structure coefficients of the Wigner D functions
+                if int_rank==2
+                    matrix_elements=clebsch_gordan_bypass(L,M,L1,M1,L2,M2).*...
+                                    clebsch_gordan_bypass(L,N,L1,N1,L2,N2).*...
+                                    normalization_factor;
+                else
+                    matrix_elements=clebsch_gordan_general(L,M,L1,M1,L2,M2).*...
+                                    clebsch_gordan_general(L,N,L1,N1,L2,N2).*...
+                                    normalization_factor;
+                end
+
+                % Assign matrix elements
+                destin_state_indices=L.*(4*L.^2+6*(L-M)+5)/3-M-N+1;
+                source_state_indices=L2.*(4*L2.^2+6*(L2-M2)+5)/3-M2-N2+1;
+                D{int_rank}{m,n}=sparse(destin_state_indices,source_state_indices,...
+                                        matrix_elements,basis_dim,basis_dim);
+
             end
-            
-            % Screen source and destination lists
-            L=destinations(:,1); L2=sources(:,1); 
-            M=destinations(:,2); M2=sources(:,2);
-            N=destinations(:,3); N2=sources(:,3);
-            hit_list=(L>=max(0,abs(L2-L1)))&(abs(M)<=L)&(abs(N)<=L)&(L<=max_rank);
-            L=L(hit_list); L1=L1*ones(size(L)); L2=L2(hit_list);
-            M=M(hit_list); M1=M1*ones(size(M)); M2=M2(hit_list);
-            N=N(hit_list); N1=N1*ones(size(N)); N2=N2(hit_list);
-            
-            % Scaling factor for the structure coefficients that is equivalent 
-            % to normalizing the Wigner D functions used
-            normalization_factor=sqrt((2*L2+1)./(2*L+1));
-            
-            % Compute the structure coefficients of the Wigner D functions
-            matrix_elements=clebsch_gordan_bypass(L,M,L1,M1,L2,M2).*...
-                            clebsch_gordan_bypass(L,N,L1,N1,L2,N2).*...
-                            normalization_factor;
-                
-            % Assign matrix elements
-            destin_state_indices=L.*(4*L.^2+6*(L-M)+5)/3-M-N+1;
-            source_state_indices=L2.*(4*L2.^2+6*(L2-M2)+5)/3-M2-N2+1;
-            D{m,n}=sparse(destin_state_indices,source_state_indices,matrix_elements,basis_dim,basis_dim);
-                
+
         end
-        
+
     end
         
     try % Try to save a cache record, but don't insist
@@ -287,11 +313,31 @@ end
 
 end
 
+% General Clebsch-Gordan coefficients for arbitrary acting rank
+function cg=clebsch_gordan_general(L_array,M_array,L1,M1_array,L2_array,M2_array)
+
+% Preallocate the answer
+cg=zeros(size(L_array));
+
+% Compute the coefficients
+parfor n=1:numel(L_array)
+    cg(n)=clebsch_gordan(L_array(n),M_array(n),L1(n),...
+                         M1_array(n),L2_array(n),M2_array(n));
+end
+
+end
+
 % Consistency enforcement
-function grumble(max_rank)
+function grumble(max_rank,int_ranks)
 if (numel(max_rank)~=1)||(~isnumeric(max_rank))||(~isreal(max_rank))||...
    (max_rank<1)||(mod(max_rank,1)~=0)
     error('max_rank must be a real positive integer.');
+end
+if (~isnumeric(int_ranks))||(~isreal(int_ranks))||...
+   (~isempty(int_ranks)&&(~isrow(int_ranks)))||...
+   any(mod(int_ranks,1)~=0)||any(int_ranks<1)||...
+   (numel(unique(int_ranks))~=numel(int_ranks))
+    error('int_ranks must be a row vector of distinct positive integers.');
 end
 end
 

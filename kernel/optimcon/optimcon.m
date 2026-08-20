@@ -540,8 +540,29 @@ if isfield(control,'offsets')&&isfield(control,'off_ops')
         end
     end
 
+    % Goodwin's Hessian disallows non-Hermitian offset operators
+    if strcmp('goodwin',spin_system.control.method)
+
+        % Over offset channels
+        for n=1:numel(control.off_ops)
+
+            % Get pertinent norms
+            norm_a=cheap_norm(control.off_ops{n}-...
+                              control.off_ops{n}');
+            norm_b=cheap_norm(control.off_ops{n});
+
+            % Check the norms
+            if norm_a>1e-10*norm_b
+                error(['all offset operators must be Hermitian under '...
+                       'control.method=''goodwin''.']);
+            end
+
+        end
+
+    end
+
     % Absorb offset distributions
-    spin_system.control.offsets=control.offsets; 
+    spin_system.control.offsets=control.offsets;
     control=rmfield(control,'offsets');
 
     % Clean up and absorb offset operators

@@ -838,8 +838,8 @@ if ( ismember('t1_t2',spin_system.rlx.theories))&&...
     error('extended T1,T2 relaxation theory is only available for sphten-liouv formalism.');
 end
 if ( ismember('redfield',spin_system.rlx.theories))&&...
-   (~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'}))
-    error('Redfield relaxation theory is only available in Liouville space.');
+   (~strcmp(spin_system.bas.formalism,'sphten-liouv'))
+    error('Redfield relaxation theory is only available for sphten-liouv formalism.');
 end
 if ( ismember('naka-zwan',spin_system.rlx.theories))&&...
    (~strcmp(spin_system.bas.formalism,'sphten-liouv'))

@@ -279,6 +279,10 @@ switch spin_system.control.integrator
                 if n>1
                     P_cum{n}=P_cum{n}*P_cum{n-1};
                 end
+                if issparse(P_cum{n})&&(nnz(P_cum{n})>...
+                   spin_system.tols.dense_matrix*numel(P_cum{n}))
+                    P_cum{n}=full(P_cum{n});
+                end
             end
 
             % Take a time step forwards and backwards
@@ -632,15 +636,21 @@ if strcmp(spin_system.control.integrator,'rectangle')&&(n_outputs>3)
             % derivative trajectory
             bwd_dP=fliplr(bwd_dP);
 
+            % Preallocate conditioning flags
+            ill_cond=false(1,nsteps);
+
             % Loop over timesteps
             parfor n=1:nsteps
+
+                % Factorise the cumulative propagator and flag conditioning
+                P_cum_fact=decomposition(P_cum{n});
+                ill_cond(n)=isIllConditioned(P_cum_fact);
 
                 % Loop over controls
                 for k=1:nctrls
 
-                    % Invert forward derivatives back
-                    % to first time step
-                    fwd_dP{k,n}=P_cum{n}\fwd_dP{k,n};
+                    % Invert forward derivatives back to first time step
+                    fwd_dP{k,n}=P_cum_fact\fwd_dP{k,n};
 
                     % From second step
                     if n>1
@@ -653,6 +663,14 @@ if strcmp(spin_system.control.integrator,'rectangle')&&(n_outputs>3)
 
                 end
 
+            end
+
+            % Ill-conditioned cumulative propagators cost Hessian accuracy
+            if any(ill_cond)
+                report(spin_system,['WARNING - ill-conditioned cumulative '...
+                                    'propagator at ' num2str(nnz(ill_cond))...
+                                    ' of ' num2str(nsteps) ' time steps, '...
+                                    'Hessian accuracy is reduced.']);
             end
 
             % Flip the backward trajectory

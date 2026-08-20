@@ -61,7 +61,7 @@ grumble(spin_system,parameters,H,R,K);
 % Damp unit state and check
 R(1,1)=-mean(abs(diag(R))); Rc=condest(R);
 if Rc>1e9, error('R must be non-singular.'); end
-if ismember('redfield',spin_system.rlx.theories)&&...
+if any(ismember({'redfield','naka-zwan'},spin_system.rlx.theories))&&...
            (Rc>1/spin_system.tols.rlx_integration)
     error('R acuracy too low, reduce spin_system.tols.rlx_integration');
 end

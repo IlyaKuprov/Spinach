@@ -278,8 +278,6 @@ switch spin_system.control.integrator
                 P_cum{n}=propagator(ss_parfor,L_forw{n},dt(n));
                 if n>1
                     P_cum{n}=P_cum{n}*P_cum{n-1};
-                    P_cum{n}=clean_up(spin_system,P_cum{n},...
-                                      spin_system.tols.prop_chop);
                 end
             end
 
@@ -640,9 +638,9 @@ if strcmp(spin_system.control.integrator,'rectangle')&&(n_outputs>3)
                 % Loop over controls
                 for k=1:nctrls
 
-                    % Propagate forward derivatives
+                    % Invert forward derivatives back
                     % to first time step
-                    fwd_dP{k,n}=P_cum{n}'*fwd_dP{k,n};
+                    fwd_dP{k,n}=P_cum{n}\fwd_dP{k,n};
 
                     % From second step
                     if n>1

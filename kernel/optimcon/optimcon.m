@@ -958,6 +958,10 @@ if isfield(control,'keyholes')
     if ~iscell(control.keyholes)
         error('control.keyholes must be a cell array.');
     end
+    if numel(control.keyholes)~=spin_system.control.pulse_ntpts
+        error(['control.keyholes must have ' ...
+               int2str(spin_system.control.pulse_ntpts) ' elements.']);
+    end
     for n=1:numel(control.keyholes)
         if (~isempty(control.keyholes{n}))&&(~isa(control.keyholes{n},'function_handle'))
             error('non-empty elements of control.keyholes must be function handles.');

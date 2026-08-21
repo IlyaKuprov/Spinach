@@ -289,10 +289,10 @@ end
         err=norm(theo_pcs-expt_pcs,2)^2; err_ls=err;
         
         % Compute contrast functional
-        if parameters.sharpen>0
-            pivot=max(abs(den))/2; pden=den/pivot; 
+        if (parameters.sharpen>0)&&any(den)
+            pivot=max(abs(den))/2; pden=den/pivot;
             reg_a=contrast_scaling*parameters.sharpen*...
-                  sum((pden.^2).*exp(-pden.^2)); 
+                  sum((pden.^2).*exp(-pden.^2));
             err=err+reg_a; clear('pden');
         else
             reg_a=0;
@@ -317,11 +317,17 @@ end
             grad_err=2*1e6*reshape(real(ifftn(S.*fftn_dx)),[npoints^3 1])/probdens_scaling;
             
             % Add contrast gradient (ugly interpolation over the singularity)
-            if parameters.sharpen>0
+            if (parameters.sharpen>0)&&any(den)
                 [pivot,where]=max(abs(den)); pivot=pivot/2; pden=den/pivot;
                 grad_cont=2*contrast_scaling*parameters.sharpen*...
                             exp(-pden.^2).*pden.*(1-pden.^2)/pivot;
-                grad_cont(where)=(grad_cont(where+1)+grad_cont(where-1))/2; 
+                if where==1
+                    grad_cont(where)=grad_cont(where+1);
+                elseif where==numel(grad_cont)
+                    grad_cont(where)=grad_cont(where-1);
+                else
+                    grad_cont(where)=(grad_cont(where+1)+grad_cont(where-1))/2;
+                end
                 grad_err=grad_err+grad_cont; clear('grad_cont','pden');
             end
             

@@ -1113,8 +1113,11 @@ if isfield(control,'budget')
 
     % Input validation
     if (~isnumeric(control.budget))||(~isreal(control.budget))||...
-       (~isscalar(control.budget))||(control.budget<=0)
+       (~isscalar(control.budget))||isnan(control.budget)||(control.budget<=0)
         error('control.budget must be a positive real scalar.');
+    end
+    if isfinite(control.budget)&&(control.budget>1)&&(mod(control.budget,1)~=0)
+        error('a control.budget above one must be an integer member count.');
     end
 
     % Absorb ensemble budget

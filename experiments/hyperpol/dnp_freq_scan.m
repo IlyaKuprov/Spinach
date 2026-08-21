@@ -58,8 +58,22 @@ function dnp=dnp_freq_scan(spin_system,parameters,H,R,K)
 % Check consistency
 grumble(spin_system,parameters,H,R,K);
 
-% Damp unit state and check
-R(1,1)=-mean(abs(diag(R))); Rc=condest(R);
+% Damp the trace direction and check
+switch spin_system.bas.formalism
+
+    case 'sphten-liouv'
+
+        % Unit state carries the trace
+        R(1,1)=-mean(abs(diag(R)));
+
+    case 'zeeman-liouv'
+
+        % Trace direction is the stretched unit matrix
+        dim=sqrt(size(R,1)); u0=speye(dim); u0=u0(:);
+        R=R-(mean(abs(diag(R)))/dim)*(u0*u0');
+
+end
+Rc=condest(R);
 if Rc>1e9, error('R must be non-singular.'); end
 if any(ismember({'redfield','naka-zwan'},spin_system.rlx.theories))&&...
            (Rc>1/spin_system.tols.rlx_integration)
@@ -199,8 +213,8 @@ end
 
 % Consistency checking
 function grumble(spin_system,parameters,H,R,K)
-if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
-    error('this function is only available for sphten-liouv formalism.');
+if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
+    error('this function is only available for sphten-liouv and zeeman-liouv formalisms.');
 end
 if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))

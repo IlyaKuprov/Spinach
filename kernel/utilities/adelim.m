@@ -5,7 +5,7 @@
 %
 % Parameters:
 %
-%   L        - Liouvillian in sphten-liouv formalism,
+%   L        - Liouvillian in a Liouville space formalism,
 %              fast subbsystem must be dissipative
 %
 %   fast_idx - a vector of integers specifying which
@@ -27,9 +27,10 @@
 %              ce the fast subspace is adiabatically
 %              eliminated
 %
-% Note: the function needs sphten-liouv formalism because
-%       there the basis states are attributable to indivi-
-%       dual spins.
+% Note: in sphten-liouv the basis states are attributable to
+%       individual spins; in zeeman-liouv the caller must
+%       supply index sets that are meaningful in the Zeeman
+%       basis of Liouville space.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -57,8 +58,8 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,L,fast_idx,slow_idx)
-if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
-    error('adiabatic elimination is only available for sphten-liouv formalism.');
+if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
+    error('adiabatic elimination is only available for sphten-liouv and zeeman-liouv formalisms.');
 end
 if (~isnumeric(L))||(size(L,1)~=size(L,2))
     error('L must be a square matrix.');

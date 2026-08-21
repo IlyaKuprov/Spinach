@@ -26,8 +26,12 @@
 % Note: this function is an analytical equivalent of a perfect decoup-
 %       ling pulse sequence on the specified spins.
 %
-% Note: this function requires sphten-liouv formalism and supports Fok-
-%       ker-Planck direct products.
+% Note: this function requires sphten-liouv or zeeman-liouv formalism
+%       and supports Fokker-Planck direct products. In zeeman-liouv the
+%       operation is an exact projection onto the subspace where the
+%       decoupled spins carry only their identity component, because
+%       spin involvement is not diagonal in the Zeeman basis of the
+%       Liouville space.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -43,42 +47,92 @@ grumble(spin_system,L,rho,spins);
 
 % Find the spins to be decoupled
 if isnumeric(spins)
-    
+
     % Find spins by numbers
     dec_mask=false(1,spin_system.comp.nspins); dec_mask(spins)=true;
-    
+
 else
-    
+
     % Find spins by name
     dec_mask=ismember(spin_system.comp.isotopes,spins);
-    
+
 end
 
 % Inform the user
 report(spin_system,[num2str(nnz(dec_mask)) ' spins to be frozen and depopulated.']);
-                
-% Get the list of states to be wiped
-zero_mask=(sum(spin_system.bas.basis(:,dec_mask),2)~=0);
+
+% Build the wipeout machinery
+switch spin_system.bas.formalism
+
+    case 'sphten-liouv'
+
+        % Get the list of states to be wiped
+        zero_mask=(sum(spin_system.bas.basis(:,dec_mask),2)~=0);
+
+        % Get the spin space dimension
+        spn_dim=size(spin_system.bas.basis,1);
+
+    case 'zeeman-liouv'
+
+        % Hilbert space dimension and multiplicities
+        dim=prod(spin_system.comp.mults);
+        mults=spin_system.comp.mults;
+
+        % Identity component projector of the decoupled spins
+        P=speye(dim^2);
+        for n=find(dec_mask)
+            idch=sparse(dim^2,dim^2);
+            for p=1:mults(n)
+                for q=1:mults(n)
+                    A=kron(kron(speye(prod(mults(1:(n-1)))),...
+                                sparse(p,q,1,mults(n),mults(n))),...
+                           speye(prod(mults((n+1):end))));
+                    idch=idch+kron(conj(A),A)/mults(n);
+                end
+            end
+            P=P*idch;
+        end
+
+        % Get the spin space dimension
+        spn_dim=dim^2;
+
+end
 
 % Process the Liouvillian
 if (nargout>0)&&(~isempty(L))
-    
+
     % Get dimension statistics
-    spn_dim=size(spin_system.bas.basis,1); 
     spc_dim=size(L,1)/spn_dim;
-    
-    % Kron the list into the Fokker-Planck space
-    fp_zero_mask=logical(kron(ones(spc_dim,1),zero_mask));
 
     % Inform the user
     report(spin_system,['space sub-problem dimension: ' num2str(spc_dim)]);
     report(spin_system,['spin sub-problem dimension:  ' num2str(spn_dim)]);
-    report(spin_system,['zeroing ' num2str(nnz(fp_zero_mask))...
-                        ' rows and columns in the Liouvillian.']);
 
-    % Apply the zero mask
-    L(fp_zero_mask,:)=0; L(:,fp_zero_mask)=0;
-    
+    % Apply the wipeout machinery
+    switch spin_system.bas.formalism
+
+        case 'sphten-liouv'
+
+            % Kron the list into the Fokker-Planck space
+            fp_zero_mask=logical(kron(ones(spc_dim,1),zero_mask));
+
+            % Inform the user
+            report(spin_system,['zeroing ' num2str(nnz(fp_zero_mask))...
+                                ' rows and columns in the Liouvillian.']);
+
+            % Apply the zero mask
+            L(fp_zero_mask,:)=0; L(:,fp_zero_mask)=0;
+
+        case 'zeeman-liouv'
+
+            % Kron the projector into the Fokker-Planck space
+            fp_proj=kron(speye(spc_dim),P);
+
+            % Apply the projector from both sides
+            L=fp_proj*L*fp_proj;
+
+    end
+
     % Re-evaluate sparsity
     L=clean_up(spin_system,L,spin_system.tols.liouv_zero);
 
@@ -86,31 +140,47 @@ end
 
 % Process state vector stack
 if (nargout>1)&&(~isempty(rho))
-    
+
     % Get dimension statistics
-    spn_dim=size(spin_system.bas.basis,1); 
     spc_dim=size(rho,1)/spn_dim;
 
-    % Kron the list into the Fokker-Planck space
-    fp_zero_mask=logical(kron(ones(spc_dim,1),zero_mask));
-    
     % Inform the user
     report(spin_system,['space sub-problem dimension: ' num2str(spc_dim)]);
     report(spin_system,['spin sub-problem dimension:  ' num2str(spn_dim)]);
-    report(spin_system,['zeroing ' num2str(nnz(fp_zero_mask))...
-                        ' rows in the state vector.']);
-                    
-    % Apply the zero mask
-    rho(fp_zero_mask,:)=0;
-    
+
+    % Apply the wipeout machinery
+    switch spin_system.bas.formalism
+
+        case 'sphten-liouv'
+
+            % Kron the list into the Fokker-Planck space
+            fp_zero_mask=logical(kron(ones(spc_dim,1),zero_mask));
+
+            % Inform the user
+            report(spin_system,['zeroing ' num2str(nnz(fp_zero_mask))...
+                                ' rows in the state vector.']);
+
+            % Apply the zero mask
+            rho(fp_zero_mask,:)=0;
+
+        case 'zeeman-liouv'
+
+            % Kron the projector into the Fokker-Planck space
+            fp_proj=kron(speye(spc_dim),P);
+
+            % Apply the projector
+            rho=fp_proj*rho;
+
+    end
+
 end
 
 end
 
 % Consistency enforcement
 function grumble(spin_system,L,rho,spins)
-if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
-    error('analytical decoupling is only available for sphten-liouv formalism.');
+if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
+    error('analytical decoupling is only available for sphten-liouv and zeeman-liouv formalisms.');
 end
 if (~isempty(rho))&&(~isempty(L))&&(size(L,2)~=size(rho,1))
     error('matrix dimensions of L and rho must agree.');

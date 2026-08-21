@@ -25,8 +25,8 @@
 %   rho     - the state vector with the undesired orders of
 %             spin correlations zeroed out
 %
-% Note: this function requires sphten-liouv formalism and supports Fok-
-%       ker-Planck direct products.
+% Note: this function requires sphten-liouv or zeeman-liouv formalism
+%       and supports Fokker-Planck direct products.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -39,15 +39,44 @@ function rho=coherence(spin_system,rho,spec)
 grumble(spin_system,rho,spec);
 
 % Store dimension statistics
-spn_dim=size(spin_system.bas.basis,1);
+switch spin_system.bas.formalism
+    case 'sphten-liouv'
+        spn_dim=size(spin_system.bas.basis,1);
+    case 'zeeman-liouv'
+        spn_dim=prod(spin_system.comp.mults)^2;
+end
 spc_dim=numel(rho)/spn_dim;
 problem_dims=size(rho);
 
 % Fold indirect dimensions
 rho=reshape(rho,[spn_dim spc_dim]);
 
-% Compute projection quantum numbers of basis states
-[~,M]=lin2lm(spin_system.bas.basis);
+% Compute coherence order bookkeeping array
+switch spin_system.bas.formalism
+
+    case 'sphten-liouv'
+
+        % Projection quantum numbers of basis states
+        [~,M]=lin2lm(spin_system.bas.basis);
+
+    case 'zeeman-liouv'
+
+        % Hilbert space dimension and multiplicities
+        dim=prod(spin_system.comp.mults);
+        mults=spin_system.comp.mults;
+
+        % Zeeman projection quantum numbers of Hilbert space states
+        Mh=zeros(dim,numel(mults));
+        for n=1:numel(mults)
+            Mh(:,n)=kron(kron(ones(prod(mults(1:(n-1))),1),...
+                              ((mults(n)-1)/2:-1:-(mults(n)-1)/2)'),...
+                         ones(prod(mults((n+1):end)),1));
+        end
+
+        % Coherence orders of stretched density matrix elements
+        M=kron(ones(dim,1),Mh)-kron(Mh,ones(dim,1));
+
+end
 
 % Preallocate state mask array
 state_mask=false(spn_dim,numel(spec));
@@ -102,13 +131,18 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,rho,spec)
-if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
-    error('analytical coherence order selection is only available for sphten-liouv formalism.');
+if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
+    error('analytical coherence order selection is only available for sphten-liouv and zeeman-liouv formalisms.');
 end
 if ~isnumeric(rho)
     error('the state vector(s) must be numeric.');
 end
-if mod(numel(rho),size(spin_system.bas.basis,1))~=0
+if strcmp(spin_system.bas.formalism,'sphten-liouv')
+    spn_dim=size(spin_system.bas.basis,1);
+else
+    spn_dim=prod(spin_system.comp.mults)^2;
+end
+if mod(numel(rho),spn_dim)~=0
     error('the number of elements in rho must be a multiple of the dimension of the spin state space.');
 end
 if ~iscell(spec)

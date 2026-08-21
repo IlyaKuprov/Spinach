@@ -39,9 +39,13 @@ classdef (InferiorClasses={?gpuArray}) opium
         end
         
         % Number of non-zeroes
-        function n=nnz(op) %#ok<MANU>
+        function n=nnz(op)
             
-            n=1; % Always
+            if op.coeff==0
+                n=0;
+            else
+                n=1;
+            end
             
         end
         

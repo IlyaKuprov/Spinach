@@ -87,9 +87,6 @@ for n=1:numel(Q)
     end
 end
     
-% Final clean-up
-R=clean_up(spin_system,R,1e-2*spin_system.tols.rlx_zero);
-
 % Deallocate variables
 clear('Q','L0','R_int','weights','rates','states');
 

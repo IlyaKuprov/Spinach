@@ -30,18 +30,17 @@ grumble(spin_system,R);
 % Interpret the basis
 [L,M]=lin2lm(spin_system.bas.basis);
 
-% Index single- and multi-spin orders (sso and mso)
+% Index single-spin orders
 sso_mask=(sum(logical(spin_system.bas.basis),2)==1);
-mso_mask=(sum(logical(spin_system.bas.basis),2)>1 );
 
-% Index longlitudinal and transverse states
+% Index longitudinal and transverse states
 long_sso_mask=any((L>0)&(M==0),2)&sso_mask;
 tran_sso_mask=any((L>0)&(M~=0),2)&sso_mask;
 
 % Split the relaxation superoperator
-R1=R; R1(~long_sso_mask,~long_sso_mask)=0;
-R2=R; R2(~tran_sso_mask,~tran_sso_mask)=0;
-Rm=R; Rm(~mso_mask,~mso_mask)=0;
+R1=0*R; R1(long_sso_mask,long_sso_mask)=R(long_sso_mask,long_sso_mask);
+R2=0*R; R2(tran_sso_mask,tran_sso_mask)=R(tran_sso_mask,tran_sso_mask);
+Rm=R-R1-R2;
 
 end
 

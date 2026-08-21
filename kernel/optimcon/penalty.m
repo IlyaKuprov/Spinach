@@ -239,6 +239,9 @@ end
 if ~ischar(type)
     error('type must be a character string.');
 end
+if strcmp(type,'DNS')&&(size(wf,2)<5)
+    error('DNS penalty needs at least five waveform time points.');
+end
 if strcmp(type,'SNSA')&&((~isscalar(fb))||(~isscalar(cb)))
     error('SNSA bounds must be scalar.');
 end

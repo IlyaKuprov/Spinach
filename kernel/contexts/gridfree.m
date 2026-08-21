@@ -90,17 +90,28 @@ grumble(spin_system,pulse_sequence,parameters,assumptions);
 % Report to the user
 report(spin_system,'building the Liouvillian...');
 
-% Get spatial operators
-[Lx,Ly,Lz,D,~]=sle_operators(parameters.max_rank);
-
 % Set the assumptions
 spin_system=assume(spin_system,assumptions);
 
 % Get the Hamiltonian
 [H,Q]=hamiltonian(spin_system);
 
-% Disallow giant spin
-if numel(Q)>2, error('giant spin model is not supported in this module.'); end
+% Detect non-empty spherical ranks
+int_ranks=[];
+for r=1:numel(Q)
+    if any(cellfun(@nnz,Q{r}),'all')
+        int_ranks=[int_ranks r]; %#ok<AGROW>
+    end
+end
+report(spin_system,['non-empty spherical ranks in Q: ' num2str(int_ranks)]);
+
+% Warn about spatially truncated interaction ranks
+if any(int_ranks>parameters.max_rank)
+    report(spin_system,'WARNING - max_rank is below an interaction rank, its anisotropy is truncated.');
+end
+
+% Get spatial operators
+[Lx,Ly,Lz,D,~]=sle_operators(parameters.max_rank,int_ranks);
 
 % Apply offsets
 H=frqoffset(spin_system,H,parameters);
@@ -140,10 +151,12 @@ H=polyadic({{speye(spc_dim),H}});
 R=polyadic({{speye(spc_dim),R}});
 K=polyadic({{speye(spc_dim),K}});
 
-% Add anisotropic parts
-for k=1:5
-    for m=1:5
-        H=H+polyadic({{D{k,m},Q{2}{k,m}}});
+% Add anisotropic parts of every non-empty rank
+for r=int_ranks
+    for k=1:(2*r+1)
+        for m=1:(2*r+1)
+            H=H+polyadic({{D{r}{k,m},Q{r}{k,m}}});
+        end
     end
 end
 

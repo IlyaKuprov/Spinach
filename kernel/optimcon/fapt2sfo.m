@@ -33,7 +33,7 @@
 function [wave,dt,time_grid]=fapt2sfo(fapt,time_grid)
 
 % Check consistency
-grumble(fapt);
+grumble(fapt,exist('time_grid','var'));
 
 % Make time grid if not provided
 if ~exist('time_grid','var')
@@ -43,11 +43,6 @@ if ~exist('time_grid','var')
 
     % Find the end time of the sequence
     end_time=max(cellfun(@(x)x(5),fapt));
-
-    % Refuse zero-frequency sequences without a grid
-    if max_freq==0
-        error('all frequencies in fapt are zero, an explicit time_grid must be supplied.');
-    end
 
     % Get the time grid with dt < half Nyquist
     dt_hN=1/(4*max_freq); npts=ceil(end_time/dt_hN)+1;
@@ -89,7 +84,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(fapt)
+function grumble(fapt,have_grid)
 if ~iscell(fapt)
     error('fapt must be a cell array of five-element vectors.');
 end
@@ -103,6 +98,9 @@ for n=1:numel(fapt)
     if fapt{n}(4)>=fapt{n}(5)
         error('end time precedes start time in fapt.');
     end
+end
+if (~have_grid)&&(max(abs(cellfun(@(x)x(1),fapt)))==0)
+    error('all frequencies in fapt are zero, an explicit time_grid must be supplied.');
 end
 end
 

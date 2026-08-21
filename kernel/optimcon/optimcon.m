@@ -526,6 +526,9 @@ if isfield(control,'offsets')&&isfield(control,'off_ops')
            (size(control.off_ops{n},1)~=size(control.off_ops{n},2))
             error('elements of control.off_ops must be square matrices.');
         end
+        if size(control.off_ops{n},1)~=size(spin_system.control.operators{1},1)
+            error('control.off_ops must have the same dimension as the control operators.');
+        end
     end
 
     % Reject non-Hermitian offsets where unitarity is required
@@ -633,6 +636,9 @@ if isfield(control,'carrier_ops')
             size(control.carrier_ops{n},2))
             error('elements of control.carrier_ops must be square matrices.');
         end
+        if size(control.carrier_ops{n},1)~=size(spin_system.control.operators{1},1)
+            error('control.carrier_ops must have the same dimension as the control operators.');
+        end
     end
     if ~isfield(control,'carrier_frq')
         error('control.carrier_ops and control.carrier_frq are required simultaneously.');
@@ -695,6 +701,10 @@ if isfield(control,'drifts')
         if (numel(control.drifts{n})~=1)&&(numel(control.drifts{n})~=spin_system.control.pulse_ntpts)
             error(['need either 1 or ' int2str(spin_system.control.pulse_ntpts) ' elements in control.drift{' ...
                    int2str(n) '}, found ' int2str(numel(control.drifts{n})) ' elements.']);
+        end
+        if ~all(cellfun(@(m)isequal(size(m),size(spin_system.control.operators{1})),...
+                        control.drifts{n}(:)))
+            error('drift generators must have the same dimension as the control operators.');
         end
     end
     if ~all(cellfun(@numel,control.drifts(:))==numel(control.drifts{1}))

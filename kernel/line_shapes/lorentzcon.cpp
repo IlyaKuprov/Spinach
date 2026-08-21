@@ -194,15 +194,15 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
 
     if (n_offs==3)
     {
-        const double norm_offs=std::sqrt(offs[0]*offs[0]+offs[1]*offs[1]+offs[2]*offs[2]);
-        const double sim_tol=std::sqrt(std::numeric_limits<double>::epsilon())*norm_offs;
+        const double sim_tol=std::sqrt(std::numeric_limits<double>::epsilon())*
+                             std::sqrt(offs[0]*offs[0]+offs[1]*offs[1]+offs[2]*offs[2]);
 
-        if (offs[2]-offs[0]<sim_tol)
+        if (offs[2]-offs[0]<=sim_tol)
         {
             plan.mode=0;
             plan.centre=(offs[0]+offs[1]+offs[2])/3.0;
         }
-        else if (offs[1]-offs[0]<sim_tol)
+        else if (offs[1]-offs[0]<=sim_tol)
         {
             plan.mode=2;
             plan.edge0=0.5*(offs[0]+offs[1]);
@@ -212,7 +212,7 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
             plan.coef0=two_ampl_pi/den;
             plan.coef_log0=ampl_gam_pi/den;
         }
-        else if (offs[2]-offs[1]<sim_tol)
+        else if (offs[2]-offs[1]<=sim_tol)
         {
             plan.mode=3;
             plan.edge0=offs[0];

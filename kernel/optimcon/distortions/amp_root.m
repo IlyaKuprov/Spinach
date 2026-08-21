@@ -130,8 +130,9 @@ if (~isnumeric(w))||(~isreal(w))||(mod(size(w,1),2)~=0)
     error('w must be an array of reals with an even number of rows.');
 end
 if (~isnumeric(sat_lvls))||(~isreal(sat_lvls))||...
-   (numel(sat_lvls)~=size(w,1)/2)||any(sat_lvls<=0,'all')
-    error('sat_lvls must be a real array with one element per XY channel pair.');
+   (numel(sat_lvls)~=size(w,1)/2)||any(~isfinite(sat_lvls),'all')||...
+   any(sat_lvls<=0,'all')
+    error('sat_lvls must be a finite positive real array with one element per XY channel pair.');
 end
 if (~isnumeric(s))||(~isreal(s))||(numel(s)~=size(w,1)/2)||...
    any(mod(s,1)~=0,'all')||any(s<1,'all')

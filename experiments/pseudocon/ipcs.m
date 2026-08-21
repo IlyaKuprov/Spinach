@@ -221,6 +221,11 @@ else
        
 end
 
+% Refuse a zero starting density under the contrast term
+if (parameters.sharpen>0)&&(~any(guess))
+    error('the initial density is identically zero, the contrast functional is undefined there.');
+end
+
 % Generate Fourier derivative multipliers
 [X,Y,Z]=ndgrid(fftdiff(1,npoints,1),fftdiff(1,npoints,1),fftdiff(1,npoints,1));
 
@@ -290,9 +295,12 @@ end
         
         % Compute contrast functional
         if parameters.sharpen>0
-            pivot=max(abs(den))/2; pden=den/pivot; 
+            if ~any(den)
+                error('density is identically zero, the contrast functional is undefined.');
+            end
+            pivot=max(abs(den))/2; pden=den/pivot;
             reg_a=contrast_scaling*parameters.sharpen*...
-                  sum((pden.^2).*exp(-pden.^2)); 
+                  sum((pden.^2).*exp(-pden.^2));
             err=err+reg_a; clear('pden');
         else
             reg_a=0;
@@ -318,10 +326,19 @@ end
             
             % Add contrast gradient (ugly interpolation over the singularity)
             if parameters.sharpen>0
+                if ~any(den)
+                    error('density is identically zero, the contrast functional is undefined.');
+                end
                 [pivot,where]=max(abs(den)); pivot=pivot/2; pden=den/pivot;
                 grad_cont=2*contrast_scaling*parameters.sharpen*...
                             exp(-pden.^2).*pden.*(1-pden.^2)/pivot;
-                grad_cont(where)=(grad_cont(where+1)+grad_cont(where-1))/2; 
+                if where==1
+                    grad_cont(where)=grad_cont(where+1);
+                elseif where==numel(grad_cont)
+                    grad_cont(where)=grad_cont(where-1);
+                else
+                    grad_cont(where)=(grad_cont(where+1)+grad_cont(where-1))/2;
+                end
                 grad_err=grad_err+grad_cont; clear('grad_cont','pden');
             end
             
@@ -422,10 +439,19 @@ end
             
             % Add contrast Hessian (ugly interpolation over the singularity)
             if parameters.sharpen>0
+                if ~any(den_x)
+                    error('density is identically zero, the contrast functional is undefined.');
+                end
                 [pivot,where]=max(abs(den_x)); pivot=pivot/2; pden_x=den_x/pivot;
                 hess_cont=2*contrast_scaling*parameters.sharpen*(1/pivot^2)*...
                             exp(-pden_x.^2).*(1-5*pden_x.^2+2*pden_x.^4).*den_v;
-                hess_cont(where)=(hess_cont(where+1)+hess_cont(where-1))/2;
+                if where==1
+                    hess_cont(where)=hess_cont(where+1);
+                elseif where==numel(hess_cont)
+                    hess_cont(where)=hess_cont(where-1);
+                else
+                    hess_cont(where)=(hess_cont(where+1)+hess_cont(where-1))/2;
+                end
                 y(:,n)=y(:,n)+hess_cont;
             end
             

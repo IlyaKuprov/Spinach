@@ -109,7 +109,10 @@ if ismember('redfield',spin_system.rlx.theories)
     % Get the rotational basis, including the non-secular terms
     report(spin_system,'computing the lab frame Hamiltonian superoperator...');
     [L0,Q]=hamiltonian(assume(spin_system,'labframe')); %#ok<ASGLU>
-    
+
+    % Redfield theory is the on-shell kernel at zero shift
+    rlx_onshell=true; rlx_shift=0; %#ok<NASGU>
+
     % Compute Redfield integral
     if isworkernode||ismember('asyredf',spin_system.sys.disable)
         report(spin_system,'serial evaluation path...');
@@ -118,7 +121,7 @@ if ismember('redfield',spin_system.rlx.theories)
         report(spin_system,'parallel evaluation path...');
         redfield_integral_async;
     end
-    
+
     % Catch abuse of Redfield theory
     max_rate=max(abs(diag(R)));
     for n=1:numel(spin_system.rlx.tau_c)
@@ -132,7 +135,89 @@ if ismember('redfield',spin_system.rlx.theories)
     % Report the wall clock time
     report(spin_system,['Redfield superoperator build time: ' ...
                          num2str(toc(timer_redfield)) ' seconds']);
-    
+
+end
+
+% Add Nakajima-Zwanzig terms
+if ismember('naka-zwan',spin_system.rlx.theories)
+
+    % Update the user and get the timer going
+    report(spin_system,'Nakajima-Zwanzig theory (rotational diffusion).');
+    timer_nz=tic;
+
+    % Catch zero correlation times
+    for n=1:numel(spin_system.rlx.tau_c)
+        if ~any(spin_system.rlx.tau_c{n},'all')
+            error('zero rotational correlation times are not supported.');
+        end
+    end
+
+    % Resolve the kernel evaluation point from radical pair kinetics
+    if ischar(spin_system.rlx.nz_shift)
+        switch spin_system.chem.rp_theory
+            case 'exponential'
+                rlx_shift=sum(spin_system.chem.rp_rates);
+            case {'haberkorn','jones-hore'}
+                rlx_shift=sum(spin_system.chem.rp_rates)/2;
+                report(spin_system,'scalar lifetime shift, state-selective recombination approximated');
+            otherwise
+                error('nz_shift=''chem'' requires radical pair kinetics in inter.chem.');
+        end
+    else
+        rlx_shift=spin_system.rlx.nz_shift;
+    end
+
+    % Absorb the kernel form switch
+    rlx_onshell=spin_system.rlx.nz_onshell;
+
+    % Report the kernel form and the evaluation point
+    if rlx_onshell, kern_form='on-shell'; else, kern_form='off-shell'; end
+    report(spin_system,['NZ kernel form: ' kern_form ', evaluation point (Hz): ' num2str(rlx_shift)]);
+
+    % Recommend keeping the dynamic frequency shift
+    if (rlx_shift~=0)&&(~strcmp(spin_system.rlx.dfs,'keep'))
+        report(spin_system,'WARNING - imaginary parts are physical at a nonzero evaluation point, consider rlx_dfs=''keep''.');
+    end
+
+    % Get the rotational basis, including the non-secular terms
+    report(spin_system,'computing the lab frame Hamiltonian superoperator...');
+    [L0,Q]=hamiltonian(assume(spin_system,'labframe')); %#ok<ASGLU>
+
+    % Report the coherence damping caveat of the off-shell kernel
+    if ~rlx_onshell
+        for n=1:numel(spin_system.rlx.tau_c)
+            omega_tau=cheap_norm(L0)*max(spin_system.rlx.tau_c{n});
+            report(spin_system,['off-shell kernel, species ' num2str(n) ...
+                                ', max|omega|*tau_c upper bound: ' num2str(omega_tau)]);
+            if omega_tau>1
+                report(spin_system,'WARNING - coherence damping differs from Redfield outside |omega|*tau_c<1.');
+            end
+        end
+    end
+
+    % Compute the Nakajima-Zwanzig integral
+    if isworkernode||ismember('asyredf',spin_system.sys.disable)
+        report(spin_system,'serial evaluation path...');
+        redfield_integral_serial;
+    else
+        report(spin_system,'parallel evaluation path...');
+        redfield_integral_async;
+    end
+
+    % Catch abuse of the Born approximation
+    max_rate=max(abs(diag(R)));
+    for n=1:numel(spin_system.rlx.tau_c)
+        if (1/max_rate)<spin_system.rlx.tau_c{n}
+            report(spin_system,['1/max(diag(R)) = ' num2str(1/max_rate) ...
+                                ', tau_c = ' num2str(spin_system.rlx.tau_c{n})]);
+            error('T1,2>>tau_c validity condition violation in Nakajima-Zwanzig theory');
+        end
+    end
+
+    % Report the wall clock time
+    report(spin_system,['Nakajima-Zwanzig superoperator build time: ' ...
+                         num2str(toc(timer_nz)) ' seconds']);
+
 end
         
 % Add Lindblad terms
@@ -739,9 +824,14 @@ if ~iscell(spin_system.rlx.theories)||any(~cellfun(@ischar,spin_system.rlx.theor
 end
 for n=1:numel(spin_system.rlx.theories)
     if ~ismember(spin_system.rlx.theories{n},{'none','damp','t1_t2','SRSK','SRFK'...
-                                              'redfield','lindblad','nottingham','weizmann'})
+                                              'redfield','lindblad','nottingham',...
+                                              'weizmann','naka-zwan'})
         error('unrecognised relaxation theory specification.');
     end
+end
+if ismember('redfield',spin_system.rlx.theories)&&...
+   ismember('naka-zwan',spin_system.rlx.theories)
+    error('redfield and naka-zwan are alternative evaluations of the same kernel, specify one.');
 end
 if ( ismember('t1_t2',spin_system.rlx.theories))&&...
    (~ismember(spin_system.bas.formalism,{'sphten-liouv'}))
@@ -750,6 +840,14 @@ end
 if ( ismember('redfield',spin_system.rlx.theories))&&...
    (~ismember(spin_system.bas.formalism,{'sphten-liouv'}))
     error('Redfield relaxation theory is only available for sphten-liouv formalism.');
+end
+if ( ismember('naka-zwan',spin_system.rlx.theories))&&...
+   (~ismember(spin_system.bas.formalism,{'sphten-liouv'}))
+    error('Nakajima-Zwanzig relaxation theory is only available for sphten-liouv formalism.');
+end
+if ismember('naka-zwan',spin_system.rlx.theories)&&...
+   ((~isfield(spin_system.rlx,'nz_shift'))||(~isfield(spin_system.rlx,'nz_onshell')))
+    error('Nakajima-Zwanzig theory requires nz_shift and nz_onshell in spin_system.rlx.');
 end
 if ( ismember('lindblad',spin_system.rlx.theories))&&...
    (~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'}))

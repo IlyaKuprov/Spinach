@@ -1,6 +1,7 @@
-% Redfield integral evaluation, the serial path. This include is 
-% called from within relaxation.m and follows the notation used
-% in IK's paper:
+% Bloch-Wangsness-Redfield and Nakajima-Zwanzig integral evaluati-
+% on, the serial path. This include is called from within the rel-
+% axation.m theory blocks and follows the notation used in IK's
+% paper:
 %
 %           http://dx.doi.org/10.1016/j.jmr.2010.12.004
 %
@@ -10,7 +11,13 @@
 %
 %                http://dx.doi.org/10.1063/1.4928978
 %
-% This include is called when relaxation.m is not at the top of 
+% The calling theory block must set rlx_onshell (true selects the
+% back-rotated kernel that reduces to Redfield theory at zero
+% shift, false the resolvent kernel of Nakajima-Zwanzig theory)
+% and rlx_shift (the Laplace evaluation point, Hz); Redfield the-
+% ory is the on-shell form at zero shift.
+%
+% This include is called when relaxation.m is not at the top of
 % the parallelisation call stack. When it is, the asynchronous
 % include is called instead.
 %
@@ -62,8 +69,15 @@ for n=1:numel(Q)
                                         % Kill the terms in L0 that are irrelevant on the time scale of the integration
                                         B=clean_up(spin_system,L0,spin_system.tols.rlx_integration/abs(upper_limit));
                                                             
-                                        % Prepare the relevant matrices
-                                        A=Q{n}{k,m}; C=Q{n}{p,q}'; D=B-1i*rates{s}(j)*speye(size(B));
+                                        % Prepare the coupling matrices
+                                        A=Q{n}{k,m}; C=Q{n}{p,q}';
+
+                                        % Kernel form and evaluation point set by the calling theory
+                                        if rlx_onshell
+                                            D=B-1i*(rates{s}(j)-rlx_shift)*speye(size(B));
+                                        else
+                                            D=-1i*(rates{s}(j)-rlx_shift)*speye(size(B));
+                                        end
                                         
                                         % Obliterate irrelevant elements
                                         A(~states{s},~states{s})=0; B(~states{s},~states{s})=0;
@@ -91,7 +105,7 @@ end
 clear('Q','L0','R_int','weights','rates','states');
 
 % Report to the user
-report(spin_system,'Redfield superoperator done.');
+report(spin_system,'relaxation integral evaluation done.');
 
 % Think not of what was asked, but of why. When you figure out why,
 % you would know how to answer.

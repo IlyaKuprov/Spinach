@@ -1151,6 +1151,26 @@ else
     spin_system.rlx.tau_c={};
 end
 
+% Nakajima-Zwanzig kernel evaluation point
+if isfield(inter,'nz_shift')
+    spin_system.rlx.nz_shift=inter.nz_shift;
+    if ischar(spin_system.rlx.nz_shift)
+        report(spin_system,'NZ kernel evaluation point: from radical pair kinetics');
+    else
+        report(spin_system,['NZ kernel evaluation point (Hz): ' num2str(spin_system.rlx.nz_shift)]);
+    end
+end
+
+% Nakajima-Zwanzig kernel form
+if isfield(inter,'nz_onshell')
+    spin_system.rlx.nz_onshell=inter.nz_onshell;
+    if spin_system.rlx.nz_onshell
+        report(spin_system,'NZ kernel form: on-shell, back-rotated');
+    else
+        report(spin_system,'NZ kernel form: off-shell, resolvent');
+    end
+end
+
 % Terms to keep in the relaxation superoperator
 if ~isempty(spin_system.rlx.theories)
     spin_system.rlx.keep=inter.rlx_keep;
@@ -2002,8 +2022,14 @@ if isfield(inter,'relaxation')
     
     % Check relaxation theories
     if ~all(ismember(inter.relaxation,{'damp','t1_t2','redfield','lindblad',...
-                                       'nottingham','weizmann','SRFK','SRSK'}))
+                                       'nottingham','weizmann','SRFK','SRSK',...
+                                       'naka-zwan'}))
         error('unrecognised relaxation theory specification.');
+    end
+
+    % Refuse simultaneous Redfield and Nakajima-Zwanzig theories
+    if all(ismember({'redfield','naka-zwan'},inter.relaxation))
+        error('redfield and naka-zwan are alternative evaluations of the same kernel, specify one.');
     end
     
     % Enforce term retention policy specification
@@ -2019,6 +2045,49 @@ if isfield(inter,'relaxation')
     % Enforce correlation time with Redfield theory
     if ismember('redfield',inter.relaxation)&&(~isfield(inter,'tau_c'))
         error('correlation time(s) must be specified with Redfield theory.');
+    end
+
+    % Enforce correlation time with Nakajima-Zwanzig theory
+    if ismember('naka-zwan',inter.relaxation)&&(~isfield(inter,'tau_c'))
+        error('correlation time(s) must be specified with Nakajima-Zwanzig theory.');
+    end
+
+    % Enforce kernel evaluation point with Nakajima-Zwanzig theory
+    if ismember('naka-zwan',inter.relaxation)&&(~isfield(inter,'nz_shift'))
+        error('kernel evaluation point must be specified in inter.nz_shift with Nakajima-Zwanzig theory.');
+    end
+
+    % Enforce kernel form with Nakajima-Zwanzig theory
+    if ismember('naka-zwan',inter.relaxation)&&(~isfield(inter,'nz_onshell'))
+        error('kernel form must be specified in inter.nz_onshell with Nakajima-Zwanzig theory.');
+    end
+
+    % Check the Nakajima-Zwanzig kernel evaluation point
+    if isfield(inter,'nz_shift')
+        if ~ismember('naka-zwan',inter.relaxation)
+            error('inter.nz_shift requires naka-zwan relaxation theory.');
+        end
+        if ischar(inter.nz_shift)
+            if ~strcmp(inter.nz_shift,'chem')
+                error('the only character value allowed in inter.nz_shift is ''chem''.');
+            end
+            if (~isfield(inter,'chem'))||(~isfield(inter.chem,'rp_rates'))
+                error('inter.nz_shift=''chem'' requires radical pair kinetics in inter.chem.');
+            end
+        elseif (~isnumeric(inter.nz_shift))||(~isscalar(inter.nz_shift))||...
+               (~isfinite(inter.nz_shift))||(real(inter.nz_shift)<0)
+            error('inter.nz_shift must be ''chem'' or a finite scalar with a non-negative real part.');
+        end
+    end
+
+    % Check the Nakajima-Zwanzig kernel form switch
+    if isfield(inter,'nz_onshell')
+        if ~ismember('naka-zwan',inter.relaxation)
+            error('inter.nz_onshell requires naka-zwan relaxation theory.');
+        end
+        if (~islogical(inter.nz_onshell))||(~isscalar(inter.nz_onshell))
+            error('inter.nz_onshell must be a logical scalar.');
+        end
     end
     
     % Enforce damping rate with isotropic damping
@@ -2102,9 +2171,10 @@ if isfield(inter,'tau_c')
             error('elements of inter.tau_c must be non-negative and real.');
         end
         
-        % Enforce Redfield theory if tau_c is specified
-        if (~isfield(inter,'relaxation'))||(~ismember('redfield',inter.relaxation))
-            error('inter.tau_c requires Redfield relaxation theory.');
+        % Enforce a rotational kernel theory if tau_c is specified
+        if (~isfield(inter,'relaxation'))||...
+           (~any(ismember({'redfield','naka-zwan'},inter.relaxation)))
+            error('inter.tau_c requires Redfield or Nakajima-Zwanzig relaxation theory.');
         end
         
     end

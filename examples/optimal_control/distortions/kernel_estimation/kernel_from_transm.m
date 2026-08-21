@@ -47,7 +47,10 @@ df=freq_axis_ghz(2)-freq_axis_ghz(1); zf=2*numel(amp);
 [~,t]=ifft_time_axis(numel(amp),df,zf);
 h_old=h(t<=16); t_old=t(t<=16); t=(0:31)'/2;
 h=interp1(t_old,h_old,t,'spline');
-save('hiper_kernel_trans.mat','h');
+
+% Save the kernel next to this script
+save(fullfile(fileparts(mfilename('fullpath')),...
+              'hiper_kernel_trans.mat'),'h');
 subplot(2,1,2); plot(t,[real(h) imag(h)]);
 kxlabel('time, ns'); kgrid; xlim tight; ylim padded;
 kylabel('filter ampl.'); klegend({'in-phase','quadrature'});

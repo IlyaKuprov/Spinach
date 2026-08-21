@@ -190,8 +190,9 @@ end
 if any(size(Hp)~=size(H0))||any(size(H0)~=size(Hm))
     error('dimensions of the three Hamiltonian components must be the same.');
 end
-if (~isnumeric(omega))||(~isreal(omega))||(~isscalar(omega))
-    error('omega parameter must be a real number.');
+if (~isnumeric(omega))||(~isreal(omega))||(~isscalar(omega))||...
+   (~isfinite(omega))||(omega==0)
+    error('omega parameter must be a non-zero finite real number.');
 end
 if ~ischar(theory)
     error('theory parameter must be a character string.');

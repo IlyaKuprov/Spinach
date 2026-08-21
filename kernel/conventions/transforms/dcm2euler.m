@@ -34,8 +34,8 @@ function [arg1,arg2,arg3]=dcm2euler(dcm)
 % Check consistency
 grumble(dcm);
 
-% Get the beta angle out and wrap it into [0,pi]
-beta=mod(acos(dcm(3,3)),pi);
+% Get the beta angle out, clamping the cosine into [-1,1]
+beta=acos(max(-1,min(1,dcm(3,3))));
 
 % Do a brute force surface scan with respect to alpha and gamma
 alphas=pi*linspace(0.05,1.95,20);

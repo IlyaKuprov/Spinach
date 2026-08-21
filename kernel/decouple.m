@@ -61,6 +61,9 @@ end
 % Inform the user
 report(spin_system,[num2str(nnz(dec_mask)) ' spins to be frozen and depopulated.']);
 
+% Get the spin space dimension
+spn_dim=size(spin_system.bas.basis,1);
+
 % Build the wipeout machinery
 switch spin_system.bas.formalism
 
@@ -68,9 +71,6 @@ switch spin_system.bas.formalism
 
         % Get the list of states to be wiped
         zero_mask=(sum(spin_system.bas.basis(:,dec_mask),2)~=0);
-
-        % Get the spin space dimension
-        spn_dim=size(spin_system.bas.basis,1);
 
     case 'zeeman-liouv'
 
@@ -92,9 +92,6 @@ switch spin_system.bas.formalism
             end
             P=P*idch;
         end
-
-        % Get the spin space dimension
-        spn_dim=dim^2;
 
 end
 

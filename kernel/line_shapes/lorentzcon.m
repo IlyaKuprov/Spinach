@@ -37,9 +37,6 @@ offs=sort(offs(:),1,'ascend');
 
 % Similarity tolerance
 sim_tol=sqrt(eps)*norm(offs,2);
-if sim_tol==0
-    sim_tol=eps;
-end
 
 % Single offset or three identical vertices
 if isscalar(offs)||(offs(3)-offs(1)<=sim_tol)

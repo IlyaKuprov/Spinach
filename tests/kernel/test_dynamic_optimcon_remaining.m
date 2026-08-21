@@ -218,9 +218,32 @@ base_freq=3;
 chirp_rate=4;
 signal=exp(1i*2*pi*(base_freq*time_axis+0.5*chirp_rate*time_axis.^2));
 freq_ref=base_freq+chirp_rate*time_axis;
-freq=inst_freq(signal,sample_dt,5,2);
+freq=inst_freq(signal,sample_dt,5,2,0);
 result=test_close(result,'inst_freq chirp',freq,freq_ref,1e-10,1e-10,...
                   'inst_freq must recover the exact frequency of a quadratic phase');
+
+% Check low-amplitude stencil masking
+signal_masked=signal;
+signal_masked(2)=0.25*signal_masked(2);
+freq_masked=inst_freq(signal_masked,sample_dt,5,2,0.5);
+mask_ref=false(size(signal));
+mask_ref(1:4)=true;
+result=test_true(result,'inst_freq low-amplitude stencil mask',...
+                 isequal(isnan(freq_masked),mask_ref),...
+                 'inst_freq must mask every stencil containing a weak-amplitude point');
+result=test_close(result,'inst_freq low-amplitude finite tail',...
+                  freq_masked(~mask_ref),freq_ref(~mask_ref),1e-10,1e-10,...
+                  'inst_freq must preserve unaffected local stencil estimates');
+
+% Check zero-magnitude masking at zero tolerance
+signal_zero=signal; signal_zero(2)=0;
+freq_zero=inst_freq(signal_zero,sample_dt,5,2,0);
+result=test_true(result,'inst_freq zero-magnitude stencil mask',...
+                 isequal(isnan(freq_zero),mask_ref),...
+                 'inst_freq must mask stencils containing zero-magnitude points at zero tolerance');
+result=test_close(result,'inst_freq zero-magnitude finite tail',...
+                  freq_zero(~mask_ref),freq_ref(~mask_ref),1e-10,1e-10,...
+                  'inst_freq must preserve stencils without zero-magnitude points');
 
 % Check drift extraction through a minimal context callback
 spin_system.bas.basis=speye(2);

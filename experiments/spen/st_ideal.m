@@ -97,13 +97,19 @@ elseif numel(parameters.g_amp)~=1
 end
 if ~isfield(parameters,'delta_sml')
     error('the gradient duration should be specified in parameters.delta_sml variable.');
-elseif numel(parameters.delta_sml)~=1
-    error('parameters.delta_sml array should have exactly one element.');
+elseif (numel(parameters.delta_sml)~=1)||(~isnumeric(parameters.delta_sml))||...
+       (~isfloat(parameters.delta_sml))||(~isreal(parameters.delta_sml))||...
+       (~isfinite(parameters.delta_sml))||(parameters.delta_sml<=0)
+    error('parameters.delta_sml must be a positive finite real floating-point scalar.');
 end
 if ~isfield(parameters,'delta_big')
     error('the diffusion delay should be specified in parameters.delta_big variable.');
-elseif numel(parameters.delta_big)~=1
-    error('parameters.delta_big array should have exactly one element.');
+elseif (numel(parameters.delta_big)~=1)||(~isnumeric(parameters.delta_big))||...
+       (~isfloat(parameters.delta_big))||(~isreal(parameters.delta_big))||...
+       (~isfinite(parameters.delta_big))||(parameters.delta_big<=0)
+    error('parameters.delta_big must be a positive finite real floating-point scalar.');
+elseif parameters.delta_big<parameters.delta_sml-4*eps(parameters.delta_sml)
+    error('parameters.delta_big must not be smaller than parameters.delta_sml.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');

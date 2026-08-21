@@ -534,10 +534,39 @@ if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef'})
     
     % Report to the user
     report(spin_system,['matrix dimension for all operators and states: ' num2str(prod(spin_system.comp.mults))]);
-    
+
     % Run the symmetry treatment
     spin_system=symmetry(spin_system,bas);
-    
+
+end
+
+% Process Liouville space Zeeman basis
+if strcmp(spin_system.bas.formalism,'zeeman-liouv')
+
+    % Build the Hilbert space Zeeman index table
+    dim=prod(spin_system.comp.mults);
+    zbas=zeros(dim,spin_system.comp.nspins);
+    for n=1:spin_system.comp.nspins
+        current_column=1;
+        for k=1:spin_system.comp.nspins
+            if n==k
+                current_column=kron(current_column,(1:spin_system.comp.mults(k))');
+            else
+                current_column=kron(current_column,ones(spin_system.comp.mults(k),1));
+            end
+        end
+        zbas(:,n)=current_column;
+    end
+
+    % Ket and bra index tables in the vectorisation order
+    spin_system.bas.basis=[repmat(zbas,[dim 1]) kron(zbas,ones(dim,1))];
+
+    % Report to the user
+    report(spin_system,['matrix dimension for all superoperators and state vectors: ' num2str(dim^2)]);
+
+    % Run the symmetry treatment
+    spin_system=symmetry(spin_system,bas);
+
 end
 
 % Preload Lie algebra structure tables

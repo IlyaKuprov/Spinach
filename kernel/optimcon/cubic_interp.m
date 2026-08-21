@@ -71,32 +71,32 @@ end
 
 % Consistency enforcement
 function grumble(end_a,end_b,alpha_a,alpha_b,f_a,dir_der_a,f_b,dir_der_b)
-if isempty(end_a)||(~isnumeric(end_a))||(~isreal(end_a))||(~isscalar(end_a))
-    error('end_A must be a real scalar.');
+if isempty(end_a)||(~isnumeric(end_a))||(~isreal(end_a))||(~isscalar(end_a))||(~isfinite(end_a))
+    error('end_A must be a finite real scalar.');
 end
-if isempty(end_b)||(~isnumeric(end_b))||(~isreal(end_b))||(~isscalar(end_b))
-    error('end_B must be a real scalar.');
+if isempty(end_b)||(~isnumeric(end_b))||(~isreal(end_b))||(~isscalar(end_b))||(~isfinite(end_b))
+    error('end_B must be a finite real scalar.');
 end
-if isempty(alpha_a)||(~isnumeric(alpha_a))||(~isreal(alpha_a))||(~isscalar(alpha_a))
-    error('alpha_A must be a real scalar.');
+if isempty(alpha_a)||(~isnumeric(alpha_a))||(~isreal(alpha_a))||(~isscalar(alpha_a))||(~isfinite(alpha_a))
+    error('alpha_A must be a finite real scalar.');
 end
-if isempty(alpha_b)||(~isnumeric(alpha_b))||(~isreal(alpha_b))||(~isscalar(alpha_b))
-    error('alpha_B must be a real scalar.');
+if isempty(alpha_b)||(~isnumeric(alpha_b))||(~isreal(alpha_b))||(~isscalar(alpha_b))||(~isfinite(alpha_b))
+    error('alpha_B must be a finite real scalar.');
 end
 if alpha_a==alpha_b
     error('alpha_A and alpha_B must be different.');
 end
-if isempty(f_a)||(~isnumeric(f_a))||(~isreal(f_a))||(~isscalar(f_a))
-    error('f_A must be a real scalar.');
+if isempty(f_a)||(~isnumeric(f_a))||(~isreal(f_a))||(~isscalar(f_a))||(~isfinite(f_a))
+    error('f_A must be a finite real scalar.');
 end
-if isempty(dir_der_a)||(~isnumeric(dir_der_a))||(~isreal(dir_der_a))||(~isscalar(dir_der_a))
-    error('dir_deriv_A must be a real scalar.');
+if isempty(dir_der_a)||(~isnumeric(dir_der_a))||(~isreal(dir_der_a))||(~isscalar(dir_der_a))||(~isfinite(dir_der_a))
+    error('dir_deriv_A must be a finite real scalar.');
 end
-if isempty(f_b)||(~isnumeric(f_b))||(~isreal(f_b))||(~isscalar(f_b))
-    error('f_B must be a real scalar.');
+if isempty(f_b)||(~isnumeric(f_b))||(~isreal(f_b))||(~isscalar(f_b))||(~isfinite(f_b))
+    error('f_B must be a finite real scalar.');
 end
-if isempty(dir_der_b)||(~isnumeric(dir_der_b))||(~isreal(dir_der_b))||(~isscalar(dir_der_b))
-    error('dir_deriv_B must be a real scalar.');
+if isempty(dir_der_b)||(~isnumeric(dir_der_b))||(~isreal(dir_der_b))||(~isscalar(dir_der_b))||(~isfinite(dir_der_b))
+    error('dir_deriv_B must be a finite real scalar.');
 end
 end
 

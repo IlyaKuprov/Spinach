@@ -1,37 +1,51 @@
-% Multiplies an RCV sparse matrix by a numeric scalar. Syntax:
+% Multiplies an RCV sparse matrix by a numeric scalar,
+% in either operand order. Syntax:
 %
-%                         A=times(k,A)
+%                        C=times(A,B)
 %
 % Parameters:
 %
-%    k - numeric scalar
-%
-%    A - RCV sparse matrix
+%    A,B - an RCV sparse matrix and a numeric
+%          scalar, in either order
 %
 % Outputs:
 %
-%    A - RCV sparse matrix
+%    C - RCV sparse matrix
 %
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/times.m>
 
-function A=times(k,A)
+function C=times(A,B)
 
 % Check consistency
-grumble(k,A);
+grumble(A,B);
 
-% Multiply values
-A.val=k*A.val;
+% RCV sparse by a scalar
+if isa(A,'rcv')
+
+    A.val=A.val*B; C=A;
+
+% Scalar by RCV sparse
+else
+
+    B.val=B.val*A; C=B;
+
+end
 
 end
 
 % Consistency enforcement
-function grumble(k,A)
-if ~isa(A,'rcv')
-    error('the second argument must be an RCV sparse matrix.');
+function grumble(A,B)
+if ~xor(isa(A,'rcv'),isa(B,'rcv'))
+    error('exactly one of the arguments must be an RCV sparse matrix.');
 end
-if (~isnumeric(k))||(~isscalar(k))
+if isa(A,'rcv')
+    scalar_arg=B;
+else
+    scalar_arg=A;
+end
+if (~isnumeric(scalar_arg))||(~isscalar(scalar_arg))
     error('multiplication is only defined by numeric scalars.');
 end
 end

@@ -31,11 +31,15 @@ grumble(tt,ttrank);
 tt.cores=cell(d,1);
 
 % Fill the cores with random elements
-tt.cores{1,1}=rand(1,sz(1,1),sz(1,2),ttrank);
-for k=2:d-1
-    tt.cores{k,1}=rand(ttrank,sz(k,1),sz(k,2),ttrank);
+if d==1
+    tt.cores{1,1}=rand(1,sz(1,1),sz(1,2),1);
+else
+    tt.cores{1,1}=rand(1,sz(1,1),sz(1,2),ttrank);
+    for k=2:d-1
+        tt.cores{k,1}=rand(ttrank,sz(k,1),sz(k,2),ttrank);
+    end
+    tt.cores{d,1}=rand(ttrank,sz(d,1),sz(d,2),1);
 end
-tt.cores{d,1}=rand(ttrank,sz(d,1),sz(d,2),1);
 
 % Unit coefficient and zero tolerance
 tt.coeff=1; tt.tolerance=0;

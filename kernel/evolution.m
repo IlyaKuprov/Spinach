@@ -496,10 +496,10 @@ switch spin_system.bas.formalism
                 % Recombine the subspaces
                 report(spin_system,'recombining subspaces...');
                 rows=cell2mat(rows); cols=cell2mat(cols); vals=cell2mat(vals);
-                answer=sparse(rows,cols,vals,size(rho,1),nsteps+1);
+                answer=sparse(rows,cols,vals,size(rho,1),size(rho,2));
                 answer=clean_up(spin_system,answer,spin_system.tols.zte_tol);
                 report(spin_system,'data retrieval finished.');
-                
+
             case 'observable'
                 
                 % Create arrays of projections

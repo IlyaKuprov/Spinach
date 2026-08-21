@@ -39,12 +39,7 @@ function rho=coherence(spin_system,rho,spec)
 grumble(spin_system,rho,spec);
 
 % Store dimension statistics
-switch spin_system.bas.formalism
-    case 'sphten-liouv'
-        spn_dim=size(spin_system.bas.basis,1);
-    case 'zeeman-liouv'
-        spn_dim=prod(spin_system.comp.mults)^2;
-end
+spn_dim=size(spin_system.bas.basis,1);
 spc_dim=numel(rho)/spn_dim;
 problem_dims=size(rho);
 
@@ -61,20 +56,14 @@ switch spin_system.bas.formalism
 
     case 'zeeman-liouv'
 
-        % Hilbert space dimension and multiplicities
-        dim=prod(spin_system.comp.mults);
-        mults=spin_system.comp.mults;
-
-        % Zeeman projection quantum numbers of Hilbert space states
-        Mh=zeros(dim,numel(mults));
-        for n=1:numel(mults)
-            Mh(:,n)=kron(kron(ones(prod(mults(1:(n-1))),1),...
-                              ((mults(n)-1)/2:-1:-(mults(n)-1)/2)'),...
-                         ones(prod(mults((n+1):end)),1));
-        end
+        % Projection quantum numbers of ket and bra indices
+        nspins=spin_system.comp.nspins;
+        spns=(spin_system.comp.mults-1)/2;
+        M_ket=spns-spin_system.bas.basis(:,1:nspins)+1;
+        M_bra=spns-spin_system.bas.basis(:,(nspins+1):end)+1;
 
         % Coherence orders of stretched density matrix elements
-        M=kron(ones(dim,1),Mh)-kron(Mh,ones(dim,1));
+        M=M_ket-M_bra;
 
 end
 
@@ -137,12 +126,7 @@ end
 if ~isnumeric(rho)
     error('the state vector(s) must be numeric.');
 end
-if strcmp(spin_system.bas.formalism,'sphten-liouv')
-    spn_dim=size(spin_system.bas.basis,1);
-else
-    spn_dim=prod(spin_system.comp.mults)^2;
-end
-if mod(numel(rho),spn_dim)~=0
+if mod(numel(rho),size(spin_system.bas.basis,1))~=0
     error('the number of elements in rho must be a multiple of the dimension of the spin state space.');
 end
 if ~iscell(spec)

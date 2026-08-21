@@ -39,12 +39,7 @@ if ~exist('spins','var'), spins='all'; end
 grumble(spin_system,rho,orders,spins)
 
 % Store dimension statistics
-switch spin_system.bas.formalism
-    case 'sphten-liouv'
-        spn_dim=size(spin_system.bas.basis,1);
-    case 'zeeman-liouv'
-        spn_dim=prod(spin_system.comp.mults)^2;
-end
+spn_dim=size(spin_system.bas.basis,1);
 spc_dim=numel(rho)/spn_dim;
 problem_dims=size(rho);
 

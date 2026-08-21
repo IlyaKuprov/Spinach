@@ -478,8 +478,9 @@ if isfield(control,'pwr_levels')
 
     % Input validation
     if (~isnumeric(control.pwr_levels))||(~isreal(control.pwr_levels))||...
-       (~isrow(control.pwr_levels))||any(control.pwr_levels(:)<=0)
-        error('control.pwr_levels must be a row vector of positive real numbers.');
+       (~isrow(control.pwr_levels))||any(~isfinite(control.pwr_levels(:)))||...
+       any(control.pwr_levels(:)<=0)
+        error('control.pwr_levels must be a row vector of finite positive real numbers.');
     end
 
     % Absorb power levels
@@ -1022,11 +1023,13 @@ if isfield(control,'u_bound')&&isfield(control,'l_bound')
     wf_dims=[spin_system.control.ncontrols spin_system.control.pulse_ntpts];
 
     % Input validation
-    if (~isnumeric(control.u_bound))||(~isreal(control.u_bound))
-        error('control.u_bound must be a real scalar or a real array.');
+    if (~isnumeric(control.u_bound))||(~isreal(control.u_bound))||...
+       any(isnan(control.u_bound(:)))
+        error('control.u_bound must be a real scalar or a real array, free of NaN.');
     end
-    if (~isnumeric(control.l_bound))||(~isreal(control.l_bound))
-        error('control.l_bound must be a real scalar or a real array.');
+    if (~isnumeric(control.l_bound))||(~isreal(control.l_bound))||...
+       any(isnan(control.l_bound(:)))
+        error('control.l_bound must be a real scalar or a real array, free of NaN.');
     end
     if (~isscalar(control.u_bound))&&(~isequal(size(control.u_bound),wf_dims))
         error(['control.u_bound must be a scalar or have dimensions ' int2str(wf_dims) '.']);

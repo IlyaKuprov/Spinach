@@ -30,6 +30,13 @@ mesh.vor.cells=C;
 mesh.vor.cells=mesh.vor.cells(mesh.idx.active);
 mesh.vor.ncells=numel(mesh.vor.cells);
 
+% Refuse unbounded active cells
+unbounded=cellfun(@(x)any(x==1),mesh.vor.cells);
+if any(unbounded)
+    error(['vertices ' int2str(reshape(mesh.idx.active(unbounded),1,[])) ...
+           ' have unbounded Voronoi cells and must be inactivated.']);
+end
+
 % Voronoi cell area calculation
 vor_cell_areas=zeros(mesh.vor.ncells,1);
 for n=1:mesh.vor.ncells
@@ -48,8 +55,8 @@ end
 
 % Consistency enforcement
 function grumble(mesh)
-if ~isfield(mesh,'idx')
-    error('vertex index is missing from mesh structure.');
+if (~isfield(mesh,'idx'))||(~isfield(mesh.idx,'active'))
+    error('active vertex index is missing from mesh structure.');
 end
 end
 

@@ -43,11 +43,16 @@ switch spin_system.bas.formalism
         % Liouville space period for H0
         T=-2*pi/(spin(isotope)*spin_system.inter.magnet);
         
-    case {'zeeman-hilb'}
-        
+    case {'zeeman-hilb','zeeman-wavef'}
+
         % Hilbert space period for H0
         T=-4*pi/(spin(isotope)*spin_system.inter.magnet);
-        
+
+    otherwise
+
+        % Complain and bomb out
+        error('unknown formalism specification.');
+
 end
 
 % Run the interaction representation transformation

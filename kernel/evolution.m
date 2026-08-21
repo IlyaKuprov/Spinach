@@ -86,8 +86,15 @@
 %
 %       destination - this argument is ignored.
 %
+%  For wavefunction calculations the Liouville space call signature and
+%  options apply with L the Hamiltonian matrix, rho a wavefunction or a
+%  horizontal stack thereof, and coil a reference wavefunction: the
+%  'observable' and 'multichannel' outputs return overlap trajectories
+%  of the coil with the evolving wavefunction; expectation values of
+%  operators require a density matrix formalism.
+%
 % Outputs:
-% 
+%
 %       answer - a vector, a matrix, or a cell array or matrices,
 %                depending on the options set during the call
 %
@@ -119,9 +126,9 @@ if isa(rho,'gpuArray'), rho=gather(rho); end
 
 % Decide how to proceed
 switch spin_system.bas.formalism
-    
-    case {'sphten-liouv','zeeman-liouv'}
-        
+
+    case {'sphten-liouv','zeeman-liouv','zeeman-wavef'}
+
         % Apply trajectory-level reduction algorithms
         report(spin_system,'trying to reduce the problem dimension...');
         

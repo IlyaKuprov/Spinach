@@ -199,8 +199,9 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,L,coil,rho,timestep,nsteps,output)
-if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
-    error('this function only works in Lioville space.');
+if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv',...
+                                        'zeeman-wavef'})
+    error('this function requires a state vector based formalism.');
 end
 if ~isnumeric(L)
     error('Liouvillian must be numeric.');

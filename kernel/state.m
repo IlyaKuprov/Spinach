@@ -44,6 +44,16 @@
 %
 %                   psi=state(spin_system,[-1/2 1/2 0])
 %
+% 5. For bosonic modes, valid labels are 'E' (identity), 'BLn' (the n-th
+%    energy level projector), products of 'C' (creation), 'A' (annihila-
+%    tion) and 'N' (number) operators, and 'coh(alpha)' for the coherent
+%    state of amplitude alpha, for example:
+%
+%                   rho=state(spin_system,'coh(1.5)',3)
+%
+%    returns the normalised Fock space truncation of the coherent state
+%    on mode 3; the norm lost to the truncation is reported.
+%
 % Method argument has the following effect in sphten-liouv formalism:
 %
 %    'cheap'  - the state vector is generated without

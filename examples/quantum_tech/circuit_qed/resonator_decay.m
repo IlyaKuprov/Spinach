@@ -51,7 +51,7 @@ G=-1i*H+R;
 
 % Fock state and coherent state as initial conditions
 rho_fock=state(spin_system,'BL5',1);
-rho_coh=coherent(spin_system,1,1.5);
+rho_coh=state(spin_system,'coh(1.5)',1);
 
 % Fock level population detection states
 coils=[state(spin_system,'BL1',1) state(spin_system,'BL2',1) ...

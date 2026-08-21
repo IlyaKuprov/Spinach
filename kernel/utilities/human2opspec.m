@@ -300,6 +300,27 @@ elseif iscell(operators)&&iscell(spins)
                     opspecs=kron(ones(numel(b_states),1),opspecs);
                     opspecs(:,spins{n})=states; coeffs=kron(b_coeffs,coeffs);
 
+                elseif (numel(operators{n})>3)&&strcmp(operators{n}(1:4),'coh(')
+
+                    % Validate coherent state specification
+                    if isempty(regexp(operators{n},'^coh\(.+\)$','once'))
+                        error('unrecognized operator or state specification.');
+                    end
+
+                    % Extract and validate the coherent state amplitude
+                    alpha=str2double(operators{n}(5:(end-1)));
+                    if (~isscalar(alpha))||(~isfinite(alpha))
+                        error('invalid coherent state amplitude.');
+                    end
+
+                    % Get the spherical tensor expansion of the coherent state
+                    [b_states,b_coeffs,lost_weight]=coh2ist(alpha,nlevels);
+                    report(spin_system,['coherent state truncation lost ' ...
+                                        num2str(lost_weight,'%0.5g') ' of the norm.']);
+                    states=kron(b_states,ones(size(opspecs,1),1));
+                    opspecs=kron(ones(numel(b_states),1),opspecs);
+                    opspecs(:,spins{n})=states; coeffs=kron(b_coeffs,coeffs);
+
                 else
 
                     % Get the spherical tensor expansion

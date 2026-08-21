@@ -68,6 +68,9 @@
 % Note: perturbative corrections to the rotating frame transformation are
 %       not supported - use singlerot.m instead.
 %
+% Note: the spinning sense matches singlerot.m - the same parameters.rate
+%       produces the same powder result in both contexts.
+%
 % Note: the function supports parallel processing via Matlab's Distri-
 %       buted Computing Toolbox - different system orientations are eva-
 %       luated on different labs.
@@ -146,8 +149,8 @@ alphas=sph_grid.alphas; betas=sph_grid.betas;
 gammas=sph_grid.gammas; weights=sph_grid.weights;
 n_orients=numel(weights);
 
-% Build the MAS part of the Liouvillian
-M=2*pi*parameters.rate*kron(spdiags((parameters.max_rank:-1:-parameters.max_rank)',0,spc_dim,spc_dim),speye(spn_dim));
+% Rotor turning generator, spinning sense matched to singlerot.m
+M=2*pi*parameters.rate*kron(spdiags((-parameters.max_rank:parameters.max_rank)',0,spc_dim,spc_dim),speye(spn_dim));
 
 % Kron up relaxation and kinetics
 R=kron(speye(spc_dim),R); K=kron(speye(spc_dim),K);

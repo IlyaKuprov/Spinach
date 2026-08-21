@@ -152,9 +152,13 @@ function grumble(drifts,controls,cc_comm_idx,cc_comm,dt,cL,cR,k,j)
 if ~iscell(drifts)
     error('drifts must be a cell array of matrices.');
 end
-for n=1:numel(drifts)     
-    if (~isnumeric(drifts{n}))||(size(drifts{n},1)~=size(drifts{n},2))
-        error('all elements of drifts cell array must be square matrices.');
+if numel(drifts)~=2
+    error('drifts must contain exactly two generators.');
+end
+for n=1:numel(drifts)
+    if (~isnumeric(drifts{n}))||(size(drifts{n},1)~=size(drifts{n},2))||...
+       (size(drifts{n},1)~=size(drifts{1},1))
+        error('all elements of drifts cell array must be square matrices of the same size.');
     end
 end
 if ~iscell(controls)
@@ -172,8 +176,8 @@ if (~islogical(cc_comm_idx))||...
    (size(cc_comm_idx,1)~=numel(controls))
     error('cc_comm_idx must be a square matrix of logicals, with length equal to the number of controls.');
 end
-if ~iscell(cc_comm)
-    error('cc_comm must be a cell array of square matrices.');
+if (~iscell(cc_comm))||(~isequal(size(cc_comm),numel(controls)*[1 1]))
+    error('cc_comm must be a square cell array with one row and column per control.');
 end
 for n=1:numel(cc_comm)
     if (~isnumeric(cc_comm{n}))||...
@@ -185,14 +189,17 @@ end
 if (~isnumeric(dt))||(~isreal(dt))||(~isscalar(dt))||(dt<=0)
     error('dt must be a positive real scalar.');
 end
-if (~isnumeric(cL))||(~isreal(cL))||(~isnumeric(cR))||(~isreal(cR))
-    error('cL and cR must be arrays of real numbers.');
+if (~isnumeric(cL))||(~isreal(cL))||(~isnumeric(cR))||(~isreal(cR))||...
+   (numel(cL)~=numel(controls))||(numel(cR)~=numel(controls))
+    error('cL and cR must be real arrays with one element per control operator.');
 end
-if (~isnumeric(k))||(~isreal(k))||(~isscalar(k))||(k<=0)||(mod(k,1)~=0)
-    error('k must be a positive real integer.');
+if (~isnumeric(k))||(~isreal(k))||(~isscalar(k))||(k<=0)||...
+   (mod(k,1)~=0)||(k>numel(controls))
+    error('k must be a positive real integer not exceeding the number of controls.');
 end
-if (~isnumeric(j))||(~isreal(j))||(~isscalar(j))||(j<0)||(mod(j,1)~=0)
-    error('j must be a non-negative real integer.');
+if (~isnumeric(j))||(~isreal(j))||(~isscalar(j))||(j<0)||...
+   (mod(j,1)~=0)||(j>numel(controls))
+    error('j must be a non-negative real integer not exceeding the number of controls.');
 end
 end
 

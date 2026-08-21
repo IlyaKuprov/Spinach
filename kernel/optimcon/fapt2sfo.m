@@ -44,6 +44,11 @@ if ~exist('time_grid','var')
     % Find the end time of the sequence
     end_time=max(cellfun(@(x)x(5),fapt));
 
+    % Refuse zero-frequency sequences without a grid
+    if max_freq==0
+        error('all frequencies in fapt are zero, an explicit time_grid must be supplied.');
+    end
+
     % Get the time grid with dt < half Nyquist
     dt_hN=1/(4*max_freq); npts=ceil(end_time/dt_hN)+1;
     time_grid=linspace(0,end_time,npts); dt=time_grid(2);

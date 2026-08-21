@@ -240,13 +240,15 @@ elseif numel(parameters.smfactor)~=1
 end
 if ~isfield(parameters,'Te')
     error('pulse duration should be specified in parameters.Te variable.');
-elseif numel(parameters.Te)~=1
-    error('parameters.Te array should have exactly one elements.');
+elseif (numel(parameters.Te)~=1)||(~isnumeric(parameters.Te))||...
+       (~isreal(parameters.Te))||(~isfinite(parameters.Te))||(parameters.Te<=0)
+    error('parameters.Te must be a positive finite real scalar.');
 end
 if ~isfield(parameters,'Tau')
     error('extra dephasing gradient duration should be specified in parameters.Tau variable.');
-elseif numel(parameters.Tau)~=1
-    error('parameters.Tau array should have exactly one elements.');
+elseif (numel(parameters.Tau)~=1)||(~isnumeric(parameters.Tau))||...
+       (~isreal(parameters.Tau))||(~isfinite(parameters.Tau))||(parameters.Tau<0)
+    error('parameters.Tau must be a non-negative finite real scalar.');
 end
 if ~isfield(parameters,'BW')
     error('pulse bandwidth should be specified in parameters.BW variable.');
@@ -265,8 +267,11 @@ elseif ~ischar(parameters.chirptype)
 end
 if ~isfield(parameters,'td')
     error('the diffusion delay should be specified in parameters.td variable.');
-elseif numel(parameters.td)~=1
-    error('parameters.td array should have exactly one elements.');
+elseif (numel(parameters.td)~=1)||(~isnumeric(parameters.td))||...
+       (~isreal(parameters.td))||(~isfinite(parameters.td))
+    error('parameters.td must be a finite real scalar.');
+elseif parameters.td<parameters.Tau+parameters.Te
+    error('parameters.td must not be smaller than parameters.Tau+parameters.Te.');
 end
 end
 

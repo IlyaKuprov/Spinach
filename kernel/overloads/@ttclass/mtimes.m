@@ -23,7 +23,7 @@ function c=mtimes(a,b)
 if isa(a,'ttclass')&&isa(b,'double')&&isscalar(b)
     
     % Multiply tensor train by a scalar from the right
-    c=a; c.coeff=b*c.coeff; c.tolerance=b*c.tolerance;
+    c=a; c.coeff=b*c.coeff; c.tolerance=abs(b)*c.tolerance;
     
 elseif isa(a,'ttclass')&&isa(b,'double')&&numel(b)>1
     
@@ -70,7 +70,7 @@ elseif isa(a,'ttclass')&&isa(b,'double')&&numel(b)>1
 elseif isa(a,'double')&&isa(b,'ttclass')&&isscalar(a)
     
     % Multiply tensor train by a scalar from the left
-    c=b; c.coeff=a*c.coeff; c.tolerance=a*c.tolerance;
+    c=b; c.coeff=a*c.coeff; c.tolerance=abs(a)*c.tolerance;
     
 elseif isa(a,'ttclass')&&isa(b,'ttclass')
     

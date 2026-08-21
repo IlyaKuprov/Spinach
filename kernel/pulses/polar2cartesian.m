@@ -121,8 +121,8 @@ if nargin==2
         error('amplitude and phase vectors must have the same dimension.');
     end
 elseif nargin==4
-    if (~isnumeric(r))||(~isreal(r))||(~all(r>=0))
-        error('amplitude parameter must be a vector of non-negative real numbers.');
+    if (~isnumeric(r))||(~isreal(r))||(~all(r>0))
+        error('amplitude parameter must be a vector of positive real numbers when derivatives are requested.');
     end
     if (~isnumeric(p))||(~isreal(p))
         error('phase parameter must be a vector of real numbers.');
@@ -138,8 +138,8 @@ elseif nargin==4
         error('all input vectors must have the same dimension.');
     end
 elseif nargin==8
-    if (~isnumeric(r))||(~isreal(r))||(~all(r>=0))
-        error('amplitude parameter must be a vector of non-negative real numbers.');
+    if (~isnumeric(r))||(~isreal(r))||(~all(r>0))
+        error('amplitude parameter must be a vector of positive real numbers when derivatives are requested.');
     end
     if (~isnumeric(p))||(~isreal(p))
         error('phase parameter must be a vector of real numbers.');

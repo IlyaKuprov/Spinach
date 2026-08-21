@@ -19,7 +19,9 @@
 %
 %    amp_tol    - fractional amplitude tolerance
 %                 relative to the maximum signal
-%                 amplitude
+%                 amplitude; zero tolerance still
+%                 masks zero-magnitude points where
+%                 the phase is undefined
 %
 % Outputs:
 %
@@ -67,7 +69,7 @@ for n=1:nsamps
     win_idx=win_left:(win_left+npoints-1);
 
     % Check whether any stencil point is below threshold
-    weak_stencil(n)=any(abs(signal_col(win_idx))<amp_limit);
+    weak_stencil(n)=any(abs(signal_col(win_idx))<=amp_limit);
 
 end
 

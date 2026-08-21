@@ -92,7 +92,7 @@ if isfield(control,'integrator')
         error('control.integrator must be a character string.');
     end
     if ~ismember(control.integrator,{'rectangle','trapezium'})
-        error('control.intgrator must be either ''rectangle'' or ''trapezium''.');
+        error('control.integrator must be either ''rectangle'' or ''trapezium''.');
     end
 
     % Absorb integrator type

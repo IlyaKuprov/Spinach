@@ -21,6 +21,9 @@ end
 % Check consistency
 grumble(config_style);
 
+% Resolve the Spinach root directory
+spinach_root=fileparts(mfilename('fullpath'));
+
 % Run the configuration
 switch config_style
 
@@ -36,10 +39,10 @@ switch config_style
         disp('Updating Matlab path...');
 
         % Add Spinach directories to path
-        addpath(genpath('etc'),'-begin');
-        addpath(genpath('experiments'),'-begin');
-        addpath(genpath('interfaces'),'-begin');
-        addpath(genpath('kernel'),'-begin');
+        addpath(genpath(fullfile(spinach_root,'etc')),'-begin');
+        addpath(genpath(fullfile(spinach_root,'experiments')),'-begin');
+        addpath(genpath(fullfile(spinach_root,'interfaces')),'-begin');
+        addpath(genpath(fullfile(spinach_root,'kernel')),'-begin');
 
         % Run existential checks
         existentials();
@@ -53,10 +56,10 @@ switch config_style
         disp('Updating Matlab path...');
 
         % Keep revious path, add Spinach
-        addpath(genpath('etc'),'-begin');
-        addpath(genpath('experiments'),'-begin');
-        addpath(genpath('interfaces'),'-begin');
-        addpath(genpath('kernel'),'-begin');
+        addpath(genpath(fullfile(spinach_root,'etc')),'-begin');
+        addpath(genpath(fullfile(spinach_root,'experiments')),'-begin');
+        addpath(genpath(fullfile(spinach_root,'interfaces')),'-begin');
+        addpath(genpath(fullfile(spinach_root,'kernel')),'-begin');
 
         % Run existential checks
         existentials();
@@ -70,10 +73,10 @@ switch config_style
         disp('Updating Matlab path...');
 
         % Keep revious path, remove Spinach
-        rmpath(genpath('etc'));
-        rmpath(genpath('experiments'));
-        rmpath(genpath('interfaces'));
-        rmpath(genpath('kernel'));
+        rmpath(genpath(fullfile(spinach_root,'etc')));
+        rmpath(genpath(fullfile(spinach_root,'experiments')));
+        rmpath(genpath(fullfile(spinach_root,'interfaces')));
+        rmpath(genpath(fullfile(spinach_root,'kernel')));
 
         % Report to the console
         disp('Spinach folders have been removed from Matlab path.');

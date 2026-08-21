@@ -49,8 +49,17 @@ switch reference(1).type
             error('exactly two indices required to evaluate tt(j,k) element');
         elseif isscalar(reference(1).subs{1})&&isscalar(reference(1).subs{2})
             siz=sizes(ttrain);
-            ind=ttclass_ind2sub(siz(:,1),reference(1).subs{1});
-            jnd=ttclass_ind2sub(siz(:,2),reference(1).subs{2});
+            row_ind=reference(1).subs{1}; col_ind=reference(1).subs{2};
+            if (~isnumeric(row_ind))||(~isreal(row_ind))||(mod(row_ind,1)~=0)||...
+               (row_ind<1)||(row_ind>prod(siz(:,1)))
+                error('row index must be a positive integer within matrix dimensions.');
+            end
+            if (~isnumeric(col_ind))||(~isreal(col_ind))||(mod(col_ind,1)~=0)||...
+               (col_ind<1)||(col_ind>prod(siz(:,2)))
+                error('column index must be a positive integer within matrix dimensions.');
+            end
+            ind=ttclass_ind2sub(siz(:,1),row_ind);
+            jnd=ttclass_ind2sub(siz(:,2),col_ind);
         else
             error('advanced indexing is not implemented for tensor trains.');
         end

@@ -995,6 +995,9 @@ if isfield(control,'penalties')&&isfield(control,'p_weights')
        (~isrow(control.p_weights))||any(control.p_weights(:)<0)
             error('control.p_weights must be a row vector of non-negative real numbers.');
     end
+    if numel(control.p_weights)~=numel(control.penalties)
+        error('control.p_weights must have one weight per entry in control.penalties.');
+    end
     
     % Absorb penalties and their weights
     spin_system.control.penalties=control.penalties; control=rmfield(control,'penalties');

@@ -24,22 +24,25 @@
 function varargout=size(tt,dim)
 
 % Multiply up physical dimensions of all cores
-if nargin==1
-    m=prod(cellfun(@(x)size(x,2),tt.cores),1);
-    n=prod(cellfun(@(x)size(x,3),tt.cores),1);
-    varargout={[m(1) n(1)]};
-elseif dim==1
-    m=prod(cellfun(@(x)size(x,2),tt.cores),1);
-    varargout={m(1)};
-elseif dim==2
-    n=prod(cellfun(@(x)size(x,3),tt.cores),1);
-    varargout={n(1)};
+m=prod(cellfun(@(x)size(x,2),tt.cores),1);
+n=prod(cellfun(@(x)size(x,3),tt.cores),1);
+
+% Compose the answer
+if (nargin==1)&&(nargout<=1)
+    varargout{1}=[m(1) n(1)];
+elseif (nargin==1)&&(nargout==2)
+    varargout{1}=m(1);
+    varargout{2}=n(1);
+elseif (nargin==2)&&(dim==1)
+    varargout{1}=m(1);
+elseif (nargin==2)&&(dim==2)
+    varargout{1}=n(1);
 else
     error('incorrect call syntax.');
 end
 
 % Check for infinities
-if any(varargout{1}>intmax)
+if any(cellfun(@(x)any(x(:)>intmax),varargout))
     error('tensor train dimensions exceed Matlab''s intmax.');
 end
 

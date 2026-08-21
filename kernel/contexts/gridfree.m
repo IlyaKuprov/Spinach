@@ -267,14 +267,18 @@ elseif (~isnumeric(parameters.max_rank))||(~isreal(parameters.max_rank))||...
 end
 
 % Spinning rate
-if isfield(parameters,'rate')&&((~isnumeric(parameters.rate))||(~isreal(parameters.rate)))
-    error('parameters.rate must be a real number.');
+if isfield(parameters,'rate')&&((~isnumeric(parameters.rate))||(~isreal(parameters.rate))||...
+                                (~isscalar(parameters.rate))||(~isfinite(parameters.rate)))
+    error('parameters.rate must be a finite real number.');
 end
 
 % Spinning axis
 if isfield(parameters,'axis')&&((~isnumeric(parameters.axis))||(~isreal(parameters.axis))||...
-                                (~isrow(parameters.axis))||(numel(parameters.axis)~=3))
-    error('parameters.axis must be a row vector of three real numbers.');
+                                (~isrow(parameters.axis))||(numel(parameters.axis)~=3)||...
+                                (~all(isfinite(parameters.axis)))||(norm(parameters.axis,2)==0))
+    error('parameters.axis must be a row vector of three finite real numbers with a non-zero norm.');
+elseif isfield(parameters,'rate')&&(abs(parameters.rate)>0)&&(~isfield(parameters,'axis'))
+    error('a non-zero parameters.rate requires parameters.axis to be specified.');
 end
 
 % Check rotational correlation time

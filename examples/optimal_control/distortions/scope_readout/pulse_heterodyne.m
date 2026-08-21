@@ -24,13 +24,16 @@ ktitle('wall clock'); kxlabel('time, s');
 % Carrier frequency and timing
 carrier_freq=500.1029395e6;
 dt=time_grid(2)-time_grid(1);
-                                  
+
+% Upsample twofold, the scope rate being under four samples per carrier period
+expt_data=resample(expt_data,2,1); dt=dt/2;
+
 % Apply heterodyne transformation wrt carrier frequency
 [real_bruk,imag_bruk]=heterodyne(dt,expt_data,carrier_freq);
 
 % Resample and convert to complex
-real_bruk=resample(real_bruk,1,10000);
-imag_bruk=resample(imag_bruk,1,10000);
+real_bruk=resample(real_bruk,1,20000);
+imag_bruk=resample(imag_bruk,1,20000);
 time_grid=linspace(time_grid(1),...
                    time_grid(end),...
                    numel(real_bruk))';

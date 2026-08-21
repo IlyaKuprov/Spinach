@@ -772,6 +772,16 @@ if ismember('frq_controls',spin_system.control.plotting)
         error('instantaneous frequency plots require an even number of control channels.');
     end
 end
+if ismember('phi_controls',spin_system.control.plotting)
+    if ~(mod(size(waveform,1),2)==0)
+        error('phase plots require an even number of control channels.');
+    end
+end
+if ismember('amp_controls',spin_system.control.plotting)
+    if ~(mod(size(waveform,1),2)==0)
+        error('amplitude plots require an even number of control channels.');
+    end
+end
 end
 
 % If you can't explain it simply, you don't

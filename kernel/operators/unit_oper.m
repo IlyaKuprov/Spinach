@@ -40,13 +40,13 @@ switch spin_system.bas.formalism
         % Unit matrix
         A=speye(prod(spin_system.comp.mults.^2));
         
-    case 'zeeman-hilb'
-        
+    case {'zeeman-hilb','zeeman-wavef'}
+
         % Unit matrix
         A=speye(prod(spin_system.comp.mults));
-        
+
     otherwise
-        
+
         % Complain and bomb out
         error('unknown formalism specification.');
         

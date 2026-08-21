@@ -39,9 +39,9 @@ inter.rlx_keep='kite';       % which terms of R survive
 inter.equilibrium='zero';    % where relaxation drives the system
 ```
 
-Formalism restrictions are enforced. `t1_t2` is `sphten-liouv` only.
-`redfield`, `lindblad`, `nottingham`, `weizmann`, `SRFK`, `SRSK`, and IME
-thermalisation all require Liouville space (`sphten-liouv` or
+Formalism restrictions are enforced. `t1_t2` and `redfield` are
+`sphten-liouv` only. `lindblad`, `nottingham`, `weizmann`, `SRFK`, `SRSK`,
+and IME thermalisation all require Liouville space (`sphten-liouv` or
 `zeeman-liouv`). Only `damp` works in `zeeman-hilb`.
 
 Terms accumulate in a fixed order: `t1_t2`, `redfield`, `lindblad`,

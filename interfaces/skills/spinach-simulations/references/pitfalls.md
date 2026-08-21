@@ -106,7 +106,7 @@ picking `zeeman-hilb` or `zeeman-wavef` for convenience and then asking for
 relaxation is a frequent dead end:
 
 ```
-Redfield relaxation theory is only available in Liouville space.
+Redfield relaxation theory is only available for sphten-liouv formalism.
 extended T1,T2 relaxation theory is only available for sphten-liouv formalism.
 analytical decoupling is only available for sphten-liouv formalism.
 chemical reaction modelling is only available for sphten-liouv formalism.
@@ -114,8 +114,8 @@ bas.projections option is only available for sphten-liouv formalism.
 ```
 
 (Lindblad, Nottingham, Weizmann, SRFK, SRSK relaxation and IME thermalisation
-carry the same Liouville-space restriction with parallel wording; the `kite`
-and `secular` values of `inter.rlx_keep` are also `sphten-liouv` only.) The
+are refused outside Liouville space with parallel wording; the `kite` and
+`secular` values of `inter.rlx_keep` are also `sphten-liouv` only.) The
 fix is to move to `sphten-liouv`, which is the correct default anyway.
 
 ### Relaxation setup

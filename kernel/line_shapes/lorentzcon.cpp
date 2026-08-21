@@ -194,11 +194,8 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
 
     if (n_offs==3)
     {
-        double sim_tol=std::sqrt(std::numeric_limits<double>::epsilon())*
-                       std::sqrt(offs[0]*offs[0]+offs[1]*offs[1]+offs[2]*offs[2]);
-
-        if (sim_tol==0.0)
-            sim_tol=std::numeric_limits<double>::epsilon();
+        const double sim_tol=std::sqrt(std::numeric_limits<double>::epsilon())*
+                             std::sqrt(offs[0]*offs[0]+offs[1]*offs[1]+offs[2]*offs[2]);
 
         if (offs[2]-offs[0]<=sim_tol)
         {

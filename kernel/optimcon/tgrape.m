@@ -146,8 +146,9 @@ end
 if size(waveform,1)~=numel(controls)
     error('number of waveform rows must be equal to the number of controls.');
 end
-if (~isnumeric(dt_grid))||(~isreal(dt_grid))||(~iscolumn(dt_grid))
-    error('dt_grid must be a real row vector.');
+if (~isnumeric(dt_grid))||(~isreal(dt_grid))||(~iscolumn(dt_grid))||...
+   any(~isfinite(dt_grid))
+    error('dt_grid must be a finite real column vector.');
 end
 if (~isnumeric(time_unit))||(~isreal(time_unit))||(numel(time_unit)~=1)||...
    (~isfinite(time_unit))||(time_unit<=0)

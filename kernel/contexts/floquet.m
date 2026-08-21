@@ -68,6 +68,9 @@
 % Note: perturbative corrections to the rotating frame transformation are
 %       not supported - use singlerot.m instead.
 %
+% Note: the spinning sense matches singlerot.m - the same parameters.rate
+%       produces the same powder result in both contexts.
+%
 % Note: the function supports parallel processing via Matlab's Distri-
 %       buted Computing Toolbox - different system orientations are eva-
 %       luated on different labs.
@@ -98,8 +101,22 @@ spin_system=assume(spin_system,assumptions);
 % Get the Hamiltonian
 [H,Q]=hamiltonian(spin_system);
 
-% Disallow giant spin
-if numel(Q)>2, error('giant spin model is not supported in this module.'); end
+% Detect non-empty spherical ranks
+int_ranks=[];
+for r=1:numel(Q)
+    if any(cellfun(@nnz,Q{r}),'all')
+        int_ranks=[int_ranks r]; %#ok<AGROW>
+    end
+end
+report(spin_system,['non-empty spherical ranks in Q: ' num2str(int_ranks)]);
+
+% Fourier block extent covers every non-empty rank
+max_int=max([int_ranks 2]);
+
+% Warn about truncated rotor harmonics
+if max_int>parameters.max_rank
+    report(spin_system,'WARNING - max_rank is below an interaction rank, its harmonics are truncated.');
+end
 
 % Apply frequency offsets
 H=frqoffset(spin_system,H,parameters);
@@ -132,15 +149,21 @@ alphas=sph_grid.alphas; betas=sph_grid.betas;
 gammas=sph_grid.gammas; weights=sph_grid.weights;
 n_orients=numel(weights);
 
-% Build the MAS part of the Liouvillian
-M=2*pi*parameters.rate*kron(spdiags((parameters.max_rank:-1:-parameters.max_rank)',0,spc_dim,spc_dim),speye(spn_dim));
+% Rotor turning generator, spinning sense matched to singlerot.m
+M=2*pi*parameters.rate*kron(spdiags((-parameters.max_rank:parameters.max_rank)',0,spc_dim,spc_dim),speye(spn_dim));
 
 % Kron up relaxation and kinetics
 R=kron(speye(spc_dim),R); K=kron(speye(spc_dim),K);
 
 % Get the rotor orientation
 [phi,theta,~]=cart2sph(parameters.axis(1),parameters.axis(2),parameters.axis(3));
-theta=pi/2-theta; D_lab2rot=wigner(2,phi,theta,0); D_rot2lab=D_lab2rot';
+theta=pi/2-theta;
+
+% Rotor axis tilt rotations for every non-empty rank
+D_lab2rot=cell(1,max_int); D_rot2lab=cell(1,max_int);
+for r=int_ranks
+    D_lab2rot{r}=wigner(r,phi,theta,0); D_rot2lab{r}=D_lab2rot{r}';
+end
 
 % Project states
 P=spalloc(spc_dim,1,1); P((spc_dim+1)/2)=1;
@@ -205,34 +228,41 @@ end
 % Powder averaged spectrum
 parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
 
-    % Set the crystal reference frame
-    D_mol2rot=wigner(2,alphas(q),betas(q),gammas(q));
-    
-    % Move into rotor frame
-    D_mol2rot=D_lab2rot*D_mol2rot*D_rot2lab;
-    
     % Preallocate fourier terms
-    fourier_terms=cell(5,1);
-    
-    % Get Fourier terms of the Hamiltonian
-    for n=1:5
-        fourier_terms{n}=spalloc(size(H,1),size(H,2),0);
-        D_rotor=zeros(5,5); D_rotor(n,n)=1;
-        D=D_lab2rot*D_rotor*D_rot2lab*D_mol2rot;
-        for m=1:5
-            for k=1:5
-                fourier_terms{n}=fourier_terms{n}+Q{2}{k,m}*D(k,m);
+    fourier_terms=cell(2*max_int+1,1);
+    for h=1:(2*max_int+1)
+        fourier_terms{h}=spalloc(size(H,1),size(H,2),0);
+    end
+
+    % Loop over the non-empty spherical ranks
+    for r=int_ranks
+
+        % Set the crystal reference frame
+        D_mol2rot=wigner(r,alphas(q),betas(q),gammas(q));
+
+        % Move into rotor frame
+        D_mol2rot=D_lab2rot{r}*D_mol2rot*D_rot2lab{r};
+
+        % Get Fourier terms of the Hamiltonian
+        for n=1:(2*r+1)
+            D_rotor=zeros(2*r+1); D_rotor(n,n)=1;
+            D=D_lab2rot{r}*D_rotor*D_rot2lab{r}*D_mol2rot;
+            for m=1:(2*r+1)
+                for k=1:(2*r+1)
+                    fourier_terms{n-r+max_int}=fourier_terms{n-r+max_int}+Q{r}{k,m}*D(k,m);
+                end
             end
         end
+
     end
 
     % Add the isotropic part
-    fourier_terms{3}=fourier_terms{3}+H;
-    
+    fourier_terms{max_int+1}=fourier_terms{max_int+1}+H;
+
     % Kron up into the Floquet space
     F=spalloc(spc_dim*spn_dim,spc_dim*spn_dim,0);
-    for n=1:5
-        F=F+kron(spdiags(ones(spc_dim,1),n-3,spc_dim,spc_dim),fourier_terms{n});
+    for h=1:(2*max_int+1)
+        F=F+kron(spdiags(ones(spc_dim,1),h-max_int-1,spc_dim,spc_dim),fourier_terms{h});
     end
     
     % Add the MAS part and clean up
@@ -245,7 +275,7 @@ parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
     ans_array{q}=pulse_sequence(spin_system,parameters,F,R,K);
 
     % Report parfor progress
-    if do_diag, send(DQ,n); end
+    if do_diag, send(DQ,q); end
 
 end
 

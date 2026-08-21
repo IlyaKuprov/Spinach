@@ -39,13 +39,13 @@ offs=sort(offs(:),1,'ascend');
 sim_tol=sqrt(eps)*norm(offs,2);
 
 % Single offset or three identical vertices
-if isscalar(offs)||(offs(3)-offs(1)<sim_tol)
+if isscalar(offs)||(offs(3)-offs(1)<=sim_tol)
     
     % Just a Lorentzian curve
     y=(ampl/(pi*gam))./(1+((x-mean(offs))/gam).^2);
     
 % Vertices 1 and 2 identical
-elseif (offs(2)-offs(1)<sim_tol)
+elseif (offs(2)-offs(1)<=sim_tol)
     
     % Update the offsets
     offs=[mean(offs(1:2)) offs(3)];
@@ -56,7 +56,7 @@ elseif (offs(2)-offs(1)<sim_tol)
       ((ampl*gam/pi)/((offs(1)-offs(2))*(offs(1)-offs(2))))*log(((offs(1)-x).^2+gam^2)./((offs(2)-x).^2+gam^2));
     
 % Vertices 2 and 3 identical
-elseif (offs(3)-offs(2)<sim_tol)
+elseif (offs(3)-offs(2)<=sim_tol)
     
     % Update the offsets
     offs=[offs(1) mean(offs(2:3))];

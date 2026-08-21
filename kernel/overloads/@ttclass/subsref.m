@@ -49,8 +49,12 @@ switch reference(1).type
             error('exactly two indices required to evaluate tt(j,k) element');
         elseif isscalar(reference(1).subs{1})&&isscalar(reference(1).subs{2})
             siz=sizes(ttrain);
-            ind=ttclass_ind2sub(siz(:,1),reference(1).subs{1});
-            jnd=ttclass_ind2sub(siz(:,2),reference(1).subs{2});
+            row_ind=reference(1).subs{1}; col_ind=reference(1).subs{2};
+            if islogical(row_ind), row_ind=double(row_ind); end
+            if islogical(col_ind), col_ind=double(col_ind); end
+            grumble(row_ind,col_ind,siz);
+            ind=ttclass_ind2sub(siz(:,1),row_ind);
+            jnd=ttclass_ind2sub(siz(:,2),col_ind);
         else
             error('advanced indexing is not implemented for tensor trains.');
         end
@@ -79,6 +83,32 @@ end
 
 end
 
+% Consistency enforcement
+function grumble(row_ind,col_ind,siz)
+if (~isnumeric(row_ind))||(~isreal(row_ind))||...
+   (mod(row_ind,1)~=0)||(row_ind<1)||(row_ind>flintmax)
+    error('row index must be a positive integer not exceeding flintmax.');
+end
+if (~isnumeric(col_ind))||(~isreal(col_ind))||...
+   (mod(col_ind,1)~=0)||(col_ind<1)||(col_ind>flintmax)
+    error('column index must be a positive integer not exceeding flintmax.');
+end
+leftover=row_ind-1;
+for n=1:size(siz,1)
+    leftover=floor(leftover/siz(n,1));
+end
+if leftover>0
+    error('row index must be a positive integer within matrix dimensions.');
+end
+leftover=col_ind-1;
+for n=1:size(siz,1)
+    leftover=floor(leftover/siz(n,2));
+end
+if leftover>0
+    error('column index must be a positive integer within matrix dimensions.');
+end
+end
+
 % Index to subscript transformation
 function ivec=ttclass_ind2sub(siz,ind)
 d=numel(siz); ind=ind-1; ivec=zeros(d,1);
@@ -93,5 +123,4 @@ end
 %
 % A Russian saying
 
-% #NGRUM
 

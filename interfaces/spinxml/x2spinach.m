@@ -115,11 +115,8 @@ sys.labels=sys.labels(index);
 inter.coordinates=inter.coordinates(index);
 
 % Check for missing spin ids
-if norm(diff(diff(spin_ids)),1)>1e-6
-    error('spin id numbers are not sequential integers.');
-end
-if min(spin_ids)~=1
-    error('spin id numbers must start from 1.');
+if ~isequal(spin_ids(:).',1:numel(spin_ids))
+    error('spin id numbers must be sequential integers starting from 1.');
 end
 
 % Preallocate interaction arrays

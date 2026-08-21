@@ -192,6 +192,16 @@ for n=1:spin_system.control.max_iter
             
     end
 
+    % Refuse a non-finite search direction
+    if any(~isfinite(dir))
+        error('search direction contains Inf or NaN, check gradients and Hessians.');
+    end
+
+    % Fall back to projected steepest ascent for non-ascent directions
+    if g(~frozen)'*dir(~frozen)<=0
+        dir=g.*(~frozen);
+    end
+
     % Store the reference point
     g_ref=g(~frozen); dir_ref=dir(~frozen);
 

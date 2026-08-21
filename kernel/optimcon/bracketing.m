@@ -121,6 +121,11 @@ while true
     br_end_pt_A=2*alpha_2-alpha_1;
     br_end_pt_B=alpha_2+spin_system.control.ls_tau1*(alpha_2-alpha_1);
 
+    % Stop if the expansion has escaped to non-finite values
+    if ~all(isfinite([br_end_pt_A br_end_pt_B fx_2 gfx_2'*dir]))
+        error('line search expansion diverged, objective appears unbounded above.');
+    end
+
     % Maximise the cubic model inside interpolation bounds
     alpha_new=cubic_interp(br_end_pt_A,br_end_pt_B,alpha_1,alpha_2,...
                            fx_1,gfx_1'*dir,fx_2,gfx_2'*dir);

@@ -50,8 +50,15 @@ end
 
 % Consistency enforcement
 function grumble(hess,dim1,dim2)
-if numel(hess)~=(dim1*dim2)^2
-    error('Hessian size should be (K*N)^2')
+if (~isnumeric(dim1))||(~isreal(dim1))||(~isscalar(dim1))||...
+   (dim1<1)||(mod(dim1,1)~=0)||...
+   (~isnumeric(dim2))||(~isreal(dim2))||(~isscalar(dim2))||...
+   (dim2<1)||(mod(dim2,1)~=0)
+    error('K and N must be positive integers.');
+end
+if (~isnumeric(hess))||(~ismatrix(hess))||...
+   (size(hess,1)~=dim1*dim2)||(size(hess,2)~=dim1*dim2)
+    error('hess must be a (K*N)x(K*N) matrix.');
 end
 end
 

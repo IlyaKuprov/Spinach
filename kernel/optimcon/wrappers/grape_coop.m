@@ -102,8 +102,9 @@ switch spin_system.bas.formalism
         fidelity(1)=fidelity(1)-mean(cellfun(@(x)norm(x,2)^2,dirt_sum));
 end
 
-% Assemble the gradient
-gradient=cat(1,gradient_a,gradient_b)/2-2*cat(1,gradient_c,gradient_d);
+% Assemble the gradient, impurity term only enters the fidelity slice
+gradient=cat(1,gradient_a,gradient_b)/2;
+gradient(:,:,1)=gradient(:,:,1)-2*cat(1,gradient_c(:,:,1),gradient_d(:,:,1));
 
 % Return both trajectories
 traj_data={traj_data_a,traj_data_b};

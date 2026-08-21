@@ -67,7 +67,7 @@ end
 if (~isempty(p.prefix))&&(size(p.prefix{end},2)~=core_dims(1,1))
     error('inconsistent dimensions in prefix-core product.');
 end
-if (~isempty(p.suffix))&&(size(p.suffix{end},1)~=core_dims(1,2))
+if (~isempty(p.suffix))&&(size(p.suffix{1},1)~=core_dims(1,2))
     error('inconsistent dimensions in core-suffix product.');
 end
 if numel(p.prefix)>1

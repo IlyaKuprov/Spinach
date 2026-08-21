@@ -62,11 +62,11 @@ function [x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy]=polar2cartesian(r,p,Dr,Dp,Drr,Drp,Dpr,Dpp)
 
 % Check consistency
 if nargin==2
-    grumble(r,p);
+    grumble(nargout,r,p);
 elseif nargin==4
-    grumble(r,p,Dr,Dp);
+    grumble(nargout,r,p,Dr,Dp);
 elseif nargin==8
-    grumble(r,p,Dr,Dp,Drr,Drp,Dpr,Dpp);
+    grumble(nargout,r,p,Dr,Dp,Drr,Drp,Dpr,Dpp);
 else
     error('incorrect number of arguments.');
 end
@@ -109,8 +109,8 @@ end
 end
 
 % Consistency enforcement
-function grumble(r,p,df_dr,df_dp,d2f_dr2,d2f_drdp,d2f_dpdr,d2f_dp2)
-if nargin==2
+function grumble(nouts,r,p,df_dr,df_dp,d2f_dr2,d2f_drdp,d2f_dpdr,d2f_dp2)
+if nargin==3
     if (~isnumeric(r))||(~isreal(r))||(~all(r>=0))
         error('amplitude parameter must be a vector of non-negative real numbers.');
     end
@@ -120,9 +120,9 @@ if nargin==2
     if ~all(size(r)==size(p))
         error('amplitude and phase vectors must have the same dimension.');
     end
-elseif nargin==4
-    if (~isnumeric(r))||(~isreal(r))||(~all(r>=0))
-        error('amplitude parameter must be a vector of non-negative real numbers.');
+elseif nargin==5
+    if (~isnumeric(r))||(~isreal(r))||(~all(r>=0))||((nouts>2)&&(~all(r>0)))
+        error('amplitude parameter must be a vector of positive real numbers when derivatives are requested.');
     end
     if (~isnumeric(p))||(~isreal(p))
         error('phase parameter must be a vector of real numbers.');
@@ -137,9 +137,9 @@ elseif nargin==4
        (~all(size(df_dr)==size(df_dp)))
         error('all input vectors must have the same dimension.');
     end
-elseif nargin==8
-    if (~isnumeric(r))||(~isreal(r))||(~all(r>=0))
-        error('amplitude parameter must be a vector of non-negative real numbers.');
+elseif nargin==9
+    if (~isnumeric(r))||(~isreal(r))||(~all(r>=0))||((nouts>2)&&(~all(r>0)))
+        error('amplitude parameter must be a vector of positive real numbers when derivatives are requested.');
     end
     if (~isnumeric(p))||(~isreal(p))
         error('phase parameter must be a vector of real numbers.');

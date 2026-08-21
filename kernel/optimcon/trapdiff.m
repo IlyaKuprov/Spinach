@@ -68,9 +68,13 @@ end
 % Consistency enforcement
 function grumble(Hd,Hc,dt,cL,cR)
 if ~iscell(Hd), error('Hd must be a cell array of matrices.'); end
-for n=1:numel(Hd)     
-    if (~isnumeric(Hd{n}))||(size(Hd{n},1)~=size(Hd{n},2))
-        error('all elements of Hd cell array must be square matrices.');
+if numel(Hd)~=2
+    error('Hd must contain exactly two drift generators.');
+end
+for n=1:numel(Hd)
+    if (~isnumeric(Hd{n}))||(size(Hd{n},1)~=size(Hd{n},2))||...
+       (size(Hd{n},1)~=size(Hd{1},1))
+        error('all elements of Hd cell array must be square matrices of the same size.');
     end
 end
 if (~isnumeric(Hc))||(size(Hc,1)~=size(Hc,2))||(size(Hc,1)~=size(Hd{1},1))
@@ -80,7 +84,8 @@ end
 if (~isnumeric(dt))||(~isreal(dt))||(~isscalar(dt))||(dt<=0)
     error('dt must be a positive real scalar.');
 end
-if (~isnumeric(cL))||(~isreal(cL))||(~isnumeric(cR))||(~isreal(cR))
+if (~isnumeric(cL))||(~isreal(cL))||(~isscalar(cL))||...
+   (~isnumeric(cR))||(~isreal(cR))||(~isscalar(cR))
     error('cL and cR must be real scalars.');
 end
 end

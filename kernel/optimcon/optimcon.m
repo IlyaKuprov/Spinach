@@ -92,7 +92,7 @@ if isfield(control,'integrator')
         error('control.integrator must be a character string.');
     end
     if ~ismember(control.integrator,{'rectangle','trapezium'})
-        error('control.intgrator must be either ''rectangle'' or ''trapezium''.');
+        error('control.integrator must be either ''rectangle'' or ''trapezium''.');
     end
 
     % Absorb integrator type
@@ -478,8 +478,9 @@ if isfield(control,'pwr_levels')
 
     % Input validation
     if (~isnumeric(control.pwr_levels))||(~isreal(control.pwr_levels))||...
-       (~isrow(control.pwr_levels))||any(control.pwr_levels(:)<=0)
-        error('control.pwr_levels must be a row vector of positive real numbers.');
+       (~isrow(control.pwr_levels))||any(~isfinite(control.pwr_levels(:)))||...
+       any(control.pwr_levels(:)<=0)
+        error('control.pwr_levels must be a row vector of finite positive real numbers.');
     end
 
     % Absorb power levels
@@ -525,6 +526,9 @@ if isfield(control,'offsets')&&isfield(control,'off_ops')
         if (~isnumeric(control.off_ops{n}))||...
            (size(control.off_ops{n},1)~=size(control.off_ops{n},2))
             error('elements of control.off_ops must be square matrices.');
+        end
+        if size(control.off_ops{n},1)~=size(spin_system.control.operators{1},1)
+            error('control.off_ops must have the same dimension as the control operators.');
         end
     end
 
@@ -633,6 +637,9 @@ if isfield(control,'carrier_ops')
             size(control.carrier_ops{n},2))
             error('elements of control.carrier_ops must be square matrices.');
         end
+        if size(control.carrier_ops{n},1)~=size(spin_system.control.operators{1},1)
+            error('control.carrier_ops must have the same dimension as the control operators.');
+        end
     end
     if ~isfield(control,'carrier_frq')
         error('control.carrier_ops and control.carrier_frq are required simultaneously.');
@@ -695,6 +702,10 @@ if isfield(control,'drifts')
         if (numel(control.drifts{n})~=1)&&(numel(control.drifts{n})~=spin_system.control.pulse_ntpts)
             error(['need either 1 or ' int2str(spin_system.control.pulse_ntpts) ' elements in control.drift{' ...
                    int2str(n) '}, found ' int2str(numel(control.drifts{n})) ' elements.']);
+        end
+        if ~all(cellfun(@(m)isequal(size(m),size(spin_system.control.operators{1})),...
+                        control.drifts{n}(:)))
+            error('drift generators must have the same dimension as the control operators.');
         end
     end
     if ~all(cellfun(@numel,control.drifts(:))==numel(control.drifts{1}))
@@ -947,6 +958,10 @@ if isfield(control,'keyholes')
     if ~iscell(control.keyholes)
         error('control.keyholes must be a cell array.');
     end
+    if numel(control.keyholes)~=spin_system.control.pulse_ntpts
+        error(['control.keyholes must have ' ...
+               int2str(spin_system.control.pulse_ntpts) ' elements.']);
+    end
     for n=1:numel(control.keyholes)
         if (~isempty(control.keyholes{n}))&&(~isa(control.keyholes{n},'function_handle'))
             error('non-empty elements of control.keyholes must be function handles.');
@@ -995,6 +1010,9 @@ if isfield(control,'penalties')&&isfield(control,'p_weights')
        (~isrow(control.p_weights))||any(control.p_weights(:)<0)
             error('control.p_weights must be a row vector of non-negative real numbers.');
     end
+    if numel(control.p_weights)~=numel(control.penalties)
+        error('control.p_weights must have one weight per entry in control.penalties.');
+    end
     
     % Absorb penalties and their weights
     spin_system.control.penalties=control.penalties; control=rmfield(control,'penalties');
@@ -1022,11 +1040,13 @@ if isfield(control,'u_bound')&&isfield(control,'l_bound')
     wf_dims=[spin_system.control.ncontrols spin_system.control.pulse_ntpts];
 
     % Input validation
-    if (~isnumeric(control.u_bound))||(~isreal(control.u_bound))
-        error('control.u_bound must be a real scalar or a real array.');
+    if (~isnumeric(control.u_bound))||(~isreal(control.u_bound))||...
+       any(isnan(control.u_bound(:)))
+        error('control.u_bound must be a real scalar or a real array, free of NaN.');
     end
-    if (~isnumeric(control.l_bound))||(~isreal(control.l_bound))
-        error('control.l_bound must be a real scalar or a real array.');
+    if (~isnumeric(control.l_bound))||(~isreal(control.l_bound))||...
+       any(isnan(control.l_bound(:)))
+        error('control.l_bound must be a real scalar or a real array, free of NaN.');
     end
     if (~isscalar(control.u_bound))&&(~isequal(size(control.u_bound),wf_dims))
         error(['control.u_bound must be a scalar or have dimensions ' int2str(wf_dims) '.']);
@@ -1113,8 +1133,11 @@ if isfield(control,'budget')
 
     % Input validation
     if (~isnumeric(control.budget))||(~isreal(control.budget))||...
-       (~isscalar(control.budget))||(control.budget<=0)
+       (~isscalar(control.budget))||isnan(control.budget)||(control.budget<=0)
         error('control.budget must be a positive real scalar.');
+    end
+    if isfinite(control.budget)&&(control.budget>1)&&(mod(control.budget,1)~=0)
+        error('a control.budget above one must be an integer member count.');
     end
 
     % Absorb ensemble budget

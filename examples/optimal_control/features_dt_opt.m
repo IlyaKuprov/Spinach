@@ -104,7 +104,7 @@ subplot(1,2,2); plot_1d(spin_system,real(spectrum_new),parameters);
 ktitle('composite inversion, optimised');
 
 % Write the old and the new pulses to the console
-disp('Old and new durations (s):'); disp([dt_old dt_new]);
+disp('Old and new durations (microseconds):'); disp([dt_old dt_new]);
 
 end
 

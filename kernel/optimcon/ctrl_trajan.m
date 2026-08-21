@@ -496,7 +496,7 @@ if ismember('frq_controls',spin_system.control.plotting)
                    -1i*waveform(2*n  ,1:last_slice_to_plot);
 
         % Compute the instantaneous frequency profile
-        frq_profile(n,:)=inst_freq(cplx_ch_wf,dt,npoints,poly_order);
+        frq_profile(n,:)=inst_freq(cplx_ch_wf,dt,npoints,poly_order,0);
 
     end
 
@@ -770,6 +770,16 @@ end
 if ismember('frq_controls',spin_system.control.plotting)
     if ~(mod(size(waveform,1),2)==0)
         error('instantaneous frequency plots require an even number of control channels.');
+    end
+end
+if ismember('phi_controls',spin_system.control.plotting)
+    if ~(mod(size(waveform,1),2)==0)
+        error('phase plots require an even number of control channels.');
+    end
+end
+if ismember('amp_controls',spin_system.control.plotting)
+    if ~(mod(size(waveform,1),2)==0)
+        error('amplitude plots require an even number of control channels.');
     end
 end
 end

@@ -188,6 +188,15 @@ if ~isempty(spin_system.control.basis)
         error(['the number of columns in control.basis must be '...
                int2str(spin_system.control.pulse_ntpts)]);
     end
+    if size(waveform,2)~=size(spin_system.control.basis,1)
+        error(['waveform must have one column per basis function, i.e. '...
+               int2str(size(spin_system.control.basis,1)) ' columns.']);
+    end
+else
+    if size(waveform,2)~=spin_system.control.pulse_ntpts
+        error(['waveform must have ' ...
+               int2str(spin_system.control.pulse_ntpts) ' columns.']);
+    end
 end
 end
 

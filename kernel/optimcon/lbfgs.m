@@ -86,8 +86,16 @@ function grumble(dx_hist,dg_hist,g_new)
 if (size(dx_hist,2)~=size(dg_hist,2))||(size(g_new,2)~=1)
     error('all vector inputs must be column vector arrays.');
 end
+if (~isempty(dx_hist))&&((size(dx_hist,1)~=size(g_new,1))||...
+                         (size(dg_hist,1)~=size(g_new,1)))
+    error('dx_hist and dg_hist must have the same number of rows as g_new.');
+end
 if (~isreal(dx_hist))||(~isreal(dg_hist))||(~isreal(g_new))
     error('all vector inputs must be real.');
+end
+if any(~isfinite(dx_hist(:)))||any(~isfinite(dg_hist(:)))||...
+   any(~isfinite(g_new(:)))
+    error('all vector inputs must be finite.');
 end
 end
 

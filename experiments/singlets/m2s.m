@@ -69,8 +69,9 @@ end
 if (~isnumeric(J))||(~isreal(J))||(~isscalar(J))
     error('J must be a real scalar.');
 end
-if (~isnumeric(delta_v))||(~isreal(delta_v))||(~isscalar(delta_v))
-    error('delta_v must be a real scalar.');
+if (~isnumeric(delta_v))||(~isreal(delta_v))||(~isscalar(delta_v))||...
+   (~isfinite(delta_v))||(delta_v==0)
+    error('delta_v must be a non-zero finite real scalar.');
 end
 end
 

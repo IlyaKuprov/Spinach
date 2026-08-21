@@ -100,8 +100,8 @@ parfor n=1:N*M %#ok<*PFBNS>
     pcs=paramag_shift_perms(p_index,:)-diamag_shift_perms(d_index,:); 
     
     % Build the input arrays
-    hfcs=cell(numel(cell2mat(parameters.spin_groups)),1); p=1;
-    pcs_expt=zeros(numel(cell2mat(parameters.spin_groups)),1); 
+    hfcs=cell(sum(cellfun(@numel,parameters.spin_groups(:))),1); p=1;
+    pcs_expt=zeros(sum(cellfun(@numel,parameters.spin_groups(:))),1); 
     for k=1:numel(parameters.spin_groups)
         for m=1:numel(parameters.spin_groups{k})
             hfcs{p}=parameters.hfcs{parameters.spin_groups{k}(m)};
@@ -122,8 +122,8 @@ p_shifts=paramag_shift_perms(p_index,:);
 disp(['Minimum score: ' num2str(min_score)]);
 
 % Build the input arrays
-hfcs=cell(numel(cell2mat(parameters.spin_groups)),1); p=1;
-pcs_expt=zeros(numel(cell2mat(parameters.spin_groups)),1);
+hfcs=cell(sum(cellfun(@numel,parameters.spin_groups(:))),1); p=1;
+pcs_expt=zeros(sum(cellfun(@numel,parameters.spin_groups(:))),1);
 for k=1:numel(parameters.spin_groups)
     for m=1:numel(parameters.spin_groups{k})
         hfcs{p}=parameters.hfcs{parameters.spin_groups{k}(m)};
@@ -141,7 +141,7 @@ for k=1:numel(hfcs)
 end
 
 % Compute the predicted total shifts
-total_theo=pcs_theo+kron(d_shifts',[1; 1; 1]);
+total_theo=pcs_theo+repelem(d_shifts(:),cellfun(@numel,parameters.spin_groups(:)));
 
 % Report to the user
 disp('Best permuted diamagnetic shifts:'); disp(d_shifts');

@@ -41,6 +41,7 @@ classdef (InferiorClasses={?gpuArray}) opium
         % Number of non-zeroes
         function n=nnz(op)
             
+            % Distinguish zero and scaled unit objects
             if op.coeff==0
                 n=0;
             else

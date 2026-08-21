@@ -34,7 +34,7 @@ dx=zeros(size(x)); x=x(:);
 for n=1:(npoints-1)/2
     w=fdweights(n,1:npoints,order);
     dx(n)=w(end,:)*x(1:npoints);
-    dx(end-n+1)=-w(end,end:-1:1)*x((end-npoints+1):end);
+    dx(end-n+1)=((-1)^order)*w(end,end:-1:1)*x((end-npoints+1):end);
 end
 
 % Fill in the middle with centered schemes

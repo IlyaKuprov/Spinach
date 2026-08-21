@@ -43,8 +43,8 @@ grumble(spectrum,parameters,stack_dim);
 
 % If a complex spectrum is received, plot both components
 if nnz(imag(spectrum))>0
-    stack_2d(spin_system,real(spectrum),parameters,stack_dim); hold on;
-    stack_2d(spin_system,imag(spectrum),parameters,stack_dim);
+    stack_2d(spin_system,real(spectrum),parameters,stack_dim,alpha_fun); hold on;
+    stack_2d(spin_system,imag(spectrum),parameters,stack_dim,alpha_fun); return;
 end
 
 % Inform the user

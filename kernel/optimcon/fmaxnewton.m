@@ -123,8 +123,17 @@ for n=1:spin_system.control.max_iter
                 % Get objective and gradient
                 [data,fx,g]=objeval(x,cost_function,data,spin_system);
 
+                % Refuse non-finite objectives and gradients
+                if (~isfinite(fx))||(~all(isfinite(g(~frozen))))
+                    error('non-finite objective or gradient at the initial point.');
+                end
+
                 % Stop if the initial point already meets the gradient tolerance
-                if norm(g(~frozen),2)<spin_system.control.tol_g
+                grad_norm=norm(g(~frozen),2);
+                if (grad_norm==0)||(grad_norm<spin_system.control.tol_g)
+                    if strcmp(spin_system.control.fidelity,'square')&&(fx<sqrt(eps))
+                        error('square-fidelity start is numerically orthogonal to the target, choose a different initial guess.');
+                    end
                     exitflag=1; break;
                 end
                 

@@ -1,5 +1,5 @@
-% Converts an OPIUM object into a full
-% unit matrix. Syntax:
+% Converts an OPIUM object into the full scaled
+% unit matrix that it represents. Syntax:
 %
 %              M=full(M)
 %
@@ -9,8 +9,8 @@
 %
 % Outputs:
 %
-%     M - a full unit matrix of app-
-%         ropriate dimension
+%     M - a full scaled unit matrix
+%         of appropriate dimension
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -18,8 +18,8 @@
 
 function M=full(M)
     
-    % Make a unit matrix
-    M=eye(M.dim);
+    % Make a scaled unit matrix
+    M=M.coeff*eye(M.dim);
 
 end
 

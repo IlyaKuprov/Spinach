@@ -111,8 +111,8 @@ end
 if numel(p)~=size(w,1)/2
     error('p must have one element per X,Y control pair.');
 end
-if any(abs(p(:))>=1)
-    error('must have |p(k)|<1 for causal stability.');
+if any(~isfinite(p(:)))||any(abs(p(:))>=1)
+    error('p elements must be finite with |p(k)|<1 for causal stability.');
 end
 end
 

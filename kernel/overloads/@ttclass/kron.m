@@ -54,7 +54,7 @@ if a.coeff==0 || b.coeff==0
     c.tolerance=0;
 else
     % The relative tolerances sum up
-    c.tolerance=a.coeff*b.tolerance+b.coeff*a.tolerance;
+    c.tolerance=abs(a.coeff)*b.tolerance+abs(b.coeff)*a.tolerance;
 end
 
 end

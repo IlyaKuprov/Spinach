@@ -28,13 +28,18 @@ if isstruct(spectrum)
     
     % Get the field names
     struct_fieldnames=fieldnames(spectrum);
-    
-    % Loop over field names
-    for n=1:length(struct_fieldnames)
-        
-        % Call itself for each field name
-        spectrum.(struct_fieldnames{n})=destreak(spectrum.(struct_fieldnames{n}));
-                      
+
+    % Loop over structure elements
+    for m=1:numel(spectrum)
+
+        % Loop over field names
+        for n=1:length(struct_fieldnames)
+
+            % Call itself for each field of each element
+            spectrum(m).(struct_fieldnames{n})=destreak(spectrum(m).(struct_fieldnames{n}));
+
+        end
+
     end
 
     % Done

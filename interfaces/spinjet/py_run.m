@@ -55,9 +55,14 @@ if ~isempty(arg_in)
         
         % Ensure input as characters
         if ~ischar(arg_in{inputs})
-            arg_in{inputs}=num2str(arg_in{inputs}); 
+            arg_in{inputs}=num2str(arg_in{inputs});
         end
-        
+
+        % Strip pre-existing surrounding quotes
+        if (numel(arg_in{inputs})>1)&&(arg_in{inputs}(1)=='"')&&(arg_in{inputs}(end)=='"')
+            arg_in{inputs}=arg_in{inputs}(2:end-1);
+        end
+
         % Append the command string
         command_string=[command_string '"' arg_in{inputs} '" ']; %#ok<AGROW>
         

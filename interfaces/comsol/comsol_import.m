@@ -56,7 +56,7 @@ mesh=comsol_velo(mesh,comsol.velo_file);
 mesh=mesh_crop(mesh,comsol.crop); 
 
 % Inactivate user-specified vertices
-mesh=mesh_inact(mesh,comsol.inactivate);   
+mesh=mesh_inact(mesh,comsol.inactivate(:).');
 
 % Run Voronoi tessellation
 mesh=mesh_vorn(mesh);

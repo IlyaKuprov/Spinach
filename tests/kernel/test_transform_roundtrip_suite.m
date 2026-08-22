@@ -41,8 +41,8 @@ result=test_close(result,'anax2qter/qter2anax rotation',R_from_quat,R_from_axis,
 angles=[0.21*pi 0.37*pi 0.43*pi];
 R=euler2dcm(angles);
 angles_back=dcm2euler(R);
-result=test_close(result,'dcm2euler/euler2dcm rotation',euler2dcm(angles_back),R,1e-7,1e-7,...
-                  'Euler-angle recovery must reconstruct the original active ZYZ rotation to the documented numerical accuracy of the inverse problem');
+result=test_close(result,'dcm2euler/euler2dcm rotation',euler2dcm(angles_back),R,1e-14,1e-14,...
+                  'Euler-angle recovery must reconstruct the original active ZYZ rotation to machine precision');
 
 % Axiality/rhombicity to matrix with zero Euler angles gives the Mehring-order eigenvalues
 iso=4; ax=6; rh=2;

@@ -46,8 +46,15 @@ result=test_true(result,'euler_equiv tolerance fail',~euler_equiv([0 0 0],[2e-6 
 angles=[0.37 0.91 -0.42];
 R=euler2dcm(angles);
 angles_obs=dcm2euler(R);
-result=test_close(result,'dcm2euler reconstruction',euler2dcm(angles_obs),R,1e-7,1e-7,...
-                  'Euler angles are not unique, but the reconstructed DCM must be the same rotation to optimiser tolerance');
+result=test_close(result,'dcm2euler reconstruction',euler2dcm(angles_obs),R,1e-14,1e-14,...
+                  'Euler angles are not unique, but the reconstructed DCM must be the same rotation to machine precision');
+result=test_close(result,'dcm2euler beta zero',euler2dcm(dcm2euler(euler2dcm(0.4,0,1.1))),euler2dcm(0.4,0,1.1),1e-14,1e-14,...
+                  'the beta=0 gimbal case must reconstruct exactly');
+result=test_close(result,'dcm2euler beta pi',euler2dcm(dcm2euler(euler2dcm(0.4,pi,1.1))),euler2dcm(0.4,pi,1.1),1e-14,1e-14,...
+                  'the beta=pi gimbal case must reconstruct exactly');
+R_dirty=R+1e-7*[0.3 -0.7 0.2; 0.1 0.4 -0.6; -0.5 0.2 0.3];
+result=test_close(result,'dcm2euler corrupted input',euler2dcm(dcm2euler(R_dirty)),R,1e-6,1e-6,...
+                  'a subtly corrupted DCM must return the angles of the nearest proper rotation');
 
 % Compose two active rotations in the documented order
 rot_one=[0.2 0.4 -0.3];

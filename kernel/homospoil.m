@@ -49,13 +49,12 @@ if strcmp(spin_system.bas.formalism,'zeeman-hilb')
     rho=spdiags(rhod,0,dim,dim); return;
 end
 
-% In Zeeman basis of Liouville space, fold back
-% into Hilbert space, keep diagonal, and unfold
+% In Zeeman basis of Liouville space, zero off-diagonals in every stacked column
 if strcmp(spin_system.bas.formalism,'zeeman-liouv')
     dim=sqrt(size(rho,1));
-    rho=reshape(rho,[dim dim]);
-    rho=spdiags(diag(rho),0,dim,dim);
-    rho=rho(:); return;
+    offdiag_mask=true(dim^2,1);
+    offdiag_mask(1:(dim+1):dim^2)=false;
+    rho(offdiag_mask,:)=0; return;
 end
 
 % Store dimension statistics

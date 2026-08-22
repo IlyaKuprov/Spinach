@@ -252,14 +252,11 @@ if isscalar(parameters.npts)
         if numel(parameters.u)~=parameters.npts
             error('the number of elements in parameters.u must be equal to parameters.npts');
         end
-        for n={'dxx'}
-            if isfield(parameters,n{1})
-                d=getfield(parameters,n{1}); %#ok<GFLD>
-                if (~isnumeric(d))||(~isreal(d))||...
-                   (~iscolumn(d))||any(~isfinite(d))
-                    error(['parameters.' n{1} ' must be a real column vector.']);
-                end
-            end
+    end
+    if isfield(parameters,'dxx')
+        if (~isnumeric(parameters.dxx))||(~isreal(parameters.dxx))||(~iscolumn(parameters.dxx))||...
+           any(~isfinite(parameters.dxx))||any(parameters.dxx<0)
+            error('parameters.dxx must be a non-negative real column vector.');
         end
     end
 end
@@ -286,9 +283,14 @@ if numel(parameters.npts)==2
         if isfield(parameters,n{1})
             d=getfield(parameters,n{1}); %#ok<GFLD>
             if (~isnumeric(d))||(~isreal(d))||any(size(d)~=parameters.npts)||...
-                any(~isfinite(d(:)))||any(d(:)<0)
+                any(~isfinite(d(:)))
                 error(['parameters.' n{1} ' must be a real array of dimension ' num2str(parameters.npts)]);
             end
+        end
+    end
+    for n={'dxx','dyy'}
+        if isfield(parameters,n{1})&&any(parameters.(n{1})(:)<0)
+            error(['parameters.' n{1} ' must be non-negative.']);
         end
     end
     if any(isfield(parameters,{'dxx','dxy','dyx','dyy'}))&&...
@@ -319,9 +321,14 @@ if (numel(parameters.npts)==3)
         if isfield(parameters,n{1})
             d=getfield(parameters,n{1}); %#ok<GFLD>
             if (~isnumeric(d))||(~isreal(d))||any(size(d)~=parameters.npts)||...
-                any(~isfinite(d(:)))||any(d(:)<0)
+                any(~isfinite(d(:)))
                 error(['parameters.' n{1} ' must be a real array of dimension ' num2str(parameters.npts)]);
             end
+        end
+    end
+    for n={'dxx','dyy','dzz'}
+        if isfield(parameters,n{1})&&any(parameters.(n{1})(:)<0)
+            error(['parameters.' n{1} ' must be non-negative.']);
         end
     end
     if any(isfield(parameters,{'dxx','dxy','dxz','dyx','dyy','dyz','dzx','dzy','dzz'}))&&...

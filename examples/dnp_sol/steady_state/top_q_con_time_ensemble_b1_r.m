@@ -149,7 +149,7 @@ contact_times=(parameters.pulse_dur+parameters.delay_dur)*loop_counts;
 kfigure(); plot(contact_times*1e6,real(dnp_a));
 hold on; plot(contact_times*1e6,real(dnp_b));
 kylabel('$I_\textrm{z}$ expectation value on $^{1}$H');
-klegend({'TOP, 18 MHz','TOP, 33 MHz'});
+klegend({'TOP, 15 MHz','TOP, 30 MHz'});
 kxlabel('Total contact time, $\mu$s'); 
 kgrid; xlim tight; ylim padded;
 

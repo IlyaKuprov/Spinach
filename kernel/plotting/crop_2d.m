@@ -71,7 +71,7 @@ parameters.sweep= [(axis_f1_hz(r_bound_f1)-axis_f1_hz(l_bound_f1)) ...
                    (axis_f2_hz(r_bound_f2)-axis_f2_hz(l_bound_f2))];
                
 % Update the point counts
-parameters.zerofill=[(r_bound_f1-l_bound_f1) (r_bound_f2-l_bound_f2)];
+parameters.zerofill=[(r_bound_f1-l_bound_f1+1) (r_bound_f2-l_bound_f2+1)];
 
 % Cut the spectrum
 spec=spec(l_bound_f1:r_bound_f1,l_bound_f2:r_bound_f2);

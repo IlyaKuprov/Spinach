@@ -76,7 +76,7 @@ for n=1:parameters.nloops
 end
 
 % Acquisition
-[L,rho]=decouple(spin_system,L,rho,{'1H'});
+[L,rho]=decouple(spin_system,L,rho,parameters.spins(1));
 fid=evolution(spin_system,L,parameters.coil,rho,...
               1/parameters.sweep,parameters.npoints-1,'observable');
           

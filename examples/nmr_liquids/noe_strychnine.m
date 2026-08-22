@@ -46,7 +46,7 @@ rho_eq=equilibrium(spin_system,hamiltonian(assume(spin_system,'labframe'),'left'
 
 % Start in a state with one spin inverted
 Lz9=state(spin_system,{'Lz'},{9});
-rho=rho_eq-2*Lz9*(Lz9'*rho_eq)/norm(Lz9);
+rho=rho_eq-2*Lz9*(Lz9'*rho_eq)/norm(Lz9)^2;
 
 % Evolve for 500 ms under the relaxation superoperator
 rho=evolution(spin_system,1i*R,[],rho,0.5,1,'final');

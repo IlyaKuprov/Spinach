@@ -22,6 +22,13 @@ addpath(fullfile(root_dir,'lib'));
 addpath(genpath(fullfile(root_dir,'kernel')));
 addpath(genpath(fullfile(root_dir,'interfaces')));
 
+% Add the Spinach production directories to the path
+spinach_root=fileparts(root_dir);
+addpath(genpath(fullfile(spinach_root,'etc')));
+addpath(genpath(fullfile(spinach_root,'experiments')));
+addpath(genpath(fullfile(spinach_root,'interfaces')));
+addpath(genpath(fullfile(spinach_root,'kernel')));
+
 % Parse options
 options=test_options(varargin{:});
 
@@ -84,3 +91,4 @@ if n_fail>0
 end
 
 end
+

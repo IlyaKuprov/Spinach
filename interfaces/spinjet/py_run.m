@@ -40,9 +40,9 @@ grumble(spin_system,pyscript,arg_in);
 arg_out={};
 
 % Initialise command string to run the selected python script file
-command_string=['python ' spin_system.sys.root_dir filesep ...
+command_string=['python "' spin_system.sys.root_dir filesep ...
                 'interfaces' filesep 'spinjet' filesep ...
-                'Xepr_python' filesep pyscript '.py'];
+                'Xepr_python' filesep pyscript '.py"'];
 
 % Process extra argument cell, if needed
 if ~isempty(arg_in)
@@ -59,7 +59,7 @@ if ~isempty(arg_in)
         end
         
         % Append the command string
-        command_string=[command_string arg_in{inputs} ' ']; %#ok<AGROW>
+        command_string=[command_string '"' arg_in{inputs} '" ']; %#ok<AGROW>
         
     end
     

@@ -6,7 +6,7 @@
 %
 % Parameters:
 %
-%   mode   - 'online' (default) checks the documentation
+%   mode   - 'online' checks the documentation
 %            Wiki for the corresponding page; 'offline'
 %            skips the Wiki check 
 %
@@ -21,9 +21,6 @@
 % <https://spindynamics.org/wiki/index.php?title=exorcise.m>
 
 function exorcise(mode)
-
-% Default mode is online
-if ~exist('mode','var'), mode='online'; end
 
 % Check consistency
 grumble(mode);

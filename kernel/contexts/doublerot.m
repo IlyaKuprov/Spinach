@@ -206,8 +206,14 @@ sph_grid=load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ...
                                         filesep parameters.grid '.mat']);
 
 % Assign local variables
-alphas=sph_grid.alphas; betas=sph_grid.betas; 
+alphas=sph_grid.alphas; betas=sph_grid.betas;
 gammas=sph_grid.gammas; weights=sph_grid.weights;
+
+% Reject two-angle powder grids in the Hilbert space route
+if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef'})&&...
+   (numel(weights)>1)&&all(alphas(:)==0)
+    error('Hilbert space rotor stacks require a three-angle spherical grid.');
+end
 
 % Project into the Fokker-Planck space in Liouville formalisms
 if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})

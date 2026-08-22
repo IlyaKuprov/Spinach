@@ -92,6 +92,12 @@ if strcmp(spin_system.bas.formalism,'zeeman-hilb')
     zbas=spin_system.bas.basis; hdim=size(zbas,1);
     spin_system.bas.basis=[repmat(zbas,[hdim 1]) kron(zbas,ones(hdim,1))];
 
+    % Discard Hilbert space symmetry data
+    if isfield(spin_system.bas,'irrep')
+        spin_system.bas=rmfield(spin_system.bas,'irrep');
+        report(spin_system,'Hilbert space irreps discarded, proceeding without symmetry.');
+    end
+
     % Update the formalism setting
     spin_system.bas.formalism='zeeman-liouv';
 

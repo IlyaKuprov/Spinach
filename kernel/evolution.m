@@ -86,12 +86,15 @@
 %
 %       destination - this argument is ignored.
 %
-%  For wavefunction calculations the Liouville space call signature and
-%  options apply with L the Hamiltonian matrix, rho a wavefunction or a
+%  For wavefunction calculations the Liouville space call signature
+%  applies with L the Hamiltonian matrix, rho a wavefunction or a
 %  horizontal stack thereof, and coil a reference wavefunction: the
 %  'observable' and 'multichannel' outputs return overlap trajectories
 %  of the coil with the evolving wavefunction; expectation values of
-%  operators require a density matrix formalism.
+%  operators require a density matrix formalism. Stacks are supported
+%  by 'final', 'refocus', 'observable', and 'multichannel'; the
+%  'trajectory' output takes a single column, and 'total' is not
+%  defined for unitary wavefunction evolution.
 %
 % Outputs:
 %
@@ -273,9 +276,14 @@ switch spin_system.bas.formalism
                 report(spin_system,'data retrieval finished.');
                 
             case 'total'
-                
+
+                % Refuse integrals of unitary dynamics
+                if strcmp(spin_system.bas.formalism,'zeeman-wavef')
+                    error('total observable integral is not defined for unitary wavefunction evolution.');
+                end
+
                 % Create arrays of projections
-                L_sub=cell(nsubs,1); 
+                L_sub=cell(nsubs,1);
                 rho_sub=cell(nsubs,1); coil_sub=cell(nsubs,1);
                 report(spin_system,'splitting the space...');
                 for sub=1:nsubs
@@ -315,7 +323,12 @@ switch spin_system.bas.formalism
                 answer=full(answer);
                 
             case 'trajectory'
-                
+
+                % Refuse state vector stacks
+                if size(rho,2)>1
+                    error('trajectory output is not available for state vector stacks.');
+                end
+
                 % Create arrays of projections
                 L_sub=cell(nsubs,1); rho_sub=cell(nsubs,1);
                 rows=cell(nsubs,1); cols=cell(nsubs,1); vals=cell(nsubs,1);

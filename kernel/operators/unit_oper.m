@@ -1,9 +1,9 @@
 % Returns a unit operator in the current formalism and basis. The
 % operator has dimension equal to the basis size in sphten-liouv
 % formalism, the dimension equal to the product of all spin multi-
-% plicities in zeeman-hilb formalism, and the dimension of square
-% of the product of all spin multiplicities in zeeman-liouv forma-
-% lism. Syntax:
+% plicities in zeeman-hilb and zeeman-wavef formalisms, and the
+% dimension of square of the product of all spin multiplicities in
+% zeeman-liouv formalism. Syntax:
 %
 %                      A=unit_oper(spin_system)
 %

@@ -92,28 +92,26 @@ switch spin_system.bas.formalism
             end
         end
 
-        % Generating function samples over the selected spins
+        % Generating function samples on the roots of unity
         nsel=numel(spins); gsam=cell(1,nsel+1);
-        for x=0:nsel
-            gs=rho;
+        for j=0:nsel
+            gs=rho; x=exp(2i*pi*j/(nsel+1));
             for n=1:nsel
                 gs=idch{n}*gs+x*(gs-idch{n}*gs);
             end
-            gsam{x+1}=gs;
+            gsam{j+1}=gs;
         end
 
-        % Cardinal weights of the correlation orders to keep
-        vmat=zeros(nsel+1); ind=zeros(nsel+1,1);
-        for c=0:nsel
-            vmat(c+1,:)=(0:nsel).^c;
-            ind(c+1)=double(ismember(c,orders));
+        % Discrete Fourier weights of the correlation orders to keep
+        wts=zeros(nsel+1,1); okords=orders(ismember(orders,0:nsel));
+        for j=0:nsel
+            wts(j+1)=sum(exp(-2i*pi*okords(:)*j/(nsel+1)))/(nsel+1);
         end
-        wts=vmat\ind;
 
         % Assemble the projected state
         rho=wts(1)*gsam{1};
-        for x=1:nsel
-            rho=rho+wts(x+1)*gsam{x+1};
+        for j=1:nsel
+            rho=rho+wts(j+1)*gsam{j+1};
         end
 
 end

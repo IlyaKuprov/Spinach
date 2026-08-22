@@ -142,7 +142,7 @@ parfor n=0:18 %#ok<*PFBNS>
                          parameters.nsteps+1);
 
     % Move to GPU if requested
-    if ismember('gpu',sys.enable)
+    if ismember('gpu',spin_system.sys.enable)
         L=gpuArray(H+1i*R);  G11=gpuArray(G1{1});
         G12=gpuArray(G1{2}); G21=gpuArray(G2{1});
         G22=gpuArray(G2{2}); eta=gpuArray(eta); coil=gpuArray(Hp);

@@ -30,11 +30,11 @@ result=test_close(result,'anax2dcm determinant',det(R),1,1e-14,1e-14,...
 
 % Quaternion and angle-axis representations must describe the same rotation
 axis=[1 2 3]; angle=0.37*pi;
-q=anax2quat(axis,angle);
-[axis_back,angle_back]=quat2anax(q);
+q=anax2qter(axis,angle);
+[axis_back,angle_back]=qter2anax(q);
 R_from_axis=anax2dcm(axis,angle);
 R_from_quat=anax2dcm(axis_back,angle_back);
-result=test_close(result,'anax2quat/quat2anax rotation',R_from_quat,R_from_axis,1e-14,1e-14,...
+result=test_close(result,'anax2qter/qter2anax rotation',R_from_quat,R_from_axis,1e-14,1e-14,...
                   'quaternion round-trip must preserve the represented rotation');
 
 % Euler conversion is ill-conditioned in angles, but DCM reconstruction is unique

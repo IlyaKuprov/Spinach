@@ -1,6 +1,6 @@
 % Converts angle-axis rotation parameters into a quaternion. Syntax:
 %
-%                  q=anax2quat(rot_axis,rot_angle)
+%                  q=anax2qter(rot_axis,rot_angle)
 %
 % Parameters:
 %
@@ -17,9 +17,9 @@
 % gareth.charnock@oerc.ox.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
-% <https://spindynamics.org/wiki/index.php?title=anax2quat.m>
+% <https://spindynamics.org/wiki/index.php?title=anax2qter.m>
 
-function q=anax2quat(rot_axis,rot_angle)
+function q=anax2qter(rot_axis,rot_angle)
 
 % Check consistency
 grumble(rot_axis,rot_angle);

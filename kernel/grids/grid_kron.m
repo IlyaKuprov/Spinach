@@ -33,20 +33,24 @@ function [angles,weights]=grid_kron(angles1,weights1,angles2,weights2)
 grumble(angles1,weights1,angles2,weights2);
 
 % Convert both grids to quaternions
-quats1=angle2quat(angles1(:,1),angles1(:,2),angles1(:,3),'ZYZ');
-quats2=angle2quat(angles2(:,1),angles2(:,2),angles2(:,3),'ZYZ');
+qter1=euler2qter(angles1(:,1),angles1(:,2),angles1(:,3));
+qter2=euler2qter(angles2(:,1),angles2(:,2),angles2(:,3));
 
-% Build a table of quaternion products
-quats=[kron(quats1,ones(size(quats2,1),1)) kron(ones(size(quats1,1),1),quats2)];
+% Build a table of quaternion pairs
+n1=size(angles1,1); n2=size(angles2,1);
+u1=kron(qter1.u,ones(n2,1)); u2=kron(ones(n1,1),qter2.u);
+i1=kron(qter1.i,ones(n2,1)); i2=kron(ones(n1,1),qter2.i);
+j1=kron(qter1.j,ones(n2,1)); j2=kron(ones(n1,1),qter2.j);
+k1=kron(qter1.k,ones(n2,1)); k2=kron(ones(n1,1),qter2.k);
 
 % Multiply up quaternions
-quats=[quats(:,1).*quats(:,5)-quats(:,2).*quats(:,6)-quats(:,3).*quats(:,7)-quats(:,4).*quats(:,8),...
-       quats(:,1).*quats(:,6)+quats(:,2).*quats(:,5)+quats(:,3).*quats(:,8)-quats(:,4).*quats(:,7),...
-       quats(:,1).*quats(:,7)-quats(:,2).*quats(:,8)+quats(:,3).*quats(:,5)+quats(:,4).*quats(:,6),...
-       quats(:,1).*quats(:,8)+quats(:,2).*quats(:,7)-quats(:,3).*quats(:,6)+quats(:,4).*quats(:,5)];
-   
+qter.u=u1.*u2-i1.*i2-j1.*j2-k1.*k2;
+qter.i=u1.*i2+i1.*u2+j1.*k2-k1.*j2;
+qter.j=u1.*j2-i1.*k2+j1.*u2+k1.*i2;
+qter.k=u1.*k2+i1.*j2-j1.*i2+k1.*u2;
+
 % Convert quaternions into angles
-[alphas,betas,gammas]=quat2angle(quats,'ZYZ'); angles=real([alphas betas gammas]);
+[alphas,betas,gammas]=qter2euler(qter); angles=[alphas betas gammas];
 
 % Tile the weights
 weights=kron(weights1,weights2);

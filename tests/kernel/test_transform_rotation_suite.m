@@ -78,16 +78,28 @@ result=test_close(result,'anax2dcm active convention, Y axis',anax2dcm([0 1 0],0
                   'a rotation about the Y axis must match the corresponding active ZYZ Euler rotation');
 
 % Round-trip a non-zero angle through quaternion form
-q=anax2quat(axis_vec,angle);
-[axis_obs,angle_obs]=quat2anax(q);
+q=anax2qter(axis_vec,angle);
+[axis_obs,angle_obs]=qter2anax(q);
 axis_ref=(axis_vec/norm(axis_vec,2)).';
 q_norm=sqrt(q.u^2+q.i^2+q.j^2+q.k^2);
-result=test_close(result,'anax2quat unit norm',q_norm,1,1e-15,1e-15,...
+result=test_close(result,'anax2qter unit norm',q_norm,1,1e-15,1e-15,...
                   'rotation quaternions must have unit norm');
-result=test_close(result,'quat2anax axis',axis_obs,axis_ref,1e-15,1e-15,...
+result=test_close(result,'qter2anax axis',axis_obs,axis_ref,1e-15,1e-15,...
                   'for angles below pi the quaternion axis is the normalised input axis');
-result=test_close(result,'quat2anax angle',angle_obs,angle,1e-15,1e-15,...
+result=test_close(result,'qter2anax angle',angle_obs,angle,1e-15,1e-15,...
                   'for angles below pi the quaternion angle is recovered without branch ambiguity');
+
+% Check the quaternion conversions against the Euler convention
+qtr=euler2qter(0.4,1.1,-0.7);
+result=test_close(result,'euler2qter unit norm',sqrt(qtr.u^2+qtr.i^2+qtr.j^2+qtr.k^2),1,1e-15,1e-15,...
+                  'rotation quaternions must have unit norm');
+result=test_close(result,'euler2qter/qter2dcm convention',qter2dcm(qtr),euler2dcm(0.4,1.1,-0.7),1e-14,1e-14,...
+                  'the quaternion route must reproduce the active ZYZ rotation matrix');
+[alp_obs,bet_obs,gam_obs]=qter2euler(qtr);
+result=test_close(result,'qter2euler recovery',euler2dcm(alp_obs,bet_obs,gam_obs),euler2dcm(0.4,1.1,-0.7),1e-14,1e-14,...
+                  'Euler angles are not unique, but the recovered angles must give the same rotation');
+result=test_close(result,'dcm2qter/qter2dcm rotation',qter2dcm(dcm2qter(euler2dcm(0.4,1.1,-0.7))),euler2dcm(0.4,1.1,-0.7),1e-14,1e-14,...
+                  'the DCM round trip through the quaternion must be exact to machine precision');
 
 % Check that identity rotation has identity second-rank Wigner matrix
 D=dcm2wigner(eye(3));

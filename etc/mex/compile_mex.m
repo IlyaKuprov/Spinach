@@ -32,6 +32,14 @@ mex('-R2018a','-O','-DNDEBUG',...
 mex('-R2018a','-O','-DNDEBUG',...
     [P '/kernel/indexing/spunicols.cpp'],'-outdir',[P '/kernel/indexing']);
 
+% Sparse matrix clean-up
+mex('-R2018a','-O','-DNDEBUG',...
+    [P '/etc/mex/prune_cpu.cpp'],'-outdir',[P '/etc/mex']);
+
+% Row partitioning into cells
+mex('-R2018a','-O','-DNDEBUG',...
+    [P '/etc/mex/knum2cell.cpp'],'-outdir',[P '/etc/mex']);
+
 end
 
 % Audiophiles don't use their equip-
@@ -40,3 +48,5 @@ end
 % their equipment.
 %
 % Alan Parsons
+
+

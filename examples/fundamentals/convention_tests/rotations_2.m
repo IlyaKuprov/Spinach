@@ -71,7 +71,7 @@ resnorm=norm(H_A-H_B,1);
 
 % Display the diagnostics
 if resnorm>1e-3
-    report(spin_system,['rotation test failed, ' num2str(resnorm)]);
+    error(['rotation test failed, residual norm ' num2str(resnorm)]);
 else
     report(spin_system,['rotation test passed, ' num2str(resnorm)]);
 end

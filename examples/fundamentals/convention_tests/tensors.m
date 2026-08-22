@@ -38,6 +38,7 @@ else
     disp('Test FAILED.');
     disp(full(lin_comb_a));
     disp(full(lin_comb_b));
+    error('tensor conversion test FAILED.');
 end
 
 end

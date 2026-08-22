@@ -69,9 +69,6 @@ function trajan(spin_system,traj,property,time_axis)
 if ~exist('time_axis','var'), time_axis=[]; end
 grumble(spin_system,traj,property,time_axis);
 
-% Set the defaults
-if ~exist('property','var'), property='correlation_order'; end
-
 % Project out unit state
 if ~strcmp(property,'level_populations')
     unit=unit_state(spin_system);

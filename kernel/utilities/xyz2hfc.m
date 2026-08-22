@@ -1,15 +1,15 @@
 % Converts point electron and nuclear coordinates into a hyper-
 % fine interaction tensor. Syntax:
 %
-%                  A=xyz2hfc(mxyz,exyz,isotope)
+%                  A=xyz2hfc(exyz,nxyz,isotope)
 %
 % Parameters:
 %
 %     exyz     - Cartesian coordinates of the electron,
-%                a three-element vector in Angstrom
+%                a 1x3 row vector in Angstrom
 %
 %     nxyz     - Cartesian coordinates of the nucleus,
-%                a three-element vector in Angstrom
+%                a 1x3 row vector in Angstrom
 %
 %     isotope  - isitope specification, e.g. '13C'
 %
@@ -58,14 +58,11 @@ end
 
 % Consistency enforcement
 function grumble(exyz,nxyz,isotope)
-if (~isnumeric(exyz))||(~isreal(exyz))||(numel(exyz)~=3)
-    error('e_xyz must be a three-element real vector.');
+if (~isnumeric(exyz))||(~isreal(exyz))||(~isequal(size(exyz),[1 3]))
+    error('exyz must be a 1x3 real row vector.');
 end
-if (~isnumeric(nxyz))||(~isreal(nxyz))||(numel(nxyz)~=3)
-    error('n_xyz must be a three-element real vector.');
-end
-if ~all(size(exyz)==size(nxyz))
-    error('e_xyz and n_xyz must have the same dimension.');
+if (~isnumeric(nxyz))||(~isreal(nxyz))||(~isequal(size(nxyz),[1 3]))
+    error('nxyz must be a 1x3 real row vector.');
 end
 if norm(nxyz-exyz,2)==0
     error('e_xyz and n_xyz coordinates must be different.');

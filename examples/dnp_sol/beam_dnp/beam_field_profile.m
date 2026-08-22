@@ -45,11 +45,21 @@ parameters.coil=state(spin_system,'Lz','1H');
 
 % Experiment parameters
 parameters.spins={'E','1H'};
-parameters.irr_powers=32.0e6;            % Electron nutation frequency [Hz]
-parameters.pulse_dur=[20.0e-9 28.7e-9];  % Pulse durations, seconds
-parameters.nloops=165;                   % Number of BEAM DNP blocks
-parameters.grid='rep_2ang_800pts_sph';   % Powder averaging grid
-parameters.needs={'aniso_eq'};           % Sequence needs rho_eq
+
+% Electron nutation frequency [Hz]
+parameters.irr_powers=32.0e6;
+
+% Pulse durations, seconds
+parameters.pulse_dur=[20.0e-9 28.7e-9];
+
+% Number of BEAM DNP blocks
+parameters.nloops=165;
+
+% Powder averaging grid
+parameters.grid='rep_2ang_800pts_sph';
+
+% Sequence needs rho_eq
+parameters.needs={'aniso_eq'};
 
 % MW resonance offset grid, Hz
 offsets=linspace(-60e6,60e6,120);

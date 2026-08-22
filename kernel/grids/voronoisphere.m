@@ -1,188 +1,118 @@
-% Voronoi tessellation on a sphere. Syntax:
+% Voronoi tessellation of the unit sphere around the specified po-
+% ints, computed as the exact geometric dual of the Delaunay tri-
+% angulation returned by the convex hull. Syntax:
 %
-%   [vertices,indices,polygons,sangles]=voronoisphere(xyz,res)
+%      [vertices,indices,polygons,sangles]=voronoisphere(xyz)
 %
 % Parameters:
 %
 %     xyz      - (3 x n) array, coordinates of n distinct vectors
-%                 in R^3; these will be normalised
-%
-%     res      - polygon edges longer than this resolution will
-%                have extra points added so that spherical plots
-%                look neat (optional, default is pi/180)
+%                in R^3; these will be normalised
 %
 % Outputs:
 %
 %     vertices - (3 x m) array, coordinates of the vertices of the
-%                 Voronoi tessellation
+%                Voronoi tessellation
 %
 %     indices  - (n x 1) cell array, j-th element contains the in-
-%                 dices of the Voronoi cell vertices that corres-
-%                 pond to xyz(:,j). Vertices are oriented counter-
-%                 clockwise when looking from outside.
+%                dices of the Voronoi cell vertices that correspond
+%                to xyz(:,j). Vertices are oriented counterclockwise
+%                when looking from outside.
 %
-%     polygons - (n x 1) cell array, j-th element contains the dis-
-%                 cretised spherical polygonal coordinates of the
-%                 vertices of the j-th Voronoi cell.
+%     polygons - (n x 1) cell array, j-th element contains the coor-
+%                dinates of the vertices of the j-th Voronoi cell,
+%                in the same counterclockwise order
 %
 %     sangles  - (n x 1) array, solid angles of each Voronoi cell
 %
-% brunoluong@yahoo.com
+% Note: every Voronoi vertex is the circumcentre of a Delaunay tri-
+%       angle, placed on the side of the triangle plane that the
+%       convex hull property guarantees to be empty; every Voronoi
+%       cell is geodesically convex and therefore star-shaped around
+%       its generator point, which makes the angular sort used here
+%       an exact construction rather than a heuristic.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=voronoisphere.m>
 
-function [vertices,indices,polygons,sangles]=voronoisphere(xyz,res)
+function [vertices,indices,polygons,sangles]=voronoisphere(xyz)
 
-% Default polygon sampling resolution
-if ~exist('res','var'), res=pi/180; end
+% Check consistency
+grumble(xyz);
 
-% Check consistency and normalise
-grumble(xyz); xyz=xyz./sqrt(sum(xyz.^2,1));
+% Normalise the points
+xyz=xyz./sqrt(sum(xyz.^2,1)); npts=size(xyz,2);
 
-% Get Delaunay triangles of the convex hull
+% Delaunay triangles of a spherical point set are convex hull facets
 triangles=convhull(xyz.'); ntrian=size(triangles,1);
 
-% Voronoi vertices are centres of Delaunay triangles
-vertices=dtcentres(xyz,triangles);
-
-% Compile triangle edge index
-edges=sort([triangles(:,[1 2]); 
-            triangles(:,[2 3]); 
-            triangles(:,[3 1])],2);
-
-% Link up forward and backward edge pairs
-[~,~,J]=unique(edges,'rows');
-if ~all(accumarray(J,1)==2)
-    error('edge ambiguities found, check for point overlap.');
+% Refuse point sets whose hull is not a closed surface
+edges=sort([triangles(:,[1 2]); triangles(:,[2 3]); triangles(:,[3 1])],2);
+[~,~,edge_ids]=unique(edges,'rows');
+if ~all(accumarray(edge_ids,1)==2)
+    error('the point set does not triangulate into a closed surface.');
 end
 
-% Which 2 seeds the edge vertices correspond?
-allids=repmat((1:ntrian).',[3 1]);
-k=accumarray(J,(1:3*ntrian).',[],@(x){x});
-k=[k{:}]; vid=allids(k.');
+% Voronoi vertices are triangle circumcentres on the empty side
+normals=cross(xyz(:,triangles(:,2))-xyz(:,triangles(:,1)),...
+              xyz(:,triangles(:,3))-xyz(:,triangles(:,1)),1);
+vertices=normals./sqrt(sum(normals.^2,1));
+empty_side=sign(sum(vertices.*(xyz(:,triangles(:,1))-mean(xyz,2)),1));
+vertices=vertices.*empty_side;
 
-% each row is 2 cell ids of the edge
-cellofedge = edges(k(1,:),:); % ne x 2
-ne = size(cellofedge,1);
-edges = repmat((1:ne).',[2 1]);
-edgeofcell = accumarray(cellofedge(:),edges, [], @(x){x});
+% List the triangles incident at each point
+incidence=accumarray([triangles(:,1); triangles(:,2); triangles(:,3)],...
+                     repmat((1:ntrian).',3,1),[npts 1],@(x){x});
 
-% Build the geodesic arcs that link two vertices
-nverts = size(vid,1);
-edgearcs = cell(1,nverts);
-for k=1:nverts
-    edgearcs{k} = geodark(vertices(:,vid(k,:)), res);
-end
+% Build each cell by angular sorting around its generator
+indices=cell(npts,1); polygons=cell(npts,1);
+for n=1:npts
 
-% Build the contour of the voronoi cells
-polygons = cell(size(edgeofcell));
-indices = cell(size(edgeofcell));
-for k = 1:size(xyz,2)
-    
-    % Ordering and orientation of the edges
-    v = cycling_edge(edgeofcell{k}, vid);
-    v = oriented_edge(v, vertices, xyz(:,k));
-    [~, loc] = ismember(sort(v,2),sort(vid,2),'rows');
-    
-    % Joining the arcs
-    X = edgearcs(loc);
-    flip = v(:,1)~=vid(loc,1);
-    X(flip) = cellfun(@fliplr, X(flip), 'unif', false);
-    X = cellfun(@(x) x(:,1:end-1), X, 'unif', false); % remove duplicated points
-    polygons{k} = cat(2, X{:});
-    
-    % Indices of the Voronoi
-    indices{k}=v(:,1);
-    
+    % Right-handed tangent frame at the generator
+    pivot=zeros(3,1); [~,pos]=min(abs(xyz(:,n))); pivot(pos)=1;
+    tang_a=cross(xyz(:,n),pivot); tang_a=tang_a/norm(tang_a,2);
+    tang_b=cross(xyz(:,n),tang_a);
+
+    % Sort the cell vertices counterclockwise from outside
+    cell_verts=vertices(:,incidence{n});
+    [~,ccw_order]=sort(atan2(tang_b.'*cell_verts,tang_a.'*cell_verts));
+    indices{n}=incidence{n}(ccw_order);
+    polygons{n}=vertices(:,indices{n});
+
 end
 
 % Return solid angles if needed
-if nargout >= 4
-    sangles = vcell_solidangle(vertices, indices, xyz);
+if nargout>=4
+    sangles=vcell_solidangle(vertices,indices,xyz);
 end
 
 end
-
-% Returns a discretized arc between points A and B
-function G = geodark(AB, resolution)
-A = AB(:,1);
-B = AB(:,2);
-AxB = cross(A,B);
-AdB = dot(A,B);
-Ap = cross(AxB, A);
-Ap = Ap/norm(Ap,2);
-theta = atan2(sqrt(sum(AxB.^2,1)), AdB); % > 0
-npnts = max(ceil(theta/resolution),2); % at least 2 points
-theta = linspace(0, theta, npnts);
-G = A*cos(theta) + Ap*sin(theta);
-end
-
-% Centres of Delaunay triangles
-function cents=dtcentres(xyz,triangles)
-xyz=reshape(xyz(:,triangles),[3 size(triangles)]);
-A=xyz(:,:,1)-xyz(:,:,3); B=xyz(:,:,2)-xyz(:,:,3);
-A2B=sum(A.^2,1).*B; B2A=sum(B.^2,1).*A; AxB=cross(A,B,1);
-cents=xyz(:,:,3)+cross(A2B-B2A,AxB,1)./(2*sum(AxB.^2,1));
-cents=cents.*sign(dot(AxB,xyz(:,:,3)))./sqrt(sum(cents.^2,1));
-end
-
-%%
-function v = cycling_edge(edges, vertexes)
-% Chain the edges in cycle
-u = vertexes(edges,:).';
-n = size(u, 2);
-[~, ~, I] = unique(u);
-I = reshape(I,[2 n]);
-J = repmat(1:n,[2 1]);
-if ~all(accumarray(I(:), 1) == 2)
-    error('Topology issue due to numerical precision')
-end
-K = accumarray(I(:), J(:), [], @(x) {x});
-K = [K{:}];
-v = zeros([n 2]);
-p = 0;
-q = 1;
-% chain the edges
-for j = 1:n
-    i = K(:,q);
-    if i(1) == p
-        p = i(2);
-    else
-        p = i(1);
-    end    
-    i = I(:,p);
-    if i(1) == q
-        v(j,:) = u([1 2],p);
-        q = i(2);
-    else
-        v(j,:) = u([2 1],p);
-        q = i(1);
-    end
-end % for-loop
-end % cycling_edge
-
-%%
-function v = oriented_edge(v, P, xyz)
-% Orient the edges counter-clockwise
-Q = null(xyz.');
-E = P(:,v([1:end 1],1));
-xy = Q'*E;
-a = (xy(1,1:end-1)-xy(1,2:end))*(xy(2,1:end-1)+xy(2,2:end))';
-if xor(a < 0, det([xyz Q]) < 0) % Combine orientation and directness of Q
-    v = rot90(v,2);
-end
-end % oriented_edge
 
 % Consistency enforcement
 function grumble(xyz)
 if (~isnumeric(xyz))||(~isreal(xyz))||(size(xyz,1)~=3)
     error('xyz must be a [3 x N] array of real numbers.');
 end
-if size(xyz,2)<4, error('a minimum of four points needed.'); end
+if any(~isfinite(xyz(:)))
+    error('xyz must not contain NaN or Inf elements.');
+end
+if size(xyz,2)<4
+    error('a minimum of four points is needed.');
+end
+if any(sum(xyz.^2,1)==0)
+    error('xyz must not contain zero-length vectors.');
+end
+xyz=xyz./sqrt(sum(xyz.^2,1));
+if size(uniquetol(xyz.',1e-9,'ByRows',true),1)<size(xyz,2)
+    error('coincident points detected on the unit sphere.');
+end
+if min(svd(xyz))<1e-12*size(xyz,2)
+    error('the points must not all lie on a single great circle.');
+end
 end
 
 % May we never confuse honest dissent with disloyal subversion.
-% 
+%
 % Dwight Eisenhower
 

@@ -34,7 +34,7 @@ y=xyz(2,:).';
 z=xyz(3,:).';
 
 % Compute the spherical Voronoi tessellation once
-[~,~,vorn]=voronoisphere(xyz,pi/3);
+[~,~,vorn]=voronoisphere(xyz);
 
 % Draw supplied tessera with numeric colours and no centre dots
 fig=figure('Visible','off');

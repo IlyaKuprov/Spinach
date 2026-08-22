@@ -83,8 +83,8 @@ if (uf_dim_size) ~= (ga_points_number)
     error('the size of the uf dimension must be equal to the product of the maximal k-value and the sample dimension.');
 end
 
-% Get axis in the uf dimension 
-axis_f1=(-sweep_uf/2:res_uf:sweep_uf/2)+parameters.offset(1); 
+% Get axis in the uf dimension
+axis_f1=-sweep_uf/2+res_uf*(0:(uf_dim_size-1))+parameters.offset(1);
 
 % Get the units 
 switch parameters.axis_units

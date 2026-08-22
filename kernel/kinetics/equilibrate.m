@@ -28,7 +28,7 @@ grumble(K,c0);
 if norm(c0,2)==0, c=c0; return; end
 
 % Recursive calls for independent reactions
-indep_rxn_idx=scomponents(logical(K));
+indep_rxn_idx=scomponents(logical(K)|logical(K)');
 n_indep_rxns=numel(unique(indep_rxn_idx));
 if n_indep_rxns>1
     c=zeros(size(c0));

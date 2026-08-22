@@ -41,12 +41,24 @@ parameters.coil=state(spin_system,'Lz','1H');
 
 % Experiment parameters
 parameters.spins={'E','1H'};
-parameters.offset=[(-3.3+5.0)*1e6 0];    % -13 MHz reference point, 5.0 MHz offset
-parameters.irr_powers=32.0e6;            % Electron nutation frequency [Hz]
-parameters.pulse_dur=[20.0e-9 28.7e-9];  % Pulse durations, seconds
-parameters.nloops=165;                   % Number of BEAM DNP blocks
-parameters.grid='rep_2ang_800pts_sph';   % Powder averaging grid
-parameters.needs={'aniso_eq'};           % Sequence needs rho_eq
+
+% -13 MHz reference point, 5.0 MHz offset
+parameters.offset=[(-3.3+5.0)*1e6 0];
+
+% Electron nutation frequency [Hz]
+parameters.irr_powers=32.0e6;
+
+% Pulse durations, seconds
+parameters.pulse_dur=[20.0e-9 28.7e-9];
+
+% Number of BEAM DNP blocks
+parameters.nloops=165;
+
+% Powder averaging grid
+parameters.grid='rep_2ang_800pts_sph';
+
+% Sequence needs rho_eq
+parameters.needs={'aniso_eq'};
 
 % Run the calculation
 contact_curve=powder(spin_system,@beamdnp,parameters,'esr');

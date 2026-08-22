@@ -13,13 +13,13 @@
 %
 % Outputs:
 %
-%     this function writes a file
+%     file_path - full path of the downloaded file on disk
 %
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=retrieve_file.m>
 
-function retrieve_file(file_url,file_name,dest_dir)
+function file_path=retrieve_file(file_url,file_name,dest_dir)
 
 % Check consistency
 grumble(file_url,file_name,dest_dir);

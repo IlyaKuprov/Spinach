@@ -73,8 +73,8 @@ grumble(nxyz,expt_pcs,ranks,mguess);
 n_mvars=sum(2*nonzeros(ranks)+1);
 
 % Suppress the method switch warning, restore on exit
-ws=warning('off','optim:fminunc:SwitchingMethod');
-cleanup_obj=onCleanup(@()warning(ws));
+warn_state=warning('off','optim:fminunc:SwitchingMethod');
+cleanup_obj=onCleanup(@()warning(warn_state));
 
 % Set optimisation options
 options=optimset('Display','iter','MaxIter',inf,'UseParallel',true,...

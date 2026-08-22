@@ -22,7 +22,7 @@ try:
     import XeprAPI      # load the Xepr API module
     Xepr=XeprAPI.Xepr()
 except:
-    print "xepr_import_error"
+    print("xepr_import_error")
     sys.exit(1)
 
 # get current experiment name

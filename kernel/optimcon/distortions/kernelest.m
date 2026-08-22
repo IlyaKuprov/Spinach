@@ -11,11 +11,11 @@
 %
 %    ker_len  - kernel length (number of taps)
 %
-%    method   - 'backslash' (default) | 'pinv' | 'svd' | 'tikh'
+%    method   - 'backslash' | 'pinv' | 'svd' | 'tikh'
 %
-%    align    - 'causal' (default) or 'same' output alignment
+%    align    - 'causal' or 'same' output alignment
 %
-%    lambda   - Tikhonov parameter for 'tikh' (optional)
+%    lambda   - Tikhonov parameter for 'tikh'
 %
 % Outputs:
 %
@@ -26,11 +26,6 @@
 % <https://spindynamics.org/wiki/index.php?title=kernelest.m>
 
 function h=kernelest(x,y,ker_len,method,align,lambda)
-
-% Set the defaults
-if nargin<4, method='backslash'; end
-if nargin<5, align='causal'; end
-if nargin<6, lambda=1e-6; end
 
 % Check consistency
 grumble(x,y,ker_len,method,align,lambda);

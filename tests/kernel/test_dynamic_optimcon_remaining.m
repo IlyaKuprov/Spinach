@@ -124,7 +124,7 @@ h_ref=[0.60; -0.20; 0.10];
 y=conv(x,h_ref); y=y(1:numel(x));
 methods={'backslash','pinv','svd'};
 for n=1:numel(methods)
-    h_est=kernelest(x,y,numel(h_ref),methods{n},'causal');
+    h_est=kernelest(x,y,numel(h_ref),methods{n},'causal',1e-6);
     result=test_close(result,['kernelest ' methods{n}],h_est,h_ref,1e-12,1e-12,...
                       'kernelest must recover a full-rank causal FIR kernel');
 end
@@ -137,7 +137,7 @@ conv_mat=toeplitz([x; zeros(numel(h_ref)-1,1)],...
                   [x(1) zeros(1,numel(h_ref)-1)]);
 row_start=floor(numel(h_ref)/2)+1;
 y_same=conv_mat(row_start:(row_start+numel(x)-1),:)*h_ref;
-h_same=kernelest(x,y_same,numel(h_ref),'backslash','same');
+h_same=kernelest(x,y_same,numel(h_ref),'backslash','same',1e-6);
 result=test_close(result,'kernelest same align',h_same,h_ref,1e-12,1e-12,...
                   'same-aligned kernel estimation must use the central convolution rows');
 

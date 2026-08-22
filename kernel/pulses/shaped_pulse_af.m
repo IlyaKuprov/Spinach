@@ -244,7 +244,11 @@ rho=squeeze(sum(reshape(full(rho),[spn_dim spc_dim stk_dim]),2));
 % Gather results from the GPU
 if ismember('gpu',spin_system.sys.enable)
     rho=gather(rho);
-    if nargout>1, traj=gather(traj); end
+    if nargout>1
+        for n=1:numel(traj)
+            traj{n}=gather(traj{n});
+        end
+    end
     if nargout>2, P=gather(P); end
 end
 

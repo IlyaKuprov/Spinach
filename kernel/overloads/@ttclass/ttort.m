@@ -35,9 +35,6 @@ function [tt,lognrm]=ttort(tt,direct)
 sz=tt.sizes; rnk=tt.ranks;
 d=tt.ncores; N=tt.ntrains;
 
-% Set the default dir if it is not present
-if ~exist('dir','var'), direct=+1; end
-
 % Compute logs of norms
 if (nargout>1)
     lognrm=log(tt.coeff);

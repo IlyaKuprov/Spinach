@@ -5,9 +5,10 @@
 %                    G(L,k,m,p,q)=<D{L}(k,m)*D{L}(p,q)'>
 %
 % The sigma parameters refer to the rates of rotation and the four indices
-% to the Wigner functions being correlated.
+% to the Wigner functions being correlated. High-rank isotropic rotational
+% diffusion tested here.
 %
-% High-rank isotropic rotational diffusion tested here.
+% Calculation time: minutes.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -22,7 +23,7 @@ k=L+1+k; m=L+1+m; p=L+1+p; q=L+1+q;
 %% Numerical Monte-Carlo calculation
 
 % Number of points and lags
-npoints=1e5; nlags=100;
+npoints=1e6; nlags=100;
 
 % Generate angle track
 angles=randn(3,npoints);

@@ -5,6 +5,8 @@
 % where R is the 3D Cartesian rotation matrix, using the 
 % Monte-Carlo method.
 %
+% Calculation time: minutes.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function correlation_function_5()
@@ -13,7 +15,7 @@ function correlation_function_5()
 sigma_iso=0.2; k=2; m=3; p=2; q=3;
 
 % Set number of points
-npoints=1e5; nlags=300;
+npoints=1e6; nlags=300;
 
 % Generate angle track
 angles=randn(3,npoints);

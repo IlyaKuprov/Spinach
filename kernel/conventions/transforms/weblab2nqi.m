@@ -92,8 +92,11 @@ if (~isreal(C_q))||(~isreal(eta_q))||(~isreal(I))||...
     error('all inputs must be real.');
 end
 if (~isscalar(C_q))||(~isscalar(eta_q))||(~isscalar(I))||...
-   (~isscalar(alpha))||(~isscalar(theta))||(~isscalar(phi))
+   (~isscalar(alpha))||(~isscalar(theta))
     error('all inputs must be scalar.');
+end
+if (~isscalar(phi))&&(~isempty(phi))
+    error('phi must be a scalar or empty.');
 end
 if (numel(I)~=1)||(I<1)||(mod(2*I+1,1)~=0)
     error('I must be an integer or half-integer greater or equal to 1.');

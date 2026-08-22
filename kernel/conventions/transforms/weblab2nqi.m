@@ -14,8 +14,12 @@
 %
 %     alpha
 %     theta
-%     phi          - the three angles of Weblab cone model 
-%                    (see weblab_cone.png), in radians
+%     phi          - the three angles of Weblab cone model
+%                    (see weblab_cone.png), in radians; in
+%                    the four- and six-output modes phi is
+%                    overwritten by a fixed grid and may be
+%                    given as an empty array to acknowledge
+%                    that and suppress the overwrite warning
 %
 % Outputs:
 %
@@ -30,7 +34,7 @@
 function varargout=weblab2nqi(C_q,eta_q,I,alpha,theta,phi)
 
 % Check consistency
-grumble(C_q,eta_q,I,alpha,theta,phi);
+grumble(C_q,eta_q,I,alpha,theta,phi,nargout);
 
 % Translate conventions and call eeqq2nqi
 switch nargout
@@ -82,7 +86,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(C_q,eta_q,I,alpha,theta,phi)
+function grumble(C_q,eta_q,I,alpha,theta,phi,n_outs)
 if (~isnumeric(C_q))||(~isnumeric(eta_q))||(~isnumeric(I))||...
    (~isnumeric(alpha))||(~isnumeric(theta))||(~isnumeric(phi))
     error('all inputs must be numeric.');
@@ -97,6 +101,9 @@ if (~isscalar(C_q))||(~isscalar(eta_q))||(~isscalar(I))||...
 end
 if (~isscalar(phi))&&(~isempty(phi))
     error('phi must be a scalar or empty.');
+end
+if isempty(phi)&&(n_outs<4)
+    error('empty phi is only valid for four- and six-output calls.');
 end
 if (numel(I)~=1)||(I<1)||(mod(2*I+1,1)~=0)
     error('I must be an integer or half-integer greater or equal to 1.');

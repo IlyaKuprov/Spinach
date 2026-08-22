@@ -21,14 +21,14 @@ try:
     import XeprAPI      # load the Xepr API module
     Xepr=XeprAPI.Xepr()
 except:
-    print "XeprAPI_import_error"
+    print("XeprAPI_import_error")
     sys.exit(1)
 
 # python inputs
 try:
     program_file=(str(sys.argv[1]))
 except:
-    print "python_input_error"
+    print("python_input_error")
     sys.exit(2)
 
 # Attempt to change the shape file
@@ -38,5 +38,5 @@ try:
 	Xepr.XeprCmds.aqPgCompValid()
 	Xepr.XeprCmds.aqPgCompile()
 except:
-	print "program_load_compile_error"
+	print("program_load_compile_error")
 	sys.exit(3)

@@ -67,6 +67,7 @@ L=H+1i*R+1i*K;
 
 % Pulse operators
 Ep=operator(spin_system,'L+',parameters.spins{1});
+Ep=kron(speye(parameters.spc_dim),Ep);
 Ex=(Ep+Ep')/2; Ey=(Ep-Ep')/2i;
 
 % A soft pulse

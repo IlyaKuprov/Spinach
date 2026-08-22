@@ -189,6 +189,9 @@ for n=1:numel(mec_time)
         error('elements of mec_time must be a positive real scalars.');
     end
 end
+if numel(mec_oper)~=numel(mec_time)
+    error('mec_oper and mec_time must have the same number of elements.');
+end
 end
 
 % A wolf hates both men and dogs, but dogs he hates more.

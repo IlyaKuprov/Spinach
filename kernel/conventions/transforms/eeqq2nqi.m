@@ -47,7 +47,7 @@ R=euler2dcm(eulers);
 Q=R*diag([XX YY ZZ])*R';
 
 % Clean up small rounding errors
-Q=Q-trace(Q)/3; Q=(Q+Q')/2;
+Q=Q-eye(3)*trace(Q)/3; Q=(Q+Q')/2;
 
 end
 

@@ -36,9 +36,9 @@ end
 grumble(parameters);
 
 % Build the reported frames
-c2rot=anax2dcm([0 0 1],-pi);
+c2rot=anax2dcm([0 0 1],pi);
 gframe=diamond_frame_xyz([1 1 0],[0 0 1],[1 -1 0]);
-nframe=anax2dcm([1 -1 0],3.5*pi/180)*...
+nframe=anax2dcm([1 -1 0],-3.5*pi/180)*...
        diamond_frame_xyz([1 1 -2],[1 1 1],[1 -1 0]);
 
 % Orthogonalise the carbon hyperfine frame axes
@@ -48,7 +48,7 @@ zaxis=[-1 1 1]';
 zaxis=zaxis-xaxis*dot(xaxis,zaxis);
 zaxis=zaxis/norm(zaxis,2);
 yaxis=cross(zaxis,xaxis);
-cframe=anax2dcm([-1 -1 0],-2.0*pi/180)*...
+cframe=anax2dcm([-1 -1 0],2.0*pi/180)*...
        diamond_frame_xyz(xaxis,yaxis,zaxis);
 
 % Build the electron tensors

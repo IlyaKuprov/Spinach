@@ -363,10 +363,11 @@ for n=1:numel(xml.children)
                         end
                     
                         % Get the DCM
-                        dcm=quat2dcm([q.u q.i q.j q.k]);
-                        
+                        [rot_axis,rot_angle]=quat2anax(q);
+                        dcm=anax2dcm(rot_axis,rot_angle);
+
                         % Clear temporary variables
-                        clear('q');
+                        clear('q','rot_axis','rot_angle');
                         
                     elseif strcmpi(xml.children(n).children(k).children(m).name,'dcm')
                         

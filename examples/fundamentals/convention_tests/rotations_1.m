@@ -111,15 +111,15 @@ qnorm=norm([q.u q.i q.j q.k],2);
 q.u=q.u/qnorm; q.i=q.i/qnorm;
 q.j=q.j/qnorm; q.k=q.k/qnorm;
 
-% Convert directly to DCM
+% Convert directly to a passive DCM, Aerospace Toolbox convention
 R1=quat2dcm([q.u q.i q.j q.k]);
 
-% Convert to DCM via angle-axis
+% Convert to an active DCM via angle-axis
 [aa_axis,aa_angle]=quat2anax(q);
 R2=anax2dcm(aa_axis,aa_angle);
 
-% Check the difference
-if norm(R1-R2,2)<1e-10
+% Check the transpose relation between the conventions
+if norm(R1-R2',2)<1e-10
     disp('Test 7 passed.');
 else
     error('Test 7 inconsistency detected');

@@ -72,6 +72,10 @@ result=test_close(result,'anax2dcm proper orthogonality',R_one'*R_one,eye(3),1e-
                   'direction cosine matrices preserve lengths');
 result=test_close(result,'anax2dcm determinant',det(R_one),1,1e-14,1e-14,...
                   'proper rotations have determinant +1');
+result=test_close(result,'anax2dcm active convention, Z axis',anax2dcm([0 0 1],0.31),euler2dcm(0,0,0.31),1e-14,1e-14,...
+                  'a rotation about the Z axis must match the corresponding active ZYZ Euler rotation');
+result=test_close(result,'anax2dcm active convention, Y axis',anax2dcm([0 1 0],0.27),euler2dcm(0,0.27,0),1e-14,1e-14,...
+                  'a rotation about the Y axis must match the corresponding active ZYZ Euler rotation');
 
 % Round-trip a non-zero angle through quaternion form
 q=anax2quat(axis_vec,angle);

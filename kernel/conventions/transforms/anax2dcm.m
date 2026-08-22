@@ -1,6 +1,7 @@
-% Converts angle-axis rotation parameters to directional
-% cosine matrix. Angle should be in radians, axis is nor-
-% malized by the function. Syntax:
+% Converts angle-axis rotation parameters to a direction
+% cosine matrix in the active convention, matching the one
+% used by euler2dcm.m function. Angle should be in radians,
+% axis is normalized by the function. Syntax:
 %
 %              dcm=anax2dcm(rot_axis,rot_angle)
 %
@@ -16,6 +17,14 @@
 %
 %           dcm - directional cosine matrix
 %
+% Note: the resulting rotation matrix is to be used as follows:
+%
+%         v=R*v    (for 3x1 vectors)
+%         A=R*A*R' (for 3x3 interaction tensors)
+%
+% Note: Matlab's Aerospace Toolbox quat2dcm() returns the
+%       transpose of this matrix for the same rotation.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=anax2dcm.m>
@@ -29,7 +38,7 @@ grumble(rot_axis,rot_angle);
 rot_axis=rot_axis(:)/norm(rot_axis(:),2);
 
 % Compute the DCM
-dcm=eye(3)-sin(rot_angle)*[ 0           -rot_axis(3)  rot_axis(2);
+dcm=eye(3)+sin(rot_angle)*[ 0           -rot_axis(3)  rot_axis(2);
                             rot_axis(3)  0           -rot_axis(1);
                            -rot_axis(2)  rot_axis(1)  0          ]+...
                     (1-cos(rot_angle))*(rot_axis*rot_axis'-eye(3));

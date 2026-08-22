@@ -19,8 +19,11 @@
 %   rho     - the state vector with the undesired orders of
 %             spin correlations zeroed out
 %
-% Note: this function requires sphten-liouv formalism and supports Fok-
-%       ker-Planck direct products.
+% Note: this function requires sphten-liouv or zeeman-liouv formalism
+%       and supports Fokker-Planck direct products. In zeeman-liouv the
+%       selection is an exact projection built from per-spin identity
+%       component channels because correlation order is not diagonal in
+%       the Zeeman basis of Liouville space.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -52,17 +55,66 @@ if ~isnumeric(spins)
     end
 end
 
-% Compute the order of correlation for each basis state
-orders_present=sum(logical(spin_system.bas.basis(:,spins)),2);
+% Decide how to proceed
+switch spin_system.bas.formalism
 
-% Wipe all correlation orders except those specified by the user
-state_mask=false(size(spin_system.bas.basis,1),1);
-for n=orders
-    state_mask=state_mask|(orders_present==n);
+    case 'sphten-liouv'
+
+        % Compute the order of correlation for each basis state
+        orders_present=sum(logical(spin_system.bas.basis(:,spins)),2);
+
+        % Wipe all correlation orders except those specified by the user
+        state_mask=false(size(spin_system.bas.basis,1),1);
+        for n=orders
+            state_mask=state_mask|(orders_present==n);
+        end
+
+        % Apply the mask
+        rho(~state_mask,:)=0;
+
+    case 'zeeman-liouv'
+
+        % Hilbert space dimension and multiplicities
+        dim=prod(spin_system.comp.mults);
+        mults=spin_system.comp.mults;
+
+        % Identity component channels of the selected spins
+        idch=cell(1,numel(spins));
+        for n=1:numel(spins)
+            idch{n}=sparse(dim^2,dim^2);
+            for p=1:mults(spins(n))
+                for q=1:mults(spins(n))
+                    A=kron(kron(speye(prod(mults(1:(spins(n)-1)))),...
+                                sparse(p,q,1,mults(spins(n)),mults(spins(n)))),...
+                           speye(prod(mults((spins(n)+1):end))));
+                    idch{n}=idch{n}+kron(conj(A),A)/mults(spins(n));
+                end
+            end
+        end
+
+        % Generating function samples on the roots of unity
+        nsel=numel(spins); gsam=cell(1,nsel+1);
+        for j=0:nsel
+            gs=rho; x=exp(2i*pi*j/(nsel+1));
+            for n=1:nsel
+                gs=idch{n}*gs+x*(gs-idch{n}*gs);
+            end
+            gsam{j+1}=gs;
+        end
+
+        % Discrete Fourier weights of the correlation orders to keep
+        wts=zeros(nsel+1,1); okords=orders(ismember(orders,0:nsel));
+        for j=0:nsel
+            wts(j+1)=sum(exp(-2i*pi*okords(:)*j/(nsel+1)))/(nsel+1);
+        end
+
+        % Assemble the projected state
+        rho=wts(1)*gsam{1};
+        for j=1:nsel
+            rho=rho+wts(j+1)*gsam{j+1};
+        end
+
 end
-    
-% Apply the mask
-rho(~state_mask,:)=0;
 
 % Unfold indirect dimensions
 rho=reshape(rho,problem_dims);
@@ -76,8 +128,8 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,rho,correlation_orders,spins)
-if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
-    error('analytical correlation order selection is only available for sphten-liouv formalism.');
+if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
+    error('analytical correlation order selection is only available for sphten-liouv and zeeman-liouv formalisms.');
 end
 if ~isnumeric(rho)
     error('the state vector(s) must be numeric.');

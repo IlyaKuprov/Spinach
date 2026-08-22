@@ -34,6 +34,27 @@
 
 function [r1,r2,t1,t2,R]=relaxan(spin_system,euler_angles)
 
+% Move into adjoint representation if needed
+if strcmp(spin_system.bas.formalism,'zeeman-hilb')
+
+    % Inform the user
+    report(spin_system,'projecting zeeman-hilb simulation into Liouville space...');
+
+    % Rebuild the basis index table for the Liouville space
+    zbas=spin_system.bas.basis; hdim=size(zbas,1);
+    spin_system.bas.basis=[repmat(zbas,[hdim 1]) kron(zbas,ones(hdim,1))];
+
+    % Discard Hilbert space symmetry data
+    if isfield(spin_system.bas,'irrep')
+        spin_system.bas=rmfield(spin_system.bas,'irrep');
+        report(spin_system,'Hilbert space irreps discarded, proceeding without symmetry.');
+    end
+
+    % Update the formalism setting
+    spin_system.bas.formalism='zeeman-liouv';
+
+end
+
 % Check consistency
 if nargin==2
     grumble(spin_system,euler_angles);

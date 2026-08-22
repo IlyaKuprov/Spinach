@@ -42,6 +42,46 @@
 
 function answer=dnp_time_dep(spin_system,parameters,H,R,K)
 
+% Move into adjoint representation if needed
+if strcmp(spin_system.bas.formalism,'zeeman-hilb')
+
+    % Inform the user
+    report(spin_system,'projecting zeeman-hilb simulation into Liouville space...');
+
+    % Project into Liouville space
+    H=hilb2liouv(H,'comm'); R=hilb2liouv(R,'acomm'); K=hilb2liouv(K,'acomm');
+
+    % Stretch the state parameters
+    if isfield(parameters,'rho0')
+        parameters.rho0=reshape(parameters.rho0,size(spin_system.bas.basis,1)^2,[]);
+    end
+    if isfield(parameters,'coil')
+        parameters.coil=reshape(parameters.coil,size(spin_system.bas.basis,1)^2,[]);
+    end
+
+    % Project the microwave and electron Zeeman operators
+    if isfield(parameters,'mw_oper')
+        parameters.mw_oper=hilb2liouv(parameters.mw_oper,'comm');
+    end
+    if isfield(parameters,'ez_oper')
+        parameters.ez_oper=hilb2liouv(parameters.ez_oper,'comm');
+    end
+
+    % Rebuild the basis index table for the Liouville space
+    zbas=spin_system.bas.basis; hdim=size(zbas,1);
+    spin_system.bas.basis=[repmat(zbas,[hdim 1]) kron(zbas,ones(hdim,1))];
+
+    % Discard Hilbert space symmetry data
+    if isfield(spin_system.bas,'irrep')
+        spin_system.bas=rmfield(spin_system.bas,'irrep');
+        report(spin_system,'Hilbert space irreps discarded, proceeding without symmetry.');
+    end
+
+    % Update the formalism setting
+    spin_system.bas.formalism='zeeman-liouv';
+
+end
+
 % Check consistency
 grumble(spin_system,parameters)
 

@@ -124,6 +124,69 @@ switch spin_system.bas.formalism
         
         end
         
+    case 'zeeman-wavef'
+
+        % If a stack is supplied, choose a representative wavefunction
+        if size(rho,2)>1, rho=mean(abs(rho),2); end
+
+        % Run symmetry factorization
+        if ismember('symmetry',spin_system.sys.disable)
+
+            % Issue a reminder to the user
+            report(spin_system,'WARNING - permutation symmetry treatment disabled by user.');
+
+            % Return unit matrix
+            projectors{1}=1;
+
+        elseif ~isfield(spin_system.bas,'irrep')
+
+            % Inform the user
+            report(spin_system,'no permutation symmetry information has been supplied.');
+
+            % Return unit matrix
+            projectors{1}=1;
+
+        else
+
+            % Decide which irreps to keep
+            n_irreps=numel(spin_system.bas.irrep);
+            irrep_keep_index=true(n_irreps,1);
+            for n=1:n_irreps
+
+                % Check the irrep contribution to the total norm
+                if spin_system.bas.irrep(n).dimension==0
+
+                    % Update the user
+                    report(spin_system,['irrep #' num2str(n) ' has dimension zero - dropped.']);
+
+                    % Flag the irrep for dropping
+                    irrep_keep_index(n)=0;
+
+                elseif norm(spin_system.bas.irrep(n).projector'*rho,1)<spin_system.tols.irrep_drop
+
+                    % Update the user
+                    report(spin_system,['irrep #' num2str(n) ', dimension '...
+                                        num2str(spin_system.bas.irrep(n).dimension) ' has less than '...
+                                        num2str(spin_system.tols.irrep_drop) ' of the state norm - dropped.']);
+
+                    % Flag the irrep for dropping
+                    irrep_keep_index(n)=0;
+
+                else
+
+                    % Update the user
+                    report(spin_system,['irrep #' num2str(n) ', dimension '...
+                                        num2str(spin_system.bas.irrep(n).dimension) ' is active - kept.']);
+
+                end
+
+            end
+
+            % Compile the projector array
+            projectors={spin_system.bas.irrep(irrep_keep_index).projector};
+
+        end
+
     case {'zeeman-liouv','sphten-liouv'}
 
         % If a stack is supplied, choose a representative state vector

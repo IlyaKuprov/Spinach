@@ -54,7 +54,7 @@ time_axis=(0:1:parameters.npoints-1)/parameters.sweep;
 for n=1:numel(ma_errors)
     
     % Tilt the spinnig axis away from the magic angle
-    parameters.axis=[sqrt(2/3) 0 sqrt(1/3)]*euler2dcm(0,ma_errors(n),0);
+    parameters.axis=[sqrt(2/3) 0 sqrt(1/3)]*euler2dcm(0,ma_errors(n),0).';
 
     % Run the MAS simulation
     fid=singlerot(spin_system,@acquire,parameters,'nmr');

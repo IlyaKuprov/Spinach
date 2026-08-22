@@ -28,7 +28,7 @@ precision=eps(class(M));
 norm_m=cheap_norm(M);
 
 % Decide if M is traceless
-A=(abs(trace(M))<precision*norm_m);
+A=(abs(trace(M))<=precision*norm_m);
 
 end
 

@@ -43,8 +43,11 @@ function [mxyz,chi,pred_pcs,s_mxyz,s_chi]=ippcs(nxyz,mguess,expt_pcs)
 % Check consistency
 grumble(nxyz,mguess,expt_pcs);
 
+% Suppress the method switch warning, restore on exit
+ws=warning('off','optim:fminunc:SwitchingMethod');
+cleanup_obj=onCleanup(@()warning(ws));
+
 % Set optimisation options
-warning('off','optim:fminunc:SwitchingMethod');
 options=optimset('Display','iter','MaxIter',inf,'UseParallel',true,...
                  'MaxFunEvals',inf,'FinDiffType','central');
 

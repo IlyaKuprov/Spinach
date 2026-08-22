@@ -39,7 +39,7 @@ if nargin<2
         T=v(:,[1 k k+1]);
         num=det(T);
         denom=1+sum(sum(T.*T(:,[2 3 1]),1),2);
-        s(k-1)=num/denom;
+        s(k-1)=atan2(num,denom);
     end
 else
     v(:,end+1)=v(:,1);
@@ -49,10 +49,10 @@ else
         T=[centre, v(:,[k k+1])];
         num=det(T);
         denom=1+sum(sum(T.*T(:,[2 3 1]),1),2);
-        s(k)=num/denom;
+        s(k)=atan2(num,denom);
     end
 end
-S=atan(s); S=2*sum(S);
+S=2*sum(s);
 
 end
 

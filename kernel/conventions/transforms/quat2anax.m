@@ -30,14 +30,15 @@ qnorm=norm([q.u q.i q.j q.k],2);
 q.u=q.u/qnorm; q.i=q.i/qnorm;
 q.j=q.j/qnorm; q.k=q.k/qnorm;
 
-% Compute the angle
-rot_angle=2*atan2(norm([q.i q.j q.k],2),q.u);
+% Compute the vector part norm
+vec_norm=norm([q.i q.j q.k],2);
 
-% Compute the axis
-if rot_angle==0
-    rot_axis=[0 0 1];
+% Compute the angle and the axis
+if vec_norm==0
+    rot_angle=0; rot_axis=[0 0 1];
 else
-    rot_axis=[q.i q.j q.k]/norm([q.i q.j q.k],2);
+    rot_angle=2*atan2(vec_norm,q.u);
+    rot_axis=[q.i q.j q.k]/vec_norm;
 end
 
 end

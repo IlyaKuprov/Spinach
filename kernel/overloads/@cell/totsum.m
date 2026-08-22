@@ -24,7 +24,7 @@ grumble(A);
 
 % Check array type
 r_u_sparse=cellfun(@issparse,A);
-sparse_path=any(r_u_sparse(:));
+sparse_path=all(r_u_sparse(:));
 
 % Run the addition
 if sparse_path

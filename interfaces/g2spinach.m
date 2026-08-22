@@ -174,6 +174,7 @@ switch ismember('E',[particles{:}])
             inter.coupling.matrix(killing_pattern,:)=[];
             inter.zeeman.matrix(killing_pattern)=[];
             sys.isotopes(killing_pattern)=[];
+            if include_xyz, inter.coordinates(killing_pattern)=[]; end
         end
         
     % NMR parameterization    

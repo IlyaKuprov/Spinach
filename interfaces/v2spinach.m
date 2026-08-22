@@ -9,7 +9,8 @@
 %
 % Outputs:
 %
-%  vdata.fid      - complex free induction decay
+%  vdata.fid      - complex free induction decay, one
+%                   column per trace in file order
 %
 % Modified for Spinach from the function by:
 %
@@ -52,7 +53,7 @@ vdata.status=fread(fileid_fid,1,'int16');
 vdata.nbheaders=fread(fileid_fid,1,'int32');
 
 % Preallocate fid array
-vdata.fid=zeros(vdata.np/2,vdata.nblocks,'like',1i);
+vdata.fid=zeros(vdata.np/2,vdata.ntraces*vdata.nblocks,'like',1i);
 
 % Read in fid blocks
 for m=1:vdata.nblocks
@@ -67,21 +68,26 @@ for m=1:vdata.nblocks
     vdata.block(m).lpval=fread(fileid_fid,1,'float32'); 
     vdata.block(m).rpval=fread(fileid_fid,1,'float32'); 
     vdata.block(m).lvl=fread(fileid_fid,1,'float32');
-    vdata.block(m).tlt=fread(fileid_fid,1,'float32'); 
-    
+    vdata.block(m).tlt=fread(fileid_fid,1,'float32');
+
+    % Skip any further block headers
+    fseek(fileid_fid,28*(vdata.nbheaders-1),'cof');
+
     % Read in block fid
     if vdata.block(m).bitstatus(4)==1
-        fid_data=fread(fileid_fid,vdata.np,'float32');
+        fid_data=fread(fileid_fid,vdata.ntraces*vdata.np,'float32');
     elseif vdata.block(m).bitstatus(3)==1
-        fid_data=fread(fileid_fid,vdata.np,'int32');
+        fid_data=fread(fileid_fid,vdata.ntraces*vdata.np,'int32');
     elseif vdata.block(m).bitstatus(3)==0
-        fid_data=fread(fileid_fid,vdata.np,'int16');
+        fid_data=fread(fileid_fid,vdata.ntraces*vdata.np,'int16');
     else
         error('illegal combination in file header status.')
     end
-    
+
     % Add to the fid array
-    vdata.fid(:,m)=fid_data(1:2:vdata.np,:)+1i*fid_data(2:2:vdata.np);
+    fid_data=reshape(fid_data,[vdata.np vdata.ntraces]);
+    vdata.fid(:,(m-1)*vdata.ntraces+(1:vdata.ntraces))=...
+        fid_data(1:2:vdata.np,:)+1i*fid_data(2:2:vdata.np,:);
     
 end
 

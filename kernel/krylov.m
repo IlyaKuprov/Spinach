@@ -51,7 +51,10 @@
 %      answer - a vector or a matrix, depending on the options set during
 %               the call.
 %
-% Note: this function does not support Hilbert space formalisms.
+% Note: this function does not support the zeeman-hilb formalism; in
+%       zeeman-wavef, L is the Hamiltonian matrix, rho is a wavefunc-
+%       tion or a horizontal stack thereof, coil is a reference wave-
+%       function, and observables are overlap trajectories.
 %
 % Note: we initially had a faithful implementation of the Krylov process
 %       here - subspace, orthogonalisation, projection, etc., but in all

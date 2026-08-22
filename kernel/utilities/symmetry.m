@@ -72,7 +72,7 @@ else
     % Irreducible representation composition
     if isfield(bas,'sym_a1g_only')
         spin_system.comp.sym_a1g_only=bas.sym_a1g_only;
-    elseif strcmp(spin_system.bas.formalism,'zeeman-hilb')
+    elseif ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef'})
         spin_system.comp.sym_a1g_only=false();
     else
         spin_system.comp.sym_a1g_only=true();
@@ -142,6 +142,9 @@ else
         parfor n=1:group.order %#ok<*PFBNS>
             group_element=1:spin_system.comp.nspins;
             group_element(spins)=group_element(spins(group.elements(n,:)));
+            if strcmp(spin_system.bas.formalism,'zeeman-liouv')
+                group_element=[group_element group_element+spin_system.comp.nspins];
+            end
             permuted_basis=spin_system.bas.basis(:,group_element);
             index=spsortrows(sparse(permuted_basis));
             permutation_table(:,n)=index;
@@ -204,7 +207,7 @@ else
                 hit_index=(sum(abs(coeff_matrix),1)==0); coeff_matrix(:,hit_index)=[];
                 
                 % Remove identical columns
-                coeff_matrix=spunicols(coeff_matrix);
+                coeff_matrix=spunicols(sparse(coeff_matrix));
                 
                 % Decide how to proceed
                 if size(coeff_matrix,2)==0

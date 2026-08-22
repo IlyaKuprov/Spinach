@@ -78,8 +78,8 @@ result=test_true(result,'st_product_table shipped cache',exist(fullfile(cache_ro
                  'the shipped two-level ST product table cache should be available');
 result=test_true(result,'bos_product_table shipped cache',exist(fullfile(cache_root,'bos_product_table_2.mat'),'file')==2,...
                  'the shipped two-level bosonic product table cache should be available');
-result=test_true(result,'sle_operators shipped cache',exist(fullfile(cache_root,'sle_operators_rank_1.mat'),'file')==2,...
-                 'the shipped rank-one SLE operator cache should be available');
+result=test_true(result,'sle_operators shipped cache',exist(fullfile(cache_root,'sle_operators_rank_1_int_2.mat'),'file')==2,...
+                 'the shipped rank-one spin-one SLE operator cache should be available');
 
 % Load small cache-table records and check their dimensions
 [st_left,st_right]=st_product_table(2);

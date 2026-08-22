@@ -363,8 +363,8 @@ for n=1:numel(xml.children)
                         end
                     
                         % Get the DCM
-                        dcm=quat2dcm([q.u q.i q.j q.k]);
-                        
+                        dcm=qter2dcm(q);
+
                         % Clear temporary variables
                         clear('q');
                         

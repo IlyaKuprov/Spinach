@@ -70,19 +70,19 @@ else
     error('Test 4 inconsistency detected');
 end
 
-%% Test 5: dcm2quat, quat2dcm
+%% Test 5: dcm2qter, qter2dcm
 
 % Generate a DCM
 R=euler2dcm(eulers);
 
-% Convert to quaternions and back
-if norm(R-quat2dcm(dcm2quat(R)),2)<1e-10
+% Convert to a quaternion and back
+if norm(R-qter2dcm(dcm2qter(R)),2)<1e-10
     disp('Test 5 passed.');
 else
     error('Test 5 inconsistency detected');
 end
 
-%% Test 6: anax2quat, quat2anax
+%% Test 6: anax2qter, qter2anax
 
 % Generate a unit quaternion
 q1.u=randn(); q1.i=randn();
@@ -92,8 +92,8 @@ q1.u=q1.u/qnorm; q1.i=q1.i/qnorm;
 q1.j=q1.j/qnorm; q1.k=q1.k/qnorm;
 
 % Convert to angle-axis and back
-[aa_axis,aa_angle]=quat2anax(q1);
-q2=anax2quat(aa_axis,aa_angle);
+[aa_axis,aa_angle]=qter2anax(q1);
+q2=anax2qter(aa_axis,aa_angle);
 
 % Check the difference
 if norm([q1.u-q2.u q1.i-q2.i q1.j-q2.j q1.k-q2.k],2)<1e-10
@@ -102,7 +102,7 @@ else
     error('Test 6 inconsistency detected');
 end
 
-%% Test 7: quat2anax, anax2dcm, quat2dcm
+%% Test 7: qter2anax, anax2dcm, qter2dcm
 
 % Generate a unit quaternion
 q.u=randn(); q.i=randn();
@@ -111,11 +111,11 @@ qnorm=norm([q.u q.i q.j q.k],2);
 q.u=q.u/qnorm; q.i=q.i/qnorm;
 q.j=q.j/qnorm; q.k=q.k/qnorm;
 
-% Convert directly to DCM
-R1=quat2dcm([q.u q.i q.j q.k]);
+% Convert directly to a DCM
+R1=qter2dcm(q);
 
-% Convert to DCM via angle-axis
-[aa_axis,aa_angle]=quat2anax(q);
+% Convert to a DCM via angle-axis
+[aa_axis,aa_angle]=qter2anax(q);
 R2=anax2dcm(aa_axis,aa_angle);
 
 % Check the difference

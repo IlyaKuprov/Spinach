@@ -30,19 +30,19 @@ result=test_close(result,'anax2dcm determinant',det(R),1,1e-14,1e-14,...
 
 % Quaternion and angle-axis representations must describe the same rotation
 axis=[1 2 3]; angle=0.37*pi;
-q=anax2quat(axis,angle);
-[axis_back,angle_back]=quat2anax(q);
+q=anax2qter(axis,angle);
+[axis_back,angle_back]=qter2anax(q);
 R_from_axis=anax2dcm(axis,angle);
 R_from_quat=anax2dcm(axis_back,angle_back);
-result=test_close(result,'anax2quat/quat2anax rotation',R_from_quat,R_from_axis,1e-14,1e-14,...
+result=test_close(result,'anax2qter/qter2anax rotation',R_from_quat,R_from_axis,1e-14,1e-14,...
                   'quaternion round-trip must preserve the represented rotation');
 
 % Euler conversion is ill-conditioned in angles, but DCM reconstruction is unique
 angles=[0.21*pi 0.37*pi 0.43*pi];
 R=euler2dcm(angles);
 angles_back=dcm2euler(R);
-result=test_close(result,'dcm2euler/euler2dcm rotation',euler2dcm(angles_back),R,1e-7,1e-7,...
-                  'Euler-angle recovery must reconstruct the original active ZYZ rotation to the documented numerical accuracy of the inverse problem');
+result=test_close(result,'dcm2euler/euler2dcm rotation',euler2dcm(angles_back),R,1e-14,1e-14,...
+                  'Euler-angle recovery must reconstruct the original active ZYZ rotation to machine precision');
 
 % Axiality/rhombicity to matrix with zero Euler angles gives the Mehring-order eigenvalues
 iso=4; ax=6; rh=2;

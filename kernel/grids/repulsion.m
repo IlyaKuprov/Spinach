@@ -108,7 +108,9 @@ switch ndims
     case 4
         
         % In 4D case return Euler angles
-        [alphas,betas,gammas]=quat2angle(R','ZYZ');
+        qter.u=R(1,:)'; qter.i=R(2,:)';
+        qter.j=R(3,:)'; qter.k=R(4,:)';
+        [alphas,betas,gammas]=qter2euler(qter);
        
 end
 

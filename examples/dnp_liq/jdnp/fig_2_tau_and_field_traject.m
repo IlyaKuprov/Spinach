@@ -89,7 +89,7 @@ for n=1:numel(field_grid)
                         parameters.nsteps+1);  
         
         % Plotting
-        plot(t_axis,answer); drawnow;
+        plot(1e3*t_axis,answer); drawnow;
              
     end
     

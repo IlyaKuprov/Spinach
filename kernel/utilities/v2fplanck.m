@@ -249,7 +249,7 @@ if isscalar(parameters.npts)
            (~iscolumn(parameters.u))||any(~isfinite(parameters.u))
             error('parameters.u must be a real column vector.');
         end
-        if numel(parameters.u)~=parameters.npts
+        if (~isscalar(parameters.u))&&(numel(parameters.u)~=parameters.npts)
             error('the number of elements in parameters.u must be equal to parameters.npts');
         end
         for n={'dxx'}
@@ -271,15 +271,15 @@ if numel(parameters.npts)==2
         error('parameters.dxz,dyz,dzx,dzy,dzz do not apply to two-dimensional samples.');
     end
     if isfield(parameters,'u')
-        if (~isnumeric(parameters.u))||(~isreal(parameters.u))||...
-           any(size(parameters.u)~=parameters.npts)||any(~isfinite(parameters.u(:)))
-            error(['parameters.u must be a real array of dimension ' num2str(parameters.npts)]);
+        if (~isnumeric(parameters.u))||(~isreal(parameters.u))||any(~isfinite(parameters.u(:)))||...
+           ((~isscalar(parameters.u))&&(~isequal(size(parameters.u),parameters.npts)))
+            error(['parameters.u must be a finite real scalar or array of dimension ' num2str(parameters.npts)]);
         end
     end
     if isfield(parameters,'v')
-        if (~isnumeric(parameters.v))||(~isreal(parameters.v))||...
-           any(size(parameters.v)~=parameters.npts)||any(~isfinite(parameters.v(:)))
-            error(['parameters.v must be a real array of dimension ' num2str(parameters.npts)]);
+        if (~isnumeric(parameters.v))||(~isreal(parameters.v))||any(~isfinite(parameters.v(:)))||...
+           ((~isscalar(parameters.v))&&(~isequal(size(parameters.v),parameters.npts)))
+            error(['parameters.v must be a finite real scalar or array of dimension ' num2str(parameters.npts)]);
         end
     end
     for n={'dxx','dxy','dyx','dyy'}
@@ -298,21 +298,21 @@ if numel(parameters.npts)==2
 end
 if (numel(parameters.npts)==3)
     if isfield(parameters,'u')
-        if (~isnumeric(parameters.u))||(~isreal(parameters.u))||...
-           any(size(parameters.u)~=parameters.npts)||any(~isfinite(parameters.u(:)))
-            error(['parameters.u must be a real array of dimension ' num2str(parameters.npts)]);
+        if (~isnumeric(parameters.u))||(~isreal(parameters.u))||any(~isfinite(parameters.u(:)))||...
+           ((~isscalar(parameters.u))&&(~isequal(size(parameters.u),parameters.npts)))
+            error(['parameters.u must be a finite real scalar or array of dimension ' num2str(parameters.npts)]);
         end
     end
     if isfield(parameters,'v')
-        if (~isnumeric(parameters.v))||(~isreal(parameters.v))||...
-           any(size(parameters.v)~=parameters.npts)||any(~isfinite(parameters.v(:)))
-            error(['parameters.v must be a real array of dimension ' num2str(parameters.npts)]);
+        if (~isnumeric(parameters.v))||(~isreal(parameters.v))||any(~isfinite(parameters.v(:)))||...
+           ((~isscalar(parameters.v))&&(~isequal(size(parameters.v),parameters.npts)))
+            error(['parameters.v must be a finite real scalar or array of dimension ' num2str(parameters.npts)]);
         end
     end
     if isfield(parameters,'w')
-        if (~isnumeric(parameters.w))||(~isreal(parameters.w))||...
-           any(size(parameters.w)~=parameters.npts)||any(~isfinite(parameters.w(:)))
-            error(['parameters.w must be a real array of dimension ' num2str(parameters.npts)]);
+        if (~isnumeric(parameters.w))||(~isreal(parameters.w))||any(~isfinite(parameters.w(:)))||...
+           ((~isscalar(parameters.w))&&(~isequal(size(parameters.w),parameters.npts)))
+            error(['parameters.w must be a finite real scalar or array of dimension ' num2str(parameters.npts)]);
         end
     end
     for n={'dxx','dxy','dxz','dyx','dyy','dyz','dzx','dzy','dzz'}

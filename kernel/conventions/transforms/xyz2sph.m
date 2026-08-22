@@ -32,7 +32,7 @@ r=sqrt(x.^2+y.^2+z.^2);
 theta=acos(z./r); 
 
 % Azimuth 0 <= phi < 2*pi
-phi=atan2(y,x);    
+phi=mod(atan2(y,x),2*pi);
 
 end
 

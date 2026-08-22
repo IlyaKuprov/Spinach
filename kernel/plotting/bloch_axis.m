@@ -28,9 +28,9 @@ dy_dt=fdvec(y,5,1); d2y_dt2=fdvec(y,5,2);
 dz_dt=fdvec(z,5,1); d2z_dt2=fdvec(z,5,2);
 
 % Get instantaneous rotation axis
-ax=dz_dt.*d2y_dt2-dy_dt.*d2z_dt2;
-ay=dx_dt.*d2z_dt2-dz_dt.*d2x_dt2;
-az=dy_dt.*d2x_dt2-dx_dt.*d2y_dt2;
+ax=dy_dt.*d2z_dt2-dz_dt.*d2y_dt2;
+ay=dz_dt.*d2x_dt2-dx_dt.*d2z_dt2;
+az=dx_dt.*d2y_dt2-dy_dt.*d2x_dt2;
 
 end
 

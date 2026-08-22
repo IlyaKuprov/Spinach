@@ -252,14 +252,11 @@ if isscalar(parameters.npts)
         if numel(parameters.u)~=parameters.npts
             error('the number of elements in parameters.u must be equal to parameters.npts');
         end
-        for n={'dxx'}
-            if isfield(parameters,n{1})
-                d=getfield(parameters,n{1}); %#ok<GFLD>
-                if (~isnumeric(d))||(~isreal(d))||...
-                   (~iscolumn(d))||any(~isfinite(d))
-                    error(['parameters.' n{1} ' must be a real column vector.']);
-                end
-            end
+    end
+    if isfield(parameters,'dxx')
+        if (~isnumeric(parameters.dxx))||(~isreal(parameters.dxx))||(~iscolumn(parameters.dxx))||...
+           any(~isfinite(parameters.dxx))||any(parameters.dxx<0)
+            error('parameters.dxx must be a non-negative real column vector.');
         end
     end
 end
@@ -286,7 +283,7 @@ if numel(parameters.npts)==2
         if isfield(parameters,n{1})
             d=getfield(parameters,n{1}); %#ok<GFLD>
             if (~isnumeric(d))||(~isreal(d))||any(size(d)~=parameters.npts)||...
-                any(~isfinite(d(:)))||any(d(:)<0)
+                any(~isfinite(d(:)))
                 error(['parameters.' n{1} ' must be a real array of dimension ' num2str(parameters.npts)]);
             end
         end
@@ -294,6 +291,17 @@ if numel(parameters.npts)==2
     if any(isfield(parameters,{'dxx','dxy','dyx','dyy'}))&&...
        (~all(isfield(parameters,{'dxx','dxy','dyx','dyy'})))
         error('parameters.dxx,dxy,dyx,dyy must be specified simultaneously.');
+    end
+    if all(isfield(parameters,{'dxx','dxy','dyx','dyy'}))
+        sym_scl=max(max(abs(parameters.dxy(:))),max(abs(parameters.dyx(:))));
+        if max(abs(parameters.dxy(:)-parameters.dyx(:)))>1e-10*max(sym_scl,eps())
+            error('the diffusion tensor field must be symmetric at every voxel.');
+        end
+        d_off=(parameters.dxy+parameters.dyx)/2;
+        if any(parameters.dxx(:)<0)||any(parameters.dyy(:)<0)||...
+           any(parameters.dxx(:).*parameters.dyy(:)-d_off(:).^2<0)
+            error('the diffusion tensor field must be positive semidefinite at every voxel.');
+        end
     end
 end
 if (numel(parameters.npts)==3)
@@ -319,7 +327,7 @@ if (numel(parameters.npts)==3)
         if isfield(parameters,n{1})
             d=getfield(parameters,n{1}); %#ok<GFLD>
             if (~isnumeric(d))||(~isreal(d))||any(size(d)~=parameters.npts)||...
-                any(~isfinite(d(:)))||any(d(:)<0)
+                any(~isfinite(d(:)))
                 error(['parameters.' n{1} ' must be a real array of dimension ' num2str(parameters.npts)]);
             end
         end
@@ -327,6 +335,25 @@ if (numel(parameters.npts)==3)
     if any(isfield(parameters,{'dxx','dxy','dxz','dyx','dyy','dyz','dzx','dzy','dzz'}))&&...
        (~all(isfield(parameters,{'dxx','dxy','dxz','dyx','dyy','dyz','dzx','dzy','dzz'})))
         error('parameters.dxx,dxy,dxz,dyx,dyy,dyz,dzx,dzy,dzz must be specified simultaneously.');
+    end
+    if all(isfield(parameters,{'dxx','dxy','dxz','dyx','dyy','dyz','dzx','dzy','dzz'}))
+        sym_scl=max([abs(parameters.dxy(:)); abs(parameters.dyx(:)); abs(parameters.dxz(:));
+                     abs(parameters.dzx(:)); abs(parameters.dyz(:)); abs(parameters.dzy(:))]);
+        sym_gap=max([abs(parameters.dxy(:)-parameters.dyx(:));
+                     abs(parameters.dxz(:)-parameters.dzx(:));
+                     abs(parameters.dyz(:)-parameters.dzy(:))]);
+        if sym_gap>1e-10*max(sym_scl,eps())
+            error('the diffusion tensor field must be symmetric at every voxel.');
+        end
+        s12=(parameters.dxy(:)+parameters.dyx(:))/2; m11=parameters.dxx(:);
+        s13=(parameters.dxz(:)+parameters.dzx(:))/2; m22=parameters.dyy(:);
+        s23=(parameters.dyz(:)+parameters.dzy(:))/2; m33=parameters.dzz(:);
+        det_top=m11.*(m22.*m33-s23.^2)-s12.*(s12.*m33-s23.*s13)+s13.*(s12.*s23-m22.*s13);
+        if any(m11<0)||any(m22<0)||any(m33<0)||...
+           any(m11.*m22-s12.^2<0)||any(m11.*m33-s13.^2<0)||...
+           any(m22.*m33-s23.^2<0)||any(det_top<0)
+            error('the diffusion tensor field must be positive semidefinite at every voxel.');
+        end
     end
 end
 if isfield(parameters,'diff')

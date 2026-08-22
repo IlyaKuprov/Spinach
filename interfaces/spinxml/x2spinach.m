@@ -537,13 +537,18 @@ for n=1:numel(xml.children)
                 end
                 
                 % Translate shielding into shift
-                isotope=sys.isotopes{inter_spin_a};
+                isotope=sys.isotopes{inter_spin_a}; ref_found=false();
                 for k=1:numel(shielding_refs)
                     if strcmp(isotope,shielding_refs{k}{1})
-                        A=eye(3)*shielding_refs{k}{2}-A;
+                        A=eye(3)*shielding_refs{k}{2}-A; ref_found=true();
                     end
                 end
-                
+
+                % Catch a missing shielding reference
+                if ~ref_found
+                    error(['no shielding reference supplied for ' isotope '.']);
+                end
+
                 % Assign chemical shift
                 inter.zeeman.matrix{inter_spin_a}=A;
                 

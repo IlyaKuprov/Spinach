@@ -35,6 +35,9 @@ function A=xyz2hfc(exyz,nxyz,isotope)
 % Check consistency
 grumble(exyz,nxyz,isotope);
 
+% Force row vectors
+exyz=exyz(:).'; nxyz=nxyz(:).';
+
 % Fundamental constants
 hbar=1.054571730e-34; 
 mu0=4*pi*1e-7;

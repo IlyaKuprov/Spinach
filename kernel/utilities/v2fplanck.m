@@ -6,13 +6,19 @@
 % Parameters:
 %
 %   parameters.u       - X components of the velocity vectors
-%                        for each voxel in the sample, m/s
+%                        for each voxel in the sample, m/s;
+%                        a scalar specifies spatially uni-
+%                        form flow along X
 %
 %   parameters.v       - Y components of the velocity vectors
-%                        for each voxel in the sample, m/s
+%                        for each voxel in the sample, m/s;
+%                        a scalar specifies spatially uni-
+%                        form flow along Y
 %
 %   parameters.w       - Z components of the velocity vectors
-%                        for each voxel in the sample, m/s
+%                        for each voxel in the sample, m/s;
+%                        a scalar specifies spatially uni-
+%                        form flow along Z
 %
 %   parameters.diff    - diffusion coefficient or 3x3 tensor, m^2/s
 %                        for situations when this parameter is the 
@@ -245,11 +251,11 @@ if isscalar(parameters.npts)
         error('parameters.dxy,dxz,dyx,dyy,dyz,dzx,dzy,dzz do not apply to one-dimensional samples.');
     end
     if isfield(parameters,'u')
-        if (~isnumeric(parameters.u))||(~isreal(parameters.u))||...
+        if (~isa(parameters.u,'double'))||(~isreal(parameters.u))||...
            (~iscolumn(parameters.u))||any(~isfinite(parameters.u))
-            error('parameters.u must be a real column vector.');
+            error('parameters.u must be a real double-precision column vector.');
         end
-        if numel(parameters.u)~=parameters.npts
+        if (~isscalar(parameters.u))&&(numel(parameters.u)~=parameters.npts)
             error('the number of elements in parameters.u must be equal to parameters.npts');
         end
     end
@@ -268,15 +274,15 @@ if numel(parameters.npts)==2
         error('parameters.dxz,dyz,dzx,dzy,dzz do not apply to two-dimensional samples.');
     end
     if isfield(parameters,'u')
-        if (~isnumeric(parameters.u))||(~isreal(parameters.u))||...
-           any(size(parameters.u)~=parameters.npts)||any(~isfinite(parameters.u(:)))
-            error(['parameters.u must be a real array of dimension ' num2str(parameters.npts)]);
+        if (~isa(parameters.u,'double'))||(~isreal(parameters.u))||any(~isfinite(parameters.u(:)))||...
+           ((~isscalar(parameters.u))&&(~isequal(size(parameters.u),parameters.npts)))
+            error(['parameters.u must be a finite real double-precision scalar or array of dimension ' num2str(parameters.npts)]);
         end
     end
     if isfield(parameters,'v')
-        if (~isnumeric(parameters.v))||(~isreal(parameters.v))||...
-           any(size(parameters.v)~=parameters.npts)||any(~isfinite(parameters.v(:)))
-            error(['parameters.v must be a real array of dimension ' num2str(parameters.npts)]);
+        if (~isa(parameters.v,'double'))||(~isreal(parameters.v))||any(~isfinite(parameters.v(:)))||...
+           ((~isscalar(parameters.v))&&(~isequal(size(parameters.v),parameters.npts)))
+            error(['parameters.v must be a finite real double-precision scalar or array of dimension ' num2str(parameters.npts)]);
         end
     end
     for n={'dxx','dxy','dyx','dyy'}
@@ -306,21 +312,21 @@ if numel(parameters.npts)==2
 end
 if (numel(parameters.npts)==3)
     if isfield(parameters,'u')
-        if (~isnumeric(parameters.u))||(~isreal(parameters.u))||...
-           any(size(parameters.u)~=parameters.npts)||any(~isfinite(parameters.u(:)))
-            error(['parameters.u must be a real array of dimension ' num2str(parameters.npts)]);
+        if (~isa(parameters.u,'double'))||(~isreal(parameters.u))||any(~isfinite(parameters.u(:)))||...
+           ((~isscalar(parameters.u))&&(~isequal(size(parameters.u),parameters.npts)))
+            error(['parameters.u must be a finite real double-precision scalar or array of dimension ' num2str(parameters.npts)]);
         end
     end
     if isfield(parameters,'v')
-        if (~isnumeric(parameters.v))||(~isreal(parameters.v))||...
-           any(size(parameters.v)~=parameters.npts)||any(~isfinite(parameters.v(:)))
-            error(['parameters.v must be a real array of dimension ' num2str(parameters.npts)]);
+        if (~isa(parameters.v,'double'))||(~isreal(parameters.v))||any(~isfinite(parameters.v(:)))||...
+           ((~isscalar(parameters.v))&&(~isequal(size(parameters.v),parameters.npts)))
+            error(['parameters.v must be a finite real double-precision scalar or array of dimension ' num2str(parameters.npts)]);
         end
     end
     if isfield(parameters,'w')
-        if (~isnumeric(parameters.w))||(~isreal(parameters.w))||...
-           any(size(parameters.w)~=parameters.npts)||any(~isfinite(parameters.w(:)))
-            error(['parameters.w must be a real array of dimension ' num2str(parameters.npts)]);
+        if (~isa(parameters.w,'double'))||(~isreal(parameters.w))||any(~isfinite(parameters.w(:)))||...
+           ((~isscalar(parameters.w))&&(~isequal(size(parameters.w),parameters.npts)))
+            error(['parameters.w must be a finite real double-precision scalar or array of dimension ' num2str(parameters.npts)]);
         end
     end
     for n={'dxx','dxy','dxz','dyx','dyy','dyz','dzx','dzy','dzz'}

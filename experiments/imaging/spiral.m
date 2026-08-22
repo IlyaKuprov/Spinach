@@ -55,7 +55,7 @@ rho=step(spin_system,Hy,rho,pi);
 rho=evolution(spin_system,L,[],rho,parameters.t_echo,1,'final');
 
 % Build the spiral
-time_grid=linspace(0,parameters.spiral_dur,parameters.spiral_npts);
+time_grid=(0:(parameters.spiral_npts-1))*(parameters.spiral_dur/parameters.spiral_npts);
 spiral_x=time_grid*(parameters.grad_amp/parameters.spiral_dur).*cos(parameters.spiral_frq*time_grid);
 spiral_y=time_grid*(parameters.grad_amp/parameters.spiral_dur).*sin(parameters.spiral_frq*time_grid);
 

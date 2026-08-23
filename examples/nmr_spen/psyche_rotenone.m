@@ -33,6 +33,10 @@ inter.coupling.scalar{10,11}=9.8;
 inter.coupling.scalar{9,11}=8.1; 
 inter.coupling.scalar{13,14}=1.5; 
 inter.coupling.scalar{12,14}=0.9; 
+inter.coupling.scalar{13,15}=1.5; 
+inter.coupling.scalar{12,15}=0.9; 
+inter.coupling.scalar{13,16}=1.5; 
+inter.coupling.scalar{12,16}=0.9; 
 inter.coupling.scalar{22,22}=0;
 
 % Basis set
@@ -40,6 +44,8 @@ bas.formalism='sphten-liouv';
 bas.approximation='IK-2';
 bas.connectivity='scalar_couplings';
 bas.space_level=1;
+bas.sym_group={'S3','S3','S3'};
+bas.sym_spins={[14 15 16],[17 18 19],[20 21 22]};
 
 % Algorithmic options
 sys.disable={'pt','colorbar'};

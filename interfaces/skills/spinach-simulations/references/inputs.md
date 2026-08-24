@@ -396,10 +396,14 @@ chemical shifts, J-couplings, a non-selective line width and the magnet field;
 everything else has to be added by hand.
 `[sys,inter]=x2spinach(filename,shielding_refs)` reads SpinXML files.
 
-Two importers handle data rather than parameters, and neither produces `sys` or
-`inter`. `vdata=v2spinach(inpath)` reads an experimental FID in Varian format
-from a data directory, returning `vdata.fid` and the acquisition header fields;
-it has nothing to do with VASP. `mesh=comsol_import(comsol)` imports a COMSOL 2D
+Three importers handle data rather than parameters, and none of them produces
+`sys` or `inter`. `vdata=v2spinach(inpath)` reads experimental FIDs in Varian
+format from a data directory, returning `vdata.fid`, the acquisition header
+fields, the fully parsed `procpar`, and derived spectral and diffusion
+parameters; it has nothing to do with VASP. `bdata=b2spinach(inpath)` does the
+same for Bruker experiment directories: fid or ser data, the acquisition and
+processing parameter files, the digital filter group delay, and the gradient
+and delay lists when present. `mesh=comsol_import(comsol)` imports a COMSOL 2D
 mesh for the `meshflow` context from `comsol.mesh_file` and `comsol.velo_file`,
 with `comsol.crop` and `comsol.inactivate` controlling the retained region.
 

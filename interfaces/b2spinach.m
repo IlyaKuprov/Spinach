@@ -50,7 +50,10 @@
 %                         ry file, and the column count of the
 %                         fid matrix; exceeds arraydim when the
 %                         acquisition was preallocated or inter-
-%                         rupted
+%                         rupted, and falls short of it for non-
+%                         uniformly sampled data sets, where the
+%                         fids follow the acquisition order of
+%                         the sampling schedule in nus_list
 %
 %     bdata.npoints     - complex points per fid
 %
@@ -167,8 +170,8 @@ bdata.at=bdata.npoints/(bdata.sw_ppm*bdata.sfrq);
 if isfield(bdata,'procs')
     bdata.spec_start=bdata.procs.OFFSET-bdata.sw_ppm;
 else
-    bdata.spec_start=1e6*(bdata.acqus.SFO1/bdata.acqus.BF1-1)+...
-                     (0.5*bdata.acqus.SFO1/bdata.acqus.BF1-1)*bdata.sw_ppm;
+    bdata.spec_start=1e6*(bdata.acqus.SFO1/bdata.acqus.BF1-1)-...
+                     0.5*bdata.sw_ppm*bdata.acqus.SFO1/bdata.acqus.BF1;
 end
 
 % Digital filter group delay in complex points
@@ -254,7 +257,9 @@ end
 switch bdata.acqus.DTYPA
     case 0
         data_type='int32'; block_pts=256;
-    case {1,2}
+    case 1
+        data_type='float32'; block_pts=256;
+    case 2
         data_type='float64'; block_pts=128;
     otherwise
         error('unknown DTYPA value in acqus.');
@@ -289,7 +294,7 @@ end
 
 % Count the fids held by the file, at least the declared number
 bdata.fids_in_file=numel(data_pts)/fid_stride;
-if bdata.fids_in_file<bdata.arraydim
+if (bdata.fids_in_file<bdata.arraydim)&&(~isfile([inpath filesep 'nuslist']))
     error('the data file holds fewer fids than the status parameters declare.');
 end
 
@@ -416,6 +421,8 @@ for n=1:numel(all_lines)
     % Convert time unit suffixes into multipliers
     text_line=all_lines{n};
     switch text_line(end)
+        case 'n'
+            multiplier=1e-9; text_line=text_line(1:(end-1));
         case 'u'
             multiplier=1e-6; text_line=text_line(1:(end-1));
         case 'm'

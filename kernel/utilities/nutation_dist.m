@@ -74,7 +74,7 @@ end
 % Locate the noise-limited spectral support
 freq_step=2*pi/(nfft*dt);
 noise_bin=noise_var*sum(window.^2);
-power_cut=max(10*noise_bin,0.01*max(selected_power));
+power_cut=max(10*noise_bin,1e-5*max(selected_power));
 active=find(selected_power>=power_cut);
 if isempty(active)
     peak_idx=find(selected_power==max(selected_power),1,'first');
@@ -114,16 +114,14 @@ lambda=lambdas(find(trial_err<=1.1*min(trial_err),1,'last'));
 % Search for a small error in the time origin
 shift_grid=linspace(-2*dt,2*dt,9);
 best_err=inf;
-best_weights=[];
 best_shift=0;
 for n=1:numel(shift_grid)
     shifted_time=time+shift_grid(n);
     kernel=exp(phase_sign*1i*shifted_time*freq.');
     real_kernel=[real(kernel);imag(kernel)];
-    [weights,fit_err]=fit_nutation(signal,kernel,real_kernel,D,lambda);
+    [~,fit_err]=fit_nutation(signal,kernel,real_kernel,D,lambda);
     if fit_err<best_err
         best_err=fit_err;
-        best_weights=weights;
         best_shift=shift_grid(n);
     end
 end
@@ -135,32 +133,43 @@ for n=1:numel(shift_grid)
     shifted_time=time+shift_grid(n);
     kernel=exp(phase_sign*1i*shifted_time*freq.');
     real_kernel=[real(kernel);imag(kernel)];
-    [weights,fit_err]=fit_nutation(signal,kernel,real_kernel,D,lambda);
+    [~,fit_err]=fit_nutation(signal,kernel,real_kernel,D,lambda);
     if fit_err<best_err
         best_err=fit_err;
-        best_weights=weights;
+        best_shift=shift_grid(n);
     end
 end
 
+% Re-select the regularisation at the corrected time origin
+shifted_time=time+best_shift;
+kernel=exp(phase_sign*1i*shifted_time*freq.');
+real_kernel=[real(kernel);imag(kernel)];
+for n=1:numel(lambdas)
+    [~,trial_err(n)]=fit_nutation(signal,kernel,real_kernel,D,lambdas(n));
+end
+lambda=lambdas(find(trial_err<=1.1*min(trial_err),1,'last'));
+
+% Final fit at the corrected origin and regularisation
+best_weights=fit_nutation(signal,kernel,real_kernel,D,lambda);
+
 % Convert fitted probability masses into a unit-integral density
-dfreq=freq(2)-freq(1);
 distr=max(best_weights,0);
-distr=distr/(sum(distr)*dfreq);
+distr=distr/trapz(freq,distr);
 
 end
 
 % Fit a non-negative regularised distribution with an unknown complex scale
 function [weights,fit_err]=fit_nutation(signal,kernel,real_kernel,D,lambda)
 
-% Build the quadratic Tikhonov system
-gram=real_kernel'*real_kernel+lambda*(D'*D);
+% Stack the data fit and the regularisation penalty
+lsq_mat=[real_kernel;sqrt(lambda)*full(D)];
+zero_pen=zeros(size(D,1),1);
 phase=exp(1i*angle(signal(1)));
 
 % Alternate phase estimation and non-negative Tikhonov fitting
 for n=1:8
     rotated=conj(phase)*signal;
-    rhs=real_kernel'*[real(rotated);imag(rotated)];
-    weights=nnls_quad(gram,rhs);
+    weights=lsqnonneg(lsq_mat,[real(rotated);imag(rotated);zero_pen]);
     predicted=kernel*weights;
     overlap=predicted'*signal;
     if abs(overlap)>0
@@ -172,41 +181,6 @@ end
 
 % Evaluate the fitted residual
 fit_err=norm(phase*predicted-signal,2)^2;
-
-end
-
-% Solve the non-negative quadratic subproblem by an active-set iteration
-function weights=nnls_quad(gram,rhs)
-
-% Start with every variable free
-nvars=numel(rhs);
-free=true(nvars,1);
-weights=zeros(nvars,1);
-
-% Alternate unconstrained solves and KKT active-set updates
-for n=1:(nvars+2)
-    trial=zeros(nvars,1);
-    if any(free)
-        trial(free)=gram(free,free)\rhs(free);
-    end
-    negative=(trial<0)&free;
-    if any(negative)
-        free(negative)=false;
-        continue
-    end
-    weights=trial;
-    gradient=gram*weights-rhs;
-    tolerance=1e-10*max(1,norm(rhs,inf));
-    add=(~free)&(gradient< -tolerance);
-    if any(add)
-        free(add)=true;
-        continue
-    end
-    break
-end
-
-% Remove round-off negativity
-weights=max(weights,0);
 
 end
 

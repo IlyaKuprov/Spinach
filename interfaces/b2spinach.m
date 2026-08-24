@@ -43,7 +43,14 @@
 %
 %     bdata.ndims_data  - number of dimensions in the data set
 %
-%     bdata.arraydim    - number of fids in the data set
+%     bdata.arraydim    - number of fids the status parameter
+%                         files declare as acquired
+%
+%     bdata.fids_in_file - number of fid slots held by the bina-
+%                         ry file, and the column count of the
+%                         fid matrix; exceeds arraydim when the
+%                         acquisition was preallocated or inter-
+%                         rupted
 %
 %     bdata.npoints     - complex points per fid
 %
@@ -165,7 +172,12 @@ else
 end
 
 % Digital filter group delay in complex points
-if isfield(bdata.acqus,'GRPDLY')&&(bdata.acqus.GRPDLY~=-1)
+if isfield(bdata.acqus,'DIGMOD')&&(bdata.acqus.DIGMOD==0)
+
+    % Analogue filtering has no group delay
+    bdata.digshift=0;
+
+elseif isfield(bdata.acqus,'GRPDLY')&&(bdata.acqus.GRPDLY~=-1)
 
     % Modern hardware reports the group delay directly
     bdata.digshift=bdata.acqus.GRPDLY;
@@ -177,31 +189,49 @@ elseif isfield(bdata.acqus,'DECIM')&&(bdata.acqus.DECIM~=1)
             256 384 512 768 1024 1536 2048];
 
     % Group delay table, one row per DECIM, columns DSPFVS 10 to 12
-    delays=[44.750  46.000  46.311; 33.500  36.500  36.530;
-            66.625  48.000  47.870; 59.083  50.167  50.229;
-            68.563  53.250  53.289; 60.375  69.500  69.551;
-            69.531  72.250  71.600; 61.021  70.167  70.184;
-            70.016  72.750  72.138; 61.344  70.500  70.528;
-            70.258  73.000  72.348; 61.505  70.667  70.700;
-            70.379  72.500  72.524; 61.586  71.333     NaN;
-            70.439  72.250     NaN; 61.626  71.667     NaN;
-            70.470  72.125     NaN; 61.647  71.833     NaN;
-            70.485  72.063     NaN; 61.657  71.917     NaN;
-            70.492  72.031     NaN];
+    delays=[44.7500000000  46.000  46.311; 33.5000000000  36.500  36.530;
+            66.6250000000  48.000  47.870; 59.0833333333  50.167  50.229;
+            68.5625000000  53.250  53.289; 60.3750000000  69.500  69.551;
+            69.5312500000  72.250  71.600; 61.0208333333  70.167  70.184;
+            70.0156250000  72.750  72.138; 61.3437500000  70.500  70.528;
+            70.2578125000  73.000  72.348; 61.5052083333  70.667  70.700;
+            70.3789062500  72.500  72.524; 61.5859375000  71.333     NaN;
+            70.4394531250  72.250     NaN; 61.6263020833  71.667     NaN;
+            70.4697265625  72.125     NaN; 61.6464843750  71.833     NaN;
+            70.4848632813  72.063     NaN; 61.6565755208  71.917     NaN;
+            70.4924316406  72.031     NaN];
 
     % Make sure the firmware version is present
     if ~isfield(bdata.acqus,'DSPFVS')
         error('DECIM without DSPFVS in acqus: cannot get the group delay.');
     end
 
-    % Locate the firmware and decimation combination
+    % Locate the decimation factor
     decim_row=find(decims==bdata.acqus.DECIM,1);
-    dspfvs_col=bdata.acqus.DSPFVS-9;
-    if isempty(decim_row)||(dspfvs_col<1)||(dspfvs_col>3)||...
-       isnan(delays(decim_row,dspfvs_col))
-        error('unknown DECIM and DSPFVS combination in acqus.');
+    if isempty(decim_row)
+        error('unknown DECIM value in acqus.');
     end
-    bdata.digshift=delays(decim_row,dspfvs_col);
+
+    % Branch on the firmware version
+    if (bdata.acqus.DSPFVS>=10)&&(bdata.acqus.DSPFVS<=12)
+
+        % Tabulated group delays of the DMX generation
+        bdata.digshift=delays(decim_row,bdata.acqus.DSPFVS-9);
+        if isnan(bdata.digshift)
+            error('unknown DECIM and DSPFVS combination in acqus.');
+        end
+
+    elseif bdata.acqus.DSPFVS==13
+
+        % Closed form group delay of the 13 firmware family
+        bdata.digshift=3-1/(2*bdata.acqus.DECIM);
+
+    else
+
+        % Complain and bomb out
+        error('unknown DSPFVS value in acqus.');
+
+    end
 
 else
 
@@ -248,24 +278,24 @@ bin_file=fopen(bin_path,'r',byte_order);
 data_pts=fread(bin_file,inf,data_type);
 fclose(bin_file);
 
-% Match the point count to padded or unpadded layout
-if numel(data_pts)==padded_pts*bdata.arraydim
-
-    % Reshape and drop the block padding
-    data_pts=reshape(data_pts,[padded_pts bdata.arraydim]);
-    data_pts=data_pts(1:(2*bdata.npoints),:);
-
-elseif numel(data_pts)==2*bdata.npoints*bdata.arraydim
-
-    % Reshape the unpadded data
-    data_pts=reshape(data_pts,[2*bdata.npoints bdata.arraydim]);
-
+% Get the per-fid stride, padded or unpadded
+if mod(numel(data_pts),padded_pts)==0
+    fid_stride=padded_pts;
+elseif mod(numel(data_pts),2*bdata.npoints)==0
+    fid_stride=2*bdata.npoints;
 else
-
-    % Complain and bomb out
     error('the size of the data file does not match the acqus parameters.');
-
 end
+
+% Count the fids held by the file, at least the declared number
+bdata.fids_in_file=numel(data_pts)/fid_stride;
+if bdata.fids_in_file<bdata.arraydim
+    error('the data file holds fewer fids than the status parameters declare.');
+end
+
+% Reshape and drop the block padding
+data_pts=reshape(data_pts,[fid_stride bdata.fids_in_file]);
+data_pts=data_pts(1:(2*bdata.npoints),:);
 
 % Assemble complex fids using the Bruker sign convention
 bdata.fid=data_pts(1:2:end,:)-1i*data_pts(2:2:end,:);

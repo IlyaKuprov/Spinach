@@ -5,8 +5,9 @@
 %
 % Parameters:
 %
-%    curve  - complex X+iY nutation curve from a quadrature
-%             receiver, a row or column vector
+%    curve  - nutation curve, a row or column vector; either
+%             the complex X+iY output of a quadrature receiver,
+%             or a real phase-corrected trace
 %
 %    dt     - sampling interval in seconds
 %
@@ -28,11 +29,12 @@
 %
 %        and the reception weight is divided out, so that the
 %        returned density is the true nutation frequency distribu-
-%        tion. The frequency support, receiver phase, sub-sample
-%        time shift, and second-derivative Tikhonov parameter are
-%        selected from the supplied trace; the returned density is
-%        therefore a stable estimate rather than a raw finite-time
-%        transform.
+%        tion. A real receiver scale is a valid special case, and
+%        a phase-corrected real trace is therefore accepted. The
+%        frequency support, receiver phase, sub-sample time shift,
+%        and second-derivative Tikhonov parameter are selected from
+%        the supplied trace; the returned density is therefore a
+%        stable estimate rather than a raw finite-time transform.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -199,8 +201,8 @@ end
 
 % Consistency enforcement
 function grumble(curve,dt)
-if (~isnumeric(curve))||(~isvector(curve))||isempty(curve)||isreal(curve)
-    error('curve must be a non-empty complex numeric vector.');
+if (~isnumeric(curve))||(~isvector(curve))||isempty(curve)
+    error('curve must be a non-empty numeric vector.');
 end
 if numel(curve)<8
     error('curve must contain at least eight points.');

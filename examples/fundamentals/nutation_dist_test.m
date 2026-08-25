@@ -1,9 +1,12 @@
-% Recovery of an RF field distribution from a nutation curve. A
-% proton ensemble is driven on-resonance by a bimodal distribution
-% of RF field amplitudes; the two magnetisation components that
-% rotate under the RF field are combined into a complex nutation
-% curve, noise is added, and nutation_dist.m is called to recover
-% the nutation frequency distribution.
+% Recovery of an RF field distribution from a nutation curve measured
+% with the same coil used for excitation and detection. A proton en-
+% semble is driven on-resonance by a bimodal distribution of RF field
+% amplitudes; following the reciprocity principle, the detected sig-
+% nal of every ensemble member is weighted by its own RF field ampli-
+% tude. The transverse magnetisation components are combined into a
+% complex nutation curve, a receiver phase is applied, noise is add-
+% ed, and nutation_dist.m is called to recover the true nutation
+% frequency distribution with the reception weight divided out.
 %
 % Calculation time: seconds
 %
@@ -33,7 +36,7 @@ spin_system=basis(spin_system,bas);
 
 % Initial and observable states
 rho=state(spin_system,'Lz','1H');
-coil_z=state(spin_system,'Lz','1H');
+coil_x=state(spin_system,'Lx','1H');
 coil_y=state(spin_system,'Ly','1H');
 
 % RF field operator
@@ -61,13 +64,16 @@ curve=zeros(npts,1);
 for n=1:numel(b1_freq)
 
     % Magnetisation trajectories for the current RF field
-    traj=evolution(spin_system,H+b1_freq(n)*Lx,[coil_z coil_y],...
+    traj=evolution(spin_system,H+b1_freq(n)*Lx,[coil_x coil_y],...
                    rho,dt,npts-1,'multichannel');
 
-    % Weighted accumulation of the complex nutation curve
-    curve=curve+b1_mass(n)*(traj(1,:)+1i*traj(2,:)).';
+    % Reciprocity-weighted accumulation of the nutation curve
+    curve=curve+b1_mass(n)*b1_freq(n)*(traj(1,:)+1i*traj(2,:)).';
 
 end
+
+% Receiver phase and gain
+curve=exp(1i*1.9)*curve/max(abs(curve));
 
 % Complex measurement noise
 rng(1); curve=curve+2e-3*(randn(npts,1)+1i*randn(npts,1));

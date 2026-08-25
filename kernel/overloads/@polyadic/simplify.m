@@ -53,16 +53,14 @@ while changes_made
         
         % Absorb opium prefixes
         if isa(p.prefix{n},'opium')
-            p=p.prefix{n}.coeff*p;
-            p.prefix{n}=[];
-            changes_made=true();
+            coeff=p.prefix{n}.coeff;
+            p.prefix(n)=[]; p=coeff*p; return;
         end
 
         % Absorb scalar prefixes
         if isnumeric(p.prefix{n})&&isscalar(p.prefix{n})
-            p=p.prefix{n}*p;
-            p.prefix{n}=[];
-            changes_made=true();
+            coeff=p.prefix{n};
+            p.prefix(n)=[]; p=coeff*p; return;
         end
 
     end
@@ -87,16 +85,14 @@ while changes_made
         
         % Absorb opium suffixes
         if isa(p.suffix{n},'opium')
-            p=p.suffix{n}.coeff*p;
-            p.suffix{n}=[];
-            changes_made=true();
+            coeff=p.suffix{n}.coeff;
+            p.suffix(n)=[]; p=coeff*p; return;
         end
 
         % Absorb scalar suffixes
         if isnumeric(p.suffix{n})&&isscalar(p.suffix{n})
-            p=p.suffix{n}*p;
-            p.suffix{n}=[];
-            changes_made=true();
+            coeff=p.suffix{n};
+            p.suffix(n)=[]; p=coeff*p; return;
         end
 
     end

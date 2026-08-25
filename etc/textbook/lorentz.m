@@ -49,13 +49,13 @@ if nargout>2
     for n=1:numel(gens)
         
         % Get the first operator adjoint
-        AdA=kron(eye(D,D),gens{n})-kron(transpose(gens{n}),eye(D,D));
+        AdA=kron(eye(2*D,2*D),gens{n})-kron(transpose(gens{n}),eye(2*D,2*D));
         
         % Loop over generators
         for k=1:numel(gens)
             
             % Get the second operator adjoint
-            AdB=kron(eye(D,D),gens{k})-kron(transpose(gens{k}),eye(D,D));
+            AdB=kron(eye(2*D,2*D),gens{k})-kron(transpose(gens{k}),eye(2*D,2*D));
             
             % Get the Killing form element
             Kil(n,k)=trace(AdA*AdB);

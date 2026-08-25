@@ -28,12 +28,8 @@ dt=time_grid(2)-time_grid(1);
 % Upsample twofold, the scope rate being under four samples per carrier period
 expt_data=resample(expt_data,2,1); dt=dt/2;
 
-% Lowpass filter rejecting the sum frequency left behind by the mixer
-lp_filt=designfilt('lowpassfir','FilterOrder',8,...
-                   'HalfPowerFrequency',0.25);
-
 % Apply heterodyne transformation wrt carrier frequency
-[real_bruk,imag_bruk]=heterodyne(dt,expt_data,carrier_freq,lp_filt);
+[real_bruk,imag_bruk]=heterodyne(dt,expt_data,carrier_freq);
 
 % Resample and convert to complex
 real_bruk=resample(real_bruk,1,20000);

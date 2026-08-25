@@ -49,8 +49,7 @@ dt=1e-4;
 freq=1000;
 time_grid=dt*((1:4096)'-1);
 signal=cos(2*pi*freq*time_grid);
-lp_filt=designfilt('lowpassfir','FilterOrder',8,'HalfPowerFrequency',0.25);
-[X_het,Y_het]=heterodyne(dt,signal,freq,lp_filt);
+[X_het,Y_het]=heterodyne(dt,signal,freq);
 steady=200:(numel(signal)-200);
 result=test_close(result,'heterodyne in-phase mean',mean(X_het(steady)),1,5e-2,5e-2,...
                   'mixing a unit cosine with its carrier leaves unit in-phase DC signal after filtering');

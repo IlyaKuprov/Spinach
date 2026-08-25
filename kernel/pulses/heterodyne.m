@@ -2,6 +2,7 @@
 % frame. Uses a GPU if one is available. Syntax:
 %
 %          [X,Y]=heterodyne(dt,signal,freq,lp_filt)
+%          [X,Y]=heterodyne(dt,signal,freq)
 %
 % Parameters:
 %
@@ -14,7 +15,10 @@
 %   lp_filt    - lowpass filter rejecting the sum frequen-
 %                cy component left behind by the quadrature
 %                mixer, a digitalFilter object as returned
-%                by Matlab's designfilt() function
+%                by Matlab's designfilt() function; when
+%                this argument is omitted, an order 8 FIR
+%                filter with a half-power frequency of
+%                0.25 is used
 %
 % Outputs:
 %
@@ -35,6 +39,15 @@
 % <https://spindynamics.org/wiki/index.php?title=heterodyne.m>
 
 function [X,Y]=heterodyne(dt,signal,freq,lp_filt)
+
+% Check if the user supplied a filter
+if ~exist('lp_filt','var')
+
+    % Define a lowpass filter
+    lp_filt=designfilt('lowpassfir','FilterOrder',8,...
+                       'HalfPowerFrequency',0.25);
+
+end
 
 % Check consistency
 grumble(dt,signal,freq,lp_filt);

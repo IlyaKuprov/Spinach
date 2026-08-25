@@ -1,7 +1,7 @@
-% Signal heterodyne from wall clock time into the rotating 
+% Signal heterodyne from wall clock time into the rotating
 % frame. Uses a GPU if one is available. Syntax:
-% 
-%              heterodyne(dt,exp_data,car_freq)
+%
+%          [X,Y]=heterodyne(dt,signal,freq,lp_filt)
 %
 % Parameters:
 %
@@ -11,34 +11,39 @@
 %
 %   freq       - frequency to be demodulated, Hz
 %
+%   lp_filt    - lowpass filter rejecting the sum frequen-
+%                cy component left behind by the quadrature
+%                mixer, a digitalFilter object as returned
+%                by Matlab's designfilt() function
+%
 % Outputs:
 %
 %   X, Y       - in-phase and out-of-phase parts of the
-%                rotating frame
+%                rotating frame signal, column vectors
 %
-%
-% Note: the signal must be sampled with at least four points 
-%       per period of the frequency being demodulated.
+% Notes: the signal must be sampled with at least four points
+%        per period of the frequency being demodulated; the
+%        outputs are delayed with respect to the input by the
+%        group delay of lp_filt, which is (n-1)/2 samples for
+%        a linear phase FIR filter with n coefficients; when
+%        the function is called without outputs, the frequen-
+%        cy response of lp_filt is plotted instead.
 %
 % a.acharya@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=heterodyne.m>
 
-function [X,Y]=heterodyne(dt,signal,freq)
+function [X,Y]=heterodyne(dt,signal,freq,lp_filt)
 
 % Check consistency
-grumble(dt,signal,freq);
-
-% Define a lowpass filter
-F=designfilt('lowpassfir','FilterOrder',8,...
-             'HalfPowerFrequency',0.25);
+grumble(dt,signal,freq,lp_filt);
 
 % Decide the output
 if nargout==0
 
     % Plot the filter profile
-    freqz(F.Coefficients,1,[],1/dt);
+    freqz(lp_filt.Coefficients,1,[],1/dt);
 
 else
 
@@ -47,7 +52,7 @@ else
 
     % Move inputs to GPU
     if canUseGPU()
-        signal=gpuArray(signal); 
+        signal=gpuArray(signal);
         time_grid=gpuArray(time_grid);
     end
 
@@ -57,13 +62,13 @@ else
     clear('signal','time_grid');
 
     % Get coefficients
-    B=F.Coefficients; 
+    B=lp_filt.Coefficients;
     if canUseGPU()
         B=gpuArray(B);
     end
 
     % Apply the filter
-    X=gather(fftfilt(B,X)); 
+    X=gather(fftfilt(B,X));
     Y=gather(fftfilt(B,Y));
 
 end
@@ -71,7 +76,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(dt,signal,freq)
+function grumble(dt,signal,freq,lp_filt)
 if (~isnumeric(dt))||(~isreal(dt))||(~isscalar(dt))||...
    (~isfinite(dt))||(dt<=0)
     error('dt must be a finite positive real number.');
@@ -85,6 +90,12 @@ end
 if (freq~=0)&&((4*dt)>(1/abs(freq)))
     error('the specified frequency is not sampled well enough.');
 end
+if ~isa(lp_filt,'digitalFilter')
+    error('lp_filt must be a digitalFilter object from designfilt().');
+end
+if ~isfir(lp_filt)
+    error('lp_filt must be an FIR filter.');
+end
 end
 
 % How did we spend the entire day monitoring what we thought was an NMR
@@ -96,6 +107,6 @@ end
 % station spikes can appear. That's what seems to have misled us. Moral:
 % check that the "NMR signal" disappears when no pulse is applied.
 %
-% Malcolm Levitt's email to 
+% Malcolm Levitt's email to
 % his group, July 2023.
 

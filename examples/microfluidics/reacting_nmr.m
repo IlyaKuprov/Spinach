@@ -141,13 +141,19 @@ parfor n=0:18 %#ok<*PFBNS>
     timing_grid=linspace(n,n+parameters.nsteps*nmr_dt,...
                          parameters.nsteps+1);
 
-    % Get everything to the GPU
-    L=gpuArray(H+1i*R);  G11=gpuArray(G1{1});
-    G12=gpuArray(G1{2}); G21=gpuArray(G2{1});
-    G22=gpuArray(G2{2}); eta=gpuArray(eta); coil=gpuArray(Hp);
+    % Move to GPU if requested
+    if ismember('gpu',spin_system.sys.enable)
+        L=gpuArray(H+1i*R);  G11=gpuArray(G1{1});
+        G12=gpuArray(G1{2}); G21=gpuArray(G2{1});
+        G22=gpuArray(G2{2}); eta=gpuArray(eta); coil=gpuArray(Hp);
+        current_fid=gpuArray.zeros(1,parameters.nsteps+1);
+    else
+        L=H+1i*R; G11=G1{1}; G12=G1{2};
+        G21=G2{1}; G22=G2{2}; coil=Hp;
+        current_fid=zeros(1,parameters.nsteps+1);
+    end
 
     % Get the fid started
-    current_fid=gpuArray.zeros(1,parameters.nsteps+1);
     current_fid(1)=hdot(coil,eta);
 
     % Stage 2: nuclear spin dynamics

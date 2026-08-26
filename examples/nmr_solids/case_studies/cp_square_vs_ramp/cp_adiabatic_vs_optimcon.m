@@ -88,7 +88,6 @@ control.penalties={'SNS'};                % Penalty
 control.p_weights=100;                    % Penalty weight
 control.method='lbfgs';                   % Optimisation method
 control.max_iter=30;                      % Termination tolerance
-control.parallel='ensemble';              % Parallelisation
 
 % Spinach housekeeping
 spin_system=optimcon(spin_system,control);

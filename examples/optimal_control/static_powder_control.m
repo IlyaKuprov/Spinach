@@ -75,7 +75,6 @@ control.max_iter=100;                          % Maximum iterations
 control.dead_time=100e-6;                      % Dead time
 control.penalties={'NS','SNS'};                % Penalties
 control.p_weights=[0.1 10];                    % Penalty weights
-control.parallel='ensemble';                   % Parallelisation
 
 % Plotting options
 control.plotting={'xy_controls','robustness','spectrogram'};

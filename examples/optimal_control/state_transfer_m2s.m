@@ -68,7 +68,6 @@ control.penalties={'NS','SNS'};                   % Penalties
 control.p_weights=[1 10];                         % Penalty weights
 control.method='lbfgs';                           % Optimisation method
 control.max_iter=3000;                            % Termination condition
-control.parallel='ensemble';                      % Parallelisation mode
 
 % Plots during optimisation
 control.plotting={'correlation_order','coherence_order',...

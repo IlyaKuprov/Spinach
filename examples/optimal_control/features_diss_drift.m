@@ -101,7 +101,6 @@ control.penalties={'NS'};                         % Penalties
 control.p_weights=0.01;                           % Penalty weights
 control.method='lbfgs';                           % Optimisation method
 control.max_iter=500;                             % Termination tolerance
-control.parallel='ensemble';                      % Parallelisation
 
 % Control trajectory analysis plots
 control.plotting={'correlation_order','local_each_spin',...

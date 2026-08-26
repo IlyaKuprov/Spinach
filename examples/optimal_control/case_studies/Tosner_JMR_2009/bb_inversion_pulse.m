@@ -56,7 +56,6 @@ control.penalties={'NS','SNSA'};                 % Penalties
 control.p_weights=[0.01 10];                     % Penalty weights
 control.method='lbfgs';                          % Optimiser
 control.max_iter=200;                            % Max iterations
-control.parallel='ensemble';                     % Parallel mode
 control.plotting={'phi_controls','amp_controls',...
                   'robustness','spectrogram'};
 

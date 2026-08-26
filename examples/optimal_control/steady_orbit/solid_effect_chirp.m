@@ -99,7 +99,6 @@ control.amplitudes=[ones(1,720) ...              % Pulse itself
                     zeros(1,1)];                 % Sequence delay
 control.method='rbfgs';                          % Optimisation method
 control.max_iter=10000;                          % Maximum iterations
-control.parallel='ensemble';                     % Parallelisation
 control.steady=true();                           % Steady state
 control.budget=500;                              % Increase this
 

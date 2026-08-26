@@ -51,6 +51,9 @@ options=optimset('Display','iter','MaxIter',inf,'UseParallel',true,...
 % Vector of squared residuals
 vec_res_sq=@(x)(expt_pcs-ppcs(nxyz,x(1:3),x(4:8))).^2;
 
+% Vector of residuals
+vec_res=@(x)(expt_pcs-ppcs(nxyz,x(1:3),x(4:8)));
+
 % Sum of squared residuals 
 sum_res_sq=@(x)sum(vec_res_sq(x));
 
@@ -61,7 +64,7 @@ p=fminunc(sum_res_sq,[mguess 0.1 0.1 0.1 0.1 0.1],options);
 pred_pcs=ppcs(nxyz,p(1:3),p(4:8));
 
 % Compute the Jacobian at the optimal point
-jac=jacobianest(vec_res_sq,p);
+jac=jacobianest(vec_res,p);
 
 % Get the Studentized residual
 sdr=sqrt(sum_res_sq(p)/(numel(expt_pcs)-8));

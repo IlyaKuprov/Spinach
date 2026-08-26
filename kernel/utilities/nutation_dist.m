@@ -43,7 +43,10 @@
 %        frequency support, receiver phase, and sub-sample time
 %        shift are selected from the supplied trace; the returned
 %        density is therefore a stable estimate rather than a raw
-%        finite-time transform.
+%        finite-time transform. The reconstruction runs on twice
+%        the noise-limited support width, centred on the same band
+%        and clipped to the Nyquist interval, so that the margins
+%        of the distribution are visible rather than truncated.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -102,6 +105,12 @@ end
 if freq_hi<=freq_lo
     error('the curve does not contain a resolvable frequency range.');
 end
+
+% Double the support about its centre to expose the distribution margins
+freq_mid=(freq_lo+freq_hi)/2;
+freq_span=freq_hi-freq_lo;
+freq_lo=max(0,freq_mid-freq_span);
+freq_hi=min(pi/dt,freq_mid+freq_span);
 
 % Choose a frequency grid at approximately twice the Fourier resolution
 resolution=ceil((freq_hi-freq_lo)*npts*dt/(2*pi));

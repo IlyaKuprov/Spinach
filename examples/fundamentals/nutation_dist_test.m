@@ -80,7 +80,7 @@ curve=exp(1i*1.9)*curve/max(abs(curve));
 rng(1); curve=curve+2e-3*(randn(npts,1)+1i*randn(npts,1));
 
 % Second-derivative Tikhonov regularisation parameter
-lambda=1e4;
+lambda=3e2;
 
 % Nutation frequency distribution recovery
 [freq,distr]=nutation_dist(curve,dt,lambda);

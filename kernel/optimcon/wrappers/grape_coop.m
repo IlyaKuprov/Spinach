@@ -88,6 +88,8 @@ spin_system.control.rho_init(:)={rho};
 
 % Impurity cancellation gradients
 spin_system.control.ens_corrs={'rho_ens'};
+[spin_system.control.catalog,...
+ spin_system.control.ens_sizes]=ens_catalog(spin_system.control);
 [~,~,gradient_c]=grape_phase(profile_a,spin_system);
 [~,~,gradient_d]=grape_phase(profile_b,spin_system);
 

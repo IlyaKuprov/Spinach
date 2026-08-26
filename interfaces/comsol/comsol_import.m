@@ -16,7 +16,7 @@
 %    comsol.crop      - {[xmin xmax],[ymin ymax]} 
 %                       region of the mesh to retain
 %
-%    comsol.inactivate - a vector with mesh vertex
+%    comsol.inactivate - a row vector with mesh vertex
 %                        indices to deactivate
 %
 % Outputs:
@@ -56,7 +56,7 @@ mesh=comsol_velo(mesh,comsol.velo_file);
 mesh=mesh_crop(mesh,comsol.crop); 
 
 % Inactivate user-specified vertices
-mesh=mesh_inact(mesh,comsol.inactivate);   
+mesh=mesh_inact(mesh,comsol.inactivate);
 
 % Run Voronoi tessellation
 mesh=mesh_vorn(mesh);
@@ -86,9 +86,9 @@ if (~isnumeric(comsol.crop{1}))||(~isreal(comsol.crop{1}))||                ...
     error('comsol.crop must be {[xmin xmax],[ymin ymax]}.');
 end
 if ~isfield(comsol,'inactivate'), error('comsol.inactivate must be specified.'); end
-if (~isnumeric(comsol.inactivate))||(~isvector(comsol.inactivate))|| ...
-    any(comsol.inactivate(:)<1)||any(mod(comsol.inactivate(:),1)~=0)
-    error('comsol.inactivate must be a vector of positive integers.');
+if (~isnumeric(comsol.inactivate))||(~isrow(comsol.inactivate))||...
+    any(comsol.inactivate<1)||any(mod(comsol.inactivate,1)~=0)
+    error('comsol.inactivate must be a row vector of positive integers.');
 end
 end
 

@@ -24,8 +24,8 @@ function ttrain=shrink(ttrain)
 % Summation
 ttrain=pack(ttrain);
 
-% Right-to-left orthogonalization
-ttrain=ttort(ttrain);
+% Left-to-right orthogonalisation
+ttrain=ttort(ttrain,+1);
 
 % Check the norm and escape if the object is zero
 nrm=ttrain.coeff*norm(ttrain.cores{d,1}(:),2);

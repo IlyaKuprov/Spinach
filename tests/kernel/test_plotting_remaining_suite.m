@@ -158,8 +158,8 @@ crop_ranges={[-0.5 0.3],[-1.0 0.4]};
 [crop_spec,crop_params]=crop_2d(spin_system,spec,parameters,crop_ranges);
 
 % Compute the expected crop indices independently from the same public inputs
-axis_f1_hz=linspace(-parameters.sweep(1)/2,parameters.sweep(1)/2,size(spec,1))+parameters.offset(1);
-axis_f2_hz=linspace(-parameters.sweep(2)/2,parameters.sweep(2)/2,size(spec,2))+parameters.offset(2);
+axis_f1_hz=ft_axis(parameters.offset(1),parameters.sweep(1),size(spec,1));
+axis_f2_hz=ft_axis(parameters.offset(2),parameters.sweep(2),size(spec,2));
 axis_f1_ppm=1e6*(2*pi)*axis_f1_hz/(spin(parameters.spins{1})*spin_system.inter.magnet);
 axis_f2_ppm=1e6*(2*pi)*axis_f2_hz/(spin(parameters.spins{2})*spin_system.inter.magnet);
 left_f1=find(axis_f1_ppm>crop_ranges{1}(1),1);
@@ -167,9 +167,12 @@ right_f1=find(axis_f1_ppm>crop_ranges{1}(2),1);
 left_f2=find(axis_f2_ppm>crop_ranges{2}(1),1);
 right_f2=find(axis_f2_ppm>crop_ranges{2}(2),1);
 ref_spec=spec(left_f1:right_f1,left_f2:right_f2);
-ref_offset=[mean(axis_f1_hz([left_f1 right_f1])) mean(axis_f2_hz([left_f2 right_f2]))];
-ref_sweep=[axis_f1_hz(right_f1)-axis_f1_hz(left_f1) axis_f2_hz(right_f2)-axis_f2_hz(left_f2)];
-ref_zerofill=[right_f1-left_f1 right_f2-left_f2];
+ref_zerofill=[right_f1-left_f1+1 right_f2-left_f2+1];
+dres_f1=parameters.sweep(1)/size(spec,1);
+dres_f2=parameters.sweep(2)/size(spec,2);
+ref_sweep=[ref_zerofill(1)*dres_f1 ref_zerofill(2)*dres_f2];
+ref_offset=[axis_f1_hz(left_f1)+ref_sweep(1)/2-mod(ref_zerofill(1),2)*dres_f1/2 ...
+            axis_f2_hz(left_f2)+ref_sweep(2)/2-mod(ref_zerofill(2),2)*dres_f2/2];
 result=test_close(result,'crop_2d spectrum',crop_spec,ref_spec,1e-12,1e-12,...
                   'crop_2d extracts the digital bins selected by ppm bounds');
 result=test_close(result,'crop_2d offset',crop_params.offset,ref_offset,1e-12,1e-12,...
@@ -178,6 +181,14 @@ result=test_close(result,'crop_2d sweep',crop_params.sweep,ref_sweep,1e-12,1e-12
                   'crop_2d updates sweep widths to the retained digital range');
 result=test_close(result,'crop_2d zerofill',crop_params.zerofill,ref_zerofill,1e-12,1e-12,...
                   'crop_2d updates point counts to the retained digital range');
+result=test_close(result,'crop_2d axis reconstruction F1',...
+                  ft_axis(crop_params.offset(1),crop_params.sweep(1),crop_params.zerofill(1)),...
+                  axis_f1_hz(left_f1:right_f1),1e-12,1e-12,...
+                  'the returned parameters must reproduce the retained F1 axis points on the ft_axis grid');
+result=test_close(result,'crop_2d axis reconstruction F2',...
+                  ft_axis(crop_params.offset(2),crop_params.sweep(2),crop_params.zerofill(2)),...
+                  axis_f2_hz(left_f2:right_f2),1e-12,1e-12,...
+                  'the returned parameters must reproduce the retained F2 axis points on the ft_axis grid');
 
 % Check three-dimensional fractional zooming
 volume=reshape(1:1000,[10 10 10]);

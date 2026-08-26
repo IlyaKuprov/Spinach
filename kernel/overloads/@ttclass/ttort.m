@@ -5,7 +5,7 @@
 %
 % Parameters:
 %
-%    direct=+1 - {default} gives you left-to-right orthogonality,
+%    direct=+1 - gives left-to-right orthogonality,
 %    direct=-1 - gives right-to-left orthogonality
 %
 %    tt     - tensor train object, possibly with buffered sums
@@ -34,9 +34,6 @@ function [tt,lognrm]=ttort(tt,direct)
 % Read tensor ranks and dimensions
 sz=tt.sizes; rnk=tt.ranks;
 d=tt.ncores; N=tt.ntrains;
-
-% Set the default dir if it is not present
-if ~exist('dir','var'), direct=+1; end
 
 % Compute logs of norms
 if (nargout>1)

@@ -23,7 +23,9 @@
 %
 %          spec - 2D matrix containing the cropped spectrum
 %
-%    parameters - the updated parameters structure
+%    parameters - the updated parameters structure; the new
+%                 offset, sweep, and zerofill reproduce the
+%                 retained axis points on the ft_axis grid
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -46,8 +48,8 @@ if isscalar(parameters.sweep)
 end
 
 % Build axes and apply offsets
-axis_f1_hz=linspace(-parameters.sweep(1)/2,parameters.sweep(1)/2,size(spec,1))+parameters.offset(1);
-axis_f2_hz=linspace(-parameters.sweep(2)/2,parameters.sweep(2)/2,size(spec,2))+parameters.offset(2);
+axis_f1_hz=ft_axis(parameters.offset(1),parameters.sweep(1),size(spec,1));
+axis_f2_hz=ft_axis(parameters.offset(2),parameters.sweep(2),size(spec,2));
 
 % Convert the units 
 axis_f1_ppm=1e6*(2*pi)*axis_f1_hz/(spin(parameters.spins{1})*spin_system.inter.magnet);
@@ -62,16 +64,19 @@ if isempty(l_bound_f1)||isempty(r_bound_f1)||isempty(l_bound_f2)||isempty(r_boun
     error('crop_ranges must lie inside the spectrum axes.');
 end
 
-% Find the new offsets
-parameters.offset=[(axis_f1_hz(l_bound_f1)+axis_f1_hz(r_bound_f1))/2 ...
-                   (axis_f2_hz(l_bound_f2)+axis_f2_hz(r_bound_f2))/2];
+% Digital resolutions of the input grid
+dres_f1=parameters.sweep(1)/size(spec,1);
+dres_f2=parameters.sweep(2)/size(spec,2);
+
+% Update the point counts
+parameters.zerofill=[(r_bound_f1-l_bound_f1+1) (r_bound_f2-l_bound_f2+1)];
 
 % Find the new sweeps
-parameters.sweep= [(axis_f1_hz(r_bound_f1)-axis_f1_hz(l_bound_f1)) ...
-                   (axis_f2_hz(r_bound_f2)-axis_f2_hz(l_bound_f2))];
-               
-% Update the point counts
-parameters.zerofill=[(r_bound_f1-l_bound_f1) (r_bound_f2-l_bound_f2)];
+parameters.sweep=[parameters.zerofill(1)*dres_f1 parameters.zerofill(2)*dres_f2];
+
+% Find the new offsets
+parameters.offset=[axis_f1_hz(l_bound_f1)+parameters.sweep(1)/2-mod(parameters.zerofill(1),2)*dres_f1/2 ...
+                   axis_f2_hz(l_bound_f2)+parameters.sweep(2)/2-mod(parameters.zerofill(2),2)*dres_f2/2];
 
 % Cut the spectrum
 spec=spec(l_bound_f1:r_bound_f1,l_bound_f2:r_bound_f2);

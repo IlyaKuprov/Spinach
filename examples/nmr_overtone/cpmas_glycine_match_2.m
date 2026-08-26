@@ -101,7 +101,7 @@ end
 % Plot as image
 kfigure();
 imagesc([min(rf_powers)  max(rf_powers)]/1000,...
-        [min(spin_rates) max(spin_rates)]/1000,intensities);
+        [min(spin_rates) max(spin_rates)]/1000,intensities.');
 kxlabel('1H nutation frequency, kHz');
 kylabel('Sample spinning rate, kHz');
 set(gca,'YDir','normal'); colorbar;

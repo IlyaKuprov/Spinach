@@ -53,8 +53,8 @@ if (~isnumeric(A_left))||(~isnumeric(A_right))||...
     error('all inputs must be numeric.');
 end
 if (~isnumeric(rlx_rate))||(~isscalar(rlx_rate))||...
-   (~isreal(rlx_rate))
-    error('rlx_rate must be a non-negative real number.');
+   (~isreal(rlx_rate))||(~isfinite(rlx_rate))||(rlx_rate<0)
+    error('rlx_rate must be a finite non-negative real number.');
 end
 end
 

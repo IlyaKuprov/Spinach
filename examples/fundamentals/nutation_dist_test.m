@@ -5,8 +5,9 @@
 % nal of every ensemble member is weighted by its own RF field ampli-
 % tude. The transverse magnetisation components are combined into a
 % complex nutation curve, a receiver phase is applied, noise is add-
-% ed, and nutation_dist.m is called to recover the true nutation
-% frequency distribution with the reception weight divided out.
+% ed, and nutation_dist.m is called with a user-specified Tikhonov
+% regularisation parameter to recover the true nutation frequency
+% distribution with the reception weight divided out.
 %
 % Calculation time: seconds
 %
@@ -78,8 +79,11 @@ curve=exp(1i*1.9)*curve/max(abs(curve));
 % Complex measurement noise
 rng(1); curve=curve+2e-3*(randn(npts,1)+1i*randn(npts,1));
 
+% Second-derivative Tikhonov regularisation parameter
+lambda=3e2;
+
 % Nutation frequency distribution recovery
-[freq,distr]=nutation_dist(curve,dt);
+[freq,distr]=nutation_dist(curve,dt,lambda);
 
 % Plot the source and recovered distributions
 kfigure(); plot(b1_freq/(2*pi*1e3),2*pi*1e3*b1_dist,'b-');

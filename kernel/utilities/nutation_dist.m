@@ -1,7 +1,7 @@
 % Nutation frequency distribution from a nutation curve measured with
 % the same coil used for excitation and detection. Syntax:
 %
-%                   [freq,distr]=nutation_dist(curve,dt)
+%                [freq,distr]=nutation_dist(curve,dt,lambda)
 %
 % Parameters:
 %
@@ -10,6 +10,15 @@
 %             or a real phase-corrected trace
 %
 %    dt     - sampling interval in seconds
+%
+%    lambda - second-derivative Tikhonov regularisation para-
+%             meter, a non-negative real scalar; the curve is
+%             normalised to unit maximum modulus and the fit-
+%             ting kernel is dimensionless, so lambda is a di-
+%             mensionless number of the order of the ratio of
+%             the squared Frobenius norms of the kernel and of
+%             the second difference matrix; zero switches the
+%             regularisation off
 %
 % Outputs:
 %
@@ -31,19 +40,19 @@
 %        returned density is the true nutation frequency distribu-
 %        tion. A real receiver scale is a valid special case, and
 %        a phase-corrected real trace is therefore accepted. The
-%        frequency support, receiver phase, sub-sample time shift,
-%        and second-derivative Tikhonov parameter are selected from
-%        the supplied trace; the returned density is therefore a
-%        stable estimate rather than a raw finite-time transform.
+%        frequency support, receiver phase, and sub-sample time
+%        shift are selected from the supplied trace; the returned
+%        density is therefore a stable estimate rather than a raw
+%        finite-time transform.
 %
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=nutation_dist.m>
 
-function [freq,distr]=nutation_dist(curve,dt)
+function [freq,distr]=nutation_dist(curve,dt,lambda)
 
 % Check consistency
-grumble(curve,dt);
+grumble(curve,dt,lambda);
 
 % Fold the input into a column
 signal=curve(:);
@@ -108,18 +117,6 @@ rec_weight=freq.'/freq_hi;
 % Silence the non-negative least squares solver
 options=optimset('Display','off');
 
-% Scale the regularisation search to the data and grid
-kernel=sin(time*freq.').*rec_weight;
-scale=norm(kernel,'fro')^2/max(norm(D,'fro')^2,eps);
-lambdas=scale*logspace(-8,4,13);
-
-% Choose the strongest regularisation within 10% of the best misfit
-trial_err=zeros(size(lambdas));
-for n=1:numel(lambdas)
-    [~,trial_err(n)]=fit_nutation(signal,kernel,D,lambdas(n),options);
-end
-lambda=lambdas(find(trial_err<=1.1*min(trial_err),1,'last'));
-
 % Search for a small error in the time origin
 shift_grid=linspace(-2*dt,2*dt,9);
 best_err=inf;
@@ -145,14 +142,8 @@ for n=1:numel(shift_grid)
     end
 end
 
-% Re-select the regularisation at the corrected time origin
+% Final fit at the corrected time origin
 kernel=sin((time+best_shift)*freq.').*rec_weight;
-for n=1:numel(lambdas)
-    [~,trial_err(n)]=fit_nutation(signal,kernel,D,lambdas(n),options);
-end
-lambda=lambdas(find(trial_err<=1.1*min(trial_err),1,'last'));
-
-% Final fit at the corrected origin and regularisation
 best_weights=fit_nutation(signal,kernel,D,lambda,options);
 
 % Convert fitted probability masses into a unit-integral density
@@ -200,7 +191,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(curve,dt)
+function grumble(curve,dt,lambda)
 if (~isnumeric(curve))||(~isvector(curve))||isempty(curve)
     error('curve must be a non-empty numeric vector.');
 end
@@ -215,6 +206,10 @@ if ~any(curve)
 end
 if (~isnumeric(dt))||(~isreal(dt))||(~isscalar(dt))||(~isfinite(dt))||(dt<=0)
     error('dt must be a positive real scalar.');
+end
+if (~isnumeric(lambda))||(~isreal(lambda))||(~isscalar(lambda))||...
+   (~isfinite(lambda))||(lambda<0)
+    error('lambda must be a non-negative real scalar.');
 end
 end
 

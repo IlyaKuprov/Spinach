@@ -72,8 +72,11 @@ grumble(nxyz,expt_pcs,ranks,mguess);
 % Count the multipole variables
 n_mvars=sum(2*nonzeros(ranks)+1);
 
+% Suppress the method switch warning, restore on exit
+warn_state=warning('off','optim:fminunc:SwitchingMethod');
+cleanup_obj=onCleanup(@()warning(warn_state));
+
 % Set optimisation options
-warning('off','optim:fminunc:SwitchingMethod');
 options=optimset('Display','iter','MaxIter',inf,'UseParallel',true,...
                  'MaxFunEvals',inf,'FinDiffType','central');
 

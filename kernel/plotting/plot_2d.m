@@ -80,12 +80,16 @@ report(spin_system,'plotting...');
 if nnz(imag(spectrum))>0
     
     % Recursively plot the real part
-    subplot(1,2,1); plot_2d(spin_system,real(spectrum),parameters,ncont,delta,k,ncol,m,signs);
+    subplot(1,2,1);
+    [axis_f1,axis_f2]=plot_2d(spin_system,real(spectrum),parameters,ncont,delta,k,ncol,m,signs);
     ktitle('Real part of the complex spectrum.');
-    
+
     % Recursively plot the imaginary part
     subplot(1,2,2); plot_2d(spin_system,imag(spectrum),parameters,ncont,delta,k,ncol,m,signs);
-    ktitle('Imaginary part of the complex spectrum.'); return
+    ktitle('Imaginary part of the complex spectrum.');
+
+    % Return the transposed plotting matrix
+    spectrum=transpose(spectrum); return
     
 end
 

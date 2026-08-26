@@ -25,7 +25,7 @@ try:
 	import XeprAPI      # load the Xepr API module
 	Xepr=XeprAPI.Xepr()
 except:
-	print "xepr_import_error"
+	print("xepr_import_error")
 	sys.exit(1)
 
 try:
@@ -42,7 +42,7 @@ fullDefs = currentExp.getParam("PlsSPELGlbTxt").value
 # need to check if fullDefs is empty and exit cause pulsespel not being loaded
 fullDefs = fullDefs.split("\n")
 
-no_defs=(len(sys.argv)-1)/2
+no_defs=(len(sys.argv)-1)//2
 
 try:
 	for value in fullDefs:
@@ -51,6 +51,6 @@ try:
 				cmdStr = str(sys.argv[(2*index)-1])+" = "+str(sys.argv[2*index])
 				currentExp["ftEPR.PlsSPELSetVar"].value = cmdStr
 except:
-	print "error changing pulseSPEL defs"
+	print("error changing pulseSPEL defs")
 	sys.exit(4)
 

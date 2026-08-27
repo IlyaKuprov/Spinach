@@ -44,6 +44,8 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Always RTFM:** Before writing code, check Matlab manual and Spinach knowledge base to see if some or all of the required features already exist somewhere in *Matlab* or *Spinach*. If they do, call existing functions to minimize the size and complexity of your code. Make sure that the functions you are calling actually exist in *Matlab* or *Spinach*. Never call functions that do not exist without making them first.
 
+* **Code overrules documentation:** Where code and documentation disagree, and the code is physically / mathematically correct, update the documentation to match the code.
+
 ## Spinach Wiki Documentation Instructions
 
 *Spinach* maintains a Wiki for function documentation. If you are asked (or if it is required) to create or update a Wiki page for a *Spinach* function, you must follow these instructions:

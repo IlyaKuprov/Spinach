@@ -1183,6 +1183,9 @@ if isfield(control,'ens_corrs')
             error('control.ens_corrs contains an unknown ensemble correlation setting')
         end
     end
+    if ismember('rho_ens',control.ens_corrs)&&(numel(control.ens_corrs)>1)
+        error('rho_ens cannot be combined with other ensemble correlations.');
+    end
     if ismember('rho_drift',control.ens_corrs)&&...
        (numel(spin_system.control.rho_init)~=spin_system.control.ndrifts)
         error('rho_drift correlation needs one state pair per drift.');

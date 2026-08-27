@@ -17,16 +17,19 @@
 %     spin_system  - updated Spinach data structure
 %
 % Note: this function freezes the optimisation problem. The ensemble
-%       case catalog is built here, and the complete frozen problem,
-%       including the drift generators, the control operators, and
-%       the offset operators, is published to the parallel pool wor-
-%       kers exactly once, as a parallel.pool.Constant held in
-%       spin_system.control.invariants; those three heavy fields are
-%       then removed from the returned structure. Numerical values
-%       of timings, powers, offsets, phases, states, and penalties
-%       may be overwritten between optimisations; changes to the en-
-%       semble composition, the operators, or the generators require
-%       a fresh optimcon() call.
+%       case catalog is built here, and the complete frozen problem
+%       is published to the parallel pool workers exactly once, as a
+%       parallel.pool.Constant held in spin_system.control.invari-
+%       ants. Heavy invariants - the drift generators, the control
+%       operators, the offset operators, the control commutators,
+%       and the Bloch-Siegert response operators - are then removed
+%       from the returned structure, and their names are recorded
+%       in spin_system.control.frozen_fields. All other control
+%       fields stay live: ensemble() re-sends them to the workers
+%       at every evaluation, and they may be overwritten between
+%       optimisations. Changes to the ensemble composition, the
+%       operators, or the generators require a fresh optimcon()
+%       call.
 %
 % david.goodwin@inano.au.dk
 % u.rasulov@soton.ac.uk
@@ -1400,11 +1403,15 @@ if nworkers>0
                         num2str(balance,'%.3f')]);
 end
 
+% Record the names of the heavy worker-resident invariants
+frozen_fields={'drifts','operators','off_ops','cc_comm','cc_comm_idx','resp_ops'};
+spin_system.control.frozen_fields=frozen_fields(isfield(spin_system.control,frozen_fields));
+
 % Publish the complete frozen problem to the pool, once per problem
 spin_system.control.invariants=parallel.pool.Constant(spin_system);
 
 % Keep heavy invariants off the per-evaluation communication path
-spin_system.control=rmfield(spin_system.control,{'operators','off_ops','drifts'});
+spin_system.control=rmfield(spin_system.control,spin_system.control.frozen_fields);
 
 end
 

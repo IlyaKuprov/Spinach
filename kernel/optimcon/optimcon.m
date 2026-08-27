@@ -1177,7 +1177,7 @@ end
 % Process ensemble correlations
 if isfield(control,'ens_corrs')
 
-    % Input validation (more inside ensemble function)
+    % Input validation
     if (~iscell(control.ens_corrs))||(~all(cellfun(@ischar,control.ens_corrs)))
         error('control.ens_corrs must be a cell array of character strings.');
     end
@@ -1186,7 +1186,18 @@ if isfield(control,'ens_corrs')
             error('control.ens_corrs contains an unknown ensemble correlation setting')
         end
     end
-    
+    if ismember('rho_ens',control.ens_corrs)&&(numel(control.ens_corrs)>1)
+        error('rho_ens cannot be combined with other ensemble correlations.');
+    end
+    if ismember('rho_drift',control.ens_corrs)&&...
+       (numel(spin_system.control.rho_init)~=spin_system.control.ndrifts)
+        error('rho_drift correlation needs one state pair per drift.');
+    end
+    if ismember('power_drift',control.ens_corrs)&&...
+       (numel(spin_system.control.pwr_levels)~=spin_system.control.ndrifts)
+        error('power_drift correlation needs one power level per drift.');
+    end
+
     % Absorb ensemble correlations
     spin_system.control.ens_corrs=control.ens_corrs;
     control=rmfield(control,'ens_corrs');
@@ -1391,6 +1402,12 @@ end
 [spin_system.control.catalog,...
  spin_system.control.ens_sizes]=ens_catalog(spin_system.control);
 n_cases=size(spin_system.control.catalog,1);
+
+% Match the state pair list to the correlated ensemble
+if ismember('rho_ens',spin_system.control.ens_corrs)&&...
+   (numel(spin_system.control.rho_init)~=prod(spin_system.control.ens_sizes(2:end)))
+    error('rho_ens correlation needs one state pair per ensemble member.');
+end
 
 % Inform the user
 report(spin_system,[pad('Ensemble cases per objective evaluation',60) ...

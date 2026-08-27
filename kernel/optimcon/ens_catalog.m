@@ -61,7 +61,7 @@ catalog=[kron(ones(n_distortions,1),catalog) kron((1:n_distortions)',ones(size(c
 % Ensemble correlation: own state pair for each member
 if ismember('rho_ens',control.ens_corrs)
     catalog=catalog(:,2:end);
-    catalog=unique(catalog,'rows');
+    catalog=unique(catalog,'rows','stable');
     catalog=[(1:size(catalog,1))' catalog];
 end
 

@@ -1543,7 +1543,8 @@ unit-quadrature control operators\\
 \code{amplitudes} & --- & fixed amplitude profile for
 \code{grape\_phase}; validated there\\
 \code{freeze} & none & logical waveform-shaped mask of elements
-excluded from optimisation; may not freeze everything\\
+excluded from optimisation; may not freeze everything; incompatible
+with \code{basis}, which mixes time points\\
 \code{max\_iter} & \code{100} & iteration cap, non-negative integer;
 zero evaluates and plots once\\
 \code{tol\_x} & \code{1e-3} & termination on step 1-norm\\
@@ -1555,7 +1556,7 @@ $[\varphi_{\mathrm{init}},\varphi_{1..K/2},\varphi_{\mathrm{targ}}]$,
 radians; requires an even control count; $K/2+2$ columns\\
 \code{basis} & none & orthonormal waveform basis, rows are basis
 functions, \code{pulse\_ntpts} columns; optimisation runs in
-coefficient space\\
+coefficient space; incompatible with \code{freeze}\\
 \code{keyholes} & none & cell of \code{pulse\_ntpts} entries, each
 empty or a linear idempotent function handle; rectangle integrator
 only\\

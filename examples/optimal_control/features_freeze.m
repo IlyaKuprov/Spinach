@@ -78,7 +78,6 @@ control.penalties={'NS'};                       % Penalty type
 control.p_weights=0.01;                         % Penalty weight
 control.method='goodwin';                       % Optimisation method
 control.max_iter=100;                           % Termination condition
-control.parallel='ensemble';                    % Parallelisation
 
 % Initial guess
 guess=randn(6,100)/10; 

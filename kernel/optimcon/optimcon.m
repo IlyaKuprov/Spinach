@@ -1,6 +1,6 @@
 % Validates optimal control options and updates the spin system
 % object. Syntax:
-% 
+%
 %          spin_system=optimcon(spin_system,control)
 %
 % Parameters:
@@ -9,12 +9,24 @@
 %                    created by create.m and updated
 %                    by basis.m functions
 %
-%     control      - control data structure described 
+%     control      - control data structure described
 %                    in detail in the online manual
 %
 % Outputs:
 %
 %     spin_system  - updated Spinach data structure
+%
+% Note: this function freezes the optimisation problem. The ensemble
+%       case catalog is built here, and the complete frozen problem,
+%       including the drift generators, the control operators, and
+%       the offset operators, is published to the parallel pool wor-
+%       kers exactly once, as a parallel.pool.Constant held in
+%       spin_system.control.invariants; those three heavy fields are
+%       then removed from the returned structure. Numerical values
+%       of timings, powers, offsets, phases, states, and penalties
+%       may be overwritten between optimisations; changes to the en-
+%       semble composition, the operators, or the generators require
+%       a fresh optimcon() call.
 %
 % david.goodwin@inano.au.dk
 % u.rasulov@soton.ac.uk
@@ -728,16 +740,9 @@ if isfield(control,'drifts')
         report(spin_system,[pad('Time-dependent drift generator',60) 'yes']);
     end
 
-    % Put drift generators on pool ValueStore
-    vs_labels=cell([numel(control.drifts) 1]);
-    for n=1:numel(control.drifts)
-        vs_labels{n}=['oc_drift_' num2str(n)];
-    end
-    store=gcp('nocreate').ValueStore;
-    put(store,vs_labels,control.drifts);
-
-    % Only keep the overall drift count
-    spin_system.control.ndrifts=numel(control.drifts); 
+    % Absorb drift generators and their count
+    spin_system.control.drifts=control.drifts;
+    spin_system.control.ndrifts=numel(control.drifts);
     control=rmfield(control,'drifts');
 
 else
@@ -1164,31 +1169,6 @@ else
     report(spin_system,[pad('Ensemble budget',60) 'all']);
 end
 
-% Parallelisation strategy
-if isfield(control,'parallel')
-
-    % Input validation
-    if ~ischar(control.parallel)
-        error('control.parallel must be a character string.');
-    end
-    if ~ismember(control.parallel,{'ensemble','time'})
-        error('control.parallel must be ''ensemble'' or ''time''.');
-    end
-
-    % Absorb the specification
-    spin_system.control.parallel=control.parallel;
-    control=rmfield(control,'parallel');
-
-else
-
-    % Default is over time steps
-    spin_system.control.parallel='time';
-
-end
-
-% Inform the user
-report(spin_system,[pad('Parallelisation strategy',60) spin_system.control.parallel]);
-                     
 % Plotting options
 if isfield(control,'plotting')
 
@@ -1335,6 +1315,31 @@ if ~isempty(unparsed)
     end
     error('there are problems with the control structure.');
 end
+
+% Build the ensemble case catalog
+[spin_system.control.catalog,...
+ spin_system.control.ens_sizes]=ens_catalog(spin_system.control);
+n_cases=size(spin_system.control.catalog,1);
+
+% Inform the user
+report(spin_system,[pad('Ensemble cases per objective evaluation',60) ...
+                    int2str(n_cases)]);
+
+% Report the parallel load balance ceiling
+nworkers=poolsize;
+if nworkers>0
+    balance=n_cases/(nworkers*ceil(n_cases/nworkers));
+    report(spin_system,[pad('Parallel pool size, workers',60) ...
+                        int2str(nworkers)]);
+    report(spin_system,[pad('Ensemble parallel efficiency ceiling',60) ...
+                        num2str(balance,'%.3f')]);
+end
+
+% Publish the complete frozen problem to the pool, once per problem
+spin_system.control.invariants=parallel.pool.Constant(spin_system);
+
+% Keep heavy invariants off the per-evaluation communication path
+spin_system.control=rmfield(spin_system.control,{'operators','off_ops','drifts'});
 
 end
 

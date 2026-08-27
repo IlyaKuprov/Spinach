@@ -61,7 +61,6 @@ control.max_iter=1000;                          % Termination condition
 control.amplitudes=exp(-linspace(-2,2,250).^2); % Amplitude profile
 control.penalties={'DNS'};                      % Penalise non-smooth
 control.p_weights=1;                            % Penalty weight
-control.parallel='ensemble';                    % Parallelisation 
 
 % Plotting options
 control.plotting={'xy_controls','phi_controls',...

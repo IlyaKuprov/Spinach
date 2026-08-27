@@ -69,7 +69,6 @@ control.off_ops={Lz};                               % Offset operator
 control.method='lbfgs';                             % Optimisation method
 control.max_iter=100;                               % Termination condition
 control.amplitudes=ones(1,100);                     % Amplitude profile
-control.parallel='ensemble';                        % Parallelisation
 
 % Plotting options
 control.plotting={'phi_controls','robustness',...

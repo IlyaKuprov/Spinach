@@ -50,7 +50,7 @@ function [traj_data,fidelity,df_du]=grape_curv(waveform_u,u2x,...
 grumble(waveform_u,u2x,dx_du,spin_system);
 
 % Count rectilinear and curvilinear coordinates
-size_x=numel(spin_system.control.operators); 
+size_x=spin_system.control.ncontrols; 
 n_time_pts=size(waveform_u,2);
 size_u=size(waveform_u,1); 
 

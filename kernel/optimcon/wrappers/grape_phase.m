@@ -108,7 +108,7 @@ elseif nargout==4
 
     % Transform Hessian from n^2 kxk block matrices to k^2 nxn matrices
     for n=1:size(hess_xy,3)
-        hess_xy(:,:,n)=hess_reorder(hess_xy(:,:,n),numel(spin_system.control.operators),...
+        hess_xy(:,:,n)=hess_reorder(hess_xy(:,:,n),spin_system.control.ncontrols,...
                                                    spin_system.control.pulse_nsteps);
     end
 
@@ -173,7 +173,7 @@ if ~isfield(spin_system.control,'amplitudes')
     error('control amplitude profile missing from spin_system.control.amplitudes.');
 end
 amp_profile=spin_system.control.amplitudes;
-if mod(numel(spin_system.control.operators),2)~=0
+if mod(spin_system.control.ncontrols,2)~=0
     error('phase-amplitude optimisations must have an even number of controls.');
 end
 if (~isnumeric(amp_profile))||(~isreal(amp_profile))
@@ -188,10 +188,10 @@ end
 if numel(amp_profile)~=numel(phi_profile)
     error('amp_profile and phi_profile must have the same number of elements.');
 end
-if size(amp_profile,1)~=numel(spin_system.control.operators)/2
+if size(amp_profile,1)~=spin_system.control.ncontrols/2
     error('the number of rows in amp_profile must be half the number of controls.');
 end
-if size(phi_profile,1)~=numel(spin_system.control.operators)/2
+if size(phi_profile,1)~=spin_system.control.ncontrols/2
     error('the number of rows in phi_profile must be half the number of controls.');
 end
 switch spin_system.control.integrator

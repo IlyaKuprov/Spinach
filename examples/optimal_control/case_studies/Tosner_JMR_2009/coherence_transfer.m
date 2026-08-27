@@ -61,7 +61,6 @@ control.penalties={'NS'};                      % Penalties
 control.p_weights=0.01;                        % Penalty weight
 control.method='lbfgs';                        % Optimiser
 control.max_iter=200;                          % Max iterations
-control.parallel='ensemble';                   % Parallel mode
 
 % Visual diagnostics
 control.plotting={'xy_controls','spectrogram','robustness'};

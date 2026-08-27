@@ -54,7 +54,6 @@ control.penalties={'NS'};
 control.p_weights=0.001;
 control.method='lbfgs';
 control.max_iter=200;
-control.parallel='ensemble';
 
 % Plots during optimisation
 control.plotting={'xy_controls'};

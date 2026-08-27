@@ -66,7 +66,6 @@ control.pwr_levels=2*pi*linspace(50e3,70e3,10); % Power levels
 control.amplitudes=ones(1,60);                  % Amplitude profile
 control.method='lbfgs';                         % Optimisation method
 control.max_iter=200;                           % Termination condition
-control.parallel='ensemble';                    % Parallelisation
 
 % Plotting options
 control.plotting={'phi_controls','xy_controls',...

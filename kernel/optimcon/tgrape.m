@@ -93,7 +93,7 @@ if nargout>1
     grad=zeros(size(dt_grid));
 
     % Loop over control sequence
-    parfor n=1:nsteps
+    for n=1:nsteps
 
         % Make evolution generator
         L=drift;

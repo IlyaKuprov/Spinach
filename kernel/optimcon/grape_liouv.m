@@ -69,7 +69,7 @@
 
 function [traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,...
                                                     waveform,rho_init,rho_targ,...
-                                                    fidelity_type) %#ok<*PFBNS>
+                                                    fidelity_type)
 % Check consistency
 grumble(spin_system,drifts,controls,waveform,...
         rho_init,rho_targ,fidelity_type);
@@ -116,7 +116,7 @@ switch spin_system.control.integrator
 
         else
 
-            % Parfor needs these empty declarations
+            % Empty declarations tested downstream
             fwd_dP={}; bwd_dP={}; fwd_d2P={}; P_cum={};
 
         end
@@ -125,7 +125,7 @@ switch spin_system.control.integrator
         if spin_system.control.steady
             P=cell(1,nsteps);
         else
-            P={}; % Needed by parfor
+            P={};
         end
 
     % Piecewise-linear
@@ -173,10 +173,6 @@ if ~isempty(spin_system.control.suffix)
     rho_targ=suffix(spin_system,drifts{end},rho_targ);
 end
 
-% Strip the spin system object for communication efficiency
-ss_parfor.sys=spin_system.sys; ss_parfor.tols=spin_system.tols;
-ss_parfor.bas.formalism=spin_system.bas.formalism;
-
 % Define a vector and a matrix of zeroes for auxiliary systems
 zero_state=complex(spalloc(size(rho_init,1),size(rho_init,2),0));
 zero_drift=complex(spalloc(size(drifts{1},1),size(drifts{1},2),0));
@@ -195,10 +191,9 @@ switch spin_system.control.integrator
 
         % Preallocate evolution generators
         L_forw=cell(1,nsteps); L_back=cell(1,nsteps);
-        
+
         % Precompute evolution generators
-        % (this is surprisingly expensive)
-        parfor n=1:nsteps
+        for n=1:nsteps
 
             % Cycle through the drifts array
             L_forw{n}=drifts{mod(n-1,ndrifts)+1};
@@ -227,7 +222,7 @@ switch spin_system.control.integrator
             for n=1:nsteps
 
                 % Get the step propagator
-                P{n}=propagator(ss_parfor,L_forw{n},dt(n));
+                P{n}=propagator(spin_system,L_forw{n},dt(n));
 
                 % Merge into the total (physical: no keyholes)
                 P_tot=clean_up(spin_system,P{n}*P_tot,...
@@ -275,7 +270,7 @@ switch spin_system.control.integrator
 
             % Goodwin's optimiser needs cumulative propagators
             if strcmp(spin_system.control.method,'goodwin')&&(n_outputs>3)
-                P_cum{n}=propagator(ss_parfor,L_forw{n},dt(n));
+                P_cum{n}=propagator(spin_system,L_forw{n},dt(n));
                 if n>1
                     P_cum{n}=P_cum{n}*P_cum{n-1};
                     P_cum{n}=clean_up(spin_system,P_cum{n},...
@@ -313,7 +308,7 @@ switch spin_system.control.integrator
         L_back_left=cell(1,nsteps); L_back_right=cell(1,nsteps);
 
         % Precompute evolution generators
-        parfor n=1:nsteps
+        for n=1:nsteps
 
             % Cycle through the drifts array
             L_forw_left{n}=drifts{mod(n-1,ndrifts)+1};           
@@ -386,8 +381,8 @@ if n_outputs>2
         case 'rectangle'
 
             % Over time steps
-            parfor n=1:nsteps
-                
+            for n=1:nsteps
+
                 % Preallocate local gradient column
                 grad_col=zeros(nctrls,1,'like',1i);
 
@@ -405,7 +400,7 @@ if n_outputs>2
                         aux_vec=[zero_state; fwd_traj(:,n)];
             
                         % Propagate the auxiliary vector
-                        aux_vec=step(ss_parfor,aux_matrix,aux_vec,dt(n));
+                        aux_vec=step(spin_system,aux_matrix,aux_vec,dt(n));
                 
                         % Compute the derivative
                         grad_col(k)=bwd_traj(:,n+1)'*aux_vec(1:(end/2));
@@ -432,7 +427,7 @@ if n_outputs>2
             cc_comm=spin_system.control.cc_comm;
 
             % Loop over control sequence
-            parfor n=1:(nsteps+1)
+            for n=1:(nsteps+1)
 
                 % Allocate local gradient column
                 grad_col=zeros(nctrls,1,'like',1i);
@@ -454,7 +449,7 @@ if n_outputs>2
                         aux_vec=[zero_state; fwd_traj(:,n)];
 
                         % Propagate the auxiliary vector
-                        aux_vec=step(ss_parfor,DL_first,aux_vec,dt(n));
+                        aux_vec=step(spin_system,DL_first,aux_vec,dt(n));
 
                         % Compute the derivative
                         grad_col(k)=bwd_traj(:,n+1)'*aux_vec(1:(end/2));
@@ -478,7 +473,7 @@ if n_outputs>2
                         aux_vec=[zero_state; fwd_traj(:,n-1)];
 
                         % Propagate the auxiliary vector
-                        aux_vec=step(ss_parfor,DR_last,aux_vec,dt(n-1));
+                        aux_vec=step(spin_system,DR_last,aux_vec,dt(n-1));
 
                         % Compute the derivative
                         grad_col(k)=bwd_traj(:,end)'*aux_vec(1:(end/2));
@@ -502,7 +497,7 @@ if n_outputs>2
                         aux_vec_a=[zero_state; fwd_traj(:,n)];
 
                         % Propagate and extract derivative action
-                        aux_vec_a=step(ss_parfor,Right_DL,aux_vec_a,dt(n)); 
+                        aux_vec_a=step(spin_system,Right_DL,aux_vec_a,dt(n)); 
 
                         % Product rule: [dP2]*[P1]*rho part
                         grad_col(k)=grad_col(k)+bwd_traj(:,n+1)'*aux_vec_a(1:(end/2));
@@ -518,7 +513,7 @@ if n_outputs>2
                         aux_vec_b=[zero_state; fwd_traj(:,n-1)];
                         
                         % Propagate and extract derivative action
-                        aux_vec_b=step(ss_parfor,Left_DR,aux_vec_b,dt(n-1));
+                        aux_vec_b=step(spin_system,Left_DR,aux_vec_b,dt(n-1));
 
                         % Product rule: [P2]*[dP1]*rho part
                         grad_col(k)=grad_col(k)+bwd_traj(:,n)'*aux_vec_b(1:(end/2));
@@ -544,11 +539,11 @@ end
 % Compute Hessian
 if strcmp(spin_system.control.integrator,'rectangle')&&(n_outputs>3)
 
-    % Flip the backward trajectory for ease of paralellisation
+    % Flip the backward trajectory to match forward indexing
     bwd_traj=fliplr(bwd_traj);
 
     % Compute derivative trajectories
-    parfor n=1:nsteps
+    for n=1:nsteps
 
         % Preallocate local arrays
         fwd_dP_col=cell(nctrls,1);
@@ -635,7 +630,7 @@ if strcmp(spin_system.control.integrator,'rectangle')&&(n_outputs>3)
             bwd_dP=fliplr(bwd_dP);
 
             % Loop over timesteps
-            parfor n=1:nsteps
+            for n=1:nsteps
 
                 % Loop over controls
                 for k=1:nctrls
@@ -661,7 +656,7 @@ if strcmp(spin_system.control.integrator,'rectangle')&&(n_outputs>3)
             bwd_traj=fliplr(bwd_traj);
 
             % Loop over timesteps
-            parfor n=1:nsteps
+            for n=1:nsteps
 
                 % Preallocate local Hessian column
                 hess_col=zeros(nctrls,nsteps,nctrls,1,'like',1i);
@@ -708,7 +703,7 @@ if strcmp(spin_system.control.integrator,'rectangle')&&(n_outputs>3)
             bwd_traj=fliplr(bwd_traj); bwd_dP=fliplr(bwd_dP);
 
             % Loop over timesteps
-            parfor n=1:nsteps
+            for n=1:nsteps
 
                 % Allocate local Hessian column
                 hess_col=zeros(nctrls,nsteps,nctrls,1,'like',1i);

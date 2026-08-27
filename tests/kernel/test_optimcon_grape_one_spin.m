@@ -22,7 +22,7 @@ result=new_test_result('optimcon/grape_one_spin',...
                        'One-spin optimal-control setup and GRAPE gradient',...
                        'optimcon() and grape_hilb() must handle a tiny Hilbert-space control problem.');
 
-% Ensure that optimcon() has a process-pool ValueStore available
+% Ensure that a parallel pool is available for the ensemble loop
 current_pool=gcp('nocreate');
 if isempty(current_pool)
     parpool('Processes',1);

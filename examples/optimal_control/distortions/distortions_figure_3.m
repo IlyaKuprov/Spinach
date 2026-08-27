@@ -55,7 +55,6 @@ control.method='lbfgs';                            % Optimisation method
 control.penalties={'NS','SNS'};                    % Penalty types
 control.p_weights=[0.01 10.0];                     % Penalty weights
 control.max_iter=200;                              % Termination condition
-control.parallel='ensemble';                       % Parallelisation
 
 % Last five slices are dead time
 control.freeze=zeros(2,45);

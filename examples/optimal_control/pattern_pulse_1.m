@@ -61,7 +61,6 @@ control.pwr_levels=2*pi*nutf_range;       % Power levels (B1 in rad/s)
 control.amplitudes=ones(1,250);           % Amplitude profile
 control.method='lbfgs';                   % Optimisation method
 control.max_iter=200;                     % Termination condition
-control.parallel='ensemble';              % Parallelisation
 control.ens_corrs={'rho_ens'};            % Own state pair for each B1
 
 % Plotting options

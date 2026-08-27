@@ -67,7 +67,6 @@ control.penalties={'SNS'};                        % Penalty
 control.p_weights=100;                            % Penalty weight
 control.method='lbfgs';                           % Optimisation method
 control.max_iter=200;                             % Termination condition
-control.parallel='ensemble';                      % Parallelisation
 
 % Set the keyhole
 control.keyholes=cell(1,50);

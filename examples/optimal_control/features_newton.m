@@ -75,7 +75,6 @@ control.penalties={'NS'};                       % Penalty type
 control.p_weights=0.01;                         % Penalty weight
 control.method='newton';                        % Optimisation method
 control.max_iter=50;                            % Termination condition
-control.parallel='ensemble';                    % Parallelisation
 
 % Plots during optimisation
 control.plotting={'correlation_order','local_each_spin',...

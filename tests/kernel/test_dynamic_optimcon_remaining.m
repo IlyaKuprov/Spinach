@@ -25,7 +25,7 @@ result=new_test_result('kernel/dynamic_optimcon_remaining',...
                        ['Remaining optimcon helper functions must pass '...
                         'small deterministic regression checks.']);
 
-% Ensure that optimcon and ensemble can use a process-pool ValueStore
+% Ensure that a parallel pool is available for the ensemble loop
 local_ensure_pool();
 
 % Run independent groups of small checks
@@ -607,7 +607,6 @@ control.p_weights=0;
 control.l_bound=-100;
 control.u_bound=100;
 control.plotting={};
-control.parallel='time';
 control.amplitudes=[5 6 7];
 spin_system=optimcon(spin_system,control);
 
@@ -628,7 +627,6 @@ spin_system.control.suffix=[];
 spin_system.control.keyholes=cell(1,2);
 spin_system.control.method='newton';
 spin_system.control.plotting={};
-spin_system.control.parallel='time';
 spin_system.control.freeze=[];
 spin_system.control.steady=false();
 drift=[0.20 0.10; -0.05 -0.10];
@@ -657,7 +655,6 @@ control.p_weights=0;
 control.l_bound=-100;
 control.u_bound=100;
 control.plotting={'correlation_order'};
-control.parallel='time';
 control.amplitudes=[4 5];
 spin_system=optimcon(spin_system,control);
 

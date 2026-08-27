@@ -71,7 +71,6 @@ for m=1:2
     control.p_weights=0.001;
     control.method='lbfgs';
     control.max_iter=300;
-    control.parallel='ensemble';
 
     % Plots during optimisation
     control.plotting={'xy_controls'};

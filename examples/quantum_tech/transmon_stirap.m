@@ -66,7 +66,6 @@ control.penalties={'SNSA'};                       % Penalties
 control.p_weights=1.0;                            % Penalty weights
 control.method='goodwin';                         % Optimisation method
 control.max_iter=50;                              % Termination condition
-control.parallel='ensemble';                      % Parallelisation mode
 
 % Plots during optimisation
 control.plotting={'xy_controls','spectrogram','robustness'};

@@ -69,7 +69,6 @@ control.p_weights=100;                            % Penalty weight
 control.integrator='trapezium';                   % Piecewise-linear
 control.method='lbfgs';                           % Optimisation method
 control.max_iter=100;                             % Termination condition
-control.parallel='ensemble';                      % Parallelisation
 
 % Plots during optimisation
 control.plotting={'correlation_order','local_each_spin',...

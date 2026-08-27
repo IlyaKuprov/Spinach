@@ -69,7 +69,6 @@ control.method='lbfgs';                           % Optimisation method
 control.max_iter=100;                             % Termination condition
 control.phase_cycle=[0  0  0  0  0;
                      0  0  0  pi pi];             % Phase cycle (only 0, pi supported so far)
-control.parallel='ensemble';                      % Parallelisation
 
 % Plots during optimisation
 control.plotting={'correlation_order','local_each_spin',...

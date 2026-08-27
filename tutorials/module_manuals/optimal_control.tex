@@ -1078,6 +1078,8 @@ LxC=operator(spin_system,'Lx','13C');
 LyC=operator(spin_system,'Ly','13C');
 
 % Control problem specification
+control.isotopes={'1H','13C'};                 % isotopes under control
+control.channels=[1;1;2;2];                    % channel of each operator
 control.drifts={{H}};                          % drift ensemble: one member
 control.operators={LxH,LyH,LxC,LyC};           % four control channels
 control.rho_init={rho_init};                   % one state pair
@@ -1106,7 +1108,7 @@ layout as the guess.
 
 \subsection{Anatomy of the control structure}
 
-Six fields are mandatory:
+Eight fields are mandatory:
 \begin{center}
 \begin{tabular}{lp{9.5cm}}
 \toprule
@@ -1117,6 +1119,10 @@ arrays over time --- \code{\{\{H\}\}} for one static drift;
 \code{\{\{H1\},\{H2\},...\}} for a drift ensemble; each inner array has
 either one element or one per time point for time-dependent drifts\\
 \code{operators} & cell array of control operators\\
+\code{isotopes} & cell array of isotope strings: the isotopes that the
+control channels address\\
+\code{channels} & vector with one element per control operator: the
+index into \code{isotopes} of the channel that the operator drives\\
 \code{rho\_init} & cell array of initial states (vectors in Liouville
 space, density matrices in Hilbert space)\\
 \code{rho\_targ} & cell array of target states, same length\\
@@ -1308,6 +1314,81 @@ pulse--and--relaxation cycle --- the natural objective for steady-state
 DNP and related experiments; the \code{steady\_orbit} example family
 shows complete solid effect setups.
 
+\subsection{Bloch--Siegert corrections}
+\label{sec:bsiegert}
+
+A resonant control operator is the rotating-frame remnant of a linearly
+polarised laboratory-frame drive. The counter-rotating component that
+the rotating-wave approximation discards shifts every energy level in
+second order of the drive amplitude, and the same drive also shifts
+every spin that it is not resonant with. Setting
+\code{control.bsiegert=true()} keeps these shifts in the optimisation:
+during problem freezing, \code{optimcon()} calls \code{bss\_ops()} to
+build one response operator per control channel,
+\begin{equation}
+  \mathbf{B}_k=\sum_{n\,\in\,k}
+  \frac{\mathbf{L}_{\mathrm{Z}}^{(n)}}{2\left(\omega_n+\omega_k\right)}
+  +\sum_{n\,\notin\,k}
+  \left(\frac{\gamma_n}{\gamma_k}\right)^{2}
+  \frac{\omega_n\,\mathbf{L}_{\mathrm{Z}}^{(n)}}
+       {\omega_n^{2}-\omega_k^{2}}
+\end{equation}
+where $n\in k$ runs over the spins of the isotope that the $k$-th
+channel addresses, $\omega_n$ are the signed laboratory-frame Zeeman
+frequencies, and $\omega_k$ and $\gamma_k$ are the carrier frequency
+and the magnetogyric ratio of the channel isotope. Spins of the channel
+isotope receive only the never-resonant term, because their resonant
+term is the control operator itself, which GRAPE propagates exactly;
+for every other spin the resonant and the never-resonant terms sum into
+the familiar off-resonant shift
+$\omega_n\omega_{1n}^{2}/(\omega_n^{2}-\omega_k^{2})$, in which
+$\omega_{1n}=(\gamma_n/\gamma_k)c_{kn}$ is the nutation frequency the
+drive induces at spin $n$. The slice generators acquire a quadratic
+term,
+\begin{equation}
+  \mathbf{L}_n=\mathbf{L}_0
+  +\sum_k c_{kn}\mathbf{C}_k
+  +\sum_k c_{kn}^{2}\,\mathbf{B}_k
+\end{equation}
+and the derivative direction $\mathbf{C}_k+2c_{kn}\mathbf{B}_k$
+replaces $\mathbf{C}_k$ in the gradient calculation --- the gradient
+stays analytically exact.
+
+The waveform coefficients $c_{kn}$ must therefore be physical nutation
+frequencies: \code{optimcon()} refuses control operators on corrected
+channels that are not unit quadratures
+$\cos\varphi\,\mathbf{L}_{\mathrm{X}}+\sin\varphi\,\mathbf{L}_{\mathrm{Y}}$
+of their channel isotope. Carrier frequencies are taken on resonance
+with each channel isotope at the current magnet field; zero and
+degenerate carrier denominators are refused, as are the trapezium
+integrator and the exact-Hessian optimisers. The response operators are
+stored without clean-up because their matrix elements scale as inverse
+Zeeman frequencies.
+
+To replay an optimised pulse outside the optimiser under the same slice
+generators, \code{bloch\_siegert()} appends the response operators to
+the control operator list as virtual channels with squared coefficient
+vectors, ready for the piecewise-constant methods of
+\code{shaped\_pulse\_xy()}:
+
+\begin{lstlisting}
+% Amplitudes in rad/s from the normalised waveform
+coefs=mat2cell(pwr*pulse,[1 1]);
+
+% Append the Bloch-Siegert virtual channels
+[ops,coefs]=bloch_siegert(spin_system,{Lx,Ly},coefs);
+
+% Propagate with a piecewise-constant method
+rho=shaped_pulse_xy(spin_system,H,ops,coefs,...
+                    control.pulse_dt,rho,'expv-pwc');
+\end{lstlisting}
+
+The \code{examples/optimal\_control/bloch\_siegert} folder demonstrates
+the corrections on transfer fidelities as a function of drive power, on
+spectator-spin Ramsey phases, and on the classic 1940 level-shift
+experiment; \code{difdiff\_bs\_rect.m} in the derivative test folder
+verifies the corrected gradients against finite differences.
+
 \subsection{Second-order methods}
 
 \code{newton} and \code{goodwin} converge in far fewer iterations than
@@ -1401,6 +1482,10 @@ index over the ensemble, inner over time; inner length 1 or
 match the control operators; Hermitian where unitarity is required\\
 \code{operators} & cell of matrices & control operators
 $\mathbf{C}_k$; cleaned up at absorption\\
+\code{isotopes} & cell of strings & isotopes addressed by the control
+channels; each must be present in the spin system\\
+\code{channels} & vector of positive integers & index into
+\code{isotopes} for each control operator, one element per operator\\
 \code{rho\_init} & cell & initial states: column vectors
 (\code{sphten-liouv}, \code{zeeman-liouv}, \code{zeeman-wavef}) or
 square matrices (\code{zeeman-hilb})\\
@@ -1442,9 +1527,11 @@ non-negative; target evolved backwards under the last drift\\
 \code{offsets} + \code{off\_ops} & none & offset ensembles: cell of row
 vectors (Hz) and matching cell of offset operators; both together;
 same channel count; operator dimensions must match controls\\
-\code{carrier\_ops} + \code{carrier\_frq} & none & Bloch--Siegert
-carrier data, absorbed together; reserved for future use --- no
-consumer in the current kernel\\
+\code{bsiegert} & \code{false} & logical scalar; enables
+Bloch--Siegert corrections (Section~\ref{sec:bsiegert}): quadratic
+response operators added to the slice generators and to the gradient;
+requires first-order optimisers, the rectangle integrator, and
+unit-quadrature control operators\\
 \code{amplitudes} & --- & fixed amplitude profile for
 \code{grape\_phase}; validated there\\
 \code{freeze} & none & logical waveform-shaped mask of elements
@@ -1505,7 +1592,8 @@ besides the absorbed options: \code{ncontrols} and \code{ndrifts}
 control--control commutators and their zero table), \code{catalog} and
 \code{ens\_sizes} (the ensemble case catalog and dimension sizes),
 \code{invariants} (the worker-resident frozen problem,
-a \code{parallel.pool.Constant}), the line search and regularisation
+a \code{parallel.pool.Constant}), \code{resp\_ops} (Bloch--Siegert
+response operators, present when \code{bsiegert} is enabled), the line search and regularisation
 constants (\code{ls\_c1}, \code{ls\_c2}, \code{ls\_tau1},
 \code{ls\_tau2}, \code{ls\_tau3}, \code{reg\_max\_iter},
 \code{reg\_alpha}, \code{reg\_phi}, \code{reg\_max\_cond}), and the
@@ -1543,6 +1631,11 @@ returned structure --- they live on the workers.
   \code{waveform,dt\_grid,time\_unit,rho\_init,rho\_targ)}:
   fidelity and its gradient with respect to interval durations at a
   fixed waveform.
+\item[\code{[ops,coefs]=bloch\_siegert(spin\_system,ops,coefs)}] ---
+  appends the Bloch--Siegert response operator of each control channel
+  as a virtual channel whose coefficient vector is the square of that
+  channel's amplitude vector; the outputs feed the piecewise-constant
+  methods of \code{shaped\_pulse\_xy()}.
 \item[\code{[catalog,ens\_sizes]=ens\_catalog(control)}] --- the
   ensemble case catalog: one row per case, columns indexing the state
   pair, drift, power, offset combination, phase cycle line, and
@@ -1568,7 +1661,8 @@ matrices, Eqs.~\eqref{eq:dgeffl}--\eqref{eq:dgeffr}; \code{dirdiff()}
 \code{bfgs()}, \code{hessreg()}, \code{bracketing()},
 \code{sectioning()}, and \code{cubic\_interp()} are the optimiser
 internals; \code{fapt2sfo()} and \code{inst\_freq()} support the
-diagnostics.
+diagnostics; \code{bss\_ops()} builds the Bloch--Siegert response
+operators from the channel isotope list and the carrier frequencies.
 
 \subsection{Compatibility matrix}
 
@@ -1581,6 +1675,7 @@ LBFGS / RBFGS            & yes & yes\\
 Newton / Goodwin Hessians & yes & no\\
 keyholes                 & yes & no\\
 waveform distortions     & LBFGS only & LBFGS only\\
+Bloch--Siegert corrections & LBFGS/RBFGS only & no\\
 stroboscopic steady state & yes (see below) & no\\
 phase cycles, offsets, powers, drifts ensembles & yes & yes\\
 prefix / suffix / dead time & yes & yes (not steady)\\

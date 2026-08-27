@@ -406,9 +406,12 @@ if isfield(control,'steady')
     if ~islogical(control.steady) || ~isscalar(control.steady)
         error('control.steady must be true() or false()');
     end
+    if control.steady&&(~strcmp(spin_system.bas.formalism,'sphten-liouv'))
+        error('stroboscopic steady states require sphten-liouv formalism.');
+    end
 
     % Absorb stroboscopic steady state switch
-    spin_system.control.steady=control.steady; 
+    spin_system.control.steady=control.steady;
     control=rmfield(control,'steady');
 
     % Inform the user

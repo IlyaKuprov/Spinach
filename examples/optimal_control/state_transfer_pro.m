@@ -74,6 +74,8 @@ parameters.offset=[3214 10000 -4800];
 H=frqoffset(spin_system,H,parameters);
 
 % Define control parameters
+control.isotopes={'1H','13C','15N'};              % Isotopes
+control.channels=[1; 1; 2; 2; 3; 3];              % Channel map
 control.drifts={{H}};                             % Drift
 control.operators={LxH,LyH,LxC,LyC,LxN,LyN};      % Controls
 control.off_ops={LzH,LzC,LzN};                    % Offset operators 

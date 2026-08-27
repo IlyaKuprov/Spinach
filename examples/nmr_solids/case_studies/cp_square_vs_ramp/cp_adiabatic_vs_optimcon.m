@@ -64,6 +64,8 @@ xlim tight; kgrid; kxlabel('time, seconds'); drawnow();
 %% GRAPE optimisation with the same timing
 
 % Drift Hamiltonians for every system in the powder
+control.isotopes={'1H','15N'};
+control.channels=[1;2];
 control.drifts=drifts(spin_system,@powder,parameters,'qnmr');
 
 % Initial state: Ly on 1H

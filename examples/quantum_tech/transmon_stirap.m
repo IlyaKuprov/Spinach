@@ -55,6 +55,8 @@ rho_init=rho_init/norm(rho_init,'fro');
 rho_targ=rho_targ/norm(rho_targ,'fro');
 
 % Define control parameters
+control.isotopes={'T3'};                          % Isotopes
+control.channels=[1;1];                           % Channel map
 control.drifts={{H}};                             % Drift
 control.operators={hilb2liouv(H01,'comm'),...
                    hilb2liouv(H12,'comm')};       % Controls

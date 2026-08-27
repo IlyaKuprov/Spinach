@@ -37,6 +37,8 @@ drift=sparse(2,2);
 pulse_dt=[0.02 0.03];
 
 % Configure a minimal optimal-control problem
+control.isotopes={'E'};
+control.channels=1;
 control.operators={S.y};
 control.rho_init={S.x};
 control.rho_targ={S.z};
@@ -139,6 +141,7 @@ spin_system.tols.small_matrix=64;
 spin_system.tols.dense_matrix=0.5;
 spin_system.tols.prop_chop=1e-14;
 spin_system.bas.formalism='zeeman-hilb';
+spin_system.comp.isotopes={'E'};
 
 end
 

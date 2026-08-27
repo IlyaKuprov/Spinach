@@ -36,7 +36,7 @@ Ly=operator(spin_system,'Ly','13C');
 Lz=operator(spin_system,'Lz','13C');
 
 % Get the drift Hamiltonian (zero here)
-H=hamiltonian(assume(spin_system,'nmr'));
+D=hamiltonian(assume(spin_system,'nmr'));
 
 % Transmitter offset range in Hz
 toff_range=linspace(-4e3,4e3,128);
@@ -53,7 +53,9 @@ xlim tight; ylim([-0.1 1.1]); drawnow; figure(1);
 rho_targ=X.*repmat(Sx,1,128)+Z.*repmat(Sz,1,128);
 
 % Define control parameters
-control.drifts={{H}};                     % Drift
+control.isotopes={'13C'};                 % Isotopes
+control.channels=[1; 1];                  % Channel map
+control.drifts={{D}};                     % Drift
 control.operators={Lx,Ly};                % Controls
 control.off_ops={Lz};                     % Offset operator
 control.offsets={toff_range};             % Transmitter offsets
@@ -89,7 +91,7 @@ parfor n=1:numel(toff_range) %#ok<*PFBNS>
 
     % Simulate the optimised pulse
     rho_init=control.rho_init{n};
-    rho=shaped_pulse_xy(spin_system,H+2*pi*toff_range(n)*control.off_ops{1},...
+    rho=shaped_pulse_xy(spin_system,D+2*pi*toff_range(n)*control.off_ops{1},...
                         {Lx,Ly},{CLx,CLy},control.pulse_dt,rho_init,'expv-pwc');
 
     % Project out the destination states

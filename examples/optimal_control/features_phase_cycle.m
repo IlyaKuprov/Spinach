@@ -54,11 +54,13 @@ LxF=operator(spin_system,'Lx','19F');
 LyF=operator(spin_system,'Ly','19F');
 
 % Drift Hamiltonian
-H=hamiltonian(assume(spin_system,'nmr'));
+D=hamiltonian(assume(spin_system,'nmr'));
 
 % Define control parameters
-control.drifts={{H}};                             % Drift
-control.operators={LxH,LyH,LxC,LyC,LxF,LyF};      % Controls
+control.isotopes={'1H','13C','19F'};              % Isotopes
+control.channels=[1; 1; 2; 2; 3; 3];              % Channel map
+control.drifts={{D}};                             % Drift operator
+control.operators={LxH,LyH,LxC,LyC,LxF,LyF};      % Control operators
 control.rho_init={rho_init};                      % Starting state
 control.rho_targ={rho_targ};                      % Destination state
 control.pwr_levels=2*pi*linspace(0.8e3,1.2e3,5);  % Pulse powers, rad/s
@@ -97,7 +99,7 @@ for n=1:size(control.phase_cycle,1)
     % Run a test simulation using the optimal pulse
     report(spin_system,['Test simulation, phase cycle step ' int2str(n) ':']);
     phased_pulse=mat2cell(phased_pulse,[1 1 1 1 1 1]);
-    rho=shaped_pulse_xy(spin_system,H,control.operators,phased_pulse,...
+    rho=shaped_pulse_xy(spin_system,D,control.operators,phased_pulse,...
                                       control.pulse_dt,rho_init,'expv-pwc');
 
     % Run state diagnoistics

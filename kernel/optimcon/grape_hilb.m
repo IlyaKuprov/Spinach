@@ -127,6 +127,12 @@ end
 % Count the drifts
 ndrifts=numel(drifts);
 
+% Pull Bloch-Siegert response operators
+bss_on=isfield(spin_system.control,'bsiegert')&&spin_system.control.bsiegert;
+if bss_on
+    resp_ops=spin_system.control.resp_ops;
+end
+
 % Precompute interval Hamiltonians and propagators
 switch spin_system.control.integrator
 
@@ -148,6 +154,13 @@ switch spin_system.control.integrator
                 % Forward evolution generator
                 H{n}=H{n}+waveform(k,n)*controls{k};
 
+            end
+
+            % Add Bloch-Siegert terms to the generator
+            if bss_on
+                for k=1:nctrls
+                    H{n}=H{n}+waveform(k,n)^2*resp_ops{k};
+                end
             end
 
             % Compute the interval propagator
@@ -252,8 +265,15 @@ if n_outputs>2
                 % Calculate gradient at this timestep
                 for k=1:nctrls
 
+                    % Pull the derivative direction through the Bloch-Siegert map
+                    if bss_on
+                        deriv_op=controls{k}+2*waveform(k,n)*resp_ops{k};
+                    else
+                        deriv_op=controls{k};
+                    end
+
                     % Compute directional derivative of the propagator
-                    auxmat=dirdiff(spin_system,H{n},controls{k},dt(n),2);
+                    auxmat=dirdiff(spin_system,H{n},deriv_op,dt(n),2);
 
                     % Apply the derivative to the density matrix
                     rho_deriv=auxmat{2}*fwd_traj{n}*auxmat{1}'+...

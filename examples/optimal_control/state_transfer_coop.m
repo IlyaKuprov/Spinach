@@ -53,8 +53,10 @@ Lx=operator(spin_system,'Lx','14N');
 Ly=operator(spin_system,'Ly','14N');
 
 % Define control parameters
-control.drifts={{H}};               % Drift
-control.operators={Lx,Ly};          % Controls
+control.isotopes={'14N'};           % Isotopes
+control.channels=[1; 1];            % Channel map
+control.drifts={{H}};               % Drift operator
+control.operators={Lx,Ly};          % Control operators
 control.rho_init={rho_init};        % Starting state
 control.rho_targ={rho_targ};        % Destination state
 control.pwr_levels=2*pi*50e3;       % Pulse power

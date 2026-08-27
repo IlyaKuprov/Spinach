@@ -44,6 +44,8 @@ LzH=operator(spin_system,'Lz',1);
 H=hamiltonian(assume(spin_system,'nmr'));
 
 % Control data structure
+control.isotopes={'1H'};                         % Isotopes
+control.channels=[1; 1];                         % Channel map
 control.drifts={{H}};                            % Drift Hamiltonian
 control.operators={LxH,LyH};                     % Control operators
 control.off_ops={LzH};                           % Offset operator

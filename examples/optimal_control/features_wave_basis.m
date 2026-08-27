@@ -48,11 +48,13 @@ Cx=operator(spin_system,'Lx','13C');
 Cy=operator(spin_system,'Ly','13C');
 
 % Get the drift Hamiltonian
-H=hamiltonian(assume(spin_system,'nmr'));
+D=hamiltonian(assume(spin_system,'nmr'));
 
 % Define control parameters
-control.drifts={{H}};                            % Drift
-control.operators={Cx,Cy};                       % Controls
+control.isotopes={'13C'};                        % Isotopes
+control.channels=[1; 1];                         % Channel map
+control.drifts={{D}};                            % Drift operator
+control.operators={Cx,Cy};                       % Control opertors
 control.rho_init={rho_init};                     % Starting state
 control.rho_targ={rho_targ};                     % Target state
 control.pulse_dt=4e-6*ones(1,125);               % Slice durations
@@ -82,7 +84,7 @@ pulse=mat2cell(pulse,[1 1]);
 
 % Simulate the optimised pulse
 rho_init=state(spin_system,'Lz','13C');
-rho=shaped_pulse_xy(spin_system,H,{Cx,Cy},pulse,...
+rho=shaped_pulse_xy(spin_system,D,{Cx,Cy},pulse,...
                     control.pulse_dt,rho_init,'expv-pwc');
 
 % Set acquisition parameters

@@ -61,6 +61,8 @@ Lz=operator(spin_system,'Lz','87Rb');
 Lz=kron(space_part,Lz);
 
 % Control parameters
+control.isotopes={'87Rb'};                          % Isotopes
+control.channels=[1; 1];                            % Channel map
 control.operators={Lx,Ly};                          % Control operators
 control.pulse_dt=0.5e-6*ones(1,100);                % Slice up one rotor period
 control.pwr_levels=2*pi*[110 120 130]*1e3/sqrt(2);  % Power per channel

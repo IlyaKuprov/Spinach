@@ -16,6 +16,8 @@ for n=1:numel(formalisms)
     [spin_system,Sx,Sy,Sz,Lx,Ly,H]=dirdiff_test_system(formalisms{n});
 
     % Define control parameters
+    control.isotopes={'13C'};                       % Isotopes
+    control.channels=[1;1];                         % Channel map
     control.drifts={{H}};                           % Drift
     control.operators={Lx Ly};                      % Controls
     control.rho_init={ Sx Sy Sz};                   % Starting states

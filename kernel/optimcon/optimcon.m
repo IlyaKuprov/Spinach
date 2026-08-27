@@ -162,6 +162,56 @@ herm_gens=ismember(spin_system.bas.formalism,...
                    {'zeeman-hilb','zeeman-wavef'})||...
           strcmp(spin_system.control.method,'goodwin');
 
+% Process isotope list
+if isfield(control,'isotopes')
+
+    % Input validation
+    if (~iscell(control.isotopes))||(~all(cellfun(@ischar,control.isotopes(:))))
+        error('control.isotopes must be a cell array of character strings.');
+    end
+    for n=1:numel(control.isotopes)
+        if ~ismember(control.isotopes{n},spin_system.comp.isotopes)
+            error('control.isotopes refers to spins that are not present.');
+        end
+    end
+
+    % Absorb isotope list
+    spin_system.control.isotopes=control.isotopes;
+    control=rmfield(control,'isotopes');
+
+else
+
+    % Complain and bomb out
+    error('active isotope list must be supplied in control.isotopes field.');
+
+end
+
+% Process control channel map
+if isfield(control,'channels')
+
+    % Input validation
+    if (~isnumeric(control.channels))||(~isreal(control.channels))||...
+       (~isvector(control.channels))||isempty(control.channels)
+        error('control.channels must be a real numeric vector.');
+    end
+    if (~all(mod(control.channels,1)==0))||any(control.channels<1)
+        error('elements of control.channels must be positive integers.');
+    end
+    if any(control.channels>numel(spin_system.control.isotopes))
+        error('elements of control.channels must not exceed isotope count.');
+    end
+
+    % Absorb control channel map
+    spin_system.control.channels=control.channels(:);
+    control=rmfield(control,'channels');
+
+else
+
+    % Complain and bomb out
+    error('control channel map must be supplied in control.channels field.');
+
+end
+
 % Process control operators
 if isfield(control,'operators')
 
@@ -177,6 +227,11 @@ if isfield(control,'operators')
 
     % Control operator count
     spin_system.control.ncontrols=numel(control.operators);
+
+    % Match the channel map to the control operators
+    if numel(spin_system.control.channels)~=spin_system.control.ncontrols
+        error('control.channels must have one element per control operator.');
+    end
 
     % Absorb control operators and clean them up
     for n=1:spin_system.control.ncontrols
@@ -578,6 +633,80 @@ else
     
 end
 
+% Process Bloch-Siegert settings
+if isfield(control,'bsiegert')
+    
+    % Input validation
+    if (~islogical(control.bsiegert))||(~isscalar(control.bsiegert))
+        error('control.bsiegert must be a logical scalar.');
+    end
+    
+    % Absorb the switch
+    spin_system.control.bsiegert=control.bsiegert;
+    control=rmfield(control,'bsiegert');
+    
+    % Branch on the switch
+    if spin_system.control.bsiegert
+        
+        % Refuse methods that use exact Hessians
+        if ismember(spin_system.control.method,{'newton','goodwin'})
+            error('Bloch-Siegert corrections are only available with LBFGS optimisers.');
+        end
+        
+        % Refuse the trapezium integrator
+        if strcmp(spin_system.control.integrator,'trapezium')
+            error('Bloch-Siegert corrections are not available for trapezium integrator.');
+        end
+        
+        % Isotope of each control channel
+        chan_isos=spin_system.control.isotopes(spin_system.control.channels);
+
+        % Corrected channels need waveform values to be physical nutation frequencies
+        for n=1:numel(chan_isos)
+
+            % Canonical transverse operators of the channel
+            Lxc=operator(spin_system,'Lx',chan_isos{n});
+            Lyc=operator(spin_system,'Ly',chan_isos{n});
+
+            % Project the control operator onto the quadratures
+            quad_x=hdot(Lxc,spin_system.control.operators{n})/hdot(Lxc,Lxc);
+            quad_y=hdot(Lyc,spin_system.control.operators{n})/hdot(Lyc,Lyc);
+
+            % Require a unit quadrature of the canonical operators
+            resid=spin_system.control.operators{n}-quad_x*Lxc-quad_y*Lyc;
+            if (norm(resid,'fro')>1e-6*norm(Lxc,'fro'))||...
+               (abs(quad_x^2+quad_y^2-1)>1e-6)
+                error('with control.bsiegert, control operators must be unit quadratures of Lx and Ly on their channel isotope.');
+            end
+
+        end
+
+        % On-resonance carrier frequency of each control channel
+        carrier_frq=zeros(1,numel(chan_isos));
+        for n=1:numel(chan_isos)
+            carrier_frq(n)=-spin(chan_isos{n})*spin_system.inter.magnet;
+        end
+
+        % Build the response operators, stored without clean-up
+        spin_system.control.resp_ops=bss_ops(spin_system,chan_isos,carrier_frq);
+        
+        % Inform the user
+        report(spin_system,[pad('Bloch-Siegert shifts',60) 'enabled']);
+        
+    else
+        
+        % Inform the user
+        report(spin_system,[pad('Bloch-Siegert shifts',60) 'disabled']);
+        
+    end
+    
+else
+    
+    % Default is disabled
+    spin_system.control.bsiegert=false();
+    
+end
+
 % Process sequence timing
 if isfield(control,'pulse_dt')
 
@@ -630,71 +759,6 @@ else
     % Complain and bomb out
     error('interval duration infomation in control.pulse_dt must be provided.');
   
-end
-
-% Process carrier operators
-if isfield(control,'carrier_ops')
-
-    % Input validation
-    if ~iscell(control.carrier_ops)
-        error('control.carrier_ops must be a cell array of matrices.');
-    end
-    if numel(control.carrier_ops)~=numel(spin_system.control.operators)
-        error('must have one carrier operator for each control operator.');
-    end
-    for n=1:numel(control.carrier_ops)
-        if (~isnumeric(control.carrier_ops{n}))||...
-           (~ismatrix(control.carrier_ops{n}))||...
-           (size(control.carrier_ops{n},1)~=...
-            size(control.carrier_ops{n},2))
-            error('elements of control.carrier_ops must be square matrices.');
-        end
-        if size(control.carrier_ops{n},1)~=size(spin_system.control.operators{1},1)
-            error('control.carrier_ops must have the same dimension as the control operators.');
-        end
-    end
-    if ~isfield(control,'carrier_frq')
-        error('control.carrier_ops and control.carrier_frq are required simultaneously.');
-    end
-
-    % Inform the user
-    report(spin_system,[pad('Bloch-Siegert shift corrections',60) 'on']);
-
-    % Store the carrier operators
-    spin_system.control.carrier_ops=control.carrier_ops;
-    control=rmfield(control,'carrier_ops');
-
-else
-
-    % Inform the user
-    report(spin_system,[pad('Bloch-Siegert shift corrections',60) 'off']);
-
-end
-
-% Process carrier frequencies
-if isfield(control,'carrier_frq')
-
-    % Input validation
-    if ~isfield(spin_system.control,'carrier_ops')
-        error('control.carrier_ops and control.carrier_frq are required simultaneously.');
-    end
-    if ~isnumeric(control.carrier_frq)
-        error('control.carrier_frq must be a vector.');
-    end
-    if numel(control.carrier_frq)~=numel(spin_system.control.carrier_ops)
-        error('must have one carrier frequency for each carrier operator.');
-    end
-    for n=1:numel(control.carrier_frq)
-        if (~isnumeric(control.carrier_frq(n)))||...
-           (~isreal(control.carrier_frq(n)))
-            error('elements of control.carrier_frq must be real numbers.');
-        end
-    end
-    
-    % Store the carrier frequencies
-    spin_system.control.carrier_frq=control.carrier_frq;
-    control=rmfield(control,'carrier_frq');
-
 end
 
 % Process drift generators

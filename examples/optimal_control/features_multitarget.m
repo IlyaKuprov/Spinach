@@ -63,14 +63,16 @@ LxC=operator(spin_system,'Lx','13C');
 LyC=operator(spin_system,'Ly','13C');
 
 % Generate a distribution in J-couplings
-J=linspace(13,16,11); H=cell(numel(J),1);
-for m=1:numel(H)
+J=linspace(13,16,11); D=cell(numel(J),1);
+for m=1:numel(D) % Build drift Hamiltonians
     spin_system.inter.coupling.matrix{1,2}=2*pi*J(m)*eye(3);
-    H{m}{1}=hamiltonian(assume(spin_system,'nmr'));
+    D{m}{1}=hamiltonian(assume(spin_system,'nmr'));
 end
 
 % Define control parameters
-control.drifts=H;                       % Drift array
+control.isotopes={'1H','13C'};          % Isotopes
+control.channels=[1; 1; 2; 2];          % Channel map
+control.drifts=D;                       % Drift array
 control.operators={LxH,LyH,LxC,LyC};	% Control operators
 control.rho_init=sources;               % Initial states
 control.rho_targ=targets;               % Destination states
@@ -97,7 +99,7 @@ pulse=mat2cell(pulse,[1 1 1 1]);
 
 % Run a test simulation using the optimal pulse
 report(spin_system,'running test simulation...');
-rho=shaped_pulse_xy(spin_system,H{6}{1},control.operators,pulse,...
+rho=shaped_pulse_xy(spin_system,D{6}{1},control.operators,pulse,...
                     control.pulse_dt,cell2mat(control.rho_init),'expv-pwc');
 fidelity_a=real(control.rho_targ{1}'*rho(:,1));
 fidelity_b=real(control.rho_targ{2}'*rho(:,2));

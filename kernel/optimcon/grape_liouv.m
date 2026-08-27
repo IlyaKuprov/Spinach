@@ -183,6 +183,12 @@ fwd_traj(:,1)=rho_init; bwd_traj(:,1)=rho_targ;
 % Count the drifts
 ndrifts=numel(drifts);
 
+% Pull Bloch-Siegert response operators
+bss_on=isfield(spin_system.control,'bsiegert')&&spin_system.control.bsiegert;
+if bss_on
+    resp_ops=spin_system.control.resp_ops;
+end
+
 % Run forward and backward propagation
 switch spin_system.control.integrator
 
@@ -210,6 +216,14 @@ switch spin_system.control.integrator
                 % Backward evolution generator
                 L_back{n}=L_back{n}+waveform(k,nsteps+1-n)*controls{k}';
 
+            end
+
+            % Add Bloch-Siegert terms to the generators
+            if bss_on
+                for k=1:nctrls
+                    L_forw{n}=L_forw{n}+waveform(k,n)^2*resp_ops{k};
+                    L_back{n}=L_back{n}+waveform(k,nsteps+1-n)^2*resp_ops{k}';
+                end
             end
 
         end
@@ -391,9 +405,16 @@ if n_outputs>2
 
                     % Check the freeze mask
                     if ~frozen(k,n)
-            
+
+                        % Pull the derivative direction through the Bloch-Siegert map
+                        if bss_on
+                            deriv_op=controls{k}+2*waveform(k,n)*resp_ops{k};
+                        else
+                            deriv_op=controls{k};
+                        end
+
                         % Create auxiliary system
-                        aux_matrix=[ L_forw{n}   controls{k}
+                        aux_matrix=[ L_forw{n}   deriv_op
                                      zero_drift  L_forw{n}   ];
 
                         % Build the auxiliary vector

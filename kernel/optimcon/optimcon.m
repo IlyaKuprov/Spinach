@@ -633,6 +633,60 @@ else
     
 end
 
+% Process Bloch-Siegert settings
+if isfield(control,'bsiegert')
+    
+    % Input validation
+    if (~islogical(control.bsiegert))||(~isscalar(control.bsiegert))
+        error('control.bsiegert must be a logical scalar.');
+    end
+    
+    % Absorb the switch
+    spin_system.control.bsiegert=control.bsiegert;
+    control=rmfield(control,'bsiegert');
+    
+    % Branch on the switch
+    if spin_system.control.bsiegert
+        
+        % Refuse methods that use exact Hessians
+        if ismember(spin_system.control.method,{'newton','goodwin'})
+            error('Bloch-Siegert corrections are only available with LBFGS optimisers.');
+        end
+        
+        % Refuse the trapezium integrator
+        if strcmp(spin_system.control.integrator,'trapezium')
+            error('Bloch-Siegert corrections are not available for trapezium integrator.');
+        end
+        
+        % Isotope of each control channel
+        chan_isos=spin_system.control.isotopes(spin_system.control.channels);
+        
+        % On-resonance carrier frequency of each control channel
+        carrier_frq=zeros(1,numel(chan_isos));
+        for n=1:numel(chan_isos)
+            carrier_frq(n)=-spin(chan_isos{n})*spin_system.inter.magnet;
+        end
+        
+        % Build the response operators, stored without clean-up
+        spin_system.control.resp_ops=bss_ops(spin_system,chan_isos,carrier_frq);
+        
+        % Inform the user
+        report(spin_system,[pad('Bloch-Siegert shifts',60) 'enabled']);
+        
+    else
+        
+        % Inform the user
+        report(spin_system,[pad('Bloch-Siegert shifts',60) 'disabled']);
+        
+    end
+    
+else
+    
+    % Default is disabled
+    spin_system.control.bsiegert=false();
+    
+end
+
 % Process sequence timing
 if isfield(control,'pulse_dt')
 
@@ -712,17 +766,9 @@ if isfield(control,'carrier_ops')
         error('control.carrier_ops and control.carrier_frq are required simultaneously.');
     end
 
-    % Inform the user
-    report(spin_system,[pad('Bloch-Siegert shift corrections',60) 'on']);
-
     % Store the carrier operators
     spin_system.control.carrier_ops=control.carrier_ops;
     control=rmfield(control,'carrier_ops');
-
-else
-
-    % Inform the user
-    report(spin_system,[pad('Bloch-Siegert shift corrections',60) 'off']);
 
 end
 

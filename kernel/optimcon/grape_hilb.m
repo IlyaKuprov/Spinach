@@ -242,7 +242,7 @@ if n_outputs>2
 end
 
 % Calculate the state overlap
-overlap=hdot(fwd_traj{end},rho_targ);
+overlap=hdot(rho_targ,fwd_traj{end});
 
 % Compute gradient
 if n_outputs>2

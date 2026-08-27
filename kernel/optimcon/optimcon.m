@@ -761,63 +761,6 @@ else
   
 end
 
-% Process carrier operators
-if isfield(control,'carrier_ops')
-
-    % Input validation
-    if ~iscell(control.carrier_ops)
-        error('control.carrier_ops must be a cell array of matrices.');
-    end
-    if numel(control.carrier_ops)~=numel(spin_system.control.operators)
-        error('must have one carrier operator for each control operator.');
-    end
-    for n=1:numel(control.carrier_ops)
-        if (~isnumeric(control.carrier_ops{n}))||...
-           (~ismatrix(control.carrier_ops{n}))||...
-           (size(control.carrier_ops{n},1)~=...
-            size(control.carrier_ops{n},2))
-            error('elements of control.carrier_ops must be square matrices.');
-        end
-        if size(control.carrier_ops{n},1)~=size(spin_system.control.operators{1},1)
-            error('control.carrier_ops must have the same dimension as the control operators.');
-        end
-    end
-    if ~isfield(control,'carrier_frq')
-        error('control.carrier_ops and control.carrier_frq are required simultaneously.');
-    end
-
-    % Store the carrier operators
-    spin_system.control.carrier_ops=control.carrier_ops;
-    control=rmfield(control,'carrier_ops');
-
-end
-
-% Process carrier frequencies
-if isfield(control,'carrier_frq')
-
-    % Input validation
-    if ~isfield(spin_system.control,'carrier_ops')
-        error('control.carrier_ops and control.carrier_frq are required simultaneously.');
-    end
-    if ~isnumeric(control.carrier_frq)
-        error('control.carrier_frq must be a vector.');
-    end
-    if numel(control.carrier_frq)~=numel(spin_system.control.carrier_ops)
-        error('must have one carrier frequency for each carrier operator.');
-    end
-    for n=1:numel(control.carrier_frq)
-        if (~isnumeric(control.carrier_frq(n)))||...
-           (~isreal(control.carrier_frq(n)))
-            error('elements of control.carrier_frq must be real numbers.');
-        end
-    end
-    
-    % Store the carrier frequencies
-    spin_system.control.carrier_frq=control.carrier_frq;
-    control=rmfield(control,'carrier_frq');
-
-end
-
 % Process drift generators
 if isfield(control,'drifts')
 

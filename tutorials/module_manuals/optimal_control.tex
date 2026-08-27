@@ -929,20 +929,22 @@ once per optimisation.}
 Section~\ref{sec:ensembles}, one row per case, produced by
 \code{ens\_catalog()} together with the dimension sizes --- and then
 publishes the complete frozen problem (the entire \code{spin\_system},
-control structure included, with drifts, control operators, and offset
-operators) to the parallel pool as a \code{parallel.pool.Constant} held
-in \code{control.invariants}. The three heavy generator fields are then
-removed from the client-side structure. A
+control structure included) to the parallel pool as a
+\code{parallel.pool.Constant} held in \code{control.invariants}. The
+heavy invariant fields --- drifts, control operators, offset operators,
+the trapezium control--control commutator tables, and the Bloch--Siegert
+response operators, when present --- are then removed from the
+client-side structure, and their names are recorded in
+\code{control.frozen\_fields}. A
 \code{parallel.pool.Constant} constructs without a pool, broadcasts
 lazily to pools created later, and survives pool deletion and recreation,
 so serial runs and delayed pool startup work without special cases.
 
 Each objective evaluation calls \code{ensemble()}, which runs a
 \code{parfor} over the catalog rows. Every case fetches the
-worker-resident frozen problem (a fast local dereference), grafts the
-current values of the \emph{live} fields --- states, timings, powers,
-offsets, phase cycle, distortions, freeze mask, fidelity type, plotting
-set, keyholes, and the trapezium commutator tables --- assembles its
+worker-resident frozen problem (a fast local dereference), replaces its
+control structure wholesale with the live client-side one, re-attaches
+the fields named in \code{control.frozen\_fields}, assembles its
 drift (offset terms added per the catalog), applies its phase cycle and
 distortion chain, calls the serial GRAPE kernel, and returns fidelity,
 gradient, and Hessian contributions. The client sums the contributions in
@@ -979,19 +981,25 @@ should know:
 
 \begin{description}
 \item[May be overwritten between optimisations] (the \emph{live} set):
-  \code{rho\_init}, \code{rho\_targ} (same member counts),
-  \code{pulse\_dt} (same length), \code{pwr\_levels},
+  every control field not named in \code{control.frozen\_fields} ---
+  in particular \code{rho\_init}, \code{rho\_targ} (same member
+  counts), \code{pulse\_dt} (same length), \code{pwr\_levels},
   \code{offsets} (same value counts), \code{phase\_cycle} (same line
   count), \code{distortion} (same rows), \code{freeze},
   \code{fidelity}, \code{plotting}, \code{keyholes}, penalties,
-  weights, and bounds. Overwrites take effect at the next objective
-  evaluation --- this is how parameter sweeps reuse one
-  \code{optimcon()} setup across many optimisations.
+  weights, bounds, and the prefix and suffix functions. The live
+  structure travels to the workers fresh at every objective
+  evaluation, so overwrites take effect at the next one --- this is
+  how parameter sweeps reuse one \code{optimcon()} setup across many
+  optimisations.
 \item[Frozen] (changes require a fresh \code{optimcon()} call): the
   ensemble \emph{composition} --- the member counts of every ensemble
   dimension, the correlation settings \code{ens\_corrs}, and the budget
-  --- and the generators: \code{drifts}, \code{operators},
-  \code{off\_ops}. The generator fields are physically absent from the
+  --- and the worker-resident invariants named in
+  \code{control.frozen\_fields}: \code{drifts}, \code{operators},
+  \code{off\_ops}, the trapezium commutator tables \code{cc\_comm} and
+  \code{cc\_comm\_idx}, and the Bloch--Siegert \code{resp\_ops}. These
+  fields are physically absent from the
   client structure after \code{optimcon()}; touching them, or changing
   anything that alters the case catalog, raises an immediate error
   rather than silently running a stale ensemble. The guard literally
@@ -1588,18 +1596,20 @@ silently become a no-op.
 For sweep drivers and callback authors, the frozen structure contains,
 besides the absorbed options: \code{ncontrols} and \code{ndrifts}
 (counts), \code{pulse\_dur}, \code{pulse\_nsteps}, \code{pulse\_ntpts}
-(timing), \code{cc\_comm} and \code{cc\_comm\_idx} (trapezium
-control--control commutators and their zero table), \code{catalog} and
+(timing), \code{catalog} and
 \code{ens\_sizes} (the ensemble case catalog and dimension sizes),
 \code{invariants} (the worker-resident frozen problem,
-a \code{parallel.pool.Constant}), \code{resp\_ops} (Bloch--Siegert
-response operators, present when \code{bsiegert} is enabled), the line search and regularisation
+a \code{parallel.pool.Constant}), \code{frozen\_fields} (the names of
+the worker-resident invariant fields), the line search and regularisation
 constants (\code{ls\_c1}, \code{ls\_c2}, \code{ls\_tau1},
 \code{ls\_tau2}, \code{ls\_tau3}, \code{reg\_max\_iter},
 \code{reg\_alpha}, \code{reg\_phi}, \code{reg\_max\_cond}), and the
-parsed forms of every option above. The fields \code{drifts},
-\code{operators}, and \code{off\_ops} are \emph{absent} from the
-returned structure --- they live on the workers.
+parsed forms of every option above. The fields named in
+\code{frozen\_fields} --- \code{drifts}, \code{operators},
+\code{off\_ops}, and, when present, the trapezium commutator tables
+\code{cc\_comm} and \code{cc\_comm\_idx} and the Bloch--Siegert
+response operators \code{resp\_ops} --- are \emph{absent} from the
+returned structure: they live on the workers.
 
 \subsection{Public functions}
 

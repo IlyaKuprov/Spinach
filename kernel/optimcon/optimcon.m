@@ -712,7 +712,8 @@ if isfield(control,'pulse_dt')
 
     % Input validation
     if (~isnumeric(control.pulse_dt))||(~isreal(control.pulse_dt))||...
-       (~isrow(control.pulse_dt))||any(control.pulse_dt(:)<=0)
+       (~isrow(control.pulse_dt))||any(~isfinite(control.pulse_dt(:)))||...
+       any(control.pulse_dt(:)<=0)
         error('control.pulse_dt must be a row vector of positive real numbers.');
     end
 

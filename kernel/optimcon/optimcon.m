@@ -832,6 +832,11 @@ end
 % Process freeze mask
 if isfield(control,'freeze')
 
+    % Freeze masks act on time points, waveform bases mix them
+    if isfield(control,'basis')
+        error('control.freeze cannot be combined with control.basis.');
+    end
+
     % Store the mask (validated in fmaxnewton)
     spin_system.control.freeze=logical(control.freeze);
     control=rmfield(control,'freeze');

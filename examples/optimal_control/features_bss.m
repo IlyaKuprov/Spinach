@@ -1,18 +1,10 @@
 % Optimal control pulse optimisation with Bloch-Siegert shift corrections
 % switched on. A single proton with a Larmor frequency of 1 MHz is driven
-% at a tenth of its Larmor frequency - a regime where the counter-rotating
-% component of the control field shifts the resonance appreciably. A 90-
-% degree pulse is optimised with the LBFGS-GRAPE algorithm in a model that
-% carries the Bloch-Siegert corrections through the response operators
-% that optimcon.m builds using bss_ops.m from the control channel map
-% when control.bsiegert is set; the corrections enter each time
-% slice through the squares of the control amplitudes, and the fidelity
-% gradient is pulled back through that quadratic map inside the GRAPE
-% engines.
-%
-% For comparison, the same pulse is also optimised with the corrections
-% switched off and then evaluated in the corrected model: the fidelity
-% penalty of ignoring the Bloch-Siegert physics is printed.
+% at a significant fraction of its Larmor frequency -- a regime where the
+% counter-rotating component of the control field shifts the resonance ap-
+% preciably. A 90-degree pulse is optimised using LBFGS-GRAPE algorithm. 
+% For comparison, the same pulse is also optimised with the corrections 
+% switched off and then evaluated in the corrected model.
 %
 % Calculation time: minutes.
 %
@@ -22,7 +14,7 @@
 
 function features_bss()
 
-% Larmor frequency 2*pi*1e6 rad/s via the magnet value
+% Larmor frequency of 1 MHz
 sys.magnet=2*pi*1e6/spin('1H');
 
 % Spin system
@@ -54,50 +46,45 @@ dim=size(spin_system.bas.basis,1);
 control.drifts={{sparse(dim,dim)}};
 control.operators={operator(spin_system,'Lx','1H'),...
                    operator(spin_system,'Ly','1H')};
+control.off_ops={operator(spin_system,'Lx','1H')};
+control.offsets={linspace(-1e5,1e5,11)};
 control.isotopes={'1H'};
 control.channels=[1;1];
 control.rho_init={rho_init};
 control.rho_targ={rho_targ};
-control.pwr_levels=0.1*abs(spin_system.inter.basefrqs(1));
-control.pulse_dt=(2.5*pi/control.pwr_levels/50)*ones(1,50);
+control.pwr_levels=0.2*abs(spin_system.inter.basefrqs(1));
+control.pulse_dt=(8.0*pi/control.pwr_levels/50)*ones(1,50);
 control.method='lbfgs';
 control.fidelity='real';
 control.max_iter=100;
 
-% Switch the Bloch-Siegert corrections on
-control.bsiegert=true();
-
-% Spinach housekeeping
-spin_system=optimcon(spin_system,control);
-
 % Deterministic initial guess
 guess=[linspace(0.1,0.5,50); 0.05*ones(1,50)];
 
-% Optimise with Bloch-Siegert corrections on
+% Optimisation
+control.bsiegert=true();
+spin_system=optimcon(spin_system,control);
 pulse=fmaxnewton(spin_system,@grape_xy,guess);
 
-% Fidelity of the corrected pulse in the corrected model
+% Corrected pulse in the corrected model
 [~,fid_corr]=ensemble(pulse,spin_system);
-report(spin_system,['corrected pulse, corrected model:   ' ...
-                    num2str(fid_corr,'%.6f')]);
 
-% Rebuild the problem with the corrections off
+% Optimisation
 control.bsiegert=false();
-spin_system=create(sys,inter);
-spin_system=basis(spin_system,bas);
 spin_system=optimcon(spin_system,control);
-
-% Optimise with Bloch-Siegert corrections off
 pulse_off=fmaxnewton(spin_system,@grape_xy,guess);
 
-% Evaluate the uncorrected pulse in the corrected model
+% Uncorrected pulse in the corrected model
 control.bsiegert=true();
-spin_system=create(sys,inter);
-spin_system=basis(spin_system,bas);
 spin_system=optimcon(spin_system,control);
 [~,fid_off]=ensemble(pulse_off,spin_system);
+
+% Report the results
+report(spin_system,'---------------');
+report(spin_system,['corrected pulse, corrected model:   ' ...
+                     num2str(fid_corr,'%.6f')]);
 report(spin_system,['uncorrected pulse, corrected model: ' ...
-                    num2str(fid_off,'%.6f')]);
+                     num2str(fid_off,'%.6f')]);
 
 end
 

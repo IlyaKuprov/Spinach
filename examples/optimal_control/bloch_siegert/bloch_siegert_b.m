@@ -51,22 +51,23 @@ control.drifts={{D}};
 control.operators={Lx,Ly};
 control.rho_init={ Sx Sy Sz};
 control.rho_targ={-Sz Sy Sx};
-control.method='rbfgs';
-control.max_iter=100;
+control.method='lbfgs';
+control.max_iter=500;
+control.tol_x=1e-4;
 control.plotting={};
 
 % Power levels to sweep (rad/s)
 zeeman_frq=abs(spin('13C')*sys.magnet);
-pwr_list=zeeman_frq*linspace(1e-3,1,20);
+pwr_list=zeeman_frq*linspace(1e-3,1.0,20);
 
 % Preallocate results
-inf_no_bss=zeros(size(pwr_list));
-inf_bss=zeros(size(pwr_list));
+fid_a=zeros(size(pwr_list));
+fid_b=zeros(size(pwr_list));
 
 % Common initial guess
 guess=randn(2,50)/10;
 
-% Loop over power 
+% Loop over control power 
 for n=1:numel(pwr_list)
 
     % Set current power
@@ -76,30 +77,20 @@ for n=1:numel(pwr_list)
     dt=(pi/100)/control.pwr_levels;
     control.pulse_dt=dt*ones(1,50);
 
-    % Optimisation without BSS
+    % BSS settings: off, on
     control.bsiegert=false();
-    spin_system_no_bss=optimcon(spin_system,control);
-    pulse_no_bss=fmaxnewton(spin_system_no_bss,@grape_xy,guess);
+    setting_a=optimcon(spin_system,control);
+    control.bsiegert=true();  
+    setting_b=optimcon(spin_system,control);
 
-    % Optimisation with BSS
-    control.bsiegert=true();
-    spin_system_bss=optimcon(spin_system,control);
-    pulse_bs=fmaxnewton(spin_system_bss,@grape_xy,guess);
-    
-    % Test the pulse without BSS in reality with BSS
-    pulse_no_bss=mat2cell(control.pwr_levels*pulse_no_bss,[1 1]);
-    [controls_aug,pulse_aug]=bloch_siegert(spin_system_bss,{Lx,Ly},pulse_no_bss);
-    rho=shaped_pulse_xy(spin_system_bss,D,controls_aug,pulse_aug,...
-                        control.pulse_dt,[Sx,Sy,Sz],'expv-pwc');
-    inf_no_bss(n)=3-real(trace([-Sz Sy Sx]'*rho));
+    % Optimisation with and without BSS 
+    pulse_a=fmaxnewton(setting_a,@grape_xy,guess);
+    pulse_b=fmaxnewton(setting_b,@grape_xy,guess);
 
-    % Test the pulse with BSS in reality with BSS
-    pulse_bss=mat2cell(control.pwr_levels*pulse_bs,[1 1]);
-    [controls_aug,pulse_aug]=bloch_siegert(spin_system_bss,{Lx,Ly},pulse_bss);
-    rho=shaped_pulse_xy(spin_system_bss,D,controls_aug,pulse_aug,...
-                        control.pulse_dt,[Sx,Sy,Sz],'expv-pwc');
-    inf_bss(n)=3-real(trace([-Sz Sy Sx]'*rho));
-   
+    % Evaluation for a system with BSS
+    [~,fid_a(n)]=ensemble(pulse_a,setting_b);
+    [~,fid_b(n)]=ensemble(pulse_b,setting_b);
+
 end
 
 % Compute relative control powers
@@ -107,8 +98,8 @@ relative_power=pwr_list./zeeman_frq;
 
 % Plotting
 kfigure(); scale_figure([1.0 0.75]); 
-plot(relative_power,inf_no_bss); hold on; kgrid;
-plot(relative_power,inf_bss); set(gca,'Yscale','log');
+plot(relative_power,1-fid_a); hold on; kgrid;
+plot(relative_power,1-fid_b); set(gca,'Yscale','log');
 kxlabel('relative control power $|\omega_1 / \omega_0|$');
 kylabel('terminal infidelity'); ylim padded;
 klegend({'GRAPE','GRAPE + BSS'},'Location','East');

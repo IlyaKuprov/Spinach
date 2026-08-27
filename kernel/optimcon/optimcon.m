@@ -660,13 +660,33 @@ if isfield(control,'bsiegert')
         
         % Isotope of each control channel
         chan_isos=spin_system.control.isotopes(spin_system.control.channels);
-        
+
+        % Corrected channels need waveform values to be physical nutation frequencies
+        for n=1:numel(chan_isos)
+
+            % Canonical transverse operators of the channel
+            Lxc=operator(spin_system,'Lx',chan_isos{n});
+            Lyc=operator(spin_system,'Ly',chan_isos{n});
+
+            % Project the control operator onto the quadratures
+            quad_x=hdot(Lxc,spin_system.control.operators{n})/hdot(Lxc,Lxc);
+            quad_y=hdot(Lyc,spin_system.control.operators{n})/hdot(Lyc,Lyc);
+
+            % Require a unit quadrature of the canonical operators
+            resid=spin_system.control.operators{n}-quad_x*Lxc-quad_y*Lyc;
+            if (norm(resid,'fro')>1e-6*norm(Lxc,'fro'))||...
+               (abs(quad_x^2+quad_y^2-1)>1e-6)
+                error('with control.bsiegert, control operators must be unit quadratures of Lx and Ly on their channel isotope.');
+            end
+
+        end
+
         % On-resonance carrier frequency of each control channel
         carrier_frq=zeros(1,numel(chan_isos));
         for n=1:numel(chan_isos)
             carrier_frq(n)=-spin(chan_isos{n})*spin_system.inter.magnet;
         end
-        
+
         % Build the response operators, stored without clean-up
         spin_system.control.resp_ops=bss_ops(spin_system,chan_isos,carrier_frq);
         

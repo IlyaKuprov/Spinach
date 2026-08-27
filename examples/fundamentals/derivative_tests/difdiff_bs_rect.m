@@ -116,7 +116,7 @@ else
     fail_count=fail_count+1;
 end
 
-% Waveform midpointd
+% Waveform midpoint
 n_rows=size(guess,1);
 n_cols=size(guess,2);
 mid_row=ceil(n_rows/2);
@@ -143,7 +143,7 @@ end
 if fail_count==0
     disp('all derivative tests passed');
 else
-    disp([int2str(fail_count) ' derivative test(s) failed']);
+    error([int2str(fail_count) ' derivative test(s) failed']);
 end
 
 end

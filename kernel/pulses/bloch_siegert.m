@@ -32,6 +32,11 @@
 %                  tors, with the squared amplitude vector of
 %                  each channel appended
 %
+% Note: the augmented arrays are only valid for the piecewise-constant
+%       propagation methods of shaped_pulse_xy; piecewise-linear methods
+%       would interpolate the squared coefficients, which does not cor-
+%       respond to the square of the interpolated control amplitude.
+%
 % aditya.dev@weizmann.ac.il
 % ilya.kuprov@weizmann.ac.il
 %

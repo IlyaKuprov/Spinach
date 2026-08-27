@@ -94,8 +94,8 @@ if (~iscell(channels))||any(~cellfun(@ischar,channels(:)))
     error('channels must be a cell array of character strings.');
 end
 if (~isnumeric(carrier_frq))||(~isreal(carrier_frq))||...
-   (numel(carrier_frq)~=numel(channels))
-    error('carrier_frq must be a real vector with one element per channel.');
+   (~all(isfinite(carrier_frq)))||(numel(carrier_frq)~=numel(channels))
+    error('carrier_frq must be a finite real vector with one element per channel.');
 end
 for c=1:numel(channels)
     if ~ismember(channels{c},spin_system.comp.isotopes)

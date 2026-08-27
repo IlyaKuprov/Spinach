@@ -51,6 +51,8 @@ LyC=operator(spin_system,'Ly',2);
 H=hamiltonian(assume(spin_system,'nmr'));
 
 % Control data structure
+control.isotopes={'1H','13C'};                 % Isotopes
+control.channels=[1; 1; 2; 2];                 % Channel map
 control.drifts={{H}};                          % Drift Hamiltonian
 control.operators={LxH,LyH,LxC,LyC};           % Control operators
 control.rho_init={rho_init};                   % Initial state

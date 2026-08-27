@@ -60,11 +60,13 @@ LyF=operator(spin_system,'Ly','19F');
 LzH=operator(spin_system,'Lz','1H');
 
 % Drift Hamiltonian
-H=hamiltonian(assume(spin_system,'nmr'));
+D=hamiltonian(assume(spin_system,'nmr'));
 
 % Define control parameters
-control.drifts={{H}};                           % Drift
-control.operators={LxH,LyH,LxC,LyC,LxF,LyF};    % Controls
+control.isotopes={'1H','13C','19F'};            % Isotopes
+control.channels=[1; 1; 2; 2; 3; 3];            % Channel map
+control.drifts={{D}};                           % Drift operator
+control.operators={LxH,LyH,LxC,LyC,LxF,LyF};    % Control operators
 control.off_ops={LzH};                          % Offset operator 
 control.offsets={linspace(-1e3,+1e3,5)};        % Offset range, Hz
 control.rho_init={rho_init};                    % Starting state
@@ -95,7 +97,7 @@ pulse=mat2cell(pulse,[1 1 1 1 1 1]);
 
 % Run a test simulation using the optimal pulse
 report(spin_system,'running test simulation...');
-rho=shaped_pulse_xy(spin_system,H,control.operators,pulse,...
+rho=shaped_pulse_xy(spin_system,D,control.operators,pulse,...
                     control.pulse_dt,rho_init,'expv-pwc');
 fidelity=real(rho_targ'*rho);
 report(spin_system,['Re[<target|rho(T)>] = ' num2str(fidelity)]);

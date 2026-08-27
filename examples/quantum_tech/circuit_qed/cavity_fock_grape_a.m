@@ -61,6 +61,8 @@ for m=1:2
     rho_targ=rho_targ/norm(rho_targ,'fro');
 
     % Define control parameters
+    control.isotopes={trunc_labels{m},'E'};
+    control.channels=[1;1;2;2];
     control.drifts={{H}};
     control.operators=ops;
     control.rho_init={rho_init};

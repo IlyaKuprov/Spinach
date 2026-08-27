@@ -58,6 +58,8 @@ parameters.offset=[1050 5285];
 H=frqoffset(spin_system,H,parameters);
 
 % Define control parameters
+control.isotopes={'1H','13C'};                    % Isotopes
+control.channels=[1; 1; 2; 2];                    % Channel map
 control.drifts={{H}};                             % Drift
 control.operators={LxH,LyH,LxC,LyC};              % Controls
 control.rho_init={rho_init};                      % Starting state

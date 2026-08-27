@@ -57,8 +57,10 @@ Ly=operator(spin_system,'Ly','13C');
 H=hamiltonian(assume(spin_system,'nmr'));
 
 % Define control parameters
-control.drifts={{H}};                           % Drift
-control.operators={Lx,Ly};                      % Controls
+control.isotopes={'13C'};                       % Isotopes
+control.channels=[1; 1];                        % Channel map
+control.drifts={{H}};                           % Drift operator
+control.operators={Lx,Ly};                      % Control operators
 control.rho_init={ Sx Sy Sz};                   % Starting states
 control.rho_targ={-Sz Sy Sx};                   % Target states
 control.pulse_dt=1e-6*ones(1,60);               % Pulse interval grid

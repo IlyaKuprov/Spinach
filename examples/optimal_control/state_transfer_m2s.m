@@ -56,8 +56,10 @@ H=frqoffset(spin_system,H,parameters);
 Hz=operator(spin_system,'Lz','1H');
 
 % Define control parameters
-control.drifts={{H}};                             % Drift
-control.operators={LxH,LyH};                      % Controls
+control.isotopes={'1H'};                          % Isotopes
+control.channels=[1; 1];                          % Channel map
+control.drifts={{H}};                             % Drift operator
+control.operators={LxH,LyH};                      % Control operators
 control.off_ops={Hz};                             % Offset operator
 control.offsets={linspace(-10,10,5)};             % Offset distribution
 control.rho_init={rho_init};                      % Starting state

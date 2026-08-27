@@ -42,10 +42,12 @@ Lx=operator(spin_system,'Lx','13C');
 Ly=operator(spin_system,'Ly','13C');
 
 % Get the drift Hamiltonian
-H=hamiltonian(assume(spin_system,'nmr'));
+D=hamiltonian(assume(spin_system,'nmr'));
 
 % Define control parameters
-control.drifts={{H}};                              % Drift
+control.isotopes={'13C'};                          % Isotopes
+control.channels=[1; 1];                           % Channel map
+control.drifts={{D}};                              % Drift
 control.operators={Lx,Ly};                         % Controls
 control.rho_init={ Sx Sy Sz};                      % Starting states
 control.rho_targ={-Sz Sy Sx};                      % Target states
@@ -104,7 +106,7 @@ for n=1:numel(sat_factor)
         CLy=xy_profile_dist(2,:);
 
         % Simulate the pulse
-        rho=shaped_pulse_xy(spin_system,H,{Lx,Ly},{CLx,CLy},control.pulse_dt,...
+        rho=shaped_pulse_xy(spin_system,D,{Lx,Ly},{CLx,CLy},control.pulse_dt,...
                             cell2mat(control.rho_init),'expv-pwc');
 
         % Get the fidelity

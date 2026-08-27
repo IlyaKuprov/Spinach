@@ -35,7 +35,7 @@ Lx=operator(spin_system,'Lx','13C');
 Ly=operator(spin_system,'Ly','13C');
 
 % Get the drift Hamiltonian (zero here)
-H=hamiltonian(assume(spin_system,'nmr'));
+D=hamiltonian(assume(spin_system,'nmr'));
 
 % Nutation frequency range in Hz
 nutf_range=linspace(6e3,14e3,128);
@@ -52,8 +52,10 @@ xlim tight; ylim([-0.1 1.1]); drawnow; figure(1);
 rho_targ=X.*repmat(Sx,1,128)+Z.*repmat(Sz,1,128);
 
 % Define control parameters
-control.drifts={{H}};                     % Drift
-control.operators={Lx,Ly};                % Controls
+control.isotopes={'13C'};                 % Isotopes
+control.channels=[1; 1];                  % Channel map
+control.drifts={{D}};                     % Drift operator
+control.operators={Lx,Ly};                % Control operators
 control.rho_init=repmat({Sz},1,128);      % Starting states
 control.rho_targ=num2cell(rho_targ,1);    % Target states
 control.pulse_dt=2e-5*ones(1,250);        % Pulse interval grid
@@ -86,7 +88,7 @@ parfor n=1:numel(control.pwr_levels) %#ok<*PFBNS>
 
     % Simulate the optimised pulse
     rho_init=control.rho_init{n};
-    rho=shaped_pulse_xy(spin_system,H,{Lx,Ly},{CLx,CLy},...
+    rho=shaped_pulse_xy(spin_system,D,{Lx,Ly},{CLx,CLy},...
         control.pulse_dt,rho_init,'expv-pwc');
 
     % Project out the destination states

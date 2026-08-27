@@ -45,11 +45,13 @@ Lx=operator(spin_system,'Lx','13C');
 Ly=operator(spin_system,'Ly','13C');
 
 % Drift Hamiltonian
-H=hamiltonian(assume(spin_system,'nmr'));
+D=hamiltonian(assume(spin_system,'nmr'));
 
 % Define control parameters
-control.drifts={{H}};                             % Drift
-control.operators={Lx,Ly};                        % Controls
+control.isotopes={'13C'};                         % Isotopes
+control.channels=[1; 1];                          % Channel map
+control.drifts={{D}};                             % Drift operator
+control.operators={Lx,Ly};                        % Control operators
 control.rho_init={rho_init};                      % Starting state
 control.rho_targ={rho_targ};                      % Destination state
 control.pulse_dt=1e-3*ones(1,50);                 % Pulse duration
@@ -89,7 +91,7 @@ cart_profile=mean(control.pwr_levels)*cart_profile;
 CLx=cart_profile(1,:); CLy=cart_profile(2,:);
 
 % Simulate the optimised pulse
-rho=shaped_pulse_xy(spin_system,H,{Lx,Ly},{CLx,CLy},...
+rho=shaped_pulse_xy(spin_system,D,{Lx,Ly},{CLx,CLy},...
                     control.pulse_dt,rho_init,'expv-pwc');
 
 % Filter out the singlet state

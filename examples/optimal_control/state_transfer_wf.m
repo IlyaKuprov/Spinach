@@ -52,6 +52,8 @@ parameters.offset=[1050 5285];
 H=frqoffset(spin_system,H,parameters);
 
 % Define control parameters
+control.isotopes={'1H','13C'};                    % Isotopes
+control.channels=[1; 1; 2; 2];                    % Channel map
 control.drifts={{H}};                             % Drift
 control.operators={LxH,LyH,LxC,LyC};              % Controls
 control.rho_init={rho_init};                      % Starting state
@@ -60,7 +62,7 @@ control.pwr_levels=2*pi*[460 480 500 520 540];    % Pulse power
 control.pulse_dt=1.5e-4*ones(1,100);              % Slice durations
 control.penalties={'NS','SNS'};                   % Penalties
 control.p_weights=[0.1 10];                       % Penalty weights
-control.method='goodwin';                           % Optimisation method
+control.method='goodwin';                         % Optimisation method
 control.max_iter=100;                             % Termination condition
 
 % Plots during optimisation

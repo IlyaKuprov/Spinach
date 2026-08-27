@@ -63,7 +63,9 @@ Dy=operator(spin_system,'Ly','2H');
 Dz=operator(spin_system,'Lz','2H');
 
 % Define control parameters
-control.operators={Dx,Dy};                     % Controls
+control.isotopes={'2H'};                       % Isotopes
+control.channels=[1; 1];                       % Channel map
+control.operators={Dx,Dy};                     % Control operators
 control.rho_init={rho_init};                   % Starting state
 control.rho_targ={rho_targ};                   % Destination state
 control.pwr_levels=2*pi*[46 48 50 52 54]*1e3;  % Power distribution

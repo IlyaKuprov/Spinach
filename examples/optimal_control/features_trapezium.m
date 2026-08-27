@@ -55,11 +55,13 @@ LxF=operator(spin_system,'Lx','19F');
 LyF=operator(spin_system,'Ly','19F');
 
 % Drift Hamiltonian
-H=hamiltonian(assume(spin_system,'nmr'));
+D=hamiltonian(assume(spin_system,'nmr'));
 
 % Define control parameters
-control.drifts={{H}};                             % Drift
-control.operators={LxH,LyH,LxC,LyC,LxF,LyF};      % Controls
+control.isotopes={'1H','13C','19F'};              % Isotopes
+control.channels=[1; 1; 2; 2; 3; 3];              % Channel map
+control.drifts={{D}};                             % Drift operator
+control.operators={LxH,LyH,LxC,LyC,LxF,LyF};      % Control operators
 control.rho_init={rho_init};                      % Starting state
 control.rho_targ={rho_targ};                      % Destination state
 control.pwr_levels=2*pi*linspace(0.8e3,1.2e3,5);  % Pulse powers, rad/s
@@ -92,7 +94,7 @@ rho=rho_init;
 for n=1:numel(control.pulse_dt)
 
     % Build generators
-    G_L=H; G_R=H;
+    G_L=D; G_R=D;
     for k=1:size(pulse,1)
         G_L=G_L+pulse(k,n)*control.operators{k};
         G_R=G_R+pulse(k,n+1)*control.operators{k};

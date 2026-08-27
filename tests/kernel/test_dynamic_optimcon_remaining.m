@@ -585,6 +585,7 @@ spin_system.tols.small_matrix=64;
 spin_system.tols.dense_matrix=0.5;
 spin_system.tols.prop_chop=1e-14;
 spin_system.bas.formalism=formalism;
+spin_system.comp.isotopes={'E'};
 
 end
 
@@ -594,6 +595,8 @@ function spin_system=local_hilb_control_system()
 % Build a minimal Hilbert-space one-spin optimal-control system
 spin_system=local_spin_system('zeeman-hilb');
 S=pauli(2);
+control.isotopes={'E'};
+control.channels=[1;1];
 control.operators={S.x,S.y};
 control.rho_init={S.x};
 control.rho_targ={S.z};
@@ -642,6 +645,8 @@ function spin_system=local_sphten_control_system()
 % Build a tiny spherical-tensor-like cooperative-control fixture
 spin_system=local_spin_system('sphten-liouv');
 spin_system.bas.basis=[0; 1];
+control.isotopes={'E'};
+control.channels=[1;1];
 control.operators={[0 1; 1 0],[0 -1i; 1i 0]};
 control.rho_init={[1; 0.2]};
 control.rho_targ={[0.3; 1.0]};

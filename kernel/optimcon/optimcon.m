@@ -162,6 +162,56 @@ herm_gens=ismember(spin_system.bas.formalism,...
                    {'zeeman-hilb','zeeman-wavef'})||...
           strcmp(spin_system.control.method,'goodwin');
 
+% Process isotope list
+if isfield(control,'isotopes')
+
+    % Input validation
+    if (~iscell(control.isotopes))||(~all(cellfun(@ischar,control.isotopes(:))))
+        error('control.isotopes must be a cell array of character strings.');
+    end
+    for n=1:numel(control.isotopes)
+        if ~ismember(control.isotopes{n},spin_system.comp.isotopes)
+            error('control.isotopes refers to spins that are not present.');
+        end
+    end
+
+    % Absorb isotope list
+    spin_system.control.isotopes=control.isotopes;
+    control=rmfield(control,'isotopes');
+
+else
+
+    % Complain and bomb out
+    error('active isotope list must be supplied in control.isotopes field.');
+
+end
+
+% Process control channel map
+if isfield(control,'channels')
+
+    % Input validation
+    if (~isnumeric(control.channels))||(~isreal(control.channels))||...
+       (~isvector(control.channels))||isempty(control.channels)
+        error('control.channels must be a real numeric vector.');
+    end
+    if (~all(mod(control.channels,1)==0))||any(control.channels<1)
+        error('elements of control.channels must be positive integers.');
+    end
+    if any(control.channels>numel(spin_system.control.isotopes))
+        error('elements of control.channels must not exceed isotope count.');
+    end
+
+    % Absorb control channel map
+    spin_system.control.channels=control.channels(:);
+    control=rmfield(control,'channels');
+
+else
+
+    % Complain and bomb out
+    error('control channel map must be supplied in control.channels field.');
+
+end
+
 % Process control operators
 if isfield(control,'operators')
 
@@ -177,6 +227,11 @@ if isfield(control,'operators')
 
     % Control operator count
     spin_system.control.ncontrols=numel(control.operators);
+
+    % Match the channel map to the control operators
+    if numel(spin_system.control.channels)~=spin_system.control.ncontrols
+        error('control.channels must have one element per control operator.');
+    end
 
     % Absorb control operators and clean them up
     for n=1:spin_system.control.ncontrols

@@ -32,10 +32,10 @@
 %
 % Note: the ensemble cases enumerated in spin_system.control.catalog
 %       are distributed over the parallel pool workers. Each case
-%       fetches the evaluation-invariant problem data from the pool
-%       constant published by optimcon.m, so only the waveform, the
-%       states, and the evaluation-variable settings travel at each
-%       objective evaluation.
+%       fetches the frozen problem data from the pool constant pub-
+%       lished by optimcon.m and grafts the live client-side control
+%       structure on top of it, so only the waveform and the live
+%       control fields travel at each objective evaluation.
 %
 % david.goodwin@inano.au.dk
 % ilya.kuprov@weizmann.ac.il
@@ -55,27 +55,14 @@ n_cases=size(catalog,1);
 % Pull the worker-resident problem data handle
 invariants=spin_system.control.invariants;
 
-% Collect the evaluation-variable settings
-live.rho_init=spin_system.control.rho_init;
-live.rho_targ=spin_system.control.rho_targ;
-live.pulse_dt=spin_system.control.pulse_dt;
-live.pwr_levels=spin_system.control.pwr_levels;
-live.offsets=spin_system.control.offsets;
-live.phase_cycle=spin_system.control.phase_cycle;
-live.distortion=spin_system.control.distortion;
-live.freeze=spin_system.control.freeze;
-live.fidelity=spin_system.control.fidelity;
-live.plotting=spin_system.control.plotting;
-live.keyholes=spin_system.control.keyholes;
-live.return_traj=isfield(spin_system.control,'return_traj')&&...
-                 spin_system.control.return_traj;
-if strcmp(spin_system.control.integrator,'trapezium')
-    live.cc_comm=spin_system.control.cc_comm;
-    live.cc_comm_idx=spin_system.control.cc_comm_idx;
-end
+% Live problem data is the client-side control structure
+control=rmfield(spin_system.control,'invariants');
+
+% Default the trajectory return flag
+control.return_traj=isfield(control,'return_traj')&&control.return_traj;
 
 % Get offset ensemble size
-off_ens_sizes=cellfun(@numel,live.offsets);
+off_ens_sizes=cellfun(@numel,control.offsets);
 
 % Count the outputs
 n_outputs=nargout;
@@ -96,22 +83,11 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     % Fetch worker-resident problem data
     ss=invariants.Value;
 
-    % Graft the evaluation-variable settings
-    ss.control.rho_init=live.rho_init;
-    ss.control.rho_targ=live.rho_targ;
-    ss.control.pulse_dt=live.pulse_dt;
-    ss.control.pwr_levels=live.pwr_levels;
-    ss.control.offsets=live.offsets;
-    ss.control.phase_cycle=live.phase_cycle;
-    ss.control.distortion=live.distortion;
-    ss.control.freeze=live.freeze;
-    ss.control.fidelity=live.fidelity;
-    ss.control.plotting=live.plotting;
-    ss.control.keyholes=live.keyholes;
-    ss.control.return_traj=live.return_traj;
-    if isfield(live,'cc_comm')
-        ss.control.cc_comm=live.cc_comm;
-        ss.control.cc_comm_idx=live.cc_comm_idx;
+    % Graft live client data over the frozen worker copy
+    frozen=ss.control; ss.control=control;
+    for k=1:numel(control.frozen_fields)
+        fname=control.frozen_fields{k};
+        ss.control.(fname)=frozen.(fname);
     end
 
     % Extract ensemble indices
@@ -120,21 +96,21 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     n_phi=catalog(n,5); n_dis=catalog(n,6);
 
     % Get initial and target state
-    rho_init=live.rho_init{n_rho};
-    rho_targ=live.rho_targ{n_rho};
+    rho_init=control.rho_init{n_rho};
+    rho_targ=control.rho_targ{n_rho};
 
     % Localise the waveform
     local_waveform=waveform;
 
     % Apply the phase cycle
-    if ~isempty(live.phase_cycle)
+    if ~isempty(control.phase_cycle)
 
         % Apply phase to the initial state
-        phi=live.phase_cycle(n_phi,1);
+        phi=control.phase_cycle(n_phi,1);
         rho_init=exp(1i*phi)*rho_init;
 
         % Apply phase to the target state
-        phi=live.phase_cycle(n_phi,end);
+        phi=control.phase_cycle(n_phi,end);
         rho_targ=exp(1i*phi)*rho_targ;
 
         % Apply phases to the waveform
@@ -145,7 +121,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
                    1i*local_waveform(2*k,:);
 
             % Get the phase
-            phi=live.phase_cycle(n_phi,k+1);
+            phi=control.phase_cycle(n_phi,k+1);
 
             % Apply the phase
             cplx_wave=exp(1i*phi)*cplx_wave;
@@ -175,7 +151,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
             oper_idx=numel(off_ens_sizes)-k+1;
 
             % Add to the drift (user specifies offsets in Hz)
-            L=L+sparse(2*pi*live.offsets{oper_idx}(vj)*...
+            L=L+sparse(2*pi*control.offsets{oper_idx}(vj)*...
                             ss.control.off_ops{oper_idx});
 
             % Next channel
@@ -186,17 +162,17 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     end
 
     % Move the waveform into physical units
-    power_lvl=live.pwr_levels(n_pwr);
+    power_lvl=control.pwr_levels(n_pwr);
     local_waveform=power_lvl*local_waveform;
 
     % Call GRAPE
     if n_outputs==2
 
         % Apply waveform distortions
-        for k=1:size(live.distortion,2)
+        for k=1:size(control.distortion,2)
 
             % Get distortion function
-            dist_function=live.distortion{n_dis,k};
+            dist_function=control.distortion{n_dis,k};
 
             % Apply distortion function
             local_waveform=dist_function(local_waveform);
@@ -211,13 +187,13 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
                 % Call Liouville space version of the GRAPE function
                 [traj_data{n},fidelities{n}]=grape_liouv(ss,L,ss.control.operators,...
                                                          local_waveform,rho_init,rho_targ,...
-                                                         live.fidelity);
+                                                         control.fidelity);
             case 'zeeman-hilb'
 
                 % Call Hilbert space version of the GRAPE function
                 [traj_data{n},fidelities{n}]=grape_hilb(ss,L,ss.control.operators,...
                                                         local_waveform,rho_init,rho_targ,...
-                                                        live.fidelity);
+                                                        control.fidelity);
 
             otherwise
 
@@ -232,10 +208,10 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
         J=speye(numel(local_waveform));
 
         % Apply waveform distortions
-        for k=1:size(live.distortion,2)
+        for k=1:size(control.distortion,2)
 
             % Get distortion function
-            dist_function=live.distortion{n_dis,k};
+            dist_function=control.distortion{n_dis,k};
 
             % Apply distortion and get its Jacobian
             [local_waveform,stage_jacobian]=dist_function(local_waveform);
@@ -253,13 +229,13 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
                 % Call Liouville space version of the GRAPE function
                 [traj_data{n},fidelities{n},gradients{n}]=grape_liouv(ss,L,ss.control.operators,...
                                                                       local_waveform,rho_init,rho_targ,...
-                                                                      live.fidelity);
+                                                                      control.fidelity);
             case 'zeeman-hilb'
 
                 % Call Hilbert space version of the GRAPE function
                 [traj_data{n},fidelities{n},gradients{n}]=grape_hilb(ss,L,ss.control.operators,...
                                                                      local_waveform,rho_init,rho_targ,...
-                                                                     live.fidelity);
+                                                                     control.fidelity);
 
             otherwise
 
@@ -288,14 +264,14 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
                 [traj_data{n},fidelities{n},...
                  gradients{n},hessians{n}]=grape_liouv(ss,L,ss.control.operators,...
                                                        local_waveform,rho_init,rho_targ,...
-                                                       live.fidelity);
+                                                       control.fidelity);
             case 'zeeman-hilb'
 
                 % Call Hilbert space version of the GRAPE function
                 [traj_data{n},fidelities{n},...
                  gradients{n},hessians{n}]=grape_hilb(ss,L,ss.control.operators,...
                                                       local_waveform,rho_init,rho_targ,...
-                                                      live.fidelity);
+                                                      control.fidelity);
 
             otherwise
 
@@ -307,7 +283,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     end
 
     % Post-process gradient
-    if (~isempty(live.phase_cycle))&&(n_outputs>2)
+    if (~isempty(control.phase_cycle))&&(n_outputs>2)
 
         % Un-apply phases to gradient
         for k=1:(size(gradients{n},1)/2)
@@ -317,7 +293,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
                    1i*gradients{n}(2*k,:);
 
             % Get the phase
-            phi=live.phase_cycle(n_phi,k+1);
+            phi=control.phase_cycle(n_phi,k+1);
 
             % Un-apply the phase
             cplx_grad=exp(-1i*phi)*cplx_grad;
@@ -331,7 +307,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     end
 
     % Post-process Hessian
-    if (~isempty(live.phase_cycle))&&(n_outputs>3)
+    if (~isempty(control.phase_cycle))&&(n_outputs>3)
 
         % Re-shape the Hessian as [ncont x nsteps x nsteps x ncont]
         hessians{n}=reshape(hessians{n},[ncont nsteps ncont nsteps]);
@@ -340,7 +316,7 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
         for k=1:(size(gradients{n},1)/2)
 
             % Get the phase
-            phi=live.phase_cycle(n_phi,k+1);
+            phi=control.phase_cycle(n_phi,k+1);
 
             % Assemble complex Hessian - left
             cplx_hess=hessians{n}(2*k-1,:,:,:)+...
@@ -448,10 +424,10 @@ function grumble(spin_system,waveform)
 if ~isfield(spin_system,'control')
     error('control data missing from spin_system, run optimcon() first.');
 end
-if ~all(isfield(spin_system.control,{'catalog','ens_sizes','invariants'}))
+if ~all(isfield(spin_system.control,{'catalog','ens_sizes','invariants','frozen_fields'}))
     error('ensemble catalog missing from spin_system, run optimcon() first.');
 end
-if any(isfield(spin_system.control,{'operators','off_ops','drifts'}))
+if any(isfield(spin_system.control,spin_system.control.frozen_fields))
     error('generators and operators are frozen after optimcon(), re-run optimcon() to change them.');
 end
 if (~isnumeric(waveform))||(~isreal(waveform))

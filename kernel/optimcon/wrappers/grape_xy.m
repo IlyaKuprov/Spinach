@@ -41,6 +41,12 @@ grumble(spin_system,waveform);
 % Count penalty terms
 npenterms=numel(spin_system.control.penalties);
 
+% Freeze masks act on time points, waveform bases mix them
+if (~isempty(spin_system.control.basis))&&...
+   (~isempty(spin_system.control.freeze))
+    error('control.freeze cannot be combined with control.basis.');
+end
+
 % Translate the basis if necessary
 if ~isempty(spin_system.control.basis)
     nwaves=size(spin_system.control.basis,1);

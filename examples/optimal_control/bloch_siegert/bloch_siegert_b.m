@@ -63,6 +63,9 @@ pwr_list=zeeman_frq*linspace(1e-3,1,20);
 inf_no_bss=zeros(size(pwr_list));
 inf_bss=zeros(size(pwr_list));
 
+% Common initial guess
+guess=randn(2,50)/10;
+
 % Loop over power 
 for n=1:numel(pwr_list)
 
@@ -76,12 +79,12 @@ for n=1:numel(pwr_list)
     % Optimisation without BSS
     control.bsiegert=false();
     spin_system_no_bss=optimcon(spin_system,control);
-    pulse_no_bss=fmaxnewton(spin_system_no_bss,@grape_xy,randn(2,50)/10);
+    pulse_no_bss=fmaxnewton(spin_system_no_bss,@grape_xy,guess);
 
     % Optimisation with BSS
     control.bsiegert=true();
     spin_system_bss=optimcon(spin_system,control);
-    pulse_bs=fmaxnewton(spin_system_bss,@grape_xy,randn(2,50)/10);
+    pulse_bs=fmaxnewton(spin_system_bss,@grape_xy,guess);
     
     % Test the pulse without BSS in reality with BSS
     pulse_no_bss=mat2cell(control.pwr_levels*pulse_no_bss,[1 1]);

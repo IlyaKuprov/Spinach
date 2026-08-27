@@ -49,8 +49,9 @@ control.drifts={{D}};
 control.operators={Lx,Ly};
 control.rho_init={rho_init};
 control.rho_targ={rho_targ};
-control.method='rbfgs';
-control.max_iter=100;
+control.method='lbfgs';
+control.max_iter=200;
+control.tol_x=1e-4;
 control.plotting={};
 
 % Power levels to sweep (rad/s)
@@ -60,6 +61,9 @@ pwr_list=zeeman_frq*linspace(1e-3,1,20);
 % Preallocate results
 inf_no_bss=zeros(size(pwr_list));
 inf_bss=zeros(size(pwr_list));
+
+% Common initial guess
+guess=randn(2,50)/10;
 
 % Loop over control power 
 for n=1:numel(pwr_list)
@@ -74,12 +78,12 @@ for n=1:numel(pwr_list)
     % Optimisation without BSS
     control.bsiegert=false();
     spin_system_no_bss=optimcon(spin_system,control);
-    pulse_no_bss=fmaxnewton(spin_system_no_bss,@grape_xy,randn(2,50)/10);
+    pulse_no_bss=fmaxnewton(spin_system_no_bss,@grape_xy,guess);
 
     % Optimisation with BSS
     control.bsiegert=true();
     spin_system_bss=optimcon(spin_system,control);
-    pulse_bs=fmaxnewton(spin_system_bss,@grape_xy,randn(2,50)/10);
+    pulse_bss=fmaxnewton(spin_system_bss,@grape_xy,guess);
 
     % Test the pulse without BSS in reality with BSS
     pulse_no_bss=mat2cell(control.pwr_levels*pulse_no_bss,[1 1]);
@@ -89,7 +93,7 @@ for n=1:numel(pwr_list)
     inf_no_bss(n)=1-real(rho_targ'*rho);
 
     % Test the pulse with BSS in reality with BSS
-    pulse_bss=mat2cell(control.pwr_levels*pulse_bs,[1 1]);
+    pulse_bss=mat2cell(control.pwr_levels*pulse_bss,[1 1]);
     [controls_aug,pulse_aug]=bloch_siegert(spin_system_bss,{Lx,Ly},pulse_bss);
     rho=shaped_pulse_xy(spin_system_bss,D,controls_aug,pulse_aug,...
                         control.pulse_dt,rho_init,'expv-pwc');

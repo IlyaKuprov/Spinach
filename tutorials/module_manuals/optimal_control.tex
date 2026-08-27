@@ -1,0 +1,1675 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{braket}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{microtype}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+
+\lstset{basicstyle=\small\ttfamily,
+        keywordstyle=\color{blue!60!black},
+        commentstyle=\color{green!40!black},
+        stringstyle=\color{purple!60!black},
+        language=Matlab,
+        breaklines=true,
+        columns=fullflexible,
+        keepspaces=true,
+        frame=single,
+        rulecolor=\color{black!30},
+        xleftmargin=1em,
+        xrightmargin=1em}
+
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\Tr}{\operatorname{Tr}}
+\newcommand{\op}[1]{\hat{#1}}
+\newcommand{\sop}[1]{\hat{\hat{#1}}}
+
+\title{\textbf{The Spinach Optimal Control Module}\\[2mm]
+       \Large User Manual}
+\author{Talos\thanks{AI research assistant, Weizmann Institute of Science.
+        The module itself is the work of David Goodwin, Uluk Rasulov,
+        Marcel Keitel, Ilya Kuprov, and the Spinach developer team.}}
+\date{27 August 2026 \\[1mm] \normalsize Spinach 2.12, optimal control
+      module architecture of pull request \#332}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\clearpage
+
+%===============================================================
+\section{Physics and mathematics of GRAPE}
+%===============================================================
+
+\subsection{The quantum optimal control problem}
+
+Magnetic resonance systems evolve under an equation of motion that Spinach
+always writes in the form
+\begin{equation}
+  \frac{d}{dt}\,\boldsymbol{\rho}(t)
+  =-i\,\mathbf{L}(t)\,\boldsymbol{\rho}(t),
+  \qquad
+  \boldsymbol{\rho}(t)
+  =\exp_{(\mathrm{o})}\!\left[-i\!\int_0^t \mathbf{L}(\tau)\,d\tau\right]
+   \boldsymbol{\rho}(0),
+  \label{eq:eom}
+\end{equation}
+where $\exp_{(\mathrm{o})}$ denotes a time-ordered exponential. In Hilbert
+space $\boldsymbol{\rho}$ is a density matrix and $\mathbf{L}$ is the
+commutation superoperator with a Hermitian Hamiltonian, so that the
+propagation over an interval of constant $\mathbf{H}$ is a unitary sandwich
+\begin{equation}
+  \boldsymbol{\rho}(t+\Delta t)
+  =\mathbf{P}\,\boldsymbol{\rho}(t)\,\mathbf{P}^{\dagger},
+  \qquad
+  \mathbf{P}=\exp(-i\mathbf{H}\Delta t).
+  \label{eq:sandwich}
+\end{equation}
+In Liouville space $\boldsymbol{\rho}$ is a state vector and $\mathbf{L}$
+is a Liouvillian that may contain relaxation and chemical kinetics; it is
+then not Hermitian, the propagation
+\begin{equation}
+  \boldsymbol{\rho}(t+\Delta t)=\exp(-i\mathbf{L}\Delta t)\,
+  \boldsymbol{\rho}(t)
+  \label{eq:liouvprop}
+\end{equation}
+is not unitary, and dissipative dynamics is handled without further
+ceremony. This is the principal reason why the workhorse formalism of the
+optimal control module is Liouville space.
+
+The control problem is stated as follows. The evolution generator is split
+into an uncontrollable \emph{drift} and a linear combination of
+\emph{control operators} $\{\mathbf{C}_k\}$, $k=1,\ldots,K$, whose
+coefficients are at the disposal of the instrument:
+\begin{equation}
+  \mathbf{L}(t)=\mathbf{L}_0(t)+\sum_{k=1}^{K}c_k(t)\,\mathbf{C}_k.
+  \label{eq:splitting}
+\end{equation}
+Typical control operators are $\op{L}_X$ and $\op{L}_Y$ magnetisation
+operators on the channels of the instrument; the drift contains chemical
+shifts, couplings, exchange, and relaxation. The pulse of total duration
+$T$ is discretised over $N$ intervals $\Delta t_1,\ldots,\Delta t_N$. Two
+discretisations of $c_k(t)$ are supported:
+\begin{description}
+  \item[Piecewise-constant (\code{rectangle}).] The coefficient
+  $c_k(t)=c_{kn}$ is constant on the $n$-th interval; the waveform array
+  has $N$ columns. This is the classical GRAPE setting of Khaneja \emph{et
+  al.}~\cite{khaneja2005}.
+  \item[Piecewise-linear (\code{trapezium}).] The coefficient is a linear
+  interpolation between \emph{nodal} values $c_{kn}$ specified at the
+  $N{+}1$ interval edges; the waveform array has $N{+}1$ columns. This
+  matches what waveform generators actually emit, and is integrated with a
+  product quadrature (Section~\ref{sec:trapezium})~\cite{rasulov2023}.
+\end{description}
+In Spinach the user-facing waveform is dimensionless and order unity: the
+physical coefficient is $c_{kn}=p\,u_{kn}$, where $p$ is the nominal
+control power (rad/s) supplied in \code{control.pwr\_levels}, and
+$u_{kn}\in[-1,1]$ is the normalised waveform that the optimiser
+manipulates. All derivatives reported to the optimiser are with respect to
+$u_{kn}$; conversions are handled internally by the chain rule.
+
+Starting from an initial state $\boldsymbol{\rho}_0$, the pulse should
+arrive as closely as possible at a target $\boldsymbol{\sigma}$. With the
+overlap
+\begin{equation}
+  o=\braket{\boldsymbol{\sigma}|\boldsymbol{\rho}(T)}
+  =\begin{cases}
+     \boldsymbol{\sigma}^{\dagger}\boldsymbol{\rho}(T)
+       & \text{(Liouville space)}\\[1mm]
+     \Tr\!\left[\boldsymbol{\sigma}^{\dagger}\boldsymbol{\rho}(T)\right]
+       & \text{(Hilbert space)}
+   \end{cases}
+  \label{eq:overlap}
+\end{equation}
+three fidelity functionals are supported
+(\code{control.fidelity}):
+\begin{equation}
+  f_{\mathrm{real}}=\operatorname{Re}o,\qquad
+  f_{\mathrm{imag}}=\operatorname{Im}o,\qquad
+  f_{\mathrm{square}}=|o|^{2}.
+  \label{eq:fidelities}
+\end{equation}
+When states are normalised, $f_{\mathrm{real}}\in[-1,+1]$ and
+$f_{\mathrm{square}}\in[0,1]$; the square functional is insensitive to the
+overall phase of the final state. The optimiser maximises the total
+objective
+\begin{equation}
+  F(\mathbf{u})=f(\mathbf{u})-\sum_{j} w_j\,P_j(\mathbf{u}),
+  \label{eq:objective}
+\end{equation}
+where $P_j$ are penalty functionals (Section~\ref{sec:penalties}) with
+non-negative weights $w_j$ that hold the waveform inside instrumental
+constraints. In ensemble optimisations (Section~\ref{sec:ensembles}) the
+fidelity is additionally averaged over a set of system instances.
+
+GRAPE --- gradient ascent pulse engineering~\cite{khaneja2005} --- is the
+observation that, for piecewise-defined waveforms, the gradient
+$\partial f/\partial u_{kn}$ (and, with more effort, the Hessian) can be
+computed \emph{analytically} at a cost comparable to that of the
+simulation itself, after which any standard numerical maximiser converges
+rapidly. Spinach implements first-order (LBFGS) and second-order (Newton,
+with two Hessian assembly strategies) optimisers over both integrators and
+both spaces; the derivations follow.
+
+\subsection{Directional derivatives of the matrix exponential}
+\label{sec:dirdiff}
+
+Everything in GRAPE reduces to derivatives of interval propagators
+$\mathbf{P}=\exp[-i(\mathbf{A}+\varepsilon\mathbf{B})\Delta t]$ with
+respect to $\varepsilon$ at $\varepsilon=0$ --- \emph{directional}
+derivatives of the matrix exponential in the direction $\mathbf{B}$.
+Differentiating the exponential series term by term,
+\begin{equation}
+  \mathcal{D}_{\mathbf{B}}\exp(-i\mathbf{A}\Delta t)
+  =\left.\frac{\partial}{\partial\varepsilon}
+   e^{-i(\mathbf{A}+\varepsilon\mathbf{B})\Delta t}\right|_{\varepsilon=0}
+  =-i\!\int_0^{\Delta t}
+   e^{-i\mathbf{A}(\Delta t-\tau)}\,\mathbf{B}\,
+   e^{-i\mathbf{A}\tau}\,d\tau,
+  \label{eq:duhamel}
+\end{equation}
+a nested integral that would be expensive head-on. The auxiliary matrix
+technique of Van Loan~\cite{vanloan1978} and Najfeld and
+Havel~\cite{najfeld1995}, in the form of Eq.~16 of Goodwin and
+Kuprov~\cite{goodwin2015}, obtains it from a single exponential of a
+block-bidiagonal matrix:
+\begin{equation}
+  \exp\!\left(-i
+  \begin{bmatrix}
+    \mathbf{A} & \mathbf{B}\\
+    \mathbf{0} & \mathbf{A}
+  \end{bmatrix}\Delta t\right)
+  =
+  \begin{bmatrix}
+    \mathbf{P} & \mathcal{D}_{\mathbf{B}}\mathbf{P}\\
+    \mathbf{0} & \mathbf{P}
+  \end{bmatrix},
+  \qquad \mathbf{P}=e^{-i\mathbf{A}\Delta t}.
+  \label{eq:auxmat2}
+\end{equation}
+The block structure telescopes: with $N$ diagonal blocks $\mathbf{A}$ and
+directions $\mathbf{B}_1,\ldots,\mathbf{B}_{N-1}$ on the superdiagonal,
+the top-right corner of the exponential contains the nested integral of
+the ordered product of all the directions; for equal directions
+$\mathbf{B}$ it equals the $n$-th derivative divided by $n!$. In
+particular, the $3\times3$ block matrix
+\begin{equation}
+  \exp\!\left(-i
+  \begin{bmatrix}
+    \mathbf{A} & \mathbf{B}_1 & \mathbf{0}\\
+    \mathbf{0} & \mathbf{A}   & \mathbf{B}_2\\
+    \mathbf{0} & \mathbf{0}   & \mathbf{A}
+  \end{bmatrix}\Delta t\right)
+\end{equation}
+delivers in its top-right block the mixed second directional derivative
+(the ordered half; the full mixed derivative is the sum of both orderings,
+and for $\mathbf{B}_1{=}\mathbf{B}_2{=}\mathbf{B}$ the block is
+$\tfrac{1}{2}\mathcal{D}^2_{\mathbf{B}}\mathbf{P}$). The kernel utility
+\code{dirdiff.m} implements exactly this: it builds the $N$-block
+auxiliary matrix, exponentiates it with the standard Spinach
+\code{propagator()} machinery at tightened tolerance, and returns
+$\{\mathbf{P},\,\mathcal{D}\mathbf{P},\,\mathcal{D}^2\mathbf{P},\ldots\}$
+with the factorial factors restored.
+
+Two properties make this exact and cheap: the auxiliary matrix is highly
+sparse when $\mathbf{A}$ and $\mathbf{B}$ are sparse, and --- crucially
+for Liouville space --- the derivative is never needed as a matrix, only
+its \emph{action on a state}. Acting with Eq.~\eqref{eq:auxmat2} on a
+stacked vector,
+\begin{equation}
+  \exp\!\left(-i
+  \begin{bmatrix}
+    \mathbf{A} & \mathbf{B}\\
+    \mathbf{0} & \mathbf{A}
+  \end{bmatrix}\Delta t\right)
+  \begin{bmatrix}\mathbf{0}\\ \boldsymbol{\rho}\end{bmatrix}
+  =
+  \begin{bmatrix}
+    (\mathcal{D}_{\mathbf{B}}\mathbf{P})\,\boldsymbol{\rho}\\
+    \mathbf{P}\,\boldsymbol{\rho}
+  \end{bmatrix},
+  \label{eq:auxvec}
+\end{equation}
+so one call to the Spinach matrix-exponential-times-vector routine
+\code{step()} on a doubled-dimension sparse generator returns the
+derivative applied to the current state. This \emph{auxiliary vector
+trick} is the computational core of the Liouville-space GRAPE gradient.
+
+\subsection{GRAPE in Liouville space}
+\label{sec:grapeliouv}
+
+Let the piecewise-constant generator on interval $n$ be
+\begin{equation}
+  \mathbf{L}_n=\mathbf{L}_0^{(n)}+\sum_{k=1}^{K}c_{kn}\mathbf{C}_k,
+  \qquad
+  \mathbf{P}_n=\exp(-i\mathbf{L}_n\Delta t_n),
+\end{equation}
+where the drift $\mathbf{L}_0^{(n)}$ cycles through the user-supplied
+drift array (one drift, or one per time slice for time-dependent drifts,
+e.g.\ under magic angle spinning). The final state is
+$\boldsymbol{\rho}(T)=\mathbf{P}_N\cdots\mathbf{P}_1\boldsymbol{\rho}_0$
+and the overlap is
+$o=\boldsymbol{\sigma}^{\dagger}\mathbf{P}_N\cdots\mathbf{P}_1
+\boldsymbol{\rho}_0$. Differentiating with respect to $c_{kn}$ touches
+only $\mathbf{P}_n$:
+\begin{equation}
+  \frac{\partial o}{\partial c_{kn}}
+  =\boldsymbol{\sigma}^{\dagger}\,
+   \mathbf{P}_N\cdots\mathbf{P}_{n+1}
+   \left(\mathcal{D}_{\mathbf{C}_k}\mathbf{P}_n\right)
+   \mathbf{P}_{n-1}\cdots\mathbf{P}_1\boldsymbol{\rho}_0
+  =\boldsymbol{\chi}_{n}^{\dagger}
+   \left(\mathcal{D}_{\mathbf{C}_k}\mathbf{P}_n\right)
+   \boldsymbol{\rho}_{n-1},
+  \label{eq:gradliouv}
+\end{equation}
+where the \emph{forward trajectory} and the \emph{adjoint (backward)
+trajectory} are
+\begin{equation}
+  \boldsymbol{\rho}_{n}=\mathbf{P}_n\cdots\mathbf{P}_1
+  \boldsymbol{\rho}_0,
+  \qquad
+  \boldsymbol{\chi}_{n}
+  =\mathbf{P}_{n+1}^{\dagger}\cdots\mathbf{P}_N^{\dagger}\,
+  \boldsymbol{\sigma}.
+  \label{eq:trajectories}
+\end{equation}
+Both trajectories cost one propagation sweep each; all $KN$ gradient
+elements then follow from Eq.~\eqref{eq:auxvec} at one doubled-dimension
+\code{step()} call each, with the stacked vector
+$[\,\mathbf{0};\boldsymbol{\rho}_{n-1}]$ and the auxiliary generator
+built from $\mathbf{L}_n$ and $\mathbf{C}_k$. No propagator and no
+derivative is ever stored as a matrix.
+
+Because Liouvillians need not be Hermitian,
+$\mathbf{P}_n^{\dagger}\neq\mathbf{P}_n^{-1}$ in general, and the adjoint
+trajectory is generated by propagating with the \emph{adjoint generator
+over negative time}:
+$\mathbf{P}_n^{\dagger}=\exp(-i\mathbf{L}_n^{\dagger}(-\Delta t_n))$. The
+kernel therefore builds backward generators from adjoint drifts and
+adjoint control operators and steps them with $-\Delta t$; for Hermitian
+controls this is invisible, and for deliberately non-Hermitian
+(dissipative) controls it produces the correct adjoint. The same
+convention gives correct gradients in the presence of relaxation, where
+fidelity is genuinely lost along the way.
+
+\emph{Keyholes} --- user-supplied linear idempotent maps (projectors)
+applied to the state between intervals --- commute with this scheme: the
+forward pass applies the keyhole after each step, the backward pass
+applies it before the adjoint step at the mirrored position, and since
+projectors are Hermitian the gradient formula~\eqref{eq:gradliouv} is
+unchanged. Frozen waveform elements (a logical mask in
+\code{control.freeze}) are simply skipped, and their gradient entries set
+to zero.
+
+\subsection{GRAPE in Hilbert space}
+\label{sec:grapehilb}
+
+In the \code{zeeman-hilb} formalism the state is a density matrix, the
+propagation is the unitary sandwich of Eq.~\eqref{eq:sandwich}, and all
+generators are required to be Hermitian (this is enforced at problem
+setup). The trajectories are
+\begin{equation}
+  \boldsymbol{\rho}_{n}
+  =\mathbf{P}_n\boldsymbol{\rho}_{n-1}\mathbf{P}_n^{\dagger},
+  \qquad
+  \boldsymbol{\chi}_{n}
+  =\mathbf{P}_{n+1}^{\dagger}\boldsymbol{\chi}_{n+1}\mathbf{P}_{n+1},
+  \qquad \boldsymbol{\chi}_{N}=\boldsymbol{\sigma},
+\end{equation}
+the overlap is the Frobenius inner product
+$o=\Tr[\boldsymbol{\sigma}^{\dagger}\boldsymbol{\rho}_N]$, and the product
+rule applied to the sandwich gives
+\begin{equation}
+  \frac{\partial o}{\partial c_{kn}}
+  =\Braket{\boldsymbol{\chi}_{n}\,|\,
+   (\mathcal{D}_{\mathbf{C}_k}\mathbf{P}_n)\,
+   \boldsymbol{\rho}_{n-1}\mathbf{P}_n^{\dagger}
+   +\mathbf{P}_n\boldsymbol{\rho}_{n-1}\,
+   (\mathcal{D}_{\mathbf{C}_k}\mathbf{P}_n)^{\dagger}},
+  \label{eq:gradhilb}
+\end{equation}
+with $\braket{\mathbf{A}|\mathbf{B}}=\Tr[\mathbf{A}^{\dagger}\mathbf{B}]$.
+Here matrix dimensions are those of Hilbert, not Liouville, space, so
+propagators and their derivatives are computed and stored as matrices:
+\code{dirdiff.m} with two blocks returns $\{\mathbf{P}_n,
+\mathcal{D}\mathbf{P}_n\}$ in one auxiliary exponential per $(k,n)$ pair.
+Second derivatives for the Newton optimiser use the three-block auxiliary
+matrix for $\mathcal{D}^2\mathbf{P}$ (equal and mixed directions) and the
+second-order product rule for the sandwich,
+\begin{equation}
+  \partial^2(\mathbf{P}\boldsymbol{\rho}\mathbf{P}^{\dagger})
+  =(\mathcal{D}^2\mathbf{P})\boldsymbol{\rho}\mathbf{P}^{\dagger}
+  +2\,(\mathcal{D}\mathbf{P})\boldsymbol{\rho}
+      (\mathcal{D}\mathbf{P})^{\dagger}
+  +\mathbf{P}\boldsymbol{\rho}(\mathcal{D}^2\mathbf{P})^{\dagger},
+\end{equation}
+distributed over interval pairs in the same way as in Liouville space
+(Section~\ref{sec:hessians}).
+
+\subsection{Fidelity functionals and their derivatives}
+\label{sec:fidelityfun}
+
+All propagator differentiation above concerns the complex overlap $o$ and
+its derivatives $g_{kn}=\partial o/\partial c_{kn}$ and
+$h_{kn,jm}=\partial^2 o/\partial c_{kn}\partial c_{jm}$. The requested
+fidelity functional is applied at the very end:
+\begin{align}
+  f=\operatorname{Re}o:&\quad
+    \nabla f=\operatorname{Re}\mathbf{g},\quad
+    \nabla^2 f=\operatorname{Re}\mathbf{h};\\
+  f=\operatorname{Im}o:&\quad
+    \nabla f=\operatorname{Im}\mathbf{g},\quad
+    \nabla^2 f=\operatorname{Im}\mathbf{h};\\
+  f=|o|^2=o\bar{o}:&\quad
+    \nabla f=\bar{o}\,\mathbf{g}+o\,\bar{\mathbf{g}}
+    =2\operatorname{Re}(\bar{o}\,\mathbf{g}),\\
+  &\quad
+    \nabla^2 f=\bar{o}\,\mathbf{h}+o\,\bar{\mathbf{h}}
+    +\mathbf{g}\bar{\mathbf{g}}^{\mathrm{T}}
+    +\bar{\mathbf{g}}\mathbf{g}^{\mathrm{T}}.
+\end{align}
+The \code{real} functional is the default and is appropriate for
+state-to-state transfer with a fixed target phase; \code{square} removes
+the phase sensitivity; \code{imag} is occasionally useful for quadrature
+targets.
+
+\subsection{The piecewise-linear (trapezium) integrator}
+\label{sec:trapezium}
+
+Real instruments emit waveforms that ramp linearly between the points of
+the digital-to-analogue converter. On interval $n$ the generator
+interpolates linearly between its edge values,
+$\mathbf{G}(t)=\mathbf{G}_L+(\mathbf{G}_R-\mathbf{G}_L)\,t/\Delta t$,
+where $\mathbf{G}_{L}$ and $\mathbf{G}_{R}$ are built from the nodal
+control coefficients $c_{k,n}$ and $c_{k,n+1}$. The exact propagator is
+the time-ordered exponential; expanding it in the Magnus series and
+keeping the terms through second order gives
+\begin{align}
+  \boldsymbol{\Omega}
+  &=-i\!\int_0^{\Delta t}\!\mathbf{G}(t)\,dt
+    +\frac{1}{2}\int_0^{\Delta t}\!\!\!\int_0^{t_1}
+    \left[-i\mathbf{G}(t_1),-i\mathbf{G}(t_2)\right]dt_2\,dt_1
+    +\cdots\notag\\
+  &=-i\Delta t\,\frac{\mathbf{G}_L+\mathbf{G}_R}{2}
+    +\frac{\Delta t^2}{12}\left[\mathbf{G}_L,\mathbf{G}_R\right]
+    +O(\Delta t^{5}),
+\end{align}
+where the double integral was evaluated using
+$[\mathbf{G}(t_1),\mathbf{G}(t_2)]
+=\frac{t_2-t_1}{\Delta t}[\mathbf{G}_L,\mathbf{G}_R]$. The interval
+propagator is therefore written as a standard exponential of an
+\emph{effective generator},
+\begin{equation}
+  \mathbf{P}=\exp(-i\,\mathbf{G}_{\mathrm{eff}}\,\Delta t),
+  \qquad
+  \mathbf{G}_{\mathrm{eff}}
+  =\frac{\mathbf{G}_L+\mathbf{G}_R}{2}
+   +\frac{i\Delta t}{12}\left[\mathbf{G}_L,\mathbf{G}_R\right],
+  \label{eq:inquad}
+\end{equation}
+the Iserles--N{\o}rsett product quadrature~\cite{iserles1999} used
+throughout Spinach for piecewise-linear
+propagation~\cite{rasulov2023}. The kernel routine \code{step()} applies
+this quadrature when it is given the edge and midpoint generators of an
+interval; the optimal control code supplies
+$\{\mathbf{G}_L,(\mathbf{G}_L{+}\mathbf{G}_R)/2,\mathbf{G}_R\}$ for each
+forward step and the adjoint triple in reverse order for each backward
+step.
+
+Derivatives require one extra chain-rule stage, because each nodal
+coefficient now enters the effective generator both linearly and through
+the commutator. Differentiating Eq.~\eqref{eq:inquad} with respect to the
+left-edge and right-edge coefficients of control $k$:
+\begin{align}
+  \frac{\partial\mathbf{G}_{\mathrm{eff}}}{\partial c_{k}^{(L)}}
+  &=\frac{\mathbf{C}_k}{2}
+   +\frac{i\Delta t}{12}\left[\mathbf{C}_k,\mathbf{G}_R\right]
+  =\frac{\mathbf{C}_k}{2}
+   +\frac{i\Delta t}{12}\left(\left[\mathbf{C}_k,\mathbf{D}_R\right]
+   +\sum_{m}c_{m}^{(R)}\left[\mathbf{C}_k,\mathbf{C}_m\right]\right),
+   \label{eq:dgeffl}\\
+  \frac{\partial\mathbf{G}_{\mathrm{eff}}}{\partial c_{k}^{(R)}}
+  &=\frac{\mathbf{C}_k}{2}
+   +\frac{i\Delta t}{12}\left[\mathbf{G}_L,\mathbf{C}_k\right]
+  =\frac{\mathbf{C}_k}{2}
+   +\frac{i\Delta t}{12}\left(\left[\mathbf{D}_L,\mathbf{C}_k\right]
+   +\sum_{m}c_{m}^{(L)}\left[\mathbf{C}_m,\mathbf{C}_k\right]\right),
+   \label{eq:dgeffr}
+\end{align}
+where $\mathbf{D}_{L,R}$ are the edge drifts. The control--control
+commutators $[\mathbf{C}_k,\mathbf{C}_m]$ do not depend on the waveform;
+they are computed once at problem setup, stored in
+\code{control.cc\_comm}, and a logical table of exactly commuting pairs
+(\code{control.cc\_comm\_idx}) skips the vanishing terms. The kernel
+function \code{aux\_mat.m} assembles
+Eqs.~\eqref{eq:dgeffl}--\eqref{eq:dgeffr} and packs them into the
+auxiliary block matrices of Section~\ref{sec:dirdiff} with
+$\mathbf{A}=\mathbf{G}_{\mathrm{eff}}$ and
+$\mathbf{B}=\partial\mathbf{G}_{\mathrm{eff}}/\partial c$; the propagator
+derivative then follows from the same auxiliary vector trick, applied per
+interval edge.
+
+Since every interior node is the right edge of one interval and the left
+edge of the next, its gradient is a two-term product rule,
+\begin{equation}
+  \frac{\partial o}{\partial c_{kn}}
+  =\boldsymbol{\chi}_{n}^{\dagger}
+   \left(\frac{\partial\mathbf{P}_n}{\partial c_{kn}}\right)
+   \boldsymbol{\rho}_{n-1}
+  +\boldsymbol{\chi}_{n-1}^{\dagger}
+   \left(\frac{\partial\mathbf{P}_{n-1}}{\partial c_{kn}}\right)
+   \boldsymbol{\rho}_{n-2},
+\end{equation}
+with the first and the last node contributing one term only. The
+trapezium integrator is available in both spaces; analytic Hessians are
+not implemented for it, so the optimiser choices are the quasi-Newton
+family (Section~\ref{sec:optimisers}).
+
+\subsection{Analytic Hessians}
+\label{sec:hessians}
+
+For the piecewise-constant integrator, second derivatives of the overlap
+come in two kinds. \emph{Same-interval} elements need the second
+directional derivative of a single propagator,
+\begin{equation}
+  \frac{\partial^2 o}{\partial c_{kn}\partial c_{jn}}
+  =\boldsymbol{\chi}_{n}^{\dagger}\,
+   \mathcal{D}^{2}_{\mathbf{C}_k\mathbf{C}_j}\mathbf{P}_n\,
+   \boldsymbol{\rho}_{n-1},
+\end{equation}
+obtained from the three-block auxiliary matrix of
+Section~\ref{sec:dirdiff}; the code doubles the extracted ordered block,
+which for $k=j$ is exactly $\mathcal{D}^2\mathbf{P}$ and for $k\neq j$
+combines with the transposed assembly below into the symmetric mixed
+derivative. \emph{Cross-interval} elements ($m<n$) factor into two first
+derivatives separated by ordinary propagation,
+\begin{equation}
+  \frac{\partial^2 o}{\partial c_{kn}\partial c_{jm}}
+  =\boldsymbol{\chi}_{n}^{\dagger}
+   \left(\mathcal{D}_{\mathbf{C}_k}\mathbf{P}_n\right)
+   \mathbf{P}_{n-1}\cdots\mathbf{P}_{m+1}
+   \left(\mathcal{D}_{\mathbf{C}_j}\mathbf{P}_m\right)
+   \boldsymbol{\rho}_{m-1}.
+  \label{eq:hesscross}
+\end{equation}
+Two assembly strategies are implemented:
+\begin{description}
+\item[\code{newton}.] The derivative actions
+$(\mathcal{D}_{\mathbf{C}_j}\mathbf{P}_m)\boldsymbol{\rho}_{m-1}$ are
+stored for all $(j,m)$ during a single sweep; then, for each $n$, the
+left factor
+$\boldsymbol{\chi}_{n}^{\dagger}(\mathcal{D}_{\mathbf{C}_k}\mathbf{P}_n)$
+is propagated \emph{backwards} interval by interval with the adjoint
+generators, forming inner products with the stored right factors along
+the way. The cost is one backward sweep per $(k,n)$ pair, all of it
+matrix-vector.
+\item[\code{goodwin}.] Goodwin's acceleration~\cite{goodwin2016} projects
+every derivative action to the common time origin using cumulative
+propagators
+$\mathbf{Q}_n=\mathbf{P}_n\cdots\mathbf{P}_1$:
+Eq.~\eqref{eq:hesscross} becomes a single inner product between
+$\mathbf{Q}_{n-1}$-projected left rows and $\mathbf{Q}$-projected right
+columns, at the price of computing and storing the cumulative propagators
+as matrices. It trades memory for speed on problems where the propagators
+are affordable; it also requires unitary propagation, so all generators
+must be Hermitian (checked at setup).
+\end{description}
+The assembled Hessian is symmetrised, the rows and columns of frozen
+waveform elements are cleared with unit diagonal, and the fidelity chain
+rule of Section~\ref{sec:fidelityfun} is applied. Analytic Hessians are
+available in both spaces for the rectangle integrator in ordinary
+(non-steady-state, undistorted) optimisations.
+
+\subsection{Ensemble optimal control}
+\label{sec:ensembles}
+
+A pulse is useful when it works over the instrument and sample
+inhomogeneities. Spinach optimises the \emph{ensemble average fidelity}
+\begin{equation}
+  \bar{f}=\frac{1}{M}\sum_{i=1}^{M}f_i,
+  \qquad
+  \nabla\bar{f}=\frac{1}{M}\sum_{i=1}^{M}\nabla f_i,
+\end{equation}
+where each ensemble member $i$ is one fully specified simulation --- a
+\emph{case}. Cases are enumerated as the Cartesian product of six
+ensemble dimensions:
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+dimension & source \\
+\midrule
+initial--target state pair      & \code{control.rho\_init} / \code{rho\_targ} cells\\
+drift generator                 & \code{control.drifts} cell array\\
+control power level             & \code{control.pwr\_levels} vector ($B_1$ miscalibration)\\
+resonance offset combination    & \code{control.offsets} / \code{off\_ops} ($B_0$ distribution)\\
+phase cycle line                & \code{control.phase\_cycle} rows\\
+distortion function set         & \code{control.distortion} rows\\
+\bottomrule
+\end{tabular}
+\end{center}
+Offsets enter by adding $2\pi\,\delta_{\nu}\,\mathbf{O}_c$ to the drift of
+the case, where $\delta_\nu$ is the offset value in Hz on channel $c$ and
+$\mathbf{O}_c$ the corresponding offset operator (multiple channels form
+their own Cartesian product). Power levels scale the physical waveform,
+$c=p_i u$, so by the chain rule the reported gradient acquires a factor
+$p_i$ and the Hessian $p_i^2$. Phase cycling multiplies the initial
+state, the target state, and each X/Y control pair by case-specific
+phases (Section~\ref{sec:phasecycle}), with the inverse phases applied to
+the returned gradient and Hessian. Distortion chains and their Jacobians
+are described in Section~\ref{sec:distortions}.
+
+Three \emph{ensemble correlations} (\code{control.ens\_corrs}) restrict
+the Cartesian product to physically correlated combinations:
+\code{rho\_ens} gives each surviving case its own state pair,
+\code{rho\_drift} pairs state $i$ with drift $i$, and \code{power\_drift}
+pairs power $i$ with drift $i$. An \emph{ensemble budget}
+(\code{control.budget}) draws a reproducible random subset of the full
+case list --- either a member count or a fraction --- for stochastic
+robustness at fixed cost. The bookkeeping lives in a six-column integer
+\emph{catalog} built once at problem setup by \code{ens\_catalog.m}
+(Section~\ref{sec:architecture}); the ensemble average runs over the
+catalog rows, and summation order is fixed, so results are deterministic
+and independent of the parallel pool size.
+
+\subsection{Penalty functionals}
+\label{sec:penalties}
+
+Instrumental limits are enforced softly, by subtracting weighted penalty
+terms from the fidelity, Eq.~\eqref{eq:objective}. With the normalised
+waveform $u_{kn}$ ($K$ channels, $N_t$ columns), the implemented
+functionals are:
+\begin{align}
+  P_{\mathrm{NS}}&=\frac{1}{N_t}\sum_{k,n}u_{kn}^{2}
+  &&\text{norm square: favours low power;}\\
+  P_{\mathrm{DNS}}&=\frac{1}{N_t}\sum_{k,n}
+    \left[(\mathbf{u}\mathbf{D}^{\mathrm{T}})_{kn}\right]^{2}
+  &&\text{derivative norm square: favours smoothness,}
+\end{align}
+where $\mathbf{D}$ is a five-point second-derivative matrix with wall
+boundary conditions;
+\begin{equation}
+  P_{\mathrm{SNS}}=\frac{1}{N_t}\sum_{k,n}
+  \left[(u_{kn}-b^{\mathrm{ceil}}_{kn})^2\,\theta(u_{kn}>b^{\mathrm{ceil}}_{kn})
+       +(u_{kn}-b^{\mathrm{floor}}_{kn})^2\,\theta(u_{kn}<b^{\mathrm{floor}}_{kn})
+  \right]
+\end{equation}
+is the \emph{spillout norm square}: zero inside the bounds
+$[\,b^{\mathrm{floor}},b^{\mathrm{ceil}}\,]$ (scalars or per-element
+arrays, in fractions of the power level) and quadratic outside --- the
+default penalty, with weight 100, keeping the waveform inside the
+amplifier range without biasing it inside. $P_{\mathrm{SNSA}}$ is SNS
+applied to the \emph{amplitude} $\sqrt{u_X^2+u_Y^2}$ of each X/Y channel
+pair after a polar transformation (with the exact polar chain rules for
+gradient and Hessian): it caps the pulse amplitude while leaving the
+phase free, which is the physically right constraint for
+amplitude-limited, phase-agile hardware. All penalties return analytic
+gradients and Hessians, which the optimiser combines with the fidelity
+derivatives; penalties act on the ideal normalised waveform, before power
+scaling and before any distortion chain.
+
+\subsection{Stroboscopic steady state}
+\label{sec:steady}
+
+For experiments that repeat a pulse--and--delay block indefinitely (e.g.\
+steady-state DNP), the object of optimisation is not a single transfer
+but the \emph{stroboscopic steady state} of the period map. With the
+period propagator $\mathbf{P}_{\mathrm{tot}}=\mathbf{P}_N\cdots
+\mathbf{P}_1$ (keyholes excluded --- the map must be physical), the
+steady state $\boldsymbol{\rho}_{\mathrm{ss}}$ satisfies
+$\mathbf{P}_{\mathrm{tot}}\boldsymbol{\rho}_{\mathrm{ss}}
+=\boldsymbol{\rho}_{\mathrm{ss}}$ and is found by the kernel
+\code{steady()} routine; relaxation must be present (in Liouville space
+with a thermal fixed point) for the map to be contractive. The fidelity
+is the overlap of a zero-trace observable $\boldsymbol{\sigma}$ with the
+steady state at the stroboscopic grid, and its gradient requires the
+derivative of the fixed point. Writing the steady state as the geometric
+series of period maps acting on the unit-trace component shows that the
+correct adjoint seed is the \emph{dressed target}
+\begin{equation}
+  \boldsymbol{\chi}_0:\quad
+  (\mathbf{1}-\mathbf{P}_{\mathrm{tot}})^{\dagger}\,\boldsymbol{\chi}_0
+  =\boldsymbol{\sigma}
+  \quad\text{on the traceless subspace,}
+\end{equation}
+solved with the unit-state singularity excluded (the code works on the
+subspace orthogonal to the identity; the target must therefore be
+traceless, which is checked). With $\boldsymbol{\rho}_0$ overwritten by
+$\boldsymbol{\rho}_{\mathrm{ss}}$ and $\boldsymbol{\sigma}$ by
+$\boldsymbol{\chi}_0$, the ordinary GRAPE gradient machinery of
+Section~\ref{sec:grapeliouv} then delivers the steady-state fidelity
+derivative. Steady-state mode requires the \code{sphten-liouv} formalism,
+the rectangle integrator, first-order optimisers, and no
+prefix/suffix/dead-time decorations; the initial state supplied by the
+user is ignored (with a warning), because the steady state does not
+depend on it.
+
+\subsection{Phase cycles and cooperative pulses}
+\label{sec:phasecycle}
+
+Phase cycling is built into the ensemble machinery: each line of
+\code{control.phase\_cycle} is
+$[\varphi_{\mathrm{init}},\ \varphi_1,\ldots,\varphi_{K/2},\
+\varphi_{\mathrm{targ}}]$, and the corresponding ensemble case runs with
+$\boldsymbol{\rho}_0\to e^{i\varphi_{\mathrm{init}}}\boldsymbol{\rho}_0$,
+$\boldsymbol{\sigma}\to e^{i\varphi_{\mathrm{targ}}}\boldsymbol{\sigma}$,
+and each X/Y control pair rotated through its phase,
+$(u_X+iu_Y)\to e^{i\varphi_k}(u_X+iu_Y)$. The returned gradient (and
+Hessian) is rotated back through $e^{-i\varphi_k}$, which is the exact
+chain rule of the rotation. Maximising the phase-cycled average fidelity
+produces pulses whose \emph{coherence-pathway-selected sum} behaves as
+specified.
+
+Cooperative pulses~(\code{grape\_coop}) push this one step further for
+phase-modulated point-to-point transfers: two pulses are optimised
+simultaneously so that each maximises its own fidelity while their
+\emph{impurities} --- the projections of the final states off the target
+--- cancel in the sum of the two experiments. The functional is
+\begin{equation}
+  F=\frac{f_a+f_b}{2}
+  -\left\langle\left\|
+   (\mathbf{1}-\mathbf{P}_{\sigma})
+   (\boldsymbol{\rho}_a(T)+\boldsymbol{\rho}_b(T))
+   \right\|^2\right\rangle,
+\end{equation}
+with $\mathbf{P}_{\sigma}$ the projector onto the target state and the
+average running over the ensemble; the impurity gradient is assembled by
+a second pass through the phase-GRAPE machinery with the summed impurity
+as the target. The two phase profiles travel side by side in one
+optimisation vector.
+%===============================================================
+\section{Numerical implementation in Spinach}
+%===============================================================
+
+\subsection{Propagation primitives}
+
+All optimal control code is built on the two kernel propagation
+primitives. Given a generator and an interval, \code{propagator()}
+returns the matrix $\exp(-i\mathbf{L}\Delta t)$ using
+scaled-and-squared Taylor exponentiation with aggressive sparsity
+bookkeeping; small elements are chopped at \code{tols.prop\_chop}, and
+computed propagators are cached (in memory and, for large objects, on
+disk) so that repeated requests are cheap. \code{step()} computes the
+\emph{action} $\exp(-i\mathbf{L}\Delta t)\,\boldsymbol{\rho}$ on a
+state without ever forming the propagator, which is the only practical
+option at Liouville-space dimensions; given a cell array of edge and
+midpoint generators it applies the piecewise-linear product quadrature
+of Section~\ref{sec:trapezium}. The optimal control module uses
+\code{propagator()} where matrices are genuinely needed (Hilbert space,
+steady-state period maps, Goodwin cumulative propagators) and
+\code{step()} everywhere else.
+
+The auxiliary matrices of Section~\ref{sec:dirdiff} are assembled as
+sparse blocks --- the doubled or tripled dimension is harmless because
+the top-right coupling block is as sparse as the control operator ---
+and either exponentiated with \code{propagator()} (Hilbert space, via
+\code{dirdiff.m}) or applied to stacked vectors with \code{step()}
+(Liouville space). Propagation inside the derivative loops runs with
+reporting hushed; the outer functions restore the console before
+printing.
+
+Numerical hygiene points that matter in practice:
+\begin{itemize}
+\item Control operators, offset operators, and drifts are cleaned up
+  (\code{clean\_up}) at problem setup, so numerical dust in the inputs
+  does not degrade the sparsity of the auxiliary matrices.
+\item Where unitary propagation is mathematically required --- Hilbert
+  space, wavefunction formalism, and the Goodwin Hessian --- all
+  generators are checked for Hermiticity at setup and refused otherwise.
+\item Exactly zero fidelity or an exactly zero gradient aborts the run
+  with an explanatory error: the target is unreachable from the source
+  (a symmetry is in the way), or the initial guess is pathologically
+  poor. This check has saved a great many silently useless optimisations.
+\item The first LBFGS iteration takes a deliberately conservative step,
+  $0.01\,\mathbf{g}/\max|\mathbf{g}|$, because the fidelity landscape
+  near a random guess is often violently nonlinear.
+\end{itemize}
+
+\subsection{The optimiser stack}
+\label{sec:optimisers}
+
+The maximiser \code{fmaxnewton(spin\_system,cost\_function,guess)} runs
+the iteration loop for all methods; the objective is called through
+\code{objeval()}, which assembles the total functional of
+Eq.~\eqref{eq:objective} from the fidelity-and-penalties vector returned
+by the cost function, keeps evaluation counters, and reshapes between
+waveform arrays and optimisation vectors.
+
+\begin{description}
+\item[\code{lbfgs}] (default): limited-memory BFGS ascent
+  \cite{liu1989}. The inverse Hessian is applied implicitly from a
+  history of waveform and gradient differences; the history depth is
+  \code{control.n\_grads} (default 50). No regularisation is possible or
+  needed; memory cost is linear in problem size.
+\item[\code{rbfgs}]: full-matrix BFGS pseudo-Hessian, regularised before
+  inversion (below). Useful when the pseudo-Hessian conditioning, not the
+  memory, is the limiting factor.
+\item[\code{newton}]: analytic Hessian of
+  Section~\ref{sec:hessians}, symmetrised and regularised. Quadratic
+  local convergence; each iteration costs one Hessian evaluation.
+\item[\code{goodwin}]: the same Newton step with the cross-interval
+  Hessian assembled through cumulative propagators
+  \cite{goodwin2016}; requires Hermitian generators.
+\end{description}
+
+Newton-family Hessians are made safely negative-definite (this is a
+maximisation) by \emph{rational function optimisation} regularisation
+\cite{banerjee1985} in the kernel routine \code{hessreg()}: the Hessian
+is embedded in an augmented matrix whose scaled eigenvalue problem shifts
+the spectrum away from zero, with the scaling iterated (up to
+\code{reg\_max\_iter}, condition number capped at \code{reg\_max\_cond})
+until the step is well-posed. If a computed direction still fails the
+ascent test $\mathbf{g}^{\mathrm{T}}\mathbf{d}>0$, the optimiser falls
+back to projected steepest ascent for that iteration.
+
+The step length is found by a Fletcher-style two-stage line search
+\cite{fletcher2000}: \code{bracketing()} expands an interval that is
+guaranteed to contain acceptable points, and \code{sectioning()}
+contracts it with cubic interpolation until the strong Wolfe conditions
+hold --- sufficient increase with $c_1=10^{-2}$ and curvature with
+$c_2=0.9$ (bracket expansion factor 3, section contraction bounds 0.1 and
+0.5; these live in \code{control.ls\_*} and rarely need attention).
+Termination is on step norm ($\|\alpha\mathbf{d}\|_1<$ \code{tol\_x},
+default $10^{-3}$), gradient norm ($\|\mathbf{g}\|_2<$ \code{tol\_g},
+default $10^{-6}$), iteration count (\code{max\_iter}, default 100), or a
+failed line search. Every iteration prints fidelity, penalties, total,
+step length, gradient norm, and the angle between the search direction
+and the gradient (SDGA) --- a useful health indicator: it should be well
+below $90^\circ$ and typically shrinks as curvature information
+accumulates.
+
+Optional machinery hanging off the loop: a checkpoint file
+(\code{control.checkpoint}) saves the current waveform in the scratch
+directory after every accepted step and restarts from it if the run is
+interrupted; a video writer (\code{control.video\_file}) grabs the
+diagnostic figure every iteration; a freeze mask
+(\code{control.freeze}) excludes selected waveform elements from the
+optimisation everywhere --- gradient, Hessian, history, and line search.
+
+\subsection{Coordinate systems and wrappers}
+\label{sec:wrappers}
+
+The kernel GRAPE functions differentiate with respect to raw control
+coefficients; user-facing parametrisations are handled by thin wrappers
+that apply exact chain rules:
+
+\begin{description}
+\item[\code{grape\_xy}] --- Cartesian X/Y control amplitudes, the
+  standard entry point, called as the cost function of
+  \code{fmaxnewton}. If a waveform basis $\mathbf{B}$ is supplied
+  (\code{control.basis}, orthonormal rows), the optimisation variables
+  are the expansion coefficients $\mathbf{w}$, the physical waveform is
+  $\mathbf{u}=\mathbf{w}\mathbf{B}$, and gradients pull back through
+  $\mathbf{B}^{\mathrm{T}}$; Hessians are reordered and transformed with
+  the corresponding tensor contraction. Penalties are computed here and
+  returned in the separated fidelity vector.
+\item[\code{grape\_phase}] --- phase-modulated pulses with a fixed
+  amplitude profile (\code{control.amplitudes}): variables are the
+  phases $\varphi_k(t)$, the Cartesian waveform is
+  $(A\cos\varphi,A\sin\varphi)$, and the polar chain rule converts
+  gradients and Hessians; only the phase gradient is returned.
+\item[\code{grape\_curv}] --- arbitrary user-defined curvilinear
+  coordinates: the user supplies $u\!\to\!x$ maps and their Jacobians,
+  and the wrapper applies them; penalties are evaluated in the
+  rectilinear representation.
+\item[\code{grape\_coop}] --- cooperative pulse pairs
+  (Section~\ref{sec:phasecycle}) on top of \code{grape\_phase}.
+\end{description}
+
+A separate special-purpose objective, \code{tgrape()}, differentiates the
+fidelity with respect to the \emph{interval durations} at a fixed
+waveform: since
+$\partial\exp(-i\mathbf{L}\Delta t)/\partial\Delta t
+=-i\mathbf{L}\exp(-i\mathbf{L}\Delta t)$, the duration gradient needs
+only generator actions on the stored trajectory. Durations are passed in
+a user-chosen time unit so that the optimisation variables are of order
+one --- optimisers stall on badly scaled variables.
+
+\subsection{Diagnostics and plotting}
+\label{sec:plotting}
+
+If \code{control.plotting} is non-empty, the client calls
+\code{ctrl\_trajan()} after every objective evaluation with the current
+waveform, trajectory data, and per-case fidelities. Available panels:
+\begin{center}
+\begin{tabular}{lp{8.6cm}}
+\toprule
+waveform & \code{xy\_controls}, \code{phi\_controls},
+           \code{amp\_controls}, \code{frq\_controls}
+           (instantaneous frequency)\\
+trajectory & \code{trajectory}, \code{correlation\_order},
+             \code{coherence\_order}, \code{local\_each\_spin},
+             \code{total\_each\_spin}, \code{level\_populations}\\
+ensemble & \code{robustness} (fidelity across the ensemble)\\
+time-frequency & \code{spectrogram}, \code{time\_by\_slice}\\
+\bottomrule
+\end{tabular}
+\end{center} Trajectory-derived panels force the (large) trajectory stack to
+be returned from the workers, and all plotting runs on the client every
+single evaluation --- hence the setup-time warning that diagnostic plots
+are computationally expensive. \code{control.distplot} optionally applies
+a distortion chain to the waveform before plotting, so that the display
+shows what the hardware would emit.
+
+\subsection{Waveform distortions}
+\label{sec:distortions}
+
+Real pulses are distorted between the waveform generator and the sample
+--- amplifier compression, resonator ringdown, transmission line
+response. Spinach handles this exactly: \code{control.distortion} is a
+cell array of function handles, each mapping a physical waveform to a
+distorted physical waveform and, on request, returning the Jacobian of
+that map. During every ensemble case the chain is applied in sequence,
+\begin{equation}
+  \mathbf{u}_{\mathrm{phys}}
+  =D_M(\cdots D_2(D_1(p\,\mathbf{u}))\cdots),
+  \qquad
+  \mathbf{J}=\mathbf{J}_M\cdots\mathbf{J}_2\mathbf{J}_1,
+\end{equation}
+and the gradient returned by GRAPE is pulled back through
+$\mathbf{J}^{\mathrm{T}}$ before the power-level chain rule. Rows of the
+cell array form an ensemble dimension (distinct distortion realisations
+to be robust against); columns form the chain stages. Distortion
+functions may implement anything differentiable --- RLC response models,
+amplifier saturation curves, measured impulse responses --- and the
+supplied Jacobian is verified by the derivative test examples. Because
+the map composes with the fidelity, only first-order optimisers are
+permitted when distortions are present (\code{lbfgs}); analytic Hessians
+of composed distortion chains are not implemented.
+
+%===============================================================
+\section{Spinach optimal control module architecture}
+\label{sec:architecture}
+%===============================================================
+
+\subsection{Data flow}
+
+An optimal control calculation passes through the following layers, top
+to bottom:
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+layer & role \\
+\midrule
+\code{optimcon()} & parses and freezes the problem, builds the catalog,\\
+                  & publishes worker-resident invariants\\
+\code{fmaxnewton()} & optimiser iterations and line search\\
+\code{objeval()} & objective assembly, counters, reshaping\\
+\code{grape\_xy()} and other wrappers
+                  & coordinate chain rules, penalties\\
+\code{ensemble()} & parallel loop over ensemble cases\\
+\code{grape\_liouv()}, \code{grape\_hilb()} & trajectories and
+                    propagator derivatives\\
+\code{step()}, \code{propagator()}, & \\
+\code{dirdiff()}, \code{aux\_mat()} & propagation primitives\\
+\bottomrule
+\end{tabular}
+\end{center}
+The user builds the \code{control} structure, calls
+\code{spin\_system=optimcon(spin\_system,control)} once, and hands
+\code{fmaxnewton} a cost function --- almost always \code{@grape\_xy} or
+\code{@grape\_phase} --- together with an initial guess.
+
+\subsection{The frozen problem and the worker-resident ensemble}
+
+The architectural principle of the module is:
+\emph{the ensemble is the only parallel dimension, and the
+evaluation-invariant problem data crosses the process boundary exactly
+once per optimisation.}
+
+\code{optimcon()} ends by freezing the problem. It builds the
+\emph{ensemble case catalog} --- the six-column integer array of
+Section~\ref{sec:ensembles}, one row per case, produced by
+\code{ens\_catalog()} together with the dimension sizes --- and then
+publishes the complete frozen problem (the entire \code{spin\_system},
+control structure included, with drifts, control operators, and offset
+operators) to the parallel pool as a \code{parallel.pool.Constant} held
+in \code{control.invariants}. The three heavy generator fields are then
+removed from the client-side structure. A
+\code{parallel.pool.Constant} constructs without a pool, broadcasts
+lazily to pools created later, and survives pool deletion and recreation,
+so serial runs and delayed pool startup work without special cases.
+
+Each objective evaluation calls \code{ensemble()}, which runs a
+\code{parfor} over the catalog rows. Every case fetches the
+worker-resident frozen problem (a fast local dereference), grafts the
+current values of the \emph{live} fields --- states, timings, powers,
+offsets, phase cycle, distortions, freeze mask, fidelity type, plotting
+set, keyholes, and the trapezium commutator tables --- assembles its
+drift (offset terms added per the catalog), applies its phase cycle and
+distortion chain, calls the serial GRAPE kernel, and returns fidelity,
+gradient, and Hessian contributions. The client sums the contributions in
+fixed order and divides by the case count. Per-case propagation is pure
+serial: the eleven interior \code{parfor} loops of the previous
+architecture are gone, along with the time-parallel strategy and all
+\code{ValueStore} traffic.
+
+The consequences, measured on a Liouville dimension 21067 problem with
+36 ensemble cases and 12 process workers: interprocess traffic fell from
+96.97 to 0.20~MB per objective evaluation, and wall clock from 79.9 to
+60.8~s median --- the per-evaluation broadcast serialisation was costing
+about a quarter of the wall time at scale. Only the waveform, the states,
+and small numerics travel at each evaluation.
+
+Because cases are distributed over workers whole, the parallel
+efficiency ceiling is the load balance
+\begin{equation}
+  \eta_{\max}
+  =\frac{M}{W\left\lceil M/W\right\rceil},
+\end{equation}
+for $M$ cases on $W$ workers; \code{optimcon()} prints this number at
+setup. It pays to make the case count a multiple of the worker count
+(e.g.\ 36 cases on 12 workers gives $\eta_{\max}=1$; 37 cases give
+$0.77$). Single-case optimisations do not parallelise --- for those, the
+serial kernel is already the optimum at this granularity.
+
+\subsection{The mutation contract}
+\label{sec:contract}
+
+Freezing the problem draws a sharp line through the
+\code{spin\_system.control} structure that every user of sweep drivers
+should know:
+
+\begin{description}
+\item[May be overwritten between optimisations] (the \emph{live} set):
+  \code{rho\_init}, \code{rho\_targ} (same member counts),
+  \code{pulse\_dt} (same length), \code{pwr\_levels},
+  \code{offsets} (same value counts), \code{phase\_cycle} (same line
+  count), \code{distortion} (same rows), \code{freeze},
+  \code{fidelity}, \code{plotting}, \code{keyholes}, penalties,
+  weights, and bounds. Overwrites take effect at the next objective
+  evaluation --- this is how parameter sweeps reuse one
+  \code{optimcon()} setup across many optimisations.
+\item[Frozen] (changes require a fresh \code{optimcon()} call): the
+  ensemble \emph{composition} --- the member counts of every ensemble
+  dimension, the correlation settings \code{ens\_corrs}, and the budget
+  --- and the generators: \code{drifts}, \code{operators},
+  \code{off\_ops}. The generator fields are physically absent from the
+  client structure after \code{optimcon()}; touching them, or changing
+  anything that alters the case catalog, raises an immediate error
+  rather than silently running a stale ensemble. The guard literally
+  recomputes the catalog from the current control structure at every
+  evaluation and requires it to be identical to the frozen one, so any
+  catalog-defining drift is caught, including settings added in the
+  future.
+\end{description}
+
+Two further architectural guarantees. First, \emph{callbacks see
+everything}: prefix and suffix functions execute on the workers against
+the complete frozen problem with the live fields grafted fresh, so a
+callback that reads \code{control.parameters} --- the designated stash
+for user data, accepted by \code{optimcon()} without parsing --- or any
+other control field behaves exactly as it would client-side. Second,
+\emph{direct low-level calls keep working}: \code{grape\_liouv()} and
+\code{grape\_hilb()} accept the client-side structure with explicit
+drift and control arguments, which is how the shipped regression tests
+drive them.
+
+\subsection{Parallel execution model}
+
+The module never opens or resizes pools on its own: it uses the pool
+that exists (\code{sys.parallel} at \code{create()} time, or an explicit
+\code{parpool} call), and runs serially if there is none ---
+\code{parfor} with a zero worker cap degrades gracefully. Determinism is
+worker-count-independent because summation happens client-side in
+catalog order. The \code{parallel.pool.Constant} transport is documented
+by MathWorks for process-local and cluster pools alike; local process
+pools are the measured configuration.
+
+For very large ensembles, the budget mechanism
+(Section~\ref{sec:ensembles}) bounds the per-evaluation cost; the random
+subset is drawn once, at setup, with a fixed seed, so the optimisation
+surface is deterministic. For very large state spaces with a single
+case, parallelism must come from within the propagation primitives
+(threaded BLAS, GPU arrays supplied as drifts and controls), not from
+the ensemble loop.
+%===============================================================
+\section{Getting started with optimal control in Spinach}
+%===============================================================
+
+\subsection{A complete first example}
+
+The following script designs a pulse that moves longitudinal
+magnetisation from the proton to the carbon in a two-spin system through
+the $J$-coupling, using controls on both channels --- the classic
+state-to-state transfer. It is complete and runnable as shown.
+
+\begin{lstlisting}
+% Parallel pool: eight local process workers
+sys.parallel={'processes',8};
+
+% Magnet and spin system
+sys.magnet=9.4;
+sys.isotopes={'1H','13C'};
+
+% Chemical shifts, ppm, and J-coupling, Hz
+inter.zeeman.scalar={1.0,50.0};
+inter.coupling.scalar=cell(2);
+inter.coupling.scalar{1,2}=140;
+
+% Basis set: full spherical tensor basis, Liouville space
+bas.formalism='sphten-liouv';
+bas.approximation='none';
+
+% Spinach housekeeping
+spin_system=create(sys,inter);
+spin_system=basis(spin_system,bas);
+
+% Drift Liouvillian under the NMR rotating-frame assumptions
+H=hamiltonian(assume(spin_system,'nmr'));
+
+% Normalised initial and target states
+rho_init=state(spin_system,{'Lz'},{1});
+rho_init=rho_init/norm(full(rho_init),2);
+rho_targ=state(spin_system,{'Lz'},{2});
+rho_targ=rho_targ/norm(full(rho_targ),2);
+
+% Control operators: X and Y on both channels
+LxH=operator(spin_system,'Lx','1H');
+LyH=operator(spin_system,'Ly','1H');
+LxC=operator(spin_system,'Lx','13C');
+LyC=operator(spin_system,'Ly','13C');
+
+% Control problem specification
+control.drifts={{H}};                          % drift ensemble: one member
+control.operators={LxH,LyH,LxC,LyC};           % four control channels
+control.rho_init={rho_init};                   % one state pair
+control.rho_targ={rho_targ};
+control.pwr_levels=2*pi*linspace(9e3,11e3,3);  % B1 ensemble, rad/s
+control.pulse_dt=1e-4*ones(1,50);              % 50 steps of 100 us
+control.method='lbfgs';                        % optimiser
+control.max_iter=100;                          % iteration cap
+control.plotting={'xy_controls','robustness'}; % live diagnostics
+
+% Freeze the problem
+spin_system=optimcon(spin_system,control);
+
+% Random normalised initial guess
+guess=randn(4,50)/10;
+
+% Run the optimisation
+pulse=fmaxnewton(spin_system,@grape_xy,guess);
+\end{lstlisting}
+
+Everything before the \code{control} block is ordinary Spinach setup; the
+optimal control part is the control structure, one \code{optimcon()}
+call, and one \code{fmaxnewton()} call. The result \code{pulse} is the
+optimised normalised waveform, one row per control operator, in the same
+layout as the guess.
+
+\subsection{Anatomy of the control structure}
+
+Six fields are mandatory:
+\begin{center}
+\begin{tabular}{lp{9.5cm}}
+\toprule
+field & content \\
+\midrule
+\code{drifts} & drift generators: a cell array over the ensemble of cell
+arrays over time --- \code{\{\{H\}\}} for one static drift;
+\code{\{\{H1\},\{H2\},...\}} for a drift ensemble; each inner array has
+either one element or one per time point for time-dependent drifts\\
+\code{operators} & cell array of control operators\\
+\code{rho\_init} & cell array of initial states (vectors in Liouville
+space, density matrices in Hilbert space)\\
+\code{rho\_targ} & cell array of target states, same length\\
+\code{pwr\_levels} & row vector of nominal control powers, rad/s ---
+more than one value creates a $B_1$ robustness ensemble\\
+\code{pulse\_dt} & row vector of interval durations, seconds\\
+\bottomrule
+\end{tabular}
+\end{center}
+Everything else has a sensible default (Section~\ref{sec:reference}).
+The waveform the optimiser works with is normalised: a value of $1$ on a
+channel means the full nominal power. The guess should therefore be
+order-of-tenths random numbers or a physically motivated shape scaled the
+same way; the number of rows equals the number of control operators, the
+number of columns equals the number of intervals
+(\code{numel(pulse\_dt)}) for the rectangle integrator, one more for the
+trapezium integrator.
+
+\subsection{Reading the console output}
+
+\code{optimcon()} prints one line per parsed option, the ensemble case
+count, the pool size, and the parallel efficiency ceiling ---
+worth a glance before a long run. \code{fmaxnewton()} then prints one
+line per iteration:
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+column & meaning \\
+\midrule
+\code{Iter} & iteration number\\
+\code{\#f, \#g, \#H, \#R} & cumulative objective, gradient, Hessian,
+                            and regularisation counts\\
+\code{fidelity} & current fidelity $f$ \\
+\code{penalties} & current weighted penalty total\\
+\code{total} & the maximised objective, $f-\sum w_jP_j$\\
+\code{alpha} & accepted line search step\\
+\code{|grad|} & gradient 2-norm\\
+\code{SDGA} & angle (degrees) between search direction and gradient\\
+\bottomrule
+\end{tabular}
+\end{center}
+A healthy run shows the total climbing, the gradient norm falling, and
+SDGA well below $90^\circ$. The footer reports which termination
+condition fired. For a state-to-state transfer with the default
+\code{real} fidelity, $f=1$ is a perfect transfer; how close one can get
+depends on the pulse duration relative to the coupling topology and on
+the ensemble spread.
+
+\subsection{Using the result}
+
+The returned waveform is normalised; the physical pulse on channel $k$
+is \code{pwr\_levels(m)*pulse(k,:)} for the power level of interest.
+From here:
+\begin{itemize}
+\item simulate the pulse in any Spinach sequence by adding
+  $\sum_k c_k(t)\,\mathbf{C}_k$ to the drift interval by interval, or by
+  calling the shaped-pulse machinery of the kernel;
+\item export amplitude and phase per channel:
+  $A=\sqrt{u_X^2+u_Y^2}\cdot p/(2\pi)$ in Hz and
+  $\varphi=\operatorname{atan2}(u_Y,u_X)$, then resample to the
+  instrument grid;
+\item verify robustness by evaluating the fidelity over a denser
+  offset/power grid than was optimised over (rebuild the control
+  structure with the dense ensemble, rerun \code{optimcon()}, and call
+  the cost function once with \code{max\_iter=0} or evaluate
+  \code{grape\_xy} directly);
+\item continue the optimisation from the result --- the returned
+  waveform is a valid guess, including across changes of live settings
+  (Section~\ref{sec:contract}).
+\end{itemize}
+
+%===============================================================
+\section{Advanced user manual}
+%===============================================================
+
+\subsection{Robustness ensembles}
+
+The six ensemble dimensions compose freely; the case count is their
+product (after correlations and budget). The two workhorse dimensions:
+
+\emph{$B_1$ miscalibration.} Several entries in \code{pwr\_levels}
+optimise the average fidelity over amplifier miscalibration; three to
+five values spanning $\pm10\%$ around nominal are typical.
+
+\emph{Resonance offset.} \code{control.offsets} is a cell array of row
+vectors of offset values in Hz, one cell per offset channel, with the
+matching operators in \code{control.off\_ops} (typically $2\pi$-free
+$\op{L}_Z$ operators of the irradiated species --- the code multiplies by
+$2\pi$ internally). Multiple channels form a Cartesian product. For a
+broadband proton pulse: \code{control.offsets=\{linspace(-5000,5000,25)\}},
+\code{control.off\_ops=\{LzH\}}.
+
+For drift ensembles (orientations of a powder, conformer sets, hardware
+$B_0$ maps), supply one drift per member; the \code{rho\_drift} and
+\code{power\_drift} correlations bind the state or power dimension to the
+drift dimension when members are physically linked (e.g.\ each crystal
+orientation carrying its own starting state). When the full product is
+too expensive, \code{control.budget} caps the evaluated subset: an
+integer is a member count, a value $\leq1$ is a fraction; the subset is
+drawn once with a fixed seed, so the objective stays deterministic.
+Optimising on a budget subset and \emph{validating on the full grid} is
+standard practice.
+
+\subsection{Time-dependent drifts}
+
+Each drift ensemble member may be a cell array with one generator per
+time point, which is how magic angle spinning, field sweeps, and other
+programmed drift modulations enter: the propagation cycles through the
+inner array as it steps through the pulse. All members must have the same
+number of time slices, and that number must equal the control array
+length. Rotor-synchronised optimal control under MAS is set up exactly
+this way.
+
+\subsection{Phase cycles}
+
+\code{control.phase\_cycle} requires an even number of controls arranged
+in X/Y pairs. Each row is one cycle line:
+$[\varphi_{\mathrm{init}},\varphi_1,\ldots,\varphi_{K/2},
+\varphi_{\mathrm{targ}}]$, radians. The optimiser then maximises the
+average fidelity of the cycle, i.e.\ designs the pulse so that the
+\emph{sum} of the phase-shifted experiments performs the transfer while
+the unwanted pathways cancel. Note that the number of columns is
+$K/2+2$; a receiver phase is folded into $\varphi_{\mathrm{targ}}$.
+
+\subsection{Waveform distortions}
+
+Supply \code{control.distortion} as an $E\times S$ cell array of function
+handles: $S$ chain stages applied left to right, $E$ ensemble rows. Each
+handle must implement
+\begin{lstlisting}
+[wf_out,J]=my_distortion(wf_in)   % J optional, needed for gradients
+\end{lstlisting}
+on the \emph{physical} (power-scaled) waveform, returning the Jacobian of
+the stacked waveform vector on request. Shipped examples cover RLC
+resonator response chains and the associated Jacobians; the derivative
+test suite (\code{examples/fundamentals/derivative\_tests}) shows how to
+verify a hand-written Jacobian against finite differences before trusting
+an optimisation to it. Distortions restrict the optimiser to
+\code{lbfgs}, and combine freely with all other ensemble dimensions ---
+distinct rows model unit-to-unit hardware spread.
+
+\subsection{Keyholes, prefix, suffix, and dead time}
+
+\emph{Keyholes} (\code{control.keyholes}, rectangle integrator only) are
+projectors applied to the state after every interval: a cell array with
+one entry per time point, each empty or a linear idempotent function
+handle (both properties are verified numerically at setup). They
+implement engineered subspace constraints --- decoherence-protected
+manifolds, coherence-order gating --- directly in the trajectory and its
+derivatives.
+
+\emph{Prefix and suffix} (\code{control.prefix} and
+\code{control.suffix}) are function handles with the signature
+\begin{center}
+\code{rho=f(spin\_system,drift,rho)}
+\end{center}
+applied to the initial state before the pulse and to the target state
+before the backward propagation (coded in reverse time), used for fixed
+preparation and readout blocks around the optimised segment. They execute on the parallel workers
+against the complete control structure, so they may read any control
+field, including the free-form \code{control.parameters} stash.
+
+\emph{Dead time} (\code{control.dead\_time}) evolves the target backward
+under the last drift for a fixed delay, producing pulses whose outcome
+survives a receiver dead time; it is applied with the adjoint generator,
+so relaxation during the dead time is handled correctly.
+
+\subsection{Trapezium integrator in practice}
+
+Set \code{control.integrator='trapezium'} and give the waveform (and
+guess) $N+1$ columns for $N$ intervals. The optimised pulse is then
+natively piecewise-linear --- what the instrument plays between DAC
+points --- and the fidelity model error drops from second to fourth
+order in the interval length~\cite{rasulov2023}, which allows far
+coarser time grids at equal accuracy. Restrictions: first-order
+optimisers only (no analytic Hessian), no keyholes, and no steady-state
+mode. Control--control commutators are precomputed at setup; for
+commuting control sets (single-channel X/Y pairs commute with themselves
+only trivially) the extra cost over the rectangle integrator is small.
+
+\subsection{Stroboscopic steady-state optimisation}
+
+Set \code{control.steady=true()}. Requirements: \code{sphten-liouv}
+formalism, relaxation present, rectangle integrator, first-order
+optimiser, traceless target, no prefix/suffix/dead time; the supplied
+initial state is ignored. The optimised functional is the overlap of the
+target observable with the periodic steady state of the
+pulse--and--relaxation cycle --- the natural objective for steady-state
+DNP and related experiments; the \code{steady\_orbit} example family
+shows complete solid effect setups.
+
+\subsection{Second-order methods}
+
+\code{newton} and \code{goodwin} converge in far fewer iterations than
+LBFGS once inside the quadratic basin, at a much higher per-iteration
+cost ($O(K^2N)$ auxiliary propagations for the same-interval blocks plus
+the cross-interval assembly, against $O(KN)$ for the gradient). They pay
+off when the fidelity landscape is stiff --- strongly coupled targets,
+tight bounds through penalties, ill-conditioned bases --- and on modest
+state-space dimensions where propagator matrices are affordable. The RFO
+regularisation makes raw saddle-ridden GRAPE Hessians usable; the
+regularisation iteration count appears in the \code{\#R} column. Goodwin
+assembly additionally requires all generators Hermitian and is the
+faster of the two when its cumulative propagators fit in memory. A
+practical pattern is LBFGS to $f\sim0.9$, then Newton to convergence ---
+run one optimisation, overwrite \code{control.method} is \emph{not}
+possible (method is frozen); instead re-run \code{optimcon()} with the
+new method and pass the LBFGS result as the guess.
+
+\subsection{Penalties, bounds, and freeze masks}
+
+The default is SNS with weight 100 and bounds $\pm1$ --- soft clipping at
+nominal power. To change the admissible corridor, set
+\code{control.u\_bound}/\code{l\_bound} (scalars, or arrays shaped like
+the waveform for time- and channel-dependent envelopes). For
+phase-modulated pulses with a fixed amplitude profile, bounds are
+meaningless (amplitude is fixed); for amplitude-limited phase-agile
+hardware, use \code{SNSA}, which caps
+$\sqrt{u_X^2+u_Y^2}$ instead of the Cartesian components. \code{DNS}
+with a modest weight produces smooth, hardware-friendly waveforms;
+combining \code{\{'SNS','DNS'\}} with weights like \code{[100 10]} is a
+common choice. Weights are part of the objective: check the
+\code{penalties} column stays small compared to the fidelity, otherwise
+the optimiser is fighting the penalty rather than the physics.
+
+\code{control.freeze} is a logical array of the waveform shape: true
+elements are locked at their guess values --- used to pin pulse edges to
+zero, protect hand-designed segments, or optimise one channel at a time.
+For \code{grape\_phase}, the freeze mask has the phase-profile shape and
+is expanded to the Cartesian pairs internally.
+
+\subsection{Sweeps and re-optimisation}
+
+The mutation contract (Section~\ref{sec:contract}) is designed for
+sweep drivers: after one \code{optimcon()} call, loops may overwrite
+live numerical fields --- pulse durations, powers, offset values, phase
+cycles, states, penalties, bounds, plotting --- and re-run
+\code{fmaxnewton()} each time, typically warm-starting from the previous
+result. Composition changes (member counts, correlations, budget) and
+generator changes error out immediately; rebuild the control structure
+and call \code{optimcon()} again --- it is cheap relative to any
+optimisation. For unattended long runs, set \code{control.checkpoint};
+for post-mortem analysis of convergence, \code{control.video\_file}
+records the diagnostic figure per iteration.
+
+\subsection{Parallel performance tuning}
+
+The rules of thumb that follow from the architecture:
+\begin{itemize}
+\item Aim for a case count that is a multiple of the worker count; the
+  setup printout shows the achievable ceiling.
+\item More workers than cases is waste; fewer, heavier cases per worker
+  amortise the fixed per-evaluation costs better than many light ones.
+\item The one-off \code{optimcon()} Constant broadcast scales with the
+  size of drifts and operators; per-evaluation traffic does not. Sweep
+  drivers that re-run \code{optimcon()} in a loop pay the broadcast each
+  time --- restructure so that composition changes are outside the hot
+  loop where possible.
+\item Diagnostics cost real time every evaluation: switch
+  \code{control.plotting} off for production runs and use
+  \code{robustness} plots only while exploring.
+\item On a single case, pool workers are idle by design; large
+  single-system problems should invest in threaded BLAS or GPU operators
+  instead.
+\end{itemize}
+
+%===============================================================
+\section{Complete function and option reference}
+\label{sec:reference}
+%===============================================================
+
+\subsection{\code{optimcon()} options: required fields}
+
+\begin{center}
+\begin{tabular}{lp{4.2cm}p{7.2cm}}
+\toprule
+field & type & meaning and constraints\\
+\midrule
+\code{drifts} & cell of cells of matrices & drift generators, outer
+index over the ensemble, inner over time; inner length 1 or
+\code{pulse\_ntpts}; all members equal inner length; dimensions must
+match the control operators; Hermitian where unitarity is required\\
+\code{operators} & cell of matrices & control operators
+$\mathbf{C}_k$; cleaned up at absorption\\
+\code{rho\_init} & cell & initial states: column vectors
+(\code{sphten-liouv}, \code{zeeman-liouv}, \code{zeeman-wavef}) or
+square matrices (\code{zeeman-hilb})\\
+\code{rho\_targ} & cell & target states, same count and kind as
+\code{rho\_init}\\
+\code{pwr\_levels} & row vector & nominal control powers, rad/s;
+finite, positive; length $>1$ creates the power ensemble\\
+\code{pulse\_dt} & row vector & interval durations, seconds; positive;
+defines \code{pulse\_nsteps}, \code{pulse\_dur}, and
+\code{pulse\_ntpts} (equal to \code{pulse\_nsteps}, or plus one for
+the trapezium integrator)\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{\code{optimcon()} options: optional fields}
+
+\begin{longtable}{lp{2.6cm}p{7.6cm}}
+\toprule
+field & default & meaning and constraints\\
+\midrule
+\endhead
+\code{fidelity} & \code{'real'} & fidelity functional:
+\code{'real'}, \code{'imag'}, or \code{'square'},
+Eq.~\eqref{eq:fidelities}\\
+\code{integrator} & \code{'rectangle'} & \code{'rectangle'}
+(piecewise-constant) or \code{'trapezium'} (piecewise-linear)\\
+\code{method} & \code{'lbfgs'} & optimiser: \code{'lbfgs'},
+\code{'rbfgs'}, \code{'newton'}, \code{'goodwin'}; the last two refuse
+the trapezium integrator and distortions; \code{'goodwin'} requires
+Hermitian generators\\
+\code{steady} & \code{false} & stroboscopic steady-state mode
+(Section~\ref{sec:steady}); many restrictions apply\\
+\code{prefix}, \code{suffix} & none & function handles
+\code{rho=f(spin\_system,drift,rho)} applied before the pulse (initial
+state) and to the target in reverse time\\
+\code{dead\_time} & \code{0} & receiver dead time, seconds,
+non-negative; target evolved backwards under the last drift\\
+\code{offsets} + \code{off\_ops} & none & offset ensembles: cell of row
+vectors (Hz) and matching cell of offset operators; both together;
+same channel count; operator dimensions must match controls\\
+\code{carrier\_ops} + \code{carrier\_frq} & none & Bloch--Siegert
+carrier data, absorbed together; reserved for future use --- no
+consumer in the current kernel\\
+\code{amplitudes} & --- & fixed amplitude profile for
+\code{grape\_phase}; validated there\\
+\code{freeze} & none & logical waveform-shaped mask of elements
+excluded from optimisation; may not freeze everything\\
+\code{max\_iter} & \code{100} & iteration cap, non-negative integer;
+zero evaluates and plots once\\
+\code{tol\_x} & \code{1e-3} & termination on step 1-norm\\
+\code{tol\_g} & \code{1e-6} & termination on gradient 2-norm\\
+\code{n\_grads} & \code{50} & LBFGS/RBFGS history depth, integer
+$\geq2$\\
+\code{phase\_cycle} & none & cycle lines
+$[\varphi_{\mathrm{init}},\varphi_{1..K/2},\varphi_{\mathrm{targ}}]$,
+radians; requires an even control count; $K/2+2$ columns\\
+\code{basis} & none & orthonormal waveform basis, rows are basis
+functions, \code{pulse\_ntpts} columns; optimisation runs in
+coefficient space\\
+\code{keyholes} & none & cell of \code{pulse\_ntpts} entries, each
+empty or a linear idempotent function handle; rectangle integrator
+only\\
+\code{penalties} + \code{p\_weights} & \code{\{'SNS'\}}, \code{100} &
+penalty types from \code{'none'}, \code{'NS'}, \code{'SNS'},
+\code{'SNSA'}, \code{'DNS'} with non-negative weights, both together,
+equal counts\\
+\code{u\_bound}, \code{l\_bound} & \code{+1}, \code{-1} & SNS
+corridor in fractions of the power level; scalars or waveform-shaped
+arrays; arrays are incompatible with SNSA and with amplitude-profile
+optimisations\\
+\code{ens\_corrs} & \code{\{\}} & ensemble correlations from
+\code{'rho\_ens'}, \code{'rho\_drift'}, \code{'power\_drift'}\\
+\code{budget} & \code{Inf} & ensemble budget: integer member count
+($>1$) or fraction ($\leq1$); reproducible random subset\\
+\code{plotting} & \code{\{\}} & diagnostic panels
+(Section~\ref{sec:plotting}); expensive\\
+\code{distplot} & \code{\{\}} & distortion chain applied to the
+plotted waveform only\\
+\code{distortion} & none & $E\times S$ cell of distortion function
+handles with Jacobians; forces \code{lbfgs}\\
+\code{traj\_opts} & \code{\{\}} & \code{\{'average'\}} returns the
+ensemble-averaged trajectory\\
+\code{checkpoint} & none & checkpoint file name in the scratch
+directory; saves after every accepted step, restarts if present\\
+\code{video\_file} & none & MJPEG video of the diagnostic figure;
+requires plotting\\
+\code{parameters} & none & free-form user data, absorbed without
+parsing; visible to callbacks everywhere\\
+\bottomrule
+\end{longtable}
+
+Unrecognised fields are reported by name and refused --- a typo cannot
+silently become a no-op.
+
+\subsection{Fields created by \code{optimcon()}}
+
+For sweep drivers and callback authors, the frozen structure contains,
+besides the absorbed options: \code{ncontrols} and \code{ndrifts}
+(counts), \code{pulse\_dur}, \code{pulse\_nsteps}, \code{pulse\_ntpts}
+(timing), \code{cc\_comm} and \code{cc\_comm\_idx} (trapezium
+control--control commutators and their zero table), \code{catalog} and
+\code{ens\_sizes} (the ensemble case catalog and dimension sizes),
+\code{invariants} (the worker-resident frozen problem,
+a \code{parallel.pool.Constant}), the line search and regularisation
+constants (\code{ls\_c1}, \code{ls\_c2}, \code{ls\_tau1},
+\code{ls\_tau2}, \code{ls\_tau3}, \code{reg\_max\_iter},
+\code{reg\_alpha}, \code{reg\_phi}, \code{reg\_max\_cond}), and the
+parsed forms of every option above. The fields \code{drifts},
+\code{operators}, and \code{off\_ops} are \emph{absent} from the
+returned structure --- they live on the workers.
+
+\subsection{Public functions}
+
+\begin{description}
+\item[\code{spin\_system=optimcon(spin\_system,control)}] --- parses,
+  validates, and freezes the optimal control problem; builds the
+  ensemble catalog; publishes the worker-resident invariants.
+\item[\code{[x,data]=fmaxnewton(spin\_system,cost\_function,guess)}]
+  --- maximises the objective from \code{guess}; returns the optimal
+  waveform and a diagnostics structure (\code{data.count.*} counters,
+  \code{data.fx\_sep\_pen} fidelity-and-penalties vector of the last
+  evaluation, \code{data.traj\_data} trajectory data).
+\item[\code{[traj,fid,grad,hess]=grape\_xy(waveform,spin\_system)}] ---
+  Cartesian cost function: ensemble fidelity with penalties separated
+  (\code{fid(1)} fidelity, \code{fid(2:end)} weighted penalties;
+  gradients and Hessians stacked accordingly in the third dimension).
+\item[\code{[traj,fid,grad,hess]=grape\_phase(phi,spin\_system)}] ---
+  phase-modulated cost function over a fixed amplitude profile.
+\item[\code{[traj,fid,df\_du]=grape\_curv(u,u2x,dx\_du,spin\_system)}]
+  --- curvilinear-coordinate cost function with user Jacobians.
+\item[\code{[traj,fid,grad]=grape\_coop(phi,spin\_system)}] ---
+  cooperative pulse pairs; the two phase profiles are stacked
+  vertically.
+\item[\code{[traj,fid,grad,hess]=ensemble(waveform,spin\_system)}] ---
+  the parallel ensemble average of the bare fidelity (no penalties);
+  called by the wrappers, callable directly.
+\item[\code{tgrape()}] ---
+  \code{[fid,grad]=tgrape(spin\_system,drift,controls,}
+  \code{waveform,dt\_grid,time\_unit,rho\_init,rho\_targ)}:
+  fidelity and its gradient with respect to interval durations at a
+  fixed waveform.
+\item[\code{[catalog,ens\_sizes]=ens\_catalog(control)}] --- the
+  ensemble case catalog: one row per case, columns indexing the state
+  pair, drift, power, offset combination, phase cycle line, and
+  distortion row.
+\item[\code{[p,pg,ph]=penalty(wf,type,fb,cb)}] --- penalty value,
+  gradient, and Hessian for a waveform between floor and ceiling
+  bounds.
+\item[\code{ctrl\_trajan(spin\_system,waveform,traj,fids)}] ---
+  diagnostic plotting; called internally, configured through
+  \code{control.plotting}.
+\end{description}
+
+\subsection{Low-level and internal functions}
+
+\code{grape\_liouv()} and \code{grape\_hilb()} are the serial GRAPE
+kernels (trajectories, gradients, Hessians for one ensemble case); they
+accept the client-side structure with explicit drift and control
+arguments and are the right entry point for custom ensemble schemes and
+for regression tests. \code{aux\_mat()} builds the trapezium auxiliary
+matrices, Eqs.~\eqref{eq:dgeffl}--\eqref{eq:dgeffr}; \code{dirdiff()}
+(kernel utilities) implements the $N$-block directional derivatives;
+\code{objeval()} assembles the total objective; \code{lbfgs()},
+\code{bfgs()}, \code{hessreg()}, \code{bracketing()},
+\code{sectioning()}, and \code{cubic\_interp()} are the optimiser
+internals; \code{fapt2sfo()} and \code{inst\_freq()} support the
+diagnostics.
+
+\subsection{Compatibility matrix}
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+feature & \code{rectangle} & \code{trapezium}\\
+\midrule
+LBFGS / RBFGS            & yes & yes\\
+Newton / Goodwin Hessians & yes & no\\
+keyholes                 & yes & no\\
+waveform distortions     & LBFGS only & LBFGS only\\
+stroboscopic steady state & yes (see below) & no\\
+phase cycles, offsets, powers, drifts ensembles & yes & yes\\
+prefix / suffix / dead time & yes & yes (not steady)\\
+waveform basis            & yes & yes\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Steady-state mode additionally requires \code{sphten-liouv}, a
+first-order optimiser, a traceless target, and no
+prefix/suffix/dead-time; Hilbert space (\code{zeeman-hilb}),
+wavefunction formalism, and the Goodwin method require all generators
+Hermitian; phase cycles require an even number of controls; SNSA and
+amplitude-profile optimisations require scalar bounds; array bounds
+require SNS.
+
+%===============================================================
+\begin{thebibliography}{10}
+%===============================================================
+
+\bibitem{khaneja2005}
+N.~Khaneja, T.~Reiss, C.~Kehlet, T.~Schulte-Herbr\"uggen, S.J.~Glaser,
+\emph{Optimal control of coupled spin dynamics: design of NMR pulse
+sequences by gradient ascent algorithms},
+J.~Magn.~Reson.\ \textbf{172} (2005) 296--305.
+
+\bibitem{defouquieres2011}
+P.~de~Fouquieres, S.G.~Schirmer, S.J.~Glaser, I.~Kuprov,
+\emph{Second order gradient ascent pulse engineering},
+J.~Magn.~Reson.\ \textbf{212} (2011) 412--417.
+
+\bibitem{goodwin2015}
+D.L.~Goodwin, I.~Kuprov,
+\emph{Auxiliary matrix formalism for interaction representation
+transformations, optimal control, and spin relaxation theories},
+J.~Chem.~Phys.\ \textbf{143} (2015) 084113.
+
+\bibitem{goodwin2016}
+D.L.~Goodwin, I.~Kuprov,
+\emph{Modified Newton--Raphson GRAPE methods for optimal control of
+spin systems},
+J.~Chem.~Phys.\ \textbf{144} (2016) 204107.
+
+\bibitem{najfeld1995}
+I.~Najfeld, T.F.~Havel,
+\emph{Derivatives of the matrix exponential and their computation},
+Adv.~Appl.~Math.\ \textbf{16} (1995) 321--375.
+
+\bibitem{vanloan1978}
+C.F.~Van~Loan,
+\emph{Computing integrals involving the matrix exponential},
+IEEE Trans.\ Autom.\ Control \textbf{23} (1978) 395--404.
+
+\bibitem{rasulov2023}
+U.~Rasulov, A.~Acharya, M.~Carravetta, G.~Mathies, I.~Kuprov,
+\emph{Simulation and design of shaped pulses beyond the
+piecewise-constant approximation},
+J.~Magn.~Reson.\ \textbf{353} (2023) 107478.
+
+\bibitem{iserles1999}
+A.~Iserles, S.P.~N{\o}rsett,
+\emph{On the solution of linear differential equations in Lie groups},
+Phil.~Trans.~R.~Soc.~Lond.~A \textbf{357} (1999) 983--1019.
+
+\bibitem{liu1989}
+D.C.~Liu, J.~Nocedal,
+\emph{On the limited memory BFGS method for large scale optimization},
+Math.~Program.\ \textbf{45} (1989) 503--528.
+
+\bibitem{banerjee1985}
+A.~Banerjee, N.~Adams, J.~Simons, R.~Shepard,
+\emph{Search for stationary points on surfaces},
+J.~Phys.~Chem.\ \textbf{89} (1985) 52--57.
+
+\bibitem{fletcher2000}
+R.~Fletcher,
+\emph{Practical Methods of Optimization}, 2nd ed., Wiley, 2000.
+
+\bibitem{hogben2011}
+H.J.~Hogben, M.~Krzystyniak, G.T.P.~Charnock, P.J.~Hore, I.~Kuprov,
+\emph{Spinach --- a software library for simulation of spin dynamics
+in large spin systems},
+J.~Magn.~Reson.\ \textbf{208} (2011) 179--194.
+
+\bibitem{kuprov2023}
+I.~Kuprov,
+\emph{Spin: From Basic Symmetries to Quantum Optimal Control},
+Springer, 2023.
+
+\end{thebibliography}
+
+\end{document}

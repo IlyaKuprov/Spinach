@@ -17,15 +17,16 @@
 %     spin_system  - updated Spinach data structure
 %
 % Note: this function freezes the optimisation problem. The ensemble
-%       case catalog is built here, and the evaluation-invariant data
-%       (drift generators, control operators, and offset operators)
-%       is published to the parallel pool workers exactly once, as a
-%       parallel.pool.Constant held in spin_system.control.invariants;
-%       those three fields are then removed from the returned struc-
-%       ture. Numerical values of timings, powers, offsets, phases,
-%       states, and penalties may be overwritten between optimisati-
-%       ons; changes to the ensemble composition, the operators, or
-%       the generators require a fresh optimcon() call.
+%       case catalog is built here, and the complete frozen problem,
+%       including the drift generators, the control operators, and
+%       the offset operators, is published to the parallel pool wor-
+%       kers exactly once, as a parallel.pool.Constant held in
+%       spin_system.control.invariants; those three heavy fields are
+%       then removed from the returned structure. Numerical values
+%       of timings, powers, offsets, phases, states, and penalties
+%       may be overwritten between optimisations; changes to the en-
+%       semble composition, the operators, or the generators require
+%       a fresh optimcon() call.
 %
 % david.goodwin@inano.au.dk
 % u.rasulov@soton.ac.uk
@@ -1334,22 +1335,8 @@ if nworkers>0
                         num2str(balance,'%.3f')]);
 end
 
-% Pack the evaluation-invariant problem data
-worker_data=spin_system; worker_data.control=struct();
-worker_data.control.integrator=spin_system.control.integrator;
-worker_data.control.method=spin_system.control.method;
-worker_data.control.steady=spin_system.control.steady;
-worker_data.control.dead_time=spin_system.control.dead_time;
-worker_data.control.prefix=spin_system.control.prefix;
-worker_data.control.suffix=spin_system.control.suffix;
-worker_data.control.pulse_nsteps=spin_system.control.pulse_nsteps;
-worker_data.control.pulse_ntpts=spin_system.control.pulse_ntpts;
-worker_data.control.operators=spin_system.control.operators;
-worker_data.control.off_ops=spin_system.control.off_ops;
-worker_data.control.drifts=spin_system.control.drifts;
-
-% Publish the invariants to the parallel pool, once per problem
-spin_system.control.invariants=parallel.pool.Constant(worker_data);
+% Publish the complete frozen problem to the pool, once per problem
+spin_system.control.invariants=parallel.pool.Constant(spin_system);
 
 % Keep heavy invariants off the per-evaluation communication path
 spin_system.control=rmfield(spin_system.control,{'operators','off_ops','drifts'});

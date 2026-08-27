@@ -97,8 +97,15 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     ss=invariants.Value;
 
     % Graft the evaluation-variable settings
+    ss.control.rho_init=live.rho_init;
+    ss.control.rho_targ=live.rho_targ;
     ss.control.pulse_dt=live.pulse_dt;
+    ss.control.pwr_levels=live.pwr_levels;
+    ss.control.offsets=live.offsets;
+    ss.control.phase_cycle=live.phase_cycle;
+    ss.control.distortion=live.distortion;
     ss.control.freeze=live.freeze;
+    ss.control.fidelity=live.fidelity;
     ss.control.plotting=live.plotting;
     ss.control.keyholes=live.keyholes;
     ss.control.return_traj=live.return_traj;
@@ -468,19 +475,10 @@ end
 if numel(spin_system.control.pulse_dt)~=spin_system.control.pulse_nsteps
     error('the length of control.pulse_dt has changed, re-run optimcon().');
 end
-if ~isempty(spin_system.control.offsets)
-    n_offset_vals=prod(cellfun(@numel,spin_system.control.offsets));
-else
-    n_offset_vals=1;
-end
-live_sizes=[numel(spin_system.control.rho_init) ...
-            spin_system.control.ndrifts ...
-            numel(spin_system.control.pwr_levels) ...
-            n_offset_vals ...
-            size(spin_system.control.phase_cycle,1) ...
-            size(spin_system.control.distortion,1)];
+[catalog_now,ens_sizes_now]=ens_catalog(spin_system.control);
 if (numel(spin_system.control.rho_targ)~=numel(spin_system.control.rho_init))||...
-   any(live_sizes~=spin_system.control.ens_sizes)
+   (~isequal(ens_sizes_now,spin_system.control.ens_sizes))||...
+   (~isequal(catalog_now,spin_system.control.catalog))
     error('ensemble composition changed after optimcon(), re-run optimcon().');
 end
 end

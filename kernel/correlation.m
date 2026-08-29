@@ -6,7 +6,9 @@
 %
 % Parameters:
 %
-%   rho     -  a state vector or a horizontal stack thereof
+%   rho     -  a state vector or a horizontal stack thereof;
+%              in zeeman-hilb, a density matrix or a horizon-
+%              tal stack thereof
 %
 %   correlation_orders  -  a row vector of correlation
 %                          orders to keep
@@ -19,11 +21,13 @@
 %   rho     - the state vector with the undesired orders of
 %             spin correlations zeroed out
 %
-% Note: this function requires sphten-liouv or zeeman-liouv formalism
-%       and supports Fokker-Planck direct products. In zeeman-liouv the
+% Note: this function requires sphten-liouv, zeeman-liouv, or zeeman-
+%       hilb formalism; Fokker-Planck direct products are supported in
+%       the Liouville space formalisms. In the Zeeman formalisms the
 %       selection is an exact projection built from per-spin identity
-%       component channels because correlation order is not diagonal in
-%       the Zeeman basis of Liouville space.
+%       component channels because correlation order is not diagonal
+%       in the Zeeman basis; zeeman-hilb density matrices are stretch-
+%       ed into Liouville space, filtered there, and folded back.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -40,6 +44,9 @@ grumble(spin_system,rho,orders,spins)
 
 % Store dimension statistics
 spn_dim=size(spin_system.bas.basis,1);
+if strcmp(spin_system.bas.formalism,'zeeman-hilb')
+    spn_dim=spn_dim^2;
+end
 spc_dim=numel(rho)/spn_dim;
 problem_dims=size(rho);
 
@@ -72,7 +79,7 @@ switch spin_system.bas.formalism
         % Apply the mask
         rho(~state_mask,:)=0;
 
-    case 'zeeman-liouv'
+    case {'zeeman-liouv','zeeman-hilb'}
 
         % Hilbert space dimension and multiplicities
         dim=prod(spin_system.comp.mults);
@@ -128,8 +135,8 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,rho,correlation_orders,spins)
-if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
-    error('analytical correlation order selection is only available for sphten-liouv and zeeman-liouv formalisms.');
+if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv','zeeman-hilb'})
+    error('analytical correlation order selection is only available for sphten-liouv, zeeman-liouv, and zeeman-hilb formalisms.');
 end
 if ~isnumeric(rho)
     error('the state vector(s) must be numeric.');

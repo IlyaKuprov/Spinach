@@ -7,10 +7,12 @@
 %
 % Parameters:
 %
-%     L     - Liouvillian superoperator, this may be left empty
+%     L     - Liouvillian superoperator or, in zeeman-hilb,
+%             the Hamiltonian; this may be left empty
 %
-%     rho   - state vector or a horizontal stack thereof, this
-%             may be left empty
+%     rho   - state vector or a horizontal stack thereof or,
+%             in zeeman-hilb, a density matrix or a horizon-
+%             tal stack thereof; this may be left empty
 %
 %     spins - spins to be wiped, specified either by name, e.g.
 %             {'13C','1H'}, or by a list of numbers, e.g. [1 2]
@@ -26,12 +28,16 @@
 % Note: this function is an analytical equivalent of a perfect decoup-
 %       ling pulse sequence on the specified spins.
 %
-% Note: this function requires sphten-liouv or zeeman-liouv formalism
-%       and supports Fokker-Planck direct products. In zeeman-liouv the
+% Note: this function requires sphten-liouv, zeeman-liouv, or zeeman-
+%       hilb formalism; Fokker-Planck direct products are supported in
+%       the Liouville space formalisms. In the Zeeman formalisms the
 %       operation is an exact projection onto the subspace where the
 %       decoupled spins carry only their identity component, because
-%       spin involvement is not diagonal in the Zeeman basis of the
-%       Liouville space.
+%       spin involvement is not diagonal in the Zeeman basis. In
+%       zeeman-hilb, the Hamiltonian and the density matrices are
+%       stretched into Liouville space, projected there, and folded
+%       back; this replaces every decoupled-spin factor of the Hamil-
+%       tonian by its identity component average.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -72,7 +78,7 @@ switch spin_system.bas.formalism
         % Get the list of states to be wiped
         zero_mask=(sum(spin_system.bas.basis(:,dec_mask),2)~=0);
 
-    case 'zeeman-liouv'
+    case {'zeeman-liouv','zeeman-hilb'}
 
         % Hilbert space dimension and multiplicities
         dim=prod(spin_system.comp.mults);
@@ -128,6 +134,11 @@ if (nargout>0)&&(~isempty(L))
             % Apply the projector from both sides
             L=fp_proj*L*fp_proj;
 
+        case 'zeeman-hilb'
+
+            % Stretch, project, and fold the Hamiltonian
+            L=reshape(P*L(:),size(L));
+
     end
 
     % Re-evaluate sparsity
@@ -168,6 +179,11 @@ if (nargout>1)&&(~isempty(rho))
             % Apply the projector
             rho=fp_proj*rho;
 
+        case 'zeeman-hilb'
+
+            % Stretch, project, and fold the state stack
+            rho=reshape(P*reshape(rho,spn_dim^2,[]),size(rho));
+
     end
 
 end
@@ -176,8 +192,8 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,L,rho,spins)
-if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
-    error('analytical decoupling is only available for sphten-liouv and zeeman-liouv formalisms.');
+if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv','zeeman-hilb'})
+    error('analytical decoupling is only available for sphten-liouv, zeeman-liouv, and zeeman-hilb formalisms.');
 end
 if (~isempty(rho))&&(~isempty(L))&&(size(L,2)~=size(rho,1))
     error('matrix dimensions of L and rho must agree.');

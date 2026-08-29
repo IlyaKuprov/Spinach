@@ -114,7 +114,7 @@ report(spin_system,['non-empty spherical ranks in Q: ' num2str(int_ranks)]);
 max_int=max([int_ranks 2]);
 
 % Warn about truncated rotor harmonics
-if max_int>parameters.max_rank
+if any(int_ranks>parameters.max_rank)
     report(spin_system,'WARNING - max_rank is below an interaction rank, its harmonics are truncated.');
 end
 

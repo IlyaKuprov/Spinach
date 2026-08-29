@@ -66,15 +66,15 @@ switch parameters.orientation
 
     case '100'
 
-        R=rotmat_align([1 1 1],[1 0 0]);
+        R=rotmat_align([1 0 0],[0 0 1])*crys2def';
 
     case '110'
 
-        R=rotmat_align([1 1 1],[1 1 0]);
+        R=rotmat_align([1 1 0],[0 0 1])*crys2def';
 
     case '111'
 
-        R=eye(3);
+        R=rotmat_align([1 1 1],[0 0 1])*crys2def';
 
     otherwise
 

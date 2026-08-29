@@ -41,6 +41,9 @@ static inline double clamp_value(const double x,const double lo,const double hi)
 
 static inline void append_root(double *roots,mwSize& n_roots,double root,const double root_tol)
 {
+    if (n_roots>=3)
+        return;
+
     if (!std::isfinite(root))
         return;
 

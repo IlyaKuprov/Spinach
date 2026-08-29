@@ -7,8 +7,8 @@
 %     result  - regression test result with explanatory messages
 %
 % The test checks cacheman() and wipe_cache() against a temporary scratch
-% directory, loads shipped small cache tables without generating new kernel
-% cache files, and smoke-tests the read-only sniff() integrity pass.
+% directory, loads shipped small cache tables, exercises the on-demand
+% SLE operator cache, and smoke-tests the read-only sniff() integrity pass.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -78,8 +78,6 @@ result=test_true(result,'st_product_table shipped cache',exist(fullfile(cache_ro
                  'the shipped two-level ST product table cache should be available');
 result=test_true(result,'bos_product_table shipped cache',exist(fullfile(cache_root,'bos_product_table_2.mat'),'file')==2,...
                  'the shipped two-level bosonic product table cache should be available');
-result=test_true(result,'sle_operators shipped cache',exist(fullfile(cache_root,'sle_operators_rank_1_int_2.mat'),'file')==2,...
-                 'the shipped rank-one spin-one SLE operator cache should be available');
 
 % Load small cache-table records and check their dimensions
 [st_left,st_right]=st_product_table(2);
@@ -96,6 +94,8 @@ result=test_true(result,'sle_operators dimensions',isequal(size(Lx),[10 10])&&is
                  isequal(size(Lz),[10 10])&&iscell(D)&&isequal(size(D),[1 2])&&...
                  isempty(D{1})&&isequal(size(D{2}),[5 5])&&isequal(size(space_basis),[10 3]),...
                  'rank-one SLE operators must match the ten-function Wigner basis');
+result=test_true(result,'sle_operators cache record',exist(fullfile(cache_root,'sle_operators_rank_1_int_2.mat'),'file')==2,...
+                 'sle_operators() should create or reuse its on-demand cache record');
 
 % Smoke-test the read-only integrity sniffer without requiring a pristine tree
 old_dir=pwd;

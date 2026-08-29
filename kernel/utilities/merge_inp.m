@@ -42,6 +42,7 @@ grumble(sys_parts,inter_parts);
 
 % Count the spins in each subsystem
 part_sizes=cellfun(@(x)numel(x.isotopes),sys_parts);
+part_sizes=part_sizes(:).';
 
 % Create structure stubs
 sys.stub=1; inter.stub=1;

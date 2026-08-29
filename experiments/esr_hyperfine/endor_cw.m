@@ -27,6 +27,9 @@
 
 function fid=endor_cw(spin_system,parameters,H,R,K)
 
+% Move into adjoint representation if needed
+[spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K);
+
 % Consistency check
 grumble(spin_system,parameters,H,R,K);
 

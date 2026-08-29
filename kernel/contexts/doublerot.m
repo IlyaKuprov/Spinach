@@ -1,6 +1,9 @@
-% Fokker-Planck double angle spinning context. Generates a Liouvillian
-% superoperator and passes it on to the pulse sequence function, which
-% should be supplied as a handle. Syntax:
+% Double angle spinning context. In Liouville space, this wrapper builds
+% the Fokker-Planck evolution generator and passes it on to the pulse se-
+% quence function, which should be supplied as a handle. In Hilbert space,
+% this wrapper builds the stack of spin Hamiltonians, one for each pair of
+% rotor phases on the two-rotor phase grid, and hands that stack to the
+% pulse sequence. Syntax:
 %
 %      [answer,sph_grid]=doublerot(spin_system,pulse_sequence,...
 %                                  parameters,assumptions)
@@ -47,7 +50,10 @@
 %                         laboratory frame.
 %
 %   parameters.grid     - spherical grid file name. See grids
-%                         directory in the kernel.
+%                         directory in the kernel. Two-angle
+%                         grids should be used in Liouville
+%                         space and three-angle grids in Hil-
+%                         bert space.
 %
 %   parameters.needs    - a cell array of character strings spe-
 %                         cifying additional requirements that
@@ -112,7 +118,7 @@ parameters=defaults(spin_system,parameters);
 grumble(spin_system,pulse_sequence,parameters,assumptions);
 
 % Report to the user
-report(spin_system,'building the Liouvillian...');
+report(spin_system,'building the evolution generator...');
 
 % Set the assumptions
 spin_system=assume(spin_system,assumptions);
@@ -141,7 +147,6 @@ npoints_total=npoints_outer*npoints_inner;
 spc_dim=npoints_total; spn_dim=size(H,1);
 report(spin_system,['lab space problem dimension     ' num2str(spc_dim)]);
 report(spin_system,['spin space problem dimension    ' num2str(spn_dim)]);
-report(spin_system,['Fokker-Planck problem dimension ' num2str(spc_dim*spn_dim)]);
 parameters.spc_dim=spc_dim; parameters.spn_dim=spn_dim;
 
 % Compute spectral derivative operators
@@ -152,9 +157,31 @@ parameters.spc_dim=spc_dim; parameters.spn_dim=spn_dim;
 phases_outer=kron(traj_outer,ones(npoints_inner,1));
 phases_inner=kron(ones(npoints_outer,1),traj_inner);
 
-% Compute double spinning operator
-M=2*pi*kron((parameters.rate_outer*kron(d_dphi_outer,speye(size(d_dphi_inner)))+...
-             parameters.rate_inner*kron(speye(size(d_dphi_outer)),d_dphi_inner)),speye(size(H)));
+% Formalism-dependent stage
+switch spin_system.bas.formalism
+
+    % Liouville space
+    case {'sphten-liouv','zeeman-liouv'}
+
+        % Report the composite dimension of the Fokker-Planck problem
+        report(spin_system,['Fokker-Planck problem dimension ' num2str(spc_dim*spn_dim)]);
+
+        % Compute double spinning operator
+        M=2*pi*kron((parameters.rate_outer*kron(d_dphi_outer,speye(size(d_dphi_inner)))+...
+                     parameters.rate_inner*kron(speye(size(d_dphi_outer)),d_dphi_inner)),speye(size(H)));
+
+    % Hilbert space
+    case {'zeeman-hilb','zeeman-wavef'}
+
+        % No spinning operator in the rotor stack route
+        M=[];
+
+    otherwise
+
+        % Complain and bomb out
+        error('unknown formalism specification.');
+
+end
 
 % Get rotor axis orientations
 [phi_inner,theta_inner,~]=cart2sph(parameters.axis_inner(1),...
@@ -179,33 +206,44 @@ sph_grid=load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ...
                                         filesep parameters.grid '.mat']);
 
 % Assign local variables
-alphas=sph_grid.alphas; betas=sph_grid.betas; 
+alphas=sph_grid.alphas; betas=sph_grid.betas;
 gammas=sph_grid.gammas; weights=sph_grid.weights;
 
-% Project relaxation and kinetics
-R=kron(speye(spc_dim),R); K=kron(speye(spc_dim),K);
-
-% Project the initial state
-if isfield(parameters,'rho0')&&strcmp(parameters.grid,'single_crystal')
-    
-    % Single crystal simulations start at 12 o'clock
-    space_part=zeros(parameters.spc_dim,1); space_part(1)=1;
-    parameters.rho0=kron(space_part,parameters.rho0);
-    report(spin_system,'single crystal simulation, rotor phase averaging switched off.');
-    
-elseif isfield(parameters,'rho0')
-    
-    % Powder simulations start equally distributed
-    space_part=ones(parameters.spc_dim,1)/parameters.spc_dim;
-    parameters.rho0=kron(space_part,parameters.rho0);
-    report(spin_system,'powder simulation, rotor phase averaging switched on.');
-    
+% Reject two-angle powder grids in the Hilbert space route
+if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef'})&&...
+   (numel(weights)>1)&&all(alphas(:)==0)
+    error('Hilbert space rotor stacks require a three-angle spherical grid.');
 end
 
-% Project the coil state: same coil everywhere
-if isfield(parameters,'coil')
-    space_part=ones(parameters.spc_dim,1);
-    parameters.coil=kron(space_part,parameters.coil);
+% Project into the Fokker-Planck space in Liouville formalisms
+if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
+
+    % Project relaxation and kinetics
+    R=kron(speye(spc_dim),R); K=kron(speye(spc_dim),K);
+
+    % Project the initial state
+    if isfield(parameters,'rho0')&&strcmp(parameters.grid,'single_crystal')
+
+        % Single crystal simulations start at 12 o'clock
+        space_part=zeros(parameters.spc_dim,1); space_part(1)=1;
+        parameters.rho0=kron(space_part,parameters.rho0);
+        report(spin_system,'single crystal simulation, rotor phase averaging switched off.');
+
+    elseif isfield(parameters,'rho0')
+
+        % Powder simulations start equally distributed
+        space_part=ones(parameters.spc_dim,1)/parameters.spc_dim;
+        parameters.rho0=kron(space_part,parameters.rho0);
+        report(spin_system,'powder simulation, rotor phase averaging switched on.');
+
+    end
+
+    % Project the coil state: same coil everywhere
+    if isfield(parameters,'coil')
+        space_part=ones(parameters.spc_dim,1);
+        parameters.coil=kron(space_part,parameters.coil);
+    end
+
 end
 
 % Preallocate answer array
@@ -290,14 +328,39 @@ parfor (q=1:numel(weights),nworkers) %#ok<*PFBNS>
         
     end
     
-    % Assemble the liouvillian
-    L=clean_up(spin_system,cell2mat(L),spin_system.tols.liouv_zero);
-    
     % Report to the user
     report(spin_system,'running the pulse sequence...');
-    
-    % Run the pulse sequence
-    ans_array{q}=pulse_sequence(spin_system,parameters,L+1i*M,R,K);
+
+    % Formalism-dependent stage
+    switch spin_system.bas.formalism
+
+        % Liouville space
+        case {'sphten-liouv','zeeman-liouv'}
+
+            % Assemble the Liouvillian
+            L=clean_up(spin_system,cell2mat(L),spin_system.tols.liouv_zero);
+
+            % Run the pulse sequence
+            ans_array{q}=pulse_sequence(spin_system,parameters,L+1i*M,R,K);
+
+        % Hilbert space
+        case {'zeeman-hilb','zeeman-wavef'}
+
+            % Extract the Hamiltonian rotor stack
+            ham_stack=cell(npoints_total,1);
+            for n=1:npoints_total
+                ham_stack{n}=sparse(L{n,n});
+            end
+
+            % Run the pulse sequence with a Hamiltonian stack
+            ans_array{q}=pulse_sequence(spin_system,parameters,ham_stack,R,K);
+
+        otherwise
+
+            % Complain and bomb out
+            error('unknown formalism specification.');
+
+    end
     
 end
 
@@ -360,9 +423,10 @@ end
 % Consistency enforcement
 function grumble(spin_system,pulse_sequence,parameters,assumptions)
 
-% Formalism 
-if ~ismember(spin_system.bas.formalism,{'zeeman-liouv','sphten-liouv'})
-    error('this function is only available in Liouville space.');
+% Wavefunctions cannot represent thermal equilibria
+if strcmp(spin_system.bas.formalism,'zeeman-wavef')&&isfield(parameters,'needs')&&...
+   ismember('iso_eq',parameters.needs)
+    error('thermal equilibrium state cannot be represented by a wavefunction.');
 end
 
 % Rotor ranks

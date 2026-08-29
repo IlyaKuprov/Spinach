@@ -81,8 +81,8 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,parameters,H,R,K,G,F)
-if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
-    error('this function is only available in sphten-liouv formalism.');
+if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
+    error('this function is only available in sphten-liouv and zeeman-liouv formalisms.');
 end
 if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~isnumeric(F))||(~ismatrix(H))||(~ismatrix(R))||...

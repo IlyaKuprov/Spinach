@@ -51,7 +51,10 @@
 %      answer - a vector or a matrix, depending on the options set during
 %               the call.
 %
-% Note: this function does not support Hilbert space formalisms.
+% Note: this function does not support the zeeman-hilb formalism; in
+%       zeeman-wavef, L is the Hamiltonian matrix, rho is a wavefunc-
+%       tion or a horizontal stack thereof, coil is a reference wave-
+%       function, and observables are overlap trajectories.
 %
 % Note: we initially had a faithful implementation of the Krylov process
 %       here - subspace, orthogonalisation, projection, etc., but in all
@@ -199,8 +202,9 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,L,coil,rho,timestep,nsteps,output)
-if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
-    error('this function only works in Lioville space.');
+if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv',...
+                                        'zeeman-wavef'})
+    error('this function requires a state vector based formalism.');
 end
 if ~isnumeric(L)
     error('Liouvillian must be numeric.');

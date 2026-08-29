@@ -6,7 +6,9 @@
 %
 % Arguments:
 %
-%     rho    -  a state vector or a horizontal stack thereof
+%     rho    -  a state vector or a horizontal stack thereof;
+%               in zeeman-hilb, a density matrix or a horizon-
+%               tal stack thereof
 %
 %     spec   -  a cell array containing the specification of
 %               which coherences to keep on which spins. For
@@ -25,8 +27,11 @@
 %   rho     - the state vector with the undesired orders of
 %             spin correlations zeroed out
 %
-% Note: this function requires sphten-liouv formalism and supports Fok-
-%       ker-Planck direct products.
+% Note: this function requires sphten-liouv, zeeman-liouv, or zeeman-
+%       hilb formalism; Fokker-Planck direct products are supported
+%       in the Liouville space formalisms. In zeeman-hilb, the densi-
+%       ty matrices are stretched into Liouville space, filtered the-
+%       re, and folded back.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -40,14 +45,45 @@ grumble(spin_system,rho,spec);
 
 % Store dimension statistics
 spn_dim=size(spin_system.bas.basis,1);
+if strcmp(spin_system.bas.formalism,'zeeman-hilb')
+    spn_dim=spn_dim^2;
+end
 spc_dim=numel(rho)/spn_dim;
 problem_dims=size(rho);
 
 % Fold indirect dimensions
 rho=reshape(rho,[spn_dim spc_dim]);
 
-% Compute projection quantum numbers of basis states
-[~,M]=lin2lm(spin_system.bas.basis);
+% Compute coherence order bookkeeping array
+switch spin_system.bas.formalism
+
+    case 'sphten-liouv'
+
+        % Projection quantum numbers of basis states
+        [~,M]=lin2lm(spin_system.bas.basis);
+
+    case 'zeeman-liouv'
+
+        % Projection quantum numbers of ket and bra indices
+        nspins=spin_system.comp.nspins;
+        spns=(spin_system.comp.mults-1)/2;
+        M_ket=spns-spin_system.bas.basis(:,1:nspins)+1;
+        M_bra=spns-spin_system.bas.basis(:,(nspins+1):end)+1;
+
+        % Coherence orders of stretched density matrix elements
+        M=M_ket-M_bra;
+
+    case 'zeeman-hilb'
+
+        % Projection quantum numbers of the Zeeman basis
+        hdim=size(spin_system.bas.basis,1);
+        spns=(spin_system.comp.mults-1)/2;
+        M_lvl=spns-spin_system.bas.basis+1;
+
+        % Coherence orders of stretched density matrix elements
+        M=repmat(M_lvl,[hdim 1])-kron(M_lvl,ones(hdim,1));
+
+end
 
 % Preallocate state mask array
 state_mask=false(spn_dim,numel(spec));
@@ -102,8 +138,8 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,rho,spec)
-if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
-    error('analytical coherence order selection is only available for sphten-liouv formalism.');
+if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv','zeeman-hilb'})
+    error('analytical coherence order selection is only available for sphten-liouv, zeeman-liouv, and zeeman-hilb formalisms.');
 end
 if ~isnumeric(rho)
     error('the state vector(s) must be numeric.');

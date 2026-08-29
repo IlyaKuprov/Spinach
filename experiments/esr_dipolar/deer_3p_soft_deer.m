@@ -74,6 +74,9 @@
 
 function echo_stack=deer_3p_soft_deer(spin_system,parameters,H,R,K)
 
+% Move into adjoint representation if needed
+[spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K);
+
 % Check consistency
 grumble(spin_system,parameters,H,R,K);
 

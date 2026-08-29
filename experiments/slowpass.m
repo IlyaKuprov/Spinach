@@ -53,19 +53,7 @@ freq_grid=2*pi*linspace(parameters.sweep(1),...
 spectrum=zeros(size(freq_grid),'like',1i);
 
 % Move into adjoint representation if needed
-if strcmp(spin_system.bas.formalism,'zeeman-hilb')
-    
-    % Inform the user 
-    report(spin_system,'projecting zeeman-hilb simulation into Liouville space...');
-    
-    % Project into Liouville space
-    H=hilb2liouv(H,'comm'); R=hilb2liouv(R,'acomm'); K=hilb2liouv(K,'acomm');
-    parameters.rho0=parameters.rho0(:); parameters.coil=parameters.coil(:);
-    
-    % Update the formalism setting
-    spin_system.bas.formalism='zeeman-liouv';
-    
-end
+[spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K);
 
 % Compose the Liouvillian
 L=H+1i*R+1i*K;

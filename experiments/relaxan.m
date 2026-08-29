@@ -34,6 +34,9 @@
 
 function [r1,r2,t1,t2,R]=relaxan(spin_system,euler_angles)
 
+% Move into adjoint representation if needed
+spin_system=sim2liouv(spin_system,struct(),[],[],[]);
+
 % Check consistency
 if nargin==2
     grumble(spin_system,euler_angles);

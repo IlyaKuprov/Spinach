@@ -54,12 +54,19 @@ end
 
 % Add reported nearest-neighbour carbons
 if parameters.n_13c>0
-    Cmat=((frame)*diag([30.2e6 30.2e6 66.2e6])*(frame)');
+
+    % Dangling-bond lines of the split-vacancy carbons, two sites each
+    bond_dirs=[+1 -1 -1; -1 +1 -1; -1 -1 +1]/sqrt(3);
+
+    % Axial hyperfine tensor about each dangling-bond line
     nuc_idx=numel(nuclei);
     nuclei(nuc_idx+1:nuc_idx+parameters.n_13c)={[]};
     for n=1:parameters.n_13c
+        Rmat=rotmat_align([0 0 1],bond_dirs(mod(n-1,3)+1,:));
+        Cmat=Rmat*diag([30.2e6 30.2e6 66.2e6])*Rmat';
         nuclei{nuc_idx+n}=struct('iso','13C','A',Cmat);
     end
+
 end
 
 % Build the Spinach structures

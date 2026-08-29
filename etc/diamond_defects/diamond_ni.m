@@ -72,12 +72,19 @@ switch centre
             nuclei{end+1}=struct('iso',nickel);
         end
         if parameters.n_13c>0
-            Cmat=((frame_111)*diag([0.340 0.340 1.339]*hz_per_mt)*(frame_111)');
+
+            % Nearest-neighbour bond directions of the Td centre
+            bond_dirs=[+1 +1 +1; +1 -1 -1; -1 +1 -1; -1 -1 +1]/sqrt(3);
+
+            % Axial hyperfine tensor about each bond direction
             nuc_idx=numel(nuclei);
             nuclei(nuc_idx+1:nuc_idx+parameters.n_13c)={[]};
             for n=1:parameters.n_13c
+                Rmat=rotmat_align([0 0 1],bond_dirs(n,:));
+                Cmat=Rmat*diag([0.340 0.340 1.339]*hz_per_mt)*Rmat';
                 nuclei{nuc_idx+n}=struct('iso','13C','A',Cmat);
             end
+
         end
     case {'ne1','ne2','ne3','ne5','ne8'}
         electron='E';

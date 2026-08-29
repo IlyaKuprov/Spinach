@@ -7,6 +7,8 @@
 %
 %     offs - peak offset from zero - when this is a scalar,
 %            a Lorentzian is returned; when this is a vector
+%            with two elements, a convolution with a boxcar
+%            function is returned; when this is a vector
 %            with three elements, a convolution with a tri-
 %            angular function is returned.
 %
@@ -38,12 +40,18 @@ offs=sort(offs(:),1,'ascend');
 % Similarity tolerance
 sim_tol=sqrt(eps)*norm(offs,2);
 
-% Single offset or three identical vertices
-if isscalar(offs)||(offs(3)-offs(1)<=sim_tol)
-    
+% Single offset or all vertices identical
+if isscalar(offs)||(offs(end)-offs(1)<=sim_tol)
+
     % Just a Lorentzian curve
     y=(ampl/(pi*gam))./(1+((x-mean(offs))/gam).^2);
-    
+
+% Two distinct vertices
+elseif numel(offs)==2
+
+    % Lorentzian convolution with a boxcar function
+    y=(ampl/(pi*(offs(2)-offs(1))))*(atan2(offs(2)-x,gam)-atan2(offs(1)-x,gam));
+
 % Vertices 1 and 2 identical
 elseif (offs(2)-offs(1)<=sim_tol)
     
@@ -82,8 +90,8 @@ end
 % Consistency enforcement
 function grumble(offs,ampl,fwhm,x)
 if (~isnumeric(offs))||(~isreal(offs))||...
-   (~ismember(numel(offs),[1 3]))||any(~isfinite(offs(:)))
-    error('offs must be a finite real scalar or a three-element vector.');
+   (~ismember(numel(offs),[1 2 3]))||any(~isfinite(offs(:)))
+    error('offs must be a finite real vector with one, two, or three elements.');
 end
 if (~isnumeric(ampl))||(~isreal(ampl))||...
    (numel(ampl)~=1)||(~isfinite(ampl))

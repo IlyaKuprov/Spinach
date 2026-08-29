@@ -2,11 +2,12 @@
 % the formalism specified in the spin system object is 'zeeman-hilb',
 % this function projects the evolution generators into Liouville
 % space, converts the standard state-like and operator-like fields
-% of the parameters structure, rebuilds the basis index table, dis-
-% cards Hilbert space symmetry information, and sets the formalism
-% to 'zeeman-liouv'; for all other formalisms, every argument is
-% returned unchanged. This makes Liouville-space pulse sequences
-% callable with zeeman-hilb inputs. Syntax:
+% of the parameters structure, rebuilds the basis index table, mig-
+% rates the symmetry irrep projectors into the adjoint representa-
+% tion, and sets the formalism to 'zeeman-liouv'; for all other
+% formalisms, every argument is returned unchanged. This makes
+% Liouville-space pulse sequences callable with zeeman-hilb
+% inputs. Syntax:
 %
 %          [spin_system,parameters,H,R,K]=...
 %          sim2liouv(spin_system,parameters,H,R,K)
@@ -44,6 +45,15 @@
 %                   fields converted into Liouville space
 %
 %    H,R,K        - Liouville space evolution generators
+%
+% Note: a Hilbert space density matrix block S(n)*Y*S(k)' maps to
+%       the state vector kron(conj(S(k)),S(n))*Y(:), and so each
+%       ordered pair of Hilbert space irrep projectors yields the
+%       Liouville space irrep projector kron(conj(S(k)),S(n)).
+%       Every such subspace is invariant under superoperators
+%       built from symmetry-respecting Hilbert space generators;
+%       unpopulated subspaces are dropped by reduce.m at run time
+%       in the usual way.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -91,10 +101,34 @@ if strcmp(spin_system.bas.formalism,'zeeman-hilb')
     % Rebuild the basis index table for the Liouville space
     spin_system.bas.basis=[repmat(zbas,[hdim 1]) kron(zbas,ones(hdim,1))];
 
-    % Discard Hilbert space symmetry data
+    % Migrate the irreps into the adjoint representation
     if isfield(spin_system.bas,'irrep')
-        spin_system.bas=rmfield(spin_system.bas,'irrep');
-        report(spin_system,'Hilbert space irreps discarded, proceeding without symmetry.');
+
+        % Grab the Hilbert space irreps
+        hs_irreps=spin_system.bas.irrep; n_irreps=numel(hs_irreps);
+
+        % Preallocate the Liouville space irrep array
+        ls_irreps(n_irreps^2)=struct('projector',[],'dimension',[]);
+
+        % Loop over ordered pairs of Hilbert space irreps
+        for n=1:n_irreps
+            for k=1:n_irreps
+
+                % Build the irrep pair projector and dimension
+                pair_idx=n_irreps*(n-1)+k;
+                ls_irreps(pair_idx).projector=kron(conj(hs_irreps(n).projector),...
+                                                        hs_irreps(k).projector);
+                ls_irreps(pair_idx).dimension=hs_irreps(n).dimension*...
+                                              hs_irreps(k).dimension;
+
+            end
+        end
+
+        % Write the Liouville space irreps
+        spin_system.bas.irrep=ls_irreps;
+        report(spin_system,['Hilbert space irreps migrated into Liouville space, '...
+                            num2str(n_irreps^2) ' irrep pair subspaces.']);
+
     end
 
     % Update the formalism setting

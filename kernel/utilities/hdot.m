@@ -1,7 +1,7 @@
 % Hadamard route to Frobenius matrix product. Useful as a 
 % replacement for trace(A'*B) because 
 %
-%               trace(A'*B)=hadm(conj(A),B) 
+%             trace(A'*B)=sum(sum(conj(A).*B))
 %
 % and the latter only needs O(n^2) multiplications as com-
 % pared to O(n^3) for trace(A'*B). Syntax: 

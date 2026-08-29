@@ -51,8 +51,8 @@
 %
 % Note: the following functions are used to compute contour levels:
 %
-%  cont_levs_pos=delta(2)*smax*linspace(0,1,ncont).^k+smax*delta(1);
-%  cont_levs_neg=delta(2)*smin*linspace(0,1,ncont).^k+smin*delta(1);
+%  cont_levs_pos=(delta(2)-delta(1))*smax*linspace(0,1,ncont).^k+smax*delta(1);
+%  cont_levs_neg=(delta(4)-delta(3))*smin*linspace(0,1,ncont).^k+smin*delta(3);
 %
 % where smin and smax are computed from the spectrum matrix. 
 %

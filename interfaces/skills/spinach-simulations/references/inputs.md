@@ -409,7 +409,7 @@ with `comsol.crop` and `comsol.inactivate` controlling the retained region.
 
 Complete ready-made systems live in `etc/molecules/` (`strychnine(spins)`,
 `cyprinol()`, `lactate(spins)`, `allyl_pyruvate(spins)`,
-`fatty_acid(nprotons)`, `dac_reaction()`) and `etc/diamond_defects/` (fourteen
+`fatty_acid(nprotons)`, `dac_reaction()`) and `etc/diamond_defects/` (fifteen
 `[sys,inter]=<name>(parameters)` builders for NV, P1 and related centres).
 `guess_j_pro`, `guess_j_nuc` and `guess_csa_pro` are the estimators `protein`
 and `nuclacid` call internally; everything they return is an estimate and must

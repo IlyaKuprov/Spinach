@@ -190,8 +190,8 @@ averaging, and calls your pulse sequence. All contexts share the signature
 
 The `assumptions` string selects which terms survive the rotating-frame
 treatment inside `hamiltonian`: `'nmr'`, `'esr'`, `'deer'`, `'deer-zz'`,
-`'labframe'`, `'qnmr'`, and the DNP variants `'se_dnp_h+'`, `'se_dnp_h-'`,
-`'se_dnp_h0'`. Using `'nmr'` for an EPR problem silently discards the physics
+`'labframe'`, `'qnmr'`, `'cavity'`, `'spin-phonon'`, and the DNP variants
+`'se_dnp_h+'`, `'se_dnp_h-'`, `'se_dnp_h0'`. Using `'nmr'` for an EPR problem silently discards the physics
 you wanted.
 
 ## Propagation

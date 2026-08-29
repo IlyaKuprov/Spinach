@@ -18,8 +18,9 @@ rates have no effect there.
 
 `inter.relaxation` is a cell array of strings and more than one may be
 given. The accepted set is exactly `'damp'`, `'t1_t2'`, `'redfield'`,
-`'lindblad'`, `'nottingham'`, `'weizmann'`, `'SRFK'`, `'SRSK'`; anything
-else is refused by `create`. If the field is absent, `R` is zero.
+`'naka-zwan'`, `'lindblad'`, `'nottingham'`, `'weizmann'`, `'SRFK'`,
+`'SRSK'`; anything else is refused by `create`. If the field is absent,
+`R` is zero.
 
 | Theory | Physical model | Required inputs | Typical use |
 |---|---|---|---|
@@ -31,6 +32,7 @@ else is refused by `create`. If the field is absent, `R` is zero.
 | `nottingham` | DNP model on the four-level two-electron manifold | `inter.nott_r1e`, `nott_r2e`, `nott_r1n`, `nott_r2n` | Cross-effect DNP; exactly two electrons |
 | `SRFK` | Scalar relaxation of the first kind: stochastic modulation of a coupling | `inter.srfk_tau_c`, `inter.srfk_mdepth` | Exchange fast enough to modulate J; conformational averaging |
 | `SRSK` | Scalar relaxation of the second kind, Abragam's expressions | `inter.srsk_sources` | Quadrupolar neighbours (14N, 35Cl, 79Br) broadening their partners |
+| `naka-zwan` | Nakajima-Zwanzig evaluation of the same rotational-modulation kernel as `redfield`; the two are mutually exclusive | `inter.tau_c`, `inter.nz_shift`, `inter.nz_onshell` | Relaxation beyond the Redfield evaluation of the memory kernel |
 
 Two settings become mandatory the moment `inter.relaxation` is present:
 
@@ -39,13 +41,13 @@ inter.rlx_keep='kite';       % which terms of R survive
 inter.equilibrium='zero';    % where relaxation drives the system
 ```
 
-Formalism restrictions are enforced. `t1_t2` and `redfield` are
-`sphten-liouv` only. `lindblad`, `nottingham`, `weizmann`, `SRFK`, `SRSK`,
+Formalism restrictions are enforced. `t1_t2`, `redfield`, and
+`naka-zwan` are `sphten-liouv` only. `lindblad`, `nottingham`, `weizmann`, `SRFK`, `SRSK`,
 and IME thermalisation all require Liouville space (`sphten-liouv` or
 `zeeman-liouv`). Only `damp` works in `zeeman-hilb`.
 
-Terms accumulate in a fixed order: `t1_t2`, `redfield`, `lindblad`,
-`weizmann`, `nottingham`, `SRFK`, `SRSK`; then the dynamic frequency shift
+Terms accumulate in a fixed order: `t1_t2`, `redfield`, `naka-zwan`,
+`lindblad`, `weizmann`, `nottingham`, `SRFK`, `SRSK`; then the dynamic frequency shift
 policy applies, then `inter.rlx_keep` truncates, then `damp` is added, then
 thermalisation. Hence `SRSK` reads the superoperator accumulated so far to
 extract source spin T1 and T2 and is useless without a companion theory,

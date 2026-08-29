@@ -91,7 +91,7 @@ approximations then have their own required fields and cross-rules:
 
 | Message | Meaning |
 |---|---|
-| `connectivity tracing depth must be specified in bas.level variable.` | IK-0/1/2 need `bas.level`. |
+| `connectivity tracing depth must be specified in bas.level variable.` | IK-0, IK-1, and IK-DNP need `bas.level` (IK-DNP as a 1x3 vector); IK-2 does not use it. |
 | `connectivity type must be specified in bas.connectivity variable.` | IK-1/2 need `'scalar_couplings'` or `'full_tensors'`. |
 | `proximity tracing depth must be specified in bas.space_level variable.` | IK-1/2 need `bas.space_level`. |
 | `bas.level is only applicable to IK-0,1,2,DNP basis sets.` | Do not set IK fields with `approximation='none'`; the same rule exists for `bas.space_level` and `bas.connectivity` (IK-1/2 only). |
@@ -108,7 +108,7 @@ relaxation is a frequent dead end:
 ```
 Redfield relaxation theory is only available for sphten-liouv formalism.
 extended T1,T2 relaxation theory is only available for sphten-liouv formalism.
-analytical decoupling is only available for sphten-liouv formalism.
+analytical decoupling is only available for sphten-liouv, zeeman-liouv, and zeeman-hilb formalisms.
 chemical reaction modelling is only available for sphten-liouv formalism.
 bas.projections option is only available for sphten-liouv formalism.
 ```

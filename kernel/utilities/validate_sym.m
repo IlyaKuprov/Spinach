@@ -3,11 +3,14 @@
 % spin system object are strictly invariant under every operation of
 % each declared permutation group, so that the irreducible representa-
 % tion projectors built by symmetry.m correspond to a symmetry that
-% the interactions actually possess. The declared symmetry is a permu-
-% tation of spin labels, not a spatial rotation; interaction tensors
-% related by a rotation rather than being identical are not accepted.
-% When no symmetry is declared, the function returns without perfor-
-% ming any checks. Syntax:
+% the interactions actually possess. Zeeman and giant-spin interacti-
+% ons must be identical between permuted spins. Coupling tensors bet-
+% ween permuted spin pairs must have identical eigenvalues; tensors
+% that match only up to a rotation, such as dipolar couplings computed
+% from symmetric coordinates, are accepted with a report that their
+% anisotropic parts are not permutation-invariant. When no symmetry
+% is declared, the function returns without performing any checks.
+% Syntax:
 %
 %                    validate_sym(spin_system,bas)
 %
@@ -70,6 +73,9 @@ for m=1:numel(bas.sym_group)
     % Permutation elements of the declared group
     group=perm_group(bas.sym_group{m});
 
+    % Rotation-related coupling flag
+    rot_related=false();
+
     % Loop over symmetry operations
     for n=1:group.order
 
@@ -100,19 +106,29 @@ for m=1:numel(bas.sym_group)
                        'giant-spin interactions are not identical.']);
             end
 
-            % Check coupling tensor invariance against every spin
+            % Check coupling eigenvalue invariance against every spin
             for q=1:nspins
-                if norm(get_coupling(spin_system,perm(spins(k)),perm(q))-...
-                        get_coupling(spin_system,spins(k),q),2)>tol
+                coup_a=get_coupling(spin_system,spins(k),q);
+                coup_b=get_coupling(spin_system,perm(spins(k)),perm(q));
+                if norm(sort(eig(coup_b))-sort(eig(coup_a)),2)>tol
                     error(['the interaction between spins ' num2str(spins(k)) ' and ' ...
                            num2str(q) ' is not preserved by the ' bas.sym_group{m} ...
                            ' symmetry; it differs from the interaction between spins ' ...
                            num2str(perm(spins(k))) ' and ' num2str(perm(q)) '.']);
+                elseif norm(coup_b-coup_a,2)>tol
+                    rot_related=true();
                 end
             end
 
         end
 
+    end
+
+    % Report rotation-related coupling anisotropies
+    if rot_related
+        report(spin_system,['couplings in the ' bas.sym_group{m} ' group match their '...
+                            'permutation images only up to a rotation; anisotropic '...
+                            'parts are not permutation-invariant.']);
     end
 
 end

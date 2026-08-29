@@ -88,15 +88,21 @@ if ismember('op_cache',spin_system.sys.enable)
                       spin_system.bas.basis_hash});
     op_hash=[op_hash ':O']; % Mark as operator
 
-    % Get ValueStore
+    % Get ValueStore, unless the client has no parallel pool
     if ~isworkernode
-        store=gcp('nocreate').ValueStore; 
+        pool=gcp('nocreate');
+        if isempty(pool)
+            report(spin_system,'no parallel pool, operator cache skipped.');
+            store=[];
+        else
+            store=pool.ValueStore;
+        end
     else
         store=getCurrentValueStore(); 
     end
 
     % Try to retrieve the operator from the ValueStore
-    if isKey(store,op_hash), A=store(op_hash); return; end
+    if (~isempty(store))&&isKey(store,op_hash), A=store(op_hash); return; end
     
 end
 
@@ -209,7 +215,7 @@ end
 if ismember('op_cache',spin_system.sys.enable)
 
     % Update the ValueStore
-    if ~isKey(store,op_hash)
+    if (~isempty(store))&&(~isKey(store,op_hash))
         put(store,{op_hash},{A});
     end
 

@@ -609,22 +609,28 @@ if ismember('ham_cache',spin_system.sys.enable)
                            spin_system.bas.basis_hash});
     end
 
-    % Get ValueStore
+    % Get ValueStore, unless the client has no parallel pool
     if ~isworkernode
-        store=gcp('nocreate').ValueStore; 
+        pool=gcp('nocreate');
+        if isempty(pool)
+            report(spin_system,'no parallel pool, Hamiltonian cache skipped.');
+            store=[];
+        else
+            store=pool.ValueStore;
+        end
     else
         store=getCurrentValueStore(); 
     end
 
     % Try to retrieve the operator from the ValueStore
-    if build_aniso&&isKey(store,[ham_hash ':I'])...
+    if (~isempty(store))&&build_aniso&&isKey(store,[ham_hash ':I'])...
                   &&isKey(store,[ham_hash ':Q'])
 
         % Load I and Q, report success, and return
         I=store([ham_hash ':I']); Q=store([ham_hash ':Q']);
         report(spin_system,'cache record used.'); return;
 
-    elseif (~build_aniso)&&isKey(store,[ham_hash ':I'])
+    elseif (~isempty(store))&&(~build_aniso)&&isKey(store,[ham_hash ':I'])
 
         % Load I, report success, and return
         I=store([ham_hash ':I']); 
@@ -1367,12 +1373,12 @@ end
 if ismember('ham_cache',spin_system.sys.enable)
 
     % Update the cache: isotropic part
-    if ~isKey(store,[ham_hash ':I'])
+    if (~isempty(store))&&(~isKey(store,[ham_hash ':I']))
         put(store,{[ham_hash ':I']},{I});
     end
 
     % Update the cache: anisotropic part
-    if build_aniso&&(~isKey(store,[ham_hash ':Q']))
+    if (~isempty(store))&&build_aniso&&(~isKey(store,[ham_hash ':Q']))
         put(store,{[ham_hash ':Q']},{Q});
     end
 

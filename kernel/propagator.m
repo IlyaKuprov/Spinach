@@ -48,15 +48,21 @@ if ismember('prop_cache',spin_system.sys.enable)
     prop_hash=md5_hash({L,timestep,spin_system.tols.prop_chop});
     prop_hash=[prop_hash ':P']; % Mark as propagator
 
-    % Get ValueStore
+    % Get ValueStore, unless the client has no parallel pool
     if ~isworkernode
-        store=gcp('nocreate').ValueStore; 
+        pool=gcp('nocreate');
+        if isempty(pool)
+            report(spin_system,'no parallel pool, propagator cache skipped.');
+            store=[];
+        else
+            store=pool.ValueStore;
+        end
     else
         store=getCurrentValueStore(); 
     end
 
     % Try to retrieve the propagator from the ValueStore
-    if isKey(store,prop_hash), P=store(prop_hash); return; end
+    if (~isempty(store))&&isKey(store,prop_hash), P=store(prop_hash); return; end
     
 end
 
@@ -214,7 +220,7 @@ end
 if ismember('prop_cache',spin_system.sys.enable)
 
     % Update the ValueStore
-    if ~isKey(store,prop_hash)
+    if (~isempty(store))&&(~isKey(store,prop_hash))
         put(store,{prop_hash},{P});
     end
 

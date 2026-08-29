@@ -1,8 +1,10 @@
-% Signal heterodyne from wall clock time into the rotating
-% frame. Uses a GPU if one is available. Syntax:
+% Signal heterodyne from wall clock time into the rotating frame
+% using analytic signal demodulation: the negative frequency half
+% of the spectrum (the counter-rotating component), as well as the
+% direction-ambiguous DC and Nyquist bins, are dropped; the posi-
+% tive frequency half is doubled and frequency-shifted. Syntax:
 %
-%          [X,Y]=heterodyne(dt,signal,freq,lp_filt)
-%          [X,Y]=heterodyne(dt,signal,freq)
+%               [X,Y]=heterodyne(dt,signal,freq)
 %
 % Parameters:
 %
@@ -12,84 +14,46 @@
 %
 %   freq       - frequency to be demodulated, Hz
 %
-%   lp_filt    - lowpass filter rejecting the sum frequen-
-%                cy component left behind by the quadrature
-%                mixer, a digitalFilter object as returned
-%                by Matlab's designfilt() function; when
-%                this argument is omitted, an order 8 FIR
-%                filter with a half-power frequency of
-%                0.25 is used
-%
 % Outputs:
 %
 %   X, Y       - in-phase and out-of-phase parts of the
 %                rotating frame signal, column vectors
 %
-% Notes: the signal must be sampled with at least four points
-%        per period of the frequency being demodulated; the
-%        outputs are delayed with respect to the input by the
-%        group delay of lp_filt, which is (n-1)/2 samples for
-%        a linear phase FIR filter with n coefficients; when
-%        the function is called without outputs, the frequen-
-%        cy response of lp_filt is plotted instead.
+% Notes: the signal must be sampled with at least four points per
+%        period of the frequency being demodulated; the transform
+%        is zero-phase, so sample k of the outputs refers to the
+%        same wall clock time as sample k of the input; dropping
+%        the DC bin subtracts the signal mean exactly; the record
+%        is treated as periodic by the FFT, and should therefore
+%        begin and end in dead time.
 %
 % a.acharya@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=heterodyne.m>
 
-function [X,Y]=heterodyne(dt,signal,freq,lp_filt)
-
-% Check if the user supplied a filter
-if ~exist('lp_filt','var')
-
-    % Define a lowpass filter
-    lp_filt=designfilt('lowpassfir','FilterOrder',8,...
-                       'HalfPowerFrequency',0.25);
-
-end
+function [X,Y]=heterodyne(dt,signal,freq)
 
 % Check consistency
-grumble(dt,signal,freq,lp_filt);
+grumble(dt,signal,freq);
 
-% Decide the output
-if nargout==0
+% Build time grid
+time_grid=dt*((1:numel(signal))'-1);
 
-    % Plot the filter profile
-    freqz(lp_filt.Coefficients,1,[],1/dt);
+% One-sided spectral mask, DC and Nyquist bins dropped
+mask=zeros(numel(signal),1);
+mask(2:ceil(numel(signal)/2))=2;
 
-else
+% Demodulate the analytic signal into the rotating frame
+signal=ifft(mask.*fft(signal)).*exp(-2i*pi*freq*time_grid);
 
-    % Build time grid
-    time_grid=dt*((1:numel(signal))'-1);
-
-    % Move inputs to GPU
-    if canUseGPU()
-        signal=gpuArray(signal);
-        time_grid=gpuArray(time_grid);
-    end
-
-    % Mix with carrier frequency
-    X=2*signal.*cos(2*pi*freq*time_grid);
-    Y=2*signal.*sin(2*pi*freq*time_grid);
-    clear('signal','time_grid');
-
-    % Get coefficients
-    B=lp_filt.Coefficients;
-    if canUseGPU()
-        B=gpuArray(B);
-    end
-
-    % Apply the filter
-    X=gather(fftfilt(B,X));
-    Y=gather(fftfilt(B,Y));
-
-end
+% In-phase and out-of-phase components
+X=real(signal); Y=-imag(signal);
 
 end
 
 % Consistency enforcement
-function grumble(dt,signal,freq,lp_filt)
+function grumble(dt,signal,freq)
 if (~isnumeric(dt))||(~isreal(dt))||(~isscalar(dt))||...
    (~isfinite(dt))||(dt<=0)
     error('dt must be a finite positive real number.');
@@ -102,12 +66,6 @@ if (~isnumeric(freq))||(~isreal(freq))||(~isscalar(freq))||(~isfinite(freq))
 end
 if (freq~=0)&&((4*dt)>(1/abs(freq)))
     error('the specified frequency is not sampled well enough.');
-end
-if ~isa(lp_filt,'digitalFilter')
-    error('lp_filt must be a digitalFilter object from designfilt().');
-end
-if ~isfir(lp_filt)
-    error('lp_filt must be an FIR filter.');
 end
 end
 

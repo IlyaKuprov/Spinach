@@ -9,9 +9,9 @@
 % phase is removed, and the FIR kernel is then obtained by line-
 % ar least squares from the ideal and the measured waveforms.
 %
-% The group delay of the heterodyne lowpass filter is a property
-% of the digital processing rather than of the instrument, and
-% is therefore removed before the kernel is estimated.
+% The heterodyne is an analytic signal demodulation, which is
+% zero-phase: the rotating frame signal is not delayed with re-
+% spect to the oscilloscope record.
 %
 % Calculation time: seconds
 %
@@ -45,15 +45,8 @@ xlim padded; ylim padded; kgrid;
 kxlabel('time, $\mu$s'); kylabel('scope reading, a.u.');
 ktitle('wall clock');
 
-% Lowpass filter rejecting the sum frequency left behind by the mixer
-lp_filt=designfilt('lowpassfir','FilterOrder',256,...
-                   'CutoffFrequency',0.01);
-
-% Group delay of this linear phase FIR filter, in samples
-grp_delay=(numel(lp_filt.Coefficients)-1)/2;
-
-% Segment holding the waveform and its ringdown, filter delay removed
-n_start=round(t_start/dt)+grp_delay;
+% Segment holding the waveform and its ringdown
+n_start=round(t_start/dt);
 n_end=n_start+round((n_blocks*t_block+t_kernel)/dt);
 
 % Time axis of the segment, relative to the start of the waveform
@@ -64,7 +57,7 @@ n_low=round((win_start+0.5*(0:(2*n_blocks-1))')*t_block/dt)+1;
 n_up=round((win_end+0.5*(0:(2*n_blocks-1))')*t_block/dt)+1;
 
 % Heterodyne the record at the nominal carrier frequency
-[real_bruk,imag_bruk]=heterodyne(dt,scope_trace,carrier_freq,lp_filt);
+[real_bruk,imag_bruk]=heterodyne(dt,scope_trace,carrier_freq);
 cplx_bruk=real_bruk(n_start:n_end)+1i*imag_bruk(n_start:n_end);
 
 % Residual carrier offset from the phase slope in each half-block
@@ -80,7 +73,7 @@ end
 carrier_freq=carrier_freq-mean(freq_drift(2:end))/(2*pi);
 
 % Heterodyne the record again at the refined carrier frequency
-[real_bruk,imag_bruk]=heterodyne(dt,scope_trace,carrier_freq,lp_filt);
+[real_bruk,imag_bruk]=heterodyne(dt,scope_trace,carrier_freq);
 cplx_bruk=real_bruk(n_start:n_end)+1i*imag_bruk(n_start:n_end);
 
 % Constant phase of the nominally positive XiX half-blocks

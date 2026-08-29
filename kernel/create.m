@@ -369,6 +369,10 @@ if ~isworkernode
     
     end
     
+    % Propagate manual warning switches to the workers
+    warn_state=warning();
+    wait(parfevalOnAll(current_pool,@warning,0,warn_state));
+    
 else
 
     % Workers do not need setting up

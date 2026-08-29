@@ -21,14 +21,12 @@
 
 function r=frob_chop(s,tol)
 
-% Remove tiny negative round-off artefacts
-s=real(s(:));
-s(abs(s)<1e-12)=0;
-
 % Check consistency
 grumble(s,tol);
 
-% Project any remaining tiny negative round-off to zero
+% Remove round-off artefacts relative to the largest singular value
+s=real(s(:));
+s(abs(s)<1e-12*max(abs(s)))=0;
 s=max(s,0);
 
 % Find the cutting point
@@ -52,7 +50,8 @@ end
 if (~isnumeric(s))||(~isvector(s))
     error('s must be a vector of non-negative real numbers.');
 end
-if any(~isfinite(s(:)))||any(abs(imag(s(:)))>1e-10)||any(real(s(:))<-1e-10)
+if any(~isfinite(s(:)))||any(abs(imag(s(:)))>1e-10*max(abs(s(:))))||...
+   any(real(s(:))<-1e-10*max(abs(s(:))))
     error('s must be a vector of non-negative real numbers.');
 end
 end

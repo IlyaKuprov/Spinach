@@ -19,7 +19,7 @@
 %   X, Y       - in-phase and out-of-phase parts of the
 %                rotating frame signal, column vectors
 %
-% Notes: the signal must be sampled with at least four points per
+% Notes: the signal must be sampled with more than two points per
 %        period of the frequency being demodulated; the transform
 %        is zero-phase, so sample k of the outputs refers to the
 %        same wall clock time as sample k of the input; dropping
@@ -64,8 +64,8 @@ end
 if (~isnumeric(freq))||(~isreal(freq))||(~isscalar(freq))||(~isfinite(freq))
     error('freq must be a finite real number.');
 end
-if (freq~=0)&&((4*dt)>(1/abs(freq)))
-    error('the specified frequency is not sampled well enough.');
+if (freq~=0)&&((2*dt)>=(1/abs(freq)))
+    error('the carrier must be sampled with more than two points per period.');
 end
 end
 

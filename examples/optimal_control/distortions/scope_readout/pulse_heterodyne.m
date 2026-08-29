@@ -25,7 +25,7 @@ ktitle('wall clock'); kxlabel('time, s');
 carrier_freq=500.1029395e6;
 dt=time_grid(2)-time_grid(1);
 
-% Upsample twofold, the scope rate being under four samples per carrier period
+% Upsample twofold for sampling margin, the raw rate being 2.5 points per carrier period
 expt_data=resample(expt_data,2,1); dt=dt/2;
 
 % Apply heterodyne transformation wrt carrier frequency

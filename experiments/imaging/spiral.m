@@ -141,8 +141,9 @@ end
 if ~isfield(parameters,'spins')
     error('parameters.spins field must be present.');
 end
-if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||(~ischar(parameters.spins{1}))
-    error('parameters.spins must be a cell array containing one spin name.');
+if (~iscell(parameters.spins))||isempty(parameters.spins)||...
+   any(~cellfun(@ischar,parameters.spins(:)))
+    error('parameters.spins must be a nonempty cell array of character strings.');
 end
 if ~isfield(parameters,'npts')
     error('parameters.npts field must be present.');

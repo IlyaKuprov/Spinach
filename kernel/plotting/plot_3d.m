@@ -190,7 +190,7 @@ if (~isnumeric(parameters.zerofill))||(~isreal(parameters.zerofill))||...
    any(mod(parameters.zerofill,1)~=0)||any(parameters.zerofill<1)
     error('parameters.zerofill must be a three-element vector of finite positive real integers.');
 end
-if ~isequal(size(spectrum),parameters.zerofill)
+if ~isequal(size(spectrum),reshape(parameters.zerofill,1,[]))
     error('spectrum dimensions must match parameters.zerofill.');
 end
 if ~isfield(parameters,'axis_units')

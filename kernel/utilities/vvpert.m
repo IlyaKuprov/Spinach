@@ -40,6 +40,9 @@ function [Ep,G]=vvpert(E0,H1,order)
 % Check consistency
 grumble(E0,H1,order);
 
+% Enforce exact hermiticity
+H1=(H1+H1')/2;
+
 % Reciprocal energy differences
 Q=1./(E0'-E0); Q(logical(speye(size(Q))))=0;
 if any(~isfinite(Q),'all')
@@ -107,7 +110,8 @@ function grumble(E0,H1,order)
 if (~isnumeric(E0))||(~isreal(E0))||(~iscolumn(E0))
     error('E0 must be a real column vector.');
 end
-if (~isnumeric(H1))||(~ishermitian(H1))
+if (~isnumeric(H1))||(size(H1,1)~=size(H1,2))||...
+   (norm(H1-H1',1)>1e-10*max(norm(H1,1),eps()))
     error('H1 must be a Hermitian matrix.');
 end
 if (numel(E0)~=size(H1,1))||(numel(E0)~=size(H1,2))

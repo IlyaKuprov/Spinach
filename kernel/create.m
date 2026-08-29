@@ -520,6 +520,12 @@ if isfield(inter,'modes')
         end
     end
 
+    % Physical mode frequencies, laboratory carriers included where declared
+    phys_frqs=abs(spin_system.inter.modes.frqs);
+    carr_mask=spin_system.inter.modes.carriers>0;
+    phys_frqs(carr_mask)=spin_system.inter.modes.carriers(carr_mask)+...
+                         spin_system.inter.modes.frqs(carr_mask);
+
     % Absorb mode damping in its three equivalent forms
     for n=find(mode_mask)
         if isfield(inter.modes,'lifetimes')&&(~isempty(inter.modes.lifetimes{n}))
@@ -527,15 +533,9 @@ if isfield(inter,'modes')
         elseif isfield(inter.modes,'linewidths')&&(~isempty(inter.modes.linewidths{n}))
             spin_system.inter.modes.damp(n)=2*pi*inter.modes.linewidths{n};
         elseif isfield(inter.modes,'qfactors')&&(~isempty(inter.modes.qfactors{n}))
-            spin_system.inter.modes.damp(n)=abs(spin_system.inter.modes.frqs(n))/inter.modes.qfactors{n};
+            spin_system.inter.modes.damp(n)=phys_frqs(n)/inter.modes.qfactors{n};
         end
     end
-
-    % Physical mode frequencies, laboratory carriers included where declared
-    phys_frqs=abs(spin_system.inter.modes.frqs);
-    carr_mask=spin_system.inter.modes.carriers>0;
-    phys_frqs(carr_mask)=spin_system.inter.modes.carriers(carr_mask)+...
-                         spin_system.inter.modes.frqs(carr_mask);
 
     % Refuse the default temperature when the modes are damped
     if (~isfield(inter,'temperature'))&&any(spin_system.inter.modes.damp>0)
@@ -2981,11 +2981,16 @@ if isfield(inter,'modes')
             if inter.modes.qfactors{n}<=0
                 error(['inter.modes.qfactors element for mode ' int2str(n) ' must be positive.']);
             end
-            if inter.modes.frqs{n}==0
-                error(['inter.modes.qfactors for mode ' int2str(n) ' needs a non-zero mode '...
+            if isempty(carrier_n)&&(inter.modes.frqs{n}==0)
+                error(['inter.modes.qfactors for mode ' int2str(n) ' needs a non-zero physical '...
                        'frequency, use inter.modes.lifetimes or inter.modes.linewidths.']);
             end
-            damp_count=damp_count+1; kappa=2*pi*abs(inter.modes.frqs{n})/inter.modes.qfactors{n};
+            if isempty(carrier_n)
+                kappa=2*pi*abs(inter.modes.frqs{n})/inter.modes.qfactors{n};
+            else
+                kappa=2*pi*(carrier_n+inter.modes.frqs{n})/inter.modes.qfactors{n};
+            end
+            damp_count=damp_count+1;
         end
         if damp_count>1
             error(['multiple damping specifications for bosonic mode ' int2str(n)]);

@@ -1,7 +1,10 @@
-% Signal heterodyne from wall clock time into the rotating 
-% frame. Uses a GPU if one is available. Syntax:
-% 
-%              heterodyne(dt,exp_data,car_freq)
+% Signal heterodyne from wall clock time into the rotating frame
+% using analytic signal demodulation: the negative frequency half
+% of the spectrum (the counter-rotating component), as well as the
+% direction-ambiguous DC and Nyquist bins, are dropped; the posi-
+% tive frequency half is doubled and frequency-shifted. Syntax:
+%
+%               [X,Y]=heterodyne(dt,signal,freq)
 %
 % Parameters:
 %
@@ -14,11 +17,15 @@
 % Outputs:
 %
 %   X, Y       - in-phase and out-of-phase parts of the
-%                rotating frame
+%                rotating frame signal, column vectors
 %
-%
-% Note: the signal must be sampled with at least four points 
-%       per period of the frequency being demodulated.
+% Notes: the signal must be sampled with more than two points per
+%        period of the frequency being demodulated; the transform
+%        is zero-phase, so sample k of the outputs refers to the
+%        same wall clock time as sample k of the input; dropping
+%        the DC bin subtracts the signal mean exactly; the record
+%        is treated as periodic by the FFT, and should therefore
+%        begin and end in dead time.
 %
 % a.acharya@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -30,43 +37,18 @@ function [X,Y]=heterodyne(dt,signal,freq)
 % Check consistency
 grumble(dt,signal,freq);
 
-% Define a lowpass filter
-F=designfilt('lowpassfir','FilterOrder',8,...
-             'HalfPowerFrequency',0.25);
+% Build time grid
+time_grid=dt*((1:numel(signal))'-1);
 
-% Decide the output
-if nargout==0
+% One-sided spectral mask, DC and Nyquist bins dropped
+mask=zeros(numel(signal),1);
+mask(2:ceil(numel(signal)/2))=2;
 
-    % Plot the filter profile
-    freqz(F.Coefficients,1,[],1/dt);
+% Demodulate the analytic signal into the rotating frame
+signal=ifft(mask.*fft(signal)).*exp(-2i*pi*freq*time_grid);
 
-else
-
-    % Build time grid
-    time_grid=dt*((1:numel(signal))'-1);
-
-    % Move inputs to GPU
-    if canUseGPU()
-        signal=gpuArray(signal); 
-        time_grid=gpuArray(time_grid);
-    end
-
-    % Mix with carrier frequency
-    X=2*signal.*cos(2*pi*freq*time_grid);
-    Y=2*signal.*sin(2*pi*freq*time_grid);
-    clear('signal','time_grid');
-
-    % Get coefficients
-    B=F.Coefficients; 
-    if canUseGPU()
-        B=gpuArray(B);
-    end
-
-    % Apply the filter
-    X=gather(fftfilt(B,X)); 
-    Y=gather(fftfilt(B,Y));
-
-end
+% In-phase and out-of-phase components
+X=real(signal); Y=-imag(signal);
 
 end
 
@@ -82,8 +64,8 @@ end
 if (~isnumeric(freq))||(~isreal(freq))||(~isscalar(freq))||(~isfinite(freq))
     error('freq must be a finite real number.');
 end
-if (freq~=0)&&((4*dt)>(1/abs(freq)))
-    error('the specified frequency is not sampled well enough.');
+if (freq~=0)&&((2*dt)>=(1/abs(freq)))
+    error('the carrier must be sampled with more than two points per period.');
 end
 end
 
@@ -96,6 +78,6 @@ end
 % station spikes can appear. That's what seems to have misled us. Moral:
 % check that the "NMR signal" disappears when no pulse is applied.
 %
-% Malcolm Levitt's email to 
+% Malcolm Levitt's email to
 % his group, July 2023.
 

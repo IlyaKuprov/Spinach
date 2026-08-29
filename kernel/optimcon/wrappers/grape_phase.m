@@ -51,7 +51,7 @@ for n=1:size(phi_profile,1)
 end
 
 % Translate the freeze mask to Cartesians
-spin_system.control.freeze=kron(spin_system.control.freeze,[1; 1]);
+spin_system.control.freeze=logical(kron(spin_system.control.freeze,[1; 1]));
 
 % Just fidelity
 if nargout==2

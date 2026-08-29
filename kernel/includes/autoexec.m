@@ -7,6 +7,9 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=autoexec.m>
 
+% Kill the pointless GPU deprecation warning
+warning('off','parallel:gpu:device:DeviceDeprecated');
+
 % Kill stupid ass figure defaults in R2025a and later 
 set(groot,'defaultFigurePosition',[680 458 560 420]); 
 set(groot,'defaultFigureWindowStyle','normal'); 

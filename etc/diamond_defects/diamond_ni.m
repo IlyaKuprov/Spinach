@@ -9,6 +9,10 @@
 % as unresolved rather than explicitly modelled.
 % Other nickel-centre table values from Nadolinny et al., Crystals
 % 7, 237 (2017), https://doi.org/10.3390/cryst7080237
+% The zero-field splitting column of Table 2 of that review is in
+% millitesla despite its tesla header: Nadolinny et al., Appl. Magn.
+% Reson. 28, 365 (2005) report D = 171 MHz for NOL1 (NIRIM5), which
+% is -6.10 mT rather than -6.10 T.
 %
 % Parameters:
 %
@@ -51,7 +55,6 @@ end
 
 % Set field-unit conversion constants
 hz_per_mt=abs(spin('E'))/(2*pi)*1e-3;
-hz_per_t=abs(spin('E'))/(2*pi);
 
 % Select the nickel centre
 centre=lower(parameters.centre);
@@ -136,12 +139,12 @@ switch centre
         electron='E3';
         frame=frame_111;
         gmat=((frame)*diag([2.022 2.022 2.037])*(frame)');
-        zfs=frame*zfs2mat(1.132*hz_per_t,0,0,0,0)*frame';
+        zfs=frame*zfs2mat(1.132*hz_per_mt,0,0,0,0)*frame';
     case {'nol1','nirim5'}
         electron='E3';
         frame=frame_111;
         gmat=((frame)*diag([2.002 2.002 2.0235])*(frame)');
-        zfs=frame*zfs2mat(-6.10*hz_per_t,0,0,0,0)*frame';
+        zfs=frame*zfs2mat(-6.10*hz_per_mt,0,0,0,0)*frame';
     otherwise
         error('unknown nickel centre.');
 end

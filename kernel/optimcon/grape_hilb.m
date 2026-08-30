@@ -51,6 +51,12 @@
 % Note: this is a low level function that is not designed to be called
 %       directly. Use grape_xy.m and grape_phase.m instead.
 %
+% Note: the overlap is computed as hdot(rho_targ,rho(T)), with the target
+%       state on the conjugated side of the inner product; this matches
+%       the Liouville-space convention used in grape_liouv.m. The sign of
+%       the 'imag' fidelity, its gradient, and its Hessian follows this
+%       argument order; swapping the arguments would flip that sign.
+%
 % ilya.kuprov@weizmann.ac.il
 % m.keitel@soton.ac.uk
 %
@@ -94,23 +100,19 @@ end
 % Hush up the output
 spin_system.sys.output='hush';
 
-% Pull the target back through the dead time using
-% the last drift generator in the drift array
+% Pull the target back through the dead time under the last drift generator
 if spin_system.control.dead_time~=0
     rho_targ=step(spin_system,drifts{end},rho_targ,...
                  -spin_system.control.dead_time);
 end
 
-% Push the source through the prefix sequence
-% using the first element of the drift array
+% Push the source through the prefix sequence under the first drift generator
 if ~isempty(spin_system.control.prefix)
     prefix=spin_system.control.prefix;
     rho_init=prefix(spin_system,drifts{1},rho_init);
 end
 
-% Push the target through the suffix sequence
-% (which user needs to code in reverse time)
-% using the last element of the drift array
+% Push the target through the reverse-time suffix sequence under the last drift generator
 if ~isempty(spin_system.control.suffix)
     suffix=spin_system.control.suffix;
     rho_targ=suffix(spin_system,drifts{end},rho_targ);
@@ -241,7 +243,7 @@ if n_outputs>2
 
 end
 
-% Calculate the state overlap
+% State overlap, target on the conjugated side, as in grape_liouv.m
 overlap=hdot(rho_targ,fwd_traj{end});
 
 % Compute gradient

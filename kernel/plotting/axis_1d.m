@@ -25,7 +25,11 @@
 %
 %    axis                  - a row vector of axis tick values
 %
-%    ax_label              - axis label for displaying on the plot
+%    ax_label              - axis label for displaying on the plot;
+%                            the isotope prefix is LaTeX markup, so
+%                            the string must be rendered with the
+%                            LaTeX interpreter, e.g. by kxlabel.m
+%                            or kylabel.m
 %
 % Note: magnetic field units use the free electron g-tensor for conversion.
 %
@@ -66,7 +70,9 @@ basefrq=-spin(parameters.spins{1})*spin_system.inter.magnet/(2*pi);
 
 % Make the isotope mass number an upper index
 k=regexp(parameters.spins{1},'[A-Za-z]','once');
-if k>1 % For things like '195Pt' but not 'E8', etc.
+
+% For things like '195Pt' but not 'E8'
+if k>1
     iso_label=sprintf('$^{%s}$%s',parameters.spins{1}(1:k-1),...
                                   parameters.spins{1}(k:end));
 else

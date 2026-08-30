@@ -26,6 +26,12 @@
 % Note: Euler angles are not returned because the transformation
 %       in question is ill-defined
 %
+% Note: earlier versions of this function returned ax=zz-(xx+yy)/2
+%       and rh=xx-yy; the present definitions (ax doubled, rh nega-
+%       ted) match the convention of axrh2mat.m, meaning that with
+%       [iso,ax,rh]=mat2axrh(M), the call axrh2mat(iso,ax,rh,...)
+%       reproduces the eigenvalues of M
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=mat2axrh.m>

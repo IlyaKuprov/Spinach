@@ -43,7 +43,7 @@
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 % a.acharya@soton.ac.uk
-% c.musselwhite@soton.ac.uk
+% ctm1g20@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=step.m>
 

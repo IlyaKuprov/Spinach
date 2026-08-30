@@ -7,7 +7,7 @@
 %
 %              trajan(spin_system,traj,property,time_axis)
 %
-% Arguments:
+% Parameters:
 %
 %     traj       - a stack of state vectors of any length. The
 %                  number of rows in the trajectory array must
@@ -43,12 +43,12 @@
 %
 %      time_axis - (optional) user specified time axis, a row 
 %                  vector of time positions of each state vec-
-%                  tor inthe trajectory array.
+%                  tor in the trajectory array.
 %
 % The trajectory would usually come out of the evolution.m run from a
 % given starting point under a given Liouvillian.
 %
-% Output:
+% Outputs:
 %
 %     this function writes into the current figure
 %

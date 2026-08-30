@@ -3,48 +3,72 @@
 % procedure. Syntax: 
 %
 %     [source_cube,ranges,pred_pcs,err_ls,reg_a,reg_b]=...
-%                   ipcs(parameters,nxyz,expt_pcs,chi,npoints,...
-%                        lambda,margins,box_centre,box_size)
+%                        ipcs(parameters,npoints,lambda)
 %
 % Parameters:
-% 
-%     nxyz     - nuclear coordinates as [x y z] with multiple rows 
-%                at which PCS has been measured, in Angstroms
 %
-%     expt_pcs - pseudocontact shift in ppm at each nucleus
+%     parameters.xyz      - nuclear coordinates as [x y z] with
+%                           multiple rows at which PCS has been
+%                           measured, in Angstroms
 %
-%     chi      - electron magnetic susceptibility tensor, in units
-%                of Angstrom^3
+%     parameters.expt_pcs - pseudocontact shift in ppm at each
+%                           nucleus, a real column vector
 %
-%     npoints  - number of points in each dimension of the source
-%                cube, a positive integer greater than 10
+%     parameters.xyz_all  - coordinates of all atoms in the mo-
+%                           lecule as [x y z] with multiple rows
+%                           in Angstroms, used for source confi-
+%                           nement and for the molecule plots
 %
-%     lambda   - regularisation parameters, the first element is 
-%                the coefficient in front of the contrast term
-%                and the second element is the coefficient in
-%                front of the Tikhonov term
+%     parameters.chi      - electron magnetic susceptibility
+%                           tensor, in units of Angstrom^3
 %
-%     margins  - a six-element vector specifying margins to take
-%                around the bounding box of the nuclear coordina-
-%                tes supplied, to account for the possibility that
-%                some unpaired electron may be located on the pe-
-%                riphery and require adequare margins
+%     parameters.equation - 'poisson' to recover the right hand
+%                           side of the Poisson's equation, or
+%                           'kuprov' to recover the unpaired
+%                           electron probability density
 %
-%     box_centre - a three-element vector in Angstrom specifying 
-%                  the centre of the solution box
+%     parameters.box_cent - a three-element vector in Angstrom
+%                           specifying the centre of the box
 %
-%     box_size   - a three-element vector in Angstrom specifying
-%                  the size of the solution box
+%     parameters.box_size - a three-element vector in Angstrom
+%                           specifying the size of the box
 %
-%     equation   - 'poisson' to recover the right hand side of the
-%                   Poisson's equation, 'kuprov' to recover the
-%                   unpaired electron probability density
+%     parameters.margins  - a six-element vector specifying mar-
+%                           gins to take around the bounding box
+%                           of the nuclear coordinates supplied,
+%                           to account for the possibility that
+%                           some unpaired electron may be loca-
+%                           ted on the periphery and require
+%                           adequate margins
 %
-%     gpu        - set to true to enable GPU processing
-%                  (much faster), false to run on CPU
+%     parameters.confine  - two non-negative radii in Angstrom;
+%                           source density is rejected within
+%                           the first radius of any atom, and
+%                           accepted within the second
+%
+%     parameters.sharpen  - weight of the contrast penalty term,
+%                           a real scalar
+%
+%     parameters.plot     - cell array of visualisation options,
+%                           a subset of 'diagnostics', 'densi-
+%                           ty', 'molecule', 'tightzoom', and
+%                           'box'
+%
+%     parameters.gpu      - set to true to enable GPU processing
+%                           (much faster), false to run on CPU
+%
+%     npoints             - number of points in each dimension
+%                           of the source cube, a positive in-
+%                           teger greater than 10
+%
+%     lambda              - regularisation parameters, the first
+%                           element is the coefficient in front
+%                           of the contrast term and the second
+%                           element is the coefficient in front
+%                           of the Tikhonov term
 %
 % Outputs:
-% 
+%
 %     source_cube - source term cube with dimensions ordered as
 %                   [X Y Z]
 %
@@ -54,7 +78,7 @@
 %     pred_pcs    - pseudocontact shifts produced by the source
 %                   cube returned in the first parameter
 %
-%     ls_err      - least squares error in ppm^2
+%     err_ls      - least squares error in ppm^2
 %
 %     reg_a       - contrast penalty term
 %

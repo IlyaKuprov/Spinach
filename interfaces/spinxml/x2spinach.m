@@ -1,6 +1,6 @@
 % Reads SpinXML files and forms Spinach data structures. Syntax:
 %
-%         [sys,inter]=x2spinach(file_name,shielding_refs)
+%         [sys,inter]=x2spinach(filename,shielding_refs)
 %
 % Parameters: 
 %

@@ -1,7 +1,7 @@
 % Fits the point electron model PCS to the experimental pseudocon-
 % tact shift coordinates and values. Syntax:
 %
-%       [exyz,chi,pred_pcs]=ippcs(nxyz,mguess,expt_pcs)
+%   [mxyz,chi,pred_pcs,s_mxyz,s_chi]=ippcs(nxyz,mguess,expt_pcs)
 %
 % Parameters:
 %

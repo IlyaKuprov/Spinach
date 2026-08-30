@@ -153,14 +153,14 @@ profile=grid_test(0,0,0,1,0,'D_lmn');
 result=test_close(result,'grid_test rank zero residual',profile,0,1e-15,1e-15,...
                   'a single unit-weight point integrates the constant Wigner function exactly');
 
-% Check spatial-grid point estimate against the documented formula
+% Pin the spatial-grid point estimate as a change detector for the implemented formula
 amps=[0.01 -0.02];
 durs=[1e-3 2e-3];
 coh_order=2;
 sample_size=0.01;
 n_ref=ceil(abs(coh_order*spin('1H')*sum(abs(amps.*durs)))*sample_size/pi);
-result=test_close(result,'ngridpts formula',ngridpts(amps,durs,'1H',coh_order,sample_size),n_ref,0,0,...
-                  'the grid point estimate is the Nyquist count for the worst-case gradient spiral');
+result=test_close(result,'ngridpts change detector',ngridpts(amps,durs,'1H',coh_order,sample_size),n_ref,0,0,...
+                  'change detector: the reference mirrors the implemented worst-case spiral formula, not an independent derivation');
 
 % Check seeded repulsion grid invariants without relying on a particular random cloud
 rng_state=rng;

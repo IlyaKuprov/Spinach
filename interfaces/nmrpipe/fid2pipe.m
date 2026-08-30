@@ -29,6 +29,10 @@
 %       components; recombination is done in the accompanying NMRPipe
 %       processing script after the direct-dimension Fourier transform
 %
+% Note: the indirect dimension is written in the NMRPipe hypercomplex
+%       convention, two records per increment, and therefore declared
+%       with yN equal to twice yT
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=fid2pipe.m>
@@ -73,10 +77,14 @@ npts_f1=size(fid.pos,2);
 
 % Export echo and anti-echo components separately
 branches={'pos','neg'};
+quad_rots=[-1i +1i];
 for n=1:numel(branches)
 
     % Select the current component
     data=fid.(branches{n});
+
+    % Interleave the quadrature partner records NMRPipe expects in F1
+    data=reshape([data; quad_rots(n)*data],npts_f2,2*npts_f1);
 
     % Write the text input for txt2pipe
     txt_file=[file_root '_' branches{n} '.txt'];
@@ -84,7 +92,7 @@ for n=1:numel(branches)
     if file_id<0
         error('could not open the temporary text file.');
     end
-    for k=1:npts_f1
+    for k=1:2*npts_f1
         for m=1:npts_f2
             fprintf(file_id,'%d %d %24.16E %24.16E\n',m,k,real(data(m,k)),imag(data(m,k)));
         end
@@ -100,7 +108,7 @@ for n=1:numel(branches)
              ' -xOBS ' num2str(obs_f2,16) ...
              ' -xCAR ' num2str(car_f2,16) ...
              ' -xLAB ' parameters.spins{2} ...
-             ' -yN ' num2str(npts_f1) ...
+             ' -yN ' num2str(2*npts_f1) ...
              ' -yT ' num2str(npts_f1) ' -yMODE Complex' ...
              ' -ySW ' num2str(parameters.sweep(1),16) ...
              ' -yOBS ' num2str(obs_f1,16) ...

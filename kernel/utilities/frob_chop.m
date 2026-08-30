@@ -14,6 +14,11 @@
 %
 %    r   - the number of singular values to keep
 %
+% Note: singular values below numel(s)*eps*max(s), the standard
+%       numerical rank threshold, are set to zero because the
+%       SVD that produced them does not resolve them; above that
+%       threshold the requested tolerance is honoured exactly.
+%
 % d.savostyanov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 %
@@ -24,9 +29,9 @@ function r=frob_chop(s,tol)
 % Check consistency
 grumble(s,tol);
 
-% Remove round-off artefacts relative to the largest singular value
+% Remove round-off artefacts below the numerical rank threshold
 s=real(s(:));
-s(abs(s)<1e-12*max(abs(s)))=0;
+s(abs(s)<numel(s)*eps*max(abs(s)))=0;
 s=max(s,0);
 
 % Find the cutting point
@@ -47,7 +52,7 @@ function grumble(s,tol)
 if (~isnumeric(tol))||(~isreal(tol))||(~isscalar(tol))||(tol<0)
     error('tol must be a non-negative real scalar.');
 end
-if (~isnumeric(s))||(~isvector(s))
+if (~isnumeric(s))||((~isvector(s))&&(~isempty(s)))
     error('s must be a vector of non-negative real numbers.');
 end
 if any(~isfinite(s(:)))||any(abs(imag(s(:)))>1e-10*max(abs(s(:))))||...

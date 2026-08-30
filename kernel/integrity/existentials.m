@@ -106,15 +106,22 @@ end
 % Windows
 if ispc
 
-    % Find out which file system Spinach volume has
+    % Get the volume specifier of the Spinach path
     own_disk=mfilename('fullpath'); own_disk=own_disk(1:3);
-    own_disk=System.IO.DriveInfo(own_disk);
 
-    % Warn about non-NTFS volumes
-    if ~strcmp(char(own_disk.DriveFormat),'NTFS')
-        warning('Spinach:NonNTFSVolume',['Spinach is running from a ' ...
-                char(own_disk.DriveFormat) ' volume; NTFS is recommended ' ...
-                'on Windows for reliable file locking and performance.']);
+    % UNC paths have no drive letter and no volume to interrogate
+    if own_disk(2)==':'
+
+        % Find out which file system Spinach volume has
+        own_disk=System.IO.DriveInfo(own_disk);
+
+        % Warn about non-NTFS volumes
+        if ~strcmp(char(own_disk.DriveFormat),'NTFS')
+            warning('Spinach:NonNTFSVolume',['Spinach is running from a ' ...
+                    char(own_disk.DriveFormat) ' volume; NTFS is recommended ' ...
+                    'on Windows for reliable file locking and performance.']);
+        end
+
     end
 
 end

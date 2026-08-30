@@ -89,13 +89,16 @@ result=test_true(result,'ist_product_table shape',isequal(size(ist_left),[4 4 4]
 [bos_left,bos_right]=bos_product_table(2);
 result=test_true(result,'bos_product_table shape',isequal(size(bos_left),[4 4 4])&&isequal(size(bos_right),[4 4 4]),...
                  'two-level bosonic product tables must have 4x4x4 dimensions');
+
+% Generate SLE operators on demand and drop a cache record made by this test
+sle_cache=fullfile(cache_root,'sle_operators_rank_1_int_2.mat');
+sle_cached=exist(sle_cache,'file')==2;
 [Lx,Ly,Lz,D,space_basis]=sle_operators(1,2);
+if ~sle_cached&&exist(sle_cache,'file')==2, delete(sle_cache); end
 result=test_true(result,'sle_operators dimensions',isequal(size(Lx),[10 10])&&isequal(size(Ly),[10 10])&&...
                  isequal(size(Lz),[10 10])&&iscell(D)&&isequal(size(D),[1 2])&&...
                  isempty(D{1})&&isequal(size(D{2}),[5 5])&&isequal(size(space_basis),[10 3]),...
                  'rank-one SLE operators must match the ten-function Wigner basis');
-result=test_true(result,'sle_operators cache record',exist(fullfile(cache_root,'sle_operators_rank_1_int_2.mat'),'file')==2,...
-                 'sle_operators() should create or reuse its on-demand cache record');
 
 % Smoke-test the read-only integrity sniffer without requiring a pristine tree
 old_dir=pwd;

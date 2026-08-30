@@ -11,6 +11,12 @@
 %
 %     results   - structure array with test outcomes and messages
 %
+% A test is reported as a failure when it records at least one failed
+% check in the failures field of its result structure, in which case the
+% error field carries the recorded failures; the messages accumulated
+% before the failure are preserved. A test that throws a MATLAB error is
+% also reported as a failure, and the suite continues with the next test.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function results=run_tests(varargin)
@@ -44,23 +50,24 @@ end
 
 % Preallocate result array
 results=struct('id',{},'name',{},'purpose',{},'status',{},'elapsed',{},...
-               'messages',{},'error',{});
+               'messages',{},'failures',{},'error',{});
 
 % Run the tests
 for n=1:numel(manifest)
     tic;
     try
         result=feval(manifest(n).function);
-        result.status='PASS';
         result.elapsed=toc;
-        result.error='';
+        result.error=strjoin(result.failures,'; ');
+        if isempty(result.failures)
+            result.status='PASS';
+        else
+            result.status='FAIL';
+        end
     catch err
-        result.id=manifest(n).id;
-        result.name=manifest(n).name;
-        result.purpose='';
+        result=new_test_result(manifest(n).id,manifest(n).name,'');
         result.status='FAIL';
         result.elapsed=toc;
-        result.messages={};
         result.error=err.message;
     end
     results(end+1)=result; %#ok<AGROW>

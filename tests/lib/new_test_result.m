@@ -12,7 +12,10 @@
 %
 % Outputs:
 %
-%     result   - test result structure
+%     result   - test result structure, in which the messages field
+%                accumulates one line per check and the failures field
+%                accumulates the details of the checks that did not
+%                pass; an empty failures field means the test passed
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -25,6 +28,8 @@ result.purpose=purpose;
 result.status='RUNNING';
 result.elapsed=0;
 result.messages={};
+result.failures={};
 result.error='';
 
 end
+

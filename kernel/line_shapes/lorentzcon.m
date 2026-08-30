@@ -31,6 +31,10 @@ function y=lorentzcon(offs,ampl,fwhm,x)
 % Check consistency
 grumble(offs,ampl,fwhm,x);
 
+% Match the MEX numeric conversions
+offs=double(offs); ampl=double(ampl); fwhm=double(fwhm);
+if isinteger(x), x=double(x); end
+
 % Width parameter
 gam=fwhm/2;
 

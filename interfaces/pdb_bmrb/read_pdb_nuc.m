@@ -27,7 +27,7 @@
 % Note: All atoms in the file are read, make sure the PDB only contains
 %       one model.
 %
-% i.kuprov@soton.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=Read_pdb_nuc.m>
 

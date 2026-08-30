@@ -43,15 +43,8 @@ spin_s=test_spin_system(sys,inter,bas);
 unit_s=unit_state(spin_s);
 result=test_close(result,'unit_state sphten-liouv first component',unit_s,sparse(1,1,1,size(spin_s.bas.basis,1),1),1e-15,1e-15,...
                   'spherical-tensor Liouville unit state is the T(0,0) population basis vector');
-
-% Confirm that stateinfo runs without throwing on a valid state vector
-try
-    stateinfo(spin_s,unit_s,1);
-    stateinfo_ok=true;
-catch
-    stateinfo_ok=false;
-end
-result=test_true(result,'stateinfo sphten-liouv smoke',stateinfo_ok,...
+stateinfo(spin_s,unit_s,1);
+result=test_true(result,'stateinfo sphten-liouv smoke',true,...
                  'stateinfo must accept a valid spherical-tensor state vector and population count');
 
 % Two-spin singlet and triplet constructors must form four orthogonal projectors summing to identity

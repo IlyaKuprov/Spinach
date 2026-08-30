@@ -26,15 +26,18 @@
 %
 %    time_grid - row vector of time grid ticks
 %
-% Note: the rotation sense is counterclockwise - the effective RF
+% Note: the rotation sense is anticlockwise - the effective RF
 %       field of an event points at the angle 2*pi*freq*t+phi from
 %       the X axis. Spinach places a spin with a Larmor frequency
 %       offset of f Hz into a drift of 2*pi*f*Lz rad/s, under which
-%       transverse magnetisation also rotates counterclockwise; an
+%       transverse magnetisation also rotates anticlockwise; an
 %       event at frequency f is therefore on resonance with such a
 %       spin and nutates it about the axis at the angle phi from X.
-%       The opposite sign of the Y row is the counter-rotating com-
-%       ponent, which is off-resonance by 2*f and does not nutate.
+%       The opposite sign of the Y row puts the field at the angle
+%       phi-2*pi*freq*t, off-resonance by 2*f; its effect on the
+%       spin averages out to the extent that 2*f exceeds the nuta-
+%       tion frequency. At f=0 both signs give a static field, and
+%       differ only in reflecting the nutation axis into -phi.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -85,7 +88,7 @@ for n=1:numel(fapt)
     % Get the time interval mask
     time_mask=(time_grid>=start_time)&(time_grid<=end_time);
 
-    % Add event to the waveform, counterclockwise rotation sense
+    % Add event to the waveform, anticlockwise rotation sense
     wave(1,:)=wave(1,:)+ampl*cos(2*pi*freq*time_grid+phi).*time_mask;
     wave(2,:)=wave(2,:)+ampl*sin(2*pi*freq*time_grid+phi).*time_mask;
 

@@ -32,6 +32,11 @@
 %   opts.local_iters - maximum number of bicgstab iterations
 %                      for local problems
 %
+%   opts.sv_floor - absolute floor on the singular values of
+%                   each solution block: values below it are
+%                   set to zero before the relative Frobenius
+%                   norm rank chop, default 1e-10
+%
 %   opts.verb - Verbosity level: silent (0), sweep (1) or full (2)
 %
 % Outputs: 
@@ -42,6 +47,10 @@
 %
 % Note: A, y and x0 should have ntrains==1. Call shrink()
 %       on all three if that is not the case.
+%
+% Note: opts.sv_floor is an absolute threshold, and the block
+%       singular values track the norms of A and y; lower it
+%       when those norms are far below unity.
 %
 % d.savosyanov@soton.ac.uk
 % sergey.v.dolgov@gmail.com
@@ -74,6 +83,9 @@ if ~isfield(opts, 'max_full_size');   opts.max_full_size=500; end
 % Maximum number of bicgstab iterations for local problems
 if ~isfield(opts, 'local_iters');     opts.local_iters=100;   end
 
+% Absolute floor on the singular values of each solution block
+if ~isfield(opts, 'sv_floor');        opts.sv_floor=1e-10;    end
+
 % Verbosity level: silent (0), sweep (1) or full (2)
 if ~isfield(opts, 'verb');            opts.verb=1;            end
 
@@ -84,7 +96,7 @@ end
 x=x0;
 
 % Check inputs for consistency
-grumble(A,y,x);
+grumble(A,y,x,opts.sv_floor);
 
 % Read dimension and mode sizes
 d=y.ncores;     % dimension of the problem
@@ -211,7 +223,7 @@ while ~satisfied
                 
                 % Compute the SVD
                 [u,s,v] = svd(current_block,'econ'); s = real(diag(s));
-                s(abs(s)<1e-10)=0;
+                s(abs(s)<opts.sv_floor)=0;
                 
                 % Select the rank based on Fro-norm thresholding
                 new_rx = frob_chop(s,local_tolerance*norm(s,2)); 
@@ -409,7 +421,10 @@ x.coeff=1; x.tolerance=(norm_x^d)*tol;
 end
 
 % Consistency enforcement
-function grumble(A,y,x0)
+function grumble(A,y,x0,sv_floor)
+if (~isnumeric(sv_floor))||(~isreal(sv_floor))||(~isscalar(sv_floor))||(sv_floor<0)
+    error('opts.sv_floor must be a non-negative real scalar.');
+end
 if ~isa(A,'ttclass') || ~isa(y,'ttclass')
     error('Both matrix and right-hand-side should be ttclass.');
 end

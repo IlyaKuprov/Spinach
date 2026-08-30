@@ -1,6 +1,11 @@
 % Benchmarks iserstep higher-order methods on a chirped-frequency oscillator
 % with radiation damping, that has a state-dependent, and a time-dependent
-% evolution generator. Syntax:
+% evolution generator. The radiation damping term follows Bloembergen and
+% Pound:
+%
+%               https://doi.org/10.1103/PhysRev.95.8
+%
+% Syntax:
 %
 %               iserstep_bench_hiord()
 %
@@ -29,7 +34,7 @@ spin_system=bootstrap();
 
 % Make Bloch-Maxwell generator (Liouvillian, including -1i factors)
 G=@(t,mu)(-1i*[r2 cr*t 0; -cr*t r2 0; 0 0 r1]...
-          -1i*rrd*[mu(3) 0 0; 0 mu(3) 0; mu(1) mu(2) 0]);
+          -1i*rrd*[mu(3) 0 0; 0 mu(3) 0; -mu(1) -mu(2) 0]);
 
 % Set the initial magnetisation
 mu0=euler2dcm(0,pi*178/180,0)*[0 0 1]';

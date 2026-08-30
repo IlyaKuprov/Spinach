@@ -27,6 +27,9 @@
 %
 %   parameters.npts           number of discretization points in the grid
 %
+%   parameters.diff           diffusion coefficient or tensor (m^2/s),
+%                             must have a positive element
+%
 %   parameters.npoints        number of points in the acquired signal
 % 
 %   parameters.sweep          acquisition sweep width, Hz
@@ -215,6 +218,12 @@ if ~isfield(parameters,'npoints')
 elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
        (numel(parameters.npoints)~=1)||(parameters.npoints<1)||(mod(parameters.npoints,1)~=0)
     error('parameters.npoints should be a positive integer.');
+end
+if ~isfield(parameters,'diff')
+    error('the diffusion coefficient should be specified in parameters.diff.');
+elseif (~isnumeric(parameters.diff))||(~isreal(parameters.diff))||...
+       (~any(parameters.diff(:)>0))
+    error('parameters.diff should be a real scalar or tensor with a positive element.');
 end
 end
 

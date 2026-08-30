@@ -2,7 +2,7 @@
 % with Bloch-Siegert corrections enabled in the optimiser and simulator
 % BADCOP1, BADCOP2, and BADCOP3 are designed and validated
 %
-% Calculation time: minutes.
+% Calculation time: minutes
 %
 % aditya.dev@weizmann.ac.il
 

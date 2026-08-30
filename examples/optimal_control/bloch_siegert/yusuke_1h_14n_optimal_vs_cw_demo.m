@@ -24,7 +24,7 @@
 % windows are intentionally narrower than a full quadrupolar powder/MAS
 % treatment because this is an effective model.
 %
-% Calculation time: minutes.
+% Calculation time: minutes
 %
 % aditya.dev@weizmann.ac.il
 

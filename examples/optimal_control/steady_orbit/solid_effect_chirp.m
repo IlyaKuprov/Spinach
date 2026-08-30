@@ -2,7 +2,7 @@
 % with the timing and power settings matching the XiX ex-
 % eriment, but complete liberty is the choice of phase.
 %
-% Calculation time: days on a large parallel cluster.
+% Calculation time: days on a large parallel cluster
 %
 % guinevere.mathies@uni-konstanz.de
 % shebha-anandhi.jegadeesan@uni-konstanz.de

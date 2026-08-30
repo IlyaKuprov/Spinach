@@ -10,7 +10,7 @@
 % modulated decoupling. Replace the effective coefficients below with a
 % more detailed Hamiltonian model for quantitative work.
 %
-% Calculation time: seconds.
+% Calculation time: seconds
 %
 % aditya.dev@weizmann.ac.il
 

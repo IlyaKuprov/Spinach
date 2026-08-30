@@ -18,7 +18,7 @@
 % because this script is a reduced control surrogate, not a full
 % QJF/MAS quadrupolar simulation.
 %
-% Calculation time: minutes.
+% Calculation time: minutes
 %
 % aditya.dev@weizmann.ac.il
 

@@ -14,7 +14,7 @@
 %
 %      parameters.dims           size of the sample (m)
 %
-%      parameters.npts           number of discretization points in the grid
+%      parameters.npts           number of discretisation points in the grid
 %
 %      parameters.npoints        numbers of points in the two dimensions,
 %                                a two-element vector [F1 F2]
@@ -28,7 +28,7 @@
 %
 %      parameters.timestep2      time step of the F2 evolution (s)
 %
-%      parameters.pulsenpoints   number of discretization points in the
+%      parameters.pulsenpoints   number of discretisation points in the
 %                                chirp pulse waveform
 %
 %      parameters.duration       duration of each of the two chirp

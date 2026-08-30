@@ -2964,18 +2964,18 @@ if isfield(inter,'modes')
             error(['negative frequency specified for bosonic mode ' int2str(n) ...
                    ', declare inter.modes.carriers to make it a detuning.']);
         end
-        damp_count=0; kappa=0;
+        damp_count=0;
         if isfield(inter.modes,'lifetimes')&&(~isempty(inter.modes.lifetimes{n}))
             if inter.modes.lifetimes{n}<=0
                 error(['inter.modes.lifetimes element for mode ' int2str(n) ' must be positive.']);
             end
-            damp_count=damp_count+1; kappa=1/inter.modes.lifetimes{n};
+            damp_count=damp_count+1;
         end
         if isfield(inter.modes,'linewidths')&&(~isempty(inter.modes.linewidths{n}))
             if inter.modes.linewidths{n}<=0
                 error(['inter.modes.linewidths element for mode ' int2str(n) ' must be positive.']);
             end
-            damp_count=damp_count+1; kappa=2*pi*inter.modes.linewidths{n};
+            damp_count=damp_count+1;
         end
         if isfield(inter.modes,'qfactors')&&(~isempty(inter.modes.qfactors{n}))
             if inter.modes.qfactors{n}<=0
@@ -2985,17 +2985,12 @@ if isfield(inter,'modes')
                 error(['inter.modes.qfactors for mode ' int2str(n) ' needs a non-zero physical '...
                        'frequency, use inter.modes.lifetimes or inter.modes.linewidths.']);
             end
-            if isempty(carrier_n)
-                kappa=2*pi*abs(inter.modes.frqs{n})/inter.modes.qfactors{n};
-            else
-                kappa=2*pi*(carrier_n+inter.modes.frqs{n})/inter.modes.qfactors{n};
-            end
             damp_count=damp_count+1;
         end
         if damp_count>1
             error(['multiple damping specifications for bosonic mode ' int2str(n)]);
         end
-        if (kappa>0)&&(~isempty(carrier_n))&&((carrier_n+inter.modes.frqs{n})<=0)
+        if (damp_count>0)&&(~isempty(carrier_n))&&((carrier_n+inter.modes.frqs{n})<=0)
             error(['the physical frequency of damped bosonic mode ' int2str(n) ...
                    ' must be positive, check inter.modes.carriers and inter.modes.frqs.']);
         end

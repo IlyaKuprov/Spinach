@@ -422,7 +422,8 @@ end
 
 % Consistency enforcement
 function grumble(A,y,x0,sv_floor)
-if (~isnumeric(sv_floor))||(~isreal(sv_floor))||(~isscalar(sv_floor))||(sv_floor<0)
+if (~isnumeric(sv_floor))||(~isreal(sv_floor))||(~isscalar(sv_floor))||...
+   (~isfinite(sv_floor))||(sv_floor<0)
     error('opts.sv_floor must be a non-negative real scalar.');
 end
 if ~isa(A,'ttclass') || ~isa(y,'ttclass')

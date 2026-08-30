@@ -151,6 +151,10 @@ result=test_close(result,'rotor_stack phase grid',rotor_phases,0,1e-14,1e-14,...
 % Check S2 fully symmetric projector construction on a four-state product basis
 spin_system=local_minimal_system('sphten-liouv',4);
 spin_system.comp.nspins=2;
+spin_system.comp.isotopes={'1H','1H'};
+spin_system.inter.zeeman.matrix={zeros(3);zeros(3)};
+spin_system.inter.giant.coeff=cell(2,1);
+spin_system.inter.coupling.matrix=cell(2,2);
 spin_system.bas.basis=[0 0;1 0;0 1;1 1];
 bas.sym_group={'S2'};
 bas.sym_spins={[1 2]};
@@ -197,6 +201,7 @@ spin_system.sys.disable={};
 spin_system.bas.formalism=formalism;
 spin_system.bas.basis=zeros(dim,1);
 spin_system.comp.mults=2;
+spin_system.tols.inter_cutoff=1e-10;
 spin_system.tols.liouv_zero=1e-12;
 spin_system.tols.prop_chop=1e-12;
 spin_system.tols.dense_matrix=0.5;
@@ -224,3 +229,5 @@ if isempty(current_pool)
 end
 
 end
+
+

@@ -16,7 +16,7 @@ T1n=[50.0 5.0 0.500 0.050 0.005];
 % Get the figure started
 kfigure(); hold on; kgrid;
 kxlabel('XiX repetition time (ms)');
-kylabel('$\langle I_Z \rangle _{\infty}$');
+kylabel('$-\langle I_Z \rangle _{\infty}$');
 xlim([0 1]); ylim([-0.01e-3 0.7e-3]);
 
 % Plot the curves
@@ -58,8 +58,8 @@ sys.tols.prop_chop=1e-12;
 % Algorithmic options
 sys.disable={'hygiene'};
 
-% Distance ensemble
-[r,wr]=gaussleg(3.5,20,3);      % Angstrom
+% Distance ensemble, Angstrom
+[r,wr]=gaussleg(3.5,20,3);
 
 % Log spacing for rep. time
 rep_time=logspace(-5,-3,30);
@@ -74,8 +74,7 @@ for n=1:numel(r)
     inter.coordinates={[0.000 0.000 0.000];
                        [0.000 0.000 r(n) ]};
        
-    % Relaxation rates, distance and orientation 
-    % dependence provided using a function handle
+    % Relaxation rates, fixed scalars with the nuclear R1 set by the swept T1n
     inter.relaxation={'t1_t2'};
     inter.r1_rates={1e3 1/T1n};
     inter.r2_rates={200e3 50e3};
@@ -89,13 +88,23 @@ for n=1:numel(r)
     % Detect the proton
     parameters.coil=state(spin_system,'Lz','1H');
 
-    % Experiment parameters
+    % Working spins and powder grid
     parameters.spins={'E','1H'};
-    parameters.irr_powers=18e6;              % Electron nutation frequency [Hz]
     parameters.grid='rep_2ang_800pts_sph';
-    parameters.pulse_dur=48e-9;              % Pulse duration, seconds
-    parameters.nloops=36;                    % Number of XiX DNP blocks
-    parameters.phase=pi;                     % Second pulse inverted phase
+
+    % Electron nutation frequency, Hz
+    parameters.irr_powers=18e6;
+
+    % Pulse duration, seconds
+    parameters.pulse_dur=48e-9;
+
+    % Number of XiX DNP blocks
+    parameters.nloops=36;
+
+    % Second pulse inverted phase
+    parameters.phase=pi;
+
+    % Electron offset parameters, Hz
     parameters.addshift=-13e6;
     parameters.el_offs=-39e6;
 

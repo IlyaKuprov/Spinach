@@ -881,8 +881,8 @@ functions may implement anything differentiable --- RLC response models,
 amplifier saturation curves, measured impulse responses --- and the
 supplied Jacobian is verified by the derivative test examples. Because
 the map composes with the fidelity, only first-order optimisers are
-permitted when distortions are present (\code{lbfgs}); analytic Hessians
-of composed distortion chains are not implemented.
+permitted when distortions are present (\code{lbfgs}, \code{rbfgs});
+analytic Hessians of composed distortion chains are not implemented.
 
 %===============================================================
 \section{Spinach optimal control module architecture}
@@ -1269,7 +1269,7 @@ resonator response chains and the associated Jacobians; the derivative
 test suite (\code{examples/fundamentals/derivative\_tests}) shows how to
 verify a hand-written Jacobian against finite differences before trusting
 an optimisation to it. Distortions restrict the optimiser to
-\code{lbfgs}, and combine freely with all other ensemble dimensions ---
+\code{lbfgs} or \code{rbfgs}, and combine freely with all other ensemble dimensions ---
 distinct rows model unit-to-unit hardware spread.
 
 \subsection{Keyholes, prefix, suffix, and dead time}
@@ -1577,7 +1577,7 @@ optimisations\\
 \code{distplot} & \code{\{\}} & distortion chain applied to the
 plotted waveform only\\
 \code{distortion} & none & $E\times S$ cell of distortion function
-handles with Jacobians; forces \code{lbfgs}\\
+handles with Jacobians; requires \code{lbfgs} or \code{rbfgs}\\
 \code{traj\_opts} & \code{\{\}} & \code{\{'average'\}} returns the
 ensemble-averaged trajectory\\
 \code{checkpoint} & none & checkpoint file name in the scratch
@@ -1685,7 +1685,7 @@ feature & \code{rectangle} & \code{trapezium}\\
 LBFGS / RBFGS            & yes & yes\\
 Newton / Goodwin Hessians & yes & no\\
 keyholes                 & yes & no\\
-waveform distortions     & LBFGS only & LBFGS only\\
+waveform distortions     & LBFGS/RBFGS only & LBFGS/RBFGS only\\
 Bloch--Siegert corrections & LBFGS/RBFGS only & no\\
 stroboscopic steady state & yes (see below) & no\\
 phase cycles, offsets, powers, drifts ensembles & yes & yes\\

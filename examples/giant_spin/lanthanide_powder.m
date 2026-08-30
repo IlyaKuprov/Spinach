@@ -36,8 +36,7 @@ parameters.window=[9.32 9.56];
 parameters.npoints=4096;
 parameters.rspt_order=Inf;
 
-% Run the simulation in the high-T approximation
-parameters.rho0=-state(spin_system,'Lz','E8');
+% Run the simulation
 [spec,parameters]=fieldsweep(spin_system,parameters);
 
 % Plotting

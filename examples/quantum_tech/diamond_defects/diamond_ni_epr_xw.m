@@ -7,10 +7,9 @@
 
 function diamond_ni_epr_xw()
 
-% Set Ni NE1 centre model parameters.
+% Set Ni NE1 centre model parameters
 ni_params.centre='ne1';
 ni_params.orientation='111';
-ni_params.nickel='61Ni';
 
 % Build the spin system
 [sys,inter]=diamond_ni(ni_params);

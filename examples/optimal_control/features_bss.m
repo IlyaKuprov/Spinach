@@ -3,8 +3,15 @@
 % at a significant fraction of its Larmor frequency -- a regime where the
 % counter-rotating component of the control field shifts the resonance ap-
 % preciably. A 90-degree pulse is optimised using LBFGS-GRAPE algorithm. 
-% For comparison, the same pulse is also optimised with the corrections 
+% For comparison, the same pulse is also optimised with the corrections
 % switched off and then evaluated in the corrected model.
+%
+% Note: the offset ensemble is deliberately applied through a transverse
+% Lx operator rather than the usual Lz. The resulting static transverse
+% fields of up to half the drive amplitude stress the Bloch-Siegert
+% corrections much harder than resonance offsets would: the fidelity gap
+% between the corrected and the uncorrected pulse is about six times
+% larger than with an Lz offset ensemble.
 %
 % Calculation time: minutes.
 %
@@ -46,6 +53,8 @@ dim=size(spin_system.bas.basis,1);
 control.drifts={{sparse(dim,dim)}};
 control.operators={operator(spin_system,'Lx','1H'),...
                    operator(spin_system,'Ly','1H')};
+
+% Deliberately transverse (Lx) offset ensemble, see the header note
 control.off_ops={operator(spin_system,'Lx','1H')};
 control.offsets={linspace(-1e5,1e5,11)};
 control.isotopes={'1H'};

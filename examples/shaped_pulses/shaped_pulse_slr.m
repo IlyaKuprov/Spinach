@@ -41,7 +41,7 @@ Ly=operator(spin_system,'Ly','1H');
 % Initial state
 rho=state(spin_system,'Lz','1H');
 
-% Inversion SLR pulse waveform
+% Excitation SLR pulse waveform, 90-degree flip angle
 [Cx,Cy,durs]=slr_pulse(256,15e-3,32,pi/2,0.01,0.01);
 
 % Run the SLR pulse

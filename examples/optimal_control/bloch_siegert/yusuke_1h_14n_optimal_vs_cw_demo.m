@@ -16,6 +16,16 @@
 % of the example is to demonstrate the control logic of the Yusuke use
 % case inside the current Bloch-Siegert-aware GRAPE framework.
 %
+% The numerical regime is paper-inspired: an 800 MHz 1H field, low-power
+% 14N irradiation around 15-23 kHz, and 10 us pulse elements, applied as
+% a millisecond-scale decoupling block rather than a single very short
+% cycle, because the proton dephasing and Bloch-Siegert accumulation
+% become visible over acquisition-time decoupling windows. The offset
+% windows are intentionally narrower than a full quadrupolar powder/MAS
+% treatment because this is an effective model.
+%
+% Calculation time: minutes.
+%
 % aditya.dev@weizmann.ac.il
 
 function yusuke_1h_14n_optimal_vs_cw_demo()
@@ -30,9 +40,7 @@ sys.isotopes={'1H','14N'};
 inter.zeeman.scalar={0,0};
 inter.coupling.scalar=cell(2);
 
-% Effective NH interaction to be refocused by 14N irradiation. This is a
-% reduced-model surrogate for the residual proton-nitrogen interaction in
-% the decoupling problem, not a literal full solid-state Hamiltonian.
+% Effective NH interaction to be refocused by 14N irradiation, a reduced-model surrogate for the residual proton-nitrogen interaction, not a literal solid-state Hamiltonian
 inter.coupling.scalar{1,2}=1500;
 
 % Basis set
@@ -43,9 +51,7 @@ bas.approximation='none';
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Observed 1H states used to define the transverse-preservation target.
-% Only transverse magnetisation is used because that is the part directly
-% relevant to proton line preservation during decoupling.
+% Observed 1H transverse states, the part directly relevant to proton line preservation during decoupling
 Hx=state(spin_system,'Lx','1H'); Hx=Hx/norm(full(Hx),2);
 Hy=state(spin_system,'Ly','1H'); Hy=Hy/norm(full(Hy),2);
 
@@ -57,15 +63,7 @@ LzN=operator(spin_system,'Lz','14N');
 % Drift Hamiltonian
 H=hamiltonian(assume(spin_system,'nmr'));
 
-% Paper-inspired practical regime:
-%   - 800 MHz 1H field
-%   - low-power 14N irradiation around 15-23 kHz
-%   - 10 us pulse elements
-%   - a millisecond-scale decoupling block rather than a single very short
-%     cycle, because the proton dephasing and Bloch-Siegert accumulation
-%     become visible over acquisition-time decoupling windows
-% The offset windows below are intentionally narrower than a full
-% quadrupolar powder/MAS treatment because this is an effective model.
+% Paper-inspired practical regime, see the discussion in the header
 rf_nominal_hz=20e3;
 nsteps=120;
 pulse_dt=10e-6*ones(1,nsteps);
@@ -97,10 +95,7 @@ control.bsiegert=true();
 % Spinach housekeeping
 spin_system_bs=optimcon(spin_system,control);
 
-% Optimise a low-power phase-modulated 14N cycle. The seed is an XY-type
-% phase cycle rather than a random guess because the heteronuclear
-% preservation problem is structured; random initial phases can give
-% exactly zero overlap for some ensemble members and make GRAPE abort.
+% Optimise a low-power phase-modulated 14N cycle from an XY-type seed: random initial phases can give exactly zero overlap for some ensemble members and make GRAPE abort
 guess=reshape((pi/2)*mod(0:nsteps-1,4),1,[]);
 phi_opt=fmaxnewton(spin_system_bs,@grape_phase,guess);
 

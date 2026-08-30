@@ -10,15 +10,12 @@
 
 function decoherence_naphthalenetetrone()
 
-% Read the spin system (coordinates, chemical shifts,
-% J-couplings and CSAs) from a vacuum DFT calculation
+% Read the spin system (coordinates, chemical shifts, J-couplings, and CSAs) from a vacuum DFT calculation
 [sys,inter]=g2spinach(gparse('../standard_systems/naphthalenetetrone.log'),...
                                                     {{'H','1H'}},31.8,[]);
+
 % Set magnet field to 1.0 Tesla
 sys.magnet=1.0;
-
-% Tighten up the tolerances
-sys.tols.rlx_integration=1e-5;
 
 % Set relaxation theory parameters
 inter.relaxation={'redfield'};

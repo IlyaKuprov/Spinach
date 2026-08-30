@@ -11,7 +11,7 @@ function dirdiff_2()
 % Formalisms to test
 formalisms={'sphten-liouv','zeeman-liouv','zeeman-hilb'};
 
-% Loop over formalisms
+% Loop over formalisms, this only exercises test system construction: the derivative test below runs on random matrices and is formalism-blind
 for n=1:numel(formalisms)
 
     % Get the Spinach object
@@ -46,11 +46,12 @@ for n=1:numel(formalisms)
     % Test analytical against finite difference
     if (norm(DL_anl-DL_num,2)<10*sqrt(eps('double')))&&...
        (norm(DR_anl-DR_num,2)<10*sqrt(eps('double')))
-        disp([formalisms{n} ' test passed']);
+        disp('trapezium quadrature derivative test passed');
     else
-        error([formalisms{n} ' test failed']);
+        error('trapezium quadrature derivative test failed');
     end
 
 end
 
 end
+

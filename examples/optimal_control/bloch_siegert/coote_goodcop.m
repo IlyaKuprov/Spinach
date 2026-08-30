@@ -2,6 +2,8 @@
 % with Bloch-Siegert corrections enabled in the optimiser and simulator
 % The pulse enforces contracted-time C-alpha evolution while inverting CO
 %
+% Calculation time: minutes.
+%
 % aditya.dev@weizmann.ac.il
 
 function coote_goodcop()

@@ -1,6 +1,8 @@
 % Methyl trosy in a rapidly rotating 13CH3 group
-% of a slowly tumbling protein, simulated using 
+% of a slowly tumbling protein, simulated using
 % the Fokker-Planck formalism.
+%
+% Calculation time: minutes
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -9,11 +11,11 @@ function trosy_methyl()
 % Magnet field
 sys.magnet=14.1;
 
-% Cartesian coordinates
-me_xyz=[-1.290651 1.279824 -0.248354;  % C
-        -1.237804 1.209518 -1.347802;  % H
-        -2.348228 1.329796  0.051440;  % H
-        -0.799560 2.212894  0.057684]; % H
+% Cartesian coordinates, carbon in the first row, protons below
+me_xyz=[-1.290651 1.279824 -0.248354;
+        -1.237804 1.209518 -1.347802;
+        -2.348228 1.329796  0.051440;
+        -0.799560 2.212894  0.057684];
 
 % Absolute shielding tensors (DFT)
 shielding=cell(1,4);
@@ -30,9 +32,7 @@ shielding{4}=[ 28.8    1.3    1.0;
                 1.3   34.9    1.4;
                 1.0    1.4   25.7];
 
-% Convert shielding tensors into 
-% chemical shift tensors and put
-% them on resonance
+% Convert shielding tensors into chemical shift tensors and put them on resonance
 shift_tensor=cell(1,4);
 for n=1:4
     shift_tensor{n}=-remtrace(shielding{n});

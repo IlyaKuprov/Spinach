@@ -25,8 +25,9 @@
 %        rho  - the state vector(s) with only the longitudi-
 %               nal or only the zero-quantum states kept
 %
-% Note: this function is only available for sphten-liouv formalism; it
-%       supports Fokker-Planck direct products.
+% Note: this function requires sphten-liouv, zeeman-liouv, or zeeman-
+%       hilb formalism; Fokker-Planck direct products are supported
+%       in the Liouville space formalisms.
 %
 % Note: this is a purely mathematical filter that only mimics - in an
 %       idealised way - the effect of a real homospoil pulse. Essenti-
@@ -49,12 +50,13 @@ if strcmp(spin_system.bas.formalism,'zeeman-hilb')
     rho=spdiags(rhod,0,dim,dim); return;
 end
 
-% In Zeeman basis of Liouville space, zero off-diagonals in every stacked column
+% In Zeeman basis of Liouville space, keep the spin-space diagonal of every folded block
 if strcmp(spin_system.bas.formalism,'zeeman-liouv')
-    dim=sqrt(size(rho,1));
-    offdiag_mask=true(dim^2,1);
-    offdiag_mask(1:(dim+1):dim^2)=false;
-    rho(offdiag_mask,:)=0; return;
+    spn_dim=size(spin_system.bas.basis,1); spc_dim=numel(rho)/spn_dim;
+    problem_dims=size(rho); rho=reshape(rho,[spn_dim spc_dim]);
+    hdim=sqrt(spn_dim); offdiag_mask=true(spn_dim,1);
+    offdiag_mask(1:(hdim+1):spn_dim)=false;
+    rho(offdiag_mask,:)=0; rho=reshape(rho,problem_dims); return;
 end
 
 % Store dimension statistics

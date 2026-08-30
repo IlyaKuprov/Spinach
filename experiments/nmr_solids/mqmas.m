@@ -28,10 +28,11 @@
 %
 % Notes:
 %
-%     parameters.sweep should be a two-element vector
-%     with both elements set equal to parameters.rate,
-%     this is because this pulse sequence is strobo-
-%     scopic with respect to the rotor period
+%     parameters.sweep should be a real scalar set
+%     equal to parameters.rate, this is because this
+%     pulse sequence is stroboscopic with respect to
+%     the rotor period; both dimensions are sampled
+%     at that sweep width
 %
 % ilya.kuprov@weizmann.ac.il
 % m.carravetta@soton.ac.uk

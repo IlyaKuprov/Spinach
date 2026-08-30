@@ -19,9 +19,10 @@
 %
 %  parameters.ro_grad_dur   -  readout gradient duration, s
 %
-%  parameters.diff_g_amp    -  [optional] a vector of diffusion gra-
-%                              dient pair amplitudes in X,Y (T/m) to
-%                              be active during the echo time
+%  parameters.diff_g_amp    -  [optional] a three-element vector of
+%                              diffusion gradient pair amplitudes in
+%                              X,Y,Z (T/m) to be active during the
+%                              echo time
 %
 %  parameters.t_echo        -  echo time after slice selection, seconds
 %

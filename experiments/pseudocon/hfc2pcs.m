@@ -21,6 +21,10 @@
 % Note: Gauss units are used for hyperfine couplings because they do
 %       not depend on the electron g-tensor.
 %
+% Note: the hyperfine tensor must be normalised per unpaired electron,
+%       i.e. supplied in the convention where it enters the spin Hamil-
+%       tonian as S*A*I; this is the convention returned by gparse.m
+%
 % ilya.kuprov@weizmann.ac.il
 % e.suturina@bath.ac.uk
 %

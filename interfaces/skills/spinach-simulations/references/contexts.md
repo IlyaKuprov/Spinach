@@ -188,8 +188,13 @@ Coherence selection is analytical rather than by phase cycling:
 
 The first three also run in `zeeman-liouv` and `zeeman-hilb` through an
 internal Liouville round trip (`homospoil` there keeps only the
-density-matrix diagonal and ignores `zqc_flag`); all three support
-Fokker-Planck direct products.
+density-matrix diagonal and ignores `zqc_flag`). `coherence` and
+`correlation` support Fokker-Planck direct products in every formalism;
+`homospoil` supports them in `sphten-liouv` only, because its
+`zeeman-liouv` branch takes `sqrt(size(rho,1))` as the density matrix
+dimension instead of factoring the spatial part out, which throws for
+most spatial dimensions and masks the wrong elements when the combined
+row count happens to be a perfect square.
 
 ## The `state` and `operator` grammar
 

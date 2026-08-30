@@ -33,6 +33,8 @@ else
         current_line(1:length(spin_number))=spin_number;
         for k=1:spin_system.comp.nspins
             [L,M]=lin2lm(spin_system.bas.basis(n,k));
+
+            % Format the state label and place it in the line
             state_token=['(' num2str(L) ',' num2str(M) ')'];
             current_line(7+8*(k-1)+(1:length(state_token)))=state_token;
         end

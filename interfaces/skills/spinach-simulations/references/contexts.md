@@ -58,7 +58,7 @@ context can compute. The accepted strings differ by context:
 | `.max_rank` | maximum rotor harmonic (or Wigner D-function) rank retained; increase to convergence, a good first guess is the number of expected sidebands | `singlerot`, `floquet`, `gridfree` |
 | `.rate_outer`, `.rate_inner`, `.axis_outer`, `.axis_inner`, `.rank_outer`, `.rank_inner` | the same three quantities for each of the two rotors | `doublerot` |
 | `.tau_c` | rotational diffusion correlation times in seconds; a scalar for isotropic diffusion, a 3x3 matrix for anisotropic | `gridfree` |
-| `.serial` | true disables automatic parallelisation | `powder`, `doublerot` |
+| `.serial` | true disables automatic parallelisation | `powder`, `singlerot`, `doublerot`, `floquet` |
 | `.sum_up` | 1 (default) returns the powder average, 0 returns a cell array of per-orientation answers | `powder`, `singlerot`, `doublerot`, `floquet` |
 
 In `powder`, `parameters.rho0` may be a function handle of the three ZYZ
@@ -87,8 +87,8 @@ parameters.coil_ph={Ph1,...,PhN}; parameters.coil_st={rho1,...,rhoN};
 ```
 
 The relaxation pair is `_ph`/`_op`; the state pairs are `_ph`/`_st`, and the
-consistency checks enforce those names even though the file header writes
-`rho0_op` and `coil_op`. Each `Ph` has the dimension of the voxel grid, and
+consistency checks enforce those names, which the file header states
+correctly. Each `Ph` has the dimension of the voxel grid, and
 each `rho` comes from `state`. The direct product order is Z(x)Y(x)X(x)Spin,
 corresponding to column-wise vectorisation of a 3D array with dimensions
 ordered `[X Y Z]`. `meshflow`, the microfluidics and magnetohydrodynamics
@@ -186,8 +186,15 @@ Coherence selection is analytical rather than by phase cycling:
 - `rho=spinlock(spin_system,Lx,Ly,rho,direction)` applies an analytical
   spin lock.
 
-The first three require `sphten-liouv`; all three support Fokker-Planck
-direct products.
+The first three also run in `zeeman-liouv` and `zeeman-hilb` through an
+internal Liouville round trip (`homospoil` there keeps only the
+density-matrix diagonal and ignores `zqc_flag`). `coherence` and
+`correlation` support Fokker-Planck direct products in every formalism;
+`homospoil` supports them in `sphten-liouv` only, because its
+`zeeman-liouv` branch takes `sqrt(size(rho,1))` as the density matrix
+dimension instead of factoring the spatial part out, which throws for
+most spatial dimensions and masks the wrong elements when the combined
+row count happens to be a perfect square.
 
 ## The `state` and `operator` grammar
 

@@ -26,7 +26,8 @@
 %
 %     parameters.decouple_f1        nuclei that receive midpoint
 %                                   180-degree refocusing pulses in
-%                                   F1, e.g. {'1H','13C'}
+%                                   F1, e.g. {'1H','15N'}; must not
+%                                   contain the F1 active isotope
 %
 %     parameters.J                  working scalar coupling, Hz
 %

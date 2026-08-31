@@ -15,10 +15,18 @@
 % 
 %  parameters.ro_grad_amp   -  readout gradient amplitude, T/m
 %
-%  parameters.ss_grad_dur   -  the duration of the slice selection 
-%                              gradient, seconds 
+%  parameters.rf_frq_list   -  a vector of RF frequencies at each
+%                              pulse slice, Hz
 %
-%  parameters.pe_grad_dur   -  the duration of the phase encoding 
+%  parameters.rf_amp_list   -  a vector of RF amplitudes at each
+%                              pulse slice, rad/s
+%
+%  parameters.rf_dur_list   -  a vector of pulse slice durations,
+%                              seconds
+%
+%  parameters.rf_phi        -  pulse phase at time zero, radians
+%
+%  parameters.pe_grad_dur   -  the duration of the phase encoding
 %                              gradient, seconds 
 %
 %  parameters.ro_grad_dur   -  the duration of the readout gradient,

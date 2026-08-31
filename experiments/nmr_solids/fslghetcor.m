@@ -34,7 +34,11 @@
 %
 %     parameters.coil         - detection state
 %
-%     parameters.sweep        - sweep width, Hz for F1, F2
+%     parameters.sweep        - [F1 F2] sweep widths, Hz; the
+%                               F1 element is not used (the F1
+%                               dwell time is set by the FSLG
+%                               block duration) and may be set
+%                               to NaN
 %
 %     parameters.npoints      - number of points in F1, F2
 %
@@ -208,7 +212,7 @@ if ~isfield(parameters,'sweep')
     error('sweep width should be specified in parameters.sweep variable.');
 elseif (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
        (numel(parameters.sweep)~=2)||any(parameters.sweep<=0)
-    error('parameters.sweep must be a two-element vector of positive real numbers.');
+    error('parameters.sweep must be a two-element real vector with positive elements; the unused F1 element may be NaN.');
 end
 if ~isfield(parameters,'spins')
     error('working spins should be specified in parameters.spins variable.');

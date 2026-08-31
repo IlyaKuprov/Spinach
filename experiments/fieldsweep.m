@@ -2,7 +2,7 @@
 % pensive eigenfields algorithm, an explicit spherical grid, and
 % a hard-coded Lorentzian line shape. Syntax:
 %
-%        [b_axis,spec]=fieldsweep(spin_system,parameters)
+%        [spec,parameters]=fieldsweep(spin_system,parameters)
 %
 % Parameters:
 %
@@ -40,9 +40,11 @@
 %
 % Outputs:
 %
-%     b_axis   - magnetic field axis for plotting
+%     spec       - field-swept EPR spectrum
 %
-%     spec     - field-swept EPR spectrum
+%     parameters - updated parameters structure with the mag-
+%                  netic field axis for plotting returned in
+%                  parameters.b_axis
 %
 % Note: irrespective of the actual sweep extents, the magnetic field
 %       in sys.magnet should be set to 1 Tesla.

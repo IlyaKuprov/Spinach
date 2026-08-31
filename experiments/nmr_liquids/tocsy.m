@@ -39,6 +39,10 @@
 %       explicit MLEV, DIPSI, WALTZ, or clean-TOCSY composite
 %       pulse-train simulation.
 %
+% Note: the mixing time evolution runs under the full Liouvillian
+%       L=H+1i*R+1i*K, meaning that relaxation and kinetics are
+%       active during the spin lock.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=tocsy.m>
@@ -67,7 +71,7 @@ rho=step(spin_system,Lx,parameters.rho0,pi/2);
 % F1 evolution
 rho_stack=evolution(spin_system,L,[],rho,timestep(1),parameters.npoints(1)-1,'trajectory');
 
-% Mixing time under spin-lock
+% Mixing time under spin-lock and the full Liouvillian
 rho_stack_cos=evolution(spin_system,L+2*pi*parameters.lamp*Lx,[],rho_stack,parameters.tmix,1,'final');
 rho_stack_sin=evolution(spin_system,L+2*pi*parameters.lamp*Ly,[],rho_stack,parameters.tmix,1,'final');
 

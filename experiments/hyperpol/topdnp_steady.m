@@ -27,8 +27,9 @@
 %
 %     parameters.delay_dur    - delay duration, seconds
 %
-%     parameters.nloops       - number of XiX/TPPM DNP blocks,
-%                               must be an integer power of 2
+%     parameters.nloops       - number of TOP DNP blocks, a
+%                               positive integer; powers of 2
+%                               are marginally faster
 %
 %     parameters.shot_spacing - delay between microwave irradiation
 %                               periods, seconds

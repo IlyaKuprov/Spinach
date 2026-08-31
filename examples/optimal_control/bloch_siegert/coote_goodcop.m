@@ -49,8 +49,8 @@ ca_ppm=linspace(35,75,100);
 co_ppm=linspace(165,185,30);
 
 % Convert to offset frequencies
-ca_hz=ppm2hz(sys.magnet,'13C',ca_ppm,carrier_ppm);
-co_hz=ppm2hz(sys.magnet,'13C',co_ppm,carrier_ppm);
+ca_hz=ppm2hz(ca_ppm-carrier_ppm,sys.magnet,'13C');
+co_hz=ppm2hz(co_ppm-carrier_ppm,sys.magnet,'13C');
 all_hz=[ca_hz co_hz];
 
 % Build state pairs correlated to offset ensemble
@@ -110,7 +110,7 @@ pulse_nobs=mat2cell(pulse_nobs,[1 1]);
 
 % Validate on a dense ppm grid
 eval_ppm=linspace(0,200,251);
-eval_hz=ppm2hz(sys.magnet,'13C',eval_ppm,carrier_ppm);
+eval_hz=ppm2hz(eval_ppm-carrier_ppm,sys.magnet,'13C');
 mz_bs=zeros(size(eval_hz));
 mz_nobs=zeros(size(eval_hz));
 for n=1:numel(eval_hz)
@@ -147,14 +147,6 @@ plot(eval_ppm,mz_nobs,'LineWidth',1.5); kgrid;
 kxlabel('$^{13}$C chemical shift / ppm');
 kylabel('Final M$_Z$'); ktitle('GOODCOP profile ');
 legend({'BSS on','BSS off'},'Location','Best');
-
-end
-
-function off_hz=ppm2hz(magnet,isotope,ppm_grid,carrier_ppm)
-
-% Convert ppm values into offset frequencies in Hz
-frq_hz=abs(spin(isotope)*magnet/(2*pi));
-off_hz=(ppm_grid-carrier_ppm)*1e-6*frq_hz;
 
 end
 

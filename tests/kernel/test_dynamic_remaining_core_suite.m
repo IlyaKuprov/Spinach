@@ -109,13 +109,17 @@ result=test_close(result,'intrep zeroth order',Hr,diag([0.05 -0.02]),1e-13,1e-13
 
 % Check finite-difference Hessian construction on a constant 3D field
 H=fdhess(ones(5,6,7),3);
-result=test_true(result,'fdhess output layout',isequal(size(H),[3 3]),...
-                 'fdhess() must return a 3x3 Hessian cell array');
-for n=1:3
-    for k=1:3
-        result=test_close(result,['fdhess constant block ' num2str(n) num2str(k)],...
-                          H{n,k},zeros(5,6,7),1e-14,1e-14,...
-                          'all Hessian components of a constant field must vanish');
+[result,layout_ok]=test_true(result,'fdhess output layout',isequal(size(H),[3 3]),...
+                             'fdhess() must return a 3x3 Hessian cell array');
+
+% Inspect the Hessian blocks only when the layout guard held
+if layout_ok
+    for n=1:3
+        for k=1:3
+            result=test_close(result,['fdhess constant block ' num2str(n) num2str(k)],...
+                              H{n,k},zeros(5,6,7),1e-14,1e-14,...
+                              'all Hessian components of a constant field must vanish');
+        end
     end
 end
 
@@ -219,11 +223,15 @@ result=test_close(result,'stitch zero dynamics',fid,fid_ref,1e-14,1e-14,...
 rng(1,'twister');
 local_ensure_pool();
 eulers=rwalk(5,1,1e-6);
-result=test_true(result,'rwalk trajectory shape',isequal(size(eulers),[5 3])&&...
-                 all(isfinite(eulers(:))),...
-                 'rwalk() must return one finite Euler-angle triplet per trajectory point');
-result=test_close(result,'rwalk initial orientation',euler2dcm(eulers(1,:)),eye(3),1e-14,1e-14,...
-                  'the first random-walk orientation must reconstruct the starting reference frame');
+[result,shape_ok]=test_true(result,'rwalk trajectory shape',isequal(size(eulers),[5 3])&&...
+                            all(isfinite(eulers(:))),...
+                            'rwalk() must return one finite Euler-angle triplet per trajectory point');
+
+% Inspect the starting orientation only when the shape guard held
+if shape_ok
+    result=test_close(result,'rwalk initial orientation',euler2dcm(eulers(1,:)),eye(3),1e-14,1e-14,...
+                      'the first random-walk orientation must reconstruct the starting reference frame');
+end
 
 end
 
@@ -285,3 +293,5 @@ if isempty(current_pool)
 end
 
 end
+
+

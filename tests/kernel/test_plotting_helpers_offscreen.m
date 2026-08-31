@@ -228,10 +228,14 @@ subplot(1,3,1); mri_2d_plot(mri_image,parameters,'image');
 subplot(1,3,2); mri_2d_plot(mri_image,parameters,'phantom');
 subplot(1,3,3); mri_2d_plot(mri_image+1i*mri_image,parameters,'k-space');
 image_obj=findobj(fig,'Type','image');
-result=test_true(result,'mri_2d_plot image objects',numel(image_obj)==3,...
-                 'mri_2d_plot creates one image object for each supported plotting branch');
-result=test_close(result,'mri_2d_plot k-space real data',get(image_obj(1),'CData'),real(mri_image+1i*mri_image),1e-12,1e-12,...
-                  'mri_2d_plot displays the real part of complex k-space data');
+[result,count_ok]=test_true(result,'mri_2d_plot image objects',numel(image_obj)==3,...
+                            'mri_2d_plot creates one image object for each supported plotting branch');
+
+% Inspect the k-space image data only when the object count guard held
+if count_ok
+    result=test_close(result,'mri_2d_plot k-space real data',get(image_obj(1),'CData'),real(mri_image+1i*mri_image),1e-12,1e-12,...
+                      'mri_2d_plot displays the real part of complex k-space data');
+end
 close(fig);
 
 % Exercise volumetric plotting on a compact signed cube
@@ -402,3 +406,5 @@ close all force;
 set(groot,'defaultFigureVisible',old_visibility);
 
 end
+
+

@@ -250,12 +250,18 @@ spin_system.bas.basis=speye(2);
 parameters.marker=true;
 [drift_cells,spc_dim]=drifts(spin_system,@local_context,parameters,'nmr');
 H=sparse(diag(1:4));
-result=test_true(result,'drifts ensemble count',numel(drift_cells)==2,...
-                 'drifts must preserve the number of context ensemble members');
-result=test_close(result,'drifts first member',drift_cells{1}{1},H+3i*H,1e-14,1e-14,...
-                  'drifts must add Hamiltonian, relaxation, and kinetics components');
-result=test_close(result,'drifts hydro member',drift_cells{2}{1},2*H+6i*H,1e-14,1e-14,...
-                  'drifts must include hydrodynamics when supplied by the context');
+[result,count_ok]=test_true(result,'drifts ensemble count',numel(drift_cells)==2,...
+                            'drifts must preserve the number of context ensemble members');
+
+% Inspect the ensemble members only when the count guard held
+if count_ok
+    result=test_close(result,'drifts first member',drift_cells{1}{1},H+3i*H,1e-14,1e-14,...
+                      'drifts must add Hamiltonian, relaxation, and kinetics components');
+    result=test_close(result,'drifts hydro member',drift_cells{2}{1},2*H+6i*H,1e-14,1e-14,...
+                      'drifts must include hydrodynamics when supplied by the context');
+end
+
+% Check the classical subspace dimension reported by the same call
 result=test_true(result,'drifts spatial dimension',spc_dim==2,...
                  'drifts must infer the classical subspace dimension');
 
@@ -775,4 +781,5 @@ function fidelity=local_tgrape_fid(spin_system,drift,controls,waveform,dt_grid,r
 fidelity=tgrape(spin_system,drift,controls,waveform,dt_grid,1,rho_init,rho_targ);
 
 end
+
 

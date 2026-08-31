@@ -122,14 +122,18 @@ function result=local_test_arrays(result,spin_system)
 
 % Check blue-white-red colour map anchors
 colour_map=bwr_cmap();
-result=test_true(result,'bwr_cmap size',isequal(size(colour_map),[255 3]),...
-                 'bwr_cmap returns a 255-by-3 MATLAB colour map');
-result=test_close(result,'bwr_cmap blue end',colour_map(1,:),[0 0 1],1e-12,1e-12,...
-                  'bwr_cmap starts at pure blue');
-result=test_close(result,'bwr_cmap white centre',colour_map(128,:),[1 1 1],1e-12,1e-12,...
-                  'bwr_cmap maps zero to white at the centre row');
-result=test_close(result,'bwr_cmap red end',colour_map(end,:),[1 0 0],1e-12,1e-12,...
-                  'bwr_cmap ends at pure red');
+[result,size_ok]=test_true(result,'bwr_cmap size',isequal(size(colour_map),[255 3]),...
+                           'bwr_cmap returns a 255-by-3 MATLAB colour map');
+
+% Inspect the colour map anchors only when the size guard held
+if size_ok
+    result=test_close(result,'bwr_cmap blue end',colour_map(1,:),[0 0 1],1e-12,1e-12,...
+                      'bwr_cmap starts at pure blue');
+    result=test_close(result,'bwr_cmap white centre',colour_map(128,:),[1 1 1],1e-12,1e-12,...
+                      'bwr_cmap maps zero to white at the centre row');
+    result=test_close(result,'bwr_cmap red end',colour_map(end,:),[1 0 0],1e-12,1e-12,...
+                      'bwr_cmap ends at pure red');
+end
 
 % Check adaptive contour spacing for mixed-sign data
 [all_conts,pos_conts,neg_conts]=contspacing(10,-4,[0.1 0.3 0.2 0.4],2,'both',4);

@@ -86,6 +86,7 @@ spin_system=assume(spin_system,assumptions);
 % Get the Hamiltonian at the spin subsystem orientation
 [I,Q]=hamiltonian(spin_system);
 H=I+orientation(Q,parameters.orientation);
+H=(H+H')/2;
 
 % Get relaxation and kinetics superoperators
 R=relaxation(spin_system,parameters.orientation);

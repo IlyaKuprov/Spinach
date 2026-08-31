@@ -74,7 +74,7 @@ H=real(H+H')/2;
 
 % Warn if the target condition number was not reached
 if cond(H,2)>=max_cond
-    warning('RFO regularisation failed to reach the target condition number, increase control.reg_max_iter.');
+    warning('RFO regularisation failed to reach the target condition number.');
 end
 
 end

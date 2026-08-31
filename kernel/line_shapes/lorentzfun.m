@@ -1,5 +1,8 @@
-% Normalised Lorentzian function in magnetic resonance notation
-% with a phase distortion. Syntax:
+% Lorentzian function in magnetic resonance notation with a
+% phase distortion, normalised so that the absorption mode
+% integrates to ampl/2, the one-sided FID Fourier transform
+% convention; note that lorentzcon() integrates to ampl.
+% Syntax:
 %
 %    [real_part,imag_part]=lorentzfun(offs,ampl,fwhm,x,phi)
 %
@@ -58,7 +61,7 @@ if (~isnumeric(ampl))||(~isreal(ampl))||(numel(ampl)~=1)
     error('ampl must be a real scalar.');
 end
 if (~isnumeric(phi))||(~isreal(phi))||(numel(phi)~=1)
-    error('ampl must be a real scalar.');
+    error('phi must be a real scalar.');
 end
 end
 

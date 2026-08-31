@@ -9,7 +9,7 @@
 % Outputs:
 %
 %    ttrain - compressed tensor train object with 
-%             right-to-left orthogonalisation
+%             left-to-right orthogonalisation
 %
 % d.savostyanov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il

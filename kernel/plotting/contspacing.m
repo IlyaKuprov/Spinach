@@ -37,8 +37,8 @@
 %
 % Note: the following functions are used to get contour levels
 %
-%  pos_conts=delta(2)*smax*linspace(0,1,ncont).^k+smax*delta(1);
-%  neg_conts=delta(2)*smin*linspace(0,1,ncont).^k+smin*delta(1);
+%  pos_conts=(delta(2)-delta(1))*smax*linspace(0,1,ncont).^k+smax*delta(1);
+%  neg_conts=(delta(4)-delta(3))*smin*linspace(0,1,ncont).^k+smin*delta(3);
 %
 % ilya.kuprov@weizmann.ac.il
 %

@@ -27,10 +27,10 @@
 %
 %     dt  - evolution time step, seconds
 %
-%     method - 'PWCL', 'PWCM', 'RKMK4', 'RKMK-DP5',
-%              'RKMK-DP8', or 'LG4'; the latter one
-%               has a good balance of efficiency and
-%               numerical accuracy
+%     method - 'PWCL', 'LG2', 'LG4', 'LG4A', 'RKMK4',
+%              'RKMK-DP5', 'RKMK-DP8', or 'RKMK-RKF45';
+%              'LG4' has a good balance of efficiency
+%               and numerical accuracy
 %
 % Outputs:
 %

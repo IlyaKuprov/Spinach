@@ -51,16 +51,13 @@
 % Note: opts.sv_floor is an absolute threshold on the singular
 %       values of the orthogonalised solution blocks, whose scale
 %       follows norm(y)/norm(A) rather than either norm alone, so
-%       lower it when the solution is small. It is capped by the
-%       greater of the default and the truncation budget of the
-%       block, so the default acts unconditionally, as it always
-%       has, and a raise is honoured only as far as that budget
-%       allows: beyond it a coarser solution is requested through
-%       tol, which is what the tolerance of the returned train
-%       reports. Whatever a raise removes above the default noise
-%       level is deducted from the budget of the rank chop that
-%       follows it, so a raised floor and that chop together stay
-%       inside the budget of the block.
+%       lower it when the solution is small. The default is applied
+%       unconditionally, as it always has been, and everything the
+%       raise removes on top of it is capped by, and charged to, the
+%       truncation budget of the block, so a raised floor and the
+%       rank chop that follows it stay inside that budget together.
+%       Beyond the cap a coarser solution is requested through tol,
+%       which is what the tolerance of the returned train reports.
 %
 % d.savosyanov@soton.ac.uk
 % sergey.v.dolgov@gmail.com
@@ -233,13 +230,14 @@ while ~satisfied
                 
                 % Compute the SVD
                 [u,s,v] = svd(current_block,'econ'); s = real(diag(s));
+                s(abs(s)<1e-10)=0;
 
-                % Flag the noise modes, never beyond the default or the budget
+                % Flag what a raised floor removes, but never beyond the budget
                 chop_tol=local_tolerance*norm(s,2);
-                noise=abs(s)<min(opts.sv_floor,max(1e-10,chop_tol/sqrt(numel(s))));
+                noise=abs(s)<min(opts.sv_floor,chop_tol/sqrt(numel(s)));
 
-                % Zero them, and charge the budget for what the default would keep
-                floor_loss=norm(s(noise&(abs(s)>=1e-10)),2); s(noise)=0;
+                % Zero those modes, and charge the budget with what they cost
+                floor_loss=norm(s(noise),2); s(noise)=0;
                 chop_tol=sqrt(max(0,chop_tol^2-floor_loss^2));
 
                 % Select the rank based on Fro-norm thresholding

@@ -16,6 +16,9 @@
 
 function result=run_test(test_id)
 
+% Check consistency
+grumble(test_id);
+
 % Add the test library to the path
 root_dir=fileparts(mfilename('fullpath'));
 addpath(fullfile(root_dir,'lib'));
@@ -32,5 +35,12 @@ end
 results=run_tests('pattern',test_id,'verbose',true,'stop_on_fail',true);
 result=results;
 
+end
+
+% Consistency enforcement
+function grumble(test_id)
+if (~ischar(test_id))||isempty(test_id)||(~isrow(test_id))
+    error('test_id must be a non-empty character string.');
+end
 end
 

@@ -363,9 +363,11 @@ if (numel(parameters.npts)==3)
         nrm_xy=max(abs(m11),abs(s12)).*max(abs(m22),abs(s12));
         nrm_xz=max(abs(m11),abs(s13)).*max(abs(m33),abs(s13));
         nrm_yz=max(abs(m22),abs(s23)).*max(abs(m33),abs(s23));
+        nrm_det=abs(m11.*m22.*m33)+abs(m11.*s23.^2)+abs(m33.*s12.^2)+...
+                abs(m22.*s13.^2)+2*abs(s12.*s23.*s13);
         if any(m11<-1e-10*nrm_x)||any(m22<-1e-10*nrm_y)||any(m33<-1e-10*nrm_z)||...
            any(m11.*m22-s12.^2<-1e-10*nrm_xy)||any(m11.*m33-s13.^2<-1e-10*nrm_xz)||...
-           any(m22.*m33-s23.^2<-1e-10*nrm_yz)||any(det_top<-1e-10*nrm_x.*nrm_y.*nrm_z)
+           any(m22.*m33-s23.^2<-1e-10*nrm_yz)||any(det_top<-1e-10*nrm_det)
             error('the diffusion tensor field must be positive semidefinite at every voxel.');
         end
     end

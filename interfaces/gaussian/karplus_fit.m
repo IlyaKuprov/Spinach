@@ -8,14 +8,14 @@
 %               Gaussian logs
 %
 %    atoms    - a cell array of 4-element vectors
-%               specifying atmos making up the dihe-
+%               specifying atoms making up the dihe-
 %               dral angles of interest
 %
 % Outputs:
 %
-%    A,B,C    - coefficients for A+B*cos(phi)+C*cos(phi)^2
+%    A,B,C    - coefficients for A*cos(phi)^2+B*cos(phi)+C
 %
-%    As,Bs,Vs - standard deviations of those coefficients
+%    sA,sB,sC - standard deviations of those coefficients
 %
 % The directory specified in the first argument should contain 
 % a series of Gaussian J-coupling calculation logs that differ 

@@ -2,8 +2,8 @@
 %
 %          [sys,inter]=diamond_ni(parameters)
 %
-% W8 magnetic parameters from Ludwig and Woodbury, Phys. Rev. B 41,
-% 3905 (1990), https://doi.org/10.1103/PhysRevB.41.3905
+% W8 magnetic parameters from Isoya, Kanda, Norris, Tang, and Bowman,
+% Phys. Rev. B 41, 3905 (1990), https://doi.org/10.1103/PhysRevB.41.3905
 % The W8 quartet entry assumes zero ZFS: no ZFS parameters were
 % reported in the cited data, and off-central transitions are treated
 % as unresolved rather than explicitly modelled.
@@ -20,7 +20,8 @@
 %      .orientation  - '111', '110', or '100' crystal plane normal
 %                      aligned with the magnetic field
 %      .nickel       - '61Ni', 'none', or another nickel isotope;
-%                      required when .centre is 'w8'
+%                      required when .centre is 'w8', and ignored
+%                      without warning for all other centres
 %      .n_13c        - number of reported 13C hyperfine couplings
 %                      to include, from 0 to 4; applies only to W8
 %

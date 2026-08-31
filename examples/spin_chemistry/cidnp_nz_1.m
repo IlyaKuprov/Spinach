@@ -1,7 +1,7 @@
 % Field dependence of geminate CIDNP from a radical pair in a viscous
 % solvent, computed with Redfield theory and with the lifetime-shifted
 % Nakajima-Zwanzig kernel. At a rotational correlation time of 1 ns and
-% a singlet recombination rate of 1e8 Hz, the anisotropic hyperfine
+% a singlet recombination rate of 3e8 Hz, the anisotropic hyperfine
 % relaxation proceeds at a fair fraction of the recombination rate, and
 % the pair drains before the bath decorrelates: the spectral densities
 % seen by the surviving pair are lifetime-broadened, which changes the

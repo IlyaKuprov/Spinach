@@ -10,6 +10,8 @@
 % modulated decoupling. Replace the effective coefficients below with a
 % more detailed Hamiltonian model for quantitative work.
 %
+% Calculation time: seconds
+%
 % aditya.dev@weizmann.ac.il
 
 function yusuke_14n_broadening_demo()
@@ -114,8 +116,7 @@ end
 
 function eta=decoupling_profile(offset_hz,rf_hz,bandwidth_gain,profile_order)
 
-% Simple offset-response model: wider bandwidth at larger RF field or
-% more sophisticated modulation, flatter passband at higher order.
+% Simple offset-response model: wider bandwidth at larger RF field or more sophisticated modulation, flatter passband at higher order
 bw_hz=bandwidth_gain*rf_hz;
 eta=1./(1+(abs(offset_hz)./bw_hz).^profile_order);
 
@@ -203,3 +204,4 @@ else
 end
 
 end
+

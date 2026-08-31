@@ -1,6 +1,8 @@
 % Methyl trosy in a rapidly rotating 13CH3 group
-% of a slowly tumbling protein, simulated using 
+% of a slowly tumbling protein, simulated using
 % the Fokker-Planck formalism.
+%
+% Calculation time: minutes
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -30,9 +32,7 @@ shielding{4}=[ 28.8    1.3    1.0;
                 1.3   34.9    1.4;
                 1.0    1.4   25.7];
 
-% Convert shielding tensors into 
-% chemical shift tensors and put
-% them on resonance
+% Convert shielding tensors into chemical shift tensors and put them on resonance
 shift_tensor=cell(1,4);
 for n=1:4
     shift_tensor{n}=-remtrace(shielding{n});

@@ -10,6 +10,16 @@
 % are included. The "optimal pulse" is a phase-modulated waveform
 % optimised with Bloch-Siegert corrections enabled.
 %
+% The numerical regime is inspired by the 14N decoupling papers: 70 kHz
+% MAS, tp ~ 10 us, and nu_14N in the 15-23 kHz range. The reduced model
+% uses a 20 kHz carrier and a 10-step cycle of 10 us elements, giving a
+% 4pi constant-phase reference pulse. The effective offset window is
+% intentionally narrower than the full laboratory-frame 14N dispersion
+% because this script is a reduced control surrogate, not a full
+% QJF/MAS quadrupolar simulation.
+%
+% Calculation time: minutes
+%
 % aditya.dev@weizmann.ac.il
 
 function yusuke_optimal_vs_cw_demo()
@@ -42,13 +52,7 @@ Ly=operator(spin_system,'Ly','13C');
 Lz=operator(spin_system,'Lz','13C');
 H=hamiltonian(assume(spin_system,'nmr'));
 
-% Practical low-power regime inspired by the 14N decoupling papers:
-% 70 kHz MAS, tp ~ 10 us, and nu_14N in the 15-23 kHz range. In this
-% reduced model, we use a 20 kHz carrier and a 10-step cycle of 10 us
-% elements, giving a 4pi constant-phase reference pulse. The effective
-% offset window below is intentionally narrower than the full laboratory-
-% frame 14N dispersion because this script is a reduced control surrogate,
-% not a full QJF/MAS quadrupolar simulation.
+% Practical low-power regime, see the discussion in the header
 rf_nominal_hz=20e3;
 nsteps=10;
 pulse_dt=10e-6*ones(1,nsteps);

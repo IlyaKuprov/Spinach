@@ -8,7 +8,7 @@ function dirdiff_1()
 % Formalisms to test
 formalisms={'sphten-liouv','zeeman-liouv','zeeman-hilb'};
 
-% Loop over formalisms
+% Loop over formalisms, this only exercises test system construction: the derivative test below runs on random matrices and is formalism-blind
 for n=1:numel(formalisms)
 
     % Get the Spinach object
@@ -30,9 +30,9 @@ for n=1:numel(formalisms)
 
     % Test the first derivative
     if norm(D_num-D_anl{2},2)/norm(D_num,2)>1e-5
-        error([formalisms{n} ' first derivative test failed']);
+        error('first derivative test failed');
     else
-        disp([formalisms{n} ' first derivative test passed']);
+        disp('first derivative test passed');
     end
 
     % Second derivative, numerical
@@ -48,11 +48,12 @@ for n=1:numel(formalisms)
 
     % Test the second derivative
     if norm(D_num-D_anl,2)/norm(D_num,2)>1e-3
-        error([formalisms{n} ' second derivative test failed']);
+        error('second derivative test failed');
     else
-        disp([formalisms{n} ' second derivative test passed']);
+        disp('second derivative test passed');
     end
 
 end
 
 end
+

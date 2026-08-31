@@ -2,6 +2,8 @@
 % with the timing and power settings matching the XiX ex-
 % periment, but complete liberty is the choice of phase.
 %
+% Calculation time: days on a large parallel cluster
+%
 % guinevere.mathies@uni-konstanz.de
 % shebha-anandhi.jegadeesan@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il
@@ -60,13 +62,11 @@ Ey=operator(spin_system,'Ly','E');
 % Get electron offset operator
 Ez=operator(spin_system,'Lz','E');
 
-% Initial state will be ignored by StStSt, but set to
-% thermodynamic equilibrium for when the option is off
+% Initial state, ignored by the steady state module, but set to thermodynamic equilibrium for when that option is off
 H=hamiltonian(assume(spin_system,'labframe'),'left');
 rho_init=equilibrium(spin_system,H);
 
-% Target state is nuclear magnetisation,
-% relative to the thermal equilibrium
+% Target state is nuclear magnetisation, relative to the thermal equilibrium
 rho_targ=state(spin_system,'Lz','1H');
 thermal=real(rho_targ'*rho_init);
 rho_targ=rho_targ/thermal;
@@ -116,7 +116,7 @@ control.distplot={@(w)firf(w,h)};                % For plotting
 % Optimal control housekeeping
 spin_system=optimcon(spin_system,control);
 
-% XiX waveform, shifted up by 160 MHz
+% XiX waveform, shifted up by 140 MHz
 altern=72*(1:1:10);
 for n=1:numel(altern)
     j=altern(n); guess(j-37:j)=pi;

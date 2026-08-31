@@ -7,8 +7,8 @@
 %     result  - regression test result with explanatory messages
 %
 % The test checks cacheman() and wipe_cache() against a temporary scratch
-% directory, loads shipped small cache tables without generating new kernel
-% cache files, and smoke-tests the read-only sniff() integrity pass.
+% directory, loads shipped small cache tables, exercises the on-demand
+% SLE operator cache, and smoke-tests the read-only sniff() integrity pass.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -78,8 +78,6 @@ result=test_true(result,'st_product_table shipped cache',exist(fullfile(cache_ro
                  'the shipped two-level ST product table cache should be available');
 result=test_true(result,'bos_product_table shipped cache',exist(fullfile(cache_root,'bos_product_table_2.mat'),'file')==2,...
                  'the shipped two-level bosonic product table cache should be available');
-result=test_true(result,'sle_operators shipped cache',exist(fullfile(cache_root,'sle_operators_rank_1_int_2.mat'),'file')==2,...
-                 'the shipped rank-one spin-one SLE operator cache should be available');
 
 % Load small cache-table records and check their dimensions
 [st_left,st_right]=st_product_table(2);
@@ -91,7 +89,12 @@ result=test_true(result,'ist_product_table shape',isequal(size(ist_left),[4 4 4]
 [bos_left,bos_right]=bos_product_table(2);
 result=test_true(result,'bos_product_table shape',isequal(size(bos_left),[4 4 4])&&isequal(size(bos_right),[4 4 4]),...
                  'two-level bosonic product tables must have 4x4x4 dimensions');
+
+% Generate SLE operators on demand and drop a cache record made by this test
+sle_cache=fullfile(cache_root,'sle_operators_rank_1_int_2.mat');
+sle_cached=exist(sle_cache,'file')==2;
 [Lx,Ly,Lz,D,space_basis]=sle_operators(1,2);
+if ~sle_cached&&exist(sle_cache,'file')==2, delete(sle_cache); end
 result=test_true(result,'sle_operators dimensions',isequal(size(Lx),[10 10])&&isequal(size(Ly),[10 10])&&...
                  isequal(size(Lz),[10 10])&&iscell(D)&&isequal(size(D),[1 2])&&...
                  isempty(D{1})&&isequal(size(D{2}),[5 5])&&isequal(size(space_basis),[10 3]),...

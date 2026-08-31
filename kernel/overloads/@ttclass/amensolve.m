@@ -32,8 +32,8 @@
 %   opts.local_iters - maximum number of bicgstab iterations
 %                      for local problems
 %
-%   opts.sv_floor - absolute floor on the singular values of
-%                   each solution block: values below it are
+%   opts.sv_floor - absolute noise floor on the singular values
+%                   of each solution block: values below it are
 %                   set to zero before the relative Frobenius
 %                   norm rank chop, default 1e-10
 %
@@ -48,9 +48,15 @@
 % Note: A, y and x0 should have ntrains==1. Call shrink()
 %       on all three if that is not the case.
 %
-% Note: opts.sv_floor is an absolute threshold, and the block
-%       singular values track the norms of A and y; lower it
-%       when those norms are far below unity.
+% Note: opts.sv_floor is an absolute threshold on the singular
+%       values of the orthogonalised solution blocks, whose scale
+%       follows norm(y)/norm(A) rather than either norm alone, so
+%       lower it when the solution is small. It is capped by the
+%       relative truncation budget of each block, and therefore
+%       cannot discard a mode that tol would have kept: raising
+%       it above that budget does nothing, and a coarser solution
+%       is requested through tol, which is what the tolerance of
+%       the returned tensor train reports.
 %
 % d.savosyanov@soton.ac.uk
 % sergey.v.dolgov@gmail.com
@@ -223,10 +229,13 @@ while ~satisfied
                 
                 % Compute the SVD
                 [u,s,v] = svd(current_block,'econ'); s = real(diag(s));
-                s(abs(s)<opts.sv_floor)=0;
-                
+
+                % Zero the noise modes, never beyond the truncation budget
+                chop_tol=local_tolerance*norm(s,2);
+                s(abs(s)<min(opts.sv_floor,chop_tol))=0;
+
                 % Select the rank based on Fro-norm thresholding
-                new_rx = frob_chop(s,local_tolerance*norm(s,2)); 
+                new_rx = frob_chop(s,chop_tol);
                 
                 % Limit the rank to rmax
                 new_rx = min(new_rx, opts.rmax);

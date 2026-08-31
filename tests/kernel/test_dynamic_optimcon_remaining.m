@@ -518,7 +518,7 @@ for n=1:numel(fapt)
     end_time=fapt{n}(5);
     time_mask=(time_grid>=start_time)&(time_grid<=end_time);
     wave_ref(1,:)=wave_ref(1,:)+ampl*cos(2*pi*freq*time_grid+phase).*time_mask;
-    wave_ref(2,:)=wave_ref(2,:)-ampl*sin(2*pi*freq*time_grid+phase).*time_mask;
+    wave_ref(2,:)=wave_ref(2,:)+ampl*sin(2*pi*freq*time_grid+phase).*time_mask;
 end
 
 end

@@ -32,6 +32,11 @@
 %   opts.local_iters - maximum number of bicgstab iterations
 %                      for local problems
 %
+%   opts.sv_floor - absolute noise floor on the singular values
+%                   of each solution block: values below it are
+%                   set to zero before the relative Frobenius
+%                   norm rank chop, default 1e-10
+%
 %   opts.verb - Verbosity level: silent (0), sweep (1) or full (2)
 %
 % Outputs: 
@@ -42,6 +47,17 @@
 %
 % Note: A, y and x0 should have ntrains==1. Call shrink()
 %       on all three if that is not the case.
+%
+% Note: opts.sv_floor is an absolute threshold on the singular
+%       values of the orthogonalised solution blocks, whose scale
+%       follows norm(y)/norm(A) rather than either norm alone, so
+%       lower it when the solution is small. The default is applied
+%       unconditionally, as it always has been, and everything the
+%       raise removes on top of it is capped by, and charged to, the
+%       truncation budget of the block, so a raised floor and the
+%       rank chop that follows it stay inside that budget together.
+%       Beyond the cap a coarser solution is requested through tol,
+%       which is what the tolerance of the returned train reports.
 %
 % d.savosyanov@soton.ac.uk
 % sergey.v.dolgov@gmail.com
@@ -74,6 +90,9 @@ if ~isfield(opts, 'max_full_size');   opts.max_full_size=500; end
 % Maximum number of bicgstab iterations for local problems
 if ~isfield(opts, 'local_iters');     opts.local_iters=100;   end
 
+% Absolute floor on the singular values of each solution block
+if ~isfield(opts, 'sv_floor');        opts.sv_floor=1e-10;    end
+
 % Verbosity level: silent (0), sweep (1) or full (2)
 if ~isfield(opts, 'verb');            opts.verb=1;            end
 
@@ -84,7 +103,7 @@ end
 x=x0;
 
 % Check inputs for consistency
-grumble(A,y,x);
+grumble(A,y,x,tol,opts.sv_floor);
 
 % Read dimension and mode sizes
 d=y.ncores;     % dimension of the problem
@@ -212,9 +231,17 @@ while ~satisfied
                 % Compute the SVD
                 [u,s,v] = svd(current_block,'econ'); s = real(diag(s));
                 s(abs(s)<1e-10)=0;
-                
+
+                % Flag what a raised floor removes, but never beyond the budget
+                chop_tol=local_tolerance*norm(s,2);
+                noise=abs(s)<min(opts.sv_floor,chop_tol/sqrt(numel(s)));
+
+                % Zero those modes, and charge the budget with what they cost
+                floor_loss=norm(s(noise),2); s(noise)=0;
+                chop_tol=sqrt(max(0,chop_tol^2-floor_loss^2));
+
                 % Select the rank based on Fro-norm thresholding
-                new_rx = frob_chop(s,local_tolerance*norm(s,2)); 
+                new_rx = frob_chop(s,chop_tol);
                 
                 % Limit the rank to rmax
                 new_rx = min(new_rx, opts.rmax);
@@ -409,7 +436,15 @@ x.coeff=1; x.tolerance=(norm_x^d)*tol;
 end
 
 % Consistency enforcement
-function grumble(A,y,x0)
+function grumble(A,y,x0,tol,sv_floor)
+if (~isnumeric(tol))||(~isreal(tol))||(~isscalar(tol))||...
+   (~isfinite(tol))||(tol<0)
+    error('tol must be a non-negative real scalar.');
+end
+if (~isnumeric(sv_floor))||(~isreal(sv_floor))||(~isscalar(sv_floor))||...
+   (~isfinite(sv_floor))||(sv_floor<0)
+    error('opts.sv_floor must be a non-negative real scalar.');
+end
 if ~isa(A,'ttclass') || ~isa(y,'ttclass')
     error('Both matrix and right-hand-side should be ttclass.');
 end

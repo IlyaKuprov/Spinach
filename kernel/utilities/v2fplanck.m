@@ -304,7 +304,7 @@ if numel(parameters.npts)==2
             error('the diffusion tensor field must be symmetric at every voxel.');
         end
         m11=parameters.dxx(:); m22=parameters.dyy(:);
-        s12=parameters.dxy(:)/2+parameters.dyx(:)/2;
+        s12=parameters.dxy(:)+(parameters.dyx(:)-parameters.dxy(:))/2;
         psd_tol=20*eps(class(s12));
         if any(m11<0)||any(m22<0)||...
            any(abs(s12)>(1+psd_tol)*sqrt(m11).*sqrt(m22))
@@ -353,9 +353,9 @@ if (numel(parameters.npts)==3)
         if sym_gap>1e-10*max(sym_scl,eps())
             error('the diffusion tensor field must be symmetric at every voxel.');
         end
-        s12=parameters.dxy(:)/2+parameters.dyx(:)/2; m11=parameters.dxx(:);
-        s13=parameters.dxz(:)/2+parameters.dzx(:)/2; m22=parameters.dyy(:);
-        s23=parameters.dyz(:)/2+parameters.dzy(:)/2; m33=parameters.dzz(:);
+        s12=parameters.dxy(:)+(parameters.dyx(:)-parameters.dxy(:))/2; m11=parameters.dxx(:);
+        s13=parameters.dxz(:)+(parameters.dzx(:)-parameters.dxz(:))/2; m22=parameters.dyy(:);
+        s23=parameters.dyz(:)+(parameters.dzy(:)-parameters.dyz(:))/2; m33=parameters.dzz(:);
         scl_x=sqrt(abs(m11)); scl_x(scl_x==0)=1;
         scl_y=sqrt(abs(m22)); scl_y(scl_y==0)=1;
         scl_z=sqrt(abs(m33)); scl_z(scl_z==0)=1;

@@ -41,7 +41,10 @@
 %       workers, and they are therefore rebuilt here from the channel
 %       isotopes and the carrier frequencies that stay in the returned
 %       control structure, using bss_ops - the generator that optim-
-%       con() itself calls.
+%       con() itself calls. Those settings must not be edited after
+%       optimcon() has run: the optimiser keeps the operators built
+%       from the settings it saw, and a replay from edited settings
+%       would use physics that the optimisation never had.
 %
 % aditya.dev@weizmann.ac.il
 % ilya.kuprov@weizmann.ac.il
@@ -90,6 +93,12 @@ if (~isfield(spin_system.control,'isotopes'))||...
    (~isfield(spin_system.control,'channels'))||...
    (~isfield(spin_system.control,'carrier_frq'))
     error('channel settings missing, run optimcon() first.');
+end
+if (~iscell(spin_system.control.isotopes))||...
+   (~isnumeric(spin_system.control.channels))||...
+   any(~ismember(spin_system.control.channels,...
+                 1:numel(spin_system.control.isotopes)))
+    error('control.channels must be indices into control.isotopes.');
 end
 if (~iscell(ctrl_opers))||isempty(ctrl_opers)||...
    (numel(ctrl_opers)~=numel(spin_system.control.channels))

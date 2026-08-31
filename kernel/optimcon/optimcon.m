@@ -31,8 +31,11 @@
 %       carrier frequencies, kept in spin_system.control.carrier_-
 %       frq, from which bloch_siegert() rebuilds the response ope-
 %       rators when a waveform is replayed on the client. Changes
-%       to the ensemble composition, the operators, or the genera-
-%       tors require a fresh optimcon() call.
+%       to the ensemble composition, the operators, the generators,
+%       the channel isotopes, or the carrier frequencies require a
+%       fresh optimcon() call: the frozen response operators are
+%       built from the carriers seen here, and editing them after-
+%       wards would replay physics that the optimiser never saw.
 %
 % david.goodwin@inano.au.dk
 % u.rasulov@soton.ac.uk

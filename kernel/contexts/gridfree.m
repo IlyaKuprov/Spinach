@@ -42,6 +42,11 @@
 %                    pic rotational diffusion; the rotational dif-
 %                    fusion tensor is inv(6*tau_c).
 %
+%         .add_terms - optional cell array of two-element cell ar-
+%                    rays {c,A}; each term c*A is added to the iso-
+%                    tropic spin Hamiltonian after the frequency
+%                    offsets have been applied
+%
 %         .*       - additional subfields may be required by your
 %                    pulse sequence - check its documentation page 
 %
@@ -255,8 +260,6 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,pulse_sequence,parameters,assumptions)
-
-% Rotating frames
 if isfield(parameters,'rframes')
     error('numerical rotating frame transformation is not supported by SLE formalism.');
 end
@@ -310,6 +313,30 @@ if isfield(parameters,'tau_c')
         if (tau_c_asym>1e-12*norm(parameters.tau_c,'fro'))||...
            any(eig((parameters.tau_c+parameters.tau_c')/2)<=0)
             error('3x3 parameters.tau_c must be symmetric positive definite.');
+        end
+    end
+end
+
+if isfield(parameters,'add_terms')
+    if ~iscell(parameters.add_terms)
+        error('parameters.add_terms must be a cell array of two-element cell arrays.');
+    end
+    spn_dim=size(spin_system.bas.basis,1);
+    for n=1:numel(parameters.add_terms)
+        if (~iscell(parameters.add_terms{n}))||...
+           (numel(parameters.add_terms{n})~=2)
+            error('each element of parameters.add_terms must be a two-element cell array.');
+        end
+        if (~isnumeric(parameters.add_terms{n}{1}))||...
+           (~isscalar(parameters.add_terms{n}{1}))||...
+           (~isfinite(parameters.add_terms{n}{1}))
+            error('the first element of each parameters.add_terms cell must be a finite numeric scalar.');
+        end
+        if (~isnumeric(parameters.add_terms{n}{2}))||...
+           (size(parameters.add_terms{n}{2},1)~=spn_dim)||...
+           (size(parameters.add_terms{n}{2},2)~=spn_dim)
+            error(['the second element of each parameters.add_terms cell must be '...
+                   'a numeric matrix with the dimension of the spin state space.']);
         end
     end
 end

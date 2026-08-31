@@ -19,7 +19,7 @@ sys.isotopes={'1H'};
 % Set interactions 
 inter.zeeman.scalar={0.0};
 
-% Set basis
+% Set formalism and basis
 bas.formalism='sphten-liouv';
 bas.approximation='none';
 

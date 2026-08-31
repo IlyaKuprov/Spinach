@@ -4,8 +4,8 @@
 % trol amplitude on that channel. The operator collects the second-order
 % Bloch-Siegert frequency shifts of every spin in the system:
 %
-%          B=sum_n (gamma_n/gamma_c)^2*[1/(2*(omega_n+omega_c))
-%                +(foreign isotopes only) 1/(2*(omega_n-omega_c))]*Lz_n
+%     B=sum_n (gamma_n/gamma_c)^2*[1/(2*(omega_n+omega_c))
+%         +(foreign isotopes only) 1/(2*(omega_n-omega_c))]*Lz_n
 %
 % where omega_n are signed laboratory frame Zeeman frequencies from
 % spin_system.inter.basefrqs and omega_c is the signed carrier frequen-
@@ -15,7 +15,7 @@
 % Foreign isotopes receive both terms, which sum into the Ramsey shift
 % omega_n*omega_1n^2/(omega_n^2-omega_c^2). Syntax:
 %
-%       resp_ops=bss_ops(spin_system,channels,carrier_frq)
+%          resp_ops=bss_ops(spin_system,channels,carrier_frq)
 %
 % Parameters:
 %

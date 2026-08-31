@@ -167,9 +167,8 @@ end
 report(spin_system,[pad('Optimisation method',60) spin_system.control.method]);
 
 % Hilbert space, wavefunctions, and Goodwin's Hessian need unitary propagation
-herm_gens=ismember(spin_system.bas.formalism,...
-                   {'zeeman-hilb','zeeman-wavef'})||...
-          strcmp(spin_system.control.method,'goodwin');
+need_herm_gens=ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef'})||...
+               strcmp(spin_system.control.method,'goodwin');
 
 % Process isotope list
 if isfield(control,'isotopes')
@@ -230,7 +229,7 @@ if isfield(control,'operators')
     end
 
     % Reject non-Hermitian controls where unitarity is required
-    if herm_gens
+    if need_herm_gens
         check_hermiticity(control.operators,'control generators');
     end
 
@@ -612,7 +611,7 @@ if isfield(control,'offsets')&&isfield(control,'off_ops')
     end
 
     % Reject non-Hermitian offsets where unitarity is required
-    if herm_gens
+    if need_herm_gens
         check_hermiticity(control.off_ops,'offset operators');
     end
 
@@ -662,7 +661,7 @@ if isfield(control,'bsiegert')
         
         % Refuse methods that use exact Hessians
         if ismember(spin_system.control.method,{'newton','goodwin'})
-            error('Bloch-Siegert corrections are only available with LBFGS optimisers.');
+            error('Bloch-Siegert corrections are only available with BFGS optimisers.');
         end
         
         % Refuse the trapezium integrator
@@ -670,40 +669,39 @@ if isfield(control,'bsiegert')
             error('Bloch-Siegert corrections are not available for trapezium integrator.');
         end
         
-        % Isotope of each control channel
-        chan_isos=spin_system.control.isotopes(spin_system.control.channels);
+        % Get the isotope for each control channel
+        ch_isotopes=spin_system.control.isotopes(spin_system.control.channels);
 
         % Corrected channels need waveform values to be physical nutation frequencies
-        for n=1:numel(chan_isos)
+        for n=1:numel(ch_isotopes)
 
             % Canonical transverse operators of the channel
-            Lxc=operator(spin_system,'Lx',chan_isos{n});
-            Lyc=operator(spin_system,'Ly',chan_isos{n});
+            Lx_ch=operator(spin_system,'Lx',ch_isotopes{n});
+            Ly_ch=operator(spin_system,'Ly',ch_isotopes{n});
 
             % Project the control operator onto the quadratures
-            quad_x=hdot(Lxc,spin_system.control.operators{n})/hdot(Lxc,Lxc);
-            quad_y=hdot(Lyc,spin_system.control.operators{n})/hdot(Lyc,Lyc);
+            quad_x=hdot(Lx_ch,spin_system.control.operators{n})/hdot(Lx_ch,Lx_ch);
+            quad_y=hdot(Ly_ch,spin_system.control.operators{n})/hdot(Ly_ch,Ly_ch);
 
             % Require a unit quadrature of the canonical operators
-            resid=spin_system.control.operators{n}-quad_x*Lxc-quad_y*Lyc;
-            if (norm(resid,'fro')>1e-6*norm(Lxc,'fro'))||...
-               (abs(quad_x^2+quad_y^2-1)>1e-6)
+            resid=spin_system.control.operators{n}-quad_x*Lx_ch-quad_y*Ly_ch;
+            if (norm(resid,'fro')>1e-6*norm(Lx_ch,'fro'))||(abs(quad_x^2+quad_y^2-1)>1e-6)
                 error('with control.bsiegert, control operators must be unit quadratures of Lx and Ly on their channel isotope.');
             end
 
         end
 
-        % On-resonance carrier frequency of each control channel
-        carrier_frq=zeros(1,numel(chan_isos));
-        for n=1:numel(chan_isos)
-            carrier_frq(n)=-spin(chan_isos{n})*spin_system.inter.magnet;
+        % Carrier frequency of each control channel
+        carrier_frq=zeros(1,numel(ch_isotopes));
+        for n=1:numel(ch_isotopes)
+            carrier_frq(n)=-spin(ch_isotopes{n})*spin_system.inter.magnet;
         end
 
-        % Keep the carriers for the client-side replay path
+        % Keep the carriers in the data structure
         spin_system.control.carrier_frq=carrier_frq;
 
         % Build the response operators, stored without clean-up
-        spin_system.control.resp_ops=bss_ops(spin_system,chan_isos,carrier_frq);
+        spin_system.control.resp_ops=bss_ops(spin_system,ch_isotopes,carrier_frq);
         
         % Inform the user
         report(spin_system,[pad('Bloch-Siegert shifts',60) 'enabled']);
@@ -792,8 +790,9 @@ if isfield(control,'drifts')
             error('control.drifts must be a cell array (over ensemble) of cell arrays (over time) of matrices.');
         end
         if (numel(control.drifts{n})~=1)&&(numel(control.drifts{n})~=spin_system.control.pulse_ntpts)
-            error(['need either 1 or ' int2str(spin_system.control.pulse_ntpts) ' elements in control.drift{' ...
-                   int2str(n) '}, found ' int2str(numel(control.drifts{n})) ' elements.']);
+            error(['need either 1 or ' int2str(spin_system.control.pulse_ntpts) ...
+                   ' elements in control.drift{' int2str(n) ...
+                   '}, found ' int2str(numel(control.drifts{n})) ' elements.']);
         end
         if ~all(cellfun(@(m)isequal(size(m),size(spin_system.control.operators{1})),...
                         control.drifts{n}(:)))
@@ -805,7 +804,7 @@ if isfield(control,'drifts')
     end
 
     % Reject non-Hermitian drifts where unitarity is required
-    if herm_gens
+    if need_herm_gens
         for n=1:numel(control.drifts)
             check_hermiticity(control.drifts{n},'drift generators');
         end
@@ -944,7 +943,7 @@ end
 report(spin_system,[pad('Termination tolerance on |grad(x)|',60) ...
                     pad(num2str(spin_system.control.tol_g,'%0.8g'),20)]);
 
-% Set up LBFGS history
+% Set up BFGS history
 if ismember(spin_system.control.method,{'lbfgs','rbfgs'})
     
     % Decide history length
@@ -969,7 +968,7 @@ if ismember(spin_system.control.method,{'lbfgs','rbfgs'})
     end
     
     % Inform the user
-    report(spin_system,[pad('Number of gradients in LBFGS history',60) ...
+    report(spin_system,[pad('Number of gradients in BFGS history',60) ...
                         pad(num2str(spin_system.control.n_grads),20)]);
     
 end

@@ -304,8 +304,10 @@ if numel(parameters.npts)==2
             error('the diffusion tensor field must be symmetric at every voxel.');
         end
         m11=parameters.dxx(:); m22=parameters.dyy(:);
-        s12=parameters.dxy(:)+(parameters.dyx(:)-parameters.dxy(:))/2;
-        psd_tol=20*eps(class(s12));
+        s12=(parameters.dxy(:)+parameters.dyx(:))/2;
+
+        % Cauchy-Schwarz bound, scale-free in the tensor magnitude
+        psd_tol=20*eps(class([m11 m22 s12]));
         if any(m11<0)||any(m22<0)||...
            any(abs(s12)>(1+psd_tol)*sqrt(m11).*sqrt(m22))
             error('the diffusion tensor field must be positive semidefinite at every voxel.');
@@ -353,21 +355,25 @@ if (numel(parameters.npts)==3)
         if sym_gap>1e-10*max(sym_scl,eps())
             error('the diffusion tensor field must be symmetric at every voxel.');
         end
-        s12=parameters.dxy(:)+(parameters.dyx(:)-parameters.dxy(:))/2; m11=parameters.dxx(:);
-        s13=parameters.dxz(:)+(parameters.dzx(:)-parameters.dxz(:))/2; m22=parameters.dyy(:);
-        s23=parameters.dyz(:)+(parameters.dzy(:)-parameters.dyz(:))/2; m33=parameters.dzz(:);
-        scl_x=sqrt(abs(m11)); scl_x(scl_x==0)=1;
-        scl_y=sqrt(abs(m22)); scl_y(scl_y==0)=1;
-        scl_z=sqrt(abs(m33)); scl_z(scl_z==0)=1;
-        c12=s12./scl_x./scl_y; c13=s13./scl_x./scl_z; c23=s23./scl_y./scl_z;
-        det_top=1-c12.^2-c13.^2-c23.^2+2*c12.*c13.*c23;
-        nrm_det=1+c12.^2+c13.^2+c23.^2+2*abs(c12.*c13.*c23);
-        psd_tol=20*eps(class(c12));
+        m11=parameters.dxx(:); s12=(parameters.dxy(:)+parameters.dyx(:))/2;
+        m22=parameters.dyy(:); s13=(parameters.dxz(:)+parameters.dzx(:))/2;
+        m33=parameters.dzz(:); s23=(parameters.dyz(:)+parameters.dzy(:))/2;
+
+        % Correlation scale; a zero diagonal forces its own off-diagonals to zero
+        scl=sqrt([m11 m22 m33]); scl(scl==0)=1;
+
+        % Off-diagonals in correlation form, bounded by unity when semidefinite
+        c=[s12./(scl(:,1).*scl(:,2)) ...
+           s13./(scl(:,1).*scl(:,3)) ...
+           s23./(scl(:,2).*scl(:,3))];
+
+        % Cauchy-Schwarz bounds and the determinant, both scale-free
+        psd_tol=20*eps(class(c));
         if any(m11<0)||any(m22<0)||any(m33<0)||...
            any(abs(s12)>(1+psd_tol)*sqrt(m11).*sqrt(m22))||...
            any(abs(s13)>(1+psd_tol)*sqrt(m11).*sqrt(m33))||...
            any(abs(s23)>(1+psd_tol)*sqrt(m22).*sqrt(m33))||...
-           any(det_top<-psd_tol*nrm_det)
+           any(1-sum(c.^2,2)+2*prod(c,2)<-psd_tol)
             error('the diffusion tensor field must be positive semidefinite at every voxel.');
         end
     end

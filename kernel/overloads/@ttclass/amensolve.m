@@ -51,12 +51,12 @@
 % Note: opts.sv_floor is an absolute threshold on the singular
 %       values of the orthogonalised solution blocks, whose scale
 %       follows norm(y)/norm(A) rather than either norm alone, so
-%       lower it when the solution is small. It is capped by the
-%       relative truncation budget of each block, and therefore
-%       cannot discard a mode that tol would have kept: raising
-%       it above that budget does nothing, and a coarser solution
-%       is requested through tol, which is what the tolerance of
-%       the returned tensor train reports.
+%       lower it when the solution is small. It is capped so that
+%       even if it zeroes every mode of a block, their combined
+%       Frobenius norm stays within the truncation budget of that
+%       block, so raising it beyond that point does nothing, and
+%       a coarser solution is requested through tol, which is what
+%       the tolerance of the returned tensor train reports.
 %
 % d.savosyanov@soton.ac.uk
 % sergey.v.dolgov@gmail.com
@@ -232,7 +232,7 @@ while ~satisfied
 
                 % Zero the noise modes, never beyond the truncation budget
                 chop_tol=local_tolerance*norm(s,2);
-                s(abs(s)<min(opts.sv_floor,chop_tol))=0;
+                s(abs(s)<min(opts.sv_floor,chop_tol/sqrt(numel(s))))=0;
 
                 % Select the rank based on Fro-norm thresholding
                 new_rx = frob_chop(s,chop_tol);

@@ -44,8 +44,8 @@ alpha_scale=0.91;
 pulse_dur=1e-3;
 ca_ppm=linspace(40,72,100);
 co_ppm=linspace(165,185,30);
-ca_hz=ppm2hz(sys.magnet,'13C',ca_ppm,carrier_ppm);
-co_hz=ppm2hz(sys.magnet,'13C',co_ppm,carrier_ppm);
+ca_hz=ppm2hz(ca_ppm-carrier_ppm,sys.magnet,'13C');
+co_hz=ppm2hz(co_ppm-carrier_ppm,sys.magnet,'13C');
 
 % Build all three variants from Table 1
 variants={...
@@ -63,8 +63,8 @@ for k=1:numel(variants)
     mask=(cb_prs_ppm<variants{k}.cb_inv_ppm(1))|...
          (cb_prs_ppm>variants{k}.cb_inv_ppm(2));
     cb_prs_ppm=cb_prs_ppm(mask);
-    cb_inv_hz=ppm2hz(sys.magnet,'13C',cb_inv_ppm,carrier_ppm);
-    cb_prs_hz=ppm2hz(sys.magnet,'13C',cb_prs_ppm,carrier_ppm);
+    cb_inv_hz=ppm2hz(cb_inv_ppm-carrier_ppm,sys.magnet,'13C');
+    cb_prs_hz=ppm2hz(cb_prs_ppm-carrier_ppm,sys.magnet,'13C');
 
     % Assemble full offset list
     all_hz=[ca_hz co_hz cb_inv_hz cb_prs_hz];
@@ -137,7 +137,7 @@ for k=1:numel(variants)
 
     % Validate on a dense ppm grid
     eval_ppm=linspace(0,200,251);
-    eval_hz=ppm2hz(sys.magnet,'13C',eval_ppm,carrier_ppm);
+    eval_hz=ppm2hz(eval_ppm-carrier_ppm,sys.magnet,'13C');
     mz_bs=zeros(size(eval_hz));
     mz_nobs=zeros(size(eval_hz));
     for n=1:numel(eval_hz)
@@ -178,14 +178,6 @@ for k=1:numel(variants)
     klegend({'BSS on','BSS off'},'Location','Best'); drawnow;
 
 end
-
-end
-
-function off_hz=ppm2hz(magnet,isotope,ppm_grid,carrier_ppm)
-
-% Convert ppm values into offset frequencies in Hz
-frq_hz=abs(spin(isotope)*magnet/(2*pi));
-off_hz=(ppm_grid-carrier_ppm)*1e-6*frq_hz;
 
 end
 

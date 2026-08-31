@@ -27,9 +27,12 @@
 %       in spin_system.control.frozen_fields. All other control
 %       fields stay live: ensemble() re-sends them to the workers
 %       at every evaluation, and they may be overwritten between
-%       optimisations. Changes to the ensemble composition, the
-%       operators, or the generators require a fresh optimcon()
-%       call.
+%       optimisations. Among them are the Bloch-Siegert channel
+%       carrier frequencies, kept in spin_system.control.carrier_-
+%       frq, from which bloch_siegert() rebuilds the response ope-
+%       rators when a waveform is replayed on the client. Changes
+%       to the ensemble composition, the operators, or the genera-
+%       tors require a fresh optimcon() call.
 %
 % david.goodwin@inano.au.dk
 % u.rasulov@soton.ac.uk
@@ -692,6 +695,9 @@ if isfield(control,'bsiegert')
         for n=1:numel(chan_isos)
             carrier_frq(n)=-spin(chan_isos{n})*spin_system.inter.magnet;
         end
+
+        % Keep the carriers for the client-side replay path
+        spin_system.control.carrier_frq=carrier_frq;
 
         % Build the response operators, stored without clean-up
         spin_system.control.resp_ops=bss_ops(spin_system,chan_isos,carrier_frq);

@@ -12,8 +12,20 @@
 %      .silicon      - '29Si', 'none', or another silicon isotope
 %      .orientation  - '111', '110', or '100' crystal plane normal
 %                      aligned with the magnetic field
-%      .n_13c       - number of reported nearest-neighbour 13C
-%                     hyperfine couplings, between 0 and 6
+%      .n_13c        - number of reported nearest-neighbour 13C
+%                      hyperfine couplings, between 0 and 6.
+%                      Carbons are added by cycling through the
+%                      three dangling-bond lines [1-1-1], [-11-1],
+%                      and [-1-11], which carry two carbons each,
+%                      so a count below six selects one specific
+%                      isotopomer rather than an average over
+%                      them. With .orientation='111' the three
+%                      lines are equivalent and the choice is
+%                      immaterial, but with '110' one of them
+%                      splits by 54.2 MHz against 30.2 MHz for
+%                      the other two. For other isotopomers, or
+%                      for a mixture, request all six carbons and
+%                      drop or weight them in the calling script
 %
 % Outputs:
 %
@@ -54,11 +66,19 @@ end
 
 % Add reported nearest-neighbour carbons
 if parameters.n_13c>0
-    Cmat=((frame)*diag([30.2e6 30.2e6 66.2e6])*(frame)');
+
+    % Dangling-bond lines of the split-vacancy carbons, two sites each
+    bond_dirs=[+1 -1 -1; -1 +1 -1; -1 -1 +1]/sqrt(3);
+
+    % Preallocate the requested carbon records
     nuc_idx=numel(nuclei);
     nuclei(nuc_idx+1:nuc_idx+parameters.n_13c)={[]};
+
+    % Build an axial hyperfine tensor about each dangling-bond line
     for n=1:parameters.n_13c
-        nuclei{nuc_idx+n}=struct('iso','13C','A',Cmat);
+        rot_mat=rotmat_align([0 0 1],bond_dirs(mod(n-1,3)+1,:));
+        hfc_mat=rot_mat*diag([30.2e6 30.2e6 66.2e6])*rot_mat';
+        nuclei{nuc_idx+n}=struct('iso','13C','A',hfc_mat);
     end
 end
 

@@ -29,7 +29,18 @@
 %                      required when .centre is 'w8', and ignored
 %                      without warning for all other centres
 %      .n_13c        - number of reported 13C hyperfine couplings
-%                      to include, from 0 to 4; applies only to W8
+%                      to include, from 0 to 4; applies only to
+%                      W8. Carbons are placed, in the order given,
+%                      on the [111], [1-1-1], [-11-1], and [-1-11]
+%                      nearest-neighbour bonds, so a count below
+%                      four selects one specific isotopomer rather
+%                      than an average over them. That choice is
+%                      observable: with .orientation='111' the
+%                      [111] carbon splits by 1.339 mT and each of
+%                      the other three by 0.451 mT. For other
+%                      isotopomers, or for a mixture, request all
+%                      four carbons and drop or weight them in the
+%                      calling script
 %
 % Outputs:
 %
@@ -79,11 +90,19 @@ switch centre
             nuclei{end+1}=struct('iso',nickel);
         end
         if parameters.n_13c>0
-            Cmat=((frame_111)*diag([0.340 0.340 1.339]*hz_per_mt)*(frame_111)');
+
+            % Nearest-neighbour bond directions of the Td centre
+            bond_dirs=[+1 +1 +1; +1 -1 -1; -1 +1 -1; -1 -1 +1]/sqrt(3);
+
+            % Preallocate the requested carbon records
             nuc_idx=numel(nuclei);
             nuclei(nuc_idx+1:nuc_idx+parameters.n_13c)={[]};
+
+            % Build an axial hyperfine tensor about each bond direction
             for n=1:parameters.n_13c
-                nuclei{nuc_idx+n}=struct('iso','13C','A',Cmat);
+                rot_mat=rotmat_align([0 0 1],bond_dirs(n,:));
+                hfc_mat=rot_mat*diag([0.340 0.340 1.339]*hz_per_mt)*rot_mat';
+                nuclei{nuc_idx+n}=struct('iso','13C','A',hfc_mat);
             end
         end
     case {'ne1','ne2','ne3','ne5','ne8'}

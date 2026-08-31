@@ -118,3 +118,4 @@ result=test_close(result,'zftrip Hermiticity',rho_zf,rho_zf',1e-12,1e-12,...
                   'projected zero-field triplet density matrix must be Hermitian');
 
 end
+

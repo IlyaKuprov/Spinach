@@ -1,6 +1,8 @@
-% Reproduction of BADCOP-style selective decoupling logic from Coote et al.
-% with Bloch-Siegert corrections enabled in the optimiser and simulator
-% BADCOP1, BADCOP2, and BADCOP3 are designed and validated
+% Reproduction of BADCOP-style selective decoupling logic 
+% from (https://doi.org/10.1038/s41467-018-05400-4) with
+% Bloch-Siegert corrections enabled in the optimiser and
+% simulator BADCOP1, BADCOP2, and BADCOP3 are designed 
+% and validated.
 %
 % Calculation time: minutes
 %
@@ -8,7 +10,7 @@
 
 function coote_badcop()
 
-% Magnetic field corresponding to 800 MHz 1H
+% Magnetic field
 sys.magnet=18.8;
 
 % Single-spin carbon model
@@ -23,18 +25,20 @@ bas.approximation='none';
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Relevant operators and states
+% Get relevant operators
 Lx=operator(spin_system,'Lx','13C');
 Ly=operator(spin_system,'Ly','13C');
 Lz=operator(spin_system,'Lz','13C');
-Ix=state(spin_system,'Lx','13C'); Ix=Ix/norm(full(Ix),2);
-Iy=state(spin_system,'Ly','13C'); Iy=Iy/norm(full(Iy),2);
-Iz=state(spin_system,'Lz','13C'); Iz=Iz/norm(full(Iz),2);
+
+% Get and normalise relevant states
+Ix=state(spin_system,'Lx','13C'); Ix=Ix/norm(Ix,2);
+Iy=state(spin_system,'Ly','13C'); Iy=Iy/norm(Iy,2);
+Iz=state(spin_system,'Lz','13C'); Iz=Iz/norm(Iz,2);
 
 % Drift Hamiltonian
 D=hamiltonian(assume(spin_system,'nmr'));
 
-% Shared paper parameters
+% Paper parameters
 carrier_ppm=100;
 alpha_scale=0.91;
 pulse_dur=1e-3;
@@ -53,9 +57,11 @@ variants={...
 for k=1:numel(variants)
 
     % Build C-beta inversion and preservation grids
-    cb_inv_ppm=linspace(variants{k}.cb_inv_ppm(1),variants{k}.cb_inv_ppm(2),60);
+    cb_inv_ppm=linspace(variants{k}.cb_inv_ppm(1),...
+                        variants{k}.cb_inv_ppm(2),60);
     cb_prs_ppm=linspace(5,80,80);
-    mask=(cb_prs_ppm<variants{k}.cb_inv_ppm(1))|(cb_prs_ppm>variants{k}.cb_inv_ppm(2));
+    mask=(cb_prs_ppm<variants{k}.cb_inv_ppm(1))|...
+         (cb_prs_ppm>variants{k}.cb_inv_ppm(2));
     cb_prs_ppm=cb_prs_ppm(mask);
     cb_inv_hz=ppm2hz(sys.magnet,'13C',cb_inv_ppm,carrier_ppm);
     cb_prs_hz=ppm2hz(sys.magnet,'13C',cb_prs_ppm,carrier_ppm);
@@ -102,14 +108,14 @@ for k=1:numel(variants)
     control.offsets={all_hz};
     control.off_ops={Lz};
     control.method='lbfgs';
-    control.max_iter=120;
+    control.max_iter=200;
     control.ens_corrs={'rho_ens'};
     control.plotting={};
 
     % Enable Bloch-Siegert corrections
     control.bsiegert=true();
 
-    % Spinach housekeeping for Bloch-Siegert case
+    % Spinach housekeeping 
     ss_bs=optimcon(spin_system,control);
 
     % Optimise the Bloch-Siegert waveform
@@ -121,7 +127,7 @@ for k=1:numel(variants)
     % Disable Bloch-Siegert corrections
     control.bsiegert=false();
 
-    % Spinach housekeeping for no Bloch-Siegert case
+    % Spinach housekeeping 
     ss_nobs=optimcon(spin_system,control);
 
     % Optimise the no Bloch-Siegert waveform
@@ -129,38 +135,47 @@ for k=1:numel(variants)
     pulse_nobs=control.pwr_levels*pulse_nobs;
     pulse_nobs=mat2cell(pulse_nobs,[1 1]);
 
-    % Validate profile on a dense ppm grid
+    % Validate on a dense ppm grid
     eval_ppm=linspace(0,200,251);
     eval_hz=ppm2hz(sys.magnet,'13C',eval_ppm,carrier_ppm);
     mz_bs=zeros(size(eval_hz));
     mz_nobs=zeros(size(eval_hz));
     for n=1:numel(eval_hz)
+
+        % Add the offset term
         Hn=D+2*pi*eval_hz(n)*Lz;
 
+        % Add Bloch-siegert virtual control channels to adapted pulse
+        [controls_aug,pulse_aug]=bloch_siegert(ss_bs,{Lx,Ly},pulse_bs);
+        
+        % Run with the Bloch-Siegert physics present
+        rho=shaped_pulse_xy(ss_bs,Hn,controls_aug,pulse_aug,...
+                            control.pulse_dt,Iz,'expv-pwc');
 
-        [controls_aug,pulse_aug]=bloch_siegert(ss_bs,{Lx,Ly},...
-                                                     pulse_bs);
-        rho=shaped_pulse_xy(ss_bs,Hn,controls_aug,pulse_aug,...
-                            control.pulse_dt,Iz,'expv-pwc');
+        % Get the fidelity
         mz_bs(n)=real(Iz'*rho);
-        [controls_aug,pulse_aug]=bloch_siegert(ss_bs,{Lx,Ly},...
-                                                     pulse_nobs);
+
+        % Add Bloch-siegert virtual control channels to unadapted pulse
+        [controls_aug,pulse_aug]=bloch_siegert(ss_bs,{Lx,Ly},pulse_nobs);
+
+        % Run with the Bloch-Siegert physics present
         rho=shaped_pulse_xy(ss_bs,Hn,controls_aug,pulse_aug,...
                             control.pulse_dt,Iz,'expv-pwc');
+
+        % Get the fidelity
         mz_nobs(n)=real(Iz'*rho);
+
     end
 
     % Plot the inversion profile
-    figure;
+    kfigure;
     plot(eval_ppm,mz_bs,'LineWidth',1.5); hold on;
-    plot(eval_ppm,mz_nobs,'LineWidth',1.5);
+    plot(eval_ppm,mz_nobs,'LineWidth',1.5); kgrid
     xline(variants{k}.cb_inv_ppm(1),'k--','LineWidth',1.0);
     xline(variants{k}.cb_inv_ppm(2),'k--','LineWidth',1.0);
-    grid on;
-    xlabel('^{13}C chemical shift / ppm');
-    ylabel('Final M_z');
-    title([variants{k}.name ' profile with and without Bloch-Siegert']);
-    legend({'With Bloch-Siegert','No Bloch-Siegert'},'Location','Best');
+    kxlabel('^{13}C chemical shift / ppm'); kylabel('Final M_z');
+    ktitle([variants{k}.name ' profile']);
+    klegend({'BSS on','BSS off'},'Location','Best'); drawnow;
 
 end
 

@@ -260,9 +260,9 @@ if isscalar(parameters.npts)
         end
     end
     if isfield(parameters,'dxx')
-        if (~isnumeric(parameters.dxx))||(~isreal(parameters.dxx))||(~iscolumn(parameters.dxx))||...
+        if (~isfloat(parameters.dxx))||(~isreal(parameters.dxx))||(~iscolumn(parameters.dxx))||...
            any(~isfinite(parameters.dxx))||any(parameters.dxx<0)
-            error('parameters.dxx must be a non-negative real column vector.');
+            error('parameters.dxx must be a non-negative real floating-point column vector.');
         end
     end
 end
@@ -288,9 +288,9 @@ if numel(parameters.npts)==2
     for n={'dxx','dxy','dyx','dyy'}
         if isfield(parameters,n{1})
             d=getfield(parameters,n{1}); %#ok<GFLD>
-            if (~isnumeric(d))||(~isreal(d))||any(size(d)~=parameters.npts)||...
+            if (~isfloat(d))||(~isreal(d))||any(size(d)~=parameters.npts)||...
                 any(~isfinite(d(:)))
-                error(['parameters.' n{1} ' must be a real array of dimension ' num2str(parameters.npts)]);
+                error(['parameters.' n{1} ' must be a real floating-point array of dimension ' num2str(parameters.npts)]);
             end
         end
     end
@@ -334,9 +334,9 @@ if (numel(parameters.npts)==3)
     for n={'dxx','dxy','dxz','dyx','dyy','dyz','dzx','dzy','dzz'}
         if isfield(parameters,n{1})
             d=getfield(parameters,n{1}); %#ok<GFLD>
-            if (~isnumeric(d))||(~isreal(d))||any(size(d)~=parameters.npts)||...
+            if (~isfloat(d))||(~isreal(d))||any(size(d)~=parameters.npts)||...
                 any(~isfinite(d(:)))
-                error(['parameters.' n{1} ' must be a real array of dimension ' num2str(parameters.npts)]);
+                error(['parameters.' n{1} ' must be a real floating-point array of dimension ' num2str(parameters.npts)]);
             end
         end
     end

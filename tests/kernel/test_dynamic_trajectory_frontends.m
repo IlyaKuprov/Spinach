@@ -45,10 +45,14 @@ fig=figure('Visible','off');
 time_axis=[0.0 1.0 2.0];
 trajan(spin_system,traj,'correlation_order',time_axis);
 line_obj=findobj(gca,'Type','line');
-result=test_true(result,'trajan correlation-order lines',numel(line_obj)==2,...
-                 'trajan() correlation-order mode must plot one-spin and two-spin orders');
-result=test_close(result,'trajan explicit time axis',sort(line_obj(1).XData),time_axis,1e-14,1e-14,...
-                  'trajan() must use the supplied time axis for plotted trajectory points');
+[result,count_ok]=test_true(result,'trajan correlation-order lines',numel(line_obj)==2,...
+                            'trajan() correlation-order mode must plot one-spin and two-spin orders');
+
+% Inspect the plotted time axis only when the line count guard held
+if count_ok
+    result=test_close(result,'trajan explicit time axis',sort(line_obj(1).XData),time_axis,1e-14,1e-14,...
+                      'trajan() must use the supplied time axis for plotted trajectory points');
+end
 close(fig);
 
 % Check coherence-order analysis

@@ -86,8 +86,10 @@
 %     bdata.vc_list     - variable counter list, present when
 %                         the vclist file exists
 %
-%     bdata.nus_list    - non-uniform sampling schedule, pre-
-%                         sent when the nuslist file exists
+%     bdata.nus_list    - non-uniform sampling schedule, one
+%                         row per sampled fid and one column
+%                         per indirect dimension, present
+%                         when the nuslist file exists
 %
 % Adapted from the brukerimport() function of the GNAT package by:
 %
@@ -412,35 +414,51 @@ all_lines=regexp(fileread(file_path),'\r?\n','split');
 all_lines=strtrim(all_lines);
 all_lines=all_lines(~cellfun(@isempty,all_lines));
 
+% Refuse empty list files
+if isempty(all_lines)
+    error(['list file is empty: ' file_path]);
+end
+
+% Split the lines into whitespace-separated entries
+all_lines=cellfun(@strsplit,all_lines,'UniformOutput',false);
+
+% Require a consistent entry count per line
+n_cols=numel(all_lines{1});
+if any(cellfun(@numel,all_lines)~=n_cols)
+    error(['inconsistent number of columns in ' file_path]);
+end
+
 % Preallocate the values
-vals=zeros(numel(all_lines),1);
+vals=zeros(numel(all_lines),n_cols);
 
-% Loop over the lines
+% Loop over the entries
 for n=1:numel(all_lines)
+    for k=1:n_cols
 
-    % Convert time unit suffixes into multipliers
-    text_line=all_lines{n};
-    switch text_line(end)
-        case 'n'
-            multiplier=1e-9; text_line=text_line(1:(end-1));
-        case 'u'
-            multiplier=1e-6; text_line=text_line(1:(end-1));
-        case 'm'
-            multiplier=1e-3; text_line=text_line(1:(end-1));
-        case 's'
-            multiplier=1;    text_line=text_line(1:(end-1));
-        otherwise
-            multiplier=1;
+        % Convert time unit suffixes into multipliers
+        entry=all_lines{n}{k};
+        switch entry(end)
+            case 'n'
+                multiplier=1e-9; entry=entry(1:(end-1));
+            case 'u'
+                multiplier=1e-6; entry=entry(1:(end-1));
+            case 'm'
+                multiplier=1e-3; entry=entry(1:(end-1));
+            case 's'
+                multiplier=1;    entry=entry(1:(end-1));
+            otherwise
+                multiplier=1;
+        end
+
+        % Convert the value into a number
+        vals(n,k)=multiplier*str2double(entry);
+
+        % Make sure the conversion succeeded
+        if isnan(vals(n,k))
+            error(['cannot interpret list file entry: ' all_lines{n}{k}]);
+        end
+
     end
-
-    % Convert the value into a number
-    vals(n)=multiplier*str2double(text_line);
-
-    % Make sure the conversion succeeded
-    if isnan(vals(n))
-        error(['cannot interpret list file entry: ' all_lines{n}]);
-    end
-
 end
 
 end

@@ -6,10 +6,10 @@
 %
 % Parameters:
 %
-%    sys_parts   - a cell array of sys structures
+%    sys_parts   - a row cell array of sys structures
 %                  to be merged
 %
-%    inter_parts - a cell array of inter structures
+%    inter_parts - a row cell array of inter structures
 %                  to be merged
 %
 % Outputs:
@@ -424,6 +424,9 @@ if numel(sys_parts)~=numel(inter_parts)
 end
 if isempty(sys_parts)
     error('at least one subsystem must be supplied.');
+end
+if (~isrow(sys_parts))||(~isrow(inter_parts))
+    error('sys_parts and inter_parts must be row cell arrays.');
 end
 if any(cellfun(@(x)(~isstruct(x)),sys_parts))||...
    any(cellfun(@(x)(~isstruct(x)),inter_parts))

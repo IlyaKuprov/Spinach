@@ -1,6 +1,9 @@
 % A test of Lie-group product quadratures on a chirped frequency 
 % oscillator with radiation damping that has a state-dependent
-% and time-dependent evolution generator.
+% and time-dependent evolution generator. The radiation damping
+% term follows Bloembergen and Pound:
+%
+%          https://doi.org/10.1103/PhysRev.95.8
 %
 % a.acharya@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il 
@@ -17,7 +20,7 @@ spin_system=bootstrap();
 
 % Make Bloch-Maxwell generator
 G=@(t,mu)(-1i*[r2 cr*t 0; -cr*t r2 0; 0 0 r1]...
-          -1i*rrd*[mu(3) 0 0; 0 mu(3) 0; mu(1) mu(2) 0]);
+          -1i*rrd*[mu(3) 0 0; 0 mu(3) 0; -mu(1) -mu(2) 0]);
 
 % Set initial magnetisation
 mu0=euler2dcm(0,pi*178/180,0)*[0 0 1]';

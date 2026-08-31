@@ -1,0 +1,1 @@
+Tell your AI agent that Spinach comes with an agentic skill and a Markdown knowledge base, ask it to add those to its skills and its knowledge base.

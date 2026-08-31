@@ -9,6 +9,12 @@
 % as unresolved rather than explicitly modelled.
 % Other nickel-centre table values from Nadolinny et al., Crystals
 % 7, 237 (2017), https://doi.org/10.3390/cryst7080237
+% The zero-field splitting column of Table 2 of that review is in
+% tesla, as its header states: Nadolinny et al., Diam. Relat. Mater.
+% 11, 627 (2002) report D = -171 GHz for NOL1 (NIRIM5), and Landolt-
+% Bornstein III/41A2a gives D = 31.72 GHz for AB5; both splittings
+% greatly exceed the 9.5 GHz X-band quantum, and the AB5 one is
+% below the 94 GHz W-band quantum of the shipped example.
 %
 % Parameters:
 %

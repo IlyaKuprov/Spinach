@@ -37,6 +37,15 @@
 %       would interpolate the squared coefficients, which does not cor-
 %       respond to the square of the interpolated control amplitude.
 %
+% Note: optimcon() keeps its response operators on the parallel pool
+%       workers, and they are therefore rebuilt here from the channel
+%       isotopes and the carrier frequencies that stay in the returned
+%       control structure, using bss_ops - the generator that optim-
+%       con() itself calls. Those settings must not be edited after
+%       optimcon() has run: the optimiser keeps the operators built
+%       from the settings it saw, and a replay from edited settings
+%       would use physics that the optimisation never had.
+%
 % aditya.dev@weizmann.ac.il
 % ilya.kuprov@weizmann.ac.il
 %
@@ -49,12 +58,18 @@ function [ctrl_opers,...
 % Check consistency
 grumble(spin_system,ctrl_opers,ctrl_coefs);
 
+% Isotope of each control channel
+chan_isos=spin_system.control.isotopes(spin_system.control.channels);
+
+% Rebuild the response operators from the control settings
+resp_ops=bss_ops(spin_system,chan_isos,spin_system.control.carrier_frq);
+
 % Count the physical channels
 n_ctrls=numel(ctrl_opers);
 
 % Append the response operator channels
 for n=1:n_ctrls
-    ctrl_opers{n_ctrls+n}=spin_system.control.resp_ops{n};
+    ctrl_opers{n_ctrls+n}=resp_ops{n};
     ctrl_coefs{n_ctrls+n}=ctrl_coefs{n}.^2;
 end
 
@@ -74,12 +89,19 @@ if (~isfield(spin_system.control,'bsiegert'))||...
    (~spin_system.control.bsiegert)
     error('Bloch-Siegert corrections must be enabled in optimcon().');
 end
-if (~isfield(spin_system.control,'resp_ops'))||...
-   (~iscell(spin_system.control.resp_ops))
-    error('response operators missing, run optimcon() first.');
+if (~isfield(spin_system.control,'isotopes'))||...
+   (~isfield(spin_system.control,'channels'))||...
+   (~isfield(spin_system.control,'carrier_frq'))
+    error('channel settings missing, run optimcon() first.');
+end
+if (~iscell(spin_system.control.isotopes))||...
+   (~isnumeric(spin_system.control.channels))||...
+   any(~ismember(spin_system.control.channels,...
+                 1:numel(spin_system.control.isotopes)))
+    error('control.channels must be indices into control.isotopes.');
 end
 if (~iscell(ctrl_opers))||isempty(ctrl_opers)||...
-   (numel(ctrl_opers)~=numel(spin_system.control.resp_ops))
+   (numel(ctrl_opers)~=numel(spin_system.control.channels))
     error('ctrl_opers must be a cell array with one element per control channel.');
 end
 if (~iscell(ctrl_coefs))||(numel(ctrl_coefs)~=numel(ctrl_opers))

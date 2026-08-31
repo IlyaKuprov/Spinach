@@ -10,8 +10,8 @@
 
 function solid_effect_dq()
 
-% W-band magnet, HiPER at St Andrews
-sys.magnet=3.35316;
+% W-band magnet
+sys.magnet=3.35316; % HIPER at St Andrews
 
 % Electron and proton
 sys.isotopes={'E','1H'};
@@ -81,57 +81,37 @@ parameters.offset=[-spin('E')*sys.magnet/(2*pi)-94.0e9, 0];
 % Get drift Liouvillians at all orientations
 control.drifts=drifts(spin_system,@powder,parameters,'esr');
 
-% Control channels: isotope, channel map, and operators
-control.isotopes={'E'};
-control.channels=[1; 1];
-control.operators={Ex,Ey};
-
-% Starting and destination states
-control.rho_init={rho_init};
-control.rho_targ={rho_targ};
-
-% Microwave power level ensemble, rad/s
-control.pwr_levels=2*pi*linspace(5,25,20)*1e6;
-
-% Microwave offset ensemble, Hz
-control.off_ops={Ez};
-control.offsets={1e6*[-2 -1  0 +1 +2]};
-
-% Time grid: pulse, ringdown delay, and sequence delay
-control.pulse_dt=[0.5e-9*ones(1,720) ...
-                  0.5e-9*ones(1,20)  ...
-                  167e-6];
-
-% Freeze the ringdown and sequence delays
-control.freeze=[false(1,720) ...
-                true(1,20)   ...
-                true(1,1)];
-
-% Amplitude profile: unit pulse, zero delays
-control.amplitudes=[ones(1,720) ...
-                    zeros(1,20) ...
-                    zeros(1,1)];
-
-% Optimisation method and iteration limit
-control.method='rbfgs';
-control.max_iter=10000;
-
-% Steady state module with a 500-member random ensemble subsample, increase for production
-control.steady=true();
-control.budget=500;
+% Define control parameters
+control.isotopes={'E'};                          % Isotopes
+control.channels=[1; 1];                         % Channel map
+control.operators={Ex,Ey};                       % Controls
+control.rho_init={rho_init};                     % Starting state
+control.rho_targ={rho_targ};                     % Destination state
+control.pwr_levels=2*pi*linspace(5,25,20)*1e6;   % Microwave power, rad/s
+control.off_ops={Ez};                            % Offset operator
+control.offsets={1e6*[-2 -1  0 +1 +2]};          % Microwave offset, Hz
+control.pulse_dt=[0.5e-9*ones(1,720) ...         % Pulse itself
+                  0.5e-9*ones(1,20)  ...         % Ringdown delay
+                  167e-6];                       % Sequence delay
+control.freeze=[false(1,720) ...                 % Pulse itself
+                true(1,20)   ...                 % Ringdown delay
+                true(1,1)];                      % Sequence delay
+control.amplitudes=[ones(1,720) ...              % Pulse itself
+                    zeros(1,20) ...              % Ringdown delay
+                    zeros(1,1)];                 % Sequence delay
+control.method='rbfgs';                          % Optimisation method
+control.max_iter=10000;                          % Maximum iterations
+control.steady=true();                           % Steady state
+control.budget=500;                              % Increase this
 
 % Plotting options
 control.plotting={'robustness','spectrogram'};
 
 % Load HiPER filter function
-load('hiper_kernel_trans.mat','h');
-
-% Truncate and normalise to unit absolute DC gain
-h=h(1:16); h=h/abs(sum(h));
-
-% Apply the distortion filter in optimisation and in plotting
-control.distortion={@(w)firf(w,h)};
-control.distplot={@(w)firf(w,h)};
+load('hiper_kernel_trans.mat','h'); 
+h=h(1:16); h=h/abs(sum(h));                      % Unit abs DC gain
+control.distortion={@(w)firf(w,h)};              % For optimisation 
+control.distplot={@(w)firf(w,h)};                % For plotting
 
 % Optimal control housekeeping
 spin_system=optimcon(spin_system,control);

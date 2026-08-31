@@ -11,11 +11,11 @@ function trosy_methyl()
 % Magnet field
 sys.magnet=14.1;
 
-% Cartesian coordinates, carbon in the first row, protons below
-me_xyz=[-1.290651 1.279824 -0.248354;
-        -1.237804 1.209518 -1.347802;
-        -2.348228 1.329796  0.051440;
-        -0.799560 2.212894  0.057684];
+% Cartesian coordinates
+me_xyz=[-1.290651 1.279824 -0.248354;  % C
+        -1.237804 1.209518 -1.347802;  % H
+        -2.348228 1.329796  0.051440;  % H
+        -0.799560 2.212894  0.057684]; % H
 
 % Absolute shielding tensors (DFT)
 shielding=cell(1,4);

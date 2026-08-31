@@ -144,9 +144,9 @@ end
 kfigure;
 plot(eval_ppm,mz_bs,'LineWidth',1.5); hold on;
 plot(eval_ppm,mz_nobs,'LineWidth',1.5); kgrid;
-kxlabel('^{13}C chemical shift / ppm');
-kylabel('Final M_z'); ktitle('GOODCOP profile ');
-legend({'BSSo n','BSS off'},'Location','Best');
+kxlabel('$^{13}$C chemical shift / ppm');
+kylabel('Final M$_Z$'); ktitle('GOODCOP profile ');
+legend({'BSS on','BSS off'},'Location','Best');
 
 end
 

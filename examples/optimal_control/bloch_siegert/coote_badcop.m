@@ -173,8 +173,8 @@ for k=1:numel(variants)
     plot(eval_ppm,mz_nobs,'LineWidth',1.5); kgrid
     xline(variants{k}.cb_inv_ppm(1),'k--','LineWidth',1.0);
     xline(variants{k}.cb_inv_ppm(2),'k--','LineWidth',1.0);
-    kxlabel('^{13}C chemical shift / ppm'); kylabel('Final M_z');
-    ktitle([variants{k}.name ' profile']);
+    kxlabel('$^{13}$C chemical shift / ppm'); 
+    kylabel('Final M$_Z$'); ktitle([variants{k}.name ' profile']);
     klegend({'BSS on','BSS off'},'Location','Best'); drawnow;
 
 end

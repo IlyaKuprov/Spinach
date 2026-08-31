@@ -40,7 +40,8 @@
 %                   Poisson's equation, 'kuprov' to recover the
 %                   unpaired electron probability density
 %
-%     gpu        - set to 1 to enable GPU processing (much faster)
+%     gpu        - set to true to enable GPU processing
+%                  (much faster), false to run on CPU
 %
 % Outputs:
 % 

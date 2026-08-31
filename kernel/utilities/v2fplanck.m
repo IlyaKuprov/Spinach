@@ -305,12 +305,9 @@ if numel(parameters.npts)==2
         end
         m11=parameters.dxx(:); m22=parameters.dyy(:);
         s12=parameters.dxy(:)/2+parameters.dyx(:)/2;
-        scl_x=sqrt(max(abs(m11),abs(s12))); scl_x(scl_x==0)=1;
-        scl_y=sqrt(max(abs(m22),abs(s12))); scl_y(scl_y==0)=1;
-        m11=m11./scl_x./scl_x; m22=m22./scl_y./scl_y; s12=s12./scl_x./scl_y;
         psd_tol=20*eps(class(s12));
-        if any(m11<-psd_tol)||any(m22<-psd_tol)||...
-           any(m11.*m22-s12.^2<-psd_tol*(abs(m11.*m22)+s12.^2))
+        if any(m11<0)||any(m22<0)||...
+           any(abs(s12)>(1+psd_tol)*sqrt(m11).*sqrt(m22))
             error('the diffusion tensor field must be positive semidefinite at every voxel.');
         end
     end
@@ -359,19 +356,17 @@ if (numel(parameters.npts)==3)
         s12=parameters.dxy(:)/2+parameters.dyx(:)/2; m11=parameters.dxx(:);
         s13=parameters.dxz(:)/2+parameters.dzx(:)/2; m22=parameters.dyy(:);
         s23=parameters.dyz(:)/2+parameters.dzy(:)/2; m33=parameters.dzz(:);
-        scl_x=sqrt(max([abs(m11) abs(s12) abs(s13)],[],2)); scl_x(scl_x==0)=1;
-        scl_y=sqrt(max([abs(s12) abs(m22) abs(s23)],[],2)); scl_y(scl_y==0)=1;
-        scl_z=sqrt(max([abs(s13) abs(s23) abs(m33)],[],2)); scl_z(scl_z==0)=1;
-        m11=m11./scl_x./scl_x; m22=m22./scl_y./scl_y; m33=m33./scl_z./scl_z;
-        s12=s12./scl_x./scl_y; s13=s13./scl_x./scl_z; s23=s23./scl_y./scl_z;
-        det_top=m11.*(m22.*m33-s23.^2)-s12.*(s12.*m33-s23.*s13)+s13.*(s12.*s23-m22.*s13);
-        nrm_det=abs(m11.*m22.*m33)+abs(m11.*s23.^2)+abs(m33.*s12.^2)+...
-                abs(m22.*s13.^2)+2*abs(s12.*s23.*s13);
-        psd_tol=20*eps(class(det_top));
-        if any(m11<-psd_tol)||any(m22<-psd_tol)||any(m33<-psd_tol)||...
-           any(m11.*m22-s12.^2<-psd_tol*(abs(m11.*m22)+s12.^2))||...
-           any(m11.*m33-s13.^2<-psd_tol*(abs(m11.*m33)+s13.^2))||...
-           any(m22.*m33-s23.^2<-psd_tol*(abs(m22.*m33)+s23.^2))||...
+        scl_x=sqrt(abs(m11)); scl_x(scl_x==0)=1;
+        scl_y=sqrt(abs(m22)); scl_y(scl_y==0)=1;
+        scl_z=sqrt(abs(m33)); scl_z(scl_z==0)=1;
+        c12=s12./scl_x./scl_y; c13=s13./scl_x./scl_z; c23=s23./scl_y./scl_z;
+        det_top=1-c12.^2-c13.^2-c23.^2+2*c12.*c13.*c23;
+        nrm_det=1+c12.^2+c13.^2+c23.^2+2*abs(c12.*c13.*c23);
+        psd_tol=20*eps(class(c12));
+        if any(m11<0)||any(m22<0)||any(m33<0)||...
+           any(abs(s12)>(1+psd_tol)*sqrt(m11).*sqrt(m22))||...
+           any(abs(s13)>(1+psd_tol)*sqrt(m11).*sqrt(m33))||...
+           any(abs(s23)>(1+psd_tol)*sqrt(m22).*sqrt(m33))||...
            any(det_top<-psd_tol*nrm_det)
             error('the diffusion tensor field must be positive semidefinite at every voxel.');
         end

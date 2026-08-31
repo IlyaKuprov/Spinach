@@ -15,11 +15,16 @@
 % check in the failures field of its result structure, in which case the
 % error field carries the recorded failures; the messages accumulated
 % before the failure are preserved. A test that throws a MATLAB error is
-% also reported as a failure, and the suite continues with the next test.
+% also reported as a failure, and the suite continues with the next test;
+% the checks it had recorded before the error are recovered from
+% test_record and reported alongside the error message.
 %
 % ilya.kuprov@weizmann.ac.il
 
 function results=run_tests(varargin)
+
+% Check consistency
+grumble(varargin);
 
 % Add the test library to the path
 root_dir=fileparts(mfilename('fullpath'));
@@ -54,7 +59,11 @@ results=struct('id',{},'name',{},'purpose',{},'status',{},'elapsed',{},...
 
 % Run the tests
 for n=1:numel(manifest)
+
+    % Reset the clock and the record accumulator
     tic;
+    test_record(new_test_result(manifest(n).id,manifest(n).name,''));
+
     try
         result=feval(manifest(n).function);
         result.elapsed=toc;
@@ -65,10 +74,11 @@ for n=1:numel(manifest)
             result.status='FAIL';
         end
     catch err
-        result=new_test_result(manifest(n).id,manifest(n).name,'');
+        result=test_record([]);
         result.status='FAIL';
         result.elapsed=toc;
-        result.error=err.message;
+        result.failures{end+1}=err.message;
+        result.error=strjoin(result.failures,'; ');
     end
     results(end+1)=result; %#ok<AGROW>
     if options.verbose
@@ -98,4 +108,17 @@ if n_fail>0
 end
 
 end
+
+% Consistency enforcement
+function grumble(option_list)
+if mod(numel(option_list),2)~=0
+    error('options must be supplied as name-value pairs.');
+end
+for n=1:2:numel(option_list)
+    if (~ischar(option_list{n}))||isempty(option_list{n})||(~isrow(option_list{n}))
+        error('option names must be non-empty character strings.');
+    end
+end
+end
+
 

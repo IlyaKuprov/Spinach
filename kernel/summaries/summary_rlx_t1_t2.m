@@ -30,12 +30,23 @@ report(spin_system,'----------------------------------------');
 for n=1:spin_system.comp.nspins
     report(spin_system,[strjust([num2str(n) blanks(3-length(num2str(n)))],'left') ' '...
                         strjust([spin_system.comp.isotopes{n} blanks(5-length(spin_system.comp.isotopes{n}))],'center') '  '...
-                        num2str(spin_system.rlx.r1_rates(n),'%+0.5e   ') '  '...
-                        num2str(spin_system.rlx.r2_rates(n),'%+0.5e   ') '  '...
+                        rate_text(spin_system.rlx.r1_rates{n}) '  '...
+                        rate_text(spin_system.rlx.r2_rates{n}) '  '...
                         spin_system.comp.labels{n}]);
 end
 report(spin_system,'========================================');
 
+end
+
+% Formats a scalar, tensor, or function-handle relaxation rate
+function rate_str=rate_text(rate)
+if isnumeric(rate)&&isscalar(rate)
+    rate_str=num2str(rate,'%+0.5e   ');
+elseif isnumeric(rate)
+    rate_str='anisotropic    ';
+else
+    rate_str='orientation    ';
+end
 end
 
 % Consistency enforcement

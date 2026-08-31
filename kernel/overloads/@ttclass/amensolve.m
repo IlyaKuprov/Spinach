@@ -103,7 +103,7 @@ end
 x=x0;
 
 % Check inputs for consistency
-grumble(A,y,x,opts.sv_floor);
+grumble(A,y,x,tol,opts.sv_floor);
 
 % Read dimension and mode sizes
 d=y.ncores;     % dimension of the problem
@@ -436,7 +436,11 @@ x.coeff=1; x.tolerance=(norm_x^d)*tol;
 end
 
 % Consistency enforcement
-function grumble(A,y,x0,sv_floor)
+function grumble(A,y,x0,tol,sv_floor)
+if (~isnumeric(tol))||(~isreal(tol))||(~isscalar(tol))||...
+   (~isfinite(tol))||(tol<0)
+    error('tol must be a non-negative real scalar.');
+end
 if (~isnumeric(sv_floor))||(~isreal(sv_floor))||(~isscalar(sv_floor))||...
    (~isfinite(sv_floor))||(sv_floor<0)
     error('opts.sv_floor must be a non-negative real scalar.');

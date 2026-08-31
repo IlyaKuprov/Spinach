@@ -26,7 +26,7 @@
 %             vectors in columns, in the same order as the 
 %             eigenvalues in Ep
 %
-% Notes: there must be no degeneracies in H0; H1 must be Hermitian,
+% Notes: no degeneracies in H0; H1 must be finite and Hermitian,
 %        the theory only converges when norm(H1,2) is much smaller
 %        than the smallest energy gap in H0; complexity is cubic
 %        both in the order and in the matrix dimension.
@@ -39,6 +39,9 @@ function [Ep,G]=vvpert(E0,H1,order)
 
 % Check consistency
 grumble(E0,H1,order);
+
+% Enforce exact hermiticity
+H1=H1/2+H1'/2;
 
 % Reciprocal energy differences
 Q=1./(E0'-E0); Q(logical(speye(size(Q))))=0;
@@ -107,8 +110,9 @@ function grumble(E0,H1,order)
 if (~isnumeric(E0))||(~isreal(E0))||(~iscolumn(E0))
     error('E0 must be a real column vector.');
 end
-if (~isnumeric(H1))||(~ishermitian(H1))
-    error('H1 must be a Hermitian matrix.');
+if (~isnumeric(H1))||(size(H1,1)~=size(H1,2))||...
+   any(~isfinite(H1),'all')||(norm(H1-H1',1)>1e-10*norm(H1,1))
+    error('H1 must be a finite Hermitian matrix.');
 end
 if (numel(E0)~=size(H1,1))||(numel(E0)~=size(H1,2))
     error('dimensions of E0 and H1 must be consistent.');

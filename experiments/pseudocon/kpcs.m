@@ -1,7 +1,7 @@
 % Computes the three-dimensional distribution of pseudocontact shift field
 % by solving Kuprov equation for PCS. Syntax:
 %
-%            [pcs_cube,pcs_vals]=kpcs(probden,chi,ranges,nxyz)
+%        [pcs_vals,pcs_cube]=kpcs(probden,chi,ranges,nxyz,method)
 %
 % Parameters: 
 %
@@ -14,6 +14,10 @@
 %
 %     nxyz    - nuclear coordinates as [x y z] with multiple rows) at which
 %               PCS is to be evaluated, in Angstroms
+%
+%     method  - 'fft' to solve the Kuprov equation in Fourier space, or
+%               'fdiff' for finite difference operators and a conjugate
+%               gradient solve
 %
 % Output:
 % 

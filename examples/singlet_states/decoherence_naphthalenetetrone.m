@@ -1,4 +1,4 @@
-% Long-lived spin states in the napthalenetetrone molecule.
+% Long-lived spin states in the naphthalenetetrone molecule.
 % (4 protons, 256-dimensional Liouville space). The relaxation
 % superoperator accounts for every dipolar coupling and every
 % CSA tensor in the system.

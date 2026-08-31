@@ -13,6 +13,9 @@
 %
 % Parameters:
 %
+%    parameters.spc_dim      - Fokker-Planck spatial dimension,
+%                              received from the context function
+%
 %    parameters.spins        - observed and dephasing spins,
 %                              e.g. {'13C','15N'} for 13C{15N}
 %                              REDOR

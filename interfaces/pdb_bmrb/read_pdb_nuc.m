@@ -10,10 +10,10 @@
 %
 % Outputs:
 %
-%     nuc_num  - nspins x 1 vector giving the number of the
+%     res_num  - nspins x 1 vector giving the number of the
 %                nucleotide to which each spin belongs
-% 
-%     nuc_typ  - nspins x 1 cell array of strings giving the
+%
+%     res_typ  - nspins x 1 cell array of strings giving the
 %                PDB identifier of the nucleotide to which
 %                each spin belongs (e.g. 'GUA')
 % 
@@ -27,7 +27,7 @@
 % Note: All atoms in the file are read, make sure the PDB only contains
 %       one model.
 %
-% i.kuprov@soton.ac.un.ac.uk
+% ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=Read_pdb_nuc.m>
 

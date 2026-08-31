@@ -1,6 +1,6 @@
 % Panoramic optimisation for stroboscopic steady state DNP
 % with the timing and power settings matching the XiX ex-
-% eriment, but complete liberty is the choice of phase.
+% periment, but complete liberty is the choice of phase.
 %
 % guinevere.mathies@uni-konstanz.de
 % shebha-anandhi.jegadeesan@uni-konstanz.de

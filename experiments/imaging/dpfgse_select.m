@@ -29,7 +29,7 @@
 % Notes: at least a hundred points are required in the spatial
 %        dimension; increase until the answer stops changing.
 %
-% i.kuprov@soton.amann.ac.uk
+% ilya.kuprov@weizmann.ac.il
 % p.lally@soton.ac.uk
 % a.j.allami@soton.ac.uk
 %

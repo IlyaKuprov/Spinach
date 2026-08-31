@@ -3,7 +3,7 @@
 % tensor from DFT hyperfine coupling tensors and experimentally ob-
 % served paramagnetic (contact + pseudocontact) shifts. Syntax:
 % 
-%                chi=pms2chi(hfcs,shifts,isotopes)
+%              [chi,err]=pms2chi(hfcs,shifts,isotopes)
 %
 % Parameters:
 %

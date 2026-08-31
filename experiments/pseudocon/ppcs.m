@@ -1,7 +1,7 @@
 % Computes pseudocontact shift from a point electron centre at the 
 % nuclear coordinates supplied. Syntax:
 %
-%                    pred_pcs=ppcs(nxyz,mxyz,chi)
+%                      pcs=ppcs(nxyz,sxyz,chi)
 %
 % Parameters: 
 %

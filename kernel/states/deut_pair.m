@@ -17,7 +17,7 @@
 %
 % Outputs:
 %
-%   S       - singet state density matrix (Hilbert space)
+%   S       - singlet state density matrix (Hilbert space)
 %             or state vector (Liouville space)
 %
 %   T       - triplet state density matrices (Hilbert space)

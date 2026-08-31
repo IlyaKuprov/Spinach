@@ -1,7 +1,7 @@
 % Computes axiality and rhombicity of a symmetric 3x3 interaction
 % tensor from the corresponding matrix. Syntax:
 %
-%                     [iso,ax,rh]=mat2axrh(M)
+%                 [iso,ax,rh,eigvals]=mat2axrh(M)
 %
 % Parameters:
 %

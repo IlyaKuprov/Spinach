@@ -1,5 +1,6 @@
-% MEX compilation utility. Rebuilds all C++ MEX binaries in 
-% the current directory. Syntax:
+% MEX compilation utility. Rebuilds all C++ MEX binaries of
+% the Spinach installation that contains this file, placing
+% each binary next to its source. Syntax:
 %
 %                       compile_mex()
 %

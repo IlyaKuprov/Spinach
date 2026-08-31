@@ -1,6 +1,6 @@
 % PSYCHE pure-shift NMR pulse sequence. Syntax:
 %
-%        fid=psyche_1d(spin_system,parameters,H,R,K,G,F)
+%         fid=psyche(spin_system,parameters,H,R,K,G,F)
 %
 % Parameters:
 %
@@ -14,15 +14,37 @@
 %
 %      parameters.dims           size of the sample (m)
 %
-%      parameters.npts           number of discretization points in the grid
+%      parameters.npts           number of discretisation points in the grid
 %
-%      parameters.sweep          spectral range (Hz)
-%
-%      parameters.npoints        number of points in the sweep
-%
-%      parameters.zerofill       number of points for the zero filling
+%      parameters.npoints        numbers of points in the two dimensions,
+%                                a two-element vector [F1 F2]
 %
 %      parameters.diff           diffusion constant (m^2/s)
+%
+%      parameters.delta          gradient evolution delay on either side
+%                                of the hard 180-degree pulse (s)
+%
+%      parameters.timestep1      time step of the F1 evolution (s)
+%
+%      parameters.timestep2      time step of the F2 evolution (s)
+%
+%      parameters.pulsenpoints   number of discretisation points in the
+%                                chirp pulse waveform
+%
+%      parameters.duration       duration of each of the two chirp
+%                                pulses of the PSYCHE element (s)
+%
+%      parameters.bandwidth      chirp sweep bandwidth around zero
+%                                frequency (Hz)
+%
+%      parameters.smfactor       chirp smoothing parameter, see the
+%                                header of chirp_pulse.m
+%
+%      parameters.chirptype      chirp waveform type, see the header
+%                                of chirp_pulse.m
+%
+%      parameters.beta           flip angle of the PSYCHE element,
+%                                degrees
 %
 %      H                         Fokker-Planck Hamiltonian, received
 %                                from the imaging context

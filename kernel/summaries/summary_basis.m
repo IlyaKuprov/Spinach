@@ -33,19 +33,10 @@ else
         current_line(1:length(spin_number))=spin_number;
         for k=1:spin_system.comp.nspins
             [L,M]=lin2lm(spin_system.bas.basis(n,k));
-            current_line(7+8*(k-1)+1)='(';
-            current_line(7+8*(k-1)+2)=num2str(L);
-            current_line(7+8*(k-1)+3)=',';
-            proj=num2str(M);
-            switch length(proj)
-                case 1
-                    current_line(7+8*(k-1)+4)=proj;
-                    current_line(7+8*(k-1)+5)=')';
-                case 2
-                    current_line(7+8*(k-1)+4)=proj(1);
-                    current_line(7+8*(k-1)+5)=proj(2);
-                    current_line(7+8*(k-1)+6)=')';
-            end
+
+            % Format the state label and place it in the line
+            state_token=['(' num2str(L) ',' num2str(M) ')'];
+            current_line(7+8*(k-1)+(1:length(state_token)))=state_token;
         end
         report(spin_system,current_line);
     end

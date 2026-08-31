@@ -931,9 +931,10 @@ if isfield(spin_system.inter,'modes')
                 omega_ref=abs(carrier_frqs(1));
             end
 
-            % Assign the reference to the member modes
+            % Assign the reference to member modes without declared carriers
             sub_modes=reshape(intersect(members,mode_list),1,[]);
-            mode_refs(sub_modes)=omega_ref;
+            no_carr=sub_modes(modes.carriers(sub_modes)==0);
+            mode_refs(no_carr)=omega_ref;
 
             % Declared carriers must agree with the connected spin carrier
             for k=sub_modes
@@ -978,7 +979,7 @@ if isfield(spin_system.inter,'modes')
                     % Add to the invariant part
                     I=I+omega*operator(spin_system,{'N'},{k},operator_type);
 
-                elseif mode_refs(k)~=0
+                elseif (mode_refs(k)~=0)||(modes.carriers(k)>0)
 
                     % Inform the user
                     report(spin_system,['bosonic mode ' num2str(k) ' is on resonance with its carrier.']);

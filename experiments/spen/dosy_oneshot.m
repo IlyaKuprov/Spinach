@@ -27,6 +27,15 @@
 %
 %   parameters.npts           number of discretization points in the grid
 %
+%   parameters.diff           spatially uniform diffusion coefficient
+%                             or tensor (m^2/s), finite, with a posi-
+%                             tive element
+%
+%   parameters.dxx            voxel-wise diffusion coefficients along
+%                             the sample axis (m^2/s), finite, with a
+%                             positive element; supply this or para-
+%                             meters.diff, but not both
+%
 %   parameters.npoints        number of points in the acquired signal
 % 
 %   parameters.sweep          acquisition sweep width, Hz
@@ -215,6 +224,17 @@ if ~isfield(parameters,'npoints')
 elseif (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
        (numel(parameters.npoints)~=1)||(parameters.npoints<1)||(mod(parameters.npoints,1)~=0)
     error('parameters.npoints should be a positive integer.');
+end
+if isfield(parameters,'diff')
+    diff_data=parameters.diff;
+elseif isfield(parameters,'dxx')
+    diff_data=parameters.dxx;
+else
+    error('diffusion should be specified in parameters.diff or parameters.dxx.');
+end
+if (~isnumeric(diff_data))||(~isreal(diff_data))||...
+   any(~isfinite(diff_data(:)))||(~any(diff_data(:)>0))
+    error('diffusion data should be finite, real, and have a positive element.');
 end
 end
 

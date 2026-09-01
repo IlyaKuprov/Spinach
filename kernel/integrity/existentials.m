@@ -26,8 +26,8 @@ disp('Running startup checks...');
 %##########################################
 
 % Global Matlab release
-if isMATLABReleaseOlderThan('R2024b')
-    error('Spinach requires Matlab R2024b or later.');
+if isMATLABReleaseOlderThan('R2026a')
+    error('Spinach requires Matlab R2026a or later.');
 end
 
 % Existential toolboxes
@@ -48,9 +48,6 @@ if ~exist([matlabroot filesep 'toolbox' filesep 'stats'],'dir')
 end
 if ~exist([matlabroot filesep 'toolbox' filesep 'map'],'dir')
     error('Spinach requires Mapping Toolbox.');
-end
-if ~exist([matlabroot filesep 'toolbox' filesep 'aero'],'dir')
-    error('Spinach requires Aerospace Toolbox.');
 end
 
 % List top level directories

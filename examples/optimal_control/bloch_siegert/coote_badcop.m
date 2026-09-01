@@ -1,8 +1,13 @@
-% Reproduction of BADCOP-style selective decoupling logic 
+% Reproduction of BADCOP-style selective decoupling logic
 % from (https://doi.org/10.1038/s41467-018-05400-4) with
 % Bloch-Siegert corrections enabled in the optimiser and
-% simulator BADCOP1, BADCOP2, and BADCOP3 are designed 
-% and validated.
+% simulator. BADCOP1, BADCOP2, and BADCOP3 are designed
+% and validated. Durations, RF ceilings, the contraction
+% factor, and the inversion bands are those of Table 1
+% and the text of the paper, and the 53.2 ppm carrier is
+% the one stated in Supplementary Figure 5. Only BADCOP2
+% and BADCOP3 are asked to preserve C-beta magnetisation
+% outside their inversion band.
 %
 % Calculation time: minutes
 %
@@ -39,7 +44,7 @@ Iz=state(spin_system,'Lz','13C'); Iz=Iz/norm(Iz,2);
 D=hamiltonian(assume(spin_system,'nmr'));
 
 % Paper parameters
-carrier_ppm=100;
+carrier_ppm=53.2;
 alpha_scale=0.91;
 pulse_dur=1e-3;
 ca_ppm=linspace(40,72,100);
@@ -49,22 +54,27 @@ co_hz=ppm2hz(co_ppm-carrier_ppm,sys.magnet,'13C');
 
 % Build all three variants from Table 1
 variants={...
-    struct('name','BADCOP1','rf_hz',5.94e3,'cb_inv_ppm',[5 37]),...
-    struct('name','BADCOP2','rf_hz',4.87e3,'cb_inv_ppm',[28 35]),...
-    struct('name','BADCOP3','rf_hz',7.22e3,'cb_inv_ppm',[10 45])};
+    struct('name','BADCOP1','rf_hz',5.94e3,'cb_inv_ppm',[5 37],'cb_prs',false),...
+    struct('name','BADCOP2','rf_hz',4.87e3,'cb_inv_ppm',[28 35],'cb_prs',true),...
+    struct('name','BADCOP3','rf_hz',7.22e3,'cb_inv_ppm',[10 45],'cb_prs',true)};
 
 % Design and evaluate each variant
 for k=1:numel(variants)
 
-    % Build C-beta inversion and preservation grids
+    % Build the C-beta inversion grid
     cb_inv_ppm=linspace(variants{k}.cb_inv_ppm(1),...
                         variants{k}.cb_inv_ppm(2),60);
-    cb_prs_ppm=linspace(5,80,80);
-    mask=(cb_prs_ppm<variants{k}.cb_inv_ppm(1))|...
-         (cb_prs_ppm>variants{k}.cb_inv_ppm(2));
-    cb_prs_ppm=cb_prs_ppm(mask);
     cb_inv_hz=ppm2hz(cb_inv_ppm-carrier_ppm,sys.magnet,'13C');
-    cb_prs_hz=ppm2hz(cb_prs_ppm-carrier_ppm,sys.magnet,'13C');
+
+    % Only BADCOP2 and BADCOP3 preserve C-beta outside that band
+    if variants{k}.cb_prs
+        cb_prs_ppm=linspace(5,80,80);
+        mask=(cb_prs_ppm<variants{k}.cb_inv_ppm(1))|...
+             (cb_prs_ppm>variants{k}.cb_inv_ppm(2));
+        cb_prs_hz=ppm2hz(cb_prs_ppm(mask)-carrier_ppm,sys.magnet,'13C');
+    else
+        cb_prs_hz=[];
+    end
 
     % Assemble full offset list
     all_hz=[ca_hz co_hz cb_inv_hz cb_prs_hz];

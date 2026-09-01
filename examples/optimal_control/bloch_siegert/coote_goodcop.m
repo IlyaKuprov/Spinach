@@ -1,8 +1,12 @@
-% Reproduction of the GOODCOP pulse design logic from 
-% (https://doi.org/10.1038/s41467-018-05400-4) with 
-% Bloch-Siegert corrections enabled in the optimiser 
+% Reproduction of the GOODCOP pulse design logic from
+% (https://doi.org/10.1038/s41467-018-05400-4) with
+% Bloch-Siegert corrections enabled in the optimiser
 % and simulator. The pulse enforces contracted-time
-% C-alpha evolution while inverting CO.
+% C-alpha evolution while inverting CO. The duration,
+% the RF ceiling, the time contraction factor, and the
+% two ensemble bands are those of Table 1 and the text
+% of the paper; the 53.2 ppm carrier is the one stated
+% in Supplementary Figure 5.
 %
 % Calculation time: minutes
 %
@@ -39,7 +43,7 @@ Iz=state(spin_system,'Lz','13C'); Iz=Iz/norm(Iz,2);
 D=hamiltonian(assume(spin_system,'nmr'));
 
 % Paper parameters
-carrier_ppm=100;
+carrier_ppm=53.2;
 alpha_scale=0.90;
 pulse_dur=150e-6;
 max_rf_hz=15e3;

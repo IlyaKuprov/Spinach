@@ -304,8 +304,9 @@ if numel(parameters.npts)==2
             error('the diffusion tensor field must be symmetric at every voxel.');
         end
         d_off=(parameters.dxy+parameters.dyx)/2;
-        if any(parameters.dxx(:)<0)||any(parameters.dyy(:)<0)||...
-           any(parameters.dxx(:).*parameters.dyy(:)-d_off(:).^2<0)
+        d_ten=reshape([parameters.dxx(:) d_off(:) d_off(:) parameters.dyy(:)]',...
+                      [2 2 numel(d_off)]); d_eig=pageeig(d_ten);
+        if any(min(d_eig,[],1)<-20*eps()*max(abs(d_eig),[],1),'all')
             error('the diffusion tensor field must be positive semidefinite at every voxel.');
         end
     end
@@ -354,10 +355,9 @@ if (numel(parameters.npts)==3)
         s12=(parameters.dxy(:)+parameters.dyx(:))/2; m11=parameters.dxx(:);
         s13=(parameters.dxz(:)+parameters.dzx(:))/2; m22=parameters.dyy(:);
         s23=(parameters.dyz(:)+parameters.dzy(:))/2; m33=parameters.dzz(:);
-        det_top=m11.*(m22.*m33-s23.^2)-s12.*(s12.*m33-s23.*s13)+s13.*(s12.*s23-m22.*s13);
-        if any(m11<0)||any(m22<0)||any(m33<0)||...
-           any(m11.*m22-s12.^2<0)||any(m11.*m33-s13.^2<0)||...
-           any(m22.*m33-s23.^2<0)||any(det_top<0)
+        d_ten=reshape([m11 s12 s13 s12 m22 s23 s13 s23 m33]',[3 3 numel(m11)]);
+        d_eig=pageeig(d_ten);
+        if any(min(d_eig,[],1)<-20*eps()*max(abs(d_eig),[],1),'all')
             error('the diffusion tensor field must be positive semidefinite at every voxel.');
         end
     end

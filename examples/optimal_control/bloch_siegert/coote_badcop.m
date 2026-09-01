@@ -185,7 +185,8 @@ for k=1:numel(variants)
     xline(variants{k}.cb_inv_ppm(2),'k--','LineWidth',1.0);
     kxlabel('$^{13}$C chemical shift / ppm'); 
     kylabel('Final M$_Z$'); ktitle([variants{k}.name ' profile']);
-    klegend({'BSS on','BSS off'},'Location','Best'); drawnow;
+    klegend({'BSS on','BSS off'},'Location','Best'); 
+    set(gca,'XDir','Reverse'); drawnow;
 
 end
 

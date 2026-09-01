@@ -151,6 +151,7 @@ plot(eval_ppm,mz_nobs,'LineWidth',1.5); kgrid;
 kxlabel('$^{13}$C chemical shift / ppm');
 kylabel('Final M$_Z$'); ktitle('GOODCOP profile ');
 legend({'BSS on','BSS off'},'Location','Best');
+set(gca,'XDir','Reverse');
 
 end
 

@@ -24,10 +24,10 @@ bas.approximation='none';
 % Run Spinach housekeeping
 spin_system=create(sys,inter);
 
-% Leave only 14N nucleus and 13C nuclei with hyperfines larger than
-% a_iso > 8 MHz
+% Keep 14N and 13C with HFC(iso) > 8 MHz
 spin_system=kill_spin(spin_system,[5 7:9 11:15 17:20]);
 
+% Basis and formalism processing
 spin_system=basis(spin_system,bas);
 
 % Set common EPR parameters

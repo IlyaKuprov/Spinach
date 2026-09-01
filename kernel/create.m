@@ -211,7 +211,7 @@ if ~isempty(spin_system.sys.enable)
 end
 
 % Get a unique job identifier by hashing the clock and the process identifier
-spin_system.sys.job_id=md5_hash([posixtime(datetime('now')) feature('getpid')]);
+spin_system.sys.job_id=md5_hash([posixtime(datetime('now')) feature('getpid')]); %#ok<FEATGPID>
 report(spin_system,['job identifier: ' spin_system.sys.job_id]);
 
 % Create a unique scratch subdirectory for the current job

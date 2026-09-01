@@ -14,6 +14,8 @@
 % This file is a Matlab fallback for the compiled MEX function.
 %
 % ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=spunicols.m>
 
 function A=spunicols(A)
 

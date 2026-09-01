@@ -64,7 +64,7 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=ttclass/amensolve.m>
 
-function x=amensolve(A,y,tol,opts,x0)
+function x=amensolve(A,y,tol,opts,x0) % #NORMOK
 
 % Get the default options started
 if (nargin<4)||isempty(opts), opts=struct; end

@@ -191,4 +191,3 @@ end
 %
 % David Hilbert, about Emmy Noether, in 1915.
 
-

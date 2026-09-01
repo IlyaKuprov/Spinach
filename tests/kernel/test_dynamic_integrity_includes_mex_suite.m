@@ -188,8 +188,9 @@ end
 
 function result=local_test_redfield_serial(result,serial_file)
 
-% Build a one-dimensional Redfield fixture with an analytical integral
+% Build a one-dimensional Redfield fixture, on-shell kernel at zero shift
 [spin_system,Q,L0,R,expected]=local_redfield_fixture(); %#ok<ASGLU>
+rlx_onshell=true; rlx_shift=0; %#ok<NASGU>
 run(serial_file);
 result=test_close(result,'serial Redfield include integral',R,expected,1e-10,1e-10,...
                   'the serial include must add the one-dimensional analytical Redfield integral');
@@ -202,8 +203,9 @@ end
 
 function result=local_test_redfield_async(result,async_file)
 
-% Build a one-dimensional Redfield fixture with an analytical integral
+% Build a one-dimensional Redfield fixture, on-shell kernel at zero shift
 [spin_system,Q,L0,R,expected]=local_redfield_fixture(); %#ok<ASGLU>
+rlx_onshell=true; rlx_shift=0; %#ok<NASGU>
 run(async_file);
 result=test_close(result,'async Redfield include integral',R,expected,1e-10,1e-10,...
                   'the asynchronous include must reproduce the analytical Redfield integral through parfeval and ValueStore');
@@ -255,12 +257,14 @@ result=test_true(result,'parallel profiler direct script dispatch',...
 
 % Execute the serial Redfield include by script name
 [spin_system,Q,L0,R,expected]=local_redfield_fixture(); %#ok<ASGLU>
+rlx_onshell=true; rlx_shift=0; %#ok<NASGU>
 redfield_integral_serial;
 result=test_close(result,'serial Redfield direct script dispatch',R,expected,1e-10,1e-10,...
                   'direct serial Redfield include dispatch must reproduce the analytical integral');
 
 % Execute the asynchronous Redfield include by script name
 [spin_system,Q,L0,R,expected]=local_redfield_fixture(); %#ok<ASGLU>
+rlx_onshell=true; rlx_shift=0; %#ok<NASGU>
 redfield_integral_async;
 result=test_close(result,'async Redfield direct script dispatch',R,expected,1e-10,1e-10,...
                   'direct asynchronous Redfield include dispatch must reproduce the analytical integral');

@@ -6,18 +6,13 @@
 % The anisotropy is carried by the 14N hyperfine coupling, of which
 % the dipolar part is 10.9 MHz; the two outer hyperfine lines there-
 % fore acquire sideband manifolds, whereas the central line has no
-% hyperfine anisotropy and stays sharp. The rotation frequency used
-% here is above what a mechanical rotor can deliver, but within the
-% range reported for optically levitated nanoparticles:
-%
-%           R. Reimann et al., Phys. Rev. Lett. 121, 033602 (2018)
-%           J. Ahn et al., Phys. Rev. Lett. 121, 033603 (2018)
+% hyperfine anisotropy and stays sharp.
 %
 % Calculation time: minutes
 %
 % ilya.kuprov@weizmann.ac.il
 
-function diamond_p1_mas()
+function mas_diamond_p1()
 
 % P1 centre parameters
 p1_params.orientation='111';
@@ -26,8 +21,15 @@ p1_params.nitrogen='14N';
 % Build the spin system
 [sys,inter]=diamond_p1(p1_params);
 
+% Set the relaxation times
+inter.relaxation={'t1_t2'};
+inter.r1_rates={1e6 1e2};
+inter.r2_rates={1e6 1e4};
+inter.rlx_keep='diagonal';
+inter.equilibrium='zero';
+
 % Magnet field
-sys.magnet=7;
+sys.magnet=7.0;
 
 % Basis set
 bas.formalism='sphten-liouv';
@@ -38,9 +40,9 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Rotor parameters
-parameters.rate=5e6;
+parameters.rate=35000;
 parameters.axis=[1 1 1];
-parameters.max_rank=17;
+parameters.max_rank=11;
 
 % Sequence parameters
 parameters.spins={'E'};
@@ -48,9 +50,9 @@ parameters.rho0=state(spin_system,'L+','E');
 parameters.coil=state(spin_system,'L+','E');
 parameters.offset=1.234e7;
 parameters.sweep=3e8;
-parameters.npoints=4096;
-parameters.zerofill=16384;
-parameters.grid='rep_2ang_1600pts_sph';
+parameters.npoints=128;
+parameters.zerofill=512;
+parameters.grid='rep_2ang_400pts_sph';
 parameters.axis_units='MHz-labframe';
 parameters.invert_axis=1;
 parameters.verbose=0;

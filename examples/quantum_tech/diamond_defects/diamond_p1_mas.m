@@ -3,12 +3,14 @@
 % transverse electron magnetisation, and therefore no pulse is need-
 % ed: the single angle spinning context calls acquire.m directly.
 %
-% The anisotropy is carried by the 14N hyperfine coupling, of which
-% the dipolar part is 10.9 MHz; the two outer hyperfine lines there-
-% fore acquire sideband manifolds, whereas the central line has no
-% hyperfine anisotropy and stays sharp. The rotation frequency used
-% here is above what a mechanical rotor can deliver, but within the
-% range reported for optically levitated nanoparticles:
+% The anisotropy is dominated by the 14N hyperfine coupling, of which
+% the dipolar part is 10.9 MHz, so the two outer hyperfine lines ac-
+% quire strong sideband manifolds. The central line has no hyperfine
+% anisotropy, and keeps only the weak sidebands produced by the 1.96
+% MHz anisotropy of the g-tensor, 0.55 per cent of its own centreband
+% at the settings below. The rotation frequency used here is above
+% what a mechanical rotor can deliver, but within the range reported
+% for optically levitated nanoparticles:
 %
 %           R. Reimann et al., Phys. Rev. Lett. 121, 033602 (2018)
 %           J. Ahn et al., Phys. Rev. Lett. 121, 033603 (2018)

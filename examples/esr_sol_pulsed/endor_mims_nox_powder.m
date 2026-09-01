@@ -36,10 +36,10 @@ spin_system=basis(spin_system,bas);
 
 % Sequence parameters
 parameters.offset=0;
-parameters.npoints=512;
-parameters.sweep=10e8;
+parameters.npoints=128;
+parameters.sweep=3e8;
 parameters.tau=100e-9;
-parameters.zerofill=4096;
+parameters.zerofill=512;
 parameters.spins={'E'};
 parameters.axis_units='MHz';
 parameters.grid='rep_2ang_12800pts_sph';

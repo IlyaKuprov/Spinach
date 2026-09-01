@@ -21,13 +21,6 @@ p1_params.nitrogen='14N';
 % Build the spin system
 [sys,inter]=diamond_p1(p1_params);
 
-% Set the relaxation times
-inter.relaxation={'t1_t2'};
-inter.r1_rates={1e6 1e2};
-inter.r2_rates={1e6 1e4};
-inter.rlx_keep='diagonal';
-inter.equilibrium='zero';
-
 % Magnet field
 sys.magnet=7.0;
 
@@ -53,8 +46,7 @@ parameters.sweep=3e8;
 parameters.npoints=128;
 parameters.zerofill=512;
 parameters.grid='rep_2ang_400pts_sph';
-parameters.axis_units='MHz-labframe';
-parameters.invert_axis=1;
+parameters.axis_units='MHz';
 parameters.verbose=0;
 
 % Simulation

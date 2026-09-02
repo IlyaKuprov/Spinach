@@ -203,10 +203,10 @@ switch ismember('E',[particles{:}])
         end
         
         % Absorb spin-rotation couplings
-        if isfield(props,'src')
+        if isfield(props,'srt')
             inter.spinrot.matrix=cell(nspins);
             for n=1:nspins
-                inter.spinrot.matrix{n}=props.src{index(n)};
+                inter.spinrot.matrix{n}=props.srt{index(n)};
             end
         end
         

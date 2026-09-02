@@ -48,7 +48,7 @@ fid=apodisation(spin_system,fid-mean(fid),{{'kaiser',6}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));
-ax=linspace(-1/(parameters.timestep),1/(parameters.timestep),...
+ax=linspace(-1/(2*parameters.timestep),1/(2*parameters.timestep),...
             parameters.zerofill)*1e-6;
 
 % Plot the spectrum

@@ -60,6 +60,9 @@ function [E,V,dE,T,LP]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,B)
 % Check consistency
 grumble(parameters,Hz,Hc,Hmw,B);
 
+% Hamiltonian, needed for both branches below
+H=B*Hz+Hc; H=full((H+H')/2);
+
 % Recursive call for symmetry
 if isfield(spin_system.bas,'irrep')
 
@@ -95,9 +98,6 @@ if isfield(spin_system.bas,'irrep')
     E=cell2mat(E); V=cell2mat(V);
 
 else
-
-    % Hamiltonian
-    H=B*Hz+Hc; H=full((H+H')/2);
 
     % Decide the method
     switch parameters.rspt_order

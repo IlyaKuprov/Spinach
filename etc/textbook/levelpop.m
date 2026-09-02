@@ -52,8 +52,8 @@ H=-mg_ratio*field*S.z; H=full(H);
 % Get the energies
 E=h_bar*diag(H)/(k_bol*temperature);
 
-% Get the populations
-P=exp(-h_bar*diag(H)/(k_bol*temperature));
+% Get the populations, shifted to avoid exp() overflow
+P=exp(-E+min(E));
 
 % Normalise populations
 P=P/sum(P);

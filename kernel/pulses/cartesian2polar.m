@@ -88,7 +88,11 @@ end
 
 % Transform second derivatives
 if (nargin>4)&&(nargout>4)
-    
+
+    % Canonicalise orientation for the outer products below
+    p=reshape(p,1,[]); x=reshape(x,1,[]); y=reshape(y,1,[]);
+    Dx=reshape(Dx,1,[]); Dy=reshape(Dy,1,[]);
+
     % Radius, radius
     Drr=+(cos(p')*cos(p)).*Dxx +(sin(p')*sin(p)).*Dyy...
         +(sin(p')*cos(p)).*Dyx +(cos(p')*sin(p)).*Dxy;

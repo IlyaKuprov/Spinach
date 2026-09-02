@@ -41,10 +41,14 @@
 %                               stack of initial states).
 %
 %                'multichannel' - returns the time dynamics of several
-%                                 observables as rows of a matrix. Note
-%                                 that destination state screening may be
-%                                 less efficient when there are multiple
-%                                 destinations to screen against.
+%                                 observables as rows of a matrix (if
+%                                 starting from a single initial state)
+%                                 or as a channels-by-time-by-states
+%                                 array (if starting from a stack of
+%                                 initial states). Note that destination
+%                                 state screening may be less efficient
+%                                 when there are multiple destinations
+%                                 to screen against.
 %
 %      coil   - the detection state, used when 'observable' is specified as
 %               the output option. If 'multichannel' is selected, the coil
@@ -619,7 +623,7 @@ switch spin_system.bas.formalism
                 end
                 
                 % Preallocate the answer
-                answer=zeros([size(coil,2) (nsteps+1)],'like',1i);
+                answer=zeros([size(coil,2) (nsteps+1) size(rho,2)],'like',1i);
                 
                 % Loop over independent subspaces
                 parfor (sub=1:nsubs,nworkers)
@@ -643,7 +647,7 @@ switch spin_system.bas.formalism
                         P=propagator(spin_system,L_loc,timestep);
                         
                         % Preallocate the local answer
-                        answer_loc=zeros([size(coil_loc,2) (nsteps+1)],'like',1i);
+                        answer_loc=zeros([size(coil_loc,2) (nsteps+1) size(rho_loc,2)],'like',1i);
                         
                         % Adapt to the target device
                         if ismember('gpu',spin_system.sys.enable)
@@ -656,7 +660,7 @@ switch spin_system.bas.formalism
                             
                             % Propagate the system
                             for n=1:(nsteps+1)
-                                answer_loc(:,n)=gather(coil_loc'*rho_loc);
+                                answer_loc(:,n,:)=gather(coil_loc'*rho_loc);
                                 rho_loc=P*rho_loc;
                             end
                             
@@ -667,7 +671,7 @@ switch spin_system.bas.formalism
                             
                             % Propagate the system
                             for n=1:(nsteps+1)
-                                answer_loc(:,n)=coil_loc'*rho_loc;
+                                answer_loc(:,n,:)=coil_loc'*rho_loc;
                                 rho_loc=P*rho_loc;
                             end
                         

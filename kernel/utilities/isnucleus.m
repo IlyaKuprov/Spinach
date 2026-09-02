@@ -20,7 +20,7 @@ function verdict=isnucleus(spin_spec)
 grumble(spin_spec);
 
 % A simple name matching check
-if ismember(spin_spec(1),{'E','C','V'})||...
+if ismember(spin_spec(1),{'E','C','V','T'})||...
    ismember(spin_spec,{'G','E','T','M'})
     verdict=false();
 else

@@ -60,7 +60,7 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plot the spectrum
 subplot(2,1,2);
-plot(linspace(-1/(parameters.timestep),1/(parameters.timestep),...
+plot(linspace(-1/(2*parameters.timestep),1/(2*parameters.timestep),...
      parameters.zerofill)*1e-6,abs(spectrum));
 kxlabel('frequency, MHz'); axis tight; kgrid;
 

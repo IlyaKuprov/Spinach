@@ -192,6 +192,11 @@ if all(all(rnk==1))
                     end
                 end
                 
+            else
+                
+                % Save the untruncated last core
+                y.cores{k,1} = reshape(ynew, [ry(k),sz(k,1),sz(k,2),ry(k+1)]);
+                
             end
             
         end

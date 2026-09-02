@@ -17,7 +17,8 @@
 %              in ppm  
 %
 %      ranks - row of multipole expansion ranks to be used in the
-%              fitting procedure
+%              fitting procedure, starting with 0; the rank 0 moment
+%              is fixed by normalisation and is not fitted
 %
 %     mguess - guess value for the paramagnetic centre position,
 %              a three-element vector in Angstrom
@@ -149,8 +150,9 @@ end
 if (~isnumeric(mguess))||(size(mguess,2)~=3)||(size(mguess,1)~=1)||(~isreal(mguess))
     error('mxyz parameter should be a real row vector with three elements.');
 end
-if (~isnumeric(L))||(~isreal(L))
-    error('L must be a real vector.');
+if (~isnumeric(L))||(~isreal(L))||(~isrow(L))||any(mod(L,1)~=0)||...
+   (numel(unique(L))~=numel(L))||any(L<0)||(L(1)~=0)
+    error('ranks must be a row of unique non-negative integers starting with 0.');
 end
 end
 

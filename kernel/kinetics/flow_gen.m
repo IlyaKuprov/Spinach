@@ -95,10 +95,10 @@ parfor k=1:ncells %#ok<*PFBNS>
                 F_local=[F_local; m, k, -F_km];
             end
             
-            % Diffusion goes both ways
-            D_km=(1/A_k)*(b_km/norm(r_km,2))*parameters.diff;
-            F_local=[F_local; k m  D_km];
-            F_local=[F_local; m k  D_km];
+            % Diffusion goes both ways, per unit amount in the source cell
+            D_km=(b_km/norm(r_km,2))*parameters.diff;
+            F_local=[F_local; k m  D_km/mesh.vor.weights(m)];
+            F_local=[F_local; m k  D_km/A_k];
 
         end
 

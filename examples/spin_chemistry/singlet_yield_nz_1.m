@@ -124,7 +124,7 @@ L=H+1i*R+1i*K;
 x=bicg(L,rho0,1e-8,numel(rho0));
 
 % Convention-free fractional singlet yield
-yield=real((k_cage/2)*imag(S'*x)/(k_cage*imag(EE'*x)));
+yield=real(k_cage*imag(S'*x)/(k_cage*imag(EE'*x)));
 
 end
 

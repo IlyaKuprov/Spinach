@@ -52,7 +52,7 @@ sweep_conv=1/(2*Ta); % Hz
 res_conv=1/(2*Ta*parameters.nloops); % Hz
 
 % Get axis in the conventional dimension
-axis_f2=(-sweep_conv/2:res_conv:sweep_conv/2-1)+parameters.offset(2); 
+axis_f2=(-sweep_conv/2:res_conv:sweep_conv/2-res_conv)+parameters.offset(2);
 
 % Get the magnetogyric ratio        
 gamma=spin(parameters.spins{1}); % rad/s T

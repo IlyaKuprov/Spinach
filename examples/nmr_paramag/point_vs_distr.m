@@ -64,8 +64,8 @@ chi=R*diag([(-ax/3+rh) (-ax/3-rh) (2*ax/3)])*R';
 % Pad density with zeros (two volumes each side) to avoid PBC effects
 pad_size=2; pad_density=padarray(rho,pad_size*size(rho),0,'both');
 
-% Update grid extents
-ext=(2*pad_size+1)*ext;
+% Update grid extents to include the padded samples
+ext=ext+[-1 1 -1 1 -1 1]*pad_size*size(rho,1)*(ext(2)-ext(1))/(npoints-1);
 
 % Compute PCS exactly using FFT method for PDE equation
 [expt_pcs,~]=kpcs(pad_density,chi,ext,[x y z],'fft');

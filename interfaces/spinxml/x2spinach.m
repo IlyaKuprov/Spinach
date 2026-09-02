@@ -886,6 +886,14 @@ for n=1:numel(shielding_refs)
         error('the second part of each element of parameters.rframes must be a number.');
     end
 end
+
+% Extract isotope labels for the duplicate check below
+isotope_list=cellfun(@(x)x{1},shielding_refs,'UniformOutput',false);
+
+% Catch duplicate isotope entries in shielding_refs
+if numel(unique(isotope_list))<numel(isotope_list)
+    error('shielding_refs contains a duplicate isotope entry.');
+end
 end
 
 % People who think they know everything are a great 

@@ -78,9 +78,6 @@ if (~isempty(min_neg))&&(min_neg<0)
     
 end
 
-% Add colour calibration spots
-data_cube(1,1,1)=1; data_cube(2,2,2)=-1;
-
 % Permute dimensions to match surf/meshgrid convention
 data_cube=permute(data_cube,[3 2 1]);
 

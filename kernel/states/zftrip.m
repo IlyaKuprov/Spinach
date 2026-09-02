@@ -52,9 +52,9 @@ H_ZFS=2*pi*(ZFS(1,1)*Ex*Ex+ZFS(1,2)*Ex*Ey+ZFS(1,3)*Ex*Ez+...
 % Diagonalise ZFS Hamiltonian
 [V,D]=eig(full(H_ZFS),'vector');
 
-% Match literature convention (|zz|>|xx|>|yy|)
+% Match literature convention (|zz|>|yy|>|xx|)
 [~,ord]=sort(abs(D),'ascend'); V=V(:,ord);
-Vz=V(:,3); Vx=V(:,2); Vy=V(:,1);
+Vz=V(:,3); Vx=V(:,1); Vy=V(:,2);
 
 % Build zero field density matrix from populations
 DM=Vx*pops(1)*Vx'+Vy*pops(2)*Vy'+Vz*pops(3)*Vz'; 

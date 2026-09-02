@@ -34,7 +34,7 @@ if numel(spin_system.chem.parts)>1
         report(spin_system,'===============================');
         report(spin_system,' N(from)   N(to)    Rate(Hz)   ');
         report(spin_system,'-------------------------------');
-        [rows,cols,vals]=find(spin_system.chem.rates);
+        [rows,cols,vals]=find(spin_system.chem.rates-diag(diag(spin_system.chem.rates)));
         for n=1:length(vals)
             report(spin_system,[' ' strjust([num2str(rows(n)) blanks(3-length(num2str(rows(n))))],'left') '       '...
                                     strjust([num2str(cols(n)) blanks(3-length(num2str(cols(n))))],'left') '      '...

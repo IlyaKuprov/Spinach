@@ -28,7 +28,7 @@ grumble(tt);
 n=prod(prod(sizes(tt)));
 
 % Check for infinities
-if n>intmax
+if n>intmax('int64')
     error('the number of elements exceeds Matlab''s intmax.');
 end
 

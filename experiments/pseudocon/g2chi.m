@@ -30,14 +30,11 @@ mu_b=9.274009994e-24;
 mu_0=4*pi*1e-7;
 k_b=1.38064852e-23;
 
-% Diagonalise the g-tensor
-[V,D]=eig(g);
+% Curie law prefactor
+prefactor=S*(S+1)*mu_0*(mu_b^2)/(3*k_b*T);
 
-% Apply the Curie law to the eigenvalues
-D=S*(S+1)*mu_0*(mu_b^2)*(D.^2)/(3*k_b*T);
-
-% Compose the susceptibility tensor
-chi=1e30*V*D*inv(V); %#ok<MINV>
+% Compose the susceptibility tensor from the g-tensor Gram matrix
+chi=1e30*prefactor*(g.'*g);
 
 end
 

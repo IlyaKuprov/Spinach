@@ -23,13 +23,13 @@ function C=plus(A,B)
 grumble(A,B);
 
 % Process the special cases
-if isa(A,'rcv')&&isscalar(B)&&isnumeric(B)
+if isa(A,'rcv')&&(~isa(B,'rcv'))&&isscalar(B)&&isnumeric(B)
 
     % Explain the refusal to add a scalar to an RCV object
     error('adding a scalar makes a matrix non-sparse; inflate manually first.');
 
 % Add a scalar to an RCV sparse matrix
-elseif isa(B,'rcv')&&isscalar(A)&&isnumeric(A)
+elseif isa(B,'rcv')&&(~isa(A,'rcv'))&&isscalar(A)&&isnumeric(A)
     
     % Explain the refusal to add a scalar to an RCV object
     error('adding a scalar makes a matrix non-sparse; inflate manually first.');

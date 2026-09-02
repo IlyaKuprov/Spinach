@@ -47,25 +47,30 @@ end
 
 % Cartesian coordinates
 props.symbols={}; props.std_geom=zeros(0,3);
+atom_keys=cell(1,numel(castep_log)); atom_count=0;
 for n=1:numel(castep_log)
     if (numel(castep_log{n})>3)&&strcmp(castep_log{n}(1:4),'atom')
         atom_spec=textscan(castep_log{n},'atom %s %s %f %f %f %f',...
                            'Delimiter',' ','MultipleDelimsAsOne',1);
         props.symbols{end+1}=atom_spec{1}{1};
         props.std_geom(end+1,:)=[atom_spec{4:6}];
+        atom_count=atom_count+1;
+        atom_keys{atom_count}=[atom_spec{1}{1} num2str(atom_spec{3})];
     end
 end
+atom_keys=atom_keys(1:atom_count);
 
-% Shielding tensors
-props.cst={};
+% Shielding tensors, matched to atom_keys by species and atom index
+props.cst=cell(size(props.symbols));
 for n=1:numel(castep_log)
     if (numel(castep_log{n})>1)&&strcmp(castep_log{n}(1:2),'ms')
         cst_spec=textscan(castep_log{n},'ms %s %f %f %f %f %f %f %f %f %f %f',...
                           'Delimiter',' ','MultipleDelimsAsOne',1);
         if isempty(cst_spec{end}) % CASTEP printing bug
-            cst_spec={cst_spec{1}{1}(1) str2double(cst_spec{1}{1}(2:end)) cst_spec{2:(end-1)}};
+            cst_spec={{cst_spec{1}{1}(1)} str2double(cst_spec{1}{1}(2:end)) cst_spec{2:(end-1)}};
         end
-        props.cst{end+1}=reshape([cst_spec{3:11}],[3 3]);
+        atom_idx=strcmp(atom_keys,[cst_spec{1}{1} num2str(cst_spec{2})]);
+        props.cst{atom_idx}=reshape([cst_spec{3:11}],[3 3]);
     end
 end
 

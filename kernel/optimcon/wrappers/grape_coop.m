@@ -43,8 +43,11 @@ switch spin_system.bas.formalism
             error('target state has zero norm.');
         end
     otherwise
-        P_targ=rho_targ*rho_targ';
-        P_dirt=eye(size(P_targ))-P_targ;
+        targ_norm=rho_targ'*rho_targ;
+        if abs(targ_norm)==0
+            error('target state has zero norm.');
+        end
+        P_dirt=eye(numel(rho_targ))-rho_targ*rho_targ'/targ_norm;
 end
 
 % Make sure final states are available

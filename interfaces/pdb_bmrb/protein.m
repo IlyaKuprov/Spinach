@@ -86,7 +86,7 @@ end
 grumble(pdb_file,bmrb_file,options);
 
 % Parse the PDB file
-[pdb_aa_num,pdb_aa_typ,pdb_atom_id,pdb_coords]=read_pdb_pro(pdb_file,options.pdb_mol);
+[pdb_aa_num,pdb_aa_typ,pdb_atom_id,pdb_coords,pdb_ser]=read_pdb_pro(pdb_file,options.pdb_mol);
 
 % Parse the BMRB file
 [bmrb_aa_num,bmrb_aa_typ,bmrb_atom_id,bmrb_chemsh]=read_bmrb(bmrb_file);
@@ -95,7 +95,7 @@ grumble(pdb_file,bmrb_file,options);
 kill_mask=ismember(pdb_atom_id,{'O','OE','OE1','OE2','OD1','OD2','OG','OG1','HG1',...
                                 'OG2','OH','HH','SD','SG','OXT','O''','O'''''});
 pdb_aa_num(kill_mask)=[]; pdb_atom_id(kill_mask)=[]; 
-pdb_aa_typ(kill_mask)=[]; pdb_coords(kill_mask)=[];
+pdb_aa_typ(kill_mask)=[]; pdb_coords(kill_mask)=[]; pdb_ser(kill_mask)=[];
 disp('WARNING: oxygen, sulphur, and OH protons will not appear in the simulation.');
 
 % Match chemical shifts
@@ -300,8 +300,8 @@ end
 % Process atom selection specification
 if isnumeric(options.select)
     
-    % Import atoms with user-specified numbers
-    subset=false(size(pdb_atom_id)); subset(options.select)=true;
+    % Import atoms with user-specified PDB serial numbers
+    subset=ismember(pdb_ser,options.select);
 
 elseif strcmp(options.select,'backbone')
     

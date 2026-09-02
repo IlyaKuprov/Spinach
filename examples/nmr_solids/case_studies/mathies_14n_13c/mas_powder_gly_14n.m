@@ -1,6 +1,7 @@
-% 14N MAS spectrum of glycine powder (assuming decoupling of 1H
-% and 13C), computed using the Fokker-Planck MAS formalism and
-% a spherical grid. Numerical rotating frame transformation is
+% Static 14N powder spectrum of glycine (assuming decoupling of
+% 1H and 13C), computed on a spherical grid and compared to the
+% static 14N measurement by O'Dell and Schurko (PCCP 2009, DOI
+% 10.1039/b906114b). Numerical rotating frame transformation is
 % used because 14N quadrupolar interaction is large.
 %
 % Calculation time: seconds.

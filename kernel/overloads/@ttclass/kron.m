@@ -23,8 +23,9 @@
 
 function c=kron(a,b)
 
-% Shrink a and b before going any further
-a=shrink(a); b=shrink(b);
+% Shrink a and b, but keep the train structure if shrink collapses it
+a_shrunk=shrink(a); if isa(a_shrunk,'ttclass'), a=a_shrunk; end
+b_shrunk=shrink(b); if isa(b_shrunk,'ttclass'), b=b_shrunk; end
 
 % Read sizes and ranks of the operands
 [a_ncores,~]=size(a.cores); a_ranks=ranks(a); a_sizes=sizes(a);

@@ -90,6 +90,10 @@ inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,10,28.0);
 inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,11,52.1);
 inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,12,173.3);
 
+% Spinach housekeeping
+spin_system=create(sys,inter);
+spin_system=basis(spin_system,bas);
+
 % Add to the previous simulation
 fid=fid+singlerot(spin_system,@acquire,parameters,'nmr');
 

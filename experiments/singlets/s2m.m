@@ -66,8 +66,8 @@ end
 if size(rho,1)~=size(L,2)
     error('dimensions of rho and L must be consistent.');
 end
-if (~isnumeric(J))||(~isreal(J))||(~isscalar(J))
-    error('J must be a real scalar.');
+if (~isnumeric(J))||(~isreal(J))||(~isscalar(J))||(~isfinite(J))
+    error('J must be a finite real scalar.');
 end
 if (~isnumeric(delta_v))||(~isreal(delta_v))||(~isscalar(delta_v))||...
    (~isfinite(delta_v))||(delta_v==0)

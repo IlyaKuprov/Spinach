@@ -119,6 +119,12 @@ else
     % Determine which tracks to drop
     if exist('nstates','var')
         
+        % Check the number of states requested
+        if (~isnumeric(nstates))||(~isreal(nstates))||(~isscalar(nstates))||...
+           (nstates<1)||(mod(nstates,1)~=0)||(nstates>numel(rho))
+            error('nstates must be a positive integer not exceeding the state space dimension.');
+        end
+        
         % Determine state amplitudes
         amplitudes=max(abs(trajectory),[],2);
         

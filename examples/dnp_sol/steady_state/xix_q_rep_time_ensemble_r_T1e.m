@@ -78,7 +78,7 @@ for n=1:numel(r)
     % dependence provided using a function handle
     inter.relaxation={'t1_t2'};
     r1n_rate=@(alp,bet,gam)r1n_dnp(sys.magnet,inter.temperature,...
-                                   2.00230,1e-3,52,r(n),bet);
+                                   2.00230,T1e,52,r(n),bet);
     inter.r1_rates={1/T1e r1n_rate};
     inter.r2_rates={200e3 50e3};
     inter.rlx_keep='diagonal';

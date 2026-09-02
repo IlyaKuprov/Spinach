@@ -105,6 +105,9 @@ x=x0;
 % Check inputs for consistency
 grumble(A,y,x,tol,opts.sv_floor);
 
+% Zero right-hand side has the zero solution
+if norm(y,'fro')==0, x=y; return; end
+
 % Read dimension and mode sizes
 d=y.ncores;     % dimension of the problem
 sz=A.sizes;     % mode sizes

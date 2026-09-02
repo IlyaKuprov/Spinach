@@ -190,6 +190,16 @@ switch output
             end
             
         end
+
+    case 'total'
+
+        % Refuse integrals of unitary dynamics
+        if strcmp(spin_system.bas.formalism,'zeeman-wavef')
+            error('total observable integral is not defined for unitary wavefunction evolution.');
+        end
+
+        % Integrate the observable trajectory to infinity
+        answer=full(real(gather(coil'*((1i*L)\rho))));
         
     otherwise
         

@@ -46,6 +46,10 @@ pdb_id={}; coords={};
 % Parse the PDB file
 while ~feof(file_id)
     data_line=fgetl(file_id);
+
+    % Blank the PDB chain identifier column, this parser does not use it
+    if numel(data_line)>=22, data_line(22)=' '; end
+
     if ~isempty(data_line)
         parsed_string=textscan(data_line,'ATOM %f %s %s %f %f %f %f %f %f %s','delimiter',' ','MultipleDelimsAsOne',1); 
         if all(~cellfun(@isempty,parsed_string))

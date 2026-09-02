@@ -39,6 +39,10 @@ if n_indep_rxns>1
     return;
 end
 
+% Normalise the rate scale so that conditioning does not depend on time units
+rate_scale=max(abs(K(:)));
+if rate_scale>0, K=K/rate_scale; end
+
 % Assemble the steady state system
 A=vertcat(ones(1,size(K,2)),K);
 b=vertcat(sum(c0),zeros(size(K,1),1));

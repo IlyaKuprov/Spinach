@@ -35,7 +35,7 @@ xyz=[[0.000 0.000 0.000];
      [0.000 0.000 1.050]*euler2dcm(0,theta,4*pi/3+phase)];
 
 % Rotate the CC bond
-xyz=xyz*euler2dcm(0,cc_th,cc_ph);
+xyz=xyz*euler2dcm(0,-cc_th,-cc_ph);
 
 % Translate the carbon
 xyz=xyz+c_xyz;

@@ -42,6 +42,11 @@ function plot_uf(spin_system,spectrum_uf,parameters)
 % Check consistency
 grumble(spectrum_uf,parameters)
 
+% Accommodate homonuclear sequences
+if isscalar(parameters.spins)
+    parameters.spins=[parameters.spins parameters.spins];
+end
+
 % Get Ta (duration of one single acquisition gradient)
 Ta=parameters.deltat*parameters.npoints; % s
 

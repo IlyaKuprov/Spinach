@@ -28,10 +28,10 @@
 %
 % Notes:
 %
-%     parameters.sweep should be a real scalar set
-%     equal to parameters.rate, this is because this
-%     pulse sequence is stroboscopic with respect to
-%     the rotor period; both dimensions are sampled
+%     parameters.sweep should be a positive real scalar
+%     equal to abs(parameters.rate), this is because
+%     this pulse sequence is stroboscopic with respect
+%     to the rotor period; both dimensions are sampled
 %     at that sweep width
 %
 % ilya.kuprov@weizmann.ac.il
@@ -144,11 +144,11 @@ if ~isfield(parameters,'sweep')
     error('sweep width must be specified in parameters.sweep variable.');
 end
 if (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
-   (~isscalar(parameters.sweep))||(parameters.sweep==0)
-    error('parameters.sweep must be a non-zero real scalar.');
+   (~isscalar(parameters.sweep))||(parameters.sweep<=0)
+    error('parameters.sweep must be a positive real scalar.');
 end
-if parameters.sweep~=parameters.rate
-    error('parameters.sweep must be equal to parameters.rate in MQMAS.');
+if parameters.sweep~=abs(parameters.rate)
+    error('parameters.sweep must be equal to abs(parameters.rate) in MQMAS.');
 end
 if ~isfield(parameters,'rho0')
     error('initial state must be specified in parameters.rho0 variable.');
@@ -172,9 +172,6 @@ if numel(parameters.decouple)>0
     if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})
         error('analytical decoupling is only available for sphten-liouv formalism.');
     end
-end
-if abs(parameters.sweep)~=abs(parameters.rate)
-    error('parameters.sweep must be equal to parameters.rate (rotor-synchronous sequence).');
 end
 end
 

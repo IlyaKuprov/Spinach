@@ -39,7 +39,7 @@ report(spin_system,['Singlet state norm: ' ...
                     num2str(norm(full(rho),2))]);
 
 % Remove the part that does not commute with H
-[EvH,~]=eig(H); rho_inv=remncomm(rho,EvH);
+[EvH,evals_h]=eig(H,'vector'); rho_inv=remncomm(rho,EvH,evals_h);
 
 % Remove the unit part
 rho_inv=remtrace(rho_inv);
@@ -78,7 +78,7 @@ report(spin_system,['Singlet state norm: ' ...
 H=(H+ctranspose(H))/2;
 
 % Remove the part that does not commute with H
-[EvH,~]=eig(H); rho_inv=remncomm(rho,EvH);
+[EvH,evals_h]=eig(H,'vector'); rho_inv=remncomm(rho,EvH,evals_h);
 
 % Remove the unit part
 rho_inv=remtrace(rho_inv);

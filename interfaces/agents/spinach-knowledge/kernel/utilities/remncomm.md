@@ -1,12 +1,12 @@
 # kernel/utilities/remncomm.m
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/remncomm.m`
-- Signature: `A=remncomm(A,EvB)`
+- Signature: `A=remncomm(A,EvB,evals_b)`
 - Total lines: 54
 
 ## Purpose
 
-Removes from the Hermitian operator A the part that does not com- mute with the Hermitian operator B. Syntax: C=remncomm(A,EvB)
+Removes from the Hermitian operator A the part that does not com- mute with the Hermitian operator B. Syntax: C=remncomm(A,EvB,evals_b)
 
 ## Physical / mathematical content
 
@@ -21,16 +21,20 @@ Removes from the Hermitian operator A the part that does not com- mute with the 
 
 ### Comment-guided execution stages
 
-- Lines 26-27: Check consistency; implemented by `grumble(A,EvB)`.
-- Lines 29-30: The standard projector expression; implemented by `A=EvB*(diag(diag(EvB'*A*EvB)))*EvB'`.
+- Lines 30-31: Check consistency; implemented by `grumble(A,EvB,evals_b)`.
+- Lines 33-34: Move A into the eigenbasis of B; implemented by `A=EvB'*A*EvB`.
+- Lines 36-38: Zero out elements linking non-degenerate eigenvalues of B; implemented by `degen_mask=abs(evals_b-evals_b.')<=1e-10*max(abs(evals_b)); A=A.*degen_mask`.
+- Lines 40-41: Move the commuting part back into the original basis; implemented by `A=EvB*A*EvB'`.
 
 ### Key state/data transformations
 
-- Lines 30: computes `A` using `A=EvB*(diag(diag(EvB'*A*EvB)))*EvB'`.
+- Lines 34: computes `A` using `A=EvB'*A*EvB`.
+- Lines 37: computes `degen_mask` using `degen_mask=abs(evals_b-evals_b.')<=1e-10*max(abs(evals_b))`.
+- Lines 41: computes `A` using `A=EvB*A*EvB'`.
 
 ### Local helper functions
 
-- Line 35: `grumble()` — `function grumble(A,EvB)`. The first scientific measurement of the speed of electricity was conducted in 1764 by French physicist Jean-Antoine Nollet. He ar-
+- Line 46: `grumble()` — `function grumble(A,EvB,evals_b)`. The first scientific measurement of the speed of electricity was conducted in 1764 by French physicist Jean-Antoine Nollet. He ar-
   - Representative operation: `if (~isnumeric(A))||(size(A,1)~=size(A,2))|| (~ishermitian(A))`.
   - Representative operation: `(~ishermitian(A))`.
 
@@ -39,28 +43,36 @@ Removes from the Hermitian operator A the part that does not com- mute with the 
 - A -a square matrix
 - EvB -a square matrix containing eigenvectors
 - of B in columns
+- evals_b - a column vector containing the eigenvalues
+- of B in the same order as the columns of EvB
 
 ## Outputs
 
 - C -a square matrix
-- Note: when the matrix B is diagonal, the part of A that commutes
-- with it is the diagonal part, so just use diag(diag(A))
+- Note: within a degenerate eigenspace of B, every Hermitian operator
+- supported on that eigenspace commutes with B, so the corres-
+- ponding block of A (not just its diagonal) is kept
 
 ## Implementation structure
 
 - Removes from the Hermitian operator A the part that does not com-
 - mute with the Hermitian operator B. Syntax:
-- C=remncomm(A,EvB)
+- C=remncomm(A,EvB,evals_b)
 - A - a square matrix
 - EvB - a square matrix containing eigenvectors
 - of B in columns
+- evals_b - a column vector containing the eigenvalues
+- of B in the same order as the columns of EvB
 - C - a square matrix
-- Note: when the matrix B is diagonal, the part of A that commutes
-- with it is the diagonal part, so just use diag(diag(A))
+- Note: within a degenerate eigenspace of B, every Hermitian operator
+- supported on that eigenspace commutes with B, so the corres-
+- ponding block of A (not just its diagonal) is kept
 - Check consistency
-- The standard projector expression
+- Move A into the eigenbasis of B
+- Zero out elements linking non-degenerate eigenvalues of B
+- Move the commuting part back into the original basis
 - Consistency enforcement
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `grumble()`, `ishermitian()`.
+- Called routines detected from the main body: `grumble()`, `isfinite()`, `ishermitian()`.

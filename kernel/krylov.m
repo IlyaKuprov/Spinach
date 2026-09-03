@@ -202,21 +202,32 @@ switch output
         if isa(L,'polyadic'), L=inflate(L); end
 
         % Find the states reachable from the initial condition
-        reach=any(rho,2);
-        while true
-            fresh=reach|any(L(:,reach),2);
-            if isequal(fresh,reach), break; end
-            reach=fresh;
+        reach=full(any(rho,2)); front=find(reach);
+        while ~isempty(front)
+            [front,~]=find(L(:,front));
+            front=unique(front(~reach(front)));
+            reach(front)=true;
         end
-        reach=gather(reach);
+
+        % Find the states from which the coil is reachable
+        cover=full(any(coil,2)); front=find(cover);
+        while ~isempty(front)
+            [~,front]=find(L(front,:));
+            front=unique(front(~cover(front)));
+            cover(front)=true;
+        end
+
+        % Keep the states that contribute to the observable
+        reach=gather(reach&cover); L=L(reach,reach);
+        rho=rho(reach,:); coil=coil(reach,:);
+
+        % Refuse integrals of non-decaying modes
+        if any(imag(eig(full(gather(L))))>=0)
+            error('a mode contributing to the observable does not decay, the integral diverges.');
+        end
 
         % Integrate the observable trajectory to infinity
-        answer=full(real(gather(coil(reach,:)'*((1i*L(reach,reach))\rho(reach,:)))));
-
-        % Refuse integrals that do not converge
-        if ~all(isfinite(answer),'all')
-            error('the generator is singular on the subspace reachable from rho.');
-        end
+        answer=full(real(gather(coil'*((1i*L)\rho))));
         
     otherwise
         

@@ -168,11 +168,11 @@ for n=1:numel(xml.children)
                     
         end
           
-    elseif strcmpi(xml.children(n).name,'coupling_matrix')
-        
-        % Increment subsystem counter
+    end
+    
+    % Count coupling matrices seen so far
+    if strcmpi(xml.children(n).name,'coupling_matrix')
         current_subsystem=current_subsystem+1;
-        
     end
     
 end

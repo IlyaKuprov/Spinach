@@ -49,7 +49,7 @@ Ta=parameters.deltat*parameters.npoints; % s
 sweep_conv=1/(2*Ta); % Hz
 
 % Get axis in the conventional dimension
-axis_f2=ft_axis(parameters.offset(2),sweep_conv,parameters.nloops);
+axis_f2=sweep_conv*(-floor(parameters.nloops/2):(ceil(parameters.nloops/2)-1))/parameters.nloops+parameters.offset(2);
 
 % Get the magnetogyric ratio        
 gamma=spin(parameters.spins{1}); % rad/s T
@@ -160,8 +160,8 @@ if ~isfield(parameters,'dims')
 end
 if (~isnumeric(parameters.nloops))||(~isreal(parameters.nloops))||...
    (~isscalar(parameters.nloops))||(~isfinite(parameters.nloops))||...
-   (parameters.nloops<3)||(mod(parameters.nloops,1)~=0)
-    error('parameters.nloops must be a finite real integer greater than 2.');
+   (parameters.nloops<1)||(mod(parameters.nloops,1)~=0)
+    error('parameters.nloops must be a finite positive real integer.');
 end
 if (~isnumeric(parameters.Te))||(~isreal(parameters.Te))||...
    (~isscalar(parameters.Te))||(~isfinite(parameters.Te))||(parameters.Te<=0)

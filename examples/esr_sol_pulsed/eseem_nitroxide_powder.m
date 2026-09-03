@@ -61,8 +61,7 @@ kxlabel('time, $\mu$s'); axis tight; kgrid;
 
 % Plot the spectrum
 subplot(2,1,2);
-plot(linspace(-1/(2*parameters.timestep),1/(2*parameters.timestep),...
-     parameters.zerofill)*1e-6,real(spectrum));
+plot(ft_axis(0,1/parameters.timestep,parameters.zerofill)*1e-6,real(spectrum));
 kxlabel('frequency, MHz'); axis tight; kgrid;
 
 end

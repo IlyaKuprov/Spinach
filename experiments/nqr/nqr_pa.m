@@ -51,6 +51,16 @@ function spectrum=nqr_pa(spin_system,parameters,H,R,K)
 % Check consistency
 grumble(parameters,H,R,K);
 
+% Move into Liouville space if starting in zeeman-hilb
+was_hilbert=strcmp(spin_system.bas.formalism,'zeeman-hilb');
+[spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K);
+
+% Fold the RF operators into commutation superoperators too
+if was_hilbert
+    parameters.Lx=hilb2liouv(parameters.Lx,'comm');
+    parameters.Ly=hilb2liouv(parameters.Ly,'comm');
+end
+
 % Project pulse operators
 Lx=kron(speye(parameters.spc_dim),parameters.Lx);
 Ly=kron(speye(parameters.spc_dim),parameters.Ly);

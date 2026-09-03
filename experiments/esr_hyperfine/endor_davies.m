@@ -90,7 +90,7 @@ Nx=(Np+Np')/2; Ny=(Np-Np')/2i;
 
 % Soft pulse frequencies
 parameters.e_frq=parameters.e_frq-parameters.offset(1);
-parameters.n_frq=parameters.n_frq+spin(parameters.spins{2})*spin_system.inter.magnet/(2*pi);
+parameters.n_frq=parameters.n_frq+spin(parameters.spins{2})*spin_system.inter.magnet/(2*pi)-parameters.offset(2);
 
 % Pi pulse on the electron
 rho0=shaped_pulse_af(spin_system,L,Ex,Ey,parameters.rho0, parameters.e_frq,...

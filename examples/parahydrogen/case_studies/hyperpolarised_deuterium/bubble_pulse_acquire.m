@@ -23,13 +23,17 @@ inter.coupling.scalar=cell(4,4);
 inter.coupling.scalar{1,2} = 12.0;
 inter.coupling.scalar{3,4} = 0.24;
 
-% NQI tensors from a DFT calculation
-inter.coupling.matrix{3,3}=1e3*[ 108.2    0.1   28.1
-                                   0.1  -55.6    4.5
-                                  28.1    4.5  -52.6];  
-inter.coupling.matrix{4,4}=1e3*[ -55.2    8.1  -14.5
-                                   8.1   -6.3  -73.9
-                                 -14.5  -73.9   61.5];
+% NQI tensors from a DFT calculation, rotated from the
+% Gaussian abc principal axis frame into the standard
+% orientation frame used below for the coordinates, via
+% chi_std=R*chi_abc*R', R taken from the "Rotation matrix
+% to Principal Axis frame" block of ir_active_efg.out
+inter.coupling.matrix{3,3}=1e3*[ 106.7   -6.2   31.9
+                                  -6.2  -55.5    3.3
+                                  31.9    3.3  -51.2];
+inter.coupling.matrix{4,4}=1e3*[ -53.7   11.8  -19.7
+                                   11.8   -5.3  -73.8
+                                  -19.7  -73.8   59.0];
 
 % Cartesian coordinates, DFT calculation
 inter.coordinates={[]; []; % None for D2

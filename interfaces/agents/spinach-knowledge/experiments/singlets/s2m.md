@@ -25,7 +25,7 @@ S2M sequence of Pileio and Levitt. Syntax: rho=s2m(spin_system,L,Hx,Hy,rho,J,del
 
 - Lines 30-31: Check consistency; implemented by `grumble(L,Hx,Hy,rho,J,delta_v)`.
 - Lines 33-34: Evolution time; implemented by `t=1/(4*sqrt(J^2+delta_v^2))`.
-- Lines 36-37: Repetition count; implemented by `m1=floor(pi*J/(2*delta_v))`.
+- Lines 36-37: Repetition count; implemented by `m1=floor(pi*abs(J)/(2*abs(delta_v)))`.
 - Lines 40-41: Pulse sequence; implemented by `for n=1:m1/2`.
 
 ### Control flow inferred from the code
@@ -37,7 +37,7 @@ S2M sequence of Pileio and Levitt. Syntax: rho=s2m(spin_system,L,Hx,Hy,rho,J,del
 ### Key state/data transformations
 
 - Lines 34: computes `t` using `t=1/(4*sqrt(J^2+delta_v^2))`.
-- Lines 37: computes `m1` using `m1=floor(pi*J/(2*delta_v))`.
+- Lines 37: computes `m1` using `m1=floor(pi*abs(J)/(2*abs(delta_v)))`.
 - Lines 42: computes `rho` using `rho=step(spin_system,L,rho,t)`.
 
 ### Local helper functions

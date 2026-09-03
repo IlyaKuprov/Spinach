@@ -69,7 +69,7 @@ elseif size(obs,2)==3
     % Three observables: assume phase + amp + Z and map into HSV
     RGB=hsv2rgb(wrapTo2Pi(obs(:,1))/(2*pi),...
                 obs(:,2)/max(obs(:,2)),...
-                (obs(:,3)+min(obs(:,3)))/(max(obs(:,3))-min(obs(:,3))));
+                (obs(:,3)-min(obs(:,3)))/(max(obs(:,3))-min(obs(:,3))));
 
 else
 

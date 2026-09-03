@@ -24,6 +24,7 @@ Number of elements in the matrix represented by a tensor train. Syntax: n=numel(
 - Lines 24-25: Check consistency; implemented by `grumble(tt)`.
 - Lines 27-28: Compute the number of elements exactly; implemented by `n=prod(int64(sizes(tt)),'all','native')`.
 - Lines 30-31: Check for overflow; implemented by `if n>flintmax`.
+- Lines 35-36: Return a double; implemented by `n=double(n)`.
 
 ### Control flow inferred from the code
 
@@ -32,6 +33,7 @@ Number of elements in the matrix represented by a tensor train. Syntax: n=numel(
 ### Key state/data transformations
 
 - Lines 28: computes `n` using `n=prod(int64(sizes(tt)),'all','native')`.
+- Lines 36: computes `n` using `n=double(n)`.
 
 ### Local helper functions
 
@@ -59,8 +61,9 @@ Number of elements in the matrix represented by a tensor train. Syntax: n=numel(
 - Note: for large spin systems, the result may be too large
 - to be represented exactly as a double.
 - Check consistency
-- Compute the number of elements
-- Check for infinities
+- Compute the number of elements exactly
+- Check for overflow
+- Return a double
 - Consistency enforcement
 - If it had been possible to build the tower of Babel without
 

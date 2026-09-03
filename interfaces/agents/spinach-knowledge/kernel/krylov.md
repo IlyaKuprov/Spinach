@@ -42,7 +42,7 @@ Krylov propagation function. Avoids matrix exponentiation, but can be slow. Shou
 - Lines 144-145: Preallocate the answer; implemented by `answer=zeros([(nsteps+1) size(rho,2)],'like',1i)`.
 - Lines 147-148: Set the initial point; implemented by `answer(1,:)=gather(coil'*rho)`.
 - Lines 156-157: Assign the answer; implemented by `answer(n+1,:)=gather(coil'*rho)`.
-- Lines 170-171: Preallocate the answer; implemented by `answer=zeros([size(coil,2) (nsteps+1)],'like',1i)`.
+- Lines 170-171: Preallocate the answer; implemented by `answer=zeros([size(coil,2) (nsteps+1) size(rho,2)],'like',1i)`.
 
 ### Control flow inferred from the code
 
@@ -102,10 +102,14 @@ Krylov propagation function. Avoids matrix exponentiation, but can be slow. Shou
 - tial state) or a matrix (if starting from a
 - stack of initial states).
 - 'multichannel' -returns the time dynamics of several
-- observables as rows of a matrix. Note
-- that destination state screening may be
-- less efficient when there are multiple
-- destinations to screen against.
+- observables as rows of a matrix (if
+- starting from a single initial state)
+- or as a channels-by-time-by-states
+- array (if starting from a stack of
+- initial states). Note that destination
+- state screening may be less efficient
+- when there are multiple destinations
+- to screen against.
 - coil -the detection state, used when 'observable' is specified as
 - the output option. If 'multichannel' is selected, the coil
 - should contain multiple columns corresponding to individual

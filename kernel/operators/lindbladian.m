@@ -36,13 +36,16 @@ grumble(A_left,A_right,rho,rlx_rate);
 % Generate a Lindbladian
 R=A_left*A_right'-(A_left'*A_left+A_right*A_right')/2;
 
-% Check for silly inputs
-if abs(rho'*R*rho)<1e-10
+% Remove the arbitrary scale of the user-supplied state
+rho=rho/norm(rho,2);
+
+% Check for silly inputs, relative to the part of R that acts on rho
+if abs(rho'*R*rho)<=1e-10*norm(R*rho,2)
     error('the operator supplied does not appear to relax the given state.');
 end
 
 % Calibrate the Lindbladian
-rho=rho/norm(rho,2); R=-rlx_rate*R/(rho'*R*rho);
+R=-rlx_rate*R/(rho'*R*rho);
 
 end
 
@@ -55,6 +58,9 @@ end
 if (~isnumeric(rlx_rate))||(~isscalar(rlx_rate))||...
    (~isreal(rlx_rate))||(~isfinite(rlx_rate))||(rlx_rate<0)
     error('rlx_rate must be a finite non-negative real number.');
+end
+if norm(rho,2)==0
+    error('rho must not be a zero vector.');
 end
 end
 

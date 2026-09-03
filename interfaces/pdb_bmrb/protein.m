@@ -16,9 +16,10 @@
 %                     amide groups included, 'all' imports every-
 %                     thing that is assigned in BMRB. If a list of
 %                     numbers is supplied, atoms with those serial
-%                     numbers in the PDB file are imported; those
-%                     without a BMRB assignment are then kept or
-%                     deleted according to options.noshift.
+%                     numbers in the PDB file are imported, and
+%                     every number must be present in the file;
+%                     those without a BMRB assignment are then
+%                     kept or deleted according to options.noshift.
 %
 % options.pdb_mol   - the number of molecule if there are multiple 
 %                     molecules in the pdb file 
@@ -301,6 +302,12 @@ end
 % Process atom selection specification
 if isnumeric(options.select)
     
+    % Refuse serial numbers absent from the importable atoms
+    missing_ser=setdiff(options.select,pdb_ser);
+    if ~isempty(missing_ser)
+        error(['PDB serial numbers not found among importable atoms: ' num2str(missing_ser(:)')]);
+    end
+
     % Import atoms with user-specified PDB serial numbers
     subset=ismember(pdb_ser,options.select);
 

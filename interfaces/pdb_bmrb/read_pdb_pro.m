@@ -39,15 +39,17 @@ grumble(pdb_file_name,mod_id);
 file_id=fopen(pdb_file_name,'r');
 
 % Scroll to the selected structure
+has_models=false;
 while ~feof(file_id)
     parsed_string=textscan(fgetl(file_id),'MODEL %d','delimiter',' ','MultipleDelimsAsOne',1);
+    has_models=has_models||(~isempty(parsed_string{1}));
     if parsed_string{1}==mod_id
         disp(['Reading model ' num2str(mod_id) ' from ' pdb_file_name '...' ]); break;
     end
 end
 
 % Files without MODEL records contain a single model
-if feof(file_id)&&(mod_id==1)
+if (~has_models)&&(mod_id==1)
     disp(['Reading single-model file ' pdb_file_name '...']); frewind(file_id);
 end
 

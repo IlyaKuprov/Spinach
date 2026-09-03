@@ -15,9 +15,13 @@
 %                     as backbone, but with GLN and ASN side chain
 %                     amide groups included, 'all' imports every-
 %                     thing that is assigned in BMRB. If a list of
-%                     numbers is supplied, spins with those num-
-%                     bers in the PDB file are imported, but only
-%                     if they are assigned in the PDB.
+%                     numbers is supplied, atoms with those serial
+%                     numbers in the PDB file are imported; every
+%                     number must be present in the file, atoms of
+%                     unsupported types (oxygen, sulphur, OH pro-
+%                     tons) are dropped with a warning, and those
+%                     without a BMRB assignment are kept or dele-
+%                     ted according to options.noshift.
 %
 % options.pdb_mol   - the number of molecule if there are multiple 
 %                     molecules in the pdb file 
@@ -86,7 +90,15 @@ end
 grumble(pdb_file,bmrb_file,options);
 
 % Parse the PDB file
-[pdb_aa_num,pdb_aa_typ,pdb_atom_id,pdb_coords]=read_pdb_pro(pdb_file,options.pdb_mol);
+[pdb_aa_num,pdb_aa_typ,pdb_atom_id,pdb_coords,pdb_ser]=read_pdb_pro(pdb_file,options.pdb_mol);
+
+% Refuse serial numbers absent from the PDB model
+if isnumeric(options.select)
+    missing_ser=setdiff(options.select,pdb_ser);
+    if ~isempty(missing_ser)
+        error(['PDB serial numbers not found in the model: ' num2str(missing_ser(:)')]);
+    end
+end
 
 % Parse the BMRB file
 [bmrb_aa_num,bmrb_aa_typ,bmrb_atom_id,bmrb_chemsh]=read_bmrb(bmrb_file);
@@ -94,9 +106,17 @@ grumble(pdb_file,bmrb_file,options);
 % Remove oxygens, sulphurs and terminal atoms
 kill_mask=ismember(pdb_atom_id,{'O','OE','OE1','OE2','OD1','OD2','OG','OG1','HG1',...
                                 'OG2','OH','HH','SD','SG','OXT','O''','O'''''});
-pdb_aa_num(kill_mask)=[]; pdb_atom_id(kill_mask)=[]; 
-pdb_aa_typ(kill_mask)=[]; pdb_coords(kill_mask)=[];
+pdb_aa_num(kill_mask)=[]; pdb_atom_id(kill_mask)=[];
+pdb_aa_typ(kill_mask)=[]; pdb_coords(kill_mask)=[]; pdb_ser(kill_mask)=[];
 disp('WARNING: oxygen, sulphur, and OH protons will not appear in the simulation.');
+
+% Warn about selected atoms of unsupported types
+if isnumeric(options.select)
+    killed_ser=setdiff(options.select,pdb_ser);
+    if ~isempty(killed_ser)
+        disp(['WARNING: serial numbers refer to unsupported atom types, dropped: ' num2str(killed_ser(:)')]);
+    end
+end
 
 % Match chemical shifts
 pdb_chemsh=cell(numel(pdb_atom_id),1);
@@ -142,8 +162,7 @@ for n=1:numel(pdb_atom_id)
     elseif ismember(pdb_atom_id{n},{'HB3'})&&ismember('HB2',bmrb_atoms)&&...
            ismember(pdb_aa_typ{n},{'MET','GLU','GLN','LYS','LEU','SER','HIS','ARG'})
         
-        % When chemical shift is given for just one proton of a methyl
-        % group, use it for all three protons (usually true)
+        % Use the shift reported for one methyl group proton for all three
         pdb_chemsh{n}=bmrb_shifts(strcmp('HB2',bmrb_atoms));
         disp(['WARNING: replicated chemical shift for ' pad([pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ':'],15,'right') ...
                                                         pad(num2str(pdb_chemsh{n},'%6.3f'),6,'left') ' ppm']);
@@ -151,8 +170,7 @@ for n=1:numel(pdb_atom_id)
     elseif ismember(pdb_atom_id{n},{'HB1','HB2','HB3'})&&...
            ismember('HB',bmrb_atoms)&&ismember(pdb_aa_typ{n},{'ALA'})
        
-        % When chemical shift is given for just one proton of a methyl
-        % group, use it for all three protons (usually true)
+        % Use the shift reported for one methyl group proton for all three
         pdb_chemsh{n}=bmrb_shifts(strcmp('HB',bmrb_atoms));
         disp(['WARNING: replicated chemical shift for ' pad([pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ':'],15,'right') ...
                                                         pad(num2str(pdb_chemsh{n},'%6.3f'),6,'left') ' ppm']);
@@ -160,8 +178,7 @@ for n=1:numel(pdb_atom_id)
     elseif ismember(pdb_atom_id{n},{'HG21','HG22','HG23','HG1','HG3'})&&...
            ismember('HG2',bmrb_atoms)&&ismember(pdb_aa_typ{n},{'ILE','THR','VAL','GLU','LYS','PRO','GLN','ARG'})
         
-        % When chemical shift is given for just one proton of a methyl
-        % group, use it for all three protons (usually true)
+        % Use the shift reported for one methyl group proton for all three
         pdb_chemsh{n}=bmrb_shifts(strcmp('HG2',bmrb_atoms));
         disp(['WARNING: replicated chemical shift for ' pad([pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ':'],15,'right') ...
                                                         pad(num2str(pdb_chemsh{n},'%6.3f'),6,'left') ' ppm']);
@@ -169,8 +186,7 @@ for n=1:numel(pdb_atom_id)
     elseif ismember(pdb_atom_id{n},{'HG11','HG12','HG13','HG2','HG3'})&&...
            ismember('HG1',bmrb_atoms)&&ismember(pdb_aa_typ{n},{'VAL'})
        
-        % When chemical shift is given for just one proton of a methyl
-        % group, use it for all three protons (usually true)
+        % Use the shift reported for one methyl group proton for all three
         pdb_chemsh{n}=bmrb_shifts(strcmp('HG1',bmrb_atoms));
         disp(['WARNING: replicated chemical shift for ' pad([pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ':'],15,'right') ...
                                                         pad(num2str(pdb_chemsh{n},'%6.3f'),6,'left') ' ppm']);
@@ -178,8 +194,7 @@ for n=1:numel(pdb_atom_id)
     elseif ismember(pdb_atom_id{n},{'HG13'})&&...
            ismember('HG12',bmrb_atoms)&&ismember(pdb_aa_typ{n},{'ILE'})
        
-        % When chemical shift is given for just one proton of a methyl
-        % group, use it for all three protons (usually true)
+        % Use the shift reported for one methyl group proton for all three
         pdb_chemsh{n}=bmrb_shifts(strcmp('HG12',bmrb_atoms));
         disp(['WARNING: replicated chemical shift for ' pad([pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ':'],15,'right') ...
                                                         pad(num2str(pdb_chemsh{n},'%6.3f'),6,'left') ' ppm']);
@@ -187,8 +202,7 @@ for n=1:numel(pdb_atom_id)
     elseif ismember(pdb_atom_id{n},{'HD11','HD12','HD13','HD2','HD3'})&&...
            ismember('HD1',bmrb_atoms)&&ismember(pdb_aa_typ{n},{'ILE','LEU'})
        
-        % When chemical shift is given for just one proton of a methyl
-        % group, use it for all three protons (usually true)
+        % Use the shift reported for one methyl group proton for all three
         pdb_chemsh{n}=bmrb_shifts(strcmp('HD1',bmrb_atoms));
         disp(['WARNING: replicated chemical shift for ' pad([pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ':'],15,'right') ...
                                                         pad(num2str(pdb_chemsh{n},'%6.3f'),6,'left') ' ppm']);
@@ -196,8 +210,7 @@ for n=1:numel(pdb_atom_id)
     elseif ismember(pdb_atom_id{n},{'HD21','HD22','HD23','HD1','HD3'})&&...
            ismember('HD2',bmrb_atoms)&&ismember(pdb_aa_typ{n},{'LYS','LEU','PRO','ARG'})
        
-        % When chemical shift is given for just one proton of a methyl
-        % group, use it for all three protons (usually true)
+        % Use the shift reported for one methyl group proton for all three
         pdb_chemsh{n}=bmrb_shifts(strcmp('HD2',bmrb_atoms));
         disp(['WARNING: replicated chemical shift for ' pad([pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ':'],15,'right') ...
                                                         pad(num2str(pdb_chemsh{n},'%6.3f'),6,'left') ' ppm']);
@@ -205,8 +218,7 @@ for n=1:numel(pdb_atom_id)
     elseif ismember(pdb_atom_id{n},{'HE3'})&&...
            ismember('HE2',bmrb_atoms)&&ismember(pdb_aa_typ{n},{'LYS'})
         
-        % When chemical shift is given for just one proton of a methyl
-        % group, use it for all three protons (usually true)
+        % Use the shift reported for one methyl group proton for all three
         pdb_chemsh{n}=bmrb_shifts(strcmp('HE2',bmrb_atoms));
         disp(['WARNING: replicated chemical shift for ' pad([pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ':'],15,'right') ...
                                                         pad(num2str(pdb_chemsh{n},'%6.3f'),6,'left') ' ppm']);
@@ -214,40 +226,35 @@ for n=1:numel(pdb_atom_id)
     elseif ismember(pdb_atom_id{n},{'HE1','HE2','HE3'})&&...
            ismember('HE',bmrb_atoms)&&ismember(pdb_aa_typ{n},{'MET'})
        
-        % When chemical shift is given for just one proton of a methyl
-        % group, use it for all three protons (usually true)
+        % Use the shift reported for one methyl group proton for all three
         pdb_chemsh{n}=bmrb_shifts(strcmp('HE',bmrb_atoms));
         disp(['WARNING: replicated chemical shift for ' pad([pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ':'],15,'right') ...
                                                         pad(num2str(pdb_chemsh{n},'%6.3f'),6,'left') ' ppm']);
                                                     
     elseif ismember(pdb_atom_id{n},{'CD2'})&&ismember('CD1',bmrb_atoms)&&ismember(pdb_aa_typ(n),{'PHE','TYR'})
         
-        % When chemical shift is given for one proton in a symmetric
-        % aromatic ring, use it for the other one (usually true)
+        % Use the shift reported for one symmetric aromatic ring position for the other
         pdb_chemsh{n}=bmrb_shifts(strcmp('CD1',bmrb_atoms));
         disp(['WARNING: replicated chemical shift for ' pad([pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ':'],15,'right') ...
                                                         pad(num2str(pdb_chemsh{n},'%6.3f'),6,'left') ' ppm']);
                                                     
     elseif ismember(pdb_atom_id{n},{'CE2'})&&ismember('CE1',bmrb_atoms)&&ismember(pdb_aa_typ(n),{'PHE','TYR'})
         
-        % When chemical shift is given for one proton in a symmetric
-        % aromatic ring, use it for the other one (usually true)
+        % Use the shift reported for one symmetric aromatic ring position for the other
         pdb_chemsh{n}=bmrb_shifts(strcmp('CE1',bmrb_atoms));
         disp(['WARNING: replicated chemical shift for ' pad([pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ':'],15,'right') ...
                                                         pad(num2str(pdb_chemsh{n},'%6.3f'),6,'left') ' ppm']);
                                                     
     elseif ismember(pdb_atom_id{n},{'HD2'})&&ismember('HD1',bmrb_atoms)&&ismember(pdb_aa_typ(n),{'PHE','TYR'})
         
-        % When chemical shift is given for one proton in a symmetric
-        % aromatic ring, use it for the other one (usually true)
+        % Use the shift reported for one symmetric aromatic ring position for the other
         pdb_chemsh{n}=bmrb_shifts(strcmp('HD1',bmrb_atoms));
         disp(['WARNING: replicated chemical shift for ' pad([pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ':'],15,'right') ...
                                                         pad(num2str(pdb_chemsh{n},'%6.3f'),6,'left') ' ppm']);
                                                     
     elseif ismember(pdb_atom_id{n},{'HE2'})&&ismember('HE1',bmrb_atoms)&&ismember(pdb_aa_typ(n),{'PHE','TYR'})
         
-        % When chemical shift is given for one proton in a symmetric
-        % aromatic ring, use it for the other one (usually true)
+        % Use the shift reported for one symmetric aromatic ring position for the other
         pdb_chemsh{n}=bmrb_shifts(strcmp('HE1',bmrb_atoms));
         disp(['WARNING: replicated chemical shift for ' pad([pdb_aa_typ{n} '(' num2str(pdb_aa_num(n)) ')-' pdb_atom_id{n} ':'],15,'right') ...
                                                         pad(num2str(pdb_chemsh{n},'%6.3f'),6,'left') ' ppm']);
@@ -300,8 +307,8 @@ end
 % Process atom selection specification
 if isnumeric(options.select)
     
-    % Import atoms with user-specified numbers
-    subset=false(size(pdb_atom_id)); subset(options.select)=true;
+    % Import atoms with user-specified PDB serial numbers
+    subset=ismember(pdb_ser,options.select);
 
 elseif strcmp(options.select,'backbone')
     
@@ -472,22 +479,39 @@ if ~ischar(bmrb_file)
     error('bmrb_file must be a character string specifying a file name.');
 end
 if ~isfield(options,'select')
-    error('options.select switch must be specfied.');
-elseif (~isnumeric(options.select))&&...
+    error('options.select switch must be specified.');
+end
+if isnumeric(options.select)
+    if isempty(options.select)||(~isreal(options.select))||...
+       (~all(isfinite(options.select),'all'))||...
+       (~all(mod(options.select,1)==0,'all'))||...
+       (~all(options.select>0,'all'))
+        error('numeric options.select must be a non-empty array of positive integer PDB atom serial numbers.');
+    end
+elseif (~ischar(options.select))||...
        (~ismember(options.select,{'all','backbone','backbone-hsqc',...
-                                  'backbone-minimal','backbone-extended'}))
+                                  'backbone-minimal'}))
     error('invalid value for options.select, please refer to the manual.');
 end
 if ~isfield(options,'pdb_mol')
-    error('options.pdb_mol switch must be specfied.');
-elseif ~isnumeric(options.pdb_mol)
-    error('invalid value for options.pdb_mol, please refer to the manual.');
+    error('options.pdb_mol switch must be specified.');
+elseif (~isnumeric(options.pdb_mol))||(~isreal(options.pdb_mol))||...
+       (~isscalar(options.pdb_mol))||(~isfinite(options.pdb_mol))||...
+       (options.pdb_mol<1)||(mod(options.pdb_mol,1)~=0)
+    error('options.pdb_mol must be a positive integer.');
 end
 if ~isfield(options,'noshift')
-    error('options.noshift switch must be specfied.');
-elseif (~isnumeric(options.noshift))&&...
+    error('options.noshift switch must be specified.');
+elseif (~ischar(options.noshift))||...
        (~ismember(options.noshift,{'keep','delete'}))
-    error('invalid value for options.noshift, please refer to the manual.');
+    error('options.noshift must be ''keep'' or ''delete''.');
+end
+if iscell(options.deuterate)
+    if ~all(cellfun(@ischar,options.deuterate),'all')
+        error('options.deuterate cell array must contain character strings.');
+    end
+elseif (~ischar(options.deuterate))||(~strcmp(options.deuterate,'non-Me'))
+    error('options.deuterate must be a cell array of PDB atom identifiers or ''non-Me''.');
 end
 end
 

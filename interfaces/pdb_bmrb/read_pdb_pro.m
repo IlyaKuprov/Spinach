@@ -1,7 +1,7 @@
 % Reads the a PDB file and returns amino acid numbers, amino acid types,
 % PDB atom identifiers and Cartesian coordinates. Syntax:
 %
-%  [aa_num,aa_typ,pdb_id,coords]=read_pdb_pro(pdb_file_name,instance)
+%  [aa_num,aa_typ,pdb_id,coords,pdb_ser]=read_pdb_pro(pdb_file_name,mod_id)
 %
 % Parameters:
 %
@@ -26,11 +26,14 @@
 %       coords - nspins x 1 cell array of 3-vectors giving 
 %                Cartesian coordinates of each spin in Angstrom
 %
+%      pdb_ser - nspins x 1 vector giving the PDB atom serial
+%                number of each spin
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=read_pdb_pro.m>
 
-function [aa_num,aa_typ,pdb_id,coords]=read_pdb_pro(pdb_file_name,mod_id)
+function [aa_num,aa_typ,pdb_id,coords,pdb_ser]=read_pdb_pro(pdb_file_name,mod_id)
 
 % Check consistency
 grumble(pdb_file_name,mod_id);
@@ -48,7 +51,7 @@ end
 
 % Get the outputs started
 aa_num=[]; aa_typ={};
-pdb_id={}; coords={};
+pdb_id={}; coords={}; pdb_ser=[];
 
 % Parse the PDB file
 while ~feof(file_id)
@@ -61,6 +64,7 @@ while ~feof(file_id)
             aa_typ{end+1}=parsed_string{3}{1};   %#ok<AGROW>
             pdb_id{end+1}=parsed_string{2}{1};   %#ok<AGROW>
             coords{end+1}=[parsed_string{6:8}];  %#ok<AGROW>
+            pdb_ser(end+1)=parsed_string{1};     %#ok<AGROW>
         end
     end
 end
@@ -72,7 +76,7 @@ end
 
 % Make outputs column vectors
 aa_num=aa_num'; aa_typ=aa_typ';
-pdb_id=pdb_id'; coords=coords';
+pdb_id=pdb_id'; coords=coords'; pdb_ser=pdb_ser';
 
 % Close the PDB file
 fclose(file_id);

@@ -33,7 +33,7 @@ parameters.offset=0;
 parameters.sweep=50e6;
 parameters.npoints=1024;
 parameters.zerofill=4096;
-parameters.spins={'E'};
+parameters.spins={'1H'};
 parameters.axis_units='MHz';
 parameters.derivative=1;
 

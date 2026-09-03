@@ -47,12 +47,14 @@ fullDefs = fullDefs.split("\n")
 
 no_defs=(len(sys.argv)-1)//2
 
+# exit before any write if a requested name is not among the definitions
+for index in range(1,no_defs+1):
+	if not any(str(sys.argv[(2*index)-1]) in value for value in fullDefs):
+		print("definition_not_found: "+str(sys.argv[(2*index)-1]))
+		sys.exit(5)
+
 try:
 	for index in range(1,no_defs+1):
-		# exit if the requested name is not among the definitions
-		if not any(str(sys.argv[(2*index)-1]) in value for value in fullDefs):
-			print("definition_not_found: "+str(sys.argv[(2*index)-1]))
-			sys.exit(5)
 		cmdStr = str(sys.argv[(2*index)-1])+" = "+str(sys.argv[2*index])
 		currentExp["ftEPR.PlsSPELSetVar"].value = cmdStr
 except SystemExit:

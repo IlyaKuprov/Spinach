@@ -39,14 +39,8 @@ rho_targ=spin_system.control.rho_targ{1};
 switch spin_system.bas.formalism
     case 'zeeman-hilb'
         targ_norm=hdot(rho_targ,rho_targ);
-        if abs(targ_norm)==0
-            error('target state has zero norm.');
-        end
     otherwise
         targ_norm=rho_targ'*rho_targ;
-        if abs(targ_norm)==0
-            error('target state has zero norm.');
-        end
         P_dirt=eye(numel(rho_targ))-rho_targ*rho_targ'/targ_norm;
 end
 
@@ -121,6 +115,9 @@ function grumble(spin_system)
 if (numel(spin_system.control.rho_targ)~=1)||...
    (numel(spin_system.control.rho_init)~=1)
     error('this function only supports point-to-point transformations.');
+end
+if norm(spin_system.control.rho_targ{1},'fro')==0
+    error('target state has zero norm.');
 end
 if mod(spin_system.control.ncontrols,2)~=0
     error('grape_coop is phase-modulated, number of controls must be even.');

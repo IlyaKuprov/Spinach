@@ -15,6 +15,16 @@
 %               X, Y, and Z eigenstates of the ZFS tensor
 %               at zero magnetic field, order: [pX pY pZ]
 %
+%               X, Y, and Z are labelled using the organic
+%               triplet convention |Dzz|>|Dxx|>|Dyy|, under
+%               which D and E have opposite signs, -1/3<=
+%               E/D<=0 (C.P. Poole, H.A. Farach, W.K. Jack-
+%               son, J. Chem. Phys. 61, 2220 (1974), DOI:
+%               10.1063/1.1682294). Populations quoted in
+%               the transition metal convention |Dzz|>|Dyy|
+%               >|Dxx| with 0<=E/D<=1/3 must have their X
+%               and Y entries swapped before the call.
+%
 %    Z        - 3x3 Zeeman interaction tensor (Hz/Tesla) in
 %               the laboratory frame of reference; use func- 
 %               tions like axrh2mat() to get it from eigen-
@@ -52,9 +62,9 @@ H_ZFS=2*pi*(ZFS(1,1)*Ex*Ex+ZFS(1,2)*Ex*Ey+ZFS(1,3)*Ex*Ez+...
 % Diagonalise ZFS Hamiltonian
 [V,D]=eig(full(H_ZFS),'vector');
 
-% Match literature convention (|zz|>|yy|>|xx|)
+% Organic triplet convention (|zz|>|xx|>|yy|)
 [~,ord]=sort(abs(D),'ascend'); V=V(:,ord);
-Vz=V(:,3); Vx=V(:,1); Vy=V(:,2);
+Vz=V(:,3); Vx=V(:,2); Vy=V(:,1);
 
 % Build zero field density matrix from populations
 DM=Vx*pops(1)*Vx'+Vy*pops(2)*Vy'+Vz*pops(3)*Vz'; 

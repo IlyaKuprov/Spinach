@@ -16,8 +16,9 @@
 %                     amide groups included, 'all' imports every-
 %                     thing that is assigned in BMRB. If a list of
 %                     numbers is supplied, atoms with those serial
-%                     numbers in the PDB file are imported, but
-%                     only if they are assigned in the BMRB.
+%                     numbers in the PDB file are imported; those
+%                     without a BMRB assignment are then kept or
+%                     deleted according to options.noshift.
 %
 % options.pdb_mol   - the number of molecule if there are multiple 
 %                     molecules in the pdb file 

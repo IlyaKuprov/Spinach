@@ -99,12 +99,10 @@ if nnz(imag(spectrum))>0
 end
 
 % Determine data extents and get contour levels
-if nnz(spectrum)
-    smax=max(spectrum,[],'all'); smin=min(spectrum,[],'all');
-    [contours,...
-     positive_contours,...
-     negative_contours]=contspacing(smax,smin,delta,k,signs,ncont);
-end
+smax=max(spectrum,[],'all'); smin=min(spectrum,[],'all');
+[contours,...
+ positive_contours,...
+ negative_contours]=contspacing(smax,smin,delta,k,signs,ncont);
 
 % Accommodate homonuclear 2D sequences
 if isscalar(parameters.spins)
@@ -158,7 +156,7 @@ spectrum=transpose(spectrum);
 if nnz(spectrum)
     contour(axis_f2,axis_f1,spectrum,contours);
 else
-    xlim([min(axis_f2) max(axis_f2)]); ylim([min(axis_f1) max(axis_f1)]);
+    newplot; xlim([min(axis_f2) max(axis_f2)]); ylim([min(axis_f1) max(axis_f1)]);
     text(mean(axis_f2),mean(axis_f1),'all-zero spectrum',...
          'HorizontalAlignment','center','VerticalAlignment','middle');
 end

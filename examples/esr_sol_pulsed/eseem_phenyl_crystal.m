@@ -48,8 +48,10 @@ fid=apodisation(spin_system,fid-mean(fid),{{'kaiser',6}});
 
 % Fourier transform
 spectrum=fftshift(fft(fid,parameters.zerofill));
-ax=linspace(-1/(2*parameters.timestep),1/(2*parameters.timestep),...
-            parameters.zerofill)*1e-6;
+
+% Frequency axis, interpulse delay increment is timestep/2
+ax=fft_freq_axis(parameters.npoints,parameters.timestep/2,...
+                 parameters.zerofill-parameters.npoints)*1e-6;
 
 % Plot the spectrum
 subplot(2,1,2); plot(ax,abs(spectrum)); 

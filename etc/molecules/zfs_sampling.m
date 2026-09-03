@@ -76,6 +76,9 @@ W=kron(WX,WY); W=W/sum(W);
 % Ignore small weights
 D(W<tol)=[]; E(W<tol)=[]; W(W<tol)=[];
 
+% Renormalise the retained weights
+W=W/sum(W);
+
 end
 
 % Consistency enforcement

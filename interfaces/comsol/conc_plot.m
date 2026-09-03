@@ -67,9 +67,13 @@ elseif size(obs,2)==2
 elseif size(obs,2)==3
 
     % Three observables: assume phase + amp + Z and map into HSV
+    z_range=max(obs(:,3))-min(obs(:,3));
+
+    % Constant longitudinal observable maps to full value throughout
+    if z_range==0, z_val=ones(size(obs,1),1);
+    else, z_val=(obs(:,3)+min(obs(:,3)))/z_range; end
     RGB=hsv2rgb(wrapTo2Pi(obs(:,1))/(2*pi),...
-                obs(:,2)/max(obs(:,2)),...
-                (obs(:,3)+min(obs(:,3)))/(max(obs(:,3))-min(obs(:,3))));
+                obs(:,2)/max(obs(:,2)),z_val);
 
 else
 

@@ -22,38 +22,38 @@ Projection of the zero-field triplet state with user-specified populations of Ca
 
 ### Comment-guided execution stages
 
-- Lines 41-42: Check consistency; implemented by `grumble(spin_system,ZFS,pops,Z,B,idx)`.
-- Lines 44-45: Get electron spin-1 operators; implemented by `A=pauli(3); Ex=A.x; Ey=A.y; Ez=A.z`.
-- Lines 47-50: Build ZFS Hamiltonian in the laboratory frame; implemented by `H_ZFS=2*pi*(ZFS(1,1)*Ex*Ex+ZFS(1,2)*Ex*Ey+ZFS(1,3)*Ex*Ez+ ZFS(2,1)*Ey*Ex+ZFS(2,2)*Ey*Ey+ZFS(2,3)*Ey*Ez+ ZFS(3,1)*Ez*Ex+ZFS(3,2)*Ez*Ey+ZFS(3,3)*Ez*Ez)`.
-- Lines 52-53: Diagonalise ZFS Hamiltonian; implemented by `[V,D]=eig(full(H_ZFS),'vector')`.
-- Lines 55-56: Match literature convention (|zz|>|xx|>|yy|); implemented by `[~,ord]=sort(abs(D),'ascend'); V=V(:,ord)`.
-- Lines 59-60: Build zero field density matrix from populations; implemented by `DM=Vx*pops(1)*Vx'+Vy*pops(2)*Vy'+Vz*pops(3)*Vz'`.
-- Lines 62-63: Build Zeeman Hamiltonian in the laboratory frame; implemented by `Bx=0; By=0; Bz=B`.
-- Lines 68-69: Diagonalise high field Hamiltonian; implemented by `[V,~]=eig(full(H_Z+H_ZFS),'vector')`.
-- Lines 71-72: Drop high-field coherences; implemented by `DM=V*diag(diag(V'*DM*V))*V'`.
-- Lines 74-75: Construct a Spinach state; implemented by `T=irr_sph_ten(3); rho=complex(0)`.
+- Lines 51-52: Check consistency; implemented by `grumble(spin_system,ZFS,pops,Z,B,idx)`.
+- Lines 54-55: Get electron spin-1 operators; implemented by `A=pauli(3); Ex=A.x; Ey=A.y; Ez=A.z`.
+- Lines 57-60: Build ZFS Hamiltonian in the laboratory frame; implemented by `H_ZFS=2*pi*(ZFS(1,1)*Ex*Ex+ZFS(1,2)*Ex*Ey+ZFS(1,3)*Ex*Ez+ ZFS(2,1)*Ey*Ex+ZFS(2,2)*Ey*Ey+ZFS(2,3)*Ey*Ez+ ZFS(3,1)*Ez*Ex+ZFS(3,2)*Ez*Ey+ZFS(3,3)*Ez*Ez)`.
+- Lines 62-63: Diagonalise ZFS Hamiltonian; implemented by `[V,D]=eig(full(H_ZFS),'vector')`.
+- Lines 65-66: Organic triplet convention (|zz|>|xx|>|yy|); implemented by `[~,ord]=sort(abs(D),'ascend'); V=V(:,ord)`.
+- Lines 69-70: Build zero field density matrix from populations; implemented by `DM=Vx*pops(1)*Vx'+Vy*pops(2)*Vy'+Vz*pops(3)*Vz'`.
+- Lines 72-73: Build Zeeman Hamiltonian in the laboratory frame; implemented by `Bx=0; By=0; Bz=B`.
+- Lines 78-79: Diagonalise high field Hamiltonian; implemented by `[V,~]=eig(full(H_Z+H_ZFS),'vector')`.
+- Lines 81-82: Drop high-field coherences; implemented by `DM=V*diag(diag(V'*DM*V))*V'`.
+- Lines 84-85: Construct a Spinach state; implemented by `T=irr_sph_ten(3); rho=complex(0)`.
 
 ### Control flow inferred from the code
 
-- Line 76: `for` loop over `n=1:numel(T), T{n}=T{n}/norm(T{n},'fro')^2; end`.
+- Line 86: `for` loop over `n=1:numel(T), T{n}=T{n}/norm(T{n},'fro')^2; end`.
 
 ### Key state/data transformations
 
-- Lines 45: computes `A` using `A=pauli(3); Ex=A.x; Ey=A.y; Ez=A.z`.
-- Lines 48-50: computes `H_ZFS` using `H_ZFS=2*pi*(ZFS(1,1)*Ex*Ex+ZFS(1,2)*Ex*Ey+ZFS(1,3)*Ex*Ez+ ZFS(2,1)*Ey*Ex+ZFS(2,2)*Ey*Ey+ZFS(2,3)*Ey*Ez+ ZFS(3,1)*Ez*Ex+ZFS(3,2)*Ez*Ey+ZFS(3,3)*Ez*Ez)`.
-- Lines 53: computes `[V,D]` using `[V,D]=eig(full(H_ZFS),'vector')`.
-- Lines 56: computes `[~,ord]` using `[~,ord]=sort(abs(D),'ascend'); V=V(:,ord)`.
-- Lines 57: computes `Vz` using `Vz=V(:,3); Vx=V(:,2); Vy=V(:,1)`.
-- Lines 60: computes `DM` using `DM=Vx*pops(1)*Vx'+Vy*pops(2)*Vy'+Vz*pops(3)*Vz'`.
-- Lines 63: computes `Bx` using `Bx=0; By=0; Bz=B`.
-- Lines 64-66: computes `H_Z` using `H_Z=2*pi*(Z(1,1)*Ex*Bx+Z(1,2)*Ex*By+Z(1,3)*Ex*Bz+ Z(2,1)*Ey*Bx+Z(2,2)*Ey*By+Z(2,3)*Ey*Bz+ Z(3,1)*Ez*Bx+Z(3,2)*Ez*By+Z(3,3)*Ez*Bz)`.
-- Lines 69: computes `[V,~]` using `[V,~]=eig(full(H_Z+H_ZFS),'vector')`.
-- Lines 75: computes `T` using `T=irr_sph_ten(3); rho=complex(0)`.
-- Lines 77: computes `rho` using `rho=rho+trace(T{1}'*DM)*state(spin_system,'T0,0' ,idx)`.
+- Lines 55: computes `A` using `A=pauli(3); Ex=A.x; Ey=A.y; Ez=A.z`.
+- Lines 58-60: computes `H_ZFS` using `H_ZFS=2*pi*(ZFS(1,1)*Ex*Ex+ZFS(1,2)*Ex*Ey+ZFS(1,3)*Ex*Ez+ ZFS(2,1)*Ey*Ex+ZFS(2,2)*Ey*Ey+ZFS(2,3)*Ey*Ez+ ZFS(3,1)*Ez*Ex+ZFS(3,2)*Ez*Ey+ZFS(3,3)*Ez*Ez)`.
+- Lines 63: computes `[V,D]` using `[V,D]=eig(full(H_ZFS),'vector')`.
+- Lines 66: computes `[~,ord]` using `[~,ord]=sort(abs(D),'ascend'); V=V(:,ord)`.
+- Lines 67: computes `Vz` using `Vz=V(:,3); Vx=V(:,2); Vy=V(:,1)`.
+- Lines 70: computes `DM` using `DM=Vx*pops(1)*Vx'+Vy*pops(2)*Vy'+Vz*pops(3)*Vz'`.
+- Lines 73: computes `Bx` using `Bx=0; By=0; Bz=B`.
+- Lines 74-76: computes `H_Z` using `H_Z=2*pi*(Z(1,1)*Ex*Bx+Z(1,2)*Ex*By+Z(1,3)*Ex*Bz+ Z(2,1)*Ey*Bx+Z(2,2)*Ey*By+Z(2,3)*Ey*Bz+ Z(3,1)*Ez*Bx+Z(3,2)*Ez*By+Z(3,3)*Ez*Bz)`.
+- Lines 79: computes `[V,~]` using `[V,~]=eig(full(H_Z+H_ZFS),'vector')`.
+- Lines 85: computes `T` using `T=irr_sph_ten(3); rho=complex(0)`.
+- Lines 87: computes `rho` using `rho=rho+trace(T{1}'*DM)*state(spin_system,'T0,0' ,idx)`.
 
 ### Local helper functions
 
-- Line 90: `grumble()` — `function grumble(spin_system,ZFS,pops,Z,B,idx)`.
+- Line 100: `grumble()` — `function grumble(spin_system,ZFS,pops,Z,B,idx)`.
   - Representative operation: `if (~isnumeric(ZFS))||(~isreal(ZFS))||(size(ZFS,1)~=3)|| (size(ZFS,2)~=3)||(norm(ZFS-ZFS','fro')>1e-6*norm(ZFS,'fro'))`.
   - Representative operation: `(size(ZFS,2)~=3)||(norm(ZFS-ZFS','fro')>1e-6*norm(ZFS,'fro'))`.
 
@@ -65,6 +65,7 @@ Projection of the zero-field triplet state with user-specified populations of Ca
 - pops -a three-element vector with populations of
 - X, Y, and Z eigenstates of the ZFS tensor
 - at zero magnetic field, order: [pX pY pZ]
+- X, Y, and Z are labelled using the organic triplet convention |Dzz|>|Dxx|>|Dyy|, under which D and E have opposite signs, -1/3<E/D<0 (Poole, Farach, Jackson, J. Chem. Phys. 61, 2220 (1974), DOI 10.1063/1.1682294); populations quoted in the transition metal convention |Dzz|>|Dyy|>|Dxx| with 0<E/D<1/3 must have X and Y swapped before the call; at E=0 the X and Y states are degenerate (all three when D=0 as well) and the labelling within the degenerate set is undefined; at E/D=-1/3 the X and Z energies are opposite in sign, not degenerate, but equal in magnitude, so the sort by |energy| cannot tell X from Z; in both cases the affected populations must be equal for the result to be meaningful
 - Z -3x3 Zeeman interaction tensor (Hz/Tesla) in
 - the laboratory frame of reference; use func-
 - tions like axrh2mat() to get it from eigen-
@@ -92,6 +93,7 @@ Projection of the zero-field triplet state with user-specified populations of Ca
 - pops -a three-element vector with populations of
 - X, Y, and Z eigenstates of the ZFS tensor
 - at zero magnetic field, order: [pX pY pZ]
+- X, Y, and Z are labelled using the organic triplet convention |Dzz|>|Dxx|>|Dyy|, under which D and E have opposite signs, -1/3<E/D<0 (Poole, Farach, Jackson, J. Chem. Phys. 61, 2220 (1974), DOI 10.1063/1.1682294); populations quoted in the transition metal convention |Dzz|>|Dyy|>|Dxx| with 0<E/D<1/3 must have X and Y swapped before the call; at E=0 the X and Y states are degenerate (all three when D=0 as well) and the labelling within the degenerate set is undefined; at E/D=-1/3 the X and Z energies are opposite in sign, not degenerate, but equal in magnitude, so the sort by |energy| cannot tell X from Z; in both cases the affected populations must be equal for the result to be meaningful
 - Z -3x3 Zeeman interaction tensor (Hz/Tesla) in
 
 ## Internal Spinach / MATLAB structure cues

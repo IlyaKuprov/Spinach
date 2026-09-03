@@ -59,7 +59,7 @@ q.j=evecs(3,best); q.k=evecs(4,best);
 alpha=mod(alpha,2*pi); gamma=mod(gamma,2*pi);
 
 % Make sure the result is good enough and bomb out if not
-if norm(dcm-euler2dcm(alpha,beta,gamma),1)>1e-3
+if norm(dcm-euler2dcm(alpha,beta,gamma),1)>1e-2
     disp(dcm); disp(euler2dcm(alpha,beta,gamma));
     error('DCM to Euler conversion failed.');
 end

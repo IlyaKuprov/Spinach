@@ -59,9 +59,12 @@ kfigure(); subplot(2,1,1);
 plot((0:(parameters.npoints-1))*parameters.timestep*1e6,real(fid));
 kxlabel('time, $\mu$s'); axis tight; kgrid;
 
+% Frequency axis, interpulse delay increment is timestep/2
+ax=fft_freq_axis(parameters.npoints,parameters.timestep/2,...
+                 parameters.zerofill-parameters.npoints)*1e-6;
+
 % Plot the spectrum
-subplot(2,1,2);
-plot(ft_axis(0,1/parameters.timestep,parameters.zerofill)*1e-6,real(spectrum));
+subplot(2,1,2); plot(ax,real(spectrum));
 kxlabel('frequency, MHz'); axis tight; kgrid;
 
 end

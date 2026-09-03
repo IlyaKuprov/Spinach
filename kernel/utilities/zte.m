@@ -15,8 +15,7 @@
 %      nstates - if this parameter is specified, only
 %                nstates most populated states are kept,
 %                irrespective of the tolerance parameter;
-%                omitting it or passing [] uses the tol-
-%                erance
+%                pass [] to use the tolerance instead
 %
 % Output:
 %
@@ -43,9 +42,6 @@
 % <https://spindynamics.org/wiki/index.php?title=zte.m>
 
 function projector=zte(spin_system,L,rho,nstates)
-
-% Default is no state count
-if ~exist('nstates','var'), nstates=[]; end
 
 % Validate the input
 grumble(spin_system,L,rho,nstates);

@@ -32,7 +32,7 @@ Zero track elimination function. Inspects the first few steps in the system traj
 - Lines 67-68: Skip if the state vector norm is too small for Krylov procedure; implemented by `report(spin_system,'WARNING - state vector norm below drop tolerance, basis left unchanged.')`.
 - Lines 75-76: Get the time step; implemented by `timestep=1/cheap_norm(L)`.
 - Lines 78-79: Do not allow infinite time step; implemented by `if isinf(timestep)`.
-- Lines 83-84: Report to the user; implemented by `if exist('nstates','var')`.
+- Lines 83-84: Report to the user; implemented by `if ~isempty(nstates)`.
 - Lines 93-94: Preallocate the trajectory; implemented by `trajectory=zeros(numel(rho),spin_system.tols.zte_nsteps,'like',1i)`.
 - Lines 96-97: Set the starting point; implemented by `trajectory(:,1)=rho`.
 - Lines 100-101: Compute trajectory steps with Krylov technique; implemented by `for n=2:spin_system.tols.zte_nsteps`.
@@ -40,17 +40,17 @@ Zero track elimination function. Inspects the first few steps in the system traj
 - Lines 106-107: Analyze the trajectory; implemented by `prev_space_dim=nnz(max(abs(trajectory(:,1:(n-1))),[],2)>spin_system.tols.zte_tol)`.
 - Lines 110-112: Inform the user; implemented by `report(spin_system,['evolution step ' num2str(n-1) ', active space dimension ' num2str(curr_space_dim)])`.
 - Lines 114-115: Terminate if done early; implemented by `if curr_space_dim==prev_space_dim, break; end`.
-- Lines 119-120: Determine which tracks to drop; implemented by `if exist('nstates','var')`.
+- Lines 119-120: Determine which tracks to drop; implemented by `if ~isempty(nstates)`.
 - Lines 122-123: Determine state amplitudes; implemented by `amplitudes=max(abs(trajectory),[],2)`.
 
 ### Control flow inferred from the code
 
 - Line 49: conditional branch on `ismember('zte',spin_system.sys.disable)`.
 - Line 79: conditional branch on `isinf(timestep)`.
-- Line 84: conditional branch on `exist('nstates','var')`.
+- Line 84: conditional branch on `~isempty(nstates)`.
 - Line 101: `for` loop over `n=2:spin_system.tols.zte_nsteps`.
 - Line 115: conditional branch on `curr_space_dim==prev_space_dim, break; end`.
-- Line 120: conditional branch on `exist('nstates','var')`.
+- Line 120: conditional branch on `~isempty(nstates)`.
 
 ### Key state/data transformations
 
@@ -80,7 +80,8 @@ Zero track elimination function. Inspects the first few steps in the system traj
 - time propagation
 - nstates -if this parameter is specified, only
 - nstates most populated states are kept,
-- irrespective of the tolerance parameter
+- irrespective of the tolerance parameter;
+- pass [] to use the tolerance instead
 - Output:
 - projector -projector matrix into the reduced space,
 - to be used as follows:
@@ -106,7 +107,8 @@ Zero track elimination function. Inspects the first few steps in the system traj
 - time propagation
 - nstates -if this parameter is specified, only
 - nstates most populated states are kept,
-- irrespective of the tolerance parameter
+- irrespective of the tolerance parameter;
+- pass [] to use the tolerance instead
 - Output:
 
 ## Internal Spinach / MATLAB structure cues

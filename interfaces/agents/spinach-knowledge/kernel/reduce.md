@@ -66,7 +66,7 @@ Symmetry and trajectory-level state space reduction. Tries all applicable reduct
 - Lines 87: computes `irrep_keep_index` using `irrep_keep_index=true(n_irreps,1)`.
 - Lines 98: computes `irrep_keep_index(n)` using `irrep_keep_index(n)=0`.
 - Lines 123: computes `projectors` using `projectors={spin_system.bas.irrep(irrep_keep_index).projector}`.
-- Lines 259: computes `zte_projector` using `zte_projector=zte(spin_system,projectors{n}'*L*projectors{n},projectors{n}'*rho)`.
+- Lines 259: computes `zte_projector` using `zte_projector=zte(spin_system,projectors{n}'*L*projectors{n},projectors{n}'*rho,[])`.
 - Lines 262: computes `projectors{n}` using `projectors{n}=projectors{n}*zte_projector`.
 - Lines 275: computes `pt_projectors` using `pt_projectors=path_trace(spin_system,projectors{n}'*L*projectors{n},projectors{n}'*rho)`.
 - Lines 279: computes `pt_projectors{k}` using `pt_projectors{k}=projectors{n}*pt_projectors{k}`.

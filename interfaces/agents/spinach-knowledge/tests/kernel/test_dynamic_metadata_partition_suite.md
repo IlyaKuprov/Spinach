@@ -48,7 +48,7 @@ Tests deterministic metadata, hashing, and partition helpers. Syntax: result=tes
 - Lines 64: computes `spin_system.sys.disable` using `spin_system.sys.disable={'pt'}`.
 - Lines 65: computes `projectors` using `projectors=path_trace(spin_system,speye(3),[])`.
 - Lines 70: computes `spin_system.bas.formalism` using `spin_system.bas.formalism='sphten-liouv'`.
-- Lines 72: computes `projector` using `projector=zte(spin_system,speye(3),[1;0;0])`.
+- Lines 72: computes `projector` using `projector=zte(spin_system,speye(3),[1;0;0],[])`.
 
 ## Outputs
 

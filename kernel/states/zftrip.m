@@ -24,11 +24,15 @@
 %               the transition metal convention |Dzz|>|Dyy|
 %               >|Dxx| with 0<E/D<1/3 must have their X
 %               and Y entries swapped before the call. At
-%               E=0 the X and Y states are degenerate and
-%               at E/D=-1/3 the X and Z states are degene-
-%               rate; the labelling is then undefined and
-%               the degenerate pair must have equal popu-
-%               lations for the result to be meaningful.
+%               E=0 the X and Y states are degenerate (all
+%               three when D=0 as well) and the labelling
+%               within the degenerate set is undefined. At
+%               E/D=-1/3 the X and Z energies are opposite
+%               in sign, not degenerate, but equal in mag-
+%               nitude, so the sort by |energy| cannot tell
+%               X from Z. In both cases the affected popu-
+%               lations must be equal for the result to be
+%               meaningful.
 %
 %    Z        - 3x3 Zeeman interaction tensor (Hz/Tesla) in
 %               the laboratory frame of reference; use func- 

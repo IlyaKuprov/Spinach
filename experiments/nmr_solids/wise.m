@@ -50,8 +50,8 @@ function fid=wise(spin_system,parameters,H,R,K)
 % Consistency enforcement
 grumble(spin_system,parameters,H,R,K);
 
-% Wipe the state of 13C (pre-saturation)
-[~,parameters.rho0]=decouple(spin_system,[],parameters.rho0,{'13C'});
+% Wipe the state of the low-gamma spin (pre-saturation)
+[~,parameters.rho0]=decouple(spin_system,[],parameters.rho0,parameters.spins(2));
  
 % Build 1H and 13C control operators
 Hp=operator(spin_system,'L+',parameters.spins{1});

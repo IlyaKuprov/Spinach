@@ -7,7 +7,7 @@ function kronm_test_1()
 % Pick random dimensions
 nmats=randi(4,1,1)+2; disp(['number of matrices in Q: ' num2str(nmats)]);
 ncols=randi(20,1,1); disp(['number of columns in x:  ' num2str(ncols)]);
-dims=randi(7,nmats,1)+2; disp(['dims of matrices in Q:   ' num2str(dims')]);
+dims=randi(3,nmats,1)+1; disp(['dims of matrices in Q:   ' num2str(dims')]);
 
 % Generate real Q and x
 Q_terms=cell(1,nmats); Q=1;

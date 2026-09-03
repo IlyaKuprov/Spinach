@@ -201,16 +201,22 @@ switch output
         % Inflate polyadic generators
         if isa(L,'polyadic'), L=inflate(L); end
 
-        % Find the states that the generator does not touch
-        idle=gather(~(any(L,1)'|any(L,2)));
-
-        % Refuse divergent integrals over stationary states
-        if any(coil(idle,:)'*rho(idle,:),'all')
-            error('the observable has a stationary component, the integral diverges.');
+        % Find the states reachable from the initial condition
+        reach=any(rho,2);
+        while true
+            fresh=reach|any(L(:,reach),2);
+            if isequal(fresh,reach), break; end
+            reach=fresh;
         end
+        reach=gather(reach);
 
         % Integrate the observable trajectory to infinity
-        answer=full(real(gather(coil(~idle,:)'*((1i*L(~idle,~idle))\rho(~idle,:)))));
+        answer=full(real(gather(coil(reach,:)'*((1i*L(reach,reach))\rho(reach,:)))));
+
+        % Refuse integrals that do not converge
+        if ~all(isfinite(answer),'all')
+            error('the generator is singular on the subspace reachable from rho.');
+        end
         
     otherwise
         

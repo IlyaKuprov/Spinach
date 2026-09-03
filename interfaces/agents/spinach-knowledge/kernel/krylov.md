@@ -106,10 +106,10 @@ Krylov propagation function. Avoids matrix exponentiation, but can be slow. Shou
 - that destination state screening may be
 - less efficient when there are multiple
 - destinations to screen against.
-- coil -the detection state, used when 'observable' is specified as
-- the output option. If 'multichannel' is selected, the coil
-- should contain multiple columns corresponding to individual
-- observable vectors.
+- coil -the detection state, used when 'observable' or 'total' is
+- specified as the output option. If 'multichannel' is sel-
+- ected, the coil should contain multiple columns correspon-
+- ding to individual observable vectors.
 
 ## Outputs
 

@@ -29,6 +29,11 @@ else
     grumble(A,dim);
 end
 
+% Refuse two outputs with a dimension query
+if (nargout==2)&&(nargin==2)
+    error('two-output form does not accept a dimension index.');
+end
+
 % Mimic Matlab
 if nargout==2
     s=A.numRows; ncols=A.numCols;

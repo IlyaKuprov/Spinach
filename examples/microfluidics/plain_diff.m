@@ -86,7 +86,7 @@ coil=state(spin_system,'Lz','1H');
 traj=fpl2phan(traj(:),coil,[2659 parameters.npoints]);
 
 % Make a figure
-kfigure(); scale_figure([1.5 1.5]); 
+fig=kfigure(); scale_figure([1.5 1.5]); 
 camproj('perspective'); view(-20,15); axis vis3d;
 
 % Set Z axis extents
@@ -96,7 +96,7 @@ spin_system.mesh.zext=[-0.02 0.02];
 for n=1:size(traj,2)
 
     % Do not steal focus
-    set(groot,'CurrentFigure',1); cla;
+    set(groot,'CurrentFigure',fig); cla;
 
     % Get the concentrations
     conc=full(real(traj(:,n)));

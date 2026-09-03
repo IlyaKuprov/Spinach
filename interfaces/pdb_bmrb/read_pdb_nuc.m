@@ -25,7 +25,8 @@
 %                Cartesian coordinates of each spin in Angstrom
 %
 % Note: All atoms in the file are read, make sure the PDB only contains
-%       one model.
+%       one model and one chain. Chain identifiers are accepted but not
+%       returned, files with more than one chain are refused.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -44,11 +45,15 @@ res_num=[]; res_typ={};
 pdb_id={}; coords={};
 
 % Parse the PDB file
+chain_ids='';
 while ~feof(file_id)
     data_line=fgetl(file_id);
 
-    % Blank the PDB chain identifier column, this parser does not use it
-    if numel(data_line)>=22, data_line(22)=' '; end
+    % Record and blank the chain identifier column, residue numbers do not carry it
+    chain_id=' ';
+    if numel(data_line)>=22
+        chain_id=data_line(22); data_line(22)=' ';
+    end
 
     if ~isempty(data_line)
         parsed_string=textscan(data_line,'ATOM %f %s %s %f %f %f %f %f %f %s','delimiter',' ','MultipleDelimsAsOne',1); 
@@ -57,8 +62,14 @@ while ~feof(file_id)
             res_typ{end+1}=parsed_string{3}{1};   %#ok<AGROW>
             pdb_id{end+1}=parsed_string{2}{1};    %#ok<AGROW>
             coords{end+1}=[parsed_string{5:7}];   %#ok<AGROW>
+            chain_ids(end+1)=chain_id;            %#ok<AGROW>
         end
     end
+end
+
+% Refuse multi-chain files, residue numbers would be ambiguous
+if numel(unique(chain_ids))>1
+    error('multiple chains found, the PDB file must contain a single chain.');
 end
 
 % Capitalise amino acid type specifications

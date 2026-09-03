@@ -72,7 +72,8 @@ Reads the coordinates of all atoms from the user-specified PDB file and returns,
 - coords -nspins x 1 cell array of 3-vectors giving
 - Cartesian coordinates of each spin in Angstrom
 - Note: All atoms in the file are read, make sure the PDB only contains
-- one model.
+- one model and one chain. Chain identifiers are accepted but not
+- returned, files with more than one chain are refused.
 
 ## Implementation structure
 

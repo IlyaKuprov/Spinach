@@ -55,7 +55,7 @@ for n=1:numel(castep_log)
         props.symbols{end+1}=atom_spec{1}{1};
         props.std_geom(end+1,:)=[atom_spec{4:6}];
         atom_count=atom_count+1;
-        atom_keys{atom_count}=[atom_spec{2}{1} num2str(atom_spec{3})];
+        atom_keys{atom_count}=[atom_spec{2}{1} ':' num2str(atom_spec{3})];
     end
 end
 atom_keys=atom_keys(1:atom_count);
@@ -66,12 +66,20 @@ for n=1:numel(castep_log)
     if (numel(castep_log{n})>1)&&strcmp(castep_log{n}(1:2),'ms')
         cst_spec=textscan(castep_log{n},'ms %s %f %f %f %f %f %f %f %f %f %f',...
                           'Delimiter',' ','MultipleDelimsAsOne',1);
-        if isempty(cst_spec{end}) % CASTEP printing bug
-            label_parts=regexp(cst_spec{1}{1},'^([A-Za-z]+)(\d+)$','tokens','once');
-            cst_spec={label_parts(1) str2double(label_parts{2}) cst_spec{2:(end-1)}};
+        if isempty(cst_spec{end}) % CASTEP printing bug, try every split of the glued token
+            glued=cst_spec{1}{1}; atom_idx=false(size(atom_keys));
+            for k=2:numel(glued)
+                atom_idx=atom_idx|strcmp(atom_keys,[glued(1:(k-1)) ':' glued(k:end)]);
+            end
+            cst_spec=cst_spec(2:(end-1));
+        else
+            atom_idx=strcmp(atom_keys,[cst_spec{1}{1} ':' num2str(cst_spec{2})]);
+            cst_spec=cst_spec(3:end);
         end
-        atom_idx=strcmp(atom_keys,[cst_spec{1}{1} num2str(cst_spec{2})]);
-        props.cst{atom_idx}=reshape([cst_spec{3:11}],[3 3]);
+        if nnz(atom_idx)~=1
+            error(['ms record does not match exactly one atom: ' castep_log{n}]);
+        end
+        props.cst{atom_idx}=reshape([cst_spec{:}],[3 3]);
     end
 end
 

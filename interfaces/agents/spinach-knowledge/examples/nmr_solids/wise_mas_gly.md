@@ -25,7 +25,7 @@ WISE of alpha-glycine powder under MAS. Calculation time: hours, much faster on 
 - Lines 13-14: 400 MHz spectrometer; implemented by `sys.magnet=9.4`.
 - Lines 16-17: Isotropic alpha-glycine chemical shifts; implemented by `inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,1,176.4)`.
 - Lines 25-26: Basis set; implemented by `bas.formalism='sphten-liouv'`.
-- Lines 30-31: Ignore interactions below 200 Hz; implemented by `sys.tols.inter_cutoff=2*pi*200`.
+- Lines 30-31: Ignore interactions below 200 Hz; implemented by `sys.tols.inter_cutoff=200`.
 - Lines 33-34: Use GPU arithmetic; implemented by `sys.enable={'greedy'}`.
 - Lines 36-37: Spinach housekeeping; implemented by `spin_system=create(sys,inter)`.
 - Lines 40-41: Experiment setup; implemented by `parameters.spins={'1H','13C'}`.
@@ -45,7 +45,7 @@ WISE of alpha-glycine powder under MAS. Calculation time: hours, much faster on 
 - Lines 26: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 27: computes `bas.approximation` using `bas.approximation='IK-0'`.
 - Lines 28: computes `bas.level` using `bas.level=3`.
-- Lines 31: computes `sys.tols.inter_cutoff` using `sys.tols.inter_cutoff=2*pi*200`.
+- Lines 31: computes `sys.tols.inter_cutoff` using `sys.tols.inter_cutoff=200`.
 - Lines 34: computes `sys.enable` using `sys.enable={'greedy'}`.
 - Lines 37: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 41: computes `parameters.spins` using `parameters.spins={'1H','13C'}`.

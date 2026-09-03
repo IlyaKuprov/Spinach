@@ -12,7 +12,8 @@
 %
 %      rho    - initial state vector
 %      
-%        J    - J-coupling (Hz)
+%        J    - J-coupling (Hz), the phase of the 90-degree pulse
+%               next to the lone tau delay follows its sign
 %
 %  delta_v    - Zeeman frequency difference (Hz)
 %
@@ -34,7 +35,7 @@ grumble(L,Hx,Hy,rho,J,delta_v);
 t=1/(4*sqrt(J^2+delta_v^2));
 
 % Repetition count
-m1=floor(pi*J/(2*delta_v));
+m1=floor(pi*abs(J)/(2*abs(delta_v)));
 if mod(m1,2)~=0, m1=m1+1; end
 
 % Pulse sequence
@@ -44,7 +45,7 @@ for n=1:m1
     rho=step(spin_system,Hx,rho,pi);
     rho=step(spin_system,L,rho,t);
 end
-rho=step(spin_system,Hx,rho,pi/2);
+rho=step(spin_system,Hx,rho,sign(J)*pi/2);
 rho=step(spin_system,L,rho,t);
 for n=1:m1/2
     rho=step(spin_system,L,rho,t);
@@ -66,8 +67,9 @@ end
 if size(rho,1)~=size(L,2)
     error('dimensions of rho and L must be consistent.');
 end
-if (~isnumeric(J))||(~isreal(J))||(~isscalar(J))
-    error('J must be a real scalar.');
+if (~isnumeric(J))||(~isreal(J))||(~isscalar(J))||...
+   (~isfinite(J))||(J==0)
+    error('J must be a non-zero finite real scalar.');
 end
 if (~isnumeric(delta_v))||(~isreal(delta_v))||(~isscalar(delta_v))||...
    (~isfinite(delta_v))||(delta_v==0)

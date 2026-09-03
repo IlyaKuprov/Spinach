@@ -38,7 +38,7 @@ grumble(X,Y,dt,file_name);
 phi=rad2deg(wrapTo2Pi(phi));
 
 % Bruker amplitude scale is 0 to 100
-amp=100*amp/max(amp);
+if max(amp)>0, amp=100*amp/max(amp); end
 
 % Interval count, min and max
 n_ints=numel(X); T=n_ints*dt;

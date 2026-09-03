@@ -39,8 +39,8 @@ R=A_left*A_right'-(A_left'*A_left+A_right*A_right')/2;
 % Remove the arbitrary scale of the user-supplied state
 rho=rho/norm(rho,2);
 
-% Check for silly inputs, relative to the scale of R
-if abs(rho'*R*rho)<=1e-10*norm(R,1)
+% Check for silly inputs, relative to the part of R that acts on rho
+if abs(rho'*R*rho)<=1e-10*norm(R*rho,2)
     error('the operator supplied does not appear to relax the given state.');
 end
 

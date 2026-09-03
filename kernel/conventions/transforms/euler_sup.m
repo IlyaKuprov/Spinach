@@ -58,11 +58,11 @@ elseif (abs(dcm_comp(3,3)+1)<1e-12)&&...
        (abs(rot_one(1)-rot_two(1))<1e-12)&&...
        (abs(rot_one(3)-rot_two(3))<1e-12)
 
-    % Clamp the cosine argument 
-    dcm_11=max(min(dcm_comp(1,1),1),-1);
+    % Recover alpha-gamma from both matrix elements
+    alpha_m_gamma=atan2(-dcm_comp(2,1),-dcm_comp(1,1));
 
-    % Recover the third angle 
-    gam=(acos(dcm_11)-pi)/2;
+    % Recover the third angle
+    gam=-alpha_m_gamma/2;
 
     % Return special case
     rot_cmp=[-gam pi gam];

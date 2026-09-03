@@ -20,10 +20,6 @@
 %                            rho with the user-specified number of steps
 %                            and step length.
 %
-%             'total'   - returns the integral of the observable trace
-%                         from the simulation start to infinity. This
-%                         option requires the presence of relaxation.
-%
 %             'refocus' - evolves the first vector for zero steps,
 %                         second vector for one step, third vector for
 %                         two steps, etc., consistent with the second

@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Powder spectrum of Gd(III) with ZFS up to 3rd spherical rank using the giant spin Hamiltonian formalism in a sweepable 400 MHz NMR magnet and microwaves at 263.2 GHz. Calculation time: seconds.
+Powder spectrum of Gd(III) with ZFS up to 2nd spherical rank using the giant spin Hamiltonian formalism in a sweepable 400 MHz NMR magnet and microwaves at 263.2 GHz. Calculation time: seconds.
 
 ## Physical / mathematical content
 
@@ -32,8 +32,8 @@ Powder spectrum of Gd(III) with ZFS up to 3rd spherical rank using the giant spi
 
 - Lines 12: computes `sys.isotopes` using `sys.isotopes={'E8'}`.
 - Lines 13: computes `inter.zeeman.scalar` using `inter.zeeman.scalar={1.9918}`.
-- Lines 14: computes `inter.giant.coeff` using `inter.giant.coeff={{[0 0 0],[0 0 -4.65e8 0 0],[1e7 0 0 2e7 0 0 1e7]}}`.
-- Lines 15: computes `inter.giant.euler` using `inter.giant.euler={{[0 0 0],[0 0 0],[0 0 0]}}`.
+- Lines 14: computes `inter.giant.coeff` using `inter.giant.coeff={{[0 0 0],[0 0 -4.65e8 0 0]}}`.
+- Lines 15: computes `inter.giant.euler` using `inter.giant.euler={{[0 0 0],[0 0 0]}}`.
 - Lines 18: computes `sys.magnet` using `sys.magnet=1`.
 - Lines 21: computes `bas.formalism` using `bas.formalism='zeeman-hilb'`.
 - Lines 22: computes `bas.approximation` using `bas.approximation='none'`.
@@ -51,7 +51,7 @@ Powder spectrum of Gd(III) with ZFS up to 3rd spherical rank using the giant spi
 
 ## Implementation structure
 
-- Powder spectrum of Gd(III) with ZFS up to 3rd spherical rank
+- Powder spectrum of Gd(III) with ZFS up to 2nd spherical rank
 - using the giant spin Hamiltonian formalism in a sweepable 400
 - MHz NMR magnet and microwaves at 263.2 GHz.
 - Calculation time: seconds.

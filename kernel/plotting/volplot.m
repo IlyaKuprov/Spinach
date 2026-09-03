@@ -131,8 +131,14 @@ new_alpha=new_alpha/5; new_alpha(new_alpha<0.01)=0;
 % Apply new alpha map
 alphamap(new_alpha);
 
+% Pin the colour scale to the sign convention
+clim([-1 1]);
+
+% Axis extents do not depend on the plotted geometry
+axis([xmin xmax ymin ymax zmin zmax]); daspect([1 1 1]);
+
 % Final figure cosmetics
-axis tight; axis equal; box on; kgrid;
+box on; kgrid;
 kxlabel('X'); kylabel('Y'); kzlabel('Z');
 set(gca,'Projection','perspective'); hold off;
 

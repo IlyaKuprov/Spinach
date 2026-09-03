@@ -95,9 +95,8 @@ parfor k=1:ncells %#ok<*PFBNS>
                 F_local=[F_local; m, k, -F_km];
             end
             
-            % Diffusion goes both ways
+            % Diffusion into the neighbour, its own iteration adds the reverse
             D_km=(1/A_k)*(b_km/norm(r_km,2))*parameters.diff;
-            F_local=[F_local; k m  D_km];
             F_local=[F_local; m k  D_km];
 
         end

@@ -102,10 +102,14 @@ Krylov propagation function. Avoids matrix exponentiation, but can be slow. Shou
 - tial state) or a matrix (if starting from a
 - stack of initial states).
 - 'multichannel' -returns the time dynamics of several
-- observables as rows of a matrix. Note
-- that destination state screening may be
-- less efficient when there are multiple
-- destinations to screen against.
+- observables as rows of a matrix (if
+- starting from a single initial state)
+- or as a channels-by-time-by-states
+- array (if starting from a stack of
+- initial states). Note that destination
+- state screening may be less efficient
+- when there are multiple destinations
+- to screen against.
 - coil -the detection state, used when 'observable' is specified as
 - the output option. If 'multichannel' is selected, the coil
 - should contain multiple columns corresponding to individual
@@ -113,8 +117,8 @@ Krylov propagation function. Avoids matrix exponentiation, but can be slow. Shou
 
 ## Outputs
 
-- answer -a vector or a matrix, depending on the options set during
-- the call.
+- answer -a vector, a matrix, or a channels-by-time-by-states
+- array, depending on the options set during the call.
 - Note: this function does not support the zeeman-hilb formalism; in
 - zeeman-wavef, L is the Hamiltonian matrix, rho is a wavefunc-
 - tion or a horizontal stack thereof, coil is a reference wave-

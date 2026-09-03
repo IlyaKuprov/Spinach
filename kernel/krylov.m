@@ -36,10 +36,14 @@
 %                            stack of initial states).
 %
 %             'multichannel' - returns the time dynamics of several
-%                              observables as rows of a matrix. Note
-%                              that destination state screening may be
-%                              less efficient when there are multiple
-%                              destinations to screen against.
+%                              observables as rows of a matrix (if
+%                              starting from a single initial state)
+%                              or as a channels-by-time-by-states
+%                              array (if starting from a stack of
+%                              initial states). Note that destination
+%                              state screening may be less efficient
+%                              when there are multiple destinations
+%                              to screen against.
 %
 %   coil   - the detection state, used when 'observable' is specified as
 %            the output option. If 'multichannel' is selected, the coil
@@ -48,8 +52,8 @@
 %
 % Outputs:
 %
-%      answer - a vector or a matrix, depending on the options set during
-%               the call.
+%      answer - a vector, a matrix, or a channels-by-time-by-states
+%               array, depending on the options set during the call.
 %
 % Note: this function does not support the zeeman-hilb formalism; in
 %       zeeman-wavef, L is the Hamiltonian matrix, rho is a wavefunc-
@@ -168,10 +172,10 @@ switch output
     case 'multichannel'
         
         % Preallocate the answer
-        answer=zeros([size(coil,2) (nsteps+1)],'like',1i);
+        answer=zeros([size(coil,2) (nsteps+1) size(rho,2)],'like',1i);
         
         % Set the initial point
-        answer(:,1)=answer(:,1)+gather(coil'*rho);
+        answer(:,1,:)=gather(coil'*rho);
         
         % Loop over steps
         for n=1:nsteps
@@ -180,7 +184,7 @@ switch output
             rho=step(spin_system,L,rho,timestep);
             
             % Assign the answer
-            answer(:,n+1)=gather(coil'*rho);
+            answer(:,n+1,:)=gather(coil'*rho);
             
             % Inform the user
             if (n==nsteps)||(toc(feedback)>1)

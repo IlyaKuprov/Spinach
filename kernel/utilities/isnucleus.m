@@ -21,7 +21,7 @@ grumble(spin_spec);
 
 % A simple name matching check
 if ismember(spin_spec(1),{'E','C','V','T'})||...
-   ismember(spin_spec,{'G','E','T','M'})
+   ismember(spin_spec,{'G','E','N','M'})
     verdict=false();
 else
     verdict=true();

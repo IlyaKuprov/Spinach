@@ -39,7 +39,7 @@ S2M sequence of Pileio and Levitt. Syntax: rho=s2m(spin_system,L,Hx,Hy,rho,J,del
 - Lines 35: computes `t` using `t=1/(4*sqrt(J^2+delta_v^2))`.
 - Lines 38: computes `m1` using `m1=floor(pi*abs(J)/(2*abs(delta_v)))`.
 - Lines 43: computes `rho` using `rho=step(spin_system,L,rho,t)`.
-- Line 48: the 90-degree pulse next to the lone tau delay is `rho=step(spin_system,Hx,rho,sign(J)*pi/2)`, so a negative coupling produces the same singlet order as a positive one rather than its negation.
+- Line 48: the 90-degree pulse next to the lone tau delay is `rho=step(spin_system,Hx,rho,sign(J)*pi/2)`, so a negative coupling converts singlet order into the same longitudinal magnetisation as a positive one rather than its negation.
 
 ### Local helper functions
 

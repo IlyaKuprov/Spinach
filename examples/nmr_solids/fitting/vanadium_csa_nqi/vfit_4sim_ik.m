@@ -87,7 +87,7 @@ CSAa=CSiso - 0.5*CSaniso*(CSeta+1.0);
 CSAb=CSiso + 0.5*CSaniso*(CSeta-1.0);
 CSAc=CSiso + CSaniso;
 inter.zeeman.eigs={[CSAa CSAb CSAc]+456.818}; 
-inter.zeeman.euler={[CSAeul_a CSAeul_b CSAeul_c]};
+inter.zeeman.euler={pi/180*[CSAeul_a CSAeul_b CSAeul_c]};
 
 % Quadrupolar couplings
 inter.coupling.matrix{1,1}=eeqq2nqi(Qcc,Qeta,3.5,[0 0 0]);

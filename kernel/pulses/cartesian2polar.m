@@ -70,7 +70,7 @@ if nargin==2
 elseif nargin==4
     grumble(x,y,Dx,Dy);
 elseif nargin==8
-    grumble(x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy);
+    grumble(x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy,nargout);
 else
     error('incorrect number of arguments.');
 end
@@ -116,7 +116,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy)
+function grumble(x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy,nouts)
 if nargin==2
     if (~isnumeric(x))||(~isreal(x))
         error('x parameter must be a vector of real numbers.');
@@ -144,7 +144,7 @@ elseif nargin==4
        (~all(size(Dx)==size(Dy)))
         error('all input vectors must have the same dimension.');
     end
-elseif nargin==8
+elseif nargin==9
     if (~isnumeric(x))||(~isreal(x))
         error('x parameter must be a vector of real numbers.');
     end
@@ -173,7 +173,7 @@ elseif nargin==8
        (~all(size(Dx)==size(Dy)))
         error('all input vectors must have the same dimension.');
     end
-    if (~isrow(x))||(~isrow(y))||(~isrow(Dx))||(~isrow(Dy))
+    if (nouts>4)&&((~isrow(x))||(~isrow(y))||(~isrow(Dx))||(~isrow(Dy)))
         error('x, y, df_dx, and df_dy must be row vectors.');
     end
     if (size(Dxx,2)~=length(Dx))||(size(Dxx,1)~=size(Dxx,2))||...

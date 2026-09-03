@@ -61,8 +61,11 @@ elseif (abs(dcm_comp(3,3)+1)<1e-12)&&...
     % Recover alpha-gamma from both matrix elements
     alpha_m_gamma=atan2(-dcm_comp(2,1),-dcm_comp(1,1));
 
-    % Return special case, sign-correct
-    gam=-alpha_m_gamma/2; rot_cmp=[-gam pi gam];
+    % Recover the third angle
+    gam=-alpha_m_gamma/2;
+
+    % Return special case
+    rot_cmp=[-gam pi gam];
 
 else
 

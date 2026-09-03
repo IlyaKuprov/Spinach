@@ -14,7 +14,9 @@
 %
 %      nstates - if this parameter is specified, only
 %                nstates most populated states are kept,
-%                irrespective of the tolerance parameter
+%                irrespective of the tolerance parameter;
+%                omitting it or passing [] uses the tol-
+%                erance
 %
 % Output:
 %
@@ -167,8 +169,8 @@ end
 if size(L,2)~=size(rho,1)
     error('Liouvillian and state vector dimensions must be consistent.');
 end
-if (~isempty(nstates))&&((~isnumeric(nstates))||(~isreal(nstates))||(~isscalar(nstates))||...
-                         (nstates<1)||(mod(nstates,1)~=0)||(nstates>numel(rho)))
+if (~isnumeric(nstates))||((~isempty(nstates))&&((~isreal(nstates))||(~isscalar(nstates))||...
+                           (nstates<1)||(mod(nstates,1)~=0)||(nstates>numel(rho))))
     error('nstates must be a positive integer not exceeding the state space dimension.');
 end
 end

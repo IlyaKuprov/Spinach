@@ -1,5 +1,5 @@
-% Powder spectrum of Gd(III) with ZFS up to 3rd spherical rank
-% using the giant spin Hamiltonian formalism in a sweepable 400 
+% Powder spectrum of Gd(III) with ZFS up to 2nd spherical rank
+% using the giant spin Hamiltonian formalism in a sweepable 400
 % MHz NMR magnet and microwaves at 263.2 GHz.
 %
 % Calculation time: seconds.
@@ -11,8 +11,8 @@ function lanthanide_powder()
 % Spin system properties
 sys.isotopes={'E8'};
 inter.zeeman.scalar={1.9918};
-inter.giant.coeff={{[0 0 0],[0 0 -4.65e8 0 0],[1e7 0 0 2e7 0 0 1e7]}};
-inter.giant.euler={{[0 0 0],[0 0 0],[0 0 0]}};
+inter.giant.coeff={{[0 0 0],[0 0 -4.65e8 0 0]}};
+inter.giant.euler={{[0 0 0],[0 0 0]}};
 
 % Field sweep
 sys.magnet=1;

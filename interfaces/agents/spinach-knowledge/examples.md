@@ -285,7 +285,7 @@
 | `examples/fundamentals/tensor_structures/ttrain_test_1.m` | `ttrain_test_1()` | A simple test of ttclass object arithmetic. | 31 |
 | `examples/giant_spin/dy_lft_single_1.m` | `dy_lft_single_1()` | Reproduction of MOLCAS results with the Ligand Field Theory model for a single Dy(III) ion. Calculation time: seconds | 97 |
 | `examples/giant_spin/dy_lft_single_2.m` | `dy_lft_single_2()` | A demonstration that most lanthanide complexes are in the ZFS limit for the purposes of relaxation theory. One of the fi | 91 |
-| `examples/giant_spin/lanthanide_powder.m` | `lanthanide_powder()` | Powder spectrum of Gd(III) with ZFS up to 3rd spherical rank using the giant spin Hamiltonian formalism in a sweepable 4 | 50 |
+| `examples/giant_spin/lanthanide_powder.m` | `lanthanide_powder()` | Powder spectrum of Gd(III) with ZFS up to 2nd spherical rank using the giant spin Hamiltonian formalism in a sweepable 4 | 50 |
 | `examples/giant_spin/lanthanide_redfield.m` | `lanthanide_redfield()` | Relaxation rate of Gd(III) as a function of zero-field splitting, computed using Redfield theory. The correla- tion time | 63 |
 | `examples/giant_spin/nuclear_relaxation_1.m` | `nuclear_relaxation_1()` | Nuclear relaxation rates using the adiabatic elimination method for a rapidly relaxing Dy(III) ion with a user-specified | 148 |
 | `examples/giant_spin/quartet_levels.m` | `quartet_levels()` | Energy levels magnetic field scan for a spin-3/2 particle with a zero-field splitting. Calculation time: seconds | 42 |

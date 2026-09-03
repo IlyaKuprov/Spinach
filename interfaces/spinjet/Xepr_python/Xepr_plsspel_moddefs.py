@@ -57,8 +57,6 @@ try:
 	for index in range(1,no_defs+1):
 		cmdStr = str(sys.argv[(2*index)-1])+" = "+str(sys.argv[2*index])
 		currentExp["ftEPR.PlsSPELSetVar"].value = cmdStr
-except SystemExit:
-	raise
 except:
 	print("error changing pulseSPEL defs")
 	sys.exit(4)

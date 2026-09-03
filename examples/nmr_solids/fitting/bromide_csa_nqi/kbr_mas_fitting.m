@@ -13,7 +13,7 @@
 
 function kbr_mas_fitting()
 
-% Load and normalise the data, the file runs from high to low frequency
+% Load and normalise the data
 kbr_data=readmatrix('KBr_400MHz_2kHz.txt');
 spec_expt=flipud(kbr_data(:,2))/100;
 

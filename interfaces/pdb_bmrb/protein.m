@@ -15,9 +15,9 @@
 %                     as backbone, but with GLN and ASN side chain
 %                     amide groups included, 'all' imports every-
 %                     thing that is assigned in BMRB. If a list of
-%                     numbers is supplied, spins with those num-
-%                     bers in the PDB file are imported, but only
-%                     if they are assigned in the PDB.
+%                     numbers is supplied, atoms with those serial
+%                     numbers in the PDB file are imported, but
+%                     only if they are assigned in the BMRB.
 %
 % options.pdb_mol   - the number of molecule if there are multiple 
 %                     molecules in the pdb file 
@@ -477,6 +477,11 @@ elseif (~isnumeric(options.select))&&...
        (~ismember(options.select,{'all','backbone','backbone-hsqc',...
                                   'backbone-minimal','backbone-extended'}))
     error('invalid value for options.select, please refer to the manual.');
+end
+if isnumeric(options.select)&&((~isreal(options.select))||...
+   (~all(isfinite(options.select),'all'))||(~all(mod(options.select,1)==0,'all'))||...
+   (~all(options.select>0,'all')))
+    error('numeric options.select must contain positive integer PDB atom serial numbers.');
 end
 if ~isfield(options,'pdb_mol')
     error('options.pdb_mol switch must be specfied.');

@@ -24,7 +24,7 @@ Protein data import function. Parses PDB and BMRB data, runs a J-coupl- ing gues
 
 - Lines 74-75: Set defaults; implemented by `if ~exist('options','var')`.
 - Lines 85-86: Check consistency; implemented by `grumble(pdb_file,bmrb_file,options)`.
-- Lines 88-89: Parse the PDB file; implemented by `[pdb_aa_num,pdb_aa_typ,pdb_atom_id,pdb_coords]=read_pdb_pro(pdb_file,options.pdb_mol)`.
+- Lines 88-89: Parse the PDB file; implemented by `[pdb_aa_num,pdb_aa_typ,pdb_atom_id,pdb_coords,pdb_ser]=read_pdb_pro(pdb_file,options.pdb_mol)`.
 - Lines 91-92: Parse the BMRB file; implemented by `[bmrb_aa_num,bmrb_aa_typ,bmrb_atom_id,bmrb_chemsh]=read_bmrb(bmrb_file)`.
 - Lines 94-96: Remove oxygens, sulphurs and terminal atoms; implemented by `kill_mask=ismember(pdb_atom_id,{'O','OE','OE1','OE2','OD1','OD2','OG','OG1','HG1', 'OG2','OH','HH','SD','SG','OXT','O''','O'''''})`.
 - Lines 101-102: Match chemical shifts; implemented by `pdb_chemsh=cell(numel(pdb_atom_id),1)`.
@@ -64,7 +64,7 @@ Protein data import function. Parses PDB and BMRB data, runs a J-coupl- ing gues
 - Lines 77: computes `options.pdb_mol` using `options.pdb_mol=1`.
 - Lines 78: computes `options.noshift` using `options.noshift='keep'`.
 - Lines 79: computes `options.deuterate` using `options.deuterate={}`.
-- Lines 89: computes `[pdb_aa_num,pdb_aa_typ,pdb_atom_id,pdb_coords]` using `[pdb_aa_num,pdb_aa_typ,pdb_atom_id,pdb_coords]=read_pdb_pro(pdb_file,options.pdb_mol)`.
+- Lines 89: computes `[pdb_aa_num,pdb_aa_typ,pdb_atom_id,pdb_coords,pdb_ser]` using `[pdb_aa_num,pdb_aa_typ,pdb_atom_id,pdb_coords,pdb_ser]=read_pdb_pro(pdb_file,options.pdb_mol)`.
 - Lines 92: computes `[bmrb_aa_num,bmrb_aa_typ,bmrb_atom_id,bmrb_chemsh]` using `[bmrb_aa_num,bmrb_aa_typ,bmrb_atom_id,bmrb_chemsh]=read_bmrb(bmrb_file)`.
 - Lines 95-96: computes `kill_mask` using `kill_mask=ismember(pdb_atom_id,{'O','OE','OE1','OE2','OD1','OD2','OG','OG1','HG1', 'OG2','OH','HH','SD','SG','OXT','O''','O'''''})`.
 - Lines 97: computes `pdb_aa_num(kill_mask)` using `pdb_aa_num(kill_mask)=[]; pdb_atom_id(kill_mask)=[]`.
@@ -77,7 +77,7 @@ Protein data import function. Parses PDB and BMRB data, runs a J-coupl- ing gues
 - Lines 283: computes `CSAs` using `CSAs=guess_csa_pro(pdb_aa_num,pdb_atom_id,pdb_coords,options)`.
 - Lines 286: computes `isotopes` using `isotopes=cell(1,numel(pdb_atom_id))`.
 - Lines 290: computes `isotopes{n}` using `isotopes{n}='1H'`.
-- Lines 304: computes `subset` using `subset=false(size(pdb_atom_id)); subset(options.select)=true`.
+- Lines 304: computes `subset` using `subset=ismember(pdb_ser,options.select)`, matching PDB atom serial numbers rather than positional indices.
 
 ### Local helper functions
 
@@ -95,9 +95,9 @@ Protein data import function. Parses PDB and BMRB data, runs a J-coupl- ing gues
 - as backbone, but with GLN and ASN side chain
 - amide groups included, 'all' imports every-
 - thing that is assigned in BMRB. If a list of
-- numbers is supplied, spins with those num-
-- bers in the PDB file are imported, but only
-- if they are assigned in the PDB.
+- numbers is supplied, atoms with those serial
+- numbers in the PDB file are imported, but
+- only if they are assigned in the BMRB.
 - options.pdb_mol -the number of molecule if there are multiple
 - molecules in the pdb file
 - options.noshift -'keep' places unassigned atoms between -1 and

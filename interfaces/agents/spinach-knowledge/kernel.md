@@ -255,7 +255,7 @@
 | `kernel/overloads/@rcv/plus.m` | `C=plus(A,B)` | Adds things to RCV sparse matrices. Syntax: C=plus(A,B) Parameters: A -left operand B -right operand Outputs: C -sum A+B | 98 |
 | `kernel/overloads/@rcv/rcv.m` | `obj=rcv(varargin)` | Creates an RCV (row-column-value storage) sparse matrix. Syntax: obj=rcv(M) obj=rcv(dim1,dim2) obj=rcv(R,C,V,dim1,dim2)  | 190 |
 | `kernel/overloads/@rcv/rdivide.m` | `A=rdivide(A,k)` | Divides an RCV sparse matrix by a numeric scalar. Syntax: A=rdivide(A,k) Parameters: A -RCV sparse matrix k -numeric sca | 42 |
-| `kernel/overloads/@rcv/size.m` | `s=size(A,dim)` | Returns the size of an RCV sparse matrix. Syntax: s=size(A,dim) Parameters: A -RCV sparse matrix dim -optional dimension | 61 |
+| `kernel/overloads/@rcv/size.m` | `[s,ncols]=size(A,dim)` | Returns the size of an RCV sparse matrix. Syntax: s=size(A,dim) [s,ncols]=size(A) Parameters: A -RCV sparse matrix dim -optional dimension | 61 |
 | `kernel/overloads/@rcv/sparse.m` | `A=sparse(A)` | Converts an RCV sparse matrix into a Matlab sparse matrix. Syntax: A=sparse(A) Parameters: A -RCV sparse matrix Outputs: | 48 |
 | `kernel/overloads/@rcv/spy.m` | `spy(A)` | Plots the sparsity pattern of an RCV matrix. Syntax: spy(A) Parameters: A -RCV sparse matrix Outputs: produces a sparsit | 50 |
 | `kernel/overloads/@rcv/times.m` | `C=times(A,B)` | Multiplies an RCV sparse matrix by a numeric scalar, in either operand order. Syntax: C=times(A,B) Parameters: A,B -an R | 57 |

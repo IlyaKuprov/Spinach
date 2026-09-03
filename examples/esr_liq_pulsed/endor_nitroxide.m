@@ -48,6 +48,7 @@ spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Plotting
 kfigure(); plot_1d(spin_system,abs(spectrum),parameters);
+kxlabel('Nuclear frequency, MHz');
 
 end
 

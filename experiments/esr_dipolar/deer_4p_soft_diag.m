@@ -32,13 +32,13 @@
 %      parameters.p3_nsteps  - number of third pulse posi-
 %                              tions in the interval between
 %                              the first echo and the fourth
-%                              pulse
+%                              pulse, at least two
 %
 %      parameters.echo_time  - time to sample around the ex-
 %                              pected second echo position
 %
 %      parameters.echo_npts  - number of points in the second
-%                              echo discretization
+%                              echo discretization, at least two
 %
 %      parameters.rho0       - initial state
 %
@@ -246,9 +246,9 @@ if ~isfield(parameters,'p3_nsteps')
     error('number of points in the trace must be specified in parameters.p3_nsteps field.');
 end
 if (~isnumeric(parameters.p3_nsteps))||(~isreal(parameters.p3_nsteps))||...
-   (~isscalar(parameters.p3_nsteps))||(parameters.p3_nsteps<1)||...
+   (~isscalar(parameters.p3_nsteps))||(parameters.p3_nsteps<2)||...
    (mod(parameters.p3_nsteps,1)~=0)
-    error('parameters.p3_nsteps must be a positive real integer.');
+    error('parameters.p3_nsteps must be a real integer greater than one.');
 end
 if ~isfield(parameters,'echo_time')
     error('width of the echo window must be specified in parameters.echo_time field.');
@@ -261,9 +261,9 @@ if ~isfield(parameters,'echo_npts')
     error('number of points in the echo must be specified in parameters.echo_npts field.');
 end
 if (~isnumeric(parameters.echo_npts))||(~isreal(parameters.echo_npts))||...
-   (~isscalar(parameters.echo_npts))||(parameters.echo_npts<1)||...
+   (~isscalar(parameters.echo_npts))||(parameters.echo_npts<2)||...
    (mod(parameters.echo_npts,1)~=0)
-    error('parameters.echo_npts must be a positive real integer.');
+    error('parameters.echo_npts must be a real integer greater than one.');
 end
 if ~isfield(parameters,'method')
     error('shaped pulse simulation method must be specified in parameters.method field.');

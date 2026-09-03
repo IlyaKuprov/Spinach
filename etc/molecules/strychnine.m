@@ -1,7 +1,9 @@
 % Spin system of strychnine. Isotropic chemical shifts and J-couplings
 % are taken from "200 and more NMR experiments: a practical course" by
-% by Berger and Braun. Coordinates taken as those of the major confor-
-% mer of strychnine proposed in http://dx.doi.org/10.1039/C0CC04114A
+% Berger and Braun, except the one-bond C18-H18b coupling, which is
+% taken from http://dx.doi.org/10.1016/j.jmr.2014.02.003. Coordinates
+% taken as those of the major conformer of strychnine proposed in
+% http://dx.doi.org/10.1039/C0CC04114A
 % Syntax:
 %
 %                   [sys,inter]=strychnine(spins)

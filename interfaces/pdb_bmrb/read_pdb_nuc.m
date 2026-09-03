@@ -67,6 +67,9 @@ while ~feof(file_id)
     end
 end
 
+% Close the PDB file
+fclose(file_id);
+
 % Refuse multi-chain files, residue numbers would be ambiguous
 if numel(unique(chain_ids))>1
     error('multiple chains found, the PDB file must contain a single chain.');
@@ -80,9 +83,6 @@ end
 % Make outputs column vectors
 res_num=res_num'; res_typ=res_typ';
 pdb_id=pdb_id'; coords=coords';
-
-% Close the PDB file
-fclose(file_id);
 
 end
 

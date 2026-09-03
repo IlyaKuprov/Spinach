@@ -121,6 +121,11 @@ grumble(L,coil,rho,timestep,nsteps,output);
 % Call Krylov propagation for polyadics
 if isa(L,'polyadic')
 
+    % Refuse integrals of unitary dynamics
+    if strcmp(output,'total')&&strcmp(spin_system.bas.formalism,'zeeman-wavef')
+        error('total observable integral is not defined for unitary wavefunction evolution.');
+    end
+
     % Refuse relaxation-weighted integrals, krylov() has no such case
     if strcmp(output,'total')
         error('total observable integral is not implemented for polyadic Liouvillians, use inflate(L) to materialise it first.');

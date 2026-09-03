@@ -66,7 +66,6 @@ Volumetric 3D plot function for scalar fields. Sign is mapped into colour and am
 - Lines 58: computes `data_cube(data_cube>clip_ranges(1))` using `data_cube(data_cube>clip_ranges(1))=clip_ranges(1)`.
 - Lines 69: computes `data_cube(data_cube<0)` using `data_cube(data_cube<0)=-data_cube(data_cube<0)/min_neg`.
 - Lines 74: computes `data_cube(data_cube<-clip_ranges(2))` using `data_cube(data_cube<-clip_ranges(2))=-clip_ranges(2)`.
-- Lines 82: computes `data_cube(1,1,1)` using `data_cube(1,1,1)=1; data_cube(2,2,2)=-1`.
 - Lines 85: computes `data_cube` using `data_cube=permute(data_cube,[3 2 1])`.
 - Lines 88: computes `nx` using `nx=size(data_cube,3); xmin=axis_ranges(1); xmax=axis_ranges(2)`.
 - Lines 89: computes `ny` using `ny=size(data_cube,2); ymin=axis_ranges(3); ymax=axis_ranges(4)`.

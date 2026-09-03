@@ -16,10 +16,12 @@
 %                     amide groups included, 'all' imports every-
 %                     thing that is assigned in BMRB. If a list of
 %                     numbers is supplied, atoms with those serial
-%                     numbers in the PDB file are imported, and
-%                     every number must be present in the file;
-%                     those without a BMRB assignment are then
-%                     kept or deleted according to options.noshift.
+%                     numbers in the PDB file are imported; every
+%                     number must be present in the file, atoms of
+%                     unsupported types (oxygen, sulphur, OH pro-
+%                     tons) are silently omitted, and those without
+%                     a BMRB assignment are kept or deleted accor-
+%                     ding to options.noshift.
 %
 % options.pdb_mol   - the number of molecule if there are multiple 
 %                     molecules in the pdb file 
@@ -89,6 +91,14 @@ grumble(pdb_file,bmrb_file,options);
 
 % Parse the PDB file
 [pdb_aa_num,pdb_aa_typ,pdb_atom_id,pdb_coords,pdb_ser]=read_pdb_pro(pdb_file,options.pdb_mol);
+
+% Refuse serial numbers absent from the PDB model
+if isnumeric(options.select)
+    missing_ser=setdiff(options.select,pdb_ser);
+    if ~isempty(missing_ser)
+        error(['PDB serial numbers not found in the model: ' num2str(missing_ser(:)')]);
+    end
+end
 
 % Parse the BMRB file
 [bmrb_aa_num,bmrb_aa_typ,bmrb_atom_id,bmrb_chemsh]=read_bmrb(bmrb_file);
@@ -302,12 +312,6 @@ end
 % Process atom selection specification
 if isnumeric(options.select)
     
-    % Refuse serial numbers absent from the importable atoms
-    missing_ser=setdiff(options.select,pdb_ser);
-    if ~isempty(missing_ser)
-        error(['PDB serial numbers not found among importable atoms: ' num2str(missing_ser(:)')]);
-    end
-
     % Import atoms with user-specified PDB serial numbers
     subset=ismember(pdb_ser,options.select);
 

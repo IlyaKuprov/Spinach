@@ -1,8 +1,9 @@
 % Static 14N powder spectrum of glycine (assuming decoupling of
-% 1H and 13C), computed on a spherical grid and compared to the
-% static 14N measurement by O'Dell and Schurko (PCCP 2009, DOI
-% 10.1039/b906114b). Numerical rotating frame transformation is
-% used because 14N quadrupolar interaction is large.
+% 1H and 13C), computed on a spherical grid from CASTEP tensors
+% and compared to a simulation using the quadrupolar parameters
+% measured by O'Dell and Schurko (PCCP 2009, DOI 10.1039/b906114b).
+% Numerical rotating frame transformation is used because 14N
+% quadrupolar interaction is large.
 %
 % Calculation time: seconds.
 %

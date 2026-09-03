@@ -671,7 +671,7 @@ switch spin_system.bas.formalism
                             
                             % Propagate the system
                             for n=1:(nsteps+1)
-                                answer_loc(:,n)=coil_loc'*rho_loc;
+                                answer_loc(:,n,:)=coil_loc'*rho_loc;
                                 rho_loc=P*rho_loc;
                             end
                         

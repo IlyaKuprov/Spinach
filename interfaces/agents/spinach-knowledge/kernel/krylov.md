@@ -117,8 +117,8 @@ Krylov propagation function. Avoids matrix exponentiation, but can be slow. Shou
 
 ## Outputs
 
-- answer -a vector or a matrix, depending on the options set during
-- the call.
+- answer -a vector, a matrix, or a channels-by-time-by-states
+- array, depending on the options set during the call.
 - Note: this function does not support the zeeman-hilb formalism; in
 - zeeman-wavef, L is the Hamiltonian matrix, rho is a wavefunc-
 - tion or a horizontal stack thereof, coil is a reference wave-

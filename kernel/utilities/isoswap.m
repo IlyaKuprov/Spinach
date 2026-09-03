@@ -54,8 +54,8 @@ end
 % Wipe high-rank couplings
 if isfield(inter,'giant')
     for n=spins(:)'
-        if ~isempty(inter.giant.coef{n})
-            inter.giant.coef{n}={}; inter.giant.euler{n}={};
+        if ~isempty(inter.giant.coeff{n})
+            inter.giant.coeff{n}={}; inter.giant.euler{n}={};
             disp(['WARNING: high-rank coupling for spin ' int2str(n) ...
                   ' wiped (not transferable).']);
         end

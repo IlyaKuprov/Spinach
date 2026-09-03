@@ -31,7 +31,6 @@ Volumetric 3D plot function for scalar fields. Sign is mapped into colour and am
 - Lines 65-66: Scale and clip negative values; implemented by `if (~isempty(min_neg))&&(min_neg<0)`.
 - Lines 68-69: Scale the negative values; implemented by `data_cube(data_cube<0)=-data_cube(data_cube<0)/min_neg`.
 - Lines 72-73: Clip the positive values; implemented by `if clip_ranges(2)<1`.
-- Lines 81-82: Add colour calibration spots; implemented by `data_cube(1,1,1)=1; data_cube(2,2,2)=-1`.
 - Lines 84-85: Permute dimensions to match surf/meshgrid convention; implemented by `data_cube=permute(data_cube,[3 2 1])`.
 - Lines 87-88: Determine cube dimensions; implemented by `nx=size(data_cube,3); xmin=axis_ranges(1); xmax=axis_ranges(2)`.
 - Lines 92-93: Clear the figure without the full reset that moves user-positioned windows; implemented by `clf; hold on`.
@@ -39,6 +38,8 @@ Volumetric 3D plot function for scalar fields. Sign is mapped into colour and am
 - Lines 106-107: Draw planes parallel to the XZ plane; implemented by `for n=1:ny`.
 - Lines 115-116: Draw planes parallel to the YZ plane; implemented by `for n=1:nx`.
 - Lines 124-125: Set blue -> white -> red colormap; implemented by `colormap(bwr_cmap())`.
+- Lines 134-135: Pin the colour scale to the sign convention; implemented by `clim([-1 1])`.
+- Lines 137-138: Axis extents do not depend on the plotted geometry; implemented by `axis([xmin xmax ymin ymax zmin zmax]); daspect([1 1 1])`.
 
 ### Control flow inferred from the code
 
@@ -65,7 +66,6 @@ Volumetric 3D plot function for scalar fields. Sign is mapped into colour and am
 - Lines 58: computes `data_cube(data_cube>clip_ranges(1))` using `data_cube(data_cube>clip_ranges(1))=clip_ranges(1)`.
 - Lines 69: computes `data_cube(data_cube<0)` using `data_cube(data_cube<0)=-data_cube(data_cube<0)/min_neg`.
 - Lines 74: computes `data_cube(data_cube<-clip_ranges(2))` using `data_cube(data_cube<-clip_ranges(2))=-clip_ranges(2)`.
-- Lines 82: computes `data_cube(1,1,1)` using `data_cube(1,1,1)=1; data_cube(2,2,2)=-1`.
 - Lines 85: computes `data_cube` using `data_cube=permute(data_cube,[3 2 1])`.
 - Lines 88: computes `nx` using `nx=size(data_cube,3); xmin=axis_ranges(1); xmax=axis_ranges(2)`.
 - Lines 89: computes `ny` using `ny=size(data_cube,2); ymin=axis_ranges(3); ymax=axis_ranges(4)`.

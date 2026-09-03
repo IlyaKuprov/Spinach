@@ -77,7 +77,7 @@ Protein data import function. Parses PDB and BMRB data, runs a J-coupl- ing gues
 - Lines 283: computes `CSAs` using `CSAs=guess_csa_pro(pdb_aa_num,pdb_atom_id,pdb_coords,options)`.
 - Lines 286: computes `isotopes` using `isotopes=cell(1,numel(pdb_atom_id))`.
 - Lines 290: computes `isotopes{n}` using `isotopes{n}='1H'`.
-- Lines 304: computes `subset` using `subset=ismember(pdb_ser,options.select)`, matching PDB atom serial numbers rather than positional indices; any requested serial number absent from the importable atoms raises an error first.
+- Lines 304: computes `subset` using `subset=ismember(pdb_ser,options.select)`, matching PDB atom serial numbers rather than positional indices; a requested serial number absent from the unfiltered PDB model raises an error earlier (lines 96-101), but a serial that is present yet names an atom type excluded by the oxygen/sulphur/terminal-atom kill mask (lines 106-111) is silently omitted from the subset, not an error.
 
 ### Local helper functions
 
@@ -96,10 +96,12 @@ Protein data import function. Parses PDB and BMRB data, runs a J-coupl- ing gues
 - amide groups included, 'all' imports every-
 - thing that is assigned in BMRB. If a list of
 - numbers is supplied, atoms with those serial
-- numbers in the PDB file are imported, and
-- every number must be present in the file;
-- those without a BMRB assignment are then
-- kept or deleted according to options.noshift.
+- numbers in the PDB file are imported; every
+- number must be present in the file, atoms of
+- unsupported types (oxygen, sulphur, OH pro-
+- tons) are silently omitted, and those without
+- a BMRB assignment are kept or deleted accor-
+- ding to options.noshift.
 - options.pdb_mol -the number of molecule if there are multiple
 - molecules in the pdb file
 - options.noshift -'keep' places unassigned atoms between -1 and

@@ -64,10 +64,10 @@ if isfield(parameters,'diff_g_amp')
                          rho,parameters.diff_g_dur);
 end
 
-% Preroll the gradients
-rho=evolution(spin_system,B-parameters.pe_grad_amp*G{1}...
+% Preroll the gradients, phase encoding area rescaled to readout preroll time
+rho=evolution(spin_system,B-parameters.pe_grad_amp*G{1}*(parameters.pe_grad_dur/parameters.ro_grad_dur)...
                            -parameters.ro_grad_amp*G{2},[],rho,...
-                            parameters.pe_grad_dur/2,1,'final');
+                            parameters.ro_grad_dur/2,1,'final');
 
 % Preallocate k-space image
 fid=zeros(parameters.image_size,'like',1i);

@@ -56,7 +56,7 @@ if (~exist('scaling_factor','var'))||isnan(scaling_factor)
 end
 
 % Get amplitude and phase
-A=waveform(:,1)/100; phi=pi*waveform(:,2)/180;
+A=waveform(:,1)/100; phi=unwrap(pi*waveform(:,2)/180);
 
 % Resample amplitude and phase
 A=interp1(linspace(0,1,numel(A)),A,linspace(0,1,npoints),'pchip');

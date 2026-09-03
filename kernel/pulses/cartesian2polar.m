@@ -54,6 +54,9 @@
 %    Dpp  - matrix of second derivatives of the function with respect
 %           to the waveform phases.
 %
+% Note: when second derivatives are requested, x, y, Dx, and Dy
+%       must be row vectors.
+%
 % ilya.kuprov@weizmann.ac.il
 % david.goodwin@inano.au.dk
 %
@@ -88,29 +91,25 @@ end
 
 % Transform second derivatives
 if (nargin>4)&&(nargout>4)
-
-    % Row copies for the outer products below
-    pr=reshape(p,1,[]); xr=reshape(x,1,[]); yr=reshape(y,1,[]);
-    Dxr=reshape(Dx,1,[]); Dyr=reshape(Dy,1,[]);
-
+    
     % Radius, radius
-    Drr=+(cos(pr')*cos(pr)).*Dxx +(sin(pr')*sin(pr)).*Dyy...
-        +(sin(pr')*cos(pr)).*Dyx +(cos(pr')*sin(pr)).*Dxy;
+    Drr=+(cos(p')*cos(p)).*Dxx +(sin(p')*sin(p)).*Dyy...
+        +(sin(p')*cos(p)).*Dyx +(cos(p')*sin(p)).*Dxy;
     
     % Radius, phase
-    Drp=-diag(sin(pr).*Dxr) +diag(cos(pr).*Dyr)...
-        -(cos(pr')*yr).*Dxx +(sin(pr')*xr).*Dyy...
-        -(sin(pr')*yr).*Dyx +(cos(pr')*xr).*Dxy;
+    Drp=-diag(sin(p).*Dx) +diag(cos(p).*Dy)...
+        -(cos(p')*y).*Dxx +(sin(p')*x).*Dyy...
+        -(sin(p')*y).*Dyx +(cos(p')*x).*Dxy;
     
     % Phase, radius
-    Dpr=-diag(sin(pr).*Dxr) +diag(cos(pr).*Dyr)...
-        -(yr'*cos(pr)).*Dxx +(xr'*sin(pr)).*Dyy...
-        +(xr'*cos(pr)).*Dyx -(yr'*sin(pr)).*Dxy;
+    Dpr=-diag(sin(p).*Dx) +diag(cos(p).*Dy)...
+        -(y'*cos(p)).*Dxx +(x'*sin(p)).*Dyy...
+        +(x'*cos(p)).*Dyx -(y'*sin(p)).*Dxy;
     
     % Phase, phase
-    Dpp=-diag(xr.*Dxr) -diag(yr.*Dyr)...
-        +(yr'*yr).*Dxx +(xr'*xr).*Dyy...
-        -(xr'*yr).*Dyx -(yr'*xr).*Dxy;
+    Dpp=-diag(x.*Dx) -diag(y.*Dy)...
+        +(y'*y).*Dxx +(x'*x).*Dyy...
+        -(x'*y).*Dyx -(y'*x).*Dxy;
     
 end
 
@@ -173,6 +172,9 @@ elseif nargin==8
     if (~all(size(x)==size(y)))||(~all(size(y)==size(Dx)))||...
        (~all(size(Dx)==size(Dy)))
         error('all input vectors must have the same dimension.');
+    end
+    if (~isrow(x))||(~isrow(y))||(~isrow(Dx))||(~isrow(Dy))
+        error('x, y, df_dx, and df_dy must be row vectors.');
     end
     if (size(Dxx,2)~=length(Dx))||(size(Dxx,1)~=size(Dxx,2))||...
         (~isequal(size(Dxx),size(Dyy)))||...

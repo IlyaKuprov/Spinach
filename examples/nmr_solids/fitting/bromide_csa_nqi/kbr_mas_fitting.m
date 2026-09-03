@@ -15,7 +15,7 @@ function kbr_mas_fitting()
 
 % Load and normalise the data
 kbr_data=readmatrix('KBr_400MHz_2kHz.txt');
-spec_expt=kbr_data(:,2)/100;
+spec_expt=flipud(kbr_data(:,2))/100;
 
 % Set instrumental variables
 sys.magnet=9.3659;          % magnet field, Tesla

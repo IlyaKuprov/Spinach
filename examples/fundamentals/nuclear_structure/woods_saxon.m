@@ -29,15 +29,19 @@ box_npts=[50 50 50];
 premult=1e-6*1e30*hbar^2/(2*pmass*eV);
 L=premult*fdlap(box_npts,box_sizes,5);
 
-% Potential part
-X=linspace(box_extents(1),box_extents(2),box_npts(1));
-Y=linspace(box_extents(3),box_extents(4),box_npts(2));
-Z=linspace(box_extents(5),box_extents(6),box_npts(3));
+% Potential part on the periodic grid of fdlap
+X=box_extents(1)+(0:(box_npts(1)-1))*box_sizes(1)/box_npts(1);
+Y=box_extents(3)+(0:(box_npts(2)-1))*box_sizes(2)/box_npts(2);
+Z=box_extents(5)+(0:(box_npts(3)-1))*box_sizes(3)/box_npts(3);
 [X,Y,Z]=ndgrid(X,Y,Z); R=sqrt(X.^2+Y.^2+Z.^2);
 V=-V0./(1+exp((R-r_nuc)/a));
 
+% Plot extents ending at the last grid point
+plot_extents=box_extents;
+plot_extents([2 4 6])=box_extents([2 4 6])-box_sizes./box_npts;
+
 % Plot the potential
-kfigure(); volplot(V,box_extents);
+kfigure(); volplot(V,plot_extents);
 ktitle(['Woods-Saxon potential, M=' num2str(mass_number)]);
 kxlabel('X, fm'); kylabel('Y, fm'); kzlabel('Z, fm');
 
@@ -50,7 +54,7 @@ E=diag(E); disp('Energies, MeV:'); disp(E);
 
 % Plot the state
 psi=reshape(real(psi(:,level_number)),box_npts);
-kfigure(); volplot(psi,box_extents);
+kfigure(); volplot(psi,plot_extents);
 ktitle(['Eig ' num2str(level_number) ' ,real part']); 
 kxlabel('X, fm'); kylabel('Y, fm'); kzlabel('Z, fm');
 

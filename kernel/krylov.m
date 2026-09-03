@@ -41,10 +41,10 @@
 %                              less efficient when there are multiple
 %                              destinations to screen against.
 %
-%   coil   - the detection state, used when 'observable' is specified as
-%            the output option. If 'multichannel' is selected, the coil
-%            should contain multiple columns corresponding to individual
-%            observable vectors.
+%   coil   - the detection state, used when 'observable' or 'total' is
+%            specified as the output option. If 'multichannel' is sel-
+%            ected, the coil should contain multiple columns correspon-
+%            ding to individual observable vectors.
 %
 % Outputs:
 %
@@ -198,8 +198,19 @@ switch output
             error('total observable integral is not defined for unitary wavefunction evolution.');
         end
 
+        % Inflate polyadic generators
+        if isa(L,'polyadic'), L=inflate(L); end
+
+        % Find the states that the generator does not touch
+        idle=gather(~(any(L,1)'|any(L,2)));
+
+        % Refuse divergent integrals over stationary states
+        if any(coil(idle,:)'*rho(idle,:),'all')
+            error('the observable has a stationary component, the integral diverges.');
+        end
+
         % Integrate the observable trajectory to infinity
-        answer=full(real(gather(coil'*((1i*L)\rho))));
+        answer=full(real(gather(coil(~idle,:)'*((1i*L(~idle,~idle))\rho(~idle,:)))));
         
     otherwise
         

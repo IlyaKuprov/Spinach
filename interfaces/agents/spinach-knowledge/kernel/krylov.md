@@ -47,7 +47,7 @@ Krylov propagation function. Avoids matrix exponentiation, but can be slow. Shou
 ### Control flow inferred from the code
 
 - Line 74: conditional branch on `ismember('gpu',spin_system.sys.enable)`.
-- Line 85: dispatches on `output`; cases `'final'`, `'trajectory'`, `'refocus'`, `'observable'`, `'multichannel'`.
+- Line 85: dispatches on `output`; cases `'final'`, `'trajectory'`, `'refocus'`, `'observable'`, `'multichannel'`, `'total'`.
 - Line 102: `for` loop over `n=1:nsteps`.
 - Line 111: conditional branch on `(n==nsteps)||(toc(feedback)>1)`.
 - Line 125: `for` loop over `n=2:nsteps`.

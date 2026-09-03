@@ -109,7 +109,7 @@ rho_stack=evolution(spin_system,L,[],rho,parameters.timestep1/2,...
                     parameters.npoints(1)-1,'trajectory');
 
 % Select "+1" coherence
-rho_stack=coherence(spin_system,rho_stack,{{'1H',+1}});
+rho_stack=coherence(spin_system,rho_stack,{{parameters.spins{1},+1}});
 
 % Evolve for the delta period
 rho_stack=evolution(spin_system,L+parameters.g_amp*G{1},[],...
@@ -123,7 +123,7 @@ rho_stack=evolution(spin_system,L+parameters.g_amp*G{1},[],...
                     rho_stack,parameters.delta,1,'final');
 
 % Select "-1" coherence
-rho_stack=coherence(spin_system,rho_stack,{{'1H',-1}});
+rho_stack=coherence(spin_system,rho_stack,{{parameters.spins{1},-1}});
 
 % Apply the 1st pulse of the PSYCHE element
 durations=ones(size(Cx))*parameters.duration/numel(Cx);
@@ -131,14 +131,14 @@ rho_stack=shaped_pulse_xy(spin_system,L+parameters.g_amp*G{1},...
                           {Lx,Ly},{Cx,+Cy},durations,rho_stack,'expv-pwc');
 
 % Select "0" coherence
-rho_stack=coherence(spin_system,rho_stack,{{'1H',0}});
+rho_stack=coherence(spin_system,rho_stack,{{parameters.spins{1},0}});
 
 % Apply the 2nd pulse of the PSYCHE element
 rho_stack=shaped_pulse_xy(spin_system,L+parameters.g_amp*G{1},...
                           {Lx,Ly},{Cx,-Cy},durations,rho_stack,'expv-pwc');
 
 % Select "+1" coherence
-rho_stack=coherence(spin_system,rho_stack,{{'1H',+1}});
+rho_stack=coherence(spin_system,rho_stack,{{parameters.spins{1},+1}});
 
 % Run the second half of the t1 evolution
 rho_stack=evolution(spin_system,L,[],rho_stack,parameters.timestep1/2,...

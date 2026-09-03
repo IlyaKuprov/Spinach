@@ -120,8 +120,21 @@ grumble(L,coil,rho,timestep,nsteps,output);
 
 % Call Krylov propagation for polyadics
 if isa(L,'polyadic')
+
+    % Refuse integrals outside Liouville space
+    if strcmp(output,'total')&&any(strcmp(spin_system.bas.formalism,{'zeeman-wavef','zeeman-hilb'}))
+        error('total observable integral is only defined in Liouville space.');
+    end
+
+    % Refuse relaxation-weighted integrals, krylov() has no such case
+    if strcmp(output,'total')
+        error('total observable integral is not implemented for polyadic Liouvillians, use inflate(L) to materialise it first.');
+    end
+
+    % Forward everything else to the Krylov propagator
     report(spin_system,'polyadic generator received, forwarding to krylov()...');
     answer=krylov(spin_system,L,coil,rho,timestep,nsteps,output); return;
+
 end
 
 % Gather state vectors from GPUs

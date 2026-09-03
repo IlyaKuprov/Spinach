@@ -76,7 +76,7 @@ for m=1:numel(fields)
     spin_system=basis(spin_system,bas);
     
     % Experiment setup
-    parameters.sweep=200*sys.magnet;      % unchanged in ppm
+    parameters.sweep=200*sys.magnet*spin('13C')/(2*pi*1e6);      % unchanged in ppm
     parameters.offset=43.6*sys.magnet*spin('13C')/(2*pi*1e6);
     parameters.rho0=state(spin_system,'L+','13C');
     parameters.coil=state(spin_system,'L+','13C');

@@ -59,6 +59,9 @@ if (~isnumeric(rlx_rate))||(~isscalar(rlx_rate))||...
    (~isreal(rlx_rate))||(~isfinite(rlx_rate))||(rlx_rate<0)
     error('rlx_rate must be a finite non-negative real number.');
 end
+if norm(rho,2)==0
+    error('rho must not be a zero vector.');
+end
 end
 
 % Morality, it could be argued, represents the way that people

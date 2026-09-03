@@ -17,13 +17,18 @@
 %
 %               X, Y, and Z are labelled using the organic
 %               triplet convention |Dzz|>|Dxx|>|Dyy|, under
-%               which D and E have opposite signs, -1/3<=
-%               E/D<=0 (C.P. Poole, H.A. Farach, W.K. Jack-
+%               which D and E have opposite signs, -1/3<
+%               E/D<0 (C.P. Poole, H.A. Farach, W.K. Jack-
 %               son, J. Chem. Phys. 61, 2220 (1974), DOI:
 %               10.1063/1.1682294). Populations quoted in
 %               the transition metal convention |Dzz|>|Dyy|
-%               >|Dxx| with 0<=E/D<=1/3 must have their X
-%               and Y entries swapped before the call.
+%               >|Dxx| with 0<E/D<1/3 must have their X
+%               and Y entries swapped before the call. At
+%               E=0 the X and Y states are degenerate and
+%               at E/D=-1/3 the X and Z states are degene-
+%               rate; the labelling is then undefined and
+%               the degenerate pair must have equal popu-
+%               lations for the result to be meaningful.
 %
 %    Z        - 3x3 Zeeman interaction tensor (Hz/Tesla) in
 %               the laboratory frame of reference; use func- 

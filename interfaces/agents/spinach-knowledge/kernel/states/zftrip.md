@@ -65,7 +65,7 @@ Projection of the zero-field triplet state with user-specified populations of Ca
 - pops -a three-element vector with populations of
 - X, Y, and Z eigenstates of the ZFS tensor
 - at zero magnetic field, order: [pX pY pZ]
-- X, Y, and Z are labelled using the organic triplet convention |Dzz|>|Dxx|>|Dyy|, under which D and E have opposite signs, -1/3<=E/D<=0 (Poole, Farach, Jackson, J. Chem. Phys. 61, 2220 (1974), DOI 10.1063/1.1682294); populations quoted in the transition metal convention |Dzz|>|Dyy|>|Dxx| with 0<=E/D<=1/3 must have X and Y swapped before the call
+- X, Y, and Z are labelled using the organic triplet convention |Dzz|>|Dxx|>|Dyy|, under which D and E have opposite signs, -1/3<E/D<0 (Poole, Farach, Jackson, J. Chem. Phys. 61, 2220 (1974), DOI 10.1063/1.1682294); populations quoted in the transition metal convention |Dzz|>|Dyy|>|Dxx| with 0<E/D<1/3 must have X and Y swapped before the call
 - Z -3x3 Zeeman interaction tensor (Hz/Tesla) in
 - the laboratory frame of reference; use func-
 - tions like axrh2mat() to get it from eigen-
@@ -93,7 +93,7 @@ Projection of the zero-field triplet state with user-specified populations of Ca
 - pops -a three-element vector with populations of
 - X, Y, and Z eigenstates of the ZFS tensor
 - at zero magnetic field, order: [pX pY pZ]
-- X, Y, and Z are labelled using the organic triplet convention |Dzz|>|Dxx|>|Dyy|, under which D and E have opposite signs, -1/3<=E/D<=0 (Poole, Farach, Jackson, J. Chem. Phys. 61, 2220 (1974), DOI 10.1063/1.1682294); populations quoted in the transition metal convention |Dzz|>|Dyy|>|Dxx| with 0<=E/D<=1/3 must have X and Y swapped before the call
+- X, Y, and Z are labelled using the organic triplet convention |Dzz|>|Dxx|>|Dyy|, under which D and E have opposite signs, -1/3<E/D<0 (Poole, Farach, Jackson, J. Chem. Phys. 61, 2220 (1974), DOI 10.1063/1.1682294); populations quoted in the transition metal convention |Dzz|>|Dyy|>|Dxx| with 0<E/D<1/3 must have X and Y swapped before the call
 - Z -3x3 Zeeman interaction tensor (Hz/Tesla) in
 
 ## Internal Spinach / MATLAB structure cues

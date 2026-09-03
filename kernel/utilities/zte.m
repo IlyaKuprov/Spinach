@@ -42,8 +42,11 @@
 
 function projector=zte(spin_system,L,rho,nstates)
 
+% Default is no state count
+if ~exist('nstates','var'), nstates=[]; end
+
 % Validate the input
-grumble(spin_system,L,rho);
+grumble(spin_system,L,rho,nstates);
 
 % Run Zero Track Elimination
 if ismember('zte',spin_system.sys.disable)
@@ -81,7 +84,7 @@ else
     end
     
     % Report to the user
-    if exist('nstates','var')
+    if ~isempty(nstates)
         report(spin_system,['keeping ' num2str(nstates) ' states with the greatest trajectory weight.']); 
     else
         report(spin_system,['dropping states with amplitudes below ' num2str(spin_system.tols.zte_tol)...
@@ -117,13 +120,7 @@ else
     end
     
     % Determine which tracks to drop
-    if exist('nstates','var')
-        
-        % Check the number of states requested
-        if (~isnumeric(nstates))||(~isreal(nstates))||(~isscalar(nstates))||...
-           (nstates<1)||(mod(nstates,1)~=0)||(nstates>numel(rho))
-            error('nstates must be a positive integer not exceeding the state space dimension.');
-        end
+    if ~isempty(nstates)
         
         % Determine state amplitudes
         amplitudes=max(abs(trajectory),[],2);
@@ -154,7 +151,7 @@ end
 end
 
 % Input validation function
-function grumble(spin_system,L,rho)
+function grumble(spin_system,L,rho,nstates)
 if ~ismember(spin_system.bas.formalism,{'zeeman-liouv','sphten-liouv'})
     error('zero track elimination is only available for zeeman-liouv and sphten-liouv formalisms.');
 end
@@ -169,6 +166,10 @@ if size(L,1)~=size(L,2)
 end
 if size(L,2)~=size(rho,1)
     error('Liouvillian and state vector dimensions must be consistent.');
+end
+if (~isempty(nstates))&&((~isnumeric(nstates))||(~isreal(nstates))||(~isscalar(nstates))||...
+                         (nstates<1)||(mod(nstates,1)~=0)||(nstates>numel(rho)))
+    error('nstates must be a positive integer not exceeding the state space dimension.');
 end
 end
 

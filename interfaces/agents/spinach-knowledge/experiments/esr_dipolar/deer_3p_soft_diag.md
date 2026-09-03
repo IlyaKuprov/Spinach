@@ -53,7 +53,7 @@ Complete set of simulations related to three-pulse DEER. Runs pulse diagnostics,
 - Lines 119: computes `[deer_axis_2d,echo_axis_2d]` using `[deer_axis_2d,echo_axis_2d]=meshgrid(deer_axis,echo_axis)`.
 - Lines 127: computes `[deer_echoes,deer_sigmas,deer_traces]` using `[deer_echoes,deer_sigmas,deer_traces]=svd(echo_stack)`.
 - Lines 128: computes `deer_echoes` using `deer_echoes=deer_echoes*deer_sigmas/deer_traces(1)`.
-- Lines 129: computes `deer_traces` using `deer_traces=deer_traces*deer_sigmas/deer_traces(1)`.
+- Lines 129: computes `deer_traces` using `deer_traces=deer_traces*deer_sigmas'/deer_traces(1)`.
 
 ### Local helper functions
 

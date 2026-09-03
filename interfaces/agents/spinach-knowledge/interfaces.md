@@ -16,7 +16,7 @@
 | `interfaces/comsol/comsol_import.m` | `mesh=comsol_import(comsol)` | COMSOL 2D mesh data import, cropping and preprocessing for Spinach. Syntax: mesh=comsol_import(comsol) Parameters: comso | 100 |
 | `interfaces/comsol/comsol_mesh.m` | `mesh=comsol_mesh(file_name)` | Imports ASCII 2D mesh files produced by COMSOL. Syntax: mesh=comsol_mesh(file_name) Parameters: file_name -a character s | 146 |
 | `interfaces/comsol/comsol_velo.m` | `mesh=comsol_velo(mesh,file_name)` | Imports ASCII 2D flow velocity files produced by COMSOL. Syntax: mesh=comsol_velo(mesh,file_name) Parameters: mesh -mesh | 74 |
-| `interfaces/comsol/conc_plot.m` | `conc_plot(spin_system,conc,obs)` | 2D microfluidic concentration plotting function. Uses mesh tessellation information to plot concentrations as vertical b | 199 |
+| `interfaces/comsol/conc_plot.m` | `conc_plot(spin_system,conc,obs)` | 2D microfluidic concentration plotting function. Uses mesh tessellation information to plot concentrations as vertical b | 194 |
 | `interfaces/comsol/mesh_crop.m` | `mesh=mesh_crop(mesh,ranges)` | 2D microfluidic mesh cropping. Updates the mesh object to remove anything outside the user-specified vertex coordi- nate | 109 |
 | `interfaces/comsol/mesh_inact.m` | `mesh=mesh_inact(mesh,vertex_list)` | Marks 2D microfluidic mesh vertices as inactive in hydrodyna- mic and diffusive transport processes. Syntax: mesh=mesh_i | 63 |
 | `interfaces/comsol/mesh_plot.m` | `mesh_plot(spin_system,qscale,nodelabels)` | 2D microfluidic mesh plotting function. Draws the mesh, its Vo- ronoi tessellation, and a quiver plot of velocities. Syn | 101 |

@@ -178,7 +178,7 @@ triples_database={...
 
 % Generic numbers for the backbone (to be replaced with DFT values - Zenawi)
 'C1p_C2p_C3p'   1, 2, 3,  J_CCC;  'C1p_C2p_H2p'   1, 2, 3,  J_CCH;   'C2p_C3p_C4p'  1, 2, 3,  J_CCC;
-'C3p_C4p_H4p'   3, 1, 2,  J_CCH;  'C3p_C4p_C5p'   1, 2, 3,  J_CCC;   'C2p_C3p_H2p'  1, 2, 3,  J_CCH;  
+'C3p_C4p_H4p'   3, 1, 2,  J_CCH;  'C3p_C4p_C5p'   1, 2, 3,  J_CCC;
 'C3p_C4p_H3p'   2, 1, 3,  J_CCH;  'C5p_H5p_H5pp'  2, 1, 3,  J_HCH;   'C1p_C2p_H1p'  3, 1, 2,  J_CCH;
 'C1p_C2p_H2pp'  3, 2, 1,  J_CCH;  'C2p_C3p_H2pp'  3, 1, 2,  J_CCH;  
 

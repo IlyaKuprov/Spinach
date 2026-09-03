@@ -110,6 +110,9 @@ ktitle('$R_1$ map in 3D'); drawnow();
 % Run the simulation
 fid=imaging(spin_system,@epi_3d,parameters);
 
+% For FOV and k-space extent, G{1} is effectively halved
+parameters.pe_grad_amp=parameters.pe_grad_amp/2;
+
 % Plot k-space representation of the slice,
 % the .^(1/4) improves fringe visibility
 kfigure(); scale_figure([2.0 1.0]); subplot(1,2,1);
@@ -121,9 +124,6 @@ fid=apodisation(spin_system,fid,{{'sqsin'},{'sqsin'}});
 
 % Fourier transform
 mri=real(fftshift(fft2(ifftshift(fid))));
-
-% For FOV calculation, G{1} is effectively halved
-parameters.pe_grad_amp=parameters.pe_grad_amp/2;
 
 % Plot real space representation of the slice
 subplot(1,2,2); mri_2d_plot(mri,parameters,'image');

@@ -150,7 +150,7 @@ end
 if (~isnumeric(mguess))||(size(mguess,2)~=3)||(size(mguess,1)~=1)||(~isreal(mguess))
     error('mxyz parameter should be a real row vector with three elements.');
 end
-if (~isnumeric(L))||(~isreal(L))||(~isrow(L))||any(mod(L,1)~=0)||...
+if (~isnumeric(L))||(~isreal(L))||(~isrow(L))||isempty(L)||any(mod(L,1)~=0)||...
    (numel(unique(L))~=numel(L))||any(L<0)||(L(1)~=0)
     error('ranks must be a row of unique non-negative integers starting with 0.');
 end

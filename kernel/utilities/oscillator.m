@@ -16,7 +16,7 @@
 %
 % Outputs:
 %
-%   H_oscl   -   oscillator Hamiltonian, Joules
+%   H_oscl   -   oscillator Hamiltonian, Joules with hbar=1
 %
 %   X_oscl   -   oscillator X operator, m
 %
@@ -24,6 +24,10 @@
 %
 % Note: gravitation is directed along the X axis. Finite difference
 %       derivative operators are used.
+%
+% Note: the reduced Planck constant is set to 1 J*s in the kinetic
+%       energy term, so the Hamiltonian is also the generator of
+%       time evolution in rad/s, as in expm(-1i*H_oscl*t).
 %
 % ilya.kuprov@weizmann.ac.il
 %

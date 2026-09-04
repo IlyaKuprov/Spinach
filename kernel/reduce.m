@@ -200,7 +200,7 @@ switch spin_system.bas.formalism
             
             % Run zero track elimination
             report(spin_system,'attempting zero track elimination...');
-            projectors{1}=zte(spin_system,L,rho);
+            projectors{1}=zte(spin_system,L,rho,[]);
             
         elseif ~isfield(spin_system.bas,'irrep')
             
@@ -209,7 +209,7 @@ switch spin_system.bas.formalism
             
             % Run zero track elimination
             report(spin_system,'attempting zero track elimination...');
-            projectors{1}=zte(spin_system,L,rho);
+            projectors{1}=zte(spin_system,L,rho,[]);
             
         else
             
@@ -256,7 +256,7 @@ switch spin_system.bas.formalism
                 report(spin_system,['irrep #' num2str(n) ', attempting zero track elimination...']);
                 
                 % Run zero track elimination
-                zte_projector=zte(spin_system,projectors{n}'*L*projectors{n},projectors{n}'*rho);
+                zte_projector=zte(spin_system,projectors{n}'*L*projectors{n},projectors{n}'*rho,[]);
                 
                 % Project the projectors
                 projectors{n}=projectors{n}*zte_projector;

@@ -69,7 +69,7 @@ result=test_true(result,'path_trace disabled projector',iscell(projectors)&&issc
 % Check zero-track elimination disabled exit without Krylov propagation
 spin_system.bas.formalism='sphten-liouv';
 spin_system.sys.disable={'zte'};
-projector=zte(spin_system,speye(3),[1;0;0]);
+projector=zte(spin_system,speye(3),[1;0;0],[]);
 result=test_true(result,'zte disabled projector',isequal(projector,1),...
                  'disabled zero-track elimination must return a unit projector placeholder');
 

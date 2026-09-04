@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/pseudocon/g2chi.m`
 - Signature: `chi=g2chi(g,T,S)`
-- Total lines: 64
+- Total lines: 61
 
 ## Purpose
 
@@ -14,7 +14,7 @@ Calculates a high-termperature estimate of the magnetic suscep- tibility tensor 
 
 ## Numerical / algorithmic content
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+- The susceptibility tensor is the Curie law prefactor times the g-tensor Gram matrix `g*g.'`, which follows from the Spinach magnetic moment convention `mu=-mu_b*g*S/hbar` and is valid for non-symmetric g-tensors.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
@@ -24,22 +24,20 @@ Calculates a high-termperature estimate of the magnetic suscep- tibility tensor 
 
 - Lines 25-26: Check consistency; implemented by `grumble(g,T,S)`.
 - Lines 28-29: Fundamental constants; implemented by `mu_b=9.274009994e-24`.
-- Lines 33-34: Diagonalise the g-tensor; implemented by `[V,D]=eig(g)`.
-- Lines 36-37: Apply the Curie law to the eigenvalues; implemented by `D=S*(S+1)*mu_0*(mu_b^2)*(D.^2)/(3*k_b*T)`.
-- Lines 39-40: Compose the susceptibility tensor; implemented by `chi=1e30*V*D*inv(V)`.
+- Lines 33-34: Curie law prefactor; implemented by `prefactor=S*(S+1)*mu_0*(mu_b^2)/(3*k_b*T)`.
+- Lines 36-37: Compose the susceptibility tensor from the g-tensor Gram matrix; implemented by `chi=1e30*prefactor*(g*g.')`.
 
 ### Key state/data transformations
 
 - Lines 29: computes `mu_b` using `mu_b=9.274009994e-24`.
 - Lines 30: computes `mu_0` using `mu_0=4*pi*1e-7`.
 - Lines 31: computes `k_b` using `k_b=1.38064852e-23`.
-- Lines 34: computes `[V,D]` using `[V,D]=eig(g)`.
-- Lines 37: computes `D` using `D=S*(S+1)*mu_0*(mu_b^2)*(D.^2)/(3*k_b*T)`.
-- Lines 40: computes `chi` using `chi=1e30*V*D*inv(V)`.
+- Lines 34: computes `prefactor` using `prefactor=S*(S+1)*mu_0*(mu_b^2)/(3*k_b*T)`.
+- Lines 37: computes `chi` using `chi=1e30*prefactor*(g*g.')`.
 
 ### Local helper functions
 
-- Line 45: `grumble()` — `function grumble(g,T,S)`.
+- Line 42: `grumble()` — `function grumble(g,T,S)`.
   - Representative operation: `if (~isnumeric(g))||(~isreal(g))|| (~ismatrix(g))||any(size(g)~=[3 3])`.
   - Representative operation: `(~ismatrix(g))||any(size(g)~=[3 3])`.
 
@@ -64,10 +62,9 @@ Calculates a high-termperature estimate of the magnetic suscep- tibility tensor 
 - chi -3x3 magnetic susceptibility tensor in cubic Angstrom
 - Check consistency
 - Fundamental constants
-- Diagonalise the g-tensor
-- Apply the Curie law to the eigenvalues
-- Compose the susceptibility tensor
+- Curie law prefactor
+- Compose the susceptibility tensor from the g-tensor Gram matrix
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `grumble()`, `inv()`, `ismatrix()`, `any()`, `isscalar()`.
+- Called routines detected from the main body: `grumble()`, `ismatrix()`, `any()`, `isscalar()`.

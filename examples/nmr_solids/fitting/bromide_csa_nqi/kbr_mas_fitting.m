@@ -39,7 +39,10 @@ options=optimset('Display','iter','MaxIter',5000,'MaxFunEvals',Inf);
 kfigure(); scale_figure([1.75 1.50]);
 
 % Run the optimisation
-fminsearch(@errfun,guess,options);
+best_fit=fminsearch(@errfun,guess,options);
+
+% Plot and print the fitted parameters
+errfun(best_fit);
 
     % Least squares error function
     function err=errfun(params)

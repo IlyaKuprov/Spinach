@@ -26,8 +26,8 @@ A loose implementation of single-nucleon Hamiltonian eigenfunction calculation i
 - Lines 20-21: Nuclear radius; implemented by `r_nuc=r0*mass_number^(1/3)`.
 - Lines 23-24: Simulation box dimensions; implemented by `box_extents=3*[-r_nuc,r_nuc,-r_nuc,r_nuc,-r_nuc,r_nuc]`.
 - Lines 28-29: Laplacian part; implemented by `premult=1e-6*1e30*hbar^2/(2*pmass*eV)`.
-- Lines 32-33: Potential part; implemented by `X=linspace(box_extents(1),box_extents(2),box_npts(1))`.
-- Lines 39-40: Plot the potential; implemented by `kfigure(); volplot(V,box_extents)`.
+- Lines 32-33: Potential part on the periodic grid of fdlap; implemented by `X=box_extents(1)+(0:(box_npts(1)-1))*box_sizes(1)/box_npts(1)`.
+- Lines 39-40: Plot the potential; implemented by `kfigure(); volplot(V,plot_extents)`.
 - Lines 44-45: Assemble the Hamiltonian; implemented by `H=spdiags(V(:),0,prod(box_npts),prod(box_npts))-L`.
 - Lines 47-48: Get the state; implemented by `[psi,E]=eigs(H,level_number,'smallestreal')`.
 - Lines 51-52: Plot the state; implemented by `psi=reshape(real(psi(:,level_number)),box_npts)`.
@@ -49,9 +49,9 @@ A loose implementation of single-nucleon Hamiltonian eigenfunction calculation i
 - Lines 26: computes `box_npts` using `box_npts=[50 50 50]`.
 - Lines 29: computes `premult` using `premult=1e-6*1e30*hbar^2/(2*pmass*eV)`.
 - Lines 30: computes `L` using `L=premult*fdlap(box_npts,box_sizes,5)`.
-- Lines 33: computes `X` using `X=linspace(box_extents(1),box_extents(2),box_npts(1))`.
-- Lines 34: computes `Y` using `Y=linspace(box_extents(3),box_extents(4),box_npts(2))`.
-- Lines 35: computes `Z` using `Z=linspace(box_extents(5),box_extents(6),box_npts(3))`.
+- Lines 33: computes `X` using `X=box_extents(1)+(0:(box_npts(1)-1))*box_sizes(1)/box_npts(1)`.
+- Lines 34: computes `Y` using `Y=box_extents(3)+(0:(box_npts(2)-1))*box_sizes(2)/box_npts(2)`.
+- Lines 35: computes `Z` using `Z=box_extents(5)+(0:(box_npts(3)-1))*box_sizes(3)/box_npts(3)`.
 - Lines 36: computes `[X,Y,Z]` using `[X,Y,Z]=ndgrid(X,Y,Z); R=sqrt(X.^2+Y.^2+Z.^2)`.
 - Lines 37: computes `V` using `V=-V0./(1+exp((R-r_nuc)/a))`.
 - Lines 41: computes `ktitle(['Woods-Saxon potential, M` using `ktitle(['Woods-Saxon potential, M=' num2str(mass_number)])`.

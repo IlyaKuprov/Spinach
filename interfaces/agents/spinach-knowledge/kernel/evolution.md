@@ -116,10 +116,14 @@ Time evolution function. Performs all types of time propagation with automatic t
 - tial state) or a matrix (if starting from a
 - stack of initial states).
 - 'multichannel' -returns the time dynamics of several
-- observables as rows of a matrix. Note
-- that destination state screening may be
-- less efficient when there are multiple
-- destinations to screen against.
+- observables as rows of a matrix (if
+- starting from a single initial state)
+- or as a channels-by-time-by-states
+- array (if starting from a stack of
+- initial states). Note that destination
+- state screening may be less efficient
+- when there are multiple destinations
+- to screen against.
 - coil -the detection state, used when 'observable' is specified as
 - the output option. If 'multichannel' is selected, the coil
 - should contain multiple columns corresponding to individual
@@ -158,8 +162,9 @@ Time evolution function. Performs all types of time propagation with automatic t
 
 ## Outputs
 
-- answer -a vector, a matrix, or a cell array or matrices,
-- depending on the options set during the call
+- answer -a vector, a matrix, a channels-by-time-by-states array,
+- or a cell array of matrices, depending on the options
+- set during the call
 - Calculation of final states and observables in Hilbert space is parallel-
 - ized and tested all the way to 128-core (16 nodes, 8 cores each) configu-
 - rations. Parallelization of the trajectory calculation does not appear to

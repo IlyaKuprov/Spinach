@@ -273,8 +273,16 @@ switch property
         % Compute Y axis extents
         max_val=max(result,[],'all');
         min_val=min(result,[],'all');
-        y_axis_extents=[min_val-0.05*(max_val-min_val) 
-                        max_val+0.05*(max_val-min_val)];
+        if max_val==min_val
+
+            % Pad a flat trajectory so that the axis limits differ
+            pad=max(0.05*abs(max_val),1e-6);
+            y_axis_extents=[max_val-pad max_val+pad];
+
+        else
+            y_axis_extents=[min_val-0.05*(max_val-min_val)
+                            max_val+0.05*(max_val-min_val)];
+        end
 
     otherwise
         

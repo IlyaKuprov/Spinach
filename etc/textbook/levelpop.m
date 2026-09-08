@@ -46,14 +46,14 @@ k_bol=1.380649e-23;          % J/K, exact number
 % Get Pauli matrices
 S=pauli(multipl);
 
-% Build Zeeman Hamiltonian
+% Zeeman Hamiltonian
 H=-mg_ratio*field*S.z; H=full(H);
 
-% Get Boltzmann exponential args
-B=h_bar*diag(H)/(k_bol*temperature);
+% Get fractional energies
+E=h_bar*diag(H)/(k_bol*temperature);
 
 % Preconditioned exp
-P=exp(-B+min(B));
+P=exp(-E+min(E));
 
 % Normalise and diff
 P=P/sum(P); dP=-diff(P);

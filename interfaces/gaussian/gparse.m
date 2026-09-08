@@ -66,8 +66,12 @@
 %        sors of the output=pickett block in the principal axis
 %        frame of the inertia tensor, not in the standard orien-
 %        tation used for everything else. They are rotated here
-%        into the standard orientation using the rotation matrix
-%        that Gaussian prints before them.
+%        into the standard orientation using a rotation fitted
+%        between the principal axis coordinates that Gaussian
+%        prints before them and the current orientation. The
+%        rotation matrix Gaussian prints is not used because it
+%        is an identity matrix in some logs where the principal
+%        axis coordinates are visibly permuted.
 %
 % gareth.charnock@oerc.ox.ac.uk
 % jennifer.handsel@stx.ox.ac.uk
@@ -304,14 +308,19 @@ for n=1:length(g03_output)
        disp('Gaussian import: found isotropic J-couplings.');
    end
    
-   % Read the rotation matrix from the standard orientation into the inertial frame
-   if strcmp(g03_output(n),'Rotation matrix to Principal Axis frame:')
-       abc_rot=zeros(3);
-       for k=1:3
-           row=sscanf(strrep(char(g03_output(n+k+1)),'D','E'),'%f');
-           abc_rot(k,:)=row(2:4);
+   % Fit the rotation from the inertial frame into the current orientation using the printed coordinates
+   if strcmp(g03_output(n),'Principal axis orientation:')
+       k=n+5; abc_geom=zeros(0,3);
+       while ~strcmp(deblank(g03_output(k)),'---------------------------------------------------------------------')
+           S=sscanf(char(g03_output(k)),'%f'); abc_geom(end+1,:)=S((end-2):end)'; k=k+1; %#ok<AGROW>
        end
-       disp('Gaussian import: found the rotation matrix into the inertial frame.');
+       cur_geom=atoms; if size(abc_geom,1)~=size(atoms,1), cur_geom=atoms(atomic_numbers>0,:); end
+       cur_geom=cur_geom-mean(cur_geom,1); abc_geom=abc_geom-mean(abc_geom,1);
+       [U,~,V]=svd(abc_geom'*cur_geom); abc_rot=V*diag([1 1 det(V*U')])*U';
+       if norm(cur_geom-abc_geom*abc_rot','fro')>(1e-3*norm(cur_geom,'fro')+1e-3)
+           error('Gaussian import: inertial frame coordinates do not match the molecule.');
+       end
+       disp('Gaussian import: found the inertial frame orientation.');
    end
 
    % Read spin-rotation couplings and rotate them into the standard orientation

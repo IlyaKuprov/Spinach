@@ -19,12 +19,12 @@ Karplus coefficients extraction from a DFT dihedral angle scan over one of the c
 
 ### Comment-guided execution stages
 
-- Lines 9-10: Run the Karplus fitter; implemented by `[A,B,C,sA,sB,sC]=karplus_fit('.\leu_chi_data',{[31 29 23 24]})`.
+- Lines 9-10: Run the Karplus fitter; implemented by `[A,B,C,sA,sB,sC]=karplus_fit('leu_chi_data',{[31 29 23 24]})`.
 - Lines 12-13: Display the answer; implemented by `disp(['Karplus A: ' num2str(A) ', stdev ' num2str(sA)])`.
 
 ### Key state/data transformations
 
-- Lines 10: computes `[A,B,C,sA,sB,sC]` using `[A,B,C,sA,sB,sC]=karplus_fit('.\leu_chi_data',{[31 29 23 24]})`.
+- Lines 10: computes `[A,B,C,sA,sB,sC]` using `[A,B,C,sA,sB,sC]=karplus_fit('leu_chi_data',{[31 29 23 24]})`.
 
 ## Implementation structure
 

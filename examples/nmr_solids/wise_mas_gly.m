@@ -28,7 +28,7 @@ bas.approximation='IK-0';
 bas.level=3;
 
 % Ignore interactions below 200 Hz
-sys.tols.inter_cutoff=2*pi*200;
+sys.tols.inter_cutoff=200;
 
 % Use GPU arithmetic
 sys.enable={'greedy'}; % 'gpu'

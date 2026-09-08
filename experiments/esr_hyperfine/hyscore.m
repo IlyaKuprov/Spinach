@@ -68,7 +68,7 @@ rho_stack=evolution(spin_system,L,[],rho,1/parameters.sweep,...
 rho_stack=step(spin_system,Lx,rho_stack,pi);
 
 % Propagate coil state backwards in time
-coil=evolution(spin_system,L,[],parameters.coil,-parameters.tau,1,'final');
+coil=evolution(spin_system,L',[],parameters.coil,-parameters.tau,1,'final');
 
 % Apply a backwards pulse on the coil
 coil=step(spin_system,-Lx,coil,pi/2);

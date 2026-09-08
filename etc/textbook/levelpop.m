@@ -49,17 +49,14 @@ S=pauli(multipl);
 % Build Zeeman Hamiltonian
 H=-mg_ratio*field*S.z; H=full(H);
 
-% Get the energies
-E=h_bar*diag(H)/(k_bol*temperature);
+% Get Boltzmann exponential args
+B=h_bar*diag(H)/(k_bol*temperature);
 
-% Get the populations, shifted to avoid exp() overflow
-P=exp(-E+min(E));
+% Preconditioned exp
+P=exp(-B+min(B));
 
-% Normalise populations
-P=P/sum(P);
-
-% Population differences
-dP=-diff(P);
+% Normalise and diff
+P=P/sum(P); dP=-diff(P);
 
 end
 

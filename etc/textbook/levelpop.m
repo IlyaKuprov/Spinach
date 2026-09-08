@@ -49,17 +49,14 @@ S=pauli(multipl);
 % Build Zeeman Hamiltonian
 H=-mg_ratio*field*S.z; H=full(H);
 
-% Get the energies
+% Get fractional energies
 E=h_bar*diag(H)/(k_bol*temperature);
 
-% Get the populations
-P=exp(-h_bar*diag(H)/(k_bol*temperature));
+% Preconditioned exp
+P=exp(-E+min(E));
 
-% Normalise populations
-P=P/sum(P);
-
-% Population differences
-dP=-diff(P);
+% Normalise and diff
+P=P/sum(P); dP=-diff(P);
 
 end
 

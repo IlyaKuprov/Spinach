@@ -62,6 +62,13 @@
 %        tensors returned are the ones that enter the spin
 %        Hamiltonian as S*A*I, in agreement with oparse.m
 %
+%        Gaussian prints the spin-rotation and quadrupole ten-
+%        sors of the output=pickett block in the principal axis
+%        frame of the inertia tensor, not in the standard orien-
+%        tation used for everything else. They are rotated here
+%        into the standard orientation using the rotation matrix
+%        that Gaussian prints before them.
+%
 % gareth.charnock@oerc.ox.ac.uk
 % jennifer.handsel@stx.ox.ac.uk
 % janm@umbc.edu
@@ -297,7 +304,17 @@ for n=1:length(g03_output)
        disp('Gaussian import: found isotropic J-couplings.');
    end
    
-   % Read spin-rotation couplings
+   % Read the rotation matrix from the standard orientation into the inertial frame
+   if strcmp(g03_output(n),'Rotation matrix to Principal Axis frame:')
+       abc_rot=zeros(3);
+       for k=1:3
+           row=sscanf(strrep(char(g03_output(n+k+1)),'D','E'),'%f');
+           abc_rot(k,:)=row(2:4);
+       end
+       disp('Gaussian import: found the rotation matrix into the inertial frame.');
+   end
+
+   % Read spin-rotation couplings and rotate them into the standard orientation
    if strcmp(g03_output(n),'nuclear spin - molecular rotation tensor [C] (MHz):')
        props.srt=cell(natoms,1);
        for k=1:natoms
@@ -307,22 +324,24 @@ for n=1:length(g03_output)
            props.srt{atom_num}=[eval(['[' line1(4:14) '     ' line1(21:31) '     ' line1(38:48) ']']);
                                 eval(['[' line2(4:14) '     ' line2(21:31) '     ' line2(38:48) ']']);
                                 eval(['[' line3(4:14) '     ' line3(21:31) '     ' line3(38:48) ']'])]*1e6;
+           props.srt{atom_num}=abc_rot*props.srt{atom_num}*abc_rot';
            if strcmp(g03_output(n+4*k+1),'Dipole moment (Debye):'), break; end
            if strcmp(g03_output(n+4*k+1),'Nuclear quadrupole coupling constants [Chi] (MHz):'), break; end
        end
        disp('Gaussian import: found nuclear spin-rotation tensors.');
    end
    
-   % Read quadrupole couplings and kill their trace
+   % Read quadrupole couplings, rotate them into the standard orientation, and kill their trace
    if strcmp(g03_output(n),'Nuclear quadrupole coupling constants [Chi] (MHz):')
        props.nqi=cell(natoms,1);
        for k=1:natoms
-           line3=char(g03_output(n+4*k));   line2=char(g03_output(n+4*k-1)); 
+           line3=char(g03_output(n+4*k));   line2=char(g03_output(n+4*k-1));
            line1=char(g03_output(n+4*k-2)); line0=char(g03_output(n+4*k-3));
            atom_num=regexp(line0,'^[0-9]*','match'); atom_num=eval(atom_num{1});
            props.nqi{atom_num}=[eval(['[' line1(4:14) '     ' line1(21:31) '     ' line1(38:48) ']']);
                                 eval(['[' line2(4:14) '     ' line2(21:31) '     ' line2(38:48) ']']);
                                 eval(['[' line3(4:14) '     ' line3(21:31) '     ' line3(38:48) ']'])]*1e6;
+           props.nqi{atom_num}=abc_rot*props.nqi{atom_num}*abc_rot';
            props.nqi{atom_num}=props.nqi{atom_num}-eye(3)*trace(props.nqi{atom_num})/3;
            if strcmp(g03_output(n+4*k+1),'Dipole moment (Debye):'), break; end
        end

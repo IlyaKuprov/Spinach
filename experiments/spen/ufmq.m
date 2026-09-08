@@ -34,7 +34,7 @@
 %
 % parameters.chirptype      can be 'wurst' or 'smoothed'
 %
-% parameters.smfactor       smoothing factor for the pulse
+% parameters.nWURST         chirp pulse smoothing parameter
 %
 % Outputs:
 %

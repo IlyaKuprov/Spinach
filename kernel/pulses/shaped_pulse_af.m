@@ -257,8 +257,8 @@ end
 % Consistency enforcement
 function grumble(spin_system,L0,Lx,Ly,rho,rf_frq_list,rf_amp_list,...
                  rf_dur_list,rf_phi,max_rank,method)
-if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})
-    error('this function is only applicable in Liouville space.');
+if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv','zeeman-wavef'})
+    error('this function requires a state vector based formalism.');
 end
 if (~isnumeric(L0))||(~isnumeric(Lx))||(~isnumeric(Ly))||...
     (size(L0,1)~=size(L0,2))||(size(Lx,1)~=size(Lx,2))||...

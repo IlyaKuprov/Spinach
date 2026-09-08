@@ -28,10 +28,10 @@ Rotor-synchronous MQMAS pulse sequence. Syntax: fid=mqmas(spin_system,parameters
 - Lines 53-54: Apply the decoupling; implemented by `[L,parameters.rho0]=decouple(spin_system,L,parameters.rho0,parameters.decouple)`.
 - Lines 56-58: Run the first pulse; implemented by `rho=step(spin_system,L+parameters.pulse_amp(1)*Lx, parameters.rho0,parameters.pulse_dur(1))`.
 - Lines 60-61: Do the coherence selection; implemented by `rho=coherence(spin_system,rho,{{parameters.spins{1},parameters.mq_order}})`.
-- Lines 63-65: Run the indirect dimension evolution; implemented by `rho_stack=evolution(spin_system,L,[],rho,1/parameters.rate, parameters.npoints(1)-1,'trajectory')`.
+- Lines 63-65: Run the indirect dimension evolution; implemented by `rho_stack=evolution(spin_system,L,[],rho,1/abs(parameters.rate), parameters.npoints(1)-1,'trajectory')`.
 - Lines 67-69: Run the second pulse; implemented by `rho_stack=step(spin_system,L+parameters.pulse_amp(2)*Lx, rho_stack,parameters.pulse_dur(2))`.
 - Lines 71-72: Do the coherence selection; implemented by `rho_stack=coherence(spin_system,rho_stack,{{parameters.spins{1},+1}})`.
-- Lines 74-76: Run the direct dimension evolution; implemented by `fid=evolution(spin_system,L,parameters.coil,rho_stack,1/parameters.rate, parameters.npoints(2)-1,'observable')`.
+- Lines 74-76: Run the direct dimension evolution; implemented by `fid=evolution(spin_system,L,parameters.coil,rho_stack,1/abs(parameters.rate), parameters.npoints(2)-1,'observable')`.
 
 ### Key state/data transformations
 
@@ -40,8 +40,8 @@ Rotor-synchronous MQMAS pulse sequence. Syntax: fid=mqmas(spin_system,parameters
 - Lines 51: computes `Lx` using `Lx=(Lp+Lp')/2; Lx=kron(speye(parameters.spc_dim),Lx)`.
 - Lines 54: computes `[L,parameters.rho0]` using `[L,parameters.rho0]=decouple(spin_system,L,parameters.rho0,parameters.decouple)`.
 - Lines 57-58: computes `rho` using `rho=step(spin_system,L+parameters.pulse_amp(1)*Lx, parameters.rho0,parameters.pulse_dur(1))`.
-- Lines 64-65: computes `rho_stack` using `rho_stack=evolution(spin_system,L,[],rho,1/parameters.rate, parameters.npoints(1)-1,'trajectory')`.
-- Lines 75-76: computes `fid` using `fid=evolution(spin_system,L,parameters.coil,rho_stack,1/parameters.rate, parameters.npoints(2)-1,'observable')`.
+- Lines 64-65: computes `rho_stack` using `rho_stack=evolution(spin_system,L,[],rho,1/abs(parameters.rate), parameters.npoints(1)-1,'trajectory')`.
+- Lines 75-76: computes `fid` using `fid=evolution(spin_system,L,parameters.coil,rho_stack,1/abs(parameters.rate), parameters.npoints(2)-1,'observable')`.
 
 ### Local helper functions
 
@@ -67,10 +67,11 @@ Rotor-synchronous MQMAS pulse sequence. Syntax: fid=mqmas(spin_system,parameters
 
 ## Header notes
 
-- parameters.sweep should be a two-element vector
-- with both elements set equal to parameters.rate,
-- this is because this pulse sequence is strobo-
-- scopic with respect to the rotor period
+- parameters.sweep should be a positive real scalar
+- equal to abs(parameters.rate), this is because
+- this pulse sequence is stroboscopic with respect
+- to the rotor period; both dimensions are sampled
+- at that sweep width
 
 ## Implementation structure
 

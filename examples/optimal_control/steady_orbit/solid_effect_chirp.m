@@ -62,12 +62,14 @@ Ey=operator(spin_system,'Ly','E');
 % Get electron offset operator
 Ez=operator(spin_system,'Lz','E');
 
-% Initial state, ignored by the steady state module, but set to thermodynamic equilibrium for when that option is off
+% Initial state (ignored by the steady state module)
 H=hamiltonian(assume(spin_system,'labframe'),'left');
 rho_init=equilibrium(spin_system,H);
 
-% Target state is nuclear magnetisation, relative to the thermal equilibrium
+% Target state is nuclear magnetisation
 rho_targ=state(spin_system,'Lz','1H');
+
+% Relative to the thermal equilibrium
 thermal=real(rho_targ'*rho_init);
 rho_targ=rho_targ/thermal;
 

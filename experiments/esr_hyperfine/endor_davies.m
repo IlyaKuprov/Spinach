@@ -88,9 +88,10 @@ Ex=(Ep+Ep')/2; Ey=(Ep-Ep')/2i;
 Np=operator(spin_system,'L+',parameters.spins{2});
 Nx=(Np+Np')/2; Ny=(Np-Np')/2i;
 
-% Soft pulse frequencies
+% Nuclei are in the lab frame; also apply the offsets
 parameters.e_frq=parameters.e_frq-parameters.offset(1);
-parameters.n_frq=parameters.n_frq+spin(parameters.spins{2})*spin_system.inter.magnet/(2*pi);
+parameters.n_frq=parameters.n_frq-parameters.offset(2)+...
+                 spin(parameters.spins{2})*spin_system.inter.magnet/(2*pi);
 
 % Pi pulse on the electron
 rho0=shaped_pulse_af(spin_system,L,Ex,Ey,parameters.rho0, parameters.e_frq,...

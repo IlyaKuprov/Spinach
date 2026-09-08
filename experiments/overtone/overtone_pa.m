@@ -76,7 +76,7 @@ switch parameters.method
         
         % Get the pulse Hamiltonian
         pulseop=parameters.rf_pwr*Lx;
-        pulseop=average(spin_system,pulseop/2,H,pulseop/2,omega,'matrix_log');
+        pulseop=average(spin_system,pulseop/2,H+1i*R+1i*K,pulseop/2,omega,'matrix_log');
 
         % Apply the pulse
         parameters.rho0=propagator(spin_system,pulseop,parameters.rf_dur)*parameters.rho0;
@@ -87,7 +87,7 @@ switch parameters.method
         pulse_frq=ovt_frq-parameters.rf_frq;
 
         % Apply the pulse
-        parameters.rho0=shaped_pulse_af(spin_system,H,Lx,0*Lx,parameters.rho0,pulse_frq,...
+        parameters.rho0=shaped_pulse_af(spin_system,H+1i*R+1i*K,Lx,0*Lx,parameters.rho0,pulse_frq,...
                                         parameters.rf_pwr,parameters.rf_dur,-pi/2,2,'expm');
         
 end

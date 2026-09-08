@@ -46,7 +46,7 @@ k_bol=1.380649e-23;          % J/K, exact number
 % Get Pauli matrices
 S=pauli(multipl);
 
-% Zeeman Hamiltonian
+% Get Zeeman Hamiltonian
 H=-mg_ratio*field*S.z; H=full(H);
 
 % Get fractional energies

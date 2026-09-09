@@ -45,6 +45,12 @@ function projector=zte(spin_system,L,rho,nstates)
 % Validate the input
 grumble(spin_system,L,rho);
 
+% Validate the number of states if it is specified
+if exist('nstates','var')&&((~isnumeric(nstates))||(~isreal(nstates))||(~isscalar(nstates))||...
+                            (nstates<1)||(mod(nstates,1)~=0)||(nstates>numel(rho)))
+    error('nstates must be a positive integer not exceeding the state space dimension.');
+end
+
 % Run Zero Track Elimination
 if ismember('zte',spin_system.sys.disable)
     

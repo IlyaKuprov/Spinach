@@ -1,12 +1,12 @@
 # interfaces/pdb_bmrb/read_pdb_pro.m
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/pdb_bmrb/read_pdb_pro.m`
-- Signature: `[aa_num,aa_typ,pdb_id,coords]=read_pdb_pro(pdb_file_name,mod_id)`
-- Total lines: 109
+- Signature: `[aa_num,aa_typ,pdb_id,coords,pdb_ser]=read_pdb_pro(pdb_file_name,mod_id)`
+- Total lines: 113
 
 ## Purpose
 
-Reads the a PDB file and returns amino acid numbers, amino acid types, PDB atom identifiers and Cartesian coordinates. Syntax: [aa_num,aa_typ,pdb_id,coords]=read_pdb_pro(pdb_file_name,instance)
+Reads the a PDB file and returns amino acid numbers, amino acid types, PDB atom identifiers and Cartesian coordinates. Syntax: [aa_num,aa_typ,pdb_id,coords,pdb_ser]=read_pdb_pro(pdb_file_name,mod_id)
 
 ## Physical / mathematical content
 
@@ -21,14 +21,14 @@ Reads the a PDB file and returns amino acid numbers, amino acid types, PDB atom 
 
 ### Comment-guided execution stages
 
-- Lines 35-36: Check consistency; implemented by `grumble(pdb_file_name,mod_id)`.
-- Lines 38-39: Open the PDB file; implemented by `file_id=fopen(pdb_file_name,'r')`.
-- Lines 41-42: Scroll to the selected structure; implemented by `while ~feof(file_id)`.
-- Lines 49-50: Get the outputs started; implemented by `aa_num=[]; aa_typ={}`.
-- Lines 53-54: Parse the PDB file; implemented by `while ~feof(file_id)`.
-- Lines 68-69: Capitalize amino acid type specifications; implemented by `for n=1:numel(aa_typ)`.
-- Lines 73-74: Make outputs column vectors; implemented by `aa_num=aa_num'; aa_typ=aa_typ'`.
-- Lines 77-78: Close the PDB file; implemented by `fclose(file_id)`.
+- Lines 38-39: Check consistency; implemented by `grumble(pdb_file_name,mod_id)`.
+- Lines 41-42: Open the PDB file; implemented by `file_id=fopen(pdb_file_name,'r')`.
+- Lines 44-45: Scroll to the selected structure; implemented by `while ~feof(file_id)`.
+- Lines 52-53: Get the outputs started; implemented by `aa_num=[]; aa_typ={}`.
+- Lines 56-57: Parse the PDB file; implemented by `while ~feof(file_id)`.
+- Lines 72-73: Capitalize amino acid type specifications; implemented by `for n=1:numel(aa_typ)`.
+- Lines 77-78: Make outputs column vectors; implemented by `aa_num=aa_num'; aa_typ=aa_typ'`.
+- Lines 81-82: Close the PDB file; implemented by `fclose(file_id)`.
 
 ### Control flow inferred from the code
 
@@ -42,16 +42,17 @@ Reads the a PDB file and returns amino acid numbers, amino acid types, PDB atom 
 
 ### Key state/data transformations
 
-- Lines 39: computes `file_id` using `file_id=fopen(pdb_file_name,'r')`.
-- Lines 43: computes `parsed_string` using `parsed_string=textscan(fgetl(file_id),'MODEL %d','delimiter',' ','MultipleDelimsAsOne',1)`.
-- Lines 50: computes `aa_num` using `aa_num=[]; aa_typ={}`.
-- Lines 51: computes `pdb_id` using `pdb_id={}; coords={}`.
-- Lines 55: computes `data_line` using `data_line=fgetl(file_id)`.
-- Lines 60: computes `aa_num(end+1)` using `aa_num(end+1)=parsed_string{5}`.
-- Lines 61: computes `aa_typ{end+1}` using `aa_typ{end+1}=parsed_string{3}{1}`.
-- Lines 62: computes `pdb_id{end+1}` using `pdb_id{end+1}=parsed_string{2}{1}`.
-- Lines 63: computes `coords{end+1}` using `coords{end+1}=[parsed_string{6:8}]`.
-- Lines 70: computes `aa_typ{n}` using `aa_typ{n}=upper(aa_typ{n})`.
+- Lines 42: computes `file_id` using `file_id=fopen(pdb_file_name,'r')`.
+- Lines 46: computes `parsed_string` using `parsed_string=textscan(fgetl(file_id),'MODEL %d','delimiter',' ','MultipleDelimsAsOne',1)`.
+- Lines 53: computes `aa_num` using `aa_num=[]; aa_typ={}`.
+- Lines 54: computes `pdb_id` using `pdb_id={}; coords={}; pdb_ser=[]`.
+- Lines 58: computes `data_line` using `data_line=fgetl(file_id)`.
+- Lines 63: computes `aa_num(end+1)` using `aa_num(end+1)=parsed_string{5}`.
+- Lines 64: computes `aa_typ{end+1}` using `aa_typ{end+1}=parsed_string{3}{1}`.
+- Lines 65: computes `pdb_id{end+1}` using `pdb_id{end+1}=parsed_string{2}{1}`.
+- Lines 66: computes `coords{end+1}` using `coords{end+1}=[parsed_string{6:8}]`.
+- Lines 67: computes `pdb_ser(end+1)` using `pdb_ser(end+1)=parsed_string{1}`.
+- Lines 74: computes `aa_typ{n}` using `aa_typ{n}=upper(aa_typ{n})`.
 
 ### Local helper functions
 
@@ -77,12 +78,14 @@ Reads the a PDB file and returns amino acid numbers, amino acid types, PDB atom 
 - type to which each spin belongs (e.g. 'HE2')
 - coords -nspins x 1 cell array of 3-vectors giving
 - Cartesian coordinates of each spin in Angstrom
+- pdb_ser -nspins x 1 vector giving the PDB atom serial
+- number of each spin
 
 ## Implementation structure
 
 - Reads the a PDB file and returns amino acid numbers, amino acid types,
 - PDB atom identifiers and Cartesian coordinates. Syntax:
-- [aa_num,aa_typ,pdb_id,coords]=read_pdb_pro(pdb_file_name,instance)
+- [aa_num,aa_typ,pdb_id,coords,pdb_ser]=read_pdb_pro(pdb_file_name,mod_id)
 - pdb_file_name -a character string with the file name
 - mod_id -the number of model that should be
 - read from the pdb file

@@ -975,9 +975,6 @@ function grumble(L,coil,rho,timestep,nsteps,output)
 if ~isnumeric(L)
     error('Liouvillian must be numeric.');
 end
-if isa(L,'polyadic')&&strcmp(output,'total')
-    error('total observable integral is not available for polyadic generators.');
-end
 if ~isnumeric(coil)
     error('coil argument must be numeric.');
 end
@@ -993,6 +990,9 @@ end
 if (~ischar(output))||(~ismember(output,{'observable','final',...
    'trajectory','total','multichannel','refocus'}))
     error('observable argument must be a valid character string.');
+end
+if isa(L,'polyadic')&&strcmp(output,'total')
+    error('total observable integral is not available for polyadic generators.');
 end
 end
 

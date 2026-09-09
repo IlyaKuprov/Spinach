@@ -156,7 +156,7 @@ triples_database={...
     
 % Backbone data from the literature
 'C4p_C5p_H5p'  1, 2, 3,  -5.5;   'C4p_C5p_H5pp'  1, 2, 3,   2.0;   'C4p_C5p_H4p' 3, 1, 2,  5.5;
-'C2p_C3p_H3p'  1, 2, 3,  2.3;   'C2p_C3p_H2p'   2, 1, 3,   2.3;  
+'C2p_C3p_H3p'  1, 2, 3,  2.3;   'C2p_C3p_H2p'   2, 1, 3,   -2.3;  
 
 % Conjugated ring data from the literature
 'C4_C5_C6'     1, 2, 3,   9.5;   'C4_C8_N9'      1, 3, 2,   8.0;   'C2_C4_N3'    1, 3, 2,  10.0;

@@ -43,8 +43,8 @@ if sparse_path
     
 else
     
-    % Run full matrix addition
-    S=zeros(size(A{1}));
+    % Run full matrix addition, preserving the class of the input
+    S=zeros(size(A{1}),class(A{1}));
     for n=1:numel(A)
         S=S+A{n};
     end

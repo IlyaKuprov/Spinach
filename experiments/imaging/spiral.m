@@ -9,7 +9,7 @@
 %
 %      parameters.t_echo      - echo time, seconds
 %
-%      parameters.spiral_frq  - frequency of the spiral, Hz
+%      parameters.spiral_frq  - angular frequency of the spiral, rad/s
 %
 %      parameters.spiral_dur  - duration of the spiral, seconds
 %

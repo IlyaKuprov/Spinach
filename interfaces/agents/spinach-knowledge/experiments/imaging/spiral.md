@@ -77,7 +77,7 @@
 ## Parameters / inputs
 
 - parameters.t_echo -echo time, seconds
-- parameters.spiral_frq -frequency of the spiral, Hz
+- parameters.spiral_frq -angular frequency of the spiral, rad/s
 - parameters.spiral_dur -duration of the spiral, seconds
 - parameters.grad_amp -gradient amplitude at the end
 - of the spiral, T/m
@@ -97,7 +97,7 @@
 - This sequence must be called from the imaging() context, which
 - would provide H,R,K,G, and F.
 - parameters.t_echo -echo time, seconds
-- parameters.spiral_frq -frequency of the spiral, Hz
+- parameters.spiral_frq -angular frequency of the spiral, rad/s
 - parameters.spiral_dur -duration of the spiral, seconds
 - parameters.grad_amp -gradient amplitude at the end
 - of the spiral, T/m

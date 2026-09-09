@@ -32,10 +32,10 @@ Contour plotting utility with non-linear adaptive contour spacing. The function 
 - Lines 102-103: Accommodate homonuclear 2D sequences; implemented by `if isscalar(parameters.spins)`.
 - Lines 113-114: Build axes and apply offsets; implemented by `axis_f1=ft_axis(parameters.offset(1),parameters.sweep(1),size(spectrum,2))`.
 - Lines 117-118: Convert the units; implemented by `switch parameters.axis_units`.
-- Lines 149-150: Plot the spectrum; implemented by `spectrum=transpose(spectrum)`.
+- Lines 149-150: Plot the spectrum, or say that there is nothing to plot; implemented by `spectrum=transpose(spectrum)` followed by `contour(...)` for a non-zero spectrum, and by `xlim`, `ylim` and a centred `text(...,'all-zero spectrum',...)` when `nnz(spectrum)` is zero.
 - Lines 154-155: Invert the axes; implemented by `set(gca,'XDir','reverse','YDir','reverse')`.
 - Lines 157-158: Label the axes; implemented by `kxlabel(axis_f2_label); kylabel(axis_f1_label)`.
-- Lines 160-161: Colour the contours; implemented by `if any(positive_contours)&&any(negative_contours)`.
+- Lines 160-161: Colour the contours; implemented by `if any(positive_contours)&&any(negative_contours)`. An all-zero spectrum returns before this stage, since it has no contours to colour.
 - Lines 178-179: Draw the color bar; implemented by `if ~ismember('colorbar',spin_system.sys.disable)`.
 
 ### Control flow inferred from the code

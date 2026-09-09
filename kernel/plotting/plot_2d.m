@@ -52,6 +52,11 @@
 %        spectrum         - 2D spectrum array for external 
 %                           plotting utilities
 %
+% An all-zero spectrum has no contours; an empty set of axes with the
+% correct ranges is drawn instead, carrying the words "all-zero spec-
+% trum" in the centre. This also covers the real part of a purely im-
+% aginary spectrum, both parts of which are plotted side by side.
+%
 % Note: the following functions are used to compute contour levels:
 %
 %  cont_levs_pos=delta(2)*smax*linspace(0,1,ncont).^k+smax*delta(1);
@@ -146,9 +151,18 @@ switch parameters.axis_units
         error('unknown axis units.');
 end
 
-% Plot the spectrum
+% Plot the spectrum, or say that there is nothing to plot
 spectrum=transpose(spectrum);
-contour(axis_f2,axis_f1,spectrum,contours);
+if nnz(spectrum)
+    contour(axis_f2,axis_f1,spectrum,contours);
+else
+
+    % Newplot does not clear a colour bar left over from axes reuse
+    colorbar(gca,'off');
+    newplot; xlim([min(axis_f2) max(axis_f2)]); ylim([min(axis_f1) max(axis_f1)]);
+    text(mean(axis_f2),mean(axis_f1),'all-zero spectrum',...
+         'HorizontalAlignment','center','VerticalAlignment','middle');
+end
 box on; kgrid; axis square;
 
 % Invert the axes
@@ -156,6 +170,9 @@ set(gca,'XDir','reverse','YDir','reverse');
 
 % Label the axes
 kxlabel(axis_f2_label); kylabel(axis_f1_label);
+
+% An all-zero spectrum has no contours to colour
+if ~nnz(spectrum), return; end
 
 % Colour the contours
 if any(positive_contours)&&any(negative_contours)

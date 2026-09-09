@@ -65,10 +65,13 @@ pairs_database={...
 'C6_N1'    , -7.5;     'C4_N3'    , -10.7;    'C4_C5'    , 65.0;   'C5_H5'    , 176;  
 'C8_H8'    , 216.0;   'C6_H6'    , 185.0;   'C5_C6'    , 67.0;   'C2_N3'    , -19.0;  
 'C2_N1'    , -19.0;    'C4_N9'    , -20.0;    'H41_N4'   , -86.0;   'C4_N4'    , -20.0;
-'C8_N9'    , -11.0;    'C1p_H1p'  , 170.0;   'H42_N4'   , -86.0;    
+'C8_N9'    , -11.0;    'C1p_H1p'  , 170.0;   'H42_N4'   , -86.0;
+
+% Pyridine-type N7 bonds, small and positive (B3LYP/pcJ-2, 9-methyladenine and 9-methylguanine)
+'C5_N7'    , 1.9;     'C8_N7'    , 0.4;
 
 % Generics for the conjugated ring (to be replaced with DFT values - Zenawi)
-'C2_H2'    , J_CH;    'C5_N7'    , J_CN;    'C8_N7'    , J_CN;   'C6_N6'    , J_CN;
+'C2_H2'    , J_CH;    'C6_N6'    , J_CN;
 'H61_N6'   , J_NH;    'H62_N6'   , J_NH;    'C2_N2'    , J_CN;   'H21_N2'   , J_NH;
 'H22_N2'   , J_NH;
 

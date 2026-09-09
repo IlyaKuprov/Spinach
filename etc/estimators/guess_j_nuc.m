@@ -55,17 +55,17 @@ end
 subgraphs=dfpt(sparse(proxmatrix),2);
 
 % Set generic coupling values
-J_NH=86.0; J_CN=20.0; J_CH=180.0; J_CC=65.0;
+J_NH=-86.0; J_CN=-20.0; J_CH=180.0; J_CC=65.0;
 
 % Spec all ordered connected pairs
 pairs_database={...
 
 % RNA specific values from the literature
-'C1p_N9'   , 11.0;    'C1p_N1'   , 12.0;    'H1_N1'    , 95.0;   'H3_N3'    , 91.0;   
-'C6_N1'    , 7.5;     'C4_N3'    , 10.7;    'C4_C5'    , 65.0;   'C5_H5'    , 176;  
-'C8_H8'    , 216.0;   'C6_H6'    , 185.0;   'C5_C6'    , 67.0;   'C2_N3'    , 19.0;  
-'C2_N1'    , 19.0;    'C4_N9'    , 20.0;    'H41_N4'   , 86.0;   'C4_N4'    , 20.0;
-'C8_N9'    , 11.0;    'C1p_H1p'  , 170.0;   'H42_N4'   , 86.0;    
+'C1p_N9'   , -11.0;    'C1p_N1'   , -12.0;    'H1_N1'    , -95.0;   'H3_N3'    , -91.0;   
+'C6_N1'    , -7.5;     'C4_N3'    , -10.7;    'C4_C5'    , 65.0;   'C5_H5'    , 176;  
+'C8_H8'    , 216.0;   'C6_H6'    , 185.0;   'C5_C6'    , 67.0;   'C2_N3'    , -19.0;  
+'C2_N1'    , -19.0;    'C4_N9'    , -20.0;    'H41_N4'   , -86.0;   'C4_N4'    , -20.0;
+'C8_N9'    , -11.0;    'C1p_H1p'  , 170.0;   'H42_N4'   , -86.0;    
 
 % Generics for the conjugated ring (to be replaced with DFT values - Zenawi)
 'C2_H2'    , J_CH;    'C5_N7'    , J_CN;    'C8_N7'    , J_CN;   'C6_N6'    , J_CN;
@@ -140,25 +140,25 @@ subgraphs=dfpt(sparse(proxmatrix),3);
 % Set generic coupling values
 J_CCC=-1.2;  % Zenawi's DFT
 J_CCH=0;     % Literature reference
-J_CCN=7.0;   % Zenawi's DFT
+J_CCN=-7.0;   % Zenawi's DFT
 J_NCN=0;     % Literature reference
 J_NCH=0;     % Literature reference
 J_CNH=0;     % Literature reference
 J_CNC=0;     % Literature reference
 J_HCH=-12.0; % Typical for CH2
-J_HNH=-10.0; % Typical for NH2
+J_HNH=10.0; % Typical for NH2
 
 % Spec all ordered connected triples (sorted atoms, bonding order, coupling from atom 1 to atom 3)
 triples_database={...
     
 % Backbone data from the literature
-'C4p_C5p_H5p'  1, 2, 3,  -5.5;   'C4p_C5p_H5pp'  1, 2, 3,   2.0;   'C4p_C5p_H4p' 3, 1, 2,  -5.5;
-'C2p_C3p_H3p'  1, 2, 3,  -2.3;   'C2p_C3p_H2p'   2, 1, 3,   2.3;  
+'C4p_C5p_H5p'  1, 2, 3,  -5.5;   'C4p_C5p_H5pp'  1, 2, 3,   2.0;   'C4p_C5p_H4p' 3, 1, 2,  5.5;
+'C2p_C3p_H3p'  1, 2, 3,  2.3;   'C2p_C3p_H2p'   2, 1, 3,   2.3;  
 
 % Conjugated ring data from the literature
 'C4_C5_C6'     1, 2, 3,   9.5;   'C4_C8_N9'      1, 3, 2,   8.0;   'C2_C4_N3'    1, 3, 2,  10.0;
-'C8_H8_N9'     2, 1, 3,   8.0;   'C8_H8_N7'      2, 1, 3,  11.0;   'C2_H2_N1'    2, 1, 3,  15.0;
-'C2_H2_N3'     2, 1, 3,  15.0;
+'C8_H8_N9'     2, 1, 3,   -8.0;   'C8_H8_N7'      2, 1, 3,  -11.0;   'C2_H2_N1'    2, 1, 3,  -15.0;
+'C2_H2_N3'     2, 1, 3,  -15.0;
 
 % Generic numbers for the conjugated ring (to be replaced with DFT values - Zenawi)
 'C6_N1_N6'     2, 1, 3,  J_NCN;  'C2_N1_N3'      2, 1, 3,  J_NCN;  'C2_C6_N1'     1, 3, 2,  J_CNC;                                     

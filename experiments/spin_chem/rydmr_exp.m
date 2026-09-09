@@ -104,8 +104,8 @@ switch spin_system.bas.formalism
             % Compute integration endpoint
             t_end=10/rates(n); %#ok<PFBNS>
             
-            % Compute RYDMR (rates inside for roundoff reasons)
-            answer(nm)=hdot(S,expmint(spin_system,H_curr,S*rates(n),H_curr+1i*rates(n)*Id,t_end));
+            % Compute RYDMR (rates inside for roundoff reasons, R damps both sides)
+            answer(nm)=hdot(S,expmint(spin_system,H_curr,S*rates(n),H_curr+1i*rates(n)*Id-2i*R,t_end));
             
         end
         

@@ -324,12 +324,7 @@ quads_database={...
 % Backbone and its vicinity
 'CA_CB_CG1_HA',      4, 1, 2, 3, [7.10 -1.00 0.70];    % Vuister, G. W. "J-couplings. Measurement and Usage in Structure Determination." [chi1 side-chain]
 'CA_CB_CG2_HA',      4, 1, 2, 3, [7.10 -1.00 0.70];    % Vuister, G. W. "J-couplings. Measurement and Usage in Structure Determination." [chi1 side-chain]
-'CA_CB_CG_H',        1, 2, 3, 4, [4.03 -0.87 4.50];    % http://dx.doi.org/10.1002/mrc.1260280513    chi2 ??? need to look at it later. 
-'CA_CB_CG1_HA',      4, 1, 2, 3, [10.2 -1.30 0.20];    % http://dx.doi.org/10.1021/bi00585a003              (checked)
-'CA_CB_CG2_HA',      4, 1, 2, 3, [10.2 -1.30 0.20];    % http://dx.doi.org/10.1021/bi00585a003              (checked)
-'CA_CB_CG1_HA',      4, 1, 2, 3, [10.2 -1.30 0.20];    % A. DeMarco and M. Llinas, Biochemistry 18, 3846 (1979)    [chi1 side-chain]       (checked)
-'CA_CB_CG2_HA',      4, 1, 2, 3, [10.2 -1.30 0.20];    % A. DeMarco and M. Llinas, Biochemistry 18, 3846 (1979)    [chi1 side-chain]       (checked)
-'CA_CB_CG_HA',       4, 1, 2, 3, [10.2 -1.30 0.20];    % A. DeMarco and M. Llinas, Biochemistry 18, 3846 (1979)    [chi1 side-chain]       (checked)
+'CA_CB_CG_HA',       4, 1, 2, 3, [7.10 -1.00 0.70];    % Vuister, G. W. "J-couplings. Measurement and Usage in Structure Determination." [chi1 side-chain]
 'C_CA_CB_CG',        1, 2, 3, 4, [3.42 -0.59 0.17];    % http://pubs.acs.org/doi/pdf/10.1021/ja029972s             [chi1 side-chain]       (checked)
 'C_CA_CB_CG1',       1, 2, 3, 4, [3.42 -0.59 0.17];    % http://pubs.acs.org/doi/pdf/10.1021/ja029972s             [chi1 side-chain]       (checked)
 'C_CA_CB_CG2',       1, 2, 3, 4, [3.30 -0.51 0.04];    % http://pubs.acs.org/doi/pdf/10.1021/ja029972s             [chi1 side-chain]       (checked)
@@ -358,13 +353,11 @@ quads_database={...
 'C_CA_HA_N',         1, 4, 2, 3, [3.72 -2.18 1.28];    % http://pubs.acs.org/doi/pdf/10.1021/ja001798p             [backbone phi]          (checked)
 'C_CA_CB_N',         1, 4, 2, 3, [1.59 -0.67 0.27];    % http://spin.niddk.nih.gov/bax/lit/508/244.pdf             [backbone phi]          (checked)
 'C_C_CA_N',          1, 4, 3, 2, [1.33 -0.88 0.06];    % http://pubs.acs.org/doi/pdf/10.1021/ja9616239             [backbone phi]          (checked)
-'C_CB_CA_N',         1, 4, 3, 2, [1.59 -0.67 0.27];    % http://spin.niddk.nih.gov/bax/lit/508/244.pdf             [backbone phi]          (checked)
 'C_CA_HA2_N',        4, 1, 2, 3, [-0.88 -0.61 -0.27];  % http://pubs.acs.org/doi/pdf/10.1021/ja00111a021           [backbone psi]          (checked)
 'C_CA_HA3_N',        4, 1, 2, 3, [-0.88 -0.61 -0.27];  % http://pubs.acs.org/doi/pdf/10.1021/ja00111a021           [backbone psi]          (checked)
 'C_CA_HA_N',         4, 1, 2, 3, [-0.88 -0.61 -0.27];  % http://pubs.acs.org/doi/pdf/10.1021/ja00111a021           [backbone psi]          (checked)
 'C_CA_N_N',          3, 2, 1, 4, [0.0 0.0 0.0];        % To be filled in  
 'C_CA_N_N',          4, 2, 1, 3, [0.0 0.0 0.0];        % To be filled in
-'C_CB_CA_N',         4, 1, 3, 2, [0.0 0.0 0.0];        % To be filled in
 'C_CA_CA_N',         2, 1, 4, 3, [0.0 0.0 0.0];        % To be filled in
 
 % Histidine ring (GIAO DFT M06/cc-pVTZ)
@@ -398,8 +391,8 @@ quads_database={...
 'CB_CD1_CG1_CG2',    2, 3, 1, 4, J_CCCC_AL;       'CB_CD1_CG1_HB',     4, 1, 3, 2, J_CCCH_AL;     
 'CB_CD1_CG1_HD12',   1, 3, 2, 4, J_CCCH_AL;       'CB_CD1_CG1_HD13',   1, 3, 2, 4, J_CCCH_AL;
 'CB_CD1_CG_HB2',     4, 1, 3, 2, J_CCCH_AL;       'CB_CD1_CG_HB3',     4, 1, 3, 2, J_CCCH_AL;
-'CB_CD1_CG_HD1',     1, 2, 3, 4, J_CCCH_AL;       'CB_CD1_CG_HD11',    1, 2, 3, 4, J_CCCH_AL;
-'CB_CD1_CG_HD12',    1, 2, 3, 4, J_CCCH_AL;       'CB_CD1_CG_HD13',    1, 2, 3, 4, J_CCCH_AL;
+'CB_CD1_CG_HD1',     1, 3, 2, 4, J_CCCH_AL;       'CB_CD1_CG_HD11',    1, 3, 2, 4, J_CCCH_AL;
+'CB_CD1_CG_HD12',    1, 3, 2, 4, J_CCCH_AL;       'CB_CD1_CG_HD13',    1, 3, 2, 4, J_CCCH_AL;
 'CB_CD2_CE2_CG',     1, 4, 2, 3, J_CCCC_AL;       'CB_CD2_CG_HB2',     4, 1, 3, 2, J_CCCH_AL;
 'CB_CD2_CG_HB3',     4, 1, 3, 2, J_CCCH_AL;       'CB_CD2_CG_HD2',     1, 3, 2, 4, J_CCCH_AL;
 'CB_CD2_CG_HD21',    1, 3, 2, 4, J_CCCH_AL;       'CB_CD2_CG_HD22',    1, 3, 2, 4, J_CCCH_AL;

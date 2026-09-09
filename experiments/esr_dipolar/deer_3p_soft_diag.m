@@ -126,7 +126,7 @@ kxlabel('2nd pulse position, $\mu$s'); axis tight; kgrid;
 % Extract and phase the echo modulation
 [deer_echoes,deer_sigmas,deer_traces]=svd(echo_stack);
 deer_echoes=deer_echoes*deer_sigmas/deer_traces(1);
-deer_traces=deer_traces*deer_sigmas/deer_traces(1);
+deer_traces=deer_traces*deer_sigmas'/deer_traces(1);
 
 % Plot echo components
 kfigure(); plot(echo_axis,real(deer_echoes(:,1:3)));

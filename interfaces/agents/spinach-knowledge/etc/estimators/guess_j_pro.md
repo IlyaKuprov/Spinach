@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/etc/estimators/guess_j_pro.m`
 - Signature: `jmatrix=guess_j_pro(aa_num,aa_typ,pdb_id,coords)`
-- Total lines: 660
+- Total lines: 653
 
 ## Purpose
 
@@ -55,7 +55,7 @@ Assigns J-couplings from literature values and Karplus curves. Syntax: jmatrix=g
 - Line 273: conditional branch on `(~isempty(jmatrix{spin_a,spin_c}))&&(~ismember([spin_labels{1} '_' spin_labels{2} '_' spin_labels{3}],allowed_collision…`.
 - Line 306: `for` loop over `n=1:size(subgraphs,1)`.
 - Line 307: conditional branch on `any(sum(proxmatrix(subgraphs(n,:),subgraphs(n,:)))==4)`.
-- Line 535: `for` loop over `n=1:size(subgraphs,1)`.
+- Line 528: `for` loop over `n=1:size(subgraphs,1)`.
 
 ### Key state/data transformations
 
@@ -74,13 +74,13 @@ Assigns J-couplings from literature values and Karplus curves. Syntax: jmatrix=g
 - Lines 135: computes `jmatrix{spin_numbers(1),spin_numbers(2)}` using `jmatrix{spin_numbers(1),spin_numbers(2)}=spec_string{2}`.
 - Lines 152: computes `J_CCC` using `J_CCC=-1.2`.
 - Lines 153: computes `J_CCH` using `J_CCH=0`.
-- Lines 154: computes `J_CCN` using `J_CCN=7.0`.
+- Lines 154: computes `J_CCN` using `J_CCN=-7.0`.
 - Lines 155: computes `J_HCH` using `J_HCH=-12.0`.
 - Lines 156: computes `J_HNH` using `J_HNH=-1.5`.
 
 ### Local helper functions
 
-- Line 633: `grumble()` — `function grumble(aa_num,aa_typ,pdb_id,coords)`.
+- Line 626: `grumble()` — `function grumble(aa_num,aa_typ,pdb_id,coords)`.
   - Representative operation: `if ~isnumeric(aa_num)`.
   - Representative operation: `error('aa_num must be a vector of positive integers.')`.
 

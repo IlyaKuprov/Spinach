@@ -61,16 +61,16 @@ J_NH=86.0; J_CN=20.0; J_CH=180.0; J_CC=65.0;
 pairs_database={...
 
 % RNA specific values from the literature
-'C1p_N9'   , 11.0;    'C1p_N1'   , 12.0;    'H_N1'     , 95.0;   'H3_N3'    , 91.0;   
+'C1p_N9'   , 11.0;    'C1p_N1'   , 12.0;    'H1_N1'    , 95.0;   'H3_N3'    , 91.0;   
 'C6_N1'    , 7.5;     'C4_N3'    , 10.7;    'C4_C5'    , 65.0;   'C5_H5'    , 176;  
 'C8_H8'    , 216.0;   'C6_H6'    , 185.0;   'C5_C6'    , 67.0;   'C2_N3'    , 19.0;  
 'C2_N1'    , 19.0;    'C4_N9'    , 20.0;    'H41_N4'   , 86.0;   'C4_N4'    , 20.0;
-'C8_N9'    , 11.0;    'C1p_H1p'  , 170.0;   'C_C5'     , 55.0;   'H42_N4'   , 86.0;    
+'C8_N9'    , 11.0;    'C1p_H1p'  , 170.0;   'H42_N4'   , 86.0;    
 
 % Generics for the conjugated ring (to be replaced with DFT values - Zenawi)
 'C2_H2'    , J_CH;    'C5_N7'    , J_CN;    'C8_N7'    , J_CN;   'C6_N6'    , J_CN;
 'H61_N6'   , J_NH;    'H62_N6'   , J_NH;    'C2_N2'    , J_CN;   'H21_N2'   , J_NH;
-'H1_N1'    , J_NH;    'H22_N2'   , J_NH;    'H61_N1'   , J_NH;
+'H22_N2'   , J_NH;
 
 % Generics for the sugar ring (to be replaced with DFT values - Zenawi)
 'C1p_C2p'  , J_CC;    'C2p_H2p'  , J_CH;    'C3p_C4p'  , J_CC;   'C4p_H4p'  , J_CH;
@@ -153,7 +153,7 @@ triples_database={...
     
 % Backbone data from the literature
 'C4p_C5p_H5p'  1, 2, 3,  -5.5;   'C4p_C5p_H5pp'  1, 2, 3,   2.0;   'C4p_C5p_H4p' 3, 1, 2,  -5.5;
-'C2p_C3p_H3p'  1, 2, 3,  -2.3;   'C2p_C3p_H2p'   3, 2, 1,   2.3;  
+'C2p_C3p_H3p'  1, 2, 3,  -2.3;   'C2p_C3p_H2p'   2, 1, 3,   2.3;  
 
 % Conjugated ring data from the literature
 'C4_C5_C6'     1, 2, 3,   9.5;   'C4_C8_N9'      1, 3, 2,   8.0;   'C2_C4_N3'    1, 3, 2,  10.0;
@@ -168,7 +168,7 @@ triples_database={...
 'C6_H62_N6'    1, 3, 2,  J_CNH;  'C8_N7_N9'      2, 1, 3,  J_NCN;  'C1p_C8_N9'    2, 3, 1,  J_CNC;  
 'C2_N1_N2'     2, 1, 3,  J_NCN;  'C2_H1_N1'      1, 3, 2,  J_CNH;  'C2_H21_N2'    1, 3, 2,  J_CNH;  
 'C2_H22_N2'    1, 3, 2,  J_CNH;  'C2_N2_N3'      3, 1, 2,  J_NCN;  'C6_H1_N1'     1, 3, 2,  J_CNH;      
-'C5_C6_N1'     2, 1, 3,  J_CCN;  'C6_H6_N1'      3, 1, 2,  J_NCH;  'C1p_C2_N1'    2, 3, 1,  J_CNC;                                    
+'C5_C6_N1'     1, 2, 3,  J_CCN;  'C6_H6_N1'      3, 1, 2,  J_NCH;  'C1p_C2_N1'    2, 3, 1,  J_CNC;                                    
 'C4_N3_N4'     2, 1, 3,  J_NCN;  'C4_H41_N4'     1, 3, 2,  J_CNH;  'C4_H42_N4'    1, 3, 2,  J_CNH;  
 'C4_C5_N4'     2, 1, 3,  J_CCN;  'C5_C6_H6'      1, 2, 3,  J_CCH;  'C1p_C6_N1'    2, 3, 1,  J_CNC;
 'C5_C6_H5'     2, 1, 3,  J_CCH;  'C2_H3_N3'      1, 3, 2,  J_CNH;  'C4_H3_N3'     1, 3, 2,  J_CNH;    
@@ -178,11 +178,11 @@ triples_database={...
 
 % Generic numbers for the backbone (to be replaced with DFT values - Zenawi)
 'C1p_C2p_C3p'   1, 2, 3,  J_CCC;  'C1p_C2p_H2p'   1, 2, 3,  J_CCH;   'C2p_C3p_C4p'  1, 2, 3,  J_CCC;
-'C3p_C4p_H4p'   3, 1, 2,  J_CCH;  'C3p_C4p_C5p'   1, 2, 3,  J_CCC;
+'C3p_C4p_H4p'   1, 2, 3,  J_CCH;  'C3p_C4p_C5p'   1, 2, 3,  J_CCC;
 'C3p_C4p_H3p'   2, 1, 3,  J_CCH;  'C5p_H5p_H5pp'  2, 1, 3,  J_HCH;   'C1p_C2p_H1p'  3, 1, 2,  J_CCH;
 'C1p_C2p_H2pp'  3, 2, 1,  J_CCH;  'C2p_C3p_H2pp'  3, 1, 2,  J_CCH;  
 
-'C2p_C3p_H2p1' 1, 2, 3,  J_CCH; 'C1p_C2p_H2p1'  1, 2, 3,  J_CCH;  'C4p_C5p_H5p2'  1, 2, 3,  J_CCH;  
+'C2p_C3p_H2p1' 3, 1, 2,  J_CCH; 'C1p_C2p_H2p1'  1, 2, 3,  J_CCH;  'C4p_C5p_H5p2'  1, 2, 3,  J_CCH;  
 'C4p_C5p_H5p1' 1, 2, 3, J_CCH; 'C5p_H5p1_H5p2'  2, 1, 3, J_HCH};
 
 % Exception list for four-membered rings
@@ -302,7 +302,7 @@ quads_database={...
 'C2_C5_C6_N1',      1, 4, 3, 2, [0.0 0.0 0.0];  'C5_C6_H1_N1',       3, 4, 2, 1, [0.0 0.0 0.0];
 'C2_C6_N1_N2',      4, 1, 3, 2, [0.0 0.0 0.0];  'C2_H1_N1_N2',       4, 1, 3, 2, [0.0 0.0 0.0];
 'C2_H1_N1_N3',      4, 1, 3, 2, [0.0 0.0 0.0];  'C2_H21_N2_N3',      4, 1, 3, 2, [0.0 0.0 0.0];  
-'C2_H21_N1_N2',     3, 1, 4, 2, [0.0 0.0 0.0];  'C2_H22_N2_N1',      3, 1, 4, 2, [0.0 0.0 0.0];
+'C2_H21_N1_N2',     3, 1, 4, 2, [0.0 0.0 0.0];
 'C2_C4_N2_N3',      2, 4, 1, 3, [0.0 0.0 0.0];  'C1p_C4_C5_N9',      3, 2, 4, 1, [0.0 0.0 0.0];
 'C1p_C4_N3_N9',     3, 2, 4, 1, [0.0 0.0 0.0];  'C1p_C5_C6_N1',      1, 4, 3, 2, [0.0 0.0 0.0];
 'C2_C6_H6_N1',      1, 4, 2, 3, [0.0 0.0 0.0];  'C5_C6_H5_N1',       4, 2, 1, 3, [0.0 0.0 0.0];

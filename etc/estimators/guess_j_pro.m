@@ -151,7 +151,7 @@ subgraphs=dfpt(sparse(proxmatrix),3);
 % Set generic coupling values
 J_CCC=-1.2;  % Zenawi's DFT
 J_CCH=0;     % Literature reference
-J_CCN=7.0;   % Zenawi's DFT
+J_CCN=-7.0;   % Zenawi's DFT
 J_HCH=-12.0; % Literature reference
 J_HNH=-1.5;  % Zenawi's DFT
 J_NCN=0;     % Literature reference
@@ -328,9 +328,9 @@ quads_database={...
 'C_CA_CB_CG',        1, 2, 3, 4, [3.42 -0.59 0.17];    % http://pubs.acs.org/doi/pdf/10.1021/ja029972s             [chi1 side-chain]       (checked)
 'C_CA_CB_CG1',       1, 2, 3, 4, [3.42 -0.59 0.17];    % http://pubs.acs.org/doi/pdf/10.1021/ja029972s             [chi1 side-chain]       (checked)
 'C_CA_CB_CG2',       1, 2, 3, 4, [3.30 -0.51 0.04];    % http://pubs.acs.org/doi/pdf/10.1021/ja029972s             [chi1 side-chain]       (checked)
-'CA_CB_CG_N',        4, 1, 2, 3, [2.64 0.26 -0.22];    % http://pubs.acs.org/doi/pdf/10.1021/ja029972s             [chi1 side-chain]       (checked)
-'CA_CB_CG1_N',       4, 1, 2, 3, [2.22 0.25 -0.06];    % http://pubs.acs.org/doi/pdf/10.1021/ja029972s             [chi1 side-chain]       (checked) 
-'CA_CB_CG2_N',       4, 1, 2, 3, [2.01 0.21 -0.12];    % http://pubs.acs.org/doi/pdf/10.1021/ja029972s             [chi1 side-chain]       (checked)
+'CA_CB_CG_N',        4, 1, 2, 3, [-2.64 -0.26 0.22];    % http://pubs.acs.org/doi/pdf/10.1021/ja029972s             [chi1 side-chain]       (checked)
+'CA_CB_CG1_N',       4, 1, 2, 3, [-2.22 -0.25 0.06];    % http://pubs.acs.org/doi/pdf/10.1021/ja029972s             [chi1 side-chain]       (checked) 
+'CA_CB_CG2_N',       4, 1, 2, 3, [-2.01 -0.21 0.12];    % http://pubs.acs.org/doi/pdf/10.1021/ja029972s             [chi1 side-chain]       (checked)
 'C_CA_CB_HB3',       1, 2, 3, 4, [7.2  -2.04  0.60];   % http://pubs.acs.org/doi/pdf/10.1021/ja00528a004           [chi1 side-chain]       (checked)
 'C_CA_CB_HB2',       1, 2, 3, 4, [7.2  -2.04  0.60];   % http://pubs.acs.org/doi/pdf/10.1021/ja00528a004           [chi1 side-chain]       (checked)
 'C_CA_CB_HB1',       1, 2, 3, 4, [7.2  -2.04  0.60];   % http://pubs.acs.org/doi/pdf/10.1021/ja00528a004           [chi1 side-chain]       (checked)
@@ -361,13 +361,13 @@ quads_database={...
 'C_CA_CA_N',         2, 1, 4, 3, [0.0 0.0 0.0];        % To be filled in
 
 % Histidine ring (GIAO DFT M06/cc-pVTZ)
-'CD2_CG_HD2_ND1',    3, 1, 2, 4, [0.0 0.0 2.8];   'CD2_CG_ND1_NE2',    4, 1, 2, 3, [0.0 0.0 0.0];
+'CD2_CG_HD2_ND1',    3, 1, 2, 4, [0.0 0.0 -2.8];   'CD2_CG_ND1_NE2',    4, 1, 2, 3, [0.0 0.0 0.0];
 'CB_CG_HB2_ND1',     3, 1, 2, 4, [0.0 0.0 0.0];   'CB_CG_HB3_ND1',     3, 1, 2, 4, [0.0 0.0 0.0];   
 'CB_CE1_CG_ND1',     1, 3, 4, 2, [0.0 0.0 2.3];   'CD2_CE1_HE1_NE2',   3, 2, 4, 1, [0.0 0.0 4.9];
-'CD2_CE1_HD2_NE2',   3, 1, 4, 2, [0.0 0.0 6.6];   'CD2_CE1_CG_NE2',    3, 1, 4, 2, [0.0 0.0 1.0];
+'CD2_CE1_HD2_NE2',   3, 1, 4, 2, [0.0 0.0 6.6];   'CD2_CE1_CG_NE2',    3, 1, 4, 2, [0.0 0.0 -1.0];
 'CD2_CE1_ND1_NE2',   1, 4, 2, 3, [0.0 0.0 0.0];   'CD2_CE1_CG_ND1',    1, 3, 4, 2, [0.0 0.0 3.4];
-'CE1_CG_HE1_ND1',    3, 1, 4, 2, [0.0 0.0 7.0];   'CE1_CG_ND1_NE2',    2, 3, 1, 4, [0.0 0.0 1.4];
-'CA_CB_CG_ND1',      1, 2, 3, 4, [0.0 0.0 1.0];   'CB_CD2_CG_NE2',     1, 3, 2, 4, [0.0 0.0 0.0];
+'CE1_CG_HE1_ND1',    3, 1, 4, 2, [0.0 0.0 7.0];   'CE1_CG_ND1_NE2',    2, 3, 1, 4, [0.0 0.0 -1.4];
+'CA_CB_CG_ND1',      1, 2, 3, 4, [0.0 0.0 -1.0];   'CB_CD2_CG_NE2',     1, 3, 2, 4, [0.0 0.0 0.0];
 'CE1_HD1_HE1_ND1',   2, 4, 1, 3, [0.0 0.0 3.9];   'CE1_HD1_ND1_NE2',   2, 3, 1, 4, [0.0 0.0 3.3];
 'CD2_CG_HD1_ND1',    3, 4, 2, 1, [0.0 0.0 6.1];   'CB_CG_HD1_ND1',     3, 4, 2, 1, [0.0 0.0 1.0];
 
@@ -377,7 +377,7 @@ quads_database={...
 'CD_CG_HG2_N',       3, 2, 1, 4, [0.0 0.0 0.0];   'CD_CG_HG3_N',       3, 2, 1, 4, [0.0 0.0 0.0];  
 'C_CD_CG_N',         1, 4, 2, 3, [0.0 0.0 2.5];   'C_CA_CD_N',         1, 2, 4, 3, [0.0 0.0 1.1];
 'C_CD_HD2_N',        1, 4, 2, 3, [0.0 0.0 1.0];   'C_CD_HD3_N',        1, 4, 2, 3, [0.0 0.0 1.0];
-'CA_CB_CD_N',        2, 1, 4, 3, [0.0 0.0 0.0];   'CB_CD_CG_N',        4, 2, 3, 1, [0.0 0.0 1.1];  
+'CA_CB_CD_N',        2, 1, 4, 3, [0.0 0.0 0.0];   'CB_CD_CG_N',        4, 2, 3, 1, [0.0 0.0 -1.1];  
 
 % Generic aliphatics
 'CA_CB_CD1_CG',      1, 2, 4, 3, J_CCCC_AL;       'CA_CB_CD1_CG1',     1, 2, 4, 3, J_CCCC_AL; 
@@ -437,16 +437,16 @@ quads_database={...
 'CD1_CE1_CE2_CZ',    1, 2, 4, 3, J_CCCC_AR;       
 
 % Generic amides
-'CB_CG_HB2_ND2',     3, 1, 2, 4, [3.1 -0.6 0.4]; % http://dx.doi.org/10.1016/j.carres.2007.02.023
-'CB_CG_HB3_ND2',     3, 1, 2, 4, [3.1 -0.6 0.4]; % http://dx.doi.org/10.1016/j.carres.2007.02.023
+'CB_CG_HB2_ND2',     3, 1, 2, 4, [-3.1 0.6 -0.4]; % http://dx.doi.org/10.1016/j.carres.2007.02.023
+'CB_CG_HB3_ND2',     3, 1, 2, 4, [-3.1 0.6 -0.4]; % http://dx.doi.org/10.1016/j.carres.2007.02.023
 'CB_CG_HD21_ND2',    1, 2, 4, 3, [0.0 0.0 0.0];  % Tentative, needs checking
 'CB_CG_HD22_ND2',    1, 2, 4, 3, [0.0 0.0 0.0];  % Tentative, needs checking
 'CD_CG_HE21_NE2',    3, 4, 1, 2, [0.0 0.0 0.0];  % Tentative, needs checking
 'CD_CG_HE22_NE2',    3, 4, 1, 2, [0.0 0.0 0.0];  % Tentative, needs checking
-'CD_CG_HG2_NE2',     3, 2, 1, 4, [3.1 -0.6 0.4]; % http://dx.doi.org/10.1016/j.carres.2007.02.023
+'CD_CG_HG2_NE2',     3, 2, 1, 4, [-3.1 0.6 -0.4]; % http://dx.doi.org/10.1016/j.carres.2007.02.023
 'CB_CD_CG_NE2',      1, 3, 2, 4, [0.0 0.0 0.0];  % Tentative, needs checking
 'CA_CB_CG_ND2',      1, 2, 3, 4, [0.0 0.0 0.0];  % Tentative, needs checking
-'CD_CG_HG3_NE2',     3, 2, 1, 4, [3.1 -0.6 0.4]; % http://dx.doi.org/10.1016/j.carres.2007.02.023 
+'CD_CG_HG3_NE2',     3, 2, 1, 4, [-3.1 0.6 -0.4]; % http://dx.doi.org/10.1016/j.carres.2007.02.023 
 
 % Extra parameters highlighted by the Boston visit
 'CZ_HH22_NH1_NH2',   2, 4, 1, 3, [0.0 0.0 0.0]; % Tentative, needs checking

@@ -1,7 +1,7 @@
 % Returns the size of an RCV sparse matrix. Syntax:
 %
 %                    s=size(A,dim)
-%                      
+%                    [s,ncols]=size(A)
 %
 % Parameters:
 %
@@ -11,13 +11,16 @@
 %
 % Outputs:
 %
-%    s     - size vector or dimension length
+%    s     - size vector, dimension length, or number
+%            of rows in the two-output form
+%
+%    ncols - number of columns in the two-output form
 %
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/size.m>
 
-function s=size(A,dim)
+function [s,ncols]=size(A,dim)
 
 % Check consistency
 if nargin==1
@@ -26,8 +29,15 @@ else
     grumble(A,dim);
 end
 
+% Refuse two outputs with a dimension query
+if (nargout==2)&&(nargin==2)
+    error('two-output form does not accept a dimension index.');
+end
+
 % Mimic Matlab
-if nargin==1
+if nargout==2
+    s=A.numRows; ncols=A.numCols;
+elseif nargin==1
     s=[A.numRows A.numCols];
 else
     if dim==1

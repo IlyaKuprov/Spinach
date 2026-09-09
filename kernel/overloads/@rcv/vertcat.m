@@ -8,7 +8,7 @@
 %
 % Outputs:
 %
-%    A         - concatenated RCV sparse matrix
+%    A         - RCV sparse matrix
 %
 % m.keitel@soton.ac.uk
 %
@@ -19,31 +19,26 @@ function A=vertcat(varargin)
 % Check consistency
 grumble(varargin{:});
 
-% Start from the top operand
-A=varargin{1};
-
-% Append the remaining operands
-for n=2:nargin
-
-    % Align locations
-    B=varargin{n};
-    if A.isGPU||B.isGPU
-        A=gpuArray(A);
-        B=gpuArray(B);
-    end
-
-    % Shift row indices
-    B.row=B.row+A.numRows;
-
-    % Concatenate indices
-    A.row=[A.row; B.row];
-    A.col=[A.col; B.col];
-    A.val=[A.val; B.val];
-
-    % Update row count in the result
-    A.numRows=A.numRows+B.numRows;
-
+% Move all operands to the GPU if any of them is there
+if any(cellfun(@(x)x.isGPU,varargin))
+    varargin=cellfun(@gpuArray,varargin,'UniformOutput',false);
 end
+
+% Shift row indices by the running row count
+rows=cell(nargin,1); cols=cell(nargin,1); vals=cell(nargin,1); nrows=int64(0);
+for n=1:nargin
+    rows{n}=varargin{n}.row+nrows;
+    cols{n}=varargin{n}.col;
+    vals{n}=varargin{n}.val;
+    nrows=nrows+varargin{n}.numRows;
+end
+
+% Concatenate RCV arrays once
+A=varargin{1};
+A.row=vertcat(rows{:});
+A.col=vertcat(cols{:});
+A.val=vertcat(vals{:});
+A.numRows=nrows;
 
 end
 

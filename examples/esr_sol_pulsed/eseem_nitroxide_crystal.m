@@ -59,11 +59,11 @@ fid=apodisation(spin_system,fid-mean(fid),{{'kaiser',6}});
 spectrum=fftshift(fft(fid,parameters.zerofill));
 
 % Frequency axis, interpulse delay increment is timestep/2
-ax=fft_freq_axis(parameters.npoints,parameters.timestep/2,...
-                 parameters.zerofill-parameters.npoints)*1e-6;
+freq_axis=fft_freq_axis(parameters.npoints,parameters.timestep/2,...
+                        parameters.zerofill-parameters.npoints)*1e-6;
 
 % Plot the spectrum
-subplot(2,1,2); plot(ax,abs(spectrum));
+subplot(2,1,2); plot(freq_axis,abs(spectrum));
 kxlabel('frequency, MHz'); axis tight; kgrid;
 
 end

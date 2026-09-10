@@ -56,14 +56,14 @@ for k=1:3
 end
 
 % Dressed normal modes from the single-excitation block, Eq. (2.65)
-[V,D]=eig(full(H0(idx,idx))); frq_dressed=diag(D);
+[vecs,vals]=eig(full(H0(idx,idx))); frq_dressed=diag(vals);
 
 % Label the dressed modes by their dominant bare mode
-[~,dominant]=max(abs(V),[],1); [~,order]=sort(dominant);
-V=V(:,order); frq_dressed=frq_dressed(order);
+[~,dominant]=max(abs(vecs),[],1); [~,order]=sort(dominant);
+vecs=vecs(:,order); frq_dressed=frq_dressed(order);
 
 % Transmon weights in the dressed modes, Eq. (2.66)
-u_b=V(2,:);
+u_b=vecs(2,:);
 
 % Modulation amplitude, phase, and drive frequency, Eq. (2.64)
 mod_amp=2*pi*100e6; phi_d=pi/3;
@@ -87,18 +87,26 @@ end
 nper=ceil(1.1*pi/(rate_theory*period)); pops=zeros(3,nper+1,2);
 props={P0 P1};
 for m=1:2
-    psi=zeros(size(H0,1),1); psi(idx)=V(:,1);
-    pops(:,1,m)=abs(V'*psi(idx)).^2;
+    psi=zeros(size(H0,1),1); psi(idx)=vecs(:,1);
+    pops(:,1,m)=abs(vecs'*psi(idx)).^2;
     for n=1:nper
-        psi=props{m}*psi; pops(:,n+1,m)=abs(V'*psi(idx)).^2;
+        psi=props{m}*psi; pops(:,n+1,m)=abs(vecs'*psi(idx)).^2;
     end
 end
 
 % Time axis and driven population of dressed mode c
 time_axis=period*(0:nper); pop_c=pops(3,:,2);
 
+% Validate the completeness of the driven photon transfer
+if max(pop_c)<0.9
+    error('driven photon transfer between the cavities is incomplete.');
+end
+
 % Interval during which the mode c population exceeds one half
 n_up=find(pop_c>0.5,1); n_dn=n_up+find(pop_c(n_up:end)<0.5,1)-1;
+if isempty(n_dn)
+    error('mode c population does not return below one half within the simulated window.');
+end
 t_up=interp1(pop_c(n_up-1:n_up),time_axis(n_up-1:n_up),0.5);
 t_dn=interp1(pop_c(n_dn-1:n_dn),time_axis(n_dn-1:n_dn),0.5);
 
@@ -110,11 +118,6 @@ disp(['swap rate, Eq. (2.69): ' num2str(rate_theory/(2*pi*1e3)) ' kHz']);
 % Validate the swap rate against Eq. (2.69)
 if abs(rate_numer/rate_theory-1)>0.1
     error('numerical swap rate deviates from Eq. (2.69).');
-end
-
-% Validate the completeness of the driven photon transfer
-if max(pop_c)<0.9
-    error('driven photon transfer between the cavities is incomplete.');
 end
 
 % Validate that the photon stays put without the drive

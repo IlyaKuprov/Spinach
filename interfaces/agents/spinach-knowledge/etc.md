@@ -29,7 +29,7 @@
 | `etc/diamond_defects/diamond_vacancy.m` | `[sys,inter]=diamond_vacancy(parameters)` | Vacancy-family defect spin systems for diamond. Syntax: [sys,inter]=diamond_vacancy(parameters) R4/W6 parameters from Tw | 144 |
 | `etc/estimators/guess_csa_pro.m` | `CSAs=guess_csa_pro(aa_nums,pdb_ids,coords,options)` | Guesses a reasonable amide bond 15N CSA tensor anisotropy, and a reasonable 13C=O tensor anisotropy, given a local prote | 338 |
 | `etc/estimators/guess_j_nuc.m` | `jmatrix=guess_j_nuc(nuc_num,nuc_typ,pdb_id,coords)` | RNA assignments of J-couplings from literature values and Karplus cur- ves. Syntax: jmatrix=guess_j_nuc(nuc_num,nuc_typ, | 462 |
-| `etc/estimators/guess_j_pro.m` | `jmatrix=guess_j_pro(aa_num,aa_typ,pdb_id,coords)` | Assigns J-couplings from literature values and Karplus curves. Syntax: jmatrix=guess_j_pro(aa_num,aa_typ,pdb_id,coords)  | 660 |
+| `etc/estimators/guess_j_pro.m` | `jmatrix=guess_j_pro(aa_num,aa_typ,pdb_id,coords)` | Assigns J-couplings from literature values and Karplus curves. Syntax: jmatrix=guess_j_pro(aa_num,aa_typ,pdb_id,coords)  | 653 |
 | `etc/forum.m` | `forum()` | Opens Spinach support forum page. | 18 |
 | `etc/hebrew/hebrew.m` | `ncards=hebrew(mode,max_cards) % #NWIKI #NHEAD` | IK's Hebrew flashcards function. The Excel files should contain Hebrew vocabulary in separate spreadsheets: nouns.xlsx - | 389 |
 | `etc/mex/compile_mex.m` | `compile_mex() % #NGRUM #NHEAD` | MEX compilation utility. Rebuilds all C++ MEX binaries in the current directory. Syntax: compile_mex() | 42 |

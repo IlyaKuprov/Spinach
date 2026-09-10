@@ -102,7 +102,7 @@ grid_idx=round((dwb+dw_max)*(ngrid-1)/(2*dw_max))+1;
 time_axis=dt*stride*(1:(nsteps/stride));
 
 % Preallocate the coherence decays and dephasing times
-signals=zeros(2,numel(time_axis)); t2_times=zeros(1,2); drives=[0 omega0];
+signals=zeros(2,numel(time_axis)); t2_times=zeros(1,2); tphi_times=zeros(1,2); drives=[0 omega0];
 
 % Loop over the undriven and the driven case
 for k=1:2
@@ -134,17 +134,16 @@ for k=1:2
     end
     signals(k,:)=2*abs(coherence)/ntraj;
 
-    % Coherence time from the 1/e crossing of the Gaussian decay or from an exponential fit
+    % Coherence and pure dephasing times, Eq. (E.2), from the 1/e crossing of the Gaussian decay or from an exponential fit
     if signals(k,end)<exp(-1)
         t2_times(k)=time_axis(find(signals(k,:)<exp(-1),1));
+        tphi_times(k)=t2_times(k)/sqrt(1-t2_times(k)/(2*t1_c));
     else
         decay_fit=polyfit(time_axis,log(signals(k,:)),1); t2_times(k)=-1/decay_fit(1);
+        tphi_times(k)=1/(1/t2_times(k)-1/(2*t1_c));
     end
 
 end
-
-% Pure dephasing times, Eq. (E.2), with the cavity photon loss removed
-tphi_times=1./(1./t2_times-1/(2*t1_c));
 
 % Analytical undriven pure dephasing time, Eq. (4.89), and the sweet spot residual, Eq. (4.87)
 tphi_undriven=1/(noise_amp*dwb_dphi*sens_c*sqrt(2*abs(log(2*pi*f_ir*t2_times(1)))));

@@ -28,7 +28,9 @@
 % Outputs:
 %
 %    trajs  - trajectories, [ntraj x npts] real array, the
-%             variance of each point is 2*amp^2*log(f_uv/f_ir)
+%             variance of each point is 2*amp^2*sum(1./k) over
+%             the synthesised bin indices k, which approaches
+%             2*amp^2*log(f_uv/f_ir) for bands with many bins
 %
 % Note: the trajectories are periodic with the period npts*dt;
 %       use a duration well above 1/f_ir to avoid artefacts. The

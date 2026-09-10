@@ -30,8 +30,8 @@ chi=2*(g_bc/delta_bc)^2*anharm; sens_c=(g_bc/delta_bc)^2; sens_x=-4*anharm*g_bc^
 % Transmon frequency sensitivity to flux, rad/s per flux quantum
 dwb_dphi=2*pi*6e9;
 
-% Flux noise amplitude in flux quanta, infrared and ultraviolet cutoffs, Hz
-noise_amp=1e-5; f_ir=200; f_uv=5e7;
+% Flux noise amplitude in flux quanta and the ultraviolet cutoff, Hz
+noise_amp=1e-5; f_uv=5e7;
 
 % Transmon-drive detuning, Hz
 delta_bd=-19e6;
@@ -42,8 +42,8 @@ t1_b=50e-6; t1_c=2.1e-3;
 % Time step, number of steps, coherence sampling stride, and trajectory count
 dt=1e-8; nsteps=25000; stride=100; ntraj=200;
 
-% Length of the noise synthesis grid, long enough to resolve the infrared cutoff
-nlong=2^19;
+% Length of the noise synthesis grid and the infrared cutoff at its frequency resolution, Hz
+nlong=2^19; f_ir=1/(nlong*dt);
 
 % Four-level transmon in the drive frame and a three-level cavity in its own frame
 sys.magnet=0; sys.isotopes={'T4','C3'};

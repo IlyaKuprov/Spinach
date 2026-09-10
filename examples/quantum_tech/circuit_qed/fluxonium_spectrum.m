@@ -76,10 +76,10 @@ subplot(1,3,1); plot(flux_pts,levels(:,:,2)','LineWidth',1.5);
 axis tight; kgrid; kxlabel('$\Phi_{ext}/\Phi_0$'); kylabel('energy/h, GHz');
 ktitle('fluxonium spectrum');
 
-% Phase grid and normalised Hermite functions of the oscillator basis
-phi_grid=linspace(-5,5,501); phi_zpf=(2*ec/el)^(1/4); xi=phi_grid/phi_zpf;
+% Phase grid wide enough for the whole basis, and its normalised Hermite functions, phi=sqrt(2)*phi_zpf*xi
+phi_grid=linspace(-20,20,2001); phi_scale=sqrt(2)*(2*ec/el)^(1/4); xi=phi_grid/phi_scale;
 herm=zeros(nlev(2),numel(phi_grid));
-herm(1,:)=exp(-xi.^2/2)/(pi^(1/4)*sqrt(phi_zpf));
+herm(1,:)=exp(-xi.^2/2)/(pi^(1/4)*sqrt(phi_scale));
 herm(2,:)=sqrt(2)*xi.*herm(1,:);
 for k=2:(nlev(2)-1)
     herm(k+1,:)=sqrt(2/k)*xi.*herm(k,:)-sqrt((k-1)/k)*herm(k-1,:);
@@ -88,12 +88,19 @@ end
 % Potential and the two lowest probability densities at 0.4 and 0.5 flux quanta
 for m=1:2
     flux=0.3+0.1*m; phi_e=2*pi*flux;
-    H=fluxonium(ec,ej,el,phi_e,nlev(2)); [V,D]=eig(H);
+    [H,~,phi_op]=fluxonium(ec,ej,el,phi_e,nlev(2)); [vecs,vals]=eig(H);
     potential=(-ej*cos(phi_grid-phi_e)+(el/2)*phi_grid.^2)/1e9;
-    densities=abs(herm'*V(:,1:2)).^2; energies=diag(D)/(2*pi*1e9);
+    densities=abs(herm'*vecs(:,1:2)).^2; energies=diag(vals)/(2*pi*1e9);
+
+    % Validate the phase space wavefunctions against the operator expectation values
+    norms=trapz(phi_grid,densities); phi_sq=trapz(phi_grid,phi_grid'.^2.*densities);
+    phi_sq_op=real(diag(vecs(:,1:2)'*phi_op^2*vecs(:,1:2)))';
+    if (max(abs(norms-1))>1e-6)||(max(abs(phi_sq-phi_sq_op)./phi_sq_op)>1e-6)
+        error('phase space wavefunctions are inconsistent with the oscillator basis.');
+    end
     subplot(1,3,m+1); plot(phi_grid,potential,'Color',[0.5 0.5 0.5],'LineWidth',1.5);
     hold on; plot(phi_grid,energies(1)+densities(:,1),'LineWidth',1.5);
-    plot(phi_grid,energies(2)+densities(:,2),'LineWidth',1.5); ylim([-5 5]);
+    plot(phi_grid,energies(2)+densities(:,2),'LineWidth',1.5); xlim([-5 5]); ylim([-5 5]);
     kgrid; kxlabel('$\varphi$, rad'); kylabel('energy/h, GHz');
     ktitle(['$\Phi_{ext}=' num2str(flux) '\Phi_0$']);
     klegend({'potential','$|\psi_0|^2$','$|\psi_1|^2$'},'Location','North');

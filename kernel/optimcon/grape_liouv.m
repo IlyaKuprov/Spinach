@@ -361,14 +361,15 @@ end
 % Overlaps with the target at the nodes
 overlaps=rho_targ'*fwd_traj(:,2:end); overlap=overlaps(end);
 
-% Trajectory penalty observables and value at the nodes
+% Trajectory penalty value and costate sources at the nodes
 if pen_on
     if strcmp(spin_system.bas.formalism,'zeeman-wavef')
-        pen_obs=pen_op*fwd_traj(:,2:end); pen_fac=2/nsteps;
+        pen_src=pen_op*fwd_traj(:,2:end); src_idx=1:nsteps;
+        pen_val=mean(real(dot(pen_src,fwd_traj(:,2:end)))); pen_src=2*pen_src/nsteps;
     else
-        pen_obs=pen_op*ones(1,nsteps); pen_fac=1/nsteps;
+        pen_val=mean(real(pen_op'*fwd_traj(:,2:end)));
+        pen_src=pen_op/nsteps; src_idx=ones(1,nsteps);
     end
-    pen_val=mean(real(dot(pen_obs,fwd_traj(:,2:end))));
 end
 
 % Run the backward trajectories
@@ -389,7 +390,7 @@ if n_outputs>2
     % Start the penalty costate at the last node
     if pen_on
         pen_traj=zeros(size(fwd_traj),'like',1i);
-        pen_traj(:,1)=pen_fac*pen_obs(:,nsteps);
+        pen_traj(:,1)=pen_src(:,src_idx(nsteps));
     end
 
     % Loop over time steps
@@ -417,7 +418,7 @@ if n_outputs>2
         % Add the sources at the previous node
         if n<nsteps
             bwd_traj(:,n+1)=bwd_traj(:,n+1)+weights(nsteps-n)*rho_targ;
-            if pen_on, pen_traj(:,n+1)=pen_traj(:,n+1)+pen_fac*pen_obs(:,nsteps-n); end
+            if pen_on, pen_traj(:,n+1)=pen_traj(:,n+1)+pen_src(:,src_idx(nsteps-n)); end
         end
 
     end
@@ -933,12 +934,6 @@ switch fidelity_type
         
 end
 
-% Subtract the trajectory penalty
-if pen_on
-    fidelity=fidelity-pen_val;
-    if exist('grad','var'), grad=grad-pen_grad; end
-end
-
 % Decouple frozen directions
 if exist('hess','var')
     hess(frozen(:),:)=0; 
@@ -968,6 +963,12 @@ if exist('grad','var')&&(norm(grad,1)==0)
     report(spin_system,'exactly zero gradient: either the target is unreachable');
     report(spin_system,'from the source, or the initial guess is very poor.');
     error('GRAPE cannot proceed.');
+end
+
+% Subtract the trajectory penalty
+if pen_on
+    fidelity=fidelity-pen_val;
+    if exist('grad','var'), grad=grad-pen_grad; end
 end
 
 end

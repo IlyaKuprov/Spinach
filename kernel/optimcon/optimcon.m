@@ -1357,6 +1357,9 @@ if isfield(control,'traj_pen')
                 error('unrecognised formalism specification.');
         end
     end
+    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef'})
+        check_hermiticity(control.traj_pen,'trajectory penalty operators');
+    end
     if ismember(spin_system.control.method,{'newton','goodwin'})
         error('trajectory penalties are not available with Hessian-based methods.');
     end

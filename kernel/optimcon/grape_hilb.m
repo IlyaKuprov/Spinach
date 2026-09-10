@@ -696,12 +696,6 @@ switch fidelity_type
 
 end
 
-% Subtract the trajectory penalty
-if pen_on
-    fidelity=fidelity-pen_val;
-    if exist('grad','var'), grad=grad-pen_grad; end
-end
-
 % Return the trajectory (a huge array) only if needed
 if (isfield(spin_system.control,'return_traj')&&spin_system.control.return_traj)||...
    any(ismember({'correlation_order','coherence_order',...
@@ -724,6 +718,12 @@ if exist('grad','var')&&(norm(grad,1)==0)
     report(spin_system,'exactly zero gradient: either the target is unreachable');
     report(spin_system,'from the source, or the initial guess is very poor.');
     error('GRAPE cannot proceed.');
+end
+
+% Subtract the trajectory penalty
+if pen_on
+    fidelity=fidelity-pen_val;
+    if exist('grad','var'), grad=grad-pen_grad; end
 end
 
 end

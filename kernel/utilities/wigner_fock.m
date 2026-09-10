@@ -30,9 +30,12 @@
 %             tegral over the complex plane
 %
 % Note: the Fock basis must be large enough for the displaced
-%       states to fit, meaning n well above |alpha|^2 at every
-%       point; pad the density matrix with zero rows and co-
-%       lumns when the state itself lives in a smaller space.
+%       states to fit: with the highest occupied level m of rho,
+%       n must be well above (sqrt(m)+|alpha|)^2 at every point,
+%       otherwise the truncated displacement operator distorts
+%       the values; pad the density matrix with zero rows and
+%       columns when the state itself lives in a smaller space,
+%       and check the unit integral on the grid in use.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -58,11 +61,20 @@ end
 
 % Consistency enforcement
 function grumble(rho,alpha)
-if (~isnumeric(rho))||(~ismatrix(rho))||(size(rho,1)~=size(rho,2))||(size(rho,1)<2)
-    error('rho must be a square matrix of dimension at least 2.');
+if (~isnumeric(rho))||(~ismatrix(rho))||(size(rho,1)~=size(rho,2))||(size(rho,1)<2)||(~all(isfinite(rho),'all'))
+    error('rho must be a square matrix of dimension at least 2 with finite elements.');
 end
-if ~isnumeric(alpha)
-    error('alpha must be a numeric array.');
+if norm(rho-rho',1)>sqrt(eps)*norm(rho,1)
+    error('rho must be Hermitian.');
+end
+if abs(trace(rho)-1)>sqrt(eps)
+    error('rho must have unit trace.');
+end
+if min(eig(full((rho+rho')/2)))<-sqrt(eps)
+    error('rho must be positive semidefinite.');
+end
+if (~isnumeric(alpha))||(~all(isfinite(alpha),'all'))
+    error('alpha must be a numeric array with finite elements.');
 end
 end
 

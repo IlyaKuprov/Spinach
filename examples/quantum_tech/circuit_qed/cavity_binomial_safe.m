@@ -30,8 +30,8 @@ chi=2*(g_bc/delta_bc)^2*anharm; sens_c=(g_bc/delta_bc)^2; sens_x=-4*anharm*g_bc^
 % Transmon frequency sensitivity to flux, rad/s per flux quantum
 dwb_dphi=2*pi*6e9;
 
-% Flux noise amplitude in flux quanta, infrared and ultraviolet cutoffs, Hz
-noise_amp=1e-5; f_ir=200; f_uv=5e7;
+% Flux noise amplitude in flux quanta and the ultraviolet cutoff, Hz
+noise_amp=1e-5; f_uv=5e7;
 
 % Drive amplitude, rad/s, and the transmon-drive detunings to scan, Hz
 omega0=2*pi*10e6; detunings=-(20:1:80)*1e6;
@@ -42,8 +42,8 @@ t1_b=50e-6; t1_c=20e-3;
 % Time step, number of steps, infidelity sampling stride, and trajectory count
 dt=1e-8; nsteps=30000; stride=300; ntraj=100;
 
-% Length of the noise synthesis grid, long enough to resolve the infrared cutoff
-nlong=2^19;
+% Length of the noise synthesis grid and the infrared cutoff at its frequency resolution, Hz
+nlong=2^19; f_ir=1/(nlong*dt);
 
 % Fock state pairs whose coherences matter for the code, Sec. 4.4.1
 pairs=[2 0; 4 2; 4 0; 3 0; 4 3; 2 1; 3 1];
@@ -141,6 +141,12 @@ for k=1:2
     H_case=full(H_hilb+2*pi*delta_bd*num_b+drives(k)*drive_op); [vecs,vals]=eig(H_case);
     [~,c0]=max(abs(vecs(idx(1),:))); [~,c2]=max(abs(vecs(idx(3),:))); [~,c4]=max(abs(vecs(idx(5),:)));
 
+    % Phases of the dressed states fixed by their bare state components
+    cols=[c0 c2 c4]; bare=[idx(1) idx(3) idx(5)];
+    for j=1:3
+        vecs(:,cols(j))=vecs(:,cols(j))*abs(vecs(bare(j),cols(j)))/vecs(bare(j),cols(j));
+    end
+
     % Logical |+L> state and its closed-system evolution
     psi=(vecs(:,c0)+vecs(:,c4))/2+vecs(:,c2)/sqrt(2); rho=hilb2liouv(psi*psi','statevec');
     psi_ideal=vecs*(exp(-1i*diag(vals)*time_axis).*(vecs'*psi));
@@ -170,11 +176,12 @@ for k=1:2
         infids(k,n)=1-sqrt(real(psi_ideal(:,n)'*rho_mat*psi_ideal(:,n)));
     end
 
-    % Final cavity density matrix with the transmon traced out
+    % Final cavity density matrix with the transmon traced out and the propagator truncation drift of the trace removed
     rho_end=reshape(rho_mat,[5 3 5 3]);
     for t=1:3
         rho_cav(:,:,k+1)=rho_cav(:,:,k+1)+squeeze(rho_end(:,t,:,t));
     end
+    rho_cav(:,:,k+1)=rho_cav(:,:,k+1)/trace(rho_cav(:,:,k+1));
 
 end
 

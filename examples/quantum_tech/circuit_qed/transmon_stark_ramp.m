@@ -47,21 +47,21 @@ infid=zeros(numel(delta_bd),numel(ramp_times));
 % Loop over the detunings
 for n=1:numel(delta_bd)
 
-    % Transmon in the drive frame, cavity in its own frame
+    % Transmon in the drive frame, cavity in its own frame, dispersive coupling
     inter.modes.frqs={delta_bd(n) 0};
     inter.modes.anharms={anharm []};
+    inter.modes.kerr=cell(2,2); inter.modes.kerr{1,2}=chi;
 
     % Spinach housekeeping
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);
 
-    % Rotating frame Hamiltonian with the dispersive coupling
+    % Rotating frame Hamiltonian
     H0=hamiltonian(assume(spin_system,'labframe'));
-    H0=H0+2*pi*chi*operator(spin_system,{'N','N'},{1,2});
 
     % Transmon drive operators for the two quadratures
-    Cr=operator(spin_system,'C',1); An=operator(spin_system,'A',1);
-    Dx=Cr+An; Dy=-1i*(An-Cr);
+    cr_op=operator(spin_system,'C',1); an_op=operator(spin_system,'A',1);
+    drive_i=cr_op+an_op; drive_q=-1i*(an_op-cr_op);
 
     % Bare |g,0> and |g,1> states from the projector diagonals
     [~,idx_g0]=max(diag(state(spin_system,{'BL1','BL1'},{1,2})));
@@ -72,8 +72,8 @@ for n=1:numel(delta_bd)
     omega_0=sqrt(delta_bd(n)^3/(4*anharm));
 
     % Dressed eigenstates connected to the bare states at full drive
-    [V,~]=eig(full(H0+2*pi*omega_0*Dx)); [~,idx]=max(abs(V'*psi0));
-    targets=V(:,idx);
+    [vecs,~]=eig(full(H0+2*pi*omega_0*drive_i)); [~,idx]=max(abs(vecs'*psi0));
+    targets=vecs(:,idx);
 
     % Loop over the ramp times
     for k=1:numel(ramp_times)
@@ -90,7 +90,7 @@ for n=1:numel(delta_bd)
 
         % Propagate both bare states through the ramp
         for m=1:nsteps
-            H=H0+2*pi*omega_i(m)*Dx+2*pi*omega_q(m)*Dy;
+            H=H0+2*pi*omega_i(m)*drive_i+2*pi*omega_q(m)*drive_q;
             psi=propagator(spin_system,H,tau/nsteps)*psi;
         end
 
@@ -112,9 +112,9 @@ if ~(infid(3,1)<infid(4,1)/10)
     error('DRAG quadrature did not suppress the nonadiabatic leakage.');
 end
 
-% Validate the improvement of adiabaticity with the ramp time
-if any(infid(:,end)>=infid(:,1))
-    error('infidelity does not decrease with the ramp time.');
+% Validate the monotonic improvement of adiabaticity with the ramp time
+if (~all(isfinite(infid),'all'))||any(diff(infid,1,2)>=0,'all')
+    error('infidelity does not decrease monotonically with the ramp time.');
 end
 
 % Plot the infidelities against the ramp time

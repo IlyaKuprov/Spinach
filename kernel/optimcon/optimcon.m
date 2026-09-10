@@ -22,8 +22,9 @@
 %       parallel.pool.Constant held in spin_system.control.invari-
 %       ants. Heavy invariants - the drift generators, the control
 %       operators, the offset operators, the control commutators,
-%       and the Bloch-Siegert response operators - are then removed
-%       from the returned structure, and their names are recorded
+%       the Bloch-Siegert response operators, and the trajectory
+%       penalty operators - are then removed from the returned
+%       structure, and their names are recorded
 %       in spin_system.control.frozen_fields. All other control
 %       fields stay live: ensemble() re-sends them to the workers
 %       at every evaluation, and they may be overwritten between
@@ -1332,6 +1333,84 @@ else
     
 end
 
+% Process trajectory penalty operators
+if isfield(control,'traj_pen')
+
+    % Input validation
+    if (~iscell(control.traj_pen))||isempty(control.traj_pen)
+        error('control.traj_pen must be a non-empty cell array.');
+    end
+    for n=1:numel(control.traj_pen)
+        switch spin_system.bas.formalism
+            case {'sphten-liouv','zeeman-liouv'}
+                if (~isnumeric(control.traj_pen{n}))||(~iscolumn(control.traj_pen{n}))||...
+                   (numel(control.traj_pen{n})~=numel(spin_system.control.rho_init{1}))
+                    error('control.traj_pen must be a cell array of state-sized column vectors.');
+                end
+            case {'zeeman-hilb','zeeman-wavef'}
+                if (~isnumeric(control.traj_pen{n}))||(~ismatrix(control.traj_pen{n}))||...
+                   (size(control.traj_pen{n},1)~=size(control.traj_pen{n},2))||...
+                   (size(control.traj_pen{n},1)~=size(spin_system.control.rho_init{1},1))
+                    error('control.traj_pen must be a cell array of square matrices of the drift dimension.');
+                end
+            otherwise
+                error('unrecognised formalism specification.');
+        end
+    end
+    if ismember(spin_system.control.method,{'newton','goodwin'})
+        error('trajectory penalties are not available with Hessian-based methods.');
+    end
+    if spin_system.control.steady
+        error('trajectory penalties are not available with stroboscopic steady states.');
+    end
+
+    % Absorb the specification
+    spin_system.control.traj_pen=control.traj_pen;
+    control=rmfield(control,'traj_pen');
+
+else
+
+    % Default is no trajectory penalty
+    spin_system.control.traj_pen={};
+
+end
+
+% Inform the user
+report(spin_system,[pad('Trajectory penalty operators',60) ...
+                    int2str(numel(spin_system.control.traj_pen))]);
+
+% Process fidelity time averaging
+if isfield(control,'fidelity_avg')
+
+    % Input validation
+    if (~islogical(control.fidelity_avg))||(~isscalar(control.fidelity_avg))
+        error('control.fidelity_avg must be true() or false()');
+    end
+    if control.fidelity_avg&&ismember(spin_system.control.method,{'newton','goodwin'})
+        error('time-averaged fidelity is not available with Hessian-based methods.');
+    end
+    if control.fidelity_avg&&spin_system.control.steady
+        error('time-averaged fidelity is not available with stroboscopic steady states.');
+    end
+
+    % Absorb the specification
+    spin_system.control.fidelity_avg=control.fidelity_avg;
+    control=rmfield(control,'fidelity_avg');
+
+else
+
+    % Default is the fidelity at the last node
+    spin_system.control.fidelity_avg=false();
+
+end
+
+% Inform the user
+if spin_system.control.fidelity_avg
+    report(spin_system,[pad('Fidelity time weighting',60) 'average over pulse nodes']);
+else
+    report(spin_system,[pad('Fidelity time weighting',60) 'last pulse node']);
+end
+
 % Process checkpoint file
 if isfield(control,'checkpoint')
 
@@ -1437,7 +1516,7 @@ if nworkers>0
 end
 
 % Record the names of the heavy worker-resident invariants
-frozen_fields={'drifts','operators','off_ops','cc_comm','cc_comm_idx','resp_ops'};
+frozen_fields={'drifts','operators','off_ops','cc_comm','cc_comm_idx','resp_ops','traj_pen'};
 spin_system.control.frozen_fields=frozen_fields(isfield(spin_system.control,frozen_fields));
 
 % Publish the complete frozen problem to the pool, once per problem

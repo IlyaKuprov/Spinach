@@ -50,6 +50,7 @@ sys.magnet=0; sys.isotopes={'T4','C3'};
 inter.modes.frqs={delta_bd 0};
 inter.modes.anharms={anharm []};
 inter.modes.lifetimes={t1_b t1_c};
+inter.modes.kerr=cell(2,2); inter.modes.kerr{1,2}=chi;
 inter.temperature=0;
 bas.approximation='none';
 
@@ -59,9 +60,9 @@ ss_hilb=create(sys,inter);
 ss_hilb=basis(ss_hilb,bas);
 
 % Hilbert space Hamiltonian, drive operator, and flux noise operator, Eqs. (4.16) and (4.33)
-H_hilb=hamiltonian(assume(ss_hilb,'labframe'))+2*pi*chi*operator(ss_hilb,{'N','N'},{1,2});
-D_hilb=operator(ss_hilb,'C',1)+operator(ss_hilb,'A',1);
-N_hilb=operator(ss_hilb,'N',1)+sens_c*operator(ss_hilb,'N',2)+...
+H_hilb=hamiltonian(assume(ss_hilb,'labframe'));
+drive_op=operator(ss_hilb,'C',1)+operator(ss_hilb,'A',1);
+noise_op=operator(ss_hilb,'N',1)+sens_c*operator(ss_hilb,'N',2)+...
        sens_x*operator(ss_hilb,{'N','N'},{1,2});
 
 % Positions of the bare |g,0> and |g,1> states
@@ -72,7 +73,7 @@ idx1=find(diag(state(ss_hilb,{'BL1','BL2'},{1,2}))>0.5);
 omega0_an=2*pi*sqrt(delta_bd^3/(4*anharm));
 
 % Numerical sweet spot from the flux susceptibility of the dressed cavity transition
-omega0=fzero(@(omega)suscept(H_hilb,N_hilb,D_hilb,omega,idx0,idx1),[0.5 1.5]*omega0_an);
+omega0=fzero(@(omega)suscept(H_hilb,noise_op,drive_op,omega,idx0,idx1),[0.5 1.5]*omega0_an);
 disp(['sweet spot drive amplitude, MHz: analytical ' num2str(omega0_an/(2*pi*1e6),'%.3f') ...
       ', numerical ' num2str(omega0/(2*pi*1e6),'%.3f')]);
 
@@ -82,8 +83,7 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Drift, drive, and flux noise generators with the mode dissipators
-L_drift=hamiltonian(assume(spin_system,'labframe'))+...
-        2*pi*chi*operator(spin_system,{'N','N'},{1,2})+1i*relaxation(spin_system);
+L_drift=hamiltonian(assume(spin_system,'labframe'))+1i*relaxation(spin_system);
 L_drive=operator(spin_system,'C',1)+operator(spin_system,'A',1);
 L_noise=operator(spin_system,'N',1)+sens_c*operator(spin_system,'N',2)+...
         sens_x*operator(spin_system,{'N','N'},{1,2});
@@ -108,8 +108,8 @@ signals=zeros(2,numel(time_axis)); t2_times=zeros(1,2); drives=[0 omega0];
 for k=1:2
 
     % Dressed states adiabatically connected to |g,0> and |g,1>
-    [V,E]=eig(full(H_hilb+drives(k)*D_hilb)); [~,k0]=max(abs(V(idx0,:))); [~,k1]=max(abs(V(idx1,:)));
-    phi0=V(:,k0); phi1=V(:,k1); disp(['dressed transition frequency, kHz: ' num2str((E(k1,k1)-E(k0,k0))/(2*pi*1e3),'%.2f')]);
+    [vecs,vals]=eig(full(H_hilb+drives(k)*drive_op)); [~,k0]=max(abs(vecs(idx0,:))); [~,k1]=max(abs(vecs(idx1,:)));
+    phi0=vecs(:,k0); phi1=vecs(:,k1); disp(['dressed transition frequency, kHz: ' num2str((vals(k1,k1)-vals(k0,k0))/(2*pi*1e3),'%.2f')]);
 
     % Equal superposition initial state and the coherence detection state
     rho=hilb2liouv((phi0+phi1)*(phi0+phi1)'/2,'statevec');
@@ -182,12 +182,12 @@ klegend({'no drive','sweet spot drive'},'Location','southwest');
 end
 
 % Flux susceptibility of the dressed |g,0> to |g,1> cavity transition, Eq. (4.19)
-function dnm=suscept(H_hilb,N_hilb,D_hilb,omega0,idx0,idx1)
+function dnm=suscept(H_hilb,noise_op,drive_op,omega0,idx0,idx1)
 dw=2*pi*1e3; shifts=[-dw dw]; frqs=zeros(1,2);
 for k=1:2
-    [V,E]=eig(full(H_hilb+omega0*D_hilb+shifts(k)*N_hilb));
-    [~,k0]=max(abs(V(idx0,:))); [~,k1]=max(abs(V(idx1,:)));
-    frqs(k)=E(k1,k1)-E(k0,k0);
+    [vecs,vals]=eig(full(H_hilb+omega0*drive_op+shifts(k)*noise_op));
+    [~,k0]=max(abs(vecs(idx0,:))); [~,k1]=max(abs(vecs(idx1,:)));
+    frqs(k)=vals(k1,k1)-vals(k0,k0);
 end
 dnm=(frqs(2)-frqs(1))/(2*dw);
 end

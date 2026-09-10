@@ -31,7 +31,10 @@
 %             variance of each point is 2*amp^2*log(f_uv/f_ir)
 %
 % Note: the trajectories are periodic with the period npts*dt;
-%       use a duration well above 1/f_ir to avoid artefacts.
+%       use a duration well above 1/f_ir to avoid artefacts. The
+%       band must contain at least one grid frequency below the
+%       Nyquist frequency; the Nyquist bin itself is not synthe-
+%       sised because it has no independent quadrature.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -42,8 +45,8 @@ function trajs=pink_noise(amp,dt,npts,ntraj,f_ir,f_uv)
 % Check consistency
 grumble(amp,dt,npts,ntraj,f_ir,f_uv);
 
-% Positive frequency bins of the grid
-nbins=floor(npts/2); freqs=(1:nbins)/(npts*dt);
+% Positive frequency bins of the grid, self-conjugate Nyquist bin excluded
+nbins=ceil(npts/2)-1; freqs=(1:nbins)/(npts*dt);
 
 % Standard deviation of the quadrature amplitudes in the band
 sigma=zeros(1,nbins); band=(freqs>=f_ir)&(freqs<=f_uv);
@@ -60,11 +63,11 @@ end
 
 % Consistency enforcement
 function grumble(amp,dt,npts,ntraj,f_ir,f_uv)
-if (~isnumeric(amp))||(~isreal(amp))||(~isscalar(amp))||(amp<=0)
-    error('amp must be a positive real scalar.');
+if (~isnumeric(amp))||(~isreal(amp))||(~isscalar(amp))||(~isfinite(amp))||(amp<=0)
+    error('amp must be a positive finite real scalar.');
 end
-if (~isnumeric(dt))||(~isreal(dt))||(~isscalar(dt))||(dt<=0)
-    error('dt must be a positive real scalar.');
+if (~isnumeric(dt))||(~isreal(dt))||(~isscalar(dt))||(~isfinite(dt))||(dt<=0)
+    error('dt must be a positive finite real scalar.');
 end
 if (~isnumeric(npts))||(~isreal(npts))||(~isscalar(npts))||(npts<4)||(mod(npts,1)~=0)
     error('npts must be an integer greater than 3.');
@@ -72,11 +75,14 @@ end
 if (~isnumeric(ntraj))||(~isreal(ntraj))||(~isscalar(ntraj))||(ntraj<1)||(mod(ntraj,1)~=0)
     error('ntraj must be a positive integer.');
 end
-if (~isnumeric(f_ir))||(~isreal(f_ir))||(~isscalar(f_ir))||(f_ir<1/(npts*dt))
-    error('f_ir must be a real scalar not below 1/(npts*dt).');
+if (~isnumeric(f_ir))||(~isreal(f_ir))||(~isscalar(f_ir))||(~isfinite(f_ir))||(f_ir<1/(npts*dt))
+    error('f_ir must be a finite real scalar not below 1/(npts*dt).');
 end
-if (~isnumeric(f_uv))||(~isreal(f_uv))||(~isscalar(f_uv))||(f_uv<=f_ir)||(f_uv>1/(2*dt))
-    error('f_uv must be a real scalar between f_ir and 1/(2*dt).');
+if (~isnumeric(f_uv))||(~isreal(f_uv))||(~isscalar(f_uv))||(~isfinite(f_uv))||(f_uv<=f_ir)||(f_uv>1/(2*dt))
+    error('f_uv must be a finite real scalar between f_ir and 1/(2*dt).');
+end
+if min(floor(f_uv*npts*dt),ceil(npts/2)-1)<ceil(f_ir*npts*dt)
+    error('the band between f_ir and f_uv contains no frequency grid points below the Nyquist frequency.');
 end
 end
 

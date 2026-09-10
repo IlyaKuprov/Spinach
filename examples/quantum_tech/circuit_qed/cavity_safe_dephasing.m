@@ -145,9 +145,9 @@ for k=1:2
 
 end
 
-% Analytical undriven pure dephasing time, Eq. (4.89), and the sweet spot residual, Eq. (4.87)
+% Analytical undriven pure dephasing time, Eq. (4.89), and the sweet spot residual, Eq. (4.87), with K/2pi in Hz as in the thesis
 tphi_undriven=1/(noise_amp*dwb_dphi*sens_c*sqrt(2*abs(log(2*pi*f_ir*t2_times(1)))));
-tphi_driven=1/((delta_bd/(4*anharm))*(dwb_dphi*noise_amp)^2/abs(delta_bd)+(delta_bd/(4*anharm))^2/t1_b);
+tphi_driven=1/((dwb_dphi*noise_amp)^2/(4*abs(anharm))+(delta_bd/(4*anharm))^2/t1_b);
 disp(['pure dephasing time without the drive, us: simulated ' num2str(1e6*tphi_times(1),'%.1f') ...
       ', analytical ' num2str(1e6*tphi_undriven,'%.1f')]);
 disp(['pure dephasing time with the drive, us: simulated ' num2str(1e6*tphi_times(2),'%.1f') ...

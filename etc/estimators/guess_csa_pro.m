@@ -211,7 +211,7 @@ for n=1:(max(aa_nums)-1)
 end
 
 % Loop over amino acids
-for n=2:(max(aa_nums)-1)
+for n=2:max(aa_nums)
     
     % Assign H-N proton CSAs
     if ismember('H',pdb_ids(aa_nums==n))&&...

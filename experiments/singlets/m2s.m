@@ -19,7 +19,7 @@
 %
 % Outputs:
 %
-%      rho    - final state vector.
+%      rho    - final state vector
 %
 % a.j.allami@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il

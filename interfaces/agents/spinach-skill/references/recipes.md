@@ -447,7 +447,10 @@ context: the Hamiltonian is built with `hamiltonian(assume(spin_system,'nmr'))`,
 `Lx` and `Ly` operators are passed to the kernel function
 `m2s(spin_system,H,Cx,Cy,rho0,<J coupling, Hz>,<Zeeman frequency difference,
 Hz>)`, and the population is read off by projecting onto
-`singlet(spin_system,<spin a>,<spin b>)`. `s2m_example.m` is the reverse.
+`singlet(spin_system,<spin a>,<spin b>)`. `s2m_example.m` is the reverse. Both
+functions accept either sign of the coupling and of the frequency difference:
+the echo-train repetition count uses their magnitudes and the phase of the
+90-degree pulse next to the lone tau delay follows the sign of J.
 Lifetimes limited by intramolecular mechanisms are in the `decoherence_*.m`
 files; `singlet_imaging_1.m` combines singlet order with the imaging context.
 

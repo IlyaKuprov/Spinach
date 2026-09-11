@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/singlets/m2s.m`
 - Signature: `rho=m2s(spin_system,L,Hx,Hy,rho,J,delta_v)`
-- Total lines: 81
+- Total lines: 83
 
 ## Purpose
 
@@ -58,7 +58,7 @@ M2S sequence of Pileio and Levitt. Syntax: rho=m2s(spin_system,L,Hx,Hy,rho,J,del
 
 ## Outputs
 
-- rho -final state vector.
+- rho -final state vector
 
 ## Implementation structure
 
@@ -70,7 +70,7 @@ M2S sequence of Pileio and Levitt. Syntax: rho=m2s(spin_system,L,Hx,Hy,rho,J,del
 - rho -initial state vector
 - J -J-coupling (Hz), the phase of the 90-degree pulse next to the lone tau delay follows its sign
 - delta_v -Zeeman frequency difference (Hz)
-- rho -final state vector.
+- rho -final state vector
 - Check consistency
 - Evolution time
 - Repetition count

@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/singlets/s2m.m`
 - Signature: `rho=s2m(spin_system,L,Hx,Hy,rho,J,delta_v)`
-- Total lines: 81
+- Total lines: 83
 
 ## Purpose
 

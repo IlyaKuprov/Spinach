@@ -742,6 +742,10 @@ end
 if (~ischar(fidelity_type))||(~ismember(fidelity_type,{'real','imag','square'}))
     error('fidelity_type must be ''real'', ''imag'', or ''square''.');
 end
+if (~ischar(spin_system.control.fid_type))||...
+   (~ismember(spin_system.control.fid_type,{'terminal','average'}))
+    error('spin_system.control.fid_type must be ''terminal'' or ''average''.');
+end
 if ~iscell(drifts)
     error('drifts must be a cell array of matrices.');
 end

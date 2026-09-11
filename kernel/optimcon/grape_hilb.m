@@ -89,6 +89,11 @@ if (n_outputs>3)&&(fid_avg||pen_on)
     error('Hessians are not available with trajectory cost terms.');
 end
 
+% Phase cycle factors cancel in the overlap but not in the penalty
+if pen_on&&(~isempty(spin_system.control.phase_cycle))
+    error('trajectory penalties are not available with phase cycles.');
+end
+
 % Sum the trajectory penalty operators
 if pen_on
     pen_op=spin_system.control.traj_pen{1};

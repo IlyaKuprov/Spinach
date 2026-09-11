@@ -96,6 +96,11 @@ if spin_system.control.steady&&(fid_avg||pen_on)
     error('trajectory cost terms are not available with stroboscopic steady states.');
 end
 
+% Phase cycle factors cancel in the overlap but not in the penalty
+if pen_on&&(~isempty(spin_system.control.phase_cycle))
+    error('trajectory penalties are not available with phase cycles.');
+end
+
 % Sum the trajectory penalty operators
 if pen_on
     pen_op=spin_system.control.traj_pen{1};

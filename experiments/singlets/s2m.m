@@ -34,7 +34,7 @@ grumble(L,Hx,Hy,rho,J,delta_v);
 t=1/(4*sqrt(J^2+delta_v^2));
 
 % Repetition count
-m1=floor(pi*J/(2*delta_v));
+m1=floor(pi*abs(J)/(2*abs(delta_v)));
 if mod(m1,2)~=0, m1=m1+1; end
 
 % Pulse sequence

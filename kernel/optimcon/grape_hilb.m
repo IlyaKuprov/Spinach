@@ -706,14 +706,14 @@ else
     traj_data.forward=[];
 end
 
-% Catch unreachable objectives
-if abs(fidelity)==0
+% Catch unreachable terminal objectives, trajectory cost terms may cancel legitimately
+if (~(fid_avg||pen_on))&&(abs(fidelity)==0)
     spin_system.sys.output=1;
     report(spin_system,'exactly zero fidelity: either the target is unreachable');
     report(spin_system,'from the source, or the initial guess is very poor.');
     error('GRAPE cannot proceed.');
 end
-if exist('grad','var')&&(norm(grad,1)==0)
+if (~(fid_avg||pen_on))&&exist('grad','var')&&(norm(grad,1)==0)
     spin_system.sys.output=1;
     report(spin_system,'exactly zero gradient: either the target is unreachable');
     report(spin_system,'from the source, or the initial guess is very poor.');

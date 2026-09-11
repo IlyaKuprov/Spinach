@@ -91,6 +91,11 @@ if (n_outputs>3)&&(fid_avg||pen_on)
     error('Hessians are not available with trajectory cost terms.');
 end
 
+% Trajectory cost terms need a waveform-independent initial state
+if spin_system.control.steady&&(fid_avg||pen_on)
+    error('trajectory cost terms are not available with stroboscopic steady states.');
+end
+
 % Sum the trajectory penalty operators
 if pen_on
     pen_op=spin_system.control.traj_pen{1};
@@ -951,14 +956,14 @@ else
     traj_data.forward=[];
 end
 
-% Catch unreachable objectives
-if abs(fidelity)==0
+% Catch unreachable terminal objectives, trajectory cost terms may cancel legitimately
+if (~(fid_avg||pen_on))&&(abs(fidelity)==0)
     spin_system.sys.output=1;
     report(spin_system,'exactly zero fidelity: either the target is unreachable');
     report(spin_system,'from the source, or the initial guess is very poor.');
     error('GRAPE cannot proceed.');
 end
-if exist('grad','var')&&(norm(grad,1)==0)
+if (~(fid_avg||pen_on))&&exist('grad','var')&&(norm(grad,1)==0)
     spin_system.sys.output=1;
     report(spin_system,'exactly zero gradient: either the target is unreachable');
     report(spin_system,'from the source, or the initial guess is very poor.');

@@ -84,6 +84,9 @@ switch awg_cmd
         % Acquire data from spectometer
         py_run(spin_system,'Xepr_getdata',cmd_input);
         
+        % Match the numeric-to-string conversion that py_run applies internally
+        if ~ischar(cmd_input{3}), cmd_input{3}=num2str(cmd_input{3}); end
+        
         % Save x axis, imaginary, and real parts of the signal
         data.X  = dlmread([cmd_input{3} '_X.txt']);  %#ok<DLMRD> 
         data.rY = dlmread([cmd_input{3} '_rY.txt']); %#ok<DLMRD> 

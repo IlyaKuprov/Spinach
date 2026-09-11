@@ -1382,36 +1382,37 @@ end
 report(spin_system,[pad('Trajectory penalty operators',60) ...
                     int2str(numel(spin_system.control.traj_pen))]);
 
-% Process fidelity time averaging
-if isfield(control,'fidelity_avg')
+% Process fidelity time weighting
+if isfield(control,'fid_type')
 
     % Input validation
-    if (~islogical(control.fidelity_avg))||(~isscalar(control.fidelity_avg))
-        error('control.fidelity_avg must be true() or false()');
+    if (~ischar(control.fid_type))||(~ismember(control.fid_type,{'terminal','average'}))
+        error('control.fid_type can be ''terminal'' or ''average''.');
     end
-    if control.fidelity_avg&&ismember(spin_system.control.method,{'newton','goodwin'})
+    if strcmp(control.fid_type,'average')&&ismember(spin_system.control.method,{'newton','goodwin'})
         error('time-averaged fidelity is not available with Hessian-based methods.');
     end
-    if control.fidelity_avg&&spin_system.control.steady
+    if strcmp(control.fid_type,'average')&&spin_system.control.steady
         error('time-averaged fidelity is not available with stroboscopic steady states.');
     end
 
     % Absorb the specification
-    spin_system.control.fidelity_avg=control.fidelity_avg;
-    control=rmfield(control,'fidelity_avg');
+    spin_system.control.fid_type=control.fid_type;
+    control=rmfield(control,'fid_type');
 
 else
 
     % Default is the fidelity at the last node
-    spin_system.control.fidelity_avg=false();
+    spin_system.control.fid_type='terminal';
 
 end
 
 % Inform the user
-if spin_system.control.fidelity_avg
-    report(spin_system,[pad('Fidelity time weighting',60) 'average over pulse nodes']);
-else
-    report(spin_system,[pad('Fidelity time weighting',60) 'last pulse node']);
+switch spin_system.control.fid_type
+    case 'terminal'
+        report(spin_system,[pad('Fidelity time weighting',60) 'last pulse node']);
+    case 'average'
+        report(spin_system,[pad('Fidelity time weighting',60) 'average over pulse nodes']);
 end
 
 % Process checkpoint file

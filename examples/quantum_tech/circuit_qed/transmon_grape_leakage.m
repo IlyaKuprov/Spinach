@@ -79,7 +79,7 @@ for v=1:4
     % Trajectory cost terms on top of the common parameters
     control=common;
     if ismember(v,[2 4]), control.traj_pen={leak_proj}; end
-    if ismember(v,[3 4]), control.fidelity_avg=true(); end
+    if ismember(v,[3 4]), control.fid_type='average'; end
 
     % Spinach housekeeping
     spin_system=optimcon(spin_system,control);

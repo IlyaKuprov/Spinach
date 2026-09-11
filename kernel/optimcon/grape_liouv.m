@@ -58,7 +58,7 @@
 %       tions instead.
 %
 % Note: trajectory cost terms are read from spin_system.control: when
-%       fidelity_avg is true, the fidelity is averaged over the pulse
+%       fid_type is 'average', the fidelity is averaged over the pulse
 %       nodes 1..N instead of being taken at the last node; traj_pen
 %       operators are summed, their expectation value is averaged over
 %       the same nodes and subtracted from the fidelity. Both terms use
@@ -83,7 +83,7 @@ grumble(spin_system,drifts,controls,waveform,...
 n_outputs=nargout();
 
 % Pull the trajectory cost term settings
-fid_avg=spin_system.control.fidelity_avg;
+fid_avg=strcmp(spin_system.control.fid_type,'average');
 pen_on=~isempty(spin_system.control.traj_pen);
 
 % Trajectory cost terms have no Hessians

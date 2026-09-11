@@ -1365,6 +1365,9 @@ if isfield(control,'traj_pen')
     if spin_system.control.steady
         error('trajectory penalties are not available with stroboscopic steady states.');
     end
+    if ~isempty(spin_system.control.phase_cycle)
+        error('trajectory penalties are not available with phase cycles.');
+    end
 
     % Absorb the specification
     spin_system.control.traj_pen=control.traj_pen;

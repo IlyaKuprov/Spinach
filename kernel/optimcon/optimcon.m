@@ -22,9 +22,8 @@
 %       parallel.pool.Constant held in spin_system.control.invari-
 %       ants. Heavy invariants - the drift generators, the control
 %       operators, the offset operators, the control commutators,
-%       the Bloch-Siegert response operators, and the trajectory
-%       penalty operators - are then removed from the returned
-%       structure, and their names are recorded
+%       and the Bloch-Siegert response operators - are then removed
+%       from the returned structure, and their names are recorded
 %       in spin_system.control.frozen_fields. All other control
 %       fields stay live: ensemble() re-sends them to the workers
 %       at every evaluation, and they may be overwritten between
@@ -1520,7 +1519,7 @@ if nworkers>0
 end
 
 % Record the names of the heavy worker-resident invariants
-frozen_fields={'drifts','operators','off_ops','cc_comm','cc_comm_idx','resp_ops','traj_pen'};
+frozen_fields={'drifts','operators','off_ops','cc_comm','cc_comm_idx','resp_ops'};
 spin_system.control.frozen_fields=frozen_fields(isfield(spin_system.control,frozen_fields));
 
 % Publish the complete frozen problem to the pool, once per problem

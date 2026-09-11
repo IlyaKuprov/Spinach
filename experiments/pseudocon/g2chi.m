@@ -33,8 +33,8 @@ k_b=1.38064852e-23;
 % Curie law prefactor
 prefactor=S*(S+1)*mu_0*(mu_b^2)/(3*k_b*T);
 
-% Compose the susceptibility tensor from the g-tensor Gram matrix
-chi=1e30*prefactor*(g*g.');
+% Get susceptibility tensor
+chi=1e30*prefactor*(g*transpose(g));
 
 end
 

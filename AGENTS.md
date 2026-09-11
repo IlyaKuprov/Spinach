@@ -36,7 +36,7 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Optional arguments and shapes:** Do not create optional arguments. All functions you write must have fixed signatures. Do not write array shape adaptation code, simply tell the user what the function input and output shapes are. Explain inputs and outputs in the documentation header and validate them in the grumbler.
 
-* **Default values:** Defaults are forbidden: *Spinach* has a policy of never guessing or assuming anything. If some variable is missing from the user input, that is an error. Simply rely on *Matlab* to catch it: if a variable is used but not supplied, *Matlab* would throw a natural informative error. Your grumbler calls should assume that all variables specified in the function signature are present.
+* **Default values:** Defaults are discouraged: *Spinach* has a policy of not guessing or assuming anything unobvious. If some variable is missing from the user input, that is normally an error, rely on *Matlab* to catch it, do not set a default value unless specifically told to do so.
 
 * **No bloat, no garbage:** You code must be minimalist. Do not leave any dead code, unused variables, or other redundant items in the functions you create or edit. Trivial helper functions are forbidden. Never create a separate function or a helper that is only called once. Do not create new features where existing *Spinach* features may be used. Never implement any option or structure you have not been directly asked to implement. Never add anything that does not need to be added. The use of `varargin` and `varargout` is discouraged: write a fixed signature wherever one is possible. Avoid object-oriented nonsense and use strict functional programming everywhere.
 
@@ -46,7 +46,7 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Code overrules documentation:** Where code and documentation disagree, and the code is physically / mathematically correct, update the documentation to match the code.
 
-## Spinach Wiki Documentation Instructions
+## Wiki Instructions
 
 *Spinach* maintains a Wiki for function documentation. If you are asked (or if it is required) to create or update a Wiki page for a *Spinach* function, you must follow these instructions:
 
@@ -59,6 +59,22 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 * **Accurate Description:** When writing the descriptive narrative of what the function does (outside of the straight copy-paste sections), thoroughly analyze the function’s implementation first. Make sure you understand how it works and what its key algorithms are. Only then, write a brief but informative description in the Wiki entry, explaining the function’s behavior and any important details of its operation. Always maintain a factual and clear tone – never speculate or introduce information not present in the code.
 
 * **Preserve content:** Before proposing any documentation rewrite, you must run an information-preservation gate: compare proposed code against existing documentation, flag content-drop risks, and block any edit that removes substantial existing documentation unless the user explicitly approves that removal.
+
+## Agentic skill instructions
+
+*Spinach* maintains an AI agent skill in `interfaces\agents\spinach-skill` directory. The purpose of that skill is to enable third-party AI agents to use Spinach competently. After each Spinach code change, update that skill appropriately. Follow these instructions:
+
+* **Accurate Description:** When writing an entry for a Spinach function, thoroughly analyze the function’s implementation first. Make sure you understand how it works and what its key algorithms are. Only then, write a brief but informative skill entry, explaining the function’s behavior and any important details of its operation.
+
+* **Preserve content:** Before updating the skill, you must run an information-preservation gate: compare proposed text against existing text, flag content-drop risks, and block any edit that removes useful existing records unless the user explicitly approves that removal.
+
+## Agentic knowledge base
+
+*Spinach* maintains an AI agent knowledge base in `interfaces\agents\spinach-knowledge` directory. The purpose of that knowledge base is to enable third-party AI agents to use Spinach competently. After each Spinach code change, update that knowledge base appropriately. Follow these instructions:
+
+* **Accurate Description:** When writing an entry for a Spinach function, thoroughly analyze the function’s implementation first. Make sure you understand how it works and what its key algorithms are. Only then, write a brief but informative knowledge entry, explaining the function’s behavior and any important details of its operation.
+
+* **Preserve content:** Before updating the knowledge base, you must run an information-preservation gate: compare proposed text against existing text, flag content-drop risks, and block any edit that removes useful existing records unless the user explicitly approves that removal.
 
 ## Task Execution Policies
 

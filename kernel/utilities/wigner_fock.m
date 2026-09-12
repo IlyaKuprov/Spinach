@@ -74,8 +74,8 @@ end
 if min(eig(full((rho+rho')/2)))<-tol
     error('rho must be positive semidefinite.');
 end
-if (~isnumeric(alpha))||(~all(isfinite(alpha),'all'))
-    error('alpha must be a numeric array with finite elements.');
+if (~isfloat(alpha))||(~all(isfinite(alpha),'all'))
+    error('alpha must be a floating-point array with finite elements.');
 end
 end
 

@@ -36,8 +36,11 @@ C=[2 1;0 4];
 result=test_close(result,'remtrace',remtrace(C),[-1 1;0 1],1e-15,1e-15,...
                   'remtrace subtracts trace(A)/dim times the unit matrix');
 H=[2 1+2i;1-2i 5];
-result=test_close(result,'remncomm diagonal basis',remncomm(H,eye(2)),diag(diag(H)),1e-15,1e-15,...
-                  'in the eigenbasis of B only the diagonal part commutes with B');
+result=test_close(result,'remncomm diagonal basis',remncomm(H,eye(2),[1;2]),diag(diag(H)),1e-15,1e-15,...
+                  'in the eigenbasis of a non-degenerate B only the diagonal part commutes with B');
+H=[2 1+2i 3;1-2i 5 1i;3 -1i 1];
+result=test_close(result,'remncomm degenerate basis',remncomm(H,eye(3),[1;1;2]),[2 1+2i 0;1-2i 5 0;0 0 1],1e-15,1e-15,...
+                  'in the eigenbasis of a degenerate B the whole degenerate block of A commutes with B');
 
 % Check Frobenius inner product and anti-diagonal transpose
 D=[1+1i 2-1i;3 4i];

@@ -484,7 +484,7 @@
 | `kernel/utilities/polinfo.m` | `polinfo(p,level,label)` | Draws an ASCII diagram of a polyadic object. Syntax: polinfo(p) Parameters: p - polyadic object Outputs: an ASCII diagra | 111 |
 | `kernel/utilities/poolsize.m` | `n=poolsize()` | Returns the current parallel pool size. Syntax: n=poolsize() Parameters: none Outputs: n - number of workers in the curr | 40 |
 | `kernel/utilities/prune_subgraphs.m` | `subgraphs=prune_subgraphs(subgraphs)` | Removes subgraphs that are contained entirely within other subgraphs. Syntax: subgraphs=prune_subgraphs(subgraphs) Param | 59 |
-| `kernel/utilities/remncomm.m` | `A=remncomm(A,EvB)` | Removes from the Hermitian operator A the part that does not com- mute with the Hermitian operator B. Syntax: C=remncomm | 54 |
+| `kernel/utilities/remncomm.m` | `A=remncomm(A,EvB,evals_b)` | Removes from the Hermitian operator A the part that does not com- mute with the Hermitian operator B. Syntax: C=remncomm | 54 |
 | `kernel/utilities/remtrace.m` | `A=remtrace(A)` | Subtracts an appropriate multiple of the unit matrix to make the input matrix traceless. Syntax: A=remtrace(A) Parameter | 39 |
 | `kernel/utilities/repcols.m` | `B=repcols(A,col_nums,rep_counts)` | Replicates specified columns of a matrix or cell array a specified number of times. Syntax: B=repcols(A,col_nums,rep_cou | 66 |
 | `kernel/utilities/report.m` | `report(spin_system,report_string)` | Writes a log message to the console or an ACSII file. The message includes the call stack of the function that produced  | 126 |

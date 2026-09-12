@@ -88,8 +88,8 @@ if min(floor(f_uv*npts*dt),ceil(npts/2)-1)<ceil(f_ir*npts*dt)
 end
 end
 
-% The noise is the signal.
-%
-% (a proverb of every spectroscopist who has
-%  ever tried to measure a relaxation time)
+% Про тридцать восемь попугаев
+% Училка спрашивает нас:
+% Кто они были, как их звали,
+% И в чём их подвиг состоял.
 

@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Wigner function of a bosonic mode state given as a density matrix in a truncated Fock basis, evaluated at the specified points of the phase space through the displaced parity operator (Royer, Phys. Rev. A 15, 449, 1977): W(alpha)=(2/pi)*trace(rho*D(alpha)*P*D(alpha)') where D(alpha)=expm(alpha*a'-conj(alpha)*a) is the displacement operator and P=expm(1i*pi*a'*a) is the photon number parity ope- rator, both built from
+Wigner function of a bosonic mode state given as a density matrix in a truncated Fock basis, evaluated at the specified points of the phase space through the displaced parity operator (Royer, Phys. Rev. A 15, 449, 1977): W(alpha)=(2/pi)*trace(rho*D(alpha)*P*D(alpha)') where D(alpha)=expm(alpha*a'-conj(alpha)*a) is the displacement operator and P=expm(1i*pi*a'*a) is the photon number parity ope- rator, both built from the ladder operators truncated to the di- mension of the density matrix. Syntax: W=wigner_fock(rho,alpha)
 
 ## Physical / mathematical content
 
@@ -84,4 +84,4 @@ Wigner function of a bosonic mode state given as a density matrix in a truncated
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `grumble()`, `alpha()`, `conj()`, `ismatrix()`, `all()`, `eps()`.
+- Called routines detected from the main body: `grumble()`, `conj()`, `ismatrix()`, `all()`, `eps()`.

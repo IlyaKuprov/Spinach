@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Flux-noise dephasing rates of two dual-rail qubits whose flux-tuna- ble transmon-coupled rails share one transmon ancilla, and their suppression by a Stark-assisted flux-noise evasion (SAFE) drive on the transmon, Sec. 4.4.2 and Fig. 4.4(c) of Yunwei Lu's PhD thesis (Northwestern University, 2026). The logical dephasing rate of each dual-rail qubit is set by the flux sensitivity of the dressed sin- gle-photon transit
+Flux-noise dephasing rates of two dual-rail qubits whose flux-tuna- ble transmon-coupled rails share one transmon ancilla, and their suppression by a Stark-assisted flux-noise evasion (SAFE) drive on the transmon, Sec. 4.4.2 and Fig. 4.4(c) of Yunwei Lu's PhD thesis (Northwestern University, 2026). The logical dephasing rate of each dual-rail qubit is set by the flux sensitivity of the dressed sin- gle-photon transition frequency of its transmon-coupled rail, Eqs. (4.93) and (4.95); the rates are computed from the eigenvalues of the rotating frame Hamiltonian of Eq. (4.16) at a fixed drive amp- litude as functions of the transmon-drive detuning. Both rates go through a minimum in the same detuning window, so that one drive protects both qubits. Calculation time: seconds
 
 ## Physical / mathematical content
 
@@ -83,4 +83,4 @@ Flux-noise dephasing rates of two dual-rail qubits whose flux-tuna- ble transmon
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `chi()`, `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `sens_c()`, `sens_x()`, `state()`, `detunings()`, `shifts()`, `vecs()`, `idx()`, `energies()`, `vals()`, `rates()`.
+- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `state()`, `num2str()`, `any()`.

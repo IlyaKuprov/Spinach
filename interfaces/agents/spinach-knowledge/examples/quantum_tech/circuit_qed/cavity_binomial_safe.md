@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Binomial bosonic code |0L>=(|0>+|4>)/sqrt(2), |1L>=|2> in a cavity dispersively coupled to a flux-tunable transmon ancilla, and the protection of its coherences from 1/f flux noise by a Stark-assis- ted flux-noise evasion (SAFE) drive on the transmon, Sec. 4.4.1 and Fig. 4.4(a,b) of Yunwei Lu's PhD thesis (Northwestern University, 2026). The flux noise dephasing rates of the code and error space coherences are comput
+Binomial bosonic code |0L>=(|0>+|4>)/sqrt(2), |1L>=|2> in a cavity dispersively coupled to a flux-tunable transmon ancilla, and the protection of its coherences from 1/f flux noise by a Stark-assis- ted flux-noise evasion (SAFE) drive on the transmon, Sec. 4.4.1 and Fig. 4.4(a,b) of Yunwei Lu's PhD thesis (Northwestern University, 2026). The flux noise dephasing rates of the code and error space coherences are computed from the flux sensitivities of the dressed cavity transition frequencies as functions of the transmon-drive detuning, Eq. (4.93); at the common minimum the logical state |+L> is then propagated for 300 microseconds along 1/f flux noise tra- jectories under the Lindblad master equation, with and without the drive, and the decoherence-only infidelity of Eq. (4.94) and the Wigner function of the cavity state are reported. Calculation time: minutes
 
 ## Physical / mathematical content
 
@@ -104,4 +104,4 @@ Binomial bosonic code |0L>=(|0>+|4>)/sqrt(2), |1L>=|2> in a cavity dispersively 
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `idx()`, `state()`, `int2str()`, `dressed_ens()`, `detunings()`, `rates()`, `dressed()`, `pairs()`, `median()`, `num2str()`, `any()`.
+- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `state()`, `int2str()`, `dressed_ens()`, `median()`, `num2str()`, `any()`, `kfigure()`, `subplot()`, `semilogy()`, `kxlabel()`.

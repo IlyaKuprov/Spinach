@@ -57,6 +57,14 @@
 %       the 'imag' fidelity, its gradient, and its Hessian follows this
 %       argument order; swapping the arguments would flip that sign.
 %
+% Note: trajectory cost terms are read from spin_system.control: when
+%       fid_type is 'average', the fidelity is averaged over the pulse
+%       nodes 1..N instead of being taken at the last node; traj_pen
+%       operators are summed, their expectation value is averaged over
+%       the same nodes and subtracted from the fidelity. Both terms use
+%       costates that ride on the backward sweep, the trajectory never
+%       leaves the worker. Hessians are not available with these terms.
+%
 % ilya.kuprov@weizmann.ac.il
 % m.keitel@soton.ac.uk
 %
@@ -71,6 +79,28 @@ grumble(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type);
 
 % Count the outputs
 n_outputs=nargout();
+
+% Pull the trajectory cost term settings
+fid_avg=strcmp(spin_system.control.fid_type,'average');
+pen_on=~isempty(spin_system.control.traj_pen);
+
+% Trajectory cost terms have no Hessians
+if (n_outputs>3)&&(fid_avg||pen_on)
+    error('Hessians are not available with trajectory cost terms.');
+end
+
+% Phase cycle factors cancel in the overlap but not in the penalty
+if pen_on&&(~isempty(spin_system.control.phase_cycle))
+    error('trajectory penalties are not available with phase cycles.');
+end
+
+% Sum the trajectory penalty operators
+if pen_on
+    pen_op=spin_system.control.traj_pen{1};
+    for k=2:numel(spin_system.control.traj_pen)
+        pen_op=pen_op+spin_system.control.traj_pen{k};
+    end
+end
 
 % Extract the timing grid
 dt=spin_system.control.pulse_dt;
@@ -120,11 +150,6 @@ end
 
 % Preallocate forward trajectory
 fwd_traj=cell(1,nsteps+1); fwd_traj{1}=rho_init;
-
-% Preallocate backward trajectory
-if n_outputs>2
-    bwd_traj=cell(1,nsteps+1); bwd_traj{1}=rho_targ;
-end
 
 % Count the drifts
 ndrifts=numel(drifts);
@@ -220,8 +245,40 @@ for n=1:nsteps
 
 end
 
-% Run the backward trajectory
+% Overlaps with the target at the nodes, target on the conjugated side
+overlaps=zeros(1,nsteps,'like',1i);
+for n=1:nsteps
+    overlaps(n)=hdot(rho_targ,fwd_traj{n+1});
+end
+overlap=overlaps(end);
+
+% Trajectory penalty averaged over the nodes
+if pen_on
+    pen_val=0;
+    for n=1:nsteps
+        pen_val=pen_val+real(hdot(pen_op,fwd_traj{n+1}))/nsteps;
+    end
+end
+
+% Run the backward trajectories
 if n_outputs>2
+
+    % Fidelity costate source weights at the nodes
+    if fid_avg&&strcmp(fidelity_type,'square')
+        weights=overlaps/nsteps;
+    elseif fid_avg
+        weights=ones(1,nsteps)/nsteps;
+    else
+        weights=[zeros(1,nsteps-1) 1];
+    end
+
+    % Start the fidelity costate at the last node
+    bwd_traj=cell(1,nsteps+1); bwd_traj{1}=weights(nsteps)*rho_targ;
+
+    % Start the penalty costate at the last node
+    if pen_on, pen_traj=cell(1,nsteps+1); pen_traj{1}=pen_op/nsteps; end
+
+    % Loop over time steps
     for n=1:nsteps
 
         % Index the backward interval
@@ -230,27 +287,36 @@ if n_outputs>2
         % Get the backward keyhole operator
         keyhole_back=spin_system.control.keyholes{m};
 
-        % Apply keyhole to the backward trajectory
-        if ~isempty(keyhole_back), bwd_traj{n}=keyhole_back(bwd_traj{n}); end
+        % Apply keyhole to the costates
+        if ~isempty(keyhole_back)
+            bwd_traj{n}=keyhole_back(bwd_traj{n});
+            if pen_on, pen_traj{n}=keyhole_back(pen_traj{n}); end
+        end
 
         % Take a time step backwards
         bwd_traj{n+1}=P{m}'*bwd_traj{n}*P{m};
+        if pen_on, pen_traj{n+1}=P{m}'*pen_traj{n}*P{m}; end
+
+        % Add the sources at the previous node
+        if m>1
+            bwd_traj{n+1}=bwd_traj{n+1}+weights(m-1)*rho_targ;
+            if pen_on, pen_traj{n+1}=pen_traj{n+1}+pen_op/nsteps; end
+        end
 
     end
 
-    % Flip the backward trajectory
+    % Flip the costates to match forward indexing
     bwd_traj=fliplr(bwd_traj);
+    if pen_on, pen_traj=fliplr(pen_traj); end
 
 end
-
-% State overlap, target on the conjugated side, as in grape_liouv.m
-overlap=hdot(rho_targ,fwd_traj{end});
 
 % Compute gradient
 if n_outputs>2
 
     % Preallocate results
     grad=zeros(size(waveform),'like',1i);
+    if pen_on, pen_grad=zeros(size(waveform)); end
 
     % Integrator-specific paths
     switch spin_system.control.integrator
@@ -283,6 +349,7 @@ if n_outputs>2
 
                     % Compute the derivative of the objective
                     grad_col(k)=hdot(bwd_traj{n+1},rho_deriv);
+                    if pen_on, pen_grad(k,n)=real(hdot(pen_traj{n+1},rho_deriv)); end
 
                 end
 
@@ -335,6 +402,7 @@ if n_outputs>2
 
                         % Compute the derivative of the objective
                         grad_col(k)=hdot(bwd_traj{n+1},rho_deriv);
+                        if pen_on, pen_grad(k,n)=real(hdot(pen_traj{n+1},rho_deriv)); end
 
                     end
 
@@ -367,6 +435,7 @@ if n_outputs>2
 
                         % Compute the derivative of the objective
                         grad_col(k)=hdot(bwd_traj{end},rho_deriv);
+                        if pen_on, pen_grad(k,n)=real(hdot(pen_traj{end},rho_deriv)); end
 
                     end
 
@@ -398,6 +467,7 @@ if n_outputs>2
 
                         % Product rule: [dP2]*[P1]*rho part
                         grad_col(k)=grad_col(k)+hdot(bwd_traj{n+1},rho_deriv);
+                        if pen_on, pen_grad(k,n)=pen_grad(k,n)+real(hdot(pen_traj{n+1},rho_deriv)); end
 
                         % Right pair of drifts
                         drift_pair={drifts{mod(n-2,ndrifts)+1},...
@@ -422,6 +492,7 @@ if n_outputs>2
 
                         % Product rule: [P2]*[dP1]*rho part
                         grad_col(k)=grad_col(k)+hdot(bwd_traj{n},rho_deriv);
+                        if pen_on, pen_grad(k,n)=pen_grad(k,n)+real(hdot(pen_traj{n},rho_deriv)); end
 
                     end
 
@@ -562,8 +633,12 @@ switch fidelity_type
 
     case {'real'}
 
-        % Real part of the overlap
-        fidelity=real(overlap);
+        % Real part of the overlap, averaged over the nodes if requested
+        if fid_avg
+            fidelity=mean(real(overlaps));
+        else
+            fidelity=real(overlap);
+        end
 
         % Update Hessian
         if exist('hess','var'), hess=real(hess); end
@@ -573,8 +648,12 @@ switch fidelity_type
 
     case {'imag'}
 
-        % Imaginary part of the overlap
-        fidelity=imag(overlap);
+        % Imaginary part of the overlap, averaged over the nodes if requested
+        if fid_avg
+            fidelity=mean(imag(overlaps));
+        else
+            fidelity=imag(overlap);
+        end
 
         % Update Hessian
         if exist('hess','var'), hess=imag(hess); end
@@ -584,8 +663,12 @@ switch fidelity_type
 
     case {'square'}
 
-        % Absolute square of the overalp
-        fidelity=overlap*conj(overlap);
+        % Absolute square of the overlap, averaged over the nodes if requested
+        if fid_avg
+            fidelity=mean(abs(overlaps).^2);
+        else
+            fidelity=overlap*conj(overlap);
+        end
 
         % Update Hessian
         if exist('hess','var')
@@ -602,11 +685,12 @@ switch fidelity_type
         % Update gradient
         if exist('grad','var')
 
-            % Product rule
-            grad=grad*conj(overlap)+overlap*conj(grad);
-
-            % Cleaning up
-            grad=real(grad);
+            % Product rule, averaged overlaps are inside the costate
+            if fid_avg
+                grad=2*real(grad);
+            else
+                grad=real(grad*conj(overlap)+overlap*conj(grad));
+            end
 
         end
 
@@ -627,18 +711,24 @@ else
     traj_data.forward=[];
 end
 
-% Catch unreachable objectives
-if abs(fidelity)==0
+% Catch unreachable terminal objectives, trajectory cost terms may cancel legitimately
+if (~(fid_avg||pen_on))&&(abs(fidelity)==0)
     spin_system.sys.output=1;
     report(spin_system,'exactly zero fidelity: either the target is unreachable');
     report(spin_system,'from the source, or the initial guess is very poor.');
     error('GRAPE cannot proceed.');
 end
-if exist('grad','var')&&(norm(grad,1)==0)
+if (~(fid_avg||pen_on))&&exist('grad','var')&&(norm(grad,1)==0)
     spin_system.sys.output=1;
     report(spin_system,'exactly zero gradient: either the target is unreachable');
     report(spin_system,'from the source, or the initial guess is very poor.');
     error('GRAPE cannot proceed.');
+end
+
+% Subtract the trajectory penalty
+if pen_on
+    fidelity=fidelity-pen_val;
+    if exist('grad','var'), grad=grad-pen_grad; end
 end
 
 end
@@ -656,6 +746,10 @@ if (~isnumeric(rho_targ))||(~ismatrix(rho_targ))||(size(rho_targ,1)~=size(rho_ta
 end
 if (~ischar(fidelity_type))||(~ismember(fidelity_type,{'real','imag','square'}))
     error('fidelity_type must be ''real'', ''imag'', or ''square''.');
+end
+if (~ischar(spin_system.control.fid_type))||...
+   (~ismember(spin_system.control.fid_type,{'terminal','average'}))
+    error('spin_system.control.fid_type must be ''terminal'' or ''average''.');
 end
 if ~iscell(drifts)
     error('drifts must be a cell array of matrices.');

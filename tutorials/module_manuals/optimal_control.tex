@@ -381,6 +381,22 @@ state-to-state transfer with a fixed target phase; \code{square} removes
 the phase sensitivity; \code{imag} is occasionally useful for quadrature
 targets.
 
+Two trajectory-dependent terms may be added to the objective, both
+evaluated on the workers from the forward trajectory and differentiated
+through costates that ride on the backward sweep. With
+\code{control.fid\_type='average'} the functional above is applied to
+the overlap at every pulse node $n=1,\ldots,N$ and averaged, instead of
+being taken at the last node (\code{'terminal'}, the default); this
+rewards early arrival at the target. With \code{control.traj\_pen}, a
+cell array of Hermitian operators (square matrices in Hilbert space,
+state-shaped vectors in Liouville space), the expectation value of their
+sum along the trajectory is averaged over the same nodes and subtracted
+from the fidelity; a projector onto leakage levels is the typical use.
+The penalty has no weight of its own --- scale the operators. Neither
+term has an analytic Hessian, and neither is available with the
+stroboscopic steady state; trajectory penalties are also not available
+with phase cycles or with \code{grape\_coop()}.
+
 \subsection{The piecewise-linear (trapezium) integrator}
 \label{sec:trapezium}
 
@@ -986,8 +1002,9 @@ should know:
   counts), \code{pulse\_dt} (same length), \code{pwr\_levels},
   \code{offsets} (same value counts), \code{phase\_cycle} (same line
   count), \code{distortion} (same rows), \code{freeze},
-  \code{fidelity}, \code{plotting}, \code{keyholes}, penalties,
-  weights, bounds, and the prefix and suffix functions. The live
+  \code{fidelity}, \code{fid\_type}, \code{traj\_pen}, \code{plotting},
+  \code{keyholes}, penalties, weights, bounds, and the prefix and
+  suffix functions. The live
   structure travels to the workers fresh at every objective
   evaluation, so overwrites take effect at the next one --- this is
   how parameter sweeps reuse one \code{optimcon()} setup across many
@@ -1527,6 +1544,16 @@ the trapezium integrator and distortions; \code{'goodwin'} requires
 Hermitian generators\\
 \code{steady} & \code{false} & stroboscopic steady-state mode
 (Section~\ref{sec:steady}); many restrictions apply\\
+\code{fid\_type} & \code{'terminal'} & \code{'terminal'} takes the
+fidelity at the last pulse node, \code{'average'} averages it over all
+pulse nodes (Section~\ref{sec:fidelityfun}); \code{'average'} refuses
+Hessian-based methods and the steady state\\
+\code{traj\_pen} & \code{\{\}} & cell array of Hermitian operators
+(matrices in Hilbert space, state-shaped vectors in Liouville space)
+whose summed expectation value, averaged over the pulse nodes, is
+subtracted from the fidelity (Section~\ref{sec:fidelityfun}); refuses
+Hessian-based methods, the steady state, phase cycles, and
+\code{grape\_coop()}\\
 \code{prefix}, \code{suffix} & none & function handles
 \code{rho=f(spin\_system,drift,rho)} applied before the pulse (initial
 state) and to the target in reverse time\\
@@ -1635,8 +1662,9 @@ returned structure: they live on the workers.
   cooperative pulse pairs; the two phase profiles are stacked
   vertically.
 \item[\code{[traj,fid,grad,hess]=ensemble(waveform,spin\_system)}] ---
-  the parallel ensemble average of the bare fidelity (no penalties);
-  called by the wrappers, callable directly.
+  the parallel ensemble average of the fidelity, including the
+  trajectory penalty when \code{traj\_pen} is set, but none of the
+  amplitude penalties; called by the wrappers, callable directly.
 \item[\code{tgrape()}] ---
   \code{[fid,grad]=tgrape(spin\_system,drift,controls,}
   \code{waveform,dt\_grid,time\_unit,rho\_init,rho\_targ)}:

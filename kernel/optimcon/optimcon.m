@@ -1332,6 +1332,91 @@ else
     
 end
 
+% Process trajectory penalty operators
+if isfield(control,'traj_pen')
+
+    % Input validation
+    if (~iscell(control.traj_pen))||isempty(control.traj_pen)
+        error('control.traj_pen must be a non-empty cell array.');
+    end
+    for n=1:numel(control.traj_pen)
+        switch spin_system.bas.formalism
+            case {'sphten-liouv','zeeman-liouv'}
+                if (~isnumeric(control.traj_pen{n}))||(~iscolumn(control.traj_pen{n}))||...
+                   (numel(control.traj_pen{n})~=numel(spin_system.control.rho_init{1}))
+                    error('control.traj_pen must be a cell array of state-sized column vectors.');
+                end
+            case {'zeeman-hilb','zeeman-wavef'}
+                if (~isnumeric(control.traj_pen{n}))||(~ismatrix(control.traj_pen{n}))||...
+                   (size(control.traj_pen{n},1)~=size(control.traj_pen{n},2))||...
+                   (size(control.traj_pen{n},1)~=size(spin_system.control.rho_init{1},1))
+                    error('control.traj_pen must be a cell array of square matrices of the drift dimension.');
+                end
+            otherwise
+                error('unrecognised formalism specification.');
+        end
+    end
+    if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef'})
+        check_hermiticity(control.traj_pen,'trajectory penalty operators');
+    end
+    if ismember(spin_system.control.method,{'newton','goodwin'})
+        error('trajectory penalties are not available with Hessian-based methods.');
+    end
+    if spin_system.control.steady
+        error('trajectory penalties are not available with stroboscopic steady states.');
+    end
+    if ~isempty(spin_system.control.phase_cycle)
+        error('trajectory penalties are not available with phase cycles.');
+    end
+
+    % Absorb the specification
+    spin_system.control.traj_pen=control.traj_pen;
+    control=rmfield(control,'traj_pen');
+
+else
+
+    % Default is no trajectory penalty
+    spin_system.control.traj_pen={};
+
+end
+
+% Inform the user
+report(spin_system,[pad('Trajectory penalty operators',60) ...
+                    int2str(numel(spin_system.control.traj_pen))]);
+
+% Process fidelity time weighting
+if isfield(control,'fid_type')
+
+    % Input validation
+    if (~ischar(control.fid_type))||(~ismember(control.fid_type,{'terminal','average'}))
+        error('control.fid_type can be ''terminal'' or ''average''.');
+    end
+    if strcmp(control.fid_type,'average')&&ismember(spin_system.control.method,{'newton','goodwin'})
+        error('time-averaged fidelity is not available with Hessian-based methods.');
+    end
+    if strcmp(control.fid_type,'average')&&spin_system.control.steady
+        error('time-averaged fidelity is not available with stroboscopic steady states.');
+    end
+
+    % Absorb the specification
+    spin_system.control.fid_type=control.fid_type;
+    control=rmfield(control,'fid_type');
+
+else
+
+    % Default is the fidelity at the last node
+    spin_system.control.fid_type='terminal';
+
+end
+
+% Inform the user
+switch spin_system.control.fid_type
+    case 'terminal'
+        report(spin_system,[pad('Fidelity time weighting',60) 'last pulse node']);
+    case 'average'
+        report(spin_system,[pad('Fidelity time weighting',60) 'average over pulse nodes']);
+end
+
 % Process checkpoint file
 if isfield(control,'checkpoint')
 

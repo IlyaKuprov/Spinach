@@ -115,11 +115,7 @@ if (~isnumeric(nlevels))||(~isreal(nlevels))||(~isscalar(nlevels))||...
 end
 end
 
-% Nature isn't classical, dammit, and if you want to make a
-% simulation of nature, you'd better make it quantum mecha-
-% nical, and by golly it's a wonderful problem, because it
-% doesn't look so easy.
+% The first draft of anything is shit.
 %
-% Richard Feynman
-
+% Ernest Hemingway
 

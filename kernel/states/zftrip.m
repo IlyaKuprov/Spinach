@@ -15,6 +15,25 @@
 %               X, Y, and Z eigenstates of the ZFS tensor
 %               at zero magnetic field, order: [pX pY pZ]
 %
+%               X, Y, and Z are labelled using the organic
+%               triplet convention |Dzz|>|Dxx|>|Dyy|, under
+%               which D and E have opposite signs, -1/3<
+%               E/D<0 (C.P. Poole, H.A. Farach, W.K. Jack-
+%               son, J. Chem. Phys. 61, 2220 (1974), DOI:
+%               10.1063/1.1682294). Populations quoted in
+%               the transition metal convention |Dzz|>|Dyy|
+%               >|Dxx| with 0<E/D<1/3 must have their X
+%               and Y entries swapped before the call. At
+%               E=0 the X and Y states are degenerate (all
+%               three when D=0 as well) and the labelling
+%               within the degenerate set is undefined. At
+%               E/D=-1/3 the X and Z energies are opposite
+%               in sign, not degenerate, but equal in mag-
+%               nitude, so the sort by |energy| cannot tell
+%               X from Z. In both cases the affected popu-
+%               lations must be equal for the result to be
+%               meaningful.
+%
 %    Z        - 3x3 Zeeman interaction tensor (Hz/Tesla) in
 %               the laboratory frame of reference; use func- 
 %               tions like axrh2mat() to get it from eigen-
@@ -52,7 +71,7 @@ H_ZFS=2*pi*(ZFS(1,1)*Ex*Ex+ZFS(1,2)*Ex*Ey+ZFS(1,3)*Ex*Ez+...
 % Diagonalise ZFS Hamiltonian
 [V,D]=eig(full(H_ZFS),'vector');
 
-% Match literature convention (|zz|>|xx|>|yy|)
+% Organic triplet convention (|zz|>|xx|>|yy|)
 [~,ord]=sort(abs(D),'ascend'); V=V(:,ord);
 Vz=V(:,3); Vx=V(:,2); Vy=V(:,1);
 

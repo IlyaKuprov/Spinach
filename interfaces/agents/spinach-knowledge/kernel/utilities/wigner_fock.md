@@ -42,7 +42,7 @@ Wigner function of a bosonic mode state given as a density matrix in a truncated
 
 - Line 63: `grumble()` — `function grumble(rho,alpha)`.
   - Representative operation: `if (~isfloat(rho))||(~ismatrix(rho))||(size(rho,1)~=size(rho,2))||(size(rho,1)<2)||(~all(isfinite(rho),'all'))`.
-  - Representative operation: `error('rho must be a square matrix of dimension at least 2 with finite elements.')`.
+  - Representative operation: `error('rho must be a square floating-point matrix of dimension at least 2 with finite elements.')`.
 
 ## Parameters / inputs
 

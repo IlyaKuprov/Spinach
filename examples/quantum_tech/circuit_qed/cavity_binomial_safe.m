@@ -137,8 +137,13 @@ psi_code=[1 0 sqrt(2) 0 1]'/2; rho_cav(:,:,1)=psi_code*psi_code';
 % Loop over the undriven and the driven case
 for k=1:2
 
-    % Dressed states adiabatically connected to |g,0>, |g,2>, and |g,4>
-    H_case=full(H_hilb+2*pi*delta_bd*num_b+drives(k)*drive_op); [vecs,vals]=eig(H_case);
+    % Dressed states adiabatically connected to |g,0>, |g,2>, and |g,4>, the bare states of the diagonal undriven Hamiltonian
+    H_case=full(H_hilb+2*pi*delta_bd*num_b+drives(k)*drive_op);
+    if drives(k)==0
+        vecs=eye(size(H_case)); vals=diag(diag(H_case));
+    else
+        [vecs,vals]=eig(H_case);
+    end
     [~,c0]=max(abs(vecs(idx(1),:))); [~,c2]=max(abs(vecs(idx(3),:))); [~,c4]=max(abs(vecs(idx(5),:)));
 
     % Phases of the dressed states fixed by their bare state components

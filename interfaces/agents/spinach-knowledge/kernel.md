@@ -526,6 +526,7 @@
 | `kernel/utilities/vvpert.m` | `[Ep,G]=vvpert(E0,H1,order)` | Van Vleck perturbation theory, following Shavitt and Redmon, but excluding the quasi-degenerate split. Syntax: [Ep,G]=vv | 126 |
 | `kernel/utilities/which_subst.m` | `subst=which_subst(spin_system,spins)` | Finds out which substance hosts the specified spins; throws an error if there is more than one. Syntax: subst=which_subs | 62 |
 | `kernel/utilities/wigner.m` | `D=wigner(l,alp,bet,gam)` | Wigner D matrices, defined as (Brink & Satchler, Eq 2.13): D=expm(-1i*Lz*alp)*expm(-1i*Ly*bet)*expm(-1i*Lz*gam); where L | 107 |
+| `kernel/utilities/wigner_fock.m` | `W=wigner_fock(rho,alpha)` | Wigner function of a bosonic mode state given as a density matrix in a truncated Fock basis, evaluated at the specified  | 84 |
 | `kernel/utilities/wigner_3j.m` | `w=wigner_3j(j1,m1,j2,m2,j3,m3)` | Calculates Wigner 3j-symbols. Syntax: w=wigner_3j(j1,m1,j2,m2,j3,m3) If physically inadmissible indices are supplied, a  | 67 |
 | `kernel/utilities/wigner_6j.m` | `w=wigner_6j(j1,j2,j3,j4,j5,j6)` | Wigner 6j-symbols. Syntax: w=wigner_6j(j1,j2,j3,j4,j5,j6) If physically inadmissible indices are supplied, a zero is ret | 90 |
 | `kernel/utilities/xyz2dd.m` | `[d,alp,bet,gam,M]=xyz2dd(r1,r2,isotope1,isotope2)` | Converts coordinate specification of the dipolar interaction into the dipolar interaction constant, three Euler angles,  | 97 |

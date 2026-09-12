@@ -1412,9 +1412,9 @@ end
 % Inform the user
 switch spin_system.control.fid_type
     case 'terminal'
-        report(spin_system,[pad('Fidelity time weighting',60) 'last pulse node']);
+        report(spin_system,[pad('Fidelity timing',60) 'endpoint']);
     case 'average'
-        report(spin_system,[pad('Fidelity time weighting',60) 'average over pulse nodes']);
+        report(spin_system,[pad('Fidelity timing',60) 'average']);
 end
 
 % Process checkpoint file

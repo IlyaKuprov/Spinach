@@ -17,7 +17,7 @@ Binomial bosonic code |0L>=(|0>+|4>)/sqrt(2), |1L>=|2> in a cavity dispersively 
 
 - An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+- The Lindblad propagation is averaged over 100 windowed 1/f flux-noise trajectories from `pink_noise`, with the propagators tabulated on a 201-point grid of the transmon frequency offset and looked up per time step; the Wigner functions of the final cavity states are evaluated point by point on a 71x71 phase-space grid with `wigner_fock`, and the unit integral of the initial state on that grid is checked.
 - The file also defines local helper function(s): `dressed_ens()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Code-derived implementation details

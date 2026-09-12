@@ -61,8 +61,8 @@ end
 
 % Consistency enforcement
 function grumble(rho,alpha)
-if (~isnumeric(rho))||(~ismatrix(rho))||(size(rho,1)~=size(rho,2))||(size(rho,1)<2)||(~all(isfinite(rho),'all'))
-    error('rho must be a square matrix of dimension at least 2 with finite elements.');
+if (~isfloat(rho))||(~ismatrix(rho))||(size(rho,1)~=size(rho,2))||(size(rho,1)<2)||(~all(isfinite(rho),'all'))
+    error('rho must be a square floating-point matrix of dimension at least 2 with finite elements.');
 end
 tol=sqrt(eps(class(rho)));
 if norm(rho-rho',1)>tol*norm(rho,1)

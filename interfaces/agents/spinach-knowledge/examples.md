@@ -654,6 +654,8 @@
 | `examples/parahydrogen/pasadena_ethylbenzene.m` | `pasadena_ethylbenzene()` | PASADENA experiment simulation for the parahydrogenation of styrene into ethylbenzene. Set to reproduce the top trace of | 70 |
 | `examples/parahydrogen/pasadena_propanal.m` | `pasadena_propanal()` | PASADENA experiment simulation for the parahydrogenation of acrolein into propanal. Calculation time: seconds | 64 |
 | `examples/parahydrogen/sabre_pyridine.m` | `sabre_pyridine()` | SABRE experiment simulation for Eibe Duecker and Christian Griesinger. Set to reproduce Figure 3b from http://dx.doi.org | 114 |
+| `examples/quantum_tech/circuit_qed/cavity_binomial_safe.m` | `cavity_binomial_safe()` | Binomial bosonic code \|0L>=(\|0>+\|4>)/sqrt(2), \|1L>=\|2> in a cavity dispersively coupled to a flux-tunable transmon ancil | 232 |
+| `examples/quantum_tech/circuit_qed/cavity_dual_rail_safe.m` | `cavity_dual_rail_safe()` | Flux-noise dephasing rates of two dual-rail qubits whose flux-tuna- ble transmon-coupled rails share one transmon ancill | 101 |
 | `examples/quantum_tech/circuit_qed/cavity_fock_grape_a.m` | `cavity_fock_grape_a()` | GRAPE preparation of a cavity Fock state through a dispersively coupled qubit, using piecewise-constant drives on both t | 127 |
 | `examples/quantum_tech/circuit_qed/cavity_fock_grape_b.m` | `cavity_fock_grape_b()` | GRAPE preparation of a cavity Fock state through a dispersively coupled qubit using smooth band-limited drives. The cont | 113 |
 | `examples/quantum_tech/circuit_qed/cross_resonance.m` | `cross_resonance()` | Cross-resonance gate mechanism between two fixed-frequency transmons in the laboratory frame. The control transmon is dr | 143 |

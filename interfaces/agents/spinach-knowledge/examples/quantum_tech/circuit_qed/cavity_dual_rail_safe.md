@@ -34,7 +34,7 @@ Flux-noise dephasing rates of two dual-rail qubits whose flux-tuna- ble transmon
 - Lines 73-74: Undriven rates from the bare dispersive sensitivities, Eq. (4.95); implemented by `rates_off=noise_amp*dwb_dphi*sqrt(2*4)*sens_c`.
 - Lines 76-77: Locate the minima and the common operating point; implemented by `[~,min_idx]=min(rates,[],2); common=round(mean(min_idx))`.
 - Lines 83-84: Validate the sweet spots; implemented by `if any(min_idx==1)||any(min_idx==numel(detunings))`.
-- Lines 94-95: Plot the dephasing rates, Fig. 4.4(c); implemented by `kfigure(); semilogy(-detunings/1e6,1e-9*rates',-detunings([1 end])/1e6,1e-9*rates_off'*[1 1],'--'); kgrid`.
+- Lines 94-95: Plot the dephasing rates, Fig. 4.4(c); implemented by `kfigure(); semilogy(-detunings/1e6,1e-9*rates',-detunings([1 end])/1e6,1e-9*[1; 1]*rates_off,'--'); kgrid`.
 
 ### Control flow inferred from the code
 

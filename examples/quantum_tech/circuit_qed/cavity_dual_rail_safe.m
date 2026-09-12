@@ -92,7 +92,7 @@ if any(rates_off'./rates(:,common)<5)
 end
 
 % Plot the dephasing rates, Fig. 4.4(c)
-kfigure(); semilogy(-detunings/1e6,1e-9*rates',-detunings([1 end])/1e6,1e-9*rates_off'*[1 1],'--'); kgrid;
+kfigure(); semilogy(-detunings/1e6,1e-9*rates',-detunings([1 end])/1e6,1e-9*[1; 1]*rates_off,'--'); kgrid;
 kxlabel('$-\Delta_{bd}/2\pi$, MHz'); kylabel('dephasing rate, 1/ns');
 klegend({'rail 1, driven','rail 2, driven','rail 1, undriven','rail 2, undriven'},'Location','northeast');
 ktitle('dual-rail qubits under SAFE');

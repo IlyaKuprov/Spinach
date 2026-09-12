@@ -64,13 +64,14 @@ function grumble(rho,alpha)
 if (~isnumeric(rho))||(~ismatrix(rho))||(size(rho,1)~=size(rho,2))||(size(rho,1)<2)||(~all(isfinite(rho),'all'))
     error('rho must be a square matrix of dimension at least 2 with finite elements.');
 end
-if norm(rho-rho',1)>sqrt(eps)*norm(rho,1)
+tol=sqrt(eps(class(rho)));
+if norm(rho-rho',1)>tol*norm(rho,1)
     error('rho must be Hermitian.');
 end
-if abs(trace(rho)-1)>sqrt(eps)
+if abs(trace(rho)-1)>tol
     error('rho must have unit trace.');
 end
-if min(eig(full((rho+rho')/2)))<-sqrt(eps)
+if min(eig(full((rho+rho')/2)))<-tol
     error('rho must be positive semidefinite.');
 end
 if (~isnumeric(alpha))||(~all(isfinite(alpha),'all'))

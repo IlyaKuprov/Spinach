@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/wigner_fock.m`
 - Signature: `W=wigner_fock(rho,alpha)`
-- Total lines: 84
+- Total lines: 85
 
 ## Purpose
 
@@ -11,15 +11,12 @@ Wigner function of a bosonic mode state given as a density matrix in a truncated
 ## Physical / mathematical content
 
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
 
 ## Numerical / algorithmic content
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+- Each requested phase-space point costs one `expm` of the displacement generator alpha*a'-conj(alpha)*a in the truncated Fock basis and one trace against the parity operator; there is no averaging, propagation, or quadrature, and the points are evaluated independently in a loop over `numel(alpha)`.
+- The only eigenvalue call is the positive-semidefiniteness test in the grumbler; the Hermiticity, unit-trace, and positivity tolerances are sqrt(eps) of the class of `rho`, so single-precision density matrices are accepted.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Code-derived implementation details
 
@@ -87,4 +84,4 @@ Wigner function of a bosonic mode state given as a density matrix in a truncated
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `grumble()`, `alpha()`, `conj()`, `ismatrix()`, `all()`.
+- Called routines detected from the main body: `grumble()`, `alpha()`, `conj()`, `ismatrix()`, `all()`, `eps()`.

@@ -17,8 +17,11 @@
 %
 %   updates the current axis system
 %
-% Note: the offsets are measured when the function is
-%       called; resize the figure before labelling it.
+% Note: the offsets are computed when the function is
+%       called, so the figure should already have its
+%       final size; the label is stored as a fraction
+%       of the plot box and follows the axes if they
+%       are resized or retiled later.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -37,12 +40,12 @@ ax_obj=gca; ax_units=ax_obj.Units; ax_obj.Units='points';
 plot_box=ax_obj.Position; outer_box=ax_obj.OuterPosition;
 ax_obj.Units=ax_units;
 
-% Label position relative to the plot box corner
-label_x=outer_box(1)-plot_box(1)+edge_offset;
-label_y=outer_box(2)+outer_box(4)-plot_box(2)-edge_offset;
+% Label position as a fraction of the plot box
+label_x=(outer_box(1)-plot_box(1)+edge_offset)/plot_box(3);
+label_y=(outer_box(2)+outer_box(4)-plot_box(2)-edge_offset)/plot_box(4);
 
 % Place the label with its cap line at the top offset
-text(label_x,label_y,letter_label,'Units','points',...
+text(label_x,label_y,letter_label,'Units','normalized',...
      'HorizontalAlignment','left','VerticalAlignment','cap',...
      'FontWeight','bold','FontSize',16);
 

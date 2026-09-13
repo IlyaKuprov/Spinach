@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/ensemble.m`
 - Signature: `[traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)`
-- Total lines: 468
+- Total lines: 488
 
 ## Purpose
 
@@ -17,72 +17,64 @@ A parallel wrapper around GRAPE that enables ensemble optimal control optimisati
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
+- The file also defines local helper function(s): `ens_block()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Code-derived implementation details
 
 ### Comment-guided execution stages
 
-- Lines 48-49: Check consistency; implemented by `grumble(spin_system,waveform)`.
-- Lines 51-52: Pull the ensemble case catalog; implemented by `catalog=spin_system.control.catalog`.
-- Lines 55-56: Pull the worker-resident problem data handle; implemented by `invariants=spin_system.control.invariants`.
-- Lines 58-59: Live problem data is the client-side control structure; implemented by `control=rmfield(spin_system.control,'invariants')`.
-- Lines 61-62: Default the trajectory return flag; implemented by `control.return_traj=isfield(control,'return_traj')&&control.return_traj`.
-- Lines 64-65: Get offset ensemble size; implemented by `off_ens_sizes=cellfun(@numel,control.offsets)`.
-- Lines 67-68: Count the outputs; implemented by `n_outputs=nargout`.
-- Lines 70-71: Preallocate outputs; implemented by `traj_data=cell(n_cases,1); fidelities=cell(1,n_cases)`.
-- Lines 74-75: Waveform dimension statistics; implemented by `ncont=size(waveform,1); nsteps=size(waveform,2)`.
-- Lines 77-78: Parallelise over the ensemble; implemented by `nworkers=poolsize`.
-- Lines 80-81: Run the ensemble loop; implemented by `parfor (n=1:n_cases,nworkers)`.
-- Lines 83-84: Fetch worker-resident problem data; implemented by `ss=invariants.Value`.
-- Lines 86-87: Graft live client data over the frozen worker copy; implemented by `frozen=ss.control; ss.control=control`.
-- Lines 93-94: Extract ensemble indices; implemented by `n_rho=catalog(n,1); n_sys=catalog(n,2)`.
-- Lines 98-99: Get initial and target state; implemented by `rho_init=control.rho_init{n_rho}`.
-- Lines 102-103: Localise the waveform; implemented by `local_waveform=waveform`.
-- Lines 105-106: Apply the phase cycle; implemented by `if ~isempty(control.phase_cycle)`.
-- Lines 108-109: Apply phase to the initial state; implemented by `phi=control.phase_cycle(n_phi,1)`.
+- Lines 50-51: Check consistency; implemented by `grumble(spin_system,waveform)`.
+- Lines 53-54: Pull the worker-resident problem data handle; implemented by `invariants=spin_system.control.invariants`.
+- Lines 56-57: Live problem data is the client-side control structure; implemented by `control=rmfield(spin_system.control,'invariants')`.
+- Lines 59-60: Default the trajectory return flag; implemented by `control.return_traj=isfield(control,'return_traj')&&control.return_traj`.
+- Lines 62-63: Count the outputs and the cases; implemented by `n_outputs=nargout; n_cases=size(control.catalog,1)`.
+- Lines 65-66: Run the ensemble loop, each worker over its own case block; implemented by `spmd (poolsize)`.
+- Lines 68-71: Evaluate the block of cases assigned to this worker; implemented by `[traj_local,fid_local,grad_local,hess_local]=ens_block(invariants.Value,control, control.worker_cases{spmdIndex}, waveform,n_outputs)`.
+- Lines 73-75: Reduce to the first worker and pack; implemented by `results=struct('traj',{spmdCat(traj_local,1,1)},'fid',{spmdCat(fid_local,2,1)}, 'grad',spmdPlus(grad_local,1),'hess',spmdPlus(hess_local,1))`.
+- Lines 79-80: Collect from the first worker; implemented by `results=results{1}; traj_data=results.traj; fidelities=results.fid`.
+- Lines 83-84: Apply trajectory options; implemented by `if ismember('average',spin_system.control.traj_opts)`.
+- Lines 86-87: Return average trajectory; implemented by `ave_traj=(1/n_cases)*traj_data{1}.forward`.
+- Lines 92-93: Overwrite traj_data; implemented by `traj_data=[]; traj_data{1}.forward=ave_traj`.
+- Lines 97-98: Add up fidelities; implemented by `fidelities=cell2mat(fidelities)`.
+- Lines 101-102: Normalise gradient; implemented by `if n_outputs>2`.
+- Lines 106-107: Normalise Hessian; implemented by `if (n_outputs>3)&&strcmp(spin_system.control.integrator,'rectangle')`.
+- Lines 113-114: Run diagnostic plotting (expensive!); implemented by `if ~isempty(spin_system.control.plotting)`.
+- Lines 116-117: With or without instrumental distortions; implemented by `if ~isempty(spin_system.control.distplot)`.
+- Lines 119-120: Apply the distortions; implemented by `dist_waveform=waveform`.
 
 ### Control flow inferred from the code
 
-- Line 81: `parfor` loop over `(n=1:n_cases,nworkers)`.
-- Line 88: `for` loop over `k=1:numel(control.frozen_fields)`.
-- Line 106: conditional branch on `~isempty(control.phase_cycle)`.
-- Line 117: `for` loop over `k=1:(size(local_waveform,1)/2)`.
-- Line 141: conditional branch on `~isempty(off_ens_sizes)`.
-- Line 146: `for` loop over `k=1:numel(off_ens_sizes)`.
-- Line 169: conditional branch on `n_outputs==2`.
-- Line 172: `for` loop over `k=1:size(control.distortion,2)`.
-- Line 183: dispatches on `ss.bas.formalism`; cases `{'sphten-liouv','zeeman-liouv','zeeman-wavef'}`, `'zeeman-hilb'`.
-- Line 211: `for` loop over `k=1:size(control.distortion,2)`.
-- Line 225: dispatches on `ss.bas.formalism`; cases `{'sphten-liouv','zeeman-liouv','zeeman-wavef'}`, `'zeeman-hilb'`.
-- Line 259: dispatches on `ss.bas.formalism`; cases `{'sphten-liouv','zeeman-liouv','zeeman-wavef'}`, `'zeeman-hilb'`.
-- Line 286: conditional branch on `(~isempty(control.phase_cycle))&&(n_outputs>2)`.
-- Line 289: `for` loop over `k=1:(size(gradients{n},1)/2)`.
+- Line 84: conditional branch on `ismember('average',spin_system.control.traj_opts)`.
+- Line 88: `for` loop over `n=2:numel(traj_data)`.
+- Line 102: conditional branch on `n_outputs>2`.
+- Line 107: conditional branch on `(n_outputs>3)&&strcmp(spin_system.control.integrator,'rectangle')`.
+- Line 114: conditional branch on `~isempty(spin_system.control.plotting)`.
+- Line 117: conditional branch on `~isempty(spin_system.control.distplot)`.
+- Line 121: `for` loop over `k=1:numel(spin_system.control.distplot)`.
 
 ### Key state/data transformations
 
-- Lines 52: computes `catalog` using `catalog=spin_system.control.catalog`.
-- Lines 53: computes `n_cases` using `n_cases=size(catalog,1)`.
-- Lines 56: computes `invariants` using `invariants=spin_system.control.invariants`.
-- Lines 59: computes `control` using `control=rmfield(spin_system.control,'invariants')`.
-- Lines 62: computes `control.return_traj` using `control.return_traj=isfield(control,'return_traj')&&control.return_traj`.
-- Lines 65: computes `off_ens_sizes` using `off_ens_sizes=cellfun(@numel,control.offsets)`.
-- Lines 68: computes `n_outputs` using `n_outputs=nargout`.
-- Lines 71: computes `traj_data` using `traj_data=cell(n_cases,1); fidelities=cell(1,n_cases)`.
-- Lines 72: computes `gradients` using `gradients=cell(1,n_cases); hessians=cell(1,n_cases)`.
-- Lines 75: computes `ncont` using `ncont=size(waveform,1); nsteps=size(waveform,2)`.
-- Lines 78: computes `nworkers` using `nworkers=poolsize`.
-- Lines 84: computes `ss` using `ss=invariants.Value`.
-- Lines 87: computes `frozen` using `frozen=ss.control; ss.control=control`.
-- Lines 89: computes `fname` using `fname=control.frozen_fields{k}`.
-- Lines 90: computes `ss.control.(fname)` using `ss.control.(fname)=frozen.(fname)`.
-- Lines 94: computes `n_rho` using `n_rho=catalog(n,1); n_sys=catalog(n,2)`.
-- Lines 95: computes `n_pwr` using `n_pwr=catalog(n,3); n_off=catalog(n,4)`.
-- Lines 96: computes `n_phi` using `n_phi=catalog(n,5); n_dis=catalog(n,6)`.
+- Lines 54: computes `invariants` using `invariants=spin_system.control.invariants`.
+- Lines 57: computes `control` using `control=rmfield(spin_system.control,'invariants')`.
+- Lines 60: computes `control.return_traj` using `control.return_traj=isfield(control,'return_traj')&&control.return_traj`.
+- Lines 63: computes `n_outputs` using `n_outputs=nargout; n_cases=size(control.catalog,1)`.
+- Lines 69-71: computes `[traj_local,fid_local,grad_local,hess_local]` using `[traj_local,fid_local,grad_local,hess_local]=ens_block(invariants.Value,control, control.worker_cases{spmdIndex}, waveform,n_outputs)`.
+- Lines 74-75: computes `results` using `results=struct('traj',{spmdCat(traj_local,1,1)},'fid',{spmdCat(fid_local,2,1)}, 'grad',spmdPlus(grad_local,1),'hess',spmdPlus(hess_local,1))`.
+- Lines 81: computes `gradient` using `gradient=results.grad; hessian=results.hess`.
+- Lines 87: computes `ave_traj` using `ave_traj=(1/n_cases)*traj_data{1}.forward`.
+- Lines 93: computes `traj_data` using `traj_data=[]; traj_data{1}.forward=ave_traj`.
+- Lines 98: computes `fidelities` using `fidelities=cell2mat(fidelities)`.
+- Lines 99: computes `fidelity` using `fidelity=sum(fidelities)/n_cases`.
+- Lines 108: computes `hessian` using `hessian=reshape(hessian/n_cases,numel(waveform)*[1 1])`.
+- Lines 120: computes `dist_waveform` using `dist_waveform=waveform`.
+- Lines 124: computes `dist_function` using `dist_function=spin_system.control.distplot{k}`.
 
 ### Local helper functions
 
-- Line 423: `grumble()` — `function grumble(spin_system,waveform)`.
+- Line 144: `ens_block()` — `function [traj,fid,grad,hess]=ens_block(ss,control,my_cases,waveform,n_outputs)`. Graft live client data over the frozen worker copy
+  - Representative operation: `frozen=ss.control; ss.control=control`.
+  - Representative operation: `for k=1:numel(control.frozen_fields)`.
+- Line 440: `grumble()` — `function grumble(spin_system,waveform)`.
   - Representative operation: `if ~isfield(spin_system,'control')`.
   - Representative operation: `error('control data missing from spin_system, run optimcon() first.')`.
 
@@ -107,11 +99,13 @@ A parallel wrapper around GRAPE that enables ensemble optimal control optimisati
 - ent is returned as an array separating penalty Hes-
 - sians from the fidelity Hessian.
 - Note: the ensemble cases enumerated in spin_system.control.catalog
-- are distributed over the parallel pool workers. Each case
-- fetches the frozen problem data from the pool constant pub-
-- lished by optimcon.m and grafts the live client-side control
-- structure on top of it, so only the waveform and the live
-- control fields travel at each objective evaluation.
+- are processed in the contiguous per-worker blocks assigned by
+- optimcon.m in spin_system.control.worker_cases. Each worker
+- holds the frozen problem data of its own block, published by
+- optimcon.m as a pool constant, and grafts the live client-side
+- control structure on top of it, so only the waveform and the
+- live control fields travel at each objective evaluation; the
+- gradient and the Hessian are summed on the workers.
 
 ## Implementation structure
 
@@ -130,4 +124,4 @@ A parallel wrapper around GRAPE that enables ensemble optimal control optimisati
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `grumble()`, `rmfield()`, `isfield()`, `cellfun()`, `parfor()`, `catalog()`, `local_waveform()`, `fliplr()`, `cumprod()`, `cum_sizes()`, `dist_function()`, `grape_liouv()`, `grape_hilb()`, `speye()`, `ismember()`, `cell2mat()`.
+- Called routines detected from the main body: `grumble()`, `rmfield()`, `isfield()`, `poolsize()`, `ens_block()`, `spmdCat()`, `spmdPlus()`, `ismember()`, `cell2mat()`, `reshape()`, `strcmp()`, `dist_function()`, `ctrl_trajan()`, `cellfun()`, `fliplr()`, `cumprod()`, `sparse()`, `grape_liouv()`, `grape_hilb()`, `speye()`.

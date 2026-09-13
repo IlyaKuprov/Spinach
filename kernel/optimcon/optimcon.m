@@ -17,10 +17,14 @@
 %     spin_system  - updated Spinach data structure
 %
 % Note: this function freezes the optimisation problem. The ensemble
-%       case catalog is built here, and the complete frozen problem
-%       is published to the parallel pool workers exactly once, as a
-%       parallel.pool.Constant held in spin_system.control.invari-
-%       ants. Heavy invariants - the drift generators, the control
+%       case catalog is built here, its cases are assigned to the
+%       parallel pool workers in contiguous blocks recorded in
+%       spin_system.control.worker_cases, and the frozen problem is
+%       published to the workers exactly once, as a parallel.pool.-
+%       Constant built from a per-worker Composite and held in
+%       spin_system.control.invariants; each worker receives the
+%       drift generators of its own case block and nothing else.
+%       Heavy invariants - the drift generators, the control
 %       operators, the offset operators, the control commutators,
 %       and the Bloch-Siegert response operators - are then removed
 %       from the returned structure, and their names are recorded
@@ -1525,8 +1529,26 @@ end
 frozen_fields={'drifts','operators','off_ops','cc_comm','cc_comm_idx','resp_ops'};
 spin_system.control.frozen_fields=frozen_fields(isfield(spin_system.control,frozen_fields));
 
-% Publish the complete frozen problem to the pool, once per problem
-spin_system.control.invariants=parallel.pool.Constant(spin_system);
+% Assign ensemble cases to workers in contiguous blocks
+nblocks=max(nworkers,1); edges=round(linspace(0,n_cases,nblocks+1));
+spin_system.control.worker_cases=cell(nblocks,1);
+for w=1:nblocks
+    spin_system.control.worker_cases{w}=(edges(w)+1):edges(w+1);
+end
+
+% Publish the frozen problem once, each worker getting only its block's drifts
+if nworkers>0
+    invariants=Composite(nworkers);
+    for w=1:nworkers
+        needed=unique(spin_system.control.catalog(spin_system.control.worker_cases{w},2));
+        ss=spin_system; ss.control.drifts=cell(size(ss.control.drifts));
+        ss.control.drifts(needed)=spin_system.control.drifts(needed);
+        invariants{w}=ss;
+    end
+    spin_system.control.invariants=parallel.pool.Constant(invariants);
+else
+    spin_system.control.invariants=parallel.pool.Constant(spin_system);
+end
 
 % Keep heavy invariants off the per-evaluation communication path
 spin_system.control=rmfield(spin_system.control,spin_system.control.frozen_fields);

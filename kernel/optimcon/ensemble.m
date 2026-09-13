@@ -31,11 +31,13 @@
 %                  sians from the fidelity Hessian.
 %
 % Note: the ensemble cases enumerated in spin_system.control.catalog
-%       are distributed over the parallel pool workers. Each case
-%       fetches the frozen problem data from the pool constant pub-
-%       lished by optimcon.m and grafts the live client-side control
-%       structure on top of it, so only the waveform and the live
-%       control fields travel at each objective evaluation.
+%       are processed in the contiguous per-worker blocks assigned by
+%       optimcon.m in spin_system.control.worker_cases. Each worker
+%       holds the frozen problem data of its own block, published by
+%       optimcon.m as a pool constant, and grafts the live client-side
+%       control structure on top of it, so only the waveform and the
+%       live control fields travel at each objective evaluation; the
+%       gradient and the Hessian are summed on the workers.
 %
 % david.goodwin@inano.au.dk
 % ilya.kuprov@weizmann.ac.il
@@ -48,10 +50,6 @@ function [traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)
 % Check consistency
 grumble(spin_system,waveform);
 
-% Pull the ensemble case catalog
-catalog=spin_system.control.catalog;
-n_cases=size(catalog,1);
-
 % Pull the worker-resident problem data handle
 invariants=spin_system.control.invariants;
 
@@ -61,37 +59,116 @@ control=rmfield(spin_system.control,'invariants');
 % Default the trajectory return flag
 control.return_traj=isfield(control,'return_traj')&&control.return_traj;
 
-% Get offset ensemble size
-off_ens_sizes=cellfun(@numel,control.offsets);
+% Count the outputs and the cases
+n_outputs=nargout; n_cases=size(control.catalog,1);
 
-% Count the outputs
-n_outputs=nargout;
+% Run the ensemble loop, each worker over its own case block
+spmd (poolsize)
 
-% Preallocate outputs
-traj_data=cell(n_cases,1); fidelities=cell(1,n_cases);
-gradients=cell(1,n_cases); hessians=cell(1,n_cases);
+    % Evaluate the block of cases assigned to this worker
+    [traj_local,fid_local,grad_local,hess_local]=ens_block(invariants.Value,control,...
+                                                           control.worker_cases{spmdIndex},...
+                                                           waveform,n_outputs);
+
+    % Reduce to the first worker and pack
+    results=struct('traj',{spmdCat(traj_local,1,1)},'fid',{spmdCat(fid_local,2,1)},...
+                   'grad',spmdPlus(grad_local,1),'hess',spmdPlus(hess_local,1));
+
+end
+
+% Collect from the first worker
+results=results{1}; traj_data=results.traj; fidelities=results.fid;
+gradient=results.grad; hessian=results.hess;
+
+% Apply trajectory options
+if ismember('average',spin_system.control.traj_opts)
+
+    % Return average trajectory
+    ave_traj=(1/n_cases)*traj_data{1}.forward;
+    for n=2:numel(traj_data)
+        ave_traj=ave_traj+(1/n_cases)*traj_data{n}.forward;
+    end
+
+    % Overwrite traj_data
+    traj_data=[]; traj_data{1}.forward=ave_traj;
+
+end
+
+% Add up fidelities
+fidelities=cell2mat(fidelities);
+fidelity=sum(fidelities)/n_cases;
+
+% Normalise gradient
+if n_outputs>2
+    gradient=reshape(gradient/n_cases,size(waveform));
+end
+
+% Normalise Hessian
+if (n_outputs>3)&&strcmp(spin_system.control.integrator,'rectangle')
+    hessian=reshape(hessian/n_cases,numel(waveform)*[1 1]);
+else
+    hessian=[];
+end
+
+% Run diagnostic plotting (expensive!)
+if ~isempty(spin_system.control.plotting)
+
+    % With or without instrumental distortions
+    if ~isempty(spin_system.control.distplot)
+
+        % Apply the distortions
+        dist_waveform=waveform;
+        for k=1:numel(spin_system.control.distplot)
+
+            % Extract and apply distortion function
+            dist_function=spin_system.control.distplot{k};
+            dist_waveform=dist_function(dist_waveform);
+
+        end
+
+        % Real-life trajectory and the distorted control sequence
+        ctrl_trajan(spin_system,dist_waveform,traj_data,fidelities);
+
+    else
+
+        % Real-life trajectory but the ideal control sequence
+        ctrl_trajan(spin_system,waveform,traj_data,fidelities);
+
+    end
+
+end
+
+end
+
+% Fidelity, gradient, and Hessian contributions of one block of ensemble cases
+function [traj,fid,grad,hess]=ens_block(ss,control,my_cases,waveform,n_outputs)
+
+% Graft live client data over the frozen worker copy
+frozen=ss.control; ss.control=control;
+for k=1:numel(control.frozen_fields)
+    fname=control.frozen_fields{k};
+    ss.control.(fname)=frozen.(fname);
+end
 
 % Waveform dimension statistics
 ncont=size(waveform,1); nsteps=size(waveform,2);
 
-% Parallelise over the ensemble
-nworkers=poolsize;
+% Case catalog and offset ensemble size
+catalog=control.catalog; off_ens_sizes=cellfun(@numel,control.offsets);
 
-% Run the ensemble loop
-parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
+% Number of cases in the block
+n_mine=numel(my_cases);
 
-    % Fetch worker-resident problem data
-    ss=invariants.Value;
+% Preallocate local outputs
+traj=cell(n_mine,1); fid=cell(1,n_mine);
+grad=zeros(ncont*nsteps,1); hess=[];
+if n_outputs>3, hess=zeros((ncont*nsteps)^2,1); end
 
-    % Graft live client data over the frozen worker copy
-    frozen=ss.control; ss.control=control;
-    for k=1:numel(control.frozen_fields)
-        fname=control.frozen_fields{k};
-        ss.control.(fname)=frozen.(fname);
-    end
+% Loop over the local cases
+for m=1:n_mine
 
     % Extract ensemble indices
-    n_rho=catalog(n,1); n_sys=catalog(n,2);
+    n=my_cases(m); n_rho=catalog(n,1); n_sys=catalog(n,2);
     n_pwr=catalog(n,3); n_off=catalog(n,4);
     n_phi=catalog(n,5); n_dis=catalog(n,6);
 
@@ -185,13 +262,13 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
             case {'sphten-liouv','zeeman-liouv','zeeman-wavef'}
 
                 % Call Liouville space version of the GRAPE function
-                [traj_data{n},fidelities{n}]=grape_liouv(ss,L,ss.control.operators,...
+                [traj{m},fid{m}]=grape_liouv(ss,L,ss.control.operators,...
                                                          local_waveform,rho_init,rho_targ,...
                                                          control.fidelity);
             case 'zeeman-hilb'
 
                 % Call Hilbert space version of the GRAPE function
-                [traj_data{n},fidelities{n}]=grape_hilb(ss,L,ss.control.operators,...
+                [traj{m},fid{m}]=grape_hilb(ss,L,ss.control.operators,...
                                                         local_waveform,rho_init,rho_targ,...
                                                         control.fidelity);
 
@@ -227,13 +304,13 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
             case {'sphten-liouv','zeeman-liouv','zeeman-wavef'}
 
                 % Call Liouville space version of the GRAPE function
-                [traj_data{n},fidelities{n},gradients{n}]=grape_liouv(ss,L,ss.control.operators,...
+                [traj{m},fid{m},grad_n]=grape_liouv(ss,L,ss.control.operators,...
                                                                       local_waveform,rho_init,rho_targ,...
                                                                       control.fidelity);
             case 'zeeman-hilb'
 
                 % Call Hilbert space version of the GRAPE function
-                [traj_data{n},fidelities{n},gradients{n}]=grape_hilb(ss,L,ss.control.operators,...
+                [traj{m},fid{m},grad_n]=grape_hilb(ss,L,ss.control.operators,...
                                                                      local_waveform,rho_init,rho_targ,...
                                                                      control.fidelity);
 
@@ -245,13 +322,13 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
         end
 
         % Store the gradient layout
-        [n_rows,n_cols]=size(gradients{n});
+        [n_rows,n_cols]=size(grad_n);
 
         % Stretch and apply the Jacobian
-        gradients{n}=J'*gradients{n}(:);
+        grad_n=J'*grad_n(:);
 
         % Restore the original gradient layout
-        gradients{n}=reshape(gradients{n},[n_rows n_cols]);
+        grad_n=reshape(grad_n,[n_rows n_cols]);
 
     elseif n_outputs==4
 
@@ -261,15 +338,15 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
             case {'sphten-liouv','zeeman-liouv','zeeman-wavef'}
 
                 % Call Liouville space version of the GRAPE function
-                [traj_data{n},fidelities{n},...
-                 gradients{n},hessians{n}]=grape_liouv(ss,L,ss.control.operators,...
+                [traj{m},fid{m},...
+                 grad_n,hess_n]=grape_liouv(ss,L,ss.control.operators,...
                                                        local_waveform,rho_init,rho_targ,...
                                                        control.fidelity);
             case 'zeeman-hilb'
 
                 % Call Hilbert space version of the GRAPE function
-                [traj_data{n},fidelities{n},...
-                 gradients{n},hessians{n}]=grape_hilb(ss,L,ss.control.operators,...
+                [traj{m},fid{m},...
+                 grad_n,hess_n]=grape_hilb(ss,L,ss.control.operators,...
                                                       local_waveform,rho_init,rho_targ,...
                                                       control.fidelity);
 
@@ -286,11 +363,11 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     if (~isempty(control.phase_cycle))&&(n_outputs>2)
 
         % Un-apply phases to gradient
-        for k=1:(size(gradients{n},1)/2)
+        for k=1:(size(grad_n,1)/2)
 
             % Assemble complex gradient
-            cplx_grad=gradients{n}(2*k-1,:)+...
-                   1i*gradients{n}(2*k,:);
+            cplx_grad=grad_n(2*k-1,:)+...
+                   1i*grad_n(2*k,:);
 
             % Get the phase
             phi=control.phase_cycle(n_phi,k+1);
@@ -299,8 +376,8 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
             cplx_grad=exp(-1i*phi)*cplx_grad;
 
             % Get back X and Y components
-            gradients{n}(2*k-1,:)=real(cplx_grad);
-            gradients{n}(2*k,:)=imag(cplx_grad);
+            grad_n(2*k-1,:)=real(cplx_grad);
+            grad_n(2*k,:)=imag(cplx_grad);
 
         end
 
@@ -310,109 +387,49 @@ parfor (n=1:n_cases,nworkers) %#ok<*PFBNS>
     if (~isempty(control.phase_cycle))&&(n_outputs>3)
 
         % Re-shape the Hessian as [ncont x nsteps x nsteps x ncont]
-        hessians{n}=reshape(hessians{n},[ncont nsteps ncont nsteps]);
+        hess_n=reshape(hess_n,[ncont nsteps ncont nsteps]);
 
         % Un-apply phases to Hessian
-        for k=1:(size(gradients{n},1)/2)
+        for k=1:(size(grad_n,1)/2)
 
             % Get the phase
             phi=control.phase_cycle(n_phi,k+1);
 
             % Assemble complex Hessian - left
-            cplx_hess=hessians{n}(2*k-1,:,:,:)+...
-                   1i*hessians{n}(2*k,:,:,:);
+            cplx_hess=hess_n(2*k-1,:,:,:)+...
+                   1i*hess_n(2*k,:,:,:);
 
             % Un-apply the phase
             cplx_hess=exp(-1i*phi)*cplx_hess;
 
             % Get back X and Y components
-            hessians{n}(2*k-1,:,:,:)=real(cplx_hess);
-            hessians{n}(2*k,:,:,:)=imag(cplx_hess);
+            hess_n(2*k-1,:,:,:)=real(cplx_hess);
+            hess_n(2*k,:,:,:)=imag(cplx_hess);
 
             % Assemble complex Hessian - right
-            cplx_hess=hessians{n}(:,:,2*k-1,:)+...
-                   1i*hessians{n}(:,:,2*k,:);
+            cplx_hess=hess_n(:,:,2*k-1,:)+...
+                   1i*hess_n(:,:,2*k,:);
 
             % Un-apply the phase
             cplx_hess=exp(-1i*phi)*cplx_hess;
 
             % Get back X and Y components
-            hessians{n}(:,:,2*k-1,:)=real(cplx_hess);
-            hessians{n}(:,:,2*k,:)=imag(cplx_hess);
+            hess_n(:,:,2*k-1,:)=real(cplx_hess);
+            hess_n(:,:,2*k,:)=imag(cplx_hess);
 
         end
 
         % Reshape the Hessian back
-        hessians{n}=reshape(hessians{n},[ncont*nsteps nsteps*ncont]);
+        hess_n=reshape(hess_n,[ncont*nsteps nsteps*ncont]);
 
     end
 
-    % Apply power level
+    % Apply power level and accumulate
     if n_outputs>2
-        gradients{n}=power_lvl*gradients{n}(:);
+        grad=grad+power_lvl*grad_n(:);
     end
     if n_outputs>3
-        hessians{n}=power_lvl*power_lvl*hessians{n}(:);
-    end
-
-end
-
-% Apply trajectory options
-if ismember('average',spin_system.control.traj_opts)
-
-    % Return average trajectory
-    ave_traj=(1/n_cases)*traj_data{1}.forward;
-    for n=2:numel(traj_data)
-        ave_traj=ave_traj+(1/n_cases)*traj_data{n}.forward;
-    end
-
-    % Overwrite traj_data
-    traj_data=[]; traj_data{1}.forward=ave_traj;
-
-end
-
-% Add up fidelities
-fidelities=cell2mat(fidelities);
-fidelity=sum(fidelities)/n_cases;
-
-% Add up gradients
-if n_outputs>2
-    gradient=sum(cell2mat(gradients),2)/n_cases;
-    gradient=reshape(gradient,size(waveform));
-end
-
-% Add up Hessians
-if (n_outputs>3)&&strcmp(spin_system.control.integrator,'rectangle')
-    hessian=sum(cell2mat(hessians),2)/n_cases;
-    hessian=reshape(hessian,numel(waveform)*[1 1]);
-else
-    hessian=[];
-end
-
-% Run diagnostic plotting (expensive!)
-if ~isempty(spin_system.control.plotting)
-
-    % With or without instrumental distortions
-    if ~isempty(spin_system.control.distplot)
-
-        % Apply the distortions
-        dist_waveform=waveform;
-        for k=1:numel(spin_system.control.distplot)
-
-            % Extract and apply distortion function
-            dist_function=spin_system.control.distplot{k};
-            dist_waveform=dist_function(dist_waveform);
-
-        end
-
-        % Real-life trajectory and the distorted control sequence
-        ctrl_trajan(spin_system,dist_waveform,traj_data,fidelities);
-
-    else
-
-        % Real-life trajectory but the ideal control sequence
-        ctrl_trajan(spin_system,waveform,traj_data,fidelities);
-
+        hess=hess+power_lvl*power_lvl*hess_n(:);
     end
 
 end
@@ -424,8 +441,11 @@ function grumble(spin_system,waveform)
 if ~isfield(spin_system,'control')
     error('control data missing from spin_system, run optimcon() first.');
 end
-if ~all(isfield(spin_system.control,{'catalog','ens_sizes','invariants','frozen_fields'}))
+if ~all(isfield(spin_system.control,{'catalog','ens_sizes','invariants','frozen_fields','worker_cases'}))
     error('ensemble catalog missing from spin_system, run optimcon() first.');
+end
+if numel(spin_system.control.worker_cases)~=max(poolsize,1)
+    error('parallel pool size changed after optimcon(), re-run optimcon().');
 end
 if any(isfield(spin_system.control,spin_system.control.frozen_fields))
     error('generators and operators are frozen after optimcon(), re-run optimcon() to change them.');

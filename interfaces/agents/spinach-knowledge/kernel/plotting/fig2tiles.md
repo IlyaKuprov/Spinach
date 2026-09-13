@@ -109,7 +109,7 @@ Combines Matlab figure files into a single tiled figure. Syntax: [fig_obj,tile_o
 - reopened later with openfig.m, Matlab refits them to the
 - screen and the size requested here is lost.
 
-- After the layout geometry is updated, text objects tagged `kletter` (panel letters drawn by `kletter.m` in the source figures) are deleted and re-applied on their retiled axes, so their offsets from the tile edges are exact in the merged figure.
+- After the layout geometry is updated, text objects tagged `kletter` (panel letters drawn by `kletter.m` in the source figures) are deleted and re-applied on their retiled axes, so their offsets inside the plot box are exact in the merged figure.
 
 ## Implementation structure
 

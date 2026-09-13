@@ -322,7 +322,7 @@
 | `kernel/plotting/kfigure.m` | `handle=kfigure(varargin)` | Resets the stupid ass figure defaults in R2025a and later back to sensible values. | 27 |
 | `kernel/plotting/kgrid.m` | `kgrid()` | A replacement for the 'grid' command in Matlab that produces grey (rather than black-and-transparent) grid lines that ar | 30 |
 | `kernel/plotting/klegend.m` | `leg_obj=klegend(varargin)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: leg_ | 39 |
-| `kernel/plotting/kletter.m` | `kletter(letter_label)` | Draws an academic journal style letter label in the top left corner of the current axis set. The label is placed inside the | 88 |
+| `kernel/plotting/kletter.m` | `kletter(letter_label)` | Draws an academic journal style letter label in the top left corner of the current axis set. The label is placed inside the | 86 |
 | `kernel/plotting/ksgtitle.m` | `ksgtitle(x)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: ksgt | 44 |
 | `kernel/plotting/ktitle.m` | `ktitle(x)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: ktit | 46 |
 | `kernel/plotting/kxlabel.m` | `kxlabel(varargin)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: kxla | 34 |

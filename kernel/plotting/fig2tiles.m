@@ -29,7 +29,7 @@
 %
 % Note: panel letters drawn by kletter.m in the source figures are
 %       re-applied to the retiled axes, so that their offsets from
-%       the tile edges are those of kletter.m.
+%       the plot box edges are those of kletter.m.
 %
 % ilya.kuprov@weizmann.ac.il
 %

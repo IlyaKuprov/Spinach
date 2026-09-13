@@ -389,7 +389,11 @@ pulse=fmaxnewton(spin_system,@grape_xy,guess);
 ```
 
 The state normalisation is not cosmetic: the fidelity functional assumes unit
-norm. Sweeping `pwr_levels` and `offsets` makes B1 inhomogeneity and
+norm. `optimcon` distributes the drift generators over the workers of the pool
+that is open when it runs, and `ensemble` refuses a pool of a different size or
+a call from inside a worker: keep the same pool from `optimcon` through
+`fmaxnewton` and any later `ensemble` evaluation, and re-run `optimcon` after
+restarting the pool. Sweeping `pwr_levels` and `offsets` makes B1 inhomogeneity and
 transmitter misplacement part of the optimisation target rather than something
 discovered afterwards. Verify by propagating with `shaped_pulse_xy` and taking
 `real(rho_targ'*rho)`. The `features_*.m` files demonstrate one concept each

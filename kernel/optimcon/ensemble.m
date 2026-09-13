@@ -37,7 +37,9 @@
 %       optimcon.m as a pool constant, and grafts the live client-side
 %       control structure on top of it, so only the waveform and the
 %       live control fields travel at each objective evaluation; the
-%       gradient and the Hessian are summed on the workers.
+%       gradient and the Hessian are summed on the workers. This func-
+%       tion must be called from the client, on the pool that was
+%       open when optimcon.m ran: a worker holds only its own block.
 %
 % david.goodwin@inano.au.dk
 % ilya.kuprov@weizmann.ac.il
@@ -443,6 +445,9 @@ if ~isfield(spin_system,'control')
 end
 if ~all(isfield(spin_system.control,{'catalog','ens_sizes','invariants','frozen_fields','worker_cases'}))
     error('ensemble catalog missing from spin_system, run optimcon() first.');
+end
+if ~isempty(getCurrentWorker())
+    error('ensemble() must run on the client: the frozen problem is distributed over the pool workers.');
 end
 if numel(spin_system.control.worker_cases)~=max(poolsize,1)
     error('parallel pool size changed after optimcon(), re-run optimcon().');

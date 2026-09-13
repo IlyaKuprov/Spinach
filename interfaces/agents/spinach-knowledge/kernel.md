@@ -191,7 +191,7 @@
 | `kernel/optimcon/distortions/szf.m` | `[w,J]=szf(w,z)` | Applies a discrete single-zero filter: Y(k)=X(k)/(1-z)-z*X(k-1)/(1-z); to a Spinach optimal control module waveform. Tre | 131 |
 | `kernel/optimcon/drifts.m` | `[drifts,spc_dim]=drifts(spin_system,context,...` | Returns a cell array of drift Liouvillians suitable for the control.drifts variable in ensemble control optimisations. S | 81 |
 | `kernel/optimcon/ens_catalog.m` | `[catalog,ens_sizes]=ens_catalog(control)` | Ensemble case catalog for optimal control problems. Enumerates the Cartesian product of the state-target pairs, the drif | 119 |
-| `kernel/optimcon/ensemble.m` | `[traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)` | A parallel wrapper around GRAPE that enables ensemble optimal control optimisations. This function handles systems with  | 488 |
+| `kernel/optimcon/ensemble.m` | `[traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)` | A parallel wrapper around GRAPE that enables ensemble optimal control optimisations. This function handles systems with  | 493 |
 | `kernel/optimcon/fapt2sfo.m` | `[wave,dt,time_grid]=fapt2sfo(fapt,time_grid)` | Converts a freq-ampl-phase-time specification of a pulse sequ- uence into the corresponding single frequency origin wave | 111 |
 | `kernel/optimcon/fmaxnewton.m` | `[x,data]=fmaxnewton(spin_system,cost_function,guess)` | Finds a local maximum of a function of several variables using Newton and quasi-Newton algorithms. Syntax: [x,data]=fmax | 392 |
 | `kernel/optimcon/grape_hilb.m` | `[traj_data,fidelity,grad,hess]=grape_hilb(spin_system,drifts,controls,...` | Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user | 726 |

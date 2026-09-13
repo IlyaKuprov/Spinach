@@ -27,6 +27,10 @@
 %       reopened later with openfig.m, Matlab refits them to the
 %       screen and the size requested here is lost.
 %
+% Note: panel letters drawn by kletter.m in the source figures are
+%       re-applied to the retiled axes, so that their offsets from
+%       the tile edges are those of kletter.m.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=fig2tiles.m>
@@ -338,6 +342,15 @@ if panel_count>0
                 panel_objs(1:panel_count));
     fig_obj.SizeChangedFcn={@move_panels,panel_axes(1:panel_count),...
                             panel_objs(1:panel_count)};
+end
+
+% Re-apply panel letters to the retiled axes
+lbl_objs=findobj(fig_obj,'Type','text','Tag','kletter');
+set(groot,'CurrentFigure',fig_obj);
+for n=1:numel(lbl_objs)
+    letter_label=lbl_objs(n).String;
+    set(fig_obj,'CurrentAxes',ancestor(lbl_objs(n),'axes'));
+    delete(lbl_objs(n)); kletter(letter_label);
 end
 
 % Get the screen size in pixels whatever the root units are

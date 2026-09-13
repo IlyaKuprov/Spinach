@@ -465,4 +465,5 @@ takes a one-element character string and draws a bold panel letter with its
 left edge and its cap line 10 points from the left and the top edge of the
 axes outer box (the whole figure for a single axis set, the tile in a tiled
 layout); the offsets are computed when it is called, so call it after the
-figure has its final size.
+figure has its final size; `fig2tiles` re-applies the tagged letters on the
+retiled axes of a merged figure.

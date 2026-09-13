@@ -21,7 +21,9 @@
 %       called, so the figure should already have its
 %       final size; the label is stored as a fraction
 %       of the plot box and follows the axes if they
-%       are resized or retiled later.
+%       are resized later. The label carries the tag
+%       'kletter', and fig2tiles.m re-applies it to
+%       the retiled axes of a merged figure.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -44,10 +46,10 @@ ax_obj.Units=ax_units;
 label_x=(outer_box(1)-plot_box(1)+edge_offset)/plot_box(3);
 label_y=(outer_box(2)+outer_box(4)-plot_box(2)-edge_offset)/plot_box(4);
 
-% Place the label with its cap line at the top offset
+% Place the tagged label with its cap line at the top offset
 text(label_x,label_y,letter_label,'Units','normalized',...
      'HorizontalAlignment','left','VerticalAlignment','cap',...
-     'FontWeight','bold','FontSize',16);
+     'FontWeight','bold','FontSize',16,'Tag','kletter');
 
 end
 

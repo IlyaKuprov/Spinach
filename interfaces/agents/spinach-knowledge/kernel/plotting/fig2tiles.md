@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/plotting/fig2tiles.m`
 - Signature: `[fig_obj,tile_obj]=fig2tiles(fig_files,fig_size)`
-- Total lines: 396
+- Total lines: 409
 
 ## Purpose
 
@@ -109,6 +109,8 @@ Combines Matlab figure files into a single tiled figure. Syntax: [fig_obj,tile_o
 - reopened later with openfig.m, Matlab refits them to the
 - screen and the size requested here is lost.
 
+- After the layout geometry is updated, text objects tagged `kletter` (panel letters drawn by `kletter.m` in the source figures) are deleted and re-applied on their retiled axes, so their offsets from the tile edges are exact in the merged figure.
+
 ## Implementation structure
 
 - Combines Matlab figure files into a single tiled figure. Syntax:
@@ -126,4 +128,4 @@ Combines Matlab figure files into a single tiled figure. Syntax: [fig_obj,tile_o
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `grumble()`, `ind2sub()`, `tile_nums()`, `get()`, `kfigure()`, `tiledlayout()`, `gobjects()`, `tile_axes()`, `nexttile()`, `tile_pos()`, `openfig()`, `strcmp()`, `src_obj()`, `src_tiles()`, `isscalar()`, `delete()`.
+- Called routines detected from the main body: `grumble()`, `kletter()`, `ind2sub()`, `tile_nums()`, `get()`, `kfigure()`, `tiledlayout()`, `gobjects()`, `tile_axes()`, `nexttile()`, `tile_pos()`, `openfig()`, `strcmp()`, `src_obj()`, `src_tiles()`, `isscalar()`, `delete()`.

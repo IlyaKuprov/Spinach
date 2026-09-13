@@ -35,9 +35,9 @@ grumble(letter_label);
 % Offset from the box edges, points
 edge_offset=10;
 
-% Plot box and outer box of the current axes in points
+% Rendered plot box and outer box of the current axes in points
 ax_obj=gca; ax_units=ax_obj.Units; ax_obj.Units='points';
-plot_box=ax_obj.Position; outer_box=ax_obj.OuterPosition;
+plot_box=tightPosition(ax_obj); outer_box=ax_obj.OuterPosition;
 ax_obj.Units=ax_units;
 
 % Label position as a fraction of the plot box

@@ -10,7 +10,7 @@ Draws an academic journal style letter label in the top left corner of the curre
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
+- None: `kletter` is a figure annotation utility; it draws a panel letter and carries no physical or mathematical content.
 
 ## Numerical / algorithmic content
 
@@ -23,7 +23,7 @@ Draws an academic journal style letter label in the top left corner of the curre
 
 - Lines 32-33: Check consistency; implemented by `grumble(letter_label)`.
 - Lines 35-36: Offset from the box edges, points; `edge_offset=10`.
-- Lines 38-41: Plot box and outer box of the current axes in points; the axes units are switched to points, `Position` and `OuterPosition` are read, and the units are restored.
+- Lines 38-41: Rendered plot box and outer box of the current axes in points; the axes units are switched to points, `tightPosition` (the rendered plot box, which is smaller than `Position` under a constrained aspect ratio such as `axis square`) and `OuterPosition` are read, and the units are restored.
 - Lines 43-45: Label position as a fraction of the plot box; the left offset is added to the outer box left edge and the top offset is subtracted from the outer box top edge, both measured from the plot box corner and divided by the plot box width and height.
 - Lines 47-50: Place the label with its cap line at the top offset; `text(...,'Units','normalized','HorizontalAlignment','left','VerticalAlignment','cap','FontWeight','bold','FontSize',16)`.
 
@@ -31,12 +31,12 @@ Draws an academic journal style letter label in the top left corner of the curre
 
 - Check consistency
 - Offset from the box edges, points
-- Plot box and outer box of the current axes in points
+- Rendered plot box and outer box of the current axes in points
 - Label position as a fraction of the plot box
 - Place the label with its cap line at the top offset
 - Consistency enforcement
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `gca()`, `text()`.
+- Called routines detected from the main body: `gca()`, `tightPosition()`, `text()`.
 - The grumbler requires `letter_label` to be a one-element character string.

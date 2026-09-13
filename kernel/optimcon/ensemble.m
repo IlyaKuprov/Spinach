@@ -85,7 +85,7 @@ gradient=results.grad; hessian=results.hess;
 % Apply trajectory options
 if ismember('average',spin_system.control.traj_opts)
 
-    % Return average trajectory
+    % Average the block trajectory sums
     ave_traj=(1/n_cases)*traj_data{1}.forward;
     for n=2:numel(traj_data)
         ave_traj=ave_traj+(1/n_cases)*traj_data{n}.forward;
@@ -436,6 +436,15 @@ for m=1:n_mine
 
 end
 
+% Collapse the block into one trajectory sum when only the average is needed
+if ismember('average',control.traj_opts)
+    traj_sum=0;
+    for m=1:n_mine
+        traj_sum=traj_sum+traj{m}.forward;
+    end
+    traj={struct('forward',traj_sum)};
+end
+
 end
 
 % Consistency enforcement
@@ -443,14 +452,16 @@ function grumble(spin_system,waveform)
 if ~isfield(spin_system,'control')
     error('control data missing from spin_system, run optimcon() first.');
 end
-if ~all(isfield(spin_system.control,{'catalog','ens_sizes','invariants','frozen_fields','worker_cases'}))
+if ~all(isfield(spin_system.control,{'catalog','ens_sizes','invariants','frozen_fields','worker_cases','pool_id'}))
     error('ensemble catalog missing from spin_system, run optimcon() first.');
 end
 if ~isempty(getCurrentWorker())
     error('ensemble() must run on the client: the frozen problem is distributed over the pool workers.');
 end
-if numel(spin_system.control.worker_cases)~=max(poolsize,1)
-    error('parallel pool size changed after optimcon(), re-run optimcon().');
+current_pool=gcp('nocreate'); pool_id=0;
+if ~isempty(current_pool), pool_id=current_pool.ID; end
+if pool_id~=spin_system.control.pool_id
+    error('parallel pool changed after optimcon(), re-run optimcon().');
 end
 if any(isfield(spin_system.control,spin_system.control.frozen_fields))
     error('generators and operators are frozen after optimcon(), re-run optimcon() to change them.');

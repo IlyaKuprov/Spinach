@@ -1536,6 +1536,10 @@ for w=1:nblocks
     spin_system.control.worker_cases{w}=(edges(w)+1):edges(w+1);
 end
 
+% Record the pool identity, zero when there is no pool
+spin_system.control.pool_id=0;
+if nworkers>0, spin_system.control.pool_id=gcp('nocreate').ID; end
+
 % Publish the frozen problem once, each worker getting only its block's drifts
 if nworkers>0
     invariants=Composite(nworkers);

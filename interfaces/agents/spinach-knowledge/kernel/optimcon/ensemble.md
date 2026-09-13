@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/ensemble.m`
 - Signature: `[traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)`
-- Total lines: 493
+- Total lines: 504
 
 ## Purpose
 
@@ -17,7 +17,7 @@ A parallel wrapper around GRAPE that enables ensemble optimal control optimisati
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `ens_block()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
+- The file also defines local helper function(s): `ens_block()`, `gcp()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Code-derived implementation details
 
@@ -33,7 +33,7 @@ A parallel wrapper around GRAPE that enables ensemble optimal control optimisati
 - Lines 75-77: Reduce to the first worker and pack; implemented by `results=struct('traj',{spmdCat(traj_local,1,1)},'fid',{spmdCat(fid_local,2,1)}, 'grad',spmdPlus(grad_local,1),'hess',spmdPlus(hess_local,1))`.
 - Lines 81-82: Collect from the first worker; implemented by `results=results{1}; traj_data=results.traj; fidelities=results.fid`.
 - Lines 85-86: Apply trajectory options; implemented by `if ismember('average',spin_system.control.traj_opts)`.
-- Lines 88-89: Return average trajectory; implemented by `ave_traj=(1/n_cases)*traj_data{1}.forward`.
+- Lines 88-89: Average the block trajectory sums; implemented by `ave_traj=(1/n_cases)*traj_data{1}.forward`.
 - Lines 94-95: Overwrite traj_data; implemented by `traj_data=[]; traj_data{1}.forward=ave_traj`.
 - Lines 99-100: Add up fidelities; implemented by `fidelities=cell2mat(fidelities)`.
 - Lines 103-104: Normalise gradient; implemented by `if n_outputs>2`.
@@ -59,10 +59,11 @@ A parallel wrapper around GRAPE that enables ensemble optimal control optimisati
 - Line 220: conditional branch on `~isempty(off_ens_sizes)`; the linear offset index is unpacked into one index per offset channel and `2*pi*offset` times the channel offset operator is added to the drift.
 - Line 245: the waveform is scaled to physical units by the power level of the case.
 - Lines 248, 284, 335: dispatch on the number of outputs; two outputs apply the distortion functions and call GRAPE for fidelity and trajectory, three outputs also accumulate the distortion Jacobian and apply it to the gradient, four outputs call GRAPE for the Hessian as well.
-- Lines 262: dispatch on `ss.bas.formalism`; `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef` go to `grape_liouv`, `zeeman-hilb` goes to `grape_hilb`.
+- Line 262: dispatch on `ss.bas.formalism`; `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef` go to `grape_liouv`, `zeeman-hilb` goes to `grape_hilb`.
 - Line 365: conditional branch on `(~isempty(control.phase_cycle))&&(n_outputs>2)`; the phase-cycle phases are removed from the gradient channel by channel.
 - Line 389: conditional branch on `(~isempty(control.phase_cycle))&&(n_outputs>3)`; the Hessian is reshaped to `[ncont nsteps ncont nsteps]`, the phases are removed from both sides, and it is reshaped back.
 - Line 429: the gradient and the Hessian of the case are scaled by the power level and its square and added to the running block sums.
+- Line 440: conditional branch on `ismember('average',control.traj_opts)`; the forward trajectories of the block are summed into one entry so that only block sums travel to the client, which divides by the case count.
 
 ### Key state/data transformations
 
@@ -86,7 +87,7 @@ A parallel wrapper around GRAPE that enables ensemble optimal control optimisati
 - Line 146: `ens_block()` — `function [traj,fid,grad,hess]=ens_block(ss,control,my_cases,waveform,n_outputs)`. Graft live client data over the frozen worker copy
   - Representative operation: `frozen=ss.control; ss.control=control`.
   - Representative operation: `for k=1:numel(control.frozen_fields)`.
-- Line 442: `grumble()` — `function grumble(spin_system,waveform)`.
+- Line 451: `grumble()` — `function grumble(spin_system,waveform)`.
   - Representative operation: `if ~isfield(spin_system,'control')`.
   - Representative operation: `error('control data missing from spin_system, run optimcon() first.')`.
 
@@ -138,4 +139,4 @@ A parallel wrapper around GRAPE that enables ensemble optimal control optimisati
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `grumble()`, `rmfield()`, `isfield()`, `poolsize()`, `ens_block()`, `spmdCat()`, `spmdPlus()`, `ismember()`, `cell2mat()`, `reshape()`, `strcmp()`, `dist_function()`, `ctrl_trajan()`, `cellfun()`, `fliplr()`, `cumprod()`, `sparse()`, `grape_liouv()`, `grape_hilb()`, `speye()`, `getCurrentWorker()`.
+- Called routines detected from the main body: `grumble()`, `rmfield()`, `isfield()`, `poolsize()`, `ens_block()`, `spmdCat()`, `spmdPlus()`, `ismember()`, `cell2mat()`, `reshape()`, `strcmp()`, `dist_function()`, `ctrl_trajan()`, `cellfun()`, `fliplr()`, `cumprod()`, `sparse()`, `grape_liouv()`, `grape_hilb()`, `speye()`, `getCurrentWorker()`, `gcp()`.

@@ -460,4 +460,4 @@ and `mri_2d_plot(mri,parameters,method)` with `method` in
 `[spec,parameters]=crop_2d(spin_system,spec,parameters,crop_ranges)` with
 `crop_ranges={[f1_min f1_max],[f2_min f2_max]}` in ppm only. Figures use the
 house wrappers `kfigure`, `ktitle`, `kgrid`, `kxlabel`, `kylabel`, `kzlabel`,
-`klegend`, `kcolourbar`, and `scale_figure`.
+`klegend`, `kletter`, `kcolourbar`, and `scale_figure`.

@@ -312,7 +312,7 @@
 | `kernel/plotting/cylgrid.m` | `cylgrid(zmin,zmax,rmax)` | Draws a cylindrical grid with 10% spacing added around the indicated data extent values. Syntax: cylgrid(zmin,zmax,rmax) | 99 |
 | `kernel/plotting/efg_display.m` | `efg_display(props,atoms,scaling,conmatrix,options)` | Electric field gradient tensors and their eigensystems. Two styles are implemented: A. Ellipsoids (symmetric tensors onl | 308 |
 | `kernel/plotting/fft_freq_axis.m` | `[f_shift,f,df]=fft_freq_axis(npts,dt,zf)` | Frequency axis for FFT with optional zero-filling. Syntax: [f_shift,f,df,nfft]=fft_freq_axis(npts,dt,zf) Parameters: npt | 74 |
-| `kernel/plotting/fig2tiles.m` | `[fig_obj,tile_obj]=fig2tiles(fig_files,fig_size)` | Combines Matlab figure files into a single tiled figure. Syntax: [fig_obj,tile_obj]=fig2tiles(fig_files,fig_size) Parame | 396 |
+| `kernel/plotting/fig2tiles.m` | `[fig_obj,tile_obj]=fig2tiles(fig_files,fig_size)` | Combines Matlab figure files into a single tiled figure. Syntax: [fig_obj,tile_obj]=fig2tiles(fig_files,fig_size) Parame | 409 |
 | `kernel/plotting/ft_axis.m` | `ax=ft_axis(offset,sweep,npoints)` | Fourier transform axis ticks generator that accounts for the periodicity and correctly folds the edge frequency. Syntax: | 65 |
 | `kernel/plotting/hfc_display.m` | `hfc_display(props,atoms,scaling,conmatrix,options)` | Draws hyperfine tensors and their eigensystems. Two styles are implemented: A. Ellipsoids (symmetric tensors only): 1. A | 315 |
 | `kernel/plotting/ifft_time_axis.m` | `[t_shift,t,dt]=ifft_time_axis(npts,df,zf)` | Time axis for IFFT with optional zero-filling. Syntax: [t_shift,t,dt,nifft]=ifft_time_axis(npts,df,zf) Parameters: npts  | 71 |
@@ -322,6 +322,7 @@
 | `kernel/plotting/kfigure.m` | `handle=kfigure(varargin)` | Resets the stupid ass figure defaults in R2025a and later back to sensible values. | 27 |
 | `kernel/plotting/kgrid.m` | `kgrid()` | A replacement for the 'grid' command in Matlab that produces grey (rather than black-and-transparent) grid lines that ar | 30 |
 | `kernel/plotting/klegend.m` | `leg_obj=klegend(varargin)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: leg_ | 39 |
+| `kernel/plotting/kletter.m` | `kletter(letter_label)` | Draws an academic journal style letter label in the top left corner of the current axis set. The label is placed inside the | 86 |
 | `kernel/plotting/ksgtitle.m` | `ksgtitle(x)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: ksgt | 44 |
 | `kernel/plotting/ktitle.m` | `ktitle(x)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: ktit | 46 |
 | `kernel/plotting/kxlabel.m` | `kxlabel(varargin)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: kxla | 34 |

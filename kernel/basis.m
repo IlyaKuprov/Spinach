@@ -455,8 +455,8 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
     % Deallocate variables
     clear('spin_state_lists','subgraphs','subgraph_subst','spin_dims','zq_spins');
 
-    % Pull basis descriptor from the nodes
-    basis_spec=vertcat(basis_spec{:});
+    % Pull basis descriptor from the nodes, unit state first
+    basis_spec=[sparse(1,spin_system.comp.nspins); vertcat(basis_spec{:})];
 
     % Eliminate redundant states using a hash table
     report(spin_system,'eliminating redundant states...');

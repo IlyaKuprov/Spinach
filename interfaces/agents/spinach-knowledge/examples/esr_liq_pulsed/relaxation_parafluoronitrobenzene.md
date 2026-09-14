@@ -41,7 +41,7 @@ A pulse-acquire FFT version of the EasySpin parafluoronitrobenzene test file, wi
 - Lines 18: computes `sys.isotopes` using `sys.isotopes={'E','14N','19F','1H','1H','1H','1H'}`.
 - Lines 21: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 22: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 23: computes `bas.zero_quantum` using `bas.zero_quantum={'1H'}`.
+- Lines 23: computes `bas.zero_quantum` using `bas.zero_quantum={{'1H'}}`.
 - Lines 24: computes `bas.sym_group` using `bas.sym_group={'S2','S2'}`.
 - Lines 25: computes `bas.sym_spins` using `bas.sym_spins={[4 5],[6 7]}`.
 - Lines 28: computes `inter.zeeman.eigs` using `inter.zeeman.eigs=cell(7,1)`.

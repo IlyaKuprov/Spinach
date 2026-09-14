@@ -43,7 +43,7 @@ X-band pulse-acquire FFT ESR spectrum of parafluorotoluene radical, simulated us
 - Lines 22: computes `sys.magnet` using `sys.magnet=0.33`.
 - Lines 25: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 26: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 27: computes `bas.zero_quantum` using `bas.zero_quantum={[1 2 3 5]}`.
+- Lines 27: computes `bas.zero_quantum` using `bas.zero_quantum={{[1 2 3 5]}}`.
 - Lines 30: computes `inter.relaxation` using `inter.relaxation={'redfield'}`.
 - Lines 31: computes `inter.equilibrium` using `inter.equilibrium='zero'`.
 - Lines 32: computes `inter.rlx_keep` using `inter.rlx_keep='secular'`.

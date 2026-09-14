@@ -190,7 +190,7 @@
 | `kernel/optimcon/distortions/spf.m` | `[w,J]=spf(w,p)` | Applies a discrete single-pole filter: Y(n)=(1-p)*X(n)+p*Y(n-1) to a Spinach optimal control module waveform. Treats odd | 125 |
 | `kernel/optimcon/distortions/szf.m` | `[w,J]=szf(w,z)` | Applies a discrete single-zero filter: Y(k)=X(k)/(1-z)-z*X(k-1)/(1-z); to a Spinach optimal control module waveform. Tre | 131 |
 | `kernel/optimcon/drifts.m` | `[drifts,spc_dim]=drifts(spin_system,context,...` | Returns a cell array of drift Liouvillians suitable for the control.drifts variable in ensemble control optimisations. S | 81 |
-| `kernel/optimcon/ens_block.m` | `[traj,fid,grad,hess]=ens_block(spin_system,drifts,control,block,waveform,n_outputs)` | Fidelity, gradient, and Hessian contributions of one block of ensemble cases, evaluated on the parallel pool worker that h | 192 |
+| `kernel/optimcon/ens_block.m` | `[traj,fid,grad,hess]=ens_block(spin_system,drifts,control,block,waveform,n_outputs)` | Fidelity, gradient, and Hessian contributions of one block of ensemble cases, evaluated on the parallel pool worker that h | 198 |
 | `kernel/optimcon/ens_catalog.m` | `[catalog,ens_sizes]=ens_catalog(control)` | Ensemble case catalog for optimal control problems. Enumerates the Cartesian product of the state-target pairs, the drif | 119 |
 | `kernel/optimcon/ensemble.m` | `[traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)` | A parallel wrapper around GRAPE that enables ensemble optimal control optimisations. This function handles systems with  | 192 |
 | `kernel/optimcon/fapt2sfo.m` | `[wave,dt,time_grid]=fapt2sfo(fapt,time_grid)` | Converts a freq-ampl-phase-time specification of a pulse sequ- uence into the corresponding single frequency origin wave | 111 |

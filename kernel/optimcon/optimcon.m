@@ -1531,11 +1531,12 @@ end
 frozen_fields={'drifts','operators','off_ops','cc_comm','cc_comm_idx','resp_ops'};
 spin_system.control.frozen_fields=frozen_fields(isfield(spin_system.control,frozen_fields));
 
-% Assign ensemble cases, sorted by drift generator, to workers in contiguous blocks
+% Assign ensemble cases to workers in blocks that are contiguous in the drift generator index
+[~,order]=sortrows(spin_system.control.catalog,2);
 nblocks=max(nworkers,1); edges=round(linspace(0,n_cases,nblocks+1));
 spin_system.control.worker_cases=cell(nblocks,1);
 for w=1:nblocks
-    spin_system.control.worker_cases{w}=(edges(w)+1):edges(w+1);
+    spin_system.control.worker_cases{w}=order((edges(w)+1):edges(w+1))';
 end
 
 % Record the pool identity, zero when there is no pool

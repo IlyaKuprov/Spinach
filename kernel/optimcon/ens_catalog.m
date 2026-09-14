@@ -17,9 +17,7 @@
 %    catalog    - [n_cases x 6] array of ensemble indices; the col-
 %                 umns index the state-target pair, the drift gene-
 %                 rator, the power level, the offset combination,
-%                 the phase cycle line, and the distortion function;
-%                 rows are ordered by the drift generator index so
-%                 that contiguous blocks of cases span few drifts
+%                 the phase cycle line, and the distortion function
 %
 %    ens_sizes  - [1 x 6] array of the ensemble dimension sizes the
 %                 catalog was built from, in the same column order
@@ -60,9 +58,6 @@ catalog=[kron(ones(n_offset_vals,1),catalog) kron((1:n_offset_vals)',ones(size(c
 catalog=[kron(ones(n_phase_specs,1),catalog) kron((1:n_phase_specs)',ones(size(catalog,1),1))];
 catalog=[kron(ones(n_distortions,1),catalog) kron((1:n_distortions)',ones(size(catalog,1),1))];
 
-% Order the cases by drift generator so that a contiguous block of cases spans few drifts
-catalog=sortrows(catalog,2);
-
 % Ensemble correlation: own state pair for each member
 if ismember('rho_ens',control.ens_corrs)
     catalog=catalog(:,2:end);
@@ -96,8 +91,8 @@ if ens_budget<n_cases
     % Get RNG into a reproducible state
     rng_state=rng; rng(5318008,'twister');
 
-    % Draw a random subset of the ensemble, drift order restored
-    catalog=sortrows(catalog(randperm(n_cases,ens_budget),:),2);
+    % Draw a random subset of the ensemble
+    catalog=catalog(randperm(n_cases,ens_budget),:);
 
     % Release RNG
     rng(rng_state);

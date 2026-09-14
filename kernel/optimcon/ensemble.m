@@ -84,17 +84,20 @@ spmd (poolsize)
 
 end
 
-% Collect from the first worker
-results=results{1}; traj_data=results.traj; fidelities=results.fid;
-gradient=results.grad; hessian=results.hess;
+% Collect from the first worker, fidelities back into catalog order
+results=results{1}; gradient=results.grad; hessian=results.hess;
+order=[spin_system.control.worker_cases{:}];
+fidelities=zeros(1,n_cases); fidelities(order)=results.fid;
 
-% Average the block trajectory sums
+% Average the block trajectory sums, or put the trajectories back into catalog order
 if ismember('average',control.traj_opts)
-    ave_traj=traj_data{1}.forward;
-    for n=2:numel(traj_data)
-        ave_traj=ave_traj+traj_data{n}.forward;
+    ave_traj=results.traj{1}.forward;
+    for n=2:numel(results.traj)
+        ave_traj=ave_traj+results.traj{n}.forward;
     end
     traj_data={struct('forward',{(1/n_cases)*ave_traj})};
+else
+    traj_data=cell(n_cases,1); traj_data(order)=results.traj;
 end
 
 % Ensemble averages of fidelity, gradient, and Hessian

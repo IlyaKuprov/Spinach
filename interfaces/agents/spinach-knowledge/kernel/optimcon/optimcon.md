@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/optimcon.m`
 - Signature: `spin_system=optimcon(spin_system,control)`
-- Total lines: 1609
+- Total lines: 1610
 
 ## Purpose
 
@@ -86,10 +86,10 @@ Validates optimal control options and updates the spin system object. Syntax: sp
 
 ### Local helper functions
 
-- Line 1573: `check_hermiticity()` — `function check_hermiticity(generators,generator_kind)`. Over the supplied generators
+- Line 1574: `check_hermiticity()` — `function check_hermiticity(generators,generator_kind)`. Over the supplied generators
   - Representative operation: `for n=1:numel(generators)`.
   - Representative operation: `norm_a=cheap_norm(generators{n}-generators{n}')`.
-- Line 1594: `grumble()` — `function grumble(spin_system,control)`. Whenever anyone accuses some person of being 'unfeeling' he means that that person is just. He means that that person has no causeless emotions
+- Line 1595: `grumble()` — `function grumble(spin_system,control)`. Whenever anyone accuses some person of being 'unfeeling' he means that that person is just. He means that that person has no causeless emotions
   - Representative operation: `if ~isstruct(spin_system)`.
   - Representative operation: `error('spin_system must be a Spinach data structure.')`.
 

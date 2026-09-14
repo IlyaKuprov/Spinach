@@ -61,8 +61,8 @@ drift_slices=spin_system.control.drift_slices;
 control=rmfield(spin_system.control,{'invariants','drift_slices','worker_cases','basis'});
 control.return_traj=isfield(control,'return_traj')&&control.return_traj;
 
-% Count the outputs and the cases
-n_outputs=nargout; n_cases=size(control.catalog,1);
+% Count the outputs (fidelity always computed) and the cases
+n_outputs=max(nargout,2); n_cases=size(control.catalog,1);
 
 % Run the ensemble loop, each worker over its own case block
 spmd (poolsize)

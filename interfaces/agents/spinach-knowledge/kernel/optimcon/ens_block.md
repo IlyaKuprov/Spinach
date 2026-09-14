@@ -2,11 +2,11 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/ens_block.m`
 - Signature: `[traj,fid,grad,hess]=ens_block(spin_system,drifts,control,block,waveform,n_outputs)`
-- Total lines: 186
+- Total lines: 190
 
 ## Purpose
 
-Fidelity, gradient, and Hessian contributions of one block of ensem- ble cases, evaluated on the parallel pool worker that holds the drift generators of that block. This function is called by ensemble.m in- side its spmd block; the per-case physics (phase cycle, offsets, po- wer level, waveform distortions, GRAPE) is applied here. Syntax: [traj,fid,grad,hess]=ens_block(spin_system,drifts,control,... block,waveform,n_
+Fidelity, gradient, and Hessian contributions of one block of ensemble cases, evaluated on the parallel pool worker that holds the drift generators of that block. This function is called by ensemble.m inside its spmd block; the per-case physics (phase cycle, offsets, power level, waveform distortions, GRAPE) is applied here. Syntax: `[traj,fid,grad,hess]=ens_block(spin_system,drifts,control,block,waveform,n_outputs)`.
 
 ## Physical / mathematical content
 

@@ -24,8 +24,8 @@
 %                  tor, [ncontrols x nsteps], rad/s
 %
 %   n_outputs    - number of outputs requested from ensemble.m,
-%                  1 for the trajectory, 2 for the fidelity, 3
-%                  for the gradient, 4 for the Hessian
+%                  2 for the fidelity, 3 for the gradient, 4 for
+%                  the Hessian
 %
 % Outputs:
 %
@@ -173,8 +173,12 @@ end
 if (~isnumeric(waveform))||(~isreal(waveform))
     error('waveform must be an array of real numbers.');
 end
-if (~isnumeric(n_outputs))||(~isscalar(n_outputs))||(~ismember(n_outputs,1:4))
-    error('n_outputs must be an integer between 1 and 4.');
+nsteps=spin_system.control.pulse_nsteps+strcmp(spin_system.control.integrator,'trapezium');
+if ~isequal(size(waveform),[spin_system.control.ncontrols nsteps])
+    error('waveform must be a [ncontrols x nsteps] array, nsteps+1 columns for the trapezium integrator.');
+end
+if (~isnumeric(n_outputs))||(~isscalar(n_outputs))||(~ismember(n_outputs,[2 3 4]))
+    error('n_outputs must be 2, 3, or 4.');
 end
 end
 

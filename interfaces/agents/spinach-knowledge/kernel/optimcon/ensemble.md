@@ -17,7 +17,7 @@ A parallel wrapper around GRAPE that enables ensemble optimal control optimisati
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `gcp()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
+- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Code-derived implementation details
 

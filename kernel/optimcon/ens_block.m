@@ -168,8 +168,9 @@ if (~isnumeric(block))||(~isscalar(block))||(mod(block,1)~=0)||...
     error('block must be a positive integer not exceeding the number of case blocks.');
 end
 needed=unique(control.catalog(spin_system.control.worker_cases{block},2));
-if (~iscell(drifts))||(numel(drifts)<max([needed; 0]))||any(cellfun(@isempty,drifts(needed)))
-    error('drifts must be a cell array populated at every index used by the cases of this block.');
+if (~iscell(drifts))||(numel(drifts)<max([needed; 0]))||...
+   (~all(cellfun(@(d)iscell(d)&&(~isempty(d))&&isequal(size(d{1}),size(spin_system.control.operators{1})),drifts(needed))))
+    error('drifts must hold, at every index used by the cases of this block, a cell array of generators of the same size as the control operators.');
 end
 if (~isnumeric(waveform))||(~isreal(waveform))
     error('waveform must be an array of real numbers.');

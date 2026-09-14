@@ -201,7 +201,7 @@
 | `kernel/optimcon/inst_freq.m` | `freq=inst_freq(signal,dt,npoints,poly_order,amp_tol)` | Instantaneous frequency trajectory from a complex time-domain signal by regularised phase differentiation. Syntax: freq= | 126 |
 | `kernel/optimcon/lbfgs.m` | `direction=lbfgs(dx_hist,dg_hist,g)` | Calculates an approximation to the Newton-Raphson search direction for maximising a function using past gradients to bui | 107 |
 | `kernel/optimcon/objeval.m` | `[data,fx,grad,hess]=objeval(x,objfun_handle,data,spin_system)` | Calls and collect the correct amount of outputs from an objective function -used by optimisation routines. Syntax: [data | 122 |
-| `kernel/optimcon/optimcon.m` | `spin_system=optimcon(spin_system,control)` | Validates optimal control options and updates the spin system object. Syntax: spin_system=optimcon(spin_system,control)  | 1610 |
+| `kernel/optimcon/optimcon.m` | `spin_system=optimcon(spin_system,control)` | Validates optimal control options and updates the spin system object. Syntax: spin_system=optimcon(spin_system,control)  | 1609 |
 | `kernel/optimcon/penalty.m` | `[pen_term,pen_grad,pen_hess]=penalty(wf,type,fb,cb)` | Penalty terms for the Optimal Control module. Returns the penalty function and its gradient for the waveform, which shou | 256 |
 | `kernel/optimcon/sectioning.m` | `[alpha,fx_1,gfx_1,exitflag,data]=sectioning(cost_function,a,b,x_0,fx_0,...` | Refines a previously found step bracket by repeated cubic interpolation until a step satisfying Wolfe tests is found or  | 182 |
 | `kernel/optimcon/tgrape.m` | `[fidelity,grad]=tgrape(spin_system,drift,controls,waveform,...` | A special case of Gradient Ascent Pulse Engineering (GRAPE) objective function and gradient with respect to the vector o | 168 |

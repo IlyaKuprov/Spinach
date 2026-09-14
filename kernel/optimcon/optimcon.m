@@ -26,10 +26,9 @@
 %       worker Composite in spin_system.control.drift_slices, so that
 %       each worker receives the drifts of its own case block and no-
 %       thing else; the pool must therefore have SpmdEnabled set to
-%       true. Worker-resident invariants - the drift generators,
-%       the control operators, the offset operators, the control com-
-%       mutators, the Bloch-Siegert response operators, the keyholes,
-%       and the prefix and suffix functions - are then removed
+%       true. Heavy invariants - the drift generators, the control
+%       operators, the offset operators, the control commutators,
+%       and the Bloch-Siegert response operators - are then removed
 %       from the returned structure, and their names are recorded
 %       in spin_system.control.frozen_fields. All other control
 %       fields stay live: ensemble() re-sends them to the workers
@@ -1529,7 +1528,7 @@ if nworkers>0
 end
 
 % Record the names of the worker-resident invariants
-frozen_fields={'drifts','operators','off_ops','cc_comm','cc_comm_idx','resp_ops','keyholes','prefix','suffix'};
+frozen_fields={'drifts','operators','off_ops','cc_comm','cc_comm_idx','resp_ops'};
 spin_system.control.frozen_fields=frozen_fields(isfield(spin_system.control,frozen_fields));
 
 % Assign ensemble cases, sorted by drift generator, to workers in contiguous blocks

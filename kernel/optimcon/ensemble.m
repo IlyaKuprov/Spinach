@@ -159,9 +159,9 @@ end
 my_cases=frozen.worker_cases{block}; n_mine=numel(my_cases); catalog=control.catalog;
 ncont=size(waveform,1); nsteps=size(waveform,2); off_ens_sizes=cellfun(@numel,control.offsets);
 
-% Preallocate block outputs
-traj=cell(n_mine,1); fid=zeros(1,n_mine);
-grad=zeros(ncont*nsteps,1); hess=[];
+% Preallocate block outputs, derivative buffers only when requested
+traj=cell(n_mine,1); fid=zeros(1,n_mine); grad=[]; hess=[];
+if n_outputs>2, grad=zeros(ncont*nsteps,1); end
 if n_outputs>3, hess=zeros((ncont*nsteps)^2,1); end
 
 % Loop over the cases of the block
@@ -197,7 +197,7 @@ for m=1:n_mine
     power_lvl=control.pwr_levels(n_pwr); local_waveform=power_lvl*local_waveform;
 
     % Apply waveform distortions, with their Jacobian when derivatives are needed
-    J=speye(numel(local_waveform));
+    if n_outputs>2, J=speye(numel(local_waveform)); end
     for k=1:size(control.distortion,2)
         if n_outputs>2
             [local_waveform,stage_jacobian]=control.distortion{n_dis,k}(local_waveform);

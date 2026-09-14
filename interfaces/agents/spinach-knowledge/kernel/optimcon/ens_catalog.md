@@ -34,7 +34,7 @@ Ensemble case catalog for optimal control problems. Enumerates the Cartesian pro
 - Lines 86-87: Convert fractional budget into sample count; implemented by `ens_budget=control.budget`.
 - Lines 93-94: Apply ensemble budget; implemented by `if ens_budget<n_cases`.
 - Lines 96-97: Get RNG into a reproducible state; implemented by `rng_state=rng; rng(5318008,'twister')`.
-- Lines 99-100: Draw a random subset of the ensemble; implemented by `catalog=catalog(randperm(n_cases,ens_budget),:)`.
+- Lines 99-100: Draw a random subset of the ensemble, drift order restored; implemented by `catalog=sortrows(catalog(randperm(n_cases,ens_budget),:),2)`.
 - Lines 102-103: Release RNG; implemented by `rng(rng_state)`.
 
 ### Control flow inferred from the code

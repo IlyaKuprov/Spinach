@@ -96,8 +96,8 @@ if ens_budget<n_cases
     % Get RNG into a reproducible state
     rng_state=rng; rng(5318008,'twister');
 
-    % Draw a random subset of the ensemble
-    catalog=catalog(randperm(n_cases,ens_budget),:);
+    % Draw a random subset of the ensemble, drift order restored
+    catalog=sortrows(catalog(randperm(n_cases,ens_budget),:),2);
 
     % Release RNG
     rng(rng_state);

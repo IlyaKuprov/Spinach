@@ -17,10 +17,16 @@
 %     spin_system  - updated Spinach data structure
 %
 % Note: this function freezes the optimisation problem. The ensemble
-%       case catalog is built here, and the complete frozen problem
-%       is published to the parallel pool workers exactly once, as a
-%       parallel.pool.Constant held in spin_system.control.invari-
-%       ants. Heavy invariants - the drift generators, the control
+%       case catalog is built here, its cases are assigned to the
+%       parallel pool workers in contiguous blocks recorded in
+%       spin_system.control.worker_cases, and the frozen problem is
+%       published to the workers exactly once: the common part as a
+%       parallel.pool.Constant in spin_system.control.invariants, the
+%       drift generators as a parallel.pool.Constant built from a per-
+%       worker Composite in spin_system.control.drift_slices, so that
+%       each worker receives the drifts of its own case block and no-
+%       thing else; the pool must therefore have SpmdEnabled set to
+%       true. Heavy invariants - the drift generators, the control
 %       operators, the offset operators, the control commutators,
 %       and the Bloch-Siegert response operators - are then removed
 %       from the returned structure, and their names are recorded
@@ -1521,12 +1527,40 @@ if nworkers>0
                         num2str(balance,'%.3f')]);
 end
 
-% Record the names of the heavy worker-resident invariants
+% Record the names of the worker-resident invariants
 frozen_fields={'drifts','operators','off_ops','cc_comm','cc_comm_idx','resp_ops'};
 spin_system.control.frozen_fields=frozen_fields(isfield(spin_system.control,frozen_fields));
 
-% Publish the complete frozen problem to the pool, once per problem
-spin_system.control.invariants=parallel.pool.Constant(spin_system);
+% Assign ensemble cases to workers in blocks that are contiguous in the drift generator index
+[~,order]=sortrows(spin_system.control.catalog,2);
+nblocks=max(nworkers,1); edges=round(linspace(0,n_cases,nblocks+1));
+spin_system.control.worker_cases=mat2cell(order',1,diff(edges))';
+
+% Record the pool identity, zero when there is no pool
+pool=gcp('nocreate'); spin_system.control.pool_id=0;
+if nworkers>0
+    if ~pool.SpmdEnabled
+        error('ensemble() runs spmd blocks: the parallel pool must have SpmdEnabled set to true.');
+    end
+    spin_system.control.pool_id=pool.ID;
+end
+
+% Publish the common frozen problem once
+common=spin_system; common.control=rmfield(common.control,'drifts');
+spin_system.control.invariants=parallel.pool.Constant(common);
+
+% Publish the drift generators, each worker getting only its block's
+if nworkers>0
+    drift_slices=Composite(nworkers);
+    for w=1:nworkers
+        needed=unique(spin_system.control.catalog(spin_system.control.worker_cases{w},2));
+        slice=cell(size(spin_system.control.drifts)); slice(needed)=spin_system.control.drifts(needed);
+        drift_slices{w}=slice;
+    end
+    spin_system.control.drift_slices=parallel.pool.Constant(drift_slices);
+else
+    spin_system.control.drift_slices=parallel.pool.Constant(spin_system.control.drifts);
+end
 
 % Keep heavy invariants off the per-evaluation communication path
 spin_system.control=rmfield(spin_system.control,spin_system.control.frozen_fields);

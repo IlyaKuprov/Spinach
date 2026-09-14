@@ -67,6 +67,9 @@ n_outputs=nargout; n_cases=size(control.catalog,1);
 if (n_outputs>3)&&(~all(cellfun(@(f)isequal(f,@no_dist),control.distortion(:))))
     error('Hessians are not available with waveform distortions.');
 end
+if (n_outputs>3)&&(~strcmp(control.integrator,'rectangle'))
+    error('Hessians are only available with the rectangle integrator.');
+end
 
 % Run the ensemble loop, each worker over its own case block
 spmd (poolsize)
@@ -99,10 +102,8 @@ fidelity=sum(fidelities)/n_cases;
 if n_outputs>2
     gradient=reshape(gradient/n_cases,size(waveform));
 end
-if (n_outputs>3)&&strcmp(control.integrator,'rectangle')
+if n_outputs>3
     hessian=reshape(hessian/n_cases,numel(waveform)*[1 1]);
-else
-    hessian=[];
 end
 
 % Run diagnostic plotting (expensive!)

@@ -54,7 +54,7 @@ Optimisation of slice durations in a composite inversion pulse with specified am
 - Lines 26: computes `inter.zeeman.scalar` using `inter.zeeman.scalar=num2cell(linspace(-166,166,n_spins))`.
 - Lines 30: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 31: computes `bas.approximation` using `bas.approximation='IK-2'`.
-- Lines 32: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 32: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 33: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
 - Lines 36: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 40: computes `rho_init` using `rho_init=state(spin_system,'Lz','13C')`.

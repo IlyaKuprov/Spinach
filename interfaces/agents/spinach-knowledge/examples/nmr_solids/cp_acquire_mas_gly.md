@@ -44,7 +44,7 @@
 - Lines 28: computes `inter.temperature` using `inter.temperature=298`.
 - Lines 31: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 32: computes `bas.approximation` using `bas.approximation='IK-0'`.
-- Lines 33: computes `bas.level` using `bas.level=3`.
+- Lines 33: computes `bas.inter_level` using `bas.inter_level=3`.
 - Lines 36: computes `sys.enable` using `sys.enable={'greedy'}`.
 - Lines 37: computes `sys.disable` using `sys.disable={'pt'}`.
 - Lines 40: computes `sys.tols.inter_cutoff` using `sys.tols.inter_cutoff=2*pi*200`.

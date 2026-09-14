@@ -48,8 +48,8 @@ HMBC of cyprinol with natrual abundance of 13C isotope. Calculation time: second
 - Lines 18: computes `sys.tols.prox_cutoff` using `sys.tols.prox_cutoff=4.0`.
 - Lines 21: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 22: computes `bas.approximation` using `bas.approximation='IK-1'`.
-- Lines 23: computes `bas.level` using `bas.level=3`.
-- Lines 24: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 23: computes `bas.inter_level` using `bas.inter_level=3`.
+- Lines 24: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 25: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
 - Lines 28: computes `parameters.J` using `parameters.J=150`.
 - Lines 29: computes `parameters.delta_b` using `parameters.delta_b=60e-3`.

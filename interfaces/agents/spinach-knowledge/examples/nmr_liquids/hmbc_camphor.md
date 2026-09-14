@@ -50,7 +50,7 @@ HMBC spectrum of camphor with natural content of 13C isotope. Coordinates, shiel
 - Lines 25: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 26: computes `bas.approximation` using `bas.approximation='IK-2'`.
 - Lines 27: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 28: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 28: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 31: computes `parameters.J` using `parameters.J=140`.
 - Lines 32: computes `parameters.delta_b` using `parameters.delta_b=60e-3`.
 - Lines 33: computes `parameters.sweep` using `parameters.sweep=[40000 1500]`.

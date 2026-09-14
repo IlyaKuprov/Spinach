@@ -60,7 +60,7 @@
 - Lines 39: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 40: computes `bas.approximation` using `bas.approximation='IK-1'`.
 - Lines 41: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 42: computes `bas.level` using `bas.level=4; bas.space_level=3`.
+- Lines 42: computes `bas.inter_level` using `bas.inter_level=4; bas.prox_level=3`.
 
 ## Implementation structure
 

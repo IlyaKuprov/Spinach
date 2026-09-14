@@ -37,7 +37,7 @@ Legal `sys.disable` entries, anything else being an error: `'zte'`
 `'symmetry'`, `'krylov'`, `'clean-up'`, `'hygiene'` (start-up health checks),
 `'dss'`, `'expv'`, `'trajlevel'`, `'merge'`, `'colorbar'`, `'asyredf'`. Legal
 `sys.enable` entries: `'gpu'`, `'op_cache'`, `'ham_cache'`, `'prop_cache'`,
-`'xmemlist'`, `'greedy'`, `'paranoia'` (tight tolerances), `'cowboy'` (loose
+`'greedy'`, `'paranoia'` (tight tolerances), `'cowboy'` (loose
 tolerances), `'polyadic'`, `'sodd'` (spin-orbit corrections to dipolar
 couplings), `'dafuq'`.
 
@@ -239,7 +239,7 @@ Relaxation enters through `inter.relaxation`, `inter.rlx_keep`,
 bas.formalism='sphten-liouv';
 bas.approximation='IK-2';
 bas.connectivity='scalar_couplings';
-bas.space_level=3;
+bas.prox_level=3;
 ```
 
 | Field | Legal values | Notes |
@@ -247,14 +247,14 @@ bas.space_level=3;
 | `formalism` | `'sphten-liouv'`, `'zeeman-liouv'`, `'zeeman-hilb'`, `'zeeman-wavef'` | Mandatory. |
 | `approximation` | `'none'`, `'IK-0'`, `'IK-1'`, `'IK-2'`, `'IK-DNP'` | Mandatory. Only `'none'` is legal outside `sphten-liouv`. |
 | `connectivity` | `'scalar_couplings'`, `'full_tensors'` | Required by, and only legal for, `IK-1` and `IK-2`. |
-| `level` | positive integer; `1x3` integer vector for `IK-DNP` | Required by `IK-0`, `IK-1`, `IK-DNP`. Cannot exceed the number of spins. For `IK-DNP` the three entries bound electrons, spins and nuclei respectively. |
-| `space_level` | positive integer | Required by, and only legal for, `IK-1` and `IK-2`. |
-| `projections` | row vector of integers | Keeps only the listed total projection quantum numbers. `sphten-liouv` only. |
-| `longitudinals` | cell array of isotope strings or spin index vectors | Keeps only longitudinal states on those spins. |
-| `zero_quantum` | cell array of isotope strings or spin index vectors | Keeps only zero-quantum coherences on those spins. |
-| `manual` | logical matrix with `nspins` columns | Explicit basis state list, one state per row. |
+| `inter_level` | positive integer; `1x3` integer vector for `IK-DNP` | Required by `IK-0`, `IK-1`, `IK-DNP`. Cannot exceed the number of spins; clipped to the spin count of each chemical substance. For `IK-DNP` the three entries bound electrons, spins and nuclei respectively. |
+| `prox_level` | positive integer | Required by, and only legal for, `IK-1` and `IK-2`. Clipped to the spin count of each chemical substance. |
+| `projections` | cell array with one row vector of integers per chemical substance | Keeps only the listed total projection quantum numbers in that substance; an empty element means no filter. `sphten-liouv` only. Single substance: `bas.projections={+1}`. |
+| `longitudinal` | cell array with one cell array of isotope strings or spin index vectors per chemical substance | Keeps only longitudinal states on those spins of that substance. `sphten-liouv` only. Single substance: `bas.longitudinal={{'15N'}}`. |
+| `zero_quantum` | cell array with one cell array of isotope strings or spin index vectors per chemical substance | Keeps only states that are zero-quantum over the union of the listed spins of that substance. `sphten-liouv` only. Single substance: `bas.zero_quantum={{'1H'}}`. |
+| `manual` | logical matrix with `nspins` columns | Explicit subgraph list, one subgraph per row; a row may not span two chemical substances. |
 | `sym_group` | cell array from `S2`, `S3`, `S4`, `S4A`, `S5`, `S6`, `S6A`, `S8A` | Permutation symmetry groups. |
-| `sym_spins` | cell array of index vectors | One vector per group, at least two spins each, no spin in two groups. Mandatory alongside `sym_group`. |
+| `sym_spins` | cell array of index vectors | One vector per group, at least two spins each, no spin in two groups, no group spanning two chemical substances. Mandatory alongside `sym_group`. |
 | `sym_a1g_only` | logical | Keep only the fully symmetric irreducible representation. |
 
 `sphten-liouv` refuses multiplicities above 16. `IK-DNP` requires both

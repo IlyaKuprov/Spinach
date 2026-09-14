@@ -48,7 +48,7 @@ PSYCHE pure-shift NMR spectrum of strychnine. Calculation time: hours, faster on
 - Lines 20: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 21: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
 - Lines 22: computes `bas.approximation` using `bas.approximation='IK-2'`.
-- Lines 23: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 23: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 26: computes `sys.tols.inter_cutoff` using `sys.tols.inter_cutoff=2.0`.
 - Lines 27: computes `sys.disable` using `sys.disable={'pt','colorbar'}`.
 - Lines 28: computes `sys.enable` using `sys.enable={'greedy'}`.

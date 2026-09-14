@@ -54,7 +54,7 @@ An illustration of basis set coefficient optimisation for a pul- se optimised as
 - Lines 25: computes `inter.zeeman.scalar` using `inter.zeeman.scalar=num2cell(linspace(-160,160,n_spins))`.
 - Lines 29: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 30: computes `bas.approximation` using `bas.approximation='IK-2'`.
-- Lines 31: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 31: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 32: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
 - Lines 35: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 39: computes `rho_init` using `rho_init=state(spin_system,'Lz',21:80)`.

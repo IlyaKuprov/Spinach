@@ -39,7 +39,7 @@ Singlet yield anisotropy calculation for a model radical pair reaction, Haberkor
 - Lines 16: computes `sys.isotopes` using `sys.isotopes={'E','E','14N','14N','1H','1H','1H'}`.
 - Lines 19: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 20: computes `bas.approximation` using `bas.approximation='IK-0'`.
-- Lines 21: computes `bas.level` using `bas.level=5`.
+- Lines 21: computes `bas.inter_level` using `bas.inter_level=5`.
 - Lines 24: computes `inter.coupling.matrix` using `inter.coupling.matrix=cell(7)`.
 - Lines 25: computes `inter.coupling.matrix{1,3}` using `inter.coupling.matrix{1,3}=mt2hz([-0.0989 0.0039 0.0000`.
 - Lines 28: computes `inter.coupling.matrix{2,4}` using `inter.coupling.matrix{2,4}=mt2hz([-0.0336 0.0924 -0.1354`.

@@ -39,7 +39,7 @@ Cross-polarisation experiment in the doubly rotating frame. A single nitrogen-15
 - Lines 30: computes `inter.temperature` using `inter.temperature=298`.
 - Lines 33: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 34: computes `bas.approximation` using `bas.approximation='IK-0'`.
-- Lines 35: computes `bas.level` using `bas.level=3`.
+- Lines 35: computes `bas.inter_level` using `bas.inter_level=3`.
 - Lines 38: computes `sys.tols.inter_cutoff` using `sys.tols.inter_cutoff=5.0`.
 - Lines 39: computes `sys.tols.prox_cutoff` using `sys.tols.prox_cutoff=4.0`.
 - Lines 40: computes `sys.disable` using `sys.disable={'trajlevel'}`.

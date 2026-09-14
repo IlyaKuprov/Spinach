@@ -38,7 +38,7 @@ Liquid state magnetic field effect simulation on a radical pair with four nuclei
 - Lines 19: computes `inter.coupling.scalar` using `inter.coupling.scalar = num2cell(mt2hz([0 0 0.195 0.195 0 0`.
 - Lines 27: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 28: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 29: computes `bas.projections` using `bas.projections=0`.
+- Lines 29: computes `bas.projections` using `bas.projections={0}`.
 - Lines 30: computes `bas.sym_spins` using `bas.sym_spins={[3 4]}`.
 - Lines 31: computes `bas.sym_group` using `bas.sym_group={'S2'}`.
 - Lines 34: computes `parameters.rates` using `parameters.rates=[0.176 0.880 1.76 3.52 8.8 17.6 35.2 52.8]*1e6`.

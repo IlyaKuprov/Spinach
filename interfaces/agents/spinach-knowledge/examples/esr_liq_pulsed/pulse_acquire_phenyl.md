@@ -40,8 +40,8 @@ W-band pulse-acquire FFT ESR spectrum of phenyl radical. Simple fixed line width
 - Lines 17: computes `sys.magnet` using `sys.magnet=3.5`.
 - Lines 20: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 21: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 22: computes `bas.longitudinals` using `bas.longitudinals={'1H'}`.
-- Lines 23: computes `bas.projections` using `bas.projections=+1`.
+- Lines 22: computes `bas.longitudinal` using `bas.longitudinal={{'1H'}}`.
+- Lines 23: computes `bas.projections` using `bas.projections={+1}`.
 - Lines 26: computes `inter.relaxation` using `inter.relaxation={'damp'}`.
 - Lines 27: computes `inter.rlx_keep` using `inter.rlx_keep='diagonal'`.
 - Lines 28: computes `inter.equilibrium` using `inter.equilibrium='zero'`.

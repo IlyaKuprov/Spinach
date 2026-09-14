@@ -41,7 +41,7 @@ Static powder pulse-acquire experiment on a two-spin system with a dipolar coupl
 - Lines 17: computes `sys.disable` using `sys.disable={'trajlevel'}`.
 - Lines 20: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 21: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 22: computes `bas.projections` using `bas.projections=+1`.
+- Lines 22: computes `bas.projections` using `bas.projections={+1}`.
 - Lines 25: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 29: computes `parameters.spins` using `parameters.spins={'1H'}`.
 - Lines 30: computes `parameters.rho0` using `parameters.rho0=state(spin_system,'L+','1H')`.

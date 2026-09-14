@@ -187,20 +187,18 @@ else
             % Loop over irreducible representations
             for n=1:group.n_irreps
                 
-                % Build the transformation matrix
-                rows=permutation_table;
-                cols=kron((1:basis_dim)',ones(1,group.order));
-                vals=kron(ones(basis_dim,1),group.characters(n,:));
-                coeff_matrix=sparse(rows(:),cols(:),vals(:));
-                clear('rows','cols','vals');
-                
+                % Build the transformation matrix, skipping zero characters
+                rows=permutation_table(:);
+                cols=repmat((1:basis_dim)',[group.order 1]);
+                vals=repmat(group.characters(n,:),[basis_dim 1]); vals=vals(:);
+                nonzero=(vals~=0);
+                coeff_matrix=sparse(rows(nonzero),cols(nonzero),vals(nonzero),basis_dim,basis_dim);
+                clear('rows','cols','vals','nonzero');
+
                 % Remove sign ambiguity and clean up
-                for k=1:basis_dim
-                    non_zero_elements=nonzeros(coeff_matrix(:,k));
-                    if any(non_zero_elements)
-                        coeff_matrix(:,k)=coeff_matrix(:,k)*sign(non_zero_elements(1)); %#ok<SPRIX>
-                    end
-                end
+                [~,first_nz]=max(spones(coeff_matrix),[],1);
+                first_nz=sub2ind(size(coeff_matrix),first_nz,1:basis_dim);
+                coeff_matrix=sign(coeff_matrix(first_nz)).*coeff_matrix;
                 coeff_matrix=clean_up(spin_system,coeff_matrix,spin_system.tols.liouv_zero);
                 
                 % Remove zero columns
@@ -217,7 +215,7 @@ else
                 elseif group.irrep_dims(n)>1
                     
                     % Get the overlap matrix
-                    overlap=logical(coeff_matrix'*coeff_matrix);
+                    overlap=(abs(coeff_matrix'*coeff_matrix)>spin_system.tols.liouv_zero);
                     
                     % Find non-orthogonal subspaces
                     member_states=scomponents(overlap); 
@@ -229,13 +227,17 @@ else
                         orth_coeff_matrix{k}=coeff_matrix(:,member_states==k);
                     end
                     
-                    % Orthogonalise
+                    % Orthogonalise, keeping the sign of single-vector subspaces
                     parfor k=1:n_subspaces
-                        vectors=full(orth_coeff_matrix{k});
-                        vectors=orth(vectors);
-                        vectors=clean_up(spin_system,vectors,...
-                                         spin_system.tols.liouv_zero);
-                        orth_coeff_matrix{k}=sparse(vectors);
+                        if size(orth_coeff_matrix{k},2)==1
+                            orth_coeff_matrix{k}=orth_coeff_matrix{k}/norm(orth_coeff_matrix{k},2);
+                        else
+                            vectors=full(orth_coeff_matrix{k});
+                            vectors=orth(vectors);
+                            vectors=clean_up(spin_system,vectors,...
+                                             spin_system.tols.liouv_zero);
+                            orth_coeff_matrix{k}=sparse(vectors);
+                        end
                     end
                     
                     % Build the coefficient matrix
@@ -302,17 +304,25 @@ if isfield(bas,'sym_group')
     for m=1:length(bas.sym_spins)
         
         % Check for sense
-        if any(bas.sym_spins{m}>spin_system.comp.nspins)||any(bas.sym_spins{m}<1)||(numel(bas.sym_spins{m})<2)
+        if any(bas.sym_spins{m}>spin_system.comp.nspins)||any(bas.sym_spins{m}<1)||...
+           any(mod(bas.sym_spins{m},1)~=0)||(numel(bas.sym_spins{m})<2)
             error('incorrect spin labels in bas.sym_spins.');
         end
-        
+
         % Check for intersections
         for n=1:length(bas.sym_spins)
             if (n~=m)&&(~isempty(intersect(bas.sym_spins{m},bas.sym_spins{n})))
                 error('same spin is listed in multiple symmetry groups in bas.sym_spins.');
             end
         end
-        
+
+        for n=1:numel(spin_system.chem.parts)
+            n_common=numel(intersect(bas.sym_spins{m},spin_system.chem.parts{n}));
+            if (n_common>0)&&(n_common<numel(bas.sym_spins{m}))
+                error('a symmetry group in bas.sym_spins crosses chemical substance boundaries.');
+            end
+        end
+
     end
     
     % Check the group names

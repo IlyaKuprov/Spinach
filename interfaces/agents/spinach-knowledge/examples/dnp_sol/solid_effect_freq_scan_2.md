@@ -36,8 +36,8 @@ A scan through the microwave frequency range in a steady state DNP experiment fo
 - Lines 26: computes `inter.coordinates` using `inter.coordinates={[ 0.00000000 0.00000000 10.14358975]`.
 - Lines 35: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 36: computes `bas.approximation` using `bas.approximation='IK-0'`.
-- Lines 37: computes `bas.level` using `bas.level=4`.
-- Lines 38: computes `bas.projections` using `bas.projections=[-2 -1 0 +1 +2]`.
+- Lines 37: computes `bas.inter_level` using `bas.inter_level=4`.
+- Lines 38: computes `bas.projections` using `bas.projections={[-2 -1 0 +1 +2]}`.
 - Lines 41: computes `inter.relaxation` using `inter.relaxation={'weizmann'}`.
 - Lines 42: computes `inter.rlx_keep` using `inter.rlx_keep='secular'`.
 - Lines 43: computes `inter.equilibrium` using `inter.equilibrium='zero'`.

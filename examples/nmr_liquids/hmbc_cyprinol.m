@@ -20,8 +20,8 @@ sys.tols.prox_cutoff=4.0;
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-1';
-bas.level=3;
-bas.space_level=1;
+bas.inter_level=3;
+bas.prox_level=1;
 bas.connectivity='scalar_couplings';
 
 % Sequence parameters

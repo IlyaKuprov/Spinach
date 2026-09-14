@@ -41,9 +41,9 @@
 - Lines 18: computes `inter.zeeman.matrix` using `inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,2,124.2)`.
 - Lines 31: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 32: computes `bas.approximation` using `bas.approximation='IK-0'`.
-- Lines 33: computes `bas.longitudinals` using `bas.longitudinals={'15N'}`.
-- Lines 34: computes `bas.projections` using `bas.projections=+1`.
-- Lines 35: computes `bas.level` using `bas.level=3`.
+- Lines 33: computes `bas.longitudinal` using `bas.longitudinal={{'15N'}}`.
+- Lines 34: computes `bas.projections` using `bas.projections={+1}`.
+- Lines 35: computes `bas.inter_level` using `bas.inter_level=3`.
 - Lines 38: computes `sys.tols.inter_cutoff` using `sys.tols.inter_cutoff=5.0`.
 - Lines 39: computes `sys.tols.prox_cutoff` using `sys.tols.prox_cutoff=4.0`.
 - Lines 40: computes `sys.disable` using `sys.disable={'trajlevel'}`.

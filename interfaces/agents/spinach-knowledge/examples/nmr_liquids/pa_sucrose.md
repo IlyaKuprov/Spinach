@@ -42,7 +42,7 @@
 - Lines 18: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 19: computes `bas.approximation` using `bas.approximation='IK-2'`.
 - Lines 20: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 21: computes `bas.space_level` using `bas.space_level=2`.
+- Lines 21: computes `bas.prox_level` using `bas.prox_level=2`.
 - Lines 24: computes `inter.relaxation` using `inter.relaxation={'redfield'}`.
 - Lines 25: computes `inter.equilibrium` using `inter.equilibrium='zero'`.
 - Lines 26: computes `inter.rlx_keep` using `inter.rlx_keep='secular'`.

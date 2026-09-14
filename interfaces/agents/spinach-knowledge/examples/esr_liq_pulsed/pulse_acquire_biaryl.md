@@ -40,8 +40,8 @@ A time-domain pulse-acquire version of the EasySpin biaryl test file, with ackno
 - Lines 19-20: computes `sys.isotopes` using `sys.isotopes={'E','14N','1H','1H','1H','1H','1H', '14N','1H','1H','1H','1H','1H'}`.
 - Lines 23: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 24: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 25: computes `bas.longitudinals` using `bas.longitudinals={'1H','14N'}`.
-- Lines 26: computes `bas.projections` using `bas.projections=+1`.
+- Lines 25: computes `bas.longitudinal` using `bas.longitudinal={{'1H','14N'}}`.
+- Lines 26: computes `bas.projections` using `bas.projections={+1}`.
 - Lines 27: computes `bas.sym_group` using `bas.sym_group={'S2','S2','S2','S2','S2','S2'}`.
 - Lines 28: computes `bas.sym_spins` using `bas.sym_spins={[2 8],[3 9],[4 10],[5 11],[6 12],[7 13]}`.
 - Lines 31: computes `inter.zeeman.scalar` using `inter.zeeman.scalar=cell(13,1)`.

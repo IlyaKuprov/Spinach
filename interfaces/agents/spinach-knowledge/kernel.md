@@ -11,7 +11,7 @@
 |---|---|---|---:|
 | `kernel/assume.m` | `spin_system=assume(spin_system,assumptions,retention)` | Sets case-specific assumptions for various simulation contexts. This function determines the behaviour of the Hamiltonia | 769 |
 | `kernel/average.m` | `H=average(spin_system,Hp,H0,Hm,omega,theory)` | Average Hamiltonian theories under Zeeman interaction rotating frame transformations. Syntax: H=average(spin_system,Hp,H | 209 |
-| `kernel/basis.m` | `spin_system=basis(spin_system,bas)` | Basis set control. This is the second mandatory function (after create.m) that must be called in every calculation to bu | 821 |
+| `kernel/basis.m` | `spin_system=basis(spin_system,bas)` | Basis set control. This is the second mandatory function (after create.m) that must be called in every calculation to bu | 843 |
 | `kernel/cache/bos_product_table.m` | `[product_table_left,...` | Structure coefficient tables for the associative envelopes of truncated Weyl algebras spanned by orthogonalised bosonic  | 111 |
 | `kernel/cache/cacheman.m` | `cacheman(spin_system) %#NHEAD` | Cache management heuristics. Looks after the scratch folder and prevents it from filling up the disk. Do not call direct | 103 |
 | `kernel/cache/ist_product_table.m` | `[product_table_left,product_table_right]=ist_product_table(mult)` | Structure coefficient tables for the associative envelopes of su(mult) algebras. Syntax: [product_table_left,product_tab | 156 |
@@ -80,7 +80,7 @@
 | `kernel/conventions/transforms/xyz2sph.m` | `[r,theta,phi] = xyz2sph(x,y,z)` | Converts Cartesian coordinates [x y z] into spherical coordinates according to the ISO convention. Syntax: [r,theta,phi] | 56 |
 | `kernel/conventions/transforms/zfs2mat.m` | `M=zfs2mat(D,E,alp,bet,gam)` | Converts D and E zero-field splitting parameters described in the abstract of (http://dx.doi.org/10.1063/1.1682294) into | 61 |
 | `kernel/correlation.m` | `rho=correlation(spin_system,rho,orders,spins)` | Correlation order selection function -keeps only the specified orders of spin correlation in the state vector. This is u | 168 |
-| `kernel/create.m` | `spin_system=create(sys,inter)` | The entry function of the Spinach kernel that creates the spin system object that the rest of the library requires to ru | 3192 |
+| `kernel/create.m` | `spin_system=create(sys,inter)` | The entry function of the Spinach kernel that creates the spin system object that the rest of the library requires to ru | 3191 |
 | `kernel/decouple.m` | `[L,rho]=decouple(spin_system,L,rho,spins)` | Obliterates all interactions and populations in the subspace of states that involve the specified spins in any way. The  | 225 |
 | `kernel/derivatives/fdhess.m` | `H=fdhess(A,nstenc)` | Returns the finite-difference Hessian of a 3D array using a finite difference scheme with a user-specified number of ste | 72 |
 | `kernel/derivatives/fdkup.m` | `K=fdkup(npoints,extents,chi,nstenc)` | Returns a finite difference representation of the Kuprov operator: K[rho]=-(1/3)*Trace(Hessian[rho]*chi) with the number | 98 |
@@ -393,7 +393,7 @@
 | `kernel/steady.m` | `rho=steady(spin_system,P,rho,method)` | Steady state under the repeated action by the same dissi- pative evolution propagator. Syntax: rho=steady(spin_system,P, | 220 |
 | `kernel/step.m` | `rho=step(spin_system,L,rho,time_step)` | Propagation step function. Computes the action by a matrix exponential without compuing that exponential. Supports one-, | 419 |
 | `kernel/summaries/summary_basis.m` | `summary_basis(spin_system)` | Prints basis-set state summary for a Spinach system. Syntax: summary_basis(spin_system) Parameters: spin_system -Spinach | 70 |
-| `kernel/summaries/summary_basis_opts.m` | `summary_basis_opts(spin_system)` | Prints basis-set option summary for a Spinach system. Syntax: summary_basis_opts(spin_system) Parameters: spin_system -S | 78 |
+| `kernel/summaries/summary_basis_opts.m` | `summary_basis_opts(spin_system)` | Prints basis-set option summary for a Spinach system. Syntax: summary_basis_opts(spin_system) Parameters: spin_system -S | 84 |
 | `kernel/summaries/summary_chemistry.m` | `summary_chemistry(spin_system)` | Prints chemical subsystem and exchange summary for a Spinach system. Syntax: summary_chemistry(spin_system) Parameters:  | 78 |
 | `kernel/summaries/summary_coordinates.m` | `summary_coordinates(spin_system,header)` | Prints atomic coordinate summary for a Spinach system. Syntax: summary_coordinates(spin_system,header) Parameters: spin_ | 53 |
 | `kernel/summaries/summary_couplings.m` | `summary_couplings(spin_system,header)` | Prints spin-spin coupling tensor summary for a Spinach system. Syntax: summary_couplings(spin_system,header) Parameters: | 82 |
@@ -516,7 +516,7 @@
 | `kernel/utilities/stitch.m` | `fid=stitch(spin_system,L,rho_stack,coil_stack,...` | Stitching function for bidirectionally propagated 3D NMR pulse sequences. Propagate your initial condition forward to so | 200 |
 | `kernel/utilities/svd_shrink.m` | `[vec,cov]=svd_shrink(spin_system,rho,tol)` | Generates sets of vector-covector pairs for the parallel implementation of the time propagation algorithm described in [ | 64 |
 | `kernel/utilities/swizzle.m` | `tuples=swizzle(index_arrays)` | Flattens out nested index lists and outputs them as an array of tuples in random order. This is useful for flattening ne | 58 |
-| `kernel/utilities/symmetry.m` | `spin_system=symmetry(spin_system,bas)` | Permutation symmetry treatment. Compiles character tables of composite symmetry groups, builds the permutation table for | 351 |
+| `kernel/utilities/symmetry.m` | `spin_system=symmetry(spin_system,bas)` | Permutation symmetry treatment. Compiles character tables of composite symmetry groups, builds the permutation table for | 361 |
 | `kernel/utilities/tikhoind.m` | `[x,err,reg]=tikhoind(K,D,y,lam)` | Analytical Tikhonov regularised solution to K*x=y without any constraints (sign-indefinite output). Syntax: [x,err,reg]= | 66 |
 | `kernel/utilities/tikhol1n.m` | `[x,err,reg]=tikhol1n(A,y,nnzt)` | L1 norm Tikhonov regularised solver for A*x=y where A is an ill-conditioned matrix. The error functional is norm(A*x-y,2 | 170 |
 | `kernel/utilities/tikhonov.m` | `[x,err,reg]=tikhonov(K,D,KtK,DtD,H,y,lambda)` | Tikhonov regularised solution to K*x=y with a positivity const- raint on x using regularised Newton-Raphson method. Synt | 119 |

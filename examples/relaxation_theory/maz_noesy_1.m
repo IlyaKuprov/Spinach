@@ -83,7 +83,7 @@ sys.disable={'krylov'};
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-2';
-bas.space_level=3;
+bas.prox_level=3;
 bas.connectivity='scalar_couplings';
 
 % Relaxation superoperator

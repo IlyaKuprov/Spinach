@@ -38,7 +38,7 @@ inter.coupling.scalar{5,6}=-15;
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-0';
-bas.level=4;
+bas.inter_level=4;
 
 % Spinach housekeeping
 spin_system=create(sys,inter);

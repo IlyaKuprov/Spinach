@@ -49,8 +49,8 @@ HMQC spectrum of cyprinol with natural abundance of 13C isotope. Calculation tim
 - Lines 19: computes `sys.tols.inter_cutoff` using `sys.tols.inter_cutoff=5.0`.
 - Lines 22: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 23: computes `bas.approximation` using `bas.approximation='IK-1'`.
-- Lines 24: computes `bas.level` using `bas.level=3`.
-- Lines 25: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 24: computes `bas.inter_level` using `bas.inter_level=3`.
+- Lines 25: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 26: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
 - Lines 29: computes `parameters.J` using `parameters.J=150`.
 - Lines 30: computes `parameters.sweep` using `parameters.sweep=[12000 2500]`.

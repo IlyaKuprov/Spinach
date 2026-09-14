@@ -18,7 +18,7 @@ sys.isotopes={'E','E','14N','14N','1H','1H','1H'};
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-0';
-bas.level=5;
+bas.inter_level=5;
 
 % Hyperfine coupling tensors
 inter.coupling.matrix=cell(7);

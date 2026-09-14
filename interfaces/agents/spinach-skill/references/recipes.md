@@ -65,7 +65,7 @@ and re-place `parameters.offset` and `parameters.sweep`; everything after
 `nmr_liquids/noesy_strychnine.m`, `cosy90_strychnine.m`, `tocsy_sucrose.m`,
 `roesy_strychnine.m`. NOESY starts from thermal equilibrium and so carries
 `parameters.needs={'rho_eq'}` with `inter.equilibrium='IME'` and a temperature;
-COSY does not. NOESY also needs `bas.space_level=3` rather than `1`, because
+COSY does not. NOESY also needs `bas.prox_level=3` rather than `1`, because
 cross peaks come from through-space correlations that scalar-coupling
 connectivity does not reach. States quadrature reconstruction:
 
@@ -133,12 +133,12 @@ a named grid.
 ```matlab
 inter.zeeman.eigs={[<xx> <yy> <zz>]};    % ppm
 inter.zeeman.euler={[<a> <b> <g>]};      % radians
-sys.disable={'trajlevel'}; bas.projections=+1;
+sys.disable={'trajlevel'}; bas.projections={+1};
 parameters.grid='rep_2ang_6400pts_sph'; parameters.verbose=0;
 fid=powder(spin_system,@acquire,parameters,'nmr');
 ```
 
-`bas.projections=+1` is safe because a single-quantum spectrum needs one total
+`bas.projections={+1}` is safe because a single-quantum spectrum needs one total
 projection block; `trajlevel` analysis is meaningless per orientation. Grid
 choice is a convergence parameter: refine until the pattern stops moving.
 
@@ -283,7 +283,7 @@ be built from that pattern.
 `M=liquid(spin_system,@rydmr_exp,parameters,'labframe')`. `sys.magnet` is `1`
 for normalisation and the real sweep is `parameters.fields` in tesla, alongside
 `parameters.rates` in hertz, `parameters.electrons` and
-`parameters.needs={'zeeman_op'}`. The basis carries `bas.projections=0` and
+`parameters.needs={'zeeman_op'}`. The basis carries `bas.projections={0}` and
 permutation symmetry on equivalent protons via `bas.sym_spins`/`bas.sym_group`,
 and `sys.disable={'zte'}` is required because the singlet start state is not
 the thermal one. For Haberkorn or Jones-Hore kinetics use `@rydmr` with

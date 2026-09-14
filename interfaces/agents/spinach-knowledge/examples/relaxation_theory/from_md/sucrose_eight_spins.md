@@ -51,7 +51,7 @@ One of the calculations reported in the JMR paper with Jim Prestegard: an eight-
 - Lines 25: computes `sys.isotopes` using `sys.isotopes={'1H','1H','1H','1H','1H','1H','1H','1H'}`.
 - Lines 28: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 29: computes `bas.approximation` using `bas.approximation='IK-0'`.
-- Lines 30: computes `bas.level` using `bas.level=3`.
+- Lines 30: computes `bas.inter_level` using `bas.inter_level=3`.
 - Lines 33: computes `inter.relaxation` using `inter.relaxation={'redfield'}`.
 - Lines 34: computes `inter.equilibrium` using `inter.equilibrium='zero'`.
 - Lines 35: computes `inter.rlx_keep` using `inter.rlx_keep='labframe'`.

@@ -50,7 +50,7 @@ An example of the SIFTER sequence. Calculation time: minutes.
 - Lines 33: computes `inter.coupling.euler{2,4}` using `inter.coupling.euler{2,4}=[0 0 0]`.
 - Lines 36: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 37: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 38: computes `bas.longitudinals` using `bas.longitudinals={'14N'}`.
+- Lines 38: computes `bas.longitudinal` using `bas.longitudinal={'14N'}`.
 
 ## Implementation structure
 

@@ -32,7 +32,7 @@ inter.temperature=298;
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-0';
-bas.level=3;
+bas.inter_level=3;
 
 % Algorithmic options
 sys.tols.inter_cutoff=5.0;

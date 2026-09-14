@@ -26,7 +26,7 @@ inter.coupling.scalar = num2cell(mt2hz([0       0     0.195  0.195  0    0
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-bas.projections=0;
+bas.projections={0};
 bas.sym_spins={[3 4]};
 bas.sym_group={'S2'};
 

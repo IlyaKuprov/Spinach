@@ -39,7 +39,7 @@ Powder magic angle spinning spectrum of a pair of dipole-coupled proton spins us
 - Lines 14: computes `inter.coordinates` using `inter.coordinates={[0 0 0]; [0 3.9 0.1]}`.
 - Lines 17: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 18: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 19: computes `bas.projections` using `bas.projections=+1`.
+- Lines 19: computes `bas.projections` using `bas.projections={+1}`.
 - Lines 22: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 26: computes `parameters.axis` using `parameters.axis=[1 1 1]`.
 - Lines 27: computes `parameters.max_rank` using `parameters.max_rank=15`.

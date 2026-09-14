@@ -36,8 +36,8 @@ Menthol NMR spectrum from Damien Jeannerat, including the effect of bad Z1 and Z
 - Lines 14: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 15: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
 - Lines 16: computes `bas.approximation` using `bas.approximation='IK-2'`.
-- Lines 17: computes `bas.space_level` using `bas.space_level=1`.
-- Lines 18: computes `bas.projections` using `bas.projections=+1`.
+- Lines 17: computes `bas.prox_level` using `bas.prox_level=1`.
+- Lines 18: computes `bas.projections` using `bas.projections={+1}`.
 - Lines 19: computes `bas.sym_group` using `bas.sym_group={'S3','S3','S3'}`.
 - Lines 20: computes `bas.sym_spins` using `bas.sym_spins={[4 5 6],[9 10 11],[12 13 14]}`.
 - Lines 23: computes `sys.enable` using `sys.enable={'greedy'}`.

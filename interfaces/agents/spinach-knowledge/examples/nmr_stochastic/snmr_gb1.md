@@ -58,7 +58,7 @@ A Primas-style stochastic NMR experiment on GB1 protein. The calculation require
 - Lines 24: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 25: computes `bas.approximation` using `bas.approximation='IK-1'`.
 - Lines 26: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 27: computes `bas.level` using `bas.level=4; bas.space_level=3`.
+- Lines 27: computes `bas.inter_level` using `bas.inter_level=4; bas.prox_level=3`.
 - Lines 30: computes `inter.relaxation` using `inter.relaxation={'redfield'}`.
 - Lines 31: computes `inter.rlx_keep` using `inter.rlx_keep='kite'`.
 - Lines 32: computes `inter.equilibrium` using `inter.equilibrium='IME'`.

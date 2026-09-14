@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/summaries/summary_basis_opts.m`
 - Signature: `summary_basis_opts(spin_system)`
-- Total lines: 78
+- Total lines: 84
 
 ## Purpose
 

@@ -44,7 +44,7 @@ WISE of alpha-glycine powder under MAS. Calculation time: hours, much faster on 
 - Lines 17: computes `inter.zeeman.matrix` using `inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,1,176.4)`.
 - Lines 26: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 27: computes `bas.approximation` using `bas.approximation='IK-0'`.
-- Lines 28: computes `bas.level` using `bas.level=3`.
+- Lines 28: computes `bas.inter_level` using `bas.inter_level=3`.
 - Lines 31: computes `sys.tols.inter_cutoff` using `sys.tols.inter_cutoff=200`.
 - Lines 34: computes `sys.enable` using `sys.enable={'greedy'}`.
 - Lines 37: computes `spin_system` using `spin_system=create(sys,inter)`.

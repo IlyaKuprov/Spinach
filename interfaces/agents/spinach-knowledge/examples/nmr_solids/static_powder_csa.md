@@ -41,7 +41,7 @@ Two-spin static CSA powder pattern. Calculation time: seconds
 - Lines 16: computes `sys.disable` using `sys.disable={'trajlevel'}`.
 - Lines 19: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 20: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 21: computes `bas.projections` using `bas.projections=+1`.
+- Lines 21: computes `bas.projections` using `bas.projections={+1}`.
 - Lines 24: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 28: computes `parameters.spins` using `parameters.spins={'1H'}`.
 - Lines 29: computes `parameters.rho0` using `parameters.rho0=state(spin_system,'L+','1H')`.

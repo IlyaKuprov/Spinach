@@ -55,7 +55,7 @@ PSYCOSY of Acrolein. Calculation time: hours, faster on a GPU.
 - Lines 28: computes `sys.tols.merge_dim` using `sys.tols.merge_dim=500`.
 - Lines 31: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 32: computes `bas.approximation` using `bas.approximation='IK-2'`.
-- Lines 33: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 33: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 34: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
 - Lines 37: computes `spin_system` using `spin_system=create(sys,inter)`.
 

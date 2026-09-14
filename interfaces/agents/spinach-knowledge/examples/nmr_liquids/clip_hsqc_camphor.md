@@ -53,7 +53,7 @@ CLIP-HSQC spectrum of camphor with natural content of 13C isotope. Coordinates, 
 - Lines 28: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 29: computes `bas.approximation` using `bas.approximation='IK-2'`.
 - Lines 30: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 31: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 31: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 34: computes `sys.enable` using `sys.enable={'greedy'}`.
 - Lines 35: computes `sys.tols.prox_cutoff` using `sys.tols.prox_cutoff=4.0`.
 - Lines 38: computes `parameters.J` using `parameters.J=140`.

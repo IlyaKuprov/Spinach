@@ -60,7 +60,7 @@ Integrating the Lioville -von Neumann equation through one period of the MAS rot
 - Lines 17: computes `inter.coordinates` using `inter.coordinates={[0 0 0]; [0 3.9 0.1]}`.
 - Lines 20: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 21: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 22: computes `bas.projections` using `bas.projections=+1`.
+- Lines 22: computes `bas.projections` using `bas.projections={+1}`.
 - Lines 25: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 30: computes `[H,Q]` using `[H,Q]=hamiltonian(spin_system)`.
 - Lines 33: computes `rate` using `rate=50000; T=1/rate`.

@@ -45,7 +45,7 @@ Static powder 79Br NMR spectrum of potassium bromide. At least 3 quadrupolar ten
 - Lines 26: computes `inter.coupling.matrix{3,3}` using `inter.coupling.matrix{3,3}=1e3*diag([1.5885 0.9449 -( 1.5885 + 0.9449)])`.
 - Lines 29: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 30: computes `bas.approximation` using `bas.approximation='IK-0'`.
-- Lines 31: computes `bas.level` using `bas.level=1; bas.projections=+1`.
+- Lines 31: computes `bas.inter_level` using `bas.inter_level=1; bas.projections={+1}`.
 - Lines 34: computes `sys.disable` using `sys.disable={'trajlevel'}`.
 - Lines 37: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 41: computes `parameters.grid` using `parameters.grid='icos_2ang_163842pts'`.

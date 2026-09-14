@@ -58,7 +58,7 @@ DPFGSE signal selection example for a solution of GABA in water. Gradients and s
 - Lines 30: computes `inter.coupling.scalar{7,7}` using `inter.coupling.scalar{7,7}=0`.
 - Lines 33: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 34: computes `bas.approximation` using `bas.approximation='IK-2'`.
-- Lines 35: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 35: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 36: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
 - Lines 39: computes `sys.disable` using `sys.disable={'pt','krylov'}`.
 - Lines 45: computes `spin_system` using `spin_system=create(sys,inter)`.

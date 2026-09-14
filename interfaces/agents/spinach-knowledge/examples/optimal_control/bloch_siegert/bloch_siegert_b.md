@@ -56,7 +56,7 @@ Bloch-Siegert shift compensation functionality demo. The script optimises a univ
 - Lines 22: computes `inter.zeeman.scalar` using `inter.zeeman.scalar=num2cell(linspace(-100,100,n_spins))`.
 - Lines 26: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 27: computes `bas.approximation` using `bas.approximation='IK-2'`.
-- Lines 28: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 28: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 29: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
 - Lines 32: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 36: computes `Sx` using `Sx=state(spin_system,'Lx','13C'); Sx=Sx/norm(full(Sx),2)`.

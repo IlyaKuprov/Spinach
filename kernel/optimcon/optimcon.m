@@ -20,13 +20,15 @@
 %       case catalog is built here, its cases are assigned to the
 %       parallel pool workers in contiguous blocks recorded in
 %       spin_system.control.worker_cases, and the frozen problem is
-%       published to the workers exactly once, as a parallel.pool.-
-%       Constant built from a per-worker Composite and held in
-%       spin_system.control.invariants; each worker receives the
-%       drift generators of its own case block and nothing else.
-%       Heavy invariants - the drift generators, the control
-%       operators, the offset operators, the control commutators,
-%       and the Bloch-Siegert response operators - are then removed
+%       published to the workers exactly once: the common part as a
+%       parallel.pool.Constant in spin_system.control.invariants, the
+%       drift generators as a parallel.pool.Constant built from a per-
+%       worker Composite in spin_system.control.drift_slices, so that
+%       each worker receives the drifts of its own case block and no-
+%       thing else. Worker-resident invariants - the drift generators,
+%       the control operators, the offset operators, the control com-
+%       mutators, the Bloch-Siegert response operators, the keyholes,
+%       and the prefix and suffix functions - are then removed
 %       from the returned structure, and their names are recorded
 %       in spin_system.control.frozen_fields. All other control
 %       fields stay live: ensemble() re-sends them to the workers
@@ -1525,11 +1527,11 @@ if nworkers>0
                         num2str(balance,'%.3f')]);
 end
 
-% Record the names of the heavy worker-resident invariants
-frozen_fields={'drifts','operators','off_ops','cc_comm','cc_comm_idx','resp_ops'};
+% Record the names of the worker-resident invariants
+frozen_fields={'drifts','operators','off_ops','cc_comm','cc_comm_idx','resp_ops','keyholes','prefix','suffix'};
 spin_system.control.frozen_fields=frozen_fields(isfield(spin_system.control,frozen_fields));
 
-% Assign ensemble cases to workers in contiguous blocks
+% Assign ensemble cases, sorted by drift generator, to workers in contiguous blocks
 nblocks=max(nworkers,1); edges=round(linspace(0,n_cases,nblocks+1));
 spin_system.control.worker_cases=cell(nblocks,1);
 for w=1:nblocks
@@ -1540,18 +1542,21 @@ end
 spin_system.control.pool_id=0;
 if nworkers>0, spin_system.control.pool_id=gcp('nocreate').ID; end
 
-% Publish the frozen problem once, each worker getting only its block's drifts
+% Publish the common frozen problem once
+common=spin_system; common.control=rmfield(common.control,'drifts');
+spin_system.control.invariants=parallel.pool.Constant(common);
+
+% Publish the drift generators, each worker getting only its block's
 if nworkers>0
-    invariants=Composite(nworkers);
+    drift_slices=Composite(nworkers);
     for w=1:nworkers
         needed=unique(spin_system.control.catalog(spin_system.control.worker_cases{w},2));
-        ss=spin_system; ss.control.drifts=cell(size(ss.control.drifts));
-        ss.control.drifts(needed)=spin_system.control.drifts(needed);
-        invariants{w}=ss;
+        slice=cell(size(spin_system.control.drifts)); slice(needed)=spin_system.control.drifts(needed);
+        drift_slices{w}=slice;
     end
-    spin_system.control.invariants=parallel.pool.Constant(invariants);
+    spin_system.control.drift_slices=parallel.pool.Constant(drift_slices);
 else
-    spin_system.control.invariants=parallel.pool.Constant(spin_system);
+    spin_system.control.drift_slices=parallel.pool.Constant(spin_system.control.drifts);
 end
 
 % Keep heavy invariants off the per-evaluation communication path

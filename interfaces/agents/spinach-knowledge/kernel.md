@@ -190,8 +190,8 @@
 | `kernel/optimcon/distortions/spf.m` | `[w,J]=spf(w,p)` | Applies a discrete single-pole filter: Y(n)=(1-p)*X(n)+p*Y(n-1) to a Spinach optimal control module waveform. Treats odd | 125 |
 | `kernel/optimcon/distortions/szf.m` | `[w,J]=szf(w,z)` | Applies a discrete single-zero filter: Y(k)=X(k)/(1-z)-z*X(k-1)/(1-z); to a Spinach optimal control module waveform. Tre | 131 |
 | `kernel/optimcon/drifts.m` | `[drifts,spc_dim]=drifts(spin_system,context,...` | Returns a cell array of drift Liouvillians suitable for the control.drifts variable in ensemble control optimisations. S | 81 |
-| `kernel/optimcon/ens_catalog.m` | `[catalog,ens_sizes]=ens_catalog(control)` | Ensemble case catalog for optimal control problems. Enumerates the Cartesian product of the state-target pairs, the drif | 119 |
-| `kernel/optimcon/ensemble.m` | `[traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)` | A parallel wrapper around GRAPE that enables ensemble optimal control optimisations. This function handles systems with  | 504 |
+| `kernel/optimcon/ens_catalog.m` | `[catalog,ens_sizes]=ens_catalog(control)` | Ensemble case catalog for optimal control problems. Enumerates the Cartesian product of the state-target pairs, the drif | 124 |
+| `kernel/optimcon/ensemble.m` | `[traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)` | A parallel wrapper around GRAPE that enables ensemble optimal control optimisations. This function handles systems with  | 285 |
 | `kernel/optimcon/fapt2sfo.m` | `[wave,dt,time_grid]=fapt2sfo(fapt,time_grid)` | Converts a freq-ampl-phase-time specification of a pulse sequ- uence into the corresponding single frequency origin wave | 111 |
 | `kernel/optimcon/fmaxnewton.m` | `[x,data]=fmaxnewton(spin_system,cost_function,guess)` | Finds a local maximum of a function of several variables using Newton and quasi-Newton algorithms. Syntax: [x,data]=fmax | 392 |
 | `kernel/optimcon/grape_hilb.m` | `[traj_data,fidelity,grad,hess]=grape_hilb(spin_system,drifts,controls,...` | Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user | 726 |
@@ -201,7 +201,7 @@
 | `kernel/optimcon/inst_freq.m` | `freq=inst_freq(signal,dt,npoints,poly_order,amp_tol)` | Instantaneous frequency trajectory from a complex time-domain signal by regularised phase differentiation. Syntax: freq= | 126 |
 | `kernel/optimcon/lbfgs.m` | `direction=lbfgs(dx_hist,dg_hist,g)` | Calculates an approximation to the Newton-Raphson search direction for maximising a function using past gradients to bui | 107 |
 | `kernel/optimcon/objeval.m` | `[data,fx,grad,hess]=objeval(x,objfun_handle,data,spin_system)` | Calls and collect the correct amount of outputs from an objective function -used by optimisation routines. Syntax: [data | 122 |
-| `kernel/optimcon/optimcon.m` | `spin_system=optimcon(spin_system,control)` | Validates optimal control options and updates the spin system object. Syntax: spin_system=optimcon(spin_system,control)  | 1599 |
+| `kernel/optimcon/optimcon.m` | `spin_system=optimcon(spin_system,control)` | Validates optimal control options and updates the spin system object. Syntax: spin_system=optimcon(spin_system,control)  | 1604 |
 | `kernel/optimcon/penalty.m` | `[pen_term,pen_grad,pen_hess]=penalty(wf,type,fb,cb)` | Penalty terms for the Optimal Control module. Returns the penalty function and its gradient for the waveform, which shou | 256 |
 | `kernel/optimcon/sectioning.m` | `[alpha,fx_1,gfx_1,exitflag,data]=sectioning(cost_function,a,b,x_0,fx_0,...` | Refines a previously found step bracket by repeated cubic interpolation until a step satisfying Wolfe tests is found or  | 182 |
 | `kernel/optimcon/tgrape.m` | `[fidelity,grad]=tgrape(spin_system,drift,controls,waveform,...` | A special case of Gradient Ascent Pulse Engineering (GRAPE) objective function and gradient with respect to the vector o | 168 |

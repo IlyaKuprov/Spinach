@@ -17,7 +17,9 @@
 %    catalog    - [n_cases x 6] array of ensemble indices; the col-
 %                 umns index the state-target pair, the drift gene-
 %                 rator, the power level, the offset combination,
-%                 the phase cycle line, and the distortion function
+%                 the phase cycle line, and the distortion function;
+%                 rows are ordered by the drift generator index so
+%                 that contiguous blocks of cases span few drifts
 %
 %    ens_sizes  - [1 x 6] array of the ensemble dimension sizes the
 %                 catalog was built from, in the same column order
@@ -98,6 +100,9 @@ if ens_budget<n_cases
     rng(rng_state);
 
 end
+
+% Order the cases by drift generator so that a contiguous block of cases spans few drifts
+catalog=sortrows(catalog,2);
 
 end
 

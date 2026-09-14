@@ -34,13 +34,13 @@
 %       are processed in the contiguous per-worker blocks assigned by
 %       optimcon.m in spin_system.control.worker_cases. Each worker
 %       holds the common frozen problem and the drift generators of its
-%       own block, published by optimcon.m as pool constants, and grafts
-%       the live client-side control structure on top of them, so only
-%       the waveform and the live control fields travel at each objec-
-%       tive evaluation; the gradient, the Hessian, and averaged trajec-
-%       tories are summed on the workers. This func-
-%       tion must be called from the client, on the pool that was
-%       open when optimcon.m ran: a worker holds only its own block.
+%       own block, published by optimcon.m as pool constants; the per-
+%       case physics runs in ens_block.m on each worker, so only the
+%       waveform and the live control fields travel at each objective
+%       evaluation, and the gradient, the Hessian, and averaged trajec-
+%       tories are summed on the workers. This function must be called
+%       from the client, on the pool that was open when optimcon.m ran:
+%       a worker holds only its own block.
 %
 % david.goodwin@inano.au.dk
 % ilya.kuprov@weizmann.ac.il
@@ -51,25 +51,18 @@
 function [traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)
 
 % Check consistency
-grumble(spin_system,waveform);
+grumble(spin_system,waveform,nargout);
 
 % Worker-resident problem data handles
 invariants=spin_system.control.invariants;
 drift_slices=spin_system.control.drift_slices;
 
 % Live problem data is the client-side control structure less what the workers already hold
-control=rmfield(spin_system.control,intersect({'invariants','drift_slices','worker_cases','basis'},...
-                                               fieldnames(spin_system.control)));
+control=rmfield(spin_system.control,{'invariants','drift_slices','worker_cases','basis'});
 control.return_traj=isfield(control,'return_traj')&&control.return_traj;
 
 % Count the outputs and the cases
 n_outputs=nargout; n_cases=size(control.catalog,1);
-if (n_outputs>3)&&(~all(cellfun(@(f)isequal(f,@no_dist),control.distortion(:))))
-    error('Hessians are not available with waveform distortions.');
-end
-if (n_outputs>3)&&(~strcmp(control.integrator,'rectangle'))
-    error('Hessians are only available with the rectangle integrator.');
-end
 
 % Run the ensemble loop, each worker over its own case block
 spmd (poolsize)
@@ -139,126 +132,27 @@ end
 
 end
 
-% Fidelity, gradient, and Hessian contributions of one block of ensemble cases
-function [traj,fid,grad,hess]=ens_block(ss,drifts,control,block,waveform,n_outputs)
-
-% Graft live client data over the frozen worker copy, keep what only the worker holds
-frozen=ss.control; ss.control=control; ss.control.drifts=drifts;
-missing=setdiff(fieldnames(frozen),fieldnames(control));
-for k=1:numel(missing)
-    ss.control.(missing{k})=frozen.(missing{k});
-end
-
-% GRAPE function for the formalism
-switch ss.bas.formalism
-    case {'sphten-liouv','zeeman-liouv','zeeman-wavef'}
-        grape=@grape_liouv;
-    case 'zeeman-hilb'
-        grape=@grape_hilb;
-    otherwise
-        error('unrecognised formalism specification.');
-end
-
-% Cases of this block, waveform dimensions, and offset ensemble size
-my_cases=frozen.worker_cases{block}; n_mine=numel(my_cases); catalog=control.catalog;
-ncont=size(waveform,1); nsteps=size(waveform,2); off_ens_sizes=cellfun(@numel,control.offsets);
-
-% Preallocate block outputs, derivative buffers only when requested
-traj=cell(n_mine,1); fid=zeros(1,n_mine); grad=[]; hess=[];
-if n_outputs>2, grad=zeros(ncont*nsteps,1); end
-if n_outputs>3, hess=zeros((ncont*nsteps)^2,1); end
-
-% Loop over the cases of the block
-for m=1:n_mine
-
-    % Extract ensemble indices
-    n=my_cases(m); n_rho=catalog(n,1); n_sys=catalog(n,2);
-    n_pwr=catalog(n,3); n_off=catalog(n,4);
-    n_phi=catalog(n,5); n_dis=catalog(n,6);
-
-    % Get initial and target states, drift, and waveform
-    rho_init=control.rho_init{n_rho}; rho_targ=control.rho_targ{n_rho};
-    L=ss.control.drifts{n_sys}; local_waveform=waveform;
-
-    % Phase cycle: a rotation of each control channel and phases on the states
-    R=eye(ncont);
-    if ~isempty(control.phase_cycle)
-        phi=control.phase_cycle(n_phi,:);
-        rho_init=exp(1i*phi(1))*rho_init; rho_targ=exp(1i*phi(end))*rho_targ;
-        R=kron(diag(cos(phi(2:end-1))),eye(2))+kron(diag(sin(phi(2:end-1))),[0 -1; 1 0]);
-        local_waveform=R*local_waveform;
-    end
-
-    % Add offset terms, first channel index fastest (user specifies offsets in Hz)
-    if ~isempty(off_ens_sizes)
-        off_idx=cell(1,numel(off_ens_sizes)); [off_idx{:}]=ind2sub([off_ens_sizes 1],n_off);
-        for k=1:numel(off_ens_sizes)
-            L=L+sparse(2*pi*control.offsets{k}(off_idx{k})*ss.control.off_ops{k});
-        end
-    end
-
-    % Move the waveform into physical units
-    power_lvl=control.pwr_levels(n_pwr); local_waveform=power_lvl*local_waveform;
-
-    % Apply waveform distortions, with their Jacobian when derivatives are needed
-    if n_outputs>2, J=speye(numel(local_waveform)); end
-    for k=1:size(control.distortion,2)
-        if n_outputs>2
-            [local_waveform,stage_jacobian]=control.distortion{n_dis,k}(local_waveform);
-            J=stage_jacobian*J;
-        else
-            local_waveform=control.distortion{n_dis,k}(local_waveform);
-        end
-    end
-
-    % Fidelity, trajectory, and derivatives
-    outputs=cell(1,n_outputs);
-    [outputs{:}]=grape(ss,L,ss.control.operators,local_waveform,rho_init,rho_targ,control.fidelity);
-    traj{m}=outputs{1}; fid(m)=outputs{2};
-
-    % Gradient through the Jacobian, the phase cycle, and the power level
-    if n_outputs>2
-        grad_n=R'*reshape(J'*outputs{3}(:),ncont,nsteps);
-        grad=grad+power_lvl*grad_n(:);
-    end
-
-    % Hessian through the phase cycle and the power level
-    if n_outputs>3
-        K=kron(speye(nsteps),sparse(R')); hess_n=K*outputs{4}*K';
-        hess=hess+power_lvl^2*hess_n(:);
-    end
-
-end
-
-% Collapse a non-empty block into one trajectory sum when only the average is needed
-if ismember('average',control.traj_opts)&&(n_mine>0)
-    traj_sum=traj{1}.forward;
-    for m=2:n_mine
-        traj_sum=traj_sum+traj{m}.forward;
-    end
-    traj={struct('forward',{traj_sum})};
-end
-
-end
-
 % Consistency enforcement
-function grumble(spin_system,waveform)
+function grumble(spin_system,waveform,n_outputs)
 if ~isfield(spin_system,'control')
     error('control data missing from spin_system, run optimcon() first.');
 end
 if ~all(isfield(spin_system.control,{'catalog','ens_sizes','invariants','drift_slices','frozen_fields','worker_cases','pool_id'}))
     error('ensemble catalog missing from spin_system, run optimcon() first.');
 end
-if ~isempty(getCurrentWorker())
-    error('ensemble() must run on the client: the frozen problem is distributed over the pool workers.');
-end
 current_pool=gcp('nocreate'); pool_id=0;
 if ~isempty(current_pool), pool_id=current_pool.ID; end
-if pool_id~=spin_system.control.pool_id
-    error('parallel pool changed after optimcon(), re-run optimcon().');
+if (~isempty(getCurrentWorker()))||(pool_id~=spin_system.control.pool_id)
+    error('ensemble() must run on the client, on the pool that was open when optimcon() ran; re-run optimcon() after changing the pool.');
 end
 if any(isfield(spin_system.control,spin_system.control.frozen_fields))
     error('generators and operators are frozen after optimcon(), re-run optimcon() to change them.');
+end
+if (n_outputs>3)&&(~all(cellfun(@(f)isequal(f,@no_dist),spin_system.control.distortion(:))))
+    error('Hessians are not available with waveform distortions.');
+end
+if (n_outputs>3)&&(~strcmp(spin_system.control.integrator,'rectangle'))
+    error('Hessians are only available with the rectangle integrator.');
 end
 if (~isnumeric(waveform))||(~isreal(waveform))
     error('waveform must be an array of real numbers.');

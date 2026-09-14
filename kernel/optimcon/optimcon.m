@@ -1534,18 +1534,15 @@ spin_system.control.frozen_fields=frozen_fields(isfield(spin_system.control,froz
 % Assign ensemble cases to workers in blocks that are contiguous in the drift generator index
 [~,order]=sortrows(spin_system.control.catalog,2);
 nblocks=max(nworkers,1); edges=round(linspace(0,n_cases,nblocks+1));
-spin_system.control.worker_cases=cell(nblocks,1);
-for w=1:nblocks
-    spin_system.control.worker_cases{w}=order((edges(w)+1):edges(w+1))';
-end
+spin_system.control.worker_cases=mat2cell(order',1,diff(edges))';
 
 % Record the pool identity, zero when there is no pool
-spin_system.control.pool_id=0;
+pool=gcp('nocreate'); spin_system.control.pool_id=0;
 if nworkers>0
-    if ~gcp('nocreate').SpmdEnabled
+    if ~pool.SpmdEnabled
         error('ensemble() runs spmd blocks: the parallel pool must have SpmdEnabled set to true.');
     end
-    spin_system.control.pool_id=gcp('nocreate').ID;
+    spin_system.control.pool_id=pool.ID;
 end
 
 % Publish the common frozen problem once

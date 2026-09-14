@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/optimcon.m`
 - Signature: `spin_system=optimcon(spin_system,control)`
-- Total lines: 1604
+- Total lines: 1610
 
 ## Purpose
 
@@ -17,6 +17,7 @@ Validates optimal control options and updates the spin system object. Syntax: sp
 
 ## Numerical / algorithmic content
 
+- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
@@ -26,69 +27,69 @@ Validates optimal control options and updates the spin system object. Syntax: sp
 
 ### Comment-guided execution stages
 
-- Lines 55-56: Consistency check; implemented by `grumble(spin_system,control)`.
-- Lines 58-59: Delete the previous control structure; implemented by `if isfield(spin_system,'control')`.
-- Lines 64-65: Show the banner; implemented by `banner(spin_system,'optimcon')`.
-- Lines 67-68: Process fidelity type; implemented by `if isfield(control,'fidelity')`.
-- Lines 70-71: Input validation; implemented by `if ~ischar(control.fidelity)`.
-- Lines 75-76: Absorb the input; implemented by `spin_system.control.fidelity=control.fidelity`.
-- Lines 81-82: Default is Re(<targ|P|init>); implemented by `spin_system.control.fidelity='real'`.
-- Lines 86-87: Inform the user; implemented by `switch spin_system.control.fidelity`.
-- Lines 91-93: Real part of the overlap; implemented by `report(spin_system,[pad('Fidelity measure, range [-1,+1]',60) pad('Re(<target|rho(T)>)',20)])`.
-- Lines 97-99: Imaginary part of the overlap; implemented by `report(spin_system,[pad('Fidelity measure, range [-1,+1]',60) pad('Im(<target|rho(T)>)',20)])`.
-- Lines 103-105: Absolute square of the overlap; implemented by `report(spin_system,[pad('Fidelity measure, range [0,+1]',60) pad('|<target|rho(T)>|^2',20)])`.
-- Lines 109-110: Complain and bomb out; implemented by `error('control.fidelity can be ''real'', ''imag'', or ''square''.')`.
-- Lines 114-115: Process integrator type; implemented by `if isfield(control,'integrator')`.
-- Lines 117-118: Input validation; implemented by `if ~ischar(control.integrator)`.
-- Lines 125-126: Absorb integrator type; implemented by `spin_system.control.integrator=control.integrator`.
-- Lines 131-132: Default is piecewise-constant; implemented by `spin_system.control.integrator='rectangle'`.
-- Lines 136-138: Inform the user; implemented by `report(spin_system,[pad('Equation of motion integrator',60) spin_system.control.integrator])`.
-- Lines 140-141: Process optimisation method; implemented by `if isfield(control,'method')`.
+- Lines 56-57: Consistency check; implemented by `grumble(spin_system,control)`.
+- Lines 59-60: Delete the previous control structure; implemented by `if isfield(spin_system,'control')`.
+- Lines 65-66: Show the banner; implemented by `banner(spin_system,'optimcon')`.
+- Lines 68-69: Process fidelity type; implemented by `if isfield(control,'fidelity')`.
+- Lines 71-72: Input validation; implemented by `if ~ischar(control.fidelity)`.
+- Lines 76-77: Absorb the input; implemented by `spin_system.control.fidelity=control.fidelity`.
+- Lines 82-83: Default is Re(<targ|P|init>); implemented by `spin_system.control.fidelity='real'`.
+- Lines 87-88: Inform the user; implemented by `switch spin_system.control.fidelity`.
+- Lines 92-94: Real part of the overlap; implemented by `report(spin_system,[pad('Fidelity measure, range [-1,+1]',60) pad('Re(<target|rho(T)>)',20)])`.
+- Lines 98-100: Imaginary part of the overlap; implemented by `report(spin_system,[pad('Fidelity measure, range [-1,+1]',60) pad('Im(<target|rho(T)>)',20)])`.
+- Lines 104-106: Absolute square of the overlap; implemented by `report(spin_system,[pad('Fidelity measure, range [0,+1]',60) pad('|<target|rho(T)>|^2',20)])`.
+- Lines 110-111: Complain and bomb out; implemented by `error('control.fidelity can be ''real'', ''imag'', or ''square''.')`.
+- Lines 115-116: Process integrator type; implemented by `if isfield(control,'integrator')`.
+- Lines 118-119: Input validation; implemented by `if ~ischar(control.integrator)`.
+- Lines 126-127: Absorb integrator type; implemented by `spin_system.control.integrator=control.integrator`.
+- Lines 132-133: Default is piecewise-constant; implemented by `spin_system.control.integrator='rectangle'`.
+- Lines 137-139: Inform the user; implemented by `report(spin_system,[pad('Equation of motion integrator',60) spin_system.control.integrator])`.
+- Lines 141-142: Process optimisation method; implemented by `if isfield(control,'method')`.
 
 ### Control flow inferred from the code
 
-- Line 59: conditional branch on `isfield(spin_system,'control')`.
-- Line 68: conditional branch on `isfield(control,'fidelity')`.
-- Line 71: conditional branch on `~ischar(control.fidelity)`.
-- Line 87: dispatches on `spin_system.control.fidelity`; cases `'real'`, `'imag'`, `'square'`.
-- Line 115: conditional branch on `isfield(control,'integrator')`.
-- Line 118: conditional branch on `~ischar(control.integrator)`.
-- Line 121: conditional branch on `~ismember(control.integrator,{'rectangle','trapezium'})`.
-- Line 141: conditional branch on `isfield(control,'method')`.
-- Line 144: conditional branch on `(~ischar(control.method))||(~ismember(control.method,{'lbfgs','rbfgs',`.
-- Line 154: conditional branch on `strcmp(spin_system.control.method,'newton')&&`.
-- Line 160: conditional branch on `strcmp(spin_system.control.method,'goodwin')&&`.
-- Line 180: conditional branch on `isfield(control,'isotopes')`.
-- Line 183: conditional branch on `(~iscell(control.isotopes))||(~all(cellfun(@ischar,control.isotopes(:))))`.
-- Line 186: `for` loop over `n=1:numel(control.isotopes)`.
+- Line 60: conditional branch on `isfield(spin_system,'control')`.
+- Line 69: conditional branch on `isfield(control,'fidelity')`.
+- Line 72: conditional branch on `~ischar(control.fidelity)`.
+- Line 88: dispatches on `spin_system.control.fidelity`; cases `'real'`, `'imag'`, `'square'`.
+- Line 116: conditional branch on `isfield(control,'integrator')`.
+- Line 119: conditional branch on `~ischar(control.integrator)`.
+- Line 122: conditional branch on `~ismember(control.integrator,{'rectangle','trapezium'})`.
+- Line 142: conditional branch on `isfield(control,'method')`.
+- Line 145: conditional branch on `(~ischar(control.method))||(~ismember(control.method,{'lbfgs','rbfgs',`.
+- Line 155: conditional branch on `strcmp(spin_system.control.method,'newton')&&`.
+- Line 161: conditional branch on `strcmp(spin_system.control.method,'goodwin')&&`.
+- Line 181: conditional branch on `isfield(control,'isotopes')`.
+- Line 184: conditional branch on `(~iscell(control.isotopes))||(~all(cellfun(@ischar,control.isotopes(:))))`.
+- Line 187: `for` loop over `n=1:numel(control.isotopes)`.
 
 ### Key state/data transformations
 
-- Lines 60: computes `spin_system` using `spin_system=rmfield(spin_system,'control')`.
-- Lines 76: computes `spin_system.control.fidelity` using `spin_system.control.fidelity=control.fidelity`.
-- Lines 77: computes `control` using `control=rmfield(control,'fidelity')`.
-- Lines 126: computes `spin_system.control.integrator` using `spin_system.control.integrator=control.integrator`.
-- Lines 150: computes `spin_system.control.method` using `spin_system.control.method=control.method`.
-- Lines 176-177: computes `need_herm_gens` using `need_herm_gens=ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef'})|| strcmp(spin_system.control.method,'goodwin')`.
-- Lines 193: computes `spin_system.control.isotopes` using `spin_system.control.isotopes=control.isotopes`.
-- Lines 219: computes `spin_system.control.channels` using `spin_system.control.channels=control.channels(:)`.
-- Lines 243: computes `spin_system.control.ncontrols` using `spin_system.control.ncontrols=numel(control.operators)`.
-- Lines 252-253: computes `spin_system.control.operators{n}` using `spin_system.control.operators{n}=clean_up(spin_system,control.operators{n}, spin_system.tols.liouv_zero)`.
-- Lines 265-266: computes `spin_system.control.cc_comm` using `spin_system.control.cc_comm=cell(spin_system.control.ncontrols, spin_system.control.ncontrols)`.
-- Lines 267-268: computes `spin_system.control.cc_comm_idx` using `spin_system.control.cc_comm_idx=false(spin_system.control.ncontrols, spin_system.control.ncontrols)`.
-- Lines 275-276: computes `spin_system.control.cc_comm{n,m}` using `spin_system.control.cc_comm{n,m}=comm(spin_system.control.operators{n}, spin_system.control.operators{m})`.
-- Lines 279: computes `comm_norm` using `comm_norm=norm(spin_system.control.cc_comm{n,m},1)`.
-- Lines 280: computes `spin_system.control.cc_comm_idx(n,m)` using `spin_system.control.cc_comm_idx(n,m)=(comm_norm<spin_system.tols.liouv_zero)`.
-- Lines 286: computes `n_commute` using `n_commute=(nnz(spin_system.control.cc_comm_idx)-numel(spin_system.control.operators))/2`.
-- Lines 339: computes `spin_system.control.rho_init` using `spin_system.control.rho_init=control.rho_init`.
-- Lines 399: computes `spin_system.control.rho_targ` using `spin_system.control.rho_targ=control.rho_targ`.
+- Lines 61: computes `spin_system` using `spin_system=rmfield(spin_system,'control')`.
+- Lines 77: computes `spin_system.control.fidelity` using `spin_system.control.fidelity=control.fidelity`.
+- Lines 78: computes `control` using `control=rmfield(control,'fidelity')`.
+- Lines 127: computes `spin_system.control.integrator` using `spin_system.control.integrator=control.integrator`.
+- Lines 151: computes `spin_system.control.method` using `spin_system.control.method=control.method`.
+- Lines 177-178: computes `need_herm_gens` using `need_herm_gens=ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef'})|| strcmp(spin_system.control.method,'goodwin')`.
+- Lines 194: computes `spin_system.control.isotopes` using `spin_system.control.isotopes=control.isotopes`.
+- Lines 220: computes `spin_system.control.channels` using `spin_system.control.channels=control.channels(:)`.
+- Lines 244: computes `spin_system.control.ncontrols` using `spin_system.control.ncontrols=numel(control.operators)`.
+- Lines 253-254: computes `spin_system.control.operators{n}` using `spin_system.control.operators{n}=clean_up(spin_system,control.operators{n}, spin_system.tols.liouv_zero)`.
+- Lines 266-267: computes `spin_system.control.cc_comm` using `spin_system.control.cc_comm=cell(spin_system.control.ncontrols, spin_system.control.ncontrols)`.
+- Lines 268-269: computes `spin_system.control.cc_comm_idx` using `spin_system.control.cc_comm_idx=false(spin_system.control.ncontrols, spin_system.control.ncontrols)`.
+- Lines 276-277: computes `spin_system.control.cc_comm{n,m}` using `spin_system.control.cc_comm{n,m}=comm(spin_system.control.operators{n}, spin_system.control.operators{m})`.
+- Lines 280: computes `comm_norm` using `comm_norm=norm(spin_system.control.cc_comm{n,m},1)`.
+- Lines 281: computes `spin_system.control.cc_comm_idx(n,m)` using `spin_system.control.cc_comm_idx(n,m)=(comm_norm<spin_system.tols.liouv_zero)`.
+- Lines 287: computes `n_commute` using `n_commute=(nnz(spin_system.control.cc_comm_idx)-numel(spin_system.control.operators))/2`.
+- Lines 340: computes `spin_system.control.rho_init` using `spin_system.control.rho_init=control.rho_init`.
+- Lines 400: computes `spin_system.control.rho_targ` using `spin_system.control.rho_targ=control.rho_targ`.
 
 ### Local helper functions
 
-- Line 1568: `check_hermiticity()` — `function check_hermiticity(generators,generator_kind)`. Over the supplied generators
+- Line 1574: `check_hermiticity()` — `function check_hermiticity(generators,generator_kind)`. Over the supplied generators
   - Representative operation: `for n=1:numel(generators)`.
   - Representative operation: `norm_a=cheap_norm(generators{n}-generators{n}')`.
-- Line 1589: `grumble()` — `function grumble(spin_system,control)`. Whenever anyone accuses some person of being 'unfeeling' he means that that person is just. He means that that person has no causeless emotions
+- Line 1595: `grumble()` — `function grumble(spin_system,control)`. Whenever anyone accuses some person of being 'unfeeling' he means that that person is just. He means that that person has no causeless emotions
   - Representative operation: `if ~isstruct(spin_system)`.
   - Representative operation: `error('spin_system must be a Spinach data structure.')`.
 
@@ -112,7 +113,8 @@ Validates optimal control options and updates the spin system object. Syntax: sp
 - drift generators as a parallel.pool.Constant built from a per-
 - worker Composite in spin_system.control.drift_slices, so that
 - each worker receives the drifts of its own case block and no-
-- thing else. Worker-resident invariants -the drift generators,
+- thing else; the pool must therefore have SpmdEnabled set to
+- true. Worker-resident invariants -the drift generators,
 - the control operators, the offset operators, the control com-
 - mutators, the Bloch-Siegert response operators, the keyholes,
 - and the prefix and suffix functions -are then removed

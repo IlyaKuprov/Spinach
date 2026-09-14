@@ -25,7 +25,8 @@
 %       drift generators as a parallel.pool.Constant built from a per-
 %       worker Composite in spin_system.control.drift_slices, so that
 %       each worker receives the drifts of its own case block and no-
-%       thing else. Worker-resident invariants - the drift generators,
+%       thing else; the pool must therefore have SpmdEnabled set to
+%       true. Worker-resident invariants - the drift generators,
 %       the control operators, the offset operators, the control com-
 %       mutators, the Bloch-Siegert response operators, the keyholes,
 %       and the prefix and suffix functions - are then removed
@@ -1540,7 +1541,12 @@ end
 
 % Record the pool identity, zero when there is no pool
 spin_system.control.pool_id=0;
-if nworkers>0, spin_system.control.pool_id=gcp('nocreate').ID; end
+if nworkers>0
+    if ~gcp('nocreate').SpmdEnabled
+        error('ensemble() runs spmd blocks: the parallel pool must have SpmdEnabled set to true.');
+    end
+    spin_system.control.pool_id=gcp('nocreate').ID;
+end
 
 % Publish the common frozen problem once
 common=spin_system; common.control=rmfield(common.control,'drifts');

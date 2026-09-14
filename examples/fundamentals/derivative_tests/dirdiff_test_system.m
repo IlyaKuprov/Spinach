@@ -44,7 +44,7 @@ switch formalism
 
         % Keep complete single-spin terms only
         bas.approximation='IK-2';
-        bas.space_level=1;
+        bas.prox_level=1;
         bas.connectivity='scalar_couplings';
 
     case {'zeeman-liouv','zeeman-hilb'}

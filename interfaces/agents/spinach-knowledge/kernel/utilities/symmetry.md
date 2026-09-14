@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/symmetry.m`
 - Signature: `spin_system=symmetry(spin_system,bas)`
-- Total lines: 351
+- Total lines: 361
 
 ## Purpose
 
@@ -22,7 +22,7 @@ Permutation symmetry treatment. Compiles character tables of composite symmetry 
 
 ### Comment-guided execution stages
 
-- Lines 42-43: Check consistency; implemented by `grumble(spin_system,bas)`.
+- Lines 42-43: Check consistency; implemented by `grumble(spin_system,bas)`; the grumbler rejects non-integer spin labels and symmetry groups whose spins span two chemical substances in `spin_system.chem.parts`.
 - Lines 45-46: Check the disable switch; implemented by `if ismember('symmetry',spin_system.sys.disable)`.
 - Lines 48-49: Issue a reminder to the user; implemented by `report(spin_system,'WARNING - symmetry factorization disabled by the user.')`.
 - Lines 51-52: Write empty cells; implemented by `spin_system.comp.sym_group={}`.
@@ -40,6 +40,8 @@ Permutation symmetry treatment. Compiles character tables of composite symmetry 
 - Lines 130-131: Remind the user that symmetry is not operational; implemented by `report(spin_system,'no symmetry information available.')`.
 - Lines 135-136: Run the SALC procedure; implemented by `if exist('group','var')`.
 - Lines 138-139: Preallocate the permutation table; implemented by `permutation_table=zeros(size(spin_system.bas.basis,1),group.order)`.
+- Lines 190-201: Build the SALC coefficient matrix of each irrep, skipping zero characters in the sparse constructor, then fix the sign of every column by its first non-zero element with a vectorised `max(spones(...))` lookup.
+- Lines 217-241: Group non-orthogonal SALCs by an overlap thresholded at `spin_system.tols.liouv_zero`; single-vector subspaces are normalised directly so that the sign convention survives, larger ones go through `orth`.
 
 ### Control flow inferred from the code
 

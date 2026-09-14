@@ -56,7 +56,7 @@ CLIP-HSQC spectrum of sucrose with natural content of 13C isotope. Coordinates, 
 - Lines 29: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 30: computes `bas.approximation` using `bas.approximation='IK-2'`.
 - Lines 31: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 32: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 32: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 35: computes `sys.enable` using `sys.enable={'greedy'}`.
 - Lines 36: computes `sys.tols.prox_cutoff` using `sys.tols.prox_cutoff=4.0`.
 - Lines 39: computes `parameters.sweep` using `parameters.sweep=[8000 2000]`.

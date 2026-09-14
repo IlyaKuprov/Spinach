@@ -53,8 +53,8 @@ INADEQUATE spectrum of cyprinol. The sequence selects double- quantum coherence 
 - Lines 24: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 25: computes `bas.approximation` using `bas.approximation='IK-1'`.
 - Lines 26: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 27: computes `bas.space_level` using `bas.space_level=1`.
-- Lines 28: computes `bas.level` using `bas.level=4`.
+- Lines 27: computes `bas.prox_level` using `bas.prox_level=1`.
+- Lines 28: computes `bas.inter_level` using `bas.inter_level=4`.
 - Lines 31: computes `parameters.spins` using `parameters.spins={'13C'}`.
 - Lines 32: computes `parameters.J` using `parameters.J=50`.
 - Lines 33: computes `parameters.decouple` using `parameters.decouple={'1H'}`.

@@ -28,7 +28,7 @@ inter.zeeman.eigs={[-2 -2 4]};
 inter.zeeman.euler={[0 0 0]};
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-bas.projections=+1;
+bas.projections={+1};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Set up a tiny powder acquisition

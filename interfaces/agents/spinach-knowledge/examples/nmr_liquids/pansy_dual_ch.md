@@ -48,7 +48,7 @@ PANSY-COSY spectra of camphor with natural content of 13C isotope. Coordinates, 
 - Lines 20: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 21: computes `bas.approximation` using `bas.approximation='IK-2'`.
 - Lines 22: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 23: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 23: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 26: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 29: computes `parameters.sweep` using `parameters.sweep=[1800 9000]`.
 - Lines 30: computes `parameters.offset` using `parameters.offset=[900 4500]`.

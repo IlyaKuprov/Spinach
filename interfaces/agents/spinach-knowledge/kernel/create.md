@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/create.m`
 - Signature: `spin_system=create(sys,inter)`
-- Total lines: 3192
+- Total lines: 3191
 
 ## Purpose
 

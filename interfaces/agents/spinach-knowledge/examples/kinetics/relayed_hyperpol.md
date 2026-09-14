@@ -56,8 +56,8 @@ Relayed NOE from hyperpolarized water to ALA-GLY dipeptide, generating Figure S7
 - Lines 53: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 54: computes `bas.approximation` using `bas.approximation='IK-1'`.
 - Lines 55: computes `bas.connectivity` using `bas.connectivity='full_tensors'`.
-- Lines 56: computes `bas.space_level` using `bas.space_level=3`.
-- Lines 57: computes `bas.level` using `bas.level=1`.
+- Lines 56: computes `bas.prox_level` using `bas.prox_level=3`.
+- Lines 57: computes `bas.inter_level` using `bas.inter_level=1`.
 - Lines 60: computes `inter.chem.flux_rate` using `inter.chem.flux_rate=zeros(30,30)`.
 
 ## Implementation structure

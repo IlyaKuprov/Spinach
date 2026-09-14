@@ -53,7 +53,7 @@ A Primas-style stochastic NMR experiment on strychnine. The calculation requires
 - Lines 20: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 21: computes `bas.approximation` using `bas.approximation='IK-2'`.
 - Lines 22: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 23: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 23: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 26: computes `inter.relaxation` using `inter.relaxation={'redfield'}`.
 - Lines 27: computes `inter.equilibrium` using `inter.equilibrium='IME'`.
 - Lines 28: computes `inter.temperature` using `inter.temperature=298`.

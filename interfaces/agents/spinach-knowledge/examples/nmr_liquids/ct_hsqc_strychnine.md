@@ -52,7 +52,7 @@ CT HSQC spectrum of strychnine with natural content of 13C isotope. Calculation 
 - Lines 21: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 22: computes `bas.approximation` using `bas.approximation='IK-2'`.
 - Lines 23: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 24: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 24: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 27: computes `parameters.J` using `parameters.J=140`.
 - Lines 28: computes `parameters.sweep` using `parameters.sweep=[10000 3000]`.
 - Lines 29: computes `parameters.offset` using `parameters.offset=[4000 1000]`.

@@ -46,7 +46,7 @@ ROESY spectrum of sucrose (magnetic parameters computed with DFT). Calculation t
 - Lines 17: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 18: computes `bas.approximation` using `bas.approximation='IK-2'`.
 - Lines 19: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 20: computes `bas.space_level` using `bas.space_level=3`.
+- Lines 20: computes `bas.prox_level` using `bas.prox_level=3`.
 - Lines 23: computes `inter.relaxation` using `inter.relaxation={'redfield'}`.
 - Lines 24: computes `inter.equilibrium` using `inter.equilibrium='zero'`.
 - Lines 25: computes `inter.rlx_keep` using `inter.rlx_keep='secular'`.

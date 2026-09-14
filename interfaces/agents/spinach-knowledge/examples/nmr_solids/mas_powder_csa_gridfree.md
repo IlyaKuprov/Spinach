@@ -40,7 +40,7 @@ Powder magic angle spinning spectrum of a pair of anisotropically shielded proto
 - Lines 15: computes `inter.zeeman.euler` using `inter.zeeman.euler={[0 0 0],[0 0 0]}`.
 - Lines 18: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 19: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 20: computes `bas.projections` using `bas.projections=+1`.
+- Lines 20: computes `bas.projections` using `bas.projections={+1}`.
 - Lines 23: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 27: computes `parameters.axis` using `parameters.axis=[1 1 1]`.
 - Lines 28: computes `parameters.sweep` using `parameters.sweep=2e4`.

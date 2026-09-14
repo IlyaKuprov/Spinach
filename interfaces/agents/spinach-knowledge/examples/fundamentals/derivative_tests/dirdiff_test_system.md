@@ -52,7 +52,7 @@ Spin system generator for directional derivative tests. Syntax: [spin_system,Sx,
 - Lines 37: computes `inter.zeeman.scalar` using `inter.zeeman.scalar=num2cell(linspace(-100,100,n_spins))`.
 - Lines 40: computes `bas.formalism` using `bas.formalism=formalism`.
 - Lines 46: computes `bas.approximation` using `bas.approximation='IK-2'`.
-- Lines 47: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 47: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 48: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
 - Lines 58: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 62: computes `Sx` using `Sx=state(spin_system,'Lx','13C'); Sx=Sx/norm(full(Sx),2)`.

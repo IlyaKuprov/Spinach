@@ -51,8 +51,8 @@ Pulse-acquire FFT ESR on 2-methoxy-1,4-benzoquinone radical in liquid state. Set
 - Lines 35: computes `inter.damp_rate` using `inter.damp_rate=1e6`.
 - Lines 38: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 39: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 40: computes `bas.longitudinals` using `bas.longitudinals={'1H'}`.
-- Lines 41: computes `bas.projections` using `bas.projections=+1`.
+- Lines 40: computes `bas.longitudinal` using `bas.longitudinal={{'1H'}}`.
+- Lines 41: computes `bas.projections` using `bas.projections={+1}`.
 
 ## Implementation structure
 

@@ -17,6 +17,19 @@
 %     spin_system   - primary Spinach data structure, updated with
 %                     the basis set and related information
 %
+% Note: in sphten-liouv formalism, subgraphs are generated separately
+%       for each chemical substance listed in spin_system.chem.parts,
+%       using the connectivity and proximity information of that sub-
+%       stance only. The correlation levels bas.inter_level and
+%       bas.prox_level are clipped to the number of spins in each sub-
+%       stance. The state filters bas.projections, bas.longitudinal,
+%       and bas.zero_quantum are cell arrays with one element per sub-
+%       stance; an empty element means no filter for that substance.
+%       The resulting states are merged into a single global basis
+%       with one unit state and sorted. The total projection quantum
+%       number and the correlation order of each basis state are re-
+%       turned in spin_system.bas.tot_proj and spin_system.bas.tot_cord.
+%
 % Note: it is important to understand the factors that influence basis set
 %       selection in spin dynamics simulations - see our paper
 %
@@ -54,6 +67,9 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
         error('multiplicities above 16 are not supported by sphten-liouv formalism.');
     end
 
+    % Count chemical substances
+    nsubst=numel(spin_system.chem.parts);
+
     % Run connectivity analysis for IK-DNP basis set
     if strcmp(spin_system.bas.approximation,'IK-DNP')
 
@@ -61,7 +77,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
         if (nnz(e_idx)==0)||(nnz(n_idx)==0)
             error('IK-DNP approximation requires both electrons and nuclei.');
         end
-        if ~all(e_idx|n_idx) 
+        if ~all(e_idx|n_idx)
             error('IK-DNP approximation can only handle electrons and nuclei.');
         end
 
@@ -86,34 +102,34 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
         ee_conmatrix=ee_conmatrix|speye(size(ee_conmatrix));
         en_conmatrix=en_conmatrix|speye(size(en_conmatrix));
         nn_conmatrix=nn_conmatrix|speye(size(nn_conmatrix));
-  
+
         % Make sure connectivity is reciprocal
         ee_conmatrix=ee_conmatrix|transpose(ee_conmatrix);
         en_conmatrix=en_conmatrix|transpose(en_conmatrix);
         nn_conmatrix=nn_conmatrix|transpose(nn_conmatrix);
-        
+
     end
 
     % Run connectivity analysis for IK-1,2 basis sets
     if ismember(spin_system.bas.approximation,{'IK-1','IK-2'})
-        
+
         % Build connectivity and proximity matrices
         switch bas.connectivity
-            
+
             case 'scalar_couplings'
-                
+
                 % Use scalar parts of all interaction tensors
                 report(spin_system,'scalar couplings will be used to build the coupling graph.');
                 spin_system.inter.conmatrix=sparse(abs(cellfun(@trace,spin_system.inter.coupling.matrix)/3)>2*pi*spin_system.tols.inter_cutoff);
-                
+
             case 'full_tensors'
-                
+
                 % Use complete interaction tensors
                 report(spin_system,'full coupling tensors will be used to build the coupling graph.');
                 spin_system.inter.conmatrix=sparse(cellfun(@(x)norm(x,2),spin_system.inter.coupling.matrix)>2*pi*spin_system.tols.inter_cutoff);
-                
+
         end
-        
+
         % Add every bosonic mode coupling channel to the coupling graph
         if isfield(spin_system.inter,'modes')
             report(spin_system,'bosonic mode couplings added to the coupling graph.');
@@ -132,379 +148,351 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
         % Make sure each spin is connected and proximate to itself
         spin_system.inter.conmatrix=spin_system.inter.conmatrix|speye(size(spin_system.inter.conmatrix));
         spin_system.inter.proxmatrix=spin_system.inter.proxmatrix|speye(size(spin_system.inter.proxmatrix));
-        
+
         % Make sure connectivity and proximity are reciprocal
         spin_system.inter.conmatrix=spin_system.inter.conmatrix|transpose(spin_system.inter.conmatrix);
         spin_system.inter.proxmatrix=spin_system.inter.proxmatrix|transpose(spin_system.inter.proxmatrix);
-        
+
         % Issue a report to the user
         report(spin_system,['connectivity matrix density ' num2str(100*nnz(spin_system.inter.conmatrix)/numel(spin_system.inter.conmatrix)) '%']);
         report(spin_system,['proximity matrix density ' num2str(100*nnz(spin_system.inter.proxmatrix)/numel(spin_system.inter.proxmatrix)) '%']);
-        
+
         % Determine the number of independent subsystems
         n_subsystems=max(scomponents(spin_system.inter.conmatrix|spin_system.inter.proxmatrix));
-        
+
         % Print a notice to the user
         if n_subsystems>1
             report(spin_system,['WARNING - there are ' num2str(n_subsystems) ' subsystems that are not coupled to each other.']);
         end
-        
+
     end
-    
+
     % Build state lists for individual spins
     spin_state_lists=cell(spin_system.comp.nspins,1);
     for n=1:spin_system.comp.nspins
         spin_state_lists{n}=(0:(spin_system.comp.mults(n)^2-1))';
     end
-    
+
     % Apply longitudinal filters
-    if isfield(bas,'longitudinals')
-        
-        % Build the spin list
-        spins_in_question=[];
-        for n=1:numel(bas.longitudinals)
-            if isnumeric(bas.longitudinals{n})
-                spins_in_question=[spins_in_question bas.longitudinals{n}(:)']; %#ok<AGROW>
-            else
-                spins_in_question=[spins_in_question find(strcmp(bas.longitudinals{n},spin_system.comp.isotopes))]; %#ok<AGROW>
+    if isfield(bas,'longitudinal')
+        for s=1:nsubst
+            for k=1:numel(bas.longitudinal{s})
+
+                % Find the specified spins within the current substance
+                if isnumeric(bas.longitudinal{s}{k})
+                    spins_in_question=bas.longitudinal{s}{k}(:)';
+                    if ~all(ismember(spins_in_question,spin_system.chem.parts{s}))
+                        error(['bas.longitudinal{' int2str(s) '} refers to spins outside substance ' int2str(s) '.']);
+                    end
+                else
+                    spins_in_question=spin_system.chem.parts{s}(strcmp(bas.longitudinal{s}{k},...
+                                      spin_system.comp.isotopes(spin_system.chem.parts{s})));
+                    if isempty(spins_in_question)
+                        error(['no ' bas.longitudinal{s}{k} ' spins in substance ' int2str(s) '.']);
+                    end
+                end
+
+                % Kill unwanted states
+                for n=spins_in_question(:)'
+                    report(spin_system,['keeping only longitudinal states on spin ' num2str(n) '...']);
+                    [~,M]=lin2lm(spin_state_lists{n}); spin_state_lists{n}(M~=0)=[];
+                end
+
             end
         end
-        spins_in_question=unique(spins_in_question(:))';
-        
-        % Kill unwanted states
-        for n=spins_in_question
-            report(spin_system,['keeping only longitudinal states on spin ' num2str(n) '...']);
-            [~,M]=lin2lm(spin_state_lists{n}); spin_state_lists{n}(M~=0)=[];
-        end
-        
     end
-    
+
     % Compute subspace dimensions for individual spins
     spin_dims=cellfun(@numel,spin_state_lists);
 
-    % Generate subgraphs
-    switch spin_system.bas.approximation 
-        
-        case 'none'
-            
-            % Match the chemical subsystems
-            coupling_subgraphs=false(numel(spin_system.chem.parts),spin_system.comp.nspins);
-            for n=1:numel(spin_system.chem.parts)
-                coupling_subgraphs(n,spin_system.chem.parts{n})=true();
-            end
-            
-            % Do not run proximity analysis
-            proximity_subgraphs=[];
-            
-        case 'IK-0'
-            
-            % Make the coupling subgraphs array
-            coupling_subgraphs=cell(numel(spin_system.chem.parts),1);
-            
-            % Loop over chemical subsystems
-            for n=1:numel(spin_system.chem.parts)
-                
-                % Find all possible groups of bas.level spins
-                col_index=nchoosek(spin_system.chem.parts{n},bas.level);
-                
+    % Preallocate subgraph lists and their substance indices
+    subgraphs=cell(nsubst,1); subgraph_subst=cell(nsubst,1);
+
+    % Loop over chemical substances
+    for s=1:nsubst
+
+        % Spins of the current substance
+        spins_in_subst=spin_system.chem.parts{s}(:)';
+        nspins_in_subst=numel(spins_in_subst);
+        report(spin_system,['chemical substance ' int2str(s) ', ' int2str(nspins_in_subst) ' spins:']);
+
+        % Generate subgraphs in the spin index of the substance
+        switch spin_system.bas.approximation
+
+            case 'none'
+
+                % Single subgraph with all spins of the substance
+                coupling_subgraphs=true(1,nspins_in_subst);
+
+                % Do not run proximity analysis
+                proximity_subgraphs=false(0,nspins_in_subst);
+
+            case 'IK-0'
+
+                % Clip the correlation level to the substance size
+                inter_level=min([nspins_in_subst bas.inter_level]);
+
+                % Find all possible groups of inter_level spins
+                col_index=nchoosek(1:nspins_in_subst,inter_level);
+
                 % Get the number of groups
                 ngroups=size(col_index,1);
-                
+
                 % Assign numbers to groups
-                row_index=repmat((1:ngroups)',1,bas.level);
-                
+                row_index=repmat((1:ngroups)',1,inter_level);
+
                 % Generate the subgraph list
-                coupling_subgraphs{n}=sparse(row_index,col_index,true,...
-                                             ngroups,spin_system.comp.nspins);
-                
-            end
-            
-            % Merge coupling subgraph lists
-            coupling_subgraphs=cell2mat(coupling_subgraphs);
-            
-            % Inform the user
-            report(spin_system,[num2str(size(coupling_subgraphs,1)) ...
-                                ' subgraphs generated by combinatorial analysis.']);
-            
-            % Do not run proximity analysis
-            proximity_subgraphs=[];
-        
-        case 'IK-1'
-        
-            % Run connectivity analysis
-            coupling_subgraphs=dfpt(spin_system.inter.conmatrix,bas.level);
-            report(spin_system,['' num2str(size(coupling_subgraphs,1)) ' subgraphs generated from coupling data.']);
-            
-            % Run proximity analysis
-            proximity_subgraphs=dfpt(spin_system.inter.proxmatrix,bas.space_level);
-            report(spin_system,['' num2str(size(proximity_subgraphs,1)) ' subgraphs generated from proximity data.']);
-        
-        case 'IK-2'
-        
-            % Run connectivity analysis
-            coupling_subgraphs=spin_system.inter.conmatrix;
-            report(spin_system,['' num2str(size(coupling_subgraphs,1)) ' subgraphs generated from coupling data.']);
-            
-            % Run proximity analysis
-            proximity_subgraphs=dfpt(spin_system.inter.proxmatrix,bas.space_level);
-            report(spin_system,['' num2str(size(proximity_subgraphs,1)) ' subgraphs generated from proximity data.']);
+                coupling_subgraphs=sparse(row_index,col_index,true,ngroups,nspins_in_subst);
+                report(spin_system,['    ' num2str(ngroups) ' subgraphs generated by combinatorial analysis.']);
 
-        case 'IK-DNP'
+                % Do not run proximity analysis
+                proximity_subgraphs=false(0,nspins_in_subst);
 
-            % Inter-electron connectivity analysis
-            ee_subgraphs=dfpt(ee_conmatrix,bas.level(1));
-            report(spin_system,['generated ' num2str(size(ee_subgraphs,1)-nnz(n_idx)) ' inter-electron subgraphs.']);
+            case 'IK-1'
 
-            % Electron-nuclear connectivity analysis
-            en_subgraphs=dfpt(en_conmatrix,bas.level(2));
-            report(spin_system,['generated ' num2str(size(en_subgraphs,1)) ' electron-nuclear subgraphs.']);
+                % Clip the correlation levels to the substance size
+                inter_level=min([nspins_in_subst bas.inter_level]);
+                prox_level=min([nspins_in_subst bas.prox_level]);
 
-            % Inter-nuclear connectivity analysis
-            nn_subgraphs=dfpt(nn_conmatrix,bas.level(3));
-            report(spin_system,['generated ' num2str(size(nn_subgraphs,1)-nnz(e_idx)) ' inter-nuclear subgraphs.']);
+                % Run connectivity analysis
+                coupling_subgraphs=dfpt(spin_system.inter.conmatrix(spins_in_subst,spins_in_subst),inter_level);
+                report(spin_system,['    ' num2str(size(coupling_subgraphs,1)) ' subgraphs generated from coupling data.']);
 
-            % Merge coupling subgraph lists
-            coupling_subgraphs=[ee_subgraphs; en_subgraphs; nn_subgraphs];
+                % Run proximity analysis
+                proximity_subgraphs=dfpt(spin_system.inter.proxmatrix(spins_in_subst,spins_in_subst),prox_level);
+                report(spin_system,['    ' num2str(size(proximity_subgraphs,1)) ' subgraphs generated from proximity data.']);
 
-            % Do not run proximity analysis
-            proximity_subgraphs=[];
+            case 'IK-2'
 
-        otherwise
-            
-            % Complain and bomb out
-            error('unrecognised basis set.');
-        
-    end
+                % Clip the proximity level to the substance size
+                prox_level=min([nspins_in_subst bas.prox_level]);
 
-    % Include user-specified subgraphs
-    if (~isfield(bas,'manual'))||isempty(bas.manual)
-        manual_subgraphs=[];
-    else
-        manual_subgraphs=bas.manual;
-        report(spin_system,['added ' num2str(size(manual_subgraphs,1)) ' subgraphs specified by the user.']);
-    end
-    
-    % Assemble the subgraph list
-    subgraphs=[coupling_subgraphs; proximity_subgraphs; manual_subgraphs];
-    clear('coupling_subgraphs','proximity_subgraphs','manual_subgraphs');
-    
-    % Prune subgraphs involving spin zero particles
-    report(spin_system,'pruning subgraphs involving zero spin particles...');
-    subgraphs(:,spin_system.comp.mults==1)=0;
-    
-    % Remove identical subgraphs
-    report(spin_system,'removing identical subgraphs...');
-    subgraphs=unique(subgraphs,'rows');
-    
-    % Store subgraphs for future use if needed
-    if ismember('xmemlist',spin_system.sys.enable)
-        spin_system.bas.subgraphs=logical(subgraphs);
-    end
-    
-    % Report back to the user
-    subgraph_sizes=sum(subgraphs,2);
-    for n=min(subgraph_sizes):max(subgraph_sizes)
-        if nnz(subgraph_sizes==n)>0
-            report(spin_system,['generated ' num2str(nnz(subgraph_sizes==n)) ' subgraphs with ' num2str(n) ' spins each.']);
+                % Run connectivity analysis
+                coupling_subgraphs=unique(spin_system.inter.conmatrix(spins_in_subst,spins_in_subst),'rows');
+                report(spin_system,['    ' num2str(size(coupling_subgraphs,1)) ' subgraphs generated from coupling data.']);
+
+                % Run proximity analysis
+                proximity_subgraphs=dfpt(spin_system.inter.proxmatrix(spins_in_subst,spins_in_subst),prox_level);
+                report(spin_system,['    ' num2str(size(proximity_subgraphs,1)) ' subgraphs generated from proximity data.']);
+
+            case 'IK-DNP'
+
+                % Clip the correlation levels to the substance size
+                inter_level=min(nspins_in_subst,bas.inter_level);
+
+                % Inter-electron connectivity analysis
+                ee_subgraphs=dfpt(ee_conmatrix(spins_in_subst,spins_in_subst),inter_level(1));
+                report(spin_system,['    generated ' num2str(size(ee_subgraphs,1)-nnz(n_idx(spins_in_subst))) ' inter-electron subgraphs.']);
+
+                % Electron-nuclear connectivity analysis
+                en_subgraphs=dfpt(en_conmatrix(spins_in_subst,spins_in_subst),inter_level(2));
+                report(spin_system,['    generated ' num2str(size(en_subgraphs,1)) ' electron-nuclear subgraphs.']);
+
+                % Inter-nuclear connectivity analysis
+                nn_subgraphs=dfpt(nn_conmatrix(spins_in_subst,spins_in_subst),inter_level(3));
+                report(spin_system,['    generated ' num2str(size(nn_subgraphs,1)-nnz(e_idx(spins_in_subst))) ' inter-nuclear subgraphs.']);
+
+                % Merge coupling subgraph lists
+                coupling_subgraphs=[ee_subgraphs; en_subgraphs; nn_subgraphs];
+
+                % Do not run proximity analysis
+                proximity_subgraphs=false(0,nspins_in_subst);
+
+            otherwise
+
+                % Complain and bomb out
+                error('unrecognised basis set.');
+
         end
+
+        % Include user-specified subgraphs that belong to the substance
+        manual_subgraphs=false(0,nspins_in_subst);
+        if isfield(bas,'manual')
+            for n=1:size(bas.manual,1)
+                if nnz(bas.manual(n,spins_in_subst))==nnz(bas.manual(n,:))
+                    manual_subgraphs=[manual_subgraphs; logical(bas.manual(n,spins_in_subst))]; %#ok<AGROW>
+                elseif nnz(bas.manual(n,spins_in_subst))>0
+                    error(['row ' int2str(n) ' of bas.manual crosses chemical substance boundaries.']);
+                end
+            end
+            report(spin_system,['    added ' num2str(size(manual_subgraphs,1)) ' subgraphs specified by the user.']);
+        end
+
+        % Assemble the subgraph list
+        subgraphs_in_subst=[coupling_subgraphs; proximity_subgraphs; manual_subgraphs];
+        clear('coupling_subgraphs','proximity_subgraphs','manual_subgraphs');
+
+        % Prune subgraphs involving spin zero particles
+        subgraphs_in_subst(:,spin_system.comp.mults(spins_in_subst)==1)=false;
+
+        % Remove empty, identical, and enclosed subgraphs
+        subgraphs_in_subst=subgraphs_in_subst(any(subgraphs_in_subst,2),:);
+        subgraphs_in_subst=prune_subgraphs(unique(subgraphs_in_subst,'rows'));
+
+        % Report back to the user
+        subgraph_sizes=sum(subgraphs_in_subst,2);
+        for n=min(subgraph_sizes):max(subgraph_sizes)
+            if nnz(subgraph_sizes==n)>0
+                report(spin_system,['    keeping ' num2str(nnz(subgraph_sizes==n)) ' subgraphs with ' num2str(n) ' spins each.']);
+            end
+        end
+        if isfield(bas,'projections')&&(~isempty(bas.projections{s}))
+            report(spin_system,['    keeping only coherence orders with M=[' num2str(bas.projections{s}) ']...']);
+        end
+
+        % Embed the subgraphs into the full spin index
+        subgraphs{s}=false(size(subgraphs_in_subst,1),spin_system.comp.nspins);
+        subgraphs{s}(:,spins_in_subst)=subgraphs_in_subst;
+        subgraph_subst{s}=repmat(s,[size(subgraphs_in_subst,1) 1]);
+
     end
-    if isfield(bas,'projections')
-        report(spin_system,['keeping only coherence orders with M=[' num2str(bas.projections) ']...']);
-    end
+
+    % Merge the subgraph lists of all substances
+    subgraphs=vertcat(subgraphs{:}); subgraph_subst=vertcat(subgraph_subst{:});
+    clear('subgraphs_in_subst','subgraph_sizes');
+
+    % Resolve zero-quantum filter spins for each substance
+    zq_spins=false(nsubst,spin_system.comp.nspins);
     if isfield(bas,'zero_quantum')
-        for n=1:numel(bas.zero_quantum)
-            if isnumeric(bas.zero_quantum{n})
-                report(spin_system,['keeping only the zero-quantum states on spins ' num2str(bas.zero_quantum{n}) '...']);
-            else
-                report(spin_system,['keeping only the zero-quantum states on ' bas.zero_quantum{n} '...']);
+        for s=1:nsubst
+            for k=1:numel(bas.zero_quantum{s})
+
+                % Find the specified spins within the current substance
+                if isnumeric(bas.zero_quantum{s}{k})
+                    spins_in_question=bas.zero_quantum{s}{k}(:)';
+                    if ~all(ismember(spins_in_question,spin_system.chem.parts{s}))
+                        error(['bas.zero_quantum{' int2str(s) '} refers to spins outside substance ' int2str(s) '.']);
+                    end
+                else
+                    spins_in_question=spin_system.chem.parts{s}(strcmp(bas.zero_quantum{s}{k},...
+                                      spin_system.comp.isotopes(spin_system.chem.parts{s})));
+                    if isempty(spins_in_question)
+                        error(['no ' bas.zero_quantum{s}{k} ' spins in substance ' int2str(s) '.']);
+                    end
+                end
+
+                % Add to the zero-quantum spin set of the substance
+                zq_spins(s,spins_in_question)=true();
+
+            end
+            if any(zq_spins(s,:))
+                report(spin_system,['keeping only the zero-quantum states on spins ' num2str(find(zq_spins(s,:))) '...']);
             end
         end
     end
-        
+
     % Balance the subgraph list
-    subgraphs=subgraphs(randperm(size(subgraphs,1)),:);
-    
+    shuffle=randperm(size(subgraphs,1));
+    subgraphs=subgraphs(shuffle,:); subgraph_subst=subgraph_subst(shuffle);
+
     % Populate the basis descriptor array
     report(spin_system,'building basis set descriptor...');
     basis_spec=cell(size(subgraphs,1),1);
     parfor n=1:size(subgraphs,1)
-        
-        % Determine the total number of states in the current subgraph
-        nstates=prod(spin_dims(logical(subgraphs(n,:)))); %#ok<PFBNS>
-        
+
         % Determine which spins belong to the current subgraph
-        spins_involved=find(subgraphs(n,:));
-        
+        spins_involved=find(subgraphs(n,:)); nspins_involved=numel(spins_involved);
+
+        % Determine the total number of states in the current subgraph
+        nstates=prod(spin_dims(spins_involved)); %#ok<PFBNS>
+
         % Preallocate the local descriptor array
-        local_basis_spec=spalloc(nstates,spin_system.comp.nspins,nstates*nnz(subgraphs(n,:))); %#ok<PFBNS>
-        
+        local_basis_spec=zeros(nstates,nspins_involved);
+
         % Populate the local descriptor array
-        for k=1:numel(spins_involved)
-            
+        for k=1:nspins_involved
+
             % Compute preceding dimension
             dim_before=prod(spin_dims(spins_involved(1:(k-1))));
-            
+
             % Get the current spin states
             current_states=spin_state_lists{spins_involved(k)}; %#ok<PFBNS>
-            
+
             % Compute following dimension
             dim_after=prod(spin_dims(spins_involved((k+1):end)));
-            
-            % Kron everything together
-            local_basis_spec(:,spins_involved(k))=kron(kron(ones(dim_before,1),current_states),ones(dim_after,1)); %#ok<SPRIX>
-            
+
+            % Replicate the state list into the direct product order
+            local_basis_spec(:,k)=repmat(repelem(current_states,dim_after,1),dim_before,1);
+
         end
-        
-        % Apply coherence order filter
-        if isfield(bas,'projections')
-            
-            % Compute coherence order for each basis element
+
+        % Apply coherence order filter, always keeping the unit state
+        if isfield(bas,'projections')&&(~isempty(bas.projections{subgraph_subst(n)}))
             [~,M]=lin2lm(local_basis_spec);
-            
-            % Start with empty mask
-            state_mask=false(size(local_basis_spec,1),1);
-            
-            % Keep specified coherence orders and the unit state
-            state_mask(1)=true(); projection_numbers=sum(M,2);
-            for k=bas.projections
-                state_mask=state_mask|(projection_numbers==k);
-            end
-            
-            % Kill the undesired states
-            local_basis_spec(~state_mask,:)=[]; %#ok<SPRIX>
-            
+            state_mask=ismember(sum(M,2),bas.projections{subgraph_subst(n)});
+            state_mask(1)=true(); local_basis_spec=local_basis_spec(state_mask,:);
         end
-        
-        % Apply zero-quantum filter
-        if isfield(bas,'zero_quantum')
-            
-            % Start with empty mask
-            state_mask=false(size(local_basis_spec,1),1);
-            
-            % Loop over the specified spins
-            for k=1:numel(bas.zero_quantum)
-                
-                % Find the specified spins
-                if isnumeric(bas.zero_quantum{k})
-                    spins_in_question=bas.zero_quantum{k};
-                else
-                    spins_in_question=strcmp(bas.zero_quantum{k},spin_system.comp.isotopes);
-                end
-                
-                % Analyze the basis
-                [~,M]=lin2lm(local_basis_spec(:,spins_in_question));
-                
-                % Update the mask
-                state_mask=or(state_mask,sum(M,2)~=0);
-                
-            end
-            
-            % Kill the states
-            local_basis_spec(state_mask,:)=[]; %#ok<SPRIX>
-            
+
+        % Apply zero-quantum filter over the specified spins of the substance
+        if any(zq_spins(subgraph_subst(n),spins_involved)) %#ok<PFBNS>
+            [~,M]=lin2lm(local_basis_spec(:,zq_spins(subgraph_subst(n),spins_involved)));
+            local_basis_spec=local_basis_spec(sum(M,2)==0,:);
         end
 
         % Drop excessive inter-nuclear correlations
-        if strcmp(spin_system.bas.approximation,'IK-DNP')
+        if strcmp(spin_system.bas.approximation,'IK-DNP') %#ok<PFBNS>
 
             % Identify inter-nuclear correlations
             corr_order=sum(logical(local_basis_spec),2);
-            nn_corr_order=sum(logical(local_basis_spec(:,n_idx)),2);
+            nn_corr_order=sum(logical(local_basis_spec(:,n_idx(spins_involved))),2); %#ok<PFBNS>
             pure_nn_state=(corr_order==nn_corr_order);
             pure_nn_state(1)=false;
 
             % Build the drop mask
-            state_mask=pure_nn_state&(nn_corr_order>bas.level(3));
-            
+            state_mask=pure_nn_state&(nn_corr_order>bas.inter_level(3));
+
             % Kill the states
-            local_basis_spec(state_mask,:)=[]; %#ok<SPRIX>
+            local_basis_spec(state_mask,:)=[];
 
         end
-        
-        % Assign the global variable
-        basis_spec{n}=local_basis_spec;
-        
+
+        % Embed the descriptor into the full spin index
+        [rows,cols,vals]=find(local_basis_spec);
+        basis_spec{n}=sparse(rows,spins_involved(cols),vals,size(local_basis_spec,1),spin_system.comp.nspins);
+
     end
-    
+
     % Deallocate variables
-    clear('spin_state_lists','local_basis_spec','subgraphs','spin_dims',...
-          'current_states','subgraph_sizes','local_basis_hash');
-    if isfield(bas,'projections')
-        clear('state_mask','M','projection_numbers');
-    end
-    
+    clear('spin_state_lists','subgraphs','subgraph_subst','spin_dims','zq_spins');
+
     % Pull basis descriptor from the nodes
     basis_spec=vertcat(basis_spec{:});
 
-    % Build a hash table
-    basis_hash=repmat(' ',[size(basis_spec,1) 32]);
-    parfor k=1:size(basis_spec,1)
-        basis_hash(k,:)=md5_hash(full(basis_spec(k,:)));
-    end
-   
-    % Eliminate redundant states using hash table
+    % Eliminate redundant states using a hash table
     report(spin_system,'eliminating redundant states...');
-    [~,idx]=unique(basis_hash,'rows','stable'); 
-    basis_spec=basis_spec(idx,:);
-    
-    % Deallocate variables
-    clear('basis_hash', 'idx');
-    
+    basis_spec=unihash(basis_spec);
+
     % Sort the basis explicitly
     report(spin_system,'sorting the basis...');
     if (~isworkernode)&&(nnz(basis_spec)>1e5)
-        
+
         % Run multithreaded sorting
         basis_spec=distrib_dim(basis_spec,2);
         basis_spec=sortrows(basis_spec);
         spin_system.bas.basis=gather(basis_spec);
-        
+
     else
-        
+
         % Run sorting in a single thread
         spin_system.bas.basis=sortrows(basis_spec);
-        
+
     end
-    
+
     % Deallocate variables
     clear('basis_spec');
-   
-    % Report on chemical species
-    chem_idx=false(size(spin_system.bas.basis,1),numel(spin_system.chem.parts));
-    for n=1:numel(spin_system.chem.parts)
-        chem_idx(:,n)=(sum(spin_system.bas.basis(:,spin_system.chem.parts{n}),2)>0);
-        report(spin_system,['chemical species ' num2str(n) ': ' num2str(nnz(chem_idx(:,n))) ' states.']);
-    end
-    
-    % Make sure chemical species are unlinked
-    if any(sum(chem_idx(2:end,:),2)~=1)
-        error('some basis set elements belong to either none or multiple chemical species.');
-    end
-    
-    % Build state-cluster cross-membership list if needed
-    if ismember('xmemlist',spin_system.sys.enable)
-        
-        % Report to the user
-        report(spin_system,'building state-subgraph cross-membership list... ');
-        
-        % Localise variables
-        basis_loc=spin_system.bas.basis;
-        subgraphs_loc=spin_system.bas.subgraphs;
-        
-        % Preallocate the result
-        nstates=size(basis_loc,1); nclusters=size(subgraphs_loc,1);
-        xmemlist=spalloc(nstates,nclusters,ceil(nstates*nclusters/spin_system.comp.nspins));
-        
-        % Run the matching
-        parfor n=1:size(subgraphs_loc,1)
-            xmemlist(:,n)=~any(basis_loc(:,~subgraphs_loc(n,:)),2); %#ok<SPRIX,PFBNS>
-        end
-        
-        % Store the result
-        spin_system.bas.xmemlist=xmemlist;
 
-    end 
-    
+    % Total projection quantum number and correlation order of each state
+    [L,M]=lin2lm(spin_system.bas.basis);
+    spin_system.bas.tot_proj=full(sum(M,2));
+    spin_system.bas.tot_cord=full(sum(logical(L),2));
+    clear('L','M');
+
+    % Report on chemical species
+    for s=1:nsubst
+        nstates=nnz(any(spin_system.bas.basis(:,spin_system.chem.parts{s}),2));
+        report(spin_system,['chemical substance ' int2str(s) ': ' num2str(nstates) ' states.']);
+    end
+
     % Print the summary
     summary_basis(spin_system);
 
@@ -515,10 +503,10 @@ end
 
 % Process Hilbert space Zeeman basis
 if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef'})
-   
+
     % Preallocate basis set array
     spin_system.bas.basis=zeros(prod(spin_system.comp.mults),spin_system.comp.nspins);
-    
+
     % Fill basis set array
     for n=1:spin_system.comp.nspins
         current_column=1;
@@ -531,7 +519,7 @@ if ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef'})
         end
         spin_system.bas.basis(:,n)=current_column;
     end
-    
+
     % Report to the user
     report(spin_system,['matrix dimension for all operators and states: ' num2str(prod(spin_system.comp.mults))]);
 
@@ -621,7 +609,7 @@ end
 
 % Check zeeman-hilb formalism options
 if strcmp(bas.formalism,'zeeman-hilb')
-    
+
     % Check bas.approximation
     if ~isfield(bas,'approximation')
         error('approximation level must be specified in bas.approximation for zeeman-hilb formalism.');
@@ -635,7 +623,7 @@ end
 
 % Check zeeman-liouv formalism options
 if strcmp(bas.formalism,'zeeman-liouv')
-    
+
     % Check bas.approximation
     if ~isfield(bas,'approximation')
         error('approximation level must be specified in bas.approximation for zeeman-liouv formalism.');
@@ -649,7 +637,7 @@ end
 
 % Check sphten-liouv formalism options
 if strcmp(bas.formalism,'sphten-liouv')
-    
+
     % Check bas.approximation
     if ~isfield(bas,'approximation')
         error('approximation level must be specified in bas.approximation for sphten-liouv formalism.');
@@ -658,7 +646,7 @@ if strcmp(bas.formalism,'sphten-liouv')
     elseif ~ismember(bas.approximation,{'IK-0','IK-1','IK-2','IK-DNP','none'})
         error('unrecognized approximation - see the basis preparation section of the manual.');
     end
-    
+
     % Check bas.connectivity
     if ismember(bas.approximation,{'IK-1','IK-2'})
         if ~isfield(bas,'connectivity')
@@ -669,51 +657,51 @@ if strcmp(bas.formalism,'sphten-liouv')
             error('unknown connectivity type - see the basis preparation section of the manual.');
         end
     end
-    
-    % Check bas.level
-    if ismember(bas.approximation,{'IK-0','IK-1','IK-DNP'})&&(~isfield(bas,'level'))
-        error('connectivity tracing depth must be specified in bas.level variable.');
+
+    % Check bas.inter_level
+    if ismember(bas.approximation,{'IK-0','IK-1','IK-DNP'})&&(~isfield(bas,'inter_level'))
+        error('connectivity tracing depth must be specified in bas.inter_level variable.');
     end
     if ismember(bas.approximation,{'IK-0','IK-1'})
-        if (~isnumeric(bas.level))||(~isscalar(bas.level))||(mod(bas.level,1)~=0)||(bas.level<1)
-            error('bas.level must be a positive integer.');
+        if (~isnumeric(bas.inter_level))||(~isscalar(bas.inter_level))||(mod(bas.inter_level,1)~=0)||(bas.inter_level<1)
+            error('bas.inter_level must be a positive integer.');
         end
-        if bas.level>numel(spin_system.comp.isotopes)
-            error('bas.level cannot be greater than the number of spins in the system.');
+        if bas.inter_level>numel(spin_system.comp.isotopes)
+            error('bas.inter_level cannot be greater than the number of spins in the system.');
         end
     end
     if strcmp(bas.approximation,'IK-DNP')
-        if (~isnumeric(bas.level))||(numel(bas.level)~=3)||...
-           any(mod(bas.level,1)~=0,'all')||any(bas.level<1,'all')
-            error('bas.level must be a vector with three positive integers.');
+        if (~isnumeric(bas.inter_level))||(numel(bas.inter_level)~=3)||...
+           any(mod(bas.inter_level,1)~=0,'all')||any(bas.inter_level<1,'all')
+            error('bas.inter_level must be a vector with three positive integers.');
         end
         n_electrons=nnz(cellfun(@iselectron,spin_system.comp.isotopes));
         n_nuclei=nnz(cellfun(@isnucleus,spin_system.comp.isotopes));
         n_spins=numel(spin_system.comp.isotopes);
-        if bas.level(1)>n_electrons
-            error('bas.level(1) cannot exceed the number of electrons in the system.');
+        if bas.inter_level(1)>n_electrons
+            error('bas.inter_level(1) cannot exceed the number of electrons in the system.');
         end
-        if bas.level(2)>n_spins
-            error('bas.level(2) cannot exceed the number of spins in the system.');
+        if bas.inter_level(2)>n_spins
+            error('bas.inter_level(2) cannot exceed the number of spins in the system.');
         end
-        if bas.level(3)>n_nuclei
-            error('bas.level(3) cannot exceed the number of nuclei in the system.');
-        end
-    end
-    
-    % Check bas.space_level
-    if ismember(bas.approximation,{'IK-1','IK-2'})&&(~isfield(bas,'space_level'))
-        error('proximity tracing depth must be specified in bas.space_level variable.');
-    end
-    if isfield(bas,'space_level')
-        if  (~isnumeric(bas.space_level))||(~isscalar(bas.space_level))||(mod(bas.space_level,1)~=0)||(bas.space_level<1)
-            error('bas.space_level must be a positive integer.');
-        end
-        if bas.space_level>numel(spin_system.comp.isotopes)
-            error('bas.space_level cannot be greater than the number of spins in the system.');
+        if bas.inter_level(3)>n_nuclei
+            error('bas.inter_level(3) cannot exceed the number of nuclei in the system.');
         end
     end
-    
+
+    % Check bas.prox_level
+    if ismember(bas.approximation,{'IK-1','IK-2'})&&(~isfield(bas,'prox_level'))
+        error('proximity tracing depth must be specified in bas.prox_level variable.');
+    end
+    if isfield(bas,'prox_level')
+        if  (~isnumeric(bas.prox_level))||(~isscalar(bas.prox_level))||(mod(bas.prox_level,1)~=0)||(bas.prox_level<1)
+            error('bas.prox_level must be a positive integer.');
+        end
+        if bas.prox_level>numel(spin_system.comp.isotopes)
+            error('bas.prox_level cannot be greater than the number of spins in the system.');
+        end
+    end
+
     % Check bas.manual
     if isfield(bas,'manual')
         if (~islogical(bas.manual))&&(~isnumeric(bas.manual))
@@ -722,71 +710,99 @@ if strcmp(bas.formalism,'sphten-liouv')
             error('the number of columns in bas.manual must be equal to the number of spins in the system.');
         end
     end
-    
+
     % Check bas.projections
     if isfield(bas,'projections')
-        if (~isnumeric(bas.projections))||(~isrow(bas.projections))||any(mod(bas.projections,1)~=0)
-            error('bas.projections must be a row vector of integers.');
+        if (~iscell(bas.projections))||(numel(bas.projections)~=numel(spin_system.chem.parts))
+            error('bas.projections must be a cell array with one element per chemical substance.');
         end
-    end
-    
-    % Check bas.longitudinals
-    if isfield(bas,'longitudinals')
-        if ~iscell(bas.longitudinals)
-            error('bas.longitudinals must be a cell array.');
-        end
-        for n=1:numel(bas.longitudinals)
-            if isnumeric(bas.longitudinals{n})
-                if (~isreal(bas.longitudinals{n}))||...
-                   any(mod(bas.longitudinals{n},1)~=0)||...
-                   any(bas.longitudinals{n}<1)||...
-                   any(bas.longitudinals{n}>spin_system.comp.nspins)
-                    error('numeric entries in bas.longitudinals must be positive integers within the system bounds.');
-                end
-            elseif ischar(bas.longitudinals{n})
-                if ~ismember(bas.longitudinals{n},spin_system.comp.isotopes)
-                    error('bas.longitudinals refers to spins that are not present in the system.');
-                end
-            else
-                error('bas.longitudinals must contain isotope strings or vectors of spin numbers.');
+        for n=1:numel(bas.projections)
+            if (~isnumeric(bas.projections{n}))||(~isreal(bas.projections{n}))||...
+               ((~isempty(bas.projections{n}))&&(~isrow(bas.projections{n})))||...
+               any(mod(bas.projections{n},1)~=0,'all')
+                error('elements of bas.projections must be empty or row vectors of integers.');
             end
         end
     end
-    
+
+    % Check bas.longitudinal
+    if isfield(bas,'longitudinal')
+        if (~iscell(bas.longitudinal))||(numel(bas.longitudinal)~=numel(spin_system.chem.parts))
+            error('bas.longitudinal must be a cell array with one element per chemical substance.');
+        end
+        for n=1:numel(bas.longitudinal)
+            if ~iscell(bas.longitudinal{n})
+                error('elements of bas.longitudinal must be cell arrays.');
+            end
+            for k=1:numel(bas.longitudinal{n})
+                if isnumeric(bas.longitudinal{n}{k})
+                    if (~isreal(bas.longitudinal{n}{k}))||...
+                       any(mod(bas.longitudinal{n}{k},1)~=0,'all')||...
+                       any(bas.longitudinal{n}{k}<1,'all')||...
+                       any(bas.longitudinal{n}{k}>spin_system.comp.nspins,'all')
+                        error('numeric entries in bas.longitudinal must be positive integers within the system bounds.');
+                    end
+                elseif ischar(bas.longitudinal{n}{k})
+                    if ~ismember(bas.longitudinal{n}{k},spin_system.comp.isotopes)
+                        error('bas.longitudinal refers to spins that are not present in the system.');
+                    end
+                else
+                    error('bas.longitudinal must contain isotope strings or vectors of spin numbers.');
+                end
+            end
+        end
+    end
+
     % Check bas.zero_quantum
     if isfield(bas,'zero_quantum')
-        if ~iscell(bas.zero_quantum)
-            error('bas.zero_quantum must be a cell array.');
+        if (~iscell(bas.zero_quantum))||(numel(bas.zero_quantum)~=numel(spin_system.chem.parts))
+            error('bas.zero_quantum must be a cell array with one element per chemical substance.');
         end
         for n=1:numel(bas.zero_quantum)
-            if isnumeric(bas.zero_quantum{n})
-                if (~isreal(bas.zero_quantum{n}))||...
-                   any(mod(bas.zero_quantum{n},1)~=0)||...
-                   any(bas.zero_quantum{n}<1)||...
-                   any(bas.zero_quantum{n}>spin_system.comp.nspins)
-                    error('numeric entries in bas.zero_quantum must be positive integers within the system bounds.');
+            if ~iscell(bas.zero_quantum{n})
+                error('elements of bas.zero_quantum must be cell arrays.');
+            end
+            for k=1:numel(bas.zero_quantum{n})
+                if isnumeric(bas.zero_quantum{n}{k})
+                    if (~isreal(bas.zero_quantum{n}{k}))||...
+                       any(mod(bas.zero_quantum{n}{k},1)~=0,'all')||...
+                       any(bas.zero_quantum{n}{k}<1,'all')||...
+                       any(bas.zero_quantum{n}{k}>spin_system.comp.nspins,'all')
+                        error('numeric entries in bas.zero_quantum must be positive integers within the system bounds.');
+                    end
+                elseif ischar(bas.zero_quantum{n}{k})
+                    if ~ismember(bas.zero_quantum{n}{k},spin_system.comp.isotopes)
+                        error('bas.zero_quantum refers to spins that are not present in the system.');
+                    end
+                else
+                    error('bas.zero_quantum must contain isotope strings or vectors of spin numbers.');
                 end
-            elseif ischar(bas.zero_quantum{n})
-                if ~ismember(bas.zero_quantum{n},spin_system.comp.isotopes)
-                    error('bas.zero_quantum refers to spins that are not present in the system.');
-                end
-            else
-                error('bas.zero_quantum must contain isotope strings or vectors of spin numbers.');
             end
         end
     end
-    
+
 end
-    
-% Disallow inapplicable approximations
+
+% Catch retired field names
 if isfield(bas,'level')
-    if ~ismember(bas.approximation,{'IK-0','IK-1','IK-2','IK-DNP'})
-        error('bas.level is only applicable to IK-0,1,2,DNP basis sets.');
-    end
+    error('bas.level has been renamed bas.inter_level.');
 end
 if isfield(bas,'space_level')
+    error('bas.space_level has been renamed bas.prox_level.');
+end
+if isfield(bas,'longitudinals')
+    error('bas.longitudinals has been renamed bas.longitudinal, with one cell array per chemical substance.');
+end
+
+% Disallow inapplicable approximations
+if isfield(bas,'inter_level')
+    if ~ismember(bas.approximation,{'IK-0','IK-1','IK-2','IK-DNP'})
+        error('bas.inter_level is only applicable to IK-0,1,2,DNP basis sets.');
+    end
+end
+if isfield(bas,'prox_level')
     if ~ismember(bas.approximation,{'IK-1','IK-2'})
-        error('bas.space_level is only applicable to IK-1,2 basis sets.');
+        error('bas.prox_level is only applicable to IK-1,2 basis sets.');
     end
 end
 if isfield(bas,'connectivity')
@@ -795,9 +811,15 @@ if isfield(bas,'connectivity')
     end
 end
 
-% Enforce sphten-liouv with projection selection
+% Enforce sphten-liouv with state filters
 if isfield(bas,'projections')&&(~strcmp(bas.formalism,'sphten-liouv'))
     error('bas.projections option is only available for sphten-liouv formalism.');
+end
+if isfield(bas,'longitudinal')&&(~strcmp(bas.formalism,'sphten-liouv'))
+    error('bas.longitudinal option is only available for sphten-liouv formalism.');
+end
+if isfield(bas,'zero_quantum')&&(~strcmp(bas.formalism,'sphten-liouv'))
+    error('bas.zero_quantum option is only available for sphten-liouv formalism.');
 end
 
 % Enforce sphten-liouv when any kind of chemistry is present

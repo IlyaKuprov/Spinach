@@ -18,8 +18,8 @@ sys.magnet=14.1;
 bas.formalism='sphten-liouv';
 bas.approximation='IK-1';
 bas.connectivity='scalar_couplings';
-bas.space_level=3;
-bas.level=4;
+bas.prox_level=3;
+bas.inter_level=4;
 
 % Relaxation theory parameters
 inter.relaxation={'redfield'};

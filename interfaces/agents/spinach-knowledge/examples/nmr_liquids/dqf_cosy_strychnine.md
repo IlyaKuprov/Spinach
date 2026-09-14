@@ -43,7 +43,7 @@ DQF-COSY spectrum of strychnine. Calculation time: minutes
 - Lines 21: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 22: computes `bas.approximation` using `bas.approximation='IK-2'`.
 - Lines 23: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 24: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 24: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 27: computes `parameters.offset` using `parameters.offset=1200`.
 - Lines 28: computes `parameters.sweep` using `parameters.sweep=2200`.
 - Lines 29: computes `parameters.npoints` using `parameters.npoints=[512 512]`.

@@ -53,7 +53,7 @@ A hole burning simulation for a gadolinium ion. The soft pulse is simulated usin
 - Lines 33: computes `inter.coupling.matrix{1,1}` using `inter.coupling.matrix{1,1}=0.56e9*zfs2mat(D(n),E(n),0,0,0)`.
 - Lines 36: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 37: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 38: computes `bas.projections` using `bas.projections=-3:3`.
+- Lines 38: computes `bas.projections` using `bas.projections={-3:3}`.
 - Lines 41: computes `sys.disable` using `sys.disable={'trajlevel'}`.
 - Lines 44: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 48: computes `parameters.spins` using `parameters.spins={'E8'}`.

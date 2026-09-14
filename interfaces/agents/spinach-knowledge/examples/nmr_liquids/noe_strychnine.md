@@ -51,7 +51,7 @@ Inversion-recovery NOE effect spectrum on strychnine, with the rightmost proton 
 - Lines 22: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 23: computes `bas.approximation` using `bas.approximation='IK-2'`.
 - Lines 24: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 25: computes `bas.space_level` using `bas.space_level=3`.
+- Lines 25: computes `bas.prox_level` using `bas.prox_level=3`.
 - Lines 28: computes `inter.relaxation` using `inter.relaxation={'redfield'}`.
 - Lines 29: computes `inter.equilibrium` using `inter.equilibrium='dibari'`.
 - Lines 30: computes `inter.rlx_keep` using `inter.rlx_keep='kite'`.

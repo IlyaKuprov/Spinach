@@ -50,7 +50,7 @@ Magic angle is usually calibrated using KBr powder. When the angle is not correc
 - Lines 21: computes `inter.zeeman.scalar` using `inter.zeeman.scalar={60.0933}`.
 - Lines 24: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 25: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 26: computes `bas.projections` using `bas.projections=+1`.
+- Lines 26: computes `bas.projections` using `bas.projections={+1}`.
 - Lines 29: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 33: computes `parameters.spins` using `parameters.spins={'79Br'}`.
 - Lines 34: computes `parameters.rate` using `parameters.rate=4000`.

@@ -34,8 +34,8 @@ inter.coordinates={[ 0.00000000    0.00000000   10.14358975];
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-0'; 
-bas.level=4;
-bas.projections=[-2 -1 0 +1 +2];
+bas.inter_level=4;
+bas.projections={[-2 -1 0 +1 +2]};
 
 % Relaxation theory
 inter.relaxation={'weizmann'};

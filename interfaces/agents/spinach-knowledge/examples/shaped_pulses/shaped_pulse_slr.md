@@ -51,7 +51,7 @@ Shinnar-Le Roux band-selective 90-degree pulse on a chain of 31 strongly coupled
 - Lines 26: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 27: computes `bas.approximation` using `bas.approximation='IK-2'`.
 - Lines 28: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 29: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 29: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 32: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 37: computes `H` using `H=hamiltonian(spin_system)`.
 - Lines 38: computes `Lx` using `Lx=operator(spin_system,'Lx','1H')`.

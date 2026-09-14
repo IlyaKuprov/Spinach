@@ -46,7 +46,7 @@ FSLG-HETCOR of alpha-glycine powder under MAS. Calculation time: hours on NVidia
 - Lines 18: computes `inter.zeeman.matrix` using `inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,1,176.4)`.
 - Lines 27: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 28: computes `bas.approximation` using `bas.approximation='IK-0'`.
-- Lines 29: computes `bas.level` using `bas.level=4`.
+- Lines 29: computes `bas.inter_level` using `bas.inter_level=4`.
 - Lines 32: computes `sys.tols.inter_cutoff` using `sys.tols.inter_cutoff=2*pi*200`.
 - Lines 38: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 42: computes `parameters.rho0` using `parameters.rho0=state(spin_system,'Lz','1H')`.

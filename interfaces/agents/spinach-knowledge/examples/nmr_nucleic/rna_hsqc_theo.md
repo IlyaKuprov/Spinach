@@ -50,7 +50,7 @@
 - Lines 28: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 29: computes `bas.approximation` using `bas.approximation='IK-1'`.
 - Lines 30: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 31: computes `bas.level` using `bas.level=4; bas.space_level=1`.
+- Lines 31: computes `bas.inter_level` using `bas.inter_level=4; bas.prox_level=1`.
 - Lines 34: computes `inter.relaxation` using `inter.relaxation={'damp'}`.
 - Lines 35: computes `inter.rlx_keep` using `inter.rlx_keep='diagonal'`.
 - Lines 36: computes `inter.equilibrium` using `inter.equilibrium='zero'`.

@@ -45,8 +45,8 @@ W-band pulse-acquire FFT ESR spectrum of a chrysene cation radical in a non-visc
 - Lines 26: computes `inter.damp_rate` using `inter.damp_rate=1e6`.
 - Lines 29: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 30: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 31: computes `bas.longitudinals` using `bas.longitudinals={'1H'}`.
-- Lines 32: computes `bas.projections` using `bas.projections=+1`.
+- Lines 31: computes `bas.longitudinal` using `bas.longitudinal={{'1H'}}`.
+- Lines 32: computes `bas.projections` using `bas.projections={+1}`.
 - Lines 35: computes `bas.sym_spins` using `bas.sym_spins={[1 7],[2 8],[3 9],[4 10],[5 11],[6 12]}`.
 - Lines 36: computes `bas.sym_group` using `bas.sym_group={'S2','S2','S2','S2','S2','S2'}`.
 - Lines 39: computes `spin_system` using `spin_system=create(sys,inter)`.

@@ -24,7 +24,7 @@ sys.magnet=0.33;
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-bas.zero_quantum={[1 2 3 5]};
+bas.zero_quantum={{[1 2 3 5]}};
 
 % Relaxation theory
 inter.relaxation={'redfield'};

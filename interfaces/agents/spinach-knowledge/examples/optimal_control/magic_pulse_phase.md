@@ -55,7 +55,7 @@ A template file for the "magic pulse" optimisations. The term refers to a family
 - Lines 31: computes `inter.zeeman.scalar` using `inter.zeeman.scalar=num2cell(linspace(-100,100,n_spins))`.
 - Lines 35: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 36: computes `bas.approximation` using `bas.approximation='IK-2'`.
-- Lines 37: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 37: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 38: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
 - Lines 41: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 45: computes `Sx` using `Sx=state(spin_system,'Lx','13C')`.

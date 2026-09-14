@@ -38,7 +38,7 @@ Trajectory analysis for a MAS simulation of isotopically labelled glycine powder
 - Lines 15: computes `sys.magnet` using `sys.magnet=14.1`.
 - Lines 18: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 19: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 20: computes `bas.longitudinals` using `bas.longitudinals={'15N','13C'}`.
+- Lines 20: computes `bas.longitudinal` using `bas.longitudinal={'15N','13C'}`.
 - Lines 23: computes `sys.tols.krylov_tol` using `sys.tols.krylov_tol=1000`.
 - Lines 29: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 33: computes `parameters.rate` using `parameters.rate=2000`.

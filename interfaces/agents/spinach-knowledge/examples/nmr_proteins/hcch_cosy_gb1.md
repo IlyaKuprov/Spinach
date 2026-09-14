@@ -51,7 +51,7 @@
 - Lines 24: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 25: computes `bas.approximation` using `bas.approximation='IK-1'`.
 - Lines 26: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 27: computes `bas.level` using `bas.level=4; bas.space_level=1`.
+- Lines 27: computes `bas.inter_level` using `bas.inter_level=4; bas.prox_level=1`.
 - Lines 30: computes `sys.enable` using `sys.enable={'greedy','prop_cache'}`.
 - Lines 33: computes `parameters.J_ch` using `parameters.J_ch=140`.
 - Lines 34: computes `parameters.J_cc` using `parameters.J_cc=35`.

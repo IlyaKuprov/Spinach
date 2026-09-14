@@ -42,7 +42,7 @@ Powder magic angle spinning spectrum of a pair of dipole-coupled quadrupolar nuc
 - Lines 21: computes `inter.coupling.matrix{2,2}` using `inter.coupling.matrix{2,2}=castep2nqi([ 0.1580 0.0340 -0.5562`.
 - Lines 26: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 27: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 28: computes `bas.projections` using `bas.projections=+1`.
+- Lines 28: computes `bas.projections` using `bas.projections={+1}`.
 - Lines 34: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 38: computes `parameters.rate` using `parameters.rate=100000`.
 - Lines 39: computes `parameters.axis` using `parameters.axis=[sqrt(2/3) 0 sqrt(1/3)]`.

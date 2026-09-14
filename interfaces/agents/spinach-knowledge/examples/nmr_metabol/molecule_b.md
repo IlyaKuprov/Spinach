@@ -36,7 +36,7 @@
 - Lines 13: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 14: computes `bas.approximation` using `bas.approximation='IK-2'`.
 - Lines 15: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 16: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 16: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 19: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 23: computes `parameters.spins` using `parameters.spins={'1H'}`.
 - Lines 24: computes `parameters.rho0` using `parameters.rho0=state(spin_system,'L+','1H')`.

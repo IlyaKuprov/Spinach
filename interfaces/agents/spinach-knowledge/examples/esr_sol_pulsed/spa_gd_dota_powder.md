@@ -51,7 +51,7 @@ A soft pulse simulation for a gadolinium ion. The soft pulse is simulated using 
 - Lines 30: computes `inter.coupling.matrix{1,1}` using `inter.coupling.matrix{1,1}=0.56e9*zfs2mat(D(n),E(n),0,0,0)`.
 - Lines 33: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 34: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 35: computes `bas.projections` using `bas.projections=-3:3`.
+- Lines 35: computes `bas.projections` using `bas.projections={-3:3}`.
 - Lines 38: computes `sys.disable` using `sys.disable={'trajlevel'}`.
 - Lines 41: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 45: computes `parameters.spins` using `parameters.spins={'E8'}`.

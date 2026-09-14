@@ -60,6 +60,9 @@ catalog=[kron(ones(n_offset_vals,1),catalog) kron((1:n_offset_vals)',ones(size(c
 catalog=[kron(ones(n_phase_specs,1),catalog) kron((1:n_phase_specs)',ones(size(catalog,1),1))];
 catalog=[kron(ones(n_distortions,1),catalog) kron((1:n_distortions)',ones(size(catalog,1),1))];
 
+% Order the cases by drift generator so that a contiguous block of cases spans few drifts
+catalog=sortrows(catalog,2);
+
 % Ensemble correlation: own state pair for each member
 if ismember('rho_ens',control.ens_corrs)
     catalog=catalog(:,2:end);
@@ -100,9 +103,6 @@ if ens_budget<n_cases
     rng(rng_state);
 
 end
-
-% Order the cases by drift generator so that a contiguous block of cases spans few drifts
-catalog=sortrows(catalog,2);
 
 end
 

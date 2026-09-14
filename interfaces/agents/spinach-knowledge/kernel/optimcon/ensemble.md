@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/ensemble.m`
 - Signature: `[traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)`
-- Total lines: 285
+- Total lines: 288
 
 ## Purpose
 
@@ -25,67 +25,68 @@ A parallel wrapper around GRAPE that enables ensemble optimal control optimisati
 
 - Lines 53-54: Check consistency; implemented by `grumble(spin_system,waveform)`.
 - Lines 56-57: Worker-resident problem data handles; implemented by `invariants=spin_system.control.invariants`.
-- Lines 60-62: Live problem data is the client-side control structure less what the workers already hold; implemented by `control=rmfield(spin_system.control,intersect({'invariants','drift_slices','worker_cases', 'basis','traj_pen'},fieldnames(spin_system.control)))`.
+- Lines 60-62: Live problem data is the client-side control structure less what the workers already hold; implemented by `control=rmfield(spin_system.control,intersect({'invariants','drift_slices','worker_cases','basis'}, fieldnames(spin_system.control)))`.
 - Lines 65-66: Count the outputs and the cases; implemented by `n_outputs=nargout; n_cases=size(control.catalog,1)`.
-- Lines 68-69: Run the ensemble loop, each worker over its own case block; implemented by `spmd (poolsize)`.
-- Lines 71-73: Evaluate the block of cases assigned to this worker; implemented by `[traj_local,fid_local,grad_local,hess_local]=ens_block(invariants.Value,drift_slices.Value, control,spmdIndex,waveform,n_outputs)`.
-- Lines 75-77: Reduce to the first worker and pack; implemented by `results=struct('traj',{spmdCat(traj_local,1,1)},'fid',spmdCat(fid_local,2,1), 'grad',spmdPlus(grad_local,1),'hess',spmdPlus(hess_local,1))`.
-- Lines 81-82: Collect from the first worker; implemented by `results=results{1}; traj_data=results.traj; fidelities=results.fid`.
-- Lines 85-86: Average the block trajectory sums; implemented by `if ismember('average',control.traj_opts)`.
-- Lines 91-92: Ensemble averages of fidelity, gradient, and Hessian; implemented by `fidelity=sum(fidelities)/n_cases`.
-- Lines 102-103: Run diagnostic plotting (expensive!); implemented by `if ~isempty(spin_system.control.plotting)`.
-- Lines 105-106: With or without instrumental distortions; implemented by `if ~isempty(spin_system.control.distplot)`.
-- Lines 108-109: Apply the distortions; implemented by `dist_waveform=waveform`.
-- Lines 112-113: Extract and apply distortion function; implemented by `dist_function=spin_system.control.distplot{k}`.
-- Lines 118-119: Real-life trajectory and the distorted control sequence; implemented by `ctrl_trajan(spin_system,dist_waveform,traj_data,fidelities)`.
-- Lines 123-124: Real-life trajectory but the ideal control sequence; implemented by `ctrl_trajan(spin_system,waveform,traj_data,fidelities)`.
+- Lines 71-72: Run the ensemble loop, each worker over its own case block; implemented by `spmd (poolsize)`.
+- Lines 74-76: Evaluate the block of cases assigned to this worker; implemented by `[traj_local,fid_local,grad_local,hess_local]=ens_block(invariants.Value,drift_slices.Value, control,spmdIndex,waveform,n_outputs)`.
+- Lines 78-80: Reduce to the first worker and pack; implemented by `results=struct('traj',{spmdCat(traj_local,1,1)},'fid',spmdCat(fid_local,2,1), 'grad',spmdPlus(grad_local,1),'hess',spmdPlus(hess_local,1))`.
+- Lines 84-85: Collect from the first worker; implemented by `results=results{1}; traj_data=results.traj; fidelities=results.fid`.
+- Lines 88-89: Average the block trajectory sums; implemented by `if ismember('average',control.traj_opts)`.
+- Lines 94-95: Ensemble averages of fidelity, gradient, and Hessian; implemented by `fidelity=sum(fidelities)/n_cases`.
+- Lines 105-106: Run diagnostic plotting (expensive!); implemented by `if ~isempty(spin_system.control.plotting)`.
+- Lines 108-109: With or without instrumental distortions; implemented by `if ~isempty(spin_system.control.distplot)`.
+- Lines 111-112: Apply the distortions; implemented by `dist_waveform=waveform`.
+- Lines 115-116: Extract and apply distortion function; implemented by `dist_function=spin_system.control.distplot{k}`.
+- Lines 121-122: Real-life trajectory and the distorted control sequence; implemented by `ctrl_trajan(spin_system,dist_waveform,traj_data,fidelities)`.
+- Lines 126-127: Real-life trajectory but the ideal control sequence; implemented by `ctrl_trajan(spin_system,waveform,traj_data,fidelities)`.
 
 ### Control flow inferred from the code
 
-- Line 86: conditional branch on `ismember('average',control.traj_opts)`.
-- Line 93: conditional branch on `n_outputs>2`.
-- Line 96: conditional branch on `(n_outputs>3)&&strcmp(control.integrator,'rectangle')`.
-- Line 103: conditional branch on `~isempty(spin_system.control.plotting)`.
-- Line 106: conditional branch on `~isempty(spin_system.control.distplot)`.
-- Line 110: `for` loop over `k=1:numel(spin_system.control.distplot)`.
+- Line 67: conditional branch on `(n_outputs>3)&&(~all(cellfun(@(f)isequal(f,@no_dist),control.distortion(:))))`.
+- Line 89: conditional branch on `ismember('average',control.traj_opts)`.
+- Line 96: conditional branch on `n_outputs>2`.
+- Line 99: conditional branch on `(n_outputs>3)&&strcmp(control.integrator,'rectangle')`.
+- Line 106: conditional branch on `~isempty(spin_system.control.plotting)`.
+- Line 109: conditional branch on `~isempty(spin_system.control.distplot)`.
+- Line 113: `for` loop over `k=1:numel(spin_system.control.distplot)`.
 
 ### Control flow inside `ens_block`
 
-- Line 137: the live control structure is grafted over the frozen worker copy and every field the live copy lacks (frozen invariants, the case blocks, the waveform basis, the trajectory penalty operators) is taken from the frozen copy; the drift generators come from the worker's own slice.
-- Line 143: dispatch on `ss.bas.formalism` chooses the GRAPE function once, `grape_liouv` for `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`, `grape_hilb` for `zeeman-hilb`.
-- Line 162: `for` loop over the cases of the block, each case indexed through the six catalog columns (state pair, drift, power level, offset, phase-cycle step, distortion).
-- Line 175: conditional branch on `~isempty(control.phase_cycle)`; the phase-cycle row multiplies the initial and target states by phase factors and rotates each control channel through the block-diagonal rotation matrix `R` built from the channel phases.
-- Line 183: conditional branch on `~isempty(off_ens_sizes)`; `ind2sub` unpacks the offset combination index, first channel fastest, and `2*pi*offset` times each channel offset operator is added to the drift.
-- Line 191: the waveform is scaled to physical units by the power level of the case.
-- Line 195: `for` loop over the distortion functions, collecting their Jacobian only when derivatives are requested.
-- Line 206: one GRAPE call with as many outputs as requested: trajectory, fidelity, gradient, Hessian.
-- Line 211: the gradient passes through the distortion Jacobian and the transposed rotation, and is added to the block sum scaled by the power level.
-- Line 217: the Hessian is rotated on both sides by the Kronecker product of the identity over time steps with the transposed rotation, and added to the block sum scaled by the squared power level.
-- Line 86: conditional branch on `ismember('average',control.traj_opts)`; the forward trajectories of the block are summed into one entry so that only block sums travel to the client, which divides by the case count.
+- Line 140: the live control structure is grafted over the frozen worker copy and every field the live copy lacks (frozen invariants, the case blocks, the waveform basis) is taken from the frozen copy; the drift generators come from the worker's own slice.
+- Line 146: dispatch on `ss.bas.formalism` chooses the GRAPE function once, `grape_liouv` for `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`, `grape_hilb` for `zeeman-hilb`.
+- Line 165: `for` loop over the cases of the block, each case indexed through the six catalog columns (state pair, drift, power level, offset, phase-cycle step, distortion).
+- Line 178: conditional branch on `~isempty(control.phase_cycle)`; the phase-cycle row multiplies the initial and target states by phase factors and rotates each control channel through the block-diagonal rotation matrix `R` built from the channel phases.
+- Line 186: conditional branch on `~isempty(off_ens_sizes)`; `ind2sub` unpacks the offset combination index, first channel fastest, and `2*pi*offset` times each channel offset operator is added to the drift.
+- Line 194: the waveform is scaled to physical units by the power level of the case.
+- Line 198: `for` loop over the distortion functions, collecting their Jacobian only when derivatives are requested.
+- Line 209: one GRAPE call with as many outputs as requested: trajectory, fidelity, gradient, Hessian.
+- Line 214: the gradient passes through the distortion Jacobian and the transposed rotation, and is added to the block sum scaled by the power level.
+- Line 220: the Hessian is rotated on both sides by the Kronecker product of the identity over time steps with the transposed rotation, and added to the block sum scaled by the squared power level.
+- Line 227: conditional branch on `ismember('average',control.traj_opts)`; the forward trajectories of the block are summed into one entry so that only block sums travel to the client, which divides by the case count.
 
 ### Key state/data transformations
 
 - Lines 57: computes `invariants` using `invariants=spin_system.control.invariants`.
 - Lines 58: computes `drift_slices` using `drift_slices=spin_system.control.drift_slices`.
-- Lines 61-62: computes `control` using `control=rmfield(spin_system.control,intersect({'invariants','drift_slices','worker_cases', 'basis','traj_pen'},fieldnames(spin_system.control)))`.
+- Lines 61-62: computes `control` using `control=rmfield(spin_system.control,intersect({'invariants','drift_slices','worker_cases','basis'}, fieldnames(spin_system.control)))`.
 - Lines 63: computes `control.return_traj` using `control.return_traj=isfield(control,'return_traj')&&control.return_traj`.
 - Lines 66: computes `n_outputs` using `n_outputs=nargout; n_cases=size(control.catalog,1)`.
-- Lines 72-73: computes `[traj_local,fid_local,grad_local,hess_local]` using `[traj_local,fid_local,grad_local,hess_local]=ens_block(invariants.Value,drift_slices.Value, control,spmdIndex,waveform,n_outputs)`.
-- Lines 76-77: computes `results` using `results=struct('traj',{spmdCat(traj_local,1,1)},'fid',spmdCat(fid_local,2,1), 'grad',spmdPlus(grad_local,1),'hess',spmdPlus(hess_local,1))`.
-- Lines 83: computes `gradient` using `gradient=results.grad; hessian=results.hess`.
-- Lines 87: computes `forward` using `forward=cellfun(@(t)t.forward,traj_data,'UniformOutput',false)`.
-- Lines 88: computes `traj_data` using `traj_data={struct('forward',sum(cat(4,forward{:}),4)/n_cases)}`.
-- Lines 92: computes `fidelity` using `fidelity=sum(fidelities)/n_cases`.
-- Lines 97: computes `hessian` using `hessian=reshape(hessian/n_cases,numel(waveform)*[1 1])`.
-- Lines 109: computes `dist_waveform` using `dist_waveform=waveform`.
-- Lines 113: computes `dist_function` using `dist_function=spin_system.control.distplot{k}`.
+- Lines 75-76: computes `[traj_local,fid_local,grad_local,hess_local]` using `[traj_local,fid_local,grad_local,hess_local]=ens_block(invariants.Value,drift_slices.Value, control,spmdIndex,waveform,n_outputs)`.
+- Lines 79-80: computes `results` using `results=struct('traj',{spmdCat(traj_local,1,1)},'fid',spmdCat(fid_local,2,1), 'grad',spmdPlus(grad_local,1),'hess',spmdPlus(hess_local,1))`.
+- Lines 86: computes `gradient` using `gradient=results.grad; hessian=results.hess`.
+- Lines 90: computes `forward` using `forward=cellfun(@(t)t.forward,traj_data,'UniformOutput',false)`.
+- Lines 91: computes `traj_data` using `traj_data={struct('forward',sum(cat(4,forward{:}),4)/n_cases)}`.
+- Lines 95: computes `fidelity` using `fidelity=sum(fidelities)/n_cases`.
+- Lines 100: computes `hessian` using `hessian=reshape(hessian/n_cases,numel(waveform)*[1 1])`.
+- Lines 112: computes `dist_waveform` using `dist_waveform=waveform`.
+- Lines 116: computes `dist_function` using `dist_function=spin_system.control.distplot{k}`.
 
 ### Local helper functions
 
-- Line 133: `ens_block()` — `function [traj,fid,grad,hess]=ens_block(ss,drifts,control,block,waveform,n_outputs)`. Graft live client data over the frozen worker copy, keep what only the worker holds
+- Line 136: `ens_block()` — `function [traj,fid,grad,hess]=ens_block(ss,drifts,control,block,waveform,n_outputs)`. Graft live client data over the frozen worker copy, keep what only the worker holds
   - Representative operation: `frozen=ss.control; ss.control=control; ss.control.drifts=drifts`.
   - Representative operation: `missing=setdiff(fieldnames(frozen),fieldnames(control))`.
-- Line 232: `grumble()` — `function grumble(spin_system,waveform)`.
+- Line 235: `grumble()` — `function grumble(spin_system,waveform)`.
   - Representative operation: `if ~isfield(spin_system,'control')`.
   - Representative operation: `error('control data missing from spin_system, run optimcon() first.')`.
 
@@ -138,4 +139,4 @@ A parallel wrapper around GRAPE that enables ensemble optimal control optimisati
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `grumble()`, `rmfield()`, `intersect()`, `fieldnames()`, `isfield()`, `poolsize()`, `ens_block()`, `spmdCat()`, `spmdPlus()`, `ismember()`, `cellfun()`, `cat()`, `sum()`, `reshape()`, `strcmp()`, `ctrl_trajan()`, `setdiff()`, `kron()`, `ind2sub()`, `sparse()`, `speye()`, `grape_liouv()`, `grape_hilb()`, `getCurrentWorker()`, `gcp()`.
+- Called routines detected from the main body: `grumble()`, `rmfield()`, `intersect()`, `fieldnames()`, `isfield()`, `cellfun()`, `isequal()`, `poolsize()`, `ens_block()`, `spmdCat()`, `spmdPlus()`, `ismember()`, `cat()`, `sum()`, `reshape()`, `strcmp()`, `ctrl_trajan()`, `setdiff()`, `kron()`, `ind2sub()`, `sparse()`, `speye()`, `grape_liouv()`, `grape_hilb()`, `getCurrentWorker()`, `gcp()`.

@@ -26,25 +26,25 @@ Ensemble case catalog for optimal control problems. Enumerates the Cartesian pro
 - Lines 44-45: Extract ensemble grid dimensions; implemented by `n_state_pairs=numel(control.rho_init)`.
 - Lines 51-53: Record the grid dimensions; implemented by `ens_sizes=[n_state_pairs n_ens_systems n_power_levls n_offset_vals n_phase_specs n_distortions]`.
 - Lines 55-56: Create a catalog of the ensemble; implemented by `catalog=(1:n_state_pairs)'`.
-- Lines 63-64: Ensemble correlation: own state pair for each member; implemented by `if ismember('rho_ens',control.ens_corrs)`.
-- Lines 70-71: Ensemble correlation: own state pair for each drift; implemented by `if ismember('rho_drift',control.ens_corrs)`.
-- Lines 75-76: Ensemble correlation: own control power for each drift; implemented by `if ismember('power_drift',control.ens_corrs)`.
-- Lines 80-81: Count the full ensemble size; implemented by `n_cases=size(catalog,1)`.
-- Lines 83-84: Convert fractional budget into sample count; implemented by `ens_budget=control.budget`.
-- Lines 90-91: Apply ensemble budget; implemented by `if ens_budget<n_cases`.
-- Lines 93-94: Get RNG into a reproducible state; implemented by `rng_state=rng; rng(5318008,'twister')`.
-- Lines 96-97: Draw a random subset of the ensemble; implemented by `catalog=catalog(randperm(n_cases,ens_budget),:)`.
-- Lines 99-100: Release RNG; implemented by `rng(rng_state)`.
-- Lines 104-105: Order the cases by drift generator so that a contiguous block of cases spans few drifts; implemented by `catalog=sortrows(catalog,2)`.
+- Lines 63-64: Order the cases by drift generator so that a contiguous block of cases spans few drifts; implemented by `catalog=sortrows(catalog,2)`.
+- Lines 66-67: Ensemble correlation: own state pair for each member; implemented by `if ismember('rho_ens',control.ens_corrs)`.
+- Lines 73-74: Ensemble correlation: own state pair for each drift; implemented by `if ismember('rho_drift',control.ens_corrs)`.
+- Lines 78-79: Ensemble correlation: own control power for each drift; implemented by `if ismember('power_drift',control.ens_corrs)`.
+- Lines 83-84: Count the full ensemble size; implemented by `n_cases=size(catalog,1)`.
+- Lines 86-87: Convert fractional budget into sample count; implemented by `ens_budget=control.budget`.
+- Lines 93-94: Apply ensemble budget; implemented by `if ens_budget<n_cases`.
+- Lines 96-97: Get RNG into a reproducible state; implemented by `rng_state=rng; rng(5318008,'twister')`.
+- Lines 99-100: Draw a random subset of the ensemble; implemented by `catalog=catalog(randperm(n_cases,ens_budget),:)`.
+- Lines 102-103: Release RNG; implemented by `rng(rng_state)`.
 
 ### Control flow inferred from the code
 
 - Line 38: conditional branch on `~isempty(off_ens_sizes)`.
-- Line 64: conditional branch on `ismember('rho_ens',control.ens_corrs)`.
-- Line 71: conditional branch on `ismember('rho_drift',control.ens_corrs)`.
-- Line 76: conditional branch on `ismember('power_drift',control.ens_corrs)`.
-- Line 85: conditional branch on `isfinite(ens_budget)&&(ens_budget<=1)`.
-- Line 91: conditional branch on `ens_budget<n_cases`.
+- Line 67: conditional branch on `ismember('rho_ens',control.ens_corrs)`.
+- Line 74: conditional branch on `ismember('rho_drift',control.ens_corrs)`.
+- Line 79: conditional branch on `ismember('power_drift',control.ens_corrs)`.
+- Line 88: conditional branch on `isfinite(ens_budget)&&(ens_budget<=1)`.
+- Line 94: conditional branch on `ens_budget<n_cases`.
 
 ### Key state/data transformations
 
@@ -57,9 +57,9 @@ Ensemble case catalog for optimal control problems. Enumerates the Cartesian pro
 - Lines 49: computes `n_distortions` using `n_distortions=size(control.distortion,1)`.
 - Lines 52-53: computes `ens_sizes` using `ens_sizes=[n_state_pairs n_ens_systems n_power_levls n_offset_vals n_phase_specs n_distortions]`.
 - Lines 56: computes `catalog` using `catalog=(1:n_state_pairs)'`.
-- Lines 81: computes `n_cases` using `n_cases=size(catalog,1)`.
-- Lines 84: computes `ens_budget` using `ens_budget=control.budget`.
-- Lines 94: computes `rng_state` using `rng_state=rng; rng(5318008,'twister')`.
+- Lines 84: computes `n_cases` using `n_cases=size(catalog,1)`.
+- Lines 87: computes `ens_budget` using `ens_budget=control.budget`.
+- Lines 97: computes `rng_state` using `rng_state=rng; rng(5318008,'twister')`.
 
 ### Local helper functions
 
@@ -99,4 +99,4 @@ Ensemble case catalog for optimal control problems. Enumerates the Cartesian pro
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `grumble()`, `cellfun()`, `numel()`, `prod()`, `kron()`, `ones()`, `ismember()`, `unique()`, `isfinite()`, `round()`, `max()`, `rng()`, `randperm()`, `sortrows()`.
+- Called routines detected from the main body: `grumble()`, `cellfun()`, `numel()`, `prod()`, `kron()`, `ones()`, `sortrows()`, `ismember()`, `unique()`, `isfinite()`, `round()`, `max()`, `rng()`, `randperm()`.

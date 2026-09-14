@@ -58,12 +58,15 @@ invariants=spin_system.control.invariants;
 drift_slices=spin_system.control.drift_slices;
 
 % Live problem data is the client-side control structure less what the workers already hold
-control=rmfield(spin_system.control,intersect({'invariants','drift_slices','worker_cases',...
-                                               'basis','traj_pen'},fieldnames(spin_system.control)));
+control=rmfield(spin_system.control,intersect({'invariants','drift_slices','worker_cases','basis'},...
+                                               fieldnames(spin_system.control)));
 control.return_traj=isfield(control,'return_traj')&&control.return_traj;
 
 % Count the outputs and the cases
 n_outputs=nargout; n_cases=size(control.catalog,1);
+if (n_outputs>3)&&(~all(cellfun(@(f)isequal(f,@no_dist),control.distortion(:))))
+    error('Hessians are not available with waveform distortions.');
+end
 
 % Run the ensemble loop, each worker over its own case block
 spmd (poolsize)

@@ -87,8 +87,11 @@ gradient=results.grad; hessian=results.hess;
 
 % Average the block trajectory sums
 if ismember('average',control.traj_opts)
-    forward=cellfun(@(t)t.forward,traj_data,'UniformOutput',false);
-    traj_data={struct('forward',sum(cat(4,forward{:}),4)/n_cases)};
+    ave_traj=traj_data{1}.forward;
+    for n=2:numel(traj_data)
+        ave_traj=ave_traj+traj_data{n}.forward;
+    end
+    traj_data={struct('forward',{(1/n_cases)*ave_traj})};
 end
 
 % Ensemble averages of fidelity, gradient, and Hessian
@@ -223,10 +226,13 @@ for m=1:n_mine
 
 end
 
-% Collapse the block into one trajectory sum when only the average is needed
-if ismember('average',control.traj_opts)
-    forward=cellfun(@(t)t.forward,traj,'UniformOutput',false);
-    traj={struct('forward',sum(cat(4,forward{:}),4))};
+% Collapse a non-empty block into one trajectory sum when only the average is needed
+if ismember('average',control.traj_opts)&&(n_mine>0)
+    traj_sum=traj{1}.forward;
+    for m=2:n_mine
+        traj_sum=traj_sum+traj{m}.forward;
+    end
+    traj={struct('forward',{traj_sum})};
 end
 
 end

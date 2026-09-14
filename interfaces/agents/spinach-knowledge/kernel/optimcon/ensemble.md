@@ -26,7 +26,7 @@ A parallel wrapper around GRAPE that enables ensemble optimal control optimisati
 - Lines 53-54: Check consistency; implemented by `grumble(spin_system,waveform,nargout)`.
 - Lines 56-57: Worker-resident problem data handles; implemented by `invariants=spin_system.control.invariants`.
 - Lines 60-61: Live problem data is the client-side control structure less what the workers already hold; implemented by `control=rmfield(spin_system.control,{'invariants','drift_slices','worker_cases','basis'})`.
-- Lines 64-65: Count the outputs and the cases; implemented by `n_outputs=nargout; n_cases=size(control.catalog,1)`.
+- Lines 64-65: Count the outputs (fidelity always computed) and the cases; implemented by `n_outputs=max(nargout,2); n_cases=size(control.catalog,1)`.
 - Lines 67-68: Run the ensemble loop, each worker over its own case block; implemented by `spmd (poolsize)`.
 - Lines 70-72: Evaluate the block of cases assigned to this worker; implemented by `[traj_local,fid_local,grad_local,hess_local]=ens_block(invariants.Value,drift_slices.Value, control,spmdIndex,waveform,n_outputs)`.
 - Lines 74-76: Reduce to the first worker and pack; implemented by `results=struct('traj',{spmdCat(traj_local,1,1)},'fid',spmdCat(fid_local,2,1), 'grad',spmdPlus(grad_local,1),'hess',spmdPlus(hess_local,1))`.
@@ -56,7 +56,7 @@ A parallel wrapper around GRAPE that enables ensemble optimal control optimisati
 - Lines 58: computes `drift_slices` using `drift_slices=spin_system.control.drift_slices`.
 - Lines 61: computes `control` using `control=rmfield(spin_system.control,{'invariants','drift_slices','worker_cases','basis'})`.
 - Lines 62: computes `control.return_traj` using `control.return_traj=isfield(control,'return_traj')&&control.return_traj`.
-- Lines 65: computes `n_outputs` using `n_outputs=nargout; n_cases=size(control.catalog,1)`.
+- Lines 65: computes `n_outputs` using `n_outputs=max(nargout,2); n_cases=size(control.catalog,1)`.
 - Lines 71-72: computes `[traj_local,fid_local,grad_local,hess_local]` using `[traj_local,fid_local,grad_local,hess_local]=ens_block(invariants.Value,drift_slices.Value, control,spmdIndex,waveform,n_outputs)`.
 - Lines 75-76: computes `results` using `results=struct('traj',{spmdCat(traj_local,1,1)},'fid',spmdCat(fid_local,2,1), 'grad',spmdPlus(grad_local,1),'hess',spmdPlus(hess_local,1))`.
 - Lines 82: computes `order` using `order=[spin_system.control.worker_cases{:}]`.

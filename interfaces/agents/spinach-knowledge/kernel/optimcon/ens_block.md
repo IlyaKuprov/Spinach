@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/ens_block.m`
 - Signature: `[traj,fid,grad,hess]=ens_block(spin_system,drifts,control,block,waveform,n_outputs)`
-- Total lines: 190
+- Total lines: 191
 
 ## Purpose
 
@@ -110,8 +110,8 @@ Fidelity, gradient, and Hessian contributions of one block of ensemble cases, ev
 - waveform -control coefficients for each control opera-
 - tor, [ncontrols x nsteps], rad/s
 - n_outputs -number of outputs requested from ensemble.m,
-- 1 for the trajectory, 2 for the fidelity, 3
-- for the gradient, 4 for the Hessian
+- 2 for the fidelity, 3 for the gradient, 4 for
+- the Hessian
 
 ## Outputs
 

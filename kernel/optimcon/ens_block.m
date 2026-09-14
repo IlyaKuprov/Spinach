@@ -160,15 +160,16 @@ function grumble(spin_system,drifts,control,block,waveform,n_outputs)
 if (~isfield(spin_system,'control'))||(~isfield(spin_system.control,'worker_cases'))
     error('spin_system must be the frozen problem published by optimcon().');
 end
-if ~iscell(drifts)
-    error('drifts must be a cell array of drift generators.');
-end
-if ~isstruct(control)
+if (~isstruct(control))||(~isfield(control,'catalog'))
     error('control must be the live control structure from ensemble().');
 end
 if (~isnumeric(block))||(~isscalar(block))||(mod(block,1)~=0)||...
    (block<1)||(block>numel(spin_system.control.worker_cases))
     error('block must be a positive integer not exceeding the number of case blocks.');
+end
+needed=unique(control.catalog(spin_system.control.worker_cases{block},2));
+if (~iscell(drifts))||(numel(drifts)<max([needed; 0]))||any(cellfun(@isempty,drifts(needed)))
+    error('drifts must be a cell array populated at every index used by the cases of this block.');
 end
 if (~isnumeric(waveform))||(~isreal(waveform))
     error('waveform must be an array of real numbers.');

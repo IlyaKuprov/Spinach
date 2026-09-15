@@ -76,17 +76,17 @@ Basis set control. This is the second mandatory function (after create.m) that m
 - Line 65: conditional branch on `strcmp(spin_system.bas.approximation,'IK-DNP')`.
 - Line 113: conditional branch on `ismember(spin_system.bas.approximation,{'IK-1','IK-2'})`.
 - Line 240: conditional branch on `isfield(bas,'longitudinal')`.
-- Line 212: `for` loop over `s=1:nsubst`.
-- Line 220: dispatches on `spin_system.bas.approximation`; cases `'none'`, `'IK-0'`, `'IK-1'`, `'IK-2'`, `'IK-DNP'`.
-- Line 310: conditional branch on `isfield(bas,'manual')`; a row of `bas.manual` that spans two substances is an error.
+- Line 241: `for` loop over `s=1:nsubst`.
+- Line 283: dispatches on `spin_system.bas.approximation`; cases `'none'`, `'IK-0'`, `'IK-1'`, `'IK-2'`, `'IK-DNP'`.
+- Line 373: conditional branch on `isfield(bas,'manual')`; a row of `bas.manual` that spans two substances is an error.
 - Line 419: conditional branch on `isfield(bas,'zero_quantum')`.
-- Line 391: `parfor` loop over `n=1:size(subgraphs,1)`.
+- Line 454: `parfor` loop over `n=1:size(subgraphs,1)`.
 - Line 568: conditional branch on `ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef'})`.
 - Line 595: conditional branch on `strcmp(spin_system.bas.formalism,'zeeman-liouv')`.
 
 ### Local helper functions
 
-- Line 598: `grumble()` — `function grumble(spin_system,bas)`. Checks `bas.formalism`, `bas.approximation`, `bas.connectivity`, `bas.inter_level`, `bas.prox_level`, `bas.manual`, `bas.projections`, `bas.longitudinal`, and `bas.zero_quantum`; the three filters must be cell arrays with one element per chemical substance and are only available for `sphten-liouv`.
+- Line 661: `grumble()` — `function grumble(spin_system,bas)`. Checks `bas.formalism`, `bas.approximation`, `bas.connectivity`, `bas.inter_level`, `bas.prox_level`, `bas.manual`, `bas.projections`, `bas.longitudinal`, and `bas.zero_quantum`; the three filters must be cell arrays with one element per chemical substance and are only available for `sphten-liouv`.
 
 ## Parameters / inputs
 

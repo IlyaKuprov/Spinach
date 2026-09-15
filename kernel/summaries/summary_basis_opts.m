@@ -59,6 +59,12 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
             report(spin_system,['IK-DNP approximation | max inter-nuclear correlation level:    ' int2str(spin_system.bas.inter_level(3))]);
             report(spin_system, 'IK-DNP approximation | with nearest neighbours on the coupling graph.');
             report(spin_system,['IK-DNP approximation | tensors with 2-norm below ' num2str(spin_system.tols.inter_cutoff) ' Hz dropped.']);
+        case 'IK-SBS'
+            report(spin_system,['IK-SBS approximation | max boson-boson correlation level: ' int2str(spin_system.bas.inter_level(1))]);
+            report(spin_system,['IK-SBS approximation | max spin-boson correlation level:  ' int2str(spin_system.bas.inter_level(2))]);
+            report(spin_system,['IK-SBS approximation | max spin-spin correlation level:   ' int2str(spin_system.bas.inter_level(3))]);
+            report(spin_system,['IK-SBS approximation | coupling graph from ' strrep(spin_system.bas.connectivity,'_',' ') ...
+                                ', tensors with 2-norm below ' num2str(spin_system.tols.inter_cutoff) ' Hz dropped.']);
         case 'none'
             report(spin_system, 'starting with complete basis set on all spins...');
         otherwise

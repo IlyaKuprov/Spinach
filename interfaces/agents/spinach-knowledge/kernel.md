@@ -11,7 +11,7 @@
 |---|---|---|---:|
 | `kernel/assume.m` | `spin_system=assume(spin_system,assumptions,retention)` | Sets case-specific assumptions for various simulation contexts. This function determines the behaviour of the Hamiltonia | 769 |
 | `kernel/average.m` | `H=average(spin_system,Hp,H0,Hm,omega,theory)` | Average Hamiltonian theories under Zeeman interaction rotating frame transformations. Syntax: H=average(spin_system,Hp,H | 209 |
-| `kernel/basis.m` | `spin_system=basis(spin_system,bas)` | Basis set control. This is the second mandatory function (after create.m) that must be called in every calculation to bu | 906 |
+| `kernel/basis.m` | `spin_system=basis(spin_system,bas)` | Basis set control. This is the second mandatory function (after create.m) that must be called in every calculation to bu | 1018 |
 | `kernel/cache/bos_product_table.m` | `[product_table_left,...` | Structure coefficient tables for the associative envelopes of truncated Weyl algebras spanned by orthogonalised bosonic  | 111 |
 | `kernel/cache/cacheman.m` | `cacheman(spin_system) %#NHEAD` | Cache management heuristics. Looks after the scratch folder and prevents it from filling up the disk. Do not call direct | 103 |
 | `kernel/cache/ist_product_table.m` | `[product_table_left,product_table_right]=ist_product_table(mult)` | Structure coefficient tables for the associative envelopes of su(mult) algebras. Syntax: [product_table_left,product_tab | 156 |
@@ -393,7 +393,7 @@
 | `kernel/steady.m` | `rho=steady(spin_system,P,rho,method)` | Steady state under the repeated action by the same dissi- pative evolution propagator. Syntax: rho=steady(spin_system,P, | 220 |
 | `kernel/step.m` | `rho=step(spin_system,L,rho,time_step)` | Propagation step function. Computes the action by a matrix exponential without compuing that exponential. Supports one-, | 419 |
 | `kernel/summaries/summary_basis.m` | `summary_basis(spin_system)` | Prints basis-set state summary for a Spinach system. Syntax: summary_basis(spin_system) Parameters: spin_system -Spinach | 70 |
-| `kernel/summaries/summary_basis_opts.m` | `summary_basis_opts(spin_system)` | Prints basis-set option summary for a Spinach system. Syntax: summary_basis_opts(spin_system) Parameters: spin_system -S | 84 |
+| `kernel/summaries/summary_basis_opts.m` | `summary_basis_opts(spin_system)` | Prints basis-set option summary for a Spinach system. Syntax: summary_basis_opts(spin_system) Parameters: spin_system -S | 90 |
 | `kernel/summaries/summary_chemistry.m` | `summary_chemistry(spin_system)` | Prints chemical subsystem and exchange summary for a Spinach system. Syntax: summary_chemistry(spin_system) Parameters:  | 78 |
 | `kernel/summaries/summary_coordinates.m` | `summary_coordinates(spin_system,header)` | Prints atomic coordinate summary for a Spinach system. Syntax: summary_coordinates(spin_system,header) Parameters: spin_ | 53 |
 | `kernel/summaries/summary_couplings.m` | `summary_couplings(spin_system,header)` | Prints spin-spin coupling tensor summary for a Spinach system. Syntax: summary_couplings(spin_system,header) Parameters: | 82 |

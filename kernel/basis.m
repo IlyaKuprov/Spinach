@@ -42,6 +42,9 @@ spin_system.bas=bas;
 e_idx=cellfun(@iselectron,spin_system.comp.isotopes);
 n_idx=cellfun(@isnucleus,spin_system.comp.isotopes);
 
+% Find bosonic modes
+b_idx=ismember(spin_system.comp.types,{'C','V','T'});
+
 % Report back to the user
 summary_basis_opts(spin_system);
 
@@ -109,10 +112,8 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
 
     end
 
-    % Run connectivity analysis for IK-1,2 basis sets
-    if ismember(spin_system.bas.approximation,{'IK-1','IK-2'})
-
-        % Connectivity criteria
+    % Coupling tensor norm for the connectivity analysis
+    if ismember(spin_system.bas.approximation,{'IK-1','IK-2','IK-SBS'})
         switch bas.connectivity
 
             case 'scalar_couplings'
@@ -132,8 +133,46 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
                 tensor_norm=@(x)norm(x,2);
 
         end
+    end
 
-        % Build the interaction graph connectivity matrix
+    % Run connectivity analysis for IK-1,2 basis sets
+    if ismember(spin_system.bas.approximation,{'IK-1','IK-2'})
+
+        % Build the spin-spin coupling graph connectivity matrix
+        inter_norm=cellfun(tensor_norm,spin_system.inter.coupling.matrix);
+        spin_system.inter.conmatrix=sparse(inter_norm>2*pi*spin_system.tols.inter_cutoff);
+
+        % Make sure each spin is connected and proximate to itself
+        spin_system.inter.conmatrix=spin_system.inter.conmatrix|speye(size(spin_system.inter.conmatrix));
+        spin_system.inter.proxmatrix=spin_system.inter.proxmatrix|speye(size(spin_system.inter.proxmatrix));
+
+        % Make sure connectivity and proximity are reciprocal
+        spin_system.inter.conmatrix=spin_system.inter.conmatrix|transpose(spin_system.inter.conmatrix);
+        spin_system.inter.proxmatrix=spin_system.inter.proxmatrix|transpose(spin_system.inter.proxmatrix);
+
+        % Issue a report to the user
+        report(spin_system,['connectivity matrix density ' num2str(100*nnz(spin_system.inter.conmatrix)/numel(spin_system.inter.conmatrix)) '%']);
+        report(spin_system,['proximity matrix density ' num2str(100*nnz(spin_system.inter.proxmatrix)/numel(spin_system.inter.proxmatrix)) '%']);
+
+        % Determine the number of independent subsystems
+        n_subsystems=max(scomponents(spin_system.inter.conmatrix|spin_system.inter.proxmatrix));
+
+        % Print a notice to the user
+        if n_subsystems>1
+            report(spin_system,['WARNING - there are ' num2str(n_subsystems) ' subsystems that are not coupled to each other.']);
+        end
+
+    end
+
+    % Run connectivity analysis for IK-SBS basis set
+    if strcmp(spin_system.bas.approximation,'IK-SBS')
+
+        % Make sure there are both spins and bosonic modes
+        if (nnz(b_idx)==0)||(nnz((~b_idx)&(spin_system.comp.mults>1))==0)
+            error('IK-SBS approximation requires both spins and bosonic modes.');
+        end
+
+        % Build the spin-spin coupling graph connectivity matrix
         inter_norm=cellfun(tensor_norm,spin_system.inter.coupling.matrix);
         spin_system.inter.conmatrix=sparse(inter_norm>2*pi*spin_system.tols.inter_cutoff);
 
@@ -208,25 +247,33 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
 
         end
 
-        % Make sure each spin is connected and proximate to itself
-        spin_system.inter.conmatrix=spin_system.inter.conmatrix|speye(size(spin_system.inter.conmatrix));
-        spin_system.inter.proxmatrix=spin_system.inter.proxmatrix|speye(size(spin_system.inter.proxmatrix));
-
-        % Make sure connectivity and proximity are reciprocal
+        % Make sure connectivity is reciprocal
         spin_system.inter.conmatrix=spin_system.inter.conmatrix|transpose(spin_system.inter.conmatrix);
-        spin_system.inter.proxmatrix=spin_system.inter.proxmatrix|transpose(spin_system.inter.proxmatrix);
+
+        % Isolate boson-boson connectivity
+        bb_conmatrix=spin_system.inter.conmatrix;
+        bb_conmatrix(~b_idx,:)=false;
+        bb_conmatrix(:,~b_idx)=false;
+
+        % Isolate spin-boson connectivity
+        sb_conmatrix=spin_system.inter.conmatrix;
+        sb_conmatrix(b_idx,b_idx)=false;
+        sb_conmatrix(~b_idx,~b_idx)=false;
+
+        % Isolate spin-spin connectivity
+        ss_conmatrix=spin_system.inter.conmatrix;
+        ss_conmatrix(b_idx,:)=false;
+        ss_conmatrix(:,b_idx)=false;
+
+        % Make sure each particle is connected to itself
+        bb_conmatrix=bb_conmatrix|speye(size(bb_conmatrix));
+        sb_conmatrix=sb_conmatrix|speye(size(sb_conmatrix));
+        ss_conmatrix=ss_conmatrix|speye(size(ss_conmatrix));
 
         % Issue a report to the user
-        report(spin_system,['connectivity matrix density ' num2str(100*nnz(spin_system.inter.conmatrix)/numel(spin_system.inter.conmatrix)) '%']);
-        report(spin_system,['proximity matrix density ' num2str(100*nnz(spin_system.inter.proxmatrix)/numel(spin_system.inter.proxmatrix)) '%']);
-
-        % Determine the number of independent subsystems
-        n_subsystems=max(scomponents(spin_system.inter.conmatrix|spin_system.inter.proxmatrix));
-
-        % Print a notice to the user
-        if n_subsystems>1
-            report(spin_system,['WARNING - there are ' num2str(n_subsystems) ' subsystems that are not coupled to each other.']);
-        end
+        report(spin_system,['boson-boson connectivity matrix density ' num2str(100*nnz(bb_conmatrix)/numel(bb_conmatrix)) '%']);
+        report(spin_system,['spin-boson connectivity matrix density ' num2str(100*nnz(sb_conmatrix)/numel(sb_conmatrix)) '%']);
+        report(spin_system,['spin-spin connectivity matrix density ' num2str(100*nnz(ss_conmatrix)/numel(ss_conmatrix)) '%']);
 
     end
 
@@ -357,6 +404,29 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
 
                 % Merge coupling subgraph lists
                 coupling_subgraphs=[ee_subgraphs; en_subgraphs; nn_subgraphs];
+
+                % Do not run proximity analysis
+                proximity_subgraphs=false(0,nspins_in_subst);
+
+            case 'IK-SBS'
+
+                % Clip the correlation levels to the substance size
+                inter_level=min(nspins_in_subst,bas.inter_level);
+
+                % Boson-boson connectivity analysis
+                bb_subgraphs=dfpt(bb_conmatrix(spins_in_subst,spins_in_subst),inter_level(1));
+                report(spin_system,['    generated ' num2str(size(bb_subgraphs,1)-nnz(~b_idx(spins_in_subst))) ' boson-boson subgraphs.']);
+
+                % Spin-boson connectivity analysis
+                sb_subgraphs=dfpt(sb_conmatrix(spins_in_subst,spins_in_subst),inter_level(2));
+                report(spin_system,['    generated ' num2str(size(sb_subgraphs,1)) ' spin-boson subgraphs.']);
+
+                % Spin-spin connectivity analysis
+                ss_subgraphs=dfpt(ss_conmatrix(spins_in_subst,spins_in_subst),inter_level(3));
+                report(spin_system,['    generated ' num2str(size(ss_subgraphs,1)-nnz(b_idx(spins_in_subst))) ' spin-spin subgraphs.']);
+
+                % Merge coupling subgraph lists
+                coupling_subgraphs=[bb_subgraphs; sb_subgraphs; ss_subgraphs];
 
                 % Do not run proximity analysis
                 proximity_subgraphs=false(0,nspins_in_subst);
@@ -503,6 +573,26 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
 
             % Build the drop mask
             state_mask=pure_nn_state&(nn_corr_order>bas.inter_level(3));
+
+            % Kill the states
+            local_basis_spec(state_mask,:)=[];
+
+        end
+
+        % Drop excessive pure boson-boson and pure spin-spin correlations
+        if strcmp(spin_system.bas.approximation,'IK-SBS')
+
+            % Identify pure boson-boson and pure spin-spin correlations
+            corr_order=sum(logical(local_basis_spec),2);
+            bb_corr_order=sum(logical(local_basis_spec(:,b_idx(spins_involved))),2); %#ok<PFBNS>
+            ss_corr_order=corr_order-bb_corr_order;
+            pure_bb_state=(corr_order==bb_corr_order);
+            pure_ss_state=(corr_order==ss_corr_order);
+            pure_bb_state(1)=false; pure_ss_state(1)=false;
+
+            % Build the drop mask
+            state_mask=(pure_bb_state&(bb_corr_order>bas.inter_level(1)))|...
+                       (pure_ss_state&(ss_corr_order>bas.inter_level(3)));
 
             % Kill the states
             local_basis_spec(state_mask,:)=[];
@@ -706,12 +796,17 @@ if strcmp(bas.formalism,'sphten-liouv')
         error('approximation level must be specified in bas.approximation for sphten-liouv formalism.');
     elseif ~ischar(bas.approximation)
         error('bas.approximation must be a string.');
-    elseif ~ismember(bas.approximation,{'IK-0','IK-1','IK-2','IK-DNP','none'})
+    elseif ~ismember(bas.approximation,{'IK-0','IK-1','IK-2','IK-DNP','IK-SBS','none'})
         error('unrecognized approximation - see the basis preparation section of the manual.');
     end
 
+    % Disallow bosonic modes in IK-1,2 basis sets
+    if ismember(bas.approximation,{'IK-1','IK-2'})&&any(ismember(spin_system.comp.types,{'C','V','T'}))
+        error('IK-1 and IK-2 basis sets are for spin-only systems, use IK-SBS when bosonic modes are present.');
+    end
+
     % Check bas.connectivity
-    if ismember(bas.approximation,{'IK-1','IK-2'})
+    if ismember(bas.approximation,{'IK-1','IK-2','IK-SBS'})
         if ~isfield(bas,'connectivity')
             error('connectivity type must be specified in bas.connectivity variable.');
         elseif ~ischar(bas.connectivity)
@@ -722,7 +817,7 @@ if strcmp(bas.formalism,'sphten-liouv')
     end
 
     % Check bas.inter_level
-    if ismember(bas.approximation,{'IK-0','IK-1','IK-DNP'})&&(~isfield(bas,'inter_level'))
+    if ismember(bas.approximation,{'IK-0','IK-1','IK-DNP','IK-SBS'})&&(~isfield(bas,'inter_level'))
         error('connectivity tracing depth must be specified in bas.inter_level variable.');
     end
     if ismember(bas.approximation,{'IK-0','IK-1'})
@@ -749,6 +844,23 @@ if strcmp(bas.formalism,'sphten-liouv')
         end
         if bas.inter_level(3)>n_nuclei
             error('bas.inter_level(3) cannot exceed the number of nuclei in the system.');
+        end
+    end
+    if strcmp(bas.approximation,'IK-SBS')
+        if (~isnumeric(bas.inter_level))||(numel(bas.inter_level)~=3)||...
+           any(mod(bas.inter_level,1)~=0,'all')||any(bas.inter_level<1,'all')
+            error('bas.inter_level must be a vector with three positive integers.');
+        end
+        mode_mask=ismember(spin_system.comp.types,{'C','V','T'});
+        n_modes=nnz(mode_mask); n_spins=nnz((~mode_mask)&(spin_system.comp.mults>1));
+        if bas.inter_level(1)>n_modes
+            error('bas.inter_level(1) cannot exceed the number of bosonic modes in the system.');
+        end
+        if bas.inter_level(2)>n_modes+n_spins
+            error('bas.inter_level(2) cannot exceed the number of particles in the system.');
+        end
+        if bas.inter_level(3)>n_spins
+            error('bas.inter_level(3) cannot exceed the number of spins in the system.');
         end
     end
 
@@ -859,8 +971,8 @@ end
 
 % Disallow inapplicable approximations
 if isfield(bas,'inter_level')
-    if ~ismember(bas.approximation,{'IK-0','IK-1','IK-2','IK-DNP'})
-        error('bas.inter_level is only applicable to IK-0,1,2,DNP basis sets.');
+    if ~ismember(bas.approximation,{'IK-0','IK-1','IK-2','IK-DNP','IK-SBS'})
+        error('bas.inter_level is only applicable to IK-0,1,2,DNP,SBS basis sets.');
     end
 end
 if isfield(bas,'prox_level')
@@ -869,8 +981,8 @@ if isfield(bas,'prox_level')
     end
 end
 if isfield(bas,'connectivity')
-    if ~ismember(bas.approximation,{'IK-1','IK-2'})
-        error('bas.connectivity is only applicable to IK-1,2 basis sets.');
+    if ~ismember(bas.approximation,{'IK-1','IK-2','IK-SBS'})
+        error('bas.connectivity is only applicable to IK-1,2,SBS basis sets.');
     end
 end
 

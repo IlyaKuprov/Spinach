@@ -671,6 +671,7 @@
 | `examples/quantum_tech/diamond_defects/diamond_p1_13c_epr_xw.m` | `diamond_p1_13c_epr_xw()` | Field-swept powder EPR spectra of a P1 centre in 13C-enriched diamond at X and W bands. Calculation time: minutes. | 71 |
 | `examples/quantum_tech/diamond_defects/diamond_p1_epr_xw.m` | `diamond_p1_epr_xw()` | Field-swept powder EPR spectra of a P1 centre in diamond at X and W bands. Calculation time: seconds. | 67 |
 | `examples/quantum_tech/diamond_defects/diamond_siv0_epr_xw.m` | `diamond_siv0_epr_xw()` | Field-swept powder EPR spectra of SiV0 centre in diamond at X and W bands. Calculation time: seconds. | 68 |
+| `examples/quantum_tech/geometric_phase_gate.m` | `geometric_phase_gate()` | Geometric phase gate between two trapped-ion qubits driven by a state-dependent optical dipole force, as demonstrated by Le | 143 |
 | `examples/quantum_tech/jaynes_cummings_a.m` | `jaynes_cummings_a()` | Jaynes-Cummings coupling between a spin and an electromagnetic cavity mode with five population numbers included. The av | 70 |
 | `examples/quantum_tech/jaynes_cummings_b.m` | `jaynes_cummings_b()` | Jaynes-Cummings coupling between a spin and an electromagnetic cavity mode with five population numbers included. A time | 79 |
 | `examples/quantum_tech/jaynes_cummings_c.m` | `jaynes_cummings_c()` | An exchange-coupled two-electron system with the electrons having independent Jaynes-Cummings couplings to the same mode | 74 |

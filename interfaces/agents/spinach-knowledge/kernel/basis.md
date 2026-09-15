@@ -48,7 +48,7 @@ Basis set control. This is the second mandatory function (after create.m) that m
 - Lines 487-515: Resolve zero-quantum filter spins for each substance; implemented by `zq_spins(s,spins_in_question)=true()`.
 - Lines 517-519: Balance the subgraph list; implemented by `randperm`.
 - Lines 521-606: Populate the basis descriptor array; `parfor` over subgraphs builds the direct product descriptor, applies the coherence order, zero-quantum, IK-DNP inter-nuclear, and IK-SBS pure boson-boson and pure spin-spin correlation filters, and embeds it into the full spin index with `sparse`.
-- Lines 608-609: Deallocate variables; implemented by `clear('basis_spec');`
+- Lines 608-609: Deallocate variables; implemented by `clear('spin_state_lists','subgraphs','subgraph_subst','spin_dims','zq_spins');`
 - Lines 611-612: Pull basis descriptor from the nodes, unit state first; implemented by `basis_spec=[sparse(1,spin_system.comp.nspins); vertcat(basis_spec{:})];`
 - Lines 614-616: Eliminate redundant states using a hash table; implemented by `basis_spec=unihash(basis_spec)`.
 - Lines 618-632: Sort the basis explicitly; implemented by `sortrows`, distributed with `distrib_dim` for large bases.
@@ -60,12 +60,12 @@ Basis set control. This is the second mandatory function (after create.m) that m
 - Lines 657-682: Process Hilbert space Zeeman basis; Zeeman index table for `zeeman-hilb` and `zeeman-wavef`.
 - Lines 660-661: Preallocate basis set array; implemented by `spin_system.bas.basis=zeros(prod(spin_system.comp.mults),spin_system.comp.nspins);`
 - Lines 663-674: Fill basis set array; implemented by `for n=1:spin_system.comp.nspins`
-- Lines 676-677: Report to the user; implemented by `report(spin_system,['matrix dimension for all superoperators and state vectors: ' num2str(`
+- Lines 676-677: Report to the user; implemented by `report(spin_system,['matrix dimension for all operators and states: ' num2str(prod(spin_system.comp.`
 - Lines 679-682: Run the symmetry treatment; implemented by `spin_system=symmetry(spin_system,bas);`
 - Lines 684-711: Process Liouville space Zeeman basis; ket and bra index tables for `zeeman-liouv`.
 - Lines 687-700: Build the Hilbert space Zeeman index table; implemented by `dim=prod(spin_system.comp.mults);`
 - Lines 702-703: Ket and bra index tables in the vectorisation order; implemented by `spin_system.bas.basis=[repmat(zbas,[dim 1]) kron(zbas,ones(dim,1))];`
-- Lines 705-706: Report to the user; implemented by `report(spin_system,['matrix dimension for all superoperators and state vectors: ' num2str(`
+- Lines 705-706: Report to the user; implemented by `report(spin_system,['matrix dimension for all superoperators and state vectors: ' num2str(dim^2)]);`
 - Lines 708-711: Run the symmetry treatment; implemented by `spin_system=symmetry(spin_system,bas);`
 - Lines 713-740: Preload Lie algebra structure tables; implemented by `ist_product_table`.
 - Lines 716-717: Inform the user; implemented by `report(spin_system,'caching Lie structure tables...');`

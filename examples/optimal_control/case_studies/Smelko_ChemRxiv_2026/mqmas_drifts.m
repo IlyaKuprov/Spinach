@@ -36,8 +36,6 @@
 %       carry laboratory frame assumptions, call assume() first.
 %
 % ilya.kuprov@weizmann.ac.il
-%
-% <https://spindynamics.org/wiki/index.php?title=mqmas_drifts.m>
 
 function drifts=mqmas_drifts(spin_system,parameters)
 

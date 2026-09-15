@@ -11,7 +11,7 @@
 |---|---|---|---:|
 | `kernel/assume.m` | `spin_system=assume(spin_system,assumptions,retention)` | Sets case-specific assumptions for various simulation contexts. This function determines the behaviour of the Hamiltonia | 769 |
 | `kernel/average.m` | `H=average(spin_system,Hp,H0,Hm,omega,theory)` | Average Hamiltonian theories under Zeeman interaction rotating frame transformations. Syntax: H=average(spin_system,Hp,H | 209 |
-| `kernel/basis.m` | `spin_system=basis(spin_system,bas)` | Basis set control. This is the second mandatory function (after create.m) that must be called in every calculation to bu | 843 |
+| `kernel/basis.m` | `spin_system=basis(spin_system,bas)` | Basis set control. This is the second mandatory function (after create.m) that must be called in every calculation to bu | 906 |
 | `kernel/cache/bos_product_table.m` | `[product_table_left,...` | Structure coefficient tables for the associative envelopes of truncated Weyl algebras spanned by orthogonalised bosonic  | 111 |
 | `kernel/cache/cacheman.m` | `cacheman(spin_system) %#NHEAD` | Cache management heuristics. Looks after the scratch folder and prevents it from filling up the disk. Do not call direct | 103 |
 | `kernel/cache/ist_product_table.m` | `[product_table_left,product_table_right]=ist_product_table(mult)` | Structure coefficient tables for the associative envelopes of su(mult) algebras. Syntax: [product_table_left,product_tab | 156 |

@@ -246,7 +246,7 @@ bas.prox_level=3;
 |---|---|---|
 | `formalism` | `'sphten-liouv'`, `'zeeman-liouv'`, `'zeeman-hilb'`, `'zeeman-wavef'` | Mandatory. |
 | `approximation` | `'none'`, `'IK-0'`, `'IK-1'`, `'IK-2'`, `'IK-DNP'` | Mandatory. Only `'none'` is legal outside `sphten-liouv`. |
-| `connectivity` | `'scalar_couplings'`, `'full_tensors'` | Required by, and only legal for, `IK-1` and `IK-2`. |
+| `connectivity` | `'scalar_couplings'`, `'full_tensors'` | Required by, and only legal for, `IK-1` and `IK-2`. Bosonic mode couplings above `tols.inter_cutoff` (pairwise channels, and the spin pairs and spins modulated through `inter.modes.coupling_mod` and `inter.modes.zeeman_mod`, linked to their modes) are added to the coupling graph. |
 | `inter_level` | positive integer; `1x3` integer vector for `IK-DNP` | Required by `IK-0`, `IK-1`, `IK-DNP`. Cannot exceed the number of spins; clipped to the spin count of each chemical substance. For `IK-DNP` the three entries bound electrons, spins and nuclei respectively. |
 | `prox_level` | positive integer | Required by, and only legal for, `IK-1` and `IK-2`. Clipped to the spin count of each chemical substance. |
 | `projections` | cell array with one row vector of integers per chemical substance | Keeps only the listed total projection quantum numbers in that substance; an empty element means no filter. `sphten-liouv` only. Single substance: `bas.projections={+1}`. |

@@ -1,11 +1,11 @@
 # Spinach code index: examples
 
 - Source root: `/home/kuprov/.openclaw/workspace/Spinach`
-- Source commit: `f053e432a61d7144f3946d73d0a672e3ccfc3fc5`
+- Source commit: `dad2c0f2fe6de0bb184d3614b2acc381321c2c8d`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
-- Files indexed: **756** MATLAB files
-- Generated: 2026-08-30T02:52:31
+- Files indexed: **761** MATLAB files
+- Generated: 2026-09-15T13:53:20
 
 | File | Signature | Summary | LOC |
 |---|---|---|---:|
@@ -599,6 +599,11 @@
 | `examples/optimal_control/bloch_siegert/yusuke_14n_broadening_demo.m` | `yusuke_14n_broadening_demo()` | Reduced effective-model illustration of the trade-off discussed by Nehra, Agarwal, and Nishiyama for 14N decoupling unde | 205 |
 | `examples/optimal_control/bloch_siegert/yusuke_1h_14n_optimal_vs_cw_demo.m` | `yusuke_1h_14n_optimal_vs_cw_demo()` | Reduced heteronuclear control demonstration inspired by the low-power offset-tolerant 14N decoupling papers of Nehra, Ag | 264 |
 | `examples/optimal_control/bloch_siegert/yusuke_optimal_vs_cw_demo.m` | `yusuke_optimal_vs_cw_demo()` | Bloch-Siegert-aware phase optimisation compared to a simple constant- phase low-power cycle. This is the control-side co | 240 |
+| `examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/ct_selective.m` | `ct_selective()` | Optimal control design of the central transition selective pulse of the z-filtered 27Al MQMAS experiment. Reproduces, us | 102 |
+| `examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mq_conversion.m` | `mq_conversion()` | Optimal control design of the multiple-quantum conversion pulse of the z-filtered 27Al MQMAS experiment. Reproduces, usi | 108 |
+| `examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mq_excitation.m` | `mq_excitation()` | Optimal control design of the multiple-quantum excitation pulse of the z-filtered 27Al MQMAS experiment. Reproduces, usi | 108 |
+| `examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_drifts.m` | `drifts=mqmas_drifts(spin_system,parameters)` | Drift Hamiltonians of a quadrupolar nucleus under magic angle spin- ning, resolved in rotor phase, for every combination | 193 |
+| `examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_efficiency.m` | `mqmas_efficiency()` | Efficiency of the z-filtered 27Al MQMAS pulse sequence with hard pulses and with the optimal control pulses produced by  | 144 |
 | `examples/optimal_control/case_studies/Tosner_JMR_2009/bb_inversion_pulse.m` | `bb_inversion_pulse()` | Broadband inversion pulse design for liquid-state NMR. Reprodu- ces, using Spinach, the second example from: A single pr | 101 |
 | `examples/optimal_control/case_studies/Tosner_JMR_2009/bb_refocusing_pulse.m` | `bb_refocusing_pulse()` | Spinach implementation of the broadband refocusing example from GRAPE is used to design a 200 µs broadband x-phase π pul | 97 |
 | `examples/optimal_control/case_studies/Tosner_JMR_2009/coherence_transfer.m` | `coherence_transfer()` | The first optimal control example from A heteronuclear two-spin system (1H–13C) with an scalar and both nuclei set on re | 79 |

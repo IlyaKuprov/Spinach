@@ -17,9 +17,7 @@
 % m=+3/2 and m=-3/2 levels (3Q) or between the m=+5/2 and m=-5/2
 % levels (5Q), and the target is the population difference across
 % the central transition, as in the paper. The resulting waveform
-% is saved for the MQMAS efficiency calculation; the waveforms sup-
-% plied in this folder reached fidelities of 0.96 (3Q) and 0.92 (5Q)
-% after 500 iterations.
+% is saved for the MQMAS efficiency calculation.
 %
 % Calculation time: hours on 128 cores.
 %

@@ -30,10 +30,11 @@
 %               ner index; each element is a cell array of n_slices
 %               Hamiltonian matrices, one per tick of the pulse
 %
-% Note: the rotor turns the first Euler angle, therefore the azimuth
-%       of each grid point is placed into the third Euler angle and
-%       the first one is the initial rotor phase. The spin system must
-%       carry laboratory frame assumptions, call assume() first.
+% Note: the crystallite orientation uses all three Euler angles of the
+%       grid, as in singlerot.m; two-angle grids keep the azimuth in
+%       the third angle and have zero first angles, which the rotor
+%       phase then supplies. The spin system must carry laboratory
+%       frame assumptions, call assume() first.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -50,7 +51,7 @@ C=carrier(spin_system,parameters.spins{1});
 
 % Load the spherical integration grid
 sph_grid=load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ...
-               filesep parameters.grid],'alphas','betas');
+               filesep parameters.grid],'alphas','betas','gammas');
 
 % Get rotor axis orientation
 [rotor_phi,rotor_theta,~]=cart2sph(parameters.axis(1),...
@@ -84,7 +85,7 @@ parfor n=1:n_orients %#ok<*PFBNS>
         for r=1:numel(Q)
 
             % Compute crystallite orientation
-            D_mol2rot=wigner(r,0,sph_grid.betas(n),sph_grid.alphas(n));
+            D_mol2rot=wigner(r,sph_grid.alphas(n),sph_grid.betas(n),sph_grid.gammas(n));
 
             % Compute rotor axis tilt
             D_lab2rot=wigner(r,rotor_phi,rotor_theta,0);
@@ -143,8 +144,8 @@ if ~isfield(parameters,'axis')
 end
 if (~isnumeric(parameters.axis))||(~isreal(parameters.axis))||...
    (~isrow(parameters.axis))||(numel(parameters.axis)~=3)||...
-   (abs(norm(parameters.axis)-1)>1e-6)
-    error('parameters.axis must be a normalised row vector with three real elements.');
+   any(~isfinite(parameters.axis))||(abs(norm(parameters.axis)-1)>1e-6)
+    error('parameters.axis must be a normalised row vector with three finite real elements.');
 end
 if ~isfield(parameters,'grid')
     error('powder grid must be specified in parameters.grid field.');

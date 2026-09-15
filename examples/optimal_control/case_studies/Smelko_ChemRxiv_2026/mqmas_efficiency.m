@@ -18,11 +18,7 @@
 % pulses have the durations optimised in the paper. Optimal control
 % waveforms are read from the files written by mq_excitation.m,
 % mq_conversion.m, and ct_selective.m examples; the files supplied
-% in this folder were produced by those examples on 128 cores. With
-% these waveforms, the 3QMAS efficiency is 0.076 with hard pulses
-% and 0.403 with optimal control pulses, and the 5QMAS efficiency
-% is 0.0115 and 0.249, respectively: signal enhancement factors of
-% 5.3 and 21.5, against 5.7 and 25 simulated in the paper.
+% in this folder were produced by those examples on 128 cores.
 %
 % Calculation time: minutes on 128 cores.
 %
@@ -69,15 +65,21 @@ rho_init=rho_init/norm(rho_init,'fro');
 Lx=operator(spin_system,'Lx','27Al');
 Ly=operator(spin_system,'Ly','27Al');
 
-% Hard pulse sequence, 100 kHz excitation and conversion pulses
+% Hard pulse durations and amplitudes from the paper
 if mq_order==3
-    hard_durs=[4.2e-6 1.4e-6];
+    hard_durs=[4.2e-6 1.4e-6 9e-6];
 else
-    hard_durs=[4.4e-6 2.4e-6];
+    hard_durs=[4.4e-6 2.4e-6 9e-6];
 end
-hard_pulses={{2*pi*100e3*[1; 0],hard_durs(1)},...
-             {2*pi*100e3*[1; 0],hard_durs(2)},...
-             {2*pi*9.3e3*[1; 0],9e-6}};
+hard_amps=2*pi*[100e3 100e3 9.3e3];
+
+% Hard pulses sliced at the drift tick interval
+hard_pulses=cell(1,3);
+for k=1:3
+    slice_durs=[tick_dt*ones(1,floor(hard_durs(k)/tick_dt)) mod(hard_durs(k),tick_dt)];
+    slice_durs=slice_durs(slice_durs>1e-12);
+    hard_pulses{k}={hard_amps(k)*[ones(1,numel(slice_durs)); zeros(1,numel(slice_durs))],slice_durs};
+end
 
 % Optimal control pulse sequence
 exc=load(['mq_exc_' num2str(mq_order) 'q.mat'],'pulse','pulse_dt');

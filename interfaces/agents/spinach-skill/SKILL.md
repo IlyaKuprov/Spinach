@@ -157,6 +157,7 @@ much of it to keep. Together they decide whether a simulation is feasible.
 | `IK-1` | Correlation order `bas.inter_level` on the coupling graph plus correlation order `bas.prox_level` on the proximity graph; needs `bas.connectivity`. The workhorse for large molecules. |
 | `IK-2` | Uses direct coupling connectivity with proximity subgraphs controlled by `bas.prox_level`; standard for strychnine-class organic molecules. |
 | `IK-DNP` | Tailored to electron-nuclear DNP systems. |
+| `IK-SBS` | Spin-boson systems: separate correlation levels `bas.inter_level=[bb sb ss]` on the boson-boson, spin-boson, and spin-spin coupling graphs; needs `bas.connectivity`; requires both spins and bosonic modes. |
 
 `bas.connectivity` is `'scalar_couplings'` or `'full_tensors'`. The filters
 `bas.longitudinal` and `bas.projections` are physical approximations:

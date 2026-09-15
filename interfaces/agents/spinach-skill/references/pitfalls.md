@@ -91,12 +91,13 @@ approximations then have their own required fields and cross-rules:
 
 | Message | Meaning |
 |---|---|
-| `connectivity tracing depth must be specified in bas.inter_level variable.` | IK-0, IK-1, and IK-DNP need `bas.inter_level` (IK-DNP as a 1x3 vector); IK-2 does not use it. |
-| `connectivity type must be specified in bas.connectivity variable.` | IK-1/2 need `'scalar_couplings'` or `'full_tensors'`. |
+| `connectivity tracing depth must be specified in bas.inter_level variable.` | IK-0, IK-1, IK-DNP, and IK-SBS need `bas.inter_level` (IK-DNP and IK-SBS as a 1x3 vector); IK-2 does not use it. |
+| `connectivity type must be specified in bas.connectivity variable.` | IK-1/2 and IK-SBS need `'scalar_couplings'` or `'full_tensors'`. |
 | `proximity tracing depth must be specified in bas.prox_level variable.` | IK-1/2 need `bas.prox_level`. |
-| `bas.inter_level is only applicable to IK-0,1,2,DNP basis sets.` | Do not set IK fields with `approximation='none'`; the same rule exists for `bas.prox_level` and `bas.connectivity` (IK-1/2 only). |
+| `bas.inter_level is only applicable to IK-0,1,2,DNP,SBS basis sets.` | Do not set IK fields with `approximation='none'`; the same rule exists for `bas.prox_level` (IK-1/2 only) and `bas.connectivity` (IK-1/2 and IK-SBS only). |
 | `bas.approximation should be set to 'none' in zeeman-hilb formalism.` | Hilbert space is always complete. |
 | `IK-DNP approximation requires both electrons and nuclei.` | IK-DNP is for electron-nuclear systems only. |
+| `bas.inter_level(1) cannot exceed the number of bosonic modes in the system.` | IK-SBS needs bosonic modes (`C`, `V`, `T` particles) as well as spins; the three levels are bounded by the numbers of modes, particles, and spins respectively. |
 | `multiplicities above 16 are not supported by sphten-liouv formalism.` | Very high spins need a different formalism. |
 
 ### Formalism and approximation mismatches

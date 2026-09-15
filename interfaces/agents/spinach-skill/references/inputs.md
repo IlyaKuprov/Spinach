@@ -245,9 +245,9 @@ bas.prox_level=3;
 | Field | Legal values | Notes |
 |---|---|---|
 | `formalism` | `'sphten-liouv'`, `'zeeman-liouv'`, `'zeeman-hilb'`, `'zeeman-wavef'` | Mandatory. |
-| `approximation` | `'none'`, `'IK-0'`, `'IK-1'`, `'IK-2'`, `'IK-DNP'` | Mandatory. Only `'none'` is legal outside `sphten-liouv`. |
-| `connectivity` | `'scalar_couplings'`, `'full_tensors'` | Required by, and only legal for, `IK-1` and `IK-2`. Bosonic mode couplings above `tols.inter_cutoff` (pairwise channels, and the spin pairs and spins modulated through `inter.modes.coupling_mod` and `inter.modes.zeeman_mod`, linked to their modes) are added to the coupling graph. |
-| `inter_level` | positive integer; `1x3` integer vector for `IK-DNP` | Required by `IK-0`, `IK-1`, `IK-DNP`. Cannot exceed the number of spins; clipped to the spin count of each chemical substance. For `IK-DNP` the three entries bound electrons, spins and nuclei respectively. |
+| `approximation` | `'none'`, `'IK-0'`, `'IK-1'`, `'IK-2'`, `'IK-DNP'`, `'IK-SBS'` | Mandatory. Only `'none'` is legal outside `sphten-liouv`. |
+| `connectivity` | `'scalar_couplings'`, `'full_tensors'` | Required by, and only legal for, `IK-1`, `IK-2`, and `IK-SBS`. Bosonic mode couplings above `tols.inter_cutoff` (pairwise channels, and the spin pairs and spins modulated through `inter.modes.coupling_mod` and `inter.modes.zeeman_mod`, linked to their modes) are added to the coupling graph. |
+| `inter_level` | positive integer; `1x3` integer vector for `IK-DNP` and `IK-SBS` | Required by `IK-0`, `IK-1`, `IK-DNP`, `IK-SBS`. Cannot exceed the number of spins; clipped to the spin count of each chemical substance. For `IK-DNP` the three entries bound electrons, spins and nuclei respectively. For `IK-SBS` they are the correlation levels on the boson-boson, spin-boson, and spin-spin coupling graphs; inside spin-boson subgraphs, pure boson-boson correlations above the first level and pure spin-spin correlations above the third level are dropped. |
 | `prox_level` | positive integer | Required by, and only legal for, `IK-1` and `IK-2`. Clipped to the spin count of each chemical substance. |
 | `projections` | cell array with one row vector of integers per chemical substance | Keeps only the listed total projection quantum numbers in that substance; an empty element means no filter. `sphten-liouv` only. Single substance: `bas.projections={+1}`. |
 | `longitudinal` | cell array with one cell array of isotope strings or spin index vectors per chemical substance | Keeps only longitudinal states on those spins of that substance. `sphten-liouv` only. Single substance: `bas.longitudinal={{'15N'}}`. |
@@ -258,7 +258,8 @@ bas.prox_level=3;
 | `sym_a1g_only` | logical | Keep only the fully symmetric irreducible representation. |
 
 `sphten-liouv` refuses multiplicities above 16. `IK-DNP` requires both
-electrons and nuclei and nothing else in the system.
+electrons and nuclei and nothing else in the system. `IK-SBS` requires both
+spins and bosonic modes (`C`, `V`, or `T` particles).
 
 ## Unit conversions on the way in
 

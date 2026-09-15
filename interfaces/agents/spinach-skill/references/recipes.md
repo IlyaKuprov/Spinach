@@ -411,8 +411,10 @@ Optimal control of a quadrupolar nucleus under MAS in Hilbert space is the
 conversion, and central-transition selective pulses). `mqmas_drifts.m` builds
 the rotor-phase-resolved drift Hamiltonians: a `zeeman-hilb` system with
 `labframe` assumptions, `hamiltonian` and `carrier`, all three Euler angles
-of a two-angle grid (the azimuth sits in `gammas`), the rotor rotation in the
-first angle, and `rotframe` to second order at every rotor phase tick; each
+of a two-angle grid (the azimuth sits in `gammas`; the grid must have uniform
+weights, such as the `rep_2ang_*` grids, because the optimal control ensemble
+is averaged without quadrature weights), the rotor rotation in the first
+angle, and `rotframe` to second order at every rotor phase tick; each
 ensemble member is one grid orientation at one initial rotor phase and goes
 into `control.drifts` as a cell array with one Hamiltonian per pulse slice, so
 the drifts are time-dependent and the ensemble is grid points times rotor

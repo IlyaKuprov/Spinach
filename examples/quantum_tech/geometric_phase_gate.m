@@ -3,11 +3,13 @@
 % et al. (Nature 422, 412 (2003)) with two 9Be+ ions. Here a three-
 % ion chain in the same trap is simulated: a global force beam pair
 % detuned by delta from the stretch mode pushes the outer ions in op-
-% posite directions and leaves the middle ion untouched, so that the
-% outer ions acquire a state-dependent geometric phase while the mid-
-% dle ion is a spectator. The centre-of-mass and Egyptian modes of the
-% chain (frequencies from James, Appl. Phys. B 66, 181 (1998)) are far
-% off resonance but are kept in the simulation. The ion qubits are
+% posite directions, while the middle ion has zero amplitude in the
+% stretch mode eigenvector and so does not couple to that mode; the
+% outer ions acquire a state-dependent geometric phase and the middle
+% ion is a spectator. All three ions also couple to the centre-of-mass
+% and Egyptian modes of the chain (frequencies from James, Appl. Phys.
+% B 66, 181 (1998)), which are far off resonance with the drive but are
+% kept in the simulation with their proper force constants. The ion qubits are
 % treated as spin-1/2 particles, the motional modes as bosonic modes,
 % and the Hamiltonian is written in the frame rotating with the force
 % drive, where the spin-dependent force is a static longitudinal cou-
@@ -96,11 +98,11 @@ end
 % Plot the results
 time_axis=1e6*linspace(0,parameters.gate_time,parameters.npoints);
 kfigure(); scale_figure([2.0 0.75]);
-subplot(1,2,1); plot(time_axis,real(answer.sigma_x),'LineWidth',1.5);
-hold on; plot(time_axis,real(answer.stretch_pop),'LineWidth',1.5);
+subplot(1,2,1); plot(time_axis,answer.sigma_x,'LineWidth',1.5);
+hold on; plot(time_axis,answer.stretch_pop,'LineWidth',1.5);
 axis tight; kgrid; kxlabel('time, $\mu$s');
 klegend({'$\sigma_x$, ion 1','$\sigma_x$, ion 2','$\sigma_x$, ion 3','$\langle a^{+}a\rangle$, stretch'},'Location','best');
-subplot(1,2,2); plot(answer.phases/pi,real(answer.parity),'LineWidth',1.5);
+subplot(1,2,2); plot(answer.phases/pi,answer.parity,'LineWidth',1.5);
 axis tight; kgrid; kxlabel('analysis pulse phase, $\pi$ rad');
 kylabel('parity of ions 1 and 3');
 
@@ -124,8 +126,8 @@ rho=step(spin_system,Ly,parameters.rho0,pi/2);
 % State-dependent displacement over one closed loop of the stretch mode
 dt=parameters.gate_time/(parameters.npoints-1);
 traj=evolution(spin_system,L,[],rho,dt,parameters.npoints-1,'trajectory');
-answer.sigma_x=2*(coil_x'*traj)./(ones(3,1)*(unit'*traj));
-answer.stretch_pop=(coil_n'*traj)./(unit'*traj);
+answer.sigma_x=real(2*(coil_x'*traj)./(ones(3,1)*(unit'*traj)));
+answer.stretch_pop=real((coil_n'*traj)./(unit'*traj));
 
 % Second pi/2 pulse turns the phase-gated state into a GHZ-type state of the outer ions
 rho=step(spin_system,Ly,traj(:,end),pi/2);
@@ -134,7 +136,7 @@ rho=step(spin_system,Ly,traj(:,end),pi/2);
 answer.phases=linspace(0,2*pi,101); answer.parity=zeros(size(answer.phases));
 for n=1:numel(answer.phases)
     rho_an=step(spin_system,cos(answer.phases(n))*Lx+sin(answer.phases(n))*Ly,rho,pi/2);
-    answer.parity(n)=4*(coil_p'*rho_an)/(unit'*rho_an);
+    answer.parity(n)=real(4*(coil_p'*rho_an)/(unit'*rho_an));
 end
 
 end

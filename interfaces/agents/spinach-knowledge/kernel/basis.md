@@ -76,7 +76,7 @@ Basis set control. This is the second mandatory function (after create.m) that m
 
 - Line 57: conditional branch on `strcmp(spin_system.bas.formalism,'sphten-liouv')`.
 - Line 68: conditional branch on `strcmp(spin_system.bas.approximation,'IK-DNP')`.
-- Line 113: conditional branch on `ismember(spin_system.bas.approximation,{'IK-1','IK-2'})`.
+- Line 116: conditional branch on `ismember(spin_system.bas.approximation,{'IK-1','IK-2','IK-SBS'})`.
 - Line 273: conditional branch on `isfield(bas,'longitudinal')`.
 - Line 308: `for` loop over `s=1:nsubst`.
 - Line 316: dispatches on `spin_system.bas.approximation`; cases `'none'`, `'IK-0'`, `'IK-1'`, `'IK-2'`, `'IK-DNP'`, `'IK-SBS'`.

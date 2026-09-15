@@ -97,6 +97,7 @@ approximations then have their own required fields and cross-rules:
 | `bas.inter_level is only applicable to IK-0,1,2,DNP,SBS basis sets.` | Do not set IK fields with `approximation='none'`; the same rule exists for `bas.prox_level` (IK-1/2 only) and `bas.connectivity` (IK-1/2 and IK-SBS only). |
 | `bas.approximation should be set to 'none' in zeeman-hilb formalism.` | Hilbert space is always complete. |
 | `IK-DNP approximation requires both electrons and nuclei.` | IK-DNP is for electron-nuclear systems only. |
+| `IK-1 and IK-2 basis sets are for spin-only systems, use IK-SBS when bosonic modes are present.` | Any `C`, `V`, or `T` particle in `sys.isotopes` rules out IK-1 and IK-2; use IK-SBS or `none`. |
 | `bas.inter_level(1) cannot exceed the number of bosonic modes in the system.` | IK-SBS needs bosonic modes (`C`, `V`, `T` particles) as well as spins; the three levels are bounded by the numbers of modes, particles, and spins respectively. |
 | `multiplicities above 16 are not supported by sphten-liouv formalism.` | Very high spins need a different formalism. |
 

@@ -120,36 +120,83 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
                 % Update the user
                 report(spin_system,'scalar couplings will be used to build the coupling graph.');
 
-                % Compute the norms of the isotropic parts of all interactions
-                inter_norm=abs(cellfun(@trace,spin_system.inter.coupling.matrix)/3);
+                % Norm of the isotropic part of an interaction tensor
+                tensor_norm=@(x)abs(trace(x)/3);
 
             case 'full_tensors'
 
                 % Update the user
                 report(spin_system,'full coupling tensors will be used to build the coupling graph.');
 
-                % Compute full norms of all interactions
-                inter_norm=cellfun(@(x)norm(x,2),spin_system.inter.coupling.matrix);
+                % Full norm of an interaction tensor
+                tensor_norm=@(x)norm(x,2);
 
         end
 
         % Build the interaction graph connectivity matrix
+        inter_norm=cellfun(tensor_norm,spin_system.inter.coupling.matrix);
         spin_system.inter.conmatrix=sparse(inter_norm>2*pi*spin_system.tols.inter_cutoff);
 
         % Bosonic mode connectivity
         if isfield(spin_system.inter,'modes')
 
-            % Bosonic interaction fields list
-            chan_flds={'exchange','dispersive','kerr','longitudinal','coupling_mod','zeeman_mod'};
-            
-            % No connectivity initially
-            mode_conmat=false(spin_system.comp.nspins);
+            % Pairwise bosonic interaction fields list
+            chan_flds={'exchange','dispersive','kerr','longitudinal'};
 
-            % Over interaction types
+            % Largest pairwise coupling norm between modes and between modes and spins
+            mode_norm=zeros(spin_system.comp.nspins);
             for n=1:numel(chan_flds)
+                mode_norm=max(mode_norm,cellfun(@(x)norm(x,2),spin_system.inter.modes.(chan_flds{n})));
+            end
 
-                % Update the connectivity matrix
-                mode_conmat=mode_conmat|(~cellfun(@isempty,spin_system.inter.modes.(chan_flds{n})));
+            % Build the mode connectivity matrix
+            mode_conmat=mode_norm>2*pi*spin_system.tols.inter_cutoff;
+
+            % Over coupling tensor derivatives with respect to mode coordinates
+            [m1,m2]=find(~cellfun(@isempty,spin_system.inter.modes.coupling_mod));
+            for n=1:numel(m1)
+
+                % Over derivative orders
+                derivs=spin_system.inter.modes.coupling_mod{m1(n),m2(n)};
+                for m=1:numel(derivs)
+
+                    % Skip empty derivative orders
+                    if isempty(derivs{m}), continue; end
+
+                    % Spin pairs whose coupling derivative is above the cut-off
+                    [p,q]=find(cellfun(tensor_norm,derivs{m})>2*pi*spin_system.tols.inter_cutoff);
+
+                    % Connect the modes and the spin pair
+                    for k=1:numel(p)
+                        particles=[m1(n) m2(n) p(k) q(k)];
+                        mode_conmat(particles,particles)=true;
+                    end
+
+                end
+
+            end
+
+            % Over effective field derivatives with respect to mode coordinates
+            [m1,m2]=find(~cellfun(@isempty,spin_system.inter.modes.zeeman_mod));
+            for n=1:numel(m1)
+
+                % Over derivative orders
+                derivs=spin_system.inter.modes.zeeman_mod{m1(n),m2(n)};
+                for m=1:numel(derivs)
+
+                    % Skip empty derivative orders
+                    if isempty(derivs{m}), continue; end
+
+                    % Spins whose field derivative is above the cut-off
+                    p=find(cellfun(@(x)norm(x,2),derivs{m})>2*pi*spin_system.tols.inter_cutoff);
+
+                    % Connect the modes and the spin
+                    for k=1:numel(p)
+                        particles=[m1(n) m2(n) p(k)];
+                        mode_conmat(particles,particles)=true;
+                    end
+
+                end
 
             end
 
@@ -157,7 +204,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
             spin_system.inter.conmatrix=spin_system.inter.conmatrix|sparse(mode_conmat);
 
             % Update the user
-            report(spin_system,'bosonic mode couplings added to the coupling graph.');
+            report(spin_system,'bosonic mode couplings above the cut-off added to the coupling graph.');
 
         end
 

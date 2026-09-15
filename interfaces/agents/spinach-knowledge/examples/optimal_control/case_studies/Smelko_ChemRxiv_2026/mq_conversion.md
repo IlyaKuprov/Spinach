@@ -35,7 +35,7 @@ Optimal control design of the multiple-quantum conversion pulse of the z-filtere
 - Lines 65-66: Control operators; implemented by `Lx=operator(spin_system,'Lx','27Al')`.
 - Lines 69-70: Control parameters; implemented by `control.isotopes={'27Al'}`.
 - Lines 82-83: Plotting options; implemented by `control.plotting={'amp_controls','phi_controls','spectrogram'}`.
-- Lines 85-86: Random initial guess, amplitudes up to 10% of the ceiling; implemented by `amp=0.1*rand(1,480); phi=2*pi*rand(1,480); amp(randi(480))=1`.
+- Lines 85-86: Random initial guess, amplitudes up to 10% of the ceiling with one slice at the ceiling; implemented by `amp=0.1*rand(1,480); phi=2*pi*rand(1,480); amp(randi(480))=1`.
 - Lines 89-90: Spinach housekeeping; implemented by `spin_system=optimcon(spin_system,control)`.
 - Lines 92-93: Run the optimisation; implemented by `pulse=fmaxnewton(spin_system,@grape_xy,guess)`.
 - Lines 95-96: Clip the amplitude to the ceiling; implemented by `[amp,phi]=cartesian2polar(pulse(1,:),pulse(2,:)); amp=min(amp,1)`.

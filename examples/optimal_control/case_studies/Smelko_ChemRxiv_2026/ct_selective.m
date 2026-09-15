@@ -76,7 +76,7 @@ control.max_iter=500;                      % Termination condition
 % Plotting options
 control.plotting={'amp_controls','phi_controls','spectrogram'};
 
-% Random initial guess, amplitudes up to 10% of the ceiling
+% Random initial guess, amplitudes up to 10% of the ceiling with one slice at the ceiling
 amp=0.1*rand(1,100); phi=2*pi*rand(1,100); amp(randi(100))=1;
 guess=[amp.*cos(phi); amp.*sin(phi)];
 

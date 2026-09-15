@@ -17,8 +17,8 @@
 % crystallite orientations at 32 initial rotor phases each. Hard
 % pulses have the durations optimised in the paper. Optimal control
 % waveforms are read from the files written by mq_excitation.m,
-% mq_conversion.m, and ct_selective.m examples; the files supplied
-% in this folder were produced by those examples on 128 cores.
+% mq_conversion.m, and ct_selective.m examples, which must there-
+% fore be run first, for both coherence orders.
 %
 % Calculation time: minutes on 128 cores.
 %

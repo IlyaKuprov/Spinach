@@ -34,7 +34,7 @@ Optimal control design of the central transition selective pulse of the z-filter
 - Lines 59-60: Control operators; implemented by `Lx=operator(spin_system,'Lx','27Al')`.
 - Lines 63-64: Control parameters; implemented by `control.isotopes={'27Al'}`.
 - Lines 76-77: Plotting options; implemented by `control.plotting={'amp_controls','phi_controls','spectrogram'}`.
-- Lines 79-80: Random initial guess, amplitudes up to 10% of the ceiling; implemented by `amp=0.1*rand(1,100); phi=2*pi*rand(1,100); amp(randi(100))=1`.
+- Lines 79-80: Random initial guess, amplitudes up to 10% of the ceiling with one slice at the ceiling; implemented by `amp=0.1*rand(1,100); phi=2*pi*rand(1,100); amp(randi(100))=1`.
 - Lines 83-84: Spinach housekeeping; implemented by `spin_system=optimcon(spin_system,control)`.
 - Lines 86-87: Run the optimisation; implemented by `pulse=fmaxnewton(spin_system,@grape_xy,guess)`.
 - Lines 89-90: Clip the amplitude to the ceiling; implemented by `[amp,phi]=cartesian2polar(pulse(1,:),pulse(2,:)); amp=min(amp,1)`.

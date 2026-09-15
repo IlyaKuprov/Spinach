@@ -14,7 +14,9 @@
 %    parameters.axis     - spinning axis, a normalised row
 %                          vector with three elements
 %
-%    parameters.grid     - two-angle powder grid name
+%    parameters.grid     - two-angle powder grid name; the grid
+%                          must have uniform weights because the
+%                          ensemble average in optimcon is unweighted
 %
 %    parameters.n_ticks  - rotor phase ticks per rotor period
 %
@@ -51,7 +53,12 @@ C=carrier(spin_system,parameters.spins{1});
 
 % Load the spherical integration grid
 sph_grid=load([spin_system.sys.root_dir filesep 'kernel' filesep 'grids' ...
-               filesep parameters.grid],'alphas','betas','gammas');
+               filesep parameters.grid],'alphas','betas','gammas','weights');
+
+% Uniformly weighted grids only, the ensemble average is unweighted
+if any(abs(sph_grid.weights-sph_grid.weights(1))>1e-12)
+    error('the powder grid must have uniform weights.');
+end
 
 % Get rotor axis orientation
 [rotor_phi,rotor_theta,~]=cart2sph(parameters.axis(1),...

@@ -73,10 +73,11 @@ else
 end
 hard_amps=2*pi*[100e3 100e3 9.3e3];
 
-% Hard pulses sliced at the drift tick interval
-hard_pulses=cell(1,3);
+% Hard pulses sliced at the absolute drift tick boundaries
+hard_pulses=cell(1,3); pulse_edges=[0 cumsum(hard_durs)];
 for k=1:3
-    slice_durs=[tick_dt*ones(1,floor(hard_durs(k)/tick_dt)) mod(hard_durs(k),tick_dt)];
+    tick_edges=tick_dt*(ceil(pulse_edges(k)/tick_dt):floor(pulse_edges(k+1)/tick_dt));
+    slice_durs=diff([pulse_edges(k) tick_edges pulse_edges(k+1)]);
     slice_durs=slice_durs(slice_durs>1e-12);
     hard_pulses{k}={hard_amps(k)*[ones(1,numel(slice_durs)); zeros(1,numel(slice_durs))],slice_durs};
 end

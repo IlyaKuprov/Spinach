@@ -8,16 +8,19 @@
 % elding anisotropy assumed in the paper (CQ=3.0 MHz, eta=1.0, 10
 % ppm axial shielding anisotropy) is spun at 12.5 kHz in a 400 MHz
 % magnet. The quadrupolar interaction is taken to second order in
-% the rotating frame, and the powder average runs over 100 crystal-
-% lite orientations at 20 initial rotor phases each. The pulse is
+% the rotating frame, and the powder average runs over 200 crystal-
+% lite orientations at 80 initial rotor phases each. The pulse is
 % 50 us long in 0.5 us slices, the controls are Cartesian, and the
 % 10 kHz amplitude ceiling is enforced by a spillout penalty follo-
 % wed by clipping. The initial state is the population difference
 % across the central transition, and the target is the single-qu-
 % antum coherence of the central transition, as in the paper. The
-% resulting waveform is saved for the MQMAS efficiency calculation.
+% resulting waveform is saved for the MQMAS efficiency calculation;
+% the waveform supplied in this folder reached a fidelity of 0.70
+% after 500 iterations, against the maximum of 1/sqrt(2) for this
+% initial and target state pair.
 %
-% Calculation time: minutes on 128 cores.
+% Calculation time: about an hour on 128 cores.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -44,9 +47,9 @@ spin_system=assume(spin_system,'labframe');
 % Rotor phase resolved drift Hamiltonians
 parameters.spins={'27Al'};
 parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
-parameters.grid='rep_2ang_100pts_sph';
+parameters.grid='rep_2ang_200pts_sph';
 parameters.n_ticks=160;
-parameters.n_phases=20;
+parameters.n_phases=80;
 parameters.n_slices=100;
 control.drifts=mqmas_drifts(spin_system,parameters);
 

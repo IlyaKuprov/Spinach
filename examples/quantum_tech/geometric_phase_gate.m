@@ -74,7 +74,6 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.rho0=state(spin_system,{'ZL1','ZL1','ZL1','BL1','BL1','BL1'},{1,2,3,4,5,6});
 parameters.mode_offset=[drive_frq drive_frq drive_frq];
-parameters.sweep=4e7;
 parameters.npoints=1561;
 parameters.gate_time=1/delta;
 
@@ -89,9 +88,9 @@ if abs(answer.stretch_pop(end))>1e-2
     error('stretch mode did not return to its ground state.');
 end
 
-% Validate the entangling phase: parity amplitude of the outer ions
-if abs(max(answer.parity)-1)>2e-2
-    error('parity signal amplitude is not consistent with a pi/2 geometric phase.');
+% Validate the entangling phase: parity contrast of the outer ions
+if abs((max(answer.parity)-min(answer.parity))/2-1)>2e-2
+    error('parity contrast is not consistent with a pi/2 geometric phase.');
 end
 
 % Plot the results
@@ -107,7 +106,7 @@ kylabel('parity of ions 1 and 3');
 
 end
 
-% State-dependent displacement sandwiched between two global pi/2 pulses
+% State-dependent displacement between two global pi/2 pulses, then a parity scan
 function answer=gate_sequence(spin_system,parameters,H,R,K)
 
 % Compose the Liouvillian
@@ -122,16 +121,19 @@ coil_p=state(spin_system,{'Lz','Lz'},{1,3}); unit=state(spin_system,{'E'},{1});
 % First pi/2 pulse puts every ion along +x
 rho=step(spin_system,Ly,parameters.rho0,pi/2);
 
-% State-dependent displacement
-dt=1/parameters.sweep;
+% State-dependent displacement over one closed loop of the stretch mode
+dt=parameters.gate_time/(parameters.npoints-1);
 traj=evolution(spin_system,L,[],rho,dt,parameters.npoints-1,'trajectory');
 answer.sigma_x=2*(coil_x'*traj)./(ones(3,1)*(unit'*traj));
 answer.stretch_pop=(coil_n'*traj)./(unit'*traj);
 
+% Second pi/2 pulse turns the phase-gated state into a GHZ-type state of the outer ions
+rho=step(spin_system,Ly,traj(:,end),pi/2);
+
 % Parity of the outer ions after an analysis pi/2 pulse of variable phase
 answer.phases=linspace(0,2*pi,101); answer.parity=zeros(size(answer.phases));
 for n=1:numel(answer.phases)
-    rho_an=step(spin_system,cos(answer.phases(n))*Lx+sin(answer.phases(n))*Ly,traj(:,end),pi/2);
+    rho_an=step(spin_system,cos(answer.phases(n))*Lx+sin(answer.phases(n))*Ly,rho,pi/2);
     answer.parity(n)=4*(coil_p'*rho_an)/(unit'*rho_an);
 end
 

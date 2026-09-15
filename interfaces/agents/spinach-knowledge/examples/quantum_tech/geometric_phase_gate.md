@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/geometric_phase_gate.m`
 - Signature: `geometric_phase_gate()`
-- Total lines: 139
+- Total lines: 141
 
 ## Purpose
 
@@ -12,12 +12,12 @@ Geometric phase gate between two trapped-ion qubits driven by a state-dependent 
 
 - Ion qubits are spin-1/2 particles, the three axial normal modes of the chain (stretch at 6.1 MHz, centre-of-mass at stretch/sqrt(3), Egyptian at sqrt(29/5) times centre-of-mass, James, Appl. Phys. B 66, 181 (1998)) are bosonic modes `V6`, `V3`, `V3`; the spin-dependent force is a static `inter.modes.longitudinal` coupling in the frame rotating with the force drive, and the mode frequencies are laboratory values brought into that frame by `parameters.mode_offset` of the device context under the `spin-phonon` assumption set.
 - The stretch mode force constant `kappa=delta/4` closes the phase-space loop at `T=1/delta` with a pi/2 differential geometric phase between the outer ions; the force constants of the other modes follow from the normal mode vectors and the 1/sqrt(frequency) scaling of the zero-point motion.
-- Observables are normalised by the overlap with the unit state so that they are true expectation values; the parity of the outer ions after an analysis pi/2 pulse of variable phase reproduces the measurement of Leibfried et al.
+- Observables are normalised by the overlap with the unit state so that they are true expectation values; a second global pi/2 pulse turns the phase-gated state into a GHZ-type state of the outer ions, and their parity after an analysis pi/2 pulse of variable phase oscillates with full contrast, the measurement of Leibfried et al.
 
 ## Numerical / algorithmic content
 
 - Basis set `IK-SBS` with `bas.inter_level=[2 3 2]`: boson-boson, spin-boson, and spin-spin coupling graphs traced separately; pure spin-spin correlations up to order two are kept inside the spin-boson subgraphs, which carries the entangling phase. The complete basis for this system has 186624 states.
-- The pulse sequence is a local function passed to `device`: a global pi/2 pulse, a `evolution` trajectory over the state-dependent displacement, and a loop of analysis pulses for the parity scan.
+- The pulse sequence is a local function passed to `device`: a global pi/2 pulse, an `evolution` trajectory over one closed loop of the stretch mode (`dt=gate_time/(npoints-1)`), a second global pi/2 pulse, and a loop of analysis pulses for the parity scan.
 
 ## Code-derived implementation details
 
@@ -33,14 +33,15 @@ Geometric phase gate between two trapped-ion qubits driven by a state-dependent 
 - Lines 53-62: Spin-dependent forces, Spinach convention Lz(a+a')/sqrt(2); implemented by `inter.modes.longitudinal=cell(6,6);`.
 - Lines 64-68: Basis set; implemented by `bas.formalism='sphten-liouv';`.
 - Lines 70-72: Spinach housekeeping; implemented by `spin_system=create(sys,inter);`.
-- Lines 74-79: Sequence parameters; implemented by `parameters.rho0=state(spin_system,{'ZL1','ZL1','ZL1','BL1','BL1','BL1'},{1,2,3,4,5,6});`.
-- Lines 81-82: Run the gate through the device context in the frame of the force drive; implemented by `answer=device(spin_system,@gate_sequence,parameters,'spin-phonon');`.
-- Lines 84-90: Validate the spectator ion and the closure of the motional loop; implemented by `if abs(answer.sigma_x(2,end)-answer.sigma_x(2,1))>1e-2`.
-- Lines 92-95: Validate the entangling phase: parity amplitude of the outer ions; implemented by `if abs(max(answer.parity)-1)>2e-2`.
-- Lines 97-106: Plot the results; implemented by `time_axis=1e6*linspace(0,parameters.gate_time,parameters.npoints);`.
-- Lines 110-111: State-dependent displacement sandwiched between two global pi/2 pulses; implemented by `function answer=gate_sequence(spin_system,parameters,H,R,K)`.
-- Lines 113-114: Compose the Liouvillian; implemented by `L=H+1i*R+1i*K;`.
-- Lines 116-120: Global rotation generators, observables, and the unit state for normalisation; implemented by `Lx=operator(spin_system,'Lx','E'); Ly=operator(spin_system,'Ly','E');`.
-- Lines 122-123: First pi/2 pulse puts every ion along +x; implemented by `rho=step(spin_system,Ly,parameters.rho0,pi/2);`.
-- Lines 125-129: State-dependent displacement; implemented by `dt=1/parameters.sweep;`.
-- Lines 131-136: Parity of the outer ions after an analysis pi/2 pulse of variable phase; implemented by `answer.phases=linspace(0,2*pi,101); answer.parity=zeros(size(answer.phases));`.
+- Lines 74-78: Sequence parameters; implemented by `parameters.rho0=state(spin_system,{'ZL1','ZL1','ZL1','BL1','BL1','BL1'},{1,2,3,4,5,6});`.
+- Lines 80-81: Run the gate through the device context in the frame of the force drive; implemented by `answer=device(spin_system,@gate_sequence,parameters,'spin-phonon');`.
+- Lines 83-89: Validate the spectator ion and the closure of the motional loop; implemented by `if abs(answer.sigma_x(2,end)-answer.sigma_x(2,1))>1e-2`.
+- Lines 91-94: Validate the entangling phase: parity contrast of the outer ions; implemented by `if abs((max(answer.parity)-min(answer.parity))/2-1)>2e-2`.
+- Lines 96-105: Plot the results; implemented by `time_axis=1e6*linspace(0,parameters.gate_time,parameters.npoints);`.
+- Lines 109-110: State-dependent displacement between two global pi/2 pulses, then a parity scan; implemented by `function answer=gate_sequence(spin_system,parameters,H,R,K)`.
+- Lines 112-113: Compose the Liouvillian; implemented by `L=H+1i*R+1i*K;`.
+- Lines 115-119: Global rotation generators, observables, and the unit state for normalisation; implemented by `Lx=operator(spin_system,'Lx','E'); Ly=operator(spin_system,'Ly','E');`.
+- Lines 121-122: First pi/2 pulse puts every ion along +x; implemented by `rho=step(spin_system,Ly,parameters.rho0,pi/2);`.
+- Lines 124-128: State-dependent displacement over one closed loop of the stretch mode; implemented by `dt=parameters.gate_time/(parameters.npoints-1);`.
+- Lines 130-131: Second pi/2 pulse turns the phase-gated state into a GHZ-type state of the outer ions; implemented by `rho=step(spin_system,Ly,traj(:,end),pi/2);`.
+- Lines 133-138: Parity of the outer ions after an analysis pi/2 pulse of variable phase; implemented by `answer.phases=linspace(0,2*pi,101); answer.parity=zeros(size(answer.phases));`.

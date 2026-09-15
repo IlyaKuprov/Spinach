@@ -223,7 +223,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
         if strcmp(spin_system.bas.approximation,'IK-SBS')
 
             % Make sure there are both spins and bosonic modes
-            if (nnz(b_idx)==0)||(nnz(~b_idx)==0)
+            if (nnz(b_idx)==0)||(nnz((~b_idx)&(spin_system.comp.mults>1))==0)
                 error('IK-SBS approximation requires both spins and bosonic modes.');
             end
 
@@ -832,15 +832,15 @@ if strcmp(bas.formalism,'sphten-liouv')
            any(mod(bas.inter_level,1)~=0,'all')||any(bas.inter_level<1,'all')
             error('bas.inter_level must be a vector with three positive integers.');
         end
-        n_modes=nnz(ismember(spin_system.comp.types,{'C','V','T'}));
-        n_particles=numel(spin_system.comp.isotopes);
+        mode_mask=ismember(spin_system.comp.types,{'C','V','T'});
+        n_modes=nnz(mode_mask); n_spins=nnz((~mode_mask)&(spin_system.comp.mults>1));
         if bas.inter_level(1)>n_modes
             error('bas.inter_level(1) cannot exceed the number of bosonic modes in the system.');
         end
-        if bas.inter_level(2)>n_particles
+        if bas.inter_level(2)>n_modes+n_spins
             error('bas.inter_level(2) cannot exceed the number of particles in the system.');
         end
-        if bas.inter_level(3)>n_particles-n_modes
+        if bas.inter_level(3)>n_spins
             error('bas.inter_level(3) cannot exceed the number of spins in the system.');
         end
     end

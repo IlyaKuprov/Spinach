@@ -15,7 +15,10 @@
 % wed by clipping. The initial state is the population difference
 % across the central transition, and the target is the single-qu-
 % antum coherence of the central transition, as in the paper. The
-% resulting waveform is saved for the MQMAS efficiency calculation.
+% resulting waveform is saved for the MQMAS efficiency calculation;
+% the waveform supplied in this folder reached a fidelity of 0.69
+% after 500 iterations, against the maximum of 1/sqrt(2) for this
+% initial and target state pair.
 %
 % Calculation time: about an hour on 128 cores.
 %

@@ -17,13 +17,14 @@
 % crystallite orientations at 32 initial rotor phases each. Hard
 % pulses have the durations optimised in the paper. Optimal control
 % waveforms are read from the files written by mq_excitation.m,
-% mq_conversion.m, and ct_selective.m examples, which must there-
-% fore be run first, for both coherence orders; the files supplied
-% in this folder were produced by those examples on 128 cores. With
-% these waveforms, the 3QMAS efficiency is 0.071 with hard pulses
-% and 0.419 with optimal control pulses, and the 5QMAS efficiency
-% is 0.0109 and 0.258, respectively: signal enhancement factors of
-% 5.9 and 23.8, against 5.7 and 25 simulated in the paper.
+% mq_conversion.m, and ct_selective.m examples for both coherence
+% orders; the files supplied in this folder were produced by those
+% examples on 128 cores and only need rerunning if the optimisati-
+% ons are changed. With these waveforms, the 3QMAS efficiency is
+% 0.071 with hard pulses and 0.419 with optimal control pulses, and
+% the 5QMAS efficiency is 0.0109 and 0.258, respectively: signal
+% enhancement factors of 5.9 and 23.8, against 5.7 and 25 simulated
+% in the paper.
 %
 % Calculation time: minutes on 128 cores.
 %

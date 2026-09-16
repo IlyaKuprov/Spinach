@@ -1,11 +1,11 @@
 # Spinach code index: examples
 
 - Source root: `/home/kuprov/.openclaw/workspace/Spinach`
-- Source commit: `3aa519c5d5416f08f3a67e4f459850297adcc213`
+- Source commit: `ac6136149e438077587b302a1e92d0371b099f20`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
 - Files indexed: **761** MATLAB files
-- Generated: 2026-09-16T03:22:19
+- Generated: 2026-09-16T03:34:56
 
 | File | Signature | Summary | LOC |
 |---|---|---|---:|
@@ -603,7 +603,7 @@
 | `examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mq_conversion.m` | `mq_conversion()` | Optimal control design of the multiple-quantum conversion pulse of the z-filtered 27Al MQMAS experiment. Reproduces, usi | 110 |
 | `examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mq_excitation.m` | `mq_excitation()` | Optimal control design of the multiple-quantum excitation pulse of the z-filtered 27Al MQMAS experiment. Reproduces, usi | 110 |
 | `examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_drifts.m` | `drifts=mqmas_drifts(spin_system,parameters)` | Drift Hamiltonians of a quadrupolar nucleus under magic angle spin- ning, resolved in rotor phase, for every combination | 193 |
-| `examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_efficiency.m` | `mqmas_efficiency()` | Efficiency of the z-filtered 27Al MQMAS pulse sequence with hard pulses and with the optimal control pulses produced by  | 149 |
+| `examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_efficiency.m` | `mqmas_efficiency()` | Efficiency of the z-filtered 27Al MQMAS pulse sequence with hard pulses and with the optimal control pulses produced by  | 150 |
 | `examples/optimal_control/case_studies/Tosner_JMR_2009/bb_inversion_pulse.m` | `bb_inversion_pulse()` | Broadband inversion pulse design for liquid-state NMR. Reprodu- ces, using Spinach, the second example from: A single pr | 101 |
 | `examples/optimal_control/case_studies/Tosner_JMR_2009/bb_refocusing_pulse.m` | `bb_refocusing_pulse()` | Spinach implementation of the broadband refocusing example from GRAPE is used to design a 200 µs broadband x-phase π pul | 97 |
 | `examples/optimal_control/case_studies/Tosner_JMR_2009/coherence_transfer.m` | `coherence_transfer()` | The first optimal control example from A heteronuclear two-spin system (1H–13C) with an scalar and both nuclei set on re | 79 |

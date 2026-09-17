@@ -51,7 +51,7 @@ parameters.grid='rep_2ang_200pts_sph';
 parameters.n_ticks=160;
 parameters.n_phases=80;
 parameters.n_slices=100;
-control.drifts=mqmas_drifts(spin_system,parameters);
+control.drifts=mas_drifts(spin_system,parameters);
 
 % Initial state, population difference across the central transition
 rho_init=diag([0 0 1 -1 0 0]); rho_init=rho_init/norm(rho_init,'fro');

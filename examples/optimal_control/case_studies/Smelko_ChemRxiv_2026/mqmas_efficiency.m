@@ -60,7 +60,7 @@ parameters.grid='rep_2ang_400pts_sph';
 parameters.n_ticks=160;
 parameters.n_phases=32;
 parameters.n_slices=1060;
-drifts=mqmas_drifts(spin_system,parameters);
+drifts=mas_drifts(spin_system,parameters);
 tick_dt=0.5e-6;
 
 % Initial state, Iz

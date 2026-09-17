@@ -54,7 +54,7 @@ parameters.grid='rep_2ang_200pts_sph';
 parameters.n_ticks=160;
 parameters.n_phases=80;
 parameters.n_slices=480;
-control.drifts=mqmas_drifts(spin_system,parameters);
+control.drifts=mas_drifts(spin_system,parameters);
 
 % Initial state, Iz
 rho_init=state(spin_system,'Lz','27Al');

@@ -55,7 +55,7 @@ parameters.grid='rep_2ang_200pts_sph';
 parameters.n_ticks=160;
 parameters.n_phases=80;
 parameters.n_slices=480;
-control.drifts=mqmas_drifts(spin_system,parameters);
+control.drifts=mas_drifts(spin_system,parameters);
 
 % Initial state, symmetric MQ coherence between m=+mq_order/2 and m=-mq_order/2
 rho_init=zeros(6); rho_init(3.5-mq_order/2,3.5+mq_order/2)=1;

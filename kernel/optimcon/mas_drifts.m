@@ -1,10 +1,10 @@
-% Drift Hamiltonians of a quadrupolar nucleus under magic angle spin-
-% ning, resolved in rotor phase, for every combination of a two-angle
-% powder grid orientation and an initial rotor phase. The Hamiltonian
-% is taken to second order in the rotating frame of the nucleus, and
-% is held constant within each rotor phase tick. Syntax:
+% Drift Hamiltonians under magic angle spinning, resolved in rotor
+% phase, for every combination of a two-angle powder grid orienta-
+% tion and an initial rotor phase. The Hamiltonian is taken to se-
+% cond order in the rotating frame of the nucleus, and is held 
+% constant within each rotor phase tick. Syntax:
 %
-%             drifts=mqmas_drifts(spin_system,parameters)
+%              drifts=mas_drifts(spin_system,parameters)
 %
 % Parameters:
 %
@@ -40,7 +40,7 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function drifts=mqmas_drifts(spin_system,parameters)
+function drifts=mas_drifts(spin_system,parameters)
 
 % Check consistency
 grumble(spin_system,parameters);

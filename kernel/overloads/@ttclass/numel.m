@@ -12,7 +12,7 @@
 %     n  - an integer
 %
 % Note: for large spin systems, the result may be too large
-%       to fit into the 64-bit integer.
+%       to be represented exactly as a double.
 %
 % d.savostyanov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -24,13 +24,16 @@ function n=numel(tt)
 % Check consistency
 grumble(tt);
 
-% Compute the number of elements
-n=prod(prod(sizes(tt)));
+% Compute the number of elements exactly
+n=prod(int64(sizes(tt)),'all','native');
 
-% Check for infinities
-if n>intmax
-    error('the number of elements exceeds Matlab''s intmax.');
+% Check for overflow
+if n>flintmax
+    error('the number of elements exceeds Matlab''s flintmax.');
 end
+
+% Return a double
+n=double(n);
 
 end
 

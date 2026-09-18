@@ -348,7 +348,7 @@ format".
 magres v1.0 file (CASTEP, Quantum ESPRESSO GIPAW) and returns `std_geom`
 (angstrom), `symbols`, `natoms`, and, when the file has them, `cst` (shielding
 relative to the bare nucleus in vacuum, ppm, in the printed component order),
-`efg` (a.u.⁻³), and `k_couplings` (isotropic reduced couplings from the `isc`
+`efg` (a.u.), and `k_couplings` (isotropic reduced couplings from the `isc`
 records, in the same units as `gparse`, so that `g2spinach` converts them into
 J-couplings for the isotopes it is given). Tensors are matched to atoms by
 label and index, so a file whose `ms` records are reordered or partial still

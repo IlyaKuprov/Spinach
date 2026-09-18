@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/castep/c2spinach.m`
 - Signature: `props=c2spinach(file_name)`
-- Total lines: 181
+- Total lines: 197
 
 ## Purpose
 
@@ -18,8 +18,8 @@ Parser for .magres files written by CASTEP and other codes in the CCP-NC magres 
 
 - Every record is matched with a regular expression that spells out the field count and the number syntax; a record with the right tag and the wrong shape is an error rather than a silently shifted tensor.
 - Block tags (`[atoms]`, `[magres]`, also the angle-bracket form) are located first; nested, unbalanced, missing, or repeated [atoms] and [magres] blocks are errors. Everything outside those two blocks, including the `[magres_old]` block CASTEP appends, is ignored.
-- Units records for atom, ms, efg, and isc are checked against the standard units and anything else is an error.
-- The file contains an explicit `grumble(...)` validator for the input argument.
+- Units records for atom, ms, efg, and isc are checked against the standard units and anything else is an error; an absent units record means the standard unit, as the specification prescribes.
+- The file contains an explicit `grumble(...)` validator for the input argument and a local key resolver shared by the ms, efg, and isc records.
 
 ## Code-derived implementation details
 
@@ -31,13 +31,14 @@ Parser for .magres files written by CASTEP and other codes in the CCP-NC magres 
 - Lines 88-97: Check the units of the records that are read below; implemented by matching `^units\s+(\S+)\s+(\S+)$` inside the two blocks against Angstrom, ppm, au, and 10^19.T^2.J^-1.
 - Lines 99-100: Regular expressions for a number and for a 3x3 tensor; implemented by `num_pat='([-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?)'` and `ten_pat=repmat(['\s+' num_pat],1,9)`.
 - Lines 102-110: Atom records: species, label, index in label, and coordinates; implemented by matching `^atom\s+(\S+)\s+(\S+)\s+(\d+)` plus three numbers; a malformed atom record or an empty atom list is an error.
-- Lines 112-115: Atom keys, delimited and glued, for matching the tensor records; implemented by `atom_keys=strcat(label,{' '},index)` and `glued_keys=strcat(label,index)`; duplicate keys are an error.
-- Lines 117-142: Shielding and EFG records, matched to the atoms by label and index; a record that has label, index, and nine numbers is keyed directly, a record with the label and index glued into one token (the CASTEP printing bug for indices with three or more digits) is keyed through `glued_keys`; a record that matches no atom or several atoms, or a repeated record for the same atom, is an error. `props.cst` and `props.efg` are returned only when at least one tensor was found.
-- Lines 146-165: Reduced spin-spin coupling records, isotropic parts in gparse units; self-coupling records are skipped, the isotropic parts of K(A,B) and K(B,A) are averaged when both are present, and `props.k_couplings` is returned only when isc records exist.
+- Lines 112-115: Atom keys, delimited and glued, with canonical indices; implemented by `atom_index=cellfun(@(x)num2str(str2double(x)),atom_tokens(:,3),'UniformOutput',false)`, `atom_keys=strcat(label,{' '},atom_index)`, and `glued_keys=strcat(label,atom_index)`, so that a zero-padded index matches the same unpadded index; duplicate keys are an error.
+- Lines 117-137: Shielding and EFG records, matched to the atoms by label and index; the identity tokens of each record (one glued token, or label and index) are resolved by `key_atoms`; a record that matches no atom or several atoms, or a repeated record for the same atom, is an error. `props.cst` and `props.efg` are returned only when at least one tensor was found.
+- Lines 139-159: Reduced spin-spin coupling records, isotropic parts in gparse units; the two to four identity tokens are resolved by `key_atoms` into an atom pair, self-coupling records are skipped, the isotropic parts of K(A,B) and K(B,A) are averaged when both are present, and `props.k_couplings` is returned only when isc records exist.
 
 ### Local helper functions
 
-- Line 170: `grumble()` — `function grumble(file_name)`; checks that the file name is a character string.
+- Line 164: `key_atoms()` — `function atoms=key_atoms(id_tokens,atom_keys,glued_keys,natoms_needed)`; tries every split of the identity tokens into delimited (label, index) and glued (labelindex) keys, and returns one row of atom numbers per split under which every key matches exactly one atom, so that the caller can refuse records with no match or an ambiguous match.
+- Line 186: `grumble()` — `function grumble(file_name)`; checks that the file name is a character string.
 
 ## Parameters / inputs
 
@@ -56,5 +57,5 @@ Parser for .magres files written by CASTEP and other codes in the CCP-NC magres 
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `grumble()`, `fopen()`, `textscan()`, `fclose()`, `strtrim()`, `regexprep()`, `regexp()`, `cellfun()`, `strcmp()`, `strcat()`, `str2double()`, `reshape()`, `unique()`, `ischar()`.
-- Consumers in the repository: `examples/nmr_solids/case_studies/mathies_14n_13c/*`, `examples/nmr_solids/case_studies/mathies_carbonate/*`, `examples/visualisation/efg_silicate.m` (through `efg_display`), and `g2spinach` for `cst` and `k_couplings`.
+- Called routines detected from the main body: `grumble()`, `key_atoms()`, `fopen()`, `textscan()`, `fclose()`, `strtrim()`, `regexprep()`, `regexp()`, `cellfun()`, `strcmp()`, `strcat()`, `strsplit()`, `str2double()`, `reshape()`, `unique()`, `isstrprop()`, `ischar()`.
+- Consumers in the repository: `examples/nmr_solids/case_studies/mathies_14n_13c/*`, `examples/nmr_solids/case_studies/mathies_carbonate/*`, `examples/visualisation/efg_silicate.m` (through `efg_display`), `g2spinach` for `cst` and `k_couplings`, and `tests/interfaces/test_c2spinach.m`.

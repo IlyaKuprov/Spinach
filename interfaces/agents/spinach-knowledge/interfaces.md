@@ -11,7 +11,7 @@
 |---|---|---|---:|
 | `interfaces/b2spinach.m` | `bdata=b2spinach(inpath)` | Imports time-domain NMR data recorded by Bruker instruments: reads the binary fid or ser file together with the acquisit | 464 |
 | `interfaces/bootstrap.m` | `spin_system=bootstrap(volume)` | A minimal spin_system structure required to call many Spinach functions. Use this function if your system is not a spin  | 66 |
-| `interfaces/castep/c2spinach.m` | `props=c2spinach(file_name)` | Parser for .magres files written by CASTEP and other codes in the CCP-NC magres v1.0 format. Reads the [atoms] and [magr | 181 |
+| `interfaces/castep/c2spinach.m` | `props=c2spinach(file_name)` | Parser for .magres files written by CASTEP and other codes in the CCP-NC magres v1.0 format. Reads the [atoms] and [magr | 197 |
 | `interfaces/comsol/comsol_conc.m` | `spin_system=comsol_conc(spin_system,file_name)` | Imports ASCII 2D concentration files produced by COMSOL. Syntax: spin_system=comsol_conc(spin_system,file_name) Paramete | 76 |
 | `interfaces/comsol/comsol_import.m` | `mesh=comsol_import(comsol)` | COMSOL 2D mesh data import, cropping and preprocessing for Spinach. Syntax: mesh=comsol_import(comsol) Parameters: comso | 100 |
 | `interfaces/comsol/comsol_mesh.m` | `mesh=comsol_mesh(file_name)` | Imports ASCII 2D mesh files produced by COMSOL. Syntax: mesh=comsol_mesh(file_name) Parameters: file_name -a character s | 146 |

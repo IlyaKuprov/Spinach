@@ -344,10 +344,17 @@ Its `props` can be handed to `g2spinach` or mined directly, as in
 `ocparse(filename,pad_factor)` reads ORCA spin-density cube files in "3D simple
 format".
 
-`c2spinach(file_name)` reads the new-format section of a CASTEP `.magres` file
-and returns `std_geom` (angstrom), `symbols`, `cst` (shielding relative to the
-bare nucleus in vacuum, ppm) and `efg` (a.u.⁻³). CASTEP shieldings must be
-referenced by hand, and EFGs converted:
+`c2spinach(file_name)` reads the `[atoms]` and `[magres]` blocks of a CCP-NC
+magres v1.0 file (CASTEP, Quantum ESPRESSO GIPAW) and returns `std_geom`
+(angstrom), `symbols`, `natoms`, and, when the file has them, `cst` (shielding
+relative to the bare nucleus in vacuum, ppm, in the printed component order),
+`efg` (a.u.⁻³), and `k_couplings` (isotropic reduced couplings from the `isc`
+records, in the same units as `gparse`, so that `g2spinach` converts them into
+J-couplings for the isotopes it is given). Tensors are matched to atoms by
+label and index, so a file whose `ms` records are reordered or partial still
+lands on the right atoms; atoms without a tensor get an empty cell. Test for
+optional fields with `isfield`. CASTEP shieldings must be referenced by hand,
+and EFGs converted:
 
 ```matlab
 props=c2spinach('mhc.magres');

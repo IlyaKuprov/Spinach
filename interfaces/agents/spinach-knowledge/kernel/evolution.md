@@ -162,8 +162,9 @@ Time evolution function. Performs all types of time propagation with automatic t
 
 ## Outputs
 
-- answer -a vector, a matrix, or a cell array or matrices,
-- depending on the options set during the call
+- answer -a vector, a matrix, a channels-by-time-by-states array,
+- or a cell array of matrices, depending on the options
+- set during the call
 - Calculation of final states and observables in Hilbert space is parallel-
 - ized and tested all the way to 128-core (16 nodes, 8 cores each) configu-
 - rations. Parallelization of the trajectory calculation does not appear to

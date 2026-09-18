@@ -24,8 +24,7 @@ Plotting utility for ultrafast constant-time 2D pulse sequences. Syntax: plot_uf
 - Lines 42-43: Check consistency; implemented by `grumble(spectrum_uf,parameters)`.
 - Lines 45-46: Get Ta (duration of one single acquisition gradient); implemented by `Ta=parameters.deltat*parameters.npoints`.
 - Lines 48-49: Get sweep width conventional dimension; implemented by `sweep_conv=1/(2*Ta)`.
-- Lines 51-52: Get resolution conventional dimension; implemented by `res_conv=1/(2*Ta*parameters.nloops)`.
-- Lines 54-55: Get axis in the conventional dimension; implemented by `axis_f2=(-sweep_conv/2:res_conv:sweep_conv/2-1)+parameters.offset(2)`.
+- Lines 51-52: Get axis in the conventional dimension; implemented by `axis_f2=sweep_conv*(-floor(parameters.nloops/2):(ceil(parameters.nloops/2)-1))/parameters.nloops+parameters.offset(2)`.
 - Lines 57-58: Get the magnetogyric ratio; implemented by `gamma=spin(parameters.spins{1})`.
 - Lines 60-61: Get kmax (maximal k-value); implemented by `k_max=gamma*parameters.Ga*Ta/(2*pi)`.
 - Lines 63-65: Get constant c (in according to Prog.Nucl.Magn.Reson.Spectrosc. 57,2010,241); implemented by `t_max=2*parameters.Te`.
@@ -49,8 +48,7 @@ Plotting utility for ultrafast constant-time 2D pulse sequences. Syntax: plot_uf
 
 - Lines 46: computes `Ta` using `Ta=parameters.deltat*parameters.npoints`.
 - Lines 49: computes `sweep_conv` using `sweep_conv=1/(2*Ta)`.
-- Lines 52: computes `res_conv` using `res_conv=1/(2*Ta*parameters.nloops)`.
-- Lines 55: computes `axis_f2` using `axis_f2=(-sweep_conv/2:res_conv:sweep_conv/2-1)+parameters.offset(2)`.
+- Lines 52: computes `axis_f2` using `axis_f2=sweep_conv*(-floor(parameters.nloops/2):(ceil(parameters.nloops/2)-1))/parameters.nloops+parameters.offset(2)`.
 - Lines 58: computes `gamma` using `gamma=spin(parameters.spins{1})`.
 - Lines 61: computes `k_max` using `k_max=gamma*parameters.Ga*Ta/(2*pi)`.
 - Lines 65: computes `t_max` using `t_max=2*parameters.Te`.

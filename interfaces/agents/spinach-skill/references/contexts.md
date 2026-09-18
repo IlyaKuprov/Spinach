@@ -152,7 +152,7 @@ implemented by `evolution`.
 | `'total'` | integral of the observable trace from start to infinity; requires relaxation and is supported by `evolution` only |
 | `'refocus'` | evolves the first vector zero steps, the second one step, the third two, matching indirect evolution after a refocusing pulse |
 | `'observable'` | time dynamics of one observable against `coil` |
-| `'multichannel'` | several observables as rows, `coil` carrying one column each |
+| `'multichannel'` | several observables as rows, `coil` carrying one column each; a channels-by-time-by-states array for a stack of initial states |
 
 The optional `destination` argument to `evolution` is a state for
 destination-state screening. `krylov` is for the case where `exp(L)` will not

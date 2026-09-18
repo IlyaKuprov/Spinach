@@ -1,7 +1,7 @@
-# examples/nmr_solids/case_studies/mathies_14n_13c/mas_powder_gly_14n.m
+# examples/nmr_solids/case_studies/mathies_14n_13c/powder_gly_14n.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/case_studies/mathies_14n_13c/mas_powder_gly_14n.m`
-- Signature: `mas_powder_gly_14n()`
+- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/case_studies/mathies_14n_13c/powder_gly_14n.m`
+- Signature: `powder_gly_14n()`
 - Total lines: 93
 
 ## Purpose

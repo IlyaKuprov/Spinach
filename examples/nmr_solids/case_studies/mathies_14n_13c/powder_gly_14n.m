@@ -11,7 +11,7 @@
 % guinevere.mathies@uni-konstanz.de
 % ilya.kuprov@weizmann.ac.il
 
-function mas_powder_gly_14n()
+function powder_gly_14n()
 
 % Read CASTEP file
 props=c2spinach('glycine.magres');

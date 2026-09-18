@@ -109,30 +109,23 @@ if natoms==0, error('the [atoms] block contains no atom records.'); end
 props.symbols=atom_tokens(:,1)'; props.std_geom=str2double(atom_tokens(:,4:6));
 props.natoms=natoms;
 
-% Atom keys, delimited and glued, for matching the tensor records
-atom_keys=strcat(atom_tokens(:,2),{' '},atom_tokens(:,3))';
-glued_keys=strcat(atom_tokens(:,2),atom_tokens(:,3))';
+% Atom keys, delimited and glued, with canonical indices
+atom_index=cellfun(@(x)num2str(str2double(x)),atom_tokens(:,3),'UniformOutput',false);
+atom_keys=strcat(atom_tokens(:,2),{' '},atom_index)'; glued_keys=strcat(atom_tokens(:,2),atom_index)';
 if numel(unique(atom_keys))~=natoms, error('duplicate atom label and index pairs in the [atoms] block.'); end
 
 % Shielding and EFG records, matched to the atoms by label and index
 cst=cell(1,natoms); efg=cell(1,natoms);
 site_lines=find(~cellfun(@isempty,regexp(magres_block,'^(ms|efg)\s','once')));
-site_tokens=regexp(magres_block(site_lines),['^(ms|efg)\s+(\S+)\s+(\d+)' ten_pat '$'],'tokens','once');
-glued_tokens=regexp(magres_block(site_lines),['^(ms|efg)\s+(\S+)' ten_pat '$'],'tokens','once');
+site_tokens=regexp(magres_block(site_lines),['^(ms|efg)\s+(\S+(?:\s+\S+)?)' ten_pat '$'],'tokens','once');
 for n=1:numel(site_lines)
-    if ~isempty(site_tokens{n})
-        atom_idx=strcmp(atom_keys,[site_tokens{n}{2} ' ' num2str(str2double(site_tokens{n}{3}))]);
-        tensor=reshape(str2double(site_tokens{n}(4:12)),[3 3])';
-    elseif ~isempty(glued_tokens{n})
-        atom_idx=strcmp(glued_keys,glued_tokens{n}{2});
-        tensor=reshape(str2double(glued_tokens{n}(3:11)),[3 3])';
-    else
-        error(['malformed tensor record: ' magres_block{site_lines(n)}]);
-    end
-    if nnz(atom_idx)~=1
+    if isempty(site_tokens{n}), error(['malformed tensor record: ' magres_block{site_lines(n)}]); end
+    atom_idx=key_atoms(strsplit(site_tokens{n}{2}),atom_keys,glued_keys,1);
+    if size(atom_idx,1)~=1
         error(['tensor record does not match exactly one atom: ' magres_block{site_lines(n)}]);
     end
-    if strcmp(magres_block{site_lines(n)}(1:2),'ms')
+    tensor=reshape(str2double(site_tokens{n}(3:11)),[3 3])';
+    if strcmp(site_tokens{n}{1},'ms')
         if ~isempty(cst{atom_idx}), error(['repeated ms record: ' magres_block{site_lines(n)}]); end
         cst{atom_idx}=tensor;
     else
@@ -145,25 +138,48 @@ if any(~cellfun(@isempty,efg)), props.efg=efg; end
 
 % Reduced spin-spin coupling records, isotropic parts in gparse units
 isc_lines=find(~cellfun(@isempty,regexp(magres_block,'^isc\s','once')));
-isc_tokens=regexp(magres_block(isc_lines),['^isc\s+(\S+)\s+(\d+)\s+(\S+)\s+(\d+)' ten_pat '$'],'tokens','once');
+isc_tokens=regexp(magres_block(isc_lines),['^isc\s+(\S+(?:\s+\S+){1,3})' ten_pat '$'],'tokens','once');
 if ~isempty(isc_lines)
     k_sum=zeros(natoms,natoms); k_count=zeros(natoms,natoms);
     k_factor=1e19*(5.0507837461e-27)^2/6.62607015e-34;
     for n=1:numel(isc_lines)
         if isempty(isc_tokens{n}), error(['malformed isc record: ' magres_block{isc_lines(n)}]); end
-        atom_a=strcmp(atom_keys,[isc_tokens{n}{1} ' ' num2str(str2double(isc_tokens{n}{2}))]);
-        atom_b=strcmp(atom_keys,[isc_tokens{n}{3} ' ' num2str(str2double(isc_tokens{n}{4}))]);
-        if (nnz(atom_a)~=1)||(nnz(atom_b)~=1)
+        atom_pair=key_atoms(strsplit(isc_tokens{n}{1}),atom_keys,glued_keys,2);
+        if size(atom_pair,1)~=1
             error(['isc record does not match exactly one atom pair: ' magres_block{isc_lines(n)}]);
         end
-        if any(atom_a&atom_b), continue; end
-        k_iso=k_factor*sum(str2double(isc_tokens{n}([5 9 13])))/3;
-        k_sum(atom_a,atom_b)=k_sum(atom_a,atom_b)+k_iso; k_count(atom_a,atom_b)=k_count(atom_a,atom_b)+1;
-        k_sum(atom_b,atom_a)=k_sum(atom_b,atom_a)+k_iso; k_count(atom_b,atom_a)=k_count(atom_b,atom_a)+1;
+        if atom_pair(1)==atom_pair(2), continue; end
+        k_iso=k_factor*sum(str2double(isc_tokens{n}([2 6 10])))/3;
+        k_sum(atom_pair(1),atom_pair(2))=k_sum(atom_pair(1),atom_pair(2))+k_iso;
+        k_sum(atom_pair(2),atom_pair(1))=k_sum(atom_pair(2),atom_pair(1))+k_iso;
+        k_count(atom_pair(1),atom_pair(2))=k_count(atom_pair(1),atom_pair(2))+1;
+        k_count(atom_pair(2),atom_pair(1))=k_count(atom_pair(2),atom_pair(1))+1;
     end
     props.k_couplings=k_sum./max(k_count,1);
 end
 
+end
+
+% Resolves record label and index tokens into atom numbers, one row per viable split into delimited and glued keys
+function atoms=key_atoms(id_tokens,atom_keys,glued_keys,natoms_needed)
+splits={1,2,[1 1],[1 2],[2 1],[2 2]};
+splits=splits(cellfun(@(x)(numel(x)==natoms_needed)&&(sum(x)==numel(id_tokens)),splits));
+atoms=zeros(0,natoms_needed);
+for n=1:numel(splits)
+    candidate=zeros(1,natoms_needed); pos=1;
+    for k=1:natoms_needed
+        if splits{n}(k)==1
+            match=find(strcmp(glued_keys,id_tokens{pos}));
+        elseif all(isstrprop(id_tokens{pos+1},'digit'))
+            match=find(strcmp(atom_keys,[id_tokens{pos} ' ' num2str(str2double(id_tokens{pos+1}))]));
+        else
+            match=[];
+        end
+        if numel(match)~=1, candidate=[]; break; end
+        candidate(k)=match; pos=pos+splits{n}(k);
+    end
+    atoms=[atoms; candidate]; %#ok<AGROW>
+end
 end
 
 % Consistency enforcement

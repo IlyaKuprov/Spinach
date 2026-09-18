@@ -151,8 +151,8 @@
 | `experiments/relaxan.m` | `[r1,r2,t1,t2,R]=relaxan(spin_system,euler_angles)` | Automated relaxation theory analysis. Prints longitudinal and transverse relaxation rates and times for all spins in the | 98 |
 | `experiments/respiration.m` | `fid=respiration(spin_system,parameters,H,R,K)` | RESPIRATION cross-polarisation method described in the paper from the Aarhus group (http://dx.doi.org/10.1021/jz3000905) | 154 |
 | `experiments/sat_rec.m` | `fids=sat_rec(spin_system,parameters,H,R,K)` | Saturation-recovery pulse sequence with analytical saturation (just the unit state as the initial condition). Syntax: fi | 130 |
-| `experiments/singlets/m2s.m` | `rho=m2s(spin_system,L,Hx,Hy,rho,J,delta_v)` | M2S sequence of Pileio and Levitt. Syntax: rho=m2s(spin_system,L,Hx,Hy,rho,J,delta_v) Parameters: L -background Liouvill | 81 |
-| `experiments/singlets/s2m.m` | `rho=s2m(spin_system,L,Hx,Hy,rho,J,delta_v)` | S2M sequence of Pileio and Levitt. Syntax: rho=s2m(spin_system,L,Hx,Hy,rho,J,delta_v) Parameters: L -background Liouvill | 81 |
+| `experiments/singlets/m2s.m` | `rho=m2s(spin_system,L,Hx,Hy,rho,J,delta_v)` | M2S sequence of Pileio and Levitt. Syntax: rho=m2s(spin_system,L,Hx,Hy,rho,J,delta_v) Parameters: L -background Liouvill | 83 |
+| `experiments/singlets/s2m.m` | `rho=s2m(spin_system,L,Hx,Hy,rho,J,delta_v)` | S2M sequence of Pileio and Levitt. Syntax: rho=s2m(spin_system,L,Hx,Hy,rho,J,delta_v) Parameters: L -background Liouvill | 83 |
 | `experiments/slowpass.m` | `spectrum=slowpass(spin_system,parameters,H,R,K)` | Slow passage detection -calculates spectrum values at the user- specified frequency positions using the Fourier transfor | 199 |
 | `experiments/sp_acquire.m` | `fid=sp_acquire(spin_system,parameters,H,R,K)` | Soft pulse followed by acquisition. The soft pulse is simulated using the Fokker-Planck formalism. Syntax: fid=sp_acquir | 178 |
 | `experiments/spen/dosy_oneshot.m` | `fid=dosy_oneshot(spin_system,parameters,H,R,K,G,F)` | One-shot DOSY pulse sequence. Syntax: fid=dosy_oneshot(spin_system,parameters,H,R,K,G,F) Parameters: parameters.rho0 ini | 226 |

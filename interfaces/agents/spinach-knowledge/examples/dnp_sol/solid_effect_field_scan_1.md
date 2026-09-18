@@ -47,7 +47,7 @@ Magnetic field sweep DNP experiment involving a gadolinium ion, steady-state pol
 - Lines 31: computes `inter.coordinates` using `inter.coordinates={[0.00 0.00 0.00]`.
 - Lines 35: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 36: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 37: computes `bas.projections` using `bas.projections=[-2 -1 0 1 2]`.
+- Lines 37: computes `bas.projections` using `bas.projections={[-2 -1 0 1 2]}`.
 - Lines 40: computes `inter.relaxation` using `inter.relaxation={'t1_t2'}`.
 - Lines 41: computes `inter.r1_rates` using `inter.r1_rates={1e4 1e1}`.
 - Lines 42: computes `inter.r2_rates` using `inter.r2_rates={1e7 1e3}`.

@@ -21,7 +21,7 @@ sys.tols.prox_cutoff=4.0;
 bas.formalism='sphten-liouv';
 bas.approximation='IK-2';
 bas.connectivity='scalar_couplings';
-bas.space_level=1;
+bas.prox_level=1;
 
 % Sequence parameters
 parameters.offset=1200;

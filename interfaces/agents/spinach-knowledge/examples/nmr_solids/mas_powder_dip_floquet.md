@@ -40,7 +40,7 @@ Spinning powder pulse-acquire experiment on a two-spin system with a dipolar cou
 - Lines 15: computes `inter.coordinates` using `inter.coordinates={[0 0 0]; [0 3.9 0.1]}`.
 - Lines 18: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 19: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 20: computes `bas.projections` using `bas.projections=+1`.
+- Lines 20: computes `bas.projections` using `bas.projections={+1}`.
 - Lines 23: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 27: computes `parameters.rate` using `parameters.rate=1000`.
 - Lines 28: computes `parameters.axis` using `parameters.axis=[1 1 1]`.

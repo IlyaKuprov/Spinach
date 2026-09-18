@@ -122,6 +122,9 @@ end
 if mod(spin_system.control.ncontrols,2)~=0
     error('grape_coop is phase-modulated, number of controls must be even.');
 end
+if strcmp(spin_system.control.fid_type,'average')||(~isempty(spin_system.control.traj_pen))
+    error('trajectory cost terms are not available in grape_coop.');
+end
 end
 
 % Morally authoritarian movements are attractive to

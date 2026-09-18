@@ -46,7 +46,7 @@ sys.enable={'greedy'};
 bas.formalism='sphten-liouv';
 bas.approximation='IK-2';
 bas.connectivity='scalar_couplings';
-bas.space_level=1;
+bas.prox_level=1;
 bas.sym_group={'S3','S3','S3'};
 bas.sym_spins={[14 15 16],...
                [17 18 19],...

@@ -81,13 +81,11 @@ grumble(fid,winfuns);
 if ~exist('fp_half','var'), fp_half=true(); end
 
 % Find non-singleton dimensions
-rel_dims=true(1,ndims(fid));
-rel_dims(size(fid)<2)=false();
-rel_dims=find(rel_dims);
+rel_dims=find(size(fid)>1);
 
 % Exclude inactive dimensions
-inact_dims=find(cellfun(@isempty,winfuns));
-rel_dims=setdiff(rel_dims,inact_dims);
+act_dims=~cellfun(@isempty,winfuns);
+winfuns=winfuns(act_dims); rel_dims=rel_dims(act_dims);
 
 % Factors of 2
 if fp_half
@@ -113,7 +111,7 @@ for n=1:numel(rel_dims)
     dim=rel_dims(n); npts=size(fid,dim);
 
     % Build window function
-    switch winfuns{dim}{1}
+    switch winfuns{n}{1}
 
         case 'none'
 
@@ -127,13 +125,13 @@ for n=1:numel(rel_dims)
         case 'exp'
 
             x=linspace(0,1,npts);
-            k=winfuns{dim}{2};
+            k=winfuns{n}{2};
             wf=exp(-k*x(:));
 
         case 'gauss'
 
             x=linspace(0,1,npts);
-            k=winfuns{dim}{2};
+            k=winfuns{n}{2};
             wf=exp(-k*(x(:).^2));
 
         case 'cos'
@@ -158,14 +156,14 @@ for n=1:numel(rel_dims)
 
         case 'kaiser'
 
-            k=winfuns{dim}{2};
+            k=winfuns{n}{2};
             wf=kaiser(npts,k);
 
         case 'bad-z1'
 
             % For all ye lazy PhD students out there
             x=linspace(0,1,npts); x=transpose(x(2:end));
-            wf=sinc(x*winfuns{dim}{2});
+            wf=sinc(x*winfuns{n}{2});
 
             % Avoid the singularity
             wf=[1; wf]; %#ok<AGROW>
@@ -175,7 +173,7 @@ for n=1:numel(rel_dims)
             % Well burn my papers and call me a teaching fellow: 
             % turns out we need this too, you sloppy muppets
             x=linspace(0,1,npts); x=transpose(x(2:end));
-            x=sqrt(x*winfuns{dim}{2}); wf=zeros(size(x));
+            x=sqrt(x*winfuns{n}{2}); wf=zeros(size(x));
 
             % Symbolic toolbox is slow
             parfor k=1:numel(x)
@@ -188,7 +186,7 @@ for n=1:numel(rel_dims)
         otherwise
 
             % Complain and bomb out
-            error(['window function type ' winfuns{dim}{1} ...
+            error(['window function type ' winfuns{n}{1} ...
                 ' is not implemented.']);
 
     end
@@ -199,7 +197,7 @@ for n=1:numel(rel_dims)
 
     % Report to the user
     report(spin_system,['FID dimension ' num2str(dim) ', '...
-                        winfuns{dim}{1} ' window function applied.']);
+                        winfuns{n}{1} ' window function applied.']);
 
 end
 
@@ -213,14 +211,8 @@ end
 if ~iscell(winfuns)
     error('winfuns must be a cell array.');
 end
-rel_dims=true(1,ndims(fid));
-rel_dims(size(fid)<2)=false();
-rel_dims=find(rel_dims);
-if (~isempty(rel_dims))&&(numel(winfuns)<max(rel_dims))
-    error('winfuns must cover all non-singleton dimensions of fid.');
-end
-if numel(winfuns)>ndims(fid)
-    error('winfuns must not have more elements than fid has dimensions.');
+if numel(winfuns)~=nnz(size(fid)>1)
+    error('winfuns must have one element per non-singleton dimension of fid.');
 end
 for n=1:numel(winfuns)
     if ~iscell(winfuns{n})

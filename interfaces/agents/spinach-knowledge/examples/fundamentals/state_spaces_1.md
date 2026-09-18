@@ -40,9 +40,9 @@ Correlation order dynamics in a pulse-acquire experiment on strychnine. Set to r
 - Lines 17: computes `sys.magnet` using `sys.magnet=14.1`.
 - Lines 20: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 21: computes `bas.approximation` using `bas.approximation='IK-1'`.
-- Lines 22: computes `bas.level` using `bas.level=7; bas.space_level=1`.
+- Lines 22: computes `bas.inter_level` using `bas.inter_level=7; bas.prox_level=1`.
 - Lines 23: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 24: computes `bas.projections` using `bas.projections=1`.
+- Lines 24: computes `bas.projections` using `bas.projections={1}`.
 - Lines 27: computes `sys.tols.prox_cutoff` using `sys.tols.prox_cutoff=4.0`.
 - Lines 30: computes `sys.disable` using `sys.disable={'trajlevel'}`.
 - Lines 31: computes `sys.enable` using `sys.enable={'greedy'}`.

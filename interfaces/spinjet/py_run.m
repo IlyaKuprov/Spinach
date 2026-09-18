@@ -63,6 +63,9 @@ if ~isempty(arg_in)
             arg_in{inputs}=arg_in{inputs}(2:end-1);
         end
 
+        % Escape characters that are special inside double quotes
+        arg_in{inputs}=regexprep(arg_in{inputs},'([\\$`"])','\\$1');
+
         % Append the command string
         command_string=[command_string '"' arg_in{inputs} '" ']; %#ok<AGROW>
         

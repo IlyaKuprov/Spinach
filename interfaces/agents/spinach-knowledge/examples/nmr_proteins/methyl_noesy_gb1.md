@@ -56,7 +56,7 @@
 - Lines 33: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 34: computes `bas.approximation` using `bas.approximation='IK-1'`.
 - Lines 35: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 36: computes `bas.level` using `bas.level=2; bas.space_level=2`.
+- Lines 36: computes `bas.inter_level` using `bas.inter_level=2; bas.prox_level=2`.
 - Lines 39: computes `sys.enable` using `sys.enable={'prop_cache','op_cache','greedy'}`.
 - Lines 42: computes `spin_system` using `spin_system=create(sys,inter)`.
 

@@ -69,12 +69,12 @@ end
 header=textread([g03_header_path g03_header],'%s','delimiter','\n'); %#ok<DTXTRD>
 
 % Write the inputs
-runscript=fopen('compute.bat','a');
+runscript=fopen('compute.bat','w');
 fprintf(runscript,'%s\n','@ECHO OFF');
 fprintf(runscript,'%s\n','set GAUSS_EXEDIR=C:\G16W');
 fprintf(runscript,'%s\n','set GAUSS_SCRDIR=C:\Temp');
 for n=1:length(coord_blocks)
-    g03_input=fopen(['g16_input_' num2str(n) '.gjf'],'a');
+    g03_input=fopen(['g16_input_' num2str(n) '.gjf'],'w');
     dump(g03_input,header);
     for k=1:size(coord_blocks{n},1)
         current_line=[periodic_table{coord_blocks{n}(k,2)} '       ' num2str(coord_blocks{n}(k,4:6),'%1.8f  ')];

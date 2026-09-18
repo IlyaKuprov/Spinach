@@ -5,6 +5,12 @@
 % obtain the amplitude). The two spikes show when the chirp
 % starts and finishes.
 %
+% The measurement has no phase information; the kernel is
+% therefore taken to be the minimum-phase kernel with the
+% measured amplitude spectrum, obtained by the real cepstrum
+% (Kramers-Kronig) construction. The zero-phase alternative
+% would be symmetric in time and thus non-causal.
+%
 % Rob Hunter, Hassane el-Mkami, Graham Smith,
 % Yujie Zhao, Shebha Anandhi Jegadeesan,
 % Guinevere Mathies, Ilya Kuprov
@@ -40,12 +46,21 @@ plot(freq_axis_ghz,amp,'k-');
 klegend({'spectrum raw','window function',...
          'spectrum filtered'},'Location','Best');
 
-% Get the convolution kernel with a 0.5 ns time step
-h=ifft(ifftshift([zeros(size(amp)); zeros(size(amp)); amp;
-                  zeros(size(amp)); zeros(size(amp))]));
+% Zero-fill the amplitude spectrum and put 94.0 GHz at zero frequency
+amp_spec=ifftshift([zeros(size(amp)); zeros(size(amp)); amp;
+                    zeros(size(amp)); zeros(size(amp))]);
+
+% Real cepstrum of the log-amplitude, floored at -60 dB
+cep=ifft(log(max(amp_spec,1e-3)));
+
+% Minimum-phase kernel by causal cepstrum folding, even-length grid
+npts=numel(amp_spec); cep_win=[1; 2*ones(npts/2-1,1); 1; zeros(npts/2-1,1)];
+h=ifft(exp(fft(cep_win.*cep)));
+
+% Resample to a 0.5 ns time step and rescale to keep the DC gain
 df=freq_axis_ghz(2)-freq_axis_ghz(1); zf=2*numel(amp);
-[~,t]=ifft_time_axis(numel(amp),df,zf);
-h_old=h(t<=16); t_old=t(t<=16); t=(0:31)'/2;
+[~,t,dt]=ifft_time_axis(numel(amp),df,zf);
+h_old=h(t<=16)*(0.5/dt); t_old=t(t<=16); t=(0:31)'/2;
 h=interp1(t_old,h_old,t,'spline');
 save('hiper_kernel_trans.mat','h');
 subplot(2,1,2); plot(t,[real(h) imag(h)]);

@@ -123,8 +123,9 @@ for n=1:spin_system.control.max_iter
                 % Get objective and gradient
                 [data,fx,g]=objeval(x,cost_function,data,spin_system);
 
-                % Catch unreasonably small initial fidelities and gradients
-                if (abs(data.fx_sep_pen(1))<1e-6)||(norm(g(~frozen),2)<1e-6)
+                % Catch unreasonably small initial fidelities and gradients, trajectory objectives may be small legitimately
+                plain=strcmp(spin_system.control.fid_type,'terminal')&&isempty(spin_system.control.traj_pen);
+                if (plain&&(abs(data.fx_sep_pen(1))<1e-6))||(norm(g(~frozen),2)<1e-6)
                     error('fidelity or gradient too small at iter 1, find a better guess.');
                 end
                 

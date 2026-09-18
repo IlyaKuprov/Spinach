@@ -40,8 +40,8 @@ X-band pulse-acquire FFT ESR spectrum of methyl radical. Simple common line widt
 - Lines 20: computes `sys.magnet` using `sys.magnet=0.33`.
 - Lines 23: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 24: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 25: computes `bas.projections` using `bas.projections=+1`.
-- Lines 26: computes `bas.longitudinals` using `bas.longitudinals={'1H'}`.
+- Lines 25: computes `bas.projections` using `bas.projections={+1}`.
+- Lines 26: computes `bas.longitudinal` using `bas.longitudinal={{'1H'}}`.
 - Lines 29: computes `inter.relaxation` using `inter.relaxation={'damp'}`.
 - Lines 30: computes `inter.rlx_keep` using `inter.rlx_keep='diagonal'`.
 - Lines 31: computes `inter.equilibrium` using `inter.equilibrium='zero'`.

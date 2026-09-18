@@ -58,8 +58,8 @@ INADEQUATE spectrum of sucrose. The sequence selects double- quantum coherence f
 - Lines 33: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 34: computes `bas.approximation` using `bas.approximation='IK-1'`.
 - Lines 35: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 36: computes `bas.space_level` using `bas.space_level=1`.
-- Lines 37: computes `bas.level` using `bas.level=4`.
+- Lines 36: computes `bas.prox_level` using `bas.prox_level=1`.
+- Lines 37: computes `bas.inter_level` using `bas.inter_level=4`.
 - Lines 40: computes `parameters.spins` using `parameters.spins={'13C'}`.
 - Lines 41: computes `parameters.J` using `parameters.J=50`.
 - Lines 42: computes `parameters.decouple` using `parameters.decouple={'1H'}`.

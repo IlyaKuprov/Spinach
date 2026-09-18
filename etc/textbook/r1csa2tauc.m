@@ -30,9 +30,9 @@ grumble(R1,del_sq,B0,isotope);
 % Get the Zeeman frequency
 omega=-B0*spin(isotope);
 
-% Solve the quadratic equation
-tauc(1)=(del_sq*omega^2-sqrt(del_sq^2*omega^4-225*omega^2*R1^2))/(15*omega^2*R1);
+% Solve the quadratic equation, larger root first to avoid cancellation
 tauc(2)=(del_sq*omega^2+sqrt(del_sq^2*omega^4-225*omega^2*R1^2))/(15*omega^2*R1);
+tauc(1)=1/(omega^2*tauc(2));
 
 % Check for imaginary components
 if (~isreal(tauc(1)))&&(~isreal(tauc(2)))

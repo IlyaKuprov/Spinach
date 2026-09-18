@@ -58,7 +58,7 @@ Optimal control optimisation of a pulse performing magnetisa- tion transfer from
 - Lines 36: computes `inter.coupling.scalar{5,6}` using `inter.coupling.scalar{5,6}=-15`.
 - Lines 39: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 40: computes `bas.approximation` using `bas.approximation='IK-0'`.
-- Lines 41: computes `bas.level` using `bas.level=4`.
+- Lines 41: computes `bas.inter_level` using `bas.inter_level=4`.
 - Lines 44: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 48: computes `rho_init` using `rho_init=state(spin_system,{'Lz'},{2})`.
 - Lines 52: computes `rho_targ` using `rho_targ=state(spin_system,{'Lz'},{5})`.

@@ -28,7 +28,7 @@ inter.coupling.matrix{3,3}=1e3*diag([1.5885  0.9449 -( 1.5885 + 0.9449)]);
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-0';
-bas.level=1; bas.projections=+1;
+bas.inter_level=1; bas.projections={+1};
 
 % Algorithmic options
 sys.disable={'trajlevel'};

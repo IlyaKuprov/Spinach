@@ -39,8 +39,8 @@
 - Lines 20: computes `sys.magnet` using `sys.magnet=14.1`.
 - Lines 23: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 24: computes `bas.approximation` using `bas.approximation='IK-0'`.
-- Lines 25: computes `bas.projections` using `bas.projections=+1`.
-- Lines 26: computes `bas.level` using `bas.level=3`.
+- Lines 25: computes `bas.projections` using `bas.projections={+1}`.
+- Lines 26: computes `bas.inter_level` using `bas.inter_level=3`.
 - Lines 29: computes `sys.tols.inter_cutoff` using `sys.tols.inter_cutoff=5.0`.
 - Lines 30: computes `sys.tols.prox_cutoff` using `sys.tols.prox_cutoff=4.0`.
 - Lines 31: computes `sys.enable` using `sys.enable={'greedy','polyadic'}`.

@@ -32,7 +32,7 @@
 %   props.hfc.full.matrix   - hyperfine tensors, Gauss, natoms cell
 %   props.hfc.full.eigvals  - hyperfine eigenvalues, Gauss, natoms cell
 %   props.hfc.full.eigvecs  - hyperfine eigenvectors, natoms cell
-%   props.hfc.iso           - isotropic hyperfine couplings, Gauss
+%   props.hfc.iso           - isotropic hyperfine couplings, Gauss, NaN if not printed
 %   props.efg               - EFG tensors, a.u.^-3, natoms cell
 %   props.nqi               - quadrupolar tensors, Hz, natoms cell
 %   props.isotopes          - isotopes used by ORCA, natoms cell
@@ -247,7 +247,7 @@ if ~isempty(sect)
     nucleus_idx=find_lines(log_lines,'^Nucleus\s+\d+',first,last);
     hfc_found=false; efg_found=false;
     hfc_matrix=cell(1,natoms); hfc_eigvals=cell(1,natoms);
-    hfc_eigvecs=cell(1,natoms); hfc_iso=zeros(natoms,1);
+    hfc_eigvecs=cell(1,natoms); hfc_iso=NaN(natoms,1);
     efg_matrix=cell(1,natoms); nqi_matrix=cell(1,natoms);
     isotopes=cell(1,natoms);
     for n=1:numel(nucleus_idx)

@@ -23,17 +23,18 @@ Generates a Lindblad superoperator from user-specified left-side and right-side 
 
 - Lines 33-34: Check consistency; implemented by `grumble(A_left,A_right,rho,rlx_rate)`.
 - Lines 36-37: Generate a Lindbladian; implemented by `R=A_left*A_right'-(A_left'*A_left+A_right*A_right')/2`.
-- Lines 39-40: Check for silly inputs; implemented by `if abs(rho'*R*rho)<1e-10`.
-- Lines 44-45: Calibrate the Lindbladian; implemented by `rho=rho/norm(rho,2); R=-rlx_rate*R/(rho'*R*rho)`.
+- Lines 39-40: Remove the arbitrary scale of the user-supplied state; implemented by `rho=rho/norm(rho,2)`.
+- Lines 42-43: Check for silly inputs, relative to the part of R that acts on rho; implemented by `if abs(rho'*R*rho)<=1e-10*norm(R*rho,2)`.
+- Lines 44-45: Calibrate the Lindbladian; implemented by `R=-rlx_rate*R/(rho'*R*rho)`.
 
 ### Control flow inferred from the code
 
-- Line 40: conditional branch on `abs(rho'*R*rho)<1e-10`.
+- Line 40: conditional branch on `abs(rho'*R*rho)<=1e-10*norm(R*rho,2)`.
 
 ### Key state/data transformations
 
 - Lines 37: computes `R` using `R=A_left*A_right'-(A_left'*A_left+A_right*A_right')/2`.
-- Lines 45: computes `rho` using `rho=rho/norm(rho,2); R=-rlx_rate*R/(rho'*R*rho)`.
+- Lines 45: computes `rho` using `rho=rho/norm(rho,2)`, then `R` using `R=-rlx_rate*R/(rho'*R*rho)`.
 
 ### Local helper functions
 

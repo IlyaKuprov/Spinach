@@ -26,7 +26,7 @@ function [sys,inter,bas]=cyprinol()
 H_iso=cell(1,42); H_iso(:)={'1H'}; numH=numel(H_iso);
 
 % Shorthands for human-readable coupling designations below
-H1a=1;   H1b=2;   H2=2;    H3=3;    H4a=5;   H4b=6;   H5=7;    H6a=8;   
+H1a=1;   H1b=2;   H2=4;    H3=3;    H4a=5;   H4b=6;   H5=7;    H6a=8;   
 H6b=9;   H7=10;   H8=11;   H9=12;   H11a=13; H11b=14; H12=15;  H14=16;  
 H15a=17; H15b=18; H16a=19; H16b=20; H17=21;  H18a=22; H19a=23; H20=24;  
 H21a=25; H22a=26; H22b=27; H23a=28; H23b=29; H24a=30; H24b=31; H25=32;  

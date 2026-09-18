@@ -46,9 +46,9 @@
 - Lines 23: computes `inter.zeeman.matrix` using `inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,2,124.2)`.
 - Lines 36: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 37: computes `bas.approximation` using `bas.approximation='IK-0'`.
-- Lines 38: computes `bas.longitudinals` using `bas.longitudinals={'15N'}`.
-- Lines 39: computes `bas.projections` using `bas.projections=+1`.
-- Lines 40: computes `bas.level` using `bas.level=3`.
+- Lines 38: computes `bas.longitudinal` using `bas.longitudinal={{'15N'}}`.
+- Lines 39: computes `bas.projections` using `bas.projections={+1}`.
+- Lines 40: computes `bas.inter_level` using `bas.inter_level=3`.
 - Lines 43: computes `sys.tols.inter_cutoff` using `sys.tols.inter_cutoff=5.0`.
 - Lines 44: computes `sys.tols.prox_cutoff` using `sys.tols.prox_cutoff=4.0`.
 - Lines 47: computes `spin_system` using `spin_system=create(sys,inter)`.

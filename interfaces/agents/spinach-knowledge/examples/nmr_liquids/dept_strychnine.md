@@ -49,7 +49,7 @@ DEPT135 experiment on strychnine. Calculation time: minutes
 - Lines 20: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 21: computes `bas.approximation` using `bas.approximation='IK-2'`.
 - Lines 22: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 23: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 23: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 26: computes `parameters.sweep` using `parameters.sweep=10000`.
 - Lines 27: computes `parameters.offset` using `parameters.offset=[5000 0]`.
 - Lines 28: computes `parameters.npoints` using `parameters.npoints=2048`.

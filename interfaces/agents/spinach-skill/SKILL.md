@@ -153,15 +153,19 @@ much of it to keep. Together they decide whether a simulation is feasible.
 | `bas.approximation` | Meaning |
 |---|---|
 | `none` | Complete basis. Correct by construction, but the state space grows as 4^N for spin-1/2 in Liouville space; practical to roughly ten spins. |
-| `IK-0` | Keeps all states up to a given spin correlation order (`bas.level`), irrespective of distance. |
-| `IK-1` | Correlation order `bas.level` restricted to spins within `bas.space_level` bonds; needs `bas.connectivity`. The workhorse for large molecules. |
-| `IK-2` | Uses direct coupling connectivity with proximity subgraphs controlled by `bas.space_level`; standard for strychnine-class organic molecules. |
+| `IK-0` | Keeps all states up to a given spin correlation order (`bas.inter_level`), irrespective of distance. |
+| `IK-1` | Correlation order `bas.inter_level` on the coupling graph plus correlation order `bas.prox_level` on the proximity graph; needs `bas.connectivity`. The workhorse for large molecules. Spin-only: refuses systems with bosonic modes. |
+| `IK-2` | Uses direct coupling connectivity with proximity subgraphs controlled by `bas.prox_level`; standard for strychnine-class organic molecules. Spin-only: refuses systems with bosonic modes. |
 | `IK-DNP` | Tailored to electron-nuclear DNP systems. |
+| `IK-SBS` | Spin-boson systems: separate correlation levels `bas.inter_level=[bb sb ss]` on the boson-boson, spin-boson, and spin-spin coupling graphs; needs `bas.connectivity`; requires both spins and bosonic modes. |
 
 `bas.connectivity` is `'scalar_couplings'` or `'full_tensors'`. The filters
-`bas.longitudinals` and `bas.projections` are physical approximations:
-`bas.longitudinals` deletes transverse states on selected spins, while
-`bas.projections` deletes total-coherence blocks that are not retained. Use
+`bas.longitudinal` and `bas.projections` are physical approximations:
+`bas.longitudinal` deletes transverse states on selected spins, while
+`bas.projections` deletes total-coherence blocks that are not retained. Both
+are cell arrays with one element per chemical substance (`{{'15N'}}` and
+`{+1}` for a single substance), and subgraphs are generated separately for
+each substance before the states are merged into one global basis. Use
 them only when the initial state, pulse sequence, Hamiltonian, relaxation, and
 observable cannot enter the discarded blocks. Permutation symmetry via
 `bas.sym_group` and `bas.sym_spins` factorises the problem into irreducible
@@ -237,8 +241,8 @@ result, check what physics says it must satisfy.
   density matrix preserved where it must be, and the signal finite everywhere;
   a detected FID need not be monotonic or bounded by its initial magnitude
   when coherent transfer contributes.
-- Does it converge? Increase the active basis restriction (`bas.level` and,
-  when relevant, `bas.space_level` for `IK-1`; `bas.space_level` for `IK-2`),
+- Does it converge? Increase the active basis restriction (`bas.inter_level` and,
+  when relevant, `bas.prox_level` for `IK-1`; `bas.prox_level` for `IK-2`),
   refine the grid, and halve the time step; a converged result stops moving.
   An unconverged simulation can look entirely reasonable.
 - Does a limiting case reproduce a known answer? Weak coupling should give

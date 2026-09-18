@@ -202,7 +202,6 @@ if ~isempty(spin_system.sys.enable)
     if ismember('ham_cache',spin_system.sys.enable),  report(spin_system,'         > Hamiltonian caching'); end
     if ismember('prop_cache',spin_system.sys.enable), report(spin_system,'         > propagator caching'); end
     if ismember('greedy',spin_system.sys.enable),     report(spin_system,'         > greedy parallelisation'); end
-    if ismember('xmemlist',spin_system.sys.enable),   report(spin_system,'         > state-cluster cross-membership list generation'); end
     if ismember('paranoia',spin_system.sys.enable),   report(spin_system,'         > paranoid numerical accuracy settings'); end
     if ismember('cowboy',spin_system.sys.enable),     report(spin_system,'         > loose numerical accuracy settings'); end
     if ismember('polyadic',spin_system.sys.enable),   report(spin_system,'         > polyadic arithmetic with spatial degrees of freedom'); end
@@ -1557,7 +1556,7 @@ if isfield(sys,'enable')
     if (~iscell(sys.enable))||any(~cellfun(@ischar,sys.enable))
         error('sys.enable must be a cell array of strings.');
     end
-    if any(~ismember(sys.enable,{'gpu','op_cache','xmemlist','greedy','paranoia','sodd',...
+    if any(~ismember(sys.enable,{'gpu','op_cache','greedy','paranoia','sodd',...
                                  'cowboy','polyadic','dafuq','prop_cache','ham_cache'}))
         error('unrecognised switch in sys.enable field.');
     end

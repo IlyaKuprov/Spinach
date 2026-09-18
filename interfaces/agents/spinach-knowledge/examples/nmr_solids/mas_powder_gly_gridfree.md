@@ -39,8 +39,8 @@
 - Lines 16: computes `sys.magnet` using `sys.magnet=14.1`.
 - Lines 19: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 20: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 21: computes `bas.longitudinals` using `bas.longitudinals={'15N'}`.
-- Lines 22: computes `bas.projections` using `bas.projections=+1`.
+- Lines 21: computes `bas.longitudinal` using `bas.longitudinal={{'15N'}}`.
+- Lines 22: computes `bas.projections` using `bas.projections={+1}`.
 - Lines 25: computes `sys.tols.inter_cutoff` using `sys.tols.inter_cutoff=5.0`.
 - Lines 26: computes `sys.tols.prox_cutoff` using `sys.tols.prox_cutoff=4.0`.
 - Lines 29: computes `spin_system` using `spin_system=create(sys,inter)`.

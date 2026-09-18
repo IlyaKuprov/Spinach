@@ -68,8 +68,8 @@ switch numel(parameters.npts)
         
         % Rotate gradients if necessary
         if isfield(parameters,'grad_angles')
-            R=[ cos(parameters.grad_angles) sin(parameters.grad_angles);
-               -sin(parameters.grad_angles) cos(parameters.grad_angles)];
+            R=[cos(parameters.grad_angles) -sin(parameters.grad_angles);
+               sin(parameters.grad_angles)  cos(parameters.grad_angles)];
             Gx_new=Gx*R(1,1)+Gy*R(1,2);
             Gy_new=Gx*R(2,1)+Gy*R(2,2);
             Gx=Gx_new; Gy=Gy_new;

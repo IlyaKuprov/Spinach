@@ -41,8 +41,8 @@ Pulse-acquire NMR spectrum of a highly symmetric spin system provided by Andres 
 - Lines 33: computes `bas.sym_group` using `bas.sym_group={'S3','S3','S3'}`.
 - Lines 34: computes `bas.sym_spins` using `bas.sym_spins={[1 2 3],[4 5 6],[7 8 9]}`.
 - Lines 35: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 36: computes `bas.space_level` using `bas.space_level=1`.
-- Lines 37: computes `bas.projections` using `bas.projections=+1`.
+- Lines 36: computes `bas.prox_level` using `bas.prox_level=1`.
+- Lines 37: computes `bas.projections` using `bas.projections={+1}`.
 - Lines 40: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 44: computes `parameters.spins` using `parameters.spins={'1H'}`.
 - Lines 45: computes `parameters.rho0` using `parameters.rho0=state(spin_system,'L+','1H')`.

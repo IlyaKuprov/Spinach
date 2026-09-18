@@ -1,22 +1,20 @@
 % X-band pulse-acquire FFT ESR spectrum of parafluorotoluene
 % radical, simulated using explicit time-domain propagation
-% including Redfield relaxation superoperator.
+% including Redfield relaxation superoperator. This example
+% requires at least 16 GB of RAM per CPU core.
 %
-% Calculation time: minutes
+% Calculation time: hours
 %
 % ilya.kuprov@weizmann.ac.il
 
 function relaxation_parafluorotoluene()
 
-% Ignore coordinate information (HFCs provided)
+% Drop coordinates (HFCs provided)
 options.no_xyz=1;
 
 % Read the spin system (vacuum DFT calculation)
 [sys,inter]=g2spinach(gparse('../standard_systems/parafluorotoluene.log'),...
                       {{'E','E'},{'H','1H'},{'F','19F'}},[0 0 0],options);
-
-% Ignore small HFC anisotropies
-sys.tols.inter_cutoff=1e5;
 
 % Magnet field
 sys.magnet=0.33;
@@ -24,7 +22,6 @@ sys.magnet=0.33;
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-bas.zero_quantum={[1 2 3 5]};
 
 % Relaxation theory
 inter.relaxation={'redfield'};

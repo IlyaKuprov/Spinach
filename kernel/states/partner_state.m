@@ -98,31 +98,17 @@ for n=1:numel(active_partners)
 
     % Pull current partner
     partner=active_partners(n);
-    
-    % Over the partner state set
+
+    % Expand descriptors over the partner state set
+    new_descr=cell(0,1);
     for k=1:numel(partner_state_sets{n})
-
-        % Pull current partner spin state
-        partner_state=partner_state_sets{n}{k};
-
-        % Scan descriptors
         for m=1:numel(descr)
-
-            % Pull descriptor line
             current_line=descr{m};
-
-            % Modify the descriptor line if necessary
-            if ~strcmp(current_line{partner},partner_state)
-
-                % Write in the new state and append
-                current_line{partner}=partner_state;
-                descr=[descr; {current_line}]; %#ok<AGROW>
-
-            end
-
+            current_line{partner}=partner_state_sets{n}{k};
+            new_descr=[new_descr; {current_line}]; %#ok<AGROW>
         end
-
     end
+    descr=new_descr;
 
 end
 

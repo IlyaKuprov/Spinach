@@ -54,7 +54,7 @@ HMQC spectrum of sucrose with natural content of 13C isotope (magnetic parameter
 - Lines 32: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 33: computes `bas.approximation` using `bas.approximation='IK-2'`.
 - Lines 34: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 35: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 35: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 38: computes `parameters.J` using `parameters.J=140`.
 - Lines 39: computes `parameters.sweep` using `parameters.sweep=[3350 1000]`.
 - Lines 40: computes `parameters.offset` using `parameters.offset=[5000 1200]`.

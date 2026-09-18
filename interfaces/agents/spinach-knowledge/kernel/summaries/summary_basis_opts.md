@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/summaries/summary_basis_opts.m`
 - Signature: `summary_basis_opts(spin_system)`
-- Total lines: 78
+- Total lines: 90
 
 ## Purpose
 
@@ -29,11 +29,11 @@ Prints basis-set option summary for a Spinach system. Syntax: summary_basis_opts
 
 - Line 24: dispatches on `spin_system.bas.formalism`; cases `'zeeman-wavef'`, `'zeeman-hilb'`, `'zeeman-liouv'`, `'sphten-liouv'`.
 - Line 38: conditional branch on `strcmp(spin_system.bas.formalism,'sphten-liouv')`.
-- Line 39: dispatches on `spin_system.bas.approximation`; cases `'IK-0'`, `'IK-1'`, `'IK-2'`, `'IK-DNP'`, `'none'`.
+- Line 39: dispatches on `spin_system.bas.approximation`; cases `'IK-0'`, `'IK-1'`, `'IK-2'`, `'IK-DNP'`, `'IK-SBS'` (three correlation levels, coupling graph source, and cut-off), `'none'`.
 
 ### Local helper functions
 
-- Line 66: `grumble()` — `function grumble(spin_system)`. According to a trade legend, Uhlenbeck and Goudsmit (students of Ehrenfest when they stumbled upon the concept of spin) presented
+- Line 78: `grumble()` — `function grumble(spin_system)`. According to a trade legend, Uhlenbeck and Goudsmit (students of Ehrenfest when they stumbled upon the concept of spin) presented
   - Representative operation: `if ~isstruct(spin_system)`.
   - Representative operation: `error('spin_system must be a structure.')`.
 

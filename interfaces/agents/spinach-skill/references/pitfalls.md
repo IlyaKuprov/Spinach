@@ -91,12 +91,14 @@ approximations then have their own required fields and cross-rules:
 
 | Message | Meaning |
 |---|---|
-| `connectivity tracing depth must be specified in bas.level variable.` | IK-0, IK-1, and IK-DNP need `bas.level` (IK-DNP as a 1x3 vector); IK-2 does not use it. |
-| `connectivity type must be specified in bas.connectivity variable.` | IK-1/2 need `'scalar_couplings'` or `'full_tensors'`. |
-| `proximity tracing depth must be specified in bas.space_level variable.` | IK-1/2 need `bas.space_level`. |
-| `bas.level is only applicable to IK-0,1,2,DNP basis sets.` | Do not set IK fields with `approximation='none'`; the same rule exists for `bas.space_level` and `bas.connectivity` (IK-1/2 only). |
+| `connectivity tracing depth must be specified in bas.inter_level variable.` | IK-0, IK-1, IK-DNP, and IK-SBS need `bas.inter_level` (IK-DNP and IK-SBS as a 1x3 vector); IK-2 does not use it. |
+| `connectivity type must be specified in bas.connectivity variable.` | IK-1/2 and IK-SBS need `'scalar_couplings'` or `'full_tensors'`. |
+| `proximity tracing depth must be specified in bas.prox_level variable.` | IK-1/2 need `bas.prox_level`. |
+| `bas.inter_level is only applicable to IK-0,1,2,DNP,SBS basis sets.` | Do not set IK fields with `approximation='none'`; the same rule exists for `bas.prox_level` (IK-1/2 only) and `bas.connectivity` (IK-1/2 and IK-SBS only). |
 | `bas.approximation should be set to 'none' in zeeman-hilb formalism.` | Hilbert space is always complete. |
 | `IK-DNP approximation requires both electrons and nuclei.` | IK-DNP is for electron-nuclear systems only. |
+| `IK-1 and IK-2 basis sets are for spin-only systems, use IK-SBS when bosonic modes are present.` | Any `C`, `V`, or `T` particle in `sys.isotopes` rules out IK-1 and IK-2; use IK-SBS or `none`. |
+| `bas.inter_level(1) cannot exceed the number of bosonic modes in the system.` | IK-SBS needs bosonic modes (`C`, `V`, `T` particles) as well as spins; the three levels are bounded by the numbers of modes, particles, and spins respectively. |
 | `multiplicities above 16 are not supported by sphten-liouv formalism.` | Very high spins need a different formalism. |
 
 ### Formalism and approximation mismatches
@@ -144,7 +146,7 @@ the requested state is not present in the basis.
 ```
 
 The state you asked `state()` for was excluded by the basis restriction -
-typically a spin-correlation order outside `bas.level`, or a projection
+typically a spin-correlation order outside `bas.inter_level`, or a projection
 excluded by `bas.projections`. Raise the restriction or fix the state
 specification. Related messages: `spins and operators cell arrays should have
 the same number of elements.`, `parameters.spins refers to a spin that is not
@@ -215,7 +217,7 @@ when unset, and logs that it did. A mirrored spectrum, or peaks at the
 negatives of the expected shifts, is usually an axis convention mismatch, not
 a physics error - fix the plot parameters before touching the simulation.
 
-**Unconverged results.** An insufficient `bas.level`, a too-coarse powder
+**Unconverged results.** An insufficient `bas.inter_level`, a too-coarse powder
 grid, or a too-long timestep does not crash; it produces a smooth, wrong
 spectrum (missing multiplet components, distorted powder lineshapes, phase
 errors). Convergence is established by refinement, never by appearance - see
@@ -228,10 +230,10 @@ Hilbert space). A complete `sphten-liouv` basis is practical to roughly ten
 spins; beyond that, the basis restriction is the tool, not a bigger machine:
 
 - `IK-1`/`IK-2` handles large organic molecules routinely. For `IK-1`, converge
-  by incrementing `bas.level` and, when relevant, `bas.space_level`; for
-  `IK-2`, `bas.level` does not control basis construction, so increment
-  `bas.space_level` instead until the spectrum stops changing.
-- `bas.longitudinals` and `bas.projections` are physical approximations, not
+  by incrementing `bas.inter_level` and, when relevant, `bas.prox_level`; for
+  `IK-2`, `bas.inter_level` does not control basis construction, so increment
+  `bas.prox_level` instead until the spectrum stops changing.
+- `bas.longitudinal` and `bas.projections` are physical approximations, not
   free reductions: the former deletes transverse states on selected spins,
   while the latter deletes total-coherence blocks that are not retained. Use
   them only when the initial state, pulse sequence, Hamiltonian, relaxation,
@@ -316,7 +318,7 @@ and in Hilbert-space formalisms the density matrix trace is conserved. Print
 these checks in the script so they are run every time, not once.
 
 **3. The result is converged.** Rerun with the active basis restriction
-parameter incremented (`bas.level` for `IK-1`, `bas.space_level` for `IK-2`),
+parameter incremented (`bas.inter_level` for `IK-1`, `bas.prox_level` for `IK-2`),
 the powder grid one rank finer, and the time step halved, one factor at a time,
 and compare spectra numerically - `norm(s1-s2)/norm(s1)` below a stated
 tolerance, not "looks the same". A converged result stops moving under

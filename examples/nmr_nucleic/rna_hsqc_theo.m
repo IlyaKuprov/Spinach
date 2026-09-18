@@ -28,7 +28,7 @@ sys.enable={'greedy'};
 bas.formalism='sphten-liouv';
 bas.approximation='IK-1';
 bas.connectivity='scalar_couplings';
-bas.level=4; bas.space_level=1;
+bas.inter_level=4; bas.prox_level=1;
 
 % Relaxation theory
 inter.relaxation={'damp'};

@@ -57,13 +57,18 @@
 %       directly. Use grape_xy.m, grape_phase.m, or other wrapper func-
 %       tions instead.
 %
+% Note: trajectory cost terms are read from spin_system.control: when
+%       fid_type is 'average', the fidelity is averaged over the pulse
+%       nodes 1..N instead of being taken at the last node; traj_pen
+%       operators are summed, their expectation value is averaged over
+%       the same nodes and subtracted from the fidelity. Both terms use
+%       costates that ride on the backward sweep, the trajectory never
+%       leaves the worker. Hessians are not available with these terms.
+%
 % david.goodwin@inano.au.dk
 % u.rasulov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
 % m.keitel@soton.ac.uk
-%
-% TODO (Keitel): add logic to avoid computing backward trajectory 
-%                when the gradient is not requested
 %
 % <https://spindynamics.org/wiki/index.php?title=grape_liouv.m>
 
@@ -76,6 +81,33 @@ grumble(spin_system,drifts,controls,waveform,...
     
 % Count the outputs
 n_outputs=nargout();
+
+% Pull the trajectory cost term settings
+fid_avg=strcmp(spin_system.control.fid_type,'average');
+pen_on=~isempty(spin_system.control.traj_pen);
+
+% Trajectory cost terms have no Hessians
+if (n_outputs>3)&&(fid_avg||pen_on)
+    error('Hessians are not available with trajectory cost terms.');
+end
+
+% Trajectory cost terms need a waveform-independent initial state
+if spin_system.control.steady&&(fid_avg||pen_on)
+    error('trajectory cost terms are not available with stroboscopic steady states.');
+end
+
+% Phase cycle factors cancel in the overlap but not in the penalty
+if pen_on&&(~isempty(spin_system.control.phase_cycle))
+    error('trajectory penalties are not available with phase cycles.');
+end
+
+% Sum the trajectory penalty operators
+if pen_on
+    pen_op=spin_system.control.traj_pen{1};
+    for k=2:numel(spin_system.control.traj_pen)
+        pen_op=pen_op+spin_system.control.traj_pen{k};
+    end
+end
 
 % Extract the timing grid
 dt=spin_system.control.pulse_dt;
@@ -138,8 +170,8 @@ switch spin_system.control.integrator
         fwd_traj=zeros([size(rho_init,1) (nsteps+1)],'like',1i);
         bwd_traj=zeros([size(rho_init,1) (nsteps+1)],'like',1i);
 
-        % Cannot do trapezium Hessians yet
-        fwd_dP={}; bwd_dP={}; fwd_d2P={}; P_cum={};
+        % No Hessians or precomputed propagators for trapezium
+        fwd_dP={}; bwd_dP={}; fwd_d2P={}; P_cum={}; P={};
         
     otherwise
 
@@ -270,103 +302,33 @@ switch spin_system.control.integrator
              
         end
 
-        % Loop over time steps
-        for n=1:nsteps
-
-            % Get keyhole operators (projectors are Hermitian)
-            keyhole_forw=spin_system.control.keyholes{n};
-            keyhole_back=spin_system.control.keyholes{nsteps+1-n};
-
-            % Apply keyhole to backward trajectory
-            if ~isempty(keyhole_back) 
-                bwd_traj(:,n)=keyhole_back(bwd_traj(:,n));
-            end
-
-            % Goodwin's optimiser needs cumulative propagators
-            if strcmp(spin_system.control.method,'goodwin')&&(n_outputs>3)
-                P_cum{n}=propagator(spin_system,L_forw{n},dt(n));
-                if n>1
-                    P_cum{n}=P_cum{n}*P_cum{n-1};
-                    P_cum{n}=clean_up(spin_system,P_cum{n},...
-                                      spin_system.tols.prop_chop);
-                end
-            end
-
-            % Take a time step forwards and backwards
-            if (~isempty(P))&&(~isempty(P{n}))
-
-                % Use precomputed propagators
-                fwd_traj(:,n+1)=P{n}*fwd_traj(:,n);
-                bwd_traj(:,n+1)=P{nsteps+1-n}'*bwd_traj(:,n);
-
-            else
-
-                % Memory-efficient Liouville space propagation
-                fwd_traj(:,n+1)=step(spin_system,L_forw{n},fwd_traj(:,n),+dt(n));
-                bwd_traj(:,n+1)=step(spin_system,L_back{n},bwd_traj(:,n),-dt(nsteps+1-n));
-
-            end
-
-            % Apply keyhole to forward trajectory
-            if ~isempty(keyhole_forw) 
-                fwd_traj(:,n+1)=keyhole_forw(fwd_traj(:,n+1));
-            end
-
-        end
-
     % Piecewise-linear
     case 'trapezium'
 
         % Preallocate evolution generators
-        L_forw_left=cell(1,nsteps); L_forw_right=cell(1,nsteps);
-        L_back_left=cell(1,nsteps); L_back_right=cell(1,nsteps);
+        L_forw=cell(1,nsteps); L_back=cell(1,nsteps);
 
         % Precompute evolution generators
         for n=1:nsteps
 
             % Cycle through the drifts array
-            L_forw_left{n}=drifts{mod(n-1,ndrifts)+1};           
-            L_forw_right{n}=drifts{mod(n,ndrifts)+1};
-            L_back_left{n}=drifts{mod(nsteps-n,ndrifts)+1}'; 
-            L_back_right{n}=drifts{mod(nsteps+1-n,ndrifts)+1}';
+            forw_left=drifts{mod(n-1,ndrifts)+1};
+            forw_right=drifts{mod(n,ndrifts)+1};
+            back_left=drifts{mod(nsteps-n,ndrifts)+1}';
+            back_right=drifts{mod(nsteps+1-n,ndrifts)+1}';
 
-            % Add current controls to current drifts, including
-            % conjugate-transpose for dissipative controls; the
-            % waveform is always real
+            % Add current controls to the node generators
             for k=1:nctrls
-                L_forw_left{n}=L_forw_left{n}+waveform(k,n)*controls{k};
-                L_forw_right{n}=L_forw_right{n}+waveform(k,n+1)*controls{k};
-                L_back_left{n}=L_back_left{n}+waveform(k,nsteps+1-n)*controls{k}';
-                L_back_right{n}=L_back_right{n}+waveform(k,nsteps+2-n)*controls{k}';
+                forw_left=forw_left+waveform(k,n)*controls{k};
+                forw_right=forw_right+waveform(k,n+1)*controls{k};
+                back_left=back_left+waveform(k,nsteps+1-n)*controls{k}';
+                back_right=back_right+waveform(k,nsteps+2-n)*controls{k}';
             end
 
-        end
+            % Assemble the product quadrature generator triplets
+            L_forw{n}={forw_left,(forw_left+forw_right)/2,forw_right};
+            L_back{n}={back_right,(back_right+back_left)/2,back_left};
 
-        % Loop over time steps
-        for n=1:nsteps
-
-            % Get keyhole operators (projectors are Hermitian)
-            keyhole_forw=spin_system.control.keyholes{n};
-            keyhole_back=spin_system.control.keyholes{nsteps+1-n};
-
-            % Apply keyhole to backward trajectory
-            if ~isempty(keyhole_back) 
-                bwd_traj(:,n)=keyhole_back(bwd_traj(:,n));
-            end
-
-            % Take a time step forwards and backwards
-            fwd_traj(:,n+1)=step(spin_system,{ L_forw_left{n},...
-                                              (L_forw_left{n}+L_forw_right{n})/2,...
-                                               L_forw_right{n}},fwd_traj(:,n),+dt(n));
-            bwd_traj(:,n+1)=step(spin_system,{ L_back_right{n},...
-                                              (L_back_right{n}+L_back_left{n})/2,...
-                                               L_back_left{n}},bwd_traj(:,n),-dt(nsteps+1-n));
-
-            % Apply keyhole to forward trajectory
-            if ~isempty(keyhole_forw)
-                fwd_traj(:,n+1)=keyhole_forw(fwd_traj(:,n+1));
-            end
-            
         end
 
     otherwise
@@ -376,17 +338,113 @@ switch spin_system.control.integrator
 
 end
 
-% Calculate the state overlap
-overlap=rho_targ'*fwd_traj(:,end);
+% Run the forward trajectory
+for n=1:nsteps
+
+    % Get the forward keyhole operator
+    keyhole_forw=spin_system.control.keyholes{n};
+
+    % Goodwin's optimiser needs cumulative propagators
+    if strcmp(spin_system.control.method,'goodwin')&&(n_outputs>3)
+        P_cum{n}=propagator(spin_system,L_forw{n},dt(n));
+        if n>1
+            P_cum{n}=P_cum{n}*P_cum{n-1};
+            P_cum{n}=clean_up(spin_system,P_cum{n},...
+                              spin_system.tols.prop_chop);
+        end
+    end
+
+    % Take a time step forwards
+    if (~isempty(P))&&(~isempty(P{n}))
+        fwd_traj(:,n+1)=P{n}*fwd_traj(:,n);
+    else
+        fwd_traj(:,n+1)=step(spin_system,L_forw{n},fwd_traj(:,n),+dt(n));
+    end
+
+    % Apply keyhole to forward trajectory
+    if ~isempty(keyhole_forw)
+        fwd_traj(:,n+1)=keyhole_forw(fwd_traj(:,n+1));
+    end
+
+end
+
+% Overlaps with the target at the nodes
+overlaps=rho_targ'*fwd_traj(:,2:end); overlap=overlaps(end);
+
+% Trajectory penalty value and costate sources at the nodes
+if pen_on
+    if strcmp(spin_system.bas.formalism,'zeeman-wavef')
+        pen_src=pen_op*fwd_traj(:,2:end); src_idx=1:nsteps;
+        pen_val=mean(real(dot(pen_src,fwd_traj(:,2:end)))); pen_src=2*pen_src/nsteps;
+    else
+        pen_val=mean(real(pen_op'*fwd_traj(:,2:end)));
+        pen_src=pen_op/nsteps; src_idx=ones(1,nsteps);
+    end
+end
+
+% Run the backward trajectories
+if n_outputs>2
+
+    % Fidelity costate source weights at the nodes
+    if fid_avg&&strcmp(fidelity_type,'square')
+        weights=overlaps/nsteps;
+    elseif fid_avg
+        weights=ones(1,nsteps)/nsteps;
+    else
+        weights=[zeros(1,nsteps-1) 1];
+    end
+
+    % Scale the fidelity costate start by the last node weight
+    bwd_traj(:,1)=weights(nsteps)*bwd_traj(:,1);
+
+    % Start the penalty costate at the last node
+    if pen_on
+        pen_traj=zeros(size(fwd_traj),'like',1i);
+        pen_traj(:,1)=pen_src(:,src_idx(nsteps));
+    end
+
+    % Loop over time steps
+    for n=1:nsteps
+
+        % Get the backward keyhole operator
+        keyhole_back=spin_system.control.keyholes{nsteps+1-n};
+
+        % Apply keyhole to the costates
+        if ~isempty(keyhole_back)
+            bwd_traj(:,n)=keyhole_back(bwd_traj(:,n));
+            if pen_on, pen_traj(:,n)=keyhole_back(pen_traj(:,n)); end
+        end
+
+        % Take a time step backwards
+        if (~isempty(P))&&(~isempty(P{n}))
+            bwd_traj(:,n+1)=P{nsteps+1-n}'*bwd_traj(:,n);
+        else
+            bwd_traj(:,n+1)=step(spin_system,L_back{n},bwd_traj(:,n),-dt(nsteps+1-n));
+        end
+        if pen_on
+            pen_traj(:,n+1)=step(spin_system,L_back{n},pen_traj(:,n),-dt(nsteps+1-n));
+        end
+
+        % Add the sources at the previous node
+        if n<nsteps
+            bwd_traj(:,n+1)=bwd_traj(:,n+1)+weights(nsteps-n)*rho_targ;
+            if pen_on, pen_traj(:,n+1)=pen_traj(:,n+1)+pen_src(:,src_idx(nsteps-n)); end
+        end
+
+    end
+
+    % Flip the costates to match forward indexing
+    bwd_traj=fliplr(bwd_traj);
+    if pen_on, pen_traj=fliplr(pen_traj); end
+
+end
 
 % Compute gradient
 if n_outputs>2
 
-    % Flip the backward trajectory
-    bwd_traj=fliplr(bwd_traj);
-    
     % Preallocate results
     grad=zeros(size(waveform),'like',1i);
+    if pen_on, pen_grad=zeros(size(waveform)); end
     
     % Integrator-specific paths
     switch spin_system.control.integrator
@@ -425,6 +483,7 @@ if n_outputs>2
                 
                         % Compute the derivative
                         grad_col(k)=bwd_traj(:,n+1)'*aux_vec(1:(end/2));
+                        if pen_on, pen_grad(k,n)=real(pen_traj(:,n+1)'*aux_vec(1:(end/2))); end
 
                     else
 
@@ -474,6 +533,7 @@ if n_outputs>2
 
                         % Compute the derivative
                         grad_col(k)=bwd_traj(:,n+1)'*aux_vec(1:(end/2));
+                        if pen_on, pen_grad(k,n)=real(pen_traj(:,n+1)'*aux_vec(1:(end/2))); end
 
                     end
                 
@@ -498,6 +558,7 @@ if n_outputs>2
 
                         % Compute the derivative
                         grad_col(k)=bwd_traj(:,end)'*aux_vec(1:(end/2));
+                        if pen_on, pen_grad(k,n)=real(pen_traj(:,end)'*aux_vec(1:(end/2))); end
 
                     end
 
@@ -522,6 +583,7 @@ if n_outputs>2
 
                         % Product rule: [dP2]*[P1]*rho part
                         grad_col(k)=grad_col(k)+bwd_traj(:,n+1)'*aux_vec_a(1:(end/2));
+                        if pen_on, pen_grad(k,n)=pen_grad(k,n)+real(pen_traj(:,n+1)'*aux_vec_a(1:(end/2))); end
                         
                         % Right pair of drifts
                         L={drifts{mod(n-2,ndrifts)+1},...
@@ -538,6 +600,7 @@ if n_outputs>2
 
                         % Product rule: [P2]*[dP1]*rho part
                         grad_col(k)=grad_col(k)+bwd_traj(:,n)'*aux_vec_b(1:(end/2));
+                        if pen_on, pen_grad(k,n)=pen_grad(k,n)+real(pen_traj(:,n)'*aux_vec_b(1:(end/2))); end
 
                     end
 
@@ -811,8 +874,12 @@ switch fidelity_type
     
     case {'real'}
         
-        % Real part of the overlap
-        fidelity=real(overlap);
+        % Real part of the overlap, averaged over the nodes if requested
+        if fid_avg
+            fidelity=mean(real(overlaps));
+        else
+            fidelity=real(overlap);
+        end
         
         % Update Hessian
         if exist('hess','var'), hess=real(hess); end
@@ -822,8 +889,12 @@ switch fidelity_type
         
     case {'imag'}
         
-        % Imaginary part of the overlap
-        fidelity=imag(overlap);
+        % Imaginary part of the overlap, averaged over the nodes if requested
+        if fid_avg
+            fidelity=mean(imag(overlaps));
+        else
+            fidelity=imag(overlap);
+        end
         
         % Update Hessian
         if exist('hess','var'), hess=imag(hess); end
@@ -833,8 +904,12 @@ switch fidelity_type
         
     case {'square'}
         
-        % Absolute square of the overalp
-        fidelity=overlap*conj(overlap);
+        % Absolute square of the overlap, averaged over the nodes if requested
+        if fid_avg
+            fidelity=mean(abs(overlaps).^2);
+        else
+            fidelity=overlap*conj(overlap);
+        end
         
         % Update Hessian
         if exist('hess','var')
@@ -853,11 +928,12 @@ switch fidelity_type
         % Update gradient
         if exist('grad','var')
             
-            % Product rule
-            grad=grad*conj(overlap)+overlap*conj(grad);
-        
-            % Cleaning up
-            grad=real(grad);
+            % Product rule, averaged overlaps are inside the costate
+            if fid_avg
+                grad=2*real(grad);
+            else
+                grad=real(grad*conj(overlap)+overlap*conj(grad));
+            end
         
         end
         
@@ -885,18 +961,24 @@ else
     traj_data.forward=[];
 end
 
-% Catch unreachable objectives
-if abs(fidelity)==0
+% Catch unreachable terminal objectives, trajectory cost terms may cancel legitimately
+if (~(fid_avg||pen_on))&&(abs(fidelity)==0)
     spin_system.sys.output=1;
     report(spin_system,'exactly zero fidelity: either the target is unreachable');
     report(spin_system,'from the source, or the initial guess is very poor.');
     error('GRAPE cannot proceed.');
 end
-if exist('grad','var')&&(norm(grad,1)==0)
+if (~(fid_avg||pen_on))&&exist('grad','var')&&(norm(grad,1)==0)
     spin_system.sys.output=1;
     report(spin_system,'exactly zero gradient: either the target is unreachable');
     report(spin_system,'from the source, or the initial guess is very poor.');
     error('GRAPE cannot proceed.');
+end
+
+% Subtract the trajectory penalty
+if pen_on
+    fidelity=fidelity-pen_val;
+    if exist('grad','var'), grad=grad-pen_grad; end
 end
 
 end
@@ -935,6 +1017,10 @@ if (~isnumeric(rho_targ))||(~iscolumn(rho_targ))
 end
 if (~ischar(fidelity_type))||(~ismember(fidelity_type,{'real','imag','square'}))
     error('fidelity_type must be ''real'', ''imag'', or ''square''.');
+end
+if (~ischar(spin_system.control.fid_type))||...
+   (~ismember(spin_system.control.fid_type,{'terminal','average'}))
+    error('spin_system.control.fid_type must be ''terminal'' or ''average''.');
 end
 if ~iscell(drifts)
     error('drifts must be a cell array of matrices.');

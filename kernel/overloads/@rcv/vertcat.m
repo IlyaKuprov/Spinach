@@ -1,50 +1,53 @@
 % Vertical concatenation for RCV sparse matrices. Syntax:
 %
-%                      A=vertcat(A,B)
+%                      A=vertcat(A,B,...)
 %
 % Parameters:
 %
-%    A  - top RCV matrix
-%    B  - bottom RCV matrix
+%    A,B,...   - RCV sparse matrices, top to bottom
 %
 % Outputs:
 %
-%    A  - concatenated RCV sparse matrix
+%    A         - RCV sparse matrix
 %
 % m.keitel@soton.ac.uk
 %
 % <https://spindynamics.org/wiki/index.php?title=rcv/vertcat.m>
 
-function A=vertcat(A,B)
+function A=vertcat(varargin)
 
 % Check consistency
-grumble(A,B);
+grumble(varargin{:});
 
-% Align locations
-if A.isGPU||B.isGPU
-    A=gpuArray(A);
-    B=gpuArray(B);
+% Move all operands to the GPU if any of them is there
+if any(cellfun(@(x)x.isGPU,varargin))
+    varargin=cellfun(@gpuArray,varargin,'UniformOutput',false);
 end
 
-% Shift row indices
-B.row=B.row+A.numRows;
+% Shift row indices by the running row count
+rows=cell(nargin,1); cols=cell(nargin,1); vals=cell(nargin,1); nrows=int64(0);
+for n=1:nargin
+    rows{n}=varargin{n}.row+nrows;
+    cols{n}=varargin{n}.col;
+    vals{n}=varargin{n}.val;
+    nrows=nrows+varargin{n}.numRows;
+end
 
-% Concatenate indices
-A.row=[A.row; B.row];
-A.col=[A.col; B.col];
-A.val=[A.val; B.val];
-
-% Update row count in the result
-A.numRows=A.numRows+B.numRows;
+% Concatenate RCV arrays once
+A=varargin{1};
+A.row=vertcat(rows{:});
+A.col=vertcat(cols{:});
+A.val=vertcat(vals{:});
+A.numRows=nrows;
 
 end
 
 % Consistency enforcement
-function grumble(A,B)
-if ~isa(A,'rcv')||~isa(B,'rcv')
-    error('both inputs must be RCV sparse matrices.');
+function grumble(varargin)
+if ~all(cellfun(@(x)isa(x,'rcv'),varargin))
+    error('all inputs must be RCV sparse matrices.');
 end
-if A.numCols~=B.numCols
+if numel(unique(cellfun(@(x)x.numCols,varargin)))>1
     error('column counts must match for vertical concatenation.');
 end
 end

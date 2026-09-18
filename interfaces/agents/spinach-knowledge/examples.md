@@ -1,11 +1,11 @@
 # Spinach code index: examples
 
 - Source root: `/home/kuprov/.openclaw/workspace/Spinach`
-- Source commit: `f053e432a61d7144f3946d73d0a672e3ccfc3fc5`
+- Source commit: `ac6136149e438077587b302a1e92d0371b099f20`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
-- Files indexed: **756** MATLAB files
-- Generated: 2026-08-30T02:52:31
+- Files indexed: **761** MATLAB files
+- Generated: 2026-09-16T03:34:56
 
 | File | Signature | Summary | LOC |
 |---|---|---|---:|
@@ -285,7 +285,7 @@
 | `examples/fundamentals/tensor_structures/ttrain_test_1.m` | `ttrain_test_1()` | A simple test of ttclass object arithmetic. | 31 |
 | `examples/giant_spin/dy_lft_single_1.m` | `dy_lft_single_1()` | Reproduction of MOLCAS results with the Ligand Field Theory model for a single Dy(III) ion. Calculation time: seconds | 97 |
 | `examples/giant_spin/dy_lft_single_2.m` | `dy_lft_single_2()` | A demonstration that most lanthanide complexes are in the ZFS limit for the purposes of relaxation theory. One of the fi | 91 |
-| `examples/giant_spin/lanthanide_powder.m` | `lanthanide_powder()` | Powder spectrum of Gd(III) with ZFS up to 3rd spherical rank using the giant spin Hamiltonian formalism in a sweepable 4 | 50 |
+| `examples/giant_spin/lanthanide_powder.m` | `lanthanide_powder()` | Powder spectrum of Gd(III) with ZFS up to 4th spherical rank using the giant spin Hamiltonian formalism in a sweepable 4 | 57 |
 | `examples/giant_spin/lanthanide_redfield.m` | `lanthanide_redfield()` | Relaxation rate of Gd(III) as a function of zero-field splitting, computed using Redfield theory. The correla- tion time | 63 |
 | `examples/giant_spin/nuclear_relaxation_1.m` | `nuclear_relaxation_1()` | Nuclear relaxation rates using the adiabatic elimination method for a rapidly relaxing Dy(III) ion with a user-specified | 148 |
 | `examples/giant_spin/quartet_levels.m` | `quartet_levels()` | Energy levels magnetic field scan for a spin-3/2 particle with a zero-field splitting. Calculation time: seconds | 42 |
@@ -599,6 +599,11 @@
 | `examples/optimal_control/bloch_siegert/yusuke_14n_broadening_demo.m` | `yusuke_14n_broadening_demo()` | Reduced effective-model illustration of the trade-off discussed by Nehra, Agarwal, and Nishiyama for 14N decoupling unde | 205 |
 | `examples/optimal_control/bloch_siegert/yusuke_1h_14n_optimal_vs_cw_demo.m` | `yusuke_1h_14n_optimal_vs_cw_demo()` | Reduced heteronuclear control demonstration inspired by the low-power offset-tolerant 14N decoupling papers of Nehra, Ag | 264 |
 | `examples/optimal_control/bloch_siegert/yusuke_optimal_vs_cw_demo.m` | `yusuke_optimal_vs_cw_demo()` | Bloch-Siegert-aware phase optimisation compared to a simple constant- phase low-power cycle. This is the control-side co | 240 |
+| `examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/ct_selective.m` | `ct_selective()` | Optimal control design of the central transition selective pulse of the z-filtered 27Al MQMAS experiment. Reproduces, us | 105 |
+| `examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mq_conversion.m` | `mq_conversion()` | Optimal control design of the multiple-quantum conversion pulse of the z-filtered 27Al MQMAS experiment. Reproduces, usi | 110 |
+| `examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mq_excitation.m` | `mq_excitation()` | Optimal control design of the multiple-quantum excitation pulse of the z-filtered 27Al MQMAS experiment. Reproduces, usi | 110 |
+| `examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_drifts.m` | `drifts=mqmas_drifts(spin_system,parameters)` | Drift Hamiltonians of a quadrupolar nucleus under magic angle spin- ning, resolved in rotor phase, for every combination | 193 |
+| `examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_efficiency.m` | `mqmas_efficiency()` | Efficiency of the z-filtered 27Al MQMAS pulse sequence with hard pulses and with the optimal control pulses produced by  | 150 |
 | `examples/optimal_control/case_studies/Tosner_JMR_2009/bb_inversion_pulse.m` | `bb_inversion_pulse()` | Broadband inversion pulse design for liquid-state NMR. Reprodu- ces, using Spinach, the second example from: A single pr | 101 |
 | `examples/optimal_control/case_studies/Tosner_JMR_2009/bb_refocusing_pulse.m` | `bb_refocusing_pulse()` | Spinach implementation of the broadband refocusing example from GRAPE is used to design a 200 µs broadband x-phase π pul | 97 |
 | `examples/optimal_control/case_studies/Tosner_JMR_2009/coherence_transfer.m` | `coherence_transfer()` | The first optimal control example from A heteronuclear two-spin system (1H–13C) with an scalar and both nuclei set on re | 79 |
@@ -654,6 +659,8 @@
 | `examples/parahydrogen/pasadena_ethylbenzene.m` | `pasadena_ethylbenzene()` | PASADENA experiment simulation for the parahydrogenation of styrene into ethylbenzene. Set to reproduce the top trace of | 70 |
 | `examples/parahydrogen/pasadena_propanal.m` | `pasadena_propanal()` | PASADENA experiment simulation for the parahydrogenation of acrolein into propanal. Calculation time: seconds | 64 |
 | `examples/parahydrogen/sabre_pyridine.m` | `sabre_pyridine()` | SABRE experiment simulation for Eibe Duecker and Christian Griesinger. Set to reproduce Figure 3b from http://dx.doi.org | 114 |
+| `examples/quantum_tech/circuit_qed/cavity_binomial_safe.m` | `cavity_binomial_safe()` | Binomial bosonic code \|0L>=(\|0>+\|4>)/sqrt(2), \|1L>=\|2> in a cavity dispersively coupled to a flux-tunable transmon ancil | 232 |
+| `examples/quantum_tech/circuit_qed/cavity_dual_rail_safe.m` | `cavity_dual_rail_safe()` | Flux-noise dephasing rates of two dual-rail qubits whose flux-tuna- ble transmon-coupled rails share one transmon ancill | 101 |
 | `examples/quantum_tech/circuit_qed/cavity_fock_grape_a.m` | `cavity_fock_grape_a()` | GRAPE preparation of a cavity Fock state through a dispersively coupled qubit, using piecewise-constant drives on both t | 127 |
 | `examples/quantum_tech/circuit_qed/cavity_fock_grape_b.m` | `cavity_fock_grape_b()` | GRAPE preparation of a cavity Fock state through a dispersively coupled qubit using smooth band-limited drives. The cont | 113 |
 | `examples/quantum_tech/circuit_qed/cross_resonance.m` | `cross_resonance()` | Cross-resonance gate mechanism between two fixed-frequency transmons in the laboratory frame. The control transmon is dr | 143 |
@@ -669,6 +676,7 @@
 | `examples/quantum_tech/diamond_defects/diamond_p1_13c_epr_xw.m` | `diamond_p1_13c_epr_xw()` | Field-swept powder EPR spectra of a P1 centre in 13C-enriched diamond at X and W bands. Calculation time: minutes. | 71 |
 | `examples/quantum_tech/diamond_defects/diamond_p1_epr_xw.m` | `diamond_p1_epr_xw()` | Field-swept powder EPR spectra of a P1 centre in diamond at X and W bands. Calculation time: seconds. | 67 |
 | `examples/quantum_tech/diamond_defects/diamond_siv0_epr_xw.m` | `diamond_siv0_epr_xw()` | Field-swept powder EPR spectra of SiV0 centre in diamond at X and W bands. Calculation time: seconds. | 68 |
+| `examples/quantum_tech/geometric_phase_gate.m` | `geometric_phase_gate()` | Geometric phase gate between two trapped-ion qubits driven by a state-dependent optical dipole force, as demonstrated by Le | 143 |
 | `examples/quantum_tech/jaynes_cummings_a.m` | `jaynes_cummings_a()` | Jaynes-Cummings coupling between a spin and an electromagnetic cavity mode with five population numbers included. The av | 70 |
 | `examples/quantum_tech/jaynes_cummings_b.m` | `jaynes_cummings_b()` | Jaynes-Cummings coupling between a spin and an electromagnetic cavity mode with five population numbers included. A time | 79 |
 | `examples/quantum_tech/jaynes_cummings_c.m` | `jaynes_cummings_c()` | An exchange-coupled two-electron system with the electrons having independent Jaynes-Cummings couplings to the same mode | 74 |

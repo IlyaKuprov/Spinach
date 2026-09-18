@@ -74,7 +74,7 @@ for n=1:npoints
 end
 
 % Make a figure
-kfigure(); scale_figure([2.5 2.5]);
+fig=kfigure(); scale_figure([2.5 2.5]);
 subplot(2,2,1); camproj('perspective'); view(-20,15); axis vis3d;
 subplot(2,2,2); camproj('perspective'); view(-20,15); axis vis3d;
 subplot(2,2,3); camproj('perspective'); view(-20,15); axis vis3d;
@@ -84,9 +84,8 @@ subplot(2,2,4); camproj('perspective'); view(-20,15); axis vis3d;
 for n=1:size(traj,3)
 
     % First reactant
-    subplot(2,2,1); 
+    set(groot,'CurrentFigure',fig); subplot(2,2,1); cla;
     spin_system.mesh.zext=[-0.005 0.01];
-    set(groot,'CurrentFigure',1); cla;
     conc=squeeze(full(real(traj(1,:,n))));
     mesh_plot(spin_system,0,0);
     conc_plot(spin_system,conc');
@@ -96,9 +95,8 @@ for n=1:size(traj,3)
     camorbit(0.5,0.02); ktitle('cyclopentadiene');
 
     % Second reactant
-    subplot(2,2,2); 
+    set(groot,'CurrentFigure',fig); subplot(2,2,2); cla;
     spin_system.mesh.zext=[-0.005 0.01];
-    set(groot,'CurrentFigure',1); cla;
     conc=squeeze(full(real(traj(2,:,n))));
     mesh_plot(spin_system,0,0);
     conc_plot(spin_system,conc');
@@ -108,9 +106,8 @@ for n=1:size(traj,3)
     camorbit(0.5,0.02); ktitle('acrylonitrile');
 
     % First product
-    subplot(2,2,3); 
+    set(groot,'CurrentFigure',fig); subplot(2,2,3); cla;
     spin_system.mesh.zext=[-0.005 0.01]/8;
-    set(groot,'CurrentFigure',1); cla;
     conc=squeeze(full(real(traj(3,:,n))));
     mesh_plot(spin_system,0,0);
     conc_plot(spin_system,conc');
@@ -120,9 +117,8 @@ for n=1:size(traj,3)
     camorbit(0.5,0.02); ktitle('exo-NBCN');
 
     % Second product
-    subplot(2,2,4); 
+    set(groot,'CurrentFigure',fig); subplot(2,2,4); cla;
     spin_system.mesh.zext=[-0.005 0.01]/8;
-    set(groot,'CurrentFigure',1); cla;
     conc=squeeze(full(real(traj(4,:,n))));
     mesh_plot(spin_system,0,0);
     conc_plot(spin_system,conc');

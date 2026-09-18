@@ -28,7 +28,7 @@ sys.isotopes={'1H'};
 inter.zeeman.scalar={0};
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-bas.projections=+1;
+bas.projections={+1};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Set up a short offset acquisition

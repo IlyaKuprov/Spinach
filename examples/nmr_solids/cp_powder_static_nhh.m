@@ -32,7 +32,7 @@ inter.temperature=298;
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-0';
-bas.level=4;
+bas.inter_level=4;
 
 % This needs a GPU
 sys.enable={'greedy'}; % 'gpu'

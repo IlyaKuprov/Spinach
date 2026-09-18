@@ -59,6 +59,9 @@ grumble(parameters,H,R,K);
 % Get the overtone frequency
 ovt_frq=-2*spin(parameters.spins{1})*spin_system.inter.magnet/(2*pi);
 
+% Compose Liouvillian
+L=H+1i*R+1i*K;
+
 % Project pulse operators
 Lx=kron(speye(parameters.spc_dim),parameters.Lx);
 
@@ -76,13 +79,13 @@ omega=2*pi*ovt_frq-2*pi*parameters.rf_frq;
 
 % Get the pulse Hamiltonian
 pulseop=parameters.pulse_amp*Lx;
-pulseop=average(spin_system,pulseop/2,H,pulseop/2,omega,'matrix_log');
+pulseop=average(spin_system,pulseop/2,L,pulseop/2,omega,'matrix_log');
 
 % Precompute pulse propagator
 PP=propagator(spin_system,pulseop,parameters.pulse_dur);
 
 % Precompute evolution propagator
-PE=propagator(spin_system,H,cycle_length-parameters.pulse_dur);
+PE=propagator(spin_system,L,cycle_length-parameters.pulse_dur);
 
 % Combine the propagators
 P=clean_up(spin_system,PE*PP,spin_system.tols.prop_chop);

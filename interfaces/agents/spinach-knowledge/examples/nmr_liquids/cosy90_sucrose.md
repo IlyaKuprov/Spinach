@@ -42,7 +42,7 @@ COSY spectrum of sucrose (magnetic parameters computed with DFT). Calculation ti
 - Lines 22: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 23: computes `bas.approximation` using `bas.approximation='IK-2'`.
 - Lines 24: computes `bas.connectivity` using `bas.connectivity='scalar_couplings'`.
-- Lines 25: computes `bas.space_level` using `bas.space_level=1`.
+- Lines 25: computes `bas.prox_level` using `bas.prox_level=1`.
 - Lines 28: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 32: computes `parameters.angle` using `parameters.angle=pi/2`.
 - Lines 33: computes `parameters.offset` using `parameters.offset=800`.

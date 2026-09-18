@@ -30,7 +30,7 @@ for n=1:size(spec,2)
     k=n*size(spec,1)/size(spec,2);
     
     % Find the row index extents
-    k=floor(k-brush_dim/2):ceil(k+brush_dim/2);
+    k=round(k-(brush_dim-1)/2):round(k+(brush_dim-1)/2);
     
     % Avoid array boundaries
     k(k<1)=[]; k(k>size(spec,1))=[];

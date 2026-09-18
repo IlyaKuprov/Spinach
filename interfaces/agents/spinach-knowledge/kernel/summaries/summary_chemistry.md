@@ -39,7 +39,7 @@ Prints chemical subsystem and exchange summary for a Spinach system. Syntax: sum
 
 ### Key state/data transformations
 
-- Lines 37: computes `[rows,cols,vals]` using `[rows,cols,vals]=find(spin_system.chem.rates)`.
+- Lines 37: computes `[rows,cols,vals]` using `[rows,cols,vals]=find(spin_system.chem.rates-diag(diag(spin_system.chem.rates)))`, the diagonal outflow terms are excluded from the reaction table.
 
 ### Local helper functions
 

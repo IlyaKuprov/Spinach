@@ -7,7 +7,7 @@
 function leu_chi_fit()
 
 % Run the Karplus fitter
-[A,B,C,sA,sB,sC]=karplus_fit('.\leu_chi_data',{[31 29 23 24]});
+[A,B,C,sA,sB,sC]=karplus_fit('leu_chi_data',{[31 29 23 24]});
 
 % Display the answer
 disp(['Karplus A: ' num2str(A) ', stdev ' num2str(sA)]);

@@ -65,7 +65,7 @@ and re-place `parameters.offset` and `parameters.sweep`; everything after
 `nmr_liquids/noesy_strychnine.m`, `cosy90_strychnine.m`, `tocsy_sucrose.m`,
 `roesy_strychnine.m`. NOESY starts from thermal equilibrium and so carries
 `parameters.needs={'rho_eq'}` with `inter.equilibrium='IME'` and a temperature;
-COSY does not. NOESY also needs `bas.space_level=3` rather than `1`, because
+COSY does not. NOESY also needs `bas.prox_level=3` rather than `1`, because
 cross peaks come from through-space correlations that scalar-coupling
 connectivity does not reach. States quadrature reconstruction:
 
@@ -133,12 +133,12 @@ a named grid.
 ```matlab
 inter.zeeman.eigs={[<xx> <yy> <zz>]};    % ppm
 inter.zeeman.euler={[<a> <b> <g>]};      % radians
-sys.disable={'trajlevel'}; bas.projections=+1;
+sys.disable={'trajlevel'}; bas.projections={+1};
 parameters.grid='rep_2ang_6400pts_sph'; parameters.verbose=0;
 fid=powder(spin_system,@acquire,parameters,'nmr');
 ```
 
-`bas.projections=+1` is safe because a single-quantum spectrum needs one total
+`bas.projections={+1}` is safe because a single-quantum spectrum needs one total
 projection block; `trajlevel` analysis is meaningless per orientation. Grid
 choice is a convergence parameter: refine until the pattern stops moving.
 
@@ -283,7 +283,7 @@ be built from that pattern.
 `M=liquid(spin_system,@rydmr_exp,parameters,'labframe')`. `sys.magnet` is `1`
 for normalisation and the real sweep is `parameters.fields` in tesla, alongside
 `parameters.rates` in hertz, `parameters.electrons` and
-`parameters.needs={'zeeman_op'}`. The basis carries `bas.projections=0` and
+`parameters.needs={'zeeman_op'}`. The basis carries `bas.projections={0}` and
 permutation symmetry on equivalent protons via `bas.sym_spins`/`bas.sym_group`,
 and `sys.disable={'zte'}` is required because the singlet start state is not
 the thermal one. For Haberkorn or Jones-Hore kinetics use `@rydmr` with
@@ -389,7 +389,14 @@ pulse=fmaxnewton(spin_system,@grape_xy,guess);
 ```
 
 The state normalisation is not cosmetic: the fidelity functional assumes unit
-norm. Sweeping `pwr_levels` and `offsets` makes B1 inhomogeneity and
+norm. `optimcon` distributes the drift generators over the workers of the pool
+that is open when it runs and records that pool's identity; each worker then
+evaluates its own block of ensemble cases in `ens_block`. The pool must have
+`SpmdEnabled` true (the default), and `ensemble` refuses any other pool, even
+one with the same number of workers, and refuses a call from inside a worker:
+keep the same pool object from `optimcon` through `fmaxnewton` and any later
+`ensemble` evaluation, and re-run `optimcon` after deleting or restarting the
+pool. Sweeping `pwr_levels` and `offsets` makes B1 inhomogeneity and
 transmitter misplacement part of the optimisation target rather than something
 discovered afterwards. Verify by propagating with `shaped_pulse_xy` and taking
 `real(rho_targ'*rho)`. The `features_*.m` files demonstrate one concept each
@@ -398,6 +405,30 @@ keyholes, multiple targets, phase cycling, wave bases); solid-state control is
 `static_powder_control.m` and `mas_powder_control.m`. Analytically designed
 rather than optimised pulses are propagated in
 `shaped_pulses/shaped_pulse_gaussian.m` and its chirp, Q5 and SLR siblings.
+
+Optimal control of a quadrupolar nucleus under MAS in Hilbert space is the
+`case_studies/Smelko_ChemRxiv_2026` folder (27Al 3QMAS and 5QMAS excitation,
+conversion, and central-transition selective pulses). `mqmas_drifts.m` builds
+the rotor-phase-resolved drift Hamiltonians: a `zeeman-hilb` system with
+`labframe` assumptions, `hamiltonian` and `carrier`, all three Euler angles
+of a two-angle grid (the azimuth sits in `gammas`; the grid must have uniform
+weights, such as the `rep_2ang_*` grids, because the optimal control ensemble
+is averaged without quadrature weights), the rotor rotation in the first
+angle, and `rotframe` to second order at every rotor phase tick; each
+ensemble member is one grid orientation at one initial rotor phase and goes
+into `control.drifts` as a cell array with one Hamiltonian per pulse slice, so
+the drifts are time-dependent and the ensemble is grid points times rotor
+phases. Sparse orientation or phase sampling overfits (a 100 x 20 ensemble
+scored 0.52 on itself and 0.29 on 400 x 32), so optimise at the sampling
+density you evaluate at. Targets are density matrix elements: the Hermitian
+±MQ coherence combination for excitation, the central-transition population
+difference for conversion, the central-transition coherence for the soft
+pulse. `mqmas_efficiency.m` propagates the whole z-filtered sequence with
+`step` and `coherence` filters and compares hard pulses, sliced at the drift
+tick interval, with the optimal control waveforms. The 16000-member drift
+ensemble needs the per-worker slicing in `optimcon`; set the pool size with
+`sys.parallel={'processes',N}` in `sys` and never open a pool before
+`create`, which destroys foreign pools.
 
 ## Fitting to experimental data
 
@@ -447,7 +478,10 @@ context: the Hamiltonian is built with `hamiltonian(assume(spin_system,'nmr'))`,
 `Lx` and `Ly` operators are passed to the kernel function
 `m2s(spin_system,H,Cx,Cy,rho0,<J coupling, Hz>,<Zeeman frequency difference,
 Hz>)`, and the population is read off by projecting onto
-`singlet(spin_system,<spin a>,<spin b>)`. `s2m_example.m` is the reverse.
+`singlet(spin_system,<spin a>,<spin b>)`. `s2m_example.m` is the reverse. Both
+functions accept either sign of the coupling and of the frequency difference:
+the echo-train repetition count uses their magnitudes and the phase of the
+90-degree pulse next to the lone tau delay follows the sign of J.
 Lifetimes limited by intramolecular mechanisms are in the `decoherence_*.m`
 files; `singlet_imaging_1.m` combines singlet order with the imaging context.
 

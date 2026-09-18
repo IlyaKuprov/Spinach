@@ -460,4 +460,9 @@ and `mri_2d_plot(mri,parameters,method)` with `method` in
 `[spec,parameters]=crop_2d(spin_system,spec,parameters,crop_ranges)` with
 `crop_ranges={[f1_min f1_max],[f2_min f2_max]}` in ppm only. Figures use the
 house wrappers `kfigure`, `ktitle`, `kgrid`, `kxlabel`, `kylabel`, `kzlabel`,
-`klegend`, `kcolourbar`, and `scale_figure`.
+`klegend`, `kletter`, `kcolourbar`, and `scale_figure`. `kletter(letter_label)`
+takes a one-element character string and draws a bold panel letter inside the plot
+box, with its left edge and its cap line 10 points from the left and the top
+edge of the box; the offsets are computed when it is called, so call it after the
+figure has its final size and a tiled layout all of its tiles; `fig2tiles` re-applies the tagged letters on the
+retiled axes of a merged figure.

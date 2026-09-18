@@ -33,7 +33,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.spins={'E'};
 parameters.offset=5e6;
-parameters.rho0=state(spin_system,{'Lx','E'  },{1,2})+...
+parameters.rho0=state(spin_system,{'Lx','BL1'},{1,2})+...
                 state(spin_system,{'E' ,'BL1'},{1,2})/2;
 parameters.sweep=1e8;
 parameters.npoints=251;

@@ -23,7 +23,7 @@
 %     parameters.irr_powers   - microwave amplitude (aka electron
 %                             nutation frequency), Hz 
 %
-%     parameters.coil         - detection state(s)
+%     parameters.coil         - detection state, a column vector
 %
 %     parameters.contact_dur  - contact time, seconds
 %
@@ -135,6 +135,9 @@ if (~isnumeric(parameters.irr_powers))||(~isreal(parameters.irr_powers))||...
 end
 if ~isfield(parameters,'coil')
     error('detection state must be specified in parameters.coil variable.');
+end
+if (~isnumeric(parameters.coil))||(~iscolumn(parameters.coil))
+    error('parameters.coil must be a column vector.');
 end
 if ~isfield(parameters,'contact_dur')
     error('the contact time must be specified in parameters.contact_dur variable.');

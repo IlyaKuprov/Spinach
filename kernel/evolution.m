@@ -991,6 +991,9 @@ if (~ischar(output))||(~ismember(output,{'observable','final',...
    'trajectory','total','multichannel','refocus'}))
     error('observable argument must be a valid character string.');
 end
+if isa(L,'polyadic')&&strcmp(output,'total')
+    error('total observable integral is not available for polyadic generators.');
+end
 end
 
 % Degrees of ability vary, but the basic principle remains the same: the

@@ -36,7 +36,7 @@ inter.tau_c={3e-9};
 bas.formalism='sphten-liouv';
 bas.approximation='IK-1';
 bas.connectivity='scalar_couplings';
-bas.level=5; bas.space_level=3;
+bas.inter_level=5; bas.prox_level=3;
 
 % Create the spin system structure
 spin_system=create(sys,inter);

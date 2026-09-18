@@ -4,14 +4,14 @@
 - Source commit: `f053e432a61d7144f3946d73d0a672e3ccfc3fc5`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
-- Files indexed: **523** MATLAB files
+- Files indexed: **525** MATLAB files
 - Generated: 2026-08-30T02:52:31
 
 | File | Signature | Summary | LOC |
 |---|---|---|---:|
 | `kernel/assume.m` | `spin_system=assume(spin_system,assumptions,retention)` | Sets case-specific assumptions for various simulation contexts. This function determines the behaviour of the Hamiltonia | 769 |
 | `kernel/average.m` | `H=average(spin_system,Hp,H0,Hm,omega,theory)` | Average Hamiltonian theories under Zeeman interaction rotating frame transformations. Syntax: H=average(spin_system,Hp,H | 209 |
-| `kernel/basis.m` | `spin_system=basis(spin_system,bas)` | Basis set control. This is the second mandatory function (after create.m) that must be called in every calculation to bu | 821 |
+| `kernel/basis.m` | `spin_system=basis(spin_system,bas)` | Basis set control. This is the second mandatory function (after create.m) that must be called in every calculation to bu | 1018 |
 | `kernel/cache/bos_product_table.m` | `[product_table_left,...` | Structure coefficient tables for the associative envelopes of truncated Weyl algebras spanned by orthogonalised bosonic  | 111 |
 | `kernel/cache/cacheman.m` | `cacheman(spin_system) %#NHEAD` | Cache management heuristics. Looks after the scratch folder and prevents it from filling up the disk. Do not call direct | 103 |
 | `kernel/cache/ist_product_table.m` | `[product_table_left,product_table_right]=ist_product_table(mult)` | Structure coefficient tables for the associative envelopes of su(mult) algebras. Syntax: [product_table_left,product_tab | 156 |
@@ -80,7 +80,7 @@
 | `kernel/conventions/transforms/xyz2sph.m` | `[r,theta,phi] = xyz2sph(x,y,z)` | Converts Cartesian coordinates [x y z] into spherical coordinates according to the ISO convention. Syntax: [r,theta,phi] | 56 |
 | `kernel/conventions/transforms/zfs2mat.m` | `M=zfs2mat(D,E,alp,bet,gam)` | Converts D and E zero-field splitting parameters described in the abstract of (http://dx.doi.org/10.1063/1.1682294) into | 61 |
 | `kernel/correlation.m` | `rho=correlation(spin_system,rho,orders,spins)` | Correlation order selection function -keeps only the specified orders of spin correlation in the state vector. This is u | 168 |
-| `kernel/create.m` | `spin_system=create(sys,inter)` | The entry function of the Spinach kernel that creates the spin system object that the rest of the library requires to ru | 3192 |
+| `kernel/create.m` | `spin_system=create(sys,inter)` | The entry function of the Spinach kernel that creates the spin system object that the rest of the library requires to ru | 3191 |
 | `kernel/decouple.m` | `[L,rho]=decouple(spin_system,L,rho,spins)` | Obliterates all interactions and populations in the subspace of states that involve the specified spins in any way. The  | 225 |
 | `kernel/derivatives/fdhess.m` | `H=fdhess(A,nstenc)` | Returns the finite-difference Hessian of a 3D array using a finite difference scheme with a user-specified number of ste | 72 |
 | `kernel/derivatives/fdkup.m` | `K=fdkup(npoints,extents,chi,nstenc)` | Returns a finite difference representation of the Kuprov operator: K[rho]=-(1/3)*Trace(Hessian[rho]*chi) with the number | 98 |
@@ -190,8 +190,9 @@
 | `kernel/optimcon/distortions/spf.m` | `[w,J]=spf(w,p)` | Applies a discrete single-pole filter: Y(n)=(1-p)*X(n)+p*Y(n-1) to a Spinach optimal control module waveform. Treats odd | 125 |
 | `kernel/optimcon/distortions/szf.m` | `[w,J]=szf(w,z)` | Applies a discrete single-zero filter: Y(k)=X(k)/(1-z)-z*X(k-1)/(1-z); to a Spinach optimal control module waveform. Tre | 131 |
 | `kernel/optimcon/drifts.m` | `[drifts,spc_dim]=drifts(spin_system,context,...` | Returns a cell array of drift Liouvillians suitable for the control.drifts variable in ensemble control optimisations. S | 81 |
+| `kernel/optimcon/ens_block.m` | `[traj,fid,grad,hess]=ens_block(spin_system,drifts,control,block,waveform,n_outputs)` | Fidelity, gradient, and Hessian contributions of one block of ensemble cases, evaluated on the parallel pool worker that h | 198 |
 | `kernel/optimcon/ens_catalog.m` | `[catalog,ens_sizes]=ens_catalog(control)` | Ensemble case catalog for optimal control problems. Enumerates the Cartesian product of the state-target pairs, the drif | 119 |
-| `kernel/optimcon/ensemble.m` | `[traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)` | A parallel wrapper around GRAPE that enables ensemble optimal control optimisations. This function handles systems with  | 468 |
+| `kernel/optimcon/ensemble.m` | `[traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)` | A parallel wrapper around GRAPE that enables ensemble optimal control optimisations. This function handles systems with  | 192 |
 | `kernel/optimcon/fapt2sfo.m` | `[wave,dt,time_grid]=fapt2sfo(fapt,time_grid)` | Converts a freq-ampl-phase-time specification of a pulse sequ- uence into the corresponding single frequency origin wave | 111 |
 | `kernel/optimcon/fmaxnewton.m` | `[x,data]=fmaxnewton(spin_system,cost_function,guess)` | Finds a local maximum of a function of several variables using Newton and quasi-Newton algorithms. Syntax: [x,data]=fmax | 392 |
 | `kernel/optimcon/grape_hilb.m` | `[traj_data,fidelity,grad,hess]=grape_hilb(spin_system,drifts,controls,...` | Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user | 726 |
@@ -201,7 +202,7 @@
 | `kernel/optimcon/inst_freq.m` | `freq=inst_freq(signal,dt,npoints,poly_order,amp_tol)` | Instantaneous frequency trajectory from a complex time-domain signal by regularised phase differentiation. Syntax: freq= | 126 |
 | `kernel/optimcon/lbfgs.m` | `direction=lbfgs(dx_hist,dg_hist,g)` | Calculates an approximation to the Newton-Raphson search direction for maximising a function using past gradients to bui | 107 |
 | `kernel/optimcon/objeval.m` | `[data,fx,grad,hess]=objeval(x,objfun_handle,data,spin_system)` | Calls and collect the correct amount of outputs from an objective function -used by optimisation routines. Syntax: [data | 122 |
-| `kernel/optimcon/optimcon.m` | `spin_system=optimcon(spin_system,control)` | Validates optimal control options and updates the spin system object. Syntax: spin_system=optimcon(spin_system,control)  | 1480 |
+| `kernel/optimcon/optimcon.m` | `spin_system=optimcon(spin_system,control)` | Validates optimal control options and updates the spin system object. Syntax: spin_system=optimcon(spin_system,control)  | 1607 |
 | `kernel/optimcon/penalty.m` | `[pen_term,pen_grad,pen_hess]=penalty(wf,type,fb,cb)` | Penalty terms for the Optimal Control module. Returns the penalty function and its gradient for the waveform, which shou | 256 |
 | `kernel/optimcon/sectioning.m` | `[alpha,fx_1,gfx_1,exitflag,data]=sectioning(cost_function,a,b,x_0,fx_0,...` | Refines a previously found step bracket by repeated cubic interpolation until a step satisfying Wolfe tests is found or  | 182 |
 | `kernel/optimcon/tgrape.m` | `[fidelity,grad]=tgrape(spin_system,drift,controls,waveform,...` | A special case of Gradient Ascent Pulse Engineering (GRAPE) objective function and gradient with respect to the vector o | 168 |
@@ -255,7 +256,7 @@
 | `kernel/overloads/@rcv/plus.m` | `C=plus(A,B)` | Adds things to RCV sparse matrices. Syntax: C=plus(A,B) Parameters: A -left operand B -right operand Outputs: C -sum A+B | 98 |
 | `kernel/overloads/@rcv/rcv.m` | `obj=rcv(varargin)` | Creates an RCV (row-column-value storage) sparse matrix. Syntax: obj=rcv(M) obj=rcv(dim1,dim2) obj=rcv(R,C,V,dim1,dim2)  | 190 |
 | `kernel/overloads/@rcv/rdivide.m` | `A=rdivide(A,k)` | Divides an RCV sparse matrix by a numeric scalar. Syntax: A=rdivide(A,k) Parameters: A -RCV sparse matrix k -numeric sca | 42 |
-| `kernel/overloads/@rcv/size.m` | `s=size(A,dim)` | Returns the size of an RCV sparse matrix. Syntax: s=size(A,dim) Parameters: A -RCV sparse matrix dim -optional dimension | 61 |
+| `kernel/overloads/@rcv/size.m` | `[s,ncols]=size(A,dim)` | Returns the size of an RCV sparse matrix. Syntax: s=size(A,dim) [s,ncols]=size(A) Parameters: A -RCV sparse matrix dim -optional dimension | 61 |
 | `kernel/overloads/@rcv/sparse.m` | `A=sparse(A)` | Converts an RCV sparse matrix into a Matlab sparse matrix. Syntax: A=sparse(A) Parameters: A -RCV sparse matrix Outputs: | 48 |
 | `kernel/overloads/@rcv/spy.m` | `spy(A)` | Plots the sparsity pattern of an RCV matrix. Syntax: spy(A) Parameters: A -RCV sparse matrix Outputs: produces a sparsit | 50 |
 | `kernel/overloads/@rcv/times.m` | `C=times(A,B)` | Multiplies an RCV sparse matrix by a numeric scalar, in either operand order. Syntax: C=times(A,B) Parameters: A,B -an R | 57 |
@@ -312,7 +313,7 @@
 | `kernel/plotting/cylgrid.m` | `cylgrid(zmin,zmax,rmax)` | Draws a cylindrical grid with 10% spacing added around the indicated data extent values. Syntax: cylgrid(zmin,zmax,rmax) | 99 |
 | `kernel/plotting/efg_display.m` | `efg_display(props,atoms,scaling,conmatrix,options)` | Electric field gradient tensors and their eigensystems. Two styles are implemented: A. Ellipsoids (symmetric tensors onl | 308 |
 | `kernel/plotting/fft_freq_axis.m` | `[f_shift,f,df]=fft_freq_axis(npts,dt,zf)` | Frequency axis for FFT with optional zero-filling. Syntax: [f_shift,f,df,nfft]=fft_freq_axis(npts,dt,zf) Parameters: npt | 74 |
-| `kernel/plotting/fig2tiles.m` | `[fig_obj,tile_obj]=fig2tiles(fig_files,fig_size)` | Combines Matlab figure files into a single tiled figure. Syntax: [fig_obj,tile_obj]=fig2tiles(fig_files,fig_size) Parame | 396 |
+| `kernel/plotting/fig2tiles.m` | `[fig_obj,tile_obj]=fig2tiles(fig_files,fig_size)` | Combines Matlab figure files into a single tiled figure. Syntax: [fig_obj,tile_obj]=fig2tiles(fig_files,fig_size) Parame | 409 |
 | `kernel/plotting/ft_axis.m` | `ax=ft_axis(offset,sweep,npoints)` | Fourier transform axis ticks generator that accounts for the periodicity and correctly folds the edge frequency. Syntax: | 65 |
 | `kernel/plotting/hfc_display.m` | `hfc_display(props,atoms,scaling,conmatrix,options)` | Draws hyperfine tensors and their eigensystems. Two styles are implemented: A. Ellipsoids (symmetric tensors only): 1. A | 315 |
 | `kernel/plotting/ifft_time_axis.m` | `[t_shift,t,dt]=ifft_time_axis(npts,df,zf)` | Time axis for IFFT with optional zero-filling. Syntax: [t_shift,t,dt,nifft]=ifft_time_axis(npts,df,zf) Parameters: npts  | 71 |
@@ -322,6 +323,7 @@
 | `kernel/plotting/kfigure.m` | `handle=kfigure(varargin)` | Resets the stupid ass figure defaults in R2025a and later back to sensible values. | 27 |
 | `kernel/plotting/kgrid.m` | `kgrid()` | A replacement for the 'grid' command in Matlab that produces grey (rather than black-and-transparent) grid lines that ar | 30 |
 | `kernel/plotting/klegend.m` | `leg_obj=klegend(varargin)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: leg_ | 39 |
+| `kernel/plotting/kletter.m` | `kletter(letter_label)` | Draws an academic journal style letter label in the top left corner of the current axis set. The label is placed inside the | 86 |
 | `kernel/plotting/ksgtitle.m` | `ksgtitle(x)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: ksgt | 44 |
 | `kernel/plotting/ktitle.m` | `ktitle(x)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: ktit | 46 |
 | `kernel/plotting/kxlabel.m` | `kxlabel(varargin)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: kxla | 34 |
@@ -391,7 +393,7 @@
 | `kernel/steady.m` | `rho=steady(spin_system,P,rho,method)` | Steady state under the repeated action by the same dissi- pative evolution propagator. Syntax: rho=steady(spin_system,P, | 220 |
 | `kernel/step.m` | `rho=step(spin_system,L,rho,time_step)` | Propagation step function. Computes the action by a matrix exponential without compuing that exponential. Supports one-, | 419 |
 | `kernel/summaries/summary_basis.m` | `summary_basis(spin_system)` | Prints basis-set state summary for a Spinach system. Syntax: summary_basis(spin_system) Parameters: spin_system -Spinach | 70 |
-| `kernel/summaries/summary_basis_opts.m` | `summary_basis_opts(spin_system)` | Prints basis-set option summary for a Spinach system. Syntax: summary_basis_opts(spin_system) Parameters: spin_system -S | 78 |
+| `kernel/summaries/summary_basis_opts.m` | `summary_basis_opts(spin_system)` | Prints basis-set option summary for a Spinach system. Syntax: summary_basis_opts(spin_system) Parameters: spin_system -S | 90 |
 | `kernel/summaries/summary_chemistry.m` | `summary_chemistry(spin_system)` | Prints chemical subsystem and exchange summary for a Spinach system. Syntax: summary_chemistry(spin_system) Parameters:  | 78 |
 | `kernel/summaries/summary_coordinates.m` | `summary_coordinates(spin_system,header)` | Prints atomic coordinate summary for a Spinach system. Syntax: summary_coordinates(spin_system,header) Parameters: spin_ | 53 |
 | `kernel/summaries/summary_couplings.m` | `summary_couplings(spin_system,header)` | Prints spin-spin coupling tensor summary for a Spinach system. Syntax: summary_couplings(spin_system,header) Parameters: | 82 |
@@ -514,7 +516,7 @@
 | `kernel/utilities/stitch.m` | `fid=stitch(spin_system,L,rho_stack,coil_stack,...` | Stitching function for bidirectionally propagated 3D NMR pulse sequences. Propagate your initial condition forward to so | 200 |
 | `kernel/utilities/svd_shrink.m` | `[vec,cov]=svd_shrink(spin_system,rho,tol)` | Generates sets of vector-covector pairs for the parallel implementation of the time propagation algorithm described in [ | 64 |
 | `kernel/utilities/swizzle.m` | `tuples=swizzle(index_arrays)` | Flattens out nested index lists and outputs them as an array of tuples in random order. This is useful for flattening ne | 58 |
-| `kernel/utilities/symmetry.m` | `spin_system=symmetry(spin_system,bas)` | Permutation symmetry treatment. Compiles character tables of composite symmetry groups, builds the permutation table for | 351 |
+| `kernel/utilities/symmetry.m` | `spin_system=symmetry(spin_system,bas)` | Permutation symmetry treatment. Compiles character tables of composite symmetry groups, builds the permutation table for | 361 |
 | `kernel/utilities/tikhoind.m` | `[x,err,reg]=tikhoind(K,D,y,lam)` | Analytical Tikhonov regularised solution to K*x=y without any constraints (sign-indefinite output). Syntax: [x,err,reg]= | 66 |
 | `kernel/utilities/tikhol1n.m` | `[x,err,reg]=tikhol1n(A,y,nnzt)` | L1 norm Tikhonov regularised solver for A*x=y where A is an ill-conditioned matrix. The error functional is norm(A*x-y,2 | 170 |
 | `kernel/utilities/tikhonov.m` | `[x,err,reg]=tikhonov(K,D,KtK,DtD,H,y,lambda)` | Tikhonov regularised solution to K*x=y with a positivity const- raint on x using regularised Newton-Raphson method. Synt | 119 |
@@ -526,6 +528,7 @@
 | `kernel/utilities/vvpert.m` | `[Ep,G]=vvpert(E0,H1,order)` | Van Vleck perturbation theory, following Shavitt and Redmon, but excluding the quasi-degenerate split. Syntax: [Ep,G]=vv | 126 |
 | `kernel/utilities/which_subst.m` | `subst=which_subst(spin_system,spins)` | Finds out which substance hosts the specified spins; throws an error if there is more than one. Syntax: subst=which_subs | 62 |
 | `kernel/utilities/wigner.m` | `D=wigner(l,alp,bet,gam)` | Wigner D matrices, defined as (Brink & Satchler, Eq 2.13): D=expm(-1i*Lz*alp)*expm(-1i*Ly*bet)*expm(-1i*Lz*gam); where L | 107 |
+| `kernel/utilities/wigner_fock.m` | `W=wigner_fock(rho,alpha)` | Wigner function of a bosonic mode state given as a density matrix in a truncated Fock basis, evaluated at the specified  | 85 |
 | `kernel/utilities/wigner_3j.m` | `w=wigner_3j(j1,m1,j2,m2,j3,m3)` | Calculates Wigner 3j-symbols. Syntax: w=wigner_3j(j1,m1,j2,m2,j3,m3) If physically inadmissible indices are supplied, a  | 67 |
 | `kernel/utilities/wigner_6j.m` | `w=wigner_6j(j1,j2,j3,j4,j5,j6)` | Wigner 6j-symbols. Syntax: w=wigner_6j(j1,j2,j3,j4,j5,j6) If physically inadmissible indices are supplied, a zero is ret | 90 |
 | `kernel/utilities/xyz2dd.m` | `[d,alp,bet,gam,M]=xyz2dd(r1,r2,isotope1,isotope2)` | Converts coordinate specification of the dipolar interaction into the dipolar interaction constant, three Euler angles,  | 97 |

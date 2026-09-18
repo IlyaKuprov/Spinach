@@ -35,9 +35,9 @@ inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,12,174.4);
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='IK-0';
-bas.longitudinals={'15N'};
-bas.projections=+1;
-bas.level=3;
+bas.longitudinal={{'15N'}};
+bas.projections={+1};
+bas.inter_level=3;
 
 % Algorithmic options
 sys.tols.inter_cutoff=5.0;
@@ -89,6 +89,10 @@ inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,9,125.0);
 inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,10,28.0);
 inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,11,52.1);
 inter.zeeman.matrix=shift_iso(inter.zeeman.matrix,12,173.3);
+
+% Spinach housekeeping
+spin_system=create(sys,inter);
+spin_system=basis(spin_system,bas);
 
 % Add to the previous simulation
 fid=fid+singlerot(spin_system,@acquire,parameters,'nmr');

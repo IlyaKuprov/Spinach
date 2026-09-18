@@ -32,7 +32,7 @@ inter.coupling.scalar{8,10}=7.44;  inter.coupling.scalar{9,10}=7.44;
 bas.formalism='sphten-liouv';
 bas.approximation='IK-2';
 bas.connectivity='scalar_couplings';
-bas.space_level=1;
+bas.prox_level=1;
 bas.sym_group={'S3','S2'};
 bas.sym_spins={[1 2 3],[4 5]};
 

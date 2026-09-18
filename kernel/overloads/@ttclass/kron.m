@@ -23,8 +23,10 @@
 
 function c=kron(a,b)
 
-% Shrink a and b before going any further
-a=shrink(a); b=shrink(b);
+% Shrink a and b, keeping scalar-topology trains as single normalised trains
+a_shrunk=shrink(a); b_shrunk=shrink(b);
+if isa(a_shrunk,'ttclass'), a=a_shrunk; else, a=truncate(ttort(pack(a),+1)); end
+if isa(b_shrunk,'ttclass'), b=b_shrunk; else, b=truncate(ttort(pack(b),+1)); end
 
 % Read sizes and ranks of the operands
 [a_ncores,~]=size(a.cores); a_ranks=ranks(a); a_sizes=sizes(a);

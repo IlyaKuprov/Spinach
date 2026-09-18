@@ -156,6 +156,9 @@ if (nargout>4)&&isfield(parameters,'rho0')
 
 elseif nargout>4
 
+    % Hamiltonian
+    H=B*Hz+Hc; H=(H+H')/2;
+
     % Thermal equilibrium
     rho0=equilibrium(spin_system,H);
 

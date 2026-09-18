@@ -40,7 +40,7 @@ Powder magic angle spinning spectrum of a single quadrupolar deuterium nucleus u
 - Lines 16: computes `inter.coupling.euler` using `inter.coupling.euler={[0.0 0.0 0.0]}`.
 - Lines 19: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 20: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 21: computes `bas.projections` using `bas.projections=+1`.
+- Lines 21: computes `bas.projections` using `bas.projections={+1}`.
 - Lines 24: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 28: computes `parameters.axis` using `parameters.axis=[1 1 1]`.
 - Lines 29: computes `parameters.max_rank` using `parameters.max_rank=17`.

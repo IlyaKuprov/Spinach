@@ -34,7 +34,7 @@ inter.coordinates={[0.00   0.00   0.00];
 % Basis set
 bas.formalism='sphten-liouv';
 bas.approximation='none';
-bas.projections=[-2 -1 0 1 2];
+bas.projections={[-2 -1 0 1 2]};
 
 % Relaxation theory
 inter.relaxation={'t1_t2'};

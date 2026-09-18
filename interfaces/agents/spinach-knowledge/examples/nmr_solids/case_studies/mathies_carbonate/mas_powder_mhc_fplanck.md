@@ -59,8 +59,8 @@ All protons in the unit cell of monohydrocalcite, magic angle spinning NMR simul
 - Lines 44: computes `inter.coordinates` using `inter.coordinates=mat2cell(props.std_geom,ones(18,1))`.
 - Lines 47: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 48: computes `bas.approximation` using `bas.approximation='IK-0'`.
-- Lines 49: computes `bas.level` using `bas.level=3`.
-- Lines 50: computes `bas.projections` using `bas.projections=+1`.
+- Lines 49: computes `bas.inter_level` using `bas.inter_level=3`.
+- Lines 50: computes `bas.projections` using `bas.projections={+1}`.
 - Lines 53: computes `sys.tols.inter_cutoff` using `sys.tols.inter_cutoff=500`.
 - Lines 59: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 63: computes `parameters.rate` using `parameters.rate=10000`.

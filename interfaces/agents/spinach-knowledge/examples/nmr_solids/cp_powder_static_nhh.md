@@ -38,7 +38,7 @@ Cross-polarisation experiment in the doubly rotating frame. A single nitrogen-15
 - Lines 30: computes `inter.temperature` using `inter.temperature=298`.
 - Lines 33: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 34: computes `bas.approximation` using `bas.approximation='IK-0'`.
-- Lines 35: computes `bas.level` using `bas.level=4`.
+- Lines 35: computes `bas.inter_level` using `bas.inter_level=4`.
 - Lines 38: computes `sys.enable` using `sys.enable={'greedy'}`.
 - Lines 41: computes `spin_system` using `spin_system=create(sys,inter)`.
 - Lines 45: computes `parameters.irr_powers` using `parameters.irr_powers=[5e4*ones(1,100)`.

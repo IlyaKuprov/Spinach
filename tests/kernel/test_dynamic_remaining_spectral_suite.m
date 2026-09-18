@@ -152,6 +152,7 @@ result=test_close(result,'rotor_stack phase grid',rotor_phases,0,1e-14,1e-14,...
 spin_system=local_minimal_system('sphten-liouv',4);
 spin_system.comp.nspins=2;
 spin_system.comp.isotopes={'1H','1H'};
+spin_system.chem.parts={[1 2]};
 spin_system.inter.zeeman.matrix={zeros(3);zeros(3)};
 spin_system.inter.giant.coeff=cell(2,1);
 spin_system.inter.coupling.matrix=cell(2,2);
@@ -185,7 +186,7 @@ inter.zeeman.scalar={0};
 bas.formalism=formalism;
 bas.approximation='none';
 if strcmp(formalism,'sphten-liouv')
-    bas.projections=+1;
+    bas.projections={+1};
 end
 spin_system=test_spin_system(sys,inter,bas);
 

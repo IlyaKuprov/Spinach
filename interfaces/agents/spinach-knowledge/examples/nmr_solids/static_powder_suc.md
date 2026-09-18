@@ -40,8 +40,8 @@
 - Lines 17: computes `sys.disable` using `sys.disable={'trajlevel'}`.
 - Lines 20: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
 - Lines 21: computes `bas.approximation` using `bas.approximation='IK-0'`.
-- Lines 22: computes `bas.projections` using `bas.projections=+1`.
-- Lines 23: computes `bas.level` using `bas.level=3`.
+- Lines 22: computes `bas.projections` using `bas.projections={+1}`.
+- Lines 23: computes `bas.inter_level` using `bas.inter_level=3`.
 - Lines 26: computes `sys.tols.inter_cutoff` using `sys.tols.inter_cutoff=5.0`.
 - Lines 27: computes `sys.tols.prox_cutoff` using `sys.tols.prox_cutoff=4.0`.
 - Lines 31: computes `spin_system` using `spin_system=create(sys,inter)`.

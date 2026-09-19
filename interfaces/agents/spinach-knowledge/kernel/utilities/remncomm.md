@@ -61,7 +61,7 @@ Removes from the Hermitian operator A the part that does not com- mute with the 
 - A - a square matrix
 - EvecB - a square matrix containing eigenvectors
 - of B in columns
-- EvalB -a column vector containing the eigenvalues
+- EvalB - a column vector containing the eigenvalues
 - of B in the same order as the columns of EvecB
 - C - a square matrix
 - Note: within a degenerate eigenspace of B, every Hermitian operator

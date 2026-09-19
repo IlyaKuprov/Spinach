@@ -45,9 +45,9 @@ Diffusion weighted 3D echo planar imaging pulse sequence. Syntax: fid=epi_3d(spi
 
 ### Control flow inferred from the code
 
-- Line 115: conditional branch on `parameters.pe_grad_dur>parameters.ro_grad_dur`, with an `elseif` for `parameters.ro_grad_dur>parameters.pe_grad_dur`.
 - Line 63: conditional branch on `isfield(parameters,'diff_g_amp')`.
 - Line 82: conditional branch on `isfield(parameters,'diff_g_amp')`.
+- Line 115: conditional branch on `parameters.pe_grad_dur>parameters.ro_grad_dur`, with an `elseif` for `parameters.ro_grad_dur>parameters.pe_grad_dur`.
 - Line 132: conditional branch on `ismember('gpu',spin_system.sys.enable)`.
 - Line 159: `for` loop over `n=1:parameters.image_size(1)`.
 - Line 169: `for` loop over `k=1:parameters.image_size(2)`.

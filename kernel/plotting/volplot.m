@@ -8,7 +8,8 @@
 % Parameters:
 %
 %    data_cube   - data cube with dimensions ordered
-%                  as [X Y Z]
+%                  as [X Y Z], at least two points
+%                  along each dimension
 %
 %    axis_ranges - six-element vector giving axis extents
 %                  as [xmin xmax ymin ymax zmin zmax]
@@ -78,9 +79,6 @@ if (~isempty(min_neg))&&(min_neg<0)
     
 end
 
-% Add colour calibration spots
-data_cube(1,1,1)=1; data_cube(2,2,2)=-1;
-
 % Permute dimensions to match surf/meshgrid convention
 data_cube=permute(data_cube,[3 2 1]);
 
@@ -134,8 +132,14 @@ new_alpha=new_alpha/5; new_alpha(new_alpha<0.01)=0;
 % Apply new alpha map
 alphamap(new_alpha);
 
+% Pin the colour scale to the sign convention
+clim([-1 1]);
+
+% Axis extents do not depend on the plotted geometry
+axis([xmin xmax ymin ymax zmin zmax]); daspect([1 1 1]);
+
 % Final figure cosmetics
-axis tight; axis equal; box on; kgrid;
+box on; kgrid;
 kxlabel('X'); kylabel('Y'); kzlabel('Z');
 set(gca,'Projection','perspective'); hold off;
 
@@ -151,8 +155,9 @@ if (axis_ranges(1)>=axis_ranges(2))||...
    (axis_ranges(5)>=axis_ranges(6))
     error('ranges array should have xmin<xmax, ymin<ymax and zmin<zmax.');
 end
-if (~isnumeric(data_cube))||(~isreal(data_cube))||(ndims(data_cube)~=3)
-    error('data_cube must be a three-dimensional array of real numbers.');
+if (~isnumeric(data_cube))||(~isreal(data_cube))||...
+   (ndims(data_cube)~=3)||any(size(data_cube)<2)
+    error('data_cube must be a real 3D array with at least two points along each dimension.');
 end
 if (~isnumeric(clip_ranges))||(~isreal(clip_ranges))||(numel(clip_ranges)~=2)
     error('clip_ranges must be a real vector with two elements.');

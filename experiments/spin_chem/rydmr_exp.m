@@ -32,7 +32,12 @@
 %
 % Note: exponential recombination kinetics is built into this func-
 %       tion, do not combine with inter.chem.rp_rates parameter.
-% 
+%
+% Note: in Hilbert space, R must be a multiple of the unit matrix
+%       (this is what the kernel builds for damp relaxation); as in
+%       Liouville space, the unit state component of the density
+%       matrix is exempt from the damping.
+%
 % ilya.kuprov@weizmann.ac.il
 % h.j.hogben@chem.ox.ac.uk
 % peter.hore@chem.ox.ac.uk
@@ -90,7 +95,10 @@ switch spin_system.bas.formalism
         
         % Get the unit operator
         Id=unit_state(spin_system);
-        
+
+        % Unit state component of the singlet, exempt from damping
+        S_unit=(trace(S)/size(S,1))*Id;
+
         % Merged parfor loop
         parfor nm=1:(N*M)
             
@@ -104,8 +112,9 @@ switch spin_system.bas.formalism
             % Compute integration endpoint
             t_end=10/rates(n); %#ok<PFBNS>
             
-            % Compute RYDMR (rates inside for roundoff reasons, R damps both sides)
-            answer(nm)=hdot(S,expmint(spin_system,H_curr,S*rates(n),H_curr+1i*rates(n)*Id-2i*R,t_end));
+            % Compute RYDMR (rates inside for roundoff reasons, R damps both sides of the traceless part)
+            answer(nm)=hdot(S,expmint(spin_system,H_curr,(S-S_unit)*rates(n),H_curr+1i*rates(n)*Id-2i*R,t_end))+...
+                       hdot(S,S_unit)*(1-exp(-rates(n)*t_end));
             
         end
         
@@ -129,6 +138,9 @@ if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
 end
 if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))
     error('H, R and K matrices must have the same dimension.');
+end
+if strcmp(spin_system.bas.formalism,'zeeman-hilb')&&(nnz(R-R(1,1)*speye(size(R)))>0)
+    error('in Hilbert space, R must be a multiple of the unit matrix.');
 end
 if spin_system.inter.magnet~=1
     error('unit magnet specification (sys.magnet=1) is required for field sweep experiments.');

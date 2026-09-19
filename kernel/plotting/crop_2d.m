@@ -55,11 +55,27 @@ axis_f2_hz=ft_axis(parameters.offset(2),parameters.sweep(2),size(spec,2));
 axis_f1_ppm=1e6*(2*pi)*axis_f1_hz/(spin(parameters.spins{1})*spin_system.inter.magnet);
 axis_f2_ppm=1e6*(2*pi)*axis_f2_hz/(spin(parameters.spins{2})*spin_system.inter.magnet);
 
-% Find array bounds
-l_bound_f1=find(axis_f1_ppm>crop_ranges{1}(1),1);
-r_bound_f1=find(axis_f1_ppm>crop_ranges{1}(2),1);
-l_bound_f2=find(axis_f2_ppm>crop_ranges{2}(1),1);
-r_bound_f2=find(axis_f2_ppm>crop_ranges{2}(2),1);
+% Refuse cropping bounds that fall outside the axes
+if (crop_ranges{1}(1)<min(axis_f1_ppm))||(crop_ranges{1}(2)>max(axis_f1_ppm))||...
+   (crop_ranges{2}(1)<min(axis_f2_ppm))||(crop_ranges{2}(2)>max(axis_f2_ppm))
+    error('crop_ranges must lie inside the spectrum axes.');
+end
+
+% Find array bounds, descending ppm axes of negative-gamma isotopes use the same crossings from the end
+if axis_f1_ppm(1)<axis_f1_ppm(end)
+    l_bound_f1=find(axis_f1_ppm>crop_ranges{1}(1),1);
+    r_bound_f1=find(axis_f1_ppm>crop_ranges{1}(2),1);
+else
+    l_bound_f1=find(axis_f1_ppm>crop_ranges{1}(2),1,'last');
+    r_bound_f1=find(axis_f1_ppm>crop_ranges{1}(1),1,'last');
+end
+if axis_f2_ppm(1)<axis_f2_ppm(end)
+    l_bound_f2=find(axis_f2_ppm>crop_ranges{2}(1),1);
+    r_bound_f2=find(axis_f2_ppm>crop_ranges{2}(2),1);
+else
+    l_bound_f2=find(axis_f2_ppm>crop_ranges{2}(2),1,'last');
+    r_bound_f2=find(axis_f2_ppm>crop_ranges{2}(1),1,'last');
+end
 if isempty(l_bound_f1)||isempty(r_bound_f1)||isempty(l_bound_f2)||isempty(r_bound_f2)
     error('crop_ranges must lie inside the spectrum axes.');
 end

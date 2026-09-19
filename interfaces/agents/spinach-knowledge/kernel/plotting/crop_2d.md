@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/plotting/crop_2d.m`
 - Signature: `[spec,parameters]=crop_2d(spin_system,spec,parameters,crop_ranges)`
-- Total lines: 137
+- Total lines: 153
 
 ## Purpose
 
@@ -25,19 +25,20 @@ Crops 2D spectra to user-specified ranges (in ppm), respecting the digital resol
 - Lines 39-40: Accommodate homonuclear 2D sequences; implemented by `if isscalar(parameters.spins)`.
 - Lines 50-51: Build axes and apply offsets; implemented by `axis_f1_hz=ft_axis(parameters.offset(1),parameters.sweep(1),size(spec,1))`.
 - Lines 54-55: Convert the units; implemented by `axis_f1_ppm=1e6*(2*pi)*axis_f1_hz/(spin(parameters.spins{1})*spin_system.inter.magnet)`.
-- Lines 58-59: Find array bounds; implemented by `l_bound_f1=find(axis_f1_ppm>crop_ranges{1}(1),1)`.
-- Lines 67-68: Digital resolutions of the input grid; implemented by `dres_f1=parameters.sweep(1)/size(spec,1)`.
-- Lines 71-72: Update the point counts; implemented by `parameters.zerofill=[(r_bound_f1-l_bound_f1+1) (r_bound_f2-l_bound_f2+1)]`.
-- Lines 74-75: Find the new sweeps; implemented by `parameters.sweep=[parameters.zerofill(1)*dres_f1 parameters.zerofill(2)*dres_f2]`.
-- Lines 77-79: Find the new offsets; implemented by `parameters.offset=[axis_f1_hz(l_bound_f1)+parameters.sweep(1)/2-mod(parameters.zerofill(1),2)*dres_f1/2 axis_f2_hz(l_bound_f2)+parameters.sweep(2)/2-mod(parameters.zerof…`.
-- Lines 81-82: Cut the spectrum; implemented by `spec=spec(l_bound_f1:r_bound_f1,l_bound_f2:r_bound_f2)`.
+- Lines 58-59: Refuse cropping bounds that fall outside the axes; implemented by `if (crop_ranges{1}(1)<min(axis_f1_ppm))||(crop_ranges{1}(2)>max(axis_f1_ppm))|| (crop_ranges{2}(1)<min(axis_f2_ppm))||(crop_ranges{2}(2)>max(axis_f2_ppm))`.
+- Lines 64-65: Find array bounds, descending ppm axes of negative-gamma isotopes use the same crossings from the end; implemented by `if axis_f1_ppm(1)<axis_f1_ppm(end)`.
+- Lines 83-84: Digital resolutions of the input grid; implemented by `dres_f1=parameters.sweep(1)/size(spec,1)`.
+- Lines 87-88: Update the point counts; implemented by `parameters.zerofill=[(r_bound_f1-l_bound_f1+1) (r_bound_f2-l_bound_f2+1)]`.
+- Lines 90-91: Find the new sweeps; implemented by `parameters.sweep=[parameters.zerofill(1)*dres_f1 parameters.zerofill(2)*dres_f2]`.
+- Lines 93-95: Find the new offsets; implemented by `parameters.offset=[axis_f1_hz(l_bound_f1)+parameters.sweep(1)/2-mod(parameters.zerofill(1),2)*dres_f1/2 axis_f2_hz(l_bound_f2)+parameters.sweep(2)/2-mod(parameters.zerof…`.
+- Lines 97-98: Cut the spectrum; implemented by `spec=spec(l_bound_f1:r_bound_f1,l_bound_f2:r_bound_f2)`.
 
 ### Control flow inferred from the code
 
 - Line 40: conditional branch on `isscalar(parameters.spins)`.
 - Line 43: conditional branch on `isscalar(parameters.offset)`.
 - Line 46: conditional branch on `isscalar(parameters.sweep)`.
-- Line 63: conditional branch on `isempty(l_bound_f1)||isempty(r_bound_f1)||isempty(l_bound_f2)||isempty(r_bound_f2)`.
+- Line 79: conditional branch on `isempty(l_bound_f1)||isempty(r_bound_f1)||isempty(l_bound_f2)||isempty(r_bound_f2)`.
 
 ### Key state/data transformations
 
@@ -48,18 +49,22 @@ Crops 2D spectra to user-specified ranges (in ppm), respecting the digital resol
 - Lines 52: computes `axis_f2_hz` using `axis_f2_hz=ft_axis(parameters.offset(2),parameters.sweep(2),size(spec,2))`.
 - Lines 55: computes `axis_f1_ppm` using `axis_f1_ppm=1e6*(2*pi)*axis_f1_hz/(spin(parameters.spins{1})*spin_system.inter.magnet)`.
 - Lines 56: computes `axis_f2_ppm` using `axis_f2_ppm=1e6*(2*pi)*axis_f2_hz/(spin(parameters.spins{2})*spin_system.inter.magnet)`.
-- Lines 59: computes `l_bound_f1` using `l_bound_f1=find(axis_f1_ppm>crop_ranges{1}(1),1)`.
-- Lines 60: computes `r_bound_f1` using `r_bound_f1=find(axis_f1_ppm>crop_ranges{1}(2),1)`.
-- Lines 61: computes `l_bound_f2` using `l_bound_f2=find(axis_f2_ppm>crop_ranges{2}(1),1)`.
-- Lines 62: computes `r_bound_f2` using `r_bound_f2=find(axis_f2_ppm>crop_ranges{2}(2),1)`.
-- Lines 68: computes `dres_f1` using `dres_f1=parameters.sweep(1)/size(spec,1)`.
-- Lines 69: computes `dres_f2` using `dres_f2=parameters.sweep(2)/size(spec,2)`.
-- Lines 72: computes `parameters.zerofill` using `parameters.zerofill=[(r_bound_f1-l_bound_f1+1) (r_bound_f2-l_bound_f2+1)]`.
-- Lines 82: computes `spec` using `spec=spec(l_bound_f1:r_bound_f1,l_bound_f2:r_bound_f2)`.
+- Lines 66: computes `l_bound_f1` using `l_bound_f1=find(axis_f1_ppm>crop_ranges{1}(1),1)`.
+- Lines 69: computes `l_bound_f1` using `l_bound_f1=find(axis_f1_ppm>crop_ranges{1}(2),1,'last')`.
+- Lines 67: computes `r_bound_f1` using `r_bound_f1=find(axis_f1_ppm>crop_ranges{1}(2),1)`.
+- Lines 70: computes `r_bound_f1` using `r_bound_f1=find(axis_f1_ppm>crop_ranges{1}(1),1,'last')`.
+- Lines 73: computes `l_bound_f2` using `l_bound_f2=find(axis_f2_ppm>crop_ranges{2}(1),1)`.
+- Lines 76: computes `l_bound_f2` using `l_bound_f2=find(axis_f2_ppm>crop_ranges{2}(2),1,'last')`.
+- Lines 74: computes `r_bound_f2` using `r_bound_f2=find(axis_f2_ppm>crop_ranges{2}(2),1)`.
+- Lines 77: computes `r_bound_f2` using `r_bound_f2=find(axis_f2_ppm>crop_ranges{2}(1),1,'last')`.
+- Lines 84: computes `dres_f1` using `dres_f1=parameters.sweep(1)/size(spec,1)`.
+- Lines 85: computes `dres_f2` using `dres_f2=parameters.sweep(2)/size(spec,2)`.
+- Lines 88: computes `parameters.zerofill` using `parameters.zerofill=[(r_bound_f1-l_bound_f1+1) (r_bound_f2-l_bound_f2+1)]`.
+- Lines 98: computes `spec` using `spec=spec(l_bound_f1:r_bound_f1,l_bound_f2:r_bound_f2)`.
 
 ### Local helper functions
 
-- Line 87: `grumble()` — `function grumble(spin_system,spec,parameters,crop_ranges)`.
+- Line 103: `grumble()` — `function grumble(spin_system,spec,parameters,crop_ranges)`.
   - Representative operation: `if (~isnumeric(spec))||(~ismatrix(spec))`.
   - Representative operation: `error('spec must be a matrix.')`.
 

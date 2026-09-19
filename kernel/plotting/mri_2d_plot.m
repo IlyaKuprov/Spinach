@@ -81,7 +81,7 @@ switch method
         max_freq_2=gamma*parameters.ro_grad_dur*parameters.ro_grad_amp;
         
         % Compute axis extents in Hz/m
-        k1_axis=[-max_freq_1/2,+max_freq_1/2]/(2*pi); 
+        k1_axis=[-max_freq_1,+max_freq_1]/(2*pi);
         k2_axis=[-max_freq_2/2,+max_freq_2/2]/(2*pi);
 
         % Plot the real part of the k-space signal

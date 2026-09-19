@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/fitting/bromide_csa_nqi/kbr_mas_fitting.m`
 - Signature: `kbr_mas_fitting()`
-- Total lines: 113
+- Total lines: 116
 
 ## Purpose
 
@@ -28,7 +28,8 @@ Fitting of a 79Br MAS NMR spectrum of potassium bromide with respect to the quad
 - Lines 20-21: Set instrumental variables; implemented by `sys.magnet=9.3659`.
 - Lines 35-36: Set optimizer options; implemented by `options=optimset('Display','iter','MaxIter',5000,'MaxFunEvals',Inf)`.
 - Lines 38-39: Get a figure going; implemented by `kfigure(); scale_figure([1.75 1.50])`.
-- Lines 41-42: Run the optimisation; implemented by `fminsearch(@errfun,guess,options)`.
+- Lines 41-42: Run the optimisation; implemented by `best_fit=fminsearch(@errfun,guess,options)`.
+- Lines 44-45: Plot and print the fitted parameters; implemented by `errfun(best_fit)`.
 
 ### Key state/data transformations
 
@@ -42,10 +43,11 @@ Fitting of a 79Br MAS NMR spectrum of potassium bromide with respect to the quad
 - Lines 26: computes `parameters.zerofill` using `parameters.zerofill=32768`.
 - Lines 28: computes `guess` using `guess=[60.0933`.
 - Lines 36: computes `options` using `options=optimset('Display','iter','MaxIter',5000,'MaxFunEvals',Inf)`.
+- Lines 42: computes `best_fit` using `best_fit=fminsearch(@errfun,guess,options)`.
 
 ### Local helper functions
 
-- Line 45: `errfun()` — `function err=errfun(params)`. Silence Spinach
+- Line 48: `errfun()` — `function err=errfun(params)`. Silence Spinach
   - Representative operation: `sys.output='hush'`.
   - Representative operation: `sys.disable={'hygiene','trajlevel'}`.
 
@@ -62,6 +64,7 @@ Fitting of a 79Br MAS NMR spectrum of potassium bromide with respect to the quad
 - Set optimizer options
 - Get a figure going
 - Run the optimisation
+- Plot and print the fitted parameters
 - Least squares error function
 
 ## Internal Spinach / MATLAB structure cues

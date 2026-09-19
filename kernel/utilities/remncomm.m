@@ -51,9 +51,9 @@ end
 if (~isnumeric(EvB))||(size(EvB,1)~=size(EvB,2))
     error('EvB must be a square array of column vectors.');
 end
-if (~isnumeric(evals_b))||(~iscolumn(evals_b))||(~isreal(evals_b))||...
+if (~isfloat(evals_b))||(~iscolumn(evals_b))||(~isreal(evals_b))||...
    (~all(isfinite(evals_b)))||(numel(evals_b)~=size(EvB,2))
-    error('evals_b must be a finite real column vector with as many elements as EvB has columns.');
+    error('evals_b must be a finite real floating-point column vector with as many elements as EvB has columns.');
 end
 end
 

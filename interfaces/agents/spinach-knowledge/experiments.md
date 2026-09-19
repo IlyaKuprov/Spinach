@@ -61,7 +61,7 @@
 | `experiments/imaging/dpfgse_select.m` | `fid=dpfgse_select(spin_system,parameters,H,R,K,G,F)` | DPFGSE signal selection, based on Equation 3 from the paper by Stott et al. (https://doi.org/10.1006/jmre.1997.1110). Sy | 186 |
 | `experiments/imaging/dpfgse_suppress.m` | `fid=dpfgse_suppress(spin_system,parameters,H,R,K,G,F)` | DPFGSE signal suppression, based on Equation 3 from the paper by Stott et al. (https://doi.org/10.1006/jmre.1997.1110).  | 188 |
 | `experiments/imaging/epi_2d.m` | `mri=epi_2d(spin_system,parameters,H,R,K,G,F)` | Diffusion weighted echo planar 2D imaging pulse sequence with variable diffusion encoding direction. Syntax: mri=epi_2d( | 214 |
-| `experiments/imaging/epi_3d.m` | `fid=epi_3d(spin_system,parameters,H,R,K,G,F)` | Diffusion weighted 3D echo planar imaging pulse sequence. Syntax: fid=epi_3d(spin_system,parameters,H,R,K,G,F) This sequ | 338 |
+| `experiments/imaging/epi_3d.m` | `fid=epi_3d(spin_system,parameters,H,R,K,G,F)` | Diffusion weighted 3D echo planar imaging pulse sequence. Syntax: fid=epi_3d(spin_system,parameters,H,R,K,G,F) This sequ | 348 |
 | `experiments/imaging/fse.m` | `mri=fse(spin_system,parameters,H,R,K,G,F)` | Fast spin echo (FSE) pulse sequence. Syntax: mri=fse(spin_system,parameters,H,R,K,G,F) This sequence must be called from | 178 |
 | `experiments/imaging/grad_echo.m` | `fid=grad_echo(spin_system,parameters,H,R,K,G,F)` | Gradient echo pulse sequence. Syntax: fid=grad_echo(spin_system,parameters,H,R,K,G,F) This sequence must be called from  | 140 |
 | `experiments/imaging/phase_enc_2d.m` | `mri=phase_enc_2d(spin_system,parameters,H,R,K,G,F)` | 2D phase encoding imaging pulse sequence with optional diffusion weighting during the echo time. Syntax: mri=phase_enc_2 | 222 |

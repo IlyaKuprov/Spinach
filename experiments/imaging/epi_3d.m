@@ -106,10 +106,19 @@ dims([2 4 6])=+parameters.dims/2;
 kfigure(); volplot(abs(mri_slice),dims); 
 ktitle('after slice sel. and echo'); drawnow();
 
-% Preroll the gradients, phase encoding area rescaled to readout preroll time
-rho=evolution(spin_system,B-parameters.pe_grad_amp*G{2}*(parameters.pe_grad_dur/parameters.ro_grad_dur)...
+% Preroll both gradients together for the duration of the shorter prephaser
+rho=evolution(spin_system,B-parameters.pe_grad_amp*G{2}...
                            -parameters.ro_grad_amp*G{3},[],rho,...
-                            parameters.ro_grad_dur/2,1,'final');
+                            min(parameters.pe_grad_dur,parameters.ro_grad_dur)/2,1,'final');
+
+% Finish the longer prephaser on its own
+if parameters.pe_grad_dur>parameters.ro_grad_dur
+    rho=evolution(spin_system,B-parameters.pe_grad_amp*G{2},[],rho,...
+                  (parameters.pe_grad_dur-parameters.ro_grad_dur)/2,1,'final');
+elseif parameters.ro_grad_dur>parameters.pe_grad_dur
+    rho=evolution(spin_system,B-parameters.ro_grad_amp*G{3},[],rho,...
+                  (parameters.ro_grad_dur-parameters.pe_grad_dur)/2,1,'final');
+end
 
 % Precompute propagators
 P_ro_p=propagator(spin_system,B+parameters.ro_grad_amp*G{3},...

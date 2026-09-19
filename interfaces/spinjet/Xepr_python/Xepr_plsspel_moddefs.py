@@ -47,9 +47,9 @@ fullDefs = fullDefs.split("\n")
 
 no_defs=(len(sys.argv)-1)//2
 
-# exit before any write if a requested name is not among the definitions
+# exit before any write if a requested name is not a declared definition (whole identifier at the start of a line)
 for index in range(1,no_defs+1):
-	if not any(str(sys.argv[(2*index)-1]) in value for value in fullDefs):
+	if not any(re.match(r"^\s*"+re.escape(str(sys.argv[(2*index)-1]))+r"\s*=",value) for value in fullDefs):
 		print("definition_not_found: "+str(sys.argv[(2*index)-1]))
 		sys.exit(5)
 

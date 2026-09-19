@@ -340,7 +340,7 @@
 | `kernel/plotting/slice_2d.m` | `slice_2d(spin_system,spectrum,parameters,ncont,delta,k,ncol,m,signs)` | Contour plotting utility with non-linear adaptive contour spacing and 1D slice extraction using mouse. Syntax: slice_2d( | 221 |
 | `kernel/plotting/stack_2d.m` | `stack_2d(spin_system,spectrum,parameters,stack_dim,alpha_fun)` | Stack plotting utility for 2D NMR spectra. Syntax: stack_2d(spin_system,spectrum,parameters,stack_dim,alpha_fun) Paramet | 226 |
 | `kernel/plotting/sweep2ticks.m` | `axis_hz=sweep2ticks(offs,sweep,npoints)` | Converts offset-sweep-npoints specification into axis ticks in Hz. The function returns the frequency axis of the spectr | 55 |
-| `kernel/plotting/volplot.m` | `volplot(data_cube,axis_ranges,clip_ranges)` | Volumetric 3D plot function for scalar fields. Sign is mapped into colour and amplitude into opacity. Separate scaling f | 190 |
+| `kernel/plotting/volplot.m` | `volplot(data_cube,axis_ranges,clip_ranges)` | Volumetric 3D plot function for scalar fields. Sign is mapped into colour and amplitude into opacity. Separate scaling f | 195 |
 | `kernel/plotting/write_movie.m` | `write_movie(file_name)` | Orbits the camera around a 3D plot and writes a correctly looping 359-frame movie. Intended for generating presenta- tio | 57 |
 | `kernel/plotting/zoom_3d.m` | `[density,ext]=zoom_3d(density,ext,zoom_ranges)` | Zooms a 3D data cube to the fractional limits specified by the user. Syntax: [density,ext]=zoom_3d(density,ext,zoom_rang | 87 |
 | `kernel/ppower.m` | `P=ppower(spin_system,P,N)` | Computes integer propagator powers via an efficient powers-of-two based strategy. Syntax: P=ppower(spin_system,P,N) Para | 113 |

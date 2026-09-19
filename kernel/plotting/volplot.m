@@ -8,7 +8,8 @@
 % Parameters:
 %
 %    data_cube   - data cube with dimensions ordered
-%                  as [X Y Z]
+%                  as [X Y Z], at least two points
+%                  along each dimension
 %
 %    axis_ranges - six-element vector giving axis extents
 %                  as [xmin xmax ymin ymax zmin zmax]
@@ -154,8 +155,9 @@ if (axis_ranges(1)>=axis_ranges(2))||...
    (axis_ranges(5)>=axis_ranges(6))
     error('ranges array should have xmin<xmax, ymin<ymax and zmin<zmax.');
 end
-if (~isnumeric(data_cube))||(~isreal(data_cube))||(ndims(data_cube)~=3)
-    error('data_cube must be a three-dimensional array of real numbers.');
+if (~isnumeric(data_cube))||(~isreal(data_cube))||...
+   (ndims(data_cube)~=3)||any(size(data_cube)<2)
+    error('data_cube must be a real 3D array with at least two points along each dimension.');
 end
 if (~isnumeric(clip_ranges))||(~isreal(clip_ranges))||(numel(clip_ranges)~=2)
     error('clip_ranges must be a real vector with two elements.');

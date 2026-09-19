@@ -307,7 +307,7 @@
 | `kernel/plotting/bloch_axis.m` | `[ax,ay,az]=bloch_axis(x,y,z)` | Reconstructs the instantaneous Bloch equation rotation axis of from a 3D magnetisation trajectory. Syntax: [ax,ay,az]=bl | 64 |
 | `kernel/plotting/bwr_cmap.m` | `cmap=bwr_cmap()` | Blue -> White -> Red colour map with 255 points and white colour corresponding to zero. Syntax: cmap=bwr_cmap() The outp | 42 |
 | `kernel/plotting/contspacing.m` | `[all_conts,pos_conts,neg_conts]=...` | Non-linear adaptive contour spacing. Useful for NMR data where small cross-peaks must be adequately contoured next to la | 108 |
-| `kernel/plotting/crop_2d.m` | `[spec,parameters]=crop_2d(spin_system,spec,parameters,crop_ranges)` | Crops 2D spectra to user-specified ranges (in ppm), respecting the digital resolution. Syntax: [spec,parameters]=crop_2d | 137 |
+| `kernel/plotting/crop_2d.m` | `[spec,parameters]=crop_2d(spin_system,spec,parameters,crop_ranges)` | Crops 2D spectra to user-specified ranges (in ppm), respecting the digital resolution. Syntax: [spec,parameters]=crop_2d | 153 |
 | `kernel/plotting/cst_display.m` | `cst_display(props,atoms,scaling,conmatrix,options)` | Draws shielding tensors and their eigensystems. Two styles are implemented: A. Ellipsoids (symmetric tensors only): 1. A | 305 |
 | `kernel/plotting/cylgrid.m` | `cylgrid(zmin,zmax,rmax)` | Draws a cylindrical grid with 10% spacing added around the indicated data extent values. Syntax: cylgrid(zmin,zmax,rmax) | 99 |
 | `kernel/plotting/efg_display.m` | `efg_display(props,atoms,scaling,conmatrix,options)` | Electric field gradient tensors and their eigensystems. Two styles are implemented: A. Ellipsoids (symmetric tensors onl | 308 |

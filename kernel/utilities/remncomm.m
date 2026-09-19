@@ -34,7 +34,7 @@ grumble(A,EvB,evals_b);
 A=EvB'*A*EvB;
 
 % Zero out elements linking eigenvalues of B that differ by more than eigensolver roundoff
-degen_mask=abs(evals_b-evals_b.')<=100*numel(evals_b)*eps(max(abs(evals_b)));
+degen_mask=abs(evals_b-evals_b.')<=100*numel(evals_b)*eps(max(evals_b)-min(evals_b));
 A=A.*degen_mask;
 
 % Move the commuting part back into the original basis

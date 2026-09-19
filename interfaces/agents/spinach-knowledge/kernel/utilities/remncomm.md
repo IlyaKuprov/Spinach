@@ -23,13 +23,13 @@ Removes from the Hermitian operator A the part that does not com- mute with the 
 
 - Lines 30-31: Check consistency; implemented by `grumble(A,EvB,evals_b)`.
 - Lines 33-34: Move A into the eigenbasis of B; implemented by `A=EvB'*A*EvB`.
-- Lines 36-38: Zero out elements linking eigenvalues of B that differ by more than eigensolver roundoff; implemented by `degen_mask=abs(evals_b-evals_b.')<=100*numel(evals_b)*eps(max(abs(evals_b))); A=A.*degen_mask`.
+- Lines 36-38: Zero out elements linking eigenvalues of B that differ by more than eigensolver roundoff; implemented by `degen_mask=abs(evals_b-evals_b.')<=100*numel(evals_b)*eps(max(evals_b)-min(evals_b)); A=A.*degen_mask`.
 - Lines 40-41: Move the commuting part back into the original basis; implemented by `A=EvB*A*EvB'`.
 
 ### Key state/data transformations
 
 - Lines 34: computes `A` using `A=EvB'*A*EvB`.
-- Lines 37: computes `degen_mask` using `degen_mask=abs(evals_b-evals_b.')<=100*numel(evals_b)*eps(max(abs(evals_b)))`.
+- Lines 37: computes `degen_mask` using `degen_mask=abs(evals_b-evals_b.')<=100*numel(evals_b)*eps(max(evals_b)-min(evals_b))`.
 - Lines 41: computes `A` using `A=EvB*A*EvB'`.
 
 ### Local helper functions

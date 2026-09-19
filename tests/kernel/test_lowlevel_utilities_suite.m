@@ -47,6 +47,9 @@ result=test_close(result,'remncomm offset basis',remncomm(H,eye(2),[1e12;1e12+1]
 H=[2 1+2i 3;1-2i 5 1i;3 -1i 1];
 result=test_close(result,'remncomm wide spectrum',remncomm(H,eye(3),[0;1;1e12]),diag(diag(H)),1e-15,1e-15,...
                   'a small splitting is not merged by a wide spectral span');
+H=[2 1+2i;1-2i 5];
+result=test_close(result,'remncomm shifted spectrum',remncomm(H,eye(2),[1e12;1e12+0.01]),diag(diag(H)),1e-15,1e-15,...
+                  'the degeneracy criterion does not depend on the energy origin');
 
 % Check Frobenius inner product and anti-diagonal transpose
 D=[1+1i 2-1i;3 4i];

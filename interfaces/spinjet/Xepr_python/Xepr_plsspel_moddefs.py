@@ -13,7 +13,7 @@
 #
 # david.goodwin@kit.edu
 
-import os,sys,numpy; 
+import os,sys,re,numpy; 
 from numpy import genfromtxt
 
 # xepr import

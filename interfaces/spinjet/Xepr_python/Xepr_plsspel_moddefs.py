@@ -13,7 +13,7 @@
 #
 # david.goodwin@kit.edu
 
-import os,sys,numpy; 
+import os,sys,re,numpy; 
 from numpy import genfromtxt
 
 # xepr import
@@ -39,17 +39,24 @@ except:
 # search for our desired variable
 # first get the text of the full PulseSpel def
 fullDefs = currentExp.getParam("PlsSPELGlbTxt").value
-# need to check if fullDefs is empty and exit cause pulsespel not being loaded
+# exit if the definitions text is empty: PulseSPEL not being loaded
+if not fullDefs.strip():
+	print("pulsespel_definitions_not_loaded")
+	sys.exit(3)
 fullDefs = fullDefs.split("\n")
 
 no_defs=(len(sys.argv)-1)//2
 
+# exit before any write if a requested name is not a declared definition (whole identifier at the start of a line)
+for index in range(1,no_defs+1):
+	if not any(re.match(r"^\s*"+re.escape(str(sys.argv[(2*index)-1]))+r"\s*=",value) for value in fullDefs):
+		print("definition_not_found: "+str(sys.argv[(2*index)-1]))
+		sys.exit(5)
+
 try:
-	for value in fullDefs:
-		for index in range(1,no_defs+1):
-			if str(sys.argv[(2*index)-1]) in value:
-				cmdStr = str(sys.argv[(2*index)-1])+" = "+str(sys.argv[2*index])
-				currentExp["ftEPR.PlsSPELSetVar"].value = cmdStr
+	for index in range(1,no_defs+1):
+		cmdStr = str(sys.argv[(2*index)-1])+" = "+str(sys.argv[2*index])
+		currentExp["ftEPR.PlsSPELSetVar"].value = cmdStr
 except:
 	print("error changing pulseSPEL defs")
 	sys.exit(4)

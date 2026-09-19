@@ -29,8 +29,11 @@
 %                   matrix is passed through
 %
 %    R            - relaxation matrix, converted into an
-%                   anticommutation superoperator; an empty
-%                   matrix is passed through
+%                   anticommutation superoperator with the
+%                   unit state exempted from damping, as in
+%                   the Liouville space branch of the kernel
+%                   relaxation module; an empty matrix is
+%                   passed through
 %
 %    K            - kinetics matrix, converted into an
 %                   anticommutation superoperator; an empty
@@ -133,6 +136,12 @@ if strcmp(spin_system.bas.formalism,'zeeman-hilb')
 
     % Update the formalism setting
     spin_system.bas.formalism='zeeman-liouv';
+
+    % Exempt the unit state from the projected relaxation superoperator
+    if ~isempty(R)
+        U=unit_state(spin_system); R=R-(U'*R*U)*(U*U');
+        report(spin_system,'unit state exempted from the projected relaxation superoperator.');
+    end
 
 end
 

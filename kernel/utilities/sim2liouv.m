@@ -61,12 +61,13 @@
 %       space branch of relaxation.m never does. The row and the
 %       column of the unit state are therefore projected out of
 %       the converted R, so that the unit state is neither damped
-%       nor a source of relaxation and the trace is conserved. With
-%       symmetry, this is done for the unit state of every irrep,
-%       which keeps R block-diagonal in the irrep pair subspaces
-%       that reduce.m evolves independently. For the scalar dam-
-%       ping matrix that the kernel builds in Hilbert space the
-%       result coincides with the Liouville space damp operator.
+%       nor a source of relaxation and the trace is conserved. For
+%       the scalar damping matrix that the kernel builds in Hilbert
+%       space the result coincides with the Liouville space damp
+%       operator. The unit state spans all diagonal irrep pairs,
+%       and those are merged into one subspace so that the projec-
+%       ted R stays block-diagonal in the irrep table that reduce.m
+%       evolves independently.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -121,50 +122,45 @@ if strcmp(spin_system.bas.formalism,'zeeman-hilb')
         hs_irreps=spin_system.bas.irrep; n_irreps=numel(hs_irreps);
 
         % Preallocate the Liouville space irrep array
-        ls_irreps(n_irreps^2)=struct('projector',[],'dimension',[]);
+        ls_irreps(n_irreps^2-n_irreps+1)=struct('projector',[],'dimension',[]);
 
-        % Preallocate the irrep unit state array
-        unit_cols=cell(1,n_irreps);
+        % Diagonal irrep pairs share the unit state and are merged into the first subspace
+        ls_irreps(1).projector=[]; ls_irreps(1).dimension=0; pair_idx=1;
 
         % Loop over ordered pairs of Hilbert space irreps
         for n=1:n_irreps
-
-            % Normalised unit state of the irrep
-            unit_n=sparse(reshape(hs_irreps(n).projector*hs_irreps(n).projector',[],1));
-            unit_cols{n}=unit_n/norm(unit_n,2);
-
             for k=1:n_irreps
 
                 % Build the irrep pair projector and dimension
-                pair_idx=n_irreps*(n-1)+k;
-                ls_irreps(pair_idx).projector=kron(conj(hs_irreps(n).projector),...
-                                                        hs_irreps(k).projector);
-                ls_irreps(pair_idx).dimension=hs_irreps(n).dimension*...
-                                              hs_irreps(k).dimension;
+                pair_proj=kron(conj(hs_irreps(n).projector),hs_irreps(k).projector);
+                pair_dim=hs_irreps(n).dimension*hs_irreps(k).dimension;
+
+                % Merge diagonal pairs, store off-diagonal pairs separately
+                if n==k
+                    ls_irreps(1).projector=[ls_irreps(1).projector pair_proj];
+                    ls_irreps(1).dimension=ls_irreps(1).dimension+pair_dim;
+                else
+                    pair_idx=pair_idx+1;
+                    ls_irreps(pair_idx).projector=pair_proj;
+                    ls_irreps(pair_idx).dimension=pair_dim;
+                end
 
             end
         end
 
-        % Assemble the irrep unit state array
-        U=[unit_cols{:}];
-
         % Write the Liouville space irreps
         spin_system.bas.irrep=ls_irreps;
         report(spin_system,['Hilbert space irreps migrated into Liouville space, '...
-                            num2str(n_irreps^2) ' irrep pair subspaces.']);
-
-    else
-
-        % Normalised unit state of the whole space
-        U=reshape(speye(hdim),[],1)/sqrt(hdim);
+                            num2str(numel(ls_irreps)) ' irrep pair subspaces.']);
 
     end
 
     % Update the formalism setting
     spin_system.bas.formalism='zeeman-liouv';
 
-    % Project the block unit states out of the relaxation superoperator
+    % Project the unit state out of the relaxation superoperator
     if ~isempty(R)
+        U=unit_state(spin_system);
         R=R-U*(U'*R)-(R*U)*U'+U*(U'*R*U)*U';
         report(spin_system,'unit state exempted from the projected relaxation superoperator.');
     end

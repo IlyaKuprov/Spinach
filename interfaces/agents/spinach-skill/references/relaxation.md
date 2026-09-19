@@ -120,7 +120,12 @@ transverse ZZ cross-relaxation respectively.
 eigenvalues, in hertz. Given Euler angles it is projected onto the
 orientation; without them `mean(diag(damp_rate))` is used and a warning
 notes the discarded anisotropy. Liouville space spares the unit state, so
-damping does not destroy the trace; Hilbert space does not.
+damping does not destroy the trace; Hilbert space does not. Liouville-space
+sequences called with `zeeman-hilb` inputs go through `sim2liouv`, which
+projects the unit state out of the converted relaxation superoperator (the
+report line reads `unit state exempted from the projected relaxation
+superoperator`), so the converted operator equals the native Liouville
+`damp` and the trace is conserved on that route as well.
 
 ## Scalar relaxation
 

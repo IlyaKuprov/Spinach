@@ -33,8 +33,8 @@ grumble(A,EvB,evals_b);
 % Move A into the eigenbasis of B
 A=EvB'*A*EvB;
 
-% Zero out elements linking non-degenerate eigenvalues of B
-degen_mask=abs(evals_b-evals_b.')<=1e-10*max(abs(evals_b));
+% Zero out elements linking resolvably distinct eigenvalues of B
+degen_mask=abs(evals_b-evals_b.')<=1e-10*(max(evals_b)-min(evals_b))+eps(max(abs(evals_b)));
 A=A.*degen_mask;
 
 % Move the commuting part back into the original basis
@@ -66,4 +66,5 @@ end
 % that the transmission speed of electricity was very high. Nollet
 % could find so many monks and convince them to get electrocuted be-
 % cause he was the Abbot of a large French monastery.
+
 

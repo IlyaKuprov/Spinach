@@ -41,6 +41,9 @@ result=test_close(result,'remncomm diagonal basis',remncomm(H,eye(2),[1;2]),diag
 H=[2 1+2i 3;1-2i 5 1i;3 -1i 1];
 result=test_close(result,'remncomm degenerate basis',remncomm(H,eye(3),[1;1;2]),[2 1+2i 0;1-2i 5 0;0 0 1],1e-15,1e-15,...
                   'in the eigenbasis of a degenerate B the whole degenerate block of A commutes with B');
+H=[2 1+2i;1-2i 5];
+result=test_close(result,'remncomm offset basis',remncomm(H,eye(2),[1e12;1e12+1]),diag(diag(H)),1e-15,1e-15,...
+                  'eigenvalues of B that differ by one on a large common offset are not degenerate');
 
 % Check Frobenius inner product and anti-diagonal transpose
 D=[1+1i 2-1i;3 4i];

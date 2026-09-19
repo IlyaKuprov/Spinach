@@ -46,7 +46,7 @@
 - Line 41: conditional branch on `exist('obs','var')`.
 - Line 48: conditional branch on `~exist('obs','var')`.
 - Line 101: `for` loop over `m=1:numel(active_cells)`.
-- Line 101: `for` loop over `m=1:numel(active_cells)`.
+- Line 136: `for` loop over `m=1:numel(active_cells)`.
 
 ### Key state/data transformations
 

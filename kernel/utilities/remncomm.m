@@ -55,6 +55,9 @@ if (~isfloat(evals_b))||(~iscolumn(evals_b))||(~isreal(evals_b))||...
    (~all(isfinite(evals_b)))||(numel(evals_b)~=size(EvB,2))
     error('evals_b must be a finite real floating-point column vector with as many elements as EvB has columns.');
 end
+if ~isfinite(max(evals_b)-min(evals_b))
+    error('the spread of evals_b must be representable in floating point.');
+end
 end
 
 % The first scientific measurement of the speed of electricity was 

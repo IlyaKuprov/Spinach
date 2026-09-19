@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/remncomm.m`
 - Signature: `A=remncomm(A,EvB,evals_b)`
-- Total lines: 70
+- Total lines: 73
 
 ## Purpose
 

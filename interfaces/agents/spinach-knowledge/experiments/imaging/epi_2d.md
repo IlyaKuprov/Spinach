@@ -43,9 +43,9 @@ Diffusion weighted echo planar 2D imaging pulse sequence with variable diffusion
 
 ### Control flow inferred from the code
 
-- Line 73: conditional branch on `parameters.pe_grad_dur>parameters.ro_grad_dur`, with an `elseif` for `parameters.ro_grad_dur>parameters.pe_grad_dur`.
 - Line 51: conditional branch on `isfield(parameters,'diff_g_amp')`.
 - Line 61: conditional branch on `isfield(parameters,'diff_g_amp')`.
+- Line 73: conditional branch on `parameters.pe_grad_dur>parameters.ro_grad_dur`, with an `elseif` for `parameters.ro_grad_dur>parameters.pe_grad_dur`.
 - Line 93: `for` loop over `n=1:parameters.image_size(1)`.
 - Line 99: `for` loop over `k=1:parameters.image_size(2)`.
 - Line 102: conditional branch on `ro_grad_sign>0`.

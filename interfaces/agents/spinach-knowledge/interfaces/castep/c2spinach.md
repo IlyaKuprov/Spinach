@@ -2,102 +2,60 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/castep/c2spinach.m`
 - Signature: `props=c2spinach(file_name)`
-- Total lines: 102
+- Total lines: 197
 
 ## Purpose
 
-Reads the "new format" section of CASTEP .magres files. Syntax: props=c2spinach(file_name)
+Parser for .magres files written by CASTEP and other codes in the CCP-NC magres v1.0 format. Reads the [atoms] and [magres] blocks and returns the geometry and the magnetic resonance tensors, keyed to the atoms in the order in which the atom records appear in the file. Syntax: props=c2spinach(file_name)
 
 ## Physical / mathematical content
 
-- This file belongs to the `interfaces` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
+- CASTEP interface. Recovers the periodic DFT (GIPAW) shielding, electric field gradient, and reduced spin-spin coupling tensors and converts them to the conventions used by `gparse` and `oparse`, so that `g2spinach` consumes the output the same way.
+- Shielding tensors are returned in the printed component order (xx xy xz yx yy yz zx zy zz as the rows of the 3x3 matrix), which is the orientation in which Spinach contracts a Zeeman tensor with the spin operator on the left and the field on the right; the antisymmetric part of the shielding therefore enters with the sign the magres standard defines.
+- Reduced couplings K (magres units 10^19 T^2 J^-1) are multiplied by mu_N^2/h, which is the unit `gparse` reports Gaussian K-couplings in; `g2spinach` then converts them into J-couplings for the isotopes it is given.
 
 ## Numerical / algorithmic content
 
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
+- Every record is matched with a regular expression that spells out the field count and the number syntax; a record with the right tag and the wrong shape is an error rather than a silently shifted tensor.
+- Block tags (`[atoms]`, `[magres]`, also the angle-bracket form) are located first; nested, unbalanced, missing, or repeated [atoms] and [magres] blocks are errors. Everything outside those two blocks, including the `[magres_old]` block CASTEP appends, is ignored.
+- Units records for atom, ms, efg, and isc are checked against the standard units and anything else is an error; an absent units record means the standard unit, as the specification prescribes.
+- The file contains an explicit `grumble(...)` validator for the input argument and a local key resolver shared by the ms, efg, and isc records.
 
 ## Code-derived implementation details
 
 ### Comment-guided execution stages
 
-- Lines 34-35: Check consistency; implemented by `grumble(file_name)`.
-- Lines 37-38: Read the file; implemented by `file_id=fopen(file_name,'r')`.
-- Lines 43-44: Deblank all lines; implemented by `for n=1:numel(castep_log)`.
-- Lines 48-49: Cartesian coordinates; implemented by `props.symbols={}; props.std_geom=zeros(0,3)`.
-- Lines 59-60: Shielding tensors; implemented by `props.cst={}`.
-- Lines 72-73: Electric field gradients; implemented by `props.efg={}`.
-- Lines 85-86: Atom count; implemented by `props.natoms=size(props.std_geom,1)`.
-
-### Control flow inferred from the code
-
-- Line 44: `for` loop over `n=1:numel(castep_log)`.
-- Line 50: `for` loop over `n=1:numel(castep_log)`.
-- Line 51: conditional branch on `(numel(castep_log{n})>3)&&strcmp(castep_log{n}(1:4),'atom')`.
-- Line 61: `for` loop over `n=1:numel(castep_log)`.
-- Line 62: conditional branch on `(numel(castep_log{n})>1)&&strcmp(castep_log{n}(1:2),'ms')`.
-- Line 65: conditional branch on `isempty(cst_spec{end})`.
-- Line 74: `for` loop over `n=1:numel(castep_log)`.
-- Line 75: conditional branch on `(numel(castep_log{n})>2)&&strcmp(castep_log{n}(1:3),'efg')`.
-- Line 78: conditional branch on `isempty(efg_spec{end})`.
-
-### Key state/data transformations
-
-- Lines 38: computes `file_id` using `file_id=fopen(file_name,'r')`.
-- Lines 39: computes `castep_log` using `castep_log=textscan(file_id,'%s','delimiter','\n')`.
-- Lines 40: computes `fclose(file_id); castep_log` using `fclose(file_id); castep_log=castep_log{1}`.
-- Lines 41: computes `props.filename` using `props.filename=file_name`.
-- Lines 45: computes `castep_log(n)` using `castep_log(n)=deblank(castep_log(n))`.
-- Lines 49: computes `props.symbols` using `props.symbols={}; props.std_geom=zeros(0,3)`.
-- Lines 52-53: computes `atom_spec` using `atom_spec=textscan(castep_log{n},'atom %s %s %f %f %f %f', 'Delimiter',' ','MultipleDelimsAsOne',1)`.
-- Lines 54: computes `props.symbols{end+1}` using `props.symbols{end+1}=atom_spec{1}{1}`.
-- Lines 55: computes `props.std_geom(end+1,:)` using `props.std_geom(end+1,:)=[atom_spec{4:6}]`.
-- Lines 60: computes `props.cst` using `props.cst={}`.
-- Lines 63-64: computes `cst_spec` using `cst_spec=textscan(castep_log{n},'ms %s %f %f %f %f %f %f %f %f %f %f', 'Delimiter',' ','MultipleDelimsAsOne',1)`.
-- Lines 68: computes `props.cst{end+1}` using `props.cst{end+1}=reshape([cst_spec{3:11}],[3 3])`.
-- Lines 73: computes `props.efg` using `props.efg={}`.
-- Lines 76-77: computes `efg_spec` using `efg_spec=textscan(castep_log{n},'efg %s %f %f %f %f %f %f %f %f %f %f', 'Delimiter',' ','MultipleDelimsAsOne',1)`.
-- Lines 81: computes `props.efg{end+1}` using `props.efg{end+1}=reshape([efg_spec{3:11}],[3 3])`.
-- Lines 86: computes `props.natoms` using `props.natoms=size(props.std_geom,1)`.
+- Lines 58-59: Check consistency; implemented by `grumble(file_name)`.
+- Lines 61-65: Read the file, drop the comments, and trim the lines; implemented by `magres_log=strtrim(regexprep(magres_log{1},'#.*$',''))`.
+- Lines 67-86: Locate the block tags and refuse nested or unbalanced blocks; implemented by `tag_tokens=regexp(magres_log,'^[\[<](/?)([A-Za-z_]\w*)[\]>]$','tokens','once')` followed by a pass over the tag lines that pairs each opening tag with its closing tag and records the block name and line range; exactly one [atoms] and one [magres] block are required.
+- Lines 88-97: Check the units of the records that are read below; implemented by matching `^units\s+(\S+)\s+(\S+)$` inside the two blocks against Angstrom, ppm, au, and 10^19.T^2.J^-1.
+- Lines 99-100: Regular expressions for a number and for a 3x3 tensor; implemented by `num_pat='([-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?)'` and `ten_pat=repmat(['\s+' num_pat],1,9)`.
+- Lines 102-110: Atom records: species, label, index in label, and coordinates; implemented by matching `^atom\s+(\S+)\s+(\S+)\s+(\d+)` plus three numbers; a malformed atom record or an empty atom list is an error.
+- Lines 112-115: Atom keys, delimited and glued, with canonical indices; implemented by `atom_index=cellfun(@(x)num2str(str2double(x)),atom_tokens(:,3),'UniformOutput',false)`, `atom_keys=strcat(label,{' '},atom_index)`, and `glued_keys=strcat(label,atom_index)`, so that a zero-padded index matches the same unpadded index; duplicate keys are an error.
+- Lines 117-137: Shielding and EFG records, matched to the atoms by label and index; the identity tokens of each record (one glued token, or label and index) are resolved by `key_atoms`; a record that matches no atom or several atoms, or a repeated record for the same atom, is an error. `props.cst` and `props.efg` are returned only when at least one tensor was found.
+- Lines 139-159: Reduced spin-spin coupling records, isotropic parts in gparse units; the two to four identity tokens are resolved by `key_atoms` into an atom pair, self-coupling records are skipped, the isotropic parts of K(A,B) and K(B,A) are averaged when both are present, and `props.k_couplings` is returned only when isc records exist.
 
 ### Local helper functions
 
-- Line 91: `grumble()` — `function grumble(file_name)`. Malevolence lurks in men who avoid wine, games, the company of beautiful women, and conversations at dinner. Such people
-  - Representative operation: `if ~ischar(file_name)`.
-  - Representative operation: `error('file_name must be a character string.')`.
+- Line 164: `key_atoms()` — `function atoms=key_atoms(id_tokens,atom_keys,glued_keys,natoms_needed)`; tries every split of the identity tokens into delimited (label, index) and glued (labelindex) keys, and returns one row of atom numbers per split under which every key matches exactly one atom, so that the caller can refuse records with no match or an ambiguous match.
+- Line 186: `grumble()` — `function grumble(file_name)`; checks that the file name is a character string.
 
 ## Parameters / inputs
 
-- file_name -the name of the *.magres file, a
-- character string
+- file_name - the name of the *.magres file, a character string
 
 ## Outputs
 
-- props.std_geom -atomic coordinates (Angstrom)
-- props.symbols -atomic symbols
-- props.natoms -number of atoms
-- props.filename -log file name
-- props.cst -chemical shielding tensors relative
-- to the bare nucleus in vacuum, ppm
-- props.efg -EFG tensors, a.u.^-3
-- Notes: CASTEP has a printing bug with over 100 nuclei. A kind of
-- workaround was implemented, but keep an eye on it.
-
-## Implementation structure
-
-- Reads the "new format" section of CASTEP .magres files. Syntax:
-- props=c2spinach(file_name)
-- file_name -the name of the *.magres file, a
-- character string
-- props.std_geom -atomic coordinates (Angstrom)
-- props.symbols -atomic symbols
-- props.natoms -number of atoms
-- props.filename -log file name
-- props.cst -chemical shielding tensors relative
-- to the bare nucleus in vacuum, ppm
-- props.efg -EFG tensors, a.u.^-3
-- workaround was implemented, but keep an eye on it.
+- props.filename - log file name
+- props.symbols - atomic symbols, 1 x natoms cell
+- props.std_geom - atomic coordinates, natoms x 3, Angstrom
+- props.natoms - number of atoms
+- props.cst - chemical shielding tensors relative to the bare nucleus in vacuum, ppm, 1 x natoms cell, printed component order
+- props.efg - EFG tensors, a.u., 1 x natoms cell
+- props.k_couplings - isotropic reduced spin-spin couplings, natoms x natoms, in the units used by gparse.m (magres K times mu_N^2/h, Hz)
+- Only the tensors that the file contains are returned; test for their presence with isfield. An atom without a tensor gets an empty cell.
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `grumble()`, `fopen()`, `textscan()`, `fclose()`, `castep_log()`, `deblank()`, `strcmp()`, `str2double()`, `ischar()`.
+- Called routines detected from the main body: `grumble()`, `key_atoms()`, `fopen()`, `textscan()`, `fclose()`, `strtrim()`, `regexprep()`, `regexp()`, `cellfun()`, `strcmp()`, `strcat()`, `strsplit()`, `str2double()`, `reshape()`, `unique()`, `isstrprop()`, `ischar()`.
+- Consumers in the repository: `examples/nmr_solids/case_studies/mathies_14n_13c/*`, `examples/nmr_solids/case_studies/mathies_carbonate/*`, `examples/visualisation/efg_silicate.m` (through `efg_display`), `g2spinach` for `cst` and `k_couplings`, and `tests/interfaces/test_c2spinach.m`.

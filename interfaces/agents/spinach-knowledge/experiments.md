@@ -60,7 +60,7 @@
 | `experiments/imaging/cpmg_dec.m` | `mri=cpmg_dec(spin_system,parameters,H,R,K,G,F)` | The effect of Carr-Purcell-Meiboom-Gill (CPMG) pulse sequence on the MRI phantom. The function runs the CPMG and then pr | 145 |
 | `experiments/imaging/dpfgse_select.m` | `fid=dpfgse_select(spin_system,parameters,H,R,K,G,F)` | DPFGSE signal selection, based on Equation 3 from the paper by Stott et al. (https://doi.org/10.1006/jmre.1997.1110). Sy | 186 |
 | `experiments/imaging/dpfgse_suppress.m` | `fid=dpfgse_suppress(spin_system,parameters,H,R,K,G,F)` | DPFGSE signal suppression, based on Equation 3 from the paper by Stott et al. (https://doi.org/10.1006/jmre.1997.1110).  | 188 |
-| `experiments/imaging/epi_2d.m` | `mri=epi_2d(spin_system,parameters,H,R,K,G,F)` | Diffusion weighted echo planar 2D imaging pulse sequence with variable diffusion encoding direction. Syntax: mri=epi_2d( | 214 |
+| `experiments/imaging/epi_2d.m` | `mri=epi_2d(spin_system,parameters,H,R,K,G,F)` | Diffusion weighted echo planar 2D imaging pulse sequence with variable diffusion encoding direction. Syntax: mri=epi_2d( | 224 |
 | `experiments/imaging/epi_3d.m` | `fid=epi_3d(spin_system,parameters,H,R,K,G,F)` | Diffusion weighted 3D echo planar imaging pulse sequence. Syntax: fid=epi_3d(spin_system,parameters,H,R,K,G,F) This sequ | 338 |
 | `experiments/imaging/fse.m` | `mri=fse(spin_system,parameters,H,R,K,G,F)` | Fast spin echo (FSE) pulse sequence. Syntax: mri=fse(spin_system,parameters,H,R,K,G,F) This sequence must be called from | 178 |
 | `experiments/imaging/grad_echo.m` | `fid=grad_echo(spin_system,parameters,H,R,K,G,F)` | Gradient echo pulse sequence. Syntax: fid=grad_echo(spin_system,parameters,H,R,K,G,F) This sequence must be called from  | 140 |

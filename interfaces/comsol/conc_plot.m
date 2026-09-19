@@ -60,8 +60,12 @@ elseif size(obs,2)==1
 elseif size(obs,2)==2
 
     % Two observables: assume phase + amp and map into HS
-    RGB=hsv2rgb(wrapTo2Pi(obs(:,1))/(2*pi),...
-                obs(:,2)/max(obs(:,2)),...
+    amp_peak=max(obs(:,2));
+
+    % All-zero amplitude column maps to zero saturation
+    if amp_peak==0, amp_sat=zeros(size(obs,1),1);
+    else, amp_sat=obs(:,2)/amp_peak; end
+    RGB=hsv2rgb(wrapTo2Pi(obs(:,1))/(2*pi),amp_sat,...
                 0.50*ones(size(spin_system.mesh.vor.cells,1),1));
 
 elseif size(obs,2)==3

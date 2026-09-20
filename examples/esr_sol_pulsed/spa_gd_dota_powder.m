@@ -5,7 +5,7 @@
 % 281-295 (2005). Powder average simulation with a third-order 
 % numerical rotating frame transformation.
 %
-% Calculation time: minutes
+% Calculation time: hours
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -15,7 +15,7 @@ function spa_gd_dota_powder()
 spectrum=zeros(2048,1,'like',1i);
 
 % Get the sampling
-[D,E,W]=zfs_sampling(30,5,1e-2); drawnow;
+[D,E,W]=zfs_sampling(30,5,1e-4); drawnow;
 
 % Get the figure going
 kfigure();

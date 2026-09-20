@@ -6,7 +6,7 @@
 
 ## Purpose
 
-A soft pulse simulation for a gadolinium ion. The soft pulse is simulated using Fokker-Planck formalism. Zero-field split- ting distribution is sampled using the statistical parameters reported in Figure 5 of Raitsimring et al, App. Mag. Res. 28, 281-295 (2005). Powder average simulation with a third-order numerical rotating frame transformation. Calculation time: minutes
+A soft pulse simulation for a gadolinium ion. The soft pulse is simulated using Fokker-Planck formalism. Zero-field split- ting distribution is sampled using the statistical parameters reported in Figure 5 of Raitsimring et al, App. Mag. Res. 28, 281-295 (2005). Powder average simulation with a third-order numerical rotating frame transformation. Calculation time: hours
 
 ## Physical / mathematical content
 
@@ -23,7 +23,7 @@ A soft pulse simulation for a gadolinium ion. The soft pulse is simulated using 
 ### Comment-guided execution stages
 
 - Lines 14-15: Preallocate the spectrum; implemented by `spectrum=zeros(2048,1,'like',1i)`.
-- Lines 17-18: Get the sampling; implemented by `[D,E,W]=zfs_sampling(30,5,1e-2); drawnow`.
+- Lines 17-18: Get the sampling; implemented by `[D,E,W]=zfs_sampling(30,5,1e-4); drawnow`.
 - Lines 20-21: Get the figure going; implemented by `kfigure()`.
 - Lines 23-24: Loop over ZFS distribution; implemented by `for n=1:numel(W)`.
 - Lines 26-27: Spin system parameters; implemented by `sys.magnet=3.5`.
@@ -44,7 +44,7 @@ A soft pulse simulation for a gadolinium ion. The soft pulse is simulated using 
 ### Key state/data transformations
 
 - Lines 15: computes `spectrum` using `spectrum=zeros(2048,1,'like',1i)`.
-- Lines 18: computes `[D,E,W]` using `[D,E,W]=zfs_sampling(30,5,1e-2); drawnow`.
+- Lines 18: computes `[D,E,W]` using `[D,E,W]=zfs_sampling(30,5,1e-4); drawnow`.
 - Lines 27: computes `sys.magnet` using `sys.magnet=3.5`.
 - Lines 28: computes `sys.isotopes` using `sys.isotopes={'E8'}`.
 - Lines 29: computes `inter.zeeman.scalar` using `inter.zeeman.scalar={2.002319}`.
@@ -70,7 +70,7 @@ A soft pulse simulation for a gadolinium ion. The soft pulse is simulated using 
 - reported in Figure 5 of Raitsimring et al, App. Mag. Res. 28,
 - 281-295 (2005). Powder average simulation with a third-order
 - numerical rotating frame transformation.
-- Calculation time: minutes
+- Calculation time: hours
 - Preallocate the spectrum
 - Get the sampling
 - Get the figure going

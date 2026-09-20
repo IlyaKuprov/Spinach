@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/imaging/epi_2d.m`
 - Signature: `mri=epi_2d(spin_system,parameters,H,R,K,G,F)`
-- Total lines: 214
+- Total lines: 224
 
 ## Purpose
 
@@ -29,24 +29,26 @@ Diffusion weighted echo planar 2D imaging pulse sequence with variable diffusion
 - Lines 47-48: Apply an ideal 90-degree pulse; implemented by `rho=step(spin_system,Ly,parameters.rho0,pi/2)`.
 - Lines 50-51: Apply diffusion gradient; implemented by `if isfield(parameters,'diff_g_amp')`.
 - Lines 57-58: Apply an ideal 180-degree pulse; implemented by `rho=step(spin_system,Lx,rho,pi)`.
-- Lines 67-70: Preroll the gradients; implemented by `rho=evolution(spin_system,B-parameters.pe_grad_amp*G{1} -parameters.ro_grad_amp*G{2},[],rho, parameters.pe_grad_dur/2,1,'final')`.
-- Lines 72-73: Preallocate k-space image; implemented by `fid=zeros(parameters.image_size,'like',1i)`.
-- Lines 75-77: Precompute propagators; implemented by `P_ro_p=propagator(spin_system,B+parameters.ro_grad_amp*G{2}, parameters.ro_grad_dur/(parameters.image_size(2)-1))`.
-- Lines 83-84: Phase encoding loop; implemented by `for n=1:parameters.image_size(1)`.
-- Lines 86-87: Determine readout gradient sign; implemented by `ro_grad_sign=2*mod(n,2)-1`.
-- Lines 89-90: Readout loop; implemented by `for k=1:parameters.image_size(2)`.
-- Lines 92-93: Detect under readout gradient; implemented by `if ro_grad_sign>0`.
-- Lines 103-104: Propagate under encoding gradient; implemented by `rho=P_pe_p*rho`.
-- Lines 108-109: Apodisation; implemented by `fid=apodisation(spin_system,fid,{{'sqsin'},{'sqsin'}})`.
-- Lines 111-112: Fourier transform; implemented by `mri=real(fftshift(fft2(ifftshift(fid))))`.
+- Lines 67-70: Preroll both gradients together for the duration of the shorter prephaser; implemented by `rho=evolution(spin_system,B-parameters.pe_grad_amp*G{1} -parameters.ro_grad_amp*G{2},[],rho, min(parameters.pe_grad_dur,parameters.ro_grad_dur)/2,1,'final')`.
+- Lines 72-79: Finish the longer prephaser on its own; implemented by `if parameters.pe_grad_dur>parameters.ro_grad_dur`.
+- Lines 81-82: Preallocate k-space image; implemented by `fid=zeros(parameters.image_size,'like',1i)`.
+- Lines 84-86: Precompute propagators; implemented by `P_ro_p=propagator(spin_system,B+parameters.ro_grad_amp*G{2}, parameters.ro_grad_dur/(parameters.image_size(2)-1))`.
+- Lines 92-93: Phase encoding loop; implemented by `for n=1:parameters.image_size(1)`.
+- Lines 95-96: Determine readout gradient sign; implemented by `ro_grad_sign=2*mod(n,2)-1`.
+- Lines 98-99: Readout loop; implemented by `for k=1:parameters.image_size(2)`.
+- Lines 101-102: Detect under readout gradient; implemented by `if ro_grad_sign>0`.
+- Lines 112-113: Propagate under encoding gradient; implemented by `rho=P_pe_p*rho`.
+- Lines 117-118: Apodisation; implemented by `fid=apodisation(spin_system,fid,{{'sqsin'},{'sqsin'}})`.
+- Lines 120-121: Fourier transform; implemented by `mri=real(fftshift(fft2(ifftshift(fid))))`.
 
 ### Control flow inferred from the code
 
 - Line 51: conditional branch on `isfield(parameters,'diff_g_amp')`.
 - Line 61: conditional branch on `isfield(parameters,'diff_g_amp')`.
-- Line 84: `for` loop over `n=1:parameters.image_size(1)`.
-- Line 90: `for` loop over `k=1:parameters.image_size(2)`.
-- Line 93: conditional branch on `ro_grad_sign>0`.
+- Line 73: conditional branch on `parameters.pe_grad_dur>parameters.ro_grad_dur`, with an `elseif` for `parameters.ro_grad_dur>parameters.pe_grad_dur`.
+- Line 93: `for` loop over `n=1:parameters.image_size(1)`.
+- Line 99: `for` loop over `k=1:parameters.image_size(2)`.
+- Line 102: conditional branch on `ro_grad_sign>0`.
 
 ### Key state/data transformations
 
@@ -54,18 +56,18 @@ Diffusion weighted echo planar 2D imaging pulse sequence with variable diffusion
 - Lines 42: computes `Lx` using `Lx=operator(spin_system,'Lx',parameters.spins{1})`.
 - Lines 43: computes `Ly` using `Ly=operator(spin_system,'Ly',parameters.spins{1})`.
 - Lines 48: computes `rho` using `rho=step(spin_system,Ly,parameters.rho0,pi/2)`.
-- Lines 73: computes `fid` using `fid=zeros(parameters.image_size,'like',1i)`.
-- Lines 76-77: computes `P_ro_p` using `P_ro_p=propagator(spin_system,B+parameters.ro_grad_amp*G{2}, parameters.ro_grad_dur/(parameters.image_size(2)-1))`.
-- Lines 78-79: computes `P_ro_m` using `P_ro_m=propagator(spin_system,B-parameters.ro_grad_amp*G{2}, parameters.ro_grad_dur/(parameters.image_size(2)-1))`.
-- Lines 80-81: computes `P_pe_p` using `P_pe_p=propagator(spin_system,B+parameters.pe_grad_amp*G{1}, parameters.pe_grad_dur/(parameters.image_size(1)-1))`.
-- Lines 87: computes `ro_grad_sign` using `ro_grad_sign=2*mod(n,2)-1`.
-- Lines 94: computes `fid(n,k)` using `fid(n,k)=parameters.coil'*rho`.
-- Lines 98: computes `fid(n,parameters.image_size(2)-k+1)` using `fid(n,parameters.image_size(2)-k+1)=parameters.coil'*rho`.
-- Lines 112: computes `mri` using `mri=real(fftshift(fft2(ifftshift(fid))))`.
+- Lines 82: computes `fid` using `fid=zeros(parameters.image_size,'like',1i)`.
+- Lines 85-86: computes `P_ro_p` using `P_ro_p=propagator(spin_system,B+parameters.ro_grad_amp*G{2}, parameters.ro_grad_dur/(parameters.image_size(2)-1))`.
+- Lines 87-88: computes `P_ro_m` using `P_ro_m=propagator(spin_system,B-parameters.ro_grad_amp*G{2}, parameters.ro_grad_dur/(parameters.image_size(2)-1))`.
+- Lines 89-90: computes `P_pe_p` using `P_pe_p=propagator(spin_system,B+parameters.pe_grad_amp*G{1}, parameters.pe_grad_dur/(parameters.image_size(1)-1))`.
+- Lines 96: computes `ro_grad_sign` using `ro_grad_sign=2*mod(n,2)-1`.
+- Lines 103: computes `fid(n,k)` using `fid(n,k)=parameters.coil'*rho`.
+- Lines 107: computes `fid(n,parameters.image_size(2)-k+1)` using `fid(n,parameters.image_size(2)-k+1)=parameters.coil'*rho`.
+- Lines 121: computes `mri` using `mri=real(fftshift(fft2(ifftshift(fid))))`.
 
 ### Local helper functions
 
-- Line 117: `grumble()` — `function grumble(spin_system,parameters,H,R,K,G,F)`.
+- Line 126: `grumble()` — `function grumble(spin_system,parameters,H,R,K,G,F)`.
   - Representative operation: `if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})`.
   - Representative operation: `error('this function is only available in sphten-liouv and zeeman-liouv formalisms.')`.
 

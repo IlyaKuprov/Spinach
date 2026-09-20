@@ -113,11 +113,17 @@ rho=evolution(spin_system,B-parameters.pe_grad_amp*G{2}...
 
 % Finish the longer prephaser on its own
 if parameters.pe_grad_dur>parameters.ro_grad_dur
+
+    % Evolution under the remaining G{2} duration
     rho=evolution(spin_system,B-parameters.pe_grad_amp*G{2},[],rho,...
-                  (parameters.pe_grad_dur-parameters.ro_grad_dur)/2,1,'final');
+                 (parameters.pe_grad_dur-parameters.ro_grad_dur)/2,1,'final');
+
 elseif parameters.ro_grad_dur>parameters.pe_grad_dur
+
+    % Evolution under the remaining G{3} duration
     rho=evolution(spin_system,B-parameters.ro_grad_amp*G{3},[],rho,...
-                  (parameters.ro_grad_dur-parameters.pe_grad_dur)/2,1,'final');
+                 (parameters.ro_grad_dur-parameters.pe_grad_dur)/2,1,'final');
+    
 end
 
 % Precompute propagators

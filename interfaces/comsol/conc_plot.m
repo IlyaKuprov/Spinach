@@ -60,16 +60,27 @@ elseif size(obs,2)==1
 elseif size(obs,2)==2
 
     % Two observables: assume phase + amp and map into HS
-    RGB=hsv2rgb(wrapTo2Pi(obs(:,1))/(2*pi),...
-                obs(:,2)/max(obs(:,2)),...
+    amp_peak=max(obs(:,2));
+
+    % All-zero amplitude column maps to zero saturation
+    if amp_peak==0, amp_sat=zeros(size(obs,1),1);
+    else, amp_sat=obs(:,2)/amp_peak; end
+    RGB=hsv2rgb(wrapTo2Pi(obs(:,1))/(2*pi),amp_sat,...
                 0.50*ones(size(spin_system.mesh.vor.cells,1),1));
 
 elseif size(obs,2)==3
 
     % Three observables: assume phase + amp + Z and map into HSV
-    RGB=hsv2rgb(wrapTo2Pi(obs(:,1))/(2*pi),...
-                obs(:,2)/max(obs(:,2)),...
-                (obs(:,3)-min(obs(:,3)))/(max(obs(:,3))-min(obs(:,3))));
+    amp_peak=max(obs(:,2)); z_range=max(obs(:,3))-min(obs(:,3));
+
+    % All-zero amplitude column maps to zero saturation
+    if amp_peak==0, amp_sat=zeros(size(obs,1),1);
+    else, amp_sat=obs(:,2)/amp_peak; end
+
+    % Constant longitudinal observable maps to full value throughout
+    if z_range==0, z_val=ones(size(obs,1),1);
+    else, z_val=(obs(:,3)-min(obs(:,3)))/z_range; end
+    RGB=hsv2rgb(wrapTo2Pi(obs(:,1))/(2*pi),amp_sat,z_val);
 
 else
 

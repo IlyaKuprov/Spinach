@@ -38,6 +38,8 @@
 - Lines 124-127: Draw lids and bottoms of the bars as a multifaceted patch; implemented by `patch('Faces',F,'Vertices',V,'FaceColor','flat', 'FaceVertexCData',FRGB,'EdgeColor','black', 'LineWidth',0.25,'LineJoin','round'); V(:,3)=0`.
 - Lines 132-133: Preallocate side geometry and colours; implemented by `V=zeros(2*total_vertices,3)`.
 - Lines 138-139: Build sides; implemented by `for m=1:numel(active_cells)`.
+- Lines 151-152: Build all walls for this cell; implemented by `local_idx=(1:nvert)'`.
+- Lines 159-160: Advance the vertex and face offsets; implemented by `vertex_offset=vertex_offset+2*nvert`.
 
 ### Control flow inferred from the code
 

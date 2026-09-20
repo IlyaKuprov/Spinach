@@ -30,7 +30,7 @@ Stationary state analysis for the spin system of allyl pyruvate, finding out whi
 - Lines 31-32: Tidy up rounding errors; implemented by `H=(H+ctranspose(H))/2`.
 - Lines 34-35: Get the singlet state; implemented by `rho=singlet(spin_system,3,4)`.
 - Lines 37-39: Report the norm; implemented by `report(spin_system,['Singlet state norm: ' num2str(norm(full(rho),2))])`.
-- Lines 41-42: Remove the part that does not commute with H; implemented by `[EvH,~]=eig(H); rho_inv=remncomm(rho,EvH)`.
+- Lines 41-42: Remove the part that does not commute with H; implemented by `[EvH,evals_h]=eig(H,'vector'); rho_inv=remncomm(rho,EvH,evals_h)`.
 - Lines 44-45: Remove the unit part; implemented by `rho_inv=remtrace(rho_inv)`.
 - Lines 47-49: Report the norm; implemented by `report(spin_system,[' of which commutes with H: ' num2str(norm(full(rho_inv),2))])`.
 - Lines 51-52: Project out the ZZ component; implemented by `zz_state=state(spin_system,{'Lz','Lz'},{3 4})`.
@@ -49,7 +49,7 @@ Stationary state analysis for the spin system of allyl pyruvate, finding out whi
 - Lines 24: computes `bas.approximation` using `bas.approximation='none'`.
 - Lines 29: computes `H` using `H=hamiltonian(spin_system); H=full(H)`.
 - Lines 35: computes `rho` using `rho=singlet(spin_system,3,4)`.
-- Lines 42: computes `[EvH,~]` using `[EvH,~]=eig(H); rho_inv=remncomm(rho,EvH)`.
+- Lines 42: computes `[EvH,evals_h]` using `[EvH,evals_h]=eig(H,'vector'); rho_inv=remncomm(rho,EvH,evals_h)`.
 - Lines 45: computes `rho_inv` using `rho_inv=remtrace(rho_inv)`.
 - Lines 52: computes `zz_state` using `zz_state=state(spin_system,{'Lz','Lz'},{3 4})`.
 - Lines 63: computes `parameters.offset` using `parameters.offset=2850`.

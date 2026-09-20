@@ -68,7 +68,7 @@
 | `tests/kernel/test_linear_perturbation_suite.m` | `result=test_linear_perturbation_suite()` | Tests linear-algebra, angular-momentum, and perturbation utilities. Syntax: result=test_linear_perturbation_suite() Outp | 117 |
 | `tests/kernel/test_liouville_commutator.m` | `result=test_liouville_commutator()` | Tests Liouville-space commutation superoperators. Syntax: result=test_liouville_commutator() Outputs: result -regression | 42 |
 | `tests/kernel/test_liquid_single_spin_fid.m` | `result=test_liquid_single_spin_fid()` | Tests a one-spin liquid-state free induction decay. Syntax: result=test_liquid_single_spin_fid() Outputs: result -regres | 52 |
-| `tests/kernel/test_lowlevel_utilities_suite.m` | `result=test_lowlevel_utilities_suite()` | Tests cheap deterministic low-level utility functions. Syntax: result=test_lowlevel_utilities_suite() Outputs: result -r | 93 |
+| `tests/kernel/test_lowlevel_utilities_suite.m` | `result=test_lowlevel_utilities_suite()` | Tests cheap deterministic low-level utility functions. Syntax: result=test_lowlevel_utilities_suite() Outputs: result -r | 105 |
 | `tests/kernel/test_matrix_utility_suite.m` | `result=test_matrix_utility_suite()` | Tests small matrix utility functions. Syntax: result=test_matrix_utility_suite() Outputs: result -regression test result | 118 |
 | `tests/kernel/test_multiprop_adaptive.m` | `result=test_multiprop_adaptive()` | Tests adaptive repeated propagator application. Syntax: result=test_multiprop_adaptive() Outputs: result -regression tes | 140 |
 | `tests/kernel/test_nmr_liquids_alignment_suite.m` | `result=test_nmr_liquids_alignment_suite()` | Tests compact literature-alignment probes for liquid-state NMR pulse sequences. Syntax: result=test_nmr_liquids_alignmen | 193 |

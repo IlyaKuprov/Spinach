@@ -414,6 +414,12 @@ processing parameter files, the digital filter group delay, and the gradient
 and delay lists when present. `mesh=comsol_import(comsol)` imports a COMSOL 2D
 mesh for the `meshflow` context from `comsol.mesh_file` and `comsol.velo_file`,
 with `comsol.crop` and `comsol.inactivate` controlling the retained region.
+`conc_plot(spin_system,conc,obs)` then draws concentrations on that mesh as
+vertical bars after `mesh_plot` has drawn it, colouring each cell by one
+(phase), two (phase and amplitude), or three (phase, amplitude, and
+longitudinal) observables; a zero peak amplitude gives zero saturation and a
+constant longitudinal observable gives full value, so such inputs render
+instead of producing NaN face colours.
 
 Complete ready-made systems live in `etc/molecules/` (`strychnine(spins)`,
 `cyprinol()`, `lactate(spins)`, `allyl_pyruvate(spins)`,

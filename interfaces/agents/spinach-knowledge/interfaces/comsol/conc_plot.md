@@ -71,6 +71,9 @@
 - Lines 111: computes `vertex_range` using `vertex_range=vertex_offset+(1:nvert)`.
 - Lines 112: computes `V(vertex_range,:)` using `V(vertex_range,:)=[vor_cell_x(:) vor_cell_y(:) vor_cell_z(:)]`.
 - Lines 115: computes `face` using `face=[1:nvert 1]+vertex_offset`.
+- Lines 116: computes `F(m,1:numel(face))` using `F(m,1:numel(face))=face`.
+- Lines 119: computes `FRGB(m,:)` using `FRGB(m,:)=RGB(n,:)`.
+- Lines 127: computes `V(:,3)` using `V(:,3)=0`.
 
 ### Local helper functions
 

@@ -4,9 +4,9 @@
 % relaxation in the generalised Lindblad form of Saito and Miyashita.
 % The magnetisation of every orientation of the two-angle Lebedev grid
 % is plotted alongside the powder average and the thermal equilibrium
-% magnetisation. Reproduces Figure 3 of
+% magnetisation. Reproduces Fig 3 of
 %
-%         https://arxiv.org/abs/2609.16352
+%                   https://arxiv.org/abs/2609.16352
 %
 % Calculation time: hours
 %
@@ -94,9 +94,6 @@ end
 h_avg=plot(fields,m_avg,'LineWidth',2); h_eq=plot(fields,m_eq,'--','LineWidth',2); hold off;
 kgrid; xlim tight; kxlabel('Field, Tesla'); kylabel('Magnetisation, $\mu_B$');
 klegend([h_one h_avg h_eq],{'single orientations','powder average','equilibrium'},'Location','northwest');
-
-% Save the curves
-save('ho_pzdo4_powder.mat','fields','m_avg','m_eq','answers','sph_grid');
 
 end
 

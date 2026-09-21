@@ -3,9 +3,9 @@
 % antisymmetric, at 0.2 K under a 10 T/ms sweep to 1 T, with spin-
 % phonon relaxation in the generalised Lindblad form of Saito and
 % Miyashita. The out-of-equilibrium curves are compared with the
-% thermal equilibrium magnetisation. Reproduces Figure 4 of
+% thermal equilibrium magnetisation. Reproduces Fig 4 of
 %
-%         https://arxiv.org/abs/2609.16352
+%                  https://arxiv.org/abs/2609.16352
 %
 % Calculation time: minutes
 %
@@ -88,9 +88,6 @@ for n=1:4
     klegend({'10 T/ms sweep','equilibrium'},'Location','northwest'); drawnow;
 
 end
-
-% Save the curves
-save('dimer_exchange_types.mat','answers','labels');
 
 end
 

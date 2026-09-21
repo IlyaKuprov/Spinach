@@ -5,10 +5,9 @@
 % relaxation in the generalised Lindblad form of Saito and Miyashita.
 % The full 216-state Hilbert space is used; the paper solves the same
 % problem in 16-state and 26-state effective bases. The thermal equi-
-% librium magnetisation is plotted for comparison. Reproduces Figure 6
-% of
+% librium magnetisation is plotted for comparison. Reproduces Fig 6 of
 %
-%         https://arxiv.org/abs/2609.16352
+%                   https://arxiv.org/abs/2609.16352
 %
 % Calculation time: minutes
 %
@@ -58,10 +57,13 @@ parameters.coil=-2.0*Sz;
 
 % Sweep: 50 T/ms to 10 T in 20 ns stairs, output every 100 stairs
 parameters.field_prof=@(t) 5e4*t;
-parameters.timestep=2e-8; parameters.nsteps=1e4; parameters.nout=100;
+parameters.timestep=2e-8; 
+parameters.nsteps=1e4; 
+parameters.nout=100;
 
 % Single crystal in the frame of the zero-field splitting tensors
-parameters.spins={'E6'}; parameters.orientation=[0 0 0];
+parameters.spins={'E6'}; 
+parameters.orientation=[0 0 0];
 parameters.needs={'zeeman_op'};
 
 % Run the simulation
@@ -80,9 +82,6 @@ end
 kfigure(); plot(answer.field,answer.obs); hold on; plot(answer.field,m_eq,'--'); hold off;
 kgrid; xlim tight; kxlabel('Field, Tesla'); kylabel('Magnetisation, $\mu_B$');
 klegend({'50 T/ms sweep, 216 states','equilibrium'},'Location','northwest');
-
-% Save the curves
-save('mn3_trimer_magn.mat','answer','m_eq');
 
 end
 

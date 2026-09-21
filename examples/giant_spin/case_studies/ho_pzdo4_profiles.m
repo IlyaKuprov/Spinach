@@ -4,9 +4,9 @@
 % monotone cubic spline through a measured 65 T short pulse, and a sinu-
 % soidal field at the clock transition frequency. Spin-phonon relaxation
 % is the generalised Lindblad dissipator of Saito and Miyashita with a
-% super-Ohmic phonon bath. Reproduces Figure 2 of
+% super-Ohmic phonon bath. Reproduces Fig 2 of
 %
-%         https://arxiv.org/abs/2609.16352
+%                  https://arxiv.org/abs/2609.16352
 %
 % with the crystal field parameters, g-factor, temperatures, spectral
 % density, sweep profiles, and stair widths of that paper. As in the
@@ -109,9 +109,6 @@ for n=1:4
     kxlabel(['Time, ' tunits{n}]); ktitle(labels{n}); kgrid; xlim tight; drawnow;
 
 end
-
-% Save the curves
-save('ho_pzdo4_profiles.mat','answers','labels');
 
 end
 

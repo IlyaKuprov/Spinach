@@ -22,8 +22,8 @@ Two-pulse echo-detected frequency-swept EPR spectra of the P1 substitutional nit
 ## Numerical / algorithmic content
 
 - Time propagation is explicit in Hilbert space (`zeeman-hilb`): the pulse sequence `experiments/echo_sweep.m` steps through the Hamiltonian rotor stack that `singlerot()` supplies, applying a propagator per 5 ns time step to the density matrix.
-- The rotor stack index at each time step follows from `parameters.rate`, so `rate=0` is the static case; slow spinning needs a high rotor rank (2700) because the stack must resolve the rotor phase to within one time step.
-- The electron coherence pathway (-1 after the first pulse, +1 after the second) is selected with `coherence()` in place of the phase cycle; the sequence averages over 100 rotor phases at the start of the sequence and sweeps the carrier offset inside the sequence, reusing the free-evolution propagators because the rotor stack commutes with `sz`.
+- The rotor stack index at each time step follows from `parameters.rate`, so `rate=0` is the static case; the rotor rank (2700) is set so that the stack advances by at most one element per 5 ns time step at 37 kHz, the fastest rate used, and no rotor phase is skipped.
+- The electron coherence pathway (-1 after the first pulse, +1 after the second) is selected with `coherence()` in place of the phase cycle; the sequence averages over 100 rotor phases at the start of the sequence and sweeps the carrier offset inside the sequence, reusing the free-evolution propagators because the rotor stack commutes with the electron `Lz`.
 
 ## Code-derived implementation details
 

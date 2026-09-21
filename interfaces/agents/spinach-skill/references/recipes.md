@@ -226,10 +226,13 @@ phase cycle, and sweeps the carrier inside the sequence by adding
 per carrier point because the secular stack commutes with the electron `Lz`;
 its grumbler refuses a stack that does not. The sequence takes `pulse_dur`,
 `pulse_frq`, `tau`, `echo_win`, `timestep`, `nphases`, `sweep`, and `npoints`
-and returns the complex echo integral at each carrier offset as a column.
-Slow spinning needs a high `max_rank` (2700) because the stack must resolve
-the rotor phase to within one time step; the carrier step must be finer than
-the narrowest line (0.5 MHz for the 2 MHz wide central line).
+and returns the complex echo integral at each carrier offset, averaged over
+the start phases, as a column. The rotor rank is set by the fastest rate and
+the time step, not by the slowest rate: the stack should advance by at most
+one element per step so that no rotor phase is skipped, `max_rank` of at
+least `1/(2*rate*timestep)`, which is 2700 at 37 kHz with 5 ns steps (at
+slower rates consecutive steps reuse a stack element); the carrier step must
+be finer than the narrowest line (0.5 MHz for the 2 MHz wide central line).
 
 ## DEER
 

@@ -61,8 +61,9 @@
 %
 % Outputs:
 %
-%    echo - complex echo integral at each carrier offset, a column
-%           vector with parameters.npoints elements
+%    echo - complex echo integral at each carrier offset, averaged
+%           over the rotor phases at the start of the sequence, a
+%           column vector with parameters.npoints elements
 %
 % Note: the elements of the rotor stack must commute with the elect-
 %       ron Lz operator, as they do under the 'esr' assumption set,
@@ -70,9 +71,11 @@
 %       tor and only the pulse propagators are rebuilt at each car-
 %       rier offset.
 %
-% Note: the rotor stack must resolve the rotor phase to about one
-%       element per time step, parameters.max_rank of the context
-%       function must therefore be about 1/(2*rate*timestep).
+% Note: the rotor stack should be fine enough to advance by at most
+%       one element per time step at the fastest spinning rate used,
+%       so that no rotor phase is skipped; parameters.max_rank of
+%       the context function should be at least 1/(2*rate*timestep)
+%       at that rate.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -162,6 +165,9 @@ for k=1:parameters.npoints
 
 end
 
+% Average over the rotor phases at the start of the sequence
+echo=echo/parameters.nphases;
+
 end
 
 % Consistency enforcement
@@ -242,6 +248,12 @@ if (~isnumeric(parameters.timestep))||(~isreal(parameters.timestep))||...
    (~isscalar(parameters.timestep))||(parameters.timestep<=0)
     error('parameters.timestep must be a positive real scalar.');
 end
+if parameters.pulse_dur<parameters.timestep
+    error('parameters.pulse_dur must not be shorter than parameters.timestep.');
+end
+if parameters.echo_win<parameters.timestep
+    error('parameters.echo_win must not be shorter than parameters.timestep.');
+end
 if ~isfield(parameters,'rate')
     error('spinning rate must be specified in parameters.rate field.');
 end
@@ -269,8 +281,8 @@ if ~isfield(parameters,'npoints')
 end
 if (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
    (~isscalar(parameters.npoints))||(mod(parameters.npoints,1)~=0)||...
-   (parameters.npoints<1)
-    error('parameters.npoints must be a positive real integer.');
+   (parameters.npoints<=2)
+    error('parameters.npoints must be a real integer greater than 2.');
 end
 end
 

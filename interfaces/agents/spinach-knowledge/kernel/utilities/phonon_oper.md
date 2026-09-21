@@ -17,31 +17,6 @@ Thermally dressed spin-phonon coupling operator of the generalised Lindblad diss
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 57-58: Check consistency; implemented by `grumble(E,X,I0,alpha,T)`.
-- Lines 60-61: Transition frequencies in rad/s; implemented by `w=E-E.'`.
-- Lines 63-64: Boltzmann exponents; implemented by `beta_w=spin_system.tols.hbar*w/(spin_system.tols.kbol*T)`.
-- Lines 66-67: Thermal spectral density difference, with the small and large exponent limits; implemented by `num=I0*(max(w,0).^alpha-max(-w,0).^alpha); phi=zeros(size(w))`.
-- Lines 73-74: Dressed coupling operator; implemented by `R=X.*phi`.
-
-### Key state/data transformations
-
-- Lines 61: computes `w` using `w=E-E.'`.
-- Lines 64: computes `beta_w` using `beta_w=spin_system.tols.hbar*w/(spin_system.tols.kbol*T)`.
-- Lines 67: computes `num` using `num=I0*(max(w,0).^alpha-max(-w,0).^alpha); phi=zeros(size(w))`.
-- Lines 69: computes `phi(normal)` using `phi(normal)=num(normal)./expm1(beta_w(normal))`.
-- Lines 70-71: computes `phi(small)` using `phi(small)=I0*abs(w(small)).^(alpha-1)*(spin_system.tols.kbol*T/spin_system.tols.hbar)- I0*sign(w(small)).*abs(w(small)).^alpha/2`.
-- Lines 74: computes `R` using `R=X.*phi`.
-
-### Local helper functions
-
-- Line 79: `grumble()` — `function grumble(E,X,I0,alpha,T)`.
-  - Representative operation: `if (~isnumeric(E))||(~isreal(E))||(~iscolumn(E))||any(~isfinite(E))`.
-  - Representative operation: `error('E must be a column vector of real finite eigenvalues.')`.
-
 ## Parameters / inputs
 
 - E -column vector of the eigenvalues of the Hamilto-

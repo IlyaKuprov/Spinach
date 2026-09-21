@@ -117,12 +117,14 @@ for n=1:parameters.nsteps
     rho_eig=reshape((speye(size(R_eig,1))+R_eig*dt+(R_eig*dt)^2/2)*rho_eig(:),size(H));
     rho=V*(phases.*rho_eig)*V';
 
-    % Record the observables
+    % Record the observables and report progress
     if mod(n,parameters.nout)==0
         nrec=nrec+1; answer.t(nrec)=n*parameters.timestep; answer.field(nrec)=field;
         for k=1:numel(coils)
             answer.obs(nrec,k)=real(trace(coils{k}'*rho));
         end
+        report(spin_system,['stair ' num2str(n) ' of ' num2str(parameters.nsteps) ', field ' ...
+                            num2str(field) ' T, observable ' num2str(answer.obs(nrec,1))]);
     end
 
 end

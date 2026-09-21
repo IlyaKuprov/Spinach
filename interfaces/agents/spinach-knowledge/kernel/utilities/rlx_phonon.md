@@ -2,11 +2,11 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/rlx_phonon.m`
 - Signature: `R=rlx_phonon(spin_system,H,X,I0,alpha,T)`
-- Total lines: 98
+- Total lines: 101
 
 ## Purpose
 
-Spin-phonon relaxation superoperator in the generalised Lindblad form of Saito, Miyashita, and De Raedt (Phys. Rev. B 60, 14553 (1999)), as used by Nakano and Miyashita (J. Phys. Soc. Jpn. 70, 2151 (2001)) for the magnetisation dynamics of molecular magnets. A phonon bath with the spectral density I(w)=I0*w^alpha*theta(w) couples to the spin system through a Hermitian operator X; the dissipator is d(rho)/dt = -(lambd
+Spin-phonon relaxation superoperator in the generalised Lindblad form of Saito, Miyashita, and De Raedt (Phys. Rev. B 60, 14553 (1999)), as used by Nakano and Miyashita (J. Phys. Soc. Jpn. 70, 2151 (2001)) for the magnetisation dynamics of molecular magnets. A phonon bath with the spectral density I(w)=I0*w^alpha*theta(w) couples to the spin system through a Hermitian operator X; the dissipator is d(rho)/dt = -pi*([X
 
 ## Physical / mathematical content
 
@@ -22,21 +22,21 @@ Spin-phonon relaxation superoperator in the generalised Lindblad form of Saito, 
 
 ### Comment-guided execution stages
 
-- Lines 61-62: Check consistency; implemented by `grumble(H,X,I0,alpha,T)`.
-- Lines 64-65: Diagonalise the Hamiltonian; implemented by `[V,E]=eig(full((H+H')/2),'vector')`.
-- Lines 67-68: Dressed coupling operator in the eigenbasis and back in the original basis; implemented by `XE=V'*X*V; RH=V*phonon_oper(spin_system,E,(XE+XE')/2,I0,alpha,T)*V'`.
-- Lines 70-71: Liouville space dissipator, column-stretched density matrix convention; implemented by `unit=speye(size(H,1))`.
+- Lines 64-65: Check consistency; implemented by `grumble(H,X,I0,alpha,T)`.
+- Lines 67-68: Diagonalise the Hamiltonian; implemented by `[V,E]=eig(full((H+H')/2),'vector')`.
+- Lines 70-71: Dressed coupling operator in the eigenbasis and back in the original basis; implemented by `XE=V'*X*V; RH=V*phonon_oper(spin_system,E,(XE+XE')/2,I0,alpha,T)*V'`.
+- Lines 73-74: Liouville space dissipator, column-stretched density matrix convention; implemented by `unit=speye(size(H,1))`.
 
 ### Key state/data transformations
 
-- Lines 65: computes `[V,E]` using `[V,E]=eig(full((H+H')/2),'vector')`.
-- Lines 68: computes `XE` using `XE=V'*X*V; RH=V*phonon_oper(spin_system,E,(XE+XE')/2,I0,alpha,T)*V'`.
-- Lines 71: computes `unit` using `unit=speye(size(H,1))`.
-- Lines 72: computes `R` using `R=-pi*(kron(unit,X*RH)-kron(X.',RH)+kron((RH'*X).',unit)-kron(conj(RH),X))`.
+- Lines 68: computes `[V,E]` using `[V,E]=eig(full((H+H')/2),'vector')`.
+- Lines 71: computes `XE` using `XE=V'*X*V; RH=V*phonon_oper(spin_system,E,(XE+XE')/2,I0,alpha,T)*V'`.
+- Lines 74: computes `unit` using `unit=speye(size(H,1))`.
+- Lines 75: computes `R` using `R=-pi*(kron(unit,X*RH)-kron(X.',RH)+kron((RH'*X).',unit)-kron(conj(RH),X))`.
 
 ### Local helper functions
 
-- Line 77: `grumble()` — `function grumble(H,X,I0,alpha,T)`.
+- Line 80: `grumble()` — `function grumble(H,X,I0,alpha,T)`.
   - Representative operation: `if (~isnumeric(H))||(size(H,1)~=size(H,2))||any(~isfinite(H(:)))`.
   - Representative operation: `error('H must be a square matrix with finite elements.')`.
 
@@ -75,12 +75,12 @@ Spin-phonon relaxation superoperator in the generalised Lindblad form of Saito, 
 - the magnetisation dynamics of molecular magnets. A phonon bath with
 - the spectral density I(w)=I0*w^alpha*theta(w) couples to the spin
 - system through a Hermitian operator X; the dissipator is
-- d(rho)/dt = -(lambda^2*pi)*([X,R*rho]+[X,R*rho]')
+- d(rho)/dt = -pi*([X,R*rho]+[X,R*rho]')
 - where R is built in the eigenbasis of the current Hamiltonian from
 - the transition frequencies w_kn=(E_k-E_n):
 - <k|R|n> = <k|X|n> * (I(w_kn)-I(-w_kn))/(exp(hbar*w_kn/kT)-1)
-- The Hermitian conjugate term is linear in rho for Hermitian rho, and
-- so the dissipator is returned as an ordinary Liouville space super-
+- and the square of the coupling constant lambda of the original
+- papers is absorbed into the prefactor I0 of the spectral density.
 
 ## Internal Spinach / MATLAB structure cues
 

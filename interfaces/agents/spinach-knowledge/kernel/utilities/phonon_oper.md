@@ -2,11 +2,11 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/phonon_oper.m`
 - Signature: `R=phonon_oper(spin_system,E,X,I0,alpha,T)`
-- Total lines: 97
+- Total lines: 100
 
 ## Purpose
 
-Thermally dressed spin-phonon coupling operator of the generalised Lindblad dissipator of Saito, Miyashita, and De Raedt (Phys. Rev. B 60, 14553 (1999)), in the eigenbasis of the spin Hamiltonian. For a phonon bath with the spectral density I(w)=I0*w^alpha*theta(w) that couples to the spin system through a Hermitian operator X, the dis- sipator is d(rho)/dt = -(lambda^2*pi)*([X,R*rho]+[X,R*rho]') where R is built fro
+Thermally dressed spin-phonon coupling operator of the generalised Lindblad dissipator of Saito, Miyashita, and De Raedt (Phys. Rev. B 60, 14553 (1999)), in the eigenbasis of the spin Hamiltonian. For a phonon bath with the spectral density I(w)=I0*w^alpha*theta(w) that couples to the spin system through a Hermitian operator X, the dis- sipator is d(rho)/dt = -pi*([X,R*rho]+[X,R*rho]') where R is built from the trans
 
 ## Physical / mathematical content
 
@@ -21,24 +21,24 @@ Thermally dressed spin-phonon coupling operator of the generalised Lindblad diss
 
 ### Comment-guided execution stages
 
-- Lines 54-55: Check consistency; implemented by `grumble(E,X,I0,alpha,T)`.
-- Lines 57-58: Transition frequencies in rad/s; implemented by `w=E-E.'`.
-- Lines 60-61: Boltzmann exponents; implemented by `beta_w=spin_system.tols.hbar*w/(spin_system.tols.kbol*T)`.
-- Lines 63-64: Thermal spectral density difference, with the small and large exponent limits; implemented by `num=I0*(max(w,0).^alpha-max(-w,0).^alpha); phi=zeros(size(w))`.
-- Lines 70-71: Dressed coupling operator; implemented by `R=X.*phi`.
+- Lines 57-58: Check consistency; implemented by `grumble(E,X,I0,alpha,T)`.
+- Lines 60-61: Transition frequencies in rad/s; implemented by `w=E-E.'`.
+- Lines 63-64: Boltzmann exponents; implemented by `beta_w=spin_system.tols.hbar*w/(spin_system.tols.kbol*T)`.
+- Lines 66-67: Thermal spectral density difference, with the small and large exponent limits; implemented by `num=I0*(max(w,0).^alpha-max(-w,0).^alpha); phi=zeros(size(w))`.
+- Lines 73-74: Dressed coupling operator; implemented by `R=X.*phi`.
 
 ### Key state/data transformations
 
-- Lines 58: computes `w` using `w=E-E.'`.
-- Lines 61: computes `beta_w` using `beta_w=spin_system.tols.hbar*w/(spin_system.tols.kbol*T)`.
-- Lines 64: computes `num` using `num=I0*(max(w,0).^alpha-max(-w,0).^alpha); phi=zeros(size(w))`.
-- Lines 66: computes `phi(normal)` using `phi(normal)=num(normal)./expm1(beta_w(normal))`.
-- Lines 67-68: computes `phi(small)` using `phi(small)=I0*abs(w(small)).^(alpha-1)*(spin_system.tols.kbol*T/spin_system.tols.hbar)- I0*sign(w(small)).*abs(w(small)).^alpha/2`.
-- Lines 71: computes `R` using `R=X.*phi`.
+- Lines 61: computes `w` using `w=E-E.'`.
+- Lines 64: computes `beta_w` using `beta_w=spin_system.tols.hbar*w/(spin_system.tols.kbol*T)`.
+- Lines 67: computes `num` using `num=I0*(max(w,0).^alpha-max(-w,0).^alpha); phi=zeros(size(w))`.
+- Lines 69: computes `phi(normal)` using `phi(normal)=num(normal)./expm1(beta_w(normal))`.
+- Lines 70-71: computes `phi(small)` using `phi(small)=I0*abs(w(small)).^(alpha-1)*(spin_system.tols.kbol*T/spin_system.tols.hbar)- I0*sign(w(small)).*abs(w(small)).^alpha/2`.
+- Lines 74: computes `R` using `R=X.*phi`.
 
 ### Local helper functions
 
-- Line 76: `grumble()` — `function grumble(E,X,I0,alpha,T)`.
+- Line 79: `grumble()` — `function grumble(E,X,I0,alpha,T)`.
   - Representative operation: `if (~isnumeric(E))||(~isreal(E))||(~iscolumn(E))||any(~isfinite(E))`.
   - Representative operation: `error('E must be a column vector of real finite eigenvalues.')`.
 
@@ -73,12 +73,12 @@ Thermally dressed spin-phonon coupling operator of the generalised Lindblad diss
 - phonon bath with the spectral density I(w)=I0*w^alpha*theta(w) that
 - couples to the spin system through a Hermitian operator X, the dis-
 - sipator is
-- d(rho)/dt = -(lambda^2*pi)*([X,R*rho]+[X,R*rho]')
+- d(rho)/dt = -pi*([X,R*rho]+[X,R*rho]')
 - where R is built from the transition frequencies w_kn=(E_k-E_n):
 - <k|R|n> = <k|X|n> * (I(w_kn)-I(-w_kn))/(exp(hbar*w_kn/kT)-1)
+- and the square of the coupling constant lambda of the original
+- papers is absorbed into the prefactor I0 of the spectral density.
 - This function returns R; the corresponding Liouville space super-
-- operator is assembled by rlx_phonon.m, and pulsed_field.m applies
-- the dissipator as matrix products. Syntax:
 
 ## Internal Spinach / MATLAB structure cues
 

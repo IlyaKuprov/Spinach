@@ -23,13 +23,13 @@ Spin-phonon relaxation superoperator in the generalised Lindblad form of Saito, 
 ### Comment-guided execution stages
 
 - Lines 64-65: Check consistency; implemented by `grumble(H,X,I0,alpha,T)`.
-- Lines 67-68: Diagonalise the Hamiltonian; implemented by `[V,E]=eig(full((H+H')/2),'vector')`.
+- Lines 67-68: Diagonalise the Hamiltonian; implemented by `[V,E]=eig(full(H),'vector')`.
 - Lines 70-71: Dressed coupling operator in the eigenbasis and back in the original basis; implemented by `XE=V'*X*V; RH=V*phonon_oper(spin_system,E,(XE+XE')/2,I0,alpha,T)*V'`.
 - Lines 73-74: Liouville space dissipator, column-stretched density matrix convention; implemented by `unit=speye(size(H,1))`.
 
 ### Key state/data transformations
 
-- Lines 68: computes `[V,E]` using `[V,E]=eig(full((H+H')/2),'vector')`.
+- Lines 68: computes `[V,E]` using `[V,E]=eig(full(H),'vector')`.
 - Lines 71: computes `XE` using `XE=V'*X*V; RH=V*phonon_oper(spin_system,E,(XE+XE')/2,I0,alpha,T)*V'`.
 - Lines 74: computes `unit` using `unit=speye(size(H,1))`.
 - Lines 75: computes `R` using `R=-pi*(kron(unit,X*RH)-kron(X.',RH)+kron((RH'*X).',unit)-kron(conj(RH),X))`.
@@ -37,8 +37,8 @@ Spin-phonon relaxation superoperator in the generalised Lindblad form of Saito, 
 ### Local helper functions
 
 - Line 80: `grumble()` — `function grumble(H,X,I0,alpha,T)`.
-  - Representative operation: `if (~isnumeric(H))||(size(H,1)~=size(H,2))||any(~isfinite(H(:)))`.
-  - Representative operation: `error('H must be a square matrix with finite elements.')`.
+  - Representative operation: `if (~isnumeric(H))||(~ishermitian(H))||any(~isfinite(H(:)))`.
+  - Representative operation: `error('H must be a Hermitian matrix with finite elements.')`.
 
 ## Parameters / inputs
 
@@ -84,4 +84,4 @@ Spin-phonon relaxation superoperator in the generalised Lindblad form of Saito, 
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `grumble()`, `phonon_oper()`, `speye()`, `conj()`, `any()`, `ishermitian()`, `isscalar()`.
+- Called routines detected from the main body: `grumble()`, `phonon_oper()`, `speye()`, `conj()`, `ishermitian()`, `any()`, `isscalar()`.

@@ -168,6 +168,7 @@
 | `examples/esr_sol_pulsed/hpa_nitroxide_powder.m` | `hpa_nitroxide_powder()` | Powder averaged pulse-acquire W-band Fourier ESR spectrum of nitroxide radical. An ideal pulse is assumed. Calculation t | 70 |
 | `examples/esr_sol_pulsed/hpa_triplet.m` | `hpa_triplet()` | Hypothetical powder averaged X-band pulse-acquire ESR spectrum of photogenerated pentacene triplet state. Calculation ti | 73 |
 | `examples/esr_sol_pulsed/hyscore_nitroxide_powder.m` | `hyscore_nitroxide_powder()` | Powder-averaged HYSCORE on a 14N nitroxide radical. Time-domain simulation in Liouville space. Set to reproduce Figure 2 | 65 |
+| `examples/esr_sol_pulsed/mas_diamond_p1.m` | `mas_diamond_p1()` | Two-pulse echo-detected frequency-swept EPR spectra of the P1 substitutional nitrogen defect in diamond, static and un | 178 |
 | `examples/esr_sol_pulsed/oop_eseem_photosystem_1.m` | `oop_eseem_photosystem_1()` | Powder-averaged two-pulse out-of-phase ESEEM on the [P700+,A1-] spin-correlated electron pair in Photosystem I. Time-dom | 75 |
 | `examples/esr_sol_pulsed/ridme_cu_nitroxide.m` | `ridme_cu_nitroxide()` | RIDME on a Cu(II)-NO two electron system at Q-band. The numerical calculation is done by brute-force time propaga- tion  | 90 |
 | `examples/esr_sol_pulsed/sifter_nitroxide_powder.m` | `sifter_nitroxide_powder()` | An example of the SIFTER sequence. Calculation time: minutes. | 72 |

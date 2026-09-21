@@ -45,16 +45,9 @@ inter.giant.euler={euler};
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
-% Spin-phonon coupling operator: unit elements between adjacent m_J states
-Jz=full(stevens(17,1,0)); mj=diag(Jz);
-parameters.phonon_x=double(abs(mj-mj.')==1);
-
 % Super-Ohmic bath, lambda^2*I0 of the paper (lambda=10 cm^-1, I0=1e-14 ps/rad) in rad/s units
 parameters.phonon_alpha=2;
 parameters.phonon_i0=1e2*1e-14*1e12*(1e-12)^2*0.1883651568463003^2;
-
-% Observable: magnetic moment along Z in Bohr magnetons
-parameters.coil=-1.24*Jz;
 
 % Single crystal, crystal field frame aligned with the laboratory frame
 parameters.spins={'E17'}; parameters.orientation=[0 0 0];
@@ -93,6 +86,13 @@ for n=1:4
     inter.temperature=temps(n);
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);
+
+    % Spin-phonon coupling operator: unit elements between adjacent m_J states, projections rounded to exact integers
+    Jz=full(operator(spin_system,'Lz','E17')); mj=round(2*diag(Jz))/2;
+    parameters.phonon_x=double(abs(mj-mj.')==1);
+
+    % Observable: magnetic moment along Z in Bohr magnetons
+    parameters.coil=-1.24*Jz;
 
     % Sweep parameters of the panel
     parameters.field_prof=profiles{n};

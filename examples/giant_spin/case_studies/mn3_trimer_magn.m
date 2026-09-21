@@ -44,8 +44,8 @@ bas.approximation='none';
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Total S_z and the spin-phonon coupling operator between adjacent total S_z states
-Sz=full(operator(spin_system,'Lz','E6')); msz=diag(Sz);
+% Total S_z and the spin-phonon coupling operator between adjacent total S_z states, projections rounded to exact half-integers
+Sz=full(operator(spin_system,'Lz','E6')); msz=round(2*diag(Sz))/2;
 parameters.phonon_x=double(abs(msz-msz.')==1);
 
 % Super-Ohmic bath, lambda^2*I0 of the paper (lambda=10 cm^-1, I0=1e-14 ps/rad) in rad/s units
@@ -73,9 +73,8 @@ answer=crystal(spin_system,@pulsed_field,parameters,'labframe');
 [I,Q]=hamiltonian(assume(spin_system,'labframe')); H0=I+orientation(Q,[0 0 0]);
 Z=hamiltonian(assume(spin_system,'labframe','zeeman')); H0=H0-Z; m_eq=zeros(size(answer.field));
 for k=1:numel(m_eq)
-    H=full(H0+answer.field(k)*Z); H=(H+H')/2; [V,E]=eig(H,'vector');
-    pops=exp(-spin_system.tols.hbar*(E-min(E))/(spin_system.tols.kbol*inter.temperature));
-    m_eq(k)=real(trace(parameters.coil'*(V*diag(pops/sum(pops))*V')));
+    H=full(H0+answer.field(k)*Z); rho=equilibrium(spin_system,(H+H')/2);
+    m_eq(k)=real(hdot(parameters.coil,rho));
 end
 
 % Plot the sweep and the equilibrium curves

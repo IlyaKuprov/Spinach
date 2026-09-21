@@ -45,8 +45,8 @@ bas.approximation='none';
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Spin-phonon coupling operator: unit elements between adjacent m_J states
-Jz=full(stevens(17,1,0)); mj=diag(Jz);
+% Spin-phonon coupling operator: unit elements between adjacent m_J states, projections rounded to exact integers
+Jz=full(operator(spin_system,'Lz','E17')); mj=round(2*diag(Jz))/2;
 parameters.phonon_x=double(abs(mj-mj.')==1);
 
 % Super-Ohmic bath, lambda^2*I0 of the paper (lambda=10 cm^-1, I0=1e-14 ps/rad) in rad/s units
@@ -80,9 +80,8 @@ for n=1:numel(answers)
     angles=[sph_grid.alphas(n) sph_grid.betas(n) sph_grid.gammas(n)];
     H0=I+orientation(Q,angles); Z=ZI+orientation(ZQ,angles); H0=H0-Z;
     for k=1:numel(fields)
-        H=full(H0+fields(k)*Z); H=(H+H')/2; [V,E]=eig(H,'vector');
-        pops=exp(-spin_system.tols.hbar*(E-min(E))/(spin_system.tols.kbol*inter.temperature));
-        m_eq(k)=m_eq(k)+sph_grid.weights(n)*real(trace(parameters.coil'*(V*diag(pops/sum(pops))*V')));
+        H=full(H0+fields(k)*Z); rho=equilibrium(spin_system,(H+H')/2);
+        m_eq(k)=m_eq(k)+sph_grid.weights(n)*real(hdot(parameters.coil,rho));
     end
 end
 

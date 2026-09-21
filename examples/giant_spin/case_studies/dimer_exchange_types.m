@@ -37,16 +37,9 @@ tensors={[0.2 0 0; 0 0.2 0; 0 0 0.2], ...
          [0 0.2 0.2; -0.2 0 0.2; -0.2 -0.2 0]};
 labels={'isotropic','anisotropic, $J_{xx}$','anisotropic, $J_{zz}$','antisymmetric'};
 
-% Spin-phonon coupling operator: unit elements between adjacent total S_z states
-Sz=kron(full(stevens(2,1,0)),eye(2))+kron(eye(2),full(stevens(2,1,0))); msz=diag(Sz);
-parameters.phonon_x=double(abs(msz-msz.')==1);
-
 % Super-Ohmic bath, lambda^2*I0 of the paper (lambda=10 cm^-1, I0=1e-10 ps/rad) in rad/s units
 parameters.phonon_alpha=2;
 parameters.phonon_i0=1e2*1e-10*1e12*(1e-12)^2*0.1883651568463003^2;
-
-% Observable: total magnetic moment along Z in Bohr magnetons
-parameters.coil=-2.0*Sz;
 
 % Sweep: 10 T/ms to 1 T in 10 ns stairs, output every 10 stairs
 parameters.field_prof=@(t) 1e4*t;
@@ -68,6 +61,13 @@ for n=1:4
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);
 
+    % Spin-phonon coupling operator: unit elements between adjacent total S_z states, projections rounded to exact integers
+    Sz=full(operator(spin_system,'Lz','E')); msz=round(2*diag(Sz))/2;
+    parameters.phonon_x=double(abs(msz-msz.')==1);
+
+    % Observable: total magnetic moment along Z in Bohr magnetons
+    parameters.coil=-2.0*Sz;
+
     % Run the simulation
     answers{n}=crystal(spin_system,@pulsed_field,parameters,'labframe');
 
@@ -75,9 +75,8 @@ for n=1:4
     [I,Q]=hamiltonian(assume(spin_system,'labframe')); H0=I+orientation(Q,[0 0 0]);
     Z=hamiltonian(assume(spin_system,'labframe','zeeman')); H0=H0-Z; m_eq=zeros(size(answers{n}.field));
     for k=1:numel(m_eq)
-        H=full(H0+answers{n}.field(k)*Z); H=(H+H')/2; [V,E]=eig(H,'vector');
-        pops=exp(-spin_system.tols.hbar*(E-min(E))/(spin_system.tols.kbol*inter.temperature));
-        m_eq(k)=real(trace(parameters.coil'*(V*diag(pops/sum(pops))*V')));
+        H=full(H0+answers{n}.field(k)*Z); rho=equilibrium(spin_system,(H+H')/2);
+        m_eq(k)=real(hdot(parameters.coil,rho));
     end
     answers{n}.obs_eq=m_eq;
 

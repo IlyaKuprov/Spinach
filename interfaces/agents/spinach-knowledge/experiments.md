@@ -1,20 +1,20 @@
 # Spinach code index: experiments
 
 - Source root: `/home/kuprov/.openclaw/workspace/Spinach`
-- Source commit: `f053e432a61d7144f3946d73d0a672e3ccfc3fc5`
+- Source commit: `c1abb8c65913e2d4009e0eef17c2c6b33ca1cd64`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
-- Files indexed: **160** MATLAB files
-- Generated: 2026-08-30T02:52:31
+- Files indexed: **161** MATLAB files
+- Generated: 2026-09-21T13:10:16
 
 | File | Signature | Summary | LOC |
 |---|---|---|---:|
 | `experiments/acquire.m` | `fid=acquire(spin_system,parameters,H,R,K)` | Simple forward time evolution with signal acquisition. Syntax: fid=acquire(spin_system,parameters,H,R,K) Parameters: par | 158 |
 | `experiments/bruker/hmqcetgp.m` | `fid=hmqcetgp(spin_system,parameters,H,R,K)` | Echo/antiecho gradient-selected HMQC pulse sequence, based on the Bruker hmqcetgp pulse program and the standard HMQC se | 202 |
 | `experiments/bruker/hmqcetgpsi.m` | `fid=hmqcetgpsi(spin_system,parameters,H,R,K)` | Sensitivity-improved echo/antiecho gradient-selected HMQC pulse sequence, based on the Bruker hmqcetgpsi pulse program a | 234 |
-| `experiments/bruker/hsqcedetgp.m` | `fid=hsqcedetgp(spin_system,parameters,H,R,K)` | Echo/antiecho gradient-selected multiplicity-edited HSQC pulse sequence, based on the Bruker hsqcedetgp pulse program an | 255 |
-| `experiments/bruker/hsqcetgp.m` | `fid=hsqcetgp(spin_system,parameters,H,R,K)` | Echo/antiecho gradient-selected HSQC pulse sequence, based on the Bruker hsqcetgp pulse program and the standard HSQC se | 230 |
-| `experiments/bruker/hsqcetgpsi.m` | `fid=hsqcetgpsi(spin_system,parameters,H,R,K)` | Sensitivity-improved echo/antiecho gradient-selected HSQC pulse sequence, based on the Bruker hsqcetgpsi pulse program a | 294 |
+| `experiments/bruker/hsqcedetgp.m` | `fid=hsqcedetgp(spin_system,parameters,H,R,K)` | Echo/antiecho gradient-selected multiplicity-edited HSQC pulse sequence, based on the Bruker hsqcedetgp pulse program an | 256 |
+| `experiments/bruker/hsqcetgp.m` | `fid=hsqcetgp(spin_system,parameters,H,R,K)` | Echo/antiecho gradient-selected HSQC pulse sequence, based on the Bruker hsqcetgp pulse program and the standard HSQC se | 231 |
+| `experiments/bruker/hsqcetgpsi.m` | `fid=hsqcetgpsi(spin_system,parameters,H,R,K)` | Sensitivity-improved echo/antiecho gradient-selected HSQC pulse sequence, based on the Bruker hsqcetgpsi pulse program a | 295 |
 | `experiments/cp_acquire_soft.m` | `fid=cp_acquire_soft(spin_system,parameters,H,R,K)` | Cross-polarisation experiment in the rotating frame, followed by time-domain FID acquisition. The CP stage is preceded b | 159 |
 | `experiments/cp_contact_hard.m` | `contact_curve=cp_contact_hard(spin_system,parameters,H,R,K)` | Cross-polarisation experiment in the rotating frame. Applies an ideal pi/2 pulse using the specified operators, then evo | 155 |
 | `experiments/cp_contact_soft.m` | `contact_curve=cp_contact_soft(spin_system,parameters,H,R,K)` | Cross-polarisation experiment in the rotating frame. Applies a soft pi/2 pulse using the specified operators, then evolv | 150 |
@@ -34,14 +34,14 @@
 | `experiments/esr_dipolar/ridme.m` | `answer=ridme(spin_system,parameters,H,R,K)` | RIDME pulse sequence. Idealized hard pulses are used, the pulses only affect the user-specified electron. Syntax: answer | 182 |
 | `experiments/esr_dipolar/sifter.m` | `fid=sifter(spin_system,parameters,H,R,K)` | SIFTER pulse sequence. Syntax: fid=sifter(spin_system,parameters,H,R,K) where H is the Hamiltonian matrix, R is the rela | 113 |
 | `experiments/esr_hyperfine/endor_cw.m` | `fid=endor_cw(spin_system,parameters,H,R,K)` | Fast approximate simulation of isotropic continuous-wave ENDOR pulse sequence -essentially an NMR spectrum weighted by h | 97 |
-| `experiments/esr_hyperfine/endor_davies.m` | `answer=endor_davies(spin_system,parameters,H,R,K)` | Davies ENDOR sequence with explicit soft pulses and all of the atten- dant effects, such as orientation selection. Soft  | 269 |
+| `experiments/esr_hyperfine/endor_davies.m` | `answer=endor_davies(spin_system,parameters,H,R,K)` | Davies ENDOR sequence with explicit soft pulses and all of the atten- dant effects, such as orientation selection. Soft  | 270 |
 | `experiments/esr_hyperfine/endor_mims.m` | `fid=endor_mims(spin_system,parameters,H,R,K)` | Mims ENDOR pulse sequence with ideal hard pulses. Syntax: fid=endor_mims(spin_system,parameters,H,R,K) Parameters: param | 114 |
 | `experiments/esr_hyperfine/endor_mims_echo.m` | `stim_echo=endor_mims_echo(spin_system,parameters,H,R,K)` | Stimulated echo diagnostics for the Mims ENDOR sequence. Syntax: stim_echo=endor_mims_echo(spin_system,parameters,H,R,K) | 145 |
 | `experiments/esr_hyperfine/endor_mims_ideal.m` | `endor_spec=endor_mims_ideal(spin_system,parameters,H,R,K)` | Mims ENDOR sequence with ideal electron pulses. Syntax: endor_spec=endor_mims_ideal(spin_system,parameters,H,R,K) Parame | 196 |
 | `experiments/esr_hyperfine/hyscore.m` | `fid=hyscore(spin_system,parameters,H,R,K)` | HYSCORE experiment, implemented as described in Szosenfogel and Goldfarb (http://dx.doi.org/10.1080/00268979809483260).  | 133 |
 | `experiments/fieldscan_enlev.m` | `fieldscan_enlev(spin_system,parameters)` | Plots a user-specified number of the lowest energy levels of the system as a function of the applied magnetic field. The | 113 |
 | `experiments/fieldscan_magn.m` | `[fields,z_magn]=fieldscan_magn(spin_system,parameters)` | Z magnetization of the sample as a function of magnetic field in a finite-speed magnetic field sweep experiment. Syntax: | 162 |
-| `experiments/fieldsweep.m` | `[spec,parameters]=fieldsweep(spin_system,parameters)` | Field swept powder EPR spectra. A rough implementation with ex- pensive eigenfields algorithm, an explicit spherical gri | 216 |
+| `experiments/fieldsweep.m` | `[spec,parameters]=fieldsweep(spin_system,parameters)` | Field swept powder EPR spectra. A rough implementation with ex- pensive eigenfields algorithm, an explicit spherical gri | 218 |
 | `experiments/holeburn.m` | `fid=holeburn(spin_system,parameters,H,R,K)` | Hole burning experiment -a soft pulse follwed by a hard pi/2 observation pulse. The soft pulse is simulated using Fokker | 183 |
 | `experiments/hp_acquire.m` | `fid=hp_acquire(spin_system,parameters,H,R,K)` | Standard pulse-acquire sequence with a hard pulse. The user must sup- ply the pulse operator, the pulse duration and the | 167 |
 | `experiments/hyperpol/beamdnp.m` | `contact_curve=beamdnp(spin_system,parameters,H,R,K)` | Beam DNP experiment from: Syntax (call from powder context): contact_curve=beamdnp(spin_system,parameters,H,R,K) Paramet | 151 |
@@ -50,31 +50,31 @@
 | `experiments/hyperpol/dnp_time_dep.m` | `answer=dnp_time_dep(spin_system,parameters,H,R,K)` | Time-domain spin dynamics under microwave irradiation. Syntax: answer=dnp_time_dep(spin_system,parameters,H,R,K) Paramet | 122 |
 | `experiments/hyperpol/masdnp.m` | `dnp=masdnp(spin_system,parameters)` | Magic angle spinning DNP simulation, returning the rotor period averaged steady state magnetization. This function takes | 204 |
 | `experiments/hyperpol/noveldnp.m` | `contact_curve=noveldnp(spin_system,parameters,H,R,K)` | Nuclear spin Orientation via Electron spin Locking (NOVEL) and pulsed solid effect (SE). For futher information see: Syn | 147 |
-| `experiments/hyperpol/noveldnp_steady.m` | `dnp=noveldnp_steady(spin_system,parameters,H,R,K)` | Nuclear spin Orientation via Electron spin Locking (NOVEL) and pulsed solid effect (SE), steady-state version. For futhe | 193 |
+| `experiments/hyperpol/noveldnp_steady.m` | `dnp=noveldnp_steady(spin_system,parameters,H,R,K)` | Nuclear spin Orientation via Electron spin Locking (NOVEL) and pulsed solid effect (SE), steady-state version. For futhe | 196 |
 | `experiments/hyperpol/solid_effect.m` | `answer=solid_effect(spin_system,parameters)` | Solid effect DNP experiment, computed using the large-scale formalism described in (http://dx.doi.org/10.1039/C2CP23233B | 219 |
 | `experiments/hyperpol/topdnp.m` | `contact_curve=topdnp(spin_system,parameters,H,R,K)` | Time-optimised pulsed DNP experiment from: Syntax (call from powder context): contact_curve=topdnp(spin_system,parameter | 163 |
-| `experiments/hyperpol/topdnp_steady.m` | `dnp=topdnp_steady(spin_system,parameters,H,R,K)` | Time-optimised pulsed DNP experiment from: (a steady state version). Syntax (call from powder context): dnp=topdnp_stead | 170 |
+| `experiments/hyperpol/topdnp_steady.m` | `dnp=topdnp_steady(spin_system,parameters,H,R,K)` | Time-optimised pulsed DNP experiment from: (a steady state version). Syntax (call from powder context): dnp=topdnp_stead | 171 |
 | `experiments/hyperpol/xixdnp.m` | `contact_curve=xixdnp(spin_system,parameters,H,R,K)` | TPPM DNP and its special case X-inverse-X (XiX) DNP experiment from (https://doi.org/10.1021/jacs.1c09900). Syntax (call | 146 |
 | `experiments/hyperpol/xixdnp_steady.m` | `dnp=xixdnp_steady(spin_system,parameters,H,R,K)` | TPPM DNP and its special case X-inverse-X (XiX) DNP experiment from (https://doi.org/10.1021/jacs.1c09900), steady state | 173 |
-| `experiments/imaging/basic_1d_hard.m` | `fid=basic_1d_hard(spin_system,parameters,H,R,K,G,F)` | Basic 1D imaging sequence with a hard pulse. Syntax: fid=basic_1d_hard(spin_system,parameters,H,R,K,G,F) This sequence m | 134 |
-| `experiments/imaging/cpmg_dec.m` | `mri=cpmg_dec(spin_system,parameters,H,R,K,G,F)` | The effect of Carr-Purcell-Meiboom-Gill (CPMG) pulse sequence on the MRI phantom. The function runs the CPMG and then pr | 145 |
+| `experiments/imaging/basic_1d_hard.m` | `fid=basic_1d_hard(spin_system,parameters,H,R,K,G,F)` | Basic 1D imaging sequence with a hard pulse. Syntax: fid=basic_1d_hard(spin_system,parameters,H,R,K,G,F) This sequence m | 135 |
+| `experiments/imaging/cpmg_dec.m` | `mri=cpmg_dec(spin_system,parameters,H,R,K,G,F)` | The effect of Carr-Purcell-Meiboom-Gill (CPMG) pulse sequence on the MRI phantom. The function runs the CPMG and then pr | 146 |
 | `experiments/imaging/dpfgse_select.m` | `fid=dpfgse_select(spin_system,parameters,H,R,K,G,F)` | DPFGSE signal selection, based on Equation 3 from the paper by Stott et al. (https://doi.org/10.1006/jmre.1997.1110). Sy | 186 |
 | `experiments/imaging/dpfgse_suppress.m` | `fid=dpfgse_suppress(spin_system,parameters,H,R,K,G,F)` | DPFGSE signal suppression, based on Equation 3 from the paper by Stott et al. (https://doi.org/10.1006/jmre.1997.1110).  | 188 |
-| `experiments/imaging/epi_2d.m` | `mri=epi_2d(spin_system,parameters,H,R,K,G,F)` | Diffusion weighted echo planar 2D imaging pulse sequence with variable diffusion encoding direction. Syntax: mri=epi_2d( | 224 |
-| `experiments/imaging/epi_3d.m` | `fid=epi_3d(spin_system,parameters,H,R,K,G,F)` | Diffusion weighted 3D echo planar imaging pulse sequence. Syntax: fid=epi_3d(spin_system,parameters,H,R,K,G,F) This sequ | 348 |
-| `experiments/imaging/fse.m` | `mri=fse(spin_system,parameters,H,R,K,G,F)` | Fast spin echo (FSE) pulse sequence. Syntax: mri=fse(spin_system,parameters,H,R,K,G,F) This sequence must be called from | 178 |
-| `experiments/imaging/grad_echo.m` | `fid=grad_echo(spin_system,parameters,H,R,K,G,F)` | Gradient echo pulse sequence. Syntax: fid=grad_echo(spin_system,parameters,H,R,K,G,F) This sequence must be called from  | 140 |
-| `experiments/imaging/phase_enc_2d.m` | `mri=phase_enc_2d(spin_system,parameters,H,R,K,G,F)` | 2D phase encoding imaging pulse sequence with optional diffusion weighting during the echo time. Syntax: mri=phase_enc_2 | 222 |
-| `experiments/imaging/phase_enc_3d.m` | `fid=phase_enc_3d(spin_system,parameters,H,R,K,G,F)` | 3D MRI pulse sequence, with a slice selection stage followed by phase- encoded acquisition of the slice. Syntax: fid=pha | 259 |
-| `experiments/imaging/press_1d.m` | `fid=press_1d(spin_system,parameters,H,R,K,G,F)` | 1D PRESS (voxel selective NMR) pulse sequence. Syntax: fid=press_1d(spin_system,parameters,H,R,K,G,F) This sequence must | 152 |
-| `experiments/imaging/press_2d.m` | `fid=press_2d(spin_system,parameters,H,R,K,G,F)` | 2D PRESS (voxel selective NMR) pulse sequence. Syntax: fid=press_2d(spin_system,parameters,H,R,K,G,F) This sequence must | 190 |
-| `experiments/imaging/press_voxel_1d.m` | `phan=press_voxel_1d(spin_system,parameters,H,R,K,G,F)` | Voxel selection diagnostics function for 1D PRESS sequences. Re- turns the sample excitation profile. Syntax: phan=press | 154 |
-| `experiments/imaging/press_voxel_2d.m` | `phan=press_voxel_2d(spin_system,parameters,H,R,K,G,F)` | Voxel selection diagnostics function for 2D PRESS sequences. Re- turns the sample excitation profile. Syntax: phan=press | 173 |
-| `experiments/imaging/press_voxel_3d.m` | `phan=press_voxel_3d(spin_system,parameters,H,R,K,G,F)` | Voxel selection diagnostics function for 3D PRESS sequences. Returns the sample excitation profile. Syntax: phan=press_v | 193 |
+| `experiments/imaging/epi_2d.m` | `mri=epi_2d(spin_system,parameters,H,R,K,G,F)` | Diffusion weighted echo planar 2D imaging pulse sequence with variable diffusion encoding direction. Syntax: mri=epi_2d( | 230 |
+| `experiments/imaging/epi_3d.m` | `fid=epi_3d(spin_system,parameters,H,R,K,G,F)` | Diffusion weighted 3D echo planar imaging pulse sequence. Syntax: fid=epi_3d(spin_system,parameters,H,R,K,G,F) This sequ | 354 |
+| `experiments/imaging/fse.m` | `mri=fse(spin_system,parameters,H,R,K,G,F)` | Fast spin echo (FSE) pulse sequence. Syntax: mri=fse(spin_system,parameters,H,R,K,G,F) This sequence must be called from | 179 |
+| `experiments/imaging/grad_echo.m` | `fid=grad_echo(spin_system,parameters,H,R,K,G,F)` | Gradient echo pulse sequence. Syntax: fid=grad_echo(spin_system,parameters,H,R,K,G,F) This sequence must be called from  | 141 |
+| `experiments/imaging/phase_enc_2d.m` | `mri=phase_enc_2d(spin_system,parameters,H,R,K,G,F)` | 2D phase encoding imaging pulse sequence with optional diffusion weighting during the echo time. Syntax: mri=phase_enc_2 | 223 |
+| `experiments/imaging/phase_enc_3d.m` | `fid=phase_enc_3d(spin_system,parameters,H,R,K,G,F)` | 3D MRI pulse sequence, with a slice selection stage followed by phase- encoded acquisition of the slice. Syntax: fid=pha | 267 |
+| `experiments/imaging/press_1d.m` | `fid=press_1d(spin_system,parameters,H,R,K,G,F)` | 1D PRESS (voxel selective NMR) pulse sequence. Syntax: fid=press_1d(spin_system,parameters,H,R,K,G,F) This sequence must | 153 |
+| `experiments/imaging/press_2d.m` | `fid=press_2d(spin_system,parameters,H,R,K,G,F)` | 2D PRESS (voxel selective NMR) pulse sequence. Syntax: fid=press_2d(spin_system,parameters,H,R,K,G,F) This sequence must | 191 |
+| `experiments/imaging/press_voxel_1d.m` | `phan=press_voxel_1d(spin_system,parameters,H,R,K,G,F)` | Voxel selection diagnostics function for 1D PRESS sequences. Re- turns the sample excitation profile. Syntax: phan=press | 155 |
+| `experiments/imaging/press_voxel_2d.m` | `phan=press_voxel_2d(spin_system,parameters,H,R,K,G,F)` | Voxel selection diagnostics function for 2D PRESS sequences. Re- turns the sample excitation profile. Syntax: phan=press | 174 |
+| `experiments/imaging/press_voxel_3d.m` | `phan=press_voxel_3d(spin_system,parameters,H,R,K,G,F)` | Voxel selection diagnostics function for 3D PRESS sequences. Returns the sample excitation profile. Syntax: phan=press_v | 194 |
 | `experiments/imaging/qxspen_kernel.m` | `[K,dK_dgam,dK_ddel]=qxspen_kernel(FOVy,NSR,Nyacq,alp,bet,gam,del)` | Distortion kernel of the QxSPEN experiment and its derivatives. Syntax: [K,dK_dgam,dK_ddel]=qxspen_kernel(FOVy,NSR,Nyacq | 104 |
-| `experiments/imaging/slice_select_1d.m` | `fid=slice_select_1d(spin_system,parameters,H,R,K,G,F)` | Slice selection diagnostics function. Executes a shaped pulse on the user-supplied 1D phantom and records a 1D image. Sy | 153 |
-| `experiments/imaging/spin_echo.m` | `fid=spin_echo(spin_system,parameters,H,R,K,G,F)` | Spin echo pulse sequence. Syntax: fid=spin_echo(spin_system,parameters,H,R,K,G,F) This sequence must be called from the  | 124 |
-| `experiments/imaging/spiral.m` | `mri=spiral(spin_system,parameters,H,R,K,G,F)` | 2D imaging sequence with spiral sampling of the k-space. Syntax: mri=spiral_pulse_sequence(spin_system,parameters,H,R,K, | 211 |
+| `experiments/imaging/slice_select_1d.m` | `fid=slice_select_1d(spin_system,parameters,H,R,K,G,F)` | Slice selection diagnostics function. Executes a shaped pulse on the user-supplied 1D phantom and records a 1D image. Sy | 154 |
+| `experiments/imaging/spin_echo.m` | `fid=spin_echo(spin_system,parameters,H,R,K,G,F)` | Spin echo pulse sequence. Syntax: fid=spin_echo(spin_system,parameters,H,R,K,G,F) This sequence must be called from the  | 125 |
+| `experiments/imaging/spiral.m` | `mri=spiral(spin_system,parameters,H,R,K,G,F)` | 2D imaging sequence with spiral sampling of the k-space. Syntax: mri=spiral_pulse_sequence(spin_system,parameters,H,R,K, | 215 |
 | `experiments/imaging/udd_dec.m` | `mri=udd_dec(spin_system,parameters,H,R,K,G,F)` | The effect of Uhrid Dynamic Decoupling (UDD) pulse sequence on the MRI phantom. The function runs the UDD and then pro-  | 118 |
 | `experiments/inv_rec.m` | `fids=inv_rec(spin_system,parameters,H,R,K)` | Inversion-recovery pulse sequence. Syntax: fids=inv_rec(spin_system,parameters,H,R,K) Parameters: parameters.sweep spect | 128 |
 | `experiments/microfluidics/simple_flow.m` | `traj=simple_flow(spin_system,parameters,H,R,K,~,F)` | Simple forward evolution experiment for the microfluidics module; trajectory is returned. Syntax: traj=simple_flow(spin_ | 77 |
@@ -104,7 +104,7 @@
 | `experiments/nmr_liquids/pansy_cosy.m` | `fid=pansy_cosy(spin_system,parameters,H,R,K)` | Magnitude mode PANSY-COSY pulse sequence from: Syntax: fid=pansy_cosy(spin_system,parameters,H,R,K) Parameters: paramete | 144 |
 | `experiments/nmr_liquids/pansy_triple.m` | `fid=pansy_triple(spin_system,parameters,H,R,K)` | Triple-channel PANSY pulse sequence from: Syntax: fid=pansy_triple(spin_system,parameters,H,R,K) Parameters: parameters. | 149 |
 | `experiments/nmr_liquids/roesy.m` | `fid=roesy(spin_system,parameters,H,R,K)` | Phase-sensitive homonuclear ROESY pulse sequence, assuming ideal spin-lock, described in: Syntax: fid=roesy(spin_system, | 142 |
-| `experiments/nmr_liquids/tocsy.m` | `fid=tocsy(spin_system,parameters,H,R,K)` | Amplitude-mode homonuclear TOCSY pulse sequence from: Syntax: fid=tocsy(spin_system,parameters,H,R,K) Parameters: parame | 147 |
+| `experiments/nmr_liquids/tocsy.m` | `fid=tocsy(spin_system,parameters,H,R,K)` | Amplitude-mode homonuclear TOCSY pulse sequence from: Syntax: fid=tocsy(spin_system,parameters,H,R,K) Parameters: parame | 151 |
 | `experiments/nmr_protein/hcanh.m` | `fid=hcanh(spin_system,parameters,H,R,K)` | Protein-specific H(CA)NH experiment (Figure 7.37 of "Protein NMR Spectroscopy", 2nd edition) using pre-set values of J-c | 272 |
 | `experiments/nmr_protein/hcch_cosy.m` | `fid=hcch_cosy(spin_system,parameters,H,R,K)` | HCCH-COSY pulse sequence from Figure 7.26a of Protein NMR Spectroscopy (2nd edition) using the bidirectional propagation | 287 |
 | `experiments/nmr_protein/hnca.m` | `fid=hnca(spin_system,parameters,H,R,K)` | Protein-specific HNCA experiment (Figure 7.31a of "Protein NMR Spectroscopy", 2nd edition) using pre-set values of J-cou | 221 |
@@ -114,37 +114,38 @@
 | `experiments/nmr_solids/cn2d_dq.m` | `fid=cn2d_dq(spin_system,parameters,H,R,K)` | Double-quantum version of the 13C-detected 14N-13C MAS 2D correlation experiment described by Jarvis, Haies, Williamson  | 141 |
 | `experiments/nmr_solids/cn2d_sq.m` | `fid=cn2d_sq(spin_system,parameters,H,R,K)` | Single-quantum version of the 13C-detected 14N-13C MAS 2D correlation experiment described by Jarvis, Haies, Williamson  | 141 |
 | `experiments/nmr_solids/dante.m` | `fid=dante(spin_system,parameters,H,R,K)` | DANTE pulse sequence. Syntax: fid=dante(spin_system,parameters,H,R,K) This function should normally be called using sing | 194 |
-| `experiments/nmr_solids/fslghetcor.m` | `fid=fslghetcor(spin_system,parameters,H,R,K)` | Heteronuclear correlation MAS NMR experiment with frequency-switched Lee-Goldburg homonuclear decoupling. Further detail | 235 |
-| `experiments/nmr_solids/mqmas.m` | `fid=mqmas(spin_system,parameters,H,R,K)` | Rotor-synchronous MQMAS pulse sequence. Syntax: fid=mqmas(spin_system,parameters,H,R,K) This function should normally be | 183 |
+| `experiments/nmr_solids/fslghetcor.m` | `fid=fslghetcor(spin_system,parameters,H,R,K)` | Heteronuclear correlation MAS NMR experiment with frequency-switched Lee-Goldburg homonuclear decoupling. Further detail | 239 |
+| `experiments/nmr_solids/mqmas.m` | `fid=mqmas(spin_system,parameters,H,R,K)` | Rotor-synchronous MQMAS pulse sequence. Syntax: fid=mqmas(spin_system,parameters,H,R,K) This function should normally be | 181 |
 | `experiments/nmr_solids/pdsd.m` | `fid=pdsd(spin_system,parameters,H,R,K)` | A simplified model of the PDSD experiment using NOESY type quadrature detection and phase cycle. To be cal- led from the | 145 |
-| `experiments/nmr_solids/redor.m` | `redor_curve=redor(spin_system,parameters,H,R,K)` | Rotational-echo double-resonance (REDOR) experiment with ideal hard pi pulses. The observed channel is refocused once pe | 251 |
+| `experiments/nmr_solids/redor.m` | `redor_curve=redor(spin_system,parameters,H,R,K)` | Rotational-echo double-resonance (REDOR) experiment with ideal hard pi pulses. The observed channel is refocused once pe | 234 |
 | `experiments/nmr_solids/wise.m` | `fid=wise(spin_system,parameters,H,R,K)` | WISE (WIdeline SEparation) is a powder MAS heteronuclear correlation experiment. In the common 1H-13C implementation, mo | 176 |
-| `experiments/nqr/nqr_pa.m` | `spectrum=nqr_pa(spin_system,parameters,H,R,K)` | Nuclear quadrupole resonance soft pulse-acquire experiment. Idealised ac- quisition with infinite bandwidth is done. Syn | 140 |
+| `experiments/nqr/nqr_pa.m` | `spectrum=nqr_pa(spin_system,parameters,H,R,K)` | Nuclear quadrupole resonance soft pulse-acquire experiment. Idealised ac- quisition with infinite bandwidth is done. Syn | 150 |
 | `experiments/overtone/overtone_a.m` | `spectrum=overtone_a(spin_system,parameters,H,R,K)` | Overtone signal acquisition experiment in the frequency domain. Syntax: spectrum=overtone_a(spin_system,parameters,H,R,K | 92 |
 | `experiments/overtone/overtone_cp.m` | `spectrum=overtone_cp(spin_system,parameters,H,R,K)` | Cross-polarization overtone experiment. Syntax: spectrum=overtone_cp(spin_system,parameters,H,R,K) Parameters: parameter | 176 |
-| `experiments/overtone/overtone_dante.m` | `spectrum=overtone_dante(spin_system,parameters,H,R,K)` | Overtone DANTE experiment with frequency-domain acquisition. Syntax: spectrum=overtone_dante(spin_system,parameters,H,R, | 189 |
+| `experiments/overtone/overtone_dante.m` | `spectrum=overtone_dante(spin_system,parameters,H,R,K)` | Overtone DANTE experiment with frequency-domain acquisition. Syntax: spectrum=overtone_dante(spin_system,parameters,H,R, | 192 |
 | `experiments/overtone/overtone_pa.m` | `spectrum=overtone_pa(spin_system,parameters,H,R,K)` | Overtone soft pulse-acquire experiment. Syntax: spectrum=overtone_pa(spin_system,parameters,H,R,K) Parameters: parameter | 180 |
 | `experiments/pseudocon/centroid.m` | `[x,y,z]=centroid(probden,ranges)` | Finds the centre of mass point of a 3D probability density in a cube. Syntax: [x,y,z]=centroid(probden,ranges) Parameter | 58 |
 | `experiments/pseudocon/chi_eff.m` | `[chi,pred_pcs]=chi_eff(source_cube,ranges,nxyz,expt_pcs)` | Finds the optimal magnetic susceptibility tensor that a user-supplied paramagnetic centre probability density must have  | 90 |
 | `experiments/pseudocon/csa2racs.m` | `racs=csa2racs(csa,chi,B,T)` | Calculates a high-termperature estimate of the residual aniso- tropic chemcial shift from user-supplied CSA tensor and m | 76 |
-| `experiments/pseudocon/g2chi.m` | `chi=g2chi(g,T,S)` | Calculates a high-termperature estimate of the magnetic suscep- tibility tensor from the user-supplied g-tensor. Syntax: | 64 |
+| `experiments/pseudocon/g2chi.m` | `chi=g2chi(g,T,S)` | Calculates a high-termperature estimate of the magnetic suscep- tibility tensor from the user-supplied g-tensor. Syntax: | 61 |
 | `experiments/pseudocon/geffect.m` | `g=geffect(spin_system,states)` | Effective g-tensor for the user-specified Kramers doublet, computed as described in Syntax: g=geffect(spin_system,states | 125 |
-| `experiments/pseudocon/hfc2pcs.m` | `[pcs,pcs_tensor]=hfc2pcs(A,chi,isotope)` | Converts hyperfine coupling tensors and susceptibility tensors into pseudocontact shifts (contact component is not inclu | 74 |
-| `experiments/pseudocon/hfc2pms.m` | `[pms,pms_tensor]=hfc2pms(A,chi,isotope)` | Converts hyperfine coupling tensors and susceptibility tensors into paramagnetic shifts (contact + pseudocontact compone | 72 |
-| `experiments/pseudocon/ilpcs.m` | `[mxyz,chi,Ilm,pred_pcs,s_mxyz,s_chi,s_Ilm]=ilpcs(nxyz,expt_pcs,ranks,mguess)` | Fits experimental PCS data using the distributed paramagnetc centre model described in Syntax: [mxyz,chi,Ilm,pred_pcs,s_ | 161 |
+| `experiments/pseudocon/hfc2pcs.m` | `[pcs,pcs_tensor]=hfc2pcs(A,chi,isotope)` | Converts hyperfine coupling tensors and susceptibility tensors into pseudocontact shifts (contact component is not inclu | 78 |
+| `experiments/pseudocon/hfc2pms.m` | `[pms,pms_tensor]=hfc2pms(A,chi,isotope)` | Converts hyperfine coupling tensors and susceptibility tensors into paramagnetic shifts (contact + pseudocontact compone | 76 |
+| `experiments/pseudocon/ilpcs.m` | `[mxyz,chi,Ilm,pred_pcs,s_mxyz,s_chi,s_Ilm]=ilpcs(nxyz,expt_pcs,ranks,mguess)` | Fits experimental PCS data using the distributed paramagnetc centre model described in Syntax: [mxyz,chi,Ilm,pred_pcs,s_ | 163 |
 | `experiments/pseudocon/interpmat.m` | `P=interpmat(cube_dims,ranges,xyz)` | Returns a matrix that acts on a stretched pseudocontact shift density cube and projects out the values of the PCS at the | 129 |
-| `experiments/pseudocon/ipcs.m` | `[source_cube,ranges,pred_pcs,err_ls,reg_a,reg_b]=ipcs(parameters,npoints,lambda)` | Solves the inverse problem for pseudocontact shift by recovering the source term in the Kuprov equation using Tikhonov r | 602 |
+| `experiments/pseudocon/ipcs.m` | `[source_cube,ranges,pred_pcs,err_ls,reg_a,reg_b]=ipcs(parameters,npoints,lambda)` | Solves the inverse problem for pseudocontact shift by recovering the source term in the Kuprov equation using Tikhonov r | 627 |
 | `experiments/pseudocon/ippcs.m` | `[mxyz,chi,pred_pcs,s_mxyz,s_chi]=ippcs(nxyz,mguess,expt_pcs)` | Fits the point electron model PCS to the experimental pseudocon- tact shift coordinates and values. Syntax: [exyz,chi,pr | 119 |
-| `experiments/pseudocon/kpcs.m` | `[pcs_vals,pcs_cube]=kpcs(probden,chi,ranges,nxyz,method)` | Computes the three-dimensional distribution of pseudocontact shift field by solving Kuprov equation for PCS. Syntax: [pc | 122 |
+| `experiments/pseudocon/kpcs.m` | `[pcs_vals,pcs_cube]=kpcs(probden,chi,ranges,nxyz,method)` | Computes the three-dimensional distribution of pseudocontact shift field by solving Kuprov equation for PCS. Syntax: [pc | 126 |
 | `experiments/pseudocon/lpcs.m` | `theo_pcs=lpcs(nxyz,mxyz,ranks,Ilm,chi)` | Computes PCS from the multipole moments of the paramagnetic centre probability density as described in Equation 33 is us | 138 |
 | `experiments/pseudocon/multipack.m` | `Ilm=multipack(ranks,moments)` | Packs multipole moments from a linear stream into a cell array that is arranged by ranks. Syntax: Ilm=multipack(ranks,mo | 66 |
-| `experiments/pseudocon/pcs2chi.m` | `[chi,err]=pcs2chi(hfcs,shifts,isotopes)` | Runs a least squares fitting procedure on top of Equation 10 from ponent of the susceptibility tensor from DFT hyperfine | 109 |
+| `experiments/pseudocon/pcs2chi.m` | `[chi,err]=pcs2chi(hfcs,shifts,isotopes)` | Runs a least squares fitting procedure on top of Equation 10 from ponent of the susceptibility tensor from DFT hyperfine | 113 |
 | `experiments/pseudocon/pcs_combi_fit.m` | `[d_shifts,p_shifts,pcs_theo,pcs_expt,chi,total_theo]=pcs_combi_fit(parameters)` | Combinatorial PCS fitting function. Takes into account potential am- biguities in diamagnetic and paramagnetic NMR assig | 187 |
-| `experiments/pseudocon/pms2chi.m` | `[chi,err]=pms2chi(hfcs,shifts,isotopes)` | Runs a least squares fitting procedure on top of Equation 10 from tensor from DFT hyperfine coupling tensors and experim | 110 |
+| `experiments/pseudocon/pms2chi.m` | `[chi,err]=pms2chi(hfcs,shifts,isotopes)` | Runs a least squares fitting procedure on top of Equation 10 from tensor from DFT hyperfine coupling tensors and experim | 114 |
 | `experiments/pseudocon/points2mult.m` | `Ilm=points2mult(xyz,mxyz,rho,L,method)` | Computes multipole moments from a set of points with user-specified spin populations. Syntax: Ilm=points2mult(xyz,mxyz,r | 107 |
 | `experiments/pseudocon/ppcs.m` | `pcs=ppcs(nxyz,sxyz,chi)` | Computes pseudocontact shift from a point electron centre at the nuclear coordinates supplied. Syntax: pred_pcs=ppcs(nxy | 80 |
 | `experiments/pseudocon/probmax.m` | `[x,y,z]=probmax(probden,ranges)` | Finds the maximum point of a 3D probability density in a cube. Syntax: [x,y,z]=probmax(probden,ranges) Parameters: probd | 57 |
 | `experiments/pseudocon/xyz2pms.m` | `pms_tensor=xyz2pms(nxyz,sxyz,chi)` | Computes paramagnetic shielding tensor generated by a point mag- netic susceptibility centre at the coordinates supplied | 94 |
+| `experiments/pulsed_field.m` | `answer=pulsed_field(spin_system,parameters,H,R,K) %#ok<INUSD>` | Magnetisation dynamics under a time-dependent magnetic field along the Z axis of the laboratory frame with spin-phonon r | 175 |
 | `experiments/rapidscan.m` | `[b_axis,spectrum]=rapidscan(spin_system,parameters)` | Time-domain rapid field scan ESR experiment, Eatons style. Syntax: [b_axis,spectrum]=rapidscan(spin_system,parameters) P | 120 |
 | `experiments/rdc/rdc_fit.m` | `S=rdc_fit(isotopes,xyz,rdc)` | Linear least squares fitter for residual dipolar couplings. Iso- tope pairs are arbitrary heteronuclear; multiple isotop | 88 |
 | `experiments/rdc/xyz2rdc.m` | `rdc=xyz2rdc(spin_a,spin_b,xyz_a,xyz_b,order_spec)` | Converts Cartesian coordinates of a pair of nuclei and an order matrix into residual dipolar coupling; only hetero- nucl | 86 |
@@ -155,9 +156,9 @@
 | `experiments/singlets/s2m.m` | `rho=s2m(spin_system,L,Hx,Hy,rho,J,delta_v)` | S2M sequence of Pileio and Levitt. Syntax: rho=s2m(spin_system,L,Hx,Hy,rho,J,delta_v) Parameters: L -background Liouvill | 83 |
 | `experiments/slowpass.m` | `spectrum=slowpass(spin_system,parameters,H,R,K)` | Slow passage detection -calculates spectrum values at the user- specified frequency positions using the Fourier transfor | 199 |
 | `experiments/sp_acquire.m` | `fid=sp_acquire(spin_system,parameters,H,R,K)` | Soft pulse followed by acquisition. The soft pulse is simulated using the Fokker-Planck formalism. Syntax: fid=sp_acquir | 178 |
-| `experiments/spen/dosy_oneshot.m` | `fid=dosy_oneshot(spin_system,parameters,H,R,K,G,F)` | One-shot DOSY pulse sequence. Syntax: fid=dosy_oneshot(spin_system,parameters,H,R,K,G,F) Parameters: parameters.rho0 ini | 226 |
+| `experiments/spen/dosy_oneshot.m` | `fid=dosy_oneshot(spin_system,parameters,H,R,K,G,F)` | One-shot DOSY pulse sequence. Syntax: fid=dosy_oneshot(spin_system,parameters,H,R,K,G,F) Parameters: parameters.rho0 ini | 246 |
 | `experiments/spen/idosyzs.m` | `inten=idosyzs(spin_system,parameters,H,R,K,G,F)` | A simplified model sequence of the ZS iDOSY pulse sequence. Syntax: inten=idosyzs(spin_system,parameters,H,R,K,G,F) This | 206 |
-| `experiments/spen/psyche.m` | `fid=psyche(spin_system,parameters,H,R,K,G,F)` | PSYCHE pure-shift NMR pulse sequence. Syntax: fid=psyche_1d(spin_system,parameters,H,R,K,G,F) Parameters: parameters.rho | 266 |
+| `experiments/spen/psyche.m` | `fid=psyche(spin_system,parameters,H,R,K,G,F)` | PSYCHE pure-shift NMR pulse sequence. Syntax: fid=psyche_1d(spin_system,parameters,H,R,K,G,F) Parameters: parameters.rho | 288 |
 | `experiments/spen/psycosy.m` | `fid=psycosy(spin_system,parameters,H,R,K,G,F)` | Alan Kenwright's spatially encoded COSY sequence described in fid=psycosy(spin_system,parameters,H,R,K,G,F) Parameters:  | 253 |
 | `experiments/spen/spencosy.m` | `fid=spencosy(spin_system,parameters,H,R,K,G,F)` | Ultrafast COSY pulse sequence. Syntax: fid=spencosy(spin_system,parameters,H,R,K,G,F) Parameters: parameters.dims size o | 245 |
 | `experiments/spen/spendosy.m` | `fid=spendosy(spin_system,parameters,H,R,K,G,F)` | Ultrafast DOSY pulse sequence. Syntax: fid=spendosy(spin_system,parameters,H,R,K,G,F) Parameters: parameters.dims size o | 285 |
@@ -165,7 +166,7 @@
 | `experiments/spen/st_ideal.m` | `inten=st_ideal(spin_system,parameters,H,R,K,G,F)` | The ideal Stejskal-Tanner pulse sequence using the notation from Figure 1 in http://dx.doi.org/0.1002/cmr.a.21241 with n | 132 |
 | `experiments/spen/ufmq.m` | `fid=ufmq(spin_system,parameters,H,R,K,G,F)` | Ultrafast multiple-quantum NMR, a literal implementation of Figure 1A from (http://dx.doi.org/10.1002/cphc.201800667). S | 262 |
 | `experiments/spin_chem/rydmr.m` | `A=rydmr(spin_system,parameters,H,R,K)` | Singlet-singlet RYDMR experiment using the full kinetics superoper- ator -computes the singlet yield of a radical pair r | 77 |
-| `experiments/spin_chem/rydmr_exp.m` | `answer=rydmr_exp(spin_system,parameters,H,R,K)` | Singlet-singlet RYDMR experiment with exponential recombination function (http://dx.doi.org/10.1080/00268979809483134).  | 179 |
+| `experiments/spin_chem/rydmr_exp.m` | `answer=rydmr_exp(spin_system,parameters,H,R,K)` | Singlet-singlet RYDMR experiment with exponential recombination function (http://dx.doi.org/10.1080/00268979809483134).  | 191 |
 | `experiments/traject.m` | `traj=traject(spin_system,parameters,H,R,K)` | Simple forward time evolution trajectory. Syntax: traj=traject(spin_system,parameters,H,R,K) Parameters: parameters.swee | 97 |
 | `experiments/zulf/zerofield.m` | `fid=zerofield(spin_system,parameters,H,R,K)` | Budker group style gamma-weighted pulse-acquire sequence in zero field. Uses gamma-weighted initial state (corresponding | 133 |
 | `experiments/zulf/zulf_abrupt.m` | `fid=zulf_abrupt(spin_system,parameters,H,R,K)` | Zero-field magnetometry experiment that propagates the initial condition through an exponential drop in the external mag | 182 |

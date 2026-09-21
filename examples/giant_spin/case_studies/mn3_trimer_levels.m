@@ -52,8 +52,8 @@ for k=1:numel(fields)
     H=full(H0+fields(k)*Z); levels(:,k)=hz2icm(sort(eig((H+H')/2))/(2*pi));
 end
 
-% Plot the levels relative to the field-free ground state
-kfigure(); plot(fields,levels-levels(1,1)); kgrid; xlim tight; ylim([-5 60]);
+% Plot the lowest thirty levels relative to the field-free ground state
+kfigure(); plot(fields,levels(1:30,:)-levels(1,1)); kgrid; xlim tight; ylim padded;
 kxlabel('Field, Tesla'); kylabel('Energy, cm$^{-1}$');
 
 % Save the levels

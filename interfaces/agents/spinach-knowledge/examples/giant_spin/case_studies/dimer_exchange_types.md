@@ -11,7 +11,7 @@ Pulsed-field magnetisation of a dimer of two S=1/2 spins with four types of exch
 ## Physical / mathematical content
 
 - Two electrons with g=2 and one exchange tensor at a time: isotropic 0.2 cm^-1, J_xx only, J_zz only, and a purely antisymmetric tensor. The paper writes H=-2*S1*J*S2, Spinach writes S1*A*S2 with A in hertz, so `inter.coupling.matrix{1,2}=-2*icm2hz(J)`.
-- The isotropic and J_zz tensors commute with the Zeeman term, so the sweep cannot move population between Zeeman levels and the magnetisation stays at zero while the equilibrium curve grows; J_xx and the antisymmetric tensor mix the levels and the spin-phonon dissipator drives the magnetisation towards, but behind, equilibrium (J_xx plateaus near 0.61 mu_B against 1.98 at equilibrium, antisymmetric reaches 1.61 against 1.90 at 1 T).
+- The isotropic and J_zz tensors commute with the Zeeman term, so there is no coherent mixing of the Zeeman levels and only the spin-phonon dissipator, coupling product states whose total S_z differs by one, moves population; at the paper's spectral density that leaves the magnetisation near 0.006 and 0.003 mu_B at 1 T against 2.0 at equilibrium. J_xx and the antisymmetric tensor mix the levels and the magnetisation follows, but lags behind, equilibrium (J_xx plateaus near 0.61 mu_B against 1.98 at equilibrium, antisymmetric reaches 1.61 against 1.90 at 1 T).
 - The spin-phonon coupling operator has unit elements between product states whose total S_z differs by one; the bath is super-Ohmic (`phonon_alpha=2`) with the paper's lambda^2*I0 (lambda=10 cm^-1, I0=1e-10 ps/rad) converted to rad/s units; the observable is the total moment -2*S_z in Bohr magnetons.
 
 ## Numerical / algorithmic content

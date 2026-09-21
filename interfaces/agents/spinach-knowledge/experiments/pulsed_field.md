@@ -28,8 +28,8 @@ Magnetisation dynamics under a time-dependent magnetic field along the Z axis of
 - in parameters.needs
 - parameters.timestep -stair width, seconds
 - parameters.nsteps -number of stairs
-- parameters.coil -Hilbert space observable operator or
-- a cell array of them
+- parameters.coil -Hermitian Hilbert space observable
+- operator or a cell array of them
 - parameters.phonon_x -spin-phonon coupling operator, see
 - rlx_phonon.m
 - parameters.phonon_i0 -phonon spectral density prefactor,

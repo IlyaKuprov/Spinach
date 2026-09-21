@@ -28,8 +28,8 @@
 %
 %    parameters.nsteps     - number of stairs
 %
-%    parameters.coil       - Hilbert space observable operator or
-%                            a cell array of them
+%    parameters.coil       - Hermitian Hilbert space observable
+%                            operator or a cell array of them
 %
 %    parameters.phonon_x   - spin-phonon coupling operator, see
 %                            rlx_phonon.m
@@ -192,8 +192,8 @@ if isempty(coils)
     error('parameters.coil must contain at least one observable operator.');
 end
 for k=1:numel(coils)
-    if (~isnumeric(coils{k}))||any(size(coils{k})~=size(H))||any(~isfinite(coils{k}(:)))
-        error('every coil must be a matrix of the same dimension as H with finite elements.');
+    if (~isnumeric(coils{k}))||any(size(coils{k})~=size(H))||any(~isfinite(coils{k}(:)))||(~ishermitian(coils{k}))
+        error('every coil must be a Hermitian matrix of the same dimension as H with finite elements.');
     end
 end
 if isfield(parameters,'rframes')&&(~isempty(parameters.rframes))

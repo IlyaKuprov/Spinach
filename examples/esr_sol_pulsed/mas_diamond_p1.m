@@ -1,14 +1,30 @@
-% Powder magic angle spinning EPR spectrum of the P1 substitutional
-% nitrogen defect in diamond at 7 Tesla. The initial condition is a
-% transverse electron magnetisation, and therefore no pulse is need-
-% ed: the single angle spinning context calls acquire.m directly.
+% Two-pulse echo-detected frequency-swept EPR spectra of the P1 sub-
+% stitutional nitrogen defect in diamond, static and under magic ang-
+% le spinning, after Figure 1a of Khamrui et al., J. Phys. Chem. Lett.
+% 2026, <https://doi.org/10.1021/acs.jpclett.6c02108>: 400 ns long
+% pulses with 416 kHz nutation frequency, 300 ns interpulse delay, at
+% 6.9 T, static and at 10, 25, and 37 kHz MAS. The carrier is stepped
+% across the spectrum and the integrated echo is recorded at each fre-
+% quency, with the spectra normalised to the static one.
 %
-% The anisotropy is carried by the 14N hyperfine coupling, of which
-% the dipolar part is 10.9 MHz; the two outer hyperfine lines there-
-% fore acquire sideband manifolds, whereas the central line has no
-% hyperfine anisotropy and stays sharp.
+% The 14N hyperfine coupling (dipolar part 10.9 MHz) makes the two outer
+% lines dephase under spinning as their resonance frequencies move during
+% the sequence, whereas the central line survives. Compared to the paper's
+% own simulation, the static outer edges here are weaker (0.2 of the cent-
+% ral peak against 0.4) and the central line dephases less (0.8 at 37 kHz).
 %
-% Calculation time: minutes
+% The Hamiltonian rotor stack built by singlerot.m in Hilbert space is
+% stepped through by echo_sweep.m, which averages over the rotor phase
+% at the start of the sequence and keeps the electron coherence path-
+% way (-1 after the first pulse, +1 after the second) in place of the
+% phase cycle. All P1 centre tensors are axial and coaxial, a two-
+% angle powder grid is therefore sufficient. Relaxation is not inclu-
+% ded: with T2 long against the echo window, it scales the four spec-
+% tra by nearly the same factor, which the normalisation removes. The
+% rotor rank is set so that the rotor phase resolution of the stack
+% matches the 5 ns time step at 37 kHz.
+%
+% Calculation time: hours on a 256-core node.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -21,11 +37,11 @@ p1_params.nitrogen='14N';
 % Build the spin system
 [sys,inter]=diamond_p1(p1_params);
 
-% Magnet field
-sys.magnet=7.0;
+% Magnet field, central line at 193.797 GHz
+sys.magnet=6.9156;
 
 % Basis set
-bas.formalism='sphten-liouv';
+bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Spinach housekeeping
@@ -33,33 +49,48 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Rotor parameters
-parameters.rate=35000;
 parameters.axis=[1 1 1];
-parameters.max_rank=11;
+parameters.max_rank=2700;
 
 % Sequence parameters
 parameters.spins={'E'};
-parameters.rho0=state(spin_system,'L+','E');
+parameters.rho0=state(spin_system,'Lz','E');
 parameters.coil=state(spin_system,'L+','E');
-parameters.offset=1.234e7;
+parameters.pulse_dur=400e-9;
+parameters.pulse_frq=416e3;
+parameters.tau=300e-9;
+parameters.echo_win=1.0e-6;
+parameters.timestep=5e-9;
+parameters.nphases=100;
+parameters.offset=0;
 parameters.sweep=3e8;
-parameters.npoints=128;
-parameters.zerofill=512;
+parameters.npoints=601;
+parameters.zerofill=601;
 parameters.grid='rep_2ang_400pts_sph';
-parameters.axis_units='MHz';
+parameters.axis_units='GHz-labframe';
 parameters.verbose=0;
 
+% Spinning rates
+rates=[0 10e3 25e3 37e3];
+
 % Simulation
-fid=singlerot(spin_system,@acquire,parameters,'esr');
+spectra=zeros(parameters.npoints,numel(rates));
+for n=1:numel(rates)
+    parameters.rate=rates(n);
+    spectra(:,n)=abs(singlerot(spin_system,@echo_sweep,parameters,'esr'));
+end
 
-% Apodisation
-fid=apodisation(spin_system,fid,{{'exp',6}});
-
-% Fourier transform
-spectrum=fftshift(fft(fid,parameters.zerofill));
+% Normalisation to the static spectrum
+spectra=spectra/max(spectra(:,1));
 
 % Plotting
-kfigure(); plot_1d(spin_system,real(spectrum),parameters);
+kfigure(); hold on;
+for n=1:numel(rates)
+    plot_1d(spin_system,spectra(:,n),parameters);
+end
+klegend({'static','10 kHz MAS','25 kHz MAS','37 kHz MAS'},'Location','NorthEast');
+kylabel('echo intensity, a.u.');
 
 end
+
 

@@ -19,6 +19,7 @@
 | `experiments/cp_contact_hard.m` | `contact_curve=cp_contact_hard(spin_system,parameters,H,R,K)` | Cross-polarisation experiment in the rotating frame. Applies an ideal pi/2 pulse using the specified operators, then evo | 155 |
 | `experiments/cp_contact_soft.m` | `contact_curve=cp_contact_soft(spin_system,parameters,H,R,K)` | Cross-polarisation experiment in the rotating frame. Applies a soft pi/2 pulse using the specified operators, then evolv | 150 |
 | `experiments/cpmg.m` | `fid=cpmg(spin_system,parameters,H,R,K)` | CPMG echo train with detection. Syntax: fid=cpmg(spin_system,parameters,H,R,K) Parameters: parameters.rho0 -initial stat | 118 |
+| `experiments/echo_sweep.m` | `echo=echo_sweep(spin_system,parameters,H,~,~)` | Two-pulse echo-detected frequency-swept EPR experiment, static or under magic angle spinning, in Hilbert space. Two puls | 310 |
 | `experiments/eqmag.m` | `magn=eqmag(spin_system,parameters)` | Computes the molar magnetization vector at the thermal equilibrium at the temperature specified in inter.temperature and | 120 |
 | `experiments/esr_dipolar/deer_3p_hard_deer.m` | `deer=deer_3p_hard_deer(spin_system,parameters,H,R,K)` | Three-pulse DEER pulse sequence. Idealized hard pulses are used, each pulse only affects its specific electron or transi | 204 |
 | `experiments/esr_dipolar/deer_3p_hard_echo.m` | `echo=deer_3p_hard_echo(spin_system,parameters,H,R,K)` | Samples the spin echo in the three-pulse DEER experiment to determine its precise location -in simulations, DEER spin ec | 137 |

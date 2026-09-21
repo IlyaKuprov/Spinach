@@ -211,6 +211,34 @@ simulations with explicit soft pulses and orientation selection, and are
 expensive; start from `endor_davies_nox_crystal.m` and get line positions right
 before paying for a grid.
 
+Echo-detected EPR under magic angle spinning is `esr_sol_pulsed/mas_diamond_p1.m`
+(P1 centre in diamond, two-pulse echo with a swept carrier, static and 10 to
+37 kHz MAS, after Khamrui et al. 2026). The pattern is `singlerot` in
+`zeeman-hilb`, which hands the pulse sequence `experiments/echo_sweep.m` a
+Hamiltonian rotor stack, one matrix per rotor phase, and nothing else: the
+sequence steps through the stack itself from `parameters.rate` (nearest
+element at the middle of each fixed time step, phase decreasing with time for
+a positive rate as in the Liouville branch, so `rate=0` is the static case,
+and only the elements visited are exponentiated),
+averages over `parameters.nphases` rotor phases at the start of the sequence,
+which stand in for the crystallite azimuth and let a 400-point two-angle grid
+suffice, selects the electron coherence pathway with `coherence` instead of a
+phase cycle, and sweeps the carrier inside the sequence by adding
+`2*pi*offset*Lz` to the stack elements, rebuilding only the pulse propagators
+per carrier point because the secular stack commutes with the `Lz` of the
+pulsed spin (`parameters.spins`, the electron here); its grumbler refuses a
+stack that does not. The sequence takes `pulse_dur`,
+`pulse_frq`, `tau`, `echo_win`, `timestep`, `nphases`, `sweep`, and `npoints`
+and returns the echo signal integrated over the window (sum times the time
+step) and averaged over the start phases, as a column. The rotor rank is set
+by the fastest rate and the time step, not by the slowest rate: the stack is
+a table of the Hamiltonian against rotor phase and its resolution should match
+the time step at the fastest rate, `max_rank` of about `1/(2*abs(rate)*timestep)`,
+2700 at 37 kHz with 5 ns steps (a finer stack costs propagators for no gain
+beyond the time step, a coarser one loses phase resolution; at slower rates
+consecutive steps reuse a stack element); the carrier step must be finer than
+the narrowest line (0.5 MHz for the 2 MHz wide central line).
+
 ## DEER
 
 `esr_sol_pulsed/hard_3_pulse_deer_no.m` is the minimal two-label calculation.

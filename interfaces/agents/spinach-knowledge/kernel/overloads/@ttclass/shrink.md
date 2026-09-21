@@ -14,29 +14,6 @@ Approximates a given tensor train with lower TT-ranks. Syntax: ttrain=shrink(ttr
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 21-22: Read train sizes; implemented by `[d,~]=size(ttrain.cores)`.
-- Lines 24-25: Summation; implemented by `ttrain=pack(ttrain)`.
-- Lines 27-28: Left-to-right orthogonalisation; implemented by `ttrain=ttort(ttrain,+1)`.
-- Lines 30-31: Check the norm and escape if the object is zero; implemented by `nrm=ttrain.coeff*norm(ttrain.cores{d,1}(:),2)`.
-- Lines 34-35: Truncation; implemented by `ttrain=truncate(ttrain)`.
-- Lines 37-39: Convert to a scalar if appropriate; implemented by `if all(all(cellfun(@(x)size(x,2),ttrain.cores)==1))&& all(all(cellfun(@(x)size(x,3),ttrain.cores)==1))`.
-
-### Control flow inferred from the code
-
-- Line 32: conditional branch on `nrm==0, ttrain=0*unit_like(ttrain); return; end`.
-- Line 38: conditional branch on `all(all(cellfun(@(x)size(x,2),ttrain.cores)==1))&&`.
-
-### Key state/data transformations
-
-- Lines 22: computes `[d,~]` using `[d,~]=size(ttrain.cores)`.
-- Lines 25: computes `ttrain` using `ttrain=pack(ttrain)`.
-- Lines 31: computes `nrm` using `nrm=ttrain.coeff*norm(ttrain.cores{d,1}(:),2)`.
-
 ## Parameters / inputs
 
 - ttrain -a tensor train object

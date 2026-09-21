@@ -18,29 +18,6 @@ Reconstructs the instantaneous Bloch equation rotation axis of from a 3D magneti
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 22-23: Check consistency; implemented by `grumble(x,y,z)`.
-- Lines 25-26: Get first and second derivatives; implemented by `dx_dt=fdvec(x,5,1); d2x_dt2=fdvec(x,5,2)`.
-- Lines 30-31: Get instantaneous rotation axis; implemented by `ax=dy_dt.*d2z_dt2-dz_dt.*d2y_dt2`.
-
-### Key state/data transformations
-
-- Lines 26: computes `dx_dt` using `dx_dt=fdvec(x,5,1); d2x_dt2=fdvec(x,5,2)`.
-- Lines 27: computes `dy_dt` using `dy_dt=fdvec(y,5,1); d2y_dt2=fdvec(y,5,2)`.
-- Lines 28: computes `dz_dt` using `dz_dt=fdvec(z,5,1); d2z_dt2=fdvec(z,5,2)`.
-- Lines 31: computes `ax` using `ax=dy_dt.*d2z_dt2-dz_dt.*d2y_dt2`.
-- Lines 32: computes `ay` using `ay=dz_dt.*d2x_dt2-dx_dt.*d2z_dt2`.
-- Lines 33: computes `az` using `az=dx_dt.*d2y_dt2-dy_dt.*d2x_dt2`.
-
-### Local helper functions
-
-- Line 38: `grumble()` — `function grumble(x,y,z)`.
-  - Representative operation: `if (~isnumeric(x))||(~isreal(x))|| (~ismatrix(x))||any(~isfinite(x),'all')`.
-  - Representative operation: `(~ismatrix(x))||any(~isfinite(x),'all')`.
-
 ## Parameters / inputs
 
 - x, y, z -row vectors of equal length con-

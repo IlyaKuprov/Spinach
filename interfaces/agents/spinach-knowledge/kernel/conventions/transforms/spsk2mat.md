@@ -17,28 +17,6 @@ Converts span and skew representation of a 3x3 interaction tensor (Herzfeld-Berg
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 36-37: Check consistency; implemented by `grumble(iso,sp,sk,alp,bet,gam)`.
-- Lines 39-40: Compute eigenvalues; implemented by `xx=iso-(1/6)*(3+sk)*sp`.
-- Lines 44-45: Rotate the matrix; implemented by `R=euler2dcm(alp,bet,gam)`.
-
-### Key state/data transformations
-
-- Lines 40: computes `xx` using `xx=iso-(1/6)*(3+sk)*sp`.
-- Lines 41: computes `yy` using `yy=iso+sk*sp/3`.
-- Lines 42: computes `zz` using `zz=iso+(1/6)*(3-sk)*sp`.
-- Lines 45: computes `R` using `R=euler2dcm(alp,bet,gam)`.
-- Lines 46: computes `M` using `M=R*diag([xx yy zz])*R'`.
-
-### Local helper functions
-
-- Line 51: `grumble()` — `function grumble(iso,sp,sk,alp,bet,gam)`.
-  - Representative operation: `if (~isnumeric(iso))||(~isreal(iso))||(~isscalar(iso))|| (~isnumeric(sp))||(~isreal(sp))||(~isscalar(sp))|| (~isnumeric(sk))||(~isreal(sk))||(~isscalar(sk))|| (~isnumeri…`.
-  - Representative operation: `(~isnumeric(sp))||(~isreal(sp))||(~isscalar(sp))|| (~isnumeric(sk))||(~isreal(sk))||(~isscalar(sk))|| (~isnumeric(alp))||(~isreal(alp))||(~isscalar(alp))|| (~isnumeric(b…`.
-
 ## Parameters / inputs
 
 - iso -isotropic part of the interaction, defined as

@@ -14,21 +14,6 @@ Returns TRUE for non-empty tensor train objects. Syntax: answer=isnumeric(tt)
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Non-empty tensor trains should return true(); implemented by `if isa(tt,'ttclass')&&(~isempty(tt.cores))`.
-
-### Control flow inferred from the code
-
-- Line 21: conditional branch on `isa(tt,'ttclass')&&(~isempty(tt.cores))`.
-
-### Key state/data transformations
-
-- Lines 22: computes `answer` using `answer=true()`.
-
 ## Parameters / inputs
 
 - tt -tensor train object

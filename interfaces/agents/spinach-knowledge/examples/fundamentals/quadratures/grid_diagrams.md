@@ -17,22 +17,6 @@ Spherical grid diagrams for IK's book.
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 7-8: Plotting logistics; implemented by `kfigure(); scale_figure([1.5 1.3])`.
-- Lines 12-13: Number sequence grid example -Fibonacci; implemented by `nexttile; grid_fibon('fib',321); text(-1.0,0.95,'SEQ')`.
-- Lines 17-18: Polyhedron subdivision grid -icosahedral; implemented by `load('../../../kernel/grids/icos_2ang_642pts.mat','betas','gammas')`.
-- Lines 26-27: Polyhedron subdivision grid -octahedral; implemented by `nexttile; grid_trian('stoll',13); text(-1.0,0.95,'OCT')`.
-- Lines 31-32: Optimisation grid -repulsion; implemented by `[~,betas,gammas]=repulsion(620,3,200)`.
-- Lines 40-41: Natual world inspiration grid -Igloo; implemented by `nexttile; grid_igloo(23); text(-1.0,0.95,'NAT')`.
-- Lines 45-46: "You are all wankers" -Vyacheslav Lebedev; implemented by `load('../../../kernel/grids/leb_2ang_rank_41.mat','betas','gammas')`.
-
-### Key state/data transformations
-
-- Lines 32: computes `[~,betas,gammas]` using `[~,betas,gammas]=repulsion(620,3,200)`.
-
 ## Implementation structure
 
 - Spherical grid diagrams for IK's book.

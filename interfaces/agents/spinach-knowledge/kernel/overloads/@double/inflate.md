@@ -14,13 +14,6 @@ A dummy function that mirrors the inflate() command for polyadics, but is not su
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 13-15: No effect on doubles; implemented by `end`.
-
 ## Implementation structure
 
 - A dummy function that mirrors the inflate() command for

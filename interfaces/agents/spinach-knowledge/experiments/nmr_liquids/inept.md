@@ -18,46 +18,6 @@ Non-refocused INEPT pulse sequence. This returns the directly acquired coupled a
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 41-42: Consistency check; implemented by `grumble(spin_system,parameters,H,R,K)`.
-- Lines 44-45: Compose Liouvillian; implemented by `L=H+1i*R+1i*K`.
-- Lines 47-48: Get timing parameters; implemented by `tau=abs(1/(4*parameters.J))`.
-- Lines 51-52: Isotropic thermal equilibrium; implemented by `rho=equilibrium(spin_system)`.
-- Lines 54-55: Detection state; implemented by `coil=state(spin_system,'L+',parameters.spins{1},'cheap')`.
-- Lines 57-58: Pulse operators; implemented by `Cx=operator(spin_system,'Lx',parameters.spins{1})`.
-- Lines 63-64: 90x pulse on H; implemented by `rho=step(spin_system,Hx,rho,pi/2)`.
-- Lines 66-67: tau evolution; implemented by `rho=evolution(spin_system,L,[],rho,tau,1,'final')`.
-- Lines 69-70: Two inversion pulses; implemented by `rho=step(spin_system,Cy+Hy,rho,pi)`.
-- Lines 72-73: Second tau evolution; implemented by `rho=evolution(spin_system,L,[],rho,tau,1,'final')`.
-- Lines 75-76: 90x pulse on C; implemented by `rho=step(spin_system,Cx,rho,pi/2)`.
-- Lines 78-79: Split phase 90y pulses on H; implemented by `rho_pos=step(spin_system,Hy,rho,+pi/2)`.
-- Lines 82-83: Phase cycle; implemented by `rho=(rho_pos-rho_neg)/2`.
-- Lines 85-87: Detection; implemented by `fid=evolution(spin_system,L,coil,rho,timestep, parameters.npoints-1,'observable')`.
-
-### Key state/data transformations
-
-- Lines 45: computes `L` using `L=H+1i*R+1i*K`.
-- Lines 48: computes `tau` using `tau=abs(1/(4*parameters.J))`.
-- Lines 49: computes `timestep` using `timestep=1/parameters.sweep`.
-- Lines 52: computes `rho` using `rho=equilibrium(spin_system)`.
-- Lines 55: computes `coil` using `coil=state(spin_system,'L+',parameters.spins{1},'cheap')`.
-- Lines 58: computes `Cx` using `Cx=operator(spin_system,'Lx',parameters.spins{1})`.
-- Lines 59: computes `Cy` using `Cy=operator(spin_system,'Ly',parameters.spins{1})`.
-- Lines 60: computes `Hx` using `Hx=operator(spin_system,'Lx',parameters.spins{2})`.
-- Lines 61: computes `Hy` using `Hy=operator(spin_system,'Ly',parameters.spins{2})`.
-- Lines 79: computes `rho_pos` using `rho_pos=step(spin_system,Hy,rho,+pi/2)`.
-- Lines 80: computes `rho_neg` using `rho_neg=step(spin_system,Hy,rho,-pi/2)`.
-- Lines 86-87: computes `fid` using `fid=evolution(spin_system,L,coil,rho,timestep, parameters.npoints-1,'observable')`.
-
-### Local helper functions
-
-- Line 92: `grumble()` — `function grumble(spin_system,parameters,H,R,K)`.
-  - Representative operation: `if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})`.
-  - Representative operation: `error('this function is only available for sphten-liouv formalisms.')`.
-
 ## Syntax
 
 ```matlab

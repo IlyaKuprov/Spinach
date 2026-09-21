@@ -17,23 +17,6 @@ Converts resonance offsets into chemical shifts. Syntax: ppm=hz2ppm(hz,B0,nucleu
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 26-27: Check consistency; implemented by `grumble(hz,B0,nucleus)`.
-- Lines 29-30: Calculate chemical shift in Hz; implemented by `ppm=1e6*(2*pi*hz)/(B0*spin(nucleus))`.
-
-### Key state/data transformations
-
-- Lines 30: computes `ppm` using `ppm=1e6*(2*pi*hz)/(B0*spin(nucleus))`.
-
-### Local helper functions
-
-- Line 35: `grumble()` — `function grumble(hz,B0,nucleus)`.
-  - Representative operation: `if (~isnumeric(hz))||(~isreal(hz))`.
-  - Representative operation: `error('resonance offset must be real.')`.
-
 ## Parameters / inputs
 
 - hz -resonance offset in Hz

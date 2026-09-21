@@ -18,32 +18,6 @@ Two-spin irreducible spherical tensor operators. Syntax: T=twospinist(spin_syste
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 38-39: Check consistency; implemented by `grumble(spin_system,spin_a,spin_b,indices,type)`.
-- Lines 41-42: Indexing switches; implemented by `switch indices(1)`.
-- Lines 46-47: Three first rank operators; implemented by `switch indices(2)`.
-- Lines 66-67: Complain and bomb out; implemented by `error('incorrect spherical tensor indices.')`.
-- Lines 73-74: Five second rank operators; implemented by `switch indices(2)`.
-
-### Control flow inferred from the code
-
-- Line 42: dispatches on `indices(1)`; cases `1`, `+1`, `0`, `-1`.
-- Line 47: dispatches on `indices(2)`; cases `+1`, `0`, `-1`.
-- Line 74: dispatches on `indices(2)`; cases `+2`, `+1`, `0`, `-1`, `-2`.
-
-### Key state/data transformations
-
-- Lines 51-52: computes `T` using `T=-(1/2)*(operator(spin_system,{'L+','Lz'},{spin_a spin_b},type,'csc')- operator(spin_system,{'Lz','L+'},{spin_a spin_b},type,'csc'))`.
-
-### Local helper functions
-
-- Line 117: `grumble()` — `function grumble(spin_system,spin_a,spin_b,indices,type)`.
-  - Representative operation: `if (~isnumeric(spin_a))||(~isscalar(spin_a))||(~isreal(spin_a))|| (spin_a<1)||(spin_a>spin_system.comp.nspins)||(mod(spin_a,1)~=0)`.
-  - Representative operation: `(spin_a<1)||(spin_a>spin_system.comp.nspins)||(mod(spin_a,1)~=0)`.
-
 ## Parameters / inputs
 
 - spin_a -number of the first spin

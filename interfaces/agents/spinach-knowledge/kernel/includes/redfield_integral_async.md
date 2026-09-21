@@ -18,24 +18,6 @@ Bloch-Wangsness-Redfield and Nakajima-Zwanzig integral evaluation, the asynchron
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 165-166: Get data from pool ValueStore; implemented by `store=getCurrentValueStore()`.
-- Lines 173-174: Compute the integral and do an intermediate clean-up; implemented by `R=-w*ABCD{1}*expmint(spin_system,ABCD{2},ABCD{3},ABCD{4},upper_lim)`.
-- Lines 177-178: Convert CSR sparse format into XYZ format; implemented by `[row,col,val]=find(R); clear('spin_system','R')`.
-- Lines 180-182: Send to the pool ValueStore and delete local copy; implemented by `put(store,{['redfield_int_batch_' num2str(job_id)]}, {[row col val]})`.
-
-### Key state/data transformations
-
-- Lines 166: computes `store` using `store=getCurrentValueStore()`.
-- Lines 167-170: computes `store_keys` using `store_keys={['brw_integrator_batch_' num2str(job_id) '_A'], ['brw_integrator_batch_' num2str(job_id) '_B'], ['brw_integrator_batch_' num2str(job_id) '_C'], ['brw_integra…`.
-- Lines 171: computes `ABCD` using `ABCD=get(store,store_keys); remove(store,store_keys)`.
-- Lines 174: computes `R` using `R=-w*ABCD{1}*expmint(spin_system,ABCD{2},ABCD{3},ABCD{4},upper_lim)`.
-- Lines 175: computes `clear('ABCD'); R` using `clear('ABCD'); R=clean_up(spin_system,R,1e-2*spin_system.tols.rlx_zero)`.
-- Lines 178: computes `[row,col,val]` using `[row,col,val]=find(R); clear('spin_system','R')`.
-
 ## Implementation structure
 
 - Bloch-Wangsness-Redfield and Nakajima-Zwanzig integral evaluation,

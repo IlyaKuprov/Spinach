@@ -14,20 +14,6 @@ Resonator transform test. Sends a square pulse into a simple resonator model and
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 9-10: Get a pulse shape; implemented by `pulse_in=randn(51,2)`.
-- Lines 14-15: Get a figure going; implemented by `kfigure(); scale_figure([2.0 1.0])`.
-
-### Key state/data transformations
-
-- Lines 10: computes `pulse_in` using `pulse_in=randn(51,2)`.
-- Lines 11: computes `pulse_in(1:3,:)` using `pulse_in(1:3,:)=0`.
-- Lines 12: computes `pulse_in((end-2):end,:)` using `pulse_in((end-2):end,:)=0`.
-
 ## Implementation structure
 
 - Resonator transform test. Sends a square pulse into a simple

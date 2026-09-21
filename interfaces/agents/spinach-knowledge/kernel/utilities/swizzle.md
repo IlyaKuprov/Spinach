@@ -17,29 +17,6 @@ Flattens out nested index lists and outputs them as an array of tuples in random
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 22-23: Check consistency; implemented by `grumble(index_arrays)`.
-- Lines 25-26: Kronecker up the arrays; implemented by `tuples=index_arrays{1}(:)`.
-- Lines 32-33: Randomise the tuple list; implemented by `ntuples=size(tuples,1); tuples=tuples(randperm(ntuples),:)`.
-
-### Control flow inferred from the code
-
-- Line 27: `for` loop over `n=2:numel(index_arrays)`.
-
-### Key state/data transformations
-
-- Lines 26: computes `tuples` using `tuples=index_arrays{1}(:)`.
-- Lines 33: computes `ntuples` using `ntuples=size(tuples,1); tuples=tuples(randperm(ntuples),:)`.
-
-### Local helper functions
-
-- Line 38: `grumble()` — `function grumble(index_arrays)`.
-  - Representative operation: `if ~iscell(index_arrays)`.
-  - Representative operation: `error('index_arrays must be a cell array of row vectors.')`.
-
 ## Parameters / inputs
 
 - index_arrays -a cell array of row vectors

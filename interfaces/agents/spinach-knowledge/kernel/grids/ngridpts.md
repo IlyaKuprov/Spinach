@@ -17,27 +17,6 @@ Estimates the minimum number of spatial grid points necessary to have a valid tr
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 39-40: Check consistency; implemented by `grumble(grad_amps,grad_durs,isotope,max_coh_order,sample_size)`.
-- Lines 42-43: Compute the worst-case total effective gradient; implemented by `worst_case_grad=sum(abs(grad_amps.*grad_durs))`.
-- Lines 45-46: Compute the spatial frequency of the worst-case spiral; implemented by `worst_case_freq=abs(max_coh_order*spin(isotope)*worst_case_grad)`.
-- Lines 48-49: Determine the minimum number of points required; implemented by `n=ceil(worst_case_freq*sample_size/pi)`.
-
-### Key state/data transformations
-
-- Lines 43: computes `worst_case_grad` using `worst_case_grad=sum(abs(grad_amps.*grad_durs))`.
-- Lines 46: computes `worst_case_freq` using `worst_case_freq=abs(max_coh_order*spin(isotope)*worst_case_grad)`.
-- Lines 49: computes `n` using `n=ceil(worst_case_freq*sample_size/pi)`.
-
-### Local helper functions
-
-- Line 54: `grumble()` — `function grumble(grad_amps,grad_durs,isotope,max_coh_order,sample_size)`.
-  - Representative operation: `if (~isnumeric(grad_amps))||(~isreal(grad_amps))||(~isrow(grad_amps))`.
-  - Representative operation: `error('grad_amps must be a row vector of real numbers.')`.
-
 ## Parameters / inputs
 
 - grad_amps -a row vector of all gradient amplitudes

@@ -17,31 +17,6 @@ Generates a Lindblad superoperator from user-specified left-side and right-side 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 33-34: Check consistency; implemented by `grumble(A_left,A_right,rho,rlx_rate)`.
-- Lines 36-37: Generate a Lindbladian; implemented by `R=A_left*A_right'-(A_left'*A_left+A_right*A_right')/2`.
-- Lines 39-40: Remove the arbitrary scale of the user-supplied state; implemented by `rho=rho/norm(rho,2)`.
-- Lines 42-43: Check for silly inputs, relative to the part of R that acts on rho; implemented by `if abs(rho'*R*rho)<=1e-10*norm(R*rho,2)`.
-- Lines 44-45: Calibrate the Lindbladian; implemented by `R=-rlx_rate*R/(rho'*R*rho)`.
-
-### Control flow inferred from the code
-
-- Line 40: conditional branch on `abs(rho'*R*rho)<=1e-10*norm(R*rho,2)`.
-
-### Key state/data transformations
-
-- Lines 37: computes `R` using `R=A_left*A_right'-(A_left'*A_left+A_right*A_right')/2`.
-- Lines 45: computes `rho` using `rho=rho/norm(rho,2)`, then `R` using `R=-rlx_rate*R/(rho'*R*rho)`.
-
-### Local helper functions
-
-- Line 50: `grumble()` — `function grumble(A_left,A_right,rho,rlx_rate)`. Morality, it could be argued, represents the way that people
-  - Representative operation: `if (~isnumeric(A_left))||(~isnumeric(A_right))|| (~isnumeric(rho))||(~isnumeric(rlx_rate))`.
-  - Representative operation: `(~isnumeric(rho))||(~isnumeric(rlx_rate))`.
-
 ## Parameters / inputs
 
 - A_left -left side product superoperator of the

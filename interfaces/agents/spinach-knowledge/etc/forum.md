@@ -14,13 +14,6 @@ Opens Spinach support forum page.
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 7-8: Call the default browser; implemented by `web('https://spindynamics.org/spin_forum/index.php','-browser')`.
-
 ## Implementation structure
 
 - Opens Spinach support forum page.

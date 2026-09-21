@@ -18,29 +18,6 @@ Analytical Tikhonov regularised solution to K*x=y without any constraints (sign-
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 36-37: Check consistency; implemented by `grumble(K,D,y,lam)`.
-- Lines 39-40: Analytical solution; implemented by `x=((K'*K)+lam*(D'*D))\(K'*y)`.
-- Lines 42-43: Error and regularisation signals; implemented by `if nargout>1, err=norm(K*x-y,2)^2; end`.
-
-### Control flow inferred from the code
-
-- Line 43: conditional branch on `nargout>1, err=norm(K*x-y,2)^2; end`.
-- Line 44: conditional branch on `nargout>2, reg=norm(D*x,2)^2; end`.
-
-### Key state/data transformations
-
-- Lines 40: computes `x` using `x=((K'*K)+lam*(D'*D))\(K'*y)`.
-
-### Local helper functions
-
-- Line 49: `grumble()` — `function grumble(K,D,y,lam)`.
-  - Representative operation: `if (~isnumeric(K))||(~isnumeric(D))|| (~isnumeric(y))||(~isnumeric(lam))`.
-  - Representative operation: `(~isnumeric(y))||(~isnumeric(lam))`.
-
 ## Parameters / inputs
 
 - K -kernel matrix, may be complex, may be non-square

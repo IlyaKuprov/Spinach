@@ -17,30 +17,6 @@ Packs multipole moments from a linear stream into a cell array that is arranged 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 33-34: Check consistency; implemented by `grumble(ranks,moments)`.
-- Lines 36-37: Set the cell array dimensions; implemented by `Ilm=cell(size(ranks))`.
-- Lines 39-40: Unpack the ranks; implemented by `current_position=0`.
-
-### Control flow inferred from the code
-
-- Line 41: `for` loop over `k=1:numel(ranks)`.
-
-### Key state/data transformations
-
-- Lines 37: computes `Ilm` using `Ilm=cell(size(ranks))`.
-- Lines 40: computes `current_position` using `current_position=0`.
-- Lines 42: computes `Ilm{k}` using `Ilm{k}=moments((current_position+1):(current_position+2*ranks(k)+1))`.
-
-### Local helper functions
-
-- Line 49: `grumble()` — `function grumble(ranks,moments)`.
-  - Representative operation: `if (~isnumeric(ranks))||(~isreal(ranks))|| (~isrow(ranks))||any(mod(ranks,1)~=0)|| (numel(unique(ranks))~=numel(ranks))||any(ranks<0)`.
-  - Representative operation: `(~isrow(ranks))||any(mod(ranks,1)~=0)|| (numel(unique(ranks))~=numel(ranks))||any(ranks<0)`.
-
 ## Parameters / inputs
 
 - ranks -a vector of spherical ranks present, e.g. [0 1 2]

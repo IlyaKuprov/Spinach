@@ -18,26 +18,6 @@ Returns the image painted within the Fokker-Planck vector by the user-specified 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 25-26: Check consistency; implemented by `grumble(rho,coil,dims)`.
-- Lines 28-29: Expose the spin dimension; implemented by `rho=reshape(rho,[numel(coil) prod(dims)])`.
-- Lines 31-32: Compute the observable; implemented by `phan=coil'*rho`.
-- Lines 34-35: Reshape as needed; implemented by `phan=reshape(phan,dims)`.
-
-### Key state/data transformations
-
-- Lines 29: computes `rho` using `rho=reshape(rho,[numel(coil) prod(dims)])`.
-- Lines 32: computes `phan` using `phan=coil'*rho`.
-
-### Local helper functions
-
-- Line 40: `grumble()` — `function grumble(rho,coil,dims)`.
-  - Representative operation: `if (~isnumeric(rho))||(size(rho,2)~=1)`.
-  - Representative operation: `error('rho must be a column vector.')`.
-
 ## Parameters / inputs
 
 - rho -state vector in Fokker-Planck space

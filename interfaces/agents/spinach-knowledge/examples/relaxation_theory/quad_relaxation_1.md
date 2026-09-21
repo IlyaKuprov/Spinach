@@ -18,38 +18,6 @@
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 11-12: System specification; implemented by `sys.magnet=14.1`.
-- Lines 15-16: Spin quantum number and quadrupolar tensor; implemented by `[~,s_mult]=spin(sys.isotopes{1}); s_qnum=(s_mult-1)/2`.
-- Lines 19-20: Relaxation theory; implemented by `inter.relaxation={'redfield'}`.
-- Lines 25-26: Basis set; implemented by `bas.formalism='sphten-liouv'`.
-- Lines 29-30: Spinach housekeeping; implemented by `spin_system=create(sys,inter)`.
-- Lines 33-34: Relaxation superoperator; implemented by `R=relaxation(spin_system)`.
-- Lines 36-37: Textbook relaxation rate expressions; implemented by `[r1,r2]=rlx_nqi(s_qnum,14.1*spin(sys.isotopes{1}),1.18e6,0.53,1e-9)`.
-- Lines 39-40: States of interest; implemented by `Lz=state(spin_system,'Lz',1)`.
-- Lines 44-45: Print the answers; implemented by `disp([sys.isotopes{1} ' longitudinal relaxation rate, Spinach: ' num2str(-Lz'*R*Lz)])`.
-
-### Key state/data transformations
-
-- Lines 12: computes `sys.magnet` using `sys.magnet=14.1`.
-- Lines 13: computes `sys.isotopes` using `sys.isotopes={'14N'}`.
-- Lines 16: computes `[~,s_mult]` using `[~,s_mult]=spin(sys.isotopes{1}); s_qnum=(s_mult-1)/2`.
-- Lines 17: computes `inter.coupling.matrix{1,1}` using `inter.coupling.matrix{1,1}=eeqq2nqi(1.18e6,0.53,s_qnum,[0 0 0])`.
-- Lines 20: computes `inter.relaxation` using `inter.relaxation={'redfield'}`.
-- Lines 21: computes `inter.equilibrium` using `inter.equilibrium='zero'`.
-- Lines 22: computes `inter.rlx_keep` using `inter.rlx_keep='labframe'`.
-- Lines 23: computes `inter.tau_c` using `inter.tau_c={1e-9}`.
-- Lines 26: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
-- Lines 27: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 30: computes `spin_system` using `spin_system=create(sys,inter)`.
-- Lines 34: computes `R` using `R=relaxation(spin_system)`.
-- Lines 37: computes `[r1,r2]` using `[r1,r2]=rlx_nqi(s_qnum,14.1*spin(sys.isotopes{1}),1.18e6,0.53,1e-9)`.
-- Lines 40: computes `Lz` using `Lz=state(spin_system,'Lz',1)`.
-- Lines 41: computes `Lp` using `Lp=state(spin_system,'L+',1)`.
-
 ## Implementation structure
 
 - 14N quadrupolar relaxation in glycine in liquid state. The

@@ -16,29 +16,6 @@ Hyperbolic secant pulse in Cartesian and amplitude-phase representation. Syntax:
 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 48-49: Check consistency; implemented by `grumble(peak_amp,freq_mod,phase_mod,dur,npts)`.
-- Lines 51-52: Get the time grid, t=0 is centre; implemented by `time_grid=linspace(-dur/2,dur/2,npts)`.
-- Lines 54-55: Get the amplitudes; implemented by `amps=peak_amp*sech(freq_mod*time_grid)`.
-- Lines 57-58: Get the phases (phi=0 at t=0); implemented by `phis=phase_mod*log(cosh(freq_mod*time_grid))`.
-- Lines 60-61: Convert into Cartesians; implemented by `[Cx,Cy]=polar2cartesian(amps,phis)`.
-
-### Key state/data transformations
-
-- Lines 52: computes `time_grid` using `time_grid=linspace(-dur/2,dur/2,npts)`.
-- Lines 55: computes `amps` using `amps=peak_amp*sech(freq_mod*time_grid)`.
-- Lines 58: computes `phis` using `phis=phase_mod*log(cosh(freq_mod*time_grid))`.
-- Lines 61: computes `[Cx,Cy]` using `[Cx,Cy]=polar2cartesian(amps,phis)`.
-
-### Local helper functions
-
-- Line 66: `grumble()` — `function grumble(peak_amp,freq_mod,phase_mod,dur,npts)`.
-  - Representative operation: `if (~isnumeric(peak_amp))||(~isreal(peak_amp))||(~isscalar(peak_amp))`.
-  - Representative operation: `error('peak_amp must be a real scalar.')`.
-
 ## Parameters / inputs
 
 - peak_amp -peak amplitude, rad/s

@@ -14,21 +14,6 @@ A shorthand for inflating cell arrays of polyadics; this inflates every componen
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Inflate element by element; implemented by `for n=1:numel(A)`.
-
-### Control flow inferred from the code
-
-- Line 21: `for` loop over `n=1:numel(A)`.
-
-### Key state/data transformations
-
-- Lines 22: computes `A{n}` using `A{n}=inflate(A{n})`.
-
 ## Parameters / inputs
 
 - A -a cell array of polyadics

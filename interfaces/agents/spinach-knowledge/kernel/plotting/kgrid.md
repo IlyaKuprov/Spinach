@@ -14,13 +14,6 @@ A replacement for the 'grid' command in Matlab that produces grey (rather than b
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 11-12: Publisher-friendly grid settings; implemented by `box on; grid on`.
-
 ## Implementation structure
 
 - A replacement for the 'grid' command in Matlab that

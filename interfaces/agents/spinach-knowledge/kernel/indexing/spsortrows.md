@@ -17,23 +17,6 @@ Sparse matrix row-sorting permutation utility. Syntax: idx=spsortrows(A)
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Check consistency; implemented by `grumble(A)`.
-- Lines 23-24: Return Matlab reference permutation; implemented by `[~,idx]=sortrows(A)`.
-
-### Key state/data transformations
-
-- Lines 24: computes `[~,idx]` using `[~,idx]=sortrows(A)`.
-
-### Local helper functions
-
-- Line 29: `grumble()` — `function grumble(A)`. Nihilistic Password Security Questions What is the name of your least favorite child?
-  - Representative operation: `if (~isnumeric(A))||(~issparse(A))||(~isreal(A))|| (~isa(A,'double'))||(~ismatrix(A))`.
-  - Representative operation: `(~isa(A,'double'))||(~ismatrix(A))`.
-
 ## Parameters / inputs
 
 - A -sparse real double matrix

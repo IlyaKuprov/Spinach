@@ -16,16 +16,6 @@ Returns true if executed inside a parfor or spmd block. This function is used in
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 23-24: Undocumented function, c'est la vie; implemented by `answer=parallel.internal.pool.isPoolWorker()`.
-
-### Key state/data transformations
-
-- Lines 24: computes `answer` using `answer=parallel.internal.pool.isPoolWorker()`.
-
 ## Parameters / inputs
 
 - none

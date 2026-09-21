@@ -16,22 +16,6 @@ Returns the current parallel pool size. Syntax: n=poolsize()
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 23-24: Get the pool handle; implemented by `p=gcp('nocreate')`.
-- Lines 26-27: Query the pool; implemented by `if isempty(p)`.
-
-### Control flow inferred from the code
-
-- Line 27: conditional branch on `isempty(p)`.
-
-### Key state/data transformations
-
-- Lines 24: computes `p` using `p=gcp('nocreate')`.
-- Lines 28: computes `n` using `n=0`.
-
 ## Parameters / inputs
 
 - none

@@ -14,23 +14,6 @@ Divides a tensor train object by a scalar. Syntax: c=rdivide(a,b)
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 22-23: Division of tensor train by a scalar; implemented by `if isa(a,'ttclass')&&isscalar(b)`.
-- Lines 25-26: Divide the coefficients and update the tolerances; implemented by `a.coeff=a.coeff/b; a.tolerance=a.tolerance/abs(b)`.
-- Lines 30-31: Complain and bomb out; implemented by `error('the first argument must be a tensor train and the second one a scalar.')`.
-
-### Control flow inferred from the code
-
-- Line 23: conditional branch on `isa(a,'ttclass')&&isscalar(b)`.
-
-### Key state/data transformations
-
-- Lines 26: computes `a.coeff` using `a.coeff=a.coeff/b; a.tolerance=a.tolerance/abs(b)`.
-
 ## Parameters / inputs
 
 - a -a ttclass object

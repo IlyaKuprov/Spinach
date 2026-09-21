@@ -18,30 +18,6 @@ Signal heterodyne from wall clock time into the rotating frame using analytic si
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 37-38: Check consistency; implemented by `grumble(dt,signal,freq)`.
-- Lines 40-41: Build time grid; implemented by `time_grid=dt*((1:numel(signal))'-1)`.
-- Lines 43-44: One-sided spectral mask, DC and Nyquist bins dropped; implemented by `mask=zeros(numel(signal),1)`.
-- Lines 47-48: Demodulate the analytic signal into the rotating frame; implemented by `signal=ifft(mask.*fft(signal)).*exp(-2i*pi*freq*time_grid)`.
-- Lines 50-51: In-phase and out-of-phase components; implemented by `X=real(signal); Y=-imag(signal)`.
-
-### Key state/data transformations
-
-- Lines 41: computes `time_grid` using `time_grid=dt*((1:numel(signal))'-1)`.
-- Lines 44: computes `mask` using `mask=zeros(numel(signal),1)`.
-- Lines 45: computes `mask(2:ceil(numel(signal)/2))` using `mask(2:ceil(numel(signal)/2))=2`.
-- Lines 48: computes `signal` using `signal=ifft(mask.*fft(signal)).*exp(-2i*pi*freq*time_grid)`.
-- Lines 51: computes `X` using `X=real(signal); Y=-imag(signal)`.
-
-### Local helper functions
-
-- Line 56: `grumble()` — `function grumble(dt,signal,freq)`.
-  - Representative operation: `if (~isnumeric(dt))||(~isreal(dt))||(~isscalar(dt))|| (~isfinite(dt))||(dt<=0)`.
-  - Representative operation: `(~isfinite(dt))||(dt<=0)`.
-
 ## Parameters / inputs
 
 - dt -time step in the input data, seconds

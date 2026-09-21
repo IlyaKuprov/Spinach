@@ -17,43 +17,6 @@ Powder-averaged two-pulse ESEEM on a 14N nitroxide radical. Time-domain simulati
 
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 13-14: Magnet field; implemented by `sys.magnet=0.3249`.
-- Lines 16-17: System specification; implemented by `sys.isotopes={'14N','E'}`.
-- Lines 25-26: Basis set; implemented by `bas.formalism='sphten-liouv'`.
-- Lines 29-30: Disable trajectory-level SSR algorithms; implemented by `sys.disable={'trajlevel'}`.
-- Lines 32-33: Spinach housekeeping; implemented by `spin_system=create(sys,inter)`.
-- Lines 36-37: Set the sequence parameters; implemented by `parameters.spins={'E'}`.
-- Lines 48-49: Simulation; implemented by `fid=powder(spin_system,@eseem,parameters,'esr')`.
-- Lines 51-52: Run apodization; implemented by `fid=apodisation(spin_system,mean(fid)-fid,{{'exp',5}})`.
-- Lines 54-55: Run Fourier transform; implemented by `spectrum=fftshift(fft(fid,parameters.zerofill))`.
-- Lines 57-58: Plot the time domain signal; implemented by `kfigure(); subplot(2,1,1)`.
-- Lines 62-63: Plot the spectrum; implemented by `subplot(2,1,2)`.
-
-### Key state/data transformations
-
-- Lines 14: computes `sys.magnet` using `sys.magnet=0.3249`.
-- Lines 17: computes `sys.isotopes` using `sys.isotopes={'14N','E'}`.
-- Lines 18: computes `inter.coupling.eigs` using `inter.coupling.eigs=cell(2,2)`.
-- Lines 19: computes `inter.coupling.euler` using `inter.coupling.euler=cell(2,2)`.
-- Lines 20: computes `inter.coupling.eigs{1,1}` using `inter.coupling.eigs{1,1}=[-0.4 -1.6 +2.0]*1e5`.
-- Lines 21: computes `inter.coupling.eigs{1,2}` using `inter.coupling.eigs{1,2}=[2.0 2.0 2.0]*1e6`.
-- Lines 22: computes `inter.coupling.euler{1,1}` using `inter.coupling.euler{1,1}=[0 0 0]`.
-- Lines 23: computes `inter.coupling.euler{1,2}` using `inter.coupling.euler{1,2}=[0 0 0]`.
-- Lines 26: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
-- Lines 27: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 30: computes `sys.disable` using `sys.disable={'trajlevel'}`.
-- Lines 33: computes `spin_system` using `spin_system=create(sys,inter)`.
-- Lines 37: computes `parameters.spins` using `parameters.spins={'E'}`.
-- Lines 38: computes `parameters.rho0` using `parameters.rho0=state(spin_system,'Lz','E')`.
-- Lines 39: computes `parameters.coil` using `parameters.coil=state(spin_system,'L+','E')`.
-- Lines 40: computes `parameters.screen` using `parameters.screen=state(spin_system,'L-','E')`.
-- Lines 41: computes `parameters.pulse_op` using `parameters.pulse_op=operator(spin_system,'Ly','E')`.
-- Lines 42: computes `parameters.offset` using `parameters.offset=0`.
-
 ## Implementation structure
 
 - Powder-averaged two-pulse ESEEM on a 14N nitroxide radical. Time-domain

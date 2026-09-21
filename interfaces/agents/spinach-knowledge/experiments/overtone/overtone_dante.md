@@ -20,47 +20,6 @@ Overtone DANTE experiment with frequency-domain acquisition.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 56-57: Check consistency; implemented by `grumble(parameters,H,R,K)`.
-- Lines 59-60: Get the overtone frequency; implemented by `ovt_frq=-2*spin(parameters.spins{1})*spin_system.inter.magnet/(2*pi)`.
-- Lines 62-63: Project pulse operators; implemented by `Lx=kron(speye(parameters.spc_dim),parameters.Lx)`.
-- Lines 65-66: Timing parameters; implemented by `rotor_period=abs(1/parameters.rate)`.
-- Lines 69-70: Bomb out if the schedule makes no sense; implemented by `if (cycle_length-parameters.pulse_dur)<0`.
-- Lines 74-75: Get the pulse frequency; implemented by `omega=2*pi*ovt_frq-2*pi*parameters.rf_frq`.
-- Lines 77-78: Get the pulse Hamiltonian; implemented by `pulseop=parameters.pulse_amp*Lx`.
-- Lines 81-82: Precompute pulse propagator; implemented by `PP=propagator(spin_system,pulseop,parameters.pulse_dur)`.
-- Lines 84-85: Precompute evolution propagator; implemented by `PE=propagator(spin_system,H,cycle_length-parameters.pulse_dur)`.
-- Lines 87-88: Combine the propagators; implemented by `P=clean_up(spin_system,PE*PP,spin_system.tols.prop_chop)`.
-- Lines 90-92: Apply the DANTE pulse train; implemented by `parameters.rho0=multiprop(spin_system,P,parameters.rho0, parameters.n_periods*parameters.pulse_num)`.
-- Lines 94-95: Call the acquisition; implemented by `spectrum=overtone_a(spin_system,parameters,H,R,K)`.
-
-### Control flow inferred from the code
-
-- Line 70: conditional branch on `(cycle_length-parameters.pulse_dur)<0`.
-
-### Key state/data transformations
-
-- Lines 60: computes `ovt_frq` using `ovt_frq=-2*spin(parameters.spins{1})*spin_system.inter.magnet/(2*pi)`.
-- Lines 63: computes `Lx` using `Lx=kron(speye(parameters.spc_dim),parameters.Lx)`.
-- Lines 66: computes `rotor_period` using `rotor_period=abs(1/parameters.rate)`.
-- Lines 67: computes `cycle_length` using `cycle_length=rotor_period/parameters.pulse_num`.
-- Lines 75: computes `omega` using `omega=2*pi*ovt_frq-2*pi*parameters.rf_frq`.
-- Lines 78: computes `pulseop` using `pulseop=parameters.pulse_amp*Lx`.
-- Lines 82: computes `PP` using `PP=propagator(spin_system,pulseop,parameters.pulse_dur)`.
-- Lines 85: computes `PE` using `PE=propagator(spin_system,H,cycle_length-parameters.pulse_dur)`.
-- Lines 88: computes `P` using `P=clean_up(spin_system,PE*PP,spin_system.tols.prop_chop)`.
-- Lines 91-92: computes `parameters.rho0` using `parameters.rho0=multiprop(spin_system,P,parameters.rho0, parameters.n_periods*parameters.pulse_num)`.
-- Lines 95: computes `spectrum` using `spectrum=overtone_a(spin_system,parameters,H,R,K)`.
-
-### Local helper functions
-
-- Line 100: `grumble()` — `function grumble(parameters,H,R,K)`.
-  - Representative operation: `if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))|| (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))`.
-  - Representative operation: `(~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))`.
-
 ## Syntax
 
 ```matlab

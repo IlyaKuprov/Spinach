@@ -17,19 +17,6 @@ House style settings for Matlab figures; a product of much experience with acade
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 22-23: Check consistency; implemented by `grumble(x)`.
-- Lines 25-26: Bold title rendered by LaTeX; implemented by `sgtitle(['\textbf{' x '}'],'Interpreter','latex')`.
-
-### Local helper functions
-
-- Line 31: `grumble()` — `function grumble(x)`. "There is considerable overlap between the intelligence of the smartest bears and the dumbest tourists."
-  - Representative operation: `if ~ischar(x)`.
-  - Representative operation: `error('x must be a character string')`.
-
 ## Parameters / inputs
 
 - x -a character string

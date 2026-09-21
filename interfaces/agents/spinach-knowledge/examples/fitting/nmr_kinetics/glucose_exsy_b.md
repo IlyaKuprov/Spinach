@@ -19,29 +19,6 @@ Fitting of 3,3-difluoroglucose NOESY with respect to the reaction rates in a che
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
 - The file also defines local helper function(s): `exsy_err()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 14-15: Get a figure going; implemented by `kfigure(); scale_figure([1.75 1.00])`.
-- Lines 17-21: Set the initial guess; implemented by `guess=[ 0.2331 0.1114 6.8446 0.1210 0.1423 0.1205 0.1697 0.0755 0.1158 0.0936 0.1256 26.9142 18.7751 25.5476 0.7948 0.4331 -9.0277 -9.2828 1.1924 32.9179]`.
-- Lines 23-25: Set optimiser options; implemented by `options=optimset('Display','iter','MaxIter',10, 'MaxFunEvals',Inf,'UseParallel',true)`.
-- Lines 27-28: Run the optimisation; implemented by `answer=fminsearch(@exsy_err,guess,options)`.
-- Lines 30-31: Display the result; implemented by `disp(answer)`.
-- Lines 33-34: Save figure; implemented by `savefig(gcf,'glucose_exsy_b.fig')`.
-
-### Key state/data transformations
-
-- Lines 18-21: computes `guess` using `guess=[ 0.2331 0.1114 6.8446 0.1210 0.1423 0.1205 0.1697 0.0755 0.1158 0.0936 0.1256 26.9142 18.7751 25.5476 0.7948 0.4331 -9.0277 -9.2828 1.1924 32.9179]`.
-- Lines 24-25: computes `options` using `options=optimset('Display','iter','MaxIter',10, 'MaxFunEvals',Inf,'UseParallel',true)`.
-- Lines 28: computes `answer` using `answer=fminsearch(@exsy_err,guess,options)`.
-
-### Local helper functions
-
-- Line 38: `exsy_err()` — `function err=exsy_err(params)`. Hush up Spinach
-  - Representative operation: `sys.output='hush'`.
-  - Representative operation: `sys.disable={'hygiene'}`.
-
 ## Implementation structure
 
 - Fitting of 3,3-difluoroglucose NOESY with respect to the reaction

@@ -18,28 +18,6 @@ Converts the Josephson and charging energies of a transmon into the Duffing osci
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 41-42: Check consistency; implemented by `grumble(ej,ec)`.
-- Lines 44-45: Warn outside the transmon regime; implemented by `if any(ej./ec<20,'all')`.
-- Lines 49-50: Run the conversion; implemented by `frq=sqrt(8*ej.*ec)-ec; anharm=-ec`.
-
-### Control flow inferred from the code
-
-- Line 45: conditional branch on `any(ej./ec<20,'all')`.
-
-### Key state/data transformations
-
-- Lines 50: computes `frq` using `frq=sqrt(8*ej.*ec)-ec; anharm=-ec`.
-
-### Local helper functions
-
-- Line 55: `grumble()` — `function grumble(ej,ec)`.
-  - Representative operation: `if (~isnumeric(ej))||(~isreal(ej))||any(~isfinite(ej),'all')||any(ej<=0,'all')`.
-  - Representative operation: `error('ej must be an array of positive real numbers.')`.
-
 ## Syntax
 
 ```matlab

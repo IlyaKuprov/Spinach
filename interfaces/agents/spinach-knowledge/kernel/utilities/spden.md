@@ -18,25 +18,6 @@ Lorentzian spectral density function for rotational diffusion at the user-specif
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 25-26: Check consistency; implemented by `grumble(L,D,omega)`.
-- Lines 28-29: Get the correlation time; implemented by `tau_c=1/(L*(L+1)*D)`.
-- Lines 31-32: Get the spectral density; implemented by `J=(tau_c/(2*L+1))/(1+(tau_c*omega)^2)`.
-
-### Key state/data transformations
-
-- Lines 29: computes `tau_c` using `tau_c=1/(L*(L+1)*D)`.
-- Lines 32: computes `J` using `J=(tau_c/(2*L+1))/(1+(tau_c*omega)^2)`.
-
-### Local helper functions
-
-- Line 37: `grumble()` — `function grumble(L,D,omega)`.
-  - Representative operation: `if (~isnumeric(L))||(~isscalar(L))|| (~isreal(L))||(L<1)||(mod(L,1)~=0)`.
-  - Representative operation: `(~isreal(L))||(L<1)||(mod(L,1)~=0)`.
-
 ## Parameters / inputs
 
 - L -spherical rank, use 2 for common NMR

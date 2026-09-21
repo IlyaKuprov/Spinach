@@ -14,29 +14,6 @@ Kronecker products involving an OPIUM object. Syntax: c=kron(a,b)
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: When both are opia; implemented by `if isa(a,'opium')&&isa(b,'opium')`.
-- Lines 23-24: Return a bigger opium; implemented by `c=opium(a.dim*b.dim,a.coeff*b.coeff); return`.
-- Lines 28-29: When A is an opium; implemented by `if isa(a,'opium')`.
-- Lines 31-32: Inflate and do the kron; implemented by `c=kron(a.coeff*speye(a.dim),b); return`.
-- Lines 36-37: When B is an opium; implemented by `if isa(b,'opium')`.
-- Lines 39-40: Inflate and do the kron; implemented by `c=kron(a,b.coeff*speye(b.dim)); return`.
-- Lines 44-45: Complain and bomb out; implemented by `error('operands must be either numeric or opium objects.')`.
-
-### Control flow inferred from the code
-
-- Line 21: conditional branch on `isa(a,'opium')&&isa(b,'opium')`.
-- Line 29: conditional branch on `isa(a,'opium')`.
-- Line 37: conditional branch on `isa(b,'opium')`.
-
-### Key state/data transformations
-
-- Lines 24: computes `c` using `c=opium(a.dim*b.dim,a.coeff*b.coeff); return`.
-
 ## Parameters / inputs
 
 - a,b -Kronecker operands, can be

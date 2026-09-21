@@ -17,23 +17,6 @@ Converts offset-sweep-npoints specification into axis ticks in Hz. The function 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 25-26: Check consistency; implemented by `grumble(offs,sweep,npoints)`.
-- Lines 28-29: Build the axis; implemented by `axis_hz=-linspace(-sweep/2,sweep/2,npoints)'+offs`.
-
-### Key state/data transformations
-
-- Lines 29: computes `axis_hz` using `axis_hz=-linspace(-sweep/2,sweep/2,npoints)'+offs`.
-
-### Local helper functions
-
-- Line 34: `grumble()` — `function grumble(offs,sweep,npoints)`.
-  - Representative operation: `if (~isnumeric(offs))||(~isreal(offs))||(~isscalar(offs))`.
-  - Representative operation: `error('offset must be a real scalar.')`.
-
 ## Parameters / inputs
 
 - offs -offset from carrier frequency, Hz

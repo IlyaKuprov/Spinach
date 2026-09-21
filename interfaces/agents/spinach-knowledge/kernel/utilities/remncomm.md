@@ -17,27 +17,6 @@ Removes from the Hermitian operator A the part that does not com- mute with the 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 30-31: Check consistency; implemented by `grumble(A,EvecB,EvalB)`.
-- Lines 33-34: Move A into the eigenbasis of B; implemented by `A=EvecB'*A*EvecB`.
-- Lines 36-38: Zero out elements linking eigenvalues of B that differ by more than eigensolver roundoff; implemented by `degen_mask=abs(EvalB-EvalB.')<=100*numel(EvalB)*eps(max(EvalB)-min(EvalB)); A=A.*degen_mask`.
-- Lines 40-41: Move the commuting part back into the original basis; implemented by `A=EvecB*A*EvecB'`.
-
-### Key state/data transformations
-
-- Lines 34: computes `A` using `A=EvecB'*A*EvecB`.
-- Lines 37: computes `degen_mask` using `degen_mask=abs(EvalB-EvalB.')<=100*numel(EvalB)*eps(max(EvalB)-min(EvalB))`.
-- Lines 41: computes `A` using `A=EvecB*A*EvecB'`.
-
-### Local helper functions
-
-- Line 46: `grumble()` — `function grumble(A,EvecB,EvalB)`. The first scientific measurement of the speed of electricity was conducted in 1764 by French physicist Jean-Antoine Nollet. He ar-
-  - Representative operation: `if (~isnumeric(A))||(size(A,1)~=size(A,2))|| (~ishermitian(A))`.
-  - Representative operation: `(~ishermitian(A))`.
-
 ## Parameters / inputs
 
 - A -a square matrix

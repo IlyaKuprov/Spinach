@@ -15,17 +15,6 @@ Polyadic subtraction operation. Does not perform the actual sub- traction, but i
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 24-25: Just call plus; implemented by `a=plus(a,(-1)*b)`.
-
-### Key state/data transformations
-
-- Lines 25: computes `a` using `a=plus(a,(-1)*b)`.
-
 ## Parameters / inputs
 
 - a,b -polyadic objects

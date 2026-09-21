@@ -18,38 +18,6 @@ Modifies the relaxation superoperator to drive the system to the user- specified
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 47-48: Check consistency; implemented by `grumble(spin_system,R,HLSPS,T,rho_eq,method)`.
-- Lines 50-51: Choose the method; implemented by `switch method`.
-- Lines 55-56: This is formalism-dependent; implemented by `switch spin_system.bas.formalism`.
-- Lines 60-61: Unit state has unit population of T(0,0) state; implemented by `U=sparse(1,1,1,size(R,2),1)`.
-- Lines 65-66: Unit state is a stretched unit matrix; implemented by `U=speye(prod(spin_system.comp.mults)); U=U(:)`.
-- Lines 70-71: Complain and bomb out; implemented by `error('this function is only available in Liouville space.')`.
-- Lines 75-76: Apply IME correction; implemented by `R=R-kron(U',R*rho_eq)`.
-- Lines 80-81: Get the temperature factor; implemented by `beta=spin_system.tols.hbar/(spin_system.tols.kbol*T)`.
-- Lines 83-84: Modify the relaxation superoperator; implemented by `R=R*propagator(spin_system,HLSPS,1i*beta)`.
-- Lines 88-89: Complain and bomb out; implemented by `error('unknown thermalization method.')`.
-
-### Control flow inferred from the code
-
-- Line 51: dispatches on `method`; cases `'IME'`, `'sphten-liouv'`, `'zeeman-liouv'`.
-- Line 56: dispatches on `spin_system.bas.formalism`; cases `'sphten-liouv'`, `'zeeman-liouv'`.
-
-### Key state/data transformations
-
-- Lines 61: computes `U` using `U=sparse(1,1,1,size(R,2),1)`.
-- Lines 76: computes `R` using `R=R-kron(U',R*rho_eq)`.
-- Lines 81: computes `beta` using `beta=spin_system.tols.hbar/(spin_system.tols.kbol*T)`.
-
-### Local helper functions
-
-- Line 96: `grumble()` — `function grumble(spin_system,R,HLSPS,T,rho_eq,method)`.
-  - Representative operation: `if (~isnumeric(R))||(size(R,1)~=size(R,2))`.
-  - Representative operation: `error('R must be a square matrix.')`.
-
 ## Parameters / inputs
 
 - R -symmetric negative definite relaxation super-

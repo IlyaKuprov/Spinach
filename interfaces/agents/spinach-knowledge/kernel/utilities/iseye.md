@@ -17,35 +17,6 @@ Returns true for unit matrices. The test is designed to be computationally affor
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Check consistency; implemented by `grumble(M)`.
-- Lines 23-24: Run the checks; implemented by `if size(M,1)~=size(M,2)`.
-- Lines 26-27: Not even square; implemented by `verdict=false()`.
-- Lines 31-32: Not even diagonal; implemented by `verdict=false()`.
-- Lines 36-37: Test vector; implemented by `a=randn(size(M,2),1)`.
-- Lines 39-40: Compare with unit; implemented by `if nnz(M*a-a)~=0`.
-- Lines 42-43: Test failed; implemented by `verdict=false()`.
-- Lines 47-48: Actually unit; implemented by `verdict=true()`.
-
-### Control flow inferred from the code
-
-- Line 24: conditional branch on `size(M,1)~=size(M,2)`.
-- Line 40: conditional branch on `nnz(M*a-a)~=0`.
-
-### Key state/data transformations
-
-- Lines 27: computes `verdict` using `verdict=false()`.
-- Lines 37: computes `a` using `a=randn(size(M,2),1)`.
-
-### Local helper functions
-
-- Line 57: `grumble()` — `function grumble(M)`. Some candidates also reproduced an unnecessary derivation of the quantum Hall effect, the question having clearly set off
-  - Representative operation: `if ~isnumeric(M)`.
-  - Representative operation: `error('M must be numeric.')`.
-
 ## Parameters / inputs
 
 - M -a matrix

@@ -18,43 +18,6 @@
 
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 12-14: Spin system properties (PCM DFT calculation); implemented by `[sys,inter]=g2spinach(gparse('../standard_systems/alanine.log'), {{'C','13C'},{'N','15N'}},[182.1 264.5],[])`.
-- Lines 15-16: Magnet field; implemented by `sys.magnet=14.1`.
-- Lines 18-19: Basis set; implemented by `bas.formalism='sphten-liouv'`.
-- Lines 24-25: Algorithmic options; implemented by `sys.tols.inter_cutoff=5.0`.
-- Lines 28-31: sys.enable={'gpu'};; implemented by `spin_system=create(sys,inter)`.
-- Lines 30-31: Spinach housekeeping; implemented by `spin_system=create(sys,inter)`.
-- Lines 34-35: Experiment setup; implemented by `parameters.axis=[1 1 1]`.
-- Lines 50-51: Simulation; implemented by `fid=gridfree(spin_system,@acquire,parameters,'nmr')`.
-- Lines 53-54: Apodisation; implemented by `fid=apodisation(spin_system,fid,{{'exp',6}})`.
-- Lines 56-57: Fourier transform; implemented by `spectrum=fftshift(fft(fid,parameters.zerofill))`.
-- Lines 59-60: Plotting; implemented by `kfigure(); plot_1d(spin_system,real(spectrum),parameters)`.
-
-### Key state/data transformations
-
-- Lines 13-14: computes `[sys,inter]` using `[sys,inter]=g2spinach(gparse('../standard_systems/alanine.log'), {{'C','13C'},{'N','15N'}},[182.1 264.5],[])`.
-- Lines 16: computes `sys.magnet` using `sys.magnet=14.1`.
-- Lines 19: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
-- Lines 20: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 21: computes `bas.longitudinal` using `bas.longitudinal={{'15N'}}`.
-- Lines 22: computes `bas.projections` using `bas.projections={+1}`.
-- Lines 25: computes `sys.tols.inter_cutoff` using `sys.tols.inter_cutoff=5.0`.
-- Lines 26: computes `sys.tols.prox_cutoff` using `sys.tols.prox_cutoff=4.0`.
-- Lines 27: computes `sys.disable` using `sys.disable={'trajlevel'}`.
-- Lines 31: computes `spin_system` using `spin_system=create(sys,inter)`.
-- Lines 35: computes `parameters.axis` using `parameters.axis=[1 1 1]`.
-- Lines 36: computes `parameters.max_rank` using `parameters.max_rank=17`.
-- Lines 37: computes `parameters.rate` using `parameters.rate=2000`.
-- Lines 38: computes `parameters.sweep` using `parameters.sweep=5e4`.
-- Lines 39: computes `parameters.npoints` using `parameters.npoints=256`.
-- Lines 40: computes `parameters.zerofill` using `parameters.zerofill=1024`.
-- Lines 41: computes `parameters.offset` using `parameters.offset=15000`.
-- Lines 42: computes `parameters.spins` using `parameters.spins={'13C'}`.
-
 ## Implementation structure
 
 - 13C MAS spectrum of alanine powder (assuming decoupling of 1H),

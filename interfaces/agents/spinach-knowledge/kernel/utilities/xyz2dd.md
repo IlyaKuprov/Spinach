@@ -18,39 +18,6 @@ Converts coordinate specification of the dipolar interaction into the dipolar in
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 39-40: Check consistency; implemented by `grumble(r1,r2,isotope1,isotope2)`.
-- Lines 42-43: Fundamental constants; implemented by `hbar=1.054571628e-34; mu0=4*pi*1e-7`.
-- Lines 45-46: Get the distance; implemented by `distance=norm(r2-r1,2)`.
-- Lines 48-49: Get the ort; implemented by `ort=(r2-r1)/distance`.
-- Lines 51-52: Get the dipolar interaction constant; implemented by `d=spin(isotope1)*spin(isotope2)*hbar*mu0/(4*pi*(distance*1e-10)^3)`.
-- Lines 54-55: Get the Euler angles; implemented by `[alp,bet,~]=cart2sph(ort(1),ort(2),ort(3)); bet=pi/2-bet; gam=0`.
-- Lines 57-58: Compute the matrix if needed; implemented by `if nargout>4`.
-- Lines 60-61: Get the dipolar coupling matrix; implemented by `M=d*[1-3*ort(1)*ort(1) -3*ort(1)*ort(2) -3*ort(1)*ort(3)`.
-- Lines 65-66: Clean up rounding errors; implemented by `M=(M+M')/2; M=M-eye(3)*trace(M)/3`.
-
-### Control flow inferred from the code
-
-- Line 58: conditional branch on `nargout>4`.
-
-### Key state/data transformations
-
-- Lines 43: computes `hbar` using `hbar=1.054571628e-34; mu0=4*pi*1e-7`.
-- Lines 46: computes `distance` using `distance=norm(r2-r1,2)`.
-- Lines 49: computes `ort` using `ort=(r2-r1)/distance`.
-- Lines 52: computes `d` using `d=spin(isotope1)*spin(isotope2)*hbar*mu0/(4*pi*(distance*1e-10)^3)`.
-- Lines 55: computes `[alp,bet,~]` using `[alp,bet,~]=cart2sph(ort(1),ort(2),ort(3)); bet=pi/2-bet; gam=0`.
-- Lines 61: computes `M` using `M=d*[1-3*ort(1)*ort(1) -3*ort(1)*ort(2) -3*ort(1)*ort(3)`.
-
-### Local helper functions
-
-- Line 73: `grumble()` — `function grumble(r1,r2,isotope1,isotope2)`.
-  - Representative operation: `if (~isnumeric(r1))||(~isreal(r1))||(numel(r1)~=3)`.
-  - Representative operation: `error('r1 must be a three-element real vector.')`.
-
 ## Parameters / inputs
 
 - r1,2 -3-element vectors of spin coordinates

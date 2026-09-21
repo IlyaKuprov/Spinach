@@ -17,25 +17,6 @@ Irreducible spherical tensor expansion of central transition operators of half-i
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 30-31: Check consistency; implemented by `grumble(mult,type)`.
-- Lines 33-34: Get the CT operator; implemented by `CT_Z=centrans(mult,type)`.
-- Lines 36-37: Run IST expansion; implemented by `[states,coeffs]=oper2ist(CT_Z)`.
-
-### Key state/data transformations
-
-- Lines 34: computes `CT_Z` using `CT_Z=centrans(mult,type)`.
-- Lines 37: computes `[states,coeffs]` using `[states,coeffs]=oper2ist(CT_Z)`.
-
-### Local helper functions
-
-- Line 42: `grumble()` — `function grumble(mult,type)`. A hundred miles is not a detour to a rabid dog.
-  - Representative operation: `if (~isnumeric(mult))||(~isscalar(mult))|| (~isreal(mult))||(mult<2)||(mod(mult,2)~=0)`.
-  - Representative operation: `(~isreal(mult))||(mult<2)||(mod(mult,2)~=0)`.
-
 ## Parameters / inputs
 
 - mult -multipicity of the spin in question, an

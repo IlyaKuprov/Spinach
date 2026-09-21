@@ -14,25 +14,6 @@ Gives Matlab a good smack every time MDCS gets its kni- ckers in a twist. Syntax
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 17-18: Kill the parallel pool; implemented by `delete(gcp('nocreate'))`.
-- Lines 20-21: Clear out crashed jobs; implemented by `myCluster=parcluster('Processes')`.
-- Lines 24-25: Close all handles; implemented by `fclose('all')`.
-- Lines 27-28: Clear the workspace; implemented by `clear('all')`.
-- Lines 30-31: Reset all GPUs; implemented by `for n=1:gpuDeviceCount`.
-
-### Control flow inferred from the code
-
-- Line 31: `for` loop over `n=1:gpuDeviceCount`.
-
-### Key state/data transformations
-
-- Lines 21: computes `myCluster` using `myCluster=parcluster('Processes')`.
-
 ## Implementation structure
 
 - Gives Matlab a good smack every time MDCS gets its kni-

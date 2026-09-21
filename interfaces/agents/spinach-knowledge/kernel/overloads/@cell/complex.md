@@ -14,21 +14,6 @@ A shorthand for making all elements of a cell array complex.
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 19-20: Inflate element by element; implemented by `for n=1:numel(A)`.
-
-### Control flow inferred from the code
-
-- Line 20: `for` loop over `n=1:numel(A)`.
-
-### Key state/data transformations
-
-- Lines 21: computes `A{n}` using `A{n}=complex(A{n})`.
-
 ## Syntax
 
 ```matlab

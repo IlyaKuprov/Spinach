@@ -18,31 +18,6 @@ Applies Bloch-Siegert corrections to Cartesian control pulses. Takes control ope
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 49-50: Check consistency; implemented by `grumble(spin_system,ctrl_opers,ctrl_coefs)`.
-- Lines 52-53: Count the physical channels; implemented by `n_ctrls=numel(ctrl_opers)`.
-- Lines 55-56: Append the response operator channels; implemented by `for n=1:n_ctrls`.
-
-### Control flow inferred from the code
-
-- Line 56: `for` loop over `n=1:n_ctrls`.
-
-### Key state/data transformations
-
-- Lines 46-47: computes `ctrl_coefs]` using `ctrl_coefs]=bloch_siegert(spin_system,ctrl_opers, ctrl_coefs)`.
-- Lines 53: computes `n_ctrls` using `n_ctrls=numel(ctrl_opers)`.
-- Lines 57: computes `ctrl_opers{n_ctrls+n}` using `ctrl_opers{n_ctrls+n}=spin_system.control.resp_ops{n}`.
-- Lines 58: computes `ctrl_coefs{n_ctrls+n}` using `ctrl_coefs{n_ctrls+n}=ctrl_coefs{n}.^2`.
-
-### Local helper functions
-
-- Line 64: `grumble()` — `function grumble(spin_system,ctrl_opers,ctrl_coefs)`.
-  - Representative operation: `if ~isstruct(spin_system)`.
-  - Representative operation: `error('spin_system must be a structure.')`.
-
 ## Parameters / inputs
 
 - spin_system -Spinach spin system object containing the

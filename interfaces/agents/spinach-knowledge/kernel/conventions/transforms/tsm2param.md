@@ -18,38 +18,6 @@ Attempts to convert a traceless symmetric 3x3 interaction matrix into axiality, 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 32-33: Check consistency; implemented by `grumble(M)`.
-- Lines 35-36: Assemble the matrix if needed; implemented by `if numel(M)==5`.
-- Lines 42-43: Diagonalise the matrix; implemented by `[V,D]=eig(M); D=diag(D)`.
-- Lines 45-46: Mehring order eigenvalues; implemented by `[~,IZ]=max(D); [~,IX]=min(D)`.
-- Lines 49-50: Compute the invariants; implemented by `ax=2*D(IZ)-(D(IX)+D(IY))`.
-- Lines 53-54: Compute Euler angles; implemented by `V=V(:,[IX IY IZ])`.
-
-### Control flow inferred from the code
-
-- Line 36: conditional branch on `numel(M)==5`.
-
-### Key state/data transformations
-
-- Lines 37: computes `M` using `M=[M(1) M(2) M(3)`.
-- Lines 43: computes `[V,D]` using `[V,D]=eig(M); D=diag(D)`.
-- Lines 46: computes `[~,IZ]` using `[~,IZ]=max(D); [~,IX]=min(D)`.
-- Lines 47: computes `IY` using `IY=setdiff([1 2 3],[IZ IX])`.
-- Lines 50: computes `ax` using `ax=2*D(IZ)-(D(IX)+D(IY))`.
-- Lines 51: computes `rh` using `rh=D(IY)-D(IX)`.
-- Lines 54: computes `V` using `V=V(:,[IX IY IZ])`.
-- Lines 55: computes `angles` using `angles=dcm2euler(V*det(V))`.
-
-### Local helper functions
-
-- Line 60: `grumble()` — `function grumble(M)`.
-  - Representative operation: `if (~isnumeric(M))||(~isreal(M))`.
-  - Representative operation: `error('M must be a real numeric array.')`.
-
 ## Parameters / inputs
 
 - M -3x3 matrix or its five independent elements in the

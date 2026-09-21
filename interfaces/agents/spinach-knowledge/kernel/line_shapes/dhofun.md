@@ -17,26 +17,6 @@ Normalised damped harmonic oscillator response function in mag- netic resonance 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 38-39: Check consistency; implemented by `grumble(x,nat_freq,fwhm)`.
-- Lines 41-42: The response function only lives at positive frequencies; implemented by `y=zeros(size(x),'like',x); pos_args=(x>0); arg=x(pos_args)`.
-- Lines 44-45: Compute the response in reduced frequency units; implemented by `rel_freq=arg/nat_freq; rel_fwhm=fwhm/nat_freq`.
-
-### Key state/data transformations
-
-- Lines 42: computes `y` using `y=zeros(size(x),'like',x); pos_args=(x>0); arg=x(pos_args)`.
-- Lines 45: computes `rel_freq` using `rel_freq=arg/nat_freq; rel_fwhm=fwhm/nat_freq`.
-- Lines 46-47: computes `y(pos_args)` using `y(pos_args)=(2*rel_fwhm/(pi*nat_freq))*(rel_freq.^2)./ ((rel_freq.^2-1).^2+(rel_fwhm*rel_freq).^2)`.
-
-### Local helper functions
-
-- Line 52: `grumble()` — `function grumble(x,nat_freq,fwhm)`.
-  - Representative operation: `if (~isnumeric(x))||(~isreal(x))`.
-  - Representative operation: `error('x must be an array of real numbers.')`.
-
 ## Parameters / inputs
 
 - x -argument values, a real array of any dimension;

@@ -14,24 +14,6 @@ Forces GPU arithmetic to be turned off even if the user had requested it in sys.
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 1-10: Forces GPU arithmetic to be turned off even if the user had requested it in sys.enable setting; restore previous state using end_disallow_gpu command.; implemented by `user_wanted_gpu=ismember('gpu',spin_system.sys.enable)`.
-- Lines 9-10: Check if GPU is currently enabled; implemented by `user_wanted_gpu=ismember('gpu',spin_system.sys.enable)`.
-- Lines 13-14: Disable GPU if it had been enabled; implemented by `if user_wanted_gpu`.
-
-### Control flow inferred from the code
-
-- Line 14: conditional branch on `user_wanted_gpu`.
-
-### Key state/data transformations
-
-- Lines 10: computes `user_wanted_gpu` using `user_wanted_gpu=ismember('gpu',spin_system.sys.enable)`.
-- Lines 15: computes `spin_system.sys.enable` using `spin_system.sys.enable=setdiff(spin_system.sys.enable,{'gpu'})`.
-
 ## Implementation structure
 
 - Forces GPU arithmetic to be turned off even if the user had

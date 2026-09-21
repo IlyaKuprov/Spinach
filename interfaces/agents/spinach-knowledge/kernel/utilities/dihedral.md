@@ -17,26 +17,6 @@ Computes the dihedral angle between vectors specified by the four sets of atomic
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 31-32: Check consistency; implemented by `grumble(A,B,C,D)`.
-- Lines 34-35: Do the math; implemented by `b1=(B-A)/norm(B-A,2)`.
-
-### Key state/data transformations
-
-- Lines 35: computes `b1` using `b1=(B-A)/norm(B-A,2)`.
-- Lines 36: computes `b2` using `b2=(C-B)/norm(C-B,2)`.
-- Lines 37: computes `b3` using `b3=(D-C)/norm(D-C,2)`.
-- Lines 38-39: computes `phi` using `phi=180*atan2(dot(norm(b2,2)*b1,cross(b2,b3)), dot(cross(b1,b2),cross(b2,b3)))/pi`.
-
-### Local helper functions
-
-- Line 44: `grumble()` — `function grumble(A,B,C,D)`. Why is the plight of the poor not a matter of more sustained public discussion and more decisive government policy? [...] For many Ameri-
-  - Representative operation: `if (~isnumeric(A))||(~isnumeric(B))||(~isnumeric(C))||(~isnumeric(D))|| (~isreal(A))||(~isreal(B))||(~isreal(C))||(~isreal(D))|| (numel(A)~=3)||(numel(B)~=3)||(numel(C)~…`.
-  - Representative operation: `(~isreal(A))||(~isreal(B))||(~isreal(C))||(~isreal(D))|| (numel(A)~=3)||(numel(B)~=3)||(numel(C)~=3)||(numel(D)~=3)|| (~isrow(A))||(~isrow(B))||(~isrow(C))||(~isrow(D))`.
-
 ## Parameters / inputs
 
 - A -row vector of cartesian coordinates

@@ -14,27 +14,6 @@ Number of non-zeroes in all kernels of the polyadic. Syntax: answer=nnz(p)
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 19-20: Start from zero; implemented by `answer=0`.
-- Lines 22-23: Loop over cores; implemented by `for n=1:numel(p.cores)`.
-- Lines 29-30: Loop over prefix; implemented by `for n=1:numel(p.prefix)`.
-- Lines 34-35: Loop over suffix; implemented by `for n=1:numel(p.suffix)`.
-
-### Control flow inferred from the code
-
-- Line 23: `for` loop over `n=1:numel(p.cores)`.
-- Line 24: `for` loop over `k=1:numel(p.cores{n})`.
-- Line 30: `for` loop over `n=1:numel(p.prefix)`.
-- Line 35: `for` loop over `n=1:numel(p.suffix)`.
-
-### Key state/data transformations
-
-- Lines 20: computes `answer` using `answer=0`.
-
 ## Parameters / inputs
 
 - p -a polyadic object

@@ -17,29 +17,6 @@ Generates a convex hull of a two-angle grid for 2D surface plotting. Syntax: [hu
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 32-33: Check consistency; implemented by `grumble(theta_angles,phi_angles)`.
-- Lines 35-36: Get Cartesian coordinates; implemented by `x=sin(theta_angles).*cos(phi_angles)`.
-- Lines 40-41: Get the convex hull; implemented by `hull=convhull(x,y,z)`.
-- Lines 43-44: Get the edges; implemented by `edges=unique([hull(:,1) hull(:,2)`.
-
-### Key state/data transformations
-
-- Lines 36: computes `x` using `x=sin(theta_angles).*cos(phi_angles)`.
-- Lines 37: computes `y` using `y=sin(theta_angles).*sin(phi_angles)`.
-- Lines 38: computes `z` using `z=cos(theta_angles)`.
-- Lines 41: computes `hull` using `hull=convhull(x,y,z)`.
-- Lines 44: computes `edges` using `edges=unique([hull(:,1) hull(:,2)`.
-
-### Local helper functions
-
-- Line 53: `grumble()` — `function grumble(theta_angles,phi_angles)`.
-  - Representative operation: `if (~isnumeric(theta_angles))||(~isreal(theta_angles))|| any(~isfinite(theta_angles))||(size(theta_angles,2)~=1)`.
-  - Representative operation: `any(~isfinite(theta_angles))||(size(theta_angles,2)~=1)`.
-
 ## Parameters / inputs
 
 - theta_angles -a column vector of theta angles,

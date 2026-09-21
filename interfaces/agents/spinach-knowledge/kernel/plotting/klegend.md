@@ -14,18 +14,6 @@ House style settings for Matlab figures; a product of much experience with acade
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 21-22: Display the legend using LaTeX; implemented by `leg_obj=legend(varargin{:},'Interpreter','latex')`.
-- Lines 24-26: Make legend box translucent; implemented by `set(leg_obj.BoxFace,'ColorType','truecoloralpha', 'ColorData',uint8([200 200 200 64]'))`.
-
-### Key state/data transformations
-
-- Lines 22: computes `leg_obj` using `leg_obj=legend(varargin{:},'Interpreter','latex')`.
-
 ## Parameters / inputs
 
 - varargin -same arguments as those accepted by

@@ -14,19 +14,6 @@ Example of carbon hyperfine tensor visualisation for pyrene cation radical. Gaus
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 8-9: Read the Gaussian log; implemented by `props=gparse('pyrene_cation.log')`.
-- Lines 11-12: Do the visualization; implemented by `kfigure()`.
-
-### Key state/data transformations
-
-- Lines 9: computes `props` using `props=gparse('pyrene_cation.log')`.
-- Lines 14: computes `options.style` using `options.style='ellipsoids'`.
-
 ## Implementation structure
 
 - Example of carbon hyperfine tensor visualisation for

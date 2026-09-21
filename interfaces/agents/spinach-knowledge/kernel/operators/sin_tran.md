@@ -18,33 +18,6 @@ Single transition operators, spanning the space of matri- ces of the specified d
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 33-34: Check consistency; implemented by `grumble(dim)`.
-- Lines 36-37: Empty array; implemented by `A=cell(dim^2,1)`.
-- Lines 39-40: Fill the array; implemented by `parfor n=1:dim^2`.
-- Lines 42-43: Unit element indices; implemented by `[k,q]=lin2kq(dim,n,1)`.
-- Lines 45-46: Matrix construction; implemented by `A{n}=sparse(k,q,1,dim,dim)`.
-- Lines 48-49: Complex type; implemented by `A{n}=complex(A{n})`.
-
-### Control flow inferred from the code
-
-- Line 40: `parfor` loop over `n=1:dim^2`.
-
-### Key state/data transformations
-
-- Lines 37: computes `A` using `A=cell(dim^2,1)`.
-- Lines 43: computes `[k,q]` using `[k,q]=lin2kq(dim,n,1)`.
-- Lines 46: computes `A{n}` using `A{n}=sparse(k,q,1,dim,dim)`.
-
-### Local helper functions
-
-- Line 56: `grumble()` — `function grumble(dim)`. Have nothing in your house that you do not know to be useful or believe to be beautiful.
-  - Representative operation: `if (~isnumeric(dim))||(~isscalar(dim))|| (~isreal(dim))||(dim<1)||(mod(dim,1)~=0)`.
-  - Representative operation: `(~isreal(dim))||(dim<1)||(mod(dim,1)~=0)`.
-
 ## Parameters / inputs
 
 - dim -dimension of the matrices

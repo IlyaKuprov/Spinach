@@ -14,23 +14,6 @@ MEX compilation utility. Rebuilds all C++ MEX binaries in the current directory.
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 12-13: Get own location; implemented by `P=mfilename('fullpath'); P=P(1:(end-20))`.
-- Lines 15-17: Lorentzian convolution; implemented by `mex('-R2018a','-O','-DNDBUG','COMPFLAGS=$COMPFLAGS','LINKFLAGS=$LINKFLAGS', [P '/kernel/line_shapes/lorentzcon.cpp'],'-outdir',[P '/kernel/line_shapes'])`.
-- Lines 19-21: Gaussian convolution; implemented by `mex('-R2018a','-O','-DNDBUG','COMPFLAGS=$COMPFLAGS','LINKFLAGS=$LINKFLAGS', [P '/kernel/line_shapes/gausscon.cpp'],'-outdir',[P '/kernel/line_shapes'])`.
-- Lines 23-25: Cubic polynomial roots; implemented by `mex('-R2018a','-O','-DNDBUG','COMPFLAGS=$COMPFLAGS','LINKFLAGS=$LINKFLAGS', [P '/kernel/eigenfields/cubic_roots.cpp'],'-outdir',[P '/kernel/eigenfields'])`.
-- Lines 27-29: Sparse double row sorter; implemented by `mex('-R2018a','-O','-DNDEBUG', [P '/kernel/indexing/spsortrows.cpp'],'-outdir',[P '/kernel/indexing'])`.
-- Lines 31-33: Sparse double unique columns; implemented by `mex('-R2018a','-O','-DNDEBUG', [P '/kernel/indexing/spunicols.cpp'],'-outdir',[P '/kernel/indexing'])`.
-
-### Key state/data transformations
-
-- Lines 13: computes `P` using `P=mfilename('fullpath'); P=P(1:(end-20))`.
-- Lines 16-17: computes `mex('-R2018a','-O','-DNDBUG','COMPFLAGS` using `mex('-R2018a','-O','-DNDBUG','COMPFLAGS=$COMPFLAGS','LINKFLAGS=$LINKFLAGS', [P '/kernel/line_shapes/lorentzcon.cpp'],'-outdir',[P '/kernel/line_shapes'])`.
-
 ## Implementation structure
 
 - MEX compilation utility. Rebuilds all C++ MEX binaries in

@@ -18,28 +18,6 @@ COMSOL 2D mesh data import, cropping and preprocessing for Spinach. Syntax: mesh
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 46-47: Check consistency; implemented by `grumble(comsol)`.
-- Lines 49-50: Import the mesh; implemented by `mesh=comsol_mesh(comsol.mesh_file)`.
-- Lines 52-53: Import the velocities; implemented by `mesh=comsol_velo(mesh,comsol.velo_file)`.
-- Lines 55-56: Crop to the region of interest; implemented by `mesh=mesh_crop(mesh,comsol.crop)`.
-- Lines 58-59: Inactivate user-specified vertices; implemented by `mesh=mesh_inact(mesh,comsol.inactivate)`.
-- Lines 61-62: Run Voronoi tessellation; implemented by `mesh=mesh_vorn(mesh)`.
-- Lines 64-65: Run graphical output preprocessing; implemented by `mesh=mesh_preplot(mesh)`.
-
-### Key state/data transformations
-
-- Lines 50: computes `mesh` using `mesh=comsol_mesh(comsol.mesh_file)`.
-
-### Local helper functions
-
-- Line 70: `grumble()` — `function grumble(comsol)`.
-  - Representative operation: `if ~isstruct(comsol), error('comsol must be a structure.'); end`.
-  - Representative operation: `if (~isfield(comsol,'mesh_file'))||(~ischar(comsol.mesh_file))`.
-
 ## Parameters / inputs
 
 - comsol.mesh_file -name of an ASCII file with

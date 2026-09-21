@@ -19,32 +19,6 @@ Samples the spin echo in the three-pulse DEER experiment to determine its precis
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 50-51: Check consistency; implemented by `grumble(parameters,H,R,K)`.
-- Lines 53-54: Compose Liouvillian; implemented by `L=H+1i*R+1i*K`.
-- Lines 56-57: First pulse; implemented by `rho=step(spin_system,parameters.ex_prob,parameters.rho0,pi/2)`.
-- Lines 59-60: Evolution; implemented by `rho=evolution(spin_system,L,[],rho,parameters.tb,1,'final')`.
-- Lines 62-63: Second pulse; implemented by `rho=step(spin_system,parameters.ex_pump,rho,pi)`.
-- Lines 65-66: Evolution; implemented by `rho=evolution(spin_system,L,[],rho,parameters.ta-parameters.tb,1,'final')`.
-- Lines 68-69: Third pulse; implemented by `rho=step(spin_system,parameters.ex_prob,rho,pi)`.
-- Lines 71-72: Evolution; implemented by `rho=evolution(spin_system,L,[],rho,parameters.ta-0.5*parameters.tc,1,'final')`.
-- Lines 74-76: Evolution; implemented by `echo=evolution(spin_system,L,parameters.coil,rho, parameters.tc/parameters.nsteps,parameters.nsteps,'observable')`.
-
-### Key state/data transformations
-
-- Lines 54: computes `L` using `L=H+1i*R+1i*K`.
-- Lines 57: computes `rho` using `rho=step(spin_system,parameters.ex_prob,parameters.rho0,pi/2)`.
-- Lines 75-76: computes `echo` using `echo=evolution(spin_system,L,parameters.coil,rho, parameters.tc/parameters.nsteps,parameters.nsteps,'observable')`.
-
-### Local helper functions
-
-- Line 81: `grumble()` — `function grumble(parameters,H,R,K)`.
-  - Representative operation: `if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))|| (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))`.
-  - Representative operation: `(~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))`.
-
 ## Parameters / inputs
 
 - parameters.ex_prob -probe pulse operator

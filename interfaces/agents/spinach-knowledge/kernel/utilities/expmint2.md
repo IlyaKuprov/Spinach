@@ -18,32 +18,6 @@ Computes the nested matrix exponential double integral: Integrate[expm(-i*A*(T-t
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 28-29: Check consistency; implemented by `grumble(A,B,C,D,E,T)`.
-- Lines 31-32: Zero filler block; implemented by `Z=sparse(size(A,1),size(A,2))`.
-- Lines 34-37: Auxiliary matrix; implemented by `auxmat=[A -1i*B, Z; Z C -1i*D; Z Z E]`.
-- Lines 39-40: Exponentiate the auxiliary matrix; implemented by `P=propagator(spin_system,auxmat,T)`.
-- Lines 42-43: Build block extractors; implemented by `BE1=[speye(size(A)) Z Z]`.
-- Lines 46-47: Extract; implemented by `I=BE1*P*BE3`.
-
-### Key state/data transformations
-
-- Lines 32: computes `Z` using `Z=sparse(size(A,1),size(A,2))`.
-- Lines 35-37: computes `auxmat` using `auxmat=[A -1i*B, Z; Z C -1i*D; Z Z E]`.
-- Lines 40: computes `P` using `P=propagator(spin_system,auxmat,T)`.
-- Lines 43: computes `BE1` using `BE1=[speye(size(A)) Z Z]`.
-- Lines 44: computes `BE3` using `BE3=[Z; Z; speye(size(A))]`.
-- Lines 47: computes `I` using `I=BE1*P*BE3`.
-
-### Local helper functions
-
-- Line 52: `grumble()` — `function grumble(A,B,C,D,E,T)`.
-  - Representative operation: `if (~isnumeric(A))||(~isnumeric(B))||(~isnumeric(C))|| (~isnumeric(D))||(~isnumeric(E))||(~isnumeric(T))`.
-  - Representative operation: `(~isnumeric(D))||(~isnumeric(E))||(~isnumeric(T))`.
-
 ## Parameters / inputs
 
 - A,B,C,D,E -square matrices

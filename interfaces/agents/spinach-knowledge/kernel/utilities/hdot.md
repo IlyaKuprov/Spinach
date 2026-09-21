@@ -17,23 +17,6 @@ Hadamard route to Frobenius matrix product. Useful as a replacement for trace(A'
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 25-26: Check consistency; implemented by `grumble(A,B)`.
-- Lines 28-29: Do the calculation; implemented by `H=sum(conj(A).*B,'all')`.
-
-### Key state/data transformations
-
-- Lines 29: computes `H` using `H=sum(conj(A).*B,'all')`.
-
-### Local helper functions
-
-- Line 34: `grumble()` — `function grumble(A,B)`. An infinite number of mathematicians walk into a bar. The first one orders a pint of beer, the second one half a pint, the third one a
-  - Representative operation: `if (~isnumeric(A))||(~isnumeric(B))`.
-  - Representative operation: `error('both inputs must be numeric.')`.
-
 ## Parameters / inputs
 
 - A,B -square matrices of the same size

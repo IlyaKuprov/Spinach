@@ -14,28 +14,6 @@ Parses name-value options for the Spinach test runner. Syntax: options=test_opti
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 17-18: Set defaults; implemented by `options.pattern=''`.
-- Lines 22-23: Parse name-value pairs; implemented by `if mod(numel(varargin),2)~=0`.
-
-### Control flow inferred from the code
-
-- Line 23: conditional branch on `mod(numel(varargin),2)~=0`.
-- Line 26: `for` loop over `n=1:2:numel(varargin)`.
-- Line 27: dispatches on `varargin{n}`; cases `'pattern'`, `'verbose'`, `'stop_on_fail'`.
-- Line 31: conditional branch on `islogical(varargin{n+1})&&isscalar(varargin{n+1})`.
-- Line 45: conditional branch on `islogical(varargin{n+1})&&isscalar(varargin{n+1})`.
-
-### Key state/data transformations
-
-- Lines 18: computes `options.pattern` using `options.pattern=''`.
-- Lines 19: computes `options.verbose` using `options.verbose=false`.
-- Lines 20: computes `options.stop_on_fail` using `options.stop_on_fail=false`.
-
 ## Parameters / inputs
 
 - varargin -name-value option pairs

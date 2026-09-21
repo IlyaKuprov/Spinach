@@ -18,33 +18,6 @@ Cross-polarisation experiment in the rotating frame. Applies a soft pi/2 pulse u
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 54-55: Check consistency; implemented by `grumble(parameters,H,R,K)`.
-- Lines 57-58: Compose Liouvillian; implemented by `L=H+1i*R+1i*K`.
-- Lines 60-62: Wipe the state of 13C; implemented by `[~,rho]=decouple(spin_system,[],parameters.rho0, parameters.spins(2))`.
-- Lines 64-65: Build and project 1H and 13C control operators; implemented by `Hx=operator(spin_system,'Lx',parameters.spins{1})`.
-- Lines 72-74: Apply the 90-degree pulse on 1H along +X; implemented by `rho=step(spin_system,L+2*pi*parameters.hi_pwr*Hx, rho,1/(4*parameters.hi_pwr))`.
-- Lines 76-81: Run the CP contact time evolution: irradiation of 1H along -Y, and of 13C along +X; implemented by `contact_curve=evolution(spin_system,L-2*pi*parameters.cp_pwr(1)*Hy +2*pi*parameters.cp_pwr(2)*Cx, parameters.coil,rho,parameters.timestep, parameters.nsteps,'observable')`.
-
-### Key state/data transformations
-
-- Lines 58: computes `L` using `L=H+1i*R+1i*K`.
-- Lines 61-62: computes `[~,rho]` using `[~,rho]=decouple(spin_system,[],parameters.rho0, parameters.spins(2))`.
-- Lines 65: computes `Hx` using `Hx=operator(spin_system,'Lx',parameters.spins{1})`.
-- Lines 66: computes `Hy` using `Hy=operator(spin_system,'Ly',parameters.spins{1})`.
-- Lines 67: computes `Cx` using `Cx=operator(spin_system,'Lx',parameters.spins{2})`.
-- Lines 73-74: computes `rho` using `rho=step(spin_system,L+2*pi*parameters.hi_pwr*Hx, rho,1/(4*parameters.hi_pwr))`.
-- Lines 78-81: computes `contact_curve` using `contact_curve=evolution(spin_system,L-2*pi*parameters.cp_pwr(1)*Hy +2*pi*parameters.cp_pwr(2)*Cx, parameters.coil,rho,parameters.timestep, parameters.nsteps,'observable')`.
-
-### Local helper functions
-
-- Line 86: `grumble()` — `function grumble(parameters,H,R,K)`.
-  - Representative operation: `if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))|| (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))`.
-  - Representative operation: `(~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))`.
-
 ## Parameters / inputs
 
 - parameters.spins -working spins, a cell array of

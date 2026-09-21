@@ -14,27 +14,6 @@ Computes the norm of the matrix represented by a tensor train. Syntax: ttnorm=no
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 30-31: Compute the norm; implemented by `switch norm_type`.
-- Lines 35-36: Frobenius norm; implemented by `ttrain=pack(ttrain); ttrain=ttort(ttrain,-1)`.
-- Lines 41-42: Maximum absolute column sum; implemented by `error('1-norm is not available for ttclass')`.
-- Lines 46-47: Maximum absolute row sum; implemented by `error('inf-norm is not available for ttclass')`.
-- Lines 51-52: Maximum absolute eigenvalue; implemented by `error('2-norm is not available for ttclass')`.
-- Lines 56-57: Complain and bomb out; implemented by `error('unrecognized norm type.')`.
-
-### Control flow inferred from the code
-
-- Line 31: dispatches on `norm_type`; cases `'fro'`, `1`, `inf`, `2`.
-
-### Key state/data transformations
-
-- Lines 36: computes `ttrain` using `ttrain=pack(ttrain); ttrain=ttort(ttrain,-1)`.
-- Lines 37: computes `ttnorm` using `ttnorm=abs(ttrain.coeff)*norm(ttrain.cores{1,1}(:),2)`.
-
 ## Parameters / inputs
 
 - ttrain -a tensor train representation of a matrix

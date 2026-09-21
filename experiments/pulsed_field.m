@@ -43,8 +43,10 @@
 %    parameters.nout       - number of stairs between recorded
 %                            observable values
 %
-%    H - Hamiltonian at zero field, received from the context
-%        function, Hilbert space
+%    H - Hamiltonian received from the context function, Hilbert
+%        space, containing the Zeeman term at sys.magnet=1 Tesla;
+%        the function removes that term and adds the field of
+%        each stair itself
 %
 %    R - relaxation superoperator received from the context
 %        function; ignored, the spin-phonon dissipator is built
@@ -65,8 +67,12 @@
 % Note: the sequence works in zeeman-hilb formalism under the crystal
 %       and powder contexts, which assemble the anisotropic part of
 %       the Hamiltonian; the liquid context drops that part, and with
-%       it the crystal field of a giant spin. The temperature of the
-%       phonon bath is inter.temperature.
+%       it the crystal field of a giant spin. The powder context must
+%       be called with parameters.sum_up=false because the answer is
+%       a structure; additional rotating frames (parameters.rframes)
+%       are not supported because the field operator is added in the
+%       laboratory frame. The temperature of the phonon bath is
+%       inter.temperature.
 %
 % Note: sys.magnet must be 1 Tesla, so that parameters.hzeeman is
 %       the Zeeman operator per Tesla; the Hamiltonian received from
@@ -164,6 +170,18 @@ if ~isfield(parameters,'nout')||(~isnumeric(parameters.nout))||(~isscalar(parame
 end
 if ~isfield(parameters,'coil')||(~(isnumeric(parameters.coil)||iscell(parameters.coil)))
     error('parameters.coil must be an observable operator or a cell array of them.');
+end
+if iscell(parameters.coil), coils=parameters.coil; else, coils={parameters.coil}; end
+for k=1:numel(coils)
+    if (~isnumeric(coils{k}))||any(size(coils{k})~=size(H))
+        error('every coil must be a matrix of the same dimension as H.');
+    end
+end
+if isfield(parameters,'rframes')&&(~isempty(parameters.rframes))
+    error('additional rotating frames are not supported by this function.');
+end
+if isfield(parameters,'sum_up')&&parameters.sum_up
+    error('the powder context must be called with parameters.sum_up=false.');
 end
 if ~isfield(parameters,'phonon_x')||(~isnumeric(parameters.phonon_x))||any(size(parameters.phonon_x)~=size(H))||(~ishermitian(parameters.phonon_x))
     error('parameters.phonon_x must be a Hermitian matrix of the same dimension as H.');

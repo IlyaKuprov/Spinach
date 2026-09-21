@@ -5,11 +5,14 @@
 % couples to the spin system through a Hermitian operator X, the dis-
 % sipator is
 %
-%             d(rho)/dt = -(lambda^2*pi)*([X,R*rho]+[X,R*rho]')
+%                d(rho)/dt = -pi*([X,R*rho]+[X,R*rho]')
 %
 % where R is built from the transition frequencies w_kn=(E_k-E_n):
 %
 %       <k|R|n> = <k|X|n> * (I(w_kn)-I(-w_kn))/(exp(hbar*w_kn/kT)-1)
+%
+% and the square of the coupling constant lambda of the original
+% papers is absorbed into the prefactor I0 of the spectral density.
 %
 % This function returns R; the corresponding Liouville space super-
 % operator is assembled by rlx_phonon.m, and pulsed_field.m applies

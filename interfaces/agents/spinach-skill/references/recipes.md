@@ -214,18 +214,22 @@ before paying for a grid.
 Echo-detected EPR under magic angle spinning is `esr_sol_pulsed/mas_diamond_p1.m`
 (P1 centre in diamond, two-pulse echo with a swept carrier, static and 10 to
 37 kHz MAS, after Khamrui et al. 2026). The pattern is `singlerot` in
-`zeeman-hilb`, which hands the local pulse sequence a Hamiltonian rotor stack,
-one matrix per rotor phase, and nothing else: the sequence advances through the
-stack itself from `parameters.rate` (nearest element at the middle of each
-fixed time step, so `rate=0` is the static case), averages over the rotor phase
-at the start of the sequence, which stands in for the crystallite azimuth and
-lets a 400-point two-angle grid suffice, selects the electron coherence pathway
-with `coherence` instead of a phase cycle, and sweeps the carrier inside the
-sequence by adding `2*pi*offset*Sz` to the stack elements, rebuilding only the
-pulse propagators per carrier point because the secular stack commutes with
-`Sz`. Slow spinning needs a high `max_rank` (2700) because the stack must
-resolve the rotor phase to within one time step; the carrier step must be
-finer than the narrowest line (0.5 MHz for the 2 MHz wide central line).
+`zeeman-hilb`, which hands the pulse sequence `experiments/echo_sweep.m` a
+Hamiltonian rotor stack, one matrix per rotor phase, and nothing else: the
+sequence advances through the stack itself from `parameters.rate` (nearest
+element at the middle of each fixed time step, so `rate=0` is the static case),
+averages over `parameters.nphases` rotor phases at the start of the sequence,
+which stand in for the crystallite azimuth and let a 400-point two-angle grid
+suffice, selects the electron coherence pathway with `coherence` instead of a
+phase cycle, and sweeps the carrier inside the sequence by adding
+`2*pi*offset*Lz` to the stack elements, rebuilding only the pulse propagators
+per carrier point because the secular stack commutes with the electron `Lz`;
+its grumbler refuses a stack that does not. The sequence takes `pulse_dur`,
+`pulse_frq`, `tau`, `echo_win`, `timestep`, `nphases`, `sweep`, and `npoints`
+and returns the complex echo integral at each carrier offset as a column.
+Slow spinning needs a high `max_rank` (2700) because the stack must resolve
+the rotor phase to within one time step; the carrier step must be finer than
+the narrowest line (0.5 MHz for the 2 MHz wide central line).
 
 ## DEER
 

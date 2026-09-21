@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/echo_sweep.m`
 - Signature: `echo=echo_sweep(spin_system,parameters,H,~,~)`
-- Total lines: 292
+- Total lines: 296
 
 ## Purpose
 

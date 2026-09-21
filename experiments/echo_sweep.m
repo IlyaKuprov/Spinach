@@ -202,19 +202,22 @@ if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||...
     error('parameters.spins must be a one-element cell array of character strings.');
 end
 sz=operator(spin_system,'Lz',parameters.spins{1});
+if ~isequal(size(H{1}),size(sz))
+    error('the elements of H must have the dimension of the spin system.');
+end
 if any(cellfun(@(x)norm(x*sz-sz*x,1)>spin_system.tols.liouv_zero,H))
     error('the elements of H must commute with the Lz operator of the pulsed spin.');
 end
 if ~isfield(parameters,'rho0')
     error('initial state must be specified in parameters.rho0 field.');
 end
-if (~isnumeric(parameters.rho0))||(~all(size(parameters.rho0)==size(H{1})))
+if (~isnumeric(parameters.rho0))||(~isequal(size(parameters.rho0),size(H{1})))
     error('parameters.rho0 must be a matrix of the same dimension as the elements of H.');
 end
 if ~isfield(parameters,'coil')
     error('detection state must be specified in parameters.coil field.');
 end
-if (~isnumeric(parameters.coil))||(~all(size(parameters.coil)==size(H{1})))
+if (~isnumeric(parameters.coil))||(~isequal(size(parameters.coil),size(H{1})))
     error('parameters.coil must be a matrix of the same dimension as the elements of H.');
 end
 if ~isfield(parameters,'pulse_dur')
@@ -289,4 +292,5 @@ if (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
     error('parameters.npoints must be a real integer greater than 2.');
 end
 end
+
 

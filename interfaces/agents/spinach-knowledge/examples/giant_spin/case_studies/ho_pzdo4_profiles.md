@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Pulsed-field magnetisation of the Ho(pzdo)4 metal-organic framework, a J=8 giant spin with a crystal field to twelfth spherical rank, under four magnetic field profiles: linear sweep, piecewise linear sweep, monotone cubic spline through a measured 65 T short pulse, and a sinu- soidal field at the clock transition frequency. Spin-phonon relaxation is the generalised Lindblad dissipator of Saito and Miyashita with a s
+Pulsed-field magnetisation of the Ho(pzdo)4 metal-organic framework, a J=8 giant spin with a crystal field to twelfth spherical rank, under four magnetic field profiles: linear sweep, piecewise linear sweep, monotone cubic spline through a measured 65 T short pulse, and a sinusoidal field at the clock transition frequency. Spin-phonon relaxation is the generalised Lindblad dissipator of Saito and Miyashita with a super-Ohmic phonon bath. Reproduces Figure 2 of https://arxiv.org/abs/2609.16352 with the crystal field parameters, g-factor, temperatures, spectral density, sweep profiles, and stair widths of that paper. As in the paper, the first three profiles are propagated for 1 ms (the first millisecond of the measured 10 ms pulse), the sinusoid for 140 ps. Calculation time: minutes.
 
 ## Physical / mathematical content
 

@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Pulsed-field magnetisation of the (CH6N3)2MnCl4 molecular crystal, a linear trimer of three S=5/2 manganese ions with isotropic exchange between neighbours and an axial plus rhombic zero-field splitting on every ion, at 0.6 K under a 50 T/ms sweep to 10 T with spin-phonon relaxation in the generalised Lindblad form of Saito and Miyashita. The full 216-state Hilbert space is used; the paper solves the same problem in 
+Pulsed-field magnetisation of the (CH6N3)2MnCl4 molecular crystal, a linear trimer of three S=5/2 manganese ions with isotropic exchange between neighbours and an axial plus rhombic zero-field splitting on every ion, at 0.6 K under a 50 T/ms sweep to 10 T with spin-phonon relaxation in the generalised Lindblad form of Saito and Miyashita. The full 216-state Hilbert space is used; the paper solves the same problem in 16-state and 26-state effective bases. The thermal equilibrium magnetisation is plotted for comparison. Reproduces Figure 6 of https://arxiv.org/abs/2609.16352. Calculation time: minutes.
 
 ## Physical / mathematical content
 

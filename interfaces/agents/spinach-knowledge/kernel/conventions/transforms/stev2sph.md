@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Transforms the coefficients in front of Stevens operators, as produced by stevens.m, into the coefficients before the irredu- cible spherical tensor operators, as produced by irr_sph_ten.m function. Works up to 12th spherical rank. Source for ranks up to 6:
+Transforms the coefficients in front of Stevens operators, as produced by stevens.m, into the coefficients before the irreducible spherical tensor operators, as produced by irr_sph_ten.m function. Works up to 12th spherical rank. Source for ranks up to 6: http://dx.doi.org/10.1088/0022-3719/18/7/009
 
 ## Physical / mathematical content
 

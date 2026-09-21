@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Thermally dressed spin-phonon coupling operator of the generalised Lindblad dissipator of Saito, Miyashita, and De Raedt (Phys. Rev. B 60, 14553 (1999)), in the eigenbasis of the spin Hamiltonian. For a phonon bath with the spectral density I(w)=I0*w^alpha*theta(w) that couples to the spin system through a Hermitian operator X, the dis- sipator is d(rho)/dt = -pi*([X,R*rho]+[X,R*rho]') where R is built from the trans
+Thermally dressed spin-phonon coupling operator of the generalised Lindblad dissipator of Saito, Miyashita, and De Raedt (Phys. Rev. B 60, 14553 (1999)), in the eigenbasis of the spin Hamiltonian. For a phonon bath with the spectral density I(w)=I0*w^alpha*theta(w) that couples to the spin system through a Hermitian operator X, the dissipator is `d(rho)/dt=-pi*([X,R*rho]+[X,R*rho]')`, where R is built from the transition frequencies w_kn=(E_k-E_n) as `<k|R|n>=<k|X|n>*(I(w_kn)-I(-w_kn))/(exp(hbar*w_kn/kT)-1)`, and the square of the coupling constant lambda of the original papers is absorbed into the prefactor I0 of the spectral density. This function returns R; the corresponding Liouville space superoperator is assembled by rlx_phonon.m, and pulsed_field.m applies the dissipator as matrix products.
 
 ## Physical / mathematical content
 

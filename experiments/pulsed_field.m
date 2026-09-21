@@ -83,7 +83,9 @@
 %       The initial state is the thermal equilibrium of the field-
 %       free Hamiltonian at the temperature of the phonon bath.
 %
-% Note: the field on each stair is evaluated at the stair midpoint.
+% Note: the Hamiltonian on each stair uses the field at the midpoint
+%       of the stair; answer.field is the profile evaluated at the
+%       recording times, which are the ends of the recorded stairs.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -133,9 +135,13 @@ for n=1:parameters.nsteps
     rho_eig=rho_eig+dt*drho+(dt^2/2)*dissip(drho);
     rho=V*(phases.*rho_eig)*V';
 
-    % Record the observables and report progress
+    % Record the field at the end of the stair, the observables, and the progress
     if mod(n,parameters.nout)==0
-        nrec=nrec+1; answer.t(nrec)=n*parameters.timestep; answer.field(nrec)=field;
+        nrec=nrec+1; answer.t(nrec)=n*dt; field=parameters.field_prof(n*dt);
+        if (~isnumeric(field))||(~isreal(field))||(~isscalar(field))||(~isfinite(field))
+            error('parameters.field_prof must return a real finite scalar.');
+        end
+        answer.field(nrec)=field;
         for k=1:numel(coils)
             answer.obs(nrec,k)=real(trace(coils{k}'*rho));
         end

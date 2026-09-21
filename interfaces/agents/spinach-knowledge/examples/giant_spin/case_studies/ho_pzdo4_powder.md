@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Powder-averaged pulsed-field magnetisation of the Ho(pzdo)4 metal- organic framework, a J=8 giant spin with a crystal field to twelfth spherical rank, under a 10 T/ms linear sweep at 2 K with spin-phonon relaxation in the generalised Lindblad form of Saito and Miyashita. The magnetisation of every orientation of the two-angle Lebedev grid is plotted alongside the powder average and the thermal equilibrium magnetisati
+Powder-averaged pulsed-field magnetisation of the Ho(pzdo)4 metal-organic framework, a J=8 giant spin with a crystal field to twelfth spherical rank, under a 10 T/ms linear sweep at 2 K with spin-phonon relaxation in the generalised Lindblad form of Saito and Miyashita. The magnetisation of every orientation of the two-angle Lebedev grid is plotted alongside the powder average and the thermal equilibrium magnetisation. Reproduces Figure 3 of https://arxiv.org/abs/2609.16352. Calculation time: hours.
 
 ## Physical / mathematical content
 

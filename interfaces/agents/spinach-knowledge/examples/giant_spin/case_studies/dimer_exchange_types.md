@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Pulsed-field magnetisation of a dimer of two S=1/2 spins with four types of exchange coupling tensor: isotropic, two anisotropic, and antisymmetric, at 0.2 K under a 10 T/ms sweep to 1 T, with spin- phonon relaxation in the generalised Lindblad form of Saito and Miyashita. The out-of-equilibrium curves are compared with the thermal equilibrium magnetisation. Reproduces Figure 4 of Calculation time: minutes
+Pulsed-field magnetisation of a dimer of two S=1/2 spins with four types of exchange coupling tensor: isotropic, two anisotropic, and antisymmetric, at 0.2 K under a 10 T/ms sweep to 1 T, with spin-phonon relaxation in the generalised Lindblad form of Saito and Miyashita. The out-of-equilibrium curves are compared with the thermal equilibrium magnetisation. Reproduces Figure 4 of https://arxiv.org/abs/2609.16352. Calculation time: minutes.
 
 ## Physical / mathematical content
 

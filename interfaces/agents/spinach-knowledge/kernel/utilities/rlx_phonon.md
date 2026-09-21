@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Spin-phonon relaxation superoperator in the generalised Lindblad form of Saito, Miyashita, and De Raedt (Phys. Rev. B 60, 14553 (1999)), as used by Nakano and Miyashita (J. Phys. Soc. Jpn. 70, 2151 (2001)) for the magnetisation dynamics of molecular magnets. A phonon bath with the spectral density I(w)=I0*w^alpha*theta(w) couples to the spin system through a Hermitian operator X; the dissipator is d(rho)/dt = -pi*([X
+Spin-phonon relaxation superoperator in the generalised Lindblad form of Saito, Miyashita, and De Raedt (Phys. Rev. B 60, 14553 (1999)), as used by Nakano and Miyashita (J. Phys. Soc. Jpn. 70, 2151 (2001)) for the magnetisation dynamics of molecular magnets. A phonon bath with the spectral density I(w)=I0*w^alpha*theta(w) couples to the spin system through a Hermitian operator X; the dissipator is `d(rho)/dt=-pi*([X,R*rho]+[X,R*rho]')`, where R is built in the eigenbasis of the current Hamiltonian from the transition frequencies w_kn=(E_k-E_n) as `<k|R|n>=<k|X|n>*(I(w_kn)-I(-w_kn))/(exp(hbar*w_kn/kT)-1)`, and the square of the coupling constant lambda of the original papers is absorbed into the prefactor I0 of the spectral density. The Hermitian conjugate term is linear in rho for Hermitian rho, and so the dissipator is returned as an ordinary Liouville space superoperator acting on the column-stretched density matrix. The R operator itself is built by phonon_oper.m.
 
 ## Physical / mathematical content
 

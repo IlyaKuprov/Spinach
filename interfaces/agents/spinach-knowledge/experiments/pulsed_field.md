@@ -2,11 +2,11 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/pulsed_field.m`
 - Signature: `answer=pulsed_field(spin_system,parameters,H,R,K) %#ok<INUSD>`
-- Total lines: 215
+- Total lines: 221
 
 ## Purpose
 
-Magnetisation dynamics under a time-dependent magnetic field along the Z axis of the laboratory frame with spin-phonon relaxation, as measured in pulsed-field magnetometry of molecular magnets. The field profile is replaced by a staircase; on each stair the Hamil- tonian is constant, the spin-phonon dissipator is rebuilt in the eigenbasis of that Hamiltonian, and the density matrix is propa- gated in that eigenbasis 
+Magnetisation dynamics under a time-dependent magnetic field along the Z axis of the laboratory frame with spin-phonon relaxation, as measured in pulsed-field magnetometry of molecular magnets. The field profile is replaced by a staircase; on each stair the Hamiltonian is constant, the spin-phonon dissipator is rebuilt in the eigenbasis of that Hamiltonian, and the density matrix is propagated in that eigenbasis by a symmetric split: exact coherent phases for half a stair, the dissipative step to second order in the dissipator times the stair width, and the phases again. The dissipator times the stair width must be small; the coherent part is treated exactly for any stair width. The dissipator is applied as Hilbert space matrix products (see phonon_oper.m), so the cost of a stair is cubic in the dimension of the Hilbert space.
 
 ## Physical / mathematical content
 
@@ -71,7 +71,9 @@ Magnetisation dynamics under a time-dependent magnetic field along the Z axis of
 - this function removes before adding the field on each stair.
 - The initial state is the thermal equilibrium of the field-
 - free Hamiltonian at the temperature of the phonon bath.
-- Note: the field on each stair is evaluated at the stair midpoint.
+- Note: the Hamiltonian on each stair uses the field at the midpoint
+- of the stair; answer.field is the profile evaluated at the
+- recording times, which are the ends of the recorded stairs.
 
 ## Implementation structure
 

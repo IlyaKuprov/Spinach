@@ -16,6 +16,9 @@ function dimer_exchange_types()
 % Magnet must be 1 Tesla, the field is set by the sweep
 sys.magnet=1.0;
 
+% Parallel pool size
+sys.parallel={'processes',4};
+
 % Two electron spins with g=2
 sys.isotopes={'E','E'};
 inter.zeeman.scalar={2.0 2.0};

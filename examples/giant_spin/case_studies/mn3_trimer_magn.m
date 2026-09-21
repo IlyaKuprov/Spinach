@@ -19,6 +19,9 @@ function mn3_trimer_magn()
 % Magnet must be 1 Tesla, the field is set by the sweep
 sys.magnet=1.0;
 
+% Parallel pool size
+sys.parallel={'processes',4};
+
 % Three S=5/2 spins with g=2, phonon bath at 0.6 K
 sys.isotopes={'E6','E6','E6'};
 inter.zeeman.scalar={2.0 2.0 2.0};

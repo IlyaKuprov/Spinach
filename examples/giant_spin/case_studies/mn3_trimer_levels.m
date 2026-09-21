@@ -17,6 +17,9 @@ function mn3_trimer_levels()
 % Magnet must be 1 Tesla, the field is set below
 sys.magnet=1.0;
 
+% Parallel pool size
+sys.parallel={'processes',4};
+
 % Three S=5/2 spins with g=2
 sys.isotopes={'E6','E6','E6'};
 inter.zeeman.scalar={2.0 2.0 2.0};

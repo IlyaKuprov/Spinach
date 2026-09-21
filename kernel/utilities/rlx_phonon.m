@@ -81,9 +81,6 @@ XE=V'*X*V; RH=V*(XE.*phi)*V';
 unit=speye(size(H,1));
 R=-pi*(kron(unit,X*RH)-kron(X.',RH)+kron((RH'*X).',unit)-kron(conj(RH),X));
 
-% Report the maximum relaxation rate to the user
-report(spin_system,['spin-phonon dissipator built, largest rate ' num2str(max(abs(diag(R)))) ' Hz']);
-
 end
 
 % Consistency enforcement

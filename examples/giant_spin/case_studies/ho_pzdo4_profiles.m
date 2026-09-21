@@ -30,6 +30,9 @@ end
 % Magnet must be 1 Tesla, the field is set by the sweep
 sys.magnet=1.0;
 
+% Parallel pool size
+sys.parallel={'processes',4};
+
 % J=8 giant spin, effective g-factor 1.24
 sys.isotopes={'E17'};
 inter.zeeman.scalar={1.24};

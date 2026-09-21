@@ -17,25 +17,6 @@ Converts angle-axis rotation parameters to a direction cosine matrix in the acti
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 34-35: Check consistency; implemented by `grumble(rot_axis,rot_angle)`.
-- Lines 37-38: Normalize the axis; implemented by `rot_axis=rot_axis(:)/norm(rot_axis(:),2)`.
-- Lines 40-41: Compute the DCM; implemented by `dcm=eye(3)+sin(rot_angle)*[ 0 -rot_axis(3) rot_axis(2)`.
-
-### Key state/data transformations
-
-- Lines 38: computes `rot_axis` using `rot_axis=rot_axis(:)/norm(rot_axis(:),2)`.
-- Lines 41: computes `dcm` using `dcm=eye(3)+sin(rot_angle)*[ 0 -rot_axis(3) rot_axis(2)`.
-
-### Local helper functions
-
-- Line 49: `grumble()` — `function grumble(rot_axis,rot_angle)`.
-  - Representative operation: `if (~isnumeric(rot_axis))||(~isnumeric(rot_angle))`.
-  - Representative operation: `error('both inputs must be numeric.')`.
-
 ## Parameters / inputs
 
 - rot_axis -cartesian direction vector given as

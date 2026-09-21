@@ -20,47 +20,6 @@ WISE (WIdeline SEparation) is a powder MAS heteronuclear correlation experiment.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 50-51: Consistency enforcement; implemented by `grumble(spin_system,parameters,H,R,K)`.
-- Lines 53-54: Wipe the state of 13C (pre-saturation); implemented by `[~,parameters.rho0]=decouple(spin_system,[],parameters.rho0,{'13C'})`.
-- Lines 56-57: Build 1H and 13C control operators; implemented by `Hp=operator(spin_system,'L+',parameters.spins{1})`.
-- Lines 63-64: Compose the Liouvillian; implemented by `L=H+1i*R+1i*K`.
-- Lines 66-67: High-power 90-degree pulses on 1H along X (cos) and Y (sin); implemented by `L_hp_cos=L+2*pi*parameters.hi_pwr*Hx; L_hp_sin=L+2*pi*parameters.hi_pwr*Hy`.
-- Lines 71-72: Get dwell times; implemented by `dw=1./parameters.sweep`.
-- Lines 74-76: Run the F1 evolution; implemented by `rho_stack_cos=evolution(spin_system,L,[],rho_cos,dw(1), parameters.npoints(1)-1,'trajectory')`.
-- Lines 80-81: CP contact time evolution generator (-Y on 1H, +X on 13C); implemented by `L_cp=L-2*pi*parameters.cp_pwr(1)*Hy+2*pi*parameters.cp_pwr(2)*Cx`.
-- Lines 83-85: Run CP contact time evolution; implemented by `rho_stack_cos=evolution(spin_system,L_cp,[],rho_stack_cos, parameters.cp_dur,1,'final')`.
-- Lines 89-90: Wipe and decouple protons for acquisition; implemented by `[L_dec,rho_stack_cos]=decouple(spin_system,L,rho_stack_cos,parameters.spins(1))`.
-- Lines 93-95: Run the F2 evolution; implemented by `fid.cos=evolution(spin_system,L_dec,parameters.coil,rho_stack_cos, dw(2),parameters.npoints(2)-1,'observable')`.
-
-### Key state/data transformations
-
-- Lines 54: computes `[~,parameters.rho0]` using `[~,parameters.rho0]=decouple(spin_system,[],parameters.rho0,{'13C'})`.
-- Lines 57: computes `Hp` using `Hp=operator(spin_system,'L+',parameters.spins{1})`.
-- Lines 58: computes `Cp` using `Cp=operator(spin_system,'L+',parameters.spins{2})`.
-- Lines 61: computes `Hx` using `Hx=(Hp+Hp')/2; Hy=(Hp-Hp')/2i; Cx=(Cp+Cp')/2`.
-- Lines 64: computes `L` using `L=H+1i*R+1i*K`.
-- Lines 67: computes `L_hp_cos` using `L_hp_cos=L+2*pi*parameters.hi_pwr*Hx; L_hp_sin=L+2*pi*parameters.hi_pwr*Hy`.
-- Lines 68: computes `rho_cos` using `rho_cos=step(spin_system,L_hp_cos,parameters.rho0,1/(4*parameters.hi_pwr))`.
-- Lines 69: computes `rho_sin` using `rho_sin=step(spin_system,L_hp_sin,parameters.rho0,1/(4*parameters.hi_pwr))`.
-- Lines 72: computes `dw` using `dw=1./parameters.sweep`.
-- Lines 75-76: computes `rho_stack_cos` using `rho_stack_cos=evolution(spin_system,L,[],rho_cos,dw(1), parameters.npoints(1)-1,'trajectory')`.
-- Lines 77-78: computes `rho_stack_sin` using `rho_stack_sin=evolution(spin_system,L,[],rho_sin,dw(1), parameters.npoints(1)-1,'trajectory')`.
-- Lines 81: computes `L_cp` using `L_cp=L-2*pi*parameters.cp_pwr(1)*Hy+2*pi*parameters.cp_pwr(2)*Cx`.
-- Lines 90: computes `[L_dec,rho_stack_cos]` using `[L_dec,rho_stack_cos]=decouple(spin_system,L,rho_stack_cos,parameters.spins(1))`.
-- Lines 91: computes `[~,rho_stack_sin]` using `[~,rho_stack_sin]=decouple(spin_system,[],rho_stack_sin,parameters.spins(1))`.
-- Lines 94-95: computes `fid.cos` using `fid.cos=evolution(spin_system,L_dec,parameters.coil,rho_stack_cos, dw(2),parameters.npoints(2)-1,'observable')`.
-- Lines 96-97: computes `fid.sin` using `fid.sin=evolution(spin_system,L_dec,parameters.coil,rho_stack_sin, dw(2),parameters.npoints(2)-1,'observable')`.
-
-### Local helper functions
-
-- Line 102: `grumble()` — `function grumble(spin_system,parameters,H,R,K)`.
-  - Representative operation: `if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})`.
-  - Representative operation: `error('this function is only available for sphten-liouv formalism.')`.
-
 ## Syntax
 
 ```matlab

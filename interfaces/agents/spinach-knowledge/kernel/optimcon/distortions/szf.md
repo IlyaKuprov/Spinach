@@ -19,34 +19,6 @@ Applies a discrete single-zero filter: Y(k)=X(k)/(1-z)-z*X(k-1)/(1-z); to a Spin
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `distort()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 44-45: Check consistency; implemented by `grumble(w,z)`.
-- Lines 47-48: Autodiff wrapper; implemented by `if nargout<2`.
-- Lines 50-51: Plain call; implemented by `w=distort(w(:),z,size(w))`.
-- Lines 55-56: Autodiff call including Jacobian; implemented by `[w,J]=dlfeval(@distort,dlarray(w(:)),z,size(w))`.
-- Lines 58-59: Strip autodiff rigging; kill Wirtinger terms; implemented by `w=extractdata(w); J=extractdata(J); J=real(J)`.
-
-### Control flow inferred from the code
-
-- Line 48: conditional branch on `nargout<2`.
-
-### Key state/data transformations
-
-- Lines 51: computes `w` using `w=distort(w(:),z,size(w))`.
-- Lines 56: computes `[w,J]` using `[w,J]=dlfeval(@distort,dlarray(w(:)),z,size(w))`.
-
-### Local helper functions
-
-- Line 66: `distort()` — `function [w_dist,J]=distort(w,z,dims)`. Fold into physical dimensions
-  - Representative operation: `inp=reshape(w,dims); nrows=dims(1)`.
-  - Representative operation: `ncols=dims(2); nchannels=nrows/2`.
-- Line 102: `grumble()` — `function grumble(w,z)`.
-  - Representative operation: `if (~isnumeric(w))||(~isreal(w))`.
-  - Representative operation: `error('w must be an array of real numbers.')`.
-
 ## Parameters / inputs
 
 - w -waveform, one time slice per column, and

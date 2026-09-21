@@ -18,39 +18,6 @@ Object Pretending It is a Unit Matrix (OPIUM). Syntax: M=opium(dim,coeff)
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `nnz()`, `numel()`, `isnumeric()`, `ismatrix()`, `allfinite()`, `iseye()`, `sparse()`, `conj()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 33-34: Check consistency; implemented by `grumble(dim,coeff)`.
-- Lines 36-37: Store the parameters; implemented by `M.dim=dim; M.coeff=coeff`.
-
-### Key state/data transformations
-
-- Lines 37: computes `M.dim` using `M.dim=dim; M.coeff=coeff`.
-
-### Local helper functions
-
-- Line 42: `nnz()` — `function n=nnz(op)`. Distinguish zero and scaled unit objects
-  - Representative operation: `if op.coeff==0`.
-  - Representative operation: `n=0`.
-- Line 54: `numel()` — `function n=numel(op)`. Numeric property
-  - Representative operation: `n=1`.
-- Line 61: `isnumeric()` — `function n=isnumeric(op)`. Numeric property
-  - Representative operation: `n=true()`.
-- Line 68: `ismatrix()` — `function n=ismatrix(op)`. All finite property
-  - Representative operation: `n=true()`.
-- Line 75: `allfinite()` — `function n=allfinite(op)`. Is actually unit
-  - Representative operation: `if isfinite(op.coeff)`.
-  - Representative operation: `n=true()`.
-- Line 86: `iseye()` — `function n=iseye(op)`. Conversion to sparse
-  - Representative operation: `if op.coeff==1`.
-  - Representative operation: `n=true()`.
-- Line 97: `sparse()` — `function op=sparse(op)`. Return sparse matrix
-  - Representative operation: `op=op.coeff*speye(op.dim)`.
-- Line 105: `conj()` — `function op=conj(op)`. Conjugate the coefficient
-  - Representative operation: `op.coeff=conj(op.coeff)`.
-
 ## Parameters / inputs
 
 - dim -dimension of the unit matrix

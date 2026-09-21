@@ -17,23 +17,6 @@ Subtracts one RCV object from another. Syntax: A=minus(A,B)
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 21-22: Check consistency; implemented by `grumble(A,B)`.
-- Lines 24-25: Just call plus; implemented by `A=plus(A,(-1)*B)`.
-
-### Key state/data transformations
-
-- Lines 25: computes `A` using `A=plus(A,(-1)*B)`.
-
-### Local helper functions
-
-- Line 30: `grumble()` — `function grumble(A,B)`. "My cat had been suffering from severe illness over the past month or so. This had meant that he had needed increasingly hands-on
-  - Representative operation: `if (~isa(A,'rcv'))&&(~isa(B,'rcv'))`.
-  - Representative operation: `error('at least one input must be an RCV sparse matrix.')`.
-
 ## Parameters / inputs
 
 - A -left operand

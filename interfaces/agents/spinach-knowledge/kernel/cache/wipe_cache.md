@@ -17,31 +17,6 @@ Forces a wipe of the Spinach cache folder. Syntax: wipe_cache(spin_system)
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 24-25: Defaults for command line calls; implemented by `if ~exist('spin_system','var')`.
-- Lines 29-30: Check consistency; implemented by `grumble(spin_system)`.
-- Lines 32-33: Inform the user; implemented by `report(spin_system,'cache wipe requested by the user ')`.
-- Lines 35-36: Set cache memory horizon to zero; implemented by `spin_system.tols.cache_mem=0`.
-- Lines 38-39: Call cache management; implemented by `cacheman(spin_system)`.
-
-### Control flow inferred from the code
-
-- Line 25: conditional branch on `~exist('spin_system','var')`.
-
-### Key state/data transformations
-
-- Lines 26: computes `spin_system` using `spin_system=bootstrap('hush')`.
-- Lines 36: computes `spin_system.tols.cache_mem` using `spin_system.tols.cache_mem=0`.
-
-### Local helper functions
-
-- Line 44: `grumble()` — `function grumble(spin_system)`. I can't lie to you about your chances, but... you have my sympathies.
-  - Representative operation: `if (~isfield(spin_system,'sys'))|| (~isfield(spin_system.sys,'scratch'))`.
-  - Representative operation: `(~isfield(spin_system.sys,'scratch'))`.
-
 ## Parameters / inputs
 
 - spin_system -Spinach object with information (stored

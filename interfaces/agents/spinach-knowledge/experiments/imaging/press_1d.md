@@ -19,32 +19,6 @@
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 38-39: Check consistency; implemented by `grumble(spin_system,parameters,H,R,K,G,F)`.
-- Lines 41-42: Assemble the Liouvillian; implemented by `L=H+F+1i*R+1i*K`.
-- Lines 44-45: Get pulse operators; implemented by `Lp=operator(spin_system,'L+',parameters.spins{1})`.
-- Lines 49-52: Slice selection pulse; implemented by `parameters.rho0=shaped_pulse_af(spin_system,L+parameters.ss_grad_amp*G{1},Lx,Ly, parameters.rho0,parameters.rf_frq_list,parameters.rf_amp_list, parameters.rf_dur_list,pa…`.
-- Lines 54-56: Rephasing gradient; implemented by `parameters.rho0=evolution(spin_system,L-parameters.ss_grad_amp*G{1},[], parameters.rho0,sum(parameters.rf_dur_list)/2,1,'final')`.
-- Lines 58-59: Call to acquisition; implemented by `fid=acquire(spin_system,parameters,H+F,R,K)`.
-
-### Key state/data transformations
-
-- Lines 42: computes `L` using `L=H+F+1i*R+1i*K`.
-- Lines 45: computes `Lp` using `Lp=operator(spin_system,'L+',parameters.spins{1})`.
-- Lines 46: computes `Lx` using `Lx=kron(speye(prod(parameters.npts)),(Lp+Lp')/2)`.
-- Lines 47: computes `Ly` using `Ly=kron(speye(prod(parameters.npts)),(Lp-Lp')/2i)`.
-- Lines 50-52: computes `parameters.rho0` using `parameters.rho0=shaped_pulse_af(spin_system,L+parameters.ss_grad_amp*G{1},Lx,Ly, parameters.rho0,parameters.rf_frq_list,parameters.rf_amp_list, parameters.rf_dur_list,pa…`.
-- Lines 59: computes `fid` using `fid=acquire(spin_system,parameters,H+F,R,K)`.
-
-### Local helper functions
-
-- Line 64: `grumble()` — `function grumble(spin_system,parameters,H,R,K,G,F)`.
-  - Representative operation: `if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})`.
-  - Representative operation: `error('this function is only available in sphten-liouv and zeeman-liouv formalisms.')`.
-
 ## Parameters / inputs
 
 - parameters.ss_grad_amp -the amplitude of slice selection

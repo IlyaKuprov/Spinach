@@ -17,26 +17,6 @@ Converts D and E zero-field splitting parameters described in the abstract of (h
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 27-28: Check consistency; implemented by `grumble(D,E,alp,bet,gam)`.
-- Lines 30-31: Compute the matrix in the eigenframe; implemented by `M=[-D/3+E, 0, 0; 0, -D/3-E, 0; 0, 0, 2*D/3]`.
-- Lines 33-34: Rotate the molecule; implemented by `R=euler2dcm(alp,bet,gam); M=R*M*R'`.
-- Lines 36-37: Tidy up the double precision; implemented by `M=M-eye(3)*trace(M)/3; M=(M+M')/2`.
-
-### Key state/data transformations
-
-- Lines 31: computes `M` using `M=[-D/3+E, 0, 0; 0, -D/3-E, 0; 0, 0, 2*D/3]`.
-- Lines 34: computes `R` using `R=euler2dcm(alp,bet,gam); M=R*M*R'`.
-
-### Local helper functions
-
-- Line 42: `grumble()` — `function grumble(D,E,alp,bet,gam)`. To watch the courageous Afghan freedom fighters battle modern arsenals with simple hand-held weapons is an inspiration to
-  - Representative operation: `if (~isnumeric(D))||(~isreal(D))||(~isscalar(D))|| (~isnumeric(E))||(~isreal(E))||(~isscalar(E))|| (~isnumeric(alp))||(~isreal(alp))||(~isscalar(alp))|| (~isnumeric(bet)…`.
-  - Representative operation: `(~isnumeric(E))||(~isreal(E))||(~isscalar(E))|| (~isnumeric(alp))||(~isreal(alp))||(~isscalar(alp))|| (~isnumeric(bet))||(~isreal(bet))||(~isscalar(bet))|| (~isnumeric(g…`.
-
 ## Parameters / inputs
 
 - D,E -real scalar parameters, Hz

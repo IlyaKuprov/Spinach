@@ -14,17 +14,6 @@ Converts an OPIUM object into the full scaled unit matrix that it represents. Sy
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 21-22: Make a scaled unit matrix; implemented by `M=M.coeff*eye(M.dim)`.
-
-### Key state/data transformations
-
-- Lines 22: computes `M` using `M=M.coeff*eye(M.dim)`.
-
 ## Parameters / inputs
 
 - M -an OPIUM object

@@ -17,23 +17,6 @@ Returns a triangular waveform. Syntax: waveform=triwave(amplitude,frequency,time
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 24-25: Check consistency; implemented by `grumble(amplitude,frequency,time_grid)`.
-- Lines 27-28: Compute the waveform; implemented by `waveform=abs(sawtooth(amplitude,frequency,time_grid))`.
-
-### Key state/data transformations
-
-- Lines 28: computes `waveform` using `waveform=abs(sawtooth(amplitude,frequency,time_grid))`.
-
-### Local helper functions
-
-- Line 33: `grumble()` — `function grumble(amplitude,frequency,time_grid)`.
-  - Representative operation: `if (numel(amplitude)~=1)||(~isnumeric(amplitude))||(~isreal(amplitude))`.
-  - Representative operation: `error('amplitude parameter must be a real number.')`.
-
 ## Parameters / inputs
 
 - amplitude -amplitude at the tooth top

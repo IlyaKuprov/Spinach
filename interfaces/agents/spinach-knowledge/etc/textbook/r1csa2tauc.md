@@ -18,31 +18,6 @@ Estimates the rotational correlation time from the longitudinal CSA relaxation r
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 27-28: Check consistency; implemented by `grumble(R1,del_sq,B0,isotope)`.
-- Lines 30-31: Get the Zeeman frequency; implemented by `omega=-B0*spin(isotope)`.
-- Lines 33-34: Solve the quadratic equation, larger root first to avoid cancellation; implemented by `tauc(2)=(del_sq*omega^2+sqrt(del_sq^2*omega^4-225*omega^2*R1^2))/(15*omega^2*R1)`.
-- Lines 37-38: Check for imaginary components; implemented by `if (~isreal(tauc(1)))&&(~isreal(tauc(2)))`.
-
-### Control flow inferred from the code
-
-- Line 38: conditional branch on `(~isreal(tauc(1)))&&(~isreal(tauc(2)))`.
-
-### Key state/data transformations
-
-- Lines 31: computes `omega` using `omega=-B0*spin(isotope)`.
-- Lines 34: computes `tauc(2)` (the large root) using `tauc(2)=(del_sq*omega^2+sqrt(del_sq^2*omega^4-225*omega^2*R1^2))/(15*omega^2*R1)`.
-- Lines 35: computes `tauc(1)` (the small root) from the product of the roots by Vieta's formula, `tauc(1)=1/(omega^2*tauc(2))`, which avoids cancellation loss in the subtraction form.
-
-### Local helper functions
-
-- Line 45: `grumble()` — `function grumble(R1,del_sq,B0,isotope)`.
-  - Representative operation: `if (~isnumeric(R1))||(~isreal(R1))|| (~isscalar(R1))||(R1<=0)`.
-  - Representative operation: `(~isscalar(R1))||(R1<=0)`.
-
 ## Parameters / inputs
 
 - R1 -longitudinal relaxation rate, Hz

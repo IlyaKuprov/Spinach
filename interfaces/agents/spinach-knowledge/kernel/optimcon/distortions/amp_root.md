@@ -20,33 +20,6 @@ Amplifier compression distortion model. Applies a saturating root-sigmoidal dist
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `distort()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 43-44: Check consistency; implemented by `grumble(w,sat_lvls,s)`.
-- Lines 46-47: Call the distortion function; implemented by `if nargout<2`.
-- Lines 49-50: Plain call; implemented by `w=distort(w,sat_lvls,s)`.
-- Lines 54-55: Distortion call including Jacobian; implemented by `[w,J]=distort(w,sat_lvls,s)`.
-
-### Control flow inferred from the code
-
-- Line 47: conditional branch on `nargout<2`.
-
-### Key state/data transformations
-
-- Lines 50: computes `w` using `w=distort(w,sat_lvls,s)`.
-- Lines 55: computes `[w,J]` using `[w,J]=distort(w,sat_lvls,s)`.
-
-### Local helper functions
-
-- Line 62: `distort()` — `function [w_dist,J]=distort(w,sat_lvls,s)`. Preallocate output
-  - Representative operation: `w_dist=zeros(size(w),'like',w)`.
-  - Representative operation: `if nargout>1`.
-- Line 128: `grumble()` — `function grumble(w,sat_lvls,s)`.
-  - Representative operation: `if (~isnumeric(w))||(~isreal(w))||(mod(size(w,1),2)~=0)`.
-  - Representative operation: `error('w must be an array of reals with an even number of rows.')`.
-
 ## Parameters / inputs
 
 - w -waveform in rad/s nutation frequency units,

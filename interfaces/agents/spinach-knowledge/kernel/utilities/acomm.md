@@ -17,23 +17,6 @@ A simple shorthand for the anticommutator of two matrices. Syntax: C=acomm(A,B)
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Check consistency; implemented by `grumble(A,B)`.
-- Lines 23-24: Do the deed; implemented by `C=A*B+B*A`.
-
-### Key state/data transformations
-
-- Lines 24: computes `C` using `C=A*B+B*A`.
-
-### Local helper functions
-
-- Line 29: `grumble()` — `function grumble(A,B)`.
-  - Representative operation: `if (~isnumeric(A))||(~ismatrix(A))||(size(A,1)~=size(A,2))`.
-  - Representative operation: `error('A must be a numeric square matrix.')`.
-
 ## Parameters / inputs
 
 - A,B -square matrices

@@ -14,29 +14,6 @@ Returns true if the polyadic representation is real. Syntax: answer=isreal(p)
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 19-20: Check the core array; implemented by `for n=1:numel(p.cores)`.
-- Lines 28-29: Check prefix and suffix arrays; implemented by `for n=1:numel(p.prefix)`.
-- Lines 40-41: All data is real; implemented by `answer=true()`.
-
-### Control flow inferred from the code
-
-- Line 20: `for` loop over `n=1:numel(p.cores)`.
-- Line 21: `for` loop over `k=1:numel(p.cores{n})`.
-- Line 22: conditional branch on `~isreal(p.cores{n}{k})`.
-- Line 29: `for` loop over `n=1:numel(p.prefix)`.
-- Line 30: conditional branch on `~isreal(p.prefix{n})`.
-- Line 34: `for` loop over `n=1:numel(p.suffix)`.
-- Line 35: conditional branch on `~isreal(p.suffix{n})`.
-
-### Key state/data transformations
-
-- Lines 23: computes `answer` using `answer=false; return`.
-
 ## Parameters / inputs
 
 - p -a polyadic object

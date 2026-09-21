@@ -15,20 +15,6 @@ Yamaguchi equation estimate of exchange coupling from a broken-symmetry DFT calc
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 9-10: Read Gaussian logs; implemented by `props_sing=gparse('biradical_singlet.log')`.
-- Lines 13-14: Call Yamaguchi equation; implemented by `J=brokensymm(props_sing,props_trip)`.
-
-### Key state/data transformations
-
-- Lines 10: computes `props_sing` using `props_sing=gparse('biradical_singlet.log')`.
-- Lines 11: computes `props_trip` using `props_trip=gparse('biradical_triplet.log')`.
-- Lines 14: computes `J` using `J=brokensymm(props_sing,props_trip)`.
-
 ## Implementation structure
 
 - Yamaguchi equation estimate of exchange coupling from

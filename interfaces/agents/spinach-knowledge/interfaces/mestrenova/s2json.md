@@ -20,26 +20,6 @@ Writes the parameters structure and the free induction decay into a JSON file th
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 34-35: Check consistency; implemented by `grumble(file_name,sys,inter,parameters,fid)`.
-- Lines 37-38: Form the output structure; implemented by `spinach.sys=sys; spinach.inter=inter`.
-- Lines 42-43: Save a JSON object; implemented by `savejson('spinach',spinach,file_name)`.
-
-### Key state/data transformations
-
-- Lines 38: computes `spinach.sys` using `spinach.sys=sys; spinach.inter=inter`.
-- Lines 39: computes `spinach.parameters` using `spinach.parameters=parameters`.
-- Lines 40: computes `spinach.fid` using `spinach.fid=fid`.
-
-### Local helper functions
-
-- Line 48: `grumble()` — `function grumble(file_name,sys,inter,parameters,fid)`.
-  - Representative operation: `if ~ischar(file_name)`.
-  - Representative operation: `error('file_name must be a character string.')`.
-
 ## Parameters / inputs
 
 - file_name -output file name

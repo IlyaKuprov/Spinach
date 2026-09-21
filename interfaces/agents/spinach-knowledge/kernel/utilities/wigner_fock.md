@@ -18,32 +18,6 @@ Wigner function of a bosonic mode state given as a density matrix in a truncated
 - The only eigenvalue call is the positive-semidefiniteness test in the grumbler; the Hermiticity, unit-trace, and positivity tolerances are sqrt(eps) of the class of `rho`, so single-precision density matrices are accepted.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 46-47: Check consistency; implemented by `grumble(rho,alpha)`.
-- Lines 49-50: Annihilation and parity operators in the truncated Fock basis; implemented by `nlevels=size(rho,1); an_op=diag(sqrt(1:(nlevels-1)),1)`.
-- Lines 53-54: Displaced parity expectation values at the grid points; implemented by `W=zeros(size(alpha))`.
-
-### Control flow inferred from the code
-
-- Line 55: `for` loop over `n=1:numel(alpha)`.
-
-### Key state/data transformations
-
-- Lines 50: computes `nlevels` using `nlevels=size(rho,1); an_op=diag(sqrt(1:(nlevels-1)),1)`.
-- Lines 51: computes `parity` using `parity=diag((-1).^(0:(nlevels-1)))`.
-- Lines 54: computes `W` using `W=zeros(size(alpha))`.
-- Lines 56: computes `disp_op` using `disp_op=expm(alpha(n)*an_op'-conj(alpha(n))*an_op)`.
-- Lines 57: computes `W(n)` using `W(n)=(2/pi)*real(trace(rho*(disp_op*parity*disp_op')))`.
-
-### Local helper functions
-
-- Line 63: `grumble()` — `function grumble(rho,alpha)`.
-  - Representative operation: `if (~isfloat(rho))||(~ismatrix(rho))||(size(rho,1)~=size(rho,2))||(size(rho,1)<2)||(~all(isfinite(rho),'all'))`.
-  - Representative operation: `error('rho must be a square floating-point matrix of dimension at least 2 with finite elements.')`.
-
 ## Parameters / inputs
 
 - rho -density matrix of the mode in the Fock basis

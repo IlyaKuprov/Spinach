@@ -14,17 +14,6 @@ Opens Spinach documentation Wiki page.
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 7-8: Call the default browser; implemented by `web('https://spindynamics.org/wiki/index.php?title=Main_Page','-browser')`.
-
-### Key state/data transformations
-
-- Lines 8: computes `web('https://spindynamics.org/wiki/index.php?title` using `web('https://spindynamics.org/wiki/index.php?title=Main_Page','-browser')`.
-
 ## Implementation structure
 
 - Opens Spinach documentation Wiki page.

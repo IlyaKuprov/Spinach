@@ -14,26 +14,6 @@ Tests the commutator utility. Syntax: result=test_commutator_utility()
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 16-17: Announce the test target; implemented by `fprintf('TESTING: Matrix commutator utility\n')`.
-- Lines 19-22: State the mathematical target of the test; implemented by `result=new_test_result('kernel/commutator_utility', 'Matrix commutator utility', 'comm(A,B) must return AB-BA exactly.')`.
-- Lines 24-25: Define a non-commuting pair and its reference commutator; implemented by `A=[1 2;3 4]`.
-- Lines 29-31: Check the utility on a non-commuting pair; implemented by `result=test_close(result,'non-commuting pair',comm(A,B),C,1e-15,1e-15, 'the commutator is defined as AB-BA')`.
-- Lines 33-34: Check a commuting diagonal pair; implemented by `D=diag([1 2 3])`.
-
-### Key state/data transformations
-
-- Lines 20-22: computes `result` using `result=new_test_result('kernel/commutator_utility', 'Matrix commutator utility', 'comm(A,B) must return AB-BA exactly.')`.
-- Lines 25: computes `A` using `A=[1 2;3 4]`.
-- Lines 26: computes `B` using `B=[0 1;-1 2]`.
-- Lines 27: computes `C` using `C=A*B-B*A`.
-- Lines 34: computes `D` using `D=diag([1 2 3])`.
-- Lines 35: computes `E` using `E=diag([4 5 6])`.
-
 ## Outputs
 
 - result -regression test result with explanatory messages

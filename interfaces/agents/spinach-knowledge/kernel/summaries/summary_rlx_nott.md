@@ -17,19 +17,6 @@ Prints Nottingham DNP relaxation-rate summary for a Spinach system. Syntax: summ
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Check consistency; implemented by `grumble(spin_system)`.
-- Lines 23-24: Print the relaxation-rate table; implemented by `report(spin_system,' ')`.
-
-### Local helper functions
-
-- Line 35: `grumble()` — `function grumble(spin_system)`. As a man, sometimes you have to make a choice between mocking astrology and getting laid.
-  - Representative operation: `if ~isstruct(spin_system)`.
-  - Representative operation: `error('spin_system must be a structure.')`.
-
 ## Parameters / inputs
 
 - spin_system -Spinach spin system description object

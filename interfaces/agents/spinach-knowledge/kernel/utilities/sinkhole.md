@@ -17,23 +17,6 @@ Turns the specified states into sinkholes --any population reaching them will be
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 27-28: Check consistency; implemented by `grumble(spin_system,L,states)`.
-- Lines 30-31: Zero columns corresponding to sinkhole states; implemented by `L(:,states)=0`.
-
-### Key state/data transformations
-
-- Lines 31: computes `L(:,states)` using `L(:,states)=0`.
-
-### Local helper functions
-
-- Line 36: `grumble()` — `function grumble(spin_system,L,states)`.
-  - Representative operation: `if ~strcmp(spin_system.bas.formalism,'sphten-liouv')`.
-  - Representative operation: `error('this function is only applicable to sphten-liouv formalism.')`.
-
 ## Parameters / inputs
 
 - L -Liovillian matrix

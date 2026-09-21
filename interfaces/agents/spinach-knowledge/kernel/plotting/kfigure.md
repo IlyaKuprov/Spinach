@@ -14,18 +14,6 @@ Resets the stupid ass figure defaults in R2025a and later back to sensible value
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 10-11: Reset to pre-R2025a settings; implemented by `set(groot,'defaultFigurePosition',[680 458 560 420])`.
-- Lines 16-17: Create and return a handle; implemented by `handle=figure(varargin{:})`.
-
-### Key state/data transformations
-
-- Lines 17: computes `handle` using `handle=figure(varargin{:})`.
-
 ## Implementation structure
 
 - Resets the stupid ass figure defaults in R2025a

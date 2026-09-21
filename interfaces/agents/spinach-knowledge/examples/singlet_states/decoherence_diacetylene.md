@@ -20,40 +20,6 @@ Long-lived spin states in the diacetylene molecule (2 protons, 4 carbons, 4096-d
 
 - An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 13-16: Read the spin system (coordinates, chemical shifts, J-couplings and CSAs) from a vacuum DFT calculation; implemented by `[sys,inter]=g2spinach(gparse('../standard_systems/diacetylene.log'), {{'H','1H'},{'C','13C'}},[31.8 182.4],[])`.
-- Lines 18-19: Set magnet field to 1.0 Tesla; implemented by `sys.magnet=14.1`.
-- Lines 21-22: Tighten up the tolerances; implemented by `sys.tols.rlx_integration=1e-5`.
-- Lines 24-25: Set relaxation theory parameters; implemented by `inter.relaxation={'redfield'}`.
-- Lines 30-31: Relaxation superoperator accuracy; implemented by `sys.tols.rlx_integration=1e-5`.
-- Lines 34-35: Use complete basis set; implemented by `bas.formalism='sphten-liouv'`.
-- Lines 38-39: Spinach housekeeping; implemented by `spin_system=create(sys,inter)`.
-- Lines 42-43: Build the relaxation superoperator; implemented by `R=relaxation(spin_system)`.
-- Lines 46-48: List twenty smallest magnitude eigenvalues of the relaxation superoperator (diagonal preconditioning is used); implemented by `disp('20 smallest eigenvalues of the relaxation superoperator:')`.
-- Lines 51-53: Compute the self-relaxation rate of the singlet state between the two centre carbons (spins 1 and 2 in this case); implemented by `S=singlet(spin_system,1,2); S=S/norm(S)`.
-- Lines 57-58: Find the eigenvectors corresponding to the slowly relaxing states; implemented by `[v,~]=eigs(R-speye(size(R)),2,'SM')`.
-- Lines 60-61: Get the spherical tensor composition of the slowly relaxing states; implemented by `disp('Slowly relaxing state 1:')`.
-
-### Key state/data transformations
-
-- Lines 15-16: computes `[sys,inter]` using `[sys,inter]=g2spinach(gparse('../standard_systems/diacetylene.log'), {{'H','1H'},{'C','13C'}},[31.8 182.4],[])`.
-- Lines 19: computes `sys.magnet` using `sys.magnet=14.1`.
-- Lines 22: computes `sys.tols.rlx_integration` using `sys.tols.rlx_integration=1e-5`.
-- Lines 25: computes `inter.relaxation` using `inter.relaxation={'redfield'}`.
-- Lines 26: computes `inter.equilibrium` using `inter.equilibrium='zero'`.
-- Lines 27: computes `inter.rlx_keep` using `inter.rlx_keep='labframe'`.
-- Lines 28: computes `inter.tau_c` using `inter.tau_c={100e-12}`.
-- Lines 32: computes `sys.tols.rlx_zero` using `sys.tols.rlx_zero=1e-5`.
-- Lines 35: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
-- Lines 36: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 39: computes `spin_system` using `spin_system=create(sys,inter)`.
-- Lines 43: computes `R` using `R=relaxation(spin_system)`.
-- Lines 53: computes `S` using `S=singlet(spin_system,1,2); S=S/norm(S)`.
-- Lines 58: computes `[v,~]` using `[v,~]=eigs(R-speye(size(R)),2,'SM')`.
-
 ## Implementation structure
 
 - Long-lived spin states in the diacetylene molecule (2 protons,

@@ -17,34 +17,6 @@ Saves the current parallel pool ValueStore into a Matlab file. The snapshot cont
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 18-19: Check consistency; implemented by `grumble(file_name)`.
-- Lines 21-22: Get the current parallel pool; implemented by `current_pool=gcp('nocreate')`.
-- Lines 27-28: Get the current ValueStore; implemented by `store=current_pool.ValueStore`.
-- Lines 30-31: Get all keys and values; implemented by `key_set=keys(store)`.
-- Lines 38-39: Save the snapshot; implemented by `save(file_name,'key_set','val_set','-v7.3'); drawnow`.
-
-### Control flow inferred from the code
-
-- Line 23: conditional branch on `isempty(current_pool)`.
-- Line 32: conditional branch on `isempty(key_set)`.
-
-### Key state/data transformations
-
-- Lines 22: computes `current_pool` using `current_pool=gcp('nocreate')`.
-- Lines 28: computes `store` using `store=current_pool.ValueStore`.
-- Lines 31: computes `key_set` using `key_set=keys(store)`.
-- Lines 33: computes `val_set` using `val_set=cell(size(key_set))`.
-
-### Local helper functions
-
-- Line 44: `grumble()` — `function grumble(file_name)`. History has shown us that it's not religion that's the problem, but any system of thought that insists
-  - Representative operation: `if (~ischar(file_name))||(~isrow(file_name))||isempty(file_name)`.
-  - Representative operation: `error('file_name must be a non-empty character string.')`.
-
 ## Parameters / inputs
 
 - file_name -a character string specifying the destination

@@ -19,35 +19,6 @@ Ramsey shifts of other spins under an off-resonant drive. A proton channel drive
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
 - The file also defines local helper function(s): `shift_phases()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 22-23: Off-resonant nucleus phases at the base amplitude and field; implemented by `[ph_c,ph_n,ph_ca,ph_na]=shift_phases(14.1,2*pi*25e3)`.
-- Lines 29-30: Check the phases and the sign flip; implemented by `if abs(ph_c-ph_ca)/abs(ph_ca)>1e-6`.
-- Lines 41-42: Quadratic scaling in the drive amplitude; implemented by `ph_c2=shift_phases(14.1,2*pi*50e3)`.
-- Lines 49-50: Inverse scaling in the magnet field; implemented by `ph_ch=shift_phases(14.1/2,2*pi*25e3)`.
-
-### Control flow inferred from the code
-
-- Line 30: conditional branch on `abs(ph_c-ph_ca)/abs(ph_ca)>1e-6`.
-- Line 33: conditional branch on `abs(ph_n-ph_na)/abs(ph_na)>1e-6`.
-- Line 36: conditional branch on `sign(ph_c)==sign(ph_n)`.
-- Line 45: conditional branch on `abs(ph_c2/ph_c-4)>1e-5`.
-- Line 53: conditional branch on `abs(ph_ch/ph_c-2)>1e-5`.
-
-### Key state/data transformations
-
-- Lines 23: computes `[ph_c,ph_n,ph_ca,ph_na]` using `[ph_c,ph_n,ph_ca,ph_na]=shift_phases(14.1,2*pi*25e3)`.
-- Lines 42: computes `ph_c2` using `ph_c2=shift_phases(14.1,2*pi*50e3)`.
-- Lines 50: computes `ph_ch` using `ph_ch=shift_phases(14.1/2,2*pi*25e3)`.
-
-### Local helper functions
-
-- Line 61: `shift_phases()` — `function [ph_c,ph_n,ph_ca,ph_na]=shift_phases(b_field,amp)`. Three-spin system with two off-resonant isotopes
-  - Representative operation: `sys.magnet=b_field; sys.isotopes={'1H','13C','15N'}`.
-  - Representative operation: `sys.output='hush'`.
-
 ## Implementation structure
 
 - Ramsey shifts of other spins under an off-resonant drive. A proton

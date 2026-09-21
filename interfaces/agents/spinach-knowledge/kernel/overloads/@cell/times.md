@@ -17,36 +17,6 @@ Multiplies all entries of a cell array by a user-specified scalar or a matching 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 24-25: Check consistency; implemented by `grumble(A,B)`.
-- Lines 27-28: Decide the topology; implemented by `if iscell(A)&&isnumeric(B)`.
-- Lines 30-31: Multiply every cell from the left; implemented by `for n=1:numel(A)`.
-- Lines 42-43: Multiply every cell from the right; implemented by `for n=1:numel(B)`.
-- Lines 54-55: Complain and bomb out; implemented by `error('at least one argument must be numeric.')`.
-
-### Control flow inferred from the code
-
-- Line 28: conditional branch on `iscell(A)&&isnumeric(B)`.
-- Line 31: `for` loop over `n=1:numel(A)`.
-- Line 32: conditional branch on `isscalar(B)`.
-- Line 43: `for` loop over `n=1:numel(B)`.
-- Line 44: conditional branch on `isscalar(A)`.
-
-### Key state/data transformations
-
-- Lines 33: computes `A{n}` using `A{n}=A{n}*B`.
-- Lines 38: computes `C` using `C=A`.
-- Lines 45: computes `B{n}` using `B{n}=A*B{n}`.
-
-### Local helper functions
-
-- Line 62: `grumble()` — `function grumble(A,B)`.
-  - Representative operation: `if (~iscell(A))&&(~isnumeric(A))`.
-  - Representative operation: `error('A must be either numeric or a cell array.')`.
-
 ## Parameters / inputs
 
 - A -a matrix or a cell array thereof

@@ -18,19 +18,6 @@ A wrapper intended to trick SPMD blocks into saving data. Can only save one vari
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Check consistency; implemented by `grumble(file_name)`.
-- Lines 23-24: Just call save; implemented by `save(file_name,'variable','-v7.3'); drawnow`.
-
-### Local helper functions
-
-- Line 29: `grumble()` — `function grumble(file_name)`. Life struggles to survive here, and while some clings to a tenacious existence, it is anemic and sickly.
-  - Representative operation: `if ~ischar(file_name)`.
-  - Representative operation: `error('file_name must be a character string.')`.
-
 ## Parameters / inputs
 
 - file_name -a character string specifying the

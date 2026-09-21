@@ -17,23 +17,6 @@ Converts L,M indexing of spin states into linear indexing. In the linear indexin
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 31-32: Check consistency; implemented by `grumble(L,M)`.
-- Lines 34-35: Get the linear index; implemented by `I=L.^2+L-M`.
-
-### Key state/data transformations
-
-- Lines 35: computes `I` using `I=L.^2+L-M`.
-
-### Local helper functions
-
-- Line 40: `grumble()` — `function grumble(L,M)`.
-  - Representative operation: `if (~isnumeric(L))||(~isreal(L))||any(mod(L(:),1)~=0)|| (~isnumeric(M))||(~isreal(M))||any(mod(M(:),1)~=0)`.
-  - Representative operation: `(~isnumeric(M))||(~isreal(M))||any(mod(M(:),1)~=0)`.
-
 ## Syntax
 
 ```matlab

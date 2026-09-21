@@ -17,35 +17,6 @@ Converts k,q indexing of matrices into their linear serpentine indexing. In base
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 41-42: Check consistency; implemented by `grumble(N,K,Q,idx_base)`.
-- Lines 44-45: Sepentine matrix; implemented by `S=serpentine(N,idx_base)`.
-- Lines 47-48: Direct look-up; implemented by `I=zeros(size(K))`.
-- Lines 53-54: 0-base indexing; implemented by `for n=1:numel(K)`.
-- Lines 60-61: 1-base indexing; implemented by `for n=1:numel(K)`.
-- Lines 67-68: Complain and bomb out; implemented by `error('unsupported indexing base.')`.
-
-### Control flow inferred from the code
-
-- Line 49: dispatches on `idx_base`; cases `0`, `1`.
-- Line 54: `for` loop over `n=1:numel(K)`.
-- Line 61: `for` loop over `n=1:numel(K)`.
-
-### Key state/data transformations
-
-- Lines 45: computes `S` using `S=serpentine(N,idx_base)`.
-- Lines 48: computes `I` using `I=zeros(size(K))`.
-- Lines 55: computes `I(n)` using `I(n)=S(K(n)+1,Q(n)+1)`.
-
-### Local helper functions
-
-- Line 75: `grumble()` — `function grumble(N,K,Q,idx_base)`.
-  - Representative operation: `if (~isnumeric(idx_base))||(~isreal(idx_base))|| (~isscalar(idx_base))||(~ismember(idx_base,[0 1]))`.
-  - Representative operation: `(~isscalar(idx_base))||(~ismember(idx_base,[0 1]))`.
-
 ## Syntax
 
 ```matlab

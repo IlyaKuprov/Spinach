@@ -15,26 +15,6 @@ Tests exponential FID apodisation. Syntax: result=test_apodisation_exp_window()
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 16-17: Announce the test target; implemented by `fprintf('TESTING: Exponential FID apodisation\n')`.
-- Lines 19-22: State the processing target of the test; implemented by `result=new_test_result('kernel/apodisation_exp_window', 'Exponential FID apodisation', 'exponential apodisation must multiply by exp(-k*x) and halve the first point.')`.
-- Lines 24-25: Build a minimal reporting object and a constant FID; implemented by `spin_system.sys.output='hush'`.
-- Lines 28-29: Apply an exponential window; implemented by `fid_obs=apodisation(spin_system,fid,{{'exp',1}})`.
-- Lines 33-35: Check the explicit window; implemented by `result=test_close(result,'exp window and first-point half',fid_obs,fid_ref,1e-15,1e-15, 'the first point is halved, then multiplied by exp(-x)')`.
-
-### Key state/data transformations
-
-- Lines 20-22: computes `result` using `result=new_test_result('kernel/apodisation_exp_window', 'Exponential FID apodisation', 'exponential apodisation must multiply by exp(-k*x) and halve the first point.')`.
-- Lines 25: computes `spin_system.sys.output` using `spin_system.sys.output='hush'`.
-- Lines 26: computes `fid` using `fid=ones(4,1)`.
-- Lines 29: computes `fid_obs` using `fid_obs=apodisation(spin_system,fid,{{'exp',1}})`.
-- Lines 30: computes `fid_ref` using `fid_ref=exp(-linspace(0,1,4)).'`.
-- Lines 31: computes `fid_ref(1)` using `fid_ref(1)=fid_ref(1)/2`.
-
 ## Outputs
 
 - result -regression test result with explanatory messages

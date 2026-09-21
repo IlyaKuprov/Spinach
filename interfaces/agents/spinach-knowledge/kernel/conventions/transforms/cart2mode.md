@@ -17,31 +17,6 @@ Converts Cartesian derivatives of spin Hamiltonian parameters, as produced by el
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 58-59: Check consistency; implemented by `grumble(cart_derivs,eigvecs,masses,frqs)`.
-- Lines 61-62: Expand atomic masses over Cartesian degrees of freedom; implemented by `dof_masses=kron(masses,[1;1;1])*1.66053906892e-27`.
-- Lines 64-65: Zero-point displacement scale vectors in Angstrom; implemented by `scales=1e10*eigvecs.*sqrt((6.62607015e-34/(2*pi))./(dof_masses*(2*pi*frqs)))`.
-- Lines 67-68: Contract the derivatives with the scale vectors; implemented by `if ndims(cart_derivs)==3`.
-
-### Control flow inferred from the code
-
-- Line 68: conditional branch on `ndims(cart_derivs)==3`.
-
-### Key state/data transformations
-
-- Lines 62: computes `dof_masses` using `dof_masses=kron(masses,[1;1;1])*1.66053906892e-27`.
-- Lines 65: computes `scales` using `scales=1e10*eigvecs.*sqrt((6.62607015e-34/(2*pi))./(dof_masses*(2*pi*frqs)))`.
-- Lines 69: computes `mode_derivs` using `mode_derivs=sum(cart_derivs.*reshape(scales,1,1,[]),3)`.
-
-### Local helper functions
-
-- Line 78: `grumble()` — `function grumble(cart_derivs,eigvecs,masses,frqs)`.
-  - Representative operation: `if (~isnumeric(cart_derivs))||(~isreal(cart_derivs))|| any(~isfinite(cart_derivs),'all')`.
-  - Representative operation: `any(~isfinite(cart_derivs),'all')`.
-
 ## Parameters / inputs
 
 - cart_derivs -first derivatives of an interaction with

@@ -14,29 +14,6 @@ Stretches arrays into vectors -useful for situations when the stand- ard (:) syn
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 27-28: Decide how to proceed; implemented by `if isa(A,'ttclass')`.
-- Lines 30-31: Read tensor train sizes and ranks; implemented by `[ncores,ntrains]=size(A.cores)`.
-- Lines 34-35: Reshape the cores; implemented by `for n=1:ntrains`.
-- Lines 43-44: Use standard Matlab stretch; implemented by `A=reshape(A,[numel(A) 1])`.
-
-### Control flow inferred from the code
-
-- Line 28: conditional branch on `isa(A,'ttclass')`.
-- Line 35: `for` loop over `n=1:ntrains`.
-- Line 36: `for` loop over `k=1:ncores`.
-
-### Key state/data transformations
-
-- Lines 31: computes `[ncores,ntrains]` using `[ncores,ntrains]=size(A.cores)`.
-- Lines 32: computes `ttm_ranks` using `ttm_ranks=ranks(A); ttm_sizes=sizes(A)`.
-- Lines 37: computes `A.cores{k,n}` using `A.cores{k,n}=reshape(A.cores{k,n},[ttm_ranks(k,n),ttm_sizes(k,1)*ttm_sizes(k,2),1,ttm_ranks(k+1,n)])`.
-- Lines 44: computes `A` using `A=reshape(A,[numel(A) 1])`.
-
 ## Parameters / inputs
 
 - A -numeric or ttclass array

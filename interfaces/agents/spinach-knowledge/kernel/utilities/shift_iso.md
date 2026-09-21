@@ -17,30 +17,6 @@ Replaces the isotropic parts of interaction tensors with user- supplied values. 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 34-35: Check consistency; implemented by `grumble(tensors,spin_numbers,new_iso)`.
-- Lines 37-38: Loop over the tensors; implemented by `for n=1:numel(spin_numbers)`.
-- Lines 40-41: Isolate the anisotropy; implemented by `[~,rank1,rank2]=mat2sphten(tensors{spin_numbers(n)})`.
-- Lines 43-44: Rebuild with the new isotropic part; implemented by `tensors{spin_numbers(n)}=sphten2mat([],rank1,rank2)+new_iso(n)*eye(3)`.
-
-### Control flow inferred from the code
-
-- Line 38: `for` loop over `n=1:numel(spin_numbers)`.
-
-### Key state/data transformations
-
-- Lines 41: computes `[~,rank1,rank2]` using `[~,rank1,rank2]=mat2sphten(tensors{spin_numbers(n)})`.
-- Lines 44: computes `tensors{spin_numbers(n)}` using `tensors{spin_numbers(n)}=sphten2mat([],rank1,rank2)+new_iso(n)*eye(3)`.
-
-### Local helper functions
-
-- Line 51: `grumble()` — `function grumble(tensors,spin_numbers,new_iso)`.
-  - Representative operation: `if (~iscell(tensors))||any(any(~cellfun(@isreal,tensors)))|| any(any(~cellfun(@(x)all(size(x)==[3 3]|isempty(x)),tensors)))`.
-  - Representative operation: `any(any(~cellfun(@(x)all(size(x)==[3 3]|isempty(x)),tensors)))`.
-
 ## Parameters / inputs
 
 - tensors -a cell array of interaction tensors

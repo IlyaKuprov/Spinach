@@ -17,23 +17,6 @@ Divides an RCV sparse matrix by a numeric scalar. Syntax: A=rdivide(A,k)
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 21-22: Check consistency; implemented by `grumble(A,k)`.
-- Lines 24-25: Divide stored values by the scalar; implemented by `A.val=A.val/k`.
-
-### Key state/data transformations
-
-- Lines 25: computes `A.val` using `A.val=A.val/k`.
-
-### Local helper functions
-
-- Line 30: `grumble()` — `function grumble(A,k)`. Главное памятник поставить, а голуби сами прилетят. Святослав Вернидубович Кривич
-  - Representative operation: `if ~isa(A,'rcv')`.
-  - Representative operation: `error('the first argument must be an RCV sparse matrix.')`.
-
 ## Parameters / inputs
 
 - A -RCV sparse matrix

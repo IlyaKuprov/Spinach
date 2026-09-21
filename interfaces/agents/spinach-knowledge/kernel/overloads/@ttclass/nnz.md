@@ -14,17 +14,6 @@ Counts non-zero elements in all cores of a tensor train. Syntax: answer=nnz(ttra
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Count the non-zeros; implemented by `answer=sum(sum(cellfun(@nnz,ttrain.cores)))`.
-
-### Key state/data transformations
-
-- Lines 21: computes `answer` using `answer=sum(sum(cellfun(@nnz,ttrain.cores)))`.
-
 ## Parameters / inputs
 
 - ttrain -tensor train object

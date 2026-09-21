@@ -17,29 +17,6 @@ Finds the centre of mass point of a 3D probability density in a cube. Syntax: [x
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 24-25: Check consistency; implemented by `grumble(probden,ranges)`.
-- Lines 27-30: Get coordinate arrays; implemented by `[X,Y,Z]=ndgrid(linspace(ranges(1),ranges(2),size(probden,1)), linspace(ranges(3),ranges(4),size(probden,2)), linspace(ranges(5),ranges(6),size(probden,3)))`.
-- Lines 32-33: Get the normalization; implemented by `n=trapz(trapz(trapz(probden)))`.
-- Lines 35-36: Get centroid coordinates; implemented by `x=trapz(trapz(trapz(X.*probden)))/n`.
-
-### Key state/data transformations
-
-- Lines 28-30: computes `[X,Y,Z]` using `[X,Y,Z]=ndgrid(linspace(ranges(1),ranges(2),size(probden,1)), linspace(ranges(3),ranges(4),size(probden,2)), linspace(ranges(5),ranges(6),size(probden,3)))`.
-- Lines 33: computes `n` using `n=trapz(trapz(trapz(probden)))`.
-- Lines 36: computes `x` using `x=trapz(trapz(trapz(X.*probden)))/n`.
-- Lines 37: computes `y` using `y=trapz(trapz(trapz(Y.*probden)))/n`.
-- Lines 38: computes `z` using `z=trapz(trapz(trapz(Z.*probden)))/n`.
-
-### Local helper functions
-
-- Line 43: `grumble()` — `function grumble(probden,ranges)`.
-  - Representative operation: `if (~isnumeric(ranges))||(~isreal(ranges))||(numel(ranges)~=6)`.
-  - Representative operation: `error('ranges must be a real vector with six elements.')`.
-
 ## Parameters / inputs
 
 - probden -probability density cube with dimensions

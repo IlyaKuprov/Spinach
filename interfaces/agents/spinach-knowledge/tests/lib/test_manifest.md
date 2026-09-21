@@ -24,22 +24,6 @@ Returns Spinach regression test metadata. Syntax: manifest=test_manifest()
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
 - The file also defines local helper function(s): `test_entry()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 13-118: Hand-written physically motivated tests; implemented by `manifest=[ test_entry('kernel/pauli_spin_half_algebra','Spin-half angular momentum algebra','test_pauli_spin_half_algebra'), test_entry('kernel/pauli_spin_one_algebra','…`.
-
-### Key state/data transformations
-
-- Lines 14-118: computes `manifest` using `manifest=[ test_entry('kernel/pauli_spin_half_algebra','Spin-half angular momentum algebra','test_pauli_spin_half_algebra'), test_entry('kernel/pauli_spin_one_algebra','…`.
-
-### Local helper functions
-
-- Line 123: `test_entry()` — `function entry=test_entry(id,name,function_name)`. Build one manifest entry
-  - Representative operation: `entry.id=id`.
-  - Representative operation: `entry.name=name`.
-
 ## Outputs
 
 - manifest -structure array with test identifiers and functions

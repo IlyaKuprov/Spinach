@@ -17,26 +17,6 @@ Prints basis-set option summary for a Spinach system. Syntax: summary_basis_opts
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Check consistency; implemented by `grumble(spin_system)`.
-- Lines 23-24: Report the formalism; implemented by `switch spin_system.bas.formalism`.
-- Lines 37-38: Report the approximation; implemented by `if strcmp(spin_system.bas.formalism,'sphten-liouv')`.
-
-### Control flow inferred from the code
-
-- Line 24: dispatches on `spin_system.bas.formalism`; cases `'zeeman-wavef'`, `'zeeman-hilb'`, `'zeeman-liouv'`, `'sphten-liouv'`.
-- Line 38: conditional branch on `strcmp(spin_system.bas.formalism,'sphten-liouv')`.
-- Line 39: dispatches on `spin_system.bas.approximation`; cases `'IK-0'`, `'IK-1'`, `'IK-2'`, `'IK-DNP'`, `'IK-SBS'` (three correlation levels, coupling graph source, and cut-off), `'none'`.
-
-### Local helper functions
-
-- Line 78: `grumble()` — `function grumble(spin_system)`. According to a trade legend, Uhlenbeck and Goudsmit (students of Ehrenfest when they stumbled upon the concept of spin) presented
-  - Representative operation: `if ~isstruct(spin_system)`.
-  - Representative operation: `error('spin_system must be a structure.')`.
-
 ## Parameters / inputs
 
 - spin_system -Spinach spin system description object

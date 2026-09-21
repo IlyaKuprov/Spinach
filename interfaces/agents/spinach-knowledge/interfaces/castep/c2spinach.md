@@ -21,25 +21,6 @@ Parser for .magres files written by CASTEP and other codes in the CCP-NC magres 
 - Units records for atom, ms, efg, and isc are checked against the standard units and anything else is an error; an absent units record means the standard unit, as the specification prescribes.
 - The file contains an explicit `grumble(...)` validator for the input argument and a local key resolver shared by the ms, efg, and isc records.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 58-59: Check consistency; implemented by `grumble(file_name)`.
-- Lines 61-65: Read the file, drop the comments, and trim the lines; implemented by `magres_log=strtrim(regexprep(magres_log{1},'#.*$',''))`.
-- Lines 67-86: Locate the block tags and refuse nested or unbalanced blocks; implemented by `tag_tokens=regexp(magres_log,'^[\[<](/?)([A-Za-z_]\w*)[\]>]$','tokens','once')` followed by a pass over the tag lines that pairs each opening tag with its closing tag and records the block name and line range; exactly one [atoms] and one [magres] block are required.
-- Lines 88-97: Check the units of the records that are read below; implemented by matching `^units\s+(\S+)\s+(\S+)$` inside the two blocks against Angstrom, ppm, au, and 10^19.T^2.J^-1.
-- Lines 99-100: Regular expressions for a number and for a 3x3 tensor; implemented by `num_pat='([-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?)'` and `ten_pat=repmat(['\s+' num_pat],1,9)`.
-- Lines 102-110: Atom records: species, label, index in label, and coordinates; implemented by matching `^atom\s+(\S+)\s+(\S+)\s+(\d+)` plus three numbers; a malformed atom record or an empty atom list is an error.
-- Lines 112-115: Atom keys, delimited and glued, with canonical indices; implemented by `atom_index=cellfun(@(x)num2str(str2double(x)),atom_tokens(:,3),'UniformOutput',false)`, `atom_keys=strcat(label,{' '},atom_index)`, and `glued_keys=strcat(label,atom_index)`, so that a zero-padded index matches the same unpadded index; duplicate keys are an error.
-- Lines 117-137: Shielding and EFG records, matched to the atoms by label and index; the identity tokens of each record (one glued token, or label and index) are resolved by `key_atoms`; a record that matches no atom or several atoms, or a repeated record for the same atom, is an error. `props.cst` and `props.efg` are returned only when at least one tensor was found.
-- Lines 139-159: Reduced spin-spin coupling records, isotropic parts in gparse units; the two to four identity tokens are resolved by `key_atoms` into an atom pair, self-coupling records are skipped, the isotropic parts of K(A,B) and K(B,A) are averaged when both are present, and `props.k_couplings` is returned only when isc records exist.
-
-### Local helper functions
-
-- Line 164: `key_atoms()` — `function atoms=key_atoms(id_tokens,atom_keys,glued_keys,natoms_needed)`; tries every split of the identity tokens into delimited (label, index) and glued (labelindex) keys, and returns one row of atom numbers per split under which every key matches exactly one atom, so that the caller can refuse records with no match or an ambiguous match.
-- Line 186: `grumble()` — `function grumble(file_name)`; checks that the file name is a character string.
-
 ## Parameters / inputs
 
 - file_name - the name of the *.magres file, a character string

@@ -17,28 +17,6 @@ Converts fractional crystallographic coordinates to Cartesian coordinates. Synta
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 28-29: Check consistency; implemented by `grumble(a,b,c,alp,bet,gam,ABC)`.
-- Lines 31-32: Compute the transformation matrix; implemented by `v=a*b*c*sqrt(1-cosd(alp)^2-cosd(bet)^2-cosd(gam)^2+2*cosd(alp)*cosd(bet)*cosd(gam))`.
-- Lines 37-38: Apply the transformation matrix; implemented by `XYZ=(T*ABC')'`.
-- Lines 40-41: Get the primitive vectors; implemented by `va=T(:,1); vb=T(:,2); vc=T(:,3)`.
-
-### Key state/data transformations
-
-- Lines 32: computes `v` using `v=a*b*c*sqrt(1-cosd(alp)^2-cosd(bet)^2-cosd(gam)^2+2*cosd(alp)*cosd(bet)*cosd(gam))`.
-- Lines 33: computes `T` using `T=[a b*cosd(gam) c*cosd(bet)`.
-- Lines 38: computes `XYZ` using `XYZ=(T*ABC')'`.
-- Lines 41: computes `va` using `va=T(:,1); vb=T(:,2); vc=T(:,3)`.
-
-### Local helper functions
-
-- Line 46: `grumble()` — `function grumble(a,b,c,alp,bet,gam,ABC)`.
-  - Representative operation: `if (~isnumeric(a))||(~isscalar(a))||(~isreal(a))||(a<=0)|| (~isnumeric(b))||(~isscalar(b))||(~isreal(b))||(b<=0)|| (~isnumeric(c))||(~isscalar(c))||(~isreal(c))||(c<=0)`.
-  - Representative operation: `(~isnumeric(b))||(~isscalar(b))||(~isreal(b))||(b<=0)|| (~isnumeric(c))||(~isscalar(c))||(~isreal(c))||(c<=0)`.
-
 ## Parameters / inputs
 
 - a,b,c -three unit cell dimensions

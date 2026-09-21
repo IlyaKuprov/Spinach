@@ -17,23 +17,6 @@ Converts Kelvin energy units used for Debye temperatures and thermal energy scal
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 21-22: Check consistency; implemented by `grumble(kelvin)`.
-- Lines 24-25: Run the conversion; implemented by `hz=1.380649e-23*kelvin/6.62607015e-34`.
-
-### Key state/data transformations
-
-- Lines 25: computes `hz` using `hz=1.380649e-23*kelvin/6.62607015e-34`.
-
-### Local helper functions
-
-- Line 30: `grumble()` — `function grumble(kelvin)`. When you can measure what you are speaking about, and express it in numbers, you know something about it; but
-  - Representative operation: `if (~isnumeric(kelvin))||(~isreal(kelvin))`.
-  - Representative operation: `error('the argument must be an array of real numbers.')`.
-
 ## Outputs
 
 - hz -an array of values in Hz

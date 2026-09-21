@@ -19,40 +19,6 @@ Powder magic angle spinning spectrum of a single quadrupolar deuterium nucleus u
 
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 12-13: System specification; implemented by `sys.magnet=9.4`.
-- Lines 18-19: Basis set; implemented by `bas.formalism='sphten-liouv'`.
-- Lines 23-24: Spinach housekeeping; implemented by `spin_system=create(sys,inter)`.
-- Lines 27-28: Experiment setup; implemented by `parameters.axis=[1 1 1]`.
-- Lines 43-44: Simulation; implemented by `fid=gridfree(spin_system,@acquire,parameters,'nmr')`.
-- Lines 46-47: Apodisation; implemented by `fid=apodisation(spin_system,fid,{{'exp',6}})`.
-- Lines 49-50: Fourier transform; implemented by `spectrum=fftshift(fft(fid,parameters.zerofill))`.
-- Lines 52-53: Plotting; implemented by `kfigure(); plot_1d(spin_system,real(spectrum),parameters)`.
-
-### Key state/data transformations
-
-- Lines 13: computes `sys.magnet` using `sys.magnet=9.4`.
-- Lines 14: computes `sys.isotopes` using `sys.isotopes={'2H'}`.
-- Lines 15: computes `inter.coupling.eigs` using `inter.coupling.eigs={[-1e3 -2e3 3e3]}`.
-- Lines 16: computes `inter.coupling.euler` using `inter.coupling.euler={[0.0 0.0 0.0]}`.
-- Lines 19: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
-- Lines 20: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 21: computes `bas.projections` using `bas.projections={+1}`.
-- Lines 24: computes `spin_system` using `spin_system=create(sys,inter)`.
-- Lines 28: computes `parameters.axis` using `parameters.axis=[1 1 1]`.
-- Lines 29: computes `parameters.max_rank` using `parameters.max_rank=17`.
-- Lines 30: computes `parameters.rate` using `parameters.rate=1e3`.
-- Lines 31: computes `parameters.sweep` using `parameters.sweep=2e4`.
-- Lines 32: computes `parameters.npoints` using `parameters.npoints=512`.
-- Lines 33: computes `parameters.zerofill` using `parameters.zerofill=4096`.
-- Lines 34: computes `parameters.offset` using `parameters.offset=0`.
-- Lines 35: computes `parameters.spins` using `parameters.spins={'2H'}`.
-- Lines 36: computes `parameters.decouple` using `parameters.decouple={}`.
-- Lines 37: computes `parameters.axis_units` using `parameters.axis_units='ppm'`.
-
 ## Implementation structure
 
 - Powder magic angle spinning spectrum of a single quadrupolar

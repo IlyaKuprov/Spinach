@@ -16,32 +16,6 @@ Non-linear adaptive contour spacing. Useful for NMR data where small cross-peaks
 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 50-51: Check consistency; implemented by `grumble(smax,smin,delta,k,signs,ncont)`.
-- Lines 53-54: Compute positive contour levels; implemented by `if (smax>0)&&(strcmp(signs,'positive')||strcmp(signs,'both'))`.
-- Lines 60-61: Compute negative contour levels; implemented by `if (smin<0)&&(strcmp(signs,'negative')||strcmp(signs,'both'))`.
-- Lines 67-68: Merge contour level arrays; implemented by `all_conts=[neg_conts(end:-1:1) pos_conts]`.
-
-### Control flow inferred from the code
-
-- Line 54: conditional branch on `(smax>0)&&(strcmp(signs,'positive')||strcmp(signs,'both'))`.
-- Line 61: conditional branch on `(smin<0)&&(strcmp(signs,'negative')||strcmp(signs,'both'))`.
-
-### Key state/data transformations
-
-- Lines 55: computes `pos_conts` using `pos_conts=(delta(2)-delta(1))*smax*linspace(0,1,ncont).^k+smax*delta(1)`.
-- Lines 62: computes `neg_conts` using `neg_conts=(delta(4)-delta(3))*smin*linspace(0,1,ncont).^k+smin*delta(3)`.
-- Lines 68: computes `all_conts` using `all_conts=[neg_conts(end:-1:1) pos_conts]`.
-
-### Local helper functions
-
-- Line 73: `grumble()` — `function grumble(smax,smin,delta,k,signs,ncont)`.
-  - Representative operation: `if (~isnumeric(smax))||(~isscalar(smax))||(~isreal(smax))||(~isfinite(smax))`.
-  - Representative operation: `error('smax must be a finite real scalar.')`.
-
 ## Syntax
 
 ```matlab

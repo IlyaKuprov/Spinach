@@ -17,19 +17,6 @@ Plots the sparsity pattern of an RCV matrix. Syntax: spy(A)
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 19-20: Check consistency; implemented by `grumble(A)`.
-- Lines 22-23: Delegate to MATLAB; implemented by `spy(sparse(A))`.
-
-### Local helper functions
-
-- Line 28: `grumble()` — `function grumble(A)`. Downloaded a virus for Linux lately and unpacked it. Tried to run it as root, didn't work. Googled for 2 hours, found out that, instead of
-  - Representative operation: `if ~isa(A,'rcv')`.
-  - Representative operation: `error('the input must be an RCV sparse matrix.')`.
-
 ## Parameters / inputs
 
 - A -RCV sparse matrix

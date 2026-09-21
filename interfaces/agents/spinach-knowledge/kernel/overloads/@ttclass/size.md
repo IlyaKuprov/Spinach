@@ -14,27 +14,6 @@ Returns the size of the matrix represented by a tensor train. The output mimics 
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 26-27: Multiply up physical dimensions of all cores; implemented by `m=prod(cellfun(@(x)size(x,2),tt.cores),1)`.
-- Lines 30-31: Compose the answer; implemented by `if (nargin==1)&&(nargout<=1)`.
-- Lines 44-45: Check for infinities; implemented by `if any(cellfun(@(x)any(x(:)>intmax),varargout))`.
-
-### Control flow inferred from the code
-
-- Line 31: conditional branch on `(nargin==1)&&(nargout<=1)`.
-- Line 45: conditional branch on `any(cellfun(@(x)any(x(:)>intmax),varargout))`.
-
-### Key state/data transformations
-
-- Lines 27: computes `m` using `m=prod(cellfun(@(x)size(x,2),tt.cores),1)`.
-- Lines 28: computes `n` using `n=prod(cellfun(@(x)size(x,3),tt.cores),1)`.
-- Lines 32: computes `varargout{1}` using `varargout{1}=[m(1) n(1)]`.
-- Lines 35: computes `varargout{2}` using `varargout{2}=n(1)`.
-
 ## Parameters / inputs
 
 - tt -a tensor train representation of a matrix

@@ -17,28 +17,6 @@ Tests the giant spin Hamiltonian descriptor route. Syntax: result=test_giant_ham
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
 - The file also defines local helper function(s): `local_case()`, `local_ref()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 16-17: Announce the test target; implemented by `fprintf('TESTING: Giant spin Hamiltonian descriptor\n')`.
-- Lines 19-22: State the Hamiltonian target of the test; implemented by `result=new_test_result('kernel/giant_ham_descr', 'Giant spin Hamiltonian descriptor', 'high-rank giant spin terms must match direct spherical-tensor assembly.')`.
-- Lines 24-25: Check complete giant spin terms; implemented by `result=local_case(result,'labframe','strong',[0.41 0.29 0.13])`.
-- Lines 27-28: Check secular giant spin terms; implemented by `result=local_case(result,'deer-zz','secular',[0.17 0.39 0.51])`.
-
-### Key state/data transformations
-
-- Lines 20-22: computes `result` using `result=new_test_result('kernel/giant_ham_descr', 'Giant spin Hamiltonian descriptor', 'high-rank giant spin terms must match direct spherical-tensor assembly.')`.
-
-### Local helper functions
-
-- Line 34: `local_case()` — `function result=local_case(result,assumption,strength,euler_angles)`. Build a compact high-rank giant spin system
-  - Representative operation: `sys.magnet=0`.
-  - Representative operation: `sys.isotopes={'E8'}`.
-- Line 74: `local_ref()` — `function H_ref=local_ref(spin_system,euler_angles)`. Start from a zero Hamiltonian
-  - Representative operation: `H_ref=mprealloc(spin_system,0)`.
-  - Representative operation: `for n=1:spin_system.comp.nspins`.
-
 ## Outputs
 
 - result -regression test result with explanatory messages

@@ -17,26 +17,6 @@ A floating-point precision consistent check for whether a particular matrix is t
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 21-22: Check consistency; implemented by `grumble(M)`.
-- Lines 24-25: Working precision; implemented by `precision=eps(class(M))`.
-- Lines 27-28: Cheapest norm of M; implemented by `norm_m=cheap_norm(M)`.
-- Lines 30-31: Decide if M is traceless; implemented by `A=(abs(trace(M))<=precision*norm_m)`.
-
-### Key state/data transformations
-
-- Lines 25: computes `precision` using `precision=eps(class(M))`.
-- Lines 28: computes `norm_m` using `norm_m=cheap_norm(M)`.
-
-### Local helper functions
-
-- Line 36: `grumble()` — `function grumble(M)`. The College asked me to chair the Size and Shape Committee. My wife could not stop laughing.
-  - Representative operation: `if ~isnumeric(M)`.
-  - Representative operation: `error('M must be numeric.')`.
-
 ## Parameters / inputs
 
 - M -a matrix of any dimension

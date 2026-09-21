@@ -18,49 +18,6 @@ Transverse relaxation rate as a function of the applied magnetic field in a 3-fl
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 11-13: Read 3-fluorotyrosine DFT calculation; implemented by `[~,inter_dft]=g2spinach(gparse('../standard_systems/3_fluoro_tyr.log'), {{'C','13C'},{'F','19F'}},[186.38 192.97])`.
-- Lines 15-16: Extract coordinates and CSAs; implemented by `sys.isotopes={'19F','13C'}`.
-- Lines 24-25: Relaxation theory; implemented by `inter.relaxation={'redfield'}`.
-- Lines 30-31: Basis set; implemented by `bas.formalism='sphten-liouv'`.
-- Lines 34-35: Disable startup checks; implemented by `sys.disable={'hygiene'}`.
-- Lines 37-38: Magnetic field grid; implemented by `lin_freq=linspace(200,800,20)`.
-- Lines 41-42: Loop over magnetic fields; implemented by `for n=1:numel(B0)`.
-- Lines 44-45: Set the magnet field; implemented by `sys.magnet=B0(n)`.
-- Lines 47-48: Spinach housekeeping; implemented by `spin_system=create(sys,inter)`.
-- Lines 51-52: Relaxation superoperator; implemented by `R=relaxation(spin_system)`.
-- Lines 54-55: States of interest; implemented by `LpF=state(spin_system,{'L+'},{1})`.
-- Lines 71-72: Relaxation rates; implemented by `r2c(n)=-LpC'*R*LpC`.
-- Lines 81-82: Plotting; implemented by `kfigure()`.
-
-### Control flow inferred from the code
-
-- Line 42: `for` loop over `n=1:numel(B0)`.
-
-### Key state/data transformations
-
-- Lines 12-13: computes `[~,inter_dft]` using `[~,inter_dft]=g2spinach(gparse('../standard_systems/3_fluoro_tyr.log'), {{'C','13C'},{'F','19F'}},[186.38 192.97])`.
-- Lines 16: computes `sys.isotopes` using `sys.isotopes={'19F','13C'}`.
-- Lines 17: computes `inter.zeeman.matrix` using `inter.zeeman.matrix=cell(1,2)`.
-- Lines 18: computes `inter.zeeman.matrix{1}` using `inter.zeeman.matrix{1}=inter_dft.zeeman.matrix{8}`.
-- Lines 19: computes `inter.zeeman.matrix{2}` using `inter.zeeman.matrix{2}=inter_dft.zeeman.matrix{7}`.
-- Lines 20: computes `inter.coordinates` using `inter.coordinates=cell(2,1)`.
-- Lines 21: computes `inter.coordinates{1}` using `inter.coordinates{1}=inter_dft.coordinates{8}`.
-- Lines 22: computes `inter.coordinates{2}` using `inter.coordinates{2}=inter_dft.coordinates{7}`.
-- Lines 25: computes `inter.relaxation` using `inter.relaxation={'redfield'}`.
-- Lines 26: computes `inter.rlx_keep` using `inter.rlx_keep='labframe'`.
-- Lines 27: computes `inter.equilibrium` using `inter.equilibrium='zero'`.
-- Lines 28: computes `inter.tau_c` using `inter.tau_c={25e-9}`.
-- Lines 31: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
-- Lines 32: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 35: computes `sys.disable` using `sys.disable={'hygiene'}`.
-- Lines 38: computes `lin_freq` using `lin_freq=linspace(200,800,20)`.
-- Lines 39: computes `B0` using `B0=2*pi*lin_freq*1e6/spin('1H')`.
-- Lines 45: computes `sys.magnet` using `sys.magnet=B0(n)`.
-
 ## Implementation structure
 
 - Transverse relaxation rate as a function of the applied magnetic

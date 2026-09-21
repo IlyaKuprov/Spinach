@@ -20,26 +20,6 @@ Directional derivatives for the trapezium product quadrature publi- shed by Iser
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 55-56: Check consistency; implemented by `grumble(Hd,Hc,dt,cL,cR)`.
-- Lines 58-59: Precompute directions; implemented by `H_dir_L=(1/2)*Hc+1i*dt*(sqrt(3)/12)*(Hc*Hd{2}-Hd{2}*Hc)`.
-- Lines 62-63: Call directional derivative function; implemented by `D=dirdiff(spin_system,(Hd{1}+Hd{2})/2+cL*H_dir_L+cR*H_dir_R,H_dir_L,dt,2); DL=D{2}`.
-
-### Key state/data transformations
-
-- Lines 59: computes `H_dir_L` using `H_dir_L=(1/2)*Hc+1i*dt*(sqrt(3)/12)*(Hc*Hd{2}-Hd{2}*Hc)`.
-- Lines 60: computes `H_dir_R` using `H_dir_R=(1/2)*Hc+1i*dt*(sqrt(3)/12)*(Hd{1}*Hc-Hc*Hd{1})`.
-- Lines 63: computes `D` using `D=dirdiff(spin_system,(Hd{1}+Hd{2})/2+cL*H_dir_L+cR*H_dir_R,H_dir_L,dt,2); DL=D{2}`.
-
-### Local helper functions
-
-- Line 69: `grumble()` — `function grumble(Hd,Hc,dt,cL,cR)`.
-  - Representative operation: `if ~iscell(Hd), error('Hd must be a cell array of matrices.'); end`.
-  - Representative operation: `if numel(Hd)~=2`.
-
 ## Syntax
 
 ```matlab

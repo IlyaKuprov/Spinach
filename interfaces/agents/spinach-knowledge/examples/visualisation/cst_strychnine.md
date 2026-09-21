@@ -14,19 +14,6 @@ Example of carbon shielding tensor visualisation for strychnine molecule. Gaussi
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 11-12: Read the Gaussian log; implemented by `props=gparse('strychnine.log')`.
-- Lines 14-15: Do the visualisation; implemented by `kfigure(); subplot(1,2,1)`.
-
-### Key state/data transformations
-
-- Lines 12: computes `props` using `props=gparse('strychnine.log')`.
-- Lines 16: computes `options.style` using `options.style='ellipsoids'`.
-
 ## Implementation structure
 
 - Example of carbon shielding tensor visualisation for

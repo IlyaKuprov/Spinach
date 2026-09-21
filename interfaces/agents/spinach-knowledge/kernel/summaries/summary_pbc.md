@@ -17,23 +17,6 @@ Prints periodic boundary condition vector summary for a Spinach system. Syntax: 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 22-23: Check consistency; implemented by `grumble(spin_system,header)`.
-- Lines 25-26: Print the vector table; implemented by `report(spin_system,header)`.
-
-### Control flow inferred from the code
-
-- Line 30: `for` loop over `n=1:numel(spin_system.inter.pbc)`.
-
-### Local helper functions
-
-- Line 40: `grumble()` — `function grumble(spin_system,header)`. To anger a conservative, lie to him. To anger a liberal, tell him the truth.
-  - Representative operation: `if ~isstruct(spin_system)`.
-  - Representative operation: `error('spin_system must be a structure.')`.
-
 ## Parameters / inputs
 
 - spin_system -Spinach spin system description object

@@ -14,26 +14,6 @@ Blue -> White -> Red colour map with 255 points and white colour corresponding t
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Preallocate the map; implemented by `cmap=zeros(255,3)`.
-- Lines 23-24: Rise from blue to white; implemented by `cmap(1:128,1)=linspace(0,1,128)`.
-- Lines 28-29: Rise from white to red; implemented by `cmap(128:255,1)=1`.
-- Lines 33-34: Improve contrast; implemented by `cmap=cmap.^2`.
-
-### Key state/data transformations
-
-- Lines 21: computes `cmap` using `cmap=zeros(255,3)`.
-- Lines 24: computes `cmap(1:128,1)` using `cmap(1:128,1)=linspace(0,1,128)`.
-- Lines 25: computes `cmap(1:128,2)` using `cmap(1:128,2)=linspace(0,1,128)`.
-- Lines 26: computes `cmap(1:128,3)` using `cmap(1:128,3)=1`.
-- Lines 29: computes `cmap(128:255,1)` using `cmap(128:255,1)=1`.
-- Lines 30: computes `cmap(128:255,2)` using `cmap(128:255,2)=fliplr(linspace(0,1,128))`.
-- Lines 31: computes `cmap(128:255,3)` using `cmap(128:255,3)=fliplr(linspace(0,1,128))`.
-
 ## Outputs
 
 - cmap -colour map in Matlab format

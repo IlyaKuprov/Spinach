@@ -17,23 +17,6 @@ A simple shorthand for the commutator of two matrices. Syntax: C=comm(A,B)
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Check consistency; implemented by `grumble(A,B)`.
-- Lines 23-24: Do the deed; implemented by `C=A*B-B*A`.
-
-### Key state/data transformations
-
-- Lines 24: computes `C` using `C=A*B-B*A`.
-
-### Local helper functions
-
-- Line 29: `grumble()` — `function grumble(A,B)`. Люцифер, принц изгнанников! Да вернётся имя Твоё,
-  - Representative operation: `if (~isnumeric(A))||(~isnumeric(B))`.
-  - Representative operation: `error('both inputs must be numeric.')`.
-
 ## Parameters / inputs
 
 - A,B -square matrices

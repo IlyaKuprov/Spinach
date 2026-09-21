@@ -17,31 +17,6 @@ Marks 2D microfluidic mesh vertices as inactive in hydrodyna- mic and diffusive 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 23-24: Check consistency; implemented by `grumble(mesh,vertex_list)`.
-- Lines 26-27: Update the active vertex list; implemented by `mesh.idx.active=setdiff(mesh.idx.active,vertex_list)`.
-- Lines 29-30: Zero out velocities and concentrations, if present; implemented by `vertex_list=setdiff(1:numel(mesh.x),mesh.idx.active)`.
-
-### Control flow inferred from the code
-
-- Line 31: conditional branch on `isfield(mesh,'u'), mesh.u(vertex_list)=0; end`.
-- Line 32: conditional branch on `isfield(mesh,'v'), mesh.v(vertex_list)=0; end`.
-- Line 33: conditional branch on `isfield(mesh,'c'), mesh.c(vertex_list,:)=0; end`.
-
-### Key state/data transformations
-
-- Lines 27: computes `mesh.idx.active` using `mesh.idx.active=setdiff(mesh.idx.active,vertex_list)`.
-- Lines 30: computes `vertex_list` using `vertex_list=setdiff(1:numel(mesh.x),mesh.idx.active)`.
-
-### Local helper functions
-
-- Line 38: `grumble()` — `function grumble(mesh,vertex_list)`.
-  - Representative operation: `if ~isfield(mesh,'idx')`.
-  - Representative operation: `error('indexing information is missing from mesh structure.')`.
-
 ## Parameters / inputs
 
 - mesh -Spinach mesh object

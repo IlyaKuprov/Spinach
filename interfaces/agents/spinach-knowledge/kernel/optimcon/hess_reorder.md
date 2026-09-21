@@ -17,23 +17,6 @@ The waveforms on different channels are assumed to be stored in the rows of the 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 41-42: Check consistency; implemented by `grumble(hess,K,N)`.
-- Lines 44-45: Do the reordering; implemented by `hess=reshape(hess,[K N K N])`.
-
-### Key state/data transformations
-
-- Lines 45: computes `hess` using `hess=reshape(hess,[K N K N])`.
-
-### Local helper functions
-
-- Line 52: `grumble()` — `function grumble(hess,dim1,dim2)`.
-  - Representative operation: `if (~isnumeric(dim1))||(~isreal(dim1))||(~isscalar(dim1))|| (dim1<1)||(mod(dim1,1)~=0)|| (~isnumeric(dim2))||(~isreal(dim2))||(~isscalar(dim2))|| (dim2<1)||(mod(dim2,1)~…`.
-  - Representative operation: `(dim1<1)||(mod(dim1,1)~=0)|| (~isnumeric(dim2))||(~isreal(dim2))||(~isscalar(dim2))|| (dim2<1)||(mod(dim2,1)~=0)`.
-
 ## Parameters / inputs
 
 - hess -the old Hessian matrix to be reordered, curre-

@@ -18,39 +18,6 @@ Converts directional cosine matrix into Euler angles, ZYZ active convention (rot
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 41-42: Check consistency; implemented by `grumble(dcm)`.
-- Lines 44-45: Build the Davenport matrix; implemented by `K=[dcm(1,1)+dcm(2,2)+dcm(3,3) dcm(3,2)-dcm(2,3) dcm(1,3)-dcm(3,1) dcm(2,1)-dcm(1,2)`.
-- Lines 50-51: Get the quaternion of the nearest rotation; implemented by `[evecs,evals]=eig(K,'vector'); [~,best]=max(evals)`.
-- Lines 55-56: Extract the Euler angles; implemented by `[alpha,beta,gamma]=qter2euler(q)`.
-- Lines 58-59: Wrap alpha and gamma into [0,2*pi]; implemented by `alpha=mod(alpha,2*pi); gamma=mod(gamma,2*pi)`.
-- Lines 61-62: Make sure the result is good enough and bomb out if not; implemented by `if norm(dcm-euler2dcm(alpha,beta,gamma),1)>1e-3`.
-- Lines 67-68: Adapt to the output style; implemented by `if nargout==1||nargout==0`.
-
-### Control flow inferred from the code
-
-- Line 62: conditional branch on `norm(dcm-euler2dcm(alpha,beta,gamma),1)>1e-3`.
-- Line 68: conditional branch on `nargout==1||nargout==0`.
-
-### Key state/data transformations
-
-- Lines 45: computes `K` using `K=[dcm(1,1)+dcm(2,2)+dcm(3,3) dcm(3,2)-dcm(2,3) dcm(1,3)-dcm(3,1) dcm(2,1)-dcm(1,2)`.
-- Lines 51: computes `[evecs,evals]` using `[evecs,evals]=eig(K,'vector'); [~,best]=max(evals)`.
-- Lines 52: computes `q.u` using `q.u=evecs(1,best); q.i=evecs(2,best)`.
-- Lines 53: computes `q.j` using `q.j=evecs(3,best); q.k=evecs(4,best)`.
-- Lines 56: computes `[alpha,beta,gamma]` using `[alpha,beta,gamma]=qter2euler(q)`.
-- Lines 59: computes `alpha` using `alpha=mod(alpha,2*pi); gamma=mod(gamma,2*pi)`.
-- Lines 69: computes `arg1` using `arg1=[alpha beta gamma]`.
-
-### Local helper functions
-
-- Line 79: `grumble()` — `function grumble(dcm)`.
-  - Representative operation: `if (~isnumeric(dcm))||(~isreal(dcm))||(~all(size(dcm)==[3 3]))`.
-  - Representative operation: `error('DCM must be a real 3x3 matrix.')`.
-
 ## Parameters / inputs
 
 - dcm -directional cosine matrix

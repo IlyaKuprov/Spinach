@@ -14,20 +14,6 @@ Point fit for the S217C dataset mutant dataset for human carbonic anhydrase II. 
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Load experimental data; implemented by `load('s217c_expt.mat','expt_pcs','xyz')`.
-- Lines 23-24: Solve the inverse problem; implemented by `[mxyz,chi,pred_pcs]=ippcs(xyz,[-23 -16 20],expt_pcs)`.
-- Lines 26-27: Plot experimental vs predicted PCS; implemented by `kfigure(); plot(expt_pcs,pred_pcs,'bo'); hold on; kgrid`.
-- Lines 33-34: Report and save the parameters; implemented by `disp('Susceptibility tensor:'); disp(chi)`.
-
-### Key state/data transformations
-
-- Lines 24: computes `[mxyz,chi,pred_pcs]` using `[mxyz,chi,pred_pcs]=ippcs(xyz,[-23 -16 20],expt_pcs)`.
-
 ## Implementation structure
 
 - Point fit for the S217C dataset mutant dataset for human carbonic anhydrase

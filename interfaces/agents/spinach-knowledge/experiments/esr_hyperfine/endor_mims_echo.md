@@ -18,39 +18,6 @@ Stimulated echo diagnostics for the Mims ENDOR sequence. Syntax: stim_echo=endor
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 50-51: Move into adjoint representation if needed; implemented by `[spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K)`.
-- Lines 53-54: Check consistency; implemented by `grumble(spin_system,parameters,H,R,K)`.
-- Lines 56-57: Compose Liouvillian; implemented by `L=H+1i*R+1i*K`.
-- Lines 59-60: Ideal pulse operators on all electrons; implemented by `Ex=operator(spin_system,'Lx',parameters.electrons)`.
-- Lines 63-64: Ideal initial and detection states; implemented by `rho0=state(spin_system,'Lz',parameters.electrons)`.
-- Lines 67-68: Ideal pi/2 pulse on the electrons; implemented by `rho=step(spin_system,Ex,rho0,pi/2)`.
-- Lines 70-71: Run stimulated echo delay; implemented by `rho=step(spin_system,L,rho,parameters.tau)`.
-- Lines 73-74: Ideal pi/2 pulse on the electrons; implemented by `rho=step(spin_system,Ex,rho,pi/2)`.
-- Lines 76-77: Delay corresponding to the missing nuclear pulse; implemented by `rho=evolution(spin_system,L,[],rho,parameters.n_dur,1,'final')`.
-- Lines 79-80: Ideal pi/2 pulse on the electrons; implemented by `rho=step(spin_system,Ey,rho,-pi/2)`.
-- Lines 82-85: Digitise the stimulated echo; implemented by `stim_echo=evolution(spin_system,L,coil,rho, 2*parameters.tau/parameters.nsteps, parameters.nsteps,'observable')`.
-
-### Key state/data transformations
-
-- Lines 51: computes `[spin_system,parameters,H,R,K]` using `[spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K)`.
-- Lines 57: computes `L` using `L=H+1i*R+1i*K`.
-- Lines 60: computes `Ex` using `Ex=operator(spin_system,'Lx',parameters.electrons)`.
-- Lines 61: computes `Ey` using `Ey=operator(spin_system,'Ly',parameters.electrons)`.
-- Lines 64: computes `rho0` using `rho0=state(spin_system,'Lz',parameters.electrons)`.
-- Lines 65: computes `coil` using `coil=state(spin_system,'L+',parameters.electrons)`.
-- Lines 68: computes `rho` using `rho=step(spin_system,Ex,rho0,pi/2)`.
-- Lines 83-85: computes `stim_echo` using `stim_echo=evolution(spin_system,L,coil,rho, 2*parameters.tau/parameters.nsteps, parameters.nsteps,'observable')`.
-
-### Local helper functions
-
-- Line 90: `grumble()` — `function grumble(spin_system,parameters,H,R,K)`.
-  - Representative operation: `if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))|| (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))`.
-  - Representative operation: `(~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))`.
-
 ## Parameters / inputs
 
 - parameters.spins -working spins, normally {'E'}; spe-

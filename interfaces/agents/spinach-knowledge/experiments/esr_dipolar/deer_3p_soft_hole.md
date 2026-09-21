@@ -23,38 +23,6 @@ Pulse diagnostics for the three-pulse DEER/PELDOR pulse sequen- ce. This functio
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 69-70: Move into adjoint representation if needed; implemented by `[spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K)`.
-- Lines 72-73: Check consistency; implemented by `grumble(spin_system,parameters,H,R,K)`.
-- Lines 75-76: Compose Liouvillian; implemented by `L=H+1i*R+1i*K`.
-- Lines 78-79: Pulse operators; implemented by `Ep=operator(spin_system,'L+',parameters.spins{1})`.
-- Lines 82-84: Frequency offsets; implemented by `parameters.pulse_frq=-spin_system.inter.magnet*spin('E')/(2*pi)- parameters.pulse_frq-parameters.offset`.
-- Lines 86-89: Soft pulses; implemented by `rho1=shaped_pulse_af(spin_system,L,Ex,Ey,parameters.rho0,parameters.pulse_frq(1),parameters.pulse_pwr(1), parameters.pulse_dur(1),parameters.pulse_phi(1), parameters.pul…`.
-- Lines 96-97: Hard pulse; implemented by `parameters.rho0=step(spin_system,Ey,[parameters.rho0 rho1 rho2 rho3],pi/2)`.
-- Lines 99-100: Acquisition; implemented by `fids=acquire(spin_system,parameters,H,R,K)`.
-
-### Key state/data transformations
-
-- Lines 70: computes `[spin_system,parameters,H,R,K]` using `[spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K)`.
-- Lines 76: computes `L` using `L=H+1i*R+1i*K`.
-- Lines 79: computes `Ep` using `Ep=operator(spin_system,'L+',parameters.spins{1})`.
-- Lines 80: computes `Ex` using `Ex=(Ep+Ep')/2; Ey=(Ep-Ep')/2i`.
-- Lines 83-84: computes `parameters.pulse_frq` using `parameters.pulse_frq=-spin_system.inter.magnet*spin('E')/(2*pi)- parameters.pulse_frq-parameters.offset`.
-- Lines 87-89: computes `rho1` using `rho1=shaped_pulse_af(spin_system,L,Ex,Ey,parameters.rho0,parameters.pulse_frq(1),parameters.pulse_pwr(1), parameters.pulse_dur(1),parameters.pulse_phi(1), parameters.pul…`.
-- Lines 90-92: computes `rho2` using `rho2=shaped_pulse_af(spin_system,L,Ex,Ey,parameters.rho0,parameters.pulse_frq(2),parameters.pulse_pwr(2), parameters.pulse_dur(2),parameters.pulse_phi(2), parameters.pul…`.
-- Lines 93-95: computes `rho3` using `rho3=shaped_pulse_af(spin_system,L,Ex,Ey,parameters.rho0,parameters.pulse_frq(3),parameters.pulse_pwr(3), parameters.pulse_dur(3),parameters.pulse_phi(3), parameters.pul…`.
-- Lines 97: computes `parameters.rho0` using `parameters.rho0=step(spin_system,Ey,[parameters.rho0 rho1 rho2 rho3],pi/2)`.
-- Lines 100: computes `fids` using `fids=acquire(spin_system,parameters,H,R,K)`.
-
-### Local helper functions
-
-- Line 105: `grumble()` — `function grumble(spin_system,parameters,H,R,K)`.
-  - Representative operation: `if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))|| (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))`.
-  - Representative operation: `(~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))`.
-
 ## Parameters / inputs
 
 - parameters.pulse_frq -frequencies for the three

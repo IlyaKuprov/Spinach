@@ -14,20 +14,6 @@ MD5 hash of any Matlab object as a hex string. Identical sparse and full matrice
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Make a bytestream; implemented by `A=serializeToBytes(A)`.
-- Lines 23-24: Compute MD5 hash; implemented by `hashstr=digestMD5(A)`.
-- Lines 26-27: Convert into a hex string; implemented by `hashstr=sprintf('%.2x',hashstr)`.
-
-### Key state/data transformations
-
-- Lines 21: computes `A` using `A=serializeToBytes(A)`.
-- Lines 24: computes `hashstr` using `hashstr=digestMD5(A)`.
-
 ## Parameters / inputs
 
 - A -Matlab object of any type

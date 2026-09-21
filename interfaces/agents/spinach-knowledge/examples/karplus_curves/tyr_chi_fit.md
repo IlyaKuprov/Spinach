@@ -14,18 +14,6 @@ Karplus coefficients extraction from a DFT dihedral angle scan over one of the c
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 9-10: Run the Karplus fitter; implemented by `[A,B,C,sA,sB,sC]=karplus_fit('.\tyr_chi_data',{[15 14 11 12]})`.
-- Lines 12-13: Display the answer; implemented by `disp(['Karplus A: ' num2str(A) ', stdev ' num2str(sA)])`.
-
-### Key state/data transformations
-
-- Lines 10: computes `[A,B,C,sA,sB,sC]` using `[A,B,C,sA,sB,sC]=karplus_fit('.\tyr_chi_data',{[15 14 11 12]})`.
-
 ## Implementation structure
 
 - Karplus coefficients extraction from a DFT dihedral angle scan

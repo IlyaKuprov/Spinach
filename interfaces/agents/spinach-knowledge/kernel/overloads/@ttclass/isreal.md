@@ -14,28 +14,6 @@ Returns TRUE for real-valued tensor train objects. Syntax: answer=isreal(tt)
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Non-empty tensor trains should return true(); implemented by `if isa(tt,'ttclass')`.
-- Lines 23-24: Check coefficient first; implemented by `answer=all(isreal(tt.coeff))`.
-- Lines 26-27: If the coefficients are real, check the cores; implemented by `if answer`.
-- Lines 38-39: Complain and bomb out; implemented by `error('input is not a ttclass.')`.
-
-### Control flow inferred from the code
-
-- Line 21: conditional branch on `isa(tt,'ttclass')`.
-- Line 27: conditional branch on `answer`.
-- Line 28: `for` loop over `n=1:tt.ntrains`.
-- Line 29: `for` loop over `k=1:tt.ncores`.
-- Line 31: conditional branch on `~answer, return; end`.
-
-### Key state/data transformations
-
-- Lines 24: computes `answer` using `answer=all(isreal(tt.coeff))`.
-
 ## Parameters / inputs
 
 - tt -tensor train object

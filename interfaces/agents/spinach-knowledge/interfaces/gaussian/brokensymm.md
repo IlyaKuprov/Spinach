@@ -18,23 +18,6 @@ Exchange coupling estimation from a pair of DFT logs using Yamaguchi equation. T
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 29-30: Check consistency; implemented by `grumble(props_sing,props_trip)`.
-- Lines 36-37: Convert from Hartree to Hz; implemented by `J=6.57968974479e15*J`.
-
-### Key state/data transformations
-
-- Lines 33: computes `J` using `J=(props_trip.energy-props_sing.energy)/ (`.
-
-### Local helper functions
-
-- Line 42: `grumble()` — `function grumble(props_sing,props_trip)`.
-  - Representative operation: `if ~isfield(props_sing,'energy')`.
-  - Representative operation: `error('props_sing.energy field is missing')`.
-
 ## Syntax
 
 ```matlab

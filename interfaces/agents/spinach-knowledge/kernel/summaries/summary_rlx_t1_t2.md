@@ -17,23 +17,6 @@ Prints T1 and T2 relaxation-rate summary for a Spinach system. Syntax: summary_r
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 22-23: Check consistency; implemented by `grumble(spin_system,header)`.
-- Lines 25-26: Print the relaxation-rate table; implemented by `report(spin_system,header)`.
-
-### Control flow inferred from the code
-
-- Line 30: `for` loop over `n=1:spin_system.comp.nspins`.
-
-### Local helper functions
-
-- Line 42: `grumble()` — `function grumble(spin_system,header)`. Whether you are more afraid of the forces of order or the forces of chaos is generally a
-  - Representative operation: `if ~isstruct(spin_system)`.
-  - Representative operation: `error('spin_system must be a structure.')`.
-
 ## Parameters / inputs
 
 - spin_system -Spinach spin system description object

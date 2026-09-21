@@ -28,7 +28,7 @@ end
 sys.magnet=1.0;
 
 % Parallel pool size
-sys.parallel={'processes',64};
+sys.parallel={'processes',16};
 
 % J=8 giant spin, effective g-factor 1.24, phonon bath at 2 K
 sys.isotopes={'E17'};

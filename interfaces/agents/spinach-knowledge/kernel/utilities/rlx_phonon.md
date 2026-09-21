@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/rlx_phonon.m`
 - Signature: `R=rlx_phonon(spin_system,H,X,I0,alpha,T)`
-- Total lines: 96
+- Total lines: 98
 
 ## Purpose
 
@@ -22,21 +22,21 @@ Spin-phonon relaxation superoperator in the generalised Lindblad form of Saito, 
 
 ### Comment-guided execution stages
 
-- Lines 59-60: Check consistency; implemented by `grumble(H,X,I0,alpha,T)`.
-- Lines 62-63: Diagonalise the Hamiltonian; implemented by `[V,E]=eig(full((H+H')/2),'vector')`.
-- Lines 65-66: Dressed coupling operator in the eigenbasis and back in the original basis; implemented by `XE=V'*X*V; RH=V*phonon_oper(spin_system,E,(XE+XE')/2,I0,alpha,T)*V'`.
-- Lines 68-69: Liouville space dissipator, column-stretched density matrix convention; implemented by `unit=speye(size(H,1))`.
+- Lines 61-62: Check consistency; implemented by `grumble(H,X,I0,alpha,T)`.
+- Lines 64-65: Diagonalise the Hamiltonian; implemented by `[V,E]=eig(full((H+H')/2),'vector')`.
+- Lines 67-68: Dressed coupling operator in the eigenbasis and back in the original basis; implemented by `XE=V'*X*V; RH=V*phonon_oper(spin_system,E,(XE+XE')/2,I0,alpha,T)*V'`.
+- Lines 70-71: Liouville space dissipator, column-stretched density matrix convention; implemented by `unit=speye(size(H,1))`.
 
 ### Key state/data transformations
 
-- Lines 63: computes `[V,E]` using `[V,E]=eig(full((H+H')/2),'vector')`.
-- Lines 66: computes `XE` using `XE=V'*X*V; RH=V*phonon_oper(spin_system,E,(XE+XE')/2,I0,alpha,T)*V'`.
-- Lines 69: computes `unit` using `unit=speye(size(H,1))`.
-- Lines 70: computes `R` using `R=-pi*(kron(unit,X*RH)-kron(X.',RH)+kron((RH'*X).',unit)-kron(conj(RH),X))`.
+- Lines 65: computes `[V,E]` using `[V,E]=eig(full((H+H')/2),'vector')`.
+- Lines 68: computes `XE` using `XE=V'*X*V; RH=V*phonon_oper(spin_system,E,(XE+XE')/2,I0,alpha,T)*V'`.
+- Lines 71: computes `unit` using `unit=speye(size(H,1))`.
+- Lines 72: computes `R` using `R=-pi*(kron(unit,X*RH)-kron(X.',RH)+kron((RH'*X).',unit)-kron(conj(RH),X))`.
 
 ### Local helper functions
 
-- Line 75: `grumble()` — `function grumble(H,X,I0,alpha,T)`.
+- Line 77: `grumble()` — `function grumble(H,X,I0,alpha,T)`.
   - Representative operation: `if (~isnumeric(H))||(size(H,1)~=size(H,2))||any(~isfinite(H(:)))`.
   - Representative operation: `error('H must be a square matrix with finite elements.')`.
 
@@ -49,8 +49,9 @@ Spin-phonon relaxation superoperator in the generalised Lindblad form of Saito, 
 - I0 -phonon spectral density prefactor times lambda^2,
 - such that lambda^2*I(w)=I0*w^alpha; the units are
 - (rad/s)^(1-alpha)
-- alpha -spectral density exponent (sub-Ohmic below 1,
-- Ohmic at 1, super-Ohmic above 1)
+- alpha -spectral density exponent, 1 (Ohmic) or above
+- (super-Ohmic); sub-Ohmic baths make the zero
+- frequency limit diverge and are not supported
 - T -phonon bath temperature, Kelvin
 
 ## Outputs
@@ -61,9 +62,10 @@ Spin-phonon relaxation superoperator in the generalised Lindblad form of Saito, 
 - Note: the superoperator depends on the Hamiltonian and must be
 - rebuilt whenever the field changes; pulsed_field.m does
 - this at every stair of the field profile.
-- Note: the unit state is not damped and the trace is conserved
-- because X is Hermitian; the relaxation destination is the
-- thermal equilibrium state of H at temperature T.
+- Note: the trace is conserved (the unit state is a left null vector
+- of R) because X is Hermitian; the unit state itself is not
+- stationary, the relaxation destination is the thermal equi-
+- librium state of H at temperature T.
 
 ## Implementation structure
 

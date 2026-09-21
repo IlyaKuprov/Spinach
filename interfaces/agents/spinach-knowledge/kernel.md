@@ -74,7 +74,7 @@
 | `kernel/conventions/transforms/rotmat_align.m` | `rot_mat=rotmat_align(v_from,v_to)` | Rotation matrix aligning one vector with another vector. Syntax: rot_mat=rotmat_align(v_from,v_to) Parameters: v_from -t | 107 |
 | `kernel/conventions/transforms/sphten2mat.m` | `M=sphten2mat(rank0,rank1,rank2)` | Converts the nine components of the irreducible spherical tensor re- presentation of an interaction tensor into the Cart | 91 |
 | `kernel/conventions/transforms/spsk2mat.m` | `M=spsk2mat(iso,sp,sk,alp,bet,gam)` | Converts span and skew representation of a 3x3 interaction tensor (Herzfeld-Berger convention) into the corresponding ma | 77 |
-| `kernel/conventions/transforms/stev2sph.m` | `Bkq=stev2sph(k,Bkq)` | Transforms the coefficients in front of Stevens operators, as produced by stevens.m, into the coefficients before the ir | 92 |
+| `kernel/conventions/transforms/stev2sph.m` | `Bkq=stev2sph(k,Bkq)` | Transforms the coefficients in front of Stevens operators, as produced by stevens.m, into the coefficients before the ir | 98 |
 | `kernel/conventions/transforms/tsm2param.m` | `[ax,rh,angles]=tsm2param(M)` | Attempts to convert a traceless symmetric 3x3 interaction matrix into axiality, rhombicity and three Euler angles. The t | 79 |
 | `kernel/conventions/transforms/weblab2nqi.m` | `varargout=weblab2nqi(C_q,eta_q,I,alpha,theta,phi)` | Converts the Weblab one-cone model parameters (see weblab_cone.png) into NQI tensors used by Spinach. Syntax: [Q1,Q2]=we | 118 |
 | `kernel/conventions/transforms/xyz2sph.m` | `[r,theta,phi] = xyz2sph(x,y,z)` | Converts Cartesian coordinates [x y z] into spherical coordinates according to the ISO convention. Syntax: [r,theta,phi] | 56 |
@@ -483,7 +483,7 @@
 | `kernel/utilities/path_trace.m` | `projectors=path_trace(spin_system,L,rho)` | Liouvillian path tracing. Treats the user-supplied Liouvillian as the adjacency matrix of a graph, computes the weakly c | 200 |
 | `kernel/utilities/perm_group.m` | `group=perm_group(group_name)` | Permutation group database. Returns complete data for permutation groups. The following group names are available: S2, S | 349 |
 | `kernel/utilities/phan2fpl.m` | `rho=phan2fpl(phan,rho)` | Projects a spatial intensity distribution into the Fokker-Planck space, using it as the image painted by the the spin st | 48 |
-| `kernel/utilities/phonon_oper.m` | `R=phonon_oper(spin_system,E,X,I0,alpha,T)` | Thermally dressed spin-phonon coupling operator of the generalised Lindblad dissipator of Saito, Miyashita, and De Raedt | 96 |
+| `kernel/utilities/phonon_oper.m` | `R=phonon_oper(spin_system,E,X,I0,alpha,T)` | Thermally dressed spin-phonon coupling operator of the generalised Lindblad dissipator of Saito, Miyashita, and De Raedt | 97 |
 | `kernel/utilities/polinfo.m` | `polinfo(p,level,label)` | Draws an ASCII diagram of a polyadic object. Syntax: polinfo(p) Parameters: p - polyadic object Outputs: an ASCII diagra | 111 |
 | `kernel/utilities/poolsize.m` | `n=poolsize()` | Returns the current parallel pool size. Syntax: n=poolsize() Parameters: none Outputs: n - number of workers in the curr | 40 |
 | `kernel/utilities/prune_subgraphs.m` | `subgraphs=prune_subgraphs(subgraphs)` | Removes subgraphs that are contained entirely within other subgraphs. Syntax: subgraphs=prune_subgraphs(subgraphs) Param | 59 |
@@ -493,7 +493,7 @@
 | `kernel/utilities/report.m` | `report(spin_system,report_string)` | Writes a log message to the console or an ACSII file. The message includes the call stack of the function that produced  | 126 |
 | `kernel/utilities/reprows.m` | `B=reprows(A,row_nums,rep_counts)` | Replicates specified rows of a matrix or cell array a specified number of times. Syntax: B=reprows(A,row_nums,rep_counts | 67 |
 | `kernel/utilities/rlx_modes.m` | `R=rlx_modes(spin_system)` | Bosonic mode dissipation superoperator. Builds thermalised GKSL dissipators for the amplitude damping and the pure depha | 135 |
-| `kernel/utilities/rlx_phonon.m` | `R=rlx_phonon(spin_system,H,X,I0,alpha,T)` | Spin-phonon relaxation superoperator in the generalised Lindblad form of Saito, Miyashita, and De Raedt (Phys. Rev. B 60 | 96 |
+| `kernel/utilities/rlx_phonon.m` | `R=rlx_phonon(spin_system,H,X,I0,alpha,T)` | Spin-phonon relaxation superoperator in the generalised Lindblad form of Saito, Miyashita, and De Raedt (Phys. Rev. B 60 | 98 |
 | `kernel/utilities/rlx_scalar.m` | `R=rlx_scalar(spin_system,H0,H1,tau_c_array)` | Scalar relaxation superoperator using Redfield theory. Syntax: R=rlx_scalar(spin_system,H0,H1,tau_c_array) Parameters: H | 90 |
 | `kernel/utilities/rlx_split.m` | `[R1,R2,Rm]=rlx_split(spin_system,R)` | Splits a relaxation superoperator into longitudinal, trans- verse and mixed components. Syntax: [R1,R2,Rm]=rlx_split(spi | 67 |
 | `kernel/utilities/rlx_t1_t2.m` | `[R1Op,R2Op]=rlx_t1_t2(spin_system,euler_angles)` | Extended T1/T2 relaxation model returning the relaxation super- operators separately for the longitudinal and the transv | 191 |

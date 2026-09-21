@@ -286,7 +286,7 @@
 | `examples/giant_spin/case_studies/dimer_exchange_types.m` | `dimer_exchange_types()` | Pulsed-field magnetisation of a dimer of two S=1/2 spins with four types of exchange coupling tensor: isotropic, two ani | 96 |
 | `examples/giant_spin/case_studies/ho_pzdo4_params.m` | `[ks,qs,bkq]=ho_pzdo4_params()` | Crystal field parameters of the Ho(pzdo)4 metal-organic framework in the extended Stevens operator convention, ranks 2 t | 36 |
 | `examples/giant_spin/case_studies/ho_pzdo4_powder.m` | `ho_pzdo4_powder()` | Powder-averaged pulsed-field magnetisation of the Ho(pzdo)4 metal- organic framework, a J=8 giant spin with a crystal fi | 102 |
-| `examples/giant_spin/case_studies/ho_pzdo4_profiles.m` | `ho_pzdo4_profiles()` | Pulsed-field magnetisation of the Ho(pzdo)4 metal-organic framework, a J=8 giant spin with a crystal field to twelfth sp | 115 |
+| `examples/giant_spin/case_studies/ho_pzdo4_profiles.m` | `ho_pzdo4_profiles()` | Pulsed-field magnetisation of the Ho(pzdo)4 metal-organic framework, a J=8 giant spin with a crystal field to twelfth sp | 117 |
 | `examples/giant_spin/case_studies/mn3_trimer_levels.m` | `mn3_trimer_levels()` | Zeeman energy level diagram of the (CH6N3)2MnCl4 molecular crystal, a linear trimer of three S=5/2 manganese ions with i | 63 |
 | `examples/giant_spin/case_studies/mn3_trimer_magn.m` | `mn3_trimer_magn()` | Pulsed-field magnetisation of the (CH6N3)2MnCl4 molecular crystal, a linear trimer of three S=5/2 manganese ions with is | 88 |
 | `examples/giant_spin/dy_lft_single_1.m` | `dy_lft_single_1()` | Reproduction of MOLCAS results with the Ligand Field Theory model for a single Dy(III) ion. Calculation time: seconds | 97 |

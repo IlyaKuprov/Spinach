@@ -23,7 +23,7 @@ Powder-averaged pulsed-field magnetisation of the Ho(pzdo)4 metal- organic frame
 - Lines 17-18: Crystal field parameters, cm^-1, ranks 2 to 12 in Stevens operator convention; implemented by `[ks,qs,bkq]=ho_pzdo4_params()`.
 - Lines 20-21: Convert Stevens coefficients into spherical tensor coefficients, Hz, rank by rank; implemented by `coeff=cell(1,12); euler=cell(1,12)`.
 - Lines 27-28: Magnet must be 1 Tesla, the field is set by the sweep; implemented by `sys.magnet=1.0`.
-- Lines 30-31: Parallel pool size; implemented by `sys.parallel={'processes',64}`.
+- Lines 30-31: Parallel pool size; implemented by `sys.parallel={'processes',16}`.
 - Lines 33-34: J=8 giant spin, effective g-factor 1.24, phonon bath at 2 K; implemented by `sys.isotopes={'E17'}`.
 - Lines 40-41: Formalism and basis set; implemented by `bas.formalism='zeeman-hilb'`.
 - Lines 44-45: Spinach housekeeping; implemented by `spin_system=create(sys,inter)`.
@@ -52,7 +52,7 @@ Powder-averaged pulsed-field magnetisation of the Ho(pzdo)4 metal- organic frame
 - Lines 21: computes `coeff` using `coeff=cell(1,12); euler=cell(1,12)`.
 - Lines 24: computes `coeff{k}` using `coeff{k}=stev2sph(k,icm2hz(stev)); euler{k}=[0 0 0]`.
 - Lines 28: computes `sys.magnet` using `sys.magnet=1.0`.
-- Lines 31: computes `sys.parallel` using `sys.parallel={'processes',64}`.
+- Lines 31: computes `sys.parallel` using `sys.parallel={'processes',16}`.
 - Lines 34: computes `sys.isotopes` using `sys.isotopes={'E17'}`.
 - Lines 35: computes `inter.zeeman.scalar` using `inter.zeeman.scalar={1.24}`.
 - Lines 36: computes `inter.giant.coeff` using `inter.giant.coeff={coeff}`.

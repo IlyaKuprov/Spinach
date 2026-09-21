@@ -73,7 +73,7 @@ Pulsed-field magnetisation of the (CH6N3)2MnCl4 molecular crystal, a linear trim
 - The full 216-state Hilbert space is used; the paper solves the same
 - problem in 16-state and 26-state effective bases. The thermal equi-
 - librium magnetisation is plotted for comparison. Reproduces Figure 6
-- Calculation time: hours
+- Calculation time: minutes
 - Magnet must be 1 Tesla, the field is set by the sweep
 - Parallel pool size
 - Three S=5/2 spins with g=2, phonon bath at 0.6 K

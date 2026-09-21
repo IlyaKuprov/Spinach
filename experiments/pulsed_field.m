@@ -67,12 +67,14 @@
 % Note: the sequence works in zeeman-hilb formalism under the crystal
 %       and powder contexts, which assemble the anisotropic part of
 %       the Hamiltonian; the liquid context drops that part, and with
-%       it the crystal field of a giant spin. The powder context must
-%       be called with parameters.sum_up=false because the answer is
-%       a structure; additional rotating frames (parameters.rframes)
-%       are not supported because the field operator is added in the
-%       laboratory frame. The temperature of the phonon bath is
-%       inter.temperature.
+%       it the crystal field of a giant spin. The context must be
+%       called with the labframe assumption set, so that H and the
+%       Zeeman operator are built consistently; the powder context
+%       must be called with parameters.sum_up=false because the
+%       answer is a structure; additional rotating frames (parame-
+%       ters.rframes) are not supported because the field operator
+%       is added in the laboratory frame. The temperature of the
+%       phonon bath is inter.temperature.
 %
 % Note: sys.magnet must be 1 Tesla, so that parameters.hzeeman is
 %       the Zeeman operator per Tesla; the Hamiltonian received from
@@ -111,6 +113,9 @@ for n=1:parameters.nsteps
 
     % Field at the stair midpoint and the Hamiltonian on the stair
     field=parameters.field_prof((n-0.5)*dt);
+    if (~isnumeric(field))||(~isreal(field))||(~isscalar(field))||(~isfinite(field))
+        error('parameters.field_prof must return a real finite scalar.');
+    end
     H_curr=H+field*parameters.hzeeman; H_curr=full((H_curr+H_curr')/2);
 
     % Eigensystem of the stair Hamiltonian and the coherent half-stair phases
@@ -149,6 +154,9 @@ if ~strcmp(spin_system.bas.formalism,'zeeman-hilb')
 end
 if spin_system.inter.magnet~=1
     error('sys.magnet must be 1 Tesla, the field is set by parameters.field_prof.');
+end
+if ~strcmp(spin_system.inter.assumptions,'labframe')
+    error('this function requires the labframe assumption set in the context call.');
 end
 if (~isnumeric(H))||(size(H,1)~=size(H,2))
     error('H must be a square matrix.');

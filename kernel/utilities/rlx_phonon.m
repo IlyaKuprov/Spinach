@@ -65,7 +65,7 @@ function R=rlx_phonon(spin_system,H,X,I0,alpha,T)
 grumble(H,X,I0,alpha,T);
 
 % Diagonalise the Hamiltonian
-[V,E]=eig(full((H+H')/2),'vector');
+[V,E]=eig(full(H),'vector');
 
 % Dressed coupling operator in the eigenbasis and back in the original basis
 XE=V'*X*V; RH=V*phonon_oper(spin_system,E,(XE+XE')/2,I0,alpha,T)*V';
@@ -78,8 +78,8 @@ end
 
 % Consistency enforcement
 function grumble(H,X,I0,alpha,T)
-if (~isnumeric(H))||(size(H,1)~=size(H,2))||any(~isfinite(H(:)))
-    error('H must be a square matrix with finite elements.');
+if (~isnumeric(H))||(~ishermitian(H))||any(~isfinite(H(:)))
+    error('H must be a Hermitian matrix with finite elements.');
 end
 if (~isnumeric(X))||(~ishermitian(X))||any(size(X)~=size(H))
     error('X must be a Hermitian matrix of the same dimension as H.');

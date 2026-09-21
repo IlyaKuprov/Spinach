@@ -223,8 +223,9 @@ which stand in for the crystallite azimuth and let a 400-point two-angle grid
 suffice, selects the electron coherence pathway with `coherence` instead of a
 phase cycle, and sweeps the carrier inside the sequence by adding
 `2*pi*offset*Lz` to the stack elements, rebuilding only the pulse propagators
-per carrier point because the secular stack commutes with the electron `Lz`;
-its grumbler refuses a stack that does not. The sequence takes `pulse_dur`,
+per carrier point because the secular stack commutes with the `Lz` of the
+pulsed spin (`parameters.spins`, the electron here); its grumbler refuses a
+stack that does not. The sequence takes `pulse_dur`,
 `pulse_frq`, `tau`, `echo_win`, `timestep`, `nphases`, `sweep`, and `npoints`
 and returns the echo signal integrated over the window (sum times the time
 step) and averaged over the start phases, as a column. The rotor rank is set

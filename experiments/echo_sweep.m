@@ -1,21 +1,21 @@
-% Two-pulse echo-detected frequency-swept EPR experiment, static or
-% under magic angle spinning, in Hilbert space. Two pulses of equal
-% duration are separated by a delay, the carrier is stepped across
-% the sweep, and the complex echo integral is returned at each car-
-% rier offset. The sequence steps through the Hamiltonian rotor stack
+% Two-pulse echo-detected frequency-swept experiment, static or under
+% magic angle spinning, in Hilbert space, written for the EPR case of
+% a spinning P1 centre in diamond. Two pulses of equal duration are
+% separated by a delay, the carrier is stepped across the sweep, and
+% the complex echo integral is returned at each carrier offset. The sequence steps through the Hamiltonian rotor stack
 % supplied by singlerot.m: at each time step, the stack element near-
 % est to the rotor phase at the middle of the step is used, and the
 % rotor phase at the start of the sequence, which stands in for the
-% crystallite azimuth about the rotor axis, is averaged over. The el-
-% ectron coherence pathway (-1 after the first pulse, +1 after the
-% second) is selected in place of a phase cycle. Syntax:
+% crystallite azimuth about the rotor axis, is averaged over. The co-
+% herence pathway of the pulsed spin (-1 after the first pulse, +1
+% after the second) is selected in place of a phase cycle. Syntax:
 %
 %           echo=echo_sweep(spin_system,parameters,H,R,K)
 %
 % Parameters:
 %
-%    parameters.spins     - one-element cell array with the elec-
-%                           tron specification, e.g. {'E'}
+%    parameters.spins     - one-element cell array naming the spin
+%                           the pulses are applied to, e.g. {'E'}
 %
 %    parameters.rho0      - initial state, a density matrix
 %
@@ -67,11 +67,11 @@
 %           ence, at each carrier offset, a column vector with
 %           parameters.npoints elements
 %
-% Note: the elements of the rotor stack must commute with the elect-
-%       ron Lz operator, as they do under the 'esr' assumption set,
-%       because the carrier offset is applied as a separate propaga-
-%       tor and only the pulse propagators are rebuilt at each car-
-%       rier offset.
+% Note: the elements of the rotor stack must commute with the Lz op-
+%       erator of the pulsed spin, as they do for an electron under
+%       the 'esr' assumption set, because the carrier offset is app-
+%       lied as a separate propagator and only the pulse propagators
+%       are rebuilt at each carrier offset.
 %
 % Note: the rotor stack is a table of the Hamiltonian against the
 %       rotor phase, its resolution should match the time step at
@@ -143,7 +143,7 @@ for k=1:parameters.npoints
             rho=p_pulse{idx(s)}*rho*p_pulse{idx(s)}';
         end
 
-        % Select the -1 coherence on the electron
+        % Select the -1 coherence on the pulsed spin
         rho=coherence(spin_system,rho,{{parameters.spins{1},-1}});
 
         % Interpulse delay
@@ -156,7 +156,7 @@ for k=1:parameters.npoints
             rho=p_pulse{idx(s)}*rho*p_pulse{idx(s)}';
         end
 
-        % Select the +1 coherence on the electron
+        % Select the +1 coherence on the pulsed spin
         rho=coherence(spin_system,rho,{{parameters.spins{1},+1}});
 
         % Integrate the signal over the echo window
@@ -195,7 +195,7 @@ if ~all(cellfun(@(x)all(size(x)==size(H{1})),H))
     error('all matrices in H must have the same dimension.');
 end
 if ~isfield(parameters,'spins')
-    error('the electron must be specified in parameters.spins field.');
+    error('the pulsed spin must be specified in parameters.spins field.');
 end
 if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||...
    (~ischar(parameters.spins{1}))
@@ -203,7 +203,7 @@ if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||...
 end
 sz=operator(spin_system,'Lz',parameters.spins{1});
 if any(cellfun(@(x)norm(x*sz-sz*x,1)>spin_system.tols.liouv_zero,H))
-    error('the elements of H must commute with the electron Lz operator.');
+    error('the elements of H must commute with the Lz operator of the pulsed spin.');
 end
 if ~isfield(parameters,'rho0')
     error('initial state must be specified in parameters.rho0 field.');

@@ -1,11 +1,11 @@
 # Spinach code index: examples
 
 - Source root: `/home/kuprov/.openclaw/workspace/Spinach`
-- Source commit: `ac6136149e438077587b302a1e92d0371b099f20`
+- Source commit: `5af410fea692a14c98aee9a1fce6fb72f7b3ef5c`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
-- Files indexed: **761** MATLAB files
-- Generated: 2026-09-16T03:34:56
+- Files indexed: **770** MATLAB files
+- Generated: 2026-09-21T17:01:15
 
 | File | Signature | Summary | LOC |
 |---|---|---|---:|
@@ -131,9 +131,9 @@
 | `examples/esr_liq_pulsed/data_import/gaussian_import_example.m` | `gaussian_import_example()` | Methyl radical simulation, Gaussian import. The uncommon signal intensity pattern comes from g-HFC cross-correlation. | 54 |
 | `examples/esr_liq_pulsed/data_import/orca_import_example.m` | `orca_import_example()` | Methyl radical simulation, ORCA import. The uncommon signal intensity pattern comes from g-HFC cross-correlation. | 65 |
 | `examples/esr_liq_pulsed/endor_benzoquinone.m` | `endor_benzoquinone()` | CW ENDOR on 2-methoxy-1,4-benzoquinone radical in liquid state. Set to reproduce Figure 2 in http://dx.doi.org/10.1002/m | 57 |
-| `examples/esr_liq_pulsed/endor_methyl.m` | `endor_methyl()` | Mims ENDOR spectrum of a methyl radical in liquid state. Magnetic parameters taken from a DFT calculation. Calculation t | 53 |
-| `examples/esr_liq_pulsed/endor_nitroxide.m` | `endor_nitroxide()` | Mims ENDOR on a 15N-labelled nitroxide radical in liquid state. Magnetic parameters taken from a DFT calculation. Calcul | 53 |
-| `examples/esr_liq_pulsed/endor_phenyl.m` | `endor_phenyl()` | Mims ENDOR on a phenyl radical in liquid state. The g-factor and the isotropic proton hyperfine couplings are specified  | 69 |
+| `examples/esr_liq_pulsed/endor_methyl.m` | `endor_methyl()` | Mims ENDOR spectrum of a methyl radical in liquid state. Magnetic parameters taken from a DFT calculation. Calculation t | 54 |
+| `examples/esr_liq_pulsed/endor_nitroxide.m` | `endor_nitroxide()` | Mims ENDOR on a 15N-labelled nitroxide radical in liquid state. Magnetic parameters taken from a DFT calculation. Calcul | 54 |
+| `examples/esr_liq_pulsed/endor_phenyl.m` | `endor_phenyl()` | Mims ENDOR on a phenyl radical in liquid state. The g-factor and the isotropic proton hyperfine couplings are specified  | 70 |
 | `examples/esr_liq_pulsed/pulse_acquire_benzoquinone.m` | `pulse_acquire_benzoquinone()` | Pulse-acquire FFT ESR on 2-methoxy-1,4-benzoquinone radical in liquid state. Set to reproduce Figure 1 in Simple common  | 75 |
 | `examples/esr_liq_pulsed/pulse_acquire_biaryl.m` | `pulse_acquire_biaryl()` | A time-domain pulse-acquire version of the EasySpin biaryl test file, with acknowledgements to Stefan Stoll. The Spinach | 85 |
 | `examples/esr_liq_pulsed/pulse_acquire_chrysene.m` | `pulse_acquire_chrysene()` | W-band pulse-acquire FFT ESR spectrum of a chrysene cation radical in a non-viscous liquid. Simple common line width is  | 68 |
@@ -144,16 +144,16 @@
 | `examples/esr_liq_pulsed/relaxation_fremysalt.m` | `relaxation_fremysalt()` | Pulse-acquire FFT ESR version of the EasySpin Fremy salt test file, with acknowledgements to Stefan Stoll. The Spinach s | 72 |
 | `examples/esr_liq_pulsed/relaxation_nitroxide.m` | `relaxation_nitroxide()` | W-band pulse-acquire FFT ESR spectrum of a nitroxide radical, using explicit time domain simulation with Redfield relaxa | 60 |
 | `examples/esr_liq_pulsed/relaxation_parafluoronitrobenzene.m` | `relaxation_parafluoronitrobenzene()` | A pulse-acquire FFT version of the EasySpin parafluoronitrobenzene test file, with acknowledgements to Stefan Stoll. The | 85 |
-| `examples/esr_liq_pulsed/relaxation_parafluorotoluene.m` | `relaxation_parafluorotoluene()` | X-band pulse-acquire FFT ESR spectrum of parafluorotoluene radical, simulated using explicit time-domain propagation inc | 65 |
+| `examples/esr_liq_pulsed/relaxation_parafluorotoluene.m` | `relaxation_parafluorotoluene()` | X-band pulse-acquire FFT ESR spectrum of parafluorotoluene radical, simulated using explicit time-domain propagation inc | 62 |
 | `examples/esr_sol_pulsed/endor_davies_nox_crystal.m` | `endor_davies_nox_crystal()` | Davies ENDOR simulation for a nitroxide radical at a single orientation. Soft pulses are simulated using Fokker-Planck f | 116 |
 | `examples/esr_sol_pulsed/endor_davies_nox_powder.m` | `endor_davies_nox_powder()` | Davies ENDOR simulation for a nitroxide radical. Soft pulses are simulated using Fokker-Planck formalism. This is a pain | 79 |
 | `examples/esr_sol_pulsed/endor_mims_bdpa.m` | `endor_mims_bdpa()` | Mims ENDOR pulse sequence on BDPA with ideal electron pulses, reproducing Figure 10 from Calculation time: hours, much f | 67 |
 | `examples/esr_sol_pulsed/endor_mims_echo_bdpa.m` | `endor_mims_echo_bdpa()` | Stimulated echo stage of the Mims ENDOR pulse sequence on BDPA. The nuclear pulse is not applied, this is echo dia- gnos | 57 |
 | `examples/esr_sol_pulsed/endor_mims_nox_powder.m` | `endor_mims_nox_powder()` | Mims ENDOR simulation for a nitroxide radical powder. Ideal hard pulses are assumed. Calculation time: seconds. | 61 |
 | `examples/esr_sol_pulsed/eseem_methyl_crystal.m` | `eseem_methyl_crystal()` | Two-pulse X-band ESEEM spectrum of a methyl radical at a specific orien- tation relative to the lab frame. Magnetic para | 59 |
-| `examples/esr_sol_pulsed/eseem_nitroxide_crystal.m` | `eseem_nitroxide_crystal()` | Two-pulse X-band ESEEM spectrum of a nitroxide radical at a specific orientation relative to the lab frame. Magnetic par | 68 |
-| `examples/esr_sol_pulsed/eseem_nitroxide_powder.m` | `eseem_nitroxide_powder()` | Powder-averaged two-pulse ESEEM on a 14N nitroxide radical. Time-domain simulation in Liouville space with powder averag | 69 |
-| `examples/esr_sol_pulsed/eseem_phenyl_crystal.m` | `eseem_phenyl_crystal()` | Two-pulse X-band ESEEM spectrum of a phenyl radical at a specific orientation relative to the lab frame. Magnetic parame | 59 |
+| `examples/esr_sol_pulsed/eseem_nitroxide_crystal.m` | `eseem_nitroxide_crystal()` | Two-pulse X-band ESEEM spectrum of a nitroxide radical at a specific orientation relative to the lab frame. Magnetic par | 70 |
+| `examples/esr_sol_pulsed/eseem_nitroxide_powder.m` | `eseem_nitroxide_powder()` | Powder-averaged two-pulse ESEEM on a 14N nitroxide radical. Time-domain simulation in Liouville space with powder averag | 71 |
+| `examples/esr_sol_pulsed/eseem_phenyl_crystal.m` | `eseem_phenyl_crystal()` | Two-pulse X-band ESEEM spectrum of a phenyl radical at a specific orientation relative to the lab frame. Magnetic parame | 61 |
 | `examples/esr_sol_pulsed/hard_3_pulse_deer_cu.m` | `hard_3_pulse_deer_cu()` | Three-pulse DEER on a Cu(II)-NO two electron system at X-band. The numerical calculation is done by brute-force time pro | 72 |
 | `examples/esr_sol_pulsed/hard_3_pulse_deer_exchange.m` | `hard_3_pulse_deer_exchange()` | Three-pulse DEER on a Cu(II)-Cu(II) system in a linked porphyrin complex with a strong exchange coupling between the ele | 88 |
 | `examples/esr_sol_pulsed/hard_3_pulse_deer_gd_1.m` | `hard_3_pulse_deer_gd_1()` | Gadolinium(III) DEER experiment at W-band using ideal pulses. Set to reproduce Figure 2b from the paper by Otting and co | 94 |
@@ -220,8 +220,8 @@
 | `examples/fundamentals/correlation_function_5.m` | `correlation_function_5()` | Computes the following rotational correlation function G(k,m,p,q)=<R(k,m)*R(p,q)> where R is the 3D Cartesian rotation m | 50 |
 | `examples/fundamentals/derivative_tests/auxmat_test.m` | `auxmat_test()` | Testing IK's favourite equation numerically -auxiliary matrix expression against a high-accuracy finite diffe- rence app | 61 |
 | `examples/fundamentals/derivative_tests/difdiff_bs_rect.m` | `difdiff_bs_rect()` | Directional derivative test for Cartesian GRAPE with Bloch-Siegert corrections. | 151 |
-| `examples/fundamentals/derivative_tests/dirdiff_1.m` | `dirdiff_1()` | Test of matrix exponential differentiation routines. Analytical derivatives are compared to central finite differences. | 58 |
-| `examples/fundamentals/derivative_tests/dirdiff_2.m` | `dirdiff_2()` | Test of matrix exponential differentiation of second order Magnus product quadrature (trapdiff.m) with the result com- p | 56 |
+| `examples/fundamentals/derivative_tests/dirdiff_1.m` | `dirdiff_1()` | Test of matrix exponential differentiation routines. Analytical derivatives are compared to central finite differences. | 59 |
+| `examples/fundamentals/derivative_tests/dirdiff_2.m` | `dirdiff_2()` | Test of matrix exponential differentiation of second order Magnus product quadrature (trapdiff.m) with the result com- p | 57 |
 | `examples/fundamentals/derivative_tests/dirdiff_3_rect.m` | `dirdiff_3_rect()` | Directional derivative test for the Cartesian GRAPE module, rectangles integrator. | 82 |
 | `examples/fundamentals/derivative_tests/dirdiff_3_trap.m` | `dirdiff_3_trap()` | Directional derivative test for the Cartesian GRAPE module, trapezium integrator. | 82 |
 | `examples/fundamentals/derivative_tests/dirdiff_4_rect.m` | `dirdiff_4_rect()` | Directional derivative test for the phase-modulated GRAPE module, rectangles integrator. | 83 |
@@ -233,7 +233,7 @@
 | `examples/fundamentals/derivative_tests/dirdiff_test_system.m` | `[spin_system,Sx,Sy,Sz,Lx,Ly,H]=dirdiff_test_system(formalism)` | Spin system generator for directional derivative tests. Syntax: [spin_system,Sx,Sy,Sz,Lx,Ly,H]=dirdiff_test_system(forma | 80 |
 | `examples/fundamentals/exchange_coupling/yamaguchi.m` | `yamaguchi()` | Yamaguchi equation estimate of exchange coupling from a broken-symmetry DFT calculation on a bistrityl bira- dical with  | 18 |
 | `examples/fundamentals/high_spin_system_1.m` | `high_spin_system_1()` | Pulse-acquire NMR spectrum in a system with a hypothetical scalar coupling to a 235U nucleus. The spectral lines should  | 52 |
-| `examples/fundamentals/nuclear_structure/woods_saxon.m` | `woods_saxon(mass_number,level_number)` | A loose implementation of single-nucleon Hamiltonian eigenfunction calculation in the three-dimensional Woods-Saxon pote | 58 |
+| `examples/fundamentals/nuclear_structure/woods_saxon.m` | `woods_saxon(mass_number,level_number)` | A loose implementation of single-nucleon Hamiltonian eigenfunction calculation in the three-dimensional Woods-Saxon pote | 62 |
 | `examples/fundamentals/nutation_dist_test.m` | `nutation_dist_test()` | Recovery of an RF field distribution from a nutation curve measured with the same coil used for excitation and detection | 98 |
 | `examples/fundamentals/operator_tests/commutation_1.m` | `commutation_1()` | Commutators of simple operators and superoperators. The test calculation is performed three times in the three formalism | 42 |
 | `examples/fundamentals/operator_tests/commutation_2.m` | `commutation_2()` | Commutators of simple operators and superoperators. The test calculation is performed three times in the three formalism | 42 |
@@ -255,7 +255,7 @@
 | `examples/fundamentals/quadratures/grid_quality.m` | `grid_quality()` | Performance analysis for the spherical and SO(3) integration grids supplied with Spinach kernel. | 90 |
 | `examples/fundamentals/quadratures/mas_benchmark.m` | `mas_benchmark()` | Integrating the Lioville -von Neumann equation through one period of the MAS rotor using the piecewise-constant Hamilton | 129 |
 | `examples/fundamentals/quadratures/product_quadratures_1.m` | `product_quadratures_1()` | Accuracy test for Lie-group product quadratures as a function of discretisation step in the E1000B Veshtort-Griffin puls | 135 |
-| `examples/fundamentals/quadratures/product_quadratures_2.m` | `product_quadratures_2()` | A test of Lie-group product quadratures on a chirped frequency oscillator with radiation damping that has a state-depend | 140 |
+| `examples/fundamentals/quadratures/product_quadratures_2.m` | `product_quadratures_2()` | A test of Lie-group product quadratures on a chirped frequency oscillator with radiation damping that has a state-depend | 143 |
 | `examples/fundamentals/roof_effect.m` | `roof_effect()` | Roof effect in a strongly J-coupled two-spin system. | 67 |
 | `examples/fundamentals/spin_lock.m` | `spin_lock()` | A spin-locking experiment on a two-spin system. | 66 |
 | `examples/fundamentals/state_spaces_1.m` | `state_spaces_1()` | Correlation order dynamics in a pulse-acquire experiment on strychnine. Set to reproduce Figure 4 from our state space r | 60 |
@@ -283,6 +283,12 @@
 | `examples/fundamentals/tensor_structures/polyadic_test_1.m` | `polyadic_test_1()` | Unit tests for the polyadic object. | 120 |
 | `examples/fundamentals/tensor_structures/polyadic_test_2.m` | `polyadic_test_2()` | Unit tests for advanced polyadic functionality. | 110 |
 | `examples/fundamentals/tensor_structures/ttrain_test_1.m` | `ttrain_test_1()` | A simple test of ttclass object arithmetic. | 31 |
+| `examples/giant_spin/case_studies/dimer_exchange_types.m` | `dimer_exchange_types()` | Pulsed-field magnetisation of a dimer of two S=1/2 spins with four types of exchange coupling tensor: isotropic, two ani | 96 |
+| `examples/giant_spin/case_studies/ho_pzdo4_params.m` | `[ks,qs,bkq]=ho_pzdo4_params()` | Crystal field parameters of the Ho(pzdo)4 metal-organic framework in the extended Stevens operator convention, ranks 2 t | 36 |
+| `examples/giant_spin/case_studies/ho_pzdo4_powder.m` | `ho_pzdo4_powder()` | Powder-averaged pulsed-field magnetisation of the Ho(pzdo)4 metal- organic framework, a J=8 giant spin with a crystal fi | 102 |
+| `examples/giant_spin/case_studies/ho_pzdo4_profiles.m` | `ho_pzdo4_profiles()` | Pulsed-field magnetisation of the Ho(pzdo)4 metal-organic framework, a J=8 giant spin with a crystal field to twelfth sp | 117 |
+| `examples/giant_spin/case_studies/mn3_trimer_levels.m` | `mn3_trimer_levels()` | Zeeman energy level diagram of the (CH6N3)2MnCl4 molecular crystal, a linear trimer of three S=5/2 manganese ions with i | 63 |
+| `examples/giant_spin/case_studies/mn3_trimer_magn.m` | `mn3_trimer_magn()` | Pulsed-field magnetisation of the (CH6N3)2MnCl4 molecular crystal, a linear trimer of three S=5/2 manganese ions with is | 88 |
 | `examples/giant_spin/dy_lft_single_1.m` | `dy_lft_single_1()` | Reproduction of MOLCAS results with the Ligand Field Theory model for a single Dy(III) ion. Calculation time: seconds | 97 |
 | `examples/giant_spin/dy_lft_single_2.m` | `dy_lft_single_2()` | A demonstration that most lanthanide complexes are in the ZFS limit for the purposes of relaxation theory. One of the fi | 91 |
 | `examples/giant_spin/lanthanide_powder.m` | `lanthanide_powder()` | Powder spectrum of Gd(III) with ZFS up to 4th spherical rank using the giant spin Hamiltonian formalism in a sweepable 4 | 57 |
@@ -339,7 +345,7 @@
 | `examples/microfluidics/plain_flow.m` | `plain_flow()` | Simple flow simulation with no dynamics in the spin subspace: longitudinal magnetisation is tracked as a function of tim | 116 |
 | `examples/microfluidics/plain_nmr.m` | `plain_nmr()` | NMR spectrum of the reaction mixture in the absence of chemical kinetics and spatial dynamics. | 52 |
 | `examples/microfluidics/plain_reaction.m` | `plain_reaction()` | Non-linear reaction kinetics in a situation when there is no hydrodynamics, diffusion, or spin dynamics. This is in- ten | 52 |
-| `examples/microfluidics/reacting_flow.m` | `reacting_flow()` | Flow in the absence of spin dynamics, but presence of two unidirectional second-order chemical reactions. Simulation tim | 140 |
+| `examples/microfluidics/reacting_flow.m` | `reacting_flow()` | Flow in the absence of spin dynamics, but presence of two unidirectional second-order chemical reactions. Simulation tim | 136 |
 | `examples/microfluidics/reacting_flow_nmr.m` | `reacting_flow_nmr()` | Complete microfluidic simulation: diffusion, flow, two second- order chemical reactions, and NMR detection in a narrow s | 252 |
 | `examples/microfluidics/reacting_nmr.m` | `reacting_nmr()` | Non-linear reaction kinetics in combination with spin evolution (repeated pulse-acquire NMR) and relaxation (Redfield th | 213 |
 | `examples/microfluidics/show_mesh.m` | `show_mesh()` | Import, Voronoi tessellation, and plotting of the hydrodynamic mesh and velocity field from COMSOL. | 34 |
@@ -502,7 +508,7 @@
 | `examples/nmr_solids/case_studies/magic_angle_calibration.m` | `magic_angle_calibration()` | Magic angle is usually calibrated using KBr powder. When the angle is not correctly set, the spinning sideband pat- tern | 84 |
 | `examples/nmr_solids/case_studies/mas_powder_dd_nqi.m` | `mas_powder_dd_nqi()` | Powder magic angle spinning spectrum of a pair of dipole-coupled quadrupolar nuclei; this is apparently something that o | 67 |
 | `examples/nmr_solids/case_studies/mathies_14n_13c/mas_powder_gly_13c.m` | `mas_powder_gly_13c()` | 13C MAS spectrum of glycine powder (assuming decoupling of 1H), computed using the Fokker-Planck MAS formalism and a sph | 103 |
-| `examples/nmr_solids/case_studies/mathies_14n_13c/powder_gly_14n.m` | `powder_gly_14n()` | Static 14N powder spectrum of glycine (assuming decoupling of 1H and 13C), computed on a spherical grid from CASTEP tensors | 91 |
+| `examples/nmr_solids/case_studies/mathies_14n_13c/powder_gly_14n.m` | `powder_gly_14n()` | Static 14N powder spectrum of glycine (assuming decoupling of 1H and 13C), computed on a spherical grid from CASTEP tensors | 93 |
 | `examples/nmr_solids/case_studies/mathies_carbonate/cp_mas_powder_mhc_fplanck_exchange.m` | `cp_mas_powder_mhc_fplanck_exchange()` | Cross-polarisation contact curve under magic angle spinning in the presence of chemical exchange for H1, H4 and C19 in t | 115 |
 | `examples/nmr_solids/case_studies/mathies_carbonate/mas_powder_mhc_fplanck.m` | `mas_powder_mhc_fplanck()` | All protons in the unit cell of monohydrocalcite, magic angle spinning NMR simulation. Further details in: Calculation t | 88 |
 | `examples/nmr_solids/case_studies/mathies_carbonate/mas_powder_mhc_fplanck_exchange.m` | `mas_powder_mhc_fplanck_exchange()` | Water protons in the unit cell of monohydrocalcite, inc- luding position exchange and MAS. Further details in: Calculati | 87 |
@@ -523,7 +529,7 @@
 | `examples/nmr_solids/cp_respiration.m` | `cp_respiration()` | 1H-13C RESPIRATION-CP experiment in the doubly rotating frame. Magic angle spinning simulation using Fokker-Planck forma | 57 |
 | `examples/nmr_solids/dor_powder_nav_fplanck_freq.m` | `dor_powder_nav_fplanck_freq()` | Double angle spinning spectrum of N-acetylvaline 14N nucleus using 1D Fokker-Planck equation and a spherical grid. The c | 63 |
 | `examples/nmr_solids/dor_powder_nav_fplanck_time.m` | `dor_powder_nav_fplanck_time()` | Double angle spinning spectrum of N-acetylvaline 14N nucleus using 1D Fokker-Planck equation and a spherical grid. The c | 66 |
-| `examples/nmr_solids/fitting/bromide_csa_nqi/kbr_mas_fitting.m` | `kbr_mas_fitting()` | Fitting of a 79Br MAS NMR spectrum of potassium bromide with respect to the quadrupole coupling constant. The spectrum c | 113 |
+| `examples/nmr_solids/fitting/bromide_csa_nqi/kbr_mas_fitting.m` | `kbr_mas_fitting()` | Fitting of a 79Br MAS NMR spectrum of potassium bromide with respect to the quadrupole coupling constant. The spectrum c | 116 |
 | `examples/nmr_solids/fitting/vanadium_csa_nqi/vfit_4sim_ik.m` | `vfit_4sim_ik()` | Simultaneous fitting of multiple 51V MAS NMR spectra with respect to the chemical shielding anisotropy and quadrupole co | 168 |
 | `examples/nmr_solids/fslghetcor_mas_gly.m` | `fslghetcor_mas_gly()` | FSLG-HETCOR of alpha-glycine powder under MAS. Calculation time: hours on NVidia Tesla A100, much longer on CPU | 91 |
 | `examples/nmr_solids/hmqc_mas_dq.m` | `hmqc_mas_dq()` | Powder magic angle spinning CN2D experiment (rotor-synchronized de- tection) on a 14N-1H spin pair using 1D Fokker-Planc | 74 |
@@ -546,8 +552,8 @@
 | `examples/nmr_solids/mas_powder_suc_floquet.m` | `mas_powder_suc_floquet()` | 13C MAS spectrum of sucrose powder (assuming decoupling of 1H), computed using the Floquet MAS formalism. Chemical shiel | 61 |
 | `examples/nmr_solids/mas_powder_suc_fplanck.m` | `mas_powder_suc_fplanck()` | 13C MAS spectrum of sucrose powder (assuming decoupling of 1H), computed using the Fokker-Planck MAS formalism. Chemical | 58 |
 | `examples/nmr_solids/mas_powder_suc_gridfree.m` | `mas_powder_suc_gridfree()` | 13C MAS spectrum of sucrose powder (assuming decoupling of 1H), computed using the grid-free Fokker-Planck MAS formalism | 66 |
-| `examples/nmr_solids/mas_powder_trp_floquet.m` | `mas_powder_trp_floquet()` | 13C MAS spectrum of tryptophan powder (assuming decoupling of 1H), computed using the Floquet MAS formalism. Isotropic c | 109 |
-| `examples/nmr_solids/mas_powder_trp_fplanck.m` | `mas_powder_trp_fplanck()` | 13C MAS spectrum of tryptophan powder (assuming decoupling of 1H), computed using the Fokker-Planck MAS formalism. Isotr | 106 |
+| `examples/nmr_solids/mas_powder_trp_floquet.m` | `mas_powder_trp_floquet()` | 13C MAS spectrum of tryptophan powder (assuming decoupling of 1H), computed using the Floquet MAS formalism. Isotropic c | 113 |
+| `examples/nmr_solids/mas_powder_trp_fplanck.m` | `mas_powder_trp_fplanck()` | 13C MAS spectrum of tryptophan powder (assuming decoupling of 1H), computed using the Fokker-Planck MAS formalism. Isotr | 110 |
 | `examples/nmr_solids/mas_powder_trp_gridfree.m` | `mas_powder_trp_gridfree()` | 13C MAS spectrum of tryptophan powder (assuming decoupling of 1H), computed using the grid-free Fokker-Planck MAS formal | 118 |
 | `examples/nmr_solids/mqmas_nqi.m` | `mqmas_nqi()` | Rotor-synchronous MQMAS spectrum of a 87Rb compound, transmitter set to the isotropic chemical shift. Calculation time:  | 59 |
 | `examples/nmr_solids/pdsd_simple.m` | `pdsd_simple()` | 13C 2D PDSD spectrum of a simple test spin system. Calculation time: minutes, much faster on GPU. | 74 |
@@ -593,8 +599,8 @@
 | `examples/nqr/pure_nqr_nitrogen.m` | `pure_nqr_nitrogen()` | Powder NQR spectrum of a system with a single 14N nucleus. Calculation time: seconds | 54 |
 | `examples/optimal_control/bloch_siegert/bloch_siegert_a.m` | `bloch_siegert_a()` | Bloch-Siegert shift compensation functionality demo. The script optimises a 90-degree pulse (Lz -> Lx) for a sing- le sp | 106 |
 | `examples/optimal_control/bloch_siegert/bloch_siegert_b.m` | `bloch_siegert_b()` | Bloch-Siegert shift compensation functionality demo. The script optimises a universal rotation pulse for a range of reso | 108 |
-| `examples/optimal_control/bloch_siegert/coote_badcop.m` | `coote_badcop()` | Reproduction of BADCOP-style selective decoupling logic from Coote et al. with Bloch-Siegert corrections enabled in the  | 175 |
-| `examples/optimal_control/bloch_siegert/coote_goodcop.m` | `coote_goodcop()` | Reproduction of the GOODCOP pulse design logic from Coote et al. with Bloch-Siegert corrections enabled in the optimiser | 147 |
+| `examples/optimal_control/bloch_siegert/coote_badcop.m` | `coote_badcop()` | Reproduction of BADCOP-style selective decoupling logic from Coote et al. with Bloch-Siegert corrections enabled in the  | 195 |
+| `examples/optimal_control/bloch_siegert/coote_goodcop.m` | `coote_goodcop()` | Reproduction of the GOODCOP pulse design logic from Coote et al. with Bloch-Siegert corrections enabled in the optimiser | 158 |
 | `examples/optimal_control/bloch_siegert/ramsey_shifts.m` | `ramsey_shifts()` | Ramsey shifts of other spins under an off-resonant drive. A proton channel drives a three-spin system in which 13C and 1 | 107 |
 | `examples/optimal_control/bloch_siegert/yusuke_14n_broadening_demo.m` | `yusuke_14n_broadening_demo()` | Reduced effective-model illustration of the trade-off discussed by Nehra, Agarwal, and Nishiyama for 14N decoupling unde | 205 |
 | `examples/optimal_control/bloch_siegert/yusuke_1h_14n_optimal_vs_cw_demo.m` | `yusuke_1h_14n_optimal_vs_cw_demo()` | Reduced heteronuclear control demonstration inspired by the low-power offset-tolerant 14N decoupling papers of Nehra, Ag | 264 |
@@ -615,14 +621,14 @@
 | `examples/optimal_control/distortions/kernel_estimation/kernel_application.m` | `kernel_application()` | HiPER instrument filter function kernel application to a complicated shaped pulse and a comparison with expe- rimental m | 44 |
 | `examples/optimal_control/distortions/kernel_estimation/kernel_from_87rb.m` | `kernel_from_87rb()` | Transmitter and probe distortion kernel of a 400 MHz Bruker spectrometer fitted with a 4 mm Phoenix MAS probe, estimated | 130 |
 | `examples/optimal_control/distortions/kernel_estimation/kernel_from_antenna.m` | `kernel_from_antenna()` | HiPER instrument filter function kernel estimation from the quadrature components recorded by an antenna placed close to | 61 |
-| `examples/optimal_control/distortions/kernel_estimation/kernel_from_transm.m` | `kernel_from_transm()` | Response function extraction from the transmission profile of the HiPER instrument. We are sending a linear chirp via th | 57 |
+| `examples/optimal_control/distortions/kernel_estimation/kernel_from_transm.m` | `kernel_from_transm()` | Response function extraction from the transmission profile of the HiPER instrument. We are sending a linear chirp via th | 72 |
 | `examples/optimal_control/distortions/restrans_test.m` | `restrans_test()` | Resonator transform test. Sends a square pulse into a simple resonator model and plots the time-domain response. | 38 |
 | `examples/optimal_control/distortions/rlc_response_1.m` | `rlc_response_1(interp_type)` | An illustration of the effect of the resonator response function on a typical composite pulse in NMR spectroscopy. The a | 80 |
 | `examples/optimal_control/distortions/rlc_response_2.m` | `rlc_response_2()` | Probe circuit response effect on the accuracy of the deu- terium pre-phasing pulse designed to set deuterium magne- tisa | 102 |
 | `examples/optimal_control/distortions/rlc_response_3.m` | `rlc_response_3()` | Probe circuit response effect on the accuracy of the deu- terium pre-phasing pulse designed to set deuterium magne- tisa | 102 |
 | `examples/optimal_control/distortions/scope_readout/pulse_heterodyne.m` | `pulse_heterodyne()` | Digital processing for a recording of the proton optimal control pulse, done on a 1 GHz oscilloscope using the 13C coil  | 75 |
 | `examples/optimal_control/features_ampl.m` | `features_ampl()` | An illustration of amplitude profiling in a phase-modulated pulse optimisation. The amplitude profile is supplied by the | 115 |
-| `examples/optimal_control/features_bss.m` | `features_bss()` | Optimal control pulse optimisation with Bloch-Siegert shift corrections switched on. A single proton with a Larmor frequ | 90 |
+| `examples/optimal_control/features_bss.m` | `features_bss()` | Optimal control pulse optimisation with Bloch-Siegert shift corrections switched on. A single proton with a Larmor frequ | 99 |
 | `examples/optimal_control/features_curv.m` | `features_curv()` | A transfer of coherence from longitudinal magnetization into a two-spin singlet state with a distribution of B1 powers.  | 105 |
 | `examples/optimal_control/features_diss_drift.m` | `features_diss_drift()` | Optimal control optimisation of a pulse performing magnetisa- tion transfer from H(N) to C(O) in a typical protein backb | 135 |
 | `examples/optimal_control/features_dt_opt.m` | `features_dt_opt()` | Optimisation of slice durations in a composite inversion pulse with specified amplitudes, phases, and a constrain- ed ov | 110 |
@@ -646,12 +652,12 @@
 | `examples/optimal_control/state_transfer_s2m.m` | `state_transfer_s2m()` | A transfer of coherence from a two-proton singlet state to a nearby carbon in a setting typically encountered in parahyd | 100 |
 | `examples/optimal_control/state_transfer_wf.m` | `state_transfer_wf()` | A transfer of population from the lowermost energy level in a four-spin system to the uppermost energy level using the w | 92 |
 | `examples/optimal_control/static_powder_control.m` | `static_powder_control()` | Optimal control optimisation for a pulse that is designed to set deuterium magnetisation in a -CD3 group of alanine up f | 138 |
-| `examples/optimal_control/steady_orbit/solid_effect_chirp.m` | `solid_effect_chirp()` | Panoramic optimisation for stroboscopic steady state DNP with the timing and power settings matching the XiX ex- eriment | 130 |
-| `examples/optimal_control/steady_orbit/solid_effect_dq.m` | `solid_effect_dq()` | Panoramic optimisation for stroboscopic steady state DNP with the timing and power settings matching the XiX ex- eriment | 127 |
-| `examples/optimal_control/steady_orbit/solid_effect_int.m` | `solid_effect_int()` | Panoramic optimisation for stroboscopic steady state DNP with the timing and power settings matching the XiX ex- eriment | 127 |
-| `examples/optimal_control/steady_orbit/solid_effect_xix.m` | `solid_effect_xix()` | Panoramic optimisation for stroboscopic steady state DNP with the timing and power settings matching the XiX ex- eriment | 131 |
+| `examples/optimal_control/steady_orbit/solid_effect_chirp.m` | `solid_effect_chirp()` | Panoramic optimisation for stroboscopic steady state DNP with the timing and power settings matching the XiX ex- eriment | 132 |
+| `examples/optimal_control/steady_orbit/solid_effect_dq.m` | `solid_effect_dq()` | Panoramic optimisation for stroboscopic steady state DNP with the timing and power settings matching the XiX ex- eriment | 129 |
+| `examples/optimal_control/steady_orbit/solid_effect_int.m` | `solid_effect_int()` | Panoramic optimisation for stroboscopic steady state DNP with the timing and power settings matching the XiX ex- eriment | 129 |
+| `examples/optimal_control/steady_orbit/solid_effect_xix.m` | `solid_effect_xix()` | Panoramic optimisation for stroboscopic steady state DNP with the timing and power settings matching the XiX ex- eriment | 133 |
 | `examples/parahydrogen/altadena_propanal.m` | `altadena_propanal()` | ALTADENA experiment simulation for the parahydrogenation of acrolein into propanal. Simple model of the ALTADENA effect  | 68 |
-| `examples/parahydrogen/case_studies/hyperpolarised_deuterium/bubble_pulse_acquire.m` | `bubble_pulse_acquire()` | Simulated PNL (partially negative line) spectrum of ortho-deuterium in the presence of a parahydrogena- tion catalyst. B | 120 |
+| `examples/parahydrogen/case_studies/hyperpolarised_deuterium/bubble_pulse_acquire.m` | `bubble_pulse_acquire()` | Simulated PNL (partially negative line) spectrum of ortho-deuterium in the presence of a parahydrogena- tion catalyst. B | 122 |
 | `examples/parahydrogen/case_studies/hyperpolarised_deuterium/just_bubbling.m` | `just_bubbling()` | Evolution of state populations under ortho-deuterium bubbling in the presence of a parahydrogenation cata- lyst. No puls | 115 |
 | `examples/parahydrogen/case_studies/hyperpolarised_deuterium/kinetic_isotope_effect.m` | `kinetic_isotope_effect()` | Evolution of state populations under ortho-deuterium bubbling in the presence of a parahydrogenation cata- lyst. Bubblin | 133 |
 | `examples/parahydrogen/case_studies/spontaneous_singlet_to_z/rlx_trajectory.m` | `rlx_trajectory()` | Time dependence of LzSz and Lz+Sz spin orders in a para- hydrogen molecule coordinated to a nickel cage that cre- ates l | 75 |
@@ -670,7 +676,7 @@
 | `examples/quantum_tech/diamond_defects/diamond_co_epr_xw.m` | `diamond_co_epr_xw()` | Field-swept powder EPR spectra of a Co centre in diamond at X and W bands. Calculation time: minutes. | 67 |
 | `examples/quantum_tech/diamond_defects/diamond_gev0_epr_xw.m` | `diamond_gev0_epr_xw()` | Field-swept powder EPR spectra of GeV0 centre in diamond at X and W bands. Calculation time: seconds. | 67 |
 | `examples/quantum_tech/diamond_defects/diamond_n2vm_epr_xw.m` | `diamond_n2vm_epr_xw()` | Field-swept powder EPR spectra of an N2V-centre in diamond at X and W bands. Calculation time: seconds. | 68 |
-| `examples/quantum_tech/diamond_defects/diamond_ni_epr_xw.m` | `diamond_ni_epr_xw()` | Field-swept powder EPR spectra of Ni defects in diamond at X and W bands. Calculation time: seconds. | 68 |
+| `examples/quantum_tech/diamond_defects/diamond_ni_epr_xw.m` | `diamond_ni_epr_xw()` | Field-swept powder EPR spectra of Ni defects in diamond at X and W bands. Calculation time: seconds. | 67 |
 | `examples/quantum_tech/diamond_defects/diamond_ninter_epr_xw.m` | `diamond_ninter_epr_xw()` | Field-swept powder EPR spectra of a nitrogen interstitial defect in diamond at X and W bands. Calculation time: seconds. | 68 |
 | `examples/quantum_tech/diamond_defects/diamond_nvm_epr_xw.m` | `diamond_nvm_epr_xw()` | Field-swept powder EPR spectra of an NV centre in diamond at X and W bands. Calculation time: seconds. | 67 |
 | `examples/quantum_tech/diamond_defects/diamond_p1_13c_epr_xw.m` | `diamond_p1_13c_epr_xw()` | Field-swept powder EPR spectra of a P1 centre in 13C-enriched diamond at X and W bands. Calculation time: minutes. | 71 |
@@ -745,7 +751,7 @@
 | `examples/singlet_states/decoherence_benzoquinone.m` | `decoherence_benzoquinone()` | Long-lived spin states in the para-benzoquinone molecule (4 protons, 256-dimensional Liouville space). The relaxation su | 49 |
 | `examples/singlet_states/decoherence_bicyclopropylidene.m` | `decoherence_bicyclopropylidene()` | Long-lived spin states in the bicyclopropylidene molecule (8 protons, 65536-dimensional Liouville space). The relaxation | 49 |
 | `examples/singlet_states/decoherence_diacetylene.m` | `decoherence_diacetylene()` | Long-lived spin states in the diacetylene molecule (2 protons, 4 carbons, 4096-dimensional Liouville space). The relaxat | 67 |
-| `examples/singlet_states/decoherence_naphthalenetetrone.m` | `decoherence_naphthalenetetrone()` | Long-lived spin states in the napthalenetetrone molecule. (4 protons, 256-dimensional Liouville space). The relaxation s | 49 |
+| `examples/singlet_states/decoherence_naphthalenetetrone.m` | `decoherence_naphthalenetetrone()` | Long-lived spin states in the napthalenetetrone molecule. (4 protons, 256-dimensional Liouville space). The relaxation s | 46 |
 | `examples/singlet_states/decoherence_urea.m` | `decoherence_urea()` | A demonstration that the nitrogen singlet state in urea is not long-lived. The relaxation superoperator accounts for eve | 52 |
 | `examples/singlet_states/dipolar_singlet.m` | `dipolar_singlet()` | A demonstration that the two-spin singet state is immune to dipolar relaxation. Full Redfield superoperator for dipolar  | 48 |
 | `examples/singlet_states/eigenstate_analysis.m` | `eigenstate_analysis()` | Stationary state analysis for the spin system of allyl pyruvate, finding out which component of the singlet state commut | 100 |

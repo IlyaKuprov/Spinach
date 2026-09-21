@@ -25,7 +25,7 @@ Transforms the coefficients in front of Stevens operators, as produced by steven
 - Lines 49-50: Catalog the stupid scaling factors; implemented by `a{1}=[1/sqrt(2) 1 1/sqrt(2)]'`.
 - Lines 64-65: Form the transformation matrix diagonal; implemented by `criss=[-1i*(-1).^(k:-1:1)'; 1; ones(k,1) ].*a{k}`.
 - Lines 67-68: Form the transformation matrix antidiagonal; implemented by `cross=[+1i*ones(k,1); 0; (-1).^(1:k)'].*a{k}`.
-- Lines 70-71: Form the transformation matrix; implemented by `A=diag(criss)+fliplr(diag(cross))`.
+- Lines 64-65: Form the transformation matrix; implemented by `A=diag(criss)+fliplr(diag(cross))`.
 - Lines 73-74: Transform the coefficients; implemented by `Bkq=transpose(Bkq'*A)`.
 
 ### Key state/data transformations

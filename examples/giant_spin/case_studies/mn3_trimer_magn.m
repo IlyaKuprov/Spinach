@@ -73,9 +73,8 @@ answer=crystal(spin_system,@pulsed_field,parameters,'labframe');
 [I,Q]=hamiltonian(assume(spin_system,'labframe')); H0=I+orientation(Q,[0 0 0]);
 Z=hamiltonian(assume(spin_system,'labframe','zeeman')); H0=H0-Z; m_eq=zeros(size(answer.field));
 for k=1:numel(m_eq)
-    H=full(H0+answer.field(k)*Z); H=(H+H')/2; [V,E]=eig(H,'vector');
-    pops=exp(-spin_system.tols.hbar*(E-min(E))/(spin_system.tols.kbol*inter.temperature));
-    m_eq(k)=real(trace(parameters.coil'*(V*diag(pops/sum(pops))*V')));
+    H=full(H0+answer.field(k)*Z); rho=equilibrium(spin_system,(H+H')/2);
+    m_eq(k)=real(hdot(parameters.coil,rho));
 end
 
 % Plot the sweep and the equilibrium curves

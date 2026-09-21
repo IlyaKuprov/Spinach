@@ -2,11 +2,11 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/case_studies/mn3_trimer_levels.m`
 - Signature: `mn3_trimer_levels()`
-- Total lines: 63
+- Total lines: 59
 
 ## Purpose
 
-Zeeman energy level diagram of the (CH6N3)2MnCl4 molecular crystal, a linear trimer of three S=5/2 manganese ions with isotropic exchange between neighbours and an axial plus rhombic zero-field splitting on every ion, from zero to 10 Tesla in the full 216-state Hilbert space. The lowest levels are the ones that the 16-state and 26-state effective bases of the paper are built to reproduce. Reproduces Figure 5 of https://arxiv.org/abs/2609.16352. Calculation time: seconds.
+Zeeman energy level diagram of the (CH6N3)2MnCl4 molecular crystal, a linear trimer of three S=5/2 manganese ions with isotropic exchange between neighbours and an axial plus rhombic zero-field splitting on every ion, from zero to 10 Tesla in the full 216-state Hilbert space. The lowest levels are the ones that the 16-state and 26-state effective bases of the paper are built to reproduce. Reproduces Fig 5 of https://arxiv.org/abs/2609.16352. Calculation time: seconds.
 
 ## Physical / mathematical content
 
@@ -23,7 +23,7 @@ Zeeman energy level diagram of the (CH6N3)2MnCl4 molecular crystal, a linear tri
 - between neighbours and an axial plus rhombic zero-field splitting on
 - every ion, from zero to 10 Tesla in the full 216-state Hilbert space.
 - The lowest levels are the ones that the 16-state and 26-state effec-
-- tive bases of the paper are built to reproduce. Reproduces Figure 5
+- tive bases of the paper are built to reproduce. Reproduces Fig 5 of
 - Calculation time: seconds
 - Magnet must be 1 Tesla, the field is set below
 - Parallel pool size

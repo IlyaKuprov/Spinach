@@ -550,7 +550,15 @@ J=15/2. The field-scan drivers are called directly, without a context, and
 exception is `giant_spin/case_studies`, where the pulsed-field magnetometry
 scripts run `pulsed_field` through `crystal` and `powder` with the `labframe`
 assumption set, `parameters.needs={'zeeman_op'}`, and `parameters.sum_up=false`
-under `powder`. Zero-field splitting via D and E (`quartet_levels.m`):
+under `powder`. Those scripts take spin operators from the spin system
+(`operator(spin_system,'Lz','E17')`, never `stevens` matrices, whose basis
+ordering is an assumption) and draw the equilibrium magnetisation at a field
+other than `sys.magnet` from the kernel: build `H=H0+B*Z` with `H0` the
+labframe Hamiltonian minus the unit-field Zeeman operator and `Z` from
+`hamiltonian(assume(spin_system,'labframe','zeeman'))`, then
+`rho=equilibrium(spin_system,H)` and `real(hdot(coil,rho))`, rather than
+re-deriving Boltzmann populations from `eig`. Zero-field splitting via D and
+E (`quartet_levels.m`):
 
 ```matlab
 sys.magnet=1.0;                        % must be 1 for a field scan

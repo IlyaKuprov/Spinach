@@ -44,8 +44,8 @@ bas.approximation='none';
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Total S_z and the spin-phonon coupling operator between adjacent total S_z states
-Sz=full(operator(spin_system,'Lz','E6')); msz=diag(Sz);
+% Total S_z and the spin-phonon coupling operator between adjacent total S_z states, projections rounded to exact half-integers
+Sz=full(operator(spin_system,'Lz','E6')); msz=round(2*diag(Sz))/2;
 parameters.phonon_x=double(abs(msz-msz.')==1);
 
 % Super-Ohmic bath, lambda^2*I0 of the paper (lambda=10 cm^-1, I0=1e-14 ps/rad) in rad/s units

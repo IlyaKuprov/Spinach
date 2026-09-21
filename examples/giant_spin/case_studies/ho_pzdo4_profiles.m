@@ -87,8 +87,8 @@ for n=1:4
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);
 
-    % Spin-phonon coupling operator: unit elements between adjacent m_J states
-    Jz=full(operator(spin_system,'Lz','E17')); mj=diag(Jz);
+    % Spin-phonon coupling operator: unit elements between adjacent m_J states, projections rounded to exact integers
+    Jz=full(operator(spin_system,'Lz','E17')); mj=round(2*diag(Jz))/2;
     parameters.phonon_x=double(abs(mj-mj.')==1);
 
     % Observable: magnetic moment along Z in Bohr magnetons

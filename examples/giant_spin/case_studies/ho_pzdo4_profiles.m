@@ -22,20 +22,22 @@ function ho_pzdo4_profiles()
 % Crystal field parameters, cm^-1, ranks 2 to 12 in Stevens operator convention
 [ks,qs,bkq]=ho_pzdo4_params();
 
-% Convert Stevens coefficients into spherical tensor coefficients, Hz, rank by rank
+% Convert Stevens coefficients into spherical 
+% tensor coefficients (Hz) rank by rank
 coeff=cell(1,12); euler=cell(1,12);
 for k=1:12
-    stev=zeros(2*k+1,1); sel=(ks==k); stev(qs(sel)+k+1)=bkq(sel);
-    coeff{k}=stev2sph(k,icm2hz(stev)); euler{k}=[0 0 0];
+    stev=zeros(2*k+1,1); sel=(ks==k); 
+    stev(qs(sel)+k+1)=bkq(sel);
+    coeff{k}=stev2sph(k,icm2hz(stev)); 
+    euler{k}=[0 0 0];
 end
 
-% Magnet must be 1 Tesla, the field is set by the sweep
+% Magnet must be 1 Tesla, 
+% the field is set by the sweep
 sys.magnet=1.0;
 
-% Parallel pool size
-sys.parallel={'processes',4};
-
-% J=8 giant spin, effective g-factor 1.24
+% J=8 giant spin, 
+% effective g-factor 1.24
 sys.isotopes={'E17'};
 inter.zeeman.scalar={1.24};
 inter.giant.coeff={coeff};
@@ -45,12 +47,15 @@ inter.giant.euler={euler};
 bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
-% Super-Ohmic bath, lambda^2*I0 of the paper (lambda=10 cm^-1, I0=1e-14 ps/rad) in rad/s units
+% Super-Ohmic bath, lambda^2*I0 of the paper 
+% (lambda=10 cm^-1, I0=1e-14 ps/rad) in rad/s units
 parameters.phonon_alpha=2;
 parameters.phonon_i0=1e2*1e-14*1e12*(1e-12)^2*0.1883651568463003^2;
 
-% Single crystal, crystal field frame aligned with the laboratory frame
-parameters.spins={'E17'}; parameters.orientation=[0 0 0];
+% Single crystal, crystal field frame 
+% aligned with the laboratory frame
+parameters.spins={'E17'}; 
+parameters.orientation=[0 0 0];
 parameters.needs={'zeeman_op'};
 
 % Measured 65 T pulse of the paper, ms and Tesla, 76 points, for the monotone spline profile
@@ -69,29 +74,41 @@ pulse_b=[0.000000 2.136074 3.642848 5.179167 6.810767 8.966783 10.895307 12.7425
          65.125142 65.006964 65.006964 64.829697 64.741063 64.622884 64.475161 64.297894 ...
          64.120626 63.588824];
 
-% Four field profiles, Tesla as a function of time in seconds
-profiles={@(t) 1e4*t, ...
-          @(t) interp1([0 1e-6 1e-5 1e-4 1e-3],[0 0.1 1 5 10],t,'linear'), ...
-          @(t) pchip(pulse_t,pulse_b,t), ...
-          @(t) 0.1*sin(0.134124264765e12*t)};
-temps=[2.0 2.0 2.0 0.001]; steps=[1e-8 1e-8 1e-8 1e-15]; nsteps=[1e5 1e5 1e5 140538]; nout=[100 100 100 59];
-labels={'linear, 10 T/ms','piecewise linear','spline of a measured pulse','sinusoidal, 0.1 T at the clock gap'};
-tscale=[1e6 1e6 1e6 1e12]; tunits={'$\mu$s','$\mu$s','$\mu$s','ps'};
+% Four field profiles, Tesla as 
+% a function of time in seconds
+profiles={@(t)1e4*t, ...
+          @(t)interp1([0 1e-6 1e-5 1e-4 1e-3],[0 0.1 1 5 10],t,'linear'), ...
+          @(t)pchip(pulse_t,pulse_b,t), ...
+          @(t)0.1*sin(0.134124264765e12*t)};
+temps=[2.0 2.0 2.0 0.001]; 
+steps=[1e-8 1e-8 1e-8 1e-15]; 
+nsteps=[1e5 1e5 1e5 140538]; 
+nout=[100 100 100 59];
+labels={'linear, 10 T/ms','piecewise linear',...
+        'spline of a measured pulse',...
+        'sinusoidal, 0.1 T at the clock gap'};
+tscale=[1e6 1e6 1e6 1e12]; 
+tunits={'$\mu$s','$\mu$s','$\mu$s','ps'};
 
 % Loop over the profiles
 kfigure(); scale_figure([2.0 1.6]); answers=cell(1,4);
 for n=1:4
 
-    % Spinach housekeeping at the temperature of the panel
+    % Spinach housekeeping at 
+    % the temperature of the panel
     inter.temperature=temps(n);
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);
 
-    % Spin-phonon coupling operator: unit elements between adjacent m_J states, projections rounded to exact integers
-    Jz=full(operator(spin_system,'Lz','E17')); mj=round(2*diag(Jz))/2;
+    % Spin-phonon coupling operator: unit elements 
+    % between adjacent m_J states, projections 
+    % rounded to exact integers
+    Jz=full(operator(spin_system,'Lz','E17')); 
+    mj=round(2*diag(Jz))/2;
     parameters.phonon_x=double(abs(mj-mj.')==1);
 
-    % Observable: magnetic moment along Z in Bohr magnetons
+    % Observable: magnetic moment 
+    % along Z in Bohr magnetons
     parameters.coil=-1.24*Jz;
 
     % Sweep parameters of the panel
@@ -104,9 +121,13 @@ for n=1:4
     answers{n}=crystal(spin_system,@pulsed_field,parameters,'labframe');
 
     % Plot the field and the magnetisation against time
-    subplot(2,2,n); yyaxis left; plot(answers{n}.t*tscale(n),answers{n}.field); kylabel('Field, Tesla');
-    yyaxis right; plot(answers{n}.t*tscale(n),answers{n}.obs); kylabel('Magnetisation, $\mu_B$');
-    kxlabel(['Time, ' tunits{n}]); ktitle(labels{n}); kgrid; xlim tight; drawnow;
+    subplot(2,2,n); yyaxis left; 
+    plot(answers{n}.t*tscale(n),answers{n}.field); 
+    kylabel('Field, Tesla'); yyaxis right; 
+    plot(answers{n}.t*tscale(n),answers{n}.obs); 
+    kylabel('Magnetisation, $\mu_B$');
+    kxlabel(['Time, ' tunits{n}]); 
+    ktitle(labels{n}); kgrid; xlim tight; drawnow;
 
 end
 

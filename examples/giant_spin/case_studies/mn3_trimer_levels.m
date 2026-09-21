@@ -23,12 +23,14 @@ sys.parallel={'processes',4};
 sys.isotopes={'E6','E6','E6'};
 inter.zeeman.scalar={2.0 2.0 2.0};
 
-% Isotropic exchange, J=-2.42 cm^-1 in the H=-2*J*S1*S2 convention of the paper
+% Isotropic exchange, J=-2.42 cm^-1 in 
+% the H=-2*J*S1*S2 convention of the paper
 inter.coupling.matrix=cell(3,3);
 inter.coupling.matrix{1,2}=-2*icm2hz(-2.42)*eye(3);
 inter.coupling.matrix{2,3}=-2*icm2hz(-2.42)*eye(3);
 
-% Zero-field splitting, D=0.167 cm^-1 and E=0.040 cm^-1 on every ion
+% Zero-field splitting, D=0.167 cm^-1 
+% and E=0.040 cm^-1 on every ion
 for n=1:3
     inter.coupling.matrix{n,n}=zfs2mat(icm2hz(0.167),icm2hz(0.040),0,0,0);
 end
@@ -42,18 +44,22 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Field-free Hamiltonian and the Zeeman operator per Tesla
-[I,Q]=hamiltonian(assume(spin_system,'labframe')); H0=I+orientation(Q,[0 0 0]);
-Z=hamiltonian(assume(spin_system,'labframe','zeeman')); H0=H0-Z;
+[I,Q]=hamiltonian(assume(spin_system,'labframe')); 
+Z=hamiltonian(assume(spin_system,'labframe','zeeman')); 
+H0=I+orientation(Q,[0 0 0]); H0=H0-Z;
 
 % Energy levels on a field grid, cm^-1
-fields=linspace(0,10,201); levels=zeros(size(H0,1),numel(fields));
+fields=linspace(0,10,201); 
+levels=zeros(size(H0,1),numel(fields));
 for k=1:numel(fields)
-    H=full(H0+fields(k)*Z); levels(:,k)=hz2icm(sort(eig((H+H')/2))/(2*pi));
+    H=full(H0+fields(k)*Z); 
+    levels(:,k)=hz2icm(sort(eig((H+H')/2))/(2*pi));
 end
 
 % Plot the lowest thirty levels relative to the field-free ground state
-kfigure(); plot(fields,levels(1:30,:)-levels(1,1)); kgrid; xlim tight; ylim padded;
+kfigure(); plot(fields,levels(1:30,:)-levels(1,1)); 
 kxlabel('Field, Tesla'); kylabel('Energy, cm$^{-1}$');
+kgrid; xlim tight; ylim padded;
 
 end
 

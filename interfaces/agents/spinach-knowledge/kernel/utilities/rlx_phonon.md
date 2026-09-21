@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/rlx_phonon.m`
 - Signature: `R=rlx_phonon(spin_system,H,X,I0,alpha,T)`
-- Total lines: 108
+- Total lines: 96
 
 ## Purpose
 
@@ -22,29 +22,21 @@ Spin-phonon relaxation superoperator in the generalised Lindblad form of Saito, 
 
 ### Comment-guided execution stages
 
-- Lines 58-59: Check consistency; implemented by `grumble(H,X,I0,alpha,T)`.
-- Lines 61-62: Diagonalise the Hamiltonian; implemented by `[V,E]=eig(full((H+H')/2),'vector')`.
-- Lines 64-65: Transition frequencies in rad/s; implemented by `w=E-E.'`.
-- Lines 67-68: Boltzmann exponents; implemented by `beta_w=spin_system.tols.hbar*w/(spin_system.tols.kbol*T)`.
-- Lines 70-71: Thermal spectral density difference, with the small and large exponent limits; implemented by `num=I0*(max(w,0).^alpha-max(-w,0).^alpha); phi=zeros(size(w))`.
-- Lines 77-78: Coupling operator in the eigenbasis and the R operator back in the original basis; implemented by `XE=V'*X*V; RH=V*(XE.*phi)*V'`.
-- Lines 80-81: Liouville space dissipator, column-stretched density matrix convention; implemented by `unit=speye(size(H,1))`.
+- Lines 59-60: Check consistency; implemented by `grumble(H,X,I0,alpha,T)`.
+- Lines 62-63: Diagonalise the Hamiltonian; implemented by `[V,E]=eig(full((H+H')/2),'vector')`.
+- Lines 65-66: Dressed coupling operator in the eigenbasis and back in the original basis; implemented by `XE=V'*X*V; RH=V*phonon_oper(spin_system,E,(XE+XE')/2,I0,alpha,T)*V'`.
+- Lines 68-69: Liouville space dissipator, column-stretched density matrix convention; implemented by `unit=speye(size(H,1))`.
 
 ### Key state/data transformations
 
-- Lines 62: computes `[V,E]` using `[V,E]=eig(full((H+H')/2),'vector')`.
-- Lines 65: computes `w` using `w=E-E.'`.
-- Lines 68: computes `beta_w` using `beta_w=spin_system.tols.hbar*w/(spin_system.tols.kbol*T)`.
-- Lines 71: computes `num` using `num=I0*(max(w,0).^alpha-max(-w,0).^alpha); phi=zeros(size(w))`.
-- Lines 73: computes `phi(normal)` using `phi(normal)=num(normal)./expm1(beta_w(normal))`.
-- Lines 74-75: computes `phi(small)` using `phi(small)=I0*abs(w(small)).^(alpha-1)*(spin_system.tols.kbol*T/spin_system.tols.hbar)- I0*sign(w(small)).*abs(w(small)).^alpha/2`.
-- Lines 78: computes `XE` using `XE=V'*X*V; RH=V*(XE.*phi)*V'`.
-- Lines 81: computes `unit` using `unit=speye(size(H,1))`.
-- Lines 82: computes `R` using `R=-pi*(kron(unit,X*RH)-kron(X.',RH)+kron((RH'*X).',unit)-kron(conj(RH),X))`.
+- Lines 63: computes `[V,E]` using `[V,E]=eig(full((H+H')/2),'vector')`.
+- Lines 66: computes `XE` using `XE=V'*X*V; RH=V*phonon_oper(spin_system,E,(XE+XE')/2,I0,alpha,T)*V'`.
+- Lines 69: computes `unit` using `unit=speye(size(H,1))`.
+- Lines 70: computes `R` using `R=-pi*(kron(unit,X*RH)-kron(X.',RH)+kron((RH'*X).',unit)-kron(conj(RH),X))`.
 
 ### Local helper functions
 
-- Line 87: `grumble()` — `function grumble(H,X,I0,alpha,T)`.
+- Line 75: `grumble()` — `function grumble(H,X,I0,alpha,T)`.
   - Representative operation: `if (~isnumeric(H))||(size(H,1)~=size(H,2))||any(~isfinite(H(:)))`.
   - Representative operation: `error('H must be a square matrix with finite elements.')`.
 
@@ -90,4 +82,4 @@ Spin-phonon relaxation superoperator in the generalised Lindblad form of Saito, 
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `grumble()`, `phi()`, `num()`, `expm1()`, `beta_w()`, `sign()`, `speye()`, `conj()`, `any()`, `ishermitian()`, `isscalar()`.
+- Called routines detected from the main body: `grumble()`, `phonon_oper()`, `speye()`, `conj()`, `any()`, `ishermitian()`, `isscalar()`.

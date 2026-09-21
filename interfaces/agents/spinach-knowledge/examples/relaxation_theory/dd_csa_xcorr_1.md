@@ -19,32 +19,6 @@ Complete Bloch-Redfield-Wangsness relaxation superoperator in a system with two 
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 14-15: Spin system; implemented by `sys.isotopes={'1H','13C'}`.
-- Lines 17-18: Basis set; implemented by `bas.formalism='sphten-liouv'`.
-- Lines 21-22: Interactions; implemented by `sys.magnet=14.1`.
-- Lines 30-31: Relaxation theory parameters; implemented by `inter.relaxation={'redfield'}`.
-- Lines 36-37: Spinach housekeeping; implemented by `spin_system=create(sys,inter)`.
-- Lines 40-41: Relaxation superoperator; implemented by `disp(full(relaxation(spin_system)))`.
-
-### Key state/data transformations
-
-- Lines 15: computes `sys.isotopes` using `sys.isotopes={'1H','13C'}`.
-- Lines 18: computes `bas.formalism` using `bas.formalism='sphten-liouv'`.
-- Lines 19: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 22: computes `sys.magnet` using `sys.magnet=14.1`.
-- Lines 23: computes `inter.zeeman.eigs` using `inter.zeeman.eigs={[7 15 -22]`.
-- Lines 25: computes `inter.zeeman.euler` using `inter.zeeman.euler={[pi/3 pi/4 pi/5]`.
-- Lines 27: computes `inter.coordinates` using `inter.coordinates={[0.00 0.00 0.00]`.
-- Lines 31: computes `inter.relaxation` using `inter.relaxation={'redfield'}`.
-- Lines 32: computes `inter.equilibrium` using `inter.equilibrium='zero'`.
-- Lines 33: computes `inter.rlx_keep` using `inter.rlx_keep='labframe'`.
-- Lines 34: computes `inter.tau_c` using `inter.tau_c={1e-9}`.
-- Lines 37: computes `spin_system` using `spin_system=create(sys,inter)`.
-
 ## Implementation structure
 
 - Complete Bloch-Redfield-Wangsness relaxation superoperator in a system

@@ -14,23 +14,6 @@ Tests removal of the isotropic tensor trace. Syntax: result=test_remtrace_tensor
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 16-17: Announce the test target; implemented by `fprintf('TESTING: Traceless rank-two tensor construction\n')`.
-- Lines 19-22: State the physical target of the test; implemented by `result=new_test_result('kernel/remtrace_tensor', 'Traceless rank-two tensor construction', 'anisotropic interaction tensors are obtained by subtracting the isotropic tra…`.
-- Lines 24-25: Define a symmetric interaction tensor with non-zero isotropic part; implemented by `A=[1 2 0;2 3 0;0 0 5]`.
-- Lines 29-31: Check explicit trace removal and invariants; implemented by `result=test_close(result,'explicit isotropic subtraction',A_obs,A_ref,1e-15,1e-15, 'the isotropic part is trace(A)/3 times the unit matrix')`.
-
-### Key state/data transformations
-
-- Lines 20-22: computes `result` using `result=new_test_result('kernel/remtrace_tensor', 'Traceless rank-two tensor construction', 'anisotropic interaction tensors are obtained by subtracting the isotropic tra…`.
-- Lines 25: computes `A` using `A=[1 2 0;2 3 0;0 0 5]`.
-- Lines 26: computes `A_ref` using `A_ref=A-eye(3)*trace(A)/3`.
-- Lines 27: computes `A_obs` using `A_obs=remtrace(A)`.
-
 ## Outputs
 
 - result -regression test result with explanatory messages

@@ -18,36 +18,6 @@ Inversion-recovery pulse sequence. Syntax: fids=inv_rec(spin_system,parameters,H
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 38-39: Check consistency; implemented by `grumble(spin_system,parameters,H,R,K)`.
-- Lines 41-42: Compose Liouvillian; implemented by `L=H+1i*R+1i*K`.
-- Lines 44-45: Isotropic thermal equilibrium; implemented by `rho0=equilibrium(spin_system)`.
-- Lines 47-48: Get the detection state; implemented by `coil=state(spin_system,'L+',parameters.spins{1})`.
-- Lines 50-51: Get the pulse operator; implemented by `Lp=operator(spin_system,'L+',parameters.spins{1}); Ly=(Lp-Lp')/2i`.
-- Lines 53-54: Run a 180-degree pulse; implemented by `rho=step(spin_system,Ly,rho0,pi)`.
-- Lines 56-59: Run relaxation periods; implemented by `rho_stack=evolution(spin_system,L,[],rho, parameters.max_delay/parameters.n_delays, parameters.n_delays,'trajectory')`.
-- Lines 61-62: Run a 90-degree pulse; implemented by `rho_stack=step(spin_system,Ly,rho_stack,pi/2)`.
-- Lines 64-66: Run the detection period; implemented by `fids=evolution(spin_system,L,coil,rho_stack,1/parameters.sweep, parameters.npoints-1,'observable')`.
-
-### Key state/data transformations
-
-- Lines 42: computes `L` using `L=H+1i*R+1i*K`.
-- Lines 45: computes `rho0` using `rho0=equilibrium(spin_system)`.
-- Lines 48: computes `coil` using `coil=state(spin_system,'L+',parameters.spins{1})`.
-- Lines 51: computes `Lp` using `Lp=operator(spin_system,'L+',parameters.spins{1}); Ly=(Lp-Lp')/2i`.
-- Lines 54: computes `rho` using `rho=step(spin_system,Ly,rho0,pi)`.
-- Lines 57-59: computes `rho_stack` using `rho_stack=evolution(spin_system,L,[],rho, parameters.max_delay/parameters.n_delays, parameters.n_delays,'trajectory')`.
-- Lines 65-66: computes `fids` using `fids=evolution(spin_system,L,coil,rho_stack,1/parameters.sweep, parameters.npoints-1,'observable')`.
-
-### Local helper functions
-
-- Line 71: `grumble()` — `function grumble(spin_system,parameters,H,R,K)`.
-  - Representative operation: `if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))|| (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))`.
-  - Representative operation: `(~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))`.
-
 ## Parameters / inputs
 
 - parameters.sweep spectrum sweep width, Hz

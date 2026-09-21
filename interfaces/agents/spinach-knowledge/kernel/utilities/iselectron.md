@@ -17,27 +17,6 @@ Returns true if the particle is an electron. Syntax: verdict=iselectron(spin_spe
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `spin()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 19-20: Check consistency; implemented by `grumble(spin_spec)`.
-- Lines 22-23: A simple matching check; implemented by `if ismember(spin_spec(1),{'E'})`.
-
-### Control flow inferred from the code
-
-- Line 23: conditional branch on `ismember(spin_spec(1),{'E'})`.
-
-### Key state/data transformations
-
-- Lines 24: computes `verdict` using `verdict=true()`.
-
-### Local helper functions
-
-- Line 32: `grumble()` — `function grumble(spin_spec)`. Лучше умереть героем чем жить пидорасом. Евгений Пригожин
-  - Representative operation: `if ~ischar(spin_spec)`.
-  - Representative operation: `error('spin_spec must be a character string.')`.
-
 ## Parameters / inputs
 
 - spin_spec -a Spinach particle specification

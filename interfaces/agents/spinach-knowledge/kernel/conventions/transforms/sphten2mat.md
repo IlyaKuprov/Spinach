@@ -17,32 +17,6 @@ Converts the nine components of the irreducible spherical tensor re- presentatio
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 41-42: Check the input; implemented by `grumble(rank0,rank1,rank2)`.
-- Lines 44-45: Preallocate the answer; implemented by `M=zeros(3)`.
-- Lines 47-48: Rank 0 component; implemented by `if ~isempty(rank0), M=M+rank0*eye(3); end`.
-- Lines 50-51: Rank 1 components; implemented by `if exist('rank1','var')&&~isempty(rank1)`.
-- Lines 57-58: Rank 2 components; implemented by `if exist('rank2','var')&&~isempty(rank2)`.
-
-### Control flow inferred from the code
-
-- Line 48: conditional branch on `~isempty(rank0), M=M+rank0*eye(3); end`.
-- Line 51: conditional branch on `exist('rank1','var')&&~isempty(rank1)`.
-- Line 58: conditional branch on `exist('rank2','var')&&~isempty(rank2)`.
-
-### Key state/data transformations
-
-- Lines 45: computes `M` using `M=zeros(3)`.
-
-### Local helper functions
-
-- Line 69: `grumble()` — `function grumble(rank0,rank1,rank2)`.
-  - Representative operation: `if (~isnumeric(rank0))||(~isnumeric(rank1))||(~isnumeric(rank2))`.
-  - Representative operation: `error('all inputs must be vectors.')`.
-
 ## Parameters / inputs
 
 - rank0 -a single number giving the coefficient of T(0,0) in

@@ -14,21 +14,6 @@ Returns true for polyadics that represent a matrix with a zero dimension. Syntax
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Check the size; implemented by `if any(size(p)==0)`.
-
-### Control flow inferred from the code
-
-- Line 21: conditional branch on `any(size(p)==0)`.
-
-### Key state/data transformations
-
-- Lines 22: computes `answer` using `answer=true()`.
-
 ## Parameters / inputs
 
 - p -a polyadic object

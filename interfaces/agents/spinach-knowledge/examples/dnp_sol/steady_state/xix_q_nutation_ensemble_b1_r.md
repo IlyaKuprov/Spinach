@@ -17,31 +17,6 @@ Simulation of nutation frequency dependence of XiX DNP field profiles in the ste
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
 - The file also defines local helper function(s): `xix_field_profile_b1_r()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 13-14: Nutation frequencies, Hz; implemented by `nu=1e6*[6.8 9.6 13.5 17.5 25 36]`.
-- Lines 16-17: Shot repetition times, seconds; implemented by `srt=1e-3*[0.051 0.051 0.102 0.153 0.153 0.306]`.
-- Lines 19-20: Get the figure started; implemented by `kfigure(); hold on; kgrid`.
-- Lines 28-29: Plot the curves; implemented by `for n=1:numel(nu)`.
-- Lines 33-34: Save results; implemented by `savefig(gcf,'xix_q_nutation_ensemble_b1_r.fig')`.
-
-### Control flow inferred from the code
-
-- Line 29: `for` loop over `n=1:numel(nu)`.
-
-### Key state/data transformations
-
-- Lines 14: computes `nu` using `nu=1e6*[6.8 9.6 13.5 17.5 25 36]`.
-- Lines 17: computes `srt` using `srt=1e-3*[0.051 0.051 0.102 0.153 0.153 0.306]`.
-
-### Local helper functions
-
-- Line 38: `xix_field_profile_b1_r()` — `function xix_field_profile_b1_r(nu,srt)`. Q-band magnet
-  - Representative operation: `sys.magnet=1.2142`.
-  - Representative operation: `sys.isotopes={'E','1H'}`.
-
 ## Implementation structure
 
 - Simulation of nutation frequency dependence of XiX DNP

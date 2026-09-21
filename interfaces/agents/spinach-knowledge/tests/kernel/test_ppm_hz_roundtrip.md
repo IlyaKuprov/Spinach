@@ -14,25 +14,6 @@ Tests chemical shift and frequency conversion. Syntax: result=test_ppm_hz_roundt
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 16-17: Announce the test target; implemented by `fprintf('TESTING: Chemical-shift frequency conversion\n')`.
-- Lines 19-22: State the physical target of the test; implemented by `result=new_test_result('kernel/ppm_hz_roundtrip', 'Chemical-shift frequency conversion', 'ppm2hz and hz2ppm must implement the Larmor-frequency definition.')`.
-- Lines 24-25: Define a field and shifts for positive-gamma and negative-gamma nuclei; implemented by `B0=14.1`.
-- Lines 28-29: Check explicit frequency formula for proton shifts; implemented by `hz_ref=1e-6*ppm*(B0*spin('1H')/(2*pi))`.
-- Lines 36-37: Check that negative magnetogyric ratios retain sign; implemented by `hz_ref=1e-6*ppm*(B0*spin('15N')/(2*pi))`.
-
-### Key state/data transformations
-
-- Lines 20-22: computes `result` using `result=new_test_result('kernel/ppm_hz_roundtrip', 'Chemical-shift frequency conversion', 'ppm2hz and hz2ppm must implement the Larmor-frequency definition.')`.
-- Lines 25: computes `B0` using `B0=14.1`.
-- Lines 26: computes `ppm` using `ppm=[-2.5 0 3.0 12.0]`.
-- Lines 29: computes `hz_ref` using `hz_ref=1e-6*ppm*(B0*spin('1H')/(2*pi))`.
-- Lines 30: computes `hz_obs` using `hz_obs=ppm2hz(ppm,B0,'1H')`.
-
 ## Outputs
 
 - result -regression test result with explanatory messages

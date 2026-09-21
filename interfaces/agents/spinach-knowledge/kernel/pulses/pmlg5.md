@@ -17,25 +17,6 @@ PMLG5 phase sequence as described in the paper by Vinogradova, Madhu and Vega (h
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 22-23: Check consistency; implemented by `grumble(n)`.
-- Lines 25-29: PMLG5 phase sequence; implemented by `phi_sequence=[339.22 297.65 256.08 214.51 172.94 352.94 34.51 76.08 117.65 159.22 159.22 117.65 76.08 34.51 352.94 172.94 214.51 256.08 297.65 339.22]`.
-- Lines 31-32: Loop correctly over; implemented by `phi=(pi/180)*phi_sequence(mod(n-1,20)+1)`.
-
-### Key state/data transformations
-
-- Lines 26-29: computes `phi_sequence` using `phi_sequence=[339.22 297.65 256.08 214.51 172.94 352.94 34.51 76.08 117.65 159.22 159.22 117.65 76.08 34.51 352.94 172.94 214.51 256.08 297.65 339.22]`.
-- Lines 32: computes `phi` using `phi=(pi/180)*phi_sequence(mod(n-1,20)+1)`.
-
-### Local helper functions
-
-- Line 37: `grumble()` — `function grumble(n)`. One man's crappy software is another man's full time job.
-  - Representative operation: `if (~isnumeric(n))||(~isreal(n))|| (~isscalar(n))||(n<1)||(mod(n,1)~=0)`.
-  - Representative operation: `(~isscalar(n))||(n<1)||(mod(n,1)~=0)`.
-
 ## Syntax
 
 ```matlab

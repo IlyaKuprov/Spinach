@@ -14,26 +14,6 @@ Applies a bit-revert permutation to a tensor train operator by reversing the cor
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Read sizes and ranks; implemented by `[ncores,ntrains]=size(tt.cores)`.
-- Lines 23-24: Swap bond indices; implemented by `for n=1:ntrains`.
-- Lines 30-31: Revert the train direction; implemented by `tt.cores=tt.cores(ncores:-1:1,:)`.
-
-### Control flow inferred from the code
-
-- Line 24: `for` loop over `n=1:ntrains`.
-- Line 25: `for` loop over `k=1:ncores`.
-
-### Key state/data transformations
-
-- Lines 21: computes `[ncores,ntrains]` using `[ncores,ntrains]=size(tt.cores)`.
-- Lines 26: computes `tt.cores{k,n}` using `tt.cores{k,n}=permute(tt.cores{k,n}, [4,2,3,1])`.
-- Lines 31: computes `tt.cores` using `tt.cores=tt.cores(ncores:-1:1,:)`.
-
 ## Parameters / inputs
 
 - tt -tensor train operator

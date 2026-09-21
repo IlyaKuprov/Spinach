@@ -17,23 +17,6 @@ Sparse matrix unique-column utility. Syntax: A=spunicols(A)
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 20-21: Check consistency; implemented by `grumble(A)`.
-- Lines 23-24: Return Matlab reference unique columns; implemented by `A=unique(A.','rows').'`.
-
-### Key state/data transformations
-
-- Lines 24: computes `A` using `A=unique(A.','rows').'`.
-
-### Local helper functions
-
-- Line 29: `grumble()` — `function grumble(A)`.
-  - Representative operation: `if (~isnumeric(A))||(~issparse(A))||(~isreal(A))|| (~isa(A,'double'))||(~ismatrix(A))`.
-  - Representative operation: `(~isa(A,'double'))||(~ismatrix(A))`.
-
 ## Parameters / inputs
 
 - A -sparse real double matrix

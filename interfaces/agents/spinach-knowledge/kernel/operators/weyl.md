@@ -17,31 +17,6 @@ Weyl boson operators (sparse, see below for normalisa- tion convention) for a bo
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 40-41: Ensure internal consistency; implemented by `grumble(nlevels); nlevels=double(nlevels)`.
-- Lines 43-44: Creation operator; implemented by `diags=sqrt(1:nlevels)`.
-- Lines 48-49: Number operator; implemented by `diags=0:(nlevels-1)`.
-- Lines 53-54: Annihilation operator; implemented by `diags=sqrt(0:(nlevels-1))`.
-- Lines 58-59: Unit operator; implemented by `A.u=complex(speye(nlevels))`.
-
-### Key state/data transformations
-
-- Lines 41: computes `grumble(nlevels); nlevels` using `grumble(nlevels); nlevels=double(nlevels)`.
-- Lines 44: computes `diags` using `diags=sqrt(1:nlevels)`.
-- Lines 45: computes `A.c` using `A.c=spdiags(diags',-1,nlevels,nlevels)`.
-- Lines 50: computes `A.n` using `A.n=spdiags(diags',0,nlevels,nlevels)`.
-- Lines 55: computes `A.a` using `A.a=spdiags(diags',+1,nlevels,nlevels)`.
-- Lines 59: computes `A.u` using `A.u=complex(speye(nlevels))`.
-
-### Local helper functions
-
-- Line 64: `grumble()` — `function grumble(nlevels)`. I happen to be a physicist who started life as a mathematician. As a working physicist, I am acutely
-  - Representative operation: `if (~isnumeric(nlevels))||(~isreal(nlevels))|| (~isscalar(nlevels))||(mod(nlevels,1)~=0)||(nlevels<1)`.
-  - Representative operation: `(~isscalar(nlevels))||(mod(nlevels,1)~=0)||(nlevels<1)`.
-
 ## Parameters / inputs
 
 - nlevels -an integer specifying the

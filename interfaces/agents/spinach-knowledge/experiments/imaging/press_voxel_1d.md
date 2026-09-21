@@ -19,34 +19,6 @@ Voxel selection diagnostics function for 1D PRESS sequences. Re- turns the sampl
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 39-40: Check consistency; implemented by `grumble(spin_system,parameters,H,R,K,G,F)`.
-- Lines 42-43: Compose Liouvillian; implemented by `L=H+F+1i*R+1i*K`.
-- Lines 45-46: Get pulse operators; implemented by `Lp=operator(spin_system,'L+',parameters.spins{1})`.
-- Lines 50-51: Override input with uniform initial condition; implemented by `Lz=state(spin_system,'Lz',parameters.spins{1})`.
-- Lines 54-58: Slice selection pulse; implemented by `rho=shaped_pulse_af(spin_system,L+parameters.ss_grad_amp*G{1},Lx,Ly, rho,parameters.rf_frq_list,parameters.rf_amp_list, parameters.rf_dur_list,parameters.rf_phi, paramet…`.
-- Lines 60-62: Rephasing gradient; implemented by `rho=evolution(spin_system,L-parameters.ss_grad_amp*G{1},[], rho,sum(parameters.rf_dur_list)/2,1,'final')`.
-- Lines 64-65: Get the phantom; implemented by `phan=fpl2phan(rho,Lz,[parameters.npts 1])`.
-
-### Key state/data transformations
-
-- Lines 43: computes `L` using `L=H+F+1i*R+1i*K`.
-- Lines 46: computes `Lp` using `Lp=operator(spin_system,'L+',parameters.spins{1})`.
-- Lines 47: computes `Lx` using `Lx=polyadic({{opium(prod(parameters.npts),1),(Lp+Lp')/2}})`.
-- Lines 48: computes `Ly` using `Ly=polyadic({{opium(prod(parameters.npts),1),(Lp-Lp')/2i}})`.
-- Lines 51: computes `Lz` using `Lz=state(spin_system,'Lz',parameters.spins{1})`.
-- Lines 52: computes `rho` using `rho=kron(ones(prod(parameters.npts),1),Lz)`.
-- Lines 65: computes `phan` using `phan=fpl2phan(rho,Lz,[parameters.npts 1])`.
-
-### Local helper functions
-
-- Line 70: `grumble()` — `function grumble(spin_system,parameters,H,R,K,G,F)`.
-  - Representative operation: `if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})`.
-  - Representative operation: `error('this function is only available in sphten-liouv and zeeman-liouv formalisms.')`.
-
 ## Parameters / inputs
 
 - parameters.ss_grad_amp -the amplitude of slice selection

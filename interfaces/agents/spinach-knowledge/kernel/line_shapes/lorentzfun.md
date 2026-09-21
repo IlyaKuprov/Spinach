@@ -17,26 +17,6 @@ Normalised Lorentzian function in magnetic resonance notation with a phase disto
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 31-32: Check consistency; implemented by `grumble(offs,ampl,fwhm,x,phi)`.
-- Lines 34-35: Width parameter; implemented by `gam=fwhm/2`.
-- Lines 37-39: Calculate output; implemented by `real_part=((ampl/(2*pi*gam))./(1+((x-offs)/gam).^2)).*cos(phi)- ((x-offs)/gam).*((ampl/(2*pi*gam))./(1+((x-offs)/gam).^2)).*sin(phi)`.
-
-### Key state/data transformations
-
-- Lines 35: computes `gam` using `gam=fwhm/2`.
-- Lines 38-39: computes `real_part` using `real_part=((ampl/(2*pi*gam))./(1+((x-offs)/gam).^2)).*cos(phi)- ((x-offs)/gam).*((ampl/(2*pi*gam))./(1+((x-offs)/gam).^2)).*sin(phi)`.
-- Lines 40-41: computes `imag_part` using `imag_part=((ampl/(2*pi*gam))./(1+((x-offs)/gam).^2)).*sin(phi)+ ((x-offs)/gam).*((ampl/(2*pi*gam))./(1+((x-offs)/gam).^2)).*cos(phi)`.
-
-### Local helper functions
-
-- Line 46: `grumble()` — `function grumble(offs,ampl,fwhm,x,phi)`.
-  - Representative operation: `if (~isnumeric(x))||(~isreal(x))`.
-  - Representative operation: `error('x must be an array of real numbers.')`.
-
 ## Parameters / inputs
 
 - offs -peak offset from zero

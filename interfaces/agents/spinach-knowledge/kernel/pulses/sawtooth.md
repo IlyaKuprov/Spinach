@@ -17,23 +17,6 @@ Returns a saw-tooth waveform. Syntax: waveform=sawtooth(amplitude,frequency,time
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 24-25: Check consistency; implemented by `grumble(amplitude,frequency,time_grid)`.
-- Lines 27-28: Compute the waveform; implemented by `waveform=amplitude*(2*frequency*mod(time_grid,1/frequency)-1)`.
-
-### Key state/data transformations
-
-- Lines 28: computes `waveform` using `waveform=amplitude*(2*frequency*mod(time_grid,1/frequency)-1)`.
-
-### Local helper functions
-
-- Line 33: `grumble()` — `function grumble(amplitude,frequency,time_grid)`.
-  - Representative operation: `if (numel(amplitude)~=1)||(~isnumeric(amplitude))|| (~isreal(amplitude))||(~isfinite(amplitude))`.
-  - Representative operation: `(~isreal(amplitude))||(~isfinite(amplitude))`.
-
 ## Parameters / inputs
 
 - amplitude -amplitude at the tooth top

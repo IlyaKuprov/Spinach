@@ -16,25 +16,6 @@ An include that writes the report of the profiling infrastructure around paralle
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 1-10: An include that writes the report of the profiling infrastructure around parallel stages. Should be invoked just after a parfor or an spmd for which parallel_profiler_start was previously called.; implemented by `if ~isworkernode`.
-- Lines 9-10: Brief parallel profiler report; implemented by `if ~isworkernode`.
-- Lines 17-18: Detailed parallel profiler report; implemented by `if (~isworkernode)&&ismember('dafuq',spin_system.sys.enable)`.
-
-### Control flow inferred from the code
-
-- Line 10: conditional branch on `~isworkernode`.
-- Line 18: conditional branch on `(~isworkernode)&&ismember('dafuq',spin_system.sys.enable)`.
-
-### Key state/data transformations
-
-- Lines 11: computes `nbytes` using `nbytes=mean(tocBytes(gcp),1)/2^20; walltime=toc()`.
-- Lines 19: computes `parpool_history` using `parpool_history=parProfiler.drainLog(); a=dbstack`.
-- Lines 20-21: computes `filename` using `filename=[spin_system.sys.scratch filesep datestr(clock,30) '_' a(end-1).name '.mat']`.
-
 ## Implementation structure
 
 - An include that writes the report of the profiling infrastructure

@@ -17,23 +17,6 @@ Anti-diagonal array transpose. Syntax: M=atranspose(M)
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 19-20: Check consistency; implemented by `grumble(M)`.
-- Lines 22-23: Rotate and transpose; implemented by `M=transpose(rot90(M,2))`.
-
-### Key state/data transformations
-
-- Lines 23: computes `M` using `M=transpose(rot90(M,2))`.
-
-### Local helper functions
-
-- Line 28: `grumble()` — `function grumble(M)`. Overheard at the reception following David Deutch's lecture on Constructor Theory at the Oxford Physics Department in 2012:
-  - Representative operation: `if ~isnumeric(M)`.
-  - Representative operation: `error('M must be a numeric array.')`.
-
 ## Parameters / inputs
 
 - M -a transposable array

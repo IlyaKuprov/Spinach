@@ -18,33 +18,6 @@ Returns the finite-difference Hessian of a 3D array using a finite difference sc
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 30-31: Check consistency; implemented by `grumble(A,nstenc)`.
-- Lines 33-34: Compute derivatives; implemented by `d2A_dzdz=reshape(kron(kron(fdmat(size(A,3),nstenc,2),speye(size(A,2))),speye(size(A,1)))*A(:),size(A))`.
-- Lines 44-45: Form the Hessian array; implemented by `H={d2A_dxdx d2A_dxdy d2A_dxdz`.
-
-### Key state/data transformations
-
-- Lines 34: computes `d2A_dzdz` using `d2A_dzdz=reshape(kron(kron(fdmat(size(A,3),nstenc,2),speye(size(A,2))),speye(size(A,1)))*A(:),size(A))`.
-- Lines 35: computes `d2A_dzdy` using `d2A_dzdy=reshape(kron(kron(fdmat(size(A,3),nstenc,1),fdmat(size(A,2),nstenc,1)),speye(size(A,1)))*A(:),size(A))`.
-- Lines 36: computes `d2A_dzdx` using `d2A_dzdx=reshape(kron(kron(fdmat(size(A,3),nstenc,1),speye(size(A,2))),fdmat(size(A,1),nstenc,1))*A(:),size(A))`.
-- Lines 37: computes `d2A_dydz` using `d2A_dydz=reshape(kron(kron(fdmat(size(A,3),nstenc,1),fdmat(size(A,2),nstenc,1)),speye(size(A,1)))*A(:),size(A))`.
-- Lines 38: computes `d2A_dydy` using `d2A_dydy=reshape(kron(kron(speye(size(A,3)),fdmat(size(A,2),nstenc,2)),speye(size(A,1)))*A(:),size(A))`.
-- Lines 39: computes `d2A_dydx` using `d2A_dydx=reshape(kron(kron(speye(size(A,3)),fdmat(size(A,2),nstenc,1)),fdmat(size(A,1),nstenc,1))*A(:),size(A))`.
-- Lines 40: computes `d2A_dxdz` using `d2A_dxdz=reshape(kron(kron(fdmat(size(A,3),nstenc,1),speye(size(A,2))),fdmat(size(A,1),nstenc,1))*A(:),size(A))`.
-- Lines 41: computes `d2A_dxdy` using `d2A_dxdy=reshape(kron(kron(speye(size(A,3)),fdmat(size(A,2),nstenc,1)),fdmat(size(A,1),nstenc,1))*A(:),size(A))`.
-- Lines 42: computes `d2A_dxdx` using `d2A_dxdx=reshape(kron(kron(speye(size(A,3)),speye(size(A,2))),fdmat(size(A,1),nstenc,2))*A(:),size(A))`.
-- Lines 45: computes `H` using `H={d2A_dxdx d2A_dxdy d2A_dxdz`.
-
-### Local helper functions
-
-- Line 52: `grumble()` — `function grumble(A,npoints)`.
-  - Representative operation: `if (~isnumeric(A))||(ndims(A)~=3)`.
-  - Representative operation: `error('A must be a three-dimensional numeric array.')`.
-
 ## Parameters / inputs
 
 - A -a 3D array with dimensions ordered as [X Y Z]

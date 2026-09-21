@@ -14,28 +14,6 @@ Figure 1 from the paper by Rasulov and Kuprov:
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 10-11: Pulse sequence and its discretisation; implemented by `fapt={[0 pi/10e-6 0 0.0e-6 5.0e-6]`.
-- Lines 19-20: Convert waveform to mT; implemented by `wave=1e3*wave/spin('1H')`.
-- Lines 22-23: Apply a cascade of two single-pole filters; implemented by `wave_spf=spf(wave, 0.9*exp(-1i*0.05))`.
-- Lines 26-27: Original vs second-order low-pass filter; implemented by `kfigure(); scale_figure([1 1.6])`.
-- Lines 39-40: Apply a cascade of three single-zero filters; implemented by `wave_szf=szf(wave, 0.1*exp(-1i*0.05))`.
-- Lines 44-45: Original vs third-order high-pass filter; implemented by `subplot(3,1,2); hold on; box on`.
-- Lines 56-57: Apply an RLC filter; implemented by `wave_spf=spf(wave, 0.9*exp(-1i*0.5))`.
-- Lines 60-61: Original vs RLC filter; implemented by `subplot(3,1,3); hold on; box on`.
-
-### Key state/data transformations
-
-- Lines 11: computes `fapt` using `fapt={[0 pi/10e-6 0 0.0e-6 5.0e-6]`.
-- Lines 16: computes `time_grid` using `time_grid=linspace(-5e-6,40e-6,1000)`.
-- Lines 17: computes `wave` using `wave=fapt2sfo(fapt,time_grid)`.
-- Lines 23: computes `wave_spf` using `wave_spf=spf(wave, 0.9*exp(-1i*0.05))`.
-- Lines 40: computes `wave_szf` using `wave_szf=szf(wave, 0.1*exp(-1i*0.05))`.
-
 ## Implementation structure
 
 - Figure 1 from the paper by Rasulov and Kuprov:

@@ -14,14 +14,6 @@ House style settings for Matlab figures; a product of much experience with acade
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 21-22: Display the label using LaTeX; implemented by `zlabel(varargin{:},'Interpreter','latex')`.
-- Lines 24-25: Switch tick labels to LaTeX; implemented by `set(gca,'TickLabelInterpreter','latex','FontSize',12)`.
-
 ## Parameters / inputs
 
 - varargin -same arguments as those accepted by

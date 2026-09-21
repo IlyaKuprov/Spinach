@@ -17,30 +17,6 @@ Converts a unit quaternion in the active convention into Euler angles (ZYZ activ
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 30-31: Check consistency; implemented by `grumble(q)`.
-- Lines 33-34: Normalise the quaternions; implemented by `qnorm=sqrt(q.u.^2+q.i.^2+q.j.^2+q.k.^2)`.
-- Lines 38-39: Compute the angle sums and differences; implemented by `sum_ag=2*atan2(q.k,q.u); dif_ga=2*atan2(q.i,q.j)`.
-- Lines 41-42: Compute the Euler angles; implemented by `beta=2*atan2(sqrt(q.i.^2+q.j.^2),sqrt(q.u.^2+q.k.^2))`.
-
-### Key state/data transformations
-
-- Lines 34: computes `qnorm` using `qnorm=sqrt(q.u.^2+q.i.^2+q.j.^2+q.k.^2)`.
-- Lines 35: computes `q.u` using `q.u=q.u./qnorm; q.i=q.i./qnorm`.
-- Lines 36: computes `q.j` using `q.j=q.j./qnorm; q.k=q.k./qnorm`.
-- Lines 39: computes `sum_ag` using `sum_ag=2*atan2(q.k,q.u); dif_ga=2*atan2(q.i,q.j)`.
-- Lines 42: computes `beta` using `beta=2*atan2(sqrt(q.i.^2+q.j.^2),sqrt(q.u.^2+q.k.^2))`.
-- Lines 43: computes `alpha` using `alpha=(sum_ag-dif_ga)/2; gamma=(sum_ag+dif_ga)/2`.
-
-### Local helper functions
-
-- Line 48: `grumble()` — `function grumble(q)`.
-  - Representative operation: `if ~all(isfield(q,{'i','j','k','u'}))`.
-  - Representative operation: `error('quaternion data structure must contain u, i, j, and k fields.')`.
-
 ## Syntax
 
 ```matlab

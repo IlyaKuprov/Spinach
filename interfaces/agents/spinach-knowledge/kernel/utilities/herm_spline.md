@@ -17,36 +17,6 @@ Cubic Hermite spline on [0,1] interval from values and deriva- tives at the inte
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 38-39: Check consistency; implemented by `grumble(f0,df0,f1,df1,x)`.
-- Lines 41-43: Adapt to input; implemented by `if isscalar(f0)&&isscalar(df0)&& isscalar(f1)&&isscalar(df1)&&(~isscalar(x))`.
-- Lines 48-49: Preallocate the output; implemented by `y=zeros(size(x))`.
-- Lines 51-52: Loop over the entries; implemented by `for n=1:numel(x)`.
-- Lines 54-55: Get spline coefficients (x^3 -> x^0); implemented by `c=[ 1 2 1 -2`.
-- Lines 60-61: Evaluate at the query point; implemented by `y(n)=c(1)*x(n)^3+c(2)*x(n)^2+c(3)*x(n)+c(4)`.
-
-### Control flow inferred from the code
-
-- Line 42: conditional branch on `isscalar(f0)&&isscalar(df0)&&`.
-- Line 52: `for` loop over `n=1:numel(x)`.
-
-### Key state/data transformations
-
-- Lines 44: computes `f0` using `f0=f0*ones(size(x)); df0=df0*ones(size(x))`.
-- Lines 45: computes `f1` using `f1=f1*ones(size(x)); df1=df1*ones(size(x))`.
-- Lines 49: computes `y` using `y=zeros(size(x))`.
-- Lines 55: computes `c` using `c=[ 1 2 1 -2`.
-- Lines 61: computes `y(n)` using `y(n)=c(1)*x(n)^3+c(2)*x(n)^2+c(3)*x(n)+c(4)`.
-
-### Local helper functions
-
-- Line 68: `grumble()` — `function grumble(f0,df0,f1,df1,x)`.
-  - Representative operation: `if (~isnumeric(f0))||(~isreal(f0))||any(~isfinite(f0),'all')|| (~isnumeric(df0))||(~isreal(df0))||any(~isfinite(df0),'all')|| (~isnumeric(f1))||(~isreal(f1))||any(~isfin…`.
-  - Representative operation: `(~isnumeric(df0))||(~isreal(df0))||any(~isfinite(df0),'all')|| (~isnumeric(f1))||(~isreal(f1))||any(~isfinite(f1),'all')|| (~isnumeric(df1))||(~isreal(df1))||any(~isfini…`.
-
 ## Parameters / inputs
 
 - f0 -function value(s) at the left edge, a real

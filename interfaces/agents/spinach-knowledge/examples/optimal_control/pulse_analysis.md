@@ -14,19 +14,6 @@ An example of spectrogram analysis for a quadratic chirp pulse; adapted from Mat
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 10-11: Quadratic chirp superposition; implemented by `fs=1000; t=0:1/fs:2-1/fs`.
-- Lines 15-16: Do the plotting; implemented by `kfigure(); subplot(1,2,1); plot(t,y); kgrid`.
-
-### Key state/data transformations
-
-- Lines 11: computes `fs` using `fs=1000; t=0:1/fs:2-1/fs`.
-- Lines 12-13: computes `y` using `y=chirp(t,100,1,200,'quadratic')+ chirp(t,200,1,100,'quadratic')`.
-
 ## Implementation structure
 
 - An example of spectrogram analysis for a quadratic chirp

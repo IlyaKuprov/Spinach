@@ -18,27 +18,6 @@ Simple forward time evolution trajectory. Syntax: traj=traject(spin_system,param
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 32-33: Check consistency; implemented by `grumble(spin_system,parameters,H,R,K)`.
-- Lines 35-36: Compose Liouvillian; implemented by `L=H+1i*R+1i*K`.
-- Lines 38-39: Apply the decoupling; implemented by `[L,parameters.rho0]=decouple(spin_system,L,parameters.rho0,parameters.decouple)`.
-- Lines 41-43: Run the evolution and watch the coil state; implemented by `traj=evolution(spin_system,L,[],parameters.rho0,1/parameters.sweep, parameters.npoints-1,'trajectory')`.
-
-### Key state/data transformations
-
-- Lines 36: computes `L` using `L=H+1i*R+1i*K`.
-- Lines 39: computes `[L,parameters.rho0]` using `[L,parameters.rho0]=decouple(spin_system,L,parameters.rho0,parameters.decouple)`.
-- Lines 42-43: computes `traj` using `traj=evolution(spin_system,L,[],parameters.rho0,1/parameters.sweep, parameters.npoints-1,'trajectory')`.
-
-### Local helper functions
-
-- Line 48: `grumble()` — `function grumble(spin_system,parameters,H,R,K)`.
-  - Representative operation: `if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))|| (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))`.
-  - Representative operation: `(~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))`.
-
 ## Parameters / inputs
 
 - parameters.sweep sweep width, Hz

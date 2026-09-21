@@ -18,28 +18,6 @@ Time-domain spin dynamics under microwave irradiation. Syntax: answer=dnp_time_d
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 45-46: Move into adjoint representation if needed; implemented by `[spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K)`.
-- Lines 48-49: Check consistency; implemented by `grumble(spin_system,parameters)`.
-- Lines 51-52: Add microwave terms to the Hamiltonian; implemented by `H=H+parameters.mw_pwr*parameters.mw_oper`.
-- Lines 54-55: Add microwave offset to the Hamiltonian; implemented by `H=H-parameters.mw_off*parameters.ez_oper`.
-- Lines 57-59: Run the time evolution; implemented by `answer=evolution(spin_system,H+1i*R+1i*K,parameters.coil,parameters.rho0, parameters.dt,parameters.nsteps,'multichannel')`.
-
-### Key state/data transformations
-
-- Lines 46: computes `[spin_system,parameters,H,R,K]` using `[spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K)`.
-- Lines 52: computes `H` using `H=H+parameters.mw_pwr*parameters.mw_oper`.
-- Lines 58-59: computes `answer` using `answer=evolution(spin_system,H+1i*R+1i*K,parameters.coil,parameters.rho0, parameters.dt,parameters.nsteps,'multichannel')`.
-
-### Local helper functions
-
-- Line 64: `grumble()` — `function grumble(spin_system,parameters)`.
-  - Representative operation: `if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})`.
-  - Representative operation: `error('this function is only available for sphten-liouv and zeeman-liouv formalisms.')`.
-
 ## Parameters / inputs
 
 - parameters.mw_pwr -microwave power, rad/s

@@ -14,20 +14,6 @@ Example of electric field gradient tensor visualisation for an aluminosilicate s
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 10-11: Import CASTEP data; implemented by `props=c2spinach('alsilicate.magres')`.
-- Lines 13-14: Do the visualisation; implemented by `kfigure(); scale_figure([1.875 1.125])`.
-
-### Key state/data transformations
-
-- Lines 11: computes `props` using `props=c2spinach('alsilicate.magres')`.
-- Lines 15: computes `subplot(1,2,1); options.style` using `subplot(1,2,1); options.style='ellipsoids'`.
-- Lines 19: computes `subplot(1,2,2); options.style` using `subplot(1,2,2); options.style='harmonics'`.
-
 ## Implementation structure
 
 - Example of electric field gradient tensor visualisation for

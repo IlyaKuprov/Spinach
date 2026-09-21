@@ -17,23 +17,6 @@ Transfer matrix calculation for linear filters. Syntax: T=transfermat(amp_inps,a
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 25-26: Check consistency; implemented by `grumble(amp_inps,amp_outs)`.
-- Lines 28-29: Run the SVD pseudoinverse; implemented by `T=amp_outs/amp_inps`.
-
-### Key state/data transformations
-
-- Lines 29: computes `T` using `T=amp_outs/amp_inps`.
-
-### Local helper functions
-
-- Line 34: `grumble()` — `function grumble(amp_inps,amp_outs)`.
-  - Representative operation: `if (~isnumeric(amp_inps))||(size(amp_inps,2)<size(amp_inps,1))`.
-  - Representative operation: `error('amp_inps must be a stack of column vectors wider than it is tall.')`.
-
 ## Parameters / inputs
 
 - amp_inps -a matrix with amplifier input vectors as columns

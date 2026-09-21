@@ -17,22 +17,6 @@ Azzalini's skew normal distribution. Syntax: p=snormpdf(x,mu,sigma,alpha)
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 26-27: Check consistency; implemented by `grumble(x,mu,sigma,alpha)`.
-
-### Key state/data transformations
-
-- Lines 30: computes `p` using `p=2*normpdf(x,mu,sigma).*normcdf(alpha*x,alpha*mu,sigma)`.
-
-### Local helper functions
-
-- Line 35: `grumble()` — `function grumble(x,mu,sigma,alpha)`.
-  - Representative operation: `if (~isnumeric(x))||(~isreal(x))`.
-  - Representative operation: `error('x must be a real numeric array.')`.
-
 ## Parameters / inputs
 
 - x -an array of real numbers

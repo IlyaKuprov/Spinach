@@ -19,38 +19,6 @@ Plots grid integration quality as a function of spherical rank. The quality is d
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 35-36: Check consistency; implemented by `grumble(alphas,betas,gammas,weights,ranks,sfun)`.
-- Lines 38-39: Preallocate the answer; implemented by `grid_profile=zeros(size(ranks))`.
-- Lines 41-42: Loop over spherical ranks; implemented by `for k=1:numel(ranks)`.
-- Lines 44-45: Preallocate Wigner matrix; implemented by `D=zeros(2*ranks(k)+1,'like',1i)`.
-- Lines 47-48: Loop over grid points; implemented by `parfor n=1:numel(alphas)`.
-- Lines 53-54: Update grid profile; implemented by `if strcmp(sfun,'D_lmn')`.
-- Lines 64-66: Update the user; implemented by `disp(['Spherical rank ' num2str(ranks(k)) ', residual ' sfun ' norm: ' num2str(grid_profile(k))])`.
-- Lines 70-71: Do the plotting; implemented by `if nargout==0`.
-
-### Control flow inferred from the code
-
-- Line 42: `for` loop over `k=1:numel(ranks)`.
-- Line 48: `parfor` loop over `n=1:numel(alphas)`.
-- Line 54: conditional branch on `strcmp(sfun,'D_lmn')`.
-- Line 71: conditional branch on `nargout==0`.
-
-### Key state/data transformations
-
-- Lines 39: computes `grid_profile` using `grid_profile=zeros(size(ranks))`.
-- Lines 45: computes `D` using `D=zeros(2*ranks(k)+1,'like',1i)`.
-- Lines 55: computes `grid_profile(k)` using `grid_profile(k)=norm(D,2)-krondelta(0,ranks(k))`.
-
-### Local helper functions
-
-- Line 80: `grumble()` — `function grumble(alphas,betas,gammas,weights,ranks,sfun)`.
-  - Representative operation: `if (~isnumeric(alphas))||(~isreal(alphas))|| any(~isfinite(alphas))||(size(alphas,2)~=1)`.
-  - Representative operation: `any(~isfinite(alphas))||(size(alphas,2)~=1)`.
-
 ## Parameters / inputs
 
 - alphas -alpha Euler angles of the grid, in radians,

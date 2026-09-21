@@ -14,26 +14,6 @@ HiPER instrument filter function kernel application to a complicated shaped puls
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 11-13: Read the input pulse; implemented by `load('shaped_pulse_inp.mat','time_ns', 'real_part','imag_part')`.
-- Lines 15-16: Plot the input pulse; implemented by `kfigure(); scale_figure([1.0 1.5])`.
-- Lines 21-22: Load appropriate HiPER kernel; implemented by `load('hiper_kernel_antenna.mat','h')`.
-- Lines 24-25: Compute and plot the convolution; implemented by `x=real_part+1i*imag_part`.
-- Lines 31-33: Read the measured pulse; implemented by `load('shaped_pulse_out.mat','time_ns', 'real_part','imag_part')`.
-- Lines 39-40: Plot the measured pulse; implemented by `subplot(3,1,3); plot(time_ns,[real_part imag_part])`.
-
-### Key state/data transformations
-
-- Lines 25: computes `x` using `x=real_part+1i*imag_part`.
-- Lines 26: computes `y` using `y=conv(x,h); y=y(1:numel(x))`.
-- Lines 34: computes `real_part` using `real_part=real_part(174:934)`.
-- Lines 35: computes `imag_part` using `imag_part=imag_part(174:934)`.
-- Lines 36: computes `time_ns` using `time_ns=time_ns(174:934)`.
-
 ## Implementation structure
 
 - HiPER instrument filter function kernel application to

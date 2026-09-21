@@ -18,23 +18,6 @@ Second order shift of the centre of gravity of the powder pattern of |S,m> to |S
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 38-39: Check consistency; implemented by `grumble(Cq,eta,v0,S,m)`.
-- Lines 41-43: Use Samoson's expression; implemented by `delta=-1e6*(3/40)*(Cq/v0)^2*(1+eta^2/3)* (S*(S+1)-9*m*(m-1)-3)/(S^2*(2*S-1)^2)`.
-
-### Key state/data transformations
-
-- Lines 42-43: computes `delta` using `delta=-1e6*(3/40)*(Cq/v0)^2*(1+eta^2/3)* (S*(S+1)-9*m*(m-1)-3)/(S^2*(2*S-1)^2)`.
-
-### Local helper functions
-
-- Line 48: `grumble()` — `function grumble(Cq,eta,v0,S,m)`.
-  - Representative operation: `if (~isnumeric(Cq))||(~isreal(Cq))||(~isscalar(Cq))`.
-  - Representative operation: `error('Cq must be a real scalar.')`.
-
 ## Syntax
 
 ```matlab

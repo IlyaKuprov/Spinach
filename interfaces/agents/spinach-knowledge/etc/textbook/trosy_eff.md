@@ -19,29 +19,6 @@ TROSY efficiency in a two-spin system. Returns the extent of the cancellation of
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 39-40: Check consistency; implemented by `grumble(B0,isotopes,xyz,csa)`.
-- Lines 42-43: Dipole-dipole coupling tensor; implemented by `[~,~,~,~,DD]=xyz2dd(xyz{1},xyz{2},isotopes{1},isotopes{2})`.
-- Lines 45-46: Anisotropic part of the Zeeman tensor at our field; implemented by `Z=1e-6*B0*(csa-eye(3)*trace(csa)/3)*spin(isotopes{1})`.
-- Lines 48-49: Second rank Blicharski invariants; implemented by `[~,DsqZ]=blinv(Z); [~,X_DD_Z]=blprod(DD,Z)`.
-- Lines 51-52: TROSY efficiency; implemented by `eff=abs(X_DD_Z/DsqZ)`.
-
-### Key state/data transformations
-
-- Lines 43: computes `[~,~,~,~,DD]` using `[~,~,~,~,DD]=xyz2dd(xyz{1},xyz{2},isotopes{1},isotopes{2})`.
-- Lines 46: computes `Z` using `Z=1e-6*B0*(csa-eye(3)*trace(csa)/3)*spin(isotopes{1})`.
-- Lines 49: computes `[~,DsqZ]` using `[~,DsqZ]=blinv(Z); [~,X_DD_Z]=blprod(DD,Z)`.
-- Lines 52: computes `eff` using `eff=abs(X_DD_Z/DsqZ)`.
-
-### Local helper functions
-
-- Line 57: `grumble()` — `function grumble(B0,isotopes,xyz,csa)`.
-  - Representative operation: `if (~isnumeric(B0))||(~isreal(B0))||(~isscalar(B0))|| (~isfinite(B0))||(B0==0)`.
-  - Representative operation: `(~isfinite(B0))||(B0==0)`.
-
 ## Parameters / inputs
 
 - B0 -magnet field, Tesla

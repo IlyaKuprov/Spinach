@@ -17,52 +17,6 @@ Directional derivative test for the phase-modulated GRAPE module, with an ensemb
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 10-11: Formalisms to test; implemented by `formalisms={'sphten-liouv','zeeman-liouv','zeeman-hilb'}`.
-- Lines 13-14: Loop over formalisms; implemented by `for n=1:numel(formalisms)`.
-- Lines 16-17: Build the derivative-test system; implemented by `[spin_system,Sx,Sy,Sz,Lx,Ly,H]=dirdiff_test_system(formalisms{n})`.
-- Lines 19-20: Define control parameters; implemented by `control.isotopes={'13C'}`.
-- Lines 32-33: Define an ensemble of distortion chains; implemented by `control.distortion={@(w)firf(w,[0.9 0.1i]), @(w)spf(w,0.2), @(w)szf(w,0.2), @(w)amp_root(w,2*pi*20e3,4)`.
-- Lines 36-37: Set the interval grid; implemented by `control.pulse_dt=12.8e-6*ones(1,5)`.
-- Lines 40-41: Spinach housekeeping; implemented by `spin_system=optimcon(spin_system,control)`.
-- Lines 43-44: Random phases and finite diff increment; implemented by `guess=randn(1,5)/3; h=sqrt(eps('double'))`.
-- Lines 46-47: Call GRAPE and request analytical gradient; implemented by `[~,~,grad_anl]=grape_phase(guess,spin_system)`.
-- Lines 50-51: Left waveform edge; implemented by `wave_forw=guess; wave_forw(1)=wave_forw(1)+h`.
-- Lines 62-63: Right waveform edge; implemented by `wave_forw=guess; wave_forw(end)=wave_forw(end)+h`.
-- Lines 74-75: Waveform midpoint; implemented by `wave_forw=guess; wave_forw(3)=wave_forw(3)+h`.
-
-### Control flow inferred from the code
-
-- Line 14: `for` loop over `n=1:numel(formalisms)`.
-- Line 56: conditional branch on `abs(grad_anl(1)-grad_num)/abs(grad_num)<1e-6`.
-- Line 68: conditional branch on `abs(grad_anl(end)-grad_num)/abs(grad_num)<1e-6`.
-- Line 80: conditional branch on `abs(grad_anl(3)-grad_num)/abs(grad_num)<1e-6`.
-
-### Key state/data transformations
-
-- Lines 11: computes `formalisms` using `formalisms={'sphten-liouv','zeeman-liouv','zeeman-hilb'}`.
-- Lines 17: computes `[spin_system,Sx,Sy,Sz,Lx,Ly,H]` using `[spin_system,Sx,Sy,Sz,Lx,Ly,H]=dirdiff_test_system(formalisms{n})`.
-- Lines 20: computes `control.isotopes` using `control.isotopes={'13C'}`.
-- Lines 21: computes `control.channels` using `control.channels=[1;1]`.
-- Lines 22: computes `control.drifts` using `control.drifts={{H}}`.
-- Lines 23: computes `control.operators` using `control.operators={Lx,Ly}`.
-- Lines 24: computes `control.rho_init` using `control.rho_init={ Sx Sy Sz}`.
-- Lines 25: computes `control.rho_targ` using `control.rho_targ={-Sz Sy Sx}`.
-- Lines 26: computes `control.pwr_levels` using `control.pwr_levels=2*pi*linspace(50e3,70e3,10)`.
-- Lines 27: computes `control.method` using `control.method='lbfgs'`.
-- Lines 28: computes `control.max_iter` using `control.max_iter=1000`.
-- Lines 29: computes `control.plotting` using `control.plotting={}`.
-- Lines 30: computes `control.integrator` using `control.integrator='rectangle'`.
-- Lines 33: computes `control.distortion` using `control.distortion={@(w)firf(w,[0.9 0.1i]), @(w)spf(w,0.2), @(w)szf(w,0.2), @(w)amp_root(w,2*pi*20e3,4)`.
-- Lines 37: computes `control.pulse_dt` using `control.pulse_dt=12.8e-6*ones(1,5)`.
-- Lines 38: computes `control.amplitudes` using `control.amplitudes=ones(1,5)`.
-- Lines 41: computes `spin_system` using `spin_system=optimcon(spin_system,control)`.
-- Lines 44: computes `guess` using `guess=randn(1,5)/3; h=sqrt(eps('double'))`.
-
 ## Implementation structure
 
 - Directional derivative test for the phase-modulated GRAPE

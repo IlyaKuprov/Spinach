@@ -14,28 +14,6 @@ Tensor train addition operation. Does not perform the actual addition, but inste
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 24-25: Validate the input; implemented by `if (~isa(a,'ttclass'))||(~isa(b,'ttclass'))`.
-- Lines 31-32: Write the sum object; implemented by `a.coeff=[a.coeff b.coeff]`.
-- Lines 36-37: Filter out zero coeff; implemented by `pos=find(a.coeff)`.
-
-### Control flow inferred from the code
-
-- Line 25: conditional branch on `(~isa(a,'ttclass'))||(~isa(b,'ttclass'))`.
-- Line 38: conditional branch on `~isempty(pos)`.
-
-### Key state/data transformations
-
-- Lines 32: computes `a.coeff` using `a.coeff=[a.coeff b.coeff]`.
-- Lines 33: computes `a.cores` using `a.cores=[a.cores b.cores]`.
-- Lines 34: computes `a.tolerance` using `a.tolerance=[a.tolerance b.tolerance]`.
-- Lines 37: computes `pos` using `pos=find(a.coeff)`.
-- Lines 43: computes `a` using `a=0*unit_like(a)`.
-
 ## Parameters / inputs
 
 - a -a tensor train object

@@ -18,40 +18,6 @@ INADEQUATE pulse sequence. Selects double-quantum coherence from coupled carbon 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 43-44: Consistency check; implemented by `grumble(spin_system,parameters,H,R,K)`.
-- Lines 46-47: Compose Liouvillian; implemented by `L=H+1i*R+1i*K`.
-- Lines 49-50: Decoupling; implemented by `L=decouple(spin_system,L,[],parameters.decouple)`.
-- Lines 52-53: Sequence timing; implemented by `timestep=1./parameters.sweep`.
-- Lines 56-57: Initial and detection states; implemented by `rho=state(spin_system,'Lz',parameters.spins{1},'cheap')`.
-- Lines 60-61: Pulse operators; implemented by `Cx=operator(spin_system,'Lx',parameters.spins{1})`.
-- Lines 64-65: Pulse 90x; implemented by `rho=step(spin_system,Cx,rho,pi/2)`.
-- Lines 67-68: J-coupling evolution; implemented by `rho=step(spin_system,L,rho,tau)`.
-- Lines 70-71: Pulse 180y; implemented by `rho=step(spin_system,Cy,rho,pi)`.
-- Lines 79-80: Select double-quantum coherence; implemented by `rho=coherence(spin_system,rho,{{parameters.spins{1},[2 -2]}})`.
-- Lines 82-83: Pulse on 90x; implemented by `rho=step(spin_system,Cx,rho,pi/2)`.
-- Lines 85-87: Detection; implemented by `fid=evolution(spin_system,L,coil,rho,timestep(1), parameters.npoints(1)-1,'observable')`.
-
-### Key state/data transformations
-
-- Lines 47: computes `L` using `L=H+1i*R+1i*K`.
-- Lines 53: computes `timestep` using `timestep=1./parameters.sweep`.
-- Lines 54: computes `tau` using `tau=abs(1/(4*parameters.J))`.
-- Lines 57: computes `rho` using `rho=state(spin_system,'Lz',parameters.spins{1},'cheap')`.
-- Lines 58: computes `coil` using `coil=state(spin_system,'L+',parameters.spins{1},'cheap')`.
-- Lines 61: computes `Cx` using `Cx=operator(spin_system,'Lx',parameters.spins{1})`.
-- Lines 62: computes `Cy` using `Cy=operator(spin_system,'Ly',parameters.spins{1})`.
-- Lines 86-87: computes `fid` using `fid=evolution(spin_system,L,coil,rho,timestep(1), parameters.npoints(1)-1,'observable')`.
-
-### Local helper functions
-
-- Line 92: `grumble()` — `function grumble(spin_system,parameters,H,R,K)`.
-  - Representative operation: `if ~ismember(spin_system.bas.formalism,{'sphten-liouv'})`.
-  - Representative operation: `error('this function is only available for sphten-liouv formalisms.')`.
-
 ## Syntax
 
 ```matlab

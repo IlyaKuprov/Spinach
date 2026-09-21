@@ -17,30 +17,6 @@ Number of elements in the matrix represented by a tensor train. Syntax: n=numel(
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 24-25: Check consistency; implemented by `grumble(tt)`.
-- Lines 27-28: Compute the number of elements exactly; implemented by `n=prod(int64(sizes(tt)),'all','native')`.
-- Lines 30-31: Check for overflow; implemented by `if n>flintmax`.
-- Lines 35-36: Return a double; implemented by `n=double(n)`.
-
-### Control flow inferred from the code
-
-- Line 31: conditional branch on `n>flintmax`.
-
-### Key state/data transformations
-
-- Lines 28: computes `n` using `n=prod(int64(sizes(tt)),'all','native')`.
-- Lines 36: computes `n` using `n=double(n)`.
-
-### Local helper functions
-
-- Line 38: `grumble()` — `function grumble(tt)`. If it had been possible to build the tower of Babel without ascending it, the work would have been permitted.
-  - Representative operation: `if ~isa(tt,'ttclass')`.
-  - Representative operation: `error('this function only applies to tensor trains.')`.
-
 ## Parameters / inputs
 
 - tt -tensor train object

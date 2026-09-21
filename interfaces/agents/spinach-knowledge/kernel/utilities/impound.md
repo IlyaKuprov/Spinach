@@ -14,17 +14,6 @@ This function packages everything it receives into a cell array and returns it b
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 21-22: Return what was received; implemented by `answer=varargin`.
-
-### Key state/data transformations
-
-- Lines 22: computes `answer` using `answer=varargin`.
-
 ## Parameters / inputs
 
 - varargin -any number of parameters of any type

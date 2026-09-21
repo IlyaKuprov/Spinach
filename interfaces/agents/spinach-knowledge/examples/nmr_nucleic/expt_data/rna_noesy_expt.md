@@ -14,26 +14,6 @@ Experimental NOESY spectrum of the Harvard RNA. Shunsuke Imai Scott Robson Gerha
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 11-12: Magnet field; implemented by `spin_system.inter.magnet=17.62`.
-- Lines 14-15: Sequence parameters; implemented by `parameters.offset=3473`.
-- Lines 21-22: Load data; implemented by `load('rna_noesy_expt.mat','spec_expt')`.
-- Lines 24-25: Plotting; implemented by `spin_system.sys.disable={}; spin_system.sys.output=1`.
-
-### Key state/data transformations
-
-- Lines 12: computes `spin_system.inter.magnet` using `spin_system.inter.magnet=17.62`.
-- Lines 15: computes `parameters.offset` using `parameters.offset=3473`.
-- Lines 16: computes `parameters.sweep` using `parameters.sweep=[7500.00 7496.252]`.
-- Lines 17: computes `parameters.zerofill` using `parameters.zerofill=[1024 4096]`.
-- Lines 18: computes `parameters.spins` using `parameters.spins={'1H','1H'}`.
-- Lines 19: computes `parameters.axis_units` using `parameters.axis_units='ppm'`.
-- Lines 25: computes `spin_system.sys.disable` using `spin_system.sys.disable={}; spin_system.sys.output=1`.
-
 ## Implementation structure
 
 - Experimental NOESY spectrum of the Harvard RNA.

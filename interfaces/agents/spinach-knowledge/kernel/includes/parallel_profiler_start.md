@@ -16,23 +16,6 @@ An include that starts profiling infrastructure around parallel stages. Should b
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 1-9: An include that starts profiling infrastructure around parallel stages. Should be invoked just before a parfor or an spmd.; implemented by `if ~isworkernode`.
-- Lines 8-9: Brief parallel profiler start; implemented by `if ~isworkernode`.
-- Lines 14-15: Detailed parallel profiler start; implemented by `if (~isworkernode)&&ismember('dafuq',spin_system.sys.enable)`.
-
-### Control flow inferred from the code
-
-- Line 9: conditional branch on `~isworkernode`.
-- Line 15: conditional branch on `(~isworkernode)&&ismember('dafuq',spin_system.sys.enable)`.
-
-### Key state/data transformations
-
-- Lines 16: computes `parProfiler` using `parProfiler=parallel.internal.profiling.PoolProfiler()`.
-
 ## Implementation structure
 
 - An include that starts profiling infrastructure around parallel

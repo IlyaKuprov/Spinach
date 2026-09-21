@@ -14,22 +14,6 @@ Adds a logical regression check with a clear message. Syntax: result=test_true(r
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 23-24: Check the condition; implemented by `if ~isscalar(condition)||~condition`.
-- Lines 28-29: Record the pass message; implemented by `result.messages{end+1}=['PASS: ' label ' -- ' why]`.
-
-### Control flow inferred from the code
-
-- Line 24: conditional branch on `~isscalar(condition)||~condition`.
-
-### Key state/data transformations
-
-- Lines 29: computes `result.messages{end+1}` using `result.messages{end+1}=['PASS: ' label ' -- ' why]`.
-
 ## Parameters / inputs
 
 - result -test result structure

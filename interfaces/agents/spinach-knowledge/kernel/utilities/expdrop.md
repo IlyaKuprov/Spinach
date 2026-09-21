@@ -17,25 +17,6 @@ Exponential drop function. Produces an exponential fall-off from a specified val
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 30-31: Check consistency; implemented by `grumble(from,to,duration,npoints,drop_rate)`.
-- Lines 33-34: Get the exponential drop parameters; implemented by `B=(from-to)/(1-exp(-drop_rate*duration)); A=from-B`.
-- Lines 36-37: Compute the drop; implemented by `drop=A+B*exp(-drop_rate*linspace(0,duration,npoints))`.
-
-### Key state/data transformations
-
-- Lines 34: computes `B` using `B=(from-to)/(1-exp(-drop_rate*duration)); A=from-B`.
-- Lines 37: computes `drop` using `drop=A+B*exp(-drop_rate*linspace(0,duration,npoints))`.
-
-### Local helper functions
-
-- Line 42: `grumble()` — `function grumble(from,to,duration,npoints,drop_rate)`.
-  - Representative operation: `if (~isnumeric(npoints))||(~isreal(npoints))|| (numel(npoints)~=1)||(npoints<1)||(mod(npoints,1)~=0)`.
-  - Representative operation: `(numel(npoints)~=1)||(npoints<1)||(mod(npoints,1)~=0)`.
-
 ## Parameters / inputs
 
 - from -the value to drop from

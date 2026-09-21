@@ -14,22 +14,6 @@ Runs one Spinach regression test by identifier substring. Syntax: result=run_tes
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 17-18: Run one matching test verbosely; implemented by `results=run_tests('pattern',test_id,'verbose',true,'stop_on_fail',true)`.
-
-### Control flow inferred from the code
-
-- Line 19: conditional branch on `numel(results)~=1`.
-
-### Key state/data transformations
-
-- Lines 18: computes `results` using `results=run_tests('pattern',test_id,'verbose',true,'stop_on_fail',true)`.
-- Lines 22: computes `result` using `result=results`.
-
 ## Parameters / inputs
 
 - test_id -test identifier or unique substring from list_tests()

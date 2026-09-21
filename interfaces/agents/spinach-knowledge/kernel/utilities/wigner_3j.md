@@ -17,23 +17,6 @@ Calculates Wigner 3j-symbols. Syntax: w=wigner_3j(j1,m1,j2,m2,j3,m3) If physical
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 27-28: Check consistency; implemented by `grumble(j1,m1,j2,m2,j3,m3)`.
-- Lines 30-31: Call Clebsch-Gordan coefficients; implemented by `w=(((-1)^(-m3+j1+j2))/sqrt(2*j3+1))*clebsch_gordan(j3,-m3,j1,m1,j2,m2)`.
-
-### Key state/data transformations
-
-- Lines 31: computes `w` using `w=(((-1)^(-m3+j1+j2))/sqrt(2*j3+1))*clebsch_gordan(j3,-m3,j1,m1,j2,m2)`.
-
-### Local helper functions
-
-- Line 36: `grumble()` — `function grumble(j1,m1,j2,m2,j3,m3)`.
-  - Representative operation: `if (~isnumeric(j1))||(~isnumeric(j2))||(~isnumeric(j3))|| (~isnumeric(m1))||(~isnumeric(m2))||(~isnumeric(m3))`.
-  - Representative operation: `(~isnumeric(m1))||(~isnumeric(m2))||(~isnumeric(m3))`.
-
 ## Parameters / inputs
 
 - j1-j3 -integers arranged in the order shown above

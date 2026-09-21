@@ -20,49 +20,6 @@ Optimal control design of the multiple-quantum conversion pulse of the z-filtere
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 30-31: Coherence order to convert, 3 or 5; implemented by `mq_order=5`.
-- Lines 33-34: 400 MHz magnet; implemented by `sys.magnet=2*pi*400e6/spin('1H')`.
-- Lines 37-38: Quadrupolar coupling and shielding anisotropy; implemented by `inter.coupling.matrix{1,1}=eeqq2nqi(3.0e6,1.0,5/2,[0 0 0])`.
-- Lines 42-43: Hilbert space formalism; implemented by `bas.formalism='zeeman-hilb'`.
-- Lines 46-47: Spinach housekeeping; implemented by `spin_system=create(sys,inter)`.
-- Lines 51-52: Rotor phase resolved drift Hamiltonians; implemented by `parameters.spins={'27Al'}`.
-- Lines 60-61: Initial state, symmetric MQ coherence between m=+mq_order/2 and m=-mq_order/2; implemented by `rho_init=zeros(6); rho_init(3.5-mq_order/2,3.5+mq_order/2)=1`.
-- Lines 64-65: Target state, population difference across the central transition; implemented by `rho_targ=diag([0 0 1 -1 0 0]); rho_targ=rho_targ/norm(rho_targ,'fro')`.
-- Lines 67-68: Control operators; implemented by `Lx=operator(spin_system,'Lx','27Al')`.
-- Lines 71-72: Control parameters; implemented by `control.isotopes={'27Al'}`.
-- Lines 84-85: Plotting options; implemented by `control.plotting={'amp_controls','phi_controls','spectrogram'}`.
-- Lines 87-88: Random initial guess, amplitudes up to 10% of the ceiling with one slice at the ceiling; implemented by `amp=0.1*rand(1,480); phi=2*pi*rand(1,480); amp(randi(480))=1`.
-- Lines 91-92: Spinach housekeeping; implemented by `spin_system=optimcon(spin_system,control)`.
-- Lines 94-95: Run the optimisation; implemented by `pulse=fmaxnewton(spin_system,@grape_xy,guess)`.
-- Lines 97-98: Clip the amplitude to the ceiling; implemented by `[amp,phi]=cartesian2polar(pulse(1,:),pulse(2,:)); amp=min(amp,1)`.
-- Lines 101-102: Report the fidelity of the clipped pulse; implemented by `[~,fidelity]=grape_xy(pulse,spin_system)`.
-- Lines 105-106: Save the waveform in rad/s; implemented by `pulse=control.pwr_levels*pulse; pulse_dt=control.pulse_dt`.
-
-### Key state/data transformations
-
-- Lines 31: computes `mq_order` using `mq_order=5`.
-- Lines 34: computes `sys.magnet` using `sys.magnet=2*pi*400e6/spin('1H')`.
-- Lines 35: computes `sys.isotopes` using `sys.isotopes={'27Al'}`.
-- Lines 38: computes `inter.coupling.matrix{1,1}` using `inter.coupling.matrix{1,1}=eeqq2nqi(3.0e6,1.0,5/2,[0 0 0])`.
-- Lines 39: computes `inter.zeeman.eigs` using `inter.zeeman.eigs={[-5 -5 10]}`.
-- Lines 40: computes `inter.zeeman.euler` using `inter.zeeman.euler={[0 0 0]}`.
-- Lines 43: computes `bas.formalism` using `bas.formalism='zeeman-hilb'`.
-- Lines 44: computes `bas.approximation` using `bas.approximation='none'`.
-- Lines 47: computes `spin_system` using `spin_system=create(sys,inter)`.
-- Lines 52: computes `parameters.spins` using `parameters.spins={'27Al'}`.
-- Lines 53: computes `parameters.axis` using `parameters.axis=[sqrt(2/3) 0 sqrt(1/3)]`.
-- Lines 54: computes `parameters.grid` using `parameters.grid='rep_2ang_200pts_sph'`.
-- Lines 55: computes `parameters.n_ticks` using `parameters.n_ticks=160`.
-- Lines 56: computes `parameters.n_phases` using `parameters.n_phases=80`.
-- Lines 57: computes `parameters.n_slices` using `parameters.n_slices=480`.
-- Lines 58: computes `control.drifts` using `control.drifts=mqmas_drifts(spin_system,parameters)`.
-- Lines 61: computes `rho_init` using `rho_init=zeros(6); rho_init(3.5-mq_order/2,3.5+mq_order/2)=1`.
-- Lines 65: computes `rho_targ` using `rho_targ=diag([0 0 1 -1 0 0]); rho_targ=rho_targ/norm(rho_targ,'fro')`.
-
 ## Implementation structure
 
 - Optimal control design of the multiple-quantum conversion pulse

@@ -14,28 +14,6 @@ Lists Spinach regression tests. Syntax: manifest=list_tests(varargin)
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 17-18: Add the test library to the path; implemented by `root_dir=fileparts(mfilename('fullpath'))`.
-- Lines 21-22: Parse options; implemented by `options=test_options(varargin{:})`.
-- Lines 25-26: Apply substring filter; implemented by `if ~isempty(options.pattern)`.
-- Lines 32-33: Print the list; implemented by `for n=1:numel(manifest)`.
-
-### Control flow inferred from the code
-
-- Line 26: conditional branch on `~isempty(options.pattern)`.
-- Line 33: `for` loop over `n=1:numel(manifest)`.
-
-### Key state/data transformations
-
-- Lines 18: computes `root_dir` using `root_dir=fileparts(mfilename('fullpath'))`.
-- Lines 22: computes `options` using `options=test_options(varargin{:})`.
-- Lines 23: computes `manifest` using `manifest=test_manifest()`.
-- Lines 27-28: computes `keep` using `keep=contains({manifest.id},options.pattern)| contains({manifest.name},options.pattern)`.
-
 ## Parameters / inputs
 
 - varargin -optional name-value pair 'pattern', string

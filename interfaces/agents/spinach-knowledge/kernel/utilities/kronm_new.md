@@ -17,38 +17,6 @@ Calculates (Q{1}(x)Q{2}(x)...(x)Q{n})*M without opening Kronecker products. Synt
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 22-23: Check consistency; implemented by `grumble(Q,M)`.
-- Lines 25-26: Dimension statistics; implemented by `n_mats_in_q=numel(Q)`.
-- Lines 29-30: Row and column counts in Q; implemented by `row_dims=zeros(1,n_mats_in_q)`.
-- Lines 36-37: Fold up implicit dimensions of M; implemented by `M=reshape(full(M),[col_dims n_cols_in_m])`.
-- Lines 39-40: Run the products; implemented by `for n=1:n_mats_in_q`.
-- Lines 42-43: Contract each implicit dimension; implemented by `M=tensorprod(full(Q{n}),M,2,n_mats_in_q)`.
-- Lines 47-48: Unfold implicit dimensions of M; implemented by `M=reshape(M,[prod(row_dims) n_cols_in_m])`.
-
-### Control flow inferred from the code
-
-- Line 32: `for` loop over `n=1:n_mats_in_q`.
-- Line 40: `for` loop over `n=1:n_mats_in_q`.
-
-### Key state/data transformations
-
-- Lines 26: computes `n_mats_in_q` using `n_mats_in_q=numel(Q)`.
-- Lines 27: computes `n_cols_in_m` using `n_cols_in_m=size(M,2)`.
-- Lines 30: computes `row_dims` using `row_dims=zeros(1,n_mats_in_q)`.
-- Lines 31: computes `col_dims` using `col_dims=zeros(1,n_mats_in_q)`.
-- Lines 33: computes `[row_dims(n),col_dims(n)]` using `[row_dims(n),col_dims(n)]=size(Q{n_mats_in_q-n+1})`.
-- Lines 37: computes `M` using `M=reshape(full(M),[col_dims n_cols_in_m])`.
-
-### Local helper functions
-
-- Line 53: `grumble()` — `function grumble(Q,x)`.
-  - Representative operation: `if (~iscell(Q))`.
-  - Representative operation: `error('Q must be a cell array.')`.
-
 ## Parameters / inputs
 
 - Q -cell array of Kronecker terms

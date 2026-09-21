@@ -20,40 +20,6 @@ Amplitude-mode homonuclear TOCSY pulse sequence from:
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 48-49: Consistency check; implemented by `grumble(spin_system,parameters,H,R,K)`.
-- Lines 51-52: Compose Liouvillian; implemented by `L=H+1i*R+1i*K`.
-- Lines 54-55: Coherent evolution timestep; implemented by `timestep=1./parameters.sweep`.
-- Lines 57-58: Detection state; implemented by `coil=state(spin_system,'L+',parameters.spins{1},'cheap')`.
-- Lines 60-61: Pulse operators; implemented by `Lx=operator(spin_system,'Lx',parameters.spins{1})`.
-- Lines 64-65: First pulse; implemented by `rho=step(spin_system,Lx,parameters.rho0,pi/2)`.
-- Lines 67-68: F1 evolution; implemented by `rho_stack=evolution(spin_system,L,[],rho,timestep(1),parameters.npoints(1)-1,'trajectory')`.
-- Lines 70-71: Mixing time under spin-lock; implemented by `rho_stack_cos=evolution(spin_system,L+2*pi*parameters.lamp*Lx,[],rho_stack,parameters.tmix,1,'final')`.
-- Lines 74-75: F2 evolution; implemented by `fid.cos=evolution(spin_system,L,coil,rho_stack_cos,timestep(2),parameters.npoints(2)-1,'observable')`.
-
-### Key state/data transformations
-
-- Lines 52: computes `L` using `L=H+1i*R+1i*K`.
-- Lines 55: computes `timestep` using `timestep=1./parameters.sweep`.
-- Lines 58: computes `coil` using `coil=state(spin_system,'L+',parameters.spins{1},'cheap')`.
-- Lines 61: computes `Lx` using `Lx=operator(spin_system,'Lx',parameters.spins{1})`.
-- Lines 62: computes `Ly` using `Ly=operator(spin_system,'Ly',parameters.spins{1})`.
-- Lines 65: computes `rho` using `rho=step(spin_system,Lx,parameters.rho0,pi/2)`.
-- Lines 68: computes `rho_stack` using `rho_stack=evolution(spin_system,L,[],rho,timestep(1),parameters.npoints(1)-1,'trajectory')`.
-- Lines 71: computes `rho_stack_cos` using `rho_stack_cos=evolution(spin_system,L+2*pi*parameters.lamp*Lx,[],rho_stack,parameters.tmix,1,'final')`.
-- Lines 72: computes `rho_stack_sin` using `rho_stack_sin=evolution(spin_system,L+2*pi*parameters.lamp*Ly,[],rho_stack,parameters.tmix,1,'final')`.
-- Lines 75: computes `fid.cos` using `fid.cos=evolution(spin_system,L,coil,rho_stack_cos,timestep(2),parameters.npoints(2)-1,'observable')`.
-- Lines 76: computes `fid.sin` using `fid.sin=evolution(spin_system,L,coil,rho_stack_sin,timestep(2),parameters.npoints(2)-1,'observable')`.
-
-### Local helper functions
-
-- Line 81: `grumble()` — `function grumble(spin_system,parameters,H,R,K)`.
-  - Representative operation: `if ~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})`.
-  - Representative operation: `error('this function is only available for sphten-liouv and zeeman-liouv formalisms.')`.
-
 ## Syntax
 
 ```matlab

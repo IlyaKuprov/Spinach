@@ -14,25 +14,6 @@ Figure 2 from the paper by Rasulov and Kuprov:
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 10-11: Get E1000B pulse from Spinach; implemented by `waveform=vg_pulse('E1000B',1000,0.001)`.
-- Lines 14-15: Apply amplifier compression; implemented by `tanh_waveform=amp_tanh([waveform`.
-- Lines 22-23: Plot waveforms; implemented by `kfigure(); hold on`.
-- Lines 28-29: Plot saturation levels; implemented by `plot([0 1 NaN 1 0],[3e4 3e4 NaN -3e4 -3e4],'k--')`.
-- Lines 31-32: Annotate the plot; implemented by `kxlabel('time, ms')`.
-
-### Key state/data transformations
-
-- Lines 11: computes `waveform` using `waveform=vg_pulse('E1000B',1000,0.001)`.
-- Lines 12: computes `time_axis` using `time_axis=1e3*linspace(0,0.001,1000)`.
-- Lines 15: computes `tanh_waveform` using `tanh_waveform=amp_tanh([waveform`.
-- Lines 18: computes `root_waveform` using `root_waveform=amp_root([waveform`.
-- Lines 34-35: computes `klegend({'input','output, tanh','output, $s` using `klegend({'input','output, tanh','output, $s=10$', 'saturation level'},'Location','Best')`.
-
 ## Implementation structure
 
 - Figure 2 from the paper by Rasulov and Kuprov:

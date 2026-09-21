@@ -18,30 +18,6 @@ Analytical approximation to a spin locking process. This function oblite- rates 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 35-36: Check consistency; implemented by `grumble(Lx,Ly,rho,direction)`.
-- Lines 38-39: Decide the direction; implemented by `switch direction`.
-- Lines 43-44: Destroy everything except for X magnetization; implemented by `rho=step(spin_system,Ly,rho,pi/2)`.
-- Lines 50-51: Destroy everything except for Y magnetization; implemented by `rho=step(spin_system,Lx,rho,pi/2)`.
-- Lines 57-58: Complain and bomb out; implemented by `error('unrecognized spin locking direction.')`.
-
-### Control flow inferred from the code
-
-- Line 39: dispatches on `direction`; cases `'X'`, `'Y'`.
-
-### Key state/data transformations
-
-- Lines 44: computes `rho` using `rho=step(spin_system,Ly,rho,pi/2)`.
-
-### Local helper functions
-
-- Line 65: `grumble()` — `function grumble(Lx,Ly,rho,direction)`.
-  - Representative operation: `if (~ischar(direction))||(~ismember(direction,{'X','Y'}))`.
-  - Representative operation: `error('direction argument can be ''X'' or ''Y''')`.
-
 ## Parameters / inputs
 
 - Lx -X magnetization operator on the spins that

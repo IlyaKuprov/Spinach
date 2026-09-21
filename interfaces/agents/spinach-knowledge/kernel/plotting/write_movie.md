@@ -17,32 +17,6 @@ Orbits the camera around a 3D plot and writes a correctly looping 359-frame movi
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 23-24: Check consistency; implemented by `grumble(file_name)`.
-- Lines 26-27: Disable stretch-to-fill; implemented by `axis vis3d`.
-- Lines 29-30: Open the video writer object; implemented by `writerObj=VideoWriter(file_name,'MPEG-4')`.
-- Lines 33-34: Orbit the camera; implemented by `for n=1:359`.
-- Lines 36-37: Grab the frame; implemented by `writeVideo(writerObj,getframe(gcf))`.
-- Lines 42-43: Close the writer object; implemented by `close(writerObj)`.
-
-### Control flow inferred from the code
-
-- Line 34: `for` loop over `n=1:359`.
-
-### Key state/data transformations
-
-- Lines 30: computes `writerObj` using `writerObj=VideoWriter(file_name,'MPEG-4')`.
-- Lines 31: computes `writerObj.Quality` using `writerObj.Quality=100; open(writerObj)`.
-
-### Local helper functions
-
-- Line 48: `grumble()` — `function grumble(file_name)`. Love is [...] friendship inspired by beauty. Marcus Tullius Cicero
-  - Representative operation: `if ~ischar(file_name)`.
-  - Representative operation: `error('file_name must be a character string.')`.
-
 ## Parameters / inputs
 
 - file_name -a character strong with a file name

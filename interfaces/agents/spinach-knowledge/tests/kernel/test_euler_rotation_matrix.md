@@ -14,23 +14,6 @@ Tests active ZYZ Euler rotation matrices. Syntax: result=test_euler_rotation_mat
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 16-17: Announce the test target; implemented by `fprintf('TESTING: Euler active rotation matrix\n')`.
-- Lines 19-22: State the physical target of the test; implemented by `result=new_test_result('kernel/euler_rotation_matrix', 'Euler active rotation matrix', 'euler2dcm must implement the active ZYZ convention.')`.
-- Lines 24-25: Build a simple ninety-degree Z rotation; implemented by `R=euler2dcm(pi/2,0,0)`.
-- Lines 28-30: Check the active rotation and orthogonality; implemented by `result=test_close(result,'active Z rotation',R,R_ref,1e-15,1e-15, 'a positive active Z rotation maps the x axis into y')`.
-
-### Key state/data transformations
-
-- Lines 20-22: computes `result` using `result=new_test_result('kernel/euler_rotation_matrix', 'Euler active rotation matrix', 'euler2dcm must implement the active ZYZ convention.')`.
-- Lines 25: computes `R` using `R=euler2dcm(pi/2,0,0)`.
-- Lines 26: computes `R_ref` using `R_ref=[0 -1 0;1 0 0;0 0 1]`.
-- Lines 36: computes `'the documented action is v` using `'the documented action is v=R*v for column vectors')`.
-
 ## Outputs
 
 - result -regression test result with explanatory messages

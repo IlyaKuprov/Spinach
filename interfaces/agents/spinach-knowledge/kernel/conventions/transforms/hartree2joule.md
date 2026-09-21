@@ -17,23 +17,6 @@ Converts Hartree energy units into J/mol. A Hartree is twice the ground state io
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 23-24: Check consistency; implemented by `grumble(energy)`.
-- Lines 26-27: Perform the conversion; implemented by `energy=2625499.62*energy`.
-
-### Key state/data transformations
-
-- Lines 27: computes `energy` using `energy=2625499.62*energy`.
-
-### Local helper functions
-
-- Line 32: `grumble()` — `function grumble(energy)`. "We only need to be lucky once. You need to be lucky every time."
-  - Representative operation: `if (~isnumeric(energy))||(~isreal(energy))`.
-  - Representative operation: `error('the argument must be an array of real numbers.')`.
-
 ## Parameters / inputs
 
 - energy -a numerical array of energies in

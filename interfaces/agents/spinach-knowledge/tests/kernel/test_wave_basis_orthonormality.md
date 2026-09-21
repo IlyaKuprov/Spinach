@@ -14,27 +14,6 @@ Tests waveform basis orthonormality. Syntax: result=test_wave_basis_orthonormali
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 16-17: Announce the test target; implemented by `fprintf('TESTING: Waveform basis orthonormality\n')`.
-- Lines 19-22: State the numerical target of the test; implemented by `result=new_test_result('kernel/wave_basis_orthonormality', 'Waveform basis orthonormality', 'pulse waveform basis columns must be orthonormal.')`.
-- Lines 24-25: Check all supported basis families; implemented by `basis_types={'sine_waves','cosine_waves','legendre'}`.
-- Lines 28-29: Build a small waveform basis; implemented by `B=wave_basis(basis_types{n},5,32)`.
-- Lines 31-33: Check orthonormality of columns; implemented by `result=test_close(result,[basis_types{n} ' Gram matrix'],B'*B,eye(5),1e-12,1e-12, 'orthonormal columns give independent waveform coefficients')`.
-
-### Control flow inferred from the code
-
-- Line 26: `for` loop over `n=1:numel(basis_types)`.
-
-### Key state/data transformations
-
-- Lines 20-22: computes `result` using `result=new_test_result('kernel/wave_basis_orthonormality', 'Waveform basis orthonormality', 'pulse waveform basis columns must be orthonormal.')`.
-- Lines 25: computes `basis_types` using `basis_types={'sine_waves','cosine_waves','legendre'}`.
-- Lines 29: computes `B` using `B=wave_basis(basis_types{n},5,32)`.
-
 ## Outputs
 
 - result -regression test result with explanatory messages

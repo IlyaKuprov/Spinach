@@ -14,29 +14,6 @@ Returns true if none of the elements of the polyadic are Inf or NaN. Syntax: ans
 
 ## Numerical / algorithmic content
 
-
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 21-22: Check the core array; implemented by `for n=1:numel(p.cores)`.
-- Lines 30-31: Check prefix and suffix arrays; implemented by `for n=1:numel(p.prefix)`.
-- Lines 42-43: All finite; implemented by `answ=true()`.
-
-### Control flow inferred from the code
-
-- Line 22: `for` loop over `n=1:numel(p.cores)`.
-- Line 23: `for` loop over `k=1:numel(p.cores{n})`.
-- Line 24: conditional branch on `~allfinite(p.cores{n}{k})`.
-- Line 31: `for` loop over `n=1:numel(p.prefix)`.
-- Line 32: conditional branch on `~allfinite(p.prefix{n})`.
-- Line 36: `for` loop over `n=1:numel(p.suffix)`.
-- Line 37: conditional branch on `~allfinite(p.suffix{n})`.
-
-### Key state/data transformations
-
-- Lines 25: computes `answ` using `answ=false; return`.
-
 ## Parameters / inputs
 
 - p -a polyadic object

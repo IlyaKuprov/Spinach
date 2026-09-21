@@ -17,23 +17,6 @@ Adds phenomenological pumping terms to the relaxation superoperator to enable ap
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-## Code-derived implementation details
-
-### Comment-guided execution stages
-
-- Lines 32-33: Check consisttency; implemented by `grumble(spin_system,R,rho,rate)`.
-- Lines 35-36: Add pumping as a coupling to unit state; implemented by `R(:,1)=R(:,1)+rate*rho`.
-
-### Key state/data transformations
-
-- Lines 36: computes `R(:,1)` using `R(:,1)=R(:,1)+rate*rho`.
-
-### Local helper functions
-
-- Line 41: `grumble()` — `function grumble(spin_system,R,rho,rate)`.
-  - Representative operation: `if (~isnumeric(R))||(~ismatrix(R))`.
-  - Representative operation: `error('R must be a matrix.')`.
-
 ## Syntax
 
 ```matlab

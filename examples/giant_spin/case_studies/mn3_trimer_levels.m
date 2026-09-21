@@ -69,7 +69,7 @@ end
 
 % Levels relative to the field-free ground state, offset
 % by 0.15 cm^-1 per basis to show the overlapping lines
-kfigure(); hold on; handles=zeros(1,3);
+kfigure(); hold on; handles=gobjects(1,3);
 colours={[0.8 0.8 0.8],[0 0 0],[1 0 0]};
 for b=1:3
     h=plot(fields,levels{b}-levels{1}(1,1)+0.15*(b-1),'-','Color',colours{b});

@@ -104,11 +104,11 @@ for n=1:4
 
 end
 
-% Axis limits and the transparent legend of the paper
+% Axis limits and legend of the paper
 hold off; kgrid; xlim([0 1]); xticks(0:0.25:1);
 ylim([0 2]); yticks(0:0.5:2);
 kxlabel('$B$ (T)'); kylabel('Magnetisation ($\mu_B$)');
-leg=klegend(labels,'Location','east'); set(leg,'Color','none');
+klegend(labels,'Location','east');
 
 end
 

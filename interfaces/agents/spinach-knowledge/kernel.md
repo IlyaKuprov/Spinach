@@ -1,7 +1,7 @@
 # Spinach code index: kernel
 
 - Source root: `/home/kuprov/.openclaw/workspace/Spinach`
-- Source commit: `ec26a5a61b96fde470c4f2c27ebd667c7151d249`
+- Source commit: `d09c69aa016cbaf1838c39692f3a12f4e55ed7ac`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
 - Files indexed: **528** MATLAB files

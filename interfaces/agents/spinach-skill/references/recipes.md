@@ -517,9 +517,12 @@ from geometry and order matrix; do not also add them by hand.
 
 Hilbert-space problems with large multiplicities. `E<N>` declares an electron
 of multiplicity `N`, so `E4` is S=3/2, `E8` is S=7/2, `E13` is J=6 and `E16` is
-J=15/2. No file in `giant_spin` uses a context; each calls an experiment driver
-directly, and `sys.magnet` must be `1` whenever the driver sweeps the field.
-Zero-field splitting via D and E (`quartet_levels.m`):
+J=15/2. The field-scan drivers are called directly, without a context, and
+`sys.magnet` must be `1` whenever a driver or a sequence sweeps the field. The
+exception is `giant_spin/case_studies`, where the pulsed-field magnetometry
+scripts run `pulsed_field` through `crystal` and `powder` with the `labframe`
+assumption set, `parameters.needs={'zeeman_op'}`, and `parameters.sum_up=false`
+under `powder`. Zero-field splitting via D and E (`quartet_levels.m`):
 
 ```matlab
 sys.magnet=1.0;                        % must be 1 for a field scan

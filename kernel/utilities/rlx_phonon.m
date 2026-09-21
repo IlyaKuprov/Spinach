@@ -81,8 +81,8 @@ function grumble(H,X,I0,alpha,T)
 if (~isnumeric(H))||(~ishermitian(H))||any(~isfinite(H(:)))
     error('H must be a Hermitian matrix with finite elements.');
 end
-if (~isnumeric(X))||(~ishermitian(X))||any(size(X)~=size(H))
-    error('X must be a Hermitian matrix of the same dimension as H.');
+if (~isnumeric(X))||(~ishermitian(X))||any(size(X)~=size(H))||any(~isfinite(X(:)))
+    error('X must be a Hermitian matrix of the same dimension as H with finite elements.');
 end
 if (~isnumeric(I0))||(~isreal(I0))||(~isscalar(I0))||(~isfinite(I0))||(I0<0)
     error('I0 must be a non-negative real scalar.');

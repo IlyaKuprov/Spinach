@@ -80,8 +80,8 @@ function grumble(E,X,I0,alpha,T)
 if (~isnumeric(E))||(~isreal(E))||(~iscolumn(E))||any(~isfinite(E))
     error('E must be a column vector of real finite eigenvalues.');
 end
-if (~isnumeric(X))||(~ishermitian(X))||any(size(X)~=numel(E))
-    error('X must be a Hermitian matrix of the same dimension as E.');
+if (~isnumeric(X))||(~ishermitian(X))||any(size(X)~=numel(E))||any(~isfinite(X(:)))
+    error('X must be a Hermitian matrix of the same dimension as E with finite elements.');
 end
 if (~isnumeric(I0))||(~isreal(I0))||(~isscalar(I0))||(~isfinite(I0))||(I0<0)
     error('I0 must be a non-negative real scalar.');

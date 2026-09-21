@@ -167,7 +167,8 @@ end
 if ~isfield(parameters,'hzeeman')||(~isnumeric(parameters.hzeeman))||any(size(parameters.hzeeman)~=size(H))
     error('parameters.hzeeman must be a matrix of the same dimension as H, add ''zeeman_op'' to parameters.needs.');
 end
-if ~isfield(parameters,'timestep')||(~isnumeric(parameters.timestep))||(~isscalar(parameters.timestep))||(parameters.timestep<=0)
+if ~isfield(parameters,'timestep')||(~isnumeric(parameters.timestep))||(~isreal(parameters.timestep))||...
+   (~isscalar(parameters.timestep))||(~isfinite(parameters.timestep))||(parameters.timestep<=0)
     error('parameters.timestep must be a positive real scalar.');
 end
 if ~isfield(parameters,'nsteps')||(~isnumeric(parameters.nsteps))||(~isscalar(parameters.nsteps))||(mod(parameters.nsteps,1)~=0)||(parameters.nsteps<1)
@@ -180,6 +181,9 @@ if ~isfield(parameters,'coil')||(~(isnumeric(parameters.coil)||iscell(parameters
     error('parameters.coil must be an observable operator or a cell array of them.');
 end
 if iscell(parameters.coil), coils=parameters.coil; else, coils={parameters.coil}; end
+if isempty(coils)
+    error('parameters.coil must contain at least one observable operator.');
+end
 for k=1:numel(coils)
     if (~isnumeric(coils{k}))||any(size(coils{k})~=size(H))
         error('every coil must be a matrix of the same dimension as H.');

@@ -31,8 +31,9 @@
 %            such that lambda^2*I(w)=I0*w^alpha; the units are
 %            (rad/s)^(1-alpha)
 %
-%    alpha - spectral density exponent (sub-Ohmic below 1,
-%            Ohmic at 1, super-Ohmic above 1)
+%    alpha - spectral density exponent, 1 (Ohmic) or above
+%            (super-Ohmic); sub-Ohmic baths make the zero
+%            frequency limit diverge and are not supported
 %
 %    T     - phonon bath temperature, Kelvin
 %
@@ -46,9 +47,10 @@
 %       rebuilt whenever the field changes; pulsed_field.m does
 %       this at every stair of the field profile.
 %
-% Note: the unit state is not damped and the trace is conserved
-%       because X is Hermitian; the relaxation destination is the
-%       thermal equilibrium state of H at temperature T.
+% Note: the trace is conserved (the unit state is a left null vector
+%       of R) because X is Hermitian; the unit state itself is not
+%       stationary, the relaxation destination is the thermal equi-
+%       librium state of H at temperature T.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -82,8 +84,8 @@ end
 if (~isnumeric(I0))||(~isreal(I0))||(~isscalar(I0))||(~isfinite(I0))||(I0<0)
     error('I0 must be a non-negative real scalar.');
 end
-if (~isnumeric(alpha))||(~isreal(alpha))||(~isscalar(alpha))||(~isfinite(alpha))||(alpha<=0)
-    error('alpha must be a positive real scalar.');
+if (~isnumeric(alpha))||(~isreal(alpha))||(~isscalar(alpha))||(~isfinite(alpha))||(alpha<1)
+    error('alpha must be a real scalar not smaller than 1.');
 end
 if (~isnumeric(T))||(~isreal(T))||(~isscalar(T))||(~isfinite(T))||(T<=0)
     error('T must be a positive real scalar.');

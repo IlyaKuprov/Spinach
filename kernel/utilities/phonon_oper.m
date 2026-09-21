@@ -30,8 +30,9 @@
 %            such that lambda^2*I(w)=I0*w^alpha; the units are
 %            (rad/s)^(1-alpha)
 %
-%    alpha - spectral density exponent (sub-Ohmic below 1,
-%            Ohmic at 1, super-Ohmic above 1)
+%    alpha - spectral density exponent, 1 (Ohmic) or above
+%            (super-Ohmic); sub-Ohmic baths make the zero
+%            frequency limit diverge and are not supported
 %
 %    T     - phonon bath temperature, Kelvin
 %
@@ -42,7 +43,7 @@
 %
 % Note: the thermal factor has a finite limit at zero frequency for
 %       alpha>=1, which is taken analytically when hbar*w/kT is below
-%       1e-3; exponents above 700 are treated as infinite.
+%       1e-3; Boltzmann exponents above 700 are treated as infinite.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -82,8 +83,8 @@ end
 if (~isnumeric(I0))||(~isreal(I0))||(~isscalar(I0))||(~isfinite(I0))||(I0<0)
     error('I0 must be a non-negative real scalar.');
 end
-if (~isnumeric(alpha))||(~isreal(alpha))||(~isscalar(alpha))||(~isfinite(alpha))||(alpha<=0)
-    error('alpha must be a positive real scalar.');
+if (~isnumeric(alpha))||(~isreal(alpha))||(~isscalar(alpha))||(~isfinite(alpha))||(alpha<1)
+    error('alpha must be a real scalar not smaller than 1.');
 end
 if (~isnumeric(T))||(~isreal(T))||(~isscalar(T))||(~isfinite(T))||(T<=0)
     error('T must be a positive real scalar.');

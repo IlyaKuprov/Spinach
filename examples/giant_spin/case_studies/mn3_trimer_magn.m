@@ -10,7 +10,7 @@
 %
 %         https://arxiv.org/abs/2609.16352
 %
-% Calculation time: hours
+% Calculation time: minutes
 %
 % ilya.kuprov@weizmann.ac.il
 

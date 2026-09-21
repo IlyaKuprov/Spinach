@@ -9,9 +9,11 @@
 %         https://arxiv.org/abs/2609.16352
 %
 % with the crystal field parameters, g-factor, temperatures, spectral
-% density, sweep profiles, and stair widths of that paper.
+% density, sweep profiles, and stair widths of that paper. As in the
+% paper, the first three profiles are propagated for 1 ms (the first
+% millisecond of the measured 10 ms pulse), the sinusoid for 140 ps.
 %
-% Calculation time: hours
+% Calculation time: minutes
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -76,7 +78,7 @@ pulse_b=[0.000000 2.136074 3.642848 5.179167 6.810767 8.966783 10.895307 12.7425
 
 % Four field profiles, Tesla as a function of time in seconds
 profiles={@(t) 1e4*t, ...
-          @(t) interp1([0 1e-6 1e-5 1e-4 1e-3 1e-2],[0 0.1 1 5 10 50],t,'linear'), ...
+          @(t) interp1([0 1e-6 1e-5 1e-4 1e-3],[0 0.1 1 5 10],t,'linear'), ...
           @(t) pchip(pulse_t,pulse_b,t), ...
           @(t) 0.1*sin(0.134124264765e12*t)};
 temps=[2.0 2.0 2.0 0.001]; steps=[1e-8 1e-8 1e-8 1e-15]; nsteps=[1e5 1e5 1e5 140538]; nout=[100 100 100 59];

@@ -37,7 +37,8 @@
 %    parameters.phonon_i0  - phonon spectral density prefactor,
 %                            see rlx_phonon.m
 %
-%    parameters.phonon_alpha - phonon spectral density exponent
+%    parameters.phonon_alpha - phonon spectral density exponent,
+%                              1 or above, see rlx_phonon.m
 %
 %    parameters.nout       - number of stairs between recorded
 %                            observable values
@@ -140,6 +141,9 @@ function grumble(spin_system,parameters,H)
 if ~strcmp(spin_system.bas.formalism,'zeeman-hilb')
     error('this function is only available in zeeman-hilb formalism.');
 end
+if spin_system.inter.magnet~=1
+    error('sys.magnet must be 1 Tesla, the field is set by parameters.field_prof.');
+end
 if (~isnumeric(H))||(size(H,1)~=size(H,2))
     error('H must be a square matrix.');
 end
@@ -161,14 +165,14 @@ end
 if ~isfield(parameters,'coil')||(~(isnumeric(parameters.coil)||iscell(parameters.coil)))
     error('parameters.coil must be an observable operator or a cell array of them.');
 end
-if ~isfield(parameters,'phonon_x')||(~isnumeric(parameters.phonon_x))||any(size(parameters.phonon_x)~=size(H))
-    error('parameters.phonon_x must be a matrix of the same dimension as H.');
+if ~isfield(parameters,'phonon_x')||(~isnumeric(parameters.phonon_x))||any(size(parameters.phonon_x)~=size(H))||(~ishermitian(parameters.phonon_x))
+    error('parameters.phonon_x must be a Hermitian matrix of the same dimension as H.');
 end
 if ~isfield(parameters,'phonon_i0')||(~isnumeric(parameters.phonon_i0))||(~isscalar(parameters.phonon_i0))||(parameters.phonon_i0<0)
     error('parameters.phonon_i0 must be a non-negative real scalar.');
 end
-if ~isfield(parameters,'phonon_alpha')||(~isnumeric(parameters.phonon_alpha))||(~isscalar(parameters.phonon_alpha))||(parameters.phonon_alpha<=0)
-    error('parameters.phonon_alpha must be a positive real scalar.');
+if ~isfield(parameters,'phonon_alpha')||(~isnumeric(parameters.phonon_alpha))||(~isscalar(parameters.phonon_alpha))||(parameters.phonon_alpha<1)
+    error('parameters.phonon_alpha must be a real scalar not smaller than 1.');
 end
 if ~isfield(spin_system.rlx,'temperature')||isempty(spin_system.rlx.temperature)
     error('the phonon bath temperature must be specified in inter.temperature.');

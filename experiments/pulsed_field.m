@@ -8,7 +8,9 @@
 % phases for half a stair, the dissipative step to second order in
 % the dissipator times the stair width, and the phases again. The
 % dissipator times the stair width must be small; the coherent part
-% is treated exactly for any stair width. Syntax:
+% is treated exactly for any stair width. The dissipator is applied
+% as Hilbert space matrix products (see phonon_oper.m), so the cost
+% of a stair is cubic in the dimension of the Hilbert space. Syntax:
 %
 %          answer=pulsed_field(spin_system,parameters,H,R,K)
 %
@@ -107,14 +109,16 @@ for n=1:parameters.nsteps
     % Eigensystem of the stair Hamiltonian and the coherent half-stair phases
     [V,E]=eig(H_curr,'vector'); phases=exp(-1i*(E-E.')*dt/2);
 
-    % Spin-phonon dissipator on the stair, moved into the eigenbasis
-    R_curr=rlx_phonon(spin_system,H_curr,parameters.phonon_x,parameters.phonon_i0,...
-                      parameters.phonon_alpha,spin_system.rlx.temperature);
-    S=kron(conj(V),V); R_eig=S'*R_curr*S;
+    % Spin-phonon coupling operator and its thermally dressed form in the eigenbasis
+    XE=V'*parameters.phonon_x*V; XE=(XE+XE')/2;
+    RE=phonon_oper(spin_system,E,XE,parameters.phonon_i0,parameters.phonon_alpha,spin_system.rlx.temperature);
+
+    % Dissipator as matrix products in the eigenbasis
+    dissip=@(rho)-pi*(XE*(RE*rho)-(RE*rho)*XE+rho*(RE'*XE)-(XE*rho)*RE');
 
     % Symmetric split step in the eigenbasis
-    rho_eig=phases.*(V'*rho*V);
-    rho_eig=reshape((speye(size(R_eig,1))+R_eig*dt+(R_eig*dt)^2/2)*rho_eig(:),size(H));
+    rho_eig=phases.*(V'*rho*V); drho=dissip(rho_eig);
+    rho_eig=rho_eig+dt*drho+(dt^2/2)*dissip(drho);
     rho=V*(phases.*rho_eig)*V';
 
     % Record the observables and report progress

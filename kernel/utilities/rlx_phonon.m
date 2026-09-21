@@ -14,7 +14,8 @@
 %
 % The Hermitian conjugate term is linear in rho for Hermitian rho, and
 % so the dissipator is returned as an ordinary Liouville space super-
-% operator acting on the column-stretched density matrix. Syntax:
+% operator acting on the column-stretched density matrix. The R oper-
+% ator itself is built by phonon_oper.m. Syntax:
 %
 %               R=rlx_phonon(spin_system,H,X,I0,alpha,T)
 %
@@ -61,21 +62,8 @@ grumble(H,X,I0,alpha,T);
 % Diagonalise the Hamiltonian
 [V,E]=eig(full((H+H')/2),'vector');
 
-% Transition frequencies in rad/s
-w=E-E.';
-
-% Boltzmann exponents
-beta_w=spin_system.tols.hbar*w/(spin_system.tols.kbol*T);
-
-% Thermal spectral density difference, with the small and large exponent limits
-num=I0*(max(w,0).^alpha-max(-w,0).^alpha); phi=zeros(size(w));
-normal=(abs(beta_w)>=1e-3)&(beta_w<=700); small=abs(beta_w)<1e-3;
-phi(normal)=num(normal)./expm1(beta_w(normal));
-phi(small)=I0*abs(w(small)).^(alpha-1)*(spin_system.tols.kbol*T/spin_system.tols.hbar)-...
-           I0*sign(w(small)).*abs(w(small)).^alpha/2;
-
-% Coupling operator in the eigenbasis and the R operator back in the original basis
-XE=V'*X*V; RH=V*(XE.*phi)*V';
+% Dressed coupling operator in the eigenbasis and back in the original basis
+XE=V'*X*V; RH=V*phonon_oper(spin_system,E,(XE+XE')/2,I0,alpha,T)*V';
 
 % Liouville space dissipator, column-stretched density matrix convention
 unit=speye(size(H,1));

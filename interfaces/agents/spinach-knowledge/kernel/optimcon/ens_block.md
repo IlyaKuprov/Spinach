@@ -64,6 +64,20 @@ Fidelity, gradient, and Hessian contributions of one block of ensemble cases, ev
 - the indices that the cases of this block use
 - control -live client-side control structure
 
+## Control flow inside the case loop
+
+- The live control structure is grafted over the frozen worker copy and every field the live copy lacks (frozen invariants, the case blocks, the waveform basis) is taken from the frozen copy; the drift generators come from the worker's own slice through the `drifts` argument.
+- Dispatch on `spin_system.bas.formalism` chooses the GRAPE function once, `grape_liouv` for `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`, `grape_hilb` for `zeeman-hilb`.
+- `for` loop over the cases of the block, each case indexed through the six catalog columns (state pair, drift, power level, offset, phase-cycle step, distortion).
+- Conditional branch on `~isempty(control.phase_cycle)`; the phase-cycle row multiplies the initial and target states by phase factors and rotates each control channel through the block-diagonal rotation matrix `R` built from the channel phases.
+- Conditional branch on `~isempty(off_ens_sizes)`; `ind2sub` unpacks the offset combination index, first channel fastest, and `2*pi*offset` times each channel offset operator is added to the drift.
+- The waveform is scaled to physical units by the power level of the case.
+- `for` loop over the distortion functions, collecting their Jacobian only when derivatives are requested.
+- One GRAPE call with as many outputs as requested: trajectory, fidelity, gradient, Hessian.
+- The gradient passes through the distortion Jacobian and the transposed rotation, and is added to the block sum scaled by the power level.
+- The Hessian is rotated on both sides by the Kronecker product of the identity over time steps with the transposed rotation, and added to the block sum scaled by the squared power level.
+- Conditional branch on `ismember('average',control.traj_opts)&&(n_mine>0)`; the forward trajectories of a non-empty block are added with the overloaded `plus`, which also covers the Hilbert-space cell trajectories, into one entry so that only block sums travel to the client, which divides by the case count; an empty block contributes nothing.
+
 ## Internal Spinach / MATLAB structure cues
 
 - Called routines detected from the main body: `grumble()`, `setdiff()`, `fieldnames()`, `cellfun()`, `ind2sub()`, `sparse()`, `speye()`, `kron()`, `reshape()`, `grape_liouv()`, `grape_hilb()`, `ismember()`, `isfield()`.

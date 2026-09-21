@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/echo_sweep.m`
 - Signature: `echo=echo_sweep(spin_system,parameters,H,~,~)`
-- Total lines: 296
+- Total lines: 301
 
 ## Purpose
 
@@ -76,7 +76,7 @@ Two-pulse echo-detected frequency-swept experiment, static or under magic angle 
 
 ### Local helper functions
 
-- Line 178: `grumble()` — `function grumble(spin_system,parameters,H)`. Requires the `zeeman-hilb` formalism, a vector cell array `H` of `parameters.spc_dim` square matrices of one dimension that commute with the `Lz` of the pulsed spin to within `spin_system.tols.liouv_zero`, `rho0` and `coil` of that dimension, finite positive real scalar `pulse_dur`, `pulse_frq`, `echo_win`, `timestep`, and `sweep` with `pulse_dur` and `echo_win` not shorter than `timestep`, finite non-negative real scalar `tau`, finite real scalar `rate`, positive integer `nphases` not exceeding `spc_dim`, and integer `npoints` greater than two as `ft_axis()` requires.
+- Line 178: `grumble()` — `function grumble(spin_system,parameters,H)`. Requires the `zeeman-hilb` formalism, a vector cell array `H` of `parameters.spc_dim` finite square matrices of one dimension, equal to that of the spin system, that commute with the `Lz` of the pulsed spin to within `spin_system.tols.liouv_zero`, finite `rho0` and `coil` of that dimension, finite positive real scalar `pulse_dur`, `pulse_frq`, `echo_win`, `timestep`, and `sweep` with `pulse_dur` and `echo_win` not shorter than `timestep`, finite non-negative real scalar `tau`, finite real scalar `rate`, positive integer `nphases` not exceeding `spc_dim`, and integer `npoints` greater than two as `ft_axis()` requires.
 
 ## Parameters / inputs
 

@@ -194,6 +194,9 @@ end
 if ~all(cellfun(@(x)all(size(x)==size(H{1})),H))
     error('all matrices in H must have the same dimension.');
 end
+if ~all(cellfun(@(x)all(isfinite(nonzeros(x))),H))
+    error('the elements of H must have finite entries.');
+end
 if ~isfield(parameters,'spins')
     error('the pulsed spin must be specified in parameters.spins field.');
 end
@@ -211,14 +214,16 @@ end
 if ~isfield(parameters,'rho0')
     error('initial state must be specified in parameters.rho0 field.');
 end
-if (~isnumeric(parameters.rho0))||(~isequal(size(parameters.rho0),size(H{1})))
-    error('parameters.rho0 must be a matrix of the same dimension as the elements of H.');
+if (~isnumeric(parameters.rho0))||(~isequal(size(parameters.rho0),size(H{1})))||...
+   (~all(isfinite(nonzeros(parameters.rho0))))
+    error('parameters.rho0 must be a finite matrix of the same dimension as the elements of H.');
 end
 if ~isfield(parameters,'coil')
     error('detection state must be specified in parameters.coil field.');
 end
-if (~isnumeric(parameters.coil))||(~isequal(size(parameters.coil),size(H{1})))
-    error('parameters.coil must be a matrix of the same dimension as the elements of H.');
+if (~isnumeric(parameters.coil))||(~isequal(size(parameters.coil),size(H{1})))||...
+   (~all(isfinite(nonzeros(parameters.coil))))
+    error('parameters.coil must be a finite matrix of the same dimension as the elements of H.');
 end
 if ~isfield(parameters,'pulse_dur')
     error('pulse duration must be specified in parameters.pulse_dur field.');

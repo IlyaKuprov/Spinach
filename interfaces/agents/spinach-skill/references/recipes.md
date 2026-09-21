@@ -230,7 +230,7 @@ and returns the echo signal integrated over the window (sum times the time
 step) and averaged over the start phases, as a column. The rotor rank is set
 by the fastest rate and the time step, not by the slowest rate: the stack is
 a table of the Hamiltonian against rotor phase and its resolution should match
-the time step at the fastest rate, `max_rank` of about `1/(2*rate*timestep)`,
+the time step at the fastest rate, `max_rank` of about `1/(2*abs(rate)*timestep)`,
 2700 at 37 kHz with 5 ns steps (a finer stack costs propagators for no gain
 beyond the time step, a coarser one loses phase resolution; at slower rates
 consecutive steps reuse a stack element); the carrier step must be finer than

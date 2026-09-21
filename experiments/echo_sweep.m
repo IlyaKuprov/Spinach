@@ -76,7 +76,7 @@
 % Note: the rotor stack is a table of the Hamiltonian against the
 %       rotor phase, its resolution should match the time step at
 %       the fastest spinning rate used, parameters.max_rank of the
-%       context function of about 1/(2*rate*timestep) at that rate;
+%       context function of about 1/(2*abs(rate)*timestep) there;
 %       a finer stack costs propagators without gaining accuracy be-
 %       yond the time step, a coarser one loses rotor phase resolu-
 %       tion. At slower rates, consecutive steps reuse elements.

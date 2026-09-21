@@ -17,7 +17,7 @@ Two-pulse echo-detected frequency-swept EPR experiment, static or under magic an
 ## Numerical / algorithmic content
 
 - Time propagation is explicit in Hilbert space: one `propagator()` per rotor stack element for free evolution, one per element and per carrier offset for the pulses, each applied as `P*rho*P'` at every time step of `parameters.timestep`.
-- The stack index at each step is `round(rate*timestep*(s-1/2)*spc_dim)` past the start index, taken modulo `spc_dim`, so `parameters.rate=0` is the static case with no special code; the stack is a table of the Hamiltonian against rotor phase whose resolution should match the time step at the fastest rate used, `parameters.max_rank` of the context of about `1/(2*rate*timestep)` at that rate; a finer stack costs propagators for no gain beyond the time step, a coarser one loses phase resolution, and at slower rates consecutive steps reuse a stack element.
+- The stack index at each step is `round(rate*timestep*(s-1/2)*spc_dim)` past the start index, taken modulo `spc_dim`, so `parameters.rate=0` is the static case with no special code; the stack is a table of the Hamiltonian against rotor phase whose resolution should match the time step at the fastest rate used, `parameters.max_rank` of the context of about `1/(2*abs(rate)*timestep)` at that rate; a finer stack costs propagators for no gain beyond the time step, a coarser one loses phase resolution, and at slower rates consecutive steps reuse a stack element.
 - The coherence pathway is enforced with `coherence()` after each pulse; the echo is the sum of `trace(coil'*rho)` over the `echo_win` steps after the second pulse, multiplied by `parameters.timestep` (Riemann sum) and divided by `parameters.nphases` at the end.
 - The file contains an explicit `grumble(...)` validator that checks the formalism, the stack, the states, every sequence parameter, and the commutation of the stack with the electron `Lz` against `spin_system.tols.liouv_zero`.
 
@@ -103,7 +103,7 @@ Two-pulse echo-detected frequency-swept EPR experiment, static or under magic an
 ## Notes
 
 - The elements of the rotor stack must commute with the electron `Lz` operator, as they do under the `'esr'` assumption set, because the carrier offset is applied as a separate propagator and only the pulse propagators are rebuilt at each carrier offset.
-- The rotor stack is a table of the Hamiltonian against the rotor phase; its resolution should match the time step at the fastest spinning rate used, `parameters.max_rank` of the context function of about `1/(2*rate*timestep)` at that rate. A finer stack costs propagators without gaining accuracy beyond the time step, a coarser one loses rotor phase resolution; at slower rates consecutive steps reuse elements.
+- The rotor stack is a table of the Hamiltonian against the rotor phase; its resolution should match the time step at the fastest spinning rate used, `parameters.max_rank` of the context function of about `1/(2*abs(rate)*timestep)` at that rate. A finer stack costs propagators without gaining accuracy beyond the time step, a coarser one loses rotor phase resolution; at slower rates consecutive steps reuse elements.
 - Used by `examples/esr_sol_pulsed/mas_diamond_p1.m` through `singlerot()` in the `zeeman-hilb` formalism.
 
 ## Internal Spinach / MATLAB structure cues

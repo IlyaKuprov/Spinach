@@ -50,8 +50,8 @@
 %    parameters.spc_dim   - number of elements in the rotor stack,
 %                           received from context function
 %
-%    H  - cell array of Hamiltonian matrices, one for each rotor
-%         phase, received from context function
+%    H  - vector cell array of Hamiltonian matrices, one for each
+%         rotor phase, received from context function
 %
 %    R  - relaxation superoperator, received from context func-
 %         tion, not used
@@ -187,9 +187,9 @@ if (~isnumeric(parameters.spc_dim))||(~isreal(parameters.spc_dim))||...
    (parameters.spc_dim<1)
     error('parameters.spc_dim must be a positive real integer.');
 end
-if (~iscell(H))||(numel(H)~=parameters.spc_dim)||...
+if (~iscell(H))||(~isvector(H))||(numel(H)~=parameters.spc_dim)||...
    (~all(cellfun(@(x)isnumeric(x)&&ismatrix(x)&&(size(x,1)==size(x,2)),H)))
-    error('H must be a cell array of parameters.spc_dim square matrices.');
+    error('H must be a vector cell array of parameters.spc_dim square matrices.');
 end
 if ~all(cellfun(@(x)all(size(x)==size(H{1})),H))
     error('all matrices in H must have the same dimension.');

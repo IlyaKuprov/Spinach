@@ -76,6 +76,8 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Preserve content:** Before updating the knowledge base, you must run an information-preservation gate: compare proposed text against existing text, flag content-drop risks, and block any edit that removes useful existing records unless the user explicitly approves that removal.
 
+* **No line-by-line code regurgitation:** A knowledge entry explains what a function or example does and why; it never restates the source one line at a time. Bullets of the form "Lines 40-41: magnet field; implemented by `sys.magnet=6.9156`" or "Line 18: computes `root_dir` using `root_dir=fileparts(...)`", and sections that list execution stages, control flow, state assignments, or local helper signatures with line numbers, carry no information beyond the source file and are prohibited. Do not add a "Code-derived implementation details" section or any of its subsections to an entry; mechanically generated text of that kind must be deleted before the entry is committed.
+
 ## Task Execution Policies
 
 * **No Hallucinations, no Lies, no Errors:** You must not lie and must not fabricate information, code, or documentation. All content you generate must be accurate and supported by the *Spinach* codebase or user instructions. If you are unsure about something, refer to the existing code or ask the user for clarification. Above all, do not make mistakes.

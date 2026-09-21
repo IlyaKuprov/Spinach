@@ -39,6 +39,8 @@
 %       frame assumptions, call assume() first.
 %
 % ilya.kuprov@weizmann.ac.il
+%
+% <https://spindynamics.org/wiki/index.php?title=mas_drifts.m>
 
 function drifts=mas_drifts(spin_system,parameters)
 
@@ -151,7 +153,7 @@ if ~isfield(parameters,'axis')
 end
 if (~isnumeric(parameters.axis))||(~isreal(parameters.axis))||...
    (~isrow(parameters.axis))||(numel(parameters.axis)~=3)||...
-   any(~isfinite(parameters.axis))||(abs(norm(parameters.axis)-1)>1e-6)
+   any(~isfinite(parameters.axis))||(abs(norm(parameters.axis,2)-1)>1e-6)
     error('parameters.axis must be a normalised row vector with three finite real elements.');
 end
 if ~isfield(parameters,'grid')

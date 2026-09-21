@@ -308,4 +308,3 @@ if (~isnumeric(parameters.npoints))||(~isreal(parameters.npoints))||...
 end
 end
 
-

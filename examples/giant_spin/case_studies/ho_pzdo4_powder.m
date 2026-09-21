@@ -21,7 +21,7 @@ function ho_pzdo4_powder()
 coeff=cell(1,12); euler=cell(1,12);
 for k=1:12
     stev=zeros(2*k+1,1); sel=(ks==k); stev(qs(sel)+k+1)=bkq(sel);
-    coeff{k}=icm2hz(stev2sph(k,stev)); euler{k}=[0 0 0];
+    coeff{k}=stev2sph(k,icm2hz(stev)); euler{k}=[0 0 0];
 end
 
 % Magnet must be 1 Tesla, the field is set by the sweep

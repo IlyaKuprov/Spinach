@@ -3,10 +3,14 @@
 % spherical rank, under a 10 T/ms linear sweep at 2 K with spin-phonon
 % relaxation in the generalised Lindblad form of Saito and Miyashita.
 % The magnetisation of every orientation of the two-angle Lebedev grid
-% is plotted alongside the powder average and the thermal equilibrium
-% magnetisation. Reproduces Fig 3 of
+% is plotted in grey alongside the powder average in red and the ther-
+% mal equilibrium powder average in blue. Reproduces Fig 3 of
 %
 %                   https://arxiv.org/abs/2609.16352
+%
+% with the axis limits and curve placement of that paper; the paper
+% uses a 170-point Lebedev grid, the nearest grid shipped with Spinach
+% has 194 points.
 %
 % Calculation time: hours
 %
@@ -73,10 +77,10 @@ parameters.timestep=1e-8;
 parameters.nsteps=1e5; 
 parameters.nout=1000;
 
-% Two-angle Lebedev grid, outputs 
+% Two-angle Lebedev grid with 194 points, outputs
 % of every orientation returned separately
 parameters.spins={'E17'}; 
-parameters.grid='leb_2ang_rank_29';
+parameters.grid='leb_2ang_rank_23';
 parameters.needs={'zeeman_op'}; 
 parameters.sum_up=false;
 
@@ -105,17 +109,19 @@ for n=1:numel(answers)
     end
 end
 
-% Plot the single orientation curves, the powder average, and the equilibrium
+% Single orientation curves in grey, the powder
+% average in red, and the equilibrium in blue
 kfigure(); hold on;
 for n=1:numel(answers)
     h_one=plot(fields,answers{n}.obs,'Color',[0.8 0.8 0.8]);
 end
-h_avg=plot(fields,m_avg,'LineWidth',2); 
-h_eq=plot(fields,m_eq,'--','LineWidth',2);
-kgrid; xlim tight; kxlabel('Field, Tesla'); 
-kylabel('Magnetisation, $\mu_B$');
-klegend([h_one h_avg h_eq],{'single orientations','powder average',...
-                            'equilibrium'},'Location','northwest');
+h_avg=plot(fields,m_avg,'r-','LineWidth',1.5);
+h_eq=plot(fields,m_eq,'b-','LineWidth',1.5); hold off;
+kgrid; xlim([0 10]); xticks(0:2.5:10); ylim([0 8]);
+kxlabel('$B$ (T)'); kylabel('Magnetisation ($\mu_B$)');
+klegend([h_one h_avg h_eq],{'QME per orientation',...
+        'QME powder average','Equil powder average'},...
+        'Location','southeast');
 
 end
 

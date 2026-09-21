@@ -2,11 +2,11 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/case_studies/dimer_exchange_types.m`
 - Signature: `dimer_exchange_types()`
-- Total lines: 92
+- Total lines: 114
 
 ## Purpose
 
-Pulsed-field magnetisation of a dimer of two S=1/2 spins with four types of exchange coupling tensor: isotropic, two anisotropic, and antisymmetric, at 0.2 K under a 10 T/ms sweep to 1 T, with spin-phonon relaxation in the generalised Lindblad form of Saito and Miyashita. The out-of-equilibrium curves are compared with the thermal equilibrium magnetisation. Reproduces Fig 4 of https://arxiv.org/abs/2609.16352. Calculation time: minutes.
+Pulsed-field magnetisation of a dimer of two S=1/2 spins with four types of exchange coupling tensor: isotropic, two anisotropic, and antisymmetric, at 0.2 K under a 10 T/ms sweep to 1 T, with spin-phonon relaxation in the generalised Lindblad form of Saito and Miyashita. The out-of-equilibrium curves are compared with the thermal equilibrium magnetisation. Reproduces Fig 4 of https://arxiv.org/abs/2609.16352 with the colours, line styles, and axis limits of that paper. Calculation time: minutes.
 
 ## Physical / mathematical content
 
@@ -18,3 +18,4 @@ Pulsed-field magnetisation of a dimer of two S=1/2 spins with four types of exch
 
 - `zeeman-hilb` formalism, `crystal` context with the `labframe` assumption and `parameters.needs={'zeeman_op'}`, `sys.magnet=1` so that `pulsed_field` receives the Zeeman operator per Tesla; 10 ns stairs, 10^4 stairs, one record every 10 stairs. The spin system is re-created for every tensor, and the total S_z (`operator(spin_system,'Lz','E')`), the coupling mask, and the coil are built after `basis` inside the loop.
 - The equilibrium curve at every recorded field is `equilibrium(spin_system,H)` on the Hilbert space Hamiltonian H0+B*Z, where H0 is the labframe Hamiltonian minus the unit-field Zeeman operator and Z is the Zeeman operator per Tesla from `hamiltonian(assume(spin_system,'labframe','zeeman'))`; the expectation value is `real(hdot(coil,rho))`. The equilibrium values are stored in `answers{n}.obs_eq`.
+- One panel as in the paper: for every tensor the equilibrium curve is solid and the sweep dashed, in red, blue, green, and orange for tensors 1 to 4, on axes of 0 to 1 T and 0 to 2 mu_B, with a transparent legend on the right listing "J_n^dimer Equilibrium" and "J_n^dimer QME".

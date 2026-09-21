@@ -7,6 +7,8 @@
 %
 %                  https://arxiv.org/abs/2609.16352
 %
+% with the colours, line styles, and axis limits of that paper.
+%
 % Calculation time: minutes
 %
 % ilya.kuprov@weizmann.ac.il
@@ -35,8 +37,10 @@ tensors={[0.2 0 0; 0 0.2 0; 0 0 0.2], ...
          [0.2 0 0; 0 0   0; 0 0 0  ], ...
          [0   0 0; 0 0   0; 0 0 0.2], ...
          [0 0.2 0.2; -0.2 0 0.2; -0.2 -0.2 0]};
-labels={'isotropic','anisotropic, $J_{xx}$',...
-        'anisotropic, $J_{zz}$','antisymmetric'};
+
+% Curve colours and legend labels of the paper
+colours={[1 0 0],[0 0 1],[0 0.6 0],[1 0.65 0]}; 
+labels=cell(1,8);
 
 % Super-Ohmic bath, lambda^2*I0 of the paper 
 % (lambda=10 cm^-1, I0=1e-10 ps/rad) in rad/s units
@@ -53,7 +57,7 @@ parameters.spins={'E'}; parameters.orientation=[0 0 0];
 parameters.needs={'zeeman_op'};
 
 % Loop over the exchange tensors
-kfigure(); scale_figure([2.0 1.6]); answers=cell(1,4);
+kfigure(); hold on; answers=cell(1,4);
 for n=1:4
 
     % Spinach coupling convention is S1*A*S2 with A in Hz
@@ -90,13 +94,21 @@ for n=1:4
     end
     answers{n}.obs_eq=m_eq;
 
-    % Plot the sweep and the equilibrium curves
-    subplot(2,2,n); plot(answers{n}.field,answers{n}.obs); hold on;
-    plot(answers{n}.field,m_eq,'--'); hold off; kgrid; xlim tight;
-    kxlabel('Field, Tesla'); kylabel('Magnetisation, $\mu_B$'); ktitle(labels{n});
-    klegend({'10 T/ms sweep','equilibrium'},'Location','northwest'); drawnow;
+    % Equilibrium as a solid line and the sweep as a
+    % dashed line in the colour of the tensor
+    plot(answers{n}.field,m_eq,'-','Color',colours{n},'LineWidth',1.5);
+    plot(answers{n}.field,answers{n}.obs,'--',...
+         'Color',colours{n},'LineWidth',1.5);
+    labels{2*n-1}=['$\mathbf{J}_' num2str(n) '^{\rm dimer}$ Equilibrium'];
+    labels{2*n}=['$\mathbf{J}_' num2str(n) '^{\rm dimer}$ QME']; drawnow;
 
 end
+
+% Axis limits and the transparent legend of the paper
+hold off; kgrid; xlim([0 1]); xticks(0:0.25:1);
+ylim([0 2]); yticks(0:0.5:2);
+kxlabel('$B$ (T)'); kylabel('Magnetisation ($\mu_B$)');
+leg=klegend(labels,'Location','east'); set(leg,'Color','none');
 
 end
 

@@ -3,11 +3,15 @@
 % between neighbours and an axial plus rhombic zero-field splitting on
 % every ion, at 0.6 K under a 50 T/ms sweep to 10 T with spin-phonon
 % relaxation in the generalised Lindblad form of Saito and Miyashita.
-% The full 216-state Hilbert space is used; the paper solves the same
-% problem in 16-state and 26-state effective bases. The thermal equili-
-% brium magnetisation is plotted for comparison. Reproduces Fig 6 of
+% As in the paper, the dynamics runs in the 16-state and 26-state
+% effective bases of mn3_trimer_basis.m, with the Hamiltonian, the
+% Zeeman operator, and the observable projected onto each basis;
+% the thermal equilibrium magnetisation of the full 216-state space
+% is plotted for comparison. Reproduces Fig 6 of
 %
 %                 https://arxiv.org/abs/2609.16352
+%
+% with the colours and axis limits of that paper.
 %
 % Calculation time: minutes
 %
@@ -44,12 +48,8 @@ bas.approximation='none';
 spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
-% Total S_z and the spin-phonon coupling 
-% operator between adjacent total S_z states, 
-% projections rounded to exact half-integers
-Sz=full(operator(spin_system,'Lz','E6')); 
-msz=round(2*diag(Sz))/2;
-parameters.phonon_x=double(abs(msz-msz.')==1);
+% Total S_z operator
+Sz=full(operator(spin_system,'Lz','E6'));
 
 % Super-Ohmic bath, lambda^2*I0 of the paper 
 % (lambda=10 cm^-1, I0=1e-14 ps/rad) in rad/s units
@@ -58,7 +58,7 @@ parameters.phonon_i0=1e2*1e-14*1e12*(1e-12)^2*0.1883651568463003^2;
 
 % Observable: total magnetic 
 % moment along Z in Bohr magnetons
-parameters.coil=-2.0*Sz;
+coil=-2.0*Sz;
 
 % Sweep: 50 T/ms to 10 T in 20 ns 
 % stairs, output every 100 stairs
@@ -67,33 +67,55 @@ parameters.timestep=2e-8;
 parameters.nsteps=1e4; 
 parameters.nout=100;
 
-% Single crystal in the frame of
-% the zero-field splitting tensors
-parameters.spins={'E6'}; 
-parameters.orientation=[0 0 0];
-parameters.needs={'zeeman_op'};
+% Full Hamiltonian at 1 Tesla in the frame of the
+% zero-field splitting tensors, Zeeman operator per Tesla
+spin_system=assume(spin_system,'labframe');
+[I,Q]=hamiltonian(spin_system); H_full=I+orientation(Q,[0 0 0]);
+Z=hamiltonian(assume(spin_system,'labframe','zeeman'));
 
-% Run the simulation
-answer=crystal(spin_system,@pulsed_field,parameters,'labframe');
+% Loop over the 16-state and 26-state
+% effective bases of the paper
+nstates=[16 26]; answers=cell(1,2);
+for n=1:2
 
-% Thermal equilibrium magnetisation at the same fields
-[I,Q]=hamiltonian(assume(spin_system,'labframe'));
-Z=hamiltonian(assume(spin_system,'labframe','zeeman')); 
-H0=I+orientation(Q,[0 0 0]); H0=H0-Z; 
-m_eq=zeros(size(answer.field));
-for k=1:numel(m_eq)
-    H=full(H0+answer.field(k)*Z); 
-    rho=equilibrium(spin_system,(H+H')/2);
-    m_eq(k)=real(hdot(parameters.coil,rho));
+    % Basis states and their total S_z projections
+    [P,msz]=mn3_trimer_basis(spin_system,nstates(n));
+
+    % Hamiltonian, Zeeman operator, and
+    % observable projected onto the basis
+    H=P'*H_full*P; H=full((H+H')/2);
+    parameters.hzeeman=full(P'*Z*P);
+    parameters.hzeeman=(parameters.hzeeman+parameters.hzeeman')/2;
+    parameters.coil=P'*coil*P;
+    parameters.coil=(parameters.coil+parameters.coil')/2;
+
+    % Spin-phonon coupling operator: unit elements
+    % between basis states with adjacent total S_z
+    parameters.phonon_x=double(abs(msz-msz.')==1);
+
+    % Run the simulation
+    answers{n}=pulsed_field(spin_system,parameters,H,[],[]);
+
 end
 
-% Plot the sweep and the equilibrium curves
-kfigure(); plot(answer.field,answer.obs); 
-hold on; plot(answer.field,m_eq,'--'); hold off;
-kgrid; xlim tight; kxlabel('Field, Tesla'); 
-kylabel('Magnetisation, $\mu_B$');
-klegend({'50 T/ms sweep, 216 states','equilibrium'},...
-        'Location','northwest');
+% Thermal equilibrium magnetisation of
+% the full space at the same fields
+H0=H_full-Z; m_eq=zeros(size(answers{1}.field));
+for k=1:numel(m_eq)
+    H=full(H0+answers{1}.field(k)*Z);
+    rho=equilibrium(spin_system,(H+H')/2);
+    m_eq(k)=real(hdot(coil,rho));
+end
+
+% Equilibrium in blue, the 16-state sweep in
+% red, and the 26-state sweep in green
+kfigure(); plot(answers{1}.field,m_eq,'b-','LineWidth',1.5);
+hold on; plot(answers{1}.field,answers{1}.obs,'r-','LineWidth',1.5);
+plot(answers{2}.field,answers{2}.obs,'-','Color',[0 0.6 0],'LineWidth',1.5);
+hold off; kgrid; xlim([0 10]); xticks(0:2.5:10); ylim([0 6]);
+kxlabel('$B$ (T)'); kylabel('Magnetisation ($\mu_B$)');
+klegend({'Equilibrium','QME - 16 states','QME - 26 states'},...
+        'Location','southeast');
 
 end
 

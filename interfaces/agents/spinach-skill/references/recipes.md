@@ -216,8 +216,10 @@ Echo-detected EPR under magic angle spinning is `esr_sol_pulsed/mas_diamond_p1.m
 37 kHz MAS, after Khamrui et al. 2026). The pattern is `singlerot` in
 `zeeman-hilb`, which hands the pulse sequence `experiments/echo_sweep.m` a
 Hamiltonian rotor stack, one matrix per rotor phase, and nothing else: the
-sequence advances through the stack itself from `parameters.rate` (nearest
-element at the middle of each fixed time step, so `rate=0` is the static case),
+sequence steps through the stack itself from `parameters.rate` (nearest
+element at the middle of each fixed time step, phase decreasing with time for
+a positive rate as in the Liouville branch, so `rate=0` is the static case,
+and only the elements visited are exponentiated),
 averages over `parameters.nphases` rotor phases at the start of the sequence,
 which stand in for the crystallite azimuth and let a 400-point two-angle grid
 suffice, selects the electron coherence pathway with `coherence` instead of a

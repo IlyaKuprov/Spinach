@@ -2,13 +2,17 @@
 % magic angle spinning, in Hilbert space, written for the EPR case of
 % a spinning P1 centre in diamond. Two pulses of equal duration are
 % separated by a delay, the carrier is stepped across the sweep, and
-% the complex echo integral is returned at each carrier offset. The sequence steps through the Hamiltonian rotor stack
-% supplied by singlerot.m: at each time step, the stack element near-
-% est to the rotor phase at the middle of the step is used, and the
-% rotor phase at the start of the sequence, which stands in for the
-% crystallite azimuth about the rotor axis, is averaged over. The co-
-% herence pathway of the pulsed spin (-1 after the first pulse, +1
-% after the second) is selected in place of a phase cycle. Syntax:
+% the complex echo integral is returned at each carrier offset. The
+% sequence steps through the Hamiltonian rotor stack supplied by the
+% singlerot.m context: at each time step, the stack element nearest
+% to the rotor phase at the middle of the step is used, the phase de-
+% creasing with time for a positive rate as in the Liouville space
+% branch of singlerot.m, and only the elements visited are exponen-
+% tiated. The rotor phase at the start of the sequence, which stands
+% in for the crystallite azimuth about the rotor axis, is averaged
+% over. The coherence pathway of the pulsed spin (-1 after the first
+% pulse, +1 after the second) is selected in place of a phase cycle.
+% Syntax:
 %
 %           echo=echo_sweep(spin_system,parameters,H,R,K)
 %
@@ -103,15 +107,21 @@ delay_steps=round(parameters.tau/parameters.timestep);
 echo_steps=round(parameters.echo_win/parameters.timestep);
 nsteps=2*pulse_steps+delay_steps+echo_steps;
 
-% Rotor stack advance at the middle of each time step
+% Rotor stack shift at the middle of each time step
 stack_shift=round(parameters.rate*parameters.timestep*((1:nsteps)-1/2)*parameters.spc_dim);
 
 % Rotor stack indices at the start of the sequence
 start_idx=floor((0:(parameters.nphases-1))*parameters.spc_dim/parameters.nphases);
 
-% Free evolution propagators at every rotor phase
+% Rotor stack indices at each time step for each start phase
+idx=mod(start_idx'-stack_shift,parameters.spc_dim)+1;
+
+% Rotor stack elements visited by the sequence
+used=unique(idx(:))';
+
+% Free evolution propagators at the rotor phases visited
 p_free=cell(parameters.spc_dim,1);
-for n=1:parameters.spc_dim
+for n=used
     p_free{n}=propagator(spin_system,H{n},parameters.timestep);
 end
 
@@ -124,9 +134,9 @@ for k=1:parameters.npoints
     % Carrier offset propagator
     p_off=propagator(spin_system,2*pi*offsets(k)*sz,parameters.timestep);
 
-    % Pulse propagators at every rotor phase
+    % Pulse propagators at the rotor phases visited
     p_pulse=cell(parameters.spc_dim,1);
-    for n=1:parameters.spc_dim
+    for n=used
         p_pulse{n}=propagator(spin_system,H{n}+2*pi*offsets(k)*sz+...
                               2*pi*parameters.pulse_frq*sx,parameters.timestep);
     end
@@ -134,13 +144,10 @@ for k=1:parameters.npoints
     % Loop over rotor phases at the start of the sequence
     for j=1:parameters.nphases
 
-        % Rotor stack indices at each time step
-        idx=mod(start_idx(j)+stack_shift,parameters.spc_dim)+1;
-
         % First pulse
         rho=parameters.rho0;
         for s=1:pulse_steps
-            rho=p_pulse{idx(s)}*rho*p_pulse{idx(s)}';
+            rho=p_pulse{idx(j,s)}*rho*p_pulse{idx(j,s)}';
         end
 
         % Select the -1 coherence on the pulsed spin
@@ -148,12 +155,12 @@ for k=1:parameters.npoints
 
         % Interpulse delay
         for s=(pulse_steps+1):(pulse_steps+delay_steps)
-            rho=p_off*p_free{idx(s)}*rho*p_free{idx(s)}'*p_off';
+            rho=p_off*p_free{idx(j,s)}*rho*p_free{idx(j,s)}'*p_off';
         end
 
         % Second pulse
         for s=(pulse_steps+delay_steps+1):(2*pulse_steps+delay_steps)
-            rho=p_pulse{idx(s)}*rho*p_pulse{idx(s)}';
+            rho=p_pulse{idx(j,s)}*rho*p_pulse{idx(j,s)}';
         end
 
         % Select the +1 coherence on the pulsed spin
@@ -161,7 +168,7 @@ for k=1:parameters.npoints
 
         % Integrate the signal over the echo window
         for s=(2*pulse_steps+delay_steps+1):nsteps
-            rho=p_off*p_free{idx(s)}*rho*p_free{idx(s)}'*p_off';
+            rho=p_off*p_free{idx(j,s)}*rho*p_free{idx(j,s)}'*p_off';
             echo(k)=echo(k)+trace(parameters.coil'*rho);
         end
 
@@ -196,6 +203,9 @@ if ~all(cellfun(@(x)all(size(x)==size(H{1})),H))
 end
 if ~all(cellfun(@(x)all(isfinite(nonzeros(x))),H))
     error('the elements of H must have finite entries.');
+end
+if any(cellfun(@(x)norm(x-x',1)>spin_system.tols.liouv_zero*norm(x,1),H))
+    error('the elements of H must be Hermitian.');
 end
 if ~isfield(parameters,'spins')
     error('the pulsed spin must be specified in parameters.spins field.');

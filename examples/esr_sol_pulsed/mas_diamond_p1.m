@@ -1,14 +1,29 @@
-% Powder magic angle spinning EPR spectrum of the P1 substitutional
-% nitrogen defect in diamond at 7 Tesla. The initial condition is a
-% transverse electron magnetisation, and therefore no pulse is need-
-% ed: the single angle spinning context calls acquire.m directly.
+% Two-pulse echo-detected frequency-swept EPR spectra of the P1 sub-
+% stitutional nitrogen defect in diamond, static and under magic ang-
+% le spinning, reproducing Figure 1a of Khamrui et al., J. Phys. Chem.
+% Lett. 2026, <https://doi.org/10.1021/acs.jpclett.6c02108>: 400 ns
+% pulses with 416 kHz nutation frequency, 300 ns interpulse delay, at
+% 6.9 T, static and at 10, 25, and 37 kHz MAS. The carrier is stepped
+% across the spectrum and the integrated echo is recorded at each fre-
+% quency, with the spectra normalised to the static one.
 %
-% The anisotropy is carried by the 14N hyperfine coupling, of which
-% the dipolar part is 10.9 MHz; the two outer hyperfine lines there-
-% fore acquire sideband manifolds, whereas the central line has no
-% hyperfine anisotropy and stays sharp.
+% The anisotropy is carried by the 14N hyperfine coupling, of which the
+% dipolar part is 10.9 MHz; the two outer hyperfine lines dephase under
+% spinning because the resonance frequency of each spin packet changes
+% during the pulse sequence, whereas the central line has no hyperfine
+% anisotropy and survives.
 %
-% Calculation time: minutes
+% The Hamiltonian rotor stack built by singlerot.m in Hilbert space is
+% stepped through by the pulse sequence, which averages over the rotor
+% phase at the start of the sequence and keeps the electron coherence
+% pathway (-1 after the first pulse, +1 after the second) in place of
+% the phase cycle. All P1 centre tensors are axial and coaxial, a two-
+% angle powder grid is therefore sufficient. Relaxation is not inclu-
+% ded because it scales the four spectra by the same factor, which the
+% normalisation removes. Slow spinning needs a high rotor rank because
+% the stack must resolve the rotor phase to within one time step.
+%
+% Calculation time: hours on a 256-core node.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -21,11 +36,11 @@ p1_params.nitrogen='14N';
 % Build the spin system
 [sys,inter]=diamond_p1(p1_params);
 
-% Magnet field
-sys.magnet=7.0;
+% Magnet field, central line at 193.797 GHz
+sys.magnet=6.9156;
 
 % Basis set
-bas.formalism='sphten-liouv';
+bas.formalism='zeeman-hilb';
 bas.approximation='none';
 
 % Spinach housekeeping
@@ -33,33 +48,131 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Rotor parameters
-parameters.rate=35000;
 parameters.axis=[1 1 1];
-parameters.max_rank=11;
+parameters.max_rank=2700;
 
 % Sequence parameters
 parameters.spins={'E'};
-parameters.rho0=state(spin_system,'L+','E');
+parameters.rho0=state(spin_system,'Lz','E');
 parameters.coil=state(spin_system,'L+','E');
-parameters.offset=1.234e7;
+parameters.pulse_dur=400e-9;
+parameters.pulse_frq=416e3;
+parameters.tau=300e-9;
+parameters.echo_win=1.0e-6;
+parameters.timestep=5e-9;
+parameters.nphases=100;
+parameters.offset=0;
 parameters.sweep=3e8;
-parameters.npoints=128;
-parameters.zerofill=512;
+parameters.npoints=601;
+parameters.zerofill=601;
 parameters.grid='rep_2ang_400pts_sph';
-parameters.axis_units='MHz';
+parameters.axis_units='GHz-labframe';
 parameters.verbose=0;
 
+% Spinning rates
+rates=[0 10e3 25e3 37e3];
+
 % Simulation
-fid=singlerot(spin_system,@acquire,parameters,'esr');
+spectra=zeros(parameters.npoints,numel(rates));
+for n=1:numel(rates)
+    parameters.rate=rates(n);
+    spectra(:,n)=abs(singlerot(spin_system,@echo_sweep,parameters,'esr'));
+end
 
-% Apodisation
-fid=apodisation(spin_system,fid,{{'exp',6}});
-
-% Fourier transform
-spectrum=fftshift(fft(fid,parameters.zerofill));
+% Normalisation to the static spectrum
+spectra=spectra/max(spectra(:,1));
 
 % Plotting
-kfigure(); plot_1d(spin_system,real(spectrum),parameters);
+kfigure(); hold on;
+for n=1:numel(rates)
+    plot_1d(spin_system,spectra(:,n),parameters);
+end
+klegend({'static','10 kHz MAS','25 kHz MAS','37 kHz MAS'},'Location','NorthEast');
+kylabel('echo intensity, a.u.');
+
+end
+
+% Integrated two-pulse echo as a function of the carrier offset
+function echo=echo_sweep(spin_system,parameters,H,~,~)
+
+% Carrier offsets across the sweep
+offsets=ft_axis(0,parameters.sweep,parameters.npoints);
+
+% Pulse and offset operators
+Sx=operator(spin_system,'Lx','E');
+Sz=operator(spin_system,'Lz','E');
+
+% Step counts of the pulses, the delay, and the echo window
+pulse_steps=round(parameters.pulse_dur/parameters.timestep);
+delay_steps=round(parameters.tau/parameters.timestep);
+echo_steps=round(parameters.echo_win/parameters.timestep);
+nsteps=2*pulse_steps+delay_steps+echo_steps;
+
+% Rotor stack advance at the middle of each time step
+stack_shift=round(parameters.rate*parameters.timestep*((1:nsteps)-1/2)*parameters.spc_dim);
+
+% Rotor stack indices at the start of the sequence
+start_idx=floor((0:(parameters.nphases-1))*parameters.spc_dim/parameters.nphases);
+
+% Free evolution propagators at every rotor phase
+P_free=cell(parameters.spc_dim,1);
+for n=1:parameters.spc_dim
+    P_free{n}=propagator(spin_system,H{n},parameters.timestep);
+end
+
+% Preallocate the answer
+echo=zeros(1,parameters.npoints);
+
+% Loop over carrier offsets
+for k=1:parameters.npoints
+
+    % Carrier offset propagator, the rotor stack commutes with Sz
+    P_off=propagator(spin_system,2*pi*offsets(k)*Sz,parameters.timestep);
+
+    % Pulse propagators at every rotor phase
+    P_pulse=cell(parameters.spc_dim,1);
+    for n=1:parameters.spc_dim
+        P_pulse{n}=propagator(spin_system,H{n}+2*pi*offsets(k)*Sz+...
+                              2*pi*parameters.pulse_frq*Sx,parameters.timestep);
+    end
+
+    % Loop over rotor phases at the start of the sequence
+    for j=1:parameters.nphases
+
+        % Rotor stack indices at each time step
+        idx=mod(start_idx(j)+stack_shift,parameters.spc_dim)+1;
+
+        % First pulse
+        rho=parameters.rho0;
+        for s=1:pulse_steps
+            rho=P_pulse{idx(s)}*rho*P_pulse{idx(s)}';
+        end
+
+        % Select the -1 coherence on the electron
+        rho=coherence(spin_system,rho,{{'E',-1}});
+
+        % Interpulse delay
+        for s=(pulse_steps+1):(pulse_steps+delay_steps)
+            rho=P_off*P_free{idx(s)}*rho*P_free{idx(s)}'*P_off';
+        end
+
+        % Second pulse
+        for s=(pulse_steps+delay_steps+1):(2*pulse_steps+delay_steps)
+            rho=P_pulse{idx(s)}*rho*P_pulse{idx(s)}';
+        end
+
+        % Select the +1 coherence on the electron
+        rho=coherence(spin_system,rho,{{'E',+1}});
+
+        % Integrate the signal over the echo window
+        for s=(2*pulse_steps+delay_steps+1):nsteps
+            rho=P_off*P_free{idx(s)}*rho*P_free{idx(s)}'*P_off';
+            echo(k)=echo(k)+trace(parameters.coil'*rho);
+        end
+
+    end
+
+end
 
 end
 

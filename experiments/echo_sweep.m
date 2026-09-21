@@ -61,9 +61,11 @@
 %
 % Outputs:
 %
-%    echo - complex echo integral at each carrier offset, averaged
-%           over the rotor phases at the start of the sequence, a
-%           column vector with parameters.npoints elements
+%    echo - complex echo signal integrated over the echo window (a
+%           sum over the time steps multiplied by the time step) and
+%           averaged over the rotor phases at the start of the sequ-
+%           ence, at each carrier offset, a column vector with
+%           parameters.npoints elements
 %
 % Note: the elements of the rotor stack must commute with the elect-
 %       ron Lz operator, as they do under the 'esr' assumption set,
@@ -71,11 +73,13 @@
 %       tor and only the pulse propagators are rebuilt at each car-
 %       rier offset.
 %
-% Note: the rotor stack should be fine enough to advance by at most
-%       one element per time step at the fastest spinning rate used,
-%       so that no rotor phase is skipped; parameters.max_rank of
-%       the context function should be at least 1/(2*rate*timestep)
-%       at that rate.
+% Note: the rotor stack is a table of the Hamiltonian against the
+%       rotor phase, its resolution should match the time step at
+%       the fastest spinning rate used, parameters.max_rank of the
+%       context function of about 1/(2*rate*timestep) at that rate;
+%       a finer stack costs propagators without gaining accuracy be-
+%       yond the time step, a coarser one loses rotor phase resolu-
+%       tion. At slower rates, consecutive steps reuse elements.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -165,8 +169,8 @@ for k=1:parameters.npoints
 
 end
 
-% Average over the rotor phases at the start of the sequence
-echo=echo/parameters.nphases;
+% Integrate over the echo window and average over the rotor phases
+echo=parameters.timestep*echo/parameters.nphases;
 
 end
 

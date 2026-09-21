@@ -20,8 +20,8 @@
 % phase cycle. All P1 centre tensors are axial and coaxial, a two-
 % angle powder grid is therefore sufficient. Relaxation is not inclu-
 % ded because it scales the four spectra by the same factor, which the
-% normalisation removes. The rotor rank is set so that the stack adva-
-% nces by at most one element per time step at 37 kHz.
+% normalisation removes. The rotor rank is set so that the rotor phase
+% resolution of the stack matches the 5 ns time step at 37 kHz.
 %
 % Calculation time: hours on a 256-core node.
 %

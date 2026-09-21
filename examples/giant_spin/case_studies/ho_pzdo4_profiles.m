@@ -9,9 +9,10 @@
 %                  https://arxiv.org/abs/2609.16352
 %
 % with the crystal field parameters, g-factor, temperatures, spectral
-% density, sweep profiles, and stair widths of that paper. As in the
-% paper, the first three profiles are propagated for 1 ms (the first
-% millisecond of the measured 10 ms pulse), the sinusoid for 140 ps.
+% density, sweep profiles, stair widths, panel layout, and axis limits
+% of that paper. As in the paper, the first three profiles are propa-
+% gated for 1 ms (the first millisecond of the measured 10 ms pulse),
+% the sinusoid for ten periods of 46.8 ps.
 %
 % Calculation time: minutes
 %
@@ -80,15 +81,22 @@ profiles={@(t)1e4*t, ...
           @(t)interp1([0 1e-6 1e-5 1e-4 1e-3],[0 0.1 1 5 10],t,'linear'), ...
           @(t)pchip(pulse_t,pulse_b,t), ...
           @(t)0.1*sin(0.134124264765e12*t)};
-temps=[2.0 2.0 2.0 0.001]; 
-steps=[1e-8 1e-8 1e-8 1e-15]; 
-nsteps=[1e5 1e5 1e5 140538]; 
-nout=[100 100 100 59];
-labels={'linear, 10 T/ms','piecewise linear',...
-        'spline of a measured pulse',...
-        'sinusoidal, 0.1 T at the clock gap'};
-tscale=[1e6 1e6 1e6 1e12]; 
-tunits={'$\mu$s','$\mu$s','$\mu$s','ps'};
+temps=[2.0 2.0 2.0 0.001];
+steps=[1e-8 1e-8 1e-8 1e-13];
+nsteps=[1e5 1e5 1e5 4680];
+nout=[100 100 100 4];
+
+% Panel titles, axis limits (time in ps, magnetisation,
+% field), and the temperature and stair labels of the paper
+titles={'(a)','(b)','(c)','(d)'};
+tlims=[0 1e9; 0 1e9; 0 1e9; 0 468];
+tticks={0:2.5e8:1e9,0:2.5e8:1e9,0:2.5e8:1e9,0:93.6:468};
+mlims=[0 6; 0 6; 0 6; -6 6];
+blims=[0 10; 0 10; 0 13; -0.25 0.25];
+labels={{'$T=2$ K','time step $=1\times10^{4}$ ps'},...
+        {'$T=2$ K','time step $=1\times10^{4}$ ps'},...
+        {'$T=2$ K','time step $=1\times10^{4}$ ps'},...
+        {'$T=0.001$ K','time step $=1\times10^{-1}$ ps'}};
 
 % Loop over the profiles
 kfigure(); scale_figure([2.0 1.6]); answers=cell(1,4);
@@ -120,14 +128,18 @@ for n=1:4
     % Run the simulation
     answers{n}=crystal(spin_system,@pulsed_field,parameters,'labframe');
 
-    % Plot the field and the magnetisation against time
-    subplot(2,2,n); yyaxis left; 
-    plot(answers{n}.t*tscale(n),answers{n}.field); 
-    kylabel('Field, Tesla'); yyaxis right; 
-    plot(answers{n}.t*tscale(n),answers{n}.obs); 
-    kylabel('Magnetisation, $\mu_B$');
-    kxlabel(['Time, ' tunits{n}]); 
-    ktitle(labels{n}); kgrid; xlim tight; drawnow;
+    % Magnetisation in red on the left axis, field in
+    % black on the right axis, time in picoseconds
+    subplot(2,2,n); yyaxis left;
+    plot(answers{n}.t*1e12,answers{n}.obs,'r-');
+    ylim(mlims(n,:)); kylabel('$M$ ($\mu_B$)');
+    yyaxis right; plot(answers{n}.t*1e12,answers{n}.field,'k-');
+    ylim(blims(n,:)); kylabel('$B$ (T)');
+    xlim(tlims(n,:)); xticks(tticks{n}); kxlabel('$t$ (ps)');
+    ktitle(titles{n}); kgrid; set(gca,'YColor','k');
+    yyaxis left; set(gca,'YColor','k');
+    text(0.97,0.10,labels{n},'Units','normalized',...
+         'HorizontalAlignment','right','Interpreter','latex'); drawnow;
 
 end
 

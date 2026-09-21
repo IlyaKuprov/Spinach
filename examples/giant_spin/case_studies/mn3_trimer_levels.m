@@ -7,6 +7,11 @@
 %
 %                  https://arxiv.org/abs/2609.16352
 %
+% with the axis limits, colours, and the slight vertical offsets that
+% the paper applies to show the overlapping lines; the 16-state and
+% 26-state effective bases of the paper (common eigenstates of the
+% isotropic exchange and the total S_z) come from mn3_trimer_basis.m.
+%
 % Calculation time: seconds
 %
 % ilya.kuprov@weizmann.ac.il
@@ -48,18 +53,33 @@ spin_system=basis(spin_system,bas);
 Z=hamiltonian(assume(spin_system,'labframe','zeeman')); 
 H0=I+orientation(Q,[0 0 0]); H0=H0-Z;
 
-% Energy levels on a field grid, cm^-1
-fields=linspace(0,10,201); 
-levels=zeros(size(H0,1),numel(fields));
-for k=1:numel(fields)
-    H=full(H0+fields(k)*Z); 
-    levels(:,k)=hz2icm(sort(eig((H+H')/2))/(2*pi));
+% Full space and the two effective bases of the paper
+bases={speye(216),mn3_trimer_basis(spin_system,16),...
+       mn3_trimer_basis(spin_system,26)};
+
+% Energy levels on a field grid, cm^-1, in each basis
+fields=linspace(0,10,201); levels=cell(1,3);
+for b=1:3
+    levels{b}=zeros(size(bases{b},2),numel(fields));
+    for k=1:numel(fields)
+        H=full(bases{b}'*(H0+fields(k)*Z)*bases{b});
+        levels{b}(:,k)=hz2icm(sort(eig((H+H')/2))/(2*pi));
+    end
 end
 
-% Plot the lowest thirty levels relative to the field-free ground state
-kfigure(); plot(fields,levels(1:30,:)-levels(1,1)); 
-kxlabel('Field, Tesla'); kylabel('Energy, cm$^{-1}$');
-kgrid; xlim tight; ylim padded;
+% Levels relative to the field-free ground state, offset
+% by 0.15 cm^-1 per basis to show the overlapping lines
+kfigure(); hold on; handles=gobjects(1,3);
+colours={[0.8 0.8 0.8],[0 0 0],[1 0 0]};
+for b=1:3
+    h=plot(fields,levels{b}-levels{1}(1,1)+0.15*(b-1),'-','Color',colours{b});
+    handles(b)=h(1);
+end
+hold off; kgrid; xlim([0 10]); xticks(0:2:10);
+ylim([-10 10]); yticks(-10:5:10);
+kxlabel('$B$ (T)'); kylabel('$E$ (cm$^{-1}$)');
+klegend(handles,{'All states','16 states','26 states'},...
+        'Location','southwest');
 
 end
 

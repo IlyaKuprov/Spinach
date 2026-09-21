@@ -557,7 +557,15 @@ other than `sys.magnet` from the kernel: build `H=H0+B*Z` with `H0` the
 labframe Hamiltonian minus the unit-field Zeeman operator and `Z` from
 `hamiltonian(assume(spin_system,'labframe','zeeman'))`, then
 `rho=equilibrium(spin_system,H)` and `real(hdot(coil,rho))`, rather than
-re-deriving Boltzmann populations from `eig`. Zero-field splitting via D and
+re-deriving Boltzmann populations from `eig`. The case studies reproduce the
+figures of arXiv:2609.16352 with that paper's axis limits, colours, and state
+counts: the Mn trimer scripts run in the paper's 16-state and 26-state
+effective bases from `mn3_trimer_basis.m` (common eigenstates of the isotropic
+exchange and the total S_z, lowest per S_z or all within 25 cm^-1), which
+`mn3_trimer_magn.m` feeds to `pulsed_field` directly with the projected
+Hamiltonian, `parameters.hzeeman`, and observable after
+`assume(spin_system,'labframe')`, a legitimate way to run a field-sweep
+sequence in a reduced basis without a context. Zero-field splitting via D and
 E (`quartet_levels.m`):
 
 ```matlab

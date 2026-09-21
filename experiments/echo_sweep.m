@@ -220,37 +220,37 @@ end
 if ~isfield(parameters,'pulse_dur')
     error('pulse duration must be specified in parameters.pulse_dur field.');
 end
-if (~isnumeric(parameters.pulse_dur))||(~isreal(parameters.pulse_dur))||...
+if (~isnumeric(parameters.pulse_dur))||(~isreal(parameters.pulse_dur))||(~isfinite(parameters.pulse_dur))||...
    (~isscalar(parameters.pulse_dur))||(parameters.pulse_dur<=0)
-    error('parameters.pulse_dur must be a positive real scalar.');
+    error('parameters.pulse_dur must be a finite positive real scalar.');
 end
 if ~isfield(parameters,'pulse_frq')
     error('pulse nutation frequency must be specified in parameters.pulse_frq field.');
 end
-if (~isnumeric(parameters.pulse_frq))||(~isreal(parameters.pulse_frq))||...
+if (~isnumeric(parameters.pulse_frq))||(~isreal(parameters.pulse_frq))||(~isfinite(parameters.pulse_frq))||...
    (~isscalar(parameters.pulse_frq))||(parameters.pulse_frq<=0)
-    error('parameters.pulse_frq must be a positive real scalar.');
+    error('parameters.pulse_frq must be a finite positive real scalar.');
 end
 if ~isfield(parameters,'tau')
     error('interpulse delay must be specified in parameters.tau field.');
 end
-if (~isnumeric(parameters.tau))||(~isreal(parameters.tau))||...
+if (~isnumeric(parameters.tau))||(~isreal(parameters.tau))||(~isfinite(parameters.tau))||...
    (~isscalar(parameters.tau))||(parameters.tau<0)
-    error('parameters.tau must be a non-negative real scalar.');
+    error('parameters.tau must be a finite non-negative real scalar.');
 end
 if ~isfield(parameters,'echo_win')
     error('echo integration window must be specified in parameters.echo_win field.');
 end
-if (~isnumeric(parameters.echo_win))||(~isreal(parameters.echo_win))||...
+if (~isnumeric(parameters.echo_win))||(~isreal(parameters.echo_win))||(~isfinite(parameters.echo_win))||...
    (~isscalar(parameters.echo_win))||(parameters.echo_win<=0)
-    error('parameters.echo_win must be a positive real scalar.');
+    error('parameters.echo_win must be a finite positive real scalar.');
 end
 if ~isfield(parameters,'timestep')
     error('propagation time step must be specified in parameters.timestep field.');
 end
-if (~isnumeric(parameters.timestep))||(~isreal(parameters.timestep))||...
+if (~isnumeric(parameters.timestep))||(~isreal(parameters.timestep))||(~isfinite(parameters.timestep))||...
    (~isscalar(parameters.timestep))||(parameters.timestep<=0)
-    error('parameters.timestep must be a positive real scalar.');
+    error('parameters.timestep must be a finite positive real scalar.');
 end
 if parameters.pulse_dur<parameters.timestep
     error('parameters.pulse_dur must not be shorter than parameters.timestep.');
@@ -261,9 +261,9 @@ end
 if ~isfield(parameters,'rate')
     error('spinning rate must be specified in parameters.rate field.');
 end
-if (~isnumeric(parameters.rate))||(~isreal(parameters.rate))||...
+if (~isnumeric(parameters.rate))||(~isreal(parameters.rate))||(~isfinite(parameters.rate))||...
    (~isscalar(parameters.rate))
-    error('parameters.rate must be a real scalar.');
+    error('parameters.rate must be a finite real scalar.');
 end
 if ~isfield(parameters,'nphases')
     error('number of rotor phases must be specified in parameters.nphases field.');
@@ -276,9 +276,9 @@ end
 if ~isfield(parameters,'sweep')
     error('carrier sweep width must be specified in parameters.sweep field.');
 end
-if (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||...
+if (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||(~isfinite(parameters.sweep))||...
    (~isscalar(parameters.sweep))||(parameters.sweep<=0)
-    error('parameters.sweep must be a positive real scalar.');
+    error('parameters.sweep must be a finite positive real scalar.');
 end
 if ~isfield(parameters,'npoints')
     error('number of carrier offsets must be specified in parameters.npoints field.');

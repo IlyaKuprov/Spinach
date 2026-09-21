@@ -76,7 +76,7 @@ Two-pulse echo-detected frequency-swept EPR experiment, static or under magic an
 
 ### Local helper functions
 
-- Line 178: `grumble()` — `function grumble(spin_system,parameters,H)`. Requires the `zeeman-hilb` formalism, a cell array `H` of `parameters.spc_dim` square matrices of one dimension that commute with the electron `Lz` to within `spin_system.tols.liouv_zero`, `rho0` and `coil` of that dimension, positive real scalar `pulse_dur`, `pulse_frq`, `echo_win`, `timestep`, and `sweep` with `pulse_dur` and `echo_win` not shorter than `timestep`, non-negative real scalar `tau`, real scalar `rate`, positive integer `nphases` not exceeding `spc_dim`, and integer `npoints` greater than two as `ft_axis()` requires.
+- Line 178: `grumble()` — `function grumble(spin_system,parameters,H)`. Requires the `zeeman-hilb` formalism, a cell array `H` of `parameters.spc_dim` square matrices of one dimension that commute with the electron `Lz` to within `spin_system.tols.liouv_zero`, `rho0` and `coil` of that dimension, finite positive real scalar `pulse_dur`, `pulse_frq`, `echo_win`, `timestep`, and `sweep` with `pulse_dur` and `echo_win` not shorter than `timestep`, finite non-negative real scalar `tau`, finite real scalar `rate`, positive integer `nphases` not exceeding `spc_dim`, and integer `npoints` greater than two as `ft_axis()` requires.
 
 ## Parameters / inputs
 

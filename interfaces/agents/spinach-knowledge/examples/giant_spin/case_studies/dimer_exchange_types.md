@@ -33,4 +33,4 @@ Pulsed-field magnetisation of a dimer of two S=1/2 spins with four types of exch
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `stevens()`, `double()`, `kfigure()`, `scale_figure()`, `icm2hz()`, `create()`, `basis()`, `crystal()`, `hamiltonian()`, `assume()`, `orientation()`, `m_eq()`, `subplot()`, `kxlabel()`, `kylabel()`, `ktitle()`.
+- Called routines in the main body: `stevens()`, `double()`, `kfigure()`, `scale_figure()`, `icm2hz()`, `create()`, `basis()`, `crystal()`, `hamiltonian()`, `assume()`, `orientation()`, `eig()`, `trace()`, `subplot()`, `plot()`, `kxlabel()`, `kylabel()`, `ktitle()`.

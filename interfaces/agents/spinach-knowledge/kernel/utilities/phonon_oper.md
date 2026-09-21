@@ -15,7 +15,7 @@ Thermally dressed spin-phonon coupling operator of the generalised Lindblad diss
 ## Numerical / algorithmic content
 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
+- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -57,4 +57,4 @@ Thermally dressed spin-phonon coupling operator of the generalised Lindblad diss
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `grumble()`, `phi()`, `num()`, `expm1()`, `beta_w()`, `sign()`, `iscolumn()`, `any()`, `ishermitian()`, `isscalar()`.
+- Called routines in the main body: `grumble()`, `max()`, `expm1()`, `abs()`, `sign()`, `zeros()`. `phi`, `num`, and `beta_w` are arrays indexed by logical masks, not calls.

@@ -33,4 +33,4 @@ Powder-averaged pulsed-field magnetisation of the Ho(pzdo)4 metal-organic framew
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `ho_pzdo4_params()`, `stev()`, `bkq()`, `stev2sph()`, `icm2hz()`, `create()`, `basis()`, `stevens()`, `double()`, `powder()`, `hamiltonian()`, `assume()`, `orientation()`, `fields()`, `m_eq()`, `kfigure()`.
+- Called routines in the main body: `ho_pzdo4_params()`, `stev2sph()`, `icm2hz()`, `create()`, `basis()`, `stevens()`, `double()`, `powder()`, `hamiltonian()`, `assume()`, `orientation()`, `eig()`, `trace()`, `kfigure()`, `plot()`.

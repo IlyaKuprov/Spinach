@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/pulsed_field.m`
 - Signature: `answer=pulsed_field(spin_system,parameters,H,R,K) %#ok<INUSD>`
-- Total lines: 221
+- Total lines: 225
 
 ## Purpose
 
@@ -62,9 +62,10 @@ Magnetisation dynamics under a time-dependent magnetic field along the Z axis of
 - Zeeman operator are built consistently; the powder context
 - must be called with parameters.sum_up=false because the
 - answer is a structure; additional rotating frames (parame-
-- ters.rframes) are not supported because the field operator
-- is added in the laboratory frame. The temperature of the
-- phonon bath is inter.temperature.
+- ters.rframes) and frequency offsets (parameters.offset) are
+- not supported because the field operator is added in the
+- laboratory frame. The temperature of the phonon bath is
+- inter.temperature.
 - Note: sys.magnet must be 1 Tesla, so that parameters.hzeeman is
 - the Zeeman operator per Tesla; the Hamiltonian received from
 - the context then contains the Zeeman term at 1 Tesla, which
@@ -92,4 +93,4 @@ Magnetisation dynamics under a time-dependent magnetic field along the Z axis of
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `grumble()`, `iscell()`, `isscalar()`, `phonon_oper()`, `dissip()`, `report()`, `num2str()`, `strcmp()`, `isfield()`, `any()`, `ishermitian()`.
+- Called routines in the main body: `grumble()`, `phonon_oper()`, `report()`, `eig()`, `trace()`, `num2str()`. The dissipator is applied through the anonymous function `dissip`, rebuilt on every stair from the dressed operator in the eigenbasis.

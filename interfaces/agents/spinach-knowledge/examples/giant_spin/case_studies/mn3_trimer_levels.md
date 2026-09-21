@@ -33,4 +33,4 @@ Zeeman energy level diagram of the (CH6N3)2MnCl4 molecular crystal, a linear tri
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `icm2hz()`, `zfs2mat()`, `create()`, `basis()`, `hamiltonian()`, `assume()`, `orientation()`, `fields()`, `levels()`, `hz2icm()`, `kfigure()`, `kxlabel()`, `kylabel()`, `save()`.
+- Called routines in the main body: `icm2hz()`, `zfs2mat()`, `create()`, `basis()`, `hamiltonian()`, `assume()`, `orientation()`, `eig()`, `sort()`, `hz2icm()`, `kfigure()`, `plot()`, `kxlabel()`, `kylabel()`, `save()`.

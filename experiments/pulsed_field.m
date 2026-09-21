@@ -72,9 +72,10 @@
 %       Zeeman operator are built consistently; the powder context
 %       must be called with parameters.sum_up=false because the
 %       answer is a structure; additional rotating frames (parame-
-%       ters.rframes) are not supported because the field operator
-%       is added in the laboratory frame. The temperature of the
-%       phonon bath is inter.temperature.
+%       ters.rframes) and frequency offsets (parameters.offset) are
+%       not supported because the field operator is added in the
+%       laboratory frame. The temperature of the phonon bath is
+%       inter.temperature.
 %
 % Note: sys.magnet must be 1 Tesla, so that parameters.hzeeman is
 %       the Zeeman operator per Tesla; the Hamiltonian received from
@@ -191,12 +192,15 @@ if isempty(coils)
     error('parameters.coil must contain at least one observable operator.');
 end
 for k=1:numel(coils)
-    if (~isnumeric(coils{k}))||any(size(coils{k})~=size(H))
-        error('every coil must be a matrix of the same dimension as H.');
+    if (~isnumeric(coils{k}))||any(size(coils{k})~=size(H))||any(~isfinite(coils{k}(:)))
+        error('every coil must be a matrix of the same dimension as H with finite elements.');
     end
 end
 if isfield(parameters,'rframes')&&(~isempty(parameters.rframes))
     error('additional rotating frames are not supported by this function.');
+end
+if isfield(parameters,'offset')&&any(parameters.offset(:)~=0)
+    error('frequency offsets are not supported by this function.');
 end
 if isfield(parameters,'sum_up')&&parameters.sum_up
     error('the powder context must be called with parameters.sum_up=false.');

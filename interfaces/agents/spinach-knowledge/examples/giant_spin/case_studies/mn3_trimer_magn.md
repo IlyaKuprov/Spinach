@@ -33,4 +33,4 @@ Pulsed-field magnetisation of the (CH6N3)2MnCl4 molecular crystal, a linear trim
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `icm2hz()`, `zfs2mat()`, `create()`, `basis()`, `operator()`, `double()`, `crystal()`, `hamiltonian()`, `assume()`, `orientation()`, `m_eq()`, `kfigure()`, `kxlabel()`, `kylabel()`, `klegend()`, `save()`.
+- Called routines in the main body: `icm2hz()`, `zfs2mat()`, `create()`, `basis()`, `operator()`, `double()`, `crystal()`, `hamiltonian()`, `assume()`, `orientation()`, `eig()`, `trace()`, `kfigure()`, `plot()`, `kxlabel()`, `kylabel()`, `klegend()`, `save()`.

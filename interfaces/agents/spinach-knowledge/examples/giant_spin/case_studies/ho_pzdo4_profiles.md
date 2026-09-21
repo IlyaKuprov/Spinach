@@ -33,4 +33,4 @@ Pulsed-field magnetisation of the Ho(pzdo)4 metal-organic framework, a J=8 giant
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `ho_pzdo4_params()`, `stev()`, `bkq()`, `stev2sph()`, `icm2hz()`, `stevens()`, `double()`, `pchip()`, `kfigure()`, `scale_figure()`, `temps()`, `create()`, `basis()`, `steps()`, `nsteps()`, `nout()`.
+- Called routines in the main body: `ho_pzdo4_params()`, `stev2sph()`, `icm2hz()`, `stevens()`, `double()`, `pchip()`, `kfigure()`, `scale_figure()`, `create()`, `basis()`, `crystal()`, `subplot()`, `plot()`, `kylabel()`.

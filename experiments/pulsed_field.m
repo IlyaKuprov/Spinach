@@ -9,7 +9,7 @@
 % the dissipator times the stair width, and the phases again. The
 % dissipator times the stair width must be small; the coherent part
 % is treated exactly for any stair width. The dissipator is applied
-% as Hilbert space matrix products (see phonon_oper.m), so the cost
+% as Hilbert space matrix products (see rlx_phonon.m), so the cost
 % of a stair is cubic in the dimension of the Hilbert space. Syntax:
 %
 %          answer=pulsed_field(spin_system,parameters,H,R,K)
@@ -126,7 +126,7 @@ for n=1:parameters.nsteps
 
     % Spin-phonon coupling operator and its thermally dressed form in the eigenbasis
     XE=V'*parameters.phonon_x*V; XE=(XE+XE')/2;
-    RE=phonon_oper(spin_system,E,XE,parameters.phonon_i0,parameters.phonon_alpha,spin_system.rlx.temperature);
+    RE=rlx_phonon(spin_system,diag(E),XE,parameters.phonon_i0,parameters.phonon_alpha,spin_system.rlx.temperature,'hilb');
 
     % Dissipator as matrix products in the eigenbasis
     dissip=@(rho)-pi*(XE*(RE*rho)-(RE*rho)*XE+rho*(RE'*XE)-(XE*rho)*RE');

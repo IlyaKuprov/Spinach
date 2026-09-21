@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Magnetisation dynamics under a time-dependent magnetic field along the Z axis of the laboratory frame with spin-phonon relaxation, as measured in pulsed-field magnetometry of molecular magnets. The field profile is replaced by a staircase; on each stair the Hamiltonian is constant, the spin-phonon dissipator is rebuilt in the eigenbasis of that Hamiltonian, and the density matrix is propagated in that eigenbasis by a symmetric split: exact coherent phases for half a stair, the dissipative step to second order in the dissipator times the stair width, and the phases again. The dissipator times the stair width must be small; the coherent part is treated exactly for any stair width. The dissipator is applied as Hilbert space matrix products (see phonon_oper.m), so the cost of a stair is cubic in the dimension of the Hilbert space.
+Magnetisation dynamics under a time-dependent magnetic field along the Z axis of the laboratory frame with spin-phonon relaxation, as measured in pulsed-field magnetometry of molecular magnets. The field profile is replaced by a staircase; on each stair the Hamiltonian is constant, the spin-phonon dissipator is rebuilt in the eigenbasis of that Hamiltonian, and the density matrix is propagated in that eigenbasis by a symmetric split: exact coherent phases for half a stair, the dissipative step to second order in the dissipator times the stair width, and the phases again. The dissipator times the stair width must be small; the coherent part is treated exactly for any stair width. The dissipator is applied as Hilbert space matrix products (see rlx_phonon.m), so the cost of a stair is cubic in the dimension of the Hilbert space.
 
 ## Physical / mathematical content
 
@@ -89,8 +89,8 @@ Magnetisation dynamics under a time-dependent magnetic field along the Z axis of
 - the dissipator times the stair width, and the phases again. The
 - dissipator times the stair width must be small; the coherent part
 - is treated exactly for any stair width. The dissipator is applied
-- as Hilbert space matrix products (see phonon_oper.m), so the cost
+- as Hilbert space matrix products (see rlx_phonon.m), so the cost
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines in the main body: `grumble()`, `phonon_oper()`, `report()`, `eig()`, `trace()`, `num2str()`. The dissipator is applied through the anonymous function `dissip`, rebuilt on every stair from the dressed operator in the eigenbasis.
+- Called routines in the main body: `grumble()`, `rlx_phonon()`, `report()`, `eig()`, `diag()`, `trace()`, `num2str()`. The dissipator is applied through the anonymous function `dissip`, rebuilt on every stair from the dressed operator that `rlx_phonon` returns in the `'hilb'` form for the diagonal matrix of the stair eigenvalues and the coupling operator in that eigenbasis.

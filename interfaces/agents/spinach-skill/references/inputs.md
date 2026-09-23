@@ -271,8 +271,8 @@ merged descriptor with one `unique` call; `lin2lm` and `lm2lin` accept those
 integer classes and return the same class; `superop` matches source and
 destination states through a joint `unique` row index, on a dense integer
 copy of the passive columns when that copy is smaller than the sparse block
-and on the sparse block otherwise. User code that reads `bas.basis` sees
-sparse double as before.
+and on the sparse block otherwise. User code that reads
+`spin_system.bas.basis` sees sparse double as before.
 
 ## Unit conversions on the way in
 

@@ -31,7 +31,3 @@ Basis set control. This is the second mandatory function (after create.m) that m
 
 - spin_system - primary Spinach data structure, updated with the basis set and related information
 - Note: it is important to understand the factors that influence basis set selection in spin dynamics simulations - see our paper for further information on this subject.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `banner()`, `grumble()`, `cellfun()`, `summary_basis_opts()`, `report()`, `dfpt()`, `nchoosek()`, `prune_subgraphs()`, `unique()`, `lin2lm()`, `repelem()`, `sparse()`, `unihash()`, `distrib_dim()`, `sortrows()`, `summary_basis()`, `symmetry()`, `ist_product_table()`, `md5_hash()`.

@@ -65,6 +65,9 @@ end
 if any(size(L)~=size(M))
     error('array dimensions are inconsistent.');
 end
+if isinteger(L)&&any(double(L(:))>=floor(sqrt(flintmax)))
+    error('integer ranks that large give indices that are not exactly representable in double precision.');
+end
 end
 
 % A casual stroll through the lunatic asylum shows that faith 

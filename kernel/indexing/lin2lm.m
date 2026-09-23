@@ -38,8 +38,11 @@ function [L,M]=lin2lm(I)
 % Check consistency
 grumble(I);
 
-% Get the ranks and projections in double precision
-L=fix(sqrt(double(I))); M=L.^2+L-double(I);
+% Get the ranks in double precision, stepping back where the root rounded up
+L=fix(sqrt(double(I))); L=L-(L.^2>double(I));
+
+% Get the projections
+M=L.^2+L-double(I);
 
 % Make sure the conversion is correct
 if nnz(lm2lin(L,M)~=double(I))>0

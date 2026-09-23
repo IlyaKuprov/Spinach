@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/indexing/lin2lm.m`
 - Signature: `[L,M]=lin2lm(I)`
-- Total lines: 67
+- Total lines: 75
 
 ## Purpose
 

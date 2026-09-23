@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/operators/superop.m`
 - Signature: `A=superop(spin_system,opspec,side)`
-- Total lines: 215
+- Total lines: 222
 
 ## Purpose
 
@@ -17,7 +17,7 @@ Sided product superoperator in the spherical tensor basis set. Returns superoper
 
 - For every source pattern of the active spins, the basis states carrying that pattern are located by column comparisons on the sparse descriptor `spin_system.bas.basis`, and the same is done for the destination pattern; when the two subspaces coincide state for state, the superoperator elements are written directly.
 - Otherwise the source rows are matched to the destination rows over the columns of the passive spins through a joint `unique(...,'rows')` index: the two subspaces are stacked, every distinct row receives one index, and a source state goes to the destination state with the same index. This is exact and replaces the earlier `ismember(...,'rows')` call, which is many times slower on sparse rows.
-- The passive columns are copied once per call into a dense array of the smallest signed integer class that covers every state index of the system (`min_int_type` of the largest multiplicity squared minus one) whenever that copy takes fewer bytes than the sparse block (one byte per element against sixteen per non-zero, the same rule as `basis.m`); integer rows match faster still, and protein-scale low-correlation bases, where the dense copy would be larger, stay sparse.
+- The passive columns are copied once per call into a dense array of the smallest signed integer class that covers every state index of the system (`min_int_type` of the largest multiplicity squared minus one) whenever that copy takes fewer bytes than the sparse block (one byte per element for `int8`, two for `int16`, against sixteen per non-zero, the same rule as `basis.m`); integer rows match faster still, and protein-scale low-correlation bases, where the dense copy would be larger, stay sparse.
 - The result is returned in XYZ triplet form (row, column, value) for the caller to assemble; an empty operator is returned as a single zero triplet.
 - The grumbler requires a `sphten-liouv` basis and an integer opspec row with one entry per spin, each below the squared multiplicity of that spin.
 

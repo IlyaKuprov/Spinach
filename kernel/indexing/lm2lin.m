@@ -26,8 +26,9 @@
 %             sparsity as L
 %
 % Note: the arithmetic runs in the class of the inputs, in the order
-%       that cannot overflow an integer class holding every index of
-%       the highest rank present; the grumbler enforces that bound.
+%       that cannot overflow. Integer classes are admitted up to the
+%       last rank they hold completely, 10 for int8 and 180 for int16,
+%       the rule by which basis.m picks them.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -62,7 +63,7 @@ if any(L(:)<0)
     error('unacceptable total angular momentum.');
 end
 if isinteger(L)&&any(L(:)>floor(sqrt(double(intmax(class(L)))+1))-1)
-    error('the integer class of L cannot hold the indices of its highest rank.');
+    error('integer ranks beyond the last one that the class holds completely.');
 end
 end
 

@@ -61,7 +61,17 @@ catch
     overflow_refused=true;
 end
 result=test_true(result,'lm2lin refuses overflow',overflow_refused,...
-                 'ranks whose indices do not fit the integer class of L must be refused');
+                 'ranks beyond the last one that the integer class of L holds completely must be refused');
+try
+    lin2lm(int8(121)); partial_refused=false;
+catch
+    partial_refused=true;
+end
+result=test_true(result,'lin2lm refuses partial rank',partial_refused,...
+                 'integer indices beyond the last rank that the class holds completely must be refused');
+[Lb,Mb]=lin2lm(int64(9007199136250224));
+result=test_true(result,'lin2lm root step-back',isequal([Lb Mb],int64([94906264 -94906264])),...
+                 'a floating-point root that rounds up to the next integer must be stepped back');
 
 % Wigner D-function indexing is one-based and ordered by increasing L, then M, then N
 J=1:35;

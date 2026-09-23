@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/basis.m`
 - Signature: `spin_system=basis(spin_system,bas)`
-- Total lines: 1015
+- Total lines: 1005
 
 ## Purpose
 
@@ -18,8 +18,8 @@ Basis set control. This is the second mandatory function (after create.m) that m
 ## Numerical / algorithmic content
 
 - Subgraph generation uses `dfpt` on the substance blocks of the connectivity and proximity matrices; empty, identical, and enclosed subgraphs are removed with `unique` and `prune_subgraphs` before the descriptor is built.
-- The descriptor of each subgraph is built densely in the direct product order with `repelem`/`repmat` in the smallest signed integer class that holds every single-spin state index of the system (`min_int_type` of the largest multiplicity squared minus one: `int8` up to multiplicity 11, `int16` above), filtered through the integer-aware `lin2lm`, and embedded into the full spin index as a sparse double array.
-- Duplicate states across subgraphs are removed and the basis is sorted lexicographically in one `unique(...,'rows')` call; when a dense integer copy of the merged descriptor takes fewer bytes than its sparse form (one byte per element for `int8`, two for `int16`, against sixteen per non-zero), the call runs on that dense copy and the result is converted back, otherwise it runs on the sparse matrix. The stored `spin_system.bas.basis` is sparse double in either case, so every consumer sees the same descriptor as before.
+- The descriptor of each subgraph is built densely in the direct product order with `repelem`/`repmat` in the smallest signed integer class that holds every single-spin state index of the system (`min_int_type` of the largest multiplicity squared minus one: `int8` up to multiplicity 11, `int16` above); the state lists, the blocks, and the `lin2lm` projections used by the filters all carry that class, and each finished block is embedded into the full spin index as a sparse single array.
+- The blocks are stacked under a unit state row, and duplicate states across subgraphs are removed and the basis sorted lexicographically in one `unique(...,'rows')` call on the sparse single matrix. The stored `spin_system.bas.basis` is sparse single: one row per state, one column per spin, and the linear index of the single-spin irreducible spherical tensor in each entry.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 
 ## Parameters / inputs

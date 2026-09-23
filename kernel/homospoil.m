@@ -76,7 +76,7 @@ switch zqc_flag
     case 'keep'
         
         % Find the states that have zero carrier frequency and kill everything else
-        rho(abs(sum(repmat(spin_system.inter.basefrqs,size(spin_system.bas.basis,1),1).*M,2))>1e-6,:)=0;
+        rho(abs(sum(repmat(spin_system.inter.basefrqs,size(spin_system.bas.basis,1),1).*double(M),2))>1e-6,:)=0;
     
     case 'destroy'
         

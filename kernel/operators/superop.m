@@ -119,14 +119,6 @@ basis_cols=spin_system.bas.basis(:,active_spins);
 % Lift the basis columns corresponding to the other spins
 basis_rest=spin_system.bas.basis; basis_rest(:,active_spins)=[];
 
-% Dense integer copy of those columns when it is smaller than the sparse one
-idx_class=min_int_type(max([1 spin_system.comp.mults.^2-1]),'signed');
-if numel(basis_rest)*numel(typecast(zeros(1,idx_class),'uint8'))<=16*nnz(basis_rest)+8*(size(basis_rest,2)+1)
-    [rows,cols,vals]=find(basis_rest);
-    basis_rest=zeros(size(basis_rest),idx_class);
-    basis_rest(sub2ind(size(basis_rest),rows,cols))=vals;
-end
-
 % For commutation superoperators remove commuting paths
 if ismember(side,{'leftofcomm','rightofcomm'})
     kill_mask=(sum(from,2)==0)|(sum(to,2)==0);

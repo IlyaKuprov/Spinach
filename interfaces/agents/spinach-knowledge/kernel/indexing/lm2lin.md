@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/indexing/lm2lin.m`
 - Signature: `I=lm2lin(L,M)`
-- Total lines: 83
+- Total lines: 73
 
 ## Purpose
 
@@ -14,8 +14,8 @@ Converts L,M indexing of spin states into linear indexing. In the linear indexin
 
 ## Numerical / algorithmic content
 
-- Integer rank and projection arrays are evaluated in int64 arithmetic, which is exact for every rank below the square root of `intmax('int64')` (about 3e9), and the result is cast back to the class of L after a check that it fits that class; the intermediate L^2+L therefore never saturates a narrow integer class or loses precision in double, and every pair returned by `lin2lm` for an accepted integer input round-trips exactly. Double and single inputs are evaluated in their own class and keep their sparsity.
-- The grumbler requires real integer-valued arrays of the same size with non-negative ranks and projections within plus or minus the rank, and refuses integer ranks at or above the square root of `intmax('int64')`.
+- The index is evaluated as `L^2-M+L` in the class of the inputs, an order in which the intermediate never exceeds the result, so no integer class that holds the result can overflow; double, single, and sparse inputs keep their class and sparsity, and every pair returned by `lin2lm` round-trips exactly.
+- The grumbler requires real integer-valued arrays of the same size and class, non-negative ranks, projections within plus or minus the rank, and, for integer classes, ranks no higher than the largest rank whose complete index range fits the class (10 for `int8`, 180 for `int16`, 46339 for `int32`); this is the bound by which `basis.m` chooses the descriptor class.
 
 ## Syntax
 

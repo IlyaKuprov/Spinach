@@ -598,7 +598,7 @@ switch spin_system.rlx.keep
         
         % Compute base frequencies of basis states
         [~,M]=lin2lm(spin_system.bas.basis);
-        frequencies=sum(spin_system.inter.basefrqs.*M,2);
+        frequencies=sum(spin_system.inter.basefrqs.*double(M),2);
         
         % Index the relaxation superoperator
         [rows,cols,vals]=find(R);

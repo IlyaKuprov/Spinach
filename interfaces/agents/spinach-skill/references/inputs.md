@@ -262,17 +262,17 @@ electrons and nuclei and nothing else in the system. `IK-SBS` requires both
 spins and bosonic modes (`C`, `V`, or `T` particles).
 
 The stored `sphten-liouv` descriptor `spin_system.bas.basis` is a sparse
-double matrix with one row per state and one column per spin, holding the
+single matrix with one row per state and one column per spin, holding the
 linear index of each single-spin irreducible spherical tensor (0 for the
-unit state). Internally, `basis` builds the per-subgraph descriptor blocks in
-the smallest signed integer class that covers every state index of the system
-(`int8` up to multiplicity 11, `int16` above) and deduplicates and sorts the
-merged descriptor with one `unique` call; `lin2lm` and `lm2lin` accept those
-integer classes and return the same class; `superop` matches source and
-destination states through a joint `unique` row index, on a dense integer
-copy of the passive columns when that copy is smaller than the sparse block
-and on the sparse block otherwise. User code that reads
-`spin_system.bas.basis` sees sparse double as before.
+unit state). Internally, `basis` decides once, from the largest multiplicity
+in the system, the signed integer class that holds every single-spin state
+index (`int8` up to multiplicity 11, `int16` above), builds the per-subgraph
+descriptor blocks in that class, and deduplicates and sorts the stacked
+descriptor with one `unique` call. `lin2lm` and `lm2lin` return the class and
+sparsity of their input, so user code that calls them on the descriptor gets
+sparse single ranks and projections; code that multiplies projections by
+frequencies should promote them to double first, as `relaxation` and
+`homospoil` do.
 
 ## Unit conversions on the way in
 

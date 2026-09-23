@@ -14,6 +14,7 @@ Minimum integer data type sufficient to store the specified value. Useful in man
 
 ## Numerical / algorithmic content
 
+- The bound is inclusive and the smallest accepted maximum is zero, which still needs one byte: `basis.m` asks for the class of the largest single-spin state index, `max(mults)^2-1`, and that is zero for a system of multiplicity-one ghost spins.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 

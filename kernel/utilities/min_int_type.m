@@ -89,8 +89,8 @@ end
 % Consistency enforcement
 function grumble(max_val,issigned)
 if (~isnumeric(max_val))||(~isscalar(max_val))||...
-   (~isreal(max_val))||(mod(max_val,1)~=0)||(max_val<1)
-    error('max_val must be a positive real integer.');
+   (~isreal(max_val))||(mod(max_val,1)~=0)||(max_val<0)
+    error('max_val must be a non-negative real integer.');
 end
 if (~ischar(issigned))||(~ismember(issigned,{'signed','unsigned'}))
     error('valid valued for issigned are ''signed'' and ''unsigned''.');

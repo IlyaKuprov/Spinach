@@ -25,10 +25,9 @@
 %             corresponding to L=0, M=0; same class and
 %             sparsity as L
 %
-% Note: integer inputs are evaluated in int64 arithmetic, which is exact
-%       for every rank below the square root of intmax('int64'), so that
-%       the intermediate L^2+L cannot saturate a narrow integer class or
-%       lose precision in double.
+% Note: the arithmetic runs in the class of the inputs, in the order
+%       that cannot overflow an integer class holding every index of
+%       the highest rank present; the grumbler enforces that bound.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -39,20 +38,8 @@ function I=lm2lin(L,M)
 % Check consistency
 grumble(L,M);
 
-% Get the linear index, exactly in int64 for integer ranks
-if isinteger(L)
-    I=int64(L).^2+int64(L)-int64(M);
-else
-    I=L.^2+L-M;
-end
-
-% Make sure the index fits the class of the ranks
-if isinteger(L)&&any(I(:)>intmax(class(L)))
-    error('the linear index does not fit the integer class of L.');
-end
-
-% Return in the class of the ranks
-I=cast(I,'like',L);
+% Linear index, in the evaluation order that cannot overflow
+I=L.^2-M+L;
 
 end
 
@@ -62,17 +49,20 @@ if (~isnumeric(L))||(~isreal(L))||any(mod(L(:),1)~=0)||...
    (~isnumeric(M))||(~isreal(M))||any(mod(M(:),1)~=0)
     error('all elements of the inputs must be real integers.');
 end
+if ~strcmp(class(L),class(M))
+    error('L and M must have the same class.');
+end
+if any(size(L)~=size(M))
+    error('array dimensions are inconsistent.');
+end
 if any(abs(M(:))>L(:))
     error('unacceptable projection number.');
 end
 if any(L(:)<0)
     error('unacceptable total angular momentum.');
 end
-if any(size(L)~=size(M))
-    error('array dimensions are inconsistent.');
-end
-if isinteger(L)&&any(double(L(:))>=floor(sqrt(double(intmax('int64')))))
-    error('integer ranks that large overflow int64 arithmetic.');
+if isinteger(L)&&any(L(:)>floor(sqrt(double(intmax(class(L)))+1))-1)
+    error('the integer class of L cannot hold the indices of its highest rank.');
 end
 end
 

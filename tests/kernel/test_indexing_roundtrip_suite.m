@@ -42,10 +42,12 @@ result=test_true(result,'lm2lin int8 inverse',isequal(lm2lin(L8,M8),int8(I)),...
                  'integer LM indexing must round-trip exactly in the input class');
 [L16,M16]=lin2lm(int16(0:255));
 result=test_true(result,'lin2lm int16 no saturation',isequal(lm2lin(L16,M16),int16(0:255))&&(min(M16)==-15),...
-                 'the intermediate L^2+L must not saturate the integer class of the input');
-[Ls,Ms]=lin2lm(sparse([0 1 2 3; 0 0 5 8]));
-result=test_true(result,'lin2lm sparse',issparse(Ls)&&issparse(Ms)&&isequal(full(Ms),[0 1 0 -1; 0 0 1 -2]),...
-                 'sparse descriptors must give sparse ranks and projections');
+                 'the integer arithmetic must not saturate the class of the input');
+result=test_true(result,'lm2lin int8 top rank',isequal(lm2lin(int8(10),int8(-10)),int8(120)),...
+                 'the highest rank whose indices fit the class must be accepted');
+[Ls,Ms]=lin2lm(sparse(single([0 1 2 3; 0 0 5 8])));
+result=test_true(result,'lin2lm sparse single',issparse(Ls)&&issparse(Ms)&&isa(Ms,'single')&&isequal(full(Ms),[0 1 0 -1; 0 0 1 -2]),...
+                 'sparse single descriptors must give sparse single ranks and projections');
 try
     lin2lm(uint8(1:3)); unsigned_refused=false;
 catch
@@ -53,6 +55,13 @@ catch
 end
 result=test_true(result,'lin2lm refuses unsigned',unsigned_refused,...
                  'projections are signed, so unsigned integer inputs must be refused');
+try
+    lm2lin(int8(11),int8(0)); overflow_refused=false;
+catch
+    overflow_refused=true;
+end
+result=test_true(result,'lm2lin refuses overflow',overflow_refused,...
+                 'ranks whose indices do not fit the integer class of L must be refused');
 
 % Wigner D-function indexing is one-based and ordered by increasing L, then M, then N
 J=1:35;

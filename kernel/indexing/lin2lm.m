@@ -25,9 +25,9 @@
 %       M   - projections of the spin states, same
 %             class and sparsity as the input
 %
-% Note: the arithmetic runs in double precision so that integer inputs
-%       cannot saturate; unsigned integer classes are refused because
-%       projections are negative for half of the states.
+% Note: the square root is the only floating-point step; the rest
+%       of the arithmetic runs in the class of the input, in the
+%       order that cannot overflow an integer class that holds I.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -38,19 +38,16 @@ function [L,M]=lin2lm(I)
 % Check consistency
 grumble(I);
 
-% Get the ranks in double precision, stepping back where the root rounded up
-L=fix(sqrt(double(I))); L=L-(L.^2>double(I));
+% Ranks: integer part of the square root, in the class of the input
+L=cast(fix(sqrt(double(I))),'like',I);
 
-% Get the projections
-M=L.^2+L-double(I);
+% Projections, in the evaluation order that cannot overflow
+M=L.^2-I+L;
 
-% Make sure the conversion is correct
-if nnz(lm2lin(L,M)~=double(I))>0
+% Make sure the root did not round across an integer
+if any(abs(M(:))>L(:))
     error('IEEE arithmetic breakdown, please contact the developer.');
 end
-
-% Return in the class of the input
-L=cast(L,'like',I); M=cast(M,'like',I);
 
 end
 
@@ -61,9 +58,6 @@ if (~isnumeric(I))||(~isreal(I))||any(mod(I(:),1)~=0)||any(I(:)<0)
 end
 if isinteger(I)&&(intmin(class(I))==0)
     error('unsigned integer input is not supported, projections are signed.');
-end
-if isinteger(I)&&any(I(:)>flintmax)
-    error('integer inputs above flintmax are not exactly representable in double precision.');
 end
 end
 

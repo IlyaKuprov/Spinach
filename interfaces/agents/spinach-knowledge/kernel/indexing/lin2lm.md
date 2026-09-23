@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/indexing/lin2lm.m`
 - Signature: `[L,M]=lin2lm(I)`
-- Total lines: 75
+- Total lines: 69
 
 ## Purpose
 
@@ -14,9 +14,9 @@ Converts linear indexing of spin states into L,M indexing. In the linear indexin
 
 ## Numerical / algorithmic content
 
-- The rank is `fix(sqrt(I))`, stepped back by one wherever the floating point square root of an index just below a perfect square rounded up, and the projection is `L^2+L-I`; both are evaluated in double precision whatever the class of the input, and the pair is checked against `lm2lin` before it is returned; the outputs are cast back to the class of the input, so a sparse double descriptor gives sparse double ranks and projections, and an `int8` or `int16` descriptor block gives ranks and projections of the same class.
+- The rank is the integer part of `sqrt(I)`, the one floating-point step, taken in double precision and returned in the class of the input; the projection is then evaluated as `L^2-I+L` in that class, an order in which every intermediate lies between -2L and L, so no signed integer class that holds I can overflow. A final check that every projection lies within plus or minus the rank catches a square root that rounded across an integer.
 - Integer inputs are accepted only in signed classes: projections are negative for half of the states of every rank, and an unsigned class would saturate them to zero, so the grumbler refuses `uint8`, `uint16`, `uint32`, and `uint64` inputs.
-- The double-precision evaluation is what makes integer inputs safe: the intermediate L^2+L exceeds the largest representable value of a narrow integer class long before the indices themselves do.
+- The `sphten-liouv` descriptor `spin_system.bas.basis` is sparse single, so its ranks and projections come back sparse single; the per-subgraph descriptor blocks inside `basis.m` are `int8` or `int16` and come back in that class.
 
 ## Syntax
 

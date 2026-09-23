@@ -25,8 +25,10 @@
 %             corresponding to L=0, M=0; same class and
 %             sparsity as L
 %
-% Note: the arithmetic runs in double precision so that integer inputs
-%       cannot saturate in the intermediate L^2+L.
+% Note: integer inputs are evaluated in int64 arithmetic, which is exact
+%       for every rank below the square root of intmax('int64'), so that
+%       the intermediate L^2+L cannot saturate a narrow integer class or
+%       lose precision in double.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -37,8 +39,12 @@ function I=lm2lin(L,M)
 % Check consistency
 grumble(L,M);
 
-% Get the linear index in double precision
-I=double(L).^2+double(L)-double(M);
+% Get the linear index, exactly in int64 for integer ranks
+if isinteger(L)
+    I=int64(L).^2+int64(L)-int64(M);
+else
+    I=L.^2+L-M;
+end
 
 % Make sure the index fits the class of the ranks
 if isinteger(L)&&any(I(:)>intmax(class(L)))
@@ -65,8 +71,8 @@ end
 if any(size(L)~=size(M))
     error('array dimensions are inconsistent.');
 end
-if isinteger(L)&&any(double(L(:))>=floor(sqrt(flintmax)))
-    error('integer ranks that large give indices that are not exactly representable in double precision.');
+if isinteger(L)&&any(double(L(:))>=floor(sqrt(double(intmax('int64')))))
+    error('integer ranks that large overflow int64 arithmetic.');
 end
 end
 

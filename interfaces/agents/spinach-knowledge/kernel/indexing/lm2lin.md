@@ -14,8 +14,8 @@ Converts L,M indexing of spin states into linear indexing. In the linear indexin
 
 ## Numerical / algorithmic content
 
-- The index is evaluated in double precision whatever the class of the inputs and cast back to the class of L, so integer rank and projection arrays return an integer index without the intermediate L^2+L saturating a narrow integer class.
-- The grumbler requires real integer-valued arrays of the same size with non-negative ranks and projections within plus or minus the rank.
+- Integer rank and projection arrays are evaluated in int64 arithmetic, which is exact for every rank below the square root of `intmax('int64')` (about 3e9), and the result is cast back to the class of L after a check that it fits that class; the intermediate L^2+L therefore never saturates a narrow integer class or loses precision in double, and every pair returned by `lin2lm` for an accepted integer input round-trips exactly. Double and single inputs are evaluated in their own class and keep their sparsity.
+- The grumbler requires real integer-valued arrays of the same size with non-negative ranks and projections within plus or minus the rank, and refuses integer ranks at or above the square root of `intmax('int64')`.
 
 ## Syntax
 

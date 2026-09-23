@@ -13,14 +13,20 @@
 %
 % Parameters:
 %
-%       L   - ranks of the spin states
+%       L   - ranks of the spin states; double, single,
+%             or a signed integer class
 %
-%       M   - projections of the spin states
+%       M   - projections of the spin states, same class
+%             as L
 %
 % Outputs:
 %
-%       I   - linear indices of spin states, with
-%             I=0 corresponding to L=0, M=0.
+%       I   - linear indices of spin states, with I=0
+%             corresponding to L=0, M=0; same class and
+%             sparsity as L
+%
+% Note: the arithmetic runs in double precision so that integer inputs
+%       cannot saturate in the intermediate L^2+L.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -31,8 +37,11 @@ function I=lm2lin(L,M)
 % Check consistency
 grumble(L,M);
 
-% Get the linear index
-I=L.^2+L-M;
+% Get the linear index in double precision
+I=double(L).^2+double(L)-double(M);
+
+% Return in the class of the ranks
+I=cast(I,'like',L);
 
 end
 

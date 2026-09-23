@@ -18,7 +18,8 @@ Basis set control. This is the second mandatory function (after create.m) that m
 ## Numerical / algorithmic content
 
 - Subgraph generation uses `dfpt` on the substance blocks of the connectivity and proximity matrices; empty, identical, and enclosed subgraphs are removed with `unique` and `prune_subgraphs` before the descriptor is built.
-- The descriptor of each subgraph is built densely in the direct product order with `repelem`/`repmat`, filtered, and embedded into the full spin index as a sparse array; duplicate states across subgraphs are removed with `unihash`, and the basis is sorted with `sortrows`, distributed for large bases.
+- The descriptor of each subgraph is built densely in the direct product order with `repelem`/`repmat` in the smallest signed integer class that holds every single-spin state index of the system (`min_int_type` of the largest multiplicity squared minus one: `int8` up to multiplicity 11, `int16` above), filtered through the integer-aware `lin2lm`, and embedded into the full spin index as a sparse double array.
+- Duplicate states across subgraphs are removed and the basis is sorted lexicographically in one `unique(...,'rows')` call; when a dense integer copy of the merged descriptor takes fewer bytes than its sparse form (one byte per element against sixteen per non-zero), the call runs on that dense copy and the result is converted back, otherwise it runs on the sparse matrix. The stored `spin_system.bas.basis` is sparse double in either case, so every consumer sees the same descriptor as before.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 
 ## Parameters / inputs

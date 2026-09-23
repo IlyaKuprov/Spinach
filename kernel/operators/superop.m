@@ -116,6 +116,11 @@ end
 % Lift the basis columns corresponding to the relevant spins
 basis_cols=spin_system.bas.basis(:,active_spins);
 
+% Dense copy of the other columns in the smallest signed integer class
+[rows,cols,vals]=find(spin_system.bas.basis);
+basis_rest=zeros(size(spin_system.bas.basis),min_int_type(max(spin_system.comp.mults.^2-1),'signed'));
+basis_rest(sub2ind(size(basis_rest),rows,cols))=vals; basis_rest(:,active_spins)=[];
+
 % For commutation superoperators remove commuting paths
 if ismember(side,{'leftofcomm','rightofcomm'})
     kill_mask=(sum(from,2)==0)|(sum(to,2)==0);
@@ -133,9 +138,8 @@ for n=1:size(from,1)
     for m=1:size(from,2)
         source_subsp_idx=and(source_subsp_idx,(basis_cols(:,m)==from(n,m)));
     end
-    source_subsp=spin_system.bas.basis(source_subsp_idx,:);
+    source_subsp=basis_rest(source_subsp_idx,:);
     source_subsp_idx=find(source_subsp_idx);
-    source_subsp(:,active_spins)=[];
     
     % Get source subspace dimension
     subsp_dim=size(source_subsp,1);
@@ -148,9 +152,8 @@ for n=1:size(from,1)
         for m=1:size(to,2)
             destin_subsp_idx=and(destin_subsp_idx,(basis_cols(:,m)==to(n,m)));
         end
-        destin_subsp=spin_system.bas.basis(destin_subsp_idx,:);
+        destin_subsp=basis_rest(destin_subsp_idx,:);
         destin_subsp_idx=find(destin_subsp_idx);
-        destin_subsp(:,active_spins)=[];
         
         % Fill the operator
         if isequal(source_subsp,destin_subsp)

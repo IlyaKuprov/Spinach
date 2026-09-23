@@ -277,10 +277,13 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
 
     end
 
+    % Smallest signed integer class that holds every single-spin state index
+    idx_class=min_int_type(max(spin_system.comp.mults.^2-1),'signed');
+
     % Build state lists for individual spins
     spin_state_lists=cell(spin_system.comp.nspins,1);
     for n=1:spin_system.comp.nspins
-        spin_state_lists{n}=(0:(spin_system.comp.mults(n)^2-1))';
+        spin_state_lists{n}=cast((0:(spin_system.comp.mults(n)^2-1))',idx_class);
     end
 
     % Apply longitudinal filters
@@ -530,7 +533,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
         nstates=prod(spin_dims(spins_involved)); %#ok<PFBNS>
 
         % Preallocate the local descriptor array
-        local_basis_spec=zeros(nstates,nspins_involved);
+        local_basis_spec=zeros(nstates,nspins_involved,idx_class);
 
         % Populate the local descriptor array
         for k=1:nspins_involved
@@ -601,7 +604,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
 
         % Embed the descriptor into the full spin index
         [rows,cols,vals]=find(local_basis_spec);
-        basis_spec{n}=sparse(rows,spins_involved(cols),vals,size(local_basis_spec,1),spin_system.comp.nspins);
+        basis_spec{n}=sparse(rows,spins_involved(cols),double(vals),size(local_basis_spec,1),spin_system.comp.nspins);
 
     end
 
@@ -611,24 +614,18 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
     % Pull basis descriptor from the nodes, unit state first
     basis_spec=[sparse(1,spin_system.comp.nspins); vertcat(basis_spec{:})];
 
-    % Eliminate redundant states using a hash table
-    report(spin_system,'eliminating redundant states...');
-    basis_spec=unihash(basis_spec);
-
-    % Sort the basis explicitly
-    report(spin_system,'sorting the basis...');
-    if (~isworkernode)&&(nnz(basis_spec)>1e5)
-
-        % Run multithreaded sorting
-        basis_spec=distrib_dim(basis_spec,2);
-        basis_spec=sortrows(basis_spec);
-        spin_system.bas.basis=gather(basis_spec);
-
+    % Eliminate redundant states and sort, on a dense integer copy if that is smaller
+    report(spin_system,'eliminating redundant states and sorting the basis...');
+    idx_bytes=numel(typecast(zeros(1,idx_class),'uint8'));
+    if numel(basis_spec)*idx_bytes<=16*nnz(basis_spec)+8*(spin_system.comp.nspins+1)
+        [rows,cols,vals]=find(basis_spec);
+        basis_spec=zeros(size(basis_spec),idx_class);
+        basis_spec(sub2ind(size(basis_spec),rows,cols))=vals;
+        basis_spec=unique(basis_spec,'rows');
+        [rows,cols,vals]=find(basis_spec);
+        spin_system.bas.basis=sparse(rows,cols,double(vals),size(basis_spec,1),spin_system.comp.nspins);
     else
-
-        % Run sorting in a single thread
-        spin_system.bas.basis=sortrows(basis_spec);
-
+        spin_system.bas.basis=unique(basis_spec,'rows');
     end
 
     % Deallocate variables

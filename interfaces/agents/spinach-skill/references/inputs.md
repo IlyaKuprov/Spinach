@@ -261,6 +261,16 @@ bas.prox_level=3;
 electrons and nuclei and nothing else in the system. `IK-SBS` requires both
 spins and bosonic modes (`C`, `V`, or `T` particles).
 
+The stored `sphten-liouv` descriptor `spin_system.bas.basis` is a sparse
+double matrix with one row per state and one column per spin, holding the
+linear index of each single-spin irreducible spherical tensor (0 for the
+unit state). Internally, `basis` builds the per-subgraph descriptor blocks,
+and `superop` matches source and destination states, in the smallest signed
+integer class that covers every state index of the system (`int8` up to
+multiplicity 11, `int16` above); `lin2lm` and `lm2lin` accept those integer
+classes and return the same class. User code that reads `bas.basis` sees
+sparse double as before.
+
 ## Unit conversions on the way in
 
 Spinach works in rad/s internally and converts on absorption, so every helper

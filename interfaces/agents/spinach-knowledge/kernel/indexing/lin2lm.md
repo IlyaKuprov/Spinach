@@ -14,7 +14,7 @@ Converts linear indexing of spin states into L,M indexing. In the linear indexin
 
 ## Numerical / algorithmic content
 
-- The rank is `fix(sqrt(I))` and the projection is `L^2+L-I`, both evaluated in double precision whatever the class of the input, and the pair is checked against `lm2lin` before it is returned; the outputs are cast back to the class of the input, so a sparse double descriptor gives sparse double ranks and projections, and an `int8` or `int16` descriptor block gives ranks and projections of the same class.
+- The rank is `fix(sqrt(I))`, stepped back by one wherever the floating point square root of an index just below a perfect square rounded up, and the projection is `L^2+L-I`; both are evaluated in double precision whatever the class of the input, and the pair is checked against `lm2lin` before it is returned; the outputs are cast back to the class of the input, so a sparse double descriptor gives sparse double ranks and projections, and an `int8` or `int16` descriptor block gives ranks and projections of the same class.
 - Integer inputs are accepted only in signed classes: projections are negative for half of the states of every rank, and an unsigned class would saturate them to zero, so the grumbler refuses `uint8`, `uint16`, `uint32`, and `uint64` inputs.
 - The double-precision evaluation is what makes integer inputs safe: the intermediate L^2+L exceeds the largest representable value of a narrow integer class long before the indices themselves do.
 

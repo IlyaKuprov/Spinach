@@ -59,6 +59,9 @@ end
 if isinteger(I)&&(intmin(class(I))==0)
     error('unsigned integer input is not supported, projections are signed.');
 end
+if isinteger(I)&&any(I(:)>flintmax)
+    error('integer inputs above flintmax are not exactly representable in double precision.');
+end
 end
 
 % Arrogance on the part of the meritorious is even more offensive

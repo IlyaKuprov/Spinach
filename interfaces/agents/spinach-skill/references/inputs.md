@@ -264,11 +264,14 @@ spins and bosonic modes (`C`, `V`, or `T` particles).
 The stored `sphten-liouv` descriptor `spin_system.bas.basis` is a sparse
 double matrix with one row per state and one column per spin, holding the
 linear index of each single-spin irreducible spherical tensor (0 for the
-unit state). Internally, `basis` builds the per-subgraph descriptor blocks,
-and `superop` matches source and destination states, in the smallest signed
-integer class that covers every state index of the system (`int8` up to
-multiplicity 11, `int16` above); `lin2lm` and `lm2lin` accept those integer
-classes and return the same class. User code that reads `bas.basis` sees
+unit state). Internally, `basis` builds the per-subgraph descriptor blocks in
+the smallest signed integer class that covers every state index of the system
+(`int8` up to multiplicity 11, `int16` above) and deduplicates and sorts the
+merged descriptor with one `unique` call; `lin2lm` and `lm2lin` accept those
+integer classes and return the same class; `superop` matches source and
+destination states through a joint `unique` row index, on a dense integer
+copy of the passive columns when that copy is smaller than the sparse block
+and on the sparse block otherwise. User code that reads `bas.basis` sees
 sparse double as before.
 
 ## Unit conversions on the way in

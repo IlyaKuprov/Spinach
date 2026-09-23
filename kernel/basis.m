@@ -278,7 +278,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
     end
 
     % Smallest signed integer class that holds every single-spin state index
-    idx_class=min_int_type(max(spin_system.comp.mults.^2-1),'signed');
+    idx_class=min_int_type(max([1 spin_system.comp.mults.^2-1]),'signed');
 
     % Build state lists for individual spins
     spin_state_lists=cell(spin_system.comp.nspins,1);

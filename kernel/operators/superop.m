@@ -116,10 +116,16 @@ end
 % Lift the basis columns corresponding to the relevant spins
 basis_cols=spin_system.bas.basis(:,active_spins);
 
-% Dense copy of the other columns in the smallest signed integer class
-[rows,cols,vals]=find(spin_system.bas.basis);
-basis_rest=zeros(size(spin_system.bas.basis),min_int_type(max(spin_system.comp.mults.^2-1),'signed'));
-basis_rest(sub2ind(size(basis_rest),rows,cols))=vals; basis_rest(:,active_spins)=[];
+% Lift the basis columns corresponding to the other spins
+basis_rest=spin_system.bas.basis; basis_rest(:,active_spins)=[];
+
+% Dense integer copy of those columns when it is smaller than the sparse one
+idx_class=min_int_type(max([1 spin_system.comp.mults.^2-1]),'signed');
+if numel(basis_rest)*numel(typecast(zeros(1,idx_class),'uint8'))<=16*nnz(basis_rest)+8*(size(basis_rest,2)+1)
+    [rows,cols,vals]=find(basis_rest);
+    basis_rest=zeros(size(basis_rest),idx_class);
+    basis_rest(sub2ind(size(basis_rest),rows,cols))=vals;
+end
 
 % For commutation superoperators remove commuting paths
 if ismember(side,{'leftofcomm','rightofcomm'})
@@ -163,8 +169,9 @@ for n=1:size(from,1)
             
         else
         
-            % Otherwise, use brute-force state-by-state matching
-            [does_it_go_anywhere,where_it_goes_if_it_does]=ismember(source_subsp,destin_subsp,'rows');
+            % Otherwise, match the states through a joint unique row index
+            [~,~,row_idx]=unique([source_subsp; destin_subsp],'rows');
+            [does_it_go_anywhere,where_it_goes_if_it_does]=ismember(row_idx(1:subsp_dim),row_idx((subsp_dim+1):end));
             A{n}=[source_subsp_idx(does_it_go_anywhere)                           ...
                   destin_subsp_idx(where_it_goes_if_it_does(does_it_go_anywhere)) ...
                   coeff(n)*ones(nnz(does_it_go_anywhere),1)];

@@ -40,6 +40,11 @@ grumble(L,M);
 % Get the linear index in double precision
 I=double(L).^2+double(L)-double(M);
 
+% Make sure the index fits the class of the ranks
+if isinteger(L)&&any(I(:)>intmax(class(L)))
+    error('the linear index does not fit the integer class of L.');
+end
+
 % Return in the class of the ranks
 I=cast(I,'like',L);
 

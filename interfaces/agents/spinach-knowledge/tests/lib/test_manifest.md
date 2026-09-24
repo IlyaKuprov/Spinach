@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/lib/test_manifest.m`
 - Signature: `manifest=test_manifest()`
-- Total lines: 130
+- Total lines: 132
 
 ## Purpose
 

@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/kill_spin.m`
 - Signature: `spin_system=kill_spin(spin_system,hit_list)`
-- Total lines: 194
+- Total lines: 227
 
 ## Purpose
 
@@ -13,6 +13,8 @@ Removes the specified spins from the spin_system structure and updates it accord
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
+
+Retained bosonic-mode frequencies, carriers, anharmonicities, damping, and dephasing follow the new particle numbering. Pair channels and mode-pair modulation entries are reindexed on both particle axes; the nested spin tensor and field derivative blocks are also reindexed, with interactions involving removed particles discarded. Rebuild the basis and assumptions after removal.
 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.

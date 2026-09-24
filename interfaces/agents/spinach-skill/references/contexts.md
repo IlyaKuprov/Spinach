@@ -291,7 +291,7 @@ cm, default 1.5), and `parameters.pathway`, one of `'P'` (default), `'N'`, or
 
 Natural-abundance simulations should use isotope dilution -
 `subsystems=dilute(spin_system,isotope,tuples)` returns a cell array of
-spin systems, one per isotopomer, to be looped over.
+spin systems, one per isotopomer, to be looped over. `kill_spin` (also used by `dilute`) reindexes retained bosonic-mode parameters, pair couplings, and nested spin-modulation blocks; rebuild the basis and assumptions afterwards.
 
 **Bruker ports** (`experiments/bruker/`) - literal translations of the
 echo/antiecho gradient-selected pulse programs: `hmqcetgp`, `hmqcetgpsi`,

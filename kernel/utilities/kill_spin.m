@@ -80,6 +80,40 @@ spin_system.inter.coordinates(hit_list)=[];
 spin_system.inter.proxmatrix(hit_list,:)=[];
 spin_system.inter.proxmatrix(:,hit_list)=[];
 
+% Update particle-indexed bosonic mode data
+if isfield(spin_system.inter,'modes')
+
+    % Remove particle coordinates from scalar mode parameters
+    fields={'frqs','carriers','anharms','damp','dephase'};
+    for n=1:numel(fields)
+        spin_system.inter.modes.(fields{n})(hit_list)=[];
+    end
+
+    % Remove particle coordinates from mode pair channels
+    fields={'exchange','kerr','longitudinal','dispersive',...
+            'coupling_mod','zeeman_mod'};
+    for n=1:numel(fields)
+        pairs=spin_system.inter.modes.(fields{n});
+        pairs(hit_list,:)=[]; pairs(:,hit_list)=[];
+
+        % Reindex spin leaves inside retained modulation derivative orders
+        if ismember(fields{n},{'coupling_mod','zeeman_mod'})
+            for k=find(~cellfun(@isempty,pairs(:)))'
+                orders=pairs{k};
+                for p=1:numel(orders)
+                    if isempty(orders{p}), continue; end
+                    orders{p}(:,hit_list)=[];
+                    if strcmp(fields{n},'coupling_mod')
+                        orders{p}(hit_list,:)=[];
+                    end
+                end
+                pairs{k}=orders;
+            end
+        end
+        spin_system.inter.modes.(fields{n})=pairs;
+    end
+end
+
 % Update relaxation parameters
 if ~isempty(spin_system.rlx.r1_rates)
     spin_system.rlx.r1_rates(hit_list)=[];

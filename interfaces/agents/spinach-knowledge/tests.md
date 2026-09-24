@@ -4,11 +4,12 @@
 - Source commit: `f053e432a61d7144f3946d73d0a672e3ccfc3fc5`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
-- Files indexed: **113** MATLAB files
+- Files indexed: **114** MATLAB files
 - Generated: 2026-08-30T02:52:31
 
 | File | Signature | Summary | LOC |
 |---|---|---|---:|
+| `tests/interfaces/test_hfc_isotopes.m` | `result=test_hfc_isotopes()` | Isotope-resolved hyperfine import from Gaussian and ORCA fixtures. | 163 |
 | `tests/interfaces/test_orca_parser.m` | `result=test_orca_parser()` | Tests the ORCA log parser on the logs bundled with the examples. Syntax: result=test_orca_parser() Outputs: result -regr | 53 |
 | `tests/kernel/test_apodisation_exp_window.m` | `result=test_apodisation_exp_window()` | Tests exponential FID apodisation. Syntax: result=test_apodisation_exp_window() Outputs: result -regression test result  | 38 |
 | `tests/kernel/test_cache_temp_scratch.m` | `result=test_cache_temp_scratch()` | Tests cache management in a temporary scratch directory. Syntax: result=test_cache_temp_scratch() Outputs: result -regre | 120 |
@@ -115,7 +116,7 @@
 | `tests/kernel/test_zeeman_hamiltonian.m` | `result=test_zeeman_hamiltonian()` | Tests the one-spin Zeeman Hamiltonian. Syntax: result=test_zeeman_hamiltonian() Outputs: result -regression test result  | 42 |
 | `tests/lib/new_test_result.m` | `result=new_test_result(id,name,purpose)` | Creates a regression test result structure. Syntax: result=new_test_result(id,name,purpose) Parameters: id -stable test  | 30 |
 | `tests/lib/test_close.m` | `result=test_close(result,label,observed,reference,abs_tol,rel_tol,why)` | Adds a numerical regression check with tolerances and explanation. Syntax: result=test_close(result,label,observed,refer | 71 |
-| `tests/lib/test_manifest.m` | `manifest=test_manifest()` | Returns Spinach regression test metadata. Syntax: manifest=test_manifest() Outputs: manifest -structure array with test  | 130 |
+| `tests/lib/test_manifest.m` | `manifest=test_manifest()` | Returns Spinach regression test metadata. Syntax: manifest=test_manifest() Outputs: manifest -structure array with test  | 132 |
 | `tests/lib/test_options.m` | `options=test_options(varargin)` | Parses name-value options for the Spinach test runner. Syntax: options=test_options(varargin) Parameters: varargin -name | 62 |
 | `tests/lib/test_spin_system.m` | `spin_system=test_spin_system(sys,inter,bas)` | Builds a small quiet Spinach spin system for tests. Syntax: spin_system=test_spin_system(sys,inter,bas) Parameters: sys  | 35 |
 | `tests/lib/test_true.m` | `result=test_true(result,label,condition,why)` | Adds a logical regression check with a clear message. Syntax: result=test_true(result,label,condition,why) Parameters: r | 31 |

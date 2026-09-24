@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/g2spinach.m`
 - Signature: `[sys,inter]=g2spinach(props,particles,references,options)`
-- Total lines: 290
+- Total lines: 324
 
 ## Purpose
 
@@ -85,21 +85,6 @@ EPR hyperfine tensors are scaled by the requested/source nuclear gyromagnetic-ra
 - inter.spinrot.matrix spin-rotation coupling tensors for
 - each nucleus
 
-## Implementation structure
+## Header notes
 
-- Makes Spinach data structures from parsed outputs of electronic
-- structure theory packages, such as Gaussian and ORCA. Syntax:
-- [sys,inter]=g2spinach(props,particles,references,options)
-- props -the output of gparse() function
-- particles -a cell array of the following form:
-- {{'H','1H'},{'N','15N'}...}
-- giving the list of elements and isotopes that
-- should be imported. If the isotope list contains
-- an electron, e.g. {{'E','E'},{'H','1H'}...},
-- then EPR mode is assumed -chemical shielding
-- and scalar couplings are ignored, but g-tensor
-- and hyperfine couplings are included.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `grumble()`, `strcmp()`, `true()`, `isfield()`, `false()`, `num2cell()`, `ismember()`, `mat2cell()`, `gauss2mhz()`, `index()`, `cellfun()`, `killing_pattern()`, `any()`, `references()`, `ref_index()`.
+The element/isotope list selects imported nuclei; including an electron selects EPR data (g-tensor and hyperfine tensors) instead of chemical shieldings and scalar couplings.

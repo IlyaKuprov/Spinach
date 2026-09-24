@@ -14,6 +14,11 @@ Relaxation superoperator. Syntax: R=relaxation(spin_system,euler_angles)
 - The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
 - The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
 
+Diagonal relaxation retention is not implemented in `zeeman-liouv` and is
+rejected explicitly: deleting population-transfer terms is not a
+basis-independent self-relaxation approximation. Spherical-tensor diagonal
+retention and Zeeman full (`labframe`) retention remain available.
+
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.

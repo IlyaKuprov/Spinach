@@ -164,7 +164,7 @@ too slow`. Contributions are additive and reported in hertz.
 
 | Value | Kept | Notes |
 |---|---|---|
-| `'diagonal'` | Self-relaxation only | Cheapest; no NOE, no cross-correlation. Unit state protected |
+| `'diagonal'` | Self-relaxation only | Cheapest; no NOE, no cross-correlation. Unit state protected in `sphten-liouv`; not implemented in `zeeman-liouv` |
 | `'kite'` | Self-relaxation plus longitudinal cross-relaxation | The NOE-capable minimum and usual liquid-state choice. `sphten-liouv` only |
 | `'secular'` | All terms connecting states of equal Zeeman frequency | Secular with respect to the Zeeman Hamiltonian. `sphten-liouv` only |
 | `'labframe'` | Everything | Only correct for laboratory frame simulations |

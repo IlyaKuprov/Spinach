@@ -367,7 +367,7 @@
 | `kernel/pulses/sawtooth.m` | `waveform=sawtooth(amplitude,frequency,time_grid)` | Returns a saw-tooth waveform. Syntax: waveform=sawtooth(amplitude,frequency,time_grid) Arguments: amplitude - amplitude  | 52 |
 | `kernel/pulses/sech_pulse.m` | `[Cx,Cy,time_grid,amps,phis]=...` | Hyperbolic secant pulse in Cartesian and amplitude-phase representation. Syntax: [Cx,Cy,time_grid,amps,phis]=... sech_pu | 93 |
 | `kernel/pulses/shaped_pulse_af.m` | `[rho,traj,P]=shaped_pulse_af(spin_system,L0,Lx,Ly,rho,rf_frq_list,...` | Shaped pulse in amplitude-frequency coordinates using Fokker-Planck formalism (Eqn. 33 in http://dx.doi.org/10.1016/j.jm | 302 |
-| `kernel/pulses/shaped_pulse_xy.m` | `[rho,traj,P]=shaped_pulse_xy(spin_system,drift,controls,...` | Shaped pulse function using Cartesian coordinates. Applies a user- specified pulse shape on user-specified operators whi | 409 |
+| `kernel/pulses/shaped_pulse_xy.m` | `[rho,traj,P]=shaped_pulse_xy(spin_system,drift,controls,...` | Shaped pulse function using Cartesian coordinates. Applies a user- specified pulse shape on user-specified operators whi | 422 |
 | `kernel/pulses/slr_pulse.m` | `[Cx,Cy,durs,amps,phis]=slr_pulse(npts,dur,tbw,flip_angle,pass_rip,stop_rip)` | Shinnar-Le Roux linear-phase selective excitation pulse. Syntax: [Cx,Cy,durs,amps,phis]=slr_pulse(npts,dur,tbw,flip_angl | 193 |
 | `kernel/pulses/spinal.m` | `phi=spinal(n)` | SPINAL phase sequences as described in the paper by Fung, Khitrin and Ermolaev (https://doi.org/10.1006/jmre.1999.1896). | 50 |
 | `kernel/pulses/triwave.m` | `waveform=triwave(amplitude,frequency,time_grid)` | Returns a triangular waveform. Syntax: waveform=triwave(amplitude,frequency,time_grid) Arguments: amplitude - amplitude  | 49 |

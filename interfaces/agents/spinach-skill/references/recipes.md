@@ -433,6 +433,9 @@ keyholes, multiple targets, phase cycling, wave bases); solid-state control is
 `static_powder_control.m` and `mas_powder_control.m`. Analytically designed
 rather than optimised pulses are propagated in
 `shaped_pulses/shaped_pulse_gaussian.m` and its chirp, Q5 and SLR siblings.
+In `zeeman-hilb`, the third output of `shaped_pulse_xy` is the one-sided
+ordered propagator for every method: reuse it as `P*rho*P'`, not `P*rho`;
+requesting it leaves the chosen two-sided state-propagation method unchanged.
 
 Optimal control of a quadrupolar nucleus under MAS in Hilbert space is the
 `case_studies/Smelko_ChemRxiv_2026` folder (27Al 3QMAS and 5QMAS excitation,

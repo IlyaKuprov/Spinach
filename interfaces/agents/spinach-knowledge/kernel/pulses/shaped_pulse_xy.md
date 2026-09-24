@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/pulses/shaped_pulse_xy.m`
 - Signature: `[rho,traj,P]=shaped_pulse_xy(spin_system,drift,controls,...`
-- Total lines: 409
+- Total lines: 422
 
 ## Purpose
 
@@ -60,6 +60,8 @@ Shaped pulse function using Cartesian coordinates. Applies a user- specified pul
 - traj -system trajectory as a [1 x (nsteps+1)] cell array,
 - the first point is the initial condition
 - P -effective pulse propagator (expensive, best avoided)
+
+In `zeeman-hilb`, all six methods return the one-sided ordered propagator `P`, reusable as `P*rho*P'`; the returned state and trajectory still use two-sided density-matrix evolution. Requesting this third output with `expv-*` or `evol-*` explicitly constructs slice propagators without changing the state-propagation method.
 
 ## Implementation structure
 

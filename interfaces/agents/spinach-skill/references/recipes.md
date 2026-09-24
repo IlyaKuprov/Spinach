@@ -436,6 +436,9 @@ rather than optimised pulses are propagated in
 In `zeeman-hilb`, the third output of `shaped_pulse_xy` is the one-sided
 ordered propagator for every method: reuse it as `P*rho*P'`, not `P*rho`;
 requesting it leaves the chosen two-sided state-propagation method unchanged.
+The registered `kernel/hilb_pulse_prop` regression covers all six choices,
+including dimension-512 sparse/full CPU controls and GPU checks that explicitly
+skip when no usable GPU is present.
 
 Optimal control of a quadrupolar nucleus under MAS in Hilbert space is the
 `case_studies/Smelko_ChemRxiv_2026` folder (27Al 3QMAS and 5QMAS excitation,

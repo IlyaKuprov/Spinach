@@ -4,7 +4,7 @@
 - Source commit: `f053e432a61d7144f3946d73d0a672e3ccfc3fc5`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
-- Files indexed: **113** MATLAB files
+- Files indexed: **114** MATLAB files
 - Generated: 2026-08-30T02:52:31
 
 | File | Signature | Summary | LOC |
@@ -59,6 +59,7 @@
 | `tests/kernel/test_giant_ham_descr.m` | `result=test_giant_ham_descr()` | Tests the giant spin Hamiltonian descriptor route. Syntax: result=test_giant_ham_descr() Outputs: result -regression tes | 134 |
 | `tests/kernel/test_graph_geometry_suite.m` | `result=test_graph_geometry_suite()` | Tests graph, geometry, lattice, and coordinate utilities. Syntax: result=test_graph_geometry_suite() Outputs: result -re | 120 |
 | `tests/kernel/test_grid_geometry_suite.m` | `result=test_grid_geometry_suite()` | Tests grid and spherical geometry helpers. Syntax: result=test_grid_geometry_suite() Outputs: result -regression test re | 178 |
+| `tests/kernel/test_hilb_pulse_prop.m` | `result=test_hilb_pulse_prop()` | Reusable Hilbert pulse propagators, density evolution, and sparse/full CPU/GPU controls. | 222 |
 | `tests/kernel/test_hilbert_operator.m` | `result=test_hilbert_operator()` | Tests Hilbert-space operator generation. Syntax: result=test_hilbert_operator() Outputs: result -regression test result  | 48 |
 | `tests/kernel/test_hilbert_state.m` | `result=test_hilbert_state()` | Tests Hilbert-space state generation. Syntax: result=test_hilbert_state() Outputs: result -regression test result with e | 44 |
 | `tests/kernel/test_indexing_inverse_suite.m` | `result=test_indexing_inverse_suite()` | Tests indexing helper inverses. Syntax: result=test_indexing_inverse_suite() Outputs: result -regression test result wit | 102 |

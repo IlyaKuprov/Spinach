@@ -16,6 +16,7 @@ Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessi
 
 ## Numerical / algorithmic content
 
+- Nonempty keyhole schedules with `newton` or `goodwin` are explicitly not implemented in `sphten-liouv` and `zeeman-liouv`, both in `optimcon` setup and direct `grape_liouv` calls. First-order keyhole methods, empty schedules, and existing Hilbert-space cases are unchanged; no algorithm is substituted.
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.

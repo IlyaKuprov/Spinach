@@ -991,6 +991,11 @@ if ~ismember(spin_system.bas.formalism,{'sphten-liouv',...
                                         'zeeman-wavef'})
     error('this function requires a state vector based formalism.');
 end
+if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})&&...
+   ismember(spin_system.control.method,{'newton','goodwin'})&&...
+   any(~cellfun(@isempty,spin_system.control.keyholes(:)))
+    error('Liouville keyholes with Newton/Goodwin Hessians are not implemented.');
+end
 if isfield(spin_system.control,'steady')&&spin_system.control.steady
     if ismember(spin_system.control.method,{'newton','goodwin'})
         error('Newton-Raphson unavailable for stroboscopic steady states.');

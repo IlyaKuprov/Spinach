@@ -1074,6 +1074,13 @@ if isfield(control,'keyholes')
         end
     end
     
+    % Refuse unsupported Liouville keyhole Hessians
+    if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})&&...
+       ismember(spin_system.control.method,{'newton','goodwin'})&&...
+       any(~cellfun(@isempty,control.keyholes(:)))
+        error('Liouville keyholes with Newton/Goodwin Hessians are not implemented.');
+    end
+
     % Absorb keyhole schedule
     spin_system.control.keyholes=control.keyholes;
     control=rmfield(control,'keyholes');

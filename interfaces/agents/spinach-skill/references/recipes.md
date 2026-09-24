@@ -430,8 +430,10 @@ discovered afterwards. Verify by propagating with `shaped_pulse_xy` and taking
 `real(rho_targ'*rho)`. The `features_*.m` files demonstrate one concept each
 (amplitude constraints, dissipative drift, time-step optimisation, freezing,
 keyholes, multiple targets, phase cycling, wave bases); solid-state control is
-`static_powder_control.m` and `mas_powder_control.m`. Analytically designed
-rather than optimised pulses are propagated in
+`static_powder_control.m` and `mas_powder_control.m`. Nonempty Liouville keyhole
+schedules with `newton` or `goodwin` are explicitly not implemented; first-order
+keyhole methods and existing Hilbert-space cases remain available.
+Analytically designed rather than optimised pulses are propagated in
 `shaped_pulses/shaped_pulse_gaussian.m` and its chirp, Q5 and SLR siblings.
 
 Optimal control of a quadrupolar nucleus under MAS in Hilbert space is the

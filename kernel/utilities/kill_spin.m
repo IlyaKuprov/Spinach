@@ -1,5 +1,5 @@
-% Removes the specified spins from the spin_system structure and
-% updates it accordingly. Syntax:
+% Removes specified particles (spins or bosonic modes) from the
+% spin_system structure and updates dependent data. Syntax:
 %
 %            spin_system=kill_spin(spin_system,hit_list)
 %
@@ -8,13 +8,13 @@
 %     spin_system   - primary Spinach data structure
 %
 %     hit_list      - a vector of integers or a logical
-%                     vector giving the numbers of spins
-%                     to be removed from the system
+%                     vector giving particle numbers in the
+%                     unified isotope list to be removed
 %
 % Outputs:
 %
 %     spin_system   - the data structure with the indica-
-%                     ted spins and all dependent infor-
+%                     ted particles and dependent infor-
 %                     mation (basis, assumptions) removed
 %
 % Notes: basis, connectivity, symmetry, and assumption information

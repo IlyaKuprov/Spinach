@@ -19,7 +19,9 @@
 %
 % Notes: basis, connectivity, symmetry, and assumption information
 %        is destroyed by this function; you would need to call the
-%        basis.m and assume.m functions again.
+%        basis.m and assume.m functions again. Mode strengths are
+%        cleared; the mode container is removed when no bosonic
+%        particles remain.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -36,7 +38,7 @@ if islogical(hit_list), hit_list=find(hit_list); end
 
 % Inform the user
 report(spin_system,['removing ' num2str(numel(hit_list)) ...
-                    ' spins from the system...']);
+                    ' particles from the system...']);
 
 % Update isotope and particle type lists
 spin_system.comp.isotopes(hit_list)=[];
@@ -111,6 +113,13 @@ if isfield(spin_system.inter,'modes')
             end
         end
         spin_system.inter.modes.(fields{n})=pairs;
+    end
+
+    % Discard inapplicable mode data and stale mode assumptions
+    if ~any(ismember(spin_system.comp.types,{'C','V','T'}))
+        spin_system.inter=rmfield(spin_system.inter,'modes');
+    elseif isfield(spin_system.inter.modes,'strength')
+        spin_system.inter.modes=rmfield(spin_system.inter.modes,'strength');
     end
 end
 

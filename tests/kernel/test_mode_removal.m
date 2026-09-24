@@ -7,7 +7,8 @@
 %     result  - regression checks against independently created systems
 %
 % The cases include pair couplings, nested first and second derivatives,
-% spin-one quadratic terms, complex transverse operators, and mode decay.
+% spin-one quadratic terms, complex transverse operators, mode decay,
+% assumption resets, and spin-only rebuilding after the final mode is removed.
 %
 % talos@spindynamics.org
 
@@ -18,7 +19,7 @@ result=new_test_result('kernel/mode_removal','Retained mode reindexing',...
                        'particle removal must preserve retained mode Hamiltonians and decay.');
 
 % Cover spectator, spin, mode, simultaneous, logical, and no-op removals
-hit_lists={2,3,1,[2 4],[false true false false false],5,[]};
+hit_lists={2,3,1,[2 4],[false true false false false],5,[],[1 5],[2 3 4],[1 2 3 4]};
 formalisms={'zeeman-hilb','zeeman-liouv'};
 for n=1:numel(hit_lists)
 
@@ -28,9 +29,16 @@ for n=1:numel(hit_lists)
     trimmed=kill_spin(original,hit_lists{n});
     reference=build_system(keep);
     label=['case ' num2str(n)];
-    result=test_true(result,[label ' mode data'],...
-                     isequal(trimmed.inter.modes,reference.inter.modes),...
-                     'all particle indices, including nested spin leaves, must match');
+    if isfield(reference.inter,'modes')
+        result=test_true(result,[label ' mode data'],...
+                         isequal(trimmed.inter.modes,reference.inter.modes),...
+                         'all particle indices, including nested spin leaves, must match');
+    else
+        [result,passed]=test_true(result,[label ' no mode container'],...
+                                 ~isfield(trimmed.inter,'modes'),...
+                                 'removing every mode must leave a spin-only system');
+        if ~passed, continue; end
+    end
 
     % Rebuild the basis and assumptions required by kill_spin
     for k=1:numel(formalisms)
@@ -59,10 +67,79 @@ for n=1:numel(hit_lists)
         % Compare finite-temperature dissipators in Liouville space
         if k==2
             R_obs=relaxation(observed); R_ref=relaxation(expected);
-            result=test_true(result,[label ' nonzero decay'],norm(R_ref,'fro')>1,...
-                             'the decay comparison must have a nonzero reference');
+            if isfield(reference.inter,'modes')
+                result=test_true(result,[label ' nonzero decay'],norm(R_ref,'fro')>1,...
+                                 'the decay comparison must have a nonzero reference');
+            end
             result=test_close(result,[label ' mode decay'],R_obs,R_ref,1e-10,1e-12,...
                               'retained damping and dephasing must match independent reconstruction');
+        end
+    end
+end
+
+% Check assumption resets and spin-only rebuilding for all bosonic particle types
+mode_types={'C3','V3','T3'}; assumptions={'labframe','cavity','spin-phonon'};
+for n=1:numel(mode_types)
+
+    % Construct independent mixed and spin-only systems with nonzero spin shifts
+    sys.isotopes={'1H','13C',mode_types{n}}; sys.magnet=1;
+    sys.output='hush'; sys.disable={'hygiene'};
+    sys.parallel={'processes',1}; sys.parprops={};
+    inter.zeeman.scalar={1,2,[]};
+    inter.modes.frqs={[],[],1000}; inter.modes.carriers={[],[],1000};
+    original=create(sys,inter);
+    sys.isotopes={'1H','13C'}; spin_inter.zeeman.scalar={1,2};
+    spin_reference=create(sys,spin_inter);
+    sys.isotopes={'1H',mode_types{n}}; inter.zeeman.scalar={1,[]};
+    inter.modes.frqs={[],1000}; inter.modes.carriers={[],1000};
+    mode_reference=create(sys,inter);
+
+    % Clear old mode assumptions and reconstruct each supported assumption set
+    for k=1:numel(assumptions)
+        trimmed=kill_spin(assume(original,assumptions{k}),2);
+        label=[mode_types{n} ' ' assumptions{k}];
+        result=test_true(result,[label ' strength reset'],...
+                         ~isfield(trimmed.inter.modes,'strength'),...
+                         'particle removal must destroy derived mode assumptions');
+        for p=1:numel(formalisms)
+            bas.formalism=formalisms{p}; bas.approximation='none';
+            observed=assume(basis(trimmed,bas),assumptions{k});
+            expected=assume(basis(mode_reference,bas),assumptions{k});
+            result=test_close(result,[label ' rebuild ' formalisms{p}],...
+                              hamiltonian(observed),hamiltonian(expected),1e-10,1e-12,...
+                              'fresh assumptions must reproduce the independent mixed system');
+        end
+    end
+
+    % Remove the final mode from both unassumed and previously assumed systems
+    sources={original,assume(original,'labframe'),assume(original,'cavity'),...
+             assume(original,'spin-phonon')};
+    for k=1:numel(sources)
+        trimmed=kill_spin(sources{k},3);
+        label=[mode_types{n} ' final mode source ' num2str(k)];
+        [result,passed]=test_true(result,[label ' container reset'],...
+                                 ~isfield(trimmed.inter,'modes'),...
+                                 'no mode metadata may remain in a spin-only system');
+        if ~passed, continue; end
+        for p=1:numel(formalisms)
+            bas.formalism=formalisms{p}; bas.approximation='none';
+            observed=basis(trimmed,bas); expected=basis(spin_reference,bas);
+            for assumption={'nmr','esr'}
+                for retention={'','zeeman','couplings'}
+
+                    % Exercise standard and restricted spin-only Hamiltonian rebuilding
+                    if isempty(retention{1})
+                        H_obs=hamiltonian(assume(observed,assumption{1}));
+                        H_ref=hamiltonian(assume(expected,assumption{1}));
+                    else
+                        H_obs=hamiltonian(assume(observed,assumption{1},retention{1}));
+                        H_ref=hamiltonian(assume(expected,assumption{1},retention{1}));
+                    end
+                    result=test_close(result,[label ' ' formalisms{p} ' '...
+                                      assumption{1} ' ' retention{1}],H_obs,H_ref,1e-10,1e-12,...
+                                      'spin-only Hamiltonians must match independent reconstruction');
+                end
+            end
         end
     end
 end
@@ -132,6 +209,9 @@ if (~isempty(mode_one))&&(~isempty(mode_two))
     inter.modes.coupling_mod{mode_one,mode_two}={[],tensors};
     inter.modes.zeeman_mod{mode_one,mode_two}={[],vectors};
 end
+
+% Omit the mode container when constructing an independent spin-only system
+if ~any(ismember(keep,[1 5])), inter=rmfield(inter,'modes'); end
 
 % Create a fresh system rather than using the production removal path
 spin_system=create(sys,inter);

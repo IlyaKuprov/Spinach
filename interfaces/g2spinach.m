@@ -5,7 +5,11 @@
 %
 % Parameters:
 %
-%    props      - the output of gparse() function
+%    props      - the output of gparse() or oparse(); EPR import
+%                 requires props.isotopes for each nonempty HFC:
+%                 Gaussian mass numbers or ORCA isotope strings.
+%                 HFCs are scaled by target/source gyromagnetic
+%                 ratio before thresholding and purging.
 %
 %    particles  - a cell array of the following form:
 %
@@ -152,8 +156,38 @@ switch ismember('E',[particles{:}])
         % All couplings are zero except for the hyperfine couplings to the electron
         inter.coupling.matrix=mat2cell(zeros(3*nspins,3*nspins),3*ones(nspins,1),3*ones(nspins,1));
         for n=1:(nspins-1)
-            inter.coupling.matrix{n,end}=1e6*gauss2mhz(props.hfc.full.matrix{index(n)}/2);
-            inter.coupling.matrix{end,n}=1e6*gauss2mhz(props.hfc.full.matrix{index(n)}/2);
+
+            % Resolve the printed HFC isotope, not the geometry isotope table
+            hfc=1e6*gauss2mhz(props.hfc.full.matrix{index(n)}/2);
+            if ~isempty(hfc)
+                source_iso='';
+                if isfield(props,'isotopes')&&(numel(props.isotopes)>=index(n))
+                    if isnumeric(props.isotopes)
+                        mass_number=props.isotopes(index(n));
+                        if isreal(mass_number)&&isfinite(mass_number)&&...
+                           (mass_number>0)&&(mod(mass_number,1)==0)
+                            source_iso=[num2str(mass_number) props.symbols{index(n)}];
+                        end
+                    elseif iscell(props.isotopes)
+                        source_iso=props.isotopes{index(n)};
+                    end
+                end
+                if ~ischar(source_iso)||isempty(source_iso)||~isrow(source_iso)||...
+                   isempty(regexp(source_iso,['^[1-9][0-9]*' props.symbols{index(n)} '$'],'once'))
+                    error('EPR import without an explicit HFC source isotope is not implemented.');
+                end
+
+                % Scale the entire tensor before thresholding or purging
+                source_gamma=spin(source_iso);
+                if source_gamma==0
+                    error('EPR import with a zero-gamma HFC source isotope is not implemented.');
+                end
+                hfc=hfc*(spin(sys.isotopes{n})/source_gamma);
+            end
+
+            % Preserve the symmetric-pair storage convention
+            inter.coupling.matrix{n,end}=hfc;
+            inter.coupling.matrix{end,n}=hfc;
         end
         
         % Remove small hyperfine couplings

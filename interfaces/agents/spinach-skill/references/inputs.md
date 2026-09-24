@@ -297,7 +297,7 @@ hertz, not rad/s, however large the numbers look.
 [sys,inter]=g2spinach(props,particles,references,options)
 ```
 
-- `props` — output of `gparse`, `oparse` or a compatible parser.
+- `props` — output of `gparse`, `oparse` or a compatible parser. EPR import requires explicit HFC source isotopes in `props.isotopes` (Gaussian mass numbers or ORCA isotope strings); whole tensors are scaled by the target/source gyromagnetic-ratio ratio before thresholding and purging, while NMR import is unchanged.
 - `particles` — cell array of element/isotope pairs, e.g.
   `{{'C','13C'},{'N','15N'}}`. Including an electron, as in
   `{{'E','E'},{'H','1H'}}`, switches the function into **EPR mode**: chemical

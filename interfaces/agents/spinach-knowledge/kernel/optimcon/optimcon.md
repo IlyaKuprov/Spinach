@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/optimcon.m`
 - Signature: `spin_system=optimcon(spin_system,control)`
-- Total lines: 1607
+- Total lines: 1619
 
 ## Purpose
 
@@ -16,6 +16,8 @@ Validates optimal control options and updates the spin system object. Syntax: sp
 - The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
 
 ## Numerical / algorithmic content
+
+- Nonempty keyhole schedules with `newton` or `goodwin` are explicitly not implemented in `sphten-liouv`, `zeeman-liouv`, or `zeeman-wavef`. First-order `lbfgs`/`rbfgs` keyhole methods, empty schedules, and existing Hilbert-space keyhole Hessians remain available; no algorithm is substituted. The same method restriction is enforced at direct `grape_liouv` entry regardless of the requested output count.
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.

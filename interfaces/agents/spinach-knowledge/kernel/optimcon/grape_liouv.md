@@ -2,11 +2,11 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/grape_liouv.m`
 - Signature: `[traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,...`
-- Total lines: 986
+- Total lines: 1087
 
 ## Purpose
 
-Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user-supplied shaped pulse from a given initial state and projects the result onto the given final state. The fidelity is returned, along with its gradient and Hessian with respect to amplitudes of all control operators at every time step of the shaped pulse. Uses Liouville-space formalism. Syntax: [tra
+Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user-supplied shaped pulse from a given initial state and projects the result onto the given final state. The fidelity is returned, along with its gradient and Hessian with respect to amplitudes of all control operators at every time step of the shaped pulse. Uses Liouville-space or wavefunction formalisms.
 
 ## Physical / mathematical content
 
@@ -16,7 +16,7 @@ Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessi
 
 ## Numerical / algorithmic content
 
-- Nonempty keyhole schedules with `newton` or `goodwin` are explicitly not implemented in `sphten-liouv` and `zeeman-liouv`, both in `optimcon` setup and direct `grape_liouv` calls. First-order keyhole methods, empty schedules, and existing Hilbert-space cases are unchanged; no algorithm is substituted.
+- Nonempty keyhole schedules with `newton` or `goodwin` are explicitly not implemented in `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`, both in `optimcon` setup and direct `grape_liouv` calls. First-order `lbfgs`/`rbfgs` keyhole methods, empty schedules, and existing Hilbert-space keyhole Hessians remain available; no algorithm is substituted. The method restriction applies regardless of the requested output count.
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
@@ -25,20 +25,18 @@ Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessi
 
 - spin_system -Spinach data object that has been through
 - the optimcon.m problem setup function.
-- drifts -the drift Liouvillians: a cell array con-
-- taining one matrix (for time-independent
+- drifts -drift generators (Liouvillians or wavefunction Hamiltonians):
+- a cell array containing one matrix (for time-independent
 - drift) or multiple matrices (one per time
 - slice / point, for time-dependent drift).
-- controls -control operators in Liouville space (cell
-- array of matrices).
+- controls -control generators in the selected formalism (cell array of matrices).
 - waveform -control coefficients for each control ope-
 - rator (in vertical dimension) at each time
 - slice / point (horizonal dimension), rad/s
-- rho_init -initial state of the system as a vector in
-- Liouville space, ignored in stroboscopic
+- rho_init -initial state as a Liouville-space vector or wavefunction,
+- ignored in stroboscopic
 - steady state optimisations
-- rho_targ -target state of the system as a vector in
-- Liouville space.
+- rho_targ -target state as a Liouville-space vector or wavefunction.
 - fidelity_type -'real' (real part of the overlap)
 - 'imag' (imaginary part of the overlap)
 - 'square' (absolute square of the overlap)
@@ -50,8 +48,8 @@ Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessi
 - the control sequence
 - hess -Hessian of the fidelity with respect to
 - the control sequence, not available for
-- piecewise-linear and stroboscopic stea-
-- dy state optimisations
+- piecewise-linear or stroboscopic steady-state optimisations,
+- or nonempty keyhole schedules
 - traj_data.forward -forward trajectory from the initial con-
 - dition or stroboscopic steady state (a
 - stack of state vectors)
@@ -68,7 +66,7 @@ Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessi
 - from a given initial state and projects the result onto the given final
 - state. The fidelity is returned, along with its gradient and Hessian
 - with respect to amplitudes of all control operators at every time step
-- of the shaped pulse. Uses Liouville-space formalism. Syntax:
+- of the shaped pulse. Uses Liouville-space or wavefunction formalisms. Syntax:
 - [traj_data,fidelity,...
 - grad,hess]=grape_liouv(spin_system,drifts,controls,...
 - waveform,rho_init,rho_targ,...

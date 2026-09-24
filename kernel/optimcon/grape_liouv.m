@@ -3,7 +3,8 @@
 % from a given initial state and projects the result onto the given final
 % state. The fidelity is returned, along with its gradient and Hessian 
 % with respect to amplitudes of all control operators at every time step
-% of the shaped pulse. Uses Liouville-space formalism. Syntax:
+% of the shaped pulse. Uses Liouville-space or wavefunction formalisms.
+% Syntax:
 %
 %        [traj_data,fidelity,...
 %         grad,hess]=grape_liouv(spin_system,drifts,controls,...
@@ -14,24 +15,25 @@
 %   spin_system         - Spinach data object that has been through 
 %                         the optimcon.m problem setup function.
 % 
-%   drifts              - the drift Liouvillians: a cell array con-
-%                         taining one matrix (for time-independent 
+%   drifts              - drift generators (Liouvillians or wavefunc-
+%                         tion Hamiltonians): a cell array containing
+%                         one matrix (for time-independent
 %                         drift) or multiple matrices (one per time
 %                         slice / point, for time-dependent drift).
 %
-%   controls            - control operators in Liouville space (cell 
-%                         array of matrices).
+%   controls            - control generators in the selected formalism
+%                         (cell array of matrices).
 %
 %   waveform            - control coefficients for each control ope-
 %                         rator (in vertical dimension) at each time
 %                         slice / point (horizonal dimension), rad/s
 %
-%   rho_init            - initial state of the system as a vector in
-%                         Liouville space, ignored in stroboscopic
+%   rho_init            - initial state as a Liouville-space vector
+%                         or wavefunction, ignored in stroboscopic
 %                         steady state optimisations
 %
-%   rho_targ            - target state of the system as a vector in
-%                         Liouville space.
+%   rho_targ            - target state as a Liouville-space vector
+%                         or wavefunction.
 %
 %   fidelity_type       - 'real'   (real part of the overlap)
 %                         'imag'   (imaginary part of the overlap)
@@ -46,8 +48,9 @@
 %
 %   hess                - Hessian of the fidelity with respect to 
 %                         the control sequence, not available for
-%                         piecewise-linear and stroboscopic stea-
-%                         dy state optimisations
+%                         piecewise-linear or stroboscopic steady-
+%                         state optimisations, or nonempty keyhole
+%                         schedules
 %
 %   traj_data.forward   - forward trajectory from the initial con-
 %                         dition or stroboscopic steady state (a 
@@ -56,6 +59,13 @@
 % Note: this is a low level function that is not designed to be called 
 %       directly. Use grape_xy.m, grape_phase.m, or other wrapper func-
 %       tions instead.
+%
+% Note: nonempty keyhole schedules with 'newton' or 'goodwin' are not
+%       implemented in the supported state-vector formalisms:
+%       'sphten-liouv', 'zeeman-liouv', and 'zeeman-wavef'. First-order
+%       'lbfgs' and 'rbfgs' keyhole methods and empty schedules remain
+%       available. The method restriction applies at setup and direct
+%       entry, regardless of the number of outputs requested.
 %
 % Note: trajectory cost terms are read from spin_system.control: when
 %       fid_type is 'average', the fidelity is averaged over the pulse
@@ -991,10 +1001,10 @@ if ~ismember(spin_system.bas.formalism,{'sphten-liouv',...
                                         'zeeman-wavef'})
     error('this function requires a state vector based formalism.');
 end
-if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'})&&...
+if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv','zeeman-wavef'})&&...
    ismember(spin_system.control.method,{'newton','goodwin'})&&...
    any(~cellfun(@isempty,spin_system.control.keyholes(:)))
-    error('Liouville keyholes with Newton/Goodwin Hessians are not implemented.');
+    error('Liouville and wavefunction keyholes with Newton/Goodwin Hessians are not implemented.');
 end
 if isfield(spin_system.control,'steady')&&spin_system.control.steady
     if ismember(spin_system.control.method,{'newton','goodwin'})

@@ -6,9 +6,9 @@
 %
 %     result  - regression test results and explanatory messages
 %
-% Population filters act between noncommuting spin-half pulse slices.
-% Both density-vector bases reject Newton/Goodwin keyhole methods at
-% setup and direct-engine entry, but retain first-order derivatives.
+% Spin-state projectors act between noncommuting spin-half pulse slices.
+% Density-vector and wavefunction bases reject Newton/Goodwin keyhole
+% methods at setup and direct-engine entry, retaining first derivatives.
 % Empty schedules and Hilbert-space keyhole Hessians remain supported.
 % The spherical basis uses normalised identity, T11, T10, and T1-1.
 %
@@ -17,7 +17,7 @@
 function result=test_keyhole_guard()
 
 % Declare the physically motivated regression
-result=new_test_result('kernel/keyhole_guard','Liouville keyhole Hessian guard',...
+result=new_test_result('kernel/keyhole_guard','State-vector keyhole Hessian guard',...
                        'Unsupported Hessians must be refused without changing supported methods.');
 
 % Define a spin-half system with complex noncommuting controls
@@ -33,13 +33,13 @@ rho_init=spin_ops.y+0.2*spin_ops.z;
 rho_targ=spin_ops.z-0.4*spin_ops.x;
 waveform=[-4 2 1;1 -3 5];
 methods={'lbfgs','rbfgs','newton','goodwin'};
-formalisms={'zeeman-liouv','sphten-liouv','zeeman-hilb'};
+formalisms={'zeeman-liouv','sphten-liouv','zeeman-hilb','zeeman-wavef'};
 
 % Change coordinates explicitly into normalised spherical tensors
 Q=[1/sqrt(2) 0 1/sqrt(2) 0;...
    0 0 0 1;0 -1 0 0;1/sqrt(2) 0 -1/sqrt(2) 0];
 
-% Exercise all three density-operator formalisms
+% Exercise the density-operator and wavefunction formalisms
 for form_idx=1:numel(formalisms)
     spin_system.bas.formalism=formalisms{form_idx};
     control=struct();
@@ -48,6 +48,10 @@ for form_idx=1:numel(formalisms)
         controls={spin_ops.x,spin_ops.y}; drift=0.7*spin_ops.z;
         source=rho_init; target=rho_targ;
         keyhole=@(rho)diag(diag(rho));
+    elseif form_idx==4
+        controls={spin_ops.x,spin_ops.y}; drift=0.7*spin_ops.z;
+        source=[2;1]/sqrt(5); target=[1;-1i]/sqrt(2); P=diag([1 0]);
+        keyhole=@(rho)P*rho; control.fidelity='square';
     else
         controls={hilb2liouv(spin_ops.x,'comm'),hilb2liouv(spin_ops.y,'comm')};
         drift=0.7*hilb2liouv(spin_ops.z,'comm');
@@ -71,7 +75,7 @@ for form_idx=1:numel(formalisms)
         control.method=methods{method_idx};
         control.keyholes={keyhole,keyhole,[]};
         label=[formalisms{form_idx} ' ' methods{method_idx}];
-        if (form_idx<3)&&(method_idx>2)
+        if (form_idx~=3)&&(method_idx>2)
 
             % Require the specific unsupported-combination error from setup
             error_text='';
@@ -81,7 +85,7 @@ for form_idx=1:numel(formalisms)
                 error_text=exception.message;
             end
             result=test_true(result,[label ' setup guard'],...
-                             contains(error_text,'Liouville keyholes')&&...
+                             contains(error_text,'keyholes with Newton/Goodwin Hessians')&&...
                              contains(error_text,'not implemented'),...
                              'setup must explicitly refuse the unsupported combination');
 
@@ -92,12 +96,12 @@ for form_idx=1:numel(formalisms)
             error_text='';
             try
                 [~,~,~,~]=grape_liouv(local_system,{drift},controls,...
-                                     waveform,source,target,'real');
+                                     waveform,source,target,local_system.control.fidelity);
             catch exception
                 error_text=exception.message;
             end
             result=test_true(result,[label ' direct guard'],...
-                             contains(error_text,'Liouville keyholes')&&...
+                             contains(error_text,'keyholes with Newton/Goodwin Hessians')&&...
                              contains(error_text,'not implemented'),...
                              'direct engine calls must not bypass the unsupported boundary');
 
@@ -133,7 +137,7 @@ for form_idx=1:numel(formalisms)
                           'first-order projected and supported Hessian paths retain their gradients');
         if method_idx>2
             result=test_close(result,[label ' Hessian'],hessian(:,:,1),hess_ref,1e-9,0,...
-                              'empty Liouville schedules and projected Hilbert Hessians remain valid');
+                              'empty vector schedules and projected Hilbert Hessians remain valid');
         end
     end
 
@@ -148,7 +152,7 @@ for form_idx=1:numel(formalisms)
             error_text=exception.message;
         end
         result=test_true(result,[formalisms{form_idx} ' damped guard'],...
-                         contains(error_text,'Liouville keyholes')&&...
+                         contains(error_text,'keyholes with Newton/Goodwin Hessians')&&...
                          contains(error_text,'not implemented'),...
                          'dissipative Newton keyholes are also explicitly unsupported');
     end

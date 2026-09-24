@@ -10,6 +10,8 @@ Pairs of cooperative pulses that may be used as components of a phase cycle. The
 
 ## Physical / mathematical content
 
+The cooperative objective averages the requested primary transfer fidelities and subtracts the mean squared norm of the summed orthogonal impurities. Auxiliary impurity derivatives use real linear overlap, including when the primary fidelity is the absolute square of the overlap; target projection retains the target norm explicitly.
+
 - Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
 - The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
 

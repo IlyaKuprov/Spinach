@@ -233,7 +233,7 @@
 | `kernel/overloads/@polyadic/inflate.m` | `answer=inflate(p)` | Converts a polyadic representation of a matrix into a sparse mat- rix. Syntax: answer=inflate(p) The function opens up a | 96 |
 | `kernel/overloads/@polyadic/isempty.m` | `answer=isempty(p)` | Returns true for polyadics that represent a matrix with a zero dimension. Syntax: answer=isempty(p) Parameters: p -a pol | 33 |
 | `kernel/overloads/@polyadic/isreal.m` | `answer=isreal(p)` | Returns true if the polyadic representation is real. Syntax: answer=isreal(p) Parameters: p -a polyadic object Outputs:  | 48 |
-| `kernel/overloads/@polyadic/kron.m` | `c=kron(a,b)` | Kronecker product function for polyadics. Syntax: c=kron(a,b) Parameters: a,b -polyadic or numeric objects Outputs: c -p | 68 |
+| `kernel/overloads/@polyadic/kron.m` | `c=kron(a,b)` | Kronecker product function for polyadics. Syntax: c=kron(a,b) Parameters: a,b -polyadic or numeric objects Outputs: c -p | 70 |
 | `kernel/overloads/@polyadic/minus.m` | `a=minus(a,b)` | Polyadic subtraction operation. Does not perform the actual sub- traction, but instead stores the operands as a sum of u | 38 |
 | `kernel/overloads/@polyadic/mtimes.m` | `C=mtimes(A,B)` | Performs multiplications involving polyadics. Syntax: C=mtimes(A,B) Parameters: A,B -a polyadic or a numerical array Out | 171 |
 | `kernel/overloads/@polyadic/nnz.m` | `answer=nnz(p)` | Number of non-zeroes in all kernels of the polyadic. Syntax: answer=nnz(p) Parameters: p -a polyadic object Outputs: ans | 45 |

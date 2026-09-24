@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/ens_block.m`
 - Signature: `[traj,fid,grad,hess]=ens_block(spin_system,drifts,control,block,waveform,n_outputs)`
-- Total lines: 198
+- Total lines: 208
 
 ## Purpose
 
@@ -14,6 +14,8 @@ Fidelity, gradient, and Hessian contributions of one block of ensemble cases, ev
 - The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
 
 ## Numerical / algorithmic content
+
+Freeze masks refer to the input waveform: the complete physical gradient is pulled back through all distortions, phase rotations, and power scaling before frozen input entries are zeroed. Supported Hessians likewise have zero frozen input rows and columns after the phase/power transformation; distortion Hessians remain unavailable. Direct GRAPE engine calls retain their separate existing behaviour.
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.

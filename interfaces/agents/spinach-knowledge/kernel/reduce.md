@@ -14,6 +14,8 @@ Symmetry and trajectory-level state space reduction. Tries all applicable reduct
 
 ## Numerical / algorithmic content
 
+Horizontal stacks of wavefunctions or Liouville states retain their actual complex columns during symmetry screening. A sector is retained when any column exceeds the population threshold; Liouville stacks continue through zero-track elimination and path tracing without disabling reduction.
+
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 

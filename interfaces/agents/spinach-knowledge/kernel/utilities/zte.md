@@ -15,6 +15,8 @@ Zero track elimination function. Inspects the first few steps in the system traj
 
 ## Numerical / algorithmic content
 
+For an N-by-M stack, each true state column is propagated, and screening uses the union of populated coordinates. The optional `nstates` is bounded by N and ranks the maximum amplitude over columns and sampled times. The existing density, small-norm, and explicit-disable shortcuts still leave the basis unchanged.
+
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.

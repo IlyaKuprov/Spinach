@@ -65,8 +65,11 @@ function [L,rotor_phases]=rotor_stack(spin_system,parameters,assumptions)
 % Check consistency
 grumble(spin_system,parameters,assumptions);
 
+% Apply the requested assumptions throughout the rotor and frame pipeline
+spin_system=assume(spin_system,assumptions);
+
 % Get the Hamiltonian
-[H,Q]=hamiltonian(assume(spin_system,assumptions));
+[H,Q]=hamiltonian(spin_system);
 
 % Apply offsets
 H=frqoffset(spin_system,H,parameters);

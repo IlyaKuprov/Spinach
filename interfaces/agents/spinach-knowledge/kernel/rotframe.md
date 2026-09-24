@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/rotframe.m`
 - Signature: `Hr=rotframe(spin_system,H0,H,isotope,order)`
-- Total lines: 108
+- Total lines: 115
 
 ## Purpose
 
@@ -17,7 +17,7 @@ Rotating frame transformation with respect to specified spins to specified order
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
-Numerical frames reject all spins under `nmr` and `cavity`; electrons under `esr`, `deer`, `deer-zz`, and `spin-phonon`; and spin-half nuclei under `qnmr`. Nuclei under electron-only rotating sets and higher-spin nuclei under `qnmr` remain in the laboratory frame and may be transformed. `labframe` retains all spin carriers.
+Numerical frames reject all spins under `nmr` and `cavity`; electrons under `esr`, `deer`, `deer-zz`, and `spin-phonon`; and spin-half nuclei under `qnmr`. Nuclei under electron-only rotating sets and higher-spin nuclei under `qnmr` remain in the laboratory frame and may be transformed. `labframe` retains all spin carriers. Numerical frames are not implemented for `se_dnp_h+`, `se_dnp_h-`, or `se_dnp_h0`: `assume` omits all Zeeman interactions from these solid-effect components, so they do not supply the laboratory Hamiltonian H0+H1 required by this transformation. This refusal does not alter the component construction or the solid-effect experiment.
 
 ## Parameters / inputs
 

@@ -92,7 +92,7 @@
 | `tests/kernel/test_relaxation_t2_rate.m` | `result=test_relaxation_t2_rate()` | Tests phenomenological T2 relaxation rate. Syntax: result=test_relaxation_t2_rate() Outputs: result -regression test res | 48 |
 | `tests/kernel/test_remtrace_tensor.m` | `result=test_remtrace_tensor()` | Tests removal of the isotropic tensor trace. Syntax: result=test_remtrace_tensor() Outputs: result -regression test resu | 38 |
 | `tests/kernel/test_rf_cartesian_polar.m` | `result=test_rf_cartesian_polar()` | Tests RF Cartesian and polar waveform conversion. Syntax: result=test_rf_cartesian_polar() Outputs: result -regression t | 51 |
-| `tests/kernel/test_rotor_assume.m` | `result=test_rotor_assume()` | Explicit assumptions throughout rotor-stack frame construction. | 230 |
+| `tests/kernel/test_rotor_assume.m` | `result=test_rotor_assume()` | Explicit assumptions throughout rotor-stack frame construction. | 273 |
 | `tests/kernel/test_scalar_coupling_hamiltonian.m` | `result=test_scalar_coupling_hamiltonian()` | Tests the two-spin scalar-coupling Hamiltonian. Syntax: result=test_scalar_coupling_hamiltonian() Outputs: result -regre | 46 |
 | `tests/kernel/test_shaped_pulse_rotation.m` | `result=test_shaped_pulse_rotation()` | Tests a one-slice Cartesian shaped pulse. Syntax: result=test_shaped_pulse_rotation() Outputs: result -regression test r | 49 |
 | `tests/kernel/test_slowpass_fft_parity.m` | `result=test_slowpass_fft_parity()` | Tests slowpass amplitude normalisation against time-domain FFT. Syntax: result=test_slowpass_fft_parity() Outputs: resul | 81 |

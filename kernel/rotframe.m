@@ -36,6 +36,10 @@
 %        under electron-only rotating sets and higher-spin
 %        nuclei under qnmr remain in the laboratory frame.
 %
+%        Numerical frames are not implemented for carrier-free
+%        solid-effect components se_dnp_h+, se_dnp_h-, and
+%        se_dnp_h0; these are not laboratory Hamiltonians H0+H1.
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=rotframe.m>
@@ -77,6 +81,9 @@ if ~ischar(isotope)
 end
 if ~isfield(spin_system.inter,'assumptions')
     error('assumption information is missing, call assume() first.');
+end
+if ismember(spin_system.inter.assumptions,{'se_dnp_h+','se_dnp_h-','se_dnp_h0'})
+    error('numerical frames for solid-effect Hamiltonian components are not implemented.');
 end
 if ismember(spin_system.inter.assumptions,{'nmr','cavity'})
     error('all spins are already in the rotating frame.');

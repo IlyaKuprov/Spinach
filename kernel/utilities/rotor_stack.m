@@ -50,7 +50,9 @@
 %                 input object. The spins in parameters.rframes
 %                 must remain in the laboratory frame under this
 %                 set; already-rotating spins are rejected by
-%                 rotframe.m. See assume.m
+%                 rotframe.m. Numerical frames for carrier-free
+%                 se_dnp_h+, se_dnp_h-, and se_dnp_h0 components
+%                 are not implemented. See assume.m
 %
 % Outputs:
 %

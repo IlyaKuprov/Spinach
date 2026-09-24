@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/rotor_stack.m`
 - Signature: `[L,rotor_phases]=rotor_stack(spin_system,parameters,assumptions)`
-- Total lines: 254
+- Total lines: 256
 
 ## Purpose
 
@@ -14,7 +14,7 @@ Returns a rotor stack of Liouvillians or Hamiltonians. The stack is needed for t
 
 ## Numerical / algorithmic content
 
-The explicit `assumptions` argument governs Hamiltonian construction and numerical rotating-frame transformations alike, independently of any prior `assume` call on the input object. Nonempty `parameters.rframes` requires laboratory-frame assumptions on the transformed spins.
+The explicit `assumptions` argument governs Hamiltonian construction and numerical rotating-frame transformations alike, independently of any prior `assume` call on the input object. Nonempty `parameters.rframes` requires laboratory-frame assumptions on the transformed spins. Numerical frames on the carrier-free `se_dnp_h+`, `se_dnp_h-`, and `se_dnp_h0` components are not implemented; empty-frame component stacks remain valid.
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.

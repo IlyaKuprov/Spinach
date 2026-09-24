@@ -10,6 +10,8 @@
 % stacks. Both MAS frames and Hilbert/Liouville representations are tested.
 % Already-rotating spins are rejected across all frame assumption sets,
 % while laboratory nuclei in mixed-frame systems remain transformable.
+% Carrier-free solid-effect components retain valid empty-frame stacks,
+% but direct and fresh/stale numerical-frame requests are refused.
 %
 % talos@spindynamics.org
 
@@ -187,7 +189,48 @@ for f=1:numel(formalisms)
                      'rotor phases must retain noncommuting nuclear dynamics');
 end
 
+% Refuse numerical frames on carrier-free solid-effect Hamiltonian components
+inter.coupling.eigs{1,2}=[0 0 0];
+parameters.offset=[0 0];
+components={'se_dnp_h+','se_dnp_h-','se_dnp_h0'};
+for f=1:numel(formalisms)
+    bas.formalism=formalisms{f};
+    spin_system=basis(create(sys,inter),bas);
+    stale=assume(spin_system,'labframe');
+    for a=1:numel(components)
+        assumed=assume(spin_system,components{a});
+        parameters.rframes={};
+        ordinary=rotor_stack(spin_system,parameters,components{a});
+        result=test_true(result,[components{a} ' zero component'],...
+                         all(cellfun(@(H) nnz(H)==0,ordinary)),...
+                         'uncoupled solid-effect components contain no Zeeman carrier');
+        for isotope={'E','1H'}
+            H0=carrier(assumed,isotope{1});
+            rejected=false;
+            try
+                rotframe(assumed,H0,ordinary{1},isotope{1},1);
+            catch failure
+                rejected=contains(failure.message,'solid-effect Hamiltonian components');
+            end
+            result=test_true(result,[components{a} ' direct ' isotope{1}],rejected,...
+                             'a carrier-free component is not a laboratory Hamiltonian');
+            parameters.rframes={{isotope{1},1}};
+            for input={spin_system,stale}
+                rejected=false;
+                try
+                    rotor_stack(input{1},parameters,components{a});
+                catch failure
+                    rejected=contains(failure.message,'solid-effect Hamiltonian components');
+                end
+                result=test_true(result,[components{a} ' rotor ' isotope{1}],rejected,...
+                                 'fresh and stale inputs must not acquire a false carrier');
+            end
+        end
+    end
+end
+
 % Specify a quadrupolar nucleus alongside an already-rotating spin-half nucleus
+parameters.offset=[70 -35];
 sys.magnet=9.4;
 sys.isotopes={'1H','14N'};
 inter.zeeman.eigs={[-12 5 20],[-30 10 45]};

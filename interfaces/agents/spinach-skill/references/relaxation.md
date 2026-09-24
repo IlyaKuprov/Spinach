@@ -158,7 +158,9 @@ between them. A source that relaxes too slowly for the treatment to hold
 stops the run with `SRSK theory is not applicable: source spin relaxation is
 too slow`. Contributions are additive and reported in hertz.
 The additive SRSK contribution is built without thermalisation; the chosen
-IME or DiBari-Levitt method is applied once to the total relaxation generator.
+IME or DiBari-Levitt method is applied once to the accumulated spin relaxation.
+The recursive contribution excludes mode dissipation; the original-temperature
+bosonic dissipators are appended once, after outer spin thermalisation.
 
 ## Which terms of R survive
 

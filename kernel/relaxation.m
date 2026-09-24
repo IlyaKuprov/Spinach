@@ -518,6 +518,12 @@ if ismember('SRSK',spin_system.rlx.theories)
 
     % Leave thermalisation of the sum to the outer call
     spin_system_local.rlx.equilibrium='zero';
+
+    % Leave mode dissipation to the outer call
+    if boson_terms
+        spin_system_local.inter.modes.damp(:)=0;
+        spin_system_local.inter.modes.dephase(:)=0;
+    end
     
     % Issue a recursive call for SRSK
     report(spin_system,'recursive call for SRSK relaxation terms...'); 

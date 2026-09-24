@@ -12,6 +12,8 @@
 % power ensemble, zero impurity, and purely imaginary auxiliary overlaps.
 % Independent matrix propagation checks the objective;
 % centred differences at three increments check its phase gradient.
+% All four optimiser methods must reject unusable assembled initial
+% guesses while permitting objective-only calls and valid optimisation.
 %
 % talos@spindynamics.org
 
@@ -32,6 +34,7 @@ spin_system.comp.isotopes={'1H'};
 spin_ops=pauli(2);
 formalisms={'zeeman-liouv','zeeman-hilb'};
 measures={'real','square'};
+methods={'lbfgs','rbfgs','newton','goodwin'};
 steps=[1e-3 1e-4 1e-5];
 
 % Exercise a unit target and a nonunit complex detection operator
@@ -190,25 +193,71 @@ for fixture=1:4
                               [const_fid;const_grad(:)],[2;zeros(4,1)],0,0,...
                               'A nonzero constant overlap must have an exact zero gradient.');
 
-            % The assembled-objective initial-guess safeguards remain active
-            local_system.control.fidelity='real'; local_system.control.max_iter=1;
-            for guard_case=1:2
-                if guard_case==1
-                    local_system.control.rho_init={source};
-                    local_system.control.rho_targ={target};
-                else
-                    local_system.control.rho_init={identity};
-                    local_system.control.rho_targ={identity};
+            % Check the assembled-objective safeguard for every optimiser method
+            local_system.control.fidelity='real'; local_system.control.pulse_dt=[0.1 0.2];
+            for method_idx=1:numel(methods)
+                local_system.control.method=methods{method_idx};
+                local_system.control.max_iter=1; local_system.control.freeze=[];
+                label=[formalisms{form_idx} ' ' methods{method_idx}];
+                for guard_case=1:2
+                    if guard_case==1
+                        local_system.control.rho_init={source};
+                        local_system.control.rho_targ={target};
+                    else
+                        local_system.control.rho_init={identity};
+                        local_system.control.rho_targ={identity};
+                    end
+                    caught=''; lastwarn('');
+                    try
+                        fmaxnewton(local_system,@grape_xy,waveform);
+                    catch err
+                        caught=err.message;
+                    end
+                    warn_text=lastwarn;
+                    result=test_true(result,sprintf('%s optimiser guard %d',label,guard_case),...
+                                     strcmp(caught,'fidelity or gradient too small at iter 1, find a better guess.')&&...
+                                     isempty(warn_text),'An unusable initial guess must fail before a singular solve.');
                 end
-                caught='';
+
+                % Preserve objective-only evaluation of constant objectives
+                local_system.control.max_iter=0;
+                [point,data]=fmaxnewton(local_system,@grape_xy,waveform);
+                result=test_true(result,[label ' objective only'],isequal(point,waveform)&&...
+                                 data.count.fx==1&&data.count.gfx==0&&data.count.hfx==0,...
+                                 'Zero iterations must not request derivatives or reject a constant objective.');
+
+                % Optimise a nonstationary physical transfer with each supported method
+                source_ref=spin_ops.x; target_ref=spin_ops.x+0.3*spin_ops.z;
+                if form_idx==1
+                    local_system.control.rho_init={source_ref(:)};
+                    local_system.control.rho_targ={target_ref(:)};
+                else
+                    local_system.control.rho_init={source_ref};
+                    local_system.control.rho_targ={target_ref};
+                end
+                local_system.control.max_iter=3; guess=[0.2 -0.3;0.4 0.5];
+                [~,before]=grape_xy(guess,local_system);
+                [point,data]=fmaxnewton(local_system,@grape_xy,guess);
+                [~,after]=grape_xy(point,local_system);
+                fprintf('OPTIMISER %s before=%.15g after=%.15g iter=%d hfx=%d\n',...
+                        label,before(1),after(1),data.count.iter,data.count.hfx);
+                result=test_true(result,[label ' nonzero objective'],all(isfinite(point),'all')&&...
+                                 after(1)>before(1),'A valid initial guess must still improve its transfer fidelity.');
+                result=test_true(result,[label ' derivative counts'],data.count.iter>1&&...
+                                 data.count.hfx==data.count.iter*ismember(methods{method_idx},{'newton','goodwin'}),...
+                                 'Only Hessian methods request Hessians, once per iteration.');
+
+                % Refuse a nonzero gradient when every input coordinate is frozen
+                local_system.control.freeze=true(size(guess)); caught=''; lastwarn('');
                 try
-                    fmaxnewton(local_system,@grape_xy,waveform);
+                    fmaxnewton(local_system,@grape_xy,guess);
                 catch err
                     caught=err.message;
                 end
-                result=test_true(result,sprintf('%s optimiser guard %d',formalisms{form_idx},guard_case),...
-                                 strcmp(caught,'fidelity or gradient too small at iter 1, find a better guess.'),...
-                                 'The optimiser must still refuse an unusable ordinary initial guess.');
+                warn_text=lastwarn;
+                result=test_true(result,[label ' frozen gradient'],...
+                                 strcmp(caught,'fidelity or gradient too small at iter 1, find a better guess.')&&...
+                                 isempty(warn_text),'Only unfrozen coordinates may contribute to the initial gradient.');
             end
         end
     end

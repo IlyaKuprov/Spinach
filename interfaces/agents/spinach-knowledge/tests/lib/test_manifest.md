@@ -28,14 +28,3 @@ Returns Spinach regression test metadata. Syntax: manifest=test_manifest()
 
 - manifest -structure array with test identifiers and functions
 
-## Implementation structure
-
-- Returns Spinach regression test metadata. Syntax:
-- manifest=test_manifest()
-- manifest -structure array with test identifiers and functions
-- Hand-written physically motivated tests
-- Build one manifest entry
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `test_entry()`.

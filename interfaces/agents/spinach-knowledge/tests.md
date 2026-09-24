@@ -4,7 +4,7 @@
 - Source commit: `f053e432a61d7144f3946d73d0a672e3ccfc3fc5`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
-- Files indexed: **113** MATLAB files
+- Files indexed: **114** MATLAB files
 - Generated: 2026-08-30T02:52:31
 
 | File | Signature | Summary | LOC |
@@ -14,6 +14,7 @@
 | `tests/kernel/test_cache_temp_scratch.m` | `result=test_cache_temp_scratch()` | Tests cache management in a temporary scratch directory. Syntax: result=test_cache_temp_scratch() Outputs: result -regre | 120 |
 | `tests/kernel/test_chemical_exchange_conservation.m` | `result=test_chemical_exchange_conservation()` | Tests conservation in two-site chemical exchange. Syntax: result=test_chemical_exchange_conservation() Outputs: result - | 44 |
 | `tests/kernel/test_commutator_utility.m` | `result=test_commutator_utility()` | Tests the commutator utility. Syntax: result=test_commutator_utility() Outputs: result -regression test result with expl | 40 |
+| `tests/kernel/test_coop_gradient.m` | `result=test_coop_gradient()` | Cooperative phase gradients for the requested transfer fidelity. | 219 |
 | `tests/kernel/test_ctx_doublerot_acquire.m` | `result=test_ctx_doublerot_acquire()` | Tests the double-rotor context with acquire(). Syntax: result=test_ctx_doublerot_acquire() Outputs: result -regression t | 71 |
 | `tests/kernel/test_ctx_floquet_acquire.m` | `result=test_ctx_floquet_acquire()` | Tests the Floquet context with acquire(). Syntax: result=test_ctx_floquet_acquire() Outputs: result -regression test res | 68 |
 | `tests/kernel/test_ctx_gridfree_acquire.m` | `result=test_ctx_gridfree_acquire()` | Tests the grid-free Fokker-Planck context with acquire(). Syntax: result=test_ctx_gridfree_acquire() Outputs: result -re | 66 |

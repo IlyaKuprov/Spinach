@@ -8,6 +8,8 @@
 %
 % Fresh, stale, and matching objects must give identical numerical-frame
 % stacks. Both MAS frames and Hilbert/Liouville representations are tested.
+% Already-rotating spins are rejected across all frame assumption sets,
+% while laboratory nuclei in mixed-frame systems remain transformable.
 %
 % talos@spindynamics.org
 
@@ -98,6 +100,129 @@ for f=1:numel(formalisms)
                          norm(lab{1}*lab{2}-lab{2}*lab{1},'fro')>1,...
                          'different rotor phases must not share a diagonal eigenbasis');
     end
+end
+
+% Specify a hyperfine-coupled pair with laboratory-frame nuclear dynamics
+sys.magnet=0.35;
+sys.isotopes={'E','1H'};
+inter.zeeman.eigs={[2.0023 2.0023 2.0023],[-12 5 20]};
+inter.coupling.scalar=cell(2);
+inter.coupling.eigs=cell(2);
+inter.coupling.euler=cell(2);
+inter.coupling.eigs{1,2}=[1e4 2e4 4e4];
+inter.coupling.euler{1,2}=[0.4 0.6 0.8];
+parameters.spins={'E','1H'};
+parameters.masframe='rotor';
+assumptions={'nmr','cavity','esr','deer','deer-zz','spin-phonon'};
+
+% Cover every all-spin and electron-only rotating-frame assumption set
+for f=1:numel(formalisms)
+    bas.formalism=formalisms{f};
+    spin_system=basis(create(sys,inter),bas);
+    stale=assume(spin_system,'labframe');
+    for a=1:numel(assumptions)
+        assumed=assume(spin_system,assumptions{a});
+        parameters.rframes={};
+        ordinary=rotor_stack(spin_system,parameters,assumptions{a});
+        normal_ref=rotor_stack(assumed,parameters,assumptions{a});
+        result=test_close(result,[assumptions{a} ' ordinary stack'],...
+                          cat(3,ordinary{:}),cat(3,normal_ref{:}),0,0,...
+                          'empty frame requests must remain valid');
+        targets={'E'};
+        if ismember(assumptions{a},{'nmr','cavity'})
+            targets={'E','1H'};
+        end
+        for t=1:numel(targets)
+
+            % Reject direct numerical transformations of already-rotating spins
+            H0=carrier(assumed,targets{t});
+            H=(ordinary{1}+ordinary{1}')/2;
+            rejected=false;
+            try
+                rotframe(assumed,H0,H,targets{t},1);
+            catch failure
+                rejected=contains(failure.message,'already in the rotating frame');
+            end
+            result=test_true(result,[assumptions{a} ' direct ' targets{t}],rejected,...
+                             'rotframe must reject a second carrier subtraction');
+
+            % Reject the same request from fresh and stale rotor-stack inputs
+            parameters.rframes={{targets{t},1}};
+            inputs={spin_system,stale};
+            for s=1:numel(inputs)
+                rejected=false;
+                try
+                    rotor_stack(inputs{s},parameters,assumptions{a});
+                catch failure
+                    rejected=contains(failure.message,'already in the rotating frame');
+                end
+                result=test_true(result,[assumptions{a} ' rotor ' targets{t}],rejected,...
+                                 'explicit assumptions must reject fresh and stale inputs alike');
+            end
+        end
+    end
+
+    % Retain nuclear numerical frames under all electron-only rotating sets
+    parameters.rframes={{'1H',1}};
+    reference=rotor_stack(spin_system,parameters,'esr');
+    for a=3:numel(assumptions)
+        fresh=rotor_stack(spin_system,parameters,assumptions{a});
+        old=rotor_stack(stale,parameters,assumptions{a});
+        frame_tol=1e-14*norm(carrier(spin_system,'1H'),'fro')*sqrt(numel(fresh));
+        result=test_close(result,[assumptions{a} ' nuclear frame'],...
+                          cat(3,fresh{:}),cat(3,reference{:}),frame_tol,1e-12,...
+                          'one-electron systems share the ESR nuclear-frame Hamiltonian');
+        result=test_close(result,[assumptions{a} ' stale nuclear frame'],...
+                          cat(3,old{:}),cat(3,reference{:}),frame_tol,1e-12,...
+                          'laboratory nuclear spins must remain eligible for transformation');
+    end
+
+    % Verify that the mixed-frame control is complex and noncommuting
+    parameters.rframes={};
+    mixed=rotor_stack(spin_system,parameters,'spin-phonon');
+    result=test_true(result,'complex mixed-frame stack',norm(imag(mixed{1}),'fro')>1,...
+                     'pseudosecular hyperfine terms must exercise complex matrices');
+    result=test_true(result,'noncommuting mixed-frame stack',...
+                     norm(mixed{1}*mixed{2}-mixed{2}*mixed{1},'fro')>1,...
+                     'rotor phases must retain noncommuting nuclear dynamics');
+end
+
+% Specify a quadrupolar nucleus alongside an already-rotating spin-half nucleus
+sys.magnet=9.4;
+sys.isotopes={'1H','14N'};
+inter.zeeman.eigs={[-12 5 20],[-30 10 45]};
+inter.coupling.eigs=cell(2);
+inter.coupling.euler=cell(2);
+inter.coupling.eigs{2,2}=[-1e5 -2e5 3e5];
+inter.coupling.euler{2,2}=[0.4 0.6 0.8];
+parameters.spins={'1H','14N'};
+for f=1:numel(formalisms)
+    bas.formalism=formalisms{f};
+    spin_system=basis(create(sys,inter),bas);
+    assumed=assume(spin_system,'qnmr');
+    stale=assume(spin_system,'nmr');
+    parameters.rframes={{'14N',1}};
+    reference=rotor_stack(assumed,parameters,'qnmr');
+    fresh=rotor_stack(spin_system,parameters,'qnmr');
+    old=rotor_stack(stale,parameters,'qnmr');
+    frame_tol=1e-14*norm(carrier(assumed,'14N'),'fro')*sqrt(numel(fresh));
+    result=test_close(result,'quadrupolar laboratory frame',cat(3,fresh{:}),...
+                      cat(3,reference{:}),frame_tol,1e-12,...
+                      'qnmr must permit numerical frames for spin-one nuclei');
+    result=test_close(result,'stale quadrupolar laboratory frame',cat(3,old{:}),...
+                      cat(3,reference{:}),frame_tol,1e-12,...
+                      'stale NMR assumptions must not reject a laboratory-frame nucleus');
+
+    % Preserve refusal of a spin-half numerical frame under qnmr
+    parameters.rframes={{'1H',1}};
+    rejected=false;
+    try
+        rotor_stack(spin_system,parameters,'qnmr');
+    catch failure
+        rejected=contains(failure.message,'already in the rotating frame');
+    end
+    result=test_true(result,'qnmr spin-half rejection',rejected,...
+                     'qnmr already removes the spin-half nuclear carrier');
 end
 
 end

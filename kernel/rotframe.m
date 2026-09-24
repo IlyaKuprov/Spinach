@@ -6,6 +6,10 @@
 %
 % Parameters:
 %
+%    spin_system - spin system with assumptions set by assume();
+%                  the selected isotope must still be in the
+%                  laboratory frame under those assumptions
+%
 %    H0      - carrier Hamiltonian with respect to which the
 %              rotating frame transformation is to be done
 %
@@ -25,6 +29,12 @@
 %
 % Notes: the auxiliary matrix method is massively faster than
 %        either commutator series or diagonalisation.
+%
+%        Numerical frames are refused for all spins under nmr
+%        and cavity; electrons under esr, deer, deer-zz, and
+%        spin-phonon; and spin-1/2 nuclei under qnmr. Nuclei
+%        under electron-only rotating sets and higher-spin
+%        nuclei under qnmr remain in the laboratory frame.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -68,10 +78,10 @@ end
 if ~isfield(spin_system.inter,'assumptions')
     error('assumption information is missing, call assume() first.');
 end
-if ismember(spin_system.inter.assumptions,{'nmr'})
+if ismember(spin_system.inter.assumptions,{'nmr','cavity'})
     error('all spins are already in the rotating frame.');
 end
-if ismember(spin_system.inter.assumptions,{'esr','deer','deer-zz'})&&...
+if ismember(spin_system.inter.assumptions,{'esr','deer','deer-zz','spin-phonon'})&&...
    (isotope(1)=='E')
     error('electrons are already in the rotating frame.');
 end

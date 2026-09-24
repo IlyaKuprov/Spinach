@@ -377,7 +377,7 @@
 | `kernel/reduce.m` | `projectors=reduce(spin_system,L,rho)` | Symmetry and trajectory-level state space reduction. Tries all applicable reduction methods (unless disabled during the  | 315 |
 | `kernel/relaxation.m` | `R=relaxation(spin_system,euler_angles)` | Relaxation superoperator. Syntax: R=relaxation(spin_system,euler_angles) Parameters: euler_angles -three Euler angles (Z | 888 |
 | `kernel/residual.m` | `spin_system=residual(spin_system)` | Sets up interaction tensors under partial ordering in a liquid crystal with the user-supplied order matrix. All adjustab | 106 |
-| `kernel/rotframe.m` | `Hr=rotframe(spin_system,H0,H,isotope,order)` | Rotating frame transformation with respect to specified spins to specified order in perturbation theory, using the forma | 98 |
+| `kernel/rotframe.m` | `Hr=rotframe(spin_system,H0,H,isotope,order)` | Rotating frame transformation with respect to specified spins to specified order in perturbation theory, using the forma | 108 |
 | `kernel/spin.m` | `[gamma,multiplicity]=spin(name)` | Database of multiplicities and magnetogyric ratios for sta- ble and long-lived particles, including spin zero. Syntax: [ | 989 |
 | `kernel/spinlock.m` | `rho=spinlock(spin_system,Lx,Ly,rho,direction)` | Analytical approximation to a spin locking process. This function oblite- rates all spin-spin correlations and all magne | 85 |
 | `kernel/state.m` | `rho=state(spin_system,states,spins,method)` | Generates Hilbert space density matrices and Liouville space state vectors from their human-readable descriptions. Synta | 321 |
@@ -497,7 +497,7 @@
 | `kernel/utilities/rlx_split.m` | `[R1,R2,Rm]=rlx_split(spin_system,R)` | Splits a relaxation superoperator into longitudinal, trans- verse and mixed components. Syntax: [R1,R2,Rm]=rlx_split(spi | 67 |
 | `kernel/utilities/rlx_t1_t2.m` | `[R1Op,R2Op]=rlx_t1_t2(spin_system,euler_angles)` | Extended T1/T2 relaxation model returning the relaxation super- operators separately for the longitudinal and the transv | 191 |
 | `kernel/utilities/rocomm.m` | `C=rocomm(A)` | Right-ordered nested commutator [[[[A{1},A{2}],A{3}],A{4}],...] built from the user-supplied matrices. Syntax: C=rocomm( | 43 |
-| `kernel/utilities/rotor_stack.m` | `[L,rotor_phases]=rotor_stack(spin_system,parameters,assumptions)` | Returns a rotor stack of Liouvillians or Hamiltonians. The stack is needed for the traditional style calculation of MAS  | 249 |
+| `kernel/utilities/rotor_stack.m` | `[L,rotor_phases]=rotor_stack(spin_system,parameters,assumptions)` | Returns a rotor stack of Liouvillians or Hamiltonians. The stack is needed for the traditional style calculation of MAS  | 254 |
 | `kernel/utilities/rspert.m` | `[Ep,Vp]=rspert(E0,H1,order)` | Rayleigh-Schrodinger perturbation theory to arbitrary order, Eqs 2.21-2.23 from Stefan Stoll's PhD thesis, with the typo | 105 |
 | `kernel/utilities/rspt_eig.m` | `[E,V,dE,T,LP]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,B)` | Eigensystem of sparse Hamiltonians to user-specified order in RSPT with careful handling of diagonal dominance and an op | 199 |
 | `kernel/utilities/rwalk.m` | `eulers=rwalk(npts,tau_c,dt)` | Random walk on SO(3), isotropic rotational diffusion. Syntax: eulers=rwalk(npts,tau_c,dt) Parameters: npts -number of po | 83 |

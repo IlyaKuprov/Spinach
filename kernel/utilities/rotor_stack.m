@@ -45,7 +45,12 @@
 %                       (two-angle powder grids will be required)
 %
 %   assumptions - assumption set to be used in generating the
-%                 Hamiltonian, see assume.m
+%                 Hamiltonian and validating numerical rotating
+%                 frames, regardless of prior assumptions on the
+%                 input object. The spins in parameters.rframes
+%                 must remain in the laboratory frame under this
+%                 set; already-rotating spins are rejected by
+%                 rotframe.m. See assume.m
 %
 % Outputs:
 %

@@ -67,7 +67,10 @@ space and three-angle grids in Hilbert space; `singlerot` supports
 arbitrary-order rotating-frame corrections and `floquet` does not.
 For traditional MAS stacks, `rotor_stack` applies its explicit assumptions
 to both Hamiltonian construction and numerical `parameters.rframes`,
-regardless of prior assumptions on the input object.
+regardless of prior assumptions on the input object. Numerical frames reject
+all spins under `nmr`/`cavity`, electrons under `esr`/`deer`/`deer-zz`/
+`spin-phonon`, and spin-half nuclei under `qnmr`. Nuclear frames remain
+allowed under the electron-only sets, as do higher-spin nuclei under `qnmr`.
 `gridfree` performs the spherical integration inside the SLE formalism, so
 supplying `parameters.grid` is an error; it is Liouville-space only, and its
 correlation times go in `parameters.tau_c`, not `inter.tau_c`, which is used

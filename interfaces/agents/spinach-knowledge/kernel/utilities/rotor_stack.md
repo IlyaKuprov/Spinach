@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/rotor_stack.m`
 - Signature: `[L,rotor_phases]=rotor_stack(spin_system,parameters,assumptions)`
-- Total lines: 249
+- Total lines: 254
 
 ## Purpose
 
@@ -53,7 +53,7 @@ The explicit `assumptions` argument governs Hamiltonian construction and numeric
 - 'rotor' -the initial orientation in the rotor frame
 - (two-angle powder grids will be required)
 - assumptions -assumption set to be used in generating the
-- Hamiltonian, see assume.m
+- Hamiltonian and numerical rotating-frame validation, regardless of the input object's prior assumptions. The transformed spins must remain in the laboratory frame under this set; already-rotating spins are rejected by `rotframe`. See `assume.m`.
 
 ## Outputs
 
@@ -62,21 +62,6 @@ The explicit `assumptions` argument governs Hamiltonian construction and numeric
 - rotor_phases -rotor phases at each tick, radians
 - Note: relaxation and chemical kinetics are not included.
 
-## Implementation structure
+## Header notes
 
-- Returns a rotor stack of Liouvillians or Hamiltonians. The stack is
-- needed for the traditional style calculation of MAS dynamics. Syntax:
-- L=rotor_stack(spin_system,parameters,assumptions)
-- parameters.axis -spinning axis, given as a normalized
-- 3-element vector
-- parameters.offset -a cell array giving transmitter off-
-- sets in Hz on each of the spins listed
-- in parameters.spins array
-- parameters.spins -a cell array giving the spins that
-- the offsets refer to, e.g. {'1H','13C'}
-- parameters.max_rank -maximum harmonic rank to retain in
-- the solution (increase till conver-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `hamiltonian()`, `assume()`, `frqoffset()`, `cart2sph()`, `fourdif()`, `carrier()`, `wigner()`, `rotor_phases()`, `strcmp()`, `rotframe()`, `clean_up()`, `isfield()`, `elseif()`, `isrow()`, `iscell()`.
+The spinning axis is a normalised three-vector; transmitter offsets are in hertz for the entries in parameters.spins. Increase the retained harmonic rank until the requested rotor-stack result is converged.

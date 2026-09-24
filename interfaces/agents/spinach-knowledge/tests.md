@@ -1,12 +1,12 @@
 # Spinach code index: tests
 
 - Source repository: `https://github.com/IlyaKuprov/Spinach`
-- Source commit: `24cfd1ce3cf46dd0c4517749f5da8491b201bbe8`
+- Source commit: `199b0f0034444f7e1f2b6522670e6fabe613d1e4`
 - Source tree state: `committed snapshot`
 - Path set: committed MATLAB files under this index directory; working-tree and untracked files are excluded.
 - Files indexed: **116** MATLAB files
 - Total source lines: **14245**
-- Generated: 2026-09-24T08:40:51+00:00
+- Generated: 2026-09-24T09:20:35+00:00
 
 | File | Signature | Summary | LOC |
 |---|---|---|---:|

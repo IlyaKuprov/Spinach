@@ -515,6 +515,9 @@ if ismember('SRSK',spin_system.rlx.theories)
     spin_system_local.rlx.theories={'t1_t2'};
     spin_system_local.rlx.r1_rates=num2cell(R1');
     spin_system_local.rlx.r2_rates=num2cell(R2');
+
+    % Leave thermalisation of the sum to the outer call
+    spin_system_local.rlx.equilibrium='zero';
     
     % Issue a recursive call for SRSK
     report(spin_system,'recursive call for SRSK relaxation terms...'); 

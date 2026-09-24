@@ -157,6 +157,8 @@ heteronuclear partner using the isotropic part of the coupling tensor
 between them. A source that relaxes too slowly for the treatment to hold
 stops the run with `SRSK theory is not applicable: source spin relaxation is
 too slow`. Contributions are additive and reported in hertz.
+The additive SRSK contribution is built without thermalisation; the chosen
+IME or DiBari-Levitt method is applied once to the total relaxation generator.
 
 ## Which terms of R survive
 

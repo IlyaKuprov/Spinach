@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/relaxation.m`
 - Signature: `R=relaxation(spin_system,euler_angles)`
-- Total lines: 888
+- Total lines: 891
 
 ## Purpose
 
@@ -13,6 +13,8 @@ Relaxation superoperator. Syntax: R=relaxation(spin_system,euler_angles)
 - This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
 - The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+
+- SRSK contributes zero-destination relaxation rates to the accumulated generator; IME or DiBari-Levitt thermalisation is applied once to the total, not separately to the recursive SRSK contribution.
 
 ## Numerical / algorithmic content
 

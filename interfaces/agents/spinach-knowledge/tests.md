@@ -4,7 +4,7 @@
 - Source commit: `f053e432a61d7144f3946d73d0a672e3ccfc3fc5`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
-- Files indexed: **113** MATLAB files
+- Files indexed: **114** MATLAB files
 - Generated: 2026-08-30T02:52:31
 
 | File | Signature | Summary | LOC |
@@ -109,6 +109,7 @@
 | `tests/kernel/test_transform_roundtrip_suite.m` | `result=test_transform_roundtrip_suite()` | Tests deterministic coordinate and tensor transforms. Syntax: result=test_transform_roundtrip_suite() Outputs: result -r | 85 |
 | `tests/kernel/test_transform_tensor_suite.m` | `result=test_transform_tensor_suite()` | Tests tensor transform helpers. Syntax: result=test_transform_tensor_suite() Outputs: result -regression test result wit | 149 |
 | `tests/kernel/test_transform_units_coordinates_suite.m` | `result=test_transform_units_coordinates_suite()` | Tests unit and coordinate transform helpers. Syntax: result=test_transform_units_coordinates_suite() Outputs: result -re | 105 |
+| `tests/kernel/test_tt_phase.m` | `result=test_tt_phase()` | Tensor-train absolute compression budgets under coefficient phases. | 98 |
 | `tests/kernel/test_unit_conversion_suite.m` | `result=test_unit_conversion_suite()` | Tests scalar unit-conversion functions. Syntax: result=test_unit_conversion_suite() Outputs: result -regression test res | 62 |
 | `tests/kernel/test_wave_basis_orthonormality.m` | `result=test_wave_basis_orthonormality()` | Tests waveform basis orthonormality. Syntax: result=test_wave_basis_orthonormality() Outputs: result -regression test re | 37 |
 | `tests/kernel/test_wigner_angular_suite.m` | `result=test_wigner_angular_suite()` | Tests angular-momentum coefficient and spherical-function helpers. Syntax: result=test_wigner_angular_suite() Outputs: r | 62 |

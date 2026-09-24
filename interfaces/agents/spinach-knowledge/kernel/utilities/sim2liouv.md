@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/sim2liouv.m`
 - Signature: `[spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K)`
-- Total lines: 190
+- Total lines: 193
 
 ## Purpose
 
@@ -28,7 +28,7 @@ Moves a zeeman-hilb simulation context into Liouville space. When the formalism 
 - (matrices or their horizontal concatena-
 - tions) are stretched into state vectors,
 - and the operator-like fields pulse_op,
-- mw_oper, and ez_oper are converted into
+- mw_oper, ez_oper, and homodec_oper are converted into
 - commutation superoperators, when present
 - H -Hamiltonian operator, converted into a
 - commutation superoperator; an empty

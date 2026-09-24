@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/relaxation.m`
 - Signature: `R=relaxation(spin_system,euler_angles)`
-- Total lines: 888
+- Total lines: 892
 
 ## Purpose
 
@@ -19,6 +19,10 @@ Relaxation superoperator. Syntax: R=relaxation(spin_system,euler_angles)
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `defaults()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
+
+SRSK is supported in spherical-tensor Liouville space only. Requests with
+`zeeman-liouv` are rejected upfront as not implemented rather than passed
+to the recursive extended T1/T2 builder; no substitute relaxation model is used.
 
 ## Parameters / inputs
 

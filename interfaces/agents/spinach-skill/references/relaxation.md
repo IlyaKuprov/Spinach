@@ -42,8 +42,8 @@ inter.rlx_keep='kite';       % which terms of R survive
 inter.equilibrium='zero';    % where relaxation drives the system
 ```
 
-Formalism restrictions are enforced. `t1_t2`, `redfield`, and
-`naka-zwan` are `sphten-liouv` only. `lindblad`, `nottingham`, `weizmann`, `SRFK`, `SRSK`,
+Formalism restrictions are enforced. `t1_t2`, `redfield`, `naka-zwan`, and
+`SRSK` are `sphten-liouv` only. `lindblad`, `nottingham`, `weizmann`, `SRFK`,
 and IME thermalisation all require Liouville space (`sphten-liouv` or
 `zeeman-liouv`). Only `damp` works in `zeeman-hilb`.
 
@@ -157,6 +157,8 @@ heteronuclear partner using the isotropic part of the coupling tensor
 between them. A source that relaxes too slowly for the treatment to hold
 stops the run with `SRSK theory is not applicable: source spin relaxation is
 too slow`. Contributions are additive and reported in hertz.
+SRSK with `zeeman-liouv` is explicitly refused as not implemented; no
+alternative high-spin Lindblad model is substituted.
 
 ## Which terms of R survive
 

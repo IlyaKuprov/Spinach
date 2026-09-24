@@ -375,7 +375,7 @@
 | `kernel/pulses/vg_pulse.m` | `waveform=vg_pulse(pulse_name,npoints,duration)` | Veshtort-Griffin shaped pulses, generated from tables given in There are good reasons to believe (see Section 2.2 of the | 136 |
 | `kernel/pulses/wave_basis.m` | `basis_waves=wave_basis(basis_type,n_func,n_points)` | Common basis sets for the expansion of pulse waveforms. Returns the wave- form basis functions as columns of a matrix. S | 105 |
 | `kernel/reduce.m` | `projectors=reduce(spin_system,L,rho)` | Symmetry and trajectory-level state space reduction. Tries all applicable reduction methods (unless disabled during the  | 315 |
-| `kernel/relaxation.m` | `R=relaxation(spin_system,euler_angles)` | Relaxation superoperator. Syntax: R=relaxation(spin_system,euler_angles) Parameters: euler_angles -three Euler angles (Z | 888 |
+| `kernel/relaxation.m` | `R=relaxation(spin_system,euler_angles)` | Relaxation superoperator. Syntax: R=relaxation(spin_system,euler_angles) Parameters: euler_angles -three Euler angles (Z | 892 |
 | `kernel/residual.m` | `spin_system=residual(spin_system)` | Sets up interaction tensors under partial ordering in a liquid crystal with the user-supplied order matrix. All adjustab | 106 |
 | `kernel/rotframe.m` | `Hr=rotframe(spin_system,H0,H,isotope,order)` | Rotating frame transformation with respect to specified spins to specified order in perturbation theory, using the forma | 98 |
 | `kernel/spin.m` | `[gamma,multiplicity]=spin(name)` | Database of multiplicities and magnetogyric ratios for sta- ble and long-lived particles, including spin zero. Syntax: [ | 989 |

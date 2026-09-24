@@ -4,7 +4,7 @@
 - Source commit: `f053e432a61d7144f3946d73d0a672e3ccfc3fc5`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
-- Files indexed: **113** MATLAB files
+- Files indexed: **114** MATLAB files
 - Generated: 2026-08-30T02:52:31
 
 | File | Signature | Summary | LOC |
@@ -56,6 +56,7 @@
 | `tests/kernel/test_euler_rotation_matrix.m` | `result=test_euler_rotation_matrix()` | Tests active ZYZ Euler rotation matrices. Syntax: result=test_euler_rotation_matrix() Outputs: result -regression test r | 39 |
 | `tests/kernel/test_exponential_krylov_suite.m` | `result=test_exponential_krylov_suite()` | Tests exponential, Chebyshev, and Krylov numerical utilities. Syntax: result=test_exponential_krylov_suite() Outputs: re | 125 |
 | `tests/kernel/test_finite_difference_suite.m` | `result=test_finite_difference_suite()` | Tests finite-difference and spectral differentiation helpers. Syntax: result=test_finite_difference_suite() Outputs: res | 170 |
+| `tests/kernel/test_freeze_map.m` | `result=test_freeze_map()` | Frozen input derivatives through composed waveform transformations. | 157 |
 | `tests/kernel/test_giant_ham_descr.m` | `result=test_giant_ham_descr()` | Tests the giant spin Hamiltonian descriptor route. Syntax: result=test_giant_ham_descr() Outputs: result -regression tes | 134 |
 | `tests/kernel/test_graph_geometry_suite.m` | `result=test_graph_geometry_suite()` | Tests graph, geometry, lattice, and coordinate utilities. Syntax: result=test_graph_geometry_suite() Outputs: result -re | 120 |
 | `tests/kernel/test_grid_geometry_suite.m` | `result=test_grid_geometry_suite()` | Tests grid and spherical geometry helpers. Syntax: result=test_grid_geometry_suite() Outputs: result -regression test re | 178 |
@@ -115,7 +116,7 @@
 | `tests/kernel/test_zeeman_hamiltonian.m` | `result=test_zeeman_hamiltonian()` | Tests the one-spin Zeeman Hamiltonian. Syntax: result=test_zeeman_hamiltonian() Outputs: result -regression test result  | 42 |
 | `tests/lib/new_test_result.m` | `result=new_test_result(id,name,purpose)` | Creates a regression test result structure. Syntax: result=new_test_result(id,name,purpose) Parameters: id -stable test  | 30 |
 | `tests/lib/test_close.m` | `result=test_close(result,label,observed,reference,abs_tol,rel_tol,why)` | Adds a numerical regression check with tolerances and explanation. Syntax: result=test_close(result,label,observed,refer | 71 |
-| `tests/lib/test_manifest.m` | `manifest=test_manifest()` | Returns Spinach regression test metadata. Syntax: manifest=test_manifest() Outputs: manifest -structure array with test  | 130 |
+| `tests/lib/test_manifest.m` | `manifest=test_manifest()` | Returns Spinach regression test metadata. Syntax: manifest=test_manifest() Outputs: manifest -structure array with test  | 132 |
 | `tests/lib/test_options.m` | `options=test_options(varargin)` | Parses name-value options for the Spinach test runner. Syntax: options=test_options(varargin) Parameters: varargin -name | 62 |
 | `tests/lib/test_spin_system.m` | `spin_system=test_spin_system(sys,inter,bas)` | Builds a small quiet Spinach spin system for tests. Syntax: spin_system=test_spin_system(sys,inter,bas) Parameters: sys  | 35 |
 | `tests/lib/test_true.m` | `result=test_true(result,label,condition,why)` | Adds a logical regression check with a clear message. Syntax: result=test_true(result,label,condition,why) Parameters: r | 31 |

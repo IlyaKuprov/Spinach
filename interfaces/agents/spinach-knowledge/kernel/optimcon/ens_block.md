@@ -51,21 +51,6 @@ Freeze masks refer to the input waveform: the complete physical gradient is pull
 - [(ncontrols*nsteps)^2 x 1] column, empty un-
 - less n_outputs>3
 
-## Implementation structure
-
-- Fidelity, gradient, and Hessian contributions of one block of ensem-
-- ble cases, evaluated on the parallel pool worker that holds the drift
-- generators of that block. This function is called by ensemble.m in-
-- side its spmd block; the per-case physics (phase cycle, offsets, po-
-- wer level, waveform distortions, GRAPE) is applied here. Syntax:
-- [traj,fid,grad,hess]=ens_block(spin_system,drifts,control,...
-- block,waveform,n_outputs)
-- spin_system -frozen problem published by optimcon.m, with
-- the drift generators removed
-- drifts -cell array of drift generators, populated at
-- the indices that the cases of this block use
-- control -live client-side control structure
-
 ## Control flow inside the case loop
 
 - The live control structure is grafted over the frozen worker copy and every field the live copy lacks (frozen invariants, the case blocks, the waveform basis) is taken from the frozen copy; the drift generators come from the worker's own slice through the `drifts` argument.
@@ -80,6 +65,6 @@ Freeze masks refer to the input waveform: the complete physical gradient is pull
 - The Hessian is rotated on both sides by the Kronecker product of the identity over time steps with the transposed rotation, and added to the block sum scaled by the squared power level.
 - Conditional branch on `ismember('average',control.traj_opts)&&(n_mine>0)`; the forward trajectories of a non-empty block are added with the overloaded `plus`, which also covers the Hilbert-space cell trajectories, into one entry so that only block sums travel to the client, which divides by the case count; an empty block contributes nothing.
 
-## Internal Spinach / MATLAB structure cues
+## Header notes
 
-- Called routines detected from the main body: `grumble()`, `setdiff()`, `fieldnames()`, `cellfun()`, `ind2sub()`, `sparse()`, `speye()`, `kron()`, `reshape()`, `grape_liouv()`, `grape_hilb()`, `ismember()`, `isfield()`.
+The worker receives the frozen spin-system description and its local drift generators together with live control data, the block identifier, waveform, and requested output count.

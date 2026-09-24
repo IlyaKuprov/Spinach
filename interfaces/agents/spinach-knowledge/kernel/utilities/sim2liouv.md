@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/sim2liouv.m`
 - Signature: `[spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K)`
-- Total lines: 190
+- Total lines: 195
 
 ## Purpose
 
@@ -14,6 +14,8 @@ Moves a zeeman-hilb simulation context into Liouville space. When the formalism 
 - The anticommutation superoperator of a Hilbert space relaxation matrix damps the unit state, which the Liouville space branch of relaxation.m never does. The row and the column of the unit state are therefore projected out of the converted R, so that the unit state is neither damped nor a source of relaxation and the trace is conserved. For the scalar damping matrix that the kernel builds in Hilbert space the result coincides with the Liouville space damp operator. The unit state spans all diagonal irrep pairs, and those are merged into one subspace so that the projected R stays block-diagonal in the irrep table that reduce.m evolves independently.
 
 ## Numerical / algorithmic content
+
+- Existing basis cache metadata is refreshed from the converted basis table using the canonical `md5_hash` rule, keeping Hilbert operators and Hamiltonians separate from their Liouville representations. Objects without cache metadata gain none, and non-Hilbert inputs remain unchanged.
 
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 - The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.

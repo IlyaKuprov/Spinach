@@ -505,7 +505,7 @@
 | `kernel/utilities/scomponents.m` | `sci=scomponents(A)` | Strongly connected components of a graph, David Gleich's imple- mentation of Tarjan's algorithm: Syntax: sci=scomponents | 88 |
 | `kernel/utilities/sec2kite.m` | `R=sec2kite(spin_system,R)` | Converts a secular relaxation superoperator into the Redfield kite form by dropping all non-longitudinal cross-relaxatio | 78 |
 | `kernel/utilities/shift_iso.m` | `tensors=shift_iso(tensors,spin_numbers,new_iso)` | Replaces the isotropic parts of interaction tensors with user- supplied values. This is useful for correcting DFT calcul | 75 |
-| `kernel/utilities/sim2liouv.m` | `[spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K)` | Moves a zeeman-hilb simulation context into Liouville space. When the formalism specified in the spin system object is ' | 190 |
+| `kernel/utilities/sim2liouv.m` | `[spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K)` | Moves a zeeman-hilb simulation context into Liouville space. When the formalism specified in the spin system object is ' | 195 |
 | `kernel/utilities/sinkhole.m` | `L=sinkhole(spin_system,L,states)` | Turns the specified states into sinkholes --any population reaching them will be summed up and stored forever in a froze | 58 |
 | `kernel/utilities/snormpdf.m` | `p=snormpdf(x,mu,sigma,alpha)` | Azzalini's skew normal distribution. Syntax: p=snormpdf(x,mu,sigma,alpha) Parameters: x -an array of real numbers mu -ex | 55 |
 | `kernel/utilities/sorensen.m` | `b=sorensen(rho_init,rho_targ)` | Sorensen bound for the maximum transfer efficiency between two states under arbitrary control operators. Equation 186 fr | 62 |

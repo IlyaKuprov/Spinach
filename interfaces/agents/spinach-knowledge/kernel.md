@@ -6,7 +6,7 @@
 - Path set: committed MATLAB files under this index directory; working-tree and untracked files are excluded.
 - Files indexed: **530** MATLAB files
 - Total source lines: **73335**
-- Generated: 2026-09-24T08:33:24+00:00
+- Generated: 2026-09-24T08:51:58+00:00
 
 | File | Signature | Summary | LOC |
 |---|---|---|---:|
@@ -226,7 +226,7 @@
 | `kernel/overloads/@opium/full.m` | `M=full(M)` | Converts an OPIUM object into the full scaled unit matrix that it represents. Syntax: M=full(M) Parameters: M -an OPIUM  | 38 |
 | `kernel/overloads/@opium/kron.m` | `c=kron(a,b)` | Kronecker products involving an OPIUM object. Syntax: c=kron(a,b) Parameters: a,b -Kronecker operands, can be matrices o | 54 |
 | `kernel/overloads/@opium/mtimes.m` | `c=mtimes(a,b)` | Matrix products involving an OPIUM object. Syntax: c=mtimes(a,b) Parameters: a,b -opia or numerical arrays Outputs: c -m | 85 |
-| `kernel/overloads/@opium/opium.m` | `grumble(dim,coeff)` | Object Pretending It is a Unit Matrix (OPIUM). Syntax: M=opium(dim,coeff) Parameters: dim -dimension of the unit matrix  | 158 |
+| `kernel/overloads/@opium/opium.m` | `M=opium(dim,coeff)` | Object Pretending It is a Unit Matrix (OPIUM). Syntax: M=opium(dim,coeff) Parameters: dim -dimension of the unit matrix  | 158 |
 | `kernel/overloads/@opium/size.m` | `varargout=size(op,dim)` | The size of the matrix represented by the OPIUM. Syntax: answer=size(op,dim) Parameters: op -an opium object dim -option | 52 |
 | `kernel/overloads/@polyadic/allfinite.m` | `answ=allfinite(p)` | Returns true if none of the elements of the polyadic are Inf or NaN. Syntax: answ=allfinite(p) Parameters: p -a polyadic | 51 |
 | `kernel/overloads/@polyadic/ctranspose.m` | `p=ctranspose(p)` | Computes the Hermitian conjugate of a matrix in a polyadic representation. Syntax: p=ctranspose(p) | 42 |
@@ -240,7 +240,7 @@
 | `kernel/overloads/@polyadic/mtimes.m` | `C=mtimes(A,B)` | Performs multiplications involving polyadics. Syntax: C=mtimes(A,B) Parameters: A,B -a polyadic or a numerical array Out | 171 |
 | `kernel/overloads/@polyadic/nnz.m` | `answer=nnz(p)` | Number of non-zeroes in all kernels of the polyadic. Syntax: answer=nnz(p) Parameters: p -a polyadic object Outputs: ans | 45 |
 | `kernel/overloads/@polyadic/plus.m` | `c=plus(a,b)` | Polyadic addition operation. Does not perform the actual additi- on, but instead stores the operands as a sum of unopene | 81 |
-| `kernel/overloads/@polyadic/polyadic.m` | `grumble(cores)` | Creates an object of a polyadic class. Syntax: p=polyadic(cores) A polyadic is a matrix formed by a Kronecker product, w | 128 |
+| `kernel/overloads/@polyadic/polyadic.m` | `p=polyadic(cores)` | Creates an object of a polyadic class. Syntax: p=polyadic(cores) A polyadic is a matrix formed by a Kronecker product, w | 128 |
 | `kernel/overloads/@polyadic/prefix.m` | `p=prefix(a,p)` | Adds prefix matrices to a polyadic. Anything the polyadic multiplies will subsequently be multiplied by the prefix matri | 62 |
 | `kernel/overloads/@polyadic/simplify.m` | `p=simplify(p)` | Simplifies the structure of the polyadic object by reordering buffers, dropping inconsequential terms, and flattening ne | 190 |
 | `kernel/overloads/@polyadic/size.m` | `varargout=size(p,dim)` | Returns the size of the matrix represented by the polyadic. Syntax: answer=size(p,dim) Parameters: p -a polyadic object  | 81 |
@@ -256,7 +256,7 @@
 | `kernel/overloads/@rcv/minus.m` | `A=minus(A,B)` | Subtracts one RCV object from another. Syntax: A=minus(A,B) Parameters: A -left operand B -right operand Outputs: A -res | 51 |
 | `kernel/overloads/@rcv/mtimes.m` | `C=mtimes(A,B)` | Multiplication for RCV sparse matrices. Syntax: C=mtimes(A,B) Parameters: A -left operand B -right operand Outputs: C -p | 90 |
 | `kernel/overloads/@rcv/plus.m` | `C=plus(A,B)` | Adds things to RCV sparse matrices. Syntax: C=plus(A,B) Parameters: A -left operand B -right operand Outputs: C -sum A+B | 98 |
-| `kernel/overloads/@rcv/rcv.m` | `grumble(varargin)` | Creates an RCV (row-column-value storage) sparse matrix. Syntax: obj=rcv(M) obj=rcv(dim1,dim2) obj=rcv(R,C,V,dim1,dim2)  | 190 |
+| `kernel/overloads/@rcv/rcv.m` | `obj=rcv(varargin)` | Creates an RCV (row-column-value storage) sparse matrix. Syntax: obj=rcv(M) obj=rcv(dim1,dim2) obj=rcv(R,C,V,dim1,dim2)  | 190 |
 | `kernel/overloads/@rcv/rdivide.m` | `A=rdivide(A,k)` | Divides an RCV sparse matrix by a numeric scalar. Syntax: A=rdivide(A,k) Parameters: A -RCV sparse matrix k -numeric sca | 42 |
 | `kernel/overloads/@rcv/size.m` | `[s,ncols]=size(A,dim)` | Returns the size of an RCV sparse matrix. Syntax: s=size(A,dim) [s,ncols]=size(A) Parameters: A -RCV sparse matrix dim -optional dimension | 71 |
 | `kernel/overloads/@rcv/sparse.m` | `A=sparse(A)` | Converts an RCV sparse matrix into a Matlab sparse matrix. Syntax: A=sparse(A) Parameters: A -RCV sparse matrix Outputs: | 48 |
@@ -301,7 +301,7 @@
 | `kernel/overloads/@ttclass/trace.m` | `tttrace=trace(tt)` | Computes the trace of a tensor train operator. Syntax: tttrace=trace(tt) Parameters: tt -tensor train operator Outputs:  | 60 |
 | `kernel/overloads/@ttclass/transpose.m` | `ttrain=transpose(ttrain)` | Transposes a tensor without complex conjugation. Syntax: ttrain=transpose(ttrain) Parameters: ttrain -tensor train repre | 38 |
 | `kernel/overloads/@ttclass/truncate.m` | `ttout=truncate(tt)` | Performs right-to-left SVD recompression for a tensor train. This should not be called directly, use shrink.m instead. S | 72 |
-| `kernel/overloads/@ttclass/ttclass.m` | `grumble(coeff,cores,tolerance)` | Creates an object of a tensor train class. A tensor train is a type of un-opened Kronecker product that behaves as a mat | 125 |
+| `kernel/overloads/@ttclass/ttclass.m` | `tt=ttclass(coeff,kronterms,tolerance)` | Creates an object of a tensor train class. A tensor train is a type of un-opened Kronecker product that behaves as a mat | 125 |
 | `kernel/overloads/@ttclass/ttort.m` | `[tt,lognrm]=ttort(tt,direct)` | Performs TT-orthogonalisation for a tensor train (or for each tensor train in a buffered sum). Syntax: [tt,lognrm]=ttort | 169 |
 | `kernel/overloads/@ttclass/unit_like.m` | `A=unit_like(A)` | Returns a unit object of the same type as whatever is supplied. Syntax: A=unit_like(A) Parameters: A -a full or sparse s | 65 |
 | `kernel/overloads/@ttclass/vec.m` | `A=vec(A)` | Stretches arrays into vectors -useful for situations when the stand- ard (:) syntax is not available. Syntax: A=vec(A) P | 54 |

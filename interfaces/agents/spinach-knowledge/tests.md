@@ -4,7 +4,7 @@
 - Source commit: `f053e432a61d7144f3946d73d0a672e3ccfc3fc5`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
-- Files indexed: **113** MATLAB files
+- Files indexed: **114** MATLAB files
 - Generated: 2026-08-30T02:52:31
 
 | File | Signature | Summary | LOC |
@@ -100,6 +100,7 @@
 | `tests/kernel/test_sparse_tensor_utility_suite.m` | `result=test_sparse_tensor_utility_suite()` | Tests sparse, tensor, and numerical utility helpers. Syntax: result=test_sparse_tensor_utility_suite() Outputs: result - | 69 |
 | `tests/kernel/test_spsortrows_mex_suite.m` | `result=test_spsortrows_mex_suite()` | Tests the sparse sortrows MEX helper. Syntax: result=test_spsortrows_mex_suite() Outputs: result -regression test result | 84 |
 | `tests/kernel/test_spunicols_mex_suite.m` | `result=test_spunicols_mex_suite()` | Tests the sparse unique-column MEX helper. Syntax: result=test_spunicols_mex_suite() Outputs: result -regression test re | 92 |
+| `tests/kernel/test_srsk_thermal.m` | `result=test_srsk_thermal()` | Once-only thermalisation of additive SRSK relaxation. | 106 |
 | `tests/kernel/test_state_constructor_suite.m` | `result=test_state_constructor_suite()` | Tests state-constructor helper functions. Syntax: result=test_state_constructor_suite() Outputs: result -regression test | 120 |
 | `tests/kernel/test_states_composite_suite.m` | `result=test_states_composite_suite()` | Tests composite state generators in kernel/states. Syntax: result=test_states_composite_suite() Outputs: result -regress | 125 |
 | `tests/kernel/test_step_matches_expm.m` | `result=test_step_matches_expm()` | Tests Hilbert-space propagation against matrix exponentiation. Syntax: result=test_step_matches_expm() Outputs: result - | 48 |

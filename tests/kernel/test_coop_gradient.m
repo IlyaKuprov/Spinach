@@ -9,7 +9,8 @@
 %
 % Two noncommuting pulses are checked in Hilbert and Liouville space,
 % with unit and nonunit targets, a complex detection operator, and a
-% power ensemble. Independent matrix propagation checks the objective;
+% power ensemble, zero impurity, and purely imaginary auxiliary overlaps.
+% Independent matrix propagation checks the objective;
 % centred differences at three increments check its phase gradient.
 %
 % talos@spindynamics.org
@@ -34,29 +35,37 @@ measures={'real','square'};
 steps=[1e-3 1e-4 1e-5];
 
 % Exercise a unit target and a nonunit complex detection operator
-for fixture=1:2
+for fixture=1:4
+    amplitudes=[3 4 2]; pulse_dt=[0.04 0.05 0.06]; drift_scale=0.7;
     if fixture==1
         rho_init=spin_ops.x;
         rho_targ=spin_ops.x+0.3*spin_ops.z;
         rho_targ=rho_targ/norm(rho_targ,'fro');
         phase_pair=[0.2 -0.3 0.5;-0.1 0.4 0.7];
         powers=1;
-    else
+    elseif fixture==2
         rho_init=spin_ops.y+0.2*spin_ops.z;
         rho_targ=1.7*(spin_ops.z-0.4*spin_ops.x+1i*spin_ops.y);
         phase_pair=[-0.6 0.9 -0.2;0.8 -0.5 1.1];
         powers=[0.8 1.1];
+    elseif fixture==3
+        rho_init=[0 1;0 0]; rho_targ=[1 3;1+1i 0];
+        phase_pair=[0 pi;0 0]; powers=1;
+        amplitudes=[1 1]; pulse_dt=[pi/2 pi/2]; drift_scale=0;
+    else
+        rho_init=eye(2); rho_targ=eye(2);
+        phase_pair=[0.2 -0.3;-0.1 0.4]; powers=1;
+        amplitudes=[0 0]; pulse_dt=[0.1 0.2]; drift_scale=0;
     end
 
     % Independently propagate both experiments in Hilbert space
-    amplitudes=[3 4 2]; pulse_dt=[0.04 0.05 0.06];
     overlaps=zeros(numel(powers),2); dirt_cost=zeros(numel(powers),1);
     for power_idx=1:numel(powers)
         dirt_sum=zeros(2);
         for pulse_idx=1:2
             rho=rho_init;
-            for slice=1:3
-                H=0.7*spin_ops.z+powers(power_idx)*amplitudes(slice)*...
+            for slice=1:numel(pulse_dt)
+                H=drift_scale*spin_ops.z+powers(power_idx)*amplitudes(slice)*...
                   (cos(phase_pair(pulse_idx,slice))*spin_ops.x+...
                    sin(phase_pair(pulse_idx,slice))*spin_ops.y);
                 P=expm(-1i*H*pulse_dt(slice)); rho=P*rho*P';
@@ -82,7 +91,7 @@ for fixture=1:2
             lx=spin_ops.x; ly=spin_ops.y; lz=spin_ops.z;
             control.rho_init={rho_init}; control.rho_targ={rho_targ};
         end
-        control.operators={lx,ly}; control.drifts={{0.7*lz}};
+        control.operators={lx,ly}; control.drifts={{drift_scale*lz}};
         control.pwr_levels=powers; control.pulse_dt=pulse_dt;
         control.method='lbfgs'; control.max_iter=0;
         control.penalties={'none'}; control.p_weights=0;
@@ -116,9 +125,90 @@ for fixture=1:2
                 end
                 fprintf('COOP %s h=%.1e error=%.12e scale=%.12e\n',...
                         label,step_size,norm(gradient-fd_grad,'fro'),norm(fd_grad,'fro'));
+
+                % Scale the second-order error allowance with the reference gradient
                 result=test_close(result,sprintf('%s h=%.1e',label,step_size),...
-                                  gradient,fd_grad,2*step_size^2+2e-9,0,...
+                                  gradient,fd_grad,2e-9,2*step_size^2,...
                                   'The derivative must match centred differences to second order.');
+            end
+        end
+
+        % Check exact zeros without confusing a costate with a primary target
+        if fixture==3
+            rho_a=[0 1;0 0]; rho_b=[0 0;1 0];
+            dirt_sum=rho_a+rho_b-rho_targ*hdot(rho_targ,rho_a+rho_b)/hdot(rho_targ,rho_targ);
+            overlap=hdot(dirt_sum,rho_a);
+            result=test_true(result,[formalisms{form_idx} ' imaginary auxiliary'],...
+                             real(overlap)==0&&imag(overlap)~=0,...
+                             'A valid auxiliary overlap is exactly nonzero and purely imaginary.');
+            if form_idx==1
+                engine=@grape_liouv; source=rho_a(:); target=dirt_sum(:);
+                identity=reshape(eye(2),[],1);
+            else
+                engine=@grape_hilb; source=rho_a; target=dirt_sum; identity=eye(2);
+            end
+            waveform=zeros(2,2);
+            [~,aux_fid,aux_grad]=engine(local_system,control.drifts{1},...
+                                      control.operators,waveform,source,target,'real');
+            result=test_close(result,[formalisms{form_idx} ' zero real auxiliary'],...
+                              aux_fid,0,0,0,'Zero real overlap must return its nonzero derivative.');
+            result=test_true(result,[formalisms{form_idx} ' nonzero auxiliary gradient'],...
+                             norm(aux_grad,'fro')>0,'The real-linear auxiliary derivative is nonzero.');
+
+            % Difference independent matrix exponentials, not engine fidelities
+            for step_size=steps
+                fd_grad=zeros(size(waveform));
+                for n=1:numel(waveform)
+                    values=zeros(1,2);
+                    for side=1:2
+                        perturbed=waveform; perturbed(n)=(3-2*side)*step_size;
+                        rho=rho_a;
+                        for slice=1:numel(pulse_dt)
+                            H=perturbed(1,slice)*spin_ops.x+perturbed(2,slice)*spin_ops.y;
+                            P=expm(-1i*H*pulse_dt(slice)); rho=P*rho*P';
+                        end
+                        values(side)=real(sum(conj(dirt_sum).*rho,'all'));
+                    end
+                    fd_grad(n)=(values(1)-values(2))/(2*step_size);
+                end
+                fprintf('AUX %s h=%.1e error=%.12e scale=%.12e\n',...
+                        formalisms{form_idx},step_size,norm(aux_grad-fd_grad,'fro'),norm(fd_grad,'fro'));
+                result=test_close(result,sprintf('%s auxiliary h=%.1e',formalisms{form_idx},step_size),...
+                                  aux_grad,fd_grad,2*step_size^2+2e-9,0,...
+                                  'The zero-value auxiliary derivative must match independent propagation.');
+            end
+
+            % Vanishing impurity has a vanishing derivative in both formalisms
+            [~,zero_fid,zero_grad]=engine(local_system,control.drifts{1},...
+                                        control.operators,waveform,source,zeros(size(target)),'real');
+            result=test_close(result,[formalisms{form_idx} ' zero impurity'],...
+                              [zero_fid;zero_grad(:)],zeros(5,1),0,0,...
+                              'A zero impurity costate must give exact zero value and gradient.');
+            [~,const_fid,const_grad]=engine(local_system,control.drifts{1},...
+                                          control.operators,waveform,identity,identity,'real');
+            result=test_close(result,[formalisms{form_idx} ' constant overlap'],...
+                              [const_fid;const_grad(:)],[2;zeros(4,1)],0,0,...
+                              'A nonzero constant overlap must have an exact zero gradient.');
+
+            % The assembled-objective initial-guess safeguards remain active
+            local_system.control.fidelity='real'; local_system.control.max_iter=1;
+            for guard_case=1:2
+                if guard_case==1
+                    local_system.control.rho_init={source};
+                    local_system.control.rho_targ={target};
+                else
+                    local_system.control.rho_init={identity};
+                    local_system.control.rho_targ={identity};
+                end
+                caught='';
+                try
+                    fmaxnewton(local_system,@grape_xy,waveform);
+                catch err
+                    caught=err.message;
+                end
+                result=test_true(result,sprintf('%s optimiser guard %d',formalisms{form_idx},guard_case),...
+                                 strcmp(caught,'fidelity or gradient too small at iter 1, find a better guess.'),...
+                                 'The optimiser must still refuse an unusable ordinary initial guess.');
             end
         end
     end

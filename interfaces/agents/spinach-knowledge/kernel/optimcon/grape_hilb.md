@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/grape_hilb.m`
 - Signature: `[traj_data,fidelity,grad,hess]=grape_hilb(spin_system,drifts,controls,...`
-- Total lines: 726
+- Total lines: 813
 
 ## Purpose
 
@@ -15,6 +15,8 @@ Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessi
 - Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
 
 ## Numerical / algorithmic content
+
+Zero fidelities and gradients are returned as valid values, including for auxiliary costates used by `grape_coop`. Initial-guess checks remain in `fmaxnewton`, where they apply to the assembled optimisation objective rather than individual GRAPE contributions.
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.

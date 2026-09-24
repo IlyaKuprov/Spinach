@@ -2,7 +2,7 @@
 
 - Source: `tests/interfaces/test_hfc_isotopes.m`
 - Signature: `result=test_hfc_isotopes()`
-- Total lines: 163
+- Total lines: 213
 
 ## Purpose
 
@@ -14,7 +14,7 @@ Hyperfine tensors scale with nuclear gyromagnetic ratios, including sign changes
 
 ## Numerical / algorithmic content
 
-Exercises source-isotope provenance, conversion before threshold/purge, equality boundaries, partial outputs, and explicit refusal to guess missing provenance.
+Exercises source-isotope provenance, conversion before threshold/purge, equality boundaries, partial outputs, and explicit refusal to guess missing provenance. Missing or malformed provenance must be rejected silently by the initial input guard, even when coordinate or g-tensor fields are unavailable. Empty tensors and direct zero-spin targets remain supported; zero-gamma sources are rejected before processing.
 
 ## Syntax
 

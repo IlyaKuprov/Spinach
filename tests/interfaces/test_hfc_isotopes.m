@@ -91,6 +91,42 @@ end
 result=test_true(result,'unprinted Gaussian isotope',caught,...
                  'zero in the parser metadata does not identify a source isotope');
 
+% Reject missing and malformed provenance before warnings or parameter access
+invalids={rmfield(props,'isotopes'),props,props,props,props,props,props,props};
+invalids{2}.isotopes(atom)=0;
+invalids{3}.isotopes(atom)=NaN;
+invalids{4}.isotopes=props.isotopes(1:atom-1);
+invalids{5}.isotopes=cell(size(props.symbols));
+invalids{5}.isotopes{atom}='14C';
+invalids{6}.isotopes=cell(size(props.symbols));
+invalids{6}.isotopes{atom}=['14N';'15N'];
+invalids{7}.isotopes=cell(size(props.symbols));
+invalids{7}.isotopes{atom}=14;
+invalids{8}.isotopes='14N';
+for n=1:numel(invalids)
+    for mode=1:3
+
+        % Exercise normal input and missing coordinate or interaction fields
+        unknown=invalids{n};
+        if mode==2, unknown=rmfield(unknown,'std_geom'); end
+        if mode==3, unknown=rmfield(unknown,'g_tensor'); end %#ok<NASGU>
+        caught=false;
+        output=evalc(['try; g2spinach(unknown,{{''E'',''E''},{''N'',''15N''}},[0 0],[]); '...
+                      'catch exception; caught=contains(exception.message,''explicit HFC source isotope'')'...
+                      '&&strcmp(exception.stack(1).name,''grumble''); end']);
+        result=test_true(result,['early provenance ' num2str(n) '/' num2str(mode)],...
+                         caught&&isempty(output),...
+                         'grumble rejects provenance before console output or parameter processing');
+    end
+end
+
+% Selected empty tensors do not need provenance even when its field is absent
+unknown=rmfield(props,'isotopes'); unknown.hfc.full.matrix{atom}=[];
+[~,empty_hfc]=g2spinach(unknown,{{'E','E'},{'N','15N'}},[0 0],options);
+result=test_true(result,'empty tensor without provenance',...
+                 isempty(empty_hfc.coupling.matrix{1,2}),...
+                 'an unprinted selected tensor remains empty without an isotope field');
+
 % No nuclear hyperfine provenance is needed for an electron-only import
 [electron,~]=g2spinach(unknown,{{'E','E'}},0,options);
 result=test_true(result,'electron only',isequal(electron.isotopes,{'E'}),...
@@ -117,6 +153,20 @@ for n=1:numel(atoms)
                       source_hfc*(spin('2H')/spin('1H')),1e-8,1e-14,...
                       'the full non-diagonal tensor scales by the gamma ratio');
 end
+
+% Preserve direct zero-spin targets and reject zero-gamma source provenance
+[zero_spin,zero_hfc]=g2spinach(props,{{'E','E'},{'C','12C'}},[0 0],options);
+result=test_true(result,'direct zero-spin target',...
+                 isequal(zero_spin.isotopes,{'12C','E'})&&...
+                 isequal(zero_hfc.coupling.matrix{1,2},zeros(3)),...
+                 'a zero-gamma target produces a zero tensor without division by its gamma');
+unknown=props; atom=strcmp(props.symbols,'C');
+unknown.isotopes{atom}='12C'; caught=false;
+output=evalc(['try; g2spinach(unknown,{{''E'',''E''},{''C'',''13C''}},[0 0],options); '...
+              'catch exception; caught=contains(exception.message,''zero-gamma HFC source isotope'')'...
+              '&&strcmp(exception.stack(1).name,''grumble''); end']);
+result=test_true(result,'early zero-gamma source',caught&&isempty(output),...
+                 'a zero-gamma source is rejected before warnings rather than divided into');
 
 % Check a shrinking target coupling before threshold and optional purge
 source_norm=norm(protons.coupling.matrix{1,end},'fro');

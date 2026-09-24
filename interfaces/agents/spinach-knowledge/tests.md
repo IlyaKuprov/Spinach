@@ -9,7 +9,7 @@
 
 | File | Signature | Summary | LOC |
 |---|---|---|---:|
-| `tests/interfaces/test_hfc_isotopes.m` | `result=test_hfc_isotopes()` | Isotope-resolved hyperfine import from Gaussian and ORCA fixtures. | 163 |
+| `tests/interfaces/test_hfc_isotopes.m` | `result=test_hfc_isotopes()` | Isotope-resolved hyperfine import from Gaussian and ORCA fixtures. | 213 |
 | `tests/interfaces/test_orca_parser.m` | `result=test_orca_parser()` | Tests the ORCA log parser on the logs bundled with the examples. Syntax: result=test_orca_parser() Outputs: result -regr | 53 |
 | `tests/kernel/test_apodisation_exp_window.m` | `result=test_apodisation_exp_window()` | Tests exponential FID apodisation. Syntax: result=test_apodisation_exp_window() Outputs: result -regression test result  | 38 |
 | `tests/kernel/test_cache_temp_scratch.m` | `result=test_cache_temp_scratch()` | Tests cache management in a temporary scratch directory. Syntax: result=test_cache_temp_scratch() Outputs: result -regre | 120 |

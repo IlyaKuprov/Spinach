@@ -99,7 +99,7 @@ function [sys,inter]=g2spinach(props,particles,references,options)
 if ~exist('options','var'), options=[]; end
 
 % Check consistency
-grumble(props,particles,references,options);
+source_gammas=grumble(props,particles,references,options);
 
 % Fundamental constants
 nuclear_magneton=7.6225932291E6;
@@ -157,32 +157,10 @@ switch ismember('E',[particles{:}])
         inter.coupling.matrix=mat2cell(zeros(3*nspins,3*nspins),3*ones(nspins,1),3*ones(nspins,1));
         for n=1:(nspins-1)
 
-            % Resolve the printed HFC isotope, not the geometry isotope table
+            % Scale the entire tensor before thresholding or purging
             hfc=1e6*gauss2mhz(props.hfc.full.matrix{index(n)}/2);
             if ~isempty(hfc)
-                source_iso='';
-                if isfield(props,'isotopes')&&(numel(props.isotopes)>=index(n))
-                    if isnumeric(props.isotopes)
-                        mass_number=props.isotopes(index(n));
-                        if isreal(mass_number)&&isfinite(mass_number)&&...
-                           (mass_number>0)&&(mod(mass_number,1)==0)
-                            source_iso=[num2str(mass_number) props.symbols{index(n)}];
-                        end
-                    elseif iscell(props.isotopes)
-                        source_iso=props.isotopes{index(n)};
-                    end
-                end
-                if ~ischar(source_iso)||isempty(source_iso)||~isrow(source_iso)||...
-                   isempty(regexp(source_iso,['^[1-9][0-9]*' props.symbols{index(n)} '$'],'once'))
-                    error('EPR import without an explicit HFC source isotope is not implemented.');
-                end
-
-                % Scale the entire tensor before thresholding or purging
-                source_gamma=spin(source_iso);
-                if source_gamma==0
-                    error('EPR import with a zero-gamma HFC source isotope is not implemented.');
-                end
-                hfc=hfc*(spin(sys.isotopes{n})/source_gamma);
+                hfc=hfc*(spin(sys.isotopes{n})/source_gammas(index(n)));
             end
 
             % Preserve the symmetric-pair storage convention
@@ -300,7 +278,7 @@ end
 end
 
 % Consistency enforcement
-function grumble(props,nuclei,references,options) %#ok<INUSD>
+function source_gammas=grumble(props,nuclei,references,options) %#ok<INUSD>
 if ~isstruct(props)
     error('the first argument must be a structure returned by gparse().');
 end
@@ -309,6 +287,36 @@ if ~iscell(nuclei)
 end
 if (~isnumeric(references))||(numel(nuclei)~=numel(references))
     error('references must be a numerical array with the same number of entries as nuclei.');
+end
+source_gammas=[];
+if ismember('E',[nuclei{:}])
+    elements=cellfun(@(entry)entry{1},nuclei,'UniformOutput',false);
+    source_gammas=zeros(size(props.symbols));
+    for n=1:numel(props.symbols)
+        if ~ismember(props.symbols{n},elements)||isempty(props.hfc.full.matrix{n})
+            continue
+        end
+        source_iso='';
+        if isfield(props,'isotopes')&&(numel(props.isotopes)>=n)
+            if isnumeric(props.isotopes)
+                mass_number=props.isotopes(n);
+                if isreal(mass_number)&&isfinite(mass_number)&&...
+                   (mass_number>0)&&(mod(mass_number,1)==0)
+                    source_iso=[num2str(mass_number) props.symbols{n}];
+                end
+            elseif iscell(props.isotopes)
+                source_iso=props.isotopes{n};
+            end
+        end
+        if ~ischar(source_iso)||isempty(source_iso)||~isrow(source_iso)||...
+           isempty(regexp(source_iso,['^[1-9][0-9]*' props.symbols{n} '$'],'once'))
+            error('EPR import without an explicit HFC source isotope is not implemented.');
+        end
+        source_gammas(n)=spin(source_iso);
+        if source_gammas(n)==0
+            error('EPR import with a zero-gamma HFC source isotope is not implemented.');
+        end
+    end
 end
 end
 

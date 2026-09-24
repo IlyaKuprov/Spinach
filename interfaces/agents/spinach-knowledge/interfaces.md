@@ -22,7 +22,7 @@
 | `interfaces/comsol/mesh_plot.m` | `mesh_plot(spin_system,qscale,nodelabels)` | 2D microfluidic mesh plotting function. Draws the mesh, its Vo- ronoi tessellation, and a quiver plot of velocities. Syn | 101 |
 | `interfaces/comsol/mesh_preplot.m` | `mesh=mesh_preplot(mesh)` | Mesh preprocessing for drawing. Creates edge, triangle, and rectangle data structures needed for fast plotting later. Sy | 87 |
 | `interfaces/comsol/mesh_vorn.m` | `mesh=mesh_vorn(mesh)` | Voronoi tessellation of a 2D COMSOL mesh. Syntax: mesh=mesh_vorn(mesh) Parameters: mesh -Spinach mesh object Outputs: me | 67 |
-| `interfaces/g2spinach.m` | `[sys,inter]=g2spinach(props,particles,references,options)` | Makes Spinach data structures from parsed outputs of electronic structure theory packages, such as Gaussian and ORCA. Sy | 324 |
+| `interfaces/g2spinach.m` | `[sys,inter]=g2spinach(props,particles,references,options)` | Makes Spinach data structures from parsed outputs of electronic structure theory packages, such as Gaussian and ORCA. Sy | 332 |
 | `interfaces/gaussian/brokensymm.m` | `J=brokensymm(props_sing,props_trip)` | Exchange coupling estimation from a pair of DFT logs using Yamaguchi equation. The notation is: H=-2J*(Sa.Sb) Syntax: J= | 62 |
 | `interfaces/gaussian/gparse.m` | `props=gparse(filename,options)` | A parser for Gaussian (03, 09, 16) calculation logs. Ex- tracts all potentially useful information. Syntax: props=gparse | 465 |
 | `interfaces/gaussian/gslice.m` | `gslice()` | Slices a Gaussian geometry scan log into property calculation inputs at the energy minimum geometries. The function asks | 103 |

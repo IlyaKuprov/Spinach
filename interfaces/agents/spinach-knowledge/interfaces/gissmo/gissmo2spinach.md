@@ -1,53 +1,36 @@
 # interfaces/gissmo/gissmo2spinach.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/gissmo/gissmo2spinach.m`
+- Source: `interfaces/gissmo/gissmo2spinach.m`
 - Signature: `[sys,inter]=gissmo2spinach(filename,subsystem)`
 - Total lines: 206
 
 ## Purpose
 
-Reads GISSMO files and forms Spinach data structures. Syntax: [sys,inter]=gissmo2spinach(file_name,subsystem)
+Reads a GISSMO XML file and forms the Spinach system and interaction structures for the selected coupling matrix.
 
 ## Physical / mathematical content
 
-- This file belongs to the `interfaces` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
+GISSMO provides proton chemical shifts in ppm, scalar J-couplings in hertz, the proton spectrometer frequency, and a non-selective linewidth. The frequency determines the magnetic induction. The linewidth is treated as Lorentzian FWHM in hertz and converted by `fwhm2rlx` to the damping rate `pi*FWHM` in inverse seconds.
+
+Pure non-selective damping uses zero equilibrium and full (`labframe`) retention. In either Liouville formalism its generator is `-rate*(I-u*u')`, where `u` is the normalised unit state: every traceless state decays, while trace and the identity are preserved. Damping is added after retention, so this setting preserves the previous spherical-tensor result without requesting unsupported Zeeman diagonal retention; it does not require a laboratory-frame Hamiltonian for pure damping.
 
 ## Numerical / algorithmic content
 
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
+The XML coupling matrices are selected by one-based order. Spin labels, shifts, and couplings use their XML indices; the imported spins are protons. Essential magnetic-field, linewidth, shift, and coupling data must be present. The file must exist and its filename must be a non-empty character string.
+
+## Syntax
+
+`[sys,inter]=gissmo2spinach(filename,subsystem)`
 
 ## Parameters / inputs
 
-- file_name -character string with the name of
-- the GISSMO XML file
-- subsystem -which of the coupling matrices to
-- to import
+- `filename`: character string containing the GISSMO XML filename.
+- `subsystem`: one-based index of the coupling matrix to import.
 
 ## Outputs
 
-- sys, inter -Spinach data structures, ready for
-- calling create.m
-- Note: GISSMO only provides chemical shifts, J-couplings, the
-- non-selective line width, and the magnet field. You may
-- want to add further parameters by editing sys and inter
-- data structures manually.
+- `sys,inter`: Spinach data structures ready for `create`.
 
-## Implementation structure
+## Header notes
 
-- Reads GISSMO files and forms Spinach data structures. Syntax:
-- [sys,inter]=gissmo2spinach(file_name,subsystem)
-- file_name - character string with the name of
-- the GISSMO XML file
-- subsystem - which of the coupling matrices to
-- to import
-- sys, inter - Spinach data structures, ready for
-- calling create.m
-- Note: GISSMO only provides chemical shifts, J-couplings, the
-- non-selective line width, and the magnet field. You may
-- want to add further parameters by editing sys and inter
-- data structures manually.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `parsexml()`, `false()`, `strcmpi()`, `str2double()`, `spin()`, `true()`, `fwhm2rlx()`, `ischar()`, `exist()`.
+GISSMO supplies only chemical shifts, J-couplings, the non-selective linewidth, and the magnet field. Add further parameters by editing `sys` and `inter` as needed. As documented by `fwhm2rlx`, a linewidth-based relaxation rate is an approximation and should be treated as an upper bound when other broadening is present.

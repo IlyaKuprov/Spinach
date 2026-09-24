@@ -401,7 +401,11 @@ reduces the affected J-couplings; `options.noshift` behaves as above.
 `[sys,inter]=gissmo2spinach(filename,subsystem)` reads a GISSMO XML file and
 returns a ready-to-use liquid-state NMR spin system. GISSMO supplies only
 chemical shifts, J-couplings, a non-selective line width and the magnet field;
-everything else has to be added by hand.
+everything else has to be added by hand. The linewidth is Lorentzian FWHM
+in hertz, converted to `pi*FWHM` inverse seconds. Its pure damping uses
+`inter.rlx_keep='labframe'`: damping is added after retention, preserving
+the spherical-tensor generator and supporting `zeeman-liouv` without
+requesting unsupported diagonal retention.
 `[sys,inter]=x2spinach(filename,shielding_refs)` reads SpinXML files.
 
 Three importers handle data rather than parameters, and none of them produces

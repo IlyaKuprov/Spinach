@@ -10,6 +10,8 @@
 % and Zeeman full retention must preserve trace and the specified rates.
 % A complex coherent state and noncommuting Hamiltonian exercise the full
 % generator rather than relying only on population or eigenstate decay.
+% A shipped GISSMO XML fixture checks pure damping in both Liouville bases
+% and the conversion from Lorentzian linewidth to transverse decay rate.
 %
 % talos@spindynamics.org
 
@@ -95,6 +97,45 @@ for n=1:numel(isotopes)
         R_ref=clean_up(spin_system,R_ref,spin_system.tols.rlx_zero);
         result=test_close(result,'full-retention damping',R,R_ref,1e-12,1e-12,...
                           'damp-only full retention preserves non-selective decay and the unit state');
+    end
+end
+
+% Import an actual GISSMO subsystem with a one-hertz Lorentzian linewidth
+root_dir=fileparts(fileparts(fileparts(mfilename('fullpath'))));
+[sys,inter]=gissmo2spinach(fullfile(root_dir,'examples','nmr_metabol','molecule_b.xml'),2);
+result=test_close(result,'GISSMO linewidth rate',inter.damp_rate,pi,0,0,...
+                  'the shipped one-hertz FWHM must give a pi-per-second damping rate');
+result=test_true(result,'GISSMO full retention',strcmp(inter.rlx_keep,'labframe'),...
+                 'pure damping must not request unsupported Zeeman diagonal retention');
+bas.approximation='none'; formalisms={'sphten-liouv','zeeman-liouv'};
+for n=1:numel(formalisms)
+
+    % Verify the entire imported generator in both full Liouville bases
+    bas.formalism=formalisms{n}; spin_system=test_spin_system(sys,inter,bas);
+    R=relaxation(spin_system); unit=unit_state(spin_system);
+    R_ref=-pi*(unit_oper(spin_system)-unit*unit');
+    round_bound=spin_system.tols.rlx_zero*sqrt(nnz(R_ref))/2;
+    R_ref=clean_up(spin_system,R_ref,spin_system.tols.rlx_zero);
+    result=test_close(result,'GISSMO damping generator',norm(R-R_ref,'fro'),0,1e-12,1e-12,...
+                      'the XML linewidth must damp every traceless state at the specified rate');
+    result=test_close(result,'GISSMO trace conservation',unit'*R,0*unit',round_bound,1e-12,...
+                      'the imported damping generator must conserve trace within entrywise rounding');
+    result=test_close(result,'GISSMO identity stationarity',R*unit,0*unit,round_bound,1e-12,...
+                      'the imported identity must remain stationary within entrywise rounding');
+
+    % Recover the linewidth from the actual transverse decay eigenvalue
+    rho_p=state(spin_system,'L+','1H');
+    rate=-real(rho_p'*R*rho_p)/(rho_p'*rho_p);
+    result=test_close(result,'GISSMO transverse decay',R*rho_p,-pi*rho_p,round_bound*norm(rho_p),1e-12,...
+                      'the transverse signal decays as exp(-pi*FWHM*t)');
+    result=test_close(result,'GISSMO linewidth in hertz',rate/pi,1,round_bound/pi,1e-12,...
+                      'Lorentzian FWHM is the transverse decay rate divided by pi');
+
+    % Preserve the formerly supported spherical diagonal-retention result
+    if strcmp(bas.formalism,'sphten-liouv')
+        spin_system.rlx.keep='diagonal'; R_diag=relaxation(spin_system);
+        result=test_close(result,'GISSMO spherical preservation',norm(R-R_diag,'fro'),0,0,0,...
+                          'damping is added after retention, so the spherical result must not change');
     end
 end
 

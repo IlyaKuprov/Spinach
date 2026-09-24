@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/relaxation.m`
 - Signature: `R=relaxation(spin_system,euler_angles)`
-- Total lines: 888
+- Total lines: 892
 
 ## Purpose
 

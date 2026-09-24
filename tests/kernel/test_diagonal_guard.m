@@ -82,6 +82,20 @@ for n=1:numel(isotopes)
                       'the supported diagonal path preserves the specified R1 rate');
     result=test_close(result,'spherical transverse rate',R*rho_p,-7*rho_p,1e-12,1e-12,...
                       'the supported diagonal path preserves the specified R2 rate');
+
+    % Preserve non-selective damping in both supported Liouville formalisms
+    inter_damp=rmfield(inter,{'lind_r1_rates','lind_r2_rates'});
+    inter_damp.relaxation={'damp'}; inter_damp.damp_rate=5;
+    formalisms={'sphten-liouv','zeeman-liouv'};
+    for k=1:numel(formalisms)
+        bas.formalism=formalisms{k};
+        spin_system=test_spin_system(sys,inter_damp,bas);
+        R=relaxation(spin_system); unit=unit_state(spin_system);
+        R_ref=-inter_damp.damp_rate*(unit_oper(spin_system)-unit*unit');
+        R_ref=clean_up(spin_system,R_ref,spin_system.tols.rlx_zero);
+        result=test_close(result,'full-retention damping',R,R_ref,1e-12,1e-12,...
+                          'damp-only full retention preserves non-selective decay and the unit state');
+    end
 end
 
 end

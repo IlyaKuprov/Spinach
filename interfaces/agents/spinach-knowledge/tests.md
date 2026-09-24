@@ -4,7 +4,7 @@
 - Source commit: `f053e432a61d7144f3946d73d0a672e3ccfc3fc5`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
-- Files indexed: **113** MATLAB files
+- Files indexed: **114** MATLAB files
 - Generated: 2026-08-30T02:52:31
 
 | File | Signature | Summary | LOC |
@@ -61,6 +61,7 @@
 | `tests/kernel/test_grid_geometry_suite.m` | `result=test_grid_geometry_suite()` | Tests grid and spherical geometry helpers. Syntax: result=test_grid_geometry_suite() Outputs: result -regression test re | 178 |
 | `tests/kernel/test_hilbert_operator.m` | `result=test_hilbert_operator()` | Tests Hilbert-space operator generation. Syntax: result=test_hilbert_operator() Outputs: result -regression test result  | 48 |
 | `tests/kernel/test_hilbert_state.m` | `result=test_hilbert_state()` | Tests Hilbert-space state generation. Syntax: result=test_hilbert_state() Outputs: result -regression test result with e | 44 |
+| `tests/kernel/test_homodec_adapt.m` | `result=test_homodec_adapt()` | Acquisition irradiation through Hilbert formalism admission. | 107 |
 | `tests/kernel/test_indexing_inverse_suite.m` | `result=test_indexing_inverse_suite()` | Tests indexing helper inverses. Syntax: result=test_indexing_inverse_suite() Outputs: result -regression test result wit | 102 |
 | `tests/kernel/test_indexing_roundtrip_suite.m` | `result=test_indexing_roundtrip_suite()` | Tests angular-momentum and matrix indexing helpers. Syntax: result=test_indexing_roundtrip_suite() Outputs: result -regr | 64 |
 | `tests/kernel/test_kinetics_generator_suite.m` | `result=test_kinetics_generator_suite()` | Tests kinetics and flow generator helpers. Syntax: result=test_kinetics_generator_suite() Outputs: result -regression te | 76 |

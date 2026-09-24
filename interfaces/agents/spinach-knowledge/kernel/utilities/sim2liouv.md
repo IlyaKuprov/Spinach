@@ -69,21 +69,6 @@ Moves a zeeman-hilb simulation context into Liouville space. When the formalism 
 - ted R stays block-diagonal in the irrep table that reduce.m
 - evolves independently.
 
-## Implementation structure
+## Header notes
 
-- Moves a zeeman-hilb simulation context into Liouville space. When
-- the formalism specified in the spin system object is 'zeeman-hilb',
-- this function projects the evolution generators into Liouville
-- space, converts the standard state-like and operator-like fields
-- of the parameters structure, rebuilds the basis index table, mig-
-- rates the symmetry irrep projectors into the adjoint representa-
-- tion, and sets the formalism to 'zeeman-liouv'; for all other
-- formalisms, every argument is returned unchanged. This makes
-- Liouville-space pulse sequences callable with zeeman-hilb
-- inputs. Syntax:
-- [spin_system,parameters,H,R,K]=...
-- sim2liouv(spin_system,parameters,H,R,K)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `strcmp()`, `report()`, `hilb2liouv()`, `isfield()`, `ls_irreps()`, `conj()`, `hs_irreps()`, `numel()`, `num2str()`, `unit_state()`, `isempty()`, `ismember()`, `isstruct()`.
+Only zeeman-hilb inputs are converted: generators, standard states/operators, basis data, and symmetry projectors move into the adjoint representation. Other formalisms return every input unchanged.

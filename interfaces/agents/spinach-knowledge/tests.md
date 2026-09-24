@@ -4,7 +4,7 @@
 - Source commit: `f053e432a61d7144f3946d73d0a672e3ccfc3fc5`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
-- Files indexed: **113** MATLAB files
+- Files indexed: **114** MATLAB files
 - Generated: 2026-08-30T02:52:31
 
 | File | Signature | Summary | LOC |
@@ -21,6 +21,7 @@
 | `tests/kernel/test_ctx_powder_average.m` | `result=test_ctx_powder_average()` | Tests powder averaging against explicit weighted summation. Syntax: result=test_ctx_powder_average() Outputs: result -re | 65 |
 | `tests/kernel/test_ctx_powder_crystal.m` | `result=test_ctx_powder_crystal()` | Tests static powder and crystal contexts at one orientation. Syntax: result=test_ctx_powder_crystal() Outputs: result -r | 58 |
 | `tests/kernel/test_ctx_singlerot_acquire.m` | `result=test_ctx_singlerot_acquire()` | Tests the single-rotor context with acquire(). Syntax: result=test_ctx_singlerot_acquire() Outputs: result -regression t | 68 |
+| `tests/kernel/test_diagonal_guard.m` | `result=test_diagonal_guard()` | Supported formalism boundaries for diagonal relaxation retention. | 103 |
 | `tests/kernel/test_dynamic_chem_geometry_suite.m` | `result=test_dynamic_chem_geometry_suite()` | Tests deterministic chemistry and geometry utility helpers. Syntax: result=test_dynamic_chem_geometry_suite() Outputs: r | 130 |
 | `tests/kernel/test_dynamic_cubic_mex_suite.m` | `result=test_dynamic_cubic_mex_suite()` | Tests the cubic-polynomial MEX helper used by eigenfields(). Syntax: result=test_dynamic_cubic_mex_suite() Outputs: resu | 103 |
 | `tests/kernel/test_dynamic_equilibrium_frontends.m` | `result=test_dynamic_equilibrium_frontends()` | Tests equilibrium and residual-order dynamic front-end kernels. Syntax: result=test_dynamic_equilibrium_frontends() Outp | 143 |

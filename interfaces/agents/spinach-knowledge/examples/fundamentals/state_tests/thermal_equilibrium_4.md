@@ -18,21 +18,3 @@ Test of the invariance of the thermal equilibrium state under the thermalised re
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
 
-## Implementation structure
-
-- Test of the invariance of the thermal equilibrium state under the
-- thermalised relaxation superoperator.
-- Magnet field
-- Isotopes
-- Chemical shifts
-- J-couplings
-- Relaxation theory parameters
-- Formalisms to test
-- Loop over formalisms
-- Basis set
-- Spinach housekeeping
-- Isotropic thermal equilibrium
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `equilibrium()`, `relaxation()`, `hamiltonian()`, `assume()`, `thermalize()`.

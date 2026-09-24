@@ -102,7 +102,7 @@
 | `tests/kernel/test_spunicols_mex_suite.m` | `result=test_spunicols_mex_suite()` | Tests the sparse unique-column MEX helper. Syntax: result=test_spunicols_mex_suite() Outputs: result -regression test re | 92 |
 | `tests/kernel/test_state_constructor_suite.m` | `result=test_state_constructor_suite()` | Tests state-constructor helper functions. Syntax: result=test_state_constructor_suite() Outputs: result -regression test | 120 |
 | `tests/kernel/test_states_composite_suite.m` | `result=test_states_composite_suite()` | Tests composite state generators in kernel/states. Syntax: result=test_states_composite_suite() Outputs: result -regress | 125 |
-| `tests/kernel/test_stack_reduce.m` | `result=test_stack_reduce()` | Tests true-column symmetry and ZTE screening, including wide sparse and independently scaled weak state stacks. | 189 |
+| `tests/kernel/test_stack_reduce.m` | `result=test_stack_reduce()` | Preservation of actual state columns during symmetry and trajectory screening. | 189 |
 | `tests/kernel/test_step_matches_expm.m` | `result=test_step_matches_expm()` | Tests Hilbert-space propagation against matrix exponentiation. Syntax: result=test_step_matches_expm() Outputs: result - | 48 |
 | `tests/kernel/test_step_zero_time.m` | `result=test_step_zero_time()` | Tests zero-duration propagation. Syntax: result=test_step_zero_time() Outputs: result -regression test result with expla | 43 |
 | `tests/kernel/test_tensor_vector_suite.m` | `result=test_tensor_vector_suite()` | Tests tensor, vector, distribution, and relaxation utilities. Syntax: result=test_tensor_vector_suite() Outputs: result  | 136 |

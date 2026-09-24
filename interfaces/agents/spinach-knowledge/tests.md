@@ -4,7 +4,7 @@
 - Source commit: `f053e432a61d7144f3946d73d0a672e3ccfc3fc5`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
-- Files indexed: **113** MATLAB files
+- Files indexed: **114** MATLAB files
 - Generated: 2026-08-30T02:52:31
 
 | File | Signature | Summary | LOC |
@@ -94,6 +94,7 @@
 | `tests/kernel/test_rf_cartesian_polar.m` | `result=test_rf_cartesian_polar()` | Tests RF Cartesian and polar waveform conversion. Syntax: result=test_rf_cartesian_polar() Outputs: result -regression t | 51 |
 | `tests/kernel/test_scalar_coupling_hamiltonian.m` | `result=test_scalar_coupling_hamiltonian()` | Tests the two-spin scalar-coupling Hamiltonian. Syntax: result=test_scalar_coupling_hamiltonian() Outputs: result -regre | 46 |
 | `tests/kernel/test_shaped_pulse_rotation.m` | `result=test_shaped_pulse_rotation()` | Tests a one-slice Cartesian shaped pulse. Syntax: result=test_shaped_pulse_rotation() Outputs: result -regression test r | 49 |
+| `tests/kernel/test_sim2liouv_cache.m` | `result=test_sim2liouv_cache()` | Representation-specific caches after Hilbert-to-Liouville conversion. | 104 |
 | `tests/kernel/test_slowpass_fft_parity.m` | `result=test_slowpass_fft_parity()` | Tests slowpass amplitude normalisation against time-domain FFT. Syntax: result=test_slowpass_fft_parity() Outputs: resul | 81 |
 | `tests/kernel/test_slr_pulse.m` | `result=test_slr_pulse()` | Tests Shinnar-Le Roux selective excitation pulse design. Syntax: result=test_slr_pulse() Outputs: result -regression tes | 191 |
 | `tests/kernel/test_sparse_tensor_graph_suite.m` | `result=test_sparse_tensor_graph_suite()` | Tests sparse, tensor-product, and simple graph utilities. Syntax: result=test_sparse_tensor_graph_suite() Outputs: resul | 79 |

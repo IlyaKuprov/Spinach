@@ -2,7 +2,7 @@
 
 - Source: `tests/kernel/test_hilb_pulse_prop.m`
 - Signature: `result=test_hilb_pulse_prop()`
-- Total lines: 222
+- Total lines: 246
 
 ## Purpose
 
@@ -16,7 +16,7 @@ For every method and quadrature, the returned operator is the ordered product of
 
 All six `expv-*`, `expm-*`, and `evol-*` choices are compared with independently assembled dense exponentials and two-point Lie generators. Nonconstant pulses, constant pulses, zero durations, both small-matrix and commutator-series Hilbert state paths, every trajectory point, and output-count invariance are covered. Wavefunction and Liouville calls provide one-sided controls.
 
-Dimension-512 direct-sum fixtures run all six choices with sparse and full storage on the CPU and, when available, the GPU. The matrix-density threshold keeps the two storage routes distinct; the dimension exceeds the explicit propagator GPU dispatch threshold. Analytic block references check the operator, state, trajectory, invariants, and final host-memory outputs. GPU checks emit an explicit `SKIP` message when `canUseGPU` is unavailable or false; errors in an available GPU production path are not caught or converted into skips.
+Dimension-512 direct-sum fixtures run all six choices with sparse and full storage on the CPU and with full storage on an available GPU. Sparse GPU coverage includes `expm-pwc` and `evol-pwc` unconditionally; the other four methods require MATLAB sparse-GPU scalar division, whose availability is probed directly before their execution. An unavailable operation produces an explicit per-method `SKIP`, not a claimed pass. The matrix-density threshold keeps the two storage routes distinct; the dimension exceeds the explicit propagator GPU dispatch threshold. Analytic block references check the operator, state, trajectory, invariants, and final host-memory outputs. GPU checks emit an explicit `SKIP` message when `canUseGPU` is unavailable or false; errors in an available GPU production path are not caught or converted into skips.
 
 ## Syntax
 

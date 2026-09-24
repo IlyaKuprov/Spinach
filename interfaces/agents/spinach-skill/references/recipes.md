@@ -438,7 +438,9 @@ ordered propagator for every method: reuse it as `P*rho*P'`, not `P*rho`;
 requesting it leaves the chosen two-sided state-propagation method unchanged.
 The registered `kernel/hilb_pulse_prop` regression covers all six choices,
 including dimension-512 sparse/full CPU controls and GPU checks that explicitly
-skip when no usable GPU is present.
+skip when no usable GPU is present. All six dense GPU methods are tested; sparse
+GPU methods requiring scalar division are skipped only when a direct MATLAB
+capability probe finds that operation unavailable. Such a skip is not a pass.
 
 Optimal control of a quadrupolar nucleus under MAS in Hilbert space is the
 `case_studies/Smelko_ChemRxiv_2026` folder (27Al 3QMAS and 5QMAS excitation,

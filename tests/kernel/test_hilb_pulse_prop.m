@@ -11,6 +11,8 @@
 % are exercised; one-sided wavefunction and Liouville calls are controls.
 % Dimension-512 sparse and full cases cover the large-matrix CPU and GPU
 % routes; GPU checks are explicitly skipped when no usable GPU is present.
+% Sparse GPU methods requiring scalar division are skipped only when that
+% MATLAB operation is unavailable; dense GPU coverage remains complete.
 %
 % talos@spindynamics.org
 
@@ -139,6 +141,20 @@ if ~gpu_ok
     result.messages{end+1}='SKIP: dimension-512 GPU checks require a usable GPU and Parallel Computing Toolbox.';
 end
 
+% Probe the separate MATLAB capability required by sparse GPU pulse methods
+sparse_div=true;
+if gpu_ok
+    try
+        sparse_probe=gpuArray(speye(2))/2; %#ok<NASGU>
+    catch failure
+        if contains(failure.message,'Sparse gpuArray matrices are not supported')
+            sparse_div=false;
+        else
+            rethrow(failure);
+        end
+    end
+end
+
 % Lift the noncommuting spin-half fixture above the GPU dispatch threshold
 bas.formalism='zeeman-hilb';
 spin_system=test_spin_system(sys,inter,bas);
@@ -163,6 +179,14 @@ for use_gpu=0:double(gpu_ok)
             controls=cellfun(@full,controls,'UniformOutput',false);
         end
         for n=1:numel(methods)
+
+            % Skip only methods requiring an unavailable MATLAB sparse operation
+            if use_gpu&&(~dense)&&(~sparse_div)&&...
+               (~ismember(methods{n},{'expm-pwc','evol-pwc'}))
+                result.messages{end+1}=['SKIP: sparse GPU ' methods{n} ...
+                                       ' requires MATLAB sparse gpuArray scalar division.'];
+                continue;
+            end
 
             % Build independent block-exponential references for two pulse slices
             amp_x=2*pi*[430 150 -100]; amp_y=2*pi*[0 220 310];

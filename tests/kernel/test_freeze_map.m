@@ -96,6 +96,93 @@ for fixture=1:2
             end
         end
 
+        % Check curvilinear masks after coupled and dimension-changing maps
+        for variant=1:9
+            local_control=control; wave=waveform;
+            u2x=@(u)u; dx_du=@(u)eye(numel(u));
+            if variant==2
+                u2x=@(u)[u(1)+0.4*u(2);0.3*u(1)+u(2)];
+                dx_du=@(u)[1 0.3;0.4 1];
+            elseif variant==3
+                wave=[waveform;0.5 -0.7 0.2];
+                u2x=@(u)[u(1)+0.4*u(3);u(2)+0.3*u(3)];
+                dx_du=@(u)[1 0;0 1;0.4 0.3];
+            elseif variant==4
+                wave=wave(1,:);
+                u2x=@(u)[u(1);0.6*u(1)]; dx_du=@(u)[1 0.6];
+            elseif variant>=5
+                wave=[abs(wave(1,:));0.2*wave(2,:)];
+                u2x=@(u)[u(1)*cos(u(2));u(1)*sin(u(2))];
+                dx_du=@(u)[cos(u(2)) sin(u(2));-u(1)*sin(u(2)) u(1)*cos(u(2))];
+            end
+            mask=false(size(wave)); mask(1,1)=true; mask(end,end)=true;
+            if ismember(variant,[6 7]), mask(:)=false; end
+            if variant==8
+                local_control.integrator='trapezium';
+                local_control.pulse_dt=[0.04 0.05];
+            end
+            if variant==9
+                local_control.distortion={@(w)firf(w,[0.8 0.4]),@(w)spf(w,0.3)};
+                local_control.phase_cycle=[0 0.7 0];
+            end
+            local_control.penalties={'NS'}; local_control.p_weights=0.2;
+            local_control.freeze=mask; local_system=optimcon(spin_system,local_control);
+            if variant==6, local_system.control.freeze=[]; end
+            label=sprintf('curv f%d r%d v%d',fixture,form_idx,variant);
+
+            % Keep shape failures visible while allowing the remaining fixtures to run
+            try
+                [~,fidelity,gradient]=grape_curv(wave,u2x,dx_du,local_system);
+            catch exception
+                result=test_true(result,[label ' call'],false,exception.message);
+                continue
+            end
+
+            % Compare all objective channels with the unconstrained pullback
+            free_system=local_system; free_system.control.freeze=[];
+            [~,free_fid,free_grad]=grape_curv(wave,u2x,dx_du,free_system);
+            result=test_close(result,[label ' value'],fidelity,free_fid,0,0,...
+                              'freezing must leave physical and penalty values unchanged');
+            full_mask=repmat(mask,1,1,size(gradient,3));
+            result=test_close(result,[label ' frozen'],gradient(full_mask),zeros(nnz(full_mask),1),0,0,...
+                              'curvilinear frozen coordinates must vanish in every objective channel');
+            result=test_close(result,[label ' pullback'],gradient(~full_mask),free_grad(~full_mask),1e-12,1e-12,...
+                              'free curvilinear coordinates must retain all Cartesian contributions');
+
+            % Differentiate the full public objective at two finite-difference increments
+            for increment=[1e-4 1e-5]
+                numerical=zeros(size(gradient));
+                for n=find(~mask(:))'
+                    plus=wave; minus=wave;
+                    plus(n)=plus(n)+increment; minus(n)=minus(n)-increment;
+                    [~,fp]=grape_curv(plus,u2x,dx_du,local_system);
+                    [~,fm]=grape_curv(minus,u2x,dx_du,local_system);
+                    for k=1:numel(fidelity)
+                        numerical(n+(k-1)*numel(wave))=(fp(k)-fm(k))/(2*increment);
+                    end
+                end
+                result=test_close(result,[label ' gradient'],gradient(~full_mask),numerical(~full_mask),1e-8,1e-8,...
+                                  'curvilinear derivatives must agree with objective differences');
+                fprintf('%s h=%.1e error=%.6e reference=%.6e\n',label,increment,...
+                        norm(gradient(~full_mask)-numerical(~full_mask)),norm(numerical(~full_mask)));
+            end
+        end
+
+        % Preserve phase-only gradients and exact Hessians with power scaling
+        local_control=control; local_control.method='newton';
+        local_control.amplitudes=[2 3 4]; local_control.freeze=[true false false];
+        local_control.phase_cycle=[0 0.7 0];
+        local_system=optimcon(spin_system,local_control); phases=[0.2 -0.4 0.7];
+        [~,fidelity,gradient,hessian]=grape_phase(phases,local_system);
+        free_system=local_system; free_system.control.freeze=[];
+        [~,free_fid,free_grad,free_hess]=grape_phase(phases,free_system);
+        free_grad(1)=0; free_hess(1,:,1)=0; free_hess(:,1,1)=0;
+        result=test_close(result,'phase value',fidelity,free_fid,0,0,'phase freezing preserves values');
+        result=test_close(result,'phase gradient',gradient,free_grad,1e-12,1e-12,...
+                          'phase freezing preserves free derivatives');
+        result=test_close(result,'phase Hessian',hessian,free_hess,1e-12,1e-12,...
+                          'phase freezing preserves free curvature');
+
         % Cover supported exact Hessians with phase mixing and asymmetric freezing
         methods={'newton','goodwin','newton'};
         for method_idx=1:3
@@ -148,6 +235,16 @@ for fixture=1:2
             free_grad(mask)=0;
             result=test_close(result,'direct engine mask',direct_grad,free_grad,0,0,...
                               'direct engine calls must retain their existing mask semantics');
+        else
+            direct_control=control; direct_control.freeze=mask;
+            direct_system=optimcon(spin_system,direct_control);
+            [~,~,direct_grad]=grape_hilb(direct_system,control.drifts{1},control.operators,...
+                                        waveform,control.rho_init{1},control.rho_targ{1},'real');
+            direct_system.control.freeze=[];
+            [~,~,free_grad]=grape_hilb(direct_system,control.drifts{1},control.operators,...
+                                      waveform,control.rho_init{1},control.rho_targ{1},'real');
+            result=test_close(result,'direct Hilbert mask',direct_grad,free_grad,0,0,...
+                              'direct Hilbert calls retain their existing unmasked derivatives');
         end
     end
 end

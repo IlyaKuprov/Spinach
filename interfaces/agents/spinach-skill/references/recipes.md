@@ -427,7 +427,11 @@ keep the same pool object from `optimcon` through `fmaxnewton` and any later
 pool. `control.freeze` masks input-waveform coordinates after the full distortion,
 phase, and power derivative pullback; frozen fidelity-gradient entries and
 supported Hessian rows and columns are zero (distortion Hessians remain
-unavailable). Sweeping `pwr_levels` and `offsets` makes B1 inhomogeneity and
+unavailable). For `grape_curv`, the mask has exactly the shape of the input
+curvilinear waveform, with coordinates in rows and time samples in columns;
+it is applied after the user-supplied Jacobian pullback, not to intermediate
+Cartesian controls. This also masks the pulled-back penalty gradients.
+Sweeping `pwr_levels` and `offsets` makes B1 inhomogeneity and
 transmitter misplacement part of the optimisation target rather than something
 discovered afterwards. Verify by propagating with `shaped_pulse_xy` and taking
 `real(rho_targ'*rho)`. The `features_*.m` files demonstrate one concept each

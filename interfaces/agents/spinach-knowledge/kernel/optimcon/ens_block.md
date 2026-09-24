@@ -10,60 +10,33 @@ Fidelity, gradient, and Hessian contributions of one block of ensemble cases, ev
 
 ## Physical / mathematical content
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+Each ensemble member has its own initial/target state pair, drift generator, power level, resonance offsets, phase-cycle step, and distortion model. Offsets specified in Hz contribute angular frequencies through the factor `2*pi`. Phase cycles rotate paired control channels and phase the states; power scaling and distortions determine the actual field experienced by the spins. The chosen GRAPE engine evaluates that member in the configured Hilbert or Liouville representation.
 
 ## Numerical / algorithmic content
 
-Freeze masks refer to the input waveform: the complete physical gradient is pulled back through all distortions, phase rotations, and power scaling before frozen input entries are zeroed. Supported Hessians likewise have zero frozen input rows and columns after the phase/power transformation; distortion Hessians remain unavailable. Direct GRAPE engine calls retain their separate existing behaviour.
+For a Cartesian input waveform, the gradient is the pullback of the physical-field derivative through the distortion Jacobian, phase rotation, and power scaling. Only then are frozen Cartesian input entries zeroed. Supported Hessians undergo the corresponding two-sided phase/power transformation and have frozen rows and columns zeroed; distortion Hessians remain unavailable. An outer coordinate wrapper must defer its own mask: `grape_curv` passes an empty Cartesian mask and freezes only after its curvilinear pullback. Direct GRAPE engine calls retain their separate existing behaviour.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
+Worker-local drift storage avoids duplicating the complete drift ensemble on every worker. Fidelities remain per-case, while gradients and Hessians are block sums for reduction and ensemble averaging by `ensemble`. With `traj_opts` containing `average`, one summed forward trajectory is returned per non-empty block; otherwise trajectories retain block order. These sums also support Hilbert-space cell trajectories. An empty block contributes no trajectories.
+
+## Syntax
+
+`[traj,fid,grad,hess]=ens_block(spin_system,drifts,control,block,waveform,n_outputs)`
 
 ## Parameters / inputs
 
-- spin_system -frozen problem published by optimcon.m, with
-- the drift generators removed
-- drifts -cell array of drift generators, populated at
-- the indices that the cases of this block use
-- control -live client-side control structure
-- block -index of the case block, into the cell array
-- spin_system.control.worker_cases
-- waveform -control coefficients for each control opera-
-- tor, [ncontrols x nsteps], rad/s
-- n_outputs -number of outputs requested from ensemble.m,
-- 2 for the fidelity, 3 for the gradient, 4 for
-- the Hessian
+- `spin_system`: frozen problem published by `optimcon`, with the drift generators removed.
+- `drifts`: cell array of drift generators populated at the indices used by this block's cases.
+- `control`: live client-side control structure.
+- `block`: index into `spin_system.control.worker_cases`.
+- `waveform`: coefficients for the control operators, with controls in rows and time samples in columns; power scaling converts them to the fields used by the engines.
+- `n_outputs`: requested output count: two for fidelity, three for the gradient, and four for the Hessian.
 
 ## Outputs
 
-- traj -cell array of trajectory structures, one per
-- case of the block in block order; when the
-- control.traj_opts contains 'average', one
-- structure holding the sum over the block, or
-- an empty cell for an empty block
-- fid -[1 x n_block] array of case fidelities
-- grad -sum of the case gradients over the block, a
-- [ncontrols*nsteps x 1] column, empty unless
-- n_outputs>2
-- hess -sum of the case Hessians over the block, a
-- [(ncontrols*nsteps)^2 x 1] column, empty un-
-- less n_outputs>3
-
-## Control flow inside the case loop
-
-- The live control structure is grafted over the frozen worker copy and every field the live copy lacks (frozen invariants, the case blocks, the waveform basis) is taken from the frozen copy; the drift generators come from the worker's own slice through the `drifts` argument.
-- Dispatch on `spin_system.bas.formalism` chooses the GRAPE function once, `grape_liouv` for `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`, `grape_hilb` for `zeeman-hilb`.
-- `for` loop over the cases of the block, each case indexed through the six catalog columns (state pair, drift, power level, offset, phase-cycle step, distortion).
-- Conditional branch on `~isempty(control.phase_cycle)`; the phase-cycle row multiplies the initial and target states by phase factors and rotates each control channel through the block-diagonal rotation matrix `R` built from the channel phases.
-- Conditional branch on `~isempty(off_ens_sizes)`; `ind2sub` unpacks the offset combination index, first channel fastest, and `2*pi*offset` times each channel offset operator is added to the drift.
-- The waveform is scaled to physical units by the power level of the case.
-- `for` loop over the distortion functions, collecting their Jacobian only when derivatives are requested.
-- One GRAPE call with as many outputs as requested: trajectory, fidelity, gradient, Hessian.
-- The gradient passes through the distortion Jacobian and the transposed rotation, and is added to the block sum scaled by the power level.
-- The Hessian is rotated on both sides by the Kronecker product of the identity over time steps with the transposed rotation, and added to the block sum scaled by the squared power level.
-- Conditional branch on `ismember('average',control.traj_opts)&&(n_mine>0)`; the forward trajectories of a non-empty block are added with the overloaded `plus`, which also covers the Hilbert-space cell trajectories, into one entry so that only block sums travel to the client, which divides by the case count; an empty block contributes nothing.
+- `traj`: trajectories in block order, or one forward-trajectory sum when `traj_opts` contains `average`; an empty block returns an empty cell.
+- `fid`: a `1 x n_block` array of per-case fidelities.
+- `grad`: summed case gradients as a `ncontrols*nsteps x 1` column, empty unless `n_outputs>2`.
+- `hess`: summed case Hessians as a `(ncontrols*nsteps)^2 x 1` column, empty unless `n_outputs>3`.
 
 ## Header notes
 

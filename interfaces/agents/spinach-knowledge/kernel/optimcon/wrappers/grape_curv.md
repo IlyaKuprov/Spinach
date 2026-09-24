@@ -1,67 +1,40 @@
 # kernel/optimcon/wrappers/grape_curv.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/wrappers/grape_curv.m`
-- Signature: `[traj_data,fidelity,df_du]=grape_curv(waveform_u,u2x,...`
-- Total lines: 125
+- Source: `kernel/optimcon/wrappers/grape_curv.m`
+- Signature: `[traj_data,fidelity,df_du]=grape_curv(waveform_u,u2x,dx_du,spin_system)`
+- Total lines: 143
 
 ## Purpose
 
-Cost function for optimal control using the GRAPE algorithm. Returns fidelity and gradient for a given waveform, specified in arbitrary curvilinear coordinates. Syntax: [traj_data,fidelity,df_du]=grape_curv(waveform_u,u2x,... dx_du,spin_system)
+Evaluates a GRAPE objective and its gradient for a waveform expressed in user-defined curvilinear coordinates. The map defines the coefficients of the physical control operators; the optimiser can therefore work in coordinates such as amplitude and phase rather than Cartesian channels.
 
 ## Physical / mathematical content
 
-- Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+For each time sample, `x=u2x(u)`. The supplied `dx_du(u)` has curvilinear coordinates along rows and Cartesian controls along columns: entry `(j,k)` is `dx(k)/du(j)`. Thus the gradient is `df_du=dx_du(u)*df_dx`, including every Cartesian contribution even if some curvilinear inputs are frozen. The number of curvilinear coordinates need not equal the number of control operators.
 
 ## Numerical / algorithmic content
 
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
+`grape_xy` supplies the Cartesian objective and derivatives, including ensemble effects and rectilinear penalty terms. `control.freeze` must have exactly the shape of `waveform_u`, or be empty. It is withheld from the Cartesian calculation and applied to each curvilinear gradient channel after the pullback. It changes neither the propagated waveform nor the objective values. Combining a non-empty freeze mask with a waveform basis remains unsupported. This wrapper returns no Hessian.
+
+## Syntax
+
+`[traj_data,fidelity]=grape_curv(waveform_u,u2x,dx_du,spin_system)`
+
+`[traj_data,fidelity,df_du]=grape_curv(waveform_u,u2x,dx_du,spin_system)`
 
 ## Parameters / inputs
 
-- waveform_u -pulse waveform in curvilinear coordinates with indi-
-- vidual coordinates in columns and time in rows
-- u2x -a handle to a function that takes a column of curvi-
-- linear coordinates and returns a column of coeffici-
-- ents in front of the control operators
-- dx_du -a handle to a function that takes a column of curvi-
-- linear coordinates and returns the Jacobian matrix
-- with the following structure:
-- [dx(1)_du(1) dx(2)_du(1) dx(3)_du(1) ...
-- dx(1)_du(2) dx(2)_du(2) dx(3)_du(2) ...
-- ... ... ... ...]
+- `waveform_u`: real array with coordinates in rows and time samples in columns.
+- `u2x`: function handle mapping one curvilinear coordinate column to a column of coefficients for the control operators.
+- `dx_du`: function handle returning the curvilinear-by-Cartesian Jacobian described above for one coordinate column.
+- `spin_system`: Spinach problem configured by `optimcon`.
 
 ## Outputs
 
-- traj_data -system trajectory data structure used for visualisa-
-- tion and progress reports
-- fidelity -figure of merit for the overlap of the current state
-- of the system and the desired state(s). When penalty
-- methods are specified, fidelity is returned as an ar-
-- ray separating the penalties from the simulation
-- fidelity.
-- df_du -gradient of the fidelity with respect to the control
-- sequence. When penalty methods are specified, gradi-
-- ent is returned as an array separating penalty gra-
-- dients from the fidelity gradient.
-- Note: penalities are computed using the rectilinear representation.
+- `traj_data`: system trajectory data for visualisation and progress reports.
+- `fidelity`: state-overlap objective followed by the separately weighted penalty values when present.
+- `df_du`: gradient in the input coordinate layout; a separate third-dimension channel is returned for each fidelity or penalty term. Frozen entries are zero in every channel.
 
-## Implementation structure
+## Header notes
 
-- Cost function for optimal control using the GRAPE algorithm. Returns
-- fidelity and gradient for a given waveform, specified in arbitrary
-- curvilinear coordinates. Syntax:
-- [traj_data,fidelity,df_du]=grape_curv(waveform_u,u2x,...
-- dx_du,spin_system)
-- waveform_u - pulse waveform in curvilinear coordinates with indi-
-- vidual coordinates in columns and time in rows
-- u2x - a handle to a function that takes a column of curvi-
-- linear coordinates and returns a column of coeffici-
-- ents in front of the control operators
-- dx_du - a handle to a function that takes a column of curvi-
-- linear coordinates and returns the Jacobian matrix
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `waveform_x()`, `u2x()`, `waveform_u()`, `grape_xy()`, `df_du()`, `dx_du()`, `df_dx()`, `isfield()`, `optimcon()`.
+Penalties are evaluated in the rectilinear representation, then differentiated through the same coordinate map.

@@ -117,7 +117,7 @@
 | `kernel/grids/sphtrsubd.m` | `[r12,r23,r31]=sphtrsubd(r1,r2,r3)` | Spherical triangle subdivision. Returns the midpoints of the sides of a spherical triangle specified by the unit vectors | 59 |
 | `kernel/grids/vcell_solidangle.m` | `S=vcell_solidangle(P,K,xyz)` | Solid angle of a spherical Voronoi cell. Syntax: s=vcell_solidangle(P,K,xyz) Parameters: P -(3 x m) array with coordinat | 85 |
 | `kernel/grids/voronoisphere.m` | `[vertices,indices,polygons,sangles]=voronoisphere(xyz)` | Voronoi tessellation of the unit sphere around the specified po- ints, computed as the exact geometric dual of the Delau | 118 |
-| `kernel/hamiltonian.m` | `[I,Q]=hamiltonian(spin_system,operator_type)` | Hamiltonian operator or superoperator and its rotational decomposi- tion. Descriptor and operator generation are paralle | 1485 |
+| `kernel/hamiltonian.m` | `[I,Q]=hamiltonian(spin_system,operator_type)` | Hamiltonian operator or superoperator and its rotational decomposi- tion. Descriptor and operator generation are paralle | 1486 |
 | `kernel/homospoil.m` | `rho=homospoil(spin_system,rho,zqc_flag)` | Emulates a strong homospoil pulse -only zero-frequency states with respect to the carrier frequencies (chemical shifts a | 120 |
 | `kernel/includes/autoexec.m` | `(script file)` | This include is executed at the start of create.m, it over- rides all user input. A good use case is forcing polyadic or | 71 |
 | `kernel/includes/end_disallow_gpu.m` | `(script file)` | Reinstates GPU arithmetic setting to the previous state after the start_disallow_gpu command had been issued. | 67 |

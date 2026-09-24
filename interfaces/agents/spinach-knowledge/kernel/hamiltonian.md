@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/hamiltonian.m`
 - Signature: `[I,Q]=hamiltonian(spin_system,operator_type)`
-- Total lines: 1478
+- Total lines: 1486
 
 ## Purpose
 
@@ -45,21 +45,6 @@ Hamiltonian operator or superoperator and its rotational decomposi- tion. Descri
 - the orientation machinery refer to the spin subsystem only,
 - for which rotations are well-defined.
 
-## Implementation structure
+## Header notes
 
-- Hamiltonian operator or superoperator and its rotational decomposi-
-- tion. Descriptor and operator generation are parallelised. Syntax:
-- [I,Q]=hamiltonian(spin_system,operator_type)
-- in Liouville space, operator_type can be set to
-- 'left' -produces left side product superoperator
-- 'right' -produces right side product superoperator
-- 'comm' -produces commutation superoperator (default)
-- 'acomm' -produces anticommutation superoperator
-- in Hilbert space this parameter is ignored.
-- I -rotationally invariant part of the Hamiltonian
-- Q -irreducible components of the anisotropic part,
-- use orientation.m to get the full Hamiltonian
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `grumble()`, `report()`, `opL()`, `opS()`, `num2str()`, `isotropic()`, `mat2sphten()`, `lam_zeeman()`, `phi_zeeman()`, `phi_quad()`, `table()`, `clear()`, `cellfun()`, `pair_list()`, `lam_coupling()`.
+Liouville requests support left, right, commutation, and anticommutation superoperators; Hilbert requests ignore operator_type. The invariant component and anisotropic components are returned separately, and orientation supplies the latter at a chosen geometry.

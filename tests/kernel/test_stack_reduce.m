@@ -9,6 +9,8 @@
 %
 % The tests cover antisymmetric, symmetric, and complex columns in three
 % formalisms, dissipative propagation, ZTE ranking, and path tracing.
+% Wide sparse and tolerance-relative mixed-scale stacks exercise a real
+% parallel pool; non-unitary generators test growth and dynamical ranking.
 %
 % talos@spindynamics.org
 
@@ -134,5 +136,54 @@ P=[projectors{:}]; Q=speye(size(H)); Q=Q(:,[2 4 7]);
 result=test_close(result,'path-tracing column union',P*P',Q*Q',0,0,...
                   'matrix 1-norm screening retains components occupied in any column');
 
+% Exercise mixed scales under the real pool conditions of stack propagation
+result=test_true(result,'active propagation pool',poolsize>0,...
+                 'the wide-stack regression must run with an actual parallel pool');
+weak=sqrt(spin_system.tols.zte_tol*eps('double'));
+result=test_true(result,'tolerance-relative weak column',...
+                 (weak>spin_system.tols.zte_tol)&&(weak<eps('double')),...
+                 'the weak column lies above ZTE tolerance but below machine epsilon');
+H=sparse([2 3],[3 2],1,300,300);
+inputs=sparse([1 2 5],[1 2 3],[1 1i*weak spin_system.tols.zte_tol/2],300,40);
+P=zte(spin_system,H,inputs);
+expected=zeros(300,1); expected([1 2 3])=1;
+result=test_close(result,'mixed-scale support',full(any(P,2)),expected,0,0,...
+                  'weak populated columns must reach their coupled coordinates');
+Q=zte(spin_system,H,full(inputs));
+result=test_close(result,'dense mixed-scale support',full(any(Q,2)),expected,0,0,...
+                  'screening must not depend on sparse versus full input storage');
+control=spin_system; control.tols.zte_maxden=1;
+one=zte(control,H,inputs(:,2));
+result=test_true(result,'independent weak trajectory',...
+                 isequal(find(any(one,2)),[2;3]),...
+                 'the stack retains the same weak trajectory as independent screening');
+
+% Retain nonzero columns that grow across the tolerance during propagation
+H=sparse(2,2,1i,300,300);
+inputs=sparse([1 2],[1 2],[1 spin_system.tols.zte_tol/2],300,40);
+P=zte(spin_system,H,inputs);
+result=test_true(result,'subthreshold initial column growth',...
+                 isequal(find(any(P,2)),[1;2]),...
+                 'only exactly zero columns may be omitted before propagation');
+
+% Rank dynamical row maxima rather than norms or input-column amplitudes
+H=sparse([2 3],[1 2],1,300,300);
+inputs=sparse([1 4],[1 40],[1 0.8i],300,40);
+P=zte(spin_system,H,inputs,2);
+result=test_true(result,'dynamical state ranking',...
+                 isequal(find(any(P,2)),[2;3]),...
+                 'two nilpotent-generator steps give row maxima [1 2 2 0.8]');
+
+% Screen a genuinely wide sparse stack without losing useful reduction
+H=sparse([1 2],[2 1],1,4096,4096);
+inputs=sparse(ones(1,512),1:512,ones(1,512),4096,513);
+inputs(:,2:2:512)=1i*inputs(:,2:2:512);
+P=zte(spin_system,H,inputs);
+result=test_true(result,'wide sparse screening',...
+                 issparse(inputs)&&isequal(size(P),[4096 2])&&...
+                 isequal(find(any(P,2)),[1;2]),...
+                 '512 phased columns and one zero column retain only two reachable rows');
+
 end
+
 

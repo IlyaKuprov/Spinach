@@ -26,6 +26,10 @@
 %                            L_reduced=P'*L*P
 %                            rho_reduced=P'*rho;
 %
+% Note: stack columns are screened independently, using one column's
+%       propagation storage and scaling at a time. Each column stops
+%       when its populated-coordinate count stops growing.
+%
 % Note: default tolerance may be altered by setting sys.tols.zte_tol
 %       variable before calling create.m 
 %
@@ -98,36 +102,38 @@ else
     report(spin_system,['a maximum of ' num2str(spin_system.tols.zte_nsteps) ...
                         ' steps shall be taken, ' num2str(timestep) ' seconds each.']);
     
-    % Track the maximum amplitude of each actual state column
-    amplitudes=abs(rho);
-    report(spin_system,['evolution step 0, active space dimension ' ...
-                        num2str(nnz(any(amplitudes>spin_system.tols.zte_tol,2)))]);
-    
-    % Compute trajectory steps with Krylov technique
-    for n=2:spin_system.tols.zte_nsteps
-        
-        % Record each column's active dimension before propagation
-        prev_space_dim=sum(amplitudes>spin_system.tols.zte_tol,1);
+    % Stream actual columns into a single vector of row maxima
+    amplitudes=zeros(size(rho,1),1);
+    for k=1:size(rho,2)
 
-        % Take a step forward with the true state columns
-        rho=step(spin_system,L,rho,timestep);
+        % Skip exactly zero columns without discarding weak initial states
+        column=rho(:,k);
+        if nnz(column)==0, continue; end
+        col_amplitudes=abs(column);
 
-        % Analyse the trajectories without mixing phases or columns
-        amplitudes=max(amplitudes,abs(rho));
-        curr_space_dim=sum(amplitudes>spin_system.tols.zte_tol,1);
-        
-        % Inform the user
-        report(spin_system,['evolution step ' num2str(n-1) ...
-                            ', active space dimension ' ...
-                            num2str(nnz(any(amplitudes>spin_system.tols.zte_tol,2)))]);
-        
-        % Terminate if done early
-        if all(curr_space_dim==prev_space_dim), break; end
-        
+        % Sample each trajectory with independent propagation scaling
+        for n=2:spin_system.tols.zte_nsteps
+
+            % Record the active dimension before propagation
+            prev_space_dim=nnz(col_amplitudes>spin_system.tols.zte_tol);
+
+            % Propagate only one column and accumulate its time maxima
+            column=step(spin_system,L,column,timestep);
+            col_amplitudes=max(col_amplitudes,abs(column));
+            curr_space_dim=nnz(col_amplitudes>spin_system.tols.zte_tol);
+
+            % Terminate when this column's active dimension stops growing
+            if curr_space_dim==prev_space_dim, break; end
+
+        end
+
+        % Combine column maxima without mixing their phases or scales
+        amplitudes=max(amplitudes,col_amplitudes);
+        report(spin_system,['screened state column ' num2str(k) ...
+                            ' of ' num2str(size(rho,2)) ', active space dimension ' ...
+                            num2str(nnz(amplitudes>spin_system.tols.zte_tol))]);
+
     end
-    
-    % Screen the union of the actual column trajectories
-    amplitudes=max(amplitudes,[],2);
 
     % Determine which tracks to drop
     if exist('nstates','var')
@@ -181,4 +187,5 @@ end
 % Lastly they say they always believed it. 
 %
 % Louis Agassiz
+
 

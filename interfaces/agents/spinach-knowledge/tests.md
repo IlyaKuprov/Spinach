@@ -4,7 +4,7 @@
 - Source commit: `f053e432a61d7144f3946d73d0a672e3ccfc3fc5`
 - Source tree state: `clean`
 - Path set: tracked MATLAB files from `git ls-files '*.m'`; untracked MATLAB files are excluded.
-- Files indexed: **113** MATLAB files
+- Files indexed: **114** MATLAB files
 - Generated: 2026-08-30T02:52:31
 
 | File | Signature | Summary | LOC |
@@ -102,6 +102,7 @@
 | `tests/kernel/test_spunicols_mex_suite.m` | `result=test_spunicols_mex_suite()` | Tests the sparse unique-column MEX helper. Syntax: result=test_spunicols_mex_suite() Outputs: result -regression test re | 92 |
 | `tests/kernel/test_state_constructor_suite.m` | `result=test_state_constructor_suite()` | Tests state-constructor helper functions. Syntax: result=test_state_constructor_suite() Outputs: result -regression test | 120 |
 | `tests/kernel/test_states_composite_suite.m` | `result=test_states_composite_suite()` | Tests composite state generators in kernel/states. Syntax: result=test_states_composite_suite() Outputs: result -regress | 125 |
+| `tests/kernel/test_stack_reduce.m` | `result=test_stack_reduce()` | Tests true-column symmetry and ZTE screening, including wide sparse and independently scaled weak state stacks. | 189 |
 | `tests/kernel/test_step_matches_expm.m` | `result=test_step_matches_expm()` | Tests Hilbert-space propagation against matrix exponentiation. Syntax: result=test_step_matches_expm() Outputs: result - | 48 |
 | `tests/kernel/test_step_zero_time.m` | `result=test_step_zero_time()` | Tests zero-duration propagation. Syntax: result=test_step_zero_time() Outputs: result -regression test result with expla | 43 |
 | `tests/kernel/test_tensor_vector_suite.m` | `result=test_tensor_vector_suite()` | Tests tensor, vector, distribution, and relaxation utilities. Syntax: result=test_tensor_vector_suite() Outputs: result  | 136 |
@@ -115,7 +116,7 @@
 | `tests/kernel/test_zeeman_hamiltonian.m` | `result=test_zeeman_hamiltonian()` | Tests the one-spin Zeeman Hamiltonian. Syntax: result=test_zeeman_hamiltonian() Outputs: result -regression test result  | 42 |
 | `tests/lib/new_test_result.m` | `result=new_test_result(id,name,purpose)` | Creates a regression test result structure. Syntax: result=new_test_result(id,name,purpose) Parameters: id -stable test  | 30 |
 | `tests/lib/test_close.m` | `result=test_close(result,label,observed,reference,abs_tol,rel_tol,why)` | Adds a numerical regression check with tolerances and explanation. Syntax: result=test_close(result,label,observed,refer | 71 |
-| `tests/lib/test_manifest.m` | `manifest=test_manifest()` | Returns Spinach regression test metadata. Syntax: manifest=test_manifest() Outputs: manifest -structure array with test  | 130 |
+| `tests/lib/test_manifest.m` | `manifest=test_manifest()` | Returns Spinach regression test metadata. Syntax: manifest=test_manifest() Outputs: manifest -structure array with test  | 132 |
 | `tests/lib/test_options.m` | `options=test_options(varargin)` | Parses name-value options for the Spinach test runner. Syntax: options=test_options(varargin) Parameters: varargin -name | 62 |
 | `tests/lib/test_spin_system.m` | `spin_system=test_spin_system(sys,inter,bas)` | Builds a small quiet Spinach spin system for tests. Syntax: spin_system=test_spin_system(sys,inter,bas) Parameters: sys  | 35 |
 | `tests/lib/test_true.m` | `result=test_true(result,label,condition,why)` | Adds a logical regression check with a clear message. Syntax: result=test_true(result,label,condition,why) Parameters: r | 31 |

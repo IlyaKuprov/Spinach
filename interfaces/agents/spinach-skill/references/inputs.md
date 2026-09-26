@@ -39,7 +39,7 @@ Legal `sys.disable` entries, anything else being an error: `'zte'`
 `sys.enable` entries: `'gpu'`, `'op_cache'`, `'ham_cache'`, `'prop_cache'`,
 `'greedy'`, `'paranoia'` (tight tolerances), `'cowboy'` (loose
 tolerances), `'polyadic'`, `'sodd'` (spin-orbit corrections to dipolar
-couplings), `'dafuq'`.
+couplings), `'dafuq'`. With `'polyadic'` enabled, `v2fplanck` supports scalar and voxel-wise velocities; spin-space Kronecker extension preserves prefactors by nesting affixed polyadics.
 
 `sys.tols` subfields are listed and defaulted in `tolerances.m`. The two that
 change physics rather than performance are `inter_cutoff`, below which coupling

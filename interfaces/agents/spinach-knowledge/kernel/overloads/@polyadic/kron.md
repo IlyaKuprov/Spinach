@@ -12,6 +12,8 @@ Kronecker product function for polyadics. Syntax: c=kron(a,b)
 
 ## Numerical / algorithmic content
 
+Core lists are extended directly only when the polyadic operand has neither prefixes nor suffixes. Otherwise, nesting preserves the complete matrix product, including multiple rectangular affixes, in either operand order. This also preserves voxel-wise flow generators when `v2fplanck` extends them into spin space.
+
 ## Parameters / inputs
 
 - a,b -polyadic or numeric objects
@@ -21,17 +23,6 @@ Kronecker product function for polyadics. Syntax: c=kron(a,b)
 - c -polyadic object
 - This operation bundles the inputs into a nested polyadic object.
 
-## Implementation structure
+## Header notes
 
-- Kronecker product function for polyadics. Syntax:
-- c=kron(a,b)
-- a,b -polyadic or numeric objects
-- c -polyadic object
-- This operation bundles the inputs into a nested polyadic object.
-- Check consistency
-- Put the new term inside the polyadic structure
-- Append B to core lists of A
-- Prepend A to core lists of B
-- Make a nested polyadic
-- Simplify
-- Consistency enforcement
+Both numeric and polyadic matrix factors are supported. An affixed operand is retained as a nested factor so that extension does not change its existing matrix dimensions.

@@ -83,6 +83,7 @@
 | `tests/kernel/test_pi_pulse_rotation.m` | `result=test_pi_pulse_rotation()` | Tests hard pi-pulse rotation. Syntax: result=test_pi_pulse_rotation() Outputs: result -regression test result with expla |
 | `tests/kernel/test_plotting_helpers_offscreen.m` | `result=test_plotting_helpers_offscreen()` | Tests offscreen execution of Spinach plotting helpers. Syntax: result=test_plotting_helpers_offscreen() Outputs: result |
 | `tests/kernel/test_plotting_remaining_suite.m` | `result=test_plotting_remaining_suite()` | Tests remaining Spinach plotting helper gaps under offscreen graphics. Syntax: result=test_plotting_remaining_suite() Ou |
+| `tests/kernel/test_polyadic_kron.m` | `result=test_polyadic_kron()` | Affixed polyadic tensor products and spin-space flow lifting. |
 | `tests/kernel/test_ppm_hz_roundtrip.m` | `result=test_ppm_hz_roundtrip()` | Tests chemical shift and frequency conversion. Syntax: result=test_ppm_hz_roundtrip() Outputs: result -regression test r |
 | `tests/kernel/test_pulses_propagation_suite.m` | `result=test_pulses_propagation_suite()` | Tests pulse-coordinate and propagation helpers. Syntax: result=test_pulses_propagation_suite() Outputs: result -regressi |
 | `tests/kernel/test_pulses_waveform_suite.m` | `result=test_pulses_waveform_suite()` | Tests deterministic pulse waveform generators. Syntax: result=test_pulses_waveform_suite() Outputs: result -regression t |

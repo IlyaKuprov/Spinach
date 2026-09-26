@@ -1,8 +1,6 @@
 # tests/kernel/test_mode_removal.m
 
-- Source: `tests/kernel/test_mode_removal.m`
 - Signature: `result=test_mode_removal()`
-- Total lines: 229
 
 ## Purpose
 

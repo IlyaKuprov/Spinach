@@ -108,6 +108,7 @@
 | `tests/kernel/test_transform_roundtrip_suite.m` | `result=test_transform_roundtrip_suite()` | Tests deterministic coordinate and tensor transforms. Syntax: result=test_transform_roundtrip_suite() Outputs: result -r |
 | `tests/kernel/test_transform_tensor_suite.m` | `result=test_transform_tensor_suite()` | Tests tensor transform helpers. Syntax: result=test_transform_tensor_suite() Outputs: result -regression test result wit |
 | `tests/kernel/test_transform_units_coordinates_suite.m` | `result=test_transform_units_coordinates_suite()` | Tests unit and coordinate transform helpers. Syntax: result=test_transform_units_coordinates_suite() Outputs: result -re |
+| `tests/kernel/test_tt_phase.m` | `result=test_tt_phase()` | Tensor-train absolute compression budgets under coefficient phases. |
 | `tests/kernel/test_unit_conversion_suite.m` | `result=test_unit_conversion_suite()` | Tests scalar unit-conversion functions. Syntax: result=test_unit_conversion_suite() Outputs: result -regression test res |
 | `tests/kernel/test_wave_basis_orthonormality.m` | `result=test_wave_basis_orthonormality()` | Tests waveform basis orthonormality. Syntax: result=test_wave_basis_orthonormality() Outputs: result -regression test re |
 | `tests/kernel/test_wigner_angular_suite.m` | `result=test_wigner_angular_suite()` | Tests angular-momentum coefficient and spherical-function helpers. Syntax: result=test_wigner_angular_suite() Outputs: r |

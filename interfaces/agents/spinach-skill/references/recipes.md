@@ -399,6 +399,8 @@ normalise initial and target states, collect control and offset operators,
 assemble the drift, hand a separate `control` structure to `optimcon`, optimise
 with `fmaxnewton`.
 
+For cooperative phase control, `grape_coop` retains the requested primary fidelity and uses real-overlap auxiliary derivatives for its squared-impurity penalty, including with nonunit targets. Zero real auxiliary overlaps and zero impurity gradients are valid engine outputs. `fmaxnewton` checks only the initial assembled gradient on unfrozen coordinates for all four methods, but `grape_coop` provides no Hessian and supports only `lbfgs` and `rbfgs` optimisation; do not reject individual auxiliary contributions. The initial gradient norm must be at least `1e-6`, regardless of the objective value. Objective-only calls with `max_iter=0` do not apply the initial-gradient check.
+
 ```matlab
 rho_init=state(spin_system,{'Lz'},{<spin>}); rho_init=rho_init/norm(full(rho_init),2);
 rho_targ=state(spin_system,{'Lz'},{<spin>}); rho_targ=rho_targ/norm(full(rho_targ),2);

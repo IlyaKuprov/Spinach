@@ -1,5 +1,5 @@
-% Removes the specified spins from the spin_system structure and
-% updates it accordingly. Syntax:
+% Removes specified particles (spins or bosonic modes) from the
+% spin_system structure and updates dependent data. Syntax:
 %
 %            spin_system=kill_spin(spin_system,hit_list)
 %
@@ -8,18 +8,20 @@
 %     spin_system   - primary Spinach data structure
 %
 %     hit_list      - a vector of integers or a logical
-%                     vector giving the numbers of spins
-%                     to be removed from the system
+%                     vector giving particle numbers in the
+%                     unified isotope list to be removed
 %
 % Outputs:
 %
 %     spin_system   - the data structure with the indica-
-%                     ted spins and all dependent infor-
+%                     ted particles and dependent infor-
 %                     mation (basis, assumptions) removed
 %
 % Notes: basis, connectivity, symmetry, and assumption information
 %        is destroyed by this function; you would need to call the
-%        basis.m and assume.m functions again.
+%        basis.m and assume.m functions again. Mode strengths are
+%        cleared; the mode container is removed when no bosonic
+%        particles remain.
 %
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
@@ -36,7 +38,7 @@ if islogical(hit_list), hit_list=find(hit_list); end
 
 % Inform the user
 report(spin_system,['removing ' num2str(numel(hit_list)) ...
-                    ' spins from the system...']);
+                    ' particles from the system...']);
 
 % Update isotope and particle type lists
 spin_system.comp.isotopes(hit_list)=[];
@@ -79,6 +81,47 @@ spin_system.inter.coordinates(hit_list)=[];
 % Update proximity matrix
 spin_system.inter.proxmatrix(hit_list,:)=[];
 spin_system.inter.proxmatrix(:,hit_list)=[];
+
+% Update particle-indexed bosonic mode data
+if isfield(spin_system.inter,'modes')
+
+    % Remove particle coordinates from scalar mode parameters
+    fields={'frqs','carriers','anharms','damp','dephase'};
+    for n=1:numel(fields)
+        spin_system.inter.modes.(fields{n})(hit_list)=[];
+    end
+
+    % Remove particle coordinates from mode pair channels
+    fields={'exchange','kerr','longitudinal','dispersive',...
+            'coupling_mod','zeeman_mod'};
+    for n=1:numel(fields)
+        pairs=spin_system.inter.modes.(fields{n});
+        pairs(hit_list,:)=[]; pairs(:,hit_list)=[];
+
+        % Reindex spin leaves inside retained modulation derivative orders
+        if ismember(fields{n},{'coupling_mod','zeeman_mod'})
+            for k=find(~cellfun(@isempty,pairs(:)))'
+                orders=pairs{k};
+                for p=1:numel(orders)
+                    if isempty(orders{p}), continue; end
+                    orders{p}(:,hit_list)=[];
+                    if strcmp(fields{n},'coupling_mod')
+                        orders{p}(hit_list,:)=[];
+                    end
+                end
+                pairs{k}=orders;
+            end
+        end
+        spin_system.inter.modes.(fields{n})=pairs;
+    end
+
+    % Discard inapplicable mode data and stale mode assumptions
+    if ~any(ismember(spin_system.comp.types,{'C','V','T'}))
+        spin_system.inter=rmfield(spin_system.inter,'modes');
+    elseif isfield(spin_system.inter.modes,'strength')
+        spin_system.inter.modes=rmfield(spin_system.inter.modes,'strength');
+    end
+end
 
 % Update relaxation parameters
 if ~isempty(spin_system.rlx.r1_rates)

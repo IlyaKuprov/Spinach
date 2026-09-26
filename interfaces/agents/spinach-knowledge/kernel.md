@@ -458,7 +458,7 @@
 | `kernel/utilities/isworkernode.m` | `answer=isworkernode()` | Returns true if executed inside a parfor or spmd block. This function is used in the internal decision making of Spinach |
 | `kernel/utilities/jacobianest.m` | `[jac,err] = jacobianest(fun,x0)` | Estimate of the Jacobian matrix of a vector valued function of n variables. Syntax: [jac,err] = jacobianest(fun,x0) Para |
 | `kernel/utilities/keep_rank.m` | `A=keep_rank(A,nsvk)` | Truncates the singular value decomposition at the specified rank and reassembles the matrix. Syntax: A=keep_rank(A,rank) |
-| `kernel/utilities/kill_spin.m` | `spin_system=kill_spin(spin_system,hit_list)` | Removes the specified spins from the spin_system structure and updates it accordingly. Syntax: spin_system=kill_spin(spi |
+| `kernel/utilities/kill_spin.m` | `spin_system=kill_spin(spin_system,hit_list)` | Removes specified particles (spins or bosonic modes) and invalidates dependent metadata. |
 | `kernel/utilities/killcross.m` | `M=killcross(M,f1idx,f2idx)` | Zeroes the specified rows and columns of a matrix. Syntax: M=killcross(M,f1idx,f2idx) Parameters: M -a matrix f1idx -num |
 | `kernel/utilities/killdiag.m` | `spec=killdiag(spec,brush_dim)` | Zeroes out the diagonal of a 2D spectrum using the brush with the specified dimensions. Syntax: spec=killdiag(spec,brush |
 | `kernel/utilities/krondelta.m` | `d=krondelta(a,b)` | Kronecker symbol. Syntax: d=krondelta(a,b) Parameters: a -an integer number b -an integer number Outputs: d -a logical n |

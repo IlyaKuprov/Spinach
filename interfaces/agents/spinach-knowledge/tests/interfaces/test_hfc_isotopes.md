@@ -1,8 +1,6 @@
 # tests/interfaces/test_hfc_isotopes.m
 
-- Source: `tests/interfaces/test_hfc_isotopes.m`
 - Signature: `result=test_hfc_isotopes()`
-- Total lines: 213
 
 ## Purpose
 

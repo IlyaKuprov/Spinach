@@ -1,8 +1,6 @@
 # interfaces/g2spinach.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/g2spinach.m`
 - Signature: `[sys,inter]=g2spinach(props,particles,references,options)`
-- Total lines: 332
 
 ## Purpose
 
@@ -12,7 +10,6 @@ Makes Spinach data structures from parsed outputs of electronic structure theory
 
 EPR hyperfine tensors are scaled by the requested/source nuclear gyromagnetic-ratio ratio before thresholding and purging. The source isotope must be explicit in `props.isotopes`: Gaussian supplies per-atom mass numbers and ORCA supplies isotope strings. Missing or malformed provenance for a selected nonempty tensor is rejected by the initial input guard, before coordinates, interactions, or warnings are processed; empty unprinted tensors are preserved. Zero-gamma sources are rejected, while direct zero-spin targets yield zero tensors. Same-isotope and NMR imports retain their existing conventions.
 
-- This file belongs to the `interfaces` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
 
 ## Numerical / algorithmic content

@@ -19,7 +19,8 @@
 function leg_obj=klegend(varargin)
 
 % Display the legend using LaTeX
-leg_obj=legend(varargin{:},'Interpreter','latex');
+leg_obj=legend(varargin{:},'Interpreter','latex',...
+                           'IconColumnWidth',10);
 
 % Make legend box translucent
 set(leg_obj.BoxFace,'ColorType','truecoloralpha',...

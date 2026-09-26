@@ -1,8 +1,6 @@
 # kernel/utilities/merge_inp.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/merge_inp.m`
 - Signature: `[sys,inter]=merge_inp(sys_parts,inter_parts)`
-- Total lines: 443
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Merges multiple sys and inter structures into one. Useful for setting up chemica
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `group_check()`, `group_gate()`, `strip()`, `merge_like_magnet()`, `merge_like_isotopes()`, `merge_like_coords()`, `merge_like_rates()`, `merge_like_couplings()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -54,7 +49,3 @@ Merges multiple sys and inter structures into one. Useful for setting up chemica
 - Note: extensive fields are concatenated with spin and chemical
 - subsystem indices offset as appropriate; non-extensive
 - fields (magnet, temperature, relaxation settings, etc.)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `cellfun()`, `merge_like_magnet()`, `merge_like_isotopes()`, `group_check()`, `all()`, `isfield()`, `merge_like_coords()`, `merge_like_rates()`, `merge_like_couplings()`, `merge_like_sources()`, `merge_like_parts()`, `strip()`, `group_gate()`, `rmfield()`, `fieldnames()`.

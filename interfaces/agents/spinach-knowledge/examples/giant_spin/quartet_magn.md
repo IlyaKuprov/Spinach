@@ -1,8 +1,6 @@
 # examples/giant_spin/quartet_magn.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/quartet_magn.m`
 - Signature: `quartet_magn()`
-- Total lines: 52
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Sample magnetisation during a finite-speed magnetic field sweep for a spin-3/2 p
 - Spinach housekeeping
 - Experiment parameters
 - Run the field scan
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `icm2hz()`, `zfs2mat()`, `create()`, `basis()`, `fieldscan_magn()`, `kfigure()`, `kxlabel()`, `kylabel()`.

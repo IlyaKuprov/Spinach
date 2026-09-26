@@ -1,8 +1,6 @@
 # examples/nmr_liquids/ct_hsqc_sucrose.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/ct_hsqc_sucrose.m`
 - Signature: `ct_hsqc_sucrose()`
-- Total lines: 87
 
 ## Purpose
 
@@ -32,7 +30,3 @@ CT HSQC spectrum of sucrose with natural content of 13C isotope (magnetic parame
 - Create the spin system structure
 - Generate isotopomers
 - Preallocate the answer
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `shift_iso()`, `create()`, `dilute()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

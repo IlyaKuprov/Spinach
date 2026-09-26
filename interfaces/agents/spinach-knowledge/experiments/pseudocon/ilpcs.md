@@ -1,8 +1,6 @@
 # experiments/pseudocon/ilpcs.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/pseudocon/ilpcs.m`
 - Signature: `[mxyz,chi,Ilm,pred_pcs,s_mxyz,s_chi,s_Ilm]=ilpcs(nxyz,expt_pcs,ranks,mguess)`
-- Total lines: 161
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Fits experimental PCS data using the distributed paramagnetc centre model descri
 - Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -72,7 +67,3 @@ ilpcs(nxyz,expt_pcs,ranks,mguess)
 - fitting procedure
 - mguess -guess value for the paramagnetic centre position,
 - a three-element vector in Angstrom
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `nonzeros()`, `onCleanup()`, `optimset()`, `lpcs()`, `multipack()`, `vec_res_sq()`, `fminunc()`, `jacobianest()`, `sum_res_sq()`, `inv()`.

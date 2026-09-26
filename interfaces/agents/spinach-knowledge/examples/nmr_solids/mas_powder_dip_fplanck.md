@@ -1,8 +1,6 @@
 # examples/nmr_solids/mas_powder_dip_fplanck.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/mas_powder_dip_fplanck.m`
 - Signature: `mas_powder_dip_fplanck()`
-- Total lines: 54
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Spinning powder pulse-acquire experiment on a two-spin system with a dipolar cou
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

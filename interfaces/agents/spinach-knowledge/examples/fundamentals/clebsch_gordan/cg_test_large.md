@@ -1,8 +1,6 @@
 # examples/fundamentals/clebsch_gordan/cg_test_large.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/clebsch_gordan/cg_test_large.m`
 - Signature: `cg_test_large()`
-- Total lines: 35
 
 ## Purpose
 
@@ -22,7 +20,3 @@ Compares the output of Spinach Clebsch-Gordan function with the arbitrary precis
 - Loop over the lines of the table
 - Compute the CG coefficient
 - Compare with the Mathematica result
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `clebsch_gordan()`, `cg_test_table()`, `num2str()`.

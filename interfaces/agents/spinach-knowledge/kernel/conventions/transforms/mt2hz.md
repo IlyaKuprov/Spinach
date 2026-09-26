@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/mt2hz.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/mt2hz.m`
 - Signature: `hfc_hz=mt2hz(hfc_mt,g)`
-- Total lines: 59
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Converts hyperfine couplings from milliTesla to Hz (linear frequency). The milli
 - Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Outputs
 
@@ -35,7 +30,3 @@ Converts hyperfine couplings from milliTesla to Hz (linear frequency). The milli
 - used for conversion
 - hfc_hz -an array of values in Hz
 - Set the defaults
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `grumble()`.

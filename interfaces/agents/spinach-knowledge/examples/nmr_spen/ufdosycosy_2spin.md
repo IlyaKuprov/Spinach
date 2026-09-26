@@ -1,8 +1,6 @@
 # examples/nmr_spen/ufdosycosy_2spin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_spen/ufdosycosy_2spin.m`
 - Signature: `ufdosycosy_2spin()`
-- Total lines: 100
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Ultrafast 3D DOSY-COSY for a two-spin system. Calculation time: hours on NVidia 
 - Assumptions
 - Sample geometry
 - Relaxation phantom
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `assume()`, `state()`, `imaging()`, `fftshift()`, `kfigure()`, `volplot()`.

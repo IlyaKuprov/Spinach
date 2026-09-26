@@ -1,16 +1,12 @@
 # kernel/plotting/klegend.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/plotting/klegend.m`
 - Signature: `leg_obj=klegend(varargin)`
-- Total lines: 39
 
 ## Purpose
 
 House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: leg_obj=klegend(varargin)
 
 ## Physical / mathematical content
-
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 
 ## Numerical / algorithmic content
 
@@ -37,7 +33,3 @@ House style settings for Matlab figures; a product of much experience with acade
 - have a tabloid story written about you, it might as well be
 - with Johnny Depp.
 - Christina Ricci, about newspapers
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `set()`, `uint8()`.

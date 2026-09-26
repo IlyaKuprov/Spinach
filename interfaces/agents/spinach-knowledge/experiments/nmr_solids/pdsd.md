@@ -1,8 +1,6 @@
 # experiments/nmr_solids/pdsd.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/nmr_solids/pdsd.m`
 - Signature: `fid=pdsd(spin_system,parameters,H,R,K)`
-- Total lines: 145
 
 ## Purpose
 
@@ -17,8 +15,6 @@ A simplified model of the PDSD experiment using NOESY type quadrature detection 
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -56,7 +52,3 @@ A simplified model of the PDSD experiment using NOESY type quadrature detection 
 - parameters.tmix -mixing time in seconds
 - parameters.rate -MAS rate in Hz, used to set
 - proton irradiation power
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `decouple()`, `operator()`, `speye()`, `state()`, `evolution()`, `step()`, `isequal()`, `isfield()`, `isscalar()`, `any()`.

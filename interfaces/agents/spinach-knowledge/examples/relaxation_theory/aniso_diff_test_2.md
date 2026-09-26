@@ -1,8 +1,6 @@
 # examples/relaxation_theory/aniso_diff_test_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/aniso_diff_test_2.m`
 - Signature: `aniso_diff_test_2()`
-- Total lines: 48
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Relaxation superoperator calculation for an anisotropically shielded two-spin sy
 - Basis set
 - Spinach housekeeping
 - Relaxation superoperator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `spin()`, `create()`, `basis()`, `relaxation()`.

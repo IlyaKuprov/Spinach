@@ -1,8 +1,6 @@
 # examples/nmr_solids/case_studies/mathies_carbonate/mas_powder_mhc_fplanck.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/case_studies/mathies_carbonate/mas_powder_mhc_fplanck.m`
 - Signature: `mas_powder_mhc_fplanck()`
-- Total lines: 88
 
 ## Purpose
 
@@ -31,7 +29,3 @@ All protons in the unit cell of monohydrocalcite, magic angle spinning NMR simul
 - Get coordinates
 - Basis set
 - Interaction cut-off, Hz
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `c2spinach()`, `ismember()`, `strcmp()`, `mat2cell()`, `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

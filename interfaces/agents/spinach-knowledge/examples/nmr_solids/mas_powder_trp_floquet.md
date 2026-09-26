@@ -1,8 +1,6 @@
 # examples/nmr_solids/mas_powder_trp_floquet.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/mas_powder_trp_floquet.m`
 - Signature: `mas_powder_trp_floquet()`
-- Total lines: 109
 
 ## Purpose
 
@@ -33,7 +31,3 @@
 - Basis set
 - Algorithmic options
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `shift_iso()`, `create()`, `basis()`, `state()`, `floquet()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

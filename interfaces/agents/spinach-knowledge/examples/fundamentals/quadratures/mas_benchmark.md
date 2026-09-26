@@ -1,8 +1,6 @@
 # examples/fundamentals/quadratures/mas_benchmark.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/quadratures/mas_benchmark.m`
 - Signature: `mas_benchmark()`
-- Total lines: 129
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Integrating the Lioville -von Neumann equation through one period of the MAS rot
 - Spinning speed, Hz
 - Magic angle
 - Initial condition
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `assume()`, `hamiltonian()`, `atan()`, `state()`, `orientation()`, `step()`, `kfigure()`, `set()`, `kxlabel()`, `kylabel()`, `klegend()`, `ylim()`, `scale_figure()`.

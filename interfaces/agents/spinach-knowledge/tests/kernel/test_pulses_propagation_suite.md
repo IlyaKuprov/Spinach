@@ -1,8 +1,6 @@
 # tests/kernel/test_pulses_propagation_suite.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_pulses_propagation_suite.m`
 - Signature: `result=test_pulses_propagation_suite()`
-- Total lines: 128
 
 ## Purpose
 
@@ -10,7 +8,6 @@ Tests pulse-coordinate and propagation helpers. Syntax: result=test_pulses_propa
 
 ## Physical / mathematical content
 
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
 
 ## Numerical / algorithmic content
@@ -39,7 +36,3 @@ Tests pulse-coordinate and propagation helpers. Syntax: result=test_pulses_propa
 - Use f=sum(r.^2)=sum(x.^2+y.^2), whose Cartesian Hessian is exactly 2I
 - Convert polar coordinates, gradients, and Hessians to Cartesian and back
 - Check Iserles second-order and fourth-order product quadrature formulae
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `polar2cartesian()`, `cartesian2polar()`, `test_close()`, `isergen()`, `test_spin_system()`, `operator()`, `state()`, `step()`, `iserstep()`, `rsequence()`, `pauli()`, `rseq_compiler()`, `int2str()`, `speye()`.

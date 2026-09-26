@@ -1,8 +1,6 @@
 # examples/nmr_proteins/expt_data/noesy_ubiquitin_expt.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/expt_data/noesy_ubiquitin_expt.m`
 - Signature: `noesy_ubiquitin_expt()`
-- Total lines: 29
 
 ## Purpose
 
@@ -23,7 +21,3 @@ Experimental HNCO spectrum of human ubiquitin. Donghan Lee (Max Planck Institute
 - Sequence parameters
 - Load data
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

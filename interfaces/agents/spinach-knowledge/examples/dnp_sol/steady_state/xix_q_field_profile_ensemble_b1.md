@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/xix_q_field_profile_ensemble_b1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/xix_q_field_profile_ensemble_b1.m`
 - Signature: `xix_q_field_profile_ensemble_b1()`
-- Total lines: 100
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simulation of XiX DNP field profile in the steady state with electron Rabi frequ
 - Relaxation rates, distance and ori. dep. R1n
 - Basis set
 - Algorithmic options
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cell2mat()`, `xyz()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `gaussleg()`, `dnp()`, `powder()`, `kfigure()`, `kylabel()`, `kxlabel()`, `savefig()`.

@@ -1,8 +1,6 @@
 # experiments/hyperpol/solid_effect.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/hyperpol/solid_effect.m`
 - Signature: `answer=solid_effect(spin_system,parameters)`
-- Total lines: 219
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Solid effect DNP experiment, computed using the large-scale formalism described 
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `find()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -70,7 +66,3 @@ Solid effect DNP experiment, computed using the large-scale formalism described 
 - options for the average Hamiltonian
 - theory calculation on top of the el-
 - ectron + nuclear rotating frame:
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `report()`, `hamiltonian()`, `assume()`, `orientation()`, `operator()`, `average()`, `isfield()`, `state()`, `cell2mat()`, `equilibrium()`, `relaxation()`, `evolution()`, `unit_state()`, `ismember()`, `cellfun()`.

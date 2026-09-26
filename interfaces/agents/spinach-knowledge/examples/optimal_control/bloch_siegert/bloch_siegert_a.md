@@ -1,8 +1,6 @@
 # examples/optimal_control/bloch_siegert/bloch_siegert_a.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/bloch_siegert/bloch_siegert_a.m`
 - Signature: `bloch_siegert_a()`
-- Total lines: 106
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Bloch-Siegert shift compensation functionality demo. The script optimises a 90-d
 - Set basis
 - Run Spinach housekeeping
 - Build and normalise the initial state (Lz)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `spin()`, `pwr_list()`, `false()`, `optimcon()`, `true()`, `fmaxnewton()`, `fid_a()`, `ensemble()`, `fid_b()`, `kfigure()`.

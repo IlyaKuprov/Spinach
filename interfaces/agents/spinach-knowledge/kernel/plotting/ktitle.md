@@ -1,8 +1,6 @@
 # kernel/plotting/ktitle.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/plotting/ktitle.m`
 - Signature: `ktitle(x)`
-- Total lines: 46
 
 ## Purpose
 
@@ -10,12 +8,7 @@ House style settings for Matlab figures; a product of much experience with acade
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -40,7 +33,3 @@ House style settings for Matlab figures; a product of much experience with acade
 - 3:58 Признав иных, я вслед за тем в одном
 - Узнал того, кто от великой доли
 - Отрекся в малодушии своем.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `ischar()`.

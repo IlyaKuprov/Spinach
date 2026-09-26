@@ -1,8 +1,6 @@
 # examples/fundamentals/tensor_structures/polyadic_test_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/tensor_structures/polyadic_test_1.m`
 - Signature: `polyadic_test_1()`
-- Total lines: 120
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Unit tests for the polyadic object.
 - Addition test 1
 - Addition test 2
 - Conjugate-transpose test 1
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `sprandn()`, `polyadic()`, `prefix()`, `suffix()`, `inflate()`, `bootstrap()`, `step()`.

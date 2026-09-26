@@ -1,8 +1,6 @@
 # examples/fundamentals/quadratures/aht_benchmark.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/quadratures/aht_benchmark.m`
 - Signature: `aht_benchmark()`
-- Total lines: 135
 
 ## Purpose
 
@@ -35,7 +33,3 @@ Accuracy benchmark for the Hamiltonian period propagator caclulation using Lie g
 - Spinach housekeeping
 - Magic angle
 - Spectrum setup
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `atan()`, `operator()`, `singlerot()`, `spin()`, `speye()`, `eps()`, `propagator()`, `isergen()`, `nslices()`, `kfigure()`, `set()`, `kxlabel()`, `kylabel()`.

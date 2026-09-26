@@ -1,8 +1,6 @@
 # kernel/states/triplet.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/states/triplet.m`
 - Signature: `[TU,T0,TD]=triplet(spin_system,spin_a,spin_b)`
-- Total lines: 66
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Returns the components of the two-spin triplet state; both particles must be spi
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -45,7 +41,3 @@ Returns the components of the two-spin triplet state; both particles must be spi
 - Check consistency
 - Build the component operators
 - Build the triplet states
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `state()`, `isscalar()`.

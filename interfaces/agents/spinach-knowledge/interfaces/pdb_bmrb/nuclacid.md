@@ -1,8 +1,6 @@
 # interfaces/pdb_bmrb/nuclacid.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/pdb_bmrb/nuclacid.m`
 - Signature: `[sys,inter]=nuclacid(pdb_file,shift_file,options)`
-- Total lines: 224
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Nucleic acid data import function. Parses PDB and chemical shift data, runs a J-
 - Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -62,7 +57,3 @@ Nucleic acid data import function. Parses PDB and chemical shift data, runs a J-
 - matted as [residue_number atom_id shift],
 - see example.txt in examples/nmr_nucleic
 - options.deut_list -a cell array of strings, specifying which
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `read_pdb_nuc()`, `fopen()`, `feof()`, `fgetl()`, `textscan()`, `all()`, `cellfun()`, `bmrb_res_num()`, `fclose()`, `ismember()`, `pdb_res_num()`, `pdb_atom_id()`, `pdb_res_typ()`, `pdb_coords()`, `bmrb_atom_id()`.

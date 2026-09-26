@@ -1,8 +1,6 @@
 # examples/microfluidics/plain_reaction.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/microfluidics/plain_reaction.m`
 - Signature: `plain_reaction()`
-- Total lines: 52
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Non-linear reaction kinetics in a situation when there is no hydrodynamics, diff
 - Preallocate concentration trajectory
 - Initial concentrations, mol/L
 - Concentration dynamics
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `bootstrap()`, `step()`, `kfigure()`, `kxlabel()`, `kylabel()`, `klegend()`.

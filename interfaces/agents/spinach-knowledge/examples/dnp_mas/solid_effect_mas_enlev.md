@@ -1,8 +1,6 @@
 # examples/dnp_mas/solid_effect_mas_enlev.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_mas/solid_effect_mas_enlev.m`
 - Signature: `solid_effect_mas_enlev()`
-- Total lines: 62
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A MAS DNP simulation performed as described in Fred Mentink- Vigier's paper (Spi
 - Stack generation parameters
 - Stack generation
 - Stack diagonalization
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `rotor_stack()`, `energies()`, `phi_axis()`, `kfigure()`, `kxlabel()`, `kylabel()`.

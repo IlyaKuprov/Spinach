@@ -1,8 +1,6 @@
 # examples/spin_chemistry/singlet_yield_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/spin_chemistry/singlet_yield_1.m`
 - Signature: `singlet_yield_1()`
-- Total lines: 56
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Liquid state magnetic field effect simulation on a radical pair with four nuclei
 - Spinach housekeeping
 - Simulation
 - Plot the answer
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `mt2hz()`, `create()`, `basis()`, `liquid()`, `kfigure()`, `kxlabel()`, `kylabel()`.

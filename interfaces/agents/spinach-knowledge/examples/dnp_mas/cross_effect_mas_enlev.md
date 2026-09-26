@@ -1,8 +1,6 @@
 # examples/dnp_mas/cross_effect_mas_enlev.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_mas/cross_effect_mas_enlev.m`
 - Signature: `cross_effect_mas_enlev()`
-- Total lines: 72
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A MAS DNP simulation performed as described in Fred Mentink- Vigier's paper (Spi
 - Stack generation parameters
 - Stack generation
 - Stack diagonalization
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `rotor_stack()`, `energies()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`.

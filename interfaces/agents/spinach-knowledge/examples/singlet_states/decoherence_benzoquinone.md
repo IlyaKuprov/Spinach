@@ -1,8 +1,6 @@
 # examples/singlet_states/decoherence_benzoquinone.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/singlet_states/decoherence_benzoquinone.m`
 - Signature: `decoherence_benzoquinone()`
-- Total lines: 49
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Long-lived spin states in the para-benzoquinone molecule (4 protons, 256-dimensi
 - Set relaxation theory parameters
 - Relaxation superoperator accuracy
 - Use complete basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `relaxation()`, `speye()`.

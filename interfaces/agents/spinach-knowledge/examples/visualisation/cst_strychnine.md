@@ -1,8 +1,6 @@
 # examples/visualisation/cst_strychnine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/visualisation/cst_strychnine.m`
 - Signature: `cst_strychnine()`
-- Total lines: 28
 
 ## Purpose
 
@@ -22,7 +20,3 @@ Example of carbon shielding tensor visualisation for strychnine molecule. Gaussi
 - sors are ignored.
 - Read the Gaussian log
 - Do the visualisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gparse()`, `kfigure()`, `subplot()`, `cst_display()`, `set()`, `ktitle()`, `scale_figure()`.

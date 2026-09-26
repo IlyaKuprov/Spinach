@@ -1,8 +1,6 @@
 # kernel/contexts/device.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/contexts/device.m`
 - Signature: `answer=device(spin_system,pulse_sequence,parameters,assumptions)`
-- Total lines: 276
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Spin-boson device interface to pulse sequences. Generates the evolution generato
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `defaults()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -80,7 +76,3 @@ Spin-boson device interface to pulse sequences. Generates the evolution generato
 - the pulse sequence works on, in the order
 - of channels, e.g. {'E'}; may be omitted
 - when no spin channels are needed
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `banner()`, `defaults()`, `grumble()`, `assume()`, `hamiltonian()`, `orientation()`, `relaxation()`, `kinetics()`, `ismember()`, `report()`, `equilibrium()`, `frqoffset()`, `num2str()`, `mode_list()`, `operator()`, `carrier()`.

@@ -1,8 +1,6 @@
 # kernel/pulses/rseq_compiler.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/pulses/rseq_compiler.m`
 - Signature: `[P,T]=rseq_compiler(spin_system,L,Sx,Sy,pulse_phi,...`
-- Total lines: 136
 
 ## Purpose
 
@@ -15,8 +13,6 @@ R sequence compiler. Uses the fact that R-sequences are very repetitive to pre-c
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -56,7 +52,3 @@ R sequence compiler. Uses the fact that R-sequences are very repetitive to pre-c
 - pulse_amp -RF nutation frequency in rad/s, a scalar
 - because R-sequences are phase-modulated
 - pulse_dur -duration of the pulses in the sequence
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `phi()`, `propagator()`, `pulse_dur()`, `pulse_phi()`, `phi_dur()`, `ischar()`, `ishermitian()`, `isscalar()`, `any()`, `ismember()`.

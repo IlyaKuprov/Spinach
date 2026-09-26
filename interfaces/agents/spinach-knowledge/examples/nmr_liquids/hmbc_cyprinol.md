@@ -1,8 +1,6 @@
 # examples/nmr_liquids/hmbc_cyprinol.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/hmbc_cyprinol.m`
 - Signature: `hmbc_cyprinol()`
-- Total lines: 71
 
 ## Purpose
 
@@ -31,7 +29,3 @@ HMBC of cyprinol with natrual abundance of 13C isotope. Calculation time: second
 - Preallocate the answer
 - Loop over isotopomers
 - Build the basis
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cyprinol()`, `create()`, `dilute()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

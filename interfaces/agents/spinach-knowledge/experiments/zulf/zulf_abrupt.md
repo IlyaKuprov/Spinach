@@ -1,8 +1,6 @@
 # experiments/zulf/zulf_abrupt.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/zulf/zulf_abrupt.m`
 - Signature: `fid=zulf_abrupt(spin_system,parameters,H,R,K)`
-- Total lines: 182
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Zero-field magnetometry experiment that propagates the initial condition through
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -58,7 +54,3 @@ Zero-field magnetometry experiment that propagates the initial condition through
 - .drop_rate -field drop rate, Hz
 - .sweep -sweep width during acquisition
 - .npoints -number of points during acquisition
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `hamiltonian()`, `assume()`, `expdrop()`, `equilibrium()`, `report()`, `num2str()`, `evolution()`, `drop()`, `spin()`, `weights()`, `state()`, `operator()`, `step()`, `ismatrix()`, `all()`.

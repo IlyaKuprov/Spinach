@@ -1,8 +1,6 @@
 # examples/nmr_solids/cp_contact_mas_nh_gridfree.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/cp_contact_mas_nh_gridfree.m`
 - Signature: `cp_contact_mas_nh_gridfree()`
-- Total lines: 64
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Cross-polarisation experiment in the doubly rotating frame. A single nitrogen-15
 - This needs a GPU
 - sys.enable={'gpu'};
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `operator()`, `state()`, `gridfree()`, `cumsum()`, `kfigure()`, `kylabel()`, `kxlabel()`.

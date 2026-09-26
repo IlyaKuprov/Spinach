@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/xyz2sph.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/xyz2sph.m`
 - Signature: `[r,theta,phi] = xyz2sph(x,y,z)`
-- Total lines: 56
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Converts Cartesian coordinates [x y z] into spherical coordinates according to t
 - Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -41,7 +36,3 @@ Converts Cartesian coordinates [x y z] into spherical coordinates according to t
 - Inclination 0 <= theta <= pi
 - Azimuth 0 <= phi < 2*pi
 - Consistency enforcement
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `acos()`, `atan2()`, `all()`.

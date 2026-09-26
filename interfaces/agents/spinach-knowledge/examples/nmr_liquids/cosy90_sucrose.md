@@ -1,8 +1,6 @@
 # examples/nmr_liquids/cosy90_sucrose.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/cosy90_sucrose.m`
 - Signature: `cosy90_sucrose()`
-- Total lines: 56
 
 ## Purpose
 
@@ -31,7 +29,3 @@ COSY spectrum of sucrose (magnetic parameters computed with DFT). Calculation ti
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

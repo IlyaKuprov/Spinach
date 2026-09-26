@@ -1,8 +1,6 @@
 # examples/kinetics/aziridine_exsy_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/kinetics/aziridine_exsy_2.m`
 - Signature: `aziridine_exsy_2()`
-- Total lines: 205
 
 ## Purpose
 
@@ -35,7 +33,3 @@ NOESY/EXSY experiment on phenylaziridine, including scalar relaxation of the sec
 - Isotopes
 - Coordinates (Angstrom)
 - 14N quadrupolar coupling
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `shift_iso()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

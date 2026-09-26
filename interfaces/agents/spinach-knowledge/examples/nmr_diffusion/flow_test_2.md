@@ -1,8 +1,6 @@
 # examples/nmr_diffusion/flow_test_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_diffusion/flow_test_2.m`
 - Signature: `flow_test_2()`
-- Total lines: 62
 
 ## Purpose
 
@@ -30,7 +28,3 @@ A combination of diffusion and flow in two dimensions with a periodic boundary c
 - 2D flow field
 - 2D diffusion tensor field
 - Diffusion and flow generator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `create()`, `basis()`, `v2fplanck()`, `inflate()`, `evolution()`, `kfigure()`, `traj()`, `pause()`.

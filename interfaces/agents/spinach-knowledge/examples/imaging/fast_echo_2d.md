@@ -1,8 +1,6 @@
 # examples/imaging/fast_echo_2d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/fast_echo_2d.m`
 - Signature: `fast_echo_2d()`
-- Total lines: 83
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Fast (in the experiment duration sense) spin echo 2D brain imaging example. Simu
 - sys.enable={'gpu'};
 - Basis set
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `rlx_t1_t2()`, `phantoms()`, `R1Ph()`, `R2Ph()`, `PDPh()`, `dims()`, `npts()`, `state()`, `imaging()`, `kfigure()`, `scale_figure()`, `subplot()`, `mri_2d_plot()`, `ktitle()`.

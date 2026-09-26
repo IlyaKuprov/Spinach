@@ -1,8 +1,6 @@
 # kernel/optimcon/ens_block.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/ens_block.m`
 - Signature: `[traj,fid,grad,hess]=ens_block(spin_system,drifts,control,block,waveform,n_outputs)`
-- Total lines: 198
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Fidelity, gradient, and Hessian contributions of one block of ensemble cases, ev
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -77,7 +73,3 @@ Fidelity, gradient, and Hessian contributions of one block of ensemble cases, ev
 - The gradient passes through the distortion Jacobian and the transposed rotation, and is added to the block sum scaled by the power level.
 - The Hessian is rotated on both sides by the Kronecker product of the identity over time steps with the transposed rotation, and added to the block sum scaled by the squared power level.
 - Conditional branch on `ismember('average',control.traj_opts)&&(n_mine>0)`; the forward trajectories of a non-empty block are added with the overloaded `plus`, which also covers the Hilbert-space cell trajectories, into one entry so that only block sums travel to the client, which divides by the case count; an empty block contributes nothing.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `setdiff()`, `fieldnames()`, `cellfun()`, `ind2sub()`, `sparse()`, `speye()`, `kron()`, `reshape()`, `grape_liouv()`, `grape_hilb()`, `ismember()`, `isfield()`.

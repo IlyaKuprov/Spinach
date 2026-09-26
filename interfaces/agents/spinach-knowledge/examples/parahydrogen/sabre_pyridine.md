@@ -1,8 +1,6 @@
 # examples/parahydrogen/sabre_pyridine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/parahydrogen/sabre_pyridine.m`
 - Signature: `sabre_pyridine()`
-- Total lines: 114
 
 ## Purpose
 
@@ -33,7 +31,3 @@ SABRE experiment simulation for Eibe Duecker and Christian Griesinger. Set to re
 - Algorithmic options
 - Do the housekeeping
 - Get the Hamiltonian superoperator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `singlet()`, `evolution()`, `decouple()`, `step()`, `state()`, `operator()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

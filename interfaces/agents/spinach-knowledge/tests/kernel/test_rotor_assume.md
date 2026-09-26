@@ -1,8 +1,6 @@
 # tests/kernel/test_rotor_assume.m
 
-- Source: `tests/kernel/test_rotor_assume.m`
 - Signature: `result=test_rotor_assume()`
-- Total lines: 273
 
 ## Purpose
 

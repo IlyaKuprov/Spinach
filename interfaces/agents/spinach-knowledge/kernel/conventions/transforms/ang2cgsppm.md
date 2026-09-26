@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/ang2cgsppm.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/ang2cgsppm.m`
 - Signature: `cgsppm=ang2cgsppm(ang)`
-- Total lines: 40
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Converts magnetic susceptibility from the Angstrom^3 units required by Spinach p
 - Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -39,7 +34,3 @@ Converts magnetic susceptibility from the Angstrom^3 units required by Spinach p
 - Consistency enforcement
 - No artist tolerates reality.
 - Friedrich Nietzsche
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`.

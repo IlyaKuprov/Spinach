@@ -1,8 +1,6 @@
 # interfaces/comsol/mesh_inact.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/comsol/mesh_inact.m`
 - Signature: `mesh=mesh_inact(mesh,vertex_list)`
-- Total lines: 63
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Marks 2D microfluidic mesh vertices as inactive in hydrodyna- mic and diffusive 
 - COMSOL interfaces. These files are mostly data-structure and numerical-geometry utilities for bringing concentration, velocity, and mesh data from finite-element simulations into Spinach transport calculations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -41,7 +36,3 @@ Marks 2D microfluidic mesh vertices as inactive in hydrodyna- mic and diffusive 
 - Zero out velocities and concentrations, if present
 - Consistency enforcement
 - The basic principle of the new education is to be that dunces and
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `setdiff()`, `isfield()`, `isrow()`, `any()`.

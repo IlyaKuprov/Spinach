@@ -1,8 +1,6 @@
 # examples/fundamentals/convention_tests/rotations_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/convention_tests/rotations_2.m`
 - Signature: `rotations_2()`
-- Total lines: 80
 
 ## Purpose
 
@@ -30,7 +28,3 @@ A rotations test comparing the Hamiltonians for a manually rotated (at the inter
 - Hamiltonian, A
 - % Input level rotation
 - A pair of spins at a distance, B
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `orientation()`, `euler2dcm()`, `num2str()`, `report()`.

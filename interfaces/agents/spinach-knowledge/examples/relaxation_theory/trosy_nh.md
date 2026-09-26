@@ -1,8 +1,6 @@
 # examples/relaxation_theory/trosy_nh.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/trosy_nh.m`
 - Signature: `trosy_nh()`
-- Total lines: 100
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Transverse relaxation rate as a function of the applied magnetic field at a typi
 - Magnetic field grid
 - Loop over magnetic fields
 - Set the magnet field
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `spin()`, `create()`, `basis()`, `relaxation()`, `state()`, `r2c()`, `r2h()`, `hleft()`, `hright()`, `nleft()`, `nright()`, `kfigure()`, `kxlabel()`, `kylabel()`, `klegend()`.

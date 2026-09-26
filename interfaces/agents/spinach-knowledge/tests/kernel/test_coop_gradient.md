@@ -1,8 +1,6 @@
 # tests/kernel/test_coop_gradient.m
 
-- Source: `tests/kernel/test_coop_gradient.m`
 - Signature: `result=test_coop_gradient()`
-- Total lines: 371
 
 ## Purpose
 

@@ -1,8 +1,6 @@
 # examples/fundamentals/state_tests/thermal_equilibrium_4.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/state_tests/thermal_equilibrium_4.m`
 - Signature: `thermal_equilibrium_4()`
-- Total lines: 72
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Test of the invariance of the thermal equilibrium state under the thermalised re
 - Basis set
 - Spinach housekeeping
 - Isotropic thermal equilibrium
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `equilibrium()`, `relaxation()`, `hamiltonian()`, `assume()`, `thermalize()`.

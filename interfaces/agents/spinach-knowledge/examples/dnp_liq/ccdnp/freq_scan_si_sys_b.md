@@ -1,8 +1,6 @@
 # examples/dnp_liq/ccdnp/freq_scan_si_sys_b.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/ccdnp/freq_scan_si_sys_b.m`
 - Signature: `freq_scan_si_sys_b()`
-- Total lines: 105
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Steady state nuclear magnetisation as a function of microwave frequency offset a
 - Basis set
 - Disable start-up checks
 - Relaxation theory
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `field_grid()`, `create()`, `basis()`, `state()`, `operator()`, `equilibrium()`, `answer()`, `liquid()`, `kfigure()`, `xlim()`, `kxlabel()`, `kylabel()`, `kcolourbar()`.

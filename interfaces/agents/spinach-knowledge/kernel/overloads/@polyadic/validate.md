@@ -1,8 +1,6 @@
 # kernel/overloads/@polyadic/validate.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@polyadic/validate.m`
 - Signature: `validate(p)`
-- Total lines: 105
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Checks the internal structure of a polyadic object and throws an error if the ob
 - Check core dimensions
 - Check prefix and suffix dimensions
 - Check the number of terms
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `iscell()`, `cellfun()`, `core_dims()`, `nrows()`, `ncols()`, `all()`.

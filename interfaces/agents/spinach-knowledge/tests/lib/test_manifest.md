@@ -1,8 +1,6 @@
 # tests/lib/test_manifest.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/lib/test_manifest.m`
 - Signature: `manifest=test_manifest()`
-- Total lines: 136
 
 ## Purpose
 
@@ -19,4 +17,3 @@ Each entry stores a stable test ID, a descriptive name, and the function name to
 ## Outputs
 
 - `manifest` — structure array with stable `id`, descriptive `name`, and callable `function` fields.
-

@@ -1,8 +1,6 @@
 # tests/kernel/test_srsk_form.m
 
-- Source: `tests/kernel/test_srsk_form.m`
 - Signature: `result=test_srsk_form()`
-- Total lines: 93
 
 ## Purpose
 

@@ -67,7 +67,7 @@ for n=1:numel(xml.children)
                 
                 % Get the line width
                 inter.relaxation={'damp'};
-                inter.rlx_keep='diagonal';
+                inter.rlx_keep='labframe';
                 inter.equilibrium='zero';
                 inter.damp_rate=fwhm2rlx(str2double(cm.children(k).children.data));
                 

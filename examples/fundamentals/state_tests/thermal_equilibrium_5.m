@@ -27,7 +27,7 @@ inter.coupling.scalar{2,4}=  -40.7675;
 inter.relaxation={'damp'};
 inter.temperature=40;
 inter.damp_rate=5.0;
-inter.rlx_keep='diagonal';
+inter.rlx_keep='labframe';
 
 % Formalisms and methods to test
 formalisms={'sphten-liouv','zeeman-liouv'};

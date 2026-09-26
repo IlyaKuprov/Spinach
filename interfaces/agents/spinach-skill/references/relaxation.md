@@ -52,7 +52,11 @@ Terms accumulate in a fixed order: `t1_t2`, `redfield`, `naka-zwan`,
 policy applies, then `inter.rlx_keep` truncates, then `damp` is added, then
 thermalisation. Hence `SRSK` reads the superoperator accumulated so far to
 extract source spin T1 and T2 and is useless without a companion theory,
-while `damp` survives even `inter.rlx_keep='diagonal'`.
+while `damp` survives even `inter.rlx_keep='diagonal'` in supported formalisms.
+For damp-only models, use `labframe` retention in cross-formalism calculations
+(as in `thermal_equilibrium_4` and `thermal_equilibrium_5`): the pre-damping
+superoperator is zero, so full retention preserves the same generator without
+requesting the unimplemented Zeeman diagonal policy.
 
 ## Redfield theory
 
@@ -164,7 +168,7 @@ too slow`. Contributions are additive and reported in hertz.
 
 | Value | Kept | Notes |
 |---|---|---|
-| `'diagonal'` | Self-relaxation only | Cheapest; no NOE, no cross-correlation. Unit state protected |
+| `'diagonal'` | Self-relaxation only | Cheapest; no NOE, no cross-correlation. Unit state protected in `sphten-liouv`; not implemented in `zeeman-liouv` |
 | `'kite'` | Self-relaxation plus longitudinal cross-relaxation | The NOE-capable minimum and usual liquid-state choice. `sphten-liouv` only |
 | `'secular'` | All terms connecting states of equal Zeeman frequency | Secular with respect to the Zeeman Hamiltonian. `sphten-liouv` only |
 | `'labframe'` | Everything | Only correct for laboratory frame simulations |

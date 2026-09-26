@@ -1,8 +1,6 @@
 # examples/nmr_liquids/noe_two_spin_hom.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/noe_two_spin_hom.m`
 - Signature: `noe_two_spin_hom()`
-- Total lines: 56
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Nuclear overhauser effect in a homonuclear two-spin system in the long correlati
 - Get thermal equilibrium state
 - Start in a state with one spin inverted
 - Compute the evolution trajectory
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `equilibrium()`, `hamiltonian()`, `assume()`, `state()`, `evolution()`, `kfigure()`, `kxlabel()`, `kylabel()`, `klegend()`.

@@ -1,8 +1,6 @@
 # examples/nmr_liquids/inad_three_spin_2d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/inad_three_spin_2d.m`
 - Signature: `inad_three_spin_2d()`
-- Total lines: 81
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Example of a 2D-INADEQUATE spectrum of a generic three-spin system. Calculation 
 - Generate isotopomers
 - Sequence parameters
 - Preallocate the answer
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `dilute()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`, `kylabel()`.

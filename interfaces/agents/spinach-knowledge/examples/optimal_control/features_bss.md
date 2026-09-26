@@ -1,8 +1,6 @@
 # examples/optimal_control/features_bss.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/features_bss.m`
 - Signature: `features_bss()`
-- Total lines: 90
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Optimal control pulse optimisation with Bloch-Siegert shift corrections switched
 - Spin system
 - Chemical shifts, ppm
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `spin()`, `create()`, `basis()`, `state()`, `operator()`, `true()`, `optimcon()`, `fmaxnewton()`, `ensemble()`, `false()`, `report()`, `num2str()`.

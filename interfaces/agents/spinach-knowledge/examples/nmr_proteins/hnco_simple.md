@@ -1,8 +1,6 @@
 # examples/nmr_proteins/hnco_simple.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/hnco_simple.m`
 - Signature: `hnco_simple()`
-- Total lines: 77
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A minimal example of HNCO pulse sequence simulation. Calculation time: seconds.
 - Apodisation
 - F3 Fourier transform
 - Absorption part of F3 signal
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `plot_3d()`.

@@ -1,8 +1,6 @@
 # experiments/esr_dipolar/deer_3p_hard_echo.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/esr_dipolar/deer_3p_hard_echo.m`
 - Signature: `echo=deer_3p_hard_echo(spin_system,parameters,H,R,K)`
-- Total lines: 137
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Samples the spin echo in the three-pulse DEER experiment to determine its precis
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -54,7 +50,3 @@ Samples the spin echo in the three-pulse DEER experiment to determine its precis
 - parameters.ta -time between first and third pulse, s
 - parameters.tb -time between first and second pulse, s
 - parameters.tc -time interval to sample around the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `step()`, `evolution()`, `ismatrix()`, `all()`, `isfield()`.

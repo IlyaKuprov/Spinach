@@ -1,8 +1,6 @@
 # kernel/homospoil.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/homospoil.m`
 - Signature: `rho=homospoil(spin_system,rho,zqc_flag)`
-- Total lines: 118
 
 ## Purpose
 
@@ -10,14 +8,11 @@ Emulates a strong homospoil pulse -only zero-frequency states with respect to th
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
 
 ## Numerical / algorithmic content
 
 - Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -59,7 +54,3 @@ Emulates a strong homospoil pulse -only zero-frequency states with respect to th
 - zero-quantum coherences -only the longitudi-
 - nal states survive the process.
 - The flag is ignored in zeeman-hilb and zeeman-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `strcmp()`, `spdiags()`, `true()`, `offdiag_mask()`, `rho()`, `lin2lm()`, `report()`, `vector()`, `ischar()`, `ismember()`.

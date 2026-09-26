@@ -1,8 +1,6 @@
 # examples/fundamentals/quadratures/product_quadratures_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/quadratures/product_quadratures_2.m`
 - Signature: `product_quadratures_2()`
-- Total lines: 140
 
 ## Purpose
 
@@ -32,7 +30,3 @@ A test of Lie-group product quadratures on a chirped frequency oscillator with r
 - Benchmarking loop
 - Half a second
 - Piecewise-constant, left edge
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `bootstrap()`, `euler2dcm()`, `mu_traj()`, `iserstep()`, `bench()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`, `klegend()`, `ylim()`, `set()`, `orders()`, `polyfit()`.

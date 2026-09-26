@@ -1,8 +1,6 @@
 # examples/fundamentals/tensor_structures/kronm_test_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/tensor_structures/kronm_test_1.m`
 - Signature: `kronm_test_1()`
-- Total lines: 47
 
 ## Purpose
 
@@ -21,7 +19,3 @@ Tests for the kron-times-matrix infrastructure.
 - Generate real Q and x
 - Compare the results
 - Generate complex Q and x
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `randi()`, `num2str()`, `dims()`, `kronm()`, `toc()`.

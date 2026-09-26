@@ -1,8 +1,6 @@
 # examples/optimal_control/features_freeze.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/features_freeze.m`
 - Signature: `features_freeze()`
-- Total lines: 114
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Optimal control pulse optimisation for state-to-state transfer across a scalar c
 - a user-specified power threshold. The initial guess is a random pulse;
 - the optimisation typically achieves a fidelity of 0.999999.
 - Calculation time: minutes.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `guess()`, `false()`, `optimcon()`, `fmaxnewton()`, `mat2cell()`, `report()`, `shaped_pulse_xy()`, `rho()`, `num2str()`.

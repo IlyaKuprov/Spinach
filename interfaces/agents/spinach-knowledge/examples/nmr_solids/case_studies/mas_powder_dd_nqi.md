@@ -1,8 +1,6 @@
 # examples/nmr_solids/case_studies/mas_powder_dd_nqi.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/case_studies/mas_powder_dd_nqi.m`
 - Signature: `mas_powder_dd_nqi()`
-- Total lines: 67
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Powder magic angle spinning spectrum of a pair of dipole-coupled quadrupolar nuc
 - Spinach housekeeping
 - Experiment setup
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `castep2nqi()`, `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

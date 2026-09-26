@@ -1,8 +1,6 @@
 # examples/nmr_solids/static_powder_trp.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/static_powder_trp.m`
 - Signature: `static_powder_trp()`
-- Total lines: 73
 
 ## Purpose
 
@@ -32,7 +30,3 @@
 - Spinach housekeeping
 - Experiment setup
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `shift_iso()`, `create()`, `basis()`, `state()`, `powder()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

@@ -1,8 +1,6 @@
 # examples/kinetics/flux_symmetric.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/kinetics/flux_symmetric.m`
 - Signature: `flux_symmetric()`
-- Total lines: 52
 
 ## Purpose
 
@@ -29,7 +27,3 @@ Two-spin symmetric magnetization flux problem. Calculation time: seconds.
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

@@ -1,8 +1,6 @@
 # examples/quantum_tech/transmon_rabi_leakage.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/transmon_rabi_leakage.m`
 - Signature: `transmon_rabi_leakage()`
-- Total lines: 61
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Rabi dynamics of a driven four-level transmon in the Duffing approximation, incl
 - Formalism and basis
 - Spinach housekeeping
 - Drift Hamiltonian from the declared interactions
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `state()`, `evolution()`, `int2str()`, `pops()`, `cellfun()`, `hdot()`, `kfigure()`, `kxlabel()`, `kylabel()`, `ktitle()`, `klegend()`.

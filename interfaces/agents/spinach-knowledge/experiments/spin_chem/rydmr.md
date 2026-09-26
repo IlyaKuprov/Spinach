@@ -1,8 +1,6 @@
 # experiments/spin_chem/rydmr.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/spin_chem/rydmr.m`
 - Signature: `A=rydmr(spin_system,parameters,H,R,K)`
-- Total lines: 77
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Singlet-singlet RYDMR experiment using the full kinetics superoper- ator -comput
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Outputs
 
@@ -37,7 +33,3 @@ Singlet-singlet RYDMR experiment using the full kinetics superoper- ator -comput
 - A -fractional singlet yield
 - Check consistency
 - Get the two-electron singlet state
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `singlet()`, `ismember()`, `gpuArray()`, `bicg()`, `gather()`, `ismatrix()`, `all()`, `isfield()`, `isscalar()`.

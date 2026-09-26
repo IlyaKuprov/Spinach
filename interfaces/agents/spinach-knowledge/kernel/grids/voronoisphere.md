@@ -1,8 +1,6 @@
 # kernel/grids/voronoisphere.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/grids/voronoisphere.m`
 - Signature: `[vertices,indices,polygons,sangles]=voronoisphere(xyz)`
-- Total lines: 118
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Voronoi tessellation of the unit sphere around the specified po- ints, computed 
 ## Numerical / algorithmic content
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -56,7 +52,3 @@ Voronoi tessellation of the unit sphere around the specified po- ints, computed 
 - dices of the Voronoi cell vertices that correspond
 - to xyz(:,j). Vertices are oriented counterclockwise
 - when looking from outside.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `convhull()`, `triangles()`, `all()`, `accumarray()`, `cross()`, `xyz()`, `sign()`, `pivot()`, `vertices()`, `atan2()`, `vcell_solidangle()`, `any()`, `uniquetol()`.

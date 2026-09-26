@@ -1,8 +1,6 @@
 # kernel/optimcon/grape_hilb.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/grape_hilb.m`
 - Signature: `[traj_data,fidelity,grad,hess]=grape_hilb(spin_system,drifts,controls,...`
-- Total lines: 813
 
 ## Purpose
 
@@ -20,8 +18,6 @@ Zero fidelities and gradients are returned as valid values, including for auxili
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -55,4 +51,3 @@ Zero fidelities and gradients are returned as valid values, including for auxili
 - tion(a stack of state matrices)
 - Note: this is a low level function that is not designed to be called
 - directly. Use grape_xy.m and grape_phase.m instead.
-

@@ -1,8 +1,6 @@
 # kernel/summaries/summary_rlx_t1_t2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/summaries/summary_rlx_t1_t2.m`
 - Signature: `summary_rlx_t1_t2(spin_system,header)`
-- Total lines: 56
 
 ## Purpose
 
@@ -10,12 +8,7 @@ Prints T1 and T2 relaxation-rate summary for a Spinach system. Syntax: summary_r
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -41,7 +34,3 @@ Prints T1 and T2 relaxation-rate summary for a Spinach system. Syntax: summary_r
 - Whether you are more afraid of the forces of
 - order or the forces of chaos is generally a
 - matter of disposition.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `report()`, `strjust()`, `num2str()`, `blanks()`, `isstruct()`, `ischar()`.

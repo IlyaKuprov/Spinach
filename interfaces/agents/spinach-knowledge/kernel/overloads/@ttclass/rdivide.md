@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/rdivide.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/rdivide.m`
 - Signature: `a=rdivide(a,b)`
-- Total lines: 42
 
 ## Purpose
 
@@ -37,7 +35,3 @@ Divides a tensor train object by a scalar. Syntax: c=rdivide(a,b)
 - very, very good, and when it is bad it's still bet-
 - ter than nothing.
 - Jim Hargrove
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `isscalar()`.

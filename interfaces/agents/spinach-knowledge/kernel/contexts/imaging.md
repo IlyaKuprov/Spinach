@@ -1,8 +1,6 @@
 # kernel/contexts/imaging.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/contexts/imaging.m`
 - Signature: `answer=imaging(spin_system,pulse_sequence,parameters)`
-- Total lines: 281
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Fokker-Planck imaging simulation context. Generates the Hamiltonian, the relaxat
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -88,7 +84,3 @@ Fokker-Planck imaging simulation context. Generates the Hamiltonian, the relaxat
 - parameters.u -X components of the velocity vectors
 - for each point in the sample, m/s
 - parameters.v -Y components of the velocity vectors
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `banner()`, `grumble()`, `assume()`, `hamiltonian()`, `frqoffset()`, `kinetics()`, `report()`, `num2str()`, `spdiags()`, `polyadic()`, `isfield()`, `opium()`, `g2fplanck()`, `v2fplanck()`, `ismember()`, `complex()`.

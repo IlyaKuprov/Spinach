@@ -1,8 +1,6 @@
 # kernel/optimcon/distortions/firf.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/distortions/firf.m`
 - Signature: `[w,J]=firf(w,ker)`
-- Total lines: 128
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Applies an FIR convolution filter to a Spinach optimal control module waveform. 
 ## Numerical / algorithmic content
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -49,7 +45,3 @@ Applies an FIR convolution filter to a Spinach optimal control module waveform. 
 - control channel
 - ker -a vector of FIR filter coefficients
 - w -distorted waveform, same dimension as the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `ker()`, `dims()`, `toeplitz()`, `speye()`, `spalloc()`, `nnz()`, `transpose()`, `w_dist()`, `isvector()`.

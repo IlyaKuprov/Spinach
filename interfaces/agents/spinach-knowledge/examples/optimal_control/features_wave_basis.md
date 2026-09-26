@@ -1,8 +1,6 @@
 # examples/optimal_control/features_wave_basis.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/features_wave_basis.m`
 - Signature: `features_wave_basis()`
-- Total lines: 116
 
 ## Purpose
 
@@ -34,7 +32,3 @@ An illustration of basis set coefficient optimisation for a pul- se optimised as
 - within the plus/minus 160 ppm range
 - Select a basis set -IK-2 keeps complete basis on each
 - spin in this case, but ignores multi-spin orders
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `wave_basis()`, `optimcon()`, `fmaxnewton()`, `mat2cell()`, `shaped_pulse_xy()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`.

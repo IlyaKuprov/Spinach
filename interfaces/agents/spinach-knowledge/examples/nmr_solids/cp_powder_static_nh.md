@@ -1,8 +1,6 @@
 # examples/nmr_solids/cp_powder_static_nh.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/cp_powder_static_nh.m`
 - Signature: `cp_powder_static_nh()`
-- Total lines: 51
 
 ## Purpose
 
@@ -28,7 +26,3 @@
 - Experiment parameters
 - Simulation
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `operator()`, `state()`, `powder()`, `cumsum()`, `kfigure()`, `kylabel()`, `kxlabel()`.

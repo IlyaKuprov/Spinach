@@ -1,8 +1,6 @@
 # examples/dnp_sol/solid_effect_field_scan_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/solid_effect_field_scan_1.m`
 - Signature: `solid_effect_field_scan_1()`
-- Total lines: 72
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Magnetic field sweep DNP experiment involving a gadolinium ion, steady-state pol
 - Basis set
 - Relaxation theory
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `powder()`, `kfigure()`, `kxlabel()`, `kylabel()`.

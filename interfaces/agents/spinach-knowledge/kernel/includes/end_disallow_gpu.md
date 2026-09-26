@@ -1,8 +1,6 @@
 # kernel/includes/end_disallow_gpu.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/includes/end_disallow_gpu.m`
 - Signature: `(script file)`
-- Total lines: 67
 
 ## Purpose
 
@@ -28,7 +26,3 @@ Reinstates GPU arithmetic setting to the previous state after the start_disallow
 - Тормоза не тормозят.
 - Вышла фига из кармана,
 - Тут же рухнули мосты,
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`.

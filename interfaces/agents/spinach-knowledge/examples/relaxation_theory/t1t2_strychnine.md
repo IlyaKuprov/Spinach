@@ -1,8 +1,6 @@
 # examples/relaxation_theory/t1t2_strychnine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/t1t2_strychnine.m`
 - Signature: `t1t2_strychnine()`
-- Total lines: 39
 
 ## Purpose
 
@@ -29,7 +27,3 @@ Relaxation analysis for strychnine, dipolar processes only. Calculation time: se
 - Distance cut-off
 - Spinach housekeeping
 - Relaxation analysis
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strychnine()`, `create()`, `basis()`, `relaxan()`.

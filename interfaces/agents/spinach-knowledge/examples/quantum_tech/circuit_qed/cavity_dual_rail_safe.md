@@ -1,8 +1,6 @@
 # examples/quantum_tech/circuit_qed/cavity_dual_rail_safe.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/circuit_qed/cavity_dual_rail_safe.m`
 - Signature: `cavity_dual_rail_safe()`
-- Total lines: 101
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Flux-noise dephasing rates of two dual-rail qubits whose flux-tuna- ble transmon
 - litude as functions of the transmon-drive detuning. Both rates go
 - through a minimum in the same detuning window, so that one drive
 - protects both qubits.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `state()`, `num2str()`, `any()`.

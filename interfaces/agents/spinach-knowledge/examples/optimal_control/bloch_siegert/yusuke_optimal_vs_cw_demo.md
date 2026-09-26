@@ -1,8 +1,6 @@
 # examples/optimal_control/bloch_siegert/yusuke_optimal_vs_cw_demo.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/bloch_siegert/yusuke_optimal_vs_cw_demo.m`
 - Signature: `yusuke_optimal_vs_cw_demo()`
-- Total lines: 240
 
 ## Purpose
 
@@ -19,7 +17,6 @@ Bloch-Siegert-aware phase optimisation compared to a simple constant- phase low-
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file also defines local helper function(s): `offset_profile()`, `b1_profile()`, `ensemble_score()`, `single_score()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -35,7 +32,3 @@ Bloch-Siegert-aware phase optimisation compared to a simple constant- phase low-
 - optimised with Bloch-Siegert corrections enabled.
 - Magnetic field corresponding to 800 MHz 1H
 - Single-spin surrogate model
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `rng()`, `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `true()`, `optimcon()`, `fmaxnewton()`, `offset_profile()`, `b1_profile()`, `ensemble_score()`, `cumsum()`, `subplot()`, `unwrap()`.

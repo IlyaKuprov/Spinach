@@ -1,8 +1,6 @@
 # examples/fundamentals/state_spaces_4.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/state_spaces_4.m`
 - Signature: `state_spaces_4()`
-- Total lines: 56
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Trajectory analysis for a MAS simulation of isotopically labelled glycine powder
 - Spinach housekeeping
 - Experiment setup
 - Get the trajectory
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `singlerot()`, `fpl2rho()`, `kfigure()`, `trajan()`, `ylim()`, `set()`.

@@ -1,8 +1,6 @@
 # examples/nmr_diffusion/flow_test_1a.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_diffusion/flow_test_1a.m`
 - Signature: `flow_test_1a()`
-- Total lines: 62
 
 ## Purpose
 
@@ -30,7 +28,3 @@ A standard diffusion and flow equation solver with no spin dynamics present and 
 - Diffusion and flow parameters
 - Diffusion and flow generator
 - Initial condition
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `v2fplanck()`, `inflate()`, `evolution()`, `kfigure()`, `traj()`, `kxlabel()`, `kylabel()`, `pause()`.

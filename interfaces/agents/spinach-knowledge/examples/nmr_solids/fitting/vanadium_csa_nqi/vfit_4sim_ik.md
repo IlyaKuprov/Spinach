@@ -1,8 +1,6 @@
 # examples/nmr_solids/fitting/vanadium_csa_nqi/vfit_4sim_ik.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/fitting/vanadium_csa_nqi/vfit_4sim_ik.m`
 - Signature: `vfit_4sim_ik()`
-- Total lines: 168
 
 ## Purpose
 
@@ -17,7 +15,6 @@ Simultaneous fitting of multiple 51V MAS NMR spectra with respect to the chemica
 ## Numerical / algorithmic content
 
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The file also defines local helper function(s): `errfun()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -33,7 +30,3 @@ Simultaneous fitting of multiple 51V MAS NMR spectra with respect to the chemica
 - Get a figure going
 - Run the optimisation
 - Least squares error function
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `sgolayfilt()`, `s35()`, `s33()`, `s31()`, `s29()`, `S35()`, `S33()`, `S31()`, `S29()`, `optimset()`, `kfigure()`, `scale_figure()`, `fminsearch()`, `errfun()`, `A35()`.

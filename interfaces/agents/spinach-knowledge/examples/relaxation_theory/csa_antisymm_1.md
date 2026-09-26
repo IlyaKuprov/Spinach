@@ -1,8 +1,6 @@
 # examples/relaxation_theory/csa_antisymm_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/csa_antisymm_1.m`
 - Signature: `csa_antisymm_1()`
-- Total lines: 49
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Longitudinal and transverse relaxation rates in a system with a significant anti
 - Spinach relaxation rates
 - Textbook relaxation rates
 - Summary
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `state()`, `rlx_csa()`, `num2str()`.

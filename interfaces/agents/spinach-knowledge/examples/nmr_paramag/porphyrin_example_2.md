@@ -1,8 +1,6 @@
 # examples/nmr_paramag/porphyrin_example_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_paramag/porphyrin_example_2.m`
 - Signature: `porphyrin_example_2()`
-- Total lines: 76
 
 ## Purpose
 
@@ -28,7 +26,3 @@ Computing PCS using different models in a basic Cu(II) porphyrin complex. The me
 - Mulliken spin populations
 - Multipole ranks to include
 - Multipole moments
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2chi()`, `ppcs()`, `points2mult()`, `lpcs()`, `oparse()`, `dft_pcs_cu()`, `hfc2pcs()`.

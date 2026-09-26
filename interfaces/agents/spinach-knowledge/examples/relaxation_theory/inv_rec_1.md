@@ -1,8 +1,6 @@
 # examples/relaxation_theory/inv_rec_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/inv_rec_1.m`
 - Signature: `inv_rec_1()`
-- Total lines: 63
 
 ## Purpose
 
@@ -30,7 +28,3 @@ A simple inversion-recovery experiment; longitudinal magnetisation is monitored 
 - Detection state
 - Static Liouvillian superoperator
 - Pulse operator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `equilibrium()`, `state()`, `hamiltonian()`, `assume()`, `operator()`, `relaxation()`, `step()`, `evolution()`, `kfigure()`, `scale_figure()`, `kylabel()`, `kxlabel()`.

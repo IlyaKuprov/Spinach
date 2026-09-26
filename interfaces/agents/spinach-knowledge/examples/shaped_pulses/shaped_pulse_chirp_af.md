@@ -1,8 +1,6 @@
 # examples/shaped_pulses/shaped_pulse_chirp_af.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/shaped_pulses/shaped_pulse_chirp_af.m`
 - Signature: `shaped_pulse_chirp_af()`
-- Total lines: 87
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Chirp inversion pulse using the Fokker-Planck formalism. Fewer points are requir
 - Couplings
 - Basis set
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `create()`, `basis()`, `state()`, `hamiltonian()`, `assume()`, `relaxation()`, `kinetics()`, `operator()`, `chirp_pulse()`, `shaped_pulse_af()`, `homospoil()`, `step()`, `acquire()`, `apodisation()`, `fftshift()`.

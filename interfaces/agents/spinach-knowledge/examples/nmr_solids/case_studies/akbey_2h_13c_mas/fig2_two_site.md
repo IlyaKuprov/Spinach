@@ -1,8 +1,6 @@
 # examples/nmr_solids/case_studies/akbey_2h_13c_mas/fig2_two_site.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/case_studies/akbey_2h_13c_mas/fig2_two_site.m`
 - Signature: `fig2_two_site()`
-- Total lines: 70
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Two-site position exchange for a deuterium nucleus. The sites differ in the chem
 - Spinach housekeeping
 - Sequence parameters
 - MAS parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `weblab2nqi()`, `acos()`, `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

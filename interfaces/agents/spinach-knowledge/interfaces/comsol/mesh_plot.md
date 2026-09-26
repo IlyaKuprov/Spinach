@@ -1,8 +1,6 @@
 # interfaces/comsol/mesh_plot.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/comsol/mesh_plot.m`
 - Signature: `mesh_plot(spin_system,qscale,nodelabels)`
-- Total lines: 101
 
 ## Purpose
 
@@ -15,8 +13,6 @@
 ## Numerical / algorithmic content
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -46,7 +42,3 @@
 - yed, 0 turns that off
 - the function creates a figure
 - Check consistency
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `patch()`, `kxlabel()`, `kylabel()`, `quiver()`, `arrayfun()`, `text()`, `set()`, `isfield()`, `isscalar()`, `ismember()`.

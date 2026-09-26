@@ -1,8 +1,6 @@
 # examples/nmr_paramag/simple_pcs_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_paramag/simple_pcs_1.m`
 - Signature: `simple_pcs_1()`
-- Total lines: 50
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Pseudocontact shift and Curie relaxation on a proton due to the presence of a po
 - Spinach housekeeping
 - Spinach relaxation rates
 - Summary
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `state()`, `num2str()`.

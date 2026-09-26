@@ -1,8 +1,6 @@
 # kernel/create.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/create.m`
 - Signature: `spin_system=create(sys,inter)`
-- Total lines: 3191
 
 ## Purpose
 
@@ -10,7 +8,6 @@ The entry function of the Spinach kernel that creates the spin system object tha
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
 - Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
 - The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
@@ -21,8 +18,6 @@ The entry function of the Spinach kernel that creates the spin system object tha
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -64,7 +59,3 @@ The entry function of the Spinach kernel that creates the spin system object tha
 - see the spin system specification section
 - of the online manual
 - spin_system -the primary object used by Spinach
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strcmp()`, `call_stack()`, `fclose()`, `which()`, `instructions()`, `root_dir()`, `grumble()`, `isfield()`, `ismember()`, `existentials()`, `fopen()`, `rmfield()`, `exist()`, `mkdir()`, `report()`, `banner()`.

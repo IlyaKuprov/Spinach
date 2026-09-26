@@ -1,8 +1,6 @@
 # examples/imaging/press_3d_example.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/press_3d_example.m`
 - Signature: `press_3d_example()`
-- Total lines: 79
 
 ## Purpose
 
@@ -30,7 +28,3 @@ PRESS excitation profile in three dimensions with tilted gradient system. Change
 - Spinach housekeeping
 - Sequence parameters
 - Pulse parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `state()`, `imaging()`, `volplot()`, `kxlabel()`, `kylabel()`, `kzlabel()`.

@@ -1,16 +1,12 @@
 # kernel/overloads/@opium/full.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@opium/full.m`
 - Signature: `M=full(M)`
-- Total lines: 38
 
 ## Purpose
 
 Converts an OPIUM object into the full scaled unit matrix that it represents. Syntax: M=full(M)
 
 ## Physical / mathematical content
-
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 
 ## Numerical / algorithmic content
 

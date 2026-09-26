@@ -1,8 +1,6 @@
 # experiments/rdc/rdc_fit.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/rdc/rdc_fit.m`
 - Signature: `S=rdc_fit(isotopes,xyz,rdc)`
-- Total lines: 88
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Linear least squares fitter for residual dipolar couplings. Iso- tope pairs are 
 - The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -46,7 +41,3 @@ Linear least squares fitter for residual dipolar couplings. Iso- tope pairs are 
 - lings in Hz
 - S -Saupe order matrix, a symmetric real
 - dimensionless 3x3 matrix
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `xyz2dd()`, `mat2sphten()`, `cell2mat()`, `rdc()`, `sphten2mat()`, `iscell()`, `ischar()`, `strcmp()`, `iscolumn()`.

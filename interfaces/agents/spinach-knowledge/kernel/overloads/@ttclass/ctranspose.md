@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/ctranspose.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/ctranspose.m`
 - Signature: `ttrain=ctranspose(ttrain)`
-- Total lines: 41
 
 ## Purpose
 
@@ -35,7 +33,3 @@ Computes a Hermitian conjugate of a matrix in a tensor train representation. Syn
 - What gives the artist real prestige is his imitators.
 - Igor Stravinsky
 - #NGRUM
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `conj()`.

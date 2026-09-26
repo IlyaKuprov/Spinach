@@ -1,8 +1,6 @@
 # examples/fundamentals/state_tests/thermal_equilibrium_3.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/state_tests/thermal_equilibrium_3.m`
 - Signature: `thermal_equilibrium_3()`
-- Total lines: 73
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Test of the thermal equilibrium functionality against the textbook expressions f
 - Formalism and basis set
 - Spinach housekeeping
 - Isotropic thermal equilibrium
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `equilibrium()`, `state()`, `levelpop()`.

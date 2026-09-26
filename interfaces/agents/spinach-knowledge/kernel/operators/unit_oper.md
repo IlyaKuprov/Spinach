@@ -1,8 +1,6 @@
 # kernel/operators/unit_oper.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/operators/unit_oper.m`
 - Signature: `A=unit_oper(spin_system)`
-- Total lines: 74
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Returns a unit operator in the current formalism and basis. The operator has dim
 - Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -41,7 +36,3 @@ Returns a unit operator in the current formalism and basis. The operator has dim
 - A -a sparse unit matrix of appropriate
 - dimension
 - Check consistency
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `speye()`, `isfield()`.

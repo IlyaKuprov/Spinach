@@ -1,8 +1,6 @@
 # examples/nmr_liquids/pansy_dual_ch.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/pansy_dual_ch.m`
 - Signature: `pansy_dual_ch()`
-- Total lines: 79
 
 ## Purpose
 
@@ -31,7 +29,3 @@ PANSY-COSY spectra of camphor with natural content of 13C isotope. Coordinates, 
 - Preallocate the answer
 - Loop over isotopomers
 - Build the basis
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `dilute()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `subplot()`, `plot_2d()`.

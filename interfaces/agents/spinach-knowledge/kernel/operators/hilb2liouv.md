@@ -1,8 +1,6 @@
 # kernel/operators/hilb2liouv.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/operators/hilb2liouv.m`
 - Signature: `L=hilb2liouv(H,conv_type)`
-- Total lines: 94
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Converts Hilbert space operators into Liouville space super- operators or state 
 - Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -50,7 +45,3 @@ Converts Hilbert space operators into Liouville space super- operators or state 
 - 'comm' -commutation superoperator
 - 'acomm' -anticommutation
 - 'statevec' -stretches the operator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `speye()`, `transpose()`, `ischar()`.

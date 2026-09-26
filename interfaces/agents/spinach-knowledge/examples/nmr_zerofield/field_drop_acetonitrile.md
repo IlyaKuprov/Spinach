@@ -1,8 +1,6 @@
 # examples/nmr_zerofield/field_drop_acetonitrile.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_zerofield/field_drop_acetonitrile.m`
 - Signature: `field_drop_acetonitrile()`
-- Total lines: 76
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Zero-field NMR spectroscopy -acetonitrile. The simulation proceeds by computing 
 - Basis set
 - Sequence parameters
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

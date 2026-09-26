@@ -1,8 +1,6 @@
 # kernel/overloads/@polyadic/full.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@polyadic/full.m`
 - Signature: `answer=full(p)`
-- Total lines: 79
 
 ## Purpose
 
@@ -36,7 +34,3 @@ Converts a polyadic representation of a matrix into a full mat- rix. Syntax: ans
 - Preallocate the answer
 - Loop over the sum
 - Compute the polyadic
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cellfun()`.

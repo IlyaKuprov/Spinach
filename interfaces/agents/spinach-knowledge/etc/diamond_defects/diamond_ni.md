@@ -1,8 +1,6 @@
 # etc/diamond_defects/diamond_ni.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/etc/diamond_defects/diamond_ni.m`
 - Signature: `[sys,inter]=diamond_ni(parameters)`
-- Total lines: 232
 
 ## Purpose
 
@@ -10,12 +8,7 @@ Nickel-related defect spin system for diamond. Syntax: [sys,inter]=diamond_ni(pa
 
 ## Physical / mathematical content
 
-- This file belongs to the `etc` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `diamond_frame_xyz()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -49,7 +42,3 @@ Nickel-related defect spin system for diamond. Syntax: [sys,inter]=diamond_ni(pa
 - parameters is a structure with the following fields:
 - .centre -'w8', 'ne1', 'ne2', 'ne3', 'ne4', 'ne5',
 - 'ne8', 'ab1', 'ab2', 'ab3', 'ab4', 'ab5',
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `strcmpi()`, `spin()`, `lower()`, `strcmp()`, `nuclei()`, `cosd()`, `sind()`, `cross()`, `diamond_frame_xyz()`, `avalues()`, `zfs2mat()`, `rotmat_align()`, `mat2ias()`, `isfield()`, `xaxis()`.

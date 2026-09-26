@@ -1,8 +1,6 @@
 # kernel/optimcon/tgrape.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/tgrape.m`
 - Signature: `[fidelity,grad]=tgrape(spin_system,drift,controls,waveform,...`
-- Total lines: 168
 
 ## Purpose
 
@@ -16,8 +14,6 @@ A special case of Gradient Ascent Pulse Engineering (GRAPE) objective function a
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -58,7 +54,3 @@ A special case of Gradient Ascent Pulse Engineering (GRAPE) objective function a
 - operator (columns) at each time slice
 - (rows), rad/s
 - dt_grid -time slice durations, a col vector
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `fwd_traj()`, `bwd_traj()`, `waveform()`, `step()`, `dt_grid()`, `fliplr()`, `grad()`, `ismember()`, `iscolumn()`, `iscell()`, `any()`.

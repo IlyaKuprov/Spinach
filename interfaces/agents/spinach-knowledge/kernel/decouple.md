@@ -1,8 +1,6 @@
 # kernel/decouple.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/decouple.m`
 - Signature: `[L,rho]=decouple(spin_system,L,rho,spins)`
-- Total lines: 225
 
 ## Purpose
 
@@ -10,13 +8,9 @@ Obliterates all interactions and populations in the subspace of states that invo
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -61,7 +55,3 @@ Obliterates all interactions and populations in the subspace of states that invo
 - tal stack thereof; this may be left empty
 - spins -spins to be wiped, specified either by name, e.g.
 - {'13C','1H'}, or by a list of numbers, e.g. [1 2]
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `false()`, `dec_mask()`, `ismember()`, `report()`, `num2str()`, `nnz()`, `speye()`, `mults()`, `conj()`, `logical()`, `clean_up()`, `rho()`, `iscell()`, `any()`.

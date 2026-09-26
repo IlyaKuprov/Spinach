@@ -1,8 +1,6 @@
 # kernel/utilities/min_int_type.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/min_int_type.m`
 - Signature: `type=min_int_type(max_val,issigned)`
-- Total lines: 106
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Minimum integer data type sufficient to store the specified value. Useful in man
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -41,7 +36,3 @@ Minimum integer data type sufficient to store the specified value. Useful in man
 - 'signed' or 'unsigned'
 - Output:
 - type -Matlab data type to use
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `intmax()`, `isscalar()`, `ischar()`, `ismember()`.

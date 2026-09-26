@@ -1,8 +1,6 @@
 # examples/quantum_tech/transmon_transfer.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/transmon_transfer.m`
 - Signature: `transmon_transfer()`
-- Total lines: 95
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Basic two-transmon system with Duffing model interacti- ons and a flip-flop coup
 - Formalism and basis
 - Spinach housekeeping
 - Drift Hamiltonian from the declared interactions
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `state()`, `sorensen()`, `optimcon()`, `fmaxnewton()`.

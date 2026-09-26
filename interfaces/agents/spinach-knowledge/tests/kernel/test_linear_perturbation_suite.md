@@ -1,8 +1,6 @@
 # tests/kernel/test_linear_perturbation_suite.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_linear_perturbation_suite.m`
 - Signature: `result=test_linear_perturbation_suite()`
-- Total lines: 117
 
 ## Purpose
 
@@ -10,7 +8,6 @@ Tests linear-algebra, angular-momentum, and perturbation utilities. Syntax: resu
 
 ## Physical / mathematical content
 
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
 
 ## Numerical / algorithmic content
@@ -40,7 +37,3 @@ Tests linear-algebra, angular-momentum, and perturbation utilities. Syntax: resu
 - Check second-order perturbation energy shifts for a two-level system
 - Check Van Vleck perturbation theory on the same two-level system
 - Check higher-order Van Vleck perturbation theory against diagonalisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `add_spins()`, `test_close()`, `rspert()`, `vvpert()`, `tikhoind()`, `transfermat()`, `jacobianest()`, `test_true()`, `all()`, `jac_err()`.

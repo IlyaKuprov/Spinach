@@ -1,8 +1,6 @@
 # experiments/nmr_liquids/noesy.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/nmr_liquids/noesy.m`
 - Signature: `fid=noesy(spin_system,parameters,H,R,K)`
-- Total lines: 206
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Phase-sensitive homonuclear NOESY pulse sequence from:
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -67,7 +63,3 @@ fid=noesy(spin_system,parameters,H,R,K)
 - of numbers, e.g. [1 2]
 - parameters.rho0 -initial state; skip this and specify
 - parameters.needs={'rho_eq'} to start
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `isfield()`, `false()`, `state()`, `operator()`, `decouple()`, `step()`, `evolution()`, `timestep()`, `homospoil()`, `ismember()`, `ismatrix()`, `all()`, `elseif()`, `any()`, `iscell()`.

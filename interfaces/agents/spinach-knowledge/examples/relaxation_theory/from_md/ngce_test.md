@@ -1,8 +1,6 @@
 # examples/relaxation_theory/from_md/ngce_test.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/from_md/ngce_test.m`
 - Signature: `ngce_test()`
-- Total lines: 77
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Test of the numerical integral route to the Redfield relaxation superoperator ag
 - Get lab frame Hamiltonian components
 - Get a random walk on a sphere
 - Get Hamiltonian trajectory
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `hamiltonian()`, `assume()`, `rwalk()`, `orientation()`, `eulers()`, `ngce()`, `STD()`, `kfigure()`, `errorbar()`, `kxlabel()`, `kylabel()`.

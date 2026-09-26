@@ -1,8 +1,6 @@
 # kernel/integrity/sniff.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/integrity/sniff.m`
 - Signature: `sniff(action)`
-- Total lines: 118
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Kernel integrity control. Checks Spinach distribution .m files for any modificat
 - Integrity-control utilities. These files check distribution state, path collisions, style conformance, sniffer databases, and other safeguards that protect Spinach reproducibility.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -36,7 +31,3 @@ Kernel integrity control. Checks Spinach distribution .m files for any modificat
 - the console, 'open' opens them
 - Default is to take no action
 - Check consistency
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `grumble()`, `mfilename()`, `dir()`, `load()`, `true()`, `ismember()`, `fopen()`, `textscan()`, `fclose()`, `md5_hash()`, `content()`, `cellfun()`, `deblank()`, `nnz()`, `strcmp()`.

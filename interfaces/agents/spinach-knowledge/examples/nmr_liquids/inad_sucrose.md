@@ -1,8 +1,6 @@
 # examples/nmr_liquids/inad_sucrose.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/inad_sucrose.m`
 - Signature: `inad_sucrose()`
-- Total lines: 89
 
 ## Purpose
 
@@ -32,7 +30,3 @@ INADEQUATE spectrum of sucrose. The sequence selects double- quantum coherence f
 - Sequence parameters
 - Spinach housekeeping
 - Generate isotopomers
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `shift_iso()`, `create()`, `dilute()`, `cellfun()`, `strcmp()`, `get_coupling()`, `c_idx()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

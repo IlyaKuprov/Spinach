@@ -1,8 +1,6 @@
 # examples/giant_spin/dy_lft_single_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/dy_lft_single_2.m`
 - Signature: `dy_lft_single_2()`
-- Total lines: 91
 
 ## Purpose
 
@@ -30,7 +28,3 @@ A demonstration that most lanthanide complexes are in the ZFS limit for the purp
 - Convert to irreducible spherical tensors
 - Supply to Spinach
 - Formalism specification
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `dcm2euler()`, `icm2hz()`, `wigner()`, `stev2sph()`, `create()`, `basis()`, `fieldscan_enlev()`.

@@ -1,8 +1,6 @@
 # examples/singlet_states/m2s_example.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/singlet_states/m2s_example.m`
 - Signature: `m2s_example()`
-- Total lines: 45
 
 ## Purpose
 
@@ -30,7 +28,3 @@ An example of the M2S sequence for a two-spin system. Calculation time: seconds
 - Detect singlet state
 - Call the M2S sequence
 - Display the singlet population
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `state()`, `singlet()`, `m2s()`, `num2str()`.

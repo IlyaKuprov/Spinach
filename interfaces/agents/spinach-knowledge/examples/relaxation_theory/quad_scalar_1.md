@@ -1,8 +1,6 @@
 # examples/relaxation_theory/quad_scalar_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/quad_scalar_1.m`
 - Signature: `quad_scalar_1()`
-- Total lines: 57
 
 ## Purpose
 
@@ -33,7 +31,3 @@ NMR spectrum of 17O enriched water inside a fullerene cage. A rather exotic comb
 - Sequence parameters
 - Simulation
 - Fourier transform
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `state()`, `liquid()`, `fftshift()`, `kfigure()`, `plot_1d()`.

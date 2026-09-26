@@ -1,8 +1,6 @@
 # examples/kinetics/flux_asymmetric.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/kinetics/flux_asymmetric.m`
 - Signature: `flux_asymmetric()`
-- Total lines: 52
 
 ## Purpose
 
@@ -29,7 +27,3 @@ Two-spin asymmetric magnetization flux problem. Calculation time: seconds.
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

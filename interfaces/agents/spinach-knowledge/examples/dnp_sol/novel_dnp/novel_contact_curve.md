@@ -1,8 +1,6 @@
 # examples/dnp_sol/novel_dnp/novel_contact_curve.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/novel_dnp/novel_contact_curve.m`
 - Signature: `novel_contact_curve()`
-- Total lines: 62
 
 ## Purpose
 
@@ -30,7 +28,3 @@ The transformation of -E_z into I_z during the contact time of the NOVEL Solid E
 - Spinach housekeeping
 - Detection state
 - Experiment parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `powder()`, `kfigure()`, `kxlabel()`, `kylabel()`.

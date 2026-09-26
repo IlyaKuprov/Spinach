@@ -1,8 +1,6 @@
 # experiments/overtone/overtone_a.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/overtone/overtone_a.m`
 - Signature: `spectrum=overtone_a(spin_system,parameters,H,R,K)`
-- Total lines: 92
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Overtone signal acquisition experiment in the frequency domain. Syntax: spectrum
 - Overtone experiment implementations. These routines excite or detect high-order quadrupolar transitions and therefore combine non-secular quadrupolar terms, MAS or field effects, and specialised detection pathways.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -54,7 +49,3 @@ Overtone signal acquisition experiment in the frequency domain. Syntax: spectrum
 - parameters.coil detection state
 - H -Hamiltonian matrix, received from context function
 - R -relaxation superoperator, received from context function
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `spin()`, `slowpass()`, `ismatrix()`, `isfield()`, `elseif()`, `iscell()`.

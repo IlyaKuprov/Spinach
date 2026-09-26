@@ -1,8 +1,6 @@
 # experiments/hyperpol/masdnp.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/hyperpol/masdnp.m`
 - Signature: `dnp=masdnp(spin_system,parameters)`
-- Total lines: 204
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Magic angle spinning DNP simulation, returning the rotor period averaged steady 
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -60,7 +56,3 @@ Magic angle spinning DNP simulation, returning the rotor period averaged steady 
 - parameters.mw_pwr - microwave power, rad/s
 - parameters.mw_frq - microwave frequency, Hz
 - parameters.mw_time - microwave irradiation duration
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `spin()`, `operator()`, `relaxation()`, `equilibrium()`, `hamiltonian()`, `assume()`, `load()`, `report()`, `num2str()`, `rotor_stack()`, `speye()`, `propagator()`, `logm()`, `evolution()`, `rho()`.

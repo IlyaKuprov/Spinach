@@ -1,8 +1,6 @@
 # examples/dnp_liq/odnp_liquid_3.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/odnp_liquid_3.m`
 - Signature: `odnp_liquid_3()`
-- Total lines: 95
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Steady state nuclear magnetisation as a function of microwave frequency offset a
 - Anisotropic Zeeman interactions
 - Isotropic hyperfine coupling
 - Coordinates for dipolar coupling
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `field_grid()`, `create()`, `basis()`, `state()`, `operator()`, `answer()`, `liquid()`, `kfigure()`, `xlim()`, `kxlabel()`, `kylabel()`, `kcolourbar()`.

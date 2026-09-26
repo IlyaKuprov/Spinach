@@ -1,8 +1,6 @@
 # examples/giant_spin/case_studies/ho_pzdo4_powder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/case_studies/ho_pzdo4_powder.m`
 - Signature: `ho_pzdo4_powder()`
-- Total lines: 127
 
 ## Purpose
 

@@ -1,8 +1,6 @@
 # examples/nmr_liquids/inad_cyprinol.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/inad_cyprinol.m`
 - Signature: `inad_cyprinol()`
-- Total lines: 80
 
 ## Purpose
 
@@ -32,7 +30,3 @@ INADEQUATE spectrum of cyprinol. The sequence selects double- quantum coherence 
 - seq parameters
 - Spinach housekeeping
 - Generate isotopomers
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cyprinol()`, `create()`, `dilute()`, `cellfun()`, `strcmp()`, `get_coupling()`, `c_idx()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

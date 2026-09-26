@@ -1,8 +1,6 @@
 # kernel/overloads/@rcv/horzcat.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@rcv/horzcat.m`
 - Signature: `A=horzcat(A,B)`
-- Total lines: 60
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Horizontal concatenation for RCV sparse matrices. Syntax: A=horzcat(A,B)
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -41,7 +37,3 @@ Horizontal concatenation for RCV sparse matrices. Syntax: A=horzcat(A,B)
 - Update column count
 - Consistency enforcement
 - The back half of your forties is a cursed age. It's not
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `gpuArray()`.

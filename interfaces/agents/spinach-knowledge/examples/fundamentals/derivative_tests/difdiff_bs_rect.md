@@ -1,8 +1,6 @@
 # examples/fundamentals/derivative_tests/difdiff_bs_rect.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/derivative_tests/difdiff_bs_rect.m`
 - Signature: `difdiff_bs_rect()`
-- Total lines: 151
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Directional derivative test for Cartesian GRAPE with Bloch-Siegert corrections.
 - Get control operators
 - Get offset and shift operators
 - Build drift Hamiltonian
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `singlet()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `true()`, `optimcon()`, `grape_xy()`, `squeeze()`, `grad_anl()`, `wave_forw()`, `wave_back()`, `fid_forw()`, `fid_back()`.

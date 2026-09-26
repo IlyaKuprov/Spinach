@@ -1,8 +1,6 @@
 # kernel/optimcon/bss_ops.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/bss_ops.m`
 - Signature: `resp_ops=bss_ops(spin_system,channels,carrier_frq)`
-- Total lines: 125
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Bloch-Siegert response operators for the optimal control module. For each contro
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -49,7 +45,3 @@ Bloch-Siegert response operators for the optimal control module. For each contro
 - cy of the channel. Spins belonging to the isotope that the channel
 - addresses receive only the never-resonant term because their resonant
 - term is the control operator itself, which GRAPE propagates exactly.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `spin()`, `mprealloc()`, `strcmp()`, `carrier_frq()`, `operator()`, `isfield()`, `iscell()`, `any()`, `cellfun()`, `channels()`, `all()`, `ismember()`.

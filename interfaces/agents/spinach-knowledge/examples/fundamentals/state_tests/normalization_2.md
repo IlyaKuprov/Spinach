@@ -1,8 +1,6 @@
 # examples/fundamentals/state_tests/normalization_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/state_tests/normalization_2.m`
 - Signature: `normalization_2()`
-- Total lines: 52
 
 ## Purpose
 
@@ -26,7 +24,3 @@ Internal consistency test for the state vectors and matrices. Checks that the in
 - Preallocate the answer
 - Get the norms
 - Run the tests
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `norms()`.

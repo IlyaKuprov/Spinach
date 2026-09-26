@@ -1,8 +1,6 @@
 # examples/fundamentals/high_spin_system_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/high_spin_system_1.m`
 - Signature: `high_spin_system_1()`
-- Total lines: 52
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Pulse-acquire NMR spectrum in a system with a hypothetical scalar coupling to a 
 - Apodization
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

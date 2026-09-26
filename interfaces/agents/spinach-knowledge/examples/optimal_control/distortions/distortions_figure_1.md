@@ -1,8 +1,6 @@
 # examples/optimal_control/distortions/distortions_figure_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/distortions/distortions_figure_1.m`
 - Signature: `distortions_figure_1()`
-- Total lines: 73
 
 ## Purpose
 
@@ -25,7 +23,3 @@ Figure 1 from the paper by Rasulov and Kuprov:
 - Original vs third-order high-pass filter
 - Apply an RLC filter
 - Original vs RLC filter
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `fapt2sfo()`, `spin()`, `spf()`, `kfigure()`, `scale_figure()`, `subplot()`, `wave()`, `wave_spf()`, `klegend()`, `kxlabel()`, `kylabel()`, `szf()`, `wave_szf()`.

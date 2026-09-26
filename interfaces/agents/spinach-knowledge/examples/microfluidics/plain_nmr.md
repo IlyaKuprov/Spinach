@@ -1,8 +1,6 @@
 # examples/microfluidics/plain_nmr.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/microfluidics/plain_nmr.m`
 - Signature: `plain_nmr()`
-- Total lines: 52
 
 ## Purpose
 
@@ -31,7 +29,3 @@ NMR spectrum of the reaction mixture in the absence of chemical kinetics and spa
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `dac_reaction()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

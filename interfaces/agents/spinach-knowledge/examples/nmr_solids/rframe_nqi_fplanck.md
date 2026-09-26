@@ -1,8 +1,6 @@
 # examples/nmr_solids/rframe_nqi_fplanck.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/rframe_nqi_fplanck.m`
 - Signature: `rframe_nqi_fplanck()`
-- Total lines: 57
 
 ## Purpose
 
@@ -35,7 +33,3 @@ Powder magic angle spinning spectrum (rotor-synchronized detection) of a single 
 - Spinach housekeeping
 - Experiment setup
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

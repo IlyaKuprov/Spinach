@@ -1,8 +1,6 @@
 # experiments/nmr_liquids/noesyhsqc.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/nmr_liquids/noesyhsqc.m`
 - Signature: `fid=noesyhsqc(spin_system,parameters,H,R,K)`
-- Total lines: 198
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Phase-sensitive NOESY-HSQC sequence described in: The sequence is hard-wired to 
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -60,7 +56,3 @@ Phase-sensitive NOESY-HSQC sequence described in: The sequence is hard-wired to 
 - cy dimensions, ordered as [f1 f2 f3].
 - parameters.J -J-coupling for the HSQC stage magneti-
 - sation transfer, Hz.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `ismember()`, `decouple()`, `state()`, `operator()`, `step()`, `evolution()`, `coherence()`, `homospoil()`, `report()`, `stitch()`, `fieldnames()`, `ismatrix()`, `all()`, `isfield()`, `isvector()`.

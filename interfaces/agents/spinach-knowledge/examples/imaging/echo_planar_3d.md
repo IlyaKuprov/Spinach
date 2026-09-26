@@ -1,8 +1,6 @@
 # examples/imaging/echo_planar_3d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/echo_planar_3d.m`
 - Signature: `echo_planar_3d()`
-- Total lines: 125
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Slice selection in 3D followed by three-dimensional echo planar imaging sequence
 - Basis set
 - Spinach housekeeping
 - Pulse phase
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `pulse_shape()`, `phantoms()`, `rlx_t1_t2()`, `state()`, `kfigure()`, `dims()`, `volplot()`, `ktitle()`, `imaging()`, `scale_figure()`, `subplot()`, `mri_2d_plot()`, `apodisation()`, `fftshift()`.

@@ -1,8 +1,6 @@
 # examples/nmr_liquids/noesy_strychnine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/noesy_strychnine.m`
 - Signature: `noesy_strychnine()`
-- Total lines: 71
 
 ## Purpose
 
@@ -34,7 +32,3 @@ NOESY spectrum of strychnine. Calculation time: minutes
 - Simulation
 - Apodisation
 - F2 Fourier transform
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strychnine()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

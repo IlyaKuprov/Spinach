@@ -1,8 +1,6 @@
 # kernel/utilities/impound.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/impound.m`
 - Signature: `answer=impound(varargin)`
-- Total lines: 31
 
 ## Purpose
 

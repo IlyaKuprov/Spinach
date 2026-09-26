@@ -1,8 +1,6 @@
 # examples/nmr_proteins/hsqc_ubiquitin_b.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/hsqc_ubiquitin_b.m`
 - Signature: `hsqc_ubiquitin_b()`
-- Total lines: 73
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Tolerances
 - Basis set
 - Algorithmic options
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `protein()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

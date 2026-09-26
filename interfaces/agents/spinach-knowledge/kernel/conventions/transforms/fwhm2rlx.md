@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/fwhm2rlx.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/fwhm2rlx.m`
 - Signature: `r2rate=fwhm2rlx(fwhm)`
-- Total lines: 44
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Converts full width at half-maximum (FWHM) of an NMR signal into an approximatio
 - Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -43,7 +38,3 @@ Converts full width at half-maximum (FWHM) of an NMR signal into an approximatio
 - Check consistency
 - Run the conversion
 - Consistency enforcement
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `any()`, `fwhm()`.

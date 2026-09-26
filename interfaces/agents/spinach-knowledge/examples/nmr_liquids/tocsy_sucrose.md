@@ -1,8 +1,6 @@
 # examples/nmr_liquids/tocsy_sucrose.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/tocsy_sucrose.m`
 - Signature: `tocsy_sucrose()`
-- Total lines: 65
 
 ## Purpose
 
@@ -33,7 +31,3 @@ TOCSY spectrum of sucrose (magnetic parameters computed with DFT). Calculation t
 - Apodisation
 - F2 Fourier transform
 - States signal
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

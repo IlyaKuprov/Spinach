@@ -1,8 +1,6 @@
 # examples/fundamentals/operator_tests/commutation_6.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/operator_tests/commutation_6.m`
 - Signature: `commutation_6()`
-- Total lines: 91
 
 ## Purpose
 
@@ -28,7 +26,3 @@ Commutation and product relations for Pauli and central transition operators.
 - Build central transition operators
 - Build central transition support projector
 - Check commutators and product identities
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `pauli()`, `comm()`, `centrans()`, `ct2ist()`, `irr_sph_ten()`, `coeffs()`, `states()`.

@@ -1,8 +1,6 @@
 # interfaces/comsol/conc_plot.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/comsol/conc_plot.m`
 - Signature: `conc_plot(spin_system,conc,obs)`
-- Total lines: 206
 
 ## Purpose
 
@@ -15,8 +13,6 @@
 ## Numerical / algorithmic content
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -53,7 +49,3 @@
 - ber of Voronoi cells; these will deter-
 - mine bar heights
 - obs -up to three observables as columns of
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `grumble()`, `hsv2rgb()`, `wrapTo2Pi()`, `obs()`, `diff()`, `cellfun()`, `nan()`, `active_cells()`, `cell_sizes()`, `conc()`, `vor_cell_x()`, `vor_cell_y()`, `vor_cell_z()`, `FRGB()`, `RGB()`.

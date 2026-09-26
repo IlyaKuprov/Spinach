@@ -1,8 +1,6 @@
 # examples/kinetics/exchange_asymmetric.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/kinetics/exchange_asymmetric.m`
 - Signature: `exchange_asymmetric()`
-- Total lines: 51
 
 ## Purpose
 
@@ -29,7 +27,3 @@ Two-spin asymmetric chemical exchange pattern. Calculation time: seconds.
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

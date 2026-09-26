@@ -1,8 +1,6 @@
 # kernel/utilities/symmetry.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/symmetry.m`
 - Signature: `spin_system=symmetry(spin_system,bas)`
-- Total lines: 361
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Permutation symmetry treatment. Compiles character tables of composite symmetry 
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -54,7 +50,3 @@ Permutation symmetry treatment. Compiles character tables of composite symmetry 
 - of the online manual.
 - bas - basis input structure described in the
 - basis specification section of the manual
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `ismember()`, `report()`, `true()`, `isfield()`, `false()`, `summary_symmetry()`, `validate_sym()`, `perm_group()`, `num2str()`, `horzcat()`, `isscalar()`, `exist()`, `group_element()`, `spins()`, `strcmp()`.

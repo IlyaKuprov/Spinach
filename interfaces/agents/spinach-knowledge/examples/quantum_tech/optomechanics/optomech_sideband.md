@@ -1,8 +1,6 @@
 # examples/quantum_tech/optomechanics/optomech_sideband.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/optomechanics/optomech_sideband.m`
 - Signature: `optomech_sideband()`
-- Total lines: 89
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Optomechanical sideband transfer of a phonon Fock state into a driven cavity. A 
 - Magnet field
 - Cavity with five and phonon mode with eleven Fock levels
 - Mode frequencies, cavity in the red-detuned drive rotating frame
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `state()`, `propagator()`, `n_cav()`, `n_mech()`, `kfigure()`, `kxlabel()`, `kylabel()`, `ktitle()`, `klegend()`.

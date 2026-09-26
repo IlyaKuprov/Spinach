@@ -1,8 +1,6 @@
 # examples/imaging/echo_planar_2d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/echo_planar_2d.m`
 - Signature: `echo_planar_2d()`
-- Total lines: 90
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Echo planar imaging example in 2D for a brain phantom. Simulation time: seconds,
 - Basis set
 - Spinach housekeeping
 - Sequence parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `rlx_t1_t2()`, `phantoms()`, `R1Ph()`, `R2Ph()`, `PDPh()`, `dims()`, `npts()`, `state()`, `imaging()`, `kfigure()`, `scale_figure()`, `subplot()`, `mri_2d_plot()`, `ktitle()`.

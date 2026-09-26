@@ -1,8 +1,6 @@
 # experiments/nmr_solids/wise.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/nmr_solids/wise.m`
 - Signature: `fid=wise(spin_system,parameters,H,R,K)`
-- Total lines: 176
 
 ## Purpose
 
@@ -17,8 +15,6 @@ WISE (WIdeline SEparation) is a powder MAS heteronuclear correlation experiment.
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -62,7 +58,3 @@ fid=wise(spin_system,parameters,H,R,K)
 - channel during the CP contact
 - time, Hz
 - parameters.cp_dur -CP contact time duration, s
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `decouple()`, `operator()`, `speye()`, `step()`, `evolution()`, `ismember()`, `ismatrix()`, `all()`, `isfield()`, `isscalar()`, `isrow()`, `any()`, `iscell()`, `cellfun()`.

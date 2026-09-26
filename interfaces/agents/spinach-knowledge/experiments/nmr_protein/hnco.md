@@ -1,8 +1,6 @@
 # experiments/nmr_protein/hnco.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/nmr_protein/hnco.m`
 - Signature: `fid=hnco(spin_system,parameters,H,R,K)`
-- Total lines: 254
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Phase-sensitive HNCO pulse sequence from using the bidirectional propagation met
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -60,7 +56,3 @@ Phase-sensitive HNCO pulse sequence from using the bidirectional propagation met
 - parameters.sweep -a vector of three real numbers giving
 - the sweep widths in the three frequen-
 - cy dimensions, ordered as [f1 f2 f3].
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `strcmp()`, `state()`, `operator()`, `step()`, `evolution()`, `coherence()`, `decouple()`, `report()`, `stitch()`, `fieldnames()`, `ismember()`, `ismatrix()`, `all()`, `isfield()`, `isvector()`.

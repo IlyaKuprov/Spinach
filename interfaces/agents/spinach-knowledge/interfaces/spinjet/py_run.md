@@ -1,8 +1,6 @@
 # interfaces/spinjet/py_run.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/spinjet/py_run.m`
 - Signature: `arg_out=py_run(spin_system,pyscript,arg_in)`
-- Total lines: 126
 
 ## Purpose
 
@@ -10,12 +8,7 @@ Runs a python script from /interfaces/spinjet/Xepr_python/ folder of Bruker Xepr
 
 ## Physical / mathematical content
 
-- This file belongs to the `interfaces` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -49,7 +42,3 @@ Runs a python script from /interfaces/spinjet/Xepr_python/ folder of Bruker Xepr
 - arg_in -cell array containing the inputs to
 - the script
 - arg_out -cell array of outputs from the script,
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `grumble()`, `ischar()`, `num2str()`, `system()`, `code()`, `int2str()`, `strsplit()`, `strtrim()`, `isfield()`, `iscell()`.

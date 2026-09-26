@@ -1,8 +1,6 @@
 # kernel/operators/sin_tran.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/operators/sin_tran.m`
 - Signature: `A=sin_tran(dim)`
-- Total lines: 67
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Single transition operators, spanning the space of matri- ces of the specified d
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -43,7 +39,3 @@ Single transition operators, spanning the space of matri- ces of the specified d
 - and likewise for larger matrices. Syntax:
 - A=sin_tran(dim)
 - dim -dimension of the matrices
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `lin2kq()`, `complex()`, `isscalar()`.

@@ -1,8 +1,6 @@
 # examples/optimal_control/bloch_siegert/yusuke_1h_14n_optimal_vs_cw_demo.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/bloch_siegert/yusuke_1h_14n_optimal_vs_cw_demo.m`
 - Signature: `yusuke_1h_14n_optimal_vs_cw_demo()`
-- Total lines: 264
 
 ## Purpose
 
@@ -19,7 +17,6 @@ Reduced heteronuclear control demonstration inspired by the low-power offset-tol
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file also defines local helper function(s): `offset_profile()`, `b1_profile()`, `ensemble_score()`, `single_score()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -35,7 +32,3 @@ Reduced heteronuclear control demonstration inspired by the low-power offset-tol
 - This is deliberately a reduced effective model rather than a full MAS
 - quadrupolar simulation. In particular, the broad 14N quadrupolar/MAS
 - response is compressed into an effective 14N offset ensemble, and the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `rng()`, `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `true()`, `optimcon()`, `fmaxnewton()`, `offset_profile()`, `b1_profile()`, `ensemble_score()`, `cumsum()`, `subplot()`, `unwrap()`.

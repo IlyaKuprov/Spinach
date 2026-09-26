@@ -1,8 +1,6 @@
 # examples/quantum_tech/circuit_qed/cavity_fock_grape_b.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/circuit_qed/cavity_fock_grape_b.m`
 - Signature: `cavity_fock_grape_b()`
-- Total lines: 113
 
 ## Purpose
 
@@ -35,7 +33,3 @@ GRAPE preparation of a cavity Fock state through a dispersively coupled qubit us
 - Calculation time: minutes
 - Magnet field
 - Truncated cavity mode and a qubit
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `state()`, `wave_basis()`, `optimcon()`, `fmaxnewton()`, `pulse()`, `propagator()`, `cumsum()`, `kfigure()`, `kxlabel()`, `kylabel()`, `ktitle()`.

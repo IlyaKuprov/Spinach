@@ -1,8 +1,6 @@
 # kernel/pulses/polar2cartesian.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/pulses/polar2cartesian.m`
 - Signature: `[x,y,Dx,Dy,Dxx,Dxy,Dyx,Dyy]=polar2cartesian(r,p,Dr,Dp,Drr,Drp,Dpr,Dpp)`
-- Total lines: 181
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Converts [RF_amplitude, RF_phase] representation of a pulse waveform and the der
 - Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -65,7 +60,3 @@ Converts [RF_amplitude, RF_phase] representation of a pulse waveform and the der
 - Dp -optional vector of derivatives of some scalar function
 - with respect to the waveform phases.
 - Drr -matrix of second derivatives of the function with respect
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `wrapToPi()`, `all()`, `isequal()`.

@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/xix_q_con_time_ensemble_b1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/xix_q_con_time_ensemble_b1.m`
 - Signature: `xix_q_con_time_ensemble_b1()`
-- Total lines: 116
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simulation of XiX DNP contact time dependence in the steady state with electron 
 - Basis set
 - Propagator accuracy
 - Algorithmic options
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cell2mat()`, `xyz()`, `gaussleg()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `loop_counts()`, `dnp()`, `powder()`, `kfigure()`, `kylabel()`, `kxlabel()`, `savefig()`.

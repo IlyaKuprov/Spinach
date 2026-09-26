@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/xix_w_field_profile_ensemble_b1_r.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/xix_w_field_profile_ensemble_b1_r.m`
 - Signature: `xix_w_field_profile_ensemble_b1_r()`
-- Total lines: 109
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simulation of XiX DNP field profile in the steady state with averaging over elec
 - Propagator accuracy
 - Algorithmic options
 - Distance and B1 ensemble, Gauss-Legendre points
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gaussleg()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `dnp()`, `powder()`, `kfigure()`, `kylabel()`, `kxlabel()`, `savefig()`.

@@ -1,8 +1,6 @@
 # kernel/grids/grid_trian.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/grids/grid_trian.m`
 - Signature: `[alps,bets,gams,whts,vorn]=grid_trian(type,n)`
-- Total lines: 212
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Triangular spherical quadrature grids, as per Appendix A.6 of (http://dx.doi.org
 ## Numerical / algorithmic content
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -50,7 +46,3 @@ Triangular spherical quadrature grids, as per Appendix A.6 of (http://dx.doi.org
 - whts -Voronoi tessellation body angle weights
 - vorn -a cell array of matrices containing the
 - coordinates of the vertices of the Voro-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `acos()`, `atan2()`, `isnan()`, `cart2sph()`, `voronoisphere()`, `grid_plot()`, `ischar()`, `isscalar()`.

@@ -1,8 +1,6 @@
 # examples/dnp_liq/ccdnp/tau_scan_main_text.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/ccdnp/tau_scan_main_text.m`
 - Signature: `tau_scan_main_text()`
-- Total lines: 107
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Steady state nuclear magnetisation as a function of microwave frequency offset a
 - Cooridnates
 - Basis set
 - Turn off startup tests
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `tau_c()`, `create()`, `basis()`, `state()`, `operator()`, `answer()`, `liquid()`, `equilibrium()`, `kfigure()`, `scale_figure()`, `kxlabel()`, `kcolourbar()`, `kylabel()`, `text()`.

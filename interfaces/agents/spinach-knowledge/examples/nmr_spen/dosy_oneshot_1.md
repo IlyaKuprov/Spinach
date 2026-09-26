@@ -1,8 +1,6 @@
 # examples/nmr_spen/dosy_oneshot_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_spen/dosy_oneshot_1.m`
 - Signature: `dosy_oneshot_1()`
-- Total lines: 88
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Oneshot DOSY pulse sequence for a system of three coupled spins with different r
 - Acquisition parameters
 - Sample geometry
 - Relaxation phantom
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `create()`, `basis()`, `relaxation()`, `state()`, `imaging()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

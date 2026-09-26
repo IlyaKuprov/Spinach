@@ -1,8 +1,6 @@
 # examples/quantum_tech/tavis_cummings_splitting.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/tavis_cummings_splitting.m`
 - Signature: `tavis_cummings_splitting()`
-- Total lines: 86
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Collective normal-mode splitting in the Tavis-Cummings model for one to four ide
 - Magnet field
 - Particle specification
 - Resonant cavity coupled to every spin
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `clear()`, `create()`, `basis()`, `assume()`, `hamiltonian()`, `speye()`, `state()`, `num2cell()`, `subspace()`, `one_quant()`, `splitting()`, `kfigure()`, `kxlabel()`, `kylabel()`, `ktitle()`, `klegend()`.

@@ -1,8 +1,6 @@
 # examples/fundamentals/strong_coupling.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/strong_coupling.m`
 - Signature: `strong_coupling()`
-- Total lines: 53
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A garden variety strongly coupled two-spin system.
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

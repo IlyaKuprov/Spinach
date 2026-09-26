@@ -1,8 +1,6 @@
 # kernel/plotting/crop_2d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/plotting/crop_2d.m`
 - Signature: `[spec,parameters]=crop_2d(spin_system,spec,parameters,crop_ranges)`
-- Total lines: 153
 
 ## Purpose
 
@@ -10,12 +8,7 @@ Crops 2D spectra to user-specified ranges (in ppm), respecting the digital resol
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -49,7 +42,3 @@ Crops 2D spectra to user-specified ranges (in ppm), respecting the digital resol
 - strings specifying the working spins.
 - parameters.offset - one or two transmitter offsets, Hz
 - spec -2D matrix containing the cropped spectrum
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `isscalar()`, `ft_axis()`, `spin()`, `axis_f1_hz()`, `axis_f2_hz()`, `spec()`, `ismatrix()`, `isfield()`, `iscell()`, `ismember()`, `any()`.

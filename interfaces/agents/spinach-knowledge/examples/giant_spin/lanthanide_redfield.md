@@ -1,8 +1,6 @@
 # examples/giant_spin/lanthanide_redfield.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/lanthanide_redfield.m`
 - Signature: `lanthanide_redfield()`
-- Total lines: 63
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Relaxation rate of Gd(III) as a function of zero-field splitting, computed using
 - Linearly spaced B20 in cm^-1
 - Loop over B20 values
 - Giant spin Hamiltonian parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `icm2hz()`, `b20()`, `create()`, `basis()`, `relaxation()`, `state()`, `kfigure()`, `set()`, `kxlabel()`, `kylabel()`.

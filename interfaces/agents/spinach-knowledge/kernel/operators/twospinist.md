@@ -1,8 +1,6 @@
 # kernel/operators/twospinist.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/operators/twospinist.m`
 - Signature: `T=twospinist(spin_system,spin_a,spin_b,indices,type)`
-- Total lines: 148
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Two-spin irreducible spherical tensor operators. Syntax: T=twospinist(spin_syste
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -51,7 +47,3 @@ Two-spin irreducible spherical tensor operators. Syntax: T=twospinist(spin_syste
 - 'right' -produces right side product superoperator
 - 'comm' -produces commutation superoperator (default)
 - 'acomm' -produces anticommutation superoperator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `indices()`, `operator()`, `isscalar()`, `ischar()`, `ismember()`.

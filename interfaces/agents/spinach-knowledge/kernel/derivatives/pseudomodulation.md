@@ -1,8 +1,6 @@
 # kernel/derivatives/pseudomodulation.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/derivatives/pseudomodulation.m`
 - Signature: `output=pseudomodulation(field,spectrum,mod_amp,mod_order)`
-- Total lines: 120
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Pseudomodulation of uniformly sampled spectra using the Hyde et al. Fourier-doma
 
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -51,7 +47,3 @@ Pseudomodulation of uniformly sampled spectra using the Hyde et al. Fourier-doma
 - output -N-by-M pseudomodulated spectrum matrix
 - The implementation follows Eqs. 5-7 of Hyde et al., J. Magn.
 - Reson. 96, 1-13 (1992). After phase-sensitive detection, the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `field()`, `sign()`, `fftdiff()`, `ang_freq()`, `besselj()`, `isfloat()`, `issparse()`, `iscolumn()`, `any()`, `eps()`, `ismatrix()`, `spectrum()`, `ismember()`.

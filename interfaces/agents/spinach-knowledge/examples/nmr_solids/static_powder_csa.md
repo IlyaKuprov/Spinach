@@ -1,8 +1,6 @@
 # examples/nmr_solids/static_powder_csa.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/static_powder_csa.m`
 - Signature: `static_powder_csa()`
-- Total lines: 54
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Two-spin static CSA powder pattern. Calculation time: seconds
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `powder()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

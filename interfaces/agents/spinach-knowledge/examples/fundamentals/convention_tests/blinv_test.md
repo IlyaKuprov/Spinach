@@ -1,8 +1,6 @@
 # examples/fundamentals/convention_tests/blinv_test.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/convention_tests/blinv_test.m`
 - Signature: `blinv_test()`
-- Total lines: 43
 
 ## Purpose
 
@@ -24,7 +22,3 @@ Internal consistency of Blicharski invariants and their polarisation relationshi
 - Blicharski invariants
 - Blicharski against Phi products, rank 2 self
 - Blicharski against Phi product, rank 2 cross
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `mat2sphten()`, `blinv()`, `blprod()`, `Phi_A()`, `Phi_B()`.

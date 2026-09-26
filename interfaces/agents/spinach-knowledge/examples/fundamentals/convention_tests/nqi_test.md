@@ -1,8 +1,6 @@
 # examples/fundamentals/convention_tests/nqi_test.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/convention_tests/nqi_test.m`
 - Signature: `nqi_test()`
-- Total lines: 39
 
 ## Purpose
 
@@ -26,7 +24,3 @@ Test of the reverse decomposition of spin-1 Hamiltonians.
 - Set up Spinach
 - Re-build using Spinach functionality
 - Compare the matrices
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `remtrace()`, `ham2nqi()`, `create()`, `basis()`, `assume()`, `hamiltonian()`, `orientation()`, `omega()`, `operator()`.

@@ -1,8 +1,6 @@
 # kernel/optimcon/fmaxnewton.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/fmaxnewton.m`
 - Signature: `[x,data]=fmaxnewton(spin_system,cost_function,guess)`
-- Total lines: 397
 
 ## Purpose
 
@@ -20,8 +18,6 @@ Finds a local maximum of a function of several variables using Newton and quasi-
 - All four methods check only the initial assembled gradient on unfrozen coordinates before constructing a search direction. A norm below `1e-6` is rejected before any Hessian regularisation or solve; the objective value and trajectory shape are not inspected by this guard. This is an optimiser-level check, not a restriction on individual GRAPE contributions.
 - Newton and Goodwin request an objective, gradient, and Hessian every iteration. LBFGS and RBFGS request the initial objective and gradient, then reuse line-search gradients. The initial checks use these existing evaluations. With `max_iter=0`, only the objective is evaluated and the initial-guess guard is not applied.
 - The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `header()`, `footer()`, `itrep()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 

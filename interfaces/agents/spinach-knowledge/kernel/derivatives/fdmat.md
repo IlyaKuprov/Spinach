@@ -1,8 +1,6 @@
 # kernel/derivatives/fdmat.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/derivatives/fdmat.m`
 - Signature: `D=fdmat(dim,nstenc,order,boundary)`
-- Total lines: 100
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Returns arbitrary-order central finite-difference differentiation matrices (spar
 ## Numerical / algorithmic content
 
 - Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -48,7 +44,3 @@ Returns arbitrary-order central finite-difference differentiation matrices (spar
 - finite difference schemes, 'pbc'
 - assumes periodic boundaries. The
 - default is 'pbc'.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `grumble()`, `spalloc()`, `fdweights()`, `ischar()`.

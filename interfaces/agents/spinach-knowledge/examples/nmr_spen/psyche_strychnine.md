@@ -1,8 +1,6 @@
 # examples/nmr_spen/psyche_strychnine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_spen/psyche_strychnine.m`
 - Signature: `psyche_strychnine()`
-- Total lines: 101
 
 ## Purpose
 
@@ -31,7 +29,3 @@ PSYCHE pure-shift NMR spectrum of strychnine. Calculation time: hours, faster on
 - Saltire chirp parameters
 - Coherent evolution timesteps
 - Sample parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strychnine()`, `create()`, `basis()`, `state()`, `imaging()`, `fid()`, `fidps()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `subplot()`, `plot_2d()`, `plot_1d()`.

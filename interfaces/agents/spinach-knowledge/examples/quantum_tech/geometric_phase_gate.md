@@ -1,8 +1,6 @@
 # examples/quantum_tech/geometric_phase_gate.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/geometric_phase_gate.m`
 - Signature: `geometric_phase_gate()`
-- Total lines: 143
 
 ## Purpose
 

@@ -1,8 +1,6 @@
 # kernel/grids/grid_kron.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/grids/grid_kron.m`
 - Signature: `[angles,weights]=grid_kron(angles1,weights1,angles2,weights2)`
-- Total lines: 90
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Spherical grid direct product. Tiles one grid using the rotations of the other. 
 ## Numerical / algorithmic content
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -47,7 +43,3 @@ Spherical grid direct product. Tiles one grid using the rotations of the other. 
 - angles -Euler angles (ZYZ active) of the product grid,
 - as [alpha beta gamma], rad
 - weights -weights of the product grid
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `euler2qter()`, `angles1()`, `angles2()`, `qter2euler()`, `any()`.

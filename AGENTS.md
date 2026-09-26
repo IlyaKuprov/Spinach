@@ -20,6 +20,8 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Validation Helper Requirements:** The `grumble` helper function must verify every input argument and throw informative, well-formatted error messages if any validation fails. Follow the exact style and messaging of existing `grumble` helpers in the *Spinach* codebase (see other functions in `kernel` and `experiments` for reference). There should be no code comments inside the grumble helper function.
 
+* **Do not validate guaranteed aspects:** If the input is received from another Spinach function that sets specific shapes and types, there is no need to re-check those shapes and types. Only values should be checked if appropriate. Do not over-check. Do not introduce pointless ass-cover checking.
+
 * **Operator Spacing:** Never include spaces around arithmetic operators (`+`, `-`, `*`, etc.), logical operators (`==`, `>`, `<=`, etc.), or the assignment operator (`=`). Write expressions like `a=b+c*d` without spaces. This convention is consistent across the entire codebase.
 
 * **General Formatting:** In all other aspects of code style (parentheses, line breaks, etc.), mimic the existing code. Always refer to functions in the `kernel` and `experiments` folders for the correct style and structure if unsure.

@@ -1,8 +1,6 @@
 # tests/kernel/test_polyadic_kron.m
 
-- Source: `tests/kernel/test_polyadic_kron.m`
 - Signature: `result=test_polyadic_kron()`
-- Total lines: 111
 
 ## Purpose
 

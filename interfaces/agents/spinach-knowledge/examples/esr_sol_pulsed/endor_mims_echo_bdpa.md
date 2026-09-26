@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/endor_mims_echo_bdpa.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/endor_mims_echo_bdpa.m`
 - Signature: `endor_mims_echo_bdpa()`
-- Total lines: 57
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Stimulated echo stage of the Mims ENDOR pulse sequence on BDPA. The nuclear puls
 - Spinach housekeeping
 - Sequence parameters
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `powder()`, `kfigure()`, `kxlabel()`, `kylabel()`.

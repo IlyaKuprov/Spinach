@@ -1,16 +1,12 @@
 # etc/wiki.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/etc/wiki.m`
 - Signature: `wiki()`
-- Total lines: 21
 
 ## Purpose
 
 Opens Spinach documentation Wiki page.
 
 ## Physical / mathematical content
-
-- This file belongs to the `etc` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 
 ## Numerical / algorithmic content
 
@@ -25,7 +21,3 @@ Opens Spinach documentation Wiki page.
 - fought for so charmless a cause.
 - Taki Theodoracopoulos
 - #NHEAD #NGRUM #NWIKI
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `web()`.

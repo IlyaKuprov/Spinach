@@ -1,8 +1,6 @@
 # kernel/overloads/@polyadic/inflate.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@polyadic/inflate.m`
 - Signature: `answer=inflate(p)`
-- Total lines: 96
 
 ## Purpose
 
@@ -37,7 +35,3 @@ Converts a polyadic representation of a matrix into a sparse mat- rix. Syntax: a
 - Find the core dimensions
 - Get index arrays going
 - Loop over the sum
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cellfun()`, `cell2mat()`, `clear()`.

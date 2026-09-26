@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/endor_davies_nox_crystal.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/endor_davies_nox_crystal.m`
 - Signature: `endor_davies_nox_crystal()`
-- Total lines: 116
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Davies ENDOR simulation for a nitroxide radical at a single orientation. Soft pu
 - Spinach housekeeping
 - % Stage 1: pulse-acquire ESR spectrum
 - Sequence parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `crystal()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `subplot()`, `plot_1d()`, `ktitle()`, `clear()`, `kxlabel()`, `kylabel()`.

@@ -1,8 +1,6 @@
 # examples/nmr_paramag/calbindin/tm_1igv_lcurve.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_paramag/calbindin/tm_1igv_lcurve.m`
 - Signature: `tm_1igv_lcurve()`
-- Total lines: 52
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Inverse problem for the unpaired electron density distribution. Experimental dat
 - Result arrays
 - Run a parallel loop
 - L-curve analysis
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `pdbread()`, `load()`, `true()`, `err()`, `reg()`, `ipcs()`, `lam()`, `lcurve()`, `num2str()`.

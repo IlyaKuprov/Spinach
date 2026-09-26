@@ -1,8 +1,6 @@
 # examples/optimal_control/state_transfer_m2s.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/state_transfer_m2s.m`
 - Signature: `state_transfer_m2s()`
-- Total lines: 147
 
 ## Purpose
 
@@ -34,7 +32,3 @@ A transfer of coherence from longitudinal magnetization into a two-spin singlet 
 - Formalism and basis set
 - Run Spinach housekeeping
 - Set up and normalise the initial state
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `allyl_pyruvate()`, `create()`, `basis()`, `state()`, `idxof()`, `operator()`, `hamiltonian()`, `assume()`, `frqoffset()`, `optimcon()`, `cumsum()`, `fmaxnewton()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`.

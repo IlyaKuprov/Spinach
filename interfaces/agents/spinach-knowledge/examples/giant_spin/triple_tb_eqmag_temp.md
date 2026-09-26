@@ -1,8 +1,6 @@
 # examples/giant_spin/triple_tb_eqmag_temp.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/triple_tb_eqmag_temp.m`
 - Signature: `triple_tb_eqmag_temp()`
-- Total lines: 226
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simulation of the temperature dependence of the magnetisation of a triple-Tb tri
 - to the DD couplings
 - g-tensor eigenvalues (rows)
 - g-tensor matrices
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `icm2hz()`, `dcm2euler()`, `wigner()`, `stev2sph()`, `nan()`, `kfigure()`, `create()`, `basis()`, `eqmag()`, `mag()`, `kxlabel()`, `kylabel()`, `load()`.

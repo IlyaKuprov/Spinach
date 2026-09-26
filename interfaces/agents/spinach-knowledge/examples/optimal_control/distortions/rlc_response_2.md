@@ -1,8 +1,6 @@
 # examples/optimal_control/distortions/rlc_response_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/distortions/rlc_response_2.m`
 - Signature: `rlc_response_2()`
-- Total lines: 102
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Probe circuit response effect on the accuracy of the deu- terium pre-phasing pul
 - Isotopes
 - Alanine CD3 NQI parameters
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `anas2mat()`, `create()`, `basis()`, `drifts()`, `state()`, `operator()`, `false()`, `optimcon()`, `guess()`, `fmaxnewton()`, `pulse_profile()`, `kfigure()`, `restrans()`, `spin()`.

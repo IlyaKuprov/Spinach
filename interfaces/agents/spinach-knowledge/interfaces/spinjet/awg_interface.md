@@ -1,8 +1,6 @@
 # interfaces/spinjet/awg_interface.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/spinjet/awg_interface.m`
 - Signature: `data=awg_interface(spin_system,awg_cmd,cmd_input)`
-- Total lines: 141
 
 ## Purpose
 
@@ -10,12 +8,7 @@ Interface to the Bruker SpinJet AWG, calling a library of Python scripts that in
 
 ## Physical / mathematical content
 
-- This file belongs to the `interfaces` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -54,7 +47,3 @@ Interface to the Bruker SpinJet AWG, calling a library of Python scripts that in
 - 'compile_pspel_exp'
 - 'modify_pspel_defs'
 - 'acquire_data'
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `grumble()`, `py_run()`, `report()`, `continue()`, `dlmread()`, `delete()`, `isfield()`, `isfolder()`, `ischar()`, `ismember()`, `iscell()`, `dir()`, `disk()`, `int2str()`.

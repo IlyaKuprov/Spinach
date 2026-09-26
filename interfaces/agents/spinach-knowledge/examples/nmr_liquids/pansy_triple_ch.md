@@ -1,8 +1,6 @@
 # examples/nmr_liquids/pansy_triple_ch.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/pansy_triple_ch.m`
 - Signature: `pansy_triple_ch()`
-- Total lines: 111
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Triple-channel PANSY experiment on glycine with natural content of 13C isotope. 
 - Preallocate the answer
 - Generate isotopomers
 - Loop over isotopomers
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `dilute()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `subplot()`, `plot_offset()`, `plot_sweep()`, `plot_zerofill()`, `plot_spins()`.

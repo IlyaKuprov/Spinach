@@ -1,8 +1,6 @@
 # kernel/operators/enlev2ist.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/operators/enlev2ist.m`
 - Signature: `[states,coeffs]=enlev2ist(mult,lvl_num,particle)`
-- Total lines: 92
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Irreducible spherical tensor expansion of specific Zeeman energy level projector
 - Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -50,7 +45,3 @@ Irreducible spherical tensor expansion of specific Zeeman energy level projector
 - for a boson
 - states -states, in the Spinach IST basis index-
 - ing, that contribute to the operator in
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `oper2ist()`, `isscalar()`.

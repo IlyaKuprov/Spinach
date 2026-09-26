@@ -1,8 +1,6 @@
 # examples/microfluidics/reacting_flow.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/microfluidics/reacting_flow.m`
 - Signature: `reacting_flow()`
-- Total lines: 140
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Flow in the absence of spin dynamics, but presence of two unidirectional second-
 - Get diffusion and flow generator
 - Trajectory preallocation and the initial state
 - Time evolution loop
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `comsol_import()`, `bootstrap()`, `flow_gen()`, `traj()`, `report()`, `int2str()`, `sp_block_diag()`, `speye()`, `x_curr()`, `step()`, `kfigure()`, `scale_figure()`, `subplot()`, `camproj()`, `view()`, `set()`.

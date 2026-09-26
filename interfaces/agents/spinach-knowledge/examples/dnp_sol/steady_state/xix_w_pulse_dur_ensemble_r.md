@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/xix_w_pulse_dur_ensemble_r.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/xix_w_pulse_dur_ensemble_r.m`
 - Signature: `xix_w_pulse_dur_ensemble_r()`
-- Total lines: 113
 
 ## Purpose
 
@@ -30,7 +28,3 @@
 - Algorithmic options
 - Distance ensemble
 - Electron pulse duration grid, s
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gaussleg()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `pulse_durs()`, `dnp()`, `powder()`, `kfigure()`, `set()`, `kylabel()`, `kxlabel()`, `kcolourbar()`, `savefig()`.

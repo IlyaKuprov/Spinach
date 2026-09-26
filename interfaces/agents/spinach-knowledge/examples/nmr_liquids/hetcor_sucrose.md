@@ -1,8 +1,6 @@
 # examples/nmr_liquids/hetcor_sucrose.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/hetcor_sucrose.m`
 - Signature: `hetcor_sucrose()`
-- Total lines: 81
 
 ## Purpose
 
@@ -31,7 +29,3 @@ HETCOR spectrum of sucrose with natural content of 13C isotope (magnetic paramet
 - Create the spin system structure
 - Generate isotopomers
 - Preallocate the answer
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `shift_iso()`, `create()`, `dilute()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

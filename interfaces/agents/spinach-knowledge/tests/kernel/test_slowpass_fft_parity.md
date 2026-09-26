@@ -1,16 +1,12 @@
 # tests/kernel/test_slowpass_fft_parity.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_slowpass_fft_parity.m`
 - Signature: `result=test_slowpass_fft_parity()`
-- Total lines: 81
 
 ## Purpose
 
 Tests slowpass amplitude normalisation against time-domain FFT. Syntax: result=test_slowpass_fft_parity()
 
 ## Physical / mathematical content
-
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 
 ## Numerical / algorithmic content
 
@@ -37,7 +33,3 @@ Tests slowpass amplitude normalisation against time-domain FFT. Syntax: result=t
 - Get production generators and states
 - Acquire the signal in the time domain
 - Use the exact FFT bins as the slowpass frequency grid
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `slowpass()`, `acquire()`, `test_spin_system()`, `assume()`, `hamiltonian()`, `relaxation()`, `kinetics()`, `state()`, `fftshift()`, `ft_axis()`, `frq_axis()`, `test_close()`, `spectrum_slow()`, `spectrum_fft()`, `contains()`.

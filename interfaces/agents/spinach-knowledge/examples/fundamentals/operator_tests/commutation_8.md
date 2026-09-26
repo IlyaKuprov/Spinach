@@ -1,8 +1,6 @@
 # examples/fundamentals/operator_tests/commutation_8.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/operator_tests/commutation_8.m`
 - Signature: `commutation_8()`
-- Total lines: 59
 
 ## Purpose
 
@@ -27,7 +25,3 @@ Delicate action and commutation tests for Hilbert-Liouville conversion and Steve
 - Build Stevens and Pauli operators
 - Compare first-rank operators
 - Report first-rank Stevens failures
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `hilb2liouv()`, `pauli()`, `stevens()`.

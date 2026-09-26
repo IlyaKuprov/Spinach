@@ -1,8 +1,6 @@
 # examples/relaxation_theory/aniso_diff_test_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/aniso_diff_test_1.m`
 - Signature: `aniso_diff_test_1()`
-- Total lines: 53
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Relaxation superoperator calculation for a dipole-coupled two-spin system with a
 - Relaxation theory
 - Basis set
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `spin()`, `euler2dcm()`, `create()`, `basis()`, `relaxation()`.

@@ -1,8 +1,6 @@
 # kernel/contexts/floquet.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/contexts/floquet.m`
 - Signature: `[answer,sph_grid]=floquet(spin_system,pulse_sequence,...`
-- Total lines: 433
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Floquet magic angle spinning context. Generates a Liouvillian super- operator an
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `parfor_progr()`, `defaults()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Outputs
 
@@ -52,7 +48,3 @@ Floquet magic angle spinning context. Generates a Liouvillian super- operator an
 - parameters.rate -spinning rate in Hz. Positive numbers
 - for JEOL, negative for Varian and Bruker
 - due to different rotation directions.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `banner()`, `defaults()`, `grumble()`, `report()`, `assume()`, `hamiltonian()`, `any()`, `cellfun()`, `num2str()`, `frqoffset()`, `ismember()`, `isfield()`, `equilibrium()`, `relaxation()`, `kinetics()`, `load()`.

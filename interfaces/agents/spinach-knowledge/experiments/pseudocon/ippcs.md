@@ -1,8 +1,6 @@
 # experiments/pseudocon/ippcs.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/pseudocon/ippcs.m`
 - Signature: `[mxyz,chi,pred_pcs,s_mxyz,s_chi]=ippcs(nxyz,mguess,expt_pcs)`
-- Total lines: 119
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Fits the point electron model PCS to the experimental pseudocon- tact shift coor
 - Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -54,7 +49,3 @@ Fits the point electron model PCS to the experimental pseudocon- tact shift coor
 - in Angstroms.
 - chi -optimized magnetic susceptibility tensor in cubic
 - Angstroms.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `onCleanup()`, `optimset()`, `ppcs()`, `vec_res_sq()`, `fminunc()`, `jacobianest()`, `sum_res_sq()`, `inv()`, `iscell()`.

@@ -1,8 +1,6 @@
 # kernel/optimcon/hessreg.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/hessreg.m`
 - Signature: `[H,data]=hessreg(spin_system,H,g,data)`
-- Total lines: 101
 
 ## Purpose
 
@@ -17,8 +15,6 @@ RFO regularisation for Newton-Raphson Hessian and gradient pairs. Syntax: [H,dat
 
 - An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
 - The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -47,7 +43,3 @@ RFO regularisation for Newton-Raphson Hessian and gradient pairs. Syntax: [H,dat
 - of RFO iterations taken
 - Check consistency
 - Set shorthands
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `logical()`, `cond()`, `speye()`, `issymmetric()`, `iscolumn()`.

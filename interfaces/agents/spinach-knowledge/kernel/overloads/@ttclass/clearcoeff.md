@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/clearcoeff.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/clearcoeff.m`
 - Signature: `tt=clearcoeff(tt)`
-- Total lines: 48
 
 ## Purpose
 

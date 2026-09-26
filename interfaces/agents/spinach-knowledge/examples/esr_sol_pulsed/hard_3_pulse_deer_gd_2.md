@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/hard_3_pulse_deer_gd_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/hard_3_pulse_deer_gd_2.m`
 - Signature: `hard_3_pulse_deer_gd_2()`
-- Total lines: 91
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Gadolinium(III) DEER experiment. The calculation is done by brute- force time pr
 - Basis set
 - Spinach housekeeping
 - Probe pulse operator -bottom transition
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `sind()`, `cosd()`, `create()`, `basis()`, `pauli()`, `speye()`, `state()`, `operator()`, `powder()`, `apodisation()`, `fftshift()`, `ft_axis()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`.

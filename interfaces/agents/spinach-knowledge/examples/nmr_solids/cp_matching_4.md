@@ -1,8 +1,6 @@
 # examples/nmr_solids/cp_matching_4.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/cp_matching_4.m`
 - Signature: `cp_matching_4()`
-- Total lines: 77
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Hartmann-Hahn matching condition test for a cross-polarisation experiment betwee
 - Spinach housekeeping
 - Relevant operators
 - Power levels
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `operator()`, `state()`, `powers()`, `singlerot()`, `fid()`, `kfigure()`, `kylabel()`, `kxlabel()`.

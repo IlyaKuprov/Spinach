@@ -1,8 +1,6 @@
 # examples/extremes/phosphorus_cluster.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/extremes/phosphorus_cluster.m`
 - Signature: `phosphorus_cluster()`
-- Total lines: 112
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Phosphorus system simulation for Gerhard Hagele. Done by brute force Liouville s
 - Basis set
 - Symmetry
 - Greedy parallelisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

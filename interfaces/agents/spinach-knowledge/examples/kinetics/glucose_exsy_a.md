@@ -1,8 +1,6 @@
 # examples/kinetics/glucose_exsy_a.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/kinetics/glucose_exsy_a.m`
 - Signature: `glucose_exsy_a()`
-- Total lines: 168
 
 ## Purpose
 
@@ -32,7 +30,3 @@
 - Chemical subsystems
 - Reaction rate matrix
 - Equilibrate translocation with alpha-beta imbalance as the start
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `equilibrate()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `load()`, `rot90()`, `keep_rank()`, `kfigure()`, `scale_figure()`, `subplot()`, `plot_2d()`, `ktitle()`, `histogram()`.

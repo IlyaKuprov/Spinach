@@ -1,8 +1,6 @@
 # kernel/utilities/shift_iso.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/shift_iso.m`
 - Signature: `tensors=shift_iso(tensors,spin_numbers,new_iso)`
-- Total lines: 75
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Replaces the isotropic parts of interaction tensors with user- supplied values. 
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -48,7 +43,3 @@ Replaces the isotropic parts of interaction tensors with user- supplied values. 
 - should have the isotropic parts
 - replaced
 - new_iso -a vector containing the new isotro-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `mat2sphten()`, `spin_numbers()`, `sphten2mat()`, `new_iso()`, `iscell()`, `any()`, `cellfun()`, `all()`.

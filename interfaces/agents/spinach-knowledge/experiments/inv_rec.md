@@ -1,8 +1,6 @@
 # experiments/inv_rec.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/inv_rec.m`
 - Signature: `fids=inv_rec(spin_system,parameters,H,R,K)`
-- Total lines: 128
 
 ## Purpose
 
@@ -10,13 +8,9 @@ Inversion-recovery pulse sequence. Syntax: fids=inv_rec(spin_system,parameters,H
 
 ## Physical / mathematical content
 
-- This file belongs to the `experiments` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -51,7 +45,3 @@ Inversion-recovery pulse sequence. Syntax: fids=inv_rec(spin_system,parameters,H
 - R -relaxation superoperator, received from context function
 - K -kinetics superoperator, received from context function
 - fids -free induction decays for each delay starting from zero,
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `equilibrium()`, `state()`, `operator()`, `step()`, `evolution()`, `ismatrix()`, `all()`, `isfield()`, `iscell()`, `ischar()`, `ismember()`, `isscalar()`, `strcmp()`.

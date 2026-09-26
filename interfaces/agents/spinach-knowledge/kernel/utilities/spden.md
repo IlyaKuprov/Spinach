@@ -1,8 +1,6 @@
 # kernel/utilities/spden.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/spden.m`
 - Signature: `J=spden(L,D,omega)`
-- Total lines: 62
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Lorentzian spectral density function for rotational diffusion at the user-specif
 - The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -43,7 +38,3 @@ Lorentzian spectral density function for rotational diffusion at the user-specif
 - Get the correlation time
 - Get the spectral density
 - Consistency enforcement
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `isscalar()`.

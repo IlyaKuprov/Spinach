@@ -1,8 +1,6 @@
 # examples/quantum_tech/circuit_qed/cavity_fock_grape_a.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/circuit_qed/cavity_fock_grape_a.m`
 - Signature: `cavity_fock_grape_a()`
-- Total lines: 127
 
 ## Purpose
 
@@ -20,7 +18,6 @@ GRAPE preparation of a cavity Fock state through a dispersively coupled qubit, u
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file also defines local helper function(s): `pulse_fidelity()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -36,7 +33,3 @@ GRAPE preparation of a cavity Fock state through a dispersively coupled qubit, u
 - Model and parameters from the bosonic GRAPE example of the para-
 - qeet package.
 - Calculation time: minutes
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `state()`, `optimcon()`, `fmaxnewton()`, `fids()`, `pulse_fidelity()`, `num2str()`, `kfigure()`, `bar()`, `set()`, `kylabel()`, `ktitle()`.

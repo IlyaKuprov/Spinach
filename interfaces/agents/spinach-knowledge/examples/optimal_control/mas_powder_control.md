@@ -1,8 +1,6 @@
 # examples/optimal_control/mas_powder_control.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/mas_powder_control.m`
 - Signature: `mas_powder_control()`
-- Total lines: 106
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Optimal control pulse starting with Lz and populating the Ly state on 87Rb in a 
 - Drift Liouvillians and classical subspace dimension for the ensemble
 - Initial state -Lz
 - Target state -Ly
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `drifts()`, `state()`, `operator()`, `speye()`, `optimcon()`, `fmaxnewton()`, `shaped_pulse_xy()`, `fid()`, `num2str()`.

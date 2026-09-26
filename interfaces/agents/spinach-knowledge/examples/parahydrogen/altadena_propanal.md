@@ -1,8 +1,6 @@
 # examples/parahydrogen/altadena_propanal.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/parahydrogen/altadena_propanal.m`
 - Signature: `altadena_propanal()`
-- Total lines: 68
 
 ## Purpose
 
@@ -31,7 +29,3 @@ ALTADENA experiment simulation for the parahydrogenation of acrolein into propan
 - Basis set
 - Spinach housekeeping
 - Sequence parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

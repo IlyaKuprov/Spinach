@@ -1,8 +1,6 @@
 # kernel/utilities/sim2liouv.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/sim2liouv.m`
 - Signature: `[spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K)`
-- Total lines: 190
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Moves a zeeman-hilb simulation context into Liouville space. When the formalism 
 
 ## Numerical / algorithmic content
 
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 - The unit state exemption is the symmetric projection `R=R-U*(U'*R)-(R*U)*U'+U*(U'*R*U)*U'` with `U=unit_state(spin_system)` taken after the formalism switch, i.e. the normalised stretched unit matrix; it is exact for any relaxation matrix, scalar or not, and leaves R Hermitian when R is Hermitian.
 - With symmetry, the migrated irrep table has `n_irreps^2-n_irreps+1` entries: the first holds all diagonal irrep pairs `kron(conj(S(n)),S(n))` side by side (dimension is the sum of the squared irrep dimensions), the rest are the off-diagonal pairs. The unit state lives entirely in the first entry, so the projection does not leak between reduction blocks, and population contrasts between irreps are damped exactly as in the native zeeman-liouv damp operator.
 
@@ -83,7 +79,3 @@ Moves a zeeman-hilb simulation context into Liouville space. When the formalism 
 - inputs. Syntax:
 - [spin_system,parameters,H,R,K]=...
 - sim2liouv(spin_system,parameters,H,R,K)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `strcmp()`, `report()`, `hilb2liouv()`, `isfield()`, `ls_irreps()`, `conj()`, `hs_irreps()`, `numel()`, `num2str()`, `unit_state()`, `isempty()`, `ismember()`, `isstruct()`.

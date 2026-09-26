@@ -1,8 +1,6 @@
 # kernel/utilities/herm_spline.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/herm_spline.m`
 - Signature: `y=herm_spline(f0,df0,f1,df1,x)`
-- Total lines: 115
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Cubic Hermite spline on [0,1] interval from values and deriva- tives at the inte
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -52,7 +47,3 @@ Cubic Hermite spline on [0,1] interval from values and deriva- tives at the inte
 - x -query point(s) inside [0,1] interval,
 - Function values and derivatives can be scalars (in which case
 - the same spline is evaluated at all query points) or arrays of
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `isscalar()`, `df0()`, `df1()`, `any()`, `all()`.

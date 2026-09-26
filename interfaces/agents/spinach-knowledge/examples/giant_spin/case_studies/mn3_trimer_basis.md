@@ -1,8 +1,6 @@
 # examples/giant_spin/case_studies/mn3_trimer_basis.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/case_studies/mn3_trimer_basis.m`
 - Signature: `[P,msz]=mn3_trimer_basis(spin_system,nstates)`
-- Total lines: 72
 
 ## Purpose
 

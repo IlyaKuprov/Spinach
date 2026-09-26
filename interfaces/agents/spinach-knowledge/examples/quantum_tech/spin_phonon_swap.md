@@ -1,8 +1,6 @@
 # examples/quantum_tech/spin_phonon_swap.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/spin_phonon_swap.m`
 - Signature: `spin_phonon_swap()`
-- Total lines: 64
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Resonant excitation swap between an electron spin and a quantised phonon mode. T
 - Spinach housekeeping
 - Sequence parameters
 - Trajectory, 'cavity' is the set that keeps spin-mode exchange
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `device()`, `cellfun()`, `hdot()`, `kfigure()`, `ylim()`, `kxlabel()`, `kylabel()`, `ktitle()`, `klegend()`.

@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/hyscore_nitroxide_powder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/hyscore_nitroxide_powder.m`
 - Signature: `hyscore_nitroxide_powder()`
-- Total lines: 65
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Powder-averaged HYSCORE on a 14N nitroxide radical. Time-domain simulation in Li
 - Simulation
 - Centre signal suppression
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `state()`, `powder()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

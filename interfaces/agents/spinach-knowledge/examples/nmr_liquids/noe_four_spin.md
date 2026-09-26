@@ -1,8 +1,6 @@
 # examples/nmr_liquids/noe_four_spin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/noe_four_spin.m`
 - Signature: `noe_four_spin()`
-- Total lines: 84
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Inversion-recovery NOE effect spectrum on a simple four-spin system, with the ri
 - Spinach housekeeping
 - Build the relaxation superoperator
 - Get thermal equilibrium state
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `equilibrium()`, `hamiltonian()`, `assume()`, `state()`, `evolution()`, `operator()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`, `scale_figure()`, `xlim()`.

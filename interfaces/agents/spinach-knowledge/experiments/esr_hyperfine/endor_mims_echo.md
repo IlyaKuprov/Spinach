@@ -1,8 +1,6 @@
 # experiments/esr_hyperfine/endor_mims_echo.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/esr_hyperfine/endor_mims_echo.m`
 - Signature: `stim_echo=endor_mims_echo(spin_system,parameters,H,R,K)`
-- Total lines: 145
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Stimulated echo diagnostics for the Mims ENDOR sequence. Syntax: stim_echo=endor
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -64,7 +60,3 @@ Stimulated echo diagnostics for the Mims ENDOR sequence. Syntax: stim_echo=endor
 - parameters.tau -the delay between the first two
 - 90-degree pulses of the Mims
 - ENDOR sequence, seconds; 200e-9
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `sim2liouv()`, `grumble()`, `operator()`, `state()`, `step()`, `evolution()`, `ismatrix()`, `all()`, `ismember()`, `isfield()`, `iscell()`, `ischar()`, `isscalar()`, `isrow()`, `any()`.

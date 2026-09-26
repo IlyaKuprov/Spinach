@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/top_q_nutation_ensemble_b1_r.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/top_q_nutation_ensemble_b1_r.m`
 - Signature: `top_q_nutation_ensemble_b1_r()`
-- Total lines: 131
 
 ## Purpose
 
@@ -15,7 +13,6 @@ Simulation of nutation frequency dependence of TOP DNP field profiles in the ste
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file also defines local helper function(s): `top_field_profile_b1_r()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -31,7 +28,3 @@ Simulation of nutation frequency dependence of TOP DNP field profiles in the ste
 - Electron and proton
 - Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
 - Spin temperature
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `kfigure()`, `kxlabel()`, `kylabel()`, `kzlabel()`, `view()`, `xlim()`, `ylim()`, `zlim()`, `set()`, `top_field_profile_b1_r()`, `savefig()`, `gaussleg()`, `r1n_dnp()`, `create()`, `basis()`, `state()`.

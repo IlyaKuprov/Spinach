@@ -1,8 +1,6 @@
 # examples/relaxation_theory/sle_solid_limit.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/sle_solid_limit.m`
 - Signature: `sle_solid_limit()`
-- Total lines: 73
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Solid limit of Stochastic Liouville equation formalism. Calculation time: hours
 - Ranks and correlation times
 - Start a figure
 - Loop over correlation times
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gauss2mhz()`, `create()`, `basis()`, `state()`, `kfigure()`, `scale_figure()`, `ranks()`, `tau_c()`, `gridfree()`, `subplot()`, `plot_1d()`, `ktitle()`, `num2str()`, `log10()`, `kxlabel()`.

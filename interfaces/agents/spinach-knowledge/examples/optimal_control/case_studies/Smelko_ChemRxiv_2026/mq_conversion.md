@@ -1,8 +1,6 @@
 # examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mq_conversion.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mq_conversion.m`
 - Signature: `mq_conversion()`
-- Total lines: 110
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Optimal control design of the multiple-quantum conversion pulse of the z-filtere
 - three rotor periods (240 us) long in 0.5 us slices, the controls
 - are Cartesian, and the 100 kHz amplitude ceiling is enforced by
 - a spillout penalty followed by clipping. The initial state is the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `spin()`, `eeqq2nqi()`, `create()`, `basis()`, `assume()`, `mqmas_drifts()`, `operator()`, `randi()`, `optimcon()`, `fmaxnewton()`, `cartesian2polar()`, `polar2cartesian()`, `grape_xy()`.

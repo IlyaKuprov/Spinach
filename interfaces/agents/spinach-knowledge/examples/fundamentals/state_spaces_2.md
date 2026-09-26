@@ -1,8 +1,6 @@
 # examples/fundamentals/state_spaces_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/state_spaces_2.m`
 - Signature: `state_spaces_2()`
-- Total lines: 116
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Contributions from different orders of spin correlation to the system trajectory
 - Magnet induction
 - Isotopes
 - Chemical shifts
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `false()`, `create()`, `basis()`, `state()`, `hamiltonian()`, `assume()`, `evolution()`, `kfigure()`, `trajan()`, `ylim()`, `set()`.

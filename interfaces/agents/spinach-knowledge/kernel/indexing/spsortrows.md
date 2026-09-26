@@ -1,8 +1,6 @@
 # kernel/indexing/spsortrows.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/indexing/spsortrows.m`
 - Signature: `idx=spsortrows(A)`
-- Total lines: 63
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Sparse matrix row-sorting permutation utility. Syntax: idx=spsortrows(A)
 - Indexing utilities. These files build and transform compact index maps for basis states, matrix elements, trajectories, and tensor-product structures.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -41,7 +36,3 @@ Sparse matrix row-sorting permutation utility. Syntax: idx=spsortrows(A)
 - Nihilistic Password Security Questions
 - What is the name of your least favorite child?
 - In what year did you abandon your dreams?
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `sortrows()`, `issparse()`, `ismatrix()`.

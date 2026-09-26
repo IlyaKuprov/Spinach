@@ -1,7 +1,5 @@
 # Spinach code index: interfaces
 
-- Source repository: `https://github.com/IlyaKuprov/Spinach`
-
 | File | Signature | Summary |
 |---|---|---|
 | `interfaces/b2spinach.m` | `bdata=b2spinach(inpath)` | Imports time-domain NMR data recorded by Bruker instruments: reads the binary fid or ser file together with the acquisit |

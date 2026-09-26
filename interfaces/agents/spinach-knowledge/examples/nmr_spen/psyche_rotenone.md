@@ -1,8 +1,6 @@
 # examples/nmr_spen/psyche_rotenone.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_spen/psyche_rotenone.m`
 - Signature: `psyche_rotenone()`
-- Total lines: 123
 
 ## Purpose
 
@@ -31,7 +29,3 @@ PSYCHE pure-shift NMR spectrum of rotenone. Calculation time: hours, faster on a
 - Saltire chirp parameters
 - Coherent evolution timesteps
 - Sample parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `imaging()`, `fid()`, `fidps()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `subplot()`, `plot_2d()`, `plot_1d()`.

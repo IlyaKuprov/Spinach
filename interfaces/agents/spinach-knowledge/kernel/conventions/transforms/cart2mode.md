@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/cart2mode.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/cart2mode.m`
 - Signature: `mode_derivs=cart2mode(cart_derivs,eigvecs,masses,frqs)`
-- Total lines: 131
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Converts Cartesian derivatives of spin Hamiltonian parameters, as produced by el
 - Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -66,7 +61,3 @@ Converts Cartesian derivatives of spin Hamiltonian parameters, as produced by el
 - mode_derivs=cart2mode(cart_derivs,eigvecs,masses,frqs)
 - cart_derivs -first derivatives of an interaction with
 - respect to Cartesian displacements, in Hz
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `ndims()`, `scales()`, `any()`, `three()`, `four()`, `iscolumn()`, `isscalar()`, `isequal()`.

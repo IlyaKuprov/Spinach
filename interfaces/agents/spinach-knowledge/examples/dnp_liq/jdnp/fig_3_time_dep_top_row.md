@@ -1,8 +1,6 @@
 # examples/dnp_liq/jdnp/fig_3_time_dep_top_row.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/jdnp/fig_3_time_dep_top_row.m`
 - Signature: `fig_3_time_dep_top_row()`
-- Total lines: 87
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A demonstration that the JDNP effect vanishes when the second electron is remove
 - Magnetic field grid, Tesla
 - Get a figure going
 - Loop over the fields
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `system_specification()`, `rmfield()`, `kfigure()`, `scale_figure()`, `field_grid()`, `g2freq()`, `create()`, `basis()`, `operator()`, `equilibrium()`, `hamiltonian()`, `assume()`, `relaxation()`, `state()`, `evolution()`, `subplot()`.

@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/relaxation_nitroxide.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/relaxation_nitroxide.m`
 - Signature: `relaxation_nitroxide()`
-- Total lines: 60
 
 ## Purpose
 
@@ -32,7 +30,3 @@ W-band pulse-acquire FFT ESR spectrum of a nitroxide radical, using explicit tim
 - Spinach housekeeping
 - Sequence parameters
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

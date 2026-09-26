@@ -1,8 +1,6 @@
 # kernel/utilities/xyz2hfc.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/xyz2hfc.m`
 - Signature: `A=xyz2hfc(exyz,nxyz,isotope)`
-- Total lines: 80
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Converts point electron and nuclear coordinates into a hyper- fine interaction t
 - The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -50,7 +45,3 @@ Converts point electron and nuclear coordinates into a hyper- fine interaction t
 - they do not depend on the electron g-tensor.
 - Note: the tensor returned is the one that enters the spin
 - Hamiltonian as S*A*I; it does not scale with the num-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `spin()`, `isequal()`, `ischar()`.

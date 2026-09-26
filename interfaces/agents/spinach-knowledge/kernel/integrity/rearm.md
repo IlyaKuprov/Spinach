@@ -1,8 +1,6 @@
 # kernel/integrity/rearm.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/integrity/rearm.m`
 - Signature: `rearm()`
-- Total lines: 68
 
 ## Purpose
 
@@ -28,7 +26,3 @@ Rearms the sniffer database. The sniffer checks Spinach distribution .m files fo
 - List exceptions
 - Get the directory trees
 - Get the table going
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `mfilename()`, `dir()`, `ismember()`, `fopen()`, `textscan()`, `fclose()`, `md5_hash()`, `delete()`, `save()`.

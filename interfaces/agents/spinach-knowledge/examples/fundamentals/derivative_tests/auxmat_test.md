@@ -1,8 +1,6 @@
 # examples/fundamentals/derivative_tests/auxmat_test.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/derivative_tests/auxmat_test.m`
 - Signature: `auxmat_test()`
-- Total lines: 61
 
 ## Purpose
 
@@ -27,7 +25,3 @@ Testing IK's favourite equation numerically -auxiliary matrix expression against
 - First parameter
 - Second parameter
 - Third parameter
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `randi()`, `dL_da()`, `dL_db()`, `dL_dc()`.

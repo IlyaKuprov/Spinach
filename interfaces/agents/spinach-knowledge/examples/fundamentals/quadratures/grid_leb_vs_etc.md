@@ -1,8 +1,6 @@
 # examples/fundamentals/quadratures/grid_leb_vs_etc.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/quadratures/grid_leb_vs_etc.m`
 - Signature: `grid_leb_vs_etc()`
-- Total lines: 68
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Heuristic vs Lebedev spherical quadrature bake-off, illus- trating the fact that
 - Evaluate SOPHE grid with Voronoi weights
 - Plot the profiles
 - Residual cosmetics
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `grid_test()`, `repulsion()`, `voronoisphere()`, `grid_fibon()`, `grid_igloo()`, `grid_trian()`, `kfigure()`, `ylim()`, `set()`, `xlim()`, `kxlabel()`, `kylabel()`, `klegend()`, `scale_figure()`.

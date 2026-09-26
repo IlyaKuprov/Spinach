@@ -1,8 +1,6 @@
 # examples/nmr_liquids/mqs_propanol.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/mqs_propanol.m`
 - Signature: `mqs_propanol()`
-- Total lines: 101
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Multiple-quantum NMR experiment for a propanol spin system. Calculation time: se
 - Spinach housekeeping
 - Initial and detection states
 - Sequence parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `kfigure()`, `scale_figure()`, `tau_max()`, `liquid()`, `apodisation()`, `fftshift()`, `fft2()`, `subplot()`, `plot_2d()`, `num2str()`.

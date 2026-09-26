@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/top_q_con_time_single.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/top_q_con_time_single.m`
 - Signature: `top_q_con_time_single()`
-- Total lines: 111
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simulation of TOP DNP contact time dependence in the steady state. Calculation t
 - Relaxation rates, distance and ori. dep. R1n
 - Basis set
 - Propagator accuracy
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cell2mat()`, `xyz()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `loop_counts()`, `dnp_a()`, `powder()`, `dnp_b()`, `kfigure()`, `kylabel()`, `klegend()`, `kxlabel()`, `savefig()`.

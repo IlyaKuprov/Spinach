@@ -17,7 +17,7 @@ Finds a local maximum of a function of several variables using Newton and quasi-
 
 ## Numerical / algorithmic content
 
-- All four methods check the initial assembled gradient on unfrozen coordinates before constructing a search direction. A norm below `1e-6` is rejected with the poor-initial-guess diagnostic, before any Hessian regularisation or solve. Terminal objectives without trajectory penalties also require a primary fidelity magnitude of at least `1e-6`; trajectory objectives retain their small-fidelity exemption. These are optimiser-level checks, not restrictions on individual GRAPE contributions.
+- All four methods check the initial assembled gradient on unfrozen coordinates before constructing a search direction. A norm below `1e-6` is rejected with the poor-initial-guess diagnostic, before any Hessian regularisation or solve. Terminal objectives without trajectory penalties also require the first returned objective channel to have magnitude at least `1e-6`; trajectory objectives retain their small-fidelity exemption. For `grape_coop`, this first channel includes the squared-impurity penalty: an otherwise optimisable cancellation can be rejected even when primary transfer and gradient are nonzero. The limitation also occurs on the unchanged `main` implementation. These are optimiser-level checks, not restrictions on individual GRAPE contributions.
 - Newton and Goodwin request an objective, gradient, and Hessian every iteration. LBFGS and RBFGS request the initial objective and gradient, then reuse line-search gradients. The initial checks use these existing evaluations. With `max_iter=0`, only the objective is evaluated and the initial-guess guard is not applied.
 - The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
@@ -42,22 +42,3 @@ Finds a local maximum of a function of several variables using Newton and quasi-
 - data.x_shape -output of size(guess)
 - data.* -further fields may be set by the
 - objective functon
-
-## Implementation structure
-
-- Finds a local maximum of a function of several variables using Newton
-- and quasi-Newton algorithms. Syntax:
-- [x,data]=fmaxnewton(spin_system,cost_function,guess)
-- spin_system -Spinach data object that has been
-- through optimcon.m function
-- cost_function -a function handle that takes the input
-- the size of guess
-- guess -the initial point of the optimisation
-- x -the final point of the optimisation
-- data.count.iter -iteration counter
-- data.count.fx -function evaluation counter
-- data.count.gfx -gradient evaluation counter
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `isfield()`, `exist()`, `report()`, `load()`, `guess()`, `all()`, `int2str()`, `false()`, `header()`, `VideoWriter()`, `open()`, `objeval()`, `dx_hist()`, `dg_hist()`, `strcmp()`.

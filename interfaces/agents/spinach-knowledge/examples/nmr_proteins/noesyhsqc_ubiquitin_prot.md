@@ -1,8 +1,6 @@
 # examples/nmr_proteins/noesyhsqc_ubiquitin_prot.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/noesyhsqc_ubiquitin_prot.m`
 - Signature: `noesyhsqc_ubiquitin_prot()`
-- Total lines: 94
 
 ## Purpose
 
@@ -32,7 +30,3 @@
 - Algorithmic options
 - Create the spin system structure
 - Kill carbons
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `protein()`, `create()`, `kill_spin()`, `strcmp()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `plot_3d()`.

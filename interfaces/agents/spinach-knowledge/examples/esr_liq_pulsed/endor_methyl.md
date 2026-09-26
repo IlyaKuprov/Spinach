@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/endor_methyl.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/endor_methyl.m`
 - Signature: `endor_methyl()`
-- Total lines: 53
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Mims ENDOR spectrum of a methyl radical in liquid state. Magnetic parameters tak
 - Crude apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

@@ -1,8 +1,6 @@
 # examples/nmr_spen/psycosy_dbpa.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_spen/psycosy_dbpa.m`
 - Signature: `psycosy_dbpa()`
-- Total lines: 90
 
 ## Purpose
 
@@ -31,7 +29,3 @@ PSYCOSY of DBPA (dibromopropionic acid) ring. Calculation time: minutes on NVidi
 - Diffusion and flow
 - Relaxation phantom
 - Initial and detection state phantoms
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `state()`, `imaging()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

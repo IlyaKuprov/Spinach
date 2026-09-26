@@ -1,8 +1,6 @@
 # examples/kinetics/nonlinear/diels_alder_spec.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/kinetics/nonlinear/diels_alder_spec.m`
 - Signature: `diels_alder_spec()`
-- Total lines: 265
 
 ## Purpose
 
@@ -36,7 +34,3 @@ Repeated pulse-acquire experiment during the Diels-Alder cyclo- addition of acet
 - Merge the spin systems
 - Magnet field
 - Greedy parallelisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gparse()`, `g2spinach()`, `kfigure()`, `scale_figure()`, `subplot()`, `cst_display()`, `camorbit()`, `ktitle()`, `num2cell()`, `merge_inp()`, `create()`, `basis()`, `conc_traj()`, `step()`, `kxlabel()`, `kylabel()`.

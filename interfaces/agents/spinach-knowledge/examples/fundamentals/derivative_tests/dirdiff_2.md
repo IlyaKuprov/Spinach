@@ -1,8 +1,6 @@
 # examples/fundamentals/derivative_tests/dirdiff_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/derivative_tests/dirdiff_2.m`
 - Signature: `dirdiff_2()`
-- Total lines: 56
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Test of matrix exponential differentiation of second order Magnus product quadra
 - A reasonable time step estimate
 - Reasonable controls
 - Get analytical derivatives
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `dirdiff_test_system()`, `trapdiff()`, `eps()`.

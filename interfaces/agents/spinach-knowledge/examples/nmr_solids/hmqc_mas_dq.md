@@ -1,8 +1,6 @@
 # examples/nmr_solids/hmqc_mas_dq.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/hmqc_mas_dq.m`
 - Signature: `hmqc_mas_dq()`
-- Total lines: 74
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Powder magic angle spinning CN2D experiment (rotor-synchronized de- tection) on 
 - Spinach housekeeping
 - Experiment setup
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

@@ -1,8 +1,6 @@
 # examples/nmr_liquids/roesy_strychnine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/roesy_strychnine.m`
 - Signature: `roesy_strychnine()`
-- Total lines: 69
 
 ## Purpose
 
@@ -34,7 +32,3 @@ ROESY spectrum of strychnine. Calculation time: minutes
 - Simulation
 - Apodisation
 - F2 Fourier transform
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strychnine()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

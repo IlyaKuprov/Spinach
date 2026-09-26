@@ -1,8 +1,6 @@
 # examples/giant_spin/case_studies/mn3_trimer_levels.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/case_studies/mn3_trimer_levels.m`
 - Signature: `mn3_trimer_levels()`
-- Total lines: 85
 
 ## Purpose
 

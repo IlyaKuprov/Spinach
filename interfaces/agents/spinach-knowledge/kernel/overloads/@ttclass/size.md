@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/size.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/size.m`
 - Signature: `varargout=size(tt,dim)`
-- Total lines: 61
 
 ## Purpose
 
@@ -39,7 +37,3 @@ Returns the size of the matrix represented by a tensor train. The output mimics 
 - Compose the answer
 - Check for infinities
 - Will fluorine ever have practical applications? It is very
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cellfun()`, `elseif()`, `any()`.

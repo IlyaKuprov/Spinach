@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/endor_benzoquinone.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/endor_benzoquinone.m`
 - Signature: `endor_benzoquinone()`
-- Total lines: 57
 
 ## Purpose
 
@@ -31,7 +29,3 @@ CW ENDOR on 2-methoxy-1,4-benzoquinone radical in liquid state. Set to reproduce
 - Crude apodization
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `mt2hz()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

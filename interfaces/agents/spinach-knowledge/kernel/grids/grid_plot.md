@@ -1,8 +1,6 @@
 # kernel/grids/grid_plot.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/grids/grid_plot.m`
 - Signature: `grid_plot(x,y,z,vorn,c,options)`
-- Total lines: 126
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Spherical quadrature grid plotter. Takes a cloud of points on a sphere and plots
 ## Numerical / algorithmic content
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -50,7 +46,3 @@ Spherical quadrature grid plotter. Takes a cloud of points on a sphere and plots
 - provided, it will be computed
 - options.dots -the default (true) puts black
 - dots at centres of tessellati-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `voronoisphere()`, `isfield()`, `grumble()`, `plot3()`, `xlim()`, `ylim()`, `zlim()`, `ischar()`, `patch()`, `campos()`, `xticks()`, `yticks()`, `zticks()`, `any()`, `iscolumn()`.

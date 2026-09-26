@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/spa_gd_dota_powder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/spa_gd_dota_powder.m`
 - Signature: `spa_gd_dota_powder()`
-- Total lines: 83
 
 ## Purpose
 
@@ -32,7 +30,3 @@ A soft pulse simulation for a gadolinium ion. The soft pulse is simulated using 
 - Get the figure going
 - Loop over ZFS distribution
 - Spin system parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `zfs_sampling()`, `kfigure()`, `zfs2mat()`, `create()`, `basis()`, `state()`, `powder()`, `apodisation()`, `fftshift()`, `plot_1d()`.

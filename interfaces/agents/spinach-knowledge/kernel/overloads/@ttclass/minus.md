@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/minus.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/minus.m`
 - Signature: `a=minus(a,b)`
-- Total lines: 50
 
 ## Purpose
 
@@ -37,7 +35,3 @@ Tensor train subtraction operation. Does not perform the actual subtraction but 
 - Filter out zero coeff
 - Meraki (Greek, n.) -the soul, creativity or love put into something;
 - the essence of yourself that is put into your work.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `elseif()`, `all()`, `sizes()`, `unit_like()`.

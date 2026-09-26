@@ -1,8 +1,6 @@
 # examples/fundamentals/paramag_test.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/paramag_test.m`
 - Signature: `paramag_test()`
-- Total lines: 32
 
 ## Purpose
 
@@ -19,7 +17,3 @@ Paramagnetic chemical shift module tests.
 - Paramagnetic chemical shift module tests.
 - xyz2pms against ppcs
 - xyz2hfc + hfc2pms against xyz2pms
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `ppcs()`, `xyz2pms()`, `xyz2hfc()`, `hfc2pms()`.

@@ -1,8 +1,6 @@
 # kernel/cache/sle_operators.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/cache/sle_operators.m`
 - Signature: `[Lx,Ly,Lz,D,space_basis]=sle_operators(max_rank,int_ranks)`
-- Total lines: 347
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Wigner D function basis set and rotation generators required by the SLE module. 
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `clebsch_gordan_bypass()`, `clebsch_gordan_general()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -62,7 +58,3 @@ Wigner D function basis set and rotation generators required by the SLE module. 
 - [L M N] format, giving indices of
 - each Wigner function in the basis.
 - Lx,Ly,Lz -representations of lab space rotation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `mfilename()`, `own_path()`, `num2str()`, `exist()`, `load()`, `space_basis()`, `source_states()`, `destin_states()`, `spdiags()`, `clear()`, `destinations()`, `sources()`, `clebsch_gordan_bypass()`, `clebsch_gordan_general()`, `save()`.

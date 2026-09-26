@@ -1,8 +1,6 @@
 # examples/benchmarks/parallelization_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/benchmarks/parallelization_2.m`
 - Signature: `parallelization_2()`
-- Total lines: 47
 
 ## Purpose
 
@@ -29,7 +27,3 @@ Parallelization test: multi-threaded evaluation of observables in Hilbert space 
 - Hamiltonian operator
 - Initial state
 - Parallel propagation benchmark, 200 steps
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `assume()`, `hamiltonian()`, `orientation()`, `operator()`, `ncores()`, `feature()`, `delete()`, `gcp()`, `parpool()`, `pause()`, `evolution()`, `num2str()`.

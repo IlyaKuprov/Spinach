@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/amensum.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/amensum.m`
 - Signature: `y=amensum(x,tol,opts)`
-- Total lines: 388
 
 ## Purpose
 
@@ -13,8 +11,6 @@ Sums buffered tensor trains in a single tensor train using AMEn algorithm. Synta
 - Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
 
 ## Numerical / algorithmic content
-
-- The file also defines local helper function(s): `local_cp_to_tt()`, `step_tt_by_cp()`, `step_tt_by_tt()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -45,7 +41,3 @@ Sums buffered tensor trains in a single tensor train using AMEn algorithm. Synta
 - opts.verb -verbosity switch
 - y -ttclass with a single tensor train, such
 - that |x-y|<tol*|x| in Frobenius norm
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `isfield()`, `all()`, `ttort()`, `step_tt_by_cp()`, `step_tt_by_tt()`, `nrm()`, `local_cp_to_tt()`, `ynew()`, `frob_chop()`, `znew()`, `enrichment()`, `ynew_enrich()`, `revert()`.

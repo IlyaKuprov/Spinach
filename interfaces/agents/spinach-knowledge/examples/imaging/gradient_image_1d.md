@@ -1,8 +1,6 @@
 # examples/imaging/gradient_image_1d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/gradient_image_1d.m`
 - Signature: `gradient_image_1d()`
-- Total lines: 78
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Basis set
 - Spinach housekeeping
 - Sequence parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `state()`, `imaging()`, `apodisation()`, `fftshift()`, `ifftshift()`, `kfigure()`, `plot_1d()`.

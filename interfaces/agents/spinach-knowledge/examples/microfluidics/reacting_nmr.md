@@ -1,8 +1,6 @@
 # examples/microfluidics/reacting_nmr.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/microfluidics/reacting_nmr.m`
 - Signature: `reacting_nmr()`
-- Total lines: 213
 
 ## Purpose
 
@@ -36,7 +34,3 @@ Non-linear reaction kinetics in combination with spin evolution (repeated pulse-
 - Kinetic time grid, 20 seconds
 - Preallocate concentration trajectory
 - Initial concentrations, mol/L
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `dac_reaction()`, `create()`, `basis()`, `chem_traj()`, `step()`, `kfigure()`, `kxlabel()`, `kylabel()`, `klegend()`, `griddedInterpolant()`, `react_gen()`, `state()`, `levelpop()`, `report()`, `int2str()`, `chem_time_grid()`.

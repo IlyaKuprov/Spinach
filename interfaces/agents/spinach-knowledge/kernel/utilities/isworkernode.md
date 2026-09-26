@@ -1,8 +1,6 @@
 # kernel/utilities/isworkernode.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/isworkernode.m`
 - Signature: `answer=isworkernode()`
-- Total lines: 33
 
 ## Purpose
 

@@ -1,8 +1,6 @@
 # examples/optimal_control/case_studies/Tosner_JMR_2009/bb_inversion_pulse.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/case_studies/Tosner_JMR_2009/bb_inversion_pulse.m`
 - Signature: `bb_inversion_pulse()`
-- Total lines: 101
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Broadband inversion pulse design for liquid-state NMR. Reprodu- ces, using Spina
 - Chemical shift (ppm)
 - Basis set
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `optimcon()`, `fmaxnewton()`, `xy_profile()`, `offs_hz()`, `shaped_pulse_xy()`, `inv_eff()`, `kfigure()`, `kxlabel()`, `kylabel()`, `xlim()`.

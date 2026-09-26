@@ -1,8 +1,6 @@
 # examples/dnp_liq/odnp_liquid_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/odnp_liquid_2.m`
 - Signature: `odnp_liquid_2()`
-- Total lines: 80
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Overhauser type DNP in liquid phase at room temperature, after a perfect inversi
 - Spinach housekeeping
 - Isotropic thermal equilibrium
 - Electron control operator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `equilibrium()`, `operator()`, `step()`, `state()`, `liquid()`, `kfigure()`, `subplot()`, `answer()`, `kxlabel()`, `kylabel()`, `klegend()`.

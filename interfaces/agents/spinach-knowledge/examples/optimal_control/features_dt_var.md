@@ -1,8 +1,6 @@
 # examples/optimal_control/features_dt_var.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/features_dt_var.m`
 - Signature: `features_dt_var()`
-- Total lines: 94
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Optimal control pulse optimisation for state-to-state transfer across a scalar c
 - Scalar couplings, Hz (literature values)
 - Basis set
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `optimcon()`, `fmaxnewton()`, `mat2cell()`, `report()`, `shaped_pulse_xy()`, `rho()`, `num2str()`.

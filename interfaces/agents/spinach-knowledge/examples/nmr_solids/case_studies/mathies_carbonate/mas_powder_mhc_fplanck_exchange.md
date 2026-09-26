@@ -1,8 +1,6 @@
 # examples/nmr_solids/case_studies/mathies_carbonate/mas_powder_mhc_fplanck_exchange.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/case_studies/mathies_carbonate/mas_powder_mhc_fplanck_exchange.m`
 - Signature: `mas_powder_mhc_fplanck_exchange()`
-- Total lines: 87
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Water protons in the unit cell of monohydrocalcite, inc- luding position exchang
 - parametrisation of Huang et al. ACIE 2021
 - Get coordinates
 - Chemical kinetics endpoints
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `c2spinach()`, `ismember()`, `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

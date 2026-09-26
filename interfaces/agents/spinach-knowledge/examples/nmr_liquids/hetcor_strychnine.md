@@ -1,8 +1,6 @@
 # examples/nmr_liquids/hetcor_strychnine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/hetcor_strychnine.m`
 - Signature: `hetcor_strychnine()`
-- Total lines: 70
 
 ## Purpose
 
@@ -31,7 +29,3 @@ HETCOR spectrum of strychnine with natural content of 13C isotope. Calculation t
 - Preallocate the answer
 - Loop over isotopomers
 - Build the basis
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strychnine()`, `create()`, `dilute()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

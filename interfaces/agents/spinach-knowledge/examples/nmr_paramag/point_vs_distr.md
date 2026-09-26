@@ -1,8 +1,6 @@
 # examples/nmr_paramag/point_vs_distr.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_paramag/point_vs_distr.m`
 - Signature: `point_vs_distr()`
-- Total lines: 117
 
 ## Purpose
 
@@ -28,7 +26,3 @@ A comparison between a point model fit and a multipole model fit described in in
 - number of points in each dimension of the 3D grid
 - Grid extents
 - Get a 3D grid
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `volplot()`, `plot3()`, `euler2dcm()`, `padarray()`, `kpcs()`, `ippcs()`, `ilpcs()`, `tensor()`, `position()`, `deviation()`, `Origin()`, `kfigure()`, `kxlabel()`, `kylabel()`, `klegend()`, `points2mult()`.

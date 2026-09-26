@@ -1,8 +1,6 @@
 # kernel/grids/get_hull.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/grids/get_hull.m`
 - Signature: `[hull,edges]=get_hull(theta_angles,phi_angles)`
-- Total lines: 72
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Generates a convex hull of a two-angle grid for 2D surface plotting. Syntax: [hu
 - Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -49,7 +44,3 @@ Generates a convex hull of a two-angle grid for 2D surface plotting. Syntax: [hu
 - number of triangular facets
 - edges -a matrix of point indices of
 - dimension Nx2, where N is the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `convhull()`, `hull()`, `edges()`, `any()`.

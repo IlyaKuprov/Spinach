@@ -1,8 +1,6 @@
 # examples/imaging/press_1d_example.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/press_1d_example.m`
 - Signature: `press_1d_example()`
-- Total lines: 115
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Basis set
 - Disable path tracing
 - This needs a GPU
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `state()`, `kfigure()`, `scale_figure()`, `subplot()`, `ylim()`, `ktitle()`, `kxlabel()`, `imaging()`, `apodisation()`, `fftshift()`, `ifftshift()`, `plot_1d()`.

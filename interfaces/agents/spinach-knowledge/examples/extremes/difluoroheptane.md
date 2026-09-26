@@ -1,8 +1,6 @@
 # examples/extremes/difluoroheptane.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/extremes/difluoroheptane.m`
 - Signature: `difluoroheptane()`
-- Total lines: 122
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Basis set
 - Greedy parallelisation
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `false()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

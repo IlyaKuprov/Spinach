@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/weblab2nqi.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/weblab2nqi.m`
 - Signature: `varargout=weblab2nqi(C_q,eta_q,I,alpha,theta,phi)`
-- Total lines: 118
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Converts the Weblab one-cone model parameters (see weblab_cone.png) into NQI ten
 - Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -53,7 +48,3 @@ Converts the Weblab one-cone model parameters (see weblab_cone.png) into NQI ten
 - I -spin quantum number
 - alpha
 - theta
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `eeqq2nqi()`, `isscalar()`.

@@ -1,8 +1,6 @@
 # kernel/contexts/doublerot.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/contexts/doublerot.m`
 - Signature: `[answer,sph_grid]=doublerot(spin_system,pulse_sequence,...`
-- Total lines: 551
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Double angle spinning context. In Liouville space, this wrapper builds the Fokke
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `defaults()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Outputs
 
@@ -47,7 +43,3 @@ Double angle spinning context. In Liouville space, this wrapper builds the Fokke
 - located in the experiments directory, assumptions is a string that would
 - be passed to assume.m when the Hamiltonian is built and parameters is a
 - structure with the following subfields:
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `banner()`, `defaults()`, `grumble()`, `report()`, `assume()`, `hamiltonian()`, `frqoffset()`, `ismember()`, `isfield()`, `equilibrium()`, `num2str()`, `fourdif()`, `speye()`, `cart2sph()`, `carrier()`, `relaxation()`.

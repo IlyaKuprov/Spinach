@@ -1,8 +1,6 @@
 # examples/dnp_sol/cross_effect_field_scan_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/cross_effect_field_scan_1.m`
 - Signature: `cross_effect_field_scan_1()`
-- Total lines: 82
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Magnetic field sweep cross effect DNP experiment -steady-state proton magnetisat
 - Hyperfine couplings
 - Exchange coupling
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `powder()`, `kfigure()`, `kxlabel()`, `kylabel()`.

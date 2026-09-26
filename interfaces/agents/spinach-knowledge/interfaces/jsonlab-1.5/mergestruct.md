@@ -1,8 +1,6 @@
 # interfaces/jsonlab-1.5/mergestruct.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/jsonlab-1.5/mergestruct.m`
 - Signature: `s=mergestruct(s1,s2)`
-- Total lines: 33
 
 ## Purpose
 
@@ -27,7 +25,3 @@ No descriptive header was found. The best immediate identifier is `s=mergestruct
 - license:
 - BSD License, see LICENSE_BSD.txt files for details
 - --this function is part of jsonlab toolbox (http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `isstruct()`, `fieldnames()`, `setfield()`, `getfield()`.

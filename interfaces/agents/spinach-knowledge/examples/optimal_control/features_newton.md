@@ -1,8 +1,6 @@
 # examples/optimal_control/features_newton.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/features_newton.m`
 - Signature: `features_newton()`
-- Total lines: 106
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Optimal control pulse optimisation for state-to-state transfer across two scalar
 - Magnetic field
 - Spin system
 - Chemical shifts, ppm
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `optimcon()`, `fmaxnewton()`, `mat2cell()`, `report()`, `shaped_pulse_xy()`, `rho()`, `num2str()`.

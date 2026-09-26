@@ -1,8 +1,6 @@
 # experiments/hyperpol/xixdnp_steady.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/hyperpol/xixdnp_steady.m`
 - Signature: `dnp=xixdnp_steady(spin_system,parameters,H,R,K)`
-- Total lines: 173
 
 ## Purpose
 
@@ -17,8 +15,6 @@ TPPM DNP and its special case X-inverse-X (XiX) DNP experiment from (https://doi
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -62,7 +58,3 @@ TPPM DNP and its special case X-inverse-X (XiX) DNP experiment from (https://doi
 - K -kinetics superoperator, received
 - from context function
 - parameters.irr_powers -microwave amplitude (aka electron
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `operator()`, `propagator()`, `clean_up()`, `ismember()`, `gpuArray()`, `ppower()`, `gather()`, `steady()`, `dnp()`, `ismatrix()`, `isfield()`, `isscalar()`.

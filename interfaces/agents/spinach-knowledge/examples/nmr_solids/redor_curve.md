@@ -1,8 +1,6 @@
 # examples/nmr_solids/redor_curve.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/redor_curve.m`
 - Signature: `redor_curve()`
-- Total lines: 54
 
 ## Purpose
 
@@ -31,7 +29,3 @@ REDOR dephasing curve for a simple 13C-15N spin pair using Fokker-Planck MAS for
 - Simulation
 - Normalised REDOR difference
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `singlerot()`, `curve()`, `kfigure()`, `kxlabel()`, `kylabel()`.

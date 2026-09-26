@@ -1,8 +1,6 @@
 # examples/nmr_overtone/mas_boron_3.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_overtone/mas_boron_3.m`
 - Signature: `mas_boron_3()`
-- Total lines: 54
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Overtone 10B magic angle spinning NMR spectrum. The sample is spinning in the JE
 - Spinach housekeeping
 - Sequence parameters
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `state()`, `singlerot()`, `kfigure()`, `plot_1d()`.

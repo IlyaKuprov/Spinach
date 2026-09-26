@@ -1,8 +1,6 @@
 # examples/parahydrogen/case_studies/spontaneous_singlet_to_z/rlx_trajectory.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/parahydrogen/case_studies/spontaneous_singlet_to_z/rlx_trajectory.m`
 - Signature: `rlx_trajectory()`
-- Total lines: 75
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Time dependence of LzSz and Lz+Sz spin orders in a para- hydrogen molecule coord
 - Relaxation theory parameters
 - Formalism and basis
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cellfun()`, `create()`, `basis()`, `assume()`, `hamiltonian()`, `relaxation()`, `singlet()`, `state()`, `evolution()`, `kfigure()`, `kxlabel()`, `kylabel()`, `klegend()`, `scale_figure()`.

@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/nnz.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/nnz.m`
 - Signature: `answer=nnz(ttrain)`
-- Total lines: 33
 
 ## Purpose
 
@@ -35,7 +33,3 @@ Counts non-zero elements in all cores of a tensor train. Syntax: answer=nnz(ttra
 - interests of specific social classes.
 - Vladimir Lenin
 - #NGRUM
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cellfun()`.

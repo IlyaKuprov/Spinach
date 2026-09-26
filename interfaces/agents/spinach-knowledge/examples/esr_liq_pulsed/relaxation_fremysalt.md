@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/relaxation_fremysalt.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/relaxation_fremysalt.m`
 - Signature: `relaxation_fremysalt()`
-- Total lines: 72
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Pulse-acquire FFT ESR version of the EasySpin Fremy salt test file, with acknowl
 - Relaxation superoperator
 - Spinach housekeeping
 - Experiment parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

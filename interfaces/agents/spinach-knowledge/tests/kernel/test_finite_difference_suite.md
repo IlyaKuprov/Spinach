@@ -1,8 +1,6 @@
 # tests/kernel/test_finite_difference_suite.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_finite_difference_suite.m`
 - Signature: `result=test_finite_difference_suite()`
-- Total lines: 170
 
 ## Purpose
 
@@ -10,7 +8,6 @@ Tests finite-difference and spectral differentiation helpers. Syntax: result=tes
 
 ## Physical / mathematical content
 
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
 
 ## Numerical / algorithmic content
@@ -41,7 +38,3 @@ Tests finite-difference and spectral differentiation helpers. Syntax: result=tes
 - Three-point centred finite-difference weights at zero are exact and familiar
 - Five-point wall finite-difference matrix differentiates quadratics exactly on a unit grid
 - Savitzky-Golay differentiation recovers a cubic exactly on a uniform grid
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `fdweights()`, `test_close()`, `fdmat()`, `fdvec()`, `sgolaydiff()`, `test_true()`, `contains()`, `fdlap()`, `fdkup()`, `fourdif()`, `fourlap()`, `fftdiff()`, `kern()`, `pseudomodulation()`, `dirdiff()`.

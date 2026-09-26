@@ -1,8 +1,6 @@
 # kernel/summaries/summary_rlx_nott.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/summaries/summary_rlx_nott.m`
 - Signature: `summary_rlx_nott(spin_system)`
-- Total lines: 45
 
 ## Purpose
 
@@ -10,12 +8,7 @@ Prints Nottingham DNP relaxation-rate summary for a Spinach system. Syntax: summ
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -39,7 +32,3 @@ Prints Nottingham DNP relaxation-rate summary for a Spinach system. Syntax: summ
 - As a man, sometimes you have to make a choice
 - between mocking astrology and getting laid.
 - Internet wisdom
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `report()`, `num2str()`, `isstruct()`.

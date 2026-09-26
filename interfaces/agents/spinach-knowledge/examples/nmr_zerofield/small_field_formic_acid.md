@@ -1,8 +1,6 @@
 # examples/nmr_zerofield/small_field_formic_acid.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_zerofield/small_field_formic_acid.m`
 - Signature: `small_field_formic_acid()`
-- Total lines: 52
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Zero-field NMR spectroscopy -15N pyridine. Set to reproduce Fig 2 from http://dx
 - Simulation
 - Apodisation
 - Fourier transform
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

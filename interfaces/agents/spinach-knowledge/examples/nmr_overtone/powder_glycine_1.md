@@ -1,8 +1,6 @@
 # examples/nmr_overtone/powder_glycine_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_overtone/powder_glycine_1.m`
 - Signature: `powder_glycine_1()`
-- Total lines: 65
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Overtone detection 14N powder NMR spectrum of glycine, computed using Fokker-Pla
 - Spinach housekeeping
 - Magic angle
 - Spectrum setup
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `atan()`, `state()`, `operator()`, `powder()`, `kfigure()`, `plot_1d()`.

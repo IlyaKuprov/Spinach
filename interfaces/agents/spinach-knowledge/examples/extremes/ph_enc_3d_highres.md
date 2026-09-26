@@ -1,8 +1,6 @@
 # examples/extremes/ph_enc_3d_highres.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/extremes/ph_enc_3d_highres.m`
 - Signature: `ph_enc_3d_highres()`
-- Total lines: 124
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Slice selection in 3D followed by phase-encoded imaging of the resulting slice. 
 - Disable path tracing
 - This needs a GPU
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `phantoms()`, `rlx_t1_t2()`, `state()`, `pulse_shape()`, `kfigure()`, `dims()`, `volplot()`, `ktitle()`, `imaging()`, `scale_figure()`, `subplot()`, `mri_2d_plot()`, `apodisation()`, `fftshift()`.

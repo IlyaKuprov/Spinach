@@ -1,8 +1,6 @@
 # kernel/plotting/efg_display.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/plotting/efg_display.m`
 - Signature: `efg_display(props,atoms,scaling,conmatrix,options)`
-- Total lines: 308
 
 ## Purpose
 
@@ -10,13 +8,9 @@ Electric field gradient tensors and their eigensystems. Two styles are implement
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
 
 - An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -62,7 +56,3 @@ efg_display(props,atoms,scaling,conmatrix,options)
 - red axis for a positive eigenvalue, and a blue
 - axis for a negative one.
 - 3. The sphere is translated to the point of corres-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `exist()`, `isfield()`, `false()`, `true()`, `light()`, `molplot()`, `atoms()`, `iscell()`, `ismember()`, `num2str()`, `eigvals()`, `coords()`, `eigvecs()`, `plot3()`, `vector_a()`.

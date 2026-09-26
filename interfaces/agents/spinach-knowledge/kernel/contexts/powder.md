@@ -1,8 +1,6 @@
 # kernel/contexts/powder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/contexts/powder.m`
 - Signature: `[answer,sph_grid]=powder(spin_system,pulse_sequence,...`
-- Total lines: 441
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Static powder interface to pulse sequences. Generates a Liouvillian superoperato
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `parfor_progr()`, `defaults()`, `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -101,7 +97,3 @@ Static powder interface to pulse sequences. Generates a Liouvillian superoperato
 - pulse sequence works on, in the order
 - of channels, e.g. {'1H','13C'}
 - parameters.offset -a cell array giving transmitter offsets
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `banner()`, `defaults()`, `grumble()`, `report()`, `ismember()`, `hamiltonian()`, `assume()`, `equilibrium()`, `kinetics()`, `frqoffset()`, `carrier()`, `load()`, `isfield()`, `num2str()`, `afterEach()`, `ticBytes()`.

@@ -1,8 +1,6 @@
 # examples/nmr_proteins/hcch_cosy_simple.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/hcch_cosy_simple.m`
 - Signature: `hcch_cosy_simple()`
-- Total lines: 81
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - F3 Fourier transform
 - Absorption part of F3 signal
 - F2 Fourier transform
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `plot_3d()`.

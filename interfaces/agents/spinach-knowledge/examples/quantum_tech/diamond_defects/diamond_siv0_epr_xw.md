@@ -1,8 +1,6 @@
 # examples/quantum_tech/diamond_defects/diamond_siv0_epr_xw.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/diamond_defects/diamond_siv0_epr_xw.m`
 - Signature: `diamond_siv0_epr_xw()`
-- Total lines: 68
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Field-swept powder EPR spectra of SiV0 centre in diamond at X and W bands. Calcu
 - Set X-band parameters
 - Run the X-band simulation
 - Plot the X-band spectrum
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `diamond_siv0()`, `create()`, `basis()`, `fieldsweep()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`, `ktitle()`.

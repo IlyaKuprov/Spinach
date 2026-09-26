@@ -1,8 +1,6 @@
 # examples/nmr_liquids/noe_zq_beats.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/noe_zq_beats.m`
 - Signature: `noe_zq_beats()`
-- Total lines: 60
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Zero-quantum beats in the Overhauser effect in a strongly coupled two-spin syste
 - Build the Liouvillian
 - Get thermal equilibrium state
 - Start in a state with one spin inverted
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `relaxation()`, `equilibrium()`, `state()`, `evolution()`, `kfigure()`, `kxlabel()`, `kylabel()`, `klegend()`.

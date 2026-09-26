@@ -1,8 +1,6 @@
 # kernel/indexing/kq2lin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/indexing/kq2lin.m`
 - Signature: `I=kq2lin(N,K,Q,idx_base)`
-- Total lines: 104
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Converts k,q indexing of matrices into their linear serpentine indexing. In base
 - Indexing utilities. These files build and transform compact index maps for basis states, matrix elements, trajectories, and tensor-product structures.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -51,7 +46,3 @@ I=kq2lin(N,K,Q,idx_base)
 - I=kq2lin(N,K,Q,idx_base)
 - N -matrix dimension, a scalar
 - K -first index, positive integer
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `serpentine()`, `isscalar()`, `ismember()`, `any()`, `element()`.

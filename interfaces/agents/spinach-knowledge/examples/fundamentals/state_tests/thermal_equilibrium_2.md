@@ -1,8 +1,6 @@
 # examples/fundamentals/state_tests/thermal_equilibrium_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/state_tests/thermal_equilibrium_2.m`
 - Signature: `thermal_equilibrium_2()`
-- Total lines: 47
 
 ## Purpose
 
@@ -25,7 +23,3 @@ Thermal equilibrium states, using all the different formalisms supported by Spin
 - Zeeman-liouv to zeeman-hilb
 - Sphten-liouv to zeeman-hilb
 - Check the differences
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `equilibrium()`, `sphten2zeeman()`.

@@ -1,8 +1,6 @@
 # examples/esr_sol_swept/temperature_gd_dota.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_swept/temperature_gd_dota.m`
 - Signature: `temperature_gd_dota()`
-- Total lines: 67
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Powder averaged W-band field-swept ESR spectrum of Gd(III) DOTA complex. Exact d
 - Temperatures
 - Loop over temperatures
 - Set the temperature
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `kfigure()`, `scale_figure()`, `create()`, `basis()`, `fieldsweep()`, `subplot()`, `kxlabel()`, `kylabel()`, `ktitle()`, `num2str()`.

@@ -1,8 +1,6 @@
 # experiments/pseudocon/csa2racs.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/pseudocon/csa2racs.m`
 - Signature: `racs=csa2racs(csa,chi,B,T)`
-- Total lines: 76
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Calculates a high-termperature estimate of the residual aniso- tropic chemcial s
 - Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -47,7 +42,3 @@ Calculates a high-termperature estimate of the residual aniso- tropic chemcial s
 - racs -residual anisotropic chemical
 - shift in ppm
 - The function implements Equation (2) from the paper by Otting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `mat2sphten()`, `sphten2mat()`, `ismatrix()`, `any()`, `isscalar()`.

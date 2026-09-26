@@ -1,8 +1,6 @@
 # examples/nmr_paramag/carb_anh/s166c_mult.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_paramag/carb_anh/s166c_mult.m`
 - Signature: `s166c_mult()`
-- Total lines: 38
 
 ## Purpose
 
@@ -23,7 +21,3 @@ Multipolar fit for the S166C mutant dataset for human carbonic anhydrase II. The
 - Solve the inverse problem
 - Plot experimental vs predicted PCS
 - Report and save the parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `ilpcs()`, `kfigure()`, `kxlabel()`, `kylabel()`, `xlim()`, `ylim()`.

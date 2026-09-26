@@ -1,8 +1,6 @@
 # examples/dnp_sol/xix_dnp/xix_field_profile.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/xix_dnp/xix_field_profile.m`
 - Signature: `xix_field_profile()`
-- Total lines: 82
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Field profile of a XiX DNP experiment. <I_z> after a fixed contact time is calcu
 - Hush the output
 - Basis set
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `offsets()`, `powder()`, `field_prof()`, `contact_curve()`, `kfigure()`, `kylabel()`, `kxlabel()`.

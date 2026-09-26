@@ -1,8 +1,6 @@
 # examples/relaxation_theory/sle_nmr_dd_csa.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/sle_nmr_dd_csa.m`
 - Signature: `sle_nmr_dd_csa()`
-- Total lines: 82
 
 ## Purpose
 
@@ -32,7 +30,3 @@
 - SLE simulation
 - SLE plotting
 - BRW parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `gridfree()`, `kfigure()`, `subplot()`, `plot_1d()`, `ktitle()`, `kylabel()`, `liquid()`.

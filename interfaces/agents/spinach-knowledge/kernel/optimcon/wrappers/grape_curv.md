@@ -1,8 +1,6 @@
 # kernel/optimcon/wrappers/grape_curv.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/wrappers/grape_curv.m`
 - Signature: `[traj_data,fidelity,df_du]=grape_curv(waveform_u,u2x,...`
-- Total lines: 125
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Cost function for optimal control using the GRAPE algorithm. Returns fidelity an
 - The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -61,7 +56,3 @@ Cost function for optimal control using the GRAPE algorithm. Returns fidelity an
 - ents in front of the control operators
 - dx_du - a handle to a function that takes a column of curvi-
 - linear coordinates and returns the Jacobian matrix
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `waveform_x()`, `u2x()`, `waveform_u()`, `grape_xy()`, `df_du()`, `dx_du()`, `df_dx()`, `isfield()`, `optimcon()`.

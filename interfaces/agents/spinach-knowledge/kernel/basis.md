@@ -1,8 +1,6 @@
 # kernel/basis.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/basis.m`
 - Signature: `spin_system=basis(spin_system,bas)`
-- Total lines: 1018
 
 ## Purpose
 
@@ -19,7 +17,6 @@ Basis set control. This is the second mandatory function (after create.m) that m
 
 - Subgraph generation uses `dfpt` on the substance blocks of the connectivity and proximity matrices; empty, identical, and enclosed subgraphs are removed with `unique` and `prune_subgraphs` before the descriptor is built.
 - The descriptor of each subgraph is built densely in the direct product order with `repelem`/`repmat`, filtered, and embedded into the full spin index as a sparse array; duplicate states across subgraphs are removed with `unihash`, and the basis is sorted with `sortrows`, distributed for large bases.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 
 ## Parameters / inputs
 
@@ -30,7 +27,3 @@ Basis set control. This is the second mandatory function (after create.m) that m
 
 - spin_system - primary Spinach data structure, updated with the basis set and related information
 - Note: it is important to understand the factors that influence basis set selection in spin dynamics simulations - see our paper for further information on this subject.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `banner()`, `grumble()`, `cellfun()`, `summary_basis_opts()`, `report()`, `dfpt()`, `nchoosek()`, `prune_subgraphs()`, `unique()`, `lin2lm()`, `repelem()`, `sparse()`, `unihash()`, `distrib_dim()`, `sortrows()`, `summary_basis()`, `symmetry()`, `ist_product_table()`, `md5_hash()`.

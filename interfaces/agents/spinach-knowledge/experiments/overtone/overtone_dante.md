@@ -1,8 +1,6 @@
 # experiments/overtone/overtone_dante.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/overtone/overtone_dante.m`
 - Signature: `spectrum=overtone_dante(spin_system,parameters,H,R,K)`
-- Total lines: 189
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Overtone DANTE experiment with frequency-domain acquisition.
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -68,7 +64,3 @@ spectrum=overtone_dante(spin_system,parameters,H,R,K)
 - as a single-element cell array
 - parameters.spc_dim -Fokker-Planck spatial dimension
 - parameters.Lx -X Zeeman operator on the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `spin()`, `speye()`, `average()`, `propagator()`, `clean_up()`, `multiprop()`, `overtone_a()`, `ismatrix()`, `all()`, `isfield()`, `elseif()`, `iscell()`.

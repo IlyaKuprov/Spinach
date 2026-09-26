@@ -1,8 +1,6 @@
 # kernel/optimcon/ensemble.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/ensemble.m`
 - Signature: `[traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)`
-- Total lines: 192
 
 ## Purpose
 
@@ -16,8 +14,6 @@ A parallel wrapper around GRAPE that enables ensemble optimal control optimisati
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -65,7 +61,3 @@ A parallel wrapper around GRAPE that enables ensemble optimal control optimisati
 - of the system and the desired state(s). When penalty
 - methods are specified, fidelity is returned as an ar-
 - ray separating the penalties from the simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `rmfield()`, `isfield()`, `poolsize()`, `ens_block()`, `spmdCat()`, `spmdPlus()`, `ismember()`, `reshape()`, `ctrl_trajan()`, `gcp()`, `getCurrentWorker()`, `cellfun()`, `isequal()`, `strcmp()`, `ens_catalog()`.

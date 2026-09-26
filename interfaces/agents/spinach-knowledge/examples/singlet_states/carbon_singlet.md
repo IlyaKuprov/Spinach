@@ -1,8 +1,6 @@
 # examples/singlet_states/carbon_singlet.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/singlet_states/carbon_singlet.m`
 - Signature: `carbon_singlet()`
-- Total lines: 53
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Singlet relaxation rate for the two triple bond carbons in cis-dimethylbut-2-yne
 - Relaxation superoperator
 - Action on longitudinal magnetization
 - Action on a singlet state
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `state()`, `report()`, `num2str()`, `singlet()`.

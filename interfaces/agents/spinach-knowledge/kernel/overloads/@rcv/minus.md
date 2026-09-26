@@ -1,8 +1,6 @@
 # kernel/overloads/@rcv/minus.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@rcv/minus.m`
 - Signature: `A=minus(A,B)`
-- Total lines: 51
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Subtracts one RCV object from another. Syntax: A=minus(A,B)
 - RCV sparse-matrix storage utilities. The focus is data structure design for sparse linear algebra and low-overhead composition of large matrices.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -40,7 +35,3 @@ Subtracts one RCV object from another. Syntax: A=minus(A,B)
 - or so. This had meant that he had needed increasingly hands-on
 - care. Due to a terminal diagnosis the decision to put him to
 - sleep was made; that took place on Monday 11th April.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `plus()`.

@@ -1,8 +1,6 @@
 # examples/optimal_control/bloch_siegert/yusuke_14n_broadening_demo.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/bloch_siegert/yusuke_14n_broadening_demo.m`
 - Signature: `yusuke_14n_broadening_demo()`
-- Total lines: 205
 
 ## Purpose
 
@@ -13,8 +11,6 @@ Reduced effective-model illustration of the trade-off discussed by Nehra, Agarwa
 - Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
 
 ## Numerical / algorithmic content
-
-- The file also defines local helper function(s): `decoupling_profile()`, `proton_line()`, `lorentzian()`, `gaussian_weights()`, `normalise_line()`, `linewidth()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -30,7 +26,3 @@ Reduced effective-model illustration of the trade-off discussed by Nehra, Agarwa
 - more detailed Hamiltonian model for quantitative work.
 - Magnetic field corresponding to 800 MHz 1H
 - Three inequivalent 14N sites around the decoupler carrier
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `spin()`, `gaussian_weights()`, `decoupling_profile()`, `proton_line()`, `subplot()`, `xline()`, `site_offsets_hz()`, `num2str()`, `normalise_line()`, `site_weights()`, `b1_weights()`, `b1_scales()`, `lorentzian()`, `linewidth()`, `freq_axis_hz()`, `idx()`.

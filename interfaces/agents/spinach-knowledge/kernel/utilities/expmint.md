@@ -1,8 +1,6 @@
 # kernel/utilities/expmint.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/expmint.m`
 - Signature: `R=expmint(spin_system,A,B,C,T)`
-- Total lines: 91
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Computes matrix exponential integrals of the following general type: Integrate[e
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -43,7 +39,3 @@ Computes matrix exponential integrals of the following general type: Integrate[e
 - Note: the auxiliary matrix method is massively faster than either
 - commutator series or diagonalisation.
 - Note: this is the most memory-intensive stage in a lot of calcula-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `nnz()`, `spalloc()`, `spdiags()`, `clear()`, `propagator()`, `report()`, `clean_up()`, `ismatrix()`, `all()`, `ishermitian()`, `isscalar()`.

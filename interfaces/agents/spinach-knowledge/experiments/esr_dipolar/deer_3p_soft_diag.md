@@ -1,8 +1,6 @@
 # experiments/esr_dipolar/deer_3p_soft_diag.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/esr_dipolar/deer_3p_soft_diag.m`
 - Signature: `deer_3p_soft_diag(spin_system,parameters)`
-- Total lines: 272
 
 ## Purpose
 
@@ -20,8 +18,6 @@ Complete set of simulations related to three-pulse DEER. Runs pulse diagnostics,
 
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
 - A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -93,7 +89,3 @@ Complete set of simulations related to three-pulse DEER. Runs pulse diagnostics,
 - parameters.pulse_phi -initial phases for the three
 - pulses, radians
 - parameters.pulse_rnk -Fokker-Planck ranks for the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `powder()`, `apodisation()`, `fids()`, `fftshift()`, `kfigure()`, `scale_figure()`, `subplot()`, `plot_1d()`, `ktitle()`, `kylabel()`, `kxlabel()`, `deer_traces()`, `deer_echoes()`, `klegend()`, `isfield()`.

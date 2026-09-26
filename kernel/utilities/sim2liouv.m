@@ -115,6 +115,11 @@ if strcmp(spin_system.bas.formalism,'zeeman-hilb')
     % Rebuild the basis index table for the Liouville space
     spin_system.bas.basis=[repmat(zbas,[hdim 1]) kron(zbas,ones(hdim,1))];
 
+    % Refresh existing cache identity using the canonical basis hash
+    if isfield(spin_system.bas,'basis_hash')
+        spin_system.bas.basis_hash=md5_hash(spin_system.bas.basis);
+    end
+
     % Migrate the irreps into the adjoint representation
     if isfield(spin_system.bas,'irrep')
 

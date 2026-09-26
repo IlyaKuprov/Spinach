@@ -41,6 +41,9 @@ Legal `sys.disable` entries, anything else being an error: `'zte'`
 tolerances), `'polyadic'`, `'sodd'` (spin-orbit corrections to dipolar
 couplings), `'dafuq'`.
 
+`sim2liouv` refreshes existing basis cache identities after Hilbert-to-Liouville
+conversion; cached operators and Hamiltonians remain representation-specific.
+
 `sys.tols` subfields are listed and defaulted in `tolerances.m`. The two that
 change physics rather than performance are `inter_cutoff`, below which coupling
 tensors are discarded (2-norm, in Hz), and `prox_cutoff`, which bounds the

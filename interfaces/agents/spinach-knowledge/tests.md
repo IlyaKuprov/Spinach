@@ -92,6 +92,7 @@
 | `tests/kernel/test_rotor_assume.m` | `result=test_rotor_assume()` | Explicit assumptions throughout rotor-stack frame construction. |
 | `tests/kernel/test_scalar_coupling_hamiltonian.m` | `result=test_scalar_coupling_hamiltonian()` | Tests the two-spin scalar-coupling Hamiltonian. Syntax: result=test_scalar_coupling_hamiltonian() Outputs: result -regre |
 | `tests/kernel/test_shaped_pulse_rotation.m` | `result=test_shaped_pulse_rotation()` | Tests a one-slice Cartesian shaped pulse. Syntax: result=test_shaped_pulse_rotation() Outputs: result -regression test r |
+| `tests/kernel/test_sim2liouv_cache.m` | `result=test_sim2liouv_cache()` | Representation-specific caches after Hilbert-to-Liouville conversion. |
 | `tests/kernel/test_slowpass_fft_parity.m` | `result=test_slowpass_fft_parity()` | Tests slowpass amplitude normalisation against time-domain FFT. Syntax: result=test_slowpass_fft_parity() Outputs: resul |
 | `tests/kernel/test_slr_pulse.m` | `result=test_slr_pulse()` | Tests Shinnar-Le Roux selective excitation pulse design. Syntax: result=test_slr_pulse() Outputs: result -regression tes |
 | `tests/kernel/test_sparse_tensor_graph_suite.m` | `result=test_sparse_tensor_graph_suite()` | Tests sparse, tensor-product, and simple graph utilities. Syntax: result=test_sparse_tensor_graph_suite() Outputs: resul |

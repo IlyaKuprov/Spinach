@@ -1,4 +1,4 @@
-% Tests cooperative phase gradients and the primary fidelity selector.
+% Tests cooperative phase gradients and the initial gradient guard.
 % Syntax:
 %
 %                     result=test_coop_gradient()
@@ -118,17 +118,10 @@ for fixture=1:4
             result=test_close(result,[label ' objective'],fidelity(1),expected,1e-11,0,...
                               'Independent propagation must retain the requested primary measure.');
 
-            % Keep both trajectory branches and report the pre-impurity primary
-            [result,has_primary]=test_true(result,[label ' trajectory metadata'],...
-                                           numel(traj_data)==2&&iscell(traj_data{1})&&...
-                                           ~isempty(traj_data{1})&&isstruct(traj_data{1}{1})&&...
-                                           isfield(traj_data{1}{1},'primary_fid'),...
-                                           'The first trajectory must carry the primary transfer.');
-            if has_primary
-                result=test_close(result,[label ' primary transfer'],...
-                                  traj_data{1}{1}.primary_fid,mean(primary,'all'),1e-11,0,...
-                                  'The optimiser must receive transfer before impurity subtraction.');
-            end
+            % Keep both trajectory branches
+            result=test_true(result,[label ' trajectories'],...
+                             numel(traj_data)==2&&iscell(traj_data{1})&&iscell(traj_data{2}),...
+                             'The cooperative objective must return both pulse trajectories.');
 
             % Compare every phase derivative at three finite-difference increments
             for step_size=steps
@@ -228,9 +221,15 @@ for fixture=1:4
                         caught=err.message;
                     end
                     warn_text=lastwarn;
-                    result=test_true(result,sprintf('%s optimiser guard %d',label,guard_case),...
-                                     strcmp(caught,'fidelity or gradient too small at iter 1, find a better guess.')&&...
-                                     isempty(warn_text),'An unusable initial guess must fail before a singular solve.');
+                    if guard_case==1
+                        result=test_true(result,[label ' zero-value admission'],...
+                                         isempty(caught)&&isempty(warn_text),...
+                                         'A nonzero derivative must be admitted even when the value vanishes.');
+                    else
+                        result=test_true(result,[label ' zero-gradient guard'],...
+                                         strcmp(caught,'gradient too small at iter 1, find a better guess.')&&...
+                                         isempty(warn_text),'A stationary guess must fail before a singular solve.');
+                    end
                 end
 
                 % Preserve objective-only evaluation of constant objectives
@@ -270,7 +269,7 @@ for fixture=1:4
                 end
                 warn_text=lastwarn;
                 result=test_true(result,[label ' frozen gradient'],...
-                                 strcmp(caught,'fidelity or gradient too small at iter 1, find a better guess.')&&...
+                                 strcmp(caught,'gradient too small at iter 1, find a better guess.')&&...
                                  isempty(warn_text),'Only unfrozen coordinates may contribute to the initial gradient.');
             end
         end
@@ -333,23 +332,28 @@ if isempty(coop_caught)
                      'The forwarded objective must improve in a real optimiser step.');
 end
 
-% Reject a nonstationary impurity direction with no primary transfer
+% Admit a nonstationary impurity direction with no primary transfer
 zero_system=coop_system; zero_system.control.rho_targ={eye(2)};
 zero_guess=coop_guess; zero_guess(2,1)=zero_guess(2,1)+pi/4;
-[zero_traj,~,zero_gradient]=grape_coop(zero_guess,zero_system);
+[~,zero_before,zero_gradient]=grape_coop(zero_guess,zero_system);
 result=test_true(result,'zero primary cooperative fixture',...
-                 abs(zero_traj{1}{1}.primary_fid)<1e-12&&...
+                 zero_before(1)<0&&...
                  norm(zero_gradient(:,:,1),'fro')>1e-3,...
-                 'A nonzero impurity gradient must not conceal zero primary transfer.');
+                 'A nonzero impurity gradient is sufficient for optimisation.');
 zero_caught='';
 try
-    fmaxnewton(zero_system,@grape_coop,zero_guess);
+    [zero_point,zero_data]=fmaxnewton(zero_system,@grape_coop,zero_guess);
 catch err
     zero_caught=err.message;
 end
-result=test_true(result,'zero primary cooperative rejected',...
-                 strcmp(zero_caught,'fidelity or gradient too small at iter 1, find a better guess.'),...
-                 'The optimiser must retain the true primary-fidelity safeguard.');
+result=test_true(result,'zero primary cooperative admitted',isempty(zero_caught),...
+                 'The optimiser must admit a nonzero assembled gradient.');
+if isempty(zero_caught)
+    [~,zero_after]=grape_coop(zero_point,zero_system);
+    result=test_true(result,'zero primary cooperative improves',...
+                     zero_after(1)>zero_before(1)&&zero_data.count.iter==1,...
+                     'The impurity gradient must improve the cooperative objective.');
+end
 
 % Keep the assembled-gradient guard when every cooperative phase is frozen
 coop_system.control.freeze=true(size(coop_guess)); coop_caught='';
@@ -359,8 +363,8 @@ catch err
     coop_caught=err.message;
 end
 result=test_true(result,'frozen cooperative gradient rejected',...
-                 strcmp(coop_caught,'fidelity or gradient too small at iter 1, find a better guess.'),...
-                 'The value exemption must not weaken the assembled-gradient guard.');
+                 strcmp(coop_caught,'gradient too small at iter 1, find a better guess.'),...
+                 'Frozen coordinates must retain the assembled-gradient guard.');
 
 end
 

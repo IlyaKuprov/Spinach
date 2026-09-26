@@ -12,9 +12,7 @@
 %
 % Outputs:
 %
-%      traj_data    -  trajectory information for both pulses;
-%                      traj_data{1}{1}.primary_fid is the mean primary
-%                      transfer before the squared impurity penalty
+%      traj_data    -  trajectory information for both pulses
 %
 %      fidelity     -  cooperative fidelity measure
 %
@@ -97,9 +95,6 @@ spin_system.control.ens_corrs={'rho_ens'};
 
 % Average fidelity of the two pulses
 fidelity=(fidelity_a+fidelity_b)/2;
-
-% Retain primary transfer before subtracting the orthogonal impurity
-traj_data_a{1}.primary_fid=fidelity(1);
 
 % Penalty on the squared norm of the dirt
 switch spin_system.bas.formalism

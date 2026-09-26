@@ -67,6 +67,10 @@
 %       available. The method restriction applies at setup and direct
 %       entry, regardless of the number of outputs requested.
 %
+% Note: zero fidelities and derivatives are valid for auxiliary costates.
+%       Initial-guess checks belong to the assembled optimisation objective
+%       in fmaxnewton.m, not to individual GRAPE contributions.
+%
 % Note: trajectory cost terms are read from spin_system.control: when
 %       fid_type is 'average', the fidelity is averaged over the pulse
 %       nodes 1..N instead of being taken at the last node; traj_pen
@@ -971,20 +975,6 @@ else
     traj_data.forward=[];
 end
 
-% Catch unreachable terminal objectives, trajectory cost terms may cancel legitimately
-if (~(fid_avg||pen_on))&&(abs(fidelity)==0)
-    spin_system.sys.output=1;
-    report(spin_system,'exactly zero fidelity: either the target is unreachable');
-    report(spin_system,'from the source, or the initial guess is very poor.');
-    error('GRAPE cannot proceed.');
-end
-if (~(fid_avg||pen_on))&&exist('grad','var')&&(norm(grad,1)==0)
-    spin_system.sys.output=1;
-    report(spin_system,'exactly zero gradient: either the target is unreachable');
-    report(spin_system,'from the source, or the initial guess is very poor.');
-    error('GRAPE cannot proceed.');
-end
-
 % Subtract the trajectory penalty
 if pen_on
     fidelity=fidelity-pen_val;
@@ -1084,4 +1074,5 @@ end
 % likely to be heroic exceptions.
 %
 % Nathaniel Branden
+
 

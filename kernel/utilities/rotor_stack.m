@@ -45,7 +45,14 @@
 %                       (two-angle powder grids will be required)
 %
 %   assumptions - assumption set to be used in generating the
-%                 Hamiltonian, see assume.m
+%                 Hamiltonian and validating numerical rotating
+%                 frames, regardless of prior assumptions on the
+%                 input object. The spins in parameters.rframes
+%                 must remain in the laboratory frame under this
+%                 set; already-rotating spins are rejected by
+%                 rotframe.m. Numerical frames for carrier-free
+%                 se_dnp_h+, se_dnp_h-, and se_dnp_h0 components
+%                 are not implemented. See assume.m
 %
 % Outputs:
 %
@@ -65,8 +72,11 @@ function [L,rotor_phases]=rotor_stack(spin_system,parameters,assumptions)
 % Check consistency
 grumble(spin_system,parameters,assumptions);
 
+% Apply the requested assumptions throughout the rotor and frame pipeline
+spin_system=assume(spin_system,assumptions);
+
 % Get the Hamiltonian
-[H,Q]=hamiltonian(assume(spin_system,assumptions));
+[H,Q]=hamiltonian(spin_system);
 
 % Apply offsets
 H=frqoffset(spin_system,H,parameters);

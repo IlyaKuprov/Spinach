@@ -1,8 +1,6 @@
 # tests/lib/test_manifest.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/lib/test_manifest.m`
 - Signature: `manifest=test_manifest()`
-- Total lines: 134
 
 ## Purpose
 

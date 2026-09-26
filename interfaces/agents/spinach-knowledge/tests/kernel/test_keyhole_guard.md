@@ -1,8 +1,6 @@
 # tests/kernel/test_keyhole_guard.m
 
-- Source: `tests/kernel/test_keyhole_guard.m`
 - Signature: `result=test_keyhole_guard()`
-- Total lines: 189
 
 ## Purpose
 

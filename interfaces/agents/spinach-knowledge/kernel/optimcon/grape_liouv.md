@@ -1,8 +1,6 @@
 # kernel/optimcon/grape_liouv.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/grape_liouv.m`
 - Signature: `[traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,...`
-- Total lines: 1084
 
 ## Purpose
 
@@ -20,8 +18,6 @@ Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessi
 - Zero fidelities and gradients are returned as valid values, including for auxiliary costates used by `grape_coop`. Initial-guess checks remain in `fmaxnewton`, where they apply to the assembled optimisation objective rather than individual GRAPE contributions.
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -60,4 +56,3 @@ Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessi
 - tions instead.
 - TODO (Keitel): add logic to avoid computing backward trajectory
 - when the gradient is not requested
-

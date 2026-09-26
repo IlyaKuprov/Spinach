@@ -1,8 +1,6 @@
 # kernel/optimcon/optimcon.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/optimcon.m`
 - Signature: `spin_system=optimcon(spin_system,control)`
-- Total lines: 1619
 
 ## Purpose
 
@@ -22,8 +20,6 @@ Validates optimal control options and updates the spin system object. Syntax: sp
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `check_hermiticity()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -62,4 +58,3 @@ Validates optimal control options and updates the spin system object. Syntax: sp
 - fresh optimcon() call: the frozen response operators are
 - built from the carriers seen here, and editing them after-
 - wards would replay physics that the optimiser never saw.
-

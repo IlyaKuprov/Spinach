@@ -1,8 +1,6 @@
 # examples/fundamentals/state_tests/thermal_equilibrium_4.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/state_tests/thermal_equilibrium_4.m`
 - Signature: `thermal_equilibrium_4()`
-- Total lines: 72
 
 ## Purpose
 
@@ -17,4 +15,3 @@ Test of the invariance of the thermal equilibrium state under the thermalised re
 - Uses full (`labframe`) relaxation retention in both Liouville formalisms. For this damp-only model, damping is added after retention, so the generator is unchanged from the former diagonal setting; Zeeman diagonal retention is not supported.
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-

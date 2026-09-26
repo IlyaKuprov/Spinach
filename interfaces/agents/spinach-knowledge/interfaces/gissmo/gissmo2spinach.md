@@ -1,8 +1,6 @@
 # interfaces/gissmo/gissmo2spinach.m
 
-- Source: `interfaces/gissmo/gissmo2spinach.m`
 - Signature: `[sys,inter]=gissmo2spinach(filename,subsystem)`
-- Total lines: 206
 
 ## Purpose
 

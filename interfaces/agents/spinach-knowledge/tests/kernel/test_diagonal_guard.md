@@ -1,8 +1,6 @@
 # tests/kernel/test_diagonal_guard.m
 
-- Source: `tests/kernel/test_diagonal_guard.m`
 - Signature: `result=test_diagonal_guard()`
-- Total lines: 144
 
 ## Purpose
 

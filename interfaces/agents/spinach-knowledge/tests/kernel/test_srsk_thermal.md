@@ -1,8 +1,6 @@
 # tests/kernel/test_srsk_thermal.m
 
-- Source: `tests/kernel/test_srsk_thermal.m`
 - Signature: `result=test_srsk_thermal()`
-- Total lines: 167
 
 ## Purpose
 

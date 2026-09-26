@@ -1,8 +1,6 @@
 # tests/kernel/test_hilb_pulse_prop.m
 
-- Source: `tests/kernel/test_hilb_pulse_prop.m`
 - Signature: `result=test_hilb_pulse_prop()`
-- Total lines: 246
 
 ## Purpose
 

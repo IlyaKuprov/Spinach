@@ -1,8 +1,6 @@
 # kernel/pulses/shaped_pulse_xy.m
 
-- Source: `kernel/pulses/shaped_pulse_xy.m`
 - Signature: `[rho,traj,P]=shaped_pulse_xy(spin_system,drift,controls,amplitudes,slice_durs,rho,method)`
-- Total lines: 422
 
 ## Purpose
 

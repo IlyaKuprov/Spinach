@@ -1,8 +1,6 @@
 # examples/nqr/pure_nqr_iodine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nqr/pure_nqr_iodine.m`
 - Signature: `pure_nqr_iodine()`
-- Total lines: 53
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Powder NQR spectrum of a system with a single 127I nucleus. Calculation time: se
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `state()`, `operator()`, `powder()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

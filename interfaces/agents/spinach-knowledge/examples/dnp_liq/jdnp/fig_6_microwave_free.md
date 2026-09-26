@@ -1,8 +1,6 @@
 # examples/dnp_liq/jdnp/fig_6_microwave_free.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/jdnp/fig_6_microwave_free.m`
 - Signature: `fig_6_microwave_free()`
-- Total lines: 134
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A demonstration of Maria Grazia Concilio's microwave-free JDNP effect where a fi
 - Increase viscosity
 - Get thermal equilibrium at starting field
 - Set up a field ramp and time step
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `system_specification()`, `spin()`, `create()`, `basis()`, `assume()`, `hamiltonian()`, `equilibrium()`, `traj()`, `field_grid()`, `relaxation()`, `evolution()`, `unit_state()`, `state()`, `kfigure()`, `subplot()`, `scale_figure()`.

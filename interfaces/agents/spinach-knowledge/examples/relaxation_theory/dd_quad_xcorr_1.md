@@ -1,8 +1,6 @@
 # examples/relaxation_theory/dd_quad_xcorr_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/dd_quad_xcorr_1.m`
 - Signature: `dd_quad_xcorr_1()`
-- Total lines: 60
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Complete Bloch-Redfield-Wangsness relaxation superoperator in a system with a qu
 - Spinach housekeeping
 - Sequence parameters
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

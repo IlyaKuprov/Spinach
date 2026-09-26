@@ -1,8 +1,6 @@
 # examples/relaxation_theory/sle_esr_nitroxide_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/sle_esr_nitroxide_1.m`
 - Signature: `sle_esr_nitroxide_1()`
-- Total lines: 79
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Comparison between nitroxide simulation using SLE formalism and Redfield relaxat
 - SLE simulation
 - SLE plotting
 - BRW parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `gridfree()`, `fdvec()`, `kfigure()`, `subplot()`, `plot_1d()`, `ktitle()`, `liquid()`.

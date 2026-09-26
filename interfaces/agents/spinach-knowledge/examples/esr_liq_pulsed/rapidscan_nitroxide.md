@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/rapidscan_nitroxide.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/rapidscan_nitroxide.m`
 - Signature: `rapidscan_nitroxide()`
-- Total lines: 55
 
 ## Purpose
 
@@ -28,7 +26,3 @@ Rapid scan ESR spectrum of a nitroxide radical. Calculation time: seconds
 - Experiment parameters
 - Run the experiment
 - Plot the result
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `rapidscan()`, `kfigure()`, `kxlabel()`, `kylabel()`.

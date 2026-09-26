@@ -1,8 +1,6 @@
 # kernel/utilities/dictum.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/dictum.m`
 - Signature: `spin_system=dictum(spin_system,spins,strength)`
-- Total lines: 153
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Overrides default assumptions about interaction terms surviving rotating frame t
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -54,7 +49,3 @@ Overrides default assumptions about interaction terms surviving rotating frame t
 - Zeeman interaction assumptions
 - to be modified, and two elements
 - would cause coupling assumptions
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `report()`, `num2str()`, `spins()`, `isscalar()`, `iscell()`, `cellfun()`, `strcmp()`, `isfield()`, `assume()`, `ischar()`, `isvector()`, `any()`, `ismember()`.

@@ -1,8 +1,6 @@
 # experiments/esr_dipolar/deer_3p_soft_deer.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/esr_dipolar/deer_3p_soft_deer.m`
 - Signature: `echo_stack=deer_3p_soft_deer(spin_system,parameters,H,R,K)`
-- Total lines: 236
 
 ## Purpose
 
@@ -20,8 +18,6 @@ Three-pulse DEER/PELDOR pulse sequence. The sequence uses soft pulses computed w
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -84,7 +80,3 @@ Three-pulse DEER/PELDOR pulse sequence. The sequence uses soft pulses computed w
 - parameters.pulse_phi -initial phases for the three
 - pulses, radians
 - parameters.pulse_rnk -Fokker-Planck ranks for the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `sim2liouv()`, `grumble()`, `operator()`, `spin()`, `shaped_pulse_af()`, `evolution()`, `rho_stack()`, `ismatrix()`, `all()`, `ismember()`, `isfield()`, `isscalar()`, `any()`, `iscell()`, `ischar()`.

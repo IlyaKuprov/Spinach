@@ -1,8 +1,6 @@
 # examples/relaxation_theory/dd_relaxation_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/dd_relaxation_2.m`
 - Signature: `dd_relaxation_2()`
-- Total lines: 42
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Complete Bloch-Redfield-Wangsness relaxation superoperator in a system with dipo
 - Basis set
 - Spinach housekeeping
 - Relaxation superoperator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `euler2dcm()`, `create()`, `basis()`, `relaxation()`.

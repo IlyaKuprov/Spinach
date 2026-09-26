@@ -1,8 +1,6 @@
 # examples/relaxation_theory/trosy_double.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/trosy_double.m`
 - Signature: `trosy_double()`
-- Total lines: 85
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Hari Arthanari's Double TROSY effect. Calculation time: seconds.
 - Sequence parameters -13C
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `subplot()`, `plot_1d()`, `kxlabel()`.

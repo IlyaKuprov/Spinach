@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/pulse_acquire_benzoquinone.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/pulse_acquire_benzoquinone.m`
 - Signature: `pulse_acquire_benzoquinone()`
-- Total lines: 75
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Pulse-acquire FFT ESR on 2-methoxy-1,4-benzoquinone radical in liquid state. Set
 - Spinach housekeeping
 - Experiment parameters
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `mt2hz()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

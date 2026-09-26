@@ -1,8 +1,6 @@
 # experiments/pseudocon/chi_eff.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/pseudocon/chi_eff.m`
 - Signature: `[chi,pred_pcs]=chi_eff(source_cube,ranges,nxyz,expt_pcs)`
-- Total lines: 90
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Finds the optimal magnetic susceptibility tensor that a user-supplied paramagnet
 - Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -48,7 +43,3 @@ Finds the optimal magnetic susceptibility tensor that a user-supplied paramagnet
 - at which PCS is measured, in Angstroms.
 - expt_pcs -pseudocontact shift in ppm at each nucleus.
 - chi -optimised magnetic susceptibility tensor in cubic
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `ranges()`, `kpcs()`, `chi()`, `theo_pcs()`, `optimset()`, `fminunc()`, `params()`, `mat2sphten()`, `sphten2mat()`, `ndims()`, `any()`, `source_cube()`.

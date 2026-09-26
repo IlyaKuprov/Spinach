@@ -1,8 +1,6 @@
 # kernel/utilities/ngce.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/ngce.m`
 - Signature: `[R,dR]=ngce(spin_system,H0,H1,dt,tau_est,reg)`
-- Total lines: 193
 
 ## Purpose
 
@@ -19,8 +17,6 @@ Numerical integral route to the Redfield relaxation superopera- tor. Syntax: [R,
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -61,7 +57,3 @@ Numerical integral route to the Redfield relaxation superopera- tor. Syntax: [R,
 - tau_est -H1 autocorrelation time estimate for internal
 - safety control, seconds
 - reg -optional overall relaxation rate, this is added to
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `normest()`, `report()`, `num2str()`, `speye()`, `propagator()`, `clean_up()`, `unit_state()`, `cell2mat()`, `dR_var()`, `exist()`, `unit_oper()`, `iscell()`.

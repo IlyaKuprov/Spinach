@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/pulse_acquire_methyl.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/pulse_acquire_methyl.m`
 - Signature: `pulse_acquire_methyl()`
-- Total lines: 64
 
 ## Purpose
 
@@ -31,7 +29,3 @@ X-band pulse-acquire FFT ESR spectrum of methyl radical. Simple common line widt
 - Spinach housekeeping
 - Set the sequence parameters
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

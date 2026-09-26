@@ -1,8 +1,6 @@
 # kernel/optimcon/distortions/szf.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/distortions/szf.m`
 - Signature: `[w,J]=szf(w,z)`
-- Total lines: 131
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Applies a discrete single-zero filter: Y(k)=X(k)/(1-z)-z*X(k-1)/(1-z); to a Spin
 ## Numerical / algorithmic content
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `distort()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -55,7 +51,3 @@ Applies a discrete single-zero filter: Y(k)=X(k)/(1-z)-z*X(k-1)/(1-z); to a Spin
 - control channel
 - z -a vector (one element per XY control pair)
 - containing the filter coefficient:
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `distort()`, `dlfeval()`, `dlarray()`, `extractdata()`, `dims()`, `inp()`, `transpose()`, `w_dist()`, `dljacobian()`, `isvector()`, `any()`.

@@ -1,8 +1,6 @@
 # kernel/utilities/fpl2rho.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/fpl2rho.m`
 - Signature: `rho=fpl2rho(rho,dims)`
-- Total lines: 55
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Returns the average of the spin state vector across the spatial dimensions of th
 - The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -43,7 +38,3 @@ Returns the average of the spin state vector across the spatial dimensions of th
 - Find out the stack size
 - Expose the spin dimension (no ND sparse support yet)
 - Average over the spatial coordinates
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `squeeze()`, `any()`, `space()`.

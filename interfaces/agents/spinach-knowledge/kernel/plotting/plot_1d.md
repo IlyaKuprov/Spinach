@@ -1,8 +1,6 @@
 # kernel/plotting/plot_1d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/plotting/plot_1d.m`
 - Signature: `plot_1d(spin_system,spectrum,parameters,varargin)`
-- Total lines: 157
 
 ## Purpose
 
@@ -10,13 +8,9 @@
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
 
 - Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `defaults()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -55,7 +49,3 @@
 - 'MHz-labframe','GHz','GHz-labframe',
 - 'gtensor','points')
 - parameters.derivative if set to 1, the spectrum is
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `defaults()`, `grumble()`, `axis_1d()`, `isfield()`, `fdvec()`, `kxlabel()`, `set()`, `isscalar()`, `report()`, `ischar()`, `iscell()`, `ismember()`.

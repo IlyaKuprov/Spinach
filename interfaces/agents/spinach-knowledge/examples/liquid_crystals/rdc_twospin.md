@@ -1,8 +1,6 @@
 # examples/liquid_crystals/rdc_twospin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/liquid_crystals/rdc_twospin.m`
 - Signature: `rdc_twospin()`
-- Total lines: 64
 
 ## Purpose
 
@@ -31,7 +29,3 @@ CLIP-HSQC spectrum of a C-H system in a liquid crystal with a user-specified ord
 - Apodisation
 - F2 Fourier transform
 - Form States signal
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

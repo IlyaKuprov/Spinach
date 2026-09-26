@@ -1,8 +1,6 @@
 # examples/nmr_solids/case_studies/magic_angle_calibration.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/case_studies/magic_angle_calibration.m`
 - Signature: `magic_angle_calibration()`
-- Total lines: 84
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Magic angle is usually calibrated using KBr powder. When the angle is not correc
 - Spinach housekeeping
 - Experiment setup
 - Convert magic angle errors to radians
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `state()`, `deg2rad()`, `kfigure()`, `scale_figure()`, `euler2dcm()`, `ma_errors()`, `singlerot()`, `apodisation()`, `fftshift()`, `subplot()`, `klegend()`, `num2str()`, `rad2deg()`.

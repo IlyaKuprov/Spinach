@@ -1,8 +1,6 @@
 # examples/nmr_solids/static_powder_nqi_b.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/static_powder_nqi_b.m`
 - Signature: `static_powder_nqi_b()`
-- Total lines: 69
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Static powder 79Br NMR spectrum of potassium bromide. At least 3 quadrupolar ten
 - Basis set
 - Algorithmic options
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `powder()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`, `ylim()`.

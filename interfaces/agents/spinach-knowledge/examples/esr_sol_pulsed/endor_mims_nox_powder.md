@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/endor_mims_nox_powder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/endor_mims_nox_powder.m`
 - Signature: `endor_mims_nox_powder()`
-- Total lines: 61
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Mims ENDOR simulation for a nitroxide radical powder. Ideal hard pulses are assu
 - Sequence parameters
 - Simulation
 - Crude apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `powder()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`, `kxlabel()`.

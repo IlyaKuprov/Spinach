@@ -1,8 +1,6 @@
 # examples/nmr_solids/mas_powder_suc_gridfree.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/mas_powder_suc_gridfree.m`
 - Signature: `mas_powder_suc_gridfree()`
-- Total lines: 66
 
 ## Purpose
 
@@ -32,7 +30,3 @@
 - Basis set
 - Algorithmic options
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `gridfree()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

@@ -20,6 +20,8 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Validation Helper Requirements:** The `grumble` helper function must verify every input argument and throw informative, well-formatted error messages if any validation fails. Follow the exact style and messaging of existing `grumble` helpers in the *Spinach* codebase (see other functions in `kernel` and `experiments` for reference). There should be no code comments inside the grumble helper function.
 
+* **Do not validate guaranteed aspects:** If the input is received from another Spinach function that sets specific shapes and types, there is no need to re-check those shapes and types. Only values should be checked if appropriate. Do not over-check. Do not introduce pointless ass-cover checking.
+
 * **Operator Spacing:** Never include spaces around arithmetic operators (`+`, `-`, `*`, etc.), logical operators (`==`, `>`, `<=`, etc.), or the assignment operator (`=`). Write expressions like `a=b+c*d` without spaces. This convention is consistent across the entire codebase.
 
 * **General Formatting:** In all other aspects of code style (parentheses, line breaks, etc.), mimic the existing code. Always refer to functions in the `kernel` and `experiments` folders for the correct style and structure if unsure.
@@ -83,6 +85,8 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 * **No Hallucinations, no Lies, no Errors:** You must not lie and must not fabricate information, code, or documentation. All content you generate must be accurate and supported by the *Spinach* codebase or user instructions. If you are unsure about something, refer to the existing code or ask the user for clarification. Above all, do not make mistakes.
 
 * **No uninformative output:** You must not produce usless or uninformative output. If you are unsure about something, you must read the existing *Spinach* code and find missing information to make sure that your output is useful and informative. Generic placeholder phrases must be removed from your output if they appear. Avoid cosmetic churn unless explicitly requested and clearly beneficial.
+
+* **No inconsequential PR or documentation entries:** Do not add mechanically derived or transient metadata to pull-request changes, the shipped knowledge base, the agent skill, or Wiki documentation when it adds no useful explanation and creates avoidable merge conflicts. This includes LOC and source-line counts, indexed-file and aggregate-line counts, generation timestamps, source commit IDs, transient branch/snapshot labels, checkout-specific absolute paths, and duplicate source-header or call-list restatements. Keep stable file paths, signatures, scientific and numerical facts, meaningful references, and substantive descriptions. Commit IDs needed for review or provenance belong in PR discussion or job records, not in shipped documentation. When updating an entry, remove existing low-value metadata without refreshing unrelated content.
 
 * **Follow Instructions:** You must do everything the user asks, and produce all requested outputs (e.g. multiple functions or files) exactly as specified by the user. Do not ignore any part of the request. Each task in the user instructions must be completed fully.
 

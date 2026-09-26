@@ -1,8 +1,6 @@
 # experiments/spen/dosy_oneshot.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/spen/dosy_oneshot.m`
 - Signature: `fid=dosy_oneshot(spin_system,parameters,H,R,K,G,F)`
-- Total lines: 226
 
 ## Purpose
 
@@ -16,8 +14,6 @@ One-shot DOSY pulse sequence. Syntax: fid=dosy_oneshot(spin_system,parameters,H,
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -61,7 +57,3 @@ One-shot DOSY pulse sequence. Syntax: fid=dosy_oneshot(spin_system,parameters,H,
 - parameters.kappa unbalancing factor to unbalance the bipolar
 - gradients in the ratio (1+kappa):(1-kappa)
 - parameters.g_stab_del gradient stabilization delay (s)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `operator()`, `speye()`, `step()`, `coherence()`, `evolution()`, `ismember()`, `ismatrix()`, `all()`, `iscell()`, `isfield()`, `elseif()`.

@@ -1,8 +1,6 @@
 # examples/nmr_liquids/ct_hsqc_2spins.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/ct_hsqc_2spins.m`
 - Signature: `ct_hsqc_2spins()`
-- Total lines: 73
 
 ## Purpose
 
@@ -32,7 +30,3 @@ CT HSQC spectrum of 2 spin system Calculation time: seconds
 - Loop over isotopomers
 - Build the basis
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `dilute()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

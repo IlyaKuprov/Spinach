@@ -1,8 +1,6 @@
 # kernel/overloads/@polyadic/isempty.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@polyadic/isempty.m`
 - Signature: `answer=isempty(p)`
-- Total lines: 33
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Returns true for polyadics that represent a matrix with a zero dimension. Syntax
 - Q: Why do sumo wrestlers shave their legs and armpits?
 - A: To make sure people can tell them apart from feminists.
 - A "festive season" cracker
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `any()`, `true()`, `false()`.

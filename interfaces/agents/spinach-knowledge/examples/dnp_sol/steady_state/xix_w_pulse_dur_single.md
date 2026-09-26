@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/xix_w_pulse_dur_single.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/xix_w_pulse_dur_single.m`
 - Signature: `xix_w_pulse_dur_single()`
-- Total lines: 102
 
 ## Purpose
 
@@ -30,7 +28,3 @@
 - Propagator accuracy
 - Algorithmic options
 - Electron pulse duration grid, s
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cell2mat()`, `xyz()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `kfigure()`, `pulse_durs()`, `dnp()`, `powder()`, `set()`, `kylabel()`, `kcolourbar()`, `kxlabel()`, `savefig()`.

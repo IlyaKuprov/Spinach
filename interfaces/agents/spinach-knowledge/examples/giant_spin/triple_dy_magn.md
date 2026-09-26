@@ -1,8 +1,6 @@
 # examples/giant_spin/triple_dy_magn.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/triple_dy_magn.m`
 - Signature: `triple_dy_magn()`
-- Total lines: 133
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simulation of a finite-speed magnetic field sweep experiment for a single crysta
 - to the DD couplings
 - g-tensor eigenvectors
 - g-tensor matrix
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `euler2dcm()`, `icm2hz()`, `dcm2euler()`, `wigner()`, `stev2sph()`, `create()`, `basis()`, `fieldscan_magn()`, `kfigure()`, `kxlabel()`, `kylabel()`.

@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/eseem_nitroxide_crystal.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/eseem_nitroxide_crystal.m`
 - Signature: `eseem_nitroxide_crystal()`
-- Total lines: 68
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Two-pulse X-band ESEEM spectrum of a nitroxide radical at a specific orientation
 - Sequence parameters
 - Simulation
 - Plot the time domain signal
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `crystal()`, `kfigure()`, `subplot()`, `kxlabel()`, `apodisation()`, `fftshift()`.

@@ -1,8 +1,6 @@
 # examples/shaped_pulses/shaped_pulse_fp.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/shaped_pulses/shaped_pulse_fp.m`
 - Signature: `shaped_pulse_fp()`
-- Total lines: 79
 
 ## Purpose
 
@@ -32,7 +30,3 @@ An off-resonance rectangular soft pulse simulated using the Fokker-Planck formal
 - Basis set
 - Spinach housekeeping
 - Background Hamiltonian
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `state()`, `shaped_pulse_af()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

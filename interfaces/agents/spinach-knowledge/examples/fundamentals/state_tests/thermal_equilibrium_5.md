@@ -1,8 +1,6 @@
 # examples/fundamentals/state_tests/thermal_equilibrium_5.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/state_tests/thermal_equilibrium_5.m`
 - Signature: `thermal_equilibrium_5()`
-- Total lines: 86
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Cross-formalism test of state recovery towards the thermodynamic equilibrium.
 - Loop over methods
 - Thermalisation method
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `equilibrium()`, `operator()`, `step()`, `assume()`, `hamiltonian()`, `relaxation()`, `state()`, `evolution()`.

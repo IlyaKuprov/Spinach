@@ -1,8 +1,6 @@
 # kernel/utilities/poolsize.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/poolsize.m`
 - Signature: `n=poolsize()`
-- Total lines: 40
 
 ## Purpose
 
@@ -41,7 +39,3 @@ Returns the current parallel pool size. Syntax: n=poolsize()
 - Run a man through a line of fire, and he turns into a seasoned
 - wolf; the weak, and in really tough cases unnecessary, intellect
 - is replaced by the wise animal instinct.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gcp()`.

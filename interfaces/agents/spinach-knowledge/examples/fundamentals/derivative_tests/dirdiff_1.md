@@ -1,8 +1,6 @@
 # examples/fundamentals/derivative_tests/dirdiff_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/derivative_tests/dirdiff_1.m`
 - Signature: `dirdiff_1()`
-- Total lines: 58
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Test of matrix exponential differentiation routines. Analytical derivatives are 
 - Test the first derivative
 - Second derivative, numerical
 - Second derivative, analytical
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `dirdiff_test_system()`, `propagator()`, `dirdiff()`.

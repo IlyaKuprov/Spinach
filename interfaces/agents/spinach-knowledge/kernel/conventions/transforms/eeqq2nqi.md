@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/eeqq2nqi.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/eeqq2nqi.m`
 - Signature: `Q=eeqq2nqi(C_q,eta_q,I,eulers)`
-- Total lines: 76
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Converts the C_q and eta_q quadrupolar interaction specification convention into
 - Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -51,7 +46,3 @@ Converts the C_q and eta_q quadrupolar interaction specification convention into
 - axis frame relative to the lab frame.
 - Q -quadrupolar coupling tensor as a 3x3
 - matrix in Hz
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `euler2dcm()`.

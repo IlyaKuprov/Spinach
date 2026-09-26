@@ -1,8 +1,6 @@
 # examples/nmr_liquids/ct_cosy_three_spin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/ct_cosy_three_spin.m`
 - Signature: `ct_cosy_three_spin()`
-- Total lines: 55
 
 ## Purpose
 
@@ -30,7 +28,3 @@ CT-COSY of three spin system. Calculation time: seconds
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

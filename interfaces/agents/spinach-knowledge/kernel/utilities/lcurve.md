@@ -1,8 +1,6 @@
 # kernel/utilities/lcurve.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/lcurve.m`
 - Signature: `lam_opt=lcurve(lam,err,reg,mode)`
-- Total lines: 165
 
 ## Purpose
 
@@ -16,8 +14,6 @@ L-curve analysis function. Syntax: lam_opt=lcurve(lam,err,reg,mode)
 
 - Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
 - The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -63,7 +59,3 @@ L-curve analysis function. Syntax: lam_opt=lcurve(lam,err,reg,mode)
 - penalty term of the error functional: when the
 - optimiser reports lam*||L*x||^2, divide it by lam
 - once before calling this function
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `any()`, `diff()`, `log10()`, `spapi()`, `optknt()`, `fnval()`, `subplot()`, `kxlabel()`, `kylabel()`, `fdvec()`, `set()`, `kappa()`, `lam()`, `err()`, `reg()`.

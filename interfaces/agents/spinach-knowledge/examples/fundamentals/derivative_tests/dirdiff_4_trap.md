@@ -1,8 +1,6 @@
 # examples/fundamentals/derivative_tests/dirdiff_4_trap.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/derivative_tests/dirdiff_4_trap.m`
 - Signature: `dirdiff_4_trap()`
-- Total lines: 83
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Directional derivative test for the phase-modulated GRAPE module, trapezium inte
 - Call GRAPE and request analytical gradient
 - Left waveform edge
 - Right waveform edge
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `dirdiff_test_system()`, `optimcon()`, `eps()`, `grape_phase()`, `squeeze()`, `grad_anl()`, `wave_forw()`, `wave_back()`, `fid_forw()`, `fid_back()`.

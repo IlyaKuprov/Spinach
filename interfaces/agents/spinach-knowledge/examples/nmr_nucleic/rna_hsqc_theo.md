@@ -1,8 +1,6 @@
 # examples/nmr_nucleic/rna_hsqc_theo.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_nucleic/rna_hsqc_theo.m`
 - Signature: `rna_hsqc_theo()`
-- Total lines: 79
 
 ## Purpose
 
@@ -33,7 +31,3 @@
 - Magnet field
 - Tolerances
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `nuclacid()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

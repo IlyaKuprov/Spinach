@@ -1,8 +1,6 @@
 # examples/optimal_control/steady_orbit/solid_effect_chirp.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/steady_orbit/solid_effect_chirp.m`
 - Signature: `solid_effect_chirp()`
-- Total lines: 130
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Panoramic optimisation for stroboscopic steady state DNP with the timing and pow
 - Relaxation rates, distance and ori. dep. R1n
 - Basis set
 - Parallelisation settings
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `r1n_dnp()`, `create()`, `basis()`, `operator()`, `hamiltonian()`, `assume()`, `equilibrium()`, `state()`, `spin()`, `drifts()`, `false()`, `true()`, `load()`, `firf()`, `optimcon()`, `chirp_pulse()`.

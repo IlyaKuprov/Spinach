@@ -1,8 +1,6 @@
 # examples/nmr_spen/ufmq_6spin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_spen/ufmq_6spin.m`
 - Signature: `ufmq_6spin()`
-- Total lines: 125
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Coherence selection
 - Basis set
 - Algorithmic options
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `spin()`, `imaging()`, `figure()`, `subplot()`, `fftshift()`, `plot_uf()`.

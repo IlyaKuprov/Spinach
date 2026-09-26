@@ -1,8 +1,6 @@
 # examples/optimal_control/distortions/rlc_response_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/distortions/rlc_response_1.m`
 - Signature: `rlc_response_1(interp_type)`
-- Total lines: 80
 
 ## Purpose
 
@@ -28,7 +26,3 @@ An illustration of the effect of the resonator response function on a typical co
 - Random phase component
 - Put the pulse together
 - Heterodyne out the carrier frequency
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `spin()`, `exist()`, `amp_part()`, `phi_part()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`, `ktitle()`, `ylim()`, `klegend()`, `lsim()`, `lowpass()`.

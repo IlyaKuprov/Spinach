@@ -1,8 +1,6 @@
 # examples/imaging/gradient_echo_1d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/gradient_echo_1d.m`
 - Signature: `gradient_echo_1d()`
-- Total lines: 64
 
 ## Purpose
 
@@ -30,7 +28,3 @@ A gradient echo experiment in the presence of diffusion and flow. Calculation ti
 - Spinach housekeeping
 - Sequence parameters
 - Sample geometry
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `imaging()`, `kfigure()`, `kxlabel()`, `kylabel()`.

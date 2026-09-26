@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/ttclass.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/ttclass.m`
 - Signature: `tt=ttclass(coeff,kronterms,tolerance)`
-- Total lines: 125
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Creates an object of a tensor train class. A tensor train is a type of un-opened
 - Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `ncores()`, `ntrains()`, `numArgumentsFromSubscript()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -55,7 +50,3 @@ Creates an object of a tensor train class. A tensor train is a type of un-opened
 - cker product makes up the spin operator
 - tolerance -maximum deviation in the 2-norm between the
 - TT representation and the flat matrix repre-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `elseif()`, `grumble()`, `ncores()`, `ntrains()`, `numArgumentsFromSubscript()`, `builtin()`, `isrow()`, `iscell()`, `any()`, `cellfun()`, `cores()`.

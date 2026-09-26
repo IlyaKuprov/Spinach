@@ -1,8 +1,6 @@
 # examples/quantum_tech/spin_cavity_vacuum_rabi.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/spin_cavity_vacuum_rabi.m`
 - Signature: `spin_cavity_vacuum_rabi()`
-- Total lines: 65
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Vacuum Rabi oscillation between an electron spin and a micro- wave cavity mode i
 - Formalism and basis
 - Spinach housekeeping
 - Sequence parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `device()`, `cellfun()`, `hdot()`, `kfigure()`, `ylim()`, `kxlabel()`, `kylabel()`, `ktitle()`, `klegend()`.

@@ -1,8 +1,6 @@
 # examples/optimal_control/case_studies/Tosner_JMR_2009/coherence_transfer.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/case_studies/Tosner_JMR_2009/coherence_transfer.m`
 - Signature: `coherence_transfer()`
-- Total lines: 79
 
 ## Purpose
 
@@ -34,7 +32,3 @@ The first optimal control example from A heteronuclear two-spin system (1H–13C
 - Basis set
 - Spinach housekeeping
 - Initial state: Lx on proton (spin 1)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `optimcon()`, `fmaxnewton()`.

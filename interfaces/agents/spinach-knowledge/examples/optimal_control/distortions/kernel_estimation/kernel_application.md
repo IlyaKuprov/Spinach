@@ -1,8 +1,6 @@
 # examples/optimal_control/distortions/kernel_estimation/kernel_application.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/distortions/kernel_estimation/kernel_application.m`
 - Signature: `kernel_application()`
-- Total lines: 44
 
 ## Purpose
 
@@ -28,7 +26,3 @@ HiPER instrument filter function kernel application to a complicated shaped puls
 - Compute and plot the convolution
 - Read the measured pulse
 - Plot the measured pulse
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`, `ktitle()`, `real_part()`, `imag_part()`, `time_ns()`.

@@ -1,8 +1,6 @@
 # tests/kernel/test_grid_geometry_suite.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_grid_geometry_suite.m`
 - Signature: `result=test_grid_geometry_suite()`
-- Total lines: 178
 
 ## Purpose
 
@@ -10,7 +8,6 @@ Tests grid and spherical geometry helpers. Syntax: result=test_grid_geometry_sui
 
 ## Physical / mathematical content
 
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
 
 ## Numerical / algorithmic content
@@ -38,7 +35,3 @@ Tests grid and spherical geometry helpers. Syntax: result=test_grid_geometry_sui
 - Check spherical arc lengths between orthogonal and opposite points
 - Check the area of the positive-octant spherical triangle
 - Check spherical midpoint subdivision
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `test_close()`, `arclength()`, `sphtarea()`, `sphtrsubd()`, `gaussleg()`, `test_true()`, `all()`, `diff()`, `grid_polar()`, `r_pol()`, `grid_fibon()`, `grid_igloo()`, `grid_trian()`, `acos()`, `xyz_tet()`.

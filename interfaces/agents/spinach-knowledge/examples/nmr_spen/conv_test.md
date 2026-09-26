@@ -1,8 +1,6 @@
 # examples/nmr_spen/conv_test.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_spen/conv_test.m`
 - Signature: `conv_test()`
-- Total lines: 190
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Convergence and accuracy test of the spatial dynamics during a pulse field gradi
 - Chemical shift
 - Basis set
 - Algorithmic options
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `grid_sizes()`, `state()`, `report()`, `stencil_sizes()`, `tic()`, `grad_amps()`, `intensities()`, `imaging()`, `spin()`, `expfactors()`, `toc()`, `num2str()`, `kfigure()`, `scale_figure()`.

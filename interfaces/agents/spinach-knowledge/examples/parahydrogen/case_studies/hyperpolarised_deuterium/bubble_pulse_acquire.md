@@ -1,8 +1,6 @@
 # examples/parahydrogen/case_studies/hyperpolarised_deuterium/bubble_pulse_acquire.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/parahydrogen/case_studies/hyperpolarised_deuterium/bubble_pulse_acquire.m`
 - Signature: `bubble_pulse_acquire()`
-- Total lines: 120
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Simulated PNL (partially negative line) spectrum of ortho-deuterium in the prese
 - Kinetics
 - Magnet field
 - Simulation formalsim
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxan()`, `deut_pair()`, `unit_state()`, `assume()`, `hamiltonian()`, `relaxation()`, `kinetics()`, `pumped_state()`, `magpump()`, `evolution()`, `state()`, `operator()`, `liquid()`, `apodisation()`.

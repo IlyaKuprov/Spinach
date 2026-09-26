@@ -1,8 +1,6 @@
 # examples/quantum_tech/spin_phonon_avoided_crossing.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/spin_phonon_avoided_crossing.m`
 - Signature: `spin_phonon_avoided_crossing()`
-- Total lines: 78
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Avoided crossing between an electron spin transition and a quantised phonon mode
 - Exchange Hamiltonian, 'cavity' is the set that keeps spin-mode exchange
 - Spin operator
 - Coupling parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `assume()`, `hamiltonian()`, `operator()`, `state()`, `speye()`, `one_quant()`, `detuning()`, `levels()`, `kfigure()`, `kxlabel()`, `kylabel()`, `ktitle()`.

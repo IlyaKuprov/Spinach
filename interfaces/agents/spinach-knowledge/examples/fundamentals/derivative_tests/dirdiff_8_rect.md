@@ -1,8 +1,6 @@
 # examples/fundamentals/derivative_tests/dirdiff_8_rect.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/derivative_tests/dirdiff_8_rect.m`
 - Signature: `dirdiff_8_rect()`
-- Total lines: 88
 
 ## Purpose
 
@@ -32,7 +30,3 @@ GRAPE phase Hessian test against finite-differenced gradients, rectangles integr
 - Call GRAPE and request analytical Hessian
 - Leftmost Hessian column
 - Rightmost Hessian column
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `dirdiff_test_system()`, `optimcon()`, `grape_phase()`, `squeeze()`, `hess_anl()`, `wave_forw()`, `wave_back()`, `grad_forw()`, `grad_back()`.

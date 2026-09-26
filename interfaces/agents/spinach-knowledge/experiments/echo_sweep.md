@@ -1,8 +1,6 @@
 # experiments/echo_sweep.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/echo_sweep.m`
 - Signature: `echo=echo_sweep(spin_system,parameters,H,~,~)`
-- Total lines: 311
 
 ## Purpose
 
@@ -49,7 +47,3 @@ Two-pulse echo-detected frequency-swept experiment, static or under magic angle 
 - The rotor stack is a table of the Hamiltonian against the rotor phase; its resolution should match the time step at the fastest spinning rate used, `parameters.max_rank` of the context function of about `1/(2*abs(rate)*timestep)` at that rate. A finer stack costs propagators without gaining accuracy beyond the time step, a coarser one loses rotor phase resolution; at slower rates consecutive steps reuse elements.
 - The sequence is not restricted to electrons: `parameters.spins` names the spin that is pulsed and whose coherence pathway is selected, so a nuclear two-pulse echo is obtained by naming the nucleus.
 - Used by `examples/esr_sol_pulsed/mas_diamond_p1.m` through `singlerot()` in the `zeeman-hilb` formalism.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `ft_axis()`, `operator()`, `propagator()`, `coherence()`, `trace()`.

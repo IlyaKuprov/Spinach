@@ -1,8 +1,6 @@
 # examples/imaging/diffusion_weighted_epi_2d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/diffusion_weighted_epi_2d.m`
 - Signature: `diffusion_weighted_epi_2d()`
-- Total lines: 95
 
 ## Purpose
 
@@ -30,7 +28,3 @@
 - This needs a GPU
 - sys.enable={'gpu'};
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `rlx_t1_t2()`, `phantoms()`, `R1Ph()`, `R2Ph()`, `PDPh()`, `dims()`, `npts()`, `state()`, `imaging()`, `kfigure()`, `scale_figure()`, `subplot()`, `mri_2d_plot()`, `ktitle()`.

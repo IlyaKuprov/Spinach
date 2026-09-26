@@ -1,8 +1,6 @@
 # examples/nmr_liquids/clip_hsqc_camphor.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/clip_hsqc_camphor.m`
 - Signature: `clip_hsqc_camphor()`
-- Total lines: 87
 
 ## Purpose
 
@@ -32,7 +30,3 @@ CLIP-HSQC spectrum of camphor with natural content of 13C isotope. Coordinates, 
 - Sequence parameters
 - Create the spin system structure
 - Generate isotopomers
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `shift_iso()`, `create()`, `dilute()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

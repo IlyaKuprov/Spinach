@@ -1,8 +1,6 @@
 # examples/shaped_pulses/shaped_pulse_vg.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/shaped_pulses/shaped_pulse_vg.m`
 - Signature: `shaped_pulse_vg()`
-- Total lines: 83
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Veshtort-Griffin E1000B 90-degree selective pulse applied to a system of 31 prot
 - Spinach housekeeping
 - Assumptions
 - Hamiltonian superoperator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `create()`, `basis()`, `assume()`, `hamiltonian()`, `operator()`, `state()`, `vg_pulse()`, `shaped_pulse_xy()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

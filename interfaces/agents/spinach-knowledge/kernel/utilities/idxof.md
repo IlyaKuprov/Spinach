@@ -1,8 +1,6 @@
 # kernel/utilities/idxof.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/idxof.m`
 - Signature: `idx=idxof(sys,label)`
-- Total lines: 49
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Allows interaction specification by spin label rather than number. Syntax: idx=i
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -42,7 +37,3 @@ Allows interaction specification by spin label rather than number. Syntax: idx=i
 - Locate the label
 - Check the output
 - Consistency enforcement
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `cellfun()`, `strcmp()`, `ischar()`, `isfield()`.

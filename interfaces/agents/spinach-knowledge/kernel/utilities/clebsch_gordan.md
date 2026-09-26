@@ -1,8 +1,6 @@
 # kernel/utilities/clebsch_gordan.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/clebsch_gordan.m`
 - Signature: `cg=clebsch_gordan(L,M,L1,M1,L2,M2)`
-- Total lines: 157
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Clebsch-Gordan coefficient: the coefficient in front of Y(L,M) spheri- cal harmo
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -48,7 +43,3 @@ Clebsch-Gordan coefficient: the coefficient in front of Y(L,M) spheri- cal harmo
 - Clebsch-Gordan coefficient
 - Note: only some combinations of L,M,L1,M1,L2,M2 are allowed by the pro-
 - perties of spherical harmonics and spin states. If inadmissible
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `gamma()`, `double()`.

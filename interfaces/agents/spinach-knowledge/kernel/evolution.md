@@ -1,8 +1,6 @@
 # kernel/evolution.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/evolution.m`
 - Signature: `answer=evolution(spin_system,L,coil,rho,timestep,nsteps,output,destination)`
-- Total lines: 1005
 
 ## Purpose
 
@@ -10,7 +8,6 @@ Time evolution function. Performs all types of time propagation with automatic t
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
 
 ## Numerical / algorithmic content
@@ -18,8 +15,6 @@ Time evolution function. Performs all types of time propagation with automatic t
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -117,7 +112,3 @@ Time evolution function. Performs all types of time propagation with automatic t
 - rho -the initial state vector or a horizontal stack thereof
 - output -a string giving the type of evolution that is required
 - 'final' -returns the final state vector or a horizontal
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `report()`, `krylov()`, `gather()`, `ismember()`, `reduce()`, `exist()`, `parfor()`, `num2str()`, `clean_up()`, `log2()`, `dim()`, `propagator()`, `gpuArray()`, `clear()`, `cell2mat()`.

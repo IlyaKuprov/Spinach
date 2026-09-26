@@ -1,8 +1,6 @@
 # examples/quantum_tech/diamond_defects/diamond_ninter_epr_xw.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/diamond_defects/diamond_ninter_epr_xw.m`
 - Signature: `diamond_ninter_epr_xw()`
-- Total lines: 68
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Field-swept powder EPR spectra of a nitrogen interstitial defect in diamond at X
 - Set X-band parameters
 - Run the X-band simulation
 - Plot the X-band spectrum
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `diamond_n_inter()`, `create()`, `basis()`, `fieldsweep()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`, `ktitle()`.

@@ -1,8 +1,6 @@
 # examples/relaxation_theory/maz_noesy_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/maz_noesy_1.m`
 - Signature: `maz_noesy_1()`
-- Total lines: 137
 
 ## Purpose
 
@@ -34,7 +32,3 @@
 - Scalar couplings (vacuum DFT)
 - Coordinates (Angstrom, vacuum DFT)
 - Algorithmic options
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `expt_shift()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

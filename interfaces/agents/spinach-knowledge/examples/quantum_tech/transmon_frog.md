@@ -1,8 +1,6 @@
 # examples/quantum_tech/transmon_frog.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/transmon_frog.m`
 - Signature: `transmon_frog()`
-- Total lines: 85
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Basic implementation of a Frequency Robust Gate (FROG) for a single transmon, ba
 - Spinach housekeeping
 - Drift Hamiltonian from the declared interactions
 - Build the intial control pulses (FROG)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `state()`, `hilb2liouv()`, `optimcon()`, `fmaxnewton()`.

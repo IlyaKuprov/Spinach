@@ -1,8 +1,6 @@
 # kernel/overloads/@polyadic/allfinite.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@polyadic/allfinite.m`
 - Signature: `answ=allfinite(p)`
-- Total lines: 51
 
 ## Purpose
 
@@ -37,7 +35,3 @@ Returns true if none of the elements of the polyadic are Inf or NaN. Syntax: ans
 - Beauty is the first test: there is no permanent
 - place in the world for ugly mathematics.
 - G.H. Hardy
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `true()`.

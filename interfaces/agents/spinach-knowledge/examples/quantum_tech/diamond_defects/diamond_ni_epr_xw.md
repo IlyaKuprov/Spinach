@@ -1,8 +1,6 @@
 # examples/quantum_tech/diamond_defects/diamond_ni_epr_xw.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/diamond_defects/diamond_ni_epr_xw.m`
 - Signature: `diamond_ni_epr_xw()`
-- Total lines: 68
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Field-swept powder EPR spectra of Ni defects in diamond at X and W bands. Calcul
 - Set X-band parameters
 - Run the X-band simulation
 - Plot the X-band spectrum
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `diamond_ni()`, `create()`, `basis()`, `fieldsweep()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`, `ktitle()`.

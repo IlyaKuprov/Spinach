@@ -1,8 +1,6 @@
 # kernel/plotting/plot_3d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/plotting/plot_3d.m`
 - Signature: `plot_3d(spin_system,spectrum,parameters,nsurf,delta,k,signs)`
-- Total lines: 238
 
 ## Purpose
 
@@ -10,12 +8,7 @@ Volume isosurface plotting utility with non-linear adaptive surface spacing. The
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -61,7 +54,3 @@ Volume isosurface plotting utility with non-linear adaptive surface spacing. The
 - parameters.offset - three transmitter offsets, Hz
 - parameters.axis_units - axis units ('ppm','Hz','Gauss')
 - nsurf -the number of surfaces, a reasonable value is 20
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `report()`, `contspacing()`, `ft_axis()`, `spin()`, `subplot()`, `patch()`, `isosurface()`, `set()`, `box()`, `camlight()`, `lighting()`, `kxlabel()`, `kylabel()`, `kzlabel()`, `plot_2d()`.

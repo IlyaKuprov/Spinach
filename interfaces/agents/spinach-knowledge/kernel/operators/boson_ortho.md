@@ -1,8 +1,6 @@
 # kernel/operators/boson_ortho.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/operators/boson_ortho.m`
 - Signature: `B=boson_ortho(nlevels)`
-- Total lines: 50
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Orthogonal bosonic monomials calculated from the bosonic mono- mial basis produc
 - Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -39,7 +34,3 @@ Orthogonal bosonic monomials calculated from the bosonic mono- mial basis produc
 - Consistency enforcement
 - "We're all our own prisons. We are each our own wardens.
 - We do our own time. Prison Is In Your Mind."
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `boson_mono()`, `hdot()`, `isscalar()`.

@@ -1,8 +1,6 @@
 # examples/fundamentals/derivative_tests/dirdiff_6_rect.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/derivative_tests/dirdiff_6_rect.m`
 - Signature: `dirdiff_6_rect()`
-- Total lines: 85
 
 ## Purpose
 
@@ -31,7 +29,3 @@ GRAPE Hessian test against finite-differenced gradients.
 - Leftmost Hessian column
 - Rightmost Hessian column
 - Middle Hessian column
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `dirdiff_test_system()`, `optimcon()`, `eps()`, `grape_xy()`, `squeeze()`, `hess_anl()`, `wave_forw()`, `wave_back()`, `grad_forw()`, `grad_back()`.

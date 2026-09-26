@@ -1,8 +1,6 @@
 # examples/spin_chemistry/singlet_yield_4.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/spin_chemistry/singlet_yield_4.m`
 - Signature: `singlet_yield_4()`
-- Total lines: 54
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Figure 3 from the paper by Till, Timmel, Brocklehurst and Hore: Note: the origin
 - Couplings
 - Sequence parameters
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gauss2mhz()`, `create()`, `basis()`, `liquid()`, `kfigure()`, `kylabel()`, `kxlabel()`.

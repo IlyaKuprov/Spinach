@@ -1,8 +1,6 @@
 # examples/nmr_overtone/dor_glycine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_overtone/dor_glycine.m`
 - Signature: `dor_glycine()`
-- Total lines: 78
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Panoramic double rotation overtone 14N spectrum of glycine, simulated as describ
 - Algorithmic options
 - Spinach housekeeping
 - Magic angle
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `atan()`, `state()`, `operator()`, `doublerot()`, `kfigure()`, `plot_1d()`.

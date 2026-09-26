@@ -1,8 +1,6 @@
 # examples/nmr_proteins/hnco_ubiquitin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/hnco_ubiquitin.m`
 - Signature: `hnco_ubiquitin()`
-- Total lines: 82
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Theoretical HNCO of human ubiquitin. It is assumed that only the backbone is 13C
 - Sequence parameters
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `protein()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `plot_3d()`.

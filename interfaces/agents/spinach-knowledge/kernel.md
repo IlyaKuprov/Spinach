@@ -1,12 +1,12 @@
 # Spinach code index: kernel
 
 - Source repository: `https://github.com/IlyaKuprov/Spinach`
-- Source commit: `1ee5434f210bc406143a4dbc4c9224d81d630ff4`
-- Source tree state: `committed snapshot`
+- Source commit: `a28d720078dbf954b7fe62dc4bb61a3d55fa9ebb` (parent of gradient-only guard update)
+- Source tree state: `PR #556 snapshot with gradient-only initial guard`
 - Path set: committed MATLAB files under this index directory; working-tree and untracked files are excluded.
 - Files indexed: **530** MATLAB files
-- Total source lines: **73334**
-- Generated: 2026-09-24T08:51:59+00:00
+- Total source lines: **73324**
+- Generated: 2026-09-26T14:58:55+00:00
 
 | File | Signature | Summary | LOC |
 |---|---|---|---:|
@@ -195,9 +195,9 @@
 | `kernel/optimcon/ens_catalog.m` | `[catalog,ens_sizes]=ens_catalog(control)` | Ensemble case catalog for optimal control problems. Enumerates the Cartesian product of the state-target pairs, the drif | 119 |
 | `kernel/optimcon/ensemble.m` | `[traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)` | A parallel wrapper around GRAPE that enables ensemble optimal control optimisations. This function handles systems with | 192 |
 | `kernel/optimcon/fapt2sfo.m` | `[wave,dt,time_grid]=fapt2sfo(fapt,time_grid)` | Converts a freq-ampl-phase-time specification of a pulse sequ- uence into the corresponding single frequency origin wave | 124 |
-| `kernel/optimcon/fmaxnewton.m` | `[x,data]=fmaxnewton(spin_system,cost_function,guess)` | Finds a local maximum of a function of several variables using Newton and quasi-Newton algorithms. Syntax: [x,data]=fmax | 393 |
-| `kernel/optimcon/grape_hilb.m` | `[traj_data,fidelity,grad,hess]=grape_hilb(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)` | Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user | 822 |
-| `kernel/optimcon/grape_liouv.m` | `[traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)` | Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user | 1072 |
+| `kernel/optimcon/fmaxnewton.m` | `[x,data]=fmaxnewton(spin_system,cost_function,guess)` | Finds a local maximum of a function of several variables using Newton and quasi-Newton algorithms. Syntax: [x,data]=fmax | 397 |
+| `kernel/optimcon/grape_hilb.m` | `[traj_data,fidelity,grad,hess]=grape_hilb(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)` | Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user | 813 |
+| `kernel/optimcon/grape_liouv.m` | `[traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)` | Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user | 1063 |
 | `kernel/optimcon/hess_reorder.m` | `hess=hess_reorder(hess,K,N)` | The waveforms on different channels are assumed to be stored in the rows of the input array. The Hessian elements corres | 70 |
 | `kernel/optimcon/hessreg.m` | `[H,data]=hessreg(spin_system,H,g,data)` | RFO regularisation for Newton-Raphson Hessian and gradient pairs. Syntax: [H,data]=hessreg(spin_system,H,g,data) Paramet | 101 |
 | `kernel/optimcon/inst_freq.m` | `freq=inst_freq(signal,dt,npoints,poly_order,amp_tol)` | Instantaneous frequency trajectory from a complex time-domain signal by regularised phase differentiation. Syntax: freq= | 126 |
@@ -209,7 +209,7 @@
 | `kernel/optimcon/sectioning.m` | `[alpha,fx_1,gfx_1,exitflag,data]=sectioning(cost_function,a,b,x_0,fx_0,gfx_0,dir,data,spin_system)` | Refines a previously found step bracket by repeated cubic interpolation until a step satisfying Wolfe tests is found or | 182 |
 | `kernel/optimcon/tgrape.m` | `[fidelity,grad]=tgrape(spin_system,drift,controls,waveform,dt_grid,time_unit,rho_init,rho_targ)` | A special case of Gradient Ascent Pulse Engineering (GRAPE) objective function and gradient with respect to the vector o | 168 |
 | `kernel/optimcon/trapdiff.m` | `[DL,DR]=trapdiff(spin_system,Hd,Hc,dt,cL,cR)` | Directional derivatives for the trapezium product quadrature publi- shed by Iserles and Norsett (see Corollary 3.3) in T | 97 |
-| `kernel/optimcon/wrappers/grape_coop.m` | `[traj_data,fidelity,gradient]=grape_coop(phi_profile,spin_system)` | Pairs of cooperative pulses that may be used as components of a phase cycle. The pulses are designed to produce as much | 134 |
+| `kernel/optimcon/wrappers/grape_coop.m` | `[traj_data,fidelity,gradient]=grape_coop(phi_profile,spin_system)` | Pairs of cooperative pulses that may be used as components of a phase cycle. The pulses are designed to produce as much | 137 |
 | `kernel/optimcon/wrappers/grape_curv.m` | `[traj_data,fidelity,df_du]=grape_curv(waveform_u,u2x,dx_du,spin_system)` | Cost function for optimal control using the GRAPE algorithm. Returns fidelity and gradient for a given waveform, specifi | 125 |
 | `kernel/optimcon/wrappers/grape_phase.m` | `[traj_data,fidelity,gradient,hessian]=grape_phase(phi_profile,spin_system)` | Cost function for optimal control using the GRAPE algorithm. Returns fidelity, gradient and Hessian for a given waveform | 221 |
 | `kernel/optimcon/wrappers/grape_xy.m` | `[traj_data,fidelity,grad,hess]=grape_xy(waveform,spin_system)` | Cost function for optimal control using the GRAPE algorithm. Returns fidelity, gradient and hessian for a given waveform | 213 |
@@ -324,7 +324,7 @@
 | `kernel/plotting/kcolourbar.m` | `kcolourbar(x)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: kcol | 58 |
 | `kernel/plotting/kfigure.m` | `handle=kfigure(varargin)` | Resets the stupid ass figure defaults in R2025a and later back to sensible values. | 27 |
 | `kernel/plotting/kgrid.m` | `kgrid()` | A replacement for the 'grid' command in Matlab that produces grey (rather than black-and-transparent) grid lines that ar | 30 |
-| `kernel/plotting/klegend.m` | `leg_obj=klegend(varargin)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: leg_ | 39 |
+| `kernel/plotting/klegend.m` | `leg_obj=klegend(varargin)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: leg_ | 40 |
 | `kernel/plotting/kletter.m` | `kletter(letter_label)` | Draws an academic journal style letter label in the top left corner of the current axis set. The label is placed inside the | 87 |
 | `kernel/plotting/ksgtitle.m` | `ksgtitle(x)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: ksgt | 44 |
 | `kernel/plotting/ktitle.m` | `ktitle(x)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: ktit | 46 |

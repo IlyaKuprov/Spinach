@@ -32,6 +32,10 @@
 %    data.*          - further fields may be set by the 
 %                      objective functon
 %
+% Note: all methods reject an initial assembled gradient whose unfrozen
+%       part has norm below 1e-6. Zero-iteration calls only evaluate
+%       the objective.
+%
 % david.goodwin@inano.au.dk
 % ilya.kuprov@weizmann.ac.il
 %
@@ -98,8 +102,7 @@ if isfield(spin_system.control,'video_file')
 
 end
 
-% If zero iterations, still display graphics,
-% return fidelity and the procedural data
+% Zero iterations display graphics and return fidelity and procedural data
 if spin_system.control.max_iter==0
     [data,fx]=objeval(x,cost_function,data,spin_system);
 end
@@ -113,21 +116,24 @@ for n=1:spin_system.control.max_iter
     % Update iteration counter
     data.count.iter=data.count.iter+1;
     
+    % Evaluate derivatives not retained from the previous line search
+    if ismember(spin_system.control.method,{'newton','goodwin'})
+        [data,fx,g,H]=objeval(x,cost_function,data,spin_system);
+    elseif n==1
+        [data,fx,g]=objeval(x,cost_function,data,spin_system);
+    end
+
+    % Reject a negligible initial gradient on unfrozen coordinates
+    if (n==1)&&(norm(g(~frozen),2)<1e-6)
+        error('gradient too small at iter 1, find a better guess.');
+    end
+
     % Get the search direction
     switch spin_system.control.method
         
         case {'lbfgs','rbfgs'}
             
             if n==1
-                
-                % Get objective and gradient
-                [data,fx,g]=objeval(x,cost_function,data,spin_system);
-
-                % Catch unreasonably small initial fidelities and gradients, trajectory objectives may be small legitimately
-                plain=strcmp(spin_system.control.fid_type,'terminal')&&isempty(spin_system.control.traj_pen);
-                if (plain&&(abs(data.fx_sep_pen(1))<1e-6))||(norm(g(~frozen),2)<1e-6)
-                    error('fidelity or gradient too small at iter 1, find a better guess.');
-                end
                 
                 % Start history arrays
                 old_x=x(~frozen); dx_hist=[]; 
@@ -174,9 +180,6 @@ for n=1:spin_system.control.max_iter
             end
 
         case {'newton','goodwin'}
-            
-            % Get objective, gradient, and Hessian
-            [data,fx,g,H]=objeval(x,cost_function,data,spin_system);
             
             % Tidy up the inputs
             H=real(H+H')/2; g=real(g);
@@ -390,4 +393,5 @@ end
 % sublimity; they see the monster, they do not see the prodigy.
 %
 % Victor Hugo - Ninety-three
+
 

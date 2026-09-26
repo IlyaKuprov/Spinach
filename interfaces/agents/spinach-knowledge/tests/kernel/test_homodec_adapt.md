@@ -1,8 +1,6 @@
 # tests/kernel/test_homodec_adapt.m
 
-- Source: `tests/kernel/test_homodec_adapt.m`
 - Signature: `result=test_homodec_adapt()`
-- Total lines: 107
 
 ## Purpose
 

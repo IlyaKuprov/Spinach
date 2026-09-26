@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/wrappers/grape_coop.m`
 - Signature: `[traj_data,fidelity,gradient]=grape_coop(phi_profile,spin_system)`
-- Total lines: 137
+- Total lines: 142
 
 ## Purpose
 
@@ -10,7 +10,7 @@ Pairs of cooperative pulses that may be used as components of a phase cycle. The
 
 ## Physical / mathematical content
 
-The cooperative objective averages the requested primary transfer fidelities and subtracts the mean squared norm of the summed orthogonal impurities. Auxiliary impurity derivatives use real linear overlap, including when the primary fidelity is the absolute square of the overlap; target projection retains the target norm explicitly. Purely imaginary auxiliary overlaps and vanishing impurities have valid real-linear derivatives, including zero derivatives; the low-level engines return these without applying primary-optimisation initial-guess checks.
+The cooperative objective averages the requested primary transfer fidelities and subtracts the mean squared norm of the summed orthogonal impurities. The first trajectory structure (`traj_data{1}{1}`) carries `primary_fid` before impurity subtraction, allowing the shared optimiser's initial-guess check to inspect primary transfer even through callback forwarding. Auxiliary impurity derivatives use real linear overlap, including when the primary fidelity is the absolute square of the overlap; target projection retains the target norm explicitly. Purely imaginary auxiliary overlaps and vanishing impurities have valid real-linear derivatives, including zero derivatives; the low-level engines return these without applying primary-optimisation initial-guess checks.
 
 - Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
 - The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
@@ -27,7 +27,7 @@ The cooperative objective averages the requested primary transfer fidelities and
 
 ## Outputs
 
-- traj_data -trajectory information structure
+- traj_data -two trajectory branches; the first member of the first branch has scalar `primary_fid` before the squared impurity penalty
 - fidelity -cooperative fidelity measure
 - gradient -cooperative fidelity gradient
 - Note: only phase-modulated point-to-point transformations are supported.

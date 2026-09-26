@@ -34,9 +34,10 @@
 %
 % Note: all methods reject an initial assembled gradient whose unfrozen
 %       part has norm below 1e-6. Terminal objectives without trajectory
-%       penalties also require the first objective channel to have magnitude
-%       at least 1e-6, except for cooperative scores that include impurity
-%       cancellation. Zero-iteration calls only evaluate the objective.
+%       penalties also require an initial primary transfer of magnitude
+%       at least 1e-6; objectives that report a separate primary_fid use
+%       that value instead of a penalty-containing composite score.
+%       Zero-iteration calls only evaluate the objective.
 %
 % david.goodwin@inano.au.dk
 % ilya.kuprov@weizmann.ac.il
@@ -125,11 +126,21 @@ for n=1:spin_system.control.max_iter
         [data,fx,g]=objeval(x,cost_function,data,spin_system);
     end
 
-    % Check the initial gradient without mistaking cooperative cost for primary fidelity
+    % Use objective-provided primary transfer when the reported score includes costs
     if n==1
         plain=strcmp(spin_system.control.fid_type,'terminal')&&isempty(spin_system.control.traj_pen);
-        if (plain&&~isequal(cost_function,@grape_coop)&&...
-            (abs(data.fx_sep_pen(1))<1e-6))||(norm(g(~frozen),2)<1e-6)
+        primary_fid=data.fx_sep_pen(1);
+        if plain&&iscell(data.traj_data)&&~isempty(data.traj_data)&&...
+           iscell(data.traj_data{1})&&~isempty(data.traj_data{1})&&...
+           isstruct(data.traj_data{1}{1})&&isscalar(data.traj_data{1}{1})&&...
+           isfield(data.traj_data{1}{1},'primary_fid')
+            primary_fid=data.traj_data{1}{1}.primary_fid;
+            if (~isnumeric(primary_fid))||(~isscalar(primary_fid))||...
+               (~isreal(primary_fid))||(~isfinite(primary_fid))
+                error('primary_fid metadata must be a finite real scalar.');
+            end
+        end
+        if (plain&&(abs(primary_fid)<1e-6))||(norm(g(~frozen),2)<1e-6)
             error('fidelity or gradient too small at iter 1, find a better guess.');
         end
     end

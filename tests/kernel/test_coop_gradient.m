@@ -10,7 +10,8 @@
 % Two noncommuting pulses are checked in Hilbert and Liouville space,
 % with unit and nonunit targets, a complex detection operator, and a
 % power ensemble, zero impurity, purely imaginary auxiliary overlaps,
-% and cancellation of primary transfer by the impurity penalty.
+% and cancellation of primary transfer by the impurity penalty, including
+% an anonymous forwarding adapter.
 % Independent matrix propagation checks the objective;
 % centred differences at three increments check its phase gradient.
 % All four optimiser methods must reject unusable assembled initial
@@ -106,7 +107,7 @@ for fixture=1:4
         for measure_idx=1:2
             control.fidelity=measures{measure_idx};
             local_system=optimcon(spin_system,control);
-            [~,fidelity,gradient]=grape_coop(phase_pair,local_system);
+            [traj_data,fidelity,gradient]=grape_coop(phase_pair,local_system);
             gradient=gradient(:,:,1);
             switch measures{measure_idx}
                 case 'real', primary=real(overlaps);
@@ -116,6 +117,18 @@ for fixture=1:4
             label=sprintf('fixture %d %s %s',fixture,formalisms{form_idx},measures{measure_idx});
             result=test_close(result,[label ' objective'],fidelity(1),expected,1e-11,0,...
                               'Independent propagation must retain the requested primary measure.');
+
+            % Keep both trajectory branches and report the pre-impurity primary
+            [result,has_primary]=test_true(result,[label ' trajectory metadata'],...
+                                           numel(traj_data)==2&&iscell(traj_data{1})&&...
+                                           ~isempty(traj_data{1})&&isstruct(traj_data{1}{1})&&...
+                                           isfield(traj_data{1}{1},'primary_fid'),...
+                                           'The first trajectory must carry the primary transfer.');
+            if has_primary
+                result=test_close(result,[label ' primary transfer'],...
+                                  traj_data{1}{1}.primary_fid,mean(primary,'all'),1e-11,0,...
+                                  'The optimiser must receive transfer before impurity subtraction.');
+            end
 
             % Compare every phase derivative at three finite-difference increments
             for step_size=steps
@@ -301,6 +314,42 @@ if isempty(coop_caught)
                      coop_after(1)>coop_before(1)&&coop_data.count.iter==1,...
                      'A nonstationary zero-score waveform must improve in a real optimiser step.');
 end
+
+% Check identical cooperative admission through an anonymous adapter
+coop_adapter=@(wave,system)grape_coop(wave,system);
+coop_caught='';
+try
+    [adapt_point,adapt_data]=fmaxnewton(coop_system,coop_adapter,coop_guess);
+catch err
+    coop_caught=err.message;
+end
+result=test_true(result,'forwarded cooperative cancellation admitted',isempty(coop_caught),...
+                 'Callback forwarding must not turn a composite score into primary transfer.');
+if isempty(coop_caught)
+    [~,adapt_after]=grape_coop(adapt_point,coop_system);
+    result=test_true(result,'forwarded cooperative cancellation improves',...
+                     adapt_after(1)>coop_before(1)&&adapt_data.count.iter==1&&...
+                     adapt_data.count.fx==coop_data.count.fx,...
+                     'The forwarded objective must improve in a real optimiser step.');
+end
+
+% Reject a nonstationary impurity direction with no primary transfer
+zero_system=coop_system; zero_system.control.rho_targ={eye(2)};
+zero_guess=coop_guess; zero_guess(2,1)=zero_guess(2,1)+pi/4;
+[zero_traj,~,zero_gradient]=grape_coop(zero_guess,zero_system);
+result=test_true(result,'zero primary cooperative fixture',...
+                 abs(zero_traj{1}{1}.primary_fid)<1e-12&&...
+                 norm(zero_gradient(:,:,1),'fro')>1e-3,...
+                 'A nonzero impurity gradient must not conceal zero primary transfer.');
+zero_caught='';
+try
+    fmaxnewton(zero_system,@grape_coop,zero_guess);
+catch err
+    zero_caught=err.message;
+end
+result=test_true(result,'zero primary cooperative rejected',...
+                 strcmp(zero_caught,'fidelity or gradient too small at iter 1, find a better guess.'),...
+                 'The optimiser must retain the true primary-fidelity safeguard.');
 
 % Keep the assembled-gradient guard when every cooperative phase is frozen
 coop_system.control.freeze=true(size(coop_guess)); coop_caught='';

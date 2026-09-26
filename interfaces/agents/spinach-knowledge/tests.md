@@ -1,12 +1,12 @@
 # Spinach code index: tests
 
 - Source repository: `https://github.com/IlyaKuprov/Spinach`
-- Source commit: `0b7348fb9e69f7b220395ce7b502abb8f165cde8` (parent of cooperative guard update)
-- Source tree state: `merged PR snapshot with cooperative guard correction`
+- Source commit: `b723d45ee772d5384c67ff45d42f5c0c91a5ca1c` (parent of primary-metadata update)
+- Source tree state: `merged PR snapshot with handle-independent primary-fidelity guard`
 - Path set: committed MATLAB files under this index directory; working-tree and untracked files are excluded.
 - Files indexed: **117** MATLAB files
-- Total source lines: **14693**
-- Generated: 2026-09-26T14:31:39+00:00
+- Total source lines: **14742**
+- Generated: 2026-09-26T14:58:55+00:00
 
 | File | Signature | Summary | LOC |
 |---|---|---|---:|
@@ -16,7 +16,7 @@
 | `tests/kernel/test_cache_temp_scratch.m` | `result=test_cache_temp_scratch()` | Tests cache management in a temporary scratch directory. Syntax: result=test_cache_temp_scratch() Outputs: result -regre | 123 |
 | `tests/kernel/test_chemical_exchange_conservation.m` | `result=test_chemical_exchange_conservation()` | Tests conservation in two-site chemical exchange. Syntax: result=test_chemical_exchange_conservation() Outputs: result - | 44 |
 | `tests/kernel/test_commutator_utility.m` | `result=test_commutator_utility()` | Tests the commutator utility. Syntax: result=test_commutator_utility() Outputs: result -regression test result with expl | 40 |
-| `tests/kernel/test_coop_gradient.m` | `result=test_coop_gradient()` | Cooperative phase gradients for the requested transfer fidelity. | 318 |
+| `tests/kernel/test_coop_gradient.m` | `result=test_coop_gradient()` | Cooperative phase gradients for the requested transfer fidelity. | 367 |
 | `tests/kernel/test_ctx_doublerot_acquire.m` | `result=test_ctx_doublerot_acquire()` | Tests the double-rotor context with acquire(). Syntax: result=test_ctx_doublerot_acquire() Outputs: result -regression t | 71 |
 | `tests/kernel/test_ctx_floquet_acquire.m` | `result=test_ctx_floquet_acquire()` | Tests the Floquet context with acquire(). Syntax: result=test_ctx_floquet_acquire() Outputs: result -regression test res | 68 |
 | `tests/kernel/test_ctx_gridfree_acquire.m` | `result=test_ctx_gridfree_acquire()` | Tests the grid-free Fokker-Planck context with acquire(). Syntax: result=test_ctx_gridfree_acquire() Outputs: result -re | 66 |

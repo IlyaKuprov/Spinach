@@ -9,7 +9,8 @@
 %
 % Two noncommuting pulses are checked in Hilbert and Liouville space,
 % with unit and nonunit targets, a complex detection operator, and a
-% power ensemble, zero impurity, and purely imaginary auxiliary overlaps.
+% power ensemble, zero impurity, purely imaginary auxiliary overlaps,
+% and cancellation of primary transfer by the impurity penalty.
 % Independent matrix propagation checks the objective;
 % centred differences at three increments check its phase gradient.
 % All four optimiser methods must reject unusable assembled initial
@@ -262,6 +263,55 @@ for fixture=1:4
         end
     end
 end
+
+% Check a nonstationary cooperative objective at a zero-score cancellation
+spin_system.bas.formalism='zeeman-hilb';
+coop_control=struct();
+coop_control.isotopes={'1H'}; coop_control.channels=[1;1];
+coop_control.operators={spin_ops.x,spin_ops.y};
+coop_control.drifts={{0.1*spin_ops.z}};
+coop_control.rho_init={spin_ops.x};
+coop_control.rho_targ={(spin_ops.x+0.3*spin_ops.z)/norm(spin_ops.x+0.3*spin_ops.z,'fro')};
+coop_control.pwr_levels=1; coop_control.pulse_dt=[0.2 0.2];
+coop_control.method='lbfgs'; coop_control.max_iter=1;
+coop_control.penalties={'none'}; coop_control.p_weights=0;
+coop_control.l_bound=-100; coop_control.u_bound=100;
+coop_control.plotting={}; coop_control.amplitudes=[10 10];
+coop_system=optimcon(spin_system,coop_control);
+coop_guess=0.364110104613*ones(2,2);
+[~,coop_before,coop_gradient]=grape_coop(coop_guess,coop_system);
+[~,primary_a]=grape_phase(coop_guess(1,:),coop_system);
+[~,primary_b]=grape_phase(coop_guess(2,:),coop_system);
+primary=(primary_a(1)+primary_b(1))/2;
+result=test_true(result,'cooperative cancellation fixture',...
+                 abs(coop_before(1))<1e-6&&primary>1e-3&&...
+                 norm(coop_gradient(:,:,1),'fro')>1e-3,...
+                 'The nearly zero composite score hides substantial primary transfer and gradient.');
+coop_caught='';
+try
+    [coop_point,coop_data]=fmaxnewton(coop_system,@grape_coop,coop_guess);
+catch err
+    coop_caught=err.message;
+end
+result=test_true(result,'cooperative cancellation admitted',isempty(coop_caught),...
+                 'The optimiser must not confuse impurity cancellation with zero primary transfer.');
+if isempty(coop_caught)
+    [~,coop_after]=grape_coop(coop_point,coop_system);
+    result=test_true(result,'cooperative cancellation improves',...
+                     coop_after(1)>coop_before(1)&&coop_data.count.iter==1,...
+                     'A nonstationary zero-score waveform must improve in a real optimiser step.');
+end
+
+% Keep the assembled-gradient guard when every cooperative phase is frozen
+coop_system.control.freeze=true(size(coop_guess)); coop_caught='';
+try
+    fmaxnewton(coop_system,@grape_coop,coop_guess);
+catch err
+    coop_caught=err.message;
+end
+result=test_true(result,'frozen cooperative gradient rejected',...
+                 strcmp(coop_caught,'fidelity or gradient too small at iter 1, find a better guess.'),...
+                 'The value exemption must not weaken the assembled-gradient guard.');
 
 end
 

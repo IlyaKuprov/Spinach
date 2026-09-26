@@ -1,12 +1,12 @@
 # Spinach code index: kernel
 
 - Source repository: `https://github.com/IlyaKuprov/Spinach`
-- Source commit: `7d367a3966d4d1651cc0f0233d1960ca75912258` and `fc60ce81e799a489abb394619fa1e4f63e8d441e` (merged snapshot)
-- Source tree state: `merged committed-parent snapshot`
+- Source commit: `0b7348fb9e69f7b220395ce7b502abb8f165cde8` (parent of cooperative guard update)
+- Source tree state: `merged PR snapshot with cooperative guard correction`
 - Path set: committed MATLAB files under this index directory; working-tree and untracked files are excluded.
 - Files indexed: **530** MATLAB files
-- Total source lines: **73329**
-- Generated: 2026-09-26T13:51:43+00:00
+- Total source lines: **73330**
+- Generated: 2026-09-26T14:31:39+00:00
 
 | File | Signature | Summary | LOC |
 |---|---|---|---:|
@@ -195,7 +195,7 @@
 | `kernel/optimcon/ens_catalog.m` | `[catalog,ens_sizes]=ens_catalog(control)` | Ensemble case catalog for optimal control problems. Enumerates the Cartesian product of the state-target pairs, the drif | 119 |
 | `kernel/optimcon/ensemble.m` | `[traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)` | A parallel wrapper around GRAPE that enables ensemble optimal control optimisations. This function handles systems with | 192 |
 | `kernel/optimcon/fapt2sfo.m` | `[wave,dt,time_grid]=fapt2sfo(fapt,time_grid)` | Converts a freq-ampl-phase-time specification of a pulse sequ- uence into the corresponding single frequency origin wave | 124 |
-| `kernel/optimcon/fmaxnewton.m` | `[x,data]=fmaxnewton(spin_system,cost_function,guess)` | Finds a local maximum of a function of several variables using Newton and quasi-Newton algorithms. Syntax: [x,data]=fmax | 402 |
+| `kernel/optimcon/fmaxnewton.m` | `[x,data]=fmaxnewton(spin_system,cost_function,guess)` | Finds a local maximum of a function of several variables using Newton and quasi-Newton algorithms. Syntax: [x,data]=fmax | 403 |
 | `kernel/optimcon/grape_hilb.m` | `[traj_data,fidelity,grad,hess]=grape_hilb(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)` | Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user | 813 |
 | `kernel/optimcon/grape_liouv.m` | `[traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)` | Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user | 1063 |
 | `kernel/optimcon/hess_reorder.m` | `hess=hess_reorder(hess,K,N)` | The waveforms on different channels are assumed to be stored in the rows of the input array. The Hessian elements corres | 70 |

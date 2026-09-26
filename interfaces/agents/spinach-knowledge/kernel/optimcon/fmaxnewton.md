@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/fmaxnewton.m`
 - Signature: `[x,data]=fmaxnewton(spin_system,cost_function,guess)`
-- Total lines: 402
+- Total lines: 403
 
 ## Purpose
 
@@ -17,7 +17,7 @@ Finds a local maximum of a function of several variables using Newton and quasi-
 
 ## Numerical / algorithmic content
 
-- All four methods check the initial assembled gradient on unfrozen coordinates before constructing a search direction. A norm below `1e-6` is rejected with the poor-initial-guess diagnostic, before any Hessian regularisation or solve. Terminal objectives without trajectory penalties also require the first returned objective channel to have magnitude at least `1e-6`; trajectory objectives retain their small-fidelity exemption. For `grape_coop`, this first channel includes the squared-impurity penalty: an otherwise optimisable cancellation can be rejected even when primary transfer and gradient are nonzero. The limitation also occurs on the unchanged `main` implementation. These are optimiser-level checks, not restrictions on individual GRAPE contributions.
+- All four methods check the initial assembled gradient on unfrozen coordinates before constructing a search direction. A norm below `1e-6` is rejected with the poor-initial-guess diagnostic, before any Hessian regularisation or solve. Terminal objectives without trajectory penalties also require the first returned objective channel to have magnitude at least `1e-6`, except `grape_coop`: its first channel includes the squared-impurity penalty and can vanish by cancellation despite substantial primary transfer. Cooperative initial guesses are checked by their assembled gradient instead. Trajectory objectives retain the small-fidelity exemption. These are optimiser-level checks, not restrictions on individual GRAPE contributions.
 - Newton and Goodwin request an objective, gradient, and Hessian every iteration. LBFGS and RBFGS request the initial objective and gradient, then reuse line-search gradients. The initial checks use these existing evaluations. With `max_iter=0`, only the objective is evaluated and the initial-guess guard is not applied.
 - The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.

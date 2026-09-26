@@ -2,7 +2,7 @@
 
 - Source: `tests/kernel/test_coop_gradient.m`
 - Signature: `result=test_coop_gradient()`
-- Total lines: 268
+- Total lines: 318
 
 ## Purpose
 
@@ -14,7 +14,7 @@ The cooperative objective combines primary transfer and squared orthogonal impur
 
 ## Numerical / algorithmic content
 
-Finite differences check phase derivatives in both density formalisms with unit/nonunit complex targets, noncommuting pulses, a power ensemble, vanishing impurity, and purely imaginary auxiliary overlaps. Exact zero auxiliary values and gradients remain valid engine outputs.
+Finite differences check phase derivatives in both density formalisms with unit/nonunit complex targets, noncommuting pulses, a power ensemble, vanishing impurity, and purely imaginary auxiliary overlaps. Exact zero auxiliary values and gradients remain valid engine outputs. A cooperative one-spin transfer with nonzero primary overlap and gradient but near-zero combined score must be admitted and improve in a real optimiser step.
 
 All four `fmaxnewton` methods are tested in both density formalisms: unusable assembled initial guesses and all-frozen gradients must receive the poor-guess diagnostic without singular-solve warnings. Constant objectives remain valid for zero-iteration evaluation. A nonstationary physical transfer must improve over multiple iterations, with Hessian evaluations requested only by Newton and Goodwin, once per iteration.
 

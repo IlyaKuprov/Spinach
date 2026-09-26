@@ -1,8 +1,6 @@
 # kernel/optimcon/wrappers/grape_curv.m
 
-- Source: `kernel/optimcon/wrappers/grape_curv.m`
 - Signature: `[traj_data,fidelity,df_du]=grape_curv(waveform_u,u2x,dx_du,spin_system)`
-- Total lines: 143
 
 ## Purpose
 

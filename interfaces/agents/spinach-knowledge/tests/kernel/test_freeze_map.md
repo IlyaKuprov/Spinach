@@ -1,8 +1,6 @@
 # tests/kernel/test_freeze_map.m
 
-- Source: `tests/kernel/test_freeze_map.m`
 - Signature: `result=test_freeze_map()`
-- Total lines: 254
 
 ## Purpose
 

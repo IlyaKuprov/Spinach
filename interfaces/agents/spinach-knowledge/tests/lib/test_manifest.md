@@ -2,7 +2,7 @@
 
 - Source: `tests/lib/test_manifest.m`
 - Signature: `manifest=test_manifest()`
-- Total lines: 132
+- Total lines: 134
 
 ## Purpose
 

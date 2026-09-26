@@ -1,21 +1,22 @@
 # Spinach code index: tests
 
 - Source repository: `https://github.com/IlyaKuprov/Spinach`
-- Source commit: `176258171dcaaefff69b8b11c4cf3b6c3ba6e89f`
-- Source tree state: `committed snapshot`
+- Source commit: `4f7919589104e492c38b8c6e72a6881fd4b167fa` (merged with PR head)
+- Source tree state: `merged working tree prior to merge commit`
 - Path set: committed MATLAB files under this index directory; working-tree and untracked files are excluded.
-- Files indexed: **116** MATLAB files
-- Total source lines: **14355**
+- Files indexed: **118** MATLAB files
+- Total source lines: **15001**
 - Generated: 2026-09-24T08:33:21+00:00
 
 | File | Signature | Summary | LOC |
 |---|---|---|---:|
 | `tests/interfaces/test_c2spinach.m` | `result=test_c2spinach()` | Tests the magres parser with bundled CASTEP files and synthetic atom/tensor fixtures. | 75 |
 | `tests/interfaces/test_orca_parser.m` | `result=test_orca_parser()` | Tests the ORCA log parser on the logs bundled with the examples. Syntax: result=test_orca_parser() Outputs: result -regr | 53 |
-| `tests/kernel/test_apodisation_exp_window.m` | `result=test_apodisation_exp_window()` | Tests exponential FID apodisation. Syntax: result=test_apodisation_exp_window() Outputs: result -regression test result  | 38 |
+| `tests/kernel/test_apodisation_exp_window.m` | `result=test_apodisation_exp_window()` | Tests exponential FID apodisation. Syntax: result=test_apodisation_exp_window() Outputs: result -regression test result | 38 |
 | `tests/kernel/test_cache_temp_scratch.m` | `result=test_cache_temp_scratch()` | Tests cache management in a temporary scratch directory. Syntax: result=test_cache_temp_scratch() Outputs: result -regre | 123 |
 | `tests/kernel/test_chemical_exchange_conservation.m` | `result=test_chemical_exchange_conservation()` | Tests conservation in two-site chemical exchange. Syntax: result=test_chemical_exchange_conservation() Outputs: result - | 44 |
 | `tests/kernel/test_commutator_utility.m` | `result=test_commutator_utility()` | Tests the commutator utility. Syntax: result=test_commutator_utility() Outputs: result -regression test result with expl | 40 |
+| `tests/kernel/test_coop_gradient.m` | `result=test_coop_gradient()` | Cooperative phase gradients for the requested transfer fidelity. | 371 |
 | `tests/kernel/test_ctx_doublerot_acquire.m` | `result=test_ctx_doublerot_acquire()` | Tests the double-rotor context with acquire(). Syntax: result=test_ctx_doublerot_acquire() Outputs: result -regression t | 71 |
 | `tests/kernel/test_ctx_floquet_acquire.m` | `result=test_ctx_floquet_acquire()` | Tests the Floquet context with acquire(). Syntax: result=test_ctx_floquet_acquire() Outputs: result -regression test res | 68 |
 | `tests/kernel/test_ctx_gridfree_acquire.m` | `result=test_ctx_gridfree_acquire()` | Tests the grid-free Fokker-Planck context with acquire(). Syntax: result=test_ctx_gridfree_acquire() Outputs: result -re | 66 |
@@ -46,14 +47,14 @@
 | `tests/kernel/test_dynamic_remaining_core_suite.m` | `result=test_dynamic_remaining_core_suite()` | Tests remaining deterministic utility helpers. Syntax: result=test_dynamic_remaining_core_suite() Outputs: result -regre | 297 |
 | `tests/kernel/test_dynamic_remaining_parallel_suite.m` | `result=test_dynamic_remaining_parallel_suite()` | Tests remaining parallel, stochastic, and diagnostic utilities. Syntax: result=test_dynamic_remaining_parallel_suite() O | 86 |
 | `tests/kernel/test_dynamic_remaining_regularisation_suite.m` | `result=test_dynamic_remaining_regularisation_suite()` | Tests remaining regularisation and inverse-problem utilities. Syntax: result=test_dynamic_remaining_regularisation_suite | 62 |
-| `tests/kernel/test_dynamic_remaining_spectral_suite.m` | `result=test_dynamic_remaining_spectral_suite()` | Tests remaining spectral, symmetry, and Fokker-Planck utilities. Syntax: result=test_dynamic_remaining_spectral_suite()  | 234 |
+| `tests/kernel/test_dynamic_remaining_spectral_suite.m` | `result=test_dynamic_remaining_spectral_suite()` | Tests remaining spectral, symmetry, and Fokker-Planck utilities. Syntax: result=test_dynamic_remaining_spectral_suite() | 234 |
 | `tests/kernel/test_dynamic_rlx_split_suite.m` | `result=test_dynamic_rlx_split_suite()` | Tests relaxation-superoperator component splitting. Syntax: result=test_dynamic_rlx_split_suite() Outputs: result -regre | 69 |
 | `tests/kernel/test_dynamic_shaped_pulses_deep.m` | `result=test_dynamic_shaped_pulses_deep()` | Tests dynamic shaped-pulse propagation paths. Syntax: result=test_dynamic_shaped_pulses_deep() Outputs: result -regressi | 140 |
 | `tests/kernel/test_dynamic_spin_edit_suite.m` | `result=test_dynamic_spin_edit_suite()` | Tests deterministic spin-system editing support utilities. Syntax: result=test_dynamic_spin_edit_suite() Outputs: result | 270 |
 | `tests/kernel/test_dynamic_state_equilibrium_suite.m` | `result=test_dynamic_state_equilibrium_suite()` | Tests thermal equilibrium state construction paths. Syntax: result=test_dynamic_state_equilibrium_suite() Outputs: resul | 73 |
 | `tests/kernel/test_dynamic_state_projection_suite.m` | `result=test_dynamic_state_projection_suite()` | Tests dynamic state projection helper paths. Syntax: result=test_dynamic_state_projection_suite() Outputs: result -regre | 110 |
 | `tests/kernel/test_dynamic_superop.m` | `result=test_dynamic_superop()` | Tests superop() sparse-XYZ spherical-tensor product operators. Syntax: result=test_dynamic_superop() Outputs: result -re | 74 |
-| `tests/kernel/test_dynamic_trajectory_frontends.m` | `result=test_dynamic_trajectory_frontends()` | Tests trajectory-analysis dynamic front-end kernels. Syntax: result=test_dynamic_trajectory_frontends() Outputs: result  | 151 |
+| `tests/kernel/test_dynamic_trajectory_frontends.m` | `result=test_dynamic_trajectory_frontends()` | Tests trajectory-analysis dynamic front-end kernels. Syntax: result=test_dynamic_trajectory_frontends() Outputs: result | 151 |
 | `tests/kernel/test_dynamic_voitlander.m` | `result=test_dynamic_voitlander()` | Tests voitlander() on an isotropic one-electron field-swept line. Syntax: result=test_dynamic_voitlander() Outputs: resu | 191 |
 | `tests/kernel/test_euler_rotation_matrix.m` | `result=test_euler_rotation_matrix()` | Tests active ZYZ Euler rotation matrices. Syntax: result=test_euler_rotation_matrix() Outputs: result -regression test r | 39 |
 | `tests/kernel/test_exponential_krylov_suite.m` | `result=test_exponential_krylov_suite()` | Tests exponential, Chebyshev, and Krylov numerical utilities. Syntax: result=test_exponential_krylov_suite() Outputs: re | 125 |
@@ -62,7 +63,7 @@
 | `tests/kernel/test_giant_ham_descr.m` | `result=test_giant_ham_descr()` | Tests the giant spin Hamiltonian descriptor route. Syntax: result=test_giant_ham_descr() Outputs: result -regression tes | 134 |
 | `tests/kernel/test_graph_geometry_suite.m` | `result=test_graph_geometry_suite()` | Tests graph, geometry, lattice, and coordinate utilities. Syntax: result=test_graph_geometry_suite() Outputs: result -re | 120 |
 | `tests/kernel/test_grid_geometry_suite.m` | `result=test_grid_geometry_suite()` | Tests grid and spherical geometry helpers. Syntax: result=test_grid_geometry_suite() Outputs: result -regression test re | 178 |
-| `tests/kernel/test_hilbert_operator.m` | `result=test_hilbert_operator()` | Tests Hilbert-space operator generation. Syntax: result=test_hilbert_operator() Outputs: result -regression test result  | 48 |
+| `tests/kernel/test_hilbert_operator.m` | `result=test_hilbert_operator()` | Tests Hilbert-space operator generation. Syntax: result=test_hilbert_operator() Outputs: result -regression test result | 48 |
 | `tests/kernel/test_hilbert_state.m` | `result=test_hilbert_state()` | Tests Hilbert-space state generation. Syntax: result=test_hilbert_state() Outputs: result -regression test result with e | 44 |
 | `tests/kernel/test_indexing_inverse_suite.m` | `result=test_indexing_inverse_suite()` | Tests indexing helper inverses. Syntax: result=test_indexing_inverse_suite() Outputs: result -regression test result wit | 102 |
 | `tests/kernel/test_indexing_roundtrip_suite.m` | `result=test_indexing_roundtrip_suite()` | Tests angular-momentum and matrix indexing helpers. Syntax: result=test_indexing_roundtrip_suite() Outputs: result -regr | 64 |
@@ -81,13 +82,13 @@
 | `tests/kernel/test_operator_expansion_suite.m` | `result=test_operator_expansion_suite()` | Tests operator expansion and conversion helpers. Syntax: result=test_operator_expansion_suite() Outputs: result -regress | 156 |
 | `tests/kernel/test_optimcon_grape_one_spin.m` | `result=test_optimcon_grape_one_spin()` | Tests one-spin optimal-control setup and Hilbert-space GRAPE. Syntax: result=test_optimcon_grape_one_spin() Outputs: res | 147 |
 | `tests/kernel/test_optimcon_support_paths.m` | `result=test_optimcon_support_paths()` | Tests small optimal-control support paths. Syntax: result=test_optimcon_support_paths() Outputs: result -regression test | 352 |
-| `tests/kernel/test_orientation_average_suite.m` | `result=test_orientation_average_suite()` | Tests orientation() and average() on small exact cases. Syntax: result=test_orientation_average_suite() Outputs: result  | 68 |
+| `tests/kernel/test_orientation_average_suite.m` | `result=test_orientation_average_suite()` | Tests orientation() and average() on small exact cases. Syntax: result=test_orientation_average_suite() Outputs: result | 68 |
 | `tests/kernel/test_overload_arithmetic_suite.m` | `result=test_overload_arithmetic_suite()` | Tests cheap overload arithmetic for cell, struct, RCV, and polyadic classes. Syntax: result=test_overload_arithmetic_sui | 155 |
 | `tests/kernel/test_pauli_spin_half_algebra.m` | `result=test_pauli_spin_half_algebra()` | Tests spin-half angular momentum matrices. Syntax: result=test_pauli_spin_half_algebra() Outputs: result -regression tes | 61 |
-| `tests/kernel/test_pauli_spin_one_algebra.m` | `result=test_pauli_spin_one_algebra()` | Tests spin-one angular momentum matrices. Syntax: result=test_pauli_spin_one_algebra() Outputs: result -regression test  | 52 |
+| `tests/kernel/test_pauli_spin_one_algebra.m` | `result=test_pauli_spin_one_algebra()` | Tests spin-one angular momentum matrices. Syntax: result=test_pauli_spin_one_algebra() Outputs: result -regression test | 52 |
 | `tests/kernel/test_perm_group_suite.m` | `result=test_perm_group_suite()` | Tests permutation group database metadata. Syntax: result=test_perm_group_suite() Outputs: result -regression test resul | 142 |
 | `tests/kernel/test_pi_pulse_rotation.m` | `result=test_pi_pulse_rotation()` | Tests hard pi-pulse rotation. Syntax: result=test_pi_pulse_rotation() Outputs: result -regression test result with expla | 42 |
-| `tests/kernel/test_plotting_helpers_offscreen.m` | `result=test_plotting_helpers_offscreen()` | Tests offscreen execution of Spinach plotting helpers. Syntax: result=test_plotting_helpers_offscreen() Outputs: result  | 410 |
+| `tests/kernel/test_plotting_helpers_offscreen.m` | `result=test_plotting_helpers_offscreen()` | Tests offscreen execution of Spinach plotting helpers. Syntax: result=test_plotting_helpers_offscreen() Outputs: result | 410 |
 | `tests/kernel/test_plotting_remaining_suite.m` | `result=test_plotting_remaining_suite()` | Tests remaining Spinach plotting helper gaps under offscreen graphics. Syntax: result=test_plotting_remaining_suite() Ou | 461 |
 | `tests/kernel/test_ppm_hz_roundtrip.m` | `result=test_ppm_hz_roundtrip()` | Tests chemical shift and frequency conversion. Syntax: result=test_ppm_hz_roundtrip() Outputs: result -regression test r | 45 |
 | `tests/kernel/test_pulses_propagation_suite.m` | `result=test_pulses_propagation_suite()` | Tests pulse-coordinate and propagation helpers. Syntax: result=test_pulses_propagation_suite() Outputs: result -regressi | 128 |
@@ -95,6 +96,7 @@
 | `tests/kernel/test_relaxation_t2_rate.m` | `result=test_relaxation_t2_rate()` | Tests phenomenological T2 relaxation rate. Syntax: result=test_relaxation_t2_rate() Outputs: result -regression test res | 48 |
 | `tests/kernel/test_remtrace_tensor.m` | `result=test_remtrace_tensor()` | Tests removal of the isotropic tensor trace. Syntax: result=test_remtrace_tensor() Outputs: result -regression test resu | 38 |
 | `tests/kernel/test_rf_cartesian_polar.m` | `result=test_rf_cartesian_polar()` | Tests RF Cartesian and polar waveform conversion. Syntax: result=test_rf_cartesian_polar() Outputs: result -regression t | 51 |
+| `tests/kernel/test_rotor_assume.m` | `result=test_rotor_assume()` | Explicit assumptions throughout rotor-stack frame construction. | 273 |
 | `tests/kernel/test_scalar_coupling_hamiltonian.m` | `result=test_scalar_coupling_hamiltonian()` | Tests the two-spin scalar-coupling Hamiltonian. Syntax: result=test_scalar_coupling_hamiltonian() Outputs: result -regre | 46 |
 | `tests/kernel/test_shaped_pulse_rotation.m` | `result=test_shaped_pulse_rotation()` | Tests a one-slice Cartesian shaped pulse. Syntax: result=test_shaped_pulse_rotation() Outputs: result -regression test r | 49 |
 | `tests/kernel/test_slowpass_fft_parity.m` | `result=test_slowpass_fft_parity()` | Tests slowpass amplitude normalisation against time-domain FFT. Syntax: result=test_slowpass_fft_parity() Outputs: resul | 81 |
@@ -107,7 +109,7 @@
 | `tests/kernel/test_states_composite_suite.m` | `result=test_states_composite_suite()` | Tests composite state generators in kernel/states. Syntax: result=test_states_composite_suite() Outputs: result -regress | 125 |
 | `tests/kernel/test_step_matches_expm.m` | `result=test_step_matches_expm()` | Tests Hilbert-space propagation against matrix exponentiation. Syntax: result=test_step_matches_expm() Outputs: result - | 48 |
 | `tests/kernel/test_step_zero_time.m` | `result=test_step_zero_time()` | Tests zero-duration propagation. Syntax: result=test_step_zero_time() Outputs: result -regression test result with expla | 43 |
-| `tests/kernel/test_tensor_vector_suite.m` | `result=test_tensor_vector_suite()` | Tests tensor, vector, distribution, and relaxation utilities. Syntax: result=test_tensor_vector_suite() Outputs: result  | 136 |
+| `tests/kernel/test_tensor_vector_suite.m` | `result=test_tensor_vector_suite()` | Tests tensor, vector, distribution, and relaxation utilities. Syntax: result=test_tensor_vector_suite() Outputs: result | 136 |
 | `tests/kernel/test_transform_rotation_suite.m` | `result=test_transform_rotation_suite()` | Tests rotation transform helpers. Syntax: result=test_transform_rotation_suite() Outputs: result -regression test result | 138 |
 | `tests/kernel/test_transform_roundtrip_suite.m` | `result=test_transform_roundtrip_suite()` | Tests deterministic coordinate and tensor transforms. Syntax: result=test_transform_roundtrip_suite() Outputs: result -r | 85 |
 | `tests/kernel/test_transform_tensor_suite.m` | `result=test_transform_tensor_suite()` | Tests tensor transform helpers. Syntax: result=test_transform_tensor_suite() Outputs: result -regression test result wit | 149 |
@@ -115,13 +117,13 @@
 | `tests/kernel/test_unit_conversion_suite.m` | `result=test_unit_conversion_suite()` | Tests scalar unit-conversion functions. Syntax: result=test_unit_conversion_suite() Outputs: result -regression test res | 62 |
 | `tests/kernel/test_wave_basis_orthonormality.m` | `result=test_wave_basis_orthonormality()` | Tests waveform basis orthonormality. Syntax: result=test_wave_basis_orthonormality() Outputs: result -regression test re | 37 |
 | `tests/kernel/test_wigner_angular_suite.m` | `result=test_wigner_angular_suite()` | Tests angular-momentum coefficient and spherical-function helpers. Syntax: result=test_wigner_angular_suite() Outputs: r | 62 |
-| `tests/kernel/test_zeeman_hamiltonian.m` | `result=test_zeeman_hamiltonian()` | Tests the one-spin Zeeman Hamiltonian. Syntax: result=test_zeeman_hamiltonian() Outputs: result -regression test result  | 42 |
-| `tests/lib/new_test_result.m` | `result=new_test_result(id,name,purpose)` | Creates a regression test result structure. Syntax: result=new_test_result(id,name,purpose) Parameters: id -stable test  | 52 |
+| `tests/kernel/test_zeeman_hamiltonian.m` | `result=test_zeeman_hamiltonian()` | Tests the one-spin Zeeman Hamiltonian. Syntax: result=test_zeeman_hamiltonian() Outputs: result -regression test result | 42 |
+| `tests/lib/new_test_result.m` | `result=new_test_result(id,name,purpose)` | Creates a regression test result structure. Syntax: result=new_test_result(id,name,purpose) Parameters: id -stable test | 52 |
 | `tests/lib/test_close.m` | `result=test_close(result,label,observed,reference,abs_tol,rel_tol,why)` | Adds a numerical regression check with tolerances and explanation. Syntax: result=test_close(result,label,observed,refer | 114 |
-| `tests/lib/test_manifest.m` | `manifest=test_manifest()` | Returns Spinach regression test metadata. Syntax: manifest=test_manifest() Outputs: manifest -structure array with test  | 132 |
+| `tests/lib/test_manifest.m` | `manifest=test_manifest()` | Returns Spinach regression test metadata. Syntax: manifest=test_manifest() Outputs: manifest -structure array with test  | 134 |
 | `tests/lib/test_options.m` | `options=test_options(varargin)` | Parses name-value options for the Spinach test runner. Syntax: options=test_options(varargin) Parameters: varargin -name | 62 |
 | `tests/lib/test_record.m` | `record=test_record(record)` | Retains an in-progress regression result so completed checks survive a later test error. | 47 |
-| `tests/lib/test_spin_system.m` | `spin_system=test_spin_system(sys,inter,bas)` | Builds a small quiet Spinach spin system for tests. Syntax: spin_system=test_spin_system(sys,inter,bas) Parameters: sys  | 35 |
+| `tests/lib/test_spin_system.m` | `spin_system=test_spin_system(sys,inter,bas)` | Builds a small quiet Spinach spin system for tests. Syntax: spin_system=test_spin_system(sys,inter,bas) Parameters: sys | 35 |
 | `tests/lib/test_true.m` | `[result,passed]=test_true(result,label,condition,why)` | Adds a logical regression check with a clear message. Syntax: result=test_true(result,label,condition,why) Parameters: r | 72 |
 | `tests/list_tests.m` | `manifest=list_tests(varargin)` | Lists Spinach regression tests. Syntax: manifest=list_tests(varargin) Parameters: varargin -optional name-value pair 'pa | 37 |
 | `tests/run_test.m` | `result=run_test(test_id)` | Runs one Spinach regression test by identifier substring. Syntax: result=run_test(test_id) Parameters: test_id -test ide | 46 |

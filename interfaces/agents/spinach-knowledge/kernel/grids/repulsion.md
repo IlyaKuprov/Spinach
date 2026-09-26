@@ -1,8 +1,6 @@
 # kernel/grids/repulsion.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/grids/repulsion.m`
 - Signature: `[alphas,betas,gammas,weights]=repulsion(npoints,ndims,niter)`
-- Total lines: 140
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Generates repulsion grids on a unit hypersphere. See the paper by Bak and Nielse
 - Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -52,7 +47,3 @@ Generates repulsion grids on a unit hypersphere. See the paper by Bak and Nielse
 - niter -number of repulsion interations (simple clipped
 - gradient descent at the moment)
 - alphas -alpha Euler angles of the grid, in radians,
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `dist_vecs()`, `num2str()`, `cart2pol()`, `cart2sph()`, `kfigure()`, `plot3()`, `qter2euler()`, `ismember()`.

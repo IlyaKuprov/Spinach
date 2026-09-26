@@ -1,8 +1,6 @@
 # kernel/derivatives/fourdif.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/derivatives/fourdif.m`
 - Signature: `[x,DM]=fourdif(N,m)`
-- Total lines: 98
 
 ## Purpose
 
@@ -16,8 +14,6 @@ The function [x,DM] = fourdif(N,m) computes the m'th derivative Fourier spectral
 ## Numerical / algorithmic content
 
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -51,7 +47,3 @@ The function [x,DM] = fourdif(N,m) computes the m'th derivative Fourier spectral
 - m=2. A discrete Fourier approach is employed for m>2. The prog-
 - ram computes the first column and first row and then uses the
 - toeplitz() function to create the matrix.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `cot()`, `flipud()`, `topc()`, `csc()`, `col1()`, `toeplitz()`.

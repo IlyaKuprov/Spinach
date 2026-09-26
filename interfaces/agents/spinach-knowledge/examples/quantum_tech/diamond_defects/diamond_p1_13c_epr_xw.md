@@ -1,8 +1,6 @@
 # examples/quantum_tech/diamond_defects/diamond_p1_13c_epr_xw.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/diamond_defects/diamond_p1_13c_epr_xw.m`
 - Signature: `diamond_p1_13c_epr_xw()`
-- Total lines: 71
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Field-swept powder EPR spectra of a P1 centre in 13C-enriched diamond at X and W
 - a_iso > 8 MHz
 - Set common EPR parameters
 - Set X-band parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `diamond_p1_13c()`, `create()`, `kill_spin()`, `basis()`, `fieldsweep()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`, `ktitle()`.

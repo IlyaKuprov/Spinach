@@ -1,8 +1,6 @@
 # examples/nqr/pure_nqr_nitrogen.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nqr/pure_nqr_nitrogen.m`
 - Signature: `pure_nqr_nitrogen()`
-- Total lines: 54
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Powder NQR spectrum of a system with a single 14N nucleus. Calculation time: sec
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `state()`, `operator()`, `powder()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

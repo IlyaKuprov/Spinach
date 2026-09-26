@@ -1,8 +1,6 @@
 # examples/optimal_control/state_transfer_coop.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/state_transfer_coop.m`
 - Signature: `state_transfer_coop()`
-- Total lines: 89
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Optimal control pulse optimisation for state-to-state transfer in a quadrupolar 
 - Basis set
 - Run Spinach housekeeping
 - Set up and normalise the initial state
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `state()`, `assume()`, `hamiltonian()`, `orientation()`, `carrier()`, `rotframe()`, `operator()`, `optimcon()`, `fmaxnewton()`, `outcome_b()`.

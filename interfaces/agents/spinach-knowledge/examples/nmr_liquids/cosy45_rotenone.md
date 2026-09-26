@@ -1,8 +1,6 @@
 # examples/nmr_liquids/cosy45_rotenone.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/cosy45_rotenone.m`
 - Signature: `cosy45_rotenone()`
-- Total lines: 83
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Magnitude mode COSY-45 spectrum of rotenone. Calculation time: minutes
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

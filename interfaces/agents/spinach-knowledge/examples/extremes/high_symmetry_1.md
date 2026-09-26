@@ -1,8 +1,6 @@
 # examples/extremes/high_symmetry_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/extremes/high_symmetry_1.m`
 - Signature: `high_symmetry_1()`
-- Total lines: 89
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Basis set
 - Spinach housekeeping
 - Sequence parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

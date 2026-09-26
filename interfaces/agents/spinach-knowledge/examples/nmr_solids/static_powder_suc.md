@@ -1,8 +1,6 @@
 # examples/nmr_solids/static_powder_suc.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/static_powder_suc.m`
 - Signature: `static_powder_suc()`
-- Total lines: 61
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Experiment setup
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `powder()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

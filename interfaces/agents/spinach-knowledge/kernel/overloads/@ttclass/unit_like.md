@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/unit_like.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/unit_like.m`
 - Signature: `A=unit_like(A)`
-- Total lines: 65
 
 ## Purpose
 
@@ -43,7 +41,3 @@ A=unit_like(A)
 - Briefly stated, the Gell-Mann Amnesia effect is as follows. You open the
 - newspaper to an article on some subject you know well. You read the arti-
 - cle and see the journalist has absolutely no understanding of either the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `sizes()`, `all()`, `mode_sizes()`, `ttclass()`, `ismatrix()`, `issparse()`, `speye()`.

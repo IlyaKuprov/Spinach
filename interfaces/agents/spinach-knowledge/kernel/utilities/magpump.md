@@ -1,8 +1,6 @@
 # kernel/utilities/magpump.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/magpump.m`
 - Signature: `R=magpump(spin_system,R,rho,rate)`
-- Total lines: 68
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Adds phenomenological pumping terms to the relaxation superoperator to enable ap
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -52,7 +47,3 @@ R=magpump(spin_system,R,rho,rate)
 - must be set to 1.
 - Note: this function is only available in sphten-liouv formalism, and
 - may be called repeatedly if multiple states are pumped.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `ismatrix()`, `iscolumn()`, `isscalar()`, `ismember()`, `rho()`.

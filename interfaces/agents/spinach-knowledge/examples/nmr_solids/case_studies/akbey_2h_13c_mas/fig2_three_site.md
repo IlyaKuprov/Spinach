@@ -1,8 +1,6 @@
 # examples/nmr_solids/case_studies/akbey_2h_13c_mas/fig2_three_site.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/case_studies/akbey_2h_13c_mas/fig2_three_site.m`
 - Signature: `fig2_three_site()`
-- Total lines: 72
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Three-site position exchange for a deuterium nucleus. The sites differ in the ch
 - Spinach housekeeping
 - Sequence parameters
 - MAS parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `weblab2nqi()`, `acos()`, `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

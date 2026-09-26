@@ -1,8 +1,6 @@
 # examples/optimal_control/distortions/kernel_estimation/kernel_from_antenna.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/distortions/kernel_estimation/kernel_from_antenna.m`
 - Signature: `kernel_from_antenna()`
-- Total lines: 61
 
 ## Purpose
 
@@ -32,7 +30,3 @@ HiPER instrument filter function kernel estimation from the quadrature component
 - Plot the ideal waveform
 - Extract the kernel
 - Compute and plot the convolution
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `kfigure()`, `scale_figure()`, `subplot()`, `xlim()`, `kxlabel()`, `kylabel()`, `ktitle()`, `kernelest()`, `save()`, `fftshift()`, `fft_freq_axis()`.

@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/full.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/full.m`
 - Signature: `answer=full(ttrain)`
-- Total lines: 58
 
 ## Purpose
 
@@ -37,7 +35,3 @@ Converts a tensor train representation of a matrix into a matrix. Syntax: answer
 - Get mode sizes
 - Loop over the buffer
 - Multiply up the tensor train
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `ranks()`, `sizes()`, `ttranks()`, `modesizes()`.

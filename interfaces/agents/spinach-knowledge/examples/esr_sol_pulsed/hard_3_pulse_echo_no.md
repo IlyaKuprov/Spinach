@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/hard_3_pulse_echo_no.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/hard_3_pulse_echo_no.m`
 - Signature: `hard_3_pulse_echo_no()`
-- Total lines: 58
 
 ## Purpose
 
@@ -30,7 +28,3 @@ DEER spin echo for a pair of nitroxide radicals at X-band. Two nit- roxide radic
 - Sequence parameters
 - Pulse sequence
 - Build the time axis
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `powder()`, `kfigure()`, `kxlabel()`.

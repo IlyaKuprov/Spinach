@@ -1,8 +1,6 @@
 # examples/imaging/dpfgse_signal_suppress.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/dpfgse_signal_suppress.m`
 - Signature: `dpfgse_signal_suppress()`
-- Total lines: 99
 
 ## Purpose
 
@@ -33,7 +31,3 @@ DPFGSE water suppression example for a solution of GABA in water. Gradients and 
 - This needs a GPU
 - sys.enable={'gpu'};
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `pulse_shape()`, `state()`, `imaging()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

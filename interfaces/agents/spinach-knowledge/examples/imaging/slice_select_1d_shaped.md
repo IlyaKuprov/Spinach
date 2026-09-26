@@ -1,8 +1,6 @@
 # examples/imaging/slice_select_1d_shaped.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/slice_select_1d_shaped.m`
 - Signature: `slice_select_1d_shaped()`
-- Total lines: 88
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Slice selection example using a one-dimensional sample and a shaped slice select
 - Relaxation model
 - Basis set
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `pulse_shape()`, `relaxation()`, `state()`, `imaging()`, `apodisation()`, `fftshift()`, `ifftshift()`, `kfigure()`, `plot_1d()`.

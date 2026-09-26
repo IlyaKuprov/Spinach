@@ -1,8 +1,6 @@
 # examples/nmr_paramag/carb_anh/s217c_point.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_paramag/carb_anh/s217c_point.m`
 - Signature: `s217c_point()`
-- Total lines: 38
 
 ## Purpose
 
@@ -23,7 +21,3 @@ Point fit for the S217C dataset mutant dataset for human carbonic anhydrase II. 
 - Solve the inverse problem
 - Plot experimental vs predicted PCS
 - Report and save the parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `ippcs()`, `kfigure()`, `kxlabel()`, `kylabel()`, `xlim()`, `ylim()`.

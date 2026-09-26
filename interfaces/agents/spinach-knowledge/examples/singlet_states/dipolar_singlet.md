@@ -1,8 +1,6 @@
 # examples/singlet_states/dipolar_singlet.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/singlet_states/dipolar_singlet.m`
 - Signature: `dipolar_singlet()`
-- Total lines: 48
 
 ## Purpose
 
@@ -33,7 +31,3 @@ A demonstration that the two-spin singet state is immune to dipolar relaxation. 
 - Proximity cut-off
 - Basis set
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `singlet()`, `num2str()`.

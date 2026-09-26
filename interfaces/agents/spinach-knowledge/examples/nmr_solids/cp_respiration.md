@@ -1,8 +1,6 @@
 # examples/nmr_solids/cp_respiration.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/cp_respiration.m`
 - Signature: `cp_respiration()`
-- Total lines: 57
 
 ## Purpose
 
@@ -32,7 +30,3 @@
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

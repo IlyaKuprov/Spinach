@@ -1,8 +1,6 @@
 # examples/nmr_liquids/cosy90_derome.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/cosy90_derome.m`
 - Signature: `cosy90_derome()`
-- Total lines: 59
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Figure 8.26 from Andrew Derome's "Modern NMR Techniques for Chemistry Research".
 - Simulation
 - Apodisation
 - Fourier transform
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

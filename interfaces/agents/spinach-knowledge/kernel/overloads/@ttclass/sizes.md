@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/sizes.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/sizes.m`
 - Signature: `modesizes=sizes(tt)`
-- Total lines: 43
 
 ## Purpose
 
@@ -37,7 +35,3 @@ Returns mode sizes (physical dimensions of each core) of a tensor train. Syntax:
 - Computer models are no different from fashion models: seductive,
 - unreliable, easily corrupted, and they lead sensible people to
 - make fools of themselves.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `modesizes()`.

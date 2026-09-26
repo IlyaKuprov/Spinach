@@ -1,8 +1,6 @@
 # examples/fitting/nmr_kinetics/glucose_exsy_a.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fitting/nmr_kinetics/glucose_exsy_a.m`
 - Signature: `glucose_exsy_a()`
-- Total lines: 201
 
 ## Purpose
 
@@ -17,7 +15,6 @@ Fitting of 2,2,3,3-tetrafluoroglucose NOESY with respect to the reaction rates i
 ## Numerical / algorithmic content
 
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The file also defines local helper function(s): `exsy_err()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -33,7 +30,3 @@ Fitting of 2,2,3,3-tetrafluoroglucose NOESY with respect to the reaction rates i
 - Display the result
 - Hush up Spinach
 - Magnet field
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `kfigure()`, `scale_figure()`, `optimset()`, `fminsearch()`, `exsy_err()`, `num2cell()`, `params()`, `equilibrate()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `load()`, `rot90()`.

@@ -1,8 +1,6 @@
 # examples/nmr_solids/mas_powder_nqi_gridfree.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/mas_powder_nqi_gridfree.m`
 - Signature: `mas_powder_nqi_gridfree()`
-- Total lines: 56
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Powder magic angle spinning spectrum of a single quadrupolar deuterium nucleus u
 - Simulation
 - Apodisation
 - Fourier transform
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `gridfree()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

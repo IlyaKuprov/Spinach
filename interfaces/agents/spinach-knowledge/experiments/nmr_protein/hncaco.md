@@ -1,8 +1,6 @@
 # experiments/nmr_protein/hncaco.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/nmr_protein/hncaco.m`
 - Signature: `fid=hncaco(spin_system,parameters,H,R,K)`
-- Total lines: 274
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Protein-specific HN(CA)CO experiment (Figure 7.41 of "Protein NMR Spectroscopy",
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -59,7 +55,3 @@ Protein-specific HN(CA)CO experiment (Figure 7.41 of "Protein NMR Spectroscopy",
 - number of points in the three temporal
 - dimensions, ordered as [t1 t2 t3].
 - parameters.sweep -a vector of three real numbers giving
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `operator()`, `strcmp()`, `state()`, `decouple()`, `evolution()`, `step()`, `coherence()`, `stitch()`, `fieldnames()`, `ismember()`, `ismatrix()`, `all()`, `isfield()`, `isvector()`, `any()`.

@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/conj.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/conj.m`
 - Signature: `tt=conj(tt)`
-- Total lines: 44
 
 ## Purpose
 

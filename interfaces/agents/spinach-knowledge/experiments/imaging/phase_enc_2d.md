@@ -1,8 +1,6 @@
 # experiments/imaging/phase_enc_2d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/imaging/phase_enc_2d.m`
 - Signature: `mri=phase_enc_2d(spin_system,parameters,H,R,K,G,F)`
-- Total lines: 222
 
 ## Purpose
 
@@ -17,8 +15,6 @@
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -53,7 +49,3 @@
 - parameters.pe_grad_amp - phase encoding gradient amplitude, T/m
 - parameters.ro_grad_amp - readout gradient amplitude, T/m
 - parameters.pe_grad_dur - the duration of the phase encoding
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `operator()`, `speye()`, `step()`, `isfield()`, `evolution()`, `pe_grad_amps()`, `fid()`, `apodisation()`, `fftshift()`, `fft2()`, `ifftshift()`, `ismember()`, `ismatrix()`, `all()`, `iscell()`.

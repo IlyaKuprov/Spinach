@@ -1,16 +1,12 @@
 # tests/kernel/test_step_matches_expm.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_step_matches_expm.m`
 - Signature: `result=test_step_matches_expm()`
-- Total lines: 48
 
 ## Purpose
 
 Tests Hilbert-space propagation against matrix exponentiation. Syntax: result=test_step_matches_expm()
 
 ## Physical / mathematical content
-
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 
 ## Numerical / algorithmic content
 
@@ -35,7 +31,3 @@ Tests Hilbert-space propagation against matrix exponentiation. Syntax: result=te
 - Define a Hamiltonian and an initial density matrix
 - Build the independent exact propagator
 - Check exact finite-dimensional propagation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `step()`, `test_spin_system()`, `pauli()`, `test_close()`.

@@ -1,8 +1,6 @@
 # examples/esr_sol_swept/fieldsweep_porphyrin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_swept/fieldsweep_porphyrin.m`
 - Signature: `fieldsweep_porphyrin()`
-- Total lines: 69
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Field swept EPR spectrum of copper porphyrin complex, computed by finding resona
 - Symmetry
 - Spinach housekeeping
 - Experiment parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `fieldsweep()`, `kfigure()`, `kxlabel()`, `kylabel()`.

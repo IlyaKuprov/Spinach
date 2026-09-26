@@ -1,8 +1,6 @@
 # examples/nmr_solids/cp_contact_mas_nh_fplanck.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/cp_contact_mas_nh_fplanck.m`
 - Signature: `cp_contact_mas_nh_fplanck()`
-- Total lines: 60
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Cross-polarisation experiment in the doubly rotating frame. A single nitrogen-15
 - MAS parameters
 - Simulation
 - Plot the answer
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `operator()`, `state()`, `singlerot()`, `cumsum()`, `kfigure()`, `kylabel()`, `kxlabel()`.

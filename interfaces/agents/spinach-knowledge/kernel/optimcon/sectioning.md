@@ -1,8 +1,6 @@
 # kernel/optimcon/sectioning.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/sectioning.m`
 - Signature: `[alpha,fx_1,gfx_1,exitflag,data]=sectioning(cost_function,a,b,x_0,fx_0,...`
-- Total lines: 182
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Refines a previously found step bracket by repeated cubic interpolation until a 
 - Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -54,7 +49,3 @@ Refines a previously found step bracket by repeated cubic interpolation until a 
 - b -upper bracket structure with
 - x_0 -current optimisation vector
 - fx_0 -objective value at x_0
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `cubic_interp()`, `eps()`, `objeval()`, `alpha_conds()`, `isstruct()`, `isfield()`, `isscalar()`, `iscolumn()`, `isequal()`.

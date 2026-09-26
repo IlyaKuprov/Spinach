@@ -1,8 +1,6 @@
 # experiments/relaxan.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/relaxan.m`
 - Signature: `[r1,r2,t1,t2,R]=relaxan(spin_system,euler_angles)`
-- Total lines: 98
 
 ## Purpose
 
@@ -10,13 +8,9 @@ Automated relaxation theory analysis. Prints longitudinal and transverse relaxat
 
 ## Physical / mathematical content
 
-- This file belongs to the `experiments` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -51,7 +45,3 @@ Automated relaxation theory analysis. Prints longitudinal and transverse relaxat
 - r2 -a vector of transverse relaxation rates
 - t1 -a vector of longitudinal relaxation times
 - t2 -a vector of transverse relaxation times
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `sim2liouv()`, `grumble()`, `relaxation()`, `state()`, `report()`, `pad()`, `num2str()`, `ismember()`.

@@ -1,8 +1,6 @@
 # examples/fundamentals/quadratures/grid_diagrams.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/quadratures/grid_diagrams.m`
 - Signature: `grid_diagrams()`
-- Total lines: 55
 
 ## Purpose
 
@@ -27,7 +25,3 @@ Spherical grid diagrams for IK's book.
 - Optimisation grid -repulsion
 - Natual world inspiration grid -Igloo
 - "You are all wankers" -Vyacheslav Lebedev
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `kfigure()`, `scale_figure()`, `tiledlayout()`, `grid_fibon()`, `text()`, `load()`, `grid_plot()`, `grid_trian()`, `repulsion()`, `grid_igloo()`.

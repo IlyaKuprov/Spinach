@@ -1,8 +1,6 @@
 # experiments/pseudocon/pcs2chi.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/pseudocon/pcs2chi.m`
 - Signature: `[chi,err]=pcs2chi(hfcs,shifts,isotopes)`
-- Total lines: 109
 
 ## Purpose
 
@@ -15,9 +13,6 @@ Runs a least squares fitting procedure on top of Equation 10 from ponent of the 
 - The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `lsq_err()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -51,7 +46,3 @@ Runs a least squares fitting procedure on top of Equation 10 from ponent of the 
 - isotopes that exhibit each of the chemical
 - shifts supplied, for example {'1H','13C'}
 - chi -the fitted anisotropic part of the magnetic
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `optimoptions()`, `fminunc()`, `lsq_err()`, `chi()`, `shifts()`, `hfc2pcs()`, `iscell()`, `issymmetric()`, `any()`, `ischar()`.

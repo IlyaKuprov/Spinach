@@ -1,8 +1,6 @@
 # examples/giant_spin/lanthanide_powder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/lanthanide_powder.m`
 - Signature: `lanthanide_powder()`
-- Total lines: 57
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Powder spectrum of Gd(III) with ZFS up to 4th spherical rank using the giant spi
 - Experiment parameters
 - Run the simulation in the high-T approximation
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `fieldsweep()`, `kfigure()`, `kxlabel()`, `kylabel()`.

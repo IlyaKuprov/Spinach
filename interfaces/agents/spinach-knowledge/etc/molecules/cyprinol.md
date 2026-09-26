@@ -1,16 +1,12 @@
 # etc/molecules/cyprinol.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/etc/molecules/cyprinol.m`
 - Signature: `[sys,inter,bas]=cyprinol()`
-- Total lines: 193
 
 ## Purpose
 
 Spin system of cyprinol. Isotropic chemical shifts and J-couplings are taken from http://dx.doi.org/10.1002/mrc.4782 and, when not gi- ven there, estimated by tossing a twenty-sided coin. Syntax: [sys,inter,bas]=cyprinol()
 
 ## Physical / mathematical content
-
-- This file belongs to the `etc` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 
 ## Numerical / algorithmic content
 
@@ -38,7 +34,3 @@ Spin system of cyprinol. Isotropic chemical shifts and J-couplings are taken fro
 - Bud MacAulay
 - Ilya Kuprov
 - Hydrogen atoms
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `H_iso()`, `C_iso()`.

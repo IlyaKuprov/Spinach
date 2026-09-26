@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/hard_3_pulse_echo_cu.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/hard_3_pulse_echo_cu.m`
 - Signature: `hard_3_pulse_echo_cu()`
-- Total lines: 57
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Three-pulse DEER echo on a Cu(II)-NO two electron system at X-band. The calculat
 - Pulse sequence
 - Build the time axis
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `powder()`, `kfigure()`, `kxlabel()`.

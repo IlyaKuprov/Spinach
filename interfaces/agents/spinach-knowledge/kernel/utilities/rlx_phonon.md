@@ -1,8 +1,6 @@
 # kernel/utilities/rlx_phonon.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/rlx_phonon.m`
 - Signature: `R=rlx_phonon(spin_system,H,X,I0,alpha,T,form)`
-- Total lines: 136
 
 ## Purpose
 
@@ -16,8 +14,7 @@ Spin-phonon relaxation in the generalised Lindblad form of Saito, Miyashita, and
 
 - An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator. When H is already diagonal, the diagonalisation is skipped and the supplied basis is taken as the eigenbasis.
 - The thermal factor `(I(w)-I(-w))/(exp(hbar*w/kT)-1)` is evaluated with `expm1` at ordinary exponents, replaced by its analytic zero-frequency expansion where `|hbar*w/kT|<1e-3`, and set to zero where the exponent exceeds 700.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
+- `phi`, `num`, and `beta_w` are arrays indexed by logical masks, not function calls.
 
 ## Parameters / inputs
 
@@ -71,7 +68,3 @@ Spin-phonon relaxation in the generalised Lindblad form of Saito, Miyashita, and
 - w_kn=(E_k-E_n):
 - <k|R|n> = <k|X|n> * (I(w_kn)-I(-w_kn))/(exp(hbar*w_kn/kT)-1)
 - and the square of the coupling constant lambda of the original
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines in the main body: `grumble()`, `isdiag()`, `speye()`, `full()`, `diag()`, `eig()`, `max()`, `expm1()`, `abs()`, `sign()`, `zeros()`, `strcmp()`, `kron()`, `conj()`. `phi`, `num`, and `beta_w` are arrays indexed by logical masks, not calls.

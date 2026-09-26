@@ -1,8 +1,6 @@
 # examples/nmr_liquids/pa_strychnine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/pa_strychnine.m`
 - Signature: `pa_strychnine()`
-- Total lines: 61
 
 ## Purpose
 
@@ -32,7 +30,3 @@
 - Sequence parameters
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strychnine()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

@@ -1,8 +1,6 @@
 # examples/nmr_liquids/roesy_sucrose.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/roesy_sucrose.m`
 - Signature: `roesy_sucrose()`
-- Total lines: 70
 
 ## Purpose
 
@@ -34,7 +32,3 @@ ROESY spectrum of sucrose (magnetic parameters computed with DFT). Calculation t
 - Simulation
 - Apodisation
 - F2 Fourier transform
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

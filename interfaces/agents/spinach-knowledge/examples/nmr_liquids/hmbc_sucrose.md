@@ -1,8 +1,6 @@
 # examples/nmr_liquids/hmbc_sucrose.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/hmbc_sucrose.m`
 - Signature: `hmbc_sucrose()`
-- Total lines: 80
 
 ## Purpose
 
@@ -31,7 +29,3 @@ HMBC spectrum of sucrose with natural content of 13C isotope (magnetic parameter
 - Create the spin system structure
 - Generate isotopomers
 - Preallocate the answer
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `shift_iso()`, `create()`, `dilute()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

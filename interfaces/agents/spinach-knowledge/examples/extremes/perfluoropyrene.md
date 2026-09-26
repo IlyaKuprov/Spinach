@@ -1,8 +1,6 @@
 # examples/extremes/perfluoropyrene.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/extremes/perfluoropyrene.m`
 - Signature: `perfluoropyrene()`
-- Total lines: 64
 
 ## Purpose
 
@@ -31,7 +29,3 @@ X-band pulsed ESR spectrum of perfluoropyrene cation radical, computed using bru
 - Magnet induction
 - Relaxation theory
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

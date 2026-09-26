@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/mrdivide.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/mrdivide.m`
 - Signature: `a=mrdivide(a,b)`
-- Total lines: 41
 
 ## Purpose
 
@@ -36,7 +34,3 @@ Divides a tensor train object by a scalar. Syntax: c=mrdivide(a,b)
 - It is dangerous to be right in matters on which the established
 - authorities are wrong.
 - Voltaire
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `isscalar()`.

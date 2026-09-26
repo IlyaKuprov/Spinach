@@ -1,8 +1,6 @@
 # examples/relaxation_theory/trosy_proton.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/trosy_proton.m`
 - Signature: `trosy_proton()`
-- Total lines: 101
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Transverse relaxation rate as a function of the applied magnetic field at the C-
 - Loop over magnetic fields
 - Set the magnet field
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `spin()`, `create()`, `basis()`, `relaxation()`, `state()`, `r2c()`, `r2h()`, `hleft()`, `hright()`, `cleft()`, `cright()`, `kfigure()`, `ylim()`, `kxlabel()`.

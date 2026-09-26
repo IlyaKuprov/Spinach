@@ -1,8 +1,6 @@
 # examples/optimal_control/features_trapezium.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/features_trapezium.m`
 - Signature: `features_trapezium()`
-- Total lines: 113
 
 ## Purpose
 
@@ -35,7 +33,3 @@ Optimal control pulse optimisation for state-to-state transfer across a scalar c
 - Chemical shifts, ppm
 - Scalar couplings, Hz (literature values)
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `optimcon()`, `fmaxnewton()`, `report()`, `pulse()`, `step()`, `rho()`, `num2str()`.

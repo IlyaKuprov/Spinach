@@ -1,8 +1,6 @@
 # examples/singlet_states/s2m_example.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/singlet_states/s2m_example.m`
 - Signature: `s2m_example()`
-- Total lines: 45
 
 ## Purpose
 
@@ -30,7 +28,3 @@ An example of the S2M sequence for a two-spin system. Calculation time: seconds
 - Detect longitudinal magnetisation
 - Call the S2M sequence
 - Display the longitudinal magnetisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `singlet()`, `state()`, `s2m()`, `num2str()`.

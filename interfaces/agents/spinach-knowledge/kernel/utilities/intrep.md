@@ -1,8 +1,6 @@
 # kernel/utilities/intrep.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/intrep.m`
 - Signature: `Hr=intrep(spin_system,H0,H,T,order)`
-- Total lines: 113
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Interaction representation transformation with respect to a specified Hamiltonia
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -50,7 +46,3 @@ Interaction representation transformation with respect to a specified Hamiltonia
 - resentation, typically the full Hamiltonian
 - T -period of the H0 propagator
 - order -perturbation theory order in the rotating
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `propagator()`, `speye()`, `report()`, `num2str()`, `logm()`, `dirdiff()`, `nchoosek()`, `factorial()`, `clean_up()`, `nnz()`, `issparse()`, `ishermitian()`, `isinf()`.

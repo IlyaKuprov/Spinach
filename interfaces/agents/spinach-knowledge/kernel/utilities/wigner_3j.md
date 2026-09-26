@@ -1,8 +1,6 @@
 # kernel/utilities/wigner_3j.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/wigner_3j.m`
 - Signature: `w=wigner_3j(j1,m1,j2,m2,j3,m3)`
-- Total lines: 67
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Calculates Wigner 3j-symbols. Syntax: w=wigner_3j(j1,m1,j2,m2,j3,m3) If physical
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -40,7 +35,3 @@ Calculates Wigner 3j-symbols. Syntax: w=wigner_3j(j1,m1,j2,m2,j3,m3) If physical
 - Check consistency
 - Call Clebsch-Gordan coefficients
 - Consistency enforcement
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `clebsch_gordan()`.

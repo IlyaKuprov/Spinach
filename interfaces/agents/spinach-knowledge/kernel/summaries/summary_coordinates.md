@@ -1,8 +1,6 @@
 # kernel/summaries/summary_coordinates.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/summaries/summary_coordinates.m`
 - Signature: `summary_coordinates(spin_system,header)`
-- Total lines: 53
 
 ## Purpose
 
@@ -10,12 +8,7 @@ Prints atomic coordinate summary for a Spinach system. Syntax: summary_coordinat
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -41,7 +34,3 @@ Prints atomic coordinate summary for a Spinach system. Syntax: summary_coordinat
 - If I asked the public what they wanted, they would
 - say "a faster horse".
 - Henry Ford
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `report()`, `strjust()`, `num2str()`, `blanks()`, `isstruct()`, `ischar()`.

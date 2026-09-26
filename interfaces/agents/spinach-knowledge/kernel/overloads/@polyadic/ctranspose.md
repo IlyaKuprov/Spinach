@@ -1,8 +1,6 @@
 # kernel/overloads/@polyadic/ctranspose.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@polyadic/ctranspose.m`
 - Signature: `p=ctranspose(p)`
-- Total lines: 42
 
 ## Purpose
 
@@ -28,7 +26,3 @@ Computes the Hermitian conjugate of a matrix in a polyadic representation. Synta
 - staff members, and 30 litres of ethanol a month!
 - Nikolai Gorshkov, USSR Deputy Minister
 - for Radioelectronics Industry, 1980
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `fliplr()`.

@@ -1,8 +1,6 @@
 # tests/kernel/test_dynamic_metadata_partition_suite.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_dynamic_metadata_partition_suite.m`
 - Signature: `result=test_dynamic_metadata_partition_suite()`
-- Total lines: 78
 
 ## Purpose
 
@@ -10,7 +8,6 @@ Tests deterministic metadata, hashing, and partition helpers. Syntax: result=tes
 
 ## Physical / mathematical content
 
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
 
 ## Numerical / algorithmic content
@@ -37,7 +34,3 @@ Tests deterministic metadata, hashing, and partition helpers. Syntax: result=tes
 - Check stable duplicate-row removal through hash-table identity
 - Check least-squares transfer matrix recovery from overdetermined samples
 - Check strongly connected components on a two-component directed graph
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `poolsize()`, `test_true()`, `isscalar()`, `isworkernode()`, `md5_hash()`, `strcmp()`, `all()`, `isstrprop()`, `speye()`, `test_close()`, `unihash()`, `transfermat()`, `logical()`, `scomponents()`, `sci()`.

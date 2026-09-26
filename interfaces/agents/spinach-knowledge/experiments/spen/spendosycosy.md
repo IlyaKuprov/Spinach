@@ -1,8 +1,6 @@
 # experiments/spen/spendosycosy.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/spen/spendosycosy.m`
 - Signature: `fid=spendosycosy(spin_system,parameters,H,R,K,G,F)`
-- Total lines: 321
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Ultrafast 3D DOSY-COSY pulse sequence. Syntax: fid=spendosycosy(spin_system,para
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -68,7 +64,3 @@ Ultrafast 3D DOSY-COSY pulse sequence. Syntax: fid=spendosycosy(spin_system,para
 - a positive and a negative readout
 - parameters.Ga acquisition gradient in T/m
 - parameters.pulsenpoints number of points in the pulse shape
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `operator()`, `speye()`, `chirp_pulse()`, `step()`, `coherence()`, `shaped_pulse_xy()`, `evolution()`, `propagator()`, `clean_up()`, `clear()`, `ismember()`, `gpuArray()`, `report()`, `gather()`, `local_fid()`.

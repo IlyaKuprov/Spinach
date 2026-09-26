@@ -1,8 +1,6 @@
 # kernel/pulses/pulse_demod.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/pulses/pulse_demod.m`
 - Signature: `demod_pulse=pulse_demod(time_grid,in_phase,out_phase)`
-- Total lines: 442
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Interactive demodulation of a complex pulse waveform by a user- specified freque
 - Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `set_mult()`, `set_plot()`, `get()`, `str2double()`, `set_slider()`, `select_button()`, `select_plot()`, `select_wrap()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -53,7 +48,3 @@ Interactive demodulation of a complex pulse waveform by a user- specified freque
 - The phase and frequency buttons switch the plot between unwrapped
 - phase in radians and instantaneous frequency in Hz. The sticky wrap
 - button switches the phase plot into the [0,2*pi] interval.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `kfigure()`, `scale_figure()`, `axes()`, `ktitle()`, `kxlabel()`, `kylabel()`, `klegend()`, `get()`, `uicontrol()`, `select_button()`, `select_plot()`, `select_wrap()`, `update_plot()`, `uiwait()`, `ishandle()`.

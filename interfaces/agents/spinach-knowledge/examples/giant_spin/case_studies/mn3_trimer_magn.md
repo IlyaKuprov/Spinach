@@ -1,8 +1,6 @@
 # examples/giant_spin/case_studies/mn3_trimer_magn.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/case_studies/mn3_trimer_magn.m`
 - Signature: `mn3_trimer_magn()`
-- Total lines: 121
 
 ## Purpose
 

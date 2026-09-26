@@ -1,8 +1,6 @@
 # examples/spin_chemistry/cidnp_pumping_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/spin_chemistry/cidnp_pumping_2.m`
 - Signature: `cidnp_pumping_2()`
-- Total lines: 84
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A simulation of Figure 2A in IK's paper on chemically amplified NOEs (https://do
 - Relaxation theories
 - Formalism and basis
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `relaxation()`, `state()`, `magpump()`, `unit_state()`, `evolution()`, `kfigure()`, `scale_figure()`, `subplot()`, `answer()`, `ktitle()`, `kxlabel()`.

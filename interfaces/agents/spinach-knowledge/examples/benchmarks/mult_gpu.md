@@ -1,8 +1,6 @@
 # examples/benchmarks/mult_gpu.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/benchmarks/mult_gpu.m`
 - Signature: `mult_gpu(precision)`
-- Total lines: 69
 
 ## Purpose
 
@@ -30,7 +28,3 @@ CPU and GPU matrix arithmetic benchmark. Set the argument to either 'single' or 
 - Tesla A800 PCIe (2024): 15 TFLOPS
 - Tesla H200 SXM (2025): 60 TFLOPS
 - Default to double precision
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `power()`, `nan()`, `mmTimesCPU()`, `timeit()`, `gpuArray()`, `mmTimesGPU()`, `gputimeit()`, `TFLOPS()`.

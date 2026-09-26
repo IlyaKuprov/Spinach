@@ -1,8 +1,6 @@
 # kernel/eigenfields/eigenfields.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/eigenfields/eigenfields.m`
 - Signature: `tran=eigenfields(spin_system,parameters,Hz,Hc,Hmw)`
-- Total lines: 514
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Computes resonance fields. For a Hamiltonian Hc+B*Hz, returns all magnetic field
 ## Numerical / algorithmic content
 
 - An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -69,7 +65,3 @@ Computes resonance fields. For a Hamiltonian Hc+B*Hz, returns all magnetic field
 - roperator (Liouville space), containing couplings and
 - offsets
 - Hmw - observable operator (Hilbert space) or observable
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `spin()`, `rspt_eig()`, `false()`, `any()`, `converged()`, `new_conv()`, `true()`, `herm_spline()`, `new_grid()`, `new_dE()`, `new_LP()`, `new_E()`, `new_T()`, `new_V()`, `state_ovlp()`.

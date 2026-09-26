@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/soft_4_pulse_deer_3e.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/soft_4_pulse_deer_3e.m`
 - Signature: `soft_4_pulse_deer_3e()`
-- Total lines: 83
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Four-pulse DEER simulation for a three-electron system. Soft pulses are simulate
 - Basis set
 - Algorithmic options
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `deer_4p_soft_diag()`.

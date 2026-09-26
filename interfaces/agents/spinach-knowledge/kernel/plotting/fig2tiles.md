@@ -1,8 +1,6 @@
 # kernel/plotting/fig2tiles.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/plotting/fig2tiles.m`
 - Signature: `[fig_obj,tile_obj]=fig2tiles(fig_files,fig_size)`
-- Total lines: 409
 
 ## Purpose
 
@@ -10,12 +8,7 @@ Combines Matlab figure files into a single tiled figure. Syntax: [fig_obj,tile_o
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `move_panels()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -55,7 +48,3 @@ Combines Matlab figure files into a single tiled figure. Syntax: [fig_obj,tile_o
 - ated, and so the figure must already have its final size at
 - that point. Matlab shrinks a visible figure to fit the disp-
 - lay; the merge therefore runs off the screen, and the figure
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `kletter()`, `ind2sub()`, `tile_nums()`, `get()`, `kfigure()`, `tiledlayout()`, `gobjects()`, `tile_axes()`, `nexttile()`, `tile_pos()`, `openfig()`, `strcmp()`, `src_obj()`, `src_tiles()`, `isscalar()`, `delete()`.

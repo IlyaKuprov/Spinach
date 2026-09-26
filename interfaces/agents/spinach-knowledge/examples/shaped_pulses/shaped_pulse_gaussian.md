@@ -1,8 +1,6 @@
 # examples/shaped_pulses/shaped_pulse_gaussian.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/shaped_pulses/shaped_pulse_gaussian.m`
 - Signature: `shaped_pulse_gaussian()`
-- Total lines: 91
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Gaussian 90-degree pulse on a chain of 31 strongly coupled protons. Calculation 
 - Hamiltonian superoperator
 - Control and offset operators
 - Initial state
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `create()`, `basis()`, `assume()`, `hamiltonian()`, `operator()`, `state()`, `read_wave()`, `polar2cartesian()`, `shaped_pulse_xy()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

@@ -1,8 +1,6 @@
 # kernel/assume.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/assume.m`
 - Signature: `spin_system=assume(spin_system,assumptions,retention)`
-- Total lines: 769
 
 ## Purpose
 
@@ -10,14 +8,10 @@ Sets case-specific assumptions for various simulation contexts. This function de
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
 - The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -77,7 +71,3 @@ Sets case-specific assumptions for various simulation contexts. This function de
 - 'deer' for DEER spectroscopy
 - 'deer-zz' for DEER spectroscopy with electron
 - flip-flop terms removed
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `any()`, `ismember()`, `report()`, `strcmp()`, `specialised()`, `isfield()`, `elseif()`, `all()`, `cellfun()`, `exist()`, `ischar()`.

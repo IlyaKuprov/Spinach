@@ -12,7 +12,7 @@
 %
 % Outputs:
 %
-%      traj_data    -  trajectory information structure
+%      traj_data    -  trajectory information for both pulses
 %
 %      fidelity     -  cooperative fidelity measure
 %
@@ -82,6 +82,9 @@ spin_system.control.rho_targ=dirt_sum;
 rho=spin_system.control.rho_init{1};
 spin_system.control.rho_init=cell(size(spin_system.control.rho_targ));
 spin_system.control.rho_init(:)={rho};
+
+% The squared impurity norm requires a real linear overlap
+spin_system.control.fidelity='real';
 
 % Impurity cancellation gradients
 spin_system.control.ens_corrs={'rho_ens'};

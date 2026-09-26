@@ -4,16 +4,30 @@
 
 ## Purpose
 
-Returns the registry of hand-written Spinach regression tests for the test runner.
+Registers Spinach's hand-written regression tests for the test runner.
 
 ## Physical / mathematical content
 
-The manifest does not perform a physical calculation; its entries identify tests covering physical models, numerical methods, interfaces, and utility functions.
+The registry covers physical models, numerical methods, interfaces, and utility functions; the calculations reside in the registered tests.
 
 ## Numerical / algorithmic content
 
-Each entry stores a stable test ID, a descriptive name, and the function name to run. The cooperative-gradient and rotor-assumption tests are both registered. This catalogue does not execute the tests.
+Each entry associates a stable test identifier and a descriptive name with a test function name. The merged registry includes the branch-specific regression and the cooperative-gradient and rotor-assumption tests from main; this function does not execute them.
+
+## Syntax
+
+```matlab
+manifest=test_manifest()
+```
+
+## Parameters / inputs
+
+None.
 
 ## Outputs
 
-- `manifest` — structure array with `id`, `name`, and `function` fields.
+`manifest` is a structure array with `id`, `name`, and `function` fields.
+
+## Header notes
+
+The manifest stores test metadata only.

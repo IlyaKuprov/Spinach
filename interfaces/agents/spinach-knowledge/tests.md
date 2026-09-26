@@ -53,6 +53,7 @@
 | `tests/kernel/test_euler_rotation_matrix.m` | `result=test_euler_rotation_matrix()` | Tests active ZYZ Euler rotation matrices. Syntax: result=test_euler_rotation_matrix() Outputs: result -regression test r |
 | `tests/kernel/test_exponential_krylov_suite.m` | `result=test_exponential_krylov_suite()` | Tests exponential, Chebyshev, and Krylov numerical utilities. Syntax: result=test_exponential_krylov_suite() Outputs: re |
 | `tests/kernel/test_finite_difference_suite.m` | `result=test_finite_difference_suite()` | Tests finite-difference and spectral differentiation helpers. Syntax: result=test_finite_difference_suite() Outputs: res |
+| `tests/kernel/test_giant_cache.m` | `result=test_giant_cache()` | Giant-spin Hamiltonian cache identity under retained interactions. |
 | `tests/kernel/test_giant_ham_descr.m` | `result=test_giant_ham_descr()` | Tests the giant spin Hamiltonian descriptor route. Syntax: result=test_giant_ham_descr() Outputs: result -regression tes |
 | `tests/kernel/test_graph_geometry_suite.m` | `result=test_graph_geometry_suite()` | Tests graph, geometry, lattice, and coordinate utilities. Syntax: result=test_graph_geometry_suite() Outputs: result -re |
 | `tests/kernel/test_grid_geometry_suite.m` | `result=test_grid_geometry_suite()` | Tests grid and spherical geometry helpers. Syntax: result=test_grid_geometry_suite() Outputs: result -regression test re |

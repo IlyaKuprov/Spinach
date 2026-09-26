@@ -5,7 +5,7 @@
 - Source tree state: `PR #553 merge candidate with keyhole guard and current main`
 - Path set: committed MATLAB files under this index directory; working-tree and untracked files are excluded.
 - Files indexed: **530** MATLAB files
-- Total source lines: **73351**
+- Total source lines: **73357**
 - Generated: 2026-09-26T16:11:53+00:00
 
 | File | Signature | Summary | LOC |
@@ -197,7 +197,7 @@
 | `kernel/optimcon/fapt2sfo.m` | `[wave,dt,time_grid]=fapt2sfo(fapt,time_grid)` | Converts a freq-ampl-phase-time specification of a pulse sequ- uence into the corresponding single frequency origin wave | 124 |
 | `kernel/optimcon/fmaxnewton.m` | `[x,data]=fmaxnewton(spin_system,cost_function,guess)` | Finds a local maximum of a function of several variables using Newton and quasi-Newton algorithms. Syntax: [x,data]=fmax | 397 |
 | `kernel/optimcon/grape_hilb.m` | `[traj_data,fidelity,grad,hess]=grape_hilb(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)` | Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user | 813 |
-| `kernel/optimcon/grape_liouv.m` | `[traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)` | Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user | 1078 |
+| `kernel/optimcon/grape_liouv.m` | `[traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)` | Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user | 1084 |
 | `kernel/optimcon/hess_reorder.m` | `hess=hess_reorder(hess,K,N)` | The waveforms on different channels are assumed to be stored in the rows of the input array. The Hessian elements corres | 70 |
 | `kernel/optimcon/hessreg.m` | `[H,data]=hessreg(spin_system,H,g,data)` | RFO regularisation for Newton-Raphson Hessian and gradient pairs. Syntax: [H,data]=hessreg(spin_system,H,g,data) Paramet | 101 |
 | `kernel/optimcon/inst_freq.m` | `freq=inst_freq(signal,dt,npoints,poly_order,amp_tol)` | Instantaneous frequency trajectory from a complex time-domain signal by regularised phase differentiation. Syntax: freq= | 126 |

@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/grape_liouv.m`
 - Signature: `[traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,...`
-- Total lines: 1078
+- Total lines: 1084
 
 ## Purpose
 
@@ -16,7 +16,7 @@ Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessi
 
 ## Numerical / algorithmic content
 
-- Nonempty keyhole schedules with `newton` or `goodwin` are explicitly not implemented in `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`, both in `optimcon` setup and direct `grape_liouv` calls. First-order `lbfgs`/`rbfgs` keyhole methods, empty schedules, and existing Hilbert-space keyhole Hessians remain available; no algorithm is substituted. The method restriction applies regardless of the requested output count.
+- Nonempty keyhole schedules with `newton` or `goodwin` are explicitly not implemented in `sphten-liouv`, `zeeman-liouv`, and `zeeman-wavef`, both in `optimcon` setup and direct `grape_liouv` calls. First-order `lbfgs`/`rbfgs` keyhole methods, empty schedules, and existing Hilbert-space keyhole Hessians remain available; no algorithm is substituted. The method restriction applies regardless of output count, and any four-output request with a state-vector keyhole is refused.
 - Zero fidelities and gradients are returned as valid values, including for auxiliary costates used by `grape_coop`. Initial-guess checks remain in `fmaxnewton`, where they apply to the assembled optimisation objective rather than individual GRAPE contributions.
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.

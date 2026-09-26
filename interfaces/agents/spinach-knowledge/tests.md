@@ -5,7 +5,7 @@
 - Source tree state: `PR #553 merge candidate with keyhole guard and current main`
 - Path set: committed MATLAB files under this index directory; working-tree and untracked files are excluded.
 - Files indexed: **118** MATLAB files
-- Total source lines: **14910**
+- Total source lines: **14936**
 - Generated: 2026-09-26T16:11:53+00:00
 
 | File | Signature | Summary | LOC |
@@ -66,7 +66,7 @@
 | `tests/kernel/test_hilbert_state.m` | `result=test_hilbert_state()` | Tests Hilbert-space state generation. Syntax: result=test_hilbert_state() Outputs: result -regression test result with e | 44 |
 | `tests/kernel/test_indexing_inverse_suite.m` | `result=test_indexing_inverse_suite()` | Tests indexing helper inverses. Syntax: result=test_indexing_inverse_suite() Outputs: result -regression test result wit | 102 |
 | `tests/kernel/test_indexing_roundtrip_suite.m` | `result=test_indexing_roundtrip_suite()` | Tests angular-momentum and matrix indexing helpers. Syntax: result=test_indexing_roundtrip_suite() Outputs: result -regr | 64 |
-| `tests/kernel/test_keyhole_guard.m` | `result=test_keyhole_guard()` | Explicit boundaries for keyhole-projected exact-Hessian optimisation. | 163 |
+| `tests/kernel/test_keyhole_guard.m` | `result=test_keyhole_guard()` | Explicit boundaries for keyhole-projected exact-Hessian optimisation. | 189 |
 | `tests/kernel/test_kinetics_generator_suite.m` | `result=test_kinetics_generator_suite()` | Tests kinetics and flow generator helpers. Syntax: result=test_kinetics_generator_suite() Outputs: result -regression te | 76 |
 | `tests/kernel/test_kinetics_invariants_suite.m` | `result=test_kinetics_invariants_suite()` | Tests deterministic chemical kinetics helpers. Syntax: result=test_kinetics_invariants_suite() Outputs: result -regressi | 79 |
 | `tests/kernel/test_linear_perturbation_suite.m` | `result=test_linear_perturbation_suite()` | Tests linear-algebra, angular-momentum, and perturbation utilities. Syntax: result=test_linear_perturbation_suite() Outp | 117 |

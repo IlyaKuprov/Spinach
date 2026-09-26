@@ -65,7 +65,8 @@
 %       'sphten-liouv', 'zeeman-liouv', and 'zeeman-wavef'. First-order
 %       'lbfgs' and 'rbfgs' keyhole methods and empty schedules remain
 %       available. The method restriction applies at setup and direct
-%       entry, regardless of the number of outputs requested.
+%       entry, regardless of the number of outputs requested. Any
+%       fourth-output Hessian request with keyholes is also refused.
 %
 % Note: zero fidelities and derivatives are valid for auxiliary costates.
 %       Initial-guess checks belong to the assembled optimisation objective
@@ -95,6 +96,11 @@ grumble(spin_system,drifts,controls,waveform,...
     
 % Count the outputs
 n_outputs=nargout();
+
+% Refuse Hessians through intermediate state-vector keyholes
+if (n_outputs>3)&&any(~cellfun(@isempty,spin_system.control.keyholes(:)))
+    error('Liouville and wavefunction keyhole Hessians are not implemented.');
+end
 
 % Pull the trajectory cost term settings
 fid_avg=strcmp(spin_system.control.fid_type,'average');

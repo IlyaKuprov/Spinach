@@ -114,6 +114,32 @@ for form_idx=1:numel(formalisms)
         result=test_true(result,[label ' method retained'],...
                          strcmp(local_system.control.method,methods{method_idx}),...
                          'setup must never substitute another optimisation algorithm');
+        if (form_idx~=3)&&(method_idx<=2)
+
+            % Refuse requested Hessians even under first-order methods
+            error_text='';
+            try
+                [~,~,~,~]=grape_xy(waveform,local_system);
+            catch exception
+                error_text=exception.message;
+            end
+            result=test_true(result,[label ' requested Hessian guard'],...
+                             ~isempty(error_text),...
+                             'first-order methods must not expose incorrect keyhole Hessians');
+
+            % Enforce the same boundary on direct engine calls
+            error_text='';
+            try
+                [~,~,~,~]=grape_liouv(local_system,{drift},controls,...
+                                     waveform,source,target,local_system.control.fidelity);
+            catch exception
+                error_text=exception.message;
+            end
+            result=test_true(result,[label ' direct Hessian guard'],...
+                             contains(error_text,'keyhole Hessians')&&...
+                             contains(error_text,'not implemented'),...
+                             'direct requests must not expose incorrect keyhole Hessians');
+        end
         if method_idx>2
             [~,~,gradient,hessian]=grape_xy(waveform,local_system);
         else

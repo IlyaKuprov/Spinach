@@ -2,7 +2,7 @@
 
 - Source: `tests/kernel/test_keyhole_guard.m`
 - Signature: `result=test_keyhole_guard()`
-- Total lines: 163
+- Total lines: 189
 
 ## Purpose
 
@@ -14,7 +14,7 @@ Noncommuting spin-half controls and population projections test supported gradie
 
 ## Numerical / algorithmic content
 
-Checks setup and direct-engine refusals, retained method identities, first-order keyholes, empty schedules, and supported Hilbert counterparts.
+Checks setup and direct-engine refusals, requested four-output Hessian refusals under first-order methods, retained method identities, first-order keyholes, empty schedules, and supported Hilbert counterparts.
 
 ## Syntax
 

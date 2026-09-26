@@ -1,8 +1,6 @@
 # examples/relaxation_theory/dd_relaxation_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/dd_relaxation_1.m`
 - Signature: `dd_relaxation_1()`
-- Total lines: 73
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Complete Bloch-Redfield-Wangsness relaxation superoperator in a system with a di
 - Textbook rates
 - Textbook and Spinach R1 for first spin
 - Textbook and Spinach R1 for second spin
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `rlx_dip()`, `state()`, `num2str()`.

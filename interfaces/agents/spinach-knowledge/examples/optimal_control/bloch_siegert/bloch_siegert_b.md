@@ -1,8 +1,6 @@
 # examples/optimal_control/bloch_siegert/bloch_siegert_b.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/bloch_siegert/bloch_siegert_b.m`
 - Signature: `bloch_siegert_b()`
-- Total lines: 108
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Bloch-Siegert shift compensation functionality demo. The script optimises a univ
 - Select a basis set -IK-2 keeps complete basis on each
 - spin in this case, but ignores multi-spin orders
 - Run Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `spin()`, `pwr_list()`, `false()`, `optimcon()`, `true()`, `fmaxnewton()`, `fid_a()`, `ensemble()`, `fid_b()`.

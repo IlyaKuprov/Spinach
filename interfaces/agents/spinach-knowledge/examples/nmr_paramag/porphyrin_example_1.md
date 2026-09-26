@@ -1,8 +1,6 @@
 # examples/nmr_paramag/porphyrin_example_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_paramag/porphyrin_example_1.m`
 - Signature: `porphyrin_example_1()`
-- Total lines: 46
 
 ## Purpose
 
@@ -25,7 +23,3 @@ Computing PCS using different models in basic Cu(II) and Co(II) porphyrin comple
 - Metal position
 - PCS calculation
 - Output
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2chi()`, `ppcs()`.

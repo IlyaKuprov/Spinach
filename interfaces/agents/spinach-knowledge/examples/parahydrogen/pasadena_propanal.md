@@ -1,8 +1,6 @@
 # examples/parahydrogen/pasadena_propanal.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/parahydrogen/pasadena_propanal.m`
 - Signature: `pasadena_propanal()`
-- Total lines: 64
 
 ## Purpose
 
@@ -31,7 +29,3 @@ PASADENA experiment simulation for the parahydrogenation of acrolein into propan
 - Sequence parameters
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

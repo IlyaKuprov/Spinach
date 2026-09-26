@@ -1,8 +1,6 @@
 # kernel/pulses/wave_basis.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/pulses/wave_basis.m`
 - Signature: `basis_waves=wave_basis(basis_type,n_func,n_points)`
-- Total lines: 105
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Common basis sets for the expansion of pulse waveforms. Returns the wave- form b
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -56,7 +52,3 @@ Common basis sets for the expansion of pulse waveforms. Returns the wave- form b
 - n_func -the number of functions to return (integer
 - frequencies starting from zero on the case
 - of cosines, integer frequencies starting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `basis_waves()`, `legendreP()`, `orth()`, `ischar()`.

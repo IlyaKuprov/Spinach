@@ -1,8 +1,6 @@
 # examples/optimal_control/bloch_siegert/coote_badcop.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/bloch_siegert/coote_badcop.m`
 - Signature: `coote_badcop()`
-- Total lines: 175
 
 ## Purpose
 
@@ -19,7 +17,6 @@ Reproduction of BADCOP-style selective decoupling logic from Coote et al. with B
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file also defines local helper function(s): `ppm2hz()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -35,7 +32,3 @@ Reproduction of BADCOP-style selective decoupling logic from Coote et al. with B
 - Shared paper parameters
 - Build all three variants from Table 1
 - Design and evaluate each variant
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `operator()`, `state()`, `hamiltonian()`, `assume()`, `ppm2hz()`, `cb_prs_ppm()`, `step()`, `ca_hz()`, `true()`, `optimcon()`, `fmaxnewton()`, `mat2cell()`, `false()`, `eval_hz()`.

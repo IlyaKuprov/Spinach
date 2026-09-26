@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/pulse_acquire_chrysene.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/pulse_acquire_chrysene.m`
 - Signature: `pulse_acquire_chrysene()`
-- Total lines: 68
 
 ## Purpose
 
@@ -31,7 +29,3 @@ W-band pulse-acquire FFT ESR spectrum of a chrysene cation radical in a non-visc
 - Basis set
 - Symmetry
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

@@ -1,8 +1,6 @@
 # kernel/utilities/hydrodynamics.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/hydrodynamics.m`
 - Signature: `[Fx,Fy,Fz]=hydrodynamics(spin_system,parameters)`
-- Total lines: 165
 
 ## Purpose
 
@@ -16,8 +14,6 @@ A basic hydrodynamics infrastructure provider, returns first derivative operator
 ## Numerical / algorithmic content
 
 - Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -56,7 +52,3 @@ A basic hydrodynamics infrastructure provider, returns first derivative operator
 - element row vector
 - parameters.deriv -{'fourier'} requests Fourier diffe-
 - rentiation matrices; {'period',n}
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `isscalar()`, `fdmat()`, `fourdif()`, `polyadic()`, `opium()`, `ismember()`, `inflate()`, `isfield()`, `any()`, `iscell()`, `ischar()`, `strcmp()`.

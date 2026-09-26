@@ -1,8 +1,6 @@
 # examples/nmr_solids/case_studies/cp_square_vs_ramp/cp_adiabatic_vs_optimcon.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/case_studies/cp_square_vs_ramp/cp_adiabatic_vs_optimcon.m`
 - Signature: `cp_adiabatic_vs_optimcon()`
-- Total lines: 147
 
 ## Purpose
 
@@ -34,7 +32,3 @@
 - Common experiment parameters
 - Simulate tangent ramped amplitude CP
 - Plotting -waveform
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `operator()`, `state()`, `fliplr()`, `powder()`, `kfigure()`, `scale_figure()`, `cumsum()`, `subplot()`, `time_axis()`, `kxlabel()`, `kylabel()`, `ylim()`, `klegend()`, `drifts()`.

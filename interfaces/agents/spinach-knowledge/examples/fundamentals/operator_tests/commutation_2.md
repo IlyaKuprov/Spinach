@@ -1,8 +1,6 @@
 # examples/fundamentals/operator_tests/commutation_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/operator_tests/commutation_2.m`
 - Signature: `commutation_2()`
-- Total lines: 42
 
 ## Purpose
 
@@ -25,7 +23,3 @@ Commutators of simple operators and superoperators. The test calculation is perf
 - Preallocate the answer
 - Run the tests
 - Report the outcome
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `operator()`, `answer()`.

@@ -1,8 +1,6 @@
 # kernel/utilities/phan2fpl.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/phan2fpl.m`
 - Signature: `rho=phan2fpl(phan,rho)`
-- Total lines: 48
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Projects a spatial intensity distribution into the Fokker-Planck space, using it
 - The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -42,7 +37,3 @@ Projects a spatial intensity distribution into the Fokker-Planck space, using it
 - Stretch the phantom and kron it with the spin state
 - Consistency enforcement
 - Q: "How many members of a certain demographic group does
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `phan()`, `ismember()`, `ndims()`.

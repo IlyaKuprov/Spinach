@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/diag.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/diag.m`
 - Signature: `tt=diag(tt)`
-- Total lines: 73
 
 ## Purpose
 
@@ -39,7 +37,3 @@ Mimics the diag behaviour for tensor train matrix. Syntax: tt=diag(tt)
 - Vector on input, diagonal matrix on output
 - Matrix on input, column vector on output
 - The only mistake [the famous criminal finacier] Bernie Madoff
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `ranks()`, `sizes()`, `all()`, `matrix_core()`, `vector_core()`.

@@ -1,8 +1,6 @@
 # examples/optimal_control/features_multitarget.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/features_multitarget.m`
 - Signature: `features_multitarget()`
-- Total lines: 110
 
 ## Purpose
 
@@ -34,7 +32,3 @@ An example of multi-target optimal control pulse design in the context of single
 - Interactions
 - Basis set
 - Run Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `unit_oper()`, `operator()`, `unit_state()`, `hamiltonian()`, `assume()`, `optimcon()`, `fmaxnewton()`, `mat2cell()`, `report()`, `shaped_pulse_xy()`, `cell2mat()`, `rho()`, `num2str()`.

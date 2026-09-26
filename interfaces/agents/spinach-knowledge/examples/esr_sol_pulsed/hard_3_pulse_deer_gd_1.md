@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/hard_3_pulse_deer_gd_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/hard_3_pulse_deer_gd_1.m`
 - Signature: `hard_3_pulse_deer_gd_1()`
-- Total lines: 94
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Gadolinium(III) DEER experiment at W-band using ideal pulses. Set to reproduce F
 - ferent pulse frequencies in the experiment.
 - Calculation time: minutes.
 - Spin system properties
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `powder()`, `apodisation()`, `fftshift()`, `ft_axis()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `ktitle()`.

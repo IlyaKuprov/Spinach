@@ -1,8 +1,6 @@
 # examples/imaging/press_2d_example.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/press_2d_example.m`
 - Signature: `press_2d_example()`
-- Total lines: 113
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Spin systems
 - Basis set
 - Disable path tracing
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `state()`, `kfigure()`, `scale_figure()`, `subplot()`, `mri_2d_plot()`, `ktitle()`, `imaging()`, `apodisation()`, `fftshift()`, `ifftshift()`, `plot_1d()`.

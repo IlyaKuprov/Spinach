@@ -1,8 +1,6 @@
 # kernel/utilities/clean_up.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/clean_up.m`
 - Signature: `A=clean_up(spin_system,A,nonzero_tol)`
-- Total lines: 98
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Array clean-up utility. Drops non-zero elements with magnitude below the user-sp
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -40,7 +35,3 @@ Array clean-up utility. Drops non-zero elements with magnitude below the user-sp
 - Process cells recursively
 - Process polyadics recursively
 - Check consistency
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `isnan()`, `iscell()`, `grumble()`, `ismember()`, `issparse()`, `nnz()`, `any()`, `all()`.

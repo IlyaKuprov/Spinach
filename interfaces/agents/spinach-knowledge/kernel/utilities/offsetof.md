@@ -1,8 +1,6 @@
 # kernel/utilities/offsetof.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/offsetof.m`
 - Signature: `offs=offsetof(spin_system,idx)`
-- Total lines: 60
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Returns the isotropic Zeeman offset of the specified spin from the pure magnetog
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -43,7 +38,3 @@ Returns the isotropic Zeeman offset of the specified spin from the pure magnetog
 - eld, Hz
 - Check consistency
 - Pull out the Zeeman tensor
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `isscalar()`.

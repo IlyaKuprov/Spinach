@@ -1,8 +1,6 @@
 # kernel/pulses/rsequence.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/pulses/rsequence.m`
 - Signature: `[phases,pulse_amp,pulse_dur]=rsequence(n_rotor_periods,n_blocks_per_period,...`
-- Total lines: 197
 
 ## Purpose
 
@@ -13,9 +11,6 @@ R-sequences described in Malcolm Levitt's review: Nomenclature is based on the f
 - Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -68,7 +63,3 @@ R-sequences described in Malcolm Levitt's review: Nomenclature is based on the f
 - phase_factor - "nu" to calculate the alternating phase in the
 - R sequence:
 - 180*nu/N = 180*phase_factor/n_blocks_per_period
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `phases()`, `pulse_dur()`, `isscalar()`, `ischar()`.

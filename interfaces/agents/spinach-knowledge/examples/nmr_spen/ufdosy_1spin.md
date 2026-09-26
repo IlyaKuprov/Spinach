@@ -1,8 +1,6 @@
 # examples/nmr_spen/ufdosy_1spin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_spen/ufdosy_1spin.m`
 - Signature: `ufdosy_1spin()`
-- Total lines: 87
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Ultrafast DOSY for one spin. Calculation time: seconds on NVidia Tesla A100, muc
 - Assumptions
 - Sample geometry
 - Relaxation phantom
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `assume()`, `state()`, `imaging()`, `fftshift()`, `spin()`, `kfigure()`, `kxlabel()`, `kylabel()`.

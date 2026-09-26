@@ -1,8 +1,6 @@
 # kernel/plotting/contspacing.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/plotting/contspacing.m`
 - Signature: `[all_conts,pos_conts,neg_conts]=...`
-- Total lines: 108
 
 ## Purpose
 
@@ -10,11 +8,7 @@ Non-linear adaptive contour spacing. Useful for NMR data where small cross-peaks
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 
 ## Syntax
 
@@ -63,7 +57,3 @@ contspacing(smax,smin,delta,k,signs,ncont)
 - first pair of numbers refers to the positive conto-
 - urs and the second pair to the negative ones.
 - k -a coefficient that controls the curvature of the contour
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `contspacing()`, `grumble()`, `strcmp()`, `delta()`, `neg_conts()`, `isscalar()`, `any()`, `ischar()`, `ismember()`.

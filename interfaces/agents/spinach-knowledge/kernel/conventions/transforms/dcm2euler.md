@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/dcm2euler.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/dcm2euler.m`
 - Signature: `[arg1,arg2,arg3]=dcm2euler(dcm)`
-- Total lines: 114
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Converts directional cosine matrix into Euler angles, ZYZ active convention (rot
 ## Numerical / algorithmic content
 
 - An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -54,7 +50,3 @@ Converts directional cosine matrix into Euler angles, ZYZ active convention (rot
 - as alpha, beta, gamma, in radians
 - Note: the problem of recovering Euler angles from a DCM is, in
 - general, ill-posed. This function is a product of consi-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `dcm()`, `evecs()`, `qter2euler()`, `euler2dcm()`, `all()`, `any()`.

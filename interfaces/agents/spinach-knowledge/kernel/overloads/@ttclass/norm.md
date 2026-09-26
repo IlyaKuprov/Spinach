@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/norm.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/norm.m`
 - Signature: `ttnorm=norm(ttrain,norm_type) %#NORMOK`
-- Total lines: 74
 
 ## Purpose
 
@@ -43,7 +41,3 @@ Computes the norm of the matrix represented by a tensor train. Syntax: ttnorm=no
 - Note: only Frobenius norm is currently available for tensor trains;
 - other norm types raise errors.
 - Compute the norm
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `pack()`, `ttort()`.

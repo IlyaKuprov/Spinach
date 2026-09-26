@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/mev2hz.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/mev2hz.m`
 - Signature: `hz=mev2hz(mev)`
-- Total lines: 42
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Converts meV energy units used in solid state physics and phonon spectroscopy in
 - Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Outputs
 
@@ -35,7 +30,3 @@ Converts meV energy units used in solid state physics and phonon spectroscopy in
 - Consistency enforcement
 - O God, I could be bounded in a nutshell, and count
 - myself a king of infinite space, were it not that I
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`.

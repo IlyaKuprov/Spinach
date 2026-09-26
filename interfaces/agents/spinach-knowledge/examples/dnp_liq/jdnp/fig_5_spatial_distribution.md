@@ -1,8 +1,6 @@
 # examples/dnp_liq/jdnp/fig_5_spatial_distribution.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/jdnp/fig_5_spatial_distribution.m`
 - Signature: `fig_5_spatial_distribution()`
-- Total lines: 156
 
 ## Purpose
 
@@ -31,7 +29,3 @@ An illustration of the fact that JDNP effect does not vanish on position and ori
 - Set microwave offset frequency
 - Set the exchange coupling
 - Specify coordinate arrays
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `system_specification()`, `g2freq()`, `spin()`, `kfigure()`, `scale_figure()`, `nan()`, `create()`, `basis()`, `operator()`, `state()`, `equilibrium()`, `hamiltonian()`, `assume()`, `relaxation()`, `evolution()`, `xy_dnp()`.

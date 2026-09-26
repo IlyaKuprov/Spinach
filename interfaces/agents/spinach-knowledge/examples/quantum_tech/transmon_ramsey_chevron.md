@@ -1,8 +1,6 @@
 # examples/quantum_tech/transmon_ramsey_chevron.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/transmon_ramsey_chevron.m`
 - Signature: `transmon_ramsey_chevron()`
-- Total lines: 86
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Ramsey chevron of a three-level transmon in the Duffing ap- proximation. A nomin
 - Anharmonicity part from the declared interactions
 - Transmon operators
 - Free-evolution parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `assume()`, `hamiltonian()`, `operator()`, `state()`, `detunings()`, `time_axis()`, `answer()`, `hdot()`, `kfigure()`, `kxlabel()`, `kylabel()`, `ktitle()`.

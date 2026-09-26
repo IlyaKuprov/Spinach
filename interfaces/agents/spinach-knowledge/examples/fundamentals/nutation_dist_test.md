@@ -1,8 +1,6 @@
 # examples/fundamentals/nutation_dist_test.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/nutation_dist_test.m`
 - Signature: `nutation_dist_test()`
-- Total lines: 98
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Recovery of an RF field distribution from a nutation curve measured with the sam
 - distribution with the reception weight divided out.
 - Calculation time: seconds
 - Isotopes
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `trapz()`, `b1_freq()`, `evolution()`, `b1_mass()`, `traj()`, `rng()`, `nutation_dist()`, `kfigure()`, `kxlabel()`, `kgrid()`.

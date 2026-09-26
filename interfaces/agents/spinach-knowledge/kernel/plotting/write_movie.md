@@ -1,8 +1,6 @@
 # kernel/plotting/write_movie.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/plotting/write_movie.m`
 - Signature: `write_movie(file_name)`
-- Total lines: 57
 
 ## Purpose
 
@@ -10,12 +8,7 @@ Orbits the camera around a 3D plot and writes a correctly looping 359-frame movi
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -39,7 +32,3 @@ Orbits the camera around a 3D plot and writes a correctly looping 359-frame movi
 - Disable stretch-to-fill
 - Open the video writer object
 - Orbit the camera
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `VideoWriter()`, `open()`, `writeVideo()`, `getframe()`, `pause()`, `camorbit()`, `close()`, `ischar()`.

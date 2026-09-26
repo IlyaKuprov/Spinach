@@ -1,8 +1,6 @@
 # examples/fundamentals/tensor_structures/polyadic_test_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/tensor_structures/polyadic_test_2.m`
 - Signature: `polyadic_test_2()`
-- Total lines: 110
 
 ## Purpose
 
@@ -15,7 +13,6 @@ Unit tests for advanced polyadic functionality.
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file also defines local helper function(s): `assert_small()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -31,7 +28,3 @@ Unit tests for advanced polyadic functionality.
 - Check finiteness and internal non-zero counts
 - Check zero-dimension behaviour
 - Check nested simplification paths
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `sprandn()`, `polyadic()`, `assert_small()`, `inflate()`, `validate()`, `prefix()`, `suffix()`, `assert()`, `isequal()`, `transpose()`, `ctranspose()`, `allfinite()`, `all()`, `ref()`, `nnz()`, `simplify()`.

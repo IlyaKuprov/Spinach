@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/xix_q_rep_time_ensemble_r_T1e.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/xix_q_rep_time_ensemble_r_T1e.m`
 - Signature: `xix_q_rep_time_ensemble_r_T1e()`
-- Total lines: 128
 
 ## Purpose
 
@@ -15,7 +13,6 @@ Simulation of T1e dependent XiX DNP optimisation of repetition time in the stead
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file also defines local helper function(s): `xix_rep_time_ensemble_r()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -31,7 +28,3 @@ Simulation of T1e dependent XiX DNP optimisation of repetition time in the stead
 - Q-band magnet
 - Electron and proton
 - Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `kfigure()`, `kxlabel()`, `time()`, `kylabel()`, `xlim()`, `ylim()`, `xix_rep_time_ensemble_r()`, `T1e()`, `klegend()`, `savefig()`, `gaussleg()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `rep_time()`.

@@ -1,8 +1,6 @@
 # kernel/utilities/xyz2dd.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/xyz2dd.m`
 - Signature: `[d,alp,bet,gam,M]=xyz2dd(r1,r2,isotope1,isotope2)`
-- Total lines: 97
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Converts coordinate specification of the dipolar interaction into the dipolar in
 - The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -51,7 +46,3 @@ Converts coordinate specification of the dipolar interaction into the dipolar in
 - alp -alpha Euler angle, radians
 - bet -beta Euler angle, radians
 - gam -gamma Euler angle, radians
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `spin()`, `cart2sph()`, `ort()`, `all()`, `ischar()`.

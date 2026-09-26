@@ -1,8 +1,6 @@
 # examples/fundamentals/state_tests/state_consistency_3.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/state_tests/state_consistency_3.m`
 - Signature: `state_consistency_3()`
-- Total lines: 81
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Deuterium pair singlet, triplet, and quintet state internal consistency test.
 - Test triplet states
 - Test quintet states
 - Move to Liouville space
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `deut_pair()`, `state()`.

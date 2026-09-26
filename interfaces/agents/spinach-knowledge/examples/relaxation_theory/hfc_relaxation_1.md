@@ -1,8 +1,6 @@
 # examples/relaxation_theory/hfc_relaxation_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/hfc_relaxation_1.m`
 - Signature: `hfc_relaxation_1()`
-- Total lines: 74
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Computes and prints the full Redfield superoperator for an electron- nucleus sys
 - Relaxation superoperator
 - Textbook rates
 - Textbook and Spinach R1 for first spin
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `rlx_dip()`, `state()`, `num2str()`.

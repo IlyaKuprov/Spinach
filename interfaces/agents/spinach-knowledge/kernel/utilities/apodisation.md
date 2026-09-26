@@ -1,8 +1,6 @@
 # kernel/utilities/apodisation.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/apodisation.m`
 - Signature: `fid=apodisation(spin_system,fid,winfuns,fp_half)`
-- Total lines: 253
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Performs free induction decay apodisation. Supports free induction decays of any
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `true()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -83,7 +79,3 @@ Performs free induction decay apodisation. Supports free induction decays of any
 - the (1,1,1) corner point in the case of a 3D FID, etc.
 - winfuns -a cell array of window function specifications for each
 - dimension of the FID in the format {{spec},{spec},...},
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `exist()`, `true()`, `ndims()`, `rel_dims()`, `false()`, `cellfun()`, `setdiff()`, `fid()`, `report()`, `num2str()`, `kaiser()`, `transpose()`, `sinc()`, `fresnelc()`, `fresnels()`.

@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/top_q_rep_time_ensemble_b1_r.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/top_q_rep_time_ensemble_b1_r.m`
 - Signature: `top_q_rep_time_ensemble_b1_r()`
-- Total lines: 121
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simulation of TOP DNP repetition time scan in the steady state with distribution
 - Propagator accuracy
 - Algorithmic options
 - Distance and B1 ensemble
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gaussleg()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `rep_time()`, `dnp()`, `powder()`, `kfigure()`, `kylabel()`, `kxlabel()`, `savefig()`.

@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/sifter_nitroxide_powder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/sifter_nitroxide_powder.m`
 - Signature: `sifter_nitroxide_powder()`
-- Total lines: 72
 
 ## Purpose
 
@@ -30,7 +28,3 @@ An example of the SIFTER sequence. Calculation time: minutes.
 - Set the sequence parameters
 - Simulation and time axis generation
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `powder()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`, `ktitle()`.

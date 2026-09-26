@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/trace.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/trace.m`
 - Signature: `tttrace=trace(tt)`
-- Total lines: 60
 
 ## Purpose
 
@@ -36,7 +34,3 @@ Computes the trace of a tensor train operator. Syntax: tttrace=trace(tt)
 - Reshape the core
 - Sum up the auxiliary tensor train
 - Pronouncement of experts to the effect that something
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `ranks()`, `sizes()`, `tt_ranks()`, `tt_sizes()`.

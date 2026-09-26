@@ -1,8 +1,6 @@
 # interfaces/gaussian/gparse.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/gaussian/gparse.m`
 - Signature: `props=gparse(filename,options)`
-- Total lines: 424
 
 ## Purpose
 
@@ -17,8 +15,6 @@ A parser for Gaussian (03, 09, 16) calculation logs. Ex- tracts all potentially 
 ## Numerical / algorithmic content
 
 - An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -88,7 +84,3 @@ A parser for Gaussian (03, 09, 16) calculation logs. Ex- tracts all potentially 
 - 'g_nosymm', 'cst_nosymm',
 - 'hfc_nosymm'
 - props.inp_geom -input geometry (Angstrom)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `grumble()`, `fopen()`, `textscan()`, `fclose()`, `g03_output()`, `deblank()`, `char()`, `strcmp()`, `current_line()`, `eval()`, `atoms()`, `atomic_numbers()`, `baa()`, `bbb()`, `bcc()`.

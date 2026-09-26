@@ -1,8 +1,6 @@
 # interfaces/nmrpipe/fid2pipe.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/nmrpipe/fid2pipe.m`
 - Signature: `fid2pipe(spin_system,file_root,fid,parameters,nmrpipe_root)`
-- Total lines: 195
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Exports phase-sensitive 2D Spinach free induction decays into native NMRPipe tim
 - Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -53,7 +48,3 @@ Exports phase-sensitive 2D Spinach free induction decays into native NMRPipe tim
 - indirect-dimension points
 - parameters -pulse sequence parameters structure with fields
 - sweep, npoints, offset, and spins
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `fullfile()`, `setenv()`, `getenv()`, `isfolder()`, `spin()`, `hz2ppm()`, `fopen()`, `data()`, `fclose()`, `num2str()`, `system()`, `delete()`, `isstruct()`, `isfield()`, `iscell()`.

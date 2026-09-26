@@ -1,8 +1,6 @@
 # examples/nmr_solids/mqmas_nqi.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/mqmas_nqi.m`
 - Signature: `mqmas_nqi()`
-- Total lines: 59
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Rotor-synchronous MQMAS spectrum of a 87Rb compound, transmitter set to the isot
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

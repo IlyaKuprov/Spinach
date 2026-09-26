@@ -1,8 +1,6 @@
 # kernel/contexts/meshflow.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/contexts/meshflow.m`
 - Signature: `answer=meshflow(spin_system,pulse_sequence,parameters)`
-- Total lines: 173
 
 ## Purpose
 
@@ -16,8 +14,6 @@ First draft of the magnetohydrodynamics context for microfluidic simu- lations. 
 ## Numerical / algorithmic content
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -68,7 +64,3 @@ First draft of the magnetohydrodynamics context for microfluidic simu- lations. 
 - specified in the following way:
 - parameters.R_ph={Ph1,Ph2,...,PhN}
 - parameters.R_op={R1,R2,...,RN}
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `flow_gen()`, `report()`, `num2str()`, `spdiags()`, `polyadic()`, `opium()`, `ismember()`, `inflate()`, `pulse_sequence()`, `isfield()`.

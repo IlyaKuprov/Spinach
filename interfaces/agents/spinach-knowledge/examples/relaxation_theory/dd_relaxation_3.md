@@ -1,8 +1,6 @@
 # examples/relaxation_theory/dd_relaxation_3.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/dd_relaxation_3.m`
 - Signature: `dd_relaxation_3()`
-- Total lines: 76
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Extreme narrowing limit case comparison between the dipolar relaxation rates in 
 - Spinach housekeeping
 - Relaxation superoperator
 - Longitudinal relaxation rate
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `state()`, `num2str()`, `spin()`.

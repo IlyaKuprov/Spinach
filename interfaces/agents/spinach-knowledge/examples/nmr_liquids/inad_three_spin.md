@@ -1,8 +1,6 @@
 # examples/nmr_liquids/inad_three_spin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/inad_three_spin.m`
 - Signature: `inad_three_spin()`
-- Total lines: 50
 
 ## Purpose
 
@@ -30,7 +28,3 @@ INADEQUATE spectrum of a three-spin system with J-coupling between two spins onl
 - Simulation
 - Processing
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

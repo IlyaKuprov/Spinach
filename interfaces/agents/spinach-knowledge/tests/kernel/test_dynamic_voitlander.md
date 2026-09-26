@@ -1,16 +1,12 @@
 # tests/kernel/test_dynamic_voitlander.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_dynamic_voitlander.m`
 - Signature: `result=test_dynamic_voitlander()`
-- Total lines: 191
 
 ## Purpose
 
 Tests voitlander() on an isotropic one-electron field-swept line. Syntax: result=test_dynamic_voitlander()
 
 ## Physical / mathematical content
-
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 
 ## Numerical / algorithmic content
 
@@ -36,7 +32,3 @@ Tests voitlander() on an isotropic one-electron field-swept line. Syntax: result
 - Get Zeeman, coupling, and microwave Hamiltonians
 - Find the isotropic transition at one orientation
 - Define the positive octant spherical triangle
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `voitlander()`, `test_spin_system()`, `state()`, `hamiltonian()`, `assume()`, `orientation()`, `eigenfields()`, `test_true()`, `isscalar()`, `test_close()`, `sphtrsubd()`, `sphtarea()`, `all()`, `spec()`, `tri_corr()`.

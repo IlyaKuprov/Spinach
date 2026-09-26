@@ -1,8 +1,6 @@
 # interfaces/v2spinach.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/v2spinach.m`
 - Signature: `vdata=v2spinach(inpath)`
-- Total lines: 329
 
 ## Purpose
 
@@ -10,12 +8,7 @@ Imports time-domain NMR data recorded by Varian and Agilent inst- ruments: reads
 
 ## Physical / mathematical content
 
-- This file belongs to the `interfaces` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -92,7 +85,3 @@ Imports time-domain NMR data recorded by Varian and Agilent inst- ruments: reads
 - run first, data blocks run second
 - vdata.procpar -structure with every parameter found in
 - the procpar file: numeric parameters as
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `fopen()`, `fread()`, `bitget()`, `uint16()`, `fseek()`, `points()`, `fclose()`, `fgetl()`, `ischar()`, `strtrim()`, `textscan()`, `sscanf()`, `numbers()`, `nnz()`, `val_line()`.

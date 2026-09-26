@@ -1,8 +1,6 @@
 # examples/nmr_solids/dor_powder_nav_fplanck_freq.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/dor_powder_nav_fplanck_freq.m`
 - Signature: `dor_powder_nav_fplanck_freq()`
-- Total lines: 63
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Double angle spinning spectrum of N-acetylvaline 14N nucleus using 1D Fokker-Pla
 - Calculation time: minutes
 - System specification
 - Relaxation theory
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `state()`, `doublerot()`, `kfigure()`, `plot_1d()`.

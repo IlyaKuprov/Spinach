@@ -1,8 +1,6 @@
 # examples/optimal_control/features_keyhole.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/features_keyhole.m`
 - Signature: `features_keyhole()`
-- Total lines: 102
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Optimal control pulse optimisation for state-to-state transfer across a scalar c
 - Magnetic field
 - Spin system
 - Chemical shifts, ppm
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `correlation()`, `optimcon()`, `fmaxnewton()`, `mat2cell()`, `report()`, `shaped_pulse_xy()`, `rho()`, `num2str()`.

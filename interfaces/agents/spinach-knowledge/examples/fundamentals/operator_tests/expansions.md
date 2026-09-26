@@ -1,8 +1,6 @@
 # examples/fundamentals/operator_tests/expansions.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/operator_tests/expansions.m`
 - Signature: `expansions()`
-- Total lines: 83
 
 ## Purpose
 
@@ -26,7 +24,3 @@ Product action tests for irreducible spherical tensor operators and orthogonalis
 - Right side product action
 - Accuracy tests
 - BM test loop
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `randi()`, `irr_sph_ten()`, `boson_ortho()`, `ist_product_table()`, `bos_product_table()`, `ist_PTL()`, `ist_PTR()`, `bos_PTL()`, `bos_PTR()`.

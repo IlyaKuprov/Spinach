@@ -1,8 +1,6 @@
 # examples/esr_sol_swept/fieldsweep_nitroxide.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_swept/fieldsweep_nitroxide.m`
 - Signature: `fieldsweep_nitroxide()`
-- Total lines: 56
 
 ## Purpose
 
@@ -29,7 +27,3 @@ Field swept EPR spectrum of nitroxide, computed by finding resonance fields and 
 - Experiment parameters
 - Run the simulation in the high-T approximation
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `fieldsweep()`, `kfigure()`, `kxlabel()`, `kylabel()`.

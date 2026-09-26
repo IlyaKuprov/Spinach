@@ -1,8 +1,6 @@
 # examples/fundamentals/quadratures/grid_quality.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/quadratures/grid_quality.m`
 - Signature: `grid_quality()`
-- Total lines: 90
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Performance analysis for the spherical and SO(3) integration grids supplied with
 - % Three-angle REPULSION grids
 - Loop over three-angle REPULSION grids
 - % Two-angle Lebedev grids
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `kfigure()`, `set()`, `load()`, `num2str()`, `grid_test()`, `grid_profile()`, `kxlabel()`, `kylabel()`, `klegend()`, `ranks()`.

@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/xix_q_field_profile_single.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/xix_q_field_profile_single.m`
 - Signature: `xix_q_field_profile_single()`
-- Total lines: 84
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simulation of XiX DNP field profile in the steady state, a single spin system wi
 - Relaxation rates, distance and ori. dep. R1n
 - Basis set
 - Algorithmic options
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cell2mat()`, `xyz()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `powder()`, `kfigure()`, `kylabel()`, `kxlabel()`, `savefig()`.

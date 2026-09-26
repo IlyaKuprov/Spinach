@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/ham2nqi.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/ham2nqi.m`
 - Signature: `[omega,Q]=ham2nqi(H)`
-- Total lines: 94
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Converts a single-spin Hamiltonian back into the Zeeman and quadrupolar interact
 - Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -50,7 +45,3 @@ Converts a single-spin Hamiltonian back into the Zeeman and quadrupolar interact
 - coupling tensor, rad/s
 - The outputs are returned such that:
 - H = omega(1)*Sx + omega(2)*Sy + omega(3)*Sz +
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `irr_sph_ten()`, `pauli()`, `omega()`, `rank2()`, `sphten2mat()`, `ishermitian()`, `eps()`.

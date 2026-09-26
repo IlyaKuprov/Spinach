@@ -1,8 +1,6 @@
 # kernel/grids/grid_fibon.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/grids/grid_fibon.m`
 - Signature: `[alps,bets,gams,whts,vorn]=grid_fibon(type,parm)`
-- Total lines: 123
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Fibonacci type spherical quadrature grids, as per Appendix A.5 of http://dx.doi.
 ## Numerical / algorithmic content
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -53,7 +49,3 @@ Fibonacci type spherical quadrature grids, as per Appendix A.5 of http://dx.doi.
 - zeros because these are two-angle grids
 - bets -beta Euler angles of the grid (radians)
 - gams -gamma Euler angles of the grid (radians)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `acos()`, `fibonacci()`, `voronoisphere()`, `grid_plot()`, `ischar()`, `isscalar()`.

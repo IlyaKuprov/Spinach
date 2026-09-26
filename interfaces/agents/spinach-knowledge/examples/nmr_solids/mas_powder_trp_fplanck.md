@@ -1,8 +1,6 @@
 # examples/nmr_solids/mas_powder_trp_fplanck.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/mas_powder_trp_fplanck.m`
 - Signature: `mas_powder_trp_fplanck()`
-- Total lines: 106
 
 ## Purpose
 
@@ -33,7 +31,3 @@
 - Basis set
 - Algorithmic options
 - sys.enable={'gpu'};
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `shift_iso()`, `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

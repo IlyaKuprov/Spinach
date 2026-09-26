@@ -1,8 +1,6 @@
 # examples/imaging/phase_encoding_2d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/phase_encoding_2d.m`
 - Signature: `phase_encoding_2d()`
-- Total lines: 75
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Simple phase-encoded 2D imaging example. Calculation time: seconds. Ahmed Allami
 - Basis set
 - Spinach housekeeping
 - Sequence parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `rlx_t1_t2()`, `load()`, `state()`, `imaging()`, `get()`, `figure()`, `loc()`, `subplot()`, `mri_2d_plot()`, `ktitle()`.

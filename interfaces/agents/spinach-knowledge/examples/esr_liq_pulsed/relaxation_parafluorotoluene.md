@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/relaxation_parafluorotoluene.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/relaxation_parafluorotoluene.m`
 - Signature: `relaxation_parafluorotoluene()`
-- Total lines: 65
 
 ## Purpose
 
@@ -32,7 +30,3 @@ X-band pulse-acquire FFT ESR spectrum of parafluorotoluene radical, simulated us
 - Relaxation theory
 - Spinach housekeeping
 - Set the sequence parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

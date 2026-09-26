@@ -1,8 +1,6 @@
 # examples/relaxation_theory/trosy_selenium.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/trosy_selenium.m`
 - Signature: `trosy_selenium()`
-- Total lines: 102
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Transverse relaxation rate as a function of the applied magnetic field in ethyls
 - Magnetic field grid
 - Loop over magnetic fields
 - Set the magnet field
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `spin()`, `create()`, `basis()`, `relaxation()`, `state()`, `r2c()`, `r2se()`, `seleft()`, `seright()`, `cleft()`, `cright()`, `kfigure()`, `kxlabel()`, `kylabel()`.

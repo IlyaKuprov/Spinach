@@ -1,8 +1,6 @@
 # kernel/plotting/kletter.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/plotting/kletter.m`
 - Signature: `kletter(letter_label)`
-- Total lines: 87
 
 ## Purpose
 
@@ -28,5 +26,4 @@ Draws an academic journal style letter label in the top left corner of the curre
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `gca()`, `tightPosition()`, `text()`.
 - The grumbler requires `letter_label` to be a one-element character string.

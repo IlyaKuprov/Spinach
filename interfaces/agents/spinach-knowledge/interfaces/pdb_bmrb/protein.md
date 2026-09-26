@@ -1,8 +1,6 @@
 # interfaces/pdb_bmrb/protein.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/pdb_bmrb/protein.m`
 - Signature: `[sys,inter,aux]=protein(pdb_file,bmrb_file,options)`
-- Total lines: 524
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Protein data import function. Parses PDB and BMRB data, runs a J-coupl- ing gues
 - Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -79,7 +74,3 @@ Protein data import function. Parses PDB and BMRB data, runs a J-coupl- ing gues
 - amide groups included, 'all' imports every-
 - thing that is assigned in BMRB. If a list of
 - numbers is supplied, spins with those num-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `isfield()`, `grumble()`, `read_pdb_pro()`, `read_bmrb()`, `ismember()`, `pdb_aa_num()`, `pdb_atom_id()`, `pdb_aa_typ()`, `pdb_coords()`, `bmrb_atom_id()`, `bmrb_chemsh()`, `all()`, `strcmp()`, `bmrb_aa_typ()`, `num2str()`.

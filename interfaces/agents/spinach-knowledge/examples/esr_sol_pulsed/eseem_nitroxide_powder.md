@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/eseem_nitroxide_powder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/eseem_nitroxide_powder.m`
 - Signature: `eseem_nitroxide_powder()`
-- Total lines: 69
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Powder-averaged two-pulse ESEEM on a 14N nitroxide radical. Time-domain simulati
 - Spinach housekeeping
 - Set the sequence parameters
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `powder()`, `apodisation()`, `fftshift()`, `kfigure()`, `subplot()`, `kxlabel()`.

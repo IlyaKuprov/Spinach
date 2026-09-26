@@ -1,8 +1,6 @@
 # examples/nmr_proteins/expt_data/hnco_ubiquitin_expt.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/expt_data/hnco_ubiquitin_expt.m`
 - Signature: `hnco_ubiquitin_expt()`
-- Total lines: 53
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Experimental HNCO spectrum of human ubiquitin. Donghan Lee (Max Planck Institute
 - Baseline correction
 - Water signal elimination
 - Parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `fid()`, `apodisation()`, `fftshift()`, `spectrum()`, `kfigure()`, `plot_3d()`.

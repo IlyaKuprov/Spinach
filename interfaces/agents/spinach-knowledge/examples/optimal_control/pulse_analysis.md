@@ -1,8 +1,6 @@
 # examples/optimal_control/pulse_analysis.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/pulse_analysis.m`
 - Signature: `pulse_analysis()`
-- Total lines: 23
 
 ## Purpose
 
@@ -21,7 +19,3 @@ An example of spectrogram analysis for a quadratic chirp pulse; adapted from Mat
 - Calculation time: seconds.
 - Quadratic chirp superposition
 - Do the plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `chirp()`, `kfigure()`, `subplot()`, `kxlabel()`, `kylabel()`, `scale_figure()`, `spectrogram()`.

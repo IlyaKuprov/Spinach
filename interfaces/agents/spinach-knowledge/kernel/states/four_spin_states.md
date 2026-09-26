@@ -1,8 +1,6 @@
 # kernel/states/four_spin_states.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/states/four_spin_states.m`
 - Signature: `rho=four_spin_states(spin_system,spins,spin_state)`
-- Total lines: 194
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Returns user-specified states for a system of four spin-1/2 particles; see also 
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -44,7 +40,3 @@ Returns user-specified states for a system of four spin-1/2 particles; see also 
 - Component operators: four-spin
 - Component operators: three-spin
 - Component operators: two-spin
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `state()`, `num2cell()`, `spins()`, `isvector()`, `any()`, `isrow()`, `ischar()`.

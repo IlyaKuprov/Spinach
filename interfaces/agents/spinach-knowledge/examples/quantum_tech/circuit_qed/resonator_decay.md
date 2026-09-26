@@ -1,8 +1,6 @@
 # examples/quantum_tech/circuit_qed/resonator_decay.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/circuit_qed/resonator_decay.m`
 - Signature: `resonator_decay()`
-- Total lines: 117
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Open-system dynamics of a leaky microwave resonator at finite temperature. A Foc
 - Calculation time: seconds
 - Magnet field
 - Microwave resonator with five Fock levels
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `relaxation()`, `state()`, `coherent()`, `pops_fock()`, `pops_coh()`, `n_fock()`, `n_coh()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`.

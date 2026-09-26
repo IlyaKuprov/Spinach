@@ -1,8 +1,6 @@
 # experiments/nmr_liquids/ct_hsqc.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/nmr_liquids/ct_hsqc.m`
 - Signature: `fid=ct_hsqc(spin_system,parameters,H,R,K)`
-- Total lines: 222
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Constant-time phase-sensitive HSQC pulse sequence from:
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -59,7 +55,3 @@ fid=ct_hsqc(spin_system,parameters,H,R,K)
 - R -relaxation superoperator, received from context function
 - K -kinetics superoperator, received from context function
 - fid.pos,fid.neg - two components of the States quadrature
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `isfield()`, `grumble()`, `state()`, `operator()`, `step()`, `evolution()`, `t1_grid()`, `rho_stack()`, `coherence()`, `decouple()`, `timestep()`, `ismember()`, `ismatrix()`, `all()`, `elseif()`, `any()`.

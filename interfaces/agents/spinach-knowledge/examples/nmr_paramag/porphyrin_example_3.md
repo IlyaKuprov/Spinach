@@ -1,8 +1,6 @@
 # examples/nmr_paramag/porphyrin_example_3.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_paramag/porphyrin_example_3.m`
 - Signature: `porphyrin_example_3()`
-- Total lines: 74
 
 ## Purpose
 
@@ -28,7 +26,3 @@ Computes PCS using different models in basic Cu(II) porphyrin complex. See the "
 - Compute HFC PCS
 - Parse ORCA cube and pad the density with zeros to avoid PBC effects
 - Compute extentens for original density without padding
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2chi()`, `oparse()`, `hfc_pcs_cu()`, `hfc2pcs()`, `ocparse()`, `zoom_3d()`, `kfigure()`, `volplot()`, `molplot()`, `kpcs()`.

@@ -1,8 +1,6 @@
 # examples/nmr_proteins/hcch_cosy_gb1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/hcch_cosy_gb1.m`
 - Signature: `hcch_cosy_gb1()`
-- Total lines: 87
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Kill nitrogens (not relevant)
 - Build the basis
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `protein()`, `create()`, `kill_spin()`, `strcmp()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `plot_3d()`.

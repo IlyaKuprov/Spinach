@@ -1,8 +1,6 @@
 # interfaces/castep/c2spinach.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/castep/c2spinach.m`
 - Signature: `props=c2spinach(file_name)`
-- Total lines: 197
 
 ## Purpose
 
@@ -38,5 +36,4 @@ Parser for .magres files written by CASTEP and other codes in the CCP-NC magres 
 
 ## Internal Spinach / MATLAB structure cues
 
-- Called routines detected from the main body: `grumble()`, `key_atoms()`, `fopen()`, `textscan()`, `fclose()`, `strtrim()`, `regexprep()`, `regexp()`, `cellfun()`, `strcmp()`, `strcat()`, `strsplit()`, `str2double()`, `reshape()`, `unique()`, `isstrprop()`, `ischar()`.
 - Consumers in the repository: `examples/nmr_solids/case_studies/mathies_14n_13c/*`, `examples/nmr_solids/case_studies/mathies_carbonate/*`, `examples/visualisation/efg_silicate.m` (through `efg_display`), `g2spinach` for `cst` and `k_couplings`, and `tests/interfaces/test_c2spinach.m`.

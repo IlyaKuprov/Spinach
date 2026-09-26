@@ -1,8 +1,6 @@
 # kernel/includes/start_disallow_gpu.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/includes/start_disallow_gpu.m`
 - Signature: `(script file)`
-- Total lines: 25
 
 ## Purpose
 
@@ -26,7 +24,3 @@ Forces GPU arithmetic to be turned off even if the user had requested it in sys.
 - me square in the eyes and said "same high bro, Stokes theorem".
 - Internet folklore
 - #NHEAD #NGRUM
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `ismember()`, `report()`, `setdiff()`.

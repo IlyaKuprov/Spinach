@@ -1,8 +1,6 @@
 # examples/quantum_tech/jaynes_cummings_a.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/jaynes_cummings_a.m`
 - Signature: `jaynes_cummings_a()`
-- Total lines: 70
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Jaynes-Cummings coupling between a spin and an electromagnetic cavity mode with 
 - Spinach housekeeping
 - Rotating frame Hamiltonian
 - Electron detuning operator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `spin()`, `create()`, `basis()`, `assume()`, `hamiltonian()`, `operator()`, `state()`, `speye()`, `one_quant()`, `delta()`, `eig_array()`, `kfigure()`, `kxlabel()`, `kylabel()`.

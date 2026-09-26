@@ -1,8 +1,6 @@
 # kernel/utilities/report.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/report.m`
 - Signature: `report(spin_system,report_string)`
-- Total lines: 126
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Writes a log message to the console or an ACSII file. The message includes the c
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -47,7 +43,3 @@ Writes a log message to the console or an ACSII file. The message includes the c
 - by setting sys.output='hush' in the Spinach input
 - stream or by setting spin_system.sys.output='hush'
 - at any point during the calculation.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strcmp()`, `grumble()`, `iDispatchDataReceived()`, `ismember()`, `call_stack()`, `prefix_string()`, `pad()`, `isfield()`, `ischar()`.

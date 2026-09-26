@@ -1,8 +1,6 @@
 # examples/relaxation_theory/cpmg_echo_train.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/cpmg_echo_train.m`
 - Signature: `cpmg_echo_train()`
-- Total lines: 55
 
 ## Purpose
 
@@ -28,7 +26,3 @@ CPMG echo train in a powder. Calculation time: seconds
 - Experiment setup
 - Simulation
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `powder()`, `kfigure()`, `scale_figure()`, `kxlabel()`, `kylabel()`.

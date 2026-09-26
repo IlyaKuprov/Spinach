@@ -1,8 +1,6 @@
 # examples/dnp_sol/novel_dnp/novel_field_profile.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/novel_dnp/novel_field_profile.m`
 - Signature: `novel_field_profile()`
-- Total lines: 83
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Field profile of a NOVEL DNP experiment. <I_z> on 1H after a 0.25 us contact tim
 - Hush the output
 - Basis set
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `offsets()`, `powder()`, `field_prof()`, `contactcurve()`, `kfigure()`, `kylabel()`, `kxlabel()`.

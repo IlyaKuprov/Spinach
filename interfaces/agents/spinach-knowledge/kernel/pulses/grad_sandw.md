@@ -1,8 +1,6 @@
 # kernel/pulses/grad_sandw.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/pulses/grad_sandw.m`
 - Signature: `rho=grad_sandw(spin_system,L,rho,P,g_amps,s_len,g_durs,s_facs)`
-- Total lines: 113
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Emulates the effect of a gradient sandwich on the sample average density matrix 
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -57,7 +53,3 @@ Emulates the effect of a gradient sandwich on the sample average density matrix 
 - g_amps -row vector containing the amplitudes of
 - the two gradients, Gauss/cm
 - s_len -sample length, cm
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `report()`, `carrier()`, `s_facs()`, `g_amps()`, `g_durs()`, `cheap_norm()`, `evolution()`, `aux_rho()`, `ismember()`, `isscalar()`, `any()`.

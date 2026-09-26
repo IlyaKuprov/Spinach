@@ -1,8 +1,6 @@
 # examples/microfluidics/reacting_flow_nmr.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/microfluidics/reacting_flow_nmr.m`
 - Signature: `reacting_flow_nmr()`
-- Total lines: 252
 
 ## Purpose
 
@@ -35,7 +33,3 @@ Complete microfluidic simulation: diffusion, flow, two second- order chemical re
 - % Concentration dynamics stage
 - Rate constants, mol/(L*s)
 - Cycloaddition reaction generator, including solvent
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `dac_reaction()`, `comsol_import()`, `create()`, `basis()`, `flow_gen()`, `chem_traj()`, `report()`, `int2str()`, `sp_block_diag()`, `speye()`, `c_curr()`, `step()`, `griddedInterpolant()`, `squeeze()`, `react_gen()`, `double()`.

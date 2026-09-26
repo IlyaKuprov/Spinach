@@ -1,8 +1,6 @@
 # examples/nmr_solids/case_studies/cp_square_vs_ramp/cp_square_vs_ramp.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/case_studies/cp_square_vs_ramp/cp_square_vs_ramp.m`
 - Signature: `cp_square_vs_ramp()`
-- Total lines: 81
 
 ## Purpose
 
@@ -30,7 +28,3 @@
 - Spinach housekeeping
 - Common experiment parameters
 - Simulate fixed amplitude CP
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `operator()`, `state()`, `powder()`, `fliplr()`, `kfigure()`, `scale_figure()`, `cumsum()`, `subplot()`, `time_axis()`, `kxlabel()`, `kylabel()`, `ylim()`, `klegend()`.

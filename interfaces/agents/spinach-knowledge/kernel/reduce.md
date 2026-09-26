@@ -1,8 +1,6 @@
 # kernel/reduce.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/reduce.m`
 - Signature: `projectors=reduce(spin_system,L,rho)`
-- Total lines: 315
 
 ## Purpose
 
@@ -10,12 +8,7 @@ Symmetry and trajectory-level state space reduction. Tries all applicable reduct
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -50,7 +43,3 @@ Symmetry and trajectory-level state space reduction. Tries all applicable reduct
 - evolving reduced subspaces. The projectors are
 - to be used as follows:
 - L_reduced=P'*L*P; (for matrices)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `ismember()`, `report()`, `iscell()`, `isfield()`, `true()`, `num2str()`, `irrep_keep_index()`, `zte()`, `path_trace()`.

@@ -1,8 +1,6 @@
 # kernel/pulses/isergen.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/pulses/isergen.m`
 - Signature: `H=isergen(HL,HM,HR,dt)`
-- Total lines: 72
 
 ## Purpose
 
@@ -16,8 +14,6 @@
 ## Numerical / algorithmic content
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -47,7 +43,3 @@
 - dt -interval duration, seconds
 - H -effective evolution generator, to be used
 - as exp(-1i*H*dt)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `isscalar()`.

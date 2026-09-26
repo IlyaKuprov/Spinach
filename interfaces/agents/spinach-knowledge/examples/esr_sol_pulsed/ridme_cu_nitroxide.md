@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/ridme_cu_nitroxide.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/ridme_cu_nitroxide.m`
 - Signature: `ridme_cu_nitroxide()`
-- Total lines: 90
 
 ## Purpose
 
@@ -31,7 +29,3 @@ RIDME on a Cu(II)-NO two electron system at Q-band. The numerical calculation is
 - Relaxation theory
 - Formalism
 - Disable trajectory level SSR algorithms
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `powder()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `ktitle()`, `klegend()`.

@@ -1,8 +1,6 @@
 # kernel/plotting/int_2d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/plotting/int_2d.m`
 - Signature: `int_2d(spin_system,spectrum,parameters,ncont,...`
-- Total lines: 160
 
 ## Purpose
 
@@ -10,12 +8,7 @@ Contour plotting utility with non-linear adaptive contour spacing and 2D integra
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -69,7 +62,3 @@ Contour plotting utility with non-linear adaptive contour spacing and 2D integra
 - parameters.axis_units - axis units ('ppm','Hz','Gauss')
 - ncont -the number of contours, a reasonable value is 20
 - delta -minimum and maximum elevation (as a fraction of the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `plot_2d()`, `exist()`, `report()`, `true()`, `ginput()`, `save()`, `griddedInterpolant()`, `transpose()`, `S_int()`, `integral2()`, `num2str()`, `load()`, `ischar()`.

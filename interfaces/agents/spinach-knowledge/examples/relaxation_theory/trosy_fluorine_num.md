@@ -1,8 +1,6 @@
 # examples/relaxation_theory/trosy_fluorine_num.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/trosy_fluorine_num.m`
 - Signature: `trosy_fluorine_num()`
-- Total lines: 102
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Transverse relaxation rate as a function of the applied magnetic field in a 3-fl
 - Magnetic field grid
 - Loop over magnetic fields
 - Set the magnet field
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `spin()`, `create()`, `basis()`, `relaxation()`, `state()`, `r2c()`, `r2f()`, `fleft()`, `fright()`, `cleft()`, `cright()`, `kfigure()`, `kxlabel()`, `kylabel()`.

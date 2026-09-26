@@ -1,8 +1,6 @@
 # examples/optimal_control/features_ampl.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/features_ampl.m`
 - Signature: `features_ampl()`
-- Total lines: 115
 
 ## Purpose
 
@@ -34,7 +32,3 @@ An illustration of amplitude profiling in a phase-modulated pulse optimisation. 
 - 100 non-interacting spins at equal intervals
 - within the plus/minus 160 ppm range
 - Select a basis set -IK-2 keeps complete basis on each
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `optimcon()`, `fmaxnewton()`, `polar2cartesian()`, `shaped_pulse_xy()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

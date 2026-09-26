@@ -1,8 +1,6 @@
 # examples/parahydrogen/ortho_deuterium.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/parahydrogen/ortho_deuterium.m`
 - Signature: `ortho_deuterium()`
-- Total lines: 68
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Ortho-deuteration simulation for acrylonitrile in Figure 1 of the paper by Natte
 - Experiment parameters
 - Simulation
 - Apodisation and sign flip
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `deut_pair()`, `state()`, `operator()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

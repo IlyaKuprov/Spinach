@@ -1,8 +1,6 @@
 # examples/fundamentals/operator_tests/commutation_5.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/operator_tests/commutation_5.m`
 - Signature: `commutation_5()`
-- Total lines: 62
 
 ## Purpose
 
@@ -27,7 +25,3 @@ Tests of basic product and commutation relations between bosonic operators.
 - Bosonic monomials
 - Physical indices
 - Deviation norm testing
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `randi()`, `eps()`, `weyl()`, `comm()`, `boson_mono()`, `lin2kq()`.

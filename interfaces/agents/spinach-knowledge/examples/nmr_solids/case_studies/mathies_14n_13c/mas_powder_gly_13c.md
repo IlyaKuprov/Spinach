@@ -1,8 +1,6 @@
 # examples/nmr_solids/case_studies/mathies_14n_13c/mas_powder_gly_13c.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/case_studies/mathies_14n_13c/mas_powder_gly_13c.m`
 - Signature: `mas_powder_gly_13c()`
-- Total lines: 103
 
 ## Purpose
 
@@ -33,7 +31,3 @@
 - Keep 13CA and 14N
 - Convert shielding tensors into shift
 - Set isotropic chemical shifts to experimental values
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `c2spinach()`, `ismember()`, `shift_iso()`, `castep2nqi()`, `remtrace()`, `kfigure()`, `fields()`, `create()`, `basis()`, `spin()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `plot_1d()`, `klegend()`.

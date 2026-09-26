@@ -1,8 +1,6 @@
 # kernel/overloads/@polyadic/isreal.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@polyadic/isreal.m`
 - Signature: `answer=isreal(p)`
-- Total lines: 48
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Returns true if the polyadic representation is real. Syntax: answer=isreal(p)
 - All data is real
 - A little inaccuracy sometimes saves a ton of explanation.
 - H.H. Munro
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `true()`.

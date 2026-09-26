@@ -1,8 +1,6 @@
 # examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/ct_selective.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/ct_selective.m`
 - Signature: `ct_selective()`
-- Total lines: 105
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Optimal control design of the central transition selective pulse of the z-filter
 - 50 us long in 0.5 us slices, the controls are Cartesian, and the
 - 10 kHz amplitude ceiling is enforced by a spillout penalty follo-
 - wed by clipping. The initial state is the population difference
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `spin()`, `eeqq2nqi()`, `create()`, `basis()`, `assume()`, `mqmas_drifts()`, `operator()`, `randi()`, `optimcon()`, `fmaxnewton()`, `cartesian2polar()`, `polar2cartesian()`, `grape_xy()`.

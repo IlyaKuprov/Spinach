@@ -1,8 +1,6 @@
 # examples/optimal_control/distortions/distortions_figure_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/distortions/distortions_figure_2.m`
 - Signature: `distortions_figure_2()`
-- Total lines: 39
 
 ## Purpose
 
@@ -22,7 +20,3 @@ Figure 2 from the paper by Rasulov and Kuprov:
 - Plot waveforms
 - Plot saturation levels
 - Annotate the plot
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `vg_pulse()`, `amp_tanh()`, `tanh_waveform()`, `amp_root()`, `root_waveform()`, `kfigure()`, `kxlabel()`, `kylabel()`, `klegend()`.

@@ -1,8 +1,6 @@
 # interfaces/b2spinach.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/b2spinach.m`
 - Signature: `bdata=b2spinach(inpath)`
-- Total lines: 464
 
 ## Purpose
 
@@ -10,12 +8,7 @@ Imports time-domain NMR data recorded by Bruker instruments: reads the binary fi
 
 ## Physical / mathematical content
 
-- This file belongs to the `interfaces` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `read_jcamp()`, `read_list()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -97,7 +90,3 @@ Imports time-domain NMR data recorded by Bruker instruments: reads the binary fi
 - cays, one per column, in the order
 - they are stored in the file; for data
 - sets with three and more dimensions
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `isfile()`, `read_jcamp()`, `spin()`, `isfield()`, `delays()`, `isnan()`, `fopen()`, `fread()`, `fclose()`, `data_pts()`, `read_list()`, `regexp()`, `fileread()`, `strncmp()`, `strfind()`.

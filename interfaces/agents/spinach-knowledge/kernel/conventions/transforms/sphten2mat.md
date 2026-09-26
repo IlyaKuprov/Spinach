@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/sphten2mat.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/sphten2mat.m`
 - Signature: `M=sphten2mat(rank0,rank1,rank2)`
-- Total lines: 91
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Converts the nine components of the irreducible spherical tensor re- presentatio
 - Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -46,7 +41,3 @@ Converts the nine components of the irreducible spherical tensor re- presentatio
 - irreducible spherical tensor operators returned by irr_sph_ten.m fun-
 - ction Syntax:
 - M=sphten2mat(rank0,rank1,rank2)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `exist()`, `rank1()`, `rank2()`.

@@ -1,16 +1,12 @@
 # tests/kernel/test_transform_roundtrip_suite.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_transform_roundtrip_suite.m`
 - Signature: `result=test_transform_roundtrip_suite()`
-- Total lines: 85
 
 ## Purpose
 
 Tests deterministic coordinate and tensor transforms. Syntax: result=test_transform_roundtrip_suite()
 
 ## Physical / mathematical content
-
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 
 ## Numerical / algorithmic content
 
@@ -34,7 +30,3 @@ Tests deterministic coordinate and tensor transforms. Syntax: result=test_transf
 - Euler conversion is ill-conditioned in angles, but DCM reconstruction is unique
 - Axiality/rhombicity to matrix with zero Euler angles gives the Mehring-order eigenvalues
 - Cartesian and irreducible spherical tensor representations are algebraic inverses
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `anax2dcm()`, `test_close()`, `anax2qter()`, `qter2anax()`, `euler2dcm()`, `dcm2euler()`, `axrh2mat()`, `mat2axrh()`, `eigvals()`, `mat2sphten()`, `sphten2mat()`, `frac2cart()`, `xyz2sph()`.

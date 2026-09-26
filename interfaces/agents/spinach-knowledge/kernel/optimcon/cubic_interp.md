@@ -1,8 +1,6 @@
 # kernel/optimcon/cubic_interp.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/cubic_interp.m`
 - Signature: `[alpha,fx]=cubic_interp(end_a,end_b,alpha_a,alpha_b,...`
-- Total lines: 124
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Finds the extremum of a cubic interpolant built from function values and directi
 - Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -47,7 +42,3 @@ Finds the extremum of a cubic interpolant built from function values and directi
 - f_a -function value at alpha_a
 - dir_der_a -directional derivative at alpha_a
 - f_b -function value at alpha_b
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `roots()`, `s_points()`, `polyval()`, `isscalar()`.

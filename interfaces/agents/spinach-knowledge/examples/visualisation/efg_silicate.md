@@ -1,8 +1,6 @@
 # examples/visualisation/efg_silicate.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/visualisation/efg_silicate.m`
 - Signature: `efg_silicate()`
-- Total lines: 25
 
 ## Purpose
 
@@ -20,7 +18,3 @@ Example of electric field gradient tensor visualisation for an aluminosilicate s
 - an aluminosilicate solid. CASTEP log is parsed.
 - Import CASTEP data
 - Do the visualisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `c2spinach()`, `kfigure()`, `scale_figure()`, `subplot()`, `efg_display()`, `set()`, `ktitle()`.

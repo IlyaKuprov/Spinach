@@ -1,8 +1,6 @@
 # examples/benchmarks/fft_gpu.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/benchmarks/fft_gpu.m`
 - Signature: `fft_gpu()`
-- Total lines: 54
 
 ## Purpose
 
@@ -31,7 +29,3 @@ GPU arithmetic benchmark -3D Fourier transforms.
 - GPU benchmark
 - Analysis
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `sizes()`, `timings()`, `num2str()`, `wait()`, `kfigure()`, `means()`, `xlim()`, `set()`.

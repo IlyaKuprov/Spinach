@@ -1,8 +1,6 @@
 # examples/nmr_solids/mas_powder_csa_fplanck.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/mas_powder_csa_fplanck.m`
 - Signature: `mas_powder_csa_fplanck()`
-- Total lines: 51
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Powder magic angle spinning spectrum of a pair of anisotropically shielded proto
 - Apodization
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

@@ -1,8 +1,6 @@
 # examples/nmr_stochastic/snmr_strychnine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_stochastic/snmr_strychnine.m`
 - Signature: `snmr_strychnine()`
-- Total lines: 107
 
 ## Purpose
 
@@ -32,7 +30,3 @@ A Primas-style stochastic NMR experiment on strychnine. The calculation requires
 - sys.enable={'gpu'};
 - Spinach housekeeping
 - Get the Hamiltonian
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strychnine()`, `create()`, `basis()`, `hamiltonian()`, `assume()`, `relaxation()`, `operator()`, `equilibrium()`, `gpuArray()`, `report()`, `traj()`, `step()`, `num2str()`, `gather()`, `state()`, `kfigure()`.

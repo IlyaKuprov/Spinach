@@ -1,8 +1,6 @@
 # examples/dnp_liq/jdnp/system_specification.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/jdnp/system_specification.m`
 - Signature: `[sys,inter,bas,parameters]=system_specification()`
-- Total lines: 50
 
 ## Purpose
 

@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/qter2euler.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/qter2euler.m`
 - Signature: `[alpha,beta,gamma]=qter2euler(q)`
-- Total lines: 65
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Converts a unit quaternion in the active convention into Euler angles (ZYZ activ
 - Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -53,7 +48,3 @@ Converts a unit quaternion in the active convention into Euler angles (ZYZ activ
 - ternion component fields
 - Note: Euler angles are not unique; the angles returned sa-
 - tisfy euler2dcm(alpha,beta,gamma)=qter2dcm(q) with
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `atan2()`, `all()`, `isfield()`, `iscolumn()`, `any()`, `eps()`.

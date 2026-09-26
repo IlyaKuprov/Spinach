@@ -1,8 +1,6 @@
 # examples/quantum_tech/transmon_duffing_ladder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/transmon_duffing_ladder.m`
 - Signature: `transmon_duffing_ladder()`
-- Total lines: 62
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Duffing-model energy ladder of a weakly anharmonic transmon, showing how the tra
 - Spinach housekeeping
 - Harmonic part from the declared frequency
 - Anharmonicity operator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `assume()`, `hamiltonian()`, `operator()`, `anharm()`, `trans_frq()`, `diff()`, `kfigure()`, `kxlabel()`, `kylabel()`, `ktitle()`, `klegend()`.

@@ -1,8 +1,6 @@
 # examples/spin_chemistry/singlet_yield_nz_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/spin_chemistry/singlet_yield_nz_2.m`
 - Signature: `singlet_yield_nz_2()`
-- Total lines: 112
 
 ## Purpose
 
@@ -17,7 +15,6 @@ Field dependence of the decay rate of a micelle-confined triplet-born benzopheno
 ## Numerical / algorithmic content
 
 - An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- The file also defines local helper function(s): `scrp_decay()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -33,7 +30,3 @@ Field dependence of the decay rate of a micelle-confined triplet-born benzopheno
 - are representative of the SDS supercage systems of Sakaguchi, Hayashi,
 - and Nagakura:
 - Calculation time: minutes
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `decay_rf()`, `scrp_decay()`, `fields()`, `decay_nz()`, `field()`, `rate()`, `num2str()`, `kfigure()`, `semilogy()`, `klegend()`, `kxlabel()`, `kylabel()`, `mt2hz()`, `strcmp()`, `create()`, `basis()`.

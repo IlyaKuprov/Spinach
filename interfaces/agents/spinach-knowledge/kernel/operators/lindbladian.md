@@ -1,8 +1,6 @@
 # kernel/operators/lindbladian.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/operators/lindbladian.m`
 - Signature: `R=lindbladian(A_left,A_right,rho,rlx_rate)`
-- Total lines: 66
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Generates a Lindblad superoperator from user-specified left-side and right-side 
 - Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -48,7 +43,3 @@ Generates a Lindblad superoperator from user-specified left-side and right-side 
 - rho -the state vector whose relaxation rate
 - is known from the experiment
 - rlx_rate -experimental relaxation rate of rho
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `isscalar()`.

@@ -1,8 +1,6 @@
 # examples/nmr_solids/mas_powder_ala_gridfree.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/mas_powder_ala_gridfree.m`
 - Signature: `mas_powder_ala_gridfree()`
-- Total lines: 63
 
 ## Purpose
 
@@ -32,7 +30,3 @@
 - sys.enable={'gpu'};
 - Spinach housekeeping
 - Experiment setup
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `gridfree()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

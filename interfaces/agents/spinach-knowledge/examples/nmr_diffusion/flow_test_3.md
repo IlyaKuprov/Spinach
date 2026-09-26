@@ -1,8 +1,6 @@
 # examples/nmr_diffusion/flow_test_3.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_diffusion/flow_test_3.m`
 - Signature: `flow_test_3()`
-- Total lines: 81
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Circular flow in three-dimensional space in the absence of spin dynamics. Calcul
 - Get a 3D grid
 - Get circular wind vectors
 - Constant diffusion tensor field
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `v2fplanck()`, `inflate()`, `evolution()`, `kfigure()`, `volplot()`, `traj()`.

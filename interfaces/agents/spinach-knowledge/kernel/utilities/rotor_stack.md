@@ -2,7 +2,7 @@
 
 - Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/rotor_stack.m`
 - Signature: `[L,rotor_phases]=rotor_stack(spin_system,parameters,assumptions)`
-- Total lines: 246
+- Total lines: 256
 
 ## Purpose
 
@@ -13,6 +13,8 @@ Returns a rotor stack of Liouvillians or Hamiltonians. The stack is needed for t
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
+
+The explicit `assumptions` argument governs Hamiltonian construction and numerical rotating-frame transformations alike, independently of any prior `assume` call on the input object. Nonempty `parameters.rframes` requires laboratory-frame assumptions on the transformed spins. Numerical frames on the carrier-free `se_dnp_h+`, `se_dnp_h-`, and `se_dnp_h0` components are not implemented; empty-frame component stacks remain valid.
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
@@ -51,7 +53,7 @@ Returns a rotor stack of Liouvillians or Hamiltonians. The stack is needed for t
 - 'rotor' -the initial orientation in the rotor frame
 - (two-angle powder grids will be required)
 - assumptions -assumption set to be used in generating the
-- Hamiltonian, see assume.m
+- Hamiltonian and numerical rotating-frame validation, regardless of the input object's prior assumptions. The transformed spins must remain in the laboratory frame under this set; already-rotating spins are rejected by `rotframe`. See `assume.m`.
 
 ## Outputs
 
@@ -60,21 +62,6 @@ Returns a rotor stack of Liouvillians or Hamiltonians. The stack is needed for t
 - rotor_phases -rotor phases at each tick, radians
 - Note: relaxation and chemical kinetics are not included.
 
-## Implementation structure
+## Header notes
 
-- Returns a rotor stack of Liouvillians or Hamiltonians. The stack is
-- needed for the traditional style calculation of MAS dynamics. Syntax:
-- L=rotor_stack(spin_system,parameters,assumptions)
-- parameters.axis -spinning axis, given as a normalized
-- 3-element vector
-- parameters.offset -a cell array giving transmitter off-
-- sets in Hz on each of the spins listed
-- in parameters.spins array
-- parameters.spins -a cell array giving the spins that
-- the offsets refer to, e.g. {'1H','13C'}
-- parameters.max_rank -maximum harmonic rank to retain in
-- the solution (increase till conver-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `hamiltonian()`, `assume()`, `frqoffset()`, `cart2sph()`, `fourdif()`, `carrier()`, `wigner()`, `rotor_phases()`, `strcmp()`, `rotframe()`, `clean_up()`, `isfield()`, `elseif()`, `isrow()`, `iscell()`.
+The spinning axis is a normalised three-vector; transmitter offsets are in hertz for the entries in parameters.spins. Increase the retained harmonic rank until the requested rotor-stack result is converged.

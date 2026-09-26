@@ -1,8 +1,6 @@
 # tests/kernel/test_tt_phase.m
 
-- Source: `tests/kernel/test_tt_phase.m`
 - Signature: `result=test_tt_phase()`
-- Total lines: 98
 
 ## Purpose
 

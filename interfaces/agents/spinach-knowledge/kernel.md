@@ -1,12 +1,11 @@
 # Spinach code index: kernel
 
 - Source repository: `https://github.com/IlyaKuprov/Spinach`
-- Source commit: `9bdcb98ca508b641cd463173d74a12cc0c2dfe09`
-- Source tree state: `committed snapshot`
-- Path set: committed MATLAB files under this index directory; working-tree and untracked files are excluded.
+- Source commit: `4f7919589104e492c38b8c6e72a6881fd4b167fa` (main parent of this merge)
+- Source tree state: merged PR and main source tree
+- Path set: tracked MATLAB files under this index directory; untracked files are excluded.
 - Files indexed: **530** MATLAB files
-- Total source lines: **73310**
-- Generated: 2026-09-24T08:51:59+00:00
+- Total source lines: **73327**
 
 | File | Signature | Summary | LOC |
 |---|---|---|---:|
@@ -195,9 +194,9 @@
 | `kernel/optimcon/ens_catalog.m` | `[catalog,ens_sizes]=ens_catalog(control)` | Ensemble case catalog for optimal control problems. Enumerates the Cartesian product of the state-target pairs, the drif | 119 |
 | `kernel/optimcon/ensemble.m` | `[traj_data,fidelity,gradient,hessian]=ensemble(waveform,spin_system)` | A parallel wrapper around GRAPE that enables ensemble optimal control optimisations. This function handles systems with | 192 |
 | `kernel/optimcon/fapt2sfo.m` | `[wave,dt,time_grid]=fapt2sfo(fapt,time_grid)` | Converts a freq-ampl-phase-time specification of a pulse sequ- uence into the corresponding single frequency origin wave | 124 |
-| `kernel/optimcon/fmaxnewton.m` | `[x,data]=fmaxnewton(spin_system,cost_function,guess)` | Finds a local maximum of a function of several variables using Newton and quasi-Newton algorithms. Syntax: [x,data]=fmax | 393 |
-| `kernel/optimcon/grape_hilb.m` | `[traj_data,fidelity,grad,hess]=grape_hilb(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)` | Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user | 822 |
-| `kernel/optimcon/grape_liouv.m` | `[traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)` | Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user | 1072 |
+| `kernel/optimcon/fmaxnewton.m` | `[x,data]=fmaxnewton(spin_system,cost_function,guess)` | Finds a local maximum of a function of several variables using Newton and quasi-Newton algorithms. Syntax: [x,data]=fmax | 397 |
+| `kernel/optimcon/grape_hilb.m` | `[traj_data,fidelity,grad,hess]=grape_hilb(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)` | Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user | 813 |
+| `kernel/optimcon/grape_liouv.m` | `[traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,waveform,rho_init,rho_targ,fidelity_type)` | Gradient Ascent Pulse Engineering (GRAPE) objective function, gradient and Hessian. Propagates the system through a user | 1063 |
 | `kernel/optimcon/hess_reorder.m` | `hess=hess_reorder(hess,K,N)` | The waveforms on different channels are assumed to be stored in the rows of the input array. The Hessian elements corres | 70 |
 | `kernel/optimcon/hessreg.m` | `[H,data]=hessreg(spin_system,H,g,data)` | RFO regularisation for Newton-Raphson Hessian and gradient pairs. Syntax: [H,data]=hessreg(spin_system,H,g,data) Paramet | 101 |
 | `kernel/optimcon/inst_freq.m` | `freq=inst_freq(signal,dt,npoints,poly_order,amp_tol)` | Instantaneous frequency trajectory from a complex time-domain signal by regularised phase differentiation. Syntax: freq= | 126 |
@@ -209,7 +208,7 @@
 | `kernel/optimcon/sectioning.m` | `[alpha,fx_1,gfx_1,exitflag,data]=sectioning(cost_function,a,b,x_0,fx_0,gfx_0,dir,data,spin_system)` | Refines a previously found step bracket by repeated cubic interpolation until a step satisfying Wolfe tests is found or | 182 |
 | `kernel/optimcon/tgrape.m` | `[fidelity,grad]=tgrape(spin_system,drift,controls,waveform,dt_grid,time_unit,rho_init,rho_targ)` | A special case of Gradient Ascent Pulse Engineering (GRAPE) objective function and gradient with respect to the vector o | 168 |
 | `kernel/optimcon/trapdiff.m` | `[DL,DR]=trapdiff(spin_system,Hd,Hc,dt,cL,cR)` | Directional derivatives for the trapezium product quadrature publi- shed by Iserles and Norsett (see Corollary 3.3) in T | 97 |
-| `kernel/optimcon/wrappers/grape_coop.m` | `[traj_data,fidelity,gradient]=grape_coop(phi_profile,spin_system)` | Pairs of cooperative pulses that may be used as components of a phase cycle. The pulses are designed to produce as much | 134 |
+| `kernel/optimcon/wrappers/grape_coop.m` | `[traj_data,fidelity,gradient]=grape_coop(phi_profile,spin_system)` | Pairs of cooperative pulses that may be used as components of a phase cycle. The pulses are designed to produce as much | 137 |
 | `kernel/optimcon/wrappers/grape_curv.m` | `[traj_data,fidelity,df_du]=grape_curv(waveform_u,u2x,dx_du,spin_system)` | Cost function for optimal control using the GRAPE algorithm. Returns fidelity and gradient for a given waveform, specifi | 125 |
 | `kernel/optimcon/wrappers/grape_phase.m` | `[traj_data,fidelity,gradient,hessian]=grape_phase(phi_profile,spin_system)` | Cost function for optimal control using the GRAPE algorithm. Returns fidelity, gradient and Hessian for a given waveform | 221 |
 | `kernel/optimcon/wrappers/grape_xy.m` | `[traj_data,fidelity,grad,hess]=grape_xy(waveform,spin_system)` | Cost function for optimal control using the GRAPE algorithm. Returns fidelity, gradient and hessian for a given waveform | 213 |
@@ -324,7 +323,7 @@
 | `kernel/plotting/kcolourbar.m` | `kcolourbar(x)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: kcol | 58 |
 | `kernel/plotting/kfigure.m` | `handle=kfigure(varargin)` | Resets the stupid ass figure defaults in R2025a and later back to sensible values. | 27 |
 | `kernel/plotting/kgrid.m` | `kgrid()` | A replacement for the 'grid' command in Matlab that produces grey (rather than black-and-transparent) grid lines that ar | 30 |
-| `kernel/plotting/klegend.m` | `leg_obj=klegend(varargin)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: leg_ | 39 |
+| `kernel/plotting/klegend.m` | `leg_obj=klegend(varargin)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: leg_ | 40 |
 | `kernel/plotting/kletter.m` | `kletter(letter_label)` | Draws an academic journal style letter label in the top left corner of the current axis set. The label is placed inside the | 87 |
 | `kernel/plotting/ksgtitle.m` | `ksgtitle(x)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: ksgt | 44 |
 | `kernel/plotting/ktitle.m` | `ktitle(x)` | House style settings for Matlab figures; a product of much experience with academic publication aesthetics. Syntax: ktit | 46 |
@@ -379,7 +378,7 @@
 | `kernel/reduce.m` | `projectors=reduce(spin_system,L,rho)` | Symmetry and trajectory-level state space reduction. Tries all applicable reduction methods (unless disabled during the | 315 |
 | `kernel/relaxation.m` | `R=relaxation(spin_system,euler_angles)` | Relaxation superoperator. Syntax: R=relaxation(spin_system,euler_angles) Parameters: euler_angles -three Euler angles (Z | 888 |
 | `kernel/residual.m` | `spin_system=residual(spin_system)` | Sets up interaction tensors under partial ordering in a liquid crystal with the user-supplied order matrix. All adjustab | 106 |
-| `kernel/rotframe.m` | `Hr=rotframe(spin_system,H0,H,isotope,order)` | Rotating frame transformation with respect to specified spins to specified order in perturbation theory, using the forma | 98 |
+| `kernel/rotframe.m` | `Hr=rotframe(spin_system,H0,H,isotope,order)` | Rotating frame transformation with respect to specified spins to specified order in perturbation theory, using the forma | 115 |
 | `kernel/spin.m` | `[gamma,multiplicity]=spin(name)` | Database of multiplicities and magnetogyric ratios for sta- ble and long-lived particles, including spin zero. Syntax: [ | 989 |
 | `kernel/spinlock.m` | `rho=spinlock(spin_system,Lx,Ly,rho,direction)` | Analytical approximation to a spin locking process. This function oblite- rates all spin-spin correlations and all magne | 85 |
 | `kernel/state.m` | `rho=state(spin_system,states,spins,method)` | Generates Hilbert space density matrices and Liouville space state vectors from their human-readable descriptions. Synta | 321 |
@@ -501,7 +500,7 @@
 | `kernel/utilities/rlx_split.m` | `[R1,R2,Rm]=rlx_split(spin_system,R)` | Splits a relaxation superoperator into longitudinal, trans- verse and mixed components. Syntax: [R1,R2,Rm]=rlx_split(spi | 67 |
 | `kernel/utilities/rlx_t1_t2.m` | `[R1Op,R2Op]=rlx_t1_t2(spin_system,euler_angles)` | Extended T1/T2 relaxation model returning the relaxation super- operators separately for the longitudinal and the transv | 191 |
 | `kernel/utilities/rocomm.m` | `C=rocomm(A)` | Right-ordered nested commutator [[[[A{1},A{2}],A{3}],A{4}],...] built from the user-supplied matrices. Syntax: C=rocomm( | 43 |
-| `kernel/utilities/rotor_stack.m` | `[L,rotor_phases]=rotor_stack(spin_system,parameters,assumptions)` | Returns a rotor stack of Liouvillians or Hamiltonians. The stack is needed for the traditional style calculation of MAS | 246 |
+| `kernel/utilities/rotor_stack.m` | `[L,rotor_phases]=rotor_stack(spin_system,parameters,assumptions)` | Returns a rotor stack of Liouvillians or Hamiltonians. The stack is needed for the traditional style calculation of MAS | 256 |
 | `kernel/utilities/rspert.m` | `[Ep,Vp]=rspert(E0,H1,order)` | Rayleigh-Schrodinger perturbation theory to arbitrary order, Eqs 2.21-2.23 from Stefan Stoll's PhD thesis, with the typo | 105 |
 | `kernel/utilities/rspt_eig.m` | `[E,V,dE,T,LP]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,B)` | Eigensystem of sparse Hamiltonians to user-specified order in RSPT with careful handling of diagonal dominance and an op | 199 |
 | `kernel/utilities/rwalk.m` | `eulers=rwalk(npts,tau_c,dt)` | Random walk on SO(3), isotropic rotational diffusion. Syntax: eulers=rwalk(npts,tau_c,dt) Parameters: npts -number of po | 83 |

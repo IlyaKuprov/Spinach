@@ -432,8 +432,14 @@ discovered afterwards. Verify by propagating with `shaped_pulse_xy` and taking
 `real(rho_targ'*rho)`. The `features_*.m` files demonstrate one concept each
 (amplitude constraints, dissipative drift, time-step optimisation, freezing,
 keyholes, multiple targets, phase cycling, wave bases); solid-state control is
-`static_powder_control.m` and `mas_powder_control.m`. Analytically designed
-rather than optimised pulses are propagated in
+`static_powder_control.m` and `mas_powder_control.m`. Nonempty keyhole schedules
+with `newton` or `goodwin` are explicitly not implemented in `sphten-liouv`,
+`zeeman-liouv`, or `zeeman-wavef`, at setup and direct `grape_liouv` entry.
+First-order `lbfgs`/`rbfgs` keyhole methods, empty schedules, and existing
+Hilbert-space keyhole Hessians remain available; no algorithm is substituted.
+Four-output Hessian requests with nonempty state-vector keyholes are refused
+even when the configured optimisation method is `lbfgs` or `rbfgs`.
+Analytically designed rather than optimised pulses are propagated in
 `shaped_pulses/shaped_pulse_gaussian.m` and its chirp, Q5 and SLR siblings.
 
 Optimal control of a quadrupolar nucleus under MAS in Hilbert space is the

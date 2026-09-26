@@ -43,6 +43,11 @@
 %       built from the carriers seen here, and editing them after-
 %       wards would replay physics that the optimiser never saw.
 %
+% Note: nonempty keyhole schedules with 'newton' or 'goodwin' are not
+%       implemented for 'sphten-liouv', 'zeeman-liouv', or 'zeeman-wavef'.
+%       First-order 'lbfgs' and 'rbfgs' keyhole methods, empty schedules,
+%       and existing Hilbert-space keyhole Hessians remain available.
+%
 % david.goodwin@inano.au.dk
 % u.rasulov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il
@@ -1074,6 +1079,13 @@ if isfield(control,'keyholes')
         end
     end
     
+    % Refuse unsupported state-vector keyhole Hessians
+    if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv','zeeman-wavef'})&&...
+       ismember(spin_system.control.method,{'newton','goodwin'})&&...
+       any(~cellfun(@isempty,control.keyholes(:)))
+        error('Liouville and wavefunction keyholes with Newton/Goodwin Hessians are not implemented.');
+    end
+
     % Absorb keyhole schedule
     spin_system.control.keyholes=control.keyholes;
     control=rmfield(control,'keyholes');

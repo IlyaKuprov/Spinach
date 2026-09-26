@@ -60,6 +60,7 @@
 | `tests/kernel/test_hilbert_state.m` | `result=test_hilbert_state()` | Tests Hilbert-space state generation. Syntax: result=test_hilbert_state() Outputs: result -regression test result with e |
 | `tests/kernel/test_indexing_inverse_suite.m` | `result=test_indexing_inverse_suite()` | Tests indexing helper inverses. Syntax: result=test_indexing_inverse_suite() Outputs: result -regression test result wit |
 | `tests/kernel/test_indexing_roundtrip_suite.m` | `result=test_indexing_roundtrip_suite()` | Tests angular-momentum and matrix indexing helpers. Syntax: result=test_indexing_roundtrip_suite() Outputs: result -regr |
+| `tests/kernel/test_keyhole_guard.m` | `result=test_keyhole_guard()` | Explicit boundaries for keyhole-projected exact-Hessian optimisation. |
 | `tests/kernel/test_kinetics_generator_suite.m` | `result=test_kinetics_generator_suite()` | Tests kinetics and flow generator helpers. Syntax: result=test_kinetics_generator_suite() Outputs: result -regression te |
 | `tests/kernel/test_kinetics_invariants_suite.m` | `result=test_kinetics_invariants_suite()` | Tests deterministic chemical kinetics helpers. Syntax: result=test_kinetics_invariants_suite() Outputs: result -regressi |
 | `tests/kernel/test_linear_perturbation_suite.m` | `result=test_linear_perturbation_suite()` | Tests linear-algebra, angular-momentum, and perturbation utilities. Syntax: result=test_linear_perturbation_suite() Outp |

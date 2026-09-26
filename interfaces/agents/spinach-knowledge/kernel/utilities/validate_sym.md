@@ -1,8 +1,6 @@
 # kernel/utilities/validate_sym.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/validate_sym.m`
 - Signature: `validate_sym(spin_system,bas)`
-- Total lines: 149
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Extended validation of user-declared permutation symmetry. Confirms that the Zee
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -48,7 +43,3 @@ Extended validation of user-declared permutation symmetry. Confirms that the Zee
 - ming any checks. Syntax:
 - validate_sym(spin_system,bas)
 - spin_system -Spinach spin system description object, with the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `ismember()`, `isfield()`, `any()`, `strcmp()`, `spins()`, `perm_group()`, `perm()`, `num2str()`, `get_coupling()`, `report()`, `iscell()`, `cellfun()`.

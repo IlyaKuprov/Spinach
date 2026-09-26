@@ -1,8 +1,6 @@
 # examples/relaxation_theory/trosy_fluorine_sym.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/trosy_fluorine_sym.m`
 - Signature: `trosy_fluorine_sym()`
-- Total lines: 74
 
 ## Purpose
 
@@ -29,7 +27,3 @@ Transverse relaxation rate as a function of the applied magnetic field in a 3-fl
 - Call the analytical function
 - Relaxation rates
 - Mechanisms for 13C
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `spin()`, `rlx_dd_csa()`, `r2c()`, `r2f()`, `f_bro()`, `f_nar()`, `c_bro()`, `c_nar()`, `c_tro_dd()`, `c_tro_csa()`, `c_tro_xc()`, `kfigure()`, `ylim()`, `kxlabel()`.

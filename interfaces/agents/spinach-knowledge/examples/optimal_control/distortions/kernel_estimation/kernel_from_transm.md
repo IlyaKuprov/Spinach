@@ -1,8 +1,6 @@
 # examples/optimal_control/distortions/kernel_estimation/kernel_from_transm.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/distortions/kernel_estimation/kernel_from_transm.m`
 - Signature: `kernel_from_transm()`
-- Total lines: 57
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Response function extraction from the transmission profile of the HiPER instrume
 - Load power data and convert to amplitude
 - Plot as received
 - Get apodisation weights
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `power_at_eik()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`, `ktitle()`, `nnz()`, `fliplr()`, `resample()`, `freq_axis_ghz()`, `weights()`, `klegend()`, `ifftshift()`, `ifft_time_axis()`.

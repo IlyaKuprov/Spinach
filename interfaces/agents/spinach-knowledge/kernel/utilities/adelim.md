@@ -1,8 +1,6 @@
 # kernel/utilities/adelim.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/adelim.m`
 - Signature: `[L,R]=adelim(spin_system,L,fast_idx,slow_idx)`
-- Total lines: 99
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Adiabatic elimination in Liouville space, implements Section 6.1 of Kuprov's boo
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -56,7 +51,3 @@ Adiabatic elimination in Liouville space, implements Section 6.1 of Kuprov's boo
 - states in the basis only involve the
 - slow subsystem
 - L -projection of the original Liouvillian
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `unit_oper()`, `ismember()`, `isvector()`, `intersect()`.

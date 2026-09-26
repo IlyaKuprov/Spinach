@@ -1,8 +1,6 @@
 # kernel/optimcon/bfgs_upd.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/bfgs_upd.m`
 - Signature: `H=bfgs_upd(H,dx,dg)`
-- Total lines: 118
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Performs a one-step BFGS Hessian update for maximisation using the argument and 
 
 ## Numerical / algorithmic content
 
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 - If no valid curvature information exists yet, the code scales an identity matrix using y^T y / y^T dx, a standard quasi-Newton initialisation that roughly matches curvature along the first accepted step.
 
 ## Syntax
@@ -58,7 +54,3 @@ H=bfgs_upd(H,dx,dg)
 - dg -increment in gradients between the current
 - H -updated BFGS approximation to the Hessian
 - Hessian of the objective
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `isvector()`.

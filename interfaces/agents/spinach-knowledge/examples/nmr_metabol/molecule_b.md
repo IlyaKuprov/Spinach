@@ -1,8 +1,6 @@
 # examples/nmr_metabol/molecule_b.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_metabol/molecule_b.m`
 - Signature: `molecule_b()`
-- Total lines: 47
 
 ## Purpose
 
@@ -29,7 +27,3 @@
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gissmo2spinach()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

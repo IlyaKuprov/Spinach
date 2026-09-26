@@ -1,8 +1,6 @@
 # examples/singlet_states/singlet_imaging_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/singlet_states/singlet_imaging_1.m`
 - Signature: `singlet_imaging_1()`
-- Total lines: 160
 
 ## Purpose
 
@@ -17,7 +15,6 @@ Singlet imaging in a system with one-dimensional diffusion and flow. Calculation
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file also defines local helper function(s): `tube_flow()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -33,7 +30,3 @@ Singlet imaging in a system with one-dimensional diffusion and flow. Calculation
 - Sample geometry
 - Sequence parameters
 - Assumptions
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `assume()`, `relaxation()`, `tube()`, `state()`, `tube_flow()`, `operator()`, `speye()`, `pulse_shape()`, `shaped_pulse_af()`, `step()`, `evolution()`, `imaging()`, `singlet()`, `kfigure()`.

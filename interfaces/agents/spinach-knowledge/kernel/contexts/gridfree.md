@@ -1,8 +1,6 @@
 # kernel/contexts/gridfree.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/contexts/gridfree.m`
 - Signature: `answer=gridfree(spin_system,pulse_sequence,parameters,assumptions)`
-- Total lines: 365
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Fokker-Planck magic angle spinning and SLE context. Generates a Liouvil- lian su
 ## Numerical / algorithmic content
 
 - An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `defaults()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -86,7 +82,3 @@ Fokker-Planck magic angle spinning and SLE context. Generates a Liouvil- lian su
 - .rate -spinning rate in Hz. Positive numbers
 - for JEOL, negative for Varian and Bruker
 - due to different rotation directions.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `banner()`, `defaults()`, `grumble()`, `report()`, `assume()`, `hamiltonian()`, `any()`, `cellfun()`, `num2str()`, `sle_operators()`, `frqoffset()`, `isfield()`, `ismember()`, `equilibrium()`, `relaxation()`, `kinetics()`.

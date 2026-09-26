@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/hard_3_pulse_deer_no.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/hard_3_pulse_deer_no.m`
 - Signature: `hard_3_pulse_deer_no()`
-- Total lines: 56
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Nitroxide spin label DEER experiment at X-band. Two nitroxide radicals are posit
 - Spinach housekeeping
 - Sequence parameters
 - Pulse sequence
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `powder()`, `kfigure()`, `kxlabel()`.

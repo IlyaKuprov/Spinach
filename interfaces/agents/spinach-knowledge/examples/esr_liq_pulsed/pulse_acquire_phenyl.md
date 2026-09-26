@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/pulse_acquire_phenyl.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/pulse_acquire_phenyl.m`
 - Signature: `pulse_acquire_phenyl()`
-- Total lines: 61
 
 ## Purpose
 
@@ -31,7 +29,3 @@ W-band pulse-acquire FFT ESR spectrum of phenyl radical. Simple fixed line width
 - Set the sequence parameters
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

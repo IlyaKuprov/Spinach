@@ -1,8 +1,6 @@
 # examples/nmr_solids/fslghetcor_mas_gly.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/fslghetcor_mas_gly.m`
 - Signature: `fslghetcor_mas_gly()`
-- Total lines: 91
 
 ## Purpose
 
@@ -33,7 +31,3 @@ FSLG-HETCOR of alpha-glycine powder under MAS. Calculation time: hours on NVidia
 - sys.enable={'gpu'};
 - Spinach housekeeping
 - Start with Lz of 1H, detect in quadrature on 13C
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `shift_iso()`, `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

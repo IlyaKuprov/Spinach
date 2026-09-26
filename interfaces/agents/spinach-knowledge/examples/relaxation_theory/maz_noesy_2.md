@@ -1,8 +1,6 @@
 # examples/relaxation_theory/maz_noesy_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/maz_noesy_2.m`
 - Signature: `maz_noesy_2()`
-- Total lines: 145
 
 ## Purpose
 
@@ -35,7 +33,3 @@ Methylaziridine NOESY, including the effects of the scalar relaxation of the fir
 - Assign isotropic components from the experiment
 - Quadrupole couplings (vacuum DFT)
 - Scalar couplings (vacuum DFT)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `expt_shift()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

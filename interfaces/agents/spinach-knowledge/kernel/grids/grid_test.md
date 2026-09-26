@@ -1,8 +1,6 @@
 # kernel/grids/grid_test.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/grids/grid_test.m`
 - Signature: `grid_profile=grid_test(alphas,betas,gammas,weights,ranks,sfun)`
-- Total lines: 118
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Plots grid integration quality as a function of spherical rank. The quality is d
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -50,7 +46,3 @@ Plots grid integration quality as a function of spherical rank. The quality is d
 - weights -point weights of the grid
 - ranks -spherical ranks to consider
 - sfun -spherical function type: for three-angle
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `ranks()`, `weights()`, `wigner()`, `alphas()`, `betas()`, `gammas()`, `strcmp()`, `grid_profile()`, `krondelta()`, `num2str()`, `kfigure()`, `kxlabel()`, `kylabel()`, `any()`, `isvector()`.

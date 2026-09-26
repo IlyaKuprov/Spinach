@@ -1,16 +1,12 @@
 # tests/kernel/test_kinetics_invariants_suite.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_kinetics_invariants_suite.m`
 - Signature: `result=test_kinetics_invariants_suite()`
-- Total lines: 79
 
 ## Purpose
 
 Tests deterministic chemical kinetics helpers. Syntax: result=test_kinetics_invariants_suite()
 
 ## Physical / mathematical content
-
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 
 ## Numerical / algorithmic content
 
@@ -37,7 +33,3 @@ Tests deterministic chemical kinetics helpers. Syntax: result=test_kinetics_inva
 - Check recursive treatment of independent reaction blocks
 - Check the zero-concentration shortcut
 - Build a two-site spherical-tensor spin system for exchange and reactions
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `test_close()`, `equilibrate()`, `blkdiag()`, `test_spin_system()`, `kinetics()`, `react_gen()`, `state()`.

@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/pulse_acquire_biaryl.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/pulse_acquire_biaryl.m`
 - Signature: `pulse_acquire_biaryl()`
-- Total lines: 85
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A time-domain pulse-acquire version of the EasySpin biaryl test file, with ackno
 - Zeeman interactions
 - Spin-spin couplings
 - Relaxation theory
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

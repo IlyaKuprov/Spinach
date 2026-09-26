@@ -1,8 +1,6 @@
 # experiments/imaging/slice_select_1d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/imaging/slice_select_1d.m`
 - Signature: `fid=slice_select_1d(spin_system,parameters,H,R,K,G,F)`
-- Total lines: 153
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Slice selection diagnostics function. Executes a shaped pulse on the user-suppli
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -51,7 +47,3 @@ Slice selection diagnostics function. Executes a shaped pulse on the user-suppli
 - parameters.rf_amp_list -a vector of RF amplitudes at each
 - pulse slice, rad/s
 - parameters.rf_dur_list -a vector of pulse slice durations,
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `operator()`, `speye()`, `shaped_pulse_af()`, `evolution()`, `basic_1d_hard()`, `strcmp()`, `ismatrix()`, `all()`, `iscell()`, `isfield()`, `ischar()`, `isscalar()`, `isvector()`, `any()`.

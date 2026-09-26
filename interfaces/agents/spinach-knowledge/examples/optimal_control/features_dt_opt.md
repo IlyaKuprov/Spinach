@@ -1,8 +1,6 @@
 # examples/optimal_control/features_dt_opt.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/features_dt_opt.m`
 - Signature: `features_dt_opt()`
-- Total lines: 110
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Optimisation of slice durations in a composite inversion pulse with specified am
 - Put 100 non-interacting spins at equal intervals over the area
 - that needs to be affected by the pulse (25 kHz either side)
 - Select a basis set -IK-2 keeps complete basis on each
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `optimoptions()`, `tgrape()`, `fmincon()`, `step()`, `waveform()`, `dt_old()`, `dt_new()`, `liquid()`, `apodisation()`.

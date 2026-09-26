@@ -1,8 +1,6 @@
 # examples/fundamentals/tensor_structures/ttrain_test_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/tensor_structures/ttrain_test_1.m`
 - Signature: `ttrain_test_1()`
-- Total lines: 31
 
 ## Purpose
 
@@ -22,7 +20,3 @@ A simple test of ttclass object arithmetic.
 - Compute a function in TT
 - Compute the usual way
 - Compare results
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `magic()`, `ttclass()`, `eps()`.

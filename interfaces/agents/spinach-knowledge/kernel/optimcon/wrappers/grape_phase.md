@@ -1,8 +1,6 @@
 # kernel/optimcon/wrappers/grape_phase.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/wrappers/grape_phase.m`
 - Signature: `[traj_data,fidelity,gradient,hessian]=grape_phase(phi_profile,spin_system)`
-- Total lines: 221
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Cost function for optimal control using the GRAPE algorithm. Returns fidelity, g
 - The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -53,7 +48,3 @@ Cost function for optimal control using the GRAPE algorithm. Returns fidelity, g
 - methods are specified, fidelity is returned as an ar-
 - ray separating the penalties from the simulation
 - fidelity.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `waveform_xy()`, `polar2cartesian()`, `amplitudes()`, `phi_profile()`, `grape_xy()`, `gradient()`, `cartesian2polar()`, `grad_xy()`, `hess_xy()`, `hess_reorder()`, `hess_block()`, `hessian()`, `isfield()`, `optimcon()`, `any()`.

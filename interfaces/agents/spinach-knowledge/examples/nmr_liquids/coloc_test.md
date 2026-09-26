@@ -1,8 +1,6 @@
 # examples/nmr_liquids/coloc_test.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/coloc_test.m`
 - Signature: `coloc_test()`
-- Total lines: 54
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A simple COLOC pulse sequence example for a two-spin 1H-13C system with a long-r
 - Simulation
 - Apodisation
 - Fourier transform
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

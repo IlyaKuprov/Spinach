@@ -1,8 +1,6 @@
 # examples/kinetics/mas_exchange_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/kinetics/mas_exchange_1.m`
 - Signature: `mas_exchange_1()`
-- Total lines: 69
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Two-site position exchange for a deuterium nucleus. The sites differ in the chem
 - Basis set
 - Spinach housekeeping
 - Sequence parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `weblab2nqi()`, `acos()`, `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

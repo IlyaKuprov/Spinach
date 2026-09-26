@@ -1,8 +1,6 @@
 # examples/fundamentals/convention_tests/euler_sup_test.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/convention_tests/euler_sup_test.m`
 - Signature: `euler_sup_test()`
-- Total lines: 100
 
 ## Purpose
 
@@ -28,7 +26,3 @@ Euler angle superposition tests.
 - Singular branch stress test B
 - Singular branch stress test C
 - Draw same-phase rotations adding to beta=pi
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `euler_sup()`, `euler2dcm()`.

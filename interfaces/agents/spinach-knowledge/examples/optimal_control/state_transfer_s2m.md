@@ -1,8 +1,6 @@
 # examples/optimal_control/state_transfer_s2m.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/state_transfer_s2m.m`
 - Signature: `state_transfer_s2m()`
-- Total lines: 100
 
 ## Purpose
 
@@ -34,7 +32,3 @@ A transfer of coherence from a two-proton singlet state to a nearby carbon in a 
 - Run Spinach housekeeping
 - Set up and normalise the initial state
 - Set up and normalise the target state
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `singlet()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `frqoffset()`, `optimcon()`, `fmaxnewton()`, `mat2cell()`, `report()`, `shaped_pulse_xy()`, `rho()`, `num2str()`.

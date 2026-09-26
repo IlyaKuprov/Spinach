@@ -1,8 +1,6 @@
 # examples/nmr_liquids/mqs_six_spin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/mqs_six_spin.m`
 - Signature: `mqs_six_spin()`
-- Total lines: 90
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Multiple-quantum (MQ) NMR experiment for a coupled system of six spins. Calculat
 - Coherence to select
 - Basis set
 - Algorithmic options
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`, `kxlabel()`, `kylabel()`.

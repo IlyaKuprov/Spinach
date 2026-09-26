@@ -1,8 +1,6 @@
 # examples/dnp_sol/beam_dnp/beam_field_profile.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/beam_dnp/beam_field_profile.m`
 - Signature: `beam_field_profile()`
-- Total lines: 81
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Field profile of a BEAM DNP experiment. <I_z> after a fixed contact time is calc
 - Hush the output
 - Basis set
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `offsets()`, `powder()`, `field_prof()`, `contact_curve()`, `kfigure()`, `kylabel()`, `kxlabel()`.

@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/eseem_phenyl_crystal.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/eseem_phenyl_crystal.m`
 - Signature: `eseem_phenyl_crystal()`
-- Total lines: 59
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Two-pulse X-band ESEEM spectrum of a phenyl radical at a specific orientation re
 - Simulation
 - Plot the time domain signal
 - Crude apodization
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `operator()`, `crystal()`, `kfigure()`, `subplot()`, `kxlabel()`, `apodisation()`, `fftshift()`.

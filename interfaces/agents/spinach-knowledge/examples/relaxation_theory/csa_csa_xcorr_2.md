@@ -1,8 +1,6 @@
 # examples/relaxation_theory/csa_csa_xcorr_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/csa_csa_xcorr_2.m`
 - Signature: `csa_csa_xcorr_2()`
-- Total lines: 63
 
 ## Purpose
 
@@ -33,7 +31,3 @@ CSA-CSA cross-correlation in the 103Rh subsystem and its effect on the widths of
 - Sequence parameters -1H
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/hard_3_pulse_deer_exchange.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/hard_3_pulse_deer_exchange.m`
 - Signature: `hard_3_pulse_deer_exchange()`
-- Total lines: 88
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Three-pulse DEER on a Cu(II)-Cu(II) system in a linked porphyrin complex with a 
 - Magnet field
 - Isotopes
 - Zeeman interactions
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gaussfun()`, `j_values()`, `create()`, `basis()`, `state()`, `operator()`, `powder()`, `weights()`, `kfigure()`, `kxlabel()`.

@@ -1,8 +1,6 @@
 # examples/nmr_liquids/ct_cosy_2spins.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/ct_cosy_2spins.m`
 - Signature: `ct_cosy_2spins()`
-- Total lines: 53
 
 ## Purpose
 
@@ -30,7 +28,3 @@ CT COSY spectrum for 2 spins. Calculation time: minutes
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

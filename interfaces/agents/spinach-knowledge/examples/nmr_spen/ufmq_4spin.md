@@ -1,8 +1,6 @@
 # examples/nmr_spen/ufmq_4spin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_spen/ufmq_4spin.m`
 - Signature: `ufmq_4spin()`
-- Total lines: 114
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Basis set
 - Algorithmic options
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `spin()`, `imaging()`, `kfigure()`, `subplot()`, `fftshift()`, `plot_uf()`.

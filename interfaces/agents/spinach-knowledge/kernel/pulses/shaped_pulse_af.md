@@ -1,8 +1,6 @@
 # kernel/pulses/shaped_pulse_af.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/pulses/shaped_pulse_af.m`
 - Signature: `[rho,traj,P]=shaped_pulse_af(spin_system,L0,Lx,Ly,rho,rf_frq_list,...`
-- Total lines: 299
 
 ## Purpose
 
@@ -20,8 +18,6 @@ Shaped pulse in amplitude-frequency coordinates using Fokker-Planck formalism (E
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -87,7 +83,3 @@ max_rank,method)
 - rho -initial state vector or a horizontal
 - stack thereof
 - rf_frq_list -a vector of RF frequencies at each
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `grumble()`, `report()`, `num2str()`, `fourdif()`, `polyadic()`, `opium()`, `spdiags()`, `ismember()`, `complex()`, `inflate()`, `proj()`, `gpuArray()`, `squeeze()`, `tic()`, `step()`.

@@ -1,8 +1,6 @@
 # kernel/optimcon/ctrl_trajan.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/ctrl_trajan.m`
 - Signature: `ctrl_trajan(spin_system,waveform,traj_data,fidelities)`
-- Total lines: 791
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Diagnostic plotting function for optimal control module. Plots trajectory and co
 - The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -46,7 +41,3 @@ Diagnostic plotting function for optimal control module. Plots trajectory and co
 - user-end functions, such as grape_xy
 - Note: this function is called internally by the optimal cont-
 - rol module, you should not be calling it directly. All
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `setdiff()`, `ismember()`, `set()`, `scale_figure()`, `subplot()`, `waveform()`, `fliplr()`, `spectrogram()`, `atan2()`, `cat()`, `image()`, `hsv2rgb()`, `ktitle()`, `num2str()`, `kylabel()`.

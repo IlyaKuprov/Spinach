@@ -1,16 +1,12 @@
 # tests/kernel/test_remtrace_tensor.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_remtrace_tensor.m`
 - Signature: `result=test_remtrace_tensor()`
-- Total lines: 38
 
 ## Purpose
 
 Tests removal of the isotropic tensor trace. Syntax: result=test_remtrace_tensor()
 
 ## Physical / mathematical content
-
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 
 ## Numerical / algorithmic content
 
@@ -31,7 +27,3 @@ Tests removal of the isotropic tensor trace. Syntax: result=test_remtrace_tensor
 - State the physical target of the test
 - Define a symmetric interaction tensor with non-zero isotropic part
 - Check explicit trace removal and invariants
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `remtrace()`, `test_close()`, `A_obs()`.

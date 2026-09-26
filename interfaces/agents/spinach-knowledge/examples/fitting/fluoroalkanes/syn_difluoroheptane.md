@@ -1,8 +1,6 @@
 # examples/fitting/fluoroalkanes/syn_difluoroheptane.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fitting/fluoroalkanes/syn_difluoroheptane.m`
 - Signature: `syn_difluoroheptane()`
-- Total lines: 208
 
 ## Purpose
 
@@ -16,7 +14,6 @@ Fitting of 1H NMR spectrum of syn-3,5-difluoroheptane with respect to J-coupling
 ## Numerical / algorithmic content
 
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The file also defines local helper function(s): `errfun()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -32,7 +29,3 @@ Fitting of 1H NMR spectrum of syn-3,5-difluoroheptane with respect to J-coupling
 - Get the figure going
 - Run the optimisation
 - Display the result
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `optimset()`, `kfigure()`, `scale_figure()`, `fminsearch()`, `errfun()`, `params()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `spec_theo_f()`, `spec_theo_ha()`, `spec_theo_hb()`.

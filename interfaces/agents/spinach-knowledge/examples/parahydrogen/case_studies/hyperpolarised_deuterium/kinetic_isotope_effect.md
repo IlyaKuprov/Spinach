@@ -1,8 +1,6 @@
 # examples/parahydrogen/case_studies/hyperpolarised_deuterium/kinetic_isotope_effect.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/parahydrogen/case_studies/hyperpolarised_deuterium/kinetic_isotope_effect.m`
 - Signature: `kinetic_isotope_effect()`
-- Total lines: 133
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Evolution of state populations under ortho-deuterium bubbling in the presence of
 - Kinetics
 - Magnet field
 - Simulation formalsim
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxan()`, `deut_pair()`, `unit_state()`, `coils()`, `assume()`, `hamiltonian()`, `relaxation()`, `kinetics()`, `pumped_state()`, `magpump()`, `evolution()`, `traj_a()`, `kfigure()`, `scale_figure()`.

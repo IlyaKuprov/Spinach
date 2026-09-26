@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/hard_3_pulse_echo_gd.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/hard_3_pulse_echo_gd.m`
 - Signature: `hard_3_pulse_echo_gd()`
-- Total lines: 68
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Gadolinium(III) DEER echo experiment. The calculation is done by brute-force tim
 - Basis set
 - Spinach housekeeping
 - Probe pulse operator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `pauli()`, `speye()`, `state()`, `powder()`, `kfigure()`, `kxlabel()`.

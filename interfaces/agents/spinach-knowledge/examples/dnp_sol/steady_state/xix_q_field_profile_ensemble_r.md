@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/xix_q_field_profile_ensemble_r.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/xix_q_field_profile_ensemble_r.m`
 - Signature: `xix_q_field_profile_ensemble_r()`
-- Total lines: 96
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simulation of XiX DNP field profile in the steady state with electron-proton dis
 - Algorithmic options
 - Distance ensemble, Gauss-Legendre points
 - Microwave resonance offsets, Hz
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gaussleg()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `dnp()`, `powder()`, `kfigure()`, `kylabel()`, `kxlabel()`, `savefig()`.

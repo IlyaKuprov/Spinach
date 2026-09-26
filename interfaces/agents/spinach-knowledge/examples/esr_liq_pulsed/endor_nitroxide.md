@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/endor_nitroxide.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/endor_nitroxide.m`
 - Signature: `endor_nitroxide()`
-- Total lines: 53
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Mims ENDOR on a 15N-labelled nitroxide radical in liquid state. Magnetic paramet
 - Spinach housekeeping
 - Simulation
 - Crude apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

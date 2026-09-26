@@ -1,8 +1,6 @@
 # kernel/overloads/@polyadic/nnz.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@polyadic/nnz.m`
 - Signature: `answer=nnz(p)`
-- Total lines: 45
 
 ## Purpose
 

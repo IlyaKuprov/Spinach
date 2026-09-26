@@ -1,8 +1,6 @@
 # examples/nmr_liquids/clip_hsqc_sucrose.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/clip_hsqc_sucrose.m`
 - Signature: `clip_hsqc_sucrose()`
-- Total lines: 91
 
 ## Purpose
 
@@ -32,7 +30,3 @@ CLIP-HSQC spectrum of sucrose with natural content of 13C isotope. Coordinates, 
 - Sequence parameters
 - Create the spin system structure
 - Remove fast exchanging and uncoupled spins from the simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `shift_iso()`, `create()`, `kill_spin()`, `dilute()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

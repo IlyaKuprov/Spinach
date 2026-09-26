@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/kron.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/kron.m`
 - Signature: `c=kron(a,b)`
-- Total lines: 67
 
 ## Purpose
 
@@ -41,7 +39,3 @@ Kronecker product of two matrices in a tensor train format. Syntax: c=kron(a,b)
 - Shrink a and b before going any further
 - Read sizes and ranks of the operands
 - Check consistency
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `shrink()`, `ranks()`, `sizes()`, `a_ranks()`, `a_sizes()`, `b_ranks()`, `b_sizes()`.

@@ -1,8 +1,6 @@
 # examples/nmr_zerofield/zero_field_methanol.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_zerofield/zero_field_methanol.m`
 - Signature: `zero_field_methanol()`
-- Total lines: 55
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Zero-field NMR spectroscopy -13C methanol. Set to reproduce Figure 1 from http:/
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

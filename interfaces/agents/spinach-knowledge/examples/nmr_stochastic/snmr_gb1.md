@@ -1,8 +1,6 @@
 # examples/nmr_stochastic/snmr_gb1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_stochastic/snmr_gb1.m`
 - Signature: `snmr_gb1()`
-- Total lines: 165
 
 ## Purpose
 
@@ -32,7 +30,3 @@ A Primas-style stochastic NMR experiment on GB1 protein. The calculation require
 - sys.enable={'gpu'};
 - Spinach housekeeping
 - Get the Hamiltonian
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `protein()`, `create()`, `basis()`, `hamiltonian()`, `assume()`, `relaxation()`, `save()`, `operator()`, `state()`, `equilibrium()`, `gpuArray()`, `report()`, `fids()`, `gather()`, `cHx()`, `cHy()`.

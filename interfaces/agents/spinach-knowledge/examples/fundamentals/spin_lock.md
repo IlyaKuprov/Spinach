@@ -1,8 +1,6 @@
 # examples/fundamentals/spin_lock.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/spin_lock.m`
 - Signature: `spin_lock()`
-- Total lines: 66
 
 ## Purpose
 
@@ -30,7 +28,3 @@ A spin-locking experiment on a two-spin system.
 - Pulse operators
 - Hamiltonian
 - Spin-locking field of 1.5 kHz along Y
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `step()`, `evolution()`, `kfigure()`, `plot3()`, `answer()`.

@@ -1,8 +1,6 @@
 # kernel/operator.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/operator.m`
 - Signature: `A=operator(spin_system,operators,spins,operator_type,format)`
-- Total lines: 271
 
 ## Purpose
 
@@ -10,13 +8,9 @@ Generates Hilbert space operators or Liouville space superoperators from their h
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -75,7 +69,3 @@ Generates Hilbert space operators or Liouville space superoperators from their h
 - and m are integers), 'CTx', 'CTy', 'CTz', 'CT+', 'CT-' (central transi-
 - tion operators in the Zeeman basis). Valid labels for spins are standard
 - isotope names, as well as 'electrons', 'nuclei', and 'all'.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `grumble()`, `ismember()`, `md5_hash()`, `gcp()`, `getCurrentValueStore()`, `isKey()`, `store()`, `human2opspec()`, `superop()`, `coeffs()`, `lin2lm()`, `irr_sph_ten()`, `mults()`, `strcmp()`, `hilb2liouv()`.

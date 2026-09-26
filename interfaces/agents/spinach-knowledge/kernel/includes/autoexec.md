@@ -1,8 +1,6 @@
 # kernel/includes/autoexec.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/includes/autoexec.m`
 - Signature: `(script file)`
-- Total lines: 71
 
 ## Purpose
 
@@ -28,7 +26,3 @@ This include is executed at the start of create.m, it over- rides all user input
 - 4 workers per GPU are safe
 - Do nothing
 - This relocates the scratch folder
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `set()`, `isfield()`, `getenv()`, `ismember()`.

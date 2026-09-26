@@ -1,8 +1,6 @@
 # examples/fundamentals/derivative_tests/dirdiff_5_rect.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/derivative_tests/dirdiff_5_rect.m`
 - Signature: `dirdiff_5_rect()`
-- Total lines: 71
 
 ## Purpose
 
@@ -29,7 +27,3 @@ GRAPE Hessian internal consistency test: Newton against Goodwin algorithm.
 - Get Goodwin Hessian
 - Pick initial guess, XY-modulated GRAPE
 - Run the comparisons
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `dirdiff_test_system()`, `optimcon()`, `grape_phase()`, `grape_xy()`, `newton_hess_ph()`, `goodwin_hess_ph()`, `newton_hess_xy()`, `goodwin_hess_xy()`.

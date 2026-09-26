@@ -1,11 +1,11 @@
 # Spinach code index: tests
 
 - Source repository: `https://github.com/IlyaKuprov/Spinach`
-- Source commit: `67aee1728db76f9ab46f51bab009c5f2bede53a1`
-- Source tree state: `committed snapshot`
+- Source commit: `4f7919589104e492c38b8c6e72a6881fd4b167fa` (merged with PR head)
+- Source tree state: `merged source tree (PR head plus origin/main)`
 - Path set: committed MATLAB files under this index directory; working-tree and untracked files are excluded.
-- Files indexed: **116** MATLAB files
-- Total source lines: **14347**
+- Files indexed: **118** MATLAB files
+- Total source lines: **14993**
 - Generated: 2026-09-24T08:40:52+00:00
 
 | File | Signature | Summary | LOC |
@@ -16,6 +16,7 @@
 | `tests/kernel/test_cache_temp_scratch.m` | `result=test_cache_temp_scratch()` | Tests cache management in a temporary scratch directory. Syntax: result=test_cache_temp_scratch() Outputs: result -regre | 123 |
 | `tests/kernel/test_chemical_exchange_conservation.m` | `result=test_chemical_exchange_conservation()` | Tests conservation in two-site chemical exchange. Syntax: result=test_chemical_exchange_conservation() Outputs: result - | 44 |
 | `tests/kernel/test_commutator_utility.m` | `result=test_commutator_utility()` | Tests the commutator utility. Syntax: result=test_commutator_utility() Outputs: result -regression test result with expl | 40 |
+| `tests/kernel/test_coop_gradient.m` | `result=test_coop_gradient()` | Cooperative phase gradients for the requested transfer fidelity. | 371 |
 | `tests/kernel/test_ctx_doublerot_acquire.m` | `result=test_ctx_doublerot_acquire()` | Tests the double-rotor context with acquire(). Syntax: result=test_ctx_doublerot_acquire() Outputs: result -regression t | 71 |
 | `tests/kernel/test_ctx_floquet_acquire.m` | `result=test_ctx_floquet_acquire()` | Tests the Floquet context with acquire(). Syntax: result=test_ctx_floquet_acquire() Outputs: result -regression test res | 68 |
 | `tests/kernel/test_ctx_gridfree_acquire.m` | `result=test_ctx_gridfree_acquire()` | Tests the grid-free Fokker-Planck context with acquire(). Syntax: result=test_ctx_gridfree_acquire() Outputs: result -re | 66 |
@@ -95,6 +96,7 @@
 | `tests/kernel/test_relaxation_t2_rate.m` | `result=test_relaxation_t2_rate()` | Tests phenomenological T2 relaxation rate. Syntax: result=test_relaxation_t2_rate() Outputs: result -regression test res | 48 |
 | `tests/kernel/test_remtrace_tensor.m` | `result=test_remtrace_tensor()` | Tests removal of the isotropic tensor trace. Syntax: result=test_remtrace_tensor() Outputs: result -regression test resu | 38 |
 | `tests/kernel/test_rf_cartesian_polar.m` | `result=test_rf_cartesian_polar()` | Tests RF Cartesian and polar waveform conversion. Syntax: result=test_rf_cartesian_polar() Outputs: result -regression t | 51 |
+| `tests/kernel/test_rotor_assume.m` | `result=test_rotor_assume()` | Explicit assumptions throughout rotor-stack frame construction. | 273 |
 | `tests/kernel/test_scalar_coupling_hamiltonian.m` | `result=test_scalar_coupling_hamiltonian()` | Tests the two-spin scalar-coupling Hamiltonian. Syntax: result=test_scalar_coupling_hamiltonian() Outputs: result -regre | 46 |
 | `tests/kernel/test_shaped_pulse_rotation.m` | `result=test_shaped_pulse_rotation()` | Tests a one-slice Cartesian shaped pulse. Syntax: result=test_shaped_pulse_rotation() Outputs: result -regression test r | 49 |
 | `tests/kernel/test_slowpass_fft_parity.m` | `result=test_slowpass_fft_parity()` | Tests slowpass amplitude normalisation against time-domain FFT. Syntax: result=test_slowpass_fft_parity() Outputs: resul | 81 |
@@ -118,7 +120,7 @@
 | `tests/kernel/test_zeeman_hamiltonian.m` | `result=test_zeeman_hamiltonian()` | Tests the one-spin Zeeman Hamiltonian. Syntax: result=test_zeeman_hamiltonian() Outputs: result -regression test result | 42 |
 | `tests/lib/new_test_result.m` | `result=new_test_result(id,name,purpose)` | Creates a regression test result structure. Syntax: result=new_test_result(id,name,purpose) Parameters: id -stable test | 52 |
 | `tests/lib/test_close.m` | `result=test_close(result,label,observed,reference,abs_tol,rel_tol,why)` | Adds a numerical regression check with tolerances and explanation. Syntax: result=test_close(result,label,observed,refer | 114 |
-| `tests/lib/test_manifest.m` | `manifest=test_manifest()` | Returns Spinach regression test metadata. Syntax: manifest=test_manifest() Outputs: manifest -structure array with test | 132 |
+| `tests/lib/test_manifest.m` | `manifest=test_manifest()` | Returns Spinach regression test metadata. Syntax: manifest=test_manifest() Outputs: manifest -structure array with test | 134 |
 | `tests/lib/test_options.m` | `options=test_options(varargin)` | Parses name-value options for the Spinach test runner. Syntax: options=test_options(varargin) Parameters: varargin -name | 62 |
 | `tests/lib/test_record.m` | `record=test_record(record)` | Retains an in-progress regression result so completed checks survive a later test error. | 47 |
 | `tests/lib/test_spin_system.m` | `spin_system=test_spin_system(sys,inter,bas)` | Builds a small quiet Spinach spin system for tests. Syntax: spin_system=test_spin_system(sys,inter,bas) Parameters: sys | 35 |

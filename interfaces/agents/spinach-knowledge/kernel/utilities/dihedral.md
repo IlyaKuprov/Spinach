@@ -1,8 +1,6 @@
 # kernel/utilities/dihedral.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/dihedral.m`
 - Signature: `phi=dihedral(A,B,C,D)`
-- Total lines: 65
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Computes the dihedral angle between vectors specified by the four sets of atomic
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -46,7 +41,3 @@ Computes the dihedral angle between vectors specified by the four sets of atomic
 - for atom C
 - D - row vector of cartesian coordinates
 - for atom D
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `atan2()`, `dot()`, `cross()`, `isrow()`.

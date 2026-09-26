@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/hartree2joule.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/hartree2joule.m`
 - Signature: `energy=hartree2joule(energy)`
-- Total lines: 43
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Converts Hartree energy units into J/mol. A Hartree is twice the ground state io
 - Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -41,7 +36,3 @@ Converts Hartree energy units into J/mol. A Hartree is twice the ground state io
 - "We only need to be lucky once. You need to be
 - lucky every time."
 - The IRA to Margaret Thatcher, after
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`.

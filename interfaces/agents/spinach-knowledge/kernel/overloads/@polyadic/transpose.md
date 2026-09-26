@@ -1,8 +1,6 @@
 # kernel/overloads/@polyadic/transpose.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@polyadic/transpose.m`
 - Signature: `p=transpose(p)`
-- Total lines: 39
 
 ## Purpose
 
@@ -26,7 +24,3 @@ Computes the transpose of a matrix in a polyadic representa- tion. Syntax: p=tra
 - we are doubly sure.
 - Reinhold Niebuhr
 - #NHEAD #NGRUM
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `fliplr()`.

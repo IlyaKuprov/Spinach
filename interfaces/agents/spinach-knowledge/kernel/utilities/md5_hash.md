@@ -1,8 +1,6 @@
 # kernel/utilities/md5_hash.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/md5_hash.m`
 - Signature: `hashstr=md5_hash(A)`
-- Total lines: 45
 
 ## Purpose
 
@@ -36,7 +34,3 @@ MD5 hash of any Matlab object as a hex string. Identical sparse and full matrice
 - idlers must not be made to feel inferior to intelligent and indus-
 - trious pupils. That would be "undemocratic". These differences be-
 - tween pupils -for there are obviously and nakedly individual dif-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `serializeToBytes()`, `digestMD5()`.

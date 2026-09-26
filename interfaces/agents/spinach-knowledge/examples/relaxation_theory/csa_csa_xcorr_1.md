@@ -1,8 +1,6 @@
 # examples/relaxation_theory/csa_csa_xcorr_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/csa_csa_xcorr_1.m`
 - Signature: `csa_csa_xcorr_1()`
-- Total lines: 38
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Complete Bloch-Redfield-Wangsness relaxation superoperator in a system with two 
 - Basis set
 - Spinach housekeeping
 - Relaxation superoperator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`.

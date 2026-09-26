@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/ttort.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/ttort.m`
 - Signature: `[tt,lognrm]=ttort(tt,direct)`
-- Total lines: 169
 
 ## Purpose
 
@@ -46,7 +44,3 @@ Performs TT-orthogonalisation for a tensor train (or for each tensor train in a 
 - lognrm -if this output is present, all buffered trains
 - are also normalized, and natural logs of their
 - norms returned in the vector lognrm. Use this
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `rnk()`, `lognrm()`.

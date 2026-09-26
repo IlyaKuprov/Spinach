@@ -1,8 +1,6 @@
 # kernel/grids/one_vcell_solidangle.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/grids/one_vcell_solidangle.m`
 - Signature: `S=one_vcell_solidangle(v,centre)`
-- Total lines: 83
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Solid angle of a convex spherical polygon as described in
 - Quadrature and geometry utilities. These files generate spherical/SO(3) grids, Voronoi weights, and adaptive integration tools for orientation averaging.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -47,7 +42,3 @@ A=one_vcell_solidangle(v,centre)
 - Being a mathematician is a bit like being a manic
 - depressive: you spend your life alternating between
 - giddy elation and black despair.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `atan2()`, `any()`, `iscolumn()`, `centre()`.

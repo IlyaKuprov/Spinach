@@ -1,8 +1,6 @@
 # examples/nmr_solids/mas_powder_dip_floquet.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/mas_powder_dip_floquet.m`
 - Signature: `mas_powder_dip_floquet()`
-- Total lines: 56
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Spinning powder pulse-acquire experiment on a two-spin system with a dipolar cou
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `floquet()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

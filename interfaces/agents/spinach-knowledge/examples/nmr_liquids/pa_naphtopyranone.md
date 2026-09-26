@@ -1,8 +1,6 @@
 # examples/nmr_liquids/pa_naphtopyranone.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/pa_naphtopyranone.m`
 - Signature: `pa_naphtopyranone()`
-- Total lines: 73
 
 ## Purpose
 
@@ -31,7 +29,3 @@ NMR spectrum of 3-phenylmethylene-1H,3H-naphtho-[1,8-c,d]-pyran-1-one, magnetic 
 - Sequence parameters
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

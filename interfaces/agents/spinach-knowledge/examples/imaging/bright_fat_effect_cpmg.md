@@ -1,8 +1,6 @@
 # examples/imaging/bright_fat_effect_cpmg.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/bright_fat_effect_cpmg.m`
 - Signature: `bright_fat_effect_cpmg()`
-- Total lines: 90
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Bright fat effect under CPMG echo train -magnetisation losses are greater in MRI
 - and 4,5,6 are molecule B
 - Kinetic rate matrix (Hz)
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `load()`, `state()`, `imaging()`, `kfigure()`, `set()`, `kxlabel()`, `kylabel()`, `ktitle()`.

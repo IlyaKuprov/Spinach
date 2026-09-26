@@ -1,8 +1,6 @@
 # examples/fundamentals/perturb_theory.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/perturb_theory.m`
 - Signature: `perturb_theory()`
-- Total lines: 81
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Rayleigh-Schrodinger and Van Vleck perturbation theory modules test. Eigenvector
 - Eigensystems, PTs
 - RSPT gets the eigensystem directly
 - VVPT returns a generator that needs exponentiation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `pauli()`, `E_rs()`, `rspert()`, `E_vv()`, `vvpert()`, `kfigure()`, `subplot()`, `set()`, `kxlabel()`, `kylabel()`, `klegend()`, `V_inf()`, `cellfun()`.

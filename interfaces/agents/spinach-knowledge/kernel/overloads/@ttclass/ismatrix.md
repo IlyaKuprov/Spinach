@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/ismatrix.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/ismatrix.m`
 - Signature: `answer=ismatrix(tt)`
-- Total lines: 34
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Returns TRUE for non-empty tensor train objects. Syntax: answer=ismatrix(tt)
 - The stronger the house, the greater the immigration.
 - The Law of Three Little Pigs
 - #NGRUM
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `true()`, `false()`.

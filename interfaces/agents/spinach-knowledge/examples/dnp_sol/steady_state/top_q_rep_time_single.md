@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/top_q_rep_time_single.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/top_q_rep_time_single.m`
 - Signature: `top_q_rep_time_single()`
-- Total lines: 101
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simulation of TOP DNP repetition time scan in the steady state. Calculation time
 - Basis set
 - Propagator accuracy
 - Algorithmic options
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cell2mat()`, `xyz()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `rep_time()`, `dnp()`, `powder()`, `kfigure()`, `kylabel()`, `kxlabel()`, `savefig()`.

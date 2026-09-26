@@ -1,8 +1,6 @@
 # examples/nmr_spen/ufdosy_2spin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_spen/ufdosy_2spin.m`
 - Signature: `ufdosy_2spin()`
-- Total lines: 102
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Ultrafast DOSY for two coupled spins with additional complications like DD and C
 - Relaxation theory
 - Algorithmic options
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `assume()`, `relaxation()`, `state()`, `imaging()`, `fftshift()`, `spin()`, `kfigure()`, `kxlabel()`, `kylabel()`.

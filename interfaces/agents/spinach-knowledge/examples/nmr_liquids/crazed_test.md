@@ -1,8 +1,6 @@
 # examples/nmr_liquids/crazed_test.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/crazed_test.m`
 - Signature: `crazed_test()`
-- Total lines: 60
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Long range intermolecular coherences predicted by Warren and co-workers Calculat
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `equilibrium()`, `crystal()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

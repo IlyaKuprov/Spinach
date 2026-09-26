@@ -1,8 +1,6 @@
 # kernel/operators/weyl.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/operators/weyl.m`
 - Signature: `A=weyl(nlevels)`
-- Total lines: 78
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Weyl boson operators (sparse, see below for normalisa- tion convention) for a bo
 - Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -51,7 +46,3 @@ Weyl boson operators (sparse, see below for normalisa- tion convention) for a bo
 - A.n -population number operator
 - Note: the matrices are normalised to obey the following
 - relations for all energy level counts
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `double()`, `spdiags()`, `complex()`, `speye()`, `isscalar()`.

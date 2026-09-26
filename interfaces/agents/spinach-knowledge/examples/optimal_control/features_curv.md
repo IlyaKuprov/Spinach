@@ -1,8 +1,6 @@
 # examples/optimal_control/features_curv.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/features_curv.m`
 - Signature: `features_curv()`
-- Total lines: 105
 
 ## Purpose
 
@@ -34,7 +32,3 @@ A transfer of coherence from longitudinal magnetization into a two-spin singlet 
 - Isotopes
 - Interactions
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `singlet()`, `operator()`, `hamiltonian()`, `assume()`, `optimcon()`, `fmaxnewton()`, `grape_curv()`, `cart_profile()`, `u2x()`, `curv_profile()`, `shaped_pulse_xy()`, `coherence()`, `correlation()`.

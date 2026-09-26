@@ -1,8 +1,6 @@
 # kernel/spin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/spin.m`
 - Signature: `[gamma,multiplicity]=spin(name)`
-- Total lines: 989
 
 ## Purpose
 
@@ -10,13 +8,9 @@ Database of multiplicities and magnetogyric ratios for sta- ble and long-lived p
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -63,7 +57,3 @@ Database of multiplicities and magnetogyric ratios for sta- ble and long-lived p
 - multiplicity
 - 'C#' -electromagnetic cavity mo-
 - de, # is an integer speci-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `strcmp()`, `name()`, `regexp()`, `str2double()`, `ischar()`.

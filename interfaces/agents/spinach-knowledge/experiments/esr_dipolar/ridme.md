@@ -1,8 +1,6 @@
 # experiments/esr_dipolar/ridme.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/esr_dipolar/ridme.m`
 - Signature: `answer=ridme(spin_system,parameters,H,R,K)`
-- Total lines: 182
 
 ## Purpose
 
@@ -18,8 +16,6 @@ RIDME pulse sequence. Idealized hard pulses are used, the pulses only affect the
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -63,7 +59,3 @@ RIDME pulse sequence. Idealized hard pulses are used, the pulses only affect the
 - K kinetics superoperator (received from
 - parameters.rho0 initial state
 - parameters.probe_spin number of the spin on which the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `state()`, `operator()`, `step()`, `evolution()`, `rho_stack_pxpx()`, `rho_stack_pypy()`, `rho_stack_mxmx()`, `rho_stack_mymy()`, `ismatrix()`, `all()`, `isfield()`, `isscalar()`, `isrow()`, `any()`.

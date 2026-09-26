@@ -1,8 +1,6 @@
 # examples/fundamentals/convention_tests/invariants.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/convention_tests/invariants.m`
 - Signature: `invariants()`
-- Total lines: 60
 
 ## Purpose
 
@@ -30,7 +28,3 @@ A test of Equation 3 in http://dx.doi.org/10.1002/chem.200902300
 - Axial test
 - Random axial eigenvalues
 - Zero trace
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `randperm()`.

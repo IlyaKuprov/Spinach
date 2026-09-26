@@ -1,8 +1,6 @@
 # kernel/operators/irr_sph_ten.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/operators/irr_sph_ten.m`
 - Signature: `T=irr_sph_ten(mult,k)`
-- Total lines: 108
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Single-spin irreducible spherical tensor operators T(k,m) obeying the following 
 - Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -55,7 +50,3 @@ T=irr_sph_ten(mult,k)
 - tensors of all ranks and puts them into a
 - cell array in the order of increasing rank,
 - and decreasing projection within each rank.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `speye()`, `pauli()`, `isscalar()`.

@@ -1,8 +1,6 @@
 # experiments/zulf/zerofield.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/zulf/zerofield.m`
 - Signature: `fid=zerofield(spin_system,parameters,H,R,K)`
-- Total lines: 133
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Budker group style gamma-weighted pulse-acquire sequence in zero field. Uses gam
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -52,7 +48,3 @@ Budker group style gamma-weighted pulse-acquire sequence in zero field. Uses gam
 - frequency sign discrimination
 - parameters.flip_angle -pulse flip angle in radians for
 - protons; for other nuclei, this
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `spin()`, `weights()`, `state()`, `operator()`, `step()`, `evolution()`, `ismatrix()`, `all()`, `isfield()`, `ismember()`, `elseif()`.

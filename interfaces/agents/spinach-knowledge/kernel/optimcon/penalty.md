@@ -1,8 +1,6 @@
 # kernel/optimcon/penalty.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/penalty.m`
 - Signature: `[pen_term,pen_grad,pen_hess]=penalty(wf,type,fb,cb)`
-- Total lines: 256
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Penalty terms for the Optimal Control module. Returns the penalty function and i
 ## Numerical / algorithmic content
 
 - Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -78,7 +74,3 @@ Penalty terms for the Optimal Control module. Returns the penalty function and i
 - type='DNS' - derivative norm square, desig-
 - ned to favour smooth waveforms
 - over jagged ones.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `speye()`, `fdmat()`, `pen_hess()`, `amp()`, `phi()`, `cartesian2polar()`, `amp_safe()`, `pen_grad()`, `polar2cartesian()`, `pen_dr()`, `pen_dp()`, `ch_map()`, `isscalar()`, `isequal()`, `any()`.

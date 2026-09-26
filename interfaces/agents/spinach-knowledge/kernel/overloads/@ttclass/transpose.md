@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/transpose.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/transpose.m`
 - Signature: `ttrain=transpose(ttrain)`
-- Total lines: 38
 
 ## Purpose
 

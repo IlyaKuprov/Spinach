@@ -1,8 +1,6 @@
 # kernel/utilities/overwound.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/overwound.m`
 - Signature: `overwound(rho,spc_dim,spn_dim)`
-- Total lines: 140
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Checks if a Fokker-Planck state vector has any spatial frequencies that its spat
 ## Numerical / algorithmic content
 
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -49,7 +45,3 @@ Checks if a Fokker-Planck state vector has any spatial frequencies that its spat
 - Planck problem
 - Output:
 - figures and diagnostic messages to the console
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `spc_dim()`, `fftshift()`, `kfigure()`, `kxlabel()`, `kylabel()`, `isvector()`, `any()`, `isscalar()`.

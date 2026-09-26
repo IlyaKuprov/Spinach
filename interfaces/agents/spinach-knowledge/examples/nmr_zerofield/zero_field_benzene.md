@@ -1,8 +1,6 @@
 # examples/nmr_zerofield/zero_field_benzene.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_zerofield/zero_field_benzene.m`
 - Signature: `zero_field_benzene()`
-- Total lines: 74
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Zero-field NMR spectroscopy -benzene with one 13C nucleus. Set to reproduce Figu
 - Simulation
 - Apodisation
 - Fourier transform
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

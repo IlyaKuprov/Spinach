@@ -1,8 +1,6 @@
 # kernel/utilities/tikhol1n.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/tikhol1n.m`
 - Signature: `[x,err,reg]=tikhol1n(A,y,nnzt)`
-- Total lines: 170
 
 ## Purpose
 
@@ -15,8 +13,6 @@ L1 norm Tikhonov regularised solver for A*x=y where A is an ill-conditioned matr
 ## Numerical / algorithmic content
 
 - The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -47,7 +43,3 @@ L1 norm Tikhonov regularised solver for A*x=y where A is an ill-conditioned matr
 - nnzt -the target for the number of
 - non-zeroes in the solution
 - x -a real or complex vector
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `ctranspose()`, `normest()`, `sign()`, `int2str()`, `soft_thr()`, `nnz()`, `ismember()`, `num2str()`, `ismatrix()`, `iscolumn()`, `isscalar()`.

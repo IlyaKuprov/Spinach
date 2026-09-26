@@ -1,8 +1,6 @@
 # examples/giant_spin/case_studies/dimer_exchange_types.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/case_studies/dimer_exchange_types.m`
 - Signature: `dimer_exchange_types()`
-- Total lines: 114
 
 ## Purpose
 

@@ -1,16 +1,12 @@
 # tests/kernel/test_multiprop_adaptive.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_multiprop_adaptive.m`
 - Signature: `result=test_multiprop_adaptive()`
-- Total lines: 140
 
 ## Purpose
 
 Tests adaptive repeated propagator application. Syntax: result=test_multiprop_adaptive()
 
 ## Physical / mathematical content
-
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 
 ## Numerical / algorithmic content
 
@@ -37,7 +33,3 @@ Tests adaptive repeated propagator application. Syntax: result=test_multiprop_ad
 - Define a non-normal sparse propagator and a state vector
 - Compare state-vector propagation with an explicit matrix power
 - Define a diagonal sparse propagator and a state vector
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `multiprop()`, `uint64()`, `double()`, `test_close()`, `spdiags()`, `pauli()`, `speye()`, `test_true()`.

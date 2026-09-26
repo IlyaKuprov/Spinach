@@ -1,8 +1,6 @@
 # examples/spin_chemistry/cidnp_flash_acquire.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/spin_chemistry/cidnp_flash_acquire.m`
 - Signature: `cidnp_flash_acquire()`
-- Total lines: 100
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A model of the CIDNP magnetisation pumping process described in IK's paper: The 
 - Chemical shift anisotropies (DFT)
 - Coordinates (DFT)
 - J-coupling (expt)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `hamiltonian()`, `assume()`, `relaxation()`, `magpump()`, `unit_state()`, `evolution()`, `traj_a()`, `traj_b()`, `kfigure()`, `scale_figure()`, `subplot()`, `ktitle()`, `kxlabel()`.

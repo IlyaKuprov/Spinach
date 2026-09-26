@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/mas_diamond_p1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/mas_diamond_p1.m`
 - Signature: `mas_diamond_p1()`
-- Total lines: 96
 
 ## Purpose
 
@@ -52,7 +50,3 @@ Two-pulse echo-detected frequency-swept EPR spectra of the P1 substitutional nit
 - Simulation
 - Normalisation to the static spectrum
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `diamond_p1()`, `create()`, `basis()`, `state()`, `singlerot()` with the `echo_sweep()` handle, `kfigure()`, `plot_1d()`, `klegend()`, `kylabel()`.

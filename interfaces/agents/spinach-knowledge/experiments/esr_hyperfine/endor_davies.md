@@ -1,8 +1,6 @@
 # experiments/esr_hyperfine/endor_davies.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/esr_hyperfine/endor_davies.m`
 - Signature: `answer=endor_davies(spin_system,parameters,H,R,K)`
-- Total lines: 269
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Davies ENDOR sequence with explicit soft pulses and all of the atten- dant effec
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -74,7 +70,3 @@ Davies ENDOR sequence with explicit soft pulses and all of the atten- dant effec
 - parameters.e_dur -duration of the electron pulse, s
 - parameters.e_rnk -Fokker-Planck cut-off rank for
 - the electron pulse
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `sim2liouv()`, `grumble()`, `operator()`, `spin()`, `shaped_pulse_af()`, `isfield()`, `evolution()`, `answer()`, `ismatrix()`, `all()`, `ismember()`, `ischar()`, `iscell()`, `cellfun()`, `isrow()`, `isscalar()`.

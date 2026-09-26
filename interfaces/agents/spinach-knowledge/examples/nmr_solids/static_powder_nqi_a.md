@@ -1,8 +1,6 @@
 # examples/nmr_solids/static_powder_nqi_a.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/static_powder_nqi_a.m`
 - Signature: `static_powder_nqi_a()`
-- Total lines: 54
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Static quadrupolar 14N powder pattern of L-valyl-L-alanine using very large nume
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `state()`, `powder()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

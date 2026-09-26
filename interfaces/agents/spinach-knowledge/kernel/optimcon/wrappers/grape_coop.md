@@ -1,8 +1,6 @@
 # kernel/optimcon/wrappers/grape_coop.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/wrappers/grape_coop.m`
 - Signature: `[traj_data,fidelity,gradient]=grape_coop(phi_profile,spin_system)`
-- Total lines: 137
 
 ## Purpose
 
@@ -17,9 +15,6 @@ The cooperative objective averages the requested primary transfer fidelities and
 
 ## Numerical / algorithmic content
 
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
-
 ## Parameters / inputs
 
 - phi_profile -phase profiles of the two pulses,
@@ -31,4 +26,3 @@ The cooperative objective averages the requested primary transfer fidelities and
 - fidelity -cooperative fidelity measure
 - gradient -cooperative fidelity gradient
 - Note: only phase-modulated point-to-point transformations are supported.
-

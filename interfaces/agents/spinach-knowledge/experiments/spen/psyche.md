@@ -1,8 +1,6 @@
 # experiments/spen/psyche.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/spen/psyche.m`
 - Signature: `fid=psyche(spin_system,parameters,H,R,K,G,F)`
-- Total lines: 266
 
 ## Purpose
 
@@ -16,8 +14,6 @@ PSYCHE pure-shift NMR pulse sequence. Syntax: fid=psyche_1d(spin_system,paramete
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -60,7 +56,3 @@ PSYCHE pure-shift NMR pulse sequence. Syntax: fid=psyche_1d(spin_system,paramete
 - parameters.npoints number of points in the sweep
 - parameters.zerofill number of points for the zero filling
 - parameters.diff diffusion constant (m^2/s)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `operator()`, `speye()`, `chirp_pulse()`, `strcmp()`, `cosd()`, `step()`, `evolution()`, `coherence()`, `shaped_pulse_xy()`, `ismember()`, `ismatrix()`, `all()`, `iscell()`, `isfield()`, `elseif()`.

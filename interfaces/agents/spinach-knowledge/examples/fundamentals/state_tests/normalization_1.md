@@ -1,8 +1,6 @@
 # examples/fundamentals/state_tests/normalization_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/state_tests/normalization_1.m`
 - Signature: `normalization_1()`
-- Total lines: 47
 
 ## Purpose
 
@@ -24,7 +22,3 @@ Internal consistency test for the state vectors and matrices in each of the thre
 - Preallocate the answer
 - Compute norm differences
 - Display the answers
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `norm_diffs()`, `any()`.

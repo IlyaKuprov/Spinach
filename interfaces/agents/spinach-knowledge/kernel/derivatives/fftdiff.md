@@ -1,8 +1,6 @@
 # kernel/derivatives/fftdiff.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/derivatives/fftdiff.m`
 - Signature: `kern=fftdiff(order,npoints,dx)`
-- Total lines: 74
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Spectral differentiation kernel. Syntax: kern=fftdiff(order,npoints,dx)
 ## Numerical / algorithmic content
 
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -44,7 +40,3 @@ Spectral differentiation kernel. Syntax: kern=fftdiff(order,npoints,dx)
 - derivative=real(ifft(fft(signal).*kern));
 - Note: periodic boundary conditions.
 - Check consistency
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `ifftshift()`.

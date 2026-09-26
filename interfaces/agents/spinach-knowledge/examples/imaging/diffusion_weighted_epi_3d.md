@@ -1,8 +1,6 @@
 # examples/imaging/diffusion_weighted_epi_3d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/diffusion_weighted_epi_3d.m`
 - Signature: `diffusion_weighted_epi_3d()`
-- Total lines: 133
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Three-dimensional echo planar imaging in the presence of realistic diffusion. Si
 - Basis set
 - Spinach housekeeping
 - Pulse phase
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `pulse_shape()`, `phantoms()`, `rlx_t1_t2()`, `state()`, `kfigure()`, `dims()`, `volplot()`, `ktitle()`, `imaging()`, `scale_figure()`, `subplot()`, `mri_2d_plot()`, `apodisation()`, `fftshift()`.

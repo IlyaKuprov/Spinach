@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/pack.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/pack.m`
 - Signature: `ttout=pack(tt)`
-- Total lines: 73
 
 ## Purpose
 
@@ -38,7 +36,3 @@ This subroutine packs all trains from the addition buffer into a single tensor t
 - Read tensor ranks and dimensions
 - Fast return if possible
 - Total rank of all summands
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cumsum()`.

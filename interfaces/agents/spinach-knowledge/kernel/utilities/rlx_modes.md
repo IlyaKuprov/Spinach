@@ -1,8 +1,6 @@
 # kernel/utilities/rlx_modes.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/rlx_modes.m`
 - Signature: `R=rlx_modes(spin_system)`
-- Total lines: 136
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Bosonic mode dissipation superoperator. Builds thermalised GKSL dissipators for 
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -48,7 +44,3 @@ Bosonic mode dissipation superoperator. Builds thermalised GKSL dissipators for 
 - spin_system -Spinach spin system description object
 - with bosonic mode information present
 - R -bosonic mode dissipation superoperator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `mprealloc()`, `ismember()`, `num2str()`, `report()`, `operator()`, `isfield()`.

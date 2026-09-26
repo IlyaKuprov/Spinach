@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/hpa_nitroxide_powder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/hpa_nitroxide_powder.m`
 - Signature: `hpa_nitroxide_powder()`
-- Total lines: 70
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Powder averaged pulse-acquire W-band Fourier ESR spectrum of nitroxide radical. 
 - Spinach housekeeping
 - Sequence parameters
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `powder()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

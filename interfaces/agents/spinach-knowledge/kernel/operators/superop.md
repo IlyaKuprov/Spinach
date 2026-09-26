@@ -1,8 +1,6 @@
 # kernel/operators/superop.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/operators/superop.m`
 - Signature: `A=superop(spin_system,opspec,side)`
-- Total lines: 212
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Sided product superoperator in the spherical tensor basis set. Returns superoper
 - Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -50,7 +45,3 @@ Sided product superoperator in the spherical tensor basis set. Returns superoper
 - tion superoperator respectively.
 - A -a three-column array of row indices (first column),
 - column indices (second column) and values (third column).
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strcmp()`, `grumble()`, `unit_oper()`, `active_spins()`, `opspec()`, `squeeze()`, `ismember()`, `from()`, `coeff()`, `true()`, `and()`, `basis_cols()`, `source_subsp()`, `destin_subsp()`, `isequal()`, `source_subsp_idx()`.

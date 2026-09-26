@@ -1,8 +1,6 @@
 # interfaces/comsol/comsol_velo.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/comsol/comsol_velo.m`
 - Signature: `mesh=comsol_velo(mesh,file_name)`
-- Total lines: 74
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Imports ASCII 2D flow velocity files produced by COMSOL. Syntax: mesh=comsol_vel
 - COMSOL interfaces. These files are mostly data-structure and numerical-geometry utilities for bringing concentration, velocity, and mesh data from finite-element simulations into Spinach transport calculations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -42,7 +37,3 @@ Imports ASCII 2D flow velocity files produced by COMSOL. Syntax: mesh=comsol_vel
 - Velocity readout count
 - Parse velocity readouts
 - Close the file
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `fopen()`, `fgetl()`, `contains()`, `textscan()`, `num2str()`, `nan()`, `fclose()`, `ischar()`.

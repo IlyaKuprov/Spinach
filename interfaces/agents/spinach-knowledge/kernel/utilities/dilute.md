@@ -1,8 +1,6 @@
 # kernel/utilities/dilute.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/dilute.m`
 - Signature: `subsystems=dilute(spin_system,isotope,tuples)`
-- Total lines: 93
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Splits the spin system into several independent subsystems, each containing only
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -56,7 +51,3 @@ subsystems=dilute(spin_system,isotope,tuples)
 - tuples -1 returns all subsystems with
 - a single instance of the isoto-
 - pe, 2 returns all subsystems
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `grumble()`, `report()`, `num2str()`, `cellfun()`, `strcmp()`, `nchoosek()`, `kill_spin()`, `setdiff()`, `combos()`, `ischar()`, `isscalar()`.

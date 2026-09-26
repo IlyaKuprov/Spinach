@@ -1,8 +1,6 @@
 # examples/nmr_solids/pdsd_simple.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/pdsd_simple.m`
 - Signature: `pdsd_simple()`
-- Total lines: 74
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Experiment parameters
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

@@ -1,8 +1,6 @@
 # kernel/line_shapes/dhofun.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/line_shapes/dhofun.m`
 - Signature: `y=dhofun(x,nat_freq,fwhm)`
-- Total lines: 65
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Normalised damped harmonic oscillator response function in mag- netic resonance 
 - Line-shape utilities. These files compute, transform, or fit spectral line shapes, connecting simulated transition frequencies and relaxation widths to observable spectra.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -49,7 +44,3 @@ Normalised damped harmonic oscillator response function in mag- netic resonance 
 - x -argument values, a real array of any dimension;
 - the function is zero at non-positive arguments
 - nat_freq -natural frequency of the undamped oscillator, a
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`.

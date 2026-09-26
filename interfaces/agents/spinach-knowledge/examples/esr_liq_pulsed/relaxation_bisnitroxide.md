@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/relaxation_bisnitroxide.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/relaxation_bisnitroxide.m`
 - Signature: `relaxation_bisnitroxide()`
-- Total lines: 79
 
 ## Purpose
 
@@ -32,7 +30,3 @@ X-band pulse-acquire FFT ESR spectrum of a bisnitroxide radical, using explicit 
 - Relaxation theory
 - Spinach housekeeping
 - Sequence parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

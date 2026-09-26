@@ -1,8 +1,6 @@
 # examples/nmr_liquids/hsqc_cyprinol.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/hsqc_cyprinol.m`
 - Signature: `hsqc_cyprinol()`
-- Total lines: 80
 
 ## Purpose
 
@@ -32,7 +30,3 @@ HSQC spectrum of cyprinol with natural abundance of 13C isotope. Calculation tim
 - Preallocate the answer
 - Loop over isotopomers
 - Build the basis
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cyprinol()`, `create()`, `dilute()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

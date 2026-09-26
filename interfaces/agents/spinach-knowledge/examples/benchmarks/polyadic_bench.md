@@ -1,8 +1,6 @@
 # examples/benchmarks/polyadic_bench.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/benchmarks/polyadic_bench.m`
 - Signature: `polyadic_bench()`
-- Total lines: 100
 
 ## Purpose
 
@@ -28,7 +26,3 @@ A benchmark for the polyadic object.
 - Time polyadic multiplication
 - Inflate the polyadic
 - Time flat multiplication
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2str()`, `randi()`, `polyadic()`, `runtimes_full_poly()`, `runtimes_full_flat()`, `sprandn()`, `runtimes_sparse_poly()`, `inflate()`, `runtimes_sparse_flat()`, `std()`.

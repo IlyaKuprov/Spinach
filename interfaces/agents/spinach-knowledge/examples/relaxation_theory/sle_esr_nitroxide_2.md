@@ -1,8 +1,6 @@
 # examples/relaxation_theory/sle_esr_nitroxide_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/sle_esr_nitroxide_2.m`
 - Signature: `sle_esr_nitroxide_2()`
-- Total lines: 60
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Slow motion regime simulation of an ESR spectrum of a nitroxide radical. Set to 
 - SLE parameters
 - SLE simulation
 - SLE plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gauss2mhz()`, `create()`, `basis()`, `state()`, `gridfree()`, `kfigure()`, `plot_1d()`.

@@ -1,16 +1,12 @@
 # tests/kernel/test_hilbert_operator.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_hilbert_operator.m`
 - Signature: `result=test_hilbert_operator()`
-- Total lines: 48
 
 ## Purpose
 
 Tests Hilbert-space operator generation. Syntax: result=test_hilbert_operator()
 
 ## Physical / mathematical content
-
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 
 ## Numerical / algorithmic content
 
@@ -34,7 +30,3 @@ Tests Hilbert-space operator generation. Syntax: result=test_hilbert_operator()
 - Build a one-proton Hilbert-space spin system
 - Textbook spin-half reference matrices
 - Check label-to-matrix mapping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `operator()`, `test_spin_system()`, `pauli()`, `test_close()`.

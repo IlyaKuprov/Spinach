@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/oop_eseem_photosystem_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/oop_eseem_photosystem_1.m`
 - Signature: `oop_eseem_photosystem_1()`
-- Total lines: 75
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Powder-averaged two-pulse out-of-phase ESEEM on the [P700+,A1-] spin-correlated 
 - Relaxation theory
 - Basis set
 - Disable trajectory-level SSR algorithms
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `mt2hz()`, `create()`, `basis()`, `state()`, `operator()`, `powder()`, `kfigure()`, `kxlabel()`, `kylabel()`.

@@ -1,8 +1,6 @@
 # examples/nmr_solids/case_studies/mathies_14n_13c/powder_gly_14n.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/case_studies/mathies_14n_13c/powder_gly_14n.m`
 - Signature: `powder_gly_14n()`
-- Total lines: 93
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Static 14N powder spectrum of glycine (assuming decoupling of 1H and 13C), compu
 - Set isotropic chemical shift to experimental value
 - Quadrupolar interaction from CASTEP
 - Magnet field
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `c2spinach()`, `ismember()`, `shift_iso()`, `castep2nqi()`, `remtrace()`, `create()`, `basis()`, `state()`, `powder()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`, `eeqq2nqi()`, `klegend()`.

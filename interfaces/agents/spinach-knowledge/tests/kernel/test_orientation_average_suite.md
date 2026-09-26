@@ -1,8 +1,6 @@
 # tests/kernel/test_orientation_average_suite.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_orientation_average_suite.m`
 - Signature: `result=test_orientation_average_suite()`
-- Total lines: 68
 
 ## Purpose
 
@@ -10,7 +8,6 @@ Tests orientation() and average() on small exact cases. Syntax: result=test_orie
 
 ## Physical / mathematical content
 
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
 
 ## Numerical / algorithmic content
@@ -36,7 +33,3 @@ Tests orientation() and average() on small exact cases. Syntax: result=test_orie
 - Contract the zero-orientation Hamiltonian
 - Check the zero-angle Wigner identity path
 - Build a quiet spin system for average() diagnostics
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `orientation()`, `test_close()`, `wigner()`, `test_spin_system()`, `average()`.

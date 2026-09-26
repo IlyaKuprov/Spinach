@@ -1,8 +1,6 @@
 # examples/nmr_solids/mas_powder_trp_gridfree.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/mas_powder_trp_gridfree.m`
 - Signature: `mas_powder_trp_gridfree()`
-- Total lines: 118
 
 ## Purpose
 
@@ -33,7 +31,3 @@
 - Magnet field
 - First conformation
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `shift_iso()`, `create()`, `basis()`, `state()`, `gridfree()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

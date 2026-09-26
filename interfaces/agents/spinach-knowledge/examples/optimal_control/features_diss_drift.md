@@ -1,8 +1,6 @@
 # examples/optimal_control/features_diss_drift.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/features_diss_drift.m`
 - Signature: `features_diss_drift()`
-- Total lines: 135
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Optimal control optimisation of a pulse performing magnetisa- tion transfer from
 - The waveform is optimized with LBFGS-GRAPE algorithm with point-
 - by-point variation and a penalty on the waveform amplitude.
 - Calculation time: hours.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `assume()`, `hamiltonian()`, `relaxation()`, `frqoffset()`, `optimcon()`, `guess()`, `fmaxnewton()`, `mat2cell()`, `report()`, `shaped_pulse_xy()`, `rho()`, `num2str()`.

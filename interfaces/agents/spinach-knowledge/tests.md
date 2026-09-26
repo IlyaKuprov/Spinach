@@ -58,6 +58,7 @@
 | `tests/kernel/test_grid_geometry_suite.m` | `result=test_grid_geometry_suite()` | Tests grid and spherical geometry helpers. Syntax: result=test_grid_geometry_suite() Outputs: result -regression test re |
 | `tests/kernel/test_hilbert_operator.m` | `result=test_hilbert_operator()` | Tests Hilbert-space operator generation. Syntax: result=test_hilbert_operator() Outputs: result -regression test result |
 | `tests/kernel/test_hilbert_state.m` | `result=test_hilbert_state()` | Tests Hilbert-space state generation. Syntax: result=test_hilbert_state() Outputs: result -regression test result with e |
+| `tests/kernel/test_homodec_adapt.m` | `result=test_homodec_adapt()` | Acquisition irradiation through Hilbert formalism admission. |
 | `tests/kernel/test_indexing_inverse_suite.m` | `result=test_indexing_inverse_suite()` | Tests indexing helper inverses. Syntax: result=test_indexing_inverse_suite() Outputs: result -regression test result wit |
 | `tests/kernel/test_indexing_roundtrip_suite.m` | `result=test_indexing_roundtrip_suite()` | Tests angular-momentum and matrix indexing helpers. Syntax: result=test_indexing_roundtrip_suite() Outputs: result -regr |
 | `tests/kernel/test_kinetics_generator_suite.m` | `result=test_kinetics_generator_suite()` | Tests kinetics and flow generator helpers. Syntax: result=test_kinetics_generator_suite() Outputs: result -regression te |

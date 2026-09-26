@@ -278,7 +278,9 @@ they build their own generators.
 `sp_acquire` adds `pulse_frq` (Hz, relative to the current rotating frame),
 `pulse_phi` (rad), `pulse_pwr` (rad/s), `pulse_dur` (s), `pulse_rnk`
 (Fokker-Planck cut-off rank - start at 2 and increase until the answer stops
-moving), and `method` (`'expv'`, `'expm'`, `'evolution'`).
+moving), and `method` (`'expv'`, `'expm'`, `'evolution'`). When `sim2liouv`
+admits a Hilbert-space sequence, it converts `homodec_oper` into a
+commutation superoperator alongside the other operator-like fields.
 
 **Liquid-state 2D** (`experiments/nmr_liquids/`) - `cosy`, `gcosy`,
 `ct_cosy`, `dqf_cosy`, `ecosy`, `tocsy`, `noesy`, `roesy`, `hoesy`,

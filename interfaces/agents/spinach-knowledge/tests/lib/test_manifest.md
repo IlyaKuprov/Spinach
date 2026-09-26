@@ -12,8 +12,8 @@ The manifest does not perform a physical calculation; its entries identify tests
 
 ## Numerical / algorithmic content
 
-Each entry stores a stable test ID, a descriptive name, and the function name to run. The cooperative-gradient and rotor-assumption tests are both registered. This catalogue does not execute the tests.
+Each entry stores a stable test ID, a descriptive name, and the function name to run. The cooperative-gradient, rotor-assumption, and homodecoupling adapter tests are registered. This catalogue does not execute the tests.
 
 ## Outputs
 
-- `manifest` — structure array with `id`, `name`, and `function` fields.
+- `manifest` — structure array with stable `id`, descriptive `name`, and callable `function` fields.

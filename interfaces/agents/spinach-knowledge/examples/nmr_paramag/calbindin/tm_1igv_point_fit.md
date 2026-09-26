@@ -1,8 +1,6 @@
 # examples/nmr_paramag/calbindin/tm_1igv_point_fit.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_paramag/calbindin/tm_1igv_point_fit.m`
 - Signature: `tm_1igv_point_fit()`
-- Total lines: 29
 
 ## Purpose
 
@@ -24,7 +22,3 @@ Electron location and susceptibility tensor recovery from experimental PCS data 
 - Solve the inverse problem
 - Plot experimental vs predicted PCS
 - Report the parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `ippcs()`, `kfigure()`, `kxlabel()`, `kylabel()`, `xlim()`, `ylim()`.

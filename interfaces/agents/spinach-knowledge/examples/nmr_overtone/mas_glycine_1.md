@@ -1,8 +1,6 @@
 # examples/nmr_overtone/mas_glycine_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_overtone/mas_glycine_1.m`
 - Signature: `mas_glycine_1()`
-- Total lines: 76
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Overtone detection 14N magic angle spinning NMR spectrum of glycine, computed us
 - Algorithmic options
 - Spinach housekeeping
 - Magic angle
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `atan()`, `state()`, `operator()`, `singlerot()`, `kfigure()`, `plot_1d()`.

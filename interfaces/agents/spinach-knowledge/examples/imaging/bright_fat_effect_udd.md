@@ -1,8 +1,6 @@
 # examples/imaging/bright_fat_effect_udd.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/bright_fat_effect_udd.m`
 - Signature: `bright_fat_effect_udd()`
-- Total lines: 89
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Bright fat effect under UDD echo train -magnetisation losses are greater in MRI 
 - Kinetic rate matrix (Hz)
 - Basis set
 - Disable path tracing
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `load()`, `state()`, `imaging()`, `kfigure()`, `set()`, `kxlabel()`, `kylabel()`, `ktitle()`.

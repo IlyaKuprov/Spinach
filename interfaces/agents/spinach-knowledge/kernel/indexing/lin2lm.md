@@ -1,8 +1,6 @@
 # kernel/indexing/lin2lm.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/indexing/lin2lm.m`
 - Signature: `[L,M]=lin2lm(I)`
-- Total lines: 56
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Converts linear indexing of spin states into L,M indexing. In the linear indexin
 - Indexing utilities. These files build and transform compact index maps for basis states, matrix elements, trajectories, and tensor-product structures.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -47,7 +42,3 @@ Converts linear indexing of spin states into L,M indexing. In the linear indexin
 - I=0 corresponding to L=0, M=0.
 - L -ranks of the spin states
 - M -projections of the spin states
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `fix()`, `nnz()`, `lm2lin()`, `any()`.

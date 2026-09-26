@@ -1,8 +1,6 @@
 # examples/dnp_mas/cross_effect_mas_powder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_mas/cross_effect_mas_powder.m`
 - Signature: `cross_effect_mas_powder()`
-- Total lines: 69
 
 ## Purpose
 
@@ -30,7 +28,3 @@ A MAS DNP simulation performed as described in Fred Mentink- Vigier's paper (Spi
 - Spinach housekeeping
 - Experiment parameters
 - Run the MAS DNP simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `masdnp()`, `num2str()`.

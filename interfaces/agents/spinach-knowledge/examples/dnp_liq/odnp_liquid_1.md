@@ -1,8 +1,6 @@
 # examples/dnp_liq/odnp_liquid_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/odnp_liquid_1.m`
 - Signature: `odnp_liquid_1()`
-- Total lines: 69
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Overhauser type DNP in liquid phase at room temperature, using a continu- ous on
 - Spinach housekeeping
 - Experiment paramaters
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `liquid()`, `kfigure()`, `subplot()`, `answer()`, `kxlabel()`, `kylabel()`, `klegend()`.

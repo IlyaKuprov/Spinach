@@ -1,8 +1,6 @@
 # kernel/contexts/crystal.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/contexts/crystal.m`
 - Signature: `answer=crystal(spin_system,pulse_sequence,parameters,assumptions)`
-- Total lines: 259
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Single-crystal interface to pulse sequences. Generates a Liouvillian superoperat
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `defaults()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -82,7 +78,3 @@ Single-crystal interface to pulse sequences. Generates a Liouvillian superoperat
 - the pulse sequence involves, e.g.
 - {'1H','13C'}
 - parameters.offset -a cell array giving transmitter off-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `banner()`, `defaults()`, `grumble()`, `report()`, `assume()`, `hamiltonian()`, `ismember()`, `equilibrium()`, `frqoffset()`, `orientation()`, `clear()`, `carrier()`, `rotframe()`, `relaxation()`, `kinetics()`, `pulse_sequence()`.

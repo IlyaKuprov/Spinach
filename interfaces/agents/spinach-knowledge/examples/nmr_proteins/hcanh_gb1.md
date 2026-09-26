@@ -1,8 +1,6 @@
 # examples/nmr_proteins/hcanh_gb1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/hcanh_gb1.m`
 - Signature: `hcanh_gb1()`
-- Total lines: 79
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Simulated H(CA)NH spectrum of GB1 protein. It is assumed that only the backbone 
 - Sequence parameters
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `protein()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `plot_3d()`.

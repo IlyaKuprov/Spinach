@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/hpa_triplet.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/hpa_triplet.m`
 - Signature: `hpa_triplet()`
-- Total lines: 73
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Hypothetical powder averaged X-band pulse-acquire ESR spectrum of photogenerated
 - Spinach housekeeping
 - Sequence parameters
 - Zeeman tensor into Hz/Tesla
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `zfs2mat()`, `create()`, `basis()`, `state()`, `operator()`, `spin()`, `zftrip()`, `euler2dcm()`, `powder()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

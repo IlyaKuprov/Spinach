@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/endor_davies_nox_powder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/endor_davies_nox_powder.m`
 - Signature: `endor_davies_nox_powder()`
-- Total lines: 79
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Davies ENDOR simulation for a nitroxide radical. Soft pulses are simulated using
 - Basis set
 - Relaxation theory
 - Disable trajectory-level SSR algorithms
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `powder()`, `kfigure()`, `kylabel()`, `kxlabel()`.

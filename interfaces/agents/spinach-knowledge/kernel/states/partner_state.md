@@ -1,8 +1,6 @@
 # kernel/states/partner_state.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/states/partner_state.m`
 - Signature: `[A,descr]=partner_state(spin_system,set_spin,partners)`
-- Total lines: 208
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Partner state expansion; a given state of the specified spins is kroneckered wit
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -76,7 +72,3 @@ Partner state expansion; a given state of the specified spins is kroneckered wit
 - These spins will have their states set
 - immutably as specified.
 - partners -a cell array of partner state specifica-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `cellfun()`, `active_partners()`, `strcmp()`, `num2cell()`, `state()`, `isfield()`, `isscalar()`, `iscell()`, `ischar()`, `set_spin_idx()`, `any()`, `isvector()`, `ismember()`.

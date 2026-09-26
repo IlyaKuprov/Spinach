@@ -1,8 +1,6 @@
 # examples/fundamentals/operator_tests/commutation_7.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/operator_tests/commutation_7.m`
 - Signature: `commutation_7()`
-- Total lines: 126
 
 ## Purpose
 
@@ -28,7 +26,3 @@ Expansion relations for operator basis transforms.
 - Obtain BM expansion.
 - Reconstruct operator from BM terms
 - Report BM expansion failures
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `irr_sph_ten()`, `enlev2ist()`, `coeffs()`, `states()`, `boson_mono()`, `enlev2bm()`, `weyl()`, `speye()`, `bos2ist()`, `sin_tran()`, `hdot()`, `oper2bm()`.

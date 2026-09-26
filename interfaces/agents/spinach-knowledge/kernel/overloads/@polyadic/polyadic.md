@@ -1,8 +1,6 @@
 # kernel/overloads/@polyadic/polyadic.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@polyadic/polyadic.m`
 - Signature: `p=polyadic(cores)`
-- Total lines: 128
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Creates an object of a polyadic class. Syntax: p=polyadic(cores) A polyadic is a
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `iseye()`, `numel()`, `isnumeric()`, `ismatrix()`, `isfloat()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -46,7 +42,3 @@ Creates an object of a polyadic class. Syntax: p=polyadic(cores) A polyadic is a
 - whose Konecker products make up the mat-
 - rix of interest.
 - p - a polyadic representation of a matrix
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `classdef()`, `grumble()`, `validate()`, `iseye()`, `false()`, `true()`, `ismatrix()`, `isfloat()`, `iscell()`.

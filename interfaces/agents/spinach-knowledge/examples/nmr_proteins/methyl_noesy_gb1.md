@@ -1,8 +1,6 @@
 # examples/nmr_proteins/methyl_noesy_gb1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/methyl_noesy_gb1.m`
 - Signature: `methyl_noesy_gb1()`
-- Total lines: 84
 
 ## Purpose
 
@@ -32,7 +30,3 @@
 - Basis set
 - Algorithmic options
 - Create the spin system structure
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `protein()`, `create()`, `kill_spin()`, `strcmp()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

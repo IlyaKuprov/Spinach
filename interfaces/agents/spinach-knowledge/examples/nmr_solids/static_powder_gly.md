@@ -1,8 +1,6 @@
 # examples/nmr_solids/static_powder_gly.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/static_powder_gly.m`
 - Signature: `static_powder_gly()`
-- Total lines: 61
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Simulation
 - Apodisation
 - Fourier transform
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `powder()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

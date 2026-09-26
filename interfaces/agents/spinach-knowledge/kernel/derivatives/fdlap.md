@@ -1,8 +1,6 @@
 # kernel/derivatives/fdlap.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/derivatives/fdlap.m`
 - Signature: `L=fdlap(dims,extents,nstenc)`
-- Total lines: 112
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Returns a finite-difference representation of the Laplacian for an array with a 
 ## Numerical / algorithmic content
 
 - Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -52,7 +48,3 @@ Returns a finite-difference representation of the Laplacian for an array with a 
 - array of data that the operator will be acting
 - on, ordered as [X Y Z].
 - extents - a one-element, two-element, or three-element
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `fdmat()`, `dims()`, `extents()`, `speye()`, `any()`.

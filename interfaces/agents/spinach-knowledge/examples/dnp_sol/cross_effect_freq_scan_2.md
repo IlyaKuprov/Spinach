@@ -1,8 +1,6 @@
 # examples/dnp_sol/cross_effect_freq_scan_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/cross_effect_freq_scan_2.m`
 - Signature: `cross_effect_freq_scan_2()`
-- Total lines: 72
 
 ## Purpose
 
@@ -30,7 +28,3 @@ A simple TOTAPOL based Cross Effect DNP system. Set to repro- duce Figure 2a fro
 - Spin system
 - Basis set
 - Relaxation theory
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `crystal()`, `kfigure()`, `kxlabel()`, `kylabel()`.

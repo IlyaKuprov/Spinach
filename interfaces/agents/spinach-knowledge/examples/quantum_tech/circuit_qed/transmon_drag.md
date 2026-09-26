@@ -1,8 +1,6 @@
 # examples/quantum_tech/circuit_qed/transmon_drag.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/circuit_qed/transmon_drag.m`
 - Signature: `transmon_drag()`
-- Total lines: 129
 
 ## Purpose
 
@@ -33,7 +31,3 @@ DRAG correction of a resonant Gaussian pulse on a three-level Duffing transmon i
 - columns are the envelope amplitude, the DRAG detuning, the lo-
 - cal oscillator frequency, the mixer phase, and the DRAG quad-
 - rature switch. The propagator is taken into the frame of the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `pulse_params()`, `pops()`, `fids()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`, `ktitle()`, `klegend()`.

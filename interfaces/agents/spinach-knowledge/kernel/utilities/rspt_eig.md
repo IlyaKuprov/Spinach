@@ -1,8 +1,6 @@
 # kernel/utilities/rspt_eig.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/rspt_eig.m`
 - Signature: `[E,V,dE,T,LP]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,B)`
-- Total lines: 196
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Eigensystem of sparse Hamiltonians to user-specified order in RSPT with careful 
 
 - An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
 - Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -68,7 +64,3 @@ Eigensystem of sparse Hamiltonians to user-specified order in RSPT with careful 
 - Hc - laboratory frame Hamiltonian, containing all
 - spin-spin couplings, but no Zeeman terms
 - Hmw - observable operator without the amplitude pre-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `isfield()`, `rmfield()`, `cell2mat()`, `rspert()`, `equilibrium()`, `isscalar()`.

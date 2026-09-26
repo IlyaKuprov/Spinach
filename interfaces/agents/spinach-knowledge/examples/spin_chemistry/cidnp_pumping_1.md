@@ -1,8 +1,6 @@
 # examples/spin_chemistry/cidnp_pumping_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/spin_chemistry/cidnp_pumping_1.m`
 - Signature: `cidnp_pumping_1()`
-- Total lines: 69
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A simulation of the matrix in Equation 2 of IK's paper on chemically amplified N
 - Relaxation theory
 - Formalism and basis
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `unit_state()`, `state()`, `magpump()`.

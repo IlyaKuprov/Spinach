@@ -1,8 +1,6 @@
 # examples/relaxation_theory/scalar_relaxation_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/scalar_relaxation_1.m`
 - Signature: `scalar_relaxation_1()`
-- Total lines: 43
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Redfield superoperator for the scalar relaxation of the first kind in a two-prot
 - Relaxation superoperator
 - Spinach housekeeping
 - Show a spy plot of R
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `kfigure()`, `spy()`, `relaxation()`, `ktitle()`.

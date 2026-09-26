@@ -1,8 +1,6 @@
 # examples/optimal_control/pattern_pulse_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/pattern_pulse_1.m`
 - Signature: `pattern_pulse_1()`
-- Total lines: 103
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Nutation frequency selective excitation described in Glaser group paper (https:/
 - Run Spinach housekeeping
 - Get pertinent spin states
 - Get pertinent control operators
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `figure()`, `kxlabel()`, `klegend()`, `ylim()`, `num2cell()`, `optimcon()`, `fmaxnewton()`, `polar2cartesian()`, `shaped_pulse_xy()`.

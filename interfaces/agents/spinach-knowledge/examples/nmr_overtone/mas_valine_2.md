@@ -1,8 +1,6 @@
 # examples/nmr_overtone/mas_valine_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_overtone/mas_valine_2.m`
 - Signature: `mas_valine_2()`
-- Total lines: 59
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Overtone Z-detection 14N magic angle spinning NMR spectrum of N-acetylvaline, co
 - Spectrum setup
 - Simulation
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `state()`, `singlerot()`, `kfigure()`, `plot_1d()`.

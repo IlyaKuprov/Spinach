@@ -1,8 +1,6 @@
 # examples/dnp_liq/jdnp/energy_levels.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/jdnp/energy_levels.m`
 - Signature: `energy_levels()`
-- Total lines: 52
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Energy level diagram transition from the Zeeman limit to the exchange coupling l
 - Get the energy levels
 - Diagonalise the Hamiltonian
 - Sort and record energies
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `spin()`, `omega_j()`, `energies()`, `kfigure()`, `kxlabel()`, `kylabel()`.

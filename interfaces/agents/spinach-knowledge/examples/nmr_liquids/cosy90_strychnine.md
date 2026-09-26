@@ -1,8 +1,6 @@
 # examples/nmr_liquids/cosy90_strychnine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/cosy90_strychnine.m`
 - Signature: `cosy90_strychnine()`
-- Total lines: 56
 
 ## Purpose
 
@@ -31,7 +29,3 @@ COSY spectrum of strychnine. Calculation time: minutes
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strychnine()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

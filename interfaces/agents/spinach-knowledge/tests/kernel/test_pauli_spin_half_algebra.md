@@ -1,16 +1,12 @@
 # tests/kernel/test_pauli_spin_half_algebra.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_pauli_spin_half_algebra.m`
 - Signature: `result=test_pauli_spin_half_algebra()`
-- Total lines: 61
 
 ## Purpose
 
 Tests spin-half angular momentum matrices. Syntax: result=test_pauli_spin_half_algebra()
 
 ## Physical / mathematical content
-
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 
 ## Numerical / algorithmic content
 
@@ -35,7 +31,3 @@ Tests spin-half angular momentum matrices. Syntax: result=test_pauli_spin_half_a
 - Write the textbook matrices explicitly
 - Check the operator matrices against the textbook representation
 - Check the angular momentum commutation relations
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `pauli()`, `test_close()`, `comm()`.

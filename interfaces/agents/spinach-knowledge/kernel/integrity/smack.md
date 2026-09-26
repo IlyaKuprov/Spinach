@@ -1,8 +1,6 @@
 # kernel/integrity/smack.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/integrity/smack.m`
 - Signature: `smack()`
-- Total lines: 38
 
 ## Purpose
 
@@ -28,7 +26,3 @@ Gives Matlab a good smack every time MDCS gets its kni- ckers in a twist. Syntax
 - Close all handles
 - Clear the workspace
 - Reset all GPUs
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `delete()`, `gcp()`, `parcluster()`, `fclose()`, `clear()`, `gpuDevice()`.

@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/hz2ppm.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/hz2ppm.m`
 - Signature: `ppm=hz2ppm(hz,B0,nucleus)`
-- Total lines: 55
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Converts resonance offsets into chemical shifts. Syntax: ppm=hz2ppm(hz,B0,nucleu
 - Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -42,7 +37,3 @@ Converts resonance offsets into chemical shifts. Syntax: ppm=hz2ppm(hz,B0,nucleu
 - Consistency enforcement
 - Somebody Else's Wife: oh, I am so tired of being boringly taken
 - for granted, he never really acknowledges
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `spin()`, `ischar()`.

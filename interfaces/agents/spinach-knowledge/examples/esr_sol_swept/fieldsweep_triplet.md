@@ -1,8 +1,6 @@
 # examples/esr_sol_swept/fieldsweep_triplet.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_swept/fieldsweep_triplet.m`
 - Signature: `fieldsweep_triplet()`
-- Total lines: 64
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Powder averaged X-band field-swept ESR spectrum of photo- generated pentacene tr
 - Experiment parameters
 - Zeeman tensor into Hz/Tesla
 - Orientation-and field-dependent initial condition
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `zfs2mat()`, `create()`, `basis()`, `spin()`, `zftrip()`, `euler2dcm()`, `fieldsweep()`, `kfigure()`, `kxlabel()`, `kylabel()`.

@@ -1,8 +1,6 @@
 # examples/fundamentals/correlation_function_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/correlation_function_2.m`
 - Signature: `correlation_function_2()`
-- Total lines: 96
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Computes rotational correlation functions using a Monte-Carlo method and compare
 - Convert indices from [-L,L] to [1,2*L+1]
 - % Numerical Monte-Carlo calculation
 - Number of points and lags
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `DCMT()`, `angles()`, `squeeze()`, `dcm2euler()`, `wigner()`, `xcorr()`, `ifftshift()`, `create()`, `basis()`, `corrfun()`, `kfigure()`, `lags()`, `cf_mc()`, `xlim()`, `kylabel()`, `kxlabel()`.

@@ -1,8 +1,6 @@
 # examples/fundamentals/state_tests/state_consistency_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/state_tests/state_consistency_1.m`
 - Signature: `state_consistency_1()`
-- Total lines: 76
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Test of internal consistency for state and operator generation across the three 
 - Unit state from Spinach
 - Two-spin singlet-triplet state sum test
 - Four-spin singlet-triplet state sum test
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `singlet()`, `triplet()`, `num2cell()`, `perms()`, `four_spin_states()`.

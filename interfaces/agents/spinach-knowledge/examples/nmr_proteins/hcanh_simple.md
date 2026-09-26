@@ -1,8 +1,6 @@
 # examples/nmr_proteins/hcanh_simple.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/hcanh_simple.m`
 - Signature: `hcanh_simple()`
-- Total lines: 81
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A minimal example of H(CA)NH pulse sequence simulation. Calculation time: second
 - Apodisation
 - F3 Fourier transform
 - Absorption part of F3 signal
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `plot_3d()`.

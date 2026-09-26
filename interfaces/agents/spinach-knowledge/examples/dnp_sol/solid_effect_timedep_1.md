@@ -1,8 +1,6 @@
 # examples/dnp_sol/solid_effect_timedep_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/solid_effect_timedep_1.m`
 - Signature: `solid_effect_timedep_1()`
-- Total lines: 91
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A simulation of solid effect DNP for a tilted linear chain of three protons posi
 - Basis set
 - Spinach housekeeping
 - Experiment parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `euler2dcm()`, `create()`, `basis()`, `solid_effect()`, `kfigure()`, `scale_figure()`, `subplot()`, `answer()`, `kylabel()`, `kxlabel()`, `klegend()`, `set()`.

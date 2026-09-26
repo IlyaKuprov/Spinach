@@ -1,8 +1,6 @@
 # examples/relaxation_theory/sat_rec_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/sat_rec_1.m`
 - Signature: `sat_rec_1()`
-- Total lines: 61
 
 ## Purpose
 
@@ -30,7 +28,3 @@ A simple saturation-recovery experiment. Calculation time: seconds.
 - Static Hamiltonian superoperator
 - Pulse operator
 - Relaxation superoperator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `hamiltonian()`, `assume()`, `operator()`, `relaxation()`, `step()`, `evolution()`, `kfigure()`, `kylabel()`, `kxlabel()`.

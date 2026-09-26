@@ -1,8 +1,6 @@
 # kernel/includes/redfield_integral_serial.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/includes/redfield_integral_serial.m`
 - Signature: `(script file)`
-- Total lines: 116
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Bloch-Wangsness-Redfield and Nakajima-Zwanzig integral evaluati- on, the serial 
 - shift, false the resolvent kernel of Nakajima-Zwanzig theory)
 - and rlx_shift (the Laplace evaluation point, Hz); Redfield the-
 - ory is the on-shell form at zero shift.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cheap_norm()`, `corrfun()`, `report()`, `num2str()`, `clean_up()`, `speye()`, `expmint()`, `clear()`.

@@ -1,8 +1,6 @@
 # examples/nmr_liquids/dqf_cosy_sucrose.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/dqf_cosy_sucrose.m`
 - Signature: `dqf_cosy_sucrose()`
-- Total lines: 62
 
 ## Purpose
 
@@ -31,7 +29,3 @@ DQF-COSY spectrum of sucrose (magnetic parameters computed with DFT). Calculatio
 - Apodization
 - F2 Fourier transform
 - Form States signal
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

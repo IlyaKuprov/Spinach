@@ -1,8 +1,6 @@
 # examples/nmr_proteins/ct_hsqc_gb1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/ct_hsqc_gb1.m`
 - Signature: `ct_hsqc_gb1()`
-- Total lines: 74
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Constant-time HSQC experiment simulation for the GB1 protein. Simulation time: h
 - Create the spin system structure
 - Kill carbons (protein assumed unlabelled)
 - Build the basis
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `protein()`, `create()`, `kill_spin()`, `strcmp()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

@@ -1,8 +1,6 @@
 # examples/fundamentals/exchange_coupling/yamaguchi.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/exchange_coupling/yamaguchi.m`
 - Signature: `yamaguchi()`
-- Total lines: 18
 
 ## Purpose
 
@@ -22,7 +20,3 @@ Yamaguchi equation estimate of exchange coupling from a broken-symmetry DFT calc
 - dical with an alkynyl linker from Olav Schiemann.
 - Read Gaussian logs
 - Call Yamaguchi equation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gparse()`, `brokensymm()`, `num2str()`.

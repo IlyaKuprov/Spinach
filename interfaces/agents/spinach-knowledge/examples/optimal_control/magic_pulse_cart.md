@@ -1,8 +1,6 @@
 # examples/optimal_control/magic_pulse_cart.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/magic_pulse_cart.m`
 - Signature: `magic_pulse_cart()`
-- Total lines: 135
 
 ## Purpose
 
@@ -34,7 +32,3 @@ A template file for the "magic pulse" optimisations. The term refers to a family
 - between 50 kHz and 70 kHz across the RF coil.
 - Calculation time: minutes.
 - Set the magnetic field
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `optimcon()`, `fmaxnewton()`, `xy_profile()`, `shaped_pulse_xy()`, `liquid()`, `apodisation()`, `fftshift()`, `figure()`, `subplot()`.

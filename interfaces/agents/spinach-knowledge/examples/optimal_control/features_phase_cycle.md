@@ -1,8 +1,6 @@
 # examples/optimal_control/features_phase_cycle.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/features_phase_cycle.m`
 - Signature: `features_phase_cycle()`
-- Total lines: 111
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Optimal control pulse optimisation for state-to-state transfer across a scalar c
 - Spin system
 - Chemical shifts, ppm
 - Scalar couplings, Hz (literature values)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `optimcon()`, `fmaxnewton()`, `pulse()`, `phased_pulse()`, `report()`, `int2str()`, `mat2cell()`, `shaped_pulse_xy()`, `stateinfo()`.

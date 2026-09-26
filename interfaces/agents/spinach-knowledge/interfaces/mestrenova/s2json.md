@@ -1,8 +1,6 @@
 # interfaces/mestrenova/s2json.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/mestrenova/s2json.m`
 - Signature: `s2json(file_name,sys,inter,parameters,fid)`
-- Total lines: 70
 
 ## Purpose
 
@@ -10,15 +8,12 @@ Writes the parameters structure and the free induction decay into a JSON file th
 
 ## Physical / mathematical content
 
-- This file belongs to the `interfaces` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
 - Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
 
 ## Numerical / algorithmic content
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -51,7 +46,3 @@ Writes the parameters structure and the free induction decay into a JSON file th
 - this function writes a file
 - must be a complex matrix. For 2D States quadrature
 - data (e.g. NOESY), fid.cos and fid.sin matrices must
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `savejson()`, `ischar()`, `isstruct()`.

@@ -1,8 +1,6 @@
 # kernel/integrity/existentials.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/integrity/existentials.m`
 - Signature: `existentials()`
-- Total lines: 130
 
 ## Purpose
 
@@ -28,7 +26,3 @@ Kernel integrity control. Checks for collisions between Spinach functions and an
 - ##########################################
 - NO, IT WILL NOT MAGICALLY START WORKING %
 - IF YOU COMMENT ANY OF THIS OUT %
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `isMATLABReleaseOlderThan()`, `exist()`, `mfilename()`, `dir()`, `which()`, `strcmp()`, `contains()`, `own_disk()`, `char()`.

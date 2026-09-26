@@ -1,8 +1,6 @@
 # examples/nmr_proteins/noesy_ubiquitin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/noesy_ubiquitin.m`
 - Signature: `noesy_ubiquitin()`
-- Total lines: 82
 
 ## Purpose
 
@@ -32,7 +30,3 @@
 - Create the spin system structure
 - Kill carbons and nitrogens (protein assumed unlabelled)
 - Build the basis
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `protein()`, `create()`, `kill_spin()`, `strcmp()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

@@ -1,8 +1,6 @@
 # kernel/overloads/@polyadic/kron.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@polyadic/kron.m`
 - Signature: `c=kron(a,b)`
-- Total lines: 68
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Kronecker product function for polyadics. Syntax: c=kron(a,b)
 - Polyadic tensor-product linear algebra. The emphasis is compressed operator representation, deferred algebra, and efficient Kronecker-structured manipulations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -40,7 +35,3 @@ Kronecker product function for polyadics. Syntax: c=kron(a,b)
 - Make a nested polyadic
 - Simplify
 - Consistency enforcement
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `elseif()`, `polyadic()`, `simplify()`.

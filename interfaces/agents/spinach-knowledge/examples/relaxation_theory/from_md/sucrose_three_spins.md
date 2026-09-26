@@ -1,8 +1,6 @@
 # examples/relaxation_theory/from_md/sucrose_three_spins.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/from_md/sucrose_three_spins.m`
 - Signature: `sucrose_three_spins()`
-- Total lines: 112
 
 ## Purpose
 
@@ -32,7 +30,3 @@ One of the calculations reported in the JMR paper with Jim Prestegard: a three-s
 - Calculation time: minutes, with most of the time spent
 - computing MD frame Hamiltonians
 - Three-spin system
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `assume()`, `hamiltonian()`, `load()`, `traj()`, `report()`, `double()`, `traj_slice()`, `dipolar()`, `orientation()`, `ngce()`, `relaxation()`, `kfigure()`, `errorbar()`, `kxlabel()`.

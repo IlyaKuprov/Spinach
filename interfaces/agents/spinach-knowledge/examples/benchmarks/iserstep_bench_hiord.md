@@ -1,8 +1,6 @@
 # examples/benchmarks/iserstep_bench_hiord.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/benchmarks/iserstep_bench_hiord.m`
 - Signature: `iserstep_bench_hiord()`
-- Total lines: 191
 
 ## Purpose
 
@@ -15,7 +13,6 @@ Benchmarks iserstep higher-order methods on a chirped-frequency oscillator with 
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file also defines local helper function(s): `run_method()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Outputs
 
@@ -36,7 +33,3 @@ Benchmarks iserstep higher-order methods on a chirped-frequency oscillator with 
 - Bootstrap the object
 - Make Bloch-Maxwell generator (Liouvillian, including -1i factors)
 - Set the initial magnetisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `bootstrap()`, `euler2dcm()`, `mu_traj()`, `step()`, `run_method()`, `bench()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`, `klegend()`, `ylim()`, `set()`, `orders()`, `polyfit()`.

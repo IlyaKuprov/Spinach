@@ -1,8 +1,6 @@
 # kernel/utilities/dirdiff.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/dirdiff.m`
 - Signature: `D=dirdiff(spin_system,A,B,T,N)`
-- Total lines: 96
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Directional derivatives of the matrix exponential. Implements Equation 11 of Naj
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -47,7 +43,3 @@ Directional derivatives of the matrix exponential. Implements Equation 11 of Naj
 - N -block dimension of the auxiliary matrix, use N=2
 - to get the propagator and its first derivative
 - D -a cell array of matrices {D0,D1,D2,...} of Eq 18
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `iscell()`, `propagator()`, `cell2mat()`, `factorial()`, `auxmat()`, `isscalar()`.

@@ -1,8 +1,6 @@
 # examples/shaped_pulses/shaped_pulse_chirp_xy.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/shaped_pulses/shaped_pulse_chirp_xy.m`
 - Signature: `shaped_pulse_chirp_xy()`
-- Total lines: 86
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Chirped inversion pulse. Calculation time: seconds
 - Pulse infrastructure
 - Chirp waveform in amplitude-frequency coordinates
 - Soft pulse
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `create()`, `basis()`, `state()`, `hamiltonian()`, `assume()`, `relaxation()`, `kinetics()`, `operator()`, `chirp_pulse()`, `shaped_pulse_xy()`, `homospoil()`, `step()`, `acquire()`, `apodisation()`, `fftshift()`.

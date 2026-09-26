@@ -1,8 +1,6 @@
 # kernel/operators/pauli.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/operators/pauli.m`
 - Signature: `S=pauli(mult)`
-- Total lines: 98
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Pauli spin operators (sparse, see below for normalisa- tion conventions) for a s
 - Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -55,7 +50,3 @@ Pauli spin operators (sparse, see below for normalisa- tion conventions) for a s
 - S.x -Sx observable operator
 - S.y -Sy observable operator
 - S.z -Sz observable operator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `double()`, `complex()`, `spdiags()`, `speye()`, `isscalar()`.

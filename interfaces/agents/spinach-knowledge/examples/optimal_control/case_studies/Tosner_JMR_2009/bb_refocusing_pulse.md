@@ -1,8 +1,6 @@
 # examples/optimal_control/case_studies/Tosner_JMR_2009/bb_refocusing_pulse.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/case_studies/Tosner_JMR_2009/bb_refocusing_pulse.m`
 - Signature: `bb_refocusing_pulse()`
-- Total lines: 97
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Spinach implementation of the broadband refocusing example from GRAPE is used to
 - RF controls and offset operator
 - Drift Hamiltonian
 - Control data structure
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `optimcon()`, `fmaxnewton()`, `xy_profile()`, `offs_hz()`, `shaped_pulse_xy()`, `fidelities()`, `kfigure()`, `kxlabel()`, `kylabel()`, `xlim()`.

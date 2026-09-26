@@ -1,8 +1,6 @@
 # experiments/pseudocon/pcs_combi_fit.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/pseudocon/pcs_combi_fit.m`
 - Signature: `[d_shifts,p_shifts,pcs_theo,pcs_expt,chi,total_theo]=pcs_combi_fit(parameters)`
-- Total lines: 187
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Combinatorial PCS fitting function. Takes into account potential am- biguities i
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -69,7 +65,3 @@ Combinatorial PCS fitting function. Takes into account potential am- biguities i
 - parameters.spin_groups -cell array of integer vectors
 - specifying the numbers of spins
 - that have each of the chemical
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `perms()`, `num2str()`, `diamag_shift_perms()`, `cell2mat()`, `perm_table_d()`, `paramag_shift_perms()`, `perm_table_p()`, `ind2sub()`, `cellfun()`, `pcs_expt()`, `pcs()`, `score()`, `pcs2chi()`, `p_shifts()`, `d_shifts()`.

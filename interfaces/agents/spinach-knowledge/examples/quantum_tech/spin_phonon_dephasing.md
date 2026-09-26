@@ -1,8 +1,6 @@
 # examples/quantum_tech/spin_phonon_dephasing.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/spin_phonon_dephasing.m`
 - Signature: `spin_phonon_dephasing()`
-- Total lines: 72
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Longitudinal spin-phonon coupling producing spin coherence modulation and spin-c
 - Calculation time: seconds
 - Magnet field
 - Particle specification
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `device()`, `cellfun()`, `hdot()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`, `ktitle()`.

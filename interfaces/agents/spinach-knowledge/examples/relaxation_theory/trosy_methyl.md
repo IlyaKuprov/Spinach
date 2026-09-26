@@ -1,8 +1,6 @@
 # examples/relaxation_theory/trosy_methyl.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/trosy_methyl.m`
 - Signature: `trosy_methyl()`
-- Total lines: 155
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Methyl trosy in a rapidly rotating 13CH3 group of a slowly tumbling protein, sim
 - Methyl proton chemical shifts (guess)
 - J-couplings
 - Spin system instances for the three methyl rotamers
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `remtrace()`, `me_xyz()`, `create()`, `basis()`, `kfigure()`, `scale_figure()`, `state()`, `gridfree()`, `subplot()`, `plot_1d()`.

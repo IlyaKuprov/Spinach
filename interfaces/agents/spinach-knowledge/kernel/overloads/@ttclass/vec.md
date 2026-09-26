@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/vec.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/vec.m`
 - Signature: `A=vec(A)`
-- Total lines: 54
 
 ## Purpose
 
@@ -41,7 +39,3 @@ Stretches arrays into vectors -useful for situations when the stand- ard (:) syn
 - Decide how to proceed
 - Read tensor train sizes and ranks
 - Reshape the cores
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `ranks()`, `sizes()`, `ttm_ranks()`, `ttm_sizes()`.

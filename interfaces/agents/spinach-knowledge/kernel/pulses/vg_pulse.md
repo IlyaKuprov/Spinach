@@ -1,8 +1,6 @@
 # kernel/pulses/vg_pulse.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/pulses/vg_pulse.m`
 - Signature: `waveform=vg_pulse(pulse_name,npoints,duration)`
-- Total lines: 136
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Veshtort-Griffin shaped pulses, generated from tables given in There are good re
 - Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -46,7 +41,3 @@ Veshtort-Griffin shaped pulses, generated from tables given in There are good re
 - npoints -number of discrete time intervals in the pulse
 - duration -duration of the pulse, seconds
 - waveform -amplitude of the pulse at each interval (there
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `strcmp()`, `cosines()`, `sines()`, `ischar()`.

@@ -1,8 +1,6 @@
 # examples/nmr_paramag/combi_fit_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_paramag/combi_fit_2.m`
 - Signature: `combi_fit_2()`
-- Total lines: 50
 
 ## Purpose
 
@@ -28,7 +26,3 @@ Extracting the susceptibility tensor from DFT hyperfine tensors and experimental
 - Paramagnetic shifts
 - Paramagnetic shift ambiguities
 - Run the combinatorial fitting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gparse()`, `pcs_combi_fit()`, `kfigure()`.

@@ -1,8 +1,6 @@
 # examples/parahydrogen/pasadena_ethylbenzene.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/parahydrogen/pasadena_ethylbenzene.m`
 - Signature: `pasadena_ethylbenzene()`
-- Total lines: 70
 
 ## Purpose
 
@@ -31,7 +29,3 @@ PASADENA experiment simulation for the parahydrogenation of styrene into ethylbe
 - Sequence parameters
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

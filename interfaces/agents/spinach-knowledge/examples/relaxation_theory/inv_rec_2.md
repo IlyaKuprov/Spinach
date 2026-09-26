@@ -1,8 +1,6 @@
 # examples/relaxation_theory/inv_rec_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/inv_rec_2.m`
 - Signature: `inv_rec_2()`
-- Total lines: 97
 
 ## Purpose
 
@@ -35,7 +33,3 @@ An example of inversion recovery experiment simulation for a strychnine spin sys
 - Spinach housekeeping
 - Aquisition parameters
 - Set up different recovery delays
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strychnine()`, `create()`, `basis()`, `equilibrium()`, `state()`, `hamiltonian()`, `assume()`, `relaxation()`, `operator()`, `kfigure()`, `scale_figure()`, `mixing_time()`, `step()`, `evolution()`, `apodisation()`, `fftshift()`.

@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/hpa_gd_dota_powder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/hpa_gd_dota_powder.m`
 - Signature: `hpa_gd_dota_powder()`
-- Total lines: 61
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Powder averaged W-band pulsed ESR spectrum of Gd(III) DOTA complex. Ideal pulse 
 - Spinach housekeeping
 - Sequence parameters
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `powder()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

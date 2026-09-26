@@ -1,8 +1,6 @@
 # kernel/optimcon/drifts.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/drifts.m`
 - Signature: `[drifts,spc_dim]=drifts(spin_system,context,...`
-- Total lines: 81
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Returns a cell array of drift Liouvillians suitable for the control.drifts varia
 - Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -52,7 +47,3 @@ Returns a cell array of drift Liouvillians suitable for the control.drifts varia
 - semble member
 - spc_dim -dimension of the classical dynamics
 - subspace (e.g. rotor grid in MAS)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `varargin()`, `context()`, `ischar()`.

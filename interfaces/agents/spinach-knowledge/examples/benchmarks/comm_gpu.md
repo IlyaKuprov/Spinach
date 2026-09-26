@@ -1,8 +1,6 @@
 # examples/benchmarks/comm_gpu.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/benchmarks/comm_gpu.m`
 - Signature: `comm_gpu(n)`
-- Total lines: 97
 
 ## Purpose
 
@@ -30,7 +28,3 @@ GPU communications benchmark. Adapted from example code in Matlab documentation.
 - Array sizes to test
 - Preallocate answer arrays
 - Measure performance
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gpuDeviceCount()`, `gpuDevice()`, `num2str()`, `power()`, `inf()`, `sizes()`, `randi()`, `gpuArray()`, `send_times()`, `gputimeit()`, `gather()`, `gather_times()`, `plus()`, `memory_times_gpu()`, `memory_times_host()`, `timeit()`.

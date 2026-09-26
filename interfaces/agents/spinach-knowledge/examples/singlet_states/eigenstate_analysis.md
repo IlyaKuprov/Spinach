@@ -1,8 +1,6 @@
 # examples/singlet_states/eigenstate_analysis.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/singlet_states/eigenstate_analysis.m`
 - Signature: `eigenstate_analysis()`
-- Total lines: 100
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Stationary state analysis for the spin system of allyl pyruvate, finding out whi
 - Tidy up rounding errors
 - Get the singlet state
 - Report the norm
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `allyl_pyruvate()`, `create()`, `dilute()`, `basis()`, `assume()`, `hamiltonian()`, `ctranspose()`, `singlet()`, `report()`, `num2str()`, `remncomm()`, `remtrace()`, `state()`, `frqoffset()`, `operator()`.

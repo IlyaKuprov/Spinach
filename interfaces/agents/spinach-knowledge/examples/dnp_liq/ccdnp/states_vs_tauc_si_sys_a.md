@@ -1,8 +1,6 @@
 # examples/dnp_liq/ccdnp/states_vs_tauc_si_sys_a.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/ccdnp/states_vs_tauc_si_sys_a.m`
 - Signature: `states_vs_tauc_si_sys_a()`
-- Total lines: 143
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Steady state populations of various spin states a function of rotational correla
 - Coordinates for anisotropic HF
 - Basis set
 - Relaxation theory
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `tau_c()`, `create()`, `basis()`, `state()`, `operator()`, `answer()`, `liquid()`, `kfigure()`, `subplot()`, `scale_figure()`, `kxlabel()`, `kylabel()`, `xlim()`.

@@ -28,6 +28,9 @@ The reduced Liouville-space basis is what makes large spin systems tractable.
 ## Large matrix representations
 
 Tensor-structured and unopened-Kronecker forms for matrices too large to store.
+For `ttclass` compression, use `shrink`: its absolute Frobenius tolerance is
+independent of coefficient sign or phase, and zero coefficients are handled
+before the SVD truncation sweep.
 
 - D.V. Savostyanov, S.V. Dolgov, J.M. Werner, I. Kuprov, "Exact NMR simulation of protein-size spin systems using tensor train formalism", Physical Review B 90(8), 085139 (2014), DOI: 10.1103/PhysRevB.90.085139 - the `@ttclass` overload.
 - L.J. Edwards, D.V. Savostyanov, Z.T. Welderufael, D. Lee, I. Kuprov, "Quantum mechanical NMR simulation algorithm for protein-size spin systems", Journal of Magnetic Resonance 243, 107-113 (2014), DOI: 10.1016/j.jmr.2014.04.002 - restricted basis plus tensor trains at protein scale.

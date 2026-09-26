@@ -98,6 +98,7 @@
 | `tests/kernel/test_sparse_tensor_utility_suite.m` | `result=test_sparse_tensor_utility_suite()` | Tests sparse, tensor, and numerical utility helpers. Syntax: result=test_sparse_tensor_utility_suite() Outputs: result - |
 | `tests/kernel/test_spsortrows_mex_suite.m` | `result=test_spsortrows_mex_suite()` | Tests the sparse sortrows MEX helper. Syntax: result=test_spsortrows_mex_suite() Outputs: result -regression test result |
 | `tests/kernel/test_spunicols_mex_suite.m` | `result=test_spunicols_mex_suite()` | Tests the sparse unique-column MEX helper. Syntax: result=test_spunicols_mex_suite() Outputs: result -regression test re |
+| `tests/kernel/test_srsk_thermal.m` | `result=test_srsk_thermal()` | Once-only SRSK thermalisation and mode dissipation. |
 | `tests/kernel/test_state_constructor_suite.m` | `result=test_state_constructor_suite()` | Tests state-constructor helper functions. Syntax: result=test_state_constructor_suite() Outputs: result -regression test |
 | `tests/kernel/test_states_composite_suite.m` | `result=test_states_composite_suite()` | Tests composite state generators in kernel/states. Syntax: result=test_states_composite_suite() Outputs: result -regress |
 | `tests/kernel/test_step_matches_expm.m` | `result=test_step_matches_expm()` | Tests Hilbert-space propagation against matrix exponentiation. Syntax: result=test_step_matches_expm() Outputs: result - |

@@ -11,6 +11,8 @@ Relaxation superoperator. Syntax: R=relaxation(spin_system,euler_angles)
 - The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
 - The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
 
+- SRSK contributes zero-destination relaxation rates to the accumulated generator; IME or DiBari-Levitt thermalisation is applied once to the accumulated spin relaxation, not separately to the recursive SRSK contribution. Bosonic mode dissipation is excluded from that recursive contribution and appended once after outer spin thermalisation, with the original mode parameters and temperature.
+
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
@@ -39,17 +41,6 @@ Relaxation superoperator. Syntax: R=relaxation(spin_system,euler_angles)
 - space formalisms; the euler_angles parameter refers to the
 - spin subsystem only and has no effect on the mode terms.
 
-## Implementation structure
+## Header notes
 
-- Relaxation superoperator. Syntax:
-- R=relaxation(spin_system,euler_angles)
-- euler_angles -three Euler angles (ZYZ active convention
-- in radians) specifying system orientation
-- relative to the input orientation; requi-
-- by those theories that support relaxation
-- rate anisotropy. It has no effect on tho-
-- se theories (e.g. Redfield) that do not.
-- R -relaxation superoperator. If a Liouvillian is
-- assembled manually, this dissipative superoperator
-- must enter as 1i*R, for example
-- L=H+1i*R+1i*K; do not use H+R+K.
+Euler angles use the active ZYZ convention in radians and affect theories with anisotropic rates, not Redfield rotational averaging. In a manually assembled generator use L=H+1i*R+1i*K, not H+R+K.

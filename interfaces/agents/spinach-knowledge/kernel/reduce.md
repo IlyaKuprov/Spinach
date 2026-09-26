@@ -1,8 +1,6 @@
 # kernel/reduce.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/reduce.m`
 - Signature: `projectors=reduce(spin_system,L,rho)`
-- Total lines: 311
 
 ## Purpose
 

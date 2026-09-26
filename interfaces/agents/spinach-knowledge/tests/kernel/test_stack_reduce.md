@@ -1,8 +1,6 @@
 # tests/kernel/test_stack_reduce.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_stack_reduce.m`
 - Signature: `result=test_stack_reduce()`
-- Total lines: 189
 
 ## Purpose
 

@@ -1,8 +1,6 @@
 # kernel/utilities/zte.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/zte.m`
 - Signature: `projector=zte(spin_system,L,rho,nstates)`
-- Total lines: 191
 
 ## Purpose
 

@@ -1,8 +1,6 @@
 # examples/optimal_control/distortions/scope_readout/pulse_heterodyne.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/distortions/scope_readout/pulse_heterodyne.m`
 - Signature: `pulse_heterodyne()`
-- Total lines: 75
 
 ## Purpose
 
@@ -28,7 +26,3 @@ Digital processing for a recording of the proton optimal control pulse, done on 
 - Resample and convert to complex
 - Empirical initial phase offset
 - Load the pulse produced by optimal control
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `double()`, `kfigure()`, `scale_figure()`, `subplot()`, `xlim()`, `ktitle()`, `kxlabel()`, `time_grid()`, `heterodyne()`, `resample()`, `pulse()`, `stairs()`, `klegend()`.

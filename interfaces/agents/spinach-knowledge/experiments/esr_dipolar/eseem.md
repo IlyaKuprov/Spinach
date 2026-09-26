@@ -1,8 +1,6 @@
 # experiments/esr_dipolar/eseem.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/esr_dipolar/eseem.m`
 - Signature: `fid=eseem(spin_system,parameters,H,R,K)`
-- Total lines: 120
 
 ## Purpose
 
@@ -17,8 +15,6 @@ ESEEM pulse sequence with ideal hard pulses. Syntax: fid=eseem(spin_system,param
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -53,7 +49,3 @@ ESEEM pulse sequence with ideal hard pulses. Syntax: fid=eseem(spin_system,param
 - parameters.pulse_op pulse operator
 - H -Hamiltonian matrix, received from context function
 - R -relaxation superoperator, received from context function
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `sim2liouv()`, `grumble()`, `isfield()`, `step()`, `evolution()`, `transpose()`, `ismember()`, `ismatrix()`, `all()`, `any()`.

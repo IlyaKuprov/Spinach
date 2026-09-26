@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/mtimes.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/mtimes.m`
 - Signature: `c=mtimes(a,b)`
-- Total lines: 171
 
 ## Purpose
 
@@ -37,7 +35,3 @@ Performs tensor train multiplication followed by a shrink. Syntax: c=mtimes(a,b)
 - Preallocate result
 - Loop over the buffers of the operands
 - Set current vector as the right-hand side
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `isscalar()`, `ranks()`, `sizes()`, `a_sizes()`, `b_sizes()`, `a_ranks()`, `all()`, `b_ranks()`, `new_coeff()`, `new_tolerance()`, `new_cores()`, `unit_like()`, `shrink()`.

@@ -1,8 +1,6 @@
 # examples/extremes/fluoroisooctane.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/extremes/fluoroisooctane.m`
 - Signature: `fluoroisooctane()`
-- Total lines: 96
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A deliberately adversarial example from Art Bochevarov at Schodinger Inc. In thi
 - Larger J-couplings
 - Smaller J-couplings, tert-butyl
 - Smaller J-couplings, isopropyl
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `plot_1d()`.

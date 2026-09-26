@@ -1,8 +1,6 @@
 # examples/dnp_liq/jdnp/fig_1_exch_and_field_scan.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/jdnp/fig_1_exch_and_field_scan.m`
 - Signature: `fig_1_exch_and_field_scan()`
-- Total lines: 96
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Matching condition plot for JDNP -proton polarisation at a particular time as a 
 - Loop over the fields
 - Set the magnet field
 - Trityl and free electron frequencies
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `system_specification()`, `kfigure()`, `scale_figure()`, `field_grid()`, `g2freq()`, `exch_grid()`, `create()`, `basis()`, `operator()`, `equilibrium()`, `state()`, `hamiltonian()`, `assume()`, `relaxation()`, `evolution()`, `dnp()`.

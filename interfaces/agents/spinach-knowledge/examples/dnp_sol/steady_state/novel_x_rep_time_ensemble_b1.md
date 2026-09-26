@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/novel_x_rep_time_ensemble_b1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/novel_x_rep_time_ensemble_b1.m`
 - Signature: `novel_x_rep_time_ensemble_b1()`
-- Total lines: 130
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simulation of NOVEL DNP repetition time scan in the steady state with distributi
 - Basis set
 - Propagator accuracy
 - Algorithmic options
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cell2mat()`, `xyz()`, `gaussleg()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `rep_time()`, `dnp_noflip()`, `powder()`, `dnp_flip()`, `kfigure()`, `kylabel()`, `klegend()`, `kxlabel()`, `xlim()`.

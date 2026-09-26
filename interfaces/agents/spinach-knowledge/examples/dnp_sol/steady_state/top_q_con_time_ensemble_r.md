@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/top_q_con_time_ensemble_r.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/top_q_con_time_ensemble_r.m`
 - Signature: `top_q_con_time_ensemble_r()`
-- Total lines: 126
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simulation of TOP DNP contact time dependence in the steady state with electron-
 - Algorithmic options
 - Distance ensemble
 - TOP loop count
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gaussleg()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `loop_counts()`, `dnp_a()`, `powder()`, `dnp_b()`, `kfigure()`, `kylabel()`, `klegend()`, `kxlabel()`, `savefig()`.

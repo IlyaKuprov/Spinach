@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/revert.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/revert.m`
 - Signature: `tt=revert(tt)`
-- Total lines: 42
 
 ## Purpose
 

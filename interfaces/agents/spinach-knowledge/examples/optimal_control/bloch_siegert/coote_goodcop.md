@@ -1,8 +1,6 @@
 # examples/optimal_control/bloch_siegert/coote_goodcop.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/bloch_siegert/coote_goodcop.m`
 - Signature: `coote_goodcop()`
-- Total lines: 147
 
 ## Purpose
 
@@ -19,7 +17,6 @@ Reproduction of the GOODCOP pulse design logic from Coote et al. with Bloch-Sieg
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file also defines local helper function(s): `ppm2hz()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -35,7 +32,3 @@ Reproduction of the GOODCOP pulse design logic from Coote et al. with Bloch-Sieg
 - Paper parameters for GOODCOP
 - Offset grids from the paper
 - Convert to offset frequencies
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `operator()`, `state()`, `hamiltonian()`, `assume()`, `ppm2hz()`, `step()`, `ca_hz()`, `true()`, `optimcon()`, `fmaxnewton()`, `mat2cell()`, `false()`, `eval_hz()`, `bloch_siegert()`.

@@ -1,8 +1,6 @@
 # examples/nmr_liquids/noesy_methanol.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/noesy_methanol.m`
 - Signature: `noesy_methanol()`
-- Total lines: 88
 
 ## Purpose
 
@@ -33,7 +31,3 @@ NOESY spectrum of 13C methanol. J-couplings from Pecul and Helgaker, CSA tensors
 - Basis set
 - Relaxation theory parameters
 - Algorithmic options
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `shift_iso()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

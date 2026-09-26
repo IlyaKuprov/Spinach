@@ -1,8 +1,6 @@
 # kernel/utilities/snormpdf.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/snormpdf.m`
 - Signature: `p=snormpdf(x,mu,sigma,alpha)`
-- Total lines: 55
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Azzalini's skew normal distribution. Syntax: p=snormpdf(x,mu,sigma,alpha)
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -43,7 +38,3 @@ Azzalini's skew normal distribution. Syntax: p=snormpdf(x,mu,sigma,alpha)
 - Equation 2 in http://www.jstor.org/stable/4615982
 - Consistency enforcement
 - The smallest minority on earth is the individual. Those who deny
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `normpdf()`, `normcdf()`, `isscalar()`.

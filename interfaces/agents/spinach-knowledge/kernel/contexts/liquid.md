@@ -1,8 +1,6 @@
 # kernel/contexts/liquid.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/contexts/liquid.m`
 - Signature: `answer=liquid(spin_system,pulse_sequence,parameters,assumptions)`
-- Total lines: 240
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Liquid-phase interface to pulse sequences. Generates a Liouvillian superoperator
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `defaults()`, `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -76,7 +72,3 @@ Liquid-phase interface to pulse sequences. Generates a Liouvillian superoperator
 - pulse sequences that ship with Spinach.
 - parameters.spins -a cell array giving the
 - spins that the pulse sequence works on, in
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `banner()`, `defaults()`, `grumble()`, `assume()`, `ismember()`, `relaxation()`, `kinetics()`, `residual()`, `hamiltonian()`, `orientation()`, `report()`, `equilibrium()`, `frqoffset()`, `carrier()`, `rotframe()`, `pulse_sequence()`.

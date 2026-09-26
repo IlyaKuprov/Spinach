@@ -1,8 +1,6 @@
 # examples/nmr_liquids/deptq_strychnine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/deptq_strychnine.m`
 - Signature: `deptq_strychnine()`
-- Total lines: 67
 
 ## Purpose
 
@@ -32,7 +30,3 @@ DEPTQ135 experiment on strychnine. Calculation time: minutes
 - Preallocate the answer
 - Loop over isotopomers
 - Build the basis
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strychnine()`, `create()`, `dilute()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

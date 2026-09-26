@@ -1,8 +1,6 @@
 # examples/nmr_solids/case_studies/mathies_carbonate/sle_nmr_dd_csa_mhc.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/case_studies/mathies_carbonate/sle_nmr_dd_csa_mhc.m`
 - Signature: `sle_nmr_dd_csa_mhc()`
-- Total lines: 101
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Water protons in the unit cell of monohydrocalcite, inc- luding slow isotropic r
 - parametrisation of Huang et al. ACIE 2021
 - Get coordinates
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `c2spinach()`, `ismember()`, `create()`, `basis()`, `state()`, `kfigure()`, `tau_c()`, `max_rank()`, `gridfree()`, `apodisation()`, `fftshift()`, `plot_1d()`, `ylim()`, `klegend()`, `kylabel()`.

@@ -1,8 +1,6 @@
 # examples/quantum_tech/jaynes_cummings_b.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/jaynes_cummings_b.m`
 - Signature: `jaynes_cummings_b()`
-- Total lines: 79
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Jaynes-Cummings coupling between a spin and an electromagnetic cavity mode with 
 - Basis set
 - Spinach housekeeping
 - Sequence parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `spin()`, `create()`, `basis()`, `state()`, `device()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`, `ktitle()`, `klegend()`.

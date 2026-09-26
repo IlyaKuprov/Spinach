@@ -1,8 +1,6 @@
 # kernel/utilities/distrib_dim.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/distrib_dim.m`
 - Signature: `A=distrib_dim(A,dim)`
-- Total lines: 77
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Distributes an array in the user-specified dimension for parallel processing usi
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -40,7 +36,3 @@ Distributes an array in the user-specified dimension for parallel processing usi
 - Get the size
 - Set the stage
 - Codistributor with default partitioning
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `codistributor1d()`, `cumsum()`, `ndims()`, `partLimits()`, `distributed()`, `isscalar()`.

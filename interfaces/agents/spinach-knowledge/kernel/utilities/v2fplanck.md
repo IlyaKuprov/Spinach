@@ -1,8 +1,6 @@
 # kernel/utilities/v2fplanck.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/v2fplanck.m`
 - Signature: `F=v2fplanck(spin_system,parameters)`
-- Total lines: 428
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Translates a stationary 3D velocity field and a diffusion tensor field into a Fo
 ## Numerical / algorithmic content
 
 - An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -73,7 +69,3 @@ Translates a stationary 3D velocity field and a diffusion tensor field into a Fo
 - parameters.w -Z components of the velocity vectors
 - form flow along Z
 - parameters.diff -diffusion coefficient or 3x3 tensor, m^2/s
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `hydrodynamics()`, `isfield()`, `isscalar()`, `spdiags()`, `all()`, `clean_up()`, `opium()`, `isrow()`, `any()`, `iscolumn()`, `isequal()`, `num2str()`, `getfield()`, `eps()`, `d_off()`.

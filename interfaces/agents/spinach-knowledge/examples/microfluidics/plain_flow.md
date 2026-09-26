@@ -1,8 +1,6 @@
 # examples/microfluidics/plain_flow.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/microfluidics/plain_flow.m`
 - Signature: `plain_flow()`
-- Total lines: 116
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simple flow simulation with no dynamics in the spin subspace: longitudinal magne
 - Algorithmic switches
 - Spinach housekeeping
 - Initial condition: Lz in a few cells
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `comsol_import()`, `create()`, `basis()`, `state()`, `assume()`, `hamiltonian()`, `frqoffset()`, `relaxation()`, `drainage()`, `speye()`, `meshflow()`, `fpl2phan()`, `traj()`, `kfigure()`, `scale_figure()`, `camproj()`.

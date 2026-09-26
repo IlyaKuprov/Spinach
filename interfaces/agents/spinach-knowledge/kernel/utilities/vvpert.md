@@ -1,8 +1,6 @@
 # kernel/utilities/vvpert.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/vvpert.m`
 - Signature: `[Ep,G]=vvpert(E0,H1,order)`
-- Total lines: 126
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Van Vleck perturbation theory, following Shavitt and Redmon, but excluding the q
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -56,7 +52,3 @@ Van Vleck perturbation theory, following Shavitt and Redmon, but excluding the q
 - problems
 - Ep -eigenvalues of H0+H1 to the specified order,
 - a column vector of reals, not necessarily
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `logical()`, `speye()`, `any()`, `factorial()`, `comm()`, `bch()`, `cell2mat()`, `iscolumn()`, `ishermitian()`, `isscalar()`.

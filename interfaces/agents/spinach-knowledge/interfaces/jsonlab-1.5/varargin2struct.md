@@ -1,8 +1,6 @@
 # interfaces/jsonlab-1.5/varargin2struct.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/jsonlab-1.5/varargin2struct.m`
 - Signature: `opt=varargin2struct(varargin)`
-- Total lines: 40
 
 ## Purpose
 
@@ -28,7 +26,3 @@ No descriptive header was found. The best immediate identifier is `opt=varargin2
 - opt: a struct where opt.param1=value1, opt.param2=value2 ...
 - license:
 - BSD License, see LICENSE_BSD.txt files for details
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `isstruct()`, `mergestruct()`, `elseif()`, `ischar()`, `setfield()`, `lower()`.

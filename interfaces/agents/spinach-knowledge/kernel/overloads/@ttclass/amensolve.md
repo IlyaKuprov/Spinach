@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/amensolve.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/amensolve.m`
 - Signature: `x=amensolve(A,y,tol,opts,x0)`
-- Total lines: 574
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Solves the linear system Ax=y using the AMEn iteration. Syntax: x=amensolve(A,y,
 - Tensor-train linear algebra. These files implement compressed high-dimensional operators and AMEn/SVD-based algebra in tensor-train format.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`, `revert_interface()`, `reduce_matrix()`, `reduce_vector()`, `local_matvec()`, `local_matrix()`, `local_vector()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -59,7 +54,3 @@ Solves the linear system Ax=y using the AMEn iteration. Syntax: x=amensolve(A,y,
 - opts.init_guess_rank -the rank of the initial guess
 - opts.enrichment_rank -the rank of the residual and
 - enrichment
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `isfield()`, `exist()`, `ttort()`, `grumble()`, `clearcoeff()`, `local_vector()`, `local_matvec()`, `local_matrix()`, `local_iters()`, `bicgstab()`, `frob_chop()`, `norm_x()`, `reduce_matrix()`, `reduce_vector()`, `norm_yAx()`, `revert_interface()`.

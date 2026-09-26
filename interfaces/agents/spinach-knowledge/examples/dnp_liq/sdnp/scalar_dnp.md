@@ -1,8 +1,6 @@
 # examples/dnp_liq/sdnp/scalar_dnp.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/sdnp/scalar_dnp.m`
 - Signature: `scalar_dnp()`
-- Total lines: 116
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Field dependence of the couping factor between 13C of CHCl3 and the electron spi
 - Relaxation theories
 - Electron R1 and R2 for empirical T1/T2
 - Nuclear R1 and R2 for empirical T1/T2
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `b_vector()`, `create()`, `basis()`, `relaxation()`, `state()`, `R1n()`, `kfigure()`, `expt_data()`, `set()`, `kxlabel()`, `kylabel()`.

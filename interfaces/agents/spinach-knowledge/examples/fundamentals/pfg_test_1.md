@@ -1,8 +1,6 @@
 # examples/fundamentals/pfg_test_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/pfg_test_1.m`
 - Signature: `pfg_test_1()`
-- Total lines: 77
 
 ## Purpose
 
@@ -30,7 +28,3 @@ A test of the explicit gradient pulse function that uses the auxiliary matrix fo
 - Determine the coherence order of each state
 - Find out which coherence orders are present
 - Weight coherence orders by the number of states
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `assume()`, `hamiltonian()`, `rho()`, `lin2lm()`, `weighting()`, `time_axis()`, `rho_stack()`, `grad_pulse()`, `kfigure()`, `trajan()`, `set()`.

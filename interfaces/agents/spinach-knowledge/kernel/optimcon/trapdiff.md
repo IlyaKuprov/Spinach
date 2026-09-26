@@ -1,8 +1,6 @@
 # kernel/optimcon/trapdiff.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/trapdiff.m`
 - Signature: `[DL,DR]=trapdiff(spin_system,Hd,Hc,dt,cL,cR)`
-- Total lines: 97
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Directional derivatives for the trapezium product quadrature publi- shed by Iser
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -59,7 +55,3 @@ Directional derivatives for the trapezium product quadrature publi- shed by Iser
 - The derivatives are calculated using Eq 16 of Goodwin and Kuprov
 - [DL,DR]=trapdiff(spin_system,Hd,Hc,dt,cL,cR)
 - Hd -a cell array of two matrices containing drift
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `dirdiff()`, `iscell()`, `isscalar()`.

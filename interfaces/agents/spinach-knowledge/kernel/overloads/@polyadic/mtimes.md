@@ -1,8 +1,6 @@
 # kernel/overloads/@polyadic/mtimes.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@polyadic/mtimes.m`
 - Signature: `C=mtimes(A,B)`
-- Total lines: 171
 
 ## Purpose
 
@@ -36,7 +34,3 @@ Performs multiplications involving polyadics. Syntax: C=mtimes(A,B)
 - Issue a recursive call
 - When B is a number
 - Multiply smallest cores in the A buffer
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `isscalar()`, `cellfun()`, `simplify()`, `issparse()`, `ctranspose()`, `kronm()`, `true()`, `polyadic()`, `suffix()`.

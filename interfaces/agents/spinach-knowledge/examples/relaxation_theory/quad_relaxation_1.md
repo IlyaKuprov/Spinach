@@ -1,8 +1,6 @@
 # examples/relaxation_theory/quad_relaxation_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/quad_relaxation_1.m`
 - Signature: `quad_relaxation_1()`
-- Total lines: 51
 
 ## Purpose
 
@@ -32,7 +30,3 @@
 - Relaxation superoperator
 - Textbook relaxation rate expressions
 - States of interest
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `spin()`, `eeqq2nqi()`, `create()`, `basis()`, `relaxation()`, `rlx_nqi()`, `state()`, `num2str()`.

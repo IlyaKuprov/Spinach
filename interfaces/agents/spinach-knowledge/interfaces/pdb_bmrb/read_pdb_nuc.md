@@ -1,8 +1,6 @@
 # interfaces/pdb_bmrb/read_pdb_nuc.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/pdb_bmrb/read_pdb_nuc.m`
 - Signature: `[res_num,res_typ,pdb_id,coords]=read_pdb_nuc(pdb_file_name)`
-- Total lines: 95
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Reads the coordinates of all atoms from the user-specified PDB file and returns,
 - PDB/BMRB interfaces. These files bridge biomolecular structure/assignment data and Spinach input structures, including atom selection, coordinates, and chemical-shift metadata.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -51,7 +46,3 @@ Reads the coordinates of all atoms from the user-specified PDB file and returns,
 - each spin belongs (e.g. 'GUA')
 - pdb_id -nspins x 1 cell array of strings giving the
 - PDB identifier of the nucleic acid atom
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `fopen()`, `feof()`, `fgetl()`, `textscan()`, `all()`, `cellfun()`, `res_num()`, `upper()`, `fclose()`, `ischar()`.

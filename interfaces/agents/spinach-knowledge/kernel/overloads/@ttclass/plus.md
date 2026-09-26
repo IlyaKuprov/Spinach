@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/plus.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/plus.m`
 - Signature: `a=plus(a,b)`
-- Total lines: 52
 
 ## Purpose
 
@@ -37,7 +35,3 @@ Tensor train addition operation. Does not perform the actual addition, but inste
 - Filter out zero coeff
 - Twinkle, twinkle, little star.
 - I don't wonder what you are.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `elseif()`, `all()`, `sizes()`, `unit_like()`.

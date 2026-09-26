@@ -1,8 +1,6 @@
 # kernel/overloads/@polyadic/minus.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@polyadic/minus.m`
 - Signature: `a=minus(a,b)`
-- Total lines: 38
 
 ## Purpose
 
@@ -39,7 +37,3 @@ Polyadic subtraction operation. Does not perform the actual sub- traction, but i
 - The 1958 Fourier transform NMR article by Morozov, Melnikov and
 - Skripov only came to light during a patent dispute between Bruker
 - and Varian. The Nobel Prize winning paper by Ernst and Anderson
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `plus()`.

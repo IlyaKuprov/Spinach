@@ -1,8 +1,6 @@
 # interfaces/jsonlab-1.5/jsonopt.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/jsonlab-1.5/jsonopt.m`
 - Signature: `val=jsonopt(key,default,varargin)`
-- Total lines: 35
 
 ## Purpose
 
@@ -28,7 +26,3 @@ No descriptive header was found. The best immediate identifier is `val=jsonopt(k
 - output:
 - val: if key exists, val=optstruct.key; otherwise val=default
 - license:
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `isstruct()`, `isfield()`, `getfield()`, `elseif()`, `lower()`.

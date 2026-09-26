@@ -1,8 +1,6 @@
 # examples/relaxation_theory/dd_csa_xcorr_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/dd_csa_xcorr_2.m`
 - Signature: `dd_csa_xcorr_2()`
-- Total lines: 103
 
 ## Purpose
 
@@ -34,7 +32,3 @@ DD-CSA cross-correlation -a reproduction of Fig 5a from the paper by Grace and K
 - Get the Hamiltonian superoperator
 - Add Redfield superoperator,
 - Apply the offset
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `assume()`, `hamiltonian()`, `relaxation()`, `frqoffset()`, `operator()`, `state()`, `sweep2ticks()`, `equilibrium()`, `kfigure()`, `step()`, `evolution()`, `fftshift()`.

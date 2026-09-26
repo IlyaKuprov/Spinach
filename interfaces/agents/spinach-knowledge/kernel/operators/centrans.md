@@ -1,8 +1,6 @@
 # kernel/operators/centrans.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/operators/centrans.m`
 - Signature: `A=centrans(mult,type)`
-- Total lines: 87
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Central transition operators of half-integer spins in the Pauli basis. Syntax: A
 - Operator-construction utilities. They build bases and irreducible tensor representations for spin, bosonic, and transition operators.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -42,7 +37,3 @@ Central transition operators of half-integer spins in the Pauli basis. Syntax: A
 - Build CT operator
 - Sx on central transition
 - Sy on central transition
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `spalloc()`, `complex()`, `isscalar()`, `ischar()`, `ismember()`.

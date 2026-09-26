@@ -1,8 +1,6 @@
 # kernel/optimcon/alpha_conds.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/alpha_conds.m`
 - Signature: `test=alpha_conds(test_type,alpha,fx_0,fx_1,gfx_0,gfx_1,dir,spin_system)`
-- Total lines: 125
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Applies one of the line search acceptance tests used by the brac- keting and sec
 - Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -52,7 +47,3 @@ Applies one of the line search acceptance tests used by the brac- keting and sec
 - 3 for ascent direction test
 - alpha -trial step length
 - fx_0 -objective value at the initial point
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `isscalar()`, `ismember()`, `iscolumn()`, `isequal()`.

@@ -1,16 +1,12 @@
 # tests/kernel/test_transform_rotation_suite.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_transform_rotation_suite.m`
 - Signature: `result=test_transform_rotation_suite()`
-- Total lines: 138
 
 ## Purpose
 
 Tests rotation transform helpers. Syntax: result=test_transform_rotation_suite()
 
 ## Physical / mathematical content
-
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 
 ## Numerical / algorithmic content
 
@@ -35,7 +31,3 @@ Tests rotation transform helpers. Syntax: result=test_transform_rotation_suite()
 - Compare equivalent rotations through their Euler angle degeneracy
 - Check angular tolerance acceptance
 - Check angular tolerance rejection
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `euler2dcm()`, `test_close()`, `test_true()`, `euler_equiv()`, `dcm2euler()`, `euler_sup()`, `anax2dcm()`, `anax2qter()`, `qter2anax()`, `euler2qter()`, `qter2dcm()`, `qter2euler()`, `dcm2qter()`, `dcm2wigner()`, `rotmat_align()`.

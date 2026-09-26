@@ -1,8 +1,6 @@
 # examples/nmr_liquids/pa_rotenone.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/pa_rotenone.m`
 - Signature: `pa_rotenone()`
-- Total lines: 91
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Spinach housekeeping
 - Sequence parameters
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

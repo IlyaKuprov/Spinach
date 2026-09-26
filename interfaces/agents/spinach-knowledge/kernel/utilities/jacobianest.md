@@ -1,8 +1,6 @@
 # kernel/utilities/jacobianest.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/jacobianest.m`
 - Signature: `[jac,err] = jacobianest(fun,x0)`
-- Total lines: 177
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Estimate of the Jacobian matrix of a vector valued function of n variables. Synt
 ## Numerical / algorithmic content
 
 - Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `swapelement()`, `rombextrap()`, `vec2mat()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -50,7 +46,3 @@ Estimate of the Jacobian matrix of a vector valued function of n variables. Synt
 - Assuming that x0 is a vector of length p
 - and fun returns a vector of length n, then
 - jac will be an array of size (n,p)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `ischar()`, `str2func()`, `fun()`, `swapelement()`, `delta()`, `fdel()`, `fdif()`, `rombextrap()`, `derest()`, `der_romb()`, `tags()`, `errest()`, `err()`, `jac()`, `vec()`.

@@ -1,8 +1,6 @@
 # examples/quantum_tech/transmon_cavity_swap.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/transmon_cavity_swap.m`
 - Signature: `transmon_cavity_swap()`
-- Total lines: 65
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Vacuum Rabi swap between a transmon and a microwave cavity mode, both represente
 - Spinach housekeeping
 - Sequence parameters
 - Trajectory through the device context
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `device()`, `cellfun()`, `hdot()`, `kfigure()`, `kxlabel()`, `kylabel()`, `ktitle()`, `klegend()`.

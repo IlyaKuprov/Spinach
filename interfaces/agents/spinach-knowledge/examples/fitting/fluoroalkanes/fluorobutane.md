@@ -1,8 +1,6 @@
 # examples/fitting/fluoroalkanes/fluorobutane.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fitting/fluoroalkanes/fluorobutane.m`
 - Signature: `fluorobutane()`
-- Total lines: 196
 
 ## Purpose
 
@@ -16,7 +14,6 @@ Fitting of 1H NMR spectrum of 2-fluoropentane with respect to J-couplings. See o
 ## Numerical / algorithmic content
 
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The file also defines local helper function(s): `errfun()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -32,7 +29,3 @@ Fitting of 1H NMR spectrum of 2-fluoropentane with respect to J-couplings. See o
 - Run the optimisation
 - Display the result
 - Least squares error function
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `trapz()`, `optimset()`, `kfigure()`, `scale_figure()`, `fminsearch()`, `errfun()`, `params()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `spin()`, `sim_h()`.

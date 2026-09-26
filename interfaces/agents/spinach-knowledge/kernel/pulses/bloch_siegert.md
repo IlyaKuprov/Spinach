@@ -1,8 +1,6 @@
 # kernel/pulses/bloch_siegert.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/pulses/bloch_siegert.m`
 - Signature: `[ctrl_opers,...`
-- Total lines: 114
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Applies Bloch-Siegert corrections to Cartesian control pulses. Takes control ope
 - The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -54,7 +49,3 @@ Applies Bloch-Siegert corrections to Cartesian control pulses. Takes control ope
 - ctrl_coefs]=bloch_siegert(spin_system,ctrl_opers,...
 - ctrl_coefs)
 - spin_system -Spinach spin system object containing the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `bloch_siegert()`, `grumble()`, `isstruct()`, `isfield()`, `optimcon()`, `islogical()`, `isscalar()`, `iscell()`, `isvector()`.

@@ -1,8 +1,6 @@
 # kernel/grids/gaussleg.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/grids/gaussleg.m`
 - Signature: `[x,w]=gaussleg(a,b,n)`
-- Total lines: 75
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Computes Gauss-Legendre points and weights in [a,b] interval with accuracy order
 - The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -44,7 +39,3 @@ Computes Gauss-Legendre points and weights in [a,b] interval with accuracy order
 - Check consistency
 - Initial guess for the nodes in [-1 1]
 - Newton-Raphson refinement
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`.

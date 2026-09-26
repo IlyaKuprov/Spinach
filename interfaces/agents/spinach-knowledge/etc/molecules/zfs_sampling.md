@@ -1,8 +1,6 @@
 # etc/molecules/zfs_sampling.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/etc/molecules/zfs_sampling.m`
 - Signature: `[D,E,W]=zfs_sampling(npoints_d,npoints_e,tol)`
-- Total lines: 102
 
 ## Purpose
 
@@ -10,14 +8,11 @@ Gadolinium ZFS probability distribution function for DOTA-type ligand complexes 
 
 ## Physical / mathematical content
 
-- This file belongs to the `etc` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
 
 ## Numerical / algorithmic content
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -59,7 +54,3 @@ Gadolinium ZFS probability distribution function for DOTA-type ligand complexes 
 - below which grid points are dropped
 - D -a vector of D values at each integration
 - grid point
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `gaussleg()`, `normpdf()`, `kfigure()`, `scale_figure()`, `subplot()`, `ktitle()`, `kxlabel()`, `kylabel()`, `isscalar()`.

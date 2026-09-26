@@ -1,8 +1,6 @@
 # examples/kinetics/nonlinear/diels_alder_zmag.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/kinetics/nonlinear/diels_alder_zmag.m`
 - Signature: `diels_alder_zmag()`
-- Total lines: 170
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Time-domain Z magnetisation dynamics in the Diels-Alder cycloaddition of acetyle
 - Magnet field
 - Chemical parts and unit concentrations
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gparse()`, `g2spinach()`, `kfigure()`, `scale_figure()`, `subplot()`, `cst_display()`, `camorbit()`, `ktitle()`, `num2cell()`, `merge_inp()`, `create()`, `basis()`, `step()`, `griddedInterpolant()`, `kxlabel()`, `kylabel()`.

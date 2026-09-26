@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/xix_w_pulse_dur_ensemble_b1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/xix_w_pulse_dur_ensemble_b1.m`
 - Signature: `xix_w_pulse_dur_ensemble_b1()`
-- Total lines: 115
 
 ## Purpose
 
@@ -30,7 +28,3 @@
 - Basis set
 - Propagator accuracy
 - Algorithmic options
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cell2mat()`, `xyz()`, `gaussleg()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `pulse_durs()`, `dnp()`, `powder()`, `kfigure()`, `set()`, `kylabel()`, `kxlabel()`, `kcolourbar()`, `savefig()`.

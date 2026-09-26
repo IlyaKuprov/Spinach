@@ -1,8 +1,6 @@
 # interfaces/g2spinach.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/g2spinach.m`
 - Signature: `[sys,inter]=g2spinach(props,particles,references,options)`
-- Total lines: 290
 
 ## Purpose
 
@@ -10,13 +8,9 @@ Makes Spinach data structures from parsed outputs of electronic structure theory
 
 ## Physical / mathematical content
 
-- This file belongs to the `interfaces` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -97,7 +91,3 @@ Makes Spinach data structures from parsed outputs of electronic structure theory
 - then EPR mode is assumed -chemical shielding
 - and scalar couplings are ignored, but g-tensor
 - and hyperfine couplings are included.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `grumble()`, `strcmp()`, `true()`, `isfield()`, `false()`, `num2cell()`, `ismember()`, `mat2cell()`, `gauss2mhz()`, `index()`, `cellfun()`, `killing_pattern()`, `any()`, `references()`, `ref_index()`.

@@ -1,8 +1,6 @@
 # examples/dnp_liq/ccdnp/rates_main_text.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/ccdnp/rates_main_text.m`
 - Signature: `rates_main_text()`
-- Total lines: 99
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Self-and cross-relaxation rates in cross-correlated DNP, considering a system wi
 - Basis set
 - Relaxation theory
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `state()`, `num2str()`.

@@ -1,8 +1,6 @@
 # kernel/utilities/wigner_fock.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/wigner_fock.m`
 - Signature: `W=wigner_fock(rho,alpha)`
-- Total lines: 85
 
 ## Purpose
 
@@ -16,7 +14,6 @@ Wigner function of a bosonic mode state given as a density matrix in a truncated
 
 - Each requested phase-space point costs one `expm` of the displacement generator alpha*a'-conj(alpha)*a in the truncated Fock basis and one trace against the parity operator; there is no averaging, propagation, or quadrature, and the points are evaluated independently in a loop over `numel(alpha)`.
 - The only eigenvalue call is the positive-semidefiniteness test in the grumbler; the Hermiticity, unit-trace, and positivity tolerances are sqrt(eps) of the class of `rho`, so single-precision density matrices are accepted.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 
 ## Parameters / inputs
 
@@ -55,7 +52,3 @@ Wigner function of a bosonic mode state given as a density matrix in a truncated
 - W=wigner_fock(rho,alpha)
 - rho -density matrix of the mode in the Fock basis
 - with the levels in ascending order, [n x n]
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `conj()`, `ismatrix()`, `all()`, `eps()`.

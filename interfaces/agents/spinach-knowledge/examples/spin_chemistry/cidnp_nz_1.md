@@ -1,8 +1,6 @@
 # examples/spin_chemistry/cidnp_nz_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/spin_chemistry/cidnp_nz_1.m`
 - Signature: `cidnp_nz_1()`
-- Total lines: 124
 
 ## Purpose
 
@@ -17,7 +15,6 @@ Field dependence of geminate CIDNP from a radical pair in a viscous solvent, com
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file also defines local helper function(s): `geminate_pol()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -33,7 +30,3 @@ Field dependence of geminate CIDNP from a radical pair in a viscous solvent, com
 - is motivated by the field-cycling CIDNP work of the Yurkovskaya and
 - Ivanov school:
 - Calculation time: minutes
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `pol_rf()`, `geminate_pol()`, `fields()`, `pol_nz()`, `field()`, `num2str()`, `kfigure()`, `klegend()`, `kxlabel()`, `kylabel()`, `mt2hz()`, `strcmp()`, `create()`, `basis()`, `hamiltonian()`, `assume()`.

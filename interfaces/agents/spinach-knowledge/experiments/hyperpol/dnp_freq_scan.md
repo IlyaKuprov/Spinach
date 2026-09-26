@@ -1,8 +1,6 @@
 # experiments/hyperpol/dnp_freq_scan.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/hyperpol/dnp_freq_scan.m`
 - Signature: `dnp=dnp_freq_scan(spin_system,parameters,H,R,K)`
-- Total lines: 282
 
 ## Purpose
 
@@ -18,8 +16,6 @@ Microwave frequency scan steady-state DNP experiment. Returns the steady-state p
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -65,7 +61,3 @@ Microwave frequency scan steady-state DNP experiment. Returns the steady-state p
 - frequency offsets are specified
 - parameters.rho0 - thermal equilibrium state
 - parameters.coil - coil state vector or a horizon-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `speye()`, `condest()`, `any()`, `ismember()`, `spin()`, `fourdif()`, `spdiags()`, `gmres()`, `dnp()`, `ilu()`, `ismatrix()`, `all()`, `isfield()`, `elseif()`, `isscalar()`.

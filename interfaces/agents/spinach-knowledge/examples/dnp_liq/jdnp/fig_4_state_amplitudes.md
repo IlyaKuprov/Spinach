@@ -1,8 +1,6 @@
 # examples/dnp_liq/jdnp/fig_4_state_amplitudes.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/jdnp/fig_4_state_amplitudes.m`
 - Signature: `fig_4_state_amplitudes()`
-- Total lines: 126
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Time evolution of the individual states in the basis set built from the singlet-
 - Set microwave offset frequency
 - Set the exchange coupling
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `system_specification()`, `g2freq()`, `spin()`, `create()`, `basis()`, `operator()`, `equilibrium()`, `hamiltonian()`, `assume()`, `relaxation()`, `unit_state()`, `state()`, `evolution()`, `kfigure()`, `scale_figure()`, `subplot()`.

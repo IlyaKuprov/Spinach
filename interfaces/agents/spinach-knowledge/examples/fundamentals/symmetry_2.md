@@ -1,8 +1,6 @@
 # examples/fundamentals/symmetry_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/symmetry_2.m`
 - Signature: `symmetry_2()`
-- Total lines: 68
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Pulse-acquire NMR spectrum of a highly symmetric spin system provided by Andres 
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

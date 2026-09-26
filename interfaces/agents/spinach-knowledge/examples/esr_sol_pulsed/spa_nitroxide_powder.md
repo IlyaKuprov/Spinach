@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/spa_nitroxide_powder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/spa_nitroxide_powder.m`
 - Signature: `spa_nitroxide_powder()`
-- Total lines: 73
 
 ## Purpose
 
@@ -32,7 +30,3 @@ A soft pulse simulation for a nitroxide radical powder. The soft pulse is simula
 - Spinach housekeeping
 - Sequence parameters
 - Soft pulse parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `powder()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

@@ -1,8 +1,6 @@
 # examples/spin_chemistry/singlet_yield_anisotropy_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/spin_chemistry/singlet_yield_anisotropy_2.m`
 - Signature: `singlet_yield_anisotropy_2()`
-- Total lines: 73
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Singlet yield anisotropy calculation for a radical pair using exponential recomb
 - Zeeman interactions
 - Spinach housekeeping
 - Sequence parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gauss2mhz()`, `create()`, `basis()`, `powder()`, `cell2mat()`, `get_hull()`, `kfigure()`, `trisurf()`.

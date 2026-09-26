@@ -1,8 +1,6 @@
 # examples/nmr_solids/fitting/bromide_csa_nqi/kbr_mas_fitting.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/fitting/bromide_csa_nqi/kbr_mas_fitting.m`
 - Signature: `kbr_mas_fitting()`
-- Total lines: 116
 
 ## Purpose
 
@@ -18,7 +16,6 @@ Fitting of a 79Br MAS NMR spectrum of potassium bromide with respect to the quad
 ## Numerical / algorithmic content
 
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The file also defines local helper function(s): `errfun()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -35,7 +32,3 @@ Fitting of a 79Br MAS NMR spectrum of potassium bromide with respect to the quad
 - Run the optimisation
 - Plot and print the fitted parameters
 - Least squares error function
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `readmatrix()`, `kbr_data()`, `optimset()`, `kfigure()`, `scale_figure()`, `fminsearch()`, `errfun()`, `params()`, `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `plot_1d()`.

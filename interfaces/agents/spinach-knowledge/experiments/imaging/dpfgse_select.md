@@ -1,8 +1,6 @@
 # experiments/imaging/dpfgse_select.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/imaging/dpfgse_select.m`
 - Signature: `fid=dpfgse_select(spin_system,parameters,H,R,K,G,F)`
-- Total lines: 186
 
 ## Purpose
 
@@ -15,8 +13,6 @@ DPFGSE signal selection, based on Equation 3 from the paper by Stott et al. (htt
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -52,7 +48,3 @@ DPFGSE signal selection, based on Equation 3 from the paper by Stott et al. (htt
 - parameters.max_rank
 - parameters.sweep -detection sweep width, Hz
 - parameters.npoints -number of points in the fid
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `operator()`, `speye()`, `step()`, `shaped_pulse_af()`, `evolution()`, `isfield()`, `isvector()`, `any()`, `isscalar()`.

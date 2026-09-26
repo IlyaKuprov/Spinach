@@ -1,8 +1,6 @@
 # kernel/derivatives/sgolaydiff.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/derivatives/sgolaydiff.m`
 - Signature: `dy=sgolaydiff(y,der_order,npoints,poly_order)`
-- Total lines: 111
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Savitzky-Golay differentiation of noisy sampled signals by local least-squares p
 ## Numerical / algorithmic content
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -50,7 +46,3 @@ Savitzky-Golay differentiation of noisy sampled signals by local least-squares p
 - poly_order -order of the local polynomial
 - dy -N-by-M derivative matrix on a unit-step
 - uniform grid
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `factorial()`, `win_idx()`, `coeff()`, `isfloat()`, `issparse()`, `ismatrix()`, `any()`.

@@ -1,8 +1,6 @@
 # examples/nmr_spen/psycosy_salsalate.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_spen/psycosy_salsalate.m`
 - Signature: `psycosy_salsalate()`
-- Total lines: 92
 
 ## Purpose
 
@@ -31,7 +29,3 @@ PSYCOSY of one salsalate ring. Calculation time: minutes on NVidia Tesla A100, m
 - Diffusion and flow
 - Relaxation phantom
 - Initial and detection state phantoms
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `state()`, `imaging()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

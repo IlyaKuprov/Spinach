@@ -1,8 +1,6 @@
 # kernel/includes/redfield_integral_async.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/includes/redfield_integral_async.m`
 - Signature: `job_id=brw_compute_kernel(spin_system,w,job_id,upper_lim)`
-- Total lines: 193
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Bloch-Wangsness-Redfield and Nakajima-Zwanzig integral evaluation, the asynchron
 - false the resolvent kernel of Nakajima-Zwanzig theory) and
 - rlx_shift (the Laplace evaluation point, Hz); Redfield theory is
 - the on-shell form at zero shift.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `cheap_norm()`, `corrfun()`, `report()`, `num2str()`, `clean_up()`, `speye()`, `gcp()`, `parfeval()`, `clear()`, `exist()`, `fetchNext()`, `rethrow()`, `cell2mat()`, `get()`, `remove()`, `XYZ()`.

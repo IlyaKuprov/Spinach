@@ -1,8 +1,6 @@
 # examples/giant_spin/case_studies/ho_pzdo4_profiles.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/case_studies/ho_pzdo4_profiles.m`
 - Signature: `ho_pzdo4_profiles()`
-- Total lines: 147
 
 ## Purpose
 

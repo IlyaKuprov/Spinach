@@ -1,8 +1,6 @@
 # examples/nmr_spen/idosyzs_test_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_spen/idosyzs_test_1.m`
 - Signature: `idosyzs_test_1()`
-- Total lines: 104
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Diffusion attenuation during soft pulses in a simplified model sequence of the Z
 - Spinach housekeeping
 - Sample geometry
 - Diffusion coefficient
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `grad_amps()`, `inten()`, `imaging()`, `gather()`, `spin()`, `optimoptions()`, `lsqcurvefit()`, `kfigure()`, `num2str()`.

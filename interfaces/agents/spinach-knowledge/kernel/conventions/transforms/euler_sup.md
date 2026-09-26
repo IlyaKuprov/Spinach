@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/euler_sup.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/euler_sup.m`
 - Signature: `rot_cmp=euler_sup(rot_one,rot_two)`
-- Total lines: 107
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Superposition of ZYZ active Euler rotations. Syntax: rot_cmp=euler_sup(rot_one,r
 - Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -47,7 +42,3 @@ Superposition of ZYZ active Euler rotations. Syntax: rot_cmp=euler_sup(rot_one,r
 - therefore the composite matrix is
 - R_comp=R_two*R_one
 - Check consistency
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `rot_one()`, `rot_two()`, `wrapToPi()`, `euler2dcm()`, `all()`, `elseif()`, `dcm_comp()`, `acos()`, `dcm2euler()`, `isvector()`, `any()`.

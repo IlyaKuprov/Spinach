@@ -1,8 +1,6 @@
 # examples/fundamentals/symmetry_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/symmetry_1.m`
 - Signature: `symmetry_1()`
-- Total lines: 52
 
 ## Purpose
 
@@ -29,7 +27,3 @@ Liouvillian symmetrization for a radical pair with four equivalent nuclei under 
 - Hamiltonian superoperator
 - Symmetry factorization
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `mt2hz()`, `create()`, `basis()`, `assume()`, `hamiltonian()`, `horzcat()`, `kfigure()`, `scale_figure()`, `subplot()`, `spy()`, `ktitle()`, `xline()`, `yline()`.

@@ -1,8 +1,6 @@
 # examples/nmr_liquids/pa_difluoroheptane_syn.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/pa_difluoroheptane_syn.m`
 - Signature: `pa_difluoroheptane_syn()`
-- Total lines: 127
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Pulse-acquire 1H NMR spectrum of syn-3,5-difluoroheptane with a manual basis set
 - J-couplings
 - Basis set
 - GPU is useful here
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `false()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `plot_1d()`.

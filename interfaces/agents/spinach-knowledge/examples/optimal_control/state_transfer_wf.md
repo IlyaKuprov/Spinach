@@ -1,8 +1,6 @@
 # examples/optimal_control/state_transfer_wf.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/state_transfer_wf.m`
 - Signature: `state_transfer_wf()`
-- Total lines: 92
 
 ## Purpose
 
@@ -32,7 +30,3 @@ A transfer of population from the lowermost energy level in a four-spin system t
 - Bottom ground state to start
 - Top excited state to finish
 - Get the control operators
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `rho_init()`, `rho_targ()`, `operator()`, `hamiltonian()`, `assume()`, `frqoffset()`, `optimcon()`, `fmaxnewton()`, `mat2cell()`, `report()`, `shaped_pulse_xy()`, `rho()`, `num2str()`.

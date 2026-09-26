@@ -1,8 +1,6 @@
 # examples/dnp_mas/solid_effect_mas_steady.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_mas/solid_effect_mas_steady.m`
 - Signature: `solid_effect_mas_steady()`
-- Total lines: 108
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A MAS DNP simulation performed as described in Fred Mentink- Vigier's paper (Spi
 - Basis set
 - Spinach housekeeping
 - Stack generation parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `rotor_stack()`, `operator()`, `relaxation()`, `speye()`, `propagator()`, `steady()`, `rho()`, `step()`, `kfigure()`, `trajan()`, `equilibrium()`, `hamiltonian()`, `assume()`, `state()`.

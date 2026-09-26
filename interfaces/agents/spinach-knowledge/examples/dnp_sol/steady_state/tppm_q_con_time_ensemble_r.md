@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/tppm_q_con_time_ensemble_r.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/tppm_q_con_time_ensemble_r.m`
 - Signature: `tppm_q_con_time_ensemble_r()`
-- Total lines: 111
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simulation of TPPM DNP contact time dependence in the steady state with electron
 - Algorithmic options
 - Distance ensemble
 - TPPM loop count
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gaussleg()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `loop_counts()`, `dnp()`, `powder()`, `kfigure()`, `kylabel()`, `kxlabel()`, `savefig()`.

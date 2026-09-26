@@ -1,8 +1,6 @@
 # examples/giant_spin/nuclear_relaxation_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/nuclear_relaxation_1.m`
 - Signature: `nuclear_relaxation_1()`
-- Total lines: 148
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Nuclear relaxation rates using the adiabatic elimination method for a rapidly re
 - Rotate the ligand field into the molecular frame
 - Liza -this needs more decimal places
 - Ligand field parameters (MOLCAS)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `dcm2euler()`, `icm2hz()`, `wigner()`, `stev2sph()`, `create()`, `basis()`, `hamiltonian()`, `assume()`, `relaxation()`, `load()`, `orientation()`, `alphas()`, `betas()`, `gammas()`, `adelim()`, `weights()`.

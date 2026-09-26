@@ -1,8 +1,6 @@
 # examples/spin_chemistry/singlet_yield_anisotropy_3.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/spin_chemistry/singlet_yield_anisotropy_3.m`
 - Signature: `singlet_yield_anisotropy_3()`
-- Total lines: 72
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Singlet yield anisotropy calculation for a model radical pair reaction, Haberkor
 - Sequence parameters
 - Enable GPU arithmetic
 - sys.enable={'gpu'};
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `mt2hz()`, `create()`, `basis()`, `powder()`, `kfigure()`, `cell2mat()`, `kxlabel()`, `kylabel()`.

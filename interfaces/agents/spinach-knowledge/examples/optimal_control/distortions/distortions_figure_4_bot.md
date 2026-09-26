@@ -1,8 +1,6 @@
 # examples/optimal_control/distortions/distortions_figure_4_bot.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/distortions/distortions_figure_4_bot.m`
 - Signature: `distortions_figure_4_bot()`
-- Total lines: 132
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Figure 4 (bottom) from the paper by Rasulov and Kuprov:
 - Get the drift Hamiltonian
 - Define control parameters
 - Last 5 slices are dead time
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `load()`, `guess()`, `amp_tanh()`, `sat_factor()`, `optimcon()`, `fmaxnewton()`, `figure()`, `pwr_levels()`, `xy_profile_dist()`.

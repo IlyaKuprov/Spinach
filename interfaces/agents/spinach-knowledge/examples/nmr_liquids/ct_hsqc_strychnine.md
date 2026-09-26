@@ -1,8 +1,6 @@
 # examples/nmr_liquids/ct_hsqc_strychnine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/ct_hsqc_strychnine.m`
 - Signature: `ct_hsqc_strychnine()`
-- Total lines: 76
 
 ## Purpose
 
@@ -32,7 +30,3 @@ CT HSQC spectrum of strychnine with natural content of 13C isotope. Calculation 
 - Preallocate the answer
 - Loop over isotopomers
 - Build the basis
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strychnine()`, `create()`, `dilute()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

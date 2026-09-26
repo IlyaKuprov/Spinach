@@ -1,8 +1,6 @@
 # examples/nmr_diffusion/diffusion_test_2a.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_diffusion/diffusion_test_2a.m`
 - Signature: `diffusion_test_2a()`
-- Total lines: 62
 
 ## Purpose
 
@@ -30,7 +28,3 @@ A standard diffusion equation solver with no spin dynamics present. Isotropic di
 - 2D flow parameters
 - 2D diffusion tensor field
 - Diffusion and flow generator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `create()`, `basis()`, `v2fplanck()`, `inflate()`, `evolution()`, `kfigure()`, `traj()`, `pause()`.

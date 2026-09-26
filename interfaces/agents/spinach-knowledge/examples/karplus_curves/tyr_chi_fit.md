@@ -1,8 +1,6 @@
 # examples/karplus_curves/tyr_chi_fit.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/karplus_curves/tyr_chi_fit.m`
 - Signature: `tyr_chi_fit()`
-- Total lines: 18
 
 ## Purpose
 
@@ -20,7 +18,3 @@ Karplus coefficients extraction from a DFT dihedral angle scan over one of the c
 - over one of the chi angles in tyrosine using Gaussian09.
 - Run the Karplus fitter
 - Display the answer
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `karplus_fit()`, `num2str()`.

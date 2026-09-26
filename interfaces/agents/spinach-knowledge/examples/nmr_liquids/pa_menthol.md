@@ -1,8 +1,6 @@
 # examples/nmr_liquids/pa_menthol.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/pa_menthol.m`
 - Signature: `pa_menthol()`
-- Total lines: 56
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Menthol NMR spectrum from Damien Jeannerat, including the effect of bad Z1 and Z
 - Gaussian apodisation and then bad shims
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

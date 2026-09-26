@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/holeburn_gd_dota_powder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/holeburn_gd_dota_powder.m`
 - Signature: `holeburn_gd_dota_powder()`
-- Total lines: 93
 
 ## Purpose
 
@@ -32,7 +30,3 @@ A hole burning simulation for a gadolinium ion. The soft pulse is simulated usin
 - Get the sampling
 - Get the figure going
 - Loop over ZFS distribution
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `zfs_sampling()`, `kfigure()`, `zfs2mat()`, `create()`, `basis()`, `state()`, `powder()`, `apodisation()`, `fftshift()`, `plot_1d()`.

@@ -1,8 +1,6 @@
 # kernel/optimcon/bfgs.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/bfgs.m`
 - Signature: `H=bfgs(dx_hist,dg_hist,g)`
-- Total lines: 135
 
 ## Purpose
 
@@ -16,9 +14,6 @@ Calculates a BFGS approximation to the Newton-Raphson search direction for maxim
 - The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -52,7 +47,3 @@ Calculates a BFGS approximation to the Newton-Raphson search direction for maxim
 - a stack of column vectors, from
 - the latest to the earliest
 - g -current gradient (used for sizing)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `dx_hist()`, `dg_hist()`, `any()`, `g_new()`.

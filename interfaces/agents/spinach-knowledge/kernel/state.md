@@ -1,8 +1,6 @@
 # kernel/state.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/state.m`
 - Signature: `rho=state(spin_system,states,spins,method)`
-- Total lines: 321
 
 ## Purpose
 
@@ -10,13 +8,9 @@ Generates Hilbert space density matrices and Liouville space state vectors from 
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -80,7 +74,3 @@ Generates Hilbert space density matrices and Liouville space state vectors from 
 - ble spherical tensor, l and m are integers), 'CTx', 'CTy', 'CTz',
 - 'CT+','CT-' (central transition operators in the Zeeman basis). Va-
 - lid labels for spins are standard isotope names, as well as 'elect-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `grumble()`, `speye()`, `unit()`, `human2opspec()`, `logical()`, `nnz()`, `and()`, `indices()`, `operator()`, `spalloc()`, `true()`, `cellfun()`, `ismember()`, `active_spins()`, `coeffs()`.

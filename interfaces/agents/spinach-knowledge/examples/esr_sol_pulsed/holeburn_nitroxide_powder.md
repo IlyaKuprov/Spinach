@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/holeburn_nitroxide_powder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/holeburn_nitroxide_powder.m`
 - Signature: `holeburn_nitroxide_powder()`
-- Total lines: 91
 
 ## Purpose
 
@@ -32,7 +30,3 @@ A hole burning simulation for a nitroxide radical. The soft pulse is simulated u
 - Spinach housekeeping
 - Sequence parameters
 - Soft pulse parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `powder()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`, `klegend()`.

@@ -1,8 +1,6 @@
 # examples/nmr_proteins/hsqc_ubiquitin_a.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/hsqc_ubiquitin_a.m`
 - Signature: `hsqc_ubiquitin_a()`
-- Total lines: 72
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Basis set
 - Algorithmic options
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `protein()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

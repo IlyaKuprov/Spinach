@@ -1,8 +1,6 @@
 # experiments/fieldsweep.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/fieldsweep.m`
 - Signature: `[spec,parameters]=fieldsweep(spin_system,parameters)`
-- Total lines: 216
 
 ## Purpose
 
@@ -10,13 +8,9 @@ Field swept powder EPR spectra. A rough implementation with ex- pensive eigenfie
 
 ## Physical / mathematical content
 
-- This file belongs to the `experiments` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -66,7 +60,3 @@ Field swept powder EPR spectra. A rough implementation with ex- pensive eigenfie
 - parameters.spins - a one-element cell array speci-
 - fying the spin that is coupled
 - couple to the microwave field,
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `hamiltonian()`, `assume()`, `state()`, `load()`, `get_hull()`, `eigensets()`, `betas()`, `gammas()`, `orientation()`, `parfeval()`, `fetchOutputs()`, `spec()`, `hull()`, `isfield()`, `ischar()`.

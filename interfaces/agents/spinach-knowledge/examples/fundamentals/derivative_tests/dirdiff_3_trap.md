@@ -1,8 +1,6 @@
 # examples/fundamentals/derivative_tests/dirdiff_3_trap.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/derivative_tests/dirdiff_3_trap.m`
 - Signature: `dirdiff_3_trap()`
-- Total lines: 82
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Directional derivative test for the Cartesian GRAPE module, trapezium integrator
 - Call GRAPE and request analytical gradient
 - Left waveform edge
 - Right waveform edge
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `dirdiff_test_system()`, `optimcon()`, `eps()`, `grape_xy()`, `squeeze()`, `grad_anl()`, `wave_forw()`, `wave_back()`, `fid_forw()`, `fid_back()`.

@@ -1,8 +1,6 @@
 # examples/nmr_paramag/dft_density.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_paramag/dft_density.m`
 - Signature: `dft_density()`
-- Total lines: 72
 
 ## Purpose
 
@@ -28,7 +26,3 @@ Simulation of the pseudocontact shift field of the Europium(III) complex of 1,4,
 - Load DFT data (HFCs are read in Gauss)
 - Normalize probability density
 - Get susceptibility tensor
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `gparse()`, `trapz()`, `mat2sphten()`, `sphten2mat()`, `ppcs()`, `kpcs()`, `strcmp()`, `pcs_hfc()`, `hfc2pcs()`, `kfigure()`, `kxlabel()`, `kylabel()`, `sign()`, `volplot()`, `molplot()`.

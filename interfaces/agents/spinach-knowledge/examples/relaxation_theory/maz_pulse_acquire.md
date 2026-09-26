@@ -1,8 +1,6 @@
 # examples/relaxation_theory/maz_pulse_acquire.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/maz_pulse_acquire.m`
 - Signature: `maz_pulse_acquire()`
-- Total lines: 132
 
 ## Purpose
 
@@ -35,7 +33,3 @@ Methylaziridine pulse-acquire, showing the effect of the scalar relaxation of th
 - Scalar couplings (vacuum DFT)
 - Coordinates (Angstrom, vacuum DFT)
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `expt_shift()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

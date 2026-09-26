@@ -1,8 +1,6 @@
 # examples/giant_spin/triple_dy_eqmag_temp.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/triple_dy_eqmag_temp.m`
 - Signature: `triple_dy_eqmag_temp()`
-- Total lines: 152
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simulation of the temperature dependence of the magnetisation of a triple-Dy tri
 - to the DD couplings
 - g-tensor eigenvectors
 - g-tensor matrix
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `euler2dcm()`, `icm2hz()`, `dcm2euler()`, `wigner()`, `stev2sph()`, `nan()`, `kfigure()`, `create()`, `basis()`, `eqmag()`, `mag()`, `kxlabel()`, `kylabel()`, `load()`.

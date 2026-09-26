@@ -1,8 +1,6 @@
 # examples/fundamentals/state_spaces_3.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/state_spaces_3.m`
 - Signature: `state_spaces_3()`
-- Total lines: 64
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Transverse magnetisation dynamics in a pulse-acquire experiment on a fatty acid.
 - Spinach housekeeping
 - Sequence parameters
 - Assumptions
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `fatty_acid()`, `create()`, `basis()`, `state()`, `assume()`, `hamiltonian()`, `operator()`, `evolution()`, `traj()`, `step()`, `kfigure()`, `trajan()`.

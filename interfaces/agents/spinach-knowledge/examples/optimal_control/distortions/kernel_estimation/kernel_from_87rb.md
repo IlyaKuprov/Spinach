@@ -1,8 +1,6 @@
 # examples/optimal_control/distortions/kernel_estimation/kernel_from_87rb.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/distortions/kernel_estimation/kernel_from_87rb.m`
 - Signature: `kernel_from_87rb()`
-- Total lines: 130
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Transmitter and probe distortion kernel of a 400 MHz Bruker spectrometer fitted 
 - The heterodyne is an analytic signal demodulation, which is
 - zero-phase: the rotating frame signal is not delayed with re-
 - spect to the oscilloscope record.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `time_scope()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`, `ktitle()`, `heterodyne()`, `real_bruk()`, `imag_bruk()`, `n_low()`, `n_up()`, `polyfit()`, `time_grid()`, `unwrap()`.

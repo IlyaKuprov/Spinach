@@ -1,8 +1,6 @@
 # examples/nmr_overtone/cpmas_valine_match_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_overtone/cpmas_valine_match_2.m`
 - Signature: `cpmas_valine_match_2()`
-- Total lines: 110
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Cross-polarization experiment between protons and 14N overtone transition in N-a
 - Spinach housekeeping
 - Magic angle
 - Spectrum setup
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `atan()`, `state()`, `operator()`, `ind2sub()`, `rf_powers()`, `spin_rates()`, `singlerot()`, `intensities()`, `kfigure()`, `kxlabel()`, `set()`, `kylabel()`.

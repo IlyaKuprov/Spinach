@@ -1,8 +1,6 @@
 # experiments/pseudocon/kpcs.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/pseudocon/kpcs.m`
 - Signature: `[pcs_vals,pcs_cube]=kpcs(probden,chi,ranges,nxyz,method)`
-- Total lines: 122
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Computes the three-dimensional distribution of pseudocontact shift field by solv
 
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
 - Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -51,7 +47,3 @@ Computes the three-dimensional distribution of pseudocontact shift field by solv
 - Output:
 - pcs_vals -pseudocontact shift in ppm at each nucleus
 - pcs_cube -pseudocontact shift field on the same grid as the unpaired
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `mat2sphten()`, `sphten2mat()`, `extents()`, `ranges()`, `fftdiff()`, `chi()`, `fdlap()`, `fdkup()`, `cgs()`, `probden()`, `clear()`, `interpn()`, `nxyz()`, `ndims()`.

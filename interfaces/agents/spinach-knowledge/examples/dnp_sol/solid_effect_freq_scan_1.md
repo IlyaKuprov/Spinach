@@ -1,8 +1,6 @@
 # examples/dnp_sol/solid_effect_freq_scan_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/solid_effect_freq_scan_1.m`
 - Signature: `solid_effect_freq_scan_1()`
-- Total lines: 89
 
 ## Purpose
 
@@ -30,7 +28,3 @@ A scan through the microwave frequency range in a steady state DNP experiment fo
 - Magnetic field
 - Spin system
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `crystal()`, `kfigure()`, `scale_figure()`, `subplot()`, `answer()`, `kxlabel()`, `kylabel()`.

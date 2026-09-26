@@ -1,8 +1,6 @@
 # examples/fundamentals/nuclear_structure/woods_saxon.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/nuclear_structure/woods_saxon.m`
 - Signature: `woods_saxon(mass_number,level_number)`
-- Total lines: 58
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A loose implementation of single-nucleon Hamiltonian eigenfunction calculation i
 - Plot the potential
 - Assemble the Hamiltonian
 - Get the state
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `fdlap()`, `box_extents()`, `box_npts()`, `kfigure()`, `volplot()`, `ktitle()`, `num2str()`, `kxlabel()`, `kylabel()`, `kzlabel()`, `spdiags()`, `psi()`.

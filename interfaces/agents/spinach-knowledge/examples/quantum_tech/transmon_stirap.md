@@ -1,8 +1,6 @@
 # examples/quantum_tech/transmon_stirap.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/transmon_stirap.m`
 - Signature: `transmon_stirap()`
-- Total lines: 85
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Basic single transmon system with Duffing model in- teractions, parameters and m
 - Spinach housekeeping
 - Drift Hamiltonian from the declared interactions
 - Pulse power ensemble
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `state()`, `hilb2liouv()`, `optimcon()`, `fmaxnewton()`.

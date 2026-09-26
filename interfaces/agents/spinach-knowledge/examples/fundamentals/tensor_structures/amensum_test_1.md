@@ -1,8 +1,6 @@
 # examples/fundamentals/tensor_structures/amensum_test_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/tensor_structures/amensum_test_1.m`
 - Signature: `amensum_test_1()`
-- Total lines: 150
 
 ## Purpose
 
@@ -13,8 +11,6 @@ Detailed unit test for ttclass/amensum against dense references. The test uses b
 - Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
 
 ## Numerical / algorithmic content
-
-- The file also defines local helper function(s): `build_case()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -30,7 +26,3 @@ Detailed unit test for ttclass/amensum against dense references. The test uses b
 - Build the test cases
 - Run the main numerical tests
 - Pull out the current case
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `rng()`, `build_case()`, `amensum()`, `any()`, `all()`, `dense_amen()`, `coeff()`, `dims()`, `ttclass()`.

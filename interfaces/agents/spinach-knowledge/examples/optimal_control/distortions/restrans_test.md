@@ -1,8 +1,6 @@
 # examples/optimal_control/distortions/restrans_test.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/distortions/restrans_test.m`
 - Signature: `restrans_test()`
-- Total lines: 38
 
 ## Purpose
 
@@ -20,7 +18,3 @@ Resonator transform test. Sends a square pulse into a simple resonator model and
 - resonator model and plots the time-domain response.
 - Get a pulse shape
 - Get a figure going
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `pulse_in()`, `kfigure()`, `scale_figure()`, `subplot()`, `restrans()`, `ktitle()`.

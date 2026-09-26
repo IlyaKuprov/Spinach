@@ -1,8 +1,6 @@
 # examples/nmr_zerofield/zero_field_pyridine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_zerofield/zero_field_pyridine.m`
 - Signature: `zero_field_pyridine()`
-- Total lines: 66
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Zero-field NMR spectroscopy -15N pyridine. Set to reproduce Figure 3 from http:/
 - Simulation
 - Apodisation
 - Fourier transform
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

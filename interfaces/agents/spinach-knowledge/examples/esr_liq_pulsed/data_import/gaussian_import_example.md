@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/data_import/gaussian_import_example.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/data_import/gaussian_import_example.m`
 - Signature: `gaussian_import_example()`
-- Total lines: 54
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Methyl radical simulation, Gaussian import. The uncommon signal intensity patter
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

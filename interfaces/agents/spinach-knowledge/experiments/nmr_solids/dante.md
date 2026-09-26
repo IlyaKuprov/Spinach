@@ -1,8 +1,6 @@
 # experiments/nmr_solids/dante.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/nmr_solids/dante.m`
 - Signature: `fid=dante(spin_system,parameters,H,R,K)`
-- Total lines: 194
 
 ## Purpose
 
@@ -16,8 +14,6 @@ DANTE pulse sequence. Syntax: fid=dante(spin_system,parameters,H,R,K) This funct
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -55,7 +51,3 @@ DANTE pulse sequence. Syntax: fid=dante(spin_system,parameters,H,R,K) This funct
 - parameters.spins -working spin, specified as a
 - single-element cell array
 - parameters.decouple -isotopes to decouple, specified
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `operator()`, `speye()`, `decouple()`, `evolution()`, `ismatrix()`, `all()`, `isfield()`, `elseif()`, `iscell()`, `ismember()`, `spins()`, `any()`, `cellfun()`.

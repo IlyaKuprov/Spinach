@@ -1,8 +1,6 @@
 # examples/nmr_liquids/noe_strychnine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/noe_strychnine.m`
 - Signature: `noe_strychnine()`
-- Total lines: 84
 
 ## Purpose
 
@@ -35,7 +33,3 @@ Inversion-recovery NOE effect spectrum on strychnine, with the rightmost proton 
 - Proximity cut-off
 - Spinach housekeeping
 - Build the relaxation superoperator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strychnine()`, `create()`, `basis()`, `relaxation()`, `equilibrium()`, `hamiltonian()`, `assume()`, `state()`, `evolution()`, `operator()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

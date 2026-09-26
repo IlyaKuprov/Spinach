@@ -1,8 +1,6 @@
 # examples/dnp_liq/jdnp/fig_2_tau_and_field_traject.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/jdnp/fig_2_tau_and_field_traject.m`
 - Signature: `fig_2_tau_and_field_traject()`
-- Total lines: 104
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Time evolution plot for JDNP: proton polarisation as a function of time for spec
 - Get a figure going
 - Loop over the field grid
 - Set magnet field
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `system_specification()`, `kfigure()`, `scale_figure()`, `field_grid()`, `g2freq()`, `spin()`, `subplot()`, `ylim()`, `ktitle()`, `num2str()`, `kylabel()`, `kxlabel()`, `tau_c()`, `create()`, `basis()`, `operator()`.

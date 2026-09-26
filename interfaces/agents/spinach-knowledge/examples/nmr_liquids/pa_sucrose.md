@@ -1,8 +1,6 @@
 # examples/nmr_liquids/pa_sucrose.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/pa_sucrose.m`
 - Signature: `pa_sucrose()`
-- Total lines: 61
 
 ## Purpose
 
@@ -32,7 +30,3 @@
 - Sequence parameters
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

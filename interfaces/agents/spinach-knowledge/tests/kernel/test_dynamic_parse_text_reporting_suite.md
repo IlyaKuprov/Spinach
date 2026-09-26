@@ -1,8 +1,6 @@
 # tests/kernel/test_dynamic_parse_text_reporting_suite.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_dynamic_parse_text_reporting_suite.m`
 - Signature: `result=test_dynamic_parse_text_reporting_suite()`
-- Total lines: 97
 
 ## Purpose
 
@@ -10,11 +8,7 @@ Tests deterministic parsing, text, and safe reporting utilities. Syntax: result=
 
 ## Physical / mathematical content
 
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file also defines local helper function(s): `local_parse_spin_system()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Outputs
 
@@ -36,7 +30,3 @@ Tests deterministic parsing, text, and safe reporting utilities. Syntax: result=
 - Check product-operator parsing and Lx expansion coefficients
 - Check label lookup against a unique label list
 - Check electron and nucleus isotope predicates
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `local_parse_spin_system()`, `human2opspec()`, `test_true()`, `isequal()`, `test_close()`, `idxof()`, `isnucleus()`, `iselectron()`, `evalc()`, `report()`, `banner()`, `summary_coordinates()`, `polinfo()`, `polyadic()`, `speye()`.

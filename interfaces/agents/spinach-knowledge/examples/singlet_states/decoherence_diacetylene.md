@@ -1,8 +1,6 @@
 # examples/singlet_states/decoherence_diacetylene.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/singlet_states/decoherence_diacetylene.m`
 - Signature: `decoherence_diacetylene()`
-- Total lines: 67
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Long-lived spin states in the diacetylene molecule (2 protons, 4 carbons, 4096-d
 - Set relaxation theory parameters
 - Relaxation superoperator accuracy
 - Use complete basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `relaxation()`, `format()`, `speye()`, `singlet()`, `stateinfo()`.

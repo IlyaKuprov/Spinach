@@ -1,8 +1,6 @@
 # examples/fundamentals/quadratures/product_quadratures_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/quadratures/product_quadratures_1.m`
 - Signature: `product_quadratures_1()`
-- Total lines: 135
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Accuracy test for Lie-group product quadratures as a function of discretisation 
 - Assumptions
 - Hamiltonian superoperator
 - Control operator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `num2cell()`, `create()`, `basis()`, `assume()`, `hamiltonian()`, `operator()`, `state()`, `vg_pulse()`, `step()`, `amps()`, `kfigure()`, `scale_figure()`, `subplot()`, `kylabel()`, `kxlabel()`, `npi()`.

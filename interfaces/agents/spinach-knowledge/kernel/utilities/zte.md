@@ -1,8 +1,6 @@
 # kernel/utilities/zte.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/zte.m`
 - Signature: `projector=zte(spin_system,L,rho,nstates)`
-- Total lines: 174
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Zero track elimination function. Inspects the first few steps in the system traj
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -56,7 +52,3 @@ Zero track elimination function. Inspects the first few steps in the system traj
 - nstates most populated states are kept,
 - irrespective of the tolerance parameter
 - Output:
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `ismember()`, `report()`, `nnz()`, `cheap_norm()`, `isinf()`, `exist()`, `num2str()`, `trajectory()`, `step()`, `true()`, `zero_track_mask()`, `index()`, `false()`, `speye()`, `projector()`.

@@ -1,8 +1,6 @@
 # kernel/derivatives/fdkup.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/derivatives/fdkup.m`
 - Signature: `K=fdkup(npoints,extents,chi,nstenc)`
-- Total lines: 98
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Returns a finite difference representation of the Kuprov operator: K[rho]=-(1/3)
 ## Numerical / algorithmic content
 
 - Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -53,7 +49,3 @@ Returns a finite difference representation of the Kuprov operator: K[rho]=-(1/3)
 - acting on, in Angstroms. The dimensions are assu-
 - med to be ordered as [X Y Z].
 - chi - the electron magnetic susceptibility tensor in
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `fdmat()`, `npoints()`, `speye()`, `extents()`, `chi()`, `any()`.

@@ -1,8 +1,6 @@
 # examples/optimal_control/bloch_siegert/ramsey_shifts.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/bloch_siegert/ramsey_shifts.m`
 - Signature: `ramsey_shifts()`
-- Total lines: 107
 
 ## Purpose
 
@@ -17,7 +15,6 @@ Ramsey shifts of other spins under an off-resonant drive. A proton channel drive
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file also defines local helper function(s): `shift_phases()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -33,7 +30,3 @@ Ramsey shifts of other spins under an off-resonant drive. A proton channel drive
 - analytic formula, and the quadratic scaling of the shift in the
 - drive amplitude and its inverse scaling in the magnet field are
 - demonstrated.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `shift_phases()`, `num2str()`, `sign()`, `create()`, `basis()`, `state()`, `operator()`, `true()`, `optimcon()`, `ensemble()`, `bfrq()`, `gam()`.

@@ -1,8 +1,6 @@
 # experiments/nqr/nqr_pa.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/nqr/nqr_pa.m`
 - Signature: `spectrum=nqr_pa(spin_system,parameters,H,R,K)`
-- Total lines: 140
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Nuclear quadrupole resonance soft pulse-acquire experiment. Idealised ac- quisit
 - NQR experiment implementations. These pulse sequences work in quadrupolar-dominated regimes with little or no Zeeman interaction and focus on nutation, free evolution, and transition detection in electric-field-gradient frames.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -58,7 +53,3 @@ Nuclear quadrupole resonance soft pulse-acquire experiment. Idealised ac- quisit
 - parameters.Ly the RF Hamiltonian
 - parameters.rf_frq RF irradiation frequency, Hz
 - parameters.rf_pwr the multiplier (rad/s) in front
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `speye()`, `shaped_pulse_af()`, `slowpass()`, `ismatrix()`, `all()`, `isfield()`, `isrow()`, `isequal()`, `isscalar()`.

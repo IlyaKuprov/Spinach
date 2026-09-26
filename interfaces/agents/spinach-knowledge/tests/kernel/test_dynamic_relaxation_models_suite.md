@@ -1,8 +1,6 @@
 # tests/kernel/test_dynamic_relaxation_models_suite.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_dynamic_relaxation_models_suite.m`
 - Signature: `result=test_dynamic_relaxation_models_suite()`
-- Total lines: 160
 
 ## Purpose
 
@@ -10,7 +8,6 @@ Tests dynamic relaxation model helper paths. Syntax: result=test_dynamic_relaxat
 
 ## Physical / mathematical content
 
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
 
 ## Numerical / algorithmic content
@@ -37,7 +34,3 @@ Tests dynamic relaxation model helper paths. Syntax: result=test_dynamic_relaxat
 - Check non-selective damping in Liouville space
 - Check one-spin Lindblad relaxation rates
 - Check scalar Redfield integral against the closed zero-H0 reference
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `test_spin_system()`, `rlx_t1_t2()`, `state()`, `test_close()`, `relaxation()`, `unit_state()`, `rlx_scalar()`, `speye()`, `corrfun()`, `nnz()`, `test_true()`.

@@ -1,8 +1,6 @@
 # kernel/utilities/stitch.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/stitch.m`
 - Signature: `fid=stitch(spin_system,L,rho_stack,coil_stack,...`
-- Total lines: 200
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Stitching function for bidirectionally propagated 3D NMR pulse sequences. Propag
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -55,7 +51,3 @@ Stitching function for bidirectionally propagated 3D NMR pulse sequences. Propag
 - rho_stack -state vector stack from the forward part of
 - the simulation
 - coil_stack -coil vector stack from the backward part of
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `grumble()`, `propagator()`, `speye()`, `clean_up()`, `ismember()`, `gpuArray()`, `report()`, `num2str()`, `fid()`, `gather()`, `ismatrix()`, `isfield()`, `isscalar()`, `iscell()`, `all()`.

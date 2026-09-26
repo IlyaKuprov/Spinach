@@ -1,8 +1,6 @@
 # examples/nmr_proteins/hncaco_gb1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/hncaco_gb1.m`
 - Signature: `hncaco_gb1()`
-- Total lines: 83
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Simulated HNCACO spectrum of GB1 protein. It is assumed that only the backbone i
 - Sequence parameters
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `protein()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `plot_3d()`.

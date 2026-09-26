@@ -1,8 +1,6 @@
 # examples/optimal_control/state_transfer_pro.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/state_transfer_pro.m`
 - Signature: `state_transfer_pro()`
-- Total lines: 122
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Optimal control optimisation of a pulse performing magnetisa- tion transfer from
 - Spin system
 - Textbook chemical shifts, ppm
 - Scalar couplings, Hz (literature values)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `hamiltonian()`, `assume()`, `frqoffset()`, `optimcon()`, `guess()`, `fmaxnewton()`, `mat2cell()`, `report()`, `shaped_pulse_xy()`, `rho()`, `num2str()`.

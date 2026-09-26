@@ -1,8 +1,6 @@
 # examples/fundamentals/symmetry_3.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/symmetry_3.m`
 - Signature: `symmetry_3()`
-- Total lines: 57
 
 ## Purpose
 
@@ -29,7 +27,3 @@
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

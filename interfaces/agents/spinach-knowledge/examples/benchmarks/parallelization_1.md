@@ -1,8 +1,6 @@
 # examples/benchmarks/parallelization_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/benchmarks/parallelization_1.m`
 - Signature: `parallelization_1()`
-- Total lines: 67
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Parallelization test: multi-threaded evaluation of observables in Hilbert space 
 - Basis set
 - Spinach housekeeping
 - Assumptions
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `assume()`, `hamiltonian()`, `operator()`, `ncores()`, `feature()`, `delete()`, `gcp()`, `parpool()`, `pause()`, `evolution()`, `num2str()`.

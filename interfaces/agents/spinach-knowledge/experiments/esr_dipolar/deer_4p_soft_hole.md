@@ -1,8 +1,6 @@
 # experiments/esr_dipolar/deer_4p_soft_hole.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/esr_dipolar/deer_4p_soft_hole.m`
 - Signature: `fids=deer_4p_soft_hole(spin_system,parameters,H,R,K)`
-- Total lines: 200
 
 ## Purpose
 
@@ -20,8 +18,6 @@ Pulse diagnostics for the four-pulse DEER/PELDOR pulse sequen- ce. This function
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
 - A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -75,7 +71,3 @@ Pulse diagnostics for the four-pulse DEER/PELDOR pulse sequen- ce. This function
 - parameters.pulse_pwr -power levels for the four
 - pulses, rad/s
 - parameters.pulse_dur -durations for the four
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `sim2liouv()`, `grumble()`, `operator()`, `spin()`, `shaped_pulse_af()`, `step()`, `acquire()`, `ismatrix()`, `all()`, `ismember()`, `isfield()`, `isscalar()`, `any()`, `iscell()`, `ischar()`.

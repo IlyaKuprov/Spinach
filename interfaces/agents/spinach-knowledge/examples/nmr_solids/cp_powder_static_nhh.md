@@ -1,8 +1,6 @@
 # examples/nmr_solids/cp_powder_static_nhh.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/cp_powder_static_nhh.m`
 - Signature: `cp_powder_static_nhh()`
-- Total lines: 67
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Cross-polarisation experiment in the doubly rotating frame. A single nitrogen-15
 - Spinach housekeeping
 - Experiment parameters
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `operator()`, `state()`, `powder()`, `cumsum()`, `kfigure()`, `kylabel()`, `kxlabel()`.

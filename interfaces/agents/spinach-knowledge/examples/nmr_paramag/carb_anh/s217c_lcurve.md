@@ -1,8 +1,6 @@
 # examples/nmr_paramag/carb_anh/s217c_lcurve.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_paramag/carb_anh/s217c_lcurve.m`
 - Signature: `s217c_lcurve()`
-- Total lines: 57
 
 ## Purpose
 
@@ -29,7 +27,3 @@ L-curves for the S217C mutant dataset for human carbonic anhydrase II. The syste
 - Result arrays
 - Run a parallel loop
 - L-curve analysis
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `true()`, `err()`, `reg()`, `ipcs()`, `lam()`, `kfigure()`, `lcurve()`, `num2str()`.

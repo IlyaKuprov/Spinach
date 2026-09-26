@@ -1,8 +1,6 @@
 # examples/fundamentals/quadratures/expmint2_test.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/quadratures/expmint2_test.m`
 - Signature: `expmint2_test()`
-- Total lines: 48
 
 ## Purpose
 
@@ -29,7 +27,3 @@ Verification of expmint2 against numerical integration.
 - Outer integrand and its integral
 - Call Matlab integrator
 - Test the error norm
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `randi()`, `bootstrap()`, `expmint2()`, `integral()`, `int_inner()`, `int_outer()`, `eps()`.

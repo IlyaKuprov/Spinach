@@ -1,8 +1,6 @@
 # examples/nmr_solids/cp_contact_mas_nhh.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/cp_contact_mas_nhh.m`
 - Signature: `cp_contact_mas_nhh()`
-- Total lines: 77
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Cross-polarisation experiment in the doubly rotating frame. A single nitrogen-15
 - Spinach housekeeping
 - Relevant operators
 - MAS parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `operator()`, `state()`, `singlerot()`, `cumsum()`, `kfigure()`, `kylabel()`, `kxlabel()`.

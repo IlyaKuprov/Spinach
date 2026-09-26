@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/shrink.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/shrink.m`
 - Signature: `ttrain=shrink(ttrain)`
-- Total lines: 48
 
 ## Purpose
 
@@ -37,7 +35,3 @@ Approximates a given tensor train with lower TT-ranks. Syntax: ttrain=shrink(ttr
 - Truncation
 - Convert to a scalar if appropriate
 - It's a tough life, being small and delicious.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `pack()`, `ttort()`, `unit_like()`, `truncate()`, `all()`, `cellfun()`.

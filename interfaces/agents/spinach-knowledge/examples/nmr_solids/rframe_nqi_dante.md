@@ -1,8 +1,6 @@
 # examples/nmr_solids/rframe_nqi_dante.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/rframe_nqi_dante.m`
 - Signature: `rframe_nqi_dante()`
-- Total lines: 65
 
 ## Purpose
 
@@ -33,7 +31,3 @@ DANTE MAS spectrum of a single quadrupolar 14N nucleus using 1D Fokker-Planck eq
 - Experiment setup
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

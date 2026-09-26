@@ -1,8 +1,6 @@
 # examples/nmr_solids/mas_powder_suc_fplanck.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/mas_powder_suc_fplanck.m`
 - Signature: `mas_powder_suc_fplanck()`
-- Total lines: 58
 
 ## Purpose
 
@@ -32,7 +30,3 @@
 - Experiment setup
 - % Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

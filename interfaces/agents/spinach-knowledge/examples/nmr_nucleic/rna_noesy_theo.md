@@ -1,8 +1,6 @@
 # examples/nmr_nucleic/rna_noesy_theo.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_nucleic/rna_noesy_theo.m`
 - Signature: `rna_noesy_theo()`
-- Total lines: 84
 
 ## Purpose
 
@@ -34,7 +32,3 @@
 - Magnet field
 - Tolerances
 - Relaxation theory
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `nuclacid()`, `create()`, `kill_spin()`, `strcmp()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

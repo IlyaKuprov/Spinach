@@ -1,8 +1,6 @@
 # examples/nmr_solids/case_studies/mathies_carbonate/cp_mas_powder_mhc_fplanck_exchange.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/case_studies/mathies_carbonate/cp_mas_powder_mhc_fplanck_exchange.m`
 - Signature: `cp_mas_powder_mhc_fplanck_exchange()`
-- Total lines: 115
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Cross-polarisation contact curve under magic angle spinning in the presence of c
 - Convert shielding tensors into shift using the
 - parametrisation of Huang et al. ACIE 2021
 - Cartesian coordinates
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `c2spinach()`, `ismember()`, `exch_rates()`, `create()`, `basis()`, `state()`, `contact_curves()`, `singlerot()`, `kfigure()`, `kxlabel()`, `kylabel()`.

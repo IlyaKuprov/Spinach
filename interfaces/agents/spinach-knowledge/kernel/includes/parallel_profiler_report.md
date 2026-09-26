@@ -1,8 +1,6 @@
 # kernel/includes/parallel_profiler_report.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/includes/parallel_profiler_report.m`
 - Signature: `(script file)`
-- Total lines: 44
 
 ## Purpose
 
@@ -30,7 +28,3 @@ An include that writes the report of the profiling infrastructure around paralle
 - But they were fucked up in their turn
 - By fools in old-style hats and coats,
 - Who half the time were soppy-stern
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `tocBytes()`, `toc()`, `report()`, `num2str()`, `nbytes()`, `ismember()`, `datestr()`, `save()`.

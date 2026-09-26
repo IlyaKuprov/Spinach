@@ -1,8 +1,6 @@
 # examples/microfluidics/show_mesh.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/microfluidics/show_mesh.m`
 - Signature: `show_mesh()`
-- Total lines: 34
 
 ## Purpose
 
@@ -23,7 +21,3 @@ Import, Voronoi tessellation, and plotting of the hydrodynamic mesh and velocity
 - Import hydrodynamics information
 - No spin system here
 - Draw the mesh
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `comsol_import()`, `bootstrap()`, `kfigure()`, `mesh_plot()`, `xlim()`, `ylim()`, `klegend()`.

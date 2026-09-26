@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/mldivide.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/mldivide.m`
 - Signature: `x=mldivide(A,y)`
-- Total lines: 50
 
 ## Purpose
 
@@ -39,7 +37,3 @@ Solves a linear system with tensor train objects. Syntax: x=mldivide(A,y)
 - Solve it with AMEn algorithm
 - Complain and bomb out
 - The penalty for success is to be bored by the people
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `shrink()`, `amensolve()`.

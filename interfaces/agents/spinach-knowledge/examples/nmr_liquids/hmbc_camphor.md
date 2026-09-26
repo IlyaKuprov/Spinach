@@ -1,8 +1,6 @@
 # examples/nmr_liquids/hmbc_camphor.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/hmbc_camphor.m`
 - Signature: `hmbc_camphor()`
-- Total lines: 74
 
 ## Purpose
 
@@ -31,7 +29,3 @@ HMBC spectrum of camphor with natural content of 13C isotope. Coordinates, shiel
 - Create the spin system structure
 - Generate isotopomers
 - Preallocate the answer
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `dilute()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `fft2()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

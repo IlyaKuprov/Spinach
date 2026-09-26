@@ -1,8 +1,6 @@
 # experiments/pulsed_field.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/pulsed_field.m`
 - Signature: `answer=pulsed_field(spin_system,parameters,H,R,K) %#ok<INUSD>`
-- Total lines: 225
 
 ## Purpose
 
@@ -10,13 +8,10 @@ Magnetisation dynamics under a time-dependent magnetic field along the Z axis of
 
 ## Physical / mathematical content
 
-- This file belongs to the `experiments` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
 
 - An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
+- On each field stair, the anonymous Hilbert-space dissipator is rebuilt using the dressed operator returned by `rlx_phonon(...,'hilb')` for the diagonal stair Hamiltonian and the coupling operator in that eigenbasis.
 
 ## Parameters / inputs
 
@@ -90,7 +85,3 @@ Magnetisation dynamics under a time-dependent magnetic field along the Z axis of
 - dissipator times the stair width must be small; the coherent part
 - is treated exactly for any stair width. The dissipator is applied
 - as Hilbert space matrix products (see rlx_phonon.m), so the cost
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines in the main body: `grumble()`, `rlx_phonon()`, `report()`, `eig()`, `diag()`, `trace()`, `num2str()`. The dissipator is applied through the anonymous function `dissip`, rebuilt on every stair from the dressed operator that `rlx_phonon` returns in the `'hilb'` form for the diagonal matrix of the stair eigenvalues and the coupling operator in that eigenbasis.

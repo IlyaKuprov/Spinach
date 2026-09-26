@@ -1,8 +1,6 @@
 # examples/relaxation_theory/from_md/rwalk_plot.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/from_md/rwalk_plot.m`
 - Signature: `rwalk_plot()`
-- Total lines: 33
 
 ## Purpose
 
@@ -23,7 +21,3 @@ A plot of a typical random walk on a sphere.
 - Trajectory preallocation
 - Trajectory
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `rng()`, `rwalk()`, `traj()`, `euler2dcm()`, `eulers()`, `plot3()`, `xlim()`, `ylim()`, `zlim()`.

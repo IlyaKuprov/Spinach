@@ -1,8 +1,6 @@
 # examples/fundamentals/convention_tests/tensors.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/convention_tests/tensors.m`
 - Signature: `tensors()`
-- Total lines: 45
 
 ## Purpose
 
@@ -23,7 +21,3 @@ Test the conversion from Stevens operator coefficients to irreducible spherical 
 - Build the linear combination
 - Translate the coefficients into ISTs
 - Subtract the matrices and check the norm
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `stevens()`, `stev2sph()`, `irr_sph_ten()`.

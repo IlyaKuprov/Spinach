@@ -1,8 +1,6 @@
 # kernel/utilities/human2opspec.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/human2opspec.m`
 - Signature: `[opspecs,coeffs]=human2opspec(spin_system,operators,spins)`
-- Total lines: 374
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Converts user-friendly descriptions of spin states and operators into the formal
 - The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `numel()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -66,7 +61,3 @@ Converts user-friendly descriptions of spin states and operators into the formal
 - 'L-', 'Tl,m' (irreducible spherical tensor, l and m are integers), 'CTx',
 - 'CTy', 'CTz', 'CT+','CT-' (central transition operators in the Zeeman ba-
 - sis). Valid labels for spins are standard isotope names, as well as 'elec-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `ischar()`, `cellfun()`, `strncmp()`, `strcmp()`, `spin_numbers()`, `vertcat()`, `cell2mat()`, `spins()`, `iscell()`, `opspecs()`, `opspecs_a()`, `opspecs_b()`, `ct2ist()`, `regexp()`, `textscan()`.

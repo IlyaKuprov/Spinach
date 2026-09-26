@@ -1,8 +1,6 @@
 # examples/nmr_paramag/calbindin/tm_1igv_distr_fit.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_paramag/calbindin/tm_1igv_distr_fit.m`
 - Signature: `tm_1igv_distr_fit()`
-- Total lines: 48
 
 ## Purpose
 
@@ -25,7 +23,3 @@ Inverse problem for the unpaired electron density distribution. Experimental dat
 - Inverse solver parameters
 - Iteratively refine the grid
 - Get the new susceptibility tensor
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `pdbread()`, `load()`, `true()`, `ipcs()`, `chi_eff()`, `save()`.

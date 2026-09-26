@@ -1,8 +1,6 @@
 # kernel/utilities/tikhonov.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/tikhonov.m`
 - Signature: `[x,err,reg]=tikhonov(K,D,KtK,DtD,H,y,lambda)`
-- Total lines: 119
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Tikhonov regularised solution to K*x=y with a positivity const- raint on x using
 
 - Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
 - The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `lsq_err()`, `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -59,7 +55,3 @@ Tikhonov regularised solution to K*x=y with a positivity const- raint on x using
 - H -Tikhonov Hessian 2*real(KtK+lambda*DtD), for re-
 - peated calls it may be faster to precompute this
 - quantity, leave empty otherwise
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `fdmat()`, `lsq_err()`, `optimoptions()`, `inf()`, `fmincon()`, `isscalar()`.

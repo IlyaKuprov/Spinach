@@ -1,8 +1,6 @@
 # examples/fundamentals/pfg_test_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/pfg_test_2.m`
 - Signature: `pfg_test_2()`
-- Total lines: 86
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Demonstrate the use of the auxiliary matrix algorithm in generating a gradient s
 - Build initial state vector
 - Determine projection quantum numbers of the basis
 - Determine the coherence order of each state
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `assume()`, `hamiltonian()`, `operator()`, `propagator()`, `rho()`, `lin2lm()`, `weighting()`, `durations_temp()`, `time_axis()`, `rho_stack()`, `grad_sandw()`, `kfigure()`, `trajan()`, `set()`.

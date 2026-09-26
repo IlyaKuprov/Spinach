@@ -1,8 +1,6 @@
 # kernel/utilities/kill_spin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/kill_spin.m`
 - Signature: `spin_system=kill_spin(spin_system,hit_list)`
-- Total lines: 194
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Removes the specified spins from the spin_system structure and updates it accord
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -47,7 +42,3 @@ Removes the specified spins from the spin_system structure and updates it accord
 - mation (basis, assumptions) removed
 - is destroyed by this function; you would need to call the
 - basis.m and assume.m functions again.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `islogical()`, `report()`, `num2str()`, `isfield()`, `md5_hash()`, `srsk_spins()`, `false()`, `subsystem_idx()`, `true()`, `reacting_spins()`, `rmfield()`, `any()`.

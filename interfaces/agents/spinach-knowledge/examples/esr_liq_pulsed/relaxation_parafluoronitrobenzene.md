@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/relaxation_parafluoronitrobenzene.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/relaxation_parafluoronitrobenzene.m`
 - Signature: `relaxation_parafluoronitrobenzene()`
-- Total lines: 85
 
 ## Purpose
 
@@ -32,7 +30,3 @@ A pulse-acquire FFT version of the EasySpin parafluoronitrobenzene test file, wi
 - Spin-spin couplings
 - Relaxation superoperator
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

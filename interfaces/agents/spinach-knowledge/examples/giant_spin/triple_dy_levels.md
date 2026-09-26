@@ -1,8 +1,6 @@
 # examples/giant_spin/triple_dy_levels.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/triple_dy_levels.m`
 - Signature: `triple_dy_levels()`
-- Total lines: 124
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Eight lowest energy levels as a function of the applied magnetic fi- eld in a tr
 - g-tensor eigenvectors
 - g-tensor matrix
 - Triangle arrangement
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `euler2dcm()`, `icm2hz()`, `dcm2euler()`, `wigner()`, `stev2sph()`, `create()`, `basis()`, `fieldscan_enlev()`.

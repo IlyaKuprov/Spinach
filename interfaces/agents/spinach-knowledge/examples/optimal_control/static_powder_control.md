@@ -1,8 +1,6 @@
 # examples/optimal_control/static_powder_control.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/static_powder_control.m`
 - Signature: `static_powder_control()`
-- Total lines: 138
 
 ## Purpose
 
@@ -35,7 +33,3 @@ Optimal control optimisation for a pulse that is designed to set deuterium magne
 - it yields a sophisticated kind of spin echo.
 - Calculation time: minutes
 - 600 MHz magnet
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `anas2mat()`, `create()`, `basis()`, `drifts()`, `state()`, `operator()`, `optimcon()`, `fmaxnewton()`, `pulse_profile()`, `shaped_pulse_xy()`, `evolution()`, `kfigure()`, `subplot()`, `kxlabel()`, `xlim()`, `fid_optim()`.

@@ -1,8 +1,6 @@
 # experiments/pseudocon/multipack.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/pseudocon/multipack.m`
 - Signature: `Ilm=multipack(ranks,moments)`
-- Total lines: 66
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Packs multipole moments from a linear stream into a cell array that is arranged 
 - Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -46,7 +41,3 @@ Packs multipole moments from a linear stream into a cell array that is arranged 
 - for L=1, three elements
 - for L=2, five elements
 - et cetera.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `moments()`, `ranks()`, `isrow()`, `any()`.

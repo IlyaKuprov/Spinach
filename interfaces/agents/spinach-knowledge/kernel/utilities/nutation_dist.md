@@ -1,8 +1,6 @@
 # kernel/utilities/nutation_dist.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/nutation_dist.m`
 - Signature: `[freq,distr]=nutation_dist(curve,dt,lambda)`
-- Total lines: 225
 
 ## Purpose
 
@@ -19,8 +17,6 @@ Nutation frequency distribution from a nutation curve measured with the same coi
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
 - The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `fit_nutation()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -75,7 +71,3 @@ Nutation frequency distribution from a nutation curve measured with the same coi
 - normalised to unit maximum modulus and the fit-
 - ting kernel is dimensionless, so lambda is a di-
 - mensionless number of the order of the ratio of
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `curve()`, `signal()`, `median()`, `conj()`, `nextpow2()`, `fftshift()`, `freq_axis()`, `spectrum()`, `selected_freq()`, `active()`, `spdiags()`, `optimset()`, `shift_grid()`, `fit_nutation()`, `trapz()`.

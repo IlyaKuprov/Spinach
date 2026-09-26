@@ -1,8 +1,6 @@
 # examples/fundamentals/state_spaces_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/state_spaces_1.m`
 - Signature: `state_spaces_1()`
-- Total lines: 60
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Correlation order dynamics in a pulse-acquire experiment on strychnine. Set to r
 - Relaxation theory parameters
 - Spinach housekeeping
 - Initial condition
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strychnine()`, `create()`, `basis()`, `state()`, `assume()`, `hamiltonian()`, `relaxation()`, `evolution()`, `kfigure()`, `trajan()`, `set()`.

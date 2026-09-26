@@ -1,8 +1,6 @@
 # examples/dnp_liq/jdnp/fig_3_time_dep_bot_row.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_liq/jdnp/fig_3_time_dep_bot_row.m`
 - Signature: `fig_3_time_dep_bot_row()`
-- Total lines: 86
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Time evolution plot for JDNP: proton polarisation as a function of time for spec
 - Get a figure going
 - Loop over the fields
 - Set magnet field
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `system_specification()`, `kfigure()`, `scale_figure()`, `field_grid()`, `g2freq()`, `spin()`, `create()`, `basis()`, `operator()`, `equilibrium()`, `hamiltonian()`, `assume()`, `relaxation()`, `state()`, `evolution()`, `subplot()`.

@@ -1,8 +1,6 @@
 # examples/fundamentals/convention_tests/rotations_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/convention_tests/rotations_1.m`
 - Signature: `rotations_1()`
-- Total lines: 129
 
 ## Purpose
 
@@ -28,7 +26,3 @@ Tests the internal consistency of kernel rotation functions.
 - Transform the DCM back into Euler angles
 - % Test 3: euler2dcm, wigner, dcm2wigner
 - Transforms Euler angles into DCM, then DCM to Wigner matrix
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `mat2sphten()`, `euler2dcm()`, `wigner()`, `eulers()`, `dcm2euler()`, `dcm2wigner()`, `sphten2mat()`, `qter2dcm()`, `dcm2qter()`, `qter2anax()`, `anax2qter()`, `anax2dcm()`.

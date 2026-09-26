@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/endor_phenyl.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/endor_phenyl.m`
 - Signature: `endor_phenyl()`
-- Total lines: 69
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Mims ENDOR on a phenyl radical in liquid state. The g-factor and the isotropic p
 - Electron and the five ring protons (two ortho, two meta, one para)
 - Phenyl radical isotropic g-factor
 - Isotropic proton hyperfine couplings, converted from milliTesla
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `mt2hz()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

@@ -1,8 +1,6 @@
 # examples/nmr_overtone/dante_glycine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_overtone/dante_glycine.m`
 - Signature: `dante_glycine()`
-- Total lines: 73
 
 ## Purpose
 
@@ -33,7 +31,3 @@
 - Magic angle
 - Spectrum setup
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `atan()`, `state()`, `operator()`, `singlerot()`, `kfigure()`, `plot_1d()`.

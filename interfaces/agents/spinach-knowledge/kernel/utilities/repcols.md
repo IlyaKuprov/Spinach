@@ -1,8 +1,6 @@
 # kernel/utilities/repcols.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/repcols.m`
 - Signature: `B=repcols(A,col_nums,rep_counts)`
-- Total lines: 66
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Replicates specified columns of a matrix or cell array a specified number of tim
 - General mathematical and infrastructure utilities. This area contains finite differences, perturbation theory, graph algorithms, spectral densities, tensor algebra, hash/report helpers, and other reusable numerical components.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -40,7 +35,3 @@ Replicates specified columns of a matrix or cell array a specified number of tim
 - Check consistency
 - Replication counts for every column
 - Build column index vector
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `rep_map()`, `rep_counts()`, `repelem()`, `iscell()`, `isvector()`, `any()`.

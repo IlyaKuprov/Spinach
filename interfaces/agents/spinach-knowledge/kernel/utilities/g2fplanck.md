@@ -1,8 +1,6 @@
 # kernel/utilities/g2fplanck.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/g2fplanck.m`
 - Signature: `G=g2fplanck(spin_system,parameters)`
-- Total lines: 146
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Returns gradient operators within the Fokker-Planck formalism used in the imagin
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -55,7 +51,3 @@ Returns gradient operators within the Fokker-Planck formalism used in the imagin
 - G -a cell array with the three gradient operators
 - ordered as {Gx,Gy,Gz}, normalised to 1 T/m, empty
 - matrices for non-exitent dimensions
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `hamiltonian()`, `assume()`, `spdiags()`, `polyadic()`, `opium()`, `isfield()`, `euler2dcm()`, `any()`.

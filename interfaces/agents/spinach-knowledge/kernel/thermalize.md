@@ -1,8 +1,6 @@
 # kernel/thermalize.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/thermalize.m`
 - Signature: `R=thermalize(spin_system,R,HLSPS,T,rho_eq,method)`
-- Total lines: 141
 
 ## Purpose
 
@@ -10,13 +8,9 @@ Modifies the relaxation superoperator to drive the system to the user- specified
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -58,7 +52,3 @@ Modifies the relaxation superoperator to drive the system to the user- specified
 - HLSPS -lab frame Hamiltonian left side product super-
 - operator, available from hamiltonian.m (also
 - call orientation.m if necessary); this is not
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `speye()`, `propagator()`, `unit_state()`, `ischar()`, `ismember()`, `strcmp()`, `iscolumn()`, `isscalar()`.

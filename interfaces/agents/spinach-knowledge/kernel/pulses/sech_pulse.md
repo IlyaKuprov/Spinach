@@ -1,8 +1,6 @@
 # kernel/pulses/sech_pulse.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/pulses/sech_pulse.m`
 - Signature: `[Cx,Cy,time_grid,amps,phis]=...`
-- Total lines: 93
 
 ## Purpose
 
@@ -13,8 +11,6 @@ Hyperbolic secant pulse in Cartesian and amplitude-phase representation. Syntax:
 - Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
 
 ## Parameters / inputs
 
@@ -54,7 +50,3 @@ Hyperbolic secant pulse in Cartesian and amplitude-phase representation. Syntax:
 - Cx -a vector of coefficients in front of Sx
 - spin operator at each time slice, rad/s
 - Cy -a vector of coefficients in front of Sy
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `sech_pulse()`, `grumble()`, `sech()`, `cosh()`, `polar2cartesian()`, `isscalar()`.

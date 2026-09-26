@@ -1,8 +1,6 @@
 # kernel/utilities/tikhoind.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/tikhoind.m`
 - Signature: `[x,err,reg]=tikhoind(K,D,y,lam)`
-- Total lines: 66
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Analytical Tikhonov regularised solution to K*x=y without any constraints (sign-
 ## Numerical / algorithmic content
 
 - The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -49,7 +45,3 @@ Analytical Tikhonov regularised solution to K*x=y without any constraints (sign-
 - err -error signal norm(K*x-y,2)^2
 - reg -regularisation signal norm(D*x,2)^2
 - Note: for best numerical performance, scale K to have approxima-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `isscalar()`.

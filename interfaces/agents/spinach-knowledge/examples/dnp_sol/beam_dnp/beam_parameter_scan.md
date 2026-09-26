@@ -1,8 +1,6 @@
 # examples/dnp_sol/beam_dnp/beam_parameter_scan.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/beam_dnp/beam_parameter_scan.m`
 - Signature: `beam_parameter_scan()`
-- Total lines: 99
 
 ## Purpose
 
@@ -30,7 +28,3 @@
 - Basis set
 - Spinach housekeeping
 - Detection state
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `kfigure()`, `offsets()`, `nutfrqs()`, `powder()`, `dnp_surf()`, `contact_curve()`, `contourf()`, `kylabel()`, `kxlabel()`, `kcolourbar()`.

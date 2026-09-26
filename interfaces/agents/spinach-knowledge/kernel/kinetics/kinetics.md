@@ -1,8 +1,6 @@
 # kernel/kinetics/kinetics.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/kinetics/kinetics.m`
 - Signature: `K=kinetics(spin_system)`
-- Total lines: 249
 
 ## Purpose
 
@@ -10,7 +8,6 @@ Chemical kinetics superoperator. Syntax: K=kinetics(spin_system)
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
 
 ## Numerical / algorithmic content
@@ -52,7 +49,3 @@ Chemical kinetics superoperator. Syntax: K=kinetics(spin_system)
 - assembled manually, this dissipative super-
 - operator must enter as 1i*K, for example
 - L=H+1i*R+1i*K
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `mprealloc()`, `strcmp()`, `sources()`, `destins()`, `logical()`, `isequal()`, `rates()`, `report()`, `source_spins()`, `destin_spins()`, `xor()`, `flux_rate()`, `ismember()`, `unit_oper()`, `operator()`, `num2cell()`.

@@ -1,8 +1,6 @@
 # examples/fundamentals/roof_effect.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/roof_effect.m`
 - Signature: `roof_effect()`
-- Total lines: 67
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Roof effect in a strongly J-coupled two-spin system.
 - Loop over line positions
 - Update the Zeeman frequencies
 - Run the simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `kfigure()`, `scale_figure()`, `spin()`, `liquid()`, `apodisation()`, `fftshift()`, `subplot()`, `plot_1d()`, `kylabel()`.

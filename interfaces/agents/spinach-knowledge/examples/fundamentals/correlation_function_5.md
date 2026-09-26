@@ -1,8 +1,6 @@
 # examples/fundamentals/correlation_function_5.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/correlation_function_5.m`
 - Signature: `correlation_function_5()`
-- Total lines: 50
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Computes the following rotational correlation function G(k,m,p,q)=<R(k,m)*R(p,q)
 - Loop over Monte-Carlo steps
 - Generate a random rotation
 - Get Monte-Carlo correlation function
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `angles()`, `xcorr()`, `squeeze()`, `ifftshift()`, `kfigure()`, `lags()`, `cf_mc()`, `xlim()`, `kxlabel()`, `kylabel()`, `klegend()`.

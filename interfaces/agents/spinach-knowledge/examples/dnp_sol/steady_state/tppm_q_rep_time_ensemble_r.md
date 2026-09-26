@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/tppm_q_rep_time_ensemble_r.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/tppm_q_rep_time_ensemble_r.m`
 - Signature: `tppm_q_rep_time_ensemble_r()`
-- Total lines: 108
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simulation of TPPM DNP repetition time scan in the steady state with distributio
 - Algorithmic options
 - Distance ensemble
 - Log spacing for rep. time
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `gaussleg()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `rep_time()`, `dnp()`, `powder()`, `kfigure()`, `kylabel()`, `kxlabel()`, `savefig()`.

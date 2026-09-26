@@ -1,8 +1,6 @@
 # interfaces/pdb_bmrb/read_pdb_pro.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/pdb_bmrb/read_pdb_pro.m`
 - Signature: `[aa_num,aa_typ,pdb_id,coords,pdb_ser]=read_pdb_pro(pdb_file_name,mod_id)`
-- Total lines: 113
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Reads the a PDB file and returns amino acid numbers, amino acid types, PDB atom 
 - PDB/BMRB interfaces. These files bridge biomolecular structure/assignment data and Spinach input structures, including atom selection, coordinates, and chemical-shift metadata.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -52,7 +47,3 @@ Reads the a PDB file and returns amino acid numbers, amino acid types, PDB atom 
 - the PDB identifier of the amino acid to
 - which each spin belongs (e.g. 'TYR')
 - pdb_id -nspins x 1 cell array of strings giving
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `fopen()`, `feof()`, `textscan()`, `fgetl()`, `num2str()`, `strcmp()`, `data_line()`, `all()`, `cellfun()`, `aa_num()`, `upper()`, `fclose()`, `ischar()`, `isscalar()`.

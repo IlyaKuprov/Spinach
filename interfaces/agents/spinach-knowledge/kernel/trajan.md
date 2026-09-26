@@ -1,8 +1,6 @@
 # kernel/trajan.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/trajan.m`
 - Signature: `trajan(spin_system,traj,property,time_axis)`
-- Total lines: 347
 
 ## Purpose
 
@@ -10,12 +8,7 @@ Trajectory analysis function. Plots the time dependence of the densi- ty matrix 
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
-
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -70,7 +63,3 @@ Trajectory analysis function. Plots the time dependence of the densi- ty matrix 
 - one-spin, two-spin, three-spin, etc. corre-
 - lations in the system.
 - if set to 'coherence_order', returns the ti-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `exist()`, `grumble()`, `strcmp()`, `unit_state()`, `logical()`, `setdiff()`, `unique_correlation_orders()`, `traj()`, `result()`, `conj()`, `num2str()`, `lin2lm()`, `unique_coherence_orders()`, `sphten2zeeman()`, `kxlabel()`, `hsv2rgb()`.

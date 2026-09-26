@@ -1,8 +1,6 @@
 # experiments/imaging/epi_2d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/imaging/epi_2d.m`
 - Signature: `mri=epi_2d(spin_system,parameters,H,R,K,G,F)`
-- Total lines: 224
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Diffusion weighted echo planar 2D imaging pulse sequence with variable diffusion
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Outputs
 
@@ -37,7 +33,3 @@ Diffusion weighted echo planar 2D imaging pulse sequence with variable diffusion
 - parameters.image_size -number of points in each dimension
 - of the resulting image
 - parameters.diff_g_amp -[optional] a vector of diffusion
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `operator()`, `speye()`, `step()`, `isfield()`, `evolution()`, `propagator()`, `fid()`, `apodisation()`, `fftshift()`, `fft2()`, `ifftshift()`, `ismember()`, `ismatrix()`, `all()`, `iscell()`.

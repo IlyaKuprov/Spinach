@@ -1,8 +1,6 @@
 # examples/nmr_zerofield/earth_field_dfp.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_zerofield/earth_field_dfp.m`
 - Signature: `earth_field_dfp()`
-- Total lines: 102
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Earth's field NMR Simulation for 2,6-difluoropyridine; replicates simulated spec
 - Relaxation theory
 - Sequence parameters
 - This needs a GPU
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `spin()`, `idxof()`, `kfigure()`, `scale_figure()`, `R_14N()`, `create()`, `basis()`, `liquid()`, `fftshift()`, `sweep2ticks()`, `xlim()`, `kxlabel()`, `set()`.

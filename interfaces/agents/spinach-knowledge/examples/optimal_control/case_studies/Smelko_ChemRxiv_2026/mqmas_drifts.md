@@ -1,8 +1,6 @@
 # examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_drifts.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_drifts.m`
 - Signature: `drifts=mqmas_drifts(spin_system,parameters)`
-- Total lines: 193
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Drift Hamiltonians of a quadrupolar nucleus under magic angle spinning, resolved
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -59,7 +55,3 @@ Drift Hamiltonians of a quadrupolar nucleus under magic angle spinning, resolved
 - vector with three elements
 - parameters.grid -two-angle powder grid name; the grid
 - must have uniform weights because the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `hamiltonian()`, `carrier()`, `load()`, `any()`, `cart2sph()`, `wigner()`, `rotframe()`, `isfield()`, `iscell()`, `ischar()`, `ismember()`, `isrow()`.

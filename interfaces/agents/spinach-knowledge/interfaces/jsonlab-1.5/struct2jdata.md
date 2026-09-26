@@ -1,8 +1,6 @@
 # interfaces/jsonlab-1.5/struct2jdata.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/interfaces/jsonlab-1.5/struct2jdata.m`
 - Signature: `newdata=struct2jdata(data,varargin)`
-- Total lines: 96
 
 ## Purpose
 
@@ -28,7 +26,3 @@ No descriptive header was found. The best immediate identifier is `newdata=struc
 - "_ArrayIsSparse_", "_ArrayIsComplex_"
 - opt: (optional) a list of 'Param',value pairs for additional options
 - The supported options include
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `fieldnames()`, `jsonopt()`, `isstruct()`, `getfield()`, `data()`, `newdata()`, `setfield()`, `jstruct2array()`, `strmatch()`, `cast()`, `double()`, `any()`, `ndata()`, `complex()`, `dim()`, `elseif()`.

@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/hard_3_pulse_deer_cu.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/hard_3_pulse_deer_cu.m`
 - Signature: `hard_3_pulse_deer_cu()`
-- Total lines: 72
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Three-pulse DEER on a Cu(II)-NO two electron system at X-band. The numerical cal
 - Disable trajectory level SSR algorithms
 - Spinach housekeeping
 - Sequence parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `operator()`, `powder()`, `xyz2dd()`, `deer_analyt()`, `kfigure()`, `subplot()`, `kxlabel()`, `ktitle()`.

@@ -1,8 +1,6 @@
 # examples/nmr_solids/wise_mas_gly.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/wise_mas_gly.m`
 - Signature: `wise_mas_gly()`
-- Total lines: 82
 
 ## Purpose
 
@@ -31,7 +29,3 @@ WISE of alpha-glycine powder under MAS. Calculation time: hours, much faster on 
 - Experiment setup
 - Detection state
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `shift_iso()`, `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `stack_2d()`.

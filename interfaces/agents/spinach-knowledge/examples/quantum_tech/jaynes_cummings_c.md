@@ -1,8 +1,6 @@
 # examples/quantum_tech/jaynes_cummings_c.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/jaynes_cummings_c.m`
 - Signature: `jaynes_cummings_c()`
-- Total lines: 74
 
 ## Purpose
 
@@ -31,7 +29,3 @@ An exchange-coupled two-electron system with the electrons having independent Ja
 - Exchange coupling between the electrons
 - Cavity resonant with the electrons
 - Basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `spin()`, `create()`, `basis()`, `state()`, `device()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`, `ktitle()`.

@@ -1,8 +1,6 @@
 # kernel/pulses/shaped_pulse_xy.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/pulses/shaped_pulse_xy.m`
 - Signature: `[rho,traj,P]=shaped_pulse_xy(spin_system,drift,controls,...`
-- Total lines: 409
 
 ## Purpose
 
@@ -20,8 +18,6 @@ Shaped pulse function using Cartesian coordinates. Applies a user- specified pul
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -75,7 +71,3 @@ Shaped pulse function using Cartesian coordinates. Applies a user- specified pul
 - channel, this may include operators for spatial degrees
 - of freedom, such as gradients and diffusion.
 - amplitudes -a cell array of control amplitude vectors in rad/s, one
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `tic()`, `speye()`, `ismember()`, `gpuArray()`, `method()`, `step()`, `slice_durs()`, `clean_up()`, `toc()`, `report()`, `num2str()`, `isergen()`, `propagator()`, `evolution()`, `gather()`.

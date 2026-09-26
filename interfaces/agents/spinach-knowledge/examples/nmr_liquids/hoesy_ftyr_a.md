@@ -1,8 +1,6 @@
 # examples/nmr_liquids/hoesy_ftyr_a.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/hoesy_ftyr_a.m`
 - Signature: `hoesy_ftyr_a()`
-- Total lines: 75
 
 ## Purpose
 
@@ -32,7 +30,3 @@
 - Algorithmic options
 - Spinach housekeeping
 - Sequence parameters
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

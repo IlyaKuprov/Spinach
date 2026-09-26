@@ -1,8 +1,6 @@
 # examples/esr_liq_pulsed/data_import/orca_import_example.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_liq_pulsed/data_import/orca_import_example.m`
 - Signature: `orca_import_example()`
-- Total lines: 65
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Methyl radical simulation, ORCA import. The uncommon signal intensity pattern co
 - Spinach housekeeping
 - Sequence parameters
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `oparse()`, `gauss2mhz()`, `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

@@ -1,8 +1,6 @@
 # examples/esr_sol_swept/fieldsweep_gd_dota.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_swept/fieldsweep_gd_dota.m`
 - Signature: `fieldsweep_gd_dota()`
-- Total lines: 52
 
 ## Purpose
 
@@ -29,7 +27,3 @@ Powder averaged W-band field-swept ESR spectrum of Gd(III) DOTA complex. Exact d
 - Experiment parameters
 - Run the simulation in the high-T approximation
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `fieldsweep()`, `kfigure()`, `kxlabel()`, `kylabel()`.

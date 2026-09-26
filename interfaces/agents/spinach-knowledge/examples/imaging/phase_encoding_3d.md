@@ -1,8 +1,6 @@
 # examples/imaging/phase_encoding_3d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/phase_encoding_3d.m`
 - Signature: `phase_encoding_3d()`
-- Total lines: 123
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Slice selection in 3D followed by phase-encoded imaging of the resulting slice. 
 - Basis set
 - Spinach housekeeping
 - Gat phantom from library
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `phantoms()`, `rlx_t1_t2()`, `state()`, `pulse_shape()`, `kfigure()`, `dims()`, `volplot()`, `ktitle()`, `imaging()`, `scale_figure()`, `subplot()`, `mri_2d_plot()`, `apodisation()`, `fftshift()`.

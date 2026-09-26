@@ -10,7 +10,9 @@
 %     L   -  Liouvillian matrix
 %
 %     rho -  initial state (source state screening) or
-%            destination state (destination state screening)
+%            destination state (destination state screening);
+%            wavefunctions and Liouville states may be columns
+%            of a horizontal stack
 %
 % Outputs:
 %
@@ -126,9 +128,6 @@ switch spin_system.bas.formalism
         
     case 'zeeman-wavef'
 
-        % If a stack is supplied, choose a representative wavefunction
-        if size(rho,2)>1, rho=mean(abs(rho),2); end
-
         % Run symmetry factorization
         if ismember('symmetry',spin_system.sys.disable)
 
@@ -189,9 +188,6 @@ switch spin_system.bas.formalism
 
     case {'zeeman-liouv','sphten-liouv'}
 
-        % If a stack is supplied, choose a representative state vector
-        if size(rho,2)>1, rho=mean(abs(rho),2); end
-        
         % Run symmetry factorization and ZTE
         if ismember('symmetry',spin_system.sys.disable)
             

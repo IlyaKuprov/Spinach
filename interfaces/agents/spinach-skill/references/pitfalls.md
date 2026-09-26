@@ -245,7 +245,12 @@ spins; beyond that, the basis restriction is the tool, not a bigger machine:
 At run time Spinach reduces dimension further on its own: zero-track
 elimination and path tracing routinely cut the active space by an order of
 magnitude, visible in the log as "state space dimension reduced from 64 to
-15". These reductions can be switched off through
+15". Horizontal wavefunction and Liouville-state stacks are screened using
+their actual columns; ZTE retains the union of their populated coordinates.
+ZTE streams nonzero columns independently, bounding additional screening
+storage by the row dimension and scaling each column separately. Weak
+columns above `zte_tol` must not be judged against another column's scale.
+These reductions can be switched off through
 `sys.disable={'zte','pt','symmetry',...}` for debugging, at a large cost.
 
 Matrices switch to sparse algebra automatically, and above a state-space

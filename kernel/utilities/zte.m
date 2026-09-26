@@ -9,12 +9,14 @@
 %      L       - the Liouvillian to be used for time 
 %                propagation
 %
-%      rho     - the initial state to be used for 
-%                time propagation
+%      rho     - initial state column or horizontal stack of
+%                state columns to be used for time propagation
 %
 %      nstates - if this parameter is specified, only
 %                nstates most populated states are kept,
-%                irrespective of the tolerance parameter
+%                irrespective of the tolerance parameter; stacks
+%                are ranked by maximum amplitude over columns
+%                and sampled times
 %
 % Output:
 %
@@ -23,6 +25,10 @@
 %
 %                            L_reduced=P'*L*P
 %                            rho_reduced=P'*rho;
+%
+% Note: stack columns are screened independently, using one column's
+%       propagation storage and scaling at a time. Each column stops
+%       when its populated-coordinate count stops growing.
 %
 % Note: default tolerance may be altered by setting sys.tols.zte_tol
 %       variable before calling create.m 
@@ -47,7 +53,7 @@ grumble(spin_system,L,rho);
 
 % Validate the number of states if it is specified
 if exist('nstates','var')&&((~isnumeric(nstates))||(~isreal(nstates))||(~isscalar(nstates))||...
-                            (nstates<1)||(mod(nstates,1)~=0)||(nstates>numel(rho)))
+                            (nstates<1)||(mod(nstates,1)~=0)||(nstates>size(rho,1)))
     error('nstates must be a positive integer not exceeding the state space dimension.');
 end
 
@@ -60,7 +66,7 @@ if ismember('zte',spin_system.sys.disable)
     % Return a unit matrix
     projector=1;
 
-elseif nnz(rho)/numel(rho)>spin_system.tols.zte_maxden
+elseif nnz(any(rho,2))/size(rho,1)>spin_system.tols.zte_maxden
     
     % Skip if the benefit is likely to be minor
     report(spin_system,'WARNING - too few zeros in the state vector, basis left unchanged.');
@@ -96,49 +102,53 @@ else
     report(spin_system,['a maximum of ' num2str(spin_system.tols.zte_nsteps) ...
                         ' steps shall be taken, ' num2str(timestep) ' seconds each.']);
     
-    % Preallocate the trajectory
-    trajectory=zeros(numel(rho),spin_system.tols.zte_nsteps,'like',1i);
-    
-    % Set the starting point
-    trajectory(:,1)=rho;
-    report(spin_system,['evolution step 0, active space dimension ' num2str(nnz(abs(trajectory(:,1))>spin_system.tols.zte_tol))]);
-    
-    % Compute trajectory steps with Krylov technique
-    for n=2:spin_system.tols.zte_nsteps
-        
-        % Take a step forward
-        trajectory(:,n)=step(spin_system,L,trajectory(:,n-1),timestep);
-        
-        % Analyze the trajectory
-        prev_space_dim=nnz(max(abs(trajectory(:,1:(n-1))),[],2)>spin_system.tols.zte_tol);
-        curr_space_dim=nnz(max(abs(trajectory),[],2)>spin_system.tols.zte_tol);
-        
-        % Inform the user
-        report(spin_system,['evolution step ' num2str(n-1) ...
-                            ', active space dimension ' num2str(curr_space_dim)]);
-        
-        % Terminate if done early
-        if curr_space_dim==prev_space_dim, break; end
-        
+    % Stream actual columns into a single vector of row maxima
+    amplitudes=zeros(size(rho,1),1);
+    for k=1:size(rho,2)
+
+        % Skip exactly zero columns without discarding weak initial states
+        column=rho(:,k);
+        if nnz(column)==0, continue; end
+        col_amplitudes=abs(column);
+
+        % Sample each trajectory with independent propagation scaling
+        for n=2:spin_system.tols.zte_nsteps
+
+            % Record the active dimension before propagation
+            prev_space_dim=nnz(col_amplitudes>spin_system.tols.zte_tol);
+
+            % Propagate only one column and accumulate its time maxima
+            column=step(spin_system,L,column,timestep);
+            col_amplitudes=max(col_amplitudes,abs(column));
+            curr_space_dim=nnz(col_amplitudes>spin_system.tols.zte_tol);
+
+            % Terminate when this column's active dimension stops growing
+            if curr_space_dim==prev_space_dim, break; end
+
+        end
+
+        % Combine column maxima without mixing their phases or scales
+        amplitudes=max(amplitudes,col_amplitudes);
+        report(spin_system,['screened state column ' num2str(k) ...
+                            ' of ' num2str(size(rho,2)) ', active space dimension ' ...
+                            num2str(nnz(amplitudes>spin_system.tols.zte_tol))]);
+
     end
-    
+
     % Determine which tracks to drop
     if exist('nstates','var')
-        
-        % Determine state amplitudes
-        amplitudes=max(abs(trajectory),[],2);
         
         % Sort the maximum amplitudes in descending order
         [~,index]=sort(amplitudes,'descend');
         
         % Drop all states beyond a given number
-        zero_track_mask=true(size(rho));
+        zero_track_mask=true(size(rho,1),1);
         zero_track_mask(index(1:nstates))=false();
         
     else
         
         % Drop all states with maximum amplitude below the threshold 
-        zero_track_mask=(max(abs(trajectory),[],2)<spin_system.tols.zte_tol);
+        zero_track_mask=(amplitudes<spin_system.tols.zte_tol);
         
     end
     
@@ -161,8 +171,8 @@ end
 if (~isnumeric(L))||(~isnumeric(rho))
     error('both inputs must be numeric.');
 end
-if ~isvector(rho)
-    error('single state vector expected, not a stack.');
+if (~ismatrix(rho))||(size(rho,2)==0)
+    error('state column or horizontal stack of state columns expected.');
 end
 if size(L,1)~=size(L,2)
     error('Liouvillian must be square.');
@@ -177,4 +187,5 @@ end
 % Lastly they say they always believed it. 
 %
 % Louis Agassiz
+
 

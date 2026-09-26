@@ -1,8 +1,6 @@
 # tests/kernel/test_sim2liouv_cache.m
 
-- Source: `tests/kernel/test_sim2liouv_cache.m`
 - Signature: `result=test_sim2liouv_cache()`
-- Total lines: 104
 
 ## Purpose
 

@@ -1,73 +1,44 @@
 # kernel/pulses/shaped_pulse_xy.m
 
-- Signature: `[rho,traj,P]=shaped_pulse_xy(spin_system,drift,controls,...`
+- Signature: `[rho,traj,P]=shaped_pulse_xy(spin_system,drift,controls,amplitudes,slice_durs,rho,method)`
 
 ## Purpose
 
-Shaped pulse function using Cartesian coordinates. Applies a user- specified pulse shape on user-specified operators while the rest of the drift Liouvillian continues to affect the spin system. Syntax: [rho,traj,P]=shaped_pulse_xy(spin_system,drift,controls,... amplitudes,slice_durs,rho,method)
+Apply a Cartesian shaped pulse on specified control operators while the drift generator continues to act, including any transmitter offset.
 
 ## Physical / mathematical content
 
-- Pulse and waveform utilities. These files encode shaped RF pulses, gradient events, rotating-frame transformations, resonator response, and Lie-group integration of time-dependent driven dynamics.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+A slice generator is the drift plus the amplitude-weighted control operators. Propagation uses `exp(-1i*H*dt)`: wavefunction and Liouville states evolve by left multiplication, while Hilbert density matrices evolve by `P*rho*P'`. Piecewise-linear pulses use the two-point Lie quadrature implemented by `isergen`.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+`expv-pwc` and `expv-pwl` use `step` for the state; these action-exponential methods are usually preferable for one or two outputs. `expm-pwc` and `expm-pwl` construct explicit slice propagators and are usually preferable for three outputs. `evol-pwc` and `evol-pwl` call `evolution`; choose them only for a specific reason.
+
+For all six methods in `zeeman-hilb`, the third output is the one-sided ordered product of slice propagators. Requesting it with `expv-*` or `evol-*` explicitly constructs those propagators without changing the selected two-sided state-propagation method. Propagator accumulation uses the configured clean-up tolerance. GPU arithmetic is selected by `'gpu'` in `spin_system.sys.enable`; returned states, trajectories, and propagators are gathered to host memory.
+
+## Syntax
+
+```matlab
+[rho,traj,P]=shaped_pulse_xy(spin_system,drift,controls,...
+                            amplitudes,slice_durs,rho,method)
+```
 
 ## Parameters / inputs
 
-- drift -the drift Liouvillian, the part of the Liouvillian that
-- should continue running in the background. This should
-- include the transmitter offset term, if any.
-- controls -a cell array of control operators corresponding to each
-- channel, this may include operators for spatial degrees
-- of freedom, such as gradients and diffusion.
-- amplitudes -a cell array of control amplitude vectors in rad/s, one
-- vector per control channel; the elements of each vector
-- correspond to different time points.
-- slice_durs -a vector containing the duration of each pulse slice,
-- seconds. For piecewise-constant methods, the number of
-- durations should be equal to the nuber of amplitudes.
-- For piecewise-linear methods, there should be one ele-
-- ment more in the amplitude array.
-- rho -initial state vector or a bookshelf matrix thereof
-- method -propagation method and product quadrature:
-- Krylov algorithm (usually faster for calls with one
-- and two outputs):
-- 'expv-pwc' -piecewise-constant
-- 'expv-pwl' -2nd order Lie quadrature
-- Explicit matrix exponentiation (usually faster for
-- calls with three outputs):
-- 'expm-pwc' -piecewise-constant
-- 'expm-pwl' -2nd order Lie quadrature
-- Spinach evolution function call (do not choose un-
-- less you have a specific good reason):
-- 'evol-pwc' -piecewise-constant
-- 'evol-pwl' -2nd order Lie quadrature
+- `spin_system`: Spinach system carrying the formalism, numerical tolerances, and execution options.
+- `drift`: background Hamiltonian or Liouvillian, including the transmitter offset when needed.
+- `controls`: cell array of control operators, one per channel; operators may include spatial degrees of freedom such as gradients and diffusion.
+- `amplitudes`: cell array of amplitude vectors in rad/s, one per control channel.
+- `slice_durs`: pulse-slice durations in seconds. PWC amplitudes have one element per slice; PWL amplitudes have one extra element for the edge values.
+- `rho`: initial state vector or bookshelf of vectors in one-sided formalisms; density matrix in `zeeman-hilb`.
+- `method`: one of `expv-pwc`, `expv-pwl`, `expm-pwc`, `expm-pwl`, `evol-pwc`, or `evol-pwl`.
 
 ## Outputs
 
-- rho -state vector for the final state, or a stack thereof
-- traj -system trajectory as a [1 x (nsteps+1)] cell array,
-- the first point is the initial condition
-- P -effective pulse propagator (expensive, best avoided)
+- `rho`: final state with the same physical interpretation as the input.
+- `traj`: `1 x (nsteps+1)` cell array of states, including the initial condition.
+- `P`: effective pulse propagator, expensive to construct and best avoided unless needed. In Hilbert space reuse it as `P*rho_initial*P'`, not `P*rho_initial`.
 
-## Implementation structure
+## Header notes
 
-- Shaped pulse function using Cartesian coordinates. Applies a user-
-- specified pulse shape on user-specified operators while the rest of
-- the drift Liouvillian continues to affect the spin system. Syntax:
-- [rho,traj,P]=shaped_pulse_xy(spin_system,drift,controls,...
-- amplitudes,slice_durs,rho,method)
-- drift -the drift Liouvillian, the part of the Liouvillian that
-- should continue running in the background. This should
-- include the transmitter offset term, if any.
-- controls -a cell array of control operators corresponding to each
-- channel, this may include operators for spatial degrees
-- of freedom, such as gradients and diffusion.
-- amplitudes -a cell array of control amplitude vectors in rad/s, one
+The source links to https://spindynamics.org/wiki/index.php?title=shaped_pulse_xy.m .

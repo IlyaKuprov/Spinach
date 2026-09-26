@@ -4,16 +4,28 @@
 
 ## Purpose
 
-Returns the registry of hand-written Spinach regression tests for the test runner.
+Registers the regression tests available to the Spinach test runner. Adding a test file does not register it: its stable identifier, descriptive name, and callable function name must also appear in this manifest.
 
 ## Physical / mathematical content
 
-The manifest does not perform a physical calculation; its entries identify tests covering physical models, numerical methods, interfaces, and utility functions.
+None is evaluated here. The listed tests cover physical and numerical subjects, but the manifest itself is metadata, not an implementation of those theories or algorithms.
 
 ## Numerical / algorithmic content
 
-Each entry stores a stable test ID, a descriptive name, and the function name to run. The cooperative-gradient and rotor-assumption tests are both registered. This catalogue does not execute the tests.
+Returns an ordered structure array with the same three fields for every registration. It does not run tests, calculate tolerances, inspect results, or infer registrations from files on disk. The runner uses these records to identify and invoke test functions.
+
+## Syntax
+
+`manifest=test_manifest()`
+
+## Parameters / inputs
+
+None.
 
 ## Outputs
 
-- `manifest` — structure array with `id`, `name`, and `function` fields.
+`manifest` is a structure array. Each element contains `id` (stable test identifier), `name` (human-readable description), and `function` (test function name as a character vector).
+
+## Header notes
+
+The function returns regression-test metadata only.

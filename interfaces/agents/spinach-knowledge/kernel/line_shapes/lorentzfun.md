@@ -1,8 +1,6 @@
 # kernel/line_shapes/lorentzfun.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/line_shapes/lorentzfun.m`
 - Signature: `[real_part,imag_part]=lorentzfun(offs,ampl,fwhm,x,phi)`
-- Total lines: 69
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Normalised Lorentzian function in magnetic resonance notation with a phase disto
 - Line-shape utilities. These files compute, transform, or fit spectral line shapes, connecting simulated transition frequencies and relaxation widths to observable spectra.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -44,7 +39,3 @@ Normalised Lorentzian function in magnetic resonance notation with a phase disto
 - imag_part -an array of values, same size as x
 - Check consistency
 - Width parameter
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`.

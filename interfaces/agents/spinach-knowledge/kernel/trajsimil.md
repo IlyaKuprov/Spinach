@@ -1,8 +1,6 @@
 # kernel/trajsimil.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/trajsimil.m`
 - Signature: `score=trajsimil(spin_system,trajectory_1,trajectory_2,scorefcn)`
-- Total lines: 183
 
 ## Purpose
 
@@ -10,14 +8,11 @@ Computes trajectory similarity scores. Returns a function representing "similari
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
 
 ## Numerical / algorithmic content
 
 - A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -67,7 +62,3 @@ Computes trajectory similarity scores. Returns a function representing "similari
 - scalar products between the cor-
 - responding vectors of the trajec-
 - tories.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `strncmp()`, `report()`, `lin2lm()`, `lm2lin()`, `scorefcn()`, `state_list()`, `grouped_trajectory_1()`, `trajectory_1()`, `grouped_trajectory_2()`, `trajectory_2()`, `num2str()`, `score()`, `dot()`, `ismember()`, `ischar()`.

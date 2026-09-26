@@ -1,8 +1,6 @@
 # kernel/utilities/tolerances.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/tolerances.m`
 - Signature: `[spin_system,sys]=tolerances(spin_system,sys)`
-- Total lines: 519
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Tolerances and fundamental constants. Sets various accuracy cut-offs, constants 
 ## Numerical / algorithmic content
 
 - A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -49,7 +45,3 @@ Tolerances and fundamental constants. Sets various accuracy cut-offs, constants 
 - the tolerance substructure parsed out
 - the accuracy settings should be modified by setting the sys.tols
 - structure, see the input preparation manual.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `isfield()`, `rmfield()`, `report()`, `pad()`, `below()`, `num2str()`, `ismember()`, `eps()`, `than()`, `inf()`, `constant()`, `setdiff()`, `fieldnames()`, `isscalar()`, `ischar()`.

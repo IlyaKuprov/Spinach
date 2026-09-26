@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/rotmat_align.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/rotmat_align.m`
 - Signature: `rot_mat=rotmat_align(v_from,v_to)`
-- Total lines: 107
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Rotation matrix aligning one vector with another vector. Syntax: rot_mat=rotmat_
 - Convention and tensor-transform utilities. They convert among tensor parameterisations, coordinate systems, and unit systems; the underlying mathematics is linear algebra on rank-2 tensors and rotation representations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -49,7 +44,3 @@ Rotation matrix aligning one vector with another vector. Syntax: rot_mat=rotmat_
 - que third Euler angle (the twist around the aligned axis). This
 - implementation fixes that freedom by returning the minimum-
 - angle alignment without any additional twist around the aligned
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `v_from()`, `v_to()`, `cross()`, `dot()`, `null()`, `null_basis()`, `rot_axis()`, `isvector()`, `any()`, `eps()`.

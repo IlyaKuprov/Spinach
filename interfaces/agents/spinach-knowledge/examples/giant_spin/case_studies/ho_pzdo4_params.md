@@ -1,8 +1,6 @@
 # examples/giant_spin/case_studies/ho_pzdo4_params.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/case_studies/ho_pzdo4_params.m`
 - Signature: `[ks,qs,bkq]=ho_pzdo4_params()`
-- Total lines: 53
 
 ## Purpose
 

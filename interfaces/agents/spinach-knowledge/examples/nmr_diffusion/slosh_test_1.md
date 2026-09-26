@@ -1,8 +1,6 @@
 # examples/nmr_diffusion/slosh_test_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_diffusion/slosh_test_1.m`
 - Signature: `slosh_test_1()`
-- Total lines: 36
 
 ## Purpose
 
@@ -25,7 +23,3 @@ Probability density sloshing around a harmonic oscillator. Calculation time: sec
 - Get the initial state
 - Get the propagator
 - Run the evolution
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `oscillator()`, `kfigure()`, `kxlabel()`, `kylabel()`, `pause()`.

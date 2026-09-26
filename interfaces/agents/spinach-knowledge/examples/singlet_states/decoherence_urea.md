@@ -1,8 +1,6 @@
 # examples/singlet_states/decoherence_urea.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/singlet_states/decoherence_urea.m`
 - Signature: `decoherence_urea()`
-- Total lines: 52
 
 ## Purpose
 
@@ -33,7 +31,3 @@ A demonstration that the nitrogen singlet state in urea is not long-lived. The r
 - Relaxation superoperator accuracy
 - Use complete basis set
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `relaxation()`, `state()`, `singlet()`, `num2str()`.

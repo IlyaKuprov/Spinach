@@ -1,8 +1,6 @@
 # examples/spin_chemistry/singlet_yield_nz_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/spin_chemistry/singlet_yield_nz_1.m`
 - Signature: `singlet_yield_nz_1()`
-- Total lines: 130
 
 ## Purpose
 
@@ -17,7 +15,6 @@ Magnetic field effect on a triplet-born benzophenone ketyl / thiyl radical pair 
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file also defines local helper function(s): `cage_pair()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -33,7 +30,3 @@ Magnetic field effect on a triplet-born benzophenone ketyl / thiyl radical pair 
 - Field grid, cage drain, and correlation time
 - Preallocate singlet yields
 - Loop over the field grid
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `yield_rf()`, `cage_pair()`, `fields()`, `yield_nz()`, `field()`, `num2str()`, `edge_rf()`, `drains()`, `edge_nz()`, `rate()`, `kfigure()`, `scale_figure()`, `subplot()`, `klegend()`, `kxlabel()`, `kylabel()`.

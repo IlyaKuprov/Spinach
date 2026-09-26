@@ -1,8 +1,6 @@
 # kernel/eigenfields/voitlander.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/eigenfields/voitlander.m`
 - Signature: `spec=voitlander(spin_system,parameters,triangle,Ic,Iz,Qc,Qz,Hmw)`
-- Total lines: 421
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Adaptively recursed Voitlander integrator. Computes an approximation of an integ
 - Eigenfield utilities. These files analyse field-dependent eigenstructure and resonance conditions, linking Hamiltonian spectra to magnetic-field sweeps and transition behaviour.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `trint()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -74,7 +69,3 @@ Adaptively recursed Voitlander integrator. Computes an approximation of an integ
 - element per transition
 - triangle(1:3).tm -transition moments at the corners of the sphe-
 - rical triangle, positive column vectors, one
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `sphtrsubd()`, `triangle()`, `cart2sph()`, `r12()`, `orientation()`, `eigenfields()`, `r23()`, `r31()`, `triangle_a()`, `triangle_b()`, `triangle_c()`, `triangle_d()`, `trint()`, `parfeval()`, `fetchOutputs()`.

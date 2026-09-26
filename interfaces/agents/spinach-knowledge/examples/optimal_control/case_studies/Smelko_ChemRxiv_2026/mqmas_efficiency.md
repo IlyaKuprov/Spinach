@@ -1,8 +1,6 @@
 # examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_efficiency.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/mqmas_efficiency.m`
 - Signature: `mqmas_efficiency()`
-- Total lines: 150
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Efficiency of the z-filtered 27Al MQMAS pulse sequence with hard pulses and with
 - transition selective pulse, and detection of the central transi-
 - tion single-quantum coherence. The efficiency is the modulus of
 - the detected element of the density matrix, normalised to the
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `spin()`, `eeqq2nqi()`, `create()`, `basis()`, `assume()`, `mqmas_drifts()`, `state()`, `operator()`, `cumsum()`, `diff()`, `load()`, `num2str()`, `step()`.

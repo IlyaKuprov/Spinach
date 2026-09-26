@@ -1,8 +1,6 @@
 # kernel/average.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/average.m`
 - Signature: `H=average(spin_system,Hp,H0,Hm,omega,theory)`
-- Total lines: 209
 
 ## Purpose
 
@@ -10,7 +8,6 @@ Average Hamiltonian theories under Zeeman interaction rotating frame transformat
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
 - Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
 
@@ -20,8 +17,6 @@ Average Hamiltonian theories under Zeeman interaction rotating frame transformat
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -65,7 +60,3 @@ Average Hamiltonian theories under Zeeman interaction rotating frame transformat
 - omega - the frequency of the rotating frame transformation, rad/s
 - theory - the level of the average Hamiltonian theory:
 - 'ah_first_order' -first order in Waugh theory
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `report()`, `num2str()`, `time_grid()`, `propagator()`, `isergen()`, `logm()`, `clean_up()`, `nnz()`, `issparse()`, `ismatrix()`, `any()`, `isscalar()`, `ischar()`.

@@ -1,16 +1,12 @@
 # tests/kernel/test_overload_arithmetic_suite.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_overload_arithmetic_suite.m`
 - Signature: `result=test_overload_arithmetic_suite()`
-- Total lines: 155
 
 ## Purpose
 
 Tests cheap overload arithmetic for cell, struct, RCV, and polyadic classes. Syntax: result=test_overload_arithmetic_suite()
 
 ## Physical / mathematical content
-
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 
 ## Numerical / algorithmic content
 
@@ -35,7 +31,3 @@ Tests cheap overload arithmetic for cell, struct, RCV, and polyadic classes. Syn
 - Check cell addition and subtraction overloads
 - Check cell scalar-array and matrix multiplication overloads
 - Check cell totals and inflation shorthand
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `test_close()`, `totsum()`, `inflate()`, `complex()`, `rcv()`, `double()`, `polyadic()`, `nnz()`, `speye()`.

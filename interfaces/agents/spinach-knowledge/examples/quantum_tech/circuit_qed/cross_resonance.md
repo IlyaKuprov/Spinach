@@ -1,8 +1,6 @@
 # examples/quantum_tech/circuit_qed/cross_resonance.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/circuit_qed/cross_resonance.m`
 - Signature: `cross_resonance()`
-- Total lines: 143
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Cross-resonance gate mechanism between two fixed-frequency transmons in the labo
 - two, and an echo sequence would be needed to remove it. A weak
 - direct tone on the target sets the gate phases. The simulation
 - runs in the laboratory frame, but the recorded kets are rotated
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `unit_mat()`, `bloch()`, `erf()`, `kfigure()`, `scale_figure()`, `subplot()`, `squeeze()`, `kxlabel()`, `kylabel()`, `ktitle()`, `klegend()`.

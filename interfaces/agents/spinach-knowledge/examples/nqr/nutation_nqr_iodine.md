@@ -1,8 +1,6 @@
 # examples/nqr/nutation_nqr_iodine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nqr/nutation_nqr_iodine.m`
 - Signature: `nutation_nqr_iodine()`
-- Total lines: 69
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Powder NQR nutation curve for a system with a single 127I nucleus. Calculation t
 - Loop over the pulse durations
 - Set pulse duration
 - Run the simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `state()`, `operator()`, `kfigure()`, `scale_figure()`, `powder()`, `subplot()`, `ktitle()`, `num2str()`, `kxlabel()`, `ylim()`, `set()`.

@@ -1,8 +1,6 @@
 # experiments/pseudocon/ppcs.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/pseudocon/ppcs.m`
 - Signature: `pcs=ppcs(nxyz,sxyz,chi)`
-- Total lines: 80
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Computes pseudocontact shift from a point electron centre at the nuclear coordin
 - Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -45,7 +40,3 @@ Computes pseudocontact shift from a point electron centre at the nuclear coordin
 - sxyz -susceptibility centre coordinates as [x y z], in
 - Angstroms.
 - Output:
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `chi()`, `grumble()`, `xyz2sph()`, `nxyz()`, `qform2sph()`, `chi2()`, `spher_harmon()`.

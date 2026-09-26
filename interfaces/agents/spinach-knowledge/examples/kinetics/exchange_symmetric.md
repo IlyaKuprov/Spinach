@@ -1,8 +1,6 @@
 # examples/kinetics/exchange_symmetric.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/kinetics/exchange_symmetric.m`
 - Signature: `exchange_symmetric()`
-- Total lines: 51
 
 ## Purpose
 
@@ -29,7 +27,3 @@ Two-spin symmetric chemical exchange pattern. Calculation time: seconds.
 - Apodisation
 - Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

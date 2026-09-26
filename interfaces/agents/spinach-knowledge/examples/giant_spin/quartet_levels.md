@@ -1,8 +1,6 @@
 # examples/giant_spin/quartet_levels.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/giant_spin/quartet_levels.m`
 - Signature: `quartet_levels()`
-- Total lines: 42
 
 ## Purpose
 
@@ -29,7 +27,3 @@ Energy levels magnetic field scan for a spin-3/2 particle with a zero-field spli
 - Spinach housekeeping
 - Experiment parameters
 - Run the field scan
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `icm2hz()`, `zfs2mat()`, `create()`, `basis()`, `fieldscan_enlev()`.

@@ -1,8 +1,6 @@
 # examples/nmr_proteins/expt_data/hsqc_ubiquitin_expt.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/expt_data/hsqc_ubiquitin_expt.m`
 - Signature: `hsqc_ubiquitin_expt()`
-- Total lines: 43
 
 ## Purpose
 
@@ -29,7 +27,3 @@ Experimental HSQC spectrum of human ubiquitin. Donghan Lee (Max Planck Institute
 - Form States signal
 - F1 Fourier transform
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `apodisation()`, `fftshift()`, `conj()`, `flip()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

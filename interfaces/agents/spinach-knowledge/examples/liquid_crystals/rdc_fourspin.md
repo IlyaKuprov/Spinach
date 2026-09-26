@@ -1,8 +1,6 @@
 # examples/liquid_crystals/rdc_fourspin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/liquid_crystals/rdc_fourspin.m`
 - Signature: `rdc_fourspin()`
-- Total lines: 70
 
 ## Purpose
 
@@ -31,7 +29,3 @@ CLIP-HSQC spectrum of a four-spin system in a liquid crystal with a user-specifi
 - Simulation
 - Apodisation
 - F2 Fourier transform
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

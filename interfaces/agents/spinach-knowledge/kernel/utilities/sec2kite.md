@@ -1,8 +1,6 @@
 # kernel/utilities/sec2kite.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/sec2kite.m`
 - Signature: `R=sec2kite(spin_system,R)`
-- Total lines: 78
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Converts a secular relaxation superoperator into the Redfield kite form by dropp
 - The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -40,7 +35,3 @@ Converts a secular relaxation superoperator into the Redfield kite form by dropp
 - Convert R to XYZ format
 - Zero all rates except self-relaxation and longitudinal cross-relaxation terms
 - Recompose the relaxation superoperator and get nonzero count
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `nnz()`, `lin2lm()`, `ismember()`, `report()`, `int2str()`, `strcmp()`, `unit_state()`.

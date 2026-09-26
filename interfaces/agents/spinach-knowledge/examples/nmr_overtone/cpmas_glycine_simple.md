@@ -1,8 +1,6 @@
 # examples/nmr_overtone/cpmas_glycine_simple.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_overtone/cpmas_glycine_simple.m`
 - Signature: `cpmas_glycine_simple()`
-- Total lines: 74
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Cross-polarization experiment between protons and 14N overtone transition in gly
 - Magic angle
 - Spectrum setup
 - Simulation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `atan()`, `state()`, `operator()`, `singlerot()`, `kfigure()`, `plot_1d()`.

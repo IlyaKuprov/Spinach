@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/mean.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/mean.m`
 - Signature: `answer=mean(ttrain,dim)`
-- Total lines: 80
 
 ## Purpose
 
@@ -39,7 +37,3 @@ Mean of elements of a tensor train representation of a matrix. Syntax: answer=me
 - In dim is omitted, choose first non-singleton dimension
 - (this mimics the Matlab behaviour for matices)
 - Make an auxiliary tensor train
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `ranks()`, `sizes()`, `all()`, `tt_sizes()`, `tt_ranks()`.

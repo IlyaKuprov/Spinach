@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/isreal.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/isreal.m`
 - Signature: `answer=isreal(tt)`
-- Total lines: 51
 
 ## Purpose
 
@@ -37,7 +35,3 @@ Returns TRUE for real-valued tensor train objects. Syntax: answer=isreal(tt)
 - Democracy is a pathetic belief in the collective wisdom
 - of individual ignorance.
 - H.L. Mencken
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `all()`.

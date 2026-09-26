@@ -1,8 +1,6 @@
 # kernel/pulses/iserstep.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/pulses/iserstep.m`
 - Signature: `rho_b=iserstep(spin_system,LTM,rho_a,dt)`
-- Total lines: 517
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Lie-group and Runge-Kutta-Munthe-Kaas solvers for the Lie equa- tion. LG methods
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `RKMK()`, `dexpinv()`, `bernoulli_B()`, `rk_tableau()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -54,7 +50,3 @@ Lie-group and Runge-Kutta-Munthe-Kaas solvers for the Lie equa- tion. LG methods
 - time and state vector, and return the evolution
 - generator (in rad/s) of the Lie equation:
 - d_rho/d_t = -i*L(t,rho)*rho
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `step()`, `a_fun()`, `comm()`, `RKMK()`, `ischar()`, `isstring()`, `char()`, `rk_tableau()`, `lower()`, `bernoulli_B()`, `isequal()`, `dexpinv()`, `comm_fun()`, `bern_coeffs()`, `factorial()`.

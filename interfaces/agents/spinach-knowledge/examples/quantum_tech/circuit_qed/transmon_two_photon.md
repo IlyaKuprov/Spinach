@@ -1,8 +1,6 @@
 # examples/quantum_tech/circuit_qed/transmon_two_photon.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/quantum_tech/circuit_qed/transmon_two_photon.m`
 - Signature: `transmon_two_photon()`
-- Total lines: 95
 
 ## Purpose
 
@@ -35,7 +33,3 @@ Two-photon transition in a four-level Duffing transmon. The drive carrier is pla
 - Particle specification
 - Transmon detuning from the carrier and anharmonicity
 - Formalism and basis
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `operator()`, `state()`, `optimcon()`, `fmaxnewton()`, `pops()`, `pulse()`, `propagator()`, `dts()`, `kfigure()`, `cumsum()`, `kxlabel()`, `kylabel()`.

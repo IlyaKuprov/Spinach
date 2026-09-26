@@ -1,8 +1,6 @@
 # examples/singlet_states/decoherence_naphthalenetetrone.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/singlet_states/decoherence_naphthalenetetrone.m`
 - Signature: `decoherence_naphthalenetetrone()`
-- Total lines: 49
 
 ## Purpose
 
@@ -34,7 +32,3 @@ Long-lived spin states in the napthalenetetrone molecule. (4 protons, 256-dimens
 - Set relaxation theory parameters
 - Relaxation superoperator accuracy
 - Use complete basis set
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `relaxation()`, `speye()`.

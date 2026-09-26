@@ -1,8 +1,6 @@
 # examples/nmr_spen/ufcosy_2spin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_spen/ufcosy_2spin.m`
 - Signature: `ufcosy_2spin()`
-- Total lines: 75
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Ultrafast COSY for a coupled two-spin system. Calculation time: minutes on NVidi
 - Relaxation phantom
 - Initial and detection state phantoms
 - Diffusion and flow
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `state()`, `imaging()`, `fftshift()`, `kfigure()`.

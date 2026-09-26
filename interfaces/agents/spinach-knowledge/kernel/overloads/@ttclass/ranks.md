@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/ranks.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/ranks.m`
 - Signature: `ttranks=ranks(ttrain)`
-- Total lines: 45
 
 ## Purpose
 
@@ -39,7 +37,3 @@ Returns the bond dimensions of a tensor train. Syntax: ttranks=ranks(ttrain)
 - Extract the ranks
 - I refrain from publishing for fear that disputes and controversies
 - may be raised against me by ignoramuses.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `ttranks()`.

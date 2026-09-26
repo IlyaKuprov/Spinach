@@ -1,8 +1,6 @@
 # examples/nmr_liquids/hoesy_strychnine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/hoesy_strychnine.m`
 - Signature: `hoesy_strychnine()`
-- Total lines: 88
 
 ## Purpose
 
@@ -33,7 +31,3 @@
 - Sequence parameters
 - Generate isotopomers
 - Preallocate the answer
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strychnine()`, `create()`, `dilute()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

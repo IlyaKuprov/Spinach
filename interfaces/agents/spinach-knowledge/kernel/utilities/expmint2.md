@@ -1,8 +1,6 @@
 # kernel/utilities/expmint2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/expmint2.m`
 - Signature: `I=expmint2(spin_system,A,B,C,D,E,T)`
-- Total lines: 81
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Computes the nested matrix exponential double integral: Integrate[expm(-i*A*(T-t
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `size()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -39,7 +35,3 @@ Computes the nested matrix exponential double integral: Integrate[expm(-i*A*(T-t
 - I -the integral as above
 - Check consistency
 - Zero filler block
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `propagator()`, `speye()`, `ismatrix()`, `isscalar()`.

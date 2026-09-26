@@ -1,8 +1,6 @@
 # examples/nmr_liquids/pa_styrene.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/pa_styrene.m`
 - Signature: `pa_styrene()`
-- Total lines: 64
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Sequence parameters
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

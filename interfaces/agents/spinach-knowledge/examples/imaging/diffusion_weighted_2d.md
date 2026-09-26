@@ -1,8 +1,6 @@
 # examples/imaging/diffusion_weighted_2d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/diffusion_weighted_2d.m`
 - Signature: `diffusion_weighted_2d()`
-- Total lines: 80
 
 ## Purpose
 
@@ -30,7 +28,3 @@
 - Spinach housekeeping
 - Sequence parameters
 - Sample geometry
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `load()`, `imaging()`, `get()`, `figure()`, `loc()`, `subplot()`, `mri_2d_plot()`, `ktitle()`.

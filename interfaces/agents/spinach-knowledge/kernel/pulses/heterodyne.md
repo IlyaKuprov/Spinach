@@ -1,8 +1,6 @@
 # kernel/pulses/heterodyne.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/pulses/heterodyne.m`
 - Signature: `[X,Y]=heterodyne(dt,signal,freq)`
-- Total lines: 83
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Signal heterodyne from wall clock time into the rotating frame using analytic si
 ## Numerical / algorithmic content
 
 - The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -50,7 +46,3 @@ Signal heterodyne from wall clock time into the rotating frame using analytic si
 - X, Y -in-phase and out-of-phase parts of the
 - rotating frame signal, column vectors
 - period of the frequency being demodulated; the transform
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `mask()`, `isscalar()`, `iscolumn()`.

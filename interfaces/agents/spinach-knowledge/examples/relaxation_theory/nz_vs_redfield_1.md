@@ -1,8 +1,6 @@
 # examples/relaxation_theory/nz_vs_redfield_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/nz_vs_redfield_1.m`
 - Signature: `nz_vs_redfield_1()`
-- Total lines: 98
 
 ## Purpose
 
@@ -33,7 +31,3 @@ Nakajima-Zwanzig relaxation theory against Redfield theory for a two-spin system
 - Calculation time: minutes
 - Magnet and isotopes
 - Chemical shielding tensors
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `relaxation()`, `basis()`, `create()`, `num2str()`, `null()`, `hamiltonian()`, `assume()`, `tau_grid()`, `rel_diff()`, `shift_grid()`, `max_rates()`, `kfigure()`, `scale_figure()`, `subplot()`, `kxlabel()`, `kylabel()`.

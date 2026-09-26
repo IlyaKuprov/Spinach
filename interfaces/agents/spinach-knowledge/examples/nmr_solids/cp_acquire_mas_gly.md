@@ -1,8 +1,6 @@
 # examples/nmr_solids/cp_acquire_mas_gly.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_solids/cp_acquire_mas_gly.m`
 - Signature: `cp_acquire_mas_gly()`
-- Total lines: 80
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Algorithmic options
 - Neglect interactions below 200 Hz
 - Spinach housekeeping
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `shift_iso()`, `create()`, `basis()`, `state()`, `singlerot()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

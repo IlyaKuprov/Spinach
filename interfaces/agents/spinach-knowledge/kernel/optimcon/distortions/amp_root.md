@@ -1,8 +1,6 @@
 # kernel/optimcon/distortions/amp_root.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/distortions/amp_root.m`
 - Signature: `[w,J]=amp_root(w,sat_lvls,s)`
-- Total lines: 148
 
 ## Purpose
 
@@ -17,8 +15,6 @@ Amplifier compression distortion model. Applies a saturating root-sigmoidal dist
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `distort()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -55,7 +51,3 @@ Amplifier compression distortion model. Applies a saturating root-sigmoidal dist
 - ged as XYXY... with respect to in-phase and
 - quadrature parts on each control channel
 - sat_lvls -saturation levels beyond which the amplifi-
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `distort()`, `sat_lvls()`, `w_dist()`, `gather()`, `rows()`, `cols()`, `vals()`, `any()`.

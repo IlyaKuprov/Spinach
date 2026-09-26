@@ -1,8 +1,6 @@
 # experiments/pseudocon/lpcs.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/pseudocon/lpcs.m`
 - Signature: `theo_pcs=lpcs(nxyz,mxyz,ranks,Ilm,chi)`
-- Total lines: 138
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Computes PCS from the multipole moments of the paramagnetic centre probability d
 - Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -59,7 +54,3 @@ theo_pcs=lpcs(nxyz,mxyz,ranks,Ilm,chi)
 - in Angstroms.
 - ranks -array of multipole ranks supplied in Ilm
 - Ilm -{[],[]} array of numbers corresponding to
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `chi()`, `qform2sph()`, `cg_fast()`, `xyz2sph()`, `nxyz()`, `ranks()`, `sign()`, `chi2()`, `spher_harmon()`, `any()`, `mxyz()`, `isvector()`, `isequal()`, `iscell()`.

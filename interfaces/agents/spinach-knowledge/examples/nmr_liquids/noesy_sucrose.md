@@ -1,8 +1,6 @@
 # examples/nmr_liquids/noesy_sucrose.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/noesy_sucrose.m`
 - Signature: `noesy_sucrose()`
-- Total lines: 72
 
 ## Purpose
 
@@ -34,7 +32,3 @@ NOESY spectrum of sucrose (magnetic parameters computed with DFT). Calculation t
 - Simulation
 - Apodisation
 - F2 Fourier transform
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `g2spinach()`, `gparse()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

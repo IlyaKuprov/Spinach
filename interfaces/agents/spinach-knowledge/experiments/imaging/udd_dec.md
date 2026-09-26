@@ -1,8 +1,6 @@
 # experiments/imaging/udd_dec.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/imaging/udd_dec.m`
 - Signature: `mri=udd_dec(spin_system,parameters,H,R,K,G,F)`
-- Total lines: 118
 
 ## Purpose
 
@@ -15,8 +13,6 @@ The effect of Uhrid Dynamic Decoupling (UDD) pulse sequence on the MRI phantom. 
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Outputs
 
@@ -39,7 +35,3 @@ The effect of Uhrid Dynamic Decoupling (UDD) pulse sequence on the MRI phantom. 
 - excluding the first pi/2 pulse
 - parameters.spins -nuclei on which the sequence
 - is to act, e.g. {'1H'}
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `operator()`, `speye()`, `step()`, `uhrig_times()`, `udd_delays()`, `report()`, `num2str()`, `fpl2phan()`, `ismember()`, `ismatrix()`, `all()`, `iscell()`, `isfield()`, `isscalar()`.

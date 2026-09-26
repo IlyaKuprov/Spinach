@@ -1,8 +1,6 @@
 # examples/singlet_states/warren_singlet.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/singlet_states/warren_singlet.m`
 - Signature: `warren_singlet()`
-- Total lines: 45
 
 ## Purpose
 
@@ -34,7 +32,3 @@ A demonstration that long-lived states exist that are immune not only to dipolar
 - Basis set
 - Spinach housekeeping
 - Relaxation superoperator
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `eeqq2nqi()`, `create()`, `basis()`, `relaxation()`.

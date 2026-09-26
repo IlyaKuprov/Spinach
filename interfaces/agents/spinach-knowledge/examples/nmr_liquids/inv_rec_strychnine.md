@@ -1,8 +1,6 @@
 # examples/nmr_liquids/inv_rec_strychnine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/inv_rec_strychnine.m`
 - Signature: `inv_rec_strychnine()`
-- Total lines: 62
 
 ## Purpose
 
@@ -32,7 +30,3 @@
 - Sequence parameters
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strychnine()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

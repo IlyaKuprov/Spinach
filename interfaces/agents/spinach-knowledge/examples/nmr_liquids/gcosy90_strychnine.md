@@ -1,8 +1,6 @@
 # examples/nmr_liquids/gcosy90_strychnine.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_liquids/gcosy90_strychnine.m`
 - Signature: `gcosy90_strychnine()`
-- Total lines: 67
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Gradient-selected COSY spectrum of strychnine. Calculation time: minutes
 - Apodisation
 - F2 Fourier transform
 - Form echo/anti-echo signal
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `strychnine()`, `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `conj()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

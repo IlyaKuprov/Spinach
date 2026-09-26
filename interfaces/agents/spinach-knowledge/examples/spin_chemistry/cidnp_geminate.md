@@ -1,8 +1,6 @@
 # examples/spin_chemistry/cidnp_geminate.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/spin_chemistry/cidnp_geminate.m`
 - Signature: `cidnp_geminate()`
-- Total lines: 59
 
 ## Purpose
 
@@ -31,7 +29,3 @@ A basic example of the geminate CIDNP effect simulation. Calculation time: secon
 - Set up a reaction ("whatever is leaving reactants must appear in products")
 - Assemble the Liouvillian
 - Evolve for a microsecond
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `hamiltonian()`, `assume()`, `kinetics()`, `singlet()`, `evolution()`, `state()`, `rho()`, `num2str()`.

@@ -1,8 +1,6 @@
 # examples/fundamentals/state_tests/state_consistency_2.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/fundamentals/state_tests/state_consistency_2.m`
 - Signature: `state_consistency_2()`
-- Total lines: 72
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Test of consistency in the projection between spherical tensor basis set and Zee
 - Liouville space, IST basis
 - Project into Zeeman basis
 - Check the results
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `sphten2zeeman()`.

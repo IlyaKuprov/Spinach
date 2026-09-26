@@ -1,8 +1,6 @@
 # kernel/optimcon/hess_reorder.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/optimcon/hess_reorder.m`
 - Signature: `hess=hess_reorder(hess,K,N)`
-- Total lines: 70
 
 ## Purpose
 
@@ -13,9 +11,6 @@ The waveforms on different channels are assumed to be stored in the rows of the 
 - Optimal-control core routines. These files implement GRAPE-style objective evaluation, quasi-Newton search, line search, regularisation, distortion models, and waveform parameterisations.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -42,7 +37,3 @@ The waveforms on different channels are assumed to be stored in the rows of the 
 - [X1 X2 ... Xn Y1 Y2 ... Yn Z1 Z2 ... Zn]
 - interchanging the order from controls then time point to time point
 - then controls, or vice versa. Syntax:
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `isscalar()`, `ismatrix()`.

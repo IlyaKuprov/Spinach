@@ -1,16 +1,12 @@
 # tests/kernel/test_liouville_commutator.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/tests/kernel/test_liouville_commutator.m`
 - Signature: `result=test_liouville_commutator()`
-- Total lines: 42
 
 ## Purpose
 
 Tests Liouville-space commutation superoperators. Syntax: result=test_liouville_commutator()
 
 ## Physical / mathematical content
-
-- This file belongs to the `tests` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 
 ## Numerical / algorithmic content
 
@@ -34,7 +30,3 @@ Tests Liouville-space commutation superoperators. Syntax: result=test_liouville_
 - Build a one-proton Zeeman Liouville-space spin system
 - Generate three forms of the same labelled operator
 - Check the superoperator identity
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `new_test_result()`, `test_spin_system()`, `operator()`, `test_close()`.

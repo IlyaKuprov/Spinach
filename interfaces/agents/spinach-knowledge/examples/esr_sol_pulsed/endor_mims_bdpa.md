@@ -1,8 +1,6 @@
 # examples/esr_sol_pulsed/endor_mims_bdpa.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/esr_sol_pulsed/endor_mims_bdpa.m`
 - Signature: `endor_mims_bdpa()`
-- Total lines: 67
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Mims ENDOR pulse sequence on BDPA with ideal electron pulses, reproducing Figure
 - Sequence parameters
 - Simulation
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `spin()`, `powder()`, `kfigure()`, `kylabel()`, `kxlabel()`.

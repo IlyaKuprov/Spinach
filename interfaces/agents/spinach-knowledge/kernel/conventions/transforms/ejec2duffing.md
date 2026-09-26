@@ -1,8 +1,6 @@
 # kernel/conventions/transforms/ejec2duffing.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/conventions/transforms/ejec2duffing.m`
 - Signature: `[frq,anharm]=ejec2duffing(ej,ec)`
-- Total lines: 72
 
 ## Purpose
 
@@ -14,9 +12,6 @@ Converts the Josephson and charging energies of a transmon into the Duffing osci
 - The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Syntax
 
@@ -57,7 +52,3 @@ Converts the Josephson and charging energies of a transmon into the Duffing osci
 - real numbers
 - ec -charging energies in Hz (energy over the
 - real numbers of the same size as ej
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `any()`, `isequal()`.

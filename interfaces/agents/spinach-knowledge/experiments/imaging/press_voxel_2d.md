@@ -1,8 +1,6 @@
 # experiments/imaging/press_voxel_2d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/imaging/press_voxel_2d.m`
 - Signature: `phan=press_voxel_2d(spin_system,parameters,H,R,K,G,F)`
-- Total lines: 173
 
 ## Purpose
 
@@ -16,8 +14,6 @@ Voxel selection diagnostics function for 2D PRESS sequences. Re- turns the sampl
 ## Numerical / algorithmic content
 
 - Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -53,7 +49,3 @@ Voxel selection diagnostics function for 2D PRESS sequences. Re- turns the sampl
 - parameters.rf_amp_list -cell array of two vectors of RF
 - amplitudes at each pulse slice, rad/s
 - parameters.rf_dur_list -cell array of two vectors of pulse
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `operator()`, `polyadic()`, `opium()`, `state()`, `shaped_pulse_af()`, `evolution()`, `coherence()`, `fpl2phan()`, `ismember()`, `ismatrix()`, `all()`, `iscell()`, `isfield()`, `ischar()`, `any()`.

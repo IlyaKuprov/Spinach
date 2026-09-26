@@ -1,8 +1,6 @@
 # experiments/slowpass.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/experiments/slowpass.m`
 - Signature: `spectrum=slowpass(spin_system,parameters,H,R,K)`
-- Total lines: 199
 
 ## Purpose
 
@@ -10,14 +8,11 @@ Slow passage detection -calculates spectrum values at the user- specified freque
 
 ## Physical / mathematical content
 
-- This file belongs to the `experiments` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
 
 ## Numerical / algorithmic content
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -54,7 +49,3 @@ Slow passage detection -calculates spectrum values at the user- specified freque
 - in Hz
 - parameters.npoints number of points in the spectrum
 - parameters.rho0 initial state
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `sim2liouv()`, `reduce()`, `speye()`, `ismember()`, `report()`, `gpuArray()`, `dot()`, `freq_grid()`, `spectrum()`, `gather()`, `ilu()`, `nnz()`, `num2str()`, `gmres()`, `ismatrix()`.

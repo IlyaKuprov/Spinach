@@ -1,8 +1,6 @@
 # examples/nmr_proteins/ct_cosy_gb1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_proteins/ct_cosy_gb1.m`
 - Signature: `ct_cosy_gb1()`
-- Total lines: 67
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Constant-time COSY experiment simulation for the GB1 protein. Simulation time: m
 - Spinach housekeeping
 - Kill carbons and nitrogens (protein assumed unlabelled)
 - Build the basis
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `protein()`, `create()`, `kill_spin()`, `strcmp()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

@@ -1,8 +1,6 @@
 # examples/nmr_zerofield/small_field_acetonitrile.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_zerofield/small_field_acetonitrile.m`
 - Signature: `small_field_acetonitrile()`
-- Total lines: 59
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Small-field NMR spectroscopy -acetonitrile with 13C on the methyl group. Set to 
 - Spinach housekeeping
 - Simulation
 - Apodisation
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `liquid()`, `apodisation()`, `fftshift()`, `kfigure()`, `plot_1d()`.

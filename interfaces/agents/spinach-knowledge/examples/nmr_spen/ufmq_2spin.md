@@ -1,8 +1,6 @@
 # examples/nmr_spen/ufmq_2spin.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_spen/ufmq_2spin.m`
 - Signature: `ufmq_2spin()`
-- Total lines: 106
 
 ## Purpose
 
@@ -31,7 +29,3 @@
 - Algorithmic options
 - Spinach housekeeping
 - Sample geometry
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `state()`, `spin()`, `imaging()`, `kfigure()`, `subplot()`, `fftshift()`, `plot_uf()`.

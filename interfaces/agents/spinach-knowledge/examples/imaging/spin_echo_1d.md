@@ -1,8 +1,6 @@
 # examples/imaging/spin_echo_1d.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/imaging/spin_echo_1d.m`
 - Signature: `spin_echo_1d()`
-- Total lines: 65
 
 ## Purpose
 
@@ -30,7 +28,3 @@ A spin echo experiment under a gradient in the presence of diffusion and flow. C
 - Spinach housekeeping
 - Sequence parameters
 - Sample geometry
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `state()`, `imaging()`, `kfigure()`, `kylabel()`, `kxlabel()`.

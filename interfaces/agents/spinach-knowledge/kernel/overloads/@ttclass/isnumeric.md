@@ -1,8 +1,6 @@
 # kernel/overloads/@ttclass/isnumeric.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/overloads/@ttclass/isnumeric.m`
 - Signature: `answer=isnumeric(tt)`
-- Total lines: 33
 
 ## Purpose
 
@@ -32,7 +30,3 @@ Returns TRUE for non-empty tensor train objects. Syntax: answer=isnumeric(tt)
 - People who think honestly and deeply have a hostile
 - attitude towards the public.
 - Johann Wolfgang von Goethe
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `true()`, `false()`.

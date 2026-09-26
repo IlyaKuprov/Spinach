@@ -1,8 +1,6 @@
 # kernel/utilities/oscillator.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/utilities/oscillator.m`
 - Signature: `[H_oscl,X_oscl,xgrid]=oscillator(parameters)`
-- Total lines: 100
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Harmonic oscillator infrastructure in 1D. Syntax: [H_oscl,X_oscl,xgrid]=oscillat
 ## Numerical / algorithmic content
 
 - Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -48,7 +44,3 @@ Harmonic oscillator infrastructure in 1D. Syntax: [H_oscl,X_oscl,xgrid]=oscillat
 - xgrid - X coordinate grid, m
 - Note: gravitation is directed along the X axis. Finite difference
 - derivative operators are used.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `fdmat()`, `spdiags()`, `d2_dx2()`, `isfield()`.

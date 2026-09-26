@@ -1,8 +1,6 @@
 # examples/nmr_nucleic/expt_data/rna_noesy_expt.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/nmr_nucleic/expt_data/rna_noesy_expt.m`
 - Signature: `rna_noesy_expt()`
-- Total lines: 31
 
 ## Purpose
 
@@ -26,7 +24,3 @@ Experimental NOESY spectrum of the Harvard RNA. Shunsuke Imai Scott Robson Gerha
 - Sequence parameters
 - Load data
 - Plotting
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `load()`, `kfigure()`, `scale_figure()`, `plot_2d()`.

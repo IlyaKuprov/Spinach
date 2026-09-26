@@ -1,8 +1,6 @@
 # kernel/cache/st_product_table.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/cache/st_product_table.m`
 - Signature: `[pt_left,pt_right]=st_product_table(nlevels)`
-- Total lines: 94
 
 ## Purpose
 
@@ -13,9 +11,6 @@ Structure coefficient tables for single transition operators. Syntax: [pt_left,p
 - Cache-management utilities. These files maintain Spinach temporary or persistent cache state used to avoid repeated expensive construction of large operators or metadata.
 
 ## Numerical / algorithmic content
-
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -48,7 +43,3 @@ Structure coefficient tables for single transition operators. Syntax: [pt_left,p
 - of IK's book (normalisation is missing in the book, that's a typo).
 - Numbering translation between single and double index is given by
 - kq2lin and lin2kq functions.
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `mfilename()`, `own_path()`, `num2str()`, `exist()`, `load()`, `sin_tran()`, `pt_left()`, `hdot()`, `pt_right()`, `save()`, `isscalar()`.

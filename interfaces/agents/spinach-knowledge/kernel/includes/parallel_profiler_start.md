@@ -1,8 +1,6 @@
 # kernel/includes/parallel_profiler_start.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/includes/parallel_profiler_start.m`
 - Signature: `(script file)`
-- Total lines: 32
 
 ## Purpose
 
@@ -30,7 +28,3 @@ An include that starts profiling infrastructure around parallel stages. Should b
 - S = 100 + 99 + ... + 1
 - --------------------------
 - 2S = 101 + 101 + ... + 101 => S = 101*100/2 = 5050
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `ticBytes()`, `tic()`, `ismember()`.

@@ -1,8 +1,6 @@
 # kernel/grids/vcell_solidangle.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/grids/vcell_solidangle.m`
 - Signature: `S=vcell_solidangle(P,K,xyz)`
-- Total lines: 85
 
 ## Purpose
 
@@ -15,8 +13,6 @@ Solid angle of a spherical Voronoi cell. Syntax: s=vcell_solidangle(P,K,xyz)
 ## Numerical / algorithmic content
 
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 
@@ -47,7 +43,3 @@ Solid angle of a spherical Voronoi cell. Syntax: s=vcell_solidangle(P,K,xyz)
 - the node (and not the complement cell)
 - S -the solid angle of the Voronoi cell
 - Check consistency
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `grumble()`, `cellfun()`, `one_vcell_solidangle()`, `arrayfun()`, `xyz()`, `any()`, `iscell()`.

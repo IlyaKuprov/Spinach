@@ -1,8 +1,6 @@
 # examples/microfluidics/plain_diff.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/microfluidics/plain_diff.m`
 - Signature: `plain_diff()`
-- Total lines: 115
 
 ## Purpose
 
@@ -30,7 +28,3 @@ Simple diffusion simulation without spin dynamics. Longitudinal magnetisation is
 - Detection state: Lz in all cells
 - Sequence and timing parameters
 - Set assumptions
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `comsol_import()`, `create()`, `basis()`, `state()`, `assume()`, `hamiltonian()`, `frqoffset()`, `relaxation()`, `drainage()`, `speye()`, `meshflow()`, `fpl2phan()`, `traj()`, `kfigure()`, `scale_figure()`, `camproj()`.

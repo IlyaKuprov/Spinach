@@ -1,8 +1,6 @@
 # examples/relaxation_theory/hfc_antisymm_1.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/relaxation_theory/hfc_antisymm_1.m`
 - Signature: `hfc_antisymm_1()`
-- Total lines: 73
 
 ## Purpose
 
@@ -31,7 +29,3 @@ Longitudinal and transverse relaxation rates in a system with a significant anti
 - Textbook and Spinach R1 for first spin
 - Textbook and Spinach R1 for second spin
 - Textbook and Spinach R2 for first spin
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `create()`, `basis()`, `relaxation()`, `rlx_hfc()`, `state()`, `num2str()`.

@@ -1,8 +1,6 @@
 # examples/dnp_sol/steady_state/xix_q_field_profile_ensemble_r_T2n.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/examples/dnp_sol/steady_state/xix_q_field_profile_ensemble_r_T2n.m`
 - Signature: `xix_q_field_profile_ensemble_r_T2n()`
-- Total lines: 116
 
 ## Purpose
 
@@ -15,7 +13,6 @@ Simulation of T2n dependence of XiX DNP field profiles in the steady state with 
 ## Numerical / algorithmic content
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-- The file also defines local helper function(s): `xix_field_profile_ensemble_r()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Implementation structure
 
@@ -31,7 +28,3 @@ Simulation of T2n dependence of XiX DNP field profiles in the steady state with 
 - Q-band magnet
 - Electron and proton
 - Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-
-## Internal Spinach / MATLAB structure cues
-
-- Called routines detected from the main body: `kfigure()`, `kxlabel()`, `kylabel()`, `ylim()`, `xix_field_profile_ensemble_r()`, `T2n()`, `klegend()`, `savefig()`, `gaussleg()`, `r1n_dnp()`, `create()`, `basis()`, `state()`, `dnp()`, `powder()`.

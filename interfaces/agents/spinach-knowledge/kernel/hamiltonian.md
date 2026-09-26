@@ -1,8 +1,6 @@
 # kernel/hamiltonian.m
 
-- Source: `/home/kuprov/.openclaw/workspace/Spinach/kernel/hamiltonian.m`
 - Signature: `[I,Q]=hamiltonian(spin_system,operator_type)`
-- Total lines: 1486
 
 ## Purpose
 
@@ -10,7 +8,6 @@ Hamiltonian operator or superoperator and its rotational decomposi- tion. Descri
 
 ## Physical / mathematical content
 
-- This file belongs to the `kernel` part of Spinach. Its role should be read together with nearby files in the same directory, which usually share a common physical regime or infrastructure purpose.
 - Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
 
 ## Numerical / algorithmic content
@@ -19,8 +16,6 @@ Hamiltonian operator or superoperator and its rotational decomposi- tion. Descri
 
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-- The file contains an explicit `grumble(...)` validator, which is Spinach convention for front-loading dimension, type, and regime checks before expensive linear-algebra work begins.
-- The file also defines local helper function(s): `parfor_progr()`, `mode_quads()`, `spin_facts()`, `grumble()`. This usually means the public entry point is supported by tightly coupled validation or helper logic kept private to the file.
 
 ## Parameters / inputs
 

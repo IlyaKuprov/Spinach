@@ -1,8 +1,6 @@
 # tests/kernel/test_giant_cache.m
 
-- Source: `tests/kernel/test_giant_cache.m`
 - Signature: `result=test_giant_cache()`
-- Total lines: 133
 
 ## Purpose
 

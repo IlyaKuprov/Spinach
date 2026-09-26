@@ -53,6 +53,7 @@
 | `tests/kernel/test_euler_rotation_matrix.m` | `result=test_euler_rotation_matrix()` | Tests active ZYZ Euler rotation matrices. Syntax: result=test_euler_rotation_matrix() Outputs: result -regression test r |
 | `tests/kernel/test_exponential_krylov_suite.m` | `result=test_exponential_krylov_suite()` | Tests exponential, Chebyshev, and Krylov numerical utilities. Syntax: result=test_exponential_krylov_suite() Outputs: re |
 | `tests/kernel/test_finite_difference_suite.m` | `result=test_finite_difference_suite()` | Tests finite-difference and spectral differentiation helpers. Syntax: result=test_finite_difference_suite() Outputs: res |
+| `tests/kernel/test_freeze_map.m` | `result=test_freeze_map()` | Frozen input derivatives through composed waveform transformations. |
 | `tests/kernel/test_giant_ham_descr.m` | `result=test_giant_ham_descr()` | Tests the giant spin Hamiltonian descriptor route. Syntax: result=test_giant_ham_descr() Outputs: result -regression tes |
 | `tests/kernel/test_graph_geometry_suite.m` | `result=test_graph_geometry_suite()` | Tests graph, geometry, lattice, and coordinate utilities. Syntax: result=test_graph_geometry_suite() Outputs: result -re |
 | `tests/kernel/test_grid_geometry_suite.m` | `result=test_grid_geometry_suite()` | Tests grid and spherical geometry helpers. Syntax: result=test_grid_geometry_suite() Outputs: result -regression test re |
@@ -114,7 +115,7 @@
 | `tests/kernel/test_zeeman_hamiltonian.m` | `result=test_zeeman_hamiltonian()` | Tests the one-spin Zeeman Hamiltonian. Syntax: result=test_zeeman_hamiltonian() Outputs: result -regression test result |
 | `tests/lib/new_test_result.m` | `result=new_test_result(id,name,purpose)` | Creates a regression test result structure. Syntax: result=new_test_result(id,name,purpose) Parameters: id -stable test |
 | `tests/lib/test_close.m` | `result=test_close(result,label,observed,reference,abs_tol,rel_tol,why)` | Adds a numerical regression check with tolerances and explanation. Syntax: result=test_close(result,label,observed,refer |
-| `tests/lib/test_manifest.m` | `manifest=test_manifest()` | Returns Spinach regression test metadata. Syntax: manifest=test_manifest() Outputs: manifest -structure array with test |
+| `tests/lib/test_manifest.m` | `manifest=test_manifest()` | Returns Spinach regression test metadata. Syntax: manifest=test_manifest() Outputs: manifest -structure array with test  |
 | `tests/lib/test_options.m` | `options=test_options(varargin)` | Parses name-value options for the Spinach test runner. Syntax: options=test_options(varargin) Parameters: varargin -name |
 | `tests/lib/test_record.m` | `record=test_record(record)` | Retains an in-progress regression result so completed checks survive a later test error. |
 | `tests/lib/test_spin_system.m` | `spin_system=test_spin_system(sys,inter,bas)` | Builds a small quiet Spinach spin system for tests. Syntax: spin_system=test_spin_system(sys,inter,bas) Parameters: sys |

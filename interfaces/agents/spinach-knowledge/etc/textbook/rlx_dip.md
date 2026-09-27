@@ -10,7 +10,7 @@ Calculates Redfield longitudinal and transverse relaxation rates and longitudina
 
 ## Model and calculation
 
-The routine constructs the dipolar interaction invariant from the inter-spin separation and combines it with each spin's spin-square factor. Spectral-density terms use the Zeeman frequencies, their sum and difference, and the zero-frequency contribution; the rotational diffusion coefficient is `1/(6*tau_c)`.
+The routine constructs the dipolar interaction invariant from the inter-spin separation and combines it with each spin's spin-square factor. The dipolar interaction is rank-2 anisotropic, and the calculation uses the corresponding rank-2 spectral density. Spectral-density terms use the Zeeman frequencies, their sum and difference, and the zero-frequency contribution; the rotational diffusion coefficient is `1/(6*tau_c)`.
 
 ## Inputs
 

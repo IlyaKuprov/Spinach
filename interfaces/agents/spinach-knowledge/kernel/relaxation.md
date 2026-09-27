@@ -11,6 +11,10 @@ Relaxation superoperator. Syntax: R=relaxation(spin_system,euler_angles)
 - The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
 - The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
 
+Diagonal relaxation retention is not implemented in `zeeman-liouv` and is
+rejected explicitly: deleting population-transfer terms is not a
+basis-independent self-relaxation approximation. Spherical-tensor diagonal
+retention and Zeeman full (`labframe`) retention remain available.
 - SRSK contributes zero-destination relaxation rates to the accumulated generator; IME or DiBari-Levitt thermalisation is applied once to the accumulated spin relaxation, not separately to the recursive SRSK contribution. Bosonic mode dissipation is excluded from that recursive contribution and appended once after outer spin thermalisation, with the original mode parameters and temperature.
 
 ## Numerical / algorithmic content

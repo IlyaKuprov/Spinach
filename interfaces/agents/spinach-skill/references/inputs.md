@@ -39,7 +39,10 @@ Legal `sys.disable` entries, anything else being an error: `'zte'`
 `sys.enable` entries: `'gpu'`, `'op_cache'`, `'ham_cache'`, `'prop_cache'`,
 `'greedy'`, `'paranoia'` (tight tolerances), `'cowboy'` (loose
 tolerances), `'polyadic'`, `'sodd'` (spin-orbit corrections to dipolar
-couplings), `'dafuq'`.
+couplings), `'dafuq'`. With `'polyadic'` enabled, `v2fplanck` supports scalar and voxel-wise velocities; spin-space Kronecker extension preserves prefactors by nesting affixed polyadics.
+
+`sim2liouv` refreshes existing basis cache identities after Hilbert-to-Liouville
+conversion; cached operators and Hamiltonians remain representation-specific.
 
 `sys.tols` subfields are listed and defaulted in `tolerances.m`. The two that
 change physics rather than performance are `inter_cutoff`, below which coupling
@@ -179,7 +182,9 @@ Available for electron spins only. `inter.giant.coeff{n}{k}` is the vector of
 `2k+1` spherical-tensor coefficients of rank `k` for spin `n`, in hertz;
 `inter.giant.euler{n}{k}` is the corresponding `1x3` Euler angle vector in
 radians. Both cell arrays must have one entry per spin, and every rank present
-in `coeff` must have its Euler angles supplied.
+in `coeff` must have its Euler angles supplied. With `ham_cache` enabled,
+giant-spin coefficients and retention strengths distinguish cache entries,
+including full and Zeeman-only Hamiltonians.
 
 ```matlab
 inter.giant.coeff={{[0 0 0],Bkq{2},[0 0 0 0 0 0 0],Bkq{4}}};

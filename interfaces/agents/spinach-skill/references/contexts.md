@@ -278,7 +278,9 @@ they build their own generators.
 `sp_acquire` adds `pulse_frq` (Hz, relative to the current rotating frame),
 `pulse_phi` (rad), `pulse_pwr` (rad/s), `pulse_dur` (s), `pulse_rnk`
 (Fokker-Planck cut-off rank - start at 2 and increase until the answer stops
-moving), and `method` (`'expv'`, `'expm'`, `'evolution'`).
+moving), and `method` (`'expv'`, `'expm'`, `'evolution'`). When `sim2liouv`
+admits a Hilbert-space sequence, it converts `homodec_oper` into a
+commutation superoperator alongside the other operator-like fields.
 
 **Liquid-state 2D** (`experiments/nmr_liquids/`) - `cosy`, `gcosy`,
 `ct_cosy`, `dqf_cosy`, `ecosy`, `tocsy`, `noesy`, `roesy`, `hoesy`,
@@ -300,7 +302,7 @@ cm, default 1.5), and `parameters.pathway`, one of `'P'` (default), `'N'`, or
 
 Natural-abundance simulations should use isotope dilution -
 `subsystems=dilute(spin_system,isotope,tuples)` returns a cell array of
-spin systems, one per isotopomer, to be looped over.
+spin systems, one per isotopomer, to be looped over. `kill_spin` (also used by `dilute`) reindexes retained bosonic-mode parameters, pair couplings, and nested spin-modulation blocks. It clears mode assumption strengths and removes the mode container when no C, V, or T particles remain; rebuild the basis and assumptions afterwards. After removing the final mode, ordinary spin-only assumption sets and retention options apply.
 
 **Bruker ports** (`experiments/bruker/`) - literal translations of the
 echo/antiecho gradient-selected pulse programs: `hmqcetgp`, `hmqcetgpsi`,

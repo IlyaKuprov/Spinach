@@ -32,7 +32,7 @@ sz=tt.sizes; rnk=tt.ranks; d=tt.ncores;
 ttout=tt; r=rnk(:,1);
 
 % Define the relative approximation accuracy
-eps=tt.tolerance(1,1)/tt.coeff(1,1);
+eps=tt.tolerance(1,1)/abs(tt.coeff(1,1));
 eps=eps/sqrt(d);
 
 % SVD cores right-to-left

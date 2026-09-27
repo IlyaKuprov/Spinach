@@ -15,6 +15,7 @@ Diagonal relaxation retention is not implemented in `zeeman-liouv` and is
 rejected explicitly: deleting population-transfer terms is not a
 basis-independent self-relaxation approximation. Spherical-tensor diagonal
 retention and Zeeman full (`labframe`) retention remain available.
+- SRSK contributes zero-destination relaxation rates to the accumulated generator; IME or DiBari-Levitt thermalisation is applied once to the accumulated spin relaxation, not separately to the recursive SRSK contribution. Bosonic mode dissipation is excluded from that recursive contribution and appended once after outer spin thermalisation, with the original mode parameters and temperature.
 
 ## Numerical / algorithmic content
 
@@ -43,3 +44,7 @@ retention and Zeeman full (`labframe`) retention remain available.
 - thermalised GKSL dissipators from rlx_modes.m in Liouville
 - space formalisms; the euler_angles parameter refers to the
 - spin subsystem only and has no effect on the mode terms.
+
+## Header notes
+
+Euler angles use the active ZYZ convention in radians and affect theories with anisotropic rates, not Redfield rotational averaging. In a manually assembled generator use L=H+1i*R+1i*K, not H+R+K.

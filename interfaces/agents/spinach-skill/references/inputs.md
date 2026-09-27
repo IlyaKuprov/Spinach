@@ -179,7 +179,9 @@ Available for electron spins only. `inter.giant.coeff{n}{k}` is the vector of
 `2k+1` spherical-tensor coefficients of rank `k` for spin `n`, in hertz;
 `inter.giant.euler{n}{k}` is the corresponding `1x3` Euler angle vector in
 radians. Both cell arrays must have one entry per spin, and every rank present
-in `coeff` must have its Euler angles supplied.
+in `coeff` must have its Euler angles supplied. With `ham_cache` enabled,
+giant-spin coefficients and retention strengths distinguish cache entries,
+including full and Zeeman-only Hamiltonians.
 
 ```matlab
 inter.giant.coeff={{[0 0 0],Bkq{2},[0 0 0 0 0 0 0],Bkq{4}}};

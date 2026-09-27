@@ -4,27 +4,14 @@
 
 ## Purpose
 
-Eight lowest energy levels as a function of the applied magnetic fi- eld in a triple Dy triangular complex -see Figure 12 in Ligand field parameters and g-tensor for the J=15/2 ground term were computed using the SINGLE_ANISO routine in MOLCAS. Calculation time: hours
+Calculate the eight lowest energy levels as a function of applied magnetic field for a triangular complex of three Dy centres, as in Figure 12 of https://doi.org/10.1002/chem.201703842. The ligand-field parameters and g-tensor for the J=15/2 ground term were computed using the SINGLE_ANISO routine in MOLCAS. The source notes a calculation time of hours.
 
 ## Physical / mathematical content
 
-- Giant-spin examples. The effective model treats lanthanides or high-spin centres using crystal-field / Stevens-operator Hamiltonians, Zeeman splitting, and magnetisation dynamics.
+- Represent the three J=15/2 Dy centres as `E16` spins arranged in a triangle. Their g-tensors are related by rotations of 120°.
+- Include spin–orbit corrections to the dipole–dipole couplings with `sys.enable={'sodd'}` and pairwise exchange couplings of `0.0063 cm^-1`, converted to hertz. The exchange matrix uses the NMR convention required by Spinach.
+- Convert the supplied rank-2, rank-4 and rank-6 Stevens coefficients from inverse centimetres to hertz, transform them to irreducible spherical tensors, and rotate the ligand field into the molecular frame. Apply the resulting coefficients to all three centres with their specified Euler rotations.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Eight lowest energy levels as a function of the applied magnetic fi-
-- eld in a triple Dy triangular complex -see Figure 12 in
-- Ligand field parameters and g-tensor for the J=15/2 ground term were
-- computed using the SINGLE_ANISO routine in MOLCAS.
-- Calculation time: hours
-- Three J=15/2 dysprosium atoms
-- g-tensor eigenvalues
-- Spin-orbit corrections
-- to the DD couplings
-- g-tensor eigenvectors
-- g-tensor matrix
-- Triangle arrangement
+The calculation uses an unapproximated Zeeman Hilbert-space basis (`zeeman-hilb`, `none`). After creating the spin system and basis, it calls `fieldscan_enlev` for 30 field points from 0 to 1 T, orientation `[0 pi/2 0]`, and the lowest eight states. `sys.magnet` is set to 1.0 T as required by the example.

@@ -8,22 +8,12 @@ Liouvillian symmetrization for a radical pair with four equivalent nuclei under 
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+The zero-field model contains two electron spins and four equivalent protons; the four protons are assigned to an S4 symmetry group. The basis uses the full set of symmetry sectors rather than restricting to A1g alone.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+Constructs the Hamiltonian superoperator, concatenates the symmetry-irrep projectors into a transformation matrix, and displays sparsity plots for the original Liouvillian and its symmetry-transformed form.
 
 ## Implementation structure
 
-- Liouvillian symmetrization for a radical pair with four
-- equivalent nuclei under the S4 permutation group.
-- Magnetic field
-- Spin system
-- Basis set
-- Interactions
-- Spinach housekeeping
-- Assumptions
-- Hamiltonian superoperator
-- Symmetry factorization
-- Plotting
+Defines the spin system and interactions, builds the spherical-tensor Liouville basis with S4 symmetry, makes the lab-frame assumption, then compares the two sparsity patterns.

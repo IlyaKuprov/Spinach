@@ -4,27 +4,8 @@
 
 ## Purpose
 
-Test of consistency in the projection between spherical tensor basis set and Zeeman basis set.
+Verify that a constructed two-spin state is represented consistently in Zeeman Hilbert space, Zeeman Liouville space, and spherical-tensor Liouville space after projection back to the Zeeman basis.
 
-## Physical / mathematical content
+## Method
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Test of consistency in the projection between spherical
-- tensor basis set and Zeeman basis set.
-- Magneti field
-- Isotopes
-- No interactions
-- Hilbert space, Zeeman basis
-- A suitably complicated state
-- Liouville space, Zeeman basis
-- Fold back into Hilbert space
-- Liouville space, IST basis
-- Project into Zeeman basis
-- Check the results
+The example uses non-interacting `14N` and `235U` spins at 14.1 T. In each formalism it builds the same operator state: Lz on spin 1 and Lx on spin 2, plus L+ on spin 1. The Zeeman Liouville representation is reshaped to a 24-by-24 matrix; the spherical-tensor representation is first transformed with `sphten2zeeman` and then reshaped. The three matrices must agree pairwise within an L1-norm tolerance of `1e-6`, or the test fails.

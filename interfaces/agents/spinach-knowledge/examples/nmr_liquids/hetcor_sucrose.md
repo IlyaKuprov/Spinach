@@ -4,28 +4,10 @@
 
 ## Purpose
 
-HETCOR spectrum of sucrose with natural content of 13C isotope (magnetic parameters computed with DFT). Calculation time: minutes
+Simulates a HETCOR spectrum of sucrose at natural 13C abundance. Magnetic parameters come from a vacuum DFT calculation, with isotropic shielding values replaced by experimental shifts. Calculation time: minutes.
 
-## Physical / mathematical content
+## Implementation
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- HETCOR spectrum of sucrose with natural content of 13C isotope
-- (magnetic parameters computed with DFT).
-- Calculation time: minutes
-- Spin system properties (vacuum DFT calculation)
-- Set the isotropic parts of shielding tensors to experimental values
-- Magnet field
-- Algorithmic options
-- Basis set
-- Sequence parameters
-- Create the spin system structure
-- Generate isotopomers
-- Preallocate the answer
+- Imports the sucrose spin system from `../standard_systems/sucrose.log`, sets a 5.9 T field, and uses a spherical-tensor Liouville basis with `IK-2` approximation and scalar-coupling connectivity.
+- Sets `J=140`, 1H/13C sweep widths of `[1000 3350]`, offsets of `[1200 5000]`, `[256 256]` points, and `[512 512]` zero filling; decouples 1H and reports axes in ppm.
+- Generates 13C isotopomers, simulates each with `hetcor` in a parallel loop, applies cosine apodisation, Fourier-transforms and sums the spectra, then plots the absolute-value 2D spectrum.

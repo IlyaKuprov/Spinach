@@ -8,25 +8,15 @@ CT HSQC spectrum of sucrose with natural content of 13C isotope (magnetic parame
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Two-dimensional constant-time HSQC of sucrose using 13C and 1H spins. Magnetic parameters are initialized from a vacuum DFT log, then selected isotropic shifts are replaced with experimental values.
+- The simulation treats 13C isotopomers separately, applies squared-cosine apodisation to the positive and negative FIDs, forms a States signal, and Fourier transforms both dimensions.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- Spin-system generation uses `g2spinach` with `min_j=3.0` and `no_xyz=1`; the code then sets the isotropic shifts for listed spins. The basis is sphten-liouv / IK-2 with scalar-coupling connectivity and proximity level 1; greedy settings use `prox_cutoff=4.0`.
+- Sequence settings are `J=140`, sweep `[3350 950]`, offset `[5000 1100]`, `npoints=[128 128]`, and `zerofill=[512 512]`; F2 13C is decoupled. Isotopomer calculations use `parfor` (no GPU path is present).
 
 ## Implementation structure
 
-- CT HSQC spectrum of sucrose with natural content of 13C isotope
-- (magnetic parameters computed with DFT).
-- Calculation time: seconds
-- Spin system properties (vacuum DFT calculation)
-- Set the isotropic parts of shielding tensors to experimental values
-- Magnet field
-- Algorithmic options
-- Basis set
-- Sequence parameters
-- Create the spin system structure
-- Generate isotopomers
-- Preallocate the answer
+- Build the sucrose spin system from the vacuum DFT log and replace the listed isotropic shifts with experimental values; set the field to 5.9 T and define the selected basis and CT-HSQC parameters.
+- Generate 13C isotopomers, simulate each in parallel, then apodise the FIDs, form the States signal, Fourier transform both dimensions, and plot the real spectrum.

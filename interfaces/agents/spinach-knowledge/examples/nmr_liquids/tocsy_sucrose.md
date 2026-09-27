@@ -4,30 +4,18 @@
 
 ## Purpose
 
-TOCSY spectrum of sucrose (magnetic parameters computed with DFT). Calculation time: seconds
+Simulates a liquid-state 2D TOCSY spectrum of sucrose using magnetic parameters from a vacuum DFT calculation. The source states a calculation time of seconds.
 
-## Physical / mathematical content
+## Spin system and basis
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Parses `../standard_systems/sucrose.log` with `gparse` and converts hydrogen atoms to `1H` with `g2spinach`, using `options.min_j=1.0` and the supplied conversion parameter `31.8`.
+- Sets the magnet field to `5.9`.
+- Uses the `sphten-liouv` formalism with `IK-2` approximation, `scalar_couplings` connectivity, and proximity level `1`.
+- Enables `greedy`, **disables `krylov`**, and sets `sys.tols.prox_cutoff=4.0`.
 
-## Numerical / algorithmic content
+## Sequence and processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-
-## Implementation structure
-
-- TOCSY spectrum of sucrose (magnetic parameters computed with DFT).
-- Calculation time: seconds
-- Spin system properties (vacuum DFT calculation)
-- Magnet field
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- F2 Fourier transform
-- States signal
+- Creates the spin system and basis, then simulates with `liquid(spin_system,@tocsy,parameters,'nmr')`.
+- Sets mixing time `0.100`, `lamp=1e4`, offset `800`, sweeps `[1700 1700]`, acquisition points `[512 512]`, zero filling `[2048 2048]`, observed spins `{'1H'}`, and axis units `ppm`. The initial state is proton `Lz`.
+- Applies squared-cosine apodisation in both dimensions to the cosine and sine signals. The F2 transforms use the imaginary part of the cosine signal and the real part of the sine signal; these are combined as `f1_cos-1i*f1_sin` for the States signal. An F1 Fourier transform then produces the spectrum.
+- Plots `abs(spectrum)` with `plot_2d`.

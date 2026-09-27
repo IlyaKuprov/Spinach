@@ -8,25 +8,12 @@ HSQC spectrum of strychnine with natural content of 13C isotope. Calculation tim
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The example simulates a strychnine HSQC spectrum with natural 13C abundance by diluting the spin system into 13C isotopomers. The sequence specifies J=140 Hz, observes 13C and 1H, and decouples 1H in F1 and 13C in F2.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The IK-2 sphten-liouv basis uses scalar-coupling connectivity and proximity level 1. Simulations run over isotopomers in a `parfor` loop; square-cosine apodisation and two Fourier transforms with States combination form the 2D spectrum.
 
 ## Implementation structure
 
-- HSQC spectrum of strychnine with natural content of 13C isotope.
-- Calculation time: minutes
-- Spin system properties
-- Magnet field
-- Algorithmic options
-- Basis set
-- Sequence parameters
-- Create the spin system structure
-- Generate isotopomers
-- Preallocate the answer
-- Loop over isotopomers
-- Build the basis
+The field is 5.9 T. Acquisition uses sweeps [10000 3000] Hz, offsets [4000 1000] Hz, 128 points per dimension and 512-point zero filling. The greedy algorithm uses proximity cutoff 4.0. The real spectrum is plotted with positive polarity.

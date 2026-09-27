@@ -8,7 +8,7 @@ NMR spectrum of the reaction mixture in the absence of chemical kinetics and spa
 
 ## Physical / mathematical content
 
-- Microfluidics examples. The coupled model is spin dynamics plus advection-diffusion-reaction transport on a mesh or regular grid. Numerical issues include finite-difference operators, mesh interpolation, and coupled reaction-flow evolution.
+- This is a homogeneous liquid-state NMR calculation, not a spatial microfluidics simulation. It imports the Diels–Alder reaction spin system, sets equal concentrations for the four chemical species with no solvent, and acquires a proton spectrum without chemical kinetics or spatial dynamics.
 - Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
 
 ## Numerical / algorithmic content

@@ -4,25 +4,12 @@
 
 ## Purpose
 
-Tests the internal consistency of kernel rotation functions.
+Checks consistency among Spinach's DCM, Euler-angle, Wigner-matrix, and Cartesian-to-spherical-tensor rotation routines.
 
-## Physical / mathematical content
+## Checks
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+A random symmetric traceless 3×3 matrix and random Euler angles are used for three comparisons:
 
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Tests the internal consistency of kernel rotation functions.
-- Generate a random symmetric traceless 3x3 matrix
-- Generate a random set of Euler angles
-- % Test 1: euler2dcm, wigner, mat2sphten
-- DCM rotation followed by a transformation into irreducible components
-- Transformation into irreducible components followed by a Wigner rotation
-- Check the difference
-- % Test 2: euler2dcm, dcm2euler
-- Transforms Euler angles into DCM
-- Transform the DCM back into Euler angles
-- % Test 3: euler2dcm, wigner, dcm2wigner
-- Transforms Euler angles into DCM, then DCM to Wigner matrix
+1. Rotating the matrix by its DCM and then converting it with `mat2sphten` is compared with converting first and applying `wigner(2,...)`; the rank-2 coefficient residual must be below 10⁻¹⁰ in the 2-norm.
+2. Converting the Euler angles to a DCM and back with `dcm2euler` must reproduce the angles within a 2-norm tolerance of 10⁻³.
+3. `dcm2wigner(euler2dcm(...))` is compared with the direct `wigner(2,...)` result, with a 2-norm tolerance of 10⁻¹⁰.

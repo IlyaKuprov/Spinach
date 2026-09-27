@@ -4,32 +4,16 @@
 
 ## Purpose
 
-Complete microfluidic simulation: diffusion, flow, two second- order chemical reactions, and NMR detection in a narrow strip of the chip where the coil is assumed to be located. Calculation time: days, much faster on GPU.
+This example couples flow and diffusion through a microfluidic chip to two second-order Diels–Alder reaction pathways, then simulates proton NMR detection in the narrow region assumed to contain the coil. The calculation takes days on a CPU and is much faster on a GPU.
 
 ## Physical / mathematical content
 
-- Microfluidics examples. The coupled model is spin dynamics plus advection-diffusion-reaction transport on a mesh or regular grid. Numerical issues include finite-difference operators, mesh interpolation, and coupled reaction-flow evolution.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+COMSOL mesh and velocity data define transport across the chip. Cell-wise concentrations of the reactants and products evolve under advection, diffusion, and competing exo/endo reaction channels; the NMR signal is detected only over the selected coil footprint.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+A shared flow-diffusion generator is combined at each time step with local reaction generators to advance the concentration field. The resulting cell concentrations are interpolated in time and used to initialise spin states at successive reaction times. During each NMR acquisition, the spin system evolves with transport and concentration-dependent reaction terms, using a two-point Lie quadrature step; the FIDs are then apodised, zero-filled, Fourier transformed, and displayed as a waterfall spectrum.
 
 ## Implementation structure
 
-- Complete microfluidic simulation: diffusion, flow, two second-
-- order chemical reactions, and NMR detection in a narrow strip
-- of the chip where the coil is assumed to be located.
-- Calculation time: days, much faster on GPU.
-- Import Diels-Alder cycloaddition
-- Import hydrodynamics information
-- Magnet field
-- This needs a GPU
-- Spinach housekeeping
-- % Concentration dynamics stage
-- Rate constants, mol/(L*s)
-- Cycloaddition reaction generator, including solvent
+The function imports the Diels–Alder kinetics and COMSOL hydrodynamics, builds the mesh and spin system, and advances the concentration dynamics before running the coupled chemistry, hydrodynamics, and spin-dynamics stage. A rectangular phantom selects the detection region, and spectra are calculated at sampled reaction times.

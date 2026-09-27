@@ -8,25 +8,15 @@ DEPT135 experiment on strychnine. Calculation time: minutes
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Simulates a one-dimensional DEPT135 experiment on the 1H/13C strychnine spin system. The signal is generated with Spinach’s liquid-state DEPT sequence, including scalar-coupling-mediated transfer.
+- Natural-abundance 13C isotopomers are simulated separately; the free-induction decay is exponentially apodised and Fourier transformed to give the plotted carbon spectrum.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- Uses a sphten-liouv / IK-2 basis with scalar-coupling connectivity and proximity level 1; temperature is 298 K and the field is 5.9 T. Sequence parameters are sweep `10000`, offset `[5000 0]`, `npoints=2048`, `zerofill=8196`, `J=150`, and `beta=3*pi/4`.
+- Iteration over 13C isotopomers is parallelised with `parfor`; no GPU execution is present.
 
 ## Implementation structure
 
-- DEPT135 experiment on strychnine.
-- Calculation time: minutes
-- Read the spin system properties
-- Magnet field
-- Temperature
-- Basis set
-- Sequence parameters
-- Create the spin system structure
-- Generate isotopomers
-- Preallocate the answer
-- Loop over isotopomers
-- Build the basis
+- Create the 1H/13C strychnine spin system; set the 5.9 T field and 298 K temperature, then configure the scalar-coupling basis and DEPT135 parameters.
+- Generate 13C isotopomers and simulate each in parallel. Exponentially apodise (`exp`, 6), Fourier transform, and plot the real 13C spectrum.

@@ -4,27 +4,10 @@
 
 ## Purpose
 
-Transverse magnetisation dynamics in a pulse-acquire experiment on a fatty acid. This example looks at how the magnetisation drifts around the state space under the influence of strong J-coupling in the absence of relaxation. Calculation time: minutes.
+Simulate transverse magnetisation in the fatty-acid system produced by `fatty_acid(15)` under scalar-coupling evolution and repeated 180° pulses, without relaxation, and inspect how the state spreads through correlation orders. The source estimates minutes of calculation time.
 
-## Physical / mathematical content
+## Method
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+The example uses the `sphten-liouv` formalism, `IK-2` basis approximation, proximal level 1, scalar-coupling connectivity, and a 14.1 T field. It starts from proton Lx magnetisation and observes with proton L+. After 50 trajectory points at `4e-5` s intervals, it applies eight pi-rotation pulses about Lx; each pulse is followed by 100 further points at the same interval. The combined trajectory is analysed with `trajan(...,'correlation_order')`.
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Implementation structure
-
-- Transverse magnetisation dynamics in a pulse-acquire experiment on
-- a fatty acid. This example looks at how the magnetisation drifts
-- around the state space under the influence of strong J-coupling in
-- the absence of relaxation.
-- Calculation time: minutes.
-- Read spin system properties
-- Magnet field
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Assumptions
+The system enables `greedy` and `prop_cache`. No relaxation operator or relaxation evolution is included.

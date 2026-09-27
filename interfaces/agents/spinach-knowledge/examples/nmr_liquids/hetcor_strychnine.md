@@ -4,28 +4,11 @@
 
 ## Purpose
 
-HETCOR spectrum of strychnine with natural content of 13C isotope. Calculation time: minutes
+Simulates a HETCOR spectrum of strychnine at natural 13C abundance. Calculation time: minutes.
 
-## Physical / mathematical content
+## Implementation
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- HETCOR spectrum of strychnine with natural content of 13C isotope.
-- Calculation time: minutes
-- Read the spin system properties
-- Magnet field
-- Algorithmic options
-- Basis set
-- Sequence parameters
-- Create the spin system structure
-- Generate isotopomers
-- Preallocate the answer
-- Loop over isotopomers
-- Build the basis
+- Loads the `1H`/`13C` strychnine spin system and sets the magnetic field to 5.9.
+- Uses the `sphten-liouv` formalism with `IK-2` approximation, scalar-coupling connectivity, and proximity level 1; enables `greedy` and sets the proximity cutoff to 4.0.
+- Sets `J=140`, sweep widths `[3000 10000]`, offsets `[1000 4000]`, `[256 256]` points, and `[512 512]` zero filling; decouples `1H` and uses ppm axes.
+- Generates 13C isotopomers with `dilute`, simulates each with `liquid(...,@hetcor,...)` in a `parfor` loop, applies cosine apodisation in both dimensions, and sums the shifted 2D Fourier transforms before plotting the absolute spectrum.

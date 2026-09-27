@@ -8,12 +8,12 @@ Flow in the absence of spin dynamics, but presence of two unidirectional second-
 
 ## Physical / mathematical content
 
-- Microfluidics examples. The coupled model is spin dynamics plus advection-diffusion-reaction transport on a mesh or regular grid. Numerical issues include finite-difference operators, mesh interpolation, and coupled reaction-flow evolution.
+- This example has no spin dynamics: it combines flow and strong diffusion on an imported COMSOL mesh with two competing second-order cycloaddition reactions. The local chemistry is evaluated from reactant concentrations in each mesh cell.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- At each time step, the code builds a cell-specific chemical generator, combines it with the mesh flow/diffusion generator, and advances the flattened concentration trajectory with `step`.
+- A `parfor` loop evaluates the local reaction generator independently for each mesh cell; the four plotted fields are the two reactants and two products.
 
 ## Implementation structure
 

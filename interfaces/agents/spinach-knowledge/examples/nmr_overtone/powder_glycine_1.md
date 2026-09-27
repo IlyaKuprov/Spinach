@@ -4,30 +4,10 @@
 
 ## Purpose
 
-Overtone detection 14N powder NMR spectrum of glycine, computed using Fokker-Planck formalism. Glycine quadrupolar tensor data comes from the paper by O'Dell and Ratcliffe: A very short pulse with an unphysically large power is used. Calculation time: seconds
+Simulates the 14N powder overtone NMR spectrum of glycine using Fokker–Planck formalism. The quadrupolar tensor data are attributed to [O'Dell and Ratcliffe](http://dx.doi.org/10.1016/j.cplett.2011.08.030). The source notes that it uses a very short pulse with unphysically large power and estimates a calculation time of seconds.
 
-## Physical / mathematical content
+## Scientific and numerical content
 
-- Overtone NMR examples. The important regime is excitation or detection of formally forbidden high-order transitions in quadrupolar nuclei, usually aided by MAS or Fokker-Planck treatments of periodic motion.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The model uses 14N at 14.1 T, quadrupolar parameters `eeqq2nqi(1.18e6,0.53,1,[0 0 0])`, scalar Zeeman value 32.4, an unapproximated `sphten-liouv` basis and diagonal damping rate 500 with zero equilibrium. Krylov and trajectory-level methods are disabled.
 
-## Numerical / algorithmic content
-
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-
-## Implementation structure
-
-- Overtone detection 14N powder NMR spectrum of glycine, computed using
-- Fokker-Planck formalism. Glycine quadrupolar tensor data comes from
-- the paper by O'Dell and Ratcliffe:
-- A very short pulse with an unphysically large power is used.
-- Calculation time: seconds
-- System specification
-- Basis set
-- Relaxation theory
-- Algorithmic options
-- Spinach housekeeping
-- Magic angle
-- Spectrum setup
+The powder calculation uses the `rep_2ang_6400pts_sph` grid, 0–15 kHz sweep and 256 points with 256-point zero filling. At the magic angle, the initial 14N Lz state and angle-weighted Lz/Lx coil and Lx operator are used. It calls `powder` with `@overtone_pa` and `qnmr`; the pulse is 1 μs with the source's `2*pi*11.3e6/sin(theta)` power expression and 10 kHz offset.

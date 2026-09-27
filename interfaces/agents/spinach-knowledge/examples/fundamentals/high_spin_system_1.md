@@ -4,28 +4,14 @@
 
 ## Purpose
 
-Pulse-acquire NMR spectrum in a system with a hypothetical scalar coupling to a 235U nucleus. The spectral lines should be split accordingly.
+Simulates a pulse-acquire NMR spectrum for a hypothetical scalar coupling to 235U, illustrating the splitting of proton spectral lines.
 
-## Physical / mathematical content
+## Spin system and acquisition
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The system is at 14.1 T and contains 1H, 235U, 1H, and 1H spins. Their scalar shifts are −0.5, 0.0, 2.5, and 1.3 ppm; the specified scalar couplings are J12=100 Hz, J34=50 Hz, and J44=0. The basis is sphten-liouv with approximation none.
 
-## Numerical / algorithmic content
+Acquisition observes 1H only, starting from L+ and detecting with an L+ coil; no decoupling is applied. The offset is 0, sweep width 3500 Hz, and the FID has 1024 points, zero-filled to 4096. The axis is in ppm and inverted.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Processing
 
-## Implementation structure
-
-- Pulse-acquire NMR spectrum in a system with a hypothetical scalar
-- coupling to a 235U nucleus. The spectral lines should be split
-- accordingly.
-- Magnet field
-- Basis set
-- Spin system
-- Spinach housekeeping
-- Pulse sequence parameters
-- Simulation
-- Apodization
-- Fourier transform
-- Plotting
+The script calls liquid with acquire and NMR mode, applies exponential apodisation with parameter 6, and computes fftshift(fft(fid,4096)). It plots the real spectrum with plot_1d.

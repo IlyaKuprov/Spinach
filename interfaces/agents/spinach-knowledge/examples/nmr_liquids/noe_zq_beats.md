@@ -4,28 +4,19 @@
 
 ## Purpose
 
-Zero-quantum beats in the Overhauser effect in a strongly coupled two-spin system. Calculation time: seconds
+Zero-quantum beats in the Overhauser effect in a strongly coupled two-spin system. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+- The system is two protons with a 0.01 ppm difference in isotropic shift, a 3.0 Hz scalar coupling, and a 2.00 Å separation. Redfield relaxation is specified with a 1 ns correlation time, 298 K, the Di Bari equilibrium convention, and secular retention.
+- Starting from thermal equilibrium with spin 1 inverted, the calculation follows both longitudinal magnetizations; the strong coupling allows the zero-quantum-beat behaviour associated with the NOE to appear.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- The Liouvillian is the NMR-frame Hamiltonian plus the relaxation contribution. It is propagated in the full spherical-tensor Liouville basis, with a 4.0 proximity cutoff.
+- The two longitudinal detection channels are sampled every 0.01 s over 1000 intervals (0–10 s).
 
 ## Implementation structure
 
-- Zero-quantum beats in the Overhauser effect in a strongly
-- coupled two-spin system.
-- Calculation time: seconds
-- Set the spin system
-- Magnet field
-- Basis set
-- Relaxation theory parameters
-- Proximity cut-off
-- Spinach housekeeping
-- Build the Liouvillian
-- Get thermal equilibrium state
-- Start in a state with one spin inverted
+- Build the two-proton system at 14.1 T, construct the Redfield superoperator, and add it to the assumed NMR Hamiltonian.
+- Invert spin 1 relative to equilibrium, run multichannel evolution with both `Lz` operators, and plot the real longitudinal signals for Proton A and Proton B.

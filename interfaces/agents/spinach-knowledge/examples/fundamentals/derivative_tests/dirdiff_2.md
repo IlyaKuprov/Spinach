@@ -4,29 +4,19 @@
 
 ## Purpose
 
-Test of matrix exponential differentiation of second order Magnus product quadrature (trapdiff.m) with the result com- pared to the central finite difference derivative. General coherent + non-symmetric dissipative case is tested.
+Check the analytical left- and right-control derivatives returned by `trapdiff` against central finite differences for the second-order Magnus product quadrature.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+The test uses a general coherent and non-symmetric dissipative case, represented by separate left and right drift generators and a control operator. The three formalism labels are used to construct Spinach test systems; the derivative check then operates on random matrices.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+The time step is estimated as the mean of the inverse 2-norms of the two drift matrices. The finite-difference increment is `sqrt(eps('double'))`. Analytical directional derivatives are compared with centered differences of matrix exponentials; each difference must be below `10*sqrt(eps('double'))` in 2-norm.
 
 ## Implementation structure
 
-- Test of matrix exponential differentiation of second order
-- Magnus product quadrature (trapdiff.m) with the result com-
-- pared to the central finite difference derivative. General
-- coherent + non-symmetric dissipative case is tested.
-- Formalisms to test
-- Loop over formalisms
-- Get the Spinach object
-- Left and right drift generators, dissipative
-- Control operator
-- A reasonable time step estimate
-- Reasonable controls
-- Get analytical derivatives
+- Construct test systems for `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb`.
+- Generate two random complex `50×50` drift matrices and one random complex control matrix.
+- Build the left and right control directions and evaluate both derivatives with `trapdiff`.
+- Compare each result with its finite-difference estimate and fail if either check is outside tolerance.

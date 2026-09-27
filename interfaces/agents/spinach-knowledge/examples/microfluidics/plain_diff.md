@@ -8,11 +8,11 @@ Simple diffusion simulation without spin dynamics. Longitudinal magnetisation is
 
 ## Physical / mathematical content
 
-- Microfluidics examples. The coupled model is spin dynamics plus advection-diffusion-reaction transport on a mesh or regular grid. Numerical issues include finite-difference operators, mesh interpolation, and coupled reaction-flow evolution.
+- This example isolates diffusion and distal-pipe drainage on an imported COMSOL mesh: it zeros both mesh velocity components, initializes longitudinal magnetisation in cells 1240 and 1246, and detects it with a uniform Lz coil. No spin-subspace dynamics or chemical reaction is included.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- `meshflow` propagates the spatial signal with diffusion coefficient 1e-7 m^2/s and a drainage term in the distal cells; the script then plots the concentration-like trajectory over the mesh.
 
 ## Implementation structure
 

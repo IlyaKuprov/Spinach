@@ -4,29 +4,12 @@
 
 ## Purpose
 
-GRAPE phase Hessian test against finite-differenced gradients, rectangles integrator.
+Tests the phase-modulated GRAPE Hessian by finite-differencing analytical gradients for a rectangular pulse.
 
-## Physical / mathematical content
+## Setup
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The test covers sphten-liouv, zeeman-liouv, and zeeman-hilb, using a 13C system from dirdiff_test_system. The channel map is [1;1;1;1]. The four control operators are Lx, Ly, 0.4*Lx+0.2*Ly, and 0.7*Ly-0.1*Lx; initial states are Sx, Sy, Sz, with targets −Sz, Sy, Sx. Power levels are 2*pi*linspace(50e3,70e3,10). GRAPE uses Newton optimisation, a 1000-iteration limit, and the rectangle integrator. Five intervals have pulse_dt=12.8e-6*ones(1,5); the amplitude rows are ones(1,5) and 0.8+0.1*(1:5).
 
-## Numerical / algorithmic content
+## Hessian check
 
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
-
-## Implementation structure
-
-- GRAPE phase Hessian test against finite-differenced gradients,
-- rectangles integrator.
-- Formalisms to test
-- Loop over formalisms
-- Build the derivative-test system
-- Define control parameters
-- Set the interval grid
-- Spinach housekeeping
-- Random phases and finite diff increment
-- Call GRAPE and request analytical Hessian
-- Leftmost Hessian column
-- Rightmost Hessian column
+For a random 2-by-5 phase array randn(2,5)/3, the code requests the analytical Hessian from grape_phase. It uses centered differences of gradients with h=1e-5, perturbing waveform entries i=1, i=end, and i=5 to test the leftmost, rightmost, and fifth Hessian columns. Each selected column passes when norm(hess_anl(:,i)-hess_num,1)<1e-5*norm(hess_num,1); otherwise the test raises an error naming the formalism and column.

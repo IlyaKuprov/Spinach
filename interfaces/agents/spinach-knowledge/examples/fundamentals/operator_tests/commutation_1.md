@@ -4,22 +4,10 @@
 
 ## Purpose
 
-Commutators of simple operators and superoperators. The test calculation is performed three times in the three formalisms supported by Spinach.
+Checks spin-operator commutators across the three Spinach formalisms supported by this test: zeeman-hilb, zeeman-liouv, and sphten-liouv.
 
-## Physical / mathematical content
+## System and checks
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+For each formalism, the script creates a single 1H spin at zero field with zero scalar chemical shift and uses basis approximation none. It constructs Lx, Ly, Lz, L+, and L−, then evaluates the Frobenius norms of the residuals for [Lz,L+]=L+, [Lz,L−]=−L−, and [Lx,Ly]=iLz.
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Commutators of simple operators and superoperators. The test
-- calculation is performed three times in the three formalisms
-- supported by Spinach.
-- Simple 1-spin system
-- Preallocate the answer
-- Run the tests
-- Report the outcome
+The 3-by-3 array of residual norms passes if its Frobenius norm is below 1e-6. The script then reports that the cross-formalism test passed; otherwise it raises an error.

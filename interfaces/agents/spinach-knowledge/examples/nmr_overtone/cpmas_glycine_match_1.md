@@ -4,28 +4,16 @@
 
 ## Purpose
 
-Cross-polarization experiment between protons and 14N overtone transition in glycine under MAS. Glycine quadrupolar tensor da- ta comes from the paper by O'Dell and Ratcliffe: Hartmann-Hahn condition profile with a rough powder grid, as a function of 1H RF power. Calculation time: minutes
+Maps the glycine 14N-overtone/proton cross-polarisation Hartmann–Hahn profile against 1H RF power under MAS, using a rough powder grid. The source estimates minutes of computation and credits Ilya Kuprov, M. Carravetta, and M. Concistre.
 
 ## Physical / mathematical content
 
-- Overtone NMR examples. The important regime is excitation or detection of formally forbidden high-order transitions in quadrupolar nuclei, usually aided by MAS or Fokker-Planck treatments of periodic motion.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The source attributes the glycine quadrupolar tensor data to O'Dell and Ratcliffe ([DOI](http://dx.doi.org/10.1016/j.cplett.2011.08.030)). The model uses 14N and 1H at 14.10220742 T, quadrupolar parameters 1.18 MHz and η=0.53 for 14N, a 1H shift of 32.4, damping rate 300, and the sphten-liouv basis without approximation. The MAS rate is −19.840 kHz and the nitrogen overtone RF frequency is 48 kHz.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The rough powder grid is `rep_2ang_200pts_oct`; spectra use rank 7, 256 points over [44, 52] kHz. The 1H RF power is sampled at 15 values from 25 to 39 kHz, while the 14N RF power is 55 kHz; the RF duration is 100 μs. Each setting is simulated with `singlerot` and `@overtone_cp`.
 
 ## Implementation structure
 
-- Cross-polarization experiment between protons and 14N overtone
-- transition in glycine under MAS. Glycine quadrupolar tensor da-
-- ta comes from the paper by O'Dell and Ratcliffe:
-- Hartmann-Hahn condition profile with a rough powder grid, as a
-- function of 1H RF power.
-- Calculation time: minutes
-- System specification
-- Relaxation theory
-- Basis set
-- Spinach housekeeping
-- Magic angle
-- Spectrum setup
+The function prepares the system, basis and CP operators, loops over the 15 proton-power settings, computes a spectrum for each, and displays the spectra in a row of panels.

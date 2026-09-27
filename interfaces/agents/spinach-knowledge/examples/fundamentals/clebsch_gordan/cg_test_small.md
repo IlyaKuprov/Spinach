@@ -4,19 +4,16 @@
 
 ## Purpose
 
-Compares the output of Spinach Clebsch-Gordan function with the arbitrary precision results returned by Mathematica.
+Checks Spinach Clebsch-Gordan coefficients against the arbitrary-precision reference values in the small test table, which are reported as Mathematica results.
 
-## Physical / mathematical content
+## Physical and mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+The test exercises Clebsch-Gordan coefficient evaluation for the cases stored in `cg_test_table_small.mat`; it is a numerical reference comparison rather than a spectrum simulation.
 
-## Numerical / algorithmic content
+## Numerical and algorithmic content
+
+For each row, the script computes a coefficient and compares it with the stored reference. An absolute difference below `2*eps` is reported as PASS; otherwise the script raises an error with the difference and fails.
 
 ## Implementation structure
 
-- Compares the output of Spinach Clebsch-Gordan function with the
-- arbitrary precision results returned by Mathematica.
-- Load the test file
-- Loop over the lines of the table
-- Compute the CG coefficient
-- Compare with the Mathematica result
+The function loads `cg_test_table_small.mat`, loops over its rows, calls `clebsch_gordan` using the row's inputs, and checks the result against the reference in that row.

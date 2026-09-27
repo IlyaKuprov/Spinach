@@ -4,27 +4,20 @@
 
 ## Purpose
 
-Unit tests for advanced polyadic functionality.
+Validates the `polyadic` matrix object's constructor, dense conversion, and overloaded operations against explicit Kronecker-product matrix references. The test covers composition, arithmetic, sparse and dense operands, empty matrices, nested simplification, and GPU conversion when a device is available.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+- The main reference is the sum `kron(a,b)+kron(c,d)`, represented as a two-term polyadic object. Further references are formed by ordinary dense matrix operations on that sum.
+- This is a matrix-algebra test; it does not define a physical spin system or dynamics.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- Most dense-reference identities are checked at `1e-12`; the optional GPU round-trip uses `1e-10`. GPU coverage is skipped when `gpuDeviceCount` is zero.
+- Checks include constructor/`full`/`inflate` consistency, `validate`, prefix and suffix multiplication, size and emptiness, addition and subtraction, scalar and matrix multiplication, Kronecker products, transpose operations, finiteness, nonzero counts, and simplification of nested expressions.
 
 ## Implementation structure
 
-- Unit tests for advanced polyadic functionality.
-- Get random test matrices
-- Build a reference polyadic and its matrix form
-- Check constructor, full, inflate, and validate
-- Check prefixes, suffixes, size, and emptiness
-- Check addition and subtraction paths
-- Check multiplication paths
-- Check Kronecker products
-- Check transpose operations
-- Check finiteness and internal non-zero counts
-- Check zero-dimension behaviour
-- Check nested simplification paths
+- Construct complex dense and sparse factors, form a two-term polyadic object, and compare it with the dense sum-of-Kronecker-products reference.
+- Apply each operation to both polyadic and dense forms, asserting their results agree.
+- Exercise the zero-dimension and nested-simplification cases, then test GPU upload only if hardware is available.

@@ -4,26 +4,18 @@
 
 ## Purpose
 
-GRAPE Hessian internal consistency test: Newton against Goodwin algorithm.
+Check internal consistency between the Newton and Goodwin GRAPE Hessians.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The test compares Hessians for both phase-modulated and Cartesian controls in the `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb` formalisms.
 
 ## Numerical / algorithmic content
 
+With the rectangles integrator, the Newton and Goodwin Hessian arrays are compared using their relative 1-norm difference. Each comparison must be no greater than `1e-6` times the Newton Hessian's 1-norm.
+
 ## Implementation structure
 
-- GRAPE Hessian internal consistency test: Newton
-- against Goodwin algorithm.
-- Formalisms to test
-- Loop over formalisms
-- Build the derivative-test system
-- Define control parameters
-- Pick initial guess, phase-modulated GRAPE
-- Get Newton Hessian
-- Get Goodwin Hessian
-- Pick initial guess, XY-modulated GRAPE
-- Run the comparisons
+- Configure the GRAPE control system and generate an initial phase waveform and an initial Cartesian waveform.
+- For each waveform, obtain the Hessian from `grape_phase` or `grape_xy` with `control.method` set first to `newton`, then to `goodwin`.
+- Compare the two Hessians for each modulation and fail if either consistency check exceeds tolerance.

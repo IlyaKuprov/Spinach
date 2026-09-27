@@ -4,31 +4,16 @@
 
 ## Purpose
 
-1H-1H NOESY spectrum of the example RNA molecule provided by the Gerhard Wagner group at Harvard University. Calculation time: hours Shunsuke Imai Scott Robson Gerhard Wagner Zenawi Welderufael Ilya Kuprov
+Simulates a 1H–1H NOESY spectrum of the example RNA provided by Gerhard Wagner's group at Harvard University. The source estimates a calculation time of hours and credits Shunsuke Imai, Scott Robson, Gerhard Wagner, Zenawi Welderufael, and Ilya Kuprov.
 
 ## Physical / mathematical content
 
-- Nucleic-acid NMR examples. These files specialise biomolecular NMR workflows to RNA or DNA systems, with labelled nuclei, residue-level assignments, and multidimensional heteronuclear transfer logic.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The RNA structure and assignments are imported from `example.pdb` and `example.txt`; the listed exchangeable protons are deuterated, and 13C and 15N spins are removed under the source's assumption that the RNA is unlabelled. The system is set to 17.62 T with Redfield relaxation (`rlx_keep='kite'`, zero equilibrium, and `tau_c={3e-9}`). The basis uses the sphten-liouv formalism, IK-1 approximation, scalar couplings, interaction level 5, and proximity level 3.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+The sequence uses a 0.200 mixing time, 1H spins, offsets of 3473, sweeps [7500, 7500], 512 acquired points, and zero filling [1024, 4096]. The source disables Krylov propagation and enables propagator caching and the greedy option. It applies squared-cosine apodisation, Fourier-transforms F2, combines the cosine and sine components as a States signal, Fourier-transforms F1, then plots the negative real spectrum.
 
 ## Implementation structure
 
-- 1H-1H NOESY spectrum of the example RNA molecule provided by
-- the Gerhard Wagner group at Harvard University.
-- Calculation time: hours
-- Shunsuke Imai
-- Scott Robson
-- Gerhard Wagner
-- Zenawi Welderufael
-- Ilya Kuprov
-- Import RNA data
-- Magnet field
-- Tolerances
-- Relaxation theory
+After system construction, the code removes 13C and 15N spins, builds the basis, and simulates with `liquid(spin_system,@noesy,parameters,'nmr')`. The processed spectrum is displayed with the source's plotting scale and contour settings.

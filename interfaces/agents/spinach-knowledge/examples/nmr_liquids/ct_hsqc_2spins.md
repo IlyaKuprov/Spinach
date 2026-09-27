@@ -4,29 +4,16 @@
 
 ## Purpose
 
-CT HSQC spectrum of 2 spin system Calculation time: seconds
+CT HSQC spectrum of 2 spin system. Calculation time: seconds
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+This is a two-spin heteronuclear constant-time HSQC example with one `13C` and one `1H` site, coupled by 140.0. It uses Spinach's liquid-state `ct_hsqc` simulation and combines the positive- and negative-frequency signals using States-style quadrature reconstruction.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The source sets field value 5.9, chemical shifts 50.00 and 3.00, and `parameters.J=140`. It uses sweeps [2500 950], offsets [3000 600], 128 points and 512 zero-fill points, with `13C` decoupling in F2. It dilutes the system into carbon isotopomers, simulates each, applies squared-cosine apodisation separately to positive and negative FIDs, Fourier-transforms in F2, combines them as `f1_pos+conj(f1_neg)`, accumulates the F1 transforms, and plots the real spectrum in negative display mode.
 
 ## Implementation structure
 
-- CT HSQC spectrum of 2 spin system
-- Calculation time: seconds
-- Spin system
-- Magnet field
-- Basis set
-- Sequence parameters
-- Create the spin system structure
-- Generate isotopomers
-- Preallocate the answer
-- Loop over isotopomers
-- Build the basis
-- Simulation
+The function constructs the heteronuclear system, creates the carbon-diluted subsystem list and preallocates the zero-filled complex spectrum. A parallel loop builds each subsystem basis, runs `ct_hsqc`, processes both signal components and adds their F1 transforms to the accumulated spectrum.

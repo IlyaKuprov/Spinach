@@ -4,29 +4,16 @@
 
 ## Purpose
 
-Cross-polarization experiment between protons and 14N overtone transition in glycine under MAS. Glycine quadrupolar tensor da- ta comes from the paper by O'Dell and Ratcliffe: Calculation time: hours
+Simulates a 14N-overtone/proton cross-polarisation spectrum for glycine under MAS. The source estimates a calculation time of hours and credits Ilya Kuprov, M. Carravetta, and M. Concistre.
 
 ## Physical / mathematical content
 
-- Overtone NMR examples. The important regime is excitation or detection of formally forbidden high-order transitions in quadrupolar nuclei, usually aided by MAS or Fokker-Planck treatments of periodic motion.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The source attributes the glycine quadrupolar tensor data to O'Dell and Ratcliffe ([DOI](http://dx.doi.org/10.1016/j.cplett.2011.08.030)). It specifies 14N and 1H at 14.1 T, 14N quadrupolar parameters of 1.18 MHz and η=0.53, and a 1H shift of 32.4. Damping relaxation is used with diagonal retention, zero equilibrium, and rate 300. The basis is sphten-liouv without approximation.
 
 ## Numerical / algorithmic content
 
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+The source disables Krylov and trajectory-level options and uses the 6400-point spherical powder grid `rep_2ang_6400pts_sph`, rank 7, and a MAS rate of −19.840 kHz. The spectrum spans [44, 52] kHz with 256 acquired and zero-filled points; the RF powers are 55.0 and 35.1 kHz, the RF frequency is 48 kHz, and the RF duration is 100 μs. The spectrum is computed with `singlerot` and `@overtone_cp`.
 
 ## Implementation structure
 
-- Cross-polarization experiment between protons and 14N overtone
-- transition in glycine under MAS. Glycine quadrupolar tensor da-
-- ta comes from the paper by O'Dell and Ratcliffe:
-- Calculation time: hours
-- System specification
-- Relaxation theory
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Magic angle
-- Spectrum setup
-- Simulation
+The function builds the system and basis, sets the MAS and cross-polarisation operators, runs the single spectrum simulation, and plots its real part.

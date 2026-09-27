@@ -4,28 +4,10 @@
 
 ## Purpose
 
-Circular flow in three-dimensional space in the absence of spin dynamics. Calculation time: minutes, faster on GPU.
+Shows a three-dimensional circular-flow advection–diffusion calculation with no active spin interactions. The source describes a minutes-long calculation, faster on GPU.
 
-## Physical / mathematical content
+## Physical and numerical content
 
-- Diffusion examples. The dominant mathematics is diffusion or advection-diffusion PDE propagation, sometimes with additional spin phase accumulation under gradients.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+The system uses a ghost spin with empty Zeeman and coupling matrices. A 50 × 50 × 50 grid spans a 0.02 m cube; the velocity field is u = −1000y, v = 1000x, w = 0, and the diffusion tensor is isotropic with diagonal entries 8×10⁻⁶ and zero off-diagonal entries. The derivative settings are {period, 7}. The initial state is a signed combination of three Gaussian peaks centered at the coded coordinates, with sigma = 2×10⁻⁶.
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Implementation structure
-
-- Circular flow in three-dimensional space in the absence
-- of spin dynamics.
-- Calculation time: minutes, faster on GPU.
-- Ghost spin
-- No spin interactions
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Sample geometry
-- Get a 3D grid
-- Get circular wind vectors
-- Constant diffusion tensor field
+The example builds the Fokker–Planck generator with `v2fplanck`, inflates it, and obtains a 200-point trajectory using `evolution` with a step parameter of 5×10⁻⁵. It plots each three-dimensional state with `volplot`.

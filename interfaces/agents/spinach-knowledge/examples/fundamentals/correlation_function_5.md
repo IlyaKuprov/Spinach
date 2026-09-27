@@ -4,27 +4,16 @@
 
 ## Purpose
 
-Computes the following rotational correlation function G(k,m,p,q)=<R(k,m)*R(p,q)> where R is the 3D Cartesian rotation matrix, using the Monte-Carlo method. Calculation time: minutes.
+Uses Monte Carlo rotational diffusion to estimate `G(k,m,p,q)=<R(k,m)*R(p,q)>`, where `R` is a three-dimensional Cartesian rotation matrix. Unlike the preceding Wigner-function examples, this script plots only the Monte Carlo estimate.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+The isotropic rate parameter is `sigma_iso=0.2`; the selected matrix elements are `k=2, m=3, p=2, q=3`. The correlation is scaled by `1/3`, as implemented in the source.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The script propagates `1e6` rotations from Gaussian angular increments and computes a normalized cross-correlation with `nlags=300`. It plots the real Monte Carlo correlation against lag; the source estimates a run time of minutes.
 
 ## Implementation structure
 
-- Computes the following rotational correlation function
-- G(k,m,p,q)=<R(k,m)*R(p,q)>
-- where R is the 3D Cartesian rotation matrix, using the
-- Monte-Carlo method.
-- Calculation time: minutes.
-- Set testing parameters
-- Set number of points
-- Generate angle track
-- Preallocate rotation matrix array
-- Loop over Monte-Carlo steps
-- Generate a random rotation
-- Get Monte-Carlo correlation function
+Starting from the identity matrix, each step right-multiplies the accumulated rotation by the matrix exponential of the increment generator scaled by `sigma_iso`. The chosen Cartesian matrix elements are passed to `xcorr`; the shifted result is scaled by `1/3` before plotting.

@@ -4,33 +4,19 @@
 
 ## Purpose
 
-Repeated pulse-acquire experiment during the Diels-Alder cyclo- addition of acetylene to butadiene, demonstrating the non-linear kinetics module. Calculation time: hours, GPU is hard-coded.
+Repeated pulse-acquire experiment during the Diels–Alder cycloaddition of acetylene to butadiene, demonstrating the nonlinear kinetics module. Calculation time: hours; GPU use is hard-coded.
 
 ## Physical / mathematical content
 
-- Chemical-kinetics examples. The files couple spin dynamics to exchange, pumping, or nonlinear reaction networks represented by kinetic generators in Liouville space.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+DFT output supplies the spin systems for acetylene (A), butadiene (B), and cyclohexadiene (C); natural-abundance ethanol (D) is added as solvent. The second-order reaction A + B → C is coupled to the spin evolution, while ethanol is not a reactant. The rate constant is 25 mol/(L·s), and concentration-weighted product/reactant spin systems are evolved with the time-dependent reaction generators. Redfield/T1-T2 relaxation is configured, with nonzero rates assigned to the solvent spins.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+Concentrations are integrated for 10 s in 100 steps using the LG4 stepper, then interpolated to supply the reaction-dependent generators. The spin trajectory uses a two-point Lie quadrature. Nine pulse-acquire experiments (at integer-second time points 0–8 s) run in a `parfor` loop; each uses a GPU-resident evolution and 4096 acquired points at 4000 Hz. The collected FIDs are apodised and Fourier transformed with 16384-point zero filling for a ppm waterfall plot.
 
 ## Implementation structure
 
-- Repeated pulse-acquire experiment during the Diels-Alder cyclo-
-- addition of acetylene to butadiene, demonstrating the non-linear
-- kinetics module.
-- Calculation time: hours, GPU is hard-coded.
-- DFT import options
-- Load and display acetylene (substance A)
-- Load and display butadiene (substance B)
-- Load and display cyclohexadiene (substance C)
-- Add natural abundance ethanol (substance D)
-- Merge the spin systems
-- Magnet field
-- Greedy parallelisation
+- Imports the three molecular spin systems from `acetylene.out`, `butadiene.out`, and `cyclohexadiene.out`; adds six-spin ethanol.
+- Sets B₀ = 14.1 T, greedy parallelisation, and reaction rate constant 25 mol/(L·s).
+- Starts at [0.01, 0.02, 0, 17.1] mol/L for A, B, C, and D; ethanol is excluded from the concentration-kinetics plot and reaction.
+- Sets acquisition offset 2370 Hz, sweep 4000 Hz, 4096 points, and 16384-point zero filling.

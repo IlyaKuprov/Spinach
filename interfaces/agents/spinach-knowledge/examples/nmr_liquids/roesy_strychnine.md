@@ -4,31 +4,17 @@
 
 ## Purpose
 
-ROESY spectrum of strychnine. Calculation time: minutes
+Simulate and plot a liquid-state ROESY spectrum of strychnine. Stated calculation time: minutes.
 
-## Physical / mathematical content
+## Spin system and settings
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Load strychnine’s `1H` spin system with `strychnine({'1H'})`; set `sys.magnet=5.9`.
+- Use the `sphten-liouv` basis with `IK-2` approximation, `scalar_couplings` connectivity, and proximity level 3.
+- Set Redfield relaxation, zero equilibrium, secular relaxation terms, and correlation time `200e-12`.
+- Enable `greedy`, disable `krylov`, and set the proximity cutoff to `4.0`.
 
-## Numerical / algorithmic content
+## Sequence and processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
-
-## Implementation structure
-
-- ROESY spectrum of strychnine.
-- Calculation time: minutes
-- Spin system properties
-- Magnet field
-- Basis set
-- Relaxation theory parameters
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- F2 Fourier transform
+- Set mixing time to `0.5`, offset to `1200`, sweeps to `[2500 2500]`, points to `[512 512]`, and zero filling to `[2048 2048]`. Use `1H`, ppm axes, and the `Lz` state for `1H` as the initial state.
+- Generate the signal with `liquid(spin_system,@roesy,parameters,'nmr')`. Apply squared-cosine apodisation in both dimensions to the cosine and sine signals.
+- Fourier-transform the cosine and sine signals along dimension 1, taking their imaginary and real parts respectively; combine them as `f1_cos-1i*f1_sin`. Fourier-transform the result along dimension 2 and plot the real spectrum with `plot_2d`.

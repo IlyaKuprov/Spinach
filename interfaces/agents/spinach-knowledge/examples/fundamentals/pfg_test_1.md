@@ -4,27 +4,18 @@
 
 ## Purpose
 
-A test of the explicit gradient pulse function that uses the auxiliary matrix formalism to compute sample volume integral. For details, see:
+Exercise the explicit gradient-pulse function grad_pulse, which uses the auxiliary-matrix formalism to compute a sample-volume integral. Background: [10.1016/j.jmr.2014.01.011](http://dx.doi.org/10.1016/j.jmr.2014.01.011).
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
+The example evolves a three-proton system under a rectangular homospoil gradient pulse and examines the trajectory by coherence order. Chemical shifts and scalar couplings are randomized for the run.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+It evaluates 100 pulse durations at steps of 2e-7 s, with gradient strength 20 G/cm, sample length 1.5 cm, and rectangular shape factor 1. The trajectory loop uses parfor.
 
 ## Implementation structure
 
-- A test of the explicit gradient pulse function that uses the auxiliary
-- matrix formalism to compute sample volume integral. For details, see:
-- Magnet and isotopes
-- Random chemical shifts and couplings
-- Basis set
-- Spinach housekeeping
-- Spin Hamiltonian
-- Build initial state vector
-- Determine projection quantum numbers of the basis
-- Determine the coherence order of each state
-- Find out which coherence orders are present
-- Weight coherence orders by the number of states
+- Set a 5.9 T, three-1H system with random scalar shifts and couplings, then construct the sphten-liouv basis and Hamiltonian.
+- Build and weight the initial state by coherence-order subspaces, then call grad_pulse for each duration.
+- Plot the resulting state trajectory with trajan(...,'coherence_order').

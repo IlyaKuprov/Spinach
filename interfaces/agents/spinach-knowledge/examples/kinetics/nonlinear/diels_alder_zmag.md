@@ -4,29 +4,19 @@
 
 ## Purpose
 
-Time-domain Z magnetisation dynamics in the Diels-Alder cycloaddition of acetylene to butadiene, demonstrating the non-linear kinetics module. Calculation time: minutes.
+Time-domain Z-magnetisation dynamics in the Diels–Alder cycloaddition of acetylene to butadiene, demonstrating the nonlinear kinetics module. Calculation time: minutes.
 
 ## Physical / mathematical content
 
-- Chemical-kinetics examples. The files couple spin dynamics to exchange, pumping, or nonlinear reaction networks represented by kinetic generators in Liouville space.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+The source imports acetylene (A), butadiene (B), and cyclohexadiene (C) spin systems from DFT outputs and adds natural-abundance ethanol (D) as a solvent subsystem. A + B → C is a second-order reaction with rate constant 25 mol/(L·s); the solvent is a spectator. Concentrations weight the initial spin state, and reaction generators couple the changing reactant/product populations to spin evolution.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+The concentration trajectory runs for 10 s in 100 LG4 steps. Interpolated concentrations set the left- and right-edge reaction generators in each two-point Lie-quadrature spin step. The script plots the Z expectation values for acetylene, butadiene, and cyclohexadiene against time; it does not perform the pulse-acquire/GPU workflow of the companion spectrum example.
 
 ## Implementation structure
 
-- Time-domain Z magnetisation dynamics in the Diels-Alder cycloaddition
-- of acetylene to butadiene, demonstrating the non-linear kinetics module.
-- Calculation time: minutes.
-- DFT import options
-- Load and display acetylene (substance A)
-- Load and display butadiene (substance B)
-- Load and display cyclohexadiene (substance C)
-- Add natural abundance ethanol (substance D)
-- Merge the spin systems
-- Magnet field
-- Chemical parts and unit concentrations
-- Basis set
+- Merges the three DFT-derived species with six-spin ethanol; sets B₀ = 14.1 T and unit initial concentrations in the kinetic model.
+- Initializes [A, B, C, D] to [0.01, 0.02, 0, 0.1] mol/L and excludes ethanol from the plotted species and spin observables.
+- Uses 100 steps over 10 s and rate constant 25 mol/(L·s).
+- Plots the three concentration-weighted species Z-magnetisation trajectories.

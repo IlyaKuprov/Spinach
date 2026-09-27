@@ -4,28 +4,19 @@
 
 ## Purpose
 
-Directional derivative test for the Cartesian GRAPE module, trapezium integrator.
+Check directional derivatives of the Cartesian GRAPE module with the trapezium integrator.
 
 ## Physical / mathematical content
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The test checks how the GRAPE fidelity changes with selected Cartesian waveform samples. Spin systems are constructed in the `sphten-liouv`, `zeeman-liouv`, and `zeeman-hilb` formalisms.
 
 ## Numerical / algorithmic content
 
+For the left edge, midpoint, and right edge of a random two-channel waveform, the analytical gradient from `grape_xy` is compared with a centered finite difference using `sqrt(eps('double'))). Each relative discrepancy must be below `1e-6`.
+
 ## Implementation structure
 
-- Directional derivative test for the Cartesian GRAPE
-- module, trapezium integrator.
-- Formalisms to test
-- Loop over formalisms
-- Build the derivative-test system
-- Define control parameters
-- Set the interval grid
-- Spinach housekeeping
-- Random guess and finite diff increment
-- Call GRAPE and request analytical gradient
-- Left waveform edge
-- Right waveform edge
+- Configure Cartesian controls with the trapezium integrator, L-BFGS method, and `12.8e-6` s pulse intervals.
+- Obtain the analytical gradient for a random `2×5` waveform.
+- Perturb waveform entries 1, 3, and 10 in both directions and compare the resulting finite-difference gradients with the corresponding analytical entries.
+- Raise an error for any failed edge or midpoint check.

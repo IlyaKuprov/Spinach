@@ -4,29 +4,14 @@
 
 ## Purpose
 
-Slice selection in 3D followed by phase-encoded imaging of the resulting slice. Simulation time: minutes, faster with a Tesla V100 GPU.
+Simulates 3D slice selection followed by phase-encoded imaging of the selected slice. The example uses the library brain-medres phantom and reconstructs an image from the acquired signal. The source estimates minutes of runtime, with a Tesla V100 GPU reported as faster.
 
-## Physical / mathematical content
+## Model and sequence
 
-- MRI and spectroscopic-imaging examples. These files combine gradient terms, spatial encoding, diffusion, slice selection, k-space sampling, and Fourier reconstruction, generally within Fokker-Planck or explicit spatial-grid descriptions.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The spin system is one `1H` at 5.9 T, with zero chemical shift, diagonal T1/T2 relaxation, rates `r1 = r2 = 1`, and zero equilibrium. The example obtains the R1, R2, and proton-density maps and dimensions from `phantoms('brain-medres')`; diffusion and all three flow components are set to zero.
 
-## Numerical / algorithmic content
+A 50-step Gaussian RF pulse (total duration `2.0e-4 s`, frequency `-5 kHz`, peak scale `2*pi*7500`, phase `pi/2`) performs slice selection. The imaging grid is `[129 129]`; slice-selection, phase-encoding, and readout gradients are each `32 mT/m`, with durations `1.0e-4`, `2.0e-4`, and `3.0e-4 s`, respectively. The echo time is `20 ms`, and the gradient angles are `[pi/3 pi/4 pi/5]`.
 
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+## Computation and output
 
-## Implementation structure
-
-- Slice selection in 3D followed by phase-encoded imaging
-- of the resulting slice.
-- Simulation time: minutes, faster with a Tesla V100 GPU.
-- Isotopes
-- Magnetic induction
-- Chemical shifts
-- Relaxation theory
-- Disable path tracing
-- This needs a GPU
-- Basis set
-- Spinach housekeeping
-- Gat phantom from library
+The sequence is run with `imaging(spin_system,@phase_enc_3d,parameters)`. The example displays the k-space data, applies square-sine apodisation in both dimensions, computes a shifted 2D Fourier transform, and displays the real-space image. Path tracing and Krylov propagation are disabled in the source; the greedy option is enabled.

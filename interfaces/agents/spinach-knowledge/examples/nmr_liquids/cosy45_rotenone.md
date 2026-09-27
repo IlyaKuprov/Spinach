@@ -4,28 +4,10 @@
 
 ## Purpose
 
-Magnitude mode COSY-45 spectrum of rotenone. Calculation time: minutes
+Simulates a magnitude-mode 45° COSY spectrum for a 22-proton rotenone spin system. The source estimates minutes of calculation time.
 
-## Physical / mathematical content
+## Physical and numerical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The source specifies the proton shifts and scalar couplings, and uses an IK-2 scalar-coupling basis with proximity level 1, cutoff 4.0, and three S3 symmetry groups on spins [14–16], [17–19], and [20–22]. At 5.9 T it sets the COSY angle to pi/4, offset 1200, sweep 2000, and 512 × 512 acquired points, zero-filled to 2048 × 2048. After cosine apodisation, it computes a two-dimensional Fourier transform and plots abs(spectrum) (axis units: ppm).
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Magnitude mode COSY-45 spectrum of rotenone.
-- Calculation time: minutes
-- Spin system
-- Interactions
-- Algorithmic options
-- Basis set
-- Sequence parameters
-- Spinach housekeeping
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+Source citation: [DOI 10.1002/jhet.5570250160](http://dx.doi.org/10.1002/jhet.5570250160).

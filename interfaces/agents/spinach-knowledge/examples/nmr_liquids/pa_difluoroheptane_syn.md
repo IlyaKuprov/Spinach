@@ -4,28 +4,18 @@
 
 ## Purpose
 
-Pulse-acquire 1H NMR spectrum of syn-3,5-difluoroheptane with a manual basis set specification as a merger of Lie algebras of the user-specified structral fragments followed by symmetry fac- torisation and conservation law screening. See our paper: for further information. Calculation time: minutes, faster with a GPU.
+Pulse-acquire a ¹H NMR spectrum of syn-3,5-difluoroheptane. The basis is manually specified by merging Lie algebras of user-selected structural fragments, followed by symmetry factorisation and conservation-law screening. Source paper: [https://doi.org/doi/10.1021/acs.joc.4c00670](https://doi.org/doi/10.1021/acs.joc.4c00670). The source comment estimates minutes of computation and notes it is faster with a GPU.
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Models liquid-state NMR with explicit isotopes, chemical shifts, and scalar couplings for syn-3,5-difluoroheptane.
+- Uses a fragment-based Liouville basis, then applies symmetry factorisation and conservation-law screening.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Constructs the specified basis and simulates a liquid-state acquisition to obtain an FID.
+- Applies exponential apodisation, zero-filled Fourier transformation, and plotting of the real spectrum on an inverted ppm axis.
 
 ## Implementation structure
 
-- Pulse-acquire 1H NMR spectrum of syn-3,5-difluoroheptane with a
-- manual basis set specification as a merger of Lie algebras of
-- the user-specified structral fragments followed by symmetry fac-
-- torisation and conservation law screening. See our paper:
-- for further information.
-- Calculation time: minutes, faster with a GPU.
-- Magnet induction
-- Isotopes
-- Chemical shifts
-- J-couplings
-- Basis set
-- GPU is useful here
+- Defines the spin-system parameters and manually assembles the basis; runs the acquisition, apodises and Fourier-transforms the FID, then plots the spectrum.

@@ -4,27 +4,16 @@
 
 ## Purpose
 
-Sample magnetisation during a finite-speed magnetic field sweep for a spin-3/2 particle with a zero-field splitting. Calculation time: seconds
+Calculate and plot the sample magnetisation during a finite-speed magnetic-field sweep for a spin-3/2 particle with zero-field splitting. The source estimates a calculation time of seconds.
 
-## Physical / mathematical content
+## Physical model
 
-- Giant-spin examples. The effective model treats lanthanides or high-spin centres using crystal-field / Stevens-operator Hamiltonians, Zeeman splitting, and magnetisation dynamics.
+- The particle is specified as `sys.isotopes={'E4'}`, with an isotropic Zeeman tensor `diag([2 2 2])`.
+- The zero-field-splitting parameters are `D=icm2hz(-0.5)` and `E=0.3*D`. The coupling matrix is `zfs2mat(D,E,0,0,0)`.
+- The temperature is `inter.temperature=1.0`.
 
-## Numerical / algorithmic content
+## Calculation and output
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Sample magnetisation during a finite-speed magnetic field
-- sweep for a spin-3/2 particle with a zero-field splitting.
-- Calculation time: seconds
-- This must be set to 1 Tesla
-- Particle
-- Zeeman tensor
-- Zero-field splitting
-- Formalism and basis set
-- Temperature
-- Spinach housekeeping
-- Experiment parameters
-- Run the field scan
+- Set `sys.magnet=1.0` Tesla, as required by the source. Create the spin system with `create(sys,inter)` and set the basis using `bas.approximation='none'` and `bas.formalism='zeeman-hilb'`.
+- Scan `parameters.fields=[0 1]` with `parameters.npoints=1000` over `parameters.sweep_time=1e-9` seconds. Set `parameters.orientation=[0 0 0]` and `parameters.nstates=4`.
+- Call `[fields,z_magn]=fieldscan_magn(spin_system,parameters)` and plot `z_magn` against `fields`, labelling the axes “Magnetic field, Tesla” and “Sample magnetisation”.

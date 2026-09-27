@@ -4,25 +4,10 @@
 
 ## Purpose
 
-Euler angle superposition tests.
+Tests whether `euler_sup` composes Euler-angle rotations consistently with direct direction-cosine-matrix (DCM) multiplication, including the near-singular branches.
 
-## Physical / mathematical content
+## Checks
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Euler angle superposition tests.
-- Identity composition test
-- Random stress test
-- Draw random Euler angles
-- Compose through Euler superposition utility
-- Compose through direct matrix multiplication
-- Compare the two composite matrices
-- Singular branch stress test A
-- Draw random near-singular rotations
-- Singular branch stress test B
-- Singular branch stress test C
-- Draw same-phase rotations adding to beta=pi
+- Composing two zero-angle triples must give the identity DCM, to a 1-norm tolerance of 10⁻¹².
+- For 2,000 random angle pairs drawn over [−4π, 4π] per angle, the DCM from `euler_sup` is compared with `euler2dcm(ang_two)*euler2dcm(ang_one)`; the 1-norm residual must not exceed 10⁻³.
+- Three 500-case stress loops test rotations with both middle angles near 0, both near π, and same-phase rotations whose middle angles sum to π. Each uses the same direct-multiplication reference and 10⁻³ tolerance.

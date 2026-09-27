@@ -4,27 +4,10 @@
 
 ## Purpose
 
-Overtone 10B magic angle spinning NMR spectrum. The sample is spinning in the JEOL direction. Parameters from Nghia Duong and Yusuke Nishiyama. An unphysically strong pulse is used to obtain a panoramic spectrum. Calculation time: hours
+Simulates an overtone `10B` MAS NMR spectrum with the sample spinning in the JEOL direction. The source credits parameters to Nghia Duong and Yusuke Nishiyama and describes an unphysically strong pulse to obtain a panoramic spectrum. It estimates hours of calculation time.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Overtone NMR examples. The important regime is excitation or detection of formally forbidden high-order transitions in quadrupolar nuclei, usually aided by MAS or Fokker-Planck treatments of periodic motion.
+The `10B` system is at 16.4 T, with quadrupole parameters 0.7 MHz, asymmetry 0, and spin 3. Diagonal damping relaxation is used at rate 1000, and trajectory-level options are disabled.
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Overtone 10B magic angle spinning NMR spectrum. The sample is
-- spinning in the JEOL direction. Parameters from Nghia Duong
-- and Yusuke Nishiyama. An unphysically strong pulse is used
-- to obtain a panoramic spectrum.
-- Calculation time: hours
-- System specification
-- Basis set
-- Relaxation theory
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
+The sequence setup uses rank 12, a 70 kHz spinning rate, grid `rep_2ang_200pts_oct`, and a −200 to 200 kHz sweep with 4096 points and 4096-point zero-fill. The initial state and receiver are both `10B` `Lz`; the code runs `singlerot` with `overtone_a`.

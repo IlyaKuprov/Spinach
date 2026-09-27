@@ -4,29 +4,16 @@
 
 ## Purpose
 
-1H NMR spectrum of sucrose (magnetic parameters read in from a DFT calculation), including Redfield relaxation superoperator. Calculation time: seconds
+Simulates the ¹H NMR spectrum of sucrose using magnetic parameters read from a DFT calculation and a Redfield relaxation superoperator. The source estimates a calculation time of seconds.
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Uses DFT-derived magnetic parameters for the sucrose spin system and includes Redfield relaxation.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Builds the relaxation-enabled model, simulates the liquid-state FID, applies exponential apodisation, Fourier-transforms it, and plots the spectrum.
 
 ## Implementation structure
 
-- 1H NMR spectrum of sucrose (magnetic parameters read in from a DFT
-- calculation), including Redfield relaxation superoperator.
-- Calculation time: seconds
-- Read the spin system properties (vacuum DFT calculation)
-- Magnet field
-- Basis set
-- Relaxation theory parameters
-- Proximity cut-off
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
+- Imports the magnetic parameters, configures the spin system and Redfield relaxation, then runs acquisition and signal processing.

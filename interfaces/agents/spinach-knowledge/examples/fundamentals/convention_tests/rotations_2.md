@@ -4,27 +4,8 @@
 
 ## Purpose
 
-A rotations test comparing the Hamiltonians for a manually rotated (at the interaction specification level) spin system with the Hamiltonian that has been rotated using Spinach operator rotation functionality.
+Compares two representations of the same rotated spin system: rotate the interaction tensors and coordinates in the input, or keep them fixed and rotate the anisotropic Hamiltonian contribution with Spinach's `orientation` function.
 
-## Physical / mathematical content
+## Method and check
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- A rotations test comparing the Hamiltonians for a manually rotated (at
-- the interaction specification level) spin system with the Hamiltonian
-- that has been rotated using Spinach operator rotation functionality.
-- Generate random matrices
-- % Kernel level rotation
-- Magnet field
-- Basis set
-- A pair of spins at a distance, A
-- Spinach housekeeping, A
-- Hamiltonian, A
-- % Input level rotation
-- A pair of spins at a distance, B
+The test generates random chemical-shift and coupling tensors for a 1H–15N pair at 14.1 T, using the `sphten-liouv` basis with no approximation. In the kernel-level construction, it evaluates the Hamiltonian at Euler angles [1,2,3]. In the input-level construction, it rotates both shift tensors, the coupling tensor, and the coordinates by the corresponding DCM, then evaluates the Hamiltonian at zero orientation. The 1-norm of the Hamiltonian difference must be no greater than 10⁻³.

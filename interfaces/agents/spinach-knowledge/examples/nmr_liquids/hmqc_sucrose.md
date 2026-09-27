@@ -4,28 +4,14 @@
 
 ## Purpose
 
-HMQC spectrum of sucrose with natural content of 13C isotope (magnetic parameters computed with DFT). Calculation time: seconds
+Simulates a liquid-state HMQC spectrum of sucrose at natural 13C abundance using magnetic parameters from a vacuum DFT calculation. The source notes a calculation time of seconds.
 
-## Physical / mathematical content
+## Model and parameters
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Reads `../standard_systems/sucrose.log` for 1H and 13C, with a 3.0 Hz minimum coupling threshold, then sets selected isotropic shielding shifts to experimental values.
+- Uses a 5.9 T magnetic field, a scalar-coupling-connected `sphten-liouv` basis with `IK-2` approximation, and a 4.0 proximity cutoff.
+- Sets `J=140`, sweep widths `[3350 1000]`, offsets `[5000 1200]`, and a `[256 256]` acquisition grid zero-filled to `[512 512]`; axes are in ppm.
 
-## Numerical / algorithmic content
+## Calculation
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- HMQC spectrum of sucrose with natural content of 13C isotope
-- (magnetic parameters computed with DFT).
-- Calculation time: seconds
-- Read the spin system properties (vacuum DFT calculation)
-- Set the isotropic parts of shielding tensors to experimental values
-- Magnet field
-- Algorithmic options
-- Basis set
-- Sequence parameters
-- Create the spin system structure
-- Generate isotopomers
-- Preallocate the answer
+Generates 13C isotopomers with `dilute`, simulates each with `liquid(...,@hmqc,...)` in a `parfor` loop, applies cosine apodisation in both dimensions, and sums the shifted 2D Fourier transforms. Plots the magnitude spectrum with `plot_2d`.

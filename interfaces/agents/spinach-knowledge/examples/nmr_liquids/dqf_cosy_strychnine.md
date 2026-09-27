@@ -8,24 +8,14 @@ DQF-COSY spectrum of strychnine. Calculation time: minutes
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Two-dimensional 1H DQF-COSY simulation of strychnine. The liquid-state sequence selects double-quantum-filtered scalar-coupling correlations.
+- Cosine windows are applied to both cosine and sine FID components; the States signal is formed and Fourier transformed along F2 and F1.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Uses the sphten-liouv / IK-2 basis with scalar-coupling connectivity and proximity level 1, plus greedy settings with `prox_cutoff=4.0`. Sequence parameters are offset `1200`, sweep `2200`, `npoints=[512 512]`, and `zerofill=[2048 2048]` (1H). The simulation is performed once for the full spin system; it does not use the parallel isotope loop or a GPU.
 
 ## Implementation structure
 
-- DQF-COSY spectrum of strychnine.
-- Calculation time: minutes
-- Read the spin system properties
-- Magnet field
-- Algorithmic options
-- Basis set
-- Sequence parameters
-- Spinach housekeeping
-- Simulation
-- Apodisation
-- F2 Fourier transform
-- Form States signal
+- Build the 1H strychnine spin system at 5.9 T and construct the selected basis.
+- Simulate DQF-COSY with the stated 1H acquisition settings, apodise the cosine and sine FIDs, form the States signal, Fourier transform both dimensions, and plot the real spectrum.

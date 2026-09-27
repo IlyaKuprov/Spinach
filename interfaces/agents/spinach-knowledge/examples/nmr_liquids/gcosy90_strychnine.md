@@ -8,24 +8,14 @@ Gradient-selected COSY spectrum of strychnine. Calculation time: minutes
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Two-dimensional gradient-selected COSY simulation of strychnine using 1H spins and a 90-degree pulse. Scalar-coupling evolution generates the COSY correlations; gradient selection uses the `P+N` pathway.
+- The positive and negative echo FIDs are squared-cosine apodised, Fourier transformed along F2, combined as an echo/anti-echo signal, and transformed along F1.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Uses the sphten-liouv / IK-2 basis with scalar-coupling connectivity and proximity level 1, and greedy settings with `prox_cutoff=4.0`; the field is 5.9 T. Sequence settings are angle `pi/2`, offset `1200`, sweep `2200`, `npoints=[512 512]`, `zerofill=[2048 2048]`, gradient amplitude `3`, duration `2e-3`, stabilization delay `2e-4`, and `s_len=1.5`. The single simulation has no isotopomer-parallel or GPU loop.
 
 ## Implementation structure
 
-- Gradient-selected COSY spectrum of strychnine.
-- Calculation time: minutes
-- Read the spin system properties
-- Magnet field
-- Algorithmic options
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- F2 Fourier transform
-- Form echo/anti-echo signal
+- Create the 1H strychnine spin system at 5.9 T and construct the selected basis.
+- Run gradient-selected COSY with the listed pulse, gradient, and acquisition settings; apply squared-cosine apodisation, form the echo/anti-echo signal, Fourier transform both dimensions, and plot the real spectrum.

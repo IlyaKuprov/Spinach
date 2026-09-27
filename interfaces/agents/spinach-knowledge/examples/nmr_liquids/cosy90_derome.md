@@ -4,28 +4,8 @@
 
 ## Purpose
 
-Figure 8.26 from Andrew Derome's "Modern NMR Techniques for Chemistry Research". Calculation time: seconds
+Reproduces Figure 8.26 from Andrew Derome's *Modern NMR Techniques for Chemistry Research* with a three-proton 90° COSY simulation. The source estimates seconds of calculation time.
 
-## Physical / mathematical content
+## Physical and numerical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Figure 8.26 from Andrew Derome's "Modern NMR Techniques
-- for Chemistry Research".
-- Calculation time: seconds
-- Magnet field
-- Spin system and interactions
-- Basis set
-- Algorithmic options
-- Sequence parameters
-- Spinach housekeeping
-- Simulation
-- Apodisation
-- Fourier transform
+The three proton shifts are 3.70, 3.92, and 4.50; the specified scalar couplings are J12 = 10, J23 = 12, and J13 = 4. At 16.1 T, the source uses the full sphten-Liouville basis and sets the COSY angle to pi/2, offset 2800, sweep 700, and 1024 × 1024 points with 2048 × 2048 zero filling. The simulated FID is square-cosine apodised, Fourier transformed in both dimensions, and the real spectrum is plotted (axis units: ppm).

@@ -4,31 +4,19 @@
 
 ## Purpose
 
-NOESY spectrum of strychnine. Calculation time: minutes
+NOESY spectrum of strychnine. Calculation time: minutes.
 
 ## Physical / mathematical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The proton spin system is strychnine. Redfield relaxation uses the IME equilibrium option, 298 K, a 200 ps correlation time, and kite retention. The sequence has a 0.5 s mixing time.
+- The simulated two-dimensional spectrum is derived from the NOESY cosine and sine FIDs using States combination and Fourier transformation in both dimensions.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+- The spherical-tensor Liouville basis uses IK-2 with scalar-coupling connectivity and proximity level 3. Greedy handling is enabled, Krylov propagation disabled, and the proximity cutoff is 4.0.
+- The 1H spectrum uses a 1200 Hz offset, 2500 Hz sweep in each dimension, 512 acquired points and 2048-point zero filling per dimension. Square-cosine apodisation is applied to both States components.
 
 ## Implementation structure
 
-- NOESY spectrum of strychnine.
-- Calculation time: minutes
-- Spin system properties
-- Magnet field
-- Basis set
-- Relaxation theory parameters
-- Algorithmic options
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- F2 Fourier transform
+- Create the strychnine proton spin system at 5.9 T, construct the basis and set the 0.5 s NOESY mixing period.
+- Simulate the sequence, apodise the cosine and sine FIDs, combine the States signal, Fourier transform F2 and F1, and plot the negative real spectrum.

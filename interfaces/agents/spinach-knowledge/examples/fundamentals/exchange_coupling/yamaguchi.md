@@ -4,19 +4,8 @@
 
 ## Purpose
 
-Yamaguchi equation estimate of exchange coupling from a broken-symmetry DFT calculation on a bistrityl bira- dical with an alkynyl linker from Olav Schiemann.
+Estimates exchange coupling with the Yamaguchi equation from broken-symmetry DFT calculations for a bistrityl biradical with an alkynyl linker. The example is attributed to Olav Schiemann.
 
-## Physical / mathematical content
+## Implementation
 
-- Fundamentals examples. These are unit tests, convention checks, and pedagogical demonstrations of operator algebra, perturbation theory, tensor conventions, symmetry, quadrature, and numerical differentiation.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
-
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Yamaguchi equation estimate of exchange coupling from
-- a broken-symmetry DFT calculation on a bistrityl bira-
-- dical with an alkynyl linker from Olav Schiemann.
-- Read Gaussian logs
-- Call Yamaguchi equation
+The script reads `biradical_singlet.log` and `biradical_triplet.log` with `gparse`, then calculates J = brokensymm(props_sing,props_trip). It displays J/1e9 under the label “Exchange coupling:” in GHz.

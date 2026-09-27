@@ -4,21 +4,20 @@
 
 ## Purpose
 
-Non-linear reaction kinetics in a situation when there is no hydrodynamics, diffusion, or spin dynamics. This is in- tended as a stepping stone to the more complicated cases in the same directory of the Spinach example set. Calculation time: seconds.
+Non-linear reaction kinetics in a situation when there is no hydrodynamics, diffusion, or spin dynamics. This is intended as a stepping stone to the more complicated cases in the same directory of the Spinach example set. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Microfluidics examples. The coupled model is spin dynamics plus advection-diffusion-reaction transport on a mesh or regular grid. Numerical issues include finite-difference operators, mesh interpolation, and coupled reaction-flow evolution.
+- This standalone concentration model contains two competing second-order cycloaddition channels from cyclopentadiene and acrylonitrile to the exo and endo products. It has no spin system, hydrodynamics, or diffusion; solvent is included as an inert fifth component.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- The nonlinear concentration-dependent reaction generator is stepped on a 20-second grid with 200 time steps using Spinach `step` and the `LG4` integrator; the plotted traces omit the solvent.
 
 ## Implementation structure
 
 - Non-linear reaction kinetics in a situation when there is
-- no hydrodynamics, diffusion, or spin dynamics. This is in-
-- tended as a stepping stone to the more complicated cases
+- no hydrodynamics, diffusion, or spin dynamics. This is intended as a stepping stone to the more complicated cases
 - in the same directory of the Spinach example set.
 - Calculation time: seconds.
 - No spin system here

@@ -4,29 +4,10 @@
 
 ## Purpose
 
-CLIP-HSQC spectrum of camphor with natural content of 13C isotope. Coordinates, shielding anisotropies and J-couplings computed with DFT, isotropic chemical shifts taken from experimental data. Calculation time: minutes.
+Simulates and plots a natural-abundance ¹³C CLIP-HSQC spectrum of camphor. The source estimates minutes of calculation time.
 
-## Physical / mathematical content
+## Physical and numerical content
 
-- Liquid-state NMR examples. The physics is scalar-coupling-mediated coherence transfer in weakly or moderately coupled spin systems, often in Liouville space. Typical mechanisms include INEPT-style polarisation transfer, J-refocusing, phase cycling, indirect evolution, and multidimensional detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The molecular spin system is read from `../standard_systems/camphor.log` using `g2spinach` with min_j = 3.0 and no_xyz = 0; the source identifies coordinates, shielding anisotropies, and couplings as DFT-derived, then replaces isotropic shifts with experimental values. At 14.1 T it builds an IK-2 basis with scalar-coupling connectivity, proximity level 1, and a 4.0 proximity cutoff. It generates ¹³C isotopomers with `dilute` and simulates each using `liquid(...,@clip_hsqc,...,'nmr')` in a `parfor` loop.
 
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- CLIP-HSQC spectrum of camphor with natural content of 13C isotope.
-- Coordinates, shielding anisotropies and J-couplings computed with
-- DFT, isotropic chemical shifts taken from experimental data.
-- Calculation time: minutes.
-- Spin system properties (vacuum DFT calculation)
-- Magnet field
-- Isotropic shift components come from the experiment
-- Basis set
-- Algorithmic options
-- Sequence parameters
-- Create the spin system structure
-- Generate isotopomers
+The sequence uses J = 140, sweep [8000 1500], offset [4000 1000], 128 × 128 acquired points, and 512 × 512 zero filling on the ¹³C and ¹H axes (axis units: ppm). Cosine-squared apodisation is applied to the positive and negative FIDs; the code Fourier transforms the direct dimension, combines them as a States signal, transforms the indirect dimension, and plots the real spectrum.

@@ -4,25 +4,17 @@
 
 ## Purpose
 
-No descriptive header was found. The best immediate identifier is `newdata=struct2jdata(data,varargin)`, and the implementation details below should be used to infer its role.
+Converts a JData object represented by a struct array into an array, regrouping its first-level JData keyword fields according to the JData specification.
 
-## Physical / mathematical content
+## Input and options
 
-- JSONLab vendored utilities. The main content is data serialisation, structure walking, option parsing, and text/binary JSON handling rather than spin physics.
+- `data`: struct array. Recognized array fields include `_ArrayType_`, `_ArraySize_`, `_ArrayData_`, `_ArrayIsSparse_`, and `_ArrayIsComplex_`.
+- `Recursive` (optional parameter): 1 applies conversion to every child; 0 disables recursive conversion. Other optional parameter/value pairs are accepted.
 
-## Numerical / algorithmic content
+## Output
 
-## Implementation structure
+`newdata` contains the converted data when the input has a JData structure; otherwise the input is returned unchanged.
 
-- newdata=struct2jdata(data,opt,...)
-- convert a JData object (in the form of a struct array) into an array
-- authors:Qianqian Fang (q.fang <at> neu.edu)
-- input:
-- data: a struct array. If data contains JData keywords in the first
-- level children, these fields are parsed and regrouped into a
-- data object (arrays, trees, graphs etc) based on JData
-- specification. The JData keywords are
-- "_ArrayType_", "_ArraySize_", "_ArrayData_"
-- "_ArrayIsSparse_", "_ArrayIsComplex_"
-- opt: (optional) a list of 'Param',value pairs for additional options
-- The supported options include
+## Source notes
+
+JSONLab toolbox utility by Qianqian Fang (http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab); the source specifies a BSD license.

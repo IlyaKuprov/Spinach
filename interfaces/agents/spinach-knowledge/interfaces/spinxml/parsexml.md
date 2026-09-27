@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Converts an XML file into a Matlab structure. Syntax: xml=parsexml(filename) This function is called by x2spinach() during import of SpinXML files. Direct calls are discouraged.
+Reads an XML file and converts its document nodes to a MATLAB structure. x2spinach() uses it when importing SpinXML files; direct calls are discouraged.
 
 ## Physical / mathematical content
 
@@ -12,24 +12,15 @@ Converts an XML file into a Matlab structure. Syntax: xml=parsexml(filename) Thi
 
 ## Parameters / inputs
 
-- filename -a string with the XML file name
+- filename — a non-empty character string naming an existing XML file
 
 ## Outputs
 
-- xml -Matlab structure containing the
-- information from the XML file
+- xml — a structure with node names, attributes, data, and child nodes
 
 ## Implementation structure
 
-- Converts an XML file into a Matlab structure. Syntax:
-- xml=parsexml(filename)
-- This function is called by x2spinach() during import
-- of SpinXML files. Direct calls are discouraged.
-- filename -a string with the XML file name
-- xml -Matlab structure containing the
-- information from the XML file
-- Check consistency
-- Use Matlab's native XML engine, avoiding Java
-- Read the file
-- Parse child nodes
-- Child node parsing
+- Checks that filename is a non-empty character string and names an existing file.
+- Reads the XML with MATLAB's xmlread using the XMLEngine setting `maxp`.
+- Recursively converts child nodes to structures with `name`, `attributes`, `data`, and `children` fields; attributes are represented by name/value pairs.
+- Uses element tag names, and labels text and comment nodes `#text` and `#comment`, respectively. Parse or read failures raise an error.

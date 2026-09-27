@@ -8,9 +8,11 @@ Imports ASCII 2D concentration files produced by COMSOL. Syntax: spin_system=com
 
 ## Physical / mathematical content
 
-- COMSOL interfaces. These files are mostly data-structure and numerical-geometry utilities for bringing concentration, velocity, and mesh data from finite-element simulations into Spinach transport calculations.
+Imports concentration values associated with vertices of an existing Spinach mesh. The file vertex coordinates must match `spin_system.mesh.x` and `spin_system.mesh.y`.
 
 ## Numerical / algorithmic content
+
+Finds the line containing `% Nodes:` and reads its third field as the concentration-record count. After skipping four lines, reads that many coordinate and concentration records, assigns the concentration data to `spin_system.mesh.c`, then checks the imported coordinates against the mesh with a 1-norm tolerance of `1e-6`.
 
 ## Parameters / inputs
 
@@ -26,15 +28,4 @@ Imports ASCII 2D concentration files produced by COMSOL. Syntax: spin_system=com
 
 ## Implementation structure
 
-- Imports ASCII 2D concentration files produced by COMSOL. Syntax:
-- spin_system=comsol_conc(spin_system,file_name)
-- spin_system -Spinach spin system object
-- file_name -a character string
-- the following fields are added to spin_system object
-- mesh.c -stack of column vectors with
-- concentrations (in rows) at
-- each vertex of the mesh
-- Check consistency
-- Open the file
-- Concentration readout count
-- Read concentrations
+Validates that `file_name` is a character string and that `spin_system.mesh` exists; opens the file; finds `% Nodes:` and reads the record count; reads the vertex coordinates and concentrations; assigns `spin_system.mesh.c`; closes the file; and checks the vertex coordinates against the existing mesh.

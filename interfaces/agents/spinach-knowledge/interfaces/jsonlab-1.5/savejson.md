@@ -4,12 +4,11 @@
 
 ## Purpose
 
-No descriptive header was found. The best immediate identifier is `json=savejson(rootname,obj,varargin)`, and the implementation details below should be used to infer its role.
+Convert a MATLAB cell, struct, or array into a JSON string.
 
 ## Physical / mathematical content
 
 - JSONLab vendored utilities. The main content is data serialisation, structure walking, option parsing, and text/binary JSON handling rather than spin physics.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
 
 ## Numerical / algorithmic content
 

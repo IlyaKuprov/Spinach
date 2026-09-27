@@ -13,7 +13,7 @@ A parser for ORCA text output logs, versions 2.6 to 6.1. Reads the geometry and 
 
 ## Numerical / algorithmic content
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
+- The parser computes eigenvalues and eigenvectors of the symmetrised g-matrix, zero-field splitting tensor, and hyperfine tensors when those tensors are printed.
 
 ## Parameters / inputs
 
@@ -43,7 +43,7 @@ A parser for ORCA text output logs, versions 2.6 to 6.1. Reads the geometry and 
 - props.hfc.full.matrix -hyperfine tensors, Gauss, natoms cell
 - props.hfc.full.eigvals -hyperfine eigenvalues, Gauss, natoms cell
 - props.hfc.full.eigvecs -hyperfine eigenvectors, natoms cell
-- props.hfc.iso -isotropic hyperfine couplings, Gauss
+- props.hfc.iso -isotropic hyperfine couplings, Gauss, NaN if not printed
 - props.efg -EFG tensors, a.u.^-3, natoms cell
 - props.nqi -quadrupolar tensors, Hz, natoms cell
 - props.isotopes -isotopes used by ORCA, natoms cell

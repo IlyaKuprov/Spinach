@@ -4,44 +4,22 @@
 
 ## Purpose
 
-Exchange coupling estimation from a pair of DFT logs using Yamaguchi equation. The notation is: H=-2J*(Sa.Sb)
+Estimates the exchange coupling from singlet and triplet DFT results using the Yamaguchi equation. The Hamiltonian convention is `H=-2J*(Sa.Sb)`; the routine returns a rough order-of-magnitude estimate, not a high-precision coupling.
 
-## Physical / mathematical content
+## Method
 
-- Gaussian interfaces. These parse quantum-chemistry output into spin Hamiltonian ingredients such as hyperfine, shielding, or exchange parameters.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
-
-## Numerical / algorithmic content
-
-## Syntax
-
-```matlab
-J=brokensymm(props_sing,props_trip)
-```
+Using the singlet and triplet energies and their squared-spin expectation values, the function evaluates `J=(E_trip-E_sing)/(S2_sing-S2_trip)`, then converts Hartree to Hz with the factor `6.57968974479e15`. This is Eq. 6 of the cited paper.
 
 ## Parameters / inputs
 
-- props_sing -the output of gparse for the singlet
-- state of the biradical
-- props_trip -the output of gparse for the triplet
-- state of the biradical
+- `props_sing`: `gparse` output for the singlet state of the biradical; must contain `energy` and `s_sq`.
+- `props_trip`: `gparse` output for the triplet state of the biradical; must contain `energy` and `s_sq`.
 
-## Outputs
+## Output
 
-- J -an order-of-magnitude (really rough)
-- estimate of exchange coupling, Hz
+- `J`: rough estimate of the exchange coupling in Hz under the stated Hamiltonian convention.
 
-## Implementation structure
+## References
 
-- Exchange coupling estimation from a pair of DFT logs using
-- Yamaguchi equation. The notation is:
-- H=-2J*(Sa.Sb)
-- J=brokensymm(props_sing,props_trip)
-- props_sing -the output of gparse for the singlet
-- state of the biradical
-- props_trip -the output of gparse for the triplet
-- J -an order-of-magnitude (really rough)
-- estimate of exchange coupling, Hz
-- Check consistency
-- Eq 6 in https://doi.org/10.1063/1.5144696
-- Convert from Hartree to Hz
+- Yamaguchi equation, Eq. 6: [doi:10.1063/1.5144696](https://doi.org/10.1063/1.5144696).
+- [Spinach Wiki: brokensymm.m](https://spindynamics.org/wiki/index.php?title=brokensymm.m)

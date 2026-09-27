@@ -4,34 +4,21 @@
 
 ## Purpose
 
-2D microfluidic mesh cropping. Updates the mesh object to remove anything outside the user-specified vertex coordi- nate ranges. Syntax: mesh=mesh_crop(mesh,ranges)
+Crops a 2D mesh to the rectangular coordinate window `[xmin,xmax] × [ymin,ymax]`. Vertices on the bounds are retained.
 
-## Physical / mathematical content
+## Behavior
 
-- COMSOL interfaces. These files are mostly data-structure and numerical-geometry utilities for bringing concentration, velocity, and mesh data from finite-element simulations into Spinach transport calculations.
-
-## Numerical / algorithmic content
+The routine removes cached Voronoi and plotting data when present, selects vertices within both coordinate ranges, keeps edges, triangles, and rectangles whose vertices all survive, and reindexes those elements. It crops coordinates and any present velocity or concentration arrays (`u`, `v`, and `c`). The active-vertex list is replaced by the vertices appearing in the retained triangles; an existing list triggers a warning.
 
 ## Parameters / inputs
 
-- mesh -Spinach mesh object
-- ranges -{[xmin xmax],[ymin ymax]}
+- `mesh`: Spinach mesh object with vertex-index data.
+- `ranges`: two-element cell array `{[xmin xmax],[ymin ymax]}`; each pair must contain two real, increasing bounds.
 
-## Outputs
+## Output
 
-- mesh -updated mesh object
+- `mesh`: cropped and reindexed mesh object.
 
-## Implementation structure
+## Source
 
-- 2D microfluidic mesh cropping. Updates the mesh object to
-- remove anything outside the user-specified vertex coordi-
-- nate ranges. Syntax:
-- mesh=mesh_crop(mesh,ranges)
-- mesh -Spinach mesh object
-- ranges -{[xmin xmax],[ymin ymax]}
-- mesh -updated mesh object
-- Check consistency
-- Remove tessellation and preplot
-- Find vertices in the user-specified range
-- Find edges in the user-specified range
-- Re-index edges with updated vertices
+[Spinach Wiki: mesh_crop.m](https://spindynamics.org/wiki/index.php?title=mesh_crop.m)

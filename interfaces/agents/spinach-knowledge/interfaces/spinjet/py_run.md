@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Runs a python script from /interfaces/spinjet/Xepr_python/ folder of Bruker Xepr installation. Variable inputs and output can be passed to and from the script. Syntax: arg_out=py_run(spin_system,pyscript,arg_in)
+Runs a Python script from the `interfaces/spinjet/Xepr_python/` folder of a Bruker Xepr installation, passing inputs to the script and returning its printed output.
 
 ## Physical / mathematical content
 
@@ -12,33 +12,14 @@ Runs a python script from /interfaces/spinjet/Xepr_python/ folder of Bruker Xepr
 
 ## Parameters / inputs
 
-- spin_system -spin_system created by spinach, with
-- spin_system.sys.root_dir defined
-- pyscript -name of the python script to run, in
-- the form of a string without the .py
-- extension
-- arg_in -cell array containing the inputs to
-- the script
+- `spin_system` - spin system created by Spinach, with `spin_system.sys.root_dir` defined as a character string.
+- `pyscript` - name of the Python script as a character string, without the `.py` extension.
+- `arg_in` - cell array containing inputs to the script. If omitted, it defaults to an empty cell array. Non-character entries are converted with `num2str`.
 
 ## Outputs
 
-- arg_out -cell array of outputs from the script,
-- split at every space character (only
-- if no error exception has occourred -
-- in that case the error message would
-- be returned)
+- `arg_out` - cell array of tokens from the script's standard output, split on whitespace. It is empty if the command succeeds without producing output. If the command returns a nonzero status, the function raises an error containing the status code and returned output rather than returning `arg_out`.
 
 ## Implementation structure
 
-- Runs a python script from /interfaces/spinjet/Xepr_python/ folder of
-- Bruker Xepr installation. Variable inputs and output can be passed to
-- and from the script. Syntax:
-- arg_out=py_run(spin_system,pyscript,arg_in)
-- spin_system -spin_system created by spinach, with
-- spin_system.sys.root_dir defined
-- pyscript -name of the python script to run, in
-- the form of a string without the .py
-- extension
-- arg_in -cell array containing the inputs to
-- the script
-- arg_out -cell array of outputs from the script,
+The function checks the spin system, script name, script file, and input cell array before running the script. It builds a `python` command using `spin_system.sys.root_dir` and the script name. Each supplied input is passed as a double-quoted command-line argument; existing surrounding double quotes are removed, and backslashes, dollar signs, backticks, and double quotes are escaped. It then runs the command with `system` and splits nonempty output after trimming it.

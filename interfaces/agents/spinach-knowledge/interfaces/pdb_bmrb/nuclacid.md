@@ -9,7 +9,7 @@ Nucleic acid data import function. Parses PDB and chemical shift data, runs a J-
 ## Physical / mathematical content
 
 - PDB/BMRB interfaces. These files bridge biomolecular structure/assignment data and Spinach input structures, including atom selection, coordinates, and chemical-shift metadata.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+- Isotropic chemical shifts are stored in `inter.zeeman.scalar` (ppm). Chemical-shift anisotropy is not implemented here.
 
 ## Numerical / algorithmic content
 

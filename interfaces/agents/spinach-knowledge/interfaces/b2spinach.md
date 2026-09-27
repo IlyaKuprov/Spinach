@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Imports time-domain NMR data recorded by Bruker instruments: reads the binary fid or ser file together with the acquisiti- on and processing parameter files from the numbered experi- ment directory. Syntax: bdata=b2spinach(inpath)
+Imports time-domain NMR data recorded by Bruker instruments. Reads the binary `fid` or `ser` file and acquisition and processing parameter files in the numbered experiment directory.
 
 ## Physical / mathematical content
 
@@ -78,15 +78,4 @@ Imports time-domain NMR data recorded by Bruker instruments: reads the binary fi
 
 ## Implementation structure
 
-- Imports time-domain NMR data recorded by Bruker instruments:
-- reads the binary fid or ser file together with the acquisiti-
-- on and processing parameter files from the numbered experi-
-- ment directory. Syntax:
-- bdata=b2spinach(inpath)
-- inpath - character string with the path to the numbered
-- Bruker experiment directory containing the ac-
-- qus file and the fid or ser file
-- bdata.fid -matrix of complex free induction de-
-- cays, one per column, in the order
-- they are stored in the file; for data
-- sets with three and more dimensions
+Validates the experiment directory and reads acquisition parameters for up to four dimensions, plus processing parameters when present. Reads the binary data using the specified byte order and numeric type, removes block padding, assembles and scales the complex FIDs, and reads optional gradient, delay, counter, and non-uniform sampling lists.

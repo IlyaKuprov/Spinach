@@ -24,7 +24,7 @@ Moves a zeeman-hilb simulation context into Liouville space. When the formalism 
 - (matrices or their horizontal concatena-
 - tions) are stretched into state vectors,
 - and the operator-like fields pulse_op,
-- mw_oper, and ez_oper are converted into
+- mw_oper, ez_oper, and homodec_oper are converted into
 - commutation superoperators, when present
 - H -Hamiltonian operator, converted into a
 - commutation superoperator; an empty
@@ -65,17 +65,6 @@ Moves a zeeman-hilb simulation context into Liouville space. When the formalism 
 - ted R stays block-diagonal in the irrep table that reduce.m
 - evolves independently.
 
-## Implementation structure
+## Header notes
 
-- Moves a zeeman-hilb simulation context into Liouville space. When
-- the formalism specified in the spin system object is 'zeeman-hilb',
-- this function projects the evolution generators into Liouville
-- space, converts the standard state-like and operator-like fields
-- of the parameters structure, rebuilds the basis index table, mig-
-- rates the symmetry irrep projectors into the adjoint representa-
-- tion, and sets the formalism to 'zeeman-liouv'; for all other
-- formalisms, every argument is returned unchanged. This makes
-- Liouville-space pulse sequences callable with zeeman-hilb
-- inputs. Syntax:
-- [spin_system,parameters,H,R,K]=...
-- sim2liouv(spin_system,parameters,H,R,K)
+Only zeeman-hilb inputs are converted: generators, standard states/operators, basis data, and symmetry projectors move into the adjoint representation. Other formalisms return every input unchanged.

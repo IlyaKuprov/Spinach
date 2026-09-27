@@ -249,6 +249,41 @@ for fixture=1:2
     end
 end
 
+% Frozen long intervals must not request unreachable physical derivatives
+spin_system.bas.formalism='sphten-liouv';
+spin_system.tols.stst_tol=1e-10; control=struct();
+control.isotopes={'1H'}; control.channels=[1;1];
+control.operators={0.2*diag([0 1 -1 0]),0.3*diag([0 0 1 -1])};
+drift=diag([0 0.3-0.1i -0.3-0.1i 0.2-0.1i]);
+drift(4,1)=-0.02i; control.drifts={{drift}};
+control.rho_init={[1;0;0;0]}; control.rho_targ={[0;0;0;1]};
+control.pwr_levels=1; control.pulse_dt=[0.02 0.03 0.03 1e5];
+control.freeze=[false(2,2) true(2,2)];
+control.distortion={@(w)firf(w,[0.8 0.4])};
+control.method='rbfgs'; control.max_iter=0; control.plotting={};
+control.steady=true; control.budget=1;
+local_system=optimcon(spin_system,control);
+[~,fidelity,gradient]=grape_xy([1 2 0 0;0 1 0 0],local_system);
+result=test_true(result,'steady frozen delay',...
+                 all(isfinite(fidelity),'all')&&all(isfinite(gradient),'all'),...
+                 'a physically frozen long delay must not request its derivative');
+
+% A rank-one distortion cancels the free phase-cycled input at the long delay
+control.freeze=[false(2,2) true(2,1) [true; false]];
+control.distortion={@cancel_last}; control.phase_cycle=[0 pi/4 0];
+local_system=optimcon(spin_system,control);
+[~,fidelity,gradient]=grape_xy([1 2 0 0;0 1 0 0],local_system);
+result=test_true(result,'phase-cancelled frozen delay',...
+                 all(isfinite(fidelity),'all')&&all(isfinite(gradient),'all'),...
+                 'composed Jacobians must identify cancelled physical derivatives');
+
+end
+
+% Final [2 x nsteps] map and its [2*nsteps x 2*nsteps] Jacobian
+function [waveform,J]=cancel_last(waveform)
+rows=(size(waveform,2)-1)*size(waveform,1)+(1:2);
+J=speye(numel(waveform)); J(rows,:)=0; J(rows(1),rows)=1;
+waveform(:,end)=[sum(waveform(:,end));0];
 end
 
 

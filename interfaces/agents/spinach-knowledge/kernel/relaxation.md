@@ -21,6 +21,10 @@ retention and Zeeman full (`labframe`) retention remain available.
 
 - The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
 
+SRSK is supported in spherical-tensor Liouville space only. Requests with
+`zeeman-liouv` are rejected upfront as not implemented rather than passed
+to the recursive extended T1/T2 builder; no substitute relaxation model is used.
+
 ## Parameters / inputs
 
 - euler_angles -three Euler angles (ZYZ active convention

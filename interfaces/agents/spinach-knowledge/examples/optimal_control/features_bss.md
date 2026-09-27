@@ -4,31 +4,16 @@
 
 ## Purpose
 
-Optimal control pulse optimisation with Bloch-Siegert shift corrections switched on. A single proton with a Larmor frequency of 1 MHz is driven at a significant fraction of its Larmor frequency --a regime where the counter-rotating component of the control field shifts the resonance ap- preciably. A 90-degree pulse is optimised using LBFGS-GRAPE algorithm. For comparison, the same pulse is also optimised with the cor
+Optimises a 90-degree pulse for a single proton with a 1 MHz Larmor frequency when Bloch–Siegert corrections are included. The control is a significant fraction of the Larmor frequency, so the counter-rotating field shifts the resonance. The example compares pulses optimised with the correction enabled and disabled, evaluating both in the corrected model. Its offset ensemble is deliberately applied through transverse Lx rather than the usual Lz operator.
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The single-spin pulse-design problem includes Bloch–Siegert shift corrections and an offset ensemble represented by a transverse Lx term. The target is a 90-degree rotation.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The pulse is optimised with LBFGS-GRAPE, once with Bloch–Siegert corrections enabled and once without them. Both resulting pulses are evaluated using the corrected model, and their fidelities are reported.
 
 ## Implementation structure
 
-- Optimal control pulse optimisation with Bloch-Siegert shift corrections
-- switched on. A single proton with a Larmor frequency of 1 MHz is driven
-- at a significant fraction of its Larmor frequency --a regime where the
-- counter-rotating component of the control field shifts the resonance ap-
-- preciably. A 90-degree pulse is optimised using LBFGS-GRAPE algorithm.
-- For comparison, the same pulse is also optimised with the corrections
-- switched off and then evaluated in the corrected model.
-- Calculation time: minutes.
-- Larmor frequency of 1 MHz
-- Spin system
-- Chemical shifts, ppm
-- Basis set
+The script creates the one-proton spin system, sets Lx and Ly as RF controls, defines the transverse offset ensemble, runs the two optimisation cases, and reports corrected-model fidelities. The stated Larmor frequency is 1 MHz.

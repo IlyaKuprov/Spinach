@@ -4,30 +4,18 @@
 
 ## Purpose
 
-Powder magic angle spinning spectrum of a single quadrupolar deuterium nucleus using Floquet theory. Perturbative correcti- ons to the rotationg frame transformation are not applied. Calculation time: seconds
+Simulates the powder MAS spectrum of a single quadrupolar deuterium nucleus using Floquet theory. Perturbative corrections to the rotating-frame transformation are not applied. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file relies on Floquet theory, where periodic time dependence is lifted into an enlarged block representation that converts time-periodic dynamics into a time-independent eigenproblem.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+- The source specifies one `2H` nucleus at 9.4 T, with quadrupolar coupling eigenvalues `[-1e3 -2e3 3e3]` and Euler angles `[0 0 0]`.
+- The rotor axis is `[1 1 1]` at 1000 Hz; both the initial state and detected operator are `L+` on `2H`.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Uses the spherical-tensor Liouville-space basis with no approximation and projection +1. Floquet acquisition uses maximum rank 17 and grid `leb_2ang_rank_17`.
+- Acquires 512 points over a `2e4` sweep, zero-fills to 4096, applies exponential apodisation parameter 6, then Fourier transforms and plots the real spectrum.
 
 ## Implementation structure
 
-- Powder magic angle spinning spectrum of a single quadrupolar
-- deuterium nucleus using Floquet theory. Perturbative correcti-
-- ons to the rotationg frame transformation are not applied.
-- Calculation time: seconds
-- System specification
-- Basis set
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+- Define the quadrupolar spin system and basis, configure the experiment, run the Floquet acquisition, apodise, Fourier transform, and plot.

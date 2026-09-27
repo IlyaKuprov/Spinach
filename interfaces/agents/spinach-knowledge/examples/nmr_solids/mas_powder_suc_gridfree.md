@@ -4,29 +4,20 @@
 
 ## Purpose
 
-13C MAS spectrum of sucrose powder (assuming decoupling of 1H), computed using the grid-free Fokker-Planck MAS formalism. Che- mical shielding tensors, J-couplings and coordinates are esti- mated with DFT. A polyadic representation of the evolution ge- nerator is used, further particulars here: Calculation time: hours on a Tesla V100 GPU, much longer on CPU
+13C MAS spectrum of sucrose powder (assuming decoupling of 1H), computed using the grid-free Fokker-Planck MAS formalism. Chemical shielding tensors, J-couplings and coordinates are estimated with DFT. The evolution generator uses a polyadic representation; see [the cited paper](https://doi.org/10.1126/sciadv.aaw8962) for further particulars. Calculation time: hours on a Tesla V100 GPU, much longer on CPU.
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Simulates the `13C` MAS spectrum of sucrose powder assuming `1H` decoupling; the source identifies shielding tensors, J-couplings, and coordinates as DFT-derived.
+- Uses grid-free Fokker-Planck MAS dynamics with a polyadic representation of the evolution generator, as described in the cited paper.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Enables the `greedy` and `polyadic` algorithms for `gridfree`, then applies exponential apodisation with parameter 6 and Fourier transforms the FID after 1024-point zero filling.
 
 ## Implementation structure
 
-- 13C MAS spectrum of sucrose powder (assuming decoupling of 1H),
-- computed using the grid-free Fokker-Planck MAS formalism. Che-
-- mical shielding tensors, J-couplings and coordinates are esti-
-- mated with DFT. A polyadic representation of the evolution ge-
-- nerator is used, further particulars here:
-- Calculation time: hours on a Tesla V100 GPU,
-- much longer on CPU
-- Spin system properties (PCM DFT calculation)
-- Magnet field
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
+- Imports the sucrose spin system from the PCM DFT log with `g2spinach`, selects `13C`, and sets the field to 14.1 T.
+- Uses the `sphten-liouv` basis with `IK-0`, `+1` projections, and interaction level 3; sets interaction and proximity cutoffs to 5.0 and 4.0 and enables `greedy` and `polyadic`.
+- Configures MAS about `[1 1 1]` at 6000 Hz, maximum rank 23, a 50 kHz sweep, 256 points, 1024-point zero filling, and a 15000 Hz offset.
+- Runs `gridfree` with `acquire` in NMR mode, applies exponential apodisation with parameter 6, Fourier transforms the FID, and plots the real spectrum.

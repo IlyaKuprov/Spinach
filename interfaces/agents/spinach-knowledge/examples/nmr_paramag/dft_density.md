@@ -4,25 +4,18 @@
 
 ## Purpose
 
-Simulation of the pseudocontact shift field of the Europium(III) complex of 1,4,7,10-tetrakis(2-pyridylmethyl)-1,4,7,10-tetraazacyclododecane. The spin density, the hyperfine couplings and the susceptibility tensor are imported from a DFT calculation. The partial differential equation used for the delo- calised model solution is described in: One outlier point is due to the presence of contact shift due to the isotro
+Simulation of the PCS field for the Eu(III) complex of 1,4,7,10-tetrakis(2-pyridylmethyl)-1,4,7,10-tetraazacyclododecane. The example imports the electron probability density and DFT hyperfine and susceptibility data, then compares the distributed-density solution with point-model and HFC-derived PCS. The distributed model is based on the [Kuprov-equation paper](http://dx.doi.org/10.1039/C4CP03106G). The source notes that one outlier arises from an isotropic hyperfine contact shift for a nucleus; the point model and Kuprov equation used here do not include contact shifts.
 
 ## Physical / mathematical content
 
-- Paramagnetic NMR examples. These files work with pseudocontact shifts, paramagnetic relaxation, susceptibility tensors, and inverse problems for metal-site localisation or distributed electron density reconstruction.
+The calculation normalizes the imported three-dimensional electron probability density, obtains the susceptibility tensor from the DFT data, and solves the PCS field with `kpcs`. It also computes point-model PCS with `ppcs` and HFC-derived PCS with `hfc2pcs` for comparison.
 
 ## Numerical / algorithmic content
 
+The DFT-derived PCS values are generated for the parsed nuclei using the corresponding isotope labels (¹H, ¹³C, or ¹⁴N). The example plots HFC-derived and point-model PCS against the distributed solution and displays the distributed PCS field.
+
 ## Implementation structure
 
-- Simulation of the pseudocontact shift field of the Europium(III) complex of
-- 1,4,7,10-tetrakis(2-pyridylmethyl)-1,4,7,10-tetraazacyclododecane. The spin
-- density, the hyperfine couplings and the susceptibility tensor are imported
-- from a DFT calculation. The partial differential equation used for the delo-
-- calised model solution is described in:
-- One outlier point is due to the presence of contact shift due to the isotro-
-- pic hyperfine coupling being non-sero for that particular nucleus. Point mo-
-- del and Kuprov equation do not include contact shifts.
-- Load unpaired electron probability density
-- Load DFT data (HFCs are read in Gauss)
-- Normalize probability density
-- Get susceptibility tensor
+- Load and normalize the electron probability density and read the DFT data.
+- Derive the susceptibility tensor and compute point-model and distributed PCS.
+- Calculate PCS from DFT hyperfine tensors and compare all models; plot the distributed field.

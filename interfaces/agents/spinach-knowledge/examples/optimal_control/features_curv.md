@@ -4,31 +4,16 @@
 
 ## Purpose
 
-A transfer of coherence from longitudinal magnetization into a two-spin singlet state with a distribution of B1 powers. An ensemble of ten spin systems with different power levels is simultaneously driven to optimal fidelity, which in this case is 1/sqrt(2) = 0.7071 Curvilinear GRAPE interface is used -the user specifies the definition of the curvilinear coordinates and the Jacobian. In this case, the coor- dinates a
+Demonstrates optimal-control pulse design in curvilinear coordinates. The control variables are mapped to RF amplitude and phase through a user-defined coordinate map and its Jacobian, which are passed to the curvilinear GRAPE calculation.
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+The example uses a two-13C spin system at 14.1 T with a 60 Hz scalar coupling and the sphten-liouv basis. It explores the control landscape through curvilinear coordinates for the RF amplitude and phase.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The script supplies the coordinate transformation and Jacobian to grape_curv and optimises over an ensemble of 11 B1 power levels spanning 0.6 to 1.4. This is a gradient-based curvilinear-control calculation. For the coherence-to-singlet transfer, the source gives the optimal fidelity as 1/√2 ≈ 0.7071.
 
 ## Implementation structure
 
-- A transfer of coherence from longitudinal magnetization into a two-spin
-- singlet state with a distribution of B1 powers. An ensemble of ten spin
-- systems with different power levels is simultaneously driven to optimal
-- fidelity, which in this case is 1/sqrt(2) = 0.7071
-- Curvilinear GRAPE interface is used -the user specifies the definition
-- of the curvilinear coordinates and the Jacobian. In this case, the coor-
-- dinates are phase-amplitude.
-- Calculation time: minutes.
-- Magnetic field
-- Isotopes
-- Interactions
-- Basis set
+The MATLAB code constructs the spin system and basis, defines the amplitude/phase coordinate map and its Jacobian, sets the B1 power ensemble, and calls grape_curv for pulse optimisation. The ensemble uses linspace(0.6,1.4,11).

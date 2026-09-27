@@ -4,29 +4,8 @@
 
 ## Purpose
 
-Ramsey shifts of other spins under an off-resonant drive. A proton channel drives a three-spin system in which 13C and 15N are far off resonance: each of their Zeeman frequencies shifts by delta_n=w_n*w1n^2/(w_n^2-w_c^2) where w_n is the signed Zeeman frequency of the nucleus, w_c is the signed carrier frequency, and w1n is the drive amplitude scaled by the ratio of the magnetogyric ratios. The negative magnetogyric 
+The current example lives at `examples/fundamentals/ramsey_shifts.m`; this knowledge entry retains its earlier path for lookup. A constant proton-channel drive shifts the off-resonant 13C and 15N Zeeman frequencies in a three-spin system. For either nucleus, the analytic shift is `delta_n=w_n*w1n^2/(w_n^2-w_c^2)`, where `w_n` is its signed Zeeman frequency, `w_c` the signed carrier frequency, and `w1n` the proton-drive amplitude scaled by that nucleus’s magnetogyric-ratio ratio. The negative 15N magnetogyric ratio gives an opposite phase direction to 13C.
 
-## Physical / mathematical content
+## Method
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Ramsey shifts of other spins under an off-resonant drive. A proton
-- channel drives a three-spin system in which 13C and 15N are far off
-- resonance: each of their Zeeman frequencies shifts by
-- delta_n=w_n*w1n^2/(w_n^2-w_c^2)
-- where w_n is the signed Zeeman frequency of the nucleus, w_c is the
-- signed carrier frequency, and w1n is the drive amplitude scaled by
-- the ratio of the magnetogyric ratios. The negative magnetogyric
-- ratio of 15N makes its shift precess the opposite way to 13C. The
-- accumulated phases of the off-resonant nuclei are compared with the
-- analytic formula, and the quadratic scaling of the shift in the
-- drive amplitude and its inverse scaling in the magnet field are
-- demonstrated.
+The script propagates the driven state for 20 ms with the Ramsey correction enabled and compares the two accumulated phases with the analytic expression. It also checks the opposite signs, the fourfold phase change on doubling drive amplitude, and the twofold change on halving the magnetic field. These are checks in the example code, not independently rerun results.

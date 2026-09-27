@@ -3,20 +3,17 @@
 - Signature: `s166c_kuprov()`
 
 ## Purpose
-
-Distributed fit for the S166C mutant dataset for human carbonic anhydrase II. The system and the method are described in: A step-by-step tutorial is available here:
-
+Distributed fit for the S166C mutant dataset for human carbonic anhydrase II. The system and method are described in the [cited article](http://dx.doi.org/10.1039/c6sc03736d). A step-by-step tutorial is [available here](http://spindynamics.org/wiki/index.php?title=Pseudocontact_shift_analysis).
 ## Physical / mathematical content
 
-- Paramagnetic NMR examples. These files work with pseudocontact shifts, paramagnetic relaxation, susceptibility tensors, and inverse problems for metal-site localisation or distributed electron density reconstruction.
+
+- The S166C example fits a distributed PCS source and derives an effective susceptibility tensor from that distribution.
 
 ## Numerical / algorithmic content
 
 ## Implementation structure
 
-- Distributed fit for the S166C mutant dataset for human carbonic anhydrase
-- II. The system and the method are described in:
-- A step-by-step tutorial is available here:
+
 - Load experimental data
 - Load susceptibility tensor
 - Set inverse problem parameters

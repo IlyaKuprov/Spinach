@@ -8,11 +8,10 @@ Figure 4 (bottom) from the paper by Rasulov and Kuprov:
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+- The script models 100 non-interacting 13C spins with chemical shifts spanning −100 to +100 ppm at a magnetic field of 28.18.
+- It optimises two-channel, 125-interval RF controls to map initial states Sx, Sy, and Sz to −Sz, Sy, and Sx. The last five intervals are frozen as dead time.
+- The control setup specifies `lbfgs`, and the script runs `fmaxnewton(spin_system,@grape_xy,guess)`, labelled LBFGS-GRAPE in the source. The optimisation includes power levels, NS and SNS penalties, and an ensemble of amplifier-saturation distortions.
+- A subsequent simulation evaluates infidelity across grids of RF power and amplifier-saturation factors, then plots its logarithm.
 
 ## Numerical / algorithmic content
 

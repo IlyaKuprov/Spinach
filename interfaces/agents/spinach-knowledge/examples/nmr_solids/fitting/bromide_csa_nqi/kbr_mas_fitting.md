@@ -4,31 +4,16 @@
 
 ## Purpose
 
-Fitting of a 79Br MAS NMR spectrum of potassium bromide with respect to the quadrupole coupling constant. The spectrum cannot be fitted with a single quadrupolar tensor; at least 3 are necessary, likely due to a dist- ribution of electrostatic environments in the powder. Calculation time: hours.
+Fitting of a 79Br MAS NMR spectrum of potassium bromide with respect to the quadrupole coupling constant. The spectrum cannot be fitted with a single quadrupolar tensor; at least 3 are necessary, likely due to a distribution of electrostatic environments in the powder. Calculation time: hours.
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The fitting model contains three 79Br sites with a shared isotropic chemical shift and three diagonal quadrupolar coupling tensors. The source comments that one tensor cannot fit the spectrum and that at least three are needed, likely because the powder has a distribution of electrostatic environments.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The script reads `KBr_400MHz_2kHz.txt`, uses a 2 kHz MAS rate, and sets the acquisition sweep width to 100 kHz (`parameters.sweep=1e5 Hz`). It optimises the model parameters with `fminsearch` (up to 5000 iterations). It simulates with an IK-0 basis, rank 50 and `rep_2ang_200pts_oct`; the objective is the squared 2-norm between experimental and calculated spectra. The source disables hygiene and trajectory-level output inside the objective and plots the experimental and fitted curves at each evaluation.
 
 ## Implementation structure
 
-- Fitting of a 79Br MAS NMR spectrum of potassium bromide
-- with respect to the quadrupole coupling constant.
-- The spectrum cannot be fitted with a single quadrupolar
-- tensor; at least 3 are necessary, likely due to a dist-
-- ribution of electrostatic environments in the powder.
-- Calculation time: hours.
-- Load and normalise the data
-- Set instrumental variables
-- Set optimizer options
-- Get a figure going
-- Run the optimisation
-- Plot and print the fitted parameters
-- Least squares error function
+Loads and normalises the experimental spectrum, sets the instrumental parameters and initial guesses, then repeatedly constructs the three-site spin system, simulates and Fourier transforms its signal, and evaluates the least-squares residual.

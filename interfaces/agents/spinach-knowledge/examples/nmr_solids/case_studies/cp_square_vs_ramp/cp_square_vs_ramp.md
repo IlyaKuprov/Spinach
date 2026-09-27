@@ -3,12 +3,11 @@
 - Signature: `cp_square_vs_ramp()`
 
 ## Purpose
-
-1H-15N cross-polarisation experiment in the doubly rotating frame using (a) fixed amplitude CP; (b) linearly ramped CP; (c) tangent-ramped CP. Static powder simulation demonstra- ting the advantages of ramped cross-polarisation. For fur- ther information, see: Calculation time: seconds
+Compares fixed-amplitude, linearly ramped, and tangent-ramped ¹H–¹⁵N cross-polarisation in a static-powder simulation. Calculation time: seconds.
 
 ## Physical / mathematical content
-
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
+- Simulates static-powder ¹H–¹⁵N cross-polarisation with fixed-amplitude, linear-ramp, and tangent-ramp irradiation.
+- Uses a 9.394 T field and a 1.05 Å ¹⁵N–¹H separation; each 1 ms contact period has 500 steps of 2 µs. The script plots the irradiation amplitudes and ¹⁵N transverse-signal expectation value.
 
 ## Numerical / algorithmic content
 

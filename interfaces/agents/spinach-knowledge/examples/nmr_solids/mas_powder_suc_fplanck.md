@@ -4,29 +4,20 @@
 
 ## Purpose
 
-13C MAS spectrum of sucrose powder (assuming decoupling of 1H), computed using the Fokker-Planck MAS formalism. Chemical shiel- ding tensors, J-couplings and coordinates are estimated with DFT. Calculation time: days
+13C MAS spectrum of sucrose powder (assuming decoupling of 1H), computed using the Fokker-Planck MAS formalism. Chemical shielding tensors, J-couplings and coordinates are estimated with DFT. Calculation time: days
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Simulates the `13C` MAS spectrum of sucrose powder assuming `1H` decoupling; chemical shielding tensors, J-couplings, and coordinates are described as DFT-derived.
+- The example identifies its method as Fokker-Planck MAS; the implementation calls `singlerot` for signal acquisition.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Runs `singlerot` to acquire the FID, applies exponential apodisation with parameter 6, zero-fills to 1024 points, and plots the real Fourier-transformed spectrum.
 
 ## Implementation structure
 
-- 13C MAS spectrum of sucrose powder (assuming decoupling of 1H),
-- computed using the Fokker-Planck MAS formalism. Chemical shiel-
-- ding tensors, J-couplings and coordinates are estimated with DFT.
-- Calculation time: days
-- Spin system properties (PCM DFT calculation)
-- Magnet field
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Experiment setup
-- % Simulation
-- Apodisation
+- Imports the sucrose spin system from the PCM DFT log with `g2spinach`, selecting `13C`, then sets the field to 14.1 T.
+- Uses the `sphten-liouv` basis with `IK-0`, `+1` projections, and interaction level 3; sets interaction and proximity cutoffs to 5.0 and 4.0.
+- Configures MAS at 6000 Hz about `[1 1 1]`, maximum rank 23, a 50 kHz sweep, 256 points, 1024-point zero filling, and a 15000 Hz offset; selects `leb_2ang_rank_23` for the grid.
+- Runs `singlerot` with `acquire` in NMR mode, applies exponential apodisation with parameter 6, Fourier transforms the FID, and plots the real spectrum.

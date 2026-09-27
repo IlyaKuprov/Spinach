@@ -4,31 +4,23 @@
 
 ## Purpose
 
-Nutation frequency selective excitation described in Glaser group paper (https://doi.org/10.1016/j.jmr.2004.12.005). User-specified nutation frequency intervals have magnetisation arriving into us- er specified states. The pulse is phase-modulated. Calculation time: minutes.
+Design a phase-modulated pulse for nutation-frequency-selective excitation, as described in the Glaser group paper (https://doi.org/10.1016/j.jmr.2004.12.005). The pulse drives magnetisation into specified target states over specified nutation-frequency intervals. Calculation time: minutes.
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+- A single on-resonance `13C` spin is simulated at a magnetic field of 28.18 T, with no basis approximations. The drift Hamiltonian is zero.
+- The initial state is normalised `Sz`. Across 128 nutation frequencies from 6 to 14 kHz, the target is normalised `Sz` in the first 20, middle 20 (indices 54–73), and last 20 frequency samples, and normalised `Sx` elsewhere.
+- The optimised control is the phase of a pulse with a fixed amplitude profile. Its Cartesian components act through `Lx` and `Ly`.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- The script runs GRAPE phase optimisation with the L-BFGS method (`control.method='lbfgs'`, `@grape_phase`), starting from a constant `pi/4` phase profile and allowing up to 200 iterations.
+- The pulse has 250 intervals of 20 µs each. The ensemble uses B1 power levels of `2*pi*nutf_range` rad/s and a separate initial–target state pair for each level.
+- After optimisation, a `parfor` loop simulates the shaped pulse at each power level using `shaped_pulse_xy` with the `expv-pwc` propagator. The resulting states are projected onto `Sx` and `Sz` and plotted against the target pattern.
 
 ## Implementation structure
 
-- Nutation frequency selective excitation described in Glaser group
-- paper (https://doi.org/10.1016/j.jmr.2004.12.005). User-specified
-- nutation frequency intervals have magnetisation arriving into us-
-- er specified states. The pulse is phase-modulated.
-- Calculation time: minutes.
-- Magnetic field
-- Single carbon spin
-- Transmitter is on resonance
-- No approximations
-- Run Spinach housekeeping
-- Get pertinent spin states
-- Get pertinent control operators
+- Initialise the spin system and obtain the normalised `Sx` and `Sz` states, `Lx` and `Ly` control operators, and drift Hamiltonian.
+- Construct and plot the frequency-dependent `Sx` and `Sz` target pattern.
+- Set the control ensemble, pulse grid, plotting options, and initial phase guess; configure optimisation with `optimcon` and run `fmaxnewton` using `@grape_phase`.
+- Simulate the optimised pulse across the nutation-frequency range in parallel and plot its `Sx` and `Sz` projections alongside the targets.

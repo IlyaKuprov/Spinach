@@ -8,7 +8,7 @@ Figure 1 from the paper by Rasulov and Kuprov:
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
+- A discretised pulse sequence is converted to a waveform in mT. Cascaded single-pole and single-zero filters, plus an RLC filter, are applied to compare the input and filtered in-phase and quadrature components.
 
 ## Numerical / algorithmic content
 

@@ -4,20 +4,19 @@
 
 ## Purpose
 
-Experimental HNCO spectrum of human ubiquitin. Donghan Lee (Max Planck Institute) Ilya Kuprov (University of Southampton)
+Plots a precomputed experimental proton spectrum of human ubiquitin loaded from `noesy_ubiquitin_expt.mat`.
 
 ## Physical / mathematical content
 
-- Protein NMR examples. These files specialise liquid-state pulse sequences to labelled biomolecules, exploiting one-bond and two-bond heteronuclear couplings, coherence pathway filtering, selective decoupling, and high-dimensional indirect detection.
+- Uses proton axes for a two-dimensional spectrum.
 
 ## Numerical / algorithmic content
 
+- Loads the spectrum directly and plots it without further spectral processing.
+
 ## Implementation structure
 
-- Experimental HNCO spectrum of human ubiquitin.
 - Donghan Lee (Max Planck Institute)
 - Ilya Kuprov (University of Southampton)
-- Magnet field
-- Sequence parameters
-- Load data
-- Plotting
+- Sets the magnetic field to 21.1356 T, offset to 4250 Hz, sweep to 10815 Hz, zero filling to [1024 1024], and axis units to ppm.
+- Loads `spectrum` from `noesy_ubiquitin_expt.mat` and plots it with `plot_2d`.

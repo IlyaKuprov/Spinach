@@ -4,21 +4,8 @@
 
 ## Purpose
 
-Electron location and susceptibility tensor recovery from experimental PCS data using point electron model. Experi- mental data kindly provided by Gottfried Otting (Australi- an National University).
+Recovers a point-electron location and susceptibility tensor from experimental PCS data. The source credits the experimental data to Gottfried Otting (Australian National University).
 
-## Physical / mathematical content
+## Numerical and implementation details
 
-- Paramagnetic NMR examples. These files work with pseudocontact shifts, paramagnetic relaxation, susceptibility tensors, and inverse problems for metal-site localisation or distributed electron density reconstruction.
-
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Electron location and susceptibility tensor recovery from
-- experimental PCS data using point electron model. Experi-
-- mental data kindly provided by Gottfried Otting (Australi-
-- an National University).
-- Load experimental data
-- Solve the inverse problem
-- Plot experimental vs predicted PCS
-- Report the parameters
+The script loads PCS values and x, y, z coordinates from `tm_1igv_pcs.mat` and calls `ilpcs([x y z],expt_pcs,[0 1 2],[-5 5 -15])` to obtain the fitted location, susceptibility tensor and predicted PCS values. It plots measured versus predicted PCS with a y=x reference line, then displays the recovered tensor and point-electron location.

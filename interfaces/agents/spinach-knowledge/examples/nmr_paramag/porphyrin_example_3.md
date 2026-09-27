@@ -4,25 +4,19 @@
 
 ## Purpose
 
-Computes PCS using different models in basic Cu(II) porphyrin complex. See the "getting started" manual at The paper describing the distributed PCS model used below is available at Calculation time: minutes, 64GB of RAM required
+Computes pseudocontact shifts (PCS) using hyperfine tensors and a distributed spin-density model for a Cu(II) porphyrin complex. Calculation time: minutes, 64GB of RAM required.
 
 ## Physical / mathematical content
 
-- Paramagnetic NMR examples. These files work with pseudocontact shifts, paramagnetic relaxation, susceptibility tensors, and inverse problems for metal-site localisation or distributed electron density reconstruction.
+- Converts the Cu(II) g-tensor to a Curie susceptibility tensor at 298 K for spin 1/2.
+- Computes proton PCS from hyperfine tensors and solves the Kuprov equation using the padded spin density and susceptibility tensor.
 
 ## Numerical / algorithmic content
 
+- Uses FFT mode for the density-based PCS calculation and displays the HFC and PDE PCS values side by side in ppm.
+
 ## Implementation structure
 
-- Computes PCS using different models in basic Cu(II) porphyrin complex. See
-- the "getting started" manual at
-- The paper describing the distributed PCS model used below is available at
-- Calculation time: minutes, 64GB of RAM required
-- Porphyrin ring proton coordinates
-- Cu(II) g-tensor eigenvalues
-- Curie susceptibility tensor
-- Parse ORCA log
-- Extract hyperfine tensors
-- Compute HFC PCS
-- Parse ORCA cube and pad the density with zeros to avoid PBC effects
-- Compute extentens for original density without padding
+- Defines porphyrin ring proton coordinates and Cu(II) g-tensor eigenvalues.
+- Parses an ORCA log for hyperfine tensors and an ORCA spin-density cube with zero padding to avoid PBC effects.
+- Plots the spin density and PCS field alongside the molecular geometry.

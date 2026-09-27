@@ -4,29 +4,12 @@
 
 ## Purpose
 
-13C NMR spectrum of tryptophan powder. Isotropic chemical shifts come from the experimental data. Coordinates and CSAs are estima- ted with DFT. Protons are assumed to be decoupled. Calculation time: hours
+Simulates the 13C NMR spectrum of tryptophan powder. The source takes the coordinates and chemical-shift anisotropies from DFT data, substitutes experimental isotropic shifts, and assumes proton decoupling. Estimated runtime: hours.
 
-## Physical / mathematical content
+## Model and basis
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+Spin-system data are read from `../standard_systems/trp_xray.out`; the field is 14.1 T. The source sets isotropic shifts (ppm) for sites 2–12 as follows: 2: 124.2, 3: 110.1, 4: 118.0, 5: 119.3, 6: 114.7, 7: 107.5, 8: 134.9, 9: 125.0, 10: 26.8, 11: 54.6, and 12: 174.4. The basis is `sphten-liouv` with IK-0 approximation, 15N longitudinal order, +1 projection, and inter-level 3; the interaction and proximity cutoffs are 5.0 and 4.0.
 
-## Numerical / algorithmic content
+## Simulation and processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- 13C NMR spectrum of tryptophan powder. Isotropic chemical shifts
-- come from the experimental data. Coordinates and CSAs are estima-
-- ted with DFT. Protons are assumed to be decoupled.
-- Calculation time: hours
-- Spin system properties (DFT calculation)
-- Magnet field
-- Experimental chemical shifts
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Experiment setup
-- Simulation
+The 13C powder acquisition uses the `rep_2ang_6400pts_sph` grid, 60 kHz sweep, 128 points, 512-point zero-fill, 18000 offset, and an inverted ppm axis. The 13C `L+` state is both the initial and detection state. The powder FID is apodised exponentially with parameter 6, Fourier transformed, and plotted.

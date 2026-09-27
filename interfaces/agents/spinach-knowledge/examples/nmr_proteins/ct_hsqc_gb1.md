@@ -8,24 +8,13 @@ Constant-time HSQC experiment simulation for the GB1 protein. Simulation time: h
 
 ## Physical / mathematical content
 
-- Protein NMR examples. These files specialise liquid-state pulse sequences to labelled biomolecules, exploiting one-bond and two-bond heteronuclear couplings, coherence pathway filtering, selective decoupling, and high-dimensional indirect detection.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Imports GB1 backbone data and removes 13C spins; the sequence observes 15N and 1H and specifies 15N decoupling in F2.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Simulates positive and negative FIDs with `ct_hsqc`, applies squared-cosine apodisation, Fourier-transforms and combines them into a States signal, then Fourier-transforms and plots the spectrum.
 
 ## Implementation structure
 
-- Constant-time HSQC experiment simulation for the
-- GB1 protein.
-- Simulation time: hours, faster with a Tesla A100 GPU.
-- Protein data import
-- Magnet field
-- Tolerances
-- Basis set
-- Algorithmic options
-- Sequence parameters
-- Create the spin system structure
-- Kill carbons (protein assumed unlabelled)
-- Build the basis
+- Imports `2N9K.pdb` and `2N9K.bmrb`, sets a 14.1 T field and interaction tolerances, and builds an IK-1 `sphten-liouv` basis.
+- Sets J to 90, sweeps to [3000 3000] Hz, offsets to [-7300 5100] Hz, acquisition points to [128 128], and zero filling to [512 512]; plots in ppm.

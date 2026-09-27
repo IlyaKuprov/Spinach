@@ -4,29 +4,18 @@
 
 ## Purpose
 
-Spinning powder pulse-acquire experiment on a two-spin system with a dipolar coupling using Fokker-Planck formalism: Calculation time: seconds
+Spinning-powder pulse-acquire experiment on two dipolar-coupled protons. The source header identifies the Fokker–Planck formalism; the simulation call is `singlerot(...)`. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+- The two `1H` spins have isotropic Zeeman shifts 5.0 and -2.0 and coordinates `[0 0 0]` and `[0 3.9 0.1]`; the system is set to 14.1 T.
+- The source comment cites [doi:10.1016/j.jmr.2016.07.005](https://doi.org/10.1016/j.jmr.2016.07.005). The MAS rate is 1000 Hz along `[1 1 1]`.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Uses the spherical-tensor Liouville-space basis with no approximation and projection +1; the angular grid is `leb_2ang_rank_17` with maximum rank 17.
+- Acquires 512 points over a sweep of `2e4`, zero-fills to 4096, applies exponential apodisation parameter 6, and Fourier transforms the FID.
 
 ## Implementation structure
 
-- Spinning powder pulse-acquire experiment on a two-spin system
-- with a dipolar coupling using Fokker-Planck formalism:
-- Calculation time: seconds
-- System specification
-- Basis set
-- Spinach housekeeping
-- Pulse-acquire setup
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+- Define the two-spin system and basis, build the Spinach system, set acquisition and rotor parameters, call `singlerot(spin_system,@acquire,parameters,'nmr')`, apodise, Fourier transform, and plot.

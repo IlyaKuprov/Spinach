@@ -4,28 +4,14 @@
 
 ## Purpose
 
-WISE of alpha-glycine powder under MAS. Calculation time: hours, much faster on GPU
+Simulates a two-dimensional WISE (wide-line separation) spectrum of alpha-glycine powder under magic-angle spinning. The source notes an hours-long runtime, substantially shorter on a GPU.
 
-## Physical / mathematical content
+## Spin system and experiment
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The PCM-DFT spin system is loaded from `../../examples/standard_systems/glycine.log`; the field is 9.4 T. Isotropic shifts are set to 176.4 and 43.6 ppm for CO and Cα, 2.6 and 3.8 ppm for the two Hα sites, and 8.0 ppm for each of the three HN sites. The calculation uses the `sphten-liouv` basis with IK-0 approximation and inter-level 3. MAS rate is 5 kHz, the axis is [1 1 1], maximum rank is 9, and the powder grid is `rep_2ang_200pts_sph`.
 
-## Numerical / algorithmic content
+The WISE/CP settings are offsets [2000, 10000] Hz, high-power irradiation 83 kHz, CP powers [60, 50] kHz, and CP duration 100 μs. The two dimensions use sweeps [1/(6 μs), 1/(33 μs)] Hz, [128, 512] acquired points, and [512, 2048] zero-filled points; the listed spin channels are 1H and 13C.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+## Processing
 
-## Implementation structure
-
-- WISE of alpha-glycine powder under MAS.
-- Calculation time: hours, much faster on GPU
-- Spin system properties (PCM DFT calculation)
-- 400 MHz spectrometer
-- Isotropic alpha-glycine chemical shifts
-- Basis set
-- Ignore interactions below 200 Hz
-- Use GPU arithmetic
-- Spinach housekeeping
-- Experiment setup
-- Detection state
-- Simulation
+The sequence is simulated by `singlerot` with the WISE sequence function. Cosine and sine components are Fourier transformed along the first dimension and combined as `real(F1_cos) + i real(F1_sin)`; a second Fourier transform produces the plotted 2D spectrum.

@@ -4,27 +4,11 @@
 
 ## Purpose
 
-Cross-polarisation contact curve under magic angle spinning in the presence of chemical exchange for H1, H4 and C19 in the unit cell of monohydrocalcite. Further details in: Calculation time: hours, much faster on a GPU.
+Calculates cross-polarisation contact curves under magic-angle spinning for H1, H4, and C19 in monohydrocalcite, with chemical exchange between two three-spin endpoints. The source cites further details at https://doi.org/10.1038/s41467-023-44381-x and reports hours of CPU time, much faster on a GPU.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Cross-polarisation contact curve under magic angle spinning
-- in the presence of chemical exchange for H1, H4 and C19 in
-- the unit cell of monohydrocalcite. Further details in:
-- Calculation time: hours, much faster on a GPU.
-- 400 MHz NMR
-- Read CASTEP file
-- Drop O and Ca atoms
-- Two chemical endpoints: H1, H4, and C19,
-- with H1 and H4 under chemical exchange
-- Convert shielding tensors into shift using the
-- parametrisation of Huang et al. ACIE 2021
-- Cartesian coordinates
+- Reads `mhc.magres`, removes O and Ca, and constructs two endpoints containing H1/H4/C19 and H4/H1/C19, respectively. The H1 and H4 sites exchange; endpoint concentrations are `[1 1]`.
+- Uses the Huang et al. ACIE 2021 shift parametrisation, Cartesian coordinates, a 9.4 T field, and an `sphten-liouv` basis with no approximation. The GPU enable line is present but commented out.
+- The exchange-rate series is 10, 100, 1,000, 10,000, 100,000, and 1,000,000 Hz. Each endpoint rate matrix is built from the selected rate as `[-1 1; 1 -1]`.
+- Cross-polarisation settings: MAS rate 10,000 Hz, axis `[1 1 1]`, maximum rank 7, grid `rep_2ang_800pts_sph`, offsets `[2e3 1e4]` Hz, high-power field 83 kHz, and CP powers `[60 50]` kHz. Each curve uses 1,000 steps of 10 microseconds. The source calls `singlerot` with `@cp_contact_soft` and plots all six contact curves.

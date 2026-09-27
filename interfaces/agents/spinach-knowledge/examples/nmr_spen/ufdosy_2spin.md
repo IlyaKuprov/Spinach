@@ -4,30 +4,14 @@
 
 ## Purpose
 
-Ultrafast DOSY for two coupled spins with additional complications like DD and CSA relaxation, and spatial flow. Calculation time: minutes on NVidia Tesla A100, much longer on CPU Ludmilla Guduff Jean-Nicolas Dumez Ilya Kuprov
+Simulates ultrafast DOSY for two coupled spins, including dipole-dipole (DD) and chemical-shift-anisotropy (CSA) relaxation, diffusion, and spatial flow. The source estimates minutes on an NVIDIA Tesla A100 and much longer on CPU. Authors: Ludmilla Guduff, Jean-Nicolas Dumez, and Ilya Kuprov.
 
-## Physical / mathematical content
+## Model and setup
 
-- SPEN / ultrafast NMR examples. These files encode spatially dependent phase evolution and acquisition, linking pulse gradients, diffusion attenuation, and single-scan multidimensional encoding.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+The system is two 1H spins at 14.1 T, with shifts 6.5 and 7.5, a 15 Hz scalar coupling, and CSA tensors with eigenvalues [-10 -10 20] and Euler angles [0 0 0] and [0 pi/2 0]. Redfield relaxation uses tau_c=1.0e-9 s, secular retention, and zero equilibrium. The basis is sphten-liouv with no approximation.
 
-## Numerical / algorithmic content
+The one-dimensional sample model has length 0.015 m and 3000 points; flow velocity is 1e-4 and diffusion coefficient is 8e-10 m^2/s. The sequence calls imaging with spendosy; acquisition uses 128 points, 256 loops, deltat=1.5e-6 s, and Ga=0.52 T/m. Encoding uses 1000 pulse points, Te=0.0015 s, Tau=0.0016 s, BW=110000 Hz, and Ge=0.2535 T/m.
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- Finite-difference discretisation appears in the implementation, so numerical accuracy depends on stencil order, boundary handling, and the balance between resolution and conditioning.
+## Processing
 
-## Implementation structure
-
-- Ultrafast DOSY for two coupled spins with additional complications
-- like DD and CSA relaxation, and spatial flow.
-- Calculation time: minutes on NVidia Tesla A100, much longer on CPU
-- Ludmilla Guduff
-- Jean-Nicolas Dumez
-- Ilya Kuprov
-- Spin system
-- Interactions
-- Basis set
-- Relaxation theory
-- Algorithmic options
-- Spinach housekeeping
+The returned signal is Fourier transformed along both dimensions and plotted as magnitude against chemical shift and field of view.

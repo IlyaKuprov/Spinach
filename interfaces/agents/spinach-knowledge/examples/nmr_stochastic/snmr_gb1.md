@@ -4,29 +4,14 @@
 
 ## Purpose
 
-A Primas-style stochastic NMR experiment on GB1 protein. The calculation requires a terabyte of RAM and NVidia A100 GPU. Calculation time: hours
+Runs a Primas-style stochastic NMR trajectory for GB1 protein. The source warns that the calculation requires a terabyte of RAM and an NVIDIA A100 GPU and estimates hours. Author: Ilya Kuprov (ilya.kuprov@weizmann.ac.il).
 
-## Physical / mathematical content
+## Model and calculation
 
-- Stochastic NMR examples. These scripts model random processes, trajectories, or stochastic Liouville dynamics and connect fluctuating Hamiltonians or transport processes to ensemble-averaged observables.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+The protein is imported from 2N9K.pdb and 2N9K.bmrb with all selections retained, then simulated at 18.79 T. The basis uses IK-1, scalar-coupling connectivity, interaction level 4, and proximity level 3; interaction and proximity cutoffs are 2.0 and 4.0. Redfield relaxation uses kite retention, IME equilibrium, correlation time 5e-9 s, and temperature 298 K.
 
-## Numerical / algorithmic content
+The script builds the Hamiltonian and relaxation superoperator, initializes isotropic thermal equilibrium, and defines x/y control and observable operators for 1H, 13C, and 15N. It generates six independent Gaussian control-noise tracks with sigma=100 Hz, timestep 1e-5 s, and 1e6 steps. GPU arrays are used for the operators and state. At each step it records six expectation values and advances the state with the time-dependent generator; checkpoints are saved every 1000 steps to gb1_workspace.mat.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Output
 
-## Implementation structure
-
-- A Primas-style stochastic NMR experiment on GB1 protein. The
-- calculation requires a terabyte of RAM and NVidia A100 GPU.
-- Calculation time: hours
-- Protein data import
-- Magnet field
-- Tolerances
-- Basis set
-- Relaxation theory
-- Use GPU arithmetic
-- sys.enable={'gpu'};
-- Spinach housekeeping
-- Get the Hamiltonian
+The example reports the trajectory rate and plots each control track alongside its corresponding observable trajectory.

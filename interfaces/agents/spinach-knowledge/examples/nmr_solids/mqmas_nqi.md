@@ -8,24 +8,16 @@ Rotor-synchronous MQMAS spectrum of a 87Rb compound, transmitter set to the isot
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Models the quadrupolar nucleus `87Rb` using an NQI interaction built by `eeqq2nqi(5e6,0.50,3/2,[0 0 0])`.
+- Simulates a rotor-synchronous multiple-quantum MAS experiment with MQ order 3 and the transmitter offset at zero, as stated in the example description.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- Uses `singlerot` to simulate the two-dimensional lab-frame pulse sequence, then applies squared-cosine apodisation along both dimensions and a two-dimensional Fourier transform with zero filling to `[256 256]`.
+- The experiment uses a 62.5 kHz rotor rate, rank-7 orientation grid `rep_2ang_1600pts_sph`, two 128-point dimensions, pulse amplitudes `2π × [250e3 250e3]`, and durations of 2 μs and 1 μs. The plotting call passes `20` as an argument.
 
 ## Implementation structure
 
-- Rotor-synchronous MQMAS spectrum of a 87Rb compound,
-- transmitter set to the isotropic chemical shift.
-- Calculation time: minutes
-- System specification: just the NQI
-- Formalism and basis set
-- Algorithmic options
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+- Creates a 9.4 T `87Rb` spin system in the `sphten-liouv` basis without approximation and disables trajectory-level output.
+- Uses `Lz` as the initial state and `L+` as the receiver; runs `mqmas` through `singlerot` in the lab frame with the specified rotor and pulse parameters.
+- Applies the two-dimensional apodisation and Fourier transform, then plots the magnitude spectrum.

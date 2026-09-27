@@ -4,28 +4,11 @@
 
 ## Purpose
 
-1H-13C cross-polarisation followed by acquisition under magic angle spinning in alpha-glycine powder. Reduced Liouville spa- ce is used: up to, and including, three-spin correlations. Calculation time: minutes on Tesla A100, much longer on CPU.
+Simulates 1H-to-13C cross-polarisation followed by acquisition under MAS in alpha-glycine powder. The source states that the reduced Liouville-space calculation includes correlations up to three spins and takes minutes on a Tesla A100, much longer on a CPU.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- 1H-13C cross-polarisation followed by acquisition under magic
-- angle spinning in alpha-glycine powder. Reduced Liouville spa-
-- ce is used: up to, and including, three-spin correlations.
-- Calculation time: minutes on Tesla A100, much longer on CPU.
-- Spin system properties (PCM DFT calculation)
-- 400 MHz spectrometer
-- Isotropic alpha-glycine chemical shifts
-- Spin temperature
-- Basis set
-- Algorithmic options
-- Neglect interactions below 200 Hz
-- Spinach housekeeping
+- Builds the spin system from the glycine log file with `g2spinach`, uses a 9.4 T field, and sets the alpha-glycine isotropic shifts to 176.4, 43.6, 2.6, 3.8, 8.0, 8.0, and 8.0 ppm. Spin temperature is 298 K.
+- Uses the `sphten-liouv` basis, approximation `IK-0`, and inter-level 3; enables the greedy option, disables `pt`, and neglects interactions below `2*pi*200` rad/s.
+- CP/MAS settings: rotor rate 10,000 Hz, axis `[sqrt(2/3) 0 sqrt(1/3)]`, maximum rank 5, grid `rep_2ang_100pts_sph`, offsets `[2e3 10e3]` Hz, high-power field 83 kHz, CP powers `[60 50]` kHz, and CP duration `50e-5` s. Acquisition uses 50 kHz sweep, 512 points, and 4096-point zero filling.
+- Calls `singlerot` with `@cp_acquire_soft`, detects on 13C, then applies exponential apodisation (6), Fourier transforms, and plots the real spectrum.

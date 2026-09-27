@@ -4,29 +4,18 @@
 
 ## Purpose
 
-Spinning powder pulse-acquire experiment on a two-spin system with a dipolar coupling using Floquet theory. Calculation time: seconds
+Simulates a two-proton spinning-powder pulse-acquire experiment with dipolar coupling using Floquet theory. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file relies on Floquet theory, where periodic time dependence is lifted into an enlarged block representation that converts time-periodic dynamics into a time-independent eigenproblem.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+- The two `1H` spins have isotropic Zeeman shifts 5.0 and -2.0 and coordinates `[0 0 0]` and `[0 3.9 0.1]`; the system is set to 14.1 T.
+- The rotor axis is `[1 1 1]` at 1000 Hz. The simulation obtains the acquisition FID with `floquet(spin_system,@acquire,parameters,'nmr')`.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Uses the spherical-tensor Liouville-space basis with no approximation and projection +1. The MAS grid is `leb_2ang_rank_17`, with maximum rank 17.
+- Acquires 512 points over a sweep of `2e4`, zero-fills to 4096, applies exponential apodisation parameter 6, then Fourier transforms and plots the real spectrum.
 
 ## Implementation structure
 
-- Spinning powder pulse-acquire experiment on a two-spin system
-- with a dipolar coupling using Floquet theory.
-- Calculation time: seconds
-- System specification
-- Basis set
-- Spinach housekeeping
-- Pulse-acquire setup
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+- Define the two-spin system and basis, build the Spinach system, set pulse-acquire and MAS parameters, run the Floquet acquisition, apodise, Fourier transform, and plot.

@@ -7,9 +7,8 @@
 Magic angle is usually calibrated using KBr powder. When the angle is not correctly set, the spinning sideband pat- tern is blurred. This simulation demonstrates the effect. Calculation time: seconds
 
 ## Physical / mathematical content
-
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Simulates ⁷⁹Br magic-angle-spinning NMR of KBr powder at 9.4 T and 4 kHz spinning to show how rotor-axis errors of −1°, −0.25°, 0°, +0.25°, and +1° blur the spinning-sideband pattern.
+- Applies exponential apodisation to each simulated time-domain signal, then Fourier transforms it with zero filling to plot the corresponding spectrum.
 
 ## Numerical / algorithmic content
 

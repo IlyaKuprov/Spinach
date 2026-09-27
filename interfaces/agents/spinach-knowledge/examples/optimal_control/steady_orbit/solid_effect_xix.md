@@ -2,32 +2,11 @@
 
 - Signature: `solid_effect_xix()`
 
-## Purpose
+Panoramic phase optimisation for stroboscopic steady-state DNP, using the timing and power settings of the XiX experiment. The calculation takes days on a large parallel cluster.
 
-Panoramic optimisation for stroboscopic steady state DNP with the timing and power settings matching the XiX ex- eriment, but complete liberty is the choice of phase.
+- **Spin system:** An electron and a proton in a 3.35316 T W-band field (HiPER, St Andrews), at 80 K. The trityl electron g-tensor has principal values `[2.00319 2.00319 2.00258]`; the proton chemical shift is `[0 0 5]` ppm. Their Euler angles are `[0 10 0]` and `[0 0 10]` degrees, respectively. The electron and proton coordinates are `[0 0 0]` and `[0 0 3.500]`; their separation is passed to `r1n_dnp` for an orientation-dependent nuclear longitudinal relaxation rate, together with parameters `2.00230`, `1.0e-3`, `52.0`, and the angle `bet`.
+- **Relaxation and basis:** `t1_t2` relaxation uses electron R1 = `1e3`, electron R2 = `200e3`, and proton R2 = `50e3`; proton R1 is supplied by `r1n_dnp`. Relaxation keeps diagonal terms, equilibrium is `dibari`, and the basis is `sphten-liouv` without approximation. The calculation uses 240 parallel processes, with `prop_chop=1e-14` and `stst_tol=1e-10`.
+- **Objective and ensemble:** Electron `Lx` and `Ly` are the control operators; electron `Lz` is the offset operator. The target is proton `Lz` magnetisation normalised to its thermal-equilibrium expectation. The starting equilibrium state is supplied, although the steady-state module ignores the initial state. Powder averaging uses `rep_2ang_800pts_sph`; drift Liouvillians are generated with `drifts(...,@powder,parameters,'esr')`. The transmitter is set to 94.0 GHz. Microwave powers span `2π × linspace(5,25,20) × 10⁶` rad/s, and offsets are `[-2,-1,0,1,2]` MHz.
+- **Pulse and optimisation:** The sequence comprises 720 freely phased 0.5 ns pulse samples at unit amplitude, 20 frozen zero-amplitude 0.5 ns ringdown samples, and one frozen zero-amplitude 167 µs delay. Steady-state phase optimisation uses `rbfgs`, up to 10,000 iterations, with a budget of 500. The initial XiX phase guess flips by π at samples `j-37:j` for `j=72,144,…,720`, applies a 140 MHz phase shift over 360 ns, and appends zeros for the ringdown and delay. The HiPER FIR filter is loaded from `hiper_kernel_trans.mat`, truncated to 16 taps, normalised to unit absolute DC gain, and used for both distortion and plotting. Robustness and spectrogram plots are requested. `fmaxnewton(spin_system,@grape_phase,guess)` runs the optimisation, assigning its result to `pulse_profile`.
 
-## Physical / mathematical content
-
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Panoramic optimisation for stroboscopic steady state DNP
-- with the timing and power settings matching the XiX ex-
-- eriment, but complete liberty is the choice of phase.
-- W-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Cartesian coordinates
-- Get electron-nuclear distance
-- Relaxation rates, distance and ori. dep. R1n
-- Basis set
-- Parallelisation settings
+Contacts: guinevere.mathies@uni-konstanz.de; shebha-anandhi.jegadeesan@uni-konstanz.de; ilya.kuprov@weizmann.ac.il.

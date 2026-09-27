@@ -4,29 +4,12 @@
 
 ## Purpose
 
-Static quadrupolar 14N powder pattern of L-valyl-L-alanine using very large numerical orientation grid, set to reproduce Figure 5 from the paper by O'Dell and Ratcliffe: Calculation time: minutes
+Simulates the static 14N powder pattern of L-valyl-L-alanine, using the large orientation grid specified in the example to reproduce Figure 5 of O'Dell and Ratcliffe. The source estimates a calculation time of minutes. Reference: [O'Dell and Ratcliffe](https://doi.org/10.1016/j.cplett.2011.08.030).
 
-## Physical / mathematical content
+## Spin system and interactions
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The model contains two 14N spins at 21.1 T. Their quadrupolar interaction matrices are generated with `eeqq2nqi`, using coupling magnitudes 1.24 and 3.06 MHz and asymmetries 0.22 and 0.40, respectively. The basis is the full Zeeman Hilbert-space basis (`zeeman-hilb`, no approximation).
 
-## Numerical / algorithmic content
+## Simulation and processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Static quadrupolar 14N powder pattern of L-valyl-L-alanine using
-- very large numerical orientation grid, set to reproduce Figure 5
-- from the paper by O'Dell and Ratcliffe:
-- Calculation time: minutes
-- System specification
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Apodisation
-- Fourier transform
-- Plotting
+The acquisition uses 14N, a 6 MHz sweep, 512 points, a 2048-point zero-fill, and the `icos_2ang_163842pts` powder grid. The frequency axis is in MHz and inverted. Initial and detection states are both the 14N `L+� state. The powder FID is apodised with an exponential parameter of 6, Fourier transformed, and plotted.

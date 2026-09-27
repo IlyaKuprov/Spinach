@@ -4,29 +4,12 @@
 
 ## Purpose
 
-1H-1H NOESY spectrum of GB1 with everything deuterated except methyl groups. Deuteria are kept in the spin system because they are a part of the coupling network; methyl group rotati- on is not accounted for in this simulation. Calculation time: hours.
+A 1H–1H NOESY simulation of GB1 deuterated everywhere except methyl groups. Deuteria remain in the spin system because they participate in the coupling network; methyl rotation is not modelled. The source estimates hours of calculation time.
 
-## Physical / mathematical content
+## Setup and acquisition
 
-- Protein NMR examples. These files specialise liquid-state pulse sequences to labelled biomolecules, exploiting one-bond and two-bond heteronuclear couplings, coherence pathway filtering, selective decoupling, and high-dimensional indirect detection.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The example imports `2N9K.pdb` / `2N9K.bmrb`, deuterates non-methyl positions, and sets the field to 21.1356 T. It uses an inter-spin cutoff of 100 (the source comment says this retains significant dipole–dipole couplings) and a proximity cutoff of 5.0, to be increased until convergence. Redfield relaxation is selected with `tau_c=5e-9` s, `rlx_keep='kite'`, and zero equilibrium. The IK-1 sphten-liouv basis uses scalar-coupling connectivity and pairwise inter/proximal levels 2/2. After creating the system, the code removes `13C` and `15N` spins. The NOESY mixing time is 200 ms; the initial state is proton `Lz`; offset 750, sweeps [3000, 3000], points [512, 512], zero-fill sizes [2048, 2048], and axes in ppm.
 
-## Numerical / algorithmic content
+## Processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- 1H-1H NOESY spectrum of GB1 with everything deuterated except
-- methyl groups. Deuteria are kept in the spin system because
-- they are a part of the coupling network; methyl group rotati-
-- on is not accounted for in this simulation.
-- Calculation time: hours.
-- Protein data import
-- Magnet field
-- Tolerances
-- Relaxation theory
-- Basis set
-- Algorithmic options
-- Create the spin system structure
+The `liquid` simulation uses `@noesy`. Cosine and sine FIDs are squared-cosine apodised, transformed in F2, and combined as `f1_cos-1i*f1_sin` for States processing before the F1 transform. The negative real 2D spectrum is plotted.

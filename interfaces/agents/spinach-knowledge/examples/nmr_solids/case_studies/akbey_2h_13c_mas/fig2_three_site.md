@@ -7,10 +7,8 @@
 Three-site position exchange for a deuterium nucleus. The sites differ in the chemical shift and the orientation of the quadru- polar tensor. Set to reproduce Figure 2 in: Calculation time: seconds.
 
 ## Physical / mathematical content
-
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+- Simulates three-site deuterium position exchange at 9.4 T; the sites differ in chemical shift and quadrupolar-tensor orientation, have equal populations, and exchange pairwise at 10⁴ s⁻¹.
+- Acquires a magic-angle-spinning spectrum at 8.5 kHz using an 800-point spherical orientation grid, then Fourier-transforms the 1,024-point signal without apodisation.
 
 ## Numerical / algorithmic content
 

@@ -8,23 +8,13 @@ Ultrafast COSY for a coupled three-spin system. Calculation time: minutes on NVi
 
 ## Physical / mathematical content
 
-- SPEN / ultrafast NMR examples. These files encode spatially dependent phase evolution and acquisition, linking pulse gradients, diffusion attenuation, and single-scan multidimensional encoding.
+- The source defines a coupled three-spin system and sets up a 15 mm sample with 500 spatial points; diffusion and flow are set to zero.
+- The imaging simulation uses the `@spencosy` sequence with encoding and coherence-selection parameters specified in the source.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- The script Fourier-transforms the FID along its second dimension, then displays the magnitude as a contour plot.
 
 ## Implementation structure
 
-- Ultrafast COSY for a coupled three-spin system.
-- Calculation time: minutes on NVidia Tesla A100, much longer on CPU
-- Jean-Nicolas Dumez
-- Ludmilla Guduff
-- Interactions
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Sample geometry
-- Relaxation phantom
-- Initial and detection state phantoms
-- Diffusion and flow
+- Constructs the spin system and basis, configures sample and sequence parameters, runs imaging, and plots the processed spectrum.

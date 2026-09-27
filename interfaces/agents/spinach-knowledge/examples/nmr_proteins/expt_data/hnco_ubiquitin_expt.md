@@ -4,27 +4,18 @@
 
 ## Purpose
 
-Experimental HNCO spectrum of human ubiquitin. Donghan Lee (Max Planck Institute) Ilya Kuprov (University of Southampton)
+Processes and plots an experimental HNCO spectrum of human ubiquitin.
 
 ## Physical / mathematical content
 
-- Protein NMR examples. These files specialise liquid-state pulse sequences to labelled biomolecules, exploiting one-bond and two-bond heteronuclear couplings, coherence pathway filtering, selective decoupling, and high-dimensional indirect detection.
+- Displays a three-dimensional 15N, 13C, and 1H spectrum.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Loads and truncates the FID, applies cosine apodisation, processes F3, F2, and F1 with Fourier transforms, shifts the spectrum, corrects its baseline, and zeros the first 40 points of the third dimension to eliminate the water signal.
 
 ## Implementation structure
 
-- Experimental HNCO spectrum of human ubiquitin.
 - Donghan Lee (Max Planck Institute)
 - Ilya Kuprov (University of Southampton)
-- Data loading and truncation
-- Apodisation
-- F3 processing
-- F2 processing
-- F1 processing
-- Window shifting
-- Baseline correction
-- Water signal elimination
-- Parameters
+- Loads `hnco_ubiquitin_expt.mat`, sets the magnetic field to 11.7395 T and the spectral axis parameters, then plots the real spectrum in ppm.

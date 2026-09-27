@@ -4,27 +4,19 @@
 
 ## Purpose
 
-Cross-polarisation experiment in the doubly rotating frame. A single nitrogen-15 in a bath of 8 protons scattered on a 2 Angstrom radius sphere around it. Static single crystal simulation in a full Liouvil- le space (here necessary because this is not a powder and everything interacts with everything). Calculation time: minutes on a Tesla A100, much longer on CPU.
+Simulates static, single-crystal ¹H→¹⁵N cross-polarisation for a ¹⁵N coupled to eight protons. The example retains the full Liouville space; its source notes that this is needed for the non-powder calculation with all spins interacting. The source estimates minutes on a Tesla A100 and longer on a CPU.
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
+The nine-spin model specifies isotropic shifts, explicit coordinates for the proton bath around ¹⁵N, and temperature 298 K. The source describes the eight-proton bath as scattered on a 2 Å-radius sphere around ¹⁵N. It samples one crystal orientation, `[pi/3 pi/4 pi/5]`, rather than averaging a powder. The experiment uses 50 kHz spin-lock fields on both channels and detects the ¹⁵N transverse signal during CP.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The source uses `sphten-liouv` with no basis approximation and calls `crystal` with `@cp_contact_hard`. It requests `aniso_eq` for ¹⁵N and uses 100 time steps of 10 μs. Although a source comment says a GPU is needed, the active setting is `sys.enable={'greedy'}`; `'gpu'` appears only as a commented alternative.
 
 ## Implementation structure
 
-- Cross-polarisation experiment in the doubly rotating frame. A single
-- nitrogen-15 in a bath of 8 protons scattered on a 2 Angstrom radius
-- sphere around it. Static single crystal simulation in a full Liouvil-
-- le space (here necessary because this is not a powder and everything
-- interacts with everything).
-- Calculation time: minutes on a Tesla A100, much longer on CPU.
-- System specification
-- Interactions
-- Basis set
-- This needs a GPU
-- Spinach housekeeping
-- Experiment parameters
+- Defines the ¹H₈–¹⁵N spin system, isotropic shifts, coordinates, and temperature.
+- Builds the full basis, then creates the CP irradiation operators and ¹⁵N coil state.
+- Sets the RF powers, equilibrium requirement, time grid, and single-crystal orientation.
+- Runs the crystal CP simulation and plots the real ¹⁵N signal versus time.

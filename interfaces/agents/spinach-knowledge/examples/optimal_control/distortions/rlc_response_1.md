@@ -4,25 +4,8 @@
 
 ## Purpose
 
-An illustration of the effect of the resonator response function on a typical composite pulse in NMR spectroscopy. The argument may be set to 'previous' (default, corresponds to piecewise con- stant input waveform) or any of the options ('linear', 'cubic', etc.) supported by interp1() function. Calculation time: seconds.
+Illustrates how a resonator response affects a typical composite pulse in NMR. `interp_type` defaults to `'previous'`, corresponding to a piecewise-constant input waveform; other `interp1` interpolation options, including `'linear'` and `'cubic'`, may also be used. Calculation time: seconds.
 
-## Physical / mathematical content
+## Method
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
-
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- An illustration of the effect of the resonator response function
-- on a typical composite pulse in NMR spectroscopy. The argument
-- may be set to 'previous' (default, corresponds to piecewise con-
-- stant input waveform) or any of the options ('linear', 'cubic',
-- etc.) supported by interp1() function.
-- Calculation time: seconds.
-- Default to piecewise-constant
-- Decide the time grid (4 x Nyquist)
-- Random amplitude component
-- Random phase component
-- Put the pulse together
-- Heterodyne out the carrier frequency
+For ¹⁴N NMR at 14.09 T, the script creates random amplitude and phase controls over 20 slices spanning 50 μs, interpolates them onto a time grid set at four times the Nyquist rate, and forms the modulated input signal. It applies a second-order RLC band-pass response with Q = 80, heterodynes the output, and plots the input and output in both wall-clock and rotating-frame representations.

@@ -8,7 +8,7 @@ HiPER instrument filter function kernel application to a complicated shaped puls
 
 ## Physical / mathematical content
 
-- Optimal-control examples. These scripts formulate pulse design as a nonlinear optimisation problem over waveform samples or basis coefficients. The core mathematical objects are fidelities, gradients, Hessians or Hessian approximations, ensemble robustness objectives, and constrained search over RF amplitude/phase trajectories.
+- The script combines the input pulse’s real and imaginary parts into a complex waveform, convolves it with the HiPER antenna kernel, and truncates the result to the input pulse length for comparison with the measured output.
 
 ## Numerical / algorithmic content
 

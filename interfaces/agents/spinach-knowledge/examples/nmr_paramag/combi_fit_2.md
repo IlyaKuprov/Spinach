@@ -8,9 +8,11 @@ Extracting the susceptibility tensor from DFT hyperfine tensors and experimental
 
 ## Physical / mathematical content
 
-- Paramagnetic NMR examples. These files work with pseudocontact shifts, paramagnetic relaxation, susceptibility tensors, and inverse problems for metal-site localisation or distributed electron density reconstruction.
+- The routine enumerates the specified ambiguous diamagnetic- and paramagnetic-shift assignments and fits a susceptibility tensor from the DFT hyperfine tensors to the experimental paramagnetic shifts.
 
 ## Numerical / algorithmic content
+
+The setup supplies 27 proton isotope labels, nine spin groups, measured diamagnetic and paramagnetic shifts, and the corresponding ambiguity sets to `pcs_combi_fit`. The returned theoretical and experimental PCS values are plotted against one another.
 
 ## Implementation structure
 

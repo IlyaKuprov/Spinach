@@ -8,26 +8,17 @@
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+- Models the `13C` MAS spectrum of tryptophan powder assuming `1H` decoupling; isotropic shifts are experimental, coordinates are from X-ray data, and CSAs are estimated with DFT.
+- The source describes the calculation as Fokker-Planck MAS and uses `singlerot` to acquire each molecule's signal.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Acquires and sums the `singlerot` FIDs for the two unit-cell molecules, then applies exponential apodisation and a Fourier transform.
 
 ## Implementation structure
 
-- 13C MAS spectrum of tryptophan powder (assuming decoupling of 1H),
-- computed using the Fokker-Planck MAS formalism. Isotropic chemical
-- shifts come from the experimental data. Coordinates are from X-ray
-- data and CSAs are estimated with DFT.
-- Calculation time: days, hours with a Tesla A100 GPU.
-- % First molecule in the unit cell
-- Spin system properties (DFT calculation)
-- Magnet field
-- Experimental chemical shifts, first conformation
-- Basis set
-- Algorithmic options
-- sys.enable={'gpu'};
+- Imports the tryptophan spin system from `trp_xray.out`, mapping C and N to `13C` and `15N`, and sets the field to 9.4 T.
+- For each of two molecules in the unit cell, applies the corresponding experimental isotropic shifts to the DFT Zeeman tensors. The first uses an `sphten-liouv`/`IK-0` basis with longitudinal `15N`, `+1` projections, and interaction level 3; the second enables GPU execution.
+- Configures a 14 kHz rotor rate, `[1 1 1]` axis, maximum rank 11 with `leb_2ang_rank_11`, 100 kHz sweep, 2048 points, and 8192-point zero filling.
+- Runs `singlerot` with `acquire` in NMR mode for each molecule and sums the FIDs.
+- Applies exponential apodisation with parameter 6, Fourier transforms the summed FID, and plots the real spectrum.

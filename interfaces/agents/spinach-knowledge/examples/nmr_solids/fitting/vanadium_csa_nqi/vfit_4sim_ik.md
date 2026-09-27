@@ -8,25 +8,12 @@ Simultaneous fitting of multiple 51V MAS NMR spectra with respect to the chemica
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The model is a single 51V spin with a chemical-shielding tensor and a quadrupolar coupling tensor. One common set of tensor parameters is used to fit four experimental spectra acquired at different MAS rates; the source lists the rates as 41, 38.5, 36, and 34 kHz.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The script loads and Savitzky–Golay filters `v12_29_dec15.spc`, `v12_31_dec15.spc`, `v12_33_dec15.spc`, and `v12_35_dec15.spc`, extracts and normalises the selected spectral ranges, then minimises a summed squared residual with `fminsearch`. Each trial simulates the four spectra using the same 51V spin system, a rank-30 truncation, and `rep_2ang_200pts_oct`; each signal is Gaussian-apodised before Fourier transformation.
 
 ## Implementation structure
 
-- Simultaneous fitting of multiple 51V MAS NMR spectra with
-- respect to the chemical shielding anisotropy and quadrupole
-- coupling tensor parameters.
-- Calculation time: hours, much faster with a GPU.
-- Load and filter the data
-- Set spectral ranges
-- Preprocess the spectra
-- Set the initial guess
-- Set optimiser options
-- Get a figure going
-- Run the optimisation
-- Least squares error function
+Preprocesses four experimental spectra, maps the fitted parameters to the chemical-shift and quadrupolar tensors, performs four MAS simulations at their respective rates, and compares the resulting spectra with the measurements in a four-panel plot.

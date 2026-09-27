@@ -8,26 +8,17 @@ Powder magic angle spinning spectrum of a single quadrupolar deuterium nucleus u
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+- Models a single `2H` nucleus with a quadrupolar coupling tensor whose eigenvalues are `[-1e3 -2e3 3e3]` and Euler angles `[0 0 0]`.
+- Simulates powder MAS with the grid-free Fokker-Planck formalism; the example explicitly states that second-order rotating-frame transformation corrections are not applied.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Acquires the FID with `gridfree`, applies exponential apodisation with parameter 6, zero-fills to 4096 points, and plots the real Fourier-transformed spectrum.
 
 ## Implementation structure
 
-- Powder magic angle spinning spectrum of a single quadrupolar
-- deuterium nucleus using grid-free Fokker-Planck MAS formalism.
-- Second order corrections to the rotating frame transformation
-- are not applied.
-- Calculation time: minutes
-- System specification
-- Basis set
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodisation
-- Fourier transform
+- Defines a single-deuterium system at 9.4 T with quadrupolar coupling eigenvalues `[-1e3 -2e3 3e3]` and zero Euler angles.
+- Uses the `sphten-liouv` basis without approximation and retains the `+1` projection.
+- Sets the MAS axis to `[1 1 1]`, rate to `1e3`, maximum rank to 17, sweep to `2e4`, and acquisition to 512 points with 4096-point zero filling.
+- Creates the initial state and receiver as `L+` on `2H`, then runs `gridfree` with `acquire` in NMR mode.
+- Applies exponential apodisation with parameter 6, Fourier transforms the FID, and plots the real spectrum.

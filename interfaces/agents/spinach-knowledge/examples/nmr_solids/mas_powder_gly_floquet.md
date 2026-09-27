@@ -4,29 +4,18 @@
 
 ## Purpose
 
-13C MAS spectrum of glycine powder (assuming decoupling of 1H), computed using the Floquet MAS formalism. Calculation time: seconds
+Calculates a glycine powder `13C` MAS spectrum using Floquet MAS formalism. The source header says to assume `1H` decoupling; however, the script sets `parameters.decouple={}`. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Solid-state NMR examples. The key physics is anisotropic spin interactions under static or magic-angle-spinning conditions: chemical-shift anisotropy, dipolar coupling, quadrupolar coupling, cross-polarisation, and orientation averaging using Floquet, Fokker-Planck, or direct powder quadrature formalisms.
-- The file relies on Floquet theory, where periodic time dependence is lifted into an enlarged block representation that converts time-periodic dynamics into a time-independent eigenproblem.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The spin system is generated from the glycine PCM-DFT log with `g2spinach`; the script sets the field to 14.1 T and observes `13C`.
+- The basis uses no approximation, projection +1, and a longitudinal `15N` subspace. Interaction and proximity cutoffs are set to 5.0 and 4.0.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Floquet acquisition uses a 2000 Hz rotor rate, axis `[1 1 1]`, maximum rank 23, and grid `leb_2ang_rank_23`.
+- The FID has 256 points over a `5e4` sweep, zero-filled to 1024 with offset 17000; exponential apodisation parameter 6 is applied before Fourier transformation.
 
 ## Implementation structure
 
-- 13C MAS spectrum of glycine powder (assuming decoupling of 1H),
-- computed using the Floquet MAS formalism.
-- Calculation time: seconds
-- Spin system properties (PCM DFT calculation)
-- Magnet field
-- Basis set
-- Algorithmic options
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Apodisation
-- Fourier transform
+- Parse the glycine DFT log and generate the spin system, set field and basis options, configure the experiment, call `floquet(...)`, apodise, Fourier transform, and plot.

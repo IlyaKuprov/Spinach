@@ -12,7 +12,7 @@ The chain rule must include every physical waveform coordinate before constraini
 
 ## Numerical / algorithmic content
 
-Checks serial filters, phase rotation, power scaling, empty masks, supported exact Hessians, dissipative dynamics, unchanged direct-engine masking, and a thermalized steady-state fixture with a physically unreachable frozen long interval.
+Checks serial filters, phase rotation, power scaling, empty masks, supported exact Hessians, dissipative dynamics, unchanged direct-engine masking, and thermalized steady-state fixtures with a physically unreachable frozen long interval, both directly and after phase-cycle/rank-one-distortion cancellation.
 
 The same two waveform/target fixtures are tested in Hilbert and vectorised Liouville formalisms with identity, coupled linear, three-to-two, one-to-two, and nonlinear polar coordinate maps. Empty and all-false masks, trapezium propagation, phase/power/filter composition, and a non-zero rectilinear norm-square penalty are covered. Frozen entries must vanish in every returned curvilinear gradient channel; free entries must equal the unmasked pullback and centred objective differences at two increments. Error and reference-derivative norms are reported. Phase-only gradient/Hessian masking and the existing direct Hilbert engine behaviour are checked in addition to the original Cartesian and direct Liouville cases.
 

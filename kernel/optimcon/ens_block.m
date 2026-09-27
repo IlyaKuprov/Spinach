@@ -130,9 +130,12 @@ for m=1:n_mine
 
     % Skip physical derivatives only where no unfrozen input can reach
     if (n_outputs>2)&&any(freeze(:))
-        free_input=reshape(~freeze,ncont,nsteps);
-        free_local=reshape((abs(R)>0)*free_input>0,[],1);
-        spin_system.control.freeze=reshape(~any(J(:,free_local),2),ncont,nsteps);
+        free_map=kron(speye(nsteps),sparse(R));
+        free_map=free_map(:,~freeze(:));
+        influence=J*free_map; terms=sum(J~=0,2);
+        roundoff=(2*eps*terms)./(1-2*eps*terms);
+        spin_system.control.freeze=reshape(~any(abs(influence)>...
+                roundoff.*(abs(J)*abs(free_map)),2),ncont,nsteps);
     end
 
     % Fidelity, trajectory, and derivatives

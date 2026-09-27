@@ -268,6 +268,22 @@ result=test_true(result,'steady frozen delay',...
                  all(isfinite(fidelity),'all')&&all(isfinite(gradient),'all'),...
                  'a physically frozen long delay must not request its derivative');
 
+% A rank-one distortion cancels the free phase-cycled input at the long delay
+control.freeze=[false(2,2) true(2,1) [true; false]];
+control.distortion={@cancel_last}; control.phase_cycle=[0 pi/4 0];
+local_system=optimcon(spin_system,control);
+[~,fidelity,gradient]=grape_xy([1 2 0 0;0 1 0 0],local_system);
+result=test_true(result,'phase-cancelled frozen delay',...
+                 all(isfinite(fidelity),'all')&&all(isfinite(gradient),'all'),...
+                 'composed Jacobians must identify cancelled physical derivatives');
+
+end
+
+% Final [2 x nsteps] map and its [2*nsteps x 2*nsteps] Jacobian
+function [waveform,J]=cancel_last(waveform)
+rows=(size(waveform,2)-1)*size(waveform,1)+(1:2);
+J=speye(numel(waveform)); J(rows,:)=0; J(rows(1),rows)=1;
+waveform(:,end)=[sum(waveform(:,end));0];
 end
 
 

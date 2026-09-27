@@ -22,7 +22,8 @@ function c=kron(a,b)
 grumble(a,b);
 
 % Put the new term inside the polyadic structure
-if isa(a,'polyadic')&&(~isa(b,'polyadic'))&&isempty(a.suffix)
+if isa(a,'polyadic')&&(~isa(b,'polyadic'))&&...
+   isempty(a.prefix)&&isempty(a.suffix)
     
     % Append B to core lists of A
     for n=1:numel(a.cores)
@@ -30,7 +31,8 @@ if isa(a,'polyadic')&&(~isa(b,'polyadic'))&&isempty(a.suffix)
     end
     c=a;
     
-elseif (~isa(a,'polyadic'))&&isa(b,'polyadic')&&isempty(b.prefix)
+elseif (~isa(a,'polyadic'))&&isa(b,'polyadic')&&...
+       isempty(b.prefix)&&isempty(b.suffix)
     
     % Prepend A to core lists of B
     for n=1:numel(b.cores)

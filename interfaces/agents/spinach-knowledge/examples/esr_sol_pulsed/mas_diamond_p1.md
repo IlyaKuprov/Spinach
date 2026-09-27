@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Calculates two-pulse echo-detected, frequency-swept EPR spectra of the P1 substitutional nitrogen defect in diamond, both static and under magic-angle spinning (MAS). It follows Figure 1a of Khamrui et al., *J. Phys. Chem. Lett.* (2026), [doi:10.1021/acs.jpclett.6c02108](https://doi.org/10.1021/acs.jpclett.6c02108). The example uses 400 ns pulses with a 416 kHz nutation frequency, a 300 ns interpulse delay, and a 6.9156 T field; MAS rates are 10, 25, and 37 kHz. The carrier is swept and the integrated echo is recorded at each offset. Each spectrum is normalised by the maximum of the static spectrum. Calculation time: hours on a 256-core node.
+Calculates two-pulse echo-detected, frequency-swept EPR spectra of the P1 substitutional nitrogen defect in diamond, both static and under magic-angle spinning (MAS). It follows Figure 1a of Khamrui et al., *J. Phys. Chem. Lett.* (2026), [doi:10.1021/acs.jpclett.6c02108](https://doi.org/10.1021/acs.jpclett.6c02108). The example uses 400 ns pulses with a 416 kHz nutation frequency, a 300 ns interpulse delay, and a 6.9156 T field; the source identifies the central line at 193.797 GHz. MAS rates are 10, 25, and 37 kHz. The carrier is swept and the integrated echo is recorded at each offset. Each spectrum is normalised by the maximum of the static spectrum. Calculation time: hours on a 256-core node.
 
 ## Model and sequence
 

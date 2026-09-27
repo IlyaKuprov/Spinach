@@ -90,36 +90,15 @@
 function [traj_data,fidelity,grad,hess]=grape_liouv(spin_system,drifts,controls,...
                                                     waveform,rho_init,rho_targ,...
                                                     fidelity_type)
-% Check consistency
-grumble(spin_system,drifts,controls,waveform,...
-        rho_init,rho_targ,fidelity_type);
-    
-% Count the outputs
-n_outputs=nargout();
 
-% Refuse Hessians through intermediate state-vector keyholes
-if (n_outputs>3)&&any(~cellfun(@isempty,spin_system.control.keyholes(:)))
-    error('Liouville and wavefunction keyhole Hessians are not implemented.');
-end
+% Check consistency
+n_outputs=nargout();
+grumble(spin_system,drifts,controls,waveform,...
+        rho_init,rho_targ,fidelity_type,n_outputs);
 
 % Pull the trajectory cost term settings
 fid_avg=strcmp(spin_system.control.fid_type,'average');
 pen_on=~isempty(spin_system.control.traj_pen);
-
-% Trajectory cost terms have no Hessians
-if (n_outputs>3)&&(fid_avg||pen_on)
-    error('Hessians are not available with trajectory cost terms.');
-end
-
-% Trajectory cost terms need a waveform-independent initial state
-if spin_system.control.steady&&(fid_avg||pen_on)
-    error('trajectory cost terms are not available with stroboscopic steady states.');
-end
-
-% Phase cycle factors cancel in the overlap but not in the penalty
-if pen_on&&(~isempty(spin_system.control.phase_cycle))
-    error('trajectory penalties are not available with phase cycles.');
-end
 
 % Sum the trajectory penalty operators
 if pen_on
@@ -160,8 +139,7 @@ switch spin_system.control.integrator
             bwd_dP=cell(nctrls,nsteps); 
             fwd_d2P=cell(nctrls,nctrls,nsteps);
 
-            % Goodwin Hessian route needs
-            % cumulative propagators
+            % Goodwin Hessian route needs cumulative propagators
             if strcmp(spin_system.control.method,'goodwin')
                 P_cum=cell(1,nsteps);
             end
@@ -203,23 +181,19 @@ end
 % Hush up the output
 spin_system.sys.output='hush';
 
-% Pull the target back through the dead time using
-% the last drift generator in the drift array
+% Pull the target back through dead time using the last drift generator
 if spin_system.control.dead_time~=0
     rho_targ=step(spin_system,drifts{end}',rho_targ,...
                  -spin_system.control.dead_time);
 end
 
-% Push the source through the prefix sequence
-% using the first element of the drift array
+% Push the source through the prefix using the first drift generator
 if ~isempty(spin_system.control.prefix)
     prefix=spin_system.control.prefix;
     rho_init=prefix(spin_system,drifts{1},rho_init);
 end
 
-% Push the target through the suffix sequence
-% (which user needs to code in reverse time)
-% using the last element of the drift array
+% Push the target through the reverse-time suffix using the last drift
 if ~isempty(spin_system.control.suffix)
     suffix=spin_system.control.suffix;
     rho_targ=suffix(spin_system,drifts{end},rho_targ);
@@ -257,9 +231,7 @@ switch spin_system.control.integrator
             L_forw{n}=drifts{mod(n-1,ndrifts)+1};
             L_back{n}=drifts{mod(nsteps-n,ndrifts)+1}';
 
-            % Add current controls to current drifts, including
-            % conjugate-transpose for dissipative controls; the
-            % waveform is always real
+            % Add real controls to drifts, conjugating dissipative controls
             for k=1:nctrls
 
                 % Forward evolution generator
@@ -729,8 +701,7 @@ if strcmp(spin_system.control.integrator,'rectangle')&&(n_outputs>3)
         % Goodwin's method
         case 'goodwin'
 
-            % Flip the backwards 
-            % derivative trajectory
+            % Flip the backward derivative trajectory
             bwd_dP=fliplr(bwd_dP);
 
             % Loop over timesteps
@@ -739,15 +710,13 @@ if strcmp(spin_system.control.integrator,'rectangle')&&(n_outputs>3)
                 % Loop over controls
                 for k=1:nctrls
 
-                    % Propagate forward derivatives
-                    % to first time step
+                    % Propagate forward derivatives to the first time step
                     fwd_dP{k,n}=P_cum{n}'*fwd_dP{k,n};
 
                     % From second step
                     if n>1
 
-                        % Propagate backward derivatives
-                        % to first time step
+                        % Propagate backward derivatives to the first time step
                         bwd_dP{k,n}=bwd_dP{k,n}'*P_cum{n-1};
 
                     end
@@ -777,8 +746,7 @@ if strcmp(spin_system.control.integrator,'rectangle')&&(n_outputs>3)
                             % Construct array of forward derivatives
                             array_fwd_dP=cat(2,fwd_dP{j,1:n-1});
 
-                            % Multiply out current backward derivatives and
-                            % array of all forward derivatives
+                            % Multiply backward derivatives by all forward derivatives
                             hess_col(j,1:n-1,k)=bwd_dP{k,n}*array_fwd_dP;
 
                         end
@@ -991,7 +959,7 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,drifts,controls,waveform,...
-                 rho_init,rho_targ,fidelity_type)
+                 rho_init,rho_targ,fidelity_type,n_outputs)
 if ~ismember(spin_system.bas.formalism,{'sphten-liouv',...
                                         'zeeman-liouv',...
                                         'zeeman-wavef'})
@@ -1001,6 +969,20 @@ if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv','zeeman-wav
    ismember(spin_system.control.method,{'newton','goodwin'})&&...
    any(~cellfun(@isempty,spin_system.control.keyholes(:)))
     error('Liouville and wavefunction keyholes with Newton/Goodwin Hessians are not implemented.');
+end
+if (n_outputs>3)&&any(~cellfun(@isempty,spin_system.control.keyholes(:)))
+    error('Liouville and wavefunction keyhole Hessians are not implemented.');
+end
+fid_avg=strcmp(spin_system.control.fid_type,'average');
+pen_on=~isempty(spin_system.control.traj_pen);
+if (n_outputs>3)&&(fid_avg||pen_on)
+    error('Hessians are not available with trajectory cost terms.');
+end
+if spin_system.control.steady&&(fid_avg||pen_on)
+    error('trajectory cost terms are not available with stroboscopic steady states.');
+end
+if pen_on&&(~isempty(spin_system.control.phase_cycle))
+    error('trajectory penalties are not available with phase cycles.');
 end
 if isfield(spin_system.control,'steady')&&spin_system.control.steady
     if ismember(spin_system.control.method,{'newton','goodwin'})

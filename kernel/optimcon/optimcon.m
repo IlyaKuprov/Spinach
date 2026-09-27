@@ -1079,13 +1079,6 @@ if isfield(control,'keyholes')
         end
     end
     
-    % Refuse unsupported state-vector keyhole Hessians
-    if ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv','zeeman-wavef'})&&...
-       ismember(spin_system.control.method,{'newton','goodwin'})&&...
-       any(~cellfun(@isempty,control.keyholes(:)))
-        error('Liouville and wavefunction keyholes with Newton/Goodwin Hessians are not implemented.');
-    end
-
     % Absorb keyhole schedule
     spin_system.control.keyholes=control.keyholes;
     control=rmfield(control,'keyholes');
@@ -1607,6 +1600,12 @@ if ~isstruct(spin_system)
 end
 if ~isstruct(control)
     error('control must be a structure.');
+end
+if isfield(control,'method')&&ismember(control.method,{'newton','goodwin'})&&...
+   isfield(control,'keyholes')&&iscell(control.keyholes)&&...
+   ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv','zeeman-wavef'})&&...
+   any(~cellfun(@isempty,control.keyholes(:)))
+    error('Liouville and wavefunction keyholes with Newton/Goodwin Hessians are not implemented.');
 end
 end
 

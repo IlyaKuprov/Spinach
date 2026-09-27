@@ -4,59 +4,37 @@
 
 ## Purpose
 
-Magnetic field scan steady-state DNP experiment. Returns the steady-state population of the user-specified state as a fun- ction of magnetic field. Syntax: dnp=dnp_field_scan(spin_system,parameters,H,R,K)
+Magnetic-field scan of a steady-state DNP experiment. Returns the steady-state expectation values of the states specified in `parameters.coil` at each supplied magnetic field offset.
 
 ## Physical / mathematical content
 
-- Hyperpolarisation experiment implementations. They propagate driven electron-nuclear systems under microwave irradiation, MAS, relaxation, and repetition until transient or steady-state observables are assembled.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+- The calculation uses `H` (Hamiltonian), `R` (relaxation superoperator), and `K` (kinetics superoperator). The relaxation superoperator must **not** be thermalized for this calculation.
+- The thermal equilibrium state and relaxation superoperator are assumed unchanged across the sweep; **do not use this function for broad magnetic-field sweeps**.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- Supports the `sphten-liouv` and `zeeman-liouv` formalisms. It damps the trace direction in `R`, checks that `R` is sufficiently nonsingular, and forms the Liouvillian from `H`, `R`, and `K` with microwave and frequency-offset terms.
+- Computes `b=R*parameters.rho0`, then solves for the steady state at each field offset in a `parfor` loop. The `'backslash'` method uses MATLAB's linear solver; `'gmres'` uses ILU-preconditioned GMRES.
 
 ## Parameters / inputs
 
-- parameters.mw_pwr -microwave power, Hz
-- parameters.mw_frq -microwave frequency offset from
-- the free electron frequency at
-- the reference B0 field, Hz
-- parameters.fields -a vector of magnetic field off-
-- sets from the reference B0 field,
-- Tesla
-- parameters.rho0 -equilibrium state at the reference
-- B0 field
-- parameters.coil -coil state vector or a horizon-
-- tal stack thereof
-- parameters.mw_oper -microwave irradiation operator
-- parameters.ez_oper -Lz operator on the electrons
-- parameters.method -'backslash' to use Matlab's
-- linear equation solver, 'gmres'
-- to use ILU preconditioned GMRES
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- Output:
-- dnp -an array of steady state expectation values for
-- the states specified in parameters.coil at each
-- of the fields supplied
-- Note: the relaxation superoperator should NOT be thermalized
-- for this type of calculation.
-- Note: thermal equilibrium state and relaxation superoperator are
-- assumed to be the same at all fields in the sweep -DO NOT
-- USE with broad magnetic field sweep experiments.
+- `parameters.mw_pwr` — microwave power, Hz.
+- `parameters.mw_frq` — microwave frequency offset from the free-electron frequency at the reference B0 field, Hz.
+- `parameters.fields` — vector of magnetic-field offsets from the reference B0 field, Tesla.
+- `parameters.rho0` — equilibrium state at the reference B0 field.
+- `parameters.coil` — coil state vector or a horizontal stack of coil state vectors.
+- `parameters.mw_oper` — microwave irradiation operator.
+- `parameters.ez_oper` — electron Lz operator.
+- `parameters.method` — `'backslash'` for MATLAB's linear equation solver or `'gmres'` for ILU-preconditioned GMRES.
+- `H` — Hamiltonian matrix, received from the context function.
+- `R` — relaxation superoperator, received from the context function.
+- `K` — kinetics superoperator, received from the context function.
 
-## Implementation structure
+## Output
 
-- Magnetic field scan steady-state DNP experiment. Returns the
-- steady-state population of the user-specified state as a fun-
-- ction of magnetic field. Syntax:
-- dnp=dnp_field_scan(spin_system,parameters,H,R,K)
-- parameters.mw_pwr - microwave power, Hz
-- parameters.mw_frq - microwave frequency offset from
-- the free electron frequency at
-- the reference B0 field, Hz
-- parameters.fields - a vector of magnetic field off-
-- sets from the reference B0 field,
-- Tesla
-- parameters.rho0 - equilibrium state at the reference
+- `dnp` — array of steady-state expectation values for the states specified in `parameters.coil` at each supplied field.
+
+## Citation and link
+
+- ilya.kuprov@weizmann.ac.il
+- <https://spindynamics.org/wiki/index.php?title=dnp_field_scan.m>

@@ -4,51 +4,24 @@
 
 ## Purpose
 
-A simplified model of the PDSD experiment using NOESY type quadrature detection and phase cycle. To be cal- led from the singlerot context. Syntax: fid=pdsd(spin_system,parameters,H,R,K)
-
-## Physical / mathematical content
-
-- Solid-state pulse sequence implementations. The core ingredients are anisotropic Hamiltonians, rotor synchronisation, cross-polarisation, recoupling/decoupling, and powder or rotor-stack propagation.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+A simplified 2D PDSD experiment with NOESY-type quadrature detection and a four-step phase cycle, called from the `singlerot` context.
 
 ## Parameters / inputs
 
-- spin_system -Spinach spin system object
-- parameters.sweep -sweep width in Hz
-- parameters.npoints -two-element vector giving the
-- number of complex points in the
-- indirect and direct dimensions
-- parameters.tmix -mixing time in seconds
-- parameters.rate -MAS rate in Hz, used to set
-- proton irradiation power
-- parameters.spc_dim -spatial dimension of the MAS
-- problem, received from the
-- context function
-- H, R, K -Hamiltonian, relaxation, and
-- kinetics superoperators, recei-
-- ved from the context function
+- `spin_system` — Spinach spin system object.
+- `parameters.sweep` — Sweep width in Hz; sets the evolution timestep to `1/parameters.sweep`.
+- `parameters.npoints` — Two-element vector giving the number of complex points in the indirect and direct dimensions.
+- `parameters.tmix` — Mixing time in seconds.
+- `parameters.rate` — MAS rate in Hz, used to set proton irradiation power during mixing.
+- `parameters.spc_dim` — Spatial dimension of the MAS problem, received from the context function.
+- `H`, `R`, `K` — Hamiltonian, relaxation, and kinetics superoperators received from the context function.
 
 ## Outputs
 
-- fid.cos, fid.sin -States quadrature components
-- of the 2D PDSD spectrum
+- `fid.cos`, `fid.sin` — Quadrature components of the 2D PDSD spectrum.
 
-## Implementation structure
+## Implementation summary
 
-- A simplified model of the PDSD experiment using NOESY
-- type quadrature detection and phase cycle. To be cal-
-- led from the singlerot context. Syntax:
-- fid=pdsd(spin_system,parameters,H,R,K)
-- spin_system -Spinach spin system object
-- parameters.sweep -sweep width in Hz
-- parameters.npoints -two-element vector giving the
-- number of complex points in the
-- indirect and direct dimensions
-- parameters.tmix -mixing time in seconds
-- parameters.rate -MAS rate in Hz, used to set
-- proton irradiation power
+The sequence starts from a `13C` `Ly` state, omitting cross-polarisation. It evolves the indirect dimension under proton decoupling, applies the phase-cycled second pulse, evolves for `parameters.tmix` with proton irradiation, and applies a third pulse. After the proton subspace is removed, direct-dimension evolution and `13C` detection occur under proton decoupling. Differences between paired phase-cycle signals form `fid.cos` and `fid.sin` to eliminate axial peaks.
+
+Source reference: <https://spindynamics.org/wiki/index.php?title=pdsd.m>

@@ -8,11 +8,11 @@ DPFGSE signal selection, based on Equation 3 from the paper by Stott et al. (htt
 
 ## Physical / mathematical content
 
-- Imaging sequence implementations. They build spatially resolved Liouvillians that include gradients, slice-selection RF terms, diffusion, and acquisition operators.
+The sequence applies a hard 90° pulse, then two soft 180° pulses, each bracketed by a pair of equal-amplitude gradient periods. Evolution uses `L=H+F+1i*R+1i*K`, with each gradient period adding `parameters.g_amp(i)*G{1}`.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The hard pulse and gradient periods use `step`; each soft pulse uses `shaped_pulse_af` with RF frequencies shifted by `parameters.offset` and the `'expv'` method. The FID is acquired with `evolution` in `'observable'` mode at intervals of `1/parameters.sweep`.
 
 ## Parameters / inputs
 
@@ -36,15 +36,4 @@ DPFGSE signal selection, based on Equation 3 from the paper by Stott et al. (htt
 
 ## Implementation structure
 
-- DPFGSE signal selection, based on Equation 3 from the paper by
-- Stott et al. (https://doi.org/10.1006/jmre.1997.1110). Syntax:
-- fid=dpfgse_select(spin_system,parameters,H,R,K,G,F)
-- parameters.g_amp -amplitudes of the two gradients, T/m
-- parameters.g_dur -gradient duration, seconds
-- parameters.rf_frq_list -soft pulse parameters that will
-- parameters.rf_amp_list be passed to shaped_pulse_af
-- parameters.rf_dur_list function
-- parameters.rf_phi
-- parameters.max_rank
-- parameters.sweep -detection sweep width, Hz
-- parameters.npoints -number of points in the fid
+The function validates the parameter fields with the local `grumble` function, constructs spatially extended `Lx` and `Ly` pulse operators, and propagates `parameters.rho0` through the pulse–gradient sequence. It then observes the resulting state through `parameters.coil` to return `fid`.

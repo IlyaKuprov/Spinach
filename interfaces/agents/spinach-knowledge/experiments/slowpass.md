@@ -4,48 +4,26 @@
 
 ## Purpose
 
-Slow passage detection -calculates spectrum values at the user- specified frequency positions using the Fourier transform of the Liouville -von Neumann equation. The biggest advantage over the fid+fft style detection is easy parallelization and the possibi- lity of getting spectrum values at specific frequencies without recalculating the entire free induction decay. Syntax: spectrum=slowpass(spin_system,parameters,H,
-
-## Physical / mathematical content
-
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+Calculates spectrum values at the frequency positions specified by `parameters.sweep`, without first calculating the complete free induction decay.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The routine constructs a frequency grid, projects the initial state, detection state, and Liouvillian into each selected subspace, and solves a linear system at each frequency. Depending on the configured execution path it uses backslash or preconditioned GMRES; a GPU backslash path is also provided. The accumulated spectrum is scaled by the sampling rate implied by the frequency grid to match the unnormalised FFT amplitude convention. The relaxation matrix `R` must not be thermalised.
 
 ## Parameters / inputs
 
-- parameters.sweep vector with two elements giving
-- the spectrum frequency extents
-- in Hz
-- parameters.npoints number of points in the spectrum
-- parameters.rho0 initial state
-- parameters.coil detection state
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+- `parameters.sweep` — two-element vector giving the spectrum frequency extents, Hz
+- `parameters.npoints` — number of points in the spectrum
+- `parameters.rho0` — initial state
+- `parameters.coil` — detection state
+- `H` — Hamiltonian matrix, received from the context function
+- `R` — relaxation superoperator, received from the context function; it must not be thermalised
+- `K` — kinetics superoperator, received from the context function
 
 ## Outputs
 
-- spectrum -the spectrum of the system with the specified
-- starting state detected on the specified coil
-- state within the frequency interval requested
-- Note: relaxation must be present in the system dynamics, or the
-- matrix inversion operation would fail to converge. The re-
-- laxation matrix R must *not* be thermalized.
+- `spectrum` — spectrum of the system for the specified starting state and detection state over the requested frequency interval
 
-## Implementation structure
+## Reference
 
-- Slow passage detection -calculates spectrum values at the user-
-- specified frequency positions using the Fourier transform of the
-- Liouville -von Neumann equation. The biggest advantage over the
-- fid+fft style detection is easy parallelization and the possibi-
-- lity of getting spectrum values at specific frequencies without
-- recalculating the entire free induction decay. Syntax:
-- spectrum=slowpass(spin_system,parameters,H,R,K)
-- parameters.sweep vector with two elements giving
-- the spectrum frequency extents
-- in Hz
-- parameters.npoints number of points in the spectrum
-- parameters.rho0 initial state
+- [Spinach documentation](https://spindynamics.org/wiki/index.php?title=slowpass.m)

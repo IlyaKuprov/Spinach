@@ -4,17 +4,17 @@
 
 ## Purpose
 
-Ultrafast 3D DOSY-COSY pulse sequence. Syntax: fid=spendosycosy(spin_system,parameters,H,R,K,G,F)
+Simulates the ultrafast 3D DOSY-COSY pulse sequence and returns the free induction decay over both acquisition dimensions and the loop index.
 
 ## Physical / mathematical content
 
-- SPEN experiment implementations. These files combine shaped pulses, gradients, spatial encoding, and often diffusion-aware propagation.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+- Combines diffusion encoding with COSY coherence transfer. The source applies chirp pulses and gradient intervals, selects the specified coherence orders, and includes the intervening diffusion evolution.
+- Uses the Hamiltonian, relaxation, kinetics, gradient, and diffusion/flow superoperators supplied by the imaging context; the measured signal is formed with the supplied detection state.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- Applies shaped chirp pulses by piecewise-constant propagation and builds propagators for the acquisition periods.
+- Stores loop starting states, propagates and detects the signal over both acquired point dimensions, and uses parallel loop execution; GPU arrays are used when enabled.
 
 ## Parameters / inputs
 
@@ -52,15 +52,5 @@ Ultrafast 3D DOSY-COSY pulse sequence. Syntax: fid=spendosycosy(spin_system,para
 
 ## Implementation structure
 
-- Ultrafast 3D DOSY-COSY pulse sequence. Syntax:
-- fid=spendosycosy(spin_system,parameters,H,R,K,G,F)
-- parameters.dims size of the sample in m
-- parameters.npts number of spin packets
-- parameters.spins nuclei on which the sequence runs
-- parameters.deltat timestep for acquisition
-- parameters.npoints number of acquired points for each
-- gradient readout
-- parameters.nloops number of loop, where each loop consists of
-- a positive and a negative readout
-- parameters.Ga acquisition gradient in T/m
-- parameters.pulsenpoints number of points in the pulse shape
+- Forms the Liouvillian and pulse operators, then executes the source-defined diffusion-encoding and COSY preparation with coherence-order selection.
+- Builds the acquisition propagators and loop states, and returns an FID array indexed by `npoints1`, `npoints2`, and `nloops`.

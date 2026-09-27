@@ -4,62 +4,27 @@
 
 ## Purpose
 
-Phase-sensitive homonuclear NOESY pulse sequence from:
+Phase-sensitive homonuclear NOESY. The source cites [10.1063/1.438208](https://doi.org/10.1063/1.438208), [10.1016/0006-291X(80)90695-6](https://doi.org/10.1016/0006-291X(80)90695-6), and [10.1016/0022-2364(82)90279-7](https://doi.org/10.1016/0022-2364(82)90279-7).
 
-## Physical / mathematical content
+## Sequence and output
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
+The routine forms `L = H + 1i*R + 1i*K`, applies the first 90° pulse, evolves during F1, and runs a four-step phase cycle. By default, homospoil retains longitudinal magnetisation before mixing under relaxation and kinetics (`1i*R + 1i*K`). Setting `parameters.oldschool` true disables this homospoil path and uses the full generator during mixing. The four acquisitions are combined by axial-peak elimination.
 
-## Numerical / algorithmic content
+- Output: `fid.cos` and `fid.sin`, the two FID components for hypercomplex F1 processing.
+- The layout is optimized for memory rather than CPU time and is intended for very large protein and nucleic-acid simulations.
+- Non-empty analytical decoupling is meaningful only in `sphten-liouv`; the routine also accepts `zeeman-liouv` formalism.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## Inputs
 
-## Syntax
+- `parameters.sweep`: two positive sweep widths in Hz.
+- `parameters.npoints`: two positive integer point counts.
+- `parameters.spins`: one working-spin label, e.g. `{'1H'}` or `{'13C'}`.
+- `parameters.tmix`: non-negative mixing time in seconds.
+- `parameters.decouple` (optional): spin labels such as `{'13C','1H'}` or a numeric list of spin indices.
+- `parameters.rho0`: initial state; exact thermal equilibrium can be requested through `parameters.needs={'rho_eq'}`.
+- `parameters.oldschool` (optional): logical scalar; true disables the default homospoil gradient before mixing.
+- `H`, `R`, and `K`: Hamiltonian matrix, relaxation superoperator, and kinetics superoperator from the context function.
 
-```matlab
-fid=noesy(spin_system,parameters,H,R,K)
-```
+## Reference link
 
-## Parameters / inputs
-
-- parameters.sweep -sweep widths, Hz
-- parameters.npoints -number of points for both dimensions
-- parameters.spins -nuclei on which the sequence runs,
-- specified as {'1H'}, {'13C'}, etc.
-- parameters.tmix -mixing time, seconds
-- parameters.decouple -spins to be decoupled, specified either
-- by name, e.g. {'13C','1H'}, or by a list
-- of numbers, e.g. [1 2]
-- parameters.rho0 -initial state; skip this and specify
-- parameters.needs={'rho_eq'} to start
-- from exact thermal equilibrium
-- parameters.oldschool -set to 1 to disable homospoil gradient
-- before the mixing time
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- fid.cos,fid.sin -two components of the FID for F1 hyper-
-- complex processing
-- Note: this function is used for extreme simulations (proteins
-- and nucleic acids) -its layout is optimised for minimum
-- memory footprint rather than CPU time.
-- Note: non-empty analytical decoupling is meaningful only in
-- sphten-liouv formalism.
-
-## Implementation structure
-
-- Phase-sensitive homonuclear NOESY pulse sequence from:
-- fid=noesy(spin_system,parameters,H,R,K)
-- parameters.sweep -sweep widths, Hz
-- parameters.npoints -number of points for both dimensions
-- parameters.spins -nuclei on which the sequence runs,
-- specified as {'1H'}, {'13C'}, etc.
-- parameters.tmix -mixing time, seconds
-- parameters.decouple -spins to be decoupled, specified either
-- by name, e.g. {'13C','1H'}, or by a list
-- of numbers, e.g. [1 2]
-- parameters.rho0 -initial state; skip this and specify
-- parameters.needs={'rho_eq'} to start
+[Spinach Wiki: noesy.m](https://spindynamics.org/wiki/index.php?title=noesy.m)

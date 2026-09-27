@@ -4,43 +4,22 @@
 
 ## Purpose
 
-Time-domain rapid field scan ESR experiment, Eatons style. Syntax: [b_axis,spectrum]=rapidscan(spin_system,parameters)
-
-## Physical / mathematical content
+Simulates a time-domain rapid-scan ESR experiment in the electron rotating frame. It combines the Zeeman and coupling terms with the microwave drive and relaxation, then propagates the equilibrium state as the magnetic field is swept.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The routine starts from isotropic thermal equilibrium, constructs the `L+` detection state, and advances the state for `parameters.nsteps` time steps using `step`. At each step it records the `L+` observable amplitude and uses the corresponding field offset in the propagator. The returned field axis is the sweep waveform shifted by the centre field `spin_system.inter.magnet`.
 
 ## Parameters / inputs
 
-- parameters.mw_pwr -microwave power, rad/s
-- parameters.sweep -magnetic field sweep extents,
-- arouind the centre field specified
-- in sys.magnet, a two-element vector
-- in Tesla
-- parameters.nsteps -number of steps in the magnetic
-- field sweep
-- parameters.timestep -duration of each time step, seconds
+- `parameters.mw_pwr` — microwave power in rad/s.
+- `parameters.sweep` — two ascending magnetic-field sweep offsets in Tesla, relative to the centre field in `spin_system.inter.magnet`.
+- `parameters.nsteps` — number of magnetic-field steps.
+- `parameters.timestep` — duration of each time step in seconds.
 
 ## Outputs
 
-- b_axis -magnetic field axis, Tesla
-- spectrum -L+ observable amplitude at each
-- magnetic field
-- Note: this experiment should be called directly without a context.
+- `b_axis` — magnetic-field axis in Tesla.
+- `spectrum` — `L+` observable amplitude at each magnetic field.
 
-## Implementation structure
-
-- Time-domain rapid field scan ESR experiment, Eatons style. Syntax:
-- [b_axis,spectrum]=rapidscan(spin_system,parameters)
-- parameters.mw_pwr -microwave power, rad/s
-- parameters.sweep -magnetic field sweep extents,
-- arouind the centre field specified
-- in sys.magnet, a two-element vector
-- in Tesla
-- parameters.nsteps -number of steps in the magnetic
-- field sweep
-- parameters.timestep -duration of each time step, seconds
-- b_axis -magnetic field axis, Tesla
-- spectrum -L+ observable amplitude at each
+Call this experiment directly, without a context.

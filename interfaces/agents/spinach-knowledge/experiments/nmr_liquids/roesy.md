@@ -4,55 +4,25 @@
 
 ## Purpose
 
-Phase-sensitive homonuclear ROESY pulse sequence, assuming ideal spin-lock, described in:
+Phase-sensitive homonuclear ROESY with an ideal spin-lock. The source cites [10.1021/ja00315a069](https://doi.org/10.1021/ja00315a069) and [10.1016/0022-2364(85)90171-4](https://doi.org/10.1016/0022-2364(85)90171-4).
 
-## Physical / mathematical content
+## Sequence and output
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
+The routine forms `L = H + 1i*R + 1i*K`, applies a 90° pulse, and evolves during F1. The analytical spin-lock creates cosine and sine branches; each mixes under `1i*R + 1i*K` for `parameters.tmix`, then evolves and is detected during F2.
 
-## Numerical / algorithmic content
+- Output: `fid.cos` and `fid.sin`, the free-induction decay components for hypercomplex processing.
+- The ideal spin-lock model does not represent finite RF amplitude, RF offset, Hartmann-Hahn matching errors, or explicit RF phase transients.
+- The routine accepts `sphten-liouv` and `zeeman-liouv` formalisms.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## Inputs
 
-## Syntax
+- `parameters.sweep`: two positive sweep widths in Hz, ordered F1,F2.
+- `parameters.npoints`: two positive integer point counts, ordered F1,F2.
+- `parameters.spins`: one working-spin label, e.g. `{'1H'}`.
+- `parameters.tmix`: non-negative mixing time in seconds.
+- `parameters.rho0`: initial state.
+- `H`, `R`, and `K`: Hamiltonian matrix, relaxation superoperator, and kinetics superoperator from the context function; the matrices must have matching dimensions.
 
-```matlab
-fid=roesy(spin_system,parameters,H,R,K)
-```
+## Reference link
 
-## Parameters / inputs
-
-- parameters.sweep -a vector with sweep widths
-- in F1 and F2 directions, Hz
-- parameters.npoints -a vector with point count
-- in F1 and F2 directions
-- parameters.spins -nuclei on which the sequence
-- runs, e.g. {'1H'}
-- parameters.tmix -mixing time, seconds
-- parameters.rho0 -initial state
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-
-## Outputs
-
-- fid.cos, fid.sin -components of the free induction
-- decay for hypercomplex processing
-- Note: this ideal spin-lock model does not represent finite RF
-- amplitude, RF offset, Hartmann-Hahn matching errors, or
-- explicit RF phase transients.
-
-## Implementation structure
-
-- Phase-sensitive homonuclear ROESY pulse sequence, assuming ideal
-- spin-lock, described in:
-- fid=roesy(spin_system,parameters,H,R,K)
-- parameters.sweep -a vector with sweep widths
-- in F1 and F2 directions, Hz
-- parameters.npoints -a vector with point count
-- in F1 and F2 directions
-- parameters.spins -nuclei on which the sequence
-- runs, e.g. {'1H'}
-- parameters.tmix -mixing time, seconds
-- parameters.rho0 -initial state
-- H -Hamiltonian matrix, received from context function
+[Spinach Wiki: roesy.m](https://spindynamics.org/wiki/index.php?title=roesy.m)

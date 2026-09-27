@@ -4,41 +4,25 @@
 
 ## Purpose
 
-M2S sequence of Pileio and Levitt. Syntax: rho=m2s(spin_system,L,Hx,Hy,rho,J,delta_v)
-
-## Physical / mathematical content
-
-- Singlet-conversion experiment implementations. The aim is adiabatic or pulse-assisted transfer between Zeeman magnetisation and singlet order.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+Implements the M2S sequence of Pileio and Levitt.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The routine sets `t=1/(4*sqrt(J^2+delta_v^2))` and chooses an even repetition count from `floor(pi*abs(J)/(2*abs(delta_v)))`. It applies a `pi/2` pulse about `Hy`, alternates evolution under `L` for `t` with `pi` pulses about `Hx` for the full repetition count, then applies a `sign(J)*pi/2` pulse about `Hx` and an additional `L` evolution. A final loop runs half as many evolution/`Hx`-pulse/evolution blocks.
 
 ## Parameters / inputs
 
-- L -background Liouvillian
-- Hx -X spin operator
-- Hy -Y spin operator
-- rho -initial state vector
-- J -J-coupling (Hz), the phase of the 90-degree pulse next to the lone tau delay follows its sign
-- delta_v -Zeeman frequency difference (Hz)
+- `L` — background Liouvillian
+- `Hx` — X spin operator
+- `Hy` — Y spin operator
+- `rho` — initial state vector
+- `J` — J-coupling (Hz); the phase of the 90-degree pulse next to the lone tau delay follows its sign
+- `delta_v` — Zeeman frequency difference (Hz)
 
 ## Outputs
 
-- rho -final state vector
+- `rho` — final state vector
 
-## Implementation structure
+## Reference
 
-- M2S sequence of Pileio and Levitt. Syntax:
-- rho=m2s(spin_system,L,Hx,Hy,rho,J,delta_v)
-- L -background Liouvillian
-- Hx -X spin operator
-- Hy -Y spin operator
-- rho -initial state vector
-- J -J-coupling (Hz), the phase of the 90-degree pulse next to the lone tau delay follows its sign
-- delta_v -Zeeman frequency difference (Hz)
-- rho -final state vector
-- Check consistency
-- Evolution time
-- Repetition count
+- [Spinach documentation](https://spindynamics.org/wiki/index.php?title=m2s.m)

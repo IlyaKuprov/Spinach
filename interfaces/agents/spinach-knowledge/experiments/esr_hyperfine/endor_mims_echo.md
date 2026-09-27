@@ -8,11 +8,15 @@ Stimulated echo diagnostics for the Mims ENDOR sequence. Syntax: stim_echo=endor
 
 ## Physical / mathematical content
 
-- Hyperfine ESR experiment implementations. These sequences probe coupled electron-nuclear dynamics through ENDOR or HYSCORE-type manipulations of coherence pathways.
+
+- Implements an electron stimulated-echo diagnostic for Mims ENDOR, using electron Lz as the initial state and electron L+ for detection. It does not apply a nuclear RF pulse; the nuclear-pulse-duration parameter is used as an evolution interval.
+- The sequence uses ideal electron pi/2 rotations about x, x, and y, with the specified delays between them.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+
+- The state is propagated through the pulse and delay sequence with the Liouvillian `L = H + iR + iK`, and the echo is sampled over the configured time points.
+- Propagation uses `step()` and `evolution()`; the returned signal is the detected time-domain echo, not a HYSCORE dataset.
 
 ## Parameters / inputs
 
@@ -48,15 +52,6 @@ Stimulated echo diagnostics for the Mims ENDOR sequence. Syntax: stim_echo=endor
 
 ## Implementation structure
 
-- Stimulated echo diagnostics for the Mims ENDOR sequence. Syntax:
-- stim_echo=endor_mims_echo(spin_system,parameters,H,R,K)
-- parameters.spins -working spins, normally {'E'}; spe-
-- cify multiplicity if electron spin
-- is not 1/2, for example {'7E'} for
-- gadolinium
-- parameters.electrons -a vector of integers specifying
-- which spins in sys.isotopes are
-- electrons
-- parameters.tau -the delay between the first two
-- 90-degree pulses of the Mims
-- ENDOR sequence, seconds; 200e-9
+
+- Converts to Liouville/adjoint representation as needed, checks dimensions and parameters, and constructs electron pulse and detection operators.
+- Applies the electron rotations and free-evolution intervals, then returns the sampled stimulated echo.

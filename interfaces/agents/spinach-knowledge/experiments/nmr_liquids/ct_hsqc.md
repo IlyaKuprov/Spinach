@@ -4,17 +4,16 @@
 
 ## Purpose
 
-Constant-time phase-sensitive HSQC pulse sequence from:
+Constant-time phase-sensitive HSQC sequence, citing [DOI 10.1016/0022-2364(92)90144-V](https://doi.org/10.1016/0022-2364(92)90144-V) and [DOI 10.1007/BF00227470](https://doi.org/10.1007/BF00227470).
 
 ## Physical / mathematical content
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+- The source sets the J-evolution interval to `abs(1/(4*parameters.J))`, prepares the initial state on spin 2, and applies the transfer and refocusing pulses on the two specified spins. It samples a constant-time t1 grid and separates the two States quadrature pathways as `fid.pos` and `fid.neg`.
+- The requested F2 decoupling is applied before detection; the detection state defaults to `L+` on `parameters.spins{2}`. The implementation forms `L = H + 1i*R + 1i*K`; the initial state defaults to longitudinal magnetisation on `parameters.spins{2}`, and the detection state to its `L+` operator.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+- The two sweep widths set the F1 grid and F2 dwell (`1/sweep(2)`). The source requires the `sphten-liouv` formalism and equal-sized matrix inputs `H`, `R`, and `K`; it does not perform orientation or geometry averaging.
 
 ## Syntax
 
@@ -24,34 +23,16 @@ fid=ct_hsqc(spin_system,parameters,H,R,K)
 
 ## Parameters / inputs
 
-- parameters.sweep [F1 F2] sweep widths, Hz
-- parameters.npoints [F1 F2] numbers of points
-- parameters.spins {F1 F2} nuclei (e.g. '13C','1H')
-- parameters.decouple_f2 [optional] nuclei to decouple
-- in F2, e.g. {'15N','13C'}
-- parameters.J working scalar coupling, Hz
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+- `parameters.sweep`: two sweep widths `[F1 F2]` in Hz.
+- `parameters.npoints`: two point counts `[F1 F2]`.
+- `parameters.spins`: two spin labels `{F1 F2}`, e.g. `'13C'` and `'1H'`.
+- `parameters.decouple_f2`: optional nuclei to decouple during F2; defaults to empty (for example, `{'15N','13C'}`).
+- `parameters.J`: working scalar coupling in Hz.
+- Optional `parameters.rho0` and `parameters.coil` set the initial and detection states.
+- `H`, `R`, and `K`: Hamiltonian, relaxation, and kinetics matrices received from the context function.
 
 ## Outputs
 
-- fid.pos,fid.neg -two components of the States quadrature
-- signal.
-- Note: natural abundance simulations should make use of the isotope
-- dilution functionality. See dilute.m function.
+- `fid.pos` and `fid.neg`: the two components of the States quadrature signal. For natural-abundance simulations, use isotope dilution; see `dilute.m`.
 
-## Implementation structure
-
-- Constant-time phase-sensitive HSQC pulse sequence from:
-- fid=ct_hsqc(spin_system,parameters,H,R,K)
-- parameters.sweep [F1 F2] sweep widths, Hz
-- parameters.npoints [F1 F2] numbers of points
-- parameters.spins {F1 F2} nuclei (e.g. '13C','1H')
-- parameters.decouple_f2 [optional] nuclei to decouple
-- in F2, e.g. {'15N','13C'}
-- parameters.J working scalar coupling, Hz
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- fid.pos,fid.neg - two components of the States quadrature
+[Spinach Wiki: ct_hsqc.m](https://spindynamics.org/wiki/index.php?title=ct_hsqc.m)

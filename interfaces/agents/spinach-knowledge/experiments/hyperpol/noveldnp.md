@@ -4,44 +4,31 @@
 
 ## Purpose
 
-Nuclear spin Orientation via Electron spin Locking (NOVEL) and pulsed solid effect (SE). For futher information see: Syntax (call from powder context): contact_curve=noveldnp(spin_system,parameters,H,R,K)
+Calculate the contact-time signal for nuclear spin orientation via electron spin locking (NOVEL) or the pulsed solid effect. The `parameters.flippulse` switch selects the protocol: 0 uses the initial state directly (solid effect); 1 applies a 90-degree electron flip pulse before the contact period (NOVEL).
 
-## Physical / mathematical content
+## Method
 
-- Hyperpolarisation experiment implementations. They propagate driven electron-nuclear systems under microwave irradiation, MAS, relaxation, and repetition until transient or steady-state observables are assembled.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The function forms the Liouvillian `H + 1i*R + 1i*K` and constructs the electron transverse operators. For NOVEL it evolves the initial state under an x-directed microwave pulse for `parameters.pulse_dur`; otherwise it starts from `parameters.rho0`. It then applies a continuous spin lock along -y at the specified microwave amplitude and records the coil observable over the requested contact-time steps.
 
 ## Parameters / inputs
 
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- parameters.irr_powers -microwave amplitude (aka electron
-- nutation frequency), Hz
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.timestep -time step of the contact curve, s
-- parameters.nsteps -number of time steps in the con-
-- tact curve
-- parameters.flippulse -0: Solid Effect (no flip pulse)
-- 1: NOVEL (90-degree flip pulse)
-- Output:
-- contact_curve -time dependence of the coil state
+- `H` — Hamiltonian matrix supplied by the context function.
+- `R` — relaxation superoperator supplied by the context function.
+- `K` — kinetics superoperator supplied by the context function.
+- `parameters.irr_powers` — microwave amplitude (electron nutation frequency), in Hz.
+- `parameters.rho0` — initial state.
+- `parameters.coil` — detection state.
+- `parameters.timestep` — contact-curve time step, in seconds.
+- `parameters.nsteps` — number of time steps in the contact curve.
+- `parameters.flippulse` — 0 for solid effect (no flip pulse), 1 for NOVEL (90-degree flip pulse).
+- `parameters.pulse_dur` — flip-pulse duration in seconds; required when `parameters.flippulse` is 1.
 
-## Implementation structure
+## Output
 
-- Nuclear spin Orientation via Electron spin Locking (NOVEL) and pulsed
-- solid effect (SE). For futher information see:
-- Syntax (call from powder context):
-- contact_curve=noveldnp(spin_system,parameters,H,R,K)
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- parameters.irr_powers -microwave amplitude (aka electron
-- nutation frequency), Hz
-- parameters.rho0 -initial state
-- parameters.coil -detection state
-- parameters.timestep -time step of the contact curve, s
+- `contact_curve` — time dependence of the coil-state observable.
+
+## References
+
+- https://doi.org/10.1016/0022-2364(88)90190-4
+- https://doi.org/10.1063/1.5000528
+- Source documentation: <https://spindynamics.org/wiki/index.php?title=noveldnp.m>

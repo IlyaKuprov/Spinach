@@ -4,51 +4,27 @@
 
 ## Purpose
 
-Cross-polarisation experiment in the rotating frame. Applies a soft pi/2 pulse using the specified operators, then evolves the system with the specified spin-lock terms added to the Liovilli- an. The contact curve is returned. Syntax: contact_curve=cp_contact_soft(spin_system,parameters,H,R,K)
+Simulates a rotating-frame cross-polarisation contact curve with a soft `pi/2` high-gamma excitation pulse, followed by spin-lock evolution.
 
-## Physical / mathematical content
+## Implementation
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The routine composes `L=H+1i*R+1i*K`, wipes the low-gamma spin state from `parameters.rho0`, applies the high-gamma excitation pulse, and evolves during the CP contact while detecting on `parameters.coil`. The requested contact evolution is set by the time step and number of steps.
 
 ## Parameters / inputs
 
-- parameters.spins -working spins, a cell array of
-- strings with high-gamma spins
-- first and low-gamma spins last,
-- for example {'1H','13C'}
-- parameters.hi_pwr -nutation frequency of the exci-
-- tation pulse on the high-gamma
-- spins, Hz
-- parameters.cp_pwr -nutation frequencies on the two
-- channels during the CP contact
-- time, a two-element vector, Hz
-- parameters.timestep -time step of the CP contact ti-
-- me, seconds
-- parameters.nsteps -number of time steps to take
-- during the CP contact time
-- parameters.rho0 -initial state, the state of the
-- low-gamma spins will be wiped
-- parameters.coil -detection state vector
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- Output:
-- contact_curve -contact curve detected on the coil
-- state specified in parameters.coil
+- `parameters.spins`: working spins in a cell array, high-gamma first and low-gamma last (for example, {'1H','13C'}).
+- `parameters.hi_pwr`: high-gamma excitation-pulse nutation frequency, Hz.
+- `parameters.cp_pwr`: two-channel nutation frequencies during CP contact, Hz.
+- `parameters.timestep`: CP contact time step, s.
+- `parameters.nsteps`: number of CP contact time steps.
+- `parameters.rho0`: initial state; the low-gamma spin state is wiped before the sequence.
+- `parameters.coil`: detection state vector.
+- `H`: Hamiltonian matrix supplied by the context function.
+- `R`: relaxation superoperator supplied by the context function.
+- `K`: kinetics superoperator supplied by the context function.
 
-## Implementation structure
+## Output
 
-- Cross-polarisation experiment in the rotating frame. Applies a
-- soft pi/2 pulse using the specified operators, then evolves the
-- system with the specified spin-lock terms added to the Liovilli-
-- an. The contact curve is returned. Syntax:
-- contact_curve=cp_contact_soft(spin_system,parameters,H,R,K)
-- parameters.spins -working spins, a cell array of
-- strings with high-gamma spins
-- first and low-gamma spins last,
-- for example {'1H','13C'}
-- parameters.hi_pwr -nutation frequency of the exci-
-- tation pulse on the high-gamma
-- spins, Hz
+- `contact_curve`: signal detected on the coil state during the CP contact.
+
+[Source page](https://spindynamics.org/wiki/index.php?title=cp_contact_soft.m)

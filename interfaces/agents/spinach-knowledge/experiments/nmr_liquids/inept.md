@@ -4,15 +4,11 @@
 
 ## Purpose
 
-Non-refocused INEPT pulse sequence. This returns the directly acquired coupled antiphase spectrum rather than a refocused, broadband-decoupled INEPT variant. Implemented as here:
+Non-refocused INEPT. This variant returns the directly acquired coupled antiphase spectrum; it is not the refocused, broadband-decoupled INEPT variant. The source cites [this paper](https://doi.org/10.1021/ja00497a058).
 
-## Physical / mathematical content
+## Sequence and signal
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+The sequence starts from isotropic thermal equilibrium, applies pulses to the two working spin channels with J-coupling evolution intervals of `abs(1/(4*parameters.J))`, and uses phase-cycled pulses on the second configured spin channel before direct acquisition. The detected result is the coupled antiphase FID, rather than a refocused broadband-decoupled spectrum.
 
 ## Syntax
 
@@ -22,33 +18,14 @@ fid=inept(spin_system,parameters,H,R,K)
 
 ## Parameters / inputs
 
-- parameters.sweep [F1] Sweep width in Hz
-- parameters.npoints [F1] number of points
-- parameters.spins {F1 F2} working nuclei,
-- e.g. {'15N','1H'}
-- parameters.J working scalar coupling
-- in Hz
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+- `parameters.sweep`: F1 sweep width, Hz.
+- `parameters.npoints`: number of points.
+- `parameters.spins`: {F1 F2} working nuclei, e.g. `{'15N','1H'}`.
+- `parameters.J`: working scalar coupling, Hz.
+- `H`, `R`, `K`: Hamiltonian matrix, relaxation superoperator, and kinetics superoperator supplied by the context function.
 
-## Outputs
+## Output
 
-- fid -free induction decay
-- Note: use dilute() to generate carbon isotopomers.
-- Andrew Porter, Ilya Kuprov
+- `fid`: directly acquired free induction decay.
 
-## Implementation structure
-
-- Non-refocused INEPT pulse sequence. This returns the directly
-- acquired coupled antiphase spectrum rather than a refocused,
-- broadband-decoupled INEPT variant. Implemented as here:
-- fid=inept(spin_system,parameters,H,R,K)
-- parameters.sweep [F1] Sweep width in Hz
-- parameters.npoints [F1] number of points
-- parameters.spins {F1 F2} working nuclei,
-- e.g. {'15N','1H'}
-- parameters.J working scalar coupling
-- in Hz
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
+[Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=inept.m).

@@ -4,21 +4,17 @@
 
 ## Purpose
 
-Overtone signal acquisition experiment in the frequency domain. Syntax: spectrum=overtone_a(spin_system,parameters,H,R,K)
-
+Frequency-domain overtone acquisition: the routine converts the requested sweep offsets to absolute frequencies around the overtone reference and delegates acquisition to `slowpass`.
 ## Physical / mathematical content
 
-- Overtone experiment implementations. These routines excite or detect high-order quadrupolar transitions and therefore combine non-secular quadrupolar terms, MAS or field effects, and specialised detection pathways.
-
+The overtone reference frequency is `-2*spin(parameters.spins{1})*spin_system.inter.magnet/(2*pi)`. The sweep is specified relative to this frequency.
 ## Numerical / algorithmic content
 
+The function validates its inputs, computes the overtone reference frequency, changes `parameters.sweep` to `ovt_frq-parameters.sweep`, and calls `slowpass` with the adjusted parameters and supplied dynamics matrices.
 ## Parameters / inputs
 
-- parameters.spins overtone-active nucleus, specified as a
-- single-element cell array
-- parameters.sweep vector with two elements giving
-- the spectrum frequency extents
-- in Hz around the overtone frequency
+- parameters.spins overtone-active nucleus, specified as a single-element cell array
+- parameters.sweep vector with two elements giving the spectrum frequency extents in Hz around the overtone frequency
 - parameters.npoints number of points in the spectrum
 - parameters.rho0 initial state
 - parameters.coil detection state
@@ -37,15 +33,4 @@ Overtone signal acquisition experiment in the frequency domain. Syntax: spectrum
 
 ## Implementation structure
 
-- Overtone signal acquisition experiment in the frequency domain. Syntax:
-- spectrum=overtone_a(spin_system,parameters,H,R,K)
-- parameters.spins overtone-active nucleus, specified as a
-- single-element cell array
-- parameters.sweep vector with two elements giving
-- the spectrum frequency extents
-- in Hz around the overtone frequency
-- parameters.npoints number of points in the spectrum
-- parameters.rho0 initial state
-- parameters.coil detection state
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
+A thin wrapper around `slowpass`, preceded by the local `grumble` input validator.

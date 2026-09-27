@@ -4,52 +4,30 @@
 
 ## Purpose
 
-Protein-specific H(CA)NH experiment (Figure 7.37 of "Protein NMR Spectroscopy", 2nd edition) using pre-set values of J-couplings used in the magnetisation transfer stages. The simulation uses the bidirectional propagation method described in The sequence is hard-wired to work on 1H,13C,15N proteins and uses PDB labels to select spins that will be affected by otherwise ideal pulses. F1 is 1H, F2 is 15N, F3 is 1H. Synt
+Protein-specific H(CA)NH experiment, Figure 7.37 in the second edition of *Protein NMR Spectroscopy*. It uses preset J-couplings for magnetisation transfer and the bidirectional propagation method described in [the cited paper](http://dx.doi.org/10.1016/j.jmr.2014.04.002). The sequence is hard-wired for 1H, 13C, and 15N proteins; F1, F2, and F3 are 1H, 15N, and 1H, respectively.
 
 ## Physical / mathematical content
 
-- Protein triple-resonance sequence implementations. They orchestrate heteronuclear coherence transfers across biomolecular spin networks while preserving phase and acquisition conventions.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+The forward half starts from CA-proton magnetisation, selects positive and negative 1H coherence for F1 States quadrature, and carries out the transfer and refocusing steps. The backward half propagates the 1H detection state under the adjoint Liouvillian; stitching the two halves produces the four sign combinations. The pulse sequence uses ideal broadband pulses selected by PDB atom labels and decouples 13CO during the indicated transfer periods.
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+The source hard-codes J_CH = 140 Hz and J_NH = 92 Hz, with delays derived from those couplings and additional fixed delays of 12.5 ms and 23.0 ms. Evolution uses `L = H + iR + iK`.
 
 ## Parameters / inputs
 
-- parameters.npoints -a vector of three integers giving the
-- number of points in the three temporal
-- dimensions, ordered as [t1 t2 t3].
-- parameters.sweep -a vector of three real numbers giving
-- the sweep widths in the three frequen-
-- cy dimensions, ordered as [f1 f2 f3].
-- parameters.spins -isotopes affected by ideal broadband
-- pulses, specified as a cell array of
-- strings, e.g. {'1H','15N','1H'}.
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+- `parameters.npoints`: three positive integer point counts ordered as [t1 t2 t3].
+- `parameters.sweep`: three positive sweep widths in Hz ordered as [f1 f2 f3].
+- `parameters.spins`: required to be `{'1H','15N','1H'}`.
+- `parameters.rho0`: optional initial state; if omitted, the source constructs it from protons with labels HA, HA1, HA2, or HA3.
+- `parameters.coil`: optional detection state; if omitted, the source constructs it from protons labelled H.
+- `H`: Hamiltonian matrix; `R`: relaxation superoperator; `K`: kinetics superoperator, supplied by the context function with matching dimensions.
+- The spin-system labels must use PDB atom IDs such as CA, HA, and H for the sequence's selective operations.
 
 ## Outputs
 
-- fid -a structure with four fields: fid.pos_pos, fid.pos_neg,
-- fid.neg_pos, fid.neg_neg that are used in the subsequ-
-- ent States quadrature processing
-- Note: spin labels must be set to PDB atom IDs ('CA', 'HA', etc.) in
-- sys.labels for this sequence to work properly.
+Returns a structure with `fid.pos_pos`, `fid.pos_neg`, `fid.neg_pos`, and `fid.neg_neg`, the four sign combinations used in subsequent States quadrature processing.
 
-## Implementation structure
+## References
 
-- Protein-specific H(CA)NH experiment (Figure 7.37 of "Protein NMR
-- Spectroscopy", 2nd edition) using pre-set values of J-couplings
-- used in the magnetisation transfer stages. The simulation uses
-- the bidirectional propagation method described in
-- The sequence is hard-wired to work on 1H,13C,15N proteins and uses
-- PDB labels to select spins that will be affected by otherwise ideal
-- pulses. F1 is 1H, F2 is 15N, F3 is 1H. Syntax:
-- fid=hcanh(spin_system,parameters,H,R,K)
-- parameters.npoints -a vector of three integers giving the
-- number of points in the three temporal
-- dimensions, ordered as [t1 t2 t3].
-- parameters.sweep -a vector of three real numbers giving
+- *Protein NMR Spectroscopy*, 2nd edition, Figure 7.37.
+- [Bidirectional propagation method](http://dx.doi.org/10.1016/j.jmr.2014.04.002)
+- [Spin Dynamics Wiki: hcanh.m](https://spindynamics.org/wiki/index.php?title=hcanh.m)

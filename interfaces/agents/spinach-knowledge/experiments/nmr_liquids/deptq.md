@@ -4,15 +4,16 @@
 
 ## Purpose
 
-DEPTQ pulse sequence from:
+DEPTQ pulse sequence; see [DOI 10.1006/jmre.1998.1595](https://doi.org/10.1006/jmre.1998.1595). This is the DEPTQ135-style variant with a fixed first proton pulse; `parameters.beta` controls the final proton editing pulse.
 
 ## Physical / mathematical content
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
+- The source starts from isotropic thermal equilibrium, applies a carbon pulse, and uses J-coupling intervals of `abs(1/(2*parameters.J))` with phase-alternated carbon and proton pulses. The final beta pulse and detection pulse precede proton decoupling and FID acquisition on the carbon spin.
+- Unlike `dept.m`, this sequence allows quaternary-carbon signals. The effective Liouvillian is `L = H + 1i*R + 1i*K`.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- The single-dimension dwell time is `1/parameters.sweep`; acquisition uses `parameters.npoints` points. The implementation requires the `sphten-liouv` formalism.
 
 ## Syntax
 
@@ -22,37 +23,16 @@ fid=deptq(spin_system,parameters,H,R,K)
 
 ## Parameters / inputs
 
-- parameters.sweep [F1] Sweep width in Hz
-- parameters.npoints [F1] number of points
-- parameters.spins {F1,F2} nuclei, e.g. {'13C','1H'}
-- parameters.J working J-coupling in Hz
-- parameters.beta the angle used in the selection
-- pulse, radians
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
+- `parameters.sweep`: sweep width in Hz.
+- `parameters.npoints`: number of acquisition points.
+- `parameters.spins`: two spin labels `{F1,F2}`, e.g. `'13C'` and `'1H'`.
+- `parameters.J`: working J-coupling in Hz.
+- `parameters.beta`: angle of the selection pulse, in radians.
+- `H`, `R`, and `K`: Hamiltonian, relaxation, and kinetics matrices received from the context function.
 
 ## Outputs
 
-- fid -free induction decay
-- Note: this implementation is the DEPTQ135-style fixed first
-- proton pulse variant. The beta parameter controls the
-- last proton editing pulse.
-- Note: use dilute.m to generate carbon isotopomers.
-- Note: the sequence differs from dept.m in that quaternary carbons
-- do appear.
+- `fid`: free induction decay.
+- Use isotope dilution to generate carbon isotopomers; see `dilute.m`.
 
-## Implementation structure
-
-- DEPTQ pulse sequence from:
-- fid=deptq(spin_system,parameters,H,R,K)
-- parameters.sweep [F1] Sweep width in Hz
-- parameters.npoints [F1] number of points
-- parameters.spins {F1,F2} nuclei, e.g. {'13C','1H'}
-- parameters.J working J-coupling in Hz
-- parameters.beta the angle used in the selection
-- pulse, radians
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- fid -free induction decay
+[Spinach Wiki: deptq.m](https://spindynamics.org/wiki/index.php?title=deptq.m)

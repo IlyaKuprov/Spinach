@@ -4,17 +4,20 @@
 
 ## Purpose
 
-Davies ENDOR sequence with explicit soft pulses and all of the atten- dant effects, such as orientation selection. Soft pulses are simula- ted using the Fokker-Planck formalism. Syntax: answer=endor_davies(spin_system,parameters,H,R,K)
+
+Simulates a Davies ENDOR sequence with explicit soft electron and nuclear pulses, including orientation-selection effects. The soft pulses use the Fokker-Planck formalism.
 
 ## Physical / mathematical content
 
-- Hyperfine ESR experiment implementations. These sequences probe coupled electron-nuclear dynamics through ENDOR or HYSCORE-type manipulations of coherence pathways.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
+
+- The sequence compares RF-on and RF-off branches; both undergo the electron-pulse sequence, while only the RF-on branch receives the nuclear pulse. Orientation selection is represented through soft pulses in the Fokker-Planck formalism.
+- For each nuclear frequency, the detected signal is the RF-on amplitude divided by the RF-off reference amplitude.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+
+- Pulse evolution combines the Hamiltonian, relaxation, and kinetics terms as `L = H + iR + iK`; shaped pulses are propagated in the Fokker-Planck formalism.
+- An optional electron spin echo is included when `parameters.tau` is nonzero, and the nuclear-frequency scan is evaluated in parallel.
 
 ## Parameters / inputs
 
@@ -58,15 +61,6 @@ Davies ENDOR sequence with explicit soft pulses and all of the atten- dant effec
 
 ## Implementation structure
 
-- Davies ENDOR sequence with explicit soft pulses and all of the atten-
-- dant effects, such as orientation selection. Soft pulses are simula-
-- ted using the Fokker-Planck formalism. Syntax:
-- answer=endor_davies(spin_system,parameters,H,R,K)
-- The following parameters refer to the electron pi pulse. The duration
-- of the electron pi/2 pulse is obtained by halving parameters.e_dur:
-- parameters.e_frq -frequency of the electron pulse, Hz
-- parameters.e_phi -phase of the electron pulse, rad
-- parameters.e_pwr -power of the electron pulse, rad/s
-- parameters.e_dur -duration of the electron pulse, s
-- parameters.e_rnk -Fokker-Planck cut-off rank for
-- the electron pulse
+
+- Converts to the adjoint representation when needed, validates the inputs, and constructs the electron and nuclear pulse operators.
+- Applies the electron pulses, evaluates the RF-on and RF-off branches for each nuclear frequency, and returns their detected-amplitude ratio.

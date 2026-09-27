@@ -4,20 +4,7 @@
 
 ## Purpose
 
-Complete set of simulations related to three-pulse DEER. Runs pulse diagnostics, which is followed by echo diagnostics, which is follow- ed by DEER simulation. Syntax: deer_3p_soft_diag(spin_system,parameters)
-
-## Physical / mathematical content
-
-- Dipolar ESR experiment implementations. The pulse logic resolves dipolar couplings by echo modulation, with selective excitation and time-domain accumulation.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-
-## Numerical / algorithmic content
-
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+Runs the three-pulse diagnostic sequence and an echo-stack calculation. It calls `deer_3p_soft_hole` through `powder`, apodises and zero-fills/FFT-transforms its four FIDs for pulse diagnostic plots, then calls `deer_3p_soft_deer` through `powder`. It plots the unphased echo stack and SVD-derived echo and DEER components against their respective axes.
 
 ## Parameters / inputs
 
@@ -74,18 +61,3 @@ Complete set of simulations related to three-pulse DEER. Runs pulse diagnostics,
 - ration is recommended.
 - Note: the time in the DEER trace refers to the second pulse inser-
 - tion point, after end of first pulse.
-
-## Implementation structure
-
-- Complete set of simulations related to three-pulse DEER. Runs pulse
-- diagnostics, which is followed by echo diagnostics, which is follow-
-- ed by DEER simulation. Syntax:
-- deer_3p_soft_diag(spin_system,parameters)
-- parameters.pulse_frq -frequencies for the three
-- pulses, Hz
-- parameters.pulse_pwr -power levels for the three
-- parameters.pulse_dur -durations for the three
-- pulses, seconds
-- parameters.pulse_phi -initial phases for the three
-- pulses, radians
-- parameters.pulse_rnk -Fokker-Planck ranks for the

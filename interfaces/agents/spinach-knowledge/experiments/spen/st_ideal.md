@@ -4,15 +4,16 @@
 
 ## Purpose
 
-The ideal Stejskal-Tanner pulse sequence using the notation from Figure 1 in http://dx.doi.org/0.1002/cmr.a.21241 with no gaps be- tween pulse sequence events. Syntax: inten=st_ideal(spin_system,parameters,H,R,K,G,F) This sequence must be called from the imaging() context, which would provide H, R, K, G, and F. Parameters: parameters.spins -working spin. parameters.g_amp -gradient amplitude, T/m parameters.delta_sml 
+Computes the signal for the ideal Stejskal-Tanner diffusion-encoding sequence in the notation of Figure 1 in http://dx.doi.org/0.1002/cmr.a.21241 with no gaps between events, and returns the absolute first FID point.
 
 ## Physical / mathematical content
 
-- SPEN experiment implementations. These files combine shaped pulses, gradients, spatial encoding, and often diffusion-aware propagation.
+- This is the ideal Stejskal-Tanner sequence in the notation of Figure 1 in http://dx.doi.org/0.1002/cmr.a.21241 The evolution generator is `L=H+F+1i*R+1i*K`; the two gradient periods use `L+g_amp*G{1}` and each last `delta_sml`. The two intervening delays each last `(delta_big-delta_sml)/2`.
+- Applies the source-defined excitation and refocusing pulses and detects the resulting state with the supplied coil.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- Propagates the state through the pulse sequence, gradient intervals, and delays, then evaluates the detected signal. The function returns a scalar absolute signal rather than a sampled time-domain trace.
 
 ## Outputs
 
@@ -23,15 +24,5 @@ The ideal Stejskal-Tanner pulse sequence using the notation from Figure 1 in htt
 
 ## Implementation structure
 
-- The ideal Stejskal-Tanner pulse sequence using the notation from
-- Figure 1 in http://dx.doi.org/0.1002/cmr.a.21241 with no gaps be-
-- tween pulse sequence events. Syntax:
-- inten=st_ideal(spin_system,parameters,H,R,K,G,F)
-- This sequence must be called from the imaging() context, which
-- would provide H, R, K, G, and F. Parameters:
-- parameters.spins -working spin.
-- parameters.g_amp -gradient amplitude, T/m
-- parameters.delta_sml -the small delta parameter
-- (see the figure)
-- parameters.delta_big -the big delta parameter
-- inten -the absolute value of the first point in
+- Checks the formalism, input operator dimensions, gradient container, spin selection, and required scalar parameters.
+- Constructs the Liouvillian, applies the ideal pulse and diffusion-gradient timing, and returns the absolute detected signal.

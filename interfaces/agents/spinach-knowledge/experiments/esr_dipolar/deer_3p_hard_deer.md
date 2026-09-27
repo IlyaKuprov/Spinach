@@ -2,67 +2,17 @@
 
 - Signature: `deer=deer_3p_hard_deer(spin_system,parameters,H,R,K)`
 
-## Purpose
+## Purpose and sequence
 
-Three-pulse DEER pulse sequence. Idealized hard pulses are used, each pulse only affects its specific electron or transition, de- pending on the pulse operators supplied. Syntax: deer=deer_3p_hard_deer(spin_system,parameters,H,R,K)
+Generate a three-pulse DEER trace using the spin system, state, pulse operators and evolution matrices supplied by the caller. Starting from `parameters.rho0`, apply a probe `pi/2` pulse, evolve, apply a pump `pi` pulse through the pump-pulse sandwich, evolve, apply the probe `pi` pulse, and detect on the probe spin with `parameters.coil_prob`. Evolution uses the supplied `H`, `R` and `K` matrices; the function does not construct a dipolar interaction. Hard pulses are appropriate only for spin-1/2 systems; for higher-spin systems, supply transition-selective pulse operators.
 
-## Physical / mathematical content
+## Parameters and output
 
-- Dipolar ESR experiment implementations. The pulse logic resolves dipolar couplings by echo modulation, with selective excitation and time-domain accumulation.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+- `parameters.ex_prob` and `parameters.ex_pump`: probe and pump excitation operators.
+- `parameters.stepsize` and `parameters.nsteps`: time increment and number of steps in the pump-pulse sandwich; the increment must be positive and the count a positive integer.
+- `parameters.output`: choose `brief` or `detailed`.
+- `brief` returns `deer.deer_trace`. `detailed` additionally requires `parameters.ex_hard`, `parameters.coil_pump`, `parameters.spectrum_sweep` and `parameters.spectrum_nsteps`, and returns `deer.hard_pulse_fid`, `deer.prob_pulse_fid` and `deer.pump_pulse_fid` as well.
 
-## Numerical / algorithmic content
+## Input requirements
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Parameters / inputs
-
-- parameters.rho0 initial state
-- parameters.coil_prob detection state on probe spin
-- parameters.stepsize increment time for the pump pulse
-- sandwich
-- parameters.nsteps number of steps for the pump pulse
-- sandwich
-- parameters.ex_prob excitation operators to be used for
-- parameters.ex_pump the probe and pump electron respec-
-- tively.
-- parameters.output 'brief' returns just the DEER trace,
-- 'detailed' also returns excitation
-- profiles and the EPR spectrum.
-- H -Hamiltonian matrix, received from context function
-- R -relaxation superoperator, received from context function
-- K -kinetics superoperator, received from context function
-- If 'detailed' is selected as the output option, the following pa-
-- rameters are also required:
-- parameters.ex_hard hard pulse excitation operator
-- parameters.spectrum_sweep sweep width of the EPR spectrum, Hz
-- parameters.spectrum_nsteps number of time steps in the FID
-- parameters.coil_pump detection state on pump spin
-
-## Outputs
-
-- deer.hard_pulse_fid -('detailed') free induction decay
-- after a non-selective ideal pulse
-- deer.prob_pulse_fid -('detailed') free induction decay
-- after just the the probe pulse
-- deer.pump_pulse_fid -('detailed') free induction decay
-- after just the pump pulse
-- deer.deer_trace -DEER signal
-- Note: hard pulses are only appropriate for spin-1/2 systems; for
-- higher spin systems transition selective pulse operators
-- must be supplied.
-
-## Implementation structure
-
-- Three-pulse DEER pulse sequence. Idealized hard pulses are used,
-- each pulse only affects its specific electron or transition, de-
-- pending on the pulse operators supplied. Syntax:
-- deer=deer_3p_hard_deer(spin_system,parameters,H,R,K)
-- parameters.rho0 initial state
-- parameters.coil_prob detection state on probe spin
-- parameters.stepsize increment time for the pump pulse
-- sandwich
-- parameters.nsteps number of steps for the pump pulse
-- parameters.ex_prob excitation operators to be used for
-- parameters.ex_pump the probe and pump electron respec-
-- tively.
+`H`, `R` and `K` must be same-sized matrices. Supply the initial state and probe detection state as `parameters.rho0` and `parameters.coil_prob`.

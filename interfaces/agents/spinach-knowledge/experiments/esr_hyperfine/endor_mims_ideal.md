@@ -8,12 +8,15 @@ Mims ENDOR sequence with ideal electron pulses. Syntax: endor_spec=endor_mims_id
 
 ## Physical / mathematical content
 
-- Hyperfine ESR experiment implementations. These sequences probe coupled electron-nuclear dynamics through ENDOR or HYSCORE-type manipulations of coherence pathways.
+
+- Implements Mims ENDOR: electron polarization is stored along `Lz`, followed by electron pi/2 pulses, a nuclear RF pulse, and electron-coherence detection through `L+`.
+- Nuclear pulse operators are assembled from x- and y-axis rotations weighted by the gyromagnetic ratios of the selected nuclei; the evolution generator is `L = H + iR + iK`.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+
+- The sequence propagates the density operator through the configured pulse and delay intervals and evaluates the detected response across the nuclear-frequency points.
+- The implementation uses `step()` and `evolution()` for propagation; it returns the ENDOR response and does not perform an FFT or other spectrum post-processing.
 
 ## Parameters / inputs
 
@@ -50,15 +53,6 @@ Mims ENDOR sequence with ideal electron pulses. Syntax: endor_spec=endor_mims_id
 
 ## Implementation structure
 
-- Mims ENDOR sequence with ideal electron pulses. Syntax:
-- endor_spec=endor_mims_ideal(spin_system,parameters,H,R,K)
-- parameters.spins -working spins, normally {'E'}; spe-
-- cify multiplicity if electron spin
-- is not 1/2, for example {'7E'} for
-- gadolinium
-- parameters.electrons -a vector of integers specifying
-- which spins in sys.isotopes are
-- electrons
-- parameters.tau -the delay between the first two
-- 90-degree pulses of the Mims
-- ENDOR sequence, seconds; 200e-9
+
+- Converts to the adjoint representation when needed and checks dimensions, Liouville formalism, and parameter shapes before constructing pulse operators.
+- Builds electron and gyromagnetic-ratio-weighted nuclear operators, applies the pulse-delay sequence, and returns the detected response.

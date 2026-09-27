@@ -4,38 +4,24 @@
 
 ## Purpose
 
-Converts hyperfine coupling tensors and susceptibility tensors into pseudocontact shifts (contact component is not included) using Equa- tion 10 from http://dx.doi.org/10.1039/C4CP03106G. Syntax: [pcs,pcs_tensor]=hfc2pcs(A,chi,isotope)
-
-## Physical / mathematical content
-
-- Paramagnetic-pseudocontact inference routines. The mathematics includes inverse problems, tensor parameterisation, interpolation, and regularisation.
-
-## Numerical / algorithmic content
+Converts a hyperfine coupling tensor and magnetic susceptibility tensor to the pseudocontact shift tensor and its isotropic part, excluding the contact contribution, according to Equation 10 of [10.1039/C4CP03106G](https://doi.org/10.1039/C4CP03106G).
 
 ## Parameters / inputs
 
-- A -hyperfine coupling tensor, Gauss
-- chi -magnetic susceptibility tensor, Angstrom^3
-- isotope -isotope i.e. '1H'
+- `A` — real symmetric 3-by-3 hyperfine coupling tensor in Gauss, normalised per unpaired electron in the `S*A*I` convention (as returned by `gparse.m`).
+- `chi` — real symmetric 3-by-3 magnetic susceptibility tensor in Å^3.
+- `isotope` — isotope label as a character string, for example `'1H'`.
 
 ## Outputs
 
-- pcs -isotropic pseudocontact shift, ppm
-- pcs_tensor -pseudocontact shift tensor, ppm
-- Note: Gauss units are used for hyperfine couplings because they do
-- not depend on the electron g-tensor.
+- `pcs_tensor` — pseudocontact shift tensor in ppm.
+- `pcs` — isotropic pseudocontact shift in ppm, calculated as `trace(pcs_tensor)/3`.
 
-## Implementation structure
+## Method
 
-- Converts hyperfine coupling tensors and susceptibility tensors into
-- pseudocontact shifts (contact component is not included) using Equa-
-- tion 10 from http://dx.doi.org/10.1039/C4CP03106G. Syntax:
-- [pcs,pcs_tensor]=hfc2pcs(A,chi,isotope)
-- A -hyperfine coupling tensor, Gauss
-- chi -magnetic susceptibility tensor, Angstrom^3
-- isotope -isotope i.e. '1H'
-- pcs -isotropic pseudocontact shift, ppm
-- pcs_tensor -pseudocontact shift tensor, ppm
-- Note: Gauss units are used for hyperfine couplings because they do
-- not depend on the electron g-tensor.
-- Check consistency
+The routine keeps only the rank-2 components of `A` and `chi`, obtains the nuclear gyromagnetic ratio from `spin(isotope)`, and evaluates the full shift tensor using the fundamental-constant factor in Equation 10. It then takes one third of the tensor trace for the isotropic shift. Inputs are checked for real symmetric 3-by-3 tensors and a character-string isotope label.
+
+## References
+
+- [10.1039/C4CP03106G](https://doi.org/10.1039/C4CP03106G)
+- [Spin Dynamics Wiki: hfc2pcs.m](https://spindynamics.org/wiki/index.php?title=hfc2pcs.m)

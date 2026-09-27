@@ -4,55 +4,46 @@
 
 ## Purpose
 
-PSYCHE pure-shift NMR pulse sequence. Syntax: fid=psyche_1d(spin_system,parameters,H,R,K,G,F)
-
-## Physical / mathematical content
-
-- SPEN experiment implementations. These files combine shaped pulses, gradients, spatial encoding, and often diffusion-aware propagation.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+PSYCHE pure-shift NMR pulse sequence that returns a two-dimensional free induction decay.
 
 ## Parameters / inputs
 
-- parameters.rho0 initial state
-- parameters.coil detection state
-- parameters.spins nuclei on which the sequence runs
-- parameters.g_amp gradient amplitude (T/m)
-- parameters.dims size of the sample (m)
-- parameters.npts number of discretization points in the grid
-- parameters.sweep spectral range (Hz)
-- parameters.npoints number of points in the sweep
-- parameters.zerofill number of points for the zero filling
-- parameters.diff diffusion constant (m^2/s)
-- H Fokker-Planck Hamiltonian, received
-- from the imaging context
-- R Fokker-Planck relaxation superoperator,
-- received from the imaging context
-- K Fokker-Planck kinetics superoperator,
-- received from the imaging context
-- G Fokker-Planck gradient superoperators,
-- received from the imaging context
-- F Fokker-Planck diffusion and flow super-
-- operator, received from the context
+- `parameters.rho0`: initial state.
+- `parameters.coil`: detection state.
+- `parameters.spins`: nuclei on which the sequence runs; a one-element cell array.
+- `parameters.g_amp`: gradient amplitude (T/m).
+- `parameters.dims`: sample size (m).
+- `parameters.npts`: number of spatial grid discretisation points.
+- `parameters.npoints`: two-element point-count vector `[F1 F2]`.
+- `parameters.diff`: diffusion constant (m^2/s).
+- `parameters.delta`: gradient evolution delay on either side of the hard 180-degree pulse (s).
+- `parameters.timestep1`, `parameters.timestep2`: F1 and F2 evolution time steps (s).
+- `parameters.pulsenpoints`: number of chirp waveform discretisation points.
+- `parameters.duration`: duration of each PSYCHE chirp pulse (s).
+- `parameters.bandwidth`: chirp sweep bandwidth around zero frequency (Hz).
+- `parameters.smfactor`: chirp smoothing parameter; see `chirp_pulse.m`.
+- `parameters.chirptype`: chirp waveform type; see `chirp_pulse.m`.
+- `parameters.beta`: PSYCHE-element flip angle (degrees).
+- `H`, `R`, `K`: Fokker–Planck Hamiltonian, relaxation superoperator, and kinetics superoperator, respectively, from the imaging context.
+- `G`: three Fokker–Planck gradient superoperators from the imaging context.
+- `F`: Fokker–Planck diffusion and flow superoperator from the context.
 
-## Outputs
+## Physical / numerical content
 
-- fid -a PSYCHE free induction decay as a 2D array
+The sequence forms `L=H+F+1i*R+1i*K` and constructs spatially extended `Lx` and `Ly` pulse operators. It generates a chirp waveform with `chirp_pulse`, calculates its RF amplitude from `beta` using a separate formula for `chirptype='saltire'`, normalises the waveform, and scales both quadratures by `2*pi*rfbeta`.
 
-## Implementation structure
+A hard 90-degree pulse precedes the first half of F1 evolution. The sequence selects `+1` coherence, evolves for `delta` under `L+g_amp*G{1}`, applies a hard 180-degree pulse, and repeats that gradient evolution. It then selects `-1` coherence, applies the first gradient-assisted chirp with quadratures `{Cx,+Cy}`, selects `0` coherence, applies the second chirp with `{Cx,-Cy}`, and selects `+1` coherence. Each chirp is propagated with `shaped_pulse_xy` using `expv-pwc`. Refocused second-half F1 evolution is followed by F2 observable evolution using `parameters.coil`.
 
-- PSYCHE pure-shift NMR pulse sequence. Syntax:
-- fid=psyche_1d(spin_system,parameters,H,R,K,G,F)
-- parameters.rho0 initial state
-- parameters.coil detection state
-- parameters.spins nuclei on which the sequence runs
-- parameters.g_amp gradient amplitude (T/m)
-- parameters.dims size of the sample (m)
-- parameters.npts number of discretization points in the grid
-- parameters.sweep spectral range (Hz)
-- parameters.npoints number of points in the sweep
-- parameters.zerofill number of points for the zero filling
-- parameters.diff diffusion constant (m^2/s)
+## Output
+
+- `fid`: PSYCHE free induction decay as a 2D array.
+
+## Consistency checks
+
+Requires `sphten-liouv` formalism; matching-dimension numeric matrices `H`, `R`, `K`, and `F`; and a three-element cell array of numeric gradient operators `G`. Initial and detection states must be numeric column vectors matching `H`. `npoints` contains two integers greater than one; `npts` and `pulsenpoints` are positive integers. `dims`, `duration`, `bandwidth`, `timestep1`, and `timestep2` are positive finite real scalars; `diff` and `delta` are non-negative finite real scalars; `g_amp`, `smfactor`, and `beta` are finite real scalars. Supported `chirptype` values are `wurst`, `wurst-adaptive`, `smoothed`, `smoothed-adaptive`, `saltire`, and `saltire-adaptive`.
+
+## Source attribution
+
+- mohammadali.foroozandeh@chem.ox.ac.uk
+- mariagrazia.concilio@sjtu.edu.cn
+- <https://spindynamics.org/wiki/index.php?title=psyche.m>

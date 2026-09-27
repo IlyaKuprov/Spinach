@@ -4,58 +4,27 @@
 
 ## Purpose
 
-Multiple quantum correlation pulse sequence with refocusing, as described in:
+Two-dimensional multiple-quantum correlation with refocusing. The source cites [10.1063/1.432450](https://doi.org/10.1063/1.432450) and [10.1016/0022-2364(80)90096-7](https://doi.org/10.1016/0022-2364(80)90096-7).
 
-## Physical / mathematical content
+## Sequence and output
 
-- Liquid-state pulse sequence implementations. These are production experiment kernels that carry out coherence transfer, mixing, refocusing, decoupling, and indirect evolution on precomputed Hamiltonian/relaxation/kinetics operators.
+The routine forms `L = H + 1i*R + 1i*K`, applies an initial 90° pulse, evolves for `parameters.delay_1`, applies a 180° refocusing pulse, then evolves for `parameters.delay_1` again. It selects the first requested coherence order, records the F1 trajectory, applies the final pulse of angle `parameters.angle`, and selects the second requested order. A `parameters.delay_2` period is followed by a 180° refocusing pulse and another `parameters.delay_2` period before F2 acquisition.
 
-## Numerical / algorithmic content
+- Output: `fid`, a two-dimensional free-induction decay for amplitude-mode processing.
+- In practice this implementation is homonuclear and uses exact analytical coherence-order projection rather than an explicit phase cycle.
+- It requires the `sphten-liouv` formalism.
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+## Inputs
 
-## Syntax
+- `parameters.sweep`: two sweep widths in Hz, ordered [F1 F2].
+- `parameters.npoints`: two point counts, ordered [F1 F2].
+- `parameters.spins`: two spin labels; the documented example is `{'1H','1H'}`.
+- `parameters.angle`: final-pulse flip angle in radians.
+- `parameters.mqorder`: two integer coherence orders.
+- `parameters.delay_1`, `parameters.delay_2`: evolution delays in seconds.
+- `parameters.rho0`: initial state; `parameters.coil`: detection state.
+- `H`, `R`, and `K`: Hamiltonian, relaxation, and kinetics superoperators supplied by the context function; they must be matrices of matching dimensions.
 
-```matlab
-fid=mqs_refocus(spin_system,parameters,H,R,K)
-```
+## Reference link
 
-## Parameters / inputs
-
-- parameters.sweep [F1 F2] sweep widths (Hz)
-- parameters.npoints [F1 F2] numbers of fid points
-- parameters.spins {F1 F2} nuclei, in this case:
-- {'1H','1H'}
-- parameters.angle flip angle for the final
-- pulse, radians
-- parameters.mqorder coherence orders to select,
-- a two-element integer array
-- parameters.delay_1 first evolution delay, seconds
-- parameters.delay_2 second evolution delay, seconds
-- parameters.rho0 initial state
-- parameters.coil detection state
-- H -Hamiltonian superoperator, provided by the context function
-- R -relaxation superoperator, provided by the context function
-- K -kinetics superoperator, provided by the context function
-
-## Outputs
-
-- fid -2D free induction decay for amplitude-mode processing
-- Note: this implementation is homonuclear in practice and uses
-- exact analytical coherence-order projection rather than an
-- explicit phase cycle.
-
-## Implementation structure
-
-- Multiple quantum correlation pulse sequence with refocusing,
-- as described in:
-- fid=mqs_refocus(spin_system,parameters,H,R,K)
-- parameters.sweep [F1 F2] sweep widths (Hz)
-- parameters.npoints [F1 F2] numbers of fid points
-- parameters.spins {F1 F2} nuclei, in this case:
-- {'1H','1H'}
-- parameters.angle flip angle for the final
-- pulse, radians
-- parameters.mqorder coherence orders to select,
-- a two-element integer array
-- parameters.delay_1 first evolution delay, seconds
+[Spinach Wiki: mqs_refocus.m](https://spindynamics.org/wiki/index.php?title=mqs_refocus.m)

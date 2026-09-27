@@ -4,20 +4,15 @@
 
 ## Purpose
 
-Pulse diagnostics for the three-pulse DEER/PELDOR pulse sequen- ce. This function shows how soft pulses affect the magnetisati- on of the sample. It is a hypothetical experiment where a soft pulse specified by the user is performed, immediately followed by an ideal pi/2 pulse on all spins followed by infinite-band- width time-domain detection. Syntax: fids=deer_3p_soft_hole(spin_system,parameters,H,R,K)
+Computes pulse diagnostics for the three-pulse DEER/PELDOR sequence. It evaluates each specified soft pulse from `parameters.rho0`, applies a common ideal `pi/2` hard pulse about `Ey` to the reference and three responses, then acquires the four FIDs.
 
 ## Physical / mathematical content
 
-- Dipolar ESR experiment implementations. The pulse logic resolves dipolar couplings by echo modulation, with selective excitation and time-domain accumulation.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+The function converts to Liouville representation as needed and forms `L = H + 1i*R + 1i*K`. Each response is generated with `shaped_pulse_af` using its pulse frequency, power, duration, phase, Fokker–Planck rank, and selected method, followed by time-domain acquisition with `acquire`.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+The returned FIDs are intended for pulse diagnostics; the source recommends apodising and Fourier transforming them. This routine does not calculate the DEER echo stack.
 
 ## Parameters / inputs
 
@@ -56,18 +51,3 @@ Pulse diagnostics for the three-pulse DEER/PELDOR pulse sequen- ce. This functio
 - Note: for the method, start with 'expm', change to 'expv' if the
 - calculation runs out of memory, and use 'evolution' as the
 - last resort.
-
-## Implementation structure
-
-- Pulse diagnostics for the three-pulse DEER/PELDOR pulse sequen-
-- ce. This function shows how soft pulses affect the magnetisati-
-- on of the sample. It is a hypothetical experiment where a soft
-- pulse specified by the user is performed, immediately followed
-- by an ideal pi/2 pulse on all spins followed by infinite-band-
-- width time-domain detection. Syntax:
-- fids=deer_3p_soft_hole(spin_system,parameters,H,R,K)
-- parameters.pulse_frq -frequencies for the three
-- pulses, Hz
-- parameters.pulse_pwr -power levels for the three
-- pulses, rad/s
-- parameters.pulse_dur -durations for the three

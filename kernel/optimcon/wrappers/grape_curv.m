@@ -8,7 +8,7 @@
 % Parameters:
 %
 %   waveform_u   -  pulse waveform in curvilinear coordinates with indi-
-%                   vidual coordinates in columns and time in rows
+%                   vidual coordinates in rows and time in columns
 %
 %   u2x          -  a handle to a function that takes a column of curvi-
 %                   linear coordinates and returns a column of coeffici-
@@ -38,7 +38,9 @@
 %                   ent is returned as an array separating penalty gra-
 %                   dients from the fidelity gradient.
 %
-% Note: penalities are computed using the rectilinear representation.
+% Note: penalties are computed using the rectilinear representation.
+%       control.freeze must match waveform_u; frozen gradient entries
+%       are zeroed after the coordinate pullback, including penalties.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -46,8 +48,12 @@
 
 function [traj_data,fidelity,df_du]=grape_curv(waveform_u,u2x,...
                                                dx_du,spin_system)
+
 % Check consistency
 grumble(waveform_u,u2x,dx_du,spin_system);
+
+% Reserve the curvilinear mask for the outer coordinate pullback
+freeze=spin_system.control.freeze; spin_system.control.freeze=[];
 
 % Count rectilinear and curvilinear coordinates
 size_x=spin_system.control.ncontrols; 
@@ -88,7 +94,10 @@ switch nargout
                 df_du(:,k,n)=dx_du(waveform_u(:,k))*df_dx(:,k,n);
                 
             end
-            
+
+            % Freeze only after all Cartesian contributions have been collected
+            grad_u=df_du(:,:,n); grad_u(freeze)=0; df_du(:,:,n)=grad_u;
+
         end
        
     otherwise
@@ -111,6 +120,14 @@ end
 if (~isnumeric(waveform_u))||(~isreal(waveform_u))
     error('waveform_u must be an array of real numbers.');
 end
+if ~isempty(spin_system.control.freeze)
+    if ~isequal(size(spin_system.control.freeze),size(waveform_u))
+        error('control.freeze must have the same dimensions as waveform_u.');
+    end
+    if ~isempty(spin_system.control.basis)
+        error('control.freeze cannot be combined with control.basis.');
+    end
+end
 end
 
 % The worst case of unintended consequences IK has ever had was a paper, submitted
@@ -121,5 +138,6 @@ end
 % his editor hat on, IK took the same position as the Reviewers and made the accep-
 % tance conditional on the authors providing some evidence that the contrast agent
 % did not accumulate in the organism. Two weeks later, a revised version of the pa-
-% per turned up... the authors killed the dog and ran its tissues through ICP-MS. 
+% per turned up... the authors killed the dog and ran its tissues through ICP-MS.
+
 

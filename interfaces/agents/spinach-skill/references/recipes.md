@@ -426,7 +426,14 @@ evaluates its own block of ensemble cases in `ens_block`. The pool must have
 one with the same number of workers, and refuses a call from inside a worker:
 keep the same pool object from `optimcon` through `fmaxnewton` and any later
 `ensemble` evaluation, and re-run `optimcon` after deleting or restarting the
-pool. Sweeping `pwr_levels` and `offsets` makes B1 inhomogeneity and
+pool. `control.freeze` masks input-waveform coordinates after the full distortion,
+phase, and power derivative pullback; frozen fidelity-gradient entries and
+supported Hessian rows and columns are zero (distortion Hessians remain
+unavailable). For `grape_curv`, the mask has exactly the shape of the input
+curvilinear waveform, with coordinates in rows and time samples in columns;
+it is applied after the user-supplied Jacobian pullback, not to intermediate
+Cartesian controls. This also masks the pulled-back penalty gradients.
+Sweeping `pwr_levels` and `offsets` makes B1 inhomogeneity and
 transmitter misplacement part of the optimisation target rather than something
 discovered afterwards. Verify by propagating with `shaped_pulse_xy` and taking
 `real(rho_targ'*rho)`. The `features_*.m` files demonstrate one concept each
@@ -435,6 +442,14 @@ keyholes, multiple targets, phase cycling, wave bases); solid-state control is
 `static_powder_control.m` and `mas_powder_control.m`. Analytically designed
 rather than optimised pulses are propagated in
 `shaped_pulses/shaped_pulse_gaussian.m` and its chirp, Q5 and SLR siblings.
+In `zeeman-hilb`, the third output of `shaped_pulse_xy` is the one-sided
+ordered propagator for every method: reuse it as `P*rho*P'`, not `P*rho`;
+requesting it leaves the chosen two-sided state-propagation method unchanged.
+The registered `kernel/hilb_pulse_prop` regression covers all six choices,
+including dimension-512 sparse/full CPU controls and GPU checks that explicitly
+skip when no usable GPU is present. All six dense GPU methods are tested; sparse
+GPU methods requiring scalar division are skipped only when a direct MATLAB
+capability probe finds that operation unavailable. Such a skip is not a pass.
 
 Optimal control of a quadrupolar nucleus under MAS in Hilbert space is the
 `case_studies/Smelko_ChemRxiv_2026` folder (27Al 3QMAS and 5QMAS excitation,

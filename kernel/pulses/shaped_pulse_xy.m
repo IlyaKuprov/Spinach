@@ -123,7 +123,11 @@ switch method(1:4)
 
                     % Update the propagator
                     if nargout>2
-                        P=step(spin_system,slice_oper,P,slice_durs(n));
+                        if strcmp(spin_system.bas.formalism,'zeeman-hilb')
+                            P=propagator(spin_system,slice_oper,slice_durs(n))*P;
+                        else
+                            P=step(spin_system,slice_oper,P,slice_durs(n));
+                        end
                         P=clean_up(spin_system,P,spin_system.tols.prop_chop);
                     end
 
@@ -144,7 +148,12 @@ switch method(1:4)
 
                     % Update pulse propagator
                     if nargout>2
-                        P=step(spin_system,{slice_oper_l,slice_oper_r},P,slice_durs(n));
+                        if strcmp(spin_system.bas.formalism,'zeeman-hilb')
+                            slice_oper=isergen(slice_oper_l,[],slice_oper_r,slice_durs(n));
+                            P=propagator(spin_system,slice_oper,slice_durs(n))*P;
+                        else
+                            P=step(spin_system,{slice_oper_l,slice_oper_r},P,slice_durs(n));
+                        end
                         P=clean_up(spin_system,P,spin_system.tols.prop_chop);
                     end
 
@@ -307,7 +316,11 @@ switch method(1:4)
 
             % Update pulse propagator
             if nargout>2
-                P=evolution(spin_system,slice_oper,[],P,slice_durs(n),1,'final');
+                if strcmp(spin_system.bas.formalism,'zeeman-hilb')
+                    P=propagator(spin_system,slice_oper,slice_durs(n))*P;
+                else
+                    P=evolution(spin_system,slice_oper,[],P,slice_durs(n),1,'final');
+                end
                 P=clean_up(spin_system,P,spin_system.tols.prop_chop);
             end
 

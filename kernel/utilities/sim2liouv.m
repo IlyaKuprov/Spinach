@@ -21,7 +21,7 @@
 %                   (matrices or their horizontal concatena-
 %                   tions) are stretched into state vectors,
 %                   and the operator-like fields pulse_op,
-%                   mw_oper, and ez_oper are converted into
+%                   mw_oper, ez_oper, and homodec_oper become
 %                   commutation superoperators, when present
 %
 %    H            - Hamiltonian operator, converted into a
@@ -111,9 +111,17 @@ if strcmp(spin_system.bas.formalism,'zeeman-hilb')
     if isfield(parameters,'ez_oper')
         parameters.ez_oper=hilb2liouv(parameters.ez_oper,'comm');
     end
+    if isfield(parameters,'homodec_oper')
+        parameters.homodec_oper=hilb2liouv(parameters.homodec_oper,'comm');
+    end
 
     % Rebuild the basis index table for the Liouville space
     spin_system.bas.basis=[repmat(zbas,[hdim 1]) kron(zbas,ones(hdim,1))];
+
+    % Refresh existing cache identity using the canonical basis hash
+    if isfield(spin_system.bas,'basis_hash')
+        spin_system.bas.basis_hash=md5_hash(spin_system.bas.basis);
+    end
 
     % Migrate the irreps into the adjoint representation
     if isfield(spin_system.bas,'irrep')

@@ -13,6 +13,8 @@ Moves a zeeman-hilb simulation context into Liouville space. When the formalism 
 
 ## Numerical / algorithmic content
 
+- Existing basis cache metadata is refreshed from the converted basis table using the canonical `md5_hash` rule, keeping Hilbert operators and Hamiltonians separate from their Liouville representations. Objects without cache metadata gain none, and non-Hilbert inputs remain unchanged.
+
 - The unit state exemption is the symmetric projection `R=R-U*(U'*R)-(R*U)*U'+U*(U'*R*U)*U'` with `U=unit_state(spin_system)` taken after the formalism switch, i.e. the normalised stretched unit matrix; it is exact for any relaxation matrix, scalar or not, and leaves R Hermitian when R is Hermitian.
 - With symmetry, the migrated irrep table has `n_irreps^2-n_irreps+1` entries: the first holds all diagonal irrep pairs `kron(conj(S(n)),S(n))` side by side (dimension is the sum of the squared irrep dimensions), the rest are the off-diagonal pairs. The unit state lives entirely in the first entry, so the projection does not leak between reduction blocks, and population contrasts between irreps are damped exactly as in the native zeeman-liouv damp operator.
 

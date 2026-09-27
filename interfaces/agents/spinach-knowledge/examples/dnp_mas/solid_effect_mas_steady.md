@@ -4,28 +4,8 @@
 
 ## Purpose
 
-A MAS DNP simulation performed as described in Fred Mentink- Vigier's paper (Spinach rotation conventions are different): Steady state rotor period simulation for a single crystal, computed using Newton-Raphson steady state solver. Calculation time: seconds
+Finds the steady state of a single-crystal solid-effect DNP system over one MAS rotor period, then analyses its level-population trajectory and proton enhancement. The example follows Fred Mentink-Vigier et al. (Spinach rotation conventions differ; [paper](https://doi.org/10.1016/j.jmr.2015.07.001)); the source estimates seconds to run.
 
-## Physical / mathematical content
+## Model and calculation
 
-- MAS DNP examples. These files model microwave-driven electron-nuclear polarisation transfer under magic-angle spinning, combining rotor-synchronised anisotropic interactions, relaxation, microwave irradiation, and powder/rotor averaging.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Implementation structure
-
-- A MAS DNP simulation performed as described in Fred Mentink-
-- Vigier's paper (Spinach rotation conventions are different):
-- Steady state rotor period simulation for a single crystal,
-- computed using Newton-Raphson steady state solver.
-- Calculation time: seconds
-- Magnet field
-- Spin specification
-- Interactions
-- Relaxation parameters
-- Basis set
-- Spinach housekeeping
-- Stack generation parameters
+The model is an electron–`^1H` pair at 9.403 T with the specified anisotropic electron g tensor and 3.00 Å separation. It uses Weizmann relaxation at 100 K, DiBari equilibrium, secular relaxation retention, and a full sphten-Liouville basis. An ESR rotor stack (12.5 kHz MAS, rank limit 3000) is formed about `[sqrt(2/3) 0 sqrt(1/3)]`. With 0.85 MHz microwave power and −400 MHz offset, the code composes one-period propagator `P`, finds `rho_st=steady(...,'newton')`, steps that state through the rotor period, and calls `trajan` for level populations. It reports the proton `Lz` expectation relative to thermal equilibrium as the enhancement factor. This is a single-crystal calculation, not a powder average.

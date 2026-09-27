@@ -4,16 +4,16 @@
 
 ## Purpose
 
-X-band pulsed ESR spectrum of perfluoropyrene cation radical, computed using brute force operator algebra in the full 4,194,304 -dimensional Liouville space. This is deliberate -a much faster calculation is, of course, possible with a restricted basis set. This calculation requires at least 64GB of RAM and illustrates the per- formance of trajectory-level state space restriction in Spinach. Calculation time: minutes
+X-band pulsed ESR spectrum of perfluoropyrene cation radical, computed using brute-force operator algebra in the full 4,194,304-dimensional Liouville space. This is deliberate—a much faster calculation is possible with a restricted basis set. The calculation requires at least 64 GB of RAM and illustrates the performance of trajectory-level state-space restriction in Spinach. Calculation time: minutes
 
 ## Physical / mathematical content
 
-- Extreme-regime examples. These scripts exercise Spinach in unusually large, stiff, high-field, low-field, or otherwise numerically demanding regimes where approximations, conditioning, and basis-size control are central.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The example computes the X-band pulsed ESR spectrum of the perfluoropyrene cation radical in a 4,194,304-dimensional Liouville space; the full-space calculation is retained deliberately to demonstrate trajectory-level state-space restriction.
+- The detected time-domain signal is apodised and Fourier-transformed to produce the ESR spectrum.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- The script propagates the pulsed ESR signal in the full Liouville space, applies apodisation, and uses an FFT for the plotted spectrum.
 
 ## Implementation structure
 

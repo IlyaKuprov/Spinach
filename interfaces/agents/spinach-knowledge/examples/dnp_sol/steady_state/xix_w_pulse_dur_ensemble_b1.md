@@ -8,23 +8,14 @@
 
 ## Physical / mathematical content
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+- Models an electron–proton pair at 3.4 T and 80 K, separated by 3.5 Å, with specified electron g-tensor and proton Zeeman shifts. Uses `t1_t2` relaxation, including an orientation-dependent proton R1 rate, and detects the proton Lz expectation value. The XiX sequence uses a phase-inverted second pulse.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- Samples five electron B1 values from 10 to 20 MHz with Gaussian-Legendre weights. For each B1 value, a `parfor` loop scans 200 pulse durations from 2 to 21 ns; each steady-state calculation uses ESR powder averaging over the specified spherical grid and 101 electron offsets from −230 to 205 MHz. The results are weighted over the B1 ensemble before plotting.
 
 ## Implementation structure
 
-- 2D parameter scan of XiX DNP in the steady state with
-- electron Rabi frequency ensemble.
-- Calculation time: hours.
-- W-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Cartesian coordinates
-- Get electron-nuclear distance
-- Basis set
-- Propagator accuracy
-- Algorithmic options
+- Sets the W-band field, electron and proton interactions, temperature, coordinates, spherical-tensor Liouville-space basis, and propagator tolerance.
+- Constructs the spin system and proton detection operator, then sets the XiX experiment parameters, including pulse phase, offset grid, loop count, and shot spacing.
+- Calls `powder` with `@xixdnp_steady` for each B1 value and pulse duration; plots the real proton expectation value against microwave offset and pulse duration, then saves `xix_w_pulse_dur_ensemble_b1.fig`.

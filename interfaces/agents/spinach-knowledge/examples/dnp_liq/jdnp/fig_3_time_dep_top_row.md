@@ -1,31 +1,13 @@
 # examples/dnp_liq/jdnp/fig_3_time_dep_top_row.m
 
 - Signature: `fig_3_time_dep_top_row()`
+- Reference: [Physical Chemistry Chemical Physics, DOI: 10.1039/D1CP04186J](https://doi.org/10.1039/d1cp04186j)
+- Calculation time: seconds (per source comment)
 
 ## Purpose
 
-A demonstration that the JDNP effect vanishes when the second electron is removed from the system. Proton polarisation as a function of time for specific external fields is plotted. See also the "bot row" simulation where both electrons are active and the JDNP enhancement is present. Further details in: Calculation time: seconds, line-by-line plotting
+Provides the top-row comparison for the JDNP time traces by reducing the `system_specification()` model to the proton and one electron. The source describes this as a demonstration that the JDNP effect vanishes when the second electron is removed; the paired bottom-row script retains both electrons.
 
-## Physical / mathematical content
+## Calculation
 
-- Liquid-state DNP examples. The main ingredients are electron-nuclear cross-relaxation, scalar or dipolar contact mechanisms, motional spectral densities, and field/frequency dependence of polarisation transfer.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Implementation structure
-
-- A demonstration that the JDNP effect vanishes when the second
-- electron is removed from the system. Proton polarisation as a
-- function of time for specific external fields is plotted. See
-- also the "bot row" simulation where both electrons are active
-- and the JDNP enhancement is present. Further details in:
-- Calculation time: seconds, line-by-line plotting
-- Load the spin system
-- Kill the second electron
-- Experiment parameters
-- Magnetic field grid, Tesla
-- Get a figure going
-- Loop over the fields
+The script keeps the first two isotopes, Zeeman matrices, and coordinates, replaces the scalar-coupling array with a zero-filled 2-by-2 cell array, removes the listed SRFK fields, and selects Redfield relaxation. It calculates proton (L_z) trajectories at 0.034, 0.34, and 3.4 T. At each field it sets the microwave offset from the trityl–free-electron frequency difference, propagates the thermal-equilibrium state under the ESR Hamiltonian, microwave drive, offset, and relaxation superoperator for 300 ms, and normalizes the signal by its proton equilibrium expectation value. The time step is 1 ms; each trajectory is plotted in its own field panel.

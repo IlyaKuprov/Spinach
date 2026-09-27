@@ -4,27 +4,10 @@
 
 ## Purpose
 
-Gadolinium(III) DEER echo experiment. The calculation is done by brute-force time propagation and powder averaging. Outermost ZFS transition is excited by the probe pulse and the central transi- tion is excited by the pump pulse. Pulses are assumed to be hard. Note: gadolinium spin echo is very sharp and difficult to catch in simulations because they do not include zero-field splitting distributions found in experime
+Calculates a three-pulse DEER echo for two Gd(III) centres. The outermost ZFS transition is excited by the probe pulse and the central transition by the pump pulse; the pulses are treated as hard. The calculation uses brute-force time propagation and powder averaging.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
+The pair is modelled at 3.5 T with axial ZFS tensors of magnitude `D = 0.56 GHz`, different tensor orientations, and a 29.5 Å separation. The pulse delays are 2 µs, 1 µs, and 50 ns; the trace has 500 steps and is averaged over a 1,600-point spherical grid. The script plots the imaginary echo as a function of time in microseconds.
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Gadolinium(III) DEER echo experiment. The calculation is done by
-- brute-force time propagation and powder averaging. Outermost ZFS
-- transition is excited by the probe pulse and the central transi-
-- tion is excited by the pump pulse. Pulses are assumed to be hard.
-- Note: gadolinium spin echo is very sharp and difficult to catch in
-- simulations because they do not include zero-field splitting
-- distributions found in experimental systems.
-- Calculation time: seconds
-- Spin system properties
-- Basis set
-- Spinach housekeeping
-- Probe pulse operator
+The source cautions that the Gd echo is very sharp and that the simulation does not include the ZFS distributions found in experimental systems. Estimated calculation time: seconds.

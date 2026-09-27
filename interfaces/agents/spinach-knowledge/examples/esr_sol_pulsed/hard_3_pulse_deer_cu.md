@@ -4,28 +4,19 @@
 
 ## Purpose
 
-Three-pulse DEER on a Cu(II)-NO two electron system at X-band. The numerical calculation is done by brute-force time propaga- tion and numerical powder averaging in Liouville space, inclu- ding g-factor orientation effects on the dipolar coupling. The analytical calculation is done for isotropic parts of the electron g-factors. Calculation time: seconds
+Three-pulse DEER on a Cu(II)–NO two-electron system at X-band. The numerical calculation uses brute-force time propagation and powder averaging in Liouville space, including orientation effects of the electron g tensors on dipolar coupling. An analytical calculation uses the isotropic parts of the electron g tensors. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+- The electrons are at [0, 0, 0] and [20, 0, 0] in a 0.33 T magnetic field, with g eigenvalues [2.056, 2.056, 2.205] and [2.009, 2.006, 2.003].
+- The analytical dipolar coupling is calculated from the coordinates and scaled using the mean g-factor of each electron.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- The numerical sequence uses a 10 ns step, 50 steps, and the `rep_2ang_1600pts_sph` powder grid.
+- The analytical trace is `0.35*deer_analyt(D,0,time_axis)`.
 
 ## Implementation structure
 
-- Three-pulse DEER on a Cu(II)-NO two electron system at X-band.
-- The numerical calculation is done by brute-force time propaga-
-- tion and numerical powder averaging in Liouville space, inclu-
-- ding g-factor orientation effects on the dipolar coupling.
-- The analytical calculation is done for isotropic parts of the
-- electron g-factors.
-- Calculation time: seconds
-- Spin system parameters
-- Basis set
-- Disable trajectory level SSR algorithms
-- Spinach housekeeping
-- Sequence parameters
+- Create the spin system in the `sphten-liouv` basis without approximation, with trajectory-level SSR disabled.
+- Run `powder` with `@deer_3p_hard_deer` in the `deer` context, then plot the imaginary numerical trace beside the analytical result.

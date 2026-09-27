@@ -4,27 +4,10 @@
 
 ## Purpose
 
-DEER spin echo for a pair of nitroxide radicals at X-band. Two nit- roxide radicals are positioned at a distance of 25 Angstroms. The calculation is done by brute-force time propagation and numerical powder averaging in Liouville space. Nitroxide g-tensor data comes from http://dx.doi.org/10.1063/1.1697233 Calculation time: seconds
+Simulates a three-pulse DEER spin echo for two nitroxide radicals separated by 25 Å at X-band, using brute-force time propagation and numerical powder averaging.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
+The electron spins are simulated at 0.33 T with anisotropic nitroxide g tensors and the orientations given in the source. The calculation uses a Zeeman Hilbert-space basis and a 3,200-point spherical powder grid—not a Liouville-space basis. It evaluates the hard-echo sequence with delays of 1.0 µs, 0.5 µs, and 0.5 µs, using 256 steps, then plots the echo against time in microseconds. The source estimates a run time of seconds.
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- DEER spin echo for a pair of nitroxide radicals at X-band. Two nit-
-- roxide radicals are positioned at a distance of 25 Angstroms.
-- The calculation is done by brute-force time propagation and numerical
-- powder averaging in Liouville space. Nitroxide g-tensor data comes
-- from http://dx.doi.org/10.1063/1.1697233
-- Calculation time: seconds
-- Spin system properties
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Pulse sequence
-- Build the time axis
+Nitroxide g-tensor reference: http://dx.doi.org/10.1063/1.1697233

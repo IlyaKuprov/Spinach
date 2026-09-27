@@ -4,27 +4,18 @@
 
 ## Purpose
 
-2D parameter scan of a NOVEL DNP experiment. <I_z> on 1H after a 0.25 us contact time is calculated as a function of electron pul- se amplitude and offset. Further information in: Calculation time: minutes
+Computes a two-dimensional NOVEL DNP parameter scan: the proton (I_z) expectation value at the end of a 0.25 (mumathrm{s}) contact sequence as a function of electron-pulse nutation frequency and microwave resonance offset. The source cites [doi:10.1063/1.5000528](https://doi.org/10.1063/1.5000528) and estimates the calculation time as minutes.
 
 ## Physical / mathematical content
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+- The system is one electron and two protons at 0.34 T and 80 K, with the trityl-like electron g-tensor, proton Zeeman guesses, and coordinates specified in the companion NOVEL examples.
+- The calculation uses 250 steps of 1 ns, a `rep_2ang_100pts_sph` powder grid, and anisotropic equilibrium. For each nutation frequency it sets the pulse duration to a quarter cycle.
+- The scan covers 30 electron nutation frequencies from 1 to 30 MHz and 71 offsets from -35 to +35 MHz, shifted by the -3.3 MHz reference point. The output surface stores the real final-time proton (I_z) expectation value.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+Uses a full Zeeman-Hilbert basis and runs the `noveldnp` sequence through `powder` in ESR mode. A serial outer loop sets each nutation frequency and pulse duration; a `parfor` loop evaluates its microwave offsets. The result is updated as a 100-level filled contour plot with offset and nutation frequency axes.
 
 ## Implementation structure
 
-- 2D parameter scan of a NOVEL DNP experiment. <I_z> on 1H after a
-- 0.25 us contact time is calculated as a function of electron pul-
-- se amplitude and offset. Further information in:
-- Calculation time: minutes
-- X-band magnet
-- Electron and two protons
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Cartesian coordinates
-- Spin temperature
-- Hush the output
-- Basis set
-- Spinach housekeeping
+The function builds the electron/two-proton system and basis, configures proton detection and the NOVEL sequence, generates the offset and nutation-frequency axes, then nests the per-power setup around the parallel offset simulations. Each simulation contributes its final proton signal to the surface before the contour plot is refreshed.

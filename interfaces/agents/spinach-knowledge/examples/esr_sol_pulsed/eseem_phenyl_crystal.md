@@ -4,28 +4,19 @@
 
 ## Purpose
 
-Two-pulse X-band ESEEM spectrum of a phenyl radical at a specific orientation relative to the lab frame. Magnetic parameters taken from a DFT calculation. Ideal pulses are assumed. Calculation time: minutes
+Two-pulse X-band ESEEM spectrum of a phenyl radical at a specific orientation relative to the lab frame. Magnetic parameters are imported from a vacuum-DFT calculation. Ideal pulses are assumed. Calculation time: minutes.
 
 ## Physical / mathematical content
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Spin-system properties are imported from `../standard_systems/phenyl.log`, mapping the electron and hydrogen to `E` and `1H`.
+- The magnetic field is 0.33 T and the crystal orientation is `[pi/5 pi/4 pi/3]`; no powder averaging is performed.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- The simulation uses 512 points at a 10 ns timestep. The mean-subtracted signal receives Kaiser apodisation with parameter 6 before an FFT with 4096-point zero filling and `fftshift`.
+- The frequency axis uses an interpulse-delay increment of half the timestep.
 
 ## Implementation structure
 
-- Two-pulse X-band ESEEM spectrum of a phenyl radical at a specific
-- orientation relative to the lab frame. Magnetic parameters taken
-- from a DFT calculation. Ideal pulses are assumed.
-- Calculation time: minutes
-- Spin system properties (vacuum DFT calculation)
-- Magnet field
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
-- Plot the time domain signal
-- Crude apodization
+- Create the spin system in the `sphten-liouv` basis without approximation, then call `crystal` with `@eseem` in the `esr` context.
+- Plot the real time-domain signal and the magnitude spectrum.

@@ -4,27 +4,12 @@
 
 ## Purpose
 
-Simulation of XiX DNP repetition time scan in the steady state with distributions in microwave B1 field. Calculation time: minutes.
+Calculates the steady-state XiX DNP proton signal versus shot repetition time, averaged over a microwave B1 distribution. The source estimates a calculation time of minutes.
 
-## Physical / mathematical content
+## Physical and numerical setup
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The electron–proton pair is simulated at 80 K and 1.2142 T with a fixed 3.5 Å separation. Five Gauss–Legendre nodes sample electron nutation frequencies from 10 to 20 MHz. Thirty repetition times are logarithmically spaced from 10 μs to 1 ms. The pulse train uses 36 XiX blocks, 48 ns pulses, and a fixed microwave offset of −39 MHz.
 
-## Numerical / algorithmic content
+## Calculation and output
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Simulation of XiX DNP repetition time scan in the steady
-- state with distributions in microwave B1 field.
-- Calculation time: minutes.
-- Q-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Cartesian coordinates
-- Get electron-nuclear distance
-- Basis set
-- Propagator accuracy
-- Algorithmic options
+For each B1 node, the script runs the steady-state powder calculation over repetition times with MATLAB `parfor`. Shot spacing is the repetition time minus the total pulse-train duration; each result comes from `powder(...,@xixdnp_steady,...,'esr')`. It averages the signal using the B1 quadrature weights, plots the real proton (I_z) expectation against repetition time, and saves `xix_q_rep_time_ensemble_b1.fig`.

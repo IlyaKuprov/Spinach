@@ -8,12 +8,12 @@
 
 ## Physical / mathematical content
 
-- Extreme-regime examples. These scripts exercise Spinach in unusually large, stiff, high-field, low-field, or otherwise numerically demanding regimes where approximations, conditioning, and basis-size control are central.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The 31P NMR spectrum is calculated for a large, highly symmetric system containing two tert-butyl groups and phosphorus nuclei.
+- The script calculates a time-domain NMR free-induction decay and Fourier-transforms it to obtain the plotted spectrum.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- The script performs brute-force time-domain propagation in Hilbert space to calculate the FID and spectrum.
 
 ## Implementation structure
 

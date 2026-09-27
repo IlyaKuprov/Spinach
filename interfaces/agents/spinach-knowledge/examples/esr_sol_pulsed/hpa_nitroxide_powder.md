@@ -4,28 +4,12 @@
 
 ## Purpose
 
-Powder averaged pulse-acquire W-band Fourier ESR spectrum of nitroxide radical. An ideal pulse is assumed. Calculation time: seconds
+Simulates the powder-averaged pulse-acquire W-band ESR spectrum of an electron–¹⁴N nitroxide radical at 3.5 T. The script models acquisition and Fourier processing; it does not define an excitation pulse sequence. Calculation time: seconds.
 
-## Physical / mathematical content
+## Physical model
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The two-spin system contains an electron (E) and ¹⁴N. The electron g tensor and electron–nitrogen hyperfine tensor are anisotropic and include off-diagonal components. The spin system uses a secular diagonal relaxation model with a 5×10⁷ s⁻¹ damping rate and zero equilibrium state.
 
-## Numerical / algorithmic content
+## Simulation and processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Powder averaged pulse-acquire W-band Fourier ESR spectrum of
-- nitroxide radical. An ideal pulse is assumed.
-- Calculation time: seconds
-- Isotopes
-- Magnet field
-- Interactions
-- Relaxation theory
-- Basis set
-- Disable trajectory-level SSR algorithms
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
+The calculation uses the full-sphten Liouville-space basis without a basis approximation and disables trajectory-level SSR. The initial state and detection coil are both the electron `L+` operator. The acquisition uses a 1 GHz sweep, 128 points, an offset of −2×10⁸ (in the script's frequency units), and the `rep_2ang_6400pts_sph` powder grid; the spectrum axis is labelled in GHz in the lab frame and inverted. After powder averaging, the FID is apodised with `crisp`, zero-filled to 512 points, Fourier transformed, and the real spectrum is plotted.

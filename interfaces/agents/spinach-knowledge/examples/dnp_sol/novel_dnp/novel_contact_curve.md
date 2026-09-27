@@ -4,27 +4,18 @@
 
 ## Purpose
 
-The transformation of -E_z into I_z during the contact time of the NOVEL Solid Effect DNP experiment. Further information in: Calculation time: seconds
+Calculates the contact-time evolution for the NOVEL solid-effect DNP example, described in the source as the transformation of (-E_z) into (I_z). It plots the real proton (I_z) expectation value against contact time. Further information is cited at [doi:10.1063/1.5000528](https://doi.org/10.1063/1.5000528). The source estimates the calculation time as seconds.
 
 ## Physical / mathematical content
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+- The model has one electron and two protons at 0.34 T and 80 K. The electron g-tensor principal values are 2.00319, 2.00319, and 2.00258; the proton Zeeman values are zero with the source's stated ppm guesses.
+- The listed positions are ([0,0,0]), ([0,3.5,0]), and ([2.475,2.475,0]). The source uses a full Zeeman-Hilbert basis.
+- The NOVEL calculation uses an electron offset of -3.3 MHz, a 14.48 MHz electron pulse nutation frequency, 1 ns time steps, 2,400 steps, and the `rep_2ang_400pts_sph` powder grid.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+Creates and bases the Spinach system with `formalism='zeeman-hilb'` and `approximation='none'`; calls `powder` with the `noveldnp` callback in ESR mode; and plots the real part of the returned curve over the contact-time axis. The sequence is configured as a flip pulse and requests the anisotropic-equilibrium term.
 
 ## Implementation structure
 
-- The transformation of -E_z into I_z during the contact time of the
-- NOVEL Solid Effect DNP experiment. Further information in:
-- Calculation time: seconds
-- X-band magnet
-- Electron and two protons
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Cartesian coordinates
-- Spin temperature
-- Basis set
-- Spinach housekeeping
-- Detection state
-- Experiment parameters
+The function specifies the field, isotopes, anisotropic Zeeman parameters and orientations, coordinates, and temperature; builds the system and basis; sets proton detection and the NOVEL pulse, offset, time-step, and powder-grid parameters; runs the powder calculation; and plots the proton (I_z) signal against time.

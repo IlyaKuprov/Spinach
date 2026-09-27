@@ -8,12 +8,13 @@ Rapid scan ESR spectrum of a nitroxide radical. Calculation time: seconds
 
 ## Physical / mathematical content
 
-- Liquid-state ESR examples. The dominant physics is electron Zeeman interaction, hyperfine coupling, relaxation broadening, and pulse-acquire or ENDOR-type detection in fast tumbling systems.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+- The spin system contains `14N` and an electron, with an anisotropic electron Zeeman matrix and nitrogen–electron coupling matrix at a centre field of 3.5 T.
+- Relaxation uses the Redfield model with secular terms, a correlation time of `2e-11` s, and a temperature of 100 K.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- The simulation uses the `sphten-liouv` formalism without basis approximation. It creates the spin system, sets its basis, and calls `rapidscan` with microwave power `2*pi*1e3`, a sweep from `-0.011` to `-0.003`, 500 steps, and a `1e-8` s timestep.
+- The code plots the real part of the spectrum against magnetic induction.
 
 ## Implementation structure
 

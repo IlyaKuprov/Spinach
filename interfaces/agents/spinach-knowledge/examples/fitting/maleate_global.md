@@ -4,28 +4,16 @@
 
 ## Purpose
 
-Simultaneous fitting of 1H and 13C NMR spectra of a slightly asymmetric maleate diester. Calculation time: hours
+Simultaneously fits the 1H and 13C NMR spectra of a slightly asymmetric maleate diester. The source estimates a calculation time of hours.
 
-## Physical / mathematical content
+## Physical and mathematical content
 
-- Fitting examples. These files formulate parameter-estimation workflows in which simulated spectra or observables are matched to data, usually through nonlinear optimisation, residual construction, and physically constrained parameterisations.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+A shared parameter vector defines the spin-system model used to fit both experimental nuclei. The source loads and normalises the proton and carbon data separately, then evaluates both simulated spectra in a joint least-squares objective.
 
-## Numerical / algorithmic content
+## Numerical and algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The top-level function supplies an initial guess and optimiser options, minimises the combined spectral residual, and displays the fitted parameters. In the local error function, each trial vector is absorbed into a Spinach system; the two acquisitions are simulated, Fourier processed and aligned with their measured axes before their residuals are combined.
 
 ## Implementation structure
 
-- Simultaneous fitting of 1H and 13C NMR spectra of a slightly
-- asymmetric maleate diester.
-- Calculation time: hours
-- Load experimental data
-- Normalise the data
-- Set the guess
-- Set optimiser options
-- Run the optimisation
-- Display the result
-- Least squares error function
-- Silence Spinach
-- Absorb parameters
+The workflow proceeds from loading the two spectra to optimisation. The error function configures the spin system, basis and separate 1H/13C acquisition parameters, computes and processes both signals, plots theory against experiment, and returns the objective value.

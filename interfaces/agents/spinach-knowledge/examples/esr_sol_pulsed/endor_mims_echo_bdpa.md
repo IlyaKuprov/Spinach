@@ -4,27 +4,12 @@
 
 ## Purpose
 
-Stimulated echo stage of the Mims ENDOR pulse sequence on BDPA. The nuclear pulse is not applied, this is echo dia- gnostics stage. The echo gets sharper when g-tensor aniso- tropy is increased. Run time: seconds.
+Stimulated-echo stage of Mims ENDOR on BDPA, simulated without applying the nuclear pulse. The example plots the echo response over the interval from 0 to `2τ`, with `τ = 200 ns`.
 
 ## Physical / mathematical content
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
+- The source defines the electron–proton coupling matrices and uses a `sphten-liouv` basis without approximation.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Stimulated echo stage of the Mims ENDOR pulse sequence on
-- BDPA. The nuclear pulse is not applied, this is echo dia-
-- gnostics stage. The echo gets sharper when g-tensor aniso-
-- tropy is increased.
-- Run time: seconds.
-- Isotopes
-- Magnet field
-- Interactions
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
-- Simulation
+- The powder calculation uses a 400-point spherical grid and the `endor_mims_echo` sequence. The plotted quantity is the real echo intensity as a function of time.

@@ -4,28 +4,12 @@
 
 ## Purpose
 
-Powder-averaged HYSCORE on a 14N nitroxide radical. Time-domain simulation in Liouville space. Set to reproduce Figure 2a from Calculation time: seconds
+Time-domain Liouville-space simulation of powder-averaged HYSCORE for a ¹⁴N nitroxide at 0.350 T. The example is intended to reproduce Figure 2a of the paper cited at [doi:10.1080/00268979809483260](http://dx.doi.org/10.1080/00268979809483260). Calculation time: seconds.
 
-## Physical / mathematical content
+## Physical model
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The system contains ¹⁴N and an electron, with electron g = 2, isotropic electron–nitrogen hyperfine coupling of 5 MHz, and a nitrogen quadrupole interaction defined by `eeqq2nqi(2.4e6,0.5,1,[0 0 0])`. The simulation uses the full sphten Liouville-space basis without approximation; trajectory-level SSR and the colorbar are disabled.
 
-## Numerical / algorithmic content
+## Simulation and processing
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Powder-averaged HYSCORE on a 14N nitroxide radical. Time-domain
-- simulation in Liouville space. Set to reproduce Figure 2a from
-- Calculation time: seconds
-- Magnet field
-- System specification
-- Basis set
-- Disable trajectory-level SSR algorithms
-- Spinach housekeeping
-- Set the sequence parameters
-- Simulation
-- Centre signal suppression
-- Apodisation
+The initial state and detection operator are the electron `Lz` and `L+`, respectively. HYSCORE is calculated with `tau = 136 ns`, a 20 MHz sweep, 128 points in each dimension, and the `rep_2ang_800pts_sph` powder grid. The two-dimensional signal has its mean removed, is apodised with cosine windows in both dimensions, and is zero-filled to 256×256 before a 2D Fourier transform. The absolute spectrum is plotted with positive contours in MHz.

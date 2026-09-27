@@ -4,15 +4,15 @@
 
 ## Purpose
 
-Parallelization test: multi-threaded evaluation of observables in Hilbert space time propagation for pyrene radical spin system at low field. For further information, see:
+Parallelization test: multi-threaded evaluation of observables in Hilbert-space time propagation for a pyrene radical spin system at low field. For further information, see: http://dx.doi.org/10.1063/1.3679656
 
 ## Physical / mathematical content
 
-- Benchmark examples. These files stress-test Spinach performance, scaling, and numerical throughput on representative spin-dynamics workloads, so runtime, memory pressure, and solver/pathway choices are part of the intended content.
+- Models pyrene radical at 50 µT with one proton and two electron spins.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- Uses the Zeeman Hilbert-space formalism and lab-frame Hamiltonian; times a 200-step observable propagation while varying the parallel-pool size up to the available core count.
 
 ## Implementation structure
 

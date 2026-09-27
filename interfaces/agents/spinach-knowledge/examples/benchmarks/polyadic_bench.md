@@ -6,11 +6,9 @@
 
 A benchmark for the polyadic object.
 
-## Physical / mathematical content
-
-- Benchmark examples. These files stress-test Spinach performance, scaling, and numerical throughput on representative spin-dynamics workloads, so runtime, memory pressure, and solver/pathway choices are part of the intended content.
-
 ## Numerical / algorithmic content
+
+- Compares multiplication by three-factor polyadics with multiplication by their full or inflated matrix forms, for both full and sparse random complex factors. The benchmark reports mean runtimes and standard errors over 100 samples.
 
 ## Implementation structure
 

@@ -4,28 +4,10 @@
 
 ## Purpose
 
-A MAS DNP simulation performed as described in Fred Mentink- Vigier's paper (Spinach rotation conventions are different): Energy level diagram as a function of the rotor phase. Calculation time: milliseconds
+Plots the spin energy levels over one MAS rotor period for a single-crystal model associated with the cross-effect DNP example of [Mentink-Vigier et al.](http://dx.doi.org/10.1016/j.jmr.2015.07.001). The source notes that Spinach uses different rotation conventions from the paper; its stated runtime is milliseconds.
 
-## Physical / mathematical content
+## Physical and numerical setup
 
-- MAS DNP examples. These files model microwave-driven electron-nuclear polarisation transfer under magic-angle spinning, combining rotor-synchronised anisotropic interactions, relaxation, microwave irradiation, and powder/rotor averaging.
+The system has two electron spins and one proton at 9.394 T, with anisotropic electron g tensors and electron-electron and electron-proton couplings. It uses the complete Zeeman-Hilbert basis. A lab-frame rotor stack is generated at 12.5 kHz for the selected electron and proton spins, with the specified rotor axis, crystal orientation, and magnetic-frame MAS convention.
 
-## Numerical / algorithmic content
-
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- A MAS DNP simulation performed as described in Fred Mentink-
-- Vigier's paper (Spinach rotation conventions are different):
-- Energy level diagram as a function of the rotor phase.
-- Calculation time: milliseconds
-- Magnet field
-- Spin specification
-- Interactions
-- Basis set
-- Spinach housekeeping
-- Stack generation parameters
-- Stack generation
-- Stack diagonalization
+For each rotor-stack Hamiltonian, the code computes and sorts its real eigenvalues, converts them to GHz, and plots the lowest eight levels against time over one rotor period in three panels. The stack diagonalizations are run with `parfor`. This example is an energy-level analysis; it does not propagate a density operator or include relaxation or microwave-drive terms.

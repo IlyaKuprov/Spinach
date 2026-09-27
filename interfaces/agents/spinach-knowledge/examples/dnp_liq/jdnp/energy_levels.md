@@ -4,27 +4,8 @@
 
 ## Purpose
 
-Energy level diagram transition from the Zeeman limit to the exchange coupling limit in a two-electron system.
+Plots the two-electron energy levels as the exchange term is varied, illustrating the progression from Zeeman-dominated to exchange-dominated behaviour.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Liquid-state DNP examples. The main ingredients are electron-nuclear cross-relaxation, scalar or dipolar contact mechanisms, motional spectral densities, and field/frequency dependence of polarisation transfer.
-
-## Numerical / algorithmic content
-
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-
-## Implementation structure
-
-- Energy level diagram transition from the Zeeman limit to
-- the exchange coupling limit in a two-electron system.
-- 600 MHz magnet
-- Two electrons
-- Exaggerate g-factor difference
-- Hilbert space calculation
-- Spinach housekeeping
-- Relevant operators
-- omega_j scan from 0 to omega_e
-- Get the energy levels
-- Diagonalise the Hamiltonian
-- Sort and record energies
+The script uses a 14.1 T field and two electron spins with deliberately exaggerated scalar g values of 1.9 and 2.1. It constructs a full Hilbert-space basis, forms the lab-frame Zeeman Hamiltonian and the pairwise (mathbf L_1cdotmathbf L_2) operator, then diagonalises (H_Z-omega_Jmathbf L_1cdotmathbf L_2) at 100 values of (omega_J) spanning (-3omega_E) to (+3omega_E), where (omega_E) is the electron Larmor frequency. Sorted energies are plotted in units of (omega_E) against (omega_J/omega_E).

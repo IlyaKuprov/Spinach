@@ -4,28 +4,16 @@
 
 ## Purpose
 
-Fitting of 1H NMR spectrum of syn-2,4-difluoropentane with respect to J-couplings. See our paper for further details: Calculation time: hours
+Fits the 1H NMR spectrum of syn-2,4-difluoropentane with respect to J-couplings. The source also simulates and fits the corresponding 19F and two 1H data sets. See the paper: https://doi.org/doi/10.1021/acs.joc.4c00670. The source notes a calculation time of hours.
 
-## Physical / mathematical content
+## Physical and mathematical content
 
-- Fitting examples. These files formulate parameter-estimation workflows in which simulated spectra or observables are matched to data, usually through nonlinear optimisation, residual construction, and physically constrained parameterisations.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The model contains ten 1H and two 19F spins, with chemical shifts and scalar couplings parameterised for the fit. The two equivalent three-proton groups are represented with S3 symmetry. Experimental spectra are loaded, scaled/shifted, and compared with Spinach simulations; the fitted vector controls couplings and signal scaling.
 
-## Numerical / algorithmic content
+## Numerical and algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The objective is the sum of squared spectral residual norms for the 19F spectrum and both 1H spectra. The script searches the supplied initial parameter vector with `fminsearch`. Simulated FIDs are apodised, Fourier transformed, converted to frequency axes, interpolated onto the experimental axes, and plotted against the data.
 
 ## Implementation structure
 
-- Fitting of 1H NMR spectrum of syn-2,4-difluoropentane with
-- respect to J-couplings. See our paper for further details:
-- Calculation time: hours
-- Load experimental data
-- Normalise and shift the data
-- Set the guess
-- Set optimiser options
-- Get the figure going
-- Run the optimisation
-- Display the result
-- Least squares error function
-- Silence Spinach
+The function loads the three experimental data files, prepares the initial guess and optimiser options, then calls the local error function. That function builds the spin system and symmetry-adapted basis, configures separate 19F and 1H acquisitions, simulates the three spectra, processes them, and returns the combined least-squares error.

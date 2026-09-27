@@ -1,31 +1,14 @@
 # examples/dnp_liq/jdnp/fig_6_microwave_free.m
 
 - Signature: `fig_6_microwave_free()`
+- Calculation time: minutes
 
 ## Purpose
 
-A demonstration of Maria Grazia Concilio's microwave-free JDNP effect where a field ramp in combination with unequal relaxati- on rates of singlet-alpha and singlet-beta product states crea- tes nuclear magnetisation enhancement beyond the Boltzmann le- vel at both the starting and the final field. Calculation time: minutes
+Simulates the microwave-free JDNP field-ramp example. The initial equilibrium state is propagated while the magnetic field is changed from 14.09 T to 9.39 T, and the script plots the singlet and triplet populations resolved by nuclear-spin projection alongside the nuclear magnetisation.
 
-## Physical / mathematical content
+## Model and ramp
 
-- Liquid-state DNP examples. The main ingredients are electron-nuclear cross-relaxation, scalar or dipolar contact mechanisms, motional spectral densities, and field/frequency dependence of polarisation transfer.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The spin system, interactions, and basis come from `system_specification()`. The electron-proton scalar coupling is set using the 11.74 T midpoint field, and the correlation time is set to 2.2 ns. The script builds the initial Spinach system at 14.09 T in the lab frame and computes its thermal-equilibrium state. It then samples a 211-point linear field grid ending at 9.39 T, with a 0.1 ms propagation step at each grid point.
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Implementation structure
-
-- A demonstration of Maria Grazia Concilio's microwave-free JDNP
-- effect where a field ramp in combination with unequal relaxati-
-- on rates of singlet-alpha and singlet-beta product states crea-
-- tes nuclear magnetisation enhancement beyond the Boltzmann le-
-- vel at both the starting and the final field.
-- Calculation time: minutes
-- Load the spin system
-- Magnet fields
-- Match exchange coupling to the midpoint field
-- Increase viscosity
-- Get thermal equilibrium at starting field
-- Set up a field ramp and time step
+At each field value, the Hamiltonian and relaxation superoperator are rebuilt and the state is advanced with `evolution`; no microwave drive is added. The trajectory is projected onto explicitly constructed singlet, triplet, electron, and nuclear-spin operators. Three panels show the alpha/beta triplet populations, the alpha/beta singlet populations, and the nuclear `N_z` signal versus the ramp time.

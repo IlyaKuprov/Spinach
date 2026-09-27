@@ -4,26 +4,19 @@
 
 ## Purpose
 
-Powder averaged W-band field-swept ESR spectrum of Gd(III) DOTA complex. Exact diagonalisation is used. Calculation time: seconds.
+Simulate a powder-averaged, W-band field-swept ESR spectrum of a Gd(III) DOTA complex using exact diagonalisation. The source notes a calculation time of seconds.
 
 ## Physical / mathematical content
 
-- Field-swept ESR examples. These files emphasise resonance-field finding, powder averaging, anisotropic g and hyperfine tensors, and intensity accumulation over orientation manifolds.
+- Models the electron spin with `E8`, a scalar Zeeman parameter of `1.9918`, and a traceless axial self-coupling tensor with principal values `[0.57e9, 0.57e9, -2*0.57e9]/3`.
+- Uses a 90 GHz microwave frequency and sweeps magnetic field from 3.05 to 3.4 T. No hyperfine tensor or anisotropic g tensor is specified.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- Uses the `zeeman-hilb` formalism with `bas.approximation='none'` for exact diagonalisation.
+- Performs powder averaging on the `rep_2ang_100pts_sph` orientation grid. Sets a linewidth of `2e-4` T, 4096 field points, `int_tol=10.0`, `tm_tol=0.1`, and `rspt_order=Inf`.
+- Sets the high-temperature initial state to `-state(spin_system,'Lz','E8')` and computes the spectrum with `fieldsweep`.
 
 ## Implementation structure
 
-- Powder averaged W-band field-swept ESR spectrum of Gd(III)
-- DOTA complex. Exact diagonalisation is used.
-- Calculation time: seconds.
-- Isotopes
-- Magnet field (must be 1)
-- Properties
-- Basis set
-- Spinach housekeeping
-- Experiment parameters
-- Run the simulation in the high-T approximation
-- Plotting
+The function creates the `E8` spin system, assigns its Zeeman and self-coupling parameters, builds the basis, runs `fieldsweep`, and plots intensity against magnetic field in tesla.

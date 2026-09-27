@@ -4,29 +4,13 @@
 
 ## Purpose
 
-X-band pulse-acquire FFT ESR spectrum of parafluorotoluene radical, simulated using explicit time-domain propagation including Redfield relaxation superoperator. Calculation time: minutes
+X-band pulse-acquire FFT ESR simulation of a para-fluorotoluene radical, using explicit time-domain propagation and a Redfield relaxation superoperator.
 
 ## Physical / mathematical content
 
-- Liquid-state ESR examples. The dominant physics is electron Zeeman interaction, hyperfine coupling, relaxation broadening, and pulse-acquire or ENDOR-type detection in fast tumbling systems.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The source sets a 0.33 T field and uses secular Redfield relaxation with a correlation time of `1e-10` s.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- X-band pulse-acquire FFT ESR spectrum of parafluorotoluene
-- radical, simulated using explicit time-domain propagation
-- including Redfield relaxation superoperator.
-- Calculation time: minutes
-- Ignore coordinate information (HFCs provided)
-- Read the spin system (vacuum DFT calculation)
-- Ignore small HFC anisotropies
-- Magnet field
-- Basis set
-- Relaxation theory
-- Spinach housekeeping
-- Set the sequence parameters
+- The FID is acquired at 1024 points and zero-filled to 4096 points before Fourier transformation; no apodisation is applied.
+- The source estimates a calculation time of hours and notes a memory requirement of at least 16 GB per CPU core.

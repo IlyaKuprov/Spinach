@@ -1,33 +1,18 @@
 # examples/dnp_liq/sdnp/scalar_dnp.m
 
 - Signature: `scalar_dnp()`
+- Simulation reference: [*Journal of Magnetic Resonance Open* (2022)](https://doi.org/10.1016/j.jmro.2022.100040)
+- Experimental data: [*Angewandte Chemie International Edition*](https://doi.org/10.1002/anie.201811892)
+- Calculation time: seconds
 
 ## Purpose
 
-Field dependence of the couping factor between 13C of CHCl3 and the electron spin of a nitroxide radical. Further particulars here: Experimental data from: Calculation time: seconds
+Calculates the field dependence of the Overhauser coupling factor for a 13C nucleus and nitroxide electron, and compares the simulated curve with four experimental values. The observable is the cross-relaxation rate divided by the 13C longitudinal relaxation rate.
 
-## Physical / mathematical content
+## Spin system and relaxation model
 
-- Liquid-state DNP examples. The main ingredients are electron-nuclear cross-relaxation, scalar or dipolar contact mechanisms, motional spectral densities, and field/frequency dependence of polarisation transfer.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+The two spins are an electron and 13C separated by 3.1 Å, with a 2 MHz isotropic hyperfine coupling. The source specifies anisotropic electron g and 13C chemical-shift tensors, Redfield and scalar-collision (SRFK) relaxation, and empirical T1/T2 rates. It uses a 30 ps rotational correlation time, a two-component SRFK correlation model with weights 0.62 and 0.38, and a 3.6 MHz scalar modulation depth. The temperature is 298 K, the equilibrium model is Di Bari, and the relaxation retention is secular. The basis is sphten-liouv without an approximation.
 
-## Numerical / algorithmic content
+## Field scan and output
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Field dependence of the couping factor between 13C of CHCl3 and the
-- electron spin of a nitroxide radical. Further particulars here:
-- Experimental data from:
-- Calculation time: seconds
-- Spin system
-- Coordinates for dipolar Redfield
-- Zeeman interactions for CSA/g-aniso Redfield
-- Static hyperfine coupling
-- Formalism and approximation
-- Relaxation theories
-- Electron R1 and R2 for empirical T1/T2
-- Nuclear R1 and R2 for empirical T1/T2
+At each of 34 magnetic fields (0.01–10 T logarithmically, followed by 15, 20, 25, and 30 T), the script builds the system and relaxation superoperator. It normalises the 13C and electron longitudinal states, evaluates the 13C relaxation rate and electron-to-13C cross-relaxation rate, and forms their ratio. A parallel loop computes the field points. The plot uses a logarithmic field axis and overlays the four tabulated experimental points.

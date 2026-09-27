@@ -4,27 +4,8 @@
 
 ## Purpose
 
-Three-pulse DEER echo on a Cu(II)-NO two electron system at X-band. The calculation is done by brute-force time propagation and numerical powder averaging in Liouville space. Calculation time: seconds
+Simulates a three-pulse DEER echo for a Cu(II)–NO two-electron system at X-band. The calculation performs brute-force time propagation and numerical powder averaging in Liouville space.
 
-## Physical / mathematical content
+## Model and calculation
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Three-pulse DEER echo on a Cu(II)-NO two electron system at X-band.
-- The calculation is done by brute-force time propagation and numerical
-- powder averaging in Liouville space.
-- Calculation time: seconds
-- Spin system parameters
-- Basis set
-- Disable trajectory level SSR algorithms
-- Spinach housekeeping
-- Sequence parameters
-- Pulse sequence
-- Build the time axis
-- Plotting
+The two electron spins are separated by 20 Å and use distinct anisotropic Zeeman tensors. The script builds probe- and pump-spin excitation operators, evaluates the hard-echo sequence with delays `ta = 0.2 µs`, `tb = 0.1 µs`, and `tc = 25 ns`, and averages over a 1,600-point spherical grid. It plots the imaginary part of the echo against time in microseconds. The source estimates a run time of seconds.

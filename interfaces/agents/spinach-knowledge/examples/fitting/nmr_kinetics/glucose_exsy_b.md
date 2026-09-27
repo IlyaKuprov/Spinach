@@ -4,29 +4,16 @@
 
 ## Purpose
 
-Fitting of 3,3-difluoroglucose NOESY with respect to the reaction rates in a chemical exchange and the rotational correlation times within Redfield theory. Calculation time: hours (iteration count is limited in this example file)
+Fits the 3,3-difluoroglucose NOESY spectrum with respect to chemical-exchange reaction rates and rotational correlation times in Redfield theory. The source estimates a calculation time of hours and notes that the iteration count is limited in this example.
 
-## Physical / mathematical content
+## Physical and mathematical content
 
-- Fitting examples. These files formulate parameter-estimation workflows in which simulated spectra or observables are matched to data, usually through nonlinear optimisation, residual construction, and physically constrained parameterisations.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+The fit treats chemical exchange and Redfield relaxation, with rotational correlation times among the varied parameters. A trial parameter vector sets up the spin system and NOESY simulation; simulated and experimental spectra are compared using a least-squares objective.
 
-## Numerical / algorithmic content
+## Numerical and algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The simulated signal is apodised and processed by F2 and F1 Fourier transforms using the States signal, after which the real spectrum is compared with the processed experimental spectrum. The script reports the error and parameters and plots theory against experiment; its figure path includes cosmetic SVD denoising.
 
 ## Implementation structure
 
-- Fitting of 3,3-difluoroglucose NOESY with respect to the reaction
-- rates in a chemical exchange and the rotational correlation times
-- within Redfield theory.
-- Calculation time: hours (iteration count is limited
-- in this example file)
-- Get a figure going
-- Set the initial guess
-- Set optimiser options
-- Run the optimisation
-- Display the result
-- Save figure
-- Hush up Spinach
+The function sets the figure, initial guess and optimiser options, then runs the fit through a local error function. The error function configures the Redfield spin-system and sequence parameters, performs the simulation and spectral processing, evaluates the least-squares mismatch, and produces the comparison plot.

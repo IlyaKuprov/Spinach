@@ -4,27 +4,19 @@
 
 ## Purpose
 
-Simulation of XiX DNP repetition time scan in the steady state. Calculation time: seconds.
+Simulate a steady-state XiX DNP repetition-time scan at Q-band; the source estimates a calculation time of seconds.
 
 ## Physical / mathematical content
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+- An electron–proton system at 80 K has specified Zeeman interactions and coordinates separated by 3.5 Å. The simulation includes electron and proton relaxation, an inverted-phase second XiX pulse, and powder averaging; it detects the proton $L_z$ expectation value.
 
 ## Numerical / algorithmic content
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+- The code scans 30 logarithmically spaced repetition times from $10^{-5}$ to $10^{-3}$ seconds. For each time, it subtracts the duration of 36 two-pulse XiX blocks to obtain the shot spacing and runs `powder(spin_system,@xixdnp_steady,localpar,'esr')` in a `parfor` loop. It plots the real signal against repetition time in milliseconds and saves `xix_q_rep_time_single.fig`.
 
 ## Implementation structure
 
-- Simulation of XiX DNP repetition time scan in the
-- steady state.
-- Calculation time: seconds.
-- Q-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Cartesian coordinates
-- Get electron-nuclear distance
-- Basis set
-- Propagator accuracy
-- Algorithmic options
+- Set the Q-band field, electron and proton Zeeman interactions, temperature, and Cartesian coordinates; obtain the electron–nuclear distance.
+- Specify the unrestricted spherical-tensor Liouville-space basis, propagator tolerance, and hygiene option.
+- Configure distance- and orientation-dependent proton longitudinal relaxation, other relaxation rates, and equilibrium; create the spin system and proton detection operator.
+- Set the powder grid, irradiation power, pulse duration, XiX block count, pulse phase, and frequency offsets before scanning repetition times.

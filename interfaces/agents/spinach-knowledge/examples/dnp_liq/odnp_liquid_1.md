@@ -1,32 +1,14 @@
 # examples/dnp_liq/odnp_liquid_1.m
 
 - Signature: `odnp_liquid_1()`
+- Calculation time: seconds
 
 ## Purpose
 
-Overhauser type DNP in liquid phase at room temperature, using a continu- ous on-resonance CW irradiation of the electron ESR signal. The simulati- on uses Redfield theory to account for the dipolar cross-relaxation. Calculation time: seconds
+Demonstrates liquid-state Overhauser DNP for two protons coupled dipolarly to an electron, with continuous-wave electron irradiation on resonance. The time-dependent simulation plots the electron and proton longitudinal signals during irradiation.
 
-## Physical / mathematical content
+## Spin system and experiment
 
-- Liquid-state DNP examples. The main ingredients are electron-nuclear cross-relaxation, scalar or dipolar contact mechanisms, motional spectral densities, and field/frequency dependence of polarisation transfer.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+The three spins are two 1H nuclei and one electron at 3.4 T. The protons are at (0, 0, 0) and (0, 2, 0) Å; the electron is at (0, 0, 1.5) Å. Their Zeeman tensors are set explicitly. The model uses a complete sphten-liouv basis, Redfield relaxation, Di Bari equilibrium, secular relaxation retention, temperature 298 K, and a 10 ps correlation time.
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Overhauser type DNP in liquid phase at room temperature, using a continu-
-- ous on-resonance CW irradiation of the electron ESR signal. The simulati-
-- on uses Redfield theory to account for the dipolar cross-relaxation.
-- Calculation time: seconds
-- Spin system
-- Zeeman interactions
-- Coordinates (Angstrom)
-- Complete basis set
-- Relaxation theory
-- Spinach housekeeping
-- Experiment paramaters
-- Simulation
+The `liquid` simulation requests the equilibrium state, detects all three longitudinal signals, and drives the electron with its Lx operator at zero offset and `parameters.mw_pwr=2*pi*1e6`. With a 1 μs time step and 1000 steps, it calls `dnp_time_dep` in the ESR context and plots the electron signal and the two proton signals over 0–1000 μs.

@@ -4,27 +4,10 @@
 
 ## Purpose
 
-Simulation of TOP DNP contact time dependence in the steady state with electron-proton distance ensembles. Calculation time: hours.
+Calculates proton longitudinal expectation versus total TOP DNP contact time for two parameter sets, averaging each result over an electron-proton distance distribution. The source comments estimate the calculation takes hours.
 
 ## Physical / mathematical content
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The model contains an electron and a proton in a Q-band field (1.2142 T), with trityl electron g principal values [2.00319, 2.00319, 2.00258], a [0, 0, 5] ppm proton shift, and spin temperature 80 K. Three Gauss-Legendre distance nodes span 3.5–20 Å; each pair is placed on z, and the proton relaxation rate depends on distance and orientation through `r1n_dnp`. The calculation uses the full sphten-liouv basis, diagonal relaxation, dibari equilibrium, and the `rep_2ang_800pts_sph` powder grid.
 
-## Numerical / algorithmic content
-
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
-
-## Implementation structure
-
-- Simulation of TOP DNP contact time dependence in the
-- steady state with electron-proton distance ensembles.
-- Calculation time: hours.
-- Q-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Spin temperature
-- Basis set
-- Propagator accuracy
-- Algorithmic options
-- Distance ensemble
-- TOP loop count
+For each distance, the script runs loop counts 1–256 with 10 ns pulses and 14 ns delays. Parameter set A uses 18 MHz electron irradiation, 95 MHz offset, and shot spacing 102 μs minus the pulse-train duration; set B uses 33 MHz, 92 MHz, and 153 μs minus that duration. Each point calls `powder` with `@topdnp_steady` in `esr` mode. The distance average includes the radial Jacobian r² and quadrature weights. The plot compares proton Iz versus contact time for the two parameter sets and is saved as `top_q_con_time_ensemble_r.fig`.

@@ -4,28 +4,20 @@
 
 ## Purpose
 
-Mims ENDOR on a phenyl radical in liquid state. The g-factor and the isotropic proton hyperfine couplings are specified explicitly from the experimental data of Kasai, Hedaya, and Whipple (J. Am. Chem. Soc. 1969, 91, 4364): a(ortho)=17.4 G, a(meta)=5.9 G, a(para)=1.9 G, and an isotropic g-factor of 2.0024. The two ortho and the two meta protons are magnetically equivalent, so the full symmetry treatment uses an S2 x 
+Simulate liquid-state Mims ENDOR of the phenyl radical. The isotropic g-factor (2.0024) and proton hyperfine couplings—ortho 17.4 G, meta 5.9 G, and para 1.9 G—are taken from Kasai, Hedaya, and Whipple (J. Am. Chem. Soc. 1969, 91, 4364). The two ortho protons and the two meta protons form equivalent pairs treated with S2 x S2 symmetry.
 
 ## Physical / mathematical content
 
-- Liquid-state ESR examples. The dominant physics is electron Zeeman interaction, hyperfine coupling, relaxation broadening, and pulse-acquire or ENDOR-type detection in fast tumbling systems.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The spin system contains one electron and five ring protons: two ortho, two meta, and one para.
+- The magnetic field is 0.33 T. Isotropic electron–proton hyperfine couplings are converted from 1.74, 0.59, and 0.19 mT to Hz using `mt2hz` and the phenyl-radical g-factor.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- The basis uses `sphten-liouv` formalism with `approximation='none'`; `bas.sym_group` and `bas.sym_spins` specify the two equivalent proton pairs.
+- Mims ENDOR is simulated with `liquid(spin_system,@endor_mims,parameters,'esr')`. Parameters specify zero offset, 512 points, a 300 MHz sweep, `tau=100 ns`, 4096-point zero filling, electron detection, and MHz axis units.
+- The mean is subtracted from the simulated FID, which is then apodised with a Kaiser window of parameter 6. The code applies `fft`, centers the result with `fftshift`, and plots the spectrum magnitude against nuclear frequency in MHz.
 
 ## Implementation structure
 
-- Mims ENDOR on a phenyl radical in liquid state. The g-factor and the
-- isotropic proton hyperfine couplings are specified explicitly from the
-- experimental data of Kasai, Hedaya, and Whipple (J. Am. Chem. Soc.
-- 1969, 91, 4364): a(ortho)=17.4 G, a(meta)=5.9 G, a(para)=1.9 G, and an
-- isotropic g-factor of 2.0024. The two ortho and the two meta protons
-- are magnetically equivalent, so the full symmetry treatment uses an
-- S2 x S2 group direct product.
-- Calculation time: seconds
-- Magnet field
-- Electron and the five ring protons (two ortho, two meta, one para)
-- Phenyl radical isotropic g-factor
-- Isotropic proton hyperfine couplings, converted from milliTesla
+- Define the field, isotopes, isotropic g-factor, and hyperfine couplings; configure the basis and symmetry; create the spin system; run the ENDOR simulation; process and plot the spectrum.
+- The source comments give a calculation time of seconds.

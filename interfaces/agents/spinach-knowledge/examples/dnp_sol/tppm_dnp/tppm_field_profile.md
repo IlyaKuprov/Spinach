@@ -4,27 +4,16 @@
 
 ## Purpose
 
-Field profile of a TPPM DNP experiment. <I_z> after a fixed contact time is calculated as a function of electron pulse amplitude and offset. Further information in: Calculation time: minutes (a large powder grid is needed)
+Calculates the final proton (I_z) value of a fixed-contact-time TPPM DNP sequence as a function of microwave resonance offset. The source estimates minutes for the powder-averaged calculation.
 
-## Physical / mathematical content
+## Model and method
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The Q-band model has one electron and two protons at 80 K. Each calculation uses 17.8 MHz electron nutation frequency, 48 ns pulses, 150 blocks, a 120° second-pulse phase, and a 1600-point spherical powder grid. The script calls `xixdnp` with the TPPM settings, shifts each microwave offset by the −13 MHz reference point, and records the final contact-curve value.
 
-## Numerical / algorithmic content
+## Scan and output
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+The 120 offsets span −150 to 150 MHz. Their final proton signals form the plotted field profile.
 
-## Implementation structure
+## Reference
 
-- Field profile of a TPPM DNP experiment. <I_z> after a fixed
-- contact time is calculated as a function of electron pulse
-- amplitude and offset. Further information in:
-- Calculation time: minutes (a large powder grid is needed)
-- Q-band magnet
-- Electron and two protons
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Cartesian coordinates
-- Spin temperature
-- Hush the output
-- Basis set
-- Spinach housekeeping
+[Redrouthu et al., DOI: 10.1063/5.0153053](https://doi.org/10.1063/5.0153053).

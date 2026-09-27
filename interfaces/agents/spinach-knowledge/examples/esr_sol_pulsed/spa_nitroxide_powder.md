@@ -4,29 +4,21 @@
 
 ## Purpose
 
-A soft pulse simulation for a nitroxide radical powder. The soft pulse is simulated using the Fokker-Planck formalism; it is fol- lowed by time domain acquisition and Fourier transform. Calculation time: seconds
+Simulate a soft-pulse spectrum of a nitroxide radical powder using the Fokker–Planck formalism, followed by time-domain acquisition and Fourier transformation. The source notes a calculation time of seconds.
 
 ## Physical / mathematical content
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The spin system contains an electron and `14N` at a magnetic field of 3.5 T. It specifies an anisotropic electron Zeeman matrix and an electron–nitrogen coupling matrix, including off-diagonal x–z terms.
+- The calculation uses the `sphten-liouv` basis without approximation and the `rep_2ang_3200pts_sph` powder grid.
+- The initial state is electron `Lz`; the detection state is electron `L+`. No spins are decoupled.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- The soft pulse has rank 2, phase `-pi/2`, frequency `-300e6` Hz, duration `100e-9` s, and power `2*pi*16.5e6`. Its propagation method is `expm`.
+- Acquisition uses an offset of `-2e8` Hz, a sweep of `8e8` Hz, and 64 points. The FID receives `crisp` apodisation before an FFT zero-filled to 512 points and shifted with `fftshift`.
 
 ## Implementation structure
 
-- A soft pulse simulation for a nitroxide radical powder. The soft
-- pulse is simulated using the Fokker-Planck formalism; it is fol-
-- lowed by time domain acquisition and Fourier transform.
-- Calculation time: seconds
-- Isotopes
-- Magnet field
-- Interactions
-- Basis set
-- Disable trajectory-level SSR algorithms
-- Spinach housekeeping
-- Sequence parameters
-- Soft pulse parameters
+- Construct the spin system with `create`, set its basis with `basis`, and disable trajectory-level SSR algorithms through `sys.disable={'trajlevel'}`.
+- Run `powder(spin_system,@sp_acquire,parameters,'esr')` to acquire the powder-averaged FID.
+- Plot the real spectrum with `plot_1d`, using MHz axis units.

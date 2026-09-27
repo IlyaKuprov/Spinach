@@ -4,16 +4,16 @@
 
 ## Purpose
 
-A deliberately adversarial example from Art Bochevarov at Schodinger Inc. In this case, IK-2 approximation in Liou- ville space generates an exceedingly large basis set; the calculation must instead be performed in Hilbert space with permutation symmetry factorisation. Calculation time: hours.
+A deliberately adversarial example from Art Bochevarov at Schrödinger, Inc. In this case, IK-2 approximation in Liouville space generates an exceedingly large basis set; the calculation must instead be performed in Hilbert space with permutation symmetry factorisation. Calculation time: hours.
 
 ## Physical / mathematical content
 
-- Extreme-regime examples. These scripts exercise Spinach in unusually large, stiff, high-field, low-field, or otherwise numerically demanding regimes where approximations, conditioning, and basis-size control are central.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The target observable is the 1H NMR spectrum of a highly coupled fluoroisooctane spin system.
+- The calculated observable is the proton free-induction decay and its Fourier-transformed NMR spectrum.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- The IK-2 Liouville basis is impractically large, so the script uses Hilbert-space formalism with three S3 permutation-symmetry blocks before calculating and Fourier-transforming the proton FID.
 
 ## Implementation structure
 

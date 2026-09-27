@@ -4,27 +4,10 @@
 
 ## Purpose
 
-A MAS DNP simulation performed as described in Fred Mentink- Vigier's paper (Spinach rotation conventions are different): Spin system trajectory analysis within the first rotor period for a single crystal. Calculation time: seconds
+Tracks the spin-system trajectory through one MAS rotor period for a single crystal in a microwave-driven DNP simulation based on [Mentink-Vigier et al.](http://dx.doi.org/10.1016/j.jmr.2015.07.001). The example notes that Spinach uses different rotation conventions from the paper; the calculation is described as taking seconds.
 
-## Physical / mathematical content
+## Physical and numerical setup
 
-- MAS DNP examples. These files model microwave-driven electron-nuclear polarisation transfer under magic-angle spinning, combining rotor-synchronised anisotropic interactions, relaxation, microwave irradiation, and powder/rotor averaging.
+The model contains two electron spins and one proton at a 9.394 T field. It assigns anisotropic electron g tensors, an electron-electron coupling and an electron-proton coupling, and uses the Nottingham relaxation model with the specified electron/nuclear relaxation rates, 100 K temperature, Di Bari equilibrium, and secular relaxation retention. The spin system is represented in the complete spherical-tensor Liouville basis (no basis approximation).
 
-## Numerical / algorithmic content
-
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Implementation structure
-
-- A MAS DNP simulation performed as described in Fred Mentink-
-- Vigier's paper (Spinach rotation conventions are different):
-- Spin system trajectory analysis within the first rotor period
-- for a single crystal.
-- Calculation time: seconds
-- Magnet field
-- Spin specification
-- Interactions
-- Relaxation parameters
-- Basis set
-- Spinach housekeeping
-- Stack generation parameters
+A single-crystal rotor stack is generated in the magnetic frame with the listed rotor axis and orientation, electron/proton spin selection, and ESR settings. Starting from thermal equilibrium, the trajectory is stepped through the rotor-stack Hamiltonians at 12.5 kHz with a microwave drive amplitude parameter of 0.85 MHz and an electron offset of -400 MHz. The resulting density-operator trajectory is analysed with `trajan` at the level-population level.

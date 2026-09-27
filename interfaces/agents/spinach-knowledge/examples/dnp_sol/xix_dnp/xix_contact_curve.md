@@ -4,27 +4,16 @@
 
 ## Purpose
 
-The transformation of -E_z into I_z during the contact time of the X-inverse-X DNP experiment. Further information in: Calculation time: seconds
+Tracks transfer from electron polarization (-E_z) to proton polarization (I_z) during an X-inverse-X (XiX) DNP contact. Further information: https://doi.org/10.1021/jacs.1c09900. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The model contains a trityl electron and two protons, with anisotropic Zeeman terms, specified coordinates, and a spin temperature of 80 K. XiX irradiation drives the electron–nuclear dynamics; the detected signal is the real expectation value of proton (L_z).
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The script evaluates a contact curve with the ESR powder simulation on the `rep_2ang_1600pts_sph` grid. It uses 80 XiX blocks, each pulse lasting 48 ns, and plots 81 samples over the corresponding total contact time.
 
 ## Implementation structure
 
-- The transformation of -E_z into I_z during the contact time of the
-- X-inverse-X DNP experiment. Further information in:
-- Calculation time: seconds
-- Q-band magnet
-- Electron and two protons
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
-- Cartesian coordinates
-- Spin temperature
-- Basis set
-- Spinach housekeeping
-- Detection state
-- Experiment parameters
+It constructs a full Zeeman–Hilbert basis, detects proton (L_z), and calls `powder` with `@xixdnp`. The irradiation uses the electron and one proton, a 17.8 MHz electron nutation frequency, and the specified offset; the plotted curve is the real-valued result.

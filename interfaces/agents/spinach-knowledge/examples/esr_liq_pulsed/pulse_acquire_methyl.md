@@ -4,28 +4,25 @@
 
 ## Purpose
 
-X-band pulse-acquire FFT ESR spectrum of methyl radical. Simple common line width is used as a relaxation model. Set to reprodu- ce Figure 4 from the paper by Zhitnikov and Dmitriev: Calculation time: seconds
+X-band pulse-acquire FFT ESR spectrum of methyl radical. A common line width is used as a relaxation model. The example is set to reproduce Figure 4 from the paper by Zhitnikov and Dmitriev: http://dx.doi.org/10.1051/0004-6361:20020268. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Liquid-state ESR examples. The dominant physics is electron Zeeman interaction, hyperfine coupling, relaxation broadening, and pulse-acquire or ENDOR-type detection in fast tumbling systems.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- Reads a methyl radical spin system from a vacuum DFT calculation, using supplied hyperfine couplings rather than coordinate information.
+- Sets the magnet induction to 0.33 and models relaxation with diagonal damping at a rate of `2.5e7`.
+- Simulates an electron-spin pulse-acquire ESR signal with `liquid(spin_system,@acquire,parameters,'esr')`.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- Uses the `sphten-liouv` basis with no approximation, projection `+1`, and longitudinal `1H` states.
+- Sets a sweep of `5e8`, acquires 256 points, and specifies 1024 points for the Fourier transform. The axis units are `GHz-labframe`; the derivative and axis-inversion flags are enabled.
+- Applies no apodisation, computes `fftshift(fft(fid,parameters.zerofill))`, and plots the real part of the spectrum.
 
 ## Implementation structure
 
-- X-band pulse-acquire FFT ESR spectrum of methyl radical. Simple
-- common line width is used as a relaxation model. Set to reprodu-
-- ce Figure 4 from the paper by Zhitnikov and Dmitriev:
-- Calculation time: seconds
-- Ignore coordinate information (HFCs provided)
-- Read the spin system (vacuum DFT calculation)
-- Magnet induction
-- Basis set
-- Relaxation theory
-- Spinach housekeeping
-- Set the sequence parameters
-- Simulation
+- Ignore coordinate information (HFCs provided).
+- Read the spin system (vacuum DFT calculation).
+- Set magnet induction, basis, and relaxation parameters.
+- Create the Spinach spin system and basis.
+- Set the sequence parameters and run the simulation.
+- Apply apodisation, perform the Fourier transform, and plot the spectrum.

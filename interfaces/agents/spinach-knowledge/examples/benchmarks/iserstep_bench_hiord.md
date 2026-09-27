@@ -1,35 +1,17 @@
 # examples/benchmarks/iserstep_bench_hiord.m
 
-- Signature: `iserstep_bench_hiord()`
+## Status
 
-## Purpose
+This page documents a historical Spinach example, not a current runnable example. The source file `examples/benchmarks/iserstep_bench_hiord.m` was deleted in commit `c70f9b30` (“Deleting a duplicate example file”) and is absent from the current checkout. The historical function signature was `iserstep_bench_hiord()`; it is not an available entry point in the current source tree.
 
-Benchmarks iserstep higher-order methods on a chirped-frequency oscillator with radiation damping, that has a state-dependent, and a time-dependent evolution generator. Syntax: iserstep_bench_hiord()
+## Historical purpose and physics
 
-## Physical / mathematical content
+The example compared higher-order `iserstep` methods for a chirped-frequency oscillator with radiation damping and a generator depending on both time and magnetisation. The comments cite Bloembergen and Pound for radiation damping: [Phys. Rev. 95, 8 (1954)](https://doi.org/10.1103/PhysRev.95.8).
 
-- Benchmark examples. These files stress-test Spinach performance, scaling, and numerical throughput on representative spin-dynamics workloads, so runtime, memory pressure, and solver/pathway choices are part of the intended content.
+In the historical source, the chirp rate was `2*pi*400`, the longitudinal and transverse relaxation rates were both `10`, and the radiation-damping rate was `40`. Its Bloch–Maxwell generator combined a chirped transverse precession/relaxation matrix with a magnetisation-dependent radiation-damping matrix, with the `-1i` Liouvillian factors included. The initial magnetisation was rotated from the positive z direction by 178 degrees. These values and the setup describe the old example only; they are not a current benchmark configuration.
 
-## Numerical / algorithmic content
+## Historical method and outputs
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+A 4096-point RKMK-DP8 propagation over 0.5 seconds supplied the reference final magnetisation. The source then compared terminal-state relative errors on ten grids from `ceil(2.^linspace(8,10.5,10))`: PWCL, LG2, LG4, and LG4A through `iserstep`, and RKMK4, RKMK-DP5, and RKMK-DP8 through `step`. It plotted the reference magnetisation trajectory and relative error versus grid size, and printed empirical convergence orders by fitting log(error) against log(grid size) over the last third of the grids.
 
-## Outputs
-
-- (none) -produces a set of diagnostic plots, and prints the empirical
-- convergence orders for each method
-
-## Implementation structure
-
-- Benchmarks iserstep higher-order methods on a chirped-frequency oscillator
-- with radiation damping, that has a state-dependent, and a time-dependent
-- evolution generator. Syntax:
-- iserstep_bench_hiord()
-- (none) -produces a set of diagnostic plots, and prints the empirical
-- convergence orders for each method
-- Set the chirp rate
-- Set the relaxation rates
-- Set the radiation damping rate
-- Bootstrap the object
-- Make Bloch-Maxwell generator (Liouvillian, including -1i factors)
-- Set the initial magnetisation
+Those are outputs and comparisons described by the historical source, not instructions or confirmation that the deleted example can be run in the current checkout. The historical source is available in repository history as `c70f9b30^:examples/benchmarks/iserstep_bench_hiord.m`.

@@ -4,29 +4,13 @@
 
 ## Purpose
 
-Davies ENDOR simulation for a nitroxide radical at a single orientation. Soft pulses are simulated using Fokker-Planck formalism. Calculation time: minutes
+Two-stage single-orientation nitroxide Davies ENDOR example. Soft pulses are simulated with the Fokker–Planck formalism.
 
 ## Physical / mathematical content
 
-- Pulsed ESR / EPR solid-state examples. These scripts revolve around electron spin echo sequences, DEER, RIDME, ENDOR, ESEEM, and HYSCORE. They combine anisotropic Zeeman and hyperfine Hamiltonians with selective pulses, echo formation, and orientation averaging.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The first stage computes a crystal-orientation pulse-acquire ESR spectrum; the second runs the Davies ENDOR sequence.
+- For the ENDOR stage, the electron-frequency offsets are +93, +10, and −73 MHz, and the nuclear-frequency sweep spans −200 to +200 MHz.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- Davies ENDOR simulation for a nitroxide radical at a single
-- orientation. Soft pulses are simulated using Fokker-Planck
-- formalism.
-- Calculation time: minutes
-- Isotopes
-- Magnet field
-- Interactions
-- Basis set
-- Relaxation theory
-- Spinach housekeeping
-- % Stage 1: pulse-acquire ESR spectrum
-- Sequence parameters
+- The ESR FID is apodised, Fourier transformed with 512-point zero filling, and plotted. The ENDOR simulation uses the source-defined frequency sweep and crystal-orientation setup.

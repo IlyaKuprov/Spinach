@@ -4,27 +4,10 @@
 
 ## Purpose
 
-Simulation of T2n dependence of XiX DNP contact curves in the steady state with electron-proton distance ensemble. Calculation time: hours
+Compares steady-state XiX proton-polarisation contact-time curves across five nuclear T2 values, averaging over electron–proton distance for each curve.
 
-## Physical / mathematical content
+## Model and scan
 
-- Solid-state DNP examples. These files model microwave-driven electron-nuclear polarisation transfer mechanisms such as the solid effect, cross effect, NOVEL, XiX, TOP, BEAM, and TPPM variants. The mathematics combines driven spin dynamics, relaxation, powder/MAS averaging, and steady-state or transient propagation.
+The source varies proton T2 across 2000, 200, 20, 2 and 0.2 μs; proton T1 is set by the distance- and orientation-dependent `r1n_dnp` rate, and electron T1 is fixed at 1 ms. Each run models a trityl–proton pair at 1.2142 T and 80 K with three Gauss–Legendre distance nodes from 3.5 to 20 Å. Diagonal relaxation terms are retained and the equilibrium is `dibari`; the full spherical-tensor Liouville basis is used without basis approximation. Distance averaging includes the radial `r^2` Jacobian.
 
-## Numerical / algorithmic content
-
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Simulation of T2n dependence of XiX DNP contact
-- curves in the steady state with electron-proton
-- distance ensemble.
-- Calculation time: hours
-- Nuclear T2 times, seconds
-- Get the figure started
-- Plot the curves
-- Add the legend and save the plot
-- Simulation for a specific T2n
-- Q-band magnet
-- Electron and proton
-- Zeeman interactions (g-tensor for trityl, ppm guess for 1H)
+Each curve scans 1–64 XiX loops using 48 ns pulses, inverted second-pulse phase, 18 MHz electron nutation frequency and an 800-point two-angle spherical powder grid. The source sets −13 MHz added shift, +61 MHz electron offset, and 153 μs shot spacing less total pulse duration; steady states are evaluated with `powder(...,@xixdnp_steady,...,'esr')`. Distance-averaged real proton `Lz` expectation-value curves are overlaid, labelled by T2n, and saved as `xix_q_con_time_ensemble_r_T2n.fig`.

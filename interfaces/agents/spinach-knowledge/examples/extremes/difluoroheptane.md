@@ -8,12 +8,12 @@
 
 ## Physical / mathematical content
 
-- Extreme-regime examples. These scripts exercise Spinach in unusually large, stiff, high-field, low-field, or otherwise numerically demanding regimes where approximations, conditioning, and basis-size control are central.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The 16-spin anti-3,4-difluoroheptane system is observed by 19F NMR at 11.7464 T; proton–fluorine couplings contribute to the fluorine spectrum.
+- The computed observable is a time-domain 19F free-induction decay, converted to a frequency-domain spectrum.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- The script uses the `sphten-liouv` formalism with greedy parallelisation, evolves the FID in time, applies exponential apodisation, and Fourier transforms it to the spectrum.
 
 ## Implementation structure
 

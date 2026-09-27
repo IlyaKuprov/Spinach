@@ -281,17 +281,16 @@ switch spin_system.bas.formalism
         % Flatten out the cell array
         projectors=[projectors{:}];
         
-    otherwise
-        
-        % Complain and bomb out
-        error('unknown formalism specification.');
-        
 end
 
 end
 
 % Consistency enforcement
-function grumble(spin_system,L,rho) %#ok<INUSD,INUSL>
+function grumble(spin_system,L,rho) %#ok<INUSL>
+if ~ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-wavef',...
+                                      'zeeman-liouv','sphten-liouv'})
+    error('unknown formalism specification.');
+end
 if ~isnumeric(L)
     error('L must be numeric.');
 end

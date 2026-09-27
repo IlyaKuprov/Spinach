@@ -49,12 +49,10 @@
 function projector=zte(spin_system,L,rho,nstates)
 
 % Validate the input
-grumble(spin_system,L,rho);
-
-% Validate the number of states if it is specified
-if exist('nstates','var')&&((~isnumeric(nstates))||(~isreal(nstates))||(~isscalar(nstates))||...
-                            (nstates<1)||(mod(nstates,1)~=0)||(nstates>size(rho,1)))
-    error('nstates must be a positive integer not exceeding the state space dimension.');
+if nargin==4
+    grumble(spin_system,L,rho,nstates);
+else
+    grumble(spin_system,L,rho);
 end
 
 % Run Zero Track Elimination
@@ -164,7 +162,7 @@ end
 end
 
 % Input validation function
-function grumble(spin_system,L,rho)
+function grumble(spin_system,L,rho,nstates)
 if ~ismember(spin_system.bas.formalism,{'zeeman-liouv','sphten-liouv'})
     error('zero track elimination is only available for zeeman-liouv and sphten-liouv formalisms.');
 end
@@ -179,6 +177,10 @@ if size(L,1)~=size(L,2)
 end
 if size(L,2)~=size(rho,1)
     error('Liouvillian and state vector dimensions must be consistent.');
+end
+if nargin==4&&((~isnumeric(nstates))||(~isreal(nstates))||(~isscalar(nstates))||...
+              (nstates<1)||(mod(nstates,1)~=0)||(nstates>size(rho,1)))
+    error('nstates must be a positive integer not exceeding the state space dimension.');
 end
 end
 

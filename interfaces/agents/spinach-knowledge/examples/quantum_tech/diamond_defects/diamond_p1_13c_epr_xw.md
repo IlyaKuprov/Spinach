@@ -8,23 +8,15 @@ Field-swept powder EPR spectra of a P1 centre in 13C-enriched diamond at X and W
 
 ## Physical / mathematical content
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
+The P1 model uses a `14N` centre with orientation `111` in 13C-enriched diamond. After constructing the full spin system, the example retains the nitrogen and carbon spins whose isotropic hyperfine couplings exceed 8 MHz, then computes electron-spin powder EPR spectra.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The remaining spin system is treated in the unapproximated Zeeman Hilbert-space basis (`zeeman-hilb`). Powder averaging uses `rep_2ang_100pts_sph`; each field sweep has 1024 points and RSPT order `Inf`. The common line width is `5e-4 T`, with integration and transition-moment tolerances both `0.1`.
 
 ## Implementation structure
 
-- Field-swept powder EPR spectra of a P1 centre
-- in 13C-enriched diamond at X and W bands.
-- Calculation time: minutes.
-- Set P1 model parameters.
-- Build the spin system.
-- Field sweep
-- Define the basis set
-- Run Spinach housekeeping
-- Leave only 14N nucleus and 13C nuclei with hyperfines larger than
-- a_iso > 8 MHz
-- Set common EPR parameters
-- Set X-band parameters
+- Build the P1/13C model with `diamond_p1_13c`, then prune spins to retain 14N and 13C nuclei with isotropic hyperfine coupling above 8 MHz.
+- Set the magnet field to 1 T, construct the Zeeman Hilbert basis, and run Spinach housekeeping.
+- Simulate X band at 9.5 GHz over 0.31–0.36 T and W band at 94 GHz over 3.33–3.38 T with `fieldsweep`.
+- Plot both spectra against their returned magnetic-field axes.

@@ -4,26 +4,21 @@
 
 ## Purpose
 
-Transverse relaxation rate as a function of the applied magnetic field in a 3-fluorotyrosine labelled protein. The fluorine atom and its directly bonded carbon are included. Analytical calcula- tions broken down by mechanism. Calculation time: seconds.
+Calculate transverse relaxation and broad and narrow TROSY line rates as functions of magnetic field for `19F` and its directly bonded `13C` in a 3-fluorotyrosine-labelled protein. The calculation also separates the `13C` TROSY rate into dipole–dipole (DD), chemical-shift anisotropy (CSA), and DD–CSA cross-correlation contributions. The source describes the analytical calculation time as seconds.
 
 ## Physical / mathematical content
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+- The calculation uses the fluorine and carbon shielding tensors and atomic coordinates extracted from a 3-fluorotyrosine DFT calculation.
+- `rlx_dd_csa` returns total `R2` rates and broad and narrow TROSY rates for both nuclei, plus the DD, CSA, and cross-correlation contributions used for the `13C` mechanism plot.
 
 ## Numerical / algorithmic content
 
+- Read `../standard_systems/3_fluoro_tyr.log` with `gparse` and `g2spinach`, mapping carbon to `13C` and fluorine to `19F` with the supplied values `[186.38 192.97]`.
+- Extract shielding tensors and coordinates from entries 8 (`19F`) and 7 (`13C`) of the resulting interaction data.
+- Evaluate 20 proton Larmor frequencies from 200 to 800 MHz and convert them to magnetic fields using `spin('1H')`.
+- At each field, call `rlx_dd_csa` with a `25e-9` s timescale, the nuclei `{'19F','13C'}`, their shielding tensors, and their coordinates.
+
 ## Implementation structure
 
-- Transverse relaxation rate as a function of the applied magnetic
-- field in a 3-fluorotyrosine labelled protein. The fluorine atom
-- and its directly bonded carbon are included. Analytical calcula-
-- tions broken down by mechanism.
-- Calculation time: seconds.
-- Read 3-fluorotyrosine DFT calculation
-- Extract coordinates and CSAs
-- Magnetic field grid
-- Loop over magnetic fields
-- Call the analytical function
-- Relaxation rates
-- Mechanisms for 13C
+- Plot broad TROSY, total `R2`, and narrow TROSY rates against proton Larmor frequency separately for `19F` and `13C`.
+- Plot the `13C` TROSY DD and CSA contributions alongside `-abs` of the DD–CSA cross-correlation contribution in a stacked bar chart. Plot rates are labelled in Hz.

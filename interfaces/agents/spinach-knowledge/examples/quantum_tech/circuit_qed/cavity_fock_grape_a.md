@@ -4,32 +4,16 @@
 
 ## Purpose
 
-GRAPE preparation of a cavity Fock state through a dispersively coupled qubit, using piecewise-constant drives on both the cavity and the qubit. A linear drive alone cannot make a Fock state out of the vacuum of a harmonic mode; the qubit conditions the cavity phase through the dispersive shift and thereby provides the requi- red nonlinearity. The optimisation is run at two Fock space trun- cations; the pulse optimis
+Uses GRAPE to prepare cavity Fock state 2 from the cavity vacuum through a dispersively coupled qubit. It optimises and compares pulses at cavity truncations `C3` and `C4`, then tests the smaller-space pulse in the larger space. The source attributes the model and parameters to the bosonic GRAPE example in the paraqeet package and gives a calculation time of minutes.
 
 ## Physical / mathematical content
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The numerical method is limited-memory quasi-Newton optimisation, which keeps only a short curvature history and is therefore suitable for waveform vectors too large for dense Hessians.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
+A linear drive alone cannot make a Fock state from the vacuum of a harmonic cavity; the dispersive coupling to the qubit supplies the required nonlinearity. The model uses a 656.2 kHz dispersive coupling. The initial state is cavity vacuum with the qubit in its upper level; the target is cavity Fock state 2 with the qubit in the same level. The controls are the two cavity quadratures and the qubit `Lx` and `Ly` operators. Comparing the two truncations demonstrates the source's point that a pulse optimised in a smaller Fock space can lose transfer fidelity when evaluated in a larger one.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+For each truncation, the script optimises a 40-slice pulse with 33 ns per slice using `fmaxnewton` and `grape_xy`. The control settings are power level `1.76828e7`, the `NS` penalty with weight 0.001, L-BFGS, and a maximum of 300 iterations. A Gaussian initial guess is applied to the in-phase cavity and qubit channels. Transfer fidelity is recomputed by direct slice-by-slice propagation; both optimised pulses must reach at least 0.95 fidelity.
 
 ## Implementation structure
 
-- GRAPE preparation of a cavity Fock state through a dispersively
-- coupled qubit, using piecewise-constant drives on both the cavity
-- and the qubit. A linear drive alone cannot make a Fock state out
-- of the vacuum of a harmonic mode; the qubit conditions the cavity
-- phase through the dispersive shift and thereby provides the requi-
-- red nonlinearity. The optimisation is run at two Fock space trun-
-- cations; the pulse optimised in the smaller space underperforms
-- when it is re-evaluated in the larger one -optimal control solu-
-- tions must be converged with respect to the Fock space truncation.
-- Model and parameters from the bosonic GRAPE example of the para-
-- qeet package.
-- Calculation time: minutes
+The script constructs each Zeeman Hilbert-space model and its cavity-frame drift Hamiltonian, defines the four control operators and initial/target states, runs the two optimisations, and evaluates all three comparisons: optimise and test at `C3`, optimise and test at `C4`, and optimise at `C3` but test at `C4`.

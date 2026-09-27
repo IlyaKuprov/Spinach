@@ -4,29 +4,16 @@
 
 ## Purpose
 
-Cavity-induced spin relaxation in the EPR Purcell regime. Coherent Jaynes-Cummings exchange is combined with rapid cavity damping in Liouville space, producing relaxation of the spin excitation by the NMR mechanism known as relaxation of the second kind. Calculation time: seconds
+Demonstrates cavity-induced spin relaxation in the EPR Purcell regime: coherent Jaynes–Cummings exchange combined with rapid cavity damping in Liouville space relaxes the spin excitation by the NMR mechanism called relaxation of the second kind. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The physics is Jaynes-Cummings-like cavity QED: a two-level or few-level matter degree of freedom exchanges excitations with a quantised harmonic mode through rotating terms such as a†σ_- + aσ_+.
+- The example constructs damped spin–cavity generators and varies spin–cavity detuning and cavity loss. It extracts the spin-amplitude decay mode from the Liouvillian and converts it to a population relaxation rate, then compares the resonant rate with the exact two-level Purcell expression.
 
 ## Numerical / algorithmic content
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- In the `zeeman-liouv` formalism without basis approximation, the code diagonalises the Liouvillian across 301 detunings and four loss rates. It also propagates a spin-excitation density operator at selected detunings to compare survival curves.
 
 ## Implementation structure
 
-- Cavity-induced spin relaxation in the EPR Purcell regime.
-- Coherent Jaynes-Cummings exchange is combined with rapid
-- cavity damping in Liouville space, producing relaxation of
-- the spin excitation by the NMR mechanism known as relaxation
-- of the second kind.
-- Calculation time: seconds
-- Magnet field
-- Particle specification
-- Formalism and basis
-- Purcell parameters
-- Preallocate rate array
-- Loop over cavity loss rates
+- The spin and cavity isotopes are `{'E','C3'}`; the coupling is `0.35e6`. Detuning spans `2*pi*linspace(-8e6,8e6,301)`, and loss rates are `2*pi*[2e6 4e6 8e6 16e6]`. At the second loss rate, the resonant extracted rate is checked against the exact expression; survival is plotted for detunings `2*pi*[0 2e6 6e6]` over 0–40 μs.

@@ -4,27 +4,22 @@
 
 ## Purpose
 
-Liquid state magnetic field effect simulation on a radical pair with six equivalent nuclei using exponential recombi- nation kinetics model. Full S6 symmatry is used. Calculation time: seconds
+Simulates a liquid-state magnetic-field effect on a radical pair with six equivalent nuclei using an exponential recombination-kinetics model and full S6 symmetry. The source states a calculation time of seconds.
 
 ## Physical / mathematical content
 
-- Spin-chemistry examples. These scripts treat radical pairs, recombination channels, chemically induced dynamic nuclear polarisation, and magnetic-field effects. The theory combines spin-selective kinetics with singlet-triplet interconversion.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+- The system contains two electrons (`E`) and six protons (`1H`). Both electron Zeeman scalar values are `2.002`; the proton values are zero.
+- The coupling matrix connects the first electron to each of the six protons. Each listed coupling is `0.295` before the matrix is divided by `2` and converted with `mt2hz`; all other listed entries are zero.
+- The kinetics rates are `[0.176 0.880 1.76 3.52 8.8 17.6 35.2 52.8]*1e6`. The field array is `1e-3*(0:0.01:5)`.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- Sets `sys.magnet=1` for the field sweep.
+- Uses the `sphten-liouv` formalism with approximation `none`, projections `{0}`, and S6 permutation symmetry for spins 3–8.
+- Specifies electrons `[1 2]`, spins `{'E'}`, and the required operator `{'zeeman_op'}`.
+- Creates the spin system, applies the basis, and computes `M=liquid(spin_system,@rydmr_exp,parameters,'labframe')`.
 
 ## Implementation structure
 
-- Liquid state magnetic field effect simulation on a radical
-- pair with six equivalent nuclei using exponential recombi-
-- nation kinetics model. Full S6 symmatry is used.
-- Calculation time: seconds
-- Unit magnet (field sweep)
-- System specification
-- Basis set
-- Fields and kinetics parameters
-- Spinach housekeeping
-- Simulation
-- Plot the answer
+- Defines the system, coupling matrix, symmetry-adapted basis, fields, and kinetics rates.
+- Runs the liquid-state simulation and plots `M` against `parameters.fields` as the singlet recombination yield versus magnetic field in Tesla.

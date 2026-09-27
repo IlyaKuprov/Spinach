@@ -4,17 +4,8 @@
 
 ## Purpose
 
-Example of carbon hyperfine tensor visualisation for pyrene cation radical. Gaussian log is parsed.
+Parse `pyrene_cation.log` and visualise carbon hyperfine tensors for the pyrene cation radical.
 
-## Physical / mathematical content
+## Implementation
 
-- Visualisation examples. These scripts expose tensor geometry: principal axes, shielding/hyperfine/EFG ellipsoids, molecular frames, and the relationship between tensor eigenstructure and observable anisotropy.
-
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Example of carbon hyperfine tensor visualisation for
-- pyrene cation radical. Gaussian log is parsed.
-- Read the Gaussian log
-- Do the visualization
+The script compares ellipsoid and spherical-harmonic views using `hfc_display`, selecting `C` and passing the source parameter `0.2` in both calls.

@@ -4,27 +4,16 @@
 
 ## Purpose
 
-Optomechanical sideband transfer of a phonon Fock state into a driven cavity. A red-detuned coherent drive on the cavity acti- vates the beam-splitter part of the radiation pressure coupling, and the second Fock state of the mechanical oscillator is cohe- rently exchanged with the cavity field. Model and parameters from the propagation test set of QuantumPropagators.jl; all quantities are in the dimensionless units o
+Optomechanical sideband transfer from a phonon Fock state to a driven cavity. A red-detuned coherent cavity drive activates the beam-splitter component of radiation-pressure coupling, exchanging the mechanical mode's second Fock state with the cavity field. The model and parameters come from the propagation test set of QuantumPropagators.jl; its dimensionless quantities are divided by 2π to cancel the Hz convention. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
+- The model has a five-level cavity and an eleven-level phonon mode. Radiation-pressure coupling links cavity photon number to the phonon coordinate; the coherent cavity drive produces the sideband exchange.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- In the `zeeman-hilb` formalism with no basis approximation, the example builds the Hamiltonian, forms a one-step propagator, and iterates it over 250 steps of 0.2 dimensionless time units. It tracks both mode occupations and checks trace preservation, the initial phonon occupation, and transfer into the cavity.
 
 ## Implementation structure
 
-- Optomechanical sideband transfer of a phonon Fock state into a
-- driven cavity. A red-detuned coherent drive on the cavity acti-
-- vates the beam-splitter part of the radiation pressure coupling,
-- and the second Fock state of the mechanical oscillator is cohe-
-- rently exchanged with the cavity field. Model and parameters
-- from the propagation test set of QuantumPropagators.jl; all
-- quantities are in the dimensionless units of the source, with
-- input values divided by 2*pi to cancel the Hz convention.
-- Calculation time: seconds
-- Magnet field
-- Cavity with five and phonon mode with eleven Fock levels
-- Mode frequencies, cavity in the red-detuned drive rotating frame
+- Both mode frequencies are `10/(2*pi)`; the longitudinal coupling is `-sqrt(2)/(2*pi)`. The drive adds `2*(C+A)` for cavity mode 1. The initial state is `{'BL1','BL3'}` on modes 1 and 2 (empty cavity and second phonon Fock state). The plotted observables are the cavity and mechanical-mode occupations.

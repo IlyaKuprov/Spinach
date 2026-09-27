@@ -4,30 +4,15 @@
 
 ## Purpose
 
-CSA-CSA cross-correlation in the 103Rh subsystem and its effect on the widths of the three lines of the proton triplet. Calculation time: seconds.
+Illustrate CSA–CSA cross-correlation in the `103Rh` subsystem and its effect on the widths of the proton triplet lines. Calculation time: seconds.
 
-## Physical / mathematical content
+## Spin system and relaxation
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+- Field: `11.75 T`; isotopes: `{'1H','103Rh','103Rh'}`.
+- The proton shielding matrix is diagonal with `[6.9 6.9 6.9]`; each rhodium shielding matrix is diagonal with `[7250 8000 7250]`.
+- Scalar couplings are 4 Hz between the proton and each rhodium, and 100 Hz between the rhodium nuclei.
+- Redfield relaxation uses `tau_c={10e-9}`, zero equilibrium, and secular retention; the basis is `sphten-liouv` with no approximation.
 
-## Numerical / algorithmic content
+## Acquisition and processing
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- CSA-CSA cross-correlation in the 103Rh subsystem and its effect
-- on the widths of the three lines of the proton triplet.
-- Calculation time: seconds.
-- Magnet field
-- Set the spin system
-- J-couplings
-- Relaxation theory
-- Basis set
-- Spinach housekeeping
-- Sequence parameters -1H
-- Simulation
-- Apodisation
+The liquid-state acquisition uses `1H` with `L+` initial and detection states, no decoupling, offset `6.9*500`, sweep 50, 2048 points, and zero-fill 16384. The axis is in ppm and inverted. The FID is generated with `liquid(...,@acquire,...,'nmr')`, exponentially apodised with 20, Fourier transformed, and plotted.

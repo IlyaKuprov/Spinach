@@ -8,13 +8,12 @@ Singlet imaging in a system with one-dimensional diffusion and flow. Calculation
 
 ## Physical / mathematical content
 
-- Long-lived singlet-state examples. The central concept is symmetry-protected or nearly symmetry-protected two-spin order that relaxes much more slowly than ordinary Zeeman magnetisation. Files here often analyse singlet-triplet subspaces, state conversion sequences, and relaxation leakage channels.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+- The model uses two 13C spins with scalar coupling 55 Hz and opposite Zeeman offsets, 0.03 and -0.03, under a Redfield relaxation model with zero equilibrium, secular retention, and correlation time `1e-9`. The example compares singlet-state and transverse-magnetisation imaging trajectories.
+- The 2D sample grid is `150 x 15` over dimensions `[0.10 0.015]`; flow is along the first coordinate at `-6e-2`, and diffusion is `3.6e-6` along that coordinate only.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- The script builds a spatial Liouvillian from the Hamiltonian, flow, relaxation, and kinetic terms, then applies a shaped pulse and an M2S sequence to prepare singlet order. `imaging` propagates both singlet and magnetisation states for display as separate tube images.
 
 ## Implementation structure
 

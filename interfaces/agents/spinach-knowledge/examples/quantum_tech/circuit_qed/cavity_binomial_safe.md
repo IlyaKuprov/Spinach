@@ -4,30 +4,16 @@
 
 ## Purpose
 
-Binomial bosonic code |0L>=(|0>+|4>)/sqrt(2), |1L>=|2> in a cavity dispersively coupled to a flux-tunable transmon ancilla, and the protection of its coherences from 1/f flux noise by a Stark-assis- ted flux-noise evasion (SAFE) drive on the transmon, Sec. 4.4.1 and Fig. 4.4(a,b) of Yunwei Lu's PhD thesis (Northwestern University, 2026). The flux noise dephasing rates of the code and error space coherences are computed from the flux sensitivities of the dressed cavity transition frequencies as functions of the transmon-drive detuning, Eq. (4.93); at the common minimum the logical state |+L> is then propagated for 300 microseconds along 1/f flux noise tra- jectories under the Lindblad master equation, with and without the drive, and the decoherence-only infidelity of Eq. (4.94) and the Wigner function of the cavity state are reported. Calculation time: minutes
+Evaluates SAFE-drive suppression of flux-noise dephasing and decoherence for a binomial cavity code. The code states are `|0L>=(|0>+|4>)/sqrt(2)` and `|1L>=|2>`. This example follows Sec. 4.4.1 and Fig. 4.4(a,b) of Yunwei Lu's 2026 Northwestern University PhD thesis; it refers to Eqs. (4.93) and (4.94).
 
 ## Physical / mathematical content
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
+A three-level flux-tunable transmon is dispersively coupled to a five-level cavity. The model uses transmon anharmonicity `-67 MHz`, coupling `86 MHz`, and detuning `1.414 GHz`, giving the stated 0.5 MHz dispersive shift. The SAFE drive amplitude is 10 MHz and its detuning is scanned from -20 to -80 MHz. Flux-noise dephasing rates for the listed code- and error-space coherences are obtained from flux sensitivities of the dressed cavity transition frequencies; the common operating detuning is selected from the median of the individual rate minima.
 
 ## Numerical / algorithmic content
 
-- An eigenvalue problem is solved or analysed, so the file is extracting spectra, stationary states, avoided crossings, or modal structure from the effective Hamiltonian or superoperator.
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The Lindblad propagation is averaged over 100 windowed 1/f flux-noise trajectories from `pink_noise`, with the propagators tabulated on a 201-point grid of the transmon frequency offset and looked up per time step; the Wigner functions of the final cavity states are evaluated point by point on a 71x71 phase-space grid with `wigner_fock`, and the unit integral of the initial state on that grid is checked.
+The script uses flux-noise amplitude `1e-5`, a 50 MHz ultraviolet cutoff, transmon and cavity relaxation times of 50 microseconds and 20 milliseconds, and 100 trajectories. It propagates a Lindblad master equation for 30,000 steps of 10 ns (300 microseconds), using propagators tabulated on 201 noise-frequency values and recording infidelity every 300 steps. It compares driven and undriven dephasing rates and decoherence-only infidelity, and computes the final cavity Wigner functions on a 71-by-71 grid. Runtime checks require at least fivefold rate suppression and threefold infidelity reduction.
 
 ## Implementation structure
 
-- Binomial bosonic code |0L>=(|0>+|4>)/sqrt(2), |1L>=|2> in a cavity
-- dispersively coupled to a flux-tunable transmon ancilla, and the
-- protection of its coherences from 1/f flux noise by a Stark-assis-
-- ted flux-noise evasion (SAFE) drive on the transmon, Sec. 4.4.1 and
-- Fig. 4.4(a,b) of Yunwei Lu's PhD thesis (Northwestern University,
-- 2026). The flux noise dephasing rates of the code and error space
-- coherences are computed from the flux sensitivities of the dressed
-- cavity transition frequencies as functions of the transmon-drive
-- detuning, Eq. (4.93); at the common minimum the logical state |+L>
-- is then propagated for 300 microseconds along 1/f flux noise tra-
-- jectories under the Lindblad master equation, with and without the
-- drive, and the decoherence-only infidelity of Eq. (4.94) and the
+The script constructs dressed-state Hamiltonians for the detuning scan, builds the Liouville-space drift, drive, and noise generators, synthesises the noise trajectories, and averages propagated states. It then traces out the transmon, checks the infidelity criterion, computes and normalises the Wigner functions, and plots the rates, infidelity, and cavity phase-space distributions.

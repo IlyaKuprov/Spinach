@@ -8,12 +8,15 @@ A simulation of the matrix in Equation 2 of IK's paper on chemically amplified N
 
 ## Physical / mathematical content
 
-- Spin-chemistry examples. These scripts treat radical pairs, recombination channels, chemically induced dynamic nuclear polarisation, and magnetic-field effects. The theory combines spin-selective kinetics with singlet-triplet interconversion.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+
+## Physical / mathematical content
+
+- At 14.1 T, the model is a 1H-19F pair with zero isotropic shifts, 50 Hz scalar coupling, and a fluorine CSA tensor with principal values `[-47 -16 63]`. The spins are separated by `2.60` along y.
+- The Redfield relaxation model retains secular terms, uses `tau_c=110e-12`, and is configured for equilibrium magnetisation at `298 K`. The script adds pumping terms with strengths `1.3` for 1H and `34.0` for 19F.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- It forms the active-state basis `[U Hz Fz -HzFz]`, projects the relaxation-plus-pumping matrix into that four-state space, and displays the resulting matrix from Equation 2.
 
 ## Implementation structure
 

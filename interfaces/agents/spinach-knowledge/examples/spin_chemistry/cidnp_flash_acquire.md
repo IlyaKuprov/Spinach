@@ -8,12 +8,12 @@ A model of the CIDNP magnetisation pumping process described in IK's paper: The 
 
 ## Physical / mathematical content
 
-- Spin-chemistry examples. These scripts treat radical pairs, recombination channels, chemically induced dynamic nuclear polarisation, and magnetic-field effects. The theory combines spin-selective kinetics with singlet-triplet interconversion.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+- At 14.1 T, the model contains 1H and 19F with zero isotropic shifts, a 50 Hz scalar coupling, and a fluorine CSA tensor with principal values `[-47 -16 63]`. The spins are separated by `2.60` along the y coordinate.
+- Relaxation is Redfield with secular terms retained, zero equilibrium, and correlation time `110e-12`. The relaxation matrix is thermalised to the sum of the proton and fluorine z-magnetisations; light-induced pumping terms are added for each spin.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- Starting from `unit_state + Hz + Fz`, the script propagates under illumination for 50 steps of `0.01 s`, then without the light-pumping terms for 500 further steps of `0.01 s`. It plots the time courses of `Fz`, `Hz`, and `HzFz` over 5.5 s.
 
 ## Implementation structure
 

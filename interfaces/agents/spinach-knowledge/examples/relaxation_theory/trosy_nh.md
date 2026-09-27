@@ -4,29 +4,16 @@
 
 ## Purpose
 
-Transverse relaxation rate as a function of the applied magnetic field at a typical amide N-H group in a protein. Rotational cor- relation time set to 25 ns. Nitrogen CSA parameters from Nitrogen-proton bond length from DFT. Calculation time: minutes.
+Calculate transverse relaxation matrix elements as a function of magnetic field for a typical protein amide `1H`–`15N` group. The rotational correlation time is 25 ns. The nitrogen CSA parameters are from [the cited study](http://dx.doi.org/10.1021/ja0016194); the nitrogen–proton bond length is from DFT. The source estimates a calculation time of minutes.
 
 ## Physical / mathematical content
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+- The two-spin system uses proton and nitrogen shielding-tensor eigenvalues `[6, 0, -6]` and `[-108, 62, 46]`, respectively. Their Euler angles are `[0, 0, 0]` and `[0, 0, -19]` degrees; the spin coordinates are `[1.04, 0, 0]` and `[0, 0, 0]`.
+- Relaxation is calculated with the `redfield` model, `labframe` relaxation terms, `zero` equilibrium, and `tau_c={25e-9}`.
+- Six rates are evaluated as negative diagonal matrix elements of the relaxation superoperator: single-spin `H+` and `N+` coherences, plus the normalized `H+ - 2 H+ Nz`, `H+ + 2 H+ Nz`, `N+ - 2 N+ Hz`, and `N+ + 2 N+ Hz` states.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Transverse relaxation rate as a function of the applied magnetic
-- field at a typical amide N-H group in a protein. Rotational cor-
-- relation time set to 25 ns. Nitrogen CSA parameters from
-- Nitrogen-proton bond length from DFT.
-- Calculation time: minutes.
-- Specify coordinates and CSAs
-- Relaxation theory
-- Formalism and approximation
-- Disable startup checks
-- Magnetic field grid
-- Loop over magnetic fields
-- Set the magnet field
+- The calculation uses the `sphten-liouv` formalism with no basis approximation. Startup hygiene checks are disabled.
+- A 30-point grid spans proton Larmor frequencies from 200 to 1500 MHz. Each frequency is converted to a magnetic field using `spin('1H')`; the spin system and basis are then built and the relaxation superoperator is calculated at that field.
+- Two figures plot the three proton and three nitrogen relaxation matrix elements against proton Larmor frequency (MHz), with relaxation matrix elements labelled in Hz.

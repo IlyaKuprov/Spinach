@@ -8,23 +8,15 @@ Field-swept powder EPR spectra of SiV0 centre in diamond at X and W bands. Calcu
 
 ## Physical / mathematical content
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
+The example models the SiV0 centre using `29Si` with no `13C` nuclei included in the spin system. It calculates the electron-spin powder EPR spectra at X and W bands.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The calculation uses the unapproximated Zeeman Hilbert-space basis (`zeeman-hilb`) and spherical powder grid `rep_2ang_100pts_sph`.  Each sweep has 2048 field points, RSPT order `Inf`, line width `0.001 T`, integration tolerance `1e-4`, and transition-moment tolerance `0.001`.
 
 ## Implementation structure
 
-- Field-swept powder EPR spectra of SiV0 centre
-- in diamond at X and W bands.
-- Calculation time: seconds.
-- Set SiV0 centre model parameters.
-- Build the spin system
-- Field sweep
-- Define the basis set
-- Run Spinach housekeeping
-- EPR sim parameters
-- Set X-band parameters
-- Run the X-band simulation
-- Plot the X-band spectrum
+- Set the SiV0 orientation to `111`, choose `29Si`, and set the number of `13C` nuclei to zero; build the system with `diamond_siv0`.
+- Set the magnet field to 1 T, construct the Zeeman Hilbert basis, and run Spinach housekeeping.
+- Run X-band `fieldsweep` at 9.5 GHz over 0.1–0.5 T and W-band `fieldsweep` at 94 GHz over 3.2–3.5 T.
+- Plot each spectrum against its returned magnetic-field axis.

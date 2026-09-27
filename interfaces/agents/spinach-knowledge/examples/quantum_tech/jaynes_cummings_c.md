@@ -4,28 +4,16 @@
 
 ## Purpose
 
-An exchange-coupled two-electron system with the electrons having independent Jaynes-Cummings couplings to the same mode of an electromagnetic cavity. A time-domain simulati- on starting with transverse spin magnetisation and empty cavity mode. Detected on the Lx operator of the spin and magnetic field operator of the cavity mode. Calculation time: seconds
+A time-domain Jaynes–Cummings simulation of two exchange-coupled electrons, each coupled to the same electromagnetic cavity mode. The initial state contains transverse spin magnetisation and an empty cavity; the calculation detects the summed spin `Lx` signal and the cavity-field quadrature. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The physics is Jaynes-Cummings-like cavity QED: a two-level or few-level matter degree of freedom exchanges excitations with a quantised harmonic mode through rotating terms such as a†σ_- + aσ_+.
+- The cavity is resonant with the electrons, and the two spins have distinct cavity exchange couplings. Their mutual scalar exchange coupling is included, so the spin and cavity dynamics evolve together.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- The source builds the system in Spinach's `sphten-liouv` formalism with no basis approximation, then propagates it through the cavity device context. The trajectory uses 251 points over 2.5 μs.
 
 ## Implementation structure
 
-- An exchange-coupled two-electron system with the electrons
-- having independent Jaynes-Cummings couplings to the same
-- mode of an electromagnetic cavity. A time-domain simulati-
-- on starting with transverse spin magnetisation and empty
-- cavity mode. Detected on the Lx operator of the spin and
-- magnetic field operator of the cavity mode.
-- Calculation time: seconds
-- Magnet field
-- System
-- Exchange coupling between the electrons
-- Cavity resonant with the electrons
-- Basis set
+- Parameters include `sys.magnet=0.33`, isotopes `{'E','E','C5'}`, electron–electron scalar coupling `5e6`, cavity exchange couplings `2.828e6` and `2.728e6`, sequence offset `5e6`, sweep `1e8`, and `npoints=251`. Both spins start with `Lx` contributions paired with cavity state `BL1`; the detected spin operator sums their `Lx` operators, and the cavity signal uses `(C-A)/2i` on mode 3.

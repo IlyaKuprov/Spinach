@@ -4,31 +4,12 @@
 
 ## Purpose
 
-DD-CSA cross-correlation -a reproduction of Fig 5a from the paper by Grace and Kumar (http://dx.doi.org/10.1006/jmra.1995.1151). Calculation time: seconds
+DD–CSA cross-correlation example reproducing Fig. 5a from Grace and Kumar ([http://dx.doi.org/10.1006/jmra.1995.1151](http://dx.doi.org/10.1006/jmra.1995.1151)). Calculation time: seconds.
 
-## Physical / mathematical content
+## Imported system and relaxation model
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+The source reads the vacuum-DFT spin system from `../standard_systems/fdnb.log` using `gparse` and `g2spinach` with the H/`1H` and F/`19F` mappings and arguments `[32.0 270.0]`. It sets the field to 9.4 T, Redfield relaxation with secular retention, Di Bari equilibrium at 298 K, and `tau_c={9.6e-12}`. The proximity cutoff is first assigned 5 Å and then overwritten with 4.0 Å before system creation. The basis is `sphten-liouv` without approximation.
 
-## Numerical / algorithmic content
+## Simulation and spectra
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-
-## Implementation structure
-
-- DD-CSA cross-correlation -a reproduction of Fig 5a from the paper
-- by Grace and Kumar (http://dx.doi.org/10.1006/jmra.1995.1151).
-- Calculation time: seconds
-- Read the spin system parameters (vacuum DFT calculation)
-- Set up the calculation
-- Proximity cut-off
-- Run Spinach housekeeping
-- Set simulation parameters
-- Set the assumptions to high-field NMR
-- Get the Hamiltonian superoperator
-- Add Redfield superoperator,
-- Apply the offset
+The acquisition uses `19F`, offset −521, sweep 50, 128 points, and zero-fill 512. The code assumes NMR conditions, forms the Hamiltonian plus `1i*relaxation(spin_system)`, and applies the frequency offset. For each mixing time `[0.1 1.4 1.6 1.8 2.0 2.2 2.4 10]` s, it starts from thermal equilibrium, applies a pi pulse, evolves through mixing, applies a pi/2 pulse, and acquires the detection period. The FID is exponentially apodised with 6 before Fourier transformation; the real spectra are plotted against 19F linear frequency in Hz.

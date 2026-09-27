@@ -4,28 +4,12 @@
 
 ## Purpose
 
-Ramsey chevron of a three-level transmon in the Duffing ap- proximation. A nominal pi/2 pulse prepares a coherence, and detuning during free evolution produces Ramsey fringes. Calculation time: seconds
+Ramsey chevron of a three-level transmon in the Duffing approximation. A nominal pi/2 pulse prepares a coherence, and detuning during free evolution produces Ramsey fringes. Calculation time: seconds.
 
-## Physical / mathematical content
+## Model and parameters
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
+The T3 transmon is in the rotating frame with anharmonicity -260 MHz and uses the Zeeman-Hilbert formalism without approximation. The detuning grid contains 256 points from -20 to 20 MHz; free-evolution times contain 256 points from 0 to 1 microsecond.
 
-## Numerical / algorithmic content
+## Calculation
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-
-## Implementation structure
-
-- Ramsey chevron of a three-level transmon in the Duffing ap-
-- proximation. A nominal pi/2 pulse prepares a coherence, and
-- detuning during free evolution produces Ramsey fringes.
-- Calculation time: seconds
-- Magnet field
-- Particle specification
-- Transmon in the rotating frame
-- Formalism and basis
-- Spinach housekeeping
-- Anharmonicity part from the declared interactions
-- Transmon operators
-- Free-evolution parameters
+A nominal pi/2 propagator prepares the initial BL1 state. For each detuning and time, the code propagates under the anharmonic Hamiltonian plus the number-operator offset, applies the same final pi/2 pulse, and detects BL2 population. The result is plotted as a detuning-versus-time Ramsey chevron.

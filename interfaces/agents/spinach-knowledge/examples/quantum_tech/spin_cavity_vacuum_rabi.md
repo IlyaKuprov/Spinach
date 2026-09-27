@@ -4,28 +4,16 @@
 
 ## Purpose
 
-Vacuum Rabi oscillation between an electron spin and a micro- wave cavity mode in the Jaynes-Cummings approximation. This is the one-spin limit of the spin-ensemble cavity experiments of Schuster et al. and Kubo et al., Phys. Rev. Lett. 105, 140501 and 140502 (2010). Calculation time: seconds
+Vacuum Rabi oscillation between an electron spin and a microwave cavity mode in the Jaynes–Cummings approximation. This is the one-spin limit of the spin-ensemble cavity experiments of Schuster et al. and Kubo et al., Phys. Rev. Lett. 105, 140501 and 140502 (2010). Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The physics is Jaynes-Cummings-like cavity QED: a two-level or few-level matter degree of freedom exchanges excitations with a quantised harmonic mode through rotating terms such as a†σ_- + aσ_+.
+- A resonant cavity exchanges a single excitation with an electron spin. The example tracks spin and cavity excitation populations and checks both visible transfer and conservation of population in the active doublet.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- Spinach builds a `zeeman-hilb` model with no basis approximation and propagates the initial spin excitation through the cavity device context. The sequence uses 501 points, corresponding to the plotted 0–500 ns interval.
 
 ## Implementation structure
 
-- Vacuum Rabi oscillation between an electron spin and a micro-
-- wave cavity mode in the Jaynes-Cummings approximation. This
-- is the one-spin limit of the spin-ensemble cavity experiments
-- of Schuster et al. and Kubo et al., Phys. Rev. Lett. 105,
-- 140501 and 140502 (2010).
-- Calculation time: seconds
-- Magnet field
-- Particle specification
-- Resonant cavity in the rotating frame
-- Formalism and basis
-- Spinach housekeeping
-- Sequence parameters
+- The source uses isotopes `{'E','C3'}`, a resonant cavity mode at zero rotating-frame frequency, and exchange coupling `8e6`. The initial state is `{'ZL2','BL1'}` on the spin and cavity. Projectors `{'ZL2','E'}` and `{'ZL1','BL2'}` measure the spin and cavity populations, respectively.

@@ -4,17 +4,8 @@
 
 ## Purpose
 
-Example of proton hyperfine tensor visualisation for copper porphyrine. ORCA log is parsed.
+Parse the ORCA output file `porphyrine.out` and visualise proton hyperfine tensors for copper porphyrine.
 
-## Physical / mathematical content
+## Implementation
 
-- Visualisation examples. These scripts expose tensor geometry: principal axes, shielding/hyperfine/EFG ellipsoids, molecular frames, and the relationship between tensor eigenstructure and observable anisotropy.
-
-## Numerical / algorithmic content
-
-## Implementation structure
-
-- Example of proton hyperfine tensor visualisation for
-- copper porphyrine. ORCA log is parsed.
-- Read the ORCA log
-- Do the visualisation
+The script compares ellipsoid and spherical-harmonic views using `hfc_display`, selecting `H` and passing the source parameter `2.0` in both calls.

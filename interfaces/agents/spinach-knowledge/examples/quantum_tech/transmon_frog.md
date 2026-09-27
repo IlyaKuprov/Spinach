@@ -4,31 +4,12 @@
 
 ## Purpose
 
-Basic implementation of a Frequency Robust Gate (FROG) for a single transmon, based on: Ensemble GRAPE optimisation with a distribution of control powers and excess amplitude penalty. Calculation time: minutes
+A Frequency Robust Gate (FROG) for a single transmon, using ensemble GRAPE over a distribution of control powers with an excess-amplitude penalty. Calculation time: minutes. The source cites https://doi.org/10.48550/arXiv.2511.22580.
 
-## Physical / mathematical content
+## Model and parameters
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
-- The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
+The T3 transmon is represented in a rotating frame with frequency 0.5 MHz and anharmonicity -295.1 MHz, using the Zeeman-Liouville formalism without approximation. The gate duration is 112 ns with 224 control steps. Its target state is the normalized three-level superposition `[1; -1i; 0]/sqrt(2)`.
 
-## Numerical / algorithmic content
+## Optimization
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
-
-## Implementation structure
-
-- Basic implementation of a Frequency Robust Gate
-- (FROG) for a single transmon, based on:
-- Ensemble GRAPE optimisation with a distribution
-- of control powers and excess amplitude penalty.
-- Calculation time: minutes
-- Magnet field
-- Particle specification
-- Rotating frame transmon parameters
-- Formalism and basis
-- Spinach housekeeping
-- Drift Hamiltonian from the declared interactions
-- Build the intial control pulses (FROG)
+The initial two-quadrature pulse is built from five sine coefficients per channel. GRAPE optimizes it over power levels 15–19 MHz, with SNSA penalty weight 0.01, the Goodwin method, and a 50-iteration limit. The source plots controls, a spectrogram, and robustness during optimization, and runs `fmaxnewton` with `grape_xy`.

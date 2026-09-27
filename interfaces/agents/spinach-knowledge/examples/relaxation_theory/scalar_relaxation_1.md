@@ -4,27 +4,12 @@
 
 ## Purpose
 
-Redfield superoperator for the scalar relaxation of the first kind in a two-proton system with a noisy J-coupling. This si- tuation occurs in aziridines, where the slow nitrogen inversi- on jitters scalar couplings on a millisecond time scale. Set to demonstrate the effect described in: Calculation time: seconds
+Constructs and displays a Redfield superoperator for scalar relaxation of the first kind in a two-proton system with a fluctuating J-coupling. The example is described as modelling the effect of slow nitrogen inversion in aziridines, which modulates scalar couplings on a millisecond timescale; see the cited [article](http://dx.doi.org/10.1002/ange.201410271). Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+The two `1H` spins are specified at `11.75 T`, with Zeeman scalars `0.0` and `2.0`. The Redfield setup selects `SRFK` relaxation, keeps the `kite` terms, uses zero equilibrium, sets correlation times to `1.0` and `1e-3`, and sets the sole off-diagonal SRFK modulation depth to `15.0`.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Redfield superoperator for the scalar relaxation of the first
-- kind in a two-proton system with a noisy J-coupling. This si-
-- tuation occurs in aziridines, where the slow nitrogen inversi-
-- on jitters scalar couplings on a millisecond time scale. Set
-- to demonstrate the effect described in:
-- Calculation time: seconds
-- System specification
-- Basis set
-- Relaxation superoperator
-- Spinach housekeeping
-- Show a spy plot of R
+The model uses the complete `sphten-liouv` basis with no approximation. It creates the spin system and basis, obtains the relaxation superoperator, and displays the nonzero pattern with `spy`.

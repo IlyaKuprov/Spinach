@@ -4,30 +4,12 @@
 
 ## Purpose
 
-Basic single transmon system with Duffing model in- teractions, parameters and model from: Ensemble GRAPE optimisation with a distribution of control powers and a penalty on excess power. Calculation time: minutes
+Ensemble-GRAPE optimization of a single-transmon STIRAP transfer using Gaussian pulses and a penalty on excess power. Calculation time: minutes. The source identifies the model with https://doi.org/10.1038/ncomms10628.
 
-## Physical / mathematical content
+## Model and parameters
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
-- The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
+The rotating-frame T3 transmon has a 10 MHz ladder detuning and -20 MHz anharmonicity. Gaussian pulses drive the 0–1 and 1–2 transitions over 300 points spanning -150 to 150 ns, with 45 ns width and a -90 ns pulse-pair delay. Their nominal normalized amplitudes are set by 43.4 and 38.2 MHz, and the pulse-power ensemble is 30, 35, 40, 45, and 50 MHz. The transfer is from BL1 to BL3.
 
-## Numerical / algorithmic content
+## Optimization
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Basic single transmon system with Duffing model in-
-- teractions, parameters and model from:
-- Ensemble GRAPE optimisation with a distribution of
-- control powers and a penalty on excess power.
-- Calculation time: minutes
-- Magnet field
-- Particle specification
-- Rotating frame ladder detunings
-- Formalism and basis
-- Spinach housekeeping
-- Drift Hamiltonian from the declared interactions
-- Pulse power ensemble
+The two transition controls are optimized by GRAPE with the SNSA penalty (weight 1.0), Goodwin method, and a 50-iteration limit. The Gaussian pulse pair is the initial guess; the source cites https://doi.org/10.1038/ncomms10628.

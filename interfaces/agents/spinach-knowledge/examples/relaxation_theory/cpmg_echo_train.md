@@ -4,25 +4,14 @@
 
 ## Purpose
 
-CPMG echo train in a powder. Calculation time: seconds
+Simulate and plot a CPMG echo train over a powder grid for a two-proton system. Calculation time: seconds.
 
-## Physical / mathematical content
+## System and relaxation model
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
+- Field: `14.1 T`; isotopes: `{'1H','1H'}`. The shielding principal-value expressions are `[-2 -2 4]-5` and `[-1 -3 4]+5`, with zero Euler angles.
+- The `t1_t2` model uses `r1_rates={50.0 50.0}` and `r2_rates={150.0 150.0}`, zero equilibrium, and secular relaxation retention.
+- The basis is `sphten-liouv` without approximation; trajectory-level processing is disabled.
 
-## Numerical / algorithmic content
+## Powder simulation
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- CPMG echo train in a powder.
-- Calculation time: seconds
-- System specification
-- Basis set
-- Relaxation theory
-- Algorithmic options
-- Spinach housekeeping
-- Experiment setup
-- Simulation
-- Plotting
+The powder grid is `rep_2ang_200pts_sph`. The experiment selects `1H`, uses `L+` for the initial state and coil, and sets `Lx` as the pulse operator. It runs `powder(spin_system,@cpmg,parameters,'nmr')` with 10 loops, a `1e-5 s` timestep, and 100 points, then plots the real FID versus time.

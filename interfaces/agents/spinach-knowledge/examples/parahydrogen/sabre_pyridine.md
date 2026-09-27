@@ -4,30 +4,16 @@
 
 ## Purpose
 
-SABRE experiment simulation for Eibe Duecker and Christian Griesinger. Set to reproduce Figure 3b from http://dx.doi.org/10.1021/ja903601p Calculation time: minutes
+Models the pyridine SABRE experiment associated with Eibe Duecker and Christian Griesinger, aiming to reproduce Figure 3b ([http://dx.doi.org/10.1021/ja903601p](http://dx.doi.org/10.1021/ja903601p)). The source gives a calculation time of minutes.
 
 ## Physical / mathematical content
 
-- Parahydrogen examples. The physical motif is highly non-Boltzmann singlet order imported from para-H2 and converted into observable nuclear magnetisation through hydrogenation, exchange, or catalytic transfer processes.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The seven-spin model comprises five pyridine protons and two hydride protons, with the source's chemical shifts and scalar couplings. It begins with a singlet on the hydrides in a 25 mT polarization field. After 2.5 s of evolution, the hydride pair is decoupled and the system evolves for another 2.5 s; the field is then raised exponentially to 7.05 T over 5 s (1024 steps), followed by 1 s of high-field evolution.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+The script propagates the density operator under the Hamiltonian during the low-field, post-decoupling, and field-ramp stages. It then applies a `pi/2` y pulse and simulates a proton FID with a 2400 kHz offset, 600 kHz sweep, 1024 points, and 4096-point zero filling. The FID is exponentially apodised (factor 6) before Fourier transformation.
 
 ## Implementation structure
 
-- SABRE experiment simulation for Eibe Duecker and Christian Griesinger.
-- Set to reproduce Figure 3b from http://dx.doi.org/10.1021/ja903601p
-- Calculation time: minutes
-- Spin system
-- Chemical shifts
-- Couplings inside pyridine
-- Couplings of the hydride group
-- Magnetic fields
-- Basis set
-- Algorithmic options
-- Do the housekeeping
-- Get the Hamiltonian superoperator
+The script defines proton shifts and couplings, builds the spherical-tensor Liouville basis with no approximation, constructs the singlet initial state and Hamiltonian, performs the low-field, decoupling, field-ramp, and high-field stages, then sets acquisition and plotting parameters.

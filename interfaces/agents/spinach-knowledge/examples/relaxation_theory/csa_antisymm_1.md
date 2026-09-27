@@ -4,27 +4,13 @@
 
 ## Purpose
 
-Longitudinal and transverse relaxation rates in a system with a significant antisymmetry in the shielding tensor. Calculation time: seconds
+Calculate longitudinal and transverse relaxation rates for a single `13C` nucleus with a shielding tensor that has a significant antisymmetric component, then compare Spinach projections with textbook CSA rates. Calculation time: seconds.
 
-## Physical / mathematical content
+## Model and parameters
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+- Field: `14.1 T`. The shielding matrix (ppm) is `[100 20 15; 20 0 30; 25 10 -30]`.
+- Redfield relaxation uses `tau_c={50e-12}`, zero equilibrium, and `labframe` retention; the basis is `sphten-liouv` with no approximation.
 
-## Numerical / algorithmic content
+## Calculation
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Longitudinal and transverse relaxation rates in a system
-- with a significant antisymmetry in the shielding tensor.
-- Calculation time: seconds
-- System specification
-- Relaxation theory parameters
-- Basis set
-- Spinach housekeeping
-- Spinach relaxation rates
-- Textbook relaxation rates
-- Summary
+After computing `R=relaxation(spin_system)`, the example projects `R` onto `Lz` and `L+` to obtain `R1Sp` and `R2Sp`. It calls `rlx_csa` with the same field, isotope, shielding matrix, and correlation time for `R1Book` and `R2Book`, then prints both pairs of values.

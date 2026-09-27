@@ -4,30 +4,15 @@
 
 ## Purpose
 
-Complete Bloch-Redfield-Wangsness relaxation superoperator in a system with two anisotropically shielded nuclei with a dipolar coupling betwe- en them. Spinach relaxation theory module automatically accounts for all cross-correlations (CSA-CSA and DD-CSA cross-correlations are both pre- sent in this case). Dipolar couplings are computed from Cartesian coor- dinates of the two spins. Calculation time: seconds
+Construct and display a complete Redfield relaxation superoperator for anisotropically shielded `1H` and `13C` nuclei with a dipolar interaction. The source identifies CSA–CSA and DD–CSA cross-correlations as present and states that the dipolar coupling is computed from the spin coordinates. Calculation time: seconds.
 
-## Physical / mathematical content
+## Model and parameters
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+- Field: `14.1 T`; shielding principal-value rows (ppm): `[7 15 -22]` and `[11 18 -29]`.
+- Shielding Euler-angle rows: `[pi/3 pi/4 pi/5]` and `[pi/6 pi/7 pi/8]`.
+- Coordinates (Å): `[0 0 0]` and `[0 0 1.02]`.
+- Redfield relaxation uses `tau_c={1e-9}`, zero equilibrium, and `labframe` retention; the basis is `sphten-liouv` with no approximation.
 
-## Numerical / algorithmic content
+## Calculation
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Complete Bloch-Redfield-Wangsness relaxation superoperator in a system
-- with two anisotropically shielded nuclei with a dipolar coupling betwe-
-- en them. Spinach relaxation theory module automatically accounts for all
-- cross-correlations (CSA-CSA and DD-CSA cross-correlations are both pre-
-- sent in this case). Dipolar couplings are computed from Cartesian coor-
-- dinates of the two spins.
-- Calculation time: seconds
-- Spin system
-- Basis set
-- Interactions
-- Relaxation theory parameters
-- Spinach housekeeping
+Spinach creates and bases the system, evaluates `relaxation(spin_system)`, and prints the full superoperator.

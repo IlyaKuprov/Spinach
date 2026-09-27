@@ -8,26 +8,12 @@ A demonstration that the nitrogen singlet state in urea is not long-lived. The r
 
 ## Physical / mathematical content
 
-- Long-lived singlet-state examples. The central concept is symmetry-protected or nearly symmetry-protected two-spin order that relaxes much more slowly than ordinary Zeeman magnetisation. Files here often analyse singlet-triplet subspaces, state conversion sequences, and relaxation leakage channels.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+The example probes relaxation of the 15N singlet state in urea, including all dipolar couplings and CSA tensors in the system.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+At 1.0 T, it builds a Redfield relaxation superoperator with a 100 ps correlation time, zero equilibrium and lab-frame terms; the relaxation integration and zero tolerances are 1e-5.
 
 ## Implementation structure
 
-- A demonstration that the nitrogen singlet state in urea is not
-- long-lived. The relaxation superoperator accounts for every di-
-- polar coupling and every CSA tensor in the system.
-- Calculation time: seconds
-- Read the spin system (coordinates, chemical shifts,
-- J-couplings and CSAs) from a vacuum DFT calculation
-- Set magnet field to 1.0 Tesla
-- Tighten up the tolerances
-- Set relaxation theory parameters
-- Relaxation superoperator accuracy
-- Use complete basis set
-- Spinach housekeeping
+It reads urea coordinates, shifts, J-couplings and CSAs from `../standard_systems/urea.log`, uses a complete sphten-liouv basis, and prints `norm(R*Lz)/norm(Lz)` and `norm(R*S)/norm(S)` for 15N Lz and the singlet of spins 1 and 4.

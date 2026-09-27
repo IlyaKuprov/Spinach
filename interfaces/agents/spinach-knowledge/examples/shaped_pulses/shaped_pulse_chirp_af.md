@@ -4,30 +4,22 @@
 
 ## Purpose
 
-Chirp inversion pulse using the Fokker-Planck formalism. Fewer points are required by the amplitude-frequency method than the "two points per period of the largest frequency" Nyquist-Shan- non condition would need for the {Cx,Cy} parameterised simula- tion of a chirped pulse. Calculation time: seconds
+Simulate a chirp pulse in amplitude-frequency coordinates using the Fokker-Planck formalism. This method requires fewer points than the Nyquist-Shannon condition of two points per period of the highest frequency for a `{Cx,Cy}`-parameterised chirp simulation. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Shaped-pulse examples. These scripts demonstrate amplitude, phase, frequency, and gradient waveform design, including adiabatic sweeps, excitation profiles, and hardware-response considerations.
-- The file uses a Fokker-Planck-style enlarged state space in which spatial or orientational coordinates are promoted to extra dimensions and coupled to spin dynamics through differential operators.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
+- The system contains 31 `1H` spins at a 14.1 T magnetic field. Their scalar Zeeman values span `-4` to `4`, and adjacent spins have scalar couplings of `20`.
+- A WURST chirp waveform is generated with `chirp_pulse(100,0.1,2000,16,'wurst')`; its frequency coordinates are then shifted by `1000`.
+- The amplitude-frequency pulse acts on initial longitudinal magnetisation with `shaped_pulse_af(...,frqs,amps,durs,pi/2,2)`. A homospoil destroys stray transverse magnetisation before a hard `pi/2` pulse about `Ly` prepares detection.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
+- The basis uses `sphten-liouv` formalism, `IK-2` approximation, `scalar_couplings` connectivity, and proximity level `1`.
+- Acquisition detects `L+` on `1H` with zero offset, sweep `5100`, `2048` points, `8192`-point zero filling, and an axis in Hz.
+- The acquired FID receives exponential apodisation with parameter `6`; `fftshift(fft(fid,parameters.zerofill))` produces the spectrum, whose real part is plotted.
 
 ## Implementation structure
 
-- Chirp inversion pulse using the Fokker-Planck formalism. Fewer
-- points are required by the amplitude-frequency method than the
-- "two points per period of the largest frequency" Nyquist-Shan-
-- non condition would need for the {Cx,Cy} parameterised simula-
-- tion of a chirped pulse.
-- Calculation time: seconds
-- Magnetic field
-- Isotopes
-- Zeeman interactions
-- Couplings
-- Basis set
-- Spinach housekeeping
+- Create the spin system and basis, then construct the Hamiltonian, relaxation and kinetics operators, and the `Lx` and `Ly` operators.
+- Generate and frequency-shift the chirp; apply the shaped pulse, homospoil, and hard pulse in sequence.
+- Acquire, apodise, Fourier-transform, and plot the signal.

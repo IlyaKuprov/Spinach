@@ -4,32 +4,16 @@
 
 ## Purpose
 
-Methylaziridine pulse-acquire, showing the effect of the scalar relaxation of the second kind due to the fast quadrupolar rela- xation of the 14N nuclei. Calculation time: minutes
+Simulates a proton pulse-acquire spectrum of methylaziridine, illustrating scalar relaxation of the second kind from rapid quadrupolar relaxation of the 14N nucleus. The source estimates minutes of calculation time.
 
 ## Physical / mathematical content
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The eight-spin model contains seven protons and one 14N nucleus at 11.75 T. Vacuum-DFT shielding tensors, a 14N quadrupole tensor, scalar couplings, and angstrom-scale Cartesian coordinates define the system; isotropic shifts are assigned from experiment. Redfield and SRSK relaxation are combined with zero equilibrium, secular retention, a 200 ps correlation time, and nucleus 4 as the SRSK source.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+The basis is `sphten-liouv` with IK-2 approximation, scalar-coupling connectivity, and proximity level 3. Inter-spin and proximity cutoffs are 2.0 and 4.0, and Krylov propagation is disabled. The proton acquisition starts and detects with `L+`, uses no decoupling, offset 500 Hz, sweep width 1400 Hz, 4096 points, and zero-fills to 16536. Exponential apodisation with parameter 6 precedes the Fourier transform; the plotted spectrum uses the real part and inverted-axis setting.
 
 ## Implementation structure
 
-- Methylaziridine pulse-acquire, showing the effect of the scalar
-- relaxation of the second kind due to the fast quadrupolar rela-
-- xation of the 14N nuclei.
-- Calculation time: minutes
-- Magnet induction
-- Isotopes
-- Absolute shielding (vacuum DFT)
-- Assign isotropic components from the experiment
-- Quadrupole couplings (vacuum DFT)
-- Scalar couplings (vacuum DFT)
-- Coordinates (Angstrom, vacuum DFT)
-- Basis set
+After setting molecular parameters and relaxation, the script builds the spin system and basis, fills the acquisition parameters, and calls `liquid` with `@acquire` in the NMR context. It apodises the FID, Fourier transforms it with `fftshift`, and displays the real spectrum with `plot_1d`.

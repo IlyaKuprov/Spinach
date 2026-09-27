@@ -8,26 +8,12 @@ A demonstration that the two-spin singet state is immune to dipolar relaxation. 
 
 ## Physical / mathematical content
 
-- Long-lived singlet-state examples. The central concept is symmetry-protected or nearly symmetry-protected two-spin order that relaxes much more slowly than ordinary Zeeman magnetisation. Files here often analyse singlet-triplet subspaces, state conversion sequences, and relaxation leakage channels.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-- The relevant state manifold is the singlet/triplet decomposition, where permutation symmetry controls selection rules, relaxation susceptibility, and convertibility to ordinary magnetisation.
+Two 1H spins at `[0.0 0.0 0.0]` and `[0.5 0.6 0.7]` in a 14.1 T field provide a test of singlet relaxation under dipolar interactions.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+The calculation uses Redfield relaxation with zero equilibrium, lab-frame terms, a 5e-9 s correlation time, 1e-5 integration and zero tolerances, and a 4.0 proximity cutoff.
 
 ## Implementation structure
 
-- A demonstration that the two-spin singet state is immune
-- to dipolar relaxation. Full Redfield superoperator for
-- dipolar relaxation in liquid state is computed and the
-- norm of its action on a singlet state is printed to the
-- console.
-- Calculation time: seconds
-- System specification
-- Relaxation theory parameters
-- Relaxation superoperator accuracy
-- Proximity cut-off
-- Basis set
-- Spinach housekeeping
+The function builds an unrestricted sphten-liouv basis, computes the relaxation superoperator, normalizes the singlet of spins 1 and 2, and prints the norm of the superoperator acting on that state.

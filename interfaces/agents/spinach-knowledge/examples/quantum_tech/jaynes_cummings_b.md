@@ -4,28 +4,16 @@
 
 ## Purpose
 
-Jaynes-Cummings coupling between a spin and an electromagnetic cavity mode with five population numbers included. A time-dom- ain simulation starting with transverse spin magnetisation and empty cavity mode. Detected on the Lx operator of the spin and magnetic field operator of the cavity mode. Calculation time: seconds
+A time-domain Jaynes–Cummings simulation of a spin coupled to an electromagnetic cavity mode. The initial state combines transverse spin magnetisation with an empty cavity; the trajectories report the spin's `Lx` and the cavity-field quadrature, and the example also plots cavity-level populations. Calculation time: seconds.
 
 ## Physical / mathematical content
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The physics is Jaynes-Cummings-like cavity QED: a two-level or few-level matter degree of freedom exchanges excitations with a quantised harmonic mode through rotating terms such as a†σ_- + aσ_+.
+- The system uses an electron spin and a five-level cavity mode, resonant at the electron frequency, with exchange coupling between them. The dynamics illustrate excitation exchange in the Jaynes–Cummings model.
 
 ## Numerical / algorithmic content
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
+- Spinach constructs the system in the `sphten-liouv` formalism with no basis approximation and propagates it through the cavity device context. The trajectory is sampled at 251 points over 2.5 μs.
 
 ## Implementation structure
 
-- Jaynes-Cummings coupling between a spin and an electromagnetic
-- cavity mode with five population numbers included. A time-dom-
-- ain simulation starting with transverse spin magnetisation and
-- empty cavity mode. Detected on the Lx operator of the spin and
-- magnetic field operator of the cavity mode.
-- Calculation time: seconds
-- Magnet field
-- System
-- Cavity resonant with the electron
-- Basis set
-- Spinach housekeeping
-- Sequence parameters
+- The source sets `sys.magnet=0.33`, uses isotopes `{'E','C5'}`, and sets the cavity exchange to `2.828e6`. The initial state is `state(...,{'Lx','BL1'},{1,2}) + state(...,{'E','BL1'},{1,2})/2`; the sequence uses spin `E`, offset `5e6`, sweep `1e8`, and `npoints=251`. It projects the trajectory onto the spin `Lx`, the cavity quadrature `(C-A)/2i`, and the `BL1`–`BL3` cavity-level populations.

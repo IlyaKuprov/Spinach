@@ -8,12 +8,15 @@ A simulation of Figure 2A in IK's paper on chemically amplified NOEs (https://do
 
 ## Physical / mathematical content
 
-- Spin-chemistry examples. These scripts treat radical pairs, recombination channels, chemically induced dynamic nuclear polarisation, and magnetic-field effects. The theory combines spin-selective kinetics with singlet-triplet interconversion.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+
+## Physical / mathematical content
+
+- At 14.1 T, the model is a 1H-19F pair with zero isotropic shifts, 50 Hz scalar coupling, and a fluorine CSA tensor with principal values `[-47 -16 63]`; the spins are separated by `2.60` along y.
+- Redfield relaxation retains secular terms, uses `tau_c=110e-12`, and is configured for equilibrium magnetisation at `298 K`. Pumping terms act on the proton and fluorine z-magnetisations; the proton also receives an additional relaxation term with coefficient `3.0`.
 
 ## Numerical / algorithmic content
 
-- Time propagation is explicit. In Spinach this usually means repeated application of matrix exponentials or propagator factorizations to density operators or state vectors in Hilbert/Liouville/Fokker-Planck space.
+- Starting from `unit_state + 2*Hz + 2*Fz`, the script evolves for 40 steps of `0.1 s` using three detection channels, `Fz`, `-HzFz`, and `Hz`. It plots these signals over 4 s.
 
 ## Implementation structure
 

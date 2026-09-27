@@ -4,31 +4,12 @@
 
 ## Purpose
 
-Basic two-transmon system with Duffing model interacti- ons and a flip-flop coupling; coherence transfer from transmon 1 to transmon 2. GRAPE optimisation with a distribution control powers and transmon offsets with a penalty on excess power. Calculation time: minutes.
+Coherence transfer from transmon 1 to transmon 2 in a coupled two-transmon Duffing model. GRAPE optimization accounts for distributions of control powers and transmon offsets and penalizes excess power. Calculation time: minutes.
 
-## Physical / mathematical content
+## Model and parameters
 
-- Quantum-technology examples. The files in this area model cavity QED, transmon qubits, NV centres, and related effective Hamiltonians. The recurring mathematics is finite-dimensional quantum dynamics with ladder operators, rotating-wave-style couplings, anharmonic oscillator terms, avoided crossings, and coherent control in coupled few-mode systems.
-- The numerical method is quasi-Newton optimisation: curvature information is approximated from successive step and gradient differences instead of forming exact second derivatives every iteration.
-- The optimisation logic is Newton or Newton-like: search directions use first- and second-order local curvature information, usually with regularisation or line-search safeguards.
-- The control theory content is GRAPE: fidelity derivatives are propagated through a piecewise-constant pulse sequence so that waveform samples can be improved by gradient-based optimisation.
-- The effective hardware model is a weakly anharmonic oscillator. Duffing nonlinearity breaks equal level spacing and allows qubit-like addressability within a truncated bosonic ladder.
+The T3 and T5 modes have rotating-frame frequencies 100 MHz and -200 MHz, anharmonicities -10 MHz and -20 MHz, and a 50 MHz flip-flop exchange coupling. The initial coherence is on transmon 1 and the target coherence is on transmon 2.
 
-## Numerical / algorithmic content
+## Optimization
 
-- The file is built around the standard Spinach workflow: create the spin system, choose a basis or context, assemble operators/superoperators, then propagate or analyse the resulting dynamics.
-
-## Implementation structure
-
-- Basic two-transmon system with Duffing model interacti-
-- ons and a flip-flop coupling; coherence transfer from
-- transmon 1 to transmon 2. GRAPE optimisation with a
-- distribution control powers and transmon offsets with
-- a penalty on excess power.
-- Calculation time: minutes.
-- Magnet field
-- Particle specification
-- Rotating frame transmon parameters
-- Formalism and basis
-- Spinach housekeeping
-- Drift Hamiltonian from the declared interactions
+The two control channels use five offset samples each, spanning -10 to 10 MHz per transmon. The pulse-power levels are `2*pi*[40,45,50,55,60] MHz*5`; the 200 slices are 0.25 ns each. GRAPE uses the SNSA penalty (weight 1.0), rbfgs method, and a 200-iteration limit, starting from a random two-channel pulse. The target is normalized using the Sørensen bound.

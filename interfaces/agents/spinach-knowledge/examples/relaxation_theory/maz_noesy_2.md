@@ -4,32 +4,16 @@
 
 ## Purpose
 
-Methylaziridine NOESY, including the effects of the scalar relaxation of the first kind (caused by the modulation of J-coupling by the nit- rogen centre inversion process) and second kind (caused by the rapid quadrupolar relaxation of the 14N nucleus). The calculation illustra- tes the effect described in: Calculation time: minutes.
+Simulates a methylaziridine NOESY spectrum with both scalar relaxation of the first kind, from nitrogen-centre inversion modulating J-couplings, and of the second kind, from rapid 14N quadrupolar relaxation. The source points to [the study describing this effect](http://dx.doi.org/10.1002/ange.201410271) and estimates minutes of calculation time.
 
 ## Physical / mathematical content
 
-- Relaxation-theory examples. The mathematical backbone is Bloch-Redfield-Wangsness or stochastic Liouville theory, spectral densities, cross-correlation terms, motional models, and extraction of longitudinal/transverse decay behaviour from superoperators.
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Propagation is accelerated with a Krylov-subspace method, replacing direct matrix exponentiation by projection into a much smaller Arnoldi/Lanczos-type subspace.
-- Signal processing is central here: the code moves between time and frequency domains, typically using FFT conventions, apodisation, zero filling, or heterodyne frequency shifts.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The eight-spin system contains seven protons and one 14N nucleus at 11.75 T. It uses vacuum-DFT shielding tensors, quadrupole and scalar couplings, and Cartesian coordinates in angstroms; isotropic shifts are assigned from experiment. Redfield, SRFK, and SRSK relaxation are enabled with zero equilibrium, kite retention, a 25 ps correlation time, and spin 4 as the SRSK source. SRFK uses correlation parameters `[1.0 1e-3]` and modulation depths of 15 for couplings `(1,5)`, `(2,5)`, and `(3,5)`.
 
 ## Numerical / algorithmic content
 
-- The output is processed in the Fourier domain, implying standard NMR/ESR signal-processing considerations such as acquisition bandwidth, zero filling, phase, and apodisation.
-- A Krylov-subspace or Arnoldi construction is used to avoid forming or exponentiating very large dense propagators directly.
+The calculation uses `sphten-liouv` with IK-2 approximation, scalar-coupling connectivity, and proximity level 4; inter-spin and proximity cutoffs are 2.0 and 4.0, and Krylov propagation is disabled. The NOESY sequence uses 2.0 s mixing, 500 Hz offset, 1400 Hz sweeps in both dimensions, 256 points per dimension, and 1024-point zero-filling in each dimension. Cosine apodisation and two-dimensional Fourier transforms produce the plotted spectrum.
 
 ## Implementation structure
 
-- Methylaziridine NOESY, including the effects of the scalar relaxation
-- of the first kind (caused by the modulation of J-coupling by the nit-
-- rogen centre inversion process) and second kind (caused by the rapid
-- quadrupolar relaxation of the 14N nucleus). The calculation illustra-
-- tes the effect described in:
-- Calculation time: minutes.
-- Magnet induction
-- Isotopes
-- Absolute shielding tensors (vacuum DFT)
-- Assign isotropic components from the experiment
-- Quadrupole couplings (vacuum DFT)
-- Scalar couplings (vacuum DFT)
+The script specifies the eight nuclei, shielding and coupling tensors, shifts, and coordinates, configures the three relaxation contributions, and builds the spin system and basis. It runs `liquid` with `@noesy`, initial proton `Lz` state, and the NMR context. The cosine and sine FIDs are apodised and transformed along F2, combined into the states signal, transformed along F1, and plotted as the negative real spectrum.

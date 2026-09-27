@@ -1,43 +1,26 @@
 # etc/textbook/rlx_hfc.m
 
-- Signature: `[r1,r2,rx]=rlx_hfc(B0,HFC,spins,tau_c)`
+## Signature
+
+`[r1,r2,rx]=rlx_hfc(B0,HFC,spins,tau_c)`
 
 ## Purpose
 
-Redfield theory expressions for hyperfine relaxation and cross- relaxation rates, isotropic tumbling in liquid phase. Syntax: [r1,r2,rx]=rlx_hfc(B0,A,spins,tau_c)
+Calculates Redfield longitudinal and transverse relaxation rates and longitudinal cross-relaxation for a pair of spins coupled by a hyperfine interaction under isotropic tumbling in a liquid. One of the two spins must be an electron.
 
-## Physical / mathematical content
+## Model and calculation
 
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
+The routine obtains the rank-1 and rank-2 Blicharski invariants of the hyperfine tensor and combines both contributions with spectral densities at the spins' Zeeman frequencies, their sum and difference, and zero frequency. Spin-square factors account for the two spin quantum numbers; the rotational diffusion coefficient is `1/(6*tau_c)`.
 
-## Numerical / algorithmic content
+## Inputs
 
-## Parameters / inputs
-
-- B0 -magnet field, Tesla
-- A -3x3 hyperfine coupling tensor,
-- not necessarily symmetric, rad/s
-- spins -the spins involved, e.g. {'E','15N'},
-- one of those must be an electron
-- tau_c -rotational correlation time, seconds
+- `B0`: magnetic field in tesla.
+- `HFC`: real 3-by-3 hyperfine coupling tensor in radians per second; it need not be symmetric.
+- `spins`: two isotope labels, one identifying an electron; for example, `{'E','15N'}`.
+- `tau_c`: positive rotational correlation time in seconds.
 
 ## Outputs
 
-- r1 -two longitudinal relaxation rates, Hz
-- r2 -two transverse relaxation rates, Hz
-- rx -longitudinal cross-relaxation rate, Hz
-
-## Implementation structure
-
-- Redfield theory expressions for hyperfine relaxation and cross-
-- relaxation rates, isotropic tumbling in liquid phase. Syntax:
-- [r1,r2,rx]=rlx_hfc(B0,A,spins,tau_c)
-- B0 -magnet field, Tesla
-- A -3x3 hyperfine coupling tensor,
-- not necessarily symmetric, rad/s
-- spins -the spins involved, e.g. {'E','15N'},
-- one of those must be an electron
-- tau_c -rotational correlation time, seconds
-- r1 -two longitudinal relaxation rates, Hz
-- r2 -two transverse relaxation rates, Hz
-- rx -longitudinal cross-relaxation rate, Hz
+- `r1`: two longitudinal relaxation rates, in the order of the input spins, in Hz.
+- `r2`: two transverse relaxation rates, in the order of the input spins, in Hz.
+- `rx`: longitudinal cross-relaxation rate, in Hz.

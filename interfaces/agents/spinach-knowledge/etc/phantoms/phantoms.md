@@ -4,36 +4,26 @@
 
 ## Purpose
 
-MRI phantom library. Syntax: [R1Ph,R2Ph,PDPh,dims,npts]=phantoms(ph_name)
+Loads a built-in MRI phantom and returns voxelwise longitudinal and transverse relaxation rates, proton density, physical dimensions, and voxel counts. Supported names are `boob`, `brain-highres`, `brain-medres`, and `brain-lowres`; other names raise an error.
 
-## Physical / mathematical content
+## Data and processing
 
-## Numerical / algorithmic content
+For `boob`, the function loads the bundled breast phantom and maps its tissue labels to proton-density, R1, and R2 values specified for 3 T. It assumes isotropic 1 mm voxels. For the three brain entries, it loads the bundled MRiLab brain phantom, sets R1=1/T1, R2=1/T2, and PD from the MRiLab proton-density field, and replaces infinite relaxation rates with zero. The medium- and low-resolution variants subsample the data by factors of 2 and 4, respectively; the high-resolution variant uses the stored sampling. Physical dimensions account for the corresponding sampling interval.
 
-## Parameters / inputs
+The result arrays follow MATLAB's voxel-array layout. The function requires `ph_name` to be a character array.
 
-- ph_name -character string giving the name of the
-- phantom (see the function text)
+## Inputs
+
+- `ph_name` — name of a supported phantom (see above).
 
 ## Outputs
 
-- R1Ph -a cube of R1 values
-- R2Ph -a cube of R2 values
-- PDPh -a cube of PD values
-- dims -row vector of three cube dimensions, m
-- npts -row vector of three cube dimensions, points
+- `R1Ph` — cube of longitudinal relaxation rates.
+- `R2Ph` — cube of transverse relaxation rates.
+- `PDPh` — cube of proton-density values.
+- `dims` — three-element row vector of physical dimensions in metres.
+- `npts` — three-element row vector of voxel counts.
 
-## Implementation structure
+## Reference
 
-- MRI phantom library. Syntax:
-- [R1Ph,R2Ph,PDPh,dims,npts]=phantoms(ph_name)
-- ph_name -character string giving the name of the
-- phantom (see the function text)
-- R1Ph -a cube of R1 values
-- R2Ph -a cube of R2 values
-- PDPh -a cube of PD values
-- dims -row vector of three cube dimensions, m
-- npts -row vector of three cube dimensions, points
-- Check consistency
-- Get own location
-- Load the breast phantom
+See the [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=phantoms.m).

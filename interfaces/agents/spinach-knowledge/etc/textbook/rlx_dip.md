@@ -1,42 +1,26 @@
 # etc/textbook/rlx_dip.m
 
-- Signature: `[r1,r2,rx]=rlx_dip(B0,spins,dist,tau_c)`
+## Signature
+
+`[r1,r2,rx]=rlx_dip(B0,spins,dist,tau_c)`
 
 ## Purpose
 
-Redfield theory expressions for dipolar relaxation and cross- relaxation rates, isotropic tumbling in liquid phase. Syntax: [r1,r2,rx]=rlx_dip(B0,spins,dist,tau_c)
+Calculates Redfield longitudinal and transverse relaxation rates and longitudinal cross-relaxation for a pair of spins coupled by their through-space dipolar interaction in an isotropically tumbling liquid.
 
-## Physical / mathematical content
+## Model and calculation
 
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+The routine constructs the dipolar interaction invariant from the inter-spin separation and combines it with each spin's spin-square factor. Spectral-density terms use the Zeeman frequencies, their sum and difference, and the zero-frequency contribution; the rotational diffusion coefficient is `1/(6*tau_c)`.
 
-## Numerical / algorithmic content
+## Inputs
 
-## Parameters / inputs
-
-- B0 -magnet field, Tesla
-- spins -the spins involved, e.g. {'1H','15N'}
-- dist -inter-spin distance, Angstrom
-- tau_c -rotational correlation time, seconds
+- `B0`: magnetic field in tesla.
+- `spins`: two isotope labels, for example `{'1H','15N'}`.
+- `dist`: inter-spin distance in angstroms.
+- `tau_c`: positive rotational correlation time in seconds.
 
 ## Outputs
 
-- r1 -two longitudinal relaxation rates, Hz
-- r2 -two transverse relaxation rates, Hz
-- rx -longitudinal cross-relaxation rate, Hz
-
-## Implementation structure
-
-- Redfield theory expressions for dipolar relaxation and cross-
-- relaxation rates, isotropic tumbling in liquid phase. Syntax:
-- [r1,r2,rx]=rlx_dip(B0,spins,dist,tau_c)
-- B0 -magnet field, Tesla
-- spins -the spins involved, e.g. {'1H','15N'}
-- dist -inter-spin distance, Angstrom
-- tau_c -rotational correlation time, seconds
-- r1 -two longitudinal relaxation rates, Hz
-- r2 -two transverse relaxation rates, Hz
-- rx -longitudinal cross-relaxation rate, Hz
-- Check consistency
-- Blicharsky invariant and rotational diffusion coefficient
+- `r1`: two longitudinal relaxation rates, in the order of the input spins, in Hz.
+- `r2`: two transverse relaxation rates, in the order of the input spins, in Hz.
+- `rx`: longitudinal cross-relaxation rate, in Hz.

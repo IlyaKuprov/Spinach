@@ -2,42 +2,19 @@
 
 - Signature: `ncards=hebrew(mode,max_cards) % #NWIKI #NHEAD`
 
-## Purpose
+Loads Hebrew vocabulary flashcards from Excel spreadsheets. Defaults are `mode="both"` and `max_cards=Inf`; mode names are case-insensitive. `max_cards=0` loads the spreadsheets and returns the number of cards without presenting them.
 
-IK's Hebrew flashcards function. The Excel files should contain Hebrew vocabulary in separate spreadsheets: nouns.xlsx -English, masculine singular, feminine singular, masculine plural, feminine plural, invariant, notes adverbs.xlsx, directions.xlsx, greetings.xlsx, languages.xlsx, numbers.xlsx, particles.xlsx, phrases.xlsx, prepositions.xlsx, pronouns.xlsx, proper_nouns.xlsx, quantifiers.xlsx, sex_terms.xlsx, weekda
+## Spreadsheet format
 
-## Physical / mathematical content
+These files use columns for English, masculine singular, feminine singular, masculine plural, feminine plural, invariant, and notes: `nouns.xlsx`, `adverbs.xlsx`, `directions.xlsx`, `greetings.xlsx`, `languages.xlsx`, `numbers.xlsx`, `particles.xlsx`, `phrases.xlsx`, `prepositions.xlsx`, `pronouns.xlsx`, `proper_nouns.xlsx`, `quantifiers.xlsx`, `sex_terms.xlsx`, `weekdays.xlsx`, and `question_words.xlsx`.
 
-## Numerical / algorithmic content
+`adjectives.xlsx` uses English, the four gender/number forms, and notes. `verbs.xlsx` uses English, infinitive, the four gender/number forms, and notes. Nonempty English/Hebrew forms containing Hebrew characters become cards; notes are not cards. An empty card set is an error.
 
-## Syntax
+## Modes
 
-```matlab
-hebrew()
-hebrew(mode)
-ncards=hebrew(mode,max_cards)
-hebrew('gui')
-The mode may be 'forward', 'backward', 'both', or 'gui'. In forward mode,
-English is shown first and Hebrew is revealed after <Enter>. In
-backward mode, Hebrew is shown first and English is revealed after
-<Enter>. In both mode, the direction is random on every card. Exit
-an open-ended run with CTRL+C. In gui mode, a one-button graphical
-flashcard window is opened; the button reveals the answer on the
-first click and advances to another randomly selected card on the
-second click.
-```
+- `forward`: show English, then reveal Hebrew after Enter.
+- `backward`: show Hebrew first, then reveal English.
+- `both`: choose a direction randomly for each card.
+- `gui`: open a one-button window; click to reveal the answer, then click again to advance. Direction is random, with immediate repeats avoided when possible.
 
-## Implementation structure
-
-- IK's Hebrew flashcards function. The Excel files should contain
-- Hebrew vocabulary in separate spreadsheets:
-- nouns.xlsx -English, masculine singular, feminine singular,
-- masculine plural, feminine plural, invariant,
-- notes
-- adverbs.xlsx, directions.xlsx, greetings.xlsx, languages.xlsx,
-- numbers.xlsx, particles.xlsx, phrases.xlsx,
-- prepositions.xlsx, pronouns.xlsx,
-- proper_nouns.xlsx, quantifiers.xlsx,
-- sex_terms.xlsx, weekdays.xlsx -same columns as
-- nouns.xlsx
-- adjectives.xlsx -English, masculine singular, feminine singular,
+Console cards are shuffled and reshuffled after all have been shown. `max_cards` limits the console run. Press Ctrl+C to stop an open-ended run.

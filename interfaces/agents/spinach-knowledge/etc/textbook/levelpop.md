@@ -4,41 +4,24 @@
 
 ## Purpose
 
-Equilibrium populations of the energy levels of a user-specified spin at the user-specified temperature. Energies are reported as fractions of kT at the temperature specified. Syntax: [E,P,dP]=levelpop(isotope,field,temperature)
+Calculates Zeeman-level energies and their thermal populations for the spin specified by `isotope`, in a static magnetic field and at a specified temperature. The spin multiplicity and magnetogyric ratio are obtained from `spin`.
 
-## Physical / mathematical content
+## Method
 
-## Numerical / algorithmic content
+The function builds the Zeeman Hamiltonian `H=-mg_ratio*field*S.z`. It returns its energy levels in units of `k_B T`, then evaluates and normalizes the Boltzmann factors `exp(-E)`. The population calculation is shifted by the minimum energy before exponentiation for numerical stability. `dP` contains the signed differences `P(j)-P(j+1)` for adjacent entries in the returned population vector. Because the Zeeman Hamiltonian includes the signed magnetogyric ratio, the level ordering and population differences depend on its sign.
 
-## Parameters / inputs
+## Inputs
 
-- isotope -character string specifying the isotope.
-- e.g. '1H', '13C', 'E', etc.
-- field -primary magnet field in Tesla
-- temperature -spin temperature, Kelvin
+- `isotope` — character array identifying the spin (for example, `'1H'`, `'13C'`, or `'E'`).
+- `field` — real scalar magnetic field in tesla.
+- `temperature` — non-zero real scalar spin temperature in kelvin.
 
 ## Outputs
 
-- E -vector of level energies, frac-
-- tions of kT at the temperature
-- specified
-- P -vector of level populations
-- dP -vector of population differences
-- for adjacent levels
-- Notes: the function is sensitive to the sign of the magnetogyric
-- ratio -negative for electrons, positive for protons, etc.
+- `E` — vector of Zeeman energies divided by `k_B T`.
+- `P` — normalized vector of level populations.
+- `dP` — signed population differences for adjacent vector entries.
 
-## Implementation structure
+## Reference
 
-- Equilibrium populations of the energy levels of a user-specified spin at
-- the user-specified temperature. Energies are reported as fractions of kT
-- at the temperature specified. Syntax:
-- [E,P,dP]=levelpop(isotope,field,temperature)
-- isotope -character string specifying the isotope.
-- e.g. '1H', '13C', 'E', etc.
-- field -primary magnet field in Tesla
-- temperature -spin temperature, Kelvin
-- E -vector of level energies, frac-
-- tions of kT at the temperature
-- specified
-- P -vector of level populations
+See the [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=levelpop.m).

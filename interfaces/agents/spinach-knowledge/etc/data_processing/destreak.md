@@ -1,40 +1,17 @@
 # etc/data_processing/destreak.m
 
 - Signature: `spectrum=destreak(spectrum)`
+- [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=Destreak.m)
 
 ## Purpose
 
-Reduces streak artefacts in 2D and 3D NMR spectra. Edges of the input spectrum must be free of genuine signals. Cell arrays and structures are processed recursively. Syntax: spectrum=destreak(spectrum)
+Reduce streak artefacts in multidimensional NMR spectra by subtracting signal-free edge contributions. The input edges used for this correction must not contain genuine signals.
 
-## Physical / mathematical content
+## Method
 
-## Numerical / algorithmic content
+For a numeric 2D array, the routine subtracts contributions repeated from the first column and first row. For a 3D array, it subtracts the corresponding first-plane/edge contributions along each dimension. Structs and cell arrays are traversed recursively; each contained value is passed back to `destreak`.
 
-- The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
+## Input and output
 
-## Parameters / inputs
-
-- spectrum -a 2D or a 3D array, or a cell
-- array, or a structure thereof
-
-## Outputs
-
-- spectrum -a 2D or a 3D array, or a cell
-- array, or a structure thereof
-- The function works by subtracting the kronecker propduct of edge
-- lines from the spectrum matrix.
-
-## Implementation structure
-
-- Reduces streak artefacts in 2D and 3D NMR spectra. Edges of the
-- input spectrum must be free of genuine signals. Cell arrays and
-- structures are processed recursively. Syntax:
-- spectrum=destreak(spectrum)
-- spectrum -a 2D or a 3D array, or a cell
-- array, or a structure thereof
-- The function works by subtracting the kronecker propduct of edge
-- lines from the spectrum matrix.
-- Process structures and cell arrays recursively
-- Get the field names
-- Loop over structure elements
-- Loop over field names
+- `spectrum` — numeric 2D or 3D array, cell array, or struct containing values processed recursively. Numeric vectors are rejected.
+- `spectrum` — corrected data, preserving the input container and array shape.

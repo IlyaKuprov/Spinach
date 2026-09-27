@@ -1,47 +1,33 @@
 # etc/estimators/guess_csa_pro.m
 
-- Signature: `CSAs=guess_csa_pro(aa_nums,pdb_ids,coords,options)`
+`CSAs=guess_csa_pro(aa_nums,pdb_ids,coords,options)`
 
-## Purpose
+This auxiliary routine estimates approximate chemical-shift-anisotropy (CSA) tensors in ppm for amide ¹⁵N, carbonyl ¹³C, and amide H atoms from a protein's local coordinates. It is called by the `protein.m` import module; direct calls are discouraged. Residue numbering is assumed to run from the N-terminus to the C-terminus, and proline is not handled. Missing required atoms leave the corresponding output cell empty; successful assignments and failures are reported to the command window. The estimates are explicitly described as very approximate; accurate relaxation analysis requires user-supplied tensors.
 
-Guesses a reasonable amide bond 15N CSA tensor anisotropy, and a reasonable 13C=O tensor anisotropy, given a local protein geome- try. The tensors are oriented roughly according to Proline is not currently handled, amino acids are assumed to be numbered from N-terminus to C-terminus. Syntax: CSAs=guess_csa_pro(aa_nums,pdb_ids,coords,options)
+## Inputs and output
 
-## Physical / mathematical content
+- `aa_nums`: amino-acid number for each input atom.
+- `pdb_ids`: cell array of PDB atom identifiers; `coords`: matching cell array of coordinate vectors. The three input arrays must have the same number of elements.
+- `options.nh_csa`: selects the nitrogen and proton eigenvalues: `'tcb'` (default), `'bax'`, or `'pol'`. The carbonyl-carbon values do not depend on this option.
+- `CSAs`: cell array in input order; assigned elements contain a 3-by-3 tensor, while unassigned elements remain empty. (The source comment names the output `CSAa`, but the function signature and returned variable are `CSAs`.)
 
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+Each tensor is formed as `V*D*V'`, with the geometry-derived principal axes in `V` and the eigenvalues in `D`. Eigenvalues below are listed in XX, YY, ZZ order, in ppm.
 
-## Numerical / algorithmic content
+| Site | `'tcb'` | `'bax'` | `'pol'` |
+|---|---:|---:|---:|
+| Amide ¹⁵N | −125, 45, 80 | −108, 62, 46 | −92.4, 34.7, 57.7 |
+| Amide H | 7, 0, −7 | 6, 0, −6 | 6.66, 0.67, −7.33 |
 
-## Parameters / inputs
+The carbonyl ¹³C values are 70, 5, −75 ppm (XX, YY, ZZ) for all three options.
 
-- aa_nums -a vector of amino acid numbers
-- pdb_ids -a cell array of PDB atom identifiers
-- coords -a cell array of coordinate vectors
-- options.nh_csa -'tcb' (default) for Tjandra, Curtis,
-- and Bodenhausen, 'bax' for Cornilescu
-- and Bax, and 'pol' for Case, Polenova
-- and Gronenborn eigenvalues and orien-
-- tations of the CSA tensors
+## Geometrical assignments
 
-## Outputs
+- The nitrogen in residue `n+1` is assigned from the preceding residue's carbonyl C and its own N and H. The ZZ axis follows the N-to-preceding-C direction; YY is normal to the plane defined with N-to-H, and XX completes the frame.
+- The carbonyl C in residue `n` requires C and CA in residue `n` and N in residue `n+1`. XX follows C-to-CA; ZZ is normal to the plane including the next N, and YY completes the frame.
+- Amide H in residue `n` requires H, N, and CA in `n`, plus C in `n−1`. YY follows CA-to-H; XX is normal to the plane defined by CA-to-N and preceding-C-to-N, and ZZ completes the frame.
 
-- CSAa -a cell array of 3x3 CSA tensors in ppm
-- Note: these CSAs are very approximate. For accurate relaxation
-- analysis you must supply your own tensors.
-- Note: this is an auxiliary function that is called by protein.m
-- protein import module. Direct calls are discouraged.
+The routine checks required input container types and matching element counts. It also uses geometry-distance checks to flag apparent non-sequential residue numbering; the source does not state the coordinate distance units.
 
-## Implementation structure
+The tensor orientations are associated in the source with [doi:10.1007/s10858-006-9037-6](https://doi.org/10.1007/s10858-006-9037-6), [doi:10.1021/ja00083a028](https://doi.org/10.1021/ja00083a028), and [doi:10.1021/ja042863o](https://doi.org/10.1021/ja042863o). The `'bax'` and `'pol'` branches also cite [doi:10.1021/ja0016194](https://doi.org/10.1021/ja0016194) and [doi:10.1039/C8CP00647D](https://doi.org/10.1039/C8CP00647D), respectively.
 
-- Guesses a reasonable amide bond 15N CSA tensor anisotropy, and a
-- reasonable 13C=O tensor anisotropy, given a local protein geome-
-- try. The tensors are oriented roughly according to
-- Proline is not currently handled, amino acids are assumed to be
-- numbered from N-terminus to C-terminus. Syntax:
-- CSAs=guess_csa_pro(aa_nums,pdb_ids,coords,options)
-- aa_nums -a vector of amino acid numbers
-- pdb_ids -a cell array of PDB atom identifiers
-- coords -a cell array of coordinate vectors
-- options.nh_csa -'tcb' (default) for Tjandra, Curtis,
-- and Bodenhausen, 'bax' for Cornilescu
-- and Bax, and 'pol' for Case, Polenova
+[Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=Guess_csa_pro.m).

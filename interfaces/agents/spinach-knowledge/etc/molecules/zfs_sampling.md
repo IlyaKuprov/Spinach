@@ -4,53 +4,26 @@
 
 ## Purpose
 
-Gadolinium ZFS probability distribution function for DOTA-type ligand complexes in cryogenic water-methanol glasses. The para- meters match those given in Figure 5 of
+Constructs a discrete probability distribution for the zero-field-splitting (ZFS) parameters of gadolinium complexes with DOTA-type ligands in cryogenic water–methanol glasses. The parameter distributions follow Figure 5 of the cited study.
 
-## Physical / mathematical content
+## Method
 
-- Orientation or trajectory averaging is performed numerically, so grid design, weights, and integration error control matter directly to accuracy and runtime.
+Gauss–Legendre quadrature nodes for the reduced parameter D/D₀ span [-2, 2]. Their weights are modulated by an equal-width double-Gaussian profile centered at -1 and +1; the common standard deviation corresponds to unit full width at half maximum. Nodes for E/D span [0, 1/3] and are weighted by the parabolic profile `-(E/D - 0.25)² + 0.0625`. The two node sets are combined as a Cartesian product, with product weights. Points whose joint weight is below `tol` are discarded, and the retained weights are renormalized.
 
-## Numerical / algorithmic content
+The function also plots the D/D₀ and E/D probability-density profiles used to construct the grid.
 
-- Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
+## Inputs
 
-## Syntax
-
-```matlab
-[D,E,W]=zfs_sampling(npoints_d,npoints_e,tol)
-```
-
-## Parameters / inputs
-
-- npoints_d -number of Gauss-Legendre quadrature
-- points in D
-- npoints_e -number of Gauss-Legendre quadrature
-- points in E
-- tol -tolerance for integration weights
-- below which grid points are dropped
+- `npoints_d` — number of Gauss–Legendre quadrature points for D/D₀; must be a finite real integer of at least 5.
+- `npoints_e` — number of Gauss–Legendre quadrature points for E/D; must be a finite real integer of at least 5.
+- `tol` — finite, non-negative real scalar threshold for discarding joint quadrature weights.
 
 ## Outputs
 
-- D -a vector of D values at each integration
-- grid point
-- E -a vector of E values at each integration
-- grid point
-- W -a vector of weights for each integration
-- grid point
-- Notes: the function also creates a figure with the distributi-
-- ons it has used for D and E parameters.
+- `D` — D/D₀ coordinate at each retained grid point.
+- `E` — E/D coordinate at each retained grid point.
+- `W` — normalized weight of each retained grid point.
 
-## Implementation structure
+## Reference
 
-- Gadolinium ZFS probability distribution function for DOTA-type
-- ligand complexes in cryogenic water-methanol glasses. The para-
-- meters match those given in Figure 5 of
-- [D,E,W]=zfs_sampling(npoints_d,npoints_e,tol)
-- npoints_d -number of Gauss-Legendre quadrature
-- points in D
-- npoints_e -number of Gauss-Legendre quadrature
-- points in E
-- tol -tolerance for integration weights
-- below which grid points are dropped
-- D -a vector of D values at each integration
-- grid point
+Parameter distributions are described in Figure 5 of [the cited study](https://doi.org/10.1007/BF03166762). See also the [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=zfs_sampling.m).

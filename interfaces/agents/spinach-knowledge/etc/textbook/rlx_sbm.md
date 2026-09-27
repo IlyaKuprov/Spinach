@@ -1,46 +1,31 @@
 # etc/textbook/rlx_sbm.m
 
-- Signature: `[r1,r2]=rlx_sbm(B0,nucleus,dist,a_iso,e_spin,g_eff,t1e,t2e,tau_r)`
+## Signature
+
+`[r1,r2]=rlx_sbm(B0,nucleus,dist,a_iso,e_spin,g_eff,t1e,t2e,tau_r)`
 
 ## Purpose
 
-Solomon-Bloembergen-Morgan nuclear relaxation rates due to a paramagnetic centre. Syntax: [r1,r2]=rlx_sbm(B0,nucleus,dist,a_iso,e_spin,g_eff,t1e,t2e,tau_r)
+Calculates nuclear longitudinal and transverse relaxation rates caused by a paramagnetic centre, using the Solomon–Bloembergen–Morgan (SBM) model. Dipolar and isotropic-hyperfine contact mechanisms are reported separately.
 
-## Physical / mathematical content
+## Model and calculation
 
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
+The dipolar terms depend on the electron–nucleus distance, the effective electron spin and g-factor, and correlation times combining rotational motion with the electron's longitudinal or transverse relaxation. The contact terms depend on the isotropic hyperfine coupling and electron relaxation times. The spectral-density convention is `J(omega,tau)=tau/(1+omega^2*tau^2)`.
 
-## Numerical / algorithmic content
+## Inputs
 
-## Parameters / inputs
-
-- B0 -magnet field, Tesla
-- nucleus -nuclear isotope, e.g. '1H' or '13C'
-- dist -electron-nucleus distance, Angstrom
-- a_iso -isotropic hyperfine coupling, rad/s
-- e_spin -effective electron spin quantum number
-- g_eff -effective electron g-factor
-- t1e -longitudinal electron relaxation time, seconds
-- t2e -transverse electron relaxation time, seconds
-- tau_r -rotational correlation time, seconds
+- `B0`: positive magnetic field in tesla.
+- `nucleus`: nuclear isotope label, for example `'1H'` or `'13C'`.
+- `dist`: electron–nucleus distance in angstroms.
+- `a_iso`: isotropic hyperfine coupling in radians per second.
+- `e_spin`: effective electron spin quantum number.
+- `g_eff`: effective electron g-factor.
+- `t1e`, `t2e`: electron longitudinal and transverse relaxation times, respectively, in seconds.
+- `tau_r`: rotational correlation time in seconds.
 
 ## Outputs
 
-- r1 -longitudinal rates [dipolar contact], Hz
-- r2 -transverse rates [dipolar contact], Hz
-- The spectral density convention is J(omega,tau)=tau/(1+omega^2*tau^2).
+Each output is a two-element vector `[dipolar, contact]`:
 
-## Implementation structure
-
-- Solomon-Bloembergen-Morgan nuclear relaxation rates due to a
-- paramagnetic centre. Syntax:
-- [r1,r2]=rlx_sbm(B0,nucleus,dist,a_iso,e_spin,g_eff,t1e,t2e,tau_r)
-- B0 -magnet field, Tesla
-- nucleus -nuclear isotope, e.g. '1H' or '13C'
-- dist -electron-nucleus distance, Angstrom
-- a_iso -isotropic hyperfine coupling, rad/s
-- e_spin -effective electron spin quantum number
-- g_eff -effective electron g-factor
-- t1e -longitudinal electron relaxation time, seconds
-- t2e -transverse electron relaxation time, seconds
-- tau_r -rotational correlation time, seconds
+- `r1`: longitudinal relaxation rates in Hz.
+- `r2`: transverse relaxation rates in Hz.

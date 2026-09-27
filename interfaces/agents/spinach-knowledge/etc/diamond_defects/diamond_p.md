@@ -1,41 +1,30 @@
 # etc/diamond_defects/diamond_p.m
 
-- Signature: `[sys,inter]=diamond_p(parameters)`
+- Signature: [sys,inter]=diamond_p(parameters)
 
 ## Purpose
 
-Phosphorus-related defect spin system for diamond. Syntax: [sys,inter]=diamond_p(parameters) Magnetic parameters from Nadolinny et al., Crystals 7, 237 (2017),
+Builds spin systems for the phosphorus-related diamond centres MA1, NP1–NP6, NP8, and NP9. The tabulated magnetic parameters are from Nadolinny et al., *Crystals* **7**, 237 (2017), https://doi.org/10.3390/cryst7080237.
 
 ## Physical / mathematical content
 
+The selected centre determines the electron g tensor and the set of nuclear hyperfine tensors. The model includes 31P nuclei and, for NP1–NP3, the specified 14N nuclei. MA1 may additionally include the reported 13C hyperfine coupling. The routine does not add zero-field splitting or nuclear quadrupole interactions.
+
 ## Numerical / algorithmic content
+
+The tabulated principal values are converted from mT to frequency units and transformed from their principal-axis frame to the requested crystal orientation. MA1's 13C coupling is optional and disabled by default.
 
 ## Parameters / inputs
 
-- parameters is a structure with the following fields:
-- .centre -'ma1', 'np1', 'np2', 'np3', 'np4', 'np5',
-- 'np6', 'np8', or 'np9'
-- .orientation -'111', '110', or '100' crystal plane normal
-- aligned with the magnetic field
-- .include_13c -include the reported 13C hyperfine coupling;
-- applies only to MA1 and defaults to false
+- parameters.centre: 'ma1', 'np1', 'np2', 'np3', 'np4', 'np5', 'np6', 'np8', or 'np9'.
+- parameters.orientation: '111', '110', or '100'; the corresponding crystal-plane normal is aligned with the magnetic field.
+- parameters.include_13c: scalar logical; include the reported 13C hyperfine coupling for MA1. Defaults to false; true is supported only for MA1.
 
 ## Outputs
 
-- sys -Spinach system specification structure
-- inter -Spinach interaction specification structure
+- sys: Spinach system specification structure.
+- inter: Spinach interaction specification structure.
 
 ## Implementation structure
 
-- Phosphorus-related defect spin system for diamond. Syntax:
-- [sys,inter]=diamond_p(parameters)
-- Magnetic parameters from Nadolinny et al., Crystals 7, 237 (2017),
-- parameters is a structure with the following fields:
-- .centre -'ma1', 'np1', 'np2', 'np3', 'np4', 'np5',
-- 'np6', 'np8', or 'np9'
-- .orientation -'111', '110', or '100' crystal plane normal
-- aligned with the magnetic field
-- .include_13c -include the reported 13C hyperfine coupling;
-- applies only to MA1 and defaults to false
-- sys -Spinach system specification structure
-- inter -Spinach interaction specification structure
+The function selects the table entry, builds its nuclei and tensors, rotates them for the selected orientation, and returns the Zeeman and electron–nuclear coupling matrices.

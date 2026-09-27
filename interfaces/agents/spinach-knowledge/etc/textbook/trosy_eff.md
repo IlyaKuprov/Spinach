@@ -1,52 +1,24 @@
 # etc/textbook/trosy_eff.m
 
-- Signature: `eff=trosy_eff(B0,isotopes,xyz,csa)`
+## Signature
+
+`eff=trosy_eff(B0,isotopes,xyz,csa)`
 
 ## Purpose
 
-TROSY efficiency in a two-spin system. Returns the extent of the cancellation of the CSA contribution to the trans- verse relaxation by the DD-CSA cross-correlation. Syntax: eff=trosy_eff(B0,isotopes,xyz,csa)
+Estimates how much of the CSA contribution to transverse linewidth is cancelled by dipole–dipole/CSA (DD–CSA) cross-correlation for two spin-1/2 nuclei. The result is the magnitude of the cross-correlation invariant divided by the second-rank CSA invariant; the function describes `eff=1` as the limit in which the linewidth is purely dipolar.
 
-## Physical / mathematical content
+## Model and calculation
 
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+The routine constructs the dipolar coupling tensor from the two coordinates and isotope labels. It removes the isotropic part of the first spin's chemical-shift tensor, scales its anisotropic part by the magnetic field and the spin gyromagnetic ratio, and evaluates the CSA invariant and its cross-invariant with the dipolar tensor.
 
-## Numerical / algorithmic content
+## Inputs
 
-## Parameters / inputs
+- `B0`: magnetic field in tesla.
+- `isotopes`: cell array of two spin-1/2 isotope labels, for example `{'19F','13C'}`.
+- `xyz`: cell array containing the two three-element Cartesian nuclear coordinates in angstroms.
+- `csa`: real 3-by-3 chemical-shift or shielding tensor for the first spin, in ppm. Its isotropic part is removed.
 
-- B0 -magnet field, Tesla
-- isotopes -a cell array with two character
-- strings, e.g. {'19F','13C'} spe-
-- cifying spin-1/2 isotopes
-- xyz -a cell array with two Cartesian
-- coordinate vectors in angstrom,
-- giving the locations of the two
-- nuclei
-- csa -3x3 chemical shielding or chemi-
-- cal shift (does not matter here)
-- tensor of the first spin in ppm;
-- its isotropic part will be drop-
-- ped automatically
+## Output
 
-## Outputs
-
-- eff -fraction of the CSA line width
-- that is compensated by DD-CSA
-- cross-correlation, 1 means that
-- the line width is purely dipolar
-
-## Implementation structure
-
-- TROSY efficiency in a two-spin system. Returns the extent
-- of the cancellation of the CSA contribution to the trans-
-- verse relaxation by the DD-CSA cross-correlation. Syntax:
-- eff=trosy_eff(B0,isotopes,xyz,csa)
-- B0 -magnet field, Tesla
-- isotopes -a cell array with two character
-- strings, e.g. {'19F','13C'} spe-
-- cifying spin-1/2 isotopes
-- xyz -a cell array with two Cartesian
-- coordinate vectors in angstrom,
-- giving the locations of the two
-- nuclei
+- `eff`: dimensionless magnitude ratio describing the CSA linewidth cancellation by DD–CSA cross-correlation.

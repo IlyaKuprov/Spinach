@@ -1,68 +1,27 @@
 # etc/textbook/rlx_dd_csa.m
 
-- Signature: `[A,B,X]=rlx_dd_csa(B0,tau_c,isotopes,deltas,coords)`
+## Signature
+
+`[A,B,X]=rlx_dd_csa(B0,tau_c,isotopes,deltas,coords)`
 
 ## Purpose
 
-Redfield theory expressions for some relaxation and cross- relaxation rates in a CSA-DD-CSA system with two spin-1/2 particles. Syntax: [A,B,X]=rlx_dd_csa(B0,tau_c,isotopes,deltas,coords)
+Calculates Redfield relaxation and cross-relaxation rates for two spin-1/2 particles coupled by dipole–dipole (DD) and chemical-shift-anisotropy (CSA) interactions. The results include the CSA and DD contributions to each spin's longitudinal and transverse rates, the corresponding TROSY-component rates, and the longitudinal cross-relaxation rate between the spins.
 
-## Physical / mathematical content
+## Model and calculation
 
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- The spin physics includes through-space magnetic dipole-dipole coupling, a rank-2 anisotropic interaction with strong orientation dependence and characteristic secular/non-secular structure.
-- Chemical-shift anisotropy is present: shielding is treated as a second-rank tensor whose orientation relative to the field or rotor axis modulates line shapes and transfer dynamics.
+The routine evaluates the CSA, dipolar, and CSA–DD cross-correlation contributions using the rotational correlation time and the interaction geometry. It reports broad and narrow TROSY-component transverse rates by adding or subtracting the absolute cross-correlation contribution from the CSA and DD contributions. The rotational correlation time is used in the spectral-density terms.
 
-## Numerical / algorithmic content
+## Inputs
 
-## Parameters / inputs
-
-- B0 -magnet field, Tesla
-- tau_c -rotational correlation time, seconds
-- isotopes -the spins involved, e.g. {'13C','19F'}
-- deltas -a cell array with two symmetric 3x3
-- chemical shift tensors in ppm
-- coords -a cell array with two 1x3 Cartesi-
-- an coordinate vectors in Angstrom
+- `B0`: magnetic field in tesla.
+- `tau_c`: rotational correlation time in seconds; it must be positive.
+- `isotopes`: two isotope labels, for example `{'13C','19F'}`.
+- `deltas`: cell array containing the two real, symmetric 3-by-3 chemical-shift tensors in ppm.
+- `coords`: cell array containing the two 1-by-3 Cartesian coordinate vectors in angstroms.
 
 ## Outputs
 
-- (A,B).r(1,2).csa -CSA contribution to R1 and R2
-- rates of spins A and B
-- (A,B).r(1,2).dd -dipolar contribution to R1 and
-- R2 rates of spins A and B
-- (A,B).r(1,2).total -total R1 and R2 rates
-- (A,B).trosy.dd -dipole contribution to the
-- transverse relaxation rate
-- of TROSY doublet components
-- of spins A and B
-- (A,B).trosy.csa -CSA contribution to the
-- transverse relaxation rate
-- of TROSY doublet components
-- of spins A and B
-- (A,B).trosy.xc -cross-correlation contribu-
-- tion to the transverse rela-
-- xation rate of TROSY doublet
-- components of spins A and B
-- (A,B).trosy.total_bro -transverse relaxation rate of
-- the broad TROSY doublet com-
-- ponent of spins A and B
-- (A,B).trosy.total_nar -transverse relaxation rate of
-- the narrow TROSY doublet com-
-- ponent of spins A and B
-- X -longitudinal cross-relaxation rate between
-- spins A and B
-
-## Implementation structure
-
-- Redfield theory expressions for some relaxation and cross-
-- relaxation rates in a CSA-DD-CSA system with two spin-1/2
-- particles. Syntax:
-- [A,B,X]=rlx_dd_csa(B0,tau_c,isotopes,deltas,coords)
-- B0 -magnet field, Tesla
-- tau_c -rotational correlation time, seconds
-- isotopes -the spins involved, e.g. {'13C','19F'}
-- deltas -a cell array with two symmetric 3x3
-- chemical shift tensors in ppm
-- coords -a cell array with two 1x3 Cartesi-
-- an coordinate vectors in Angstrom
-- (A,B).r(1,2).csa -CSA contribution to R1 and R2
+- `A` and `B`: structures containing, for each spin, the CSA (`csa`), dipolar (`dd`), and total (`total`) contributions to longitudinal (`r1`) and transverse (`r2`) relaxation rates.
+- `A.trosy` and `B.trosy`: `dd`, `csa`, and CSA–DD cross-correlation (`xc`) contributions, plus broad- and narrow-component transverse rates (`total_bro` and `total_nar`).
+- `X`: longitudinal cross-relaxation rate between spins A and B.

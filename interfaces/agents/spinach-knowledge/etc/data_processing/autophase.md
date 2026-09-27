@@ -1,41 +1,22 @@
 # etc/data_processing/autophase.m
 
 - Signature: `[spec,cheb_coeffs]=autophase(spec,guess)`
+- [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=autophase.m)
 
 ## Purpose
 
-Chebyshev phase corrector for 1D NMR spectra. Views the phase profile across the spectral window as a slowly va- rying function and approximates it with a linear combi- nation of low-order Chebyshev polynomials. Syntax: [spec,cheb_coeffs]=autophase(spec,guess)
+Correct the phase of a one-dimensional complex NMR spectrum by fitting a smooth phase profile represented by Chebyshev polynomials.
 
-## Physical / mathematical content
+## Method
 
-## Numerical / algorithmic content
+The spectral window is mapped to `[-1,1]`. `autophase` optimises the Chebyshev coefficients with `fminunc`, choosing phases that move the spectrum’s fourth-norm signal from the imaginary component toward the real component. The fitted phase multipliers are applied to the spectrum; the initial standard-deviation scaling is then undone.
 
-## Parameters / inputs
+## Inputs
 
-- spec -1D NMR spectrum, a complex vector
-- guess -initial guess for the Chebyshev polynomi-
-- al coefficients, radians. [phi 0 0] is a
-- good start, where phi is the zero-order
-- phase correction guess.
+- `spec` — finite, non-constant numeric vector containing the complex spectrum.
+- `guess` — finite real row vector of at least two initial Chebyshev coefficients, in radians. `[phi 0 0]` is a suggested initial value, where `phi` is the zero-order phase guess.
 
 ## Outputs
 
-- spec -phased NMR spectrum, a column vector
-- coeffs -Chebyshev polynomial coefficients of the
-- phase profile across the spectrum with
-- the window treated as a [-1,1] interval
-
-## Implementation structure
-
-- Chebyshev phase corrector for 1D NMR spectra. Views the
-- phase profile across the spectral window as a slowly va-
-- rying function and approximates it with a linear combi-
-- nation of low-order Chebyshev polynomials. Syntax:
-- [spec,cheb_coeffs]=autophase(spec,guess)
-- spec -1D NMR spectrum, a complex vector
-- guess -initial guess for the Chebyshev polynomi-
-- al coefficients, radians. [phi 0 0] is a
-- good start, where phi is the zero-order
-- phase correction guess.
-- spec -phased NMR spectrum, a column vector
-- coeffs -Chebyshev polynomial coefficients of the
+- `spec` — phase-corrected spectrum, returned as a column vector.
+- `cheb_coeffs` — fitted Chebyshev coefficients describing the phase profile across the spectral window.

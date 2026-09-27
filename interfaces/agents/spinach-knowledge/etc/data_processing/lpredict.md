@@ -1,37 +1,18 @@
 # etc/data_processing/lpredict.m
 
 - Signature: `y=lpredict(x,npcoeffs,npredps)`
+- [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=lpredict.m)
 
-## Purpose
+## Purpose and method
 
-Forward linear prediction. Syntax: y=lpredict(x,npcoeffs,npredps)
+Predict future samples of a real-valued time series by linear prediction. The routine centres and standardises the input, estimates autoregressive coefficients with MATLAB’s `lpc`, then recursively generates the requested samples. It rescales and recentres the predictions before returning them.
 
-## Physical / mathematical content
+## Inputs
 
-## Numerical / algorithmic content
+- `x` — real column vector with non-zero standard deviation.
+- `npcoeffs` — integer predictor order from 2 through `numel(x)`.
+- `npredps` — positive integer number of samples to predict.
 
-## Parameters / inputs
+## Output
 
-- x -input data, a column vector
-- npcoeffs -number of predictor coefficients,
-- must be greater than 1
-- npredps -number of data points to predict
-
-## Outputs
-
-- y -predicted points
-
-## Implementation structure
-
-- Forward linear prediction. Syntax:
-- y=lpredict(x,npcoeffs,npredps)
-- x -input data, a column vector
-- npcoeffs -number of predictor coefficients,
-- must be greater than 1
-- npredps -number of data points to predict
-- y -predicted points
-- Check consistency
-- Store and subtract the mean
-- Store and scale by stdev
-- Get linear predictor coefficients
-- Pre-allocate output
+- `y` — column vector of `npredps` predicted samples.

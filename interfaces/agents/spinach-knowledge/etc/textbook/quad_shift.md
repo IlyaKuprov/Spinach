@@ -4,47 +4,31 @@
 
 ## Purpose
 
-Second order shift of the centre of gravity of the powder pattern of |S,m> to |S,m-1> transition in the NMR spectrum of a quadrupo- lar nucleus with spin S. Equation (3) from
+Evaluates the second-order quadrupolar shift of the powder-pattern centre of gravity for the `|S,m⟩ → |S,m−1⟩` NMR transition of a quadrupolar nucleus.
 
-## Physical / mathematical content
+## Expression
 
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
-
-## Numerical / algorithmic content
-
-## Syntax
+The implementation uses Samoson's expression (Equation 3 in the cited paper):
 
 ```matlab
-delta=quad_shift(Cq,eta,v0,S,m)
+delta = -1e6*(3/40)*(Cq/v0)^2*(1+eta^2/3) ...
+        *(S*(S+1)-9*m*(m-1)-3)/(S^2*(2*S-1)^2);
 ```
 
-## Parameters / inputs
+The result is in ppm. The source notes that this expression was checked against numerical calculations.
 
-- Cq -quadrupolar constant, Hz
-- eta -quadrupolar asymmetry parameter
-- v0 -Larmor frequency of the nucleus, Hz
-- S -spin quantum number of the nucleus
-- m -projection quantum number of the
-- starting energy level
+## Inputs
 
-## Outputs
+- `Cq` — quadrupolar coupling constant in Hz; real scalar.
+- `eta` — quadrupolar asymmetry parameter; real scalar.
+- `v0` — nuclear Larmor frequency in Hz; real scalar.
+- `S` — nuclear spin; integer or half-integer greater than 1/2.
+- `m` — magnetic quantum number for an existing `|S,m⟩ → |S,m−1⟩` transition.
 
-- delta -quadrupolar shift in ppm
-- Note: a few papers contain an incorrect version of this expressi-
-- on; the one used here was tested against pure numerics and
-- found to be correct.
+## Output
 
-## Implementation structure
+- `delta` — second-order quadrupolar shift in ppm.
 
-- Second order shift of the centre of gravity of the powder pattern
-- of |S,m> to |S,m-1> transition in the NMR spectrum of a quadrupo-
-- lar nucleus with spin S. Equation (3) from
-- delta=quad_shift(Cq,eta,v0,S,m)
-- Cq -quadrupolar constant, Hz
-- eta -quadrupolar asymmetry parameter
-- v0 -Larmor frequency of the nucleus, Hz
-- S -spin quantum number of the nucleus
-- m -projection quantum number of the
-- starting energy level
-- delta -quadrupolar shift in ppm
-- Note: a few papers contain an incorrect version of this expressi-
+## Reference
+
+Samoson, Equation 3: [original article](https://doi.org/10.1016/0009-2614(85)85414-2). See also the [Spinach Wiki page](https://spindynamics.org/wiki/index.php?title=quad_shift.m).

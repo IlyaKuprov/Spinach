@@ -1,45 +1,28 @@
 # etc/textbook/rlx_nqi.m
 
-- Signature: `[r1,r2,t1,t2]=rlx_nqi(I,omega,C_q,eta_q,tau_c)`
+## Signature
+
+`[r1,r2,t1,t2]=rlx_nqi(I,omega,C_q,eta_q,tau_c)`
 
 ## Purpose
 
-Redfield theory expressions for quadrupolar relaxation rates, isotropic tumbling in liquid phase. Syntax: [r1,r2,t1,t2]=rlx_nqi(I,omega,C_q,eta_q,tau_c)
+Calculates Redfield longitudinal and transverse relaxation rates for a nucleus with spin `I` subject to quadrupolar relaxation in an isotropically tumbling liquid. The implementation accepts integer or half-integer `Ige1`.
 
-## Physical / mathematical content
+## Model and calculation
 
-- The relaxation model is Redfield-type perturbation theory: fluctuating interactions enter through correlation functions or spectral densities and generate a linear relaxation superoperator.
-- Quadrupolar physics is relevant: nuclei with spin > 1/2 interact with the electric field gradient tensor, introducing second-rank anisotropy, asymmetry, and overtone or MQ phenomena.
+The routine constructs the quadrupolar tensor from the coupling constant and asymmetry, evaluates its rank-2 Blicharski invariant, and applies the spectral-density terms at zero, the nuclear Zeeman frequency, and twice that frequency. It then returns relaxation times as the reciprocals of the corresponding rates.
 
-## Numerical / algorithmic content
+## Inputs
 
-## Parameters / inputs
-
-- I -nuclear spin quantum number
-- omega -nuclear Zeeman frequency, rad/s
-- C_q -quadrupolar coupling constant,
-- e^2*q*Q/h in Hz
-- eta_q -quadrupolar tensor asymmetry
-- tau_c -rotational correlation time, seconds
+- `I`: nuclear spin quantum number (integer or half-integer, at least 1).
+- `omega`: nuclear Zeeman frequency in radians per second.
+- `C_q`: quadrupolar coupling constant `e^2 q Q/h` in Hz.
+- `eta_q`: quadrupolar tensor asymmetry.
+- `tau_c`: positive rotational correlation time in seconds.
 
 ## Outputs
 
-- r1 -longitudinal relaxation rate, Hz
-- r2 -transverse relaxation rate, Hz
-- t1 -longitudinal relaxation time, seconds
-- t2 -transverse relaxation time, seconds
-
-## Implementation structure
-
-- Redfield theory expressions for quadrupolar relaxation rates,
-- isotropic tumbling in liquid phase. Syntax:
-- [r1,r2,t1,t2]=rlx_nqi(I,omega,C_q,eta_q,tau_c)
-- I -nuclear spin quantum number
-- omega -nuclear Zeeman frequency, rad/s
-- C_q -quadrupolar coupling constant,
-- e^2*q*Q/h in Hz
-- eta_q -quadrupolar tensor asymmetry
-- tau_c -rotational correlation time, seconds
-- r1 -longitudinal relaxation rate, Hz
-- r2 -transverse relaxation rate, Hz
-- t1 -longitudinal relaxation time, seconds
+- `r1`: longitudinal relaxation rate in Hz.
+- `r2`: transverse relaxation rate in Hz.
+- `t1`: longitudinal relaxation time in seconds, `1/r1`.
+- `t2`: transverse relaxation time in seconds, `1/r2`.

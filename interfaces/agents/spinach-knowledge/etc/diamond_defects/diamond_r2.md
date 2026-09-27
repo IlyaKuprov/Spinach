@@ -1,38 +1,16 @@
 # etc/diamond_defects/diamond_r2.m
 
-- Signature: `[sys,inter]=diamond_r2(parameters)`
+`[sys,inter]=diamond_r2(parameters)`
 
-## Purpose
+Builds a single-electron Spinach model for the R2 self-interstitial defect. The magnetic parameters are attributed to Hunt et al., *Physical Review B* **61**, 3863 (2000) ([doi:10.1103/PhysRevB.61.3863](https://doi.org/10.1103/PhysRevB.61.3863)).
 
-R2 self-interstitial spin system for diamond. Syntax: [sys,inter]=diamond_r2(parameters) Magnetic parameters from Hunt et al., Phys. Rev. B 61, 3863 (2000), https://doi.org/10.1103/PhysRevB.61.3863
+## Parameters
 
-## Physical / mathematical content
+- `parameters.d_sign`: real scalar multiplying the axial zero-field-splitting parameter, whose magnitude is 4173 MHz.
+- `parameters.orientation`: crystal plane normal, specified as `'111'`, `'110'`, or `'100'`; the chosen normal is aligned with the magnetic-field (laboratory z) axis.
 
-## Numerical / algorithmic content
+The electron g principal values are 2.0019, 2.0019, and 2.0021. The routine rotates the g and zero-field-splitting tensors into the selected field orientation, then returns them in Spinach's system and interaction structures. The electron isotope label is `E3`.
 
-## Parameters / inputs
+The input must be a structure with both fields present; the orientation must be one of the three listed character values, and `d_sign` must be a real numeric scalar.
 
-- parameters is a structure with the following fields:
-- .d_sign -sign of D
-- .orientation -'111', '110', or '100' crystal plane normal
-- aligned with the magnetic field
-
-## Outputs
-
-- sys -Spinach system specification structure
-- inter -Spinach interaction specification structure
-
-## Implementation structure
-
-- R2 self-interstitial spin system for diamond. Syntax:
-- [sys,inter]=diamond_r2(parameters)
-- Magnetic parameters from Hunt et al., Phys. Rev. B 61,
-- 3863 (2000), https://doi.org/10.1103/PhysRevB.61.3863
-- parameters is a structure with the following fields:
-- .d_sign -sign of D
-- .orientation -'111', '110', or '100' crystal plane normal
-- aligned with the magnetic field
-- sys -Spinach system specification structure
-- inter -Spinach interaction specification structure
-- Check input count
-- Check consistency
+[Spin Dynamics Wiki page](https://spindynamics.org/wiki/index.php?title=diamond_r2.m).

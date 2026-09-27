@@ -128,6 +128,13 @@ for m=1:n_mine
         end
     end
 
+    % Skip physical derivatives only where no unfrozen input can reach
+    if (n_outputs>2)&&any(freeze(:))
+        free_input=reshape(~freeze,ncont,nsteps);
+        free_local=reshape((abs(R)>0)*free_input>0,[],1);
+        spin_system.control.freeze=reshape(~any(J(:,free_local),2),ncont,nsteps);
+    end
+
     % Fidelity, trajectory, and derivatives
     outputs=cell(1,n_outputs);
     [outputs{:}]=grape(spin_system,L,spin_system.control.operators,local_waveform,rho_init,rho_targ,control.fidelity);

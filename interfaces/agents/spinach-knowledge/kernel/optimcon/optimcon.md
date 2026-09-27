@@ -15,6 +15,8 @@ Validates optimal control options and updates the spin system object. Syntax: sp
 
 ## Numerical / algorithmic content
 
+- Nonempty keyhole schedules with `newton` or `goodwin` are explicitly not implemented in `sphten-liouv`, `zeeman-liouv`, or `zeeman-wavef`. First-order `lbfgs`/`rbfgs` keyhole methods, empty schedules, and existing Hilbert-space keyhole Hessians remain available; no algorithm is substituted. The same method restriction is enforced at direct `grape_liouv` entry regardless of the requested output count.
+
 - The implementation explicitly addresses performance engineering through parallel or GPU execution, which matters because Spinach operators can become extremely large after basis expansion or powder/spatial lifting.
 - The code contains an inverse-problem or ill-conditioning aspect and therefore introduces explicit regularisation, model selection, or stabilisation logic.
 - Numerical integration over angles or geometry is part of the implementation, so point placement and weights are as important as the local Hamiltonian calculations.
@@ -56,18 +58,3 @@ Validates optimal control options and updates the spin system object. Syntax: sp
 - fresh optimcon() call: the frozen response operators are
 - built from the carriers seen here, and editing them after-
 - wards would replay physics that the optimiser never saw.
-
-## Implementation structure
-
-- Validates optimal control options and updates the spin system
-- object. Syntax:
-- spin_system=optimcon(spin_system,control)
-- spin_system -primary Spinach data structure,
-- created by create.m and updated
-- by basis.m functions
-- control -control data structure described
-- in detail in the online manual
-- spin_system -updated Spinach data structure
-- Note: this function freezes the optimisation problem. The ensemble
-- case catalog is built here, its cases are assigned to the
-- parallel pool workers in contiguous blocks recorded in

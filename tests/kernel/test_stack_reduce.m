@@ -201,6 +201,17 @@ result=test_true(result,'wide sparse screening',...
                  isequal(find(any(P,2)),[1;2]),...
                  '512 phased columns and one zero column retain only two reachable rows');
 
+% A late weak-column path may grow inside the existing union first
+H=sparse([1 4 4],[3 1 2],[1 1 -1],300,300);
+inputs=sparse([1 2 3],[1 1 2],[1 1 1],300,2);
+spin_system.tols.zte_tol=0.7;
+spin_system.tols.zte_nsteps=8;
+spin_system.tols.zte_maxden=1;
+P=zte(spin_system,H,inputs);
+result=test_true(result,'delayed support beyond union plateau',...
+                 any(P(4,:)),...
+                 'the second column reaches row four after an unchanged union count');
+
 end
 
 

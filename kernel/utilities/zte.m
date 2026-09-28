@@ -99,7 +99,7 @@ else
     report(spin_system,['a maximum of ' num2str(spin_system.tols.zte_nsteps) ...
                         ' steps shall be taken, ' num2str(timestep) ' seconds each.']);
     
-    % Initialise row maxima across the actual state columns
+    % Keep only row maxima globally; dense propagated batches are discarded
     amplitudes=max(abs(rho),[],2);
     report(spin_system,['evolution step 0, active space dimension ' ...
                         num2str(nnz(amplitudes>spin_system.tols.zte_tol))]);
@@ -107,29 +107,32 @@ else
     % Bound the dense workspace that step allocates for wide stacks
     batch_width=max(1,floor(16*1024^2/(16*size(rho,1))));
 
-    % Propagate stacks of columns at each time point
-    for n=2:spin_system.tols.zte_nsteps
+    % Propagate each multi-column batch until every column stops growing
+    for first=1:batch_width:size(rho,2)
+        columns=first:min(first+batch_width-1,size(rho,2));
+        block=rho(:,columns);
+        col_amplitudes=abs(block);
+        for n=2:spin_system.tols.zte_nsteps
 
-        % Record the active dimension before propagation
-        prev_space_dim=nnz(amplitudes>spin_system.tols.zte_tol);
+            % Record each column's active dimension independently
+            prev_space_dims=sum(col_amplitudes>spin_system.tols.zte_tol,1);
 
-        % Give step entire column batches with independent input scales
-        for first=1:batch_width:size(rho,2)
-            columns=first:min(first+batch_width-1,size(rho,2));
-            block=rho(:,columns);
+            % Normalise columns to preserve weak states in a shared step
             column_scales=max(abs(block),[],1);
             column_scales(column_scales==0)=1;
             block=step(spin_system,L,block./column_scales,timestep).*column_scales;
-            rho(:,columns)=block;
-            amplitudes=max(amplitudes,max(abs(block),[],2));
+            col_amplitudes=max(col_amplitudes,abs(block));
+
+            % A stagnant union can hide growth in an individual column
+            curr_space_dims=sum(col_amplitudes>spin_system.tols.zte_tol,1);
+            if all(curr_space_dims==prev_space_dims), break; end
+
         end
-        curr_space_dim=nnz(amplitudes>spin_system.tols.zte_tol);
-        report(spin_system,['evolution step ' num2str(n-1) ...
-                            ', active space dimension ' num2str(curr_space_dim)]);
-
-        % Terminate when the active dimension stops growing
-        if curr_space_dim==prev_space_dim, break; end
-
+        amplitudes=max(amplitudes,max(col_amplitudes,[],2));
+        report(spin_system,['screened state columns ' num2str(first) ...
+                            ' to ' num2str(columns(end)) ...
+                            ', active space dimension ' ...
+                            num2str(nnz(amplitudes>spin_system.tols.zte_tol))]);
     end
 
     % Determine which tracks to drop
